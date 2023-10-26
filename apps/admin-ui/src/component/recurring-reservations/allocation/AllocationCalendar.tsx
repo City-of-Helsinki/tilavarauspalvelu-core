@@ -1,13 +1,11 @@
 import { IconCheck, IconCross } from "hds-react";
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled, { css } from "styled-components";
 import { Strongish } from "common/src/common/typography";
-import {
-  ApplicationEventScheduleNode,
-  ApplicationEventNode,
-} from "common/types/gql-types";
-import { ALLOCATION_CALENDAR_TIMES, weekdays } from "../../../common/const";
+import { filterNonNullable } from "common/src/helpers";
+import { ApplicationEventNode } from "common/types/gql-types";
+import { ALLOCATION_CALENDAR_TIMES, weekdays } from "@/common/const";
 import {
   applicationEventSchedulesToCells,
   getSlotApplicationEventCount,
@@ -166,13 +164,10 @@ const AllocationCalendar = ({
 
   const { t } = useTranslation();
 
-  const activeSlots = useMemo(
-    () =>
-      getTimeSlots(
-        selectedApplicationEvent?.applicationEventSchedules as ApplicationEventScheduleNode[]
-      ),
-    [selectedApplicationEvent?.applicationEventSchedules]
+  const aesEvt = filterNonNullable(
+    selectedApplicationEvent?.applicationEventSchedules
   );
+  const activeSlots = getTimeSlots(aesEvt);
 
   return (
     <Wrapper>

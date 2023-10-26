@@ -19,7 +19,7 @@ import {
   getSlotApplicationEvents,
   getTimeSlotOptions,
 } from "./modules/applicationRoundAllocation";
-import ApplicationEventScheduleCard from "./ApplicationEventScheduleCard";
+import { ApplicationEventScheduleCard } from "./ApplicationEventScheduleCard";
 
 type Props = {
   applications: ApplicationNode[];

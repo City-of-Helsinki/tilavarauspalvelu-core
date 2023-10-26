@@ -13,7 +13,6 @@ import { publicUrl } from "../../../common/const";
 import { AllocationApplicationEventCardType } from "../../../common/types";
 import { formatDuration } from "../../../common/util";
 import { ageGroup } from "../../reservations/requested/util";
-import { getApplicationByApplicationEvent } from "./modules/applicationRoundAllocation";
 
 type Props = {
   applicationEvent: ApplicationEventNode;
@@ -117,9 +116,10 @@ const ApplicationEventCard = ({
 
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const application = getApplicationByApplicationEvent(
-    applications,
-    applicationEvent.pk ?? 0
+  // WHY? don't we already have application? or would it be a circular reference in gql
+  // also can we just refactor this so that applicantName + pk is passed here instead of applications?
+  const application = applications?.find((app) =>
+    app.applicationEvents?.find((ae) => ae?.pk === applicationEvent.pk)
   );
 
   if (!application || !applicationEvent) {

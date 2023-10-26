@@ -58,7 +58,7 @@ const AllApplicationRounds = dynamic(
 );
 const Criteria = dynamic(() => import(`${RECURRING_PATH}/Criteria`));
 const ApplicationRoundAllocation = dynamic(
-  () => import(`${RECURRING_PATH}/allocation/ApplicationRoundAllocation`)
+  () => import(`${RECURRING_PATH}/allocation/index`)
 );
 
 const withAuthorization = (component: JSX.Element, permission?: Permission) => (

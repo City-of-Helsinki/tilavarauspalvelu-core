@@ -7,6 +7,7 @@ import {
   type ReservationUnitType,
   type ReservationUnitByPkType,
 } from "common/types/gql-types";
+import { filterNonNullable } from "common/src/helpers";
 import type { ApplicationEventSchedulePriority } from "common/types/common";
 import i18next from "i18next";
 import type { OptionType } from "@/common/types";
@@ -75,17 +76,6 @@ export const getFilteredApplicationEvents = (
   }
 
   return applicationEvents || [];
-};
-
-export const getApplicationByApplicationEvent = (
-  applications: ApplicationNode[],
-  applicationEventId: number
-): ApplicationNode | undefined => {
-  return applications.find((application) =>
-    application?.applicationEvents?.find(
-      (applicationEvent) => applicationEvent?.pk === applicationEventId
-    )
-  );
 };
 
 export type Cell = {
@@ -241,33 +231,35 @@ export const getTimeSlotOptions = (
   return timeSlots;
 };
 
+type TimeSlotInput = {
+  day: number;
+  begin: string;
+  end: string;
+};
 export const getTimeSlots = (
-  applicationEventSchedules: ApplicationEventScheduleNode[]
+  applicationEventSchedules: TimeSlotInput[]
 ): string[] => {
-  return applicationEventSchedules?.reduce(
-    (acc: string[], cur: ApplicationEventScheduleNode) => {
-      const { day } = cur;
-      const [startHours, startMinutes] = cur.begin.split(":").map(Number);
-      const [endHours, endMinutes] = cur.end.split(":").map(Number);
-      const timeSlots: string[] = [];
-      for (let i = startHours; i <= endHours; i += 1) {
-        timeSlots.push(`${day}-${i}-00`);
-        timeSlots.push(`${day}-${i}-30`);
-      }
+  return applicationEventSchedules?.reduce<string[]>((acc, cur) => {
+    const { day } = cur;
+    const [startHours, startMinutes] = cur.begin.split(":").map(Number);
+    const [endHours, endMinutes] = cur.end.split(":").map(Number);
+    const timeSlots: string[] = [];
+    for (let i = startHours; i <= endHours; i += 1) {
+      timeSlots.push(`${day}-${i}-00`);
+      timeSlots.push(`${day}-${i}-30`);
+    }
 
-      if (startMinutes === 30) timeSlots.shift();
-      if (endMinutes === 0) {
-        timeSlots.pop();
-        timeSlots.pop();
-      }
-      if (endMinutes === 30) {
-        timeSlots.pop();
-      }
+    if (startMinutes === 30) timeSlots.shift();
+    if (endMinutes === 0) {
+      timeSlots.pop();
+      timeSlots.pop();
+    }
+    if (endMinutes === 30) {
+      timeSlots.pop();
+    }
 
-      return [...acc, ...timeSlots];
-    },
-    []
-  );
+    return [...acc, ...timeSlots];
+  }, []);
 };
 
 export const getTimeSeries = (
@@ -410,7 +402,6 @@ export type ApplicationEventScheduleResultStatuses = {
   declinedSlots: string[];
 };
 
-/* FIXME
 export const getApplicationEventScheduleResultStatuses = (
   applicationEvents: ApplicationEventNode[] | null
 ): ApplicationEventScheduleResultStatuses => {
@@ -424,31 +415,31 @@ export const getApplicationEventScheduleResultStatuses = (
       begin,
       end,
     };
-    return getTimeSlots([allocationResult as ApplicationEventScheduleNode]);
+    return getTimeSlots([allocationResult]);
   };
 
-  const schedules = applicationEvents?.flatMap(
-    (applicationEvent) => applicationEvent.applicationEventSchedules
-  ) as ApplicationEventScheduleNode[];
+  const schedules = filterNonNullable(
+    applicationEvents?.flatMap(
+      (applicationEvent) => applicationEvent.applicationEventSchedules
+    )
+  );
 
-  const { acceptedSlots, declinedSlots } = schedules.reduce(
-    (
-      acc: ApplicationEventScheduleResultStatuses,
-      cur: ApplicationEventScheduleNode
-    ): ApplicationEventScheduleResultStatuses => {
-      if (cur?.applicationEventScheduleResult?.accepted) {
-        const { allocatedDay, allocatedBegin, allocatedEnd } =
-          cur.applicationEventScheduleResult;
+  const { acceptedSlots, declinedSlots } =
+    schedules.reduce<ApplicationEventScheduleResultStatuses>(
+      (acc, cur) => {
+        const { allocatedDay, allocatedBegin, allocatedEnd } = cur;
 
+        if (!allocatedDay || !allocatedBegin || !allocatedEnd) {
+          return acc;
+        }
         const allocationResult = getResultTimeSlots(
-          allocatedDay as unknown as number,
+          allocatedDay,
           allocatedBegin,
           allocatedEnd
         );
-
         acc.acceptedSlots = [...acc.acceptedSlots, ...allocationResult];
-      }
 
+        /* TODO do we have declined slots?
       if (cur?.applicationEventScheduleResult?.declined) {
         const { allocatedDay, allocatedBegin, allocatedEnd } =
           cur.applicationEventScheduleResult;
@@ -460,15 +451,14 @@ export const getApplicationEventScheduleResultStatuses = (
         );
         acc.declinedSlots = [...acc.declinedSlots, ...allocationResult];
       }
-
-      return acc;
-    },
-    { acceptedSlots: [], declinedSlots: [] }
-  );
+      */
+        return acc;
+      },
+      { acceptedSlots: [], declinedSlots: [] }
+    );
 
   return {
     acceptedSlots,
     declinedSlots,
   };
 };
-*/

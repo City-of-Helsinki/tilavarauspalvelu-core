@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
+import { sortBy } from "lodash";
 import { H5 } from "common/src/common/typography";
 import {
   ApplicationEventNode,
@@ -12,6 +13,7 @@ import { AllocationApplicationEventCardType } from "@/common/types";
 import AllocationCalendar from "./AllocationCalendar";
 import ApplicationRoundAllocationActions from "./ApplicationRoundAllocationActions";
 import ApplicationEventCard from "./ApplicationEventCard";
+import { getApplicationEventScheduleResultStatuses } from "./modules/applicationRoundAllocation";
 
 const Content = styled.div`
   font-size: var(--fontsize-body-s);
@@ -69,19 +71,17 @@ const EventGroupList = ({
   }
   return (
     <div>
-      {applicationEvents.map((applicationEvent) => {
-        return (
-          <ApplicationEventCard
-            key={`${applicationEvent.pk}-${reservationUnit.pk}`}
-            applicationEvent={applicationEvent}
-            selectedApplicationEvent={selectedApplicationEvent}
-            setSelectedApplicationEvent={setSelectedApplicationEvent}
-            applications={applications}
-            reservationUnit={reservationUnit}
-            type={type}
-          />
-        );
-      })}
+      {applicationEvents.map((applicationEvent) => (
+        <ApplicationEventCard
+          key={`${applicationEvent.pk}-${reservationUnit.pk}`}
+          applicationEvent={applicationEvent}
+          selectedApplicationEvent={selectedApplicationEvent}
+          setSelectedApplicationEvent={setSelectedApplicationEvent}
+          applications={applications}
+          reservationUnit={reservationUnit}
+          type={type}
+        />
+      ))}
     </div>
   );
 };
@@ -97,7 +97,7 @@ function ApplicationEvents({
   applications,
   applicationEvents,
   reservationUnit,
-}: ApplicationEventsProps): JSX.Element | null {
+}: ApplicationEventsProps): JSX.Element {
   const { t } = useTranslation();
 
   const [isSelecting, setIsSelecting] = useState(false);
@@ -115,60 +115,30 @@ function ApplicationEvents({
   );
 
   useEffect(() => setSelection([]), [selectedApplicationEvent]);
-
   useEffect(() => setSelection([]), [reservationUnit]);
 
-  const allocatedApplicationEvents: ApplicationEventNode[] =
-    []; /* FIXME sortBy(
-    applicationEvents?.filter((applicationEvent) =>
-      applicationEvent?.applicationEventSchedules?.some(
-        (applicationEventSchedule) =>
-          applicationEventSchedule?.applicationEventScheduleResult?.accepted ===
-          true
-      )
-    ),
-    "name"
-  ); */
-
-  // explicitly declined application events and those that are blocked from current reservation unit
-  const declinedApplicationEvents: ApplicationEventNode[] = [];
-  /* FIXME
-  const declinedApplicationEvents = sortBy(
-    applicationEvents?.filter((applicationEvent) =>
-      applicationEvent?.applicationEventSchedules?.some(
-        (applicationEventSchedule) =>
-          applicationEventSchedule?.applicationEventScheduleResult?.declined ===
-          true
-      )
-    ),
+  const allocatedUnsorted = applicationEvents?.filter((applicationEvent) =>
+    applicationEvent?.applicationEventSchedules?.some(
+      (aes) => aes?.allocatedBegin != null
+    )
+  );
+  const allocatedApplicationEvents: ApplicationEventNode[] = sortBy(
+    allocatedUnsorted,
     "name"
   );
-  */
+
+  // const declinedApplicationEvents: ApplicationEventNode[] = []
 
   // take certain states and omit colliding application events
-  const unallocatedApplicationEvents: ApplicationEventNode[] = [];
-  /*
-  const unallocatedApplicationEvents = sortBy(
-    applicationEvents?.filter((applicationEvent) =>
-      applicationEvent?.applicationEventSchedules?.some(
-        (applicationEventSchedule) =>
-          applicationEventSchedule?.applicationEventScheduleResult === null ||
-          (applicationEventSchedule?.applicationEventScheduleResult
-            ?.accepted === false &&
-            applicationEventSchedule?.applicationEventScheduleResult
-              ?.declined === false)
-      )
-    ),
-    "name"
+  const ununsorted = applicationEvents?.filter((applicationEvent) =>
+    applicationEvent?.applicationEventSchedules?.some(
+      (aes) => aes?.allocatedBegin == null
+    )
   );
-  */
+  const unallocatedApplicationEvents = sortBy(ununsorted, "name");
 
-  // FIXME
-  const applicationEventScheduleResultStatuses = {
-    acceptedSlots: [],
-    declinedSlots: [],
-  };
-  // const applicationEventScheduleResultStatuses = getApplicationEventScheduleResultStatuses(applicationEvents)
+  const applicationEventScheduleResultStatuses =
+    getApplicationEventScheduleResultStatuses(applicationEvents);
 
   const paintApplicationEvents = (appEvents: ApplicationEventNode[]) => {
     setPaintedApplicationEvents(appEvents);
@@ -200,6 +170,7 @@ function ApplicationEvents({
               reservationUnit={reservationUnit}
               type="allocated"
             />
+            {/*
             <p>{t("Allocation.declinedApplicants")}</p>
             <EventGroupList
               applicationEvents={declinedApplicationEvents}
@@ -209,6 +180,7 @@ function ApplicationEvents({
               reservationUnit={reservationUnit}
               type="declined"
             />
+            */}
           </StyledAccordion>
         </ApplicationEventsContainer>
       </ApplicationEventList>

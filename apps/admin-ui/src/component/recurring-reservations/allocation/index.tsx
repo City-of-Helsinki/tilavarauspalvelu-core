@@ -7,13 +7,13 @@ import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import { H1, Strongish } from "common/src/common/typography";
 import {
-  type ApplicationNode,
   type QueryApplicationsArgs,
   type Query,
   type ApplicationEventNode,
   ApplicationStatusChoice,
   type ReservationUnitByPkType,
 } from "common/types/gql-types";
+import { filterNonNullable } from "common/src/helpers";
 import { AutoGrid, Container } from "@/styles/layout";
 import { OptionType } from "@/common/types";
 import { useNotification } from "@/context/NotificationContext";
@@ -84,23 +84,22 @@ function ApplicationRoundAllocation({
     }
   );
 
-  const applications =
-    applicationsData?.applications?.edges
-      .map((e) => e?.node)
-      ?.filter((x): x is ApplicationNode => x != null) ?? [];
+  const applications = filterNonNullable(
+    applicationsData?.applications?.edges.map((e) => e?.node)
+  );
 
-  const unitData = applications.flatMap((application) =>
-    application?.applicationEvents?.flatMap((ae) =>
-      ae?.eventReservationUnits
-        ?.flatMap((eru) => eru?.reservationUnit?.unit)
-        .filter((n): n is NonNullable<typeof n> => n != null)
+  const unitData = filterNonNullable(
+    applications.flatMap((application) =>
+      application?.applicationEvents?.flatMap((ae) =>
+        ae?.eventReservationUnits?.flatMap((eru) => eru?.reservationUnit?.unit)
+      )
     )
   );
   const units = uniqBy(unitData, "pk");
 
   const unitOptions = units.map((unit) => ({
-    value: unit?.pk,
-    label: unit?.nameFi,
+    value: unit.pk,
+    label: unit.nameFi,
   }));
 
   const timeOptions = [300, 200].map((n) => ({

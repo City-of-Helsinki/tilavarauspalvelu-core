@@ -81,7 +81,10 @@ export const APPLICATIONS_QUERY = gql`
 `;
 
 export const APPLICATIONS_BY_APPLICATION_ROUND_QUERY = gql`
-  query getApplicationsByPk($applicationRound: Int, $status: [String]) {
+  query getApplicationsByPk(
+    $applicationRound: Int
+    $status: [ApplicationStatusChoice]
+  ) {
     applications(applicationRound: $applicationRound, status: $status) {
       edges {
         node {
@@ -117,6 +120,19 @@ export const APPLICATIONS_BY_APPLICATION_ROUND_QUERY = gql`
               minimum
               maximum
             }
+            applicationEventSchedules {
+              pk
+              priority
+              day
+              begin
+              end
+              allocatedReservationUnit {
+                pk
+              }
+              allocatedDay
+              allocatedBegin
+              allocatedEnd
+            }
             eventReservationUnits {
               priority
               reservationUnit {
@@ -135,19 +151,10 @@ export const APPLICATIONS_BY_APPLICATION_ROUND_QUERY = gql`
   }
 `;
 
-/* FIXME these were removed how to refactor???
-export const CREATE_APPLICATION_EVENT_SCHEDULE_RESULT = gql`
-  mutation createApplicationEventScheduleResult(
-    $input: ApplicationEventScheduleResultCreateMutationInput!
-  ) {
-    createApplicationEventScheduleResult(input: $input) {
-      applicationEventSchedule
-      accepted
-      declined
-      allocatedReservationUnit
-      allocatedDay
-      allocatedBegin
-      allocatedEnd
+export const DECLINE_APPLICATION_EVENT_SCHEDULE = gql`
+  mutation ($input: ApplicationEventDeclineMutationInput!) {
+    declineApplicationEventSchedule(input: $input) {
+      pk
       errors {
         field
         messages
@@ -156,12 +163,10 @@ export const CREATE_APPLICATION_EVENT_SCHEDULE_RESULT = gql`
   }
 `;
 
-export const UPDATE_APPLICATION_EVENT_SCHEDULE_RESULT = gql`
-  mutation ($input: ApplicationEventScheduleResultUpdateMutationInput!) {
-    updateApplicationEventScheduleResult(input: $input) {
-      applicationEventSchedule
-      accepted
-      declined
+export const APPROVE_APPLICATION_EVENT_SCHEDULE = gql`
+  mutation ($input: ApplicationEventScheduleApproveMutationInput!) {
+    approveApplicationEventSchedule(input: $input) {
+      pk
       allocatedReservationUnit
       allocatedDay
       allocatedBegin
@@ -173,4 +178,3 @@ export const UPDATE_APPLICATION_EVENT_SCHEDULE_RESULT = gql`
     }
   }
 `;
-*/

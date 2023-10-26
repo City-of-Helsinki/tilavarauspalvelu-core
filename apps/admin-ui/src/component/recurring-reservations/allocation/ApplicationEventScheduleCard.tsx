@@ -2,28 +2,27 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Strong } from "common/src/common/typography";
+import { useMutation } from "@apollo/client";
 import {
-  ApplicationEventScheduleNode,
   ApplicationEventNode,
   ApplicationNode,
   ReservationUnitByPkType,
+  Mutation,
+  MutationApproveApplicationEventScheduleArgs,
 } from "common/types/gql-types";
+import { filterNonNullable } from "common/src/helpers";
 import { applicantName as getApplicantName } from "@/component/applications/util";
 import { formatDuration } from "@/common/util";
 import { SmallRoundButton } from "@/styles/buttons";
 import { useNotification } from "@/context/NotificationContext";
+import { useAllocationContext } from "@/context/AllocationContext";
 import {
   ApplicationEventScheduleResultStatuses,
   doSomeSlotsFitApplicationEventSchedule,
-  getApplicationByApplicationEvent,
   getApplicationEventScheduleTimeString,
+  timeSlotKeyToScheduleTime,
 } from "./modules/applicationRoundAllocation";
-/*
-import {
-  CREATE_APPLICATION_EVENT_SCHEDULE_RESULT,
-  UPDATE_APPLICATION_EVENT_SCHEDULE_RESULT,
-} from "../queries";
-*/
+import { APPROVE_APPLICATION_EVENT_SCHEDULE } from "../queries";
 
 type Props = {
   applicationEvent: ApplicationEventNode;
@@ -75,18 +74,6 @@ const Actions = styled.div`
   margin-top: var(--spacing-s);
 `;
 
-const getMatchingApplicationEventSchedules = (
-  selection: string[],
-  applicationEventSchedules: ApplicationEventScheduleNode[]
-): ApplicationEventScheduleNode[] => {
-  if (!applicationEventSchedules) {
-    return [];
-  }
-  return applicationEventSchedules.filter((applicationEventSchedule) =>
-    doSomeSlotsFitApplicationEventSchedule(applicationEventSchedule, selection)
-  );
-};
-
 const ApplicationEventScheduleCard = ({
   applicationEvent,
   applications,
@@ -94,15 +81,14 @@ const ApplicationEventScheduleCard = ({
   selection,
   applicationEventScheduleResultStatuses,
 }: Props): JSX.Element => {
-  // const { setRefreshApplicationEvents } = useAllocationContext();
-  const { notifyError } = useNotification();
+  const { setRefreshApplicationEvents } = useAllocationContext();
+  const { notifyError, notifySuccess } = useNotification();
   const { t } = useTranslation();
 
-  /*
   const [acceptApplicationEvent] = useMutation<
     Mutation,
-    MutationCreateApplicationEventArgs
-  >(CREATE_APPLICATION_EVENT_SCHEDULE_RESULT, {
+    MutationApproveApplicationEventScheduleArgs
+  >(APPROVE_APPLICATION_EVENT_SCHEDULE, {
     onCompleted: () => {
       notifySuccess(
         t("Allocation.acceptingSuccess", {
@@ -116,14 +102,14 @@ const ApplicationEventScheduleCard = ({
           ? "Allocation.errors.noPermission"
           : "Allocation.errors.acceptingFailed";
       notifyError(t(msg, { applicationEvent: applicationEvent.name }));
-      setProcessingResult(false);
     },
   });
 
-  const [acceptExistingApplicationEventScheduleResult] = useMutation<
+  /*
+  const [declineApplicationEvent] = useMutation<
     Mutation,
-    MutationUpdateApplicationEventArgs
-  >(UPDATE_APPLICATION_EVENT_SCHEDULE_RESULT, {
+    MutationDeclineApplicationEventScheduleArgs
+  >(DECLINE_APPLICATION_EVENT_SCHEDULE, {
     onCompleted: () => {
       notifySuccess(
         t("Allocation.acceptingSuccess", {
@@ -137,21 +123,20 @@ const ApplicationEventScheduleCard = ({
           ? "Allocation.errors.noPermission"
           : "Allocation.errors.acceptingFailed";
       notifyError(t(msg, { applicationEvent: applicationEvent.name }));
-      setProcessingResult(false);
     },
   });
   */
 
   const selectionDuration = formatDuration(selection.length * 30 * 60);
 
-  const application = getApplicationByApplicationEvent(
-    applications,
-    applicationEvent.pk ?? 0
+  const aes = filterNonNullable(applicationEvent?.applicationEventSchedules);
+  const matchingSchedules = aes.filter((ae) =>
+    doSomeSlotsFitApplicationEventSchedule(ae, selection)
   );
+  const matchingApplicationEventSchedule =
+    matchingSchedules.length > 0 ? matchingSchedules[0] : undefined;
 
   const handleAcceptSlot = async () => {
-    notifyError(t("FIXME not implemented"));
-    /*
     if (
       selection.length === 0 ||
       reservationUnit.pk == null ||
@@ -160,20 +145,22 @@ const ApplicationEventScheduleCard = ({
       notifyError(t("Allocation.errors.acceptingFailed"));
       return;
     }
-    setProcessingResult(true);
     const allocatedBegin = timeSlotKeyToScheduleTime(selection[0]);
     const allocatedEnd = timeSlotKeyToScheduleTime(
       selection[selection.length - 1],
       true
     );
     const input = {
-      accepted: true,
+      pk: matchingApplicationEventSchedule.pk,
       allocatedReservationUnit: reservationUnit.pk,
-      applicationEventSchedule: matchingApplicationEventSchedule.pk,
       allocatedDay: matchingApplicationEventSchedule.day,
       allocatedBegin,
       allocatedEnd,
     };
+
+    // FIXME accept existing only for now
+    // the other option would be to create a new event
+    /*
     if (
       matchingApplicationEventSchedule.applicationEventScheduleResult != null
     ) {
@@ -183,14 +170,13 @@ const ApplicationEventScheduleCard = ({
         },
       });
     } else {
-      await acceptApplicationEvent({
-        variables: {
-          input,
-        },
-      });
-    }
-    setRefreshApplicationEvents(true);
     */
+    await acceptApplicationEvent({
+      variables: {
+        input,
+      },
+    });
+    setRefreshApplicationEvents(true);
   };
 
   const parsedDuration =
@@ -200,25 +186,19 @@ const ApplicationEventScheduleCard = ({
           applicationEvent.maxDuration
         )}`;
 
-  const aes =
-    applicationEvent?.applicationEventSchedules?.filter(
-      (ae): ae is ApplicationEventScheduleNode => ae != null
-    ) ?? [];
   const primaryTimes = getApplicationEventScheduleTimeString(aes, 300);
   const secondaryTimes = getApplicationEventScheduleTimeString(aes, 200);
 
+  // WHY? don't we already have application? or would it be a circular reference in gql
+  // also can we just refactor this so that applicantName is passed here instead of applications?
+  const application = applications?.find((app) =>
+    app.applicationEvents?.find((ae) => ae?.pk === applicationEvent.pk)
+  );
   const applicantName =
     application != null ? getApplicantName(application) : "-";
   const isReservable = !selection.some((slot) =>
     applicationEventScheduleResultStatuses.acceptedSlots.includes(slot)
   );
-
-  const matchingSchedules = getMatchingApplicationEventSchedules(
-    selection,
-    aes
-  );
-  const matchingApplicationEventSchedule =
-    matchingSchedules.length > 0 ? matchingSchedules[0] : undefined;
 
   const disableAllocateButton =
     !reservationUnit.pk || !matchingApplicationEventSchedule || !isReservable;
@@ -254,4 +234,4 @@ const ApplicationEventScheduleCard = ({
   );
 };
 
-export default ApplicationEventScheduleCard;
+export { ApplicationEventScheduleCard };
