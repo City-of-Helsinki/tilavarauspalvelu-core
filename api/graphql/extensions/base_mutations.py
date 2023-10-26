@@ -10,7 +10,9 @@ from django.http import HttpRequest
 from graphene import ClientIDMutation, Field, InputField
 from graphene.types.utils import yank_fields_from_attrs
 from graphene_django.rest_framework.mutation import SerializerMutationOptions, fields_for_serializer
+from graphene_django.settings import graphene_settings
 from graphene_django.types import ErrorType
+from graphene_django.utils import camelize
 from graphene_permissions.permissions import AllowAny, BasePermission
 from rest_framework import serializers
 from rest_framework.serializers import ListSerializer, ModelSerializer, as_serializer_error
@@ -51,8 +53,28 @@ class BaseAuthMutation:
             return super().mutate(root=root, info=info, input=kwargs["input"])
         except (ValidationError, serializers.ValidationError) as error:
             detail = as_serializer_error(error)
-            errors = ErrorType.from_errors(detail)
+            detail = camelize(detail) if graphene_settings.CAMELCASE_ERRORS else detail
+            detail = flatten_errors(detail)
+            errors = [ErrorType(field=key, messages=value) for key, value in detail.items()]
             return cls(errors=errors)
+
+
+def flatten_errors(errors: dict[str, Any]) -> dict[str, list[str]]:
+    """
+    Flatten nested errors dict to a single level. E.g.
+
+    {"billing_address": {"city": ["msg1"], "post_code": ["msg2"]}}
+    -> {"billing_address.city": ["msg"], "billing_address.post_code": ["msg2"]}
+    """
+    flattened_errors: dict[str, list[str]] = {}
+    for field, error in errors.items():
+        if isinstance(error, dict):
+            for inner_field, inner_error in flatten_errors(error).items():
+                flattened_errors[f"{field}.{inner_field}"] = inner_error
+        else:
+            flattened_errors[field] = error
+
+    return flattened_errors
 
 
 class GetInstanceMixin:

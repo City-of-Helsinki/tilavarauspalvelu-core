@@ -302,8 +302,7 @@ def _format_for_query(value: Any) -> str:
     return json.dumps(value)
 
 
-def _build_query_definition(__name: str, /, **filter_params: Any) -> str:
-    query_def = f"{__name}"
+def _build_query_definition(query_def: str, /, **filter_params: Any) -> str:
     if filter_params:
         data = (f"{to_camel_case(key)}: {_format_for_query(value)}" for key, value in filter_params.items())
         query_def += f"({', '.join(data)})"
