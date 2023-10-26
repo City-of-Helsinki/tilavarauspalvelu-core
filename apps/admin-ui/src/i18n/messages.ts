@@ -668,6 +668,7 @@ const translations: ITranslations = {
       "Alla näet yhteenvedon aiemmin luoduista ilmoituksista. Voit luoda uusia ilmoituksia Varaamon yläreunaan Luo ilmoitus -painikkeesta.",
     ],
     isLoading: ["Ladataan ilmoitusta"],
+    loadMore: ["Lataa lisää"],
     noNotifications: ["Ei ilmoituksia"],
     newNotification: ["Luo ilmoitus"],
     noName: ["(ei nimeä)"],
@@ -1501,6 +1502,12 @@ const translations: ITranslations = {
     INTERVAL_30_MINS: ["30 min välein"],
     INTERVAL_60_MINS: ["1 tunnin välein"],
     INTERVAL_90_MINS: ["1,5 tunnin välein"],
+  },
+  ReservationStateFilter: {
+    label: ["Käsittelytila"],
+    state: {
+      CANCELLED: "",
+    },
   },
   ResourceModal: {
     modalTitle: ["Luo uusi resurssi tilalle"],
