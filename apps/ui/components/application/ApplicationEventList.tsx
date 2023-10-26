@@ -20,6 +20,9 @@ const filterPrimary = (n: ApplicationEventScheduleFormType) =>
 const filterSecondary = (n: ApplicationEventScheduleFormType) =>
   n.priority === 200;
 
+// NOTE: used by Preview and View
+// View.tsx uses FormContext because it's routed through [...params].tsx
+// it's not an actual page itself.
 const ApplicationEventList = ({
   allReservationUnits,
 }: {
@@ -72,7 +75,6 @@ const ApplicationEventList = ({
       );
     }) ?? [];
 
-  // TODO missing translations (weekdays)
   return (
     <>
       {aes.map((applicationEvent, i) => (

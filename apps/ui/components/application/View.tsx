@@ -17,6 +17,11 @@ type Props = {
   tos: TermsOfUseType[];
 };
 
+// TODO can refactor the use of ApplicationNode | ApplicationFormValues input type
+// for components used here
+// and instead just use FormContext here (remove the application prop)
+// because this is wrapped inside [...params].tsx
+// Though we'd like to remove [...params].tsx completely and use the file router instead.
 const ViewApplication = ({ application, tos }: Props): JSX.Element => {
   const { t } = useTranslation();
 
@@ -24,10 +29,14 @@ const ViewApplication = ({ application, tos }: Props): JSX.Element => {
   const router = useRouter();
 
   const { options } = useOptions();
-  const citiesOptions = options.cityOptions;
+  const cities = options.cityOptions;
 
   const tos1 = tos.find((n) => n.pk === "generic1");
   const tos2 = tos.find((n) => n.pk === "KUVAnupa");
+  const city = application.homeCity?.pk
+    ? cities.find((opt) => opt.value === application.homeCity?.pk?.toString())
+        ?.label
+    : "";
 
   return (
     <>
@@ -37,10 +46,7 @@ const ViewApplication = ({ application, tos }: Props): JSX.Element => {
         heading={t("application:preview.basicInfoSubHeading")}
         theme="thin"
       >
-        <ApplicantInfoPreview
-          cities={citiesOptions}
-          application={application}
-        />
+        <ApplicantInfoPreview city={city ?? "-"} application={application} />
       </Accordion>
       <ApplicationEventList
         allReservationUnits={

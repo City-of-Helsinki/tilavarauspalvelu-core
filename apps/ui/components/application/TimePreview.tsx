@@ -42,7 +42,7 @@ const Weekdays = ({
         return (
           <WeekWrapper key={day}>
             <Label>
-              {t(`calendar:${day}`)}
+              {t(`common:weekDayLong.${index}`)}
               {value && ":"}
             </Label>
             <div>{value}</div>

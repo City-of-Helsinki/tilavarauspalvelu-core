@@ -1,7 +1,6 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { OptionType } from "common/types/common";
 import {
   ApplicationNode,
   ApplicationsApplicationApplicantTypeChoices,
@@ -9,22 +8,26 @@ import {
 import { SpanTwoColumns, TwoColumnContainer } from "../common/common";
 import LabelValue from "../common/LabelValue";
 import Address from "./AddressPreview";
+import { ApplicationFormValues } from "./Form";
 
 const StyledLabelValue = styled(LabelValue).attrs({ theme: "thin" })``;
 
 const ApplicantInfoPreview = ({
   application,
-  cities,
+  city,
 }: {
-  application: ApplicationNode;
-  cities: OptionType[];
+  application: ApplicationNode | ApplicationFormValues;
+  city: string;
 }): JSX.Element => {
   const { t } = useTranslation();
 
   return (
     <TwoColumnContainer>
-      {application.applicantType !==
-      ApplicationsApplicationApplicantTypeChoices.Individual ? (
+      {application.applicantType == null ? (
+        // TODO translate (though this is more a system error than a user error)
+        <div style={{ gridColumn: "1 / -1" }}>ERROR: applicantType is null</div>
+      ) : application.applicantType !==
+        ApplicationsApplicationApplicantTypeChoices.Individual ? (
         <>
           <StyledLabelValue
             label={t("application:preview.organisation.name")}
@@ -50,14 +53,7 @@ const ApplicantInfoPreview = ({
           <SpanTwoColumns>
             <StyledLabelValue
               label={t("application:preview.homeCity")}
-              value={
-                application.homeCity?.pk
-                  ? cities.find(
-                      (city) =>
-                        city.value === application.homeCity?.pk?.toString()
-                    )?.label
-                  : ""
-              }
+              value={city}
             />
           </SpanTwoColumns>
           <Address
