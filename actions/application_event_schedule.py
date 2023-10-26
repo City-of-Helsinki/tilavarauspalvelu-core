@@ -82,6 +82,7 @@ class ApplicationEventScheduleActions:
                 purpose=application_event.purpose,
                 age_group=application_event.age_group,
                 home_city=application.home_city,
+                working_memo=application.working_memo,
                 # Person details
                 reservee_first_name=getattr(reservee, "first_name", ""),
                 reservee_last_name=getattr(reservee, "last_name", ""),
