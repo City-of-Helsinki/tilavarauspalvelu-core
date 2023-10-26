@@ -39,8 +39,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                     edges {
                         node {
                             user
-                            applicationPk
-                            applicationEventPk
+                            applicationEventSchedule
                             name
                         }
                     }
@@ -74,8 +73,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                     edges {
                         node {
                             user
-                            applicationPk
-                            applicationEventPk
+                            applicationEventSchedule
                             ageGroup {minimum maximum}
                             abilityGroup {name}
                             reservationUnit {nameFi}

@@ -14,9 +14,9 @@ pytestmark = [
 
 def test_general_admin_can_decline_application_event(graphql):
     # given:
-    # - There is an unallocated application event in a received application in an open application round
+    # - There is an unallocated application event in the allocation stage of the application round
     # - A general admin with application permissions is using the system
-    application = ApplicationFactory.create_in_status_received()
+    application = ApplicationFactory.create_in_status_in_allocation()
     application_event = application.application_events.first()
     general_admin = UserFactory.create_with_general_permissions(perms=["can_handle_applications"])
     graphql.force_login(general_admin)
@@ -37,9 +37,9 @@ def test_general_admin_can_decline_application_event(graphql):
 
 def test_service_sector_admin_can_decline_application_event(graphql):
     # given:
-    # - There is an unallocated application event in a received application in an open application round
+    # - There is an unallocated application event in the allocation stage of the application round
     # - A service sector admin with application permissions is using the system
-    application = ApplicationFactory.create_in_status_received()
+    application = ApplicationFactory.create_in_status_in_allocation()
     application_event = application.application_events.first()
     service_sector_admin = UserFactory.create_with_service_sector_permissions(
         service_sector=application.application_round.service_sector,
@@ -63,9 +63,9 @@ def test_service_sector_admin_can_decline_application_event(graphql):
 
 def test_regular_user_cannot_decline_application_event(graphql):
     # given:
-    # - There is an unallocated application event in a received application in an open application round
+    # - There is an unallocated application event in the allocation stage of the application round
     # - A regular user is using the system
-    application = ApplicationFactory.create_in_status_received()
+    application = ApplicationFactory.create_in_status_in_allocation()
     application_event = application.application_events.first()
     graphql.login_user_based_on_type(UserType.REGULAR)
 

@@ -1,5 +1,5 @@
-import uuid
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
+from uuid import UUID, uuid4
 
 from django.contrib.auth import get_user_model
 from django.core.validators import validate_comma_separated_integer_list
@@ -51,23 +51,39 @@ class ReservationDenyReason(models.Model):
 
 
 class RecurringReservation(models.Model):
-    uuid = models.UUIDField(default=uuid.uuid4, null=False, editable=False, unique=True)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    name: str = models.CharField(max_length=255, blank=True, default="")
+    description: str = models.CharField(max_length=500, blank=True, default="")
+    uuid: UUID = models.UUIDField(default=uuid4, editable=False, unique=True)
+    user: User | None = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
-    application = models.ForeignKey(
-        "applications.Application",
+    begin_date: date | None = models.DateField(null=True)
+    begin_time: date | None = models.TimeField(null=True)
+    end_date: date | None = models.DateField(null=True)
+    end_time: date | None = models.TimeField(null=True)
+
+    application_event_schedule = models.ForeignKey(
+        "applications.ApplicationEventSchedule",
+        on_delete=models.PROTECT,
         null=True,
         blank=True,
+        related_name="recurring_reservations",
+    )
+
+    reservation_unit = models.ForeignKey(
+        "reservation_units.ReservationUnit",
         on_delete=models.PROTECT,
         related_name="recurring_reservations",
     )
 
-    application_event = models.ForeignKey(
-        "applications.ApplicationEvent",
-        null=True,
+    recurrence_in_days: int | None = models.PositiveIntegerField(null=True)
+    """How many days between reoccurring reservations"""
+
+    weekdays: str = models.CharField(
+        max_length=16,
+        validators=[validate_comma_separated_integer_list],
+        choices=WEEKDAYS.CHOICES,
         blank=True,
-        on_delete=models.PROTECT,
-        related_name="recurring_reservations",
+        default="",
     )
 
     age_group = models.ForeignKey(
@@ -86,44 +102,7 @@ class RecurringReservation(models.Model):
         related_name="recurring_reservations",
     )
 
-    reservation_unit = models.ForeignKey(
-        "reservation_units.ReservationUnit",
-        null=False,
-        on_delete=models.PROTECT,
-        related_name="recurring_reservations",
-    )
-
-    name = models.CharField(
-        max_length=255,
-        null=False,
-        blank=True,
-        default="",
-    )
-
-    description = models.CharField(
-        max_length=500,
-        null=False,
-        default="",
-        blank=True,
-    )
-
-    recurrence_in_days = models.PositiveIntegerField(null=True)
-    """How many days between reoccurring reservations"""
-
-    weekdays = models.CharField(
-        max_length=16,
-        validators=[validate_comma_separated_integer_list],
-        choices=WEEKDAYS.CHOICES,
-        blank=True,
-        default="",
-    )
-
-    begin_date = models.DateField(null=True)
-    begin_time = models.TimeField(null=True)
-    end_date = models.DateField(null=True)
-    end_time = models.TimeField(null=True)
-
-    created = models.DateTimeField(auto_now_add=True)
+    created: datetime = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         base_manager_name = "objects"

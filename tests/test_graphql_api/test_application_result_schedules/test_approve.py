@@ -62,11 +62,8 @@ def test_approve_application_event_schedule__reservations_successful(graphql):
     assert schedule.allocated_end == schedule.end
     assert schedule.allocated_reservation_unit == reservation_unit
 
-    event.refresh_from_db()
-
-    recurring_reservations: list[RecurringReservation] = list(event.recurring_reservations.all())
+    recurring_reservations: list[RecurringReservation] = list(schedule.recurring_reservations.all())
     assert len(recurring_reservations) == 1
-    assert recurring_reservations[0].application == application
     assert recurring_reservations[0].reservation_unit == reservation_unit
 
     reservations: list[Reservation] = list(recurring_reservations[0].reservations.all())
@@ -91,6 +88,8 @@ def test_approve_application_event_schedule__reservations_successful(graphql):
     assert reservations[3].state == ReservationStateChoice.CONFIRMED
     assert reservations[3].begin == begin + datetime.timedelta(days=21)
     assert reservations[3].end == end + datetime.timedelta(days=21)
+
+    event.refresh_from_db()
 
     assert event.status == ApplicationEventStatusChoice.RESERVED
 
@@ -135,9 +134,7 @@ def test_approve_application_event_schedule__reservations_unsuccessful(graphql):
     assert schedule.allocated_end == schedule.end
     assert schedule.allocated_reservation_unit == reservation_unit
 
-    event.refresh_from_db()
-
-    recurring_reservations: list[RecurringReservation] = list(event.recurring_reservations.all())
+    recurring_reservations: list[RecurringReservation] = list(schedule.recurring_reservations.all())
     reservations: list[Reservation] = list(recurring_reservations[0].reservations.all())
     assert len(reservations) == 4
     assert reservations[0].state == ReservationStateChoice.DENIED
@@ -145,6 +142,7 @@ def test_approve_application_event_schedule__reservations_unsuccessful(graphql):
     assert reservations[2].state == ReservationStateChoice.DENIED
     assert reservations[3].state == ReservationStateChoice.DENIED
 
+    event.refresh_from_db()
     assert event.status == ApplicationEventStatusChoice.FAILED
 
 

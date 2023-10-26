@@ -12,8 +12,6 @@ from reservations.choices import ReservationStateChoice
 from reservations.models import AgeGroup, ReservationStatistic
 from tests.factories import (
     AbilityGroupFactory,
-    ApplicationEventFactory,
-    ApplicationFactory,
     RecurringReservationFactory,
     ReservationCancelReasonFactory,
     ReservationFactory,
@@ -33,7 +31,7 @@ class ReservationStatisticsCreateTestCase(TestCase):
             email="joe.reggie@foo.com",
         )
         cls.reservation_unit = ReservationUnitFactory(name="resu", unit=UnitFactory(name="mesta", tprek_id="1234"))
-        cls.recurring = RecurringReservationFactory()
+        cls.recurring = RecurringReservationFactory(application_event_schedule=None)
         cls.priority = PriorityChoice.LOW
         cls.priority_name = PriorityChoice(cls.priority).name
         cls.reservation_data = {
@@ -137,8 +135,6 @@ class ReservationStatisticsCreateTestCase(TestCase):
     def test_is_applied_has_ability_group_name(self):
         self.reservation.recurring_reservation = RecurringReservationFactory(
             ability_group=AbilityGroupFactory(name="abbis"),
-            application=ApplicationFactory(),
-            application_event=ApplicationEventFactory(),
         )
         self.reservation.save()
 

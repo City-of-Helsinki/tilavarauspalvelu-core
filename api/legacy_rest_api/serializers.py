@@ -324,46 +324,22 @@ class ReservationSerializer(serializers.ModelSerializer):
             "recurring_reservation",
             "type",
         ]
-        extra_kwargs = {
-            "state": {
-                "help_text": "State of the reservation. Default is 'created'.",
-            },
-            "priority": {
-                "help_text": "Priority of this reservation. Higher priority reservations replaces lower ones.",
-            },
-            "buffer_time_before": {
-                "help_text": "Buffer time while reservation unit is unreservable before the reservation. "
-                "Dynamically calculated from spaces and resources.",
-            },
-            "buffer_time_after": {
-                "help_text": "Buffer time while reservation unit is unreservable after the reservation. "
-                "Dynamically calculated from spaces and resources.",
-            },
-            "begin": {
-                "help_text": "Begin date and time of the reservation.",
-            },
-            "end": {
-                "help_text": "End date and time of the reservation.",
-            },
-            "recurring_reservation": {
-                "help_text": "Id relation to recurring reservation object if the reservation is part of recurrence.",
-            },
-        }
 
-    def get_begin_weekday(self, instance):
+    def get_begin_weekday(self, instance: Reservation):
         return instance.begin.weekday()
 
-    def get_application_event_name(self, instance):
+    def get_application_event_name(self, instance: Reservation):
         if instance.recurring_reservation:
-            return instance.recurring_reservation.application_event.name
+            return instance.recurring_reservation.application_event_schedule.application_event.name
         return None
 
-    def get_reservation_user(self, instance):
+    def get_reservation_user(self, instance: Reservation):
         if not instance.recurring_reservation:
             return None
 
-        if instance.recurring_reservation.application.organisation:
-            return instance.recurring_reservation.application.organisation.name
+        org = instance.recurring_reservation.application_event_schedule.application_event.application.organisation
+        if org:
+            return org.name
 
         return instance.user.get_full_name()
 
@@ -397,8 +373,7 @@ class RecurringReservationSerializer(serializers.ModelSerializer):
         model = RecurringReservation
         fields = [
             "id",
-            "application_id",
-            "application_event_id",
+            "application_event_schedule_id",
             "age_group",
             "purpose_name",
             "group_size",
@@ -410,31 +385,8 @@ class RecurringReservationSerializer(serializers.ModelSerializer):
             "reservations",
             "denied_reservations",
         ]
-        extra_kwargs = {
-            "application": {
-                "help_text": "Application of the recurring reservation.",
-            },
-            "application_event": {
-                "help_text": "Application event of the recurring reservation.",
-            },
-            "age_group": {
-                "help_text": "Age group of the recurring reservation.",
-            },
-            "ability_group": {
-                "help_text": "Ability group of the recurring reservation.",
-            },
-            "first_reservation_begin": {
-                "help_text": "Datetime when first reservation of the recurring reservation begins.",
-            },
-            "last_reservation_end": {
-                "help_text": "Datetime when last reservation of the recurring reservation ends.",
-            },
-            "denied_reservations": {
-                "help_text": "Serialized set of reservations that were denied for the recurring reservation."
-            },
-        }
 
-    def get_begin_weekday(self, instance):
+    def get_begin_weekday(self, instance: RecurringReservation):
         reservations = instance.reservations.all()
 
         if reservations:
@@ -444,7 +396,7 @@ class RecurringReservationSerializer(serializers.ModelSerializer):
 
         return None
 
-    def get_first_reservation_begin(self, instance):
+    def get_first_reservation_begin(self, instance: RecurringReservation):
         reservations = instance.reservations.all()
 
         if reservations:
@@ -454,7 +406,7 @@ class RecurringReservationSerializer(serializers.ModelSerializer):
 
         return None
 
-    def get_last_reservation_end(self, instance):
+    def get_last_reservation_end(self, instance: RecurringReservation):
         reservations = instance.reservations.all()
 
         if reservations:
@@ -464,8 +416,8 @@ class RecurringReservationSerializer(serializers.ModelSerializer):
 
         return None
 
-    def get_purpose_name(self, instance):
-        purpose = instance.application_event.purpose
+    def get_purpose_name(self, instance: RecurringReservation):
+        purpose = instance.application_event_schedule.application_event.purpose
         if purpose:
             return purpose.name
         return None

@@ -105,8 +105,7 @@ class ApplicationEventScheduleActions:
     def create_recurring_reservation_for_schedule(self) -> RecurringReservation:
         return RecurringReservation.objects.create(
             user=self.schedule.application_event.application.user,
-            application=self.schedule.application_event.application,
-            application_event=self.schedule.application_event,
+            application_event_schedule=self.schedule,
             age_group=self.schedule.application_event.age_group,
             ability_group=self.schedule.application_event.ability_group,
             reservation_unit=self.schedule.allocated_reservation_unit,

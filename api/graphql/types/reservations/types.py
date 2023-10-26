@@ -63,8 +63,7 @@ class RecurringReservationType(AuthNode, OldPrimaryKeyObjectType):
     permission_classes = (RecurringReservationPermission,)
 
     user = graphene.String()
-    application_pk = graphene.Int()
-    application_event_pk = graphene.Int()
+    application_event_schedule = graphene.Int()
     age_group = graphene.Field(AgeGroupType)
     ability_group = graphene.Field(AbilityGroupType)
     weekdays = graphene.List(graphene.Int)
@@ -73,8 +72,7 @@ class RecurringReservationType(AuthNode, OldPrimaryKeyObjectType):
         model = RecurringReservation
         fields = [
             "user",
-            "application_pk",
-            "application_event_pk",
+            "application_event_schedule",
             "age_group",
             "ability_group",
             "name",
@@ -100,18 +98,10 @@ class RecurringReservationType(AuthNode, OldPrimaryKeyObjectType):
         return root.user.email
 
     @recurring_reservation_non_public_field
-    def resolve_application_pk(root: RecurringReservation, info: GQLInfo) -> int | None:
-        if not root.application_id:
+    def resolve_application_event_schedule(root: RecurringReservation, info: GQLInfo) -> int | None:
+        if not root.application_event_schedule:
             return None
-
-        return root.application.id
-
-    @recurring_reservation_non_public_field
-    def resolve_application_event_pk(root: RecurringReservation, info: GQLInfo) -> int | None:
-        if not root.application_event_id:
-            return None
-
-        return root.application_event.id
+        return root.application_event_schedule.pk
 
     def resolve_weekdays(root: RecurringReservation, info: GQLInfo) -> list[graphene.List]:
         return root.weekday_list

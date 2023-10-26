@@ -80,6 +80,7 @@ class RecurringReservationFactory(GenericDjangoModelFactory[RecurringReservation
     class Meta:
         model = RecurringReservation
 
+    application_event_schedule = factory.SubFactory("tests.factories.ApplicationEventScheduleFactory")
     reservation_unit = factory.SubFactory("tests.factories.ReservationUnitFactory")
 
     @factory.post_generation

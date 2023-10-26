@@ -10,7 +10,6 @@ from factory import fuzzy
 from applications.choices import ApplicationEventStatusChoice, WeekdayChoice
 from applications.models import ApplicationEvent, ApplicationEventSchedule, EventReservationUnit
 from reservations.choices import ReservationStateChoice
-from reservations.models import RecurringReservation
 
 from ._base import GenericDjangoModelFactory
 
@@ -63,7 +62,7 @@ class ApplicationEventFactory(GenericDjangoModelFactory[ApplicationEvent]):
         kwargs.setdefault("application_event_schedules__allocated_begin", None)
         kwargs.setdefault("application_event_schedules__allocated_end", None)
         kwargs.setdefault("application_event_schedules__allocated_reservation_unit", None)
-        kwargs.setdefault("recurring_reservations", None)
+        kwargs.setdefault("application_event_schedules__recurring_reservations", None)
 
         if "application" not in kwargs:
             sub_kwargs = cls.pop_sub_kwargs("application", kwargs)
@@ -80,7 +79,7 @@ class ApplicationEventFactory(GenericDjangoModelFactory[ApplicationEvent]):
         from .application import ApplicationFactory
 
         cls._add_allocated_args(kwargs)
-        kwargs.setdefault("recurring_reservations", None)
+        kwargs.setdefault("application_event_schedules__recurring_reservations", None)
 
         if "application" not in kwargs:
             sub_kwargs = cls.pop_sub_kwargs("application", kwargs)
@@ -98,7 +97,10 @@ class ApplicationEventFactory(GenericDjangoModelFactory[ApplicationEvent]):
         from .application import ApplicationFactory
 
         cls._add_allocated_args(kwargs)
-        kwargs.setdefault("recurring_reservations__reservations__state", ReservationStateChoice.CONFIRMED)
+        kwargs.setdefault(
+            "application_event_schedules__recurring_reservations__reservations__state",
+            ReservationStateChoice.CONFIRMED,
+        )
 
         if "application" not in kwargs:
             sub_kwargs = cls.pop_sub_kwargs("application", kwargs)
@@ -116,7 +118,10 @@ class ApplicationEventFactory(GenericDjangoModelFactory[ApplicationEvent]):
         from .application import ApplicationFactory
 
         cls._add_allocated_args(kwargs)
-        kwargs.setdefault("recurring_reservations__reservations__state", ReservationStateChoice.DENIED)
+        kwargs.setdefault(
+            "application_event_schedules__recurring_reservations__reservations__state",
+            ReservationStateChoice.DENIED,
+        )
 
         if "application" not in kwargs:
             sub_kwargs = cls.pop_sub_kwargs("application", kwargs)
@@ -154,23 +159,6 @@ class ApplicationEventFactory(GenericDjangoModelFactory[ApplicationEvent]):
 
             kwargs.setdefault("application_event", self)
             ApplicationEventScheduleFactory.create(**kwargs)
-
-    @factory.post_generation
-    def recurring_reservations(
-        self,
-        create: bool,
-        recurring_reservations: Iterable[RecurringReservation] | None,
-        **kwargs: Any,
-    ) -> None:
-        if not create:
-            return
-
-        if not recurring_reservations and kwargs:
-            from .reservation import RecurringReservationFactory
-
-            kwargs.setdefault("application_event", self)
-            kwargs.setdefault("application", self.application)
-            RecurringReservationFactory.create(**kwargs)
 
     @factory.post_generation
     def event_reservation_units(
