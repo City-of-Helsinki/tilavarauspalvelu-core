@@ -2,7 +2,7 @@ import pytest
 
 from tests.factories import ApplicationEventScheduleFactory
 from tests.helpers import UserType
-from tests.test_graphql_api.test_application_result_schedules.helpers import schedules_query
+from tests.test_graphql_api.test_application_event_schedule.helpers import schedules_query
 
 # Applied to all tests
 pytestmark = [

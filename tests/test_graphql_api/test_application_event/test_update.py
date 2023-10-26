@@ -5,8 +5,8 @@ import pytest
 from applications.choices import ApplicationEventStatusChoice
 from applications.models import ApplicationEvent
 from common.utils import timedelta_from_json
-from tests.factories import ApplicationFactory
-from tests.test_graphql_api.test_application_events.helpers import CREATE_MUTATION, get_application_event_create_data
+from tests.factories import ApplicationEventFactory
+from tests.test_graphql_api.test_application_event.helpers import UPDATE_MUTATION, get_application_event_update_data
 
 # Applied to all tests
 pytestmark = [
@@ -15,17 +15,17 @@ pytestmark = [
 ]
 
 
-def test_create_application_event(graphql):
+def test_update_application_event(graphql):
     # given:
-    # - There is draft application in an open application round
+    # - There is an unallocated application event in a draft application in an open application round
     # - The owner of the application is using the system
-    application = ApplicationFactory.create_in_status_draft()
-    graphql.force_login(application.user)
+    application_event = ApplicationEventFactory.create_in_status_unallocated()
+    graphql.force_login(application_event.application.user)
 
     # when:
-    # - User tries to create a new application event
-    data = get_application_event_create_data(application=application)
-    response = graphql(CREATE_MUTATION, input_data=data)
+    # - User tries to update the application event
+    data = get_application_event_update_data(application_event=application_event)
+    response = graphql(UPDATE_MUTATION, input_data=data)
 
     # then:
     # - The response contains no errors
@@ -41,7 +41,7 @@ def test_create_application_event(graphql):
 
     assert event.name == data["name"]
     assert event.num_persons == data["numPersons"]
-    assert event.application == application
+    assert event.application == application_event.application
     assert event.age_group_id == data["ageGroup"]
     assert event.ability_group_id == data["abilityGroup"]
     assert event.purpose_id == data["purpose"]
@@ -59,19 +59,19 @@ def test_create_application_event(graphql):
     assert event.status == ApplicationEventStatusChoice.UNALLOCATED
 
 
-def test_cannot_create_application_event_with_smaller_max_duration_than_min_duration(graphql):
+def test_cannot_update_application_event_with_smaller_max_duration_than_min_duration(graphql):
     # given:
-    # - There is draft application in an open application round
+    # - There is an unallocated application event in a draft application in an open application round
     # - The owner of the application is using the system
-    application = ApplicationFactory.create_in_status_draft()
-    graphql.force_login(application.user)
+    application_event = ApplicationEventFactory.create_in_status_unallocated()
+    graphql.force_login(application_event.application.user)
 
     # when:
-    # - User tries to create a new application event with a smaller max duration than min duration
-    data = get_application_event_create_data(application=application)
+    # - User tries to update the application event with a smaller max duration than min duration
+    data = get_application_event_update_data(application_event=application_event)
     data["minDuration"] = "01:00:00"
     data["maxDuration"] = "00:45:00"
-    response = graphql(CREATE_MUTATION, input_data=data)
+    response = graphql(UPDATE_MUTATION, input_data=data)
 
     # then:
     # - The response contains an error about the max duration

@@ -3,7 +3,7 @@ import pytest
 from applications.models import ApplicationEvent
 from tests.factories import ApplicationEventFactory
 from tests.helpers import UserType
-from tests.test_graphql_api.test_application_events.helpers import (
+from tests.test_graphql_api.test_application_event.helpers import (
     DELETE_MUTATION,
     get_application_event_delete_data,
 )

@@ -2,7 +2,7 @@ import pytest
 
 from tests.factories import ApplicationEventFactory, UnitFactory, UnitGroupFactory, UserFactory
 from tests.helpers import UserType
-from tests.test_graphql_api.test_application_events.helpers import events_query
+from tests.test_graphql_api.test_application_event.helpers import events_query
 
 # Applied to all tests
 pytestmark = [

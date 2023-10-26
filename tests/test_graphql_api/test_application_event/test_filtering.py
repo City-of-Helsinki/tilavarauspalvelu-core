@@ -4,7 +4,7 @@ from applications.choices import ApplicantTypeChoice
 from applications.models import ApplicationEvent, EventReservationUnit
 from tests.factories import ApplicationEventFactory, ApplicationFactory
 from tests.helpers import UserType
-from tests.test_graphql_api.test_application_events.helpers import events_query
+from tests.test_graphql_api.test_application_event.helpers import events_query
 
 # Applied to all tests
 pytestmark = [
