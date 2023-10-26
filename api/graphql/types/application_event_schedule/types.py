@@ -24,7 +24,7 @@ class ApplicationEventScheduleNode(DjangoAuthNode):
             "allocated_end",
             "allocated_reservation_unit",
         ]
-        private_fields = {
+        restricted_fields = {
             "declined": user_has_staff_permissions,
             "allocated_day": user_has_staff_permissions,
             "allocated_begin": user_has_staff_permissions,

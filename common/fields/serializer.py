@@ -11,12 +11,17 @@ __all__ = [
 
 
 class IntPkOnlyObject(PKOnlyObject):
+    """PK object that is coerced to an integer."""
+
     def __int__(self) -> int:
         return int(self.pk)
 
 
 class IntegerPrimaryKeyField(serializers.PrimaryKeyRelatedField, serializers.IntegerField):
-    """A field that refers to foreign keys by an integer primary key."""
+    """
+    A field that refers to foreign keys by an integer primary key.
+    If `common.serializers.BaseModelSerializer` is used, this field is automatically used for foreign keys.
+    """
 
     def get_attribute(self, instance) -> IntPkOnlyObject | None:
         attribute = super().get_attribute(instance)
@@ -26,7 +31,11 @@ class IntegerPrimaryKeyField(serializers.PrimaryKeyRelatedField, serializers.Int
 
 
 class IntChoiceField(serializers.IntegerField):
-    """Pairs with 'common.fields.model.IntChoiceField' to allow plain integers as choices in graphql endpoints."""
+    """
+    Pairs with 'common.fields.model.IntChoiceField' to allow plain integers as choices in graphql endpoints.
+    If `common.serializers.BaseModelSerializer` is used, this field is automatically used for
+    model fields using `common.fields.model.IntChoiceField`.
+    """
 
     default_error_messages = serializers.IntegerField.default_error_messages | {
         "invalid_choice": gettext_lazy('"{input}" is not a valid choice.'),

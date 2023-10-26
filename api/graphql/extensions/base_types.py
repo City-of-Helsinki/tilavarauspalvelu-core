@@ -52,7 +52,7 @@ class DjangoAuthNode(DjangoObjectType):
       `get_queryset` and `get_node` methods.
     - Adds the `filter_queryset` method that can be overridden to add additional filtering for both
       `get_queryset` and `get_node` querysets.
-    - Adds option to define a `Meta.private_fields` dict, which adds permission checks to the resolvers of
+    - Adds option to define a `Meta.restricted_fields` dict, which adds permission checks to the resolvers of
       the fields defined in the dict. This can be used to hide fields from users that do not have
       permission to view them.
     """
@@ -89,7 +89,7 @@ class DjangoAuthNode(DjangoObjectType):
     def __init_subclass_with_meta__(
         cls,
         permission_classes: tuple[BasePermission] | None = None,
-        private_fields: dict[str, Check] | None = None,
+        restricted_fields: dict[str, Check] | None = None,
         **options: Any,
     ) -> None:
         _meta = DjangoObjectTypeOptions(cls)
@@ -106,7 +106,7 @@ class DjangoAuthNode(DjangoObjectType):
         if not hasattr(cls, "pk") and (fields == "__all__" or "pk" in fields):
             cls._add_pk_field(model)
 
-        cls._add_field_permission_checks(fields, private_fields)
+        cls._add_field_permission_checks(fields, restricted_fields)
 
         options.setdefault("connection_class", TVPBaseConnection)
         options.setdefault("interfaces", (graphene.relay.Node,))
@@ -122,8 +122,8 @@ class DjangoAuthNode(DjangoObjectType):
         cls.resolve_pk = cls.resolve_id
 
     @classmethod
-    def _add_field_permission_checks(cls, fields: list[str], private_fields: dict[str, Check]) -> None:
-        for field_name, check in (private_fields or {}).items():
+    def _add_field_permission_checks(cls, fields: list[str], restricted_fields: dict[str, Check]) -> None:
+        for field_name, check in (restricted_fields or {}).items():
             if field_name not in fields:
                 continue
 

@@ -1,7 +1,7 @@
 from collections.abc import Iterable
 from copy import deepcopy
 from enum import Enum
-from typing import Any, Generic, Literal, Self, TypeVar
+from typing import Any, Literal, Self, TypeVar
 
 import graphene
 from django.core.exceptions import ValidationError
@@ -78,6 +78,8 @@ def flatten_errors(errors: dict[str, Any]) -> dict[str, list[str]]:
 
 
 class GetInstanceMixin:
+    """Mixin class that provides a `get_instance` method for retrieving the object to be mutated."""
+
     _meta: SerializerMutationOptions
 
     @classmethod
@@ -98,6 +100,38 @@ class GetInstanceMixin:
 
 
 class ModelSerializerAuthMutation(BaseAuthMutation, ClientIDMutation):
+    """
+    Base mutation class for create and update operations.
+
+    Options are set in Meta-class:
+
+    ```
+    class Mutation(CreateMutation):
+        class Meta:
+            serializer_class = MySerializer
+    ```
+
+    `serializer_class` attribute is required, and should be set to a
+    ModelSerializer class for the model to be created/updated.
+
+    Optionally, the `permission_classes` attribute can be set to specify
+    which permissions are required to mutate the object (defaults to AllowAny).
+
+    Optionally for update, the `lookup_field` attribute can be set to specify which
+    field to use for looking up the instance (defaults to the object's
+    primary key, which is usually `id`). Note that the `lookup_field`
+    attribute has to be available from the serializer's 'Meta.fields' definition!
+
+    Optionally, the `output_serializer_class` attribute can be set to specify
+    a different serializer class for the output data (defaults to the same
+    serializer class as for the input data, which is modified so that all
+    fields are non-required, enabling partial updates).
+
+    Optionally, the `node` attribute must be set if the serializer contains a nested
+    ModelSerializer (or a ListSerializer containing a ModelSerializer) as a field.
+    (see. `api.graphql.extensions.base_mutations.ModelSerializerAuthMutation._check_for_node`)
+    """
+
     class Meta:
         abstract = True
 
@@ -307,10 +341,7 @@ class ModelSerializerAuthMutation(BaseAuthMutation, ClientIDMutation):
 
     @classmethod
     def get_instance(cls, **kwargs: Any) -> TModel | None:
-        """
-        Get the object to be updated or None if we're creating a new object.
-        Should raise a serializers.ValidationError if the object does not exist.
-        """
+        """Overridden by `GetInstanceMixin` for update."""
         return None
 
     @classmethod
@@ -330,6 +361,29 @@ class ModelSerializerAuthMutation(BaseAuthMutation, ClientIDMutation):
 
 
 class ModelAuthMutation(BaseAuthMutation, ClientIDMutation, GetInstanceMixin):
+    """
+    Base mutation class for deleting a model instance.
+    Adds a `validate` class-method for performing additional validation before deletion.
+
+    Options are set in Meta-class:
+
+    ```
+    class Mutation(CreateMutation):
+        class Meta:
+            model = MyModel
+    ```
+
+    `model` attribute is required, and should be set to a
+    Model class for the model to be deleted.
+
+    Optionally, the `permission_classes` attribute can be set to specify
+    which permissions are required to delete the object (defaults to AllowAny).
+
+    Optionally, the `lookup_field` attribute can be set to specify which
+    field to use for looking up the instance (defaults to the object's
+    primary key, which is usually `id`).
+    """
+
     class Meta:
         abstract = True
 
@@ -380,13 +434,7 @@ class ModelAuthMutation(BaseAuthMutation, ClientIDMutation, GetInstanceMixin):
         return {}
 
 
-class CreateAuthMutation(ModelSerializerAuthMutation, Generic[TModel]):
-    """
-    Mutation class for creating a model instance.
-    Should set the `serializer_class` attribute in the Meta class
-    to a ModelSerializer class for the model to be created.
-    """
-
+class CreateAuthMutation(ModelSerializerAuthMutation):
     class Meta:
         abstract = True
 
@@ -395,17 +443,7 @@ class CreateAuthMutation(ModelSerializerAuthMutation, Generic[TModel]):
         super().__init_subclass_with_meta__(model_operation="create", **options)
 
 
-class UpdateAuthMutation(GetInstanceMixin, ModelSerializerAuthMutation, Generic[TModel]):
-    """
-    Mutation class for updating a model instance.
-    Should set the `serializer_class` attribute in the Meta class
-    to a ModelSerializer class for the model to be updated.
-    Optionally, the `lookup_field` attribute can be set to specify which
-    field to use for looking up the instance (defaults to the object's
-    primary key, which is usually `id`). Note that the `lookup_field`
-    attribute has to be available from the serializer's 'Meta.fields' definition!
-    """
-
+class UpdateAuthMutation(GetInstanceMixin, ModelSerializerAuthMutation):
     class Meta:
         abstract = True
 
@@ -414,16 +452,7 @@ class UpdateAuthMutation(GetInstanceMixin, ModelSerializerAuthMutation, Generic[
         super().__init_subclass_with_meta__(model_operation="update", **options)
 
 
-class DeleteAuthMutation(ModelAuthMutation, Generic[TModel]):
-    """
-    Mutation class for deleting a model instance.
-    Should set the `model` attribute in the Meta class
-    to a model class for the model to be deleted.
-    Optionally, the `lookup_field` attribute can be set to specify which
-    field to use for looking up the instance (defaults to the object's
-    primary key, which is usually `id`).
-    """
-
+class DeleteAuthMutation(ModelAuthMutation):
     deleted = graphene.Boolean(default_value=False, description="Whether the object was deleted successfully.")
     row_count = graphene.Int(default_value=0, description="Number of rows deleted.")
 
