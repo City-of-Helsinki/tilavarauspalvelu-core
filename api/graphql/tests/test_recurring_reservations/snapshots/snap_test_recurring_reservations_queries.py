@@ -291,16 +291,14 @@ snapshots['ReservationQueryTestCase::test_general_admin_can_see_all 1'] = {
             'edges': [
                 {
                     'node': {
-                        'applicationEventPk': None,
-                        'applicationPk': None,
+                        'applicationEventSchedule': 19,
                         'name': 'admin movies',
                         'user': 'amin.general@foo.com'
                     }
                 },
                 {
                     'node': {
-                        'applicationEventPk': None,
-                        'applicationPk': None,
+                        'applicationEventSchedule': 18,
                         'name': 'movies',
                         'user': 'joe.regularl@foo.com'
                     }
@@ -635,8 +633,7 @@ snapshots['ReservationQueryTestCase::test_recurring_reservation_query 1'] = {
                     'node': {
                         'abilityGroup': None,
                         'ageGroup': None,
-                        'applicationEventPk': None,
-                        'applicationPk': None,
+                        'applicationEventSchedule': 33,
                         'beginDate': '2021-10-12',
                         'beginTime': '15:00:00',
                         'created': '2021-10-12T12:00:00+00:00',
@@ -679,8 +676,7 @@ snapshots['ReservationQueryTestCase::test_regular_user_cannot_see_other_than_own
             'edges': [
                 {
                     'node': {
-                        'applicationEventPk': None,
-                        'applicationPk': None,
+                        'applicationEventSchedule': 35,
                         'name': 'movies',
                         'user': 'joe.regularl@foo.com'
                     }
@@ -697,16 +693,14 @@ snapshots['ReservationQueryTestCase::test_service_sector_admin_can_see_recurring
             'edges': [
                 {
                     'node': {
-                        'applicationEventPk': None,
-                        'applicationPk': None,
+                        'applicationEventSchedule': None,
                         'name': 'admin movies',
                         'user': None
                     }
                 },
                 {
                     'node': {
-                        'applicationEventPk': None,
-                        'applicationPk': None,
+                        'applicationEventSchedule': None,
                         'name': 'movies',
                         'user': None
                     }
@@ -723,16 +717,14 @@ snapshots['ReservationQueryTestCase::test_unit_admin_can_see_unit_recurrings 1']
             'edges': [
                 {
                     'node': {
-                        'applicationEventPk': None,
-                        'applicationPk': None,
+                        'applicationEventSchedule': None,
                         'name': 'admin movies',
                         'user': None
                     }
                 },
                 {
                     'node': {
-                        'applicationEventPk': None,
-                        'applicationPk': None,
+                        'applicationEventSchedule': None,
                         'name': 'movies',
                         'user': None
                     }

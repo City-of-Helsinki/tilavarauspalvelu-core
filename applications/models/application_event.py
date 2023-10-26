@@ -8,7 +8,6 @@ from django.utils.functional import classproperty
 from applications.choices import ApplicationEventStatusChoice
 from applications.querysets.application_event import ApplicationEventQuerySet
 from common.connectors import ApplicationEventActionsConnector
-from reservations.choices import ReservationStateChoice
 
 if TYPE_CHECKING:
     from applications.models import ApplicationEventSchedule
@@ -84,9 +83,9 @@ class ApplicationEvent(models.Model):
             return ApplicationEventStatusChoice.DECLINED
         if not schedules or all(not schedule.accepted for schedule in schedules):
             return ApplicationEventStatusChoice.UNALLOCATED
-        if not self.recurring_reservations.all().exists():
+        if not any(schedule.reserved for schedule in schedules):
             return ApplicationEventStatusChoice.APPROVED
-        if self.recurring_reservations.filter(reservations__state=ReservationStateChoice.DENIED).exists():
+        if any(schedule.unsuccessfully_reserved for schedule in schedules):
             return ApplicationEventStatusChoice.FAILED
         return ApplicationEventStatusChoice.RESERVED
 

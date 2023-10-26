@@ -1,5 +1,6 @@
 import datetime
 import random
+from collections.abc import Iterable
 from typing import Any
 
 import factory
@@ -8,6 +9,7 @@ from factory import fuzzy
 
 from applications.choices import PriorityChoice, WeekdayChoice
 from applications.models import ApplicationEventSchedule
+from reservations.models import RecurringReservation
 
 from ._base import GenericDjangoModelFactory
 
@@ -50,3 +52,19 @@ class ApplicationEventScheduleFactory(GenericDjangoModelFactory[ApplicationEvent
             kwargs[unit_key] = ReservationUnitFactory.create(**unit_kwargs)
 
         return cls.create(**kwargs)
+
+    @factory.post_generation
+    def recurring_reservations(
+        self,
+        create: bool,
+        recurring_reservations: Iterable[RecurringReservation] | None,
+        **kwargs: Any,
+    ) -> None:
+        if not create:
+            return
+
+        if not recurring_reservations and kwargs:
+            from .reservation import RecurringReservationFactory
+
+            kwargs.setdefault("application_event_schedule", self)
+            RecurringReservationFactory.create(**kwargs)

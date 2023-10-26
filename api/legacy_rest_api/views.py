@@ -69,10 +69,8 @@ class RecurringReservationViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = (
         RecurringReservation.objects.all()
         .select_related(
-            "application",
-            "application_event",
-            "application_event__purpose",
             "age_group",
+            "application_event_schedule__application_event__purpose",
         )
         .prefetch_related(
             Prefetch(
@@ -81,10 +79,10 @@ class RecurringReservationViewSet(viewsets.ReadOnlyModelViewSet):
                     Reservation.objects.all()
                     .select_related(
                         "user",
-                        "recurring_reservation",
-                        "recurring_reservation__application",
-                        "recurring_reservation__application__organisation",
-                        "recurring_reservation__application_event",
+                        (
+                            "recurring_reservation__application_event_schedule__"
+                            "application_event__application__organisation"
+                        ),
                     )
                     .prefetch_related(
                         Prefetch(
@@ -243,10 +241,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
         Reservation.objects.all()
         .select_related(
             "user",
-            "recurring_reservation",
-            "recurring_reservation__application",
-            "recurring_reservation__application__organisation",
-            "recurring_reservation__application_event",
+            "recurring_reservation__application_event_schedule__application_event__application__organisation",
         )
         .prefetch_related(
             Prefetch(

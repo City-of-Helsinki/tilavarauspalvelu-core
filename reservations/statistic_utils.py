@@ -31,7 +31,7 @@ def create_or_update_reservation_statistics(reservation_pk: Reservation):
             "purpose_name": reservation.purpose.name if reservation.purpose else "",
             "age_group": reservation.age_group,
             "age_group_name": str(reservation.age_group),
-            "is_applied": getattr(recurring, "application", None) is not None,
+            "is_applied": getattr(recurring, "application_event_schedule", None) is not None,
             "ability_group": getattr(reservation.recurring_reservation, "ability_group", None),
             "begin": reservation.begin,
             "end": reservation.end,

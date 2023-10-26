@@ -1,7 +1,7 @@
 from django_filters import rest_framework as filters
 
 from api.legacy_rest_api.filters import ModelInFilter, NumberInFilter
-from applications.models import Application, ApplicationEvent, ApplicationRound
+from applications.models import ApplicationEvent, ApplicationRound
 from reservation_units.models import Purpose, ReservationUnit, ReservationUnitType
 from reservations.choices import ReservationStateChoice
 from reservations.models import RecurringReservation, Reservation
@@ -35,15 +35,10 @@ class ReservationFilter(filters.FilterSet):
 
 
 class RecurringReservationFilter(filters.FilterSet):
-    application_event = filters.ModelMultipleChoiceFilter(
-        field_name="application_event",
+    application_event_schedule = filters.ModelMultipleChoiceFilter(
+        field_name="application_event_schedule",
         queryset=ApplicationEvent.objects.all(),
-        help_text="Show only recurring reservations for specified application_events.",
-    )
-    application = filters.ModelMultipleChoiceFilter(
-        field_name="application",
-        queryset=Application.objects.all(),
-        help_text="Show recurring reservations fro specified application.",
+        help_text="Show only recurring reservations for specified application_event_schedule.",
     )
     reservation_unit = ModelInFilter(
         field_name="reservations__reservation_unit",

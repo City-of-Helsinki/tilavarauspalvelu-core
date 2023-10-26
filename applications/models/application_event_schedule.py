@@ -11,6 +11,7 @@ from applications.choices import PriorityChoice, WeekdayChoice
 from applications.querysets.application_event_schedule import ApplicationEventScheduleQuerySet
 from common.connectors import ApplicationEventScheduleActionsConnector
 from common.fields.model import IntChoiceField
+from reservations.choices import ReservationStateChoice
 
 if TYPE_CHECKING:
     from actions.application_event_schedule import EventOccurrence
@@ -110,6 +111,14 @@ class ApplicationEventSchedule(models.Model):
             and self.allocated_day is not None
             and self.allocated_reservation_unit is not None
         )
+
+    @property
+    def reserved(self) -> bool:
+        return self.recurring_reservations.exists()
+
+    @property
+    def unsuccessfully_reserved(self) -> bool:
+        return self.recurring_reservations.filter(reservations__state=ReservationStateChoice.DENIED).exists()
 
     @property
     def desired_occurrences(self) -> "EventOccurrence":

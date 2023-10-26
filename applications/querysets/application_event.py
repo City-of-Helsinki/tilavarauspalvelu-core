@@ -48,10 +48,14 @@ class ApplicationEventQuerySet(models.QuerySet):
             schedule_count=models.Count("application_event_schedules"),
             non_declined_count=non_declined_event_count(),
             accepted_count=accepted_event_count(),
-            recurring_count=models.Count("recurring_reservations"),
+            recurring_count=models.Count("application_event_schedules__recurring_reservations"),
             recurring_denied_count=models.Count(
-                "recurring_reservations",
-                filter=models.Q(recurring_reservations__reservations__state=ReservationStateChoice.DENIED),
+                "application_event_schedules__recurring_reservations",
+                filter=models.Q(
+                    application_event_schedules__recurring_reservations__reservations__state=(
+                        ReservationStateChoice.DENIED
+                    )
+                ),
             ),
         ).annotate(
             event_status=models.Case(
