@@ -46,6 +46,8 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
   const tos1 = tos.find((n) => n.pk === "generic1");
   const tos2 = tos.find((n) => n.pk === "KUVAnupa");
 
+  // FIXME there are missing fields applicant stuff (name, type, address)
+  // FIXME there is also missing min / max duration
   return (
     <>
       <Accordion
@@ -59,7 +61,11 @@ const Preview = ({ onNext, application, tos }: Props): JSX.Element | null => {
           application={application}
         />
       </Accordion>
-      <ApplicationEventList />
+      <ApplicationEventList
+        allReservationUnits={
+          application.applicationRound.reservationUnits ?? []
+        }
+      />
       <FormSubHeading>{t("reservationUnit:termsOfUse")}</FormSubHeading>
       {tos1 && <Terms tabIndex={0}>{getTranslation(tos1, "text")}</Terms>}
       <FormSubHeading>

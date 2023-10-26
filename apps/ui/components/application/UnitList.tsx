@@ -2,7 +2,6 @@ import React from "react";
 import styled from "styled-components";
 import { sortBy } from "lodash";
 import { fontRegular } from "common/src/common/typography";
-import { EventReservationUnitNode } from "common/types/gql-types";
 import { getTranslation } from "common/src/common/util";
 
 const UnitListWrapper = styled.ol`
@@ -20,20 +19,26 @@ const UnitName = styled.li`
   gap: var(--spacing-xl);
 `;
 
-const UnitList = ({ units }: { units: EventReservationUnitNode[] }) => {
+// NOTE prefer custom typing over gql for simple components
+// (would be even nicer to enforce non null here)
+type UnitDisplayType =
+  | {
+      priority?: number;
+      pk: number;
+      nameFi?: string;
+      nameSv?: string;
+      nameEn?: string;
+    }
+  | undefined;
+
+const UnitList = ({ units }: { units: UnitDisplayType[] }) => {
   const elems = sortBy(units, "priority");
   return (
     <UnitListWrapper>
-      {elems.map((reservationUnit, index) => (
-        <UnitName key={reservationUnit.reservationUnit?.pk}>
+      {elems.map((ru, index) => (
+        <UnitName key={ru?.pk}>
           <div>{index + 1}</div>
-          <div>
-            {" "}
-            {`${getTranslation(
-              reservationUnit.reservationUnit ?? {},
-              "name"
-            ).trim()}`}{" "}
-          </div>
+          <div>{`${getTranslation(ru ?? {}, "name").trim()}`}</div>
         </UnitName>
       ))}
     </UnitListWrapper>

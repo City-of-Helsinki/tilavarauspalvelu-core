@@ -3,21 +3,24 @@ import { FormProvider, useForm } from "react-hook-form";
 import { Notification } from "hds-react";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
-import { GetServerSideProps } from "next";
+import { type GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
+import type {
   Query,
   QueryApplicationsArgs,
   QueryTermsOfUseArgs,
   TermsOfUseType,
   Mutation,
-  MutationCreateApplicationArgs,
   MutationUpdateApplicationArgs,
-  ReservationsReservationPriorityChoices,
-  ApplicationsApplicationApplicantTypeChoices,
   ApplicationUpdateMutationInput,
+  ApplicationNode,
+  ApplicationRoundNode,
+} from "common/types/gql-types";
+import {
   Applicant_Type,
+  ApplicationsApplicationApplicantTypeChoices,
+  ReservationsReservationPriorityChoices,
 } from "common/types/gql-types";
 import { APPLICATION_QUERY } from "common/src/queries/application";
 import { useMutation, useQuery } from "@apollo/client";
@@ -38,18 +41,17 @@ import { fromUIDate, getTranslation } from "@/modules/util";
 import { TERMS_OF_USE } from "@/modules/queries/reservationUnit";
 import { createApolloClient } from "@/modules/apolloClient";
 import {
+  type AddressFormValues,
   ApplicationFormSchema,
-  ApplicationFormValues,
-  OrganisationFormValues,
+  type ApplicationFormValues,
+  type OrganisationFormValues,
+  type PersonFormValues,
   convertAddress,
   convertOrganisation,
   convertPerson,
   transformApplicationEventToForm,
 } from "@/components/application/Form";
-import {
-  CREATE_APPLICATION_MUTATION,
-  UPDATE_APPLICATION_MUTATION,
-} from "@/modules/queries/application";
+import { UPDATE_APPLICATION_MUTATION } from "@/modules/queries/application";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale } = ctx;
@@ -80,10 +82,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
-};
-
-type Props = {
-  tos: TermsOfUseType[];
 };
 
 const convertApplicantType = (
@@ -118,56 +116,56 @@ const convertPriority = (
   }
 };
 
-// remove the identifier if it's empty (otherwise the mutation fails)
-const transformOrganisation = ({
-  identifier,
-  ...rest
-}: OrganisationFormValues) => ({
-  ...rest,
-  ...(identifier != null && identifier !== "" ? { identifier } : {}),
-});
+// Filter out any empty strings from the object (otherwise the mutation fails)
+const transformPerson = (person?: PersonFormValues) => {
+  return {
+    firstName: person?.firstName || undefined,
+    lastName: person?.lastName || undefined,
+    email: person?.email || undefined,
+    phoneNumber: person?.phoneNumber || undefined,
+  };
+};
 
-// TODO refactor the input data to no include nulls
-// TODO use a custom transformation instead of the utility functions
+const transformAddress = (address?: AddressFormValues) => {
+  return {
+    pk: address?.pk || undefined,
+    streetAddress: address?.streetAddress || undefined,
+    postCode: address?.postCode || undefined,
+    city: address?.city || undefined,
+  };
+};
+// Filter out any empty strings from the object (otherwise the mutation fails)
+// remove the identifier if it's empty (otherwise the mutation fails)
+const transformOrganisation = (org?: OrganisationFormValues) => {
+  // const { identifier, ...rest } = org ?? {};
+  return {
+    name: org?.name || undefined,
+    identifier: org?.identifier || undefined,
+    address: transformAddress(org?.address),
+  };
+};
+
 const transformDateString = (date?: string | null): string | undefined =>
   date != null && toApiDate(fromUIDate(date)) != null
     ? toApiDate(fromUIDate(date))
     : undefined;
 
-const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
+const ApplicationRootPage = ({
+  application,
+  applicationRound,
+  pageId,
+  tos,
+  setError,
+}: {
+  application: ApplicationNode;
+  applicationRound: ApplicationRoundNode;
+  pageId: string;
+  tos: TermsOfUseType[];
+  setError: (error: string | null) => void;
+}): JSX.Element | null => {
   const { t } = useTranslation();
   const router = useRouter();
-  const [error, setError] = useState<string | null>();
 
-  const [applicationId, pageId] = router.query?.params as string[];
-
-  const { data: applicationData, loading: isLoading } = useQuery<
-    Query,
-    QueryApplicationsArgs
-  >(APPLICATION_QUERY, {
-    variables: {
-      pk: [Number(applicationId)],
-    },
-    skip: !applicationId || Number.isNaN(Number(applicationId)),
-    onError: (e) => {
-      console.warn("applications query failed: ", e);
-      setError(`${t("common:error.dataError")}`);
-    },
-  });
-
-  const application =
-    applicationData?.applications?.edges?.[0]?.node ?? undefined;
-  const applicationRound = application?.applicationRound ?? undefined;
-
-  const [create] = useMutation<Mutation, MutationCreateApplicationArgs>(
-    CREATE_APPLICATION_MUTATION,
-    {
-      onError: (e) => {
-        console.warn("create application mutation failed: ", e);
-        setError(`${t("application:error.saveFailed")}`);
-      },
-    }
-  );
   const [update] = useMutation<Mutation, MutationUpdateApplicationArgs>(
     UPDATE_APPLICATION_MUTATION,
     {
@@ -179,12 +177,20 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
   );
 
   const handleSave = async (appToSave: ApplicationFormValues) => {
-    // TODO check if we ever need create?
-    // if we do then refactor the input if we don't remove it
+    // There should not be a situation where we are saving on this page without an application
+    // but because of loading we might not have it when the page is rendered
+    // TODO: refactor so we don't need to check it like this
     if (appToSave.pk == null) {
+      // eslint-disable-next-line no-console
+      console.error("application pk is null");
       return 0;
     }
-    // TODO test all variations (update / create) (individual / organisation / company)
+    if (appToSave.pk === 0) {
+      // eslint-disable-next-line no-console
+      console.error("application pk is 0");
+      return 0;
+    }
+    // TODO test all variations (individual / organisation / company)
     const input: ApplicationUpdateMutationInput = {
       pk: appToSave.pk,
       additionalInformation: appToSave.additionalInformation,
@@ -200,6 +206,7 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
             ? { end: transformDateString(ae.end) }
             : {}),
           pk: ae.pk,
+          name: ae.name,
           numPersons: ae.numPersons ?? 0,
           // these (pks) can never be zero or null in the current version
           // even if there are no abilityGroups in the database...
@@ -238,6 +245,7 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
                 // This seems to be a backend problem (some extra validation that is not in sync with GQL schema)
                 // "\"priority.A_300\" ei ole kelvollinen valinta."
                 // priority: convertPriority(aes.priority),
+                priority: aes.priority,
               };
             }),
           eventReservationUnits: ae.reservationUnits?.map(
@@ -252,24 +260,16 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
       ...(appToSave.hasBillingAddress
         ? { billingAddress: appToSave.billingAddress }
         : {}),
-      contactPerson: appToSave.contactPerson ?? { firstName: "", lastName: "" },
+      // TODO check for empty fields and save undefined instead of empty string
+      contactPerson: transformPerson(appToSave.contactPerson),
       homeCity: appToSave.homeCityId,
-      organisation:
-        appToSave.organisation != null
-          ? transformOrganisation(appToSave.organisation)
-          : undefined,
+      organisation: transformOrganisation(appToSave.organisation),
       ...(appToSave.pk != null ? { pk: appToSave.pk } : {}),
     };
 
-    // TODO can this mutation ever be create?
-    // since the applications are created on a separate page
-    // i.e. can we be on this page with application.pk == null?
-    const mutation =
-      appToSave.pk == null || appToSave.pk === 0 ? create : update;
     try {
-      const response = await mutation({
+      const response = await update({
         variables: {
-          // @ts-expect-error -- TODO see if we ever use create mutation
           input,
         },
       });
@@ -327,7 +327,7 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
       pk: application?.pk ?? undefined,
       applicantType: convertApplicantType(application?.applicantType),
       // TODO do we need to get the applicationRoundId from somewhere else?
-      applicationRoundId: application?.applicationRound?.pk ?? undefined,
+      applicationRoundId: applicationRound?.pk ?? undefined,
       applicationEvents: filterNonNullable(application?.applicationEvents).map(
         (ae) => transformApplicationEventToForm(ae)
       ),
@@ -347,55 +347,32 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
   // the logic for adding should be inside the form not a custom effect
   // TODO combine the defaultValues and reset (single transformation function)
   useEffect(() => {
-    if (application) {
-      reset({
-        pk: application?.pk ?? undefined,
-        applicantType: convertApplicantType(application?.applicantType),
-        // TODO do we need to get the applicationRoundId from somewhere else?
-        applicationRoundId: application?.applicationRound?.pk ?? undefined,
-        applicationEvents: filterNonNullable(
-          application?.applicationEvents
-        ).map((ae) => transformApplicationEventToForm(ae)),
-        organisation: convertOrganisation(application?.organisation),
-        contactPerson: convertPerson(application?.contactPerson),
-        billingAddress: convertAddress(application?.billingAddress),
-        additionalInformation: application?.additionalInformation ?? "",
-        homeCityId: application?.homeCity?.pk ?? undefined,
-      });
-    }
-  }, [application, reset]);
+    reset({
+      pk: application?.pk ?? undefined,
+      applicantType: convertApplicantType(application?.applicantType),
+      // TODO do we need to get the applicationRoundId from somewhere else?
+      applicationRoundId: applicationRound?.pk ?? undefined,
+      applicationEvents: filterNonNullable(application?.applicationEvents).map(
+        (ae) => transformApplicationEventToForm(ae)
+      ),
+      organisation: convertOrganisation(application?.organisation),
+      contactPerson: convertPerson(application?.contactPerson),
+      billingAddress: convertAddress(application?.billingAddress),
+      additionalInformation: application?.additionalInformation ?? "",
+      homeCityId: application?.homeCity?.pk ?? undefined,
+    });
+  }, [application, applicationRound, reset]);
 
   const applicationRoundName =
     applicationRound != null ? getTranslation(applicationRound, "name") : "-";
 
-  // TODO the error needs to be in a top level component (wrapping this) or use context / toasts
-  if (isLoading) {
-    return error ? (
-      <Notification
-        type="error"
-        label={error}
-        position="top-center"
-        displayAutoCloseProgress={false}
-        onClose={() => router.reload()}
-      >
-        {error}
-      </Notification>
-    ) : (
-      <CenterSpinner />
-    );
-  }
-
+  // TODO refactor this to use the same <form onSubmit /> logic as other parts (not getValues)
   const handleApplicationFinished = () => {
-    // TODO get the form context here and send the form
     saveAndNavigate("sent")(getValues());
   };
 
-  // const rerender = false; // localApplicationEvents.length; // rerender every time event count is changed so that form state stays in sync
-
-  if (!application || application.applicationEvents == null) {
-    return null;
-  }
-
+  // TODO the inner content can be rewriten as a switch (or use proper file routing instead)
+  // the problem of using file routing is that we need to rewrite the forms to be per page instead
   return (
     <FormProvider {...form}>
       {pageId === "page1" && (
@@ -404,13 +381,11 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
           overrideText={applicationRoundName}
           translationKeyPrefix="application:Page1"
         >
-          {applicationRound != null && (
-            <Page1
-              applicationRound={applicationRound}
-              application={application}
-              onNext={saveAndNavigate("page2")}
-            />
-          )}
+          <Page1
+            applicationRound={applicationRound}
+            application={application}
+            onNext={saveAndNavigate("page2")}
+          />
         </ApplicationPageWrapper>
       )}
       {pageId === "page2" && (
@@ -455,8 +430,73 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
         </ApplicationPageWrapper>
       )}
       {pageId === "sent" && <Sent />}
+    </FormProvider>
+  );
+};
 
-      {error ? (
+// TODO these two wrapper components can be refactored to getServersideProps
+// Their purpose is to separate the error, query, and routing logic from the form
+const ApplicationPageWithQuery = ({
+  applicationPk,
+  pageId,
+  tos,
+}: {
+  applicationPk: number;
+  pageId: string;
+  tos: TermsOfUseType[];
+}): JSX.Element | null => {
+  const [error, setError] = useState<string | null>();
+  const router = useRouter();
+  const { t } = useTranslation();
+
+  const { data: applicationData, loading: isLoading } = useQuery<
+    Query,
+    QueryApplicationsArgs
+  >(APPLICATION_QUERY, {
+    variables: {
+      pk: [Number(applicationPk)],
+    },
+    skip: !applicationPk,
+    onError: (e) => {
+      console.warn("applications query failed: ", e);
+      setError(`${t("common:error.dataError")}`);
+    },
+  });
+
+  if (isLoading) {
+    return error ? (
+      <Notification
+        type="error"
+        label={error}
+        position="top-center"
+        displayAutoCloseProgress={false}
+        onClose={() => router.reload()}
+      >
+        {error}
+      </Notification>
+    ) : (
+      <CenterSpinner />
+    );
+  }
+
+  const application =
+    applicationData?.applications?.edges?.[0]?.node ?? undefined;
+  const applicationRound = application?.applicationRound ?? undefined;
+
+  if (application == null || applicationRound == null) {
+    return null;
+  }
+
+  return (
+    <>
+      <ApplicationRootPage
+        application={application}
+        pageId={pageId}
+        tos={tos}
+        applicationRound={applicationRound}
+        setError={setError}
+      />
+      {error != null && (
         <Notification
           type="error"
           label={error}
@@ -467,9 +507,34 @@ const ApplicationRootPage = ({ tos }: Props): JSX.Element | null => {
         >
           {error}
         </Notification>
-      ) : null}
-    </FormProvider>
+      )}
+    </>
   );
 };
 
-export default ApplicationRootPage;
+const ApplicationPageRouted = ({
+  tos,
+}: {
+  tos: TermsOfUseType[];
+}): JSX.Element | null => {
+  // TODO router could be turned to SSR prop
+  const router = useRouter();
+  const [applicationId, pageId] = router.query?.params as string[];
+
+  // TODO proper errors
+  if (!applicationId || !pageId) {
+    return <div>Error: missing page path or id</div>;
+  }
+  if (Number.isNaN(Number(applicationId))) {
+    return <div>Error: not a number</div>;
+  }
+  return (
+    <ApplicationPageWithQuery
+      applicationPk={Number(applicationId)}
+      pageId={pageId}
+      tos={tos}
+    />
+  );
+};
+
+export default ApplicationPageRouted;

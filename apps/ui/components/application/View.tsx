@@ -42,7 +42,11 @@ const ViewApplication = ({ application, tos }: Props): JSX.Element => {
           application={application}
         />
       </Accordion>
-      <ApplicationEventList />
+      <ApplicationEventList
+        allReservationUnits={
+          application.applicationRound.reservationUnits ?? []
+        }
+      />
       <FormSubHeading>{t("reservationUnit:termsOfUse")}</FormSubHeading>
       {tos1 && <Terms tabIndex={0}>{getTranslation(tos1, "text")}</Terms>}
       <FormSubHeading>

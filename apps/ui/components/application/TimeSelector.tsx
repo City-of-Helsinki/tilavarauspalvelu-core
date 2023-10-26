@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled, { CSSProperties } from "styled-components";
 import { useTranslation } from "next-i18next";
 import { IconCross, Select } from "hds-react";
@@ -313,25 +313,6 @@ const TimeSelector = ({
   summaryData,
 }: Props): JSX.Element | null => {
   const { t } = useTranslation();
-
-  const cellTypes = useMemo(
-    () => [
-      // {
-      //   type: "unavailable",
-      //   label: t("application:Page2.legend.unavailable"),
-      // },
-      {
-        type: "selected-1",
-        label: t("application:Page2.legend.selected-1"),
-      },
-      {
-        type: "selected-2",
-        label: t("application:Page2.legend.selected-2"),
-      },
-    ],
-    [t]
-  );
-
   const [priority, setPriority] =
     useState<ApplicationEventSchedulePriority>(300);
   const [paintState, setPaintState] = useState<
@@ -339,12 +320,20 @@ const TimeSelector = ({
   >(false); // toggle value true = set, false = clear: ;
   const [painting, setPainting] = useState(false); // is painting 'on'
 
-  const priorityOptions: OptionType[] = useMemo(() => {
-    return [300, 200].map((n) => ({
-      label: t(`application:Page2.priorityLabels.${n}`),
-      value: n,
-    }));
-  }, [t]);
+  const cellTypes = [
+    {
+      type: "selected-1",
+      label: t("application:Page2.legend.selected-1"),
+    },
+    {
+      type: "selected-2",
+      label: t("application:Page2.legend.selected-2"),
+    },
+  ];
+  const priorityOptions: OptionType[] = [300, 200].map((n) => ({
+    label: t(`application:Page2.priorityLabels.${n}`),
+    value: n,
+  }));
 
   if (!cells) {
     return null;

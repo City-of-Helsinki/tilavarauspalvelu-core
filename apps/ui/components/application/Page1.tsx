@@ -18,7 +18,9 @@ import { ApplicationEvent } from "./ApplicationEvent";
 import { type ApplicationFormValues } from "./Form";
 
 type Props = {
-  // TODO break this down to smaller pieces (only the required props)
+  // TODO break application round down to smaller pieces (only the required props)
+  // mostly we need periodBegin and periodEnd here (that should be Dates not strings)
+  // we also need applicationRound.reservationUnits for ReservationUnitList
   applicationRound: ApplicationRoundNode;
   application: ApplicationNode;
   onNext: (formValues: ApplicationFormValues) => void;
@@ -71,6 +73,7 @@ const Page1 = ({
   const onDeleteEvent = async (eventId: number | undefined, index: number) => {
     trigger();
 
+    // FIXME where to do this check? when submitting the form or in validation schema?
     const validationErrors = [];
     if (errors?.applicationEvents?.length != null) {
       for (let i = 0; i < errors.applicationEvents.length; i += 1) {
@@ -165,6 +168,7 @@ const Page1 = ({
     applicationEvents?.some((ae) => ae?.pk == null) ?? false;
 
   // TODO check if the form is valid? before allowing next or check when clicking next?
+  // or if invalid isDirty?
   const nextButtonDisabled = false;
 
   const onSubmit = (data: ApplicationFormValues) => {
@@ -173,17 +177,13 @@ const Page1 = ({
 
   /*
   const onSubmit = (data: ApplicationFormValues, eventId?: number) => {
-    const appToSave = {
-      ...data,
-      // override status in order to validate correctly when modifying existing application
-      // TODO this should be set in the form itself
-      status: ApplicationStatus.Draft,
-    };
+    // FIXME refactor this error somewhere (either to submit or to form schema)
     if (appToSave.applicationEvents.length === 0) {
       setError(t("application:error.noEvents"));
       return;
     }
 
+    // FIXME refactor this error somewhere (either to submit or to form schema)
     if (
       appToSave.applicationEvents.filter(
         (ae) => ae.reservationUnits.length === 0
@@ -192,12 +192,6 @@ const Page1 = ({
       setError(t("application:error.noReservationUnits"));
       return;
     }
-
-    // FIXME
-    // TODO this breaks the form submission state i.e. form.isSubmitting returns false
-    // even though the form is being saved. Too scared to change though.
-    // form.reset({ applicationEvents: appToSave.applicationEvents });
-    save({ application: appToSave, eventId });
   };
   */
 

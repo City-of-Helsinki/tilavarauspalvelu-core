@@ -1,14 +1,15 @@
+import React, { useState } from "react";
 import { IconArrowRight, Notification } from "hds-react";
-import React, { useEffect, useState } from "react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
+import { useFormContext } from "react-hook-form";
 import type { ApplicationEventSchedulePriority } from "common/types/common";
 import type {
   ApplicationEventScheduleNode,
   ApplicationNode,
 } from "common/types/gql-types";
-import { useFormContext } from "react-hook-form";
+import { filterNonNullable } from "common/src/helpers";
 import { MediumButton } from "@/styles/util";
 import { getReadableList } from "@/modules/util";
 import { AccordionWithState as Accordion } from "../common/Accordion";
@@ -191,32 +192,24 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [minDurationMsg, setMinDurationMsg] = useState(true);
-  const history = useRouter();
+  const router = useRouter();
 
   const { getValues, setValue, watch, handleSubmit } =
     useFormContext<ApplicationFormValues>();
 
-  const applicationEventsUnfiltered = watch(`applicationEvents`);
-  const applicationEvents =
-    applicationEventsUnfiltered?.filter(
-      (ae): ae is ApplicationEventFormValue => ae != null
-    ) ?? [];
+  const applicationEvents = filterNonNullable(watch("applicationEvents"));
 
-  // TOOD should save directly to form context, not to state
-  const [selectorData, setSelectorData] = useState<Cell[][][]>(
-    applicationEvents.map((ae) =>
-      applicationEventSchedulesToCells(ae.applicationEventSchedules)
-    )
+  const selectorData = applicationEvents.map((ae) =>
+    applicationEventSchedulesToCells(ae.applicationEventSchedules)
   );
-
-  useEffect(() => {
+  const setSelectorData = (selected: typeof selectorData) => {
     // So this returns them as:
     // applicationEvents (N)
     // - ApplicationEventSchedule[][]: Array(7) (i is the day)
     // - ApplicationEventSchedule[]: Array(M) (j is the continuous block)
     // priority: 200 | 300 (200 is secondary, 300 is primary)
     // priority: 100 (? assuming it's not selected)
-    const selectedAppEvents = selectorData
+    const selectedAppEvents = selected
       .map((cell) => cellsToApplicationEventSchedules(cell))
       .map((aes) =>
         aes.filter((ae) => ae.priority === 300 || ae.priority === 200)
@@ -242,7 +235,7 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
       });
       setValue(`applicationEvents.${i}.applicationEventSchedules`, val);
     });
-  }, [selectorData, setValue]);
+  };
 
   const updateCells = (index: number, newCells: Cell[][]) => {
     const updated = [...selectorData];
@@ -259,6 +252,8 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
     setSelectorData(updated);
   };
 
+  // FIXME this is broken -- creates a completely new array that doesn't actually exist instead of updating the existing one
+  // these should of course never change the length of the array
   const copyCells = (index: number) => {
     const updated = [...selectorData];
     const srcCells = updated[index];
@@ -399,7 +394,7 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
       <ButtonContainer>
         <MediumButton
           variant="secondary"
-          onClick={() => history.push(`${application.pk}/page1`)}
+          onClick={() => router.push(`${application.pk}/page1`)}
         >
           {t("common:prev")}
         </MediumButton>

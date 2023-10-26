@@ -3,6 +3,7 @@ import { formatDuration } from "common/src/common/util";
 import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
 import { filterNonNullable } from "common/src/helpers";
+import type { ReservationUnitType } from "common/types/gql-types";
 import { useOptions } from "@/hooks/useOptions";
 import { TimePreview } from "./TimePreview";
 import { StyledLabelValue, TimePreviewContainer } from "./styled";
@@ -19,8 +20,11 @@ const filterPrimary = (n: ApplicationEventScheduleFormType) =>
 const filterSecondary = (n: ApplicationEventScheduleFormType) =>
   n.priority === 200;
 
-// TODO replace events with form context
-const ApplicationEventList = () => {
+const ApplicationEventList = ({
+  allReservationUnits,
+}: {
+  allReservationUnits: ReservationUnitType[];
+}) => {
   const { t } = useTranslation();
   const { params, options } = useOptions();
   const { purposeOptions } = options;
@@ -48,9 +52,27 @@ const ApplicationEventList = () => {
       : "";
   };
 
-  const evts = watch(`applicationEvents`);
-  const aes = filterNonNullable(evts);
+  const aes = filterNonNullable(watch(`applicationEvents`));
 
+  // TODO this is a bit silly, but I'd prefer not passing the whole applicationRound around
+  // nor save the actual ReservationUnits to form context (just the pk)
+  const reservationUnits =
+    aes.map((evt) => {
+      return (
+        evt?.reservationUnits.map((eru, index) => {
+          const ru = allReservationUnits.find((x) => x.pk === eru);
+          return {
+            pk: eru,
+            priority: index,
+            nameFi: ru?.nameFi ?? undefined,
+            nameSv: ru?.nameSv ?? undefined,
+            nameEn: ru?.nameEn ?? undefined,
+          };
+        }) ?? []
+      );
+    }) ?? [];
+
+  // TODO missing translations (weekdays)
   return (
     <>
       {aes.map((applicationEvent, i) => (
@@ -107,9 +129,7 @@ const ApplicationEventList = () => {
           <FormSubHeading>
             {t("application:Page1.spacesSubHeading")}
           </FormSubHeading>
-          {/* FIXME need to convert from number[] to ReservationUnit[] or at least retrieve the name and some other info
-          <UnitList units={reservationUnits} />
-          */}
+          <UnitList units={reservationUnits?.[i]} />
           <FormSubHeading>
             {t("application:preview.applicationEventSchedules")}
           </FormSubHeading>

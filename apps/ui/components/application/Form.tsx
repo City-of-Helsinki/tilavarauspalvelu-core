@@ -107,7 +107,7 @@ export const AddressFormValueSchema = z.object({
   city: z.string(),
   postCode: z.string(),
 });
-type AddressFormValue = z.infer<typeof AddressFormValueSchema>;
+export type AddressFormValues = z.infer<typeof AddressFormValueSchema>;
 
 // TODO identifier is only optional for Associations (not for Companies / Communities)
 export const OrganisationFormValuesSchema = z.object({
@@ -140,7 +140,7 @@ export const convertPerson = (p: Maybe<PersonNode>): PersonFormValues => ({
 });
 
 // TODO are these converters the wrong way around? (not input, but output)
-export const convertAddress = (a: Maybe<AddressNode>): AddressFormValue => ({
+export const convertAddress = (a: Maybe<AddressNode>): AddressFormValues => ({
   pk: a?.pk ?? undefined,
   streetAddress: a?.streetAddress ?? "",
   city: a?.city ?? "",
