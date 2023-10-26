@@ -24,7 +24,7 @@ class ApplicationSerializer(TranslatedModelSerializer):
     contact_person = PersonSerializer(required=False, allow_null=True)
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     application_events = ApplicationEventInApplicationSerializer(required=False, many=True)
-    billing_address = AddressSerializer(required=True, allow_null=True)
+    billing_address = AddressSerializer(required=False, allow_null=True)
 
     class Meta:
         model = Application
