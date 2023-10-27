@@ -10,12 +10,13 @@ import {
   Tag as HdsTag,
 } from "hds-react";
 import { parseISO } from "date-fns";
-import { gql, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { breakpoints } from "common/src/common/style";
-import type {
-  Mutation,
-  ApplicationNode,
-  MutationCancelApplicationArgs,
+import {
+  type Mutation,
+  type ApplicationNode,
+  type MutationCancelApplicationArgs,
+  ApplicationsApplicationApplicantTypeChoices,
 } from "common/types/gql-types";
 import {
   isActive,
@@ -24,6 +25,7 @@ import {
 } from "@/modules/util";
 import { BlackButton } from "@/styles/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
+import { CANCEL_APPLICATION_MUTATION } from "@/modules/queries/application";
 import ConfirmationModal, { ModalRef } from "../common/ConfirmationModal";
 import { CenterSpinner } from "../common/common";
 
@@ -136,6 +138,9 @@ type Props = {
 };
 
 const getApplicant = (application: ApplicationNode, t: TFunction): string => {
+  if (application.applicantType === ApplicationsApplicationApplicantTypeChoices.Individual) {
+    return t("applicationCard:person");
+  }
   if (application.organisation) {
     return t("applicationCard:organisation", {
       type: t(
@@ -150,16 +155,6 @@ const getApplicant = (application: ApplicationNode, t: TFunction): string => {
 
   return "";
 };
-
-const CANCEL_APPLICATION_MUTATION = gql`
-  mutation ($input: ApplicationCancelMutationInput!) {
-    cancelApplication(input: $input) {
-      errors {
-        messages
-      }
-    }
-  }
-`;
 
 const ApplicationCard = ({
   application,
@@ -215,7 +210,7 @@ const ApplicationCard = ({
         </Tag>
         <RoundName>{getApplicationRoundName(applicationRound)}</RoundName>
         <Applicant>
-          {application.applicantType !== null
+          {application.applicantType != null
             ? getApplicant(application, t)
             : ""}
         </Applicant>

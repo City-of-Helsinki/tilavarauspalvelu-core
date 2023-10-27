@@ -367,11 +367,6 @@ const ApplicationRootPage = ({
   const applicationRoundName =
     applicationRound != null ? getTranslation(applicationRound, "name") : "-";
 
-  // TODO refactor this to use the same <form onSubmit /> logic as other parts (not getValues)
-  const handleApplicationFinished = (values: ApplicationFormValues) => {
-    saveAndNavigate("sent")(values);
-  };
-
   // TODO the inner content can be rewriten as a switch (or use proper file routing instead)
   // the problem of using file routing is that we need to rewrite the forms to be per page instead
   return (
@@ -412,7 +407,6 @@ const ApplicationRootPage = ({
         >
           <Preview
             application={application}
-            onNext={handleApplicationFinished}
             tos={tos}
           />
         </ApplicationPageWrapper>

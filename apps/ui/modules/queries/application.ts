@@ -46,6 +46,29 @@ export const CREATE_APPLICATION_MUTATION = gql`
 export const UPDATE_APPLICATION_MUTATION = gql`
   mutation ($input: ApplicationUpdateMutationInput!) {
     updateApplication(input: $input) {
+      pk
+      errors {
+        messages
+      }
+    }
+  }
+`;
+
+export const SEND_APPLICATION_MUTATION = gql`
+  mutation ($input: ApplicationSendMutationInput!) {
+    sendApplication(input: $input) {
+      pk
+      errors {
+        messages
+      }
+    }
+  }
+`;
+
+export const CANCEL_APPLICATION_MUTATION = gql`
+  mutation ($input: ApplicationCancelMutationInput!) {
+    cancelApplication(input: $input) {
+      pk
       errors {
         messages
       }
