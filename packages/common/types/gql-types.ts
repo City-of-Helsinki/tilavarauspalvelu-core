@@ -166,7 +166,7 @@ export type ApplicationCreateMutationInput = {
     Array<InputMaybe<ApplicationEventInApplicationSerializerInput>>
   >;
   applicationRound: Scalars["Int"]["input"];
-  billingAddress: AddressSerializerInput;
+  billingAddress?: InputMaybe<AddressSerializerInput>;
   clientMutationId?: InputMaybe<Scalars["String"]["input"]>;
   contactPerson?: InputMaybe<PersonSerializerInput>;
   homeCity?: InputMaybe<Scalars["Int"]["input"]>;
@@ -314,7 +314,6 @@ export type ApplicationEventNode = Node & {
   applicationEventSchedules?: Maybe<Array<ApplicationEventScheduleNode>>;
   begin?: Maybe<Scalars["Date"]["output"]>;
   biweekly: Scalars["Boolean"]["output"];
-  declinedReservationUnits?: Maybe<Array<ReservationUnitType>>;
   end?: Maybe<Scalars["Date"]["output"]>;
   /** May contain more than one error for same field. */
   errors?: Maybe<Array<Maybe<ErrorType>>>;
@@ -2206,8 +2205,7 @@ export type RecurringReservationType = Node & {
   __typename?: "RecurringReservationType";
   abilityGroup?: Maybe<AbilityGroupType>;
   ageGroup?: Maybe<AgeGroupType>;
-  applicationEventPk?: Maybe<Scalars["Int"]["output"]>;
-  applicationPk?: Maybe<Scalars["Int"]["output"]>;
+  applicationEventSchedule?: Maybe<Scalars["Int"]["output"]>;
   beginDate?: Maybe<Scalars["Date"]["output"]>;
   beginTime?: Maybe<Scalars["Time"]["output"]>;
   created: Scalars["DateTime"]["output"];

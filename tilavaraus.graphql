@@ -121,7 +121,7 @@ input ApplicationCreateMutationInput {
   applicantType: applicant_type
   applicationEvents: [ApplicationEventInApplicationSerializerInput]
   applicationRound: Int!
-  billingAddress: AddressSerializerInput!
+  billingAddress: AddressSerializerInput
   contactPerson: PersonSerializerInput
   homeCity: Int
   organisation: OrganisationSerializerInput
@@ -276,7 +276,6 @@ type ApplicationEventNode implements Node {
   ageGroup: AgeGroupType
   abilityGroup: AbilityGroupType
   purpose: ReservationPurposeType
-  declinedReservationUnits: [ReservationUnitType!]
   eventReservationUnits: [EventReservationUnitNode!]
   applicationEventSchedules: [ApplicationEventScheduleNode!]
 
@@ -1824,25 +1823,24 @@ type RecurringReservationCreateMutationPayload {
 }
 
 type RecurringReservationType implements Node {
-  user: String
-  ageGroup: AgeGroupType
-  abilityGroup: AbilityGroupType
-  reservationUnit: ReservationUnitByPkType!
   name: String!
   description: String!
-  recurrenceInDays: Int
-  weekdays: [Int]
+  user: String
   beginDate: Date
   beginTime: Time
   endDate: Date
   endTime: Time
+  applicationEventSchedule: Int
+  reservationUnit: ReservationUnitByPkType!
+  recurrenceInDays: Int
+  weekdays: [Int]
+  ageGroup: AgeGroupType
+  abilityGroup: AbilityGroupType
   created: DateTime!
 
   """The ID of the object"""
   id: ID!
   pk: Int
-  applicationPk: Int
-  applicationEventPk: Int
 }
 
 type RecurringReservationTypeConnection {
@@ -3041,21 +3039,21 @@ input ReservationUnitCreateMutationInput {
   pricingTerms: String
   paymentTypes: [String]
   pricings: [ReservationUnitPricingCreateSerializerInput]
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
@@ -3165,21 +3163,21 @@ type ReservationUnitCreateMutationPayload {
   pricingTerms: String
   paymentTypes: [String]
   pricings: [ReservationUnitPricingType]
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
@@ -3712,21 +3710,21 @@ input ReservationUnitUpdateMutationInput {
   pricingTerms: String
   paymentTypes: [String]
   pricings: [ReservationUnitPricingUpdateSerializerInput]!
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
@@ -3835,21 +3833,21 @@ type ReservationUnitUpdateMutationPayload {
   state: String
   pricingTerms: String
   paymentTypes: [String]
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
@@ -4576,12 +4574,12 @@ input UnitUpdateMutationInput {
   nameFi: String
   nameEn: String
   nameSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   clientMutationId: String
 }
 
@@ -4594,12 +4592,12 @@ type UnitUpdateMutationPayload {
   nameFi: String
   nameEn: String
   nameSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
