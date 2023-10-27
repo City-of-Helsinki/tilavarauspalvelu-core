@@ -1,23 +1,23 @@
 import React from "react";
 import styled from "styled-components";
 import { GetServerSideProps } from "next";
-import { sortBy } from "lodash";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { H2, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
-  ApplicationRoundNode,
-  Query,
-  QueryApplicationRoundsArgs,
+  type ApplicationRoundNode,
+  ApplicationRoundStatusChoice,
+  type Query,
+  type QueryApplicationRoundsArgs,
 } from "common/types/gql-types";
-import { HeroSubheading } from "../../modules/style/typography";
-import ApplicationRoundCard from "../../components/index/ApplicationRoundCard";
-import { applicationRoundState } from "../../modules/util";
+import { filterNonNullable } from "common/src/helpers";
+import { HeroSubheading } from "@/modules/style/typography";
+import ApplicationRoundCard from "@/components/index/ApplicationRoundCard";
 import KorosDefault from "@/components/common/KorosDefault";
-import { createApolloClient } from "../../modules/apolloClient";
-import { APPLICATION_ROUNDS } from "../../modules/queries/applicationRound";
-import BreadcrumbWrapper from "../../components/common/BreadcrumbWrapper";
+import { createApolloClient } from "@/modules/apolloClient";
+import { APPLICATION_ROUNDS } from "@/modules/queries/applicationRound";
+import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
 
 type Props = {
   applicationRounds: ApplicationRoundNode[];
@@ -31,13 +31,15 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { data } = await apolloClient.query<Query, QueryApplicationRoundsArgs>({
     query: APPLICATION_ROUNDS,
     fetchPolicy: "no-cache",
+    variables: {
+      orderBy: "pk",
+    },
   });
-  const applicationRounds =
-    data?.applicationRounds?.edges
-      .map((n) => n?.node)
-      .filter((n): n is NonNullable<typeof n> => !!n) ?? [];
+  const applicationRounds = filterNonNullable(
+    data?.applicationRounds?.edges.map((n) => n?.node)
+  );
 
-  const filteredApplicationRounds = sortBy(applicationRounds, ["pk"]).filter(
+  const filteredApplicationRounds = applicationRounds.filter(
     (applicationRound) =>
       applicationRound?.publicDisplayBegin &&
       applicationRound?.publicDisplayEnd &&
@@ -93,27 +95,17 @@ const RecurringLander = ({ applicationRounds }: Props): JSX.Element => {
   const { t } = useTranslation();
 
   const activeApplicationRounds = applicationRounds.filter(
-    (applicationRound) =>
-      applicationRoundState(
-        applicationRound.applicationPeriodBegin,
-        applicationRound.applicationPeriodEnd
-      ) === "active"
+    (ar) => ar.status === ApplicationRoundStatusChoice.Open
   );
 
   const pendingApplicationRounds = applicationRounds.filter(
-    (applicationRound) =>
-      applicationRoundState(
-        applicationRound.applicationPeriodBegin,
-        applicationRound.applicationPeriodEnd
-      ) === "pending"
+    (ar) => ar.status === ApplicationRoundStatusChoice.Upcoming
   );
 
   const pastApplicationRounds = applicationRounds.filter(
-    (applicationRound) =>
-      applicationRoundState(
-        applicationRound.applicationPeriodBegin,
-        applicationRound.applicationPeriodEnd
-      ) === "past"
+    (ar) =>
+      ar.status !== ApplicationRoundStatusChoice.Open &&
+      ar.status !== ApplicationRoundStatusChoice.Upcoming
   );
 
   return (
@@ -127,7 +119,7 @@ const RecurringLander = ({ applicationRounds }: Props): JSX.Element => {
       </HeadWrapper>
       <KorosDefault />
       <Content>
-        {activeApplicationRounds?.length > 0 ? (
+        {activeApplicationRounds.length > 0 ? (
           <RoundList data-testid="recurring-lander__application-round-container--active">
             <RoundHeading>
               {t("recurringLander:roundHeadings.active")}
@@ -147,7 +139,7 @@ const RecurringLander = ({ applicationRounds }: Props): JSX.Element => {
             {t("recurringLander:noRounds")}
           </RoundList>
         )}
-        {pendingApplicationRounds?.length > 0 && (
+        {pendingApplicationRounds.length > 0 && (
           <RoundList data-testid="recurring-lander__application-round-container--pending">
             <RoundHeading>
               {t("recurringLander:roundHeadings.pending")}
@@ -160,7 +152,7 @@ const RecurringLander = ({ applicationRounds }: Props): JSX.Element => {
             ))}
           </RoundList>
         )}
-        {pastApplicationRounds?.length > 0 && (
+        {pastApplicationRounds.length > 0 && (
           <RoundList data-testid="recurring-lander__application-round-container--past">
             <RoundHeading>
               {t("recurringLander:roundHeadings.past")}

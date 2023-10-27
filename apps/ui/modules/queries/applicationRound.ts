@@ -44,8 +44,8 @@ export const APPLICATION_ROUNDS_PERIODS = gql`
 
 export const APPLICATION_ROUNDS = gql`
   ${APPLICATION_ROUND_FRAGMENT}
-  query ApplicationRounds {
-    applicationRounds {
+  query ApplicationRounds($orderBy: String) {
+    applicationRounds(orderBy: $orderBy) {
       edges {
         node {
           ...ApplicationRoundFields

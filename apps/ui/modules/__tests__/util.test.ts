@@ -4,7 +4,6 @@ import {
   Cell,
 } from "common";
 import {
-  applicationRoundState,
   getComboboxValues,
   getReadableList,
   printErrorMessages,
@@ -32,33 +31,6 @@ const cell = (
   key: "key",
   hour,
   state,
-});
-
-test("applicationRoundState", () => {
-  jest
-    // .useFakeTimers("modern")
-    .useFakeTimers()
-    .setSystemTime(new Date("2021-01-01T007:59:59Z").getTime());
-  expect(
-    applicationRoundState("2021-01-01T08:00:00Z", "2021-02-01T08:00:00Z")
-  ).toBe("pending");
-
-  jest
-    // .useFakeTimers("modern")
-    .useFakeTimers()
-    .setSystemTime(new Date("2021-01-01T08:00:01Z").getTime());
-  expect(
-    applicationRoundState("2021-01-01T08:00:00Z", "2021-02-01T08:00:00Z")
-  ).toBe("active");
-
-  jest
-    // .useFakeTimers("modern")
-    .useFakeTimers()
-    .setSystemTime(new Date("2021-02-01T08:00:01Z").getTime());
-
-  expect(
-    applicationRoundState("2021-01-01T08:00:00Z", "2021-02-01T08:00:00Z")
-  ).toBe("past");
 });
 
 test("getComboboxValues", () => {

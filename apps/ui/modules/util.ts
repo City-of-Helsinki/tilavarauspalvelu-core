@@ -44,25 +44,6 @@ export const isActive = (startDate: string, endDate: string): boolean => {
   );
 };
 
-const isPast = (endDate: string): boolean => {
-  const now = new Date().getTime();
-  return isAfter(now, parseISO(endDate).getTime());
-};
-
-export const applicationRoundState = (
-  startDate: string,
-  endDate: string
-): "pending" | "active" | "past" => {
-  if (isPast(endDate)) {
-    return "past";
-  }
-  if (isActive(startDate, endDate)) {
-    return "active";
-  }
-
-  return "pending";
-};
-
 export const parseDate = (date: string): Date => parseISO(date);
 
 // Returns a Date from a string in format "yyyy-MM-dd"
@@ -306,19 +287,21 @@ export const applicationErrorText = (
 ): string => (key ? t(`application:error.${key}`, attrs) : "");
 
 /// @deprecated TODO: remove this (it makes no sense anymore with the changes to the statuses)
+// TODO all of these should return an unknown status if the status is not recognized or allowed
+// not a null / undefined
 export const getReducedApplicationStatus = (
   status?: ApplicationStatusChoice
 ): ReducedApplicationStatus | null => {
   switch (status) {
-    case ApplicationStatusChoice.InAllocation:
-    case ApplicationStatusChoice.ResultsSent:
-    case ApplicationStatusChoice.Handled:
+    case ApplicationStatusChoice.Received:
       return "processing";
     case ApplicationStatusChoice.Cancelled:
     case ApplicationStatusChoice.Expired:
     case ApplicationStatusChoice.Draft:
       return "draft";
-    case ApplicationStatusChoice.Received:
+    case ApplicationStatusChoice.InAllocation:
+    case ApplicationStatusChoice.ResultsSent:
+    case ApplicationStatusChoice.Handled:
       return "sent";
     default:
       return null;

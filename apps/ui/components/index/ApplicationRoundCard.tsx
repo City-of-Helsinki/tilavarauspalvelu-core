@@ -7,10 +7,13 @@ import { parseISO } from "date-fns";
 import { breakpoints } from "common/src/common/style";
 import { H4 } from "common/src/common/typography";
 import ClientOnly from "common/src/ClientOnly";
-import { ApplicationRoundNode } from "common/types/gql-types";
+import {
+  ApplicationRoundNode,
+  ApplicationRoundStatusChoice,
+} from "common/types/gql-types";
 import { IconButton } from "common/src/components";
 import Card from "../common/Card";
-import { applicationRoundState, searchUrl } from "../../modules/util";
+import { searchUrl } from "../../modules/util";
 import { MediumButton } from "../../styles/util";
 import { getApplicationRoundName } from "../../modules/applicationRound";
 
@@ -78,10 +81,11 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
 
   const history = useRouter();
 
-  const state = applicationRoundState(
-    applicationRound.applicationPeriodBegin,
-    applicationRound.applicationPeriodEnd
-  );
+  const state = applicationRound.status;
+  if (state == null) {
+    // eslint-disable-next-line no-console
+    console.warn("Application round status is null");
+  }
 
   const name = getApplicationRoundName(applicationRound);
 
@@ -100,24 +104,24 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
     <StyledCard aria-label={name} border>
       <StyledContainer>
         <Name>{name}</Name>
-        {["active", "pending"].includes(state) && (
+        {(state === ApplicationRoundStatusChoice.Open ||
+          state === ApplicationRoundStatusChoice.Upcoming) && (
           <ReservationPeriod>{reservationPeriod}</ReservationPeriod>
         )}
         <StatusMessage>
-          {state === "pending" &&
-            t("applicationRound:card.pending", {
-              openingDateTime: t("common:dateTime", {
-                date: parseISO(applicationRound.applicationPeriodBegin),
-              }),
-            })}
-          {state === "active" &&
-            t("applicationRound:card.open", {
-              until: parseISO(applicationRound.applicationPeriodEnd),
-            })}
-          {state === "past" &&
-            t("applicationRound:card.past", {
-              closingDate: parseISO(applicationRound.applicationPeriodEnd),
-            })}
+          {state === ApplicationRoundStatusChoice.Upcoming
+            ? t("applicationRound:card.pending", {
+                openingDateTime: t("common:dateTime", {
+                  date: parseISO(applicationRound.applicationPeriodBegin),
+                }),
+              })
+            : state === ApplicationRoundStatusChoice.Open
+            ? t("applicationRound:card.open", {
+                until: parseISO(applicationRound.applicationPeriodEnd),
+              })
+            : t("applicationRound:card.past", {
+                closingDate: parseISO(applicationRound.applicationPeriodEnd),
+              })}
         </StatusMessage>
         <StyledLink
           href={`/criteria/${applicationRound.pk}`}
@@ -125,7 +129,7 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
           icon={<IconArrowRight aria-hidden />}
         />
       </StyledContainer>
-      {state === "active" && (
+      {state === ApplicationRoundStatusChoice.Open && (
         <CardButton
           onClick={() => {
             if (applicationRound.pk) {

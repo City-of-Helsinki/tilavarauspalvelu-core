@@ -7,7 +7,7 @@ import { useLocalStorage } from "react-use";
 import { Notification } from "hds-react";
 import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { isEqual, omit, pick, sortBy } from "lodash";
+import { isEqual, omit, pick } from "lodash";
 import { NetworkStatus, useQuery } from "@apollo/client";
 import { OptionType } from "common/types/common";
 import { H2 } from "common/src/common/typography";
@@ -15,6 +15,7 @@ import { breakpoints } from "common/src/common/style";
 import ClientOnly from "common/src/ClientOnly";
 import {
   ApplicationRoundNode,
+  ApplicationRoundStatusChoice,
   Query,
   QueryApplicationRoundsArgs,
   QueryReservationUnitsArgs,
@@ -23,12 +24,9 @@ import {
 } from "common/types/gql-types";
 import { Container } from "common";
 
+import { filterNonNullable } from "common/src/helpers";
 import SearchForm from "../../components/search/SearchForm";
-import {
-  applicationRoundState,
-  capitalize,
-  searchUrl,
-} from "../../modules/util";
+import { capitalize, searchUrl } from "../../modules/util";
 import { isBrowser } from "../../modules/const";
 import { HeroSubheading } from "../../modules/style/typography";
 import { RESERVATION_UNITS } from "../../modules/queries/reservationUnit";
@@ -46,36 +44,25 @@ type Props = {
 };
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const now = new Date();
   const { locale, query } = ctx;
   const apolloClient = createApolloClient(ctx);
 
   const { data } = await apolloClient.query<Query, QueryApplicationRoundsArgs>({
     fetchPolicy: "no-cache",
     query: APPLICATION_ROUNDS,
+    variables: {
+      orderBy: "pk",
+    },
   });
-  const applicationRounds =
-    data.applicationRounds?.edges
-      ?.map((n) => n?.node)
-      .filter((n): n is NonNullable<typeof n> => n != null) ?? [];
-  const activeApplicationRounds = sortBy(
-    applicationRounds.filter(
-      (applicationRound) =>
-        new Date(applicationRound.publicDisplayBegin) <= now &&
-        new Date(applicationRound.publicDisplayEnd) >= now &&
-        applicationRoundState(
-          applicationRound.applicationPeriodBegin,
-          applicationRound.applicationPeriodEnd
-        ) === "active"
-    ),
-    ["pk"]
-  );
+  const applicationRounds = filterNonNullable(
+    data.applicationRounds?.edges.map((n) => n?.node)
+  ).filter((ar) => ar.status === ApplicationRoundStatusChoice.Open);
 
   return {
     props: {
       key: JSON.stringify({ ...query, locale }),
       overrideBackgroundColor: "var(--tilavaraus-gray)",
-      applicationRounds: activeApplicationRounds,
+      applicationRounds,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

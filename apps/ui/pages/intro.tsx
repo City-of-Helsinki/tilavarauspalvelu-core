@@ -10,6 +10,7 @@ import { OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
 import { filterNonNullable } from "common/src/helpers";
 import {
+  ApplicationRoundStatusChoice,
   type ApplicationCreateMutationInput,
   type Mutation,
   type MutationCreateApplicationArgs,
@@ -18,7 +19,6 @@ import {
 } from "common/types/gql-types";
 import { useSession } from "@/hooks/auth";
 import { redirectProtectedRoute } from "@/modules/protectedRoute";
-import { applicationRoundState } from "@/modules/util";
 import { MediumButton } from "@/styles/util";
 import Head from "@/components/application/Head";
 import { APPLICATION_ROUNDS } from "@/modules/queries/applicationRound";
@@ -76,18 +76,12 @@ const IntroPage = (): JSX.Element => {
     }
   );
 
-  const now = new Date();
-  const applicationRounds =
-    filterNonNullable(data?.applicationRounds?.edges?.map((n) => n?.node))
-      .filter(
-        (ar) =>
-          new Date(ar.publicDisplayBegin) <= now &&
-          new Date(ar.publicDisplayEnd) >= now &&
-          applicationRoundState(
-            ar.applicationPeriodBegin,
-            ar.applicationPeriodEnd
-          ) === "active"
-      )
+  const applicationRounds = filterNonNullable(
+    data?.applicationRounds?.edges?.map((n) => n?.node)
+  );
+  const applicationRoundOptions =
+    applicationRounds
+      .filter((ar) => ar.status === ApplicationRoundStatusChoice.Open)
       .map((ar) => ({
         value: ar.pk ?? 0,
         label: getApplicationRoundName(ar),
@@ -138,12 +132,12 @@ const IntroPage = (): JSX.Element => {
               <Select
                 id="applicationRoundSelect"
                 placeholder={t("common:select")}
-                options={applicationRounds}
+                options={applicationRoundOptions}
                 label={t("common:select")}
                 onChange={(selection: OptionType): void => {
                   setApplicationRound(selection.value as number);
                 }}
-                value={applicationRounds.find(
+                value={applicationRoundOptions.find(
                   (n) => n.value === applicationRound
                 )}
               />
