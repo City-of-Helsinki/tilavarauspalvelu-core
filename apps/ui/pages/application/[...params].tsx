@@ -19,6 +19,7 @@ import type {
 } from "common/types/gql-types";
 import {
   Applicant_Type,
+  ApplicationStatusChoice,
   ApplicationsApplicationApplicantTypeChoices,
   ReservationsReservationPriorityChoices,
 } from "common/types/gql-types";
@@ -52,6 +53,7 @@ import {
   transformApplicationEventToForm,
 } from "@/components/application/Form";
 import { UPDATE_APPLICATION_MUTATION } from "@/modules/queries/application";
+import type { StepperProps } from "@/components/application/Stepper";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale } = ctx;
@@ -150,6 +152,43 @@ const transformDateString = (date?: string | null): string | undefined =>
   date != null && toApiDate(fromUIDate(date)) != null
     ? toApiDate(fromUIDate(date))
     : undefined;
+
+// TODO this should not use form values but the application from the backend
+// TODO either option has a problem though
+// - change something in the form and the stepper is not updated
+// - nor does it ask for confirmation when navigating away nor does it save the form
+// For now the Stepper has an alert and blocks navigation if form is modified
+// TODO this should have more complete checks (but we are thinking of splitting the form anyway)
+const calculateCompletedStep = (
+  status: Maybe<ApplicationStatusChoice> | undefined,
+  values: ApplicationFormValues
+): 0 | 1 | 2 | 3 | 4 => {
+  // 4 should only be returned if the application state === Received
+  if (status === ApplicationStatusChoice.Received) {
+    return 4;
+  }
+  // 3 if the user information is not filled out
+  if (
+    (values.billingAddress?.streetAddress &&
+      values.applicantType === Applicant_Type.Individual) ||
+    values.contactPerson == null
+  ) {
+    return 3;
+  }
+  // 2 only if there are application events + they have time slots defined
+  if (
+    values.applicationEvents?.length &&
+    values.applicationEvents.length > 0 &&
+    values.applicationEvents?.find((x) => x?.applicationEventSchedules.length)
+  ) {
+    return 2;
+  }
+  // 1 if there are no reservation units or the basic info is missing
+  if (values.applicationEvents?.[0]?.reservationUnits?.length) {
+    return 1;
+  }
+  return 0;
+};
 
 const ApplicationRootPage = ({
   application,
@@ -258,7 +297,8 @@ const ApplicationRootPage = ({
         })
       ),
       applicationRound: appToSave.applicationRoundId,
-      ...(appToSave.hasBillingAddress
+      ...(appToSave.hasBillingAddress ||
+      appToSave.applicantType === Applicant_Type.Individual
         ? { billingAddress: appToSave.billingAddress }
         : {}),
       // TODO check for empty fields and save undefined instead of empty string
@@ -319,9 +359,6 @@ const ApplicationRootPage = ({
       router.push(target);
     };
 
-  // TODO this needs a proper transformation function from ApplicationType -> Application (form type)
-  // TODO application values???
-  // TODO need a useEffect for when the API call returns
   const form = useForm<ApplicationFormValues>({
     mode: "onChange",
     defaultValues: {
@@ -334,18 +371,23 @@ const ApplicationRootPage = ({
       ),
       organisation: convertOrganisation(application?.organisation),
       contactPerson: convertPerson(application?.contactPerson),
-      // TODO do we check if the billing address is toggled
       billingAddress: convertAddress(application?.billingAddress),
+      hasBillingAddress:
+        application?.applicantType !==
+          ApplicationsApplicationApplicantTypeChoices.Individual &&
+        application?.billingAddress?.streetAddress != null,
       additionalInformation: application?.additionalInformation ?? "",
       homeCityId: application?.homeCity?.pk ?? undefined,
     },
     resolver: zodResolver(ApplicationFormSchema),
   });
 
-  const { reset } = form;
+  const {
+    reset,
+    getValues,
+    formState: { isDirty },
+  } = form;
 
-  // TODO this is problematic since we are dynamically adding and removing events and that modifies the application
-  // the logic for adding should be inside the form not a custom effect
   // TODO combine the defaultValues and reset (single transformation function)
   useEffect(() => {
     reset({
@@ -359,6 +401,10 @@ const ApplicationRootPage = ({
       organisation: convertOrganisation(application?.organisation),
       contactPerson: convertPerson(application?.contactPerson),
       billingAddress: convertAddress(application?.billingAddress),
+      hasBillingAddress:
+        application?.applicantType !==
+          ApplicationsApplicationApplicantTypeChoices.Individual &&
+        application?.billingAddress?.streetAddress != null,
       additionalInformation: application?.additionalInformation ?? "",
       homeCityId: application?.homeCity?.pk ?? undefined,
     });
@@ -367,15 +413,23 @@ const ApplicationRootPage = ({
   const applicationRoundName =
     applicationRound != null ? getTranslation(applicationRound, "name") : "-";
 
+  const pages = ["page1", "page2", "page3", "preview"];
+  const steps: StepperProps = {
+    steps: pages.map((x, i) => ({ slug: x, step: i })),
+    completedStep: calculateCompletedStep(application.status, getValues()),
+    basePath: `/application/${application.pk ?? 0}`,
+    isFormDirty: isDirty,
+  };
+
   // TODO the inner content can be rewriten as a switch (or use proper file routing instead)
   // the problem of using file routing is that we need to rewrite the forms to be per page instead
   return (
     <FormProvider {...form}>
       {pageId === "page1" && (
         <ApplicationPageWrapper
-          application={application}
           overrideText={applicationRoundName}
           translationKeyPrefix="application:Page1"
+          steps={steps}
         >
           <Page1
             applicationRound={applicationRound}
@@ -386,37 +440,33 @@ const ApplicationRootPage = ({
       )}
       {pageId === "page2" && (
         <ApplicationPageWrapper
-          application={application}
           translationKeyPrefix="application:Page2"
+          steps={steps}
         >
           <Page2 application={application} onNext={saveAndNavigate("page3")} />
         </ApplicationPageWrapper>
       )}
       {pageId === "page3" && (
         <ApplicationPageWrapper
-          application={application}
           translationKeyPrefix="application:Page3"
+          steps={steps}
         >
           <Page3 onNext={saveAndNavigate("preview")} />
         </ApplicationPageWrapper>
       )}
       {pageId === "preview" && (
         <ApplicationPageWrapper
-          application={application}
           translationKeyPrefix="application:preview"
+          steps={steps}
         >
-          <Preview
-            application={application}
-            tos={tos}
-          />
+          <Preview application={application} tos={tos} />
         </ApplicationPageWrapper>
       )}
       {pageId === "view" && (
         <ApplicationPageWrapper
-          application={application}
           translationKeyPrefix="application:view"
           headContent={applicationRoundName}
-          hideStepper
+          steps={undefined}
         >
           <View application={application} tos={tos} />
         </ApplicationPageWrapper>

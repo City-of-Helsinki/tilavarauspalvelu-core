@@ -3,21 +3,15 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { Container } from "common";
-import {
-  ApplicationNode,
-  ApplicationsApplicationApplicantTypeChoices,
-} from "common/types/gql-types";
-import { filterNonNullable } from "common/src/helpers";
 import Head from "./Head";
-import Stepper from "./Stepper";
+import Stepper, { StepperProps } from "./Stepper";
 
 type ApplicationPageProps = {
-  application?: ApplicationNode;
   translationKeyPrefix: string;
   overrideText?: string;
   children?: React.ReactNode;
   headContent?: React.ReactNode;
-  hideStepper?: boolean;
+  steps: StepperProps | undefined;
 };
 
 const StyledContainer = styled(Container)`
@@ -47,38 +41,22 @@ const Main = styled.div`
 `;
 
 const ApplicationPageWrapper = ({
-  application,
   translationKeyPrefix,
   headContent,
   overrideText,
   children,
-  hideStepper = false,
+  steps,
 }: ApplicationPageProps): JSX.Element => {
   const { t } = useTranslation();
 
-  const aes = filterNonNullable(application?.applicationEvents);
-  const type =
-    application?.applicantType ??
-    ApplicationsApplicationApplicantTypeChoices.Individual;
-  // have to hide stepper if there are no application events
-  // should refactor the stepper to be more flexible
-  const hidden = hideStepper || application == null || aes.length === 0;
   return (
     <>
       <Head heading={t(`${translationKeyPrefix}.heading`)}>
         {headContent || overrideText || t(`${translationKeyPrefix}.text`)}
       </Head>
       <StyledContainer>
-        <InnerContainer $hideStepper={hideStepper}>
-          {hidden ? (
-            <div />
-          ) : (
-            <Stepper
-              applicationPk={application.pk ?? 0}
-              applicationEvents={aes}
-              applicantType={type}
-            />
-          )}
+        <InnerContainer $hideStepper={steps == null}>
+          {steps == null ? <div /> : <Stepper {...steps} />}
           <Main>{children}</Main>
         </InnerContainer>
       </StyledContainer>
