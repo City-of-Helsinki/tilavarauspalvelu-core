@@ -84,9 +84,10 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   };
 };
 
+// There is an issue with the type of the data returned by the query (double enums with same values)
 const convertApplicantType = (
   type: Maybe<ApplicationsApplicationApplicantTypeChoices> | undefined
-) => {
+): Applicant_Type => {
   switch (type) {
     case ApplicationsApplicationApplicantTypeChoices.Individual:
       return Applicant_Type.Individual;
@@ -97,7 +98,7 @@ const convertApplicantType = (
     case ApplicationsApplicationApplicantTypeChoices.Community:
       return Applicant_Type.Community;
     default:
-      return undefined;
+      return Applicant_Type.Individual;
   }
 };
 
@@ -194,7 +195,7 @@ const ApplicationRootPage = ({
     const input: ApplicationUpdateMutationInput = {
       pk: appToSave.pk,
       additionalInformation: appToSave.additionalInformation,
-      applicantType: appToSave.applicantType ?? undefined,
+      applicantType: appToSave.applicantType,
       // FIXME this includes nulls which are not allowed in the mutation
       // if we unregister the applicationEvent
       applicationEvents: filterNonNullable(appToSave.applicationEvents).map(
@@ -401,10 +402,7 @@ const ApplicationRootPage = ({
           application={application}
           translationKeyPrefix="application:Page3"
         >
-          <Page3
-            application={application}
-            onNext={saveAndNavigate("preview")}
-          />
+          <Page3 onNext={saveAndNavigate("preview")} />
         </ApplicationPageWrapper>
       )}
       {pageId === "preview" && (

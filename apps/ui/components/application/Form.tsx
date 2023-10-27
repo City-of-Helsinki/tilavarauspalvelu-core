@@ -160,14 +160,12 @@ export const convertOrganisation = (
 
 export const ApplicationFormSchema = z.object({
   pk: z.number().optional(),
-  applicantType: z
-    .enum([
-      Applicant_Type.Individual,
-      Applicant_Type.Company,
-      Applicant_Type.Association,
-      Applicant_Type.Community,
-    ])
-    .optional(),
+  applicantType: z.enum([
+    Applicant_Type.Individual,
+    Applicant_Type.Company,
+    Applicant_Type.Association,
+    Applicant_Type.Community,
+  ]),
   // TODO remove id (also does this need to be sent?)
   applicationRoundId: z.number(),
   applicationEvents: z

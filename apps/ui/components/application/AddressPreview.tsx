@@ -1,12 +1,9 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import styled from "styled-components";
 import { AddressNode } from "common/types/gql-types";
 import { SpanTwoColumns } from "../common/common";
-import LabelValue from "../common/LabelValue";
+import { StyledLabelValue } from "./styled";
 import { AddressFormValues } from "./Form";
-
-const StyledLabelValue = styled(LabelValue).attrs({ theme: "thin" })``;
 
 const Address = ({
   address,

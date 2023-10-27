@@ -1,16 +1,13 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import styled from "styled-components";
 import {
   ApplicationNode,
   ApplicationsApplicationApplicantTypeChoices,
 } from "common/types/gql-types";
 import { SpanTwoColumns, TwoColumnContainer } from "../common/common";
-import LabelValue from "../common/LabelValue";
 import Address from "./AddressPreview";
 import { ApplicationFormValues } from "./Form";
-
-const StyledLabelValue = styled(LabelValue).attrs({ theme: "thin" })``;
+import { StyledLabelValue } from "./styled";
 
 const ApplicantInfoPreview = ({
   application,
@@ -35,14 +32,9 @@ const ApplicantInfoPreview = ({
           />
           <StyledLabelValue
             label={t("application:preview.applicantTypeLabel")}
-            value={
-              application.applicantType &&
-              String(
-                t(
-                  `application:preview.applicantType.${application.applicantType}`
-                )
-              )
-            }
+            value={t(
+              `application:preview.applicantType.${application.applicantType}`
+            )}
           />
           <SpanTwoColumns>
             <StyledLabelValue
