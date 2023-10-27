@@ -72,8 +72,8 @@ class ApplicationEventSchedule(models.Model):
         constraints = [
             models.CheckConstraint(
                 name="begin_before_end",
-                check=models.Q(begin__lte=models.F("end")),
-                violation_error_message="Begin must be before end.",
+                check=(models.Q(end__hour=0) & models.Q(end__minute=0)) | models.Q(begin__lte=models.F("end")),
+                violation_error_message="Begin must be before end, or end must be at midnight.",
             ),
             models.CheckConstraint(
                 name="allocated_begin_before_end",
@@ -89,12 +89,15 @@ class ApplicationEventSchedule(models.Model):
                         & models.Q(allocated_end__isnull=False)
                         & models.Q(allocated_day__isnull=False)
                         & models.Q(allocated_reservation_unit__isnull=False)
-                        & models.Q(allocated_begin__lte=models.F("allocated_end"))
+                        & (
+                            (models.Q(allocated_end__hour=0) & models.Q(allocated_end__minute=0))
+                            | models.Q(allocated_begin__lte=models.F("allocated_end"))
+                        )
                     )
                 ),
                 violation_error_message=(
                     "Allocation day, allocated reservation unit, allocation begin, and allocation end "
-                    "must all be set or null, and begin must be before end."
+                    "must all be set or null, and begin must be before end, or end must be at midnight."
                 ),
             ),
         ]
