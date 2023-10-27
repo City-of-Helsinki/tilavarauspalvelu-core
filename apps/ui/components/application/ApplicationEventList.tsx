@@ -1,5 +1,5 @@
 import React from "react";
-import { formatDuration } from "common/src/common/util";
+import type { TFunction } from "i18next";
 import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
 import { filterNonNullable } from "common/src/helpers";
@@ -10,7 +10,7 @@ import { StyledLabelValue, TimePreviewContainer } from "./styled";
 import { TwoColumnContainer, FormSubHeading } from "../common/common";
 import { AccordionWithState as Accordion } from "../common/Accordion";
 import { UnitList } from "./UnitList";
-import {
+import type {
   ApplicationEventScheduleFormType,
   ApplicationFormValues,
 } from "./Form";
@@ -19,6 +19,19 @@ const filterPrimary = (n: ApplicationEventScheduleFormType) =>
   n.priority === 300;
 const filterSecondary = (n: ApplicationEventScheduleFormType) =>
   n.priority === 200;
+
+const formatDurationSeconds = (seconds: number, t: TFunction): string => {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds - hours * 3600) / 60);
+
+  if (hours === 0) {
+    return t("common:abbreviations:minute", { count: minutes });
+  }
+  if (minutes === 0) {
+    return t("common:abbreviations:hour", { count: hours });
+  }
+  return `${t("common:abbreviations:hour", { count: hours })} ${t("common:abbreviations:minute", { count: minutes })}`;
+}
 
 // NOTE: used by Preview and View
 // View.tsx uses FormContext because it's routed through [...params].tsx
@@ -33,8 +46,6 @@ const ApplicationEventList = ({
   const { purposeOptions } = options;
   const { ageGroups } = params;
 
-  // TODO check that this is only used with form context
-  // (if not we need to pass the applicationEvents here and use the form context in the parent).
   const form = useFormContext<ApplicationFormValues>();
   const { watch } = form;
 
@@ -115,12 +126,11 @@ const ApplicationEventList = ({
             />
             <StyledLabelValue
               label={t("application:preview.applicationEvent.minDuration")}
-              // TODO rewrite formatDuration to use numbers
-              value={formatDuration(applicationEvent.minDuration.toString())}
+              value={formatDurationSeconds(applicationEvent.minDuration, t)}
             />
             <StyledLabelValue
               label={t("application:preview.applicationEvent.maxDuration")}
-              value={formatDuration(applicationEvent.maxDuration.toString())}
+              value={formatDurationSeconds(applicationEvent.maxDuration, t)}
             />
             <StyledLabelValue
               label={t("application:preview.applicationEvent.eventsPerWeek")}
