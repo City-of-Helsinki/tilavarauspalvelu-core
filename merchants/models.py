@@ -80,6 +80,7 @@ class PaymentOrder(ExportModelOperationsMixin("payment_order"), models.Model):
         related_name="payment_order",
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
         help_text="Reservation this order is based on",
     )
 
