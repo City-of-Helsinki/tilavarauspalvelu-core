@@ -34,7 +34,7 @@ import Page1 from "@/components/application/Page1";
 import Page2 from "@/components/application/Page2";
 import Page3 from "@/components/application/Page3";
 import { Preview } from "@/components/application/Preview";
-import View from "@/components/application/View";
+import { View } from "@/components/application/View";
 import Sent from "@/components/application/Sent";
 import { CenterSpinner } from "@/components/common/common";
 import { fromUIDate, getTranslation } from "@/modules/util";
@@ -342,7 +342,7 @@ const ApplicationRootPage = ({
     resolver: zodResolver(ApplicationFormSchema),
   });
 
-  const { getValues, reset } = form;
+  const { reset } = form;
 
   // TODO this is problematic since we are dynamically adding and removing events and that modifies the application
   // the logic for adding should be inside the form not a custom effect
@@ -368,8 +368,8 @@ const ApplicationRootPage = ({
     applicationRound != null ? getTranslation(applicationRound, "name") : "-";
 
   // TODO refactor this to use the same <form onSubmit /> logic as other parts (not getValues)
-  const handleApplicationFinished = () => {
-    saveAndNavigate("sent")(getValues());
+  const handleApplicationFinished = (values: ApplicationFormValues) => {
+    saveAndNavigate("sent")(values);
   };
 
   // TODO the inner content can be rewriten as a switch (or use proper file routing instead)
