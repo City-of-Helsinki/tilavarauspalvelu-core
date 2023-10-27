@@ -30,8 +30,11 @@ const formatDurationSeconds = (seconds: number, t: TFunction): string => {
   if (minutes === 0) {
     return t("common:abbreviations:hour", { count: hours });
   }
-  return `${t("common:abbreviations:hour", { count: hours })} ${t("common:abbreviations:minute", { count: minutes })}`;
-}
+  return `${t("common:abbreviations:hour", { count: hours })} ${t(
+    "common:abbreviations:minute",
+    { count: minutes }
+  )}`;
+};
 
 // NOTE: used by Preview and View
 // View.tsx uses FormContext because it's routed through [...params].tsx

@@ -107,13 +107,6 @@ const IntroPage = (): JSX.Element => {
   const createNewApplication = async (applicationRoundId: number) => {
     const input: ApplicationCreateMutationInput = {
       applicationRound: applicationRoundId,
-      // TODO why is billingAddress required?
-      // also it returns silly errors if they are empty so dummy values for now
-      billingAddress: {
-        streetAddress: "dummy",
-        postCode: "dummy",
-        city: "dummy",
-      },
     };
     const { data: mutResponse, errors } = await create({
       variables: { input },

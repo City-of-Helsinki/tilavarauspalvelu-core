@@ -3,9 +3,9 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { fontBold, H4 } from "common/src/common/typography";
+import { fromMondayFirstUnsafe } from "common/src/helpers";
 import { weekdays } from "../../modules/const";
 import { ApplicationEventScheduleFormType } from "./Form";
-import { fromMondayFirstUnsafe } from "common/src/helpers";
 
 type Props = {
   primary: ApplicationEventScheduleFormType[];

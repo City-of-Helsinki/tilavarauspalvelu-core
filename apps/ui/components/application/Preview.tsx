@@ -3,7 +3,12 @@ import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { useFormContext } from "react-hook-form";
 import { useMutation } from "@apollo/client";
-import type { ApplicationNode, Mutation, MutationSendApplicationArgs, TermsOfUseType } from "common/types/gql-types";
+import type {
+  ApplicationNode,
+  Mutation,
+  MutationSendApplicationArgs,
+  TermsOfUseType,
+} from "common/types/gql-types";
 import { SEND_APPLICATION_MUTATION } from "@/modules/queries/application";
 import { MediumButton } from "@/styles/util";
 import { ButtonContainer } from "../common/common";
@@ -28,7 +33,9 @@ const Preview = ({ application, tos }: Props): JSX.Element | null => {
   const form = useFormContext<ApplicationFormValues>();
   const { handleSubmit } = form;
 
-  const [send] = useMutation<Mutation, MutationSendApplicationArgs>(SEND_APPLICATION_MUTATION);
+  const [send] = useMutation<Mutation, MutationSendApplicationArgs>(
+    SEND_APPLICATION_MUTATION
+  );
 
   const onSubmit = async (values: ApplicationFormValues) => {
     if (!acceptTermsOfUse) {
@@ -79,7 +86,7 @@ const Preview = ({ application, tos }: Props): JSX.Element | null => {
         }
         acceptTermsOfUse={acceptTermsOfUse}
         setAcceptTermsOfUse={setAcceptTermsOfUse}
-        />
+      />
       <ButtonContainer>
         <MediumButton
           variant="secondary"
@@ -87,11 +94,7 @@ const Preview = ({ application, tos }: Props): JSX.Element | null => {
         >
           {t("common:prev")}
         </MediumButton>
-        <MediumButton
-          id="submit"
-          type="submit"
-          disabled={!acceptTermsOfUse}
-        >
+        <MediumButton id="submit" type="submit" disabled={!acceptTermsOfUse}>
           {t("common:submit")}
         </MediumButton>
       </ButtonContainer>

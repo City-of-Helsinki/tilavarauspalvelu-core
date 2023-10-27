@@ -13,13 +13,14 @@ import {
   Query,
   QueryApplicationsArgs,
 } from "common/types/gql-types";
+import { filterNonNullable } from "common/src/helpers";
 import { useSession } from "@/hooks/auth";
 import { getReducedApplicationStatus } from "@/modules/util";
 import { redirectProtectedRoute } from "@/modules/protectedRoute";
-import Head from "../components/applications/Head";
-import ApplicationsGroup from "../components/applications/ApplicationsGroup";
-import { CenterSpinner } from "../components/common/common";
-import { APPLICATIONS } from "../modules/queries/application";
+import Head from "@/components/applications/Head";
+import ApplicationsGroup from "@/components/applications/ApplicationsGroup";
+import { CenterSpinner } from "@/components/common/common";
+import { APPLICATIONS } from "@/modules/queries/application";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale } = ctx;
@@ -101,10 +102,9 @@ const ApplicationsPage = (): JSX.Element | null => {
     },
   });
 
-  const appNodes =
-    appData?.applications?.edges
-      ?.map((n) => n?.node)
-      .filter((n): n is ApplicationNode => n != null) ?? [];
+  const appNodes = filterNonNullable(
+    appData?.applications?.edges?.map((n) => n?.node)
+  );
   const applications: Dictionary<ApplicationNode[]> = groupBy(appNodes, (a) =>
     getReducedApplicationStatus(a?.status ?? undefined)
   );

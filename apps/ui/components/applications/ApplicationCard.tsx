@@ -138,7 +138,10 @@ type Props = {
 };
 
 const getApplicant = (application: ApplicationNode, t: TFunction): string => {
-  if (application.applicantType === ApplicationsApplicationApplicantTypeChoices.Individual) {
+  if (
+    application.applicantType ===
+    ApplicationsApplicationApplicantTypeChoices.Individual
+  ) {
     return t("applicationCard:person");
   }
   if (application.organisation) {

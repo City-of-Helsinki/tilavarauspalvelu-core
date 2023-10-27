@@ -44,6 +44,7 @@ const ApplicationEventFormValueSchema = z.object({
     .number()
     .optional()
     .refine((s) => s, { path: [""], message: "Required" }),
+  // TODO refinements: min < max, min > 0, max > 0 (currently max duration is not required before sending)
   minDuration: z.number().min(1),
   maxDuration: z.number().min(1),
   eventsPerWeek: z.number().min(1),

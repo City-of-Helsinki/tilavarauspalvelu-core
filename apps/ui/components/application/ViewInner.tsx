@@ -2,10 +2,13 @@ import React from "react";
 import { Checkbox } from "hds-react";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next";
+import type {
+  ReservationUnitType,
+  TermsOfUseType,
+} from "common/types/gql-types";
 import { getTranslation } from "@/modules/util";
 import { useOptions } from "@/hooks/useOptions";
 import ApplicantInfoPreview from "./ApplicantInfoPreview";
-import type { ReservationUnitType, TermsOfUseType } from "common/types/gql-types";
 import { FormSubHeading } from "../common/common";
 import { CheckboxContainer, StyledNotification, Terms } from "./styled";
 import { AccordionWithState as Accordion } from "../common/Accordion";
@@ -17,11 +20,11 @@ export const ViewInner = ({
   allReservationUnits,
   acceptTermsOfUse,
   setAcceptTermsOfUse,
-} : {
-  tos: TermsOfUseType[]
-  allReservationUnits: ReservationUnitType[]
-  acceptTermsOfUse?: boolean
-  setAcceptTermsOfUse?: (value: boolean) => void
+}: {
+  tos: TermsOfUseType[];
+  allReservationUnits: ReservationUnitType[];
+  acceptTermsOfUse?: boolean;
+  setAcceptTermsOfUse?: (value: boolean) => void;
 }): JSX.Element => {
   const { t } = useTranslation();
 
@@ -36,8 +39,7 @@ export const ViewInner = ({
 
   const homeCity = watch("homeCityId");
   const city = homeCity
-    ? cities.find((opt) => opt.value === homeCity.toString())
-        ?.label ?? "-"
+    ? cities.find((opt) => opt.value === homeCity.toString())?.label ?? "-"
     : "-";
 
   return (
@@ -50,9 +52,7 @@ export const ViewInner = ({
       >
         <ApplicantInfoPreview city={city} application={getValues()} />
       </Accordion>
-      <ApplicationEventList
-        allReservationUnits={allReservationUnits}
-      />
+      <ApplicationEventList allReservationUnits={allReservationUnits} />
       <FormSubHeading>{t("reservationUnit:termsOfUse")}</FormSubHeading>
       {tos1 && <Terms tabIndex={0}>{getTranslation(tos1, "text")}</Terms>}
       <FormSubHeading>

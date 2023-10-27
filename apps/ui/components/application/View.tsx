@@ -25,7 +25,7 @@ const View = ({ application, tos }: Props): JSX.Element => {
         allReservationUnits={
           application.applicationRound.reservationUnits ?? []
         }
-        />
+      />
       <ButtonContainer>
         <BlackButton variant="secondary" onClick={() => router.back()}>
           {t("common:prev")}
