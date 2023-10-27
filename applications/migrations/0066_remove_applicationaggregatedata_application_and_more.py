@@ -32,6 +32,21 @@ def convert_schedule_results_to_schedule(apps, schema_editor):
             schedule.allocated_day = result.allocated_day
             schedule.allocated_reservation_unit = result.allocated_reservation_unit
 
+            # If allocated times would violate the check constraint
+            # 'allocated_begin_before_end', swap the beginning and end times.
+            if schedule.allocated_begin > schedule.allocated_end:
+                schedule.allocated_begin, schedule.allocated_end = schedule.allocated_end, schedule.allocated_begin
+        else:
+            schedule.allocated_begin = None
+            schedule.allocated_end = None
+            schedule.allocated_day = None
+            schedule.allocated_reservation_unit = None
+
+        # If desired times would violate the check constraint
+        # 'begin_before_end', swap the beginning and end times.
+        if schedule.begin > schedule.end:
+            schedule.begin, schedule.end = schedule.end, schedule.begin
+
         schedule.declined = result.declined is True or result.accepted is False
         schedule.save()
 
