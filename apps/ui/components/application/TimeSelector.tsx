@@ -8,6 +8,7 @@ import type {
 } from "common/types/common";
 import { fontRegular } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
+import { fromMondayFirstUnsafe } from "common/src/helpers";
 import { weekdays } from "@/modules/const";
 import {
   arrowDown,
@@ -384,7 +385,7 @@ const TimeSelector = ({
             painting={painting}
             setPainting={setPainting}
             key={`day-${c}`}
-            head={t(`calendar:${c}`)}
+            head={t(`common:weekDayLong.${fromMondayFirstUnsafe(i)}`)}
             cells={cells[i]}
             setCellValue={setCellValue}
             priority={priority}

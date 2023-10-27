@@ -5,6 +5,7 @@ import { breakpoints } from "common/src/common/style";
 import { fontBold, H4 } from "common/src/common/typography";
 import { weekdays } from "../../modules/const";
 import { ApplicationEventScheduleFormType } from "./Form";
+import { fromMondayFirstUnsafe } from "common/src/helpers";
 
 type Props = {
   primary: ApplicationEventScheduleFormType[];
@@ -42,7 +43,7 @@ const Weekdays = ({
         return (
           <WeekWrapper key={day}>
             <Label>
-              {t(`common:weekDayLong.${index}`)}
+              {t(`common:weekDayLong.${fromMondayFirstUnsafe(index)}`)}
               {value && ":"}
             </Label>
             <div>{value}</div>
