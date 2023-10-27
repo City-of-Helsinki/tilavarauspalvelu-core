@@ -7,8 +7,29 @@ from django.db import migrations, models
 def add_first_event_schedule(apps, schema_editor):
     RecurringReservation = apps.get_model("reservations", "RecurringReservation")
     for recurring in RecurringReservation.objects.all():
-        recurring.application_event_schedule = recurring.application_event.application_event_schedule.first()
-        recurring.save()
+        needs_schedule = True
+
+        # Look from the linked application event, use the first schedule found
+        if needs_schedule and recurring.application_event is not None:
+            for schedule in recurring.application_event.application_event_schedules.all():
+                recurring.application_event_schedule = schedule
+                needs_schedule = False
+                break
+
+        # Look from the linked application, use the first schedule found
+        if needs_schedule and recurring.application is not None:
+            for event in recurring.application.application_events.all():
+                if not needs_schedule:
+                    break
+
+                for schedule in event.application_event_schedules.all():
+                    recurring.application_event_schedule = schedule
+                    needs_schedule = False
+                    break
+
+        # Schedule was filled -> Should save
+        if not needs_schedule:
+            recurring.save()
 
 
 class Migration(migrations.Migration):
