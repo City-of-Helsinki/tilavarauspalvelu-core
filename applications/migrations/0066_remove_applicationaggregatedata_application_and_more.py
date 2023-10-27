@@ -34,7 +34,11 @@ def convert_schedule_results_to_schedule(apps, schema_editor):
 
             # If allocated times would violate the check constraint
             # 'allocated_begin_before_end', swap the beginning and end times.
-            if schedule.allocated_begin > schedule.allocated_end:
+            if (
+                schedule.allocated_end.hour != 0
+                and schedule.allocated_end.minute != 0
+                and schedule.allocated_begin > schedule.allocated_end
+            ):
                 schedule.allocated_begin, schedule.allocated_end = schedule.allocated_end, schedule.allocated_begin
         else:
             schedule.allocated_begin = None
@@ -44,7 +48,7 @@ def convert_schedule_results_to_schedule(apps, schema_editor):
 
         # If desired times would violate the check constraint
         # 'begin_before_end', swap the beginning and end times.
-        if schedule.begin > schedule.end:
+        if schedule.end.hour != 0 and schedule.end.minute != 0 and schedule.begin > schedule.end:
             schedule.begin, schedule.end = schedule.end, schedule.begin
 
         schedule.declined = result.declined is True or result.accepted is False
@@ -644,14 +648,6 @@ class Migration(migrations.Migration):
         migrations.AddIndex(
             model_name='applicationeventschedule',
             index=models.Index(fields=['application_event', 'priority'], name='event_priority_index'),
-        ),
-        migrations.AddConstraint(
-            model_name='applicationeventschedule',
-            constraint=models.CheckConstraint(check=models.Q(('begin__lte', models.F('end'))), name='begin_before_end', violation_error_message='Begin must be before end.'),
-        ),
-        migrations.AddConstraint(
-            model_name='applicationeventschedule',
-            constraint=models.CheckConstraint(check=models.Q(models.Q(('allocated_begin__isnull', True), ('allocated_end__isnull', True), ('allocated_day__isnull', True), ('allocated_reservation_unit__isnull', True)), models.Q(('allocated_begin__isnull', False), ('allocated_end__isnull', False), ('allocated_day__isnull', False), ('allocated_reservation_unit__isnull', False), ('allocated_begin__lte', models.F('allocated_end'))), _connector='OR'), name='allocated_begin_before_end', violation_error_message='Allocation day, allocated reservation unit, allocation begin, and allocation end must all be set or null, and begin must be before end.'),
         ),
         migrations.DeleteModel(
             name='ApplicationAggregateData',
