@@ -19,6 +19,8 @@ const Form = styled.form`
   padding-bottom: var(--spacing-l);
 `;
 
+/// TODO this isn't validated when saving
+/// make a separate schema for it? and maybe even a separate form?
 const Page3 = (): JSX.Element | null => {
   const { options } = useOptions();
   const { cityOptions } = options;

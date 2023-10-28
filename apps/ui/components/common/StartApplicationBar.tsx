@@ -5,9 +5,9 @@ import { useRouter } from "next/router";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { Container as CommonContainer } from "common";
-
-import { JustForDesktop, JustForMobile } from "../../modules/style/layout";
-import { truncatedText } from "../../styles/util";
+import ClientOnly from "common/src/ClientOnly";
+import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
+import { truncatedText } from "@/styles/util";
 
 type Props = {
   count: number;
@@ -92,6 +92,8 @@ const StartApplicationBar = ({
   const { t } = useTranslation();
   const router = useRouter();
 
+  // This breaks SSR because the server knowns nothing about client side stores
+  // we can't fix it with CSS since it doesn't update properly
   if (count === 0) {
     return null;
   }
@@ -137,4 +139,10 @@ const StartApplicationBar = ({
   );
 };
 
-export default StartApplicationBar;
+const StartApplicationBarWrapped = (props: Props) => (
+  <ClientOnly>
+    <StartApplicationBar {...props} />
+  </ClientOnly>
+);
+
+export default StartApplicationBarWrapped;

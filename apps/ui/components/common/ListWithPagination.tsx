@@ -91,6 +91,7 @@ const ListWithPagination = ({
   const shouldShowPaginationButton =
     endCursor != null && pageInfo?.hasNextPage && items?.length > 0;
 
+  // TODO this is awful don't define components inside render functions
   const content = items ? (
     <>
       <ListContainer data-testid="list-with-pagination__list--container">

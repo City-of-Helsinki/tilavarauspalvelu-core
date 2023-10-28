@@ -12,7 +12,6 @@ import { NetworkStatus, useQuery } from "@apollo/client";
 import { OptionType } from "common/types/common";
 import { H2 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import ClientOnly from "common/src/ClientOnly";
 import {
   ApplicationRoundNode,
   ApplicationRoundStatusChoice,
@@ -23,7 +22,6 @@ import {
   ReservationUnitType,
 } from "common/types/gql-types";
 import { Container } from "common";
-
 import { filterNonNullable } from "common/src/helpers";
 import SearchForm from "../../components/search/SearchForm";
 import { capitalize, searchUrl } from "../../modules/util";
@@ -305,7 +303,6 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
           />
         </StyledContainer>
       </HeadContainer>
-      <ClientOnly>
         <BottomWrapper>
           <ListWithPagination
             id="searchResultList"
@@ -358,7 +355,6 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
             clearSelections={clearSelections}
           />
         </BottomWrapper>
-      </ClientOnly>
     </Wrapper>
   );
 };

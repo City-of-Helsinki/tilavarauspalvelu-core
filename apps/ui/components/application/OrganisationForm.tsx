@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
-import { TextInput, Checkbox } from "hds-react";
+import { TextInput, Checkbox, Select } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { Control, FieldValues, useFormContext } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
 import { OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
@@ -10,7 +10,6 @@ import { applicationErrorText } from "@/modules/util";
 import { TwoColumnContainer, FormSubHeading } from "../common/common";
 import { EmailInput } from "./EmailInput";
 import { BillingAddress } from "./BillingAddress";
-import ControlledSelect from "../common/ControlledSelect";
 import { ApplicationFormValues } from "./Form";
 
 export const Placeholder = styled.span`
@@ -79,13 +78,20 @@ const OrganisationForm = ({ homeCityOptions }: Props): JSX.Element | null => {
           }
         )}
       />
-      <ControlledSelect
+      <Controller
+        control={control}
+        rules={{ required: true }}
         name="homeCityId"
-        required
-        label={t("application:Page3.homeCity")}
-        control={control as unknown as Control<FieldValues, unknown>}
-        options={homeCityOptions}
-        error={applicationErrorText(t, errors.homeCityId?.type)}
+        render={({ field }) => (
+          <Select<OptionType>
+            label={t("application:Page3.homeCity")}
+            value={homeCityOptions.find((v) => v.value === field.value)}
+            onChange={(v: OptionType) => field.onChange(v.value)}
+            required
+            options={homeCityOptions}
+            error={applicationErrorText(t, errors.homeCityId?.type)}
+            />
+        )}
       />
       <Placeholder />
       <CheckboxWrapper style={{ margin: "var(--spacing-xs) 0" }}>

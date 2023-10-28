@@ -38,6 +38,7 @@ export const CREATE_APPLICATION_MUTATION = gql`
       pk
       errors {
         messages
+        field
       }
     }
   }
@@ -49,6 +50,7 @@ export const UPDATE_APPLICATION_MUTATION = gql`
       pk
       errors {
         messages
+        field
       }
     }
   }
@@ -60,6 +62,7 @@ export const SEND_APPLICATION_MUTATION = gql`
       pk
       errors {
         messages
+        field
       }
     }
   }
@@ -71,6 +74,7 @@ export const CANCEL_APPLICATION_MUTATION = gql`
       pk
       errors {
         messages
+        field
       }
     }
   }

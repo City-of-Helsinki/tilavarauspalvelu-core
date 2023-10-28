@@ -19,7 +19,6 @@ import {
   uiDateToApiDate,
 } from "@/modules/util";
 import { ApplicationEventSummary } from "./ApplicationEventSummary";
-import ControlledSelect from "../common/ControlledSelect";
 import Accordion from "../common/Accordion";
 import { getDurationNumberOptions } from "@/modules/const";
 import { after, before } from "@/modules/validation";
@@ -203,29 +202,37 @@ const ApplicationEventInner = ({
             invalid={!!errors.applicationEvents?.[index]?.numPersons?.type}
           />
         </div>
-        <ControlledSelect
-          // TODO remove the controlled select (it's not type safe)
-          name={`applicationEvents.${index}.ageGroup`}
-          required
-          label={t("application:Page1.ageGroup")}
-          // @ts-expect-error -- Remove the ControlledSelect to fix the types
+        <Controller
           control={form.control}
-          options={ageGroupOptions}
-          error={applicationErrorText(
-            t,
-            errors.applicationEvents?.[index]?.ageGroup?.type
+          rules={{ required: true }}
+          name={`applicationEvents.${index}.ageGroup`}
+          render={({ field }) => (
+            <Select<OptionType>
+              value={ageGroupOptions.find((v) => v.value === field.value)}
+              onChange={(v: OptionType) => field.onChange(v.value)}
+              required
+              label={t("application:Page1.ageGroup")}
+              options={ageGroupOptions}
+              error={applicationErrorText(t, errors.applicationEvents?.[index]?.ageGroup?.type)}
+              />
           )}
         />
-        <ControlledSelect
-          name={`applicationEvents.${index}.purpose`}
-          required
-          label={t("application:Page1.purpose")}
-          // @ts-expect-error -- Remove the ControlledSelect to fix the types
+        <Controller
           control={form.control}
+          rules={{ required: true }}
+          name={`applicationEvents.${index}.purpose`}
+          render={({ field }) => (
+            <Select<OptionType>
+              label={t("application:Page1.purpose")}
+              value={ageGroupOptions.find((v) => v.value === field.value)}
+              onChange={(v: OptionType) => field.onChange(v.value)}
+              required
           options={purposeOptions}
           error={applicationErrorText(
             t,
             errors.applicationEvents?.[index]?.purpose?.type
+          )}
+              />
           )}
         />
       </TwoColumnContainer>
