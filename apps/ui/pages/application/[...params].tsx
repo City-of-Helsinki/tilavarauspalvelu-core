@@ -21,7 +21,6 @@ import {
   Applicant_Type,
   ApplicationStatusChoice,
   ApplicationsApplicationApplicantTypeChoices,
-  ReservationsReservationPriorityChoices,
 } from "common/types/gql-types";
 import { APPLICATION_QUERY } from "common/src/queries/application";
 import { useMutation, useQuery } from "@apollo/client";
@@ -54,6 +53,7 @@ import {
 } from "@/components/application/Form";
 import { UPDATE_APPLICATION_MUTATION } from "@/modules/queries/application";
 import type { StepperProps } from "@/components/application/Stepper";
+import useReservationUnitsList from "@/hooks/useReservationUnitList";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale } = ctx;
@@ -71,8 +71,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     query: TERMS_OF_USE,
   });
 
-  // TODO why does this work? pk should be number but we compare to string?
-  // is this an inconsistency in the backend?
   const tos = tosData?.termsOfUse?.edges
     .map((n) => n?.node)
     .filter((n) => n?.pk === "KUVAnupa" || n?.pk === "generic1");
@@ -101,21 +99,6 @@ const convertApplicantType = (
       return Applicant_Type.Community;
     default:
       return Applicant_Type.Individual;
-  }
-};
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const convertPriority = (
-  prio: ApplicationEventSchedulePriority
-): ReservationsReservationPriorityChoices => {
-  switch (prio) {
-    case 300:
-      return ReservationsReservationPriorityChoices.A_300;
-    case 200:
-      return ReservationsReservationPriorityChoices.A_200;
-    case 100:
-    default:
-      return ReservationsReservationPriorityChoices.A_100;
   }
 };
 
@@ -167,7 +150,8 @@ const calculateCompletedStep = (
   if (status === ApplicationStatusChoice.Received) {
     return 4;
   }
-  // 3 if the user information is not filled out
+
+  // 3 if the user information is filled
   if (
     (values.billingAddress?.streetAddress &&
       values.applicantType === Applicant_Type.Individual) ||
@@ -175,7 +159,8 @@ const calculateCompletedStep = (
   ) {
     return 3;
   }
-  // 2 only if there are application events + they have time slots defined
+
+  // 2 only if application events have time schedules
   if (
     values.applicationEvents?.length &&
     values.applicationEvents.length > 0 &&
@@ -183,13 +168,23 @@ const calculateCompletedStep = (
   ) {
     return 2;
   }
-  // 1 if there are no reservation units or the basic info is missing
-  if (values.applicationEvents?.[0]?.reservationUnits?.length) {
+
+  // First page is valid
+  if (values.applicationEvents?.[0]?.reservationUnits?.length
+    && values.applicationEvents?.[0]?.begin != null && values.applicationEvents?.[0]?.end != null
+    && values.applicationEvents?.[0]?.name != "" && values.applicationEvents?.[0]?.numPersons != null
+    && values.applicationEvents?.[0]?.numPersons > 0
+    && values.applicationEvents?.[0]?.purpose != null
+  ) {
     return 1;
   }
   return 0;
 };
 
+// TODO when coming to this for the first time we should have a list of reservation units the user selected
+// this used to be in the old version but isn't working right now
+// this seems to have been sticky in the old one (i.e. remove the partial application event, and recreate it the units are still there)
+// TODO also there should always be one application event created in a new form (and it's not possible to save without at least one)
 const ApplicationRootPage = ({
   application,
   applicationRound,
@@ -251,9 +246,9 @@ const ApplicationRootPage = ({
           // these (pks) can never be zero or null in the current version
           // even if there are no abilityGroups in the database...
           // so for now default them to 1 and have another look after the backend change is merged
-          abilityGroup: ae.abilityGroup ?? 1,
-          ageGroup: ae.ageGroup ?? 1,
-          purpose: ae.purpose ?? 1,
+          ...(ae.abilityGroup != null ? { abilityGroup: ae.abilityGroup } : {}),
+          ...(ae.ageGroup != null ? { ageGroup: ae.ageGroup } : {}),
+          ...(ae.purpose != null ? { purpose: ae.purpose } : {}),
           // min / max duration is a weird string format in the API
           minDuration: String(ae.minDuration ?? 0), // "3600" == 1h
           maxDuration: String(ae.maxDuration ?? 0), // "7200" == 2h
@@ -281,10 +276,6 @@ const ApplicationRootPage = ({
                 // Time format (HH:MM)
                 begin: aes.begin,
                 end: aes.end,
-                // FIXME priority is not a valid value
-                // This seems to be a backend problem (some extra validation that is not in sync with GQL schema)
-                // "\"priority.A_300\" ei ole kelvollinen valinta."
-                // priority: convertPriority(aes.priority),
                 priority: aes.priority,
               };
             }),
@@ -299,9 +290,8 @@ const ApplicationRootPage = ({
       applicationRound: appToSave.applicationRoundId,
       ...(appToSave.hasBillingAddress ||
       appToSave.applicantType === Applicant_Type.Individual
-        ? { billingAddress: appToSave.billingAddress }
+        ? { billingAddress: transformAddress(appToSave.billingAddress) }
         : {}),
-      // TODO check for empty fields and save undefined instead of empty string
       contactPerson: transformPerson(appToSave.contactPerson),
       homeCity: appToSave.homeCityId,
       organisation: transformOrganisation(appToSave.organisation),
@@ -359,6 +349,9 @@ const ApplicationRootPage = ({
       router.push(target);
     };
 
+  const formAes = filterNonNullable(application?.applicationEvents).map(
+        (ae) => transformApplicationEventToForm(ae)
+      )
   const form = useForm<ApplicationFormValues>({
     mode: "onChange",
     defaultValues: {
@@ -366,9 +359,26 @@ const ApplicationRootPage = ({
       applicantType: convertApplicantType(application?.applicantType),
       // TODO do we need to get the applicationRoundId from somewhere else?
       applicationRoundId: applicationRound?.pk ?? undefined,
-      applicationEvents: filterNonNullable(application?.applicationEvents).map(
-        (ae) => transformApplicationEventToForm(ae)
-      ),
+      applicationEvents: formAes.length > 0 ? formAes : [
+        {
+          // TODO do we need to set default values?
+          pk: undefined,
+          name: "",
+          numPersons: 0,
+          abilityGroup: undefined,
+          ageGroup: undefined,
+          purpose: undefined,
+          minDuration: 0,
+          maxDuration: 0,
+          begin: undefined,
+          end: undefined,
+          biweekly: false,
+          eventsPerWeek: 1,
+          applicationEventSchedules: [],
+          // TODO get the selected from the hook
+          reservationUnits: [],
+        },
+      ],
       organisation: convertOrganisation(application?.organisation),
       contactPerson: convertPerson(application?.contactPerson),
       billingAddress: convertAddress(application?.billingAddress),
@@ -388,6 +398,7 @@ const ApplicationRootPage = ({
     formState: { isDirty },
   } = form;
 
+  const { reservationUnits: selectedReservationUnits } = useReservationUnitsList();
   // TODO combine the defaultValues and reset (single transformation function)
   useEffect(() => {
     reset({
@@ -395,9 +406,27 @@ const ApplicationRootPage = ({
       applicantType: convertApplicantType(application?.applicantType),
       // TODO do we need to get the applicationRoundId from somewhere else?
       applicationRoundId: applicationRound?.pk ?? undefined,
-      applicationEvents: filterNonNullable(application?.applicationEvents).map(
-        (ae) => transformApplicationEventToForm(ae)
-      ),
+      applicationEvents: formAes.length > 0 ? formAes : [
+        {
+          // TODO do we need to set default values?
+          pk: undefined,
+          name: "",
+          numPersons: 0,
+          abilityGroup: undefined,
+          ageGroup: undefined,
+          purpose: undefined,
+          minDuration: 0,
+          maxDuration: 0,
+          begin: undefined,
+          end: undefined,
+          accordianOpen: true,
+          biweekly: false,
+          eventsPerWeek: 1,
+          applicationEventSchedules: [],
+          // TODO get the selected from the hook
+          reservationUnits: filterNonNullable(selectedReservationUnits.map((ru) => ru.pk)),
+        },
+      ],
       organisation: convertOrganisation(application?.organisation),
       contactPerson: convertPerson(application?.contactPerson),
       billingAddress: convertAddress(application?.billingAddress),
@@ -431,34 +460,21 @@ const ApplicationRootPage = ({
           translationKeyPrefix="application:Page1"
           steps={steps}
         >
-          <Page1
-            applicationRound={applicationRound}
-            application={application}
-            onNext={saveAndNavigate("page2")}
-          />
+          <Page1 applicationRound={applicationRound} onNext={saveAndNavigate("page2")} />
         </ApplicationPageWrapper>
       )}
       {pageId === "page2" && (
-        <ApplicationPageWrapper
-          translationKeyPrefix="application:Page2"
-          steps={steps}
-        >
+        <ApplicationPageWrapper translationKeyPrefix="application:Page2" steps={steps}>
           <Page2 application={application} onNext={saveAndNavigate("page3")} />
         </ApplicationPageWrapper>
       )}
       {pageId === "page3" && (
-        <ApplicationPageWrapper
-          translationKeyPrefix="application:Page3"
-          steps={steps}
-        >
+        <ApplicationPageWrapper translationKeyPrefix="application:Page3" steps={steps}>
           <Page3 onNext={saveAndNavigate("preview")} />
         </ApplicationPageWrapper>
       )}
       {pageId === "preview" && (
-        <ApplicationPageWrapper
-          translationKeyPrefix="application:preview"
-          steps={steps}
-        >
+        <ApplicationPageWrapper translationKeyPrefix="application:preview" steps={steps}>
           <Preview application={application} tos={tos} />
         </ApplicationPageWrapper>
       )}

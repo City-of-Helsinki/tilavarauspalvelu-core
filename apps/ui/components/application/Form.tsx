@@ -59,6 +59,8 @@ const ApplicationEventFormValueSchema = z.object({
     .refine((s) => s, { path: [""], message: "Required" }),
   applicationEventSchedules: z.array(ApplicationEventScheduleFormTypeSchema),
   reservationUnits: z.array(z.number()).min(1),
+  // extra page prop, not saved to backend
+  accordianOpen: z.boolean(),
 });
 
 export type ApplicationEventFormValue = z.infer<
@@ -100,6 +102,7 @@ export const transformApplicationEventToForm = (
     applicationEvent?.end != null && applicationEvent?.end?.includes("-")
       ? apiDateToUIDate(applicationEvent.end)
       : applicationEvent?.end ?? undefined,
+  accordianOpen: false,
 });
 
 export const AddressFormValueSchema = z.object({
@@ -113,10 +116,10 @@ export type AddressFormValues = z.infer<typeof AddressFormValueSchema>;
 // TODO identifier is only optional for Associations (not for Companies / Communities)
 export const OrganisationFormValuesSchema = z.object({
   pk: z.number().optional(),
-  name: z.string(),
+  name: z.string().min(1).max(255),
   identifier: z.string().optional(),
   yearEstablished: z.number().optional(),
-  coreBusiness: z.string(),
+  coreBusiness: z.string().min(1).max(255),
   address: AddressFormValueSchema,
 });
 export type OrganisationFormValues = z.infer<
@@ -125,10 +128,10 @@ export type OrganisationFormValues = z.infer<
 
 export const PersonFormValuesSchema = z.object({
   pk: z.number().optional(),
-  firstName: z.string(),
-  lastName: z.string(),
-  email: z.string(),
-  phoneNumber: z.string(),
+  firstName: z.string().min(1).max(255),
+  lastName: z.string().min(1).max(255),
+  email: z.string().min(1).max(255).email(),
+  phoneNumber: z.string().min(1).max(255),
 });
 export type PersonFormValues = z.infer<typeof PersonFormValuesSchema>;
 
@@ -183,7 +186,26 @@ export const ApplicationFormSchema = z.object({
   // TODO are these needed?
   createdDate: z.string().optional(),
   lastModifiedDate: z.string().optional(),
-});
+})
+/* TODO can't do this unless we split the form into multiple steps
+ .refine((v) => ((v.applicantType === Applicant_Type.Company || v.applicantType === Applicant_Type.Association || v.applicantType === Applicant_Type.Community) && v.organisation != null), {
+    path: ["organisation"],
+    message: "Required"
+}).refine((v) => v.applicantType === Applicant_Type.Individual && v.contactPerson != null, {
+    path: ["contactPerson"],
+    message: "Required"
+}).refine((v) => (v.hasBillingAddress && v.billingAddress != null), {
+    path: ["billingAddress"],
+    message: "Required"
+}).refine((v) => (v.applicantType === Applicant_Type.Individual && v.billingAddress != null), {
+    path: ["billingAddress.streetAddress"],
+    message: "Required"
+})
+*/
+
+// TODO refine
+// if applicantType === Organisation | Company => organisation.identifier is required
+// if hasBillingAddress | applicantType === Individual => billingAddress is required
 export const ApplicationFormSchemaRefined = ApplicationFormSchema;
 
 export type ApplicationFormValues = z.infer<typeof ApplicationFormSchema>;

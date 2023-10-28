@@ -1,12 +1,11 @@
 import { IconArrowRight, IconPlusCircle } from "hds-react";
-import React, { useState } from "react";
+import React from "react";
 import { useTranslation } from "next-i18next";
 import { useQuery } from "@apollo/client";
 import { uniq } from "lodash";
 import {
   type Query,
   type ApplicationRoundNode,
-  type ApplicationNode,
 } from "common/types/gql-types";
 import { useFormContext } from "react-hook-form";
 import { getTranslation, mapOptions } from "@/modules/util";
@@ -16,19 +15,19 @@ import { SEARCH_FORM_PARAMS_UNIT } from "@/modules/queries/params";
 import { ButtonContainer } from "../common/common";
 import { ApplicationEvent } from "./ApplicationEvent";
 import { type ApplicationFormValues } from "./Form";
+import useReservationUnitsList from "@/hooks/useReservationUnitList";
+import { filterNonNullable } from "common/src/helpers";
 
 type Props = {
   // TODO break application round down to smaller pieces (only the required props)
   // mostly we need periodBegin and periodEnd here (that should be Dates not strings)
   // we also need applicationRound.reservationUnits for ReservationUnitList
   applicationRound: ApplicationRoundNode;
-  application: ApplicationNode;
   onNext: (formValues: ApplicationFormValues) => void;
 };
 
 const Page1 = ({
   applicationRound,
-  application,
   onNext,
 }: Props): JSX.Element | null => {
   const { t } = useTranslation();
@@ -51,23 +50,11 @@ const Page1 = ({
 
   const { options } = useOptions();
 
-  // TODO do we want to open the first / last event by default? or only if there is only one event?
-  // or only if there is an unsaved event?
-  const firstApplicationEvent = application.applicationEvents?.find(
-    (ae) => ae?.pk != null
-  )?.pk;
-  // TODO these could be saved in the form state should they stay consistent when navigating
-  const [accordionStates, setAccordionStates] = useState<
-    { applicationEventId: number | undefined; isOpen: boolean }[]
-  >(
-    firstApplicationEvent != null
-      ? [{ applicationEventId: firstApplicationEvent, isOpen: true }]
-      : []
-  );
-
   const form = useFormContext<ApplicationFormValues>();
   const { getValues, setValue, register, unregister, watch, handleSubmit } =
     form;
+  // get the user selected defaults for reservationUnits field
+  const { reservationUnits: selectedReservationUnits } = useReservationUnitsList();
 
   /*
   const onDeleteEvent = async (eventId: number | undefined, index: number) => {
@@ -101,30 +88,24 @@ const Page1 = ({
   */
 
   const isAccordianOpen = (applicationEventId: number | undefined) => {
-    const state = accordionStates.find(
-      (s) => s.applicationEventId === applicationEventId
+    const index = applicationEvents?.findIndex(
+      (ae) => ae?.pk === applicationEventId
     );
-    return state?.isOpen ?? false;
+    if (index == null) {
+      return false;
+    }
+    return watch(`applicationEvents.${index}.accordianOpen`)
   };
 
   const handleToggleAccordion = (applicationEventId: number | undefined) => {
-    const state = accordionStates.find(
-      (s) => s.applicationEventId === applicationEventId
+    const index = applicationEvents?.findIndex(
+      (ae) => ae?.pk === applicationEventId
     );
-    if (state) {
-      setAccordionStates(
-        accordionStates.map((s) =>
-          s.applicationEventId === applicationEventId
-            ? { ...s, isOpen: !s.isOpen }
-            : s
-        )
-      );
-    } else {
-      setAccordionStates([
-        ...accordionStates,
-        { applicationEventId, isOpen: true },
-      ]);
+    if (index == null) {
+      return;
     }
+    const val = watch(`applicationEvents.${index}.accordianOpen`);
+    setValue(`applicationEvents.${index}.accordianOpen`, !val);
   };
 
   const handleDeleteEvent = (index: number) => {
@@ -156,12 +137,13 @@ const Page1 = ({
     register(`applicationEvents.${nextIndex}.end`);
     register(`applicationEvents.${nextIndex}.applicationEventSchedules`);
     register(`applicationEvents.${nextIndex}.reservationUnits`);
-    setValue(`applicationEvents.${nextIndex}.reservationUnits`, []);
+    setValue(`applicationEvents.${nextIndex}.reservationUnits`, filterNonNullable(selectedReservationUnits.map((ru) => ru.pk)));
     setValue(`applicationEvents.${nextIndex}.applicationEventSchedules`, []);
     setValue(`applicationEvents.${nextIndex}.pk`, undefined);
     setValue(`applicationEvents.${nextIndex}.name`, "");
     setValue(`applicationEvents.${nextIndex}.eventsPerWeek`, 1);
     setValue(`applicationEvents.${nextIndex}.biweekly`, false);
+    setValue(`applicationEvents.${nextIndex}.accordianOpen`, false);
   };
 
   const addNewEventButtonDisabled =
@@ -209,10 +191,8 @@ const Page1 = ({
               unitOptions,
             }}
             onDeleteEvent={() => handleDeleteEvent(index)}
-            onToggleAccordian={() =>
-              handleToggleAccordion(event.pk ?? undefined)
-            }
-            isVisible={isAccordianOpen(event.pk ?? undefined)}
+            onToggleAccordian={() => handleToggleAccordion(event.pk) }
+            isVisible={isAccordianOpen(event.pk)}
           />
         ) : null
       )}
