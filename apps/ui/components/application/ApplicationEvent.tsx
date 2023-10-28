@@ -213,8 +213,11 @@ const ApplicationEventInner = ({
               required
               label={t("application:Page1.ageGroup")}
               options={ageGroupOptions}
-              error={applicationErrorText(t, errors.applicationEvents?.[index]?.ageGroup?.type)}
-              />
+              error={applicationErrorText(
+                t,
+                errors.applicationEvents?.[index]?.ageGroup?.type
+              )}
+            />
           )}
         />
         <Controller
@@ -224,15 +227,15 @@ const ApplicationEventInner = ({
           render={({ field }) => (
             <Select<OptionType>
               label={t("application:Page1.purpose")}
-              value={ageGroupOptions.find((v) => v.value === field.value)}
+              value={purposeOptions.find((v) => v.value === field.value)}
               onChange={(v: OptionType) => field.onChange(v.value)}
               required
-          options={purposeOptions}
-          error={applicationErrorText(
-            t,
-            errors.applicationEvents?.[index]?.purpose?.type
-          )}
-              />
+              options={purposeOptions}
+              error={applicationErrorText(
+                t,
+                errors.applicationEvents?.[index]?.purpose?.type
+              )}
+            />
           )}
         />
       </TwoColumnContainer>

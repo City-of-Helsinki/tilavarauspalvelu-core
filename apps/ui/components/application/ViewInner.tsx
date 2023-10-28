@@ -1,35 +1,27 @@
 import React from "react";
 import { Checkbox } from "hds-react";
-import { useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next";
-import type {
-  ReservationUnitType,
-  TermsOfUseType,
-} from "common/types/gql-types";
+import type { ApplicationNode, TermsOfUseType } from "common/types/gql-types";
 import { getTranslation } from "@/modules/util";
 import { useOptions } from "@/hooks/useOptions";
-import ApplicantInfoPreview from "./ApplicantInfoPreview";
+import { ApplicantInfoPreview } from "./ApplicantInfoPreview";
 import { FormSubHeading } from "../common/common";
 import { CheckboxContainer, StyledNotification, Terms } from "./styled";
 import { AccordionWithState as Accordion } from "../common/Accordion";
 import { ApplicationEventList } from "./ApplicationEventList";
-import type { ApplicationFormValues } from "./Form";
 
 export const ViewInner = ({
+  application,
   tos,
-  allReservationUnits,
   acceptTermsOfUse,
   setAcceptTermsOfUse,
 }: {
+  application: ApplicationNode;
   tos: TermsOfUseType[];
-  allReservationUnits: ReservationUnitType[];
   acceptTermsOfUse?: boolean;
   setAcceptTermsOfUse?: (value: boolean) => void;
 }): JSX.Element => {
   const { t } = useTranslation();
-
-  const form = useFormContext<ApplicationFormValues>();
-  const { getValues, watch } = form;
 
   const { options } = useOptions();
   const cities = options.cityOptions;
@@ -37,7 +29,8 @@ export const ViewInner = ({
   const tos1 = tos.find((n) => n.pk === "generic1");
   const tos2 = tos.find((n) => n.pk === "KUVAnupa");
 
-  const homeCity = watch("homeCityId");
+  // TODO should refactor this to just get the city name from the application
+  const homeCity = application.homeCity?.pk;
   const city = homeCity
     ? cities.find((opt) => opt.value === homeCity.toString())?.label ?? "-"
     : "-";
@@ -50,9 +43,9 @@ export const ViewInner = ({
         heading={t("application:preview.basicInfoSubHeading")}
         theme="thin"
       >
-        <ApplicantInfoPreview city={city} application={getValues()} />
+        <ApplicantInfoPreview city={city} application={application} />
       </Accordion>
-      <ApplicationEventList allReservationUnits={allReservationUnits} />
+      <ApplicationEventList application={application} />
       <FormSubHeading>{t("reservationUnit:termsOfUse")}</FormSubHeading>
       {tos1 && <Terms tabIndex={0}>{getTranslation(tos1, "text")}</Terms>}
       <FormSubHeading>

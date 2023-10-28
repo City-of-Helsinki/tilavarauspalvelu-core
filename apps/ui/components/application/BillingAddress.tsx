@@ -4,7 +4,7 @@ import { TextInput } from "hds-react";
 import { useFormContext } from "react-hook-form";
 import { applicationErrorText } from "@/modules/util";
 import { FormSubHeading } from "../common/common";
-import type { ApplicationFormValues } from "./Form";
+import type { ApplicationFormPage3Values } from "./Form";
 
 const BillingAddress = () => {
   const { t } = useTranslation();
@@ -12,7 +12,7 @@ const BillingAddress = () => {
   const {
     register,
     formState: { errors },
-  } = useFormContext<ApplicationFormValues>();
+  } = useFormContext<ApplicationFormPage3Values>();
 
   return (
     <>

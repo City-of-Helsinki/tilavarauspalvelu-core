@@ -1,19 +1,18 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import {
-  ApplicationNode,
+  type ApplicationNode,
   ApplicationsApplicationApplicantTypeChoices,
 } from "common/types/gql-types";
 import { SpanTwoColumns, TwoColumnContainer } from "../common/common";
 import Address from "./AddressPreview";
-import { ApplicationFormValues } from "./Form";
 import { StyledLabelValue } from "./styled";
 
 const ApplicantInfoPreview = ({
   application,
   city,
 }: {
-  application: ApplicationNode | ApplicationFormValues;
+  application: ApplicationNode;
   city: string;
 }): JSX.Element => {
   const { t } = useTranslation();
@@ -91,4 +90,4 @@ const ApplicantInfoPreview = ({
   );
 };
 
-export default ApplicantInfoPreview;
+export { ApplicantInfoPreview };

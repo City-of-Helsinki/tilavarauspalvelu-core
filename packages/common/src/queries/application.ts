@@ -72,6 +72,8 @@ export const APPLICATION_QUERY = gql`
           homeCity {
             pk
             nameFi
+            nameEn
+            nameSv
           }
           billingAddress {
             pk
@@ -115,9 +117,13 @@ export const APPLICATION_QUERY = gql`
               reservationUnit {
                 pk
                 nameFi
+                nameEn
+                nameSv
                 unit {
                   pk
                   nameFi
+                  nameEn
+                  nameSv
                 }
               }
             }

@@ -5,6 +5,7 @@ import {
   type AddressNode,
   type PersonNode,
   type OrganisationNode,
+  ApplicationsApplicationApplicantTypeChoices,
 } from "common/types/gql-types";
 import { type Maybe } from "graphql/jsutils/Maybe";
 import { z } from "zod";
@@ -33,17 +34,10 @@ const ApplicationEventFormValueSchema = z.object({
   numPersons: z
     .number()
     .min(1)
-    .optional()
     .refine((s) => s, { path: [""], message: "Required" }),
-  ageGroup: z
-    .number()
-    .optional()
-    .refine((s) => s, { path: [""], message: "Required" }),
+  ageGroup: z.number().refine((s) => s, { path: [""], message: "Required" }),
   abilityGroup: z.number().optional(),
-  purpose: z
-    .number()
-    .optional()
-    .refine((s) => s, { path: [""], message: "Required" }),
+  purpose: z.number().refine((s) => s, { path: [""], message: "Required" }),
   // TODO refinements: min < max, min > 0, max > 0 (currently max duration is not required before sending)
   minDuration: z.number().min(1),
   maxDuration: z.number().min(1),
@@ -72,10 +66,11 @@ export const transformApplicationEventToForm = (
 ): ApplicationEventFormValue => ({
   pk: applicationEvent.pk ?? undefined,
   name: applicationEvent.name,
-  numPersons: applicationEvent.numPersons ?? undefined,
-  ageGroup: applicationEvent.ageGroup?.pk ?? undefined,
+  numPersons: applicationEvent.numPersons ?? 0,
+  ageGroup: applicationEvent.ageGroup?.pk ?? 0,
+  // TODO not present in the form?
   abilityGroup: applicationEvent.abilityGroup?.pk ?? undefined,
-  purpose: applicationEvent.purpose?.pk ?? undefined,
+  purpose: applicationEvent.purpose?.pk ?? 0,
   minDuration: applicationEvent.minDuration ?? 0,
   maxDuration: applicationEvent.maxDuration ?? 0,
   eventsPerWeek: applicationEvent.eventsPerWeek ?? 0,
@@ -84,6 +79,7 @@ export const transformApplicationEventToForm = (
     .sort((a, b) => (a.priority && b.priority ? a.priority - b.priority : 0))
     .map((eru) => eru.reservationUnit?.pk ?? 0)
     .filter((pk) => pk > 0),
+  // schedules are only used for page2 form
   applicationEventSchedules: filterNonNullable(
     applicationEvent.applicationEventSchedules
   ).map((aes) => ({
@@ -162,19 +158,42 @@ export const convertOrganisation = (
   address: convertAddress(o?.address),
 });
 
+// There is an issue with the type of the data returned by the query (double enums with same values)
+export const convertApplicantType = (
+  type: Maybe<ApplicationsApplicationApplicantTypeChoices> | undefined
+): Applicant_Type => {
+  switch (type) {
+    case ApplicationsApplicationApplicantTypeChoices.Individual:
+      return Applicant_Type.Individual;
+    case ApplicationsApplicationApplicantTypeChoices.Company:
+      return Applicant_Type.Company;
+    case ApplicationsApplicationApplicantTypeChoices.Association:
+      return Applicant_Type.Association;
+    case ApplicationsApplicationApplicantTypeChoices.Community:
+      return Applicant_Type.Community;
+    default:
+      return Applicant_Type.Individual;
+  }
+};
+
+const ApplicantTypeSchema = z.enum([
+  Applicant_Type.Individual,
+  Applicant_Type.Company,
+  Applicant_Type.Association,
+  Applicant_Type.Community,
+]);
 export const ApplicationFormSchema = z.object({
-  pk: z.number().optional(),
-  applicantType: z.enum([
-    Applicant_Type.Individual,
-    Applicant_Type.Company,
-    Applicant_Type.Association,
-    Applicant_Type.Community,
-  ]),
+  pk: z.number(),
+  applicantType: ApplicantTypeSchema,
   // TODO remove id (also does this need to be sent?)
-  applicationRoundId: z.number(),
   applicationEvents: z
     .array(ApplicationEventFormValueSchema.optional())
     .optional(),
+});
+
+export const ApplicationFormPage3Schema = z.object({
+  pk: z.number(),
+  applicantType: ApplicantTypeSchema,
   organisation: OrganisationFormValuesSchema.optional(),
   contactPerson: PersonFormValuesSchema.optional(),
   billingAddress: AddressFormValueSchema.optional(),
@@ -182,13 +201,10 @@ export const ApplicationFormSchema = z.object({
   hasBillingAddress: z.boolean().optional(),
   additionalInformation: z.string().optional(),
   // TODO remove id
-  homeCityId: z.number().optional(),
-  // TODO are these needed?
-  createdDate: z.string().optional(),
-  lastModifiedDate: z.string().optional(),
-})
-/* TODO can't do this unless we split the form into multiple steps
- .refine((v) => ((v.applicantType === Applicant_Type.Company || v.applicantType === Applicant_Type.Association || v.applicantType === Applicant_Type.Community) && v.organisation != null), {
+  homeCityId: z.number(),
+});
+/* TODOnot using the zod validation in this form
+ * .refine((v) => ((v.applicantType === Applicant_Type.Company || v.applicantType === Applicant_Type.Association || v.applicantType === Applicant_Type.Community) && v.organisation != null), {
     path: ["organisation"],
     message: "Required"
 }).refine((v) => v.applicantType === Applicant_Type.Individual && v.contactPerson != null, {
@@ -202,6 +218,9 @@ export const ApplicationFormSchema = z.object({
     message: "Required"
 })
 */
+export type ApplicationFormPage3Values = z.infer<
+  typeof ApplicationFormPage3Schema
+>;
 
 // TODO refine
 // if applicantType === Organisation | Company => organisation.identifier is required

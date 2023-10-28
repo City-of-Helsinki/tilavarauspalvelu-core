@@ -10,7 +10,7 @@ import { applicationErrorText } from "@/modules/util";
 import { TwoColumnContainer, FormSubHeading } from "../common/common";
 import { EmailInput } from "./EmailInput";
 import { BillingAddress } from "./BillingAddress";
-import { ApplicationFormValues } from "./Form";
+import { ApplicationFormPage3Values } from "./Form";
 
 export const Placeholder = styled.span`
   @media (max-width: ${breakpoints.m}) {
@@ -32,7 +32,7 @@ const OrganisationForm = ({ homeCityOptions }: Props): JSX.Element | null => {
     formState: { errors },
     watch,
     setValue,
-  } = useFormContext<ApplicationFormValues>();
+  } = useFormContext<ApplicationFormPage3Values>();
 
   const identifier = watch("organisation.identifier");
   const hasRegistration = identifier != null;
@@ -90,7 +90,7 @@ const OrganisationForm = ({ homeCityOptions }: Props): JSX.Element | null => {
             required
             options={homeCityOptions}
             error={applicationErrorText(t, errors.homeCityId?.type)}
-            />
+          />
         )}
       />
       <Placeholder />

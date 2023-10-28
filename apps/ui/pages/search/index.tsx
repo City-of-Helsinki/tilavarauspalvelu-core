@@ -303,58 +303,58 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
           />
         </StyledContainer>
       </HeadContainer>
-        <BottomWrapper>
-          <ListWithPagination
-            id="searchResultList"
-            items={reservationUnits?.map((ru) => (
-              <ReservationUnitCard
-                selectReservationUnit={selectReservationUnit}
-                containsReservationUnit={containsReservationUnit}
-                removeReservationUnit={removeReservationUnit}
-                reservationUnit={ru}
-                key={ru.id}
-              />
-            ))}
-            loading={loading}
-            loadingMore={loadingMore}
-            pageInfo={pageInfo}
-            totalCount={totalCount ?? undefined}
-            fetchMore={(cursor) => {
-              const variables = {
-                ...values,
-                after: cursor,
-              };
-              fetchMore({
-                variables: processVariables(variables, i18n.language),
-              });
-            }}
-            sortingComponent={
-              <StyledSorting
-                value={values.sort}
-                sortingOptions={sortingOptions}
-                setSorting={(val: OptionType) => {
-                  const params = {
-                    ...values,
-                    sort: String(val.value),
-                  };
-                  history.replace(searchUrl(params));
-                }}
-                isOrderingAsc={isOrderingAsc}
-                setIsOrderingAsc={(isAsc: boolean) => {
-                  const params = {
-                    ...values,
-                    order: isAsc ? "asc" : "desc",
-                  };
-                  history.replace(searchUrl(params));
-                }}
-              />
-            }
-          />
-          <StartApplicationBar
-            count={selectedReservationUnits.length}
-            clearSelections={clearSelections}
-          />
-        </BottomWrapper>
+      <BottomWrapper>
+        <ListWithPagination
+          id="searchResultList"
+          items={reservationUnits?.map((ru) => (
+            <ReservationUnitCard
+              selectReservationUnit={selectReservationUnit}
+              containsReservationUnit={containsReservationUnit}
+              removeReservationUnit={removeReservationUnit}
+              reservationUnit={ru}
+              key={ru.id}
+            />
+          ))}
+          loading={loading}
+          loadingMore={loadingMore}
+          pageInfo={pageInfo}
+          totalCount={totalCount ?? undefined}
+          fetchMore={(cursor) => {
+            const variables = {
+              ...values,
+              after: cursor,
+            };
+            fetchMore({
+              variables: processVariables(variables, i18n.language),
+            });
+          }}
+          sortingComponent={
+            <StyledSorting
+              value={values.sort}
+              sortingOptions={sortingOptions}
+              setSorting={(val: OptionType) => {
+                const params = {
+                  ...values,
+                  sort: String(val.value),
+                };
+                history.replace(searchUrl(params));
+              }}
+              isOrderingAsc={isOrderingAsc}
+              setIsOrderingAsc={(isAsc: boolean) => {
+                const params = {
+                  ...values,
+                  order: isAsc ? "asc" : "desc",
+                };
+                history.replace(searchUrl(params));
+              }}
+            />
+          }
+        />
+        <StartApplicationBar
+          count={selectedReservationUnits.length}
+          clearSelections={clearSelections}
+        />
+      </BottomWrapper>
     </Wrapper>
   );
 };

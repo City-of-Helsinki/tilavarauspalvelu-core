@@ -3,11 +3,9 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import { useQuery } from "@apollo/client";
 import { uniq } from "lodash";
-import {
-  type Query,
-  type ApplicationRoundNode,
-} from "common/types/gql-types";
+import { type Query, type ApplicationRoundNode } from "common/types/gql-types";
 import { useFormContext } from "react-hook-form";
+import { filterNonNullable } from "common/src/helpers";
 import { getTranslation, mapOptions } from "@/modules/util";
 import { MediumButton } from "@/styles/util";
 import { useOptions } from "@/hooks/useOptions";
@@ -16,7 +14,6 @@ import { ButtonContainer } from "../common/common";
 import { ApplicationEvent } from "./ApplicationEvent";
 import { type ApplicationFormValues } from "./Form";
 import useReservationUnitsList from "@/hooks/useReservationUnitList";
-import { filterNonNullable } from "common/src/helpers";
 
 type Props = {
   // TODO break application round down to smaller pieces (only the required props)
@@ -26,10 +23,7 @@ type Props = {
   onNext: (formValues: ApplicationFormValues) => void;
 };
 
-const Page1 = ({
-  applicationRound,
-  onNext,
-}: Props): JSX.Element | null => {
+const Page1 = ({ applicationRound, onNext }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
   const unitsInApplicationRound = uniq(
@@ -54,7 +48,8 @@ const Page1 = ({
   const { getValues, setValue, register, unregister, watch, handleSubmit } =
     form;
   // get the user selected defaults for reservationUnits field
-  const { reservationUnits: selectedReservationUnits } = useReservationUnitsList();
+  const { reservationUnits: selectedReservationUnits } =
+    useReservationUnitsList();
 
   /*
   const onDeleteEvent = async (eventId: number | undefined, index: number) => {
@@ -86,6 +81,7 @@ const Page1 = ({
     }
   };
   */
+  const applicationEvents = watch("applicationEvents");
 
   const isAccordianOpen = (applicationEventId: number | undefined) => {
     const index = applicationEvents?.findIndex(
@@ -94,7 +90,7 @@ const Page1 = ({
     if (index == null) {
       return false;
     }
-    return watch(`applicationEvents.${index}.accordianOpen`)
+    return watch(`applicationEvents.${index}.accordianOpen`);
   };
 
   const handleToggleAccordion = (applicationEventId: number | undefined) => {
@@ -117,8 +113,6 @@ const Page1 = ({
     }
   };
 
-  const applicationEvents = watch("applicationEvents");
-
   const handleAddNewApplicationEvent = () => {
     const nextIndex = applicationEvents?.length ?? 0;
     // TODO check if we have to register all the sub fields in application event
@@ -137,7 +131,10 @@ const Page1 = ({
     register(`applicationEvents.${nextIndex}.end`);
     register(`applicationEvents.${nextIndex}.applicationEventSchedules`);
     register(`applicationEvents.${nextIndex}.reservationUnits`);
-    setValue(`applicationEvents.${nextIndex}.reservationUnits`, filterNonNullable(selectedReservationUnits.map((ru) => ru.pk)));
+    setValue(
+      `applicationEvents.${nextIndex}.reservationUnits`,
+      filterNonNullable(selectedReservationUnits.map((ru) => ru.pk))
+    );
     setValue(`applicationEvents.${nextIndex}.applicationEventSchedules`, []);
     setValue(`applicationEvents.${nextIndex}.pk`, undefined);
     setValue(`applicationEvents.${nextIndex}.name`, "");
@@ -191,7 +188,7 @@ const Page1 = ({
               unitOptions,
             }}
             onDeleteEvent={() => handleDeleteEvent(index)}
-            onToggleAccordian={() => handleToggleAccordion(event.pk) }
+            onToggleAccordian={() => handleToggleAccordion(event.pk)}
             isVisible={isAccordianOpen(event.pk)}
           />
         ) : null

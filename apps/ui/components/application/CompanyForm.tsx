@@ -7,7 +7,7 @@ import { applicationErrorText } from "@/modules/util";
 import { FormSubHeading, TwoColumnContainer } from "../common/common";
 import { EmailInput } from "./EmailInput";
 import { BillingAddress } from "./BillingAddress";
-import { ApplicationFormValues } from "./Form";
+import { ApplicationFormPage3Values } from "./Form";
 
 const CompanyForm = (): JSX.Element => {
   const { t } = useTranslation();
@@ -17,7 +17,7 @@ const CompanyForm = (): JSX.Element => {
     setValue,
     formState: { errors },
     watch,
-  } = useFormContext<ApplicationFormValues>();
+  } = useFormContext<ApplicationFormPage3Values>();
 
   const hasBillingAddress = watch("hasBillingAddress");
 

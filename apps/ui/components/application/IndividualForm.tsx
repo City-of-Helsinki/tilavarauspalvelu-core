@@ -10,7 +10,7 @@ import {
 } from "../common/common";
 import { EmailInput } from "./EmailInput";
 import { BillingAddress } from "./BillingAddress";
-import type { ApplicationFormValues } from "./Form";
+import type { ApplicationFormPage3Values } from "./Form";
 
 const IndividualForm = (): JSX.Element => {
   const { t } = useTranslation();
@@ -18,7 +18,7 @@ const IndividualForm = (): JSX.Element => {
   const {
     register,
     formState: { errors },
-  } = useFormContext<ApplicationFormValues>();
+  } = useFormContext<ApplicationFormPage3Values>();
 
   return (
     <TwoColumnContainer>

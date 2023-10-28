@@ -4,7 +4,7 @@ import {
   ReservationUnitType,
 } from "common/types/gql-types";
 
-type ReservationUnitUnion = ReservationUnitType | ReservationUnitByPkType
+export type ReservationUnitUnion = ReservationUnitType | ReservationUnitByPkType
 export type ReservationUnitList = {
   reservationUnits: ReservationUnitUnion[];
   selectReservationUnit: (ru: ReservationUnitUnion) => void;

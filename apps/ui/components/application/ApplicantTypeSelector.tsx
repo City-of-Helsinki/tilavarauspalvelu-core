@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { fontRegular } from "common/src/common/typography";
 import { Applicant_Type } from "common/types/gql-types";
 import { useController, useFormContext } from "react-hook-form";
-import { ApplicationFormValues } from "./Form";
+import { ApplicationFormPage3Values } from "./Form";
 
 const Container = styled.div`
   margin-top: var(--spacing-m);
@@ -18,7 +18,7 @@ const Prefix = styled.p`
 export const ApplicantTypeSelector = (): JSX.Element => {
   const { t } = useTranslation();
 
-  const { control } = useFormContext<ApplicationFormValues>();
+  const { control } = useFormContext<ApplicationFormPage3Values>();
   const {
     field: { value, onChange },
   } = useController({

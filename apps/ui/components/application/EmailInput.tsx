@@ -4,7 +4,7 @@ import { useFormContext } from "react-hook-form";
 import { Notification, TextInput } from "hds-react";
 import { applicationErrorText } from "@/modules/util";
 import { SpanTwoColumns } from "../common/common";
-import type { ApplicationFormValues } from "./Form";
+import type { ApplicationFormPage3Values } from "./Form";
 
 const EmailInput = () => {
   const { t } = useTranslation();
@@ -12,7 +12,7 @@ const EmailInput = () => {
   const {
     register,
     formState: { errors },
-  } = useFormContext<ApplicationFormValues>();
+  } = useFormContext<ApplicationFormPage3Values>();
 
   return (
     <>
