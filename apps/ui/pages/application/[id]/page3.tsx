@@ -107,7 +107,7 @@ const convertApplicationToForm = (
         ApplicationsApplicationApplicantTypeChoices.Individual &&
       app?.billingAddress?.streetAddress != null,
     additionalInformation: app?.additionalInformation ?? "",
-    homeCityId: app?.homeCity?.pk ?? 0,
+    homeCity: app?.homeCity?.pk ?? undefined,
   };
 };
 
@@ -132,7 +132,9 @@ const transformApplication = (
     ...(values.additionalInformation != null
       ? { additionalInformation: values.additionalInformation }
       : {}),
-    ...(values.homeCityId != null ? { homeCity: values.homeCityId } : {}),
+    ...(values.homeCity != null && values.homeCity !== 0
+      ? { homeCity: values.homeCity }
+      : {}),
   };
 };
 

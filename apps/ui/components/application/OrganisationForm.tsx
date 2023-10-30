@@ -81,7 +81,7 @@ const OrganisationForm = ({ homeCityOptions }: Props): JSX.Element | null => {
       <Controller
         control={control}
         rules={{ required: true }}
-        name="homeCityId"
+        name="homeCity"
         render={({ field }) => (
           <Select<OptionType>
             label={t("application:Page3.homeCity")}
@@ -89,7 +89,7 @@ const OrganisationForm = ({ homeCityOptions }: Props): JSX.Element | null => {
             onChange={(v: OptionType) => field.onChange(v.value)}
             required
             options={homeCityOptions}
-            error={applicationErrorText(t, errors.homeCityId?.type)}
+            error={applicationErrorText(t, errors.homeCity?.type)}
           />
         )}
       />

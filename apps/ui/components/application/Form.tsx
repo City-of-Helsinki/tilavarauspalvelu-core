@@ -200,8 +200,7 @@ export const ApplicationFormPage3Schema = z.object({
   // this is not submitted, we can use it to remove the billing address from submit without losing the frontend state
   hasBillingAddress: z.boolean().optional(),
   additionalInformation: z.string().optional(),
-  // TODO remove id
-  homeCityId: z.number(),
+  homeCity: z.number().optional(),
 });
 /* TODOnot using the zod validation in this form
  * .refine((v) => ((v.applicantType === Applicant_Type.Company || v.applicantType === Applicant_Type.Association || v.applicantType === Applicant_Type.Community) && v.organisation != null), {
