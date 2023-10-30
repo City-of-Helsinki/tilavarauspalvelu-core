@@ -1,5 +1,4 @@
-import React, { useMemo } from "react";
-import { ReservationState } from "common/types/common";
+import React from "react";
 import {
   IconArrowRight,
   IconCalendar,
@@ -11,7 +10,6 @@ import { Trans, useTranslation } from "next-i18next";
 import Link from "next/link";
 import styled from "styled-components";
 import { fontRegular, H2 } from "common/src/common/typography";
-import { Reservation } from "common/src/reservation-form/types";
 import {
   PaymentOrderType,
   ReservationsReservationStateChoices,
@@ -29,7 +27,7 @@ import { reservationUnitPath } from "../../modules/const";
 import { signOut } from "@/hooks/auth";
 
 type Props = {
-  reservation: Reservation | ReservationType;
+  reservation: ReservationType;
   reservationUnit: ReservationUnitType;
   order?: PaymentOrderType;
 };
@@ -108,11 +106,7 @@ const ReservationConfirmation = ({
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
-  const instructionsKey = useMemo(
-    () =>
-      getReservationUnitInstructionsKey(reservation?.state as ReservationState),
-    [reservation?.state]
-  );
+  const instructionsKey = getReservationUnitInstructionsKey(reservation?.state);
 
   const requiresHandling =
     reservation.state === ReservationsReservationStateChoices.RequiresHandling;

@@ -277,7 +277,7 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
   const reservationUnit = reservation?.reservationUnits?.[0];
   const instructionsKey =
     reservation?.state != null
-      ? getReservationUnitInstructionsKey(reservation?.state)
+      ? getReservationUnitInstructionsKey(reservation.state)
       : undefined;
 
   const shouldDisplayPricingTerms: boolean = useMemo(() => {

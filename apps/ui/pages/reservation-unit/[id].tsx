@@ -35,7 +35,7 @@ import Calendar, { CalendarEvent } from "common/src/calendar/Calendar";
 import { Toolbar } from "common/src/calendar/Toolbar";
 import classNames from "classnames";
 import ClientOnly from "common/src/ClientOnly";
-import { PendingReservation, Reservation } from "common/types/common";
+import { PendingReservation } from "common/types/common";
 import {
   ApplicationRoundStatusChoice,
   Query,
@@ -292,7 +292,7 @@ const Columns = styled(TwoColumnLayout)`
 `;
 
 const eventStyleGetter = (
-  { event }: CalendarEvent<Reservation | ReservationType>,
+  { event }: CalendarEvent<ReservationType>,
   ownReservations: number[],
   draggable = true
 ): { style: React.CSSProperties; className?: string } => {
@@ -348,7 +348,7 @@ const EventWrapperComponent = ({
   event,
   ...props
 }: {
-  event: CalendarEvent<Reservation | ReservationType>;
+  event: CalendarEvent<ReservationType>;
 }) => {
   let isSmall = false;
   let isMedium = false;
@@ -541,7 +541,7 @@ const ReservationUnit = ({
 
   const handleCalendarEventChange = useCallback(
     (
-      { start, end }: CalendarEvent<Reservation | ReservationType>,
+      { start, end }: CalendarEvent<ReservationType>,
       skipLengthCheck = false
     ): boolean => {
       if (!reservationUnit) {
@@ -650,7 +650,7 @@ const ReservationUnit = ({
 
     if (start && end) {
       handleCalendarEventChange(
-        { start, end } as CalendarEvent<Reservation | ReservationType>,
+        { start, end } as CalendarEvent<ReservationType>,
         true
       );
     }
@@ -662,46 +662,45 @@ const ReservationUnit = ({
     [relatedReservationUnits?.length]
   );
 
-  const calendarEvents: CalendarEvent<Reservation | ReservationType>[] =
-    useMemo(() => {
-      const diff =
-        initialReservation != null
-          ? differenceInMinutes(
-              new Date(initialReservation.end),
-              new Date(initialReservation.begin)
-            )
-          : 0;
-      const duration = diff >= 90 ? `(${formatDurationMinutes(diff)})` : "";
+  const calendarEvents: CalendarEvent<ReservationType>[] = useMemo(() => {
+    const diff =
+      initialReservation != null
+        ? differenceInMinutes(
+            new Date(initialReservation.end),
+            new Date(initialReservation.begin)
+          )
+        : 0;
+    const duration = diff >= 90 ? `(${formatDurationMinutes(diff)})` : "";
 
-      if (userReservations && reservationUnit?.reservations) {
-        return [
-          ...reservationUnit.reservations,
-          {
-            ...initialReservation,
-            state: "INITIAL",
-          },
-        ]
-          .filter((n): n is NonNullable<typeof n> => n != null)
-          .map((n) => {
-            const suffix = n.state === "INITIAL" ? duration : "";
-            const event: CalendarEvent<ReservationType> = {
-              title: `${
-                n.state === "CANCELLED"
-                  ? `${t("reservationCalendar:prefixForCancelled")}: `
-                  : suffix
-              }`,
-              start: n.begin != null ? parseDate(n.begin) : new Date(),
-              end: n.end != null ? parseDate(n.end) : new Date(),
-              allDay: false,
-              // TODO refactor and remove modifying the state
-              event: n as ReservationType,
-            };
+    if (userReservations && reservationUnit?.reservations) {
+      return [
+        ...reservationUnit.reservations,
+        {
+          ...initialReservation,
+          state: "INITIAL",
+        },
+      ]
+        .filter((n): n is NonNullable<typeof n> => n != null)
+        .map((n) => {
+          const suffix = n.state === "INITIAL" ? duration : "";
+          const event: CalendarEvent<ReservationType> = {
+            title: `${
+              n.state === "CANCELLED"
+                ? `${t("reservationCalendar:prefixForCancelled")}: `
+                : suffix
+            }`,
+            start: n.begin != null ? parseDate(n.begin) : new Date(),
+            end: n.end != null ? parseDate(n.end) : new Date(),
+            allDay: false,
+            // TODO refactor and remove modifying the state
+            event: n as ReservationType,
+          };
 
-            return event;
-          });
-      }
-      return [];
-    }, [reservationUnit, t, initialReservation, userReservations]);
+          return event;
+        });
+    }
+    return [];
+  }, [reservationUnit, t, initialReservation, userReservations]);
 
   const eventBuffers = useMemo(() => {
     return getEventBuffers([
@@ -972,7 +971,7 @@ const ReservationUnit = ({
                     </StyledNotification>
                   )}
                 <div aria-hidden>
-                  <Calendar<Reservation | ReservationType>
+                  <Calendar<ReservationType>
                     events={[...calendarEvents, ...eventBuffers]}
                     begin={currentDate}
                     onNavigate={(d: Date) => {
@@ -994,9 +993,9 @@ const ReservationUnit = ({
                         setCalendarViewType(n);
                       }
                     }}
-                    onSelecting={(
-                      event: CalendarEvent<Reservation | ReservationType>
-                    ) => handleCalendarEventChange(event, true)}
+                    onSelecting={(event: CalendarEvent<ReservationType>) =>
+                      handleCalendarEventChange(event, true)
+                    }
                     min={dayStartTime}
                     showToolbar
                     reservable={!isReservationQuotaReached}

@@ -1,10 +1,5 @@
 import { cloneDeep, get as mockGet } from "lodash";
 import { addDays } from "date-fns";
-import {
-  ApplicationRound,
-  ReservationState,
-  ReservationUnit,
-} from "common/types/common";
 import { toUIDate } from "common/src/common/util";
 import {
   EquipmentType,
@@ -22,7 +17,6 @@ import {
   getEquipmentCategories,
   getEquipmentList,
   getFuturePricing,
-  getOldReservationUnitName,
   getPrice,
   getReservationUnitInstructionsKey,
   getReservationUnitName,
@@ -32,6 +26,7 @@ import {
   isReservationUnitPublished,
 } from "../reservationUnit";
 import mockTranslations from "../../public/locales/fi/prices.json";
+import { RoundPeriod } from "common/src/calendar/util";
 
 jest.mock("next/config", () => () => ({
   serverRuntimeConfig: {},
@@ -623,74 +618,6 @@ describe("getReservationUnitName", () => {
   });
 });
 
-describe("getOldReservationUnitName", () => {
-  it("should return the name of the unit", () => {
-    const reservationUnit = {
-      name: {
-        fi: "Unit 1 FI",
-        en: "Unit 1 EN",
-        sv: "Unit 1 SV",
-      },
-    } as ReservationUnit;
-
-    expect(getOldReservationUnitName(reservationUnit)).toEqual("Unit 1 FI");
-  });
-
-  it("should return the name of the unit in the current language", () => {
-    const reservationUnit = {
-      name: {
-        fi: "Unit 1 FI",
-        en: "Unit 1 EN",
-        sv: "Unit 1 SV",
-      },
-    } as ReservationUnit;
-
-    expect(getOldReservationUnitName(reservationUnit, "sv")).toEqual(
-      "Unit 1 SV"
-    );
-  });
-
-  it("should return the name of the unit in the default language", () => {
-    const reservationUnit = {
-      name: {
-        fi: "Unit 1 FI",
-        en: "",
-        sv: "",
-      },
-    } as ReservationUnit;
-
-    expect(getOldReservationUnitName(reservationUnit, "sv")).toEqual(
-      "Unit 1 FI"
-    );
-  });
-
-  it("should return the name of the unit in the default language", () => {
-    const reservationUnit = {
-      name: {
-        fi: "Unit 1 FI",
-      },
-    } as ReservationUnit;
-
-    expect(getOldReservationUnitName(reservationUnit, "sv")).toEqual(
-      "Unit 1 FI"
-    );
-  });
-
-  it("should return the name of the unit in the default language", () => {
-    const reservationUnit = {
-      name: {
-        fi: "Unit 1 FI",
-        en: null,
-        sv: null,
-      },
-    } as unknown as ReservationUnit;
-
-    expect(getOldReservationUnitName(reservationUnit, "sv")).toEqual(
-      "Unit 1 FI"
-    );
-  });
-});
-
 describe("getUnitName", () => {
   it("should return the name of the unit", () => {
     const unit = {
@@ -743,18 +670,6 @@ describe("getUnitName", () => {
 
 describe("getReservationUnitInstructionsKey", () => {
   it("should return correct key pending states", () => {
-    expect(getReservationUnitInstructionsKey("initial")).toEqual(
-      "reservationPendingInstructions"
-    );
-    expect(getReservationUnitInstructionsKey("created")).toEqual(
-      "reservationPendingInstructions"
-    );
-    expect(getReservationUnitInstructionsKey("requested")).toEqual(
-      "reservationPendingInstructions"
-    );
-    expect(getReservationUnitInstructionsKey("waiting for payment")).toEqual(
-      "reservationPendingInstructions"
-    );
     expect(
       getReservationUnitInstructionsKey(
         ReservationsReservationStateChoices.Created
@@ -768,9 +683,6 @@ describe("getReservationUnitInstructionsKey", () => {
   });
 
   it("should return correct key cancelled states", () => {
-    expect(getReservationUnitInstructionsKey("cancelled")).toEqual(
-      "reservationCancelledInstructions"
-    );
     expect(
       getReservationUnitInstructionsKey(
         ReservationsReservationStateChoices.Cancelled
@@ -779,9 +691,6 @@ describe("getReservationUnitInstructionsKey", () => {
   });
 
   it("should return correct key confirmed states", () => {
-    expect(getReservationUnitInstructionsKey("confirmed")).toEqual(
-      "reservationConfirmedInstructions"
-    );
     expect(
       getReservationUnitInstructionsKey(
         ReservationsReservationStateChoices.Confirmed
@@ -790,15 +699,11 @@ describe("getReservationUnitInstructionsKey", () => {
   });
 
   it("should return no key for rest", () => {
-    expect(getReservationUnitInstructionsKey("denied")).toEqual(null);
     expect(
       getReservationUnitInstructionsKey(
         ReservationsReservationStateChoices.Denied
       )
     ).toEqual(null);
-    expect(getReservationUnitInstructionsKey("" as ReservationState)).toEqual(
-      null
-    );
   });
 });
 
@@ -940,25 +845,25 @@ describe("getFuturePricing", () => {
     if (data.pricings == null || data.pricings.length < 2) {
       throw new Error("Invalid test data");
     }
-    const applicationRounds = [{} as ApplicationRound];
+    const applicationRounds = [{} as RoundPeriod]
 
     expect(getFuturePricing(data, applicationRounds)).toEqual(data.pricings[2]);
 
     applicationRounds[0] = {
       reservationPeriodBegin: addDays(new Date(), 1).toISOString(),
-    } as ApplicationRound;
+    } as RoundPeriod;
     expect(getFuturePricing(data, applicationRounds)).toEqual(data.pricings[2]);
 
     applicationRounds[0] = {
       reservationPeriodBegin: addDays(new Date(), 1).toISOString(),
       reservationPeriodEnd: addDays(new Date(), 19).toISOString(),
-    } as ApplicationRound;
+    };
     expect(getFuturePricing(data, applicationRounds)).toEqual(data.pricings[1]);
 
     applicationRounds[0] = {
       reservationPeriodBegin: addDays(new Date(), 1).toISOString(),
       reservationPeriodEnd: addDays(new Date(), 20).toISOString(),
-    } as ApplicationRound;
+    };
     expect(getFuturePricing(data, applicationRounds)).toBeUndefined();
   });
 

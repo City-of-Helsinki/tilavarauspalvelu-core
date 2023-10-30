@@ -2,7 +2,6 @@ import { formatters as getFormatters, getReservationVolume } from "common";
 import { flatten, trim, uniq } from "lodash";
 import { addDays } from "date-fns";
 import { i18n } from "next-i18next";
-import { ReservationState } from "common/types/common";
 import { toApiDate, toUIDate } from "common/src/common/util";
 import { RoundPeriod, isSlotWithinReservationTime } from "common/src/calendar/util";
 import {
@@ -127,23 +126,16 @@ export const getUnitName = (
 };
 
 export const getReservationUnitInstructionsKey = (
-  state: ReservationsReservationStateChoices | ReservationState
+  state: ReservationsReservationStateChoices
 ): string | null => {
   switch (state) {
-    case "initial":
-    case "created":
-    case "requested":
-    case "waiting for payment":
     case ReservationsReservationStateChoices.Created:
     case ReservationsReservationStateChoices.RequiresHandling:
       return "reservationPendingInstructions";
-    case "cancelled":
     case ReservationsReservationStateChoices.Cancelled:
       return "reservationCancelledInstructions";
-    case "confirmed":
     case ReservationsReservationStateChoices.Confirmed:
       return "reservationConfirmedInstructions";
-    case "denied":
     case ReservationsReservationStateChoices.Denied:
     default:
       return null;

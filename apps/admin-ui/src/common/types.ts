@@ -1,10 +1,3 @@
-export type Image = {
-  imageUrl: string;
-  smallUrl: string;
-  mediumUrl: string;
-  imageType: "main" | "map" | "ground_plan" | "other";
-};
-
 export interface DataFilterOption {
   key?: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -7,7 +7,7 @@ import {
 } from "common/src/calendar/util";
 import { breakpoints } from "common/src/common/style";
 import { parseDate } from "common/src/common/util";
-import { PendingReservation, Reservation } from "common/types/common";
+import type { PendingReservation } from "common/types/common";
 import {
   ApplicationRoundNode,
   ReservationType,
@@ -84,7 +84,7 @@ const Actions = styled.div`
 `;
 
 const eventStyleGetter = (
-  { event }: CalendarEvent<Reservation | ReservationType>,
+  { event }: CalendarEvent<ReservationType>,
   ownReservations: number[],
   draggable = true
 ): { style: React.CSSProperties; className?: string } => {
@@ -173,58 +173,55 @@ const EditStep0 = ({
   const [shouldCalendarControlsBeVisible, setShouldCalendarControlsBeVisible] =
     useState(false);
 
-  const calendarEvents: CalendarEvent<Reservation | ReservationType>[] =
-    useMemo(() => {
-      const maybeDiff =
-        initialReservation != null
-          ? differenceInMinutes(
-              new Date(initialReservation.end),
-              new Date(initialReservation.begin)
-            )
-          : undefined;
-      const diff = maybeDiff ?? 0;
-      const duration = diff >= 90 ? `(${formatDurationMinutes(diff)})` : "";
-      const shownReservation = { ...initialReservation, state: "INITIAL" } || {
-        begin: reservation.begin,
-        end: reservation.end,
-        state: "OWN",
-      };
-      const reservations =
-        (initialReservation?.begin
-          ? reservationUnit?.reservations?.filter(
-              (n) => n?.pk !== reservation.pk
-            )
-          : reservationUnit?.reservations) ?? [];
-      if (userReservations && reservationUnit?.reservations) {
-        return [...reservations, shownReservation]
-          .filter((n): n is NonNullable<typeof n> => n != null)
-          .map((n) => {
-            const suffix = n.state === "INITIAL" ? duration : "";
-            const event = {
-              title: `${
-                n.state === "CANCELLED"
-                  ? `${t("reservationCalendar:prefixForCancelled")}: `
-                  : suffix
-              }`,
-              start: n.begin ? parseDate(n.begin) : new Date(),
-              end: n.end ? parseDate(n.end) : new Date(),
-              allDay: false,
-              event: n,
-            };
+  const calendarEvents: CalendarEvent<ReservationType>[] = useMemo(() => {
+    const maybeDiff =
+      initialReservation != null
+        ? differenceInMinutes(
+            new Date(initialReservation.end),
+            new Date(initialReservation.begin)
+          )
+        : undefined;
+    const diff = maybeDiff ?? 0;
+    const duration = diff >= 90 ? `(${formatDurationMinutes(diff)})` : "";
+    const shownReservation = { ...initialReservation, state: "INITIAL" } || {
+      begin: reservation.begin,
+      end: reservation.end,
+      state: "OWN",
+    };
+    const reservations =
+      (initialReservation?.begin
+        ? reservationUnit?.reservations?.filter((n) => n?.pk !== reservation.pk)
+        : reservationUnit?.reservations) ?? [];
+    if (userReservations && reservationUnit?.reservations) {
+      return [...reservations, shownReservation]
+        .filter((n): n is NonNullable<typeof n> => n != null)
+        .map((n) => {
+          const suffix = n.state === "INITIAL" ? duration : "";
+          const event = {
+            title: `${
+              n.state === "CANCELLED"
+                ? `${t("reservationCalendar:prefixForCancelled")}: `
+                : suffix
+            }`,
+            start: n.begin ? parseDate(n.begin) : new Date(),
+            end: n.end ? parseDate(n.end) : new Date(),
+            allDay: false,
+            event: n,
+          };
 
-            return event as CalendarEvent<Reservation>;
-          });
-      }
-      return [];
-    }, [
-      reservationUnit,
-      t,
-      initialReservation,
-      userReservations,
-      reservation.pk,
-      reservation.begin,
-      reservation.end,
-    ]);
+          return event as CalendarEvent<ReservationType>;
+        });
+    }
+    return [];
+  }, [
+    reservationUnit,
+    t,
+    initialReservation,
+    userReservations,
+    reservation.pk,
+    reservation.begin,
+    reservation.end,
+  ]);
 
   const normalizedReservationUnit = useMemo(() => {
     return {
@@ -322,7 +319,7 @@ const EditStep0 = ({
 
   const handleEventChange = useCallback(
     (
-      { start, end }: CalendarEvent<Reservation | ReservationType>,
+      { start, end }: CalendarEvent<ReservationType>,
       skipLengthCheck = false
     ): boolean => {
       const newReservation = getNewReservation({ start, end, reservationUnit });
@@ -397,7 +394,7 @@ const EditStep0 = ({
     <>
       <CalendarWrapper>
         <div aria-hidden>
-          <Calendar<Reservation | ReservationType>
+          <Calendar<ReservationType>
             events={[...calendarEvents, ...eventBuffers]}
             begin={currentDate}
             onNavigate={(d: Date) => {
