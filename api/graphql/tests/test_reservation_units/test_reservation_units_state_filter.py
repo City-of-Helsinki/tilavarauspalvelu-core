@@ -1,7 +1,6 @@
 import datetime
 import json
 
-from assertpy import assert_that
 from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservation_units.base import (
@@ -68,8 +67,8 @@ class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):
         )
 
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_true()
-        assert_that(content.get("errors")).is_none()
+        assert self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_draft(self):
@@ -89,8 +88,8 @@ class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):
         )
 
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_scheduled_publishing(self):
@@ -110,8 +109,8 @@ class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):
         )
 
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_published(self):
@@ -131,8 +130,8 @@ class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):
         )
 
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_mixed(self):
@@ -152,8 +151,8 @@ class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):
         )
 
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_scheduled_period(self):
@@ -173,8 +172,8 @@ class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):
         )
 
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_scheduled_hiding(self):
@@ -194,8 +193,8 @@ class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):
         )
 
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_hidden(self):
@@ -215,8 +214,8 @@ class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):
         )
 
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_scheduled_publishing_when_begin_after_end(self):
@@ -245,6 +244,6 @@ class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):
         )
 
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)

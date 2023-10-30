@@ -56,9 +56,9 @@ class ReservationUnitImageCreateTestCase(GrapheneTestCaseBase, GraphQLFileUpload
             },
             client=self.client,
         )
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         image_data = content.get("data").get("createReservationUnitImage")
         assert_that(image_data.get("errors")).is_none()
 
@@ -90,9 +90,9 @@ class ReservationUnitImageCreateTestCase(GrapheneTestCaseBase, GraphQLFileUpload
             },
             client=self.client,
         )
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
 
         self.res_unit.refresh_from_db()
         img = self.res_unit.images.first()
@@ -113,9 +113,9 @@ class ReservationUnitImageCreateTestCase(GrapheneTestCaseBase, GraphQLFileUpload
             },
             client=self.client,
         )
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
 
         self.res_unit.refresh_from_db()
         img = self.res_unit.images.first()
@@ -154,9 +154,9 @@ class ReservationUnitImageUpdateTestCase(GrapheneTestCaseBase):
         input_data["imageType"] = "OTHER"
 
         response = self.query(self.get_update_query(), input_data=input_data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         update_data = content.get("data").get("updateReservationUnitImage")
         assert_that(update_data.get("errors")).is_none()
         assert_that(update_data.get("imageType")).is_equal_to("OTHER")
@@ -169,9 +169,9 @@ class ReservationUnitImageUpdateTestCase(GrapheneTestCaseBase):
         input_data["imageType"] = "OTHER"
 
         response = self.query(self.get_update_query(), input_data=input_data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
 
 
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
@@ -196,10 +196,10 @@ class ReservationUnitImageDeleteGraphQLTestCase(GrapheneTestCaseBase):
         self.client.force_login(self.general_admin)
         response = self.query(self.get_delete_query(), input_data={"pk": self.res_unit_image.pk})
 
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         assert_that(content.get("data").get("deleteReservationUnitImage").get("errors")).is_none()
         assert_that(content.get("data").get("deleteReservationUnitImage").get("deleted")).is_true()
 
@@ -210,7 +210,7 @@ class ReservationUnitImageDeleteGraphQLTestCase(GrapheneTestCaseBase):
         response = self.query(self.get_delete_query(), input_data={"pk": self.res_unit_image.pk})
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
         assert_that(content.get("errors")[0].get("message")).contains("No permissions to perform delete.")
 
         assert_that(ReservationUnitImage.objects.filter(pk=self.res_unit_image.pk).exists()).is_true()

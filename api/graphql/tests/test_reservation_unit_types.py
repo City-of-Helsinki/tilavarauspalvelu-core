@@ -1,7 +1,6 @@
 import json
 
 import snapshottest
-from assertpy import assert_that
 
 from api.graphql.tests.base import GrapheneTestCaseBase
 from tests.factories import ReservationUnitTypeFactory
@@ -38,7 +37,7 @@ class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         )
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_getting_reservation_unit_types_sorted_by_name(self):
@@ -62,5 +61,5 @@ class ReservationUnitTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         )
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)

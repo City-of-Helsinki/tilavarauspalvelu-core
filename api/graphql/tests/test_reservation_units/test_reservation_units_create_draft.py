@@ -35,86 +35,86 @@ class ReservationUnitCreateAsDraftTestCase(ReservationUnitMutationsTestCaseBase)
 
     def test_create(self):
         response = self.query(self.get_create_query(), input_data=self.get_valid_data())
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
         res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")).is_none()
+        assert content.get("errors") is None
+        assert res_unit_data.get("errors") is None
 
         res_unit = ReservationUnit.objects.first()
-        assert_that(res_unit).is_not_none()
-        assert_that(res_unit.id).is_equal_to(res_unit_data.get("pk"))
+        assert res_unit is not None
+        assert res_unit.id == res_unit_data.get("pk")
 
     @mock.patch("opening_hours.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki")
     @override_settings(HAUKI_EXPORT_ENABLED=True)
     def test_send_resource_to_hauki_is_not_called(self, send_resource_mock):
         response = self.query(self.get_create_query(), input_data=self.get_valid_data())
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
         res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")).is_none()
-        assert_that(send_resource_mock.call_count).is_equal_to(0)
+        assert content.get("errors") is None
+        assert res_unit_data.get("errors") is None
+        assert send_resource_mock.call_count == 0
 
     def test_create_errors_on_empty_name(self):
         data = self.get_valid_data()
         data["nameFi"] = ""
         response = self.query(self.get_create_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
 
         res_unit = ReservationUnit.objects.first()
-        assert_that(res_unit).is_none()
+        assert res_unit is None
 
     def test_create_with_minimum_fields_success(self):
         data = self.get_valid_data()
         data["nameEn"] = None
         data["descriptionFi"] = None
         response = self.query(self.get_create_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
         res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")).is_none()
+        assert content.get("errors") is None
+        assert res_unit_data.get("errors") is None
 
         res_unit = ReservationUnit.objects.first()
-        assert_that(res_unit).is_not_none()
-        assert_that(res_unit.id).is_equal_to(res_unit_data.get("pk"))
+        assert res_unit is not None
+        assert res_unit.id == res_unit_data.get("pk")
 
     def test_create_without_is_draft_with_name_and_unit_fails(self):
         data = self.get_valid_data()
         data["isDraft"] = None
         response = self.query(self.get_create_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
 
     def test_regular_user_cannot_create(self):
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_create_query(), input_data=self.get_valid_data())
 
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
 
         res_unit = ReservationUnit.objects.first()
-        assert_that(res_unit).is_none()
+        assert res_unit is None
 
     def test_create_with_payment_types(self):
         self.client.force_login(self.general_admin)
         data = self.get_valid_data()
         data["paymentTypes"] = ["ON_SITE", "INVOICE"]
         response = self.query(self.get_create_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(content.get("data").get("createReservationUnit").get("pk")).is_not_none()
+        assert content.get("errors") is None
+        assert content.get("data").get("createReservationUnit").get("pk") is not None
 
         created_unit = ReservationUnit.objects.get(pk=content.get("data").get("createReservationUnit").get("pk"))
         unit_payment_type_codes = [ptype.code for ptype in created_unit.payment_types.all()]
-        assert_that(created_unit).is_not_none()
+        assert created_unit is not None
         assert_that(unit_payment_type_codes).contains_only(PaymentType.ON_SITE.value, PaymentType.INVOICE.value)
 
     def test_create_with_instructions(self):
@@ -130,33 +130,22 @@ class ReservationUnitCreateAsDraftTestCase(ReservationUnitMutationsTestCaseBase)
         data["reservationCancelledInstructionsEn"] = "Cancelled instructions en"
 
         response = self.query(self.get_create_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
         res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")).is_none()
+        assert content.get("errors") is None
+        assert res_unit_data.get("errors") is None
 
         res_unit = ReservationUnit.objects.first()
-        assert_that(res_unit).is_not_none()
-        assert_that(res_unit.id).is_equal_to(res_unit_data.get("pk"))
-        assert_that(res_unit.reservation_pending_instructions_fi).is_equal_to(data["reservationPendingInstructionsFi"])
-        assert_that(res_unit.reservation_pending_instructions_sv).is_equal_to(data["reservationPendingInstructionsSv"])
-        assert_that(res_unit.reservation_pending_instructions_en).is_equal_to(data["reservationPendingInstructionsEn"])
-        assert_that(res_unit.reservation_confirmed_instructions_fi).is_equal_to(
-            data["reservationConfirmedInstructionsFi"]
-        )
-        assert_that(res_unit.reservation_confirmed_instructions_sv).is_equal_to(
-            data["reservationConfirmedInstructionsSv"]
-        )
-        assert_that(res_unit.reservation_confirmed_instructions_en).is_equal_to(
-            data["reservationConfirmedInstructionsEn"]
-        )
-        assert_that(res_unit.reservation_cancelled_instructions_fi).is_equal_to(
-            data["reservationCancelledInstructionsFi"]
-        )
-        assert_that(res_unit.reservation_cancelled_instructions_sv).is_equal_to(
-            data["reservationCancelledInstructionsSv"]
-        )
-        assert_that(res_unit.reservation_cancelled_instructions_en).is_equal_to(
-            data["reservationCancelledInstructionsEn"]
-        )
+        assert res_unit is not None
+        assert res_unit.id == res_unit_data.get("pk")
+
+        assert res_unit.reservation_pending_instructions_fi == data["reservationPendingInstructionsFi"]
+        assert res_unit.reservation_pending_instructions_sv == data["reservationPendingInstructionsSv"]
+        assert res_unit.reservation_pending_instructions_en == data["reservationPendingInstructionsEn"]
+        assert res_unit.reservation_confirmed_instructions_fi == data["reservationConfirmedInstructionsFi"]
+        assert res_unit.reservation_confirmed_instructions_sv == data["reservationConfirmedInstructionsSv"]
+        assert res_unit.reservation_confirmed_instructions_en == data["reservationConfirmedInstructionsEn"]
+        assert res_unit.reservation_cancelled_instructions_fi == data["reservationCancelledInstructionsFi"]
+        assert res_unit.reservation_cancelled_instructions_sv == data["reservationCancelledInstructionsSv"]
+        assert res_unit.reservation_cancelled_instructions_en == data["reservationCancelledInstructionsEn"]

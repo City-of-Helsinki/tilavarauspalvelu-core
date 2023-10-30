@@ -68,25 +68,26 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
 
     def test_pricing_is_not_required_on_create_for_drafts(self):
         response = self.query(self.get_create_query(), input_data=self.get_valid_data(True))
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
 
         res_unit = ReservationUnit.objects.first()
-        assert_that(res_unit).is_not_none()
-        assert_that(res_unit.pricings.count()).is_equal_to(0)
+        assert res_unit is not None
+        assert res_unit.pricings.count() == 0
 
     def test_pricing_is_required_on_create_for_non_drafts(self):
         response = self.query(self.get_create_query(), input_data=self.get_valid_data(False))
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0].get("message")).is_equal_to(
-            "pricings is required and must have one ACTIVE and one optional FUTURE pricing"
+        assert content.get("errors") is not None
+        assert (
+            content.get("errors")[0].get("message")
+            == "pricings is required and must have one ACTIVE and one optional FUTURE pricing"
         )
 
         res_unit = ReservationUnit.objects.first()
-        assert_that(res_unit).is_none()
+        assert res_unit is None
 
     def test_allow_only_one_active_pricing(self):
         input_data = self.get_valid_data(True)
@@ -96,16 +97,14 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         ]
         response = self.query(self.get_create_query(), input_data=input_data)
 
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
 
-        assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0].get("message")).is_equal_to(
-            "reservation unit must have exactly one ACTIVE pricing"
-        )
+        assert content.get("errors") is not None
+        assert content.get("errors")[0].get("message") == "reservation unit must have exactly one ACTIVE pricing"
 
         res_unit = ReservationUnit.objects.first()
-        assert_that(res_unit).is_none()
+        assert res_unit is None
 
     def test_allow_only_one_future_pricing(self):
         future_pricing_date = datetime.date.today() + datetime.timedelta(days=2)
@@ -117,16 +116,14 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         ]
         response = self.query(self.get_create_query(), input_data=input_data)
 
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
 
-        assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0].get("message")).is_equal_to(
-            "reservation unit can have only one FUTURE pricing"
-        )
+        assert content.get("errors") is not None
+        assert content.get("errors")[0].get("message") == "reservation unit can have only one FUTURE pricing"
 
         res_unit = ReservationUnit.objects.first()
-        assert_that(res_unit).is_none()
+        assert res_unit is None
 
     def test_mutating_past_pricings_is_not_allowed(self):
         input_data = self.get_valid_data(True)
@@ -136,16 +133,14 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         ]
         response = self.query(self.get_create_query(), input_data=input_data)
 
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
 
-        assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0].get("message")).is_equal_to(
-            "only ACTIVE and FUTURE pricings can be mutated"
-        )
+        assert content.get("errors") is not None
+        assert content.get("errors")[0].get("message") == "only ACTIVE and FUTURE pricings can be mutated"
 
         res_unit = ReservationUnit.objects.first()
-        assert_that(res_unit).is_none()
+        assert res_unit is None
 
     def test_active_pricing_must_be_today_or_in_the_past(self):
         pricing_data = datetime.date.today() + datetime.timedelta(days=1)
@@ -153,14 +148,14 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         input_data["pricings"] = [self.get_pricing_data(begins=pricing_data.strftime("%Y-%m-%d"))]
         response = self.query(self.get_create_query(), input_data=input_data)
 
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
 
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
         assert_that(content.get("errors")[0].get("message")).starts_with("ACTIVE pricing must be in")
 
         res_unit = ReservationUnit.objects.first()
-        assert_that(res_unit).is_none()
+        assert res_unit is None
 
     def test_future_pricing_must_be_in_the_future(self):
         pricing_date = datetime.date.today()
@@ -168,14 +163,14 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         input_data["pricings"] = [self.get_pricing_data(begins=pricing_date.strftime("%Y-%m-%d"), status="FUTURE")]
         response = self.query(self.get_create_query(), input_data=input_data)
 
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
 
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
         assert_that(content.get("errors")[0].get("message")).starts_with("FUTURE pricing must be in")
 
         res_unit = ReservationUnit.objects.first()
-        assert_that(res_unit).is_none()
+        assert res_unit is None
 
     def test_pricing_can_miss_fields(self):
         pricing_date = datetime.date.today()
@@ -188,11 +183,11 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
             }
         ]
         response = self.query(self.get_create_query(), input_data=input_data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
         res_unit_data = content.get("data").get("createReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")).is_none()
+        assert content.get("errors") is None
+        assert res_unit_data.get("errors") is None
 
         res_unit = ReservationUnit.objects.first()
         assert_that(res_unit.pricings.count()).is_equal_to(1)
@@ -211,7 +206,7 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         create_data = self.get_valid_data(True)
         response = self.query(self.get_create_query(), input_data=create_data)
 
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
         resunit_pk = content.get("data").get("createReservationUnit").get("pk")
 
@@ -223,10 +218,10 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         ]
 
         response = self.query(self.get_update_query(), input_data=update_data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
 
         updated_resunit = ReservationUnit.objects.get(pk=resunit_pk)
         assert_that(updated_resunit.pricings.count()).is_equal_to(1)
@@ -236,7 +231,7 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         create_data["pricings"] = [self.get_pricing_data(begins="2022-09-16")]
         response = self.query(self.get_create_query(), input_data=create_data)
 
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
         resunit_pk = content.get("data").get("createReservationUnit").get("pk")
 
@@ -257,12 +252,12 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         )
 
         response = self.query(self.get_update_query(), input_data=update_data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
 
         content = json.loads(response.content)
         res_unit_data = content.get("data").get("updateReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")).is_none()
+        assert content.get("errors") is None
+        assert res_unit_data.get("errors") is None
 
         updated_resunit = ReservationUnit.objects.get(pk=resunit_pk)
         assert_that(updated_resunit.pricings.count()).is_equal_to(2)
@@ -272,7 +267,7 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         create_data["pricings"] = [self.get_pricing_data(begins="2022-09-16")]
         response = self.query(self.get_create_query(), input_data=create_data)
 
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
         resunit_pk = content.get("data").get("createReservationUnit").get("pk")
 
@@ -288,12 +283,13 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         ]
 
         response = self.query(self.get_update_query(), input_data=update_data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0].get("message")).is_equal_to(
-            "ACTIVE pricing is already defined. Only one ACTIVE pricing is allowed"
+        assert content.get("errors") is not None
+        assert (
+            content.get("errors")[0].get("message")
+            == "ACTIVE pricing is already defined. Only one ACTIVE pricing is allowed"
         )
 
     def test_update_cannot_add_another_future_pricing(self):
@@ -303,7 +299,7 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
             self.get_pricing_data(begins=future_pricing_date.strftime("%Y-%m-%d"), status="FUTURE"),
         ]
         response = self.query(self.get_create_query(), input_data=create_data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
         resunit_pk = content.get("data").get("createReservationUnit").get("pk")
 
@@ -318,12 +314,13 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         ]
 
         response = self.query(self.get_update_query(), input_data=update_data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0].get("message")).is_equal_to(
-            "FUTURE pricing is already defined. Only one FUTURE pricing is allowed"
+        assert content.get("errors") is not None
+        assert (
+            content.get("errors")[0].get("message")
+            == "FUTURE pricing is already defined. Only one FUTURE pricing is allowed"
         )
 
     def test_update_can_remove_pricings(self):
@@ -334,7 +331,7 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
             self.get_pricing_data(begins=future_pricing_date.strftime("%Y-%m-%d"), status="FUTURE"),
         ]
         response = self.query(self.get_create_query(), input_data=create_data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
         resunit_pk = content.get("data").get("createReservationUnit").get("pk")
 
@@ -343,12 +340,12 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         update_data["pricings"] = []
 
         response = self.query(self.get_update_query(), input_data=update_data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
 
         content = json.loads(response.content)
         res_unit_data = content.get("data").get("updateReservationUnit")
-        assert_that(content.get("errors")).is_none()
-        assert_that(res_unit_data.get("errors")).is_none()
+        assert content.get("errors") is None
+        assert res_unit_data.get("errors") is None
 
         updated_resunit = ReservationUnit.objects.get(pk=resunit_pk)
         assert_that(updated_resunit.pricings.count()).is_equal_to(0)
