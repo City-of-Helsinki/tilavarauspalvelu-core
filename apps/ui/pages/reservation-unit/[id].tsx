@@ -195,11 +195,11 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         termsType: TermsOfUseTermsOfUseTermsTypeChoices.GenericTerms,
       },
     });
-    const bookingTerms: TermsOfUseType | undefined =
+    const bookingTerms: TermsOfUseType | null =
       genericTermsData.termsOfUse?.edges
         ?.map((e) => e?.node)
         .filter((n): n is NonNullable<typeof n> => n !== null)
-        .find((edge) => edge.pk === genericTermsVariant.BOOKING);
+        .find((edge) => edge.pk === genericTermsVariant.BOOKING) ?? null;
 
     const { data: additionalData } = await apolloClient.query<
       Query,
