@@ -11,7 +11,12 @@ from api.graphql.tests.test_reservation_units.base import (
 )
 from reservation_units.models import ReservationUnit
 from terms_of_use.models import TermsOfUse
-from tests.factories import ReservationMetadataSetFactory, ReservationUnitFactory, TermsOfUseFactory
+from tests.factories import (
+    OriginHaukiResourceFactory,
+    ReservationMetadataSetFactory,
+    ReservationUnitFactory,
+    TermsOfUseFactory,
+)
 from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 
 
@@ -149,7 +154,7 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
     @mock.patch("opening_hours.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki")
     @override_settings(HAUKI_EXPORTS_ENABLED=True)
     def test_send_resource_to_hauki_called_when_resource_id_exists(self, send_resource_mock):
-        self.res_unit.hauki_resource_id = "1"
+        self.res_unit.origin_hauki_resource = OriginHaukiResourceFactory(id=1)
         self.res_unit.save()
 
         data = self.get_valid_update_data()

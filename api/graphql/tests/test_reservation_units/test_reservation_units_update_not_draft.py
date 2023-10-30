@@ -13,7 +13,7 @@ from opening_hours.enums import ResourceType
 from opening_hours.errors import HaukiAPIError
 from opening_hours.utils.hauki_exporter import HaukiResource
 from reservation_units.models import ReservationUnit
-from tests.factories import ReservationUnitFactory
+from tests.factories import OriginHaukiResourceFactory, ReservationUnitFactory
 
 
 class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase):
@@ -40,7 +40,7 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
 
     def setUp(self):
         super().setUp()
-        self.res_unit.hauki_resource_id = None
+        self.res_unit.origin_hauki_resource = None
         self.res_unit.save()
 
     def get_update_query(self):
@@ -116,7 +116,7 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
     @mock.patch("opening_hours.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki")
     @override_settings(HAUKI_EXPORTS_ENABLED=True)
     def test_send_resource_to_hauki_called_when_resource_id_exists(self, send_resource_mock):
-        self.res_unit.hauki_resource_id = "1"
+        self.res_unit.origin_hauki_resource = OriginHaukiResourceFactory(id=1)
         self.res_unit.save()
 
         data = self.get_valid_update_data()

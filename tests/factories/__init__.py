@@ -12,6 +12,7 @@ from .email_template import EmailTemplateFactory
 from .equipment import EquipmentCategoryFactory, EquipmentFactory
 from .keyword import KeywordCategoryFactory, KeywordFactory, KeywordGroupFactory
 from .location import LocationFactory
+from .opening_hours import OriginHaukiResourceFactory, ReservableTimeSpanFactory
 from .order import OrderCustomerFactory, OrderFactory
 from .organization import OrganisationFactory
 from .payment import (
@@ -86,6 +87,7 @@ __all__ = [
     "OrderCustomerFactory",
     "OrderFactory",
     "OrganisationFactory",
+    "OriginHaukiResourceFactory",
     "PaymentAccountingFactory",
     "PaymentFactory",
     "PaymentMerchantFactory",
@@ -96,6 +98,7 @@ __all__ = [
     "QualifierFactory",
     "RealEstateFactory",
     "RecurringReservationFactory",
+    "ReservableTimeSpanFactory",
     "ReservationCancelReasonFactory",
     "ReservationDenyReasonFactory",
     "ReservationFactory",

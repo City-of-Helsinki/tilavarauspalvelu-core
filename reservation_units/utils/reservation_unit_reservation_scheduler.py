@@ -22,7 +22,6 @@ class ReservationUnitReservationScheduler:
             self.reservation_duration = 1
 
         self.start_time = self._get_reservation_period_start()
-        self.end_time = self.start_time + datetime.timedelta(hours=self.reservation_duration)
         self.reservation_date_end = self._get_reservation_period_end(self.start_time)
 
         if opening_hours_end and opening_hours_end < self.start_time.date():

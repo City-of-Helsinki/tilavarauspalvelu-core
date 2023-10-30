@@ -192,7 +192,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         res_unit = ReservationUnit.objects.first()
         assert res_unit.id is not None
         assert res_unit.name_fi == data["nameFi"]
-        assert res_unit.hauki_resource_id is None
+        assert res_unit.origin_hauki_resource is None
 
     def test_create_errors_on_empty_name_translations(self):
         data = self.get_valid_data()

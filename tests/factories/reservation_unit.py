@@ -56,6 +56,7 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
     sku = fuzzy.FuzzyText()
     name = fuzzy.FuzzyText()
     reservation_unit_type = factory.SubFactory("tests.factories.ReservationUnitTypeFactory")
+    origin_hauki_resource = None
     unit = factory.SubFactory("tests.factories.UnitFactory")
 
     @factory.post_generation

@@ -4,6 +4,7 @@ import requests
 from django.contrib.gis.geos import Point
 from django.db import transaction
 
+from opening_hours.models import OriginHaukiResource
 from opening_hours.utils.hauki_api_client import HaukiAPIClient
 from opening_hours.utils.hauki_api_types import HaukiAPIResourceListResponse
 from spaces.models import Location, Unit
@@ -193,7 +194,8 @@ class UnitHaukiResourceIdImporter:
         for unit in units:
             resource_id = self.resource_id_map.get(unit.tprek_id)
             if resource_id:
-                unit.hauki_resource_id = resource_id
+                origin_hauki_resource, _ = OriginHaukiResource.objects.get_or_create(id=resource_id)
+                unit.origin_hauki_resource = origin_hauki_resource
                 unit.save()
                 resource_ids_updated.append(unit.tprek_id)
 

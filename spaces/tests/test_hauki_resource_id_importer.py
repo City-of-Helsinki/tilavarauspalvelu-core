@@ -1,6 +1,5 @@
 from unittest import mock
 
-from assertpy import assert_that
 from django.test import override_settings
 from django.test.testcases import TestCase
 
@@ -43,12 +42,12 @@ class HaukiResourceIdImporterTestCase(TestCase):
         importer = UnitHaukiResourceIdImporter()
         importer.import_hauki_resource_ids_for_units(unit_ids=[self.unit.id])
         self.unit.refresh_from_db()
-        assert_that(self.unit.hauki_resource_id).is_equal_to("1")
-        assert_that(mock.call_count).is_equal_to(2)
+        assert self.unit.origin_hauki_resource.id == 1
+        assert mock.call_count == 2
 
     def test_resource_id_is_importer_from_tprek_ids(self, mock):
         importer = UnitHaukiResourceIdImporter()
         importer.import_hauki_resource_ids_for_units(tprek_ids=[self.unit.tprek_id])
         self.unit.refresh_from_db()
-        assert_that(self.unit.hauki_resource_id).is_equal_to("1")
-        assert_that(mock.call_count).is_equal_to(2)
+        assert self.unit.origin_hauki_resource.id == 1
+        assert mock.call_count == 2
