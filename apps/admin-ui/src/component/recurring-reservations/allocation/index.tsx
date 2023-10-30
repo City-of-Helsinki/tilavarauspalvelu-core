@@ -98,8 +98,8 @@ function ApplicationRoundAllocation({
   const units = uniqBy(unitData, "pk");
 
   const unitOptions = units.map((unit) => ({
-    value: unit.pk,
-    label: unit.nameFi,
+    value: unit.pk ?? 0,
+    label: unit.nameFi ?? "",
   }));
 
   const timeOptions = [300, 200].map((n) => ({
@@ -146,6 +146,12 @@ function ApplicationRoundAllocation({
       setRefreshApplicationEvents(false);
     }
   }, [refetch, refreshApplicationEvents, setRefreshApplicationEvents]);
+
+  useEffect(() => {
+    if (unitFilter == null && unitOptions.length > 0) {
+      setUnitFilter(unitOptions[0]);
+    }
+  }, [unitOptions, unitFilter]);
 
   const applicationEvents: ApplicationEventNode[] =
     getFilteredApplicationEvents(
