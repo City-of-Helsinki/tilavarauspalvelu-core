@@ -48,9 +48,7 @@ class ApplicationEventScheduleApproveSerializer(TranslatedModelSerializer):
         return data
 
     def update(self, instance: ApplicationEventSchedule, validated_data: dict[str, Any]):
-        instance = super().update(instance, validated_data)
-        instance.actions.create_reservation_for_schedule()
-        return instance
+        return super().update(instance, validated_data)
 
 
 class ApplicationEventScheduleDeclineSerializer(TranslatedModelSerializer):

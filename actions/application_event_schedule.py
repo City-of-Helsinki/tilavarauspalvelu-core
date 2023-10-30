@@ -28,8 +28,6 @@ class ApplicationEventScheduleActions:
         self.schedule = application_event_schedule
 
     def create_reservation_for_schedule(self):
-        recurring_reservation = self.create_recurring_reservation_for_schedule()
-
         application_event = self.schedule.application_event
         application = application_event.application
         organisation: Organisation | None = application.organisation
@@ -40,12 +38,14 @@ class ApplicationEventScheduleActions:
         interval = 14 if application_event.biweekly else 7
         reservation_date = next_or_current_matching_weekday(application_event.begin, self.schedule.allocated_day)
 
-        unit_uuid = self.schedule.allocated_reservation_unit.uuid
+        unit_uuid = str(self.schedule.allocated_reservation_unit.uuid)
         opening_hours = get_opening_hours(
             resource_id=unit_uuid,
             start_date=reservation_date,
             end_date=application_event.end,
         )
+
+        recurring_reservation = self.create_recurring_reservation_for_schedule()
 
         while reservation_date < application_event.end:
             reservations_start = datetime.datetime.combine(reservation_date, self.schedule.allocated_begin).astimezone(
