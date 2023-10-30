@@ -1,141 +1,107 @@
-from dataclasses import dataclass
+from typing import Any
 
 from opening_hours.enums import ResourceType
-from opening_hours.errors import HaukiAPIError, HaukiRequestError
+from opening_hours.errors import HaukiAPIError, HaukiRequestError, HaukiValueError
+from opening_hours.models import OriginHaukiResource
 from opening_hours.utils.hauki_api_client import HaukiAPIClient
 from opening_hours.utils.hauki_api_types import HaukiAPIResource, HaukiTranslatedField
 from reservation_units.models import ReservationUnit
 
 
-@dataclass(order=True, frozen=True)
-class HaukiResource:
-    """Represents Resource in hauki"""
+class ReservationUnitHaukiExporter:
+    def __init__(self, reservation_unit: ReservationUnit):
+        self.reservation_unit = reservation_unit
+        self.hauki_api_client = HaukiAPIClient()
 
-    id: int | None
-    name: HaukiTranslatedField
-    description: HaukiTranslatedField
-    address: HaukiTranslatedField | None
-    children: list[int]
-    parents: list[int]
-    organization: str
-    origin_id: str
-    origin_data_source_name: str
-    origin_data_source_id: str
-    resource_type: ResourceType = ResourceType.RESERVABLE
+    def send_reservation_unit_to_hauki(self) -> None:
+        # Initialise data for the Hauki API
+        hauki_resource_data = self._convert_reservation_unit_to_hauki_resource_data()
 
-    def convert_to_request_data(self):
+        # Send the data to Hauki API
+        if self.reservation_unit.origin_hauki_resource is None:
+            self._create_hauki_resource(hauki_resource_data)
+        else:
+            self._update_hauki_resource(hauki_resource_data)
+
+    def _convert_reservation_unit_to_hauki_resource_data(self) -> dict[str, Any]:
+        parent_unit_resource_id = self._get_parent_resource_id()
+        if not parent_unit_resource_id:
+            raise HaukiValueError("Parent Unit does have 'Hauki Resource' set and could not get it from Hauki API.")
+
+        if not self.reservation_unit.unit.tprek_department_id:
+            raise HaukiValueError("Parent Unit does not have a department id.")
+
         return {
-            "name": self.name,
-            "description": self.description,
-            "address": self.address,
-            "resource_type": self.resource_type.value,
-            "children": self.children,
-            "parents": self.parents,
-            "organization": self.organization,
+            "name": HaukiTranslatedField(
+                fi=self.reservation_unit.name_fi,
+                sv=self.reservation_unit.name_sv,
+                en=self.reservation_unit.name_en,
+            ),
+            "description": HaukiTranslatedField(
+                fi=self.reservation_unit.description,
+                sv=self.reservation_unit.description,
+                en=self.reservation_unit.description,
+            ),
+            "resource_type": ResourceType.RESERVABLE.value,
             "origins": [
                 {
                     "data_source": {
-                        "id": self.origin_data_source_id,
-                        "name": self.origin_data_source_name,
+                        "id": "tvp",
+                        "name": "Tilavarauspalvelu",
                     },
-                    "origin_id": self.origin_id,
+                    "origin_id": str(self.reservation_unit.uuid),
                 }
             ],
+            "parents": [parent_unit_resource_id],
+            "organization": f"tprek:{self.reservation_unit.unit.tprek_department_id}",
+            "address": None,
+            "children": [],
             "extra_data": {},
             "is_public": True,
             "timezone": "Europe/Helsinki",
         }
 
+    def _get_parent_resource_id(self) -> int | None:
+        """Get the parent units hauki resource id, so that the reservation unit can be added as a child in Hauki API."""
+        parent_unit = self.reservation_unit.unit
 
-class ReservationUnitHaukiExporter:
-    def __init__(self, reservation_unit: ReservationUnit):
-        self.reservation_unit = reservation_unit
-
-    def _get_parent_id(self) -> int | None:
-        """
-        Tries to get reservation_unit.unit `hauki_resource_id` from hauki.
-        This is used when hauki_resource_id is not found from reservation_unit's unit.
-        """
-        unit = self.reservation_unit.unit
-        if not unit or unit.tprek_id is None:
+        # No parent, no way to get the id
+        if parent_unit is None:
             return None
 
-        unit_resource_id = f"{unit.hauki_resource_data_source_id}:{unit.tprek_id}"
-        url = HaukiAPIClient.build_url(endpoint="resource", resource_id=unit_resource_id)
+        # If the parent has an origin_hauki_resource_id, use that
+        if parent_unit.origin_hauki_resource is not None:
+            return parent_unit.origin_hauki_resource.id
 
+        # Unit doesn't have a hauki resource set, so try to get it from Hauki API
+        # If the unit doesn't have a tprek_id, we can't get it from hauki
+        if parent_unit.tprek_id is None:
+            return None
+
+        unit_origin_resource_id = f"tprek:{parent_unit.tprek_id}"
         try:
-            resource_data: HaukiAPIResource = HaukiAPIClient.get(url=url)
+            resource_data = self.hauki_api_client.get_resource(hauki_resource_id=unit_origin_resource_id)
             return resource_data["id"]
         except (HaukiAPIError, HaukiRequestError, KeyError, IndexError, TypeError):
             return None
 
-    def _convert_reservation_unit_to_hauki_resource(self) -> HaukiResource:
-        parent_id = self.reservation_unit.unit.hauki_resource_id or self._get_parent_id()
-        if parent_id is None:
-            raise ValueError("Unit did not have hauki resource id and could not get it from hauki.")
+    def _create_hauki_resource(self, hauki_resource_data):
+        """Create a new HaukiResource in Hauki API for the ReservationUnit."""
+        # New Hauki Resource, create it in Hauki API and update the reservation unit
+        response_data: HaukiAPIResource = self.hauki_api_client.create_resource(data=hauki_resource_data)
 
-        department_id = getattr(self.reservation_unit.unit, "tprek_department_id", None)
-        if not department_id:
-            raise ValueError("Unit does not have a department id,")
-        department_id = f"tprek:{department_id}"
+        if not response_data["id"]:
+            raise HaukiValueError("Hauki API did not return a resource id.")
 
-        return HaukiResource(
-            id=self.reservation_unit.hauki_resource_id or None,
-            name=HaukiTranslatedField(
-                fi=self.reservation_unit.name_fi,
-                sv=self.reservation_unit.name_sv,
-                en=self.reservation_unit.name_en,
-            ),
-            description=HaukiTranslatedField(
-                fi=self.reservation_unit.description,
-                sv=self.reservation_unit.description,
-                en=self.reservation_unit.description,
-            ),
-            address=None,
-            origin_data_source_name="Tilavarauspalvelu",
-            origin_data_source_id="tvp",
-            origin_id=str(self.reservation_unit.uuid),
-            organization=department_id,
-            parents=[parent_id],
-            children=[],
-            resource_type=ResourceType.RESERVABLE,
-        )
+        # Save the returned Hauki Resource to the database as OriginHaukiResource
+        origin_hauki_resource, _ = OriginHaukiResource.objects.get_or_create(id=response_data["id"])
 
-    @staticmethod
-    def _parse_response_data_to_hauki_resource(response_data: HaukiAPIResource) -> HaukiResource | HaukiAPIResource:
-        try:
-            resource_out = HaukiResource(
-                id=response_data["id"],
-                name=response_data["name"],
-                description=response_data["description"],
-                address=response_data["address"],
-                resource_type=response_data["resource_type"],
-                children=response_data["children"],
-                parents=response_data["parents"],
-                organization=response_data["organization"],
-                origin_id=response_data["origins"][0]["origin_id"],
-                origin_data_source_name=response_data["origins"][0]["data_source"]["name"],
-                origin_data_source_id=response_data["origins"][0]["data_source"]["id"],
-            )
-        except (KeyError, ValueError, IndexError):
-            resource_out = response_data
-        return resource_out
+        self.reservation_unit.origin_hauki_resource = origin_hauki_resource
+        self.reservation_unit.save()
 
-    def send_reservation_unit_to_hauki(self) -> HaukiAPIResource:
-        hauki_resource_object: HaukiResource = self._convert_reservation_unit_to_hauki_resource()
-        data = hauki_resource_object.convert_to_request_data()
+    def _update_hauki_resource(self, hauki_resource_data):
+        """Update the Hauki Resource in Hauki API with ReservationUnits data."""
+        hauki_resource_data["id"] = self.reservation_unit.origin_hauki_resource.id
 
-        if self.reservation_unit.hauki_resource_id:
-            url = HaukiAPIClient.build_url(endpoint="resource", resource_id=hauki_resource_object.id)
-            response_data: HaukiAPIResource = HaukiAPIClient.put(url=url, data=data)
-        else:
-            url = HaukiAPIClient.build_url(endpoint="resource")
-            response_data: HaukiAPIResource = HaukiAPIClient.post(url=url, data=data)
-
-        response_data = self._parse_response_data_to_hauki_resource(response_data)
-
-        if isinstance(response_data, HaukiResource) and response_data.id:
-            self.reservation_unit.hauki_resource_id = response_data.id
-            self.reservation_unit.save()
-
-        return response_data
+        # Existing Hauki Resource, update it in Hauki API
+        self.hauki_api_client.update_resource(data=hauki_resource_data)

@@ -1,11 +1,18 @@
+import datetime
 import json
-from typing import Literal
+from typing import Literal, TypedDict
 from urllib.parse import urljoin
 
 from django.conf import settings
 from requests import Response, request
 
 from opening_hours.errors import HaukiAPIError, HaukiConfigurationError, HaukiRequestError
+from opening_hours.utils.hauki_api_types import (
+    HaukiAPIOpeningHoursResponse,
+    HaukiAPIOpeningHoursResponseItem,
+    HaukiAPIResource,
+    HaukiAPIResourceListResponse,
+)
 from tilavarauspalvelu.utils import logging
 
 REQUESTS_TIMEOUT = 15
@@ -13,8 +20,96 @@ REQUESTS_TIMEOUT = 15
 logger = logging.getLogger(__name__)
 
 
+class HaukiGetResourcesParams(TypedDict):
+    resource_ids: str  # Comma separated list of UUIDs. Supports [data_source_id]:[origin_id] style ids
+    parent: str  # ID of the parent resource
+    child: str  # ID of a child resource
+    data_source: str  # ID of the data source
+    origin_id_exists: bool  # Filter by existing/missing origin_id
+    ordering: str
+    page: int
+    page_size: int
+
+
 class HaukiAPIClient:
-    """Hauki API client, minimal functionality implemented."""
+    def __init__(self):
+        if not settings.HAUKI_API_URL:
+            raise HaukiConfigurationError("HAUKI_API_URL environment variable must to be configured.")
+
+    ############
+    # resource #
+    ############
+
+    def get_resources(
+        self,
+        *,
+        hauki_resource_ids: list[int],
+        **kwargs: HaukiGetResourcesParams,
+    ) -> HaukiAPIResourceListResponse:
+        # Prepare the URL
+        url = urljoin(settings.HAUKI_API_URL, "/v1/resource/")
+        query_params = {
+            "resource_ids": ",".join(str(id_) for id_ in hauki_resource_ids),
+            **kwargs,
+        }
+
+        return self.get(url=url, params=query_params)
+
+    def get_resource(self, *, hauki_resource_id: str) -> HaukiAPIResource:
+        url = urljoin(settings.HAUKI_API_URL, f"/v1/resource/{hauki_resource_id}/")
+
+        return self.get(url=url)
+
+    def create_resource(self, *, data: dict) -> HaukiAPIResource:
+        url = urljoin(settings.HAUKI_API_URL, "/v1/resource/")
+
+        return self.post(url=url, data=data)
+
+    def update_resource(self, *, data: dict) -> HaukiAPIResource:
+        hauki_resource_id = data["id"]
+        url = urljoin(settings.HAUKI_API_URL, f"/v1/resource/{hauki_resource_id}")
+
+        return self.put(url=url, data=data)
+
+    #################
+    # opening_hours #
+    #################
+
+    def get_resource_opening_hours(
+        self,
+        *,
+        hauki_resource_id: int,
+        start_date: datetime.date,
+        end_date: datetime.date,
+    ) -> HaukiAPIOpeningHoursResponseItem:
+        """
+        Fetch a single resource's opening hours for a given date range.
+
+        The `/v1/opening_hours/` endpoint is used instead of `/v1/resource/{}/opening_hours/`,
+        as we need the resource's timezone info.
+        The `/v1/resource/{}/opening_hours/` endpoint returns only opening hours, while the `/v1/opening_hours/`
+        endpoint returns both the resource (which includes its timezone) and the resources opening hours.
+        """
+        # Prepare the URL
+        url = urljoin(settings.HAUKI_API_URL, "/v1/opening_hours/")
+        query_params = {
+            "resource": hauki_resource_id,
+            "start_date": start_date.isoformat(),
+            "end_date": end_date.isoformat(),
+        }
+
+        # Get the data from Hauki API
+        response: HaukiAPIOpeningHoursResponse = self.get(url=url, params=query_params)
+        if response["count"] == 0:
+            raise HaukiAPIError(f"Hauki API did not return any resources matching '{hauki_resource_id}'.")
+        if response["count"] > 1:
+            raise HaukiAPIError("Received too many results from Hauki API.")
+
+        return response["results"][0]
+
+    ################
+    # Base methods #
+    ################
 
     @staticmethod
     def build_url(endpoint: Literal["resource", "opening_hours", "date_period"], resource_id: str | None = None) -> str:

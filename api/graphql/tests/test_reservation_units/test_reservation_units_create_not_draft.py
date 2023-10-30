@@ -9,7 +9,6 @@ from api.graphql.tests.test_reservation_units.base import (
     ReservationUnitMutationsTestCaseBase,
 )
 from opening_hours.errors import HaukiAPIError
-from opening_hours.utils.hauki_exporter import HaukiResource
 from reservation_units.models import (
     PriceUnit,
     PricingStatus,
@@ -156,16 +155,6 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
     @mock.patch("opening_hours.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki")
     @override_settings(HAUKI_EXPORTS_ENABLED=True)
     def test_send_resource_to_hauki_called(self, send_resource_mock):
-        res = HaukiResource(
-            id=1,
-            name={"fi": "name", "sv": "name", "en": "name"},
-            description={"fi": "desc", "sv": "desc", "en": "desc"},
-            origin_id="",
-            organization="department_id",
-            parents=[],
-        )
-        send_resource_mock.return_value = res
-
         data = self.get_valid_data()
         response = self.query(self.get_create_query(), input_data=data)
 

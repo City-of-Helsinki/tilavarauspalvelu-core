@@ -2,6 +2,10 @@ from typing import Any, Literal, TypedDict
 
 from opening_hours.enums import ResourceType, State
 
+##########
+# Common #
+##########
+
 
 class HaukiTranslatedField(TypedDict):
     fi: str | None
@@ -16,6 +20,11 @@ class HaukiAPIOrigin(TypedDict):
 
     origin_id: str
     data_source: DataSource
+
+
+############
+# Resource #
+############
 
 
 class HaukiAPIResource(TypedDict):
@@ -43,6 +52,11 @@ class HaukiAPIResourceListResponse(TypedDict):
     next: str | None
     previous: str | None
     results: list[HaukiAPIResource]
+
+
+###############
+# Date Period #
+###############
 
 
 class HaukiAPIDatePeriod(TypedDict):
@@ -81,7 +95,9 @@ class HaukiAPIDatePeriod(TypedDict):
     time_span_groups: list[TimeSpanGroup]
 
 
-# Hauki API Response types
+#################
+# Opening Hours #
+#################
 
 
 class HaukiAPIOpeningHoursResponseResource(TypedDict):

@@ -11,4 +11,9 @@ class HaukiAPIError(HaukiError):
 
 
 class HaukiConfigurationError(HaukiError):
-    """Hauki settings are not configured correctly"""
+    """Hauki API settings are not configured correctly"""
+
+
+class HaukiValueError(HaukiError):
+    """Generic Value error related to Hauki"""
+

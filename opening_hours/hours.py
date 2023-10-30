@@ -84,6 +84,14 @@ class OpeningHoursDayData:
 
 
 def _build_hauki_resource_id(resource_id: str | list[str], hauki_origin_id: str | None) -> str:
+    """
+    Build a Hauki resource id string from the given resource id(s).
+
+    Used to fetch Hauki resources from a specific origin data source, using the ID of the resource in that data source.
+    e.g. 'tvp:123', returns the resource with pk '123' in the data source with id 'tvp'.
+
+    Note: This resource id style is only usable in 'v1/resources/' endpoint.
+    """
     if not hauki_origin_id:
         hauki_origin_id = settings.HAUKI_ORIGIN_ID
     if not hauki_origin_id:
@@ -93,7 +101,7 @@ def _build_hauki_resource_id(resource_id: str | list[str], hauki_origin_id: str 
     if not isinstance(resource_id, list):
         resource_id = [resource_id]
 
-    # Build the resource id string, e.g. 'tprek:123,tprek:456'.
+    # Build the resource id string, e.g. 'tvp:123,tvp:456'.
     return f"{hauki_origin_id}:{f',{hauki_origin_id}:'.join(resource_id)}"
 
 
