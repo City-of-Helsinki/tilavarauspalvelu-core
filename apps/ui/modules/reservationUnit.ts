@@ -2,10 +2,7 @@ import { formatters as getFormatters, getReservationVolume } from "common";
 import { flatten, trim, uniq } from "lodash";
 import { addDays } from "date-fns";
 import { i18n } from "next-i18next";
-import {
-  ReservationState,
-  ReservationUnit,
-} from "common/types/common";
+import { ReservationState } from "common/types/common";
 import { toApiDate, toUIDate } from "common/src/common/util";
 import { RoundPeriod, isSlotWithinReservationTime } from "common/src/calendar/util";
 import {
@@ -19,7 +16,7 @@ import {
   ReservationUnitType,
   UnitType,
 } from "common/types/gql-types";
-import { capitalize, getTranslation, localizedValue } from "./util";
+import { capitalize, getTranslation } from "./util";
 
 export const isReservationUnitPublished = (
   reservationUnit?: ReservationUnitType | ReservationUnitByPkType
@@ -109,19 +106,6 @@ export const getReservationUnitName = (
     }
   }
   return reservationUnit.nameFi ?? "-";
-};
-
-export const getOldReservationUnitName = (
-  reservationUnit?: ReservationUnit,
-  language: string = i18n?.language ?? "fi"
-): string | undefined => {
-  if (!reservationUnit) {
-    return undefined;
-  }
-  return (
-    localizedValue(reservationUnit?.name, language) ||
-    localizedValue(reservationUnit?.name, "fi")
-  );
 };
 
 export const getUnitName = (

@@ -36,7 +36,7 @@ const Page1 = ({ applicationRound, onNext }: Props): JSX.Element | null => {
       .filter((node): node is NonNullable<typeof node> => node != null)
       .filter((u) => unitsInApplicationRound.includes(u.pk))
       .map((u) => ({
-        id: String(u.pk),
+        pk: u.pk ?? 0,
         name: getTranslation(u, "name"),
       })) ?? [];
   // TODO does this work? mapOptions wasn't working in useOptions at least (old REST things)

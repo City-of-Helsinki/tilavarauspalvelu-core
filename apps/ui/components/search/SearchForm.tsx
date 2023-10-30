@@ -13,7 +13,7 @@ import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import { useQuery } from "@apollo/client";
 import { sortBy } from "lodash";
-import { OptionType, StringParameter } from "common/types/common";
+import { OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
 import {
   ApplicationRoundNode,
@@ -230,10 +230,10 @@ const SearchForm = ({
         ?.map((e) => e?.node)
         .filter((n): n is NonNullable<typeof n> => n != null)
         .map((node) => ({
-          id: String(node.pk),
-          name: getUnitName(node),
-        }));
-      setUnitOptions(mapOptions(sortBy(units, "name") as StringParameter[]));
+          pk: node.pk ?? 0,
+          name: getUnitName(node) ?? "",
+        })) ?? [];
+      setUnitOptions(mapOptions(sortBy(units, "name")));
     },
   });
 
@@ -243,11 +243,11 @@ const SearchForm = ({
         ?.map((e) => e?.node)
         .filter((n): n is NonNullable<typeof n> => n != null)
         .map((node) => ({
-          id: String(node.pk),
+          pk: node.pk ?? 0,
           name: getTranslation(node, "name"),
-        }));
+        })) ?? [];
       setPurposeOptions(
-        mapOptions(sortBy(purposes, "name") as StringParameter[])
+        mapOptions(sortBy(purposes, "name"))
       );
     },
   });
@@ -258,9 +258,9 @@ const SearchForm = ({
         ?.map((e) => e?.node)
         .filter((n): n is NonNullable<typeof n> => n != null)
         .map((node) => ({
-          id: String(node.pk),
-          name: getTranslation(node, "name"),
-        }));
+          pk: node.pk ?? 0,
+          name: getTranslation(node, "name") ?? "",
+        })) ?? [];
       setReservationUnitTypeOptions(mapOptions(sortBy(types, "name")));
     },
   });

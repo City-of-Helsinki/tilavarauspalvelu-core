@@ -2,7 +2,6 @@ import { format, parseISO } from "date-fns";
 import i18next from "i18next";
 import { groupBy, set, get, trim } from "lodash";
 import { LocationType, Query } from "common/types/gql-types";
-import { Location } from "common/types/common";
 import { DataFilterOption } from "./types";
 import { NUMBER_OF_DECIMALS } from "./const";
 
@@ -209,18 +208,9 @@ export const parseAgeGroups = (ageGroups: IAgeGroups): string => {
   })}`;
 };
 
-// TODO type this to LocationType only (check the users)
-export const parseAddress = (location: Location | LocationType): string => {
+export const parseAddress = (location: LocationType): string => {
   return trim(
-    `${
-      (location as Location).addressStreet ||
-      (location as LocationType).addressStreetFi ||
-      ""
-    }, ${(location as Location).addressZip || ""} ${
-      (location as Location).addressCity ||
-      (location as LocationType).addressCityFi ||
-      ""
-    }`,
+    `${location.addressStreetFi ?? ""}, ${location.addressZip} ${location.addressCityFi ?? "" }`,
     ", "
   );
 };

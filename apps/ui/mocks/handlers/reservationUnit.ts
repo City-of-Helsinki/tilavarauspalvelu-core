@@ -1,7 +1,6 @@
 import { addDays, addMinutes, endOfWeek, set } from "date-fns";
 import { graphql } from "msw";
 import { toApiDate, toUIDate } from "common/src/common/util";
-import { Parameter } from "common/types/common";
 import {
   OpeningTimesType,
   Query,
@@ -1314,7 +1313,7 @@ const relatedReservationUnitsData: ReservationUnitTypeConnection = {
   },
 };
 
-const reservationUnitTypeData: Parameter[] = [
+const reservationUnitTypeData = [
   { id: 4, name: "Tilan tyyppi" },
   { id: 1, name: "Äänitysstudio" },
   { id: 2, name: "Kokoustila" },

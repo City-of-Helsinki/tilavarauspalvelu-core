@@ -13,7 +13,7 @@ export type SlotProps = {
   style?: React.CSSProperties;
 };
 
-export type TranslationObject = {
+type TranslationObject = {
   fi?: string;
   en?: string;
   sv?: string;
@@ -30,7 +30,7 @@ type ApplicationRoundStatus =
   | "validated"
   | "approved";
 
-export type CustomerType = "business" | "nonprofit" | "individual";
+type CustomerType = "business" | "nonprofit" | "individual";
 
 type ApplicationRoundBasket = {
   id: number;
@@ -74,7 +74,7 @@ type ApplicationRound = {
   criteria: string;
 };
 
-export type Space = {
+type Space = {
   id: number;
   locationType: "fixed";
   name: TranslationObject;
@@ -83,7 +83,7 @@ export type Space = {
   termsOfUse: string;
 };
 
-export type Resource = {
+type Resource = {
   id: number;
   name: TranslationObject;
   locationType: "fixed";
@@ -92,7 +92,7 @@ export type Resource = {
   bufferTimeAfter: string;
 };
 
-export type Service = {
+type Service = {
   id: number;
   name: TranslationObject;
   serviceType: "introduction";
@@ -100,7 +100,7 @@ export type Service = {
   bufferTimeAfter: string;
 };
 
-export type Location = {
+type Location = {
   id: number;
   addressStreet: string;
   addressZip: string;
@@ -116,11 +116,12 @@ export type Image = {
   imageType: "main" | "map" | "ground_plan" | "other";
 };
 
-export type Building = {
+type Building = {
   id: number;
   name: string;
 };
 
+// @deprecated required by pdf export
 export type ReservationUnit = {
   id: number;
   name: TranslationObject;
@@ -143,16 +144,11 @@ export type ReservationUnit = {
   reservations?: Reservation[];
 };
 
-export type Parameter = {
+type Parameter = {
   id: number;
   name?: TranslationObject | string;
   minimum?: number;
   maximum?: number;
-};
-
-export type StringParameter = {
-  id: string;
-  name?: TranslationObject | string;
 };
 
 export type Address = {
@@ -335,12 +331,6 @@ type TimeSpan = {
   endTimeOnNextDay: boolean;
   name: TranslationObject;
   description: TranslationObject;
-};
-
-type OpeningHourTime = {
-  startTime: string;
-  endTime: string;
-  endTimeOnNextDay?: boolean;
 };
 
 type OpeningTime = {

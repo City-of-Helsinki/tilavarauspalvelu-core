@@ -3,6 +3,7 @@ import { useTranslation } from "next-i18next";
 import type { LocalizationLanguages, OptionType } from "common/types/common";
 import type { Query, AgeGroupType, Maybe } from "common/types/gql-types";
 import { participantCountOptions } from "@/modules/const";
+import { mapOptions } from "@/modules/util";
 
 export type OptionTypes = {
   ageGroupOptions: OptionType[];
@@ -11,53 +12,6 @@ export type OptionTypes = {
   cityOptions: OptionType[];
   purposeOptions: OptionType[];
   participantCountOptions: OptionType[];
-};
-
-type ParameterType = {
-  pk: number;
-  nameFi: string;
-  nameEn?: string;
-  nameSv?: string;
-}
-
-const getLabel = (
-  parameter: ParameterType | AgeGroupType,
-  lang: LocalizationLanguages = "fi"
-): string => {
-  if ('minimum' in parameter) {
-    return `${parameter.minimum || ""} - ${parameter.maximum || ""}`;
-  }
-  if (parameter.nameFi && lang === "fi") {
-    return parameter.nameFi;
-  }
-  if (parameter.nameEn && lang === "en") {
-    return parameter.nameEn;
-  }
-  if (parameter.nameSv && lang === "sv") {
-    return parameter.nameSv;
-  }
-  if (parameter.nameFi) {
-    return parameter.nameFi;
-  }
-  return "no label";
-};
-
-// this is a copy from @/modules/util but it has some issues with types
-// might be because of change from REST -> GQL
-export const mapOptions = (
-  src: ParameterType[] | AgeGroupType[],
-  emptyOptionLabel?: string,
-  lang: LocalizationLanguages = "fi",
-): OptionType[] => {
-  const r: OptionType[] = [
-    ...(emptyOptionLabel ? [{ label: emptyOptionLabel, value: 0 }] : []),
-    ...(src.map((v) => ({
-        label: getLabel(v, lang),
-        value: v.pk ?? 0,
-      }))
-    ),
-  ]
-  return r;
 };
 
 const PARAMS = gql`

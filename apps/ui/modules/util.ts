@@ -12,22 +12,19 @@ import {
 import {
   type LocalizationLanguages,
   type OptionType,
-  type Parameter,
-  type TranslationObject,
   type ReservationUnit,
   Image,
-  ReducedApplicationStatus,
-  type StringParameter,
+  type ReducedApplicationStatus,
 } from "common/types/common";
 import {
   type ReservationUnitImageType,
   type ReservationUnitType,
   ApplicationStatusChoice,
   type ReservationUnitByPkType,
+  AgeGroupType,
 } from "common/types/gql-types";
 import {
   searchPrefix,
-  emptyOption,
   applicationsPrefix,
   singleSearchPrefix,
   reservationsPrefix,
@@ -90,54 +87,51 @@ export const formatApiDate = (date: string): string | undefined => {
   return toApiDate(parseISO(date));
 };
 
-export const localizedValue = (
-  name: string | TranslationObject | number | undefined,
-  lang: string
-): string => {
-  if (!name) {
-    return "";
-  }
+type ParameterType = {
+  pk: number;
+  nameFi: string;
+  nameEn?: string;
+  nameSv?: string;
+} | { pk:number; name: string; };
 
-  if (typeof name === "number") {
-    return name.toString();
-  }
-
-  // needed until api stabilizes
-  if (typeof name === "string") {
-    return name;
-  }
-
-  return (
-    name[lang as LocalizationLanguages] || name.fi || name.en || name.sv || ""
-  );
-};
-
-const getLabel = (
-  parameter: Parameter | StringParameter,
+export const getLabel = (
+  parameter: ParameterType | AgeGroupType,
   lang: LocalizationLanguages = "fi"
 ): string => {
-  if (parameter.name) {
-    return localizedValue(parameter.name, lang);
-  }
-  if ("minimum" in parameter || "maximum" in parameter) {
+  if ('minimum' in parameter) {
     return `${parameter.minimum || ""} - ${parameter.maximum || ""}`;
+  }
+  if ('name' in parameter) {
+    return parameter.name;
+  }
+  if (parameter.nameFi && lang === "fi") {
+    return parameter.nameFi;
+  }
+  if (parameter.nameEn && lang === "en") {
+    return parameter.nameEn;
+  }
+  if (parameter.nameSv && lang === "sv") {
+    return parameter.nameSv;
+  }
+  if (parameter.nameFi) {
+    return parameter.nameFi;
   }
   return "no label";
 };
 
 export const mapOptions = (
-  src: Parameter[] | StringParameter[],
+  src: ParameterType[] | AgeGroupType[],
   emptyOptionLabel?: string,
-  lang = "fi"
+  lang: LocalizationLanguages = "fi",
 ): OptionType[] => {
-  const r = (<OptionType[]>[])
-    .concat(emptyOptionLabel ? [emptyOption(emptyOptionLabel)] : [])
-    .concat(
-      src.map((v) => ({
-        label: getLabel(v, lang as LocalizationLanguages),
-        value: v.id,
+  const r: OptionType[] = [
+    ...(emptyOptionLabel ? [{ label: emptyOptionLabel, value: 0 }] : []),
+    ...(src.map((v) => ({
+        label: getLabel(v, lang),
+        value: v.pk ?? 0,
       }))
-    );
+    ),
+  ]
   return r;
 };
 
@@ -242,20 +236,6 @@ export const orderImages = (
   });
 
   return result;
-};
-
-export const getAddress = (ru: ReservationUnit): string | null => {
-  if (!ru.location) {
-    return null;
-  }
-
-  const lang = i18n?.language || "fi";
-  return trim(
-    `${localizedValue(ru.location.addressStreet, lang) || ""}, ${
-      localizedValue(ru.location.addressCity, lang) || ""
-    }`,
-    ", "
-  );
 };
 
 export const getAddressAlt = (ru: ReservationUnitType): string | null => {
