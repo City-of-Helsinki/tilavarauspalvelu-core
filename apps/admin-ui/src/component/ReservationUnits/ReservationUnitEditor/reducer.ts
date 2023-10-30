@@ -1,7 +1,6 @@
 import i18next from "i18next";
 import { get, pick, sortBy, sumBy, uniq, upperFirst } from "lodash";
 import { addDays, format } from "date-fns";
-import { paymentTypes } from "common/types/common";
 import {
   Query,
   ReservationUnitImageType,
@@ -23,6 +22,8 @@ import {
   ReservationUnitEditorType,
   State,
 } from "./types";
+
+const paymentTypes = ["INVOICE", "ONLINE", "ON_SITE"];
 
 export const getInitialState = (reservationUnitPk: number): State => ({
   cancellationRuleOptions: [],

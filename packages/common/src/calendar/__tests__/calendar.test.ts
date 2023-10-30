@@ -29,7 +29,6 @@ import {
   ReservationUnitsReservationUnitReservationKindChoices,
   ReservationState,
 } from "../../../types/gql-types";
-import { ApplicationRound } from "../../../types/common";
 
 jest.mock("next/config", () => () => ({
   serverRuntimeConfig: {},
@@ -142,7 +141,7 @@ describe("areSlotsReservable", () => {
       reservationPeriodBegin: format(addDays(new Date(), 8), "yyyy-MM-dd"),
       reservationPeriodEnd: format(addDays(new Date(), 8), "yyyy-MM-dd"),
     },
-  ] as ApplicationRound[];
+  ];
 
   test("Plus 7 days 09:00", () => {
     const hours = 11 + tzOffset;

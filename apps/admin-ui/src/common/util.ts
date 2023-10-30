@@ -210,7 +210,9 @@ export const parseAgeGroups = (ageGroups: IAgeGroups): string => {
 
 export const parseAddress = (location: LocationType): string => {
   return trim(
-    `${location.addressStreetFi ?? ""}, ${location.addressZip} ${location.addressCityFi ?? "" }`,
+    `${location.addressStreetFi ?? ""}, ${location.addressZip} ${
+      location.addressCityFi ?? ""
+    }`,
     ", "
   );
 };

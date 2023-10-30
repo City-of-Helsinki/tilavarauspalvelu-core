@@ -226,41 +226,42 @@ const SearchForm = ({
       publishedReservationUnits: true,
     },
     onCompleted: (res) => {
-      const units = res?.units?.edges
-        ?.map((e) => e?.node)
-        .filter((n): n is NonNullable<typeof n> => n != null)
-        .map((node) => ({
-          pk: node.pk ?? 0,
-          name: getUnitName(node) ?? "",
-        })) ?? [];
+      const units =
+        res?.units?.edges
+          ?.map((e) => e?.node)
+          .filter((n): n is NonNullable<typeof n> => n != null)
+          .map((node) => ({
+            pk: node.pk ?? 0,
+            name: getUnitName(node) ?? "",
+          })) ?? [];
       setUnitOptions(mapOptions(sortBy(units, "name")));
     },
   });
 
   useQuery<Query>(SEARCH_FORM_PARAMS_PURPOSE, {
     onCompleted: (res) => {
-      const purposes = res?.purposes?.edges
-        ?.map((e) => e?.node)
-        .filter((n): n is NonNullable<typeof n> => n != null)
-        .map((node) => ({
-          pk: node.pk ?? 0,
-          name: getTranslation(node, "name"),
-        })) ?? [];
-      setPurposeOptions(
-        mapOptions(sortBy(purposes, "name"))
-      );
+      const purposes =
+        res?.purposes?.edges
+          ?.map((e) => e?.node)
+          .filter((n): n is NonNullable<typeof n> => n != null)
+          .map((node) => ({
+            pk: node.pk ?? 0,
+            name: getTranslation(node, "name"),
+          })) ?? [];
+      setPurposeOptions(mapOptions(sortBy(purposes, "name")));
     },
   });
 
   useQuery<Query>(RESERVATION_UNIT_TYPES, {
     onCompleted: (res) => {
-      const types = res?.reservationUnitTypes?.edges
-        ?.map((e) => e?.node)
-        .filter((n): n is NonNullable<typeof n> => n != null)
-        .map((node) => ({
-          pk: node.pk ?? 0,
-          name: getTranslation(node, "name") ?? "",
-        })) ?? [];
+      const types =
+        res?.reservationUnitTypes?.edges
+          ?.map((e) => e?.node)
+          .filter((n): n is NonNullable<typeof n> => n != null)
+          .map((node) => ({
+            pk: node.pk ?? 0,
+            name: getTranslation(node, "name") ?? "",
+          })) ?? [];
       setReservationUnitTypeOptions(mapOptions(sortBy(types, "name")));
     },
   });

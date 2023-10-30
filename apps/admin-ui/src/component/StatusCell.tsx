@@ -6,7 +6,10 @@ import {
   ApplicationEventStatusChoice,
   ApplicationStatusChoice,
 } from "common/types/gql-types";
-import { getApplicationEventStatusColor, getApplicationStatusColor } from "./applications/util";
+import {
+  getApplicationEventStatusColor,
+  getApplicationStatusColor,
+} from "./applications/util";
 
 const StatusDot = styled.div<{
   status: ApplicationStatusChoice;

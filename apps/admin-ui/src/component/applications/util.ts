@@ -6,12 +6,13 @@ import {
 } from "common/types/gql-types";
 
 export const getApplicantName = (app: ApplicationNode): string => {
-  return app.applicantType === ApplicationsApplicationApplicantTypeChoices.Individual
+  return app.applicantType ===
+    ApplicationsApplicationApplicantTypeChoices.Individual
     ? `${app.contactPerson?.firstName || "-"} ${
         app.contactPerson?.lastName || "-"
       }`
     : app.organisation?.name || "-";
-}
+};
 
 export const getApplicationStatusColor = (
   status: ApplicationStatusChoice,

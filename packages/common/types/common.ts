@@ -19,61 +19,6 @@ type TranslationObject = {
   sv?: string;
 };
 
-export type Language = "fi" | "en" | "sv";
-
-type ApplicationRoundStatus =
-  | "draft"
-  | "in_review"
-  | "review_done"
-  | "allocated"
-  | "handled"
-  | "validated"
-  | "approved";
-
-type CustomerType = "business" | "nonprofit" | "individual";
-
-type ApplicationRoundBasket = {
-  id: number;
-  name: string;
-  purposeIds: number[];
-  mustBeMainPurposeOfApplicant: boolean;
-  customerType: CustomerType[] | null;
-  ageGroupIds: number[];
-  allocationPercentage: number;
-  orderNumber: number;
-  homeCityId: number | null;
-};
-
-type ApplicationRoundAggregatedData = {
-  totalHourCapacity: number;
-  totalReservationDuration: number;
-  allocationDurationTotal: number;
-  allocationResultEventsCount: number;
-};
-
-type ApplicationRound = {
-  id: number;
-  name: string;
-  // aggregatedData: ApplicationRoundAggregatedData;
-  reservationUnitIds: number[];
-  applicationPeriodBegin: string;
-  applicationPeriodEnd: string;
-  reservationPeriodBegin: string;
-  reservationPeriodEnd: string;
-  publicDisplayBegin: string;
-  publicDisplayEnd: string;
-  purposeIds: number[];
-  serviceSectorId: number;
-  // applicationRoundBaskets: ApplicationRoundBasket[];
-  status: ApplicationRoundStatus;
-  statusTimestamp: string;
-  allocating: boolean;
-  isAdmin: boolean;
-  approvedBy: string;
-  applicationsSent: boolean;
-  criteria: string;
-};
-
 type Space = {
   id: number;
   locationType: "fixed";
@@ -140,7 +85,6 @@ export type ReservationUnit = {
   unitId: number;
   minReservationDuration?: string;
   maxReservationDuration?: string;
-  openingHours?: OpeningHours;
   reservations?: Reservation[];
 };
 
@@ -266,6 +210,7 @@ type ApplicationEventSchedule = {
   priority?: ApplicationEventSchedulePriority;
 };
 
+// @deprecated required by pdf export
 export type ReservationState =
   | "initial"
   | "created"
@@ -288,6 +233,7 @@ export type Reservation = {
   calendarUrl?: string;
 };
 
+// @deprecated required by ui/reservation
 export type PendingReservation = {
   begin: string;
   end: string;
@@ -299,6 +245,7 @@ export type PendingReservation = {
   state?: string;
 };
 
+// @deprecated required by ui/reservation
 export type RecurringReservation = {
   applicationId: number;
   applicationEventId: number;
@@ -315,6 +262,7 @@ export type OptionType = {
 };
 
 export type LocalizationLanguages = "fi" | "sv" | "en";
+export type Language = "fi" | "en" | "sv";
 
 export type Cell = {
   hour: number;
@@ -323,43 +271,8 @@ export type Cell = {
   key: string;
 };
 
-type TimeSpan = {
-  startTime: string;
-  endTime: string;
-  weekdays: number[];
-  resourceState: string;
-  endTimeOnNextDay: boolean;
-  name: TranslationObject;
-  description: TranslationObject;
-};
-
-type OpeningTime = {
-  date: string;
-  startTime: string;
-  endTime: string;
-  state: string;
-  periods: number[] | null;
-};
-
-type OpeningTimePeriod = {
-  periodId: number;
-  startDate: string;
-  endDate: string;
-  resourceState: string;
-  timeSpans: TimeSpan[];
-  name: TranslationObject;
-  description: TranslationObject;
-};
-
-type OpeningHours = {
-  openingTimes?: OpeningTime[];
-  openingTimePeriods?: OpeningTimePeriod[];
-};
-
 export interface HMS {
   h: number;
   m: number;
   s: number;
 }
-
-export const paymentTypes = ["INVOICE", "ONLINE", "ON_SITE"];

@@ -10,10 +10,7 @@ interface IProps {
   className?: string;
 }
 
-function ApplicationStatusBlock({
-  status,
-  className,
-}: IProps): JSX.Element {
+function ApplicationStatusBlock({ status, className }: IProps): JSX.Element {
   const { t } = useTranslation();
 
   let icon: ReactNode | null;

@@ -12,8 +12,6 @@ import {
 import {
   type LocalizationLanguages,
   type OptionType,
-  type ReservationUnit,
-  Image,
   type ReducedApplicationStatus,
 } from "common/types/common";
 import {
@@ -209,8 +207,8 @@ const imagePriority = ["main", "map", "ground_plan", "other"].map((n) =>
 );
 
 export const getMainImage = (
-  ru?: ReservationUnit | ReservationUnitType | ReservationUnitByPkType
-): Image | ReservationUnitImageType | null => {
+  ru?: ReservationUnitType | ReservationUnitByPkType
+): ReservationUnitImageType | null => {
   if (!ru || !ru.images || ru.images.length === 0) {
     return null;
   }
