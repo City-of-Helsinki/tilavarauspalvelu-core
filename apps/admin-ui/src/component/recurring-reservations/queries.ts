@@ -113,9 +113,6 @@ export const APPLICATIONS_BY_APPLICATION_ROUND_QUERY = gql`
             eventsPerWeek
             name
             status
-            declinedReservationUnits {
-              pk
-            }
             ageGroup {
               minimum
               maximum
