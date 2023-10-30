@@ -61,7 +61,14 @@ class Unit(models.Model):
     email = models.EmailField(verbose_name=_("Email"), blank=True, max_length=255)
     phone = models.CharField(verbose_name=_("Telephone"), blank=True, max_length=255)
 
-    hauki_resource_id = models.CharField(verbose_name=_("Hauki resource id"), max_length=255, blank=True, null=True)
+    origin_hauki_resource = models.ForeignKey(
+        "opening_hours.OriginHaukiResource",
+        related_name="units",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )
+
     rank = models.PositiveIntegerField(
         blank=True,
         null=True,

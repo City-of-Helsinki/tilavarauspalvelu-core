@@ -118,7 +118,7 @@ def test_reservation_unit_export_multiple():
     assert row_2[next(index)] == reservation_unit_1.surface_area
     assert row_2[next(index)] == reservation_unit_1.buffer_time_before
     assert row_2[next(index)] == reservation_unit_1.buffer_time_after
-    assert row_2[next(index)] == reservation_unit_1.hauki_resource_id
+    assert row_2[next(index)] == reservation_unit_1.origin_hauki_resource_id
     assert row_2[next(index)] == reservation_unit_1.reservation_start_interval
     assert row_2[next(index)] == reservation_unit_1.reservations_max_days_before
     assert row_2[next(index)] == reservation_unit_1.reservations_min_days_before

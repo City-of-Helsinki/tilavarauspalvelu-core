@@ -171,7 +171,7 @@ class ReservationUnitExporter:
                             reservation_unit.surface_area,
                             reservation_unit.buffer_time_before,
                             reservation_unit.buffer_time_after,
-                            reservation_unit.hauki_resource_id,
+                            reservation_unit.origin_hauki_resource_id,
                             reservation_unit.reservation_start_interval,
                             reservation_unit.reservations_max_days_before,
                             reservation_unit.reservations_min_days_before,

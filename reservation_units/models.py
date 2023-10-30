@@ -363,7 +363,13 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
 
     buffer_time_after = models.DurationField(verbose_name=_("Buffer time after reservation"), blank=True, null=True)
 
-    hauki_resource_id = models.CharField(verbose_name=_("Hauki resource id"), max_length=255, blank=True, null=True)
+    origin_hauki_resource = models.ForeignKey(
+        "opening_hours.OriginHaukiResource",
+        related_name="reservation_units",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )
 
     cancellation_rule = models.ForeignKey(
         ReservationUnitCancellationRule,
@@ -565,7 +571,7 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
     def check_required_introduction(self, user):
         return Introduction.objects.filter(reservation_unit=self, user=user).exists()
 
-    def check_reservation_overlap(self, start_time, end_time, reservation=None):
+    def check_reservation_overlap(self, start_time: datetime.datetime, end_time: datetime.datetime, reservation=None):
         from reservations.choices import ReservationStateChoice
         from reservations.models import Reservation
 

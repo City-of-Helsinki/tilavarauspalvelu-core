@@ -74,7 +74,7 @@ class ReservationUnitAdminForm(forms.ModelForm):
             "surface_area",
             "buffer_time_before",
             "buffer_time_after",
-            "hauki_resource_id",
+            "origin_hauki_resource",
             "cancellation_rule",
             "reservation_start_interval",
             "reservations_max_days_before",

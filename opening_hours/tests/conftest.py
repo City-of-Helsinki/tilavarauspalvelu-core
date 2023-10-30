@@ -1,7 +1,7 @@
 import pytest
 
 from reservation_units.models import ReservationUnit
-from tests.factories import ReservationUnitFactory
+from tests.factories import OriginHaukiResourceFactory, ReservationUnitFactory
 
 
 @pytest.fixture(autouse=True)
@@ -18,7 +18,8 @@ def _use_hauki_env_variables(settings):
 @pytest.fixture()
 def reservation_unit() -> ReservationUnit:
     return ReservationUnitFactory(
+        origin_hauki_resource=OriginHaukiResourceFactory(id=999, opening_hours_hash="abc123"),
         unit__tprek_id=1234,
         unit__tprek_department_id=4321,
-        unit__hauki_resource_id=1,
+        unit__origin_hauki_resource=OriginHaukiResourceFactory(id=888),
     )

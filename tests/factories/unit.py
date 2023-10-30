@@ -26,10 +26,10 @@ class UnitFactory(GenericDjangoModelFactory[Unit]):
     web_page = ""
     email = ""
     phone = ""
-    hauki_resource_id = None
     rank = 0
     payment_merchant = None
     payment_accounting = None
+    origin_hauki_resource = None
 
     @factory.post_generation
     def service_sectors(self, create: bool, service_sectors: Iterable[ServiceSector] | None, **kwargs: Any) -> None:
