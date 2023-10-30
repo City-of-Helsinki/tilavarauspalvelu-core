@@ -1,7 +1,6 @@
 import { addDays, addMonths } from "date-fns";
 import { graphql } from "msw";
 import { toApiDate } from "common/src/common/util";
-import type { ApplicationRound } from "common/types/common";
 import {
   type Query,
   type ApplicationRoundNodeConnection,
@@ -123,7 +122,7 @@ const aggregatedData = {
   totalReservationDuration: 0,
 }
 
-const applicationRoundsRestResponse: ApplicationRound[] = [
+const applicationRoundsRestResponse = [
   {
     id: 2,
     name: "Ruoholahden nuorisotalon vakiovuorot syksy 2021 - kevät 2022",

@@ -21,7 +21,7 @@ export type TranslationObject = {
 
 export type Language = "fi" | "en" | "sv";
 
-export type ApplicationRoundStatus =
+type ApplicationRoundStatus =
   | "draft"
   | "in_review"
   | "review_done"
@@ -32,7 +32,7 @@ export type ApplicationRoundStatus =
 
 export type CustomerType = "business" | "nonprofit" | "individual";
 
-export type ApplicationRoundBasket = {
+type ApplicationRoundBasket = {
   id: number;
   name: string;
   purposeIds: number[];
@@ -44,17 +44,17 @@ export type ApplicationRoundBasket = {
   homeCityId: number | null;
 };
 
-export type ApplicationRoundAggregatedData = {
+type ApplicationRoundAggregatedData = {
   totalHourCapacity: number;
   totalReservationDuration: number;
   allocationDurationTotal: number;
   allocationResultEventsCount: number;
 };
 
-export type ApplicationRound = {
+type ApplicationRound = {
   id: number;
   name: string;
-  aggregatedData: ApplicationRoundAggregatedData;
+  // aggregatedData: ApplicationRoundAggregatedData;
   reservationUnitIds: number[];
   applicationPeriodBegin: string;
   applicationPeriodEnd: string;
@@ -64,7 +64,7 @@ export type ApplicationRound = {
   publicDisplayEnd: string;
   purposeIds: number[];
   serviceSectorId: number;
-  applicationRoundBaskets: ApplicationRoundBasket[];
+  // applicationRoundBaskets: ApplicationRoundBasket[];
   status: ApplicationRoundStatus;
   statusTimestamp: string;
   allocating: boolean;
@@ -162,14 +162,14 @@ export type Address = {
   city: string;
 };
 
-export type ApplicantType =
+type ApplicantType =
   | null
   | "individual"
   | "association"
   | "community"
   | "company";
 
-export type ApplicationStatus =
+type ApplicationStatus =
   // TODO approved is an extra status that should be removed from admin-ui
   | "approved"
   | "draft"
@@ -183,8 +183,10 @@ export type ApplicationStatus =
   | "cancelled"
   | "sent";
 
+// @deprecated required by pdf export
 export type ReducedApplicationStatus = "draft" | "processing" | "sent";
 
+// @deprecated required by pdf export
 export type Application = {
   id?: number;
   applicantType: ApplicantType;
@@ -200,7 +202,7 @@ export type Application = {
   additionalInformation?: string;
 };
 
-export type Organisation = {
+type Organisation = {
   id?: number;
   name: string | null;
   description: string;
@@ -210,7 +212,7 @@ export type Organisation = {
   address: Address;
 };
 
-export type ContactPerson = {
+type ContactPerson = {
   id?: number;
   firstName: string | null;
   lastName: string | null;
@@ -218,7 +220,7 @@ export type ContactPerson = {
   phoneNumber: string | null;
 };
 
-export type ApplicationEventStatus =
+type ApplicationEventStatus =
   // TODO ignored is extra status added somewhere in admin-ui
   | "ignored"
   | "created"
@@ -229,6 +231,7 @@ export type ApplicationEventStatus =
   | "declined"
   | "cancelled";
 
+// @deprecated required by pdf export
 export type ApplicationEvent = {
   id?: number;
   name: string | null;
@@ -249,7 +252,7 @@ export type ApplicationEvent = {
   status: ApplicationEventStatus;
 };
 
-export type EventReservationUnit = {
+type EventReservationUnit = {
   priority: number;
   reservationUnitId: number;
   reservationUnitDetails?: ReservationUnit;
@@ -259,7 +262,7 @@ export type DAY = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 export type ApplicationEventSchedulePriority = 100 | 200 | 300;
 
-export type ApplicationEventSchedule = {
+type ApplicationEventSchedule = {
   id?: number;
   day: DAY;
   begin: string;
@@ -324,7 +327,7 @@ export type Cell = {
   key: string;
 };
 
-export type TimeSpan = {
+type TimeSpan = {
   startTime: string;
   endTime: string;
   weekdays: number[];
@@ -334,7 +337,7 @@ export type TimeSpan = {
   description: TranslationObject;
 };
 
-export type OpeningHourTime = {
+type OpeningHourTime = {
   startTime: string;
   endTime: string;
   endTimeOnNextDay?: boolean;

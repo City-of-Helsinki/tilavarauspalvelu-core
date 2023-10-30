@@ -1,19 +1,3 @@
-type ApplicationRoundStatus =
-  | "draft"
-  | "in_review"
-  | "review_done"
-  | "allocated"
-  | "handled"
-  | "validated"
-  | "approved";
-
-/// @deprecated
-export type NormalizedApplicationRoundStatus =
-  | ApplicationRoundStatus
-  | "incoming"
-  | "handling"
-  | "sent";
-
 export type Image = {
   imageUrl: string;
   smallUrl: string;

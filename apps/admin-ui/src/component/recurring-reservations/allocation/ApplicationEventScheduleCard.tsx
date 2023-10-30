@@ -11,7 +11,7 @@ import {
   MutationApproveApplicationEventScheduleArgs,
 } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
-import { applicantName as getApplicantName } from "@/component/applications/util";
+import { getApplicantName } from "@/component/applications/util";
 import { formatDuration } from "@/common/util";
 import { SmallRoundButton } from "@/styles/buttons";
 import { useNotification } from "@/context/NotificationContext";

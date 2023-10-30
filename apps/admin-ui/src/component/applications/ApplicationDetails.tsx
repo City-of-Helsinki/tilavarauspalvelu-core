@@ -11,10 +11,8 @@ import { breakpoints } from "common/src/common/style";
 import {
   type Query,
   ApplicationStatusChoice,
-  ApplicationRoundStatusChoice,
   type ApplicationEventScheduleNode,
 } from "common/types/gql-types";
-import { ApplicationRoundStatus } from "common";
 import { IngressContainer } from "@/styles/layout";
 import {
   formatNumber,
@@ -30,36 +28,13 @@ import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import Accordion from "@/component/Accordion";
 import Loader from "@/component/Loader";
 import ValueBox from "./ValueBox";
-import {
-  applicantName,
-  applicationStatusFromGqlToRest,
-  getApplicationStatusColor,
-  getNormalizedApplicationStatus,
-} from "./util";
+import { getApplicantName, getApplicationStatusColor } from "./util";
 import { TimeSelector } from "./time-selector/TimeSelector";
 import ShowWhenTargetInvisible from "../ShowWhenTargetInvisible";
 import StickyHeader from "../StickyHeader";
 import { ApplicationUserBirthDate } from "./ApplicationUserBirthDate";
 import StatusBlock from "../StatusBlock";
 import { APPLICATION_QUERY } from "./queries";
-
-const applicationRoundStatusFromGqlToRest = (
-  t?: ApplicationRoundStatusChoice
-): ApplicationRoundStatus => {
-  switch (t) {
-    case ApplicationRoundStatusChoice.Open:
-      return "in_review";
-    case ApplicationRoundStatusChoice.InAllocation:
-      return "review_done";
-    case ApplicationRoundStatusChoice.Handled:
-      return "handled";
-    case ApplicationRoundStatusChoice.ResultsSent:
-      return "approved";
-    case ApplicationRoundStatusChoice.Upcoming:
-    default:
-      return "draft";
-  }
-};
 
 const parseApplicationEventSchedules = (
   applicationEventSchedules: ApplicationEventScheduleNode[],
@@ -82,33 +57,23 @@ const StyledStatusBlock = styled(StatusBlock)`
 
 function ApplicationStatusBlock({
   status,
-  view,
   className,
 }: {
   status: ApplicationStatusChoice;
-  view?: ApplicationRoundStatusChoice;
   className?: string;
 }): JSX.Element {
   const { t } = useTranslation();
 
-  // TODO remove REST conversion when the necessary functions are moved to use GQL types
-  const applicationStatus = applicationStatusFromGqlToRest(status);
-  const roundStatus = applicationRoundStatusFromGqlToRest(view);
-  const normalizedStatus =
-    roundStatus != null
-      ? getNormalizedApplicationStatus(applicationStatus, roundStatus)
-      : applicationStatus;
-
   let icon: ReactNode | null;
   let style: React.CSSProperties = {};
-  switch (normalizedStatus) {
-    case "approved":
+  switch (status) {
+    case ApplicationStatusChoice.Handled:
       icon = (
         <IconCheck aria-hidden style={{ color: "var(--color-success)" }} />
       );
       style = { fontSize: "var(--fontsize-heading-xs)" };
       break;
-    case "sent":
+    case ApplicationStatusChoice.ResultsSent:
       icon = <IconEnvelope aria-hidden />;
       style = { fontSize: "var(--fontsize-heading-xs)" };
       break;
@@ -117,8 +82,8 @@ function ApplicationStatusBlock({
 
   return (
     <StyledStatusBlock
-      statusStr={t(`Application.statuses.${normalizedStatus}`)}
-      color={getApplicationStatusColor(normalizedStatus, "l")}
+      statusStr={t(`Application.statuses.${status}`)}
+      color={getApplicationStatusColor(status, "l")}
       icon={icon}
       className={className}
       style={style}
@@ -300,7 +265,7 @@ function ApplicationDetails({
     application?.billingAddress &&
     !isEqual(application?.billingAddress, application?.organisation?.address);
 
-  const customerName = application != null ? applicantName(application) : "";
+  const customerName = application != null ? getApplicantName(application) : "";
   const homeCity = application?.homeCity?.nameFi ?? "-";
   const applicationEvents =
     application?.applicationEvents
@@ -349,10 +314,7 @@ function ApplicationDetails({
       </ShowWhenTargetInvisible>
       <IngressContainer>
         {application.status != null && (
-          <ApplicationStatusBlock
-            status={application.status}
-            view={applicationRound.status ?? undefined}
-          />
+          <ApplicationStatusBlock status={application.status} />
         )}
         <H2
           ref={ref}

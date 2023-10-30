@@ -8,11 +8,11 @@ import {
   ApplicationNode,
   ReservationUnitByPkType,
 } from "common/types/gql-types";
-import { applicantName as getApplicantName } from "@/component/applications/util";
-import { publicUrl } from "../../../common/const";
-import { AllocationApplicationEventCardType } from "../../../common/types";
-import { formatDuration } from "../../../common/util";
-import { ageGroup } from "../../reservations/requested/util";
+import { publicUrl } from "@/common/const";
+import { AllocationApplicationEventCardType } from "@/common/types";
+import { formatDuration } from "@/common/util";
+import { getApplicantName } from "@/component/applications/util";
+import { ageGroup } from "@/component/reservations/requested/util";
 
 type Props = {
   applicationEvent: ApplicationEventNode;

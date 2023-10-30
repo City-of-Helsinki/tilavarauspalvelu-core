@@ -1,93 +1,64 @@
 import {
-  ApplicationStatusChoice as ApplicationStatusGql,
   type ApplicationNode,
+  ApplicationEventStatusChoice,
+  ApplicationStatusChoice,
+  ApplicationsApplicationApplicantTypeChoices,
 } from "common/types/gql-types";
-import {
-  Application,
-  ApplicationRoundStatus,
-  ApplicationStatus,
-} from "common/types/common";
 
-export const applicantName = (app: Application | ApplicationNode): string => {
-  return app.applicantType === "individual" ||
-    app.applicantType === "INDIVIDUAL"
+export const getApplicantName = (app: ApplicationNode): string => {
+  return app.applicantType === ApplicationsApplicationApplicantTypeChoices.Individual
     ? `${app.contactPerson?.firstName || "-"} ${
         app.contactPerson?.lastName || "-"
       }`
     : app.organisation?.name || "-";
-};
+}
 
-/// @deprecated
 export const getApplicationStatusColor = (
-  status: ApplicationStatus,
+  status: ApplicationStatusChoice,
   size: "s" | "l"
 ): string => {
-  let color = "";
   switch (status) {
-    case "draft":
-    case "in_review":
-      color = "var(--color-info)";
-      break;
-    case "review_done":
-      color = "var(--color-success)";
-      break;
-    case "approved":
-    case "sent":
-      color = "var(--color-white)";
-      break;
-    case "declined":
-    case "cancelled":
+    case ApplicationStatusChoice.Received:
+    case ApplicationStatusChoice.Draft:
+      return "var(--color-info)";
+    case ApplicationStatusChoice.Handled:
+    case ApplicationStatusChoice.InAllocation:
+      return "var(--color-success)";
+    case ApplicationStatusChoice.ResultsSent:
+      return "var(--color-white)";
+    case ApplicationStatusChoice.Expired:
+    case ApplicationStatusChoice.Cancelled:
+    default:
       switch (size) {
         case "s":
-          color = "var(--color-error)";
-          break;
+          return "var(--color-error)";
         case "l":
         default:
-          color = "var(--color-error-dark)";
+          return "var(--color-error-dark)";
       }
-      break;
-    default:
-  }
-
-  return color;
-};
-
-/// @deprecated
-export const applicationStatusFromGqlToRest = (
-  t?: ApplicationStatusGql
-): ApplicationStatus => {
-  switch (t) {
-    case ApplicationStatusGql.Handled:
-      return "handled";
-    case ApplicationStatusGql.ResultsSent:
-      return "review_done";
-    case ApplicationStatusGql.InAllocation:
-    case ApplicationStatusGql.Expired:
-      return "in_review";
-    case ApplicationStatusGql.Cancelled:
-      return "cancelled";
-    case ApplicationStatusGql.Received:
-    case ApplicationStatusGql.Draft:
-    default:
-      return "draft";
   }
 };
 
-/// @deprecated
-export const getNormalizedApplicationStatus = (
-  status: ApplicationStatus,
-  view: ApplicationRoundStatus
-): ApplicationStatus => {
-  let normalizedStatus: ApplicationStatus = status;
-  if (["draft", "in_review", "allocated"].includes(view)) {
-    if (status === "in_review") {
-      normalizedStatus = "review_done";
-    }
-  } else if (view === "approved") {
-    if (["in_review", "review_done"].includes(normalizedStatus)) {
-      normalizedStatus = "approved";
-    }
+export const getApplicationEventStatusColor = (
+  status: ApplicationEventStatusChoice,
+  size: "s" | "l"
+): string => {
+  switch (status) {
+    case ApplicationEventStatusChoice.Reserved:
+    case ApplicationEventStatusChoice.Unallocated:
+      return "var(--color-info)";
+    case ApplicationEventStatusChoice.Approved:
+      return "var(--color-success)";
+    // return "var(--color-alert-light)";
+    case ApplicationEventStatusChoice.Failed:
+    case ApplicationEventStatusChoice.Declined:
+    default:
+      switch (size) {
+        case "s":
+          return "var(--color-error)";
+        case "l":
+        default:
+          return "var(--color-error-dark)";
+      }
   }
-
-  return normalizedStatus;
 };

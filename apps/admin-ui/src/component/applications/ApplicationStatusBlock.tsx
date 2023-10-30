@@ -1,41 +1,31 @@
 import { IconCheck, IconEnvelope } from "hds-react";
 import React, { ReactNode } from "react";
+import { ApplicationStatusChoice } from "common/types/gql-types";
 import { useTranslation } from "react-i18next";
-import { ApplicationStatus, ApplicationRoundStatus } from "common/types/common";
-
 import StatusBlock from "../StatusBlock";
-import {
-  getApplicationStatusColor,
-  getNormalizedApplicationStatus,
-} from "./util";
+import { getApplicationStatusColor } from "./util";
 
 interface IProps {
-  status: ApplicationStatus;
-  view?: ApplicationRoundStatus;
+  status: ApplicationStatusChoice;
   className?: string;
 }
 
 function ApplicationStatusBlock({
   status,
-  view,
   className,
 }: IProps): JSX.Element {
   const { t } = useTranslation();
 
-  const normalizedStatus = view
-    ? getNormalizedApplicationStatus(status, view)
-    : status;
-
   let icon: ReactNode | null;
   let style: React.CSSProperties = {};
-  switch (normalizedStatus) {
-    case "approved":
+  switch (status) {
+    case ApplicationStatusChoice.Handled:
       icon = (
         <IconCheck aria-hidden style={{ color: "var(--color-success)" }} />
       );
       style = { fontSize: "var(--fontsize-heading-xs)" };
       break;
-    case "sent":
+    case ApplicationStatusChoice.ResultsSent:
       icon = <IconEnvelope aria-hidden />;
       style = { fontSize: "var(--fontsize-heading-xs)" };
       break;
@@ -44,8 +34,8 @@ function ApplicationStatusBlock({
 
   return (
     <StatusBlock
-      statusStr={t(`Application.statuses.${normalizedStatus}`)}
-      color={getApplicationStatusColor(normalizedStatus, "l")}
+      statusStr={t(`Application.statuses.${status}`)}
+      color={getApplicationStatusColor(status, "l")}
       icon={icon}
       className={className}
       style={style}

@@ -11,7 +11,7 @@ import type {
 import { publicUrl } from "@/common/const";
 import { applicationDetailsUrl } from "@/common/urls";
 import { truncate } from "@/helpers";
-import { applicantName as getApplicantName } from "@/component/applications/util";
+import { getApplicantName } from "@/component/applications/util";
 import StatusCell from "@/component/StatusCell";
 import { CustomTable, ExternalTableLink } from "../../lists/components";
 

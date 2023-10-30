@@ -12,7 +12,7 @@ import { publicUrl } from "@/common/const";
 import { truncate } from "@/helpers";
 import { applicationDetailsUrl } from "@/common/urls";
 import StatusCell from "@/component/StatusCell";
-import { applicantName as getApplicantName } from "@/component/applications/util";
+import { getApplicantName } from "@/component/applications/util";
 import { formatNumber } from "@/common/util";
 import { CustomTable, ExternalTableLink } from "../../lists/components";
 
