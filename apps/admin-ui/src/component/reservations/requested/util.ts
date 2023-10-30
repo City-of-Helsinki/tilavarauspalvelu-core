@@ -26,11 +26,7 @@ import {
 } from "common/types/gql-types";
 import { fromApiDate } from "common/src/common/util";
 import { toMondayFirst } from "common/src/helpers";
-import {
-  DATE_FORMAT,
-  formatDate,
-  formatTime,
-} from "../../../common/util";
+import { DATE_FORMAT, formatDate, formatTime } from "@/common/util";
 
 export const reservationDateTime = (
   start: Date,

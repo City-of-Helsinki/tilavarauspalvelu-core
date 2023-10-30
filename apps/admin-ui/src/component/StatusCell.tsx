@@ -2,12 +2,63 @@ import React, { ReactNode } from "react";
 import styled from "styled-components";
 import { IconArrowRight, IconCheck, IconEnvelope } from "hds-react";
 import { useTranslation } from "react-i18next";
-import { ApplicationEventStatus, ApplicationStatus } from "common/types/common";
-import { getApplicationEventStatusColor } from "app/styles/util";
-import { getApplicationStatusColor } from "./applications/util";
+import {
+  ApplicationEventStatusChoice,
+  ApplicationStatusChoice,
+} from "common/types/gql-types";
+
+const getApplicationStatusColor = (
+  status: ApplicationStatusChoice,
+  size: "s" | "l"
+): string => {
+  switch (status) {
+    case ApplicationStatusChoice.Received:
+    case ApplicationStatusChoice.Draft:
+      return "var(--color-info)";
+    case ApplicationStatusChoice.Handled:
+    case ApplicationStatusChoice.InAllocation:
+      return "var(--color-success)";
+    case ApplicationStatusChoice.ResultsSent:
+      return "var(--color-white)";
+    case ApplicationStatusChoice.Expired:
+    case ApplicationStatusChoice.Cancelled:
+    default:
+      switch (size) {
+        case "s":
+          return "var(--color-error)";
+        case "l":
+        default:
+          return "var(--color-error-dark)";
+      }
+  }
+};
+
+const getApplicationEventStatusColor = (
+  status: ApplicationEventStatusChoice,
+  size: "s" | "l"
+): string => {
+  switch (status) {
+    case ApplicationEventStatusChoice.Reserved:
+    case ApplicationEventStatusChoice.Unallocated:
+      return "var(--color-info)";
+    // color = "var(--color-success)";
+    case ApplicationEventStatusChoice.Approved:
+      return "var(--color-alert-light)";
+    case ApplicationEventStatusChoice.Failed:
+    case ApplicationEventStatusChoice.Declined:
+    default:
+      switch (size) {
+        case "s":
+          return "var(--color-error)";
+        case "l":
+        default:
+          return "var(--color-error-dark)";
+      }
+  }
+};
 
 const StatusDot = styled.div<{
-  status: ApplicationStatus;
+  status: ApplicationStatusChoice;
   size: number;
 }>`
   display: inline-block;
@@ -18,7 +69,7 @@ const StatusDot = styled.div<{
 `;
 
 const ApplicationEventStatusDot = styled.div<{
-  status: ApplicationEventStatus;
+  status: ApplicationEventStatusChoice;
   size: number;
 }>`
   display: inline-block;
@@ -31,7 +82,7 @@ const ApplicationEventStatusDot = styled.div<{
 
 interface IStatusCellProps {
   text: string;
-  status?: ApplicationStatus | ApplicationEventStatus;
+  status?: ApplicationStatusChoice | ApplicationEventStatusChoice;
   type: "application" | "applicationEvent";
   withArrow?: boolean;
 }
@@ -66,16 +117,16 @@ const StatusCell = ({
     case "applicationEvent":
       icon = (
         <ApplicationEventStatusDot
-          status={status as ApplicationEventStatus}
+          status={status as ApplicationEventStatusChoice}
           size={12}
         />
       );
       linkText = "ApplicationEvent.gotoLink";
       break;
     case "application":
-      if (status === "sent") {
+      if (status === ApplicationStatusChoice.Received) {
         icon = <IconEnvelope aria-hidden />;
-      } else if (status === "approved") {
+      } else if (status === ApplicationStatusChoice.Handled) {
         icon = (
           <IconCheck aria-hidden style={{ color: "var(--color-success)" }} />
         );
@@ -83,7 +134,7 @@ const StatusCell = ({
         icon = (
           <StatusDot
             aria-hidden
-            status={status as ApplicationStatus}
+            status={status as ApplicationStatusChoice}
             size={12}
           />
         );

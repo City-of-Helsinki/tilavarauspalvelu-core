@@ -11,7 +11,7 @@ export const toMondayFirstUnsafe = (day: number) => {
     throw new Error(`Invalid day ${day}`);
   }
   return day === 0 ? 6 : day - 1;
-}
+};
 
 export const toMondayFirst = (day: 0 | 1 | 2 | 3 | 4 | 5 | 6) =>
   day === 0 ? 6 : day - 1;
@@ -21,7 +21,7 @@ export const fromMondayFirstUnsafe = (day: number) => {
     throw new Error(`Invalid day ${day}`);
   }
   return day === 6 ? 0 : day + 1;
-}
+};
 
 export const fromMondayFirst = (day: 0 | 1 | 2 | 3 | 4 | 5 | 6) =>
   day === 6 ? 0 : day + 1;

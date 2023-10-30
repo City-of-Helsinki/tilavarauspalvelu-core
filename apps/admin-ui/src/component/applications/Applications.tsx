@@ -29,7 +29,6 @@ import {
 import Loader from "../Loader";
 import DataTable, { CellConfig } from "../DataTable";
 import StatusCell from "../StatusCell";
-import { applicationStatusFromGqlToRest } from "./util";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -167,7 +166,7 @@ const getCellConfig = (applicationRound: ApplicationRoundNode): CellConfig => {
         transform: ({ status }: ApplicationView) => {
           return (
             <StatusCell
-              status={applicationStatusFromGqlToRest(status)}
+              status={status}
               text={`Application.statuses.${status}`}
               type="application"
             />

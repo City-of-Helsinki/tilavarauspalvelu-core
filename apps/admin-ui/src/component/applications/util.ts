@@ -17,6 +17,7 @@ export const applicantName = (app: Application | ApplicationNode): string => {
     : app.organisation?.name || "-";
 };
 
+/// @deprecated
 export const getApplicationStatusColor = (
   status: ApplicationStatus,
   size: "s" | "l"

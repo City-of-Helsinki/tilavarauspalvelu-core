@@ -8,14 +8,10 @@ import type {
   ApplicationNode,
   ApplicationStatusChoice,
 } from "common/types/gql-types";
-import { ApplicationStatus } from "common/types/common";
 import { publicUrl } from "@/common/const";
 import { applicationDetailsUrl } from "@/common/urls";
 import { truncate } from "@/helpers";
-import {
-  applicationStatusFromGqlToRest,
-  applicantName as getApplicantName,
-} from "@/component/applications/util";
+import { applicantName as getApplicantName } from "@/component/applications/util";
 import StatusCell from "@/component/StatusCell";
 import { CustomTable, ExternalTableLink } from "../../lists/components";
 
@@ -40,7 +36,7 @@ type ApplicationView = {
   type: string;
   units: UnitType[];
   applicationCount: string;
-  status: ApplicationStatus;
+  status?: ApplicationStatusChoice;
   statusView: JSX.Element;
   statusType?: ApplicationStatusChoice;
 };
@@ -113,20 +109,6 @@ const StyledStatusCell = styled(StatusCell)`
 `;
 
 const appMapper = (app: ApplicationNode, t: TFunction): ApplicationView => {
-  /*
-  let applicationStatusView: ApplicationRoundStatus;
-  switch (round.status) {
-    case ApplicationRoundStatus.
-    case "approved":
-      applicationStatusView = "approved";
-      break;
-    default:
-      applicationStatusView = "in_review";
-  }
-  */
-
-  // const unitMap = applicationEvents?.flatMap((ae) => ae?.eventReservationUnits?.map((eru) => eru?.reservationUnit?.unit)) ?? []
-  // const units = unitMap.filter((u): u is NonNullable<typeof u> => u != null)
   const applicationEvents = (app.applicationEvents || [])
     .flatMap((ae) => ae?.eventReservationUnits)
     .flatMap((eru) => ({
@@ -141,7 +123,7 @@ const appMapper = (app: ApplicationNode, t: TFunction): ApplicationView => {
   const firstEvent = app.applicationEvents?.find(() => true);
   const eventPk = firstEvent?.pk ?? 0;
 
-  const status = applicationStatusFromGqlToRest(app.status ?? undefined);
+  const status = app.status ?? undefined;
 
   const applicantName = getApplicantName(app);
 

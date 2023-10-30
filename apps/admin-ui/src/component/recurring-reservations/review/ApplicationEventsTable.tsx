@@ -6,10 +6,7 @@ import { memoize, orderBy, trim, uniqBy } from "lodash";
 import { IconLinkExternal } from "hds-react";
 import { differenceInWeeks } from "date-fns";
 import { fromApiDate } from "common/src/common/util";
-import {
-  type ApplicationEventNode,
-  ApplicationEventStatusChoice,
-} from "common/types/gql-types";
+import type { ApplicationEventNode } from "common/types/gql-types";
 import { formatters as getFormatters } from "common";
 import { publicUrl } from "@/common/const";
 import { truncate } from "@/helpers";
@@ -77,25 +74,6 @@ const StyledStatusCell = styled(StatusCell)`
   }
 `;
 
-const convertApplicationEventStatus = (
-  s?: ApplicationEventStatusChoice
-): "approved" | "declined" | "draft" | undefined => {
-  if (!s) {
-    return undefined;
-  }
-  switch (s) {
-    case ApplicationEventStatusChoice.Approved:
-    case ApplicationEventStatusChoice.Reserved:
-      return "approved";
-    case ApplicationEventStatusChoice.Failed:
-    case ApplicationEventStatusChoice.Declined:
-      return "declined";
-    case ApplicationEventStatusChoice.Unallocated:
-    default:
-      return "draft";
-  }
-};
-
 const appEventMapper = (
   appEvent: ApplicationEventNode
 ): ApplicationEventView => {
@@ -110,7 +88,7 @@ const appEventMapper = (
     }))
     .filter((unit): unit is UnitType => !!unit.pk && !!unit.name);
 
-  const status = convertApplicationEventStatus(appEvent.status ?? undefined);
+  const status = appEvent.status ?? undefined;
   const name = appEvent.name || "-";
 
   const applicantName = getApplicantName(appEvent.application);

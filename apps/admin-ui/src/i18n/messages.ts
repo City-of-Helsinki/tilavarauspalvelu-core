@@ -423,6 +423,20 @@ const translations: ITranslations = {
       cancelled: ["Peruutettu"],
       approved: ["Päatös tehty"],
       sent: ["Päatös lähetetty"],
+      // New statuses (directly from GQL enums)
+      RECEIVED: ["Vastaanotettu"],
+      HANDLED: ["Käsitelty"],
+      DRAFT: ["Luonnos"],
+      CANCELLED: ["Peruutettu"],
+      EXPIRED: ["Vanhentunut"],
+      IN_ALLOCATION: ["Varauksessa"],
+      RESULTS_SENT: ["Päätös lähetetty"],
+      // TODO these are actually ApplicationEventStatuses. tr key is wrong
+      UNALLOCATED: ["Käsittelemättä"],
+      RESERVED: ["Varattu"],
+      FAILED: ["Epäonnistunut"],
+      DECLINED: ["Hylätty"],
+      APPROVED: ["Hyväksytty"],
     },
     // TODO these are in ApplicationDetaiils
     customerBasicInfo: ["Varaajan perustiedot"],
