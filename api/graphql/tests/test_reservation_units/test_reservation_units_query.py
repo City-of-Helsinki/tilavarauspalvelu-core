@@ -186,7 +186,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         )
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_should_not_return_archived_reservation_units(self):
@@ -210,7 +210,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         )
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_should_be_able_to_find_by_pk(self):
@@ -218,7 +218,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         response = self.query(query)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         assert_that(content.get("data").get("reservationUnitByPk").get("pk")).is_equal_to(self.reservation_unit.id)
 
     def test_getting_authentication_by_pk(self):
@@ -232,7 +232,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         assert_that(content.get("data").get("reservationUnitByPk").get("authentication")).is_equal_to("WEAK")
 
     def test_getting_hauki_url_is_none_when_regular_user(self):
@@ -257,7 +257,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         response = self.query(query)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_hauki_url_for_admin(self):
@@ -284,7 +284,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         response = self.query(query)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_hauki_url_for_unit_manager(self):
@@ -319,7 +319,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         response = self.query(query)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_should_error_when_not_found_by_pk(self):
@@ -338,38 +338,30 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         mock_opening_times.return_value = get_mocked_opening_hours(self.reservation_unit.uuid)
         mock_periods.return_value = get_mocked_periods()
         query = (
-            f"{{\n"
-            f"reservationUnitByPk(pk: {self.reservation_unit.id}) {{\n"
-            f"id\n"
-            f'openingHours(periods:true openingTimes:true startDate:"2020-01-01" endDate:"2022-01-01")'
-            f"{{openingTimes{{date startTime endTime isReservable}} openingTimePeriods{{timeSpans{{startTime}}}}"
-            f"}}"
-            f"}}"
-            f"}}"
+            """
+                query {
+                    reservationUnitByPk(pk: %i) {
+                        id
+                        openingHours(periods:true openingTimes:true startDate:"2020-01-01" endDate:"2022-01-01"){
+                            openingTimes{date startTime endTime isReservable}
+                            openingTimePeriods{timeSpans{startTime}}
+                        }
+                    }
+                }
+                """
+            % self.reservation_unit.id
         )
         response = self.query(query)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data")
-            .get("reservationUnitByPk")
-            .get("openingHours")
-            .get("openingTimePeriods")[0]
-            .get("timeSpans")
-        ).is_not_empty()
 
-        assert_that(
-            content.get("data").get("reservationUnitByPk").get("openingHours").get("openingTimes")
-        ).is_not_empty()
-        assert_that(
-            content.get("data").get("reservationUnitByPk").get("openingHours").get("openingTimes")[0]["startTime"]
-        ).is_equal_to("2020-01-01T10:00:00+02:00")
-        assert_that(
-            content.get("data").get("reservationUnitByPk").get("openingHours").get("openingTimes")[0]["endTime"]
-        ).is_equal_to("2020-01-01T22:00:00+02:00")
-        assert_that(
-            content.get("data").get("reservationUnitByPk").get("openingHours").get("openingTimes")[0]["isReservable"]
-        ).is_true()
+        assert content.get("errors") is None
+
+        opening_hours = content["data"]["reservationUnitByPk"]["openingHours"]
+        assert len(opening_hours["openingTimePeriods"][0]["timeSpans"]) > 0
+        assert len(opening_hours["openingTimes"]) > 0
+        assert opening_hours["openingTimes"][0]["startTime"] == "2020-01-01T10:00:00+02:00"
+        assert opening_hours["openingTimes"][0]["endTime"] == "2020-01-01T22:00:00+02:00"
+        assert opening_hours["openingTimes"][0]["isReservable"] is True
 
     @override_settings(HAUKI_ORIGIN_ID="1234", HAUKI_API_URL="url")
     @mock.patch("opening_hours.utils.opening_hours_client.get_opening_hours")
@@ -389,10 +381,11 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         )
         response = self.query(query)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(
-            content.get("data").get("reservationUnitByPk").get("openingHours").get("openingTimes")[0]["isReservable"]
-        ).is_false()
+
+        assert content.get("errors") is None
+        opening_times = content["data"]["reservationUnitByPk"]["openingHours"]["openingTimes"]
+        assert len(opening_times) > 0
+        assert opening_times[0]["isReservable"] is False
 
     def test_reservations_date_filter(self):
         ReservationFactory(
@@ -434,7 +427,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
 
         reservations = content.get("data").get("reservationUnitByPk").get("reservations")
         assert_that(len(reservations)).is_equal_to(2)
@@ -461,7 +454,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         )
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_multiple_units(self):
@@ -486,7 +479,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         )
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_multiple_application_round(self):
@@ -510,7 +503,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         )
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_type(self):
@@ -530,7 +523,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         )
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_multiple_types(self):
@@ -560,7 +553,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         )
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_purpose(self):
@@ -583,7 +576,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         )
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_multiple_purposes(self):
@@ -610,7 +603,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         )
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_qualifier(self):
@@ -633,7 +626,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         )
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_multiple_qualifiers(self):
@@ -666,7 +659,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         )
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_type_not_found(self):
@@ -702,7 +695,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_max_persons_gte_outside_limit(self):
@@ -720,7 +713,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_max_persons_gte_not_set(self):
@@ -740,7 +733,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_max_persons_lte_within_limit(self):
@@ -758,7 +751,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_max_persons_lte_outside_limit(self):
@@ -776,7 +769,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_max_persons_lte_not_set(self):
@@ -796,7 +789,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_min_persons_gte_within_limit(self):
@@ -814,7 +807,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_min_persons_gte_outside_limit(self):
@@ -832,7 +825,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_min_persons_gte_not_set(self):
@@ -852,7 +845,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_min_persons_lte_within_limit(self):
@@ -870,7 +863,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_min_persons_lte_outside_limit(self):
@@ -888,7 +881,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_min_persons_lte_not_set(self):
@@ -908,7 +901,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_keyword_group(self):
@@ -931,7 +924,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         )
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
         response = self.query(
@@ -975,7 +968,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         )
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_name_fi(self):
@@ -995,7 +988,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_surface_area(self):
@@ -1019,7 +1012,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_rank(self):
@@ -1043,7 +1036,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_type_rank(self):
@@ -1075,7 +1068,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_reservation_timestamps(self):
@@ -1114,8 +1107,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         )
 
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_reservation_state(self):
@@ -1155,8 +1148,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         )
 
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_multiple_reservation_states(self):
@@ -1196,8 +1189,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         )
 
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_active_application_rounds(self):
@@ -1231,8 +1224,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         )
 
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_is_draft_true(self):
@@ -1256,7 +1249,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         )
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_is_draft_false(self):
@@ -1275,7 +1268,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_is_visible_true(self):
@@ -1342,7 +1335,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_is_visible_false(self):
@@ -1365,7 +1358,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_reservation_kind_direct(self):
@@ -1390,7 +1383,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_reservation_kind_season(self):
@@ -1415,7 +1408,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_order_by_name_fi(self):
@@ -1437,7 +1430,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_order_by_name_en(self):
@@ -1459,7 +1452,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_order_by_name_sv(self):
@@ -1481,7 +1474,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_order_by_type_fi(self):
@@ -1504,7 +1497,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_order_by_type_en(self):
@@ -1526,7 +1519,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_order_by_type_sv(self):
@@ -1548,7 +1541,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_order_by_unit(self):
@@ -1577,7 +1570,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_order_by_unit_reverse_order(self):
@@ -1606,7 +1599,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_order_by_max_persons(self):
@@ -1631,7 +1624,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_order_by_max_persons_reverse_order(self):
@@ -1656,7 +1649,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_order_by_surface_area(self):
@@ -1681,7 +1674,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_order_by_surface_area_reverse_order(self):
@@ -1706,7 +1699,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_order_by_name_and_unit_name(self):
@@ -1734,7 +1727,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_order_by_name_and_unit_name_reversed(self):
@@ -1762,7 +1755,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_order_by_rank(self):
@@ -1788,7 +1781,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_order_by_type_rank(self):
@@ -1821,7 +1814,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_getting_manually_given_surface_area(self):
@@ -1841,8 +1834,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_getting_terms(self):
@@ -1872,8 +1865,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filter_by_pk_single_value(self):
@@ -1891,8 +1884,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filter_by_pk_multiple_values(self):
@@ -1911,8 +1904,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_that_filter_by_invalid_pk_returns_error(self):
@@ -1930,7 +1923,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_empty()
+        assert len(content.get("errors")) > 0
 
     def test_that_state_is_draft(self):
         self.reservation_unit.name = "This should be draft"
@@ -1951,8 +1944,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_that_state_is_scheduled_publishing(self):
@@ -1979,8 +1972,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_that_state_is_scheduled_hiding(self):
@@ -2007,8 +2000,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_that_state_is_hidden(self):
@@ -2035,8 +2028,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_that_state_is_scheduled_period(self):
@@ -2063,8 +2056,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_that_state_is_published(self):
@@ -2092,8 +2085,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_that_reservation_state_is_scheduled_reservation(self):
@@ -2118,8 +2111,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_that_reservation_state_is_scheduled_period(self):
@@ -2144,8 +2137,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_that_reservation_state_is_reservable(self):
@@ -2170,8 +2163,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_that_reservation_state_is_scheduled_closing(self):
@@ -2196,8 +2189,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_that_reservation_state_is_reservation_closed(self):
@@ -2222,8 +2215,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filter_only_with_permission_unit_admin(self):
@@ -2268,8 +2261,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filter_only_with_permission_service_sector_admin(self):
@@ -2312,8 +2305,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filter_only_with_permission_general_admin_admin(self):
@@ -2335,8 +2328,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_other_reservations_does_not_show_sensitive_information(self):
@@ -2414,8 +2407,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
@@ -2494,8 +2487,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
         assert_that(PersonalInfoViewLog.objects.all().count()).is_equal_to(1)
 
@@ -2524,8 +2517,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     @mock.patch("reservation_units.tasks.create_product", return_value=mock_create_product())
@@ -2553,8 +2546,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     @mock.patch("reservation_units.tasks.create_product", return_value=mock_create_product())
@@ -2581,8 +2574,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_by_pk_has_reservations(self):
@@ -2618,7 +2611,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         )
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
@@ -2651,8 +2644,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
@@ -2682,8 +2675,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             """
         )
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_include_reservations_with_same_components(self):
@@ -2728,5 +2721,5 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         )
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.assertMatchSnapshot(content)

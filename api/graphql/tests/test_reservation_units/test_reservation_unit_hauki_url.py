@@ -62,7 +62,7 @@ class ReservationUnitHaukiUrlTestCase(GrapheneTestCaseBase, snapshottest.TestCas
 
         content = json.loads(response.content)
 
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
 
         self.assertMatchSnapshot(content)
 
@@ -77,7 +77,7 @@ class ReservationUnitHaukiUrlTestCase(GrapheneTestCaseBase, snapshottest.TestCas
 
         content = json.loads(response.content)
 
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
 
         self.assertMatchSnapshot(content)
 
@@ -92,7 +92,7 @@ class ReservationUnitHaukiUrlTestCase(GrapheneTestCaseBase, snapshottest.TestCas
 
         content = json.loads(response.content)
 
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
 
         self.assertMatchSnapshot(content)
 
@@ -102,7 +102,7 @@ class ReservationUnitHaukiUrlTestCase(GrapheneTestCaseBase, snapshottest.TestCas
 
         content = json.loads(response.content)
 
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
 
         self.assertMatchSnapshot(content)  # data should be None.
 
@@ -112,7 +112,7 @@ class ReservationUnitHaukiUrlTestCase(GrapheneTestCaseBase, snapshottest.TestCas
 
         content = json.loads(response.content)
 
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
 
         self.assertMatchSnapshot(content)  # data should be None.
 
@@ -124,7 +124,7 @@ class ReservationUnitHaukiUrlTestCase(GrapheneTestCaseBase, snapshottest.TestCas
 
         content = json.loads(response.content)
 
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
 
         url = content.get("data").get("reservationUnitHaukiUrl").get("url")
         assert_that(url).is_not_empty()
@@ -143,6 +143,6 @@ class ReservationUnitHaukiUrlTestCase(GrapheneTestCaseBase, snapshottest.TestCas
 
         content = json.loads(response.content)
 
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
 
         self.assertMatchSnapshot(content)  # data should be None.

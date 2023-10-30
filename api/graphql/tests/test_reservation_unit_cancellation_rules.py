@@ -31,9 +31,9 @@ class ReservationUnitCancellationRulesQueryTestCase(GrapheneTestCaseBase, snapsh
             }
             """
         )
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         assert "pk" in content["data"]["reservationUnitCancellationRules"]["edges"][0]["node"]
         del content["data"]["reservationUnitCancellationRules"]["edges"][0]["node"]["pk"]  # Ignore ID to allow db reuse
         self.assertMatchSnapshot(content)
@@ -55,7 +55,7 @@ class ReservationUnitCancellationRulesQueryTestCase(GrapheneTestCaseBase, snapsh
             }
             """
         )
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         assert_that(content.get("data").get("reservationUnitCancellationRules").get("edges")).is_empty()

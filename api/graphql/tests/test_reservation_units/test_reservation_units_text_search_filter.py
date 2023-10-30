@@ -1,7 +1,5 @@
 import json
 
-from assertpy import assert_that
-
 from api.graphql.tests.test_reservation_units.base import (
     ReservationUnitQueryTestCaseBase,
 )
@@ -43,8 +41,8 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         )
 
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
+        assert not self.content_is_empty(content)
         self.assertMatchSnapshot(content)
 
         response = self.query(
@@ -62,7 +60,7 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         )
 
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_true()
+        assert self.content_is_empty(content)
 
     def test_filtering_by_type_en(self):
         response = self.query(
@@ -83,8 +81,8 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         )
 
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
+        assert not self.content_is_empty(content)
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_type_sv(self):
@@ -106,8 +104,8 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         )
 
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
+        assert not self.content_is_empty(content)
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_reservation_unit_name_fi(self):
@@ -126,8 +124,8 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         )
 
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
+        assert not self.content_is_empty(content)
         self.assertMatchSnapshot(content)
 
         response = self.query(
@@ -145,7 +143,7 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         )
 
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_true()
+        assert self.content_is_empty(content)
 
     def test_filtering_by_reservation_unit_name_en(self):
         response = self.query(
@@ -163,8 +161,8 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         )
 
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
+        assert not self.content_is_empty(content)
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_reservation_unit_name_sv(self):
@@ -183,8 +181,8 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         )
 
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
+        assert not self.content_is_empty(content)
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_reservation_unit_description_fi(self):
@@ -204,8 +202,8 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         )
 
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
+        assert not self.content_is_empty(content)
         self.assertMatchSnapshot(content)
 
         response = self.query(
@@ -223,7 +221,7 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         )
 
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_true()
+        assert self.content_is_empty(content)
 
     def test_filtering_by_reservation_unit_description_en(self):
         response = self.query(
@@ -242,8 +240,8 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         )
 
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
+        assert not self.content_is_empty(content)
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_reservation_unit_description_sv(self):
@@ -263,8 +261,8 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         )
 
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
+        assert not self.content_is_empty(content)
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_space_name_fi(self):
@@ -288,8 +286,8 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         )
 
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
+        assert not self.content_is_empty(content)
         self.assertMatchSnapshot(content)
 
         response = self.query(
@@ -307,7 +305,7 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         )
 
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_true()
+        assert self.content_is_empty(content)
 
     def test_filtering_by_space_name_en(self):
         response = self.query(
@@ -326,8 +324,8 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         )
 
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
+        assert not self.content_is_empty(content)
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_space_name_sv(self):
@@ -351,6 +349,6 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         )
 
         content = json.loads(response.content)
-        assert_that(self.content_is_empty(content)).is_false()
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
+        assert not self.content_is_empty(content)
         self.assertMatchSnapshot(content)

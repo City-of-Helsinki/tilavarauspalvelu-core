@@ -45,33 +45,33 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         data["nameFi"] = "New name"
 
         response = self.query(self.get_update_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
 
         self.res_unit.refresh_from_db()
-        assert_that(self.res_unit.name_fi).is_equal_to("New name")
+        assert self.res_unit.name_fi == "New name"
 
     def test_update_with_metadata_set(self):
         metadata_set = ReservationMetadataSetFactory(name="New form")
         data = self.get_valid_update_data()
         data["metadataSetPk"] = metadata_set.pk
         response = self.query(self.get_update_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.res_unit.refresh_from_db()
-        assert_that(self.res_unit.metadata_set).is_equal_to(metadata_set)
+        assert self.res_unit.metadata_set == metadata_set
 
     def test_update_with_null_metadata_set(self):
         data = self.get_valid_update_data()
         data["metadataSetPk"] = None
         response = self.query(self.get_update_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         self.res_unit.refresh_from_db()
-        assert_that(self.res_unit.metadata_set).is_none()
+        assert self.res_unit.metadata_set is None
 
     def test_update_with_terms_of_use_pks(self):
         payment_terms = TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_PAYMENT)
@@ -83,26 +83,26 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         data["serviceSpecificTermsPk"] = service_specific_terms.pk
 
         response = self.query(self.get_update_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
 
         self.res_unit.refresh_from_db()
 
-        assert_that(self.res_unit.payment_terms).is_equal_to(payment_terms)
-        assert_that(self.res_unit.cancellation_terms).is_equal_to(cancellation_terms)
-        assert_that(self.res_unit.service_specific_terms).is_equal_to(service_specific_terms)
+        assert self.res_unit.payment_terms == payment_terms
+        assert self.res_unit.cancellation_terms == cancellation_terms
+        assert self.res_unit.service_specific_terms == service_specific_terms
 
     def test_update_with_authentication(self):
         data = self.get_valid_update_data()
         data["authentication"] = "STRONG"
 
         response = self.query(self.get_update_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
 
         self.res_unit.refresh_from_db()
         assert_that(self.res_unit.authentication).is_equal_to("strong")
@@ -111,23 +111,23 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         data = self.get_valid_update_data()
         data["authentication"] = "invalid"
         response = self.query(self.get_update_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
 
         assert_that(content.get("errors")[0].get("message")).contains('Choice "invalid" is not allowed.')
         self.res_unit.refresh_from_db()
-        assert_that(self.res_unit.authentication).is_not_equal_to("invalid")
+        assert self.res_unit.authentication != "invalid"
 
     def test_update_errors_with_empty_name(self):
         data = self.get_valid_update_data()
         data["nameFi"] = ""
 
         response = self.query(self.get_update_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
         assert_that(content.get("errors")[0].get("message")).contains("nameFi is required for draft reservation units")
 
         self.res_unit.refresh_from_db()
@@ -139,9 +139,9 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         data["nameFi"] = "Better name in my opinion."
         response = self.query(self.get_update_query(), input_data=data)
 
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
 
         self.res_unit.refresh_from_db()
         assert_that(self.res_unit.name).is_equal_to("Resunit name")
@@ -155,9 +155,9 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         data = self.get_valid_update_data()
         response = self.query(self.get_update_query(), input_data=data)
 
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         assert_that(send_resource_mock.call_count).is_equal_to(1)
 
     @mock.patch("opening_hours.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki")
@@ -166,10 +166,10 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         data = self.get_valid_update_data()
         response = self.query(self.get_update_query(), input_data=data)
 
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(send_resource_mock.call_count).is_equal_to(0)
+        assert content.get("errors") is None
+        assert send_resource_mock.call_count == 0
 
     def test_contact_information_removal_on_archive(self):
         data = self.get_valid_update_data()
@@ -177,13 +177,13 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         data["contactInformation"] = "Liu Kang"
 
         response = self.query(self.get_update_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
 
         self.res_unit.refresh_from_db()
-        assert_that(self.res_unit.is_archived).is_equal_to(True)
-        assert_that(self.res_unit.contact_information).is_equal_to("")
+        assert self.res_unit.is_archived is True
+        assert self.res_unit.contact_information == ""
 
     def test_audit_log_deletion_on_archive(self):
         self.res_unit.name = "Updated"
@@ -192,19 +192,19 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         content_type_id = ContentType.objects.get(app_label="reservation_units", model="reservationunit").id
         log_entry_count = LogEntry.objects.filter(content_type_id=content_type_id, object_id=self.res_unit.pk).count()
 
-        assert_that(log_entry_count).is_greater_than(1)
+        assert log_entry_count > 1
 
         data = self.get_valid_update_data()
         data["isArchived"] = True
         data["contactInformation"] = "Liu Kang"
 
         response = self.query(self.get_update_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
 
         log_entry_count = LogEntry.objects.filter(content_type_id=content_type_id, object_id=self.res_unit.pk).count()
-        assert_that(log_entry_count).is_equal_to(1)
+        assert log_entry_count == 1
 
     def test_update_with_pricing_fields(self):
         self.client.force_login(self.general_admin)
@@ -212,15 +212,15 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         data["pricingTermsPk"] = self.pricing_term.pk
 
         response = self.query(self.get_update_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(content.get("data").get("updateReservationUnit").get("pk")).is_not_none()
+        assert content.get("errors") is None
+        assert content.get("data").get("updateReservationUnit").get("pk") is not None
 
         created_unit = ReservationUnit.objects.get(pk=content.get("data").get("updateReservationUnit").get("pk"))
-        assert_that(created_unit).is_not_none()
-        assert_that(created_unit.pricing_terms).is_equal_to(self.pricing_term)
+        assert created_unit is not None
+        assert created_unit.pricing_terms == self.pricing_term
 
     def test_update_with_instructions(self):
         self.client.force_login(self.general_admin)
@@ -236,38 +236,20 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         data["reservationCancelledInstructionsEn"] = "Cancelled instructions updated en"
 
         response = self.query(self.get_update_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(content.get("data").get("updateReservationUnit").get("pk")).is_not_none()
+        assert content.get("errors") is None
+        assert content.get("data").get("updateReservationUnit").get("pk") is not None
 
         updated_unit = ReservationUnit.objects.get(pk=content.get("data").get("updateReservationUnit").get("pk"))
-        assert_that(updated_unit).is_not_none()
-        assert_that(updated_unit.reservation_pending_instructions_fi).is_equal_to(
-            data["reservationPendingInstructionsFi"]
-        )
-        assert_that(updated_unit.reservation_pending_instructions_sv).is_equal_to(
-            data["reservationPendingInstructionsSv"]
-        )
-        assert_that(updated_unit.reservation_pending_instructions_en).is_equal_to(
-            data["reservationPendingInstructionsEn"]
-        )
-        assert_that(updated_unit.reservation_confirmed_instructions_fi).is_equal_to(
-            data["reservationConfirmedInstructionsFi"]
-        )
-        assert_that(updated_unit.reservation_confirmed_instructions_sv).is_equal_to(
-            data["reservationConfirmedInstructionsSv"]
-        )
-        assert_that(updated_unit.reservation_confirmed_instructions_en).is_equal_to(
-            data["reservationConfirmedInstructionsEn"]
-        )
-        assert_that(updated_unit.reservation_cancelled_instructions_fi).is_equal_to(
-            data["reservationCancelledInstructionsFi"]
-        )
-        assert_that(updated_unit.reservation_cancelled_instructions_sv).is_equal_to(
-            data["reservationCancelledInstructionsSv"]
-        )
-        assert_that(updated_unit.reservation_cancelled_instructions_en).is_equal_to(
-            data["reservationCancelledInstructionsEn"]
-        )
+        assert updated_unit is not None
+        assert updated_unit.reservation_pending_instructions_fi == data["reservationPendingInstructionsFi"]
+        assert updated_unit.reservation_pending_instructions_sv == data["reservationPendingInstructionsSv"]
+        assert updated_unit.reservation_pending_instructions_en == data["reservationPendingInstructionsEn"]
+        assert updated_unit.reservation_confirmed_instructions_fi == data["reservationConfirmedInstructionsFi"]
+        assert updated_unit.reservation_confirmed_instructions_sv == data["reservationConfirmedInstructionsSv"]
+        assert updated_unit.reservation_confirmed_instructions_en == data["reservationConfirmedInstructionsEn"]
+        assert updated_unit.reservation_cancelled_instructions_fi == data["reservationCancelledInstructionsFi"]
+        assert updated_unit.reservation_cancelled_instructions_sv == data["reservationCancelledInstructionsSv"]
+        assert updated_unit.reservation_cancelled_instructions_en == data["reservationCancelledInstructionsEn"]
