@@ -1049,9 +1049,7 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
                     }}
                 }}
             }}
-            """.format(
-                self.reservation_unit_type.pk, reservation_unit_type.pk
-            )
+            """.format(self.reservation_unit_type.pk, reservation_unit_type.pk)
         )
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()

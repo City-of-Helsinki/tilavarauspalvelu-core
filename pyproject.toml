@@ -121,24 +121,41 @@ select = [
     "RUF100",   # Ruff-specific rules: Unused noqa directive
 ]
 ignore = [
-    "S101",  # assert is fine.
-    "B904",  # bare raise is fine.
-    "B905",  # zip without strict.
-    "DJ001"  # Allow `null=True` in text-based fields. TODO: Remove this ignore once the issues are fixed.
+    "S101",     # assert is fine
+    "B904",     # bare raise is fine
+    "B905",     # zip without strict
+    "DJ001",    # Allow `null=True` in text-based fields TODO: Remove this ignore once the issues are fixed.
+    #
+    # Conflicting with ruff-format
+    #
+    "COM812",   # missing-trailing-comma
+    "COM819",   # prohibited-trailing-comma
+    "D206",     # indent-with-spaces
+    "D300",     # triple-single-quotes
+    "E111",     # indentation-with-invalid-multiple
+    "E114",     # indentation-with-invalid-multiple-comment
+    "E117",     # over-indented
+    "ISC001",   # single-line-implicit-string-concatenation
+    "ISC002",   # multi-line-implicit-string-concatenation
+    "Q000",     # bad-quotes-inline-string
+    "Q001",     # bad-quotes-multiline-string
+    "Q002",     # bad-quotes-docstring
+    "Q003",     # avoidable-escaped-quote
+    "W191",     # tab-indentation
 ]
 
 [tool.ruff.extend-per-file-ignores]
 "common/management/commands/create_test_data.py" = [
-    "S311",  # pseudo-random generators are fine here.
+    "S311",     # pseudo-random generators are fine here.
 ]
 "common/management/commands/_utils.py" = [
-    "S311",  # pseudo-random generators are fine here.
+    "S311",     # pseudo-random generators are fine here.
 ]
 "test_*.py" = [
-    "S105",  # Hardcoded passwords are fine in tests
-    "S106",  # Hardcoded passwords are fine in tests
-    "S108",  # No need to care about insecure temp file usages in tests
-    "S311",  # Pseudo-random generators are fine here.
+    "S105",     # Hardcoded passwords are fine in tests
+    "S106",     # Hardcoded passwords are fine in tests
+    "S108",     # No need to care about insecure temp file usages in tests
+    "S311",     # Pseudo-random generators are fine here.
 ]
 
 [tool.ruff.isort]
@@ -150,23 +167,13 @@ known-third-party = [
 [tool.ruff.mccabe]
 max-complexity = 10
 
-[tool.black]
-line_length = 120
-target-version = ["py311"]
-force-exclude = '''
-(
-  .*/migrations/.*
-  | .*/snapshots/.*
-)
-'''
-
 [tool.bandit]
 exclude_dirs = [
     "tests",
 ]
 skips = [
-    "B101",  # Assert is fine.
-    "B311",  # Random is fine.
+    "B101",     # Assert is fine.
+    "B311",     # Random is fine.
 ]
 
 [tool.pytest.ini_options]
