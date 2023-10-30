@@ -14,7 +14,12 @@ export const APPLICATIONS_QUERY = gql`
       offset: $offset
       unit: $unit
       applicationRound: $applicationRound
-      status: ${ApplicationStatusChoice.Received}
+      status: [
+        ${ApplicationStatusChoice.Received},
+        ${ApplicationStatusChoice.InAllocation},
+        ${ApplicationStatusChoice.Handled},
+        ${ApplicationStatusChoice.ResultsSent},
+      ]
     ) {
       edges {
         node {
@@ -54,6 +59,9 @@ export const APPLICATIONS_QUERY = gql`
 `;
 
 // TODO is the status correct here? (also rename the query if you hard code the status)
+// This used to be the old status, but it doesn't return anything for some rounds
+// applicationStatus: ${ApplicationStatusChoice.Received}
+// there is no option to pass array to this filter in GQL api
 export const APPLICATIONS_EVENTS_QUERY = gql`
   query getApplicationEvents(
     $offset: Int
@@ -66,7 +74,6 @@ export const APPLICATIONS_EVENTS_QUERY = gql`
       offset: $offset
       unit: $unit
       applicationRound: $applicationRound
-      applicationStatus: ${ApplicationStatusChoice.Received}
     ) {
       edges {
         node {

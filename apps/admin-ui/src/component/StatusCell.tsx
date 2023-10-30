@@ -41,9 +41,9 @@ const getApplicationEventStatusColor = (
     case ApplicationEventStatusChoice.Reserved:
     case ApplicationEventStatusChoice.Unallocated:
       return "var(--color-info)";
-    // color = "var(--color-success)";
     case ApplicationEventStatusChoice.Approved:
-      return "var(--color-alert-light)";
+      return "var(--color-success)";
+    // return "var(--color-alert-light)";
     case ApplicationEventStatusChoice.Failed:
     case ApplicationEventStatusChoice.Declined:
     default:

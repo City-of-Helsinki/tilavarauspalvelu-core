@@ -130,7 +130,7 @@ const appEventMapper = (
       <StyledStatusCell
         status={status}
         text={`Application.statuses.${status}`}
-        type="application"
+        type="applicationEvent"
         withArrow={false}
       />
     ),

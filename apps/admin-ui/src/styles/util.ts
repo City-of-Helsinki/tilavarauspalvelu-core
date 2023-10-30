@@ -1,73 +1,7 @@
-import {
-  Button,
-  Checkbox,
-  ErrorSummary,
-  Navigation,
-  Notification,
-} from "hds-react";
+import { Button, Checkbox, Navigation, Notification } from "hds-react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { breakpoints } from "common/src/common/style";
-import { ApplicationEventStatus } from "common/types/common";
-import { NormalizedApplicationRoundStatus } from "@/common/types";
-
-/// @deprecated -- this should be replaced with the GQL status types
-export const getApplicationEventStatusColor = (
-  status: ApplicationEventStatus,
-  size: "s" | "l"
-): string => {
-  let color = "";
-  switch (status) {
-    case "created":
-    case "allocated":
-      color = "var(--color-info)";
-      break;
-    case "validated":
-      color = "var(--color-success)";
-      break;
-    case "approved":
-      color = "var(--color-alert-light)";
-      break;
-    case "ignored":
-    case "declined":
-      switch (size) {
-        case "s":
-          color = "var(--color-error)";
-          break;
-        case "l":
-        default:
-          color = "var(--color-error-dark)";
-      }
-      break;
-    default:
-  }
-
-  return color;
-};
-
-export const getApplicationRoundStatusColor = (
-  status: NormalizedApplicationRoundStatus | "incoming"
-): string => {
-  let color = "";
-  switch (status) {
-    case "handling":
-      color = "var(--color-info)";
-      break;
-    case "validated":
-      color = "var(--color-alert-light)";
-      break;
-    case "approved":
-    case "sent":
-      color = "var(--color-success)";
-      break;
-    case "draft":
-    case "incoming":
-    default:
-      color = "var(--color-silver)";
-  }
-
-  return color;
-};
 
 export const Seranwrap = styled.div`
   height: 200%;
@@ -85,11 +19,6 @@ export const Seranwrap = styled.div`
   opacity: 0.2;
 `;
 
-export const InlineErrorSummary = styled(ErrorSummary)`
-  margin: var(--spacing-l);
-  width: 40%;
-`;
-
 export const BasicLink = styled(Link)`
   color: var(--tilavaraus-admin-content-text-color);
   text-decoration: none;
@@ -98,20 +27,6 @@ export const BasicLink = styled(Link)`
   align-content: center;
   align-items: center;
   gap: var(--spacing-xs);
-`;
-
-export const InlineRowLink = styled(BasicLink).attrs({
-  onClick: (e: React.MouseEvent<HTMLElement>) => {
-    e.stopPropagation();
-  },
-})`
-  &:hover {
-    opacity: 0.5;
-  }
-
-  font-family: var(--tilavaraus-admin-font-medium);
-  font-weight: 500;
-  text-decoration: underline;
 `;
 
 export const StyledHDSNavigation = styled(Navigation)`
@@ -136,15 +51,6 @@ export const Divider = styled.hr`
   border: 0;
   margin: var(--spacing-3-xl) 0;
   grid-column: 1/-1;
-`;
-
-export const NotificationBox = styled.div`
-  background-color: var(--tilavaraus-admin-gray-darker);
-  padding: 110px var(--spacing-layout-m) 100px;
-  text-align: center;
-  white-space: pre-line;
-  line-height: var(--lineheight-xl);
-  margin-bottom: var(--spacing-5-xl);
 `;
 
 /// @deprecated

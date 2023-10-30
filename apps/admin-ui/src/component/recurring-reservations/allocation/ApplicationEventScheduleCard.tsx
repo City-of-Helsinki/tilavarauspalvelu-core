@@ -96,36 +96,7 @@ const ApplicationEventScheduleCard = ({
         })
       );
     },
-    onError: (error) => {
-      const msg =
-        error.message === "No permission to mutate"
-          ? "Allocation.errors.noPermission"
-          : "Allocation.errors.acceptingFailed";
-      notifyError(t(msg, { applicationEvent: applicationEvent.name }));
-    },
   });
-
-  /*
-  const [declineApplicationEvent] = useMutation<
-    Mutation,
-    MutationDeclineApplicationEventScheduleArgs
-  >(DECLINE_APPLICATION_EVENT_SCHEDULE, {
-    onCompleted: () => {
-      notifySuccess(
-        t("Allocation.acceptingSuccess", {
-          applicationEvent: applicationEvent.name,
-        })
-      );
-    },
-    onError: (error) => {
-      const msg =
-        error.message === "No permission to mutate"
-          ? "Allocation.errors.noPermission"
-          : "Allocation.errors.acceptingFailed";
-      notifyError(t(msg, { applicationEvent: applicationEvent.name }));
-    },
-  });
-  */
 
   const selectionDuration = formatDuration(selection.length * 30 * 60);
 
@@ -158,24 +129,29 @@ const ApplicationEventScheduleCard = ({
       allocatedEnd,
     };
 
-    // FIXME accept existing only for now
-    // the other option would be to create a new event
-    /*
-    if (
-      matchingApplicationEventSchedule.applicationEventScheduleResult != null
-    ) {
-      await acceptExistingApplicationEventScheduleResult({
-        variables: {
-          input,
-        },
-      });
-    } else {
-    */
-    await acceptApplicationEvent({
+    const { data, errors } = await acceptApplicationEvent({
       variables: {
         input,
       },
     });
+    if (errors) {
+      notifyError(
+        t("Allocation.errors.acceptingFailed", {
+          applicationEvent: applicationEvent.name,
+        })
+      );
+      return;
+    }
+    const res = data?.approveApplicationEventSchedule;
+    const { errors: resErrors } = res || {};
+    if (resErrors) {
+      notifyError(
+        t("Allocation.errors.acceptingFailed", {
+          applicationEvent: applicationEvent.name,
+        })
+      );
+      return;
+    }
     setRefreshApplicationEvents(true);
   };
 
