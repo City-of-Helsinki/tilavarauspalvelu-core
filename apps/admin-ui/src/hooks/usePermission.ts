@@ -1,11 +1,38 @@
 import { useSession } from "app/hooks/auth";
-import { type ReservationType, type UserType } from "common/types/gql-types";
+import {
+  UnitType,
+  type ReservationType,
+  type UserType,
+} from "common/types/gql-types";
 import {
   hasPermission as baseHasPermission,
   hasSomePermission as baseHasSomePermission,
   hasAnyPermission as baseHasAnyPermission,
   Permission,
 } from "app/modules/permissionHelper";
+
+const hasUnitPermission = (
+  user: UserType | undefined,
+  permissionName: Permission,
+  unit: UnitType | undefined
+): boolean => {
+  if (user == null || unit?.pk == null) {
+    return false;
+  }
+
+  const serviceSectorPks =
+    unit?.serviceSectors
+      ?.map((x) => x?.pk)
+      ?.filter((x): x is number => x != null) ?? [];
+
+  const permission = baseHasPermission(user)(
+    permissionName,
+    unit.pk,
+    serviceSectorPks
+  );
+
+  return permission;
+};
 
 const hasPermission = (
   user: UserType | undefined,
@@ -64,6 +91,8 @@ const usePermission = () => {
     ) => hasPermission(user, reservation, permissionName, includeOwn),
     hasSomePermission,
     hasAnyPermission,
+    hasUnitPermission: (permission: Permission, unit: UnitType) =>
+      hasUnitPermission(user, permission, unit),
   };
 };
 

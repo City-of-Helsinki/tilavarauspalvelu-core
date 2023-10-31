@@ -20,6 +20,8 @@ import { useNotification } from "@/context/NotificationContext";
 import { useAllocationContext } from "@/context/AllocationContext";
 import Loader from "@/component/Loader";
 import LinkPrev from "@/component/LinkPrev";
+import usePermission from "@/hooks/usePermission";
+import { Permission } from "@/modules/permissionHelper";
 import { APPLICATIONS_BY_APPLICATION_ROUND_QUERY } from "../queries";
 import { getFilteredApplicationEvents } from "./modules/applicationRoundAllocation";
 import { ApplicationEvents } from "./ApplicationEvents";
@@ -95,7 +97,10 @@ function ApplicationRoundAllocation({
       )
     )
   );
-  const units = uniqBy(unitData, "pk");
+  const { hasUnitPermission } = usePermission();
+  const units = uniqBy(unitData, "pk").filter((unit) =>
+    hasUnitPermission(Permission.CAN_VALIDATE_APPLICATIONS, unit)
+  );
 
   const unitOptions = units.map((unit) => ({
     value: unit.pk ?? 0,
