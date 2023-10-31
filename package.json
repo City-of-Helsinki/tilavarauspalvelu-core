@@ -8,8 +8,6 @@
     "preinstall": "npx -y only-allow pnpm",
     "test:browser:ci": "cd apps/ui && pnpm run test:browser:ci",
     "dev:test": "cd apps/ui && pnpm run dev:test",
-    "ncu": "npm-check-updates -p pnpm --deep --target minor --format group",
-    "ncu:upgrade": "npm-check-updates -p pnpm --deep --target minor  --format group --upgrade",
     "clean": "npkill",
     "dev": "turbo dev",
     "build": "turbo build",
@@ -22,7 +20,6 @@
   },
   "devDependencies": {
     "npkill": "^0.10.0",
-    "npm-check-updates": "^16.14.6",
     "turbo": "^1.10.16"
   },
   "packageManager": "pnpm@8.6.10"
