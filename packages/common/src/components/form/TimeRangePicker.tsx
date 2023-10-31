@@ -13,7 +13,7 @@ import { truncatedText } from "../../../styles/styledComponentUtils";
 import { removeRefParam } from "../../reservation-form/util";
 
 interface TimeRangePickerProps<T extends FieldValues>
-  extends Omit<UseControllerProps<T>, "name"> {
+  extends Omit<UseControllerProps<T>, "name" | "disabled"> {
   name: { begin: Path<T>; end: Path<T> };
   error?: string;
   required?: { begin?: boolean; end?: boolean };
