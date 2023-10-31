@@ -467,12 +467,11 @@ const translations: ITranslations = {
   ApplicationRound: {
     noUpcoming: ["Ei tulossa olevia hakukierroksia."],
     statuses: {
-      upcoming: ["Tulossa"],
-      open: ["Haku avoinna"],
-      review: ["Tarkastettavana"],
-      handling: ["Käsittelyssä"],
-      handled: ["Käsitelty"],
-      sent: ["Lähetetty"],
+      UPCOMING: ["Tulossa"],
+      OPEN: ["Haku avoinna"],
+      IN_ALLOCATION: ["Käsittelyssä"],
+      RESULTS_SENT: ["Lähetetty"],
+      HANDLED: ["Käsitelty"],
     },
     groupLabel: {
       handling: ["Odottaa jakoa"],

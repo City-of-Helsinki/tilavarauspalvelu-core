@@ -17,26 +17,26 @@ export const getApplicationRoundStatus = (
       return {
         group: "g1",
         color: "var(--color-gold-medium-light)",
-        label: "review",
+        label: ApplicationRoundStatusChoice.Open,
       };
     case ApplicationRoundStatusChoice.InAllocation:
       return {
         group: "g1",
         color: "var(--color-info-light)",
-        label: "handling",
+        label: ApplicationRoundStatusChoice.InAllocation,
       };
     case ApplicationRoundStatusChoice.Handled:
     case ApplicationRoundStatusChoice.ResultsSent:
       return {
         group: "g2",
         color: "var(--color-bus-light)",
-        label: "handled",
+        label: ApplicationRoundStatusChoice.Handled,
       };
     case ApplicationRoundStatusChoice.Upcoming:
       return {
         group: "g4",
         color: "var(--color-engel-light)",
-        label: "upcoming",
+        label: ApplicationRoundStatusChoice.Upcoming,
       };
     default:
       return {
