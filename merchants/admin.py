@@ -17,7 +17,12 @@ from merchants.verkkokauppa.merchants.types import (
 
 class PaymentMerchantForm(forms.ModelForm):
     # paytrail_merchant_id is only used when creating a merchant, later we use the ID returned from the Merchant API
-    paytrail_merchant_id = forms.CharField(label=_("Paytrail merchant ID"), min_length=6, max_length=6, required=True)
+    paytrail_merchant_id = forms.CharField(
+        label=_("Paytrail merchant ID"),
+        max_length=16,
+        required=True,
+        help_text=_("The Paytrail Merchant ID should be a six-digit number."),
+    )
 
     # These fields are saved to / loaded from Merchant API, so they are not part of the model
     shop_id = forms.CharField(label=_("Shop ID"), max_length=256, required=True)
