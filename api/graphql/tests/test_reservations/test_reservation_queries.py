@@ -9,11 +9,10 @@ from django.test import override_settings
 from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
-from applications.choices import CustomerTypeChoice
 from applications.models import City
 from merchants.models import OrderStatus
 from reservation_units.models import ReservationUnit
-from reservations.choices import ReservationStateChoice, ReservationTypeChoice
+from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import AgeGroup
 from tests.factories import (
     PaymentOrderFactory,

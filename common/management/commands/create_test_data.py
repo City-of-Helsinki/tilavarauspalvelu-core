@@ -15,7 +15,6 @@ from django.utils.timezone import now
 
 from applications.choices import (
     ApplicantTypeChoice,
-    CustomerTypeChoice,
     OrganizationTypeChoice,
     PriorityChoice,
     TargetGroupChoice,
@@ -77,7 +76,7 @@ from reservation_units.models import (
     ReservationUnitType,
     TaxPercentage,
 )
-from reservations.choices import ReservationStateChoice
+from reservations.choices import CustomerTypeChoice, ReservationStateChoice
 from reservations.models import (
     AgeGroup,
     Reservation,

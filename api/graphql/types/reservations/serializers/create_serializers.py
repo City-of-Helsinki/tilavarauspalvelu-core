@@ -13,13 +13,17 @@ from api.graphql.types.reservations.serializers.mixins import (
     ReservationPriceMixin,
     ReservationSchedulingMixin,
 )
-from applications.choices import CustomerTypeChoice
 from applications.models import City
 from common.fields.serializer import IntegerPrimaryKeyField
 from permissions.helpers import can_handle_reservation_with_units
 from reservation_units.models import ReservationKind, ReservationUnit
 from reservation_units.utils.reservation_unit_reservation_scheduler import ReservationUnitReservationScheduler
-from reservations.choices import RESERVEE_LANGUAGE_CHOICES, ReservationStateChoice, ReservationTypeChoice
+from reservations.choices import (
+    RESERVEE_LANGUAGE_CHOICES,
+    CustomerTypeChoice,
+    ReservationStateChoice,
+    ReservationTypeChoice,
+)
 from reservations.models import AgeGroup, Reservation, ReservationPurpose
 from users.utils.open_city_profile.basic_info_resolver import ProfileReadError, ProfileUserInfoReader
 

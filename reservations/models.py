@@ -10,11 +10,16 @@ from django.utils.timezone import get_current_timezone
 from django.utils.translation import gettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
 
-from applications.choices import CustomerTypeChoice, PriorityChoice
+from applications.choices import PriorityChoice
 from applications.models import ApplicationRound, City
 from merchants.models import OrderStatus
 from reservation_units.models import ReservationUnit
-from reservations.choices import RESERVEE_LANGUAGE_CHOICES, ReservationStateChoice, ReservationTypeChoice
+from reservations.choices import (
+    RESERVEE_LANGUAGE_CHOICES,
+    CustomerTypeChoice,
+    ReservationStateChoice,
+    ReservationTypeChoice,
+)
 from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 from tilavarauspalvelu.utils.commons import WEEKDAYS
 

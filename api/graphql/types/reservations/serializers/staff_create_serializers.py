@@ -6,11 +6,15 @@ from rest_framework import serializers
 from api.graphql.extensions.legacy_helpers import OldChoiceCharField, OldPrimaryKeySerializer
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from api.graphql.types.reservations.serializers.mixins import ReservationSchedulingMixin
-from applications.choices import CustomerTypeChoice
 from applications.models import City
 from common.fields.serializer import IntegerPrimaryKeyField
 from reservation_units.models import ReservationUnit
-from reservations.choices import RESERVEE_LANGUAGE_CHOICES, ReservationStateChoice, ReservationTypeChoice
+from reservations.choices import (
+    RESERVEE_LANGUAGE_CHOICES,
+    CustomerTypeChoice,
+    ReservationStateChoice,
+    ReservationTypeChoice,
+)
 from reservations.models import (
     AgeGroup,
     RecurringReservation,

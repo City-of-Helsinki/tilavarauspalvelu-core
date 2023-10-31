@@ -7,7 +7,6 @@ from django.utils.timezone import get_default_timezone
 from sentry_sdk import capture_exception, push_scope
 
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
-from applications.choices import CustomerTypeChoice
 from merchants.verkkokauppa.exceptions import UnsupportedMetaKey
 from merchants.verkkokauppa.order.exceptions import CreateOrderError
 from merchants.verkkokauppa.order.requests import create_order
@@ -17,6 +16,7 @@ from merchants.verkkokauppa.order.types import (
     OrderItemMetaParams,
     OrderItemParams,
 )
+from reservations.choices import CustomerTypeChoice
 from reservations.models import Reservation
 from tilavarauspalvelu.utils.date_util import localized_short_weekday
 from utils.decimal_utils import round_decimal

@@ -8,7 +8,6 @@ __all__ = [
     "ApplicationEventStatusChoice",
     "ApplicationRoundStatusChoice",
     "ApplicationStatusChoice",
-    "CustomerTypeChoice",
     "OrganizationTypeChoice",
     "PriorityChoice",
     "TargetGroupChoice",
@@ -30,12 +29,6 @@ class PriorityChoice(models.IntegerChoices):
     LOW = 100, _("Low")
     MEDIUM = 200, _("Medium")
     HIGH = 300, _("High")
-
-
-class CustomerTypeChoice(models.TextChoices):
-    BUSINESS = "BUSINESS", _("Business")
-    NONPROFIT = "NONPROFIT", _("Nonprofit")
-    INDIVIDUAL = "INDIVIDUAL", _("Individual")
 
 
 class ApplicantTypeChoice(models.TextChoices):

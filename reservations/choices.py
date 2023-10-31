@@ -3,6 +3,12 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
+class CustomerTypeChoice(models.TextChoices):
+    BUSINESS = "BUSINESS", _("Business")
+    NONPROFIT = "NONPROFIT", _("Nonprofit")
+    INDIVIDUAL = "INDIVIDUAL", _("Individual")
+
+
 class ReservationStateChoice(models.TextChoices):
     CREATED = "created", _("Created")
     CANCELLED = "cancelled", _("Cancelled")

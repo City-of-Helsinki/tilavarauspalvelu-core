@@ -6,9 +6,9 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.utils.timezone import get_default_timezone
 
-from applications.choices import CustomerTypeChoice, PriorityChoice
+from applications.choices import PriorityChoice
 from applications.models import City
-from reservations.choices import ReservationStateChoice
+from reservations.choices import CustomerTypeChoice, ReservationStateChoice
 from reservations.models import AgeGroup, ReservationStatistic
 from tests.factories import (
     AbilityGroupFactory,

@@ -6,14 +6,13 @@ from django.db.models import Case, CharField, F, Q, When
 from django.db.models import Value as V
 from django.db.models.functions import Concat
 
-from applications.choices import CustomerTypeChoice
 from merchants.models import OrderStatus
 from permissions.helpers import (
     get_service_sectors_where_can_view_reservations,
     get_units_where_can_view_reservations,
 )
 from reservation_units.models import ReservationUnit, ReservationUnitType
-from reservations.choices import ReservationStateChoice, ReservationTypeChoice
+from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import RecurringReservation, Reservation, User
 from spaces.models import Unit
 

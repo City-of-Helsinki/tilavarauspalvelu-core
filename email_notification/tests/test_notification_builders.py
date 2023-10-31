@@ -7,7 +7,6 @@ from django.conf import settings
 from django.test import override_settings
 from django.utils import timezone
 
-from applications.choices import CustomerTypeChoice
 from email_notification.models import EmailTemplate, EmailType
 from email_notification.sender.email_notification_builder import (
     EmailBuilderConfigError,
@@ -15,6 +14,7 @@ from email_notification.sender.email_notification_builder import (
     ReservationEmailNotificationBuilder,
 )
 from email_notification.tests.base import ReservationEmailBaseTestCase
+from reservations.choices import CustomerTypeChoice
 from tests.factories import EmailTemplateFactory, ReservationUnitFactory
 from tilavarauspalvelu.utils.commons import LANGUAGES
 
