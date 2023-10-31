@@ -8,7 +8,6 @@ from django.test import TestCase
 from django.utils import timezone
 from freezegun import freeze_time
 
-from applications.choices import CustomerTypeChoice
 from merchants.verkkokauppa.exceptions import UnsupportedMetaKey
 from merchants.verkkokauppa.helpers import (
     create_verkkokauppa_order,
@@ -16,6 +15,7 @@ from merchants.verkkokauppa.helpers import (
     get_meta_label,
     get_validated_phone_number,
 )
+from reservations.choices import CustomerTypeChoice
 from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory
 
 

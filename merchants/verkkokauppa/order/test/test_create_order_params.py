@@ -8,8 +8,8 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.utils.timezone import get_default_timezone
 
-from applications.choices import CustomerTypeChoice
 from merchants.verkkokauppa.helpers import _get_order_params, get_validated_phone_number
+from reservations.choices import CustomerTypeChoice
 from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory
 
 

@@ -6,10 +6,10 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.utils.timezone import get_default_timezone
 
-from applications.choices import CustomerTypeChoice
 from email_notification.sender.email_notification_context import (
     EmailNotificationContext,
 )
+from reservations.choices import CustomerTypeChoice
 from tests.factories import (
     LocationFactory,
     ReservationCancelReasonFactory,

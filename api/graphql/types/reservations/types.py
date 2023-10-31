@@ -25,9 +25,9 @@ from api.graphql.types.reservations.permissions import (
 )
 from api.graphql.types.users.types import UserType
 from api.legacy_rest_api.utils import hmac_signature
-from applications.choices import CustomerTypeChoice
 from applications.models import City
 from common.typing import GQLInfo
+from reservations.choices import CustomerTypeChoice
 from reservations.choices import ReservationTypeChoice as ReservationTypeField
 from reservations.models import (
     AbilityGroup,

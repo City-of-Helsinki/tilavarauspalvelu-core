@@ -10,7 +10,6 @@ from django.test import override_settings
 from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
-from applications.choices import CustomerTypeChoice
 from applications.models import City
 from opening_hours.hours import DEFAULT_TIMEZONE
 from opening_hours.tests.test_get_periods import mocked_get_resource_periods_response_data
@@ -20,7 +19,7 @@ from reservation_units.models import (
     PricingType,
     ReservationUnit,
 )
-from reservations.choices import ReservationStateChoice, ReservationTypeChoice
+from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import (
     AgeGroup,
     Reservation,

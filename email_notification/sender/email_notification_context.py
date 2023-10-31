@@ -4,8 +4,8 @@ from decimal import Decimal
 from django.conf import settings
 from django.utils.timezone import get_default_timezone
 
-from applications.choices import CustomerTypeChoice
 from email_notification.email_tester import EmailTestForm
+from reservations.choices import CustomerTypeChoice
 from reservations.models import Reservation
 
 
