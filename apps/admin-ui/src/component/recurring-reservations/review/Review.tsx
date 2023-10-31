@@ -1,16 +1,19 @@
 import React, { useState } from "react";
-import { Tabs } from "hds-react";
+import { Button, Tabs } from "hds-react";
 import { debounce, uniqBy } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { gql, useQuery } from "@apollo/client";
 import { H2 } from "common/src/common/typography";
-import { type Query, type ApplicationRoundNode } from "common/types/gql-types";
+import {
+  type Query,
+  type ApplicationRoundNode,
+  ApplicationRoundStatusChoice,
+} from "common/types/gql-types";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { Container } from "@/styles/layout";
 import { GQL_MAX_RESULTS_PER_QUERY } from "@/common/const";
-import StatusRecommendation from "./StatusRecommendation";
 import { ApplicationRoundStatusTag } from "../ApplicationRoundStatusTag";
 import TimeframeStatus from "../TimeframeStatus";
 import ApplicationDataLoader from "./ApplicationDataLoader";
@@ -33,6 +36,7 @@ const SpaceBetweenContainer = styled.div`
 
 const AlignEndContainer = styled(SpaceBetweenContainer)`
   align-items: end;
+  justify-content: flex-end;
 `;
 
 const TabContent = styled.div`
@@ -108,6 +112,11 @@ function Review({ applicationRound }: ReviewProps): JSX.Element | null {
       .filter((x): x is UnitPkName => x != null) ?? [];
   const unitPks = uniqBy(ds, (unit) => unit.pk);
 
+  const isAllocationEnabled =
+    applicationRound.status === ApplicationRoundStatusChoice.InAllocation &&
+    applicationRound.applicationsCount != null &&
+    applicationRound.applicationsCount > 0;
+
   return (
     <Container>
       <Header>
@@ -123,16 +132,15 @@ function Review({ applicationRound }: ReviewProps): JSX.Element | null {
           applicationPeriodEnd={applicationRound.applicationPeriodEnd}
         />
         <AlignEndContainer>
-          {applicationRound.status != null && (
-            <StatusRecommendation
-              status={applicationRound.status}
-              name={applicationRound.nameFi ?? "-"}
-              reservationPeriodEnd={applicationRound.reservationPeriodEnd}
-            />
+          {isAllocationEnabled ? (
+            <ButtonLikeLink to="allocation" variant="primary" size="large">
+              {t("ApplicationRound.allocate")}
+            </ButtonLikeLink>
+          ) : (
+            <Button variant="primary" disabled>
+              {t("ApplicationRound.allocate")}
+            </Button>
           )}
-          <ButtonLikeLink to="allocation" variant="primary" size="large">
-            {t("ApplicationRound.allocate")}
-          </ButtonLikeLink>
         </AlignEndContainer>
       </Header>
       <Tabs>

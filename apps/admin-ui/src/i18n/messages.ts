@@ -497,19 +497,6 @@ const translations: ITranslations = {
     listHandlingTitle: ["Käsittely"],
     appliedReservations: ["Haetut vuorot"],
     applications: ["Hakemukset"],
-    // TODO this is used in StatusRecommendations.tsx
-    recommendations: {
-      in_review: [
-        "Tarkasta lista ja neuvottele esihenkilösi kanssa mahdollisista hylkäyksistä",
-      ],
-      review_done: ["Käynnistä ehdotusten luominen"],
-      allocated: [
-        "Hyväksy tai hylkää ehdotukset ja uudelleenkäynnistä jako, kunnes kaikki ehdotukset on käsitelty.",
-      ],
-      approvalPreparation: [
-        "Lähetä koko käsittelyn lopputulos esihenkilöllesi hyväksyttäväksi.",
-      ],
-    },
     roundCriteria: ["Kierroksen kriteerit"],
     // TODO this is used in Criteria page
     attachedReservationUnits: ["Liitettyä varausyksikköä"],

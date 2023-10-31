@@ -20,6 +20,7 @@ const APPLICATION_ROUD_QUERY = gql`
           status
           applicationPeriodBegin
           applicationPeriodEnd
+          applicationsCount
           reservationUnits {
             pk
           }

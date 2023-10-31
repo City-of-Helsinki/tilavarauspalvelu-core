@@ -117,6 +117,10 @@ const getTimeLabel = (selection: string[], t: TFunction): string => {
   }:${endMinute === "30" ? "00" : "30"}`;
 };
 
+// TODO if the round status === RECEIVED (or draft etc.) we need to block all changes (and maybe the whole page)
+// because mutations (approveSchedule) are not possible
+// TODO this allows allocating when the applicationEvent is already in allocated / failed state
+// which causes a mutation error
 const ApplicationRoundAllocationActions = ({
   applications,
   applicationEvents,
