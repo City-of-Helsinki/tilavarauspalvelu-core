@@ -1,10 +1,12 @@
+// TODO this is imported all over the place,
+// move it or remove it (just use the plain HDS select instead)
 import React from "react";
 import { useTranslation } from "react-i18next";
 import memoize from "lodash/memoize";
 import { Select, SelectProps } from "hds-react";
-import { sortByName } from "../../../common/util";
+import { sortByName } from "@/common/util";
 
-function SortedSelect<T>(
+export function SortedSelect<T>(
   props: Partial<SelectProps<{ label: string; value: T }>> & {
     sort?: boolean;
     label: string;
@@ -33,4 +35,3 @@ function SortedSelect<T>(
 
   return <Select {...actualProps} options={sortedOpts} />;
 }
-export default SortedSelect;

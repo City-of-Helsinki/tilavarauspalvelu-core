@@ -16,14 +16,14 @@ import { removeRefParam } from "common/src/reservation-form/util";
 import {
   RecurringReservationFormSchema,
   type RecurringReservationForm,
-} from "app/schemas";
-import SortedSelect from "../../ReservationUnits/ReservationUnitEditor/SortedSelect";
-import { WeekdaysSelector } from "./WeekdaysSelector";
+} from "@/schemas";
+import { SortedSelect } from "@/component/SortedSelect";
 import ReservationList, {
   NewReservationListItem,
-} from "../../ReservationsList";
-import { useNotification } from "../../../context/NotificationContext";
+} from "@/component/ReservationsList";
+import { useNotification } from "@/context/NotificationContext";
 import { ActionsWrapper, Grid, Element } from "./commonStyling";
+import { WeekdaysSelector } from "./WeekdaysSelector";
 import {
   useCreateRecurringReservation,
   useFilteredReservationList,

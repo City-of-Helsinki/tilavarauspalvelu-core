@@ -1,11 +1,17 @@
-import { TextInput } from "hds-react";
 import React, { useEffect, useReducer } from "react";
+import styled from "styled-components";
+import { TextInput } from "hds-react";
 import { useTranslation } from "react-i18next";
-import { OptionType } from "../../common/types";
-import { Grid } from "../../styles/layout";
+import { OptionType } from "@/common/types";
+import { Grid , Span4 as DefaultSpan4 } from "@/styles/layout";
 import ServiceSectorFilter from "../filters/ServiceSectorFilter";
 import Tags, { getReducer, toTags } from "../lists/Tags";
-import { Span4 } from "../ReservationUnits/ReservationUnitEditor/modules/reservationUnitEditor";
+
+const Span4 = styled(DefaultSpan4)`
+  label {
+    white-space: nowrap;
+  }
+`;
 
 export type FilterArguments = {
   nameFi?: string;

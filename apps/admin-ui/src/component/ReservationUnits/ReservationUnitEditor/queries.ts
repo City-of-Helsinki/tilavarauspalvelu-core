@@ -141,6 +141,7 @@ export const RESERVATIONUNIT_QUERY = gql`
 export const UPDATE_RESERVATION_UNIT = gql`
   mutation updateReservationUnit($input: ReservationUnitUpdateMutationInput!) {
     updateReservationUnit(input: $input) {
+      pk
       errors {
         field
         messages

@@ -1,7 +1,7 @@
 import React from "react";
 import { memoize } from "lodash";
 import { Select as HDSSelect } from "hds-react";
-import { OptionType } from "../../../common/types";
+import { OptionType } from "@/common/types";
 
 type NullableStringOrNumber = string | number | null;
 
@@ -12,6 +12,7 @@ const getSelectedOption = (
   return options.find((o) => o.value === value) || ({} as OptionType);
 };
 
+/// @derprecated Use HDS select directly
 const Select = ({
   id,
   label,
@@ -77,4 +78,4 @@ const Select = ({
   );
 };
 
-export default Select;
+export { Select };

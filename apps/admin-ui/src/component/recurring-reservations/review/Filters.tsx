@@ -1,9 +1,9 @@
 import React, { useEffect, useReducer } from "react";
 import { useTranslation } from "react-i18next";
-import { OptionType } from "../../../common/types";
-import Tags, { getReducer, toTags } from "../../lists/Tags";
-import { AutoGrid, FullRow } from "../../../styles/layout";
-import SortedSelect from "../../ReservationUnits/ReservationUnitEditor/SortedSelect";
+import { OptionType } from "@/common/types";
+import Tags, { getReducer, toTags } from "@/component/lists/Tags";
+import { AutoGrid, FullRow } from "@/styles/layout";
+import { SortedSelect } from "@/component/SortedSelect";
 
 export type FilterArguments = {
   unit: OptionType[];

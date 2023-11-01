@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { gql, useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import { Query, UnitType } from "common/types/gql-types";
-import { OptionType } from "../../common/types";
-import SortedSelect from "../ReservationUnits/ReservationUnitEditor/SortedSelect";
-import { GQL_MAX_RESULTS_PER_QUERY } from "../../common/const";
+import { OptionType } from "@/common/types";
+import { SortedSelect } from "@/component/SortedSelect";
+import { GQL_MAX_RESULTS_PER_QUERY } from "@/common/const";
 
 const UNITS_QUERY = gql`
   query units($offset: Int, $count: Int) {

@@ -1,69 +1,55 @@
 import React from "react";
-import { get } from "lodash";
+import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { format, parse, startOfDay } from "date-fns";
+import { format } from "date-fns";
+import { NumberInput, RadioButton } from "hds-react";
 import {
-  Checkbox,
-  DateInput,
-  IconAlertCircleFill,
-  NumberInput,
-  RadioButton,
-} from "hds-react";
-import {
-  ReservationUnitPricingCreateSerializerInput,
   ReservationUnitsReservationUnitPricingPriceUnitChoices,
+  ReservationUnitsReservationUnitPricingPricingTypeChoices,
 } from "common/types/gql-types";
-import { fromUIDate, toApiDate } from "common/src/common/util";
 import {
   Grid,
   Span3,
   Span4,
   Span6,
-  VerticalFlex,
-} from "../../../styles/layout";
-import { Error } from "./modules/reservationUnitEditor";
-import EnumSelect from "./EnumSelect";
-import Select from "./Select";
-import SortedSelect from "./SortedSelect";
+} from "@/styles/layout";
+import { Select } from "hds-react";
+import { Controller, UseFormReturn } from "react-hook-form";
+import { ReservationEditFormValues } from "./form";
+import { PaymentTypes } from "./types";
 
-import { Action, State } from "./types";
-import { OptionType } from "../../../common/types";
-import { formatDecimal } from "../../../common/util";
+const Error = styled.div`
+  margin-top: var(--spacing-3-xs);
+  color: var(--color-error);
+  display: flex;
+  gap: var(--spacing-2-xs);
+  svg {
+    flex-shrink: 0;
+  }
+  white-space: nowrap;
+`;
 
 type Props = {
-  getValidationError: (key: string) => string | undefined;
-  state: State;
-  dispatch: React.Dispatch<Action>;
-  type: "PAST" | "ACTIVE" | "FUTURE";
-  hasPrice: boolean;
-  getSelectedOptions: (
-    state: State,
-    optionsPropertyName: string,
-    valuePropName: string
-  ) => OptionType[];
+  index: number;
+  form: UseFormReturn<ReservationEditFormValues>,
+  taxPercentageOptions: { label: string; value: number }[];
 };
 
-const hdsDate = (apiDate: string): string =>
-  format(parse(apiDate, "yyyy-MM-dd", new Date()), "dd.MM.yyyy");
-
 const PricingType = ({
-  getValidationError,
-  state,
-  dispatch,
-  getSelectedOptions,
-  type,
-  hasPrice,
+  index,
+  form,
+  taxPercentageOptions,
 }: Props): JSX.Element | null => {
-  const labelIndex = type === "ACTIVE" ? 0 : 1;
-
   const { t } = useTranslation();
 
-  const pricingType = (state.reservationUnitEdit.pricings || []).find(
-    (pt) => pt?.status === type
-  );
+  const { control, watch } = form;
 
-  let pricing: ReservationUnitPricingCreateSerializerInput =
-    pricingType as ReservationUnitPricingCreateSerializerInput;
+  const pricing = watch(`pricings.${index}`);
+
+  /* TODO these should not be here but in the parent element
+  const handleToggleFuturePrice = () => {
+    console.log("handleToggleFuturePrice");
+  }
 
   if (!pricing) {
     if (type === "FUTURE") {
@@ -72,284 +58,240 @@ const PricingType = ({
           <Checkbox
             id="priceChange"
             label={t("ReservationUnitEditor.label.priceChange")}
-            onChange={() => dispatch({ type: "toggleFuturePrice" })}
+            onChange={handleToggleFuturePrice}
           />
         </VerticalFlex>
       ) : null;
     }
   }
+  */
 
-  if (!pricing) {
-    pricing = {
-      status: "ACTIVE",
-      begins: format(startOfDay(new Date()), "yyyy-MM-dd"),
-    } as ReservationUnitPricingCreateSerializerInput;
-  }
-
-  const setPricingTypeValue = (
-    value: Partial<ReservationUnitPricingCreateSerializerInput>,
-    changeField?:
-      | "lowestPriceNet"
-      | "lowestPrice"
-      | "highestPriceNet"
-      | "highestPrice"
-      | "taxPercentagePk"
-  ) => {
-    dispatch({
-      type: "updatePricingType",
-      pricingType: {
-        ...(pricing as ReservationUnitPricingCreateSerializerInput),
-        ...value,
-      },
-      changeField,
-    });
-  };
-
+  const priceOptions = [ReservationUnitsReservationUnitPricingPricingTypeChoices.Free, ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid] as const;
   return (
-    <VerticalFlex>
-      {hasPrice && pricing.status === "FUTURE" && (
+    <>
+      {/* TODO options to add future price
+        * should not be here but in the parent element
+        * this handles rendering and form changes per pricing element
+        hasPrice && pricing?.status === "FUTURE" && (
         <>
           <Checkbox
             id="priceChange"
             label={t("ReservationUnitEditor.label.priceChange")}
             checked
-            onChange={() => dispatch({ type: "toggleFuturePrice" })}
+            onChange={handleToggleFuturePrice}
           />
           <Grid>
             <Span3>
               <DateInput
                 id="futureDate"
-                value={hdsDate(pricing.begins)}
-                onChange={(e) =>
-                  setPricingTypeValue({
-                    begins: toApiDate(fromUIDate(e)),
-                  })
-                }
+                value={toHdsDate(pricing.begins)}
+                onChange={(e) => setPricingTypeValue({ begins: fromUIDate(e) })}
               />
             </Span3>
           </Grid>
         </>
-      )}
+      ) */}
       <Grid>
-        {["FREE", "PAID"].map((typeName, index) => {
-          const checked = pricing.pricingType === typeName;
-
-          return (
-            <Span4 key={typeName}>
-              <RadioButton
-                id={`pricingType.${pricing.status}.${typeName}`}
-                name={`pricingType.${pricing.status}`}
-                label={t(
-                  `ReservationUnitEditor.label.pricingTypes.${typeName}`
-                )}
-                value={typeName}
-                checked={checked}
-                onChange={() => setPricingTypeValue({ pricingType: typeName })}
-              />
-              {index === 0 && getValidationError("pricings") && !hasPrice && (
-                <Error>
-                  <IconAlertCircleFill />
-                  <span>{getValidationError("pricings")}</span>
-                </Error>
-              )}
-            </Span4>
-          );
-        })}
+        <Controller
+          name={`pricings.${index}.pricingType`}
+          control={control}
+          render={({ field: { value, onChange } }) => (
+            <>
+            {priceOptions.map((type) => (
+              <Span4 key={`pricings.${index}.pricingType.${type}`}>
+                <RadioButton
+                  id={`pricingType.${index}.${pricing.status}.${type}`}
+                  name={`pricingType.${index}.${pricing.status}`}
+                  label={t(`ReservationUnitEditor.label.pricingTypes.${type}`)}
+                  value={type}
+                  checked={value === type}
+                  onChange={onChange}
+                />
+                {/* index === 0 && getValidationError("pricings") && !hasPrice && (
+                  <Error>
+                    <IconAlertCircleFill />
+                    <span>{getValidationError("pricings")}</span>
+                  </Error>
+                )*/}
+              </Span4>
+            ))}
+            </>
+          )}
+        />
       </Grid>
       <Grid>
-        {pricing.pricingType === "PAID" && (
-          <>
-            <Span6>
-              <EnumSelect
-                optionPrefix="priceUnit"
-                placeholder={t("common.select")}
-                id={`pricings,${labelIndex},priceUnit`}
-                required
-                value={pricing.priceUnit}
-                label={t("ReservationUnitEditor.label.priceUnit")}
-                type={ReservationUnitsReservationUnitPricingPriceUnitChoices}
-                onChange={(priceUnit) => setPricingTypeValue({ priceUnit })}
-                tooltipText={t("ReservationUnitEditor.tooltip.priceUnit")}
-                errorText={getValidationError(
-                  `pricings,${labelIndex},priceUnit`
-                )}
-              />
-            </Span6>
-            <Span6>
-              <Select
-                placeholder={t("common.select")}
-                required
-                id={`pricings,${labelIndex},taxPercentagePk`}
-                label={t(`ReservationUnitEditor.label.taxPercentagePk`)}
-                options={state.taxPercentageOptions}
-                onChange={(selectedVat) => {
-                  setPricingTypeValue(
-                    {
-                      taxPercentagePk: selectedVat as number,
-                    },
-                    "taxPercentagePk"
-                  );
-                }}
-                value={get(pricingType, "taxPercentagePk") as number}
-                errorText={getValidationError(
-                  `pricings,${labelIndex},taxPercentagePk`
-                )}
-              />
-            </Span6>
-
-            <Span3>
-              <NumberInput
-                value={
-                  typeof pricing.lowestPriceNet === "number"
-                    ? pricing.lowestPriceNet
-                    : ""
-                }
-                id={`pricings,${labelIndex},lowestPriceNet`}
-                required
-                label={t("ReservationUnitEditor.label.lowestPriceNet")}
-                minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
-                plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
-                onChange={(e) => {
-                  setPricingTypeValue(
-                    {
-                      lowestPriceNet: formatDecimal({
-                        input: e.target.value,
-                        decimals: 2,
-                      }),
-                    },
-                    "lowestPriceNet"
-                  );
-                }}
-                step={1}
-                min={0}
-                errorText={getValidationError(
-                  `pricings,${labelIndex},lowestPriceNet`
-                )}
-                invalid={
-                  !!getValidationError(`pricings,${labelIndex},lowestPriceNet`)
-                }
-              />
-            </Span3>
-            <Span3>
-              <NumberInput
-                value={
-                  typeof pricing.lowestPrice === "number"
-                    ? pricing.lowestPrice
-                    : ""
-                }
-                id={`pricings,${labelIndex},lowestPrice`}
-                required
-                label={t("ReservationUnitEditor.label.lowestPrice")}
-                minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
-                plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
-                onChange={(e) => {
-                  setPricingTypeValue(
-                    {
-                      lowestPrice: formatDecimal({
-                        input: e.target.value,
-                        decimals: 2,
-                      }),
-                    },
-                    "lowestPrice"
-                  );
-                }}
-                step={1}
-                min={0}
-                errorText={getValidationError(
-                  `pricings,${labelIndex},lowestPrice`
-                )}
-                invalid={
-                  !!getValidationError(`pricings,${labelIndex},lowestPrice`)
-                }
-                tooltipText={t("ReservationUnitEditor.tooltip.lowestPrice")}
-              />
-            </Span3>
-            <Span3>
-              <NumberInput
-                required
-                value={
-                  typeof pricing.highestPriceNet === "number"
-                    ? pricing.highestPriceNet
-                    : ""
-                }
-                id={`pricings,${labelIndex},highestPriceNet`}
-                label={t("ReservationUnitEditor.label.highestPriceNet")}
-                minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
-                plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
-                onChange={(e) => {
-                  setPricingTypeValue(
-                    {
-                      highestPriceNet: formatDecimal({
-                        input: e.target.value,
-                      }),
-                    },
-                    "highestPriceNet"
-                  );
-                }}
-                step={1}
-                min={0}
-                errorText={getValidationError("highestPriceNet")}
-                invalid={!!getValidationError("highestPriceNet")}
-              />
-            </Span3>
-            <Span3>
-              <NumberInput
-                required
-                value={
-                  typeof pricing.highestPrice === "number"
-                    ? pricing.highestPrice
-                    : ""
-                }
-                id={`pricings,${labelIndex},highestPrice`}
-                label={t("ReservationUnitEditor.label.highestPrice")}
-                minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
-                plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
-                onChange={(e) => {
-                  setPricingTypeValue(
-                    {
-                      highestPrice: formatDecimal({
-                        input: e.target.value,
-                      }),
-                    },
-                    "highestPrice"
-                  );
-                }}
-                step={1}
-                min={0}
-                errorText={getValidationError("highestPrice")}
-                invalid={!!getValidationError("highestPrice")}
-                tooltipText={t("ReservationUnitEditor.tooltip.highestPrice")}
-              />
-            </Span3>
-            <Span3 id="paymentTypes">
-              <SortedSelect
-                id="paymentTypes"
-                sort
-                multiselect
-                required
-                placeholder={t("common.select")}
-                options={state.paymentTypeOptions}
-                value={[
-                  ...getSelectedOptions(
-                    state,
-                    "paymentTypeOptions",
-                    "paymentTypes"
-                  ),
-                ]}
-                label={t("ReservationUnitEditor.label.paymentTypes")}
-                onChange={(paymentTypes) =>
-                  dispatch({ type: "setPaymentTypes", paymentTypes })
-                }
-                tooltipText={t("ReservationUnitEditor.tooltip.paymentTypes")}
-                error={getValidationError("paymentTypes")}
-                invalid={!!getValidationError("paymentTypes")}
-              />
-            </Span3>
-          </>
+        {/* TODO why is there an empty grid for non PAID? because we want a bit margin at the bottom, should be either in the parent element or gap between the sections */}
+        {pricing?.pricingType === "PAID" && (
+          <PaidPricingPart
+            form={form}
+            index={index}
+            taxPercentageOptions={taxPercentageOptions}
+          />
         )}
       </Grid>
-    </VerticalFlex>
+    </>
   );
 };
+
+const PaidPricingPart = ({
+  form,
+  index,
+  taxPercentageOptions,
+}: {
+  form: UseFormReturn<ReservationEditFormValues>;
+  index: number;
+  taxPercentageOptions: { label: string; value: number }[];
+}) => {
+  const { t } = useTranslation();
+  const { control, register, watch } = form;
+
+  const unitPriceOptions = Object.values(ReservationUnitsReservationUnitPricingPriceUnitChoices).map((choice) => ({
+    value: choice,
+    label: t(`priceUnit.${choice}`),
+  }))
+
+  const paymentTypeOptions = PaymentTypes.map((value: string) => ({
+    label: t(`paymentType.${value}`),
+    value,
+  }));
+
+  const pricing = watch(`pricings.${index}`);
+
+  return (
+    <>
+      <Span6>
+        <Controller
+          name={`pricings.${index}.priceUnit`}
+          control={control}
+          render={({ field: { value, onChange } }) => (
+            <Select
+              id={`pricings.${index}.priceUnit`}
+              placeholder={t("common.select")}
+              label={t("ReservationUnitEditor.label.priceUnit")}
+              required
+              options={unitPriceOptions}
+              onChange={(v: { value: ReservationUnitsReservationUnitPricingPriceUnitChoices; label: string }) => onChange(v.value)}
+              value={unitPriceOptions.find((option) => option.value === value) ?? null}
+              // tooltipText={t("ReservationUnitEditor.tooltip.priceUnit")}
+              // errorText={getValidationError(`pricings.${index}.priceUnit`)}
+            />
+          )}
+          />
+        </Span6>
+
+        <Span6>
+        <Controller
+          name={`pricings.${index}.taxPercentage.pk`}
+          control={control}
+          render={({ field: { value, onChange } }) => (
+          <Select
+            id={`pricings.${index}.taxPercentage.pk`}
+            placeholder={t("common.select")}
+            required
+            label={t(`ReservationUnitEditor.label.taxPercentagePk`)}
+            options={taxPercentageOptions}
+            onChange={(v: { value: number; label: string }) => onChange(v.value)}
+            value={taxPercentageOptions.find((option) => option.value === value) ?? null}
+            // errorText={getValidationError(`pricings.${index}.taxPercentagePk`)}
+          />
+          )}
+        />
+        </Span6>
+
+        <Span3>
+          <NumberInput
+            {...register(`pricings.${index}.lowestPriceNet`, { required: true, valueAsNumber: true })}
+            value={pricing?.lowestPriceNet ?? 0}
+            id={`pricings.${index}.lowestPriceNet`}
+            required
+            label={t("ReservationUnitEditor.label.lowestPriceNet")}
+            minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
+            plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
+            step={1}
+            min={0}
+            max={undefined}
+            // errorText={getValidationError( `pricings.${index}.lowestPriceNet`)}
+            // invalid={!!getValidationError(`pricings.${index}.lowestPriceNet`) }
+          />
+        </Span3>
+        <Span3>
+          <NumberInput
+            {...register(`pricings.${index}.lowestPrice`, { required: true, valueAsNumber: true })}
+            id={`pricings.${index}.lowestPrice`}
+            required
+            label={t("ReservationUnitEditor.label.lowestPrice")}
+            minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
+            plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
+            step={1}
+            min={0}
+            max={undefined}
+            // errorText={getValidationError( `pricings.${index}.lowestPrice`)}
+            // invalid={!!getValidationError(`pricings.${index}.lowestPrice`)}
+            tooltipText={t("ReservationUnitEditor.tooltip.lowestPrice")}
+          />
+        </Span3>
+        <Span3>
+          <NumberInput
+            // TODO controller
+            {...register(`pricings.${index}.highestPriceNet`, { required: true, valueAsNumber: true })}
+            required
+            id={`pricings.${index}.highestPriceNet`}
+            label={t("ReservationUnitEditor.label.highestPriceNet")}
+            minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
+            plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
+            step={1}
+            min={0}
+            max={undefined}
+            // errorText={getValidationError("highestPriceNet")}
+            // invalid={!!getValidationError("highestPriceNet")}
+          />
+        </Span3>
+        <Span3>
+          <NumberInput
+            {...register(`pricings.${index}.highestPrice`, { required: true, valueAsNumber: true })}
+            required
+            id={`pricings.${index}.highestPrice`}
+            label={t("ReservationUnitEditor.label.highestPrice")}
+            minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
+            plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
+            step={1}
+            min={0}
+            max={undefined}
+            type="number"
+            // errorText={getValidationError("highestPrice")}
+            // invalid={!!getValidationError("highestPrice")}
+            tooltipText={t("ReservationUnitEditor.tooltip.highestPrice")}
+          />
+        </Span3>
+        <Span3>
+        <Controller
+          // This is not pricing type specific
+          name={`paymentTypes`}
+          control={control}
+          render={({ field: { value, onChange } }) => (
+            <Select
+              id={`pricings.${index}.paymentTypes`}
+              // sort
+              multiselect
+              required
+              placeholder={t("common.select")}
+              // @ts-expect-error -- Something weird with HDS multiselect typing
+              options={paymentTypeOptions}
+              onChange={(x: { value: string; label: string }[]) => {
+                onChange(x.map((y: { value: string; label: string }) => y.value))
+              }}
+              value={paymentTypeOptions.filter((x) => value.find((d) => d === x.value) != null)}
+              label={t("ReservationUnitEditor.label.paymentTypes")}
+              tooltipText={t("ReservationUnitEditor.tooltip.paymentTypes")}
+              // error={getValidationError("paymentTypes")}
+              // invalid={!!getValidationError("paymentTypes")}
+            />
+          )}
+        />
+      </Span3>
+    </>
+  )
+}
+
 
 export default PricingType;

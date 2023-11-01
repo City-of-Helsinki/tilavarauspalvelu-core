@@ -53,64 +53,6 @@ export const Divider = styled.hr`
   grid-column: 1/-1;
 `;
 
-/// @deprecated
-export const ButtonsStripe = styled.div`
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  justify-content: space-between;
-  right: 0;
-  display: flex;
-  padding: var(--spacing-s);
-  background-color: var(--color-bus-dark);
-  z-index: var(--tilavaraus-admin-stack-button-stripe);
-`;
-
-/// @deprecated use Standard Button instead
-export const WhiteButton = styled(Button)<{
-  disabled: boolean;
-  variant: "secondary" | "primary" | "supplementary";
-}>`
-  --bg: var(--color-white);
-  --fg: var(--color-black);
-  --hbg: var(--fg);
-  --hfg: var(--bg);
-  --border-color: var(--color-white);
-
-  ${({ variant }) => {
-    switch (variant) {
-      case "secondary":
-        return `--fg: var(--color-white);
-      --bg: var(--color-bus-dark);`;
-      case "supplementary":
-        return `--fg: var(--color-white);
-        --bg: var(--color-bus-dark);
-        --border-color: transparent;`;
-      default:
-        return "";
-    }
-  }}
-
-  ${({ disabled }) =>
-    disabled
-      ? `--hbg: var(--bg);
-        --hfg: var(--fg);
-      `
-      : null}
-
-  height: 52px;
-  border: 2px var(--border-color) solid !important;
-
-  color: var(--fg) !important;
-  background-color: var(--bg) !important;
-
-  &:hover {
-    color: var(--hfg) !important;
-    background-color: var(--hbg) !important;
-  }
-  margin: 0;
-`;
-
 /// @deprecated use Notification context instead
 export const StyledNotification = styled(Notification)`
   z-index: var(--tilavaraus-admin-stack-notification);

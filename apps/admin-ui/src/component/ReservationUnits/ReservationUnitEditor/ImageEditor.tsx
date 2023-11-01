@@ -15,10 +15,6 @@ const Button = styled(HDSButton)`
   float: right;
 `;
 
-const ReservationUnitImage = styled.div`
-  position: relative;
-`;
-
 const Actions = styled.div`
   display: flex;
   justify-content: space-between;
@@ -27,14 +23,15 @@ const Actions = styled.div`
   margin-bottom: var(--spacing-s);
 `;
 
-const ImageTag = styled.img`
+const StyledImage = styled.img`
   max-height: 12.5em;
   width: 100%;
   object-fit: cover;
 `;
 
 const RUImage = ({ image }: { image: Image }): JSX.Element => {
-  const [imageUrl, setImageUrl] = useState<string>(image.mediumUrl || "");
+  // medium url seems to work when deployed but locally it's not available
+  const [imageUrl, setImageUrl] = useState<string>(image.mediumUrl || image.imageUrl || "");
 
   if (image.bytes) {
     const reader = new FileReader();
@@ -42,7 +39,7 @@ const RUImage = ({ image }: { image: Image }): JSX.Element => {
     reader.readAsDataURL(image.bytes);
   }
 
-  return <ImageTag src={imageUrl} />;
+  return <StyledImage src={imageUrl} />;
 };
 
 let fakepk = -1;
@@ -85,6 +82,32 @@ const SmallButton = styled(Button)`
     background-color: transparent;
   }
 `;
+
+function ReservationUnitImage ({ makeIntoMainImage, deleteImage, image }:{
+  makeIntoMainImage: (pk: number) => void;
+  deleteImage: (pk: number) => void;
+  image: Image;
+}) {
+  const isMain = image.imageType === ReservationUnitsReservationUnitImageImageTypeChoices.Main
+  const { t } = useTranslation();
+  return (
+    <div>
+      <Actions>
+        {isMain ? (
+          <span>{t("ImageEditor.mainImage")}</span>
+        ) : (
+          <SmallButton variant="secondary" onClick={() => makeIntoMainImage(image.pk as number)}>
+            {t("ImageEditor.useAsMainImage")}
+          </SmallButton>
+        )}
+        <SmallButton variant="secondary" onClick={() => deleteImage(image.pk as number)}>
+          {t("ImageEditor.deleteImage")}
+        </SmallButton>
+      </Actions>
+      <RUImage image={image} />
+    </div>
+  );
+}
 
 type Props = {
   images: Image[];
@@ -153,28 +176,12 @@ const ImageEditor = ({ images, setImages }: Props): JSX.Element => {
       {images
         .filter((image) => !image.deleted)
         .map((image) => (
-          <ReservationUnitImage key={image.pk}>
-            <Actions>
-              {image.imageType ===
-              ReservationUnitsReservationUnitImageImageTypeChoices.Main ? (
-                <span>{t("ImageEditor.mainImage")}</span>
-              ) : (
-                <SmallButton
-                  variant="secondary"
-                  onClick={() => setAsMainImage(image.pk as number)}
-                >
-                  {t("ImageEditor.useAsMainImage")}
-                </SmallButton>
-              )}
-              <SmallButton
-                variant="secondary"
-                onClick={() => deleteImage(image.pk as number)}
-              >
-                {t("ImageEditor.deleteImage")}
-              </SmallButton>
-            </Actions>
-            <RUImage image={image} />
-          </ReservationUnitImage>
+          <ReservationUnitImage
+            key={image.pk}
+            makeIntoMainImage={setAsMainImage}
+            deleteImage={deleteImage}
+            image={image}
+          />
         ))}
     </Wrapper>
   );

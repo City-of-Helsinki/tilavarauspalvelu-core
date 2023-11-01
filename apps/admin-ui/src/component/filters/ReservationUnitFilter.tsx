@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import { Query, ReservationUnitType } from "common/types/gql-types";
-import { OptionType } from "../../common/types";
-import SortedSelect from "../ReservationUnits/ReservationUnitEditor/SortedSelect";
+import { OptionType } from "@/common/types";
+import { SortedSelect } from "@/component/SortedSelect";
+import { GQL_MAX_RESULTS_PER_QUERY } from "@/common/const";
 import { RESERVATION_UNITS_QUERY } from "./queries";
-import { GQL_MAX_RESULTS_PER_QUERY } from "../../common/const";
 
 type Props = {
   onChange: (reservationUnits: OptionType[]) => void;

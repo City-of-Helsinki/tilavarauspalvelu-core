@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { Button, Dialog } from "hds-react";
-import { useModal } from "../../../context/ModalContext";
+import { useModal } from "@/context/ModalContext";
 
 const ActionButtons = styled(Dialog.ActionButtons)`
   justify-content: end;

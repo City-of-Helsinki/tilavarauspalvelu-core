@@ -21,13 +21,13 @@ import {
   ReservationTypeConnection,
   ReservationsReservationStateChoices,
 } from "common/types/gql-types";
-import { useModal } from "../../../context/ModalContext";
+import { useModal } from "@/context/ModalContext";
 import { DENY_RESERVATION, REFUND_RESERVATION } from "./queries";
-import { useNotification } from "../../../context/NotificationContext";
-import Loader from "../../Loader";
-import Select from "../../ReservationUnits/ReservationUnitEditor/Select";
-import { VerticalFlex } from "../../../styles/layout";
-import { CustomDialogHeader } from "../../CustomDialogHeader";
+import { useNotification } from "@/context/NotificationContext";
+import Loader from "@/component/Loader";
+import { Select } from "@/component/Select";
+import { VerticalFlex } from "@/styles/layout";
+import { CustomDialogHeader } from "@/component/CustomDialogHeader";
 import { useDenyReasonOptions } from "./hooks";
 
 const ActionButtons = styled(Dialog.ActionButtons)`

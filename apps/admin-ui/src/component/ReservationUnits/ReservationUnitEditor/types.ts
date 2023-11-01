@@ -1,112 +1,15 @@
 import Joi from "joi";
 import {
   Maybe,
-  Query,
-  ReservationUnitByPkType,
-  ReservationUnitCreateMutationInput,
-  ReservationUnitPricingUpdateSerializerInput,
   ReservationUnitsReservationUnitImageImageTypeChoices,
-  ReservationUnitUpdateMutationInput,
-  ResourceType,
-  SpaceType,
-  UnitByPkType,
 } from "common/types/gql-types";
-import { OptionType } from "../../../common/types";
 
-export type IProps = {
-  reservationUnitPk?: string;
-  unitPk: string;
-};
-export type NotificationType = {
-  title: string;
-  text: string;
-  type: "success" | "error";
-};
-
-export type Action =
-  | {
-      type: "setNotification";
-      notification: NotificationType;
-    }
-  | { type: "clearNotification" }
-  | { type: "toggleFuturePrice" }
-  | { type: "clearError" }
-  | { type: "dataLoaded"; reservationUnit: ReservationUnitByPkType }
-  | { type: "unitLoaded"; unit: UnitByPkType }
-  | { type: "editNew"; unitPk: number }
-  | { type: "dataInitializationError"; message: string }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  | { type: "set"; value: any }
-  | { type: "created"; pk: number }
-  | { type: "setSpaces"; spaces: OptionType[] }
-  | { type: "setResources"; resources: OptionType[] }
-  | { type: "setEquipments"; equipments: OptionType[] }
-  | { type: "setPaymentTypes"; paymentTypes: OptionType[] }
-  | {
-      type: "updatePricingType";
-      pricingType: ReservationUnitPricingUpdateSerializerInput;
-      changeField?:
-        | "lowestPriceNet"
-        | "lowestPrice"
-        | "highestPriceNet"
-        | "highestPrice"
-        | "taxPercentagePk";
-    }
-  | { type: "setPurposes"; purposes: OptionType[] }
-  | { type: "setQualifiers"; qualifiers: OptionType[] }
-  | { type: "parametersLoaded"; parameters: Query }
-  | { type: "setMaxPersons"; maxPersons: number }
-  | { type: "setReservationsMaxDaysBefore"; reservationsMaxDaysBefore: number }
-  | {
-      type: "setValidationErrors";
-      validationErrors: Joi.ValidationResult | null;
-    }
-  | { type: "setImages"; images: Image[] };
-
-export type ReservationUnitEditorType =
-  | ReservationUnitUpdateMutationInput
-  | ReservationUnitCreateMutationInput;
-
-export enum LoadingCompleted {
-  "UNIT",
-  "RESERVATION_UNIT",
-  "PARAMS",
-}
-
-export type State = {
-  reservationUnitPk?: number;
-  loading: boolean;
-  reservationUnit: ReservationUnitByPkType | null;
-  reservationUnitEdit: Partial<ReservationUnitEditorType>;
-  hasChanges: boolean;
-  error?: {
-    message: string;
-  };
-  spaces: SpaceType[];
-  resources: ResourceType[];
-  spaceOptions: OptionType[];
-  resourceOptions: OptionType[];
-  equipmentOptions: OptionType[];
-  purposeOptions: OptionType[];
-  qualifierOptions: OptionType[];
-  reservationUnitTypeOptions: OptionType[];
-  paymentTermsOptions: OptionType[];
-  paymentTypeOptions: OptionType[];
-  pricingTermsOptions: OptionType[];
-  cancellationTermsOptions: OptionType[];
-  serviceSpecificTermsOptions: OptionType[];
-  cancellationRuleOptions: OptionType[];
-  taxPercentageOptions: OptionType[];
-  metadataOptions: OptionType[];
-  unit?: UnitByPkType;
-  dataLoaded: LoadingCompleted[];
-  images: Image[];
-  validationErrors: Joi.ValidationResult | null;
-};
+export const PaymentTypes = ["ONLINE", "INVOICE", "ON_SITE"] as const;
 
 export type Image = {
   pk?: Maybe<number> | undefined;
   mediumUrl?: Maybe<string> | undefined;
+  imageUrl?: Maybe<string> | undefined;
   imageType?: ReservationUnitsReservationUnitImageImageTypeChoices;
   originalImageType?: ReservationUnitsReservationUnitImageImageTypeChoices;
   bytes?: File;
@@ -141,7 +44,7 @@ const pricing = Joi.object({
   taxPercentagePk: requiredForNonFree(Joi.number().required()),
 });
 
-export const schema = Joi.object({
+const schema = Joi.object({
   reservationKind: Joi.string().required(),
   nameFi: Joi.string().required().max(80),
   nameSv: Joi.string().required().max(80),
@@ -184,7 +87,7 @@ const draftPricing = Joi.object({
   ),
 });
 
-export const draftSchema = Joi.object({
+const draftSchema = Joi.object({
   pricings: Joi.array().min(0).items(draftPricing),
 }).options({
   allowUnknown: true,
