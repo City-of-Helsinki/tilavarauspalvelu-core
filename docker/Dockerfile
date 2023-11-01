@@ -88,6 +88,7 @@ FROM base AS build-static
 # Old variables need to be redeclared so that defaults can be used.
 ARG PROJECT_ROOT=/tvp
 ARG VENV_ROOT=$PROJECT_ROOT/venv
+ARG STATIC_ROOT=/srv/static
 
 # Change working directory to project directory.
 WORKDIR $PROJECT_ROOT
@@ -101,7 +102,7 @@ ENV PATH=$VENV_ROOT/bin:$PATH \
     VIRTUAL_ENV=$VENV_ROOT
 
 # Collect static files.
-RUN python manage.py collectstatic --clear --no-input --verbosity=2
+RUN STATIC_ROOT="$STATIC_ROOT" python manage.py collectstatic --clear --no-input --verbosity=2
 
 
 FROM base AS production
