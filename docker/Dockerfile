@@ -21,12 +21,13 @@ RUN echo "Install common dependencies" \
       gettext \
       libpq5 \
       make \
+    && apt-get clean \
     && echo "Create project directory" \
-    && mkdir -p $PROJECT_ROOT \
-    && chmod g=u $PROJECT_ROOT \
+    && mkdir -p "$PROJECT_ROOT" \
+    && chmod g=u "$PROJECT_ROOT" \
     && echo "Create directories for static files" \
-    && mkdir -p $STATIC_ROOT \
-    && chmod g=u $STATIC_ROOT \
+    && mkdir -p "$STATIC_ROOT" \
+    && chmod g=u "$STATIC_ROOT" \
     && echo "Create celery broker directories and set permissions" \
     && mkdir -p /broker/queue \
     && mkdir -p /broker/processed \
@@ -41,7 +42,7 @@ RUN echo "Install common dependencies" \
 FROM base AS builder
 
 # Setup build time variables.
-# Old variables need to be redeclared so that defaults can be used.
+# Old variables need to be redeclared after "from" statements so that defaults can be used.
 ARG PROJECT_ROOT=/tvp
 ARG VENV_ROOT=$PROJECT_ROOT/venv
 ARG DEPS=main
@@ -56,7 +57,8 @@ RUN apt-get install -y --no-install-recommends \
       curl \
       libpcre3 \
       libpcre3-dev \
-      libpq-dev
+      libpq-dev \
+    && apt-get clean
 
 # Setup environment variables for poetry.
 ENV POETRY_HOME=/usr/pypoetry
@@ -66,28 +68,29 @@ ENV POETRY_VIRTUALENVS_IN_PROJECT=true
 ENV POETRY_INSTALLER_PARALLEL=false
 
 # Install poetry.
-RUN curl -sSL https://install.python-poetry.org | POETRY_VERSION=1.6.0 python -
+RUN curl -sSL https://install.python-poetry.org | POETRY_VERSION=1.6.1 python -
 
 # Copy poetry files.
 COPY poetry.lock pyproject.toml /
 
 # Create virtualenv.
-RUN python -m venv $VENV_ROOT
+RUN python -m venv "$VENV_ROOT"
 
 # Activate virtualenv by setting some environment variables.
 ENV PATH=$VENV_ROOT/bin:$PATH \
     VIRTUAL_ENV=$VENV_ROOT
 
 # Install production dependencies (to previously created virtualenv).
-RUN poetry install --no-root --only $DEPS
+RUN poetry install --no-root --only "$DEPS"
 
 
 FROM base AS build-static
 
 # Setup build time variables.
-# Old variables need to be redeclared so that defaults can be used.
+# Old variables need to be redeclared after "from" statements so that defaults can be used.
 ARG PROJECT_ROOT=/tvp
 ARG VENV_ROOT=$PROJECT_ROOT/venv
+ARG STATIC_ROOT=/srv/static
 
 # Change working directory to project directory.
 WORKDIR $PROJECT_ROOT
@@ -101,13 +104,13 @@ ENV PATH=$VENV_ROOT/bin:$PATH \
     VIRTUAL_ENV=$VENV_ROOT
 
 # Collect static files.
-RUN python manage.py collectstatic --clear --no-input --verbosity=2
+RUN STATIC_ROOT="$STATIC_ROOT" python manage.py collectstatic --clear --no-input --verbosity=2
 
 
 FROM base AS production
 
 # Setup build time variables.
-# Old variables need to be redeclared after "from" statements" so that defaults can be used.
+# Old variables need to be redeclared after "from" statements so that defaults can be used.
 ARG PROJECT_ROOT=/tvp
 ARG VENV_ROOT=$PROJECT_ROOT/venv
 ARG STATIC_ROOT=/srv/static
