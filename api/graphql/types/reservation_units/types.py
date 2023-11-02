@@ -624,7 +624,6 @@ class ReservationUnitType(
 
 
 class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin, ReservationUnitWithReservationsMixin):
-    next_available_slot = graphene.DateTime(deprecation_reason="Old deprecated scalar. Does not yield any return.")
     hauki_url = graphene.Field(ReservationUnitHaukiUrlType)
 
     class Meta:
@@ -675,16 +674,12 @@ class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin, Reservatio
             "allow_reservations_without_opening_hours",
             "is_archived",
             "state",
-            "next_available_slot",
             "hauki_url",
             "opening_hours",
         ] + get_all_translatable_fields(model)
 
         interfaces = (graphene.relay.Node,)
         connection_class = TVPBaseConnection
-
-    def resolve_next_available_slot(self, info):
-        return None
 
     def resolve_hauki_url(self, info):
         return self
