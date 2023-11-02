@@ -94,8 +94,24 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         )
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        self.assertMatchSnapshot(content)
+        assert content.get("errors") is None
+        node = content["data"]["recurringReservations"]["edges"][0]["node"]
+        assert node.pop("applicationEventSchedule") is not None
+        assert node == {
+            "abilityGroup": None,
+            "ageGroup": None,
+            "beginDate": "2021-10-12",
+            "beginTime": "15:00:00",
+            "created": "2021-10-12T12:00:00+00:00",
+            "description": "good movies",
+            "endDate": "2021-10-12",
+            "endTime": "16:00:00",
+            "name": "movies",
+            "recurrenceInDays": None,
+            "reservationUnit": {"nameFi": "resunit"},
+            "user": "joe.regularl@foo.com",
+            "weekdays": [],
+        }
 
     def test_recurring_reservation_total_count(self):
         self.client.force_login(self.regular_joe)
@@ -123,24 +139,39 @@ class ReservationQueryTestCase(ReservationTestCaseBase):
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_query_with_personal_fields("""recurringReservations(orderBy:"name")"""))
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        self.assertMatchSnapshot(content)
+        assert content.get("errors") is None
+        assert content["data"]["recurringReservations"]["totalCount"] == 1
+        assert content["data"]["recurringReservations"]["edges"][0]["node"]["applicationEventSchedule"] is not None
+        assert content["data"]["recurringReservations"]["edges"][0]["node"]["name"] == "movies"
+        assert content["data"]["recurringReservations"]["edges"][0]["node"]["user"] == "joe.regularl@foo.com"
 
     def test_general_admin_can_see_all(self):
         self.create_recurring_by_admin()
         self.client.force_login(self.general_admin)
         response = self.query(self.get_query_with_personal_fields("""recurringReservations(orderBy:"name")"""))
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        self.assertMatchSnapshot(content)
+        assert content.get("errors") is None
+        assert content["data"]["recurringReservations"]["totalCount"] == 2
+        assert content["data"]["recurringReservations"]["edges"][0]["node"]["applicationEventSchedule"] is not None
+        assert content["data"]["recurringReservations"]["edges"][0]["node"]["name"] == "admin movies"
+        assert content["data"]["recurringReservations"]["edges"][0]["node"]["user"] == "amin.general@foo.com"
+        assert content["data"]["recurringReservations"]["edges"][1]["node"]["applicationEventSchedule"] is not None
+        assert content["data"]["recurringReservations"]["edges"][1]["node"]["name"] == "movies"
+        assert content["data"]["recurringReservations"]["edges"][1]["node"]["user"] == "joe.regularl@foo.com"
 
     def test_unit_admin_can_see_unit_recurrings(self):
         self.create_recurring_by_admin()
         self.client.force_login(self.create_unit_admin(unit=self.unit))
         response = self.query(self.get_query_with_personal_fields("""recurringReservations(orderBy:"name")"""))
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        self.assertMatchSnapshot(content)
+        assert content.get("errors") is None
+        assert content["data"]["recurringReservations"]["totalCount"] == 2
+        assert content["data"]["recurringReservations"]["edges"][0]["node"]["applicationEventSchedule"] is None
+        assert content["data"]["recurringReservations"]["edges"][0]["node"]["name"] == "admin movies"
+        assert content["data"]["recurringReservations"]["edges"][0]["node"]["user"] is None
+        assert content["data"]["recurringReservations"]["edges"][1]["node"]["applicationEventSchedule"] is None
+        assert content["data"]["recurringReservations"]["edges"][1]["node"]["name"] == "movies"
+        assert content["data"]["recurringReservations"]["edges"][1]["node"]["user"] is None
 
     def test_service_sector_admin_can_see_recurring_reservations(self):
         self.create_recurring_by_admin()

@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 # snapshottest: v1 - https://goo.gl/zC4yUc
-from __future__ import unicode_literals
 
 from snapshottest import Snapshot
-
 
 snapshots = Snapshot()
 
@@ -281,30 +278,6 @@ snapshots['ReservationQueryTestCase::test_filter_by_user 1'] = {
                 }
             ],
             'totalCount': 1
-        }
-    }
-}
-
-snapshots['ReservationQueryTestCase::test_general_admin_can_see_all 1'] = {
-    'data': {
-        'recurringReservations': {
-            'edges': [
-                {
-                    'node': {
-                        'applicationEventSchedule': 19,
-                        'name': 'admin movies',
-                        'user': 'amin.general@foo.com'
-                    }
-                },
-                {
-                    'node': {
-                        'applicationEventSchedule': 18,
-                        'name': 'movies',
-                        'user': 'joe.regularl@foo.com'
-                    }
-                }
-            ],
-            'totalCount': 2
         }
     }
 }
@@ -625,36 +598,6 @@ snapshots['ReservationQueryTestCase::test_order_by_unit_name 3'] = {
     }
 }
 
-snapshots['ReservationQueryTestCase::test_recurring_reservation_query 1'] = {
-    'data': {
-        'recurringReservations': {
-            'edges': [
-                {
-                    'node': {
-                        'abilityGroup': None,
-                        'ageGroup': None,
-                        'applicationEventSchedule': 33,
-                        'beginDate': '2021-10-12',
-                        'beginTime': '15:00:00',
-                        'created': '2021-10-12T12:00:00+00:00',
-                        'description': 'good movies',
-                        'endDate': '2021-10-12',
-                        'endTime': '16:00:00',
-                        'name': 'movies',
-                        'recurrenceInDays': None,
-                        'reservationUnit': {
-                            'nameFi': 'resunit'
-                        },
-                        'user': 'joe.regularl@foo.com',
-                        'weekdays': [
-                        ]
-                    }
-                }
-            ]
-        }
-    }
-}
-
 snapshots['ReservationQueryTestCase::test_recurring_reservation_total_count 1'] = {
     'data': {
         'recurringReservations': {
@@ -670,48 +613,7 @@ snapshots['ReservationQueryTestCase::test_recurring_reservation_total_count 1'] 
     }
 }
 
-snapshots['ReservationQueryTestCase::test_regular_user_cannot_see_other_than_own 1'] = {
-    'data': {
-        'recurringReservations': {
-            'edges': [
-                {
-                    'node': {
-                        'applicationEventSchedule': 35,
-                        'name': 'movies',
-                        'user': 'joe.regularl@foo.com'
-                    }
-                }
-            ],
-            'totalCount': 1
-        }
-    }
-}
-
 snapshots['ReservationQueryTestCase::test_service_sector_admin_can_see_recurring_reservations 1'] = {
-    'data': {
-        'recurringReservations': {
-            'edges': [
-                {
-                    'node': {
-                        'applicationEventSchedule': None,
-                        'name': 'admin movies',
-                        'user': None
-                    }
-                },
-                {
-                    'node': {
-                        'applicationEventSchedule': None,
-                        'name': 'movies',
-                        'user': None
-                    }
-                }
-            ],
-            'totalCount': 2
-        }
-    }
-}
-
-snapshots['ReservationQueryTestCase::test_unit_admin_can_see_unit_recurrings 1'] = {
     'data': {
         'recurringReservations': {
             'edges': [
