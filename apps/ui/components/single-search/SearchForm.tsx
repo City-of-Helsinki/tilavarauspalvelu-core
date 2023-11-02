@@ -235,14 +235,14 @@ const useMappedOptions = (
     variables: { ...queryOptions },
   });
   if (data != null && queryNodeName in data) {
-    const options =
+    const options: { pk: number; name: string }[] =
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       data[queryNodeName]?.edges
         ?.map((e: { node: unknown }) => e?.node)
         .filter((n: null): n is NonNullable<typeof n> => n != null)
-        .map((node: { pk: unknown }) => ({
-          id: String(node.pk),
+        .map((node: { pk: number }) => ({
+          pk: String(node.pk),
           name: getTranslation(node, "name"),
         })) ?? [];
     return {
@@ -361,17 +361,19 @@ const SearchForm = ({
     key: string,
     value: string
   ): string | undefined => {
+    const compFn = (a: typeof unitOptions[0], b: string) =>
+      a != null && String(a.value) === b;
     switch (key) {
       case "unit":
-        return unitOptions.find((n) => n.value === value)?.label;
+        return unitOptions.find((n) => compFn(n, value))?.label;
       case "reservationUnitType":
-        return unitTypeOptions.find((n) => n.value === value)?.label;
+        return unitTypeOptions.find((n) => compFn(n, value))?.label;
       case "purposes":
-        return purposeOptions.find((n) => n.value === value)?.label;
+        return purposeOptions.find((n) => compFn(n, value))?.label;
       case "equipments":
-        return equipmentsOptions.find((n) => n.value === value)?.label;
+        return equipmentsOptions.find((n) => compFn(n, value))?.label;
       case "duration":
-        return durationOptions.find((n) => n.value === value)?.label;
+        return durationOptions.find((n) => compFn(n, value))?.label;
       case "dateBegin":
       case "dateEnd":
       case "timeBegin":
@@ -392,6 +394,7 @@ const SearchForm = ({
   };
   const areOptionsLoaded =
     !unitsLoading && !purposesLoading && !typesLoading && !equipmentsLoading;
+
   return (
     <>
       <TopContainer>

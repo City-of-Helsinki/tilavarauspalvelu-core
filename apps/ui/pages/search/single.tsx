@@ -20,15 +20,14 @@ import {
   ReservationUnitType,
 } from "common/types/gql-types";
 import { Container } from "common";
-
-import SearchForm from "../../components/single-search/SearchForm";
 import { capitalize, singleSearchUrl } from "@/modules/util";
 import { isBrowser } from "@/modules/const";
 import { RESERVATION_UNITS } from "@/modules/queries/reservationUnit";
-import Sorting from "../../components/form/Sorting";
-import ListWithPagination from "../../components/common/ListWithPagination";
-import ReservationUnitCard from "../../components/single-search/ReservationUnitCard";
-import BreadcrumbWrapper from "../../components/common/BreadcrumbWrapper";
+import SearchForm from "@/components/single-search/SearchForm";
+import Sorting from "@/components/form/Sorting";
+import ListWithPagination from "@/components/common/ListWithPagination";
+import ReservationUnitCard from "@/components/single-search/ReservationUnitCard";
+import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
 
 const pagingLimit = 36;
 

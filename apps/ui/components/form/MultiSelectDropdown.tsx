@@ -170,7 +170,7 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
       ...options.filter((option) => {
         return option.label?.toLowerCase().includes(input?.toLowerCase());
       }),
-    ].filter((e) => e) as OptionType[];
+    ].filter((e) => e);
   }, [input, options]);
 
   const handleInputValueChange = React.useCallback(
@@ -324,7 +324,9 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
           return renderOptionText(val);
         }
 
-        const result = options.find((option) => option.value === val);
+        const result = options.find(
+          (option) => option.value != null && String(option.value) === val
+        );
         return result?.label || null;
       })
       .sort();
@@ -397,7 +399,7 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
           const isChecked =
             option.value === SELECT_ALL
               ? !value.length
-              : value?.includes(option.value as string);
+              : option.value != null && value?.includes(String(option.value));
 
           const setFocus = (ref: HTMLInputElement) => {
             if (isFocused) {
@@ -423,7 +425,7 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
                 label={option.label}
                 name={checkboxName}
                 onChange={handleValueChange}
-                value={option.value as string}
+                value={option.value != null ? String(option.value) : undefined}
               />
             </ScrollIntoViewWithFocus>
           );
