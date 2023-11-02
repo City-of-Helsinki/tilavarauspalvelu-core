@@ -28,8 +28,10 @@ RUN echo "Install common dependencies" \
     && mkdir -p $STATIC_ROOT \
     && chmod g=u $STATIC_ROOT \
     && echo "Create celery broker directories and set permissions" \
+    && mkdir -p /broker \
     && mkdir -p /broker/queue \
     && mkdir -p /broker/processed \
+    && chmod g+rw /broker \
     && chmod g+rw /broker/queue \
     && chmod g+rw /broker/processed \
     && echo "Create directory for django-prometheus metrics" \
