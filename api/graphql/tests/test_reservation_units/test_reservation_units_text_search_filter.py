@@ -43,7 +43,10 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         content = json.loads(response.content)
         assert content.get("errors") is None
         assert not self.content_is_empty(content)
-        self.assertMatchSnapshot(content)
+
+        reservation_unit = content["data"]["reservationUnits"]["edges"][0]["node"]
+        assert reservation_unit["nameFi"] == "test name fi"
+        assert reservation_unit["reservationUnitType"]["nameFi"] == "test type fi"
 
         response = self.query(
             """
@@ -83,7 +86,10 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         content = json.loads(response.content)
         assert content.get("errors") is None
         assert not self.content_is_empty(content)
-        self.assertMatchSnapshot(content)
+
+        reservation_unit = content["data"]["reservationUnits"]["edges"][0]["node"]
+        assert reservation_unit["nameFi"] == "test name fi"
+        assert reservation_unit["reservationUnitType"]["nameEn"] == "test type en"
 
     def test_filtering_by_type_sv(self):
         response = self.query(
@@ -106,7 +112,10 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         content = json.loads(response.content)
         assert content.get("errors") is None
         assert not self.content_is_empty(content)
-        self.assertMatchSnapshot(content)
+
+        reservation_unit = content["data"]["reservationUnits"]["edges"][0]["node"]
+        assert reservation_unit["nameFi"] == "test name fi"
+        assert reservation_unit["reservationUnitType"]["nameSv"] == "test type sv"
 
     def test_filtering_by_reservation_unit_name_fi(self):
         response = self.query(
@@ -126,7 +135,9 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         content = json.loads(response.content)
         assert content.get("errors") is None
         assert not self.content_is_empty(content)
-        self.assertMatchSnapshot(content)
+
+        reservation_unit = content["data"]["reservationUnits"]["edges"][0]["node"]
+        assert reservation_unit["nameFi"] == "test name fi"
 
         response = self.query(
             """
@@ -163,7 +174,9 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         content = json.loads(response.content)
         assert content.get("errors") is None
         assert not self.content_is_empty(content)
-        self.assertMatchSnapshot(content)
+
+        reservation_unit = content["data"]["reservationUnits"]["edges"][0]["node"]
+        assert reservation_unit["nameEn"] == "test name en"
 
     def test_filtering_by_reservation_unit_name_sv(self):
         response = self.query(
@@ -183,7 +196,9 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         content = json.loads(response.content)
         assert content.get("errors") is None
         assert not self.content_is_empty(content)
-        self.assertMatchSnapshot(content)
+
+        reservation_unit = content["data"]["reservationUnits"]["edges"][0]["node"]
+        assert reservation_unit["nameSv"] == "test name sv"
 
     def test_filtering_by_reservation_unit_description_fi(self):
         response = self.query(
@@ -204,7 +219,10 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         content = json.loads(response.content)
         assert content.get("errors") is None
         assert not self.content_is_empty(content)
-        self.assertMatchSnapshot(content)
+
+        reservation_unit = content["data"]["reservationUnits"]["edges"][0]["node"]
+        assert reservation_unit["nameFi"] == "test name fi"
+        assert reservation_unit["descriptionFi"] == "Lorem ipsum fi"
 
         response = self.query(
             """
@@ -242,7 +260,10 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         content = json.loads(response.content)
         assert content.get("errors") is None
         assert not self.content_is_empty(content)
-        self.assertMatchSnapshot(content)
+
+        reservation_unit = content["data"]["reservationUnits"]["edges"][0]["node"]
+        assert reservation_unit["nameFi"] == "test name fi"
+        assert reservation_unit["descriptionEn"] == "Lorem ipsum en"
 
     def test_filtering_by_reservation_unit_description_sv(self):
         response = self.query(
@@ -263,7 +284,10 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         content = json.loads(response.content)
         assert content.get("errors") is None
         assert not self.content_is_empty(content)
-        self.assertMatchSnapshot(content)
+
+        reservation_unit = content["data"]["reservationUnits"]["edges"][0]["node"]
+        assert reservation_unit["nameFi"] == "test name fi"
+        assert reservation_unit["descriptionSv"] == "Lorem ipsum sv"
 
     def test_filtering_by_space_name_fi(self):
         space = SpaceFactory(name="space name fi")
@@ -288,7 +312,10 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         content = json.loads(response.content)
         assert content.get("errors") is None
         assert not self.content_is_empty(content)
-        self.assertMatchSnapshot(content)
+
+        reservation_unit = content["data"]["reservationUnits"]["edges"][0]["node"]
+        assert reservation_unit["nameFi"] == "test name fi"
+        assert reservation_unit["spaces"][0]["nameFi"] == "space name fi"
 
         response = self.query(
             """
@@ -326,7 +353,10 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         content = json.loads(response.content)
         assert content.get("errors") is None
         assert not self.content_is_empty(content)
-        self.assertMatchSnapshot(content)
+
+        reservation_unit = content["data"]["reservationUnits"]["edges"][0]["node"]
+        assert reservation_unit["nameFi"] == "test name fi"
+        assert reservation_unit["spaces"][0]["nameEn"] == "space name en"
 
     def test_filtering_by_space_name_sv(self):
         space = SpaceFactory(name_sv="space name sv")
@@ -351,4 +381,7 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         content = json.loads(response.content)
         assert content.get("errors") is None
         assert not self.content_is_empty(content)
-        self.assertMatchSnapshot(content)
+
+        reservation_unit = content["data"]["reservationUnits"]["edges"][0]["node"]
+        assert reservation_unit["nameFi"] == "test name fi"
+        assert reservation_unit["spaces"][0]["nameSv"] == "space name sv"
