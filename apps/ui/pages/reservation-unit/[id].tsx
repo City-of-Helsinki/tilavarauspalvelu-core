@@ -15,6 +15,7 @@ import styled from "styled-components";
 import {
   addHours,
   addSeconds,
+  addYears,
   differenceInMinutes,
   startOfDay,
 } from "date-fns";
@@ -201,6 +202,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         .filter((n): n is NonNullable<typeof n> => n !== null)
         .find((edge) => edge.pk === genericTermsVariant.BOOKING) ?? null;
 
+    const endDate = addYears(today, 2);
     const { data: additionalData } = await apolloClient.query<
       Query,
       QueryReservationUnitByPkArgs &
@@ -212,9 +214,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       variables: {
         pk: id,
         startDate: toApiDate(today),
-        // endDate: lastOpeningPeriodEndDate,
+        endDate: toApiDate(endDate),
         from: toApiDate(today),
-        // to: lastOpeningPeriodEndDate,
+        to: toApiDate(endDate),
         state: allowedReservationStates,
         includeWithSameComponents: true,
       },

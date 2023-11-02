@@ -14,7 +14,7 @@ import {
   ReservationUnitsReservationUnitReservationStartIntervalChoices,
 } from "common/types/gql-types";
 import {
-    RoundPeriod,
+  type RoundPeriod,
   doBuffersCollide,
   doReservationsCollide,
   getIntervalMinutes,
