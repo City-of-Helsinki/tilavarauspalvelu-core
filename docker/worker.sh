@@ -1,5 +1,15 @@
 #!/bin/bash
 set -euo pipefail
 
-echo "Starting worker server..."
-exec celery -A tilavarauspalvelu worker --detach & celery -A tilavarauspalvelu beat -l info -S django
+echo "Starting Celery worker and Celery beat task scheduler..."
+exec celery \
+    -A tilavarauspalvelu \
+    worker \
+    --loglevel="${CELERY_LOG_LEVEL:-INFO}" \
+    --logfile=/broker/worker.log \
+    --detach \
+    & celery \
+    -A tilavarauspalvelu \
+    beat \
+    --loglevel="${CELERY_LOG_LEVEL:-INFO}" \
+    --scheduler=django
