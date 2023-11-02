@@ -32,6 +32,8 @@ env = environ.Env(
     CELERY_BROKER_URL=(str, "filesystem://"),
     CELERY_CACHE_BACKEND=(str, "django-cache"),
     CELERY_ENABLED=(bool, True),
+    CELERY_LOG_LEVEL=(str, "INFO"),
+    CELERY_LOG_FILE=(str, "./broker/worker.log"),
     CELERY_FILESYSTEM_BACKEND=(bool, True),
     CELERY_PROCESSED_FOLDER=(str, "./broker/processed/"),
     CELERY_QUEUE_FOLDER_IN=(str, "./broker/queue/"),
@@ -475,6 +477,8 @@ REST_FRAMEWORK = {
 # ----- Celery settings --------------------------------------------------------------------------------
 
 CELERY_ENABLED = env("CELERY_ENABLED")
+CELERY_LOG_LEVEL = env("CELERY_LOG_LEVEL")
+CELERY_LOG_FILE = env("CELERY_LOG_FILE")
 CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND")
 CELERY_CACHE_BACKEND = env("CELERY_CACHE_BACKEND")
 CELERY_TIMEZONE = env("CELERY_TIMEZONE")
