@@ -29,7 +29,6 @@ from services.models import Service
 from spaces.models import Space, Unit
 from terms_of_use.models import TermsOfUse
 from tilavarauspalvelu.utils.auditlog_util import AuditLogger
-from tilavarauspalvelu.utils.commons import WEEKDAYS
 
 Q = models.Q
 User = get_user_model()
@@ -883,90 +882,6 @@ class Qualifier(models.Model):
 
     def __str__(self) -> str:
         return self.name
-
-
-class Period(models.Model):
-    """
-    A period of time to express state of open or closed
-    Days that specifies the actual activity hours link here
-    """
-
-    LENGTH_WITHIN_DAY = "within_day"
-    LENGTH_WHOLE_DAY = "whole_day"
-    LENGTH_OVER_NIGHT = "over_night"
-    RESERVATION_LENGHT_TYPE_CHOICES = (
-        (LENGTH_WITHIN_DAY, _("within day")),
-        (LENGTH_WHOLE_DAY, _("whole day")),
-        (LENGTH_OVER_NIGHT, _("over night")),
-    )
-
-    reservation_length_type = models.CharField(
-        max_length=16,
-        choices=RESERVATION_LENGHT_TYPE_CHOICES,
-        verbose_name=_("Reservations length type"),
-        default=LENGTH_WITHIN_DAY,
-    )
-    reservation_unit = models.ForeignKey(
-        ReservationUnit,
-        verbose_name=_("Reservation unit"),
-        db_index=True,
-        null=True,
-        blank=True,
-        related_name="periods",
-        on_delete=models.CASCADE,
-    )
-
-    start = models.DateField(verbose_name=_("Start date"))
-    end = models.DateField(verbose_name=_("End date"))
-
-    name = models.CharField(max_length=200, verbose_name=_("Name"), blank=True, default="")
-    description = models.CharField(verbose_name=_("Description"), null=True, blank=True, max_length=500)
-    closed = models.BooleanField(verbose_name=_("Closed"), default=False, editable=False)
-
-    def __str__(self):
-        return f"{self.reservation_unit.name}({self.start} - {self.end})"
-
-
-class Day(models.Model):
-    """
-    Day of week and its active start and end time and whether it is open or closed
-
-    Kirjastot.fi API uses closed for both days and periods, don't know which takes precedence
-    """
-
-    period = models.ForeignKey(
-        Period,
-        verbose_name=_("Period"),
-        db_index=True,
-        related_name="days",
-        on_delete=models.CASCADE,
-    )
-    weekday = models.IntegerField(verbose_name=_("Weekday"), choices=WEEKDAYS.CHOICES)
-    opens = models.TimeField(verbose_name=_("Time when opens"), null=True, blank=True)
-    closes = models.TimeField(verbose_name=_("Time when closes"), null=True, blank=True)
-
-    def __str__(self):
-        return f"{self.get_weekday_display()}({self.period.reservation_unit.name})"
-
-
-class DayPart(models.Model):
-    ALLOWED_EVERYONE = "allowed_everyone"
-    ALLOWED_PUBLIC = "allowed_public"
-    ALLOWED_STAFF = "allowed_staff"
-
-    ALLOWED_GROUP_CHOICES = (
-        (ALLOWED_EVERYONE, _("Everyone allowed")),
-        (ALLOWED_PUBLIC, _("Public allowed")),
-        (ALLOWED_STAFF, _("Staff allowed")),
-    )
-
-    allowed_group = models.CharField(max_length=255, choices=ALLOWED_GROUP_CHOICES)
-    begin = models.TimeField(verbose_name=_("Begin time of day part"), null=True, blank=True)
-    end = models.TimeField(verbose_name=_("End time of day part"), null=True, blank=True)
-    day = models.ForeignKey(Day, verbose_name=_("Day"), on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f"{self.day.period.reservation_unit.name} {self.day.get_weekday_display()} ({self.begin}-{self.end})"
 
 
 class Introduction(models.Model):

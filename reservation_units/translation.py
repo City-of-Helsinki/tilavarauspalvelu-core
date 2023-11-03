@@ -6,7 +6,6 @@ from reservation_units.models import (
     Keyword,
     KeywordCategory,
     KeywordGroup,
-    Period,
     Purpose,
     Qualifier,
     ReservationUnit,
@@ -73,7 +72,6 @@ translator.register(KeywordGroup, KeywordGroupTranslationOptions)
 translator.register(Keyword, KeywordTranslationOptions)
 translator.register(Purpose, PurposeTranslationOptions)
 translator.register(Qualifier, QualifierTranslationOptions)
-translator.register(Period, PeriodTranslationOptions)
 translator.register(Equipment, EquipmentTranslationOptions)
 translator.register(EquipmentCategory, EquipmentCategoryTranslationOptions)
 translator.register(ReservationUnitCancellationRule, ReservationUnitCancellationRuleTranslationOptions)
