@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, TypeAlias, Union
+from typing import TYPE_CHECKING, Union
 
 from django.contrib.auth.models import AnonymousUser
 from django.core.handlers.wsgi import WSGIRequest
@@ -12,7 +12,7 @@ __all__ = [
     "GQLInfo",
 ]
 
-AnyUser: TypeAlias = Union["User", AnonymousUser]
+type AnyUser = Union["User", AnonymousUser]  # noqa: UP007
 
 
 class UserHintedWSGIRequest(WSGIRequest):
