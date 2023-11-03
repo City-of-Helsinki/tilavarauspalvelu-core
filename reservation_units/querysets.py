@@ -1,7 +1,7 @@
 from collections.abc import Iterable
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
-from typing import TYPE_CHECKING, Self, TypeAlias
+from typing import TYPE_CHECKING, Self
 
 from django.db import models
 from django.db.models import Case, Prefetch, Q, Value, When
@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     from reservation_units.models import ReservationUnit
 
 
-ReservationUnitPK: TypeAlias = int
+type ReservationUnitPK = int
 
 
 class ReservationUnitQuerySet(SearchResultsQuerySet):
