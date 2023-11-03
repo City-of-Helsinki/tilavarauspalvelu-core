@@ -13,7 +13,6 @@ export const BirthDate = ({
   hideLabel,
   showLabel,
 }: Props): JSX.Element => {
-  // default to hidden
   const [visible, setVisible] = useState(false);
 
   return (

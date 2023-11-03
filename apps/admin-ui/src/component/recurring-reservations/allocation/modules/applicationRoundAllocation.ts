@@ -243,6 +243,17 @@ export const getTimeSlots = (
     const { day } = cur;
     const [startHours, startMinutes] = cur.begin.split(":").map(Number);
     const [endHours, endMinutes] = cur.end.split(":").map(Number);
+    if (startHours > endHours) {
+      return acc;
+    }
+    if (startHours === endHours && startMinutes >= endMinutes) {
+      return acc;
+    }
+    if (Number.isNaN(startHours) || Number.isNaN(endHours)) {
+      return acc;
+    }
+    // No NaN check for minutes because of equality checks
+
     const timeSlots: string[] = [];
     for (let i = startHours; i <= endHours; i += 1) {
       timeSlots.push(`${day}-${i}-00`);

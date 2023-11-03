@@ -404,9 +404,7 @@ const NotificationForm = ({
       messageSv: data.messageSv,
       target: convertTarget(data.targetGroup),
       level: convertLevel(data.level),
-      // TODO check that this works both with create and update mutation (type wise it's ok)
       pk: data.pk,
-      // ...(data.pk !== 0 && { pk: data.pk }),
     };
     const mutationFn = data.pk === 0 ? createMutation : updateMutation;
     try {
