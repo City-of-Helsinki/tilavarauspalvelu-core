@@ -256,7 +256,6 @@ export const getAddressAlt = (ru: ReservationUnitType): string | null => {
 };
 
 export const applicationUrl = (id: number): string => `/application/${id}`;
-export const resolutionUrl = (id: number): string => `/applications/${id}`;
 
 export const applicationErrorText = (
   t: TFunction,

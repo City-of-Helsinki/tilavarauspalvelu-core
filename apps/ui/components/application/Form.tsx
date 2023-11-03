@@ -9,7 +9,7 @@ import {
 } from "common/types/gql-types";
 import { type Maybe } from "graphql/jsutils/Maybe";
 import { z } from "zod";
-import { apiDateToUIDate } from "@/modules/util";
+import { apiDateToUIDate, fromUIDate } from "@/modules/util";
 
 // NOTE the zod schemas have a lot of undefineds because the form is split into four pages
 // so you can't trust some of the zod validation (e.g. mandatory fields)
@@ -28,34 +28,41 @@ export type ApplicationEventScheduleFormType = z.infer<
   typeof ApplicationEventScheduleFormTypeSchema
 >;
 
-const ApplicationEventFormValueSchema = z.object({
-  pk: z.number().optional(),
-  name: z.string().min(1),
-  numPersons: z
-    .number()
-    .min(1)
-    .refine((s) => s, { path: [""], message: "Required" }),
-  ageGroup: z.number().refine((s) => s, { path: [""], message: "Required" }),
-  abilityGroup: z.number().optional(),
-  purpose: z.number().refine((s) => s, { path: [""], message: "Required" }),
-  // TODO refinements: min < max, min > 0, max > 0 (currently max duration is not required before sending)
-  minDuration: z.number().min(1),
-  maxDuration: z.number().min(1),
-  eventsPerWeek: z.number().min(1),
-  biweekly: z.boolean(),
-  begin: z
-    .string()
-    .optional()
-    .refine((s) => s, { path: [""], message: "Required" }),
-  end: z
-    .string()
-    .optional()
-    .refine((s) => s, { path: [""], message: "Required" }),
-  applicationEventSchedules: z.array(ApplicationEventScheduleFormTypeSchema),
-  reservationUnits: z.array(z.number()).min(1),
-  // extra page prop, not saved to backend
-  accordianOpen: z.boolean(),
-});
+const ApplicationEventFormValueSchema = z
+  .object({
+    pk: z.number().optional(),
+    name: z.string().min(1, { message: "Required" }),
+    numPersons: z.number().min(1),
+    ageGroup: z.number().refine((s) => s, { path: [""], message: "Required" }),
+    abilityGroup: z.number().optional(),
+    purpose: z.number().refine((s) => s, { path: [""], message: "Required" }),
+    minDuration: z.number().min(1, { message: "Required" }),
+    maxDuration: z.number().min(1, { message: "Required" }),
+    eventsPerWeek: z.number().min(1),
+    biweekly: z.boolean(),
+    begin: z
+      .string()
+      .optional()
+      .refine((s) => s, { path: [""], message: "Required" }),
+    end: z
+      .string()
+      .optional()
+      .refine((s) => s, { path: [""], message: "Required" }),
+    applicationEventSchedules: z.array(ApplicationEventScheduleFormTypeSchema),
+    reservationUnits: z.array(z.number()).min(1, { message: "Required" }),
+    // extra page prop, not saved to backend
+    accordianOpen: z.boolean(),
+    // form specific: new events don't have pks and we need a unique identifier
+    formKey: z.string(),
+  })
+  .refine((s) => s.maxDuration >= s.minDuration, {
+    path: ["maxDuration"],
+    message: "Maximum duration must be greater than minimum duration",
+  })
+  .refine((s) => s.begin && s.end && fromUIDate(s.begin) < fromUIDate(s.end), {
+    path: ["end"],
+    message: "End date must be after begin date",
+  });
 
 export type ApplicationEventFormValue = z.infer<
   typeof ApplicationEventFormValueSchema
@@ -65,6 +72,7 @@ export const transformApplicationEventToForm = (
   applicationEvent: ApplicationEventNode
 ): ApplicationEventFormValue => ({
   pk: applicationEvent.pk ?? undefined,
+  formKey: applicationEvent.pk ? `event-${applicationEvent.pk}` : "event-NEW",
   name: applicationEvent.name,
   numPersons: applicationEvent.numPersons ?? 0,
   ageGroup: applicationEvent.ageGroup?.pk ?? 0,
@@ -191,6 +199,9 @@ export const ApplicationFormSchema = z.object({
     .optional(),
 });
 
+// TODO refine the form (different applicant types require different fields)
+// if applicantType === Organisation | Company => organisation.identifier is required
+// if hasBillingAddress | applicantType === Individual => billingAddress is required
 export const ApplicationFormPage3Schema = z.object({
   pk: z.number(),
   applicantType: ApplicantTypeSchema,
@@ -202,28 +213,8 @@ export const ApplicationFormPage3Schema = z.object({
   additionalInformation: z.string().optional(),
   homeCity: z.number().optional(),
 });
-/* TODOnot using the zod validation in this form
- * .refine((v) => ((v.applicantType === Applicant_Type.Company || v.applicantType === Applicant_Type.Association || v.applicantType === Applicant_Type.Community) && v.organisation != null), {
-    path: ["organisation"],
-    message: "Required"
-}).refine((v) => v.applicantType === Applicant_Type.Individual && v.contactPerson != null, {
-    path: ["contactPerson"],
-    message: "Required"
-}).refine((v) => (v.hasBillingAddress && v.billingAddress != null), {
-    path: ["billingAddress"],
-    message: "Required"
-}).refine((v) => (v.applicantType === Applicant_Type.Individual && v.billingAddress != null), {
-    path: ["billingAddress.streetAddress"],
-    message: "Required"
-})
-*/
 export type ApplicationFormPage3Values = z.infer<
   typeof ApplicationFormPage3Schema
 >;
-
-// TODO refine
-// if applicantType === Organisation | Company => organisation.identifier is required
-// if hasBillingAddress | applicantType === Individual => billingAddress is required
-export const ApplicationFormSchemaRefined = ApplicationFormSchema;
 
 export type ApplicationFormValues = z.infer<typeof ApplicationFormSchema>;

@@ -137,6 +137,7 @@ const convertApplicationToForm = (
   const defaultAes: typeof formAes[0] = {
     pk: undefined,
     name: "",
+    formKey: "event-NEW",
     numPersons: 0,
     abilityGroup: undefined,
     ageGroup: 0,
@@ -217,18 +218,27 @@ const ApplicationRootPage = ({
 
   useEffect(() => {
     if (application != null) {
-      reset(convertApplicationToForm(application, selectedReservationUnits));
+      const unitsInApplicationRound =
+        applicationRound?.reservationUnits?.map((ru) => ru.pk) ?? [];
+      const resUnits = selectedReservationUnits.filter(
+        (ru) => ru?.pk != null && unitsInApplicationRound.includes(ru.pk)
+      );
+      reset(convertApplicationToForm(application, resUnits));
     }
-  }, [application, reset, selectedReservationUnits]);
+  }, [
+    application,
+    applicationRound?.reservationUnits,
+    reset,
+    selectedReservationUnits,
+  ]);
 
   const applicationRoundName =
     applicationRound != null ? getTranslation(applicationRound, "name") : "-";
 
-  // TODO transalate error
   return (
     <FormProvider {...form}>
-      {error && <ErrorToast error={error != null ? "ApolloError" : ""} />}
-      {pageId === "page1" && (
+      {error && <ErrorToast error="ApolloError" />}
+      {pageId === "page1" ? (
         <ApplicationPageWrapper
           overrideText={applicationRoundName}
           translationKeyPrefix="application:Page1"
@@ -240,8 +250,7 @@ const ApplicationRootPage = ({
             onNext={saveAndNavigate("page2")}
           />
         </ApplicationPageWrapper>
-      )}
-      {pageId === "page2" && (
+      ) : pageId === "page2" ? (
         <ApplicationPageWrapper
           translationKeyPrefix="application:Page2"
           application={application}
@@ -249,6 +258,8 @@ const ApplicationRootPage = ({
         >
           <Page2 application={application} onNext={saveAndNavigate("page3")} />
         </ApplicationPageWrapper>
+      ) : (
+        <Error statusCode={404} />
       )}
     </FormProvider>
   );

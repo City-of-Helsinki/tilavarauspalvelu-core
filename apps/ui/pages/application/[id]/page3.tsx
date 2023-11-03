@@ -70,29 +70,6 @@ const transformOrganisation = (org?: OrganisationFormValues) => {
   };
 };
 
-/// TODO this isn't validated when saving
-/// make a separate schema for it? and maybe even a separate form?
-const Page3 = (): JSX.Element | null => {
-  const { options } = useOptions();
-  const { cityOptions } = options;
-
-  const { watch } = useFormContext<ApplicationFormPage3Values>();
-
-  const type = watch("applicantType");
-
-  switch (type) {
-    case Applicant_Type.Individual:
-      return <IndividualForm />;
-    case Applicant_Type.Community:
-    case Applicant_Type.Association:
-      return <OrganisationForm homeCityOptions={cityOptions} />;
-    case Applicant_Type.Company:
-      return <CompanyForm />;
-    default:
-      return null;
-  }
-};
-
 const convertApplicationToForm = (
   app?: Maybe<ApplicationNode>
 ): ApplicationFormPage3Values => {
@@ -111,7 +88,6 @@ const convertApplicationToForm = (
   };
 };
 
-// TODO test all variations (individual / organisation / company)
 const transformApplication = (
   values: ApplicationFormPage3Values
 ): ApplicationUpdateMutationInput => {
@@ -136,6 +112,27 @@ const transformApplication = (
       ? { homeCity: values.homeCity }
       : {}),
   };
+};
+
+const Page3 = (): JSX.Element | null => {
+  const { options } = useOptions();
+  const { cityOptions } = options;
+
+  const { watch } = useFormContext<ApplicationFormPage3Values>();
+
+  const type = watch("applicantType");
+
+  switch (type) {
+    case Applicant_Type.Individual:
+      return <IndividualForm />;
+    case Applicant_Type.Community:
+    case Applicant_Type.Association:
+      return <OrganisationForm homeCityOptions={cityOptions} />;
+    case Applicant_Type.Company:
+      return <CompanyForm />;
+    default:
+      return null;
+  }
 };
 
 const Page3Wrapped = (props: { id: number | null }): JSX.Element | null => {

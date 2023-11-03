@@ -15,11 +15,18 @@
     "endBeforeBegin": "Season end date is earlier than start date",
     "endBeforePeriodBegin": "Season end date is too early",
     "missingSchedule": "Add at least one time slot for all season bookings",
-    "reservationUnitTooSmall": "This space is too small for group",
     "otherEventsHaveErrors": "Fix incorrectly filled fields",
     "noReservationUnits": "Add one or more spaces to the application",
     "noEvents": "Add one or more seasonal bookings to the application",
     "maxLength": "Maximum length: {{count}}"
+  },
+  "validation": {
+    "Required": "Required",
+    "End date must be after begin date": "End date must be after begin date",
+    "Expected number, received nan": "Has to be a number",
+    "Number must be greater than or equal to 1": "Has to be at least 1",
+    "Maximum duration must be greater than minimum duration": "Maximum duration must be greater than minimum duration",
+    "reservationUnitTooSmall": "This space is too small for group"
   },
   "Intro": {
     "startNewApplication": "Apply",

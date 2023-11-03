@@ -15,11 +15,18 @@
     "endBeforeBegin": "Säsongsavslutning är tidigare än startdagen",
     "endBeforePeriodBegin": "Säsongsavslutning är för tidigt",
     "missingSchedule": "Ange åtminstone en tid för alla säsongbokningar",
-    "reservationUnitTooSmall": "Lokalen är för liten för gruppens användning",
     "otherEventsHaveErrors": "Korrigera felaktigt ifyllda fält",
     "noReservationUnits": "Lägg till en eller flera lokaler till ansökningen",
     "noEvents": "Lägg till en eller flera säsongbokningar till ansökningen",
     "maxLength": "Maximalt antal tecken: {{count}}"
+  },
+  "validation": {
+    "Required": "Obligatorisk",
+    "End date must be after begin date": "Slutdatum måste vara efter startdatum",
+    "Expected number, received nan": "Felaktigt nummer",
+    "Number must be greater than or equal to 1": "Numret måste vara större än eller lika med 1",
+    "Maximum duration must be greater than minimum duration": "Maximala varaktigheten måste vara större än den minsta varaktigheten",
+    "reservationUnitTooSmall": "Lokalen är för liten för gruppens användning"
   },
   "Intro": {
     "startNewApplication": "Fyll i ansökan",

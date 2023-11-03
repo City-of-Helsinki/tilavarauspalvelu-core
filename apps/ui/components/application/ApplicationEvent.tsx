@@ -13,7 +13,6 @@ import { CheckboxWrapper } from "common/src/reservation-form/components";
 import { ReservationUnitList } from "./ReservationUnitList";
 import {
   apiDateToUIDate,
-  applicationErrorText,
   formatApiDate,
   formatDate,
   uiDateToApiDate,
@@ -21,7 +20,6 @@ import {
 import { ApplicationEventSummary } from "./ApplicationEventSummary";
 import Accordion from "../common/Accordion";
 import { getDurationNumberOptions } from "@/modules/const";
-import { after, before } from "@/modules/validation";
 import ConfirmationModal, { ModalRef } from "../common/ConfirmationModal";
 import { MediumButton } from "@/styles/util";
 import { ApplicationFormValues } from "./Form";
@@ -118,9 +116,13 @@ const ApplicationEventInner = ({
   const { t, i18n } = useTranslation();
   const form = useFormContext<ApplicationFormValues>();
   const {
+    control,
     register,
     formState: { errors },
+    getValues,
     setValue,
+    clearErrors,
+    trigger,
     watch,
   } = form;
 
@@ -137,9 +139,9 @@ const ApplicationEventInner = ({
     unitOptions,
   } = optionTypes;
 
-  const applicationPeriodBegin = form.watch(`applicationEvents.${index}.begin`);
-  const applicationPeriodEnd = form.watch(`applicationEvents.${index}.end`);
-  const numPersons = form.watch(`applicationEvents.${index}.numPersons`);
+  const applicationPeriodBegin = watch(`applicationEvents.${index}.begin`);
+  const applicationPeriodEnd = watch(`applicationEvents.${index}.end`);
+  const numPersons = watch(`applicationEvents.${index}.numPersons`);
   const modalRef = useRef<ModalRef>();
 
   const selectDefaultPeriod = (): void => {
@@ -154,6 +156,27 @@ const ApplicationEventInner = ({
     applicationPeriodBegin != null &&
     uiDateToApiDate(applicationPeriodBegin) === periodStartDate &&
     uiDateToApiDate(applicationPeriodEnd) === periodEndDate;
+
+  type FieldName =
+    | "begin"
+    | "end"
+    | "purpose"
+    | "ageGroup"
+    | "numPersons"
+    | "abilityGroup"
+    | "minDuration"
+    | "maxDuration"
+    | "name"
+    | "eventsPerWeek"
+    | "applicationEventSchedules"
+    | "reservationUnits";
+  const getTranslatedError = (field: FieldName): string => {
+    const error = errors.applicationEvents?.[index]?.[field];
+    if (error?.message != null) {
+      return t(`application:validation.${error.message}`);
+    }
+    return "";
+  };
 
   return (
     <>
@@ -170,12 +193,8 @@ const ApplicationEventInner = ({
             label={t("application:Page1.name")}
             id={`applicationEvents.${index}.name`}
             required
-            invalid={!!errors.applicationEvents?.[index]?.name?.type}
-            errorText={applicationErrorText(
-              t,
-              errors.applicationEvents?.[index]?.name?.type,
-              { count: 255 }
-            )}
+            invalid={errors.applicationEvents?.[index]?.name != null}
+            errorText={getTranslatedError("name")}
           />
         </div>
         <div>
@@ -195,15 +214,12 @@ const ApplicationEventInner = ({
             minusStepButtonAriaLabel={t("common:subtract")}
             plusStepButtonAriaLabel={t("common:add")}
             step={1}
-            errorText={applicationErrorText(
-              t,
-              errors.applicationEvents?.[index]?.numPersons?.type
-            )}
-            invalid={!!errors.applicationEvents?.[index]?.numPersons?.type}
+            invalid={errors.applicationEvents?.[index]?.numPersons != null}
+            errorText={getTranslatedError("numPersons")}
           />
         </div>
         <Controller
-          control={form.control}
+          control={control}
           rules={{ required: true }}
           name={`applicationEvents.${index}.ageGroup`}
           render={({ field }) => (
@@ -213,15 +229,13 @@ const ApplicationEventInner = ({
               required
               label={t("application:Page1.ageGroup")}
               options={ageGroupOptions}
-              error={applicationErrorText(
-                t,
-                errors.applicationEvents?.[index]?.ageGroup?.type
-              )}
+              invalid={errors.applicationEvents?.[index]?.ageGroup != null}
+              error={getTranslatedError("ageGroup")}
             />
           )}
         />
         <Controller
-          control={form.control}
+          control={control}
           rules={{ required: true }}
           name={`applicationEvents.${index}.purpose`}
           render={({ field }) => (
@@ -231,10 +245,8 @@ const ApplicationEventInner = ({
               onChange={(v: OptionType) => field.onChange(v.value)}
               required
               options={purposeOptions}
-              error={applicationErrorText(
-                t,
-                errors.applicationEvents?.[index]?.purpose?.type
-              )}
+              invalid={errors.applicationEvents?.[index]?.purpose != null}
+              error={getTranslatedError("purpose")}
             />
           )}
         />
@@ -262,7 +274,7 @@ const ApplicationEventInner = ({
             applicationRound.reservationPeriodBegin
           )} - ${formatDate(applicationRound.reservationPeriodEnd)}`}
           onChange={() => {
-            form.clearErrors([
+            clearErrors([
               `applicationEvents.${index}.begin`,
               `applicationEvents.${index}.end`,
             ]);
@@ -275,132 +287,55 @@ const ApplicationEventInner = ({
         <DateInput
           disableConfirmation
           language={i18n.language as LocalizationLanguages}
-          {...register(`applicationEvents.${index}.begin`, {
-            validate: {
-              required: (val) => Boolean(val),
-              beginAfterEnd: (val) => {
-                const end = form.getValues().applicationEvents?.[index]?.end;
-                return (
-                  end != null &&
-                  val != null &&
-                  !after(uiDateToApiDate(end), uiDateToApiDate(val))
-                );
-              },
-              beginBeforePeriodBegin: (val) =>
-                val != null &&
-                !before(
-                  applicationRound.reservationPeriodBegin,
-                  uiDateToApiDate(val)
-                ),
-              beginAfterPeriodEnd: (val) =>
-                val != null &&
-                !after(
-                  applicationRound.reservationPeriodEnd,
-                  uiDateToApiDate(val)
-                ),
-            },
-          })}
+          {...register(`applicationEvents.${index}.begin`)}
           onChange={(v) => {
-            form.clearErrors([
+            clearErrors([
               `applicationEvents.${index}.begin`,
               `applicationEvents.${index}.end`,
             ]);
-            form.setValue(`applicationEvents.${index}.begin`, v);
-            form.trigger([
+            setValue(`applicationEvents.${index}.begin`, v);
+            trigger([
               `applicationEvents.${index}.begin`,
               `applicationEvents.${index}.end`,
             ]);
           }}
           label={t("application:Page1.periodStartDate")}
           id={`applicationEvents.${index}.begin`}
-          value={
-            form.getValues(`applicationEvents.${index}.begin`) ?? undefined
-          }
+          value={getValues(`applicationEvents.${index}.begin`)}
           required
           minDate={new Date(applicationRound.reservationPeriodBegin)}
           maxDate={new Date(applicationRound.reservationPeriodEnd)}
-          invalid={!!errors?.applicationEvents?.[index]?.begin?.type}
-          errorText={applicationErrorText(
-            t,
-            errors?.applicationEvents?.[index]?.begin?.type
-          )}
+          invalid={errors?.applicationEvents?.[index]?.begin != null}
+          errorText={getTranslatedError("begin")}
         />
         <DateInput
-          {...register(`applicationEvents.${index}.end`, {
-            validate: {
-              required: (val) => {
-                return Boolean(val);
-              },
-              endBeforeBegin: (val) => {
-                const begin = form.getValues(
-                  `applicationEvents.${index}.begin`
-                );
-                return (
-                  begin != null &&
-                  val != null &&
-                  !before(uiDateToApiDate(begin), uiDateToApiDate(val))
-                );
-              },
-              endBeforePeriodBegin: (val) =>
-                val != null &&
-                !before(
-                  applicationRound.reservationPeriodBegin,
-                  uiDateToApiDate(val)
-                ),
-              endAfterPeriodEnd: (val) =>
-                val != null &&
-                !after(
-                  applicationRound.reservationPeriodEnd,
-                  uiDateToApiDate(val)
-                ),
-            },
-          })}
+          {...register(`applicationEvents.${index}.end`)}
           disableConfirmation
           language={i18n.language as LocalizationLanguages}
           onChange={(v) => {
-            form.clearErrors([
+            clearErrors([
               `applicationEvents.${index}.begin`,
               `applicationEvents.${index}.end`,
             ]);
-            form.setValue(`applicationEvents.${index}.end`, v);
-            form.trigger([
+            setValue(`applicationEvents.${index}.end`, v);
+            trigger([
               `applicationEvents.${index}.begin`,
               `applicationEvents.${index}.end`,
             ]);
           }}
-          value={form.getValues(`applicationEvents.${index}.end`) ?? undefined}
+          value={getValues(`applicationEvents.${index}.end`)}
           label={t("application:Page1.periodEndDate")}
           id={`applicationEvents.${index}.end`}
           required
           minDate={new Date(applicationRound.reservationPeriodBegin)}
           maxDate={new Date(applicationRound.reservationPeriodEnd)}
-          // @ts-expect-error: TODO refactor
-          invalid={errors.applicationEvents?.[index]?.end?.type}
-          errorText={applicationErrorText(
-            t,
-            errors.applicationEvents?.[index]?.end?.type
-          )}
+          invalid={errors.applicationEvents?.[index]?.end != null}
+          errorText={getTranslatedError("end")}
         />
         <Controller
-          control={form.control}
+          control={control}
           name={`applicationEvents.${index}.minDuration`}
-          rules={{
-            required: true,
-            validate: {
-              /* FIXME
-            required: (val: string) => {
-              form.clearErrors([
-                `applicationEvents.${index}.minDuration`,
-                `applicationEvents.${index}.maxDuration`,
-              ]);
-              return val !== "00:00:00";
-            },
-            minDurationBiggerThanMaxDuration: (val: string) =>
-              apiDurationToMinutes(val) <= form.getValues(`applicationEvents.${index}.maxDuration`)
-              ),
-            */
-            },
-          }}
+          rules={{ required: true }}
           render={({ field }) => (
             <Select
               id={field.name}
@@ -416,40 +351,15 @@ const ApplicationEventInner = ({
               onChange={(selection: OptionType): void => {
                 field.onChange(selection.value);
               }}
-              invalid={
-                errors.applicationEvents?.[index]?.minDuration?.type != null
-              }
-              error={applicationErrorText(
-                t,
-                errors.applicationEvents?.[index]?.minDuration?.type
-              )}
+              invalid={errors.applicationEvents?.[index]?.minDuration != null}
+              error={getTranslatedError("minDuration")}
             />
           )}
         />
         <Controller
-          control={form.control}
+          control={control}
           name={`applicationEvents.${index}.maxDuration`}
-          rules={{
-            required: true,
-            validate: {
-              /* FIXME
-            required: (val: string) => {
-              form.clearErrors([
-                `applicationEvents.${index}.minDuration`,
-                `applicationEvents.${index}.maxDuration`,
-              ]);
-              return val !== "00:00:00";
-            },
-            maxDurationSmallerThanMinDuration: (val: string) =>
-              apiDurationToMinutes(val) >=
-              apiDurationToMinutes(
-                form.getValues().applicationEvents?.[index]
-                  ?.minDuration ?? "00:00:00"
-              ),
-            }
-            */
-            },
-          }}
+          rules={{ required: true }}
           render={({ field }) => (
             <Select
               id={field.name}
@@ -465,13 +375,8 @@ const ApplicationEventInner = ({
               onChange={(selection: OptionType): void => {
                 field.onChange(selection.value);
               }}
-              invalid={
-                errors.applicationEvents?.[index]?.minDuration?.type != null
-              }
-              error={applicationErrorText(
-                t,
-                errors.applicationEvents?.[index]?.maxDuration?.type
-              )}
+              invalid={errors.applicationEvents?.[index]?.maxDuration != null}
+              error={getTranslatedError("maxDuration")}
             />
           )}
         />
@@ -479,9 +384,6 @@ const ApplicationEventInner = ({
           id={`applicationEvents.${index}.eventsPerWeek`}
           required
           {...register(`applicationEvents.${index}.eventsPerWeek`, {
-            validate: {
-              eventsPerWeekMin: (val) => Number(val) > 0,
-            },
             valueAsNumber: true,
           })}
           label={t("application:Page1.eventsPerWeek")}
@@ -490,14 +392,11 @@ const ApplicationEventInner = ({
           minusStepButtonAriaLabel={t("common:subtract")}
           plusStepButtonAriaLabel={t("common:add")}
           step={1}
-          invalid={!!errors.applicationEvents?.[index]?.eventsPerWeek?.type}
-          errorText={applicationErrorText(
-            t,
-            errors.applicationEvents?.[index]?.eventsPerWeek?.type
-          )}
+          invalid={errors.applicationEvents?.[index]?.eventsPerWeek != null}
+          errorText={getTranslatedError("eventsPerWeek")}
         />
         <Controller
-          control={form.control}
+          control={control}
           name={`applicationEvents.${index}.biweekly`}
           render={({ field }) => {
             return (
@@ -507,7 +406,7 @@ const ApplicationEventInner = ({
         />
       </PeriodContainer>
       <ApplicationEventSummary
-        applicationEvent={form.getValues(`applicationEvents.${index}`)}
+        applicationEvent={getValues(`applicationEvents.${index}`)}
         name={watch(`applicationEvents.${index}.name`) ?? ""}
       />
       <ActionContainer>
@@ -521,16 +420,6 @@ const ApplicationEventInner = ({
         >
           {t("application:Page1.deleteEvent")}
         </Button>
-        {/*
-        <Button
-          type="submit"
-          id={`applicationEvents[${index}].save`}
-          disabled={!saveEnabled}
-          onClick={onSave}
-        >
-          {t("application:Page1.saveEvent")}
-        </Button>
-        */}
         <ConfirmationModal
           id="application-event-confirmation"
           okLabel="application:Page1.deleteEvent"
@@ -552,20 +441,13 @@ const ApplicationEvent = (props: Props): JSX.Element => {
   const { t } = useTranslation();
 
   const form = useFormContext<ApplicationFormValues>();
-  const { watch, getValues } = form;
+  const { watch } = form;
 
   const eventName = watch(`applicationEvents.${index}.name`);
   watch(`applicationEvents.${index}.eventsPerWeek`);
   watch(`applicationEvents.${index}.biweekly`);
 
-  // TODO for some reason there is an applicationEvent with all fields undefined on the first render
-  // this might be because we register the fields and their values are reset in the parent
-  // it might also be because form values are async
-  // (the values are not available on the first render because the query is still in progress)
-  // but why is there a single element in the array then (should be empty)?
-  // TODO can this be removed? i.e. first render logic changed so we don't need it?
-  const shouldRenderInner =
-    isVisible && getValues(`applicationEvents.${index}`)?.name != null;
+  const shouldRenderInner = isVisible;
 
   return (
     <Wrapper>
@@ -580,17 +462,6 @@ const ApplicationEvent = (props: Props): JSX.Element => {
           <ApplicationEventInner {...props} del={onDeleteEvent} />
         )}
       </Accordion>
-      {/* FIXME this is wrong place for this
-        applicationEventSaved ? (
-        <Notification
-          size="small"
-          type="success"
-          label={t("application:applicationEventSaved")}
-          autoClose
-        >
-          {t("application:applicationEventSaved")}
-        </Notification>
-      ) : null */}
     </Wrapper>
   );
 };

@@ -77,13 +77,15 @@ const ApplicationEventSummary = ({
     return null;
   }
 
-  const { begin } = applicationEvent;
-  const { end } = applicationEvent;
-  const { biweekly } = applicationEvent;
-  const { eventsPerWeek } = applicationEvent;
-  const { minDuration } = applicationEvent;
-  const { maxDuration } = applicationEvent;
-  const { numPersons } = applicationEvent;
+  const {
+    begin,
+    end,
+    biweekly,
+    eventsPerWeek,
+    minDuration,
+    maxDuration,
+    numPersons,
+  } = applicationEvent;
   const hours = numHours(begin, end, biweekly, eventsPerWeek, minDuration / 60);
 
   if (!begin || !end || !minDuration) {

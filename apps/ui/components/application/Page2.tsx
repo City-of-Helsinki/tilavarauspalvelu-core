@@ -252,8 +252,6 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
     setSelectorData(updated);
   };
 
-  // FIXME this is broken -- creates a completely new array that doesn't actually exist instead of updating the existing one
-  // these should of course never change the length of the array
   const copyCells = (index: number) => {
     const updated = [...selectorData];
     const srcCells = updated[index];
@@ -267,7 +265,6 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
         }
       });
     });
-    selectorData.forEach(() => updated.push([...selectorData[index]]));
     setSelectorData(updated);
     setErrorMsg("");
     setSuccessMsg(t("application:Page2.notification.copyCells"));

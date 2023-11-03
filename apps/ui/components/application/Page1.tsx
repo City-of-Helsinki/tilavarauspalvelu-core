@@ -39,64 +39,29 @@ const Page1 = ({ applicationRound, onNext }: Props): JSX.Element | null => {
         pk: u.pk ?? 0,
         name: getTranslation(u, "name"),
       })) ?? [];
-  // TODO does this work? mapOptions wasn't working in useOptions at least (old REST things)
+
   const unitOptions = mapOptions(units);
 
   const { options } = useOptions();
 
   const form = useFormContext<ApplicationFormValues>();
-  const { getValues, setValue, register, unregister, watch, handleSubmit } =
-    form;
+  const { setValue, register, unregister, watch, handleSubmit } = form;
   // get the user selected defaults for reservationUnits field
   const { reservationUnits: selectedReservationUnits } =
     useReservationUnitsList();
 
-  /*
-  const onDeleteEvent = async (eventId: number | undefined, index: number) => {
-    trigger();
-
-    // FIXME where to do this check? when submitting the form or in validation schema?
-    const validationErrors = [];
-    if (errors?.applicationEvents?.length != null) {
-      for (let i = 0; i < errors.applicationEvents.length; i += 1) {
-        if (i in errors.applicationEvents) {
-          validationErrors.push(i);
-        }
-      }
-    }
-
-    const otherEventsAreValid =
-      validationErrors.filter((i) => i !== index).length === 0;
-
-    if (otherEventsAreValid) {
-      const appToSave = getValues();
-      // TODO what is this magic and why?
-      appToSave.applicationEvents = appToSave.applicationEvents.filter(
-        (ae) => ae.pk !== eventId
-      );
-      save({ application: appToSave, eventId: -1 });
-    } else {
-      // has some validation errors that needs to be fixed before event can be removed
-      setError(t("application:error.otherEventsHaveErrors"));
-    }
-  };
-  */
   const applicationEvents = watch("applicationEvents");
 
-  const isAccordianOpen = (applicationEventId: number | undefined) => {
-    const index = applicationEvents?.findIndex(
-      (ae) => ae?.pk === applicationEventId
-    );
+  const isAccordianOpen = (formKey: string) => {
+    const index = applicationEvents?.findIndex((ae) => ae?.formKey === formKey);
     if (index == null) {
       return false;
     }
     return watch(`applicationEvents.${index}.accordianOpen`);
   };
 
-  const handleToggleAccordion = (applicationEventId: number | undefined) => {
-    const index = applicationEvents?.findIndex(
-      (ae) => ae?.pk === applicationEventId
-    );
+  const handleToggleAccordion = (formKey: string) => {
+    const index = applicationEvents?.findIndex((ae) => ae?.formKey === formKey);
     if (index == null) {
       return;
     }
@@ -104,13 +69,12 @@ const Page1 = ({ applicationRound, onNext }: Props): JSX.Element | null => {
     setValue(`applicationEvents.${index}.accordianOpen`, !val);
   };
 
-  const handleDeleteEvent = (index: number) => {
-    const pk = getValues(`applicationEvents.${index}.pk`);
-    if (pk) {
-      unregister(`applicationEvents.${index}`);
-    } else {
-      unregister(`applicationEvents.${index}`);
+  const handleDeleteEvent = (formKey: string) => {
+    const index = applicationEvents?.findIndex((ae) => ae?.formKey === formKey);
+    if (index == null) {
+      return;
     }
+    unregister(`applicationEvents.${index}`);
   };
 
   const handleAddNewApplicationEvent = () => {
@@ -133,7 +97,9 @@ const Page1 = ({ applicationRound, onNext }: Props): JSX.Element | null => {
     register(`applicationEvents.${nextIndex}.reservationUnits`);
     setValue(
       `applicationEvents.${nextIndex}.reservationUnits`,
-      filterNonNullable(selectedReservationUnits.map((ru) => ru.pk))
+      filterNonNullable(selectedReservationUnits.map((ru) => ru.pk)).filter(
+        (pk) => unitsInApplicationRound.includes(pk)
+      )
     );
     setValue(`applicationEvents.${nextIndex}.applicationEventSchedules`, []);
     setValue(`applicationEvents.${nextIndex}.pk`, undefined);
@@ -141,76 +107,53 @@ const Page1 = ({ applicationRound, onNext }: Props): JSX.Element | null => {
     setValue(`applicationEvents.${nextIndex}.eventsPerWeek`, 1);
     setValue(`applicationEvents.${nextIndex}.biweekly`, false);
     setValue(`applicationEvents.${nextIndex}.accordianOpen`, false);
+    setValue(`applicationEvents.${nextIndex}.formKey`, `NEW-${nextIndex}`);
   };
 
-  const addNewEventButtonDisabled =
-    applicationEvents?.some((ae) => ae?.pk == null) ?? false;
+  const formAes = watch("applicationEvents");
 
-  // TODO check if the form is valid? before allowing next or check when clicking next?
-  // or if invalid isDirty?
-  const nextButtonDisabled = false;
+  const submitDisabled = formAes == null || formAes.length === 0;
 
   const onSubmit = (data: ApplicationFormValues) => {
     onNext(data);
   };
 
-  /*
-  const onSubmit = (data: ApplicationFormValues, eventId?: number) => {
-    // FIXME refactor this error somewhere (either to submit or to form schema)
-    if (appToSave.applicationEvents.length === 0) {
-      setError(t("application:error.noEvents"));
-      return;
-    }
-
-    // FIXME refactor this error somewhere (either to submit or to form schema)
-    if (
-      appToSave.applicationEvents.filter(
-        (ae) => ae.reservationUnits.length === 0
-      ).length > 0
-    ) {
-      setError(t("application:error.noReservationUnits"));
-      return;
-    }
-  };
-  */
-
   return (
     <form noValidate onSubmit={handleSubmit(onSubmit)}>
-      {/* NOTE can't filter this because we have undefined values in the array so the index would break */}
+      {/* NOTE can't filter this because we have undefined values in the array so the index would break
+       * we could use findIndex with the formKey though */}
       {applicationEvents?.map((event, index) =>
         event != null ? (
           <ApplicationEvent
-            key={event.pk || "NEW"}
+            key={event.formKey}
             index={index}
             applicationRound={applicationRound}
             optionTypes={{
               ...options,
               unitOptions,
             }}
-            onDeleteEvent={() => handleDeleteEvent(index)}
-            onToggleAccordian={() => handleToggleAccordion(event.pk)}
-            isVisible={isAccordianOpen(event.pk)}
+            onDeleteEvent={() => handleDeleteEvent(event.formKey)}
+            onToggleAccordian={() => handleToggleAccordion(event.formKey)}
+            isVisible={isAccordianOpen(event.formKey)}
           />
         ) : null
       )}
-      {!addNewEventButtonDisabled && (
-        <MediumButton
-          id="addApplicationEvent"
-          variant="supplementary"
-          iconLeft={<IconPlusCircle />}
-          onClick={handleAddNewApplicationEvent}
-          size="small"
-          style={{ gap: "var(--spacing-s)" }}
-        >
-          {t("application:Page1.createNew")}
-        </MediumButton>
-      )}
+      <MediumButton
+        id="addApplicationEvent"
+        variant="supplementary"
+        iconLeft={<IconPlusCircle />}
+        onClick={handleAddNewApplicationEvent}
+        size="small"
+        style={{ gap: "var(--spacing-s)" }}
+      >
+        {t("application:Page1.createNew")}
+      </MediumButton>
       <ButtonContainer style={{ marginTop: "var(--spacing-s)" }}>
         <div />
         <MediumButton
           id="button__application--next"
           iconRight={<IconArrowRight />}
-          disabled={nextButtonDisabled}
+          disabled={submitDisabled}
           type="submit"
         >
           {t("common:next")}

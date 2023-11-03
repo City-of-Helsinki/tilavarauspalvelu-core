@@ -53,7 +53,13 @@ const ReservationUnitList = ({
   const [showModal, setShowModal] = useState(false);
 
   const form = useFormContext<ApplicationFormValues>();
-  const { clearErrors, setError, watch, setValue } = form;
+  const {
+    clearErrors,
+    setError,
+    watch,
+    setValue,
+    formState: { errors },
+  } = form;
 
   const isValid = (units: ReservationUnitType[]) => {
     const error = units
@@ -87,7 +93,7 @@ const ReservationUnitList = ({
     if (valid) {
       clearErrors([`applicationEvents.${index}.reservationUnits`]);
     } else {
-      setError(fieldName, { type: "reservationUnitTooSmall" });
+      setError(fieldName, { message: "reservationUnitTooSmall" });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reservationUnits, minSize]);
@@ -122,6 +128,8 @@ const ReservationUnitList = ({
     setReservationUnits(move(reservationUnits, from, to));
   };
 
+  const error = errors.applicationEvents?.[index]?.reservationUnits;
+
   return (
     <MainContainer>
       <Notification
@@ -152,10 +160,13 @@ const ReservationUnitList = ({
           label={t("reservationUnitList:add")}
         />
       </ButtonContainer>
+      {error?.message != null && (
+        <Notification size="small" type="error">
+          {t(`application:validation:${error.message}`)}
+        </Notification>
+      )}
       <Modal
-        handleClose={() => {
-          setShowModal(false);
-        }}
+        handleClose={() => setShowModal(false)}
         show={showModal}
         closeButtonKey="reservationUnitModal:returnToApplication"
       >
