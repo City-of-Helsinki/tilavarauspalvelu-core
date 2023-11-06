@@ -401,12 +401,12 @@ const ApplicationRoundTimeSlotDay = ({
 }: ApplicationRoundTimeSlotNode) => {
   const { t } = useTranslation();
   const noSeconds = (time: string) => time.split(":").slice(0, 2).join(":");
-  const timeSlotString = (idx: number) =>
-    reservableTimes?.[idx]?.begin &&
-    reservableTimes?.[idx]?.end &&
-    `${noSeconds(String(reservableTimes?.[idx]?.begin))}-${noSeconds(
-      String(reservableTimes?.[idx]?.end)
-    )}`;
+  const timeSlotString = (idx: number): string =>
+    reservableTimes?.[idx]?.begin && reservableTimes?.[idx]?.end
+      ? `${noSeconds(String(reservableTimes?.[idx]?.begin))}-${noSeconds(
+          String(reservableTimes?.[idx]?.end)
+        )}`
+      : "";
   return (
     <TimeSlot>
       {/* eslint-disable react/no-unknown-property */}
