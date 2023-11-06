@@ -59,17 +59,11 @@ from .space import SpaceFactory
 from .tax_percentage import TaxPercentageFactory
 from .terms_of_use import TermsOfUseFactory
 from .unit import UnitFactory, UnitGroupFactory
-from .user import UserFactory
+from .user import UserFactory, UserSocialAuthFactory
 
 __all__ = [
     "AbilityGroupFactory",
     "AddressFactory",
-    "ServiceSectorRoleChoiceFactory",
-    "ServiceSectorRoleFactory",
-    "ServiceSectorRolePermissionFactory",
-    "UnitRoleChoiceFactory",
-    "UnitRoleFactory",
-    "UnitRolePermissionFactory",
     "AgeGroupFactory",
     "ApplicationEventFactory",
     "ApplicationEventScheduleFactory",
@@ -116,10 +110,17 @@ __all__ = [
     "ResourceFactory",
     "ServiceFactory",
     "ServiceSectorFactory",
+    "ServiceSectorRoleChoiceFactory",
+    "ServiceSectorRoleFactory",
+    "ServiceSectorRolePermissionFactory",
     "SpaceFactory",
     "TaxPercentageFactory",
     "TermsOfUseFactory",
     "UnitFactory",
     "UnitGroupFactory",
+    "UnitRoleChoiceFactory",
+    "UnitRoleFactory",
+    "UnitRolePermissionFactory",
     "UserFactory",
+    "UserSocialAuthFactory",
 ]

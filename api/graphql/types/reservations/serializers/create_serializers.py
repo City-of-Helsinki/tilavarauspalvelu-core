@@ -25,6 +25,7 @@ from reservations.choices import (
     ReservationTypeChoice,
 )
 from reservations.models import AgeGroup, Reservation, ReservationPurpose
+from users.helauth.utils import get_id_token, is_ad_login
 from users.utils.open_city_profile.basic_info_resolver import ProfileReadError, ProfileUserInfoReader
 
 DEFAULT_TIMEZONE = get_default_timezone()
@@ -191,7 +192,10 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
         reservation_unit_ids = [x.pk for x in reservation_units]
         self.check_reservation_type(user, reservation_unit_ids, reservation_type)
 
-        if settings.PREFILL_RESERVATION_WITH_PROFILE_DATA and prefill_from_profile:
+        prefill_from_profile = prefill_from_profile and settings.PREFILL_RESERVATION_WITH_PROFILE_DATA
+        id_token = get_id_token(user) or {}
+
+        if prefill_from_profile and not is_ad_login(id_token):
             data = self._prefill_from_from_profile(user, data)
 
         return data
