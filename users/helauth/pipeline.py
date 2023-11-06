@@ -4,7 +4,6 @@ from typing import Any, TypedDict
 
 import requests
 from django.conf import settings
-from django.contrib.sessions.backends.base import SessionBase
 from django.core.handlers.wsgi import WSGIRequest
 from helusers.tunnistamo_oidc import TunnistamoOIDCAuth
 from sentry_sdk import capture_exception, capture_message
@@ -12,6 +11,7 @@ from social_django.models import DjangoStorage, UserSocialAuth
 from social_django.strategy import DjangoStrategy
 
 from common.utils import get_nested
+from users.helauth.utils import get_profile_token, is_ad_login
 from users.models import User
 
 __all__ = [
@@ -79,7 +79,8 @@ def fetch_additional_info_for_user_from_helsinki_profile(
     **kwargs: Any,  # NOSONAR
 ) -> dict[str, Any]:
     kwargs: ExtraKwargs  # NOSONAR
-    if not ad_login(backend) and user.profile_id == "":
+    id_token = backend.id_token or {}
+    if not is_ad_login(id_token) and user.profile_id == "":
         token = get_profile_token(request.session)
         try:
             update_user_from_profile(user, token)
@@ -87,15 +88,6 @@ def fetch_additional_info_for_user_from_helsinki_profile(
             capture_exception(error)
 
     return {"user": user}
-
-
-def get_profile_token(session: SessionBase) -> str | None:
-    # See what 'helusers.pipeline.fetch_api_tokens' adds in the session
-    return session["api_tokens"].get(settings.OPEN_CITY_PROFILE_SCOPE)
-
-
-def ad_login(backend: TunnistamoOIDCAuth) -> bool:
-    return (backend.id_token or {}).get("amr") == "helsinkiazuread"
 
 
 def update_user_from_profile(user: User, token: str | None) -> None:

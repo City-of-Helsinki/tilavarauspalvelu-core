@@ -24,7 +24,6 @@ from reservations.choices import ReservationStateChoice, ReservationTypeChoice
 from reservations.models import AgeGroup, Reservation
 from tests.factories import (
     ApplicationRoundFactory,
-    CityFactory,
     ReservationFactory,
     ReservationUnitFactory,
     ReservationUnitPricingFactory,
@@ -155,105 +154,6 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(reservation.buffer_time_after).is_equal_to(self.reservation_unit.buffer_time_after)
         assert_that(reservation.buffer_time_before).is_equal_to(self.reservation_unit.buffer_time_before)
 
-    @override_settings(PREFILL_RESERVATION_WITH_PROFILE_DATA=True)
-    @patch("users.utils.open_city_profile.basic_info_resolver.requests.get")
-    def test_reservation_details_prefilled_with_profile_data(self, mock_profile_call, mock_periods, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
-        city = CityFactory(name="Helsinki", municipality_code="12345")
-        data = {
-            "data": {
-                "myProfile": {
-                    "firstName": "John",
-                    "lastName": "Doe",
-                    "primaryAddress": {
-                        "postalCode": "00100",
-                        "address": "Test street 1",
-                        "city": "Helsinki",
-                        "addressType": "HOME",
-                    },
-                    "primaryPhone": {
-                        "phone": "123456789",
-                    },
-                    "verifiedPersonalInformation": {
-                        "municipalityOfResidence": "Helsinki",
-                        "municipalityOfResidenceNumber": "12345",
-                    },
-                }
-            }
-        }
-        mock_profile_call.return_value = MagicMock(status_code=200, json=MagicMock(return_value=data))
-
-        input_data = {
-            "name": "Test reservation",
-            "description": "Test description",
-            "begin": datetime.datetime.now().strftime("%Y%m%dT%H%M%SZ"),
-            "end": (datetime.datetime.now() + datetime.timedelta(hours=1)).strftime("%Y%m%dT%H%M%SZ"),
-            "reservationUnitPks": [self.reservation_unit.pk],
-        }
-
-        self.client.force_login(self.regular_joe)
-        response = self.query(self.get_create_query(), input_data=input_data)
-        content = json.loads(response.content)
-
-        assert_that(content.get("errors")).is_none()
-        assert_that(content.get("data").get("createReservation").get("reservation").get("pk")).is_not_none()
-        pk = content.get("data").get("createReservation").get("reservation").get("pk")
-        reservation = Reservation.objects.get(id=pk)
-        assert_that(reservation).is_not_none()
-        assert_that(reservation.reservee_first_name).is_equal_to("John")
-        assert_that(reservation.reservee_last_name).is_equal_to("Doe")
-        assert_that(reservation.reservee_address_city).is_equal_to("Helsinki")
-        assert_that(reservation.reservee_address_street).is_equal_to("Test street 1")
-        assert_that(reservation.reservee_address_zip).is_equal_to("00100")
-        assert_that(reservation.home_city).is_equal_to(city)
-
-    @override_settings(PREFILL_RESERVATION_WITH_PROFILE_DATA=True)
-    @patch("users.utils.open_city_profile.basic_info_resolver.requests.get")
-    def test_reservation_details_prefilled_with_profile_data_with_foreign_address(
-        self, mock_profile_call, mock_periods, mock_opening_hours
-    ):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
-        data = {
-            "data": {
-                "myProfile": {
-                    "firstName": "John",
-                    "lastName": "Doe",
-                    "primaryPhone": {
-                        "phone": "123456789",
-                    },
-                    "verifiedPersonalInformation": {
-                        "permanentForeignAddress": {
-                            "streetAddress": "Foreign street 1",
-                            "additionalAddress": "Foreign city",
-                            "countryCode": "AX",
-                        },
-                    },
-                }
-            }
-        }
-        mock_profile_call.return_value = MagicMock(status_code=200, json=MagicMock(return_value=data))
-
-        input_data = {
-            "name": "Test reservation",
-            "description": "Test description",
-            "begin": datetime.datetime.now().strftime("%Y%m%dT%H%M%SZ"),
-            "end": (datetime.datetime.now() + datetime.timedelta(hours=1)).strftime("%Y%m%dT%H%M%SZ"),
-            "reservationUnitPks": [self.reservation_unit.pk],
-        }
-
-        self.client.force_login(self.regular_joe)
-        response = self.query(self.get_create_query(), input_data=input_data)
-        content = json.loads(response.content)
-
-        assert_that(content.get("errors")).is_none()
-        assert_that(content.get("data").get("createReservation").get("reservation").get("pk")).is_not_none()
-        pk = content.get("data").get("createReservation").get("reservation").get("pk")
-        reservation = Reservation.objects.get(id=pk)
-        assert_that(reservation).is_not_none()
-        assert_that(reservation.reservee_address_city).is_empty()
-        assert_that(reservation.reservee_address_street).is_equal_to("Foreign street 1")
-        assert_that(reservation.reservee_address_zip).is_empty()
-
     def test_creating_reservation_with_reservation_language_succeed(self, mock_periods, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
@@ -270,13 +170,16 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert_that(reservation.reservee_language).is_equal_to("fi")
 
     @patch(
-        "reservation_units.utils.reservation_unit_reservation_scheduler.ReservationUnitReservationScheduler.is_reservation_unit_open"
+        "reservation_units.utils.reservation_unit_reservation_scheduler."
+        "ReservationUnitReservationScheduler.is_reservation_unit_open"
     )
     @patch(
-        "reservation_units.utils.reservation_unit_reservation_scheduler.ReservationUnitReservationScheduler.get_conflicting_open_application_round"
+        "reservation_units.utils.reservation_unit_reservation_scheduler."
+        "ReservationUnitReservationScheduler.get_conflicting_open_application_round"
     )
     @patch(
-        "reservation_units.utils.reservation_unit_reservation_scheduler.ReservationUnitReservationScheduler.get_reservation_unit_possible_start_times"
+        "reservation_units.utils.reservation_unit_reservation_scheduler."
+        "ReservationUnitReservationScheduler.get_reservation_unit_possible_start_times"
     )
     def test_creating_reservation_copies_max_buffer_times_from_multiple_reservation_units(
         self,
