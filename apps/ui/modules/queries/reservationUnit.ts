@@ -17,6 +17,14 @@ export const RESERVATION_UNIT = gql`
         smallUrl
         imageType
       }
+      applicationRoundTimeSlots {
+        closed
+        weekday
+        reservableTimes {
+          begin
+          end
+        }
+      }
       descriptionFi
       descriptionEn
       descriptionSv
