@@ -19,7 +19,7 @@ import {
   differenceInMinutes,
   startOfDay,
 } from "date-fns";
-import { fromApiDate, toApiDate, toUIDate } from "common/src/common/util";
+import { toApiDate, toUIDate } from "common/src/common/util";
 import {
   RoundPeriod,
   getEventBuffers,
@@ -39,6 +39,7 @@ import ClientOnly from "common/src/ClientOnly";
 import { PendingReservation } from "common/types/common";
 import {
   ApplicationRoundStatusChoice,
+  ApplicationRoundTimeSlotNode,
   Query,
   QueryReservationsArgs,
   QueryReservationUnitByPkArgs,
@@ -392,88 +393,19 @@ const TimeSlot = styled.div`
   }
 `;
 
-type ApplicationRoundTimeSlotType = {
-  reservableTimes?: { end: string; begin: string }[];
-  weekday: number;
-  closed: boolean;
-  day: null;
-};
-
-type ApplicationRoundsType = {
-  applicationRounds: {
-    publicDisplayBegin: string;
-    reservationPeriodBegin: string;
-    reservationPeriodEnd: string;
-  }[];
-  applicationRoundTimeSlots: ApplicationRoundTimeSlotType[];
-};
-
-// TODO: Use real data
-const applicationRoundTimeSlotData = {
-  applicationRounds: [
-    {
-      publicDisplayBegin: "2023-09-12T00:00:00+00:00",
-      reservationPeriodBegin: "2023-09-12",
-      reservationPeriodEnd: "2027-01-01",
-    },
-  ],
-  applicationRoundTimeSlots: [
-    {
-      weekday: 1,
-      closed: false,
-      reservableTimes: [
-        {
-          begin: "10:00:00",
-          end: "12:30:00",
-        },
-      ],
-    },
-    {
-      weekday: 0,
-      closed: true,
-    },
-    {
-      weekday: 2,
-      closed: false,
-      reservableTimes: [
-        {
-          begin: "10:00:00",
-          end: "12:30:00",
-        },
-      ],
-    },
-    {
-      weekday: 3,
-      closed: false,
-      reservableTimes: [
-        {
-          begin: "10:00:00",
-          end: "12:30:00",
-        },
-        {
-          begin: "13:30:00",
-          end: "20:00:00",
-        },
-      ],
-    },
-    {
-      weekday: 6,
-      closed: true,
-    },
-  ],
-};
-
 // Returns an element for a weekday in the application round time slots, with up to two time slots
 const ApplicationRoundTimeSlotDay = ({
   weekday,
   closed,
   reservableTimes,
-}: ApplicationRoundTimeSlotType) => {
+}: ApplicationRoundTimeSlotNode) => {
   const { t } = useTranslation();
   const noSeconds = (time: string) => time.split(":").slice(0, 2).join(":");
   const timeSlotString = (idx: number) =>
-    `${noSeconds(reservableTimes[idx].begin)}-${noSeconds(
-      reservableTimes[idx].end
+    reservableTimes?.[idx]?.begin &&
+    reservableTimes?.[idx]?.end &&
+    `${noSeconds(String(reservableTimes?.[idx]?.begin))}-${noSeconds(
+      String(reservableTimes?.[idx]?.end)
     )}`;
   return (
     <TimeSlot>
@@ -635,27 +567,15 @@ const ReservationUnit = ({
     [activeApplicationRounds, reservationUnit]
   );
 
-  // TODO: Use real query data
-  // Don't display the application round time slots by default
-  let shouldDisplayApplicationRoundTimeSlots = false;
-  applicationRoundTimeSlotData.applicationRounds.forEach((applicationRound) => {
-    if (!applicationRound) return;
-    // But do display them if there is an active application round
-    if (
-      fromApiDate(applicationRound.publicDisplayBegin.split("T")[0]) <=
-        new Date() &&
-      new Date() <= fromApiDate(applicationRound.reservationPeriodEnd)
-    ) {
-      shouldDisplayApplicationRoundTimeSlots = true;
-    }
-  });
+  const shouldDisplayApplicationRoundTimeSlots =
+    !!activeApplicationRounds?.length;
 
-  const applicationRoundTimeSlots =
-    applicationRoundTimeSlotData.applicationRoundTimeSlots.sort(
-      (a, b) => a.weekday - b.weekday
-    );
+  // TODO: should this be sorted here?
+  const applicationRoundTimeSlots = (
+    reservationUnit?.applicationRoundTimeSlots ?? []
+  ).sort((a, b) => a.weekday - b.weekday);
   const orderedApplicationRoundTimeSlots =
-    applicationRoundTimeSlots[0].weekday === 0
+    applicationRoundTimeSlots[0]?.weekday === 0
       ? [...applicationRoundTimeSlots.slice(1), applicationRoundTimeSlots[0]]
       : applicationRoundTimeSlots;
 
