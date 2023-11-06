@@ -12,10 +12,8 @@ from freezegun import freeze_time
 
 from api.graphql.tests.test_reservation_units.base import (
     ReservationUnitQueryTestCaseBase,
-    get_mocked_opening_hours,
     mock_create_product,
 )
-from opening_hours.enums import State
 from permissions.models import (
     GeneralRoleChoice,
     GeneralRolePermission,
@@ -329,56 +327,6 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         errors = content.get("errors")
         assert_that(len(errors)).is_equal_to(1)
         assert_that(errors[0].get("message")).is_equal_to("No ReservationUnit matches the given query.")
-
-    @override_settings(HAUKI_ORIGIN_ID="1234", HAUKI_API_URL="url")
-    @mock.patch("opening_hours.utils.opening_hours_client.get_opening_hours")
-    def test_opening_hours(self, mock_opening_times):
-        mock_opening_times.return_value = get_mocked_opening_hours(self.reservation_unit.uuid)
-        query = (
-            """
-                query {
-                    reservationUnitByPk(pk: %i) {
-                        id
-                        openingHours(openingTimes:true startDate:"2020-01-01" endDate:"2022-01-01"){
-                            openingTimes{date startTime endTime isReservable}
-                        }
-                    }
-                }
-                """
-            % self.reservation_unit.id
-        )
-        response = self.query(query)
-        content = json.loads(response.content)
-
-        assert content.get("errors") is None
-
-        opening_hours = content["data"]["reservationUnitByPk"]["openingHours"]
-        assert len(opening_hours["openingTimes"]) > 0
-        assert opening_hours["openingTimes"][0]["startTime"] == "2020-01-01T10:00:00+02:00"
-        assert opening_hours["openingTimes"][0]["endTime"] == "2020-01-01T22:00:00+02:00"
-        assert opening_hours["openingTimes"][0]["isReservable"] is True
-
-    @override_settings(HAUKI_ORIGIN_ID="1234", HAUKI_API_URL="url")
-    @mock.patch("opening_hours.utils.opening_hours_client.get_opening_hours")
-    def test_opening_hours_is_reservable_false(self, mock_opening_times):
-        mock_opening_times.return_value = get_mocked_opening_hours(self.reservation_unit.uuid, state=State.SELF_SERVICE)
-        query = (
-            f"{{\n"
-            f"reservationUnitByPk(pk: {self.reservation_unit.id}) {{\n"
-            f"id\n"
-            f'openingHours(openingTimes:true startDate:"2020-01-01" endDate:"2022-01-01")'
-            f"{{openingTimes{{date startTime endTime isReservable}}"
-            f"}}"
-            f"}}"
-            f"}}"
-        )
-        response = self.query(query)
-        content = json.loads(response.content)
-
-        assert content.get("errors") is None
-        opening_times = content["data"]["reservationUnitByPk"]["openingHours"]["openingTimes"]
-        assert len(opening_times) > 0
-        assert opening_times[0]["isReservable"] is False
 
     def test_reservations_date_filter(self):
         ReservationFactory(

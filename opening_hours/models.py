@@ -1,5 +1,7 @@
+import datetime
+
 from django.db import models
-from django.db.models import F, Q
+from django.db.models import F, Q, QuerySet
 from django.utils.timezone import get_default_timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -16,6 +18,12 @@ class OriginHaukiResource(models.Model):
         return str(self.id)
 
 
+class ReservableTimeSpanQuerySet(models.QuerySet):
+    def filter_period(self, start: datetime.date, end: datetime.date) -> QuerySet["ReservableTimeSpan"]:
+        """Filter reservable time spans that overlap with the given period."""
+        return self.filter(start_datetime__lt=end + datetime.timedelta(days=1), end_datetime__gt=start)
+
+
 class ReservableTimeSpan(models.Model):
     """A time period on which a ReservationUnit is reservable."""
 
@@ -26,6 +34,8 @@ class ReservableTimeSpan(models.Model):
     )
     start_datetime = models.DateTimeField(null=False, blank=False)
     end_datetime = models.DateTimeField(null=False, blank=False)
+
+    objects = ReservableTimeSpanQuerySet.as_manager()
 
     class Meta:
         ordering = ["resource", "start_datetime", "end_datetime"]
