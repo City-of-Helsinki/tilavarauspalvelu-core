@@ -4,7 +4,6 @@ from graphene_permissions.mixins import AuthNode
 from api.graphql.extensions.base_types import TVPBaseConnection
 from api.graphql.extensions.legacy_helpers import OldPrimaryKeyObjectType, get_all_translatable_fields
 from api.graphql.extensions.permission_helpers import check_resolver_permission
-from api.graphql.types.opening_hours.types import OpeningHoursMixin
 from api.graphql.types.reservation_units.permissions import ReservationUnitPermission
 from api.graphql.types.spaces.permissions import SpacePermission
 from api.graphql.types.units.permissions import UnitPermission
@@ -63,9 +62,8 @@ class UnitType(AuthNode, OldPrimaryKeyObjectType):
         return None
 
 
-class UnitByPkType(UnitType, OpeningHoursMixin):
+class UnitByPkType(UnitType):
     permission_classes = (UnitPermission,)
-    hauki_origin_id = "tprek"
 
     class Meta:
         model = Unit

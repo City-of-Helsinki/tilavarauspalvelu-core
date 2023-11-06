@@ -14,7 +14,7 @@ from api.graphql.extensions.legacy_helpers import OldPrimaryKeyObjectType, get_a
 from api.graphql.extensions.permission_helpers import check_resolver_permission
 from api.graphql.types.application_round_time_slot.types import ApplicationRoundTimeSlotNode
 from api.graphql.types.merchants.types import PaymentMerchantType, PaymentProductType
-from api.graphql.types.opening_hours.types import OpeningHoursMixin
+from api.graphql.types.opening_hours.types import ReservableTimeSpansGraphQLMixin
 from api.graphql.types.reservation_units.permissions import (
     EquipmentCategoryPermission,
     EquipmentPermission,
@@ -623,7 +623,11 @@ class ReservationUnitType(
         return None
 
 
-class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin, ReservationUnitWithReservationsMixin):
+class ReservationUnitByPkType(
+    ReservationUnitType,
+    ReservableTimeSpansGraphQLMixin,
+    ReservationUnitWithReservationsMixin,
+):
     hauki_url = graphene.Field(ReservationUnitHaukiUrlType)
 
     class Meta:
@@ -675,7 +679,7 @@ class ReservationUnitByPkType(ReservationUnitType, OpeningHoursMixin, Reservatio
             "is_archived",
             "state",
             "hauki_url",
-            "opening_hours",
+            "reservable_time_spans",
         ] + get_all_translatable_fields(model)
 
         interfaces = (graphene.relay.Node,)
