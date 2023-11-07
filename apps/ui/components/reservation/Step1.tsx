@@ -280,7 +280,7 @@ const Step1 = ({
         links={
           termsOfUse.genericTerms && [
             {
-              href: "/terms/general",
+              href: "/terms/booking",
               text: t("reservationCalendar:heading.generalTerms"),
             },
           ]

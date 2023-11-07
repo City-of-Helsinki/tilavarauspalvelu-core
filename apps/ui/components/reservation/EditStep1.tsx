@@ -20,11 +20,11 @@ import React, { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import TermsBox from "common/src/termsbox/TermsBox";
-import { TERMS_OF_USE } from "../../modules/queries/reservationUnit";
-import { capitalize, getTranslation } from "../../modules/util";
+import { TERMS_OF_USE } from "@/modules/queries/reservationUnit";
+import { capitalize, getTranslation } from "@/modules/util";
 import Sanitize from "../common/Sanitize";
-import { BlackButton, MediumButton } from "../../styles/util";
-import { reservationsPrefix } from "../../modules/const";
+import { BlackButton, MediumButton } from "@/styles/util";
+import { reservationsPrefix } from "@/modules/const";
 
 type Props = {
   reservation: ReservationType;
@@ -312,7 +312,7 @@ const EditStep1 = ({
             hasTermsOfUse
               ? [
                   {
-                    href: "/terms/general",
+                    href: "/terms/booking",
                     text: t("reservationCalendar:heading.generalTerms"),
                   },
                 ]
