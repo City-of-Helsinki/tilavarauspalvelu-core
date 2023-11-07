@@ -361,7 +361,7 @@ const SearchForm = ({
     key: string,
     value: string
   ): string | undefined => {
-    const compFn = (a: typeof unitOptions[0], b: string) =>
+    const compFn = (a: (typeof unitOptions)[0], b: string) =>
       a != null && String(a.value) === b;
     switch (key) {
       case "unit":

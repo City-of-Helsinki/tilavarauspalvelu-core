@@ -23,14 +23,12 @@ const Legends = styled.div`
 
 const Container = styled.div`
   max-width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow: auto hidden;
 `;
 
 const LegendContainer = styled.div`
   max-width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow: auto hidden;
   @media (max-width: ${breakpoints.s}) {
     div {
       flex-wrap: nowrap;

@@ -81,6 +81,10 @@ module.exports = {
         format: ["camelCase"],
       },
       {
+        selector: "import",
+        format: null,
+      },
+      {
         selector: "variable",
         // have to allow PascalCase because of defining React components with arrow functions
         format: ["camelCase", "PascalCase", "UPPER_CASE"],

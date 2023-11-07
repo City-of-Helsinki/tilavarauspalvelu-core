@@ -41,8 +41,7 @@ const Content = styled.div<{ onTransitionEnd: React.TransitionEventHandler }>`
 const Inner = styled.div`
   height: calc(100% - (2 * var(--spacing-m)));
   padding: var(--spacing-m) var(--spacing-m) 0 var(--spacing-m);
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden auto;
 `;
 
 const FocusHolder = styled.button`

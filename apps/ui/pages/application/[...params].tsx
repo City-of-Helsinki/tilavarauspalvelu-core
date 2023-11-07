@@ -134,7 +134,7 @@ const convertApplicationToForm = (
     transformApplicationEventToForm(ae)
   );
   // TODO do we need to set default values?
-  const defaultAes: typeof formAes[0] = {
+  const defaultAes: (typeof formAes)[0] = {
     pk: undefined,
     name: "",
     formKey: "event-NEW",

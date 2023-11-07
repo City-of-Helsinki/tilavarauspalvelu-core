@@ -30,8 +30,7 @@ type Props = {
 // In the UI spec parent container max height is 22rem, but overflow forces us to define child max-height
 const ListWrapper = styled.div`
   max-height: 18.5rem;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden auto;
 `;
 
 const StyledList = styled.ul<{ $hasPadding: boolean }>`

@@ -13,8 +13,7 @@ type Props = {
 const Wrapper = styled.div`
   display: flex;
   flex-direction: row;
-  align-items: center;
-  justify-items: center;
+  place-items: center;
   gap: 0;
   padding: 0 0.5em;
   color: black;

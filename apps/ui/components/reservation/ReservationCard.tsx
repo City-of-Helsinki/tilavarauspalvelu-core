@@ -123,8 +123,7 @@ const Actions = styled.div`
   @media (min-width: ${breakpoints.m}) {
     display: flex;
     flex-direction: column;
-    align-self: flex-end;
-    justify-self: flex-end;
+    place-self: flex-end;
     padding: 0;
   }
 `;

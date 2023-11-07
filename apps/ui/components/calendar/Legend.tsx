@@ -60,10 +60,8 @@ const LegendItem = styled.div<{
   }
 
   display: flex;
-  align-content: flex-start;
-  justify-content: flex-start;
-  column-gap: var(--spacing-xl);
-  gap: var(--spacing-xs);
+  place-content: flex-start;
+  gap: var(--spacing-xs) var(--spacing-xl);
   position: relative;
 `;
 
