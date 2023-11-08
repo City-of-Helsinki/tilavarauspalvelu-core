@@ -6,11 +6,12 @@ from itertools import chain
 from typing import TYPE_CHECKING, Any, Literal, ParamSpec, Self, TypeVar
 
 from django.contrib.auth.models import AnonymousUser
-from django.db import models
+from django.db import IntegrityError, models, transaction
 from django.db.models.fields.related_descriptors import ManyToManyDescriptor, ReverseManyToOneDescriptor
 from django.db.models.fields.reverse_related import ManyToManyRel, ManyToOneRel
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from common.fields.model import IntChoiceField as IntChoiceModelField
 from common.fields.serializer import IntChoiceField, IntegerPrimaryKeyField
@@ -38,10 +39,15 @@ def handle_related(func: Callable[P, TModel]) -> Callable[P, TModel]:
         if validated_data is None:
             raise ValueError("'validated_data' not found in args or kwargs")
 
-        related_serializers = self._prepare_related(validated_data)
-        instance = func(*args, **kwargs)
-        if related_serializers:
-            self._handle_to_many(instance, related_serializers)
+        try:
+            with transaction.atomic():
+                related_serializers = self._prepare_related(validated_data)
+                instance = func(*args, **kwargs)
+                if related_serializers:
+                    self._handle_to_many(instance, related_serializers)
+        except IntegrityError as error:
+            raise ValidationError(error.args[0]) from error
+
         return instance
 
     return wrapper
