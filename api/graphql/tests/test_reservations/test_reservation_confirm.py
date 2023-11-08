@@ -14,7 +14,6 @@ from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from applications.models import City
 from email_notification.models import EmailType
 from merchants.models import OrderStatus, PaymentOrder, PaymentType
-from opening_hours.tests.test_get_periods import mocked_get_resource_periods_response_data
 from reservation_units.models import PricingType
 from reservations.choices import ReservationStateChoice
 from reservations.models import AgeGroup
@@ -29,7 +28,6 @@ from tests.factories import (
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")
 @patch("opening_hours.utils.opening_hours_client.get_opening_hours")
-@patch("opening_hours.hours.get_periods_for_resource", return_value=mocked_get_resource_periods_response_data)
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
 class ReservationConfirmTestCase(ReservationTestCaseBase):
     def setUp(self):
@@ -83,7 +81,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
     )
     @patch("merchants.verkkokauppa.helpers.create_order")
-    def test_confirm_reservation_changes_state(self, mock_create_order, mock_periods, mock_opening_hours):
+    def test_confirm_reservation_changes_state(self, mock_create_order, mock_opening_hours):
         mock_create_order.return_value = OrderFactory.create()
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
@@ -111,7 +109,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         SEND_RESERVATION_NOTIFICATION_EMAILS=True,
         EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
     )
-    def test_confirm_reservation_changes_state_to_requires_handling(self, mock_periods, mock_opening_hours):
+    def test_confirm_reservation_changes_state_to_requires_handling(self, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.reservation_unit.require_reservation_handling = True
         self.reservation_unit.save()
@@ -135,9 +133,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         SEND_RESERVATION_NOTIFICATION_EMAILS=True,
         EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
     )
-    def test_confirm_reservation_changes_state_to_requires_handling_on_subsidy_request(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_confirm_reservation_changes_state_to_requires_handling_on_subsidy_request(self, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
 
         self.reservation.applying_for_free_of_charge = True
@@ -163,7 +159,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         assert_that(mail.outbox[0].subject).is_equal_to("handling")
         assert_that(mail.outbox[1].subject).is_equal_to("staff requires handling")
 
-    def test_confirm_reservation_fails_if_state_is_not_created(self, mock_periods, mock_opening_hours):
+    def test_confirm_reservation_fails_if_state_is_not_created(self, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
         self.reservation.state = ReservationStateChoice.DENIED
@@ -179,7 +175,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.DENIED)
 
-    def test_confirm_reservation_fails_on_wrong_user(self, mock_periods, mock_opening_hours):
+    def test_confirm_reservation_fails_on_wrong_user(self, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         unauthorized_user = get_user_model().objects.create()
         self.client.force_login(unauthorized_user)
@@ -192,7 +188,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CREATED)
 
     @patch("merchants.verkkokauppa.helpers.create_order")
-    def test_confirm_reservation_updates_confirmed_at(self, mock_create_order, mock_periods, mock_opening_hours):
+    def test_confirm_reservation_updates_confirmed_at(self, mock_create_order, mock_opening_hours):
         mock_create_order.return_value = OrderFactory.create()
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
@@ -206,7 +202,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
 
     @patch("merchants.verkkokauppa.helpers.create_order")
     def test_confirm_reservation_succeeds_if_reservation_already_has_required_fields(
-        self, mock_create_order, mock_periods, mock_opening_hours
+        self, mock_create_order, mock_opening_hours
     ):
         mock_create_order.return_value = OrderFactory.create()
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
@@ -224,7 +220,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         confirm_data = content.get("data").get("confirmReservation")
         assert_that(confirm_data.get("errors")).is_none()
 
-    def test_confirm_reservation_fails_if_required_fields_are_not_filled(self, mock_periods, mock_opening_hours):
+    def test_confirm_reservation_fails_if_required_fields_are_not_filled(self, mock_opening_hours):
         self.reservation_unit.metadata_set = self._create_metadata_set()
         self.reservation_unit.save(update_fields=["metadata_set"])
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
@@ -240,7 +236,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
 
     @patch("api.graphql.types.reservations.serializers.confirm_serializers.create_verkkokauppa_order")
     def test_confirm_reservation_does_not_create_order_when_handling_is_required(
-        self, mock_create_vk_order, mock_periods, mock_opening_hours
+        self, mock_create_vk_order, mock_opening_hours
     ):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
 
@@ -263,7 +259,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
 
     @patch("api.graphql.types.reservations.serializers.confirm_serializers.create_verkkokauppa_order")
     def test_confirm_reservation_creates_local_order_when_payment_type_is_on_site(
-        self, mock_create_vk_order, mock_periods, mock_opening_hours
+        self, mock_create_vk_order, mock_opening_hours
     ):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
@@ -296,7 +292,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
 
     @patch("api.graphql.types.reservations.serializers.confirm_serializers.create_verkkokauppa_order")
     def test_confirm_reservation_calls_api_when_payment_type_is_not_on_site(
-        self, mock_create_vk_order, mock_periods, mock_opening_hours
+        self, mock_create_vk_order, mock_opening_hours
     ):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
 
@@ -330,9 +326,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.WAITING_FOR_PAYMENT)
 
     @patch("api.graphql.types.reservations.serializers.confirm_serializers.create_verkkokauppa_order")
-    def test_confirm_reservation_does_not_save_when_api_call_fails(
-        self, mock_create_vk_order, mock_periods, mock_opening_hours
-    ):
+    def test_confirm_reservation_does_not_save_when_api_call_fails(self, mock_create_vk_order, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         mock_create_vk_order.side_effect = Exception("Test exception")
 
@@ -356,7 +350,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CREATED)
 
-    def test_confirm_reservation_does_not_allow_unsupported_payment_type(self, mock_periods, mock_opening_hours):
+    def test_confirm_reservation_does_not_allow_unsupported_payment_type(self, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
 
         self.client.force_login(self.regular_joe)
@@ -373,9 +367,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
             "Reservation unit does not support ONLINE payment type. Allowed values: INVOICE, ON_SITE"
         )
 
-    def test_confirm_reservation_allows_unsupported_payment_type_with_zero_price(
-        self, mock_periods, mock_opening_hours
-    ):
+    def test_confirm_reservation_allows_unsupported_payment_type_with_zero_price(self, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
 
         self.reservation_unit_pricing.pricing_type = PricingType.FREE
@@ -397,7 +389,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
 
-    def test_confirm_reservation_without_payment_type_use_on_site(self, mock_periods, mock_opening_hours):
+    def test_confirm_reservation_without_payment_type_use_on_site(self, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
 
         self.client.force_login(self.regular_joe)
@@ -414,9 +406,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         assert_that(local_order.payment_type).is_equal_to(PaymentType.ON_SITE)
 
     @patch("api.graphql.types.reservations.serializers.confirm_serializers.create_verkkokauppa_order")
-    def test_confirm_reservation_without_payment_type_use_invoice(
-        self, mock_create_vk_order, mock_periods, mock_opening_hours
-    ):
+    def test_confirm_reservation_without_payment_type_use_invoice(self, mock_create_vk_order, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         mock_create_vk_order.return_value = OrderFactory()
         self.client.force_login(self.regular_joe)
@@ -433,9 +423,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         assert_that(local_order.payment_type).is_equal_to(PaymentType.INVOICE)
 
     @patch("api.graphql.types.reservations.serializers.confirm_serializers.create_verkkokauppa_order")
-    def test_confirm_reservation_without_payment_type_use_online(
-        self, mock_create_vk_order, mock_periods, mock_opening_hours
-    ):
+    def test_confirm_reservation_without_payment_type_use_online(self, mock_create_vk_order, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         mock_create_vk_order.return_value = OrderFactory()
         self.client.force_login(self.regular_joe)
@@ -451,7 +439,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         local_order = PaymentOrder.objects.first()
         assert_that(local_order.payment_type).is_equal_to(PaymentType.ONLINE)
 
-    def test_confirm_reservation_error_when_order_exists(self, mock_periods, mock_opening_hours):
+    def test_confirm_reservation_error_when_order_exists(self, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
 
@@ -465,7 +453,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
             "Reservation cannot be changed anymore because it is attached to a payment order"
         )
 
-    def test_confirm_order_not_created_when_price_is_zero(self, mock_periods, mock_opening_hours):
+    def test_confirm_order_not_created_when_price_is_zero(self, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
 
@@ -483,7 +471,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         assert_that(local_order).is_none()
 
     @patch("api.graphql.types.reservations.serializers.confirm_serializers.create_verkkokauppa_order")
-    def test_confirm_reservation_return_order_data(self, mock_create_vk_order, mock_periods, mock_opening_hours):
+    def test_confirm_reservation_return_order_data(self, mock_create_vk_order, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
 
         mock_order = OrderFactory()
@@ -521,7 +509,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         assert_that(order_data.get("receiptUrl")).is_equal_to(mock_order.receipt_url)
         assert_that(order_data.get("checkoutUrl")).is_equal_to(mock_order.checkout_url)
 
-    def test_confirm_reservation_with_price_requires_payment_product(self, mock_periods, mock_opening_hours):
+    def test_confirm_reservation_with_price_requires_payment_product(self, mock_opening_hours):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
 
@@ -546,7 +534,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         assert_that(content.get("errors")[0].get("message")).is_equal_to("Reservation unit is missing payment product")
 
     def test_confirm_reservation_without_price_and_with_free_pricing_type_does_not_require_payment_product(
-        self, mock_periods, mock_opening_hours
+        self, mock_opening_hours
     ):
         mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)

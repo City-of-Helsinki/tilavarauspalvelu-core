@@ -6,8 +6,8 @@ from django.conf import settings
 from django.utils.timezone import get_default_timezone
 
 from opening_hours.decorators import datetime_args_to_default_timezone
-from opening_hours.hours import Period, TimeElement, get_opening_hours, get_periods_for_resource
 from opening_hours.hours import State as ResourceState
+from opening_hours.hours import TimeElement, get_opening_hours
 
 TIMEZONE = get_default_timezone()
 
@@ -88,14 +88,12 @@ class OpeningHoursClient:
     end_date: datetime.date
     hauki_origin_id: str
     opening_hours: dict[str, dict[datetime.date, list[OpeningHours]]]
-    periods: dict[str, list[Period]]
 
     def __init__(
         self,
         resources: list[str] | str,
         start_date: datetime.date,
         end_date: datetime.date,
-        init_periods=False,
         init_opening_hours=True,
         hauki_origin_id=None,
     ):
@@ -117,11 +115,6 @@ class OpeningHoursClient:
         self.periods = {}
         for resource in resources:
             self.periods[resource] = []
-        if init_periods:
-            for resource in resources:
-                periods = get_periods_for_resource(resource)
-                for period in periods:
-                    self.periods[resource].append(period)
 
     def _init_opening_hours_structure(self):
         """
@@ -179,14 +172,8 @@ class OpeningHoursClient:
             #  xxxx
             #       ****  Closed hours end before next accessible/closed hours start
             # ----------
-            hours += self._remove_past_tracked_hours(
-                tracked_accessible_hours,
-                opening_hour.start_time,
-            )
-            hours += self._remove_past_tracked_hours(
-                tracked_closed_hours,
-                opening_hour.start_time,
-            )
+            hours += self._remove_past_tracked_hours(tracked_accessible_hours, opening_hour.start_time)
+            hours += self._remove_past_tracked_hours(tracked_closed_hours, opening_hour.start_time)
 
             if resource_state.is_accessible:
                 self._handle_accessible_hours_split(
@@ -401,9 +388,6 @@ class OpeningHoursClient:
             if date_start <= date <= date_end and times
         }
         return opening_hours
-
-    def get_resource_periods(self, resource) -> list[Period]:
-        return self.periods.get(resource)
 
     @datetime_args_to_default_timezone
     def is_resource_reservable(

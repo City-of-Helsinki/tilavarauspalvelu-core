@@ -8,7 +8,7 @@ from django.utils.timezone import get_default_timezone
 from opening_hours.enums import State
 from opening_hours.errors import HaukiConfigurationError
 from opening_hours.utils.hauki_api_client import HaukiAPIClient
-from opening_hours.utils.hauki_api_types import HaukiAPIDatePeriod, HaukiAPIOpeningHoursResponse
+from opening_hours.utils.hauki_api_types import HaukiAPIOpeningHoursResponse
 from tilavarauspalvelu.utils import logging
 
 REQUESTS_TIMEOUT = 15
@@ -150,54 +150,6 @@ def get_opening_hours(
             days_data_out.append(day_data_out)
 
     return days_data_out
-
-
-def get_periods_for_resource(
-    resource_id: str,
-    hauki_origin_id: str | None = None,
-) -> list[Period]:
-    """Get periods for a single Hauki resource"""
-    resource_periods_url = HaukiAPIClient.build_url(endpoint="date_period")
-    periods_data_in: list[HaukiAPIDatePeriod] = HaukiAPIClient.get(
-        url=resource_periods_url,
-        params={
-            "resource": _build_hauki_resource_id(resource_id, hauki_origin_id),
-        },
-    )
-
-    periods_data_out = []
-    for period in periods_data_in:
-        period_data_out = {
-            "id": period["id"],
-            "resource": period["resource"],
-            "start_date": datetime.datetime.strptime(period["start_date"], "%Y-%m-%d").date()
-            if period["start_date"]
-            else None,
-            "end_date": datetime.datetime.strptime(period["end_date"], "%Y-%m-%d").date()
-            if period["end_date"]
-            else None,
-            "description": period["description"],
-            "name": period["name"],
-            "resource_state": period["resource_state"],
-            "time_spans": [],
-        }
-
-        for time_span_group in period["time_span_groups"]:
-            for time_data_in in time_span_group["time_spans"]:
-                start_time = time_data_in.pop("start_time")
-                end_time = time_data_in.pop("end_time")
-
-                period_data_out["time_spans"].append(
-                    TimeSpan(
-                        start_time=datetime.time.fromisoformat(start_time) if start_time else None,
-                        end_time=datetime.time.fromisoformat(end_time) if end_time else None,
-                        **time_data_in,
-                    )
-                )
-
-            periods_data_out.append(Period(**period_data_out))
-
-    return periods_data_out
 
 
 def can_reserve_based_on_opening_hours(
