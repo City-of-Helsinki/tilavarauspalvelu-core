@@ -100,7 +100,7 @@ def test_update_application_event__switch_event_reservation_unit_preferred_order
                 "pk": event_unit_2.pk,
                 "preferredOrder": event_unit_1.preferred_order,
             },
-        ]
+        ],
     }
     response = graphql(UPDATE_MUTATION, input_data=data)
 
@@ -137,7 +137,7 @@ def test_update_application_event__cannot_have_two_event_reservation_units_with_
                 "pk": event_unit_2.pk,
                 "preferredOrder": event_unit_1.preferred_order,
             },
-        ]
+        ],
     }
     response = graphql(UPDATE_MUTATION, input_data=data)
 
