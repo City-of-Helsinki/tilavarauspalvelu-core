@@ -25,3 +25,18 @@ export const fromMondayFirstUnsafe = (day: number) => {
 
 export const fromMondayFirst = (day: 0 | 1 | 2 | 3 | 4 | 5 | 6) =>
   day === 6 ? 0 : day + 1;
+
+export type LocalizationLanguages = "fi" | "sv" | "en";
+
+export const getLocalizationLang = (code: string): LocalizationLanguages => {
+  if (code.startsWith("fi")) {
+    return "fi";
+  }
+  if (code.startsWith("sv")) {
+    return "sv";
+  }
+  if (code.startsWith("en")) {
+    return "en";
+  }
+  return "fi";
+};

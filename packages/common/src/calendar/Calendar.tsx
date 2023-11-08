@@ -9,6 +9,8 @@ import {
   startOfDay,
 } from "date-fns";
 import fi from "date-fns/locale/fi";
+import en from "date-fns/locale/en-GB";
+import sv from "date-fns/locale/sv";
 import {
   Calendar as BigCalendar,
   dateFnsLocalizer,
@@ -18,6 +20,7 @@ import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import { parseDate } from "../common/util";
+import { LocalizationLanguages } from "../helpers";
 
 export type CalendarEvent<T> = {
   title?: string;
@@ -77,7 +80,7 @@ type Props<T> = {
   overflowBreakpoint?: string;
   step?: number;
   timeslots?: number;
-  culture?: string;
+  culture?: LocalizationLanguages;
   longPressThreshold?: number;
   underlineEvents?: boolean;
 };
@@ -439,25 +442,28 @@ const StyledCalendarDND = styled(withDragAndDrop(StyledCalendar))``;
 
 const locales = {
   fi,
+  en,
+  sv,
 };
 
-const localizer = dateFnsLocalizer({
-  format: (date: Date, originalFormat: string) => {
-    let fmt = "";
-    switch (originalFormat) {
-      case "h:mma":
-        fmt = "H:mm";
-        break;
-      default:
-        fmt = originalFormat;
-    }
-    return format(date, fmt, { locale: locales.fi });
-  },
-  parse: parseDate,
-  startOfWeek: (date: Date) => startOfWeek(date, { weekStartsOn: 1 }),
-  getDay,
-  locales,
-});
+const localizer = (locale: LocalizationLanguages) =>
+  dateFnsLocalizer({
+    format: (date: Date, originalFormat: string) => {
+      let fmt = "";
+      switch (originalFormat) {
+        case "h:mma":
+          fmt = "H:mm";
+          break;
+        default:
+          fmt = originalFormat;
+      }
+      return format(date, fmt, { locale: locales[locale] });
+    },
+    parse: parseDate,
+    startOfWeek: (date: Date) => startOfWeek(date, { weekStartsOn: 1 }),
+    getDay,
+    locales,
+  });
 
 const Calendar = <T extends Record<string, unknown>>({
   events,
@@ -511,7 +517,7 @@ const Calendar = <T extends Record<string, unknown>>({
       onView={onView}
       min={min || addHours(startOfDay(begin), 6)}
       max={max || endOfMonth(begin)}
-      localizer={localizer}
+      localizer={localizer(culture)}
       toolbar={showToolbar}
       views={["day", "week", "month"]}
       className={`view-${viewType}`}

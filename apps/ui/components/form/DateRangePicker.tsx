@@ -6,7 +6,7 @@ import React, { useEffect } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { toUIDate } from "common/src/common/util";
-import { Language } from "common/types/common";
+import { getLocalizationLang } from "common/src/helpers";
 import { isValidDateString } from "../../modules/util";
 
 const initDate = (date: Date | null): string => {
@@ -146,7 +146,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
         initialMonth={new Date()}
         label={labels?.begin ?? t("dateSelector:labelStartDate")}
         aria-label={labels?.ariaBegin ?? t("dateSelector:labelStartDate")}
-        language={i18n.language as Language}
+        language={getLocalizationLang(i18n.language)}
         onChange={(date) => setInternalStartDateString(date)}
         errorText={
           errors.startDateIsInvalid
@@ -173,7 +173,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
         initialMonth={startDate ?? new Date()}
         label={labels?.end ?? t("dateSelector:labelEndDate")}
         aria-label={labels?.ariaEnd ?? t("dateSelector:labelEndDate")}
-        language={i18n.language as Language}
+        language={getLocalizationLang(i18n.language)}
         onChange={(date) => setInternalEndDateString(date)}
         errorText={
           endDateIsBeforeStartDate

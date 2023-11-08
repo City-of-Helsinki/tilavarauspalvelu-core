@@ -1,9 +1,10 @@
 import { useQuery, gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
-import type { LocalizationLanguages, OptionType } from "common/types/common";
+import type { OptionType } from "common/types/common";
 import type { Query, AgeGroupType, Maybe } from "common/types/gql-types";
 import { participantCountOptions } from "@/modules/const";
 import { mapOptions } from "@/modules/util";
+import { getLocalizationLang } from "common/src/helpers";
 
 export type OptionTypes = {
   ageGroupOptions: OptionType[];
@@ -111,12 +112,6 @@ export const useOptions = () => {
     .filter((node): node is NonNullable<typeof node> => node !== null) ?? [];
   */
 
-  const convertLang = (lang: string): LocalizationLanguages => {
-    if (lang === "fi" || lang === "en" || lang === "sv") {
-      return lang;
-    }
-    return "fi";
-  }
   const params = {
     ageGroups,
     cities,
@@ -128,7 +123,7 @@ export const useOptions = () => {
     ageGroupOptions: mapOptions(
       sortAgeGroups(ageGroups),
       undefined,
-      convertLang(i18n.language)
+      getLocalizationLang(i18n.language)
     ),
     abilityGroupOptions: [],
       /* TODO
@@ -142,19 +137,19 @@ export const useOptions = () => {
       cities.map((city) => maybeOption(city))
         .filter((city): city is NonNullable<typeof city> => city != null),
       undefined,
-      convertLang(i18n.language)
+      getLocalizationLang(i18n.language)
     ),
     purposeOptions: mapOptions(
       purposes.map((p) => maybeOption(p))
         .filter((p): p is NonNullable<typeof p> => p != null),
       undefined,
-      convertLang(i18n.language)
+      getLocalizationLang(i18n.language)
     ),
     reservationUnitTypeOptions: mapOptions(
       reservationUnitTypes.map((p) => maybeOption(p))
         .filter((p): p is NonNullable<typeof p> => p != null),
       undefined,
-      convertLang(i18n.language)
+      getLocalizationLang(i18n.language)
     ),
     participantCountOptions,
   }

@@ -9,11 +9,7 @@ import {
   isValidDate,
   getTranslation,
 } from "common/src/common/util";
-import {
-  type LocalizationLanguages,
-  type OptionType,
-  type ReducedApplicationStatus,
-} from "common/types/common";
+import type { OptionType, ReducedApplicationStatus } from "common/types/common";
 import {
   type ReservationUnitImageType,
   type ReservationUnitType,
@@ -28,6 +24,7 @@ import {
   reservationsPrefix,
   isBrowser,
 } from "./const";
+import type { LocalizationLanguages } from "common/src/helpers";
 
 export { getTranslation };
 

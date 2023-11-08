@@ -36,7 +36,7 @@ import {
   getDayIntervals,
   isRangeReservable,
 } from "common/src/calendar/util";
-import { Language, OptionType, PendingReservation } from "common/types/common";
+import type { OptionType, PendingReservation } from "common/types/common";
 import {
   fontBold,
   fontMedium,
@@ -44,6 +44,7 @@ import {
 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { ReservationUnitByPkType } from "common/types/gql-types";
+import { getLocalizationLang } from "common/src/helpers";
 import { MediumButton, truncatedText } from "../../styles/util";
 import { ReservationProps } from "../../context/DataContext";
 import { getDurationOptions } from "../../modules/reservation";
@@ -698,7 +699,7 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
               id="reservation__input--date"
               initialMonth={new Date()}
               label={t("reservationCalendar:startDate")}
-              language={i18n.language as Language}
+              language={getLocalizationLang(i18n.language)}
               minDate={new Date()}
               maxDate={
                 lastOpeningDate?.date

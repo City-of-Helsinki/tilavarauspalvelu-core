@@ -5,11 +5,12 @@ import { Checkbox, DateInput, NumberInput, Select, TextInput } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
-import { LocalizationLanguages, OptionType } from "common/types/common";
+import { OptionType } from "common/types/common";
 import type { ApplicationRoundNode } from "common/types/gql-types";
 import { fontRegular, H5 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { CheckboxWrapper } from "common/src/reservation-form/components";
+import { getLocalizationLang } from "common/src/helpers";
 import { ReservationUnitList } from "./ReservationUnitList";
 import {
   apiDateToUIDate,
@@ -286,7 +287,7 @@ const ApplicationEventInner = ({
       <PeriodContainer>
         <DateInput
           disableConfirmation
-          language={i18n.language as LocalizationLanguages}
+          language={getLocalizationLang(i18n.language)}
           {...register(`applicationEvents.${index}.begin`)}
           onChange={(v) => {
             clearErrors([
@@ -311,7 +312,7 @@ const ApplicationEventInner = ({
         <DateInput
           {...register(`applicationEvents.${index}.end`)}
           disableConfirmation
-          language={i18n.language as LocalizationLanguages}
+          language={getLocalizationLang(i18n.language)}
           onChange={(v) => {
             clearErrors([
               `applicationEvents.${index}.begin`,

@@ -27,6 +27,7 @@ import { useTranslation } from "next-i18next";
 import { useMedia } from "react-use";
 import styled from "styled-components";
 import { Toolbar } from "common/src/calendar/Toolbar";
+import { getLocalizationLang } from "common/src/helpers";
 import {
   canReservationTimeBeChanged,
   isReservationReservable,
@@ -436,7 +437,7 @@ const EditStep0 = ({
             }
             step={30}
             timeslots={getTimeslots(reservationUnit.reservationStartInterval)}
-            culture={i18n.language}
+            culture={getLocalizationLang(i18n.language)}
             aria-hidden
             longPressThreshold={100}
           />

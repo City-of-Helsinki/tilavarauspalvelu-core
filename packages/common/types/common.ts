@@ -157,9 +157,6 @@ export type OptionType = {
   value?: number | string;
 };
 
-export type LocalizationLanguages = "fi" | "sv" | "en";
-export type Language = "fi" | "en" | "sv";
-
 export interface HMS {
   h: number;
   m: number;

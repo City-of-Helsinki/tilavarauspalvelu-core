@@ -57,7 +57,7 @@ import {
   TermsOfUseType,
 } from "common/types/gql-types";
 
-import { filterNonNullable } from "common/src/helpers";
+import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
 import Head from "../../components/reservation-unit/Head";
 import Address from "../../components/reservation-unit/Address";
 import Sanitize from "../../components/common/Sanitize";
@@ -1022,7 +1022,7 @@ const ReservationUnit = ({
                     timeslots={getTimeslots(
                       reservationUnit.reservationStartInterval
                     )}
-                    culture={i18n.language}
+                    culture={getLocalizationLang(i18n.language)}
                     aria-hidden
                     longPressThreshold={100}
                   />

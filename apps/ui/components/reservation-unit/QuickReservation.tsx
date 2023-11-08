@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { getAvailableTimes, getOpenDays } from "common/src/calendar/util";
 import { chunkArray, toUIDate } from "common/src/common/util";
-import { Language, OptionType, PendingReservation } from "common/types/common";
+import type { OptionType, PendingReservation } from "common/types/common";
 import {
   addDays,
   addHours,
@@ -13,10 +13,10 @@ import {
 } from "date-fns";
 import { DateInput, IconAngleDown, Select, TimeInput } from "hds-react";
 import { maxBy, padStart } from "lodash";
-
 import { useTranslation } from "next-i18next";
 import { useLocalStorage } from "react-use";
 import styled from "styled-components";
+import { getLocalizationLang } from "common/src/helpers";
 import { fontBold, fontMedium, H4 } from "common/src/common/typography";
 import ClientOnly from "common/src/ClientOnly";
 import { ReservationUnitByPkType } from "common/types/gql-types";
@@ -467,7 +467,7 @@ const QuickReservation = ({
           id={`${idPrefix}-quick-reservation-date`}
           label={t("reservationCalendar:quickReservation.date")}
           initialMonth={new Date()}
-          language={i18n.language as Language}
+          language={getLocalizationLang(i18n.language)}
           onChange={(_val, valueAsDate) => {
             if (isValid(valueAsDate) && valueAsDate.getFullYear() > 1970) {
               setSlot(null);
