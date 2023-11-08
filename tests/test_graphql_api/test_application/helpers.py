@@ -78,7 +78,7 @@ def get_application_create_data(application_round: ApplicationRound, create_even
                 "purpose": reservation_purpose.id,
                 "eventReservationUnits": [
                     {
-                        "priority": 22,
+                        "preferredOrder": 22,
                         "reservationUnit": reservation_unit.id,
                     },
                 ],

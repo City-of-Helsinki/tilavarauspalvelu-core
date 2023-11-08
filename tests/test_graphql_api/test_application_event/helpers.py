@@ -61,7 +61,7 @@ def get_application_event_create_data(application: Application) -> dict[str, Any
         "purpose": reservation_purpose.id,
         "eventReservationUnits": [
             {
-                "priority": 22,
+                "preferredOrder": 22,
                 "reservationUnit": reservation_unit.id,
             },
         ],
@@ -98,7 +98,7 @@ def get_application_event_update_data(application_event: ApplicationEvent) -> di
         "purpose": application_event.purpose.id,
         "eventReservationUnits": [
             {
-                "priority": 22,
+                "preferredOrder": 22,
                 "reservationUnit": reservation_unit.id,
             },
         ],

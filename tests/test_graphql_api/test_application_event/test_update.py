@@ -5,7 +5,7 @@ import pytest
 from applications.choices import ApplicationEventStatusChoice
 from applications.models import ApplicationEvent
 from common.utils import timedelta_from_json
-from tests.factories import ApplicationEventFactory
+from tests.factories import ApplicationEventFactory, EventReservationUnitFactory
 from tests.test_graphql_api.test_application_event.helpers import UPDATE_MUTATION, get_application_event_update_data
 
 # Applied to all tests
@@ -76,3 +76,73 @@ def test_cannot_update_application_event_with_smaller_max_duration_than_min_dura
     # then:
     # - The response contains an error about the max duration
     assert response.field_error_messages("maxDuration") == ["Maximum duration should be larger than minimum duration"]
+
+
+def test_update_application_event__switch_event_reservation_unit_preferred_order(graphql):
+    # given:
+    # - There is an application event with two event reservation units
+    # - The owner of the application is using the system
+    application_event = ApplicationEventFactory.create_in_status_unallocated()
+    event_unit_1 = EventReservationUnitFactory.create(application_event=application_event, preferred_order=1)
+    event_unit_2 = EventReservationUnitFactory.create(application_event=application_event, preferred_order=2)
+    graphql.force_login(application_event.application.user)
+
+    # when:
+    # - User tries to update the application event, switching the preferred order of the event reservation units
+    data = {
+        "pk": application_event.pk,
+        "eventReservationUnits": [
+            {
+                "pk": event_unit_1.pk,
+                "preferredOrder": event_unit_2.preferred_order,
+            },
+            {
+                "pk": event_unit_2.pk,
+                "preferredOrder": event_unit_1.preferred_order,
+            },
+        ]
+    }
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    # then:
+    # - The response contains no errors
+    # - The preferred order between the two event reservation units has been switched
+    assert response.has_errors is False, response
+    event_unit_1.refresh_from_db()
+    event_unit_2.refresh_from_db()
+    assert event_unit_1.preferred_order == 2
+    assert event_unit_2.preferred_order == 1
+
+
+@pytest.mark.django_db(transaction=True)
+def test_update_application_event__cannot_have_two_event_reservation_units_with_same_preferred_order(graphql):
+    # given:
+    # - There is an application event with two event reservation units
+    # - The owner of the application is using the system
+    application_event = ApplicationEventFactory.create_in_status_unallocated()
+    event_unit_1 = EventReservationUnitFactory.create(application_event=application_event, preferred_order=1)
+    event_unit_2 = EventReservationUnitFactory.create(application_event=application_event, preferred_order=2)
+    graphql.force_login(application_event.application.user)
+
+    # when:
+    # - User tries to update the application event, switching the preferred order of the event reservation units
+    data = {
+        "pk": application_event.pk,
+        "eventReservationUnits": [
+            {
+                "pk": event_unit_1.pk,
+                "preferredOrder": event_unit_1.preferred_order,
+            },
+            {
+                "pk": event_unit_2.pk,
+                "preferredOrder": event_unit_1.preferred_order,
+            },
+        ]
+    }
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    # then:
+    # - The response contains errors about violating unique constraint
+    assert response.has_errors is True, response
+    msg = 'duplicate key value violates unique constraint "unique_application_event_preferred_order"'
+    assert msg in response.field_error_messages()[0]

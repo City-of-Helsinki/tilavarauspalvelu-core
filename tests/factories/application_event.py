@@ -202,5 +202,5 @@ class EventReservationUnitFactory(GenericDjangoModelFactory[EventReservationUnit
         model = EventReservationUnit
 
     application_event = factory.SubFactory("tests.factories.ApplicationEventFactory")
-    priority = fuzzy.FuzzyInteger(low=0, high=1000, step=100)
+    preferred_order = factory.Sequence(lambda n: n)
     reservation_unit = factory.SubFactory("tests.factories.ReservationUnitFactory")

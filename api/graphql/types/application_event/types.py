@@ -18,7 +18,7 @@ class EventReservationUnitNode(DjangoAuthNode):
         model = EventReservationUnit
         fields = [
             "pk",
-            "priority",
+            "preferred_order",
             "reservation_unit",
         ]
         permission_classes = (AllowAuthenticated,)
