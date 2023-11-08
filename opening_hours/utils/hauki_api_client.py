@@ -23,7 +23,7 @@ class HaukiAPIClient:
 
         url = urljoin(settings.HAUKI_API_URL, f"/v1/{endpoint}/")
         if resource_id:
-            url = urljoin(url, f"{resource_id}/")
+            url += f"{resource_id}/"
 
         return url
 
