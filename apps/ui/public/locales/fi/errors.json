@@ -6,6 +6,7 @@
     "body": "Jotain meni pieleen"
   },
   "general_error": "Tapahtui määrittämätön virhe.",
+  "CHANGES_NOT_ALLOWED": "Muutoksia ei sallita.",
   "RESERVATION_UNIT_NOT_RESERVABLE": "Kohde ei ole varattavissa.",
   "OVERLAPPING_RESERVATIONS": "Päällekkäisiä varauksia.",
   "RESERVATION_UNIT_IS_NOT_OPEN": "Kohde on tällä hetkellä suljettu.",

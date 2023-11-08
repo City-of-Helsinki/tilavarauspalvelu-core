@@ -6,6 +6,7 @@
     "body": "Something unexpected happened"
   },
   "general_error": "Undefined error.",
+  "CHANGES_NOT_ALLOWED": "You cannot make changes to the booking.",
   "RESERVATION_UNIT_NOT_RESERVABLE": "The item cannot be booked.",
   "OVERLAPPING_RESERVATIONS": "There are duplicate bookings.",
   "RESERVATION_UNIT_IS_NOT_OPEN": "The item is closed at the moment.",

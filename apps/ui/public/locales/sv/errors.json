@@ -6,6 +6,7 @@
     "body": "Något oväntat hände"
   },
   "general_error": "Odefinierat fel.",
+  "CHANGES_NOT_ALLOWED": "Du kan inte göra ändringar.",
   "RESERVATION_UNIT_NOT_RESERVABLE": "Objektet går inte att boka.",
   "OVERLAPPING_RESERVATIONS": "Överlappande bokningar.",
   "RESERVATION_UNIT_IS_NOT_OPEN": "Objektet är för närvarande stängt.",
