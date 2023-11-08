@@ -13,7 +13,6 @@ from freezegun import freeze_time
 from api.graphql.tests.test_reservation_units.base import (
     ReservationUnitQueryTestCaseBase,
     get_mocked_opening_hours,
-    get_mocked_periods,
     mock_create_product,
 )
 from opening_hours.enums import State
@@ -333,18 +332,15 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
     @override_settings(HAUKI_ORIGIN_ID="1234", HAUKI_API_URL="url")
     @mock.patch("opening_hours.utils.opening_hours_client.get_opening_hours")
-    @mock.patch("opening_hours.hours.HaukiAPIClient.get")
-    def test_opening_hours(self, mock_periods, mock_opening_times):
+    def test_opening_hours(self, mock_opening_times):
         mock_opening_times.return_value = get_mocked_opening_hours(self.reservation_unit.uuid)
-        mock_periods.return_value = get_mocked_periods()
         query = (
             """
                 query {
                     reservationUnitByPk(pk: %i) {
                         id
-                        openingHours(periods:true openingTimes:true startDate:"2020-01-01" endDate:"2022-01-01"){
+                        openingHours(openingTimes:true startDate:"2020-01-01" endDate:"2022-01-01"){
                             openingTimes{date startTime endTime isReservable}
-                            openingTimePeriods{timeSpans{startTime}}
                         }
                     }
                 }
@@ -357,7 +353,6 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         assert content.get("errors") is None
 
         opening_hours = content["data"]["reservationUnitByPk"]["openingHours"]
-        assert len(opening_hours["openingTimePeriods"][0]["timeSpans"]) > 0
         assert len(opening_hours["openingTimes"]) > 0
         assert opening_hours["openingTimes"][0]["startTime"] == "2020-01-01T10:00:00+02:00"
         assert opening_hours["openingTimes"][0]["endTime"] == "2020-01-01T22:00:00+02:00"
@@ -365,16 +360,14 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
     @override_settings(HAUKI_ORIGIN_ID="1234", HAUKI_API_URL="url")
     @mock.patch("opening_hours.utils.opening_hours_client.get_opening_hours")
-    @mock.patch("opening_hours.hours.HaukiAPIClient.get")
-    def test_opening_hours_is_reservable_false(self, mock_periods, mock_opening_times):
+    def test_opening_hours_is_reservable_false(self, mock_opening_times):
         mock_opening_times.return_value = get_mocked_opening_hours(self.reservation_unit.uuid, state=State.SELF_SERVICE)
-        mock_periods.return_value = get_mocked_periods()
         query = (
             f"{{\n"
             f"reservationUnitByPk(pk: {self.reservation_unit.id}) {{\n"
             f"id\n"
-            f'openingHours(periods:true openingTimes:true startDate:"2020-01-01" endDate:"2022-01-01")'
-            f"{{openingTimes{{date startTime endTime isReservable}} openingTimePeriods{{timeSpans{{startTime}}}}"
+            f'openingHours(openingTimes:true startDate:"2020-01-01" endDate:"2022-01-01")'
+            f"{{openingTimes{{date startTime endTime isReservable}}"
             f"}}"
             f"}}"
             f"}}"

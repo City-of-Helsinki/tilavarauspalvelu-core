@@ -11,7 +11,6 @@ from api.graphql.tests.base import GrapheneTestCaseBase
 from merchants.verkkokauppa.product.types import Product
 from opening_hours.enums import State
 from opening_hours.hours import TimeElement
-from opening_hours.utils.hauki_api_types import HaukiAPIDatePeriod
 from reservation_units.models import PaymentType, ReservationUnit, TaxPercentage
 from terms_of_use.models import TermsOfUse
 from tests.factories import (
@@ -172,64 +171,3 @@ def get_mocked_opening_hours(uuid, state: State = State.WITH_RESERVATION):
             ],
         },
     ]
-
-
-def get_mocked_periods() -> list[HaukiAPIDatePeriod]:
-    data = [
-        {
-            "id": 38600,
-            "resource": 26220,
-            "name": {"fi": "Vakiovuorot", "sv": "", "en": ""},
-            "description": {"fi": "", "sv": "", "en": ""},
-            "start_date": "2020-01-01",
-            "end_date": None,
-            "resource_state": "undefined",
-            "override": False,
-            "origins": [],
-            "created": "2021-05-07T13:01:30.477693+03:00",
-            "modified": "2021-05-07T13:01:30.477693+03:00",
-            "time_span_groups": [
-                {
-                    "id": 29596,
-                    "period": 38600,
-                    "time_spans": [
-                        {
-                            "id": 39788,
-                            "group": 29596,
-                            "name": {"fi": None, "sv": None, "en": None},
-                            "description": {"fi": None, "sv": None, "en": None},
-                            "start_time": "09:00:00",
-                            "end_time": "21:00:00",
-                            "end_time_on_next_day": False,
-                            "full_day": False,
-                            "weekdays": [6],
-                            "resource_state": "open",
-                            "created": "2021-05-07T13:01:30.513468+03:00",
-                            "modified": "2021-05-07T13:01:30.513468+03:00",
-                        },
-                        {
-                            "id": 39789,
-                            "group": 29596,
-                            "name": {
-                                "fi": None,
-                                "sv": None,
-                                "en": None,
-                            },
-                            "description": {"fi": None, "sv": None, "en": None},
-                            "start_time": "09:00:00",
-                            "end_time": "21:00:00",
-                            "end_time_on_next_day": False,
-                            "full_day": False,
-                            "weekdays": [7],
-                            "resource_state": "open",
-                            "created": "2021-05-07T13:01:30.530932+03:00",
-                            "modified": "2021-05-07T13:01:30.530932+03:00",
-                        },
-                    ],
-                    "rules": [],
-                    "is_removed": False,
-                }
-            ],
-        }
-    ]
-    return data
