@@ -2,7 +2,9 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 from tinymce.widgets import TinyMCE
 
+from applications.choices import ApplicationRoundStatusChoice
 from applications.models import ApplicationRound
+from common.fields.forms import EnumChoiceField, disabled_widget
 
 __all__ = [
     "ApplicationRoundAdminForm",
@@ -10,10 +12,37 @@ __all__ = [
 
 
 class ApplicationRoundAdminForm(forms.ModelForm):
+    status = EnumChoiceField(
+        enum=ApplicationRoundStatusChoice,
+        widget=disabled_widget,
+        required=False,
+        disabled=True,
+        help_text=(
+            f"{ApplicationRoundStatusChoice.UPCOMING.value}: "
+            f"Applications cannot yet be made in the round. "
+            f"{ApplicationRoundStatusChoice.OPEN.value}: "
+            f"Applications can be made in the round. "
+            f"{ApplicationRoundStatusChoice.IN_ALLOCATION.value}: "
+            f"Applications in the round are being allocated. "
+            f"{ApplicationRoundStatusChoice.HANDLED.value}: "
+            f"All application have been allocated. "
+            f"{ApplicationRoundStatusChoice.RESULTS_SENT.value}: "
+            f"All application results have been sent to users. "
+        ),
+    )
+
+    def __init__(self, *args, **kwargs):
+        instance = kwargs.get("instance", None)
+        if instance:
+            kwargs.setdefault("initial", {})
+            kwargs["initial"]["status"] = instance.status
+        super().__init__(*args, **kwargs)
+
     class Meta:
         model = ApplicationRound
         fields = [
             "name",
+            "status",
             "target_group",
             "reservation_units",
             "application_period_begin",

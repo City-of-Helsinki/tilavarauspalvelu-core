@@ -1,7 +1,9 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
+from applications.choices import ApplicationEventStatusChoice
 from applications.models import ApplicationEvent, ApplicationEventSchedule
+from common.fields.forms import EnumChoiceField, disabled_widget
 
 __all__ = [
     "ApplicationEventAdminForm",
@@ -10,10 +12,37 @@ __all__ = [
 
 
 class ApplicationEventAdminForm(forms.ModelForm):
+    status = EnumChoiceField(
+        enum=ApplicationEventStatusChoice,
+        widget=disabled_widget,
+        required=False,
+        disabled=True,
+        help_text=(
+            f"{ApplicationEventStatusChoice.UNALLOCATED.value}: "
+            f"Event does not have any schedules, or none of them have been accepted. "
+            f"{ApplicationEventStatusChoice.APPROVED.value}: "
+            f"At least one schedule has been approved, but no reservations have yet been made. "
+            f"{ApplicationEventStatusChoice.DECLINED.value}: "
+            f"All schedules have been declined. "
+            f"{ApplicationEventStatusChoice.FAILED.value}: "
+            f"At least one reservation was not possible for some schedule. "
+            f"{ApplicationEventStatusChoice.RESERVED.value}: "
+            f"All schedules have successful reservations. "
+        ),
+    )
+
+    def __init__(self, *args, **kwargs):
+        instance = kwargs.get("instance", None)
+        if instance:
+            kwargs.setdefault("initial", {})
+            kwargs["initial"]["status"] = instance.status
+        super().__init__(*args, **kwargs)
+
     class Meta:
         model = ApplicationEvent
         fields = [
             "name",
+            "status",
             "num_persons",
             "min_duration",
             "max_duration",

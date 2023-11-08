@@ -10,7 +10,10 @@ __all__ = [
     "IntMultipleChoiceField",
     "EnumChoiceField",
     "EnumMultipleChoiceField",
+    "disabled_widget",
 ]
+
+disabled_widget = forms.TextInput(attrs={"class": "readonly", "disabled": True, "required": False})
 
 
 class IntChoiceMixin:
