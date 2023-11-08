@@ -1,7 +1,9 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
+from applications.choices import ApplicationStatusChoice
 from applications.models import Application
+from common.fields.forms import EnumChoiceField, disabled_widget
 
 __all__ = [
     "ApplicationAdminForm",
@@ -9,10 +11,41 @@ __all__ = [
 
 
 class ApplicationAdminForm(forms.ModelForm):
+    status = EnumChoiceField(
+        enum=ApplicationStatusChoice,
+        widget=disabled_widget,
+        required=False,
+        disabled=True,
+        help_text=(
+            f"{ApplicationStatusChoice.DRAFT.value}: "
+            f"Application started but not ready. "
+            f"{ApplicationStatusChoice.RECEIVED.value}: "
+            f"Application sent by user. "
+            f"{ApplicationStatusChoice.IN_ALLOCATION.value}: "
+            f"Application's events are being allocated. "
+            f"{ApplicationStatusChoice.HANDLED.value}: "
+            f"Application's events have all been allocated. "
+            f"{ApplicationStatusChoice.RESULTS_SENT.value}: "
+            f"Application's results have been sent to user. "
+            f"{ApplicationStatusChoice.EXPIRED.value}: "
+            f"Application not completed before application round ended. "
+            f"{ApplicationStatusChoice.CANCELLED.value}: "
+            f"Application cancelled by user. "
+        ),
+    )
+
+    def __init__(self, *args, **kwargs):
+        instance = kwargs.get("instance", None)
+        if instance:
+            kwargs.setdefault("initial", {})
+            kwargs["initial"]["status"] = instance.status
+        super().__init__(*args, **kwargs)
+
     class Meta:
         model = Application
         fields = [
             "applicant_type",
+            "status",
             "application_round",
             "organisation",
             "contact_person",
