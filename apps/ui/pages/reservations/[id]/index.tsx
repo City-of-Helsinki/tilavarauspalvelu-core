@@ -49,11 +49,11 @@ import {
   getReservationUnitName,
   getReservationUnitPrice,
 } from "@/modules/reservationUnit";
-import BreadcrumbWrapper from "../../components/common/BreadcrumbWrapper";
-import ReservationStatus from "../../components/reservation/ReservationStatus";
-import Address from "../../components/reservation-unit/Address";
-import ReservationInfoCard from "../../components/reservation/ReservationInfoCard";
-import ReservationOrderStatus from "../../components/reservation/ReservationOrderStatus";
+import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
+import ReservationStatus from "@/components/reservation/ReservationStatus";
+import Address from "@/components/reservation-unit/Address";
+import ReservationInfoCard from "@/components/reservation/ReservationInfoCard";
+import ReservationOrderStatus from "@/components/reservation/ReservationOrderStatus";
 
 type Props = {
   termsOfUse: Record<string, TermsOfUseType>;
@@ -92,7 +92,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         ...(await serverSideTranslations(locale ?? "fi")),
         overrideBackgroundColor: "var(--tilavaraus-white)",
         termsOfUse: {
-          genericTerms: bookingTerms,
+          genericTerms: bookingTerms ?? null,
         },
         id,
       },

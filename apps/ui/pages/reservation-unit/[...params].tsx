@@ -47,7 +47,11 @@ import {
   reservationUnitPath,
   reservationUnitPrefix,
 } from "../../modules/const";
-import { getTranslation } from "../../modules/util";
+import {
+  getTranslation,
+  printErrorMessages,
+  reservationsUrl,
+} from "../../modules/util";
 import {
   RESERVATION_UNIT,
   TERMS_OF_USE,
@@ -69,7 +73,6 @@ import {
 import { AGE_GROUPS, RESERVATION_PURPOSES } from "../../modules/queries/params";
 import { ReservationProps } from "../../context/DataContext";
 import ReservationInfoCard from "../../components/reservation/ReservationInfoCard";
-import ReservationConfirmation from "../../components/reservation/ReservationConfirmation";
 import Step0 from "../../components/reservation/Step0";
 import Step1 from "../../components/reservation/Step1";
 import { ReservationStep } from "../../modules/types";
@@ -231,9 +234,6 @@ const ReservationUnitReservationWithReservationProp = ({
   const [storedReservation, , removeStoredReservation] =
     useLocalStorage<ReservationProps>("reservation");
 
-  const [formStatus, setFormStatus] = useState<"pending" | "error" | "sent">(
-    "pending"
-  );
   const [step, setStep] = useState(0);
   const [reservation, setReservation] = useState<ReservationType | null>(
     fetchedReservation
@@ -321,26 +321,11 @@ const ReservationUnitReservationWithReservationProp = ({
         window.scrollTo(0, 0);
       }
     },
-    onError: () => {
-      const msg = t("errors:general_error");
+    onError: (error) => {
+      const msg = printErrorMessages(error);
       setErrorMsg(msg);
     },
   });
-
-  const reservationConfirmSuccess = () => {
-    if (reservation == null) {
-      return;
-    }
-    setReservation({
-      ...reservation,
-      state: requireHandling
-        ? ReservationsReservationStateChoices.RequiresHandling
-        : ReservationsReservationStateChoices.Confirmed,
-    });
-    setFormStatus("sent");
-    setStep(2);
-    setPendingReservation(null);
-  };
 
   const [confirmReservation] = useMutation<
     { confirmReservation: ReservationConfirmMutationPayload },
@@ -348,11 +333,16 @@ const ReservationUnitReservationWithReservationProp = ({
   >(CONFIRM_RESERVATION, {
     onCompleted: (data) => {
       window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+      const { pk, state } = data.confirmReservation;
+      if (pk == null) {
+        setErrorMsg(t("errors:general_error"));
+        return;
+      }
       if (
-        data?.confirmReservation?.state ===
-        ReservationsReservationStateChoices.Confirmed
+        state === ReservationsReservationStateChoices.Confirmed ||
+        state === ReservationsReservationStateChoices.RequiresHandling
       ) {
-        reservationConfirmSuccess();
+        router.push(`${reservationsUrl}/${pk}/confirmation`);
       } else if (steps?.length > 2) {
         const order = data.confirmReservation?.order;
         const checkoutUrl = getCheckoutUrl(order ?? undefined, i18n.language);
@@ -360,14 +350,18 @@ const ReservationUnitReservationWithReservationProp = ({
         if (checkoutUrl) {
           router.push(checkoutUrl);
         } else {
+          // eslint-disable-next-line no-console
+          console.warn("No checkout url found");
           setErrorMsg(t("errors:general_error"));
         }
       } else {
-        reservationConfirmSuccess();
+        // eslint-disable-next-line no-console
+        console.warn("Confirm reservation mutation returning something odd");
+        setErrorMsg(t("errors:general_error"));
       }
     },
-    onError: () => {
-      const msg = t("errors:general_error");
+    onError: (error) => {
+      const msg = printErrorMessages(error);
       setErrorMsg(msg);
     },
   });
@@ -401,14 +395,11 @@ const ReservationUnitReservationWithReservationProp = ({
   );
 
   const pageTitle = useMemo(() => {
-    if (formStatus === "sent") {
-      return t("reservationUnit:reservationSuccessful");
-    }
     if (step === 0) {
       return t("reservationCalendar:heading.newReservation");
     }
     return t("reservationCalendar:heading.pendingReservation");
-  }, [step, formStatus, t]);
+  }, [step, t]);
 
   // TODO all this is copy pasta from EditStep1
   const supportedFields =
@@ -529,93 +520,75 @@ const ReservationUnitReservationWithReservationProp = ({
   return (
     <StyledContainer>
       <Columns>
-        {formStatus === "sent" && reservation != null ? (
+        {pendingReservation != null && (
           <div>
             <ReservationInfoCard
-              reservation={reservation}
+              reservation={pendingReservation}
               reservationUnit={reservationUnit}
-              type="confirmed"
+              type="pending"
+              shouldDisplayReservationUnitPrice={
+                shouldDisplayReservationUnitPrice
+              }
             />
+            {termsOfUseContent && (
+              <JustForDesktop>
+                <PinkBox>
+                  <Subheading>
+                    {t("reservations:reservationInfoBoxHeading")}
+                  </Subheading>
+                  <Sanitize html={termsOfUseContent} />
+                </PinkBox>
+              </JustForDesktop>
+            )}
           </div>
-        ) : (
-          pendingReservation != null && (
-            <div>
-              <ReservationInfoCard
-                reservation={pendingReservation}
-                reservationUnit={reservationUnit}
-                type="pending"
-                shouldDisplayReservationUnitPrice={
-                  shouldDisplayReservationUnitPrice
-                }
-              />
-              {termsOfUseContent && (
-                <JustForDesktop>
-                  <PinkBox>
-                    <Subheading>
-                      {t("reservations:reservationInfoBoxHeading")}
-                    </Subheading>
-                    <Sanitize html={termsOfUseContent} />
-                  </PinkBox>
-                </JustForDesktop>
-              )}
-            </div>
-          )
         )}
         <BodyContainer>
-          {formStatus === "pending" && (
-            <FormProvider {...form}>
-              <div>
-                <Title>{pageTitle}</Title>
-                {steps.length <= 2 && (
-                  <StyledStepper
-                    language={i18n.language}
-                    selectedStep={step}
-                    small={false}
-                    onStepClick={(e) => {
-                      const target = e.currentTarget;
-                      const s = target
-                        .getAttribute("data-testid")
-                        ?.replace("hds-stepper-step-", "");
-                      if (s) {
-                        setStep(parseInt(s, 10));
-                      }
-                    }}
-                    steps={steps}
-                  />
-                )}
-              </div>
-              {step === 0 && (
-                <Step0
-                  reservationUnit={reservationUnit}
-                  handleSubmit={handleSubmit(onSubmitStep0)}
-                  generalFields={generalFields}
-                  reservationApplicationFields={reservationApplicationFields}
-                  cancelReservation={cancelReservation}
-                  options={options}
-                />
-              )}
-              {step === 1 && reservation != null && (
-                <Step1
-                  reservation={reservation}
-                  reservationUnit={reservationUnit}
-                  handleSubmit={handleSubmit(onSubmitStep1)}
-                  generalFields={generalFields}
-                  reservationApplicationFields={reservationApplicationFields}
-                  options={options}
-                  reserveeType={reserveeType}
+          <FormProvider {...form}>
+            <div>
+              <Title>{pageTitle}</Title>
+              {steps.length <= 2 && (
+                <StyledStepper
+                  language={i18n.language}
+                  selectedStep={step}
+                  small={false}
+                  onStepClick={(e) => {
+                    const target = e.currentTarget;
+                    const s = target
+                      .getAttribute("data-testid")
+                      ?.replace("hds-stepper-step-", "");
+                    if (s) {
+                      setStep(parseInt(s, 10));
+                    }
+                  }}
                   steps={steps}
-                  setStep={setStep}
-                  termsOfUse={termsOfUse}
                 />
               )}
-            </FormProvider>
-          )}
-          {formStatus === "sent" && reservation != null && (
-            <ReservationConfirmation
-              reservation={reservation}
-              reservationUnit={reservationUnit}
-            />
-          )}
+            </div>
+            {step === 0 && (
+              <Step0
+                reservationUnit={reservationUnit}
+                handleSubmit={handleSubmit(onSubmitStep0)}
+                generalFields={generalFields}
+                reservationApplicationFields={reservationApplicationFields}
+                cancelReservation={cancelReservation}
+                options={options}
+              />
+            )}
+            {step === 1 && reservation != null && (
+              <Step1
+                reservation={reservation}
+                reservationUnit={reservationUnit}
+                handleSubmit={handleSubmit(onSubmitStep1)}
+                generalFields={generalFields}
+                reservationApplicationFields={reservationApplicationFields}
+                options={options}
+                reserveeType={reserveeType}
+                steps={steps}
+                setStep={setStep}
+                termsOfUse={termsOfUse}
+              />
+            )}
+          </FormProvider>
         </BodyContainer>
       </Columns>
       {errorMsg && (

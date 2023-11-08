@@ -107,83 +107,76 @@ const ReservationConfirmation = ({
   const router = useRouter();
 
   const instructionsKey = getReservationUnitInstructionsKey(reservation?.state);
-
   const requiresHandling =
     reservation.state === ReservationsReservationStateChoices.RequiresHandling;
+  const heading = t(
+    `reservationUnit:${
+      requiresHandling ? "reservationInHandling" : "reservationSuccessful"
+    }`
+  );
 
   return (
     <Wrapper>
-      <div>
-        <Heading>
-          {t(
-            `reservationUnit:${
-              requiresHandling
-                ? "reservationInHandling"
-                : "reservationSuccessful"
-            }`
-          )}
-        </Heading>
-        <Paragraph style={{ margin: "var(--spacing-xl) 0" }}>
-          <Trans
-            i18nKey={`reservationUnit:reservationReminderText${
-              requiresHandling ? "Handling" : ""
-            }`}
-            t={t}
-            components={{
-              br: <br />,
-              lnk: (
-                <InlineStyledLink href={reservationsUrl}>
-                  Omat varaukset -sivulta
-                </InlineStyledLink>
-              ),
-            }}
-          >
-            {" "}
-          </Trans>
-        </Paragraph>
-        {reservation.state ===
-          ReservationsReservationStateChoices.Confirmed && (
-          <ActionContainer1 style={{ marginBottom: "var(--spacing-2-xl)" }}>
-            <BlackButton
-              data-testid="reservation__confirmation--button__calendar-url"
-              onClick={() => router.push(String(reservation.calendarUrl))}
-              variant="secondary"
-              iconRight={<IconCalendar aria-hidden />}
-            >
-              {t("reservations:saveToCalendar")}
-            </BlackButton>
-            {order?.receiptUrl && (
-              <BlackButton
-                data-testid="reservation__confirmation--button__receipt-link"
-                onClick={() =>
-                  window.open(
-                    `${order.receiptUrl}&lang=${i18n.language}`,
-                    "_blank"
-                  )
-                }
-                variant="secondary"
-                iconRight={<IconLinkExternal aria-hidden />}
-              >
-                {t("reservations:downloadReceipt")}
-              </BlackButton>
-            )}
-          </ActionContainer1>
-        )}
-        {getTranslation(reservationUnit, String(instructionsKey)) && (
-          <>
-            <Subheading>{t("reservations:reservationInfo")}</Subheading>
-            <Paragraph style={{ margin: "var(--spacing-xl) 0" }}>
-              {getTranslation(reservationUnit, String(instructionsKey))}
-            </Paragraph>
-          </>
-        )}
-        <ReturnLinkList
-          reservationUnitHome={reservationUnitPath(Number(reservationUnit.pk))}
-          style={{
-            marginTop: "var(--spacing-3-xl)",
+      <Heading>{heading}</Heading>
+      <Paragraph style={{ margin: "var(--spacing-xl) 0" }}>
+        <Trans
+          i18nKey={`reservationUnit:reservationReminderText${
+            requiresHandling ? "Handling" : ""
+          }`}
+          t={t}
+          components={{
+            br: <br />,
+            lnk: (
+              <InlineStyledLink href={reservationsUrl}>
+                Omat varaukset -sivulta
+              </InlineStyledLink>
+            ),
           }}
-        />
-      </div>
+        >
+          {" "}
+        </Trans>
+      </Paragraph>
+      {reservation.state === ReservationsReservationStateChoices.Confirmed && (
+        <ActionContainer1 style={{ marginBottom: "var(--spacing-2-xl)" }}>
+          <BlackButton
+            data-testid="reservation__confirmation--button__calendar-url"
+            onClick={() => router.push(String(reservation.calendarUrl))}
+            variant="secondary"
+            iconRight={<IconCalendar aria-hidden />}
+          >
+            {t("reservations:saveToCalendar")}
+          </BlackButton>
+          {order?.receiptUrl && (
+            <BlackButton
+              data-testid="reservation__confirmation--button__receipt-link"
+              onClick={() =>
+                window.open(
+                  `${order.receiptUrl}&lang=${i18n.language}`,
+                  "_blank"
+                )
+              }
+              variant="secondary"
+              iconRight={<IconLinkExternal aria-hidden />}
+            >
+              {t("reservations:downloadReceipt")}
+            </BlackButton>
+          )}
+        </ActionContainer1>
+      )}
+      {getTranslation(reservationUnit, String(instructionsKey)) && (
+        <>
+          <Subheading>{t("reservations:reservationInfo")}</Subheading>
+          <Paragraph style={{ margin: "var(--spacing-xl) 0" }}>
+            {getTranslation(reservationUnit, String(instructionsKey))}
+          </Paragraph>
+        </>
+      )}
+      <ReturnLinkList
+        reservationUnitHome={reservationUnitPath(Number(reservationUnit.pk))}
+        style={{
+          marginTop: "var(--spacing-3-xl)",
+        }}
+      />
     </Wrapper>
   );
 };
