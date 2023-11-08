@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Deferrable
 
 __all__ = [
     "EventReservationUnit",
@@ -6,7 +7,7 @@ __all__ = [
 
 
 class EventReservationUnit(models.Model):
-    priority = models.IntegerField(null=True, blank=True)
+    preferred_order = models.PositiveIntegerField()
 
     application_event = models.ForeignKey(
         "applications.ApplicationEvent",
@@ -19,5 +20,20 @@ class EventReservationUnit(models.Model):
         related_name="event_reservation_units",
     )
 
+    class Meta:
+        ordering = ["preferred_order"]
+        constraints = [
+            models.UniqueConstraint(
+                name="unique_application_event_preferred_order",
+                fields=["application_event", "preferred_order"],
+                # Allows swapping `preferred_order` of two event reservation units
+                # for the same application event in a transaction
+                deferrable=Deferrable.DEFERRED,
+            ),
+        ]
+
     def __str__(self) -> str:
-        return f"EventReservationUnit {self.priority} {self.id}"
+        return (
+            f"{self.preferred_order}) application event '{self.application_event.name}' "
+            f"reservation unit '{self.reservation_unit.name}'"
+        )
