@@ -314,7 +314,7 @@ def _format_for_query(value: Any) -> str:
     if isinstance(value, Enum):
         return value.value
     if isinstance(value, list) and all(isinstance(item, Enum) for item in value):
-        return f"[{', '.join(item.value for item in value)}]"
+        return f"[{', '.join(str(item.value) for item in value)}]"
     return json.dumps(value)
 
 
