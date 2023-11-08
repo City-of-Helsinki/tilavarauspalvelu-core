@@ -109,6 +109,10 @@ class ModelSerializerAuthMutation(BaseAuthMutation, ClientIDMutation):
     class Mutation(CreateMutation):
         class Meta:
             serializer_class = MySerializer
+
+    class Mutation(UpdateMutation):
+        class Meta:
+            serializer_class = MySerializer
     ```
 
     `serializer_class` attribute is required, and should be set to a
@@ -368,7 +372,7 @@ class ModelAuthMutation(BaseAuthMutation, ClientIDMutation, GetInstanceMixin):
     Options are set in Meta-class:
 
     ```
-    class Mutation(CreateMutation):
+    class Mutation(DeleteMutation):
         class Meta:
             model = MyModel
     ```

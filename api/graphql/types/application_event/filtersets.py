@@ -73,9 +73,9 @@ class ApplicationEventFilterSet(BaseModelFilterSet):
     ) -> QuerySet:
         q = models.Q()
         if value["preferred_order"]:
-            q |= models.Q(event_reservation_units__priority__in=value["preferred_order"])
+            q |= models.Q(event_reservation_units__preferred_order__in=value["preferred_order"])
         if value["include_preferred_order_10_or_higher"]:
-            q |= models.Q(event_reservation_units__priority__gte=10)
+            q |= models.Q(event_reservation_units__preferred_order__gte=10)
 
         return qs.filter(q) if q != models.Q() else qs
 

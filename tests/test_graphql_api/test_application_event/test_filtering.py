@@ -498,15 +498,15 @@ def test_can_filter_application_event__by_preferred_order(graphql):
     application = ApplicationFactory.create_in_status_draft()
     event_1 = ApplicationEventFactory.create_in_status_unallocated(
         application=application,
-        event_reservation_units__priority=1,
+        event_reservation_units__preferred_order=1,
     )
     ApplicationEventFactory.create_in_status_unallocated(
         application=application,
-        event_reservation_units__priority=2,
+        event_reservation_units__preferred_order=2,
     )
     ApplicationEventFactory.create_in_status_unallocated(
         application=application,
-        event_reservation_units__priority=3,
+        event_reservation_units__preferred_order=3,
     )
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
@@ -530,15 +530,15 @@ def test_can_filter_application_event__by_preferred_order__multiple(graphql):
     application = ApplicationFactory.create_in_status_draft()
     event_1 = ApplicationEventFactory.create_in_status_unallocated(
         application=application,
-        event_reservation_units__priority=1,
+        event_reservation_units__preferred_order=1,
     )
     ApplicationEventFactory.create_in_status_unallocated(
         application=application,
-        event_reservation_units__priority=2,
+        event_reservation_units__preferred_order=2,
     )
     event_2 = ApplicationEventFactory.create_in_status_unallocated(
         application=application,
-        event_reservation_units__priority=3,
+        event_reservation_units__preferred_order=3,
     )
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
@@ -563,19 +563,19 @@ def test_can_filter_application_event__by_include_preferred_order_10_or_higher(g
     application = ApplicationFactory.create_in_status_draft()
     ApplicationEventFactory.create_in_status_unallocated(
         application=application,
-        event_reservation_units__priority=1,
+        event_reservation_units__preferred_order=1,
     )
     ApplicationEventFactory.create_in_status_unallocated(
         application=application,
-        event_reservation_units__priority=2,
+        event_reservation_units__preferred_order=2,
     )
     event_3 = ApplicationEventFactory.create_in_status_unallocated(
         application=application,
-        event_reservation_units__priority=10,
+        event_reservation_units__preferred_order=10,
     )
     event_4 = ApplicationEventFactory.create_in_status_unallocated(
         application=application,
-        event_reservation_units__priority=11,
+        event_reservation_units__preferred_order=11,
     )
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
@@ -600,19 +600,19 @@ def test_can_filter_application_event__by_include_preferred_order_10_or_higher__
     application = ApplicationFactory.create_in_status_draft()
     event_1 = ApplicationEventFactory.create_in_status_unallocated(
         application=application,
-        event_reservation_units__priority=1,
+        event_reservation_units__preferred_order=1,
     )
     ApplicationEventFactory.create_in_status_unallocated(
         application=application,
-        event_reservation_units__priority=2,
+        event_reservation_units__preferred_order=2,
     )
     event_3 = ApplicationEventFactory.create_in_status_unallocated(
         application=application,
-        event_reservation_units__priority=10,
+        event_reservation_units__preferred_order=10,
     )
     event_4 = ApplicationEventFactory.create_in_status_unallocated(
         application=application,
-        event_reservation_units__priority=11,
+        event_reservation_units__preferred_order=11,
     )
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 

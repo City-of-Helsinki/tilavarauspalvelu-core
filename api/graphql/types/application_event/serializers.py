@@ -14,7 +14,7 @@ class EventReservationUnitSerializer(TranslatedModelSerializer):
         model = EventReservationUnit
         fields = [
             "pk",
-            "priority",
+            "preferred_order",
             "reservation_unit",
         ]
 
