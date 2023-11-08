@@ -1,8 +1,14 @@
 import pytest
 
-from applications.choices import ApplicantTypeChoice
+from applications.choices import ApplicantTypeChoice, PriorityChoice
 from applications.models import ApplicationEvent, EventReservationUnit
-from tests.factories import ApplicationEventFactory, ApplicationFactory
+from tests.factories import (
+    AgeGroupFactory,
+    ApplicationEventFactory,
+    ApplicationFactory,
+    CityFactory,
+    ReservationPurposeFactory,
+)
 from tests.helpers import UserType
 from tests.test_graphql_api.test_application_event.helpers import events_query
 
@@ -361,3 +367,534 @@ def test_can_filter_application_event__by_application_status(graphql):
     # - The response contains the right application events
     assert len(response.edges) == 1, response
     assert response.node(0) == {"pk": event_1.pk}
+
+
+def test_can_filter_application_event__by_priority(graphql):
+    # given:
+    # - There is a draft application with application events with different priorities
+    # - A superuser is using the system
+    application = ApplicationFactory.create_in_status_draft()
+    event_1 = ApplicationEventFactory.create_in_status_unallocated(
+        application=application,
+        application_event_schedules__priority=PriorityChoice.HIGH,
+    )
+    ApplicationEventFactory.create_in_status_unallocated(
+        application=application,
+        application_event_schedules__priority=PriorityChoice.MEDIUM,
+    )
+    ApplicationEventFactory.create_in_status_unallocated(
+        application=application,
+        application_event_schedules__priority=PriorityChoice.LOW,
+    )
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    # when:
+    # - User tries to filter application events with a specific priority
+    query = events_query(priority=PriorityChoice.HIGH)
+    response = graphql(query)
+
+    # then:
+    # - The response contains no errors
+    # - The response contains the right application event
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"pk": event_1.pk}
+
+
+def test_can_filter_application_event__by_priority__multiple(graphql):
+    # given:
+    # - There is a draft application with application events with different priorities
+    # - A superuser is using the system
+    application = ApplicationFactory.create_in_status_draft()
+    event_1 = ApplicationEventFactory.create_in_status_unallocated(
+        application=application,
+        application_event_schedules__priority=PriorityChoice.HIGH,
+    )
+    ApplicationEventFactory.create_in_status_unallocated(
+        application=application,
+        application_event_schedules__priority=PriorityChoice.MEDIUM,
+    )
+    event_2 = ApplicationEventFactory.create_in_status_unallocated(
+        application=application,
+        application_event_schedules__priority=PriorityChoice.LOW,
+    )
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    # when:
+    # - User tries to filter application events with a specific priorities
+    query = events_query(priority=[PriorityChoice.HIGH, PriorityChoice.LOW])
+    response = graphql(query)
+
+    # then:
+    # - The response contains no errors
+    # - The response contains the right application events
+    assert response.has_errors is False, response
+    assert len(response.edges) == 2, response
+    assert response.node(0) == {"pk": event_1.pk}
+    assert response.node(1) == {"pk": event_2.pk}
+
+
+def test_can_filter_application_event__by_preferred_order(graphql):
+    # given:
+    # - There is a draft application with application events with different preferred orders
+    # - A superuser is using the system
+    application = ApplicationFactory.create_in_status_draft()
+    event_1 = ApplicationEventFactory.create_in_status_unallocated(
+        application=application,
+        event_reservation_units__priority=1,
+    )
+    ApplicationEventFactory.create_in_status_unallocated(
+        application=application,
+        event_reservation_units__priority=2,
+    )
+    ApplicationEventFactory.create_in_status_unallocated(
+        application=application,
+        event_reservation_units__priority=3,
+    )
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    # when:
+    # - User tries to filter application events with a specific preferred order
+    query = events_query(preferred_order=1)
+    response = graphql(query)
+
+    # then:
+    # - The response contains no errors
+    # - The response contains the right application event
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"pk": event_1.pk}
+
+
+def test_can_filter_application_event__by_preferred_order__multiple(graphql):
+    # given:
+    # - There is a draft application with application events with different preferred orders
+    # - A superuser is using the system
+    application = ApplicationFactory.create_in_status_draft()
+    event_1 = ApplicationEventFactory.create_in_status_unallocated(
+        application=application,
+        event_reservation_units__priority=1,
+    )
+    ApplicationEventFactory.create_in_status_unallocated(
+        application=application,
+        event_reservation_units__priority=2,
+    )
+    event_2 = ApplicationEventFactory.create_in_status_unallocated(
+        application=application,
+        event_reservation_units__priority=3,
+    )
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    # when:
+    # - User tries to filter application events with a specific preferred orders
+    query = events_query(preferred_order=[1, 3])
+    response = graphql(query)
+
+    # then:
+    # - The response contains no errors
+    # - The response contains the right application events
+    assert response.has_errors is False, response
+    assert len(response.edges) == 2, response
+    assert response.node(0) == {"pk": event_1.pk}
+    assert response.node(1) == {"pk": event_2.pk}
+
+
+def test_can_filter_application_event__by_include_preferred_order_10_or_higher(graphql):
+    # given:
+    # - There is a draft application with application events with different preferred orders (some of which are 10+)
+    # - A superuser is using the system
+    application = ApplicationFactory.create_in_status_draft()
+    ApplicationEventFactory.create_in_status_unallocated(
+        application=application,
+        event_reservation_units__priority=1,
+    )
+    ApplicationEventFactory.create_in_status_unallocated(
+        application=application,
+        event_reservation_units__priority=2,
+    )
+    event_3 = ApplicationEventFactory.create_in_status_unallocated(
+        application=application,
+        event_reservation_units__priority=10,
+    )
+    event_4 = ApplicationEventFactory.create_in_status_unallocated(
+        application=application,
+        event_reservation_units__priority=11,
+    )
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    # when:
+    # - User tries to filter application events with a preferred order 10 or higher
+    query = events_query(include_preferred_order_10_or_higher=True)
+    response = graphql(query)
+
+    # then:
+    # - The response contains no errors
+    # - The response contains the right application events
+    assert response.has_errors is False, response
+    assert len(response.edges) == 2, response
+    assert response.node(0) == {"pk": event_3.pk}
+    assert response.node(1) == {"pk": event_4.pk}
+
+
+def test_can_filter_application_event__by_include_preferred_order_10_or_higher__with_higher(graphql):
+    # given:
+    # - There is a draft application with application events with different preferred orders (some of which are 10+)
+    # - A superuser is using the system
+    application = ApplicationFactory.create_in_status_draft()
+    event_1 = ApplicationEventFactory.create_in_status_unallocated(
+        application=application,
+        event_reservation_units__priority=1,
+    )
+    ApplicationEventFactory.create_in_status_unallocated(
+        application=application,
+        event_reservation_units__priority=2,
+    )
+    event_3 = ApplicationEventFactory.create_in_status_unallocated(
+        application=application,
+        event_reservation_units__priority=10,
+    )
+    event_4 = ApplicationEventFactory.create_in_status_unallocated(
+        application=application,
+        event_reservation_units__priority=11,
+    )
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    # when:
+    # - User tries to filter application events with a preferred order 10 or higher, and a specific preferred order
+    query = events_query(preferred_order=1, include_preferred_order_10_or_higher=True)
+    response = graphql(query)
+
+    # then:
+    # - The response contains no errors
+    # - The response contains the right application event
+    assert response.has_errors is False, response
+    assert len(response.edges) == 3, response
+    assert response.node(0) == {"pk": event_1.pk}
+    assert response.node(1) == {"pk": event_3.pk}
+    assert response.node(2) == {"pk": event_4.pk}
+
+
+def test_can_filter_application_event__by_home_city(graphql):
+    # given:
+    # - There are two application with different home cities, each with one application event
+    # - A superuser is using the system
+    city_1 = CityFactory.create(name="Helsinki")
+    city_2 = CityFactory.create(name="Other")
+    application_1 = ApplicationFactory.create_in_status_draft(home_city=city_1)
+    application_2 = ApplicationFactory.create_in_status_draft(home_city=city_2)
+    event_1 = ApplicationEventFactory.create_in_status_unallocated(application=application_1)
+    ApplicationEventFactory.create_in_status_unallocated(application=application_2)
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    # when:
+    # - User tries to filter application events with a specific preferred order
+    query = events_query(home_city=city_1.pk)
+    response = graphql(query)
+
+    # then:
+    # - The response contains no errors
+    # - The response contains the right application event
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"pk": event_1.pk}
+
+
+def test_can_filter_application_event__by_home_city__multiple(graphql):
+    # given:
+    # - There are two application with different home cities, each with one application event
+    # - A superuser is using the system
+    city_1 = CityFactory.create(name="Helsinki")
+    city_2 = CityFactory.create(name="Other")
+    application_1 = ApplicationFactory.create_in_status_draft(home_city=city_1)
+    application_2 = ApplicationFactory.create_in_status_draft(home_city=city_2)
+    event_1 = ApplicationEventFactory.create_in_status_unallocated(application=application_1)
+    event_2 = ApplicationEventFactory.create_in_status_unallocated(application=application_2)
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    # when:
+    # - User tries to filter application events with a specific preferred order
+    query = events_query(home_city=[city_1.pk, city_2.pk])
+    response = graphql(query)
+
+    # then:
+    # - The response contains no errors
+    # - The response contains the right application event
+    assert response.has_errors is False, response
+    assert len(response.edges) == 2, response
+    assert response.node(0) == {"pk": event_1.pk}
+    assert response.node(1) == {"pk": event_2.pk}
+
+
+def test_can_filter_application_event__by_age_group(graphql):
+    # given:
+    # - There is an application with two application events with different age groups
+    # - A superuser is using the system
+    age_group_1 = AgeGroupFactory.create()
+    age_group_2 = AgeGroupFactory.create()
+    application = ApplicationFactory.create_in_status_draft()
+    event_1 = ApplicationEventFactory.create_in_status_unallocated(application=application, age_group=age_group_1)
+    ApplicationEventFactory.create_in_status_unallocated(application=application, age_group=age_group_2)
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    # when:
+    # - User tries to filter application events with a given age group
+    query = events_query(age_group=age_group_1.pk)
+    response = graphql(query)
+
+    # then:
+    # - The response contains no errors
+    # - The response contains the right application events
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"pk": event_1.pk}
+
+
+def test_can_filter_application_event__by_age_group__multiple(graphql):
+    # given:
+    # - There is an application with two application events with different age groups
+    # - A superuser is using the system
+    age_group_1 = AgeGroupFactory.create()
+    age_group_2 = AgeGroupFactory.create()
+    application = ApplicationFactory.create_in_status_draft()
+    event_1 = ApplicationEventFactory.create_in_status_unallocated(application=application, age_group=age_group_1)
+    event_2 = ApplicationEventFactory.create_in_status_unallocated(application=application, age_group=age_group_2)
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    # when:
+    # - User tries to filter application events with a given age groups
+    query = events_query(age_group=[age_group_1.pk, age_group_2.pk])
+    response = graphql(query)
+
+    # then:
+    # - The response contains no errors
+    # - The response contains the right application events
+    assert response.has_errors is False, response
+    assert len(response.edges) == 2, response
+    assert response.node(0) == {"pk": event_1.pk}
+    assert response.node(1) == {"pk": event_2.pk}
+
+
+def test_can_filter_application_event__by_purpose(graphql):
+    # given:
+    # - There is an application with two application events with different reservation purposes
+    # - A superuser is using the system
+    purpose_1 = ReservationPurposeFactory.create()
+    purpose_2 = ReservationPurposeFactory.create()
+    application = ApplicationFactory.create_in_status_draft()
+    event_1 = ApplicationEventFactory.create_in_status_unallocated(application=application, purpose=purpose_1)
+    ApplicationEventFactory.create_in_status_unallocated(application=application, purpose=purpose_2)
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    # when:
+    # - User tries to filter application events with a given reservation purpose
+    query = events_query(purpose=purpose_1.pk)
+    response = graphql(query)
+
+    # then:
+    # - The response contains no errors
+    # - The response contains the right application events
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"pk": event_1.pk}
+
+
+def test_can_filter_application_event__by_purpose__multiple(graphql):
+    # given:
+    # - There is an application with two application events with different reservation purposes
+    # - A superuser is using the system
+    purpose_1 = ReservationPurposeFactory.create()
+    purpose_2 = ReservationPurposeFactory.create()
+    application = ApplicationFactory.create_in_status_draft()
+    event_1 = ApplicationEventFactory.create_in_status_unallocated(application=application, purpose=purpose_1)
+    event_2 = ApplicationEventFactory.create_in_status_unallocated(application=application, purpose=purpose_2)
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    # when:
+    # - User tries to filter application events with a given reservation purpose
+    query = events_query(purpose=[purpose_1.pk, purpose_2.pk])
+    response = graphql(query)
+
+    # then:
+    # - The response contains no errors
+    # - The response contains the right application events
+    assert response.has_errors is False, response
+    assert len(response.edges) == 2, response
+    assert response.node(0) == {"pk": event_1.pk}
+    assert response.node(1) == {"pk": event_2.pk}
+
+
+def test_can_filter_application_event__by_text_search__event_name(graphql):
+    # given:
+    # - There is an application with two application events
+    # - A superuser is using the system
+    application = ApplicationFactory.create_in_status_draft(organisation=None, contact_person=None, user=None)
+    event_1 = ApplicationEventFactory.create_in_status_unallocated(application=application, name="foo")
+    ApplicationEventFactory.create_in_status_unallocated(application=application, name="bar")
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    # when:
+    # - User tries to filter application events with a text search
+    query = events_query(text_search="foo")
+    response = graphql(query)
+
+    # then:
+    # - The response contains no errors
+    # - The response contains the right application events
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"pk": event_1.pk}
+
+
+def test_can_filter_application_event__by_text_search__applicant__organisation_name(graphql):
+    # given:
+    # - There is an application with two application events
+    # - A superuser is using the system
+    application = ApplicationFactory.create_in_status_draft(
+        organisation__name="fizz",
+        contact_person=None,
+        user=None,
+    )
+    event = ApplicationEventFactory.create_in_status_unallocated(application=application, name="foo")
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    # when:
+    # - User tries to filter application events with a text search
+    query = events_query(text_search="fizz")
+    response = graphql(query)
+
+    # then:
+    # - The response contains no errors
+    # - The response contains the right application events
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"pk": event.pk}
+
+
+def test_can_filter_application_event__by_text_search__applicant__contact_person_first_name(graphql):
+    # given:
+    # - There is an application with two application events
+    # - A superuser is using the system
+    application = ApplicationFactory.create_in_status_draft(
+        organisation=None,
+        contact_person__first_name="fizz",
+        contact_person__last_name="none",
+        user=None,
+    )
+    event = ApplicationEventFactory.create_in_status_unallocated(application=application, name="foo")
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    # when:
+    # - User tries to filter application events with a text search
+    query = events_query(text_search="fizz")
+    response = graphql(query)
+
+    # then:
+    # - The response contains no errors
+    # - The response contains the right application events
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"pk": event.pk}
+
+
+def test_can_filter_application_event__by_text_search__applicant__contact_person_last_name(graphql):
+    # given:
+    # - There is an application with two application events
+    # - A superuser is using the system
+    application = ApplicationFactory.create_in_status_draft(
+        organisation=None,
+        contact_person__first_name="none",
+        contact_person__last_name="fizz",
+        user=None,
+    )
+    event = ApplicationEventFactory.create_in_status_unallocated(application=application, name="foo")
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    # when:
+    # - User tries to filter application events with a text search
+    query = events_query(text_search="fizz")
+    response = graphql(query)
+
+    # then:
+    # - The response contains no errors
+    # - The response contains the right application events
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"pk": event.pk}
+
+
+def test_can_filter_application_event__by_text_search__applicant__user_first_name(graphql):
+    # given:
+    # - There is an application with two application events
+    # - A superuser is using the system
+    application = ApplicationFactory.create_in_status_draft(
+        organisation=None,
+        contact_person=None,
+        user__first_name="fizz",
+        user__last_name="none",
+    )
+    event = ApplicationEventFactory.create_in_status_unallocated(application=application, name="foo")
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    # when:
+    # - User tries to filter application events with a text search
+    query = events_query(text_search="fizz")
+    response = graphql(query)
+
+    # then:
+    # - The response contains no errors
+    # - The response contains the right application events
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"pk": event.pk}
+
+
+def test_can_filter_application_event__by_text_search__applicant__user_last_name(graphql):
+    # given:
+    # - There is an application with two application events
+    # - A superuser is using the system
+    application = ApplicationFactory.create_in_status_draft(
+        organisation=None,
+        contact_person=None,
+        user__first_name="none",
+        user__last_name="fizz",
+    )
+    event = ApplicationEventFactory.create_in_status_unallocated(application=application, name="foo")
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    # when:
+    # - User tries to filter application events with a text search
+    query = events_query(text_search="fizz")
+    response = graphql(query)
+
+    # then:
+    # - The response contains no errors
+    # - The response contains the right application events
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"pk": event.pk}
+
+
+def test_can_filter_application_event__by_text_search__not_found(graphql):
+    # given:
+    # - There is an application with two application events
+    # - A superuser is using the system
+    application = ApplicationFactory.create_in_status_draft(
+        organisation__name="org",
+        contact_person__first_name="fizz",
+        contact_person__last_name="buzz",
+        user__first_name="person",
+        user__last_name="one",
+    )
+    ApplicationEventFactory.create_in_status_unallocated(application=application, name="foo")
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    # when:
+    # - User tries to filter application events with a text search
+    query = events_query(text_search="not found")
+    response = graphql(query)
+
+    # then:
+    # - The response contains no errors
+    # - The response contains no application events
+    assert response.has_errors is False, response
+    assert len(response.edges) == 0, response
