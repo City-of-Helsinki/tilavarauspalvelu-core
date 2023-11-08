@@ -34,13 +34,12 @@ import {
   ReservationUnitState,
   TermsOfUseTermsOfUseTermsTypeChoices,
   ReservationUnitByPkType,
-  ReservationUnitsReservationUnitPricingPricingTypeChoices,
   ReservationUnitsReservationUnitPricingStatusChoices,
 } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { H4 } from "common/src/common/typography";
 import { breakpoints } from "common";
-import { fromUIDate } from "common/src/common/util";
+import { fromUIDate, toApiDate } from "common/src/common/util";
 import { previewUrlPrefix, publicUrl } from "@/common/const";
 import { UNIT_WITH_SPACES_AND_RESOURCES } from "@/common/queries";
 import {
@@ -77,6 +76,7 @@ import { Image } from "./types";
 import PricingType from "./PricingType";
 import GenericDialog from "./GenericDialog";
 import { ReservationEditFormValues, convert } from "./form";
+import Error404 from "@/common/Error404";
 
 const RichTextInput = dynamic(() => import("../../RichTextInput"), {
   ssr: false,
@@ -516,6 +516,8 @@ const ReservationUnitEditor = ({
       publishBeginsTime,
       publishEndsDate,
       publishEndsTime,
+      pricings,
+      hasFuturePricing,
       ...values
     } = formValues;
 
@@ -528,9 +530,24 @@ const ReservationUnitEditor = ({
       publishEnds: constructApiDate(publishEndsDate, publishEndsTime),
       ...(isDraft ? { isDraft } : {}),
       ...(isArchived ? { isArchived } : {}),
-      // FIXME
-      pricings: [],
+      // FIXME this saves "past" status always?
+      // no it doesn't it just doesn't save status if the pk is 0
+      pricings: filterNonNullable(pricings).filter((p) => hasFuturePricing || p.status === ReservationUnitsReservationUnitPricingStatusChoices.Active).map((p) => ({
+        begins: toApiDate(fromUIDate(p.begins)) ?? "",
+        highestPrice: p.highestPrice,
+        highestPriceNet: p.highestPriceNet,
+        lowestPrice: p.lowestPrice,
+        lowestPriceNet: p.lowestPriceNet,
+        ...(p.pk != 0 ? { pk: p.pk } : {}),
+        priceUnit: p.priceUnit,
+        pricingType: p.pricingType,
+        status: p.status,
+        taxPercentagePk: p.taxPercentage.pk,
+      })),
     }
+    // FIXME only one active price can be saved
+    // FIXME we need to refetch the reservation unit after save if pricing is saved with a new pricing (pk == 0) then
+    // all subsequent saves will fail (or create new pricing) because the pk is not updated in the form
 
     const mutation = values.pk !== 0 ? updateReservationUnit : createReservationUnit;
     try {
@@ -646,7 +663,11 @@ const ReservationUnitEditor = ({
     setImages(images)
   }
 
-  const isPaid = watch('pricings').find((p) => p.pricingType === "PAID") != null;
+  const isFuturePriceVisible = watch('hasFuturePricing');
+  const isPaid = watch('pricings')
+    .filter((p) => p?.pricingType === "PAID")
+    .filter((p) => p.status === ReservationUnitsReservationUnitPricingStatusChoices.Active || isFuturePriceVisible)
+    .length > 0;
 
   const getValidationError = (_ignore: string) => undefined;
   const unit = unitResourcesData?.unitByPk ?? undefined;
@@ -730,7 +751,6 @@ const ReservationUnitEditor = ({
   const isSaving = isSubmitting;
   const hasChanges = isDirty;
 
-  const hasFuturePrice = watch('pricings').find((p) => p.status === ReservationUnitsReservationUnitPricingStatusChoices.Future) != null;
   // TODO cleanup this to separate component
   // - wrapper (with breadcrumb)
   //  - form
@@ -800,9 +820,9 @@ const ReservationUnitEditor = ({
                     required
                     id={fieldName}
                     label={t(`ReservationUnitEditor.label.${fieldName}`)}
+                    errorText={getValidationError(fieldName)}
                     /*
                     tooltipText={ lang === "fi" ? t("ReservationUnitEditor.tooltip.nameFi") : undefined }
-                    errorText={getValidationError(fieldName)}
                     invalid={!!getValidationError(fieldName)}
                     */
                   />
@@ -1391,56 +1411,90 @@ const ReservationUnitEditor = ({
               </Grid>
             </Accordion>
           )}
+            {/* TODO allow adding a new one (future option),
+              this should support one ACTIVE and one FUTURE though the backend can return a full array of anything
+              TODO split this into active and future but that's gonna break the index
+              */}
           <Accordion
             initiallyOpen
             heading={t("ReservationUnitEditor.label.pricings")}
           >
-            {/* TODO allow adding a new one (future option),
-              this should support one ACTIVE and one FUTURE though the backend can return a full array of anything */}
-            {watch('pricings').map((pricing, index) => (
-              <>
-                <FieldGroup
-                  // TODO add a formKey so we can destroy the pricings without messing the key / index
-                  key={index}
-                  id="pricings"
-                  heading={`${t("ReservationUnitEditor.label.pricingType")} *`}
-                  tooltip={t("ReservationUnitEditor.tooltip.pricingType")}
-                />
-                {/* TODO form index is bad, use pk or form key */}
-                <PricingType
-                  index={index}
-                  form={form}
-                  taxPercentageOptions={taxPercentageOptions}
-                />
-              </>
-            ))}
-            {hasFuturePrice ? (
-              // TODO allow disabling the future pricing (problem if there is more than one, but I guess we can just disable all of them)
-              <div>Future price</div>
-            ) : (
-              // TODO allow adding a new one here (register a new field with a button)
-              <div>NO future price</div>
-            )}
-            {isPaid && (
-              // TODO this should be outside the pricing type because it's reservation unit wide
-              <HorisontalFlex style={{ justifyContent: "space-between", width: "100%" }} >
-                <Controller
-                  control={control}
-                  name={"canApplyFreeOfCharge"}
-                  render={({ field: { value, onChange } }) => (
-                    <Checkbox
-                      checked={value}
-                      onChange={(e) => onChange(e.target.checked)}
-                      label={t("ReservationUnitEditor.label.canApplyFreeOfCharge")}
-                      id="canApplyFreeOfCharge"
-                    />
-                  )}
-                />
-                <Tooltip>
-                  {t("ReservationUnitEditor.tooltip.canApplyFreeOfCharge")}
-                </Tooltip>
-              </HorisontalFlex>
-            )}
+            <div style={{
+              gap: "var(--spacing-m)",
+              display: "flex",
+              flexDirection: "column",
+            }}>
+              {watch('pricings').map((pricing, index) => (
+                pricing?.status === ReservationUnitsReservationUnitPricingStatusChoices.Active && (
+                <>
+                  <FieldGroup
+                    // TODO add a formKey so we can destroy the pricings without messing the key / index
+                    key={index}
+                    id="pricings"
+                    heading={`${t("ReservationUnitEditor.label.pricingType")} *`}
+                    tooltip={t("ReservationUnitEditor.tooltip.pricingType")}
+                  />
+                  {/* TODO form index is bad, use pk or form key */}
+                  <PricingType
+                    index={index}
+                    form={form}
+                    taxPercentageOptions={taxPercentageOptions}
+                  />
+                </>
+                )
+              ))}
+              <Controller
+                control={control}
+                name={"hasFuturePricing"}
+                render={({ field: { value, onChange } }) => (
+                  <Checkbox
+                    checked={value}
+                    onChange={() => onChange(!value)}
+                    label={t("ReservationUnitEditor.label.priceChange")}
+                    id="hasFuturePrice"
+                  />
+                )}
+              />
+              {watch('hasFuturePricing') && watch('pricings').map((pricing, index) => (
+                pricing.status === ReservationUnitsReservationUnitPricingStatusChoices.Future && (
+                <>
+                  <FieldGroup
+                    // TODO add a formKey so we can destroy the pricings without messing the key / index
+                    key={index}
+                    id="pricings"
+                    heading={`${t("ReservationUnitEditor.label.pricingType")} *`}
+                    tooltip={t("ReservationUnitEditor.tooltip.pricingType")}
+                  />
+                  {/* TODO form index is bad, use pk or form key */}
+                  <PricingType
+                    index={index}
+                    form={form}
+                    taxPercentageOptions={taxPercentageOptions}
+                  />
+                </>
+                )
+              ))}
+              {isPaid && (
+                // TODO this should be outside the pricing type because it's reservation unit wide
+                <HorisontalFlex style={{ justifyContent: "space-between", width: "100%" }} >
+                  <Controller
+                    control={control}
+                    name={"canApplyFreeOfCharge"}
+                    render={({ field: { value, onChange } }) => (
+                      <Checkbox
+                        checked={value}
+                        onChange={(e) => onChange(e.target.checked)}
+                        label={t("ReservationUnitEditor.label.canApplyFreeOfCharge")}
+                        id="canApplyFreeOfCharge"
+                      />
+                    )}
+                  />
+                  <Tooltip>
+                    {t("ReservationUnitEditor.tooltip.canApplyFreeOfCharge")}
+                  </Tooltip>
+                </HorisontalFlex>
+              )}
+            </div>
           </Accordion>
           {/* FIXME getFormValue (might also disable over hidding) */}
           {watch('canApplyFreeOfCharge') && isPaid && (
@@ -1454,9 +1508,7 @@ const ReservationUnitEditor = ({
                     label={t("ReservationUnitEditor.label.pricingTermsPk")}
                     placeholder={t("common.select")}
                     required
-                    // sort
-                    // TODO
-                    // clearable={!!get(state.reservationUnitEdit, "pricingTermsPk") }
+                    clearable
                     options={pricingTermsOptions}
                     value={pricingTermsOptions.find((o) => o.value === value) ?? null}
                     onChange={(val: { value: string; label: string }) => onChange(val.value)}
@@ -1541,12 +1593,12 @@ const ReservationUnitEditor = ({
                         id={fieldName}
                         label={t(`ReservationUnitEditor.label.${fieldName}`)}
                         errorText={getValidationError(fieldName)}
-                      /* FIXME
-                      tooltipText={t("ReservationUnitEditor.tooltip.termsOfUseFi")}
-                      tooltipText={ lang === "fi" ? t( "ReservationUnitEditor.tooltip.reservationPendingInstructionsFi") : "" }
-                      errorText={getValidationError(fieldName)}
-                      invalid={!!getValidationError(fieldName)}
-                      */
+                        /* FIXME
+                        tooltipText={t("ReservationUnitEditor.tooltip.termsOfUseFi")}
+                        tooltipText={ lang === "fi" ? t( "ReservationUnitEditor.tooltip.reservationPendingInstructionsFi") : "" }
+                        errorText={getValidationError(fieldName)}
+                        invalid={!!getValidationError(fieldName)}
+                        */
                       />
                       )}
                     />
@@ -1764,7 +1816,7 @@ function EditorWrapper () {
   >(RESERVATIONUNIT_QUERY, {
     variables: { pk: Number(reservationUnitPk) },
     // TODO nan check
-    skip: !reservationUnitPk,
+    skip: !reservationUnitPk || Number(reservationUnitPk) === 0 || Number.isNaN(Number(reservationUnitPk)),
     onError: (err) => {
       console.error(err);
       notifyError(t("ReservationUnitEditor.dataLoadFailedMessage"));
@@ -1784,10 +1836,12 @@ function EditorWrapper () {
   if (isLoading) {
     return <Loader />;
   }
-  // TODO errors for routing problems (NaNs etc.)
-  if (unitPk == null) {
-    return null;
+  // TODO should catch garbage reservationUnitPk also (undefined or 'new' is fine)
+  // TODO also should catch if there is no such reservationUnit from the backend
+  if (unitPk == null || Number(unitPk) === 0 || Number.isNaN(Number(unitPk))) {
+    return <Error404 />;
   }
+
   // TODO allow new if no pk, but if the pk is invalid show an error instead
   /*
   if (reservationUnitData?.reservationUnitByPk == null) {

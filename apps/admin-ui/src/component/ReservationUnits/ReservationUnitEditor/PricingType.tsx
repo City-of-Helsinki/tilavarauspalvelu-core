@@ -1,8 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { format } from "date-fns";
-import { NumberInput, RadioButton } from "hds-react";
+import { DateInput, NumberInput, RadioButton } from "hds-react";
 import {
   ReservationUnitsReservationUnitPricingPriceUnitChoices,
   ReservationUnitsReservationUnitPricingPricingTypeChoices,
@@ -46,51 +45,42 @@ const PricingType = ({
 
   const pricing = watch(`pricings.${index}`);
 
-  /* TODO these should not be here but in the parent element
-  const handleToggleFuturePrice = () => {
-    console.log("handleToggleFuturePrice");
-  }
-
-  if (!pricing) {
-    if (type === "FUTURE") {
-      return hasPrice ? (
-        <VerticalFlex>
-          <Checkbox
-            id="priceChange"
-            label={t("ReservationUnitEditor.label.priceChange")}
-            onChange={handleToggleFuturePrice}
-          />
-        </VerticalFlex>
-      ) : null;
-    }
-  }
-  */
-
   const priceOptions = [ReservationUnitsReservationUnitPricingPricingTypeChoices.Free, ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid] as const;
+  // TODO what???
+  const hasPrice = true;
   return (
     <>
       {/* TODO options to add future price
         * should not be here but in the parent element
         * this handles rendering and form changes per pricing element
-        hasPrice && pricing?.status === "FUTURE" && (
+        */}
+      {hasPrice && pricing?.status === "FUTURE" && (
         <>
+          {/*
           <Checkbox
             id="priceChange"
             label={t("ReservationUnitEditor.label.priceChange")}
             checked
             onChange={handleToggleFuturePrice}
           />
+          */}
           <Grid>
             <Span3>
-              <DateInput
-                id="futureDate"
-                value={toHdsDate(pricing.begins)}
-                onChange={(e) => setPricingTypeValue({ begins: fromUIDate(e) })}
+              <Controller
+                name={`pricings.${index}.begins`}
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                <DateInput
+                  id="futureDate"
+                  value={value}
+                  onChange={(val) => onChange(val)}
+                />
+                )}
               />
             </Span3>
           </Grid>
         </>
-      ) */}
+      )}
       <Grid>
         <Controller
           name={`pricings.${index}.pricingType`}

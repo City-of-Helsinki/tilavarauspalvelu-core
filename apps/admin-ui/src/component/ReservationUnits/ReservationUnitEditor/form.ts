@@ -1,5 +1,5 @@
 import { filterNonNullable } from "common/src/helpers";
-import { fromApiDate } from "common/src/common/util";
+import { fromApiDate, toUIDate } from "common/src/common/util";
 import {
   ReservationUnitsReservationUnitReservationStartIntervalChoices,
   ReservationUnitsReservationUnitAuthenticationChoices,
@@ -10,9 +10,11 @@ import {
   ReservationUnitsReservationUnitPricingPriceUnitChoices,
   ReservationUnitPricingType,
 } from "common/types/gql-types";
-import { format } from "date-fns";
+import { addDays, format } from "date-fns";
 
 export type PricingFormValues = {
+  // pk === 0 means new pricing good decission?
+  // pk === 0 fails silently on the backend, but undefined creates a new pricing
   pk: number,
   taxPercentage: {
     pk?: number,
@@ -25,7 +27,9 @@ export type PricingFormValues = {
   pricingType: ReservationUnitsReservationUnitPricingPricingTypeChoices,
   priceUnit?: ReservationUnitsReservationUnitPricingPriceUnitChoices,
   status: ReservationUnitsReservationUnitPricingStatusChoices,
-  begins: Date,
+  // TODO this has to be a string because of HDS date input
+  // in ui format: "d.M.yyyy"
+  begins: string,
 }
 
 export type ReservationEditFormValues = {
@@ -83,6 +87,7 @@ export type ReservationEditFormValues = {
   purposePks: number[];
   qualifierPks: number[];
   paymentTypes: string[];
+  // TODO this can be undefined because we are registering / unregistering these
   pricings: PricingFormValues[];
   reservationUnitTypePk?: number;
   cancellationRulePk?: number;
@@ -96,6 +101,7 @@ export type ReservationEditFormValues = {
   // internal values
   isDraft: boolean;
   isArchived: boolean;
+  hasFuturePricing: boolean;
 }
 
 export const convert = (data?: ReservationUnitByPkType): ReservationEditFormValues => {
@@ -164,23 +170,31 @@ export const convert = (data?: ReservationUnitByPkType): ReservationEditFormValu
     cancellationTermsPk: data?.cancellationTerms?.pk ?? undefined,
     cancellationRulePk: data?.cancellationRule?.pk ?? undefined,
     paymentTypes: filterNonNullable(data?.paymentTypes?.map((pt) => pt?.code)),
-    pricings: convertPricings(filterNonNullable(data?.pricings)),
+    pricings: convertPricingList(filterNonNullable(data?.pricings)),
     isDraft: false,
     isArchived: false,
+    hasFuturePricing: false,
   };
 }
 
-// Always return at least one active or future pricing
-// TODO? should we return one active always (not counting the future ones)
-// Don't return past pricings (they can't be saved to backend)
-const convertPricings = (pricings: ReservationUnitPricingType[]): PricingFormValues[] => {
-  const notPast = pricings?.filter((p) => p?.status !== ReservationUnitsReservationUnitPricingStatusChoices.Past)
-  if (notPast.length > 0) {
-    return notPast.map((p) => ({
+const convertPricing = (p?: ReservationUnitPricingType): PricingFormValues => {
+  const convertBegins = (begins?: string, status?: ReservationUnitsReservationUnitPricingStatusChoices) => {
+    const d = begins != null && begins !== "" ? fromApiDate(begins) : undefined;
+    const today = new Date();
+    if (d != null) {
+      return toUIDate(d);
+    }
+    if (status === ReservationUnitsReservationUnitPricingStatusChoices.Future) {
+      return toUIDate(addDays(today, 1));
+    }
+    return toUIDate(today);
+  }
+
+  return {
       pk: p?.pk ?? 0,
       taxPercentage: {
-        pk: p?.taxPercentage.pk ?? undefined,
-        value: p?.taxPercentage.value ?? 0,
+        pk: p?.taxPercentage?.pk ?? undefined,
+        value: p?.taxPercentage?.value ?? 0,
       },
       lowestPrice: p?.lowestPrice ?? 0,
       lowestPriceNet: p?.lowestPriceNet ?? 0,
@@ -189,23 +203,22 @@ const convertPricings = (pricings: ReservationUnitPricingType[]): PricingFormVal
       pricingType: p?.pricingType ?? ReservationUnitsReservationUnitPricingPricingTypeChoices.Free,
       priceUnit: p?.priceUnit ?? undefined,
       status: p?.status ?? ReservationUnitsReservationUnitPricingStatusChoices.Active,
-      begins: p?.begins ? fromApiDate(p.begins) : new Date(),
-    }))
-  }
+      begins: convertBegins(p?.begins, p?.status),
+    }
+}
 
-  return [{
-    pk: 0,
-    taxPercentage: {
-      pk: undefined,
-      value: 0,
-    },
-    lowestPrice: 0,
-    lowestPriceNet: 0,
-    highestPrice: 0,
-    highestPriceNet: 0,
-    pricingType: ReservationUnitsReservationUnitPricingPricingTypeChoices.Free,
-    priceUnit: undefined,
-    status: ReservationUnitsReservationUnitPricingStatusChoices.Active,
-    begins: new Date(),
-  }]
+// Don't return past pricings (they can't be saved to backend)
+// Always return one active pricing and one future pricing
+// the boolean toggle in the form decides if the future one is shown or saved
+const convertPricingList = (pricings: ReservationUnitPricingType[]): PricingFormValues[] => {
+  // Past pricing can't be saved and is not displayed in the UI
+  const notPast = pricings?.filter((p) => p?.status !== ReservationUnitsReservationUnitPricingStatusChoices.Past)
+  // Only one active and one future pricing can be saved (and is actually shown)
+  const active = notPast.find((p) => p?.status === ReservationUnitsReservationUnitPricingStatusChoices.Active)
+  // TODO cleanup casting with a default values
+  const future = notPast.find((p) => p?.status === ReservationUnitsReservationUnitPricingStatusChoices.Future)
+    ?? { status: ReservationUnitsReservationUnitPricingStatusChoices.Future } as ReservationUnitPricingType;
+  // allow undefined's here so we create two default values always
+  const ret = [active, future].map(convertPricing);
+  return ret
 }

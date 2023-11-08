@@ -19,7 +19,6 @@ interface DateTimeProps<T extends FieldValues>
 
 /// or if not it's so dump it should be in the form itself
 /// NOTE HDS time component is utter garbage
-/// Seems like it's completely broken now and the value can't be set at all.
 /// It can never be reseted after creation (value === defaultValue, and it doesn't allow for refs).
 /// Most apparent when async loading server data and then trying to reset the form.
 /// TODO rework the TimeInput (either custom component or HDS upgrade)
@@ -43,8 +42,8 @@ const DateTimeInput = <T extends FieldValues>({
     rules: { required },
   });
 
-  const handleTimeChange = (evt: any) => {
-    timeField.onChange(evt.target.value)
+  const handleTimeChange = (evt: React.FormEvent<HTMLInputElement>) => {
+    timeField.onChange(evt.currentTarget.value)
   }
 
   return (
