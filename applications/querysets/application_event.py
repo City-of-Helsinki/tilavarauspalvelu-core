@@ -105,6 +105,9 @@ class ApplicationEventQuerySet(models.QuerySet):
     def has_status(self, status: ApplicationEventStatusChoice) -> Self:
         return self.with_event_status().filter(event_status=status.value)
 
+    def has_status_in(self, statuses: list[str]) -> Self:
+        return self.with_event_status().filter(event_status__in=statuses)
+
     def with_application_status(self) -> Self:
         return self.alias(
             unallocated_schedule_count=unallocated_schedule_count(),

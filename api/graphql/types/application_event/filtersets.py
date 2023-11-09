@@ -30,7 +30,7 @@ class ApplicationEventFilterSet(BaseModelFilterSet):
     unit = IntMultipleChoiceFilter(field_name="event_reservation_units__reservation_unit__unit")
 
     applicant_type = EnumMultipleChoiceFilter(field_name="application__applicant_type", enum=ApplicantTypeChoice)
-    status = EnumChoiceFilter(method="filter_by_status", enum=ApplicationEventStatusChoice)
+    status = EnumMultipleChoiceFilter(method="filter_by_status", enum=ApplicationEventStatusChoice)
     application_status = EnumChoiceFilter(method="filter_by_application_status", enum=ApplicationStatusChoice)
     priority = IntMultipleChoiceFilter(field_name="application_event_schedules__priority")
 
@@ -59,8 +59,8 @@ class ApplicationEventFilterSet(BaseModelFilterSet):
         return super().filter_queryset(queryset.with_applicant_alias())
 
     @staticmethod
-    def filter_by_status(qs: ApplicationEventQuerySet, name: str, value: str) -> QuerySet:
-        return qs.has_status(ApplicationEventStatusChoice(value))
+    def filter_by_status(qs: ApplicationEventQuerySet, name: str, value: list[str]) -> QuerySet:
+        return qs.has_status_in(value)
 
     @staticmethod
     def filter_by_application_status(qs: ApplicationEventQuerySet, name: str, value: str) -> QuerySet:

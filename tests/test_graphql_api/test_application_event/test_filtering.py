@@ -341,6 +341,34 @@ def test_can_filter_application_event__by_status(graphql):
     assert response.node(0) == {"pk": event_1.pk}
 
 
+def test_can_filter_application_event__by_status__multiple(graphql):
+    # given:
+    # - There is a draft application in an application round with two application events with different statuses
+    # - A superuser is using the system
+    application = ApplicationFactory.create_in_status_draft()
+    event_1 = ApplicationEventFactory.create_in_status_unallocated(application=application)
+    event_2 = ApplicationEventFactory.create_in_status_declined(application=application)
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    application_events = list(ApplicationEvent.objects.all().order_by("pk").with_event_status())
+    assert len(application_events) == 2
+    assert application_events[0].pk == event_1.pk
+    assert application_events[0].event_status == event_1.status.value
+    assert application_events[1].pk == event_2.pk
+    assert application_events[1].event_status == event_2.status.value
+
+    # when:
+    # - User tries to filter application events with a specific statuses
+    query = events_query(status=[event_1.status, event_2.status])
+    response = graphql(query)
+
+    # then:
+    # - The response contains the right application events
+    assert len(response.edges) == 2, response
+    assert response.node(0) == {"pk": event_1.pk}
+    assert response.node(1) == {"pk": event_2.pk}
+
+
 def test_can_filter_application_event__by_application_status(graphql):
     # given:
     # - There are two applications in different statuses in the same application round with one application event each
