@@ -115,7 +115,7 @@ const Preview = (props: {
         <ButtonContainer>
           <MediumButton
             variant="secondary"
-            onClick={() => router.push(`${application.pk}/page3`)}
+            onClick={() => router.push(`/application/${application.pk}/page3`)}
           >
             {t("common:prev")}
           </MediumButton>

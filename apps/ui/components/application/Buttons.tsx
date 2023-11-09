@@ -17,7 +17,7 @@ const Buttons = ({ applicationId }: Props): JSX.Element => {
     <ButtonContainer>
       <MediumButton
         variant="secondary"
-        onClick={() => router.push(`${applicationId}/page2`)}
+        onClick={() => router.push(`/application/${applicationId}/page2`)}
       >
         {t("common:prev")}
       </MediumButton>
