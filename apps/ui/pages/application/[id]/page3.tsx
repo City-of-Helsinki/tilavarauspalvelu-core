@@ -51,6 +51,18 @@ const transformPerson = (person?: PersonFormValues) => {
   };
 };
 
+const isAddressValid = (address?: AddressFormValues) => {
+  const { streetAddress, postCode, city } = address || {};
+  return (
+    streetAddress != null &&
+    streetAddress !== "" &&
+    postCode != null &&
+    postCode !== "" &&
+    city != null &&
+    city !== ""
+  );
+}
+
 const transformAddress = (address?: AddressFormValues) => {
   return {
     pk: address?.pk || undefined,
@@ -65,7 +77,7 @@ const transformOrganisation = (org?: OrganisationFormValues) => {
   return {
     name: org?.name || undefined,
     identifier: org?.identifier || undefined,
-    address: transformAddress(org?.address),
+    address: isAddressValid(org?.address) ? transformAddress(org?.address) : undefined,
     coreBusiness: org?.coreBusiness || undefined,
   };
 };
@@ -94,7 +106,7 @@ const transformApplication = (
   return {
     pk: values.pk,
     applicantType: values.applicantType,
-    ...(values.billingAddress != null
+    ...(values.billingAddress != null && values.hasBillingAddress
       ? { billingAddress: transformAddress(values.billingAddress) }
       : {}),
     ...(values.contactPerson != null
