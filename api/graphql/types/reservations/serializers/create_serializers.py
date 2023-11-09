@@ -136,8 +136,8 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
         self.fields["purpose_pk"].required = False
 
     def validate(self, data, prefill_from_profile=True):
-        begin = data.get("begin", getattr(self.instance, "begin", None))
-        end = data.get("end", getattr(self.instance, "end", None))
+        begin: datetime.datetime | None = data.get("begin", getattr(self.instance, "begin", None))
+        end: datetime.datetime | None = data.get("end", getattr(self.instance, "end", None))
         begin = begin.astimezone(DEFAULT_TIMEZONE)
         end = end.astimezone(DEFAULT_TIMEZONE)
 

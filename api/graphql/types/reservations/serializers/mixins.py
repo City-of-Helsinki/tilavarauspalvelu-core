@@ -237,7 +237,11 @@ class ReservationSchedulingMixin:
             )
 
     @staticmethod
-    def check_opening_hours(scheduler, begin, end):
+    def check_opening_hours(
+        scheduler: ReservationUnitReservationScheduler,
+        begin: datetime.datetime,
+        end: datetime.datetime,
+    ):
         is_reservation_unit_open = scheduler.is_reservation_unit_open(begin, end)
         if not scheduler.reservation_unit.allow_reservations_without_opening_hours and not is_reservation_unit_open:
             raise ValidationErrorWithCode(
@@ -330,7 +334,7 @@ class ReservationSchedulingMixin:
             )
 
     @staticmethod
-    def check_reservation_start_time(scheduler, begin):
+    def check_reservation_start_time(scheduler, begin: datetime.datetime):
         if scheduler.reservation_unit.allow_reservations_without_opening_hours:
             return
 
@@ -342,8 +346,7 @@ class ReservationSchedulingMixin:
         }
         interval = scheduler.reservation_unit.reservation_start_interval
         interval_minutes = interval_to_minutes[interval]
-        interval_timedelta = datetime.timedelta(minutes=interval_minutes)
-        possible_start_times = scheduler.get_reservation_unit_possible_start_times(begin, interval_timedelta)
+        possible_start_times = scheduler.get_reservation_unit_possible_start_times(begin.date(), interval_minutes)
         if begin not in possible_start_times:
             raise ValidationErrorWithCode(
                 f"Reservation start time does not match the allowed interval of {interval_minutes} minutes.",

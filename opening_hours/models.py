@@ -17,11 +17,18 @@ class OriginHaukiResource(models.Model):
     def __str__(self) -> str:
         return str(self.id)
 
+    def is_reservable(self, start_datetime: datetime.datetime, end_datetime: datetime.datetime) -> bool:
+        return self.reservable_time_spans.filter_period(start=start_datetime, end=end_datetime).exists()
+
 
 class ReservableTimeSpanQuerySet(models.QuerySet):
     def filter_period(self, start: datetime.date, end: datetime.date) -> QuerySet["ReservableTimeSpan"]:
         """Filter reservable time spans that overlap with the given period."""
         return self.filter(start_datetime__lt=end + datetime.timedelta(days=1), end_datetime__gt=start)
+
+    def filter_date(self, date: datetime.date) -> QuerySet["ReservableTimeSpan"]:
+        """Filter reservable time spans that overlap with the given date."""
+        return self.filter_period(start=date, end=date)
 
 
 class ReservableTimeSpan(models.Model):

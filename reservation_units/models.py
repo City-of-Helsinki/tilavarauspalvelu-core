@@ -639,16 +639,6 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
         return ReservationUnit.objects.filter(Q(resources__in=self.resources.all()) | Q(spaces__in=spaces)).distinct()
 
     @property
-    def hauki_resource_origin_id(self):
-        """Used by OpeningHoursMixin"""
-        return str(self.uuid)
-
-    @property
-    def hauki_resource_data_source_id(self):
-        """Used by OpeningHoursMixin"""
-        return settings.HAUKI_ORIGIN_ID
-
-    @property
     def state(self) -> ReservationUnitState:
         from reservation_units.utils.reservation_unit_state_helper import (
             ReservationUnitStateHelper,

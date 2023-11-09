@@ -12,8 +12,10 @@ from permissions.models import UnitRole, UnitRoleChoice, UnitRolePermission
 from reservation_units.models import PaymentType, ReservationUnit
 from reservations.models import ReservationMetadataField, ReservationMetadataSet
 from tests.factories import (
+    OriginHaukiResourceFactory,
     PaymentMerchantFactory,
     PaymentProductFactory,
+    ReservableTimeSpanFactory,
     ReservationPurposeFactory,
     ReservationUnitFactory,
     ReservationUnitTypeFactory,
@@ -27,6 +29,8 @@ DEFAULT_TIMEZONE = get_default_timezone()
 
 
 class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
+    reservation_unit: ReservationUnit
+
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -44,8 +48,20 @@ class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
             reservation_unit_type=cls.reservation_unit_type,
             payment_merchant=cls.payment_merchant,
             payment_product=cls.payment_product,
+            origin_hauki_resource=OriginHaukiResourceFactory(id="999"),
         )
         cls.reservation_unit.payment_types.set([PaymentType.ON_SITE])
+
+        ReservableTimeSpanFactory(
+            resource=cls.reservation_unit.origin_hauki_resource,
+            start_datetime=datetime.datetime.combine(
+                datetime.date.today(), datetime.time(hour=6), tzinfo=DEFAULT_TIMEZONE
+            ),
+            end_datetime=datetime.datetime.combine(
+                datetime.date.today(), datetime.time(hour=22), tzinfo=DEFAULT_TIMEZONE
+            ),
+        )
+
         cls.purpose = ReservationPurposeFactory(name="purpose")
 
         # Setup for reservation notification tests
