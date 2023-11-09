@@ -4,9 +4,9 @@ from django.utils.translation import gettext_lazy as _
 
 
 class CustomerTypeChoice(models.TextChoices):
-    BUSINESS = "BUSINESS", _("Business")
-    NONPROFIT = "NONPROFIT", _("Nonprofit")
-    INDIVIDUAL = "INDIVIDUAL", _("Individual")
+    BUSINESS = "business", _("Business")
+    NONPROFIT = "nonprofit", _("Nonprofit")
+    INDIVIDUAL = "individual", _("Individual")
 
 
 class ReservationStateChoice(models.TextChoices):
