@@ -117,3 +117,6 @@ class ApplicationEventQuerySet(models.QuerySet):
 
     def has_application_status(self, status: ApplicationStatusChoice) -> Self:
         return self.with_application_status().filter(application_status=status.value)
+
+    def has_application_status_in(self, statuses: list[str]) -> Self:
+        return self.with_application_status().filter(application_status__in=statuses)

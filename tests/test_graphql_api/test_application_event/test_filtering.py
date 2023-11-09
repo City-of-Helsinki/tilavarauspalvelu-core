@@ -397,6 +397,35 @@ def test_can_filter_application_event__by_application_status(graphql):
     assert response.node(0) == {"pk": event_1.pk}
 
 
+def test_can_filter_application_event__by_application_status__multiple(graphql):
+    # given:
+    # - There are two applications in different statuses in the same application round with one application event each
+    # - A superuser is using the system
+    application_1 = ApplicationFactory.create_in_status_draft()
+    application_2 = ApplicationFactory.create_in_status_in_allocation(application_events=[])
+    event_1 = ApplicationEventFactory.create_in_status_unallocated(application=application_1)
+    event_2 = ApplicationEventFactory.create_in_status_unallocated(application=application_2)
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    application_events = list(ApplicationEvent.objects.all().order_by("pk").with_application_status())
+    assert len(application_events) == 2
+    assert application_events[0].pk == event_1.pk
+    assert application_events[0].application_status == application_1.status.value
+    assert application_events[1].pk == event_2.pk
+    assert application_events[1].application_status == application_2.status.value
+
+    # when:
+    # - User tries to filter application events with a specific statuses
+    query = events_query(application_status=[application_1.status, application_2.status])
+    response = graphql(query)
+
+    # then:
+    # - The response contains the right application events
+    assert len(response.edges) == 2, response
+    assert response.node(0) == {"pk": event_1.pk}
+    assert response.node(1) == {"pk": event_2.pk}
+
+
 def test_can_filter_application_event__by_priority(graphql):
     # given:
     # - There is a draft application with application events with different priorities

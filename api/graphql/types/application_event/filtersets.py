@@ -10,7 +10,6 @@ from applications.models import ApplicationEvent
 from applications.querysets.application_event import ApplicationEventQuerySet
 from common.filtersets import (
     BaseModelFilterSet,
-    EnumChoiceFilter,
     EnumMultipleChoiceFilter,
     IntChoiceFilter,
     IntMultipleChoiceFilter,
@@ -31,7 +30,7 @@ class ApplicationEventFilterSet(BaseModelFilterSet):
 
     applicant_type = EnumMultipleChoiceFilter(field_name="application__applicant_type", enum=ApplicantTypeChoice)
     status = EnumMultipleChoiceFilter(method="filter_by_status", enum=ApplicationEventStatusChoice)
-    application_status = EnumChoiceFilter(method="filter_by_application_status", enum=ApplicationStatusChoice)
+    application_status = EnumMultipleChoiceFilter(method="filter_by_application_status", enum=ApplicationStatusChoice)
     priority = IntMultipleChoiceFilter(field_name="application_event_schedules__priority")
 
     preferred_order = IntMultipleChoiceFilter(method="filter_include_preferred_order")
@@ -63,8 +62,8 @@ class ApplicationEventFilterSet(BaseModelFilterSet):
         return qs.has_status_in(value)
 
     @staticmethod
-    def filter_by_application_status(qs: ApplicationEventQuerySet, name: str, value: str) -> QuerySet:
-        return qs.has_application_status(ApplicationStatusChoice(value))
+    def filter_by_application_status(qs: ApplicationEventQuerySet, name: str, value: list[str]) -> QuerySet:
+        return qs.has_application_status_in(value)
 
     @staticmethod
     def filter_include_preferred_order(
