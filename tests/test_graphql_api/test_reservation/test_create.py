@@ -1,12 +1,22 @@
-from datetime import date, datetime
+from datetime import datetime
 
+import freezegun
 import pytest
+from django.utils.timezone import get_default_timezone
 
 from reservations.models import Reservation
-from tests.factories import CityFactory, ReservationUnitFactory, UserFactory
+from tests.factories import (
+    CityFactory,
+    OriginHaukiResourceFactory,
+    ReservableTimeSpanFactory,
+    ReservationUnitFactory,
+    UserFactory,
+)
 from users.helauth.utils import ADLoginAMR
 
-from .helpers import CREATE_MUTATION, mock_opening_hours, mock_profile_reader
+from .helpers import CREATE_MUTATION, mock_profile_reader
+
+DEFAULT_TIMEZONE = get_default_timezone()
 
 # Applied to all tests
 pytestmark = [
@@ -16,14 +26,21 @@ pytestmark = [
 
 
 @pytest.mark.parametrize("arm", ["suomi_fi", "heltunnistussuomifi"])
+@freezegun.freeze_time("2021-01-01")
 def test_create_reservation__prefilled_with_profile_data(graphql, settings, arm: str):
     # given:
     # - Prefill setting is on
     # - There is a reservation unit in the system
+    # - The reservation unit has reservable time span
     # - There is a city in the system
     # - A regular user who has logged in with Suomi.fi is using the system
     settings.PREFILL_RESERVATION_WITH_PROFILE_DATA = True
-    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit = ReservationUnitFactory.create(origin_hauki_resource=OriginHaukiResourceFactory(id=999))
+    ReservableTimeSpanFactory(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=datetime(2023, 1, 1, 6, tzinfo=DEFAULT_TIMEZONE),
+        end_datetime=datetime(2023, 1, 1, 22, tzinfo=DEFAULT_TIMEZONE),
+    )
     CityFactory.create(name="Helsinki")
     user = UserFactory.create(social_auth__extra_data__amr=arm)
     graphql.force_login(user)
@@ -37,7 +54,8 @@ def test_create_reservation__prefilled_with_profile_data(graphql, settings, arm:
         "end": datetime(2023, 1, 1, hour=13).isoformat(),
         "reservationUnitPks": [reservation_unit.pk],
     }
-    with mock_profile_reader(), mock_opening_hours(reservation_unit.uuid, date=date(2023, 1, 1)):
+
+    with mock_profile_reader():
         response = graphql(CREATE_MUTATION, input_data=input_data)
 
     # then:
@@ -54,6 +72,7 @@ def test_create_reservation__prefilled_with_profile_data(graphql, settings, arm:
     assert reservation.home_city.name == "Helsinki"
 
 
+@freezegun.freeze_time("2021-01-01")
 def test_create_reservation__prefilled_with_profile_data__missing(graphql, settings):
     # given:
     # - Prefill setting is on
@@ -61,7 +80,12 @@ def test_create_reservation__prefilled_with_profile_data__missing(graphql, setti
     # - There is a city in the system
     # - A regular user who has logged in with Suomi.fi is using the system
     settings.PREFILL_RESERVATION_WITH_PROFILE_DATA = True
-    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit = ReservationUnitFactory.create(origin_hauki_resource=OriginHaukiResourceFactory(id=999))
+    ReservableTimeSpanFactory(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=datetime(2023, 1, 1, 6, tzinfo=DEFAULT_TIMEZONE),
+        end_datetime=datetime(2023, 1, 1, 22, tzinfo=DEFAULT_TIMEZONE),
+    )
     CityFactory.create(name="Helsinki")
     user = UserFactory.create(social_auth__extra_data__amr="suomi_fi")
     graphql.force_login(user)
@@ -75,8 +99,7 @@ def test_create_reservation__prefilled_with_profile_data__missing(graphql, setti
         "end": datetime(2023, 1, 1, hour=13).isoformat(),
         "reservationUnitPks": [reservation_unit.pk],
     }
-    with mock_profile_reader(profile_data={}), mock_opening_hours(reservation_unit.uuid, date=date(2023, 1, 1)):
-        response = graphql(CREATE_MUTATION, input_data=input_data)
+    response = graphql(CREATE_MUTATION, input_data=input_data)
 
     # then:
     # - There are no errors in the response
@@ -93,6 +116,7 @@ def test_create_reservation__prefilled_with_profile_data__missing(graphql, setti
 
 
 @pytest.mark.parametrize("arm", ADLoginAMR)
+@freezegun.freeze_time("2021-01-01")
 def test_create_reservation__prefilled_with_profile_data__ad_login(graphql, settings, arm: ADLoginAMR):
     # given:
     # - Prefill setting is on
@@ -100,7 +124,12 @@ def test_create_reservation__prefilled_with_profile_data__ad_login(graphql, sett
     # - There is a city in the system
     # - A regular user who has logged in with Azure AD is using the system
     settings.PREFILL_RESERVATION_WITH_PROFILE_DATA = True
-    reservation_unit = ReservationUnitFactory.create()
+    reservation_unit = ReservationUnitFactory.create(origin_hauki_resource=OriginHaukiResourceFactory(id=999))
+    ReservableTimeSpanFactory(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=datetime(2023, 1, 1, 6, tzinfo=DEFAULT_TIMEZONE),
+        end_datetime=datetime(2023, 1, 1, 22, tzinfo=DEFAULT_TIMEZONE),
+    )
     CityFactory.create(name="Helsinki")
     user = UserFactory.create(social_auth__extra_data__amr=arm.value)
     graphql.force_login(user)
@@ -114,8 +143,7 @@ def test_create_reservation__prefilled_with_profile_data__ad_login(graphql, sett
         "end": datetime(2023, 1, 1, hour=13).isoformat(),
         "reservationUnitPks": [reservation_unit.pk],
     }
-    with mock_profile_reader(), mock_opening_hours(reservation_unit.uuid, date=date(2023, 1, 1)):
-        response = graphql(CREATE_MUTATION, input_data=input_data)
+    response = graphql(CREATE_MUTATION, input_data=input_data)
 
     # then:
     # - There are no errors in the response

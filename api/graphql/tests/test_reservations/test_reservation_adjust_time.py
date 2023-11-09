@@ -1,7 +1,6 @@
 import datetime
 import json
 from decimal import Decimal
-from unittest.mock import patch
 
 import freezegun
 from assertpy import assert_that
@@ -17,6 +16,7 @@ from reservations.choices import ReservationStateChoice
 from tests.factories import (
     ApplicationRoundFactory,
     EmailTemplateFactory,
+    ReservableTimeSpanFactory,
     ReservationFactory,
     ReservationUnitCancellationRuleFactory,
     ReservationUnitPricingFactory,
@@ -26,7 +26,6 @@ DEFAULT_TIMEZONE = get_default_timezone()
 
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")
-@patch("opening_hours.utils.opening_hours_client.get_opening_hours")
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
 class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
     @classmethod
@@ -41,7 +40,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         cls.reservation_unit.save()
 
         cls.reservation_begin = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
-        cls.reservation_end = datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=1)
+        cls.reservation_end = datetime.datetime.now(tz=DEFAULT_TIMEZONE) + datetime.timedelta(hours=1)
         cls.reservation = ReservationFactory.create(
             reservation_unit=[cls.reservation_unit],
             reservee_email=cls.regular_joe.email,
@@ -82,8 +81,8 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
     def get_valid_adjust_data(self):
         return {
             "pk": self.reservation.pk,
-            "begin": (self.reservation_begin + datetime.timedelta(hours=1)).strftime("%Y%m%dT%H%M%S%zZ"),
-            "end": (self.reservation_end + datetime.timedelta(hours=1)).strftime("%Y%m%dT%H%M%S%zZ"),
+            "begin": (self.reservation_begin + datetime.timedelta(hours=1)).isoformat(),
+            "end": (self.reservation_end + datetime.timedelta(hours=1)).isoformat(),
         }
 
     @override_settings(
@@ -91,15 +90,14 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         SEND_RESERVATION_NOTIFICATION_EMAILS=True,
         EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
     )
-    def test_time_change_success(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+    def test_time_change_success(self):
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
 
         payload = content.get("data").get("adjustReservationTime")
-        assert_that(payload.get("errors")).is_none()
+        assert payload.get("errors") is None
 
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CONFIRMED)
@@ -108,14 +106,13 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(len(mail.outbox)).is_equal_to(1)
         assert_that(mail.outbox[0].subject).is_equal_to("modified")
 
-    def test_wrong_state_fails(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+    def test_wrong_state_fails(self):
         self.reservation.state = ReservationStateChoice.CANCELLED
         self.reservation.save()
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
         error = content.get("errors")[0].get("extensions").get("error_code")
         assert_that(error).is_equal_to("RESERVATION_MODIFICATION_NOT_ALLOWED")
 
@@ -124,9 +121,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
-    def test_new_reservation_begin_in_past_fails(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
-
+    def test_new_reservation_begin_in_past_fails(self):
         data = self.get_valid_adjust_data()
         data["begin"] = (self.reservation_begin - datetime.timedelta(hours=5)).strftime("%Y%m%dT%H%M%S%zZ")
         data["end"] = (self.reservation_end - datetime.timedelta(hours=5)).strftime("%Y%m%dT%H%M%S%zZ")
@@ -134,7 +129,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=data)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
         error = content.get("errors")[0].get("extensions").get("error_code")
         assert_that(error).is_equal_to("RESERVATION_BEGIN_IN_PAST")
 
@@ -143,15 +138,14 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
-    def test_reservation_begin_in_past_fails(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+    def test_reservation_begin_in_past_fails(self):
         self.reservation.begin = self.reservation_begin - datetime.timedelta(hours=5)
         self.reservation.end = self.reservation_end - datetime.timedelta(hours=5)
         self.reservation.save()
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
         error = content.get("errors")[0].get("extensions").get("error_code")
         assert_that(error).is_equal_to("RESERVATION_CURRENT_BEGIN_IN_PAST")
 
@@ -160,14 +154,13 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin - datetime.timedelta(hours=5))
         assert_that(self.reservation.end).is_equal_to(self.reservation_end - datetime.timedelta(hours=5))
 
-    def test_reservation_unit_missing_cancellation_rule_fails(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+    def test_reservation_unit_missing_cancellation_rule_fails(self):
         self.reservation_unit.cancellation_rule = None
         self.reservation_unit.save()
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
         error = content.get("errors")[0].get("extensions").get("error_code")
         assert_that(error).is_equal_to("CANCELLATION_NOT_ALLOWED")
 
@@ -176,15 +169,14 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
-    def test_cancellation_rule_time_limit_exceed_fails(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+    def test_cancellation_rule_time_limit_exceed_fails(self):
         self.cancel_rule.can_be_cancelled_time_before = datetime.timedelta(hours=24)
         self.cancel_rule.save()
 
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
         error = content.get("errors")[0].get("extensions").get("error_code")
         assert_that(error).is_equal_to("CANCELLATION_TIME_PAST")
 
@@ -193,15 +185,14 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
-    def test_cancellation_rule_has_needs_handling_fails(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+    def test_cancellation_rule_has_needs_handling_fails(self):
         self.cancel_rule.needs_handling = True
         self.cancel_rule.save()
 
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
         error = content.get("errors")[0].get("extensions").get("error_code")
         assert_that(error).is_equal_to("CANCELLATION_NOT_ALLOWED")
 
@@ -210,15 +201,14 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
-    def test_reservation_is_already_handled_fails(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+    def test_reservation_is_already_handled_fails(self):
         self.reservation.handled_at = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
         self.reservation.save()
 
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
         error = content.get("errors")[0].get("extensions").get("error_code")
         assert_that(error).is_equal_to("RESERVATION_MODIFICATION_NOT_ALLOWED")
 
@@ -227,15 +217,14 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
-    def test_reservation_has_price_to_be_paid_fails(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+    def test_reservation_has_price_to_be_paid_fails(self):
         self.reservation.price_net = Decimal(1)
         self.reservation.save()
 
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
         error = content.get("errors")[0].get("extensions").get("error_code")
         assert_that(error).is_equal_to("CANCELLATION_NOT_ALLOWED")
 
@@ -244,9 +233,13 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
-    def test_new_time_causes_price_change_fails(self, mock_opening_hours):
+    def test_new_time_causes_price_change_fails(self):
         money_making_date = datetime.date.today() + datetime.timedelta(days=1)
-        mock_opening_hours.return_value = self.get_mocked_opening_hours(date=money_making_date)
+        ReservableTimeSpanFactory(
+            resource=self.reservation_unit.origin_hauki_resource,
+            start_datetime=datetime.datetime.combine(money_making_date, datetime.time(hour=6)),
+            end_datetime=datetime.datetime.combine(money_making_date, datetime.time(hour=22)),
+        )
         ReservationUnitPricingFactory(
             begins=money_making_date,
             reservation_unit=self.reservation_unit,
@@ -262,7 +255,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=data)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
         error = content.get("errors")[0].get("extensions").get("error_code")
         assert_that(error).is_equal_to("RESERVATION_MODIFICATION_NOT_ALLOWED")
 
@@ -271,15 +264,14 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
-    def test_reservation_unit_not_reservable_in_new_time_fails(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+    def test_reservation_unit_not_reservable_in_new_time_fails(self):
         self.reservation_unit.reservation_begins = self.reservation_begin + datetime.timedelta(days=1)
         self.reservation_unit.save()
 
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
         error = content.get("errors")[0].get("extensions").get("error_code")
         assert_that(error).is_equal_to("RESERVATION_UNIT_NOT_RESERVABLE")
 
@@ -288,8 +280,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
-    def test_new_time_overlaps_another_fails(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+    def test_new_time_overlaps_another_fails(self):
         ReservationFactory(
             reservation_unit=[self.reservation_unit],
             begin=self.reservation_begin + datetime.timedelta(hours=1),
@@ -300,7 +291,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
         error = content.get("errors")[0].get("extensions").get("error_code")
         assert_that(error).is_equal_to("OVERLAPPING_RESERVATIONS")
 
@@ -309,15 +300,14 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
-    def test_new_time_duration_under_min_duration_fails(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+    def test_new_time_duration_under_min_duration_fails(self):
         self.reservation_unit.min_reservation_duration = datetime.timedelta(hours=2)
         self.reservation_unit.save()
 
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
         error = content.get("errors")[0].get("extensions").get("error_code")
         assert_that(error).is_equal_to("RESERVATION_UNIT_MIN_DURATION_NOT_EXCEEDED")
 
@@ -326,15 +316,14 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
-    def test_new_time_duration_over_max_duration_fails(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+    def test_new_time_duration_over_max_duration_fails(self):
         self.reservation_unit.max_reservation_duration = datetime.timedelta(seconds=2)
         self.reservation_unit.save()
 
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
         error = content.get("errors")[0].get("extensions").get("error_code")
         assert_that(error).is_equal_to("RESERVATION_UNITS_MAX_DURATION_EXCEEDED")
 
@@ -343,9 +332,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
-    def test_overlaps_with_buffer_time_fails(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
-
+    def test_overlaps_with_buffer_time_fails(self):
         ReservationFactory(
             reservation_unit=[self.reservation_unit],
             begin=self.reservation_begin + datetime.timedelta(hours=2),
@@ -361,7 +348,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=data)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
         error = content.get("errors")[0].get("extensions").get("error_code")
         assert_that(error).is_equal_to("RESERVATION_OVERLAP")
 
@@ -370,9 +357,13 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
-    def test_max_days_before_exceeded_fails(self, mock_opening_hours):
+    def test_max_days_before_exceeded_fails(self):
         open_date = datetime.date.today() + datetime.timedelta(days=2)
-        mock_opening_hours.return_value = self.get_mocked_opening_hours(date=open_date)
+        ReservableTimeSpanFactory(
+            resource=self.reservation_unit.origin_hauki_resource,
+            start_datetime=datetime.datetime.combine(open_date, datetime.time(hour=6)),
+            end_datetime=datetime.datetime.combine(open_date, datetime.time(hour=22)),
+        )
         self.reservation_unit.reservations_max_days_before = 1
         self.reservation_unit.save()
 
@@ -383,7 +374,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=data)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
         error = content.get("errors")[0].get("extensions").get("error_code")
         assert_that(error).is_equal_to("RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE")
 
@@ -392,15 +383,14 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
-    def test_min_days_before_subseeded_fails(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+    def test_min_days_before_subseeded_fails(self):
         self.reservation_unit.reservations_min_days_before = 7
         self.reservation_unit.save()
 
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
         error = content.get("errors")[0].get("extensions").get("error_code")
         assert_that(error).is_equal_to("RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE")
 
@@ -409,13 +399,18 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
-    def test_reservation_unit_not_open_in_new_time_fails(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours(start_hour=22, end_hour=23)
-
+    def test_reservation_unit_not_open_in_new_time_fails(self):
         self.client.force_login(self.regular_joe)
-        response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
+        response = self.query(
+            self.get_update_query(),
+            input_data={
+                "pk": self.reservation.pk,
+                "begin": (self.reservation_begin + datetime.timedelta(days=1)).isoformat(),
+                "end": (self.reservation_end + datetime.timedelta(days=1)).isoformat(),
+            },
+        )
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
         error = content.get("errors")[0].get("extensions").get("error_code")
         assert_that(error).is_equal_to("RESERVATION_UNIT_IS_NOT_OPEN")
 
@@ -424,8 +419,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
-    def test_reservation_unit_in_open_application_round_fails(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+    def test_reservation_unit_in_open_application_round_fails(self):
         ApplicationRoundFactory(
             reservation_units=[self.reservation_unit],
             reservation_period_begin=self.reservation_begin.date(),
@@ -435,7 +429,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
         error = content.get("errors")[0].get("extensions").get("error_code")
         assert_that(error).is_equal_to("RESERVATION_UNIT_IN_OPEN_ROUND")
 
@@ -444,8 +438,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
-    def test_reservation_start_time_not_within_the_interval_fails(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+    def test_reservation_start_time_not_within_the_interval_fails(self):
         self.reservation_unit.reservation_start_interval = ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES
         self.reservation_unit.save()
 
@@ -455,7 +448,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=data)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
         error = content.get("errors")[0].get("extensions").get("error_code")
         assert_that(error).is_equal_to("RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL")
 
@@ -464,9 +457,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
-    def test_adjust_not_allowed_for_another_user(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
-
+    def test_adjust_not_allowed_for_another_user(self):
         reggie_jim = get_user_model().objects.create(
             username="regjim",
             first_name="jim",
@@ -476,7 +467,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         self.client.force_login(reggie_jim)
         response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
         error = content.get("errors")[0].get("message")
         assert_that(error).contains_ignoring_case("No permission to mutate")
 
@@ -485,16 +476,15 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.begin).is_equal_to(self.reservation_begin)
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
-    def test_unit_admin_can_adjust_user_reservation(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+    def test_unit_admin_can_adjust_user_reservation(self):
         unit_admin = self.create_unit_admin(self.unit)
         self.client.force_login(unit_admin)
         response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
 
         payload = content.get("data").get("adjustReservationTime")
-        assert_that(payload.get("errors")).is_none()
+        assert payload.get("errors") is None
 
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CONFIRMED)
@@ -506,18 +496,17 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         SEND_RESERVATION_NOTIFICATION_EMAILS=True,
         EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
     )
-    def test_needs_handling_after_time_change(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+    def test_needs_handling_after_time_change(self):
         self.reservation_unit.require_reservation_handling = True
         self.reservation_unit.save()
 
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=self.get_valid_adjust_data())
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
 
         payload = content.get("data").get("adjustReservationTime")
-        assert_that(payload.get("errors")).is_none()
+        assert payload.get("errors") is None
 
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.REQUIRES_HANDLING)

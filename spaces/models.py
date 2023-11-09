@@ -119,16 +119,6 @@ class Unit(models.Model):
         return result
 
     @property
-    def hauki_resource_origin_id(self):
-        """Used by OpeningHoursMixin"""
-        return self.tprek_id
-
-    @property
-    def hauki_resource_data_source_id(self):
-        """Used by OpeningHoursMixin"""
-        return "tprek"
-
-    @property
     def hauki_department_id(self):
         return f"tprek:{self.tprek_department_id}"
 

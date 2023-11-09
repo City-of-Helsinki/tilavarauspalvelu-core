@@ -51,8 +51,8 @@ class ReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reservation
                 "Reservation has gone through handling and it cannot be changed anymore.",
                 ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED,
             )
-        begin = data["begin"]
-        end = data["end"]
+        begin: datetime.datetime = data["begin"]
+        end: datetime.datetime = data["end"]
         self.check_begin(begin, end)
 
         for reservation_unit in self.instance.reservation_unit.all():

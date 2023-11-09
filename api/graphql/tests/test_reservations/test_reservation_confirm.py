@@ -27,7 +27,6 @@ from tests.factories import (
 
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")
-@patch("opening_hours.utils.opening_hours_client.get_opening_hours")
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
 class ReservationConfirmTestCase(ReservationTestCaseBase):
     def setUp(self):
@@ -81,9 +80,8 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
     )
     @patch("merchants.verkkokauppa.helpers.create_order")
-    def test_confirm_reservation_changes_state(self, mock_create_order, mock_opening_hours):
+    def test_confirm_reservation_changes_state(self, mock_create_order):
         mock_create_order.return_value = OrderFactory.create()
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
 
         self.reservation_unit.payment_types.add("ON_SITE")
@@ -94,7 +92,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CREATED)
         response = self.query(self.get_confirm_query(), input_data=input_data)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         confirm_data = content.get("data").get("confirmReservation")
         assert_that(confirm_data.get("errors")).is_none()
         assert_that(confirm_data.get("state")).is_equal_to(ReservationStateChoice.CONFIRMED.upper())
@@ -109,8 +107,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         SEND_RESERVATION_NOTIFICATION_EMAILS=True,
         EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
     )
-    def test_confirm_reservation_changes_state_to_requires_handling(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+    def test_confirm_reservation_changes_state_to_requires_handling(self):
         self.reservation_unit.require_reservation_handling = True
         self.reservation_unit.save()
         self.client.force_login(self.regular_joe)
@@ -118,7 +115,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CREATED)
         response = self.query(self.get_confirm_query(), input_data=input_data)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         confirm_data = content.get("data").get("confirmReservation")
         assert_that(confirm_data.get("errors")).is_none()
         assert_that(confirm_data.get("state")).is_equal_to(ReservationStateChoice.REQUIRES_HANDLING.upper())
@@ -133,9 +130,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         SEND_RESERVATION_NOTIFICATION_EMAILS=True,
         EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
     )
-    def test_confirm_reservation_changes_state_to_requires_handling_on_subsidy_request(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
-
+    def test_confirm_reservation_changes_state_to_requires_handling_on_subsidy_request(self):
         self.reservation.applying_for_free_of_charge = True
         self.reservation.free_of_charge_reason = "Reasonable reasoning for the reason that we question."
         self.reservation.save()
@@ -147,7 +142,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
 
         response = self.query(self.get_confirm_query(), input_data=input_data)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
 
         confirm_data = content.get("data").get("confirmReservation")
         assert_that(confirm_data.get("errors")).is_none()
@@ -159,8 +154,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         assert_that(mail.outbox[0].subject).is_equal_to("handling")
         assert_that(mail.outbox[1].subject).is_equal_to("staff requires handling")
 
-    def test_confirm_reservation_fails_if_state_is_not_created(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+    def test_confirm_reservation_fails_if_state_is_not_created(self):
         self.client.force_login(self.regular_joe)
         self.reservation.state = ReservationStateChoice.DENIED
         self.reservation.save()
@@ -168,29 +162,27 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         response = self.query(self.get_confirm_query(), input_data=input_data)
         content = json.loads(response.content)
 
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
         assert_that(content.get("errors")[0]["message"]).is_equal_to("Reservation cannot be changed anymore.")
         assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to("CHANGES_NOT_ALLOWED")
 
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.DENIED)
 
-    def test_confirm_reservation_fails_on_wrong_user(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+    def test_confirm_reservation_fails_on_wrong_user(self):
         unauthorized_user = get_user_model().objects.create()
         self.client.force_login(unauthorized_user)
         assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CREATED)
         input_data = self.get_valid_confirm_data()
         response = self.query(self.get_confirm_query(), input_data=input_data)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
+        assert content.get("errors") is not None
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CREATED)
 
     @patch("merchants.verkkokauppa.helpers.create_order")
-    def test_confirm_reservation_updates_confirmed_at(self, mock_create_order, mock_opening_hours):
+    def test_confirm_reservation_updates_confirmed_at(self, mock_create_order):
         mock_create_order.return_value = OrderFactory.create()
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.client.force_login(self.regular_joe)
         input_data = self.get_valid_confirm_data()
         assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CREATED)
@@ -201,11 +193,8 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         )
 
     @patch("merchants.verkkokauppa.helpers.create_order")
-    def test_confirm_reservation_succeeds_if_reservation_already_has_required_fields(
-        self, mock_create_order, mock_opening_hours
-    ):
+    def test_confirm_reservation_succeeds_if_reservation_already_has_required_fields(self, mock_create_order):
         mock_create_order.return_value = OrderFactory.create()
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.reservation_unit.metadata_set = self._create_metadata_set()
         self.reservation_unit.save(update_fields=["metadata_set"])
         self.reservation.reservee_first_name = "John"
@@ -216,14 +205,13 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_confirm_query(), input_data=self.get_valid_confirm_data())
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         confirm_data = content.get("data").get("confirmReservation")
         assert_that(confirm_data.get("errors")).is_none()
 
-    def test_confirm_reservation_fails_if_required_fields_are_not_filled(self, mock_opening_hours):
+    def test_confirm_reservation_fails_if_required_fields_are_not_filled(self):
         self.reservation_unit.metadata_set = self._create_metadata_set()
         self.reservation_unit.save(update_fields=["metadata_set"])
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
         self.reservation.reservee_first_name = ""
         self.reservation.save()
         self.client.force_login(self.regular_joe)
@@ -235,11 +223,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         assert content.get("errors")[0]["extensions"]["field"] == "ageGroup"
 
     @patch("api.graphql.types.reservations.serializers.confirm_serializers.create_verkkokauppa_order")
-    def test_confirm_reservation_does_not_create_order_when_handling_is_required(
-        self, mock_create_vk_order, mock_opening_hours
-    ):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
-
+    def test_confirm_reservation_does_not_create_order_when_handling_is_required(self, mock_create_vk_order):
         self.reservation_unit.require_reservation_handling = True
         self.reservation_unit.save()
 
@@ -248,7 +232,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         response = self.query(self.get_confirm_query(), input_data=input_data)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
 
         confirm_data = content.get("data").get("confirmReservation")
         assert_that(confirm_data.get("errors")).is_none()
@@ -258,10 +242,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         assert_that(mock_create_vk_order.called).is_false()
 
     @patch("api.graphql.types.reservations.serializers.confirm_serializers.create_verkkokauppa_order")
-    def test_confirm_reservation_creates_local_order_when_payment_type_is_on_site(
-        self, mock_create_vk_order, mock_opening_hours
-    ):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+    def test_confirm_reservation_creates_local_order_when_payment_type_is_on_site(self, mock_create_vk_order):
         self.client.force_login(self.regular_joe)
 
         self.reservation_unit.payment_types.add(PaymentType.ON_SITE)
@@ -272,7 +253,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         response = self.query(self.get_confirm_query(), input_data=input_data)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
 
         confirm_data = content.get("data").get("confirmReservation")
         assert_that(confirm_data.get("errors")).is_none()
@@ -291,11 +272,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         assert_that(local_order.reservation).is_equal_to(self.reservation)
 
     @patch("api.graphql.types.reservations.serializers.confirm_serializers.create_verkkokauppa_order")
-    def test_confirm_reservation_calls_api_when_payment_type_is_not_on_site(
-        self, mock_create_vk_order, mock_opening_hours
-    ):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
-
+    def test_confirm_reservation_calls_api_when_payment_type_is_not_on_site(self, mock_create_vk_order):
         mock_vk_order = OrderFactory()
         mock_create_vk_order.return_value = mock_vk_order
 
@@ -309,7 +286,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         response = self.query(self.get_confirm_query(), input_data=input_data)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
 
         confirm_data = content.get("data").get("confirmReservation")
         assert_that(confirm_data.get("errors")).is_none()
@@ -326,8 +303,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.WAITING_FOR_PAYMENT)
 
     @patch("api.graphql.types.reservations.serializers.confirm_serializers.create_verkkokauppa_order")
-    def test_confirm_reservation_does_not_save_when_api_call_fails(self, mock_create_vk_order, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+    def test_confirm_reservation_does_not_save_when_api_call_fails(self, mock_create_vk_order):
         mock_create_vk_order.side_effect = Exception("Test exception")
 
         self.client.force_login(self.regular_joe)
@@ -350,9 +326,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CREATED)
 
-    def test_confirm_reservation_does_not_allow_unsupported_payment_type(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
-
+    def test_confirm_reservation_does_not_allow_unsupported_payment_type(self):
         self.client.force_login(self.regular_joe)
 
         self.reservation_unit.payment_types.add(PaymentType.INVOICE)
@@ -367,9 +341,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
             "Reservation unit does not support ONLINE payment type. Allowed values: INVOICE, ON_SITE"
         )
 
-    def test_confirm_reservation_allows_unsupported_payment_type_with_zero_price(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
-
+    def test_confirm_reservation_allows_unsupported_payment_type_with_zero_price(self):
         self.reservation_unit_pricing.pricing_type = PricingType.FREE
         self.reservation_unit_pricing.save()
 
@@ -387,11 +359,9 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         response = self.query(self.get_confirm_query(), input_data=input_data)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
 
-    def test_confirm_reservation_without_payment_type_use_on_site(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
-
+    def test_confirm_reservation_without_payment_type_use_on_site(self):
         self.client.force_login(self.regular_joe)
 
         self.reservation_unit.payment_types.add(PaymentType.ON_SITE)
@@ -400,14 +370,13 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         response = self.query(self.get_confirm_query(), input_data=input_data)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
 
         local_order = PaymentOrder.objects.first()
         assert_that(local_order.payment_type).is_equal_to(PaymentType.ON_SITE)
 
     @patch("api.graphql.types.reservations.serializers.confirm_serializers.create_verkkokauppa_order")
-    def test_confirm_reservation_without_payment_type_use_invoice(self, mock_create_vk_order, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+    def test_confirm_reservation_without_payment_type_use_invoice(self, mock_create_vk_order):
         mock_create_vk_order.return_value = OrderFactory()
         self.client.force_login(self.regular_joe)
 
@@ -417,14 +386,13 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         response = self.query(self.get_confirm_query(), input_data=input_data)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
 
         local_order = PaymentOrder.objects.first()
         assert_that(local_order.payment_type).is_equal_to(PaymentType.INVOICE)
 
     @patch("api.graphql.types.reservations.serializers.confirm_serializers.create_verkkokauppa_order")
-    def test_confirm_reservation_without_payment_type_use_online(self, mock_create_vk_order, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+    def test_confirm_reservation_without_payment_type_use_online(self, mock_create_vk_order):
         mock_create_vk_order.return_value = OrderFactory()
         self.client.force_login(self.regular_joe)
 
@@ -434,13 +402,12 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         response = self.query(self.get_confirm_query(), input_data=input_data)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
 
         local_order = PaymentOrder.objects.first()
         assert_that(local_order.payment_type).is_equal_to(PaymentType.ONLINE)
 
-    def test_confirm_reservation_error_when_order_exists(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+    def test_confirm_reservation_error_when_order_exists(self):
         self.client.force_login(self.regular_joe)
 
         PaymentOrderFactory(reservation=self.reservation)
@@ -453,8 +420,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
             "Reservation cannot be changed anymore because it is attached to a payment order"
         )
 
-    def test_confirm_order_not_created_when_price_is_zero(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+    def test_confirm_order_not_created_when_price_is_zero(self):
         self.client.force_login(self.regular_joe)
 
         self.reservation.price = Decimal(0)
@@ -465,15 +431,13 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         response = self.query(self.get_confirm_query(), input_data=input_data)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
 
         local_order = PaymentOrder.objects.first()
         assert_that(local_order).is_none()
 
     @patch("api.graphql.types.reservations.serializers.confirm_serializers.create_verkkokauppa_order")
-    def test_confirm_reservation_return_order_data(self, mock_create_vk_order, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
-
+    def test_confirm_reservation_return_order_data(self, mock_create_vk_order):
         mock_order = OrderFactory()
         mock_create_vk_order.return_value = mock_order
 
@@ -500,7 +464,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         """
         response = self.query(query, input_data=input_data)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         assert_that(content.get("data").get("confirmReservation")).is_not_none()
         assert_that(content.get("data").get("confirmReservation").get("order")).is_not_none()
 
@@ -509,8 +473,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         assert_that(order_data.get("receiptUrl")).is_equal_to(mock_order.receipt_url)
         assert_that(order_data.get("checkoutUrl")).is_equal_to(mock_order.checkout_url)
 
-    def test_confirm_reservation_with_price_requires_payment_product(self, mock_opening_hours):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+    def test_confirm_reservation_with_price_requires_payment_product(self):
         self.client.force_login(self.regular_joe)
 
         self.reservation_unit.payment_merchant = None
@@ -533,10 +496,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")[0].get("message")).is_equal_to("Reservation unit is missing payment product")
 
-    def test_confirm_reservation_without_price_and_with_free_pricing_type_does_not_require_payment_product(
-        self, mock_opening_hours
-    ):
-        mock_opening_hours.return_value = self.get_mocked_opening_hours()
+    def test_confirm_reservation_without_price_and_with_free_pricing_type_does_not_require_payment_product(self):
         self.client.force_login(self.regular_joe)
 
         self.reservation_unit.payment_merchant = None
@@ -564,5 +524,5 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         """
         response = self.query(query, input_data=input_data)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         assert_that(content.get("data").get("confirmReservation")).is_not_none()
