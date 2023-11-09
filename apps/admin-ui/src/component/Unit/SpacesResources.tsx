@@ -221,7 +221,7 @@ const SpacesResources = (): JSX.Element | null => {
     });
   };
 
-  if (state.unit === null) {
+  if (state.unit == null) {
     return null;
   }
 

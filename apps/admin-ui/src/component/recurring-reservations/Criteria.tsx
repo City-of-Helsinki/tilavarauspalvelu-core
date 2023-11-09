@@ -6,6 +6,7 @@ import styled from "styled-components";
 import { H1, H2, H3, Strong } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { type Query } from "common/types/gql-types";
+import { filterNonNullable } from "common/src/helpers";
 import { ContentContainer, IngressContainer } from "@/styles/layout";
 import { formatDate } from "@/common/util";
 import { publicUrl } from "@/common/const";
@@ -155,10 +156,9 @@ function Criteria({
         notifyError(t("errors.errorFetchingData"));
       },
     });
-  const applicationRounds =
-    applicationRoundData?.applicationRounds?.edges
-      ?.map((edge) => edge?.node)
-      .filter((n): n is NonNullable<typeof n> => n !== null) ?? [];
+  const applicationRounds = filterNonNullable(
+    applicationRoundData?.applicationRounds?.edges?.map((edge) => edge?.node)
+  );
   const applicationRound = applicationRounds[0];
 
   const { data: resUnitData, loading: isLoadingReservationUnits } =
@@ -168,10 +168,9 @@ function Criteria({
         notifyError(t("errors.errorFetchingData"));
       },
     });
-  const reservationUnits =
-    resUnitData?.reservationUnits?.edges
-      ?.map((edge) => edge?.node)
-      .filter((n): n is NonNullable<typeof n> => n !== null) ?? [];
+  const reservationUnits = filterNonNullable(
+    resUnitData?.reservationUnits?.edges?.map((edge) => edge?.node)
+  );
 
   const isLoading = isLoadingApplicationRound || isLoadingReservationUnits;
   if (isLoading) {

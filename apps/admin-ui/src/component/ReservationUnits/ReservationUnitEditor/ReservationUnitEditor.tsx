@@ -346,11 +346,12 @@ const ReservationUnitEditor = (): JSX.Element | null => {
 
         errors = res.data?.createReservationUnit?.errors;
 
-        if (res.data?.createReservationUnit?.errors === null) {
-          resUnitPk = res.data.createReservationUnit.pk as number;
+        const { pk } = res.data?.createReservationUnit || {};
+        if (pk != null) {
+          resUnitPk = pk;
         }
       }
-      if (errors === null) {
+      if (errors == null) {
         return resUnitPk;
       }
       const firstError = errors ? errors.find(() => true) : undefined;
@@ -625,7 +626,7 @@ const ReservationUnitEditor = (): JSX.Element | null => {
     );
   }
 
-  if (state.reservationUnitEdit === null) {
+  if (state.reservationUnitEdit == null) {
     return null;
   }
 

@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 export const logAxiosError = (error: unknown) => {
-  if (typeof error === "object" && error !== null) {
+  if (typeof error === "object" && error != null) {
     if ("response" in error) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx

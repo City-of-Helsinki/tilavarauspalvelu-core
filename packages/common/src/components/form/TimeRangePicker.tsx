@@ -141,7 +141,7 @@ const TimeRangePicker = <T extends FieldValues>({
         invalid={endTimeIsBeforeStartTime || beginFieldState.invalid}
         value={getSelectedOption(beginField.value, populatedTimeOptions)}
         onChange={(e: OptionType) => {
-          beginField.onChange(e !== null ? e.label : null);
+          beginField.onChange(e != null ? e.label : null);
         }}
       />
       <StyledSelect
@@ -155,7 +155,7 @@ const TimeRangePicker = <T extends FieldValues>({
         invalid={endTimeIsBeforeStartTime || endFieldState.invalid}
         value={getSelectedOption(endField.value, populatedTimeOptions)}
         onChange={(e: OptionType) => {
-          endField.onChange(e !== null ? e.label : null);
+          endField.onChange(e != null ? e.label : null);
         }}
       />
       {!!endTimeIsBeforeStartTime && (

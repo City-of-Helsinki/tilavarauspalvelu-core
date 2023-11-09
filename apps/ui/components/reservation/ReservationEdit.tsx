@@ -25,6 +25,7 @@ import { PendingReservation } from "common/types/common";
 import { toApiDate } from "common/src/common/util";
 import { Subheading } from "common/src/reservation-form/styles";
 import { Container } from "common";
+import { filterNonNullable } from "common/src/helpers";
 import { useCurrentUser } from "@/hooks/user";
 
 import {
@@ -263,7 +264,7 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
   useEffect(() => {
     const reservations = userReservationsData?.reservations?.edges
       ?.map((e) => e?.node)
-      .filter((n): n is ReservationType => n !== null)
+      .filter((n): n is ReservationType => n != null)
       .filter((n) => allowedReservationStates.includes(n.state));
     setUserReservations(reservations || []);
   }, [userReservationsData]);
@@ -274,15 +275,13 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
 
   useEffect(() => {
     if (applicationRoundsData && reservationUnit) {
-      const appRounds =
-        applicationRoundsData?.applicationRounds?.edges
-          ?.map((e) => e?.node)
-          .filter((n): n is NonNullable<typeof n> => n !== null)
-          .filter((applicationRound) =>
-            applicationRound.reservationUnits
-              ?.map((n) => n?.pk)
-              .includes(reservationUnit.pk)
-          ) || [];
+      const appRounds = filterNonNullable(
+        applicationRoundsData?.applicationRounds?.edges?.map((e) => e?.node)
+      ).filter((applicationRound) =>
+        applicationRound.reservationUnits
+          ?.map((n) => n?.pk)
+          .includes(reservationUnit.pk)
+      );
       setActiveApplicationRounds(appRounds);
     }
   }, [applicationRoundsData, reservationUnit]);
@@ -326,7 +325,7 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
     !reservation ||
     !reservationUnit ||
     !additionalData ||
-    activeApplicationRounds === null
+    activeApplicationRounds == null
   ) {
     return (
       <Wrapper>

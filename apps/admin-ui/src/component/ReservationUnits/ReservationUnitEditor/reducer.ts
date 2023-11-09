@@ -106,7 +106,7 @@ const withLoadingStatus = (
   state: State
 ): State => {
   const newDataLoaded =
-    type !== null ? uniq(state.dataLoaded.concat(type)) : state.dataLoaded;
+    type != null ? uniq(state.dataLoaded.concat(type)) : state.dataLoaded;
   const hasError = Boolean(state.error);
   const isNew =
     state.reservationUnitPk === undefined ||

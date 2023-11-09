@@ -178,7 +178,7 @@ const ResourceEditor = ({ resourcePk, unitPk }: Props) => {
         locationType: "fixed",
       });
 
-      if (data?.updateResource?.errors === null) {
+      if (data?.updateResource?.errors == null) {
         notifySuccess(
           t("ResourceEditor.resourceUpdatedNotification"),
           t("ResourceEditor.resourceUpdated")

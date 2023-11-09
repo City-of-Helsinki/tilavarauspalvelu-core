@@ -68,7 +68,7 @@ const collectSubTree = (space: SpaceType): SpaceType[] => {
 
 const spacesAsGroups = (spaces: SpaceType[]) => {
   const reconciled = buildTrees(spaces);
-  const roots = reconciled.filter((e) => e.parent === null);
+  const roots = reconciled.filter((e) => e.parent == null);
 
   return roots.map((sp) => ({
     id: sp.pk ?? 0,

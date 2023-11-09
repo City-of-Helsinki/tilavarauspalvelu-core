@@ -183,7 +183,7 @@ const getApplicationEventsWhichMinDurationsIsNotFulfilled = (
         : 0 */
       return selectedHours[index] < minDuration / 3600 ? index : null;
     })
-    .filter((n): n is NonNullable<typeof n> => n !== null);
+    .filter((n): n is NonNullable<typeof n> => n != null);
 };
 
 const Page2 = ({ application, onNext }: Props): JSX.Element => {

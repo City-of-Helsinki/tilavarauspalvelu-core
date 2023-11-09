@@ -130,7 +130,7 @@ export const getReservationPriceDetails = (
     reservation.begin
   );
 
-  if (pricing === null) return "???";
+  if (pricing == null) return "???";
 
   const { priceUnit } = pricing;
   const volume = getUnRoundedReservationVolume(durationMinutes, priceUnit);

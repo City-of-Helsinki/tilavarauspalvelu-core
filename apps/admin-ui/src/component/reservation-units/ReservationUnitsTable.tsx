@@ -58,7 +58,7 @@ const getColConfig = (t: TFunction) => [
     key: "surfaceArea",
     isSortable: true,
     transform: ({ surfaceArea }: ReservationUnitType) =>
-      surfaceArea !== null ? (
+      surfaceArea != null ? (
         <span>
           {Number(surfaceArea).toLocaleString("fi") || "-"}
           {t("common.areaUnitSquareMeter")}

@@ -153,7 +153,7 @@ function SpaceTreeDataTableGroup({
       const rowKey = get(row, cellConfig.index);
 
       const prefixWidth = PREFIX_DEPTH_WIDTH_PX * depth(row);
-      const isChildRow = row.parent !== null;
+      const isChildRow = row.parent != null;
 
       return (
         <StyledRow

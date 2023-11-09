@@ -20,6 +20,8 @@ module.exports = {
     node: true,
   },
   rules: {
+    // enforce null checks are == / != everything else ===
+    eqeqeq: ["error", "always", { null: "never" }],
     // mixing mjs with ts in nextjs causes issues
     "import/extensions": [
       "error",

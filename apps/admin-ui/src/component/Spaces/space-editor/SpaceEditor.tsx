@@ -84,7 +84,7 @@ const modified = (d: State) => ({ ...d, hasChanges: true });
 const withLoadingState = (state: State): State => {
   return {
     ...state,
-    loading: state.space === null,
+    loading: state.space == null,
   };
 };
 
@@ -254,7 +254,7 @@ const SpaceEditor = ({ space, unit }: Props): JSX.Element | null => {
         ) as SpaceUpdateMutationInput),
         surfaceArea: Math.ceil(state.spaceEdit?.surfaceArea ?? 0),
       });
-      if (data?.data?.updateSpace.errors === null) {
+      if (data?.data?.updateSpace.errors == null) {
         notifySuccess(
           t("SpaceEditor.spaceUpdatedNotification"),
           t("SpaceEditor.spaceUpdated")
@@ -292,7 +292,7 @@ const SpaceEditor = ({ space, unit }: Props): JSX.Element | null => {
     );
   }
 
-  if (state.space === null) {
+  if (state.space == null) {
     return null;
   }
 

@@ -199,7 +199,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const bookingTerms: TermsOfUseType | null =
       genericTermsData.termsOfUse?.edges
         ?.map((e) => e?.node)
-        .filter((n): n is NonNullable<typeof n> => n !== null)
+        .filter((n): n is NonNullable<typeof n> => n != null)
         .find((edge) => edge.pk === genericTermsVariant.BOOKING) ?? null;
 
     const endDate = addYears(today, 2);
@@ -424,7 +424,7 @@ const ReservationUnit = ({
     const scrollToCalendar = () =>
       window.scroll({
         top:
-          calendarRef.current !== null
+          calendarRef.current != null
             ? calendarRef.current.offsetTop - 20
             : undefined,
         left: 0,
@@ -464,20 +464,18 @@ const ReservationUnit = ({
   );
 
   useEffect(() => {
-    const reservations = userReservationsData?.reservations?.edges
-      ?.map((e) => e?.node)
-      .filter((n): n is ReservationType => n != null)
-      .filter(
-        (n) => allowedReservationStates.find((s) => s === n.state) != null
-      );
+    const reservations = filterNonNullable(
+      userReservationsData?.reservations?.edges?.map((e) => e?.node)
+    ).filter(
+      (n) => allowedReservationStates.find((s) => s === n.state) != null
+    );
     setUserReservations(reservations || []);
   }, [userReservationsData]);
 
   const slotPropGetter = useMemo(() => {
-    const openingHours =
-      reservationUnit?.openingHours?.openingTimes?.filter(
-        (x): x is NonNullable<typeof x> => x != null
-      ) ?? [];
+    const openingHours = filterNonNullable(
+      reservationUnit?.openingHours?.openingTimes
+    );
     return getSlotPropGetter({
       openingHours,
       activeApplicationRounds,
@@ -525,11 +523,8 @@ const ReservationUnit = ({
   );
 
   const shouldDisplayPricingTerms = useMemo(() => {
-    const pricings =
-      reservationUnit?.pricings?.filter(
-        (n): n is NonNullable<typeof n> => n != null
-      ) ?? undefined;
-    if (pricings == null) {
+    const pricings = filterNonNullable(reservationUnit?.pricings);
+    if (pricings.length === 0) {
       return false;
     }
     return (
@@ -807,7 +802,7 @@ const ReservationUnit = ({
 
   // Update the calendar to reflect a selected quick reservation slot
   useEffect(() => {
-    if (quickReservationSlot !== null)
+    if (quickReservationSlot != null)
       handleCalendarEventChange({
         start: quickReservationSlot.start,
         end: quickReservationSlot.end,

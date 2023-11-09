@@ -23,6 +23,8 @@ module.exports = {
   ],
   rules: {
     "global-require": 0,
+    // enforce null checks are == / != everything else ===
+    eqeqeq: ["error", "always", { null: "never" }],
     "import/no-extraneous-dependencies": [
       "error",
       {

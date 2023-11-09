@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { H1 } from "common/src/common/typography";
 import type { ApplicationRoundNode, Query } from "common/types/gql-types";
+import { filterNonNullable } from "common/src/helpers";
 import { applicationRoundUrl } from "../../common/urls";
 import { formatDate } from "../../common/util";
 import { useNotification } from "../../context/NotificationContext";
@@ -78,9 +79,9 @@ function AllApplicationRounds(): JSX.Element | null {
     },
   });
 
-  const allApplicationRounds = data?.applicationRounds?.edges
-    ?.map((ar) => ar?.node)
-    ?.filter((ar): ar is ApplicationRoundNode => ar !== null);
+  const allApplicationRounds = filterNonNullable(
+    data?.applicationRounds?.edges?.map((ar) => ar?.node)
+  );
   const applicationRounds = groupBy(
     allApplicationRounds,
     (round) => getApplicationRoundStatus(round.status ?? undefined).group

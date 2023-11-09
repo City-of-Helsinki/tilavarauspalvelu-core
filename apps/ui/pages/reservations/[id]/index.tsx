@@ -24,6 +24,7 @@ import {
 import { parseISO } from "date-fns";
 import Link from "next/link";
 import { Container } from "common";
+import { filterNonNullable } from "common/src/helpers";
 import { useSession } from "@/hooks/auth";
 import { useReservation, useOrder } from "@/hooks/reservation";
 import { genericTermsVariant, reservationUnitPath } from "@/modules/const";
@@ -81,10 +82,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         termsType: TermsOfUseTermsOfUseTermsTypeChoices.GenericTerms,
       },
     });
-    const bookingTerms = genericTermsData?.termsOfUse?.edges
-      ?.map((e) => e?.node)
-      .filter((n): n is NonNullable<typeof n> => n !== null)
-      .find((edge) => edge.pk === genericTermsVariant.BOOKING);
+    const bookingTerms = filterNonNullable(
+      genericTermsData?.termsOfUse?.edges?.map((e) => e?.node)
+    ).find((edge) => edge.pk === genericTermsVariant.BOOKING);
 
     return {
       props: {

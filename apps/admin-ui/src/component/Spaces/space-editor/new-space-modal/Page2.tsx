@@ -218,7 +218,7 @@ const Page2 = ({
 
             if (
               validationResults.filter(
-                (result) => result !== null && result.error !== undefined
+                (result) => result != null && result.error !== undefined
               ).length > 0
             ) {
               dispatch({

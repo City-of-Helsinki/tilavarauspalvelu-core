@@ -60,7 +60,7 @@ const Select = ({
         options={sortedOpts}
         required={required}
         onChange={(e: OptionType) => {
-          if (e === null) {
+          if (e == null) {
             onChange(null);
             return;
           }

@@ -18,6 +18,7 @@ import {
 } from "common/types/gql-types";
 import { Container as CommonContainer } from "common";
 import { IconButton, ShowAllContainer } from "common/src/components";
+import { filterNonNullable } from "common/src/helpers";
 import Sanitize from "../common/Sanitize";
 import {
   CANCEL_RESERVATION,
@@ -179,14 +180,14 @@ const ReservationCancellation = ({ id }: Props): JSX.Element => {
     {
       fetchPolicy: "cache-first",
       onCompleted: (data) => {
-        const nodes = data.reservationCancelReasons?.edges
-          .map((edge) => edge?.node)
-          .filter((n): n is NonNullable<typeof n> => n !== null);
-        if (nodes)
+        const nodes = filterNonNullable(
+          data.reservationCancelReasons?.edges.map((edge) => edge?.node)
+        );
+        if (nodes.length > 0)
           setReasons(
             nodes.map((node) => ({
               label: getTranslation(node, "reason"),
-              value: node?.pk !== null ? node?.pk : "",
+              value: node?.pk != null ? node?.pk : "",
             }))
           );
       },

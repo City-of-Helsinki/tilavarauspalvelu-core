@@ -48,7 +48,7 @@ export const ModalContextProvider: React.FC<Props> = ({ children }: Props) => {
     () => ({
       modalContent,
       setModalContent: toggleModal,
-      isOpen: modalContent !== null,
+      isOpen: modalContent != null,
     }),
     [modalContent]
   );

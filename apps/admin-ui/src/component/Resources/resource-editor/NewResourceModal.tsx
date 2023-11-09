@@ -119,7 +119,7 @@ const NewResourceModal = ({
         locationType: "fixed",
       });
 
-      if (data?.createResource?.errors === null) {
+      if (data?.createResource?.errors == null) {
         onSave();
         closeModal();
       } else {

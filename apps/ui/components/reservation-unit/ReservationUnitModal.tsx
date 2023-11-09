@@ -22,6 +22,7 @@ import {
   QueryReservationUnitsArgs,
   ReservationUnitType,
 } from "common/types/gql-types";
+import { filterNonNullable } from "common/src/helpers";
 import { reservationUnitPath } from "@/modules/const";
 import { getAddressAlt, getMainImage, getTranslation } from "@/modules/util";
 import { MediumButton, pixel } from "@/styles/util";
@@ -336,10 +337,9 @@ const ReservationUnitModal = ({
     }
   );
 
-  const reservationUnits =
-    data?.reservationUnits?.edges
-      .map((n) => n?.node)
-      .filter((n): n is ReservationUnitType => n !== null) ?? [];
+  const reservationUnits = filterNonNullable(
+    data?.reservationUnits?.edges.map((n) => n?.node)
+  );
 
   return (
     <MainContainer>

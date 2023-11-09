@@ -20,6 +20,7 @@ import {
   ReservationUnitType,
 } from "common/types/gql-types";
 import { Container } from "common";
+import { filterNonNullable } from "common/src/helpers";
 import { capitalize, singleSearchUrl } from "@/modules/util";
 import { isBrowser } from "@/modules/const";
 import { RESERVATION_UNITS } from "@/modules/queries/reservationUnit";
@@ -175,10 +176,9 @@ const SearchSingle = (): JSX.Element => {
     notifyOnNetworkStatusChange: true,
   });
 
-  const reservationUnits: ReservationUnitType[] =
-    data?.reservationUnits?.edges
-      ?.map((e) => e?.node)
-      .filter((n): n is NonNullable<typeof n> => n !== null) ?? [];
+  const reservationUnits: ReservationUnitType[] = filterNonNullable(
+    data?.reservationUnits?.edges?.map((e) => e?.node)
+  );
   const totalCount = data?.reservationUnits?.totalCount;
 
   const pageInfo = data?.reservationUnits?.pageInfo;
@@ -306,14 +306,9 @@ const SearchSingle = (): JSX.Element => {
           <BottomWrapper>
             <ListWithPagination
               id="searchResultList"
-              items={reservationUnits
-                ?.filter(
-                  (n: null | ReservationUnitType): n is NonNullable<typeof n> =>
-                    n != null
-                )
-                .map((ru) => (
-                  <ReservationUnitCard reservationUnit={ru} key={ru.id} />
-                ))}
+              items={filterNonNullable(reservationUnits).map((ru) => (
+                <ReservationUnitCard reservationUnit={ru} key={ru.id} />
+              ))}
               loading={loading}
               loadingMore={loadingMore}
               pageInfo={pageInfo}

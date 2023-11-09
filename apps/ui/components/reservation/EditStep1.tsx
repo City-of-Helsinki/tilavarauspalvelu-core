@@ -157,7 +157,7 @@ const EditStep1 = ({
     [reservation, t]
   );
 
-  if (hasTermsOfUse === null) {
+  if (hasTermsOfUse == null) {
     return <LoadingSpinner />;
   }
 

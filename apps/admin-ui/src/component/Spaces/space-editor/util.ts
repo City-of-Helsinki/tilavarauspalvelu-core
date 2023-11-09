@@ -27,7 +27,7 @@ export const spacesAsHierarchy = (
   spaces: SpaceType[],
   paddingChar: string
 ): SpaceType[] => {
-  const roots = spaces.filter((e) => e.parent === null);
+  const roots = spaces.filter((e) => e.parent == null);
   return roots.flatMap((rootSpace) =>
     recurse(rootSpace, spaces, 0, paddingChar)
   );

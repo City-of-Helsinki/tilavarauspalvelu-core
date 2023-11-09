@@ -29,7 +29,7 @@ export const formatNumber = (
   input?: number | null,
   suffix?: string
 ): string => {
-  if (input === null || input === undefined) return "";
+  if (input == null) return "";
 
   const number = new Intl.NumberFormat("fi").format(input);
 

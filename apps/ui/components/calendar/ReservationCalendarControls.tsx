@@ -44,7 +44,7 @@ import {
 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { ReservationUnitByPkType } from "common/types/gql-types";
-import { getLocalizationLang } from "common/src/helpers";
+import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
 import { MediumButton, truncatedText } from "../../styles/util";
 import { ReservationProps } from "../../context/DataContext";
 import { getDurationOptions } from "../../modules/reservation";
@@ -402,9 +402,7 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
       } else {
         setInitialReservation(null);
       }
-      const res =
-        reservations?.filter((r): r is NonNullable<typeof r> => r != null) ??
-        [];
+      const res = filterNonNullable(reservations);
       if (
         doBuffersCollide(
           {
@@ -420,10 +418,7 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
         setErrorMsg(t("reservationCalendar:errors.bufferCollision"));
       }
 
-      const openingTimes =
-        openingHours?.openingTimes?.filter(
-          (n): n is NonNullable<typeof n> => n !== null
-        ) ?? [];
+      const openingTimes = filterNonNullable(openingHours?.openingTimes) ?? [];
       if (doReservationsCollide({ start: startDate, end: endDate }, res)) {
         setErrorMsg(t(`reservationCalendar:errors.collision`));
       } else if (
@@ -464,12 +459,11 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
     startTime: dayStartTime,
     endTime: dayEndTime,
   }: { startTime?: string; endTime?: string } = useMemo(() => {
-    const timeframes =
+    const timeframes = filterNonNullable(
       reservationUnit.openingHours?.openingTimes
-        ?.filter((n): n is NonNullable<typeof n> => n !== null)
-        .filter(
-          (n) => n?.date != null && date != null && n.date === toApiDate(date)
-        ) ?? [];
+    ).filter(
+      (n) => n?.date != null && date != null && n.date === toApiDate(date)
+    );
 
     if (timeframes.length === 0) {
       return {
@@ -480,11 +474,11 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
 
     const possibleStartTimes = timeframes
       .map((n) => n.startTime != null && new Date(n.startTime))
-      .filter((n): n is Date => n !== null);
+      .filter((n): n is Date => n != null);
     const first = min(possibleStartTimes);
     const possibleEndTimes = timeframes
       .map((n) => n.endTime && new Date(n.endTime))
-      .filter((n): n is Date => n !== null);
+      .filter((n): n is Date => n != null);
     const last = max(possibleEndTimes);
 
     return {
