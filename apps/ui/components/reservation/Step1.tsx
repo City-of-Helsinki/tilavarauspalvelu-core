@@ -15,12 +15,12 @@ import {
   Subheading,
   TwoColumnContainer,
 } from "common/src/reservation-form/styles";
-import { ReservationStep } from "../../modules/types";
-import { capitalize, getTranslation } from "../../modules/util";
+import { ReservationStep } from "@/modules/types";
+import { capitalize, getTranslation } from "@/modules/util";
 import { ActionContainer } from "./styles";
 import Sanitize from "../common/Sanitize";
-import { MediumButton } from "../../styles/util";
-import { JustForMobile } from "../../modules/style/layout";
+import { MediumButton } from "@/styles/util";
+import { JustForMobile } from "@/modules/style/layout";
 import {
   ErrorAnchor,
   ErrorBox,
