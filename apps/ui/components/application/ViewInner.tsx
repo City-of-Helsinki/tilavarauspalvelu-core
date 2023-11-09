@@ -3,7 +3,6 @@ import { Checkbox } from "hds-react";
 import { useTranslation } from "next-i18next";
 import type { ApplicationNode, TermsOfUseType } from "common/types/gql-types";
 import { getTranslation } from "@/modules/util";
-import { useOptions } from "@/hooks/useOptions";
 import { ApplicantInfoPreview } from "./ApplicantInfoPreview";
 import { FormSubHeading } from "../common/common";
 import { CheckboxContainer, StyledNotification, Terms } from "./styled";
@@ -23,17 +22,8 @@ export const ViewInner = ({
 }): JSX.Element => {
   const { t } = useTranslation();
 
-  const { options } = useOptions();
-  const cities = options.cityOptions;
-
   const tos1 = tos.find((n) => n.pk === "generic1");
   const tos2 = tos.find((n) => n.pk === "KUVAnupa");
-
-  // TODO should refactor this to just get the city name from the application
-  const homeCity = application.homeCity?.pk;
-  const city = homeCity
-    ? cities.find((opt) => opt.value === homeCity.toString())?.label ?? "-"
-    : "-";
 
   return (
     <>
@@ -43,7 +33,7 @@ export const ViewInner = ({
         heading={t("application:preview.basicInfoSubHeading")}
         theme="thin"
       >
-        <ApplicantInfoPreview city={city} application={application} />
+        <ApplicantInfoPreview application={application} />
       </Accordion>
       <ApplicationEventList application={application} />
       <FormSubHeading>{t("reservationUnit:termsOfUse")}</FormSubHeading>

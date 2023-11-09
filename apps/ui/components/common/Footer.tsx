@@ -6,13 +6,17 @@ import styled from "styled-components";
 const linkIds: string[] = ["terms", "feedback"];
 
 const Wrapper = styled(HDSFooter)`
-  flex-shrink: 0;
+  /* problem with HDS footer not reserving space for the Koros */
+  margin-top: var(--spacing-xl);
 `;
 
 const Footer = (): JSX.Element => {
   const { t } = useTranslation("footer");
 
   // TODO HDS:Footer causes a hydration error
+  // related to hydration problems, any params we set to it are ignored in SSR
+  // so if the page is static this renders the default style
+  // if the page has client side js then the rerender fixes the styles
   return (
     <Wrapper
       title={t("common:applicationName")}

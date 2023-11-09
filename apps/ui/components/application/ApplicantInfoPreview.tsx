@@ -4,16 +4,15 @@ import {
   type ApplicationNode,
   ApplicationsApplicationApplicantTypeChoices,
 } from "common/types/gql-types";
+import { getTranslation } from "common/src/common/util";
 import { SpanTwoColumns, TwoColumnContainer } from "../common/common";
 import Address from "./AddressPreview";
 import { StyledLabelValue } from "./styled";
 
 const ApplicantInfoPreview = ({
   application,
-  city,
 }: {
   application: ApplicationNode;
-  city: string;
 }): JSX.Element => {
   const { t } = useTranslation();
 
@@ -44,7 +43,7 @@ const ApplicantInfoPreview = ({
           <SpanTwoColumns>
             <StyledLabelValue
               label={t("application:preview.homeCity")}
-              value={city}
+              value={getTranslation(application.homeCity ?? {}, "name")}
             />
           </SpanTwoColumns>
           <Address

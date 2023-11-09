@@ -62,11 +62,11 @@ const transformAddress = (address?: AddressFormValues) => {
 // Filter out any empty strings from the object (otherwise the mutation fails)
 // remove the identifier if it's empty (otherwise the mutation fails)
 const transformOrganisation = (org?: OrganisationFormValues) => {
-  // const { identifier, ...rest } = org ?? {};
   return {
     name: org?.name || undefined,
     identifier: org?.identifier || undefined,
     address: transformAddress(org?.address),
+    coreBusiness: org?.coreBusiness || undefined,
   };
 };
 
