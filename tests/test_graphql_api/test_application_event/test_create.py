@@ -78,7 +78,6 @@ def test_cannot_create_application_event_with_smaller_max_duration_than_min_dura
     assert response.field_error_messages("maxDuration") == ["Maximum duration should be larger than minimum duration"]
 
 
-@pytest.mark.django_db(transaction=True)
 def test_create_application_event__cannot_have_two_event_reservation_units_with_same_preferred_order(graphql):
     # given:
     # - There is draft application in an open application round
@@ -91,11 +90,11 @@ def test_create_application_event__cannot_have_two_event_reservation_units_with_
     data = get_application_event_create_data(application=application)
     data["eventReservationUnits"] = [
         {
-            "preferredOrder": 1,
+            "preferredOrder": 0,
             "reservationUnit": data["eventReservationUnits"][0]["reservationUnit"],
         },
         {
-            "preferredOrder": 1,
+            "preferredOrder": 0,
             "reservationUnit": data["eventReservationUnits"][0]["reservationUnit"],
         },
     ]
@@ -104,5 +103,6 @@ def test_create_application_event__cannot_have_two_event_reservation_units_with_
     # then:
     # - The response contains errors about violating unique constraint
     assert response.has_errors is True, response
-    msg = 'duplicate key value violates unique constraint "unique_application_event_preferred_order"'
-    assert msg in response.field_error_messages()[0]
+    assert response.field_error_messages("eventReservationUnits") == [
+        "Event reservation unit #2 has duplicate 'preferred_order' 0 with these event reservation units: #1"
+    ]

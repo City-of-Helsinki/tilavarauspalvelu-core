@@ -1986,7 +1986,7 @@ def _create_event_reservation_units(
 
         for i, unit in enumerate(units):
             event_unit = EventReservationUnit(
-                priority=i,
+                preferred_order=i,
                 application_event=application_event,
                 reservation_unit=unit,
             )

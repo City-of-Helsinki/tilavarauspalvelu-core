@@ -235,13 +235,12 @@ class ApplicationDataExporter:
 
                         cls._update_event_schedule_string(event_schedules, schedule)
 
-                    # Loop through event reservation units and update strings
-                    # by priority.
+                    # Loop through event reservation units and update strings by preferred_order.
                     event_reservation_unit: EventReservationUnit
-                    for _i, event_reservation_unit in enumerate(
+                    for event_reservation_unit in (
                         event.event_reservation_units.all()
                         .select_related("reservation_unit")
-                        .order_by("priority", "pk")
+                        .order_by("preferred_order", "pk")
                     ):
                         reservation_units.append(
                             f"{event_reservation_unit.reservation_unit.name}, "
