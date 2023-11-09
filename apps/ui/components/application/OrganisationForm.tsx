@@ -3,9 +3,10 @@ import { TextInput, Checkbox, Select } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { Controller, useFormContext } from "react-hook-form";
 import styled from "styled-components";
-import { OptionType } from "common/types/common";
+import type { OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
 import { CheckboxWrapper } from "common/src/reservation-form/components";
+import { Applicant_Type } from "common/types/gql-types";
 import { applicationErrorText } from "@/modules/util";
 import { TwoColumnContainer, FormSubHeading } from "../common/common";
 import { EmailInput } from "./EmailInput";
@@ -34,8 +35,8 @@ const OrganisationForm = ({ homeCityOptions }: Props): JSX.Element | null => {
     setValue,
   } = useFormContext<ApplicationFormPage3Values>();
 
-  const identifier = watch("organisation.identifier");
-  const hasRegistration = identifier != null;
+  const applicantType = watch("applicantType");
+  const hasRegistration = applicantType === Applicant_Type.Association;
   const hasBillingAddress = watch("hasBillingAddress");
 
   useEffect(() => {
@@ -102,9 +103,9 @@ const OrganisationForm = ({ homeCityOptions }: Props): JSX.Element | null => {
           checked={!hasRegistration}
           onClick={() => {
             if (!hasRegistration) {
-              setValue("organisation.identifier", "");
+              setValue('applicantType', Applicant_Type.Association);
             } else {
-              setValue("organisation.identifier", undefined);
+              setValue('applicantType', Applicant_Type.Community);
             }
           }}
         />
