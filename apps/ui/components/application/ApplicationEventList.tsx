@@ -2,10 +2,12 @@ import React from "react";
 import type { TFunction } from "i18next";
 import { useTranslation } from "next-i18next";
 import type {
+  AgeGroupType,
   ApplicationEventScheduleNode,
   ApplicationNode,
+  Maybe,
 } from "common/types/gql-types";
-import { useOptions } from "@/hooks/useOptions";
+import { getTranslation } from "common/src/common/util";
 import { TimePreview } from "./TimePreview";
 import { StyledLabelValue, TimePreviewContainer } from "./styled";
 import { TwoColumnContainer, FormSubHeading } from "../common/common";
@@ -39,6 +41,13 @@ const formatDurationSeconds = (seconds: number, t: TFunction): string => {
   )}`;
 };
 
+const ageGroupToString = (ag: Maybe<AgeGroupType> | undefined): string => {
+  if (!ag) {
+    return "";
+  }
+  return `${ag.minimum} - ${ag.maximum}`;
+};
+
 // NOTE: used by Preview and View
 // No form context unlike the edit pages, use application query result
 const ApplicationEventList = ({
@@ -47,26 +56,6 @@ const ApplicationEventList = ({
   application: ApplicationNode;
 }) => {
   const { t } = useTranslation();
-  const { params, options } = useOptions();
-  const { purposeOptions } = options;
-  const { ageGroups } = params;
-
-  const getAgeGroupString = (ageGroupId: number | null | undefined) => {
-    if (!ageGroupId) {
-      return "";
-    }
-    const fid = ageGroups.find((ag) => ag.pk != null && ag.pk === ageGroupId);
-    if (!fid) {
-      return "";
-    }
-    return `${fid.minimum} - ${fid.maximum}`;
-  };
-
-  const getPurposeString = (purposeId: number | null | undefined) => {
-    return purposeId
-      ? purposeOptions.find((n) => n.value === purposeId?.toString())?.label
-      : "";
-  };
 
   const aes = application.applicationEvents ?? [];
   const reservationUnits =
@@ -105,15 +94,11 @@ const ApplicationEventList = ({
             />
             <StyledLabelValue
               label={t("application:preview.applicationEvent.ageGroup")}
-              value={getAgeGroupString(
-                applicationEvent.ageGroup?.pk ?? undefined
-              )}
+              value={ageGroupToString(applicationEvent.ageGroup)}
             />
             <StyledLabelValue
               label={t("application:preview.applicationEvent.purpose")}
-              value={getPurposeString(
-                applicationEvent.purpose?.pk ?? undefined
-              )}
+              value={getTranslation(applicationEvent.purpose ?? {}, "name")}
             />
             <StyledLabelValue
               label={t("application:preview.applicationEvent.begin")}

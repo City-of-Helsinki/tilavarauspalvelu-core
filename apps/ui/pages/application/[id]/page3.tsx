@@ -61,7 +61,7 @@ const isAddressValid = (address?: AddressFormValues) => {
     city != null &&
     city !== ""
   );
-}
+};
 
 const transformAddress = (address?: AddressFormValues) => {
   return {
@@ -77,7 +77,9 @@ const transformOrganisation = (org?: OrganisationFormValues) => {
   return {
     name: org?.name || undefined,
     identifier: org?.identifier || undefined,
-    address: isAddressValid(org?.address) ? transformAddress(org?.address) : undefined,
+    address: isAddressValid(org?.address)
+      ? transformAddress(org?.address)
+      : undefined,
     coreBusiness: org?.coreBusiness || undefined,
   };
 };

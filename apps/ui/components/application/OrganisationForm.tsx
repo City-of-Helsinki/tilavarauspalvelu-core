@@ -103,9 +103,9 @@ const OrganisationForm = ({ homeCityOptions }: Props): JSX.Element | null => {
           checked={!hasRegistration}
           onClick={() => {
             if (!hasRegistration) {
-              setValue('applicantType', Applicant_Type.Association);
+              setValue("applicantType", Applicant_Type.Association);
             } else {
-              setValue('applicantType', Applicant_Type.Community);
+              setValue("applicantType", Applicant_Type.Community);
             }
           }}
         />

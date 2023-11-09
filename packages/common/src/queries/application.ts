@@ -94,6 +94,8 @@ export const APPLICATION_QUERY = gql`
             purpose {
               pk
               nameFi
+              nameSv
+              nameEn
             }
             ageGroup {
               pk
