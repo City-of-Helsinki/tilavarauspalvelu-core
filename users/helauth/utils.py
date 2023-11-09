@@ -11,6 +11,7 @@ from common.typing import AnyUser
 
 __all__ = [
     "get_id_token",
+    "get_jwt_payload",
     "get_profile_token",
     "is_ad_login",
 ]
@@ -65,11 +66,16 @@ def get_id_token(user: AnyUser) -> IDToken | None:
     if social_auth is not None:
         id_token: str | None = social_auth.extra_data.get("id_token", None)
         if id_token is not None:
-            payload_part: str = id_token.split(".")[1]
-            payload: str = urlsafe_b64decode(payload_part).decode()
-            return json.loads(payload)
+            return get_jwt_payload(id_token)
 
     return None
+
+
+def get_jwt_payload(json_web_token: str) -> IDToken:
+    payload_part: str = json_web_token.split(".")[1]  # Get the payload part of the id token
+    payload_part += "=" * divmod(len(payload_part), 4)[1]  # Add padding to the payload if needed
+    payload: str = urlsafe_b64decode(payload_part).decode()  # Decode the payload
+    return json.loads(payload)  # Return the payload as a dict
 
 
 class ADLoginAMR(enum.Enum):
