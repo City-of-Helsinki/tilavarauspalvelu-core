@@ -791,7 +791,7 @@ function LoadedContent({
 /// Client only: uses hooks, window, and react-router-dom
 /// We don't have proper layouts yet, so just separate the container stuff here
 const PageWrapped = ({ pk }: { pk?: number }) => {
-  const typename = "BannerNotificationType";
+  const typename = "BannerNotificationNode";
   const id = pk ? window?.btoa(`${typename}:${pk}`) : undefined;
 
   const { data, loading: isLoading } = useQuery<
