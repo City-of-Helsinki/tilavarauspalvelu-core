@@ -83,8 +83,8 @@ def test_update_application_event__switch_event_reservation_unit_preferred_order
     # - There is an application event with two event reservation units
     # - The owner of the application is using the system
     application_event = ApplicationEventFactory.create_in_status_unallocated()
-    event_unit_1 = EventReservationUnitFactory.create(application_event=application_event, preferred_order=1)
-    event_unit_2 = EventReservationUnitFactory.create(application_event=application_event, preferred_order=2)
+    event_unit_1 = EventReservationUnitFactory.create(application_event=application_event, preferred_order=0)
+    event_unit_2 = EventReservationUnitFactory.create(application_event=application_event, preferred_order=1)
     graphql.force_login(application_event.application.user)
 
     # when:
@@ -110,18 +110,17 @@ def test_update_application_event__switch_event_reservation_unit_preferred_order
     assert response.has_errors is False, response
     event_unit_1.refresh_from_db()
     event_unit_2.refresh_from_db()
-    assert event_unit_1.preferred_order == 2
-    assert event_unit_2.preferred_order == 1
+    assert event_unit_1.preferred_order == 1
+    assert event_unit_2.preferred_order == 0
 
 
-@pytest.mark.django_db(transaction=True)
 def test_update_application_event__cannot_have_two_event_reservation_units_with_same_preferred_order(graphql):
     # given:
     # - There is an application event with two event reservation units
     # - The owner of the application is using the system
     application_event = ApplicationEventFactory.create_in_status_unallocated()
-    event_unit_1 = EventReservationUnitFactory.create(application_event=application_event, preferred_order=1)
-    event_unit_2 = EventReservationUnitFactory.create(application_event=application_event, preferred_order=2)
+    event_unit_1 = EventReservationUnitFactory.create(application_event=application_event, preferred_order=0)
+    event_unit_2 = EventReservationUnitFactory.create(application_event=application_event, preferred_order=1)
     graphql.force_login(application_event.application.user)
 
     # when:
@@ -142,7 +141,40 @@ def test_update_application_event__cannot_have_two_event_reservation_units_with_
     response = graphql(UPDATE_MUTATION, input_data=data)
 
     # then:
-    # - The response contains errors about violating unique constraint
-    assert response.has_errors is True, response
-    msg = 'duplicate key value violates unique constraint "unique_application_event_preferred_order"'
-    assert msg in response.field_error_messages()[0]
+    # - The response contains errors about duplicate preferred order
+    assert response.field_error_messages("eventReservationUnits") == [
+        f"Event reservation unit {event_unit_2.pk} has duplicate 'preferred_order' "
+        f"0 with these event reservation units: {event_unit_1.pk}",
+    ]
+
+
+def test_update_application_event__preferred_order_must_be_consecutive_for_application_event(graphql):
+    # given:
+    # - There is an application event with two event reservation units
+    # - The owner of the application is using the system
+    application_event = ApplicationEventFactory.create_in_status_unallocated()
+    event_unit_1 = EventReservationUnitFactory.create(application_event=application_event, preferred_order=0)
+    event_unit_2 = EventReservationUnitFactory.create(application_event=application_event, preferred_order=1)
+    graphql.force_login(application_event.application.user)
+
+    # when:
+    # - User tries to update the application event, making the event reservation unit preferred order nonconsecutive
+    data = {
+        "pk": application_event.pk,
+        "eventReservationUnits": [
+            {
+                "pk": event_unit_1.pk,
+            },
+            {
+                "pk": event_unit_2.pk,
+                "preferredOrder": 2,
+            },
+        ],
+    }
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    # then:
+    # - The response contains errors about preferred order not being consecutive
+    assert response.field_error_messages("eventReservationUnits") == [
+        f"Event reservation unit {event_unit_2.pk} has 'preferred_order' 2 but should be 1"
+    ]

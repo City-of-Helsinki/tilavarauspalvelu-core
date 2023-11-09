@@ -6,6 +6,7 @@ from rest_framework import serializers
 from rest_framework.settings import api_settings
 
 from applications.models import ApplicationEvent, ApplicationEventSchedule, EventReservationUnit
+from applications.validators import validate_event_reservation_unit_preferred_ordering
 from common.serializers import TranslatedModelSerializer
 
 
@@ -56,6 +57,10 @@ class ApplicationEventSerializer(TranslatedModelSerializer):
             "application_event_schedules",
             "event_reservation_units",
         ]
+
+    def validate_event_reservation_units(self, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        validate_event_reservation_unit_preferred_ordering(self.instance, data)
+        return data
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         errors: dict[str, list[str]] = defaultdict(list)

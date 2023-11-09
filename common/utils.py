@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from datetime import datetime, timedelta
 from typing import Any, Literal
 
@@ -6,11 +7,12 @@ from django.db import models
 from modeltranslation.manager import get_translatable_fields_for_model
 
 __all__ = [
+    "comma_sep_str",
+    "get_field_to_related_field_mapping",
     "get_nested",
+    "get_translation_fields",
     "timedelta_from_json",
     "timedelta_to_json",
-    "get_field_to_related_field_mapping",
-    "get_translation_fields",
 ]
 
 
@@ -53,6 +55,19 @@ def timedelta_from_json(delta: str) -> timedelta:
         time_ = datetime.strptime(delta, "%H:%M")
 
     return timedelta(hours=time_.hour, minutes=time_.minute, seconds=time_.second)
+
+
+def comma_sep_str(values: Sequence[str]) -> str:
+    """
+    Return a comma separated string of the given values,
+    with an ampersand before the last value:
+
+    >>> comma_sep_str(["foo", "bar", "baz"])
+    "foo, bar & baz"
+    """
+    if len(values) == 1:
+        return str(values[0])
+    return ", ".join(values[:-1]) + f" & {values[-1]}"
 
 
 def get_field_to_related_field_mapping(model: type[models.Model]) -> dict[str, str]:
