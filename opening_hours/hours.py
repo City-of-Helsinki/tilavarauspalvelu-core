@@ -7,8 +7,7 @@ from django.utils.timezone import get_default_timezone
 
 from opening_hours.enums import State
 from opening_hours.errors import HaukiConfigurationError
-from opening_hours.utils.hauki_api_client import HaukiAPIClient
-from opening_hours.utils.hauki_api_types import HaukiAPIOpeningHoursResponse
+from opening_hours.models import ReservableTimeSpan
 from tilavarauspalvelu.utils import logging
 
 REQUESTS_TIMEOUT = 15
@@ -153,30 +152,23 @@ def get_opening_hours(
 
 
 def can_reserve_based_on_opening_hours(
-    opening_hours: list[OpeningHoursDayData],
-    reservations_start: datetime.datetime,
-    reservations_end: datetime.datetime,
+    reservable_time_spans: list[ReservableTimeSpan],
+    reservation_start: datetime.datetime,
+    reservation_end: datetime.datetime,
 ) -> bool:
     """Clamp the given reservation start and end times based on the given opening hours."""
-    for opening_hour in opening_hours:
-        time_element: TimeElement
-        for time_element in opening_hour["times"]:
-            # Find the first opening time on the reservation period
-            if reservations_start.date() <= opening_hour["date"] <= reservations_end.date():
-                opening_start = datetime.datetime.combine(
-                    opening_hour["date"],
-                    time_element.start_time,
-                    tzinfo=get_default_timezone(),
-                )
-                opening_end = datetime.datetime.combine(
-                    opening_hour["date"],
-                    time_element.end_time,
-                    tzinfo=get_default_timezone(),
-                )
+    for time_span in reservable_time_spans:
+        # Find the first opening time on the reservation period
+        if time_span.start_datetime < reservation_end and time_span.end_datetime > reservation_start:
+            max_start = max(time_span.start_datetime, reservation_start)
+            min_end = min(time_span.end_datetime, reservation_end)
 
-                max_start = max(opening_start, reservations_start)
-                min_end = min(opening_end, reservations_end)
-                return not (max_start > reservations_start or min_end < reservations_end)
+            # If the reservation period is not fully contained in the time span, we can't reserve
+            if max_start > reservation_start:
+                return False
+            if min_end < reservation_end:
+                return False
+            return True
 
     # Don't know if opening hours exists, so assume we can't get what we want
     return False
