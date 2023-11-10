@@ -1,15 +1,14 @@
 ## 🛠️ Changelog
-- Add changes here
+[//]: # "Describe the changes in this pull request here."
 
-## 🗒️ Other notes
-Additional notes if needed
+-
 
-## 🚚 Deployment reminder
-- [ ] PR requires deployment changes
-- [ ] Pipeline configuration change PR [link here]
-- [ ] Azure devops library updated if needed
-- [ ] Pipeline configuration change PR merged
+## 🧪 Test plan
+[//]: # "Help your fellow reviewer and write a short description what's the fastest way to test your changes."
+
+-
 
 ## 🎫 Tickets
-*This pull request resolves all or part of the following ticket(s):*
+[//]: # "This pull request resolves all or part of the following ticket(s)"
+
 - TILA-####

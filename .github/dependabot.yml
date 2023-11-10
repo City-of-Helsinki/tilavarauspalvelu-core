@@ -1,0 +1,29 @@
+# Setup dependabot updates
+
+version: 2
+
+updates:
+
+  # Update GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    pull-request-branch-name:
+      separator: "-"
+
+  # Update Poetry dependencies
+  - package-ecosystem: "pip"  # yes, this is correct
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    pull-request-branch-name:
+      separator: "-"
+
+  # Update Docker dependencies
+  - package-ecosystem: "docker"
+    directory: "/docker/"
+    schedule:
+      interval: "weekly"
+    pull-request-branch-name:
+      separator: "-"
