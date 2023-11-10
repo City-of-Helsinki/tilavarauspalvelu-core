@@ -80,10 +80,6 @@ pnpm test:browser
 
 You can write handlers for rest and graphql requests in '/mocks/handlers.ts'. Can also be used for mocking browser data.
 
-### GraphQL schema changes
-
-If the queries change significantly the mocks in `mocks` might need to be updated after you've ran `generate-gql-types`.
-
 ## Configurable environment variables
 
 See `.env.local.example` and Azure DevOps library for values.

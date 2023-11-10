@@ -42,6 +42,11 @@ Install deps
 pnpm i
 ```
 
+Update GraphQL schema and types.
+``` sh
+pnpm codegen
+```
+
 Start both frontends in dev mode
 ``` sh
 pnpm dev
@@ -146,12 +151,9 @@ New api changes require updating the schema and typescript types.
 Update the version backend version in `http://localhost:8000` using git and rebuild it (follow the backend README).
 
 ```sh
-cd packages/common
-pnpm update-schema generate-gql-types
+# in repo root
+pnpm codegen
 ```
-
-Some breaking changes might require fixing mocks in such case the Cypress tests will break.
-Check the Cypress section in [UI](apps/ui/README.md).
 
 ## FAQ
 

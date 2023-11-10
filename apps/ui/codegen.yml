@@ -1,4 +1,4 @@
-schema: ../tilavaraus.graphql
+schema: ./tilavaraus.graphql
 documents: "{pages,components,modules}/**/*.{ts,tsx}"
 generates:
   ./modules/gql-types.ts:

@@ -1,20 +1,25 @@
 ## Available Scripts
 
-### When GQL API changes, update local schema from core running at localhost:
-
-```
-pnpm update-schema
-```
-
-### When GQL API changes, update API types from local schema:
-
-```
-pnpm generate-gql-types
+Run all code generation scripts.
+``` sh
+pnpm codegen
 ```
 
-### Generate email .html templates
+### individual commands
 
+Generate only the `tilavaraus.schema` file, no Typescript types.
+Uses localhost:8000 as the API backend so make sure it's running.
+``` sh
+pnpm codegen:schema
 ```
+
+Generate only the Typescript types without updating the `tilavaraus.schema` from API.
+``` sh
+pnpm codegen:types
+```
+
+Generate email .html templates
+``` sh
 pnpm generate-email-templates
 ```
 

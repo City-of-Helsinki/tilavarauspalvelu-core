@@ -16,7 +16,8 @@
     "lint:css": "turbo lint:css",
     "test": "turbo test",
     "tsc:check": "turbo tsc:check",
-    "tsc:clean": "turbo tsc:clean"
+    "tsc:clean": "turbo tsc:clean",
+    "codegen": "turbo codegen"
   },
   "devDependencies": {
     "npkill": "^0.10.0",
