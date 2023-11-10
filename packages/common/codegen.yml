@@ -22,6 +22,7 @@ generates:
         JSON: string
         Long: number
         Time: string
+        TimeString: string
         Upload: unknown
         UUID: string
         Void: unknown
