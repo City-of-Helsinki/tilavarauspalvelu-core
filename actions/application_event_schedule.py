@@ -6,7 +6,8 @@ import recurrence
 from django.utils.timezone import get_default_timezone
 
 from applications.models import Address, Organisation, Person
-from opening_hours.hours import can_reserve_based_on_opening_hours, get_opening_hours
+from opening_hours.hours import can_reserve_based_on_opening_hours
+from opening_hours.models import ReservableTimeSpan
 from reservations.choices import ReservationStateChoice
 from reservations.models import RecurringReservation, Reservation
 from tilavarauspalvelu.utils.date_util import next_or_current_matching_weekday, previous_or_current_matching_weekday
@@ -38,11 +39,15 @@ class ApplicationEventScheduleActions:
         interval = 14 if application_event.biweekly else 7
         reservation_date = next_or_current_matching_weekday(application_event.begin, self.schedule.allocated_day)
 
-        unit_uuid = str(self.schedule.allocated_reservation_unit.uuid)
-        opening_hours = get_opening_hours(
-            resource_id=unit_uuid,
-            start_date=reservation_date,
-            end_date=application_event.end,
+        origin_hauki_resource = self.schedule.allocated_reservation_unit.origin_hauki_resource
+        if origin_hauki_resource is None:
+            raise ValueError(f"ReservationUnit {self.schedule.allocated_reservation_unit} has no OriginHaukiResource")
+
+        reservable_time_spans: list[ReservableTimeSpan] = list(
+            ReservableTimeSpan.objects.filter(resource=origin_hauki_resource).filter_period(
+                start=reservation_date,
+                end=application_event.end,
+            )
         )
 
         recurring_reservation = self.create_recurring_reservation_for_schedule()
@@ -60,10 +65,10 @@ class ApplicationEventScheduleActions:
                 reservations_end,
             )
 
-            valid_reservation = can_reserve_based_on_opening_hours(
-                opening_hours=opening_hours,
-                reservations_start=reservations_start,
-                reservations_end=reservations_end,
+            is_valid_reservation = can_reserve_based_on_opening_hours(
+                reservable_time_spans=reservable_time_spans,
+                reservation_start=reservations_start,
+                reservation_end=reservations_end,
             )
 
             reservation = Reservation.objects.create(
@@ -74,7 +79,7 @@ class ApplicationEventScheduleActions:
                 end=reservations_end,
                 state=(
                     ReservationStateChoice.DENIED
-                    if is_overlapping or not valid_reservation
+                    if is_overlapping or not is_valid_reservation
                     else ReservationStateChoice.CONFIRMED
                 ),
                 user=application_event.application.user,
