@@ -1,4 +1,4 @@
-import datetime
+from datetime import date, datetime, time, timedelta
 
 from django.db import models
 from django.db.models import Case, F, Q, QuerySet, Value, When
@@ -19,32 +19,34 @@ class OriginHaukiResource(models.Model):
     def __str__(self) -> str:
         return str(self.id)
 
-    def is_reservable(self, start_datetime: datetime.datetime, end_datetime: datetime.datetime) -> bool:
+    def is_reservable(self, start_datetime: datetime, end_datetime: datetime) -> bool:
         return self.reservable_time_spans.filter_period(start=start_datetime, end=end_datetime).exists()
 
 
 class ReservableTimeSpanQuerySet(models.QuerySet):
-    def filter_period(self, start: datetime.date, end: datetime.date) -> QuerySet["ReservableTimeSpan"]:
+    def filter_period(self, start: datetime | date, end: datetime | date) -> QuerySet["ReservableTimeSpan"]:
         """Filter reservable time spans that overlap with the given period."""
-        return self.filter(start_datetime__lt=end + datetime.timedelta(days=1), end_datetime__gt=start)
+        # Convert dates to datetimes to include timezone information
+        if isinstance(start, date):
+            start = datetime.combine(start, time.min, tzinfo=DEFAULT_TIMEZONE)
+        if isinstance(end, date):
+            end = datetime.combine(end, time.min, tzinfo=DEFAULT_TIMEZONE) + timedelta(days=1)
 
-    def filter_date(self, date: datetime.date) -> QuerySet["ReservableTimeSpan"]:
+        return self.filter(start_datetime__lt=end, end_datetime__gt=start)
+
+    def filter_date(self, selected_date: datetime | date) -> QuerySet["ReservableTimeSpan"]:
         """Filter reservable time spans that overlap with the given date."""
-        return self.filter_period(start=date, end=date)
+        return self.filter_period(start=selected_date, end=selected_date)
 
-    def truncated_start_and_end_datetimes_for_period(
-        self, start: datetime.date, end: datetime.date
-    ) -> QuerySet["ReservableTimeSpan"]:
+    def truncated_start_and_end_datetimes_for_period(self, start: date, end: date) -> QuerySet["ReservableTimeSpan"]:
         """
         Annotate truncated start and end datetimes for reservable time spans that overlap with the given period.
 
         If the time span starts before the period, the start time is set to the period start.
         If the time span ends after the period, the end time is set to the period end.
         """
-        start_datetime = datetime.datetime.combine(start, datetime.time.min, tzinfo=DEFAULT_TIMEZONE)
-        end_datetime = datetime.datetime.combine(end, datetime.time.min, tzinfo=DEFAULT_TIMEZONE) + datetime.timedelta(
-            days=1
-        )
+        start_datetime = datetime.combine(start, time.min, tzinfo=DEFAULT_TIMEZONE)
+        end_datetime = datetime.combine(end, time.max, tzinfo=DEFAULT_TIMEZONE) + timedelta(days=1)
         return self.filter_period(start=start, end=end).annotate(
             truncated_start_datetime=Case(
                 When(
