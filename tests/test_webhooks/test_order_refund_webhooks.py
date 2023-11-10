@@ -31,7 +31,7 @@ def test_order_refund_webhook__success(api_client, settings):
     data = {
         "orderId": str(order_id),
         "refundId": str(refund_id),
-        "refundPaymentId": str(uuid.uuid4()),
+        "refundPaymentId": f"{uuid.uuid4()}_at_20231101-083021",
         "namespace": settings.VERKKOKAUPPA_NAMESPACE,
         "eventType": "REFUND_PAID",
     }
@@ -73,7 +73,7 @@ def test_order_refund_webhook__no_action_needed(api_client, settings, status):
     data = {
         "orderId": str(order_id),
         "refundId": str(refund_id),
-        "refundPaymentId": str(uuid.uuid4()),
+        "refundPaymentId": f"{uuid.uuid4()}_at_20231101-083021",
         "namespace": settings.VERKKOKAUPPA_NAMESPACE,
         "eventType": "REFUND_PAID",
     }
@@ -102,7 +102,7 @@ def test_order_refund_webhook__missing_fields(api_client, settings, missing_fiel
     data = {
         "orderId": str(order_id),
         "refundId": str(refund_id),
-        "refundPaymentId": str(uuid.uuid4()),
+        "refundPaymentId": f"{uuid.uuid4()}_at_20231101-083021",
         "namespace": settings.VERKKOKAUPPA_NAMESPACE,
         "eventType": "REFUND_PAID",
     }
@@ -131,7 +131,7 @@ def test_order_refund_webhook__bad_namespace(api_client, settings):
     data = {
         "orderId": str(order_id),
         "refundId": str(refund_id),
-        "refundPaymentId": str(uuid.uuid4()),
+        "refundPaymentId": f"{uuid.uuid4()}_at_20231101-083021",
         "namespace": "foo",
         "eventType": "REFUND_PAID",
     }
@@ -159,7 +159,7 @@ def test_order_refund_webhook__bad_event_type(api_client, settings):
     data = {
         "orderId": str(order_id),
         "refundId": str(refund_id),
-        "refundPaymentId": str(uuid.uuid4()),
+        "refundPaymentId": f"{uuid.uuid4()}_at_20231101-083021",
         "namespace": settings.VERKKOKAUPPA_NAMESPACE,
         "eventType": "foo",
     }
@@ -181,7 +181,7 @@ def test_order_refund_webhook__payment_order_not_found(api_client, settings):
     data = {
         "orderId": str(order_id),
         "refundId": str(refund_id),
-        "refundPaymentId": str(uuid.uuid4()),
+        "refundPaymentId": f"{uuid.uuid4()}_at_20231101-083021",
         "namespace": settings.VERKKOKAUPPA_NAMESPACE,
         "eventType": "REFUND_PAID",
     }
@@ -209,7 +209,7 @@ def test_order_refund_webhook__refund_fetch_failed(api_client, settings):
     data = {
         "orderId": str(order_id),
         "refundId": str(refund_id),
-        "refundPaymentId": str(uuid.uuid4()),
+        "refundPaymentId": f"{uuid.uuid4()}_at_20231101-083021",
         "namespace": settings.VERKKOKAUPPA_NAMESPACE,
         "eventType": "REFUND_PAID",
     }
@@ -237,7 +237,7 @@ def test_order_refund_webhook__no_refund_from_verkkokauppa(api_client, settings)
     data = {
         "orderId": str(order_id),
         "refundId": str(refund_id),
-        "refundPaymentId": str(uuid.uuid4()),
+        "refundPaymentId": f"{uuid.uuid4()}_at_20231101-083021",
         "namespace": settings.VERKKOKAUPPA_NAMESPACE,
         "eventType": "REFUND_PAID",
     }
@@ -265,7 +265,7 @@ def test_order_refund_webhook__invalid_refund_status(api_client, settings):
     data = {
         "orderId": str(order_id),
         "refundId": str(refund_id),
-        "refundPaymentId": str(uuid.uuid4()),
+        "refundPaymentId": f"{uuid.uuid4()}_at_20231101-083021",
         "namespace": settings.VERKKOKAUPPA_NAMESPACE,
         "eventType": "REFUND_PAID",
     }

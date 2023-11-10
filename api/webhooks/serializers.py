@@ -51,7 +51,7 @@ class WebhookOrderCancelSerializer(serializers.Serializer):
 class WebhookRefundSerializer(serializers.Serializer):
     orderId = serializers.UUIDField()
     refundId = serializers.UUIDField()
-    refundPaymentId = serializers.UUIDField()
+    refundPaymentId = serializers.CharField()  # format: uuid + _at_ + yyyymmdd-hhmmss
     namespace = serializers.CharField()
     eventType = serializers.CharField()
 
