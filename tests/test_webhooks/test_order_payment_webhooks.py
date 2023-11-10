@@ -34,7 +34,7 @@ def test_order_payment_webhook__success(api_client, settings):
 
     data = {
         "orderId": str(order_id),
-        "paymentId": str(payment_id),
+        "paymentId": f"{payment_id}_at_20231101-083021",
         "namespace": settings.VERKKOKAUPPA_NAMESPACE,
         "eventType": "PAYMENT_PAID",
     }
@@ -70,7 +70,7 @@ def test_order_payment_webhook__success__no_reservation(api_client, settings):
 
     data = {
         "orderId": str(order_id),
-        "paymentId": str(payment_id),
+        "paymentId": f"{payment_id}_at_20231101-083021",
         "namespace": settings.VERKKOKAUPPA_NAMESPACE,
         "eventType": "PAYMENT_PAID",
     }
@@ -98,7 +98,7 @@ def test_order_payment_webhook__no_action_needed(api_client, settings, status):
 
     data = {
         "orderId": str(order_id),
-        "paymentId": str(payment_id),
+        "paymentId": f"{payment_id}_at_20231101-083021",
         "namespace": settings.VERKKOKAUPPA_NAMESPACE,
         "eventType": "PAYMENT_PAID",
     }
@@ -121,7 +121,7 @@ def test_order_payment_webhook__missing_field(api_client, settings, missing_fiel
 
     data = {
         "orderId": str(order_id),
-        "paymentId": str(payment_id),
+        "paymentId": f"{payment_id}_at_20231101-083021",
         "namespace": settings.VERKKOKAUPPA_NAMESPACE,
         "eventType": "PAYMENT_PAID",
     }
@@ -144,7 +144,7 @@ def test_order_payment_webhook__bad_namespace(api_client, settings):
 
     data = {
         "orderId": str(order_id),
-        "paymentId": str(payment_id),
+        "paymentId": f"{payment_id}_at_20231101-083021",
         "namespace": "foo",
         "eventType": "PAYMENT_PAID",
     }
@@ -166,7 +166,7 @@ def test_order_payment_webhook__bad_event_type(api_client, settings):
 
     data = {
         "orderId": str(order_id),
-        "paymentId": str(payment_id),
+        "paymentId": f"{payment_id}_at_20231101-083021",
         "namespace": settings.VERKKOKAUPPA_NAMESPACE,
         "eventType": "foo",
     }
@@ -187,7 +187,7 @@ def test_order_payment_webhook__payment_order_not_found(api_client, settings):
 
     data = {
         "orderId": str(order_id),
-        "paymentId": str(payment_id),
+        "paymentId": f"{payment_id}_at_20231101-083021",
         "namespace": settings.VERKKOKAUPPA_NAMESPACE,
         "eventType": "PAYMENT_PAID",
     }
@@ -210,7 +210,7 @@ def test_order_payment_webhook__payment_fetch_failed(api_client, settings):
 
     data = {
         "orderId": str(order_id),
-        "paymentId": str(payment_id),
+        "paymentId": f"{payment_id}_at_20231101-083021",
         "namespace": settings.VERKKOKAUPPA_NAMESPACE,
         "eventType": "PAYMENT_PAID",
     }
@@ -233,7 +233,7 @@ def test_order_payment_webhook__no_payment_from_verkkokauppa(api_client, setting
 
     data = {
         "orderId": str(order_id),
-        "paymentId": str(payment_id),
+        "paymentId": f"{payment_id}_at_20231101-083021",
         "namespace": settings.VERKKOKAUPPA_NAMESPACE,
         "eventType": "PAYMENT_PAID",
     }
@@ -256,7 +256,7 @@ def test_order_payment_webhook__invalid_payment_status(api_client, settings):
 
     data = {
         "orderId": str(order_id),
-        "paymentId": str(payment_id),
+        "paymentId": f"{payment_id}_at_20231101-083021",
         "namespace": settings.VERKKOKAUPPA_NAMESPACE,
         "eventType": "PAYMENT_PAID",
     }
