@@ -6,10 +6,17 @@ import {
   type PersonNode,
   type OrganisationNode,
   ApplicationsApplicationApplicantTypeChoices,
+  type UpdateEventReservationUnitSerializerInput,
+  type UpdateApplicationEventScheduleInEventSerializerInput,
+  type ApplicationNode,
+  type ApplicationUpdateMutationInput,
 } from "common/types/gql-types";
 import { type Maybe } from "graphql/jsutils/Maybe";
 import { z } from "zod";
+import { ApplicationEventSchedulePriority } from "common";
+import { toApiDate } from "common/src/common/util";
 import { apiDateToUIDate, fromUIDate } from "@/modules/util";
+import { ReservationUnitUnion } from "@/hooks/useReservationUnitList";
 
 // NOTE the zod schemas have a lot of undefineds because the form is split into four pages
 // so you can't trust some of the zod validation (e.g. mandatory fields)
@@ -222,3 +229,130 @@ export type ApplicationFormPage3Values = z.infer<
 >;
 
 export type ApplicationFormValues = z.infer<typeof ApplicationFormSchema>;
+
+/// form -> API transformers, enforce return types so API changes cause type errors
+/* eslint-enable @typescript-eslint/explicit-function-return-type */
+const transformDateString = (date?: string | null): string | undefined =>
+  date != null && toApiDate(fromUIDate(date)) != null
+    ? toApiDate(fromUIDate(date))
+    : undefined;
+
+type ApplicationEventScheduleFormValues = Omit<
+  NonNullable<
+    NonNullable<ApplicationFormValues["applicationEvents"]>[0]
+  >["applicationEventSchedules"][0],
+  "priority"
+> & {
+  priority: ApplicationEventSchedulePriority;
+};
+
+const transformApplicationEventSchedule = (
+  aes: ApplicationEventScheduleFormValues
+): UpdateApplicationEventScheduleInEventSerializerInput => {
+  return {
+    day: aes.day,
+    // Time format (HH:MM)
+    begin: aes.begin,
+    end: aes.end,
+    priority: aes.priority,
+  };
+};
+
+const transformEventReservationUnit = (
+  pk: number,
+  priority: number
+): UpdateEventReservationUnitSerializerInput => ({
+  preferredOrder: priority,
+  reservationUnit: pk,
+});
+
+const transformApplicationEvent = (
+  ae: NonNullable<NonNullable<ApplicationFormValues["applicationEvents"]>[0]>
+) => {
+  return {
+    ...(transformDateString(ae.begin) != null
+      ? { begin: transformDateString(ae.begin) }
+      : {}),
+    ...(transformDateString(ae.end) != null
+      ? { end: transformDateString(ae.end) }
+      : {}),
+    pk: ae.pk,
+    name: ae.name,
+    numPersons: ae.numPersons ?? 0,
+    // these (pks) can never be zero or null in the current version
+    // even if there are no abilityGroups in the database...
+    // so for now default them to 1 and have another look after the backend change is merged
+    ...(ae.abilityGroup != null ? { abilityGroup: ae.abilityGroup } : {}),
+    ...(ae.ageGroup != null ? { ageGroup: ae.ageGroup } : {}),
+    ...(ae.purpose != null ? { purpose: ae.purpose } : {}),
+    // min / max duration is a weird string format in the API
+    minDuration: String(ae.minDuration ?? 0), // "3600" == 1h
+    maxDuration: String(ae.maxDuration ?? 0), // "7200" == 2h
+    // API Date format (YYYY-MM-DD)
+    // not mandatory in the input but what is the default value?
+    ...(transformDateString(ae.begin) != null
+      ? { begin: transformDateString(ae.begin) }
+      : {}),
+    ...(transformDateString(ae.end) != null
+      ? { end: transformDateString(ae.end) }
+      : {}),
+    biweekly: ae.biweekly,
+    eventsPerWeek: ae.eventsPerWeek,
+    applicationEventSchedules: ae.applicationEventSchedules
+      ?.filter(
+        (aes): aes is ApplicationEventScheduleFormValues => aes.priority != null
+      )
+      .map((aes) => transformApplicationEventSchedule(aes)),
+    eventReservationUnits: ae.reservationUnits?.map((eruPk, eruIndex) =>
+      transformEventReservationUnit(eruPk, eruIndex)
+    ),
+  };
+};
+
+// For pages 1 and 2
+export const transformApplication = (
+  values: ApplicationFormValues
+): ApplicationUpdateMutationInput => {
+  const appEvents = filterNonNullable(values.applicationEvents);
+  return {
+    pk: values.pk,
+    applicantType: values.applicantType,
+    applicationEvents: appEvents.map((ae) => transformApplicationEvent(ae)),
+  };
+};
+
+export const convertApplicationToForm = (
+  app: Maybe<ApplicationNode> | undefined,
+  reservationUnits: ReservationUnitUnion[]
+): ApplicationFormValues => {
+  const formAes = filterNonNullable(app?.applicationEvents).map((ae) =>
+    transformApplicationEventToForm(ae)
+  );
+  // TODO do we need to set default values?
+  const defaultAes: (typeof formAes)[0] = {
+    pk: undefined,
+    name: "",
+    formKey: "event-NEW",
+    numPersons: 0,
+    abilityGroup: undefined,
+    ageGroup: 0,
+    purpose: 0,
+    minDuration: 0,
+    maxDuration: 0,
+    begin: undefined,
+    end: undefined,
+    biweekly: false,
+    eventsPerWeek: 1,
+    applicationEventSchedules: [],
+    reservationUnits: reservationUnits
+      .map((ru) => ru.pk)
+      .filter((pk): pk is number => pk != null),
+    accordianOpen: true,
+  };
+  return {
+    pk: app?.pk ?? 0,
+    applicantType: convertApplicantType(app?.applicantType),
+    applicationEvents: formAes.length > 0 ? formAes : [defaultAes],
+  };
+};
+/* eslint-disabled @typescript-eslint/explicit-function-return-type */

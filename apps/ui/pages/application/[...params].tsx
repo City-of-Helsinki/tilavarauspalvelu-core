@@ -7,29 +7,22 @@ import { type GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type {
-  ApplicationUpdateMutationInput,
   ApplicationNode,
   ApplicationRoundNode,
 } from "common/types/gql-types";
-import { ApplicationEventSchedulePriority } from "common";
-import { filterNonNullable } from "common/src/helpers";
-import { toApiDate } from "common/src/common/util";
-import { Maybe } from "graphql/jsutils/Maybe";
 import { redirectProtectedRoute } from "@/modules/protectedRoute";
 import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
 import Page1 from "@/components/application/Page1";
 import Page2 from "@/components/application/Page2";
 import { CenterSpinner } from "@/components/common/common";
-import { fromUIDate, getTranslation } from "@/modules/util";
+import { getTranslation } from "@/modules/util";
 import {
   ApplicationFormSchema,
   type ApplicationFormValues,
-  transformApplicationEventToForm,
-  convertApplicantType,
+  transformApplication,
+  convertApplicationToForm,
 } from "@/components/application/Form";
-import useReservationUnitsList, {
-  type ReservationUnitUnion,
-} from "@/hooks/useReservationUnitList";
+import useReservationUnitsList from "@/hooks/useReservationUnitList";
 import { useApplicationUpdate } from "@/hooks/useApplicationUpdate";
 import { ErrorToast } from "@/components/common/ErrorToast";
 import { useApplicationQuery } from "@/hooks/useApplicationQuery";
@@ -55,109 +48,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       slug,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
-  };
-};
-
-const transformDateString = (date?: string | null): string | undefined =>
-  date != null && toApiDate(fromUIDate(date)) != null
-    ? toApiDate(fromUIDate(date))
-    : undefined;
-
-// For pages 1 and 2
-const transformApplication = (
-  values: ApplicationFormValues
-): ApplicationUpdateMutationInput => {
-  return {
-    pk: values.pk,
-    applicantType: values.applicantType,
-    applicationEvents: filterNonNullable(values.applicationEvents).map(
-      (ae) => ({
-        ...(transformDateString(ae.begin) != null
-          ? { begin: transformDateString(ae.begin) }
-          : {}),
-        ...(transformDateString(ae.end) != null
-          ? { end: transformDateString(ae.end) }
-          : {}),
-        pk: ae.pk,
-        name: ae.name,
-        numPersons: ae.numPersons ?? 0,
-        // these (pks) can never be zero or null in the current version
-        // even if there are no abilityGroups in the database...
-        // so for now default them to 1 and have another look after the backend change is merged
-        ...(ae.abilityGroup != null ? { abilityGroup: ae.abilityGroup } : {}),
-        ...(ae.ageGroup != null ? { ageGroup: ae.ageGroup } : {}),
-        ...(ae.purpose != null ? { purpose: ae.purpose } : {}),
-        // min / max duration is a weird string format in the API
-        minDuration: String(ae.minDuration ?? 0), // "3600" == 1h
-        maxDuration: String(ae.maxDuration ?? 0), // "7200" == 2h
-        // API Date format (YYYY-MM-DD)
-        // not mandatory in the input but what is the default value?
-        ...(transformDateString(ae.begin) != null
-          ? { begin: transformDateString(ae.begin) }
-          : {}),
-        ...(transformDateString(ae.end) != null
-          ? { end: transformDateString(ae.end) }
-          : {}),
-        biweekly: ae.biweekly,
-        eventsPerWeek: ae.eventsPerWeek,
-        applicationEventSchedules: ae.applicationEventSchedules
-          ?.filter(
-            (
-              aes
-            ): aes is Omit<typeof aes, "priority"> & {
-              priority: ApplicationEventSchedulePriority;
-            } => aes.priority != null
-          )
-          .map((aes) => {
-            return {
-              day: aes.day,
-              // Time format (HH:MM)
-              begin: aes.begin,
-              end: aes.end,
-              priority: aes.priority,
-            };
-          }),
-        eventReservationUnits: ae.reservationUnits?.map((eruPk, eruIndex) => ({
-          priority: eruIndex,
-          reservationUnit: eruPk,
-        })),
-      })
-    ),
-  };
-};
-
-const convertApplicationToForm = (
-  app: Maybe<ApplicationNode> | undefined,
-  reservationUnits: ReservationUnitUnion[]
-): ApplicationFormValues => {
-  const formAes = filterNonNullable(app?.applicationEvents).map((ae) =>
-    transformApplicationEventToForm(ae)
-  );
-  // TODO do we need to set default values?
-  const defaultAes: (typeof formAes)[0] = {
-    pk: undefined,
-    name: "",
-    formKey: "event-NEW",
-    numPersons: 0,
-    abilityGroup: undefined,
-    ageGroup: 0,
-    purpose: 0,
-    minDuration: 0,
-    maxDuration: 0,
-    begin: undefined,
-    end: undefined,
-    biweekly: false,
-    eventsPerWeek: 1,
-    applicationEventSchedules: [],
-    reservationUnits: reservationUnits
-      .map((ru) => ru.pk)
-      .filter((pk): pk is number => pk != null),
-    accordianOpen: true,
-  };
-  return {
-    pk: app?.pk ?? 0,
-    applicantType: convertApplicantType(app?.applicantType),
-    applicationEvents: formAes.length > 0 ? formAes : [defaultAes],
   };
 };
 
