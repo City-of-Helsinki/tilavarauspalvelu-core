@@ -1,3 +1,4 @@
+import datetime
 import hmac
 import io
 
@@ -18,7 +19,6 @@ from api.legacy_rest_api.permissions import (
     ReservationPermission,
     ReservationUnitPermission,
 )
-from opening_hours.errors import HaukiRequestError
 from opening_hours.utils.summaries import get_resources_total_hours_per_resource
 from permissions.helpers import get_service_sectors_where_can_view_reservations, get_units_where_can_view_reservations
 from reservation_units.models import Equipment, ReservationUnit
@@ -174,14 +174,14 @@ class ReservationUnitViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"])
     def capacity(self, request, pk=None):
         reservation_units = request.query_params.get("reservation_unit")
-        period_start = self.request.query_params.get("period_start")
-        period_end = self.request.query_params.get("period_end")
+        period_start: str | None = self.request.query_params.get("period_start")
+        period_end: str | None = self.request.query_params.get("period_end")
 
         if not (period_start and period_end):
             raise serializers.ValidationError("Parameters period_start and period_end are required.")
         try:
-            period_start = parse(period_start).date()
-            period_end = parse(period_end).date()
+            period_start_date: datetime.date = parse(period_start).date()
+            period_end_date: datetime.date = parse(period_end).date()
         except (ValueError, OverflowError):
             raise serializers.ValidationError("Wrong date format. Use YYYY-MM-dd")
 
@@ -195,20 +195,23 @@ class ReservationUnitViewSet(viewsets.ModelViewSet):
 
         reservation_unit_qs = ReservationUnit.objects.filter(id__in=reservation_units)
 
-        try:
-            resource_ids = reservation_unit_qs.values_list("uuid", flat=True)
-            total_opening_hours = get_resources_total_hours_per_resource(resource_ids, period_start, period_end)
-        except HaukiRequestError:
-            total_opening_hours = {
-                res_unit: "Got an error while making request to HAUKI" for res_unit in reservation_units
-            }
+        hauki_resource_ids = (
+            reservation_unit_qs.filter(origin_hauki_resource__isnull=False)
+            .values_list("origin_hauki_resource_id", flat=True)
+            .distinct()
+        )
+        total_opening_hours = get_resources_total_hours_per_resource(
+            hauki_resource_ids,
+            period_start_date,
+            period_end_date,
+        )
 
         result_data = []
         for res_unit in reservation_unit_qs:
             total_duration = (
                 Reservation.objects.going_to_occur()
                 .filter(reservation_unit=res_unit)
-                .within_period(period_start=period_start, period_end=period_end)
+                .within_period(period_start=period_start_date, period_end=period_end_date)
                 .total_duration()
             ).get("total_duration")
 
@@ -219,8 +222,8 @@ class ReservationUnitViewSet(viewsets.ModelViewSet):
                     "id": res_unit.id,
                     "hour_capacity": total_opening_hours.get(resource_id),
                     "reservation_duration_total": total_duration,
-                    "period_start": period_start,
-                    "period_end": period_end,
+                    "period_start": period_start_date,
+                    "period_end": period_end_date,
                 }
             )
         return Response(result_data)

@@ -1,63 +1,30 @@
-import datetime
+import math
+from datetime import date, timedelta
 
-from opening_hours.hours import OpeningHoursDayData, get_opening_hours
+from django.db.models import DurationField, F, OuterRef
+from django.db.models.functions import Coalesce
 
-
-def get_resources_total_hours(
-    resource_ids: str | list[str],
-    period_start: str | datetime.date,
-    period_end: str | datetime.date,
-):
-    opening_hours = get_opening_hours(
-        resource_ids,
-        period_start,
-        period_end,
-    )
-
-    hours_in_day = 24
-    total_opening_hours = 0
-    for opening_hour in opening_hours:
-        for time in opening_hour["times"]:
-            if time.full_day:
-                total_opening_hours += hours_in_day
-                continue
-
-            if time.end_time_on_next_day:
-                total_opening_hours += hours_in_day - time.start_time.hour
-                continue
-
-            total_opening_hours += time.end_time.hour - time.start_time.hour
-
-    return total_opening_hours
+from common.db import SubQuerySum
+from opening_hours.models import OriginHaukiResource, ReservableTimeSpan
 
 
 def get_resources_total_hours_per_resource(
-    resource_ids: str | list[str],
-    period_start: str | datetime.date,
-    period_end: str | datetime.date,
-):
-    opening_hours: list[OpeningHoursDayData] = get_opening_hours(
-        resource_ids,
-        period_start,
-        period_end,
+    hauki_resource_ids: list[int],
+    period_start_date: date,
+    period_end_date: date,
+) -> dict[str, int]:
+    origin_hauki_resources = OriginHaukiResource.objects.filter(id__in=hauki_resource_ids).annotate(
+        duration=Coalesce(
+            SubQuerySum(
+                ReservableTimeSpan.objects.filter(resource_id=OuterRef("id"))
+                .truncated_start_and_end_datetimes_for_period(start=period_start_date, end=period_end_date)
+                .annotate(duration=F("truncated_end_datetime") - F("truncated_start_datetime"))
+                .values("duration"),
+                sum_field="duration",
+                output_field=DurationField(),
+            ),
+            timedelta(),
+        ),
     )
 
-    hours_in_day = 24
-    total_opening_hours = {}
-    for opening_hour in opening_hours:
-        total_open = 0
-        for time in opening_hour["times"]:
-            if time.full_day:
-                total_opening_hours += hours_in_day
-                continue
-
-            if time.end_time_on_next_day:
-                total_opening_hours += hours_in_day - time.start_time.hour
-                continue
-
-            total_open += time.end_time.hour - time.start_time.hour
-
-        prev_tot = total_opening_hours.get(opening_hour["resource_id"], 0)
-        total_opening_hours[opening_hour["resource_id"]] = total_open + prev_tot
-
-    return total_opening_hours
+    return {resource.id: math.floor(resource.duration.total_seconds() / 3600) for resource in origin_hauki_resources}
