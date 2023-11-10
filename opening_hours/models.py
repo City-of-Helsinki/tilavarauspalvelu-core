@@ -1,9 +1,11 @@
 import datetime
 
 from django.db import models
-from django.db.models import F, Q, QuerySet
+from django.db.models import Case, F, Q, QuerySet, Value, When
 from django.utils.timezone import get_default_timezone
 from django.utils.translation import gettext_lazy as _
+
+DEFAULT_TIMEZONE = get_default_timezone()
 
 
 class OriginHaukiResource(models.Model):
@@ -29,6 +31,36 @@ class ReservableTimeSpanQuerySet(models.QuerySet):
     def filter_date(self, date: datetime.date) -> QuerySet["ReservableTimeSpan"]:
         """Filter reservable time spans that overlap with the given date."""
         return self.filter_period(start=date, end=date)
+
+    def truncated_start_and_end_datetimes_for_period(
+        self, start: datetime.date, end: datetime.date
+    ) -> QuerySet["ReservableTimeSpan"]:
+        """
+        Annotate truncated start and end datetimes for reservable time spans that overlap with the given period.
+
+        If the time span starts before the period, the start time is set to the period start.
+        If the time span ends after the period, the end time is set to the period end.
+        """
+        start_datetime = datetime.datetime.combine(start, datetime.time.min, tzinfo=DEFAULT_TIMEZONE)
+        end_datetime = datetime.datetime.combine(end, datetime.time.min, tzinfo=DEFAULT_TIMEZONE) + datetime.timedelta(
+            days=1
+        )
+        return self.filter_period(start=start, end=end).annotate(
+            truncated_start_datetime=Case(
+                When(
+                    condition=Q(start_datetime__lt=start_datetime),
+                    then=Value(start_datetime),
+                ),
+                default="start_datetime",
+            ),
+            truncated_end_datetime=Case(
+                When(
+                    condition=Q(end_datetime__gt=end_datetime),
+                    then=Value(end_datetime),
+                ),
+                default="end_datetime",
+            ),
+        )
 
 
 class ReservableTimeSpan(models.Model):
@@ -60,8 +92,8 @@ class ReservableTimeSpan(models.Model):
     def _get_datetime_str(self) -> str:
         strformat = "%Y-%m-%d %H:%M"
 
-        start = self.start_datetime.astimezone(get_default_timezone())
-        end = self.end_datetime.astimezone(get_default_timezone())
+        start = self.start_datetime.astimezone(DEFAULT_TIMEZONE)
+        end = self.end_datetime.astimezone(DEFAULT_TIMEZONE)
 
         if start.date() == end.date():
             return f"{start.strftime(strformat)}-{end.strftime('%H:%M')}"
