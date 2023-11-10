@@ -11,7 +11,7 @@ def migrate_priority_to_preferred_order(apps, schema_editor):
     # Order events by priority and application event. This way we can
     # assign preferred order sequentially without having to worry about
     # what the order of priority has been.
-    for event_unit in EventReservationUnit.objects.order_by("priority", "application_event").all():
+    for event_unit in EventReservationUnit.objects.order_by("application_event", "priority").all():
         if application_event_id != event_unit.application_event_id:
             application_event_id = event_unit.application_event_id
             priority = 0
