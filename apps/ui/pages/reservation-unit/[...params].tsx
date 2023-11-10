@@ -341,7 +341,7 @@ const ReservationUnitReservationWithReservationProp = ({
         state === ReservationsReservationStateChoices.Confirmed ||
         state === ReservationsReservationStateChoices.RequiresHandling
       ) {
-        router.push(`${reservationsUrl}/${pk}/confirmation`);
+        router.push(`${reservationsUrl}${pk}/confirmation`);
       } else if (steps?.length > 2) {
         const order = data.confirmReservation?.order;
         const checkoutUrl = getCheckoutUrl(order ?? undefined, i18n.language);
