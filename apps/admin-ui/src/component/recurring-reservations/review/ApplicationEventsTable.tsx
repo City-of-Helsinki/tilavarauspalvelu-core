@@ -79,7 +79,7 @@ const appEventMapper = (
 ): ApplicationEventView => {
   const resUnits = appEvent.eventReservationUnits?.flatMap((eru) => ({
     ...eru?.reservationUnit?.unit,
-    priority: eru?.priority ?? 0,
+    priority: eru?.preferredOrder ?? 0,
   }));
   const units = orderBy(uniqBy(resUnits, "pk"), "priority", "asc")
     .map((unit) => ({

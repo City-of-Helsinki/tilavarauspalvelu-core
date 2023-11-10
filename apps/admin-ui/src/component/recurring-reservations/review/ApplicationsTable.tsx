@@ -113,7 +113,7 @@ const appMapper = (app: ApplicationNode, t: TFunction): ApplicationView => {
     .flatMap((ae) => ae?.eventReservationUnits)
     .flatMap((eru) => ({
       ...eru?.reservationUnit?.unit,
-      priority: eru?.priority ?? 0,
+      priority: eru?.preferredOrder ?? 0,
     }));
   const units = orderBy(uniqBy(applicationEvents, "pk"), "priority", "asc").map(
     (u) => ({ pk: u.pk ?? 0, name: u.nameFi ?? "-" })

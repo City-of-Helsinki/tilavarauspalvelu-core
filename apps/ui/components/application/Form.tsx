@@ -84,7 +84,11 @@ export const transformApplicationEventToForm = (
   eventsPerWeek: applicationEvent.eventsPerWeek ?? 0,
   biweekly: applicationEvent.biweekly ?? false,
   reservationUnits: filterNonNullable(applicationEvent.eventReservationUnits)
-    .sort((a, b) => (a.priority && b.priority ? a.priority - b.priority : 0))
+    .sort((a, b) =>
+      a.preferredOrder && b.preferredOrder
+        ? a.preferredOrder - b.preferredOrder
+        : 0
+    )
     .map((eru) => eru.reservationUnit?.pk ?? 0)
     .filter((pk) => pk > 0),
   // schedules are only used for page2 form

@@ -38,7 +38,7 @@ export const APPLICATIONS_QUERY = gql`
             name
             pk
             eventReservationUnits {
-              priority
+              preferredOrder
               reservationUnit {
                 unit {
                   pk
@@ -99,7 +99,7 @@ export const APPLICATIONS_EVENTS_QUERY = gql`
             }
           }
           eventReservationUnits {
-            priority
+            preferredOrder
             reservationUnit {
               unit {
                 pk

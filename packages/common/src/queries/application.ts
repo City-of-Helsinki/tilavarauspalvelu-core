@@ -113,7 +113,7 @@ export const APPLICATION_QUERY = gql`
             }
             eventReservationUnits {
               pk
-              priority
+              preferredOrder
               reservationUnit {
                 pk
                 nameFi

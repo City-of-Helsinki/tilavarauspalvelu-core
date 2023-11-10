@@ -66,7 +66,7 @@ export const APPLICATIONS_QUERY = gql`
             minDuration
             name
             eventReservationUnits {
-              priority
+              preferredOrder
               reservationUnit {
                 unit {
                   nameFi
@@ -131,7 +131,7 @@ export const APPLICATIONS_BY_APPLICATION_ROUND_QUERY = gql`
               allocatedEnd
             }
             eventReservationUnits {
-              priority
+              preferredOrder
               reservationUnit {
                 pk
                 nameFi
