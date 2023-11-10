@@ -37,7 +37,7 @@ class WebhookOrderPaidViewSet(viewsets.GenericViewSet):
             return Response(data=serializer.errors, status=400)
 
         order_id: uuid.UUID = serializer.validated_data["orderId"]
-        payment_id: uuid.UUID = serializer.validated_data["paymentId"]
+        payment_id: str = serializer.validated_data["paymentId"]
         namespace: str = serializer.validated_data["namespace"]
 
         payment_order: PaymentOrder | None = PaymentOrder.objects.filter(remote_id=order_id).first()

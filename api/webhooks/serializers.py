@@ -12,7 +12,7 @@ def sentry_webhook_error(errors: dict[str, Any]) -> None:
 
 
 class WebhookPaymentSerializer(serializers.Serializer):
-    paymentId = serializers.UUIDField()
+    paymentId = serializers.CharField()  # format: uuid + _at_ + yyyymmdd-hhmmss
     orderId = serializers.UUIDField()
     namespace = serializers.CharField()
     eventType = serializers.CharField()
