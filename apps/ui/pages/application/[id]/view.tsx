@@ -10,6 +10,7 @@ import type {
 import { getTranslation } from "common/src/common/util";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { filterNonNullable } from "common/src/helpers";
 import { BlackButton } from "@/styles/util";
 import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
 import { redirectProtectedRoute } from "@/modules/protectedRoute";
@@ -81,9 +82,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     query: TERMS_OF_USE,
   });
 
-  const tos = tosData?.termsOfUse?.edges
-    .map((n) => n?.node)
-    .filter((n) => n?.pk === "KUVAnupa" || n?.pk === "generic1");
+  const tos = filterNonNullable(
+    tosData?.termsOfUse?.edges?.map((e) => e?.node)
+  ).filter((n) => n?.pk === "KUVAnupa" || n?.pk === "generic1");
 
   // TODO should fetch on SSR but we need authentication for it
   const { query } = ctx;

@@ -118,7 +118,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const genericTerms =
       genericTermsData.termsOfUse?.edges
         ?.map((n) => n?.node)
-        // TODO why does this comparison work? or does it? pk should be a number
         .find((n) => n?.pk === "generic1") || {};
 
     const { data: reservationPurposesData } = await apolloClient.query<
