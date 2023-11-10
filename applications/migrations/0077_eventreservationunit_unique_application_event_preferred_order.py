@@ -6,7 +6,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("applications", "0075_remove_eventreservationunit_priority"),
+        ("applications", "0076_fix_preferred_order"),
     ]
 
     operations = [
