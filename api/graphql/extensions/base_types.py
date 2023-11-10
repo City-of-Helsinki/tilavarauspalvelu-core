@@ -5,6 +5,7 @@ from itertools import chain
 from typing import Any, TypedDict
 
 import graphene
+from django import forms
 from django.db import models
 from django.db.models import Model
 from graphene import Connection, Field, relay
@@ -13,6 +14,7 @@ from graphene.types.unmountedtype import UnmountedType
 from graphene_django import DjangoConnectionField, DjangoListField, DjangoObjectType
 from graphene_django.converter import convert_django_field, get_django_field_description
 from graphene_django.filter import DjangoFilterConnectionField
+from graphene_django.forms.converter import convert_form_field, get_form_field_description
 from graphene_django.types import DjangoObjectTypeOptions, ErrorType
 from graphene_permissions.permissions import BasePermission
 from graphql import GraphQLError
@@ -207,7 +209,9 @@ class TimeString(graphene.Time):
 
 @convert_django_field.register(models.TimeField)
 def convert_time_to_string(field, registry=None):
-    return TimeString(
-        description=get_django_field_description(field),
-        required=not field.null,
-    )
+    return TimeString(description=get_django_field_description(field), required=not field.null)
+
+
+@convert_form_field.register(forms.TimeField)
+def convert_form_field_to_time(field):
+    return TimeString(description=get_form_field_description(field), required=field.required)
