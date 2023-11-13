@@ -128,7 +128,7 @@ const translations: ITranslations = {
     volumeUnit: [" kpl", " ", " "],
     personUnit_one: ["{{count}} henkilö"],
     personUnit_other: ["{{count}} henkeä"],
-    hoursUnit: ["{{count}} h"],
+    hoursUnit: ["{{count}} t"],
     hoursUnitLong_one: ["{{count}} tunti"],
     hoursUnitLong_other: ["{{count}} tuntia"],
     minutesUnit: ["{{count}} min"],

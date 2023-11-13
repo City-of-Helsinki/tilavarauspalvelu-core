@@ -63,11 +63,19 @@ export const reservationDuration = (start: Date, end: Date): string => {
   return `${differenceInHours(end, start)}`;
 };
 
-const reservationDurationString = (start: string, end: string): string => {
+const reservationDurationString = (
+  start: string,
+  end: string,
+  t: TFunction
+): string => {
   const startDate = new Date(start);
   const endDate = new Date(end);
 
-  return `${differenceInHours(endDate, startDate)}`;
+  const h = differenceInHours(endDate, startDate);
+  const m = differenceInMinutes(endDate, startDate) - h * 60;
+  return `${t("common.hoursUnit", { count: h })} ${
+    m !== 0 ? t("common.minutesUnit", { count: m }) : ""
+  }`;
 };
 
 export const reservationUnitName = (
@@ -255,12 +263,13 @@ export const createTagString = (reservation: ReservationType, t: TFunction) => {
 
   const durationTag = `${reservationDurationString(
     reservation.begin,
-    reservation.end
+    reservation.end,
+    t
   )}`;
 
   const reservationTagline = `${
     reservation.recurringReservation ? recurringDateTag : singleDateTimeTag
-  }, ${durationTag}t ${
+  }, ${durationTag} ${
     recurringTag.length > 0 ? " | " : ""
   } ${recurringTag} | ${unitTag}`;
 
