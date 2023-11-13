@@ -1,4 +1,5 @@
 .PHONY: bash
+.PHONY: celery
 .PHONY: clear-db
 .PHONY: db-reset
 .PHONY: dev
@@ -32,6 +33,7 @@ define helptext
  Commands:
 
   bash                               Open bash in backend container.
+  celery                             Run a local celery worker.
   clear-db                           Reset database.
   dev                                Run local backend.
   flush-db                           Flush database.
@@ -58,6 +60,9 @@ help:
 
 bash:
 	@docker exec -it tvp-core bash
+
+celery:
+	@celery -A tilavarauspalvelu worker -l DEBUG
 
 clear-db:
 	@python manage.py dbshell -- -c "DROP SCHEMA $(call args, 'public') CASCADE;CREATE SCHEMA $(call args, 'public');"

@@ -501,6 +501,16 @@ if CELERY_FILESYSTEM_BACKEND:
         "store_processed": True,
     }
 
+# Use redis as broker if redis url is set
+elif env("REDIS_SENTINEL_SERVICE") and env("REDIS_MASTER") and env("REDIS_PASSWORD"):
+    CELERY_BROKER_URL = f"sentinel://:{env('REDIS_PASSWORD')}@{env('REDIS_SENTINEL_SERVICE')}"
+    CELERY_BROKER_TRANSPORT_OPTIONS = {
+        "master_name": env("REDIS_MASTER").removeprefix("redis://"),
+        "sentinel_kwargs": {
+            "password": env("REDIS_PASSWORD"),
+        },
+    }
+
 # ----- Redis settings ---------------------------------------------------------------------------------
 
 # Configure Redis cache for local dev environment
@@ -518,7 +528,7 @@ if env("REDIS_URL"):
     }
 
 # Configure Redis cache for production OpenShift environment
-elif env("REDIS_SENTINEL_SERVICE") and env("REDIS_MASTER"):
+elif env("REDIS_SENTINEL_SERVICE") and env("REDIS_MASTER") and env("REDIS_PASSWORD"):
     sentinel_host, sentinel_port = env("REDIS_SENTINEL_SERVICE").split(":")
     SESSION_ENGINE = "django.contrib.sessions.backends.cache"
     SESSION_CACHE_ALIAS = "default"
