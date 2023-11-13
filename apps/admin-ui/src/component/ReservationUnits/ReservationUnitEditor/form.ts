@@ -171,10 +171,18 @@ export const convert = (data?: ReservationUnitByPkType): ReservationEditFormValu
     cancellationRulePk: data?.cancellationRule?.pk ?? undefined,
     paymentTypes: filterNonNullable(data?.paymentTypes?.map((pt) => pt?.code)),
     pricings: convertPricingList(filterNonNullable(data?.pricings)),
-    isDraft: false,
-    isArchived: false,
-    hasFuturePricing: false,
+    isDraft: data?.isArchived ?? false,
+    isArchived: data?.isArchived ?? false,
+    hasFuturePricing: data?.pricings?.some((p) => p?.status != null && p?.status === ReservationUnitsReservationUnitPricingStatusChoices.Future) ?? false,
   };
+}
+
+// NOTE decimal type is incorrectly typed as number in codegen
+const convertMaybeDecimal = (value?: unknown) => {
+  if (value == null || value === "") {
+    return undefined;
+  }
+  return Number(value);
 }
 
 const convertPricing = (p?: ReservationUnitPricingType): PricingFormValues => {
@@ -191,20 +199,20 @@ const convertPricing = (p?: ReservationUnitPricingType): PricingFormValues => {
   }
 
   return {
-      pk: p?.pk ?? 0,
-      taxPercentage: {
-        pk: p?.taxPercentage?.pk ?? undefined,
-        value: p?.taxPercentage?.value ?? 0,
-      },
-      lowestPrice: p?.lowestPrice ?? 0,
-      lowestPriceNet: p?.lowestPriceNet ?? 0,
-      highestPrice: p?.highestPrice ?? 0,
-      highestPriceNet: p?.highestPriceNet ?? 0,
-      pricingType: p?.pricingType ?? ReservationUnitsReservationUnitPricingPricingTypeChoices.Free,
-      priceUnit: p?.priceUnit ?? undefined,
-      status: p?.status ?? ReservationUnitsReservationUnitPricingStatusChoices.Active,
-      begins: convertBegins(p?.begins, p?.status),
-    }
+    pk: p?.pk ?? 0,
+    taxPercentage: {
+      pk: p?.taxPercentage?.pk ?? undefined,
+      value: convertMaybeDecimal(p?.taxPercentage?.value) ?? 0,
+    },
+    lowestPrice: convertMaybeDecimal(p?.lowestPrice) ?? 0,
+    lowestPriceNet: convertMaybeDecimal(p?.lowestPriceNet) ?? 0,
+    highestPrice: convertMaybeDecimal(p?.highestPrice) ?? 0,
+    highestPriceNet: convertMaybeDecimal(p?.highestPriceNet) ?? 0,
+    pricingType: p?.pricingType ?? ReservationUnitsReservationUnitPricingPricingTypeChoices.Free,
+    priceUnit: p?.priceUnit ?? undefined,
+    status: p?.status ?? ReservationUnitsReservationUnitPricingStatusChoices.Active,
+    begins: convertBegins(p?.begins, p?.status),
+  }
 }
 
 // Don't return past pricings (they can't be saved to backend)

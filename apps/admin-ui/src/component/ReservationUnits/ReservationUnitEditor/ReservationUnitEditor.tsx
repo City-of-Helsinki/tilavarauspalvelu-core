@@ -13,12 +13,12 @@ import {
 } from "hds-react";
 import { H1, Strong } from "common/src/common/typography";
 import i18next from "i18next";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import dynamic from "next/dynamic";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, UseFormReturn, useForm } from "react-hook-form";
 import {
   Query,
   QueryReservationUnitByPkArgs,
@@ -470,9 +470,13 @@ const constructApiDate = (date: string, time: string) => {
 const ReservationUnitEditor = ({
   reservationUnit,
   unitPk,
+  form,
+  refetch,
 }: {
   reservationUnit?: ReservationUnitByPkType;
   unitPk: string;
+  form: UseFormReturn<ReservationEditFormValues>;
+  refetch: () => void;
 }): JSX.Element | null => {
   const { t } = useTranslation();
   const history = useNavigate();
@@ -498,11 +502,9 @@ const ReservationUnitEditor = ({
   const createReservationUnit = (input: ReservationUnitCreateMutationInput) =>
     createReservationUnitMutation({ variables: { input } });
 
-  const form = useForm<ReservationEditFormValues>({
-    defaultValues: convert(reservationUnit),
-  });
   const { control, register, getValues, setValue, watch, formState: { isDirty, isSubmitting }, handleSubmit, } = form;
 
+  console.log('values: ', getValues());
   const onSubmit = async (formValues: ReservationEditFormValues) => {
     const {
       isDraft,
@@ -528,8 +530,8 @@ const ReservationUnitEditor = ({
       reservationBegins: constructApiDate(reservationBeginsDate, reservationBeginsTime),
       publishBegins: constructApiDate(publishBeginsDate, publishBeginsTime),
       publishEnds: constructApiDate(publishEndsDate, publishEndsTime),
-      ...(isDraft ? { isDraft } : {}),
-      ...(isArchived ? { isArchived } : {}),
+      isDraft,
+      isArchived,
       // FIXME this saves "past" status always?
       // no it doesn't it just doesn't save status if the pk is 0
       pricings: filterNonNullable(pricings).filter((p) => hasFuturePricing || p.status === ReservationUnitsReservationUnitPricingStatusChoices.Active).map((p) => ({
@@ -596,6 +598,7 @@ const ReservationUnitEditor = ({
 
       // TODO draft / archive / publish
       notifySuccess(t("ReservationUnitEditor.saveSuccess"));
+      refetch();
       return pk;
 
     } catch (error) {
@@ -668,6 +671,7 @@ const ReservationUnitEditor = ({
     .filter((p) => p?.pricingType === "PAID")
     .filter((p) => p.status === ReservationUnitsReservationUnitPricingStatusChoices.Active || isFuturePriceVisible)
     .length > 0;
+  console.log('isFuturePriceVisible', isFuturePriceVisible, 'isPaid', isPaid);
 
   const getValidationError = (_ignore: string) => undefined;
   const unit = unitResourcesData?.unitByPk ?? undefined;
@@ -1810,7 +1814,7 @@ function EditorWrapper () {
   const { t } = useTranslation();
   const { notifyError } = useNotification();
 
-  const { data: reservationUnitData, loading: isLoading } = useQuery<
+  const { data: reservationUnitData, loading: isLoading, refetch } = useQuery<
     Query,
     QueryReservationUnitByPkArgs
   >(RESERVATIONUNIT_QUERY, {
@@ -1823,15 +1827,19 @@ function EditorWrapper () {
     },
   });
 
-  /*
+  const reservationUnit = reservationUnitData?.reservationUnitByPk ?? undefined;
+  const unit = reservationUnit?.unit
+
+  const form = useForm<ReservationEditFormValues>({
+    defaultValues: convert(reservationUnit),
+  });
+  const { reset } = form;
   useEffect(() => {
     if (reservationUnitData?.reservationUnitByPk != null) {
-      console.log("resetting form: with times", reservationUnitData.reservationUnitByPk);
       const vals = convert(reservationUnitData.reservationUnitByPk);
       reset(vals);
     }
   }, [reservationUnitData, reset]);
-  */
 
   if (isLoading) {
     return <Loader />;
@@ -1886,8 +1894,6 @@ function EditorWrapper () {
   }
   */
 
-  const reservationUnit = reservationUnitData?.reservationUnitByPk ?? undefined;
-  const unit = reservationUnit?.unit
   return (
     <Wrapper>
       <BreadcrumbWrapper
@@ -1897,7 +1903,7 @@ function EditorWrapper () {
           { slug: "", alias: reservationUnit?.nameFi || "-" },
         ]}
       />
-      <ReservationUnitEditor reservationUnit={reservationUnit} unitPk={unitPk} />
+      <ReservationUnitEditor reservationUnit={reservationUnit} form={form} unitPk={unitPk} refetch={refetch} />
     </Wrapper>
   )
 }

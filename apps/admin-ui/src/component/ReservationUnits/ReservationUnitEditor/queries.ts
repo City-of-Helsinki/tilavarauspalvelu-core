@@ -92,6 +92,7 @@ export const RESERVATIONUNIT_QUERY = gql`
       }
       unit {
         pk
+        nameFi
       }
       minPersons
       maxPersons
