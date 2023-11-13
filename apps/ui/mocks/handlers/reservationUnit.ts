@@ -1403,7 +1403,7 @@ const termsOfUseData: TermsOfUseTypeConnection = {
     {
       node: {
         id: "4",
-        pk: "generic1",
+        pk: "booking",
         nameFi: "Sopimusehdot FI",
         nameEn: "Sopimusehdot EN",
         nameSv: "Sopimusehdot SV",

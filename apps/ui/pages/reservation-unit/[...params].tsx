@@ -118,7 +118,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const genericTerms =
       genericTermsData.termsOfUse?.edges
         ?.map((n) => n?.node)
-        .find((n) => n?.pk === "generic1") || {};
+        .find((n) => n?.pk === "booking") || {};
 
     const { data: reservationPurposesData } = await apolloClient.query<
       Query,

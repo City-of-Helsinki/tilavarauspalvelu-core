@@ -22,7 +22,7 @@ export const ViewInner = ({
 }): JSX.Element => {
   const { t } = useTranslation();
 
-  const tos1 = tos.find((n) => n.pk === "generic1");
+  const tos1 = tos.find((n) => n.pk === "booking");
   const tos2 = tos.find((n) => n.pk === "KUVAnupa");
 
   return (

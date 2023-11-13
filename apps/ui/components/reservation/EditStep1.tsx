@@ -93,7 +93,7 @@ const EditStep1 = ({
       const result =
         data.termsOfUse?.edges
           .map((n) => n?.node)
-          .find((n) => n?.pk === "generic1") || undefined;
+          .find((n) => n?.pk === "booking") || undefined;
       setHasTermsOfUse(Boolean(result));
     },
   });

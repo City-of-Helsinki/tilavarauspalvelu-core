@@ -64,7 +64,7 @@ const useGenericTerms = () => {
   const genericTerms = data?.termsOfUse?.edges
     ?.map((n) => n?.node)
     ?.filter((n): n is TermsOfUseType => n != null)
-    .find((n) => n.pk != null && ["generic1"].includes(n.pk));
+    .find((n) => n.pk != null && ["booking"].includes(n.pk));
 
   return genericTerms;
 };

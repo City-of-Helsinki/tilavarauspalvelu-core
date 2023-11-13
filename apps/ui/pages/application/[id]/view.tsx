@@ -84,7 +84,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   const tos = filterNonNullable(
     tosData?.termsOfUse?.edges?.map((e) => e?.node)
-  ).filter((n) => n?.pk === "KUVAnupa" || n?.pk === "generic1");
+  ).filter((n) => n?.pk === "KUVAnupa" || n?.pk === "booking");
 
   // TODO should fetch on SSR but we need authentication for it
   const { query } = ctx;
