@@ -10,7 +10,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.12"
-celery = "^5.3"
+celery = {extras = ["redis"], version = "^5.3.5"}
 certifi = "^2023.7.22"
 cryptography = ">=41.0.3"
 Django = "^4.2"
