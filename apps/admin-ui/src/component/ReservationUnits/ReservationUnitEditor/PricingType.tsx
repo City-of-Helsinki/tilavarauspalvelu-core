@@ -14,7 +14,7 @@ import {
 } from "@/styles/layout";
 import { Select } from "hds-react";
 import { Controller, UseFormReturn } from "react-hook-form";
-import { ReservationEditFormValues } from "./form";
+import { ReservationUnitEditFormValues } from "./form";
 import { PaymentTypes } from "./types";
 
 const Error = styled.div`
@@ -30,7 +30,7 @@ const Error = styled.div`
 
 type Props = {
   index: number;
-  form: UseFormReturn<ReservationEditFormValues>,
+  form: UseFormReturn<ReservationUnitEditFormValues>,
   taxPercentageOptions: { label: string; value: number }[];
 };
 
@@ -128,7 +128,7 @@ const PaidPricingPart = ({
   index,
   taxPercentageOptions,
 }: {
-  form: UseFormReturn<ReservationEditFormValues>;
+  form: UseFormReturn<ReservationUnitEditFormValues>;
   index: number;
   taxPercentageOptions: { label: string; value: number }[];
 }) => {

@@ -1450,6 +1450,7 @@ const translations: ITranslations = {
     reservationUnitUpdatedNotification: [
       "Varausyksikön muutokset tallennettu.",
     ],
+    saveSuccess: ["Tiedot tallennettu."],
     saveFailed: [
       "Valitettavasti varausyksikön tallennus / julkaisu ei juuri nyt onnistu, kokeile myöhemmin uudelleen. ({{error}})",
     ],

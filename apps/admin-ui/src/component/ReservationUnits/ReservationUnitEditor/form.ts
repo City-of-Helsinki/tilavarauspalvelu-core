@@ -11,108 +11,246 @@ import {
   ReservationUnitPricingType,
 } from "common/types/gql-types";
 import { addDays, format } from "date-fns";
+import { z } from "zod";
 
-export type PricingFormValues = {
+export const PricingFormSchema = z.object({
   // pk === 0 means new pricing good decission?
   // pk === 0 fails silently on the backend, but undefined creates a new pricing
-  pk: number,
-  taxPercentage: {
-    pk?: number,
-    value: number,
-  },
-  lowestPrice: number,
-  lowestPriceNet: number,
-  highestPrice: number,
-  highestPriceNet: number,
-  pricingType: ReservationUnitsReservationUnitPricingPricingTypeChoices,
-  priceUnit?: ReservationUnitsReservationUnitPricingPriceUnitChoices,
-  status: ReservationUnitsReservationUnitPricingStatusChoices,
+  pk: z.number(),
+  taxPercentage: z.object({
+    pk: z.number().optional(),
+    value: z.number(),
+  }),
+  lowestPrice: z.number(),
+  lowestPriceNet: z.number(),
+  highestPrice: z.number(),
+  highestPriceNet: z.number(),
+  pricingType: z.nativeEnum(ReservationUnitsReservationUnitPricingPricingTypeChoices),
+  priceUnit: z.nativeEnum(ReservationUnitsReservationUnitPricingPriceUnitChoices).optional(),
+  status: z.nativeEnum(ReservationUnitsReservationUnitPricingStatusChoices),
   // TODO this has to be a string because of HDS date input
   // in ui format: "d.M.yyyy"
-  begins: string,
-}
+  begins: z.string(),
+});
 
-export type ReservationEditFormValues = {
-  // This is actually a choice Weak or Strong
-  authentication: ReservationUnitsReservationUnitAuthenticationChoices,
-  bufferTimeAfter: number;
-  bufferTimeBefore: number;
-  maxReservationsPerUser: number;
-  maxPersons: number;
-  minPersons: number;
-  maxReservationDuration: number;
-  minReservationDuration: number;
-  pk: number;
+export type PricingFormValues = z.infer<typeof PricingFormSchema>;
+
+export const ReservationUnitEditSchema = z.object({
+  authentication: z.nativeEnum(ReservationUnitsReservationUnitAuthenticationChoices),
+  // TODO these are optional (0 is bit different than not set)
+  // because if they are set (non undefined) we should show the active checkbox
+  bufferTimeAfter: z.number(),
+  bufferTimeBefore: z.number(),
+  // TODO default to optional
+  maxReservationsPerUser: z.number().nullable(),
+  // TODO maxPerson > minPerson
+  // TODO allow 0 (or null in the backend) for drafts?
+  maxPersons: z.number().min(1).nullable(),
+  minPersons: z.number().min(1).nullable(),
+  maxReservationDuration: z.number().min(1).nullable(),
+  minReservationDuration: z.number().min(1).nullable(),
+  pk: z.number(),
   // priceUnit: string;
   // Date in string format
-  publishBeginsDate: string;
-  publishBeginsTime: string;
-  publishEndsDate: string;
-  publishEndsTime: string;
+  publishBeginsDate: z.string(),
+  publishBeginsTime: z.string(),
+  publishEndsDate: z.string(),
+  publishEndsTime: z.string(),
   // Date in string format
-  reservationBeginsDate: string;
-  reservationBeginsTime: string;
-  reservationEndsDate: string;
-  reservationEndsTime: string;
-  requireIntroduction: boolean;
-  requireReservationHandling: boolean;
-  reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices;
-  unitPk: number;
-  canApplyFreeOfCharge: boolean;
-  reservationsMinDaysBefore: number;
-  reservationsMaxDaysBefore: number;
-  reservationKind: ReservationUnitsReservationUnitReservationKindChoices;
-  contactInformation: string;
-  reservationPendingInstructionsFi: string;
-  reservationPendingInstructionsEn: string;
-  reservationPendingInstructionsSv: string;
-  reservationConfirmedInstructionsFi: string;
-  reservationConfirmedInstructionsEn: string;
-  reservationConfirmedInstructionsSv: string;
-  reservationCancelledInstructionsFi: string;
-  reservationCancelledInstructionsEn: string;
-  reservationCancelledInstructionsSv: string;
-  descriptionFi: string;
-  descriptionEn: string;
-  descriptionSv: string;
-  nameFi: string;
-  nameEn: string;
-  nameSv: string;
-  termsOfUseFi: string;
-  termsOfUseEn: string;
-  termsOfUseSv: string;
-  spacePks:number[];
-  resourcePks:number[];
-  equipmentPks:number[];
-  purposePks: number[];
-  qualifierPks: number[];
-  paymentTypes: string[];
+  reservationBeginsDate: z.string(),
+  reservationBeginsTime: z.string(),
+  reservationEndsDate: z.string(),
+  reservationEndsTime: z.string(),
+  requireIntroduction: z.boolean(),
+  requireReservationHandling: z.boolean(),
+  reservationStartInterval: z.nativeEnum(ReservationUnitsReservationUnitReservationStartIntervalChoices),
+  unitPk: z.number().min(1), // .refine((v) => v > 0, { message: "Unit pk must be greater than 0" }),
+  canApplyFreeOfCharge: z.boolean(),
+  reservationsMinDaysBefore: z.number(),
+  reservationsMaxDaysBefore: z.number(),
+  reservationKind: z.nativeEnum(ReservationUnitsReservationUnitReservationKindChoices),
+  contactInformation: z.string(),
+  // TODO this is missing? additionalInstructionsFi
+  reservationPendingInstructionsFi: z.string(),
+  reservationPendingInstructionsEn: z.string(),
+  reservationPendingInstructionsSv: z.string(),
+  reservationConfirmedInstructionsFi: z.string(),
+  reservationConfirmedInstructionsEn: z.string(),
+  reservationConfirmedInstructionsSv: z.string(),
+  reservationCancelledInstructionsFi: z.string(),
+  reservationCancelledInstructionsEn: z.string(),
+  reservationCancelledInstructionsSv: z.string(),
+  // all are required for non draft
+  // not required for drafts
+  // TODO allow draft to have empty strings
+  descriptionFi: z.string().max(4000),
+  descriptionEn: z.string().max(4000),
+  descriptionSv: z.string().max(4000),
+  // nameFi is required for both draft and published
+  nameFi: z.string().min(1).max(80),
+  // not required for drafts
+  // TODO allow draft to have empty strings
+  nameEn: z.string().max(80), // .min(1).max(80),
+  nameSv: z.string().max(80), //.min(1).max(80),
+  // backend allows nulls but not empty strings, these are not required though
+  termsOfUseFi: z.string().max(10000),
+  termsOfUseEn: z.string().max(10000),
+  termsOfUseSv: z.string().max(10000),
+  // TODO "Not draft state reservation unit must have one or more space or resource"
+  // either or?
+  spacePks: z.array(z.number()),
+  resourcePks: z.array(z.number()),
+  equipmentPks: z.array(z.number()),
+  purposePks: z.array(z.number()),
+  qualifierPks: z.array(z.number()),
+  paymentTypes: z.array(z.string()),
   // TODO this can be undefined because we are registering / unregistering these
-  pricings: PricingFormValues[];
-  reservationUnitTypePk?: number;
-  cancellationRulePk?: number;
+  pricings: z.array(PricingFormSchema),
+  // TODO
+  // "Not draft reservation unit must have a reservation unit type."
+  reservationUnitTypePk: z.number().optional(),
+  cancellationRulePk: z.number().nullable(),
   // Terms pks are actually slugs
-  paymentTermsPk?: string;
-  pricingTerms?: string;
-  cancellationTermsPk?: string;
-  serviceSpecificTermsPk?: string;
-  metadataSetPk?: number;
-  surfaceArea: number;
+  paymentTermsPk: z.string().optional(),
+  pricingTerms: z.string().optional(),
+  cancellationTermsPk: z.string().nullable(),
+  serviceSpecificTermsPk: z.string().optional(),
+  metadataSetPk: z.number().optional(),
+  surfaceArea: z.number(),
   // internal values
-  isDraft: boolean;
-  isArchived: boolean;
-  hasFuturePricing: boolean;
-}
+  isDraft: z.boolean(),
+  isArchived: z.boolean(),
+  hasFuturePricing: z.boolean(),
+}).superRefine((v, ctx) => {
+  if (v.isDraft || v.isArchived) {
+    return;
+  }
 
-export const convert = (data?: ReservationUnitByPkType): ReservationEditFormValues => {
+  if (v.reservationKind !== ReservationUnitsReservationUnitReservationKindChoices.Season) {
+    // TODO add the separation for Single vs. Seasonal
+    // Seasonal only is missing some of the fields
+    // minReservationDuration: requiredForSingle(Joi.number().required()),
+    // maxReservationDuration: requiredForSingle(Joi.number().required()),
+    // reservationsMinDaysBefore: requiredForSingle(Joi.number().required()),
+    // reservationsMaxDaysBefore: requiredForSingle(Joi.number().required()),
+    // reservationStartInterval: requiredForSingle(Joi.string().required()),
+    // authentication: requiredForSingle(Joi.string().required()),
+    // metadataSetPk: requiredForSingle(Joi.number().required()),
+    if (v.minReservationDuration == null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Required",
+        path: ["minReservationDuration"]
+      })
+    }
+    if (v.maxReservationDuration == null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Required",
+        path: ["maxReservationDuration"]
+      })
+    }
+    if (v.reservationsMinDaysBefore == null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Required",
+        path: ["reservationsMinDaysBefore"]
+      })
+    }
+    if (v.reservationsMaxDaysBefore == null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Required",
+        path: ["reservationsMaxDaysBefore"]
+      })
+    }
+    if (v.reservationStartInterval == null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Required",
+        path: ["reservationStartInterval"]
+      })
+    }
+    if (v.authentication == null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Required",
+        path: ["authentication"]
+      })
+    }
+    if (v.metadataSetPk == null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Required",
+        path: ["metadataSetPk"]
+      })
+    }
+  }
+
+  // TODO add paymentTypes: requiredForNonFreeRU(Joi.array().min(1).required()),
+  // if there is non free pricing it should have at least one payment type
+  if (v.spacePks.length === 0 && v.resourcePks.length === 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Not draft state reservation unit must have one or more space or resource",
+      path: ["spacePks"]
+    })
+  }
+  if (v.reservationUnitTypePk == null) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Required",
+      path: ["reservationUnitTypePk"]
+    })
+  }
+  if (v.nameEn === "") {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Required",
+      path: ["nameEn"]
+    })
+  }
+  if (v.nameSv === "") {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Required",
+      path: ["nameSv"]
+    })
+  }
+  if (v.descriptionEn === "") {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Required",
+      path: ["descriptionEn"]
+    })
+  }
+  if (v.descriptionSv === "") {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Required",
+      path: ["descriptionSv"]
+    })
+  }
+  if (v.descriptionFi === "") {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Required",
+      path: ["descriptionFi"]
+    })
+  }
+})
+
+export type ReservationUnitEditFormValues =z.infer<typeof ReservationUnitEditSchema>;
+
+export const convert = (data?: ReservationUnitByPkType): ReservationUnitEditFormValues => {
   return {
     bufferTimeAfter: data?.bufferTimeAfter ?? 0,
     bufferTimeBefore: data?.bufferTimeBefore ?? 0,
-    maxReservationsPerUser: data?.maxReservationsPerUser ?? 0,
-    maxPersons: data?.maxPersons ?? 0,
-    minPersons: data?.minPersons ?? 0,
-    maxReservationDuration: data?.maxReservationDuration ?? 0,
-    minReservationDuration: data?.minReservationDuration ?? 0,
+    maxReservationsPerUser: data?.maxReservationsPerUser ?? null,
+    maxPersons: data?.maxPersons ?? null,
+    minPersons: data?.minPersons ?? null,
+    maxReservationDuration: data?.maxReservationDuration ?? null,
+    minReservationDuration: data?.minReservationDuration ?? null,
     pk: data?.pk ?? 0,
     // TODO
     // priceUnit: "", // data?.priceUnit ?? "",
@@ -167,8 +305,8 @@ export const convert = (data?: ReservationUnitByPkType): ReservationEditFormValu
     reservationUnitTypePk: data?.reservationUnitType?.pk ?? undefined,
     metadataSetPk: data?.metadataSet?.pk ?? undefined,
     pricingTerms: data?.pricingTerms?.pk ?? undefined,
-    cancellationTermsPk: data?.cancellationTerms?.pk ?? undefined,
-    cancellationRulePk: data?.cancellationRule?.pk ?? undefined,
+    cancellationTermsPk: data?.cancellationTerms?.pk ?? null,
+    cancellationRulePk: data?.cancellationRule?.pk ?? null,
     paymentTypes: filterNonNullable(data?.paymentTypes?.map((pt) => pt?.code)),
     pricings: convertPricingList(filterNonNullable(data?.pricings)),
     isDraft: data?.isArchived ?? false,

@@ -2,11 +2,13 @@ import { useMutation, useQuery } from "@apollo/client";
 import {
   Button,
   Checkbox,
+  IconAlertCircleFill,
   IconArrowLeft,
   IconLinkExternal,
   NumberInput,
   RadioButton,
   Select,
+  SelectionGroup,
   TextArea,
   TextInput,
   Tooltip,
@@ -75,8 +77,9 @@ import ImageEditor from "./ImageEditor";
 import { Image } from "./types";
 import PricingType from "./PricingType";
 import GenericDialog from "./GenericDialog";
-import { ReservationEditFormValues, convert } from "./form";
+import { ReservationUnitEditFormValues, ReservationUnitEditSchema, convert } from "./form";
 import Error404 from "@/common/Error404";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const RichTextInput = dynamic(() => import("../../RichTextInput"), {
   ssr: false,
@@ -475,18 +478,13 @@ const ReservationUnitEditor = ({
 }: {
   reservationUnit?: ReservationUnitByPkType;
   unitPk: string;
-  form: UseFormReturn<ReservationEditFormValues>;
+  form: UseFormReturn<ReservationUnitEditFormValues>;
   refetch: () => void;
 }): JSX.Element | null => {
   const { t } = useTranslation();
   const history = useNavigate();
   const { notifySuccess, notifyError } = useNotification();
 
-  // TODO remove this and use the query, mutation onError callbacks
-  const onDataError = (text: string) => {
-    console.error(text);
-    notifyError(t("ReservationUnitEditor.dataLoadFailedMessage"));
-  };
 
   const [updateReservationUnitMutation] = useMutation<Mutation>(
     UPDATE_RESERVATION_UNIT
@@ -502,11 +500,12 @@ const ReservationUnitEditor = ({
   const createReservationUnit = (input: ReservationUnitCreateMutationInput) =>
     createReservationUnitMutation({ variables: { input } });
 
-  const { control, register, getValues, setValue, watch, formState: { isDirty, isSubmitting }, handleSubmit, } = form;
+  const { control, register, getValues, setValue, watch, formState, handleSubmit } = form;
+  const { isDirty, isSubmitting, errors } = formState;
 
-  console.log('values: ', getValues());
-  const onSubmit = async (formValues: ReservationEditFormValues) => {
+  const transformReservationUnit = (values: ReservationUnitEditFormValues): ReservationUnitUpdateMutationInput | ReservationUnitCreateMutationInput => {
     const {
+      pk,
       isDraft,
       isArchived,
       surfaceArea,
@@ -520,11 +519,15 @@ const ReservationUnitEditor = ({
       publishEndsTime,
       pricings,
       hasFuturePricing,
-      ...values
-    } = formValues;
+      termsOfUseEn,
+      termsOfUseFi,
+      termsOfUseSv,
+      ...vals
+    } = values;
 
-    const input: ReservationUnitUpdateMutationInput = {
-      ...values,
+    return {
+      ...vals,
+      ...(pk ? { pk } : {}),
       surfaceArea: surfaceArea != null && surfaceArea > 0 ? Math.ceil(surfaceArea) : null,
       reservationEnds: constructApiDate(reservationEndsDate, reservationEndsTime),
       reservationBegins: constructApiDate(reservationBeginsDate, reservationBeginsTime),
@@ -532,8 +535,9 @@ const ReservationUnitEditor = ({
       publishEnds: constructApiDate(publishEndsDate, publishEndsTime),
       isDraft,
       isArchived,
-      // FIXME this saves "past" status always?
-      // no it doesn't it just doesn't save status if the pk is 0
+      termsOfUseEn: termsOfUseEn !== "" ? termsOfUseEn : null,
+      termsOfUseFi: termsOfUseFi !== "" ? termsOfUseFi : null,
+      termsOfUseSv: termsOfUseSv !== "" ? termsOfUseSv : null,
       pricings: filterNonNullable(pricings).filter((p) => hasFuturePricing || p.status === ReservationUnitsReservationUnitPricingStatusChoices.Active).map((p) => ({
         begins: toApiDate(fromUIDate(p.begins)) ?? "",
         highestPrice: p.highestPrice,
@@ -547,15 +551,20 @@ const ReservationUnitEditor = ({
         taxPercentagePk: p.taxPercentage.pk,
       })),
     }
+  }
+
+  console.log('errors: ', errors);
+
+  const onSubmit = async (formValues: ReservationUnitEditFormValues) => {
+    const input = transformReservationUnit(formValues);
     // FIXME only one active price can be saved
     // FIXME we need to refetch the reservation unit after save if pricing is saved with a new pricing (pk == 0) then
     // all subsequent saves will fail (or create new pricing) because the pk is not updated in the form
 
-    const mutation = values.pk !== 0 ? updateReservationUnit : createReservationUnit;
     try {
-      const { data, errors } = await mutation({
-        ...input
-      });
+      const promise = "pk" in input ? updateReservationUnit(input) : createReservationUnit(input);
+      const { data, errors } = await promise;
+        // = await mutation({ ...input });
       if (errors != null) {
         notifyError(t("ReservationUnitEditor.saveFailed", { error: errors }));
         return undefined;
@@ -580,10 +589,10 @@ const ReservationUnitEditor = ({
         if (success) {
           // TODO should we refetch? if we stay on the page? maybe but the reset of form isn't working atm
           // NOTE redirect if new one was created
-          if (values.pk === 0 && pk > 0) {
+          if (formValues.pk === 0 && pk > 0) {
             history(`/unit/${unitPk}/reservationUnit/edit/${pk}`);
           }
-          const tkey = values.pk === 0 ? "ReservationUnitEditor.reservationUnitUpdatedNotification" : "ReservationUnitEditor.reservationUnitCreatedNotification"
+          const tkey = formValues.pk === 0 ? "ReservationUnitEditor.reservationUnitUpdatedNotification" : "ReservationUnitEditor.reservationUnitCreatedNotification"
           notifySuccess(t(tkey, { name: getValues('nameFi') }));
         } else {
           // FIXME error
@@ -611,13 +620,15 @@ const ReservationUnitEditor = ({
     skip: !unitPk,
     variables: { pk: Number(unitPk) },
     onError: (e) => {
-      onDataError(t("errors.errorFetchingData", { error: e }));
+      console.error(e);
+      notifyError(t("errors.errorFetchingData"));
     },
   });
 
   const { data: parametersData } = useQuery<Query>(RESERVATION_UNIT_EDITOR_PARAMETERS, {
     onError: (e) => {
-      onDataError(t("errors.errorFetchingData", { error: e }));
+      console.error(e);
+      notifyError(t("errors.errorFetchingData"));
     },
   });
 
@@ -671,26 +682,20 @@ const ReservationUnitEditor = ({
     .filter((p) => p?.pricingType === "PAID")
     .filter((p) => p.status === ReservationUnitsReservationUnitPricingStatusChoices.Active || isFuturePriceVisible)
     .length > 0;
-  console.log('isFuturePriceVisible', isFuturePriceVisible, 'isPaid', isPaid);
 
-  const getValidationError = (_ignore: string) => undefined;
   const unit = unitResourcesData?.unitByPk ?? undefined;
-  const spaceOptions =
-    unit?.spaces?.map((s) => ({
-      label: String(s?.nameFi),
-      value: Number(s?.pk),
-    })) || [];
-
-  const resourceOptions =
-    unit?.spaces
-      ?.flatMap((s) => s?.resources)
-      .map((r) => ({ label: String(r?.nameFi), value: Number(r?.pk) })) ||
-    [];
-
   const spaces = filterNonNullable(unit?.spaces);
-  const selectedSpaces = spaces.filter(
-    (s) => s.pk != null && watch("spacePks").includes((s.pk))
-  );
+  const spaceOptions = spaces.map((s) => ({
+    label: String(s?.nameFi),
+    value: Number(s?.pk),
+  }));
+
+  const resourceOptions = filterNonNullable(spaces.flatMap((s) => s?.resources))
+    .map((r) => ({ label: String(r?.nameFi), value: Number(r?.pk) }));
+
+  // FIXME this isn't working
+  // the space has 12 m^2 space but when it's selected it doesn't update the surface area only if it's saved and reloaded
+  const selectedSpaces = spaces.filter((s) => s.pk != null && watch("spacePks").includes((s.pk)));
 
   // default is 1 if no spaces selected
   const minSurfaceArea = Math.ceil(selectedSpaces.map((s) => s.surfaceArea ?? 0).reduce((a, x) => a + x, 0) || 1);
@@ -715,18 +720,14 @@ const ReservationUnitEditor = ({
 
   const handleAcceptArchive = async () => {
     setValue("isArchived", true);
+    try {
     await handleSubmit(onSubmit)();
-    /* TODO redirect after completion
-     * this is different for other saves which only redirect if new one is created
-      if (r) {
-        setModalContent(null);
-        notifySuccess(t("ArchiveReservationUnitDialog.success"));
-        history(-1);
-      }
+      setModalContent(null);
+      notifySuccess(t("ArchiveReservationUnitDialog.success"));
+      history(`/unit/${unit?.pk}`);
     } catch (e) {
-      // noop
+      console.warn('unable to archive', e);
     }
-    */
   };
 
   const handleArchiveButtonClick = async () => {
@@ -755,14 +756,9 @@ const ReservationUnitEditor = ({
   const isSaving = isSubmitting;
   const hasChanges = isDirty;
 
-  // TODO cleanup this to separate component
-  // - wrapper (with breadcrumb)
-  //  - form
-  //  - buttons
   // TODO cleanup the grid -> span12 / span6 things -> component
   //  - instead use automatic grid
   //  - directly adjust the column span in the component (span full, span 1)
-  // TODO use the new breadcrump alias version (notifications)
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
       <Container>
@@ -784,6 +780,12 @@ const ReservationUnitEditor = ({
                   heading={t("ReservationUnitEditor.label.reservationKind")}
                   tooltip={t("ReservationUnitEditor.tooltip.reservationKind")}
                 >
+                  {errors["reservationKind"]?.message != null && (
+                    <div>
+                      <IconAlertCircleFill />
+                      <span>{errors["reservationKind"].message}</span>
+                    </div>
+                  )}
                   <Grid>
                     {(["DIRECT_AND_SEASON", "DIRECT", "SEASON"] as const).map((kind) => (
                       <Span4 key={kind}>
@@ -799,17 +801,6 @@ const ReservationUnitEditor = ({
                             onChange={() => field.onChange(kind)}
                             checked={field.value === kind}
                           />
-                          /* silly validation use a schema with resolver
-                          {index === 0 &&
-                            getValidationError("reservationKind") && (
-                              <Error>
-                                <IconAlertCircleFill />
-                                <span>
-                                  {getValidationError("reservationKind")}
-                                </span>
-                              </Error>
-                            )}
-                            */
                           )}
                         />
                       </Span4>
@@ -824,11 +815,9 @@ const ReservationUnitEditor = ({
                     required
                     id={fieldName}
                     label={t(`ReservationUnitEditor.label.${fieldName}`)}
-                    errorText={getValidationError(fieldName)}
-                    /*
-                    tooltipText={ lang === "fi" ? t("ReservationUnitEditor.tooltip.nameFi") : undefined }
-                    invalid={!!getValidationError(fieldName)}
-                    */
+                    errorText={errors[fieldName]?.message}
+                    invalid={errors[fieldName]?.message != null}
+                    // tooltipText={ lang === "fi" ? t("ReservationUnitEditor.tooltip.nameFi") : undefined }
                   />
                 </Span12>
               ))}
@@ -848,8 +837,8 @@ const ReservationUnitEditor = ({
                     disabled={spaceOptions.length === 0}
                     onChange={(x) => onChange(x.map((y: { value: number; label: string }) => y.value))}
                     value={spaceOptions.filter((x) => value.includes(x.value))}
-                    error={getValidationError("spacePks")}
-                    invalid={!!getValidationError("spacePks")}
+                    error={errors["spacePks"]?.message}
+                    invalid={errors["spacePks"]?.message != null}
                     tooltipText={t("ReservationUnitEditor.tooltip.spacePks")}
                   />
                 )}
@@ -870,8 +859,8 @@ const ReservationUnitEditor = ({
                       disabled={resourceOptions.length === 0}
                       onChange={(x) => onChange(x.map((y: { value: number; label: string }) => y.value))}
                       value={resourceOptions.filter((x) => value.includes(x.value))}
-                      error={getValidationError("resourcePks")}
-                      invalid={!!getValidationError("resourcePks")}
+                      error={errors["resourcePks"]?.message}
+                      invalid={errors["resourcePks"]?.message != null}
                       tooltipText={t("ReservationUnitEditor.tooltip.resourcePks")}
                     />
                   )}
@@ -891,8 +880,8 @@ const ReservationUnitEditor = ({
                   min={minSurfaceArea}
                   max={undefined}
                   required
-                  errorText={getValidationError("surfaceArea")}
-                  invalid={!!getValidationError("surfaceArea")}
+                  errorText={errors["surfaceArea"]?.message}
+                  invalid={errors["surfaceArea"]?.message != null}
                   tooltipText={t("ReservationUnitEditor.tooltip.surfaceArea")}
                 />
               </Span4>
@@ -908,8 +897,8 @@ const ReservationUnitEditor = ({
                   min={1}
                   max={maxPersons}
                   helperText={t("ReservationUnitEditor.maxPersonsHelperText")}
-                  errorText={getValidationError("maxPersons")}
-                  invalid={!!getValidationError("maxPersons")}
+                  errorText={errors["maxPersons"]?.message}
+                  invalid={errors["maxPersons"]?.message != null}
                   required
                   tooltipText={t("ReservationUnitEditor.tooltip.maxPersons")}
                 />
@@ -925,8 +914,8 @@ const ReservationUnitEditor = ({
                   type="number"
                   min={0}
                   max={watch('maxPersons') || 1}
-                  errorText={getValidationError("minPersons")}
-                  invalid={!!getValidationError("minPersons")}
+                  errorText={errors["minPersons"]?.message}
+                  invalid={errors["minPersons"]?.message != null}
                   tooltipText={t("ReservationUnitEditor.tooltip.minPersons")}
                 />
               </Span4>
@@ -954,7 +943,8 @@ const ReservationUnitEditor = ({
                     onChange={(x: { value: number; label: string }) => onChange(x.value) }
                     value={spaceOptions.find((x) => x.value === value) ?? null}
                     helper={t("ReservationUnitEditor.reservationUnitTypeHelperText")}
-                    error={getValidationError("reservationUnitTypePk")}
+                    error={errors["reservationUnitTypePk"]?.message}
+                    invalid={errors["reservationUnitTypePk"]?.message != null}
                     tooltipText={t("ReservationUnitEditor.tooltip.reservationUnitTypePk")}
                   />
                   )}
@@ -1031,7 +1021,7 @@ const ReservationUnitEditor = ({
                       required
                       id={fieldName}
                       label={t(`ReservationUnitEditor.label.${fieldName}`)}
-                      errorText={getValidationError(fieldName)}
+                      errorText={errors[fieldName]?.message}
                       tooltipText={t("ReservationUnitEditor.tooltip.description")}
                     />
                     )}
@@ -1152,7 +1142,8 @@ const ReservationUnitEditor = ({
                         label={t("ReservationUnitEditor.label.minReservationDuration")}
                         onChange={(v: { value: number; label: string }) => onChange(v.value)}
                         value={durationOptions.find((o) => o.value === value)}
-                        error={getValidationError("minReservationDuration")}
+                        error={errors["minReservationDuration"]?.message}
+                        invalid={errors["minReservationDuration"]?.message != null}
                         tooltipText={t("ReservationUnitEditor.tooltip.minReservationDuration")}
                       />
                   )}
@@ -1171,7 +1162,8 @@ const ReservationUnitEditor = ({
                         onChange={(v: { value: number; label: string }) => onChange(v.value)}
                         value={durationOptions.find((o) => o.value === value)}
                         label={t("ReservationUnitEditor.label.maxReservationDuration")}
-                        error={getValidationError("maxReservationDuration")}
+                        error={errors["maxReservationDuration"]?.message}
+                        invalid={errors["maxReservationDuration"]?.message != null}
                         tooltipText={t("ReservationUnitEditor.tooltip.maxReservationDuration")}
                       />
                     )}
@@ -1190,7 +1182,8 @@ const ReservationUnitEditor = ({
                         label={t("ReservationUnitEditor.label.reservationsMaxDaysBefore")}
                         onChange={(v: { value: number; label: string }) => onChange(v.value)}
                         value={reservationsMaxDaysBeforeOptions.find((o) => o.value === value)}
-                        error={getValidationError("reservationsMaxDaysBefore")}
+                        error={errors["reservationsMaxDaysBefore"]?.message}
+                        invalid={errors["reservationsMaxDaysBefore"]?.message != null}
                         tooltipText={t("ReservationUnitEditor.tooltip.reservationsMaxDaysBefore")}
                       />
                     )}
@@ -1208,8 +1201,8 @@ const ReservationUnitEditor = ({
                     max={watch('reservationsMaxDaysBefore')}
                     min={0}
                     required
-                    errorText={getValidationError("reservationsMinDaysBefore")}
-                    invalid={!!getValidationError("reservationsMinDaysBefore")}
+                    errorText={errors["reservationsMinDaysBefore"]?.message}
+                    invalid={errors["reservationsMinDaysBefore"]?.message != null}
                     tooltipText={t("ReservationUnitEditor.tooltip.reservationsMinDaysBefore")}
                   />
                 </Span6>
@@ -1225,7 +1218,8 @@ const ReservationUnitEditor = ({
                         required
                         value={reservationStartIntervalOptions.find((o) => o.value === value)}
                         onChange={(val: { value: ReservationUnitsReservationUnitReservationStartIntervalChoices; label: string }) => onChange(val)}
-                        error={getValidationError("reservationStartInterval")}
+                        error={errors["reservationStartInterval"]?.message}
+                        invalid={errors["reservationStartInterval"]?.message != null}
                         label={t("ReservationUnitEditor.label.reservationStartInterval")}
                         tooltipText={t("ReservationUnitEditor.tooltip.reservationStartInterval")}
                       />
@@ -1296,29 +1290,34 @@ const ReservationUnitEditor = ({
                     <ActivationGroup
                       id="cancellationIsPossible"
                       label={t("ReservationUnitEditor.cancellationIsPossible")}
-                      // FIXME
-                      initiallyOpen={watch("cancellationRulePk") !== 0}
                       // TODO what's the point of this? why are we reseting it on close?
                       // it's because there is no logic in the send of the form to handle the case where the user has selected a cancellation rule and then unselected it
-                      // onClose={() => setValue({ cancellationRulePk: null })}
+                      initiallyOpen={watch("cancellationRulePk") != null}
+                      onClose={() => setValue('cancellationRulePk', null)}
                     >
                       <Controller
                         control={control}
                         name="cancellationRulePk"
                         render={({ field: { value, onChange } }) => (
-                          <Select
-                            id="metadataSetPk"
+                          <SelectionGroup
                             required
-                            options={cancellationRuleOptions}
                             label={t("ReservationUnitEditor.cancellationGroupLabel")}
-                            onChange={(v: { label: string; value: number }) => onChange(v.value)}
-                            value={cancellationRuleOptions.find((o) => o.value === value) || null}
-                            error={getValidationError("cancelationRulePk")}
-                            tooltipText={t("ReservationUnitEditor.tooltip.cancelationRulePk")}
-                          />
+                            errorText={errors["cancellationRulePk"]?.message}
+                          >
+                          {cancellationRuleOptions.map((o) => (
+                            <RadioButton
+                              key={o.value}
+                              id={`cr-${o.value}`}
+                              value={o.value.toString()}
+                              label={o.label}
+                              onChange={(e) => onChange(e.target.value)}
+                              checked={value === o.value}
+                            />
+                          ))}
+                          </SelectionGroup>
                         )}
-                      />
-                    </ActivationGroup>
+                    />
+                  </ActivationGroup>
                 </Span12>
                 <Span6>
                   <Controller
@@ -1333,7 +1332,8 @@ const ReservationUnitEditor = ({
                         label={t("ReservationUnitEditor.label.metadataSetPk")}
                         onChange={(v: { label: string; value: number }) => onChange(v.value)}
                         value={metadataOptions.find((o) => o.value === value) || null}
-                        error={getValidationError("metadataSetPk")}
+                        error={errors["metadataSetPk"]?.message}
+                        invalid={errors["metadataSetPk"]?.message != null}
                         tooltipText={t("ReservationUnitEditor.tooltip.metadataSetPk")}
                       />
                     )}
@@ -1568,7 +1568,7 @@ const ReservationUnitEditor = ({
                         required
                         id={fieldName}
                         label={t(`ReservationUnitEditor.label.${fieldName}`)}
-                        errorText={getValidationError(fieldName)}
+                        errorText={errors[fieldName]?.message}
                         // TODO do we want to hide the tooltip for others than Fi?
                         tooltipText={t("ReservationUnitEditor.tooltip.termsOfUseFi")}
                       />
@@ -1596,12 +1596,11 @@ const ReservationUnitEditor = ({
                         {...field}
                         id={fieldName}
                         label={t(`ReservationUnitEditor.label.${fieldName}`)}
-                        errorText={getValidationError(fieldName)}
+                        errorText={errors[fieldName]?.message}
+                        invalid={errors[fieldName]?.message != null}
                         /* FIXME
                         tooltipText={t("ReservationUnitEditor.tooltip.termsOfUseFi")}
                         tooltipText={ lang === "fi" ? t( "ReservationUnitEditor.tooltip.reservationPendingInstructionsFi") : "" }
-                        errorText={getValidationError(fieldName)}
-                        invalid={!!getValidationError(fieldName)}
                         */
                       />
                       )}
@@ -1625,11 +1624,10 @@ const ReservationUnitEditor = ({
                       {...field}
                       id={fieldName}
                       label={t(`ReservationUnitEditor.label.${fieldName}`)}
-                      errorText={getValidationError(fieldName)}
+                      errorText={errors[fieldName]?.message}
+                      invalid={errors[fieldName]?.message != null}
                       /* FIXME tr key
                       label={t( `ReservationUnitEditor.label.instructions${upperFirst( lang)}`)}
-                      errorText={getValidationError(fieldName)}
-                      invalid={!!getValidationError(fieldName)}
                       tooltipText={ lang === "fi" ? t( "ReservationUnitEditor.tooltip.reservationConfirmedInstructionsFi") : "" }
                       */
                       />
@@ -1654,10 +1652,9 @@ const ReservationUnitEditor = ({
                           {...field}
                           id={fieldName}
                           label={t(`ReservationUnitEditor.label.${fieldName}`)}
-                          errorText={getValidationError(fieldName)}
+                          errorText={errors[fieldName]?.message}
+                          invalid={errors[fieldName]?.message != null}
                           /* TODO rename the keys
-                          errorText={getValidationError(fieldName)}
-                          invalid={!!getValidationError(fieldName)}
                           tooltipText={ lang === "fi" ? t( "ReservationUnitEditor.tooltip.reservationCancelledInstructionsFi") : "" }
                           */
                           />
@@ -1812,88 +1809,59 @@ type IProps = {
 function EditorWrapper () {
   const { reservationUnitPk, unitPk } = useParams<IProps>();
   const { t } = useTranslation();
-  const { notifyError } = useNotification();
 
   const { data: reservationUnitData, loading: isLoading, refetch } = useQuery<
     Query,
     QueryReservationUnitByPkArgs
   >(RESERVATIONUNIT_QUERY, {
     variables: { pk: Number(reservationUnitPk) },
-    // TODO nan check
     skip: !reservationUnitPk || Number(reservationUnitPk) === 0 || Number.isNaN(Number(reservationUnitPk)),
-    onError: (err) => {
-      console.error(err);
-      notifyError(t("ReservationUnitEditor.dataLoadFailedMessage"));
-    },
   });
 
   const reservationUnit = reservationUnitData?.reservationUnitByPk ?? undefined;
   const unit = reservationUnit?.unit
 
-  const form = useForm<ReservationEditFormValues>({
-    defaultValues: convert(reservationUnit),
+  // NOTE override the unitPk from the url for new units
+  // there is no harm in doing it to existing units either (since it should be valid)
+  const form = useForm<ReservationUnitEditFormValues>({
+    mode: "onChange",
+    // NOTE disabling because it throws an error when submitting because it can't focus the field
+    // this happens for field errors in the zod schema where the field is created using an array
+    // for example termsOfUseEn, termsOfUseFi, termsOfUseSv
+    shouldFocusError: false,
+    defaultValues: {
+      ...convert(reservationUnit),
+      unitPk: Number(unitPk),
+    },
+    resolver: zodResolver(ReservationUnitEditSchema),
   });
   const { reset } = form;
   useEffect(() => {
     if (reservationUnitData?.reservationUnitByPk != null) {
       const vals = convert(reservationUnitData.reservationUnitByPk);
-      reset(vals);
+      reset({
+        ...vals,
+        unitPk: Number(unitPk),
+      });
     }
   }, [reservationUnitData, reset]);
 
   if (isLoading) {
     return <Loader />;
   }
-  // TODO should catch garbage reservationUnitPk also (undefined or 'new' is fine)
-  // TODO also should catch if there is no such reservationUnit from the backend
   if (unitPk == null || Number(unitPk) === 0 || Number.isNaN(Number(unitPk))) {
     return <Error404 />;
   }
-
-  // TODO allow new if no pk, but if the pk is invalid show an error instead
-  /*
-  if (reservationUnitData?.reservationUnitByPk == null) {
-    return null
+  // we use null for "new" units (could also be "new" slug)
+  if (reservationUnitPk != null && Number.isNaN(Number(reservationUnitPk))) {
+    return <Error404 />;
   }
-  */
-
-  /* TODO
-  if (state.error && !state.reservationUnit) {
-    return (
-      <Wrapper>
-        <StyledNotification
-          type="error"
-          label={t("errors.functionFailedTitle")}
-          position="top-center"
-          autoClose={false}
-          dismissible
-          closeButtonLabelText={t("common.close")}
-          displayAutoCloseProgress={false}
-        >
-          {t(state.error.message)}
-        </StyledNotification>
-      </Wrapper>
-    );
+  // the pk is valid but not found in the backend
+  if (reservationUnitPk != null && reservationUnit == null) {
+    return <Error404 />;
   }
 
-  if (state.error) {
-    return (
-      <Wrapper>
-        <StyledNotification
-          type="error"
-          label={t("ReservationUnitEditor.errorDataHeading")}
-          position="top-center"
-          autoClose={false}
-          dismissible
-          closeButtonLabelText={t("common.close")}
-        >
-          {t(state.error?.message)}
-        </StyledNotification>
-      </Wrapper>
-    );
-  }
-  */
-
+  // FIXME can't query the unit name through the reservationUnit because new pages don't have reservationUnit
   return (
     <Wrapper>
       <BreadcrumbWrapper
