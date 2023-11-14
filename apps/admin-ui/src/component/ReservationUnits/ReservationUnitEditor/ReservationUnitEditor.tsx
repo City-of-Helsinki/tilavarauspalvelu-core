@@ -375,7 +375,6 @@ const DisplayUnit = ({
         </div>
         {unit.location ? <span>{parseAddress(unit.location)}</span> : null}
       </div>
-      {unit.location ? <span>{parseAddress(unit.location)}</span> : null}
     </div>
   );
 };
