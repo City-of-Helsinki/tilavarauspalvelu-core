@@ -8,6 +8,7 @@ interface IProps {
   heading: string | JSX.Element | null;
   initiallyOpen?: boolean;
   children: ReactNode;
+  headingLevel?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
   disabled?: boolean;
   className?: string;
   style?: React.CSSProperties;
@@ -41,7 +42,7 @@ const Heading = styled.div<{ $disabled: boolean }>`
       cursor: pointer;
     `}
 
-  h2 {
+  h2, h3, h4, h5, h6 {
     font-size: var(--header-font-size);
   }
 `;
@@ -81,6 +82,7 @@ const ToggleIconClosed = styled(IconAngleDown).attrs({
 /// TODO seems like this affected MainMenu link styling
 export function Accordion({
   heading,
+  headingLevel = "h2",
   initiallyOpen = false,
   children,
   disabled = false,
@@ -112,7 +114,7 @@ export function Accordion({
         data-testid="accordion__header"
         $disabled={disabled}
       >
-        <H2 className="heading" $legacy>
+        <H2 className="heading" $legacy as={headingLevel}>
           {heading}
         </H2>
         <ToggleButton

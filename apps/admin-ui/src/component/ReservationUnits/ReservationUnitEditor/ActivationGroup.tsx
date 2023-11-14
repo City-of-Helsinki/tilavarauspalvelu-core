@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Checkbox } from "hds-react";
 import styled from "styled-components";
 
@@ -30,6 +30,9 @@ const ActivationGroup = ({
   onClose?: () => void;
 }): JSX.Element => {
   const [open, setOpen] = useState(initiallyOpen);
+  useEffect(() => {
+    setOpen(initiallyOpen);
+  }, [initiallyOpen])
 
   return (
     <>

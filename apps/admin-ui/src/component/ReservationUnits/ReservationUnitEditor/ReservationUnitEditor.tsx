@@ -112,8 +112,14 @@ const ArchiveButton = styled(Button)`
   margin-top: var(--spacing-m);
 `;
 
-const ExpandLink = styled(Accordion)`
+const SubAccordion = styled(Accordion)`
   border-bottom: none !important;
+  & {
+    --header-font-size: var(--fontsize-heading-s-2);
+    h3 {
+      color: var(--color-bus);
+    }
+  }
 
   > div:nth-of-type(1) > div {
     display: flex;
@@ -1581,31 +1587,29 @@ const ReservationUnitEditor = ({
           >
             <Grid>
               <Span12>
-                <ExpandLink initiallyOpen heading={t("ReservationUnitEditor.pendingExpandLink")} >
-                  <SlimH4>
-                    {t("ReservationUnitEditor.pendingInstructions")}
-                  </SlimH4>
-                  {(["reservationPendingInstructionsFi", "reservationPendingInstructionsEn", "reservationPendingInstructionsSv"] as const).map((fieldName) => (
-                    <Controller
-                      key={fieldName}
-                      control={control}
-                      name={fieldName}
-                      render={({ field }) => (
-                      <TextArea
-                        {...field}
-                        id={fieldName}
-                        label={t(`ReservationUnitEditor.label.${fieldName}`)}
-                        errorText={errors[fieldName]?.message}
-                        invalid={errors[fieldName]?.message != null}
-                        /* FIXME
-                        tooltipText={t("ReservationUnitEditor.tooltip.termsOfUseFi")}
-                        tooltipText={ lang === "fi" ? t( "ReservationUnitEditor.tooltip.reservationPendingInstructionsFi") : "" }
-                        */
-                      />
-                      )}
+                <SlimH4>
+                  {t("ReservationUnitEditor.pendingInstructions")}
+                </SlimH4>
+                {(["reservationPendingInstructionsFi", "reservationPendingInstructionsEn", "reservationPendingInstructionsSv"] as const).map((fieldName) => (
+                  <Controller
+                    key={fieldName}
+                    control={control}
+                    name={fieldName}
+                    render={({ field }) => (
+                    <TextArea
+                      {...field}
+                      id={fieldName}
+                      label={t(`ReservationUnitEditor.label.${fieldName}`)}
+                      errorText={errors[fieldName]?.message}
+                      invalid={errors[fieldName]?.message != null}
+                      /* FIXME
+                      tooltipText={t("ReservationUnitEditor.tooltip.termsOfUseFi")}
+                      tooltipText={ lang === "fi" ? t( "ReservationUnitEditor.tooltip.reservationPendingInstructionsFi") : "" }
+                      */
                     />
-                  ))}
-                </ExpandLink>
+                    )}
+                  />
+                ))}
               </Span12>
               <Span12>
                 <SlimH4>
@@ -1634,8 +1638,11 @@ const ReservationUnitEditor = ({
                 </Span12>
               ))}
               <Span12>
-                <ExpandLink initiallyOpen
-                  heading={t("ReservationUnitEditor.cancelledExpandLink")}>
+                <SubAccordion
+                  initiallyOpen={Object.keys(errors).length > 0}
+                  heading={t("ReservationUnitEditor.cancelledSubAccordion")}
+                  headingLevel="h3"
+                >
                   <Span12>
                     <SlimH4>
                       {t("ReservationUnitEditor.cancelledInstructions")}
@@ -1661,7 +1668,7 @@ const ReservationUnitEditor = ({
                         />
                     </Span12>
                   ))}
-                </ExpandLink>
+                </SubAccordion>
               </Span12>
               <Span12>
                 <TextInput

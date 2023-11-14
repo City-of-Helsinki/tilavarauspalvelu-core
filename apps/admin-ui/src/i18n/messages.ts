@@ -1387,7 +1387,7 @@ const translations: ITranslations = {
         `Lisää nimesi ja yhteystietosi, jotta palvelusi tuoteomistaja tai Varaamon ylläpito tietää kehen tarvittaessa yhteyttä.`,
       ],
     },
-    cancelledExpandLink: ["Täydennä peruutusviestiä"],
+    cancelledSubAccordion: ["Täydennä peruutusviestiä"],
     pendingExpandLink: ["Täydennä alustavan varauksen viestiä"],
     authenticationLabel: ["Tunnistautuminen"],
     defaultHeading: ["Uusi varausyksikkö"],
