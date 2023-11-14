@@ -1,10 +1,10 @@
-import { endOfISOWeek, getISOWeek, startOfISOWeek } from "date-fns";
+import { endOfISOWeek, format, getISOWeek, startOfISOWeek } from "date-fns";
 import { Button, IconAngleLeft, IconAngleRight } from "hds-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { DATE_FORMAT_SHORT, formatDate } from "../../common/util";
-import { HorisontalFlex } from "../../styles/layout";
+import { DATE_FORMAT, DATE_FORMAT_SHORT } from "@/common/util";
+import { HorisontalFlex } from "@/styles/layout";
 
 type Props = {
   date: string;
@@ -41,8 +41,8 @@ const WeekNavigation = ({ date, onNext, onPrev }: Props): JSX.Element => {
         </Button>
         <div style={{ minWidth: "10em", textAlign: "center" }}>
           {t("common.week")} {week} /{" "}
-          {formatDate(startOfISOWeek(d).toISOString(), DATE_FORMAT_SHORT)} -{" "}
-          {formatDate(endOfISOWeek(d).toISOString())}
+          {format(startOfISOWeek(d), DATE_FORMAT_SHORT)} -{" "}
+          {format(endOfISOWeek(d), DATE_FORMAT)}
         </div>
         <Button
           aria-label={t("common.next")}

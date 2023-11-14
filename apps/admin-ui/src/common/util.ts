@@ -6,8 +6,10 @@ import { DataFilterOption } from "./types";
 import { NUMBER_OF_DECIMALS } from "./const";
 
 export const DATE_FORMAT = "d.M.yyyy";
-export const DATE_FORMAT_SHORT = "d.M";
+export const DATE_FORMAT_SHORT = "d.M.";
 
+/// @deprecated use format directly
+/// why convert date -> string -> date?
 export const formatDate = (
   date: string | null,
   outputFormat = DATE_FORMAT
