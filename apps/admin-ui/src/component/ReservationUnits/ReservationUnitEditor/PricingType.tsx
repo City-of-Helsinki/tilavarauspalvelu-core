@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { DateInput, NumberInput, RadioButton } from "hds-react";
+import { DateInput, IconAlertCircleFill, NumberInput, RadioButton } from "hds-react";
 import {
   ReservationUnitsReservationUnitPricingPriceUnitChoices,
   ReservationUnitsReservationUnitPricingPricingTypeChoices,
@@ -41,85 +41,62 @@ const PricingType = ({
 }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
-  const { control, watch } = form;
+  const { control, formState: { errors }, watch } = form;
 
   const pricing = watch(`pricings.${index}`);
 
   const priceOptions = [ReservationUnitsReservationUnitPricingPricingTypeChoices.Free, ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid] as const;
-  // TODO what???
-  const hasPrice = true;
   return (
-    <>
-      {/* TODO options to add future price
-        * should not be here but in the parent element
-        * this handles rendering and form changes per pricing element
-        */}
-      {hasPrice && pricing?.status === "FUTURE" && (
-        <>
-          {/*
-          <Checkbox
-            id="priceChange"
-            label={t("ReservationUnitEditor.label.priceChange")}
-            checked
-            onChange={handleToggleFuturePrice}
+    <Grid>
+      {pricing?.status === "FUTURE" && (
+        <Span3>
+          <Controller
+            name={`pricings.${index}.begins`}
+            control={control}
+            render={({ field: { value, onChange } }) => (
+            <DateInput
+              id="futureDate"
+              value={value}
+              onChange={(val) => onChange(val)}
+            />
+            )}
           />
-          */}
-          <Grid>
-            <Span3>
-              <Controller
-                name={`pricings.${index}.begins`}
-                control={control}
-                render={({ field: { value, onChange } }) => (
-                <DateInput
-                  id="futureDate"
-                  value={value}
-                  onChange={(val) => onChange(val)}
-                />
-                )}
-              />
-            </Span3>
-          </Grid>
-        </>
+        </Span3>
       )}
-      <Grid>
-        <Controller
-          name={`pricings.${index}.pricingType`}
-          control={control}
-          render={({ field: { value, onChange } }) => (
-            <>
-            {priceOptions.map((type) => (
-              <Span4 key={`pricings.${index}.pricingType.${type}`}>
-                <RadioButton
-                  id={`pricingType.${index}.${pricing.status}.${type}`}
-                  name={`pricingType.${index}.${pricing.status}`}
-                  label={t(`ReservationUnitEditor.label.pricingTypes.${type}`)}
-                  value={type}
-                  checked={value === type}
-                  onChange={onChange}
-                />
-                {/* index === 0 && getValidationError("pricings") && !hasPrice && (
-                  <Error>
-                    <IconAlertCircleFill />
-                    <span>{getValidationError("pricings")}</span>
-                  </Error>
-                )*/}
-              </Span4>
-            ))}
-            </>
-          )}
-        />
-      </Grid>
-      <Grid>
-        {/* TODO why is there an empty grid for non PAID? because we want a bit margin at the bottom, should be either in the parent element or gap between the sections */}
-        {pricing?.pricingType === "PAID" && (
-          <PaidPricingPart
-            form={form}
-            index={index}
-            taxPercentageOptions={taxPercentageOptions}
-          />
+      <Controller
+        name={`pricings.${index}.pricingType`}
+        control={control}
+        render={({ field: { value, onChange } }) => (
+          <>
+          {priceOptions.map((type) => (
+            <Span4 key={`pricings.${index}.pricingType.${type}`}>
+              <RadioButton
+                id={`pricingType.${index}.${pricing.status}.${type}`}
+                name={`pricingType.${index}.${pricing.status}`}
+                label={t(`ReservationUnitEditor.label.pricingTypes.${type}`)}
+                value={type}
+                checked={value === type}
+                onChange={onChange}
+              />
+           </Span4>
+          ))}
+          </>
         )}
-      </Grid>
-    </>
+      />
+      {errors["pricings"]?.message != null && (
+        <Error>
+          <IconAlertCircleFill />
+          <span>{errors["pricings"].message}</span>
+        </Error>
+      )}
+      {pricing?.pricingType === "PAID" && (
+        <PaidPricingPart
+          form={form}
+          index={index}
+          taxPercentageOptions={taxPercentageOptions}
+        />
+      )}
+    </Grid>
   );
 };
 
@@ -133,7 +110,7 @@ const PaidPricingPart = ({
   taxPercentageOptions: { label: string; value: number }[];
 }) => {
   const { t } = useTranslation();
-  const { control, register, watch } = form;
+  const { control, register, formState: { errors }, watch } = form;
 
   const unitPriceOptions = Object.values(ReservationUnitsReservationUnitPricingPriceUnitChoices).map((choice) => ({
     value: choice,
@@ -162,30 +139,32 @@ const PaidPricingPart = ({
               options={unitPriceOptions}
               onChange={(v: { value: ReservationUnitsReservationUnitPricingPriceUnitChoices; label: string }) => onChange(v.value)}
               value={unitPriceOptions.find((option) => option.value === value) ?? null}
-              // tooltipText={t("ReservationUnitEditor.tooltip.priceUnit")}
-              // errorText={getValidationError(`pricings.${index}.priceUnit`)}
+              tooltipText={t("ReservationUnitEditor.tooltip.priceUnit")}
+              error={errors.pricings?.[index]?.priceUnit?.message}
+              invalid={errors.pricings?.[index]?.priceUnit?.message != null}
             />
           )}
           />
         </Span6>
 
         <Span6>
-        <Controller
-          name={`pricings.${index}.taxPercentage.pk`}
-          control={control}
-          render={({ field: { value, onChange } }) => (
-          <Select
-            id={`pricings.${index}.taxPercentage.pk`}
-            placeholder={t("common.select")}
-            required
-            label={t(`ReservationUnitEditor.label.taxPercentagePk`)}
-            options={taxPercentageOptions}
-            onChange={(v: { value: number; label: string }) => onChange(v.value)}
-            value={taxPercentageOptions.find((option) => option.value === value) ?? null}
-            // errorText={getValidationError(`pricings.${index}.taxPercentagePk`)}
+          <Controller
+            name={`pricings.${index}.taxPercentage.pk`}
+            control={control}
+            render={({ field: { value, onChange } }) => (
+            <Select
+              id={`pricings.${index}.taxPercentage.pk`}
+              placeholder={t("common.select")}
+              required
+              label={t(`ReservationUnitEditor.label.taxPercentagePk`)}
+              options={taxPercentageOptions}
+              onChange={(v: { value: number; label: string }) => onChange(v.value)}
+              value={taxPercentageOptions.find((option) => option.value === value) ?? null}
+              error={errors.pricings?.[index]?.taxPercentage?.message}
+              invalid={errors.pricings?.[index]?.taxPercentage?.message != null}
+            />
+            )}
           />
-          )}
-        />
         </Span6>
 
         <Span3>
@@ -200,8 +179,8 @@ const PaidPricingPart = ({
             step={1}
             min={0}
             max={undefined}
-            // errorText={getValidationError( `pricings.${index}.lowestPriceNet`)}
-            // invalid={!!getValidationError(`pricings.${index}.lowestPriceNet`) }
+            errorText={errors.pricings?.[index]?.lowestPriceNet?.message}
+            invalid={errors.pricings?.[index]?.lowestPriceNet?.message != null}
           />
         </Span3>
         <Span3>
@@ -215,8 +194,8 @@ const PaidPricingPart = ({
             step={1}
             min={0}
             max={undefined}
-            // errorText={getValidationError( `pricings.${index}.lowestPrice`)}
-            // invalid={!!getValidationError(`pricings.${index}.lowestPrice`)}
+            errorText={errors.pricings?.[index]?.lowestPrice?.message}
+            invalid={errors.pricings?.[index]?.lowestPrice?.message != null}
             tooltipText={t("ReservationUnitEditor.tooltip.lowestPrice")}
           />
         </Span3>
@@ -232,8 +211,8 @@ const PaidPricingPart = ({
             step={1}
             min={0}
             max={undefined}
-            // errorText={getValidationError("highestPriceNet")}
-            // invalid={!!getValidationError("highestPriceNet")}
+            errorText={errors.pricings?.[index]?.highestPriceNet?.message}
+            invalid={errors.pricings?.[index]?.highestPriceNet?.message != null}
           />
         </Span3>
         <Span3>
@@ -248,8 +227,8 @@ const PaidPricingPart = ({
             min={0}
             max={undefined}
             type="number"
-            // errorText={getValidationError("highestPrice")}
-            // invalid={!!getValidationError("highestPrice")}
+            errorText={errors.pricings?.[index]?.highestPrice?.message}
+            invalid={errors.pricings?.[index]?.highestPrice?.message != null}
             tooltipText={t("ReservationUnitEditor.tooltip.highestPrice")}
           />
         </Span3>
@@ -273,8 +252,8 @@ const PaidPricingPart = ({
               value={paymentTypeOptions.filter((x) => value.find((d) => d === x.value) != null)}
               label={t("ReservationUnitEditor.label.paymentTypes")}
               tooltipText={t("ReservationUnitEditor.tooltip.paymentTypes")}
-              // error={getValidationError("paymentTypes")}
-              // invalid={!!getValidationError("paymentTypes")}
+              errorText={errors.paymentTypes?.message}
+              invalid={errors.paymentTypes?.message != null}
             />
           )}
         />
@@ -282,6 +261,5 @@ const PaidPricingPart = ({
     </>
   )
 }
-
 
 export default PricingType;
