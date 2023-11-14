@@ -1471,7 +1471,7 @@ const translations: ITranslations = {
     bufferTimeBeforeDuration: ["Tauon kesto"],
     bufferTimeAfter: ["Aseta vuoron jälkeen tauko"],
     bufferTimeAfterDuration: ["Tauon kesto"],
-    scheduledPublishing: ["Ajastettu julkaisu"],
+    scheduledPublishing: ["Ajasta varausyksikön julkaisu tai piilotus"],
     publishingSettings: ["Julkaisun ajastus"],
     publishBegins: ["Julkaise alkaen"],
     publishEnds: ["Piilota alkaen"],
