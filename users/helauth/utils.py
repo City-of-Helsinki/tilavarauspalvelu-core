@@ -1,7 +1,8 @@
 import enum
 import json
 from base64 import urlsafe_b64decode
-from typing import Any, TypedDict
+from functools import lru_cache
+from typing import Any, TypedDict, Literal
 
 from django.conf import settings
 from django.contrib.sessions.backends.base import SessionBase
@@ -53,6 +54,7 @@ class IDToken(TypedDict):
     """level of authentication: substantial | low"""
 
 
+@lru_cache(maxsize=3)
 def get_id_token(user: AnyUser) -> IDToken | None:
     if user.is_anonymous:
         return None
@@ -92,6 +94,11 @@ def is_ad_login(token: IDToken | dict[str, Any]) -> bool:
     if isinstance(amr, str):
         amr = [amr]
     return any(method.value in amr for method in ADLoginAMR)
+
+
+def is_strong_login(token: IDToken | dict[str, Any]) -> bool:
+    loa: Literal["substantial", "low"] | None = token.get("loa")
+    return loa == "substantial"
 
 
 def get_profile_token(session: SessionBase) -> str | None:

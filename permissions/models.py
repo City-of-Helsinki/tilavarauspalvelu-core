@@ -234,6 +234,11 @@ class UnitRoleChoice(models.Model):
     code = models.CharField(verbose_name=_("Code"), max_length=50, primary_key=True)
     verbose_name = models.CharField(verbose_name=_("Verbose name"), max_length=255)
 
+    # Translated field hints
+    verbose_name_fi: str | None
+    verbose_name_sv: str | None
+    verbose_name_en: str | None
+
     def __str__(self):
         return self.verbose_name
 
@@ -242,6 +247,11 @@ class ServiceSectorRoleChoice(models.Model):
     code = models.CharField(verbose_name=_("Code"), max_length=50, primary_key=True)
     verbose_name = models.CharField(verbose_name=_("Verbose name"), max_length=255)
 
+    # Translated field hints
+    verbose_name_fi: str | None
+    verbose_name_sv: str | None
+    verbose_name_en: str | None
+
     def __str__(self):
         return self.verbose_name
 
@@ -249,6 +259,11 @@ class ServiceSectorRoleChoice(models.Model):
 class GeneralRoleChoice(models.Model):
     code = models.CharField(verbose_name=_("Code"), max_length=50, primary_key=True)
     verbose_name = models.CharField(verbose_name=_("Verbose name"), max_length=255)
+
+    # Translated field hints
+    verbose_name_fi: str | None
+    verbose_name_sv: str | None
+    verbose_name_en: str | None
 
     def __str__(self):
         return self.verbose_name
