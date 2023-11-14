@@ -1,5 +1,7 @@
+import datetime
+
 import graphene
-from django.contrib.auth import get_user_model
+from django.db.models import QuerySet
 from graphene_permissions.mixins import AuthNode
 
 from api.graphql.extensions.base_types import DjangoAuthNode, TVPBaseConnection
@@ -8,9 +10,9 @@ from api.graphql.types.permissions.types import GeneralRoleType, ServiceSectorRo
 from api.graphql.types.users.permissions import ApplicantPermission, UserPermission
 from common.typing import GQLInfo
 from permissions.models import GeneralRole, ServiceSectorRole, UnitRole
+from users.helauth.utils import get_id_token, is_ad_login, is_strong_login
+from users.models import User
 from users.tasks import save_personal_info_view_log
-
-User = get_user_model()
 
 
 class UserType(AuthNode, OldPrimaryKeyObjectType):
@@ -20,6 +22,8 @@ class UserType(AuthNode, OldPrimaryKeyObjectType):
     general_roles = graphene.List(GeneralRoleType)
     service_sector_roles = graphene.List(ServiceSectorRoleType)
     unit_roles = graphene.List(UnitRoleType)
+    is_ad_authenticated = graphene.Boolean()
+    is_strongly_authenticated = graphene.Boolean()
 
     class Meta:
         model = User
@@ -36,28 +40,42 @@ class UserType(AuthNode, OldPrimaryKeyObjectType):
             "service_sector_roles",
             "unit_roles",
             "date_of_birth",
+            "is_ad_authenticated",
+            "is_strongly_authenticated",
         ]
         filter_fields = ()
         interfaces = (graphene.relay.Node,)
         connection_class = TVPBaseConnection
 
-    def resolve_reservation_notification(self, info: GQLInfo):
-        if self.has_staff_permissions:
-            return self.reservation_notification
+    def resolve_reservation_notification(root: User, info: GQLInfo) -> str | None:
+        if root.has_staff_permissions:
+            return root.reservation_notification
         return None
 
-    def resolve_general_roles(self, info: GQLInfo):
-        return GeneralRole.objects.filter(user__pk=self.pk)
+    def resolve_general_roles(root: User, info: GQLInfo) -> QuerySet[GeneralRole]:
+        return GeneralRole.objects.filter(user__pk=root.pk)
 
-    def resolve_service_sector_roles(self, info: GQLInfo):
-        return ServiceSectorRole.objects.filter(user__pk=self.pk)
+    def resolve_service_sector_roles(root: User, info: GQLInfo) -> QuerySet[ServiceSectorRole]:
+        return ServiceSectorRole.objects.filter(user__pk=root.pk)
 
-    def resolve_unit_roles(self, info: GQLInfo):
-        return UnitRole.objects.filter(user__pk=self.pk)
+    def resolve_unit_roles(root: User, info: GQLInfo) -> QuerySet[UnitRole]:
+        return UnitRole.objects.filter(user__pk=root.pk)
 
-    def resolve_date_of_birth(self, info: GQLInfo):
-        save_personal_info_view_log.delay(self.pk, info.context.user.id, "User.date_of_birth")
-        return self.date_of_birth
+    def resolve_date_of_birth(root: User, info: GQLInfo) -> datetime.date | None:
+        save_personal_info_view_log.delay(root.pk, info.context.user.id, "User.date_of_birth")
+        return root.date_of_birth
+
+    def resolve_is_ad_authenticated(root: User, info: GQLInfo) -> bool:
+        token = get_id_token(root)
+        if token is None:
+            return False
+        return is_ad_login(token)
+
+    def resolve_is_strongly_authenticated(root: User, info: GQLInfo) -> bool:
+        token = get_id_token(root)
+        if token is None:
+            return False
+        return is_strong_login(token)
 
 
 class ApplicantNode(DjangoAuthNode):
