@@ -38,6 +38,7 @@ import {
   ReservationUnitByPkType,
   ReservationUnitsReservationUnitPricingStatusChoices,
 } from "common/types/gql-types";
+import { DateTimeInput } from "common/src/components/form/DateTimeInput";
 import { filterNonNullable } from "common/src/helpers";
 import { H4 } from "common/src/common/typography";
 import { breakpoints } from "common";
@@ -71,7 +72,6 @@ import {
 } from "./queries";
 import ArchiveDialog from "./ArchiveDialog";
 import { ReservationStateTag, ReservationUnitStateTag } from "./tags";
-import { DateTimeInput } from "./DateTimeInput";
 import ActivationGroup from "./ActivationGroup";
 import ImageEditor from "./ImageEditor";
 import { Image } from "./types";

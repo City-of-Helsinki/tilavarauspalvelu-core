@@ -1,8 +1,9 @@
 import React from "react";
-import { DateInput, TimeInput } from "hds-react";
+import { DateInput } from "hds-react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useController, type FieldValues, type Path, type UseControllerProps } from "react-hook-form";
+import { TimeInput } from './TimeInput'
 
 const DateTimeWrapper = styled.div`
   display: grid;
@@ -59,13 +60,14 @@ const DateTimeInput = <T extends FieldValues>({
         onChange={(v) => dateField.onChange(v)}
       />
       <TimeInput
-        id={name.time}
+        name={name.time}
         required={required}
         disabled={disabled}
-        label={t("common.time")}
-        hoursLabel="hours"
-        minutesLabel="minutes"
+        // label={t("common.time")}
+        // hoursLabel="hours"
+        // minutesLabel="minutes"
         value={timeField.value}
+        label={t("common.time")}
         onChange={handleTimeChange}
       />
     </DateTimeWrapper>
