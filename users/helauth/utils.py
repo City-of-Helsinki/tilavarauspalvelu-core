@@ -2,7 +2,7 @@ import enum
 import json
 from base64 import urlsafe_b64decode
 from functools import lru_cache
-from typing import Any, TypedDict, Literal
+from typing import Any, Literal, TypedDict
 
 from django.conf import settings
 from django.contrib.sessions.backends.base import SessionBase

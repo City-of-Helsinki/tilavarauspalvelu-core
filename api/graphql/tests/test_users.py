@@ -55,7 +55,6 @@ class UserTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
         GeneralRole.objects.create(role=general_role_choice, user=cls.non_staff_user)
 
 
-
 class UpdateUserTestCase(UserTestCaseBase):
     def get_update_query(self):
         return """
