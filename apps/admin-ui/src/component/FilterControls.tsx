@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { isEqual } from "lodash";
 import { breakpoints } from "common/src/common/style";
 import { DataFilterConfig, DataFilterOption } from "../common/types";
-import Accordion from "./Accordion";
+import { Accordion } from "./Accordion";
 
 interface IProps {
   filters: DataFilterOption[];

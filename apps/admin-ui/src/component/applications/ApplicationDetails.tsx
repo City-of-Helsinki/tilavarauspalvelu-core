@@ -28,7 +28,7 @@ import { publicUrl, weekdays } from "@/common/const";
 import { useNotification } from "@/context/NotificationContext";
 import ScrollIntoView from "@/common/ScrollIntoView";
 import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
-import Accordion from "@/component/Accordion";
+import { Accordion } from "@/component/Accordion";
 import { Accordion as HDSAccordion } from "@/common/hds-fork/Accordion";
 import Loader from "@/component/Loader";
 import { ApplicationWorkingMemo } from "@/component/WorkingMemo";
@@ -293,7 +293,7 @@ function ApplicationEventDetails({
     <ScrollIntoView key={applicationEvent.pk} hash={hash}>
       <StyledAccordion
         heading={`${application.pk}-${applicationEvent.pk} ${applicationEvent.name}`}
-        defaultOpen
+        initiallyOpen
       >
         <EventProps>
           {applicationEvent.ageGroup && (

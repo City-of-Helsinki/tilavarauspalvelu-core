@@ -57,7 +57,7 @@ import Loader from "@/component/Loader";
 import { useNotification } from "@/context/NotificationContext";
 import { useModal } from "@/context/ModalContext";
 import { parseAddress } from "@/common/util";
-import { Accordion } from "@/common/hds-fork/Accordion";
+import { Accordion } from '@/component/Accordion';
 import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import { setTimeOnDate } from "@/component/reservations/utils";
 import {
@@ -922,8 +922,7 @@ const ReservationUnitEditor = ({
             </Grid>
           </Accordion>
           <Accordion
-            initiallyOpen
-            // initiallyOpen={state.validationErrors != null}
+            initiallyOpen={Object.keys(errors).length > 0}
             heading={t("ReservationUnitEditor.typesProperties")}
           >
             <Grid>
@@ -1035,7 +1034,10 @@ const ReservationUnitEditor = ({
             </Grid>
           </Accordion>
           {isDirect && (
-            <Accordion initiallyOpen heading={t("ReservationUnitEditor.settings")}>
+            <Accordion
+              initiallyOpen={Object.keys(errors).length > 0}
+              heading={t("ReservationUnitEditor.settings")}
+              >
               <Grid>
                 <Span12>
                   <FieldGroup
@@ -1141,7 +1143,7 @@ const ReservationUnitEditor = ({
                         required
                         label={t("ReservationUnitEditor.label.minReservationDuration")}
                         onChange={(v: { value: number; label: string }) => onChange(v.value)}
-                        value={durationOptions.find((o) => o.value === value)}
+                        value={durationOptions.find((o) => o.value === value) ?? null}
                         error={errors["minReservationDuration"]?.message}
                         invalid={errors["minReservationDuration"]?.message != null}
                         tooltipText={t("ReservationUnitEditor.tooltip.minReservationDuration")}
@@ -1160,7 +1162,7 @@ const ReservationUnitEditor = ({
                         required
                         options={durationOptions}
                         onChange={(v: { value: number; label: string }) => onChange(v.value)}
-                        value={durationOptions.find((o) => o.value === value)}
+                        value={durationOptions.find((o) => o.value === value) ?? null}
                         label={t("ReservationUnitEditor.label.maxReservationDuration")}
                         error={errors["maxReservationDuration"]?.message}
                         invalid={errors["maxReservationDuration"]?.message != null}
@@ -1181,7 +1183,7 @@ const ReservationUnitEditor = ({
                         required
                         label={t("ReservationUnitEditor.label.reservationsMaxDaysBefore")}
                         onChange={(v: { value: number; label: string }) => onChange(v.value)}
-                        value={reservationsMaxDaysBeforeOptions.find((o) => o.value === value)}
+                        value={reservationsMaxDaysBeforeOptions.find((o) => o.value === value) ?? null}
                         error={errors["reservationsMaxDaysBefore"]?.message}
                         invalid={errors["reservationsMaxDaysBefore"]?.message != null}
                         tooltipText={t("ReservationUnitEditor.tooltip.reservationsMaxDaysBefore")}
@@ -1216,7 +1218,7 @@ const ReservationUnitEditor = ({
                         placeholder={t("common.select")}
                         options={reservationStartIntervalOptions}
                         required
-                        value={reservationStartIntervalOptions.find((o) => o.value === value)}
+                        value={reservationStartIntervalOptions.find((o) => o.value === value) ?? null}
                         onChange={(val: { value: ReservationUnitsReservationUnitReservationStartIntervalChoices; label: string }) => onChange(val)}
                         error={errors["reservationStartInterval"]?.message}
                         invalid={errors["reservationStartInterval"]?.message != null}
@@ -1331,7 +1333,7 @@ const ReservationUnitEditor = ({
                         options={metadataOptions}
                         label={t("ReservationUnitEditor.label.metadataSetPk")}
                         onChange={(v: { label: string; value: number }) => onChange(v.value)}
-                        value={metadataOptions.find((o) => o.value === value) || null}
+                        value={metadataOptions.find((o) => o.value === value) ?? null}
                         error={errors["metadataSetPk"]?.message}
                         invalid={errors["metadataSetPk"]?.message != null}
                         tooltipText={t("ReservationUnitEditor.tooltip.metadataSetPk")}
@@ -1349,7 +1351,7 @@ const ReservationUnitEditor = ({
                         id="authentication"
                         required
                         options={authenticationOptions}
-                        value={authenticationOptions.find((o) => o.value === value) || null}
+                        value={authenticationOptions.find((o) => o.value === value) ?? null}
                         onChange={(val: { value: ReservationUnitsReservationUnitAuthenticationChoices; label: string }) => onChange(val.value)}
                         label={t("ReservationUnitEditor.authenticationLabel")}
                         tooltipText={t("ReservationUnitEditor.tooltip.authentication")}
@@ -1415,12 +1417,8 @@ const ReservationUnitEditor = ({
               </Grid>
             </Accordion>
           )}
-            {/* TODO allow adding a new one (future option),
-              this should support one ACTIVE and one FUTURE though the backend can return a full array of anything
-              TODO split this into active and future but that's gonna break the index
-              */}
           <Accordion
-            initiallyOpen
+            initiallyOpen={Object.keys(errors).length > 0}
             heading={t("ReservationUnitEditor.label.pricings")}
           >
             <div style={{
@@ -1500,7 +1498,6 @@ const ReservationUnitEditor = ({
               )}
             </div>
           </Accordion>
-          {/* FIXME getFormValue (might also disable over hidding) */}
           {watch('canApplyFreeOfCharge') && isPaid && (
             <Span6>
               <Controller
@@ -1524,7 +1521,7 @@ const ReservationUnitEditor = ({
           )}
           {isDirect && (
             <Accordion
-              initiallyOpen //={state.validationErrors != null}
+              initiallyOpen={Object.keys(errors).length > 0}
               heading={t("ReservationUnitEditor.termsInstructions")}
             >
               <Grid>
@@ -1579,7 +1576,10 @@ const ReservationUnitEditor = ({
               </Grid>
             </Accordion>
           )}
-          <Accordion initiallyOpen heading={t("ReservationUnitEditor.communication")} >
+          <Accordion
+            initiallyOpen={Object.keys(errors).length > 0}
+            heading={t("ReservationUnitEditor.communication")}
+          >
             <Grid>
               <Span12>
                 <ExpandLink initiallyOpen heading={t("ReservationUnitEditor.pendingExpandLink")} >
@@ -1613,7 +1613,6 @@ const ReservationUnitEditor = ({
                   {t("ReservationUnitEditor.confirmedInstructions")}
                 </SlimH4>
               </Span12>
-                  {/* TODO these are not rich text inputs but text areas */}
               {(["reservationConfirmedInstructionsFi", "reservationConfirmedInstructionsEn", "reservationConfirmedInstructionsSv"] as const).map((fieldName) => (
                 <Span12 key={fieldName}>
                   <Controller
@@ -1636,7 +1635,8 @@ const ReservationUnitEditor = ({
                 </Span12>
               ))}
               <Span12>
-                <ExpandLink initiallyOpen heading={t("ReservationUnitEditor.cancelledExpandLink")}>
+                <ExpandLink initiallyOpen
+                  heading={t("ReservationUnitEditor.cancelledExpandLink")}>
                   <Span12>
                     <SlimH4>
                       {t("ReservationUnitEditor.cancelledInstructions")}
@@ -1675,8 +1675,10 @@ const ReservationUnitEditor = ({
               </Span12>
             </Grid>
           </Accordion>
-          {/* TODO should print an error if the url is missing */}
-          <Accordion initiallyOpen heading={t("ReservationUnitEditor.openingHours")}>
+          <Accordion
+            initiallyOpen={Object.keys(errors).length > 0}
+            heading={t("ReservationUnitEditor.openingHours")}
+          >
             {reservationUnit?.haukiUrl?.url ? (
               <>
                 <p>
@@ -1729,6 +1731,7 @@ const ReservationUnitEditor = ({
             onClick={handleArchiveButtonClick}
             variant="secondary"
             disabled={isSaving || getValues("pk") === 0}
+            theme="black"
           >
             {t("ReservationUnitEditor.archive")}
           </ArchiveButton>
@@ -1798,16 +1801,14 @@ const ReservationUnitEditor = ({
   );
 };
 
-// TODO these are router props, separate them to a wrapper
-// so the edit page has no dependencies to the router
-type IProps = {
+type IRouterProps = {
   reservationUnitPk?: string;
   unitPk: string;
 };
 
 /// Wrap the editor so we never reset the form after async loading (because of HDS TimeInput bug)
 function EditorWrapper () {
-  const { reservationUnitPk, unitPk } = useParams<IProps>();
+  const { reservationUnitPk, unitPk } = useParams<IRouterProps>();
   const { t } = useTranslation();
 
   const { data: reservationUnitData, loading: isLoading, refetch } = useQuery<

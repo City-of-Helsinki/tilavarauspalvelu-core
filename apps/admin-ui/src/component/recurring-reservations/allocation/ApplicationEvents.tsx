@@ -8,7 +8,7 @@ import {
   ApplicationNode,
   ReservationUnitByPkType,
 } from "common/types/gql-types";
-import Accordion from "@/component/Accordion";
+import { Accordion } from "@/component/Accordion";
 import { AllocationApplicationEventCardType } from "@/common/types";
 import AllocationCalendar from "./AllocationCalendar";
 import ApplicationRoundAllocationActions from "./ApplicationRoundAllocationActions";

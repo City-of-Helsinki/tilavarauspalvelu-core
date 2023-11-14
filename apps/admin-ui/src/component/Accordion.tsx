@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { IconAngleDown, IconAngleUp } from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
@@ -6,7 +6,7 @@ import { H2 } from "common/src/common/typography";
 
 interface IProps {
   heading: string | JSX.Element | null;
-  defaultOpen?: boolean;
+  initiallyOpen?: boolean;
   children: ReactNode;
   disabled?: boolean;
   className?: string;
@@ -52,7 +52,7 @@ const Content = styled.div`
 `;
 
 const Wrapper = styled.div<{ $open: boolean }>`
-  --header-font-size: var(--fontsize-heading-xxs);
+  --header-font-size: var(--fontsize-heading-m);
   --button-size: var(--fontsize-heading-m);
   --border-color: var(--color-silver);
   --content-padding-top: var(--spacing-m);
@@ -75,18 +75,26 @@ const ToggleIconClosed = styled(IconAngleDown).attrs({
   } as React.CSSProperties,
 })``;
 
-function Accordion({
+/// HDS Accordion doesn't update when it's initiallyOpen prop changes
+/// so we can't programmatically open it (for example from validation errors)
+/// TODO styling is bit off
+/// TODO seems like this affected MainMenu link styling
+export function Accordion({
   heading,
-  defaultOpen = false,
+  initiallyOpen = false,
   children,
   disabled = false,
   className,
   style,
   ...rest
 }: IProps): JSX.Element {
-  const [isAccordionOpen, toggleOpenState] = useState(defaultOpen);
+  const [isAccordionOpen, toggleOpenState] = useState(initiallyOpen);
 
   const { t } = useTranslation();
+
+  useEffect(() => {
+    toggleOpenState(initiallyOpen);
+  }, [initiallyOpen]);
 
   const buttonAriaLabel = isAccordionOpen
     ? `${t("common.close")} ${t("common.accordion")} "${heading}"`
@@ -124,5 +132,3 @@ function Accordion({
     </Wrapper>
   );
 }
-
-export default Accordion;

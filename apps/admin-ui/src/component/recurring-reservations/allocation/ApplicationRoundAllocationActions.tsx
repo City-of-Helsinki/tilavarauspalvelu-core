@@ -12,7 +12,7 @@ import type {
 import { ShowAllContainer } from "common/src/components/";
 import { ALLOCATION_CALENDAR_TIMES } from "@/common/const";
 import { OptionType } from "@/common/types";
-import Accordion from "@/component/Accordion";
+import { Accordion } from "@/component/Accordion";
 import {
   ApplicationEventScheduleResultStatuses,
   getSelectedApplicationEvents,
@@ -89,7 +89,6 @@ const Heading = styled.div`
 
 const StyledAccordion = styled(Accordion)`
   --border-color: transparent;
-  --header-font-size: var(--fontsize-body-m);
 
   > div {
     &:nth-of-type(2) {
@@ -279,7 +278,7 @@ const ApplicationRoundAllocationActions = ({
       {otherApplicationEvents?.length > 0 && (
         <StyledAccordion
           heading={t("Allocation.secondaryItems")}
-          defaultOpen={primaryApplicationEvents?.length === 0}
+          initiallyOpen={primaryApplicationEvents?.length === 0}
           key={selection.join("-")}
         >
           {otherApplicationEvents.map((applicationEvent) => (

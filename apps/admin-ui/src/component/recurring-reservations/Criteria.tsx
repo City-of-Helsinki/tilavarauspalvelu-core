@@ -12,7 +12,7 @@ import { formatDate } from "@/common/util";
 import { publicUrl } from "@/common/const";
 import { useNotification } from "@/context/NotificationContext";
 import Loader from "@/component/Loader";
-import Accordion from "@/component/Accordion";
+import { Accordion } from "@/component/Accordion";
 import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import TimeframeStatus from "./TimeframeStatus";
 
@@ -56,11 +56,11 @@ const ReservationUnitCount = styled(H2).attrs({
   margin-bottom: var(--spacing-3-xs);
 `;
 
-const StyledAccordion = styled(Accordion).attrs({
-  style: {
-    "--header-font-size": "var(--fontsize-heading-m)",
-  } as React.CSSProperties,
-})``;
+const StyledAccordion = styled(Accordion)`
+  h2.heading {
+    padding: 0 var(--spacing-m);
+  }
+`;
 
 const TitleBox = styled.div`
   ${H3} {
@@ -211,7 +211,7 @@ function Criteria({
         </Details>
         <StyledAccordion
           heading={t("ApplicationRound.searchAndUsageTimeRanges")}
-          defaultOpen
+          initiallyOpen
         >
           <TitleBox>
             <H3>{t("ApplicationRound.applicationPeriodTitle")}</H3>
@@ -238,7 +238,7 @@ function Criteria({
         </StyledAccordion>
         <StyledAccordion
           heading={t("ApplicationRound.usedReservationUnits")}
-          defaultOpen
+          initiallyOpen
         >
           <ReservationUnits>
             {/* TODO this should be a reduce where the unique key is the unit pk and under that is all the reservationUnits that belong to it */}
