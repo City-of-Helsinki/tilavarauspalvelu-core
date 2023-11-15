@@ -3,16 +3,14 @@ import { useTranslation } from "next-i18next";
 import { Footer as HDSFooter } from "hds-react";
 import styled from "styled-components";
 
-const linkIds: string[] = ["terms", "feedback"];
-
 const Wrapper = styled(HDSFooter)`
   /* problem with HDS footer not reserving space for the Koros */
   margin-top: var(--spacing-xl);
 `;
 
 const Footer = (): JSX.Element => {
-  const { t } = useTranslation("footer");
-
+  const { t, i18n } = useTranslation("footer");
+  const locale = i18n.language === "fi" ? "" : `/${i18n.language}`;
   // TODO HDS:Footer causes a hydration error
   // related to hydration problems, any params we set to it are ignored in SSR
   // so if the page is static this renders the default style
@@ -32,29 +30,34 @@ const Footer = (): JSX.Element => {
       <HDSFooter.Navigation
         navigationAriaLabel={t("footer:Navigation.navigationAriaLabel")}
       >
-        {linkIds.map((id) => (
-          <HDSFooter.Item
-            key={id}
-            href={t(`footer:Navigation.${id}.href`)}
-            label={t(`footer:Navigation.${id}.label`)}
-            target="_blank"
-            rel="noopener noreferrer"
-          />
-        ))}
+        <HDSFooter.Item
+          href={`${locale}/terms/booking`}
+          label={t(`footer:Navigation.bookingTermsLabel`)}
+          target="_blank"
+          rel="noopener noreferrer"
+        />
+        <HDSFooter.Item
+          href={`https://app.helmet-kirjasto.fi/forms/?site=varaamopalaute&ref=https://tilavaraus.hel.fi/${
+            locale !== "" ? `&lang=${i18n.language}` : ""
+          }`}
+          label={t(`footer:Navigation.feedbackLabel`)}
+          target="_blank"
+          rel="noopener noreferrer"
+        />
       </HDSFooter.Navigation>
       <HDSFooter.Base
         copyrightHolder={t("footer:Base.copyrightHolder")}
         copyrightText={t("footer:Base.copyrightText")}
       >
         <HDSFooter.Item
-          href={t(`footer:Base.Item.privacyStatement.href`)}
-          label={t(`footer:Base.Item.privacyStatement.label`)}
+          href={`${locale}/terms/privacy`}
+          label={t(`footer:Base.Item.privacyStatement`)}
           target="_blank"
           rel="noopener noreferrer"
         />
         <HDSFooter.Item
-          href={t(`footer:Base.Item.accessibilityStatement.href`)}
-          label={t(`footer:Base.Item.accessibilityStatement.label`)}
+          href={`${locale}/terms/accessibility`}
+          label={t(`footer:Base.Item.accessibilityStatement`)}
           target="_blank"
           rel="noopener noreferrer"
         />
