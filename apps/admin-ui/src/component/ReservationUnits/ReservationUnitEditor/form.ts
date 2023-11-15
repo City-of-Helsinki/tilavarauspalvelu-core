@@ -120,7 +120,17 @@ export const ReservationUnitEditSchema = z.object({
   // internal values
   isDraft: z.boolean(),
   isArchived: z.boolean(),
+  // do we show optional fields to the user? not sent to backend but changes if the field is sent
   hasFuturePricing: z.boolean(),
+  hasScheduledPublish: z.boolean(),
+  hasPublishBegins: z.boolean(),
+  hasPublishEnds: z.boolean(),
+  hasScheduledReservation: z.boolean(),
+  hasReservationBegins: z.boolean(),
+  hasReservationEnds: z.boolean(),
+  hasBufferTimeBefore: z.boolean(),
+  hasBufferTimeAfter: z.boolean(),
+  hasCancellationRule: z.boolean(),
 }).superRefine((v, ctx) => {
   if (v.isDraft || v.isArchived) {
     return;
@@ -312,6 +322,15 @@ export const convert = (data?: ReservationUnitByPkType): ReservationUnitEditForm
     isDraft: data?.isArchived ?? false,
     isArchived: data?.isArchived ?? false,
     hasFuturePricing: data?.pricings?.some((p) => p?.status != null && p?.status === ReservationUnitsReservationUnitPricingStatusChoices.Future) ?? false,
+    hasScheduledPublish: data?.publishBegins != null || data?.publishEnds != null,
+    hasScheduledReservation: data?.reservationBegins != null || data?.reservationEnds != null,
+    hasPublishBegins: data?.publishBegins != null,
+    hasPublishEnds: data?.publishEnds != null,
+    hasReservationBegins: data?.reservationBegins != null,
+    hasReservationEnds: data?.reservationEnds != null,
+    hasBufferTimeBefore: data?.bufferTimeBefore != null,
+    hasBufferTimeAfter: data?.bufferTimeAfter != null,
+    hasCancellationRule: data?.cancellationRule != null,
   };
 }
 

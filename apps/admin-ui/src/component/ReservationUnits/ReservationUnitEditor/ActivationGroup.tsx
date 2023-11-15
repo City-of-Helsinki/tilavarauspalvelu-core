@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Checkbox } from "hds-react";
 import styled from "styled-components";
 
@@ -10,44 +10,33 @@ const Wrapper = styled.div<{ $noMargin: boolean }>`
   ${({ $noMargin }) => ($noMargin ? null : `margin-top: var(--spacing-s);`)}
 `;
 
-Wrapper.displayName = "Wrapper";
-
-const ActivationGroup = ({
+// TODO rewrite using a forwardRef (or do we want to tie this with react-hook-form?)
+export function ActivationGroup({
   id,
   label,
-  initiallyOpen,
   children,
   noIndent = false,
   noMargin = false,
-  onClose,
+  open,
+  onChange,
 }: {
   id: string;
   label: string;
-  initiallyOpen: boolean;
-  children: React.ReactChild | React.ReactChild[];
+  children: React.ReactNode;
   noIndent?: boolean;
   noMargin?: boolean;
-  onClose?: () => void;
-}): JSX.Element => {
-  const [open, setOpen] = useState(initiallyOpen);
-  useEffect(() => {
-    setOpen(initiallyOpen);
-  }, [initiallyOpen])
-
+  open: boolean;
+  onChange: () => void;
+}): JSX.Element {
   return (
     <>
       <Checkbox
         id={id}
         label={label}
         checked={open}
-        onClick={() => {
-          setOpen(!open);
-          if (open && onClose) {
-            onClose();
-          }
-        }}
+        // TODO why is this onClick? why not onChange?
+        onClick={() => onChange()}
       />
-
       {open ? (
         <Wrapper $noMargin={noMargin}>
           <Indent $noIndent={noIndent}>{children}</Indent>
@@ -56,5 +45,3 @@ const ActivationGroup = ({
     </>
   );
 };
-
-export default ActivationGroup;

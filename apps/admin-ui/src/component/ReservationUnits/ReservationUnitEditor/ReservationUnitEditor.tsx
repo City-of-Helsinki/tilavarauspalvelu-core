@@ -72,7 +72,7 @@ import {
 } from "./queries";
 import ArchiveDialog from "./ArchiveDialog";
 import { ReservationStateTag, ReservationUnitStateTag } from "./tags";
-import ActivationGroup from "./ActivationGroup";
+import { ActivationGroup } from "./ActivationGroup";
 import ImageEditor from "./ImageEditor";
 import { Image } from "./types";
 import PricingType from "./PricingType";
@@ -524,6 +524,18 @@ const ReservationUnitEditor = ({
       publishEndsTime,
       pricings,
       hasFuturePricing,
+      hasScheduledPublish, // ignored just a ui variables
+      hasScheduledReservation, // ignored just a ui variables
+      hasPublishBegins,
+      hasPublishEnds,
+      hasReservationBegins,
+      hasReservationEnds,
+      hasBufferTimeBefore,
+      hasBufferTimeAfter,
+      hasCancellationRule,
+      bufferTimeAfter,
+      bufferTimeBefore,
+      cancellationRulePk,
       termsOfUseEn,
       termsOfUseFi,
       termsOfUseSv,
@@ -534,10 +546,12 @@ const ReservationUnitEditor = ({
       ...vals,
       ...(pk ? { pk } : {}),
       surfaceArea: surfaceArea != null && surfaceArea > 0 ? Math.ceil(surfaceArea) : null,
-      reservationEnds: constructApiDate(reservationEndsDate, reservationEndsTime),
-      reservationBegins: constructApiDate(reservationBeginsDate, reservationBeginsTime),
-      publishBegins: constructApiDate(publishBeginsDate, publishBeginsTime),
-      publishEnds: constructApiDate(publishEndsDate, publishEndsTime),
+      reservationBegins: hasReservationBegins ? constructApiDate(reservationBeginsDate, reservationBeginsTime) : null,
+      reservationEnds: hasReservationEnds ? constructApiDate(reservationEndsDate, reservationEndsTime) : null,
+      publishBegins: hasPublishBegins ? constructApiDate(publishBeginsDate, publishBeginsTime) : null,
+      publishEnds: hasPublishEnds ? constructApiDate(publishEndsDate, publishEndsTime) : null,
+      bufferTimeAfter: hasBufferTimeAfter ? bufferTimeAfter : null,
+      bufferTimeBefore: hasBufferTimeBefore ? bufferTimeBefore : null,
       isDraft,
       isArchived,
       termsOfUseEn: termsOfUseEn !== "" ? termsOfUseEn : null,
@@ -1052,23 +1066,15 @@ const ReservationUnitEditor = ({
                     <ActivationGroup
                       id="useScheduledPublishing"
                       label={t("ReservationUnitEditor.scheduledPublishing")}
-                      initiallyOpen={watch('publishBeginsDate') !== '' || watch('publishBeginsTime') !== '' || watch('publishEndsDate') !== '' || watch('publishEndsTime') !== '' }
-                      onClose={() => {
-                        setValue('publishBeginsDate', '')
-                        setValue('publishBeginsTime', '')
-                        setValue('publishEndsDate', '')
-                        setValue('publishEndsTime', '')
-                      }}
+                      open={watch("hasScheduledPublish")}
+                      onChange={() => setValue('hasScheduledPublish', !watch('hasScheduledPublish'))}
                     >
                       <DenseVerticalFlex>
                         <ActivationGroup
                           id="publishBegins"
                           label={t("ReservationUnitEditor.publishBegins")}
-                          initiallyOpen={watch('publishBeginsDate') !== '' || watch('publishBeginsTime') !== ''}
-                          onClose={() => {
-                            setValue('publishBeginsDate', '')
-                            setValue('publishBeginsTime', '')
-                          }}
+                          open={watch("hasPublishBegins")}
+                          onChange={() => setValue('hasPublishBegins', !watch('hasPublishBegins'))}
                           noIndent
                           noMargin
                         >
@@ -1078,12 +1084,8 @@ const ReservationUnitEditor = ({
                         <ActivationGroup
                           id="publishEnds"
                           label={t("ReservationUnitEditor.publishEnds")}
-                          initiallyOpen={watch('publishEndsDate') !== '' || watch('publishEndsTime') !== ''}
-                          // TODO what's the point of this? why are we reseting it on close?
-                          onClose={() => {
-                            setValue('publishEndsDate', '')
-                            setValue('publishEndsTime', '')
-                          }}
+                          open={watch("hasPublishEnds")}
+                          onChange={() => setValue('hasPublishEnds', !watch('hasPublishEnds'))}
                           noIndent
                           noMargin
                         >
@@ -1103,22 +1105,14 @@ const ReservationUnitEditor = ({
                     <ActivationGroup
                       id="useScheduledReservation"
                       label={t("ReservationUnitEditor.scheduledReservation")}
-                      initiallyOpen={watch('reservationBeginsDate') !== '' || watch('reservationEndsDate') !== ''}
-                      // TODO what's the point of this? why are we reseting it on close?
-                      // we should be using a temporary state for the modal etc. and only save the changes when the user clicks save
-                      onClose={() => {
-                        setValue('reservationBeginsDate', '')
-                        setValue('reservationBeginsTime', '')
-                        setValue('reservationEndsDate', '')
-                        setValue('reservationEndsTime', '')
-                      }}
+                      open={watch("hasScheduledReservation")}
+                      onChange={() => setValue('hasScheduledReservation', !watch('hasScheduledReservation'))}
                     >
                       <ActivationGroup
                         id="reservationBegins"
                         label={t("ReservationUnitEditor.reservationBegins")}
-                        // TODO
-                        initiallyOpen={watch('reservationBeginsDate') !== ''}
-                        onClose={() => { setValue('reservationBeginsDate', ''); setValue('reservationBeginsTime', '');}}
+                        open={watch('hasReservationBegins')}
+                        onChange={() => setValue('hasReservationBegins', !watch('hasReservationBegins'))}
                         noIndent
                       >
                         <DateTimeInput control={control} name={{ date: "reservationBeginsDate", time: "reservationBeginsTime" }} />
@@ -1126,9 +1120,8 @@ const ReservationUnitEditor = ({
                       <ActivationGroup
                         id="reservationEnds"
                         label={t("ReservationUnitEditor.reservationEnds")}
-                        // TODO
-                        initiallyOpen={watch('reservationEndsDate') !== ''}
-                        onClose={() => { setValue('reservationEndsDate', ''); setValue('reservationEndsTime', '');}}
+                        open={watch("hasReservationEnds")}
+                        onChange={() => setValue("hasReservationEnds", !watch("hasReservationEnds"))}
                         noIndent
                       >
                         <DateTimeInput control={control} name={{ date: "reservationEndsDate", time: "reservationEndsTime" }} />
@@ -1244,7 +1237,8 @@ const ReservationUnitEditor = ({
                         <ActivationGroup
                           id="bufferTimeBeforeGroup"
                           label={t("ReservationUnitEditor.bufferTimeBefore")}
-                          initiallyOpen={watch("bufferTimeBefore") !== 0}
+                          open={watch("hasBufferTimeBefore")}
+                          onChange={() => setValue("hasBufferTimeBefore", !watch("hasBufferTimeBefore"))}
                         >
                           <Controller
                             control={control}
@@ -1265,7 +1259,8 @@ const ReservationUnitEditor = ({
                         <ActivationGroup
                           id="bufferTimeAfterGroup"
                           label={t("ReservationUnitEditor.bufferTimeAfter")}
-                          initiallyOpen={watch("bufferTimeAfter") !== 0}
+                          open={watch("hasBufferTimeAfter")}
+                          onChange={() => setValue("hasBufferTimeAfter", !watch("hasBufferTimeAfter"))}
                         >
                           <Controller
                             control={control}
@@ -1297,10 +1292,8 @@ const ReservationUnitEditor = ({
                     <ActivationGroup
                       id="cancellationIsPossible"
                       label={t("ReservationUnitEditor.cancellationIsPossible")}
-                      // TODO what's the point of this? why are we reseting it on close?
-                      // it's because there is no logic in the send of the form to handle the case where the user has selected a cancellation rule and then unselected it
-                      initiallyOpen={watch("cancellationRulePk") != null}
-                      onClose={() => setValue('cancellationRulePk', null)}
+                      open={watch("hasCancellationRule")}
+                      onChange={() => setValue('hasCancellationRule', watch("hasCancellationRule"))}
                     >
                       <Controller
                         control={control}
