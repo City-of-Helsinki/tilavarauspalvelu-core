@@ -240,7 +240,10 @@ export const ReservationMetaFields = ({
           headingKey="COMMON"
           params={{
             numPersons: {
-              min: reservationUnit.minPersons ?? 0,
+              min:
+                !reservationUnit.minPersons || reservationUnit.minPersons === 0
+                  ? 1
+                  : reservationUnit.minPersons,
               max:
                 reservationUnit.maxPersons != null &&
                 !Number.isNaN(reservationUnit.maxPersons) &&
