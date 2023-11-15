@@ -29,9 +29,11 @@ const StyledImage = styled.img`
   object-fit: cover;
 `;
 
-const RUImage = ({ image }: { image: Image }): JSX.Element => {
+function RUImage({ image }: { image: Image }): JSX.Element {
   // medium url seems to work when deployed but locally it's not available
-  const [imageUrl, setImageUrl] = useState<string>(image.mediumUrl || image.imageUrl || "");
+  const [imageUrl, setImageUrl] = useState<string>(
+    image.mediumUrl || image.imageUrl || ""
+  );
 
   if (image.bytes) {
     const reader = new FileReader();
@@ -40,7 +42,7 @@ const RUImage = ({ image }: { image: Image }): JSX.Element => {
   }
 
   return <StyledImage src={imageUrl} />;
-};
+}
 
 let fakepk = -1;
 
@@ -83,12 +85,18 @@ const SmallButton = styled(Button)`
   }
 `;
 
-function ReservationUnitImage ({ makeIntoMainImage, deleteImage, image }:{
+function ReservationUnitImage({
+  makeIntoMainImage,
+  deleteImage,
+  image,
+}: {
   makeIntoMainImage: (pk: number) => void;
   deleteImage: (pk: number) => void;
   image: Image;
 }) {
-  const isMain = image.imageType === ReservationUnitsReservationUnitImageImageTypeChoices.Main
+  const isMain =
+    image.imageType ===
+    ReservationUnitsReservationUnitImageImageTypeChoices.Main;
   const { t } = useTranslation();
   return (
     <div>
@@ -96,11 +104,17 @@ function ReservationUnitImage ({ makeIntoMainImage, deleteImage, image }:{
         {isMain ? (
           <span>{t("ImageEditor.mainImage")}</span>
         ) : (
-          <SmallButton variant="secondary" onClick={() => makeIntoMainImage(image.pk as number)}>
+          <SmallButton
+            variant="secondary"
+            onClick={() => makeIntoMainImage(image.pk as number)}
+          >
             {t("ImageEditor.useAsMainImage")}
           </SmallButton>
         )}
-        <SmallButton variant="secondary" onClick={() => deleteImage(image.pk as number)}>
+        <SmallButton
+          variant="secondary"
+          onClick={() => deleteImage(image.pk as number)}
+        >
           {t("ImageEditor.deleteImage")}
         </SmallButton>
       </Actions>
@@ -114,7 +128,7 @@ type Props = {
   setImages: (images: Image[]) => void;
 };
 
-const ImageEditor = ({ images, setImages }: Props): JSX.Element => {
+export function ImageEditor({ images, setImages }: Props): JSX.Element {
   const { t } = useTranslation();
 
   const addImage = (files: File[]) => {
@@ -185,6 +199,4 @@ const ImageEditor = ({ images, setImages }: Props): JSX.Element => {
         ))}
     </Wrapper>
   );
-};
-
-export default ImageEditor;
+}

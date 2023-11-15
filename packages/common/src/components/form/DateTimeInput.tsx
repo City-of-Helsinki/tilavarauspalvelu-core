@@ -2,8 +2,13 @@ import React from "react";
 import { DateInput } from "hds-react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { useController, type FieldValues, type Path, type UseControllerProps } from "react-hook-form";
-import { TimeInput } from './TimeInput'
+import {
+  useController,
+  type FieldValues,
+  type Path,
+  type UseControllerProps,
+} from "react-hook-form";
+import { TimeInput } from "./TimeInput";
 
 const DateTimeWrapper = styled.div`
   display: grid;
@@ -44,8 +49,8 @@ const DateTimeInput = <T extends FieldValues>({
   });
 
   const handleTimeChange = (evt: React.FormEvent<HTMLInputElement>) => {
-    timeField.onChange(evt.currentTarget.value)
-  }
+    timeField.onChange(evt.currentTarget.value);
+  };
 
   return (
     <DateTimeWrapper>

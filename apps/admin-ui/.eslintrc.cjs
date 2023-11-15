@@ -41,6 +41,15 @@ module.exports = {
         devDependencies: true,
       },
     ],
+    // allow deconstruction and _ for unused vars
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        varsIgnorePattern: "^_",
+        argsIgnorePattern: "^_",
+        ignoreRestSiblings: true,
+      },
+    ],
     "import/no-unresolved": "off",
     "import/prefer-default-export": 0,
     "jsx-a11y/alt-text": 1,

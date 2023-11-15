@@ -8,7 +8,7 @@ const ActionButtons = styled(Dialog.ActionButtons)`
   justify-content: end;
 `;
 
-const DialogContent = ({
+function DialogContent({
   onClose,
   onAccept,
   description,
@@ -18,7 +18,7 @@ const DialogContent = ({
   onAccept: () => void;
   description: string;
   acceptLabel: string;
-}) => {
+}): JSX.Element {
   const { t } = useTranslation();
 
   return (
@@ -42,9 +42,9 @@ const DialogContent = ({
       </ActionButtons>
     </>
   );
-};
+}
 
-const GenericDialog = ({
+export function GenericDialog({
   onClose,
   onAccept,
   title,
@@ -56,7 +56,7 @@ const GenericDialog = ({
   title: string;
   description: string;
   acceptLabel: string;
-}): JSX.Element => {
+}): JSX.Element {
   const { isOpen } = useModal();
 
   return (
@@ -76,5 +76,4 @@ const GenericDialog = ({
       />
     </Dialog>
   );
-};
-export default GenericDialog;
+}

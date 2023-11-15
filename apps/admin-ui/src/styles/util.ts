@@ -1,4 +1,4 @@
-import { Button, Checkbox, Navigation, Notification } from "hds-react";
+import { Checkbox, Navigation, Notification } from "hds-react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { breakpoints } from "common/src/common/style";

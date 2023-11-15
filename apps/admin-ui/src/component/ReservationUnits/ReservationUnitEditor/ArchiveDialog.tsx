@@ -1,18 +1,17 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { ReservationUnitByPkType } from "common/types/gql-types";
-import GenericDialog from "./GenericDialog";
+import { GenericDialog } from "./GenericDialog";
 
-const ArchiveDialog = ({
+export function ArchiveDialog({
   reservationUnit,
   onClose,
   onAccept,
 }: {
   reservationUnit: ReservationUnitByPkType;
-
   onClose: () => void;
   onAccept: () => void;
-}): JSX.Element => {
+}): JSX.Element {
   const { t } = useTranslation();
 
   return (
@@ -26,5 +25,4 @@ const ArchiveDialog = ({
       acceptLabel={t("ArchiveReservationUnitDialog.archive")}
     />
   );
-};
-export default ArchiveDialog;
+}

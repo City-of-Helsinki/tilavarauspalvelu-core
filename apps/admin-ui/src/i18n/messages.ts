@@ -1119,16 +1119,34 @@ const translations: ITranslations = {
       paymentTypes: ["Maksutapa"],
       priceUnit: ["Hinnan yksikkö"],
       taxPercentagePk: ["Hinnan alv%"],
-      reservationPendingInstructionsEn: ["Varausvahvistuksen lisäohjeteksti englanniksi"],
-      reservationPendingInstructionsFi: ["Varausvahvistuksen lisäohjeteksti suomeksi"],
-      reservationPendingInstructionsSv: ["Varausvahvistuksen lisäohjeteksti ruotsiksi"],
+      reservationPendingInstructionsEn: [
+        "Varausvahvistuksen lisäohjeteksti englanniksi",
+      ],
+      reservationPendingInstructionsFi: [
+        "Varausvahvistuksen lisäohjeteksti suomeksi",
+      ],
+      reservationPendingInstructionsSv: [
+        "Varausvahvistuksen lisäohjeteksti ruotsiksi",
+      ],
       // TODO
-      reservationConfirmedInstructionsEn: ["Varausvahvistuksen lisäohjeteksti englanniksi"],
-      reservationConfirmedInstructionsFi: ["Varausvahvistuksen lisäohjeteksti suomeksi"],
-      reservationConfirmedInstructionsSv: ["Varausvahvistuksen lisäohjeteksti ruotsiksi"],
-      reservationCancelledInstructionsEn: ["Varausvahvistuksen lisäohjeteksti englanniksi"],
-      reservationCancelledInstructionsFi: ["Varausvahvistuksen lisäohjeteksti suomeksi"],
-      reservationCancelledInstructionsSv: ["Varausvahvistuksen lisäohjeteksti ruotsiksi"],
+      reservationConfirmedInstructionsEn: [
+        "Varausvahvistuksen lisäohjeteksti englanniksi",
+      ],
+      reservationConfirmedInstructionsFi: [
+        "Varausvahvistuksen lisäohjeteksti suomeksi",
+      ],
+      reservationConfirmedInstructionsSv: [
+        "Varausvahvistuksen lisäohjeteksti ruotsiksi",
+      ],
+      reservationCancelledInstructionsEn: [
+        "Varausvahvistuksen lisäohjeteksti englanniksi",
+      ],
+      reservationCancelledInstructionsFi: [
+        "Varausvahvistuksen lisäohjeteksti suomeksi",
+      ],
+      reservationCancelledInstructionsSv: [
+        "Varausvahvistuksen lisäohjeteksti ruotsiksi",
+      ],
       reservationKinds: {
         DIRECT_AND_SEASON: ["Yksittäis- ja kausivaraus"],
         DIRECT: ["Vain yksittäisvaraus"],

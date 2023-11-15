@@ -1,5 +1,5 @@
 import React from "react";
-import { ReservationState, ReservationUnitState  } from "common/types/gql-types";
+import { ReservationState, ReservationUnitState } from "common/types/gql-types";
 import { Tag } from "hds-react";
 import { useTranslation } from "react-i18next";
 
@@ -56,7 +56,11 @@ const statusColor = (state: ReservationUnitState) => {
   }
 };
 
-export function ReservationUnitStateTag({ state }: { state: ReservationUnitState; }): JSX.Element {
+export function ReservationUnitStateTag({
+  state,
+}: {
+  state: ReservationUnitState;
+}): JSX.Element {
   const { t } = useTranslation();
   return (
     <Tag

@@ -12,7 +12,7 @@ const TimeInputContainer = styled.div`
   flex-direction: column;
 
   & > label {
-    color: var(--label-color-default,var(--color-black-90));
+    color: var(--label-color-default, var(--color-black-90));
     display: block;
     font-size: var(--fontsize-body-m);
     font-weight: 500;
@@ -29,7 +29,7 @@ const TimeInputContainer = styled.div`
       box-shadow: 0 0 0 var(--outline-width) var(--color-focus-outline);
       transform: translateZ(0);
       transition: 85ms ease-out;
-      transition-property: box-shadow,transform;
+      transition-property: box-shadow, transform;
     }
     &:hover {
       border-color: var(--input-border-color-hover);
@@ -48,74 +48,90 @@ type TimeInputProps = {
 /// Custom component because
 /// HDS TimeInput can not be changed programmatically
 /// this breaks all react-hook-forms because they rely on resetting the value (both controlled / uncontrolled)
-export const TimeInput = forwardRef(function TimeInput(props: TimeInputProps, ref: Ref<HTMLInputElement>) {
-  const { label }  = props
+/// TODO if you use this on ui side check accessibility
+export const TimeInput = forwardRef(function TimeInput(
+  props: TimeInputProps,
+  ref: Ref<HTMLInputElement>
+) {
+  const { label } = props;
 
   const isValid = (value: string): boolean => {
     return /^[0-9]{1,2}(:[0-9]{0,2})?$/.test(value);
-  }
+  };
 
   // block if the input is not a number or :
   // allow overwriting selection
   // automatic adding of : if the user types 3 numbers
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    const isNumber = !isNaN(Number(e.key))
-    const { value, selectionStart, selectionEnd } = e.currentTarget
+    const isNumber = !isNaN(Number(e.key));
+    const { value, selectionStart, selectionEnd } = e.currentTarget;
 
-    if (e.key === "ArrowRight" || e.key === "ArrowLeft" || e.key === "ArrowUp" || e.key === "ArrowDown") {
-    }
-    else if (e.key === "Tab") {
-    }
-    else if (e.key === "Backspace") {
+    if (
+      e.key === "ArrowRight" ||
+      e.key === "ArrowLeft" ||
+      e.key === "ArrowUp" ||
+      e.key === "ArrowDown"
+    ) {
+    } else if (e.key === "Tab") {
+    } else if (e.key === "Backspace") {
       // TODO use selection, and check if the last char is : or not
       if (value.length === 3) {
-        e.currentTarget.value = value.slice(0, 2)
+        e.currentTarget.value = value.slice(0, 2);
       }
-    }
-    else if (e.key === "Delete") {
+    } else if (e.key === "Delete") {
       // TODO Same as backspace
-    }
-    else if (e.key === "Enter") {
-    }
-    else if (e.key === "Escape") {
-    }
-    else if (e.key === "Home" || e.key === "End") {
-    }
-    else if ((e.key === "v" || e.key === "z" || e.key === "x" || e.key === "c" || e.key === "a") && e.ctrlKey || e.metaKey) {
-    }
-    else if (e.key !== ":" && !isNumber) {
+    } else if (e.key === "Enter") {
+    } else if (e.key === "Escape") {
+    } else if (e.key === "Home" || e.key === "End") {
+    } else if (
+      ((e.key === "v" ||
+        e.key === "z" ||
+        e.key === "x" ||
+        e.key === "c" ||
+        e.key === "a") &&
+        e.ctrlKey) ||
+      e.metaKey
+    ) {
+    } else if (e.key !== ":" && !isNumber) {
       e.preventDefault();
-      return;
-    }
-    else {
-      const newValue = value.slice(0, selectionStart ?? value.length) + e.key + value.slice(selectionEnd ?? value.length)
+    } else {
+      const newValue =
+        value.slice(0, selectionStart ?? value.length) +
+        e.key +
+        value.slice(selectionEnd ?? value.length);
       // automatically add ':' if the user types 3 numbers
       if (newValue.length === 3 && newValue.indexOf(":") === -1) {
-        e.currentTarget.value = value + ":" + e.key
+        e.currentTarget.value = `${value}:${e.key}`;
       }
       if (!isValid(newValue)) {
         e.preventDefault();
-        return;
       }
     }
-  }
+  };
 
   const onPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
-    const value = e.clipboardData.getData("text")
-    const { value: currentValue, selectionStart, selectionEnd } = e.currentTarget
-    const val = currentValue.slice(0, selectionStart ?? currentValue.length) + value + currentValue.slice(selectionEnd ?? currentValue.length)
+    const value = e.clipboardData.getData("text");
+    const {
+      value: currentValue,
+      selectionStart,
+      selectionEnd,
+    } = e.currentTarget;
+    const val =
+      currentValue.slice(0, selectionStart ?? currentValue.length) +
+      value +
+      currentValue.slice(selectionEnd ?? currentValue.length);
     if (isValid(val)) {
-      return
+      return;
     }
     // add the : automatically if it's missing and more than 2 numbers are added (primarily paste 0000 => 00:00)
     if (val.indexOf(":") === -1) {
-      const modVal = val.slice(0, 2) + ":" + val.slice(2)
+      const modVal = `${val.slice(0, 2)}:${val.slice(2)}`;
       if (isValid(modVal)) {
-        e.currentTarget.value = modVal
+        e.currentTarget.value = modVal;
       }
     }
     e.preventDefault();
-  }
+  };
 
   return (
     <TimeInputContainer>
@@ -127,7 +143,7 @@ export const TimeInput = forwardRef(function TimeInput(props: TimeInputProps, re
         size={6}
         onPaste={onPaste}
         onKeyDown={onKeyDown}
-     />
+      />
     </TimeInputContainer>
   );
-})
+});
