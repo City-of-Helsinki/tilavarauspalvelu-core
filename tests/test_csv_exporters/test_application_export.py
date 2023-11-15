@@ -71,18 +71,18 @@ def test_application_export_multiple(graphql):
     assert row[next(index)] == application_1.contact_person.email
     assert row[next(index)] == application_1.contact_person.phone_number
     assert row[next(index)] == event_1.id
+    assert row[next(index)] == event_1.status.value
     assert row[next(index)] == event_1.name
-    assert row[next(index)] == (
-        f"{event_1.begin.day}.{event_1.begin.month}.{event_1.begin.year}"
-        f" - {event_1.end.day}.{event_1.end.month}.{event_1.end.year}"
-    )
+    assert row[next(index)] == f"{event_1.begin.day}.{event_1.begin.month}.{event_1.begin.year}"
+    assert row[next(index)] == f"{event_1.end.day}.{event_1.end.month}.{event_1.end.year}"
     assert row[next(index)] == application_1.home_city.name
     assert row[next(index)] == event_1.purpose.name
     assert row[next(index)] == str(event_1.age_group)
     assert row[next(index)] == event_1.num_persons
     assert row[next(index)] == application_1.applicant_type
     assert row[next(index)] == event_1.events_per_week
-    assert row[next(index)] == "1 h - 2 h"
+    assert row[next(index)] == "1 h"
+    assert row[next(index)] == "2 h"
     assert row[next(index)] == "foo, fizz"
     assert row[next(index)] == ""  # Monday, Priority: HIGH
     assert row[next(index)] == "12:00 - 14:00"  # Tuesday, Priority: HIGH
@@ -119,18 +119,18 @@ def test_application_export_multiple(graphql):
     assert row[next(index)] == application_2.contact_person.email
     assert row[next(index)] == application_2.contact_person.phone_number
     assert row[next(index)] == event_2.id
+    assert row[next(index)] == event_2.status.value
     assert row[next(index)] == event_2.name
-    assert row[next(index)] == (
-        f"{event_2.begin.day}.{event_2.begin.month}.{event_2.begin.year}"
-        f" - {event_2.end.day}.{event_2.end.month}.{event_2.end.year}"
-    )
+    assert row[next(index)] == f"{event_2.begin.day}.{event_2.begin.month}.{event_2.begin.year}"
+    assert row[next(index)] == f"{event_2.end.day}.{event_2.end.month}.{event_2.end.year}"
     assert row[next(index)] == application_2.home_city.name
     assert row[next(index)] == event_2.purpose.name
     assert row[next(index)] == str(event_2.age_group)
     assert row[next(index)] == event_2.num_persons
     assert row[next(index)] == application_2.applicant_type
     assert row[next(index)] == event_2.events_per_week
-    assert row[next(index)] == "1 h - 2 h"
+    assert row[next(index)] == "1 h"
+    assert row[next(index)] == "2 h"
     assert row[next(index)] == "bar, buzz"
     assert row[next(index)] == ""  # Monday, Priority: HIGH
     assert row[next(index)] == ""  # Tuesday, Priority: HIGH
@@ -181,15 +181,11 @@ def test_application_export_multiple(graphql):
             ),
             "Missing event begin": MissingParams(
                 missing=Missing(null=["application_events__begin"]),
-                column_value_mapping={"hakijan ilmoittama kausi": "8.2.2023"},
+                column_value_mapping={"hakijan ilmoittaman kauden alkupäivä": ""},
             ),
             "Missing event end": MissingParams(
                 missing=Missing(null=["application_events__end"]),
-                column_value_mapping={"hakijan ilmoittama kausi": "7.2.2023"},
-            ),
-            "Missing event begin and end": MissingParams(
-                missing=Missing(null=["application_events__begin", "application_events__end"]),
-                column_value_mapping={"hakijan ilmoittama kausi": ""},
+                column_value_mapping={"hakijan ilmoittaman kauden loppupäivä": ""},
             ),
             "Missing home city": MissingParams(
                 missing=Missing(null=["home_city"]),
@@ -209,11 +205,11 @@ def test_application_export_multiple(graphql):
             ),
             "Missing event min duration": MissingParams(
                 missing=Missing(null=["application_events__min_duration"]),
-                column_value_mapping={"aika": "2 h"},
+                column_value_mapping={"minimi aika": ""},
             ),
             "Missing event max duration": MissingParams(
                 missing=Missing(null=["application_events__max_duration"]),
-                column_value_mapping={"aika": "1 h"},
+                column_value_mapping={"maksimi aika": ""},
             ),
         }
     )
