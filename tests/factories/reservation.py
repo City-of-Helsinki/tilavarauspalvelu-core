@@ -7,6 +7,7 @@ from django.utils import timezone
 from factory import fuzzy
 
 from applications.choices import PriorityChoice
+from reservation_units.models import ReservationUnit
 from reservations.choices import ReservationStateChoice
 from reservations.models import (
     RecurringReservation,
@@ -47,6 +48,7 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
             ReservationStateChoice.DENIED,
         )
     )
+    user = factory.SubFactory("tests.factories.UserFactory")
     priority = fuzzy.FuzzyInteger(low=PriorityChoice.LOW, high=PriorityChoice.HIGH, step=100)
     begin = fuzzy.FuzzyDateTime(
         start_dt=datetime(2021, 1, 1, tzinfo=timezone.utc),
@@ -58,11 +60,16 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
     )
 
     @factory.post_generation
-    def reservation_unit(self, create, reservation_units, **kwargs):
-        if not create or not reservation_units:
+    def reservation_unit(self, create: bool, reservation_units: list[ReservationUnit], **kwargs: Any):
+        if not create:
             return
 
-        for reservation_unit in reservation_units:
+        if not reservation_units and kwargs:
+            from .reservation_unit import ReservationUnitFactory
+
+            self.reservation_unit.add(ReservationUnitFactory.create(**kwargs))
+
+        for reservation_unit in reservation_units or []:
             self.reservation_unit.add(reservation_unit)
 
 

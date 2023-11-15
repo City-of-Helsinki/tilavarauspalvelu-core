@@ -45,7 +45,11 @@ def send_reservation_email_notification(
     html_content = message_builder.get_html_content()
 
     if recipients is None:
-        recipients = [reservation.reservee_email]
+        recipients: set[str] = set()
+        if reservation.reservee_email:
+            recipients.add(reservation.reservee_email)
+        if reservation.user and reservation.user.email:
+            recipients.add(reservation.user.email)
 
     email = EmailMultiAlternatives(
         subject=subject,
