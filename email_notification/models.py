@@ -18,7 +18,7 @@ class EmailType(models.TextChoices):
 
 
 class EmailTemplate(models.Model):
-    type = models.CharField(
+    type: EmailType = models.CharField(
         max_length=254,
         choices=EmailType.choices,
         unique=True,
@@ -27,7 +27,7 @@ class EmailTemplate(models.Model):
         verbose_name=_("Email type"),
         help_text=_("Only one template per type can be created."),
     )
-    name = models.CharField(
+    name: str = models.CharField(
         max_length=255,
         unique=True,
         verbose_name=_("Unique name for this content"),
@@ -35,15 +35,15 @@ class EmailTemplate(models.Model):
         blank=False,
     )
 
-    subject = models.CharField(max_length=255, null=False, blank=False)
-    content = models.TextField(
+    subject: str = models.CharField(max_length=255, null=False, blank=False)
+    content: str = models.TextField(
         verbose_name=_("Content"),
         help_text=_("Email body content. Use curly brackets to indicate data specific fields e.g {{reservee_name}}."),
         null=False,
         blank=False,
     )
 
-    html_content = models.FileField(
+    html_content: str | None = models.FileField(
         verbose_name=_("HTML content"),
         help_text=_(
             "Email body content as HTML. Use curly brackets to indicate data specific fields e.g {{reservee_name}}."
@@ -52,6 +52,17 @@ class EmailTemplate(models.Model):
         blank=True,
         upload_to=settings.EMAIL_HTML_TEMPLATES_ROOT,
     )
+
+    # Translated field hints
+    subject_fi: str | None
+    subject_en: str | None
+    subject_sv: str | None
+    content_fi: str | None
+    content_en: str | None
+    content_sv: str | None
+    html_content_fi: str | None
+    html_content_en: str | None
+    html_content_sv: str | None
 
     def __str__(self):
         choices = dict(EmailType.choices)
