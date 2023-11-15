@@ -21,15 +21,15 @@ import {
 } from "date-fns";
 import { toApiDate, toUIDate } from "common/src/common/util";
 import {
-  RoundPeriod,
   getEventBuffers,
   getNewReservation,
   getSlotPropGetter,
   getTimeslots,
   isReservationStartInFuture,
   isReservationUnitReservable,
+  RoundPeriod,
 } from "common/src/calendar/util";
-import { formatters as getFormatters, Container } from "common";
+import { Container, formatters as getFormatters } from "common";
 import { useLocalStorage, useMedia, useSessionStorage } from "react-use";
 import { breakpoints } from "common/src/common/style";
 import Calendar, { CalendarEvent } from "common/src/calendar/Calendar";
@@ -48,6 +48,7 @@ import {
   ReservationCreateMutationInput,
   ReservationCreateMutationPayload,
   ReservationsReservationStateChoices,
+  ReservationsReservationTypeChoices,
   ReservationType,
   ReservationUnitByPkType,
   ReservationUnitByPkTypeOpeningHoursArgs,
@@ -504,7 +505,7 @@ const ReservationUnit = ({
         user: currentUser?.pk?.toString(),
         reservationUnit: [reservationUnit?.pk?.toString() ?? ""],
         state: allowedReservationStates,
-        type: ReservationsReservationTypeChoices.Normal,
+        reservationType: ["NORMAL"],
       },
     }
   );
@@ -513,7 +514,9 @@ const ReservationUnit = ({
     const reservations = filterNonNullable(
       userReservationsData?.reservations?.edges?.map((e) => e?.node)
     ).filter(
-      (n) => allowedReservationStates.find((s) => s === n.state) != null
+      (n) =>
+        allowedReservationStates.find((s) => s === n.state) != null &&
+        n.type === ReservationsReservationTypeChoices.Normal
     );
     setUserReservations(reservations || []);
   }, [userReservationsData]);

@@ -117,7 +117,6 @@ export const LIST_RESERVATIONS = gql`
     $end: DateTime
     $state: [String]
     $user: ID
-    $type: ReservationsReservationReserveeTypeChoices
     $reservationUnit: [ID]
     $orderBy: String
   ) {
@@ -130,7 +129,6 @@ export const LIST_RESERVATIONS = gql`
       end: $end
       state: $state
       user: $user
-      type: $type
       reservationUnit: $reservationUnit
       orderBy: $orderBy
     ) {
@@ -146,6 +144,7 @@ export const LIST_RESERVATIONS = gql`
           bufferTimeAfter
           orderUuid
           isBlocked
+          type
           reservationUnits {
             pk
             nameFi

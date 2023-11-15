@@ -9,6 +9,7 @@ import {
   ReservationAdjustTimeMutationInput,
   ReservationAdjustTimeMutationPayload,
   ReservationsReservationStateChoices,
+  ReservationsReservationTypeChoices,
   ReservationType,
   ReservationUnitByPkType,
   ReservationUnitByPkTypeOpeningHoursArgs,
@@ -38,8 +39,8 @@ import { getTranslation } from "../../modules/util";
 import Sanitize from "../common/Sanitize";
 import ReservationInfoCard from "./ReservationInfoCard";
 import {
-  RESERVATION_UNIT,
   OPENING_HOURS,
+  RESERVATION_UNIT,
 } from "../../modules/queries/reservationUnit";
 import { mockOpeningTimes } from "../../modules/reservationUnit";
 import EditStep0 from "./EditStep0";
@@ -257,7 +258,6 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
         user: currentUser?.pk?.toString(),
         reservationUnit: [reservationUnit?.pk?.toString() ?? ""],
         state: allowedReservationStates,
-        type: ReservationsReservationStateChoices.Normal,
       },
     }
   );
@@ -265,7 +265,10 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
   useEffect(() => {
     const reservations = userReservationsData?.reservations?.edges
       ?.map((e) => e?.node)
-      .filter((n): n is ReservationType => n != null)
+      .filter(
+        (n): n is ReservationType =>
+          n != null && n.type === ReservationsReservationTypeChoices.Normal
+      )
       .filter((n) => allowedReservationStates.includes(n.state));
     setUserReservations(reservations || []);
   }, [userReservationsData]);

@@ -12,7 +12,8 @@ import { breakpoints } from "common/src/common/style";
 import {
   Query,
   QueryReservationsArgs,
-  ReservationsReservationStateChoices, ReservationsReservationTypeChoices,
+  ReservationsReservationStateChoices,
+  ReservationsReservationTypeChoices,
   ReservationType,
 } from "common/types/gql-types";
 import { Container } from "common";
@@ -114,7 +115,6 @@ const Reservations = (): JSX.Element | null => {
       ],
       orderBy: "-begin",
       user: currentUser?.pk?.toString(),
-      type: ReservationsReservationTypeChoices.Normal,
     },
     fetchPolicy: "no-cache",
   });
@@ -123,7 +123,11 @@ const Reservations = (): JSX.Element | null => {
     const reservations =
       reservationData?.reservations?.edges
         ?.map((edge) => edge?.node)
-        .filter((reservation): reservation is ReservationType => !!reservation)
+        .filter(
+          (reservation): reservation is ReservationType =>
+            !!reservation &&
+            reservation.type === ReservationsReservationTypeChoices.Normal
+        )
         .reduce(
           (acc, reservation) => {
             if (

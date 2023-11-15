@@ -3,7 +3,10 @@ import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
-import { ReservationsReservationStateChoices } from "common/types/gql-types";
+import {
+  ReservationsReservationStateChoices,
+  ReservationsReservationTypeChoices,
+} from "common/types/gql-types";
 import NotificationWrapper from "common/src/components/NotificationWrapper";
 import { useCurrentUser } from "@/hooks/user";
 import { BlackButton, Toast } from "@/styles/util";
@@ -46,7 +49,9 @@ const ReservationNotification = () => {
   });
 
   const reservation = reservations?.find(
-    (r) => r.state === ReservationsReservationStateChoices.WaitingForPayment
+    (r) =>
+      r.state === ReservationsReservationStateChoices.WaitingForPayment &&
+      r.type === ReservationsReservationTypeChoices.Normal
   );
 
   const { order } = useOrder({
