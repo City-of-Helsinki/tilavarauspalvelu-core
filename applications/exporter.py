@@ -1,3 +1,4 @@
+import datetime
 from csv import QUOTE_ALL, writer
 from functools import reduce
 from pathlib import Path
@@ -19,6 +20,8 @@ from applications.querysets.application_event import ApplicationEventQuerySet
 def get_header_rows(spaces_count: int) -> tuple[list[str], list[str], list[str]]:
     return (
         [
+            "",
+            "",
             "",
             "",
             "",
@@ -70,6 +73,8 @@ def get_header_rows(spaces_count: int) -> tuple[list[str], list[str], list[str]]
             "",
             "",
             "",
+            "",
+            "",
             "KAIKKI TILAT",
             "",
             "",
@@ -96,15 +101,18 @@ def get_header_rows(spaces_count: int) -> tuple[list[str], list[str], list[str]]
             "sähköpostiosoite",
             "yhteyshenkilön puh",
             "hakemusosan numero",
+            "hakemusosan tila",
             "varauksen nimi",
-            "hakijan ilmoittama kausi",
+            "hakijan ilmoittaman kauden alkupäivä",
+            "hakijan ilmoittaman kauden loppupäivä",
             "kotikunta",
             "vuoronkäyttötarkoitus",
             "ikäryhmä",
             "osallistujamäärä",
             "hakijan tyyppi",
             "vuoroja, kpl / vko",
-            "aika",
+            "minimi aika",
+            "maksimi aika",
         ]
         + [f"tilatoive {i}" for i in range(1, spaces_count + 1)]
         + [
@@ -138,7 +146,7 @@ class ApplicationDataExporter:
     def get_base_queryset(application_round_id: int) -> ApplicationEventQuerySet:
         return (
             ApplicationEvent.objects.with_application_status()
-            .exclude(application_status=ApplicationStatusChoice.DRAFT)
+            .exclude(application_status__in=[ApplicationStatusChoice.DRAFT, ApplicationStatusChoice.EXPIRED])
             .filter(
                 application__application_round=application_round_id,
                 application_event_schedules__isnull=False,
@@ -189,13 +197,8 @@ class ApplicationDataExporter:
 
                 for event in application_events:
                     application: Application = event.application
-                    min_duration_string = (
-                        cls._get_duration_string(event.min_duration.seconds) if event.min_duration else ""
-                    )
-                    max_duration_string = (
-                        cls._get_duration_string(event.max_duration.seconds) if event.max_duration else ""
-                    )
-                    duration_range_string = cls._get_time_range_string(min_duration_string, max_duration_string)
+                    min_duration_string = cls._get_duration_string(event.min_duration)
+                    max_duration_string = cls._get_duration_string(event.max_duration)
                     event_schedules_prio_high = {0: "", 1: "", 2: "", 3: "", 4: "", 5: "", 6: ""}
                     event_schedules_prio_medium = {0: "", 1: "", 2: "", 3: "", 4: "", 5: "", 6: ""}
                     event_schedules_prio_low = {0: "", 1: "", 2: "", 3: "", 4: "", 5: "", 6: ""}
@@ -258,15 +261,18 @@ class ApplicationDataExporter:
                         contact_person_email,
                         contact_person_phone,
                         event.id,
+                        event.status.value,
                         event.name,
-                        cls._get_time_range_string(event_begin, event_end),
+                        event_begin,
+                        event_end,
                         getattr(application.home_city, "name", "muu"),
                         getattr(event.purpose, "name", ""),
                         str(event.age_group) if event.age_group else "",
                         getattr(event, "num_persons", ""),
                         application.applicant_type,
                         event.events_per_week or 0,
-                        duration_range_string,
+                        min_duration_string,
+                        max_duration_string,
                     ]
                     row.extend(reservation_units)
                     row.extend(["" for _ in range(spaces_max_count - len(reservation_units))])
@@ -301,11 +307,13 @@ class ApplicationDataExporter:
         return None
 
     @staticmethod
-    def _get_duration_string(total_seconds: int) -> str:
-        duration_hours: int = 0
-        seconds: int = 0
+    def _get_duration_string(duration: datetime.timedelta | None) -> str:
+        if duration is None:
+            return ""
+
+        total_seconds = int(duration.total_seconds())
         duration_hours, seconds = divmod(total_seconds, 3600)
-        duration_minutes: int = seconds // 60
+        duration_minutes = int(seconds // 60)
         duration_string = ""
 
         if duration_hours:
@@ -356,9 +364,10 @@ class ApplicationDataExporter:
 
             export_writer.writerow(["Application ID", "Event name", "Status", "Reservation unit names"])
 
-            for event_id, application_id, event_name, current_status in (
+            for event_id, application_id, event_name, event_status in (
                 cls.get_base_queryset(application_round)
-                .values_list("id", "application__id", "name", "current_status")
+                .with_event_status()
+                .values_list("id", "application__id", "name", "event_status")
                 .order_by("application__organisation__name", "application__id")
             ):
                 event_reservation_unit_names = (
@@ -381,7 +390,7 @@ class ApplicationDataExporter:
                     [
                         application_id,
                         event_name,
-                        current_status,
+                        event_status,
                         reservation_units_string,
                     ]
                 )
