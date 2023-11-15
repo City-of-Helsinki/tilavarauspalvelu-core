@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.utils.timezone import get_default_timezone
 
-from merchants.verkkokauppa.helpers import _get_order_params, get_validated_phone_number
+from merchants.verkkokauppa.helpers import _get_order_params
 from reservations.choices import CustomerTypeChoice
 from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory
 
@@ -22,7 +22,7 @@ class CreateOrderParamsToJsonTestCase(TestCase):
             username="test",
             email="test@localhost",
             first_name="First",
-            last_name="Name",
+            last_name="Last",
         )
 
         reservation = ReservationFactory(
@@ -48,10 +48,10 @@ class CreateOrderParamsToJsonTestCase(TestCase):
         assert_that(json["priceNet"]).is_equal_to("10.12")
         assert_that(json["priceVat"]).is_equal_to("2.43")
         assert_that(json["priceTotal"]).is_equal_to("12.55")
-        assert_that(json["customer"]["firstName"]).is_equal_to("Firstname")
-        assert_that(json["customer"]["lastName"]).is_equal_to("Lastname")
-        assert_that(json["customer"]["email"]).is_equal_to("test@example.com")
-        assert_that(json["customer"]["phone"]).is_equal_to(get_validated_phone_number(reservation.reservee_phone))
+        assert_that(json["customer"]["firstName"]).is_equal_to("First")
+        assert_that(json["customer"]["lastName"]).is_equal_to("Last")
+        assert_that(json["customer"]["email"]).is_equal_to("test@localhost")
+        assert_that(json["customer"]["phone"]).is_equal_to("")
         assert_that(json["lastValidPurchaseDateTime"]).is_equal_to(
             (
                 datetime.now(tz=get_default_timezone())
