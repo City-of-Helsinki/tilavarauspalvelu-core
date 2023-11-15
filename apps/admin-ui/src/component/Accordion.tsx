@@ -27,7 +27,6 @@ const Heading = styled.div<{ $disabled: boolean }>`
   cursor: pointer;
   user-select: none;
   border-bottom: 1px solid var(--border-color);
-  margin-bottom: var(--spacing-m);
   ${({ $disabled }) =>
     $disabled
       ? `
@@ -76,6 +75,14 @@ const ToggleIconClosed = styled(IconAngleDown).attrs({
   } as React.CSSProperties,
 })``;
 
+const StyledH2 = styled(H2)`
+  --header-line-height: 1.5;
+  --header-padding: var(--spacing-m);
+  margin: 0;
+  padding: var(--header-padding) 0;
+  line-height: var(--header-line-height);
+`;
+
 /// HDS Accordion doesn't update when it's initiallyOpen prop changes
 /// so we can't programmatically open it (for example from validation errors)
 /// TODO styling is bit off
@@ -114,9 +121,9 @@ export function Accordion({
         data-testid="accordion__header"
         $disabled={disabled}
       >
-        <H2 className="heading" $legacy as={headingLevel}>
+        <StyledH2 className="heading" $legacy as={headingLevel}>
           {heading}
-        </H2>
+        </StyledH2>
         <ToggleButton
           type="button"
           aria-label={buttonAriaLabel}

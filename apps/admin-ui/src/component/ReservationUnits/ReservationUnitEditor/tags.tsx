@@ -3,8 +3,8 @@ import { ReservationState, ReservationUnitState } from "common/types/gql-types";
 import { Tag } from "hds-react";
 import { useTranslation } from "react-i18next";
 
-export function ReservationStateTag({ state }: { state: ReservationState }) {
-  const color = ((s: ReservationState) => {
+export function ReservationStateTag({ state }: { state?: ReservationState }) {
+  const color = ((s?: ReservationState) => {
     switch (s) {
       case ReservationState.ScheduledReservation:
         return "var(--color-summer-light)";
@@ -37,7 +37,7 @@ export function ReservationStateTag({ state }: { state: ReservationState }) {
   );
 }
 
-const statusColor = (state: ReservationUnitState) => {
+const statusColor = (state?: ReservationUnitState) => {
   switch (state) {
     case ReservationUnitState.Draft:
       return "var(--color-bus-light)";
@@ -59,7 +59,7 @@ const statusColor = (state: ReservationUnitState) => {
 export function ReservationUnitStateTag({
   state,
 }: {
-  state: ReservationUnitState;
+  state?: ReservationUnitState;
 }): JSX.Element {
   const { t } = useTranslation();
   return (

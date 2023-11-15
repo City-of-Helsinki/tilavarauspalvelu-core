@@ -47,7 +47,7 @@ import {
 } from "common/types/gql-types";
 import { DateTimeInput } from "common/src/components/form/DateTimeInput";
 import { filterNonNullable } from "common/src/helpers";
-import { H1, H4, Strong } from "common/src/common/typography";
+import { H1, H4, fontBold } from "common/src/common/typography";
 import { breakpoints } from "common";
 import { fromUIDate, toApiDate } from "common/src/common/util";
 import { previewUrlPrefix, publicUrl } from "@/common/const";
@@ -96,8 +96,12 @@ const RichTextInput = dynamic(() => import("../../RichTextInput"), {
   ssr: false,
 });
 
+// NOTE some magic values so the sticky buttons don't hide the bottom of the page
 const Wrapper = styled.div`
-  padding-bottom: 6em;
+  padding-bottom: 16rem;
+  @media (width > ${breakpoints.m}) {
+    padding-bottom: 8rem;
+  }
 `;
 
 const ButtonsContainer = styled.div`
@@ -310,6 +314,19 @@ const makeTermsOptions = (
   return [...options];
 };
 
+const FieldGroupWrapper = styled.div`
+  display: flex;
+  gap: var(--spacing-m);
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+`;
+
+const FieldGroupHeading = styled.div`
+  padding-bottom: var(--spacing-xs);
+  ${fontBold}
+`;
+
 const FieldGroup = ({
   children,
   id,
@@ -321,30 +338,24 @@ const FieldGroup = ({
   id?: string;
   children?: React.ReactNode;
 }): JSX.Element => (
-  <HorisontalFlex
-    style={{
-      justifyContent: "space-between",
-      width: "100%",
-    }}
-  >
+  <FieldGroupWrapper>
+    {/* TODO why? span > div */}
     <span>
-      <Strong style={{ display: "block", paddingBottom: "var(--spacing-xs)" }}>
-        {heading}
-      </Strong>
+      <FieldGroupHeading>{heading}</FieldGroupHeading>
       {id ? <span id={id} /> : null}
       {children}
     </span>
     <Tooltip>{tooltip}</Tooltip>
-  </HorisontalFlex>
+  </FieldGroupWrapper>
 );
 
-const DiscardChangesDialog = ({
+function DiscardChangesDialog({
   onClose,
   onAccept,
 }: {
   onClose: () => void;
   onAccept: () => void;
-}): JSX.Element => {
+}): JSX.Element {
   const { t } = useTranslation();
 
   return (
@@ -356,9 +367,21 @@ const DiscardChangesDialog = ({
       acceptLabel={t("DiscardReservationUnitChangesDialog.discard")}
     />
   );
-};
+}
 
-const DisplayUnit = ({
+const DisplayUnitWrapper = styled.div`
+  margin-bottom: var(--spacing-m);
+`;
+
+const UnitInformationWrapper = styled.div`
+  line-height: 32px;
+  font-size: var(--fontsize-heading-s);
+  > div:first-child {
+    ${fontBold}
+  }
+`;
+
+function DisplayUnit({
   heading,
   unit,
   unitState,
@@ -368,35 +391,23 @@ const DisplayUnit = ({
   unit?: UnitByPkType;
   unitState?: ReservationUnitState;
   reservationState?: ReservationState;
-}) => {
-  if (!unit) {
-    return null;
-  }
-
+}): JSX.Element {
   return (
-    <div>
+    <DisplayUnitWrapper>
       <TitleSectionWithTags>
         <H1 $legacy>{heading}</H1>
         <TagContainer>
-          {reservationState !== undefined && (
-            <ReservationStateTag state={reservationState} />
-          )}
-          {unitState !== undefined && (
-            <ReservationUnitStateTag state={unitState} />
-          )}
+          <ReservationStateTag state={reservationState} />
+          <ReservationUnitStateTag state={unitState} />
         </TagContainer>
       </TitleSectionWithTags>
-      <div
-        style={{ lineHeight: "24px", fontSize: "var(--fontsize-heading-s)" }}
-      >
-        <div>
-          <Strong>{unit.nameFi}</Strong>
-        </div>
-        {unit.location ? <span>{parseAddress(unit.location)}</span> : null}
-      </div>
-    </div>
+      <UnitInformationWrapper>
+        <div>{unit?.nameFi ?? "-"}</div>
+        <div>{unit?.location ? parseAddress(unit.location) : "-"}</div>
+      </UnitInformationWrapper>
+    </DisplayUnitWrapper>
   );
-};
+}
 
 const useImageMutations = () => {
   const [createImage] = useMutation<
@@ -1239,6 +1250,7 @@ function PricingSection({
       heading={t("ReservationUnitEditor.label.pricings")}
     >
       <div
+        // TODO replace with styled components (this is because we need a gap between the elems)
         style={{
           gap: "var(--spacing-m)",
           display: "flex",
@@ -1353,6 +1365,7 @@ function PricingSection({
     </Accordion>
   );
 }
+
 function TermsSection({
   form,
   serviceSpecificTermsOptions,

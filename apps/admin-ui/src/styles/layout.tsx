@@ -170,6 +170,7 @@ export const AutoGrid = styled.div<{ $minWidth?: string }>`
   align-items: baseline;
   gap: var(--spacing-m);
 `;
+AutoGrid.displayName = "AutoGrid";
 
 export const FullRow = styled.div`
   grid-column: 1 / -1;
