@@ -9,12 +9,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 
 from merchants.verkkokauppa.exceptions import UnsupportedMetaKey
-from merchants.verkkokauppa.helpers import (
-    create_verkkokauppa_order,
-    get_formatted_reservation_time,
-    get_meta_label,
-    get_validated_phone_number,
-)
+from merchants.verkkokauppa.helpers import create_verkkokauppa_order, get_formatted_reservation_time, get_meta_label
 from reservations.choices import CustomerTypeChoice
 from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory
 
@@ -64,78 +59,6 @@ class HelpersTestCase(TestCase):
     def test_get_formatted_reservation_time_fi_fallback(self):
         date = get_formatted_reservation_time(self.reservation)
         assert_that(date).is_equal_to("La 5.11.2022 10:00-12:00")
-
-    def test_get_validated_phone_number(self):
-        assert_that(get_validated_phone_number("+358 50 123 4567")).is_equal_to("+358 50 123 4567")
-        assert_that(get_validated_phone_number("+358 50 023 4567")).is_equal_to("+358 50 023 4567")
-        assert_that(get_validated_phone_number("+358501234567")).is_equal_to("+358501234567")
-        assert_that(get_validated_phone_number("+358-50-123-4567")).is_equal_to("+358 50 123 4567")
-        assert_that(get_validated_phone_number(" +358  50-  123- 4567  ")).is_equal_to("+358 50 123 4567")
-        assert_that(get_validated_phone_number("+1-55-50  10 0 ")).is_equal_to("+1 55 50 10 0")
-        assert_that(get_validated_phone_number("+1 55 50 10 0")).is_equal_to("+1 55 50 10 0")
-        assert_that(get_validated_phone_number("050 123 4567")).is_equal_to("")
-        assert_that(get_validated_phone_number("(+358) 50 123 4567")).is_equal_to("")
-        assert_that(get_validated_phone_number("")).is_equal_to("")
-
-    @patch("merchants.verkkokauppa.helpers.create_order")
-    def test_create_verkkokauppa_order_phone_number_is_set(self, mock_create_order):
-        user = get_user_model().objects.create(
-            username="testuser",
-            first_name="Test",
-            last_name="User",
-            email="test.user@example.com",
-        )
-        payment_product = PaymentProductFactory()
-        runit = ReservationUnitFactory(payment_product=payment_product)
-        reservation = ReservationFactory(
-            reservation_unit=[runit],
-            user=user,
-            reservee_type=CustomerTypeChoice.INDIVIDUAL,
-            reservee_phone="+358 50 123 4567",
-        )
-
-        create_verkkokauppa_order(reservation)
-        assert_that(mock_create_order.call_args.args[0].customer.phone).is_equal_to(reservation.reservee_phone)
-
-    @patch("merchants.verkkokauppa.helpers.create_order")
-    def test_create_verkkokauppa_order_phone_number_is_not_set_when_not_individual(self, mock_create_order):
-        user = get_user_model().objects.create(
-            username="testuser",
-            first_name="Test",
-            last_name="User",
-            email="test.user@example.com",
-        )
-        payment_product = PaymentProductFactory()
-        runit = ReservationUnitFactory(payment_product=payment_product)
-        reservation = ReservationFactory(
-            reservation_unit=[runit],
-            user=user,
-            reservee_type=CustomerTypeChoice.BUSINESS,
-            reservee_phone="+358 50 123 4567",
-        )
-
-        create_verkkokauppa_order(reservation)
-        assert_that(mock_create_order.call_args.args[0].customer.phone).is_equal_to("")
-
-    @patch("merchants.verkkokauppa.helpers.create_order")
-    def test_create_verkkokauppa_order_phone_number_is_not_set_when_invalid(self, mock_create_order):
-        user = get_user_model().objects.create(
-            username="testuser",
-            first_name="Test",
-            last_name="User",
-            email="test.user@example.com",
-        )
-        payment_product = PaymentProductFactory()
-        runit = ReservationUnitFactory(payment_product=payment_product)
-        reservation = ReservationFactory(
-            reservation_unit=[runit],
-            user=user,
-            reservee_type=CustomerTypeChoice.INDIVIDUAL,
-            reservee_phone="1234-333",
-        )
-
-        create_verkkokauppa_order(reservation)
-        assert_that(mock_create_order.call_args.args[0].customer.phone).is_equal_to("")
 
     @patch("merchants.verkkokauppa.helpers.create_order")
     def test_create_verkkokauppa_order_respect_reservee_language(self, mock_create_order):

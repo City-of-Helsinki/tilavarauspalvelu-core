@@ -1,4 +1,3 @@
-import re
 from datetime import datetime, timedelta
 from decimal import Decimal
 
@@ -16,7 +15,6 @@ from merchants.verkkokauppa.order.types import (
     OrderItemMetaParams,
     OrderItemParams,
 )
-from reservations.choices import CustomerTypeChoice
 from reservations.models import Reservation
 from tilavarauspalvelu.utils.date_util import localized_short_weekday
 from utils.decimal_utils import round_decimal
@@ -43,22 +41,6 @@ def get_formatted_reservation_time(reservation: Reservation) -> str:
     end_time = end.strftime("%H:%M")
 
     return begin.strftime(f"{weekday} {date} {start_time}-{end_time}")
-
-
-def get_validated_phone_number(phone_number: str) -> str:
-    if not phone_number:
-        return ""
-
-    phone_number = phone_number.replace("-", " ")
-    phone_number = re.sub(" +", " ", phone_number)
-    phone_number = phone_number.strip()
-
-    pattern = r"^\+(?:\d ?){6,14}\d$"
-    match = re.match(pattern, phone_number)
-    if match:
-        return match.group(0)
-
-    return ""
 
 
 def get_meta_label(key: str, reservation: Reservation) -> str:
@@ -154,15 +136,14 @@ def _get_order_params(reservation: Reservation):
         price_vat=Decimal(sum(item.row_price_vat for item in items)),
         price_total=Decimal(sum(item.row_price_total for item in items)),
         customer=OrderCustomer(
-            first_name=reservation.reservee_first_name,
-            last_name=reservation.reservee_last_name,
-            email=reservation.reservee_email,
-            phone=get_validated_phone_number(reservation.reservee_phone)
-            if reservation.reservee_type == CustomerTypeChoice.INDIVIDUAL
-            else "",
+            first_name=reservation.user.first_name,
+            last_name=reservation.user.last_name,
+            email=reservation.user.email,
+            phone="",
         ),
-        last_valid_purchase_datetime=datetime.now(tz=get_default_timezone())
-        + timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES),
+        last_valid_purchase_datetime=(
+            datetime.now(tz=get_default_timezone()) + timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
+        ),
     )
 
     return order_params
