@@ -1,11 +1,21 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { Footer as HDSFooter } from "hds-react";
+import { Footer as HDSFooter, IconLinkExternal } from "hds-react";
 import styled from "styled-components";
 
 const Wrapper = styled(HDSFooter)`
   /* problem with HDS footer not reserving space for the Koros */
   margin-top: var(--spacing-xl);
+  a[class*="FooterItem"] {
+    display: flex;
+    flex-flow: row-reverse;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-2-xs);
+    svg {
+      min-height: 21px; // The line height of the FooterBase element
+    }
+  }
 `;
 
 const Footer = (): JSX.Element => {
@@ -34,6 +44,7 @@ const Footer = (): JSX.Element => {
           href={`${locale}/terms/booking`}
           label={t(`footer:Navigation.bookingTermsLabel`)}
           target="_blank"
+          icon={<IconLinkExternal size="s" aria-hidden />}
           rel="noopener noreferrer"
         />
         <HDSFooter.Item
@@ -42,6 +53,7 @@ const Footer = (): JSX.Element => {
           }`}
           label={t(`footer:Navigation.feedbackLabel`)}
           target="_blank"
+          icon={<IconLinkExternal size="s" aria-hidden />}
           rel="noopener noreferrer"
         />
       </HDSFooter.Navigation>
@@ -53,12 +65,14 @@ const Footer = (): JSX.Element => {
           href={`${locale}/terms/privacy`}
           label={t(`footer:Base.Item.privacyStatement`)}
           target="_blank"
+          icon={<IconLinkExternal size="xs" aria-hidden />}
           rel="noopener noreferrer"
         />
         <HDSFooter.Item
           href={`${locale}/terms/accessibility`}
           label={t(`footer:Base.Item.accessibilityStatement`)}
           target="_blank"
+          icon={<IconLinkExternal size="xs" aria-hidden />}
           rel="noopener noreferrer"
         />
       </HDSFooter.Base>
