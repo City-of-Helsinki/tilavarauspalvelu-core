@@ -1,7 +1,5 @@
 from typing import Any
 
-import helusers.views
-from django.conf import settings
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from helsinki_gdpr.views import DryRunSerializer, GDPRAPIView
@@ -11,18 +9,6 @@ from rest_framework.response import Response
 
 from users.anonymisation import anonymize_user_data, can_user_be_anonymized
 from users.models import ProfileUser
-
-
-class TVPLoginView(helusers.views.LoginView):
-    pass
-
-
-class TVPLogoutView(helusers.views.LogoutView):
-    success_url_allowed_hosts = settings.SOCIAL_AUTH_TUNNISTAMO_ALLOWED_REDIRECT_HOSTS
-
-
-class TVPLogoutCompleteView(helusers.views.LogoutCompleteView):
-    success_url_allowed_hosts = settings.SOCIAL_AUTH_TUNNISTAMO_ALLOWED_REDIRECT_HOSTS
 
 
 class AnonymizationNotAllowedError(Exception):
