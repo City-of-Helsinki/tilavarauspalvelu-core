@@ -48,7 +48,6 @@ import {
   ReservationCreateMutationInput,
   ReservationCreateMutationPayload,
   ReservationsReservationStateChoices,
-  ReservationsReservationTypeChoices,
   ReservationType,
   ReservationUnitByPkType,
   ReservationUnitByPkTypeOpeningHoursArgs,
@@ -58,7 +57,6 @@ import {
   TermsOfUseTermsOfUseTermsTypeChoices,
   TermsOfUseType,
 } from "common/types/gql-types";
-
 import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
 import Head from "../../components/reservation-unit/Head";
 import Address from "../../components/reservation-unit/Address";
@@ -446,9 +444,6 @@ const ReservationUnit = ({
 
   const now = useMemo(() => new Date().toISOString(), []);
 
-  const [userReservations, setUserReservations] = useState<
-    ReservationType[] | null
-  >(null);
   const [focusDate, setFocusDate] = useState(new Date());
   const [calendarViewType, setCalendarViewType] = useState<WeekOptions>("week");
   const [initialReservation, setInitialReservation] =
@@ -495,6 +490,8 @@ const ReservationUnit = ({
 
   const { currentUser } = useCurrentUser();
 
+  // TODO add pagination
+  // TODO also combine with other instances of LIST_RESERVATIONS
   const { data: userReservationsData } = useQuery<Query, QueryReservationsArgs>(
     LIST_RESERVATIONS,
     {
@@ -505,21 +502,15 @@ const ReservationUnit = ({
         user: currentUser?.pk?.toString(),
         reservationUnit: [reservationUnit?.pk?.toString() ?? ""],
         state: allowedReservationStates,
-        reservationType: ["NORMAL"],
+        // valid values: "normal", "behalf", "staff", "blocked"
+        reservationType: ["normal"],
       },
     }
   );
 
-  useEffect(() => {
-    const reservations = filterNonNullable(
-      userReservationsData?.reservations?.edges?.map((e) => e?.node)
-    ).filter(
-      (n) =>
-        allowedReservationStates.find((s) => s === n.state) != null &&
-        n.type === ReservationsReservationTypeChoices.Normal
-    );
-    setUserReservations(reservations || []);
-  }, [userReservationsData]);
+  const userReservations = filterNonNullable(
+    userReservationsData?.reservations?.edges?.map((e) => e?.node)
+  );
 
   const slotPropGetter = useMemo(() => {
     const openingHours = filterNonNullable(

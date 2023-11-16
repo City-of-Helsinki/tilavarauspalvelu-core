@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { isAfter } from "date-fns";
 import { useQuery } from "@apollo/client";
 import { Tabs, TabList, Tab, TabPanel } from "hds-react";
 import styled from "styled-components";
@@ -10,13 +9,13 @@ import { useRouter } from "next/router";
 import { fontMedium } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
-  Query,
-  QueryReservationsArgs,
+  type Query,
+  type QueryReservationsArgs,
   ReservationsReservationStateChoices,
   ReservationsReservationTypeChoices,
-  ReservationType,
 } from "common/types/gql-types";
 import { Container } from "common";
+import { filterNonNullable } from "common/src/helpers";
 import { useSession } from "@/hooks/auth";
 import { Toast } from "@/styles/util";
 import { LIST_RESERVATIONS } from "@/modules/queries/reservation";
@@ -88,76 +87,47 @@ const Reservations = (): JSX.Element | null => {
   const { isAuthenticated, user: currentUser } = useSession();
   const { error: routerError } = router.query;
 
-  const [upcomingReservations, setUpcomingReservations] = useState<
-    ReservationType[]
-  >([]);
-  const [pastReservations, setPastReservations] = useState<ReservationType[]>(
-    []
-  );
-  const [cancelledReservations, setCancelledReservations] = useState<
-    ReservationType[]
-  >([]);
-  const [isLoadingReservations, setIsLoadingReservations] =
-    useState<boolean>(true);
+  const [tab, setTab] = useState<"upcoming" | "past" | "cancelled">("upcoming");
 
-  const { data: reservationData, error: reservationError } = useQuery<
-    Query,
-    QueryReservationsArgs
-  >(LIST_RESERVATIONS, {
+  const today = useMemo(() => new Date(), []);
+  // TODO add pagination
+  // TODO also combine with other instances of LIST_RESERVATIONS
+  // TODO also should do cache invalidation if the user makes a reservation
+  const {
+    data,
+    loading: isLoading,
+    error,
+  } = useQuery<Query, QueryReservationsArgs>(LIST_RESERVATIONS, {
     skip: !currentUser?.pk,
     variables: {
-      state: [
-        ReservationsReservationStateChoices.Confirmed,
-        ReservationsReservationStateChoices.RequiresHandling,
-        ReservationsReservationStateChoices.Cancelled,
-        ReservationsReservationStateChoices.WaitingForPayment,
-        ReservationsReservationStateChoices.Denied,
-      ],
+      state:
+        tab === "cancelled"
+          ? [ReservationsReservationStateChoices.Cancelled]
+          : [
+              ReservationsReservationStateChoices.Confirmed,
+              ReservationsReservationStateChoices.RequiresHandling,
+              ReservationsReservationStateChoices.WaitingForPayment,
+              ReservationsReservationStateChoices.Denied,
+            ],
       orderBy: "-begin",
       user: currentUser?.pk?.toString(),
+      // valid values: "normal", "behalf", "staff", "blocked"
+      reservationType: [
+        ReservationsReservationTypeChoices.Normal.toLowerCase(),
+      ],
+      begin: tab === "upcoming" ? today.toISOString() : undefined,
+      end: tab === "past" ? today.toISOString() : undefined,
     },
-    fetchPolicy: "no-cache",
   });
-
-  useEffect(() => {
-    const reservations =
-      reservationData?.reservations?.edges
-        ?.map((edge) => edge?.node)
-        .filter(
-          (reservation): reservation is ReservationType =>
-            !!reservation &&
-            reservation.type === ReservationsReservationTypeChoices.Normal
-        )
-        .reduce(
-          (acc, reservation) => {
-            if (
-              reservation.state ===
-              ReservationsReservationStateChoices.Cancelled
-            ) {
-              acc[2].push(reservation);
-            } else if (isAfter(new Date(reservation?.begin), new Date())) {
-              acc[0].push(reservation);
-            } else {
-              acc[1].push(reservation);
-            }
-            return acc;
-          },
-          [[], [], []] as ReservationType[][]
-        ) ?? [];
-    if (reservations?.length > 0) {
-      setUpcomingReservations([...reservations[0]].reverse());
-      setPastReservations(reservations[1]);
-      setCancelledReservations(reservations[2]);
-    }
-    if (reservationData?.reservations?.edges) {
-      setIsLoadingReservations(false);
-    }
-  }, [reservationData]);
 
   // NOTE should never happen since we do an SSR redirect
   if (!isAuthenticated) {
     return <div>{t("common:error.notAuthenticated")}</div>;
   }
+
+  const reservations = filterNonNullable(
+    data?.reservations?.edges?.map((edge) => edge?.node)
+  );
 
   return (
     <>
@@ -166,63 +136,70 @@ const Reservations = (): JSX.Element | null => {
         <Heading>
           <Tabs>
             <StyledTabList>
-              <StyledTab>{t("reservations:upcomingReservations")}</StyledTab>
-              <StyledTab>{t("reservations:pastReservations")}</StyledTab>
-              <StyledTab>{t("reservations:cancelledReservations")}</StyledTab>
+              <StyledTab onClick={() => setTab("upcoming")}>
+                {t("reservations:upcomingReservations")}
+              </StyledTab>
+              <StyledTab onClick={() => setTab("past")}>
+                {t("reservations:pastReservations")}
+              </StyledTab>
+              <StyledTab onClick={() => setTab("cancelled")}>
+                {t("reservations:cancelledReservations")}
+              </StyledTab>
             </StyledTabList>
             <StyledTabPanel>
-              {reservationError
-                ? null
-                : isLoadingReservations && <CenterSpinner />}
-              {upcomingReservations.length > 0
-                ? upcomingReservations?.map((reservation) => (
-                    <ReservationCard
-                      key={reservation.pk}
-                      reservation={reservation}
-                      type="upcoming"
-                    />
-                  ))
-                : !isLoadingReservations && (
-                    <EmptyMessage>
-                      {t("reservations:noUpcomingReservations")}
-                    </EmptyMessage>
-                  )}
+              {isLoading ? (
+                <CenterSpinner />
+              ) : reservations.length === 0 ? (
+                <EmptyMessage>
+                  {t("reservations:noUpcomingReservations")}
+                </EmptyMessage>
+              ) : (
+                reservations?.map((reservation) => (
+                  <ReservationCard
+                    key={reservation.pk}
+                    reservation={reservation}
+                    type="upcoming"
+                  />
+                ))
+              )}
             </StyledTabPanel>
             <StyledTabPanel>
-              {isLoadingReservations && <CenterSpinner />}
-              {pastReservations.length > 0
-                ? pastReservations?.map((reservation) => (
-                    <ReservationCard
-                      key={reservation.pk}
-                      reservation={reservation}
-                      type="past"
-                    />
-                  ))
-                : !isLoadingReservations && (
-                    <EmptyMessage>
-                      {t("reservations:noPastReservations")}
-                    </EmptyMessage>
-                  )}
+              {isLoading ? (
+                <CenterSpinner />
+              ) : reservations.length === 0 ? (
+                <EmptyMessage>
+                  {t("reservations:noPastReservations")}
+                </EmptyMessage>
+              ) : (
+                reservations?.map((reservation) => (
+                  <ReservationCard
+                    key={reservation.pk}
+                    reservation={reservation}
+                    type="past"
+                  />
+                ))
+              )}
             </StyledTabPanel>
             <StyledTabPanel>
-              {isLoadingReservations && <CenterSpinner />}
-              {cancelledReservations.length > 0
-                ? cancelledReservations?.map((reservation) => (
-                    <ReservationCard
-                      key={reservation.pk}
-                      reservation={reservation}
-                      type="cancelled"
-                    />
-                  ))
-                : !isLoadingReservations && (
-                    <EmptyMessage>
-                      {t("reservations:noCancelledReservations")}
-                    </EmptyMessage>
-                  )}
+              {isLoading ? (
+                <CenterSpinner />
+              ) : reservations.length === 0 ? (
+                <EmptyMessage>
+                  {t("reservations:noCancelledReservations")}
+                </EmptyMessage>
+              ) : (
+                reservations?.map((reservation) => (
+                  <ReservationCard
+                    key={reservation.pk}
+                    reservation={reservation}
+                    type="cancelled"
+                  />
+                ))
+              )}
             </StyledTabPanel>
           </Tabs>
         </Heading>
-        {reservationError && (
+        {error && (
           <Toast
             type="error"
             label={t("common:error.error")}
