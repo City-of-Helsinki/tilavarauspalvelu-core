@@ -4,11 +4,12 @@ from uuid import UUID, uuid4
 from django.contrib.auth import get_user_model
 from django.core.validators import validate_comma_separated_integer_list
 from django.db import models
-from django.db.models import F, Sum
+from django.db.models import F, Manager, Sum
 from django.utils import timezone
 from django.utils.timezone import get_current_timezone
 from django.utils.translation import gettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
+from helsinki_gdpr.models import SerializableMixin
 
 from applications.choices import PriorityChoice
 from applications.models import ApplicationRound, City
@@ -195,7 +196,37 @@ class ReservationQuerySet(models.QuerySet):
         )
 
 
-class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
+class ReservationManager(SerializableMixin.SerializableManager, Manager.from_queryset(ReservationQuerySet)):
+    """Contains custom queryset methods and GDPR serialization."""
+
+
+class Reservation(ExportModelOperationsMixin("reservation"), SerializableMixin, models.Model):
+    # For GDPR API
+    serialize_fields = (
+        {"name": "name"},
+        {"name": "description"},
+        {"name": "begin"},
+        {"name": "end"},
+        {"name": "reservee_first_name"},
+        {"name": "reservee_last_name"},
+        {"name": "reservee_email"},
+        {"name": "reservee_phone"},
+        {"name": "reservee_address_zip"},
+        {"name": "reservee_address_city"},
+        {"name": "reservee_address_street"},
+        {"name": "billing_first_name"},
+        {"name": "billing_last_name"},
+        {"name": "billing_email"},
+        {"name": "billing_phone"},
+        {"name": "billing_address_zip"},
+        {"name": "billing_address_city"},
+        {"name": "billing_address_street"},
+        {"name": "reservee_id"},
+        {"name": "reservee_organisation_name"},
+        {"name": "free_of_charge_reason"},
+        {"name": "cancel_details"},
+    )
+
     reservee_type = models.CharField(
         max_length=50,
         choices=CustomerTypeChoice.choices,
@@ -319,9 +350,10 @@ class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
 
     user = models.ForeignKey(
         User,
+        null=True,
         verbose_name=_("User"),
         on_delete=models.SET_NULL,
-        null=True,
+        related_name="reservations",
     )
     begin = models.DateTimeField(verbose_name=_("Begin time"))
     end = models.DateTimeField(verbose_name=_("End time"))
@@ -445,7 +477,7 @@ class Reservation(ExportModelOperationsMixin("reservation"), models.Model):
         help_text="Type of reservation",
     )
 
-    objects = ReservationQuerySet.as_manager()
+    objects = ReservationManager()
 
     class Meta:
         base_manager_name = "objects"

@@ -3,7 +3,9 @@ from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
 from django.db import models
+from django.db.models import Manager
 from django.utils.functional import classproperty
+from helsinki_gdpr.models import SerializableMixin
 
 from applications.choices import ApplicationEventStatusChoice
 from applications.querysets.application_event import ApplicationEventQuerySet
@@ -17,7 +19,19 @@ __all__ = [
 ]
 
 
-class ApplicationEvent(models.Model):
+class ApplicationEventManager(SerializableMixin.SerializableManager, Manager.from_queryset(ApplicationEventQuerySet)):
+    """Contains custom queryset methods and GDPR serialization."""
+
+
+class ApplicationEvent(SerializableMixin, models.Model):
+    # For GDPR API
+    serialize_fields = (
+        {"name": "name"},
+        {"name": "name_fi"},
+        {"name": "name_en"},
+        {"name": "name_sv"},
+    )
+
     name: str = models.CharField(max_length=100, null=False, blank=True)
     uuid: UUID = models.UUIDField(default=uuid4, null=False, editable=False, unique=True)
     num_persons: int | None = models.PositiveIntegerField(null=True, blank=True)
@@ -61,7 +75,7 @@ class ApplicationEvent(models.Model):
         related_name="application_events",
     )
 
-    objects = ApplicationEventQuerySet.as_manager()
+    objects = ApplicationEventManager()
     actions = ApplicationEventActionsConnector()
 
     # Translated field hints
