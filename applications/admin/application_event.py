@@ -36,7 +36,8 @@ class ApplicationEventAdmin(TranslationAdmin):
     ]
     search_fields = [
         "name",
-        "application__name",
+        "application__user__first_name",
+        "application__user__last_name",
     ]
 
     inlines = [ApplicationEventScheduleInline]

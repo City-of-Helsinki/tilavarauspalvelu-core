@@ -121,7 +121,7 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
     @classmethod
     def create_in_status_handled(cls, **kwargs: Any) -> Application:
         """
-        Create a handled application with a single reserved application event
+        Create a handled application with a single approved application event
         in an application round in the handled stage.
         """
         from .application_event import ApplicationEventFactory
@@ -141,7 +141,7 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
 
         if event_key not in kwargs:
             event_kwargs["application"] = application
-            ApplicationEventFactory.create_in_status_reserved(**event_kwargs)
+            ApplicationEventFactory.create_in_status_approved(**event_kwargs)
 
         return application
 
