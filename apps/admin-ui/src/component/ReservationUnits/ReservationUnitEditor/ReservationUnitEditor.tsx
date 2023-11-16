@@ -59,7 +59,8 @@ import {
   HorisontalFlex,
   Span12,
   Span6,
-  Span4 as DefaultSpan4,
+  AutoGrid,
+  FullRow,
 } from "@/styles/layout";
 import Loader from "@/component/Loader";
 import { useNotification } from "@/context/NotificationContext";
@@ -110,12 +111,6 @@ const ButtonsContainer = styled.div`
   flex-direction: column;
   @media (width > ${breakpoints.s}) {
     flex-direction: row;
-  }
-`;
-
-const Span4 = styled(DefaultSpan4)`
-  label {
-    white-space: nowrap;
   }
 `;
 
@@ -315,16 +310,17 @@ const makeTermsOptions = (
 };
 
 const FieldGroupWrapper = styled.div`
-  display: flex;
+  display: grid;
   gap: var(--spacing-m);
-  flex-direction: row;
+  grid-template-columns: 1fr 32px;
   justify-content: space-between;
-  width: 100%;
 `;
 
-const FieldGroupHeading = styled.div`
+// NOTE using span for easier css selectors
+const FieldGroupHeading = styled.span`
   padding-bottom: var(--spacing-xs);
   ${fontBold}
+  display: block;
 `;
 
 const FieldGroup = ({
@@ -332,22 +328,41 @@ const FieldGroup = ({
   id,
   heading,
   tooltip = "",
+  className,
+  style,
 }: {
   heading: string;
   tooltip?: string;
   id?: string;
   children?: React.ReactNode;
+  className?: string;
+  style?: React.CSSProperties;
 }): JSX.Element => (
-  <FieldGroupWrapper>
-    {/* TODO why? span > div */}
-    <span>
+  <FieldGroupWrapper className={className} style={style}>
+    <div>
       <FieldGroupHeading>{heading}</FieldGroupHeading>
       {id ? <span id={id} /> : null}
-      {children}
-    </span>
+      <div className="ReservationUnitEditor__FieldGroup-children">
+        {children}
+      </div>
+    </div>
     <Tooltip>{tooltip}</Tooltip>
   </FieldGroupWrapper>
 );
+
+const RadioFieldGroup = styled(FieldGroup)`
+  grid-column: 1 / -1;
+
+  & .ReservationUnitEditor__FieldGroup-children {
+    grid-template-columns: 1fr;
+    display: grid;
+    gap: 1rem;
+    align-items: center;
+    @media (width > ${breakpoints.s}) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+`;
 
 function DiscardChangesDialog({
   onClose,
@@ -551,47 +566,40 @@ function BasicSection({
       initiallyOpen
       heading={t("ReservationUnitEditor.basicInformation")}
     >
-      <Grid>
-        <Span12>
-          <FieldGroup
-            id="reservationKind"
-            heading={t("ReservationUnitEditor.label.reservationKind")}
-            tooltip={t("ReservationUnitEditor.tooltip.reservationKind")}
-          >
-            {errors.reservationKind?.message != null && (
-              <div>
-                <IconAlertCircleFill />
-                <span>{errors.reservationKind.message}</span>
-              </div>
-            )}
-            <Grid>
-              {(["DIRECT_AND_SEASON", "DIRECT", "SEASON"] as const).map(
-                (kind) => (
-                  <Span4 key={kind}>
-                    <Controller
-                      control={control}
-                      name="reservationKind"
-                      render={({ field }) => (
-                        <RadioButton
-                          {...field}
-                          id={`reservationKind.${kind}`}
-                          name="reservationKind"
-                          label={t(
-                            `ReservationUnitEditor.label.reservationKinds.${kind}`
-                          )}
-                          onChange={() => field.onChange(kind)}
-                          checked={field.value === kind}
-                        />
-                      )}
-                    />
-                  </Span4>
-                )
+      <AutoGrid>
+        <RadioFieldGroup
+          id="reservationKind"
+          heading={t("ReservationUnitEditor.label.reservationKind")}
+          tooltip={t("ReservationUnitEditor.tooltip.reservationKind")}
+        >
+          {errors.reservationKind?.message != null && (
+            <FullRow>
+              <IconAlertCircleFill />
+              <span>{errors.reservationKind.message}</span>
+            </FullRow>
+          )}
+          {(["DIRECT_AND_SEASON", "DIRECT", "SEASON"] as const).map((kind) => (
+            <Controller
+              control={control}
+              name="reservationKind"
+              render={({ field }) => (
+                <RadioButton
+                  {...field}
+                  id={`reservationKind.${kind}`}
+                  name="reservationKind"
+                  style={{ margin: 0 }}
+                  label={t(
+                    `ReservationUnitEditor.label.reservationKinds.${kind}`
+                  )}
+                  onChange={() => field.onChange(kind)}
+                  checked={field.value === kind}
+                />
               )}
-            </Grid>
-          </FieldGroup>
-        </Span12>
+            />
+          ))}
+        </RadioFieldGroup>
         {(["nameFi", "nameEn", "nameSv"] as const).map((fieldName) => (
-          <Span12 key={fieldName}>
+          <FullRow key={fieldName}>
             <TextInput
               {...register(fieldName, { required: true })}
               required
@@ -601,118 +609,109 @@ function BasicSection({
               invalid={errors[fieldName]?.message != null}
               // tooltipText={ lang === "fi" ? t("ReservationUnitEditor.tooltip.nameFi") : undefined }
             />
-          </Span12>
+          </FullRow>
         ))}
-        <Span6>
-          <Controller
-            control={control}
-            name="spacePks"
-            render={({ field: { value, onChange } }) => (
-              // @ts-ignore -- fuck HDS
-              <Select<{ label: string; value: number }>
-                id="spacePks"
-                multiselect
-                required
-                label={t("ReservationUnitEditor.label.spacePks")}
-                placeholder={t("ReservationUnitEditor.spacesPlaceholder")}
-                options={spaceOptions}
-                disabled={spaceOptions.length === 0}
-                onChange={(x) =>
-                  onChange(
-                    x.map((y: { value: number; label: string }) => y.value)
-                  )
-                }
-                value={spaceOptions.filter((x) => value.includes(x.value))}
-                error={errors.spacePks?.message}
-                invalid={errors.spacePks?.message != null}
-                tooltipText={t("ReservationUnitEditor.tooltip.spacePks")}
-              />
-            )}
-          />
-        </Span6>
-        <Span6>
-          <Controller
-            control={control}
-            name="resourcePks"
-            render={({ field: { value, onChange } }) => (
-              // @ts-ignore -- fuck HDS
-              <Select<{ label: string; value: number }>
-                id="resourcePks"
-                multiselect
-                label={t("ReservationUnitEditor.label.resourcePks")}
-                placeholder={t("ReservationUnitEditor.resourcesPlaceholder")}
-                options={resourceOptions}
-                disabled={resourceOptions.length === 0}
-                onChange={(x) =>
-                  onChange(
-                    x.map((y: { value: number; label: string }) => y.value)
-                  )
-                }
-                value={resourceOptions.filter((x) => value.includes(x.value))}
-                error={errors.resourcePks?.message}
-                invalid={errors.resourcePks?.message != null}
-                tooltipText={t("ReservationUnitEditor.tooltip.resourcePks")}
-              />
-            )}
-          />
-        </Span6>
-        <Span4>
-          <NumberInput
-            {...register("surfaceArea", {
-              required: true,
-              valueAsNumber: true,
-            })}
-            // value={Math.ceil(state.reservationUnitEdit.surfaceArea || 0)}
-            id="surfaceArea"
-            label={t("ReservationUnitEditor.label.surfaceArea")}
-            helperText={t("ReservationUnitEditor.surfaceAreaHelperText")}
-            minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
-            plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
-            step={1}
-            type="number"
-            min={minSurfaceArea}
-            max={undefined}
-            required
-            errorText={errors.surfaceArea?.message}
-            invalid={errors.surfaceArea?.message != null}
-            tooltipText={t("ReservationUnitEditor.tooltip.surfaceArea")}
-          />
-        </Span4>
-        <Span4>
-          <NumberInput
-            {...register("maxPersons", { required: true, valueAsNumber: true })}
-            id="maxPersons"
-            label={t("ReservationUnitEditor.label.maxPersons")}
-            minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
-            plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
-            step={1}
-            type="number"
-            min={1}
-            max={maxPersons}
-            helperText={t("ReservationUnitEditor.maxPersonsHelperText")}
-            errorText={errors.maxPersons?.message}
-            invalid={errors.maxPersons?.message != null}
-            required
-            tooltipText={t("ReservationUnitEditor.tooltip.maxPersons")}
-          />
-        </Span4>
-        <Span4>
-          <NumberInput
-            {...register("minPersons", { required: true, valueAsNumber: true })}
-            id="minPersons"
-            label={t("ReservationUnitEditor.label.minPersons")}
-            minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
-            plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
-            step={1}
-            type="number"
-            min={0}
-            max={watch("maxPersons") || 1}
-            errorText={errors.minPersons?.message}
-            invalid={errors.minPersons?.message != null}
-            tooltipText={t("ReservationUnitEditor.tooltip.minPersons")}
-          />
-        </Span4>
-      </Grid>
+        <Controller
+          control={control}
+          name="spacePks"
+          render={({ field: { value, onChange } }) => (
+            // @ts-ignore -- fuck HDS
+            <Select<{ label: string; value: number }>
+              id="spacePks"
+              multiselect
+              required
+              style={{ gridColumn: "1 / span 2" }}
+              label={t("ReservationUnitEditor.label.spacePks")}
+              placeholder={t("ReservationUnitEditor.spacesPlaceholder")}
+              options={spaceOptions}
+              disabled={spaceOptions.length === 0}
+              onChange={(x) =>
+                onChange(
+                  x.map((y: { value: number; label: string }) => y.value)
+                )
+              }
+              value={spaceOptions.filter((x) => value.includes(x.value))}
+              error={errors.spacePks?.message}
+              invalid={errors.spacePks?.message != null}
+              tooltipText={t("ReservationUnitEditor.tooltip.spacePks")}
+            />
+          )}
+        />
+        <Controller
+          control={control}
+          name="resourcePks"
+          render={({ field: { value, onChange } }) => (
+            // @ts-ignore -- fuck HDS
+            <Select<{ label: string; value: number }>
+              id="resourcePks"
+              multiselect
+              style={{ gridColumn: "span 2" }}
+              label={t("ReservationUnitEditor.label.resourcePks")}
+              placeholder={t("ReservationUnitEditor.resourcesPlaceholder")}
+              options={resourceOptions}
+              disabled={resourceOptions.length === 0}
+              onChange={(x) =>
+                onChange(
+                  x.map((y: { value: number; label: string }) => y.value)
+                )
+              }
+              value={resourceOptions.filter((x) => value.includes(x.value))}
+              error={errors.resourcePks?.message}
+              invalid={errors.resourcePks?.message != null}
+              tooltipText={t("ReservationUnitEditor.tooltip.resourcePks")}
+            />
+          )}
+        />
+        <NumberInput
+          {...register("surfaceArea", {
+            required: true,
+            valueAsNumber: true,
+          })}
+          id="surfaceArea"
+          label={t("ReservationUnitEditor.label.surfaceArea")}
+          helperText={t("ReservationUnitEditor.surfaceAreaHelperText")}
+          minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
+          plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
+          step={1}
+          type="number"
+          min={minSurfaceArea}
+          max={undefined}
+          required
+          errorText={errors.surfaceArea?.message}
+          invalid={errors.surfaceArea?.message != null}
+          tooltipText={t("ReservationUnitEditor.tooltip.surfaceArea")}
+        />
+        <NumberInput
+          {...register("maxPersons", { required: true, valueAsNumber: true })}
+          id="maxPersons"
+          label={t("ReservationUnitEditor.label.maxPersons")}
+          minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
+          plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
+          step={1}
+          type="number"
+          min={1}
+          max={maxPersons}
+          helperText={t("ReservationUnitEditor.maxPersonsHelperText")}
+          errorText={errors.maxPersons?.message}
+          invalid={errors.maxPersons?.message != null}
+          required
+          tooltipText={t("ReservationUnitEditor.tooltip.maxPersons")}
+        />
+        <NumberInput
+          {...register("minPersons", { required: true, valueAsNumber: true })}
+          id="minPersons"
+          label={t("ReservationUnitEditor.label.minPersons")}
+          minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
+          plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
+          step={1}
+          type="number"
+          min={0}
+          max={watch("maxPersons") || 1}
+          errorText={errors.minPersons?.message}
+          invalid={errors.minPersons?.message != null}
+          tooltipText={t("ReservationUnitEditor.tooltip.minPersons")}
+        />
+      </AutoGrid>
     </Accordion>
   );
 }
@@ -1581,27 +1580,20 @@ function CommunicationSection({
 }
 
 function OpeningHoursSection({
-  form,
   reservationUnit,
 }: {
-  form: UseFormReturn<ReservationUnitEditFormValues>;
   // TODO can we simplify this by passing the hauki url only?
   reservationUnit: ReservationUnitByPkType | undefined;
 }) {
   const { t } = useTranslation();
-  const { formState } = form;
-  const { errors } = formState;
 
   // TODO refactor this to inner wrapper (so we don't have a ternary in the middle)
   return (
-    <Accordion
-      initiallyOpen={Object.keys(errors).length > 0}
-      heading={t("ReservationUnitEditor.openingHours")}
-    >
+    <Accordion heading={t("ReservationUnitEditor.openingHours")}>
       {reservationUnit?.haukiUrl?.url ? (
         <>
           <p>{t("ReservationUnitEditor.openingHoursHelperTextHasLink")}</p>
-          <HorisontalFlex
+          <AutoGrid
             style={{
               fontSize: "var(--fontsize-body-s)",
             }}
@@ -1635,7 +1627,7 @@ function OpeningHoursSection({
             >
               {t("ReservationUnitEditor.previewCalendarLink")}
             </Button>
-          </HorisontalFlex>
+          </AutoGrid>
         </>
       ) : (
         <p>{t("ReservationUnitEditor.openingHoursHelperTextNoLink")}</p>
@@ -2166,7 +2158,7 @@ const ReservationUnitEditor = ({
           />
         )}
         <CommunicationSection form={form} />
-        <OpeningHoursSection form={form} reservationUnit={reservationUnit} />
+        <OpeningHoursSection reservationUnit={reservationUnit} />
         <div>
           <ArchiveButton
             onClick={handleArchiveButtonClick}

@@ -1,19 +1,10 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { Button as HDSButton, FileInput } from "hds-react";
+import { Button, FileInput } from "hds-react";
 import { ReservationUnitsReservationUnitImageImageTypeChoices } from "common/types/gql-types";
+import { AutoGrid } from "app/styles/layout";
 import { Image } from "./types";
-
-const Wrapper = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: var(--spacing-l);
-`;
-
-const Button = styled(HDSButton)`
-  float: right;
-`;
 
 const Actions = styled.div`
   display: flex;
@@ -44,7 +35,7 @@ function RUImage({ image }: { image: Image }): JSX.Element {
   return <StyledImage src={imageUrl} />;
 }
 
-let fakepk = -1;
+let fakePk = -1;
 
 const FileInputContainer = styled.div`
   div:nth-of-type(3) {
@@ -137,11 +128,13 @@ export function ImageEditor({ images, setImages }: Props): JSX.Element {
         ? ReservationUnitsReservationUnitImageImageTypeChoices.Main
         : ReservationUnitsReservationUnitImageImageTypeChoices.Other;
 
-    setImages(
-      [{ pk: (fakepk -= 1), imageType, bytes: files[0] } as Image].concat(
-        images
-      )
-    );
+    const newImage: Image = {
+      pk: fakePk,
+      imageType,
+      bytes: files[0],
+    };
+    fakePk -= 1;
+    setImages([newImage].concat(images));
   };
 
   const deleteImage = (pk: number) => {
@@ -170,7 +163,7 @@ export function ImageEditor({ images, setImages }: Props): JSX.Element {
   };
 
   return (
-    <Wrapper>
+    <AutoGrid>
       <div>
         <FileInputContainer>
           <FileInput
@@ -197,6 +190,6 @@ export function ImageEditor({ images, setImages }: Props): JSX.Element {
             image={image}
           />
         ))}
-    </Wrapper>
+    </AutoGrid>
   );
 }
