@@ -1,6 +1,8 @@
 from datetime import datetime
 
 from django.db import models
+from django.db.models.manager import Manager
+from helsinki_gdpr.models import SerializableMixin
 
 from applications.choices import ApplicantTypeChoice, ApplicationRoundStatusChoice, ApplicationStatusChoice
 from applications.querysets.application import ApplicationQuerySet
@@ -15,7 +17,20 @@ __all__ = [
 ]
 
 
-class Application(models.Model):
+class ApplicationManager(SerializableMixin.SerializableManager, Manager.from_queryset(ApplicationQuerySet)):
+    """Contains custom queryset methods and GDPR serialization."""
+
+
+class Application(SerializableMixin, models.Model):
+    # For GDPR API
+    serialize_fields = (
+        {"name": "additional_information"},
+        {"name": "application_events"},
+        {"name": "contact_person"},
+        {"name": "organisation"},
+        {"name": "billing_address"},
+    )
+
     applicant_type: str = StrChoiceField(enum=ApplicantTypeChoice, null=True, db_index=True)
     created_date: datetime = models.DateTimeField(auto_now_add=True)
     last_modified_date: datetime = models.DateTimeField(auto_now=True)
@@ -66,7 +81,7 @@ class Application(models.Model):
         related_name="applications",
     )
 
-    objects = ApplicationQuerySet.as_manager()
+    objects = ApplicationManager()
     actions = ApplicationActionsConnector()
 
     class Meta:

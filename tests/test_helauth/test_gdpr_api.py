@@ -6,11 +6,13 @@ from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from django.utils import timezone
 
-from applications.models import ApplicationEvent
+from applications.models import Application, ApplicationEvent
 from merchants.models import OrderStatus
 from reservations.choices import ReservationStateChoice
+from reservations.models import Reservation
 from tests.factories import ApplicationFactory, PaymentOrderFactory, ReservationFactory, UserFactory
 from tests.test_helauth.helpers import get_gdpr_auth_header, patch_oidc_config
+from users.models import User
 
 # Applied to all tests
 pytestmark = [
@@ -47,22 +49,22 @@ def test_query_user_data__simple(api_client, settings):
                 "value": user.date_of_birth,
             },
             {
-                "key": "USER_RESERVATIONS",
-                "value": [],
+                "key": "RESERVATIONS",
+                "children": [],
             },
             {
-                "key": "USER_APPLICATIONS",
-                "value": [],
+                "key": "APPLICATIONS",
+                "children": [],
             },
         ],
     }
 
 
 def test_query_user_data__full(api_client, settings):
-    user = UserFactory.create()
-    application = ApplicationFactory.create_in_status_in_allocation(user=user)
+    user: User = UserFactory.create()
+    application: Application = ApplicationFactory.create_in_status_in_allocation(user=user)
     event: ApplicationEvent = application.application_events.first()
-    reservation = ReservationFactory.create(user=user)
+    reservation: Reservation = ReservationFactory.create(user=user)
 
     settings.GDPR_API_QUERY_SCOPE = "testprefix.gdprquery"
     auth_header = get_gdpr_auth_header(user, [settings.GDPR_API_QUERY_SCOPE])
@@ -89,93 +91,277 @@ def test_query_user_data__full(api_client, settings):
                 "value": user.date_of_birth,
             },
             {
-                "key": "USER_RESERVATIONS",
-                "value": [
-                    [
-                        reservation.name,
-                        reservation.description,
-                        reservation.begin,
-                        reservation.end,
-                        reservation.reservee_first_name,
-                        reservation.reservee_last_name,
-                        reservation.reservee_email,
-                        reservation.reservee_phone,
-                        reservation.reservee_address_zip,
-                        reservation.reservee_address_city,
-                        reservation.reservee_address_street,
-                        reservation.billing_first_name,
-                        reservation.billing_last_name,
-                        reservation.billing_email,
-                        reservation.billing_phone,
-                        reservation.billing_address_zip,
-                        reservation.billing_address_city,
-                        reservation.billing_address_street,
-                        reservation.reservee_id,
-                        reservation.reservee_organisation_name,
-                        reservation.free_of_charge_reason,
-                        reservation.cancel_details,
-                    ]
+                "key": "RESERVATIONS",
+                "children": [
+                    {
+                        "key": "RESERVATION",
+                        "children": [
+                            {
+                                "key": "NAME",
+                                "value": reservation.name,
+                            },
+                            {
+                                "key": "DESCRIPTION",
+                                "value": reservation.description,
+                            },
+                            {
+                                "key": "BEGIN",
+                                "value": reservation.begin,
+                            },
+                            {
+                                "key": "END",
+                                "value": reservation.end,
+                            },
+                            {
+                                "key": "RESERVEE_FIRST_NAME",
+                                "value": reservation.reservee_first_name,
+                            },
+                            {
+                                "key": "RESERVEE_LAST_NAME",
+                                "value": reservation.reservee_last_name,
+                            },
+                            {
+                                "key": "RESERVEE_EMAIL",
+                                "value": reservation.reservee_email,
+                            },
+                            {
+                                "key": "RESERVEE_PHONE",
+                                "value": reservation.reservee_phone,
+                            },
+                            {
+                                "key": "RESERVEE_ADDRESS_ZIP",
+                                "value": reservation.reservee_address_zip,
+                            },
+                            {
+                                "key": "RESERVEE_ADDRESS_CITY",
+                                "value": reservation.reservee_address_city,
+                            },
+                            {
+                                "key": "RESERVEE_ADDRESS_STREET",
+                                "value": reservation.reservee_address_street,
+                            },
+                            {
+                                "key": "BILLING_FIRST_NAME",
+                                "value": reservation.billing_first_name,
+                            },
+                            {
+                                "key": "BILLING_LAST_NAME",
+                                "value": reservation.billing_last_name,
+                            },
+                            {
+                                "key": "BILLING_EMAIL",
+                                "value": reservation.billing_email,
+                            },
+                            {
+                                "key": "BILLING_PHONE",
+                                "value": reservation.billing_phone,
+                            },
+                            {
+                                "key": "BILLING_ADDRESS_ZIP",
+                                "value": reservation.billing_address_zip,
+                            },
+                            {
+                                "key": "BILLING_ADDRESS_CITY",
+                                "value": reservation.billing_address_city,
+                            },
+                            {
+                                "key": "BILLING_ADDRESS_STREET",
+                                "value": reservation.billing_address_street,
+                            },
+                            {
+                                "key": "RESERVEE_ID",
+                                "value": reservation.reservee_id,
+                            },
+                            {
+                                "key": "RESERVEE_ORGANISATION_NAME",
+                                "value": reservation.reservee_organisation_name,
+                            },
+                            {
+                                "key": "FREE_OF_CHARGE_REASON",
+                                "value": reservation.free_of_charge_reason,
+                            },
+                            {
+                                "key": "CANCEL_DETAILS",
+                                "value": reservation.cancel_details,
+                            },
+                        ],
+                    },
                 ],
             },
             {
-                "key": "USER_APPLICATIONS",
-                "value": [
-                    [
-                        application.additional_information,
-                        {
-                            "events": [
-                                event.name,
-                                event.name_fi,
-                                event.name_en,
-                                event.name_sv,
-                            ],
-                        },
-                        {
-                            "contact_person": [
-                                application.contact_person.first_name,
-                                application.contact_person.last_name,
-                                application.contact_person.email,
-                                application.contact_person.phone_number,
-                            ],
-                        },
-                        {
-                            "organisation": [
-                                application.organisation.name,
-                                application.organisation.identifier,
-                                application.organisation.email,
-                                application.organisation.core_business,
-                                application.organisation.core_business_fi,
-                                application.organisation.core_business_en,
-                                application.organisation.core_business_sv,
-                            ]
-                        },
-                        {
-                            "organisation_address": [
-                                application.organisation.address.post_code,
-                                application.organisation.address.street_address,
-                                application.organisation.address.street_address_fi,
-                                application.organisation.address.street_address_en,
-                                application.organisation.address.street_address_sv,
-                                application.organisation.address.city,
-                                application.organisation.address.city_fi,
-                                application.organisation.address.city_en,
-                                application.organisation.address.city_sv,
-                            ]
-                        },
-                        {
-                            "billing_address": [
-                                application.billing_address.post_code,
-                                application.billing_address.street_address,
-                                application.billing_address.street_address_fi,
-                                application.billing_address.street_address_en,
-                                application.billing_address.street_address_sv,
-                                application.billing_address.city,
-                                application.billing_address.city_fi,
-                                application.billing_address.city_en,
-                                application.billing_address.city_sv,
-                            ],
-                        },
-                    ]
+                "key": "APPLICATIONS",
+                "children": [
+                    {
+                        "key": "APPLICATION",
+                        "children": [
+                            {
+                                "key": "ADDITIONAL_INFORMATION",
+                                "value": application.additional_information,
+                            },
+                            {
+                                "key": "APPLICATION_EVENTS",
+                                "children": [
+                                    {
+                                        "key": "APPLICATIONEVENT",
+                                        "children": [
+                                            {
+                                                "key": "NAME",
+                                                "value": event.name,
+                                            },
+                                            {
+                                                "key": "NAME_FI",
+                                                "value": event.name_fi,
+                                            },
+                                            {
+                                                "key": "NAME_EN",
+                                                "value": event.name_en,
+                                            },
+                                            {
+                                                "key": "NAME_SV",
+                                                "value": event.name_sv,
+                                            },
+                                        ],
+                                    }
+                                ],
+                            },
+                            {
+                                "key": "PERSON",
+                                "children": [
+                                    {
+                                        "key": "FIRST_NAME",
+                                        "value": application.contact_person.first_name,
+                                    },
+                                    {
+                                        "key": "LAST_NAME",
+                                        "value": application.contact_person.last_name,
+                                    },
+                                    {
+                                        "key": "EMAIL",
+                                        "value": application.contact_person.email,
+                                    },
+                                    {
+                                        "key": "PHONE_NUMBER",
+                                        "value": application.contact_person.phone_number,
+                                    },
+                                ],
+                            },
+                            {
+                                "key": "ORGANISATION",
+                                "children": [
+                                    {
+                                        "key": "NAME",
+                                        "value": application.organisation.name,
+                                    },
+                                    {
+                                        "key": "IDENTIFIER",
+                                        "value": application.organisation.identifier,
+                                    },
+                                    {
+                                        "key": "EMAIL",
+                                        "value": application.organisation.email,
+                                    },
+                                    {
+                                        "key": "CORE_BUSINESS",
+                                        "value": application.organisation.core_business,
+                                    },
+                                    {
+                                        "key": "CORE_BUSINESS_FI",
+                                        "value": application.organisation.core_business_fi,
+                                    },
+                                    {
+                                        "key": "CORE_BUSINESS_EN",
+                                        "value": application.organisation.core_business_en,
+                                    },
+                                    {
+                                        "key": "CORE_BUSINESS_SV",
+                                        "value": application.organisation.core_business_sv,
+                                    },
+                                    {
+                                        "key": "ADDRESS",
+                                        "children": [
+                                            {
+                                                "key": "POST_CODE",
+                                                "value": application.organisation.address.post_code,
+                                            },
+                                            {
+                                                "key": "STREET_ADDRESS",
+                                                "value": application.organisation.address.street_address,
+                                            },
+                                            {
+                                                "key": "STREET_ADDRESS_FI",
+                                                "value": application.organisation.address.street_address_fi,
+                                            },
+                                            {
+                                                "key": "STREET_ADDRESS_EN",
+                                                "value": application.organisation.address.street_address_en,
+                                            },
+                                            {
+                                                "key": "STREET_ADDRESS_SV",
+                                                "value": application.organisation.address.street_address_sv,
+                                            },
+                                            {
+                                                "key": "CITY",
+                                                "value": application.organisation.address.city,
+                                            },
+                                            {
+                                                "key": "CITY_FI",
+                                                "value": application.organisation.address.city_fi,
+                                            },
+                                            {
+                                                "key": "CITY_EN",
+                                                "value": application.organisation.address.city_en,
+                                            },
+                                            {
+                                                "key": "CITY_SV",
+                                                "value": application.organisation.address.city_sv,
+                                            },
+                                        ],
+                                    },
+                                ],
+                            },
+                            {
+                                "key": "ADDRESS",
+                                "children": [
+                                    {
+                                        "key": "POST_CODE",
+                                        "value": application.billing_address.post_code,
+                                    },
+                                    {
+                                        "key": "STREET_ADDRESS",
+                                        "value": application.billing_address.street_address,
+                                    },
+                                    {
+                                        "key": "STREET_ADDRESS_FI",
+                                        "value": application.billing_address.street_address_fi,
+                                    },
+                                    {
+                                        "key": "STREET_ADDRESS_EN",
+                                        "value": application.billing_address.street_address_en,
+                                    },
+                                    {
+                                        "key": "STREET_ADDRESS_SV",
+                                        "value": application.billing_address.street_address_sv,
+                                    },
+                                    {
+                                        "key": "CITY",
+                                        "value": application.billing_address.city,
+                                    },
+                                    {
+                                        "key": "CITY_FI",
+                                        "value": application.billing_address.city_fi,
+                                    },
+                                    {
+                                        "key": "CITY_EN",
+                                        "value": application.billing_address.city_en,
+                                    },
+                                    {
+                                        "key": "CITY_SV",
+                                        "value": application.billing_address.city_sv,
+                                    },
+                                ],
+                            },
+                        ],
+                    },
                 ],
             },
         ],

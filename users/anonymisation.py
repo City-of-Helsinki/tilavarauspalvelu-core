@@ -110,7 +110,7 @@ def can_user_be_anonymized(user: User) -> bool:
     month_ago = timezone.now() - relativedelta(months=1)
 
     has_open_reservations = (
-        user.reservation_set.filter(end__gte=month_ago)
+        user.reservations.filter(end__gte=month_ago)
         .exclude(
             state__in=[
                 ReservationStateChoice.CANCELLED.value,
@@ -131,7 +131,7 @@ def can_user_be_anonymized(user: User) -> bool:
         .exists()
     )
 
-    has_open_payments = user.reservation_set.filter(
+    has_open_payments = user.reservations.filter(
         payment_order__isnull=False,
         payment_order__remote_id__isnull=False,
         payment_order__status=OrderStatus.DRAFT,

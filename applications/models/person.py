@@ -4,8 +4,18 @@ __all__ = [
     "Person",
 ]
 
+from helsinki_gdpr.models import SerializableMixin
 
-class Person(models.Model):
+
+class Person(SerializableMixin, models.Model):
+    # For GDPR API
+    serialize_fields = (
+        {"name": "first_name"},
+        {"name": "last_name"},
+        {"name": "email"},
+        {"name": "phone_number"},
+    )
+
     first_name: str = models.CharField(max_length=50)
     last_name: str = models.CharField(max_length=50)
     email: str | None = models.EmailField(null=True, blank=True)

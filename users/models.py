@@ -1,6 +1,6 @@
 import uuid
 from functools import cached_property
-from typing import Any, Self
+from typing import Self, TypedDict, Union
 
 from django.conf import settings
 from django.db import models
@@ -94,13 +94,27 @@ class PersonalInfoViewLog(models.Model):
         return f"{self.viewer_username} viewed {self.user}'s {self.field} at {self.access_time}"
 
 
+class KeyValueDict(TypedDict):
+    key: str
+    value: str
+
+
+class KeyChildrenDict(TypedDict):
+    key: str
+    children: list[Union[KeyValueDict, "KeyChildrenDict"]]
+
+
+KeyValueChildrenDict = KeyValueDict | KeyChildrenDict
+
+
 class ProfileUser(SerializableMixin, User):
+    # For GDPR API
     serialize_fields = (
         {"name": "user", "accessor": lambda user: user.get_full_name()},
         {"name": "email"},
         {"name": "date_of_birth"},
-        {"name": "user_reservations"},
-        {"name": "user_applications"},
+        {"name": "reservations"},
+        {"name": "applications"},
     )
 
     class Meta:
@@ -110,113 +124,3 @@ class ProfileUser(SerializableMixin, User):
     def user(self) -> Self:
         """Needed for `helsinki_gdpr.views.GDPRScopesPermission.has_object_permission`"""
         return self
-
-    @property
-    def user_reservations(self) -> list[list[Any]]:
-        return [
-            [
-                reservation.name,
-                reservation.description,
-                reservation.begin,
-                reservation.end,
-                reservation.reservee_first_name,
-                reservation.reservee_last_name,
-                reservation.reservee_email,
-                reservation.reservee_phone,
-                reservation.reservee_address_zip,
-                reservation.reservee_address_city,
-                reservation.reservee_address_street,
-                reservation.billing_first_name,
-                reservation.billing_last_name,
-                reservation.billing_email,
-                reservation.billing_phone,
-                reservation.billing_address_zip,
-                reservation.billing_address_city,
-                reservation.billing_address_street,
-                reservation.reservee_id,
-                reservation.reservee_organisation_name,
-                reservation.free_of_charge_reason,
-                reservation.cancel_details,
-            ]
-            for reservation in self.reservation_set.all()
-        ]
-
-    @property
-    def user_applications(self) -> list[list[Any]]:
-        applications = []
-
-        for application in self.applications.all():
-            application_data = [application.additional_information]
-
-            events = []
-            for e in application.application_events.all():
-                events.append(e.name)
-                events.append(e.name_fi)
-                events.append(e.name_en)
-                events.append(e.name_sv)
-
-            application_data.append({"events": events})
-
-            if application.contact_person:
-                application_data.append(
-                    {
-                        "contact_person": [
-                            application.contact_person.first_name,
-                            application.contact_person.last_name,
-                            application.contact_person.email,
-                            application.contact_person.phone_number,
-                        ]
-                    }
-                )
-
-            if application.organisation:
-                application_data.append(
-                    {
-                        "organisation": [
-                            application.organisation.name,
-                            application.organisation.identifier,
-                            application.organisation.email,
-                            application.organisation.core_business,
-                            application.organisation.core_business_fi,
-                            application.organisation.core_business_en,
-                            application.organisation.core_business_sv,
-                        ]
-                    }
-                )
-
-            if application.organisation and application.organisation.address:
-                application_data.append(
-                    {
-                        "organisation_address": [
-                            application.organisation.address.post_code,
-                            application.organisation.address.street_address,
-                            application.organisation.address.street_address_fi,
-                            application.organisation.address.street_address_en,
-                            application.organisation.address.street_address_sv,
-                            application.organisation.address.city,
-                            application.organisation.address.city_fi,
-                            application.organisation.address.city_en,
-                            application.organisation.address.city_sv,
-                        ]
-                    }
-                )
-
-            if application.billing_address:
-                application_data.append(
-                    {
-                        "billing_address": [
-                            application.billing_address.post_code,
-                            application.billing_address.street_address,
-                            application.billing_address.street_address_fi,
-                            application.billing_address.street_address_en,
-                            application.billing_address.street_address_sv,
-                            application.billing_address.city,
-                            application.billing_address.city_fi,
-                            application.billing_address.city_en,
-                            application.billing_address.city_sv,
-                        ]
-                    }
-                )
-            applications.append(application_data)
-
-        return applications
