@@ -1,10 +1,11 @@
 from django.contrib import admin, messages
-from django.http import FileResponse
+from django.http import FileResponse, HttpRequest
 from modeltranslation.admin import TranslationAdmin
 from sentry_sdk import capture_exception
 
 from applications.exporter import ApplicationDataExporter
 from applications.models import ApplicationRound
+from applications.querysets.application_round import ApplicationRoundQuerySet
 
 from .forms.application_round import ApplicationRoundAdminForm
 
@@ -16,12 +17,8 @@ __all__ = [
 @admin.register(ApplicationRound)
 class ApplicationRoundAdmin(TranslationAdmin):
     form = ApplicationRoundAdminForm
-
-    actions = ["export_to_csv"]
-
-    autocomplete_fields = [
-        "reservation_units",
-    ]
+    actions = ["export_to_csv", "reset_application_rounds"]
+    autocomplete_fields = ["reservation_units"]
 
     @admin.action(description="Export application events in the selected application round to CSV")
     def export_to_csv(self, request, queryset):
@@ -48,3 +45,12 @@ class ApplicationRoundAdmin(TranslationAdmin):
                 "No export data in selected application round.",
                 level=messages.INFO,
             )
+
+    @admin.action(description="Reset application round allocations")
+    def reset_application_rounds(self, request: HttpRequest, queryset: ApplicationRoundQuerySet) -> None:
+        application_round: ApplicationRound
+        for application_round in queryset:
+            application_round.actions.reset_application_round_allocation()
+
+        msg = "Application rounds were reset successfully."
+        self.message_user(request, msg, level=messages.INFO)
