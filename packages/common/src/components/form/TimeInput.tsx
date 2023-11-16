@@ -11,6 +11,10 @@ const TimeInputContainer = styled.div`
   display: flex;
   flex-direction: column;
 
+  /* iOS problems */
+  -webkit-appearance: none;
+  border-radius: 0;
+
   & > label {
     color: var(--label-color-default, var(--color-black-90));
     display: block;
@@ -138,6 +142,9 @@ export const TimeInput = forwardRef(function TimeInput(
       <label htmlFor={props.name}>{label}</label>
       <input
         {...props}
+        // use numeric keyboard on mobile
+        inputMode="numeric"
+        pattern="[0-9]:*"
         placeholder="hh:mm"
         ref={ref}
         size={6}
