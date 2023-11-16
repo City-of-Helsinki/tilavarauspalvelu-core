@@ -18,6 +18,7 @@
 .PHONY: services-local-status
 .PHONY: services-local-stop
 .PHONY: stop
+.PHONY: translations
 
 # Trick to allow passing commands to make
 # Use quotes (" ") if command contains flags (-h / --help)
@@ -49,6 +50,7 @@ define helptext
   services-local-stop                Stop required services locally with 'systemctl'.
   services-local-status              Check status of services running locally with 'systemctl'.
   stop                               Stop running containers.
+  translations                       Fetch all translation strings under ./locale/.
 
 endef
 
@@ -125,3 +127,10 @@ services-local-status:
 
 stop:
 	@docker compose stop
+
+translations:
+	@echo ""
+	@echo Making translations...
+	@python manage.py makemessages -l fi -l sv
+	@echo ""
+	@echo Done!

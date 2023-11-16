@@ -1,4 +1,5 @@
 import uuid
+from dataclasses import dataclass
 
 from auditlog.models import LogEntry
 from dateutil.relativedelta import relativedelta
@@ -106,7 +107,17 @@ def anonymize_user_data(user: User):
     anonymize_user_reservations(user)
 
 
-def can_user_be_anonymized(user: User) -> bool:
+@dataclass
+class CanAnonymizeUser:
+    has_open_reservations: bool
+    has_open_applications: bool
+    has_open_payments: bool
+
+    def __bool__(self) -> bool:
+        return not (self.has_open_reservations or self.has_open_applications or self.has_open_payments)
+
+
+def can_user_be_anonymized(user: User) -> CanAnonymizeUser:
     month_ago = timezone.now() - relativedelta(months=1)
 
     has_open_reservations = (
@@ -137,4 +148,8 @@ def can_user_be_anonymized(user: User) -> bool:
         payment_order__status=OrderStatus.DRAFT,
     ).exists()
 
-    return not (has_open_reservations or has_open_applications or has_open_payments)
+    return CanAnonymizeUser(
+        has_open_reservations=has_open_reservations,
+        has_open_applications=has_open_applications,
+        has_open_payments=has_open_payments,
+    )

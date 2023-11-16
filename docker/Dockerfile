@@ -131,6 +131,9 @@ COPY --chown=root:root --chmod=774 --from=build-static $STATIC_ROOT $STATIC_ROOT
 ENV PATH=$VENV_ROOT/bin:$PATH \
     VIRTUAL_ENV=$VENV_ROOT
 
+# Compile translations.
+RUN python manage.py compilemessages -l fi -l sv -x "$VENV_ROOT"
+
 # Expose port for uWSGI.
 EXPOSE 8000
 
