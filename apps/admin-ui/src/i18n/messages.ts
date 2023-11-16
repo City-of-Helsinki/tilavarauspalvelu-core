@@ -714,6 +714,8 @@ const translations: ITranslations = {
         WARNING: ["Varoitus (keltainen)"],
         NORMAL: ["Normaali (sininen)"],
       },
+      // NOTE reusing this validation translations for ReservationUnitEditor
+      // TODO move them under a common key
       errors: {
         Required: ["Pakollinen"],
         "Invalid date": ["Virheellinen päivämäärä"],
@@ -743,6 +745,12 @@ const translations: ITranslations = {
         ],
         "String must contain at most 1000 character(s)": [
           "Viesti ei saa olla yli 1000 merkkiä",
+        ],
+        "String must contain at most 80 character(s)": [
+          "Nimi ei saa olla yli 80 merkkiä",
+        ],
+        "String must contain at most 4000 character(s)": [
+          "Viesti ei saa olla yli 4000 merkkiä",
         ],
       },
     },
@@ -1509,6 +1517,7 @@ const translations: ITranslations = {
     imageType: ["Kuvan tyyppi"],
     label: ["Varausyksikön kuvat"],
     buttonLabel: ["Valitse ja lataa kuva"],
+    deleteImage: ["Poista"],
     mainImage: ["Pääkuva"],
     useAsMainImage: ["Käytä pääkuvana"],
   },

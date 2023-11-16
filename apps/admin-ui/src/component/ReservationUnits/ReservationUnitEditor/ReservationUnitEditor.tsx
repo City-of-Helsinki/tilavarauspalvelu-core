@@ -20,6 +20,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import dynamic from "next/dynamic";
 import { Controller, UseFormReturn, useForm } from "react-hook-form";
+import type { TFunction } from "next-i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   type Query,
@@ -524,6 +525,14 @@ const constructApiDate = (date: string, time: string) => {
   return d2.toISOString();
 };
 
+const getTranslatedError = (error: string | undefined, t: TFunction) => {
+  if (error == null) {
+    return undefined;
+  }
+  // TODO use a common translation key for these
+  return t(`Notifications.form.errors.${error}`);
+};
+
 function BasicSection({
   form,
   spaces,
@@ -564,6 +573,8 @@ function BasicSection({
   return (
     <Accordion
       initiallyOpen
+      // TODO make the errors section specific
+      open={Object.keys(errors).length > 0}
       heading={t("ReservationUnitEditor.basicInformation")}
     >
       <AutoGrid>
@@ -575,7 +586,9 @@ function BasicSection({
           {errors.reservationKind?.message != null && (
             <FullRow>
               <IconAlertCircleFill />
-              <span>{errors.reservationKind.message}</span>
+              <span>
+                {getTranslatedError(errors.reservationKind.message, t)}
+              </span>
             </FullRow>
           )}
           {(["DIRECT_AND_SEASON", "DIRECT", "SEASON"] as const).map((kind) => (
@@ -605,7 +618,7 @@ function BasicSection({
               required
               id={fieldName}
               label={t(`ReservationUnitEditor.label.${fieldName}`)}
-              errorText={errors[fieldName]?.message}
+              errorText={getTranslatedError(errors[fieldName]?.message, t)}
               invalid={errors[fieldName]?.message != null}
               // tooltipText={ lang === "fi" ? t("ReservationUnitEditor.tooltip.nameFi") : undefined }
             />
@@ -656,7 +669,7 @@ function BasicSection({
                 )
               }
               value={resourceOptions.filter((x) => value.includes(x.value))}
-              error={errors.resourcePks?.message}
+              error={getTranslatedError(errors.resourcePks?.message, t)}
               invalid={errors.resourcePks?.message != null}
               tooltipText={t("ReservationUnitEditor.tooltip.resourcePks")}
             />
@@ -677,7 +690,7 @@ function BasicSection({
           min={minSurfaceArea}
           max={undefined}
           required
-          errorText={errors.surfaceArea?.message}
+          errorText={getTranslatedError(errors.surfaceArea?.message, t)}
           invalid={errors.surfaceArea?.message != null}
           tooltipText={t("ReservationUnitEditor.tooltip.surfaceArea")}
         />
@@ -692,7 +705,7 @@ function BasicSection({
           min={1}
           max={maxPersons}
           helperText={t("ReservationUnitEditor.maxPersonsHelperText")}
-          errorText={errors.maxPersons?.message}
+          errorText={getTranslatedError(errors.maxPersons?.message, t)}
           invalid={errors.maxPersons?.message != null}
           required
           tooltipText={t("ReservationUnitEditor.tooltip.maxPersons")}
@@ -707,7 +720,7 @@ function BasicSection({
           type="number"
           min={0}
           max={watch("maxPersons") || 1}
-          errorText={errors.minPersons?.message}
+          errorText={getTranslatedError(errors.minPersons?.message, t)}
           invalid={errors.minPersons?.message != null}
           tooltipText={t("ReservationUnitEditor.tooltip.minPersons")}
         />
@@ -755,9 +768,20 @@ function ReservationUnitSettings({
     label: n?.name ?? "no-name",
   }));
 
+  // TODO this would be better if we split the form values into objects based on section
+  const open =
+    errors.reservationBeginsDate != null ||
+    errors.reservationEndsDate != null ||
+    errors.reservationBeginsTime != null ||
+    errors.reservationEndsTime != null;
+
   return (
     <Accordion
-      initiallyOpen={Object.keys(errors).length > 0}
+      // TODO this needs to be improved
+      // currently it's gonna close the Accordion after the errors are fixed
+      // it also opens all Accordions (above where the user is) if there are errors
+      // this is primarily an issue if errors are onChange / onBlur instead of onSubmit
+      open={open}
       heading={t("ReservationUnitEditor.settings")}
     >
       <Grid>
@@ -884,7 +908,10 @@ function ReservationUnitSettings({
                   onChange(v.value)
                 }
                 value={durationOptions.find((o) => o.value === value) ?? null}
-                error={errors.minReservationDuration?.message}
+                error={getTranslatedError(
+                  errors.minReservationDuration?.message,
+                  t
+                )}
                 invalid={errors.minReservationDuration?.message != null}
                 tooltipText={t(
                   "ReservationUnitEditor.tooltip.minReservationDuration"
@@ -908,7 +935,10 @@ function ReservationUnitSettings({
                 }
                 value={durationOptions.find((o) => o.value === value) ?? null}
                 label={t("ReservationUnitEditor.label.maxReservationDuration")}
-                error={errors.maxReservationDuration?.message}
+                error={getTranslatedError(
+                  errors.maxReservationDuration?.message,
+                  t
+                )}
                 invalid={errors.maxReservationDuration?.message != null}
                 tooltipText={t(
                   "ReservationUnitEditor.tooltip.maxReservationDuration"
@@ -938,7 +968,10 @@ function ReservationUnitSettings({
                     (o) => o.value === value
                   ) ?? null
                 }
-                error={errors.reservationsMaxDaysBefore?.message}
+                error={getTranslatedError(
+                  errors.reservationsMaxDaysBefore?.message,
+                  t
+                )}
                 invalid={errors.reservationsMaxDaysBefore?.message != null}
                 tooltipText={t(
                   "ReservationUnitEditor.tooltip.reservationsMaxDaysBefore"
@@ -959,7 +992,10 @@ function ReservationUnitSettings({
             max={watch("reservationsMaxDaysBefore")}
             min={0}
             required
-            errorText={errors.reservationsMinDaysBefore?.message}
+            errorText={getTranslatedError(
+              errors.reservationsMinDaysBefore?.message,
+              t
+            )}
             invalid={errors.reservationsMinDaysBefore?.message != null}
             tooltipText={t(
               "ReservationUnitEditor.tooltip.reservationsMinDaysBefore"
@@ -985,7 +1021,10 @@ function ReservationUnitSettings({
                   value: ReservationUnitsReservationUnitReservationStartIntervalChoices;
                   label: string;
                 }) => onChange(val)}
-                error={errors.reservationStartInterval?.message}
+                error={getTranslatedError(
+                  errors.reservationStartInterval?.message,
+                  t
+                )}
                 invalid={errors.reservationStartInterval?.message != null}
                 label={t(
                   "ReservationUnitEditor.label.reservationStartInterval"
@@ -1097,7 +1136,10 @@ function ReservationUnitSettings({
                 <SelectionGroup
                   required
                   label={t("ReservationUnitEditor.cancellationGroupLabel")}
-                  errorText={errors.cancellationRulePk?.message}
+                  errorText={getTranslatedError(
+                    errors.cancellationRulePk?.message,
+                    t
+                  )}
                 >
                   {cancellationRuleOptions.map((o) => (
                     <RadioButton
@@ -1129,7 +1171,7 @@ function ReservationUnitSettings({
                   onChange(v.value)
                 }
                 value={metadataOptions.find((o) => o.value === value) ?? null}
-                error={errors.metadataSetPk?.message}
+                error={getTranslatedError(errors.metadataSetPk?.message, t)}
                 invalid={errors.metadataSetPk?.message != null}
                 tooltipText={t("ReservationUnitEditor.tooltip.metadataSetPk")}
               />
@@ -1245,7 +1287,8 @@ function PricingSection({
 
   return (
     <Accordion
-      initiallyOpen={Object.keys(errors).length > 0}
+      // TODO check the section specific errors
+      open={Object.keys(errors).length > 0}
       heading={t("ReservationUnitEditor.label.pricings")}
     >
       <div
@@ -1382,7 +1425,7 @@ function TermsSection({
 
   return (
     <Accordion
-      initiallyOpen={Object.keys(errors).length > 0}
+      open={Object.keys(errors).length > 0}
       heading={t("ReservationUnitEditor.termsInstructions")}
     >
       <Grid>
@@ -1436,7 +1479,10 @@ function TermsSection({
                     required
                     id={fieldName}
                     label={t(`ReservationUnitEditor.label.${fieldName}`)}
-                    errorText={errors[fieldName]?.message}
+                    errorText={getTranslatedError(
+                      errors[fieldName]?.message,
+                      t
+                    )}
                     // TODO do we want to hide the tooltip for others than Fi?
                     tooltipText={t(
                       "ReservationUnitEditor.tooltip.termsOfUseFi"
@@ -1463,7 +1509,7 @@ function CommunicationSection({
 
   return (
     <Accordion
-      initiallyOpen={Object.keys(errors).length > 0}
+      open={Object.keys(errors).length > 0}
       heading={t("ReservationUnitEditor.communication")}
     >
       <Grid>
@@ -1485,7 +1531,7 @@ function CommunicationSection({
                   {...field}
                   id={fieldName}
                   label={t(`ReservationUnitEditor.label.${fieldName}`)}
-                  errorText={errors[fieldName]?.message}
+                  errorText={getTranslatedError(errors[fieldName]?.message, t)}
                   invalid={errors[fieldName]?.message != null}
                   /* FIXME
                 tooltipText={t("ReservationUnitEditor.tooltip.termsOfUseFi")}
@@ -1515,7 +1561,7 @@ function CommunicationSection({
                   {...field}
                   id={fieldName}
                   label={t(`ReservationUnitEditor.label.${fieldName}`)}
-                  errorText={errors[fieldName]?.message}
+                  errorText={getTranslatedError(errors[fieldName]?.message, t)}
                   invalid={errors[fieldName]?.message != null}
                   /* FIXME tr key
                 label={t( `ReservationUnitEditor.label.instructions${upperFirst( lang)}`)}
@@ -1528,7 +1574,7 @@ function CommunicationSection({
         ))}
         <Span12>
           <SubAccordion
-            initiallyOpen={Object.keys(errors).length > 0}
+            // don't open there is no errors under this
             heading={t("ReservationUnitEditor.cancelledSubAccordion")}
             headingLevel="h3"
           >
@@ -1553,7 +1599,10 @@ function CommunicationSection({
                       {...field}
                       id={fieldName}
                       label={t(`ReservationUnitEditor.label.${fieldName}`)}
-                      errorText={errors[fieldName]?.message}
+                      errorText={getTranslatedError(
+                        errors[fieldName]?.message,
+                        t
+                      )}
                       invalid={errors[fieldName]?.message != null}
                       /* TODO rename the keys
                     tooltipText={ lang === "fi" ? t( "ReservationUnitEditor.tooltip.reservationCancelledInstructionsFi") : "" }
@@ -1683,7 +1732,8 @@ function DescriptionSection({
 
   return (
     <Accordion
-      initiallyOpen={Object.keys(errors).length > 0}
+      // TODO make the errors section specific
+      open={Object.keys(errors).length > 0}
       heading={t("ReservationUnitEditor.typesProperties")}
     >
       <Grid>
@@ -1709,7 +1759,10 @@ function DescriptionSection({
                 helper={t(
                   "ReservationUnitEditor.reservationUnitTypeHelperText"
                 )}
-                error={errors.reservationUnitTypePk?.message}
+                error={getTranslatedError(
+                  errors.reservationUnitTypePk?.message,
+                  t
+                )}
                 invalid={errors.reservationUnitTypePk?.message != null}
                 tooltipText={t(
                   "ReservationUnitEditor.tooltip.reservationUnitTypePk"
@@ -1802,7 +1855,10 @@ function DescriptionSection({
                     required
                     id={fieldName}
                     label={t(`ReservationUnitEditor.label.${fieldName}`)}
-                    errorText={errors[fieldName]?.message}
+                    errorText={getTranslatedError(
+                      errors[fieldName]?.message,
+                      t
+                    )}
                     tooltipText={t("ReservationUnitEditor.tooltip.description")}
                   />
                 )}
@@ -1818,6 +1874,7 @@ function DescriptionSection({
   );
 }
 
+// TODO move to form.ts
 function transformReservationUnit(
   values: ReservationUnitEditFormValues
 ): ReservationUnitUpdateMutationInput | ReservationUnitCreateMutationInput {
@@ -1887,10 +1944,10 @@ function transformReservationUnit(
       .filter(shouldSavePricing)
       .map((p) => ({
         begins: toApiDate(fromUIDate(p.begins)) ?? "",
-        highestPrice: p.highestPrice,
-        highestPriceNet: p.highestPriceNet,
-        lowestPrice: p.lowestPrice,
-        lowestPriceNet: p.lowestPriceNet,
+        highestPrice: Number(p.highestPrice),
+        highestPriceNet: Number(p.highestPriceNet),
+        lowestPrice: Number(p.lowestPrice),
+        lowestPriceNet: Number(p.lowestPriceNet),
         ...(p.pk !== 0 ? { pk: p.pk } : {}),
         priceUnit: p.priceUnit,
         pricingType: p.pricingType,
@@ -2262,7 +2319,7 @@ function EditorWrapper() {
   // NOTE override the unitPk from the url for new units
   // there is no harm in doing it to existing units either (since it should be valid)
   const form = useForm<ReservationUnitEditFormValues>({
-    mode: "onChange",
+    mode: "onSubmit",
     // NOTE disabling because it throws an error when submitting because it can't focus the field
     // this happens for field errors in the zod schema where the field is created using an array
     // for example termsOfUseEn, termsOfUseFi, termsOfUseSv

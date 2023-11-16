@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
+import type { TFunction } from "next-i18next";
 import {
   DateInput,
   IconAlertCircleFill,
@@ -34,6 +35,14 @@ type Props = {
   taxPercentageOptions: { label: string; value: number }[];
 };
 
+const getTranslatedError = (error: string | undefined, t: TFunction) => {
+  if (error == null) {
+    return undefined;
+  }
+  // TODO use a common translation key for these
+  return t(`Notifications.form.errors.${error}`);
+};
+
 function PaidPricingPart({
   form,
   index,
@@ -44,7 +53,7 @@ function PaidPricingPart({
   taxPercentageOptions: { label: string; value: number }[];
 }) {
   const { t } = useTranslation();
-  const { control, formState, register, watch } = form;
+  const { control, setValue, formState, register, watch } = form;
   const { errors } = formState;
 
   const unitPriceOptions = Object.values(
@@ -59,8 +68,40 @@ function PaidPricingPart({
     value,
   }));
 
-  const pricing = watch(`pricings.${index}`);
+  const removeTax = (price: number, taxPercentage: number) => {
+    const tmp = price * ((100 - taxPercentage) / 100);
+    const tmp2 = Math.round(tmp * 100) / 100;
+    return tmp2;
+  };
 
+  const addTax = (price: number, taxPercentage: number) => {
+    const tmp = price * ((100 + taxPercentage) / 100);
+    const tmp2 = Math.round(tmp * 100) / 100;
+    return tmp2;
+  };
+
+  const pricing = watch(`pricings.${index}`);
+  // single use effect only when taxPercentage changes
+  useEffect(() => {
+    if (pricing?.taxPercentage) {
+      const low = Number(pricing?.lowestPrice);
+      const high = Number(pricing?.highestPrice);
+      const taxPercentage = pricing?.taxPercentage.value ?? 0;
+      if (!Number.isNaN(low)) {
+        const lowNet = removeTax(low, taxPercentage);
+        setValue(`pricings.${index}.lowestPriceNet`, String(lowNet));
+      }
+      if (!Number.isNaN(high)) {
+        const highNet = removeTax(high, taxPercentage);
+        setValue(`pricings.${index}.highestPriceNet`, String(highNet));
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only when taxPercentage changes
+  }, [pricing?.taxPercentage, setValue, index]);
+
+  const taxPercentage = watch(`pricings.${index}.taxPercentage`).value ?? 0;
+
+  // TODO mobile number keyboard?
   return (
     <>
       <Controller
@@ -71,7 +112,6 @@ function PaidPricingPart({
             id={`pricings.${index}.priceUnit`}
             placeholder={t("common.select")}
             label={t("ReservationUnitEditor.label.priceUnit")}
-            // TODO should use styled components
             style={{ gridColumnStart: "1" }}
             required
             options={unitPriceOptions}
@@ -83,13 +123,16 @@ function PaidPricingPart({
               unitPriceOptions.find((option) => option.value === value) ?? null
             }
             tooltipText={t("ReservationUnitEditor.tooltip.priceUnit")}
-            error={errors.pricings?.[index]?.priceUnit?.message}
+            error={getTranslatedError(
+              errors.pricings?.[index]?.priceUnit?.message,
+              t
+            )}
             invalid={errors.pricings?.[index]?.priceUnit?.message != null}
           />
         )}
       />
       <Controller
-        name={`pricings.${index}.taxPercentage.pk`}
+        name={`pricings.${index}.taxPercentage`}
         control={control}
         render={({ field: { value, onChange } }) => (
           <Select
@@ -99,13 +142,17 @@ function PaidPricingPart({
             label={t(`ReservationUnitEditor.label.taxPercentagePk`)}
             options={taxPercentageOptions}
             onChange={(v: { value: number; label: string }) =>
-              onChange(v.value)
+              onChange({ pk: v.value, value: Number(v.label) })
             }
             value={
-              taxPercentageOptions.find((option) => option.value === value) ??
-              null
+              taxPercentageOptions.find(
+                (option) => option.value === value.pk
+              ) ?? null
             }
-            error={errors.pricings?.[index]?.taxPercentage?.message}
+            error={getTranslatedError(
+              errors.pricings?.[index]?.taxPercentage?.message,
+              t
+            )}
             invalid={errors.pricings?.[index]?.taxPercentage?.message != null}
           />
         )}
@@ -113,9 +160,16 @@ function PaidPricingPart({
       <NumberInput
         {...register(`pricings.${index}.lowestPriceNet`, {
           required: true,
-          valueAsNumber: true,
+          onChange: (e) => {
+            const val = Number(e.currentTarget.value);
+            if (!Number.isNaN(val)) {
+              setValue(
+                `pricings.${index}.lowestPrice`,
+                String(addTax(val, taxPercentage))
+              );
+            }
+          },
         })}
-        value={pricing?.lowestPriceNet ?? 0}
         id={`pricings.${index}.lowestPriceNet`}
         required
         label={t("ReservationUnitEditor.label.lowestPriceNet")}
@@ -124,15 +178,27 @@ function PaidPricingPart({
         step={1}
         min={0}
         max={undefined}
-        errorText={errors.pricings?.[index]?.lowestPriceNet?.message}
+        errorText={getTranslatedError(
+          errors.pricings?.[index]?.lowestPriceNet?.message,
+          t
+        )}
         invalid={errors.pricings?.[index]?.lowestPriceNet?.message != null}
       />
       <NumberInput
         {...register(`pricings.${index}.lowestPrice`, {
           required: true,
-          valueAsNumber: true,
+          onChange: (e) => {
+            const val = Number(e.currentTarget.value);
+            if (!Number.isNaN(val)) {
+              setValue(
+                `pricings.${index}.lowestPriceNet`,
+                String(removeTax(val, taxPercentage))
+              );
+            }
+          },
         })}
         id={`pricings.${index}.lowestPrice`}
+        pattern="[0-9].*"
         required
         label={t("ReservationUnitEditor.label.lowestPrice")}
         minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
@@ -140,14 +206,25 @@ function PaidPricingPart({
         step={1}
         min={0}
         max={undefined}
-        errorText={errors.pricings?.[index]?.lowestPrice?.message}
+        errorText={getTranslatedError(
+          errors.pricings?.[index]?.lowestPrice?.message,
+          t
+        )}
         invalid={errors.pricings?.[index]?.lowestPrice?.message != null}
         tooltipText={t("ReservationUnitEditor.tooltip.lowestPrice")}
       />
       <NumberInput
         {...register(`pricings.${index}.highestPriceNet`, {
           required: true,
-          valueAsNumber: true,
+          onChange: (e) => {
+            const val = Number(e.currentTarget.value);
+            if (!Number.isNaN(val)) {
+              setValue(
+                `pricings.${index}.highestPrice`,
+                String(addTax(val, taxPercentage))
+              );
+            }
+          },
         })}
         required
         id={`pricings.${index}.highestPriceNet`}
@@ -157,13 +234,24 @@ function PaidPricingPart({
         step={1}
         min={0}
         max={undefined}
-        errorText={errors.pricings?.[index]?.highestPriceNet?.message}
+        errorText={getTranslatedError(
+          errors.pricings?.[index]?.highestPriceNet?.message,
+          t
+        )}
         invalid={errors.pricings?.[index]?.highestPriceNet?.message != null}
       />
       <NumberInput
         {...register(`pricings.${index}.highestPrice`, {
           required: true,
-          valueAsNumber: true,
+          onChange: (e) => {
+            const val = Number(e.currentTarget.value);
+            if (!Number.isNaN(val)) {
+              setValue(
+                `pricings.${index}.highestPriceNet`,
+                String(removeTax(val, taxPercentage))
+              );
+            }
+          },
         })}
         required
         id={`pricings.${index}.highestPrice`}
@@ -173,8 +261,10 @@ function PaidPricingPart({
         step={1}
         min={0}
         max={undefined}
-        type="number"
-        errorText={errors.pricings?.[index]?.highestPrice?.message}
+        errorText={getTranslatedError(
+          errors.pricings?.[index]?.highestPrice?.message,
+          t
+        )}
         invalid={errors.pricings?.[index]?.highestPrice?.message != null}
         tooltipText={t("ReservationUnitEditor.tooltip.highestPrice")}
       />
@@ -199,7 +289,7 @@ function PaidPricingPart({
             )}
             label={t("ReservationUnitEditor.label.paymentTypes")}
             tooltipText={t("ReservationUnitEditor.tooltip.paymentTypes")}
-            errorText={errors.paymentTypes?.message}
+            errorText={getTranslatedError(errors.paymentTypes?.message, t)}
             invalid={errors.paymentTypes?.message != null}
           />
         )}
@@ -224,6 +314,7 @@ export function PricingType({
     ReservationUnitsReservationUnitPricingPricingTypeChoices.Free,
     ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid,
   ] as const;
+
   return (
     <AutoGrid>
       {pricing?.status === "FUTURE" && (
@@ -261,7 +352,7 @@ export function PricingType({
       {errors.pricings?.message != null && (
         <Error>
           <IconAlertCircleFill />
-          <span>{errors.pricings.message}</span>
+          <span>{getTranslatedError(errors.pricings.message, t)}</span>
         </Error>
       )}
       {pricing?.pricingType === "PAID" && (

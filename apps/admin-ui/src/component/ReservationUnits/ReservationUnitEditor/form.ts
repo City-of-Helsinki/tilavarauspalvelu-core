@@ -13,29 +13,59 @@ import {
 import { addDays, format } from "date-fns";
 import { z } from "zod";
 
-export const PricingFormSchema = z.object({
-  // pk === 0 means new pricing good decission?
-  // pk === 0 fails silently on the backend, but undefined creates a new pricing
-  pk: z.number(),
-  taxPercentage: z.object({
-    pk: z.number().optional(),
-    value: z.number(),
-  }),
-  lowestPrice: z.number(),
-  lowestPriceNet: z.number(),
-  highestPrice: z.number(),
-  highestPriceNet: z.number(),
-  pricingType: z.nativeEnum(
-    ReservationUnitsReservationUnitPricingPricingTypeChoices
-  ),
-  priceUnit: z
-    .nativeEnum(ReservationUnitsReservationUnitPricingPriceUnitChoices)
-    .optional(),
-  status: z.nativeEnum(ReservationUnitsReservationUnitPricingStatusChoices),
-  // TODO this has to be a string because of HDS date input
-  // in ui format: "d.M.yyyy"
-  begins: z.string(),
-});
+export const PricingFormSchema = z
+  .object({
+    // pk === 0 means new pricing good decission?
+    // pk === 0 fails silently on the backend, but undefined creates a new pricing
+    pk: z.number(),
+    taxPercentage: z.object({
+      pk: z.number(),
+      value: z.number(),
+    }),
+    // NOTE because of how valueAsNumber works converting 21. to number throws
+    // localization / HDS problem because 21, => 21 but 21. => NaN
+
+    lowestPrice: z.string(),
+    lowestPriceNet: z.string(),
+    highestPrice: z.string(),
+    highestPriceNet: z.string(),
+    pricingType: z.nativeEnum(
+      ReservationUnitsReservationUnitPricingPricingTypeChoices
+    ),
+    priceUnit: z
+      .nativeEnum(ReservationUnitsReservationUnitPricingPriceUnitChoices)
+      .optional(),
+    status: z.nativeEnum(ReservationUnitsReservationUnitPricingStatusChoices),
+    // TODO this has to be a string because of HDS date input
+    // in ui format: "d.M.yyyy"
+    begins: z.string(),
+  })
+  .superRefine((data, ctx) => {
+    if (
+      data.pricingType ===
+      ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid
+    ) {
+      if (Number(data.lowestPrice) > Number(data.highestPrice)) {
+        ctx.addIssue({
+          message: "lowestPrice must be lower than highestPrice",
+          path: ["lowestPrice"],
+          code: z.ZodIssueCode.custom,
+        });
+      }
+    }
+  });
+// TODO add custom validation for these, number > 0
+// draft:
+// lowestPrice: requiredForNonFree(Joi.number().precision(2).min(0)),
+// highestPrice: requiredForNonFree( Joi.number().precision(2).min(Joi.ref("lowestPrice")).required()),
+// published:
+/* pricingType: Joi.string().required(),
+   * lowestPrice: requiredForNonFree(Joi.number().precision(2).min(0).required()),
+   * highestPrice: requiredForNonFree( Joi.number().precision(2).min(Joi.ref("lowestPrice")).required()),
+   * priceUnit: requiredForNonFree(Joi.string().required()),
+   * taxPercentagePk: requiredForNonFree(Joi.number().required()),
+  });
+   */
 
 export type PricingFormValues = z.infer<typeof PricingFormSchema>;
 
@@ -98,7 +128,7 @@ export const ReservationUnitEditSchema = z
     descriptionEn: z.string().max(4000),
     descriptionSv: z.string().max(4000),
     // nameFi is required for both draft and published
-    nameFi: z.string().min(1).max(80),
+    nameFi: z.string().min(1, { message: "Required" }).max(80),
     // not required for drafts
     // TODO allow draft to have empty strings
     nameEn: z.string().max(80), // .min(1).max(80),
@@ -212,13 +242,11 @@ export const ReservationUnitEditSchema = z
       }
     }
 
-    // TODO add paymentTypes: requiredForNonFreeRU(Joi.array().min(1).required()),
-    // if there is non free pricing it should have at least one payment type
+    // the backend error on mutation: "Not draft state reservation unit must have one or more space or resource",
     if (v.spacePks.length === 0 && v.resourcePks.length === 0) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message:
-          "Not draft state reservation unit must have one or more space or resource",
+        message: "Required",
         path: ["spacePks"],
       });
     }
@@ -267,6 +295,8 @@ export const ReservationUnitEditSchema = z
 
     // TODO if it includes futurePricing check that the futurePrice date is in the future (is today ok?)
     // TODO if it includes pricing (non free) check that it has a payment method
+    // TODO add paymentTypes: requiredForNonFreeRU(Joi.array().min(1).required()),
+    // if there is non free pricing it should have at least one payment type
   });
 
 export type ReservationUnitEditFormValues = z.infer<
@@ -300,13 +330,13 @@ const convertPricing = (p?: ReservationUnitPricingType): PricingFormValues => {
   return {
     pk: p?.pk ?? 0,
     taxPercentage: {
-      pk: p?.taxPercentage?.pk ?? undefined,
+      pk: p?.taxPercentage?.pk ?? 0,
       value: convertMaybeDecimal(p?.taxPercentage?.value) ?? 0,
     },
-    lowestPrice: convertMaybeDecimal(p?.lowestPrice) ?? 0,
-    lowestPriceNet: convertMaybeDecimal(p?.lowestPriceNet) ?? 0,
-    highestPrice: convertMaybeDecimal(p?.highestPrice) ?? 0,
-    highestPriceNet: convertMaybeDecimal(p?.highestPriceNet) ?? 0,
+    lowestPrice: String(convertMaybeDecimal(p?.lowestPrice) ?? 0),
+    lowestPriceNet: String(convertMaybeDecimal(p?.lowestPriceNet) ?? 0),
+    highestPrice: String(convertMaybeDecimal(p?.highestPrice) ?? 0),
+    highestPriceNet: String(convertMaybeDecimal(p?.highestPriceNet) ?? 0),
     pricingType:
       p?.pricingType ??
       ReservationUnitsReservationUnitPricingPricingTypeChoices.Free,

@@ -7,6 +7,7 @@ import { H2 } from "common/src/common/typography";
 interface IProps {
   heading: string | JSX.Element | null;
   initiallyOpen?: boolean;
+  open?: boolean;
   children: ReactNode;
   headingLevel?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
   disabled?: boolean;
@@ -51,6 +52,7 @@ const Content = styled.div`
   padding-bottom: var(--spacing-unit);
 `;
 
+// TODO add animation to the open/close toggle (ex. keyframe visiblity)
 const Wrapper = styled.div<{ $open: boolean }>`
   --header-font-size: var(--fontsize-heading-m);
   --button-size: var(--fontsize-heading-m);
@@ -87,17 +89,20 @@ const StyledH2 = styled(H2)`
 /// so we can't programmatically open it (for example from validation errors)
 /// TODO styling is bit off
 /// TODO seems like this affected MainMenu link styling
+/// @param open programmaticaly open the accordion (overrides user state temporarily)
+/// @param initiallyOpen set the default open state (overrides user state permanently)
 export function Accordion({
   heading,
   headingLevel = "h2",
   initiallyOpen = false,
+  open,
   children,
   disabled = false,
   className,
   style,
   ...rest
 }: IProps): JSX.Element {
-  const [isAccordionOpen, toggleOpenState] = useState(initiallyOpen);
+  const [accordianOpenState, toggleOpenState] = useState(initiallyOpen);
 
   const { t } = useTranslation();
 
@@ -105,6 +110,7 @@ export function Accordion({
     toggleOpenState(initiallyOpen);
   }, [initiallyOpen]);
 
+  const isAccordionOpen = open || accordianOpenState;
   const buttonAriaLabel = isAccordionOpen
     ? `${t("common.close")} ${t("common.accordion")} "${heading}"`
     : `${t("common.open")} ${t("common.accordion")} "${heading}"`;
