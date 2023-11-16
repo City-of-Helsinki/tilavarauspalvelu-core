@@ -380,6 +380,7 @@ def test_query_user_data__user_not_found(api_client, settings):
         response = api_client.get(url)
 
     assert response.status_code == 404, response.data
+    assert response.data == {"detail": "Ei löydy."}
 
 
 def test_query_user_data__wrong_scope(api_client, settings):
@@ -394,6 +395,7 @@ def test_query_user_data__wrong_scope(api_client, settings):
         response = api_client.get(url)
 
     assert response.status_code == 403, response.data
+    assert response.data == {"detail": "Sinulla ei ole oikeutta suorittaa tätä toimintoa."}
 
 
 def test_delete_user_data__should_anonymize(api_client, settings):
@@ -427,6 +429,18 @@ def test_delete_user_data__dont_anonymize_if_open_payments(api_client, settings)
         response = api_client.delete(url)
 
     assert response.status_code == 403, response.data
+    assert response.data == {
+        "errors": [
+            {
+                "code": "PAYMENT",
+                "message": {
+                    "en": "User has open payments.",
+                    "fi": "User has open payments.",
+                    "sv": "User has open payments.",
+                },
+            }
+        ]
+    }
     user.refresh_from_db()
     assert user.username == "foo"
 
@@ -446,6 +460,18 @@ def test_delete_user_data__dont_anonymize_if_open_reservations(api_client, setti
         response = api_client.delete(url)
 
     assert response.status_code == 403, response.data
+    assert response.data == {
+        "errors": [
+            {
+                "code": "RESERVATION",
+                "message": {
+                    "en": "User has upcoming or too recent reservations.",
+                    "fi": "User has upcoming or too recent reservations.",
+                    "sv": "User has upcoming or too recent reservations.",
+                },
+            }
+        ]
+    }
     user.refresh_from_db()
     assert user.username == "foo"
 
@@ -465,6 +491,18 @@ def test_delete_user_data__dont_anonymize_if_reservation_one_month_ago(api_clien
         response = api_client.delete(url)
 
     assert response.status_code == 403, response.data
+    assert response.data == {
+        "errors": [
+            {
+                "code": "RESERVATION",
+                "message": {
+                    "en": "User has upcoming or too recent reservations.",
+                    "fi": "User has upcoming or too recent reservations.",
+                    "sv": "User has upcoming or too recent reservations.",
+                },
+            }
+        ]
+    }
     user.refresh_from_db()
     assert user.username == "foo"
 
@@ -482,6 +520,18 @@ def test_delete_user_data__dont_anonymize_if_open_applications(api_client, setti
         response = api_client.delete(url)
 
     assert response.status_code == 403, response.data
+    assert response.data == {
+        "errors": [
+            {
+                "code": "APPLICATION",
+                "message": {
+                    "en": "User has an unhandled application.",
+                    "fi": "User has an unhandled application.",
+                    "sv": "User has an unhandled application.",
+                },
+            }
+        ]
+    }
     user.refresh_from_db()
     assert user.username == "foo"
 
@@ -499,6 +549,7 @@ def test_delete_user_data__cannot_anonymize_other_users_data(api_client, setting
         response = api_client.delete(url)
 
     assert response.status_code == 403, response.data
+    assert response.data == {"detail": "Sinulla ei ole oikeutta suorittaa tätä toimintoa."}
     other_user.refresh_from_db()
     assert other_user.username == "bar"
 
@@ -513,6 +564,7 @@ def test_delete_user_data__not_authenticated(api_client, settings):
         response = api_client.delete(url)
 
     assert response.status_code == 401, response.data
+    assert response.data == {"detail": "Autentikaatiotunnuksia ei annettu."}
     user.refresh_from_db()
     assert user.username == "foo"
 
@@ -529,6 +581,7 @@ def test_delete_user_data__wrong_scope(api_client, settings):
         response = api_client.delete(url)
 
     assert response.status_code == 403, response.data
+    assert response.data == {"detail": "Sinulla ei ole oikeutta suorittaa tätä toimintoa."}
     user.refresh_from_db()
     assert user.username == "foo"
 

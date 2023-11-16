@@ -1,0 +1,2000 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-11-16 11:37+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+#: actions/application_event.py:19
+msgid "Cannot decline an event without defined schedules"
+msgstr ""
+
+#: actions/application_event.py:26
+#, python-brace-format
+msgid ""
+"Cannot create reservations for event based on its status: '{status.value}'"
+msgstr ""
+
+#: api/gdpr/views.py:54
+msgid "User has upcoming or too recent reservations."
+msgstr "Käyttäjällä on tulevia tai liian äskettäisiä varauksia."
+
+#: api/gdpr/views.py:61
+msgid "User has an unhandled application."
+msgstr "Käyttäjällä on käsittelemätön hakemus."
+
+#: api/gdpr/views.py:68
+msgid "User has open payments."
+msgstr "Käyttäjällä on avoimia maksuja."
+
+#: api/graphql/extensions/duration_field.py:35
+msgid "A valid integer is required."
+msgstr ""
+
+#: api/graphql/extensions/legacy_helpers.py:137
+#, python-format
+msgid ""
+"Choice \"%(choice)s\" is not allowed. Allowed choices are: "
+"%(allowed_choices)s."
+msgstr ""
+
+#: applications/admin/forms/address.py:16 merchants/admin.py:34
+msgid "Street address"
+msgstr ""
+
+#: applications/admin/forms/address.py:17
+msgid "Post code"
+msgstr ""
+
+#: applications/admin/forms/address.py:18
+msgid "City name"
+msgstr ""
+
+#: applications/admin/forms/application.py:61
+msgid "Applicant"
+msgstr ""
+
+#: applications/admin/forms/application.py:64
+msgid "Applicant type."
+msgstr ""
+
+#: applications/admin/forms/application.py:65
+msgid "Application round the application is in."
+msgstr ""
+
+#: applications/admin/forms/application.py:66
+msgid "Organisation the application is for."
+msgstr ""
+
+#: applications/admin/forms/application.py:67
+msgid "Contact person for the application."
+msgstr ""
+
+#: applications/admin/forms/application.py:68
+msgid "Applicant for the application."
+msgstr ""
+
+#: applications/admin/forms/application.py:69
+msgid "Billing address for the application."
+msgstr ""
+
+#: applications/admin/forms/application.py:70
+msgid "Home city for the application."
+msgstr ""
+
+#: applications/admin/forms/application.py:71
+msgid "Additional information for the application."
+msgstr ""
+
+#: applications/admin/forms/application.py:72
+msgid "Working memo for staff users."
+msgstr ""
+
+#: applications/admin/forms/application.py:73
+msgid "Date when the application was sent."
+msgstr ""
+
+#: applications/admin/forms/application.py:74
+msgid "Date when the application was cancelled."
+msgstr ""
+
+#: applications/admin/forms/application_event.py:60
+msgid "Name that describes this event."
+msgstr ""
+
+#: applications/admin/forms/application_event.py:61
+msgid "Number of persons that are excepted to attend this event."
+msgstr ""
+
+#: applications/admin/forms/application_event.py:62
+msgid "Minimum duration of reservations allocated for this event."
+msgstr ""
+
+#: applications/admin/forms/application_event.py:63
+msgid "Maximum duration of reservations allocated for this event."
+msgstr ""
+
+#: applications/admin/forms/application_event.py:64
+msgid "First date on which reservations for this event are created."
+msgstr ""
+
+#: applications/admin/forms/application_event.py:65
+msgid "Last date on which reservations for this event are created."
+msgstr ""
+
+#: applications/admin/forms/application_event.py:66
+msgid "Number of reservations created per week (every other week if biweekly)."
+msgstr ""
+
+#: applications/admin/forms/application_event.py:67
+msgid "Whether reservations are created every other week."
+msgstr ""
+
+#: applications/admin/forms/application_event.py:68
+msgid "Whether this event is flagged for manual review."
+msgstr ""
+
+#: applications/admin/forms/application_event.py:69
+msgid "Application this event is in."
+msgstr ""
+
+#: applications/admin/forms/application_event.py:70
+msgid "Age group for this event."
+msgstr ""
+
+#: applications/admin/forms/application_event.py:71
+msgid "Ability group for this event."
+msgstr ""
+
+#: applications/admin/forms/application_event.py:72
+msgid "Purpose for this event."
+msgstr ""
+
+#: applications/admin/forms/application_event.py:91
+msgid "Priority of event."
+msgstr ""
+
+#: applications/admin/forms/application_event.py:92
+msgid "Requested day of the week."
+msgstr ""
+
+#: applications/admin/forms/application_event.py:93
+msgid "Requested start time of event."
+msgstr ""
+
+#: applications/admin/forms/application_event.py:94
+msgid "Requested end time of event."
+msgstr ""
+
+#: applications/admin/forms/application_event.py:95
+msgid "Has this event been declined or not."
+msgstr ""
+
+#: applications/admin/forms/application_event.py:96
+msgid "Allocated day of event."
+msgstr ""
+
+#: applications/admin/forms/application_event.py:97
+msgid "Allocated start time of event."
+msgstr ""
+
+#: applications/admin/forms/application_event.py:98
+msgid "Allocated end time of event."
+msgstr ""
+
+#: applications/admin/forms/application_event.py:99
+msgid "Allocated reservation unit."
+msgstr ""
+
+#: applications/admin/forms/application_round.py:64
+msgid "Name that describes the application round."
+msgstr ""
+
+#: applications/admin/forms/application_round.py:65
+msgid "Target group of the application round."
+msgstr ""
+
+#: applications/admin/forms/application_round.py:66
+msgid "Reservation units that can be applied for in this application round."
+msgstr ""
+
+#: applications/admin/forms/application_round.py:67
+msgid "Start date and time of the period when application can be sent."
+msgstr ""
+
+#: applications/admin/forms/application_round.py:68
+msgid "End date and time of the period when application can be sent."
+msgstr ""
+
+#: applications/admin/forms/application_round.py:69
+msgid "Start date of the period to which the reservations will be made."
+msgstr ""
+
+#: applications/admin/forms/application_round.py:70
+msgid "End date of the period to which the reservations will be made."
+msgstr ""
+
+#: applications/admin/forms/application_round.py:71
+msgid "Start date and time when application round is visible to public."
+msgstr ""
+
+#: applications/admin/forms/application_round.py:72
+msgid "End date and time when application round is visible to public."
+msgstr ""
+
+#: applications/admin/forms/application_round.py:73
+msgid "When the application round was handled."
+msgstr ""
+
+#: applications/admin/forms/application_round.py:74
+msgid "When the application round applications were sent to applicants."
+msgstr ""
+
+#: applications/admin/forms/application_round.py:75
+msgid "Purposes that are allowed in this application period."
+msgstr ""
+
+#: applications/admin/forms/application_round.py:76
+msgid "Service sector for the application round."
+msgstr ""
+
+#: applications/admin/forms/application_round.py:77
+msgid "Application criteria for the application round."
+msgstr ""
+
+#: applications/admin/forms/city.py:19
+msgid "Name of the city."
+msgstr ""
+
+#: applications/admin/forms/city.py:20
+msgid "Municipality code for the city."
+msgstr ""
+
+#: applications/admin/forms/organization.py:25
+msgid "Name of the organisation."
+msgstr ""
+
+#: applications/admin/forms/organization.py:26
+msgid "Email address of the organisation."
+msgstr ""
+
+#: applications/admin/forms/organization.py:27
+msgid "Organization company code."
+msgstr ""
+
+#: applications/admin/forms/organization.py:28
+msgid "Year the organisation was established."
+msgstr ""
+
+#: applications/admin/forms/organization.py:29
+msgid "Number of active members in the organisation."
+msgstr ""
+
+#: applications/admin/forms/organization.py:30
+msgid "Organisation core business area."
+msgstr ""
+
+#: applications/admin/forms/organization.py:31
+msgid "Organisation type."
+msgstr ""
+
+#: applications/admin/forms/organization.py:32
+msgid "Organisation address."
+msgstr ""
+
+#: applications/admin/forms/person.py:21
+msgid "Person's first name."
+msgstr ""
+
+#: applications/admin/forms/person.py:22
+msgid "Person's last name."
+msgstr ""
+
+#: applications/admin/forms/person.py:23
+msgid "Person's email address."
+msgstr ""
+
+#: applications/admin/forms/person.py:24
+msgid "Person's phone number."
+msgstr ""
+
+#: applications/choices.py:19 tilavarauspalvelu/utils/commons.py:29
+msgid "Monday"
+msgstr ""
+
+#: applications/choices.py:20 tilavarauspalvelu/utils/commons.py:30
+msgid "Tuesday"
+msgstr ""
+
+#: applications/choices.py:21 tilavarauspalvelu/utils/commons.py:31
+msgid "Wednesday"
+msgstr ""
+
+#: applications/choices.py:22 tilavarauspalvelu/utils/commons.py:32
+msgid "Thursday"
+msgstr ""
+
+#: applications/choices.py:23 tilavarauspalvelu/utils/commons.py:33
+msgid "Friday"
+msgstr ""
+
+#: applications/choices.py:24 tilavarauspalvelu/utils/commons.py:34
+msgid "Saturday"
+msgstr ""
+
+#: applications/choices.py:25 tilavarauspalvelu/utils/commons.py:35
+msgid "Sunday"
+msgstr ""
+
+#: applications/choices.py:29
+msgid "Low"
+msgstr ""
+
+#: applications/choices.py:30
+msgid "Medium"
+msgstr ""
+
+#: applications/choices.py:31
+msgid "High"
+msgstr ""
+
+#: applications/choices.py:35 reservations/choices.py:9
+msgid "Individual"
+msgstr ""
+
+#: applications/choices.py:36
+msgid "Association"
+msgstr ""
+
+#: applications/choices.py:37
+msgid "Community"
+msgstr ""
+
+#: applications/choices.py:38 applications/choices.py:156
+msgid "Company"
+msgstr ""
+
+#: applications/choices.py:121
+msgid "Unallocated"
+msgstr ""
+
+#: applications/choices.py:124
+msgid "Approved"
+msgstr ""
+
+#: applications/choices.py:127
+msgid "Declined"
+msgstr ""
+
+#: applications/choices.py:130
+msgid "Reserved"
+msgstr ""
+
+#: applications/choices.py:133
+msgid "Failed"
+msgstr ""
+
+#: applications/choices.py:150
+msgid "Internal"
+msgstr ""
+
+#: applications/choices.py:151
+msgid "Public"
+msgstr ""
+
+#: applications/choices.py:152 common/choices/banner_notification.py:12
+msgid "All"
+msgstr ""
+
+#: applications/choices.py:157
+msgid "Registered association"
+msgstr ""
+
+#: applications/choices.py:158
+msgid "Public association"
+msgstr ""
+
+#: applications/choices.py:159
+msgid "Unregistered association"
+msgstr ""
+
+#: applications/choices.py:160
+msgid "Municipality consortium"
+msgstr ""
+
+#: applications/choices.py:161
+msgid "Religious community"
+msgstr ""
+
+#: applications/models/organization.py:28
+msgid "is after current year"
+msgstr ""
+
+#: applications/validators.py:98
+msgid "This field is required."
+msgstr ""
+
+#: applications/validators.py:106
+msgid "Enter a valid time."
+msgstr ""
+
+#: common/admin/forms/banner_notification.py:24
+msgid "Name of the notification. Should be unique."
+msgstr ""
+
+#: common/admin/forms/banner_notification.py:25
+msgid "Notification body."
+msgstr ""
+
+#: common/admin/forms/banner_notification.py:26
+msgid "Level of the notification."
+msgstr ""
+
+#: common/admin/forms/banner_notification.py:27
+msgid "Target user interface of the notification."
+msgstr ""
+
+#: common/admin/forms/banner_notification.py:28
+msgid ""
+"Start date of the notification. If empty, 'active_until' must also be empty."
+msgstr ""
+
+#: common/admin/forms/banner_notification.py:29
+msgid ""
+"End date of the notification. If empty, 'active_from' must also be empty."
+msgstr ""
+
+#: common/admin/forms/banner_notification.py:31
+msgid ""
+"Is the notification a draft. Drafts won't be shown to users, even if they "
+"would be active."
+msgstr ""
+
+#: common/choices/banner_notification.py:6
+msgid "Exception"
+msgstr ""
+
+#: common/choices/banner_notification.py:7
+msgid "Warning"
+msgstr ""
+
+#: common/choices/banner_notification.py:8 reservations/choices.py:22
+msgid "Normal"
+msgstr ""
+
+#: common/choices/banner_notification.py:13 reservations/choices.py:24
+msgid "Staff"
+msgstr ""
+
+#: common/choices/banner_notification.py:14 permissions/models.py:328
+#: permissions/models.py:349 permissions/models.py:362
+#: reservation_units/models.py:969 reservations/models.py:354
+msgid "User"
+msgstr ""
+
+#: common/choices/banner_notification.py:18 merchants/models.py:62
+msgid "Draft"
+msgstr ""
+
+#: common/choices/banner_notification.py:19
+msgid "Scheduled"
+msgstr ""
+
+#: common/choices/banner_notification.py:20
+msgid "Active"
+msgstr ""
+
+#: common/fields/serializer.py:41
+#, python-brace-format
+msgid "\"{input}\" is not a valid choice."
+msgstr ""
+
+#: common/models/banner_notification.py:53
+msgid "Non-draft notifications must have an active period and message set."
+msgstr ""
+
+#: common/models/banner_notification.py:67
+msgid ""
+"Both 'active_from' and 'active_until' must be either empty or set. If both "
+"are set, 'active_until' must be after 'active_from'."
+msgstr ""
+
+#: email_notification/models.py:27
+msgid "Email type"
+msgstr ""
+
+#: email_notification/models.py:28
+msgid "Only one template per type can be created."
+msgstr ""
+
+#: email_notification/models.py:33
+msgid "Unique name for this content"
+msgstr ""
+
+#: email_notification/models.py:40
+msgid "Content"
+msgstr ""
+
+#: email_notification/models.py:41
+msgid ""
+"Email body content. Use curly brackets to indicate data specific fields e.g "
+"{{reservee_name}}."
+msgstr ""
+
+#: email_notification/models.py:47
+msgid "HTML content"
+msgstr ""
+
+#: email_notification/models.py:49
+msgid ""
+"Email body content as HTML. Use curly brackets to indicate data specific "
+"fields e.g {{reservee_name}}."
+msgstr ""
+
+#: merchants/admin.py:21
+msgid "Paytrail merchant ID"
+msgstr ""
+
+#: merchants/admin.py:24
+msgid "The Paytrail Merchant ID should be a six-digit number."
+msgstr ""
+
+#: merchants/admin.py:28
+msgid "Shop ID"
+msgstr ""
+
+#: merchants/admin.py:30
+msgid "Business ID"
+msgstr ""
+
+#: merchants/admin.py:35
+msgid "ZIP code"
+msgstr ""
+
+#: merchants/admin.py:36
+msgid "City"
+msgstr ""
+
+#: merchants/admin.py:37
+msgid "Email address"
+msgstr ""
+
+#: merchants/admin.py:38
+msgid "Phone number"
+msgstr ""
+
+#: merchants/admin.py:39
+msgid "URL"
+msgstr ""
+
+#: merchants/admin.py:40
+msgid "Terms of service URL"
+msgstr ""
+
+#: merchants/models.py:19
+msgid "Merchant ID"
+msgstr ""
+
+#: merchants/models.py:20
+msgid "Value comes from the Merchant Experience API"
+msgstr ""
+
+#: merchants/models.py:25
+msgid "Merchant name"
+msgstr ""
+
+#: merchants/models.py:36
+msgid "Product ID"
+msgstr ""
+
+#: merchants/models.py:37
+msgid "Value comes from the Product Experience API"
+msgstr ""
+
+#: merchants/models.py:44 reservation_units/models.py:506 spaces/models.py:74
+msgid "Payment merchant"
+msgstr ""
+
+#: merchants/models.py:56
+msgid "On site"
+msgstr ""
+
+#: merchants/models.py:57
+msgid "Online"
+msgstr ""
+
+#: merchants/models.py:58
+msgid "Invoice"
+msgstr ""
+
+#: merchants/models.py:63
+msgid "Expired"
+msgstr ""
+
+#: merchants/models.py:64 reservations/choices.py:14
+msgid "Cancelled"
+msgstr ""
+
+#: merchants/models.py:65
+msgid "Paid"
+msgstr ""
+
+#: merchants/models.py:66
+msgid "Paid manually"
+msgstr ""
+
+#: merchants/models.py:67
+msgid "Refunded"
+msgstr ""
+
+#: merchants/models.py:71 tilavarauspalvelu/settings.py:372
+msgid "Finnish"
+msgstr ""
+
+#: merchants/models.py:72 tilavarauspalvelu/settings.py:372
+msgid "Swedish"
+msgstr ""
+
+#: merchants/models.py:73 tilavarauspalvelu/settings.py:372
+msgid "English"
+msgstr ""
+
+#: merchants/models.py:79
+msgid "Reservation"
+msgstr ""
+
+#: merchants/models.py:88
+msgid "Remote order ID"
+msgstr ""
+
+#: merchants/models.py:89
+msgid "eCommerce order ID"
+msgstr ""
+
+#: merchants/models.py:94
+msgid "Payment ID"
+msgstr ""
+
+#: merchants/models.py:95
+msgid "eCommerce payment ID"
+msgstr ""
+
+#: merchants/models.py:101
+msgid "Refund ID"
+msgstr ""
+
+#: merchants/models.py:102
+msgid "Available only when order has been refunded"
+msgstr ""
+
+#: merchants/models.py:107
+msgid "Payment type"
+msgstr ""
+
+#: merchants/models.py:114
+msgid "Payment status"
+msgstr ""
+
+#: merchants/models.py:122
+msgid "Net amount"
+msgstr ""
+
+#: merchants/models.py:128
+msgid "VAT amount"
+msgstr ""
+
+#: merchants/models.py:134
+msgid "Total amount"
+msgstr ""
+
+#: merchants/models.py:139 reservations/models.py:396
+#: reservations/models.py:596
+msgid "Created at"
+msgstr ""
+
+#: merchants/models.py:141
+msgid "Processed at"
+msgstr ""
+
+#: merchants/models.py:144
+msgid "Language"
+msgstr ""
+
+#: merchants/models.py:151
+msgid "Reservation user UUID"
+msgstr ""
+
+#: merchants/models.py:156
+msgid "Checkout URL"
+msgstr ""
+
+#: merchants/models.py:162
+msgid "Receipt URL"
+msgstr ""
+
+#: merchants/models.py:182
+msgid "Must be greater than 0.01"
+msgstr ""
+
+#: merchants/models.py:184
+msgid "Must be greater than 0"
+msgstr ""
+
+#: merchants/models.py:186
+msgid "Must be the sum of net and vat amounts"
+msgstr ""
+
+#: merchants/models.py:195
+msgid "Accounting name"
+msgstr ""
+
+#: merchants/models.py:198
+msgid "Company code"
+msgstr ""
+
+#: merchants/models.py:206
+msgid "Main ledger account"
+msgstr ""
+
+#: merchants/models.py:213
+msgid "VAT code"
+msgstr ""
+
+#: merchants/models.py:216
+msgid "Internal order"
+msgstr ""
+
+#: merchants/models.py:224
+msgid "Profit center"
+msgstr ""
+
+#: merchants/models.py:232
+msgid "Project"
+msgstr ""
+
+#: merchants/models.py:240
+msgid "Operation area"
+msgstr ""
+
+#: merchants/models.py:248
+msgid "Balance profit center"
+msgstr ""
+
+#: merchants/models.py:267
+msgid ""
+"One of the following fields must be given: internal_order, profit_center, "
+"project"
+msgstr ""
+
+#: opening_hours/enums.py:23
+msgctxt "State"
+msgid "Open"
+msgstr ""
+
+#: opening_hours/enums.py:24
+msgctxt "State"
+msgid "Closed"
+msgstr ""
+
+#: opening_hours/enums.py:25
+msgctxt "State"
+msgid "Undefined"
+msgstr ""
+
+#: opening_hours/enums.py:26
+msgctxt "State"
+msgid "Self service"
+msgstr ""
+
+#: opening_hours/enums.py:27
+msgctxt "State"
+msgid "With key"
+msgstr ""
+
+#: opening_hours/enums.py:28
+msgctxt "State"
+msgid "With reservation"
+msgstr ""
+
+#: opening_hours/enums.py:29
+msgctxt "State"
+msgid "Open and reservable"
+msgstr ""
+
+#: opening_hours/enums.py:30
+msgctxt "State"
+msgid "With key and reservation"
+msgstr ""
+
+#: opening_hours/enums.py:31
+msgctxt "State"
+msgid "Enter only"
+msgstr ""
+
+#: opening_hours/enums.py:32
+msgctxt "State"
+msgid "Exit only"
+msgstr ""
+
+#: opening_hours/enums.py:33
+msgctxt "State"
+msgid "Weather permitting"
+msgstr ""
+
+#: opening_hours/enums.py:34
+msgctxt "State"
+msgid "Not in use"
+msgstr ""
+
+#: opening_hours/enums.py:35
+msgctxt "State"
+msgid "Maintenance"
+msgstr ""
+
+#: opening_hours/enums.py:104
+msgctxt "Weekday"
+msgid "Monday"
+msgstr ""
+
+#: opening_hours/enums.py:105
+msgctxt "Weekday"
+msgid "Tuesday"
+msgstr ""
+
+#: opening_hours/enums.py:106
+msgctxt "Weekday"
+msgid "Wednesday"
+msgstr ""
+
+#: opening_hours/enums.py:107
+msgctxt "Weekday"
+msgid "Thursday"
+msgstr ""
+
+#: opening_hours/enums.py:108
+msgctxt "Weekday"
+msgid "Friday"
+msgstr ""
+
+#: opening_hours/enums.py:109
+msgctxt "Weekday"
+msgid "Saturday"
+msgstr ""
+
+#: opening_hours/enums.py:110
+msgctxt "Weekday"
+msgid "Sunday"
+msgstr ""
+
+#: permissions/base_models.py:11
+msgid "Assigner"
+msgstr ""
+
+#: permissions/base_models.py:17 reservations/choices.py:13
+msgid "Created"
+msgstr ""
+
+#: permissions/base_models.py:18
+msgid "Modified"
+msgstr ""
+
+#: permissions/models.py:13
+msgid "Can manage general roles for the whole system"
+msgstr ""
+
+#: permissions/models.py:17
+msgid "Can manage roles for service sectors for the whole system"
+msgstr ""
+
+#: permissions/models.py:21
+msgid "Can manage roles for units in the whole system"
+msgstr ""
+
+#: permissions/models.py:25
+msgid "Can create, edit and delete reservation units in the whole system"
+msgstr ""
+
+#: permissions/models.py:29
+msgid "Can create, edit and delete purposes in the whole system"
+msgstr ""
+
+#: permissions/models.py:33
+msgid "Can create, edit and delete reservation purposes in the whole system"
+msgstr ""
+
+#: permissions/models.py:37
+msgid "Can create, edit and delete age groups in the whole system"
+msgstr ""
+
+#: permissions/models.py:41
+msgid "Can create, edit and delete ability groups in the whole system"
+msgstr ""
+
+#: permissions/models.py:45
+msgid "Can create, edit and delete reservation unit types in the whole system"
+msgstr ""
+
+#: permissions/models.py:49
+msgid "Can create, edit and delete equipment_categories in the whole system"
+msgstr ""
+
+#: permissions/models.py:53
+msgid "Can create, edit and delete equipment in the whole system"
+msgstr ""
+
+#: permissions/models.py:57
+msgid "Can create, edit and cancel reservations in the whole system"
+msgstr ""
+
+#: permissions/models.py:61
+msgid "Can view details of all reservations in the whole system"
+msgstr ""
+
+#: permissions/models.py:65
+msgid "Can create, edit and delete resources in the whole system"
+msgstr ""
+
+#: permissions/models.py:69
+msgid "Can create, edit and delete spaces in the whole system"
+msgstr ""
+
+#: permissions/models.py:73
+msgid "Can handle applications in the whole system"
+msgstr ""
+
+#: permissions/models.py:77
+msgid "Can validate applications in the whole system"
+msgstr ""
+
+#: permissions/models.py:81
+msgid "Can allocate applications in the whole system"
+msgstr ""
+
+#: permissions/models.py:85
+msgid "Can create, edit and delete application rounds in the whole system"
+msgstr ""
+
+#: permissions/models.py:89 permissions/models.py:129 permissions/models.py:204
+msgid "Can view users in the whole system"
+msgstr ""
+
+#: permissions/models.py:93
+msgid "Can comment reservations in the whole system"
+msgstr ""
+
+#: permissions/models.py:97
+msgid "Can create staff reservations in the whole system"
+msgstr ""
+
+#: permissions/models.py:101
+msgid "Can edit unit information in the whole system"
+msgstr ""
+
+#: permissions/models.py:105
+msgid "Can create, edit and delete banner notifications in the whole system"
+msgstr ""
+
+#: permissions/models.py:113
+msgid "Can modify roles for the unit"
+msgstr ""
+
+#: permissions/models.py:117
+msgid "Can create, edit and delete reservation units in the unit"
+msgstr ""
+
+#: permissions/models.py:121
+msgid "Can create, edit and cancel reservations in the unit"
+msgstr ""
+
+#: permissions/models.py:125
+msgid "Can view details of all reservations in the unit"
+msgstr ""
+
+#: permissions/models.py:133
+msgid "Can allocate applications"
+msgstr ""
+
+#: permissions/models.py:137
+msgid "Can validate applications in the unit"
+msgstr ""
+
+#: permissions/models.py:141
+msgid "Can allocate application in the unit"
+msgstr ""
+
+#: permissions/models.py:145
+msgid "Can handle application in the unit"
+msgstr ""
+
+#: permissions/models.py:149
+msgid "Can edit unit information"
+msgstr ""
+
+#: permissions/models.py:153
+msgid "Can create, edit and delete spaces in the unit"
+msgstr ""
+
+#: permissions/models.py:157
+msgid "Can create, edit and delete resources in the given unit"
+msgstr ""
+
+#: permissions/models.py:161
+msgid "Can create staff reservations in the given unit"
+msgstr ""
+
+#: permissions/models.py:165
+msgid "Can comment reservations in the unit"
+msgstr ""
+
+#: permissions/models.py:172
+msgid "Can modify roles for the service sector"
+msgstr ""
+
+#: permissions/models.py:176
+msgid "Can modify roles for units in the service sector"
+msgstr ""
+
+#: permissions/models.py:180
+msgid "Can create, edit and delete reservation units in the service sector"
+msgstr ""
+
+#: permissions/models.py:184
+msgid "Can create, edit and delete application rounds in the service sector"
+msgstr ""
+
+#: permissions/models.py:188
+msgid "Can handle applications in the service sector"
+msgstr ""
+
+#: permissions/models.py:192
+msgid "Can create, edit and cancel reservations in the service sector"
+msgstr ""
+
+#: permissions/models.py:196
+msgid "Can validate application in the service sector"
+msgstr ""
+
+#: permissions/models.py:200
+msgid "Can view details of all reservations in the service sector"
+msgstr ""
+
+#: permissions/models.py:208
+msgid "Can allocate applications in the service sector"
+msgstr ""
+
+#: permissions/models.py:212
+msgid "Can create, edit and delete spaces in the service sector"
+msgstr ""
+
+#: permissions/models.py:216
+msgid "Can create, edit and delete resources in the given service sector"
+msgstr ""
+
+#: permissions/models.py:220
+msgid "Can create staff reservations in the given service sector"
+msgstr ""
+
+#: permissions/models.py:224
+msgid "Can comment reservations in the service sector"
+msgstr ""
+
+#: permissions/models.py:228
+msgid "Can edit unit information in the service sector"
+msgstr ""
+
+#: permissions/models.py:234 permissions/models.py:247
+#: permissions/models.py:260 reservation_units/models.py:192
+msgid "Code"
+msgstr ""
+
+#: permissions/models.py:235 permissions/models.py:248
+#: permissions/models.py:261
+msgid "Verbose name"
+msgstr ""
+
+#: permissions/models.py:275 permissions/models.py:288
+#: permissions/models.py:301 permissions/models.py:312
+#: permissions/models.py:338 permissions/models.py:359
+msgid "Role"
+msgstr ""
+
+#: permissions/models.py:279 permissions/models.py:292
+#: permissions/models.py:305
+msgid "Permission"
+msgstr ""
+
+#: permissions/models.py:316
+msgid "Unit group"
+msgstr ""
+
+#: permissions/models.py:322 reservation_units/models.py:326
+#: spaces/models.py:189 spaces/models.py:254
+msgid "Unit"
+msgstr ""
+
+#: permissions/models.py:342
+msgid "Service sector"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py:155
+msgid "Which weekday this timeslot concerns."
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py:159
+msgid "Timeslots when the reservation unit is reservable"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py:171
+msgid "Is the reservation unit closed on this weekday?"
+msgstr ""
+
+#: reservation_units/models.py:39 reservation_units/models.py:52
+#: reservation_units/models.py:66 reservation_units/models.py:82
+#: reservation_units/models.py:89 reservation_units/models.py:105
+#: reservation_units/models.py:217 reservation_units/models.py:916
+#: reservations/models.py:338 reservations/models.py:572
+#: reservations/models.py:697 reservations/models.py:804
+#: reservations/models.py:810 reservations/models.py:828
+#: reservations/models.py:829 resources/models.py:13 services/models.py:16
+#: spaces/models.py:28 spaces/models.py:36 spaces/models.py:57
+#: spaces/models.py:130 spaces/models.py:145 spaces/models.py:169
+#: terms_of_use/models.py:26
+msgid "Name"
+msgstr ""
+
+#: reservation_units/models.py:43 reservation_units/models.py:70
+#: reservation_units/models.py:468 reservation_units/models.py:860
+#: spaces/models.py:68
+msgid "Order number"
+msgstr ""
+
+#: reservation_units/models.py:44 reservation_units/models.py:71
+#: reservation_units/models.py:861
+msgid "Order number to be used in api sorting."
+msgstr ""
+
+#: reservation_units/models.py:55
+msgid "Category"
+msgstr ""
+
+#: reservation_units/models.py:93
+msgid "Keyword category"
+msgstr ""
+
+#: reservation_units/models.py:109
+msgid "Keyword group"
+msgstr ""
+
+#: reservation_units/models.py:121
+msgid "Name for the rule"
+msgstr ""
+
+#: reservation_units/models.py:123
+msgid "Time before user can cancel reservations of this reservation unit"
+msgstr ""
+
+#: reservation_units/models.py:131
+msgid "Will the cancellation need manual staff handling"
+msgstr ""
+
+#: reservation_units/models.py:140 reservation_units/models.py:765
+msgid "Tax percentage"
+msgstr ""
+
+#: reservation_units/models.py:176
+msgid "per 15 minutes"
+msgstr ""
+
+#: reservation_units/models.py:177
+msgid "per 30 minutes"
+msgstr ""
+
+#: reservation_units/models.py:178
+msgid "per hour"
+msgstr ""
+
+#: reservation_units/models.py:179
+msgid "per half a day"
+msgstr ""
+
+#: reservation_units/models.py:180
+msgid "per day"
+msgstr ""
+
+#: reservation_units/models.py:181
+msgid "per week"
+msgstr ""
+
+#: reservation_units/models.py:182
+msgid "fixed"
+msgstr ""
+
+#: reservation_units/models.py:186
+msgid "past"
+msgstr ""
+
+#: reservation_units/models.py:187
+msgid "active"
+msgstr ""
+
+#: reservation_units/models.py:188
+msgid "future"
+msgstr ""
+
+#: reservation_units/models.py:216 reservations/models.py:337
+msgid "SKU"
+msgstr ""
+
+#: reservation_units/models.py:218 reservation_units/models.py:917
+#: reservations/models.py:339 spaces/models.py:58
+msgid "Description"
+msgstr ""
+
+#: reservation_units/models.py:219
+msgid "Spaces"
+msgstr ""
+
+#: reservation_units/models.py:223
+msgid "Keyword groups"
+msgstr ""
+
+#: reservation_units/models.py:230
+msgid "Resources"
+msgstr ""
+
+#: reservation_units/models.py:236
+msgid "Services"
+msgstr ""
+
+#: reservation_units/models.py:242
+msgid "Purposes"
+msgstr ""
+
+#: reservation_units/models.py:249
+msgid "Qualifiers"
+msgstr ""
+
+#: reservation_units/models.py:256 reservation_units/models.py:812
+msgid "Type"
+msgstr ""
+
+#: reservation_units/models.py:262
+msgid "Require introduction"
+msgstr ""
+
+#: reservation_units/models.py:265
+msgid "Equipments"
+msgstr ""
+
+#: reservation_units/models.py:269
+msgid "Terms of use"
+msgstr ""
+
+#: reservation_units/models.py:277 terms_of_use/models.py:18
+msgid "Payment terms"
+msgstr ""
+
+#: reservation_units/models.py:285 terms_of_use/models.py:19
+msgid "Cancellation terms"
+msgstr ""
+
+#: reservation_units/models.py:293 terms_of_use/models.py:21
+msgid "Service-specific terms"
+msgstr ""
+
+#: reservation_units/models.py:301 terms_of_use/models.py:22
+msgid "Pricing terms"
+msgstr ""
+
+#: reservation_units/models.py:307
+msgid "Additional instructions for pending reservation"
+msgstr ""
+
+#: reservation_units/models.py:313
+msgid "Additional instructions for confirmed reservation"
+msgstr ""
+
+#: reservation_units/models.py:319
+msgid "Additional instructions for cancelled reservations"
+msgstr ""
+
+#: reservation_units/models.py:332
+msgid "Contact information"
+msgstr ""
+
+#: reservation_units/models.py:337
+msgid "Maximum reservation duration"
+msgstr ""
+
+#: reservation_units/models.py:340
+msgid "Minimum reservation duration"
+msgstr ""
+
+#: reservation_units/models.py:347
+msgid "Is this in draft state"
+msgstr ""
+
+#: reservation_units/models.py:352 spaces/models.py:200
+msgid "Maximum number of persons"
+msgstr ""
+
+#: reservation_units/models.py:354
+msgid "Minimum number of persons"
+msgstr ""
+
+#: reservation_units/models.py:357 spaces/models.py:133 spaces/models.py:157
+#: spaces/models.py:196
+msgid "Surface area"
+msgstr ""
+
+#: reservation_units/models.py:362
+msgid "Buffer time before reservation"
+msgstr ""
+
+#: reservation_units/models.py:364
+msgid "Buffer time after reservation"
+msgstr ""
+
+#: reservation_units/models.py:366 spaces/models.py:64
+msgid "Hauki resource id"
+msgstr ""
+
+#: reservation_units/models.py:380
+msgid "15 minutes"
+msgstr ""
+
+#: reservation_units/models.py:381
+msgid "30 minutes"
+msgstr ""
+
+#: reservation_units/models.py:382
+msgid "60 minutes"
+msgstr ""
+
+#: reservation_units/models.py:383
+msgid "90 minutes"
+msgstr ""
+
+#: reservation_units/models.py:387
+msgid "Reservation start interval"
+msgstr ""
+
+#: reservation_units/models.py:399
+msgid "Maximum number of days before reservations can be made"
+msgstr ""
+
+#: reservation_units/models.py:405
+msgid "Minimum days before reservations can be made"
+msgstr ""
+
+#: reservation_units/models.py:413
+msgid ""
+"Time when making reservations become possible for this reservation unit."
+msgstr ""
+
+#: reservation_units/models.py:418
+msgid ""
+"Time when making reservations become not possible for this reservation unit"
+msgstr ""
+
+#: reservation_units/models.py:423
+msgid "Time after this reservation unit should be publicly visible in UI."
+msgstr ""
+
+#: reservation_units/models.py:428
+msgid "Time after this reservation unit should not be publicly visible in UI."
+msgstr ""
+
+#: reservation_units/models.py:432 reservations/models.py:586
+msgid "Reservation metadata set"
+msgstr ""
+
+#: reservation_units/models.py:438
+msgid ""
+"Reservation metadata set that defines the set of supported and required form "
+"fields for this reservation unit."
+msgstr ""
+
+#: reservation_units/models.py:443
+msgid "Maximum number of active reservations per user"
+msgstr ""
+
+#: reservation_units/models.py:449
+msgid "Does the reservations of this require a handling"
+msgstr ""
+
+#: reservation_units/models.py:452
+msgid ""
+"Does reservations of this reservation unit need to be handled before they're "
+"confirmed."
+msgstr ""
+
+#: reservation_units/models.py:455
+msgid "Weak"
+msgstr ""
+
+#: reservation_units/models.py:455
+msgid "Strong"
+msgstr ""
+
+#: reservation_units/models.py:458
+msgid "Authentication"
+msgstr ""
+
+#: reservation_units/models.py:462
+msgid "Authentication required for reserving this reservation unit."
+msgstr ""
+
+#: reservation_units/models.py:469 spaces/models.py:69
+msgid "Order number to be use in api sorting."
+msgstr ""
+
+#: reservation_units/models.py:474
+msgid "Reservation kind "
+msgstr ""
+
+#: reservation_units/models.py:485
+msgid "Can apply free of charge"
+msgstr ""
+
+#: reservation_units/models.py:486
+msgid ""
+"Can reservations to this reservation unit be able to apply free of charge."
+msgstr ""
+
+#: reservation_units/models.py:490
+msgid "Allow reservations without opening hours"
+msgstr ""
+
+#: reservation_units/models.py:497
+msgid "Is reservation unit archived"
+msgstr ""
+
+#: reservation_units/models.py:516
+msgid "Payment product"
+msgstr ""
+
+#: reservation_units/models.py:526 spaces/models.py:84
+msgid "Payment accounting"
+msgstr ""
+
+#: reservation_units/models.py:709
+msgid "Date when price is activated"
+msgstr ""
+
+#: reservation_units/models.py:717
+msgid "Pricing type"
+msgstr ""
+
+#: reservation_units/models.py:726
+msgid "Price unit"
+msgstr ""
+
+#: reservation_units/models.py:732
+msgid "Lowest price"
+msgstr ""
+
+#: reservation_units/models.py:740
+msgid "Lowest net price"
+msgstr ""
+
+#: reservation_units/models.py:748
+msgid "Highest price"
+msgstr ""
+
+#: reservation_units/models.py:756
+msgid "Highest net price"
+msgstr ""
+
+#: reservation_units/models.py:774
+msgid "Status"
+msgstr ""
+
+#: reservation_units/models.py:781 reservation_units/models.py:905
+#: reservation_units/models.py:973 reservations/models.py:364
+msgid "Reservation unit"
+msgstr ""
+
+#: reservation_units/models.py:806
+msgid "Main image"
+msgstr ""
+
+#: reservation_units/models.py:807
+msgid "Ground plan"
+msgstr ""
+
+#: reservation_units/models.py:808
+msgid "Map"
+msgstr ""
+
+#: reservation_units/models.py:809
+msgid "Other"
+msgstr ""
+
+#: reservation_units/models.py:816
+msgid "Reservation unit image"
+msgstr ""
+
+#: reservation_units/models.py:892
+msgid "within day"
+msgstr ""
+
+#: reservation_units/models.py:893
+msgid "whole day"
+msgstr ""
+
+#: reservation_units/models.py:894
+msgid "over night"
+msgstr ""
+
+#: reservation_units/models.py:900
+msgid "Reservations length type"
+msgstr ""
+
+#: reservation_units/models.py:913
+msgid "Start date"
+msgstr ""
+
+#: reservation_units/models.py:914
+msgid "End date"
+msgstr ""
+
+#: reservation_units/models.py:918
+msgid "Closed"
+msgstr ""
+
+#: reservation_units/models.py:933
+msgid "Period"
+msgstr ""
+
+#: reservation_units/models.py:938
+msgid "Weekday"
+msgstr ""
+
+#: reservation_units/models.py:939
+msgid "Time when opens"
+msgstr ""
+
+#: reservation_units/models.py:940
+msgid "Time when closes"
+msgstr ""
+
+#: reservation_units/models.py:952
+msgid "Everyone allowed"
+msgstr ""
+
+#: reservation_units/models.py:953
+msgid "Public allowed"
+msgstr ""
+
+#: reservation_units/models.py:954
+msgid "Staff allowed"
+msgstr ""
+
+#: reservation_units/models.py:958
+msgid "Begin time of day part"
+msgstr ""
+
+#: reservation_units/models.py:959
+msgid "End time of day part"
+msgstr ""
+
+#: reservation_units/models.py:960
+msgid "Day"
+msgstr ""
+
+#: reservation_units/models.py:975
+msgid "Completed at"
+msgstr ""
+
+#: reservations/admin.py:94
+msgid "Required fields must be a subset of supported fields"
+msgstr ""
+
+#: reservations/choices.py:7
+msgid "Business"
+msgstr ""
+
+#: reservations/choices.py:8
+msgid "Nonprofit"
+msgstr ""
+
+#: reservations/choices.py:15
+msgid "Requires handling"
+msgstr ""
+
+#: reservations/choices.py:16
+msgid "Waiting for payment"
+msgstr ""
+
+#: reservations/choices.py:17
+msgid "Confirmed"
+msgstr ""
+
+#: reservations/choices.py:18
+msgid "Denied"
+msgstr ""
+
+#: reservations/choices.py:23
+msgid "Blocked"
+msgstr ""
+
+#: reservations/choices.py:25
+msgid "Behalf"
+msgstr ""
+
+#: reservations/models.py:238
+msgid "Reservee first name"
+msgstr ""
+
+#: reservations/models.py:240
+msgid "Reservee last name"
+msgstr ""
+
+#: reservations/models.py:242
+msgid "Reservee organisation name"
+msgstr ""
+
+#: reservations/models.py:247
+msgid "Reservee phone"
+msgstr ""
+
+#: reservations/models.py:248
+msgid "Reservee email"
+msgstr ""
+
+#: reservations/models.py:250
+msgid "Reservee ID"
+msgstr ""
+
+#: reservations/models.py:257 reservations/models.py:788
+msgid "Reservee is an unregistered association"
+msgstr ""
+
+#: reservations/models.py:263
+msgid "Reservee address street"
+msgstr ""
+
+#: reservations/models.py:269
+msgid "Reservee address city"
+msgstr ""
+
+#: reservations/models.py:275
+msgid "Reservee address zip code"
+msgstr ""
+
+#: reservations/models.py:281 reservations/models.py:628
+msgid "Preferred language of reservee"
+msgstr ""
+
+#: reservations/models.py:287
+msgid "Billing first name"
+msgstr ""
+
+#: reservations/models.py:288
+msgid "Billing last name"
+msgstr ""
+
+#: reservations/models.py:289
+msgid "Billing phone"
+msgstr ""
+
+#: reservations/models.py:290
+msgid "Billing email"
+msgstr ""
+
+#: reservations/models.py:292
+msgid "Billing address street"
+msgstr ""
+
+#: reservations/models.py:298
+msgid "Billing address city"
+msgstr ""
+
+#: reservations/models.py:304
+msgid "Billing address zip code"
+msgstr ""
+
+#: reservations/models.py:311 reservations/models.py:642
+msgid "Home city"
+msgstr ""
+
+#: reservations/models.py:320 reservations/models.py:674
+msgid "Age group"
+msgstr ""
+
+#: reservations/models.py:326 reservations/models.py:621
+msgid "Reservee is applying for a free-of-charge reservation"
+msgstr ""
+
+#: reservations/models.py:332
+msgid "Reason for applying for a free-of-charge reservation"
+msgstr ""
+
+#: reservations/models.py:344 reservations/models.py:717
+msgid "State"
+msgstr ""
+
+#: reservations/models.py:358 reservations/models.py:702
+msgid "Begin time"
+msgstr ""
+
+#: reservations/models.py:359 reservations/models.py:704
+msgid "End time"
+msgstr ""
+
+#: reservations/models.py:361 reservations/models.py:607 resources/models.py:15
+#: services/models.py:25
+msgid "Buffer time before"
+msgstr ""
+
+#: reservations/models.py:362 reservations/models.py:608 resources/models.py:16
+#: services/models.py:26
+msgid "Buffer time after"
+msgstr ""
+
+#: reservations/models.py:368
+msgid "Recurring reservation"
+msgstr ""
+
+#: reservations/models.py:375 reservations/models.py:634
+msgid "Number of persons"
+msgstr ""
+
+#: reservations/models.py:379 reservations/models.py:664
+msgid "Reservation purpose"
+msgstr ""
+
+#: reservations/models.py:387 reservations/models.py:722
+msgid "Reason for cancellation"
+msgstr ""
+
+#: reservations/models.py:394
+msgid "Details for this reservation's cancellation"
+msgstr ""
+
+#: reservations/models.py:397 reservations/models.py:605
+msgid "Confirmed at"
+msgstr ""
+
+#: reservations/models.py:400
+msgid "Unit price"
+msgstr ""
+
+#: reservations/models.py:407 reservations/models.py:795
+msgid "Tax percentage value"
+msgstr ""
+
+#: reservations/models.py:414 reservations/models.py:753
+msgid "Price"
+msgstr ""
+
+#: reservations/models.py:421 reservations/models.py:761
+msgid "Price net"
+msgstr ""
+
+#: reservations/models.py:428 reservations/models.py:769
+msgid "Non subsidised price"
+msgstr ""
+
+#: reservations/models.py:435 reservations/models.py:776
+msgid "Non subsidised net price"
+msgstr ""
+
+#: reservations/models.py:442 reservations/models.py:599
+msgid "Handled at"
+msgstr ""
+
+#: reservations/models.py:450 reservations/models.py:738
+msgid "Reason for deny"
+msgstr ""
+
+#: reservations/models.py:458
+msgid "Handling details for this reservation"
+msgstr ""
+
+#: reservations/models.py:464
+msgid "Working memo"
+msgstr ""
+
+#: reservations/models.py:561
+msgid "Field name"
+msgstr ""
+
+#: reservations/models.py:564
+msgid "Reservation metadata field"
+msgstr ""
+
+#: reservations/models.py:565
+msgid "Reservation metadata fields"
+msgstr ""
+
+#: reservations/models.py:575
+msgid "Supported fields"
+msgstr ""
+
+#: reservations/models.py:580
+msgid "Required fields"
+msgstr ""
+
+#: reservations/models.py:587
+msgid "Reservation metadata sets"
+msgstr ""
+
+#: reservations/models.py:610
+msgid "Statistics updated at"
+msgstr ""
+
+#: reservations/models.py:651
+msgid "Home city name"
+msgstr ""
+
+#: reservations/models.py:659
+msgid "Home city municipality code"
+msgstr ""
+
+#: reservations/models.py:685
+msgid "Is the reservation done through application process."
+msgstr ""
+
+#: reservations/models.py:690
+msgid "Ability group"
+msgstr ""
+
+#: reservations/models.py:706
+msgid "Reservation duration in minutes"
+msgstr ""
+
+#: reservations/models.py:733
+msgid "The reason text of the cancel reason"
+msgstr ""
+
+#: reservations/models.py:749
+msgid "The reason text of the deny reason"
+msgstr ""
+
+#: reservations/models.py:806 reservations/models.py:824 spaces/models.py:50
+msgid "TPREK id"
+msgstr ""
+
+#: resources/models.py:11
+msgid "Fixed"
+msgstr ""
+
+#: resources/models.py:11
+msgid "Movable"
+msgstr ""
+
+#: services/models.py:11
+msgid "Introduction"
+msgstr ""
+
+#: services/models.py:12
+msgid "Catering"
+msgstr ""
+
+#: services/models.py:13
+msgid "Configuration"
+msgstr ""
+
+#: services/models.py:19
+msgid "Service type"
+msgstr ""
+
+#: spaces/models.py:29
+msgid "Units"
+msgstr ""
+
+#: spaces/models.py:56
+msgid "TPREK department id"
+msgstr ""
+
+#: spaces/models.py:59
+msgid "Short description"
+msgstr ""
+
+#: spaces/models.py:60
+msgid "Homepage for the unit"
+msgstr ""
+
+#: spaces/models.py:61
+msgid "Email"
+msgstr ""
+
+#: spaces/models.py:62
+msgid "Telephone"
+msgstr ""
+
+#: spaces/models.py:149
+msgid "Real estate"
+msgstr ""
+
+#: spaces/models.py:172
+msgid "Parent space"
+msgstr ""
+
+#: spaces/models.py:181 spaces/models.py:238
+msgid "Building"
+msgstr ""
+
+#: spaces/models.py:202
+msgid "Code for the space"
+msgstr ""
+
+#: spaces/models.py:225
+msgid "Address street"
+msgstr ""
+
+#: spaces/models.py:226
+msgid "Address zip"
+msgstr ""
+
+#: spaces/models.py:227
+msgid "Address city"
+msgstr ""
+
+#: spaces/models.py:230
+msgid "Space"
+msgstr ""
+
+#: spaces/models.py:246
+msgid "RealEstate"
+msgstr ""
+
+#: spaces/models.py:261
+msgid "Coordinates"
+msgstr ""
+
+#: terms_of_use/models.py:17
+msgid "Generic terms"
+msgstr ""
+
+#: terms_of_use/models.py:20
+msgid "Recurring reservation terms"
+msgstr ""
+
+#: terms_of_use/models.py:27
+msgid "Text"
+msgstr ""
+
+#: terms_of_use/models.py:30
+msgid "Terms type"
+msgstr ""
+
+#: terms_of_use/models.py:37
+msgctxt "singular"
+msgid "terms of use"
+msgstr ""
+
+#: terms_of_use/models.py:38
+msgctxt "plural"
+msgid "terms of use"
+msgstr ""
+
+#: users/admin.py:14 users/admin.py:15
+msgid "Notifications"
+msgstr ""
+
+#: users/models.py:27
+msgid "Preferred UI language"
+msgstr ""
+
+#: users/models.py:33
+msgid "Reservation notification"
+msgstr ""
+
+#: users/models.py:41
+msgid "Date of birth"
+msgstr ""
