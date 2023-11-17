@@ -1,0 +1,41 @@
+{% extends "admin/base_site.html" %}
+{% load i18n l10n admin_urls static %}
+
+{# Adapted from 'django/contrib/admin/templates/admin/delete_selected_confirmation.html' #}
+
+{% block extrahead %}
+    {{ block.super }}
+    {{ media }}
+    <script src="{% static 'admin/js/cancel.js' %}" async></script>
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} reset-allocation-confirmation{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+    &rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+    &rsaquo; {% translate 'Reset allocations' %}
+</div>
+{% endblock %}
+
+{% block content %}
+{% block delete_confirm %}
+
+<form method="post">{% csrf_token %}
+    <div>
+        {% for obj in queryset %}
+        <input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk|unlocalize }}">
+        {% endfor %}
+
+        <input type="hidden" name="action" value={{ action_name }}>
+        <input type="hidden" name="post" value="yes">
+
+        <input type="submit" value="{% translate 'Yes, I’m sure' %}">
+        <a href="#" class="button cancel-link">{% translate "No, take me back" %}</a>
+    </div>
+</form>
+
+{% endblock %}
+{% endblock content %}
