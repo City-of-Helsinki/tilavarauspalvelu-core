@@ -13,7 +13,7 @@ const Wrapper = styled(HDSFooter)`
     justify-content: center;
     gap: var(--spacing-2-xs);
     svg {
-      min-height: 21px; // The line height of the FooterBase element
+      min-height: 21px;
     }
   }
 `;
