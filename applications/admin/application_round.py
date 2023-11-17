@@ -1,5 +1,8 @@
 from django.contrib import admin, messages
+from django.contrib.admin import helpers
 from django.http import FileResponse, HttpRequest
+from django.template.response import TemplateResponse
+from django.utils.translation import gettext_lazy as _
 from modeltranslation.admin import TranslationAdmin
 from sentry_sdk import capture_exception
 
@@ -47,10 +50,31 @@ class ApplicationRoundAdmin(TranslationAdmin):
             )
 
     @admin.action(description="Reset application round allocations")
-    def reset_application_rounds(self, request: HttpRequest, queryset: ApplicationRoundQuerySet) -> None:
-        application_round: ApplicationRound
-        for application_round in queryset:
-            application_round.actions.reset_application_round_allocation()
+    def reset_application_rounds(
+        self,
+        request: HttpRequest,
+        queryset: ApplicationRoundQuerySet,
+    ) -> TemplateResponse | None:
+        # Coming from confirmation page, perform the action
+        if request.POST.get("post"):
+            application_round: ApplicationRound
+            for application_round in queryset:
+                application_round.actions.reset_application_round_allocation()
 
-        msg = "Application rounds were reset successfully."
-        self.message_user(request, msg, level=messages.INFO)
+            msg = "Application rounds were reset successfully."
+            self.message_user(request, msg, level=messages.INFO)
+            return None
+
+        # Show confirmation page
+        context = {
+            **self.admin_site.each_context(request),
+            "title": _("Are you sure?"),
+            "subtitle": _("Are you sure you want reset allocations?"),
+            "queryset": queryset,
+            "opts": self.model._meta,
+            "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
+            "media": self.media,
+            "action_name": "reset_application_rounds",
+        }
+        request.current_app = self.admin_site.name
+        return TemplateResponse(request, "admin/reset_allocation_confirmation.html", context)
