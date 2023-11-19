@@ -8,8 +8,11 @@ import type { ApplicationEventSchedulePriority } from "common/types/common";
 import type {
   ApplicationEventScheduleNode,
   ApplicationNode,
+  Query,
+  QueryApplicationRoundsArgs,
 } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
+import { useQuery } from "@apollo/client";
 import { MediumButton } from "@/styles/util";
 import { getReadableList } from "@/modules/util";
 import { AccordionWithState as Accordion } from "../common/Accordion";
@@ -20,6 +23,7 @@ import type {
   ApplicationEventScheduleFormType,
   ApplicationFormValues,
 } from "./Form";
+import { RESERVATION_UNIT } from "@/modules/queries/reservationUnit";
 
 type Props = {
   application: ApplicationNode;
@@ -46,7 +50,8 @@ const getListOfApplicationEventTitles = (
 };
 
 const applicationEventSchedulesToCells = (
-  applicationEventSchedules: ApplicationEventScheduleFormType[]
+  applicationEventSchedules: ApplicationEventScheduleFormType[],
+  openingHours?: { begin: string; end: string }[]
 ): Cell[][] => {
   const firstSlotStart = 7;
   const lastSlotStart = 23;
@@ -55,12 +60,26 @@ const applicationEventSchedulesToCells = (
 
   for (let j = 0; j < 7; j += 1) {
     const day = [];
+    const dayOpeningHours =
+      openingHours?.[j]?.reservableTimes.map((t) => {
+        return {
+          start: Number(t.begin.split(":")[0]),
+          end:
+            Number(t.end.split(":")[0]) === 0
+              ? 24
+              : Number(t.end.split(":")[0]),
+        };
+      }) ?? [];
+    // state is 50 if the cell is outside of the opening hours, 100 if it's inside
     for (let i = firstSlotStart; i <= lastSlotStart; i += 1) {
+      const isAvailable = dayOpeningHours.some(
+        (t) => t.start <= i && t.end > i
+      );
       day.push({
         key: `${i}-${j}`,
         hour: i,
         label: cellLabel(i),
-        state: 100 as const,
+        state: (isAvailable ? 100 : 50) as const,
       });
     }
     cells.push(day);
@@ -188,7 +207,15 @@ const getApplicationEventsWhichMinDurationsIsNotFulfilled = (
 
 const Page2 = ({ application, onNext }: Props): JSX.Element => {
   const { t } = useTranslation();
-
+  const { data: applicationRound } = useQuery<
+    Query,
+    QueryApplicationRoundsArgs
+  >(RESERVATION_UNIT, {
+    variables: {
+      pk: application.applicationRound.pk,
+    },
+    fetchPolicy: "no-cache",
+  });
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [minDurationMsg, setMinDurationMsg] = useState(true);
@@ -200,7 +227,10 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
   const applicationEvents = filterNonNullable(watch("applicationEvents"));
 
   const selectorData = applicationEvents.map((ae) =>
-    applicationEventSchedulesToCells(ae.applicationEventSchedules)
+    applicationEventSchedulesToCells(
+      ae.applicationEventSchedules,
+      applicationRound?.reservationUnitByPk?.applicationRoundTimeSlots
+    )
   );
   const setSelectorData = (selected: typeof selectorData) => {
     // So this returns them as:

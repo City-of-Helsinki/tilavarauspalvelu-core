@@ -53,9 +53,7 @@ const TimeSelectionButton = styled.button<{
 
   display: block;
   width: 100%;
-  font-family: var(--font-bold);
   font-size: var(--fontsize-heading-m);
-  font-weight: bold;
   color: ${(props) =>
     props.state ? "var(--color-white)" : "var(--color-black)"};
   padding: 0.24em 0.5em;
@@ -85,9 +83,11 @@ const TimeSelectionButton = styled.button<{
     }
     background: var(--tilavaraus-calendar-selected-secondary);
     color: var(--color-black);
+    font-weight: bold;
   `
       : `
-    background: #e5e5e5;
+    background: ${props.state === 100 ? "#ffffff" : "#e5e5e5"};
+    font-weight: ${props.state === 100 ? "bold" : "normal"};
     color: var(--color-black);
   `};
   white-space: nowrap;
