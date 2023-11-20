@@ -64,7 +64,7 @@ bash:
 	@docker exec -it tvp-core bash
 
 celery:
-	@celery -A tilavarauspalvelu worker -l DEBUG
+	@celery -A tilavarauspalvelu worker --beat --loglevel info --scheduler django
 
 clear-db:
 	@python manage.py dbshell -- -c "DROP SCHEMA $(call args, 'public') CASCADE;CREATE SCHEMA $(call args, 'public');"
