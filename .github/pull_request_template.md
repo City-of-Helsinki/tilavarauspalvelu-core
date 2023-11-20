@@ -4,7 +4,7 @@
 -
 
 ## 🧪 Test plan
-[//]: # "Help your fellow reviewer and write a short description what's the fastest way to test your changes."
+[//]: # "Help your fellow reviewer and write a short description of what's the fastest way to test your changes."
 
 -
 
