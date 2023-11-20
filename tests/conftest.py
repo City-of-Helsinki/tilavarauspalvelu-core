@@ -40,3 +40,8 @@ def outbox(settings) -> list[EmailMessage]:
     from django.core import mail
 
     return mail.outbox
+
+
+@pytest.fixture()
+def _disable_hauki_export(settings):
+    settings.HAUKI_EXPORTS_ENABLED = None
