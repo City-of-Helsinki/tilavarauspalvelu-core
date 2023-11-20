@@ -32,14 +32,14 @@ class HaukiResourceHashUpdater:
         self.fetched_hauki_resources = []
         self.resources_updated = []
 
-    def run(self):
+    def run(self, *, force_refetch: bool = False):
         self._fetch_hauki_resources()
 
         if not self.fetched_hauki_resources:
             logger.info("No resources returned from the Hauki API.")
             return
 
-        self._update_origin_hauki_resource_hashes()
+        self._update_origin_hauki_resource_hashes(force_refetch=force_refetch)
 
         if not self.resources_updated:
             logger.info("There was need to update any OriginHaukiResource hashes.")
@@ -68,7 +68,7 @@ class HaukiResourceHashUpdater:
 
         logger.info(f"Fetched {len(self.fetched_hauki_resources)} hauki resources in total.")
 
-    def _update_origin_hauki_resource_hashes(self):
+    def _update_origin_hauki_resource_hashes(self, force_refetch: bool = False):
         """Update hashes for OriginHaukiResources that have had their opening hours changed."""
         cutoff_date = timezone.now().date()
 
@@ -80,7 +80,7 @@ class HaukiResourceHashUpdater:
                 logger.info(f"OriginHaukiResource with ID '{resource['id']}' was not found.")
                 continue
 
-            if origin_hauki_resource.opening_hours_hash == resource["date_periods_hash"]:
+            if not force_refetch and origin_hauki_resource.opening_hours_hash == resource["date_periods_hash"]:
                 logger.info(f"OriginHaukiResource '{resource['id']}' date periods hash is unchanged, skipping.")
                 continue
 
