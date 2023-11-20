@@ -1,8 +1,10 @@
 from django.contrib import admin
+from django.db.models import QuerySet
 from django.urls import reverse
 from django.utils.html import format_html
 
 from opening_hours.models import OriginHaukiResource, ReservableTimeSpan
+from opening_hours.utils.hauki_resource_hash_updater import HaukiResourceHashUpdater
 from reservation_units.models import ReservationUnit
 
 
@@ -38,12 +40,18 @@ class ReservableTimeSpanInline(admin.TabularInline):
         return obj._get_datetime_str()
 
 
+def update_reservable_time_spans(modeladmin, request, queryset: QuerySet[OriginHaukiResource]):
+    ids: list[int] = queryset.values_list("id", flat=True)
+    HaukiResourceHashUpdater(ids).run(force_refetch=True)
+
+
 @admin.register(OriginHaukiResource)
 class OriginHaukiResourceAdmin(admin.ModelAdmin):
     model = OriginHaukiResource
 
     list_display = ["id", "opening_hours_hash", "latest_fetched_date"]
     readonly_fields = ["opening_hours_hash", "latest_fetched_date"]
+    actions = [update_reservable_time_spans]
 
     inlines = [
         ReservationUnitInline,
