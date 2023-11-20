@@ -625,6 +625,7 @@ function BasicSection({
             <Controller
               control={control}
               name="reservationKind"
+              key={kind}
               render={({ field }) => (
                 <RadioButton
                   {...field}
@@ -1484,39 +1485,35 @@ function CommunicationSection({
   // NOTE no required fields
   return (
     <Accordion heading={t("ReservationUnitEditor.communication")}>
-      <Grid>
-        <Span12>
-          <SlimH4>{t("ReservationUnitEditor.pendingInstructions")}</SlimH4>
-          {(
-            [
-              "reservationPendingInstructionsFi",
-              "reservationPendingInstructionsEn",
-              "reservationPendingInstructionsSv",
-            ] as const
-          ).map((fieldName) => (
-            <Controller
-              key={fieldName}
-              control={control}
-              name={fieldName}
-              render={({ field }) => (
-                <TextArea
-                  {...field}
-                  id={fieldName}
-                  label={t(`ReservationUnitEditor.label.${fieldName}`)}
-                  errorText={getTranslatedError(errors[fieldName]?.message, t)}
-                  invalid={errors[fieldName]?.message != null}
-                  /* FIXME
+      <VerticalFlex>
+        <SlimH4>{t("ReservationUnitEditor.pendingInstructions")}</SlimH4>
+        {(
+          [
+            "reservationPendingInstructionsFi",
+            "reservationPendingInstructionsEn",
+            "reservationPendingInstructionsSv",
+          ] as const
+        ).map((fieldName) => (
+          <Controller
+            key={fieldName}
+            control={control}
+            name={fieldName}
+            render={({ field }) => (
+              <TextArea
+                {...field}
+                id={fieldName}
+                label={t(`ReservationUnitEditor.label.${fieldName}`)}
+                errorText={getTranslatedError(errors[fieldName]?.message, t)}
+                invalid={errors[fieldName]?.message != null}
+                /* FIXME
                 tooltipText={t("ReservationUnitEditor.tooltip.termsOfUseFi")}
                 tooltipText={ lang === "fi" ? t( "ReservationUnitEditor.tooltip.reservationPendingInstructionsFi") : "" }
                 */
-                />
-              )}
-            />
-          ))}
-        </Span12>
-        <Span12>
-          <SlimH4>{t("ReservationUnitEditor.confirmedInstructions")}</SlimH4>
-        </Span12>
+              />
+            )}
+          />
+        ))}
+        <SlimH4>{t("ReservationUnitEditor.confirmedInstructions")}</SlimH4>
         {(
           [
             "reservationConfirmedInstructionsFi",
@@ -1524,10 +1521,42 @@ function CommunicationSection({
             "reservationConfirmedInstructionsSv",
           ] as const
         ).map((fieldName) => (
-          <Span12 key={fieldName}>
+          <Controller
+            control={control}
+            name={fieldName}
+            key={fieldName}
+            render={({ field }) => (
+              <TextArea
+                {...field}
+                id={fieldName}
+                label={t(`ReservationUnitEditor.label.${fieldName}`)}
+                errorText={getTranslatedError(errors[fieldName]?.message, t)}
+                invalid={errors[fieldName]?.message != null}
+                /* FIXME tr key
+                label={t( `ReservationUnitEditor.label.instructions${upperFirst( lang)}`)}
+                tooltipText={ lang === "fi" ? t( "ReservationUnitEditor.tooltip.reservationConfirmedInstructionsFi") : "" }
+                */
+              />
+            )}
+          />
+        ))}
+        <SubAccordion
+          // don't open there is no errors under this
+          heading={t("ReservationUnitEditor.cancelledSubAccordion")}
+          headingLevel="h3"
+        >
+          <SlimH4>{t("ReservationUnitEditor.cancelledInstructions")}</SlimH4>
+          {(
+            [
+              "reservationCancelledInstructionsFi",
+              "reservationCancelledInstructionsEn",
+              "reservationCancelledInstructionsSv",
+            ] as const
+          ).map((fieldName) => (
             <Controller
               control={control}
               name={fieldName}
+              key={fieldName}
               render={({ field }) => (
                 <TextArea
                   {...field}
@@ -1535,67 +1564,22 @@ function CommunicationSection({
                   label={t(`ReservationUnitEditor.label.${fieldName}`)}
                   errorText={getTranslatedError(errors[fieldName]?.message, t)}
                   invalid={errors[fieldName]?.message != null}
-                  /* FIXME tr key
-                label={t( `ReservationUnitEditor.label.instructions${upperFirst( lang)}`)}
-                tooltipText={ lang === "fi" ? t( "ReservationUnitEditor.tooltip.reservationConfirmedInstructionsFi") : "" }
-                */
+                  /* TODO rename the keys
+                    tooltipText={ lang === "fi" ? t( "ReservationUnitEditor.tooltip.reservationCancelledInstructionsFi") : "" }
+                    */
                 />
               )}
             />
-          </Span12>
-        ))}
-        <Span12>
-          <SubAccordion
-            // don't open there is no errors under this
-            heading={t("ReservationUnitEditor.cancelledSubAccordion")}
-            headingLevel="h3"
-          >
-            <Span12>
-              <SlimH4>
-                {t("ReservationUnitEditor.cancelledInstructions")}
-              </SlimH4>
-            </Span12>
-            {(
-              [
-                "reservationCancelledInstructionsFi",
-                "reservationCancelledInstructionsEn",
-                "reservationCancelledInstructionsSv",
-              ] as const
-            ).map((fieldName) => (
-              <Span12 key={fieldName}>
-                <Controller
-                  control={control}
-                  name={fieldName}
-                  render={({ field }) => (
-                    <TextArea
-                      {...field}
-                      id={fieldName}
-                      label={t(`ReservationUnitEditor.label.${fieldName}`)}
-                      errorText={getTranslatedError(
-                        errors[fieldName]?.message,
-                        t
-                      )}
-                      invalid={errors[fieldName]?.message != null}
-                      /* TODO rename the keys
-                    tooltipText={ lang === "fi" ? t( "ReservationUnitEditor.tooltip.reservationCancelledInstructionsFi") : "" }
-                    */
-                    />
-                  )}
-                />
-              </Span12>
-            ))}
-          </SubAccordion>
-        </Span12>
-        <Span12>
-          <TextInput
-            {...register("contactInformation")}
-            id="contactInformation"
-            label={t("ReservationUnitEditor.contactInformationLabel")}
-            helperText={t("ReservationUnitEditor.contactInformationHelperText")}
-            tooltipText={t("ReservationUnitEditor.tooltip.contactInformation")}
-          />
-        </Span12>
-      </Grid>
+          ))}
+        </SubAccordion>
+        <TextInput
+          {...register("contactInformation")}
+          id="contactInformation"
+          label={t("ReservationUnitEditor.contactInformationLabel")}
+          helperText={t("ReservationUnitEditor.contactInformationHelperText")}
+          tooltipText={t("ReservationUnitEditor.tooltip.contactInformation")}
+        />
+      </VerticalFlex>
     </Accordion>
   );
 }
