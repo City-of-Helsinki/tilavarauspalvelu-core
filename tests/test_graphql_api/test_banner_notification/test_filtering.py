@@ -186,7 +186,7 @@ def test_filter_banner_notifications_by_is_visible(graphql, value, expected):
     response = graphql(
         """
         query BannerNotifications($isVisible: Boolean!) {
-            bannerNotifications(isVisible: $isVisible) {
+            bannerNotifications(isVisible: $isVisible, orderBy: "pk") {
                 edges {
                     node {
                         name
