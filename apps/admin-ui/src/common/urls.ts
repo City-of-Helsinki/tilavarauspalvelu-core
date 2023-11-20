@@ -48,3 +48,5 @@ export const myReservationUnitUrl = (
   unitId: number,
   reservationUnitId: number
 ): string => `${myUnitUrl(unitId)}/${reservationUnitId}`;
+
+export const reservationUnitsUrl = `/premises-and-settings/reservation-units`;

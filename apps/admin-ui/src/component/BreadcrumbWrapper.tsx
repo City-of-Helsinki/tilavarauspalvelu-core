@@ -1,11 +1,12 @@
 import React from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { useMedia } from "react-use";
 import { Breadcrumb } from "common";
 import { useTranslation } from "react-i18next";
 import { trim } from "lodash";
 import { breakpoints } from "common/src/common/style";
 import { publicUrl } from "../common/const";
+import LinkPrev from "./LinkPrev";
 
 type Alias = {
   slug: string;
@@ -15,6 +16,7 @@ type Alias = {
 type Props = {
   route: string[] | Array<{ slug: string; alias?: string }>;
   aliases?: Alias[];
+  backLink?: string;
 };
 
 const Wrapper = styled.div`
@@ -23,13 +25,31 @@ const Wrapper = styled.div`
   border-bottom: 1px solid var(--color-black-20);
 `;
 
-const StyledBreadcrumb = styled(Breadcrumb)`
+const navStyling = css`
   line-height: 64px;
   margin: 0 0 0 var(--spacing-2-xs);
   overflow: hidden;
 `;
+const StyledBreadcrumb = styled(Breadcrumb)`
+  ${navStyling}
+`;
+const StyledLinkPrev = styled(LinkPrev)`
+  ${navStyling}
+`;
+const LinkWrapper = styled.div`
+  padding-left: var(--spacing-m);
+`;
 
-const BreadcrumbWrapper = ({ route, aliases }: Props): JSX.Element => {
+/**
+ * @param route - array of strings or objects with slug and alias
+ * @param aliases - deprecated, use route instead
+ * @param backLink - if set, renders a back link instead of breadcrumb
+ */
+const BreadcrumbWrapper = ({
+  route,
+  aliases,
+  backLink,
+}: Props): JSX.Element => {
   const { t } = useTranslation();
   const isMobile = useMedia(`(max-width: ${breakpoints.s})`, true);
 
@@ -51,6 +71,14 @@ const BreadcrumbWrapper = ({ route, aliases }: Props): JSX.Element => {
         slug: n.includes("/") ? n : "",
       };
     }) || [];
+
+  if (backLink != null) {
+    return (
+      <LinkWrapper>
+        <StyledLinkPrev style={{ lineHeight: "64px" }} route={backLink} />
+      </LinkWrapper>
+    );
+  }
 
   return (
     <Wrapper>

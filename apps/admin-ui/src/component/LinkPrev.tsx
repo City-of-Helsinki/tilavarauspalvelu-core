@@ -7,6 +7,8 @@ import { BasicLink } from "../styles/util";
 
 interface IProps {
   route?: string;
+  style?: React.CSSProperties;
+  className?: string;
 }
 
 const StyledLink = styled(BasicLink)`
@@ -18,12 +20,14 @@ const StyledLink = styled(BasicLink)`
   gap: var(--spacing-2-xs);
 `;
 
-function LinkPrev({ route }: IProps): JSX.Element {
+function LinkPrev({ route, style, className }: IProps): JSX.Element {
   const { t } = useTranslation();
   const navigate = useNavigate();
   return (
     <StyledLink
       to={route || "#"}
+      style={style}
+      className={className}
       data-testid="link__previous"
       onClick={(e) => {
         if (!route) {

@@ -21,6 +21,9 @@ export function ReservationStateTag({ state }: { state?: ReservationState }) {
 
   const { t } = useTranslation();
 
+  if (!state) {
+    return null;
+  }
   if (state === ReservationState.Reservable) {
     return null;
   }
@@ -60,8 +63,11 @@ export function ReservationUnitStateTag({
   state,
 }: {
   state?: ReservationUnitState;
-}): JSX.Element {
+}): JSX.Element | null {
   const { t } = useTranslation();
+  if (!state) {
+    return null;
+  }
   return (
     <Tag
       theme={{

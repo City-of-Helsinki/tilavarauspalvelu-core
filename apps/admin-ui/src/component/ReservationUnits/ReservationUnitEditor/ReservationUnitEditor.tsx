@@ -95,6 +95,7 @@ import {
   convert,
 } from "./form";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
+import { reservationUnitsUrl } from "@/common/urls";
 
 const RichTextInput = dynamic(() => import("../../RichTextInput"), {
   ssr: false,
@@ -105,15 +106,6 @@ const Wrapper = styled.div`
   padding-bottom: 16rem;
   @media (width > ${breakpoints.m}) {
     padding-bottom: 8rem;
-  }
-`;
-
-const ButtonsContainer = styled.div`
-  display: flex;
-  gap: var(--spacing-m);
-  flex-direction: column;
-  @media (width > ${breakpoints.s}) {
-    flex-direction: row;
   }
 `;
 
@@ -187,12 +179,28 @@ const ButtonsStripe = styled.div`
   position: fixed;
   bottom: 0;
   left: 0;
-  justify-content: space-between;
   right: 0;
   display: flex;
+  justify-content: space-between;
   padding: var(--spacing-s);
   background-color: var(--color-bus-dark);
   z-index: var(--tilavaraus-admin-stack-button-stripe);
+
+  /* back button should be left aligned */
+  gap: var(--spacing-m);
+  & > *:first-child {
+    margin-right: auto;
+  }
+
+  /* four buttons is too much on mobile */
+  & > *:nth-child(2) {
+    display: none;
+  }
+  @media (width > ${breakpoints.s}) {
+    & > *:nth-child(2) {
+      display: flex;
+    }
+  }
 `;
 
 // Point of this is to have lighter colour buttons on dark background (inverted colours)
@@ -2182,44 +2190,42 @@ const ReservationUnitEditor = ({
         >
           {t("common.prev")}
         </WhiteButton>
-        <ButtonsContainer>
-          <Preview
-            target="_blank"
-            rel="noopener noreferrer"
-            disabled={isSaving}
-            href={`${previewUrlPrefix}/${reservationUnit?.pk}?ru=${reservationUnit?.uuid}`}
-            // TODO
-            // onClick={(e) => state.hasChanges && e.preventDefault()}
-            title={t(
-              hasChanges
-                ? "ReservationUnitEditor.noPreviewUnsavedChangesTooltip"
-                : "ReservationUnitEditor.previewTooltip"
-            )}
-          >
-            <span>{t("ReservationUnitEditor.preview")}</span>
-          </Preview>
-          <WhiteButton
-            size="small"
-            variant="secondary"
-            // disabled={isSaving || !hasChanges}
-            isLoading={isSaving && watch("isDraft")}
-            type="button"
-            loadingText={t("ReservationUnitEditor.saving")}
-            onClick={handleSaveAsDraft}
-          >
-            {t("ReservationUnitEditor.saveAsDraft")}
-          </WhiteButton>
-          <WhiteButton
-            variant="primary"
-            // disabled={isSaving || !hasChanges}
-            isLoading={isSaving && !watch("isDraft")}
-            loadingText={t("ReservationUnitEditor.saving")}
-            type="button"
-            onClick={handlePublish}
-          >
-            {t("ReservationUnitEditor.saveAndPublish")}
-          </WhiteButton>
-        </ButtonsContainer>
+        <Preview
+          target="_blank"
+          rel="noopener noreferrer"
+          disabled={isSaving}
+          href={`${previewUrlPrefix}/${reservationUnit?.pk}?ru=${reservationUnit?.uuid}`}
+          // TODO
+          // onClick={(e) => state.hasChanges && e.preventDefault()}
+          title={t(
+            hasChanges
+              ? "ReservationUnitEditor.noPreviewUnsavedChangesTooltip"
+              : "ReservationUnitEditor.previewTooltip"
+          )}
+        >
+          <span>{t("ReservationUnitEditor.preview")}</span>
+        </Preview>
+        <WhiteButton
+          size="small"
+          variant="secondary"
+          // disabled={isSaving || !hasChanges}
+          isLoading={isSaving && watch("isDraft")}
+          type="button"
+          loadingText={t("ReservationUnitEditor.saving")}
+          onClick={handleSaveAsDraft}
+        >
+          {t("ReservationUnitEditor.saveAsDraft")}
+        </WhiteButton>
+        <WhiteButton
+          variant="primary"
+          // disabled={isSaving || !hasChanges}
+          isLoading={isSaving && !watch("isDraft")}
+          loadingText={t("ReservationUnitEditor.saving")}
+          type="button"
+          onClick={handlePublish}
+        >
+          {t("ReservationUnitEditor.saveAndPublish")}
+        </WhiteButton>
       </ButtonsStripe>
     </form>
   );
@@ -2248,7 +2254,6 @@ function EditorWrapper() {
   });
 
   const reservationUnit = reservationUnitData?.reservationUnitByPk ?? undefined;
-  const unit = reservationUnit?.unit;
 
   // NOTE override the unitPk from the url for new units
   // there is no harm in doing it to existing units either (since it should be valid)
@@ -2290,19 +2295,18 @@ function EditorWrapper() {
     return <Error404 />;
   }
 
-  // FIXME can't query the unit name through the reservationUnit because new pages don't have reservationUnit
+  const route = [
+    { slug: "", alias: t("breadcrumb.spaces-n-settings") },
+    {
+      slug: `${publicUrl}${reservationUnitsUrl}`,
+      alias: t("breadcrumb.reservation-units"),
+    },
+    { slug: "", alias: reservationUnit?.nameFi || "-" },
+  ];
+  const backLink = reservationUnitPk == null ? `/unit/${unitPk}` : undefined;
   return (
     <Wrapper>
-      <BreadcrumbWrapper
-        route={[
-          { slug: "", alias: t("breadcrumb.spaces-n-settings") },
-          {
-            slug: `${publicUrl}/unit/${unit?.pk ?? ""}`,
-            alias: unit?.nameFi ?? "-",
-          },
-          { slug: "", alias: reservationUnit?.nameFi || "-" },
-        ]}
-      />
+      <BreadcrumbWrapper route={route} backLink={backLink} />
       <ReservationUnitEditor
         reservationUnit={reservationUnit}
         form={form}
