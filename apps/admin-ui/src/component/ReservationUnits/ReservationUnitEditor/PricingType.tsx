@@ -14,6 +14,7 @@ import {
   ReservationUnitsReservationUnitPricingPricingTypeChoices,
 } from "common/types/gql-types";
 import { Controller, UseFormReturn } from "react-hook-form";
+import { addDays } from "date-fns";
 import { AutoGrid } from "@/styles/layout";
 import { ReservationUnitEditFormValues } from "./form";
 import { PaymentTypes } from "./types";
@@ -198,7 +199,6 @@ function PaidPricingPart({
           },
         })}
         id={`pricings.${index}.lowestPrice`}
-        pattern="[0-9].*"
         required
         label={t("ReservationUnitEditor.label.lowestPrice")}
         minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
@@ -289,7 +289,7 @@ function PaidPricingPart({
             )}
             label={t("ReservationUnitEditor.label.paymentTypes")}
             tooltipText={t("ReservationUnitEditor.tooltip.paymentTypes")}
-            errorText={getTranslatedError(errors.paymentTypes?.message, t)}
+            error={getTranslatedError(errors.paymentTypes?.message, t)}
             invalid={errors.paymentTypes?.message != null}
           />
         )}
@@ -326,6 +326,12 @@ export function PricingType({
               id="futureDate"
               value={value}
               onChange={(val) => onChange(val)}
+              minDate={addDays(new Date(), 1)}
+              invalid={errors.pricings?.[index]?.begins?.message != null}
+              errorText={getTranslatedError(
+                errors.pricings?.[index]?.begins?.message,
+                t
+              )}
             />
           )}
         />

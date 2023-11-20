@@ -551,7 +551,7 @@ function BasicSection({
   spaces: SpaceType[];
 }) {
   const { t } = useTranslation();
-  const { control, register, watch, formState } = form;
+  const { control, formState, register, setValue, watch } = form;
   const { errors } = formState;
 
   const spaceOptions = spaces.map((s) => ({
@@ -562,29 +562,49 @@ function BasicSection({
     spaces.flatMap((s) => s?.resources)
   ).map((r) => ({ label: String(r?.nameFi), value: Number(r?.pk) }));
 
-  // FIXME this isn't working
-  // the space has 12 m^2 space but when it's selected it doesn't update the surface area only if it's saved and reloaded
-  const selectedSpaces = spaces.filter(
-    (s) => s.pk != null && watch("spacePks").includes(s.pk)
-  );
-
-  // default is 1 if no spaces selected
-  const minSurfaceArea = Math.ceil(
-    selectedSpaces.map((s) => s.surfaceArea ?? 0).reduce((a, x) => a + x, 0) ||
-      1
+  const spacePks = watch("spacePks");
+  const selectedSpaces = filterNonNullable(
+    spacePks.map((pk) => spaces.find((s) => s.pk === pk))
   );
 
   // default is 20 if no spaces selected
-  const maxPersons = Math.ceil(
-    selectedSpaces.map((s) => s.maxPersons ?? 0).reduce((a, x) => a + x, 0) ||
-      20
-  );
+  const getMaxPersons = (spaceList: typeof selectedSpaces) => {
+    const persons =
+      spaceList.map((s) => s.maxPersons ?? 0).reduce((a, x) => a + x, 0) || 20;
+    return Math.ceil(persons);
+  };
+  // default is 1 if no spaces selected
+  const getMinSurfaceArea = (spaceList: typeof selectedSpaces) => {
+    const area =
+      spaceList.map((s) => s.surfaceArea ?? 0).reduce((a, x) => a + x, 0) || 1;
+    return Math.ceil(area);
+  };
+  // follow the spaces selection even though we allow the user to change these
+  useEffect(() => {
+    const maxPersons = getMaxPersons(selectedSpaces);
+    const minSurfaceArea = getMinSurfaceArea(selectedSpaces);
+    setValue("maxPersons", maxPersons);
+    setValue("surfaceArea", minSurfaceArea);
+  }, [watch("spacePks")]);
+
+  const minSurfaceArea = getMinSurfaceArea(selectedSpaces);
+  const maxPersons = getMaxPersons(selectedSpaces);
+
+  const hasErrors =
+    errors.reservationKind != null ||
+    errors.minPersons != null ||
+    errors.maxPersons != null ||
+    errors.surfaceArea != null ||
+    errors.spacePks != null ||
+    errors.resourcePks != null ||
+    errors.nameFi != null ||
+    errors.nameEn != null ||
+    errors.nameSv != null;
 
   return (
     <Accordion
       initiallyOpen
-      // TODO make the errors section specific
-      open={Object.keys(errors).length > 0}
+      open={hasErrors}
       heading={t("ReservationUnitEditor.basicInformation")}
     >
       <AutoGrid>
@@ -783,17 +803,17 @@ function ReservationUnitSettings({
     errors.reservationBeginsDate != null ||
     errors.reservationEndsDate != null ||
     errors.reservationBeginsTime != null ||
-    errors.reservationEndsTime != null;
+    errors.reservationEndsTime != null ||
+    errors.metadataSetPk != null ||
+    errors.cancellationRulePk != null ||
+    errors.reservationStartInterval != null ||
+    errors.reservationsMinDaysBefore != null ||
+    errors.reservationsMaxDaysBefore != null ||
+    errors.maxReservationDuration != null ||
+    errors.minReservationDuration != null;
 
   return (
-    <Accordion
-      // TODO this needs to be improved
-      // currently it's gonna close the Accordion after the errors are fixed
-      // it also opens all Accordions (above where the user is) if there are errors
-      // this is primarily an issue if errors are onChange / onBlur instead of onSubmit
-      open={open}
-      heading={t("ReservationUnitEditor.settings")}
-    >
+    <Accordion open={open} heading={t("ReservationUnitEditor.settings")}>
       <AutoGrid $minWidth="18rem">
         <FieldGroup
           heading={t("ReservationUnitEditor.publishingSettings")}
@@ -1256,10 +1276,10 @@ function PricingSection({
           isFuturePriceVisible
       ).length > 0;
 
+  const hasErrors = errors.pricings != null || errors.paymentTypes != null;
   return (
     <Accordion
-      // TODO check the section specific errors
-      open={Object.keys(errors).length > 0}
+      open={hasErrors}
       heading={t("ReservationUnitEditor.label.pricings")}
     >
       <VerticalFlex>
@@ -1267,21 +1287,20 @@ function PricingSection({
           (pricing, index) =>
             pricing?.status ===
               ReservationUnitsReservationUnitPricingStatusChoices.Active && (
-              <>
-                <FieldGroup
-                  // TODO add a formKey so we can destroy the pricings without messing the key / index
-                  key={index}
-                  id="pricings"
-                  heading={`${t("ReservationUnitEditor.label.pricingType")} *`}
-                  tooltip={t("ReservationUnitEditor.tooltip.pricingType")}
-                />
-                {/* TODO form index is bad, use pk or form key */}
+              <FieldGroup
+                // TODO add a formKey so we can destroy the pricings without messing the key / index
+                key={index}
+                id="pricings"
+                heading={`${t("ReservationUnitEditor.label.pricingType")} *`}
+                tooltip={t("ReservationUnitEditor.tooltip.pricingType")}
+              >
                 <PricingType
+                  // TODO form index is bad, use pk or form key
                   index={index}
                   form={form}
                   taxPercentageOptions={taxPercentageOptions}
                 />
-              </>
+              </FieldGroup>
             )
         )}
         <Controller
@@ -1301,23 +1320,20 @@ function PricingSection({
             (pricing, index) =>
               pricing.status ===
                 ReservationUnitsReservationUnitPricingStatusChoices.Future && (
-                <>
-                  <FieldGroup
-                    // TODO add a formKey so we can destroy the pricings without messing the key / index
-                    key={index}
-                    id="pricings"
-                    heading={`${t(
-                      "ReservationUnitEditor.label.pricingType"
-                    )} *`}
-                    tooltip={t("ReservationUnitEditor.tooltip.pricingType")}
-                  />
-                  {/* TODO form index is bad, use pk or form key */}
+                <FieldGroup
+                  // TODO add a formKey so we can destroy the pricings without messing the key / index
+                  key={index}
+                  id="pricings"
+                  heading={`${t("ReservationUnitEditor.label.pricingType")} *`}
+                  tooltip={t("ReservationUnitEditor.tooltip.pricingType")}
+                >
                   <PricingType
+                    // TODO form index is bad, use pk or form key
                     index={index}
                     form={form}
                     taxPercentageOptions={taxPercentageOptions}
                   />
-                </>
+                </FieldGroup>
               )
           )}
         {isPaid && (
@@ -1383,9 +1399,13 @@ function TermsSection({
   const { control, formState } = form;
   const { errors } = formState;
 
+  const hasErrors =
+    errors.termsOfUseFi != null ||
+    errors.termsOfUseEn != null ||
+    errors.termsOfUseSv != null;
   return (
     <Accordion
-      open={Object.keys(errors).length > 0}
+      open={hasErrors}
       heading={t("ReservationUnitEditor.termsInstructions")}
     >
       <AutoGrid $minWidth="20rem">
@@ -1461,11 +1481,9 @@ function CommunicationSection({
   const { control, register, formState } = form;
   const { errors } = formState;
 
+  // NOTE no required fields
   return (
-    <Accordion
-      open={Object.keys(errors).length > 0}
-      heading={t("ReservationUnitEditor.communication")}
-    >
+    <Accordion heading={t("ReservationUnitEditor.communication")}>
       <Grid>
         <Span12>
           <SlimH4>{t("ReservationUnitEditor.pendingInstructions")}</SlimH4>
@@ -1675,10 +1693,15 @@ function DescriptionSection({
     value: Number(s?.pk),
   }));
 
+  const hasErrors =
+    errors.reservationUnitTypePk != null ||
+    errors.descriptionFi != null ||
+    errors.descriptionEn != null ||
+    errors.descriptionSv != null;
+
   return (
     <Accordion
-      // TODO make the errors section specific
-      open={Object.keys(errors).length > 0}
+      open={hasErrors}
       heading={t("ReservationUnitEditor.typesProperties")}
     >
       <Grid>
@@ -1894,10 +1917,12 @@ function transformReservationUnit(
         lowestPrice: Number(p.lowestPrice),
         lowestPriceNet: Number(p.lowestPriceNet),
         ...(p.pk !== 0 ? { pk: p.pk } : {}),
-        priceUnit: p.priceUnit,
+        ...(p.priceUnit != null ? { priceUnit: p.priceUnit } : {}),
         pricingType: p.pricingType,
         status: p.status,
-        taxPercentagePk: p.taxPercentage.pk,
+        ...(p.taxPercentage.pk !== 0
+          ? { taxPercentagePk: p.taxPercentage.pk }
+          : {}),
       })),
   };
 }
@@ -1942,6 +1967,7 @@ const ReservationUnitEditor = ({
       skip: !unitPk,
       variables: { pk: Number(unitPk) },
       onError: (e) => {
+        // eslint-disable-next-line no-console
         console.error(e);
         notifyError(t("errors.errorFetchingData"));
       },
@@ -1952,6 +1978,7 @@ const ReservationUnitEditor = ({
     RESERVATION_UNIT_EDITOR_PARAMETERS,
     {
       onError: (e) => {
+        // eslint-disable-next-line no-console
         console.error(e);
         notifyError(t("errors.errorFetchingData"));
       },
@@ -2039,7 +2066,6 @@ const ReservationUnitEditor = ({
         data?.updateReservationUnit?.pk ?? data?.createReservationUnit?.pk;
 
       if (pk) {
-        console.log("update images for pk", pk);
         // res unit is saved, we can save changes to images
         const success = await reconcileImageChanges(pk, images);
         if (success) {
@@ -2095,6 +2121,7 @@ const ReservationUnitEditor = ({
       notifySuccess(t("ArchiveReservationUnitDialog.success"));
       history(`/unit/${unit?.pk}`);
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.warn("unable to archive", e);
     }
   };

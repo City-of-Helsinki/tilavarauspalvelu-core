@@ -752,6 +752,14 @@ const translations: ITranslations = {
         "String must contain at most 4000 character(s)": [
           "Viesti ei saa olla yli 4000 merkkiä",
         ],
+        "must be a number": ["Pitää olla numero"],
+        "lowestPrice must be lower than highestPrice": [
+          "Alin hinta pitää olla pienempi kuin ylin hinta",
+        ],
+        "taxPercentage must be selected": ["Vero prosentti pitää valita"],
+        "Begin needs to be in the future": [
+          "Alkamisajan tulee olla tulevaisuudessa",
+        ],
       },
     },
     level: {

@@ -1,5 +1,5 @@
 import { filterNonNullable } from "common/src/helpers";
-import { fromApiDate, toUIDate } from "common/src/common/util";
+import { fromApiDate, fromUIDate, toUIDate } from "common/src/common/util";
 import {
   ReservationUnitsReservationUnitReservationStartIntervalChoices,
   ReservationUnitsReservationUnitAuthenticationChoices,
@@ -13,61 +13,118 @@ import {
 import { addDays, format } from "date-fns";
 import { z } from "zod";
 
-export const PricingFormSchema = z
-  .object({
-    // pk === 0 means new pricing good decission?
-    // pk === 0 fails silently on the backend, but undefined creates a new pricing
+export const PricingFormSchema = z.object({
+  // pk === 0 means new pricing good decission?
+  // pk === 0 fails silently on the backend, but undefined creates a new pricing
+  pk: z.number(),
+  taxPercentage: z.object({
     pk: z.number(),
-    taxPercentage: z.object({
-      pk: z.number(),
-      value: z.number(),
-    }),
-    // NOTE because of how valueAsNumber works converting 21. to number throws
-    // localization / HDS problem because 21, => 21 but 21. => NaN
+    value: z.number(),
+  }),
+  // NOTE because of how valueAsNumber works converting 21. to number throws
+  // localization / HDS problem because 21, => 21 but 21. => NaN
 
-    lowestPrice: z.string(),
-    lowestPriceNet: z.string(),
-    highestPrice: z.string(),
-    highestPriceNet: z.string(),
-    pricingType: z.nativeEnum(
-      ReservationUnitsReservationUnitPricingPricingTypeChoices
-    ),
-    priceUnit: z
-      .nativeEnum(ReservationUnitsReservationUnitPricingPriceUnitChoices)
-      .optional(),
-    status: z.nativeEnum(ReservationUnitsReservationUnitPricingStatusChoices),
-    // TODO this has to be a string because of HDS date input
-    // in ui format: "d.M.yyyy"
-    begins: z.string(),
-  })
-  .superRefine((data, ctx) => {
-    if (
-      data.pricingType ===
-      ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid
-    ) {
-      if (Number(data.lowestPrice) > Number(data.highestPrice)) {
-        ctx.addIssue({
-          message: "lowestPrice must be lower than highestPrice",
-          path: ["lowestPrice"],
-          code: z.ZodIssueCode.custom,
-        });
-      }
-    }
-  });
-// TODO add custom validation for these, number > 0
-// draft:
-// lowestPrice: requiredForNonFree(Joi.number().precision(2).min(0)),
-// highestPrice: requiredForNonFree( Joi.number().precision(2).min(Joi.ref("lowestPrice")).required()),
-// published:
-/* pricingType: Joi.string().required(),
-   * lowestPrice: requiredForNonFree(Joi.number().precision(2).min(0).required()),
-   * highestPrice: requiredForNonFree( Joi.number().precision(2).min(Joi.ref("lowestPrice")).required()),
-   * priceUnit: requiredForNonFree(Joi.string().required()),
-   * taxPercentagePk: requiredForNonFree(Joi.number().required()),
-  });
-   */
+  lowestPrice: z.string(),
+  lowestPriceNet: z.string(),
+  highestPrice: z.string(),
+  highestPriceNet: z.string(),
+  pricingType: z.nativeEnum(
+    ReservationUnitsReservationUnitPricingPricingTypeChoices
+  ),
+  priceUnit: z
+    .nativeEnum(ReservationUnitsReservationUnitPricingPriceUnitChoices)
+    .nullable(),
+  status: z.nativeEnum(ReservationUnitsReservationUnitPricingStatusChoices),
+  // TODO this has to be a string because of HDS date input
+  // in ui format: "d.M.yyyy"
+  begins: z.string(),
+});
 
 export type PricingFormValues = z.infer<typeof PricingFormSchema>;
+
+const refinePricing = (
+  data: PricingFormValues,
+  ctx: z.RefinementCtx,
+  path: string
+) => {
+  if (
+    data.status === ReservationUnitsReservationUnitPricingStatusChoices.Future
+  ) {
+    if (data.begins === "") {
+      ctx.addIssue({
+        message: "Required",
+        path: [`${path}.begins`],
+        code: z.ZodIssueCode.custom,
+      });
+    }
+    if (Number.isNaN(fromUIDate(data.begins).getTime())) {
+      ctx.addIssue({
+        message: "Invalid date",
+        path: [`${path}.begins`],
+        code: z.ZodIssueCode.custom,
+      });
+    }
+    if (fromUIDate(data.begins) < new Date()) {
+      ctx.addIssue({
+        message: "Begin needs to be in the future",
+        path: [`${path}.begins`],
+        code: z.ZodIssueCode.custom,
+      });
+    }
+  }
+
+  if (
+    data.pricingType ===
+    ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid
+  ) {
+    const lowestPrice = Number(data.lowestPrice);
+    const highestPrice = Number(data.highestPrice);
+    const lowestPriceNet = Number(data.lowestPriceNet);
+    const highestPriceNet = Number(data.highestPriceNet);
+    if (Number.isNaN(lowestPrice)) {
+      ctx.addIssue({
+        message: "must be a number",
+        path: ["lowestPrice"],
+        code: z.ZodIssueCode.custom,
+      });
+    }
+    if (Number.isNaN(highestPrice)) {
+      ctx.addIssue({
+        message: "must be a number",
+        path: ["highestPrice"],
+        code: z.ZodIssueCode.custom,
+      });
+    }
+    if (Number.isNaN(lowestPriceNet)) {
+      ctx.addIssue({
+        message: "must be a number",
+        path: ["lowestPriceNet"],
+        code: z.ZodIssueCode.custom,
+      });
+    }
+    if (Number.isNaN(highestPriceNet)) {
+      ctx.addIssue({
+        message: "must be a number",
+        path: ["highestPriceNet"],
+        code: z.ZodIssueCode.custom,
+      });
+    }
+    if (data.taxPercentage.pk === 0) {
+      ctx.addIssue({
+        message: "taxPercentage must be selected",
+        path: ["taxPercentage"],
+        code: z.ZodIssueCode.custom,
+      });
+    }
+    if (lowestPrice > highestPrice) {
+      ctx.addIssue({
+        message: "lowestPrice must be lower than highestPrice",
+        path: ["lowestPrice"],
+        code: z.ZodIssueCode.custom,
+      });
+    }
+  }
+};
 
 export const ReservationUnitEditSchema = z
   .object({
@@ -182,15 +239,6 @@ export const ReservationUnitEditSchema = z
       v.reservationKind !==
       ReservationUnitsReservationUnitReservationKindChoices.Season
     ) {
-      // TODO add the separation for Single vs. Seasonal
-      // Seasonal only is missing some of the fields
-      // minReservationDuration: requiredForSingle(Joi.number().required()),
-      // maxReservationDuration: requiredForSingle(Joi.number().required()),
-      // reservationsMinDaysBefore: requiredForSingle(Joi.number().required()),
-      // reservationsMaxDaysBefore: requiredForSingle(Joi.number().required()),
-      // reservationStartInterval: requiredForSingle(Joi.string().required()),
-      // authentication: requiredForSingle(Joi.string().required()),
-      // metadataSetPk: requiredForSingle(Joi.number().required()),
       if (v.minReservationDuration == null) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -293,10 +341,33 @@ export const ReservationUnitEditSchema = z
       });
     }
 
+    // refine pricing only if not draft and the pricing is enabled
+    const enabledPricings = v.pricings.filter(
+      (p) =>
+        v.hasFuturePricing ||
+        p.status === ReservationUnitsReservationUnitPricingStatusChoices.Active
+    );
+
+    for (let i = 0; i < enabledPricings.length; ++i) {
+      refinePricing(enabledPricings[i], ctx, `pricings.${i}`);
+    }
+
     // TODO if it includes futurePricing check that the futurePrice date is in the future (is today ok?)
-    // TODO if it includes pricing (non free) check that it has a payment method
-    // TODO add paymentTypes: requiredForNonFreeRU(Joi.array().min(1).required()),
-    // if there is non free pricing it should have at least one payment type
+    if (
+      enabledPricings.some(
+        (p) =>
+          p.pricingType !==
+          ReservationUnitsReservationUnitPricingPricingTypeChoices.Free
+      )
+    ) {
+      if (v.paymentTypes.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Required",
+          path: ["paymentTypes"],
+        });
+      }
+    }
   });
 
 export type ReservationUnitEditFormValues = z.infer<
@@ -340,7 +411,7 @@ const convertPricing = (p?: ReservationUnitPricingType): PricingFormValues => {
     pricingType:
       p?.pricingType ??
       ReservationUnitsReservationUnitPricingPricingTypeChoices.Free,
-    priceUnit: p?.priceUnit ?? undefined,
+    priceUnit: p?.priceUnit ?? null,
     status:
       p?.status ?? ReservationUnitsReservationUnitPricingStatusChoices.Active,
     begins: convertBegins(p?.begins, p?.status),
