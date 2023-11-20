@@ -94,6 +94,9 @@ jobs:
 
       - name: "SonarCloud Scan"
         uses: SonarSource/sonarcloud-github-action@master
+        # Dependabot cannot access repository secrets (would need its own secrets),
+        # so we just skip SonarCloud analysis for dependabot PRs.
+        if: github.actor != 'dependabot[bot]'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

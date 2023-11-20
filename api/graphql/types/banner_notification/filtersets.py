@@ -24,6 +24,7 @@ class BannerNotificationFilterSet(django_filters.FilterSet):
     is_visible = django_filters.BooleanFilter(method="filter_visible")
     order_by = BannerNotificationOrderingFilter(
         fields=(
+            "pk",
             "name",
             ("active_from", "starts"),
             ("active_until", "ends"),

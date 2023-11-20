@@ -289,7 +289,7 @@ def test_user_permissions_on_banner_notifications_without_target_filter(graphql,
     response = graphql(
         """
         query {
-          bannerNotifications (isVisible: true) {
+          bannerNotifications (isVisible: true, orderBy: "pk") {
             edges {
               node {
                 message
