@@ -59,7 +59,7 @@ jobs:
           type=ref,event=pr
 
     - name: "Build backend container"
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v5
       with:
         context: .
         file: docker/Dockerfile
