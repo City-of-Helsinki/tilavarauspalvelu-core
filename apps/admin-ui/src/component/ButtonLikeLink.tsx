@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 type ButtonProps = {
   readonly variant?: "primary" | "secondary";
   readonly size?: "normal" | "large";
+  readonly fontSize?: "small" | "normal";
+  readonly disabled?: boolean;
 };
 
 /// @brief looks like a button but is a link
@@ -25,7 +27,12 @@ export const ButtonLikeLink = styled(Link)<ButtonProps>`
   --focus-outline-color: var(--color-focus-outline);
   --outline-gutter: 2px;
   --outline-width: 3px;
+  --font-size: ${({ fontSize }) =>
+    fontSize === "small" ? "var(--fontsize-body-s)" : "var(--fontsize-body-m)"};
 
+  font-size: var(--font-size);
+
+  opacity: ${({ disabled }) => (disabled ? "0.5" : "1")};
   text-decoration: none;
   background-color: ${({ variant }) =>
     variant === "primary" ? "var(--color-bus)" : "transparent"};

@@ -54,7 +54,7 @@ import { fromUIDate, toApiDate } from "common/src/common/util";
 import { previewUrlPrefix, publicUrl } from "@/common/const";
 import { UNIT_WITH_SPACES_AND_RESOURCES } from "@/common/queries";
 import {
-  Container,
+  ContainerMedium,
   DenseVerticalFlex,
   Grid,
   HorisontalFlex,
@@ -62,6 +62,7 @@ import {
   Span6,
   AutoGrid,
   FullRow,
+  VerticalFlex,
 } from "@/styles/layout";
 import Loader from "@/component/Loader";
 import { useNotification } from "@/context/NotificationContext";
@@ -93,6 +94,7 @@ import {
   ReservationUnitEditSchema,
   convert,
 } from "./form";
+import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 
 const RichTextInput = dynamic(() => import("../../RichTextInput"), {
   ssr: false,
@@ -633,7 +635,7 @@ function BasicSection({
               id="spacePks"
               multiselect
               required
-              style={{ gridColumn: "1 / span 2" }}
+              // style={{ gridColumn: "1 / span 2" }}
               label={t("ReservationUnitEditor.label.spacePks")}
               placeholder={t("ReservationUnitEditor.spacesPlaceholder")}
               options={spaceOptions}
@@ -658,7 +660,7 @@ function BasicSection({
             <Select<{ label: string; value: number }>
               id="resourcePks"
               multiselect
-              style={{ gridColumn: "span 2" }}
+              // style={{ gridColumn: "span 2" }}
               label={t("ReservationUnitEditor.label.resourcePks")}
               placeholder={t("ReservationUnitEditor.resourcesPlaceholder")}
               options={resourceOptions}
@@ -784,336 +786,308 @@ function ReservationUnitSettings({
       open={open}
       heading={t("ReservationUnitEditor.settings")}
     >
-      <Grid>
-        <Span12>
-          <FieldGroup
-            heading={t("ReservationUnitEditor.publishingSettings")}
-            tooltip={t("ReservationUnitEditor.tooltip.publishingSettings")}
+      <AutoGrid $minWidth="18rem">
+        <FieldGroup
+          heading={t("ReservationUnitEditor.publishingSettings")}
+          tooltip={t("ReservationUnitEditor.tooltip.publishingSettings")}
+          style={{ gridColumn: "1 / -1" }}
+        >
+          <ActivationGroup
+            id="useScheduledPublishing"
+            label={t("ReservationUnitEditor.scheduledPublishing")}
+            open={watch("hasScheduledPublish")}
+            onChange={() =>
+              setValue("hasScheduledPublish", !watch("hasScheduledPublish"))
+            }
           >
-            <ActivationGroup
-              id="useScheduledPublishing"
-              label={t("ReservationUnitEditor.scheduledPublishing")}
-              open={watch("hasScheduledPublish")}
-              onChange={() =>
-                setValue("hasScheduledPublish", !watch("hasScheduledPublish"))
-              }
-            >
-              <DenseVerticalFlex>
-                <ActivationGroup
-                  id="publishBegins"
-                  label={t("ReservationUnitEditor.publishBegins")}
-                  open={watch("hasPublishBegins")}
-                  onChange={() =>
-                    setValue("hasPublishBegins", !watch("hasPublishBegins"))
-                  }
-                  noIndent
-                  noMargin
-                >
-                  <DateTimeInput
-                    control={control}
-                    name={{
-                      date: "publishBeginsDate",
-                      time: "publishBeginsTime",
-                    }}
-                  />
-                </ActivationGroup>
+            <DenseVerticalFlex>
+              <ActivationGroup
+                id="publishBegins"
+                label={t("ReservationUnitEditor.publishBegins")}
+                open={watch("hasPublishBegins")}
+                onChange={() =>
+                  setValue("hasPublishBegins", !watch("hasPublishBegins"))
+                }
+                noIndent
+                noMargin
+              >
+                <DateTimeInput
+                  control={control}
+                  name={{
+                    date: "publishBeginsDate",
+                    time: "publishBeginsTime",
+                  }}
+                />
+              </ActivationGroup>
 
-                <ActivationGroup
-                  id="publishEnds"
-                  label={t("ReservationUnitEditor.publishEnds")}
-                  open={watch("hasPublishEnds")}
-                  onChange={() =>
-                    setValue("hasPublishEnds", !watch("hasPublishEnds"))
-                  }
-                  noIndent
-                  noMargin
-                >
-                  <DateTimeInput
-                    control={control}
-                    name={{ date: "publishEndsDate", time: "publishEndsTime" }}
-                  />
-                </ActivationGroup>
-              </DenseVerticalFlex>
-            </ActivationGroup>
-          </FieldGroup>
-        </Span12>
-        <Span12>
-          <FieldGroup
-            heading={t("ReservationUnitEditor.reservationSettings")}
-            tooltip={t("ReservationUnitEditor.tooltip.reservationSettings")}
+              <ActivationGroup
+                id="publishEnds"
+                label={t("ReservationUnitEditor.publishEnds")}
+                open={watch("hasPublishEnds")}
+                onChange={() =>
+                  setValue("hasPublishEnds", !watch("hasPublishEnds"))
+                }
+                noIndent
+                noMargin
+              >
+                <DateTimeInput
+                  control={control}
+                  name={{ date: "publishEndsDate", time: "publishEndsTime" }}
+                />
+              </ActivationGroup>
+            </DenseVerticalFlex>
+          </ActivationGroup>
+        </FieldGroup>
+        <FieldGroup
+          heading={t("ReservationUnitEditor.reservationSettings")}
+          tooltip={t("ReservationUnitEditor.tooltip.reservationSettings")}
+          style={{ gridColumn: "1 / -1" }}
+        >
+          <ActivationGroup
+            id="useScheduledReservation"
+            label={t("ReservationUnitEditor.scheduledReservation")}
+            open={watch("hasScheduledReservation")}
+            onChange={() =>
+              setValue(
+                "hasScheduledReservation",
+                !watch("hasScheduledReservation")
+              )
+            }
           >
             <ActivationGroup
-              id="useScheduledReservation"
-              label={t("ReservationUnitEditor.scheduledReservation")}
-              open={watch("hasScheduledReservation")}
+              id="reservationBegins"
+              label={t("ReservationUnitEditor.reservationBegins")}
+              open={watch("hasReservationBegins")}
               onChange={() =>
-                setValue(
-                  "hasScheduledReservation",
-                  !watch("hasScheduledReservation")
-                )
+                setValue("hasReservationBegins", !watch("hasReservationBegins"))
               }
+              noIndent
             >
-              <ActivationGroup
-                id="reservationBegins"
-                label={t("ReservationUnitEditor.reservationBegins")}
-                open={watch("hasReservationBegins")}
-                onChange={() =>
-                  setValue(
-                    "hasReservationBegins",
-                    !watch("hasReservationBegins")
-                  )
-                }
-                noIndent
-              >
-                <DateTimeInput
-                  control={control}
-                  name={{
-                    date: "reservationBeginsDate",
-                    time: "reservationBeginsTime",
-                  }}
-                />
-              </ActivationGroup>
-              <ActivationGroup
-                id="reservationEnds"
-                label={t("ReservationUnitEditor.reservationEnds")}
-                open={watch("hasReservationEnds")}
-                onChange={() =>
-                  setValue("hasReservationEnds", !watch("hasReservationEnds"))
-                }
-                noIndent
-              >
-                <DateTimeInput
-                  control={control}
-                  name={{
-                    date: "reservationEndsDate",
-                    time: "reservationEndsTime",
-                  }}
-                />
-              </ActivationGroup>
+              <DateTimeInput
+                control={control}
+                name={{
+                  date: "reservationBeginsDate",
+                  time: "reservationBeginsTime",
+                }}
+              />
             </ActivationGroup>
-          </FieldGroup>
-        </Span12>
-        <Span6>
-          <Controller
-            control={control}
-            name="minReservationDuration"
-            render={({ field: { value, onChange } }) => (
-              <Select
-                id="minReservationDuration"
-                options={durationOptions}
-                placeholder={t("common.select")}
-                required
-                label={t("ReservationUnitEditor.label.minReservationDuration")}
-                onChange={(v: { value: number; label: string }) =>
-                  onChange(v.value)
-                }
-                value={durationOptions.find((o) => o.value === value) ?? null}
-                error={getTranslatedError(
-                  errors.minReservationDuration?.message,
-                  t
-                )}
-                invalid={errors.minReservationDuration?.message != null}
-                tooltipText={t(
-                  "ReservationUnitEditor.tooltip.minReservationDuration"
-                )}
+            <ActivationGroup
+              id="reservationEnds"
+              label={t("ReservationUnitEditor.reservationEnds")}
+              open={watch("hasReservationEnds")}
+              onChange={() =>
+                setValue("hasReservationEnds", !watch("hasReservationEnds"))
+              }
+              noIndent
+            >
+              <DateTimeInput
+                control={control}
+                name={{
+                  date: "reservationEndsDate",
+                  time: "reservationEndsTime",
+                }}
               />
-            )}
-          />
-        </Span6>
-        <Span6>
-          <Controller
-            control={control}
-            name="maxReservationDuration"
-            render={({ field: { value, onChange } }) => (
-              <Select
-                id="maxReservationDuration"
-                placeholder={t("common.select")}
-                required
-                options={durationOptions}
-                onChange={(v: { value: number; label: string }) =>
-                  onChange(v.value)
+            </ActivationGroup>
+          </ActivationGroup>
+        </FieldGroup>
+        <Controller
+          control={control}
+          name="minReservationDuration"
+          render={({ field: { value, onChange } }) => (
+            <Select
+              id="minReservationDuration"
+              options={durationOptions}
+              placeholder={t("common.select")}
+              required
+              label={t("ReservationUnitEditor.label.minReservationDuration")}
+              onChange={(v: { value: number; label: string }) =>
+                onChange(v.value)
+              }
+              value={durationOptions.find((o) => o.value === value) ?? null}
+              error={getTranslatedError(
+                errors.minReservationDuration?.message,
+                t
+              )}
+              invalid={errors.minReservationDuration?.message != null}
+              tooltipText={t(
+                "ReservationUnitEditor.tooltip.minReservationDuration"
+              )}
+            />
+          )}
+        />
+        <Controller
+          control={control}
+          name="maxReservationDuration"
+          render={({ field: { value, onChange } }) => (
+            <Select
+              id="maxReservationDuration"
+              placeholder={t("common.select")}
+              required
+              options={durationOptions}
+              onChange={(v: { value: number; label: string }) =>
+                onChange(v.value)
+              }
+              value={durationOptions.find((o) => o.value === value) ?? null}
+              label={t("ReservationUnitEditor.label.maxReservationDuration")}
+              error={getTranslatedError(
+                errors.maxReservationDuration?.message,
+                t
+              )}
+              invalid={errors.maxReservationDuration?.message != null}
+              tooltipText={t(
+                "ReservationUnitEditor.tooltip.maxReservationDuration"
+              )}
+            />
+          )}
+        />
+        <Controller
+          control={control}
+          name="reservationsMaxDaysBefore"
+          render={({ field: { value, onChange } }) => (
+            <Select
+              id="reservationsMaxDaysBefore"
+              options={reservationsMaxDaysBeforeOptions}
+              placeholder={t("common.select")}
+              required
+              label={t("ReservationUnitEditor.label.reservationsMaxDaysBefore")}
+              onChange={(v: { value: number; label: string }) =>
+                onChange(v.value)
+              }
+              value={
+                reservationsMaxDaysBeforeOptions.find(
+                  (o) => o.value === value
+                ) ?? null
+              }
+              error={getTranslatedError(
+                errors.reservationsMaxDaysBefore?.message,
+                t
+              )}
+              invalid={errors.reservationsMaxDaysBefore?.message != null}
+              tooltipText={t(
+                "ReservationUnitEditor.tooltip.reservationsMaxDaysBefore"
+              )}
+            />
+          )}
+        />
+        <NumberInput
+          {...register("reservationsMinDaysBefore", { required: true })}
+          id="reservationsMinDaysBefore"
+          label={t("ReservationUnitEditor.label.reservationsMinDaysBefore")}
+          minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
+          plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
+          step={1}
+          type="number"
+          max={watch("reservationsMaxDaysBefore")}
+          min={0}
+          required
+          errorText={getTranslatedError(
+            errors.reservationsMinDaysBefore?.message,
+            t
+          )}
+          invalid={errors.reservationsMinDaysBefore?.message != null}
+          tooltipText={t(
+            "ReservationUnitEditor.tooltip.reservationsMinDaysBefore"
+          )}
+        />
+        <Controller
+          control={control}
+          name="reservationStartInterval"
+          render={({ field: { value, onChange } }) => (
+            <Select
+              id="reservationStartInterval"
+              placeholder={t("common.select")}
+              options={reservationStartIntervalOptions}
+              required
+              value={
+                reservationStartIntervalOptions.find(
+                  (o) => o.value === value
+                ) ?? null
+              }
+              onChange={(val: {
+                value: ReservationUnitsReservationUnitReservationStartIntervalChoices;
+                label: string;
+              }) => onChange(val)}
+              error={getTranslatedError(
+                errors.reservationStartInterval?.message,
+                t
+              )}
+              invalid={errors.reservationStartInterval?.message != null}
+              label={t("ReservationUnitEditor.label.reservationStartInterval")}
+              tooltipText={t(
+                "ReservationUnitEditor.tooltip.reservationStartInterval"
+              )}
+            />
+          )}
+        />
+        <FieldGroup
+          heading={t("ReservationUnitEditor.bufferSettings")}
+          tooltip={t("ReservationUnitEditor.tooltip.bufferSettings")}
+          style={{ gridColumn: "1 / -1" }}
+        >
+          <Grid>
+            <Span6>
+              <ActivationGroup
+                id="bufferTimeBeforeGroup"
+                label={t("ReservationUnitEditor.bufferTimeBefore")}
+                open={watch("hasBufferTimeBefore")}
+                onChange={() =>
+                  setValue("hasBufferTimeBefore", !watch("hasBufferTimeBefore"))
                 }
-                value={durationOptions.find((o) => o.value === value) ?? null}
-                label={t("ReservationUnitEditor.label.maxReservationDuration")}
-                error={getTranslatedError(
-                  errors.maxReservationDuration?.message,
-                  t
-                )}
-                invalid={errors.maxReservationDuration?.message != null}
-                tooltipText={t(
-                  "ReservationUnitEditor.tooltip.maxReservationDuration"
-                )}
-              />
-            )}
-          />
-        </Span6>
-        <Span6>
-          <Controller
-            control={control}
-            name="reservationsMaxDaysBefore"
-            render={({ field: { value, onChange } }) => (
-              <Select
-                id="reservationsMaxDaysBefore"
-                options={reservationsMaxDaysBeforeOptions}
-                placeholder={t("common.select")}
-                required
-                label={t(
-                  "ReservationUnitEditor.label.reservationsMaxDaysBefore"
-                )}
-                onChange={(v: { value: number; label: string }) =>
-                  onChange(v.value)
+              >
+                <Controller
+                  control={control}
+                  name="bufferTimeBefore"
+                  render={({ field: { value, onChange } }) => (
+                    <Select
+                      id="bufferTimeBefore"
+                      options={bufferTimeOptions}
+                      label={t(
+                        "ReservationUnitEditor.bufferTimeBeforeDuration"
+                      )}
+                      onChange={(v: { value: number; label: string }) =>
+                        onChange(v.value)
+                      }
+                      value={
+                        bufferTimeOptions.find((o) => o.value === value) ?? null
+                      }
+                    />
+                  )}
+                />
+              </ActivationGroup>
+            </Span6>
+            <Span6>
+              <ActivationGroup
+                id="bufferTimeAfterGroup"
+                label={t("ReservationUnitEditor.bufferTimeAfter")}
+                open={watch("hasBufferTimeAfter")}
+                onChange={() =>
+                  setValue("hasBufferTimeAfter", !watch("hasBufferTimeAfter"))
                 }
-                value={
-                  reservationsMaxDaysBeforeOptions.find(
-                    (o) => o.value === value
-                  ) ?? null
-                }
-                error={getTranslatedError(
-                  errors.reservationsMaxDaysBefore?.message,
-                  t
-                )}
-                invalid={errors.reservationsMaxDaysBefore?.message != null}
-                tooltipText={t(
-                  "ReservationUnitEditor.tooltip.reservationsMaxDaysBefore"
-                )}
-              />
-            )}
-          />
-        </Span6>
-        <Span6>
-          <NumberInput
-            {...register("reservationsMinDaysBefore", { required: true })}
-            id="reservationsMinDaysBefore"
-            label={t("ReservationUnitEditor.label.reservationsMinDaysBefore")}
-            minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
-            plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
-            step={1}
-            type="number"
-            max={watch("reservationsMaxDaysBefore")}
-            min={0}
-            required
-            errorText={getTranslatedError(
-              errors.reservationsMinDaysBefore?.message,
-              t
-            )}
-            invalid={errors.reservationsMinDaysBefore?.message != null}
-            tooltipText={t(
-              "ReservationUnitEditor.tooltip.reservationsMinDaysBefore"
-            )}
-          />
-        </Span6>
-        <Span6>
-          <Controller
-            control={control}
-            name="reservationStartInterval"
-            render={({ field: { value, onChange } }) => (
-              <Select
-                id="reservationStartInterval"
-                placeholder={t("common.select")}
-                options={reservationStartIntervalOptions}
-                required
-                value={
-                  reservationStartIntervalOptions.find(
-                    (o) => o.value === value
-                  ) ?? null
-                }
-                onChange={(val: {
-                  value: ReservationUnitsReservationUnitReservationStartIntervalChoices;
-                  label: string;
-                }) => onChange(val)}
-                error={getTranslatedError(
-                  errors.reservationStartInterval?.message,
-                  t
-                )}
-                invalid={errors.reservationStartInterval?.message != null}
-                label={t(
-                  "ReservationUnitEditor.label.reservationStartInterval"
-                )}
-                tooltipText={t(
-                  "ReservationUnitEditor.tooltip.reservationStartInterval"
-                )}
-              />
-            )}
-          />
-        </Span6>
-        <Span6 />
-        <Span12>
-          <FieldGroup
-            heading={t("ReservationUnitEditor.bufferSettings")}
-            tooltip={t("ReservationUnitEditor.tooltip.bufferSettings")}
-          >
-            <Grid>
-              <Span6>
-                <ActivationGroup
-                  id="bufferTimeBeforeGroup"
-                  label={t("ReservationUnitEditor.bufferTimeBefore")}
-                  open={watch("hasBufferTimeBefore")}
-                  onChange={() =>
-                    setValue(
-                      "hasBufferTimeBefore",
-                      !watch("hasBufferTimeBefore")
-                    )
-                  }
-                >
-                  <Controller
-                    control={control}
-                    name="bufferTimeBefore"
-                    render={({ field: { value, onChange } }) => (
-                      <Select
-                        id="bufferTimeBefore"
-                        options={bufferTimeOptions}
-                        label={t(
-                          "ReservationUnitEditor.bufferTimeBeforeDuration"
-                        )}
-                        onChange={(v: { value: number; label: string }) =>
-                          onChange(v.value)
-                        }
-                        value={
-                          bufferTimeOptions.find((o) => o.value === value) ??
-                          null
-                        }
-                      />
-                    )}
-                  />
-                </ActivationGroup>
-              </Span6>
-              <Span6>
-                <ActivationGroup
-                  id="bufferTimeAfterGroup"
-                  label={t("ReservationUnitEditor.bufferTimeAfter")}
-                  open={watch("hasBufferTimeAfter")}
-                  onChange={() =>
-                    setValue("hasBufferTimeAfter", !watch("hasBufferTimeAfter"))
-                  }
-                >
-                  <Controller
-                    control={control}
-                    name="bufferTimeAfter"
-                    render={({ field: { value, onChange } }) => (
-                      <Select
-                        id="bufferTimeAfter"
-                        label={t(
-                          "ReservationUnitEditor.bufferTimeAfterDuration"
-                        )}
-                        options={bufferTimeOptions}
-                        onChange={(v: { value: number; label: string }) =>
-                          onChange(v.value)
-                        }
-                        value={
-                          bufferTimeOptions.find(
-                            (option) => option.value === value
-                          ) ?? null
-                        }
-                      />
-                    )}
-                  />
-                </ActivationGroup>
-              </Span6>
-            </Grid>
-          </FieldGroup>
-        </Span12>
-        <Span12>
-          {/*
+              >
+                <Controller
+                  control={control}
+                  name="bufferTimeAfter"
+                  render={({ field: { value, onChange } }) => (
+                    <Select
+                      id="bufferTimeAfter"
+                      label={t("ReservationUnitEditor.bufferTimeAfterDuration")}
+                      options={bufferTimeOptions}
+                      onChange={(v: { value: number; label: string }) =>
+                        onChange(v.value)
+                      }
+                      value={
+                        bufferTimeOptions.find(
+                          (option) => option.value === value
+                        ) ?? null
+                      }
+                    />
+                  )}
+                />
+              </ActivationGroup>
+            </Span6>
+          </Grid>
+        </FieldGroup>
+        {/*
           <FieldGroup
             heading={t("ReservationUnitEditor.cancellationSettings")}
             tooltip={t(
@@ -1121,142 +1095,131 @@ function ReservationUnitSettings({
             )}
           >
           */}
-          <ActivationGroup
-            id="cancellationIsPossible"
-            label={t("ReservationUnitEditor.cancellationIsPossible")}
-            open={watch("hasCancellationRule")}
-            onChange={() =>
-              setValue("hasCancellationRule", watch("hasCancellationRule"))
-            }
-          >
-            <Controller
-              control={control}
-              name="cancellationRulePk"
-              render={({ field: { value, onChange } }) => (
-                <SelectionGroup
-                  required
-                  label={t("ReservationUnitEditor.cancellationGroupLabel")}
-                  errorText={getTranslatedError(
-                    errors.cancellationRulePk?.message,
-                    t
-                  )}
-                >
-                  {cancellationRuleOptions.map((o) => (
-                    <RadioButton
-                      key={o.value}
-                      id={`cr-${o.value}`}
-                      value={o.value.toString()}
-                      label={o.label}
-                      onChange={(e) => onChange(e.target.value)}
-                      checked={value === o.value}
-                    />
-                  ))}
-                </SelectionGroup>
-              )}
-            />
-          </ActivationGroup>
-        </Span12>
-        <Span6>
+        <ActivationGroup
+          id="cancellationIsPossible"
+          label={t("ReservationUnitEditor.cancellationIsPossible")}
+          open={watch("hasCancellationRule")}
+          onChange={() =>
+            setValue("hasCancellationRule", watch("hasCancellationRule"))
+          }
+        >
           <Controller
             control={control}
-            name="metadataSetPk"
+            name="cancellationRulePk"
             render={({ field: { value, onChange } }) => (
-              <Select
-                id="metadataSetPk"
-                // sort
+              <SelectionGroup
                 required
-                options={metadataOptions}
-                label={t("ReservationUnitEditor.label.metadataSetPk")}
-                onChange={(v: { label: string; value: number }) =>
-                  onChange(v.value)
-                }
-                value={metadataOptions.find((o) => o.value === value) ?? null}
-                error={getTranslatedError(errors.metadataSetPk?.message, t)}
-                invalid={errors.metadataSetPk?.message != null}
-                tooltipText={t("ReservationUnitEditor.tooltip.metadataSetPk")}
+                label={t("ReservationUnitEditor.cancellationGroupLabel")}
+                errorText={getTranslatedError(
+                  errors.cancellationRulePk?.message,
+                  t
+                )}
+              >
+                {cancellationRuleOptions.map((o) => (
+                  <RadioButton
+                    key={o.value}
+                    id={`cr-${o.value}`}
+                    value={o.value.toString()}
+                    label={o.label}
+                    onChange={(e) => onChange(e.target.value)}
+                    checked={value === o.value}
+                  />
+                ))}
+              </SelectionGroup>
+            )}
+          />
+        </ActivationGroup>
+        <Controller
+          control={control}
+          name="metadataSetPk"
+          render={({ field: { value, onChange } }) => (
+            <Select
+              id="metadataSetPk"
+              // sort
+              required
+              options={metadataOptions}
+              label={t("ReservationUnitEditor.label.metadataSetPk")}
+              onChange={(v: { label: string; value: number }) =>
+                onChange(v.value)
+              }
+              value={metadataOptions.find((o) => o.value === value) ?? null}
+              error={getTranslatedError(errors.metadataSetPk?.message, t)}
+              invalid={errors.metadataSetPk?.message != null}
+              tooltipText={t("ReservationUnitEditor.tooltip.metadataSetPk")}
+            />
+          )}
+        />
+        <Controller
+          control={control}
+          name="authentication"
+          render={({ field: { value, onChange } }) => (
+            <Select
+              // sort
+              id="authentication"
+              required
+              options={authenticationOptions}
+              value={
+                authenticationOptions.find((o) => o.value === value) ?? null
+              }
+              onChange={(val: {
+                value: ReservationUnitsReservationUnitAuthenticationChoices;
+                label: string;
+              }) => onChange(val.value)}
+              label={t("ReservationUnitEditor.authenticationLabel")}
+              tooltipText={t("ReservationUnitEditor.tooltip.authentication")}
+            />
+          )}
+        />
+        <NumberInput
+          {...register("maxReservationsPerUser", { valueAsNumber: true })}
+          id="maxReservationsPerUser"
+          label={t("ReservationUnitEditor.maxReservationsPerUser")}
+          minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
+          plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
+          min={1}
+          // TODO why?
+          max={15}
+          step={1}
+          type="number"
+          tooltipText={t(
+            "ReservationUnitEditor.tooltip.maxReservationsPerUser"
+          )}
+        />
+        <FieldGroup
+          heading={t("ReservationUnitEditor.introductionSettings")}
+          tooltip={t("ReservationUnitEditor.tooltip.introductionSettings")}
+        >
+          <Controller
+            control={control}
+            name="requireIntroduction"
+            render={({ field: { value, onChange } }) => (
+              <Checkbox
+                id="requireIntroduction"
+                label={t("ReservationUnitEditor.requireIntroductionLabel")}
+                checked={value}
+                onChange={(e) => onChange(e.target.checked)}
               />
             )}
           />
-        </Span6>
-        <Span6>
+        </FieldGroup>
+        <FieldGroup
+          heading={t("ReservationUnitEditor.handlingSettings")}
+          tooltip={t("ReservationUnitEditor.tooltip.handlingSettings")}
+        >
           <Controller
             control={control}
-            name="authentication"
+            name="requireReservationHandling"
             render={({ field: { value, onChange } }) => (
-              <Select
-                // sort
-                id="authentication"
-                required
-                options={authenticationOptions}
-                value={
-                  authenticationOptions.find((o) => o.value === value) ?? null
-                }
-                onChange={(val: {
-                  value: ReservationUnitsReservationUnitAuthenticationChoices;
-                  label: string;
-                }) => onChange(val.value)}
-                label={t("ReservationUnitEditor.authenticationLabel")}
-                tooltipText={t("ReservationUnitEditor.tooltip.authentication")}
+              <Checkbox
+                id="requireReservationHandling"
+                label={t("ReservationUnitEditor.requireReservationHandling")}
+                checked={value}
+                onChange={(e) => onChange(e.target.checked)}
               />
             )}
           />
-        </Span6>
-        <Span6>
-          <NumberInput
-            {...register("maxReservationsPerUser", { valueAsNumber: true })}
-            id="maxReservationsPerUser"
-            label={t("ReservationUnitEditor.maxReservationsPerUser")}
-            minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
-            plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
-            min={1}
-            // TODO why?
-            max={15}
-            step={1}
-            type="number"
-            tooltipText={t(
-              "ReservationUnitEditor.tooltip.maxReservationsPerUser"
-            )}
-          />
-        </Span6>
-        <Span12>
-          <FieldGroup
-            heading={t("ReservationUnitEditor.introductionSettings")}
-            tooltip={t("ReservationUnitEditor.tooltip.introductionSettings")}
-          >
-            <Controller
-              control={control}
-              name="requireIntroduction"
-              render={({ field: { value, onChange } }) => (
-                <Checkbox
-                  id="requireIntroduction"
-                  label={t("ReservationUnitEditor.requireIntroductionLabel")}
-                  checked={value}
-                  onChange={(e) => onChange(e.target.checked)}
-                />
-              )}
-            />
-          </FieldGroup>
-        </Span12>
-        <Span12>
-          <FieldGroup
-            heading={t("ReservationUnitEditor.handlingSettings")}
-            tooltip={t("ReservationUnitEditor.tooltip.handlingSettings")}
-          >
-            <Controller
-              control={control}
-              name="requireReservationHandling"
-              render={({ field: { value, onChange } }) => (
-                <Checkbox
-                  id="requireReservationHandling"
-                  label={t("ReservationUnitEditor.requireReservationHandling")}
-                  checked={value}
-                  onChange={(e) => onChange(e.target.checked)}
-                />
-              )}
-            />
-          </FieldGroup>
-        </Span12>
-      </Grid>
+        </FieldGroup>
+      </AutoGrid>
     </Accordion>
   );
 }
@@ -1291,14 +1254,7 @@ function PricingSection({
       open={Object.keys(errors).length > 0}
       heading={t("ReservationUnitEditor.label.pricings")}
     >
-      <div
-        // TODO replace with styled components (this is because we need a gap between the elems)
-        style={{
-          gap: "var(--spacing-m)",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
+      <VerticalFlex>
         {watch("pricings").map(
           (pricing, index) =>
             pricing?.status ===
@@ -1358,9 +1314,7 @@ function PricingSection({
           )}
         {isPaid && (
           // TODO this should be outside the pricing type because it's reservation unit wide
-          <HorisontalFlex
-            style={{ justifyContent: "space-between", width: "100%" }}
-          >
+          <HorisontalFlex style={{ justifyContent: "space-between" }}>
             <Controller
               control={control}
               name="canApplyFreeOfCharge"
@@ -1378,9 +1332,7 @@ function PricingSection({
             </Tooltip>
           </HorisontalFlex>
         )}
-      </div>
-      {watch("canApplyFreeOfCharge") && isPaid && (
-        <Span6>
+        {watch("canApplyFreeOfCharge") && isPaid && (
           <Controller
             control={control}
             name="pricingTerms"
@@ -1402,8 +1354,8 @@ function PricingSection({
               />
             )}
           />
-        </Span6>
-      )}
+        )}
+      </VerticalFlex>
     </Accordion>
   );
 }
@@ -1428,7 +1380,7 @@ function TermsSection({
       open={Object.keys(errors).length > 0}
       heading={t("ReservationUnitEditor.termsInstructions")}
     >
-      <Grid>
+      <AutoGrid $minWidth="20rem">
         {(
           [
             "serviceSpecificTermsPk",
@@ -1443,57 +1395,51 @@ function TermsSection({
               ? cancellationTermsOptions
               : paymentTermsOptions;
           return (
-            <Span6 key={name}>
-              <Controller
-                control={control}
-                name={name}
-                render={({ field }) => (
-                  <Select
-                    clearable
-                    // sort
-                    id={name}
-                    label={t(`ReservationUnitEditor.label.${name}`)}
-                    placeholder={t(`ReservationUnitEditor.termsPlaceholder`)}
-                    options={options}
-                    value={options.find((o) => o.value === field.value) ?? null}
-                    onChange={(val: { value: string; label: string }) =>
-                      field.onChange(val.value)
-                    }
-                    // helper={t(`ReservationUnitEditor.${name}.helper`)}
-                    tooltipText={t(`ReservationUnitEditor.tooltip.${name}`)}
-                  />
-                )}
-              />
-            </Span6>
+            <Controller
+              control={control}
+              name={name}
+              key={name}
+              render={({ field }) => (
+                <Select
+                  clearable
+                  // sort
+                  id={name}
+                  label={t(`ReservationUnitEditor.label.${name}`)}
+                  placeholder={t(`ReservationUnitEditor.termsPlaceholder`)}
+                  options={options}
+                  value={options.find((o) => o.value === field.value) ?? null}
+                  onChange={(val: { value: string; label: string }) =>
+                    field.onChange(val.value)
+                  }
+                  // helper={t(`ReservationUnitEditor.${name}.helper`)}
+                  tooltipText={t(`ReservationUnitEditor.tooltip.${name}`)}
+                />
+              )}
+            />
           );
         })}
         {(["termsOfUseFi", "termsOfUseEn", "termsOfUseSv"] as const).map(
           (fieldName) => (
-            <Span12 key={fieldName}>
-              <Controller
-                control={control}
-                name={fieldName}
-                render={({ field }) => (
-                  <RichTextInput
-                    {...field}
-                    required
-                    id={fieldName}
-                    label={t(`ReservationUnitEditor.label.${fieldName}`)}
-                    errorText={getTranslatedError(
-                      errors[fieldName]?.message,
-                      t
-                    )}
-                    // TODO do we want to hide the tooltip for others than Fi?
-                    tooltipText={t(
-                      "ReservationUnitEditor.tooltip.termsOfUseFi"
-                    )}
-                  />
-                )}
-              />
-            </Span12>
+            <Controller
+              control={control}
+              name={fieldName}
+              key={fieldName}
+              render={({ field }) => (
+                <RichTextInput
+                  {...field}
+                  required
+                  id={fieldName}
+                  label={t(`ReservationUnitEditor.label.${fieldName}`)}
+                  errorText={getTranslatedError(errors[fieldName]?.message, t)}
+                  style={{ gridColumn: "1 / -1" }}
+                  // TODO do we want to hide the tooltip for others than Fi?
+                  tooltipText={t("ReservationUnitEditor.tooltip.termsOfUseFi")}
+                />
+              )}
+            />
           )
         )}
-      </Grid>
+      </AutoGrid>
     </Accordion>
   );
 }
@@ -1636,48 +1582,39 @@ function OpeningHoursSection({
 }) {
   const { t } = useTranslation();
 
+  const previewUrl = `${previewUrlPrefix}/${reservationUnit?.pk}?ru=${reservationUnit?.uuid}#calendar`;
+  const previewDisabled =
+    !previewUrlPrefix || !reservationUnit?.pk || !reservationUnit?.uuid;
+
   // TODO refactor this to inner wrapper (so we don't have a ternary in the middle)
   return (
     <Accordion heading={t("ReservationUnitEditor.openingHours")}>
       {reservationUnit?.haukiUrl?.url ? (
-        <>
-          <p>{t("ReservationUnitEditor.openingHoursHelperTextHasLink")}</p>
-          <AutoGrid
-            style={{
-              fontSize: "var(--fontsize-body-s)",
-            }}
+        <AutoGrid>
+          <p style={{ gridColumn: "1 / -1" }}>
+            {t("ReservationUnitEditor.openingHoursHelperTextHasLink")}
+          </p>
+          <ButtonLikeLink
+            disabled={!reservationUnit?.haukiUrl?.url}
+            to={reservationUnit?.haukiUrl?.url ?? ""}
+            target="_blank"
+            fontSize="small"
+            rel="noopener noreferrer"
           >
-            <Button
-              theme="black"
-              variant="secondary"
-              size="small"
-              iconRight={<IconLinkExternal />}
-              onClick={() => {
-                if (reservationUnit?.haukiUrl?.url) {
-                  window.open(reservationUnit?.haukiUrl?.url, "_blank");
-                }
-              }}
-            >
-              {t("ReservationUnitEditor.openingTimesExternalLink")}
-            </Button>
-            <Button
-              theme="black"
-              variant="secondary"
-              size="small"
-              iconRight={<IconLinkExternal />}
-              onClick={() => {
-                if (reservationUnit?.haukiUrl?.url) {
-                  window.open(
-                    `${previewUrlPrefix}/${reservationUnit?.pk}?ru=${reservationUnit?.uuid}#calendar`,
-                    "_blank"
-                  );
-                }
-              }}
-            >
-              {t("ReservationUnitEditor.previewCalendarLink")}
-            </Button>
-          </AutoGrid>
-        </>
+            {t("ReservationUnitEditor.openingTimesExternalLink")}
+            <IconLinkExternal style={{ marginLeft: "var(--spacing-xs)" }} />
+          </ButtonLikeLink>
+          <ButtonLikeLink
+            disabled={previewDisabled}
+            to={previewUrl}
+            target="_blank"
+            fontSize="small"
+            rel="noopener noreferrer"
+          >
+            {t("ReservationUnitEditor.previewCalendarLink")}
+            <IconLinkExternal style={{ marginLeft: "var(--spacing-xs)" }} />
+          </ButtonLikeLink>
+        </AutoGrid>
       ) : (
         <p>{t("ReservationUnitEditor.openingHoursHelperTextNoLink")}</p>
       )}
@@ -2170,12 +2107,9 @@ const ReservationUnitEditor = ({
   const isSaving = isSubmitting;
   const hasChanges = isDirty;
 
-  // TODO cleanup the grid -> span12 / span6 things -> component
-  //  - instead use automatic grid
-  //  - directly adjust the column span in the component (span full, span 1)
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
-      <Container>
+      <ContainerMedium>
         <DisplayUnit
           heading={
             reservationUnit?.nameFi ?? t("ReservationUnitEditor.defaultHeading")
@@ -2226,7 +2160,7 @@ const ReservationUnitEditor = ({
             {t("ReservationUnitEditor.archive")}
           </ArchiveButton>
         </div>
-      </Container>
+      </ContainerMedium>
       <ButtonsStripe>
         <WhiteButton
           size="small"

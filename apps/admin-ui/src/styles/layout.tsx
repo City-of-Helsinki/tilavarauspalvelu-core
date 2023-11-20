@@ -148,8 +148,18 @@ export const Container = styled.div`
     margin: var(--spacing-layout-2-xs);
   }
 `;
-
 Container.displayName = "Container";
+
+export const ContainerMedium = styled.div`
+  display: grid;
+  gap: var(--spacing-layout-2-xs);
+  max-width: var(--container-width-l);
+  margin: var(--spacing-layout-2-xs);
+
+  @media (width > ${breakpoints.m}) {
+    margin: var(--spacing-layout-2-xs) var(--spacing-layout-m);
+  }
+`;
 
 export const Content = styled.div`
   padding: 0 var(--spacing-2-xl);
