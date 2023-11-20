@@ -1459,11 +1459,8 @@ const translations: ITranslations = {
     tosPlaceholder: ["Ohjeteksti {{language}}"],
     termsPlaceholder: ["Valitse"],
     paymentTermsPlaceholder: ["Valitse"],
-    // paymentTermsHelperText: ["Valitse tästä"],
     cancellationTermsPlaceholder: ["Valitse"],
-    // cancellationTermsHelperText: ["Valitse tästä"],
     serviceSpecificTermsPlaceholder: ["Valitse"],
-    // serviceSpecificTermsHelperText: ["Valitse tästä"],
     openingHours: ["Aukioloajat"],
     openingHoursHelperTextHasLink: [
       'Varausyksikön aukioloajat määritellään aukiolosovelluksessa. Huom. Käytä aukioloaikatyyppeinä ainoastaan "varauksella" ja "suljettu".',

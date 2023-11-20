@@ -19,6 +19,7 @@ const DateTimeWrapper = styled.div`
 interface DateTimeProps<T extends FieldValues>
   extends Omit<UseControllerProps<T>, "name" | "disabled"> {
   name: { date: Path<T>; time: Path<T> };
+  minDate?: Date;
   required?: boolean;
   disabled?: boolean;
 }
@@ -32,6 +33,7 @@ const DateTimeInput = <T extends FieldValues>({
   control,
   name,
   required,
+  minDate,
   disabled,
 }: DateTimeProps<T>): JSX.Element => {
   const { t } = useTranslation();
@@ -58,6 +60,7 @@ const DateTimeInput = <T extends FieldValues>({
         language="fi"
         required={required}
         disabled={disabled}
+        minDate={minDate}
         disableConfirmation
         label={t("common.date")}
         id={name.date}

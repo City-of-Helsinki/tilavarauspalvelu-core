@@ -348,7 +348,7 @@ export const ReservationUnitEditSchema = z
         p.status === ReservationUnitsReservationUnitPricingStatusChoices.Active
     );
 
-    for (let i = 0; i < enabledPricings.length; ++i) {
+    for (let i = 0; i < enabledPricings.length; i + 1) {
       refinePricing(enabledPricings[i], ctx, `pricings.${i}`);
     }
 

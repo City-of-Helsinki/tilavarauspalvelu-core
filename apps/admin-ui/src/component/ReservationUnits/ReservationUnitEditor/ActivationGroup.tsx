@@ -19,6 +19,8 @@ export function ActivationGroup({
   noMargin = false,
   open,
   onChange,
+  style,
+  className,
 }: {
   id: string;
   label: string;
@@ -27,9 +29,11 @@ export function ActivationGroup({
   noMargin?: boolean;
   open: boolean;
   onChange: () => void;
+  style?: React.CSSProperties;
+  className?: string;
 }): JSX.Element {
   return (
-    <>
+    <Wrapper $noMargin={noMargin} style={style} className={className}>
       <Checkbox
         id={id}
         label={label}
@@ -42,6 +46,6 @@ export function ActivationGroup({
           <Indent $noIndent={noIndent}>{children}</Indent>
         </Wrapper>
       ) : null}
-    </>
+    </Wrapper>
   );
 }
