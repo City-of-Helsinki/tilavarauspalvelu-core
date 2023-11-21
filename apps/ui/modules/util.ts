@@ -51,10 +51,12 @@ export const formatDate = (date: string, formatStr?: string): string => {
   return toUIDate(parseISO(date), formatStr);
 };
 
+// Takes a date string in format "yyyy-MM-dd" and returns a Date-object with the same date
 export const fromUIDate = (date: string): Date => {
   return parse(date, "d.M.yyyy", new Date());
 };
 
+// Takes a date string in format "yyyy-MM-dd" and returns a string in format "d.M.yyyy"
 export const apiDateToUIDate = (date: string): string => {
   return toUIDate(fromAPIDate(date));
 };

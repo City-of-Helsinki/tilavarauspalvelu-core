@@ -4,7 +4,10 @@ import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
-import type { ApplicationEventSchedulePriority } from "common/types/common";
+import type {
+  ApplicationEvent,
+  ApplicationEventSchedulePriority,
+} from "common/types/common";
 import type {
   ApplicationEventScheduleNode,
   ApplicationNode,
@@ -30,6 +33,18 @@ type Props = {
   onNext: (appToSave: ApplicationFormValues) => void;
 };
 
+type OpeningHourPeriod = {
+  begin: string;
+  beginValue: number;
+  end: string;
+  endValue: number;
+};
+
+type DailyOpeningHours = {
+  closed: boolean;
+  reservableTimes?: OpeningHourPeriod[];
+}[];
+
 const SubHeading = styled.p`
   margin-top: var(--spacing-2-xs);
 `;
@@ -51,7 +66,7 @@ const getListOfApplicationEventTitles = (
 
 const applicationEventSchedulesToCells = (
   applicationEventSchedules: ApplicationEventScheduleFormType[],
-  openingHours?: { begin: string; end: string }[]
+  openingHours?: DailyOpeningHours
 ): Cell[][] => {
   const firstSlotStart = 7;
   const lastSlotStart = 23;
@@ -61,25 +76,22 @@ const applicationEventSchedulesToCells = (
   for (let j = 0; j < 7; j += 1) {
     const day = [];
     const dayOpeningHours =
-      openingHours?.[j]?.reservableTimes.map((t) => {
+      openingHours?.[j]?.reservableTimes?.map((t) => {
         return {
-          start: Number(t.begin.split(":")[0]),
-          end:
-            Number(t.end.split(":")[0]) === 0
-              ? 24
-              : Number(t.end.split(":")[0]),
+          beginValue: +t.begin.split(":")[0],
+          endValue: +t.end.split(":")[0] === 0 ? 24 : +t.end.split(":")[0],
         };
       }) ?? [];
     // state is 50 if the cell is outside of the opening hours, 100 if it's inside
     for (let i = firstSlotStart; i <= lastSlotStart; i += 1) {
       const isAvailable = dayOpeningHours.some(
-        (t) => t.start <= i && t.end > i
+        (t) => t.beginValue <= i && t.endValue > i
       );
       day.push({
         key: `${i}-${j}`,
         hour: i,
         label: cellLabel(i),
-        state: (isAvailable ? 100 : 50) as const,
+        state: isAvailable ? 100 : 50,
       });
     }
     cells.push(day);
@@ -162,7 +174,7 @@ const cellsToApplicationEventSchedules = (
           begin: `${formatNumber(cell.begin)}:00`,
           end: `${formatNumber(cell.end)}:00`,
           id: "",
-          priority: cell.priority as number,
+          priority: cell.priority,
           declined: false,
         };
       })
@@ -220,6 +232,8 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
   const [errorMsg, setErrorMsg] = useState("");
   const [minDurationMsg, setMinDurationMsg] = useState(true);
   const router = useRouter();
+  const openingHours: DailyOpeningHours =
+    applicationRound?.reservationUnitByPk?.applicationRoundTimeSlots ?? [];
 
   const { getValues, setValue, watch, handleSubmit } =
     useFormContext<ApplicationFormValues>();
@@ -227,10 +241,7 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
   const applicationEvents = filterNonNullable(watch("applicationEvents"));
 
   const selectorData = applicationEvents.map((ae) =>
-    applicationEventSchedulesToCells(
-      ae.applicationEventSchedules,
-      applicationRound?.reservationUnitByPk?.applicationRoundTimeSlots
-    )
+    applicationEventSchedulesToCells(ae.applicationEventSchedules, openingHours)
   );
   const setSelectorData = (selected: typeof selectorData) => {
     // So this returns them as:
@@ -247,19 +258,19 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
     // this seems to work except
     // TODO: day is incorrect (empty days at the start are missing, and 200 / 300 priority on the same day gets split into two days)
     // TODO refactor the Cell -> ApplicationEventSchedule conversion to use FormTypes
-    selectedAppEvents.forEach((aes, i) => {
-      const val = aes.map((ae) => {
-        const { day } = ae;
+    selectedAppEvents.forEach((appEventSchedule, i) => {
+      const val = appEventSchedule.map((appEvent: ApplicationEvent) => {
+        const { day } = appEvent;
         // debug check
         if (day == null || day < 0 || day > 6) {
           throw new Error("Day is out of range");
         }
         return {
-          begin: ae.begin,
-          end: ae.end,
+          begin: appEvent.begin,
+          end: appEvent.end,
           // The default will never happen (it's already filtered)
           // TODO type this better
-          priority: ae.priority === 300 ? (300 as const) : (200 as const),
+          priority: appEvent.priority,
           day: day as Day,
         };
       });

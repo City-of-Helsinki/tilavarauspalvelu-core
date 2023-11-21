@@ -103,20 +103,20 @@ export const transformApplicationEventToForm = (
     applicationEvent.applicationEventSchedules
   ).map((aes) => ({
     pk: aes.pk ?? undefined,
-    day: (aes.day ?? 0) as Day,
+    day: aes.day ?? 0,
     begin: aes.begin ?? "",
     end: aes.end ?? "",
-    priority: aes.priority === 200 || aes.priority === 300 ? aes.priority : 100,
+    priority: aes.priority ?? 50,
   })),
   // TODO remove the format hacks
   begin:
-    applicationEvent?.begin != null && applicationEvent?.begin?.includes("-")
+    applicationEvent.begin != null && applicationEvent.begin.includes("-")
       ? apiDateToUIDate(applicationEvent.begin)
       : applicationEvent?.begin ?? undefined,
   end:
-    applicationEvent?.end != null && applicationEvent?.end?.includes("-")
+    applicationEvent.end != null && applicationEvent.end.includes("-")
       ? apiDateToUIDate(applicationEvent.end)
-      : applicationEvent?.end ?? undefined,
+      : applicationEvent.end ?? undefined,
   accordianOpen: false,
 });
 
