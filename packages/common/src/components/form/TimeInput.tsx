@@ -67,16 +67,21 @@ export const TimeInput = forwardRef(function TimeInput(
   // allow overwriting selection
   // automatic adding of : if the user types 3 numbers
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    const isNumber = !isNaN(Number(e.key));
+    const isNumber = !Number.isNaN(Number(e.key));
     const { value, selectionStart, selectionEnd } = e.currentTarget;
 
     if (
       e.key === "ArrowRight" ||
       e.key === "ArrowLeft" ||
       e.key === "ArrowUp" ||
-      e.key === "ArrowDown"
+      e.key === "ArrowDown" ||
+      e.key === "Tab" ||
+      e.key === "Enter" ||
+      e.key === "Escape" ||
+      e.key === "Home" ||
+      e.key === "End"
     ) {
-    } else if (e.key === "Tab") {
+      // noop
     } else if (e.key === "Backspace") {
       // TODO use selection, and check if the last char is : or not
       if (value.length === 3) {
@@ -84,9 +89,6 @@ export const TimeInput = forwardRef(function TimeInput(
       }
     } else if (e.key === "Delete") {
       // TODO Same as backspace
-    } else if (e.key === "Enter") {
-    } else if (e.key === "Escape") {
-    } else if (e.key === "Home" || e.key === "End") {
     } else if (
       ((e.key === "v" ||
         e.key === "z" ||
@@ -96,6 +98,7 @@ export const TimeInput = forwardRef(function TimeInput(
         e.ctrlKey) ||
       e.metaKey
     ) {
+      // noop
     } else if (e.key !== ":" && !isNumber) {
       e.preventDefault();
     } else {

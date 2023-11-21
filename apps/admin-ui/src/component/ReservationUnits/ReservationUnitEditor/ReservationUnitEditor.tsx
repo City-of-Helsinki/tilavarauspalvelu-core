@@ -121,7 +121,7 @@ const ArchiveButton = styled(Button)`
 const SubAccordion = styled(Accordion)`
   border-bottom: none !important;
   & {
-    --header-font-size: var(--fontsize-heading-s-2);
+    --header-font-size: var(--fontsize-heading-xs);
     h3 {
       color: var(--color-bus);
     }
@@ -209,6 +209,7 @@ const WhiteButton = styled(Button)<{
   disabled?: boolean;
   variant: "secondary" | "primary" | "supplementary";
 }>`
+  /* stylelint-disable csstools/value-no-unknown-custom-properties */
   --bg: var(--color-white);
   --fg: var(--color-black);
   --hbg: var(--fg);
@@ -246,6 +247,7 @@ const WhiteButton = styled(Button)<{
     color: var(--hfg) !important;
     background-color: var(--hbg) !important;
   }
+  /* stylelint-enable csstools/value-no-unknown-custom-properties */
   margin: 0;
 `;
 
