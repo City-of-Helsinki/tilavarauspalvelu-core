@@ -116,6 +116,7 @@ export const getLabel = (
   return "no label";
 };
 
+/// @deprecated - OptionType is dangerous, union types break type safety in comparisons
 export const mapOptions = (
   src: ParameterType[] | AgeGroupType[],
   emptyOptionLabel?: string,

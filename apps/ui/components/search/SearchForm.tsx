@@ -12,7 +12,6 @@ import {
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import { useQuery } from "@apollo/client";
-import { sortBy } from "lodash";
 import { OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
 import {
@@ -20,22 +19,16 @@ import {
   Query,
   QueryUnitsArgs,
 } from "common/types/gql-types";
-import {
-  mapOptions,
-  getSelectedOption,
-  getTranslation,
-} from "../../modules/util";
-import { emptyOption, participantCountOptions } from "../../modules/const";
-import { MediumButton, truncatedText } from "../../styles/util";
-import MultiSelectDropdown from "../form/MultiSelectDropdown";
-import {
-  SEARCH_FORM_PARAMS_PURPOSE,
-  SEARCH_FORM_PARAMS_UNIT,
-} from "../../modules/queries/params";
-import { RESERVATION_UNIT_TYPES } from "../../modules/queries/reservationUnit";
-import { getApplicationRoundName } from "../../modules/applicationRound";
-import { getUnitName } from "../../modules/reservationUnit";
-import { JustForDesktop, JustForMobile } from "../../modules/style/layout";
+import { filterNonNullable } from "common/src/helpers";
+import { getSelectedOption } from "@/modules/util";
+import { emptyOption, participantCountOptions } from "@/modules/const";
+import { MediumButton, truncatedText } from "@/styles/util";
+import { SEARCH_FORM_PARAMS_UNIT } from "@/modules/queries/params";
+import { getApplicationRoundName } from "@/modules/applicationRound";
+import { getUnitName } from "@/modules/reservationUnit";
+import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
+import { useOptions } from "@/hooks/useOptions";
+import MultiSelectDropdown from "@/components/form/MultiSelectDropdown";
 
 type Props = {
   onSearch: (search: Record<string, string>) => void;
@@ -203,15 +196,6 @@ const SearchForm = ({
 }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
-  const [unitOptions, setUnitOptions] = useState<OptionType[]>([]);
-  const [purposeOptions, setPurposeOptions] = useState<OptionType[]>([]);
-  const [reservationUnitTypeOptions, setReservationUnitTypeOptions] = useState<
-    OptionType[]
-  >([]);
-  const [reservationTypeSearchInput, setReservationTypeSearchInput] =
-    useState<string>("");
-  const [unitSearchInput, setUnitSearchInput] = useState<string>("");
-  const [purposeSearchInput, setPurposeSearchInput] = useState<string>("");
   const [areFiltersVisible, setAreFiltersVisible] = useState(false);
 
   const applicationPeriodOptions = useMemo(() => {
@@ -221,50 +205,28 @@ const SearchForm = ({
     }));
   }, [applicationRounds]);
 
-  useQuery<Query, QueryUnitsArgs>(SEARCH_FORM_PARAMS_UNIT, {
-    variables: {
-      publishedReservationUnits: true,
-    },
-    onCompleted: (res) => {
-      const units =
-        res?.units?.edges
-          ?.map((e) => e?.node)
-          .filter((n): n is NonNullable<typeof n> => n != null)
-          .map((node) => ({
-            pk: node.pk ?? 0,
-            name: getUnitName(node) ?? "",
-          })) ?? [];
-      setUnitOptions(mapOptions(sortBy(units, "name")));
-    },
-  });
+  const { options } = useOptions();
+  const { reservationUnitTypeOptions, purposeOptions } = options;
+  const { data: unitData } = useQuery<Query, QueryUnitsArgs>(
+    SEARCH_FORM_PARAMS_UNIT,
+    {
+      variables: {
+        publishedReservationUnits: true,
+      },
+    }
+  );
 
-  useQuery<Query>(SEARCH_FORM_PARAMS_PURPOSE, {
-    onCompleted: (res) => {
-      const purposes =
-        res?.purposes?.edges
-          ?.map((e) => e?.node)
-          .filter((n): n is NonNullable<typeof n> => n != null)
-          .map((node) => ({
-            pk: node.pk ?? 0,
-            name: getTranslation(node, "name"),
-          })) ?? [];
-      setPurposeOptions(mapOptions(sortBy(purposes, "name")));
-    },
-  });
-
-  useQuery<Query>(RESERVATION_UNIT_TYPES, {
-    onCompleted: (res) => {
-      const types =
-        res?.reservationUnitTypes?.edges
-          ?.map((e) => e?.node)
-          .filter((n): n is NonNullable<typeof n> => n != null)
-          .map((node) => ({
-            pk: node.pk ?? 0,
-            name: getTranslation(node, "name") ?? "",
-          })) ?? [];
-      setReservationUnitTypeOptions(mapOptions(sortBy(types, "name")));
-    },
-  });
+  const unitOptions = filterNonNullable(
+    unitData?.units?.edges?.map((e) => e?.node)
+  )
+    .map((node) => ({
+      pk: node.pk ?? 0,
+      name: getUnitName(node) ?? "",
+    }))
+    .map((node) => ({
+      value: node.pk,
+      label: node.name,
+    }));
 
   const { register, watch, handleSubmit, setValue, getValues } = useForm();
 
@@ -285,11 +247,12 @@ const SearchForm = ({
   ): string | undefined => {
     switch (key) {
       case "unit":
-        return unitOptions.find((n) => n.value === value)?.label;
+        return unitOptions.find((n) => String(n.value) === value)?.label;
       case "reservationUnitType":
-        return reservationUnitTypeOptions.find((n) => n.value === value)?.label;
+        return reservationUnitTypeOptions.find((n) => String(n.value) === value)
+          ?.label;
       case "purposes":
-        return purposeOptions.find((n) => n.value === value)?.label;
+        return purposeOptions.find((n) => String(n.value) === value)?.label;
       default:
         return "";
     }
@@ -393,7 +356,6 @@ const SearchForm = ({
           <MultiSelectDropdown
             id="reservationUnitTypeFilter"
             checkboxName="reservationUnitTypeFilter"
-            inputValue={reservationTypeSearchInput}
             name="reservationType"
             onChange={(selection: string[]): void => {
               setValue(
@@ -402,7 +364,6 @@ const SearchForm = ({
               );
             }}
             options={reservationUnitTypeOptions}
-            setInputValue={setReservationTypeSearchInput}
             showSearch
             title={t("searchForm:typeLabel")}
             value={watch("reservationUnitType")?.split(",") || [""]}
@@ -410,13 +371,11 @@ const SearchForm = ({
           <MultiSelectDropdown
             id="unitFilter"
             checkboxName="unitFilter"
-            inputValue={unitSearchInput}
             name="unit"
             onChange={(selection: string[]): void => {
               setValue("unit", selection.filter((n) => n !== "").join(","));
             }}
             options={unitOptions}
-            setInputValue={setUnitSearchInput}
             showSearch
             title={t("searchForm:unitFilter")}
             value={watch("unit")?.split(",") || [""]}
@@ -424,13 +383,11 @@ const SearchForm = ({
           <MultiSelectDropdown
             id="purposeFilter"
             checkboxName="purposeFilter"
-            inputValue={purposeSearchInput}
             name="purposes"
             onChange={(selection: string[]): void => {
               setValue("purposes", selection.filter((n) => n !== "").join(","));
             }}
             options={purposeOptions}
-            setInputValue={setPurposeSearchInput}
             showSearch
             title={t("searchForm:purposesFilter")}
             value={watch("purposes")?.split(",") || [""]}
@@ -472,7 +429,7 @@ const SearchForm = ({
                     count: Number(formValues[value]),
                   });
 
-                  const result = multiSelectFilters.includes(value) ? (
+                  return multiSelectFilters.includes(value) ? (
                     formValues[value].split(",").map((subValue) => (
                       <StyledTag
                         id={`filter-tag__${value}-${subValue}`}
@@ -499,7 +456,6 @@ const SearchForm = ({
                       {label}
                     </StyledTag>
                   );
-                  return result;
                 })}
             </FilterTags>
             {formValueKeys.length > 0 && (
