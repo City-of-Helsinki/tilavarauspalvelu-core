@@ -1,6 +1,6 @@
 from typing import Any, Literal, TypedDict
 
-from opening_hours.enums import State
+from opening_hours.enums import HaukiResourceState
 
 ##########
 # Common #
@@ -71,7 +71,7 @@ class HaukiAPIDatePeriod(TypedDict):
             end_time_on_next_day: bool
             full_day: bool
             weekdays: list[int]
-            resource_state: State
+            resource_state: HaukiResourceState
             created: str  # Timestamp, e.g. "2023-09-06T09:14:12.834385+03:00"
             modified: str  # Timestamp, e.g. "2023-09-06T09:14:12.834385+03:00"
 
@@ -87,7 +87,7 @@ class HaukiAPIDatePeriod(TypedDict):
     description: HaukiTranslatedField
     start_date: str | None  # Date, e.g. "2022-09-06"
     end_date: str | None  # Date, e.g. "2022-12-12"
-    resource_state: State
+    resource_state: HaukiResourceState
     override: bool
     origins: list[HaukiAPIOrigin]
     created: str  # Timestamp, e.g. "2023-09-06T09:14:12.671531+03:00"
@@ -113,7 +113,7 @@ class HaukiAPIOpeningHoursResponseTime(TypedDict):
     start_time: str | None  # Time, e.g. "08:00:00"
     end_time: str | None  # Time, e.g. "09:00:00"
     end_time_on_next_day: bool  # This can be mostly ignored by us, since the Hauki API already handles it nicely.
-    resource_state: State
+    resource_state: HaukiResourceState
     full_day: bool
     periods: list[int]
 

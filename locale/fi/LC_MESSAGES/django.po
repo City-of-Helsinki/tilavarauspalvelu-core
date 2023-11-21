@@ -779,67 +779,67 @@ msgid ""
 msgstr ""
 
 #: opening_hours/enums.py:23
-msgctxt "State"
+msgctxt "HaukiResourceState"
 msgid "Open"
 msgstr ""
 
 #: opening_hours/enums.py:24
-msgctxt "State"
+msgctxt "HaukiResourceState"
 msgid "Closed"
 msgstr ""
 
 #: opening_hours/enums.py:25
-msgctxt "State"
+msgctxt "HaukiResourceState"
 msgid "Undefined"
 msgstr ""
 
 #: opening_hours/enums.py:26
-msgctxt "State"
+msgctxt "HaukiResourceState"
 msgid "Self service"
 msgstr ""
 
 #: opening_hours/enums.py:27
-msgctxt "State"
+msgctxt "HaukiResourceState"
 msgid "With key"
 msgstr ""
 
 #: opening_hours/enums.py:28
-msgctxt "State"
+msgctxt "HaukiResourceState"
 msgid "With reservation"
 msgstr ""
 
 #: opening_hours/enums.py:29
-msgctxt "State"
+msgctxt "HaukiResourceState"
 msgid "Open and reservable"
 msgstr ""
 
 #: opening_hours/enums.py:30
-msgctxt "State"
+msgctxt "HaukiResourceState"
 msgid "With key and reservation"
 msgstr ""
 
 #: opening_hours/enums.py:31
-msgctxt "State"
+msgctxt "HaukiResourceState"
 msgid "Enter only"
 msgstr ""
 
 #: opening_hours/enums.py:32
-msgctxt "State"
+msgctxt "HaukiResourceState"
 msgid "Exit only"
 msgstr ""
 
 #: opening_hours/enums.py:33
-msgctxt "State"
+msgctxt "HaukiResourceState"
 msgid "Weather permitting"
 msgstr ""
 
 #: opening_hours/enums.py:34
-msgctxt "State"
+msgctxt "HaukiResourceState"
 msgid "Not in use"
 msgstr ""
 
 #: opening_hours/enums.py:35
-msgctxt "State"
+msgctxt "HaukiResourceState"
 msgid "Maintenance"
 msgstr ""
 

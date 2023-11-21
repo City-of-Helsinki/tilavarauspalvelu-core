@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.utils.timezone import get_default_timezone
 from freezegun import freeze_time
 
-from opening_hours.enums import State
+from opening_hours.enums import HaukiResourceState
 from opening_hours.errors import ReservableTimeSpanClientNothingToDoError
 from opening_hours.models import ReservableTimeSpan
 from opening_hours.utils.hauki_api_client import HaukiAPIClient
@@ -68,7 +68,7 @@ def _get_resource_opening_hours() -> HaukiAPIOpeningHoursResponseItem:
                         end_time="16:00:00",
                         end_time_on_next_day=False,
                         full_day=False,
-                        resource_state=State.WITH_RESERVATION,
+                        resource_state=HaukiResourceState.WITH_RESERVATION,
                         periods=[1],
                     ),
                     HaukiAPIOpeningHoursResponseTime(
@@ -78,7 +78,7 @@ def _get_resource_opening_hours() -> HaukiAPIOpeningHoursResponseItem:
                         end_time="12:00:00",
                         end_time_on_next_day=False,
                         full_day=False,
-                        resource_state=State.OPEN_AND_RESERVABLE,
+                        resource_state=HaukiResourceState.OPEN_AND_RESERVABLE,
                         periods=[1],
                     ),
                     HaukiAPIOpeningHoursResponseTime(
@@ -88,7 +88,7 @@ def _get_resource_opening_hours() -> HaukiAPIOpeningHoursResponseItem:
                         end_time="16:00:00",
                         end_time_on_next_day=False,
                         full_day=False,
-                        resource_state=State.CLOSED,
+                        resource_state=HaukiResourceState.CLOSED,
                         periods=[1],
                     ),
                 ],
@@ -103,7 +103,7 @@ def _get_resource_opening_hours() -> HaukiAPIOpeningHoursResponseItem:
                         end_time="20:00:00",
                         end_time_on_next_day=False,
                         full_day=False,
-                        resource_state=State.UNDEFINED,
+                        resource_state=HaukiResourceState.UNDEFINED,
                         periods=[1],
                     ),
                     HaukiAPIOpeningHoursResponseTime(
@@ -113,7 +113,7 @@ def _get_resource_opening_hours() -> HaukiAPIOpeningHoursResponseItem:
                         end_time="06:00:00",
                         end_time_on_next_day=True,
                         full_day=False,
-                        resource_state=State.OPEN_AND_RESERVABLE,
+                        resource_state=HaukiResourceState.OPEN_AND_RESERVABLE,
                         periods=[1],
                     ),
                 ],

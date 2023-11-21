@@ -4,7 +4,7 @@ from typing import Any, NamedTuple
 import pytest
 from django.utils.timezone import get_default_timezone
 
-from opening_hours.enums import State
+from opening_hours.enums import HaukiResourceState
 from opening_hours.tests.test_reservable_time_spans_client import _get_date
 from opening_hours.utils.hauki_api_types import HaukiAPIOpeningHoursResponseTime
 from opening_hours.utils.reservable_time_span_client import TimeSpanElement
@@ -27,7 +27,7 @@ class TimeSpanElementParams(NamedTuple):
     **parametrize_helper(
         {
             "Status: Open": TimeSpanElementParams(
-                time_element_changes={"resource_state": State.OPEN},
+                time_element_changes={"resource_state": HaukiResourceState.OPEN},
                 expected=None,
             ),
             "Start time greater than end time": TimeSpanElementParams(
@@ -39,7 +39,7 @@ class TimeSpanElementParams(NamedTuple):
             ),
             "Valid reservable": TimeSpanElementParams(
                 time_element_changes={
-                    "resource_state": State.OPEN_AND_RESERVABLE,
+                    "resource_state": HaukiResourceState.OPEN_AND_RESERVABLE,
                     "start_time": "10:00:00",
                     "end_time": "12:00:00",
                 },
@@ -51,7 +51,7 @@ class TimeSpanElementParams(NamedTuple):
             ),
             "Valid closed": TimeSpanElementParams(
                 time_element_changes={
-                    "resource_state": State.CLOSED,
+                    "resource_state": HaukiResourceState.CLOSED,
                     "start_time": "10:00:00",
                     "end_time": "12:00:00",
                 },
@@ -63,7 +63,7 @@ class TimeSpanElementParams(NamedTuple):
             ),
             "End time on the next day": TimeSpanElementParams(
                 time_element_changes={
-                    "resource_state": State.CLOSED,
+                    "resource_state": HaukiResourceState.CLOSED,
                     "start_time": "10:00:00",
                     "end_time": "12:00:00",
                     "end_time_on_next_day": True,
@@ -76,7 +76,7 @@ class TimeSpanElementParams(NamedTuple):
             ),
             "Full day reservation": TimeSpanElementParams(
                 time_element_changes={
-                    "resource_state": State.OPEN_AND_RESERVABLE,
+                    "resource_state": HaukiResourceState.OPEN_AND_RESERVABLE,
                     "start_time": None,
                     "end_time": None,
                     "end_time_on_next_day": True,
@@ -97,7 +97,7 @@ def test__TimeSpanElement__create_from_time_element(time_element_changes, expect
         "start_time": None,
         "end_time": None,
         "end_time_on_next_day": False,
-        "resource_state": State.UNDEFINED,
+        "resource_state": HaukiResourceState.UNDEFINED,
         "full_day": False,
         "periods": [],
     }

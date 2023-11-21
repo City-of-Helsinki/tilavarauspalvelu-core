@@ -8,7 +8,7 @@ from zoneinfo import ZoneInfo
 from django.utils import timezone
 from django.utils.timezone import get_default_timezone
 
-from opening_hours.enums import State
+from opening_hours.enums import HaukiResourceState
 from opening_hours.errors import (
     ReservableTimeSpanClientNothingToDoError,
     ReservableTimeSpanClientValueError,
@@ -55,7 +55,7 @@ class TimeSpanElement:
     ) -> Optional["TimeSpanElement"]:
         # We only care if the resource is reservable or closed on the time frame.
         # That means we can ignore all other states (OPEN, SELF_SERVICE, WEATHER_PERMITTING, etc.)
-        time_element_state = State.get(time_element["resource_state"])
+        time_element_state = HaukiResourceState.get(time_element["resource_state"])
         if not time_element_state.is_reservable and not time_element_state.is_closed:
             return None
 
