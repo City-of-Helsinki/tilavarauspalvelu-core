@@ -136,7 +136,7 @@ export const ReservationUnitEditSchema = z
     bufferTimeAfter: z.number(),
     bufferTimeBefore: z.number(),
     // TODO default to optional
-    maxReservationsPerUser: z.number().nullable(),
+    maxReservationsPerUser: z.number().min(1).nullable(),
     // TODO maxPerson > minPerson
     // TODO allow 0 (or null in the backend) for drafts?
     maxPersons: z.number().min(1).nullable(),

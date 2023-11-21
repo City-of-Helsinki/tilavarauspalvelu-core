@@ -760,6 +760,7 @@ const translations: ITranslations = {
         "Begin needs to be in the future": [
           "Alkamisajan tulee olla tulevaisuudessa",
         ],
+        "Number must be greater than or equal to 1": ["Pitää olla vähintään 1"],
       },
     },
     level: {

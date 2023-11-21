@@ -1189,15 +1189,21 @@ function ReservationUnitSettings({
           )}
         />
         <NumberInput
-          {...register("maxReservationsPerUser", { valueAsNumber: true })}
+          {...register("maxReservationsPerUser", {
+            setValueAs: (v) => (v !== "" ? Number(v) : null),
+          })}
           id="maxReservationsPerUser"
           label={t("ReservationUnitEditor.maxReservationsPerUser")}
           minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
           plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
           min={1}
-          // TODO why?
-          max={15}
+          max={undefined}
           step={1}
+          errorText={getTranslatedError(
+            errors.maxReservationsPerUser?.message,
+            t
+          )}
+          invalid={errors.maxReservationsPerUser?.message != null}
           type="number"
           tooltipText={t(
             "ReservationUnitEditor.tooltip.maxReservationsPerUser"
