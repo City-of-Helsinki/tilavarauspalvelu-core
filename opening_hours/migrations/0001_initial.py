@@ -34,6 +34,7 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={
+                "base_manager_name": "objects",
                 "ordering": ["resource", "start_datetime", "end_datetime"],
             },
         ),
