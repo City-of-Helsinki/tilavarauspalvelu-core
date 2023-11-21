@@ -84,42 +84,42 @@ const refinePricing = (
     if (Number.isNaN(lowestPrice)) {
       ctx.addIssue({
         message: "must be a number",
-        path: ["lowestPrice"],
+        path: [`${path}.lowestPrice`],
         code: z.ZodIssueCode.custom,
       });
     }
     if (Number.isNaN(highestPrice)) {
       ctx.addIssue({
         message: "must be a number",
-        path: ["highestPrice"],
+        path: [`${path}.highestPrice`],
         code: z.ZodIssueCode.custom,
       });
     }
     if (Number.isNaN(lowestPriceNet)) {
       ctx.addIssue({
         message: "must be a number",
-        path: ["lowestPriceNet"],
+        path: [`${path}.lowestPriceNet`],
         code: z.ZodIssueCode.custom,
       });
     }
     if (Number.isNaN(highestPriceNet)) {
       ctx.addIssue({
         message: "must be a number",
-        path: ["highestPriceNet"],
+        path: [`${path}.highestPriceNet`],
         code: z.ZodIssueCode.custom,
       });
     }
     if (data.taxPercentage.pk === 0) {
       ctx.addIssue({
         message: "taxPercentage must be selected",
-        path: ["taxPercentage"],
+        path: [`${path}.taxPercentage`],
         code: z.ZodIssueCode.custom,
       });
     }
     if (lowestPrice > highestPrice) {
       ctx.addIssue({
         message: "lowestPrice must be lower than highestPrice",
-        path: ["lowestPrice"],
+        path: [`${path}.lowestPrice`],
         code: z.ZodIssueCode.custom,
       });
     }
@@ -347,10 +347,9 @@ export const ReservationUnitEditSchema = z
         v.hasFuturePricing ||
         p.status === ReservationUnitsReservationUnitPricingStatusChoices.Active
     );
-
-    for (let i = 0; i < enabledPricings.length; i + 1) {
-      refinePricing(enabledPricings[i], ctx, `pricings.${i}`);
-    }
+    enabledPricings.forEach((p, i) => {
+      refinePricing(p, ctx, `pricings.${i}`);
+    });
 
     // TODO if it includes futurePricing check that the futurePrice date is in the future (is today ok?)
     if (

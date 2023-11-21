@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "next-i18next";
@@ -70,7 +70,7 @@ function PaidPricingPart({
   }));
 
   const removeTax = (price: number, taxPercentage: number) => {
-    const tmp = price * ((100 - taxPercentage) / 100);
+    const tmp = (price * 100) / (100 + taxPercentage);
     const tmp2 = Math.round(tmp * 100) / 100;
     return tmp2;
   };
@@ -82,23 +82,6 @@ function PaidPricingPart({
   };
 
   const pricing = watch(`pricings.${index}`);
-  // single use effect only when taxPercentage changes
-  useEffect(() => {
-    if (pricing?.taxPercentage) {
-      const low = Number(pricing?.lowestPrice);
-      const high = Number(pricing?.highestPrice);
-      const taxPercentage = pricing?.taxPercentage.value ?? 0;
-      if (!Number.isNaN(low)) {
-        const lowNet = removeTax(low, taxPercentage);
-        setValue(`pricings.${index}.lowestPriceNet`, String(lowNet));
-      }
-      if (!Number.isNaN(high)) {
-        const highNet = removeTax(high, taxPercentage);
-        setValue(`pricings.${index}.highestPriceNet`, String(highNet));
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- only when taxPercentage changes
-  }, [pricing?.taxPercentage, setValue, index]);
 
   const taxPercentage = watch(`pricings.${index}.taxPercentage`).value ?? 0;
 
@@ -142,9 +125,20 @@ function PaidPricingPart({
             required
             label={t(`ReservationUnitEditor.label.taxPercentagePk`)}
             options={taxPercentageOptions}
-            onChange={(v: { value: number; label: string }) =>
-              onChange({ pk: v.value, value: Number(v.label) })
-            }
+            onChange={(v: { value: number; label: string }) => {
+              onChange({ pk: v.value, value: Number(v.label) });
+              const low = Number(pricing?.lowestPrice);
+              const high = Number(pricing?.highestPrice);
+              const tax = pricing?.taxPercentage.value ?? 0;
+              if (!Number.isNaN(low)) {
+                const lowNet = removeTax(low, tax);
+                setValue(`pricings.${index}.lowestPriceNet`, String(lowNet));
+              }
+              if (!Number.isNaN(high)) {
+                const highNet = removeTax(high, tax);
+                setValue(`pricings.${index}.highestPriceNet`, String(highNet));
+              }
+            }}
             value={
               taxPercentageOptions.find(
                 (option) => option.value === value.pk
