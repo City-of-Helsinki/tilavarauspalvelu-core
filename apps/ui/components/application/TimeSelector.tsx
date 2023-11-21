@@ -86,7 +86,9 @@ const TimeSelectionButton = styled.button<{
     font-weight: bold;
   `
       : `
-    background: ${props.state === 100 ? "#ffffff" : "#e5e5e5"};
+    background: ${
+      props.state === 100 ? "var(--color-white)" : "var(--color-black-10)"
+    };
     font-weight: ${props.state === 100 ? "bold" : "normal"};
     color: var(--color-black);
   `};
@@ -97,6 +99,7 @@ const TimeSelectionButton = styled.button<{
 
 const Day = ({
   head,
+  labelHead,
   cells,
   setCellValue,
   paintState,
@@ -106,6 +109,7 @@ const Day = ({
   priority,
 }: {
   head: string;
+  labelHead: string;
   cells: Cell[];
   setCellValue: (
     selection: Cell,
@@ -137,6 +141,14 @@ const Day = ({
           case 200:
             ariaLabel = t("application:Page2.legend.selected-2");
             break;
+          /* TODO: use aria-labels for priority 100 & 50 once we have them
+          case 100:
+            ariaLabel = t("application:Page2.legend.available");
+            break;
+          case 50:
+            ariaLabel = t("application:Page2.legend.unavailable");
+            break;
+          */
           default:
         }
 
@@ -171,8 +183,10 @@ const Day = ({
               }
             }}
             role="option"
-            aria-label={ariaLabel}
-            aria-selected={!!cell.state}
+            aria-label={`${ariaLabel ? `${ariaLabel}: ` : ""}${labelHead} ${
+              cell.label
+            }`}
+            aria-selected={cell.state > 100}
             data-testid={`time-selector__button--${cell.key}`}
           >
             {cell.label}
@@ -386,6 +400,7 @@ const TimeSelector = ({
             setPainting={setPainting}
             key={`day-${c}`}
             head={t(`common:weekDayLong.${fromMondayFirstUnsafe(i)}`)}
+            labelHead={t(`common:weekDay.${fromMondayFirstUnsafe(i)}`)}
             cells={cells[i]}
             setCellValue={setCellValue}
             priority={priority}
