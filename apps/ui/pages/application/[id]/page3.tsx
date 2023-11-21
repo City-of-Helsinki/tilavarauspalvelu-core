@@ -29,7 +29,6 @@ import {
   AddressFormValues,
   OrganisationFormValues,
 } from "@/components/application/Form";
-import { redirectProtectedRoute } from "@/modules/protectedRoute";
 import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
 import { useApplicationQuery } from "@/hooks/useApplicationQuery";
 import { useApplicationUpdate } from "@/hooks/useApplicationUpdate";
@@ -257,11 +256,6 @@ const Page3Wrapped = (props: { id: number | null }): JSX.Element | null => {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale } = ctx;
-
-  const redirect = redirectProtectedRoute(ctx);
-  if (redirect) {
-    return redirect;
-  }
 
   // TODO should fetch on SSR but we need authentication for it
   const { query } = ctx;

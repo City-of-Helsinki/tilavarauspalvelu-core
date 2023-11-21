@@ -4,7 +4,6 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { isFinite } from "lodash";
 import { useTranslation } from "next-i18next";
 import { useSession } from "@/hooks/auth";
-import { redirectProtectedRoute } from "@/modules/protectedRoute";
 import ReservationCancellation from "../../components/reservation/ReservationCancellation";
 import ReservationEdit from "../../components/reservation/ReservationEdit";
 
@@ -18,11 +17,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   const id = Number(query.params?.[0]);
   const slug = query.params?.[1];
-
-  const redirect = redirectProtectedRoute(ctx);
-  if (redirect) {
-    return redirect;
-  }
 
   if (isFinite(id) && slug != null && (slug === "cancel" || slug === "edit")) {
     return {

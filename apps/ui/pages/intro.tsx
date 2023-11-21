@@ -17,7 +17,6 @@ import {
   type QueryApplicationRoundsArgs,
 } from "common/types/gql-types";
 import { useSession } from "@/hooks/auth";
-import { redirectProtectedRoute } from "@/modules/protectedRoute";
 import { MediumButton } from "@/styles/util";
 import Head from "@/components/application/Head";
 import { APPLICATION_ROUNDS } from "@/modules/queries/applicationRound";
@@ -27,11 +26,6 @@ import { CREATE_APPLICATION_MUTATION } from "@/modules/queries/application";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale } = ctx;
-
-  const redirect = redirectProtectedRoute(ctx);
-  if (redirect) {
-    return redirect;
-  }
 
   return {
     props: {

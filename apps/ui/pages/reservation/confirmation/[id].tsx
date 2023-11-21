@@ -9,7 +9,6 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Container } from "common";
-import { redirectProtectedRoute } from "@/modules/protectedRoute";
 import ReservationConfirmation from "../../../components/reservation/ReservationConfirmation";
 import ReservationInfoCard from "../../../components/reservation/ReservationInfoCard";
 import { Paragraph } from "../../../components/reservation/styles";
@@ -23,11 +22,6 @@ type Props = {
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale, params } = ctx;
   const reservationPk = Number(params?.id);
-
-  const redirect = redirectProtectedRoute(ctx);
-  if (redirect) {
-    return redirect;
-  }
 
   return {
     props: {

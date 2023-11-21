@@ -22,15 +22,9 @@ import { LIST_RESERVATIONS } from "@/modules/queries/reservation";
 import ReservationCard from "@/components/reservation/ReservationCard";
 import Head from "@/components/reservations/Head";
 import { CenterSpinner } from "@/components/common/common";
-import { redirectProtectedRoute } from "@/modules/protectedRoute";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale } = ctx;
-
-  const redirect = redirectProtectedRoute(ctx);
-  if (redirect) {
-    return redirect;
-  }
 
   return {
     props: {

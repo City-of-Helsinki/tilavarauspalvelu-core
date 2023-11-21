@@ -49,11 +49,7 @@ const nextConfig = {
       displayName: true,
     },
   },
-  webpack: (config) => {
-    // required otherwise the MSW is reqistered after the fetches are made
-    config.experiments = { topLevelAwait: true };
-    return config;
-  },
+  // NOTE webpack.experimental.topLevelAwait breaks middleware (it hangs forever)
 };
 
 const sentryWebpackPluginOptions = {

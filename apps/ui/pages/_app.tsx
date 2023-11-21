@@ -10,16 +10,10 @@ import PageWrapper from "../components/common/PageWrapper";
 import ExternalScripts from "../components/ExternalScripts";
 import { DataContextProvider } from "../context/DataContext";
 import { createApolloClient } from "../modules/apolloClient";
-import { isBrowser, mockRequests } from "../modules/const";
+import { isBrowser } from "../modules/const";
 import { TrackingWrapper } from "../modules/tracking";
 import nextI18NextConfig from "../next-i18next.config";
 import "../styles/global.scss";
-import { initMocks } from "../mocks";
-
-if (mockRequests) {
-  // await required otherwise the MSW is reqistered after the fetches are made
-  await initMocks();
-}
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const MyApp = ({ Component, pageProps }: AppProps) => {

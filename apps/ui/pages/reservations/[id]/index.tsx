@@ -28,7 +28,6 @@ import { filterNonNullable } from "common/src/helpers";
 import { useSession } from "@/hooks/auth";
 import { useReservation, useOrder } from "@/hooks/reservation";
 import { genericTermsVariant, reservationUnitPath } from "@/modules/const";
-import { redirectProtectedRoute } from "@/modules/protectedRoute";
 import { createApolloClient } from "@/modules/apolloClient";
 import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
 import { getTranslation, reservationsUrl } from "@/modules/util";
@@ -63,11 +62,6 @@ type Props = {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale, params } = ctx;
-
-  const redirect = redirectProtectedRoute(ctx);
-  if (redirect) {
-    return redirect;
-  }
 
   const apolloClient = createApolloClient(ctx);
   const id = Number(params?.id);

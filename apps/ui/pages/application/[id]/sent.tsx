@@ -9,7 +9,6 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetServerSideProps } from "next";
 import { applicationsUrl } from "@/modules/util";
 import Head from "@/components/application/Head";
-import { redirectProtectedRoute } from "@/modules/protectedRoute";
 
 const Paragraph = styled.p`
   white-space: pre-wrap;
@@ -49,11 +48,6 @@ const Sent = (): JSX.Element => {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale } = ctx;
-
-  const redirect = redirectProtectedRoute(ctx);
-  if (redirect) {
-    return redirect;
-  }
 
   // TODO should fetch on SSR but we need authentication for it
   const { query } = ctx;

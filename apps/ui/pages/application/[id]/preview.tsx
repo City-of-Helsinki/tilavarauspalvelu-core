@@ -17,7 +17,6 @@ import { SEND_APPLICATION_MUTATION } from "@/modules/queries/application";
 import { MediumButton } from "@/styles/util";
 import { ButtonContainer, CenterSpinner } from "@/components/common/common";
 import { ViewInner } from "@/components/application/ViewInner";
-import { redirectProtectedRoute } from "@/modules/protectedRoute";
 import { TERMS_OF_USE } from "@/modules/queries/reservationUnit";
 import { createApolloClient } from "@/modules/apolloClient";
 import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
@@ -136,11 +135,6 @@ const Preview = (props: {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale } = ctx;
-
-  const redirect = redirectProtectedRoute(ctx);
-  if (redirect) {
-    return redirect;
-  }
 
   const apolloClient = createApolloClient(ctx);
   const { data: tosData } = await apolloClient.query<

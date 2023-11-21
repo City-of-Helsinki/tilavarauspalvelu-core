@@ -13,7 +13,6 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { filterNonNullable } from "common/src/helpers";
 import { BlackButton } from "@/styles/util";
 import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
-import { redirectProtectedRoute } from "@/modules/protectedRoute";
 import { createApolloClient } from "@/modules/apolloClient";
 import { TERMS_OF_USE } from "@/modules/queries/reservationUnit";
 import { ViewInner } from "@/components/application/ViewInner";
@@ -68,11 +67,6 @@ const View = ({ id, tos }: Props): JSX.Element => {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale } = ctx;
-
-  const redirect = redirectProtectedRoute(ctx);
-  if (redirect) {
-    return redirect;
-  }
 
   const apolloClient = createApolloClient(ctx);
   const { data: tosData } = await apolloClient.query<

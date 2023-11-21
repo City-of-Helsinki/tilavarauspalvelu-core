@@ -16,7 +16,6 @@ import {
 import { filterNonNullable } from "common/src/helpers";
 import { useSession } from "@/hooks/auth";
 import { getReducedApplicationStatus } from "@/modules/util";
-import { redirectProtectedRoute } from "@/modules/protectedRoute";
 import Head from "@/components/applications/Head";
 import ApplicationsGroup from "@/components/applications/ApplicationsGroup";
 import { CenterSpinner } from "@/components/common/common";
@@ -24,11 +23,6 @@ import { APPLICATIONS } from "@/modules/queries/application";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale } = ctx;
-
-  const redirect = redirectProtectedRoute(ctx);
-  if (redirect) {
-    return redirect;
-  }
 
   return {
     props: {

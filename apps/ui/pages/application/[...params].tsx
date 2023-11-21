@@ -10,7 +10,6 @@ import type {
   ApplicationNode,
   ApplicationRoundNode,
 } from "common/types/gql-types";
-import { redirectProtectedRoute } from "@/modules/protectedRoute";
 import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
 import Page1 from "@/components/application/Page1";
 import Page2 from "@/components/application/Page2";
@@ -29,11 +28,6 @@ import { useApplicationQuery } from "@/hooks/useApplicationQuery";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale } = ctx;
-
-  const redirect = redirectProtectedRoute(ctx);
-  if (redirect) {
-    return redirect;
-  }
 
   // TODO should fetch on SSR but we need authentication for it
   const { query } = ctx;

@@ -11,15 +11,9 @@ import { useTranslation } from "next-i18next";
 import { useSession } from "@/hooks/auth";
 import { useOrder, useReservation } from "@/hooks/reservation";
 import ReservationFail from "@/components/reservation/ReservationFail";
-import { redirectProtectedRoute } from "@/modules/protectedRoute";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale } = ctx;
-
-  const redirect = redirectProtectedRoute(ctx);
-  if (redirect) {
-    return redirect;
-  }
 
   return {
     props: {
