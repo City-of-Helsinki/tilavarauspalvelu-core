@@ -4,7 +4,7 @@ from django.utils.translation import pgettext_lazy
 from enumfields import Enum
 
 
-class State(Enum):
+class HaukiResourceState(Enum):
     OPEN = "open"
     CLOSED = "closed"
     UNDEFINED = "undefined"
@@ -20,19 +20,19 @@ class State(Enum):
     MAINTENANCE = "maintenance"
 
     class Labels:
-        OPEN = pgettext_lazy("State", "Open")
-        CLOSED = pgettext_lazy("State", "Closed")
-        UNDEFINED = pgettext_lazy("State", "Undefined")
-        SELF_SERVICE = pgettext_lazy("State", "Self service")
-        WITH_KEY = pgettext_lazy("State", "With key")
-        WITH_RESERVATION = pgettext_lazy("State", "With reservation")
-        OPEN_AND_RESERVABLE = pgettext_lazy("State", "Open and reservable")
-        WITH_KEY_AND_RESERVATION = pgettext_lazy("State", "With key and reservation")
-        ENTER_ONLY = pgettext_lazy("State", "Enter only")
-        EXIT_ONLY = pgettext_lazy("State", "Exit only")
-        WEATHER_PERMITTING = pgettext_lazy("State", "Weather permitting")
-        NOT_IN_USE = pgettext_lazy("State", "Not in use")
-        MAINTENANCE = pgettext_lazy("State", "Maintenance")
+        OPEN = pgettext_lazy("HaukiResourceState", "Open")
+        CLOSED = pgettext_lazy("HaukiResourceState", "Closed")
+        UNDEFINED = pgettext_lazy("HaukiResourceState", "Undefined")
+        SELF_SERVICE = pgettext_lazy("HaukiResourceState", "Self service")
+        WITH_KEY = pgettext_lazy("HaukiResourceState", "With key")
+        WITH_RESERVATION = pgettext_lazy("HaukiResourceState", "With reservation")
+        OPEN_AND_RESERVABLE = pgettext_lazy("HaukiResourceState", "Open and reservable")
+        WITH_KEY_AND_RESERVATION = pgettext_lazy("HaukiResourceState", "With key and reservation")
+        ENTER_ONLY = pgettext_lazy("HaukiResourceState", "Enter only")
+        EXIT_ONLY = pgettext_lazy("HaukiResourceState", "Exit only")
+        WEATHER_PERMITTING = pgettext_lazy("HaukiResourceState", "Weather permitting")
+        NOT_IN_USE = pgettext_lazy("HaukiResourceState", "Not in use")
+        MAINTENANCE = pgettext_lazy("HaukiResourceState", "Maintenance")
 
     @classmethod
     def accessible_states(cls):
@@ -73,19 +73,19 @@ class State(Enum):
 
     @DynamicClassAttribute
     def is_accessible(self) -> bool:
-        return self in State.accessible_states()
+        return self in HaukiResourceState.accessible_states()
 
     @DynamicClassAttribute
     def is_reservable(self) -> bool:
-        return self in State.reservable_states()
+        return self in HaukiResourceState.reservable_states()
 
     @DynamicClassAttribute
     def is_closed(self) -> bool:
-        return self in State.closed_states()
+        return self in HaukiResourceState.closed_states()
 
     @classmethod
     def get(cls, state):
         try:
-            return State(state)
+            return HaukiResourceState(state)
         except ValueError:
-            return State.UNDEFINED
+            return HaukiResourceState.UNDEFINED
