@@ -28,7 +28,7 @@ export const ApplicationEventScheduleFormTypeSchema = z.object({
   day: z.number().min(0).max(6),
   begin: z.string(),
   end: z.string(),
-  priority: z.union([z.literal(100), z.literal(200), z.literal(300)]),
+  priority: z.number(),
 });
 
 export type ApplicationEventScheduleFormType = z.infer<

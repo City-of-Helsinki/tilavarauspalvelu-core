@@ -4,10 +4,7 @@ import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
-import type {
-  ApplicationEvent,
-  ApplicationEventSchedulePriority,
-} from "common/types/common";
+import type { ApplicationEventSchedulePriority } from "common/types/common";
 import type {
   ApplicationEventScheduleNode,
   ApplicationNode,
@@ -35,15 +32,15 @@ type Props = {
 
 type OpeningHourPeriod = {
   begin: string;
-  beginValue: number;
   end: string;
-  endValue: number;
-};
+} | null;
 
-type DailyOpeningHours = {
-  closed: boolean;
-  reservableTimes?: OpeningHourPeriod[];
-}[];
+type DailyOpeningHours =
+  | {
+      closed: boolean;
+      reservableTimes?: OpeningHourPeriod[] | null;
+    }[]
+  | null;
 
 const SubHeading = styled.p`
   margin-top: var(--spacing-2-xs);
@@ -78,14 +75,14 @@ const applicationEventSchedulesToCells = (
     const dayOpeningHours =
       openingHours?.[j]?.reservableTimes?.map((t) => {
         return {
-          beginValue: +t.begin.split(":")[0],
-          endValue: +t.end.split(":")[0] === 0 ? 24 : +t.end.split(":")[0],
+          begin: t && +t.begin.split(":")[0],
+          end: t && +t.end.split(":")[0] === 0 ? 24 : t && +t.end.split(":")[0],
         };
       }) ?? [];
     // state is 50 if the cell is outside of the opening hours, 100 if it's inside
     for (let i = firstSlotStart; i <= lastSlotStart; i += 1) {
       const isAvailable = dayOpeningHours.some(
-        (t) => t.beginValue <= i && t.endValue > i
+        (t) => t.begin != null && t.end != null && t?.begin <= i && t?.end > i
       );
       day.push({
         key: `${i}-${j}`,
@@ -224,15 +221,16 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
     QueryApplicationRoundsArgs
   >(RESERVATION_UNIT, {
     variables: {
-      pk: application.applicationRound.pk,
+      pk: [application.applicationRound.pk ?? 0],
     },
+    skip: !application.applicationRound.pk,
     fetchPolicy: "no-cache",
   });
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [minDurationMsg, setMinDurationMsg] = useState(true);
   const router = useRouter();
-  const openingHours: DailyOpeningHours =
+  const openingHours =
     applicationRound?.reservationUnitByPk?.applicationRoundTimeSlots ?? [];
 
   const { getValues, setValue, watch, handleSubmit } =
@@ -259,7 +257,7 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
     // TODO: day is incorrect (empty days at the start are missing, and 200 / 300 priority on the same day gets split into two days)
     // TODO refactor the Cell -> ApplicationEventSchedule conversion to use FormTypes
     selectedAppEvents.forEach((appEventSchedule, i) => {
-      const val = appEventSchedule.map((appEvent: ApplicationEvent) => {
+      const val = appEventSchedule.map((appEvent) => {
         const { day } = appEvent;
         // debug check
         if (day == null || day < 0 || day > 6) {
@@ -318,7 +316,14 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
     const selectedAppEvents = selectorData
       .map((cell) => cellsToApplicationEventSchedules(cell))
       .map((aes) =>
-        aes.filter((ae) => ae.priority === 300 || ae.priority === 200)
+        aes
+          .filter((ae) => ae.priority === 300 || ae.priority === 200)
+          .map((ae) => {
+            return {
+              ...ae,
+              priority: ae.priority === 300 ? (300 as const) : (200 as const),
+            };
+          })
       )
       .flat();
     if (selectedAppEvents.length === 0) {
