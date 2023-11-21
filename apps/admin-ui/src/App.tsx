@@ -44,10 +44,7 @@ const ReservationUnits = dynamic(
   () => import("./component/reservation-units/ReservationUnits")
 );
 const ReservationUnitEditor = dynamic(
-  () =>
-    import(
-      "./component/ReservationUnits/ReservationUnitEditor/ReservationUnitEditor"
-    )
+  () => import("./spa/ReservationUnit/edit/index")
 );
 
 const HomePage = dynamic(() => import("./spa/HomePage"));

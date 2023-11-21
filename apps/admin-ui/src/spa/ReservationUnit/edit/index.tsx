@@ -98,9 +98,12 @@ import {
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { reservationUnitsUrl } from "@/common/urls";
 
-const RichTextInput = dynamic(() => import("../../RichTextInput"), {
-  ssr: false,
-});
+const RichTextInput = dynamic(
+  () => import("../../../component/RichTextInput"),
+  {
+    ssr: false,
+  }
+);
 
 // NOTE some magic values so the sticky buttons don't hide the bottom of the page
 const Wrapper = styled.div`
