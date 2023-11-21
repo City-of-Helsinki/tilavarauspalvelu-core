@@ -539,6 +539,7 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
     objects = ReservationUnitManager.from_queryset(ReservationUnitQuerySet)()
 
     class Meta:
+        base_manager_name = "objects"
         ordering = (
             "rank",
             "id",
@@ -781,6 +782,9 @@ class ReservationUnitPricing(models.Model):
     )
 
     objects = ReservationUnitPricingManager.as_manager()
+
+    class Meta:
+        base_manager_name = "objects"
 
     def __str__(self) -> str:
         return f"{self.begins}: {self.lowest_price} - {self.highest_price} ({self.tax_percentage.value})"

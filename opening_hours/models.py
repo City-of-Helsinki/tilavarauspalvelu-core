@@ -79,6 +79,7 @@ class ReservableTimeSpan(models.Model):
     objects = ReservableTimeSpanQuerySet.as_manager()
 
     class Meta:
+        base_manager_name = "objects"
         ordering = ["resource", "start_datetime", "end_datetime"]
         constraints = [
             models.CheckConstraint(
