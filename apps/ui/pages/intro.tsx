@@ -6,7 +6,6 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useMutation, useQuery } from "@apollo/client";
 import { type GetServerSideProps } from "next";
 import styled from "styled-components";
-import { OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
 import { filterNonNullable } from "common/src/helpers";
 import {
@@ -129,17 +128,19 @@ const IntroPage = (): JSX.Element => {
         <Container>
           {applicationRounds.length > 0 ? (
             <>
-              <Select
+              <Select<{ value: number; label: string }>
                 id="applicationRoundSelect"
                 placeholder={t("common:select")}
                 options={applicationRoundOptions}
                 label={t("common:select")}
-                onChange={(selection: OptionType): void => {
-                  setApplicationRound(selection.value as number);
+                onChange={(selection: { value: number; label: string }) => {
+                  setApplicationRound(selection.value);
                 }}
-                value={applicationRoundOptions.find(
-                  (n) => n.value === applicationRound
-                )}
+                value={
+                  applicationRoundOptions.find(
+                    (n) => n.value === applicationRound
+                  ) ?? null
+                }
               />
               <MediumButton
                 id="start-application"
