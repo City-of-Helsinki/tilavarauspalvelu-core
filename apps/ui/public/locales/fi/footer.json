@@ -1,7 +1,7 @@
 {
   "Navigation": {
     "feedbackLabel": "Lähetä palautetta",
-    "bookingTermsLabel": "Palvelun yleiset käyttöehdot"
+    "generalTermsLabel": "Palvelun yleiset käyttöehdot"
   },
   "Base": {
     "Item": {

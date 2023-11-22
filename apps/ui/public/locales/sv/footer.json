@@ -1,7 +1,7 @@
 {
   "Navigation": {
     "feedbackLabel": "Ge respons",
-    "bookingTermsLabel": "Allmänna användarvillkor"
+    "generalTermsLabel": "Allmänna användarvillkor"
   },
   "Base": {
     "Item": {

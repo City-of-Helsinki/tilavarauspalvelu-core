@@ -41,8 +41,8 @@ const Footer = (): JSX.Element => {
         navigationAriaLabel={t("footer:Navigation.navigationAriaLabel")}
       >
         <HDSFooter.Item
-          href={`${locale}/terms/booking`}
-          label={t(`footer:Navigation.bookingTermsLabel`)}
+          href={`${locale}/terms/general`}
+          label={t(`footer:Navigation.generalTermsLabel`)}
           target="_blank"
           icon={<IconLinkExternal size="s" aria-hidden />}
           rel="noopener noreferrer"
