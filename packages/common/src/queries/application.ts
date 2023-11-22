@@ -12,6 +12,7 @@ export const APPLICATION_QUERY = gql`
           status
           applicantType
           workingMemo
+          lastModifiedDate
           applicant {
             name
             email
