@@ -1,20 +1,25 @@
 import datetime
-from unittest import mock
 
 import freezegun
 import pytest
 
 from opening_hours.models import OriginHaukiResource, ReservableTimeSpan
+from opening_hours.utils.hauki_api_client import HaukiAPIClient
 from opening_hours.utils.hauki_resource_hash_updater import HaukiResourceHashUpdater
-from opening_hours.utils.reservable_time_span_client import NEVER_ANY_OPENING_HOURS_HASH
+from opening_hours.utils.reservable_time_span_client import NEVER_ANY_OPENING_HOURS_HASH, ReservableTimeSpanClient
 from tests.factories.opening_hours import OriginHaukiResourceFactory, ReservableTimeSpanFactory
+from tests.helpers import patch_method
+
+# Applied to all tests
+pytestmark = [
+    pytest.mark.django_db,
+]
 
 ############
 # __init__ #
 ############
 
 
-@pytest.mark.django_db()
 def test__HaukiResourceHashUpdater__init__no_params(reservation_unit):
     updater = HaukiResourceHashUpdater()
 
@@ -24,14 +29,12 @@ def test__HaukiResourceHashUpdater__init__no_params(reservation_unit):
     ]
 
 
-@pytest.mark.django_db()
 def test__HaukiResourceHashUpdater__init__pass_resource_ids(reservation_unit):
     updater = HaukiResourceHashUpdater([1, 2, 3])
 
     assert updater.hauki_resource_ids == [1, 2, 3]
 
 
-@pytest.mark.django_db()
 def test__HaukiResourceHashUpdater__init__pass_empty_list(reservation_unit):
     updater = HaukiResourceHashUpdater([])
 
@@ -43,45 +46,33 @@ def test__HaukiResourceHashUpdater__init__pass_empty_list(reservation_unit):
 ##########################
 
 
-@mock.patch("opening_hours.utils.hauki_api_client.HaukiAPIClient.get_resources", return_value={"results": ["foo"]})
-@pytest.mark.django_db()
-def test__HaukiResourceHashUpdater__fetch_hauki_resources__single_page(mocked_get_resources, reservation_unit):
+@patch_method(HaukiAPIClient.get_resources, return_value={"results": ["foo"]})
+def test__HaukiResourceHashUpdater__fetch_hauki_resources__single_page(reservation_unit):
     updater = HaukiResourceHashUpdater()
     updater._fetch_hauki_resources()
 
-    assert mocked_get_resources.call_count == 1
+    assert HaukiAPIClient.get_resources.call_count == 1
     assert updater.fetched_hauki_resources == ["foo"]
 
 
-# First request uses `get_resources`
-@mock.patch(
-    "opening_hours.utils.hauki_api_client.HaukiAPIClient.get_resources",
-    return_value={"results": ["foo"], "next": "page2"},
-)
-# Later requests use `get`
-@mock.patch(
-    "opening_hours.utils.hauki_api_client.HaukiAPIClient.get",
-    return_value={"results": ["bar"], "next": None},
-)
-@pytest.mark.django_db()
-def test__HaukiResourceHashUpdater__fetch_hauki_resources__multiple_pages(
-    mocked_get, mocked_get_resources, reservation_unit
-):
+# First request uses `get_resources`, Later requests use `get`
+@patch_method(HaukiAPIClient.get_resources, return_value={"results": ["foo"], "next": "page2"})
+@patch_method(HaukiAPIClient.get, return_value={"results": ["bar"], "next": None})
+def test__HaukiResourceHashUpdater__fetch_hauki_resources__multiple_pages(reservation_unit):
     updater = HaukiResourceHashUpdater()
     updater._fetch_hauki_resources()
 
-    assert mocked_get_resources.call_count == 1
-    assert mocked_get.call_count == 1
+    assert HaukiAPIClient.get_resources.call_count == 1
+    assert HaukiAPIClient.get.call_count == 1
     assert updater.fetched_hauki_resources == ["foo", "bar"]
 
 
-@mock.patch("opening_hours.utils.hauki_api_client.HaukiAPIClient.get_resources", return_value={"results": []})
-@pytest.mark.django_db()
-def test__HaukiResourceHashUpdater__fetch_hauki_resources__nothing_returned(mocked_get_resources, reservation_unit):
+@patch_method(HaukiAPIClient.get_resources, return_value={"results": []})
+def test__HaukiResourceHashUpdater__fetch_hauki_resources__nothing_returned(reservation_unit):
     updater = HaukiResourceHashUpdater()
     updater._fetch_hauki_resources()
 
-    assert mocked_get_resources.call_count == 1
+    assert HaukiAPIClient.get_resources.call_count == 1
     assert updater.fetched_hauki_resources == []
 
 
@@ -90,7 +81,6 @@ def test__HaukiResourceHashUpdater__fetch_hauki_resources__nothing_returned(mock
 ####################################
 
 
-@pytest.mark.django_db()
 def test__HaukiResourceHashUpdater__update_reservation_units_hashes__no_initial_hash():
     origin_hauki_resource: OriginHaukiResource = OriginHaukiResourceFactory(
         id=999,
@@ -108,7 +98,6 @@ def test__HaukiResourceHashUpdater__update_reservation_units_hashes__no_initial_
 
 
 @freezegun.freeze_time("2020-01-01")
-@pytest.mark.django_db()
 def test__HaukiResourceHashUpdater__update_reservation_units_hashes__hash_updated():
     origin_hauki_resource: OriginHaukiResource = OriginHaukiResourceFactory(
         id=999,
@@ -156,9 +145,8 @@ def test__HaukiResourceHashUpdater__update_reservation_units_hashes__hash_update
 
 
 @freezegun.freeze_time("2020-01-01")
-@pytest.mark.django_db()
-@mock.patch("opening_hours.utils.reservable_time_span_client.ReservableTimeSpanClient.run", return_value=[1, 2, 3])
-def test__HaukiResourceHashUpdater__create_reservable_time_spans_for_reservation_units(mocked_run):
+@patch_method(ReservableTimeSpanClient.run, return_value=[1, 2, 3])
+def test__HaukiResourceHashUpdater__create_reservable_time_spans_for_reservation_units():
     updater = HaukiResourceHashUpdater()
     updater.resources_updated = [
         OriginHaukiResourceFactory(
@@ -194,11 +182,10 @@ def test__HaukiResourceHashUpdater__create_reservable_time_spans_for_reservation
 
 
 @freezegun.freeze_time("2020-01-01")
-@pytest.mark.django_db()
-@mock.patch("opening_hours.utils.hauki_api_client.HaukiAPIClient.get_resources")
-@mock.patch("opening_hours.utils.reservable_time_span_client.ReservableTimeSpanClient.run", return_value=[4, 5, 6])
-def test__HaukiResourceHashUpdater__run(mocked_run, mocked_get_resources, reservation_unit):
-    mocked_get_resources.return_value = {
+@patch_method(HaukiAPIClient.get_resources)
+@patch_method(ReservableTimeSpanClient.run, return_value=[4, 5, 6])
+def test__HaukiResourceHashUpdater__run(reservation_unit):
+    HaukiAPIClient.get_resources.return_value = {
         "results": [
             {"id": reservation_unit.origin_hauki_resource.id, "date_periods_hash": "bar"},
         ]
@@ -211,4 +198,4 @@ def test__HaukiResourceHashUpdater__run(mocked_run, mocked_get_resources, reserv
         {"id": reservation_unit.origin_hauki_resource.id, "date_periods_hash": "bar"},
     ]
     assert updater.resources_updated == [reservation_unit.origin_hauki_resource]
-    assert mocked_run.call_count == 1
+    assert ReservableTimeSpanClient.run.call_count == 1

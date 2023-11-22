@@ -1,3 +1,5 @@
+from unittest import mock
+
 import pytest
 
 from reservation_units.models import ReservationUnit
@@ -13,6 +15,16 @@ def _use_hauki_env_variables(settings):
     settings.HAUKI_SECRET = "super_secret"  # noqa: S105
     settings.HAUKI_ORGANISATION_ID = "parent-organisation"
     settings.HAUKI_ADMIN_UI_URL = "http://test.com/admin"
+
+
+@pytest.fixture(autouse=True)
+def _force_HaukiAPIClient_to_be_mocked():
+    """Force 'HaukiAPIClient.generic' to be mocked in all tests."""
+    with mock.patch(
+        "opening_hours.utils.hauki_api_client.HaukiAPIClient.generic",
+        side_effect=NotImplementedError("'HaukiAPIClient.generic' must be mocked!"),
+    ):
+        yield
 
 
 @pytest.fixture()

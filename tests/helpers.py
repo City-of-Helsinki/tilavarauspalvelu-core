@@ -1,9 +1,11 @@
 import json
-from collections.abc import Generator
+from collections.abc import Callable, Generator
 from contextlib import contextmanager
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Any, NamedTuple, Self, TypedDict, TypeVar
+from functools import wraps
+from typing import Any, NamedTuple, ParamSpec, Self, TypedDict, TypeVar
+from unittest import mock
 
 import pytest
 import sqlparse
@@ -367,3 +369,39 @@ def capture_database_queries() -> Generator[QueryData, None, None]:
             and not query["sql"].startswith("SAVEPOINT")
             and not query["sql"].startswith("RELEASE SAVEPOINT")
         ]
+
+
+T = TypeVar("T")
+P = ParamSpec("P")
+
+
+def patch_method(
+    method: Callable,
+    return_value: Any = None,
+    side_effect: Any = None,
+) -> Callable[[Callable[P, T]], Callable[P, T]]:
+    """
+    Patch a method inside a class.
+
+    Used in place of 'mock.patch' to have the 'method' argument as a function instead of a string.
+    e.g.
+        @patch_method(MyClass.my_method, return_value=...)
+        def test_something(...):
+            ...
+
+    Does not work on functions declared outside of classes.
+    """
+
+    def decorator(func: Callable[P, T]) -> Callable[P, T]:
+        @wraps(func)
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
+            # Get the full path to the method, e.g., 'module.submodule.Class.method'
+            method_path = method.__module__ + "." + method.__qualname__  # type: ignore
+
+            # Run the test with the method patched
+            with mock.patch(method_path, return_value=return_value, side_effect=side_effect):
+                return func(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
