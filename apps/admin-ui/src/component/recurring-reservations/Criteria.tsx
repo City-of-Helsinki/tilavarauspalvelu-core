@@ -7,7 +7,7 @@ import { H1, H2, H3, Strong } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { type Query } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
-import { ContentContainer, IngressContainer } from "@/styles/layout";
+import { Container } from "@/styles/layout";
 import { formatDate } from "@/common/util";
 import { publicUrl } from "@/common/const";
 import { useNotification } from "@/context/NotificationContext";
@@ -60,17 +60,7 @@ const StyledAccordion = styled(Accordion).attrs({
   style: {
     "--header-font-size": "var(--fontsize-heading-m)",
   } as React.CSSProperties,
-})`
-  h2.heading {
-    padding: 0 var(--spacing-m);
-  }
-`;
-
-const AccordionContent = styled.div`
-  @media (min-width: ${breakpoints.m}) {
-    padding-left: var(--spacing-layout-xl);
-  }
-`;
+})``;
 
 const TitleBox = styled.div`
   ${H3} {
@@ -181,21 +171,29 @@ function Criteria({
   }
 
   const title = applicationRound.nameFi ?? "-";
+  const route = [
+    {
+      alias: t("breadcrumb.recurring-reservations"),
+      slug: "",
+    },
+    {
+      alias: t("breadcrumb.application-rounds"),
+      slug: `${publicUrl}/recurring-reservations/application-rounds`,
+    },
+    {
+      alias: title,
+      slug: `${publicUrl}/recurring-reservations/application-rounds/${applicationRound.pk}`,
+    },
+    {
+      alias: t("breadcrumb.criteria"),
+      slug: "",
+    },
+  ];
+
   return (
     <>
-      <BreadcrumbWrapper
-        route={[
-          "recurring-reservations",
-          `${publicUrl}/recurring-reservations/application-rounds`,
-          `${publicUrl}/recurring-reservations/application-rounds/${applicationRound.pk}`,
-          "criteria",
-        ]}
-        aliases={[
-          { slug: "application-round", title },
-          { slug: `${applicationRound.pk}`, title },
-        ]}
-      />
-      <IngressContainer>
+      <BreadcrumbWrapper route={route} />
+      <Container>
         <H1 $legacy>{applicationRound.nameFi}</H1>
         <Details>
           <div>
@@ -211,56 +209,50 @@ function Criteria({
             <div>{t("ApplicationRound.attachedReservationUnits")}</div>
           </div>
         </Details>
-      </IngressContainer>
-      <ContentContainer>
         <StyledAccordion
           heading={t("ApplicationRound.searchAndUsageTimeRanges")}
           defaultOpen
         >
-          <AccordionContent>
-            <TitleBox>
-              <H3>{t("ApplicationRound.applicationPeriodTitle")}</H3>
-              <div>
-                {t("common.begins")}{" "}
-                {formatDate(applicationRound.applicationPeriodBegin)}
-              </div>
-              <div>
-                {t("common.ends")}{" "}
-                {formatDate(applicationRound.applicationPeriodEnd)}
-              </div>
-            </TitleBox>
-            <TitleBox>
-              <H3>{t("ApplicationRound.reservationPeriodTitle")}</H3>
-              <div>
-                {t("common.begins")}{" "}
-                {formatDate(applicationRound.reservationPeriodBegin)}
-              </div>
-              <div>
-                {t("common.ends")}{" "}
-                {formatDate(applicationRound.reservationPeriodEnd)}
-              </div>
-            </TitleBox>
-          </AccordionContent>
+          <TitleBox>
+            <H3>{t("ApplicationRound.applicationPeriodTitle")}</H3>
+            <div>
+              {t("common.begins")}{" "}
+              {formatDate(applicationRound.applicationPeriodBegin)}
+            </div>
+            <div>
+              {t("common.ends")}{" "}
+              {formatDate(applicationRound.applicationPeriodEnd)}
+            </div>
+          </TitleBox>
+          <TitleBox>
+            <H3>{t("ApplicationRound.reservationPeriodTitle")}</H3>
+            <div>
+              {t("common.begins")}{" "}
+              {formatDate(applicationRound.reservationPeriodBegin)}
+            </div>
+            <div>
+              {t("common.ends")}{" "}
+              {formatDate(applicationRound.reservationPeriodEnd)}
+            </div>
+          </TitleBox>
         </StyledAccordion>
         <StyledAccordion
           heading={t("ApplicationRound.usedReservationUnits")}
           defaultOpen
         >
-          <AccordionContent>
-            <ReservationUnits>
-              {/* TODO this should be a reduce where the unique key is the unit pk and under that is all the reservationUnits that belong to it */}
-              {reservationUnits?.map((reservationUnit) => (
-                <ReservationUnit key={reservationUnit.pk}>
-                  <div>
-                    <Strong>{reservationUnit.unit?.nameFi ?? "-"}</Strong>
-                  </div>
-                  <div>{reservationUnit.nameFi}</div>
-                </ReservationUnit>
-              ))}
-            </ReservationUnits>
-          </AccordionContent>
+          <ReservationUnits>
+            {/* TODO this should be a reduce where the unique key is the unit pk and under that is all the reservationUnits that belong to it */}
+            {reservationUnits?.map((reservationUnit) => (
+              <ReservationUnit key={reservationUnit.pk}>
+                <div>
+                  <Strong>{reservationUnit.unit?.nameFi ?? "-"}</Strong>
+                </div>
+                <div>{reservationUnit.nameFi}</div>
+              </ReservationUnit>
+            ))}
+          </ReservationUnits>
         </StyledAccordion>
-      </ContentContainer>
+      </Container>
     </>
   );
 }
