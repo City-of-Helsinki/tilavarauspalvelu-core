@@ -104,16 +104,18 @@ const convertApplicationToForm = (
 const transformApplication = (
   values: ApplicationFormPage3Values
 ): ApplicationUpdateMutationInput => {
+  const shouldSaveBillingAddress =
+    values.applicantType === Applicant_Type.Individual ||
+    values.hasBillingAddress;
   return {
     pk: values.pk,
     applicantType: values.applicantType,
-    ...(values.billingAddress != null && values.hasBillingAddress
+    ...(values.billingAddress != null && shouldSaveBillingAddress
       ? { billingAddress: transformAddress(values.billingAddress) }
       : {}),
     ...(values.contactPerson != null
       ? { contactPerson: transformPerson(values.contactPerson) }
       : {}),
-    // TODO should unregister organisation if applicantType is changed
     ...(values.organisation != null &&
     values.applicantType !== Applicant_Type.Individual
       ? { organisation: transformOrganisation(values.organisation) }
