@@ -1,10 +1,16 @@
-from unittest import mock
-
 import pytest
 
 from opening_hours.errors import HaukiAPIError
+from opening_hours.utils.hauki_api_client import HaukiAPIClient
 from opening_hours.utils.hauki_exporter import ReservationUnitHaukiExporter
 from reservation_units.models import ReservationUnit
+from tests.helpers import patch_method
+
+# Applied to all tests
+pytestmark = [
+    pytest.mark.django_db,
+]
+
 
 ##################
 # _get_parent_id #
@@ -12,7 +18,6 @@ from reservation_units.models import ReservationUnit
 
 
 # Parent ID got from ReservationUnit.unit.origin_hauki_resource
-@pytest.mark.django_db()
 def test__hauki_exporter__get_parent_id__ok__unit_has_origin_hauki_resource(reservation_unit):
     assert reservation_unit.unit.origin_hauki_resource.id == 888
     exporter = ReservationUnitHaukiExporter(reservation_unit)
@@ -21,9 +26,8 @@ def test__hauki_exporter__get_parent_id__ok__unit_has_origin_hauki_resource(rese
     assert parent_id == 888
 
 
-@mock.patch("opening_hours.utils.hauki_api_client.HaukiAPIClient.get_resource", return_value={"id": 1})
-@pytest.mark.django_db()
-def test__hauki_exporter__get_parent_id__ok__fetched_from_hauki_api(mocked_get, reservation_unit):
+@patch_method(HaukiAPIClient.get_resource, return_value={"id": 1})
+def test__hauki_exporter__get_parent_id__ok__fetched_from_hauki_api(reservation_unit):
     reservation_unit.unit.origin_hauki_resource = None
     exporter = ReservationUnitHaukiExporter(reservation_unit)
     parent_id = exporter._get_parent_resource_id()
@@ -31,7 +35,6 @@ def test__hauki_exporter__get_parent_id__ok__fetched_from_hauki_api(mocked_get, 
     assert parent_id == 1
 
 
-@pytest.mark.django_db()
 def test__hauki_exporter__get_parent_id__fail__no_unit(reservation_unit):
     reservation_unit.unit = None
     exporter = ReservationUnitHaukiExporter(reservation_unit)
@@ -40,9 +43,8 @@ def test__hauki_exporter__get_parent_id__fail__no_unit(reservation_unit):
     assert parent_id is None
 
 
-@mock.patch("opening_hours.utils.hauki_api_client.HaukiAPIClient.get_resource", return_value=None)
-@pytest.mark.django_db()
-def test__hauki_exporter__get_parent_id__fail__does_not_exist_in_hauki_api(mocked_get, reservation_unit):
+@patch_method(HaukiAPIClient.get_resource, return_value=None)
+def test__hauki_exporter__get_parent_id__fail__does_not_exist_in_hauki_api(reservation_unit):
     reservation_unit.unit.origin_hauki_resource = None
     exporter = ReservationUnitHaukiExporter(reservation_unit)
     parent_id = exporter._get_parent_resource_id()
@@ -50,9 +52,8 @@ def test__hauki_exporter__get_parent_id__fail__does_not_exist_in_hauki_api(mocke
     assert parent_id is None
 
 
-@mock.patch("opening_hours.utils.hauki_api_client.HaukiAPIClient.get_resource", side_effect=HaukiAPIError())
-@pytest.mark.django_db()
-def test__hauki_exporter__get_parent_id__fail__hauki_api_error(mocked_get, reservation_unit):
+@patch_method(HaukiAPIClient.get_resource, side_effect=HaukiAPIError())
+def test__hauki_exporter__get_parent_id__fail__hauki_api_error(reservation_unit):
     reservation_unit.unit.origin_hauki_resource = None
     exporter = ReservationUnitHaukiExporter(reservation_unit)
     parent_id = exporter._get_parent_resource_id()
@@ -65,9 +66,8 @@ def test__hauki_exporter__get_parent_id__fail__hauki_api_error(mocked_get, reser
 ####################################################
 
 
-@mock.patch("opening_hours.utils.hauki_api_client.HaukiAPIClient.get_resource", return_value={"id": 1})
-@pytest.mark.django_db()
-def test__hauki_exporter__convert_reservation_unit_to_hauki_resource(mocked_get, reservation_unit):
+@patch_method(HaukiAPIClient.get_resource, return_value={"id": 1})
+def test__hauki_exporter__convert_reservation_unit_to_hauki_resource(reservation_unit):
     exporter = ReservationUnitHaukiExporter(reservation_unit)
     res_object = exporter._convert_reservation_unit_to_hauki_resource_data()
 
@@ -99,26 +99,18 @@ _mocked_send_return_value = {
 }
 
 
-@mock.patch(
-    "opening_hours.utils.hauki_api_client.HaukiAPIClient.create_resource",
-    return_value=_mocked_send_return_value,
-)
-@pytest.mark.django_db()
-def test__hauki_exporter__send_reservation_unit_to_hauki__create_new_resource(mocked_create, reservation_unit):
+@patch_method(HaukiAPIClient.create_resource, return_value=_mocked_send_return_value)
+def test__hauki_exporter__send_reservation_unit_to_hauki__create_new_resource(reservation_unit):
     reservation_unit.origin_hauki_resource = None
 
     ReservationUnitHaukiExporter(reservation_unit).send_reservation_unit_to_hauki()
 
-    assert mocked_create.call_count > 0
+    assert HaukiAPIClient.create_resource.call_count > 0
     assert ReservationUnit.objects.first().origin_hauki_resource.id == 222
 
 
-@mock.patch(
-    "opening_hours.utils.hauki_api_client.HaukiAPIClient.update_resource",
-    return_value=_mocked_send_return_value,
-)
-@pytest.mark.django_db()
-def test__hauki_exporter__send_reservation_unit_to_hauki__update_existing_resource(mocked_update, reservation_unit):
+@patch_method(HaukiAPIClient.update_resource, return_value=_mocked_send_return_value)
+def test__hauki_exporter__send_reservation_unit_to_hauki__update_existing_resource(reservation_unit):
     ReservationUnitHaukiExporter(reservation_unit).send_reservation_unit_to_hauki()
 
-    assert mocked_update.call_count > 0
+    assert HaukiAPIClient.update_resource.call_count > 0

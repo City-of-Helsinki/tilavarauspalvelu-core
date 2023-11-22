@@ -1,5 +1,4 @@
 import datetime
-from unittest import mock
 from zoneinfo import ZoneInfo
 
 import pytest
@@ -10,6 +9,7 @@ from freezegun import freeze_time
 from opening_hours.enums import State
 from opening_hours.errors import ReservableTimeSpanClientNothingToDoError
 from opening_hours.models import ReservableTimeSpan
+from opening_hours.utils.hauki_api_client import HaukiAPIClient
 from opening_hours.utils.hauki_api_types import (
     HaukiAPIOpeningHoursResponseDate,
     HaukiAPIOpeningHoursResponseItem,
@@ -18,6 +18,12 @@ from opening_hours.utils.hauki_api_types import (
     HaukiTranslatedField,
 )
 from opening_hours.utils.reservable_time_span_client import ReservableTimeSpanClient, TimeSpanElement
+from tests.helpers import patch_method
+
+# Applied to all tests
+pytestmark = [
+    pytest.mark.django_db,
+]
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
@@ -197,7 +203,6 @@ def _get_normalised_time_spans() -> list[TimeSpanElement]:
 
 
 @freeze_time("2020-01-01")
-@pytest.mark.django_db()
 def test__ReservableTimeSpanClient__init__latest_fetched_date_is_none(reservation_unit):
     reservation_unit.origin_hauki_resource.latest_fetched_date = None
     client = ReservableTimeSpanClient(reservation_unit.origin_hauki_resource)
@@ -210,7 +215,6 @@ def test__ReservableTimeSpanClient__init__latest_fetched_date_is_none(reservatio
 
 
 @freeze_time("2020-01-01")
-@pytest.mark.django_db()
 def test__ReservableTimeSpanClient__init__latest_fetched_date_is_defined(reservation_unit):
     today = datetime.date(2020, 1, 1)
 
@@ -227,7 +231,6 @@ def test__ReservableTimeSpanClient__init__latest_fetched_date_is_defined(reserva
     assert client.end_date == datetime.date(2021, 12, 31)
 
 
-@pytest.mark.django_db()
 def test__ReservableTimeSpanClient__init__latest_fetched_date_is_defined__raise(reservation_unit):
     latest_fetched_date = timezone.now().date() + datetime.timedelta(days=ReservableTimeSpanClient.DAYS_TO_FETCH + 31)
     reservation_unit.origin_hauki_resource.latest_fetched_date = latest_fetched_date
@@ -242,18 +245,10 @@ def test__ReservableTimeSpanClient__init__latest_fetched_date_is_defined__raise(
 ##############################################################
 
 
-@mock.patch("opening_hours.utils.hauki_api_client.HaukiAPIClient.get")
-@pytest.mark.django_db()
-def test__ReservableTimeSpanClient__get_opening_hours_from_hauki_api(
-    mocked_get_resource_opening_hours, reservation_unit
-):
+@patch_method(HaukiAPIClient.get, return_value={"count": 1, "results": [_get_resource_opening_hours()]})
+def test__ReservableTimeSpanClient__get_opening_hours_from_hauki_api(reservation_unit):
     client = ReservableTimeSpanClient(reservation_unit.origin_hauki_resource)
     client._init_date_range()
-
-    mocked_get_resource_opening_hours.return_value = {
-        "count": 1,
-        "results": [_get_resource_opening_hours()],
-    }
 
     opening_hours = client._get_opening_hours_from_hauki_api()
     assert opening_hours == _get_resource_opening_hours()
@@ -264,7 +259,6 @@ def test__ReservableTimeSpanClient__get_opening_hours_from_hauki_api(
 #################################################
 
 
-@pytest.mark.django_db()
 def test__ReservableTimeSpanClient__parse_opening_hours(reservation_unit):
     client = ReservableTimeSpanClient(reservation_unit.origin_hauki_resource)
 
@@ -279,7 +273,6 @@ def test__ReservableTimeSpanClient__parse_opening_hours(reservation_unit):
 #######################################################################
 
 
-@pytest.mark.django_db()
 def test__ReservableTimeSpanClient__split_to_reservable_and_closed_time_spans(reservation_unit):
     client = ReservableTimeSpanClient(reservation_unit.origin_hauki_resource)
 
@@ -290,7 +283,6 @@ def test__ReservableTimeSpanClient__split_to_reservable_and_closed_time_spans(re
     assert closed_time_spans == _get_reservable_and_closed_time_spans()[1]
 
 
-@pytest.mark.django_db()
 def test__ReservableTimeSpanClient__split_to_reservable_and_closed_time_spans__reservable__adjacent_not_overlapping(
     reservation_unit,
 ):
@@ -348,7 +340,6 @@ def test__ReservableTimeSpanClient__split_to_reservable_and_closed_time_spans__r
     assert closed_time_spans == []
 
 
-@pytest.mark.django_db()
 def test__ReservableTimeSpanClient__split_to_reservable_and_closed_time_spans__reservable__overlapping(
     reservation_unit,
 ):
@@ -419,7 +410,6 @@ def test__ReservableTimeSpanClient__split_to_reservable_and_closed_time_spans__r
 ########################################################################
 
 
-@pytest.mark.django_db()
 def test__ReservableTimeSpanClient__override_reservable_with_closed_time_spans(reservation_unit):
     client = ReservableTimeSpanClient(reservation_unit.origin_hauki_resource)
 
@@ -430,7 +420,6 @@ def test__ReservableTimeSpanClient__override_reservable_with_closed_time_spans(r
     assert normalised_time_spans == _get_normalised_time_spans()
 
 
-@pytest.mark.django_db()
 def test__ReservableTimeSpanClient__override_reservable_with_closed_time_spans__not_overlapping(reservation_unit):
     client = ReservableTimeSpanClient(reservation_unit.origin_hauki_resource)
 
@@ -461,7 +450,6 @@ def test__ReservableTimeSpanClient__override_reservable_with_closed_time_spans__
     ]
 
 
-@pytest.mark.django_db()
 def test__ReservableTimeSpanClient__override_reservable_with_closed_time_spans__partial_overlap_same_start_or_end(
     reservation_unit,
 ):
@@ -522,7 +510,6 @@ def test__ReservableTimeSpanClient__override_reservable_with_closed_time_spans__
     ]
 
 
-@pytest.mark.django_db()
 def test__ReservableTimeSpanClient__override_reservable_with_closed_time_spans__full_overlap_same_start_or_end(
     reservation_unit,
 ):
@@ -582,7 +569,6 @@ def test__ReservableTimeSpanClient__override_reservable_with_closed_time_spans__
     assert normalised_time_spans == []
 
 
-@pytest.mark.django_db()
 def test__ReservableTimeSpanClient__override_reservable_with_closed_time_spans__reservable_split_into_many_parts(
     reservation_unit,
 ):
@@ -650,7 +636,6 @@ def test__ReservableTimeSpanClient__override_reservable_with_closed_time_spans__
 ##########################################################
 
 
-@pytest.mark.django_db()
 def test__ReservableTimeSpanClient__create_reservable_time_spans(reservation_unit):
     client = ReservableTimeSpanClient(reservation_unit.origin_hauki_resource)
 
@@ -666,7 +651,6 @@ def test__ReservableTimeSpanClient__create_reservable_time_spans(reservation_uni
     assert created_time_spans[1].end_datetime == _get_date(day=3, hour=6)
 
 
-@pytest.mark.django_db()
 def test__ReservableTimeSpanClient__create_reservable_time_spans__overlapping_with_last_existing(reservation_unit):
     client = ReservableTimeSpanClient(reservation_unit.origin_hauki_resource)
 
@@ -704,16 +688,15 @@ def test__ReservableTimeSpanClient__create_reservable_time_spans__overlapping_wi
     ################################
 
 
-@mock.patch("opening_hours.utils.hauki_api_client.HaukiAPIClient.get_resource_opening_hours")
-@pytest.mark.django_db()
-def test__ReservableTimeSpanClient__run__timezones_are_preserved(mocked_get_resource_opening_hours, reservation_unit):
+@patch_method(HaukiAPIClient.get_resource_opening_hours, return_value={"results": ["foo"]})
+def test__ReservableTimeSpanClient__run__timezones_are_preserved(reservation_unit):
     client = ReservableTimeSpanClient(reservation_unit.origin_hauki_resource)
 
     nytz = ZoneInfo("America/New_York")
 
     return_value = _get_resource_opening_hours()
     return_value["resource"]["timezone"] = str(nytz)
-    mocked_get_resource_opening_hours.return_value = return_value
+    HaukiAPIClient.get_resource_opening_hours.return_value = return_value
 
     created_time_spans = client.run()
 
