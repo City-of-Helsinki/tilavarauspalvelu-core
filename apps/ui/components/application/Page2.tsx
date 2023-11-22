@@ -286,7 +286,7 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
   const resetCells = (index: number) => {
     const updated = [...selectorData];
     updated[index] = selectorData[index].map((n) =>
-      n.map((nn) => ({ ...nn, state: 100 as const }))
+      n.map((nn) => ({ ...nn, state: 100 }))
     );
     setSelectorData(updated);
   };
@@ -318,12 +318,6 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
       .map((aes) =>
         aes
           .filter((ae) => ae.priority === 300 || ae.priority === 200)
-          .map((ae) => {
-            return {
-              ...ae,
-              priority: ae.priority === 300 ? (300 as const) : (200 as const),
-            };
-          })
       )
       .flat();
     if (selectedAppEvents.length === 0) {
