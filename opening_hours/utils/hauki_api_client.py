@@ -1,7 +1,6 @@
 import datetime
 import json
 from typing import TypedDict
-from urllib.parse import urljoin
 
 from django.conf import settings
 from requests import Response, request
@@ -14,6 +13,10 @@ from opening_hours.utils.hauki_api_types import (
     HaukiAPIResourceListResponse,
 )
 from tilavarauspalvelu.utils import logging
+
+__all__ = [
+    "HaukiAPIClient",
+]
 
 REQUESTS_TIMEOUT = 15
 
@@ -47,7 +50,7 @@ class HaukiAPIClient:
         **kwargs: HaukiGetResourcesParams,
     ) -> HaukiAPIResourceListResponse:
         # Prepare the URL
-        url = urljoin(settings.HAUKI_API_URL, "/v1/resource/")
+        url = self._build_url("resource")
         query_params = {
             "resource_ids": ",".join(str(id_) for id_ in hauki_resource_ids),
             **kwargs,
@@ -56,18 +59,18 @@ class HaukiAPIClient:
         return self.get(url=url, params=query_params)
 
     def get_resource(self, *, hauki_resource_id: str) -> HaukiAPIResource:
-        url = urljoin(settings.HAUKI_API_URL, f"/v1/resource/{hauki_resource_id}/")
+        url = self._build_url(f"resource/{hauki_resource_id}")
 
         return self.get(url=url)
 
     def create_resource(self, *, data: dict) -> HaukiAPIResource:
-        url = urljoin(settings.HAUKI_API_URL, "/v1/resource/")
+        url = self._build_url("resource")
 
         return self.post(url=url, data=data)
 
     def update_resource(self, *, data: dict) -> HaukiAPIResource:
         hauki_resource_id = data["id"]
-        url = urljoin(settings.HAUKI_API_URL, f"/v1/resource/{hauki_resource_id}")
+        url = self._build_url(f"resource/{hauki_resource_id}")
 
         return self.put(url=url, data=data)
 
@@ -91,7 +94,7 @@ class HaukiAPIClient:
         endpoint returns both the resource (which includes its timezone) and the resources opening hours.
         """
         # Prepare the URL
-        url = urljoin(settings.HAUKI_API_URL, "/v1/opening_hours/")
+        url = self._build_url("opening_hours")
         query_params = {
             "resource": hauki_resource_id,
             "start_date": start_date.isoformat(),
@@ -110,6 +113,11 @@ class HaukiAPIClient:
     ################
     # Base methods #
     ################
+
+    @staticmethod
+    def _build_url(endpoint: str):
+        hauki_api_url_base = settings.HAUKI_API_URL.removesuffix("/")
+        return f"{hauki_api_url_base}/v1/{endpoint}/"
 
     @staticmethod
     def _hauki_response_json(response: Response):
