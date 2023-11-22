@@ -7,6 +7,7 @@ from graphene_file_upload.scalars import Upload
 from graphql import GraphQLError
 from rest_framework.generics import get_object_or_404
 
+from actions.reservation_unit import ReservationUnitHaukiExporter
 from api.graphql.extensions.legacy_helpers import OldAuthDeleteMutation, OldAuthSerializerMutation
 from api.graphql.types.reservation_units.permissions import (
     EquipmentCategoryPermission,
@@ -35,7 +36,6 @@ from api.graphql.types.reservation_units.types import (
     ReservationUnitType,
 )
 from opening_hours.errors import HaukiAPIError, HaukiRequestError
-from opening_hours.utils.hauki_exporter import ReservationUnitHaukiExporter
 from reservation_units.models import (
     Equipment,
     EquipmentCategory,

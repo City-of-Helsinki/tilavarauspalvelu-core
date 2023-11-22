@@ -1,10 +1,10 @@
 import datetime
 import json
 from decimal import Decimal
-from unittest import mock
 
 from django.test import override_settings
 
+from actions.reservation_unit import ReservationUnitHaukiExporter
 from api.graphql.tests.test_reservation_units.base import (
     ReservationUnitMutationsTestCaseBase,
 )
@@ -25,6 +25,7 @@ from tests.factories import (
     ServiceFactory,
     SpaceFactory,
 )
+from tests.helpers import patch_method
 from utils.decimal_utils import round_decimal
 
 
@@ -152,9 +153,9 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         assert pricing.tax_percentage == tax_percentage
         assert pricing.status == pricing_data["status"]
 
-    @mock.patch("opening_hours.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki")
+    @patch_method(ReservationUnitHaukiExporter.send_reservation_unit_to_hauki)
     @override_settings(HAUKI_EXPORTS_ENABLED=True)
-    def test_send_resource_to_hauki_called(self, send_resource_mock):
+    def test_send_resource_to_hauki_called(self):
         data = self.get_valid_data()
         response = self.query(self.get_create_query(), input_data=data)
 
@@ -163,13 +164,11 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         res_unit_data = content.get("data").get("createReservationUnit")
         assert content.get("errors") is None
         assert res_unit_data.get("errors") is None
-        assert send_resource_mock.call_count == 1
+        assert ReservationUnitHaukiExporter.send_reservation_unit_to_hauki.call_count == 1
 
     @override_settings(HAUKI_EXPORTS_ENABLED=True)
-    @mock.patch("opening_hours.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki")
-    def test_send_resource_to_hauki_errors_returns_error_message(self, send_resource_mock):
-        send_resource_mock.side_effect = HaukiAPIError()
-
+    @patch_method(ReservationUnitHaukiExporter.send_reservation_unit_to_hauki, side_effect=HaukiAPIError())
+    def test_send_resource_to_hauki_errors_returns_error_message(self):
         data = self.get_valid_data()
         response = self.query(self.get_create_query(), input_data=data)
 
@@ -177,7 +176,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         content = json.loads(response.content)
         assert content.get("errors") is not None
         assert "Sending reservation unit as resource to HAUKI failed." in content.get("errors")[0].get("message")
-        assert send_resource_mock.call_count == 1
+        assert ReservationUnitHaukiExporter.send_reservation_unit_to_hauki.call_count == 1
         res_unit = ReservationUnit.objects.first()
         assert res_unit.id is not None
         assert res_unit.name_fi == data["nameFi"]

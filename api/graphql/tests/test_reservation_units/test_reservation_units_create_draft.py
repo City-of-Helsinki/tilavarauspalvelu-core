@@ -1,14 +1,15 @@
 import json
 from typing import Any
-from unittest import mock
 
 from assertpy import assert_that
 from django.test import override_settings
 
+from actions.reservation_unit import ReservationUnitHaukiExporter
 from api.graphql.tests.test_reservation_units.base import (
     ReservationUnitMutationsTestCaseBase,
 )
 from reservation_units.models import PaymentType, ReservationUnit
+from tests.helpers import patch_method
 
 
 class ReservationUnitCreateAsDraftTestCase(ReservationUnitMutationsTestCaseBase):
@@ -45,16 +46,16 @@ class ReservationUnitCreateAsDraftTestCase(ReservationUnitMutationsTestCaseBase)
         assert res_unit is not None
         assert res_unit.id == res_unit_data.get("pk")
 
-    @mock.patch("opening_hours.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki")
+    @patch_method(ReservationUnitHaukiExporter.send_reservation_unit_to_hauki)
     @override_settings(HAUKI_EXPORT_ENABLED=True)
-    def test_send_resource_to_hauki_is_not_called(self, send_resource_mock):
+    def test_send_resource_to_hauki_is_not_called(self):
         response = self.query(self.get_create_query(), input_data=self.get_valid_data())
         assert response.status_code == 200
         content = json.loads(response.content)
         res_unit_data = content.get("data").get("createReservationUnit")
         assert content.get("errors") is None
         assert res_unit_data.get("errors") is None
-        assert send_resource_mock.call_count == 0
+        assert ReservationUnitHaukiExporter.send_reservation_unit_to_hauki.call_count == 0
 
     def test_create_errors_on_empty_name(self):
         data = self.get_valid_data()

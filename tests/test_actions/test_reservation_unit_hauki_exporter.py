@@ -1,15 +1,27 @@
 import pytest
 
+from actions.reservation_unit import ReservationUnitHaukiExporter
 from opening_hours.errors import HaukiAPIError
 from opening_hours.utils.hauki_api_client import HaukiAPIClient
-from opening_hours.utils.hauki_exporter import ReservationUnitHaukiExporter
 from reservation_units.models import ReservationUnit
+from tests.factories import OriginHaukiResourceFactory, ReservationUnitFactory
 from tests.helpers import patch_method
 
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
+
+
+# TODO: Remove the need to have this fixture in this file
+@pytest.fixture()
+def reservation_unit() -> ReservationUnit:
+    return ReservationUnitFactory(
+        origin_hauki_resource=OriginHaukiResourceFactory(id=999, opening_hours_hash="abc123"),
+        unit__tprek_id=1234,
+        unit__tprek_department_id=4321,
+        unit__origin_hauki_resource=OriginHaukiResourceFactory(id=888),
+    )
 
 
 ##################
