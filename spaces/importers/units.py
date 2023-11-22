@@ -150,9 +150,14 @@ class UnitImporter:
 
 
 class UnitHaukiResourceIdImporter:
+    resource_id_map: dict[str, str]
+    response_page_counter: int
+    hauki_api_client: HaukiAPIClient
+
     def __init__(self):
         self.resource_id_map = {}
         self.response_page_counter = 0
+        self.hauki_api_client = HaukiAPIClient()
 
     def read_response(self, data):
         self.response_page_counter += 1
@@ -174,21 +179,22 @@ class UnitHaukiResourceIdImporter:
         # Use `unit_ids` if given, otherwise use `tprek_ids`.
         units = Unit.objects.filter(id__in=unit_ids) if unit_ids else Unit.objects.filter(tprek_id__in=tprek_ids)
 
-        url = HaukiAPIClient.build_url(endpoint="resource")
+        logger.info(f"Importing units {units} resource ids from Hauki...")
 
-        logger.info(f"Importing units {units} resource ids from url {url}")
-
-        params = {
-            "data_source": "tprek",
-            "origin_id_exists": True,
-            "page_size": 50000,
-        }
+        response = HaukiAPIClient().get_resources(
+            hauki_resource_ids=[],
+            data_source="tprek",
+            origin_id_exists=True,
+            page_size=50000,
+        )
+        self.read_response(response)
 
         # Keep fetching results until there are no more pages.
-        while url:
-            data: HaukiAPIResourceListResponse = HaukiAPIClient.get(url=url, params=params)
-            self.read_response(data)
-            url = data.get("next", None)
+        next_url = response.get("next", None)
+        while next_url:
+            response: HaukiAPIResourceListResponse = HaukiAPIClient.get(url=next_url)
+            self.read_response(response)
+            next_url = response.get("next", None)
 
         resource_ids_updated = []
         for unit in units:

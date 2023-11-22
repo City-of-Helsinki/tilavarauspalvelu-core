@@ -1,6 +1,6 @@
 import datetime
 import json
-from typing import Literal, TypedDict
+from typing import TypedDict
 from urllib.parse import urljoin
 
 from django.conf import settings
@@ -110,17 +110,6 @@ class HaukiAPIClient:
     ################
     # Base methods #
     ################
-
-    @staticmethod
-    def build_url(endpoint: Literal["resource", "opening_hours", "date_period"], resource_id: str | None = None) -> str:
-        if not settings.HAUKI_API_URL:
-            raise HaukiConfigurationError("HAUKI_API_URL environment variable must to be configured.")
-
-        url = urljoin(settings.HAUKI_API_URL, f"/v1/{endpoint}/")
-        if resource_id:
-            url += f"{resource_id}/"
-
-        return url
 
     @staticmethod
     def _hauki_response_json(response: Response):
