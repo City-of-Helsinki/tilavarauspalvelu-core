@@ -748,6 +748,7 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
               <SelectButton
                 onClick={() => setAreControlsVisible(false)}
                 disabled={!startTime}
+                data-testid="reservation__button--select-time"
               >
                 {t("reservationCalendar:selectTime")}
               </SelectButton>
