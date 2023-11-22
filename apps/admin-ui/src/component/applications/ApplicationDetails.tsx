@@ -15,6 +15,7 @@ import {
   type ApplicationEventScheduleNode,
   type ApplicationEventNode,
   type ApplicationNode,
+  ApplicationsApplicationApplicantTypeChoices,
 } from "common/types/gql-types";
 import {
   formatNumber,
@@ -413,6 +414,7 @@ function ApplicationDetails({
     !isEqual(application?.billingAddress, application?.organisation?.address);
 
   const customerName = application != null ? getApplicantName(application) : "";
+  // TODO where is this defined in the application form?
   const homeCity = application?.homeCity?.nameFi ?? "-";
   const applicationEvents = filterNonNullable(
     application?.applicationEvents
@@ -484,22 +486,16 @@ function ApplicationDetails({
                 dataId="application-details__data--applicant-type"
               />
               <KV k={t("common.homeCity")} v={homeCity} />
-              <KV
-                k={t("Application.coreActivity")}
-                v={application.organisation?.coreBusiness || "-"}
-              />
+              {isOrganisation && (
+                <KV
+                  k={t("Application.coreActivity")}
+                  v={application.organisation?.coreBusiness || "-"}
+                />
+              )}
             </DefinitionList>
             <DefinitionList>
-              <KV
-                k={t("Application.numHours")}
-                v={`${t("common.hoursUnitLong", {
-                  count: 0,
-                })}`}
-              />
-              <KV
-                k={t("Application.numTurns")}
-                v={`0 ${t("common.volumeUnit")}`}
-              />
+              <KV k={t("Application.numHours")} v="-" />
+              <KV k={t("Application.numTurns")} v="-" />
             </DefinitionList>
           </CardContentContainer>
         </Card>
@@ -531,19 +527,23 @@ function ApplicationDetails({
               `Application.applicantTypes.${application?.applicantType}`
             )}
           />
-          <ValueBox
-            label={t("Application.organisationName")}
-            value={application.organisation?.name}
-          />
-          <ValueBox
-            label={t("Application.coreActivity")}
-            value={application.organisation?.coreBusiness}
-          />
-          <ValueBox label={t("common.homeCity")} value={homeCity} />
-          <ValueBox
-            label={t("Application.identificationNumber")}
-            value={application.organisation?.identifier}
-          />
+          {isOrganisation && (
+            <>
+              <ValueBox
+                label={t("Application.organisationName")}
+                value={application.organisation?.name}
+              />
+              <ValueBox
+                label={t("Application.coreActivity")}
+                value={application.organisation?.coreBusiness}
+              />
+              <ValueBox label={t("common.homeCity")} value={homeCity} />
+              <ValueBox
+                label={t("Application.identificationNumber")}
+                value={application.organisation?.identifier}
+              />
+            </>
+          )}
           <ValueBox
             label={t("Application.headings.additionalInformation")}
             value={application.additionalInformation}
@@ -599,7 +599,12 @@ function ApplicationDetails({
         ) : null}
         {hasBillingAddress ? (
           <>
-            <H4>{t("common.billingAddress")}</H4>
+            <H4>
+              {application.applicantType ===
+              ApplicationsApplicationApplicantTypeChoices.Individual
+                ? t("Application.contactInformation")
+                : t("common.billingAddress")}
+            </H4>
             <EventProps>
               <ValueBox
                 label={t("common.streetAddress")}
