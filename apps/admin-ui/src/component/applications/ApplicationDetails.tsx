@@ -37,9 +37,9 @@ import ValueBox from "./ValueBox";
 import { getApplicantName, getApplicationStatusColor } from "./util";
 import { TimeSelector } from "./time-selector/TimeSelector";
 import StickyHeader from "../StickyHeader";
-import { ApplicationUserBirthDate } from "./ApplicationUserBirthDate";
 import StatusBlock from "../StatusBlock";
 import { APPLICATION_QUERY } from "./queries";
+import { BirthDate } from "../BirthDate";
 
 const parseApplicationEventSchedules = (
   applicationEventSchedules: ApplicationEventScheduleNode[],
@@ -551,8 +551,8 @@ function ApplicationDetails({
           <ValueBox
             label={t("Application.headings.userBirthDate")}
             value={
-              <ApplicationUserBirthDate
-                applicationPk={application.pk ?? 0}
+              <BirthDate
+                dateOfBirth={application.applicant?.dateOfBirth ?? ""}
                 showLabel={t("RequestedReservation.showBirthDate")}
                 hideLabel={t("RequestedReservation.hideBirthDate")}
               />
