@@ -13,6 +13,7 @@ from reservation_units.models import PriceUnit, PricingType, ReservationUnit
 from reservation_units.utils.reservation_unit_pricing_helper import (
     ReservationUnitPricingHelper,
 )
+from reservation_units.utils.reservation_unit_reservation_scheduler import ReservationUnitReservationScheduler
 from reservations.choices import ReservationTypeChoice
 
 
@@ -371,7 +372,7 @@ class ReservationSchedulingMixin:
             )
 
     @staticmethod
-    def check_open_application_round(scheduler, begin, end):
+    def check_open_application_round(scheduler: ReservationUnitReservationScheduler, begin, end):
         open_app_round = scheduler.get_conflicting_open_application_round(begin.date(), end.date())
 
         if open_app_round:
