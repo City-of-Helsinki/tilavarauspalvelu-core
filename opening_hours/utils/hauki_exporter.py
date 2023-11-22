@@ -1,6 +1,5 @@
 from typing import Any
 
-from opening_hours.enums import ResourceType
 from opening_hours.errors import HaukiAPIError, HaukiRequestError, HaukiValueError
 from opening_hours.models import OriginHaukiResource
 from opening_hours.utils.hauki_api_client import HaukiAPIClient
@@ -42,7 +41,7 @@ class ReservationUnitHaukiExporter:
                 sv=self.reservation_unit.description,
                 en=self.reservation_unit.description,
             ),
-            "resource_type": ResourceType.RESERVABLE.value,
+            "resource_type": "reservable",
             "origins": [
                 {
                     "data_source": {

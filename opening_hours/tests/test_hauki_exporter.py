@@ -2,7 +2,6 @@ from unittest import mock
 
 import pytest
 
-from opening_hours.enums import ResourceType
 from opening_hours.errors import HaukiAPIError
 from opening_hours.utils.hauki_exporter import ReservationUnitHaukiExporter
 from reservation_units.models import ReservationUnit
@@ -84,7 +83,7 @@ _mocked_send_return_value = {
     "name": "",
     "description": "",
     "address": "",
-    "resource_type": ResourceType.RESERVABLE.value,
+    "resource_type": "reservable",
     "children": [],
     "parents": [],
     "organization": "",

@@ -1,13 +1,10 @@
 import datetime
 
 import snapshottest
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.base import GrapheneTestCaseBase
-from opening_hours.enums import State
-from opening_hours.hours import TimeElement
 from permissions.models import UnitRole, UnitRoleChoice, UnitRolePermission
 from reservation_units.models import PaymentType, ReservationUnit
 from reservations.models import ReservationMetadataField, ReservationMetadataSet
@@ -94,40 +91,6 @@ class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
         cls.unit_group_role.unit_group.add(cls.unit_group)
 
         UnitRolePermission.objects.create(role=unit_group_viewer_role_choice, permission="can_view_reservations")
-
-    def get_mocked_opening_hours(
-        self,
-        reservation_unit: ReservationUnit | None = None,
-        date: datetime.date | None = None,
-        start_hour: int = 6,
-        end_hour: int = 22,
-    ) -> list[dict]:
-        if not reservation_unit:
-            reservation_unit = self.reservation_unit
-        if not date:
-            date = datetime.date.today()
-
-        resource_id = f"{settings.HAUKI_ORIGIN_ID}:{reservation_unit.uuid}"
-        origin_id = str(reservation_unit.uuid)
-
-        return [self._get_single_opening_hour_block(resource_id, origin_id, date, start_hour, end_hour)]
-
-    def _get_single_opening_hour_block(self, resource_id, origin_id, date, start_hour, end_hour):
-        return {
-            "timezone": DEFAULT_TIMEZONE,
-            "resource_id": resource_id,
-            "origin_id": origin_id,
-            "date": date,
-            "times": [
-                TimeElement(
-                    start_time=datetime.time(hour=start_hour),
-                    end_time=datetime.time(hour=end_hour),
-                    end_time_on_next_day=False,
-                    resource_state=State.WITH_RESERVATION,
-                    periods=[],
-                ),
-            ],
-        }
 
     def _create_metadata_set(self):
         supported_fields = ReservationMetadataField.objects.filter(
