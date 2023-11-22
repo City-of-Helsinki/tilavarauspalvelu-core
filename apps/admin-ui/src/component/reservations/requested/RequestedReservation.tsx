@@ -1,6 +1,5 @@
-import { useMutation, useQuery } from "@apollo/client";
-import { get, trim } from "lodash";
-import { Button, TextArea } from "hds-react";
+import { useQuery } from "@apollo/client";
+import { trim } from "lodash";
 import React, { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
@@ -10,19 +9,24 @@ import { add, startOfISOWeek } from "date-fns";
 import { breakpoints } from "common/src/common/style";
 import {
   Maybe,
-  Mutation,
   Query,
   QueryReservationByPkArgs,
   ReservationType,
-  ReservationWorkingMemoMutationInput,
   ReservationsReservationReserveeTypeChoices,
   ReservationUnitsReservationUnitPricingPricingTypeChoices,
   ReservationsReservationStateChoices,
 } from "common/types/gql-types";
-import { Permission } from "app/modules/permissionHelper";
-import { publicUrl } from "app/common/const";
-import { useNotification } from "../../../context/NotificationContext";
-import Loader from "../../Loader";
+import { Permission } from "@/modules/permissionHelper";
+import { publicUrl } from "@/common/const";
+import { useNotification } from "@/context/NotificationContext";
+import Loader from "@/component/Loader";
+import { useModal } from "@/context/ModalContext";
+import { ButtonContainer, Container } from "@/styles/layout";
+import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
+import ShowWhenTargetInvisible from "@/component/ShowWhenTargetInvisible";
+import StickyHeader from "@/component/StickyHeader";
+import { ReservationWorkingMemo } from "@/component/WorkingMemo";
+import { Accordion } from "@/common/hds-fork/Accordion";
 import {
   ageGroup,
   createTagString,
@@ -31,20 +35,9 @@ import {
   getTranslationKeyForReserveeType,
   reservationPrice,
 } from "./util";
-import { useModal } from "../../../context/ModalContext";
-import { UPDATE_WORKING_MEMO } from "./queries";
-import BreadcrumbWrapper from "../../BreadcrumbWrapper";
-import {
-  ButtonContainer,
-  Container,
-  HorisontalFlex,
-} from "../../../styles/layout";
-import ShowWhenTargetInvisible from "../../ShowWhenTargetInvisible";
-import StickyHeader from "../../StickyHeader";
 import Calendar from "./Calendar";
 import ReservationUserBirthDate from "./ReservationUserBirthDate";
 import VisibleIfPermission from "./VisibleIfPermission";
-import { Accordion } from "../../../common/hds-fork/Accordion";
 import ApprovalButtons from "./ApprovalButtons";
 import RecurringReservationsView from "./RecurringReservationsView";
 import { useRecurringReservations, useReservationData } from "./hooks";
@@ -363,70 +356,6 @@ const TimeBlock = ({
   );
 };
 
-const WorkingMemo = ({
-  initialValue,
-  reservationPk,
-  refetch,
-}: {
-  initialValue: string;
-  reservationPk: number;
-  refetch: () => void;
-}) => {
-  const [workingMemo, setWorkingMemo] = useState<string>(initialValue);
-  const { notifyError, notifySuccess } = useNotification();
-  const { t } = useTranslation();
-
-  const [updateWorkingMemo] = useMutation<
-    Mutation,
-    ReservationWorkingMemoMutationInput
-  >(UPDATE_WORKING_MEMO, {
-    onCompleted: () => {
-      refetch();
-      notifySuccess(t("RequestedReservation.savedWorkingMemo"));
-    },
-    onError: () => {
-      notifyError(t("RequestedReservation.errorSavingWorkingMemo"));
-    },
-  });
-
-  const updateMemo = (memo: string) =>
-    updateWorkingMemo({
-      variables: { pk: reservationPk, workingMemo: memo },
-    });
-
-  const handleSave = async () => {
-    try {
-      await updateMemo(workingMemo);
-    } catch (ex) {
-      notifyError(t("RequestedReservation.errorSavingWorkingMemo"));
-    }
-  };
-
-  return (
-    <>
-      <TextArea
-        label={t("RequestedReservation.workingMemoLabel")}
-        id="workingMemo"
-        helperText={t("RequestedReservation.workingMemoHelperText")}
-        value={workingMemo}
-        onChange={(e) => setWorkingMemo(e.target.value)}
-      />
-      <HorisontalFlex style={{ justifyContent: "flex-end" }}>
-        <Button
-          size="small"
-          variant="secondary"
-          onClick={() => setWorkingMemo(initialValue || "")}
-        >
-          {t("common.cancel")}
-        </Button>
-        <Button size="small" onClick={handleSave}>
-          {t("RequestedReservation.save")}
-        </Button>
-      </HorisontalFlex>
-    </>
-  );
-};
-
 const RequestedReservation = ({
   reservation,
   refetch,
@@ -503,12 +432,15 @@ const RequestedReservation = ({
           >
             <Accordion
               heading={t("RequestedReservation.workingMemo")}
-              initiallyOpen={get(reservation, "workingMemo.length", 0) > 0}
+              initiallyOpen={
+                reservation.workingMemo?.length != null &&
+                reservation.workingMemo?.length > 0
+              }
             >
-              <WorkingMemo
-                initialValue={reservation.workingMemo ?? ""}
+              <ReservationWorkingMemo
                 reservationPk={reservation.pk ?? 0}
                 refetch={refetch}
+                initialValue={reservation.workingMemo ?? ""}
               />
             </Accordion>
           </VisibleIfPermission>

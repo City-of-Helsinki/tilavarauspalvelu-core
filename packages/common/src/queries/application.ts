@@ -11,6 +11,7 @@ export const APPLICATION_QUERY = gql`
           pk
           status
           applicantType
+          workingMemo
           applicant {
             name
             email

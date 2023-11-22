@@ -28,12 +28,14 @@ import { useNotification } from "@/context/NotificationContext";
 import ScrollIntoView from "@/common/ScrollIntoView";
 import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import Accordion from "@/component/Accordion";
+import { Accordion as HDSAccordion } from "@/common/hds-fork/Accordion";
 import Loader from "@/component/Loader";
+import { ApplicationWorkingMemo } from "@/component/WorkingMemo";
+import ShowWhenTargetInvisible from "@/component/ShowWhenTargetInvisible";
 import { Container } from "@/styles/layout";
 import ValueBox from "./ValueBox";
 import { getApplicantName, getApplicationStatusColor } from "./util";
 import { TimeSelector } from "./time-selector/TimeSelector";
-import ShowWhenTargetInvisible from "../ShowWhenTargetInvisible";
 import StickyHeader from "../StickyHeader";
 import { ApplicationUserBirthDate } from "./ApplicationUserBirthDate";
 import StatusBlock from "../StatusBlock";
@@ -385,7 +387,11 @@ function ApplicationDetails({
   const { t } = useTranslation();
   const { notifyError } = useNotification();
 
-  const { data, loading: isLoading } = useQuery<Query>(APPLICATION_QUERY, {
+  const {
+    data,
+    loading: isLoading,
+    refetch,
+  } = useQuery<Query>(APPLICATION_QUERY, {
     skip: applicationPk === 0,
     variables: { pk: [applicationPk] },
     onError: () => {
@@ -497,6 +503,16 @@ function ApplicationDetails({
             </DefinitionList>
           </CardContentContainer>
         </Card>
+        <HDSAccordion
+          heading={t("RequestedReservation.workingMemo")}
+          initiallyOpen={application.workingMemo.length > 0}
+        >
+          <ApplicationWorkingMemo
+            applicationPk={applicationPk}
+            refetch={refetch}
+            initialValue={application.workingMemo}
+          />
+        </HDSAccordion>
         {applicationEvents.map((applicationEvent) => (
           <ApplicationEventDetails
             applicationEvent={applicationEvent}

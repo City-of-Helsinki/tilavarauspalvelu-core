@@ -1,19 +1,5 @@
 import { gql } from "@apollo/client";
 
-export const UPDATE_WORKING_MEMO = gql`
-  mutation updateWorkingMemo($pk: Int!, $workingMemo: String!) {
-    updateReservationWorkingMemo(
-      input: { pk: $pk, workingMemo: $workingMemo }
-    ) {
-      workingMemo
-      errors {
-        field
-        messages
-      }
-    }
-  }
-`;
-
 export const GET_BIRTHDATE_BY_RESERVATION_PK = gql`
   query reservationUserBirthDate($pk: Int) {
     reservationByPk(pk: $pk) {
