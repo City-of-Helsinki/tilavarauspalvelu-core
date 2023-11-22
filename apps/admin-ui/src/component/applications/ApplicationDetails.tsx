@@ -8,12 +8,12 @@ import { useQuery } from "@apollo/client";
 import { TFunction } from "i18next";
 import { H2, H4, H5, Strong } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
+import { filterNonNullable } from "common/src/helpers";
 import {
   type Query,
   ApplicationStatusChoice,
   type ApplicationEventScheduleNode,
 } from "common/types/gql-types";
-import { IngressContainer } from "@/styles/layout";
 import {
   formatNumber,
   formatDate,
@@ -27,6 +27,7 @@ import ScrollIntoView from "@/common/ScrollIntoView";
 import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import Accordion from "@/component/Accordion";
 import Loader from "@/component/Loader";
+import { Container } from "@/styles/layout";
 import ValueBox from "./ValueBox";
 import { getApplicantName, getApplicationStatusColor } from "./util";
 import { TimeSelector } from "./time-selector/TimeSelector";
@@ -81,21 +82,17 @@ function ApplicationStatusBlock({
   }
 
   return (
-    <StyledStatusBlock
-      statusStr={t(`Application.statuses.${status}`)}
-      color={getApplicationStatusColor(status, "l")}
-      icon={icon}
-      className={className}
-      style={style}
-    />
+    <div>
+      <StyledStatusBlock
+        statusStr={t(`Application.statuses.${status}`)}
+        color={getApplicationStatusColor(status, "l")}
+        icon={icon}
+        className={className}
+        style={style}
+      />
+    </div>
   );
 }
-
-const Wrapper = styled.div`
-  margin: 0 0 var(--spacing-layout-m) 0;
-  width: 100%;
-  padding-bottom: var(--spacing-5-xl);
-`;
 
 const CardContentContainer = styled.div`
   display: grid;
@@ -262,65 +259,60 @@ function ApplicationDetails({
 
   // TODO replace this with an explicit check and warn on undefined fields
   const hasBillingAddress =
-    application?.billingAddress &&
+    application?.billingAddress != null &&
     !isEqual(application?.billingAddress, application?.organisation?.address);
 
   const customerName = application != null ? getApplicantName(application) : "";
   const homeCity = application?.homeCity?.nameFi ?? "-";
-  const applicationEvents =
+  const applicationEvents = filterNonNullable(
     application?.applicationEvents
-      ?.filter((ae): ae is NonNullable<typeof ae> => ae != null)
-      .map((ae) => ({
-        ...ae,
-        eventReservationUnits: orderBy(
-          ae.eventReservationUnits,
-          "priority",
-          "asc"
-        ),
-        applicationEventSchedules: orderBy(
-          ae.applicationEventSchedules,
-          "begin",
-          "asc"
-        ),
-      })) ?? [];
+  ).map((ae) => ({
+    ...ae,
+    eventReservationUnits: orderBy(ae.eventReservationUnits, "priority", "asc"),
+    applicationEventSchedules: orderBy(
+      ae.applicationEventSchedules,
+      "begin",
+      "asc"
+    ),
+  }));
 
   if (application == null || applicationRound == null) {
     return null;
   }
 
+  const route = [
+    {
+      slug: "",
+      alias: t("breadcrumb.recurring-reservations"),
+    },
+    {
+      slug: `${publicUrl}/recurring-reservations/application-rounds`,
+      alias: t("breadcrumb.application-rounds"),
+    },
+    {
+      slug: `${publicUrl}/recurring-reservations/application-rounds/${applicationRound.pk}`,
+      alias: applicationRound.nameFi ?? "-",
+    },
+    {
+      slug: `application`,
+      alias: customerName,
+    },
+  ];
+
   return (
-    <Wrapper>
-      <BreadcrumbWrapper
-        route={[
-          "recurring-reservations",
-          `${publicUrl}/recurring-reservations/application-rounds`,
-          `${publicUrl}/recurring-reservations/application-rounds/${applicationRound.pk}`,
-          `application`,
-        ]}
-        aliases={[
-          { slug: "application-round", title: applicationRound.nameFi ?? "-" },
-          {
-            slug: `${applicationRound.pk}`,
-            title: applicationRound.nameFi ?? "-",
-          },
-          { slug: "application", title: customerName },
-        ]}
-      />
+    <>
+      <BreadcrumbWrapper route={route} />
       <ShowWhenTargetInvisible target={ref}>
         <StickyHeader
           name={customerName}
           tagline={`${t("Application.id")}: ${application.pk}`}
         />
       </ShowWhenTargetInvisible>
-      <IngressContainer>
+      <Container style={{ marginBottom: "6rem" }}>
         {application.status != null && (
           <ApplicationStatusBlock status={application.status} />
         )}
-        <H2
-          ref={ref}
-          style={{ margin: "1rem 0" }}
-          data-testid="application-details__heading--main"
-        >
+        <H2 ref={ref} data-testid="application-details__heading--main">
           {customerName}
         </H2>
         <PreCard>
@@ -361,8 +353,6 @@ function ApplicationDetails({
             </DefinitionList>
           </CardContentContainer>
         </Card>
-      </IngressContainer>
-      <IngressContainer>
         {applicationEvents.map((applicationEvent) => {
           const duration = appEventDuration(
             applicationEvent?.minDuration ?? undefined,
@@ -595,8 +585,8 @@ function ApplicationDetails({
             </EventProps>
           </>
         ) : null}
-      </IngressContainer>
-    </Wrapper>
+      </Container>
+    </>
   );
 }
 
