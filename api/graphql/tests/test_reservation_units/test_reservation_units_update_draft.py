@@ -1,11 +1,11 @@
 import json
-from unittest import mock
 
 from assertpy import assert_that
 from auditlog.models import LogEntry
 from django.contrib.contenttypes.models import ContentType
 from django.test import override_settings
 
+from actions.reservation_unit import ReservationUnitHaukiExporter
 from api.graphql.tests.test_reservation_units.base import (
     ReservationUnitMutationsTestCaseBase,
 )
@@ -17,6 +17,7 @@ from tests.factories import (
     ReservationUnitFactory,
     TermsOfUseFactory,
 )
+from tests.helpers import patch_method
 from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 
 
@@ -151,9 +152,9 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         self.res_unit.refresh_from_db()
         assert_that(self.res_unit.name).is_equal_to("Resunit name")
 
-    @mock.patch("opening_hours.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki")
+    @patch_method(ReservationUnitHaukiExporter.send_reservation_unit_to_hauki)
     @override_settings(HAUKI_EXPORTS_ENABLED=True)
-    def test_send_resource_to_hauki_called_when_resource_id_exists(self, send_resource_mock):
+    def test_send_resource_to_hauki_called_when_resource_id_exists(self):
         self.res_unit.origin_hauki_resource = OriginHaukiResourceFactory(id=1)
         self.res_unit.save()
 
@@ -163,18 +164,18 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         assert response.status_code == 200
         content = json.loads(response.content)
         assert content.get("errors") is None
-        assert_that(send_resource_mock.call_count).is_equal_to(1)
+        assert ReservationUnitHaukiExporter.send_reservation_unit_to_hauki.call_count == 1
 
-    @mock.patch("opening_hours.utils.hauki_exporter.ReservationUnitHaukiExporter.send_reservation_unit_to_hauki")
+    @patch_method(ReservationUnitHaukiExporter.send_reservation_unit_to_hauki)
     @override_settings(HAUKI_EXPORTS_ENABLED=False)
-    def test_send_resource_to_hauki_not_called_when_exports_disabled(self, send_resource_mock):
+    def test_send_resource_to_hauki_not_called_when_exports_disabled(self):
         data = self.get_valid_update_data()
         response = self.query(self.get_update_query(), input_data=data)
 
         assert response.status_code == 200
         content = json.loads(response.content)
         assert content.get("errors") is None
-        assert send_resource_mock.call_count == 0
+        assert ReservationUnitHaukiExporter.send_reservation_unit_to_hauki.call_count == 0
 
     def test_contact_information_removal_on_archive(self):
         data = self.get_valid_update_data()
