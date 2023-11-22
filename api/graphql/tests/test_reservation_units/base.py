@@ -2,15 +2,12 @@ import datetime
 from uuid import UUID
 
 import snapshottest
-from django.conf import settings
 from django.test import override_settings
 from django.utils.timezone import get_default_timezone
 from rest_framework.test import APIClient
 
 from api.graphql.tests.base import GrapheneTestCaseBase
 from merchants.verkkokauppa.product.types import Product
-from opening_hours.enums import State
-from opening_hours.hours import TimeElement
 from reservation_units.models import PaymentType, ReservationUnit, TaxPercentage
 from terms_of_use.models import TermsOfUse
 from tests.factories import (
@@ -133,41 +130,3 @@ def mock_create_product():
         namespace_entity_id="foo",
         merchant_id="bar",
     )
-
-
-def get_mocked_opening_hours(uuid, state: State = State.WITH_RESERVATION):
-    resource_id = f"{settings.HAUKI_ORIGIN_ID}:{uuid}"
-    return [
-        {
-            "timezone": TIMEZONE,
-            "resource_id": resource_id,
-            "origin_id": str(uuid),
-            "date": datetime.date(2020, 1, 1),
-            "times": [
-                TimeElement(
-                    start_time=datetime.time(hour=10),
-                    end_time=datetime.time(hour=22),
-                    end_time_on_next_day=False,
-                    resource_state=state,
-                    periods=[1, 2, 3, 4],
-                ),
-            ],
-        },
-        {
-            "timezone": TIMEZONE,
-            "resource_id": resource_id,
-            "origin_id": str(uuid),
-            "date": datetime.date(2020, 1, 2),
-            "times": [
-                TimeElement(
-                    start_time=datetime.time(hour=10),
-                    end_time=datetime.time(hour=22),
-                    end_time_on_next_day=False,
-                    resource_state=state,
-                    periods=[
-                        1,
-                    ],
-                ),
-            ],
-        },
-    ]
