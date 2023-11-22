@@ -1,6 +1,5 @@
 import { getSignOutUrl , getSignInUrl } from "~/modules/const";
 import { useCurrentUser } from "../user";
-import { authEnabled } from "@/modules/const";
 
   // Redirect the user to the sign in dialog and return to the current url after sign in
 export function signIn() {
@@ -16,6 +15,6 @@ export function signOut() {
 
 export function useSession() {
   const { currentUser, loading, error } = useCurrentUser()
-  const isAuthenticated = !authEnabled || currentUser != null
+  const isAuthenticated = currentUser != null
   return { isAuthenticated, user: currentUser, loading, error };
 }

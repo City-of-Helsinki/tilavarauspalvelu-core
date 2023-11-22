@@ -33,11 +33,6 @@ jest.mock("next-i18next", () => ({
   },
 }));
 
-jest.mock("next/config", () => () => ({
-  serverRuntimeConfig: {},
-  publicRuntimeConfig: {},
-}));
-
 describe("getDurationOptions", () => {
   test("empty inputs", () => {
     expect(

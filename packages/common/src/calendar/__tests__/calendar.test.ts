@@ -30,11 +30,6 @@ import {
   ReservationState,
 } from "../../../types/gql-types";
 
-jest.mock("next/config", () => () => ({
-  serverRuntimeConfig: {},
-  publicRuntimeConfig: {},
-}));
-
 test("isReservationShortEnough", () => {
   expect(
     isReservationShortEnough(

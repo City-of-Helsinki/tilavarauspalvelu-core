@@ -2,7 +2,6 @@
   "extends": "tsconfig/nextjs.json",
   "compilerOptions": {
     "plugins": [{ "name": "next" }],
-    "types": ["cypress", "cypress-axe"],
     "paths": {
       "@/*": ["./*"],
       // ~ is old prefer the @ as base path
@@ -12,21 +11,20 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
-    "*.d.ts",
+    "**/*.d.ts",
+    "env.mjs",
+    "jest.config.mjs",
+    "jest.setup.mjs",
     "types/**/*.d.ts",
-    "next-config.js",
+    "next.config.mjs",
     "next-env.d.ts",
     "next-i18next.config.js",
-    "jest.setup.js",
-    "jest.config.ts",
+    "jest.config.mjs",
+    "jest.setup.mjs",
     "stylelint.config.cjs",
     "sentry.server.config.js",
     "sentry.edge.config.js",
     "sentry.client.config.js",
-    "jest.config.js",
-    "jest.setup.js",
-    "cypress/",
-    "server.js",
     ".eslintrc.js"
   ],
   "exclude": [

@@ -60,15 +60,11 @@ If you find using them alot locally add a docker-compose file.
 docker build -t tilavaraus-ui-mocked \
   -f ./Dockerfile \
   --build-arg APP=ui \
-  --build-arg NEXT_PUBLIC_TILAVARAUS_API_URL=http://127.0.0.1:4000 \
-  --build-arg=NEXT_PUBLIC_MOCK_REQUESTS=true \
-  --build-arg DISABLE_AUTH=true .
+  --build-arg NEXT_PUBLIC_TILAVARAUS_API_URL=http://127.0.0.1:4000
 
 docker run -e TZ=Europe/Helsinki \
-  -e DISABLE_AUTH=true \
   -e NEXT_PUBLIC_TILAVARAUS_API_URL=http://127.0.0.1:4000 \
   -e PORT=4000 \
-  -e NEXT_PUBLIC_MOCK_REQUESTS=true \
   -p 4000:4000 -d --ipc=host --name tilavaraus-ui-test \
   tilavaraus-ui-mocked
 
@@ -88,8 +84,6 @@ See `.env.local.example` and Azure DevOps library for values.
 | ------------------------------ | --------------------------------------------------------------- |
 | NEXT_PUBLIC_BASE_URL           | application baseUrl                                             |
 | NEXT_PUBLIC_TILAVARAUS_API_URL | tilavaraus-core base url                                        |
-| DISABLE_AUTH                   | used for cypress testing, disables the next-auth private routes |
-| NEXT_PUBLIC_MOCK_REQUESTS      | 'true' enables network level request mocking                    |
 | NEXT_PUBLIC_MAPBOX_TOKEN       | token tor mapbox service                                        |
 | NEXT_PUBLIC_SENTRY_DSN         | Sentry dsn                                                      |
 | NEXT_PUBLIC_SENTRY_ENVIRONMENT | Sentry environment, for example 'test', 'prod'                  |

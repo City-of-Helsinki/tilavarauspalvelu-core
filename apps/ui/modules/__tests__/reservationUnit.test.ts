@@ -28,11 +28,6 @@ import {
 import mockTranslations from "../../public/locales/fi/prices.json";
 import { RoundPeriod } from "common/src/calendar/util";
 
-jest.mock("next/config", () => () => ({
-  serverRuntimeConfig: {},
-  publicRuntimeConfig: {},
-}));
-
 jest.mock("next-i18next", () => ({
   i18n: {
     t: (str: string) => {

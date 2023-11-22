@@ -20,11 +20,6 @@ const defaultProps: SortingProps = {
   setIsOrderingAsc: jest.fn(),
 };
 
-jest.mock("next/config", () => () => ({
-  serverRuntimeConfig: {},
-  publicRuntimeConfig: {},
-}));
-
 jest.mock("next-i18next", () => ({
   useTranslation: () => {
     return {

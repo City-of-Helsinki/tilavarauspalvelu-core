@@ -1,13 +1,7 @@
 import * as React from "react";
-
 import { DATE_TYPES } from "../../../modules/const";
 import { render } from "../../../test/testUtils";
 import DateSelectorMenu from "../DateSelectorMenu";
-
-jest.mock("next/config", () => () => ({
-  serverRuntimeConfig: {},
-  publicRuntimeConfig: {},
-}));
 
 jest.mock("next-i18next", () => ({
   useTranslation: () => {

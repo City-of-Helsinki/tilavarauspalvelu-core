@@ -15,11 +15,6 @@ import {
 } from "../../../test/testUtils";
 import DateRangePicker, { DateRangePickerProps } from "../DateRangePicker";
 
-jest.mock("next/config", () => () => ({
-  serverRuntimeConfig: {},
-  publicRuntimeConfig: {},
-}));
-
 jest.mock("next-i18next", () => ({
   useTranslation: () => {
     return {

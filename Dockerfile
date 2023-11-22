@@ -23,12 +23,12 @@ RUN pnpm install --frozen-lockfile
 COPY --from=builder /app/out/full/ .
 ARG APP
 # Required because the client (js bundle) variables are compile time only
-ARG NEXT_PUBLIC_MOCK_REQUESTS=false
 ARG NEXT_PUBLIC_TILAVARAUS_API_URL
-ARG DISABLE_AUTH=false
-ENV NEXT_PUBLIC_MOCK_REQUESTS=$NEXT_PUBLIC_MOCK_REQUESTS
 ENV NEXT_PUBLIC_TILAVARAUS_API_URL=$NEXT_PUBLIC_TILAVARAUS_API_URL
-ENV DISABLE_AUTH=$DISABLE_AUTH
+# Build should not fail on missing env variables
+# TODO this should be removed because we need NEXT_PUBLIC_TILAVARAUS_API_URL to be set during build
+# unless we let it be undefined and use "" as default value (does it work?)
+# because it's on the frontend it needs to be present during build
 ENV SKIP_ENV_VALIDATION=true
 COPY turbo.json turbo.json
 RUN corepack enable

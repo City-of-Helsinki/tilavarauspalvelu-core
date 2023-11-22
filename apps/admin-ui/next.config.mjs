@@ -1,9 +1,11 @@
+// @ts-check
 import { join } from "node:path";
 import * as url from "node:url";
 import analyser from "@next/bundle-analyzer";
 import { withSentryConfig } from "@sentry/nextjs";
 import { env } from "./src/env.mjs";
 
+// @ts-expect-error -- This works because it's only run on node (not browser)
 await import ("./src/env.mjs");
 
 const ROOT_PATH = url.fileURLToPath(new URL(".", import.meta.url));
@@ -57,6 +59,7 @@ const config ={
   },
   webpack(config) {
     // Grab the existing rule that handles SVG imports
+    // @ts-expect-error -- implicit any, hard to type webpack config
     const fileLoaderRule = config.module.rules.find((rule) =>
       rule.test?.test?.(".svg")
     );

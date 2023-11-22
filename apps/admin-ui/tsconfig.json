@@ -17,7 +17,7 @@
     ".eslintrc.cjs",
     "stylelint.config.js",
     "next-i18next.config.js",
-    "jest.config.js",
+    "jest.config.mjs",
     "__mocks__",
     "next.config.mjs",
     "next-env.d.ts"

@@ -1,10 +1,5 @@
 import { before, after } from "../validation";
 
-jest.mock("next/config", () => () => ({
-  serverRuntimeConfig: {},
-  publicRuntimeConfig: {},
-}));
-
 test("test before", () => {
   expect(before("2021-02-02", "2021-02-02")).toBeFalsy();
   expect(before("2021-02-02", "2021-02-01")).toBeTruthy();
