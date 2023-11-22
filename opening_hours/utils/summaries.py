@@ -1,6 +1,6 @@
 import datetime
 
-from opening_hours.hours import get_opening_hours
+from opening_hours.hours import OpeningHoursDayData, get_opening_hours
 
 
 def get_resources_total_hours(
@@ -36,7 +36,7 @@ def get_resources_total_hours_per_resource(
     period_start: str | datetime.date,
     period_end: str | datetime.date,
 ):
-    opening_hours = get_opening_hours(
+    opening_hours: list[OpeningHoursDayData] = get_opening_hours(
         resource_ids,
         period_start,
         period_end,

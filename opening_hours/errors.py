@@ -17,3 +17,14 @@ class HaukiConfigurationError(HaukiError):
 class HaukiValueError(HaukiError):
     """Generic Value error related to Hauki"""
 
+
+class ReservableTimeSpanClientError(Exception):
+    pass
+
+
+class ReservableTimeSpanClientValueError(ReservableTimeSpanClientError):
+    pass
+
+
+class ReservableTimeSpanClientNothingToDoError(ReservableTimeSpanClientError):
+    pass
