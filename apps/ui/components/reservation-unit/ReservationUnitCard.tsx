@@ -156,6 +156,13 @@ const Circle = styled.div<{ passive: boolean }>`
   }
 `;
 
+// NOTE size=small causes text to disappear
+const ErrorNotification = styled(Notification).attrs({
+  type: "error",
+})`
+  --fontsize-heading-xs: var(--fontsize-body-s);
+`;
+
 const ReservationUnitCard = ({
   reservationUnit,
   order,
@@ -177,9 +184,8 @@ const ReservationUnitCard = ({
         {t("reservationUnitList:option")} {order + 1}.
       </PreCardLabel>
       {invalid ? (
-        <Notification
-          type="error"
-          label={t("application:error.reservationUnitTooSmall")}
+        <ErrorNotification
+          label={t("application:validation.reservationUnitTooSmall")}
         />
       ) : null}
       <CardButtonContainer>

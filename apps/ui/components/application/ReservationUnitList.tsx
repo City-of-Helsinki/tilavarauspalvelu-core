@@ -53,13 +53,7 @@ const ReservationUnitList = ({
   const [showModal, setShowModal] = useState(false);
 
   const form = useFormContext<ApplicationFormValues>();
-  const {
-    clearErrors,
-    setError,
-    watch,
-    setValue,
-    formState: { errors },
-  } = form;
+  const { clearErrors, setError, watch, setValue } = form;
 
   const isValid = (units: ReservationUnitType[]) => {
     const error = units
@@ -128,8 +122,6 @@ const ReservationUnitList = ({
     setReservationUnits(move(reservationUnits, from, to));
   };
 
-  const error = errors.applicationEvents?.[index]?.reservationUnits;
-
   return (
     <MainContainer>
       <Notification
@@ -160,11 +152,6 @@ const ReservationUnitList = ({
           label={t("reservationUnitList:add")}
         />
       </ButtonContainer>
-      {error?.message != null && (
-        <Notification size="small" type="error">
-          {t(`application:validation:${error.message}`)}
-        </Notification>
-      )}
       <Modal
         handleClose={() => setShowModal(false)}
         show={showModal}
