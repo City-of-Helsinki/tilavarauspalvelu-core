@@ -3,13 +3,13 @@ import styled from "styled-components";
 
 const StyledUserInfo = styled.div`
   word-break: break-all;
-  padding-bottom: ${(props) => props.theme.spacing.s};
+  padding-bottom: ${(props) => props.theme.spacing.xs};
   padding-left: 36px;
   border: 0;
 
   @media (min-width: ${(props) => props.theme.breakpoints.s}) {
     padding: ${(props) => props.theme.spacing.s};
-    padding-bottom: ${(props) => props.theme.spacing.xs};
+    padding-bottom: 0;
   }
 `;
 

@@ -1,5 +1,9 @@
 import React from "react";
-import { IconSignout, Navigation as HDSNavigation } from "hds-react";
+import {
+  IconLinkExternal,
+  IconSignout,
+  Navigation as HDSNavigation,
+} from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled, { css } from "styled-components";
@@ -34,6 +38,7 @@ const StyledUserMenu = styled(HDSNavigation.User)<{
 
 const NavigationUserMenuItem = styled(HDSNavigation.Item)<{
   $divider?: boolean;
+  $dividerAfter?: boolean;
   icon?: JSX.Element;
 }>`
   &:last-of-type {
@@ -61,18 +66,22 @@ const NavigationUserMenuItem = styled(HDSNavigation.Item)<{
     margin-left: ${(props) => props.theme.spacing.xs};
   }
 
-  ${({ $divider }) =>
+  ${({ $divider, $dividerAfter }) =>
     $divider &&
     css`
       position: relative;
-      margin-top: var(--spacing-m) !important;
+      ${$dividerAfter
+        ? "margin-bottom"
+        : "margin-top"}: var(--spacing-m) !important;
 
       &:after {
         content: "";
-        border-top: 1px solid ${(props) => props.theme.colors.black.light};
+        ${$dividerAfter ? "border-bottom" : "border-top"}: 1px solid ${(
+          props
+        ) => props.theme.colors.black.light};
         position: absolute;
         width: 100%;
-        top: calc(var(--spacing-xs) * -1);
+        ${$dividerAfter ? "bottom" : "top"}: calc(var(--spacing-xs) * -1);
 
         @media (min-width: ${(props) => props.theme.breakpoints.m}) {
           width: 80%;
@@ -127,6 +136,16 @@ const NavigationUserMenu = () => {
       <NavigationUserMenuUserCard
         user={{ name: userName, email: user?.email }}
       />
+        <NavigationUserMenuItem
+          href="https://profiili.test.hel.ninja"
+          icon={<IconLinkExternal aria-hidden />}
+          label={t("navigation:profileLinkLabel")}
+          data-testid="navigation__user-profile-link"
+          target="_blank"
+          rel="noopener noreferrer"
+          $divider
+          $dividerAfter
+        />
       {userMenuItems.map((item) => (
         <NavigationUserMenuItem
           href="#"
