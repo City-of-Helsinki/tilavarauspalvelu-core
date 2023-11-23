@@ -35,51 +35,52 @@ class HaukiGetResourcesParams(TypedDict):
 
 
 class HaukiAPIClient:
-    def __init__(self):
-        if not settings.HAUKI_API_URL:
-            raise HaukiConfigurationError("HAUKI_API_URL environment variable must to be configured.")
-
     ############
     # resource #
     ############
 
+    @classmethod
     def get_resources(
-        self,
+        cls,
         *,
         hauki_resource_ids: list[int],
         **kwargs: HaukiGetResourcesParams,
     ) -> HaukiAPIResourceListResponse:
         # Prepare the URL
-        url = self._build_url("resource")
+        url = cls._build_url("resource")
         query_params = {
             "resource_ids": ",".join(str(id_) for id_ in hauki_resource_ids),
             **kwargs,
         }
 
-        return self.get(url=url, params=query_params)
+        return cls.get(url=url, params=query_params)
 
-    def get_resource(self, *, hauki_resource_id: str) -> HaukiAPIResource:
-        url = self._build_url(f"resource/{hauki_resource_id}")
+    @classmethod
+    def get_resource(cls, *, hauki_resource_id: str) -> HaukiAPIResource:
+        url = cls._build_url(f"resource/{hauki_resource_id}")
 
-        return self.get(url=url)
+        return cls.get(url=url)
 
-    def create_resource(self, *, data: dict) -> HaukiAPIResource:
-        url = self._build_url("resource")
+    @classmethod
+    def create_resource(cls, *, data: dict) -> HaukiAPIResource:
+        url = cls._build_url("resource")
 
-        return self.post(url=url, data=data)
+        return cls.post(url=url, data=data)
 
-    def update_resource(self, *, data: dict) -> HaukiAPIResource:
+    @classmethod
+    def update_resource(cls, *, data: dict) -> HaukiAPIResource:
         hauki_resource_id = data["id"]
-        url = self._build_url(f"resource/{hauki_resource_id}")
+        url = cls._build_url(f"resource/{hauki_resource_id}")
 
-        return self.put(url=url, data=data)
+        return cls.put(url=url, data=data)
 
     #################
     # opening_hours #
     #################
 
+    @classmethod
     def get_resource_opening_hours(
-        self,
+        cls,
         *,
         hauki_resource_id: int,
         start_date: datetime.date,
@@ -94,7 +95,7 @@ class HaukiAPIClient:
         endpoint returns both the resource (which includes its timezone) and the resources opening hours.
         """
         # Prepare the URL
-        url = self._build_url("opening_hours")
+        url = cls._build_url("opening_hours")
         query_params = {
             "resource": hauki_resource_id,
             "start_date": start_date.isoformat(),
@@ -102,7 +103,7 @@ class HaukiAPIClient:
         }
 
         # Get the data from Hauki API
-        response: HaukiAPIOpeningHoursResponse = self.get(url=url, params=query_params)
+        response: HaukiAPIOpeningHoursResponse = cls.get(url=url, params=query_params)
         if response["count"] == 0:
             raise HaukiAPIError(f"Hauki API did not return any resources matching '{hauki_resource_id}'.")
         if response["count"] > 1:
@@ -110,12 +111,15 @@ class HaukiAPIClient:
 
         return response["results"][0]
 
-    ################
-    # Base methods #
-    ################
+    ##################
+    # Helper methods #
+    ##################
 
     @staticmethod
     def _build_url(endpoint: str):
+        if not settings.HAUKI_API_URL:
+            raise HaukiConfigurationError("HAUKI_API_URL environment variable must to be configured.")
+
         hauki_api_url_base = settings.HAUKI_API_URL.removesuffix("/")
         return f"{hauki_api_url_base}/v1/{endpoint}/"
 
@@ -139,6 +143,10 @@ class HaukiAPIClient:
             raise HaukiAPIError("Hauki API returned an error")
 
         return response_json
+
+    ################
+    # Base methods #
+    ################
 
     @classmethod
     def generic(cls, method: str, url: str, **kwargs):
