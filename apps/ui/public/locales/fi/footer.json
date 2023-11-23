@@ -1,7 +1,7 @@
 {
   "Navigation": {
     "feedbackLabel": "Lähetä palautetta",
-    "generalTermsLabel": "Palvelun yleiset käyttöehdot"
+    "serviceTermsLabel": "Palvelun yleiset käyttöehdot"
   },
   "Base": {
     "Item": {
