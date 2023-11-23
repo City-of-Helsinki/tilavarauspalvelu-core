@@ -27,6 +27,7 @@ const ClientSchema = z.object({
   NEXT_PUBLIC_MATOMO_ENABLED: coerceBoolean,
   NEXT_PUBLIC_SENTRY_DSN: z.string().optional(),
   NEXT_PUBLIC_SENTRY_ENVIRONMENT: z.string().optional(),
+  PROFILE_UI_URL: z.string(),
 });
 
 const createEnv = () => {
@@ -56,6 +57,7 @@ const createEnv = () => {
     NEXT_PUBLIC_MATOMO_ENABLED: process.env.NEXT_PUBLIC_MATOMO_ENABLED,
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
     NEXT_PUBLIC_SENTRY_ENVIRONMENT: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT,
+    PROFILE_UI_URL: process.env.NEXT_PUBLIC_PROFILE_UI_URL,
   });
 
   if (!clientConfig.success) {
@@ -70,4 +72,5 @@ const createEnv = () => {
 }
 
 const env = createEnv();
+
 export { env };

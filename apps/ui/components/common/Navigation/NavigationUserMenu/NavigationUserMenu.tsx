@@ -10,6 +10,7 @@ import styled, { css } from "styled-components";
 import { signIn, signOut, useSession } from "~/hooks/auth";
 import { NavigationUserMenuUserCard } from "./NavigationUserMenuUserCard";
 import { MenuItem } from "../types";
+import { env } from "@/env.mjs";
 
 const StyledUserMenu = styled(HDSNavigation.User)<{
   $active?: boolean;
@@ -136,8 +137,9 @@ const NavigationUserMenu = () => {
       <NavigationUserMenuUserCard
         user={{ name: userName, email: user?.email }}
       />
+      {env.PROFILE_UI_URL && (
         <NavigationUserMenuItem
-          href="https://profiili.test.hel.ninja"
+          href={env.PROFILE_UI_URL}
           icon={<IconLinkExternal aria-hidden />}
           label={t("navigation:profileLinkLabel")}
           data-testid="navigation__user-profile-link"
@@ -146,6 +148,7 @@ const NavigationUserMenu = () => {
           $divider
           $dividerAfter
         />
+      )}
       {userMenuItems.map((item) => (
         <NavigationUserMenuItem
           href="#"
