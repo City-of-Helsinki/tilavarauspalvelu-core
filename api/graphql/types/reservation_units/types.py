@@ -14,7 +14,6 @@ from api.graphql.extensions.legacy_helpers import OldPrimaryKeyObjectType, get_a
 from api.graphql.extensions.permission_helpers import check_resolver_permission
 from api.graphql.types.application_round_time_slot.types import ApplicationRoundTimeSlotNode
 from api.graphql.types.merchants.types import PaymentMerchantType, PaymentProductType
-from api.graphql.types.opening_hours.types import ReservableTimeSpansGraphQLMixin
 from api.graphql.types.reservation_units.permissions import (
     EquipmentCategoryPermission,
     EquipmentPermission,
@@ -56,11 +55,11 @@ from reservation_units.models import (
 )
 from reservation_units.models import ReservationUnitType as ReservationUnitTypeModel
 from reservations.models import Reservation
-from spaces.models import Space
+from spaces.models import Space, Unit
 from tilavarauspalvelu.utils.date_util import end_of_day, start_of_day
 from utils.query_performance import QueryPerformanceOptimizerMixin
 
-TIMEZONE = get_default_timezone()
+DEFAULT_TIMEZONE = get_default_timezone()
 
 
 def get_payment_type_codes() -> list[str]:
@@ -623,12 +622,24 @@ class ReservationUnitType(
         return None
 
 
-class ReservationUnitByPkType(
-    ReservationUnitType,
-    ReservableTimeSpansGraphQLMixin,
-    ReservationUnitWithReservationsMixin,
-):
+class ReservableTimeSpanType(graphene.ObjectType):
+    start_datetime = graphene.DateTime()
+    end_datetime = graphene.DateTime()
+
+    def resolve_start_datetime(self, info: GQLInfo):
+        return self.start_datetime
+
+    def resolve_end_datetime(self, info: GQLInfo):
+        return self.end_datetime
+
+
+class ReservationUnitByPkType(ReservationUnitType, ReservationUnitWithReservationsMixin):
     hauki_url = graphene.Field(ReservationUnitHaukiUrlType)
+    reservable_time_spans = graphene.List(
+        ReservableTimeSpanType,
+        start_date=graphene.Date(),
+        end_date=graphene.Date(),
+    )
 
     class Meta:
         model = ReservationUnit
@@ -687,3 +698,27 @@ class ReservationUnitByPkType(
 
     def resolve_hauki_url(self, info):
         return self
+
+    def resolve_reservable_time_spans(
+        self: ReservationUnit | Unit,
+        info,
+        start_date: datetime.date | None = None,
+        end_date: datetime.date | None = None,
+    ) -> list[ReservableTimeSpanType] | None:
+        # All parameters are required to get reservable time spans
+        if not (start_date and end_date):
+            return None
+
+        origin_hauki_resource = self.origin_hauki_resource
+
+        if not origin_hauki_resource:
+            return None
+
+        time_span_qs = origin_hauki_resource.reservable_time_spans.filter_period(start=start_date, end=end_date)
+        return [
+            ReservableTimeSpanType(
+                start_datetime=time_span.start_datetime.astimezone(DEFAULT_TIMEZONE),
+                end_datetime=time_span.end_datetime.astimezone(DEFAULT_TIMEZONE),
+            )
+            for time_span in time_span_qs
+        ]
