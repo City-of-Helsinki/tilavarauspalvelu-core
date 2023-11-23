@@ -132,11 +132,11 @@ function PaidPricingPart({
               const tax = pricing?.taxPercentage.value ?? 0;
               if (!Number.isNaN(low)) {
                 const lowNet = removeTax(low, tax);
-                setValue(`pricings.${index}.lowestPriceNet`, String(lowNet));
+                setValue(`pricings.${index}.lowestPriceNet`, lowNet);
               }
               if (!Number.isNaN(high)) {
                 const highNet = removeTax(high, tax);
-                setValue(`pricings.${index}.highestPriceNet`, String(highNet));
+                setValue(`pricings.${index}.highestPriceNet`, highNet);
               }
             }}
             value={
@@ -160,10 +160,11 @@ function PaidPricingPart({
             if (!Number.isNaN(val)) {
               setValue(
                 `pricings.${index}.lowestPrice`,
-                String(addTax(val, taxPercentage))
+                addTax(val, taxPercentage)
               );
             }
           },
+          setValueAs: (val) => (val !== "" ? Number(val) : null),
         })}
         id={`pricings.${index}.lowestPriceNet`}
         required
@@ -187,10 +188,11 @@ function PaidPricingPart({
             if (!Number.isNaN(val)) {
               setValue(
                 `pricings.${index}.lowestPriceNet`,
-                String(removeTax(val, taxPercentage))
+                removeTax(val, taxPercentage)
               );
             }
           },
+          setValueAs: (val) => (val !== "" ? Number(val) : null),
         })}
         id={`pricings.${index}.lowestPrice`}
         required
@@ -215,10 +217,11 @@ function PaidPricingPart({
             if (!Number.isNaN(val)) {
               setValue(
                 `pricings.${index}.highestPrice`,
-                String(addTax(val, taxPercentage))
+                addTax(val, taxPercentage)
               );
             }
           },
+          setValueAs: (val) => (val !== "" ? Number(val) : null),
         })}
         required
         id={`pricings.${index}.highestPriceNet`}
@@ -242,10 +245,11 @@ function PaidPricingPart({
             if (!Number.isNaN(val)) {
               setValue(
                 `pricings.${index}.highestPriceNet`,
-                String(removeTax(val, taxPercentage))
+                removeTax(val, taxPercentage)
               );
             }
           },
+          setValueAs: (val) => (val !== "" ? Number(val) : null),
         })}
         required
         id={`pricings.${index}.highestPrice`}

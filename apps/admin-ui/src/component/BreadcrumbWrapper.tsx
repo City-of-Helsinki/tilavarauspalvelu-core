@@ -75,7 +75,7 @@ const BreadcrumbWrapper = ({
   if (backLink != null) {
     return (
       <LinkWrapper>
-        <StyledLinkPrev style={{ lineHeight: "64px" }} route={backLink} />
+        <StyledLinkPrev route={backLink} />
       </LinkWrapper>
     );
   }

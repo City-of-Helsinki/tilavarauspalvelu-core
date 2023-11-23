@@ -102,7 +102,7 @@ export function Accordion({
   style,
   ...rest
 }: IProps): JSX.Element {
-  const [accordianOpenState, toggleOpenState] = useState(initiallyOpen);
+  const [accordionOpenState, toggleOpenState] = useState(initiallyOpen);
 
   const { t } = useTranslation();
 
@@ -110,7 +110,7 @@ export function Accordion({
     toggleOpenState(initiallyOpen);
   }, [initiallyOpen]);
 
-  const isAccordionOpen = open || accordianOpenState;
+  const isAccordionOpen = open || accordionOpenState;
   const buttonAriaLabel = isAccordionOpen
     ? `${t("common.close")} ${t("common.accordion")} "${heading}"`
     : `${t("common.open")} ${t("common.accordion")} "${heading}"`;

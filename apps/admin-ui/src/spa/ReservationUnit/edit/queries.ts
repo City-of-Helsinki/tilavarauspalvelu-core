@@ -3,6 +3,7 @@ import { gql } from "@apollo/client";
 export const RESERVATIONUNIT_QUERY = gql`
   query reservationUnit($pk: Int) {
     reservationUnitByPk(pk: $pk) {
+      pk
       state
       reservationState
       images {
@@ -74,7 +75,6 @@ export const RESERVATIONUNIT_QUERY = gql`
         imageType
         imageUrl
       }
-      pk
       location {
         addressStreetFi
         addressZip

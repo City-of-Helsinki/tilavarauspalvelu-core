@@ -26,8 +26,6 @@ import {
   type Query,
   type QueryReservationUnitByPkArgs,
   type QueryUnitByPkArgs,
-  type ReservationUnitCreateMutationInput,
-  type ReservationUnitUpdateMutationInput,
   type Mutation,
   ReservationUnitsReservationUnitReservationStartIntervalChoices,
   type ReservationUnitImageCreateMutationInput,
@@ -50,7 +48,6 @@ import { DateTimeInput } from "common/src/components/form/DateTimeInput";
 import { filterNonNullable } from "common/src/helpers";
 import { H1, H4, fontBold } from "common/src/common/typography";
 import { breakpoints } from "common";
-import { fromUIDate, toApiDate } from "common/src/common/util";
 import { addDays } from "date-fns";
 import { previewUrlPrefix, publicUrl } from "@/common/const";
 import { UNIT_WITH_SPACES_AND_RESOURCES } from "@/common/queries";
@@ -72,7 +69,6 @@ import { parseAddress } from "@/common/util";
 import Error404 from "@/common/Error404";
 import { Accordion } from "@/component/Accordion";
 import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
-import { setTimeOnDate } from "@/component/reservations/utils";
 import {
   CREATE_IMAGE,
   CREATE_RESERVATION_UNIT,
@@ -90,10 +86,10 @@ import { Image } from "./types";
 import { PricingType } from "./PricingType";
 import { GenericDialog } from "./GenericDialog";
 import {
-  PricingFormValues,
-  ReservationUnitEditFormValues,
+  type ReservationUnitEditFormValues,
   ReservationUnitEditSchema,
-  convert,
+  convertReservationUnit,
+  transformReservationUnit,
 } from "./form";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { reservationUnitsUrl } from "@/common/urls";
@@ -147,7 +143,7 @@ const SubAccordion = styled(Accordion)`
   }
 `;
 
-const Preview = styled.a<{ disabled: boolean }>`
+const Preview = styled.a<{ $disabled: boolean }>`
   display: flex;
   place-items: center;
   border-color: var(--color-white) !important;
@@ -157,9 +153,10 @@ const Preview = styled.a<{ disabled: boolean }>`
   &:hover {
     background-color: var(--color-bus-dark);
   }
-  ${({ disabled }) =>
-    disabled
+  ${({ $disabled }) =>
+    $disabled
       ? `
+    opacity: 0.5;
     cursor: not-allowed;
     color: var(--color-white);
     &:hover {
@@ -235,7 +232,9 @@ const WhiteButton = styled(Button)<{
 
   ${({ disabled }) =>
     disabled
-      ? `--hbg: var(--bg);
+      ? `
+        opacity: 0.5;
+        --hbg: var(--bg);
         --hfg: var(--fg);
       `
       : null}
@@ -291,12 +290,7 @@ const reservationsMaxDaysBeforeOptions = [
   { value: 730, label: "24 kk" },
 ];
 
-const durationOptions = [
-  { value: 900, label: "15 minuuttia" },
-  { value: 1800, label: "30 minuuttia" },
-  { value: 3600, label: "60 minuuttia" },
-  { value: 5400, label: "90 minuuttia" },
-].concat(
+const durationOptions = bufferTimeOptions.concat(
   Array.from({ length: (23 - 2) * 2 + 1 })
     .map((_v, i) => 3600 * 2 + i * 1800)
     .map((v) => ({
@@ -312,18 +306,14 @@ const makeTermsOptions = (
   parameters: Query | undefined,
   termsType: TermsOfUseTermsOfUseTermsTypeChoices
 ) => {
-  const options = (parameters?.termsOfUse?.edges || [])
-    .filter((tou) => {
-      return termsType === tou?.node?.termsType;
-    })
+  return filterNonNullable(parameters?.termsOfUse?.edges.map((e) => e?.node))
+    .filter((tou) => termsType === tou?.termsType)
     .map((tou) => {
       return {
-        value: tou?.node?.pk ?? "",
-        label: tou?.node?.nameFi ?? "no-name",
+        value: tou?.pk ?? "",
+        label: tou?.nameFi ?? "no-name",
       };
     });
-
-  return [...options];
 };
 
 const FieldGroupWrapper = styled.div`
@@ -459,8 +449,6 @@ const useImageMutations = () => {
       const deletePromises = images
         .filter((image) => image.deleted)
         .map((image) => delImage({ variables: { pk: image.pk } }));
-      // TODO getting error: "No permissions to perform delete."
-      // here locally
       const res = await Promise.all(deletePromises);
       const hasErrors =
         res
@@ -482,7 +470,7 @@ const useImageMutations = () => {
             variables: {
               image: image.bytes,
               reservationUnitPk: resUnitPk,
-              imageType: image.imageType as string,
+              imageType: image.imageType ?? "",
             },
           })
         );
@@ -532,15 +520,6 @@ const useImageMutations = () => {
   return [reconcileImageChanges];
 };
 
-const constructApiDate = (date: string, time: string) => {
-  if (date === "" || time === "") {
-    return null;
-  }
-  const d = fromUIDate(date);
-  const d2 = setTimeOnDate(d, time);
-  return d2.toISOString();
-};
-
 const getTranslatedError = (error: string | undefined, t: TFunction) => {
   if (error == null) {
     return undefined;
@@ -549,17 +528,44 @@ const getTranslatedError = (error: string | undefined, t: TFunction) => {
   return t(`Notifications.form.errors.${error}`);
 };
 
+// For these fields only Fi has tooltips
+const getTranslatedTooltipTex = (t: TFunction, fieldName: string) => {
+  if (fieldName === "reservationCancelledInstructionsFi") {
+    return t(
+      "ReservationUnitEditor.tooltip.reservationCancelledInstructionsFi"
+    );
+  }
+  if (fieldName === "reservationConfirmedInstructionsFi") {
+    return t("ReservationUnitEditor.tooltip.reservationPendingInstructionsFi");
+  }
+  if (fieldName === "reservationConfirmedInstructionsFi") {
+    return t(
+      "ReservationUnitEditor.tooltip.reservationConfirmedInstructionsFi"
+    );
+  }
+  if (fieldName === "contactInformation") {
+    return t("ReservationUnitEditor.tooltip.contactInformation");
+  }
+  if (fieldName === "termsOfUseFi") {
+    return t("ReservationUnitEditor.tooltip.termsOfUseFi");
+  }
+  if (fieldName === "descriptionFi") {
+    return t("ReservationUnitEditor.tooltip.description");
+  }
+  return "";
+};
+
 // default is 20 if no spaces selected
 const getMaxPersons = (spaceList: NonNullable<SpaceType>[]) => {
   const persons =
     spaceList.map((s) => s.maxPersons ?? 0).reduce((a, x) => a + x, 0) || 20;
-  return Math.ceil(persons);
+  return Math.floor(persons);
 };
 // default is 1 if no spaces selected
 const getMinSurfaceArea = (spaceList: NonNullable<SpaceType>[]) => {
   const area =
     spaceList.map((s) => s.surfaceArea ?? 0).reduce((a, x) => a + x, 0) || 1;
-  return Math.ceil(area);
+  return Math.floor(area);
 };
 
 function BasicSection({
@@ -790,8 +796,7 @@ function ReservationUnitSettings({
     label: n?.name ?? "no-name",
   }));
 
-  // TODO this would be better if we split the form values into objects based on section
-  const open =
+  const hasErrors =
     errors.reservationBeginsDate != null ||
     errors.reservationEndsDate != null ||
     errors.reservationBeginsTime != null ||
@@ -805,7 +810,7 @@ function ReservationUnitSettings({
     errors.minReservationDuration != null;
 
   return (
-    <Accordion open={open} heading={t("ReservationUnitEditor.settings")}>
+    <Accordion open={hasErrors} heading={t("ReservationUnitEditor.settings")}>
       <AutoGrid $minWidth="20rem">
         <FieldGroup
           heading={t("ReservationUnitEditor.publishingSettings")}
@@ -1372,9 +1377,11 @@ function PricingSection({
                 value={
                   pricingTermsOptions.find((o) => o.value === value) ?? null
                 }
-                onChange={(val: { value: string; label: string }) =>
-                  onChange(val.value)
+                onChange={(val?: { value: string; label: string }) =>
+                  onChange(val?.value ?? null)
                 }
+                error={getTranslatedError(errors.pricingTerms?.message, t)}
+                invalid={!!errors.pricingTerms}
                 tooltipText={t("ReservationUnitEditor.tooltip.pricingTermsPk")}
               />
             )}
@@ -1431,14 +1438,13 @@ function TermsSection({
               render={({ field }) => (
                 <Select
                   clearable
-                  // sort
                   id={name}
                   label={t(`ReservationUnitEditor.label.${name}`)}
                   placeholder={t(`ReservationUnitEditor.termsPlaceholder`)}
                   options={options}
                   value={options.find((o) => o.value === field.value) ?? null}
                   onChange={(val?: { value: string; label: string }) =>
-                    field.onChange(val?.value)
+                    field.onChange(val?.value ?? null)
                   }
                   tooltipText={t(`ReservationUnitEditor.tooltip.${name}`)}
                 />
@@ -1460,8 +1466,7 @@ function TermsSection({
                   label={t(`ReservationUnitEditor.label.${fieldName}`)}
                   errorText={getTranslatedError(errors[fieldName]?.message, t)}
                   style={{ gridColumn: "1 / -1" }}
-                  // TODO do we want to hide the tooltip for others than Fi?
-                  tooltipText={t("ReservationUnitEditor.tooltip.termsOfUseFi")}
+                  tooltipText={getTranslatedTooltipTex(t, fieldName)}
                 />
               )}
             />
@@ -1504,10 +1509,7 @@ function CommunicationSection({
                 label={t(`ReservationUnitEditor.label.${fieldName}`)}
                 errorText={getTranslatedError(errors[fieldName]?.message, t)}
                 invalid={errors[fieldName]?.message != null}
-                /* FIXME
-                tooltipText={t("ReservationUnitEditor.tooltip.termsOfUseFi")}
-                tooltipText={ lang === "fi" ? t( "ReservationUnitEditor.tooltip.reservationPendingInstructionsFi") : "" }
-                */
+                tooltipText={getTranslatedTooltipTex(t, fieldName)}
               />
             )}
           />
@@ -1531,10 +1533,7 @@ function CommunicationSection({
                 label={t(`ReservationUnitEditor.label.${fieldName}`)}
                 errorText={getTranslatedError(errors[fieldName]?.message, t)}
                 invalid={errors[fieldName]?.message != null}
-                /* FIXME tr key
-                label={t( `ReservationUnitEditor.label.instructions${upperFirst( lang)}`)}
-                tooltipText={ lang === "fi" ? t( "ReservationUnitEditor.tooltip.reservationConfirmedInstructionsFi") : "" }
-                */
+                tooltipText={getTranslatedTooltipTex(t, fieldName)}
               />
             )}
           />
@@ -1563,9 +1562,7 @@ function CommunicationSection({
                   label={t(`ReservationUnitEditor.label.${fieldName}`)}
                   errorText={getTranslatedError(errors[fieldName]?.message, t)}
                   invalid={errors[fieldName]?.message != null}
-                  /* TODO rename the keys
-                    tooltipText={ lang === "fi" ? t( "ReservationUnitEditor.tooltip.reservationCancelledInstructionsFi") : "" }
-                    */
+                  tooltipText={getTranslatedTooltipTex(t, fieldName)}
                 />
               )}
             />
@@ -1576,7 +1573,7 @@ function CommunicationSection({
           id="contactInformation"
           label={t("ReservationUnitEditor.contactInformationLabel")}
           helperText={t("ReservationUnitEditor.contactInformationHelperText")}
-          tooltipText={t("ReservationUnitEditor.tooltip.contactInformation")}
+          tooltipText={getTranslatedTooltipTex(t, "contactInformation")}
         />
       </VerticalFlex>
     </Accordion>
@@ -1791,7 +1788,7 @@ function DescriptionSection({
                       errors[fieldName]?.message,
                       t
                     )}
-                    tooltipText={t("ReservationUnitEditor.tooltip.description")}
+                    tooltipText={getTranslatedTooltipTex(t, fieldName)}
                   />
                 )}
               />
@@ -1804,92 +1801,6 @@ function DescriptionSection({
       </Grid>
     </Accordion>
   );
-}
-
-// TODO move to form.ts
-function transformReservationUnit(
-  values: ReservationUnitEditFormValues
-): ReservationUnitUpdateMutationInput | ReservationUnitCreateMutationInput {
-  const {
-    pk,
-    isDraft,
-    isArchived,
-    surfaceArea,
-    reservationEndsDate,
-    reservationEndsTime,
-    reservationBeginsDate,
-    reservationBeginsTime,
-    publishBeginsDate,
-    publishBeginsTime,
-    publishEndsDate,
-    publishEndsTime,
-    pricings,
-    hasFuturePricing,
-    hasScheduledPublish, // ignored just a ui variables
-    hasScheduledReservation, // ignored just a ui variables
-    hasPublishBegins,
-    hasPublishEnds,
-    hasReservationBegins,
-    hasReservationEnds,
-    hasBufferTimeBefore,
-    hasBufferTimeAfter,
-    hasCancellationRule,
-    bufferTimeAfter,
-    bufferTimeBefore,
-    cancellationRulePk,
-    termsOfUseEn,
-    termsOfUseFi,
-    termsOfUseSv,
-    ...vals
-  } = values;
-
-  const shouldSavePricing = (p: PricingFormValues) =>
-    hasFuturePricing ||
-    p.status === ReservationUnitsReservationUnitPricingStatusChoices.Active;
-  return {
-    ...vals,
-    ...(pk ? { pk } : {}),
-    surfaceArea:
-      surfaceArea != null && surfaceArea > 0 ? Math.ceil(surfaceArea) : null,
-    reservationBegins: hasReservationBegins
-      ? constructApiDate(reservationBeginsDate, reservationBeginsTime)
-      : null,
-    reservationEnds: hasReservationEnds
-      ? constructApiDate(reservationEndsDate, reservationEndsTime)
-      : null,
-    publishBegins: hasPublishBegins
-      ? constructApiDate(publishBeginsDate, publishBeginsTime)
-      : null,
-    publishEnds: hasPublishEnds
-      ? constructApiDate(publishEndsDate, publishEndsTime)
-      : null,
-    bufferTimeAfter: hasBufferTimeAfter ? bufferTimeAfter : null,
-    bufferTimeBefore: hasBufferTimeBefore ? bufferTimeBefore : null,
-    isDraft,
-    isArchived,
-    termsOfUseEn: termsOfUseEn !== "" ? termsOfUseEn : null,
-    termsOfUseFi: termsOfUseFi !== "" ? termsOfUseFi : null,
-    termsOfUseSv: termsOfUseSv !== "" ? termsOfUseSv : null,
-    cancellationRulePk: hasCancellationRule ? cancellationRulePk : null,
-    // TODO only one active price can be saved
-    // the form doesn't allow multiples but make sure here that we only have one active and one future and warn the user if not
-    pricings: filterNonNullable(pricings)
-      .filter(shouldSavePricing)
-      .map((p) => ({
-        begins: toApiDate(fromUIDate(p.begins)) ?? "",
-        highestPrice: Number(p.highestPrice),
-        highestPriceNet: Number(p.highestPriceNet),
-        lowestPrice: Number(p.lowestPrice),
-        lowestPriceNet: Number(p.lowestPriceNet),
-        ...(p.pk !== 0 ? { pk: p.pk } : {}),
-        ...(p.priceUnit != null ? { priceUnit: p.priceUnit } : {}),
-        pricingType: p.pricingType,
-        status: p.status,
-        ...(p.taxPercentage.pk !== 0
-          ? { taxPercentagePk: p.taxPercentage.pk }
-          : {}),
-      })),
-  };
 }
 
 const ReservationUnitEditor = ({
@@ -1909,7 +1820,7 @@ const ReservationUnitEditor = ({
   const { notifySuccess, notifyError } = useNotification();
   const { setModalContent } = useModal();
   const [reconcileImageChanges] = useImageMutations();
-  // TODO should the images be inside the form state?
+  // TODO images should be inside the form, otherwise changes to them don't mark the form dirty
   const [images, setImages] = useState<Image[]>(reservationUnit?.images ?? []);
 
   const [updateMutation] = useMutation<
@@ -1920,11 +1831,6 @@ const ReservationUnitEditor = ({
     Mutation,
     MutationCreateReservationUnitArgs
   >(CREATE_RESERVATION_UNIT);
-  // Helper functions (can we remove these?)
-  const updateReservationUnit = (input: ReservationUnitUpdateMutationInput) =>
-    updateMutation({ variables: { input } });
-  const createReservationUnit = (input: ReservationUnitCreateMutationInput) =>
-    createMutation({ variables: { input } });
 
   const { data: unitResourcesData } = useQuery<Query, QueryUnitByPkArgs>(
     UNIT_WITH_SPACES_AND_RESOURCES,
@@ -2006,8 +1912,9 @@ const ReservationUnitEditor = ({
     try {
       const promise =
         "pk" in input
-          ? updateReservationUnit(input)
-          : createReservationUnit(input);
+          ? updateMutation({ variables: { input } })
+          : createMutation({ variables: { input } });
+
       const { data, errors: mutationErrors } = await promise;
       if (mutationErrors != null) {
         notifyError(
@@ -2034,15 +1941,14 @@ const ReservationUnitEditor = ({
         // res unit is saved, we can save changes to images
         const success = await reconcileImageChanges(pk, images);
         if (success) {
-          // TODO should we refetch? if we stay on the page? maybe but the reset of form isn't working atm
-          // NOTE redirect if new one was created
+          // redirect if new one was created
           if (formValues.pk === 0 && pk > 0) {
             history(`/unit/${unitPk}/reservationUnit/edit/${pk}`);
           }
           const tkey =
             formValues.pk === 0
-              ? "ReservationUnitEditor.reservationUnitUpdatedNotification"
-              : "ReservationUnitEditor.reservationUnitCreatedNotification";
+              ? "ReservationUnitEditor.reservationUnitCreatedNotification"
+              : "ReservationUnitEditor.reservationUnitUpdatedNotification";
           notifySuccess(t(tkey, { name: getValues("nameFi") }));
         } else {
           // FIXME error
@@ -2054,9 +1960,6 @@ const ReservationUnitEditor = ({
         notifyError("ei tullut pk");
         return undefined;
       }
-
-      // TODO draft / archive / publish
-      notifySuccess(t("ReservationUnitEditor.saveSuccess"));
       refetch();
       return pk;
     } catch (error) {
@@ -2066,7 +1969,6 @@ const ReservationUnitEditor = ({
   };
 
   // Have to define these like this because otherwise the state changes don't work
-  // TODO this seems to not publish (at least the Tag on the page says draft after this, even after refresh)
   const handlePublish = async () => {
     setValue("isDraft", false);
     setValue("isArchived", false);
@@ -2075,11 +1977,13 @@ const ReservationUnitEditor = ({
 
   const handleSaveAsDraft = async () => {
     setValue("isDraft", true);
+    setValue("isArchived", false);
     await handleSubmit(onSubmit)();
   };
 
   const handleAcceptArchive = async () => {
     setValue("isArchived", true);
+    setValue("isDraft", false);
     try {
       await handleSubmit(onSubmit)();
       setModalContent(null);
@@ -2106,6 +2010,11 @@ const ReservationUnitEditor = ({
 
   const isSaving = isSubmitting;
   const hasChanges = isDirty;
+  const previewDisabled =
+    isSaving ||
+    !reservationUnit?.pk ||
+    !reservationUnit?.uuid ||
+    !previewUrlPrefix;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -2153,7 +2062,9 @@ const ReservationUnitEditor = ({
           <ArchiveButton
             onClick={handleArchiveButtonClick}
             variant="secondary"
-            disabled={isSaving || getValues("pk") === 0}
+            disabled={
+              isSaving || getValues("pk") === 0 || getValues("isArchived")
+            }
             theme="black"
           >
             {t("ReservationUnitEditor.archive")}
@@ -2184,10 +2095,9 @@ const ReservationUnitEditor = ({
         <Preview
           target="_blank"
           rel="noopener noreferrer"
-          disabled={isSaving}
+          $disabled={previewDisabled}
           href={`${previewUrlPrefix}/${reservationUnit?.pk}?ru=${reservationUnit?.uuid}`}
-          // TODO
-          // onClick={(e) => state.hasChanges && e.preventDefault()}
+          onClick={(e) => previewDisabled && e.preventDefault()}
           title={t(
             hasChanges
               ? "ReservationUnitEditor.noPreviewUnsavedChangesTooltip"
@@ -2199,7 +2109,7 @@ const ReservationUnitEditor = ({
         <WhiteButton
           size="small"
           variant="secondary"
-          // disabled={isSaving || !hasChanges}
+          disabled={isSaving || !hasChanges}
           isLoading={isSaving && watch("isDraft")}
           type="button"
           loadingText={t("ReservationUnitEditor.saving")}
@@ -2209,7 +2119,7 @@ const ReservationUnitEditor = ({
         </WhiteButton>
         <WhiteButton
           variant="primary"
-          // disabled={isSaving || !hasChanges}
+          disabled={isSaving || !hasChanges}
           isLoading={isSaving && !watch("isDraft")}
           loadingText={t("ReservationUnitEditor.saving")}
           type="button"
@@ -2255,7 +2165,7 @@ function EditorWrapper() {
     // for example termsOfUseEn, termsOfUseFi, termsOfUseSv
     shouldFocusError: false,
     defaultValues: {
-      ...convert(reservationUnit),
+      ...convertReservationUnit(reservationUnit),
       unitPk: Number(unitPk),
     },
     resolver: zodResolver(ReservationUnitEditSchema),
@@ -2263,9 +2173,8 @@ function EditorWrapper() {
   const { reset } = form;
   useEffect(() => {
     if (reservationUnitData?.reservationUnitByPk != null) {
-      const vals = convert(reservationUnitData.reservationUnitByPk);
       reset({
-        ...vals,
+        ...convertReservationUnit(reservationUnitData.reservationUnitByPk),
         unitPk: Number(unitPk),
       });
     }

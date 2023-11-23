@@ -106,9 +106,10 @@ export const TimeInput = forwardRef(function TimeInput(
         value.slice(0, selectionStart ?? value.length) +
         e.key +
         value.slice(selectionEnd ?? value.length);
-      // automatically add ':' if the user types 3 numbers
-      if (newValue.length === 3 && newValue.indexOf(":") === -1) {
-        e.currentTarget.value = `${value}:${e.key}`;
+      // automatically add ':' after the user types 2 numbers
+      if (newValue.length === 2 && newValue.indexOf(":") === -1) {
+        e.currentTarget.value = `${value}${e.key}:`;
+        e.preventDefault();
       }
       if (!isValid(newValue)) {
         e.preventDefault();

@@ -1,5 +1,10 @@
 import { filterNonNullable } from "common/src/helpers";
-import { fromApiDate, fromUIDate, toUIDate } from "common/src/common/util";
+import {
+  fromApiDate,
+  fromUIDate,
+  toUIDate,
+  toApiDate,
+} from "common/src/common/util";
 import {
   ReservationUnitsReservationUnitReservationStartIntervalChoices,
   ReservationUnitsReservationUnitAuthenticationChoices,
@@ -9,9 +14,12 @@ import {
   ReservationUnitsReservationUnitPricingStatusChoices,
   ReservationUnitsReservationUnitPricingPriceUnitChoices,
   type ReservationUnitPricingType,
+  type ReservationUnitUpdateMutationInput,
+  type ReservationUnitCreateMutationInput,
 } from "common/types/gql-types";
 import { addDays, format } from "date-fns";
 import { z } from "zod";
+import { setTimeOnDate } from "@/component/reservations/utils";
 
 export const PricingFormSchema = z.object({
   // pk === 0 means new pricing good decission?
@@ -21,13 +29,10 @@ export const PricingFormSchema = z.object({
     pk: z.number(),
     value: z.number(),
   }),
-  // NOTE because of how valueAsNumber works converting 21. to number throws
-  // localization / HDS problem because 21, => 21 but 21. => NaN
-
-  lowestPrice: z.string(),
-  lowestPriceNet: z.string(),
-  highestPrice: z.string(),
-  highestPriceNet: z.string(),
+  lowestPrice: z.number(),
+  lowestPriceNet: z.number(),
+  highestPrice: z.number(),
+  highestPriceNet: z.number(),
   pricingType: z.nativeEnum(
     ReservationUnitsReservationUnitPricingPricingTypeChoices
   ),
@@ -135,16 +140,12 @@ export const ReservationUnitEditSchema = z
     // because if they are set (non undefined) we should show the active checkbox
     bufferTimeAfter: z.number(),
     bufferTimeBefore: z.number(),
-    // TODO default to optional
     maxReservationsPerUser: z.number().min(1).nullable(),
-    // TODO maxPerson > minPerson
-    // TODO allow 0 (or null in the backend) for drafts?
     maxPersons: z.number().min(1).nullable(),
     minPersons: z.number().min(1).nullable(),
     maxReservationDuration: z.number().min(1).nullable(),
     minReservationDuration: z.number().min(1).nullable(),
     pk: z.number(),
-    // priceUnit: string;
     // Date in string format
     publishBeginsDate: z.string(),
     publishBeginsTime: z.string(),
@@ -160,7 +161,7 @@ export const ReservationUnitEditSchema = z
     reservationStartInterval: z.nativeEnum(
       ReservationUnitsReservationUnitReservationStartIntervalChoices
     ),
-    unitPk: z.number().min(1), // .refine((v) => v > 0, { message: "Unit pk must be greater than 0" }),
+    unitPk: z.number().min(1),
     canApplyFreeOfCharge: z.boolean(),
     reservationsMinDaysBefore: z.number(),
     reservationsMaxDaysBefore: z.number(),
@@ -168,7 +169,6 @@ export const ReservationUnitEditSchema = z
       ReservationUnitsReservationUnitReservationKindChoices
     ),
     contactInformation: z.string(),
-    // TODO this is missing? additionalInstructionsFi
     reservationPendingInstructionsFi: z.string(),
     reservationPendingInstructionsEn: z.string(),
     reservationPendingInstructionsSv: z.string(),
@@ -178,42 +178,33 @@ export const ReservationUnitEditSchema = z
     reservationCancelledInstructionsFi: z.string(),
     reservationCancelledInstructionsEn: z.string(),
     reservationCancelledInstructionsSv: z.string(),
-    // all are required for non draft
-    // not required for drafts
-    // TODO allow draft to have empty strings
     descriptionFi: z.string().max(4000),
     descriptionEn: z.string().max(4000),
     descriptionSv: z.string().max(4000),
-    // nameFi is required for both draft and published
     nameFi: z.string().min(1, { message: "Required" }).max(80),
-    // not required for drafts
-    // TODO allow draft to have empty strings
-    nameEn: z.string().max(80), // .min(1).max(80),
-    nameSv: z.string().max(80), // .min(1).max(80),
+    nameEn: z.string().max(80),
+    nameSv: z.string().max(80),
     // backend allows nulls but not empty strings, these are not required though
     termsOfUseFi: z.string().max(10000),
     termsOfUseEn: z.string().max(10000),
     termsOfUseSv: z.string().max(10000),
-    // TODO "Not draft state reservation unit must have one or more space or resource"
-    // either or?
     spacePks: z.array(z.number()),
     resourcePks: z.array(z.number()),
     equipmentPks: z.array(z.number()),
     purposePks: z.array(z.number()),
     qualifierPks: z.array(z.number()),
     paymentTypes: z.array(z.string()),
-    // TODO this can be undefined because we are registering / unregistering these
     pricings: z.array(PricingFormSchema),
     // TODO
     // "Not draft reservation unit must have a reservation unit type."
-    reservationUnitTypePk: z.number().optional(),
+    reservationUnitTypePk: z.number().nullable(),
     cancellationRulePk: z.number().nullable(),
     // Terms pks are actually slugs
-    paymentTermsPk: z.string().optional(),
-    pricingTerms: z.string().optional(),
+    paymentTermsPk: z.string().nullable(),
+    pricingTerms: z.string().nullable(),
     cancellationTermsPk: z.string().nullable(),
-    serviceSpecificTermsPk: z.string().optional(),
-    metadataSetPk: z.number().optional(),
+    serviceSpecificTermsPk: z.string().nullable(),
+    metadataSetPk: z.number().nullable(),
     surfaceArea: z.number(),
     // internal values
     isDraft: z.boolean(),
@@ -352,20 +343,24 @@ export const ReservationUnitEditSchema = z
     });
 
     // TODO if it includes futurePricing check that the futurePrice date is in the future (is today ok?)
-    if (
-      enabledPricings.some(
-        (p) =>
-          p.pricingType !==
-          ReservationUnitsReservationUnitPricingPricingTypeChoices.Free
-      )
-    ) {
-      if (v.paymentTypes.length === 0) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Required",
-          path: ["paymentTypes"],
-        });
-      }
+    const hasPaidPricing = enabledPricings.some(
+      (p) =>
+        p.pricingType ===
+        ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid
+    );
+    if (hasPaidPricing && v.paymentTypes.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Required",
+        path: ["paymentTypes"],
+      });
+    }
+    if (v.canApplyFreeOfCharge && hasPaidPricing && v.pricingTerms == null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Required",
+        path: ["pricingTerms"],
+      });
     }
   });
 
@@ -403,10 +398,10 @@ const convertPricing = (p?: ReservationUnitPricingType): PricingFormValues => {
       pk: p?.taxPercentage?.pk ?? 0,
       value: convertMaybeDecimal(p?.taxPercentage?.value) ?? 0,
     },
-    lowestPrice: String(convertMaybeDecimal(p?.lowestPrice) ?? 0),
-    lowestPriceNet: String(convertMaybeDecimal(p?.lowestPriceNet) ?? 0),
-    highestPrice: String(convertMaybeDecimal(p?.highestPrice) ?? 0),
-    highestPriceNet: String(convertMaybeDecimal(p?.highestPriceNet) ?? 0),
+    lowestPrice: convertMaybeDecimal(p?.lowestPrice) ?? 0,
+    lowestPriceNet: convertMaybeDecimal(p?.lowestPriceNet) ?? 0,
+    highestPrice: convertMaybeDecimal(p?.highestPrice) ?? 0,
+    highestPriceNet: convertMaybeDecimal(p?.highestPriceNet) ?? 0,
     pricingType:
       p?.pricingType ??
       ReservationUnitsReservationUnitPricingPricingTypeChoices.Free,
@@ -423,29 +418,24 @@ const convertPricing = (p?: ReservationUnitPricingType): PricingFormValues => {
 const convertPricingList = (
   pricings: ReservationUnitPricingType[]
 ): PricingFormValues[] => {
-  // Past pricing can't be saved and is not displayed in the UI
-  const notPast = pricings?.filter(
-    (p) =>
-      p?.status !== ReservationUnitsReservationUnitPricingStatusChoices.Past
-  );
-  // Only one active and one future pricing can be saved (and is actually shown)
-  const active = notPast.find(
-    (p) =>
-      p?.status === ReservationUnitsReservationUnitPricingStatusChoices.Active
-  );
+  const isActive = (p?: ReservationUnitPricingType) =>
+    p?.status === ReservationUnitsReservationUnitPricingStatusChoices.Active;
+  const isFuture = (p?: ReservationUnitPricingType) =>
+    p?.status === ReservationUnitsReservationUnitPricingStatusChoices.Future;
+
+  const active = pricings.find(isActive);
+  // NOTE using casting here because we only need the status to be set for the next step
   const future =
-    notPast.find(
-      (p) =>
-        p?.status === ReservationUnitsReservationUnitPricingStatusChoices.Future
-    ) ??
+    pricings.find(isFuture) ??
     ({
       status: ReservationUnitsReservationUnitPricingStatusChoices.Future,
     } as ReservationUnitPricingType);
+
   // allow undefined's here so we create two default values always
   return [active, future].map(convertPricing);
 };
 
-export const convert = (
+export const convertReservationUnit = (
   data?: ReservationUnitByPkType
 ): ReservationUnitEditFormValues => {
   return {
@@ -458,7 +448,6 @@ export const convert = (
     minReservationDuration: data?.minReservationDuration ?? null,
     pk: data?.pk ?? 0,
     // TODO
-    // priceUnit: "", // data?.priceUnit ?? "",
     // Date split for ui components
     publishBeginsDate: data?.publishBegins
       ? format(new Date(data.publishBegins), "d.M.yyyy")
@@ -524,23 +513,20 @@ export const convert = (
     termsOfUseFi: data?.termsOfUseFi ?? "",
     termsOfUseEn: data?.termsOfUseEn ?? "",
     termsOfUseSv: data?.termsOfUseSv ?? "",
-    // spacePks: data?.spaces?.map((s) => s?.pk) ?? [],
     spacePks: filterNonNullable(data?.spaces?.map((s) => s?.pk)),
-    // resourcePks: data?.resources?.map((r) => r?.pk) ?? [],
     resourcePks: filterNonNullable(data?.resources?.map((r) => r?.pk)),
     equipmentPks: filterNonNullable(data?.equipment?.map((e) => e?.pk)),
     purposePks: filterNonNullable(data?.purposes?.map((p) => p?.pk)),
     qualifierPks: filterNonNullable(data?.qualifiers?.map((q) => q?.pk)),
-    // paymentTermsPk: data?.paymentTerms?.pk ?? undefined,
-    paymentTermsPk: data?.paymentTerms?.pk ?? undefined,
     surfaceArea: data?.surfaceArea ?? 0,
-    // paymentTypes: data?.paymentTerms?
     authentication:
       data?.authentication ??
       ReservationUnitsReservationUnitAuthenticationChoices.Weak,
-    reservationUnitTypePk: data?.reservationUnitType?.pk ?? undefined,
-    metadataSetPk: data?.metadataSet?.pk ?? undefined,
-    pricingTerms: data?.pricingTerms?.pk ?? undefined,
+    reservationUnitTypePk: data?.reservationUnitType?.pk ?? null,
+    metadataSetPk: data?.metadataSet?.pk ?? null,
+    paymentTermsPk: data?.paymentTerms?.pk ?? null,
+    pricingTerms: data?.pricingTerms?.pk ?? null,
+    serviceSpecificTermsPk: data?.serviceSpecificTerms?.pk ?? null,
     cancellationTermsPk: data?.cancellationTerms?.pk ?? null,
     cancellationRulePk: data?.cancellationRule?.pk ?? null,
     paymentTypes: filterNonNullable(data?.paymentTypes?.map((pt) => pt?.code)),
@@ -567,3 +553,98 @@ export const convert = (
     hasCancellationRule: data?.cancellationRule != null,
   };
 };
+
+const constructApiDate = (date: string, time: string) => {
+  if (date === "" || time === "") {
+    return null;
+  }
+  const d = fromUIDate(date);
+  const d2 = setTimeOnDate(d, time);
+  return d2.toISOString();
+};
+
+export function transformReservationUnit(
+  values: ReservationUnitEditFormValues
+): ReservationUnitUpdateMutationInput | ReservationUnitCreateMutationInput {
+  const {
+    pk,
+    isDraft,
+    isArchived,
+    surfaceArea,
+    reservationEndsDate,
+    reservationEndsTime,
+    reservationBeginsDate,
+    reservationBeginsTime,
+    publishBeginsDate,
+    publishBeginsTime,
+    publishEndsDate,
+    publishEndsTime,
+    pricings,
+    hasFuturePricing,
+    hasScheduledPublish,
+    hasScheduledReservation,
+    hasPublishBegins,
+    hasPublishEnds,
+    hasReservationBegins,
+    hasReservationEnds,
+    hasBufferTimeBefore,
+    hasBufferTimeAfter,
+    hasCancellationRule,
+    bufferTimeAfter,
+    bufferTimeBefore,
+    cancellationRulePk,
+    termsOfUseEn,
+    termsOfUseFi,
+    termsOfUseSv,
+    ...vals
+  } = values;
+
+  const shouldSavePricing = (p: PricingFormValues) =>
+    hasFuturePricing ||
+    p.status === ReservationUnitsReservationUnitPricingStatusChoices.Active;
+
+  return {
+    ...vals,
+    ...(pk ? { pk } : {}),
+    surfaceArea:
+      surfaceArea != null && surfaceArea > 0 ? Math.floor(surfaceArea) : null,
+    reservationBegins: hasReservationBegins
+      ? constructApiDate(reservationBeginsDate, reservationBeginsTime)
+      : null,
+    reservationEnds: hasReservationEnds
+      ? constructApiDate(reservationEndsDate, reservationEndsTime)
+      : null,
+    publishBegins: hasPublishBegins
+      ? constructApiDate(publishBeginsDate, publishBeginsTime)
+      : null,
+    publishEnds: hasPublishEnds
+      ? constructApiDate(publishEndsDate, publishEndsTime)
+      : null,
+    bufferTimeAfter: hasBufferTimeAfter ? bufferTimeAfter : null,
+    bufferTimeBefore: hasBufferTimeBefore ? bufferTimeBefore : null,
+    isDraft,
+    isArchived,
+    termsOfUseEn: termsOfUseEn !== "" ? termsOfUseEn : null,
+    termsOfUseFi: termsOfUseFi !== "" ? termsOfUseFi : null,
+    termsOfUseSv: termsOfUseSv !== "" ? termsOfUseSv : null,
+    cancellationRulePk: hasCancellationRule ? cancellationRulePk : null,
+    // TODO only one active price can be saved
+    // the form doesn't allow multiples but make sure here that we only have one active and one future and warn the user if not
+    pricings: filterNonNullable(pricings)
+      .filter(shouldSavePricing)
+      .map((p) => ({
+        begins: toApiDate(fromUIDate(p.begins)) ?? "",
+        highestPrice: Number(p.highestPrice),
+        highestPriceNet: Number(p.highestPriceNet),
+        lowestPrice: Number(p.lowestPrice),
+        lowestPriceNet: Number(p.lowestPriceNet),
+        ...(p.pk !== 0 ? { pk: p.pk } : {}),
+        ...(p.priceUnit != null ? { priceUnit: p.priceUnit } : {}),
+        pricingType: p.pricingType,
+        status: p.status,
+        ...(p.taxPercentage.pk !== 0
+          ? { taxPercentagePk: p.taxPercentage.pk }
+          : {}),
+      })),
+  };
+}

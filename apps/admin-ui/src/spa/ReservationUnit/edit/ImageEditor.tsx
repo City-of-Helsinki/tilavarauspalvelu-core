@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { Button, FileInput } from "hds-react";
 import { ReservationUnitsReservationUnitImageImageTypeChoices } from "common/types/gql-types";
-import { AutoGrid } from "app/styles/layout";
+import { AutoGrid } from "@/styles/layout";
 import { Image } from "./types";
 
 const Actions = styled.div`
@@ -97,14 +97,16 @@ function ReservationUnitImage({
         ) : (
           <SmallButton
             variant="secondary"
-            onClick={() => makeIntoMainImage(image.pk as number)}
+            disabled={isMain || image.pk == null}
+            onClick={() => makeIntoMainImage(image.pk ?? 0)}
           >
             {t("ImageEditor.useAsMainImage")}
           </SmallButton>
         )}
         <SmallButton
           variant="secondary"
-          onClick={() => deleteImage(image.pk as number)}
+          disabled={image.pk == null}
+          onClick={() => deleteImage(image.pk ?? 0)}
         >
           {t("ImageEditor.deleteImage")}
         </SmallButton>
