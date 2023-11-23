@@ -86,11 +86,12 @@ const OrganisationForm = ({ homeCityOptions }: Props): JSX.Element | null => {
         render={({ field }) => (
           <Select<OptionType>
             label={t("application:Page3.homeCity")}
-            value={homeCityOptions.find((v) => v.value === field.value)}
+            value={homeCityOptions.find((v) => v.value === field.value) ?? null}
             onChange={(v: OptionType) => field.onChange(v.value)}
             required
             options={homeCityOptions}
             error={applicationErrorText(t, errors.homeCity?.type)}
+            invalid={!!errors.homeCity?.type}
           />
         )}
       />
