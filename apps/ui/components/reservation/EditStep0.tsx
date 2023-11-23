@@ -282,8 +282,8 @@ const EditStep0 = ({
       reservationEnds: reservationUnit.reservationEnds
         ? new Date(reservationUnit.reservationEnds)
         : undefined,
-      reservationsMinDaysBefore:
-        reservationUnit.reservationsMinDaysBefore ?? undefined,
+      reservationsMinDaysBefore: reservationUnit.reservationsMinDaysBefore ?? 0,
+      reservationsMaxDaysBefore: reservationUnit.reservationsMaxDaysBefore ?? 0,
       currentDate: focusDate,
       customValidation: (date) => isSlotFree(date),
     });

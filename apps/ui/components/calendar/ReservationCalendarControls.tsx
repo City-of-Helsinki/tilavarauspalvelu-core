@@ -372,6 +372,7 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
         bufferTimeAfter,
         openingHours,
         reservationsMinDaysBefore,
+        reservationsMaxDaysBefore,
         reservations,
         reservationBegins,
         reservationEnds,
@@ -432,6 +433,7 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
             ? new Date(reservationEnds)
             : undefined,
           reservationsMinDaysBefore: reservationsMinDaysBefore ?? 0,
+          reservationsMaxDaysBefore: reservationsMaxDaysBefore ?? 0,
           activeApplicationRounds,
           reservationStartInterval,
         }) ||

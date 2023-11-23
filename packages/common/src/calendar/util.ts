@@ -137,18 +137,23 @@ export const isSlotWithinReservationTime = (
 
 export const isSlotWithinTimeframe = (
   start: Date,
+  reservationsMinDaysBefore: number,
+  reservationsMaxDaysBefore: number,
   reservationBegins?: Date,
-  reservationEnds?: Date,
-  reservationsMinDaysBefore = 0
-): boolean => {
-  return reservationsMinDaysBefore
-    ? isAfter(
-        start,
-        startOfDay(addDays(new Date(), reservationsMinDaysBefore))
-      ) &&
-        isSlotWithinReservationTime(start, reservationBegins, reservationEnds)
-    : isAfter(start, new Date()) &&
-        isSlotWithinReservationTime(start, reservationBegins, reservationEnds);
+  reservationEnds?: Date
+) => {
+  const isLegalTimeframe =
+    isAfter(start, new Date()) &&
+    isSlotWithinReservationTime(start, reservationBegins, reservationEnds);
+  const isAfterMinDaysBefore = !isAfter(
+    start,
+    addDays(new Date(), reservationsMaxDaysBefore)
+  );
+  const isBeforeMaxDaysBefore = !isBefore(
+    start,
+    startOfDay(addDays(new Date(), reservationsMinDaysBefore))
+  );
+  return isLegalTimeframe && isAfterMinDaysBefore && isBeforeMaxDaysBefore;
 };
 
 export type RoundPeriod = {
@@ -206,9 +211,10 @@ export const generateSlots = (
 export const areSlotsReservable = (
   slots: Date[],
   openingHours: OpeningTimesType[],
+  reservationsMinDaysBefore: number,
+  reservationsMaxDaysBefore: number,
   reservationBegins?: Date,
   reservationEnds?: Date,
-  reservationsMinDaysBefore = 0,
   activeApplicationRounds: RoundPeriod[] = [],
   validateEnding = false
 ): boolean => {
@@ -219,9 +225,10 @@ export const areSlotsReservable = (
       areOpeningTimesAvailable(openingHours, slotDate, validateEnding) &&
       isSlotWithinTimeframe(
         slotDate,
+        reservationsMinDaysBefore,
+        reservationsMaxDaysBefore,
         reservationBegins,
-        reservationEnds,
-        reservationsMinDaysBefore
+        reservationEnds
       ) &&
       !doesSlotCollideWithApplicationRounds(slot, activeApplicationRounds)
     );
@@ -234,14 +241,16 @@ export const isRangeReservable = ({
   reservationBegins,
   reservationEnds,
   reservationsMinDaysBefore = 0,
+  reservationsMaxDaysBefore = 0,
   activeApplicationRounds = [],
   reservationStartInterval,
 }: {
   range: Date[];
   openingHours: OpeningTimesType[];
+  reservationsMinDaysBefore: number;
+  reservationsMaxDaysBefore: number;
   reservationBegins?: Date;
   reservationEnds?: Date;
-  reservationsMinDaysBefore: number;
   activeApplicationRounds: RoundPeriod[];
   reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices;
 }): boolean => {
@@ -255,9 +264,10 @@ export const isRangeReservable = ({
       (slot) =>
         isSlotWithinTimeframe(
           slot,
+          reservationsMinDaysBefore,
+          reservationsMaxDaysBefore,
           reservationBegins,
-          reservationEnds,
-          reservationsMinDaysBefore
+          reservationEnds
         ) &&
         !doesSlotCollideWithApplicationRounds(slot, activeApplicationRounds)
     )
@@ -409,16 +419,18 @@ export const getSlotPropGetter =
     reservationBegins,
     reservationEnds,
     reservationsMinDaysBefore,
+    reservationsMaxDaysBefore,
     currentDate,
     customValidation,
   }: {
     openingHours: OpeningTimesType[];
     activeApplicationRounds: RoundPeriod[];
-    reservationBegins?: Date;
-    reservationEnds?: Date;
-    reservationsMinDaysBefore?: number;
+    reservationsMinDaysBefore: number;
+    reservationsMaxDaysBefore: number;
     currentDate: Date;
     customValidation?: (arg: Date) => boolean;
+    reservationBegins?: Date;
+    reservationEnds?: Date;
   }) =>
   (date: Date): SlotProps => {
     const hours = openingHours.filter((n) => {
@@ -432,11 +444,11 @@ export const getSlotPropGetter =
       areSlotsReservable(
         [date],
         hours,
+        reservationsMinDaysBefore,
+        reservationsMaxDaysBefore,
         reservationBegins,
         reservationEnds,
-        reservationsMinDaysBefore,
-        activeApplicationRounds,
-        false
+        activeApplicationRounds
       ) &&
       (customValidation ? customValidation(date) : true)
     ) {

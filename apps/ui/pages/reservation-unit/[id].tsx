@@ -527,6 +527,8 @@ const ReservationUnit = ({
         : undefined,
       reservationsMinDaysBefore:
         reservationUnit?.reservationsMinDaysBefore ?? 0,
+      reservationsMaxDaysBefore:
+        reservationUnit?.reservationsMaxDaysBefore ?? 0,
       currentDate: focusDate,
     });
   }, [
@@ -535,6 +537,7 @@ const ReservationUnit = ({
     reservationUnit?.reservationBegins,
     reservationUnit?.reservationEnds,
     reservationUnit?.reservationsMinDaysBefore,
+    reservationUnit?.reservationsMaxDaysBefore,
     focusDate,
   ]);
 

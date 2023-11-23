@@ -212,6 +212,7 @@ export const isReservationReservable = ({
     maxReservationDuration,
     minReservationDuration,
     reservationStartInterval,
+    reservationsMaxDaysBefore,
     reservationsMinDaysBefore,
     reservationBegins,
     reservationEnds,
@@ -253,6 +254,7 @@ export const isReservationReservable = ({
         ? new Date(reservationBegins)
         : undefined,
       reservationEnds: reservationEnds ? new Date(reservationEnds) : undefined,
+      reservationsMaxDaysBefore: reservationsMaxDaysBefore ?? 0,
       reservationsMinDaysBefore: reservationsMinDaysBefore ?? 0,
       activeApplicationRounds,
       reservationStartInterval,
