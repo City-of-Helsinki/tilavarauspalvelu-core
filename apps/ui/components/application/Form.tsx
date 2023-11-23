@@ -58,7 +58,7 @@ const ApplicationEventFormValueSchema = z
     applicationEventSchedules: z.array(ApplicationEventScheduleFormTypeSchema),
     reservationUnits: z.array(z.number()).min(1, { message: "Required" }),
     // extra page prop, not saved to backend
-    accordianOpen: z.boolean(),
+    accordionOpen: z.boolean(),
     // form specific: new events don't have pks and we need a unique identifier
     formKey: z.string(),
   })
@@ -117,7 +117,7 @@ export const transformApplicationEventToForm = (
     applicationEvent.end != null && applicationEvent.end.includes("-")
       ? apiDateToUIDate(applicationEvent.end)
       : applicationEvent.end ?? undefined,
-  accordianOpen: false,
+  accordionOpen: false,
 });
 
 export const AddressFormValueSchema = z.object({
@@ -347,7 +347,7 @@ export const convertApplicationToForm = (
     reservationUnits: reservationUnits
       .map((ru) => ru.pk)
       .filter((pk): pk is number => pk != null),
-    accordianOpen: true,
+    accordionOpen: true,
   };
   return {
     pk: app?.pk ?? 0,

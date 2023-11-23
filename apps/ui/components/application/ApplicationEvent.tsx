@@ -39,7 +39,7 @@ type Props = {
   applicationRound: ApplicationRoundNode;
   optionTypes: OptionTypes;
   isVisible: boolean;
-  onToggleAccordian: () => void;
+  onToggleAccordion: () => void;
   onDeleteEvent: () => void;
 };
 
@@ -111,7 +111,7 @@ const ApplicationEventInner = ({
   applicationRound,
   optionTypes,
   del,
-}: Omit<Props, "onToggleAccordian" | "onDeleteEvent"> & {
+}: Omit<Props, "onToggleAccordion" | "onDeleteEvent"> & {
   del: () => void;
 }): JSX.Element => {
   const { t, i18n } = useTranslation();
@@ -225,7 +225,9 @@ const ApplicationEventInner = ({
           name={`applicationEvents.${index}.ageGroup`}
           render={({ field }) => (
             <Select<OptionType>
-              value={ageGroupOptions.find((v) => v.value === field.value)}
+              value={
+                ageGroupOptions.find((v) => v.value === field.value) ?? null
+              }
               onChange={(v: OptionType) => field.onChange(v.value)}
               required
               label={t("application:Page1.ageGroup")}
@@ -242,7 +244,9 @@ const ApplicationEventInner = ({
           render={({ field }) => (
             <Select<OptionType>
               label={t("application:Page1.purpose")}
-              value={purposeOptions.find((v) => v.value === field.value)}
+              value={
+                purposeOptions.find((v) => v.value === field.value) ?? null
+              }
               onChange={(v: OptionType) => field.onChange(v.value)}
               required
               options={purposeOptions}
@@ -343,7 +347,7 @@ const ApplicationEventInner = ({
               value={
                 getDurationNumberOptions().find(
                   (x) => x.value === field.value
-                ) ?? { label: "", value: "" }
+                ) ?? null
               }
               placeholder={t("common:select")}
               options={getDurationNumberOptions()}
@@ -367,7 +371,7 @@ const ApplicationEventInner = ({
               value={
                 getDurationNumberOptions().find(
                   (x) => x.value === field.value
-                ) ?? { label: "", value: "" }
+                ) ?? null
               }
               placeholder={t("common:select")}
               options={getDurationNumberOptions()}
@@ -437,12 +441,15 @@ const ApplicationEventInner = ({
 };
 
 const ApplicationEvent = (props: Props): JSX.Element => {
-  const { index, isVisible, onDeleteEvent, onToggleAccordian } = props;
+  const { index, isVisible, onDeleteEvent, onToggleAccordion } = props;
 
   const { t } = useTranslation();
 
   const form = useFormContext<ApplicationFormValues>();
-  const { watch } = form;
+  const {
+    watch,
+    formState: { errors },
+  } = form;
 
   const eventName = watch(`applicationEvents.${index}.name`);
   watch(`applicationEvents.${index}.eventsPerWeek`);
@@ -450,11 +457,14 @@ const ApplicationEvent = (props: Props): JSX.Element => {
 
   const shouldRenderInner = isVisible;
 
+  // TODO requires us to use the accordion from admin-ui instead (or add force open)
+  const hasErrors = errors.applicationEvents?.[index] != null;
+
   return (
     <Wrapper>
       <Accordion
-        onToggle={onToggleAccordian}
-        open={isVisible}
+        onToggle={onToggleAccordion}
+        open={isVisible || hasErrors}
         heading={`${eventName}` || t("application:Page1.applicationEventName")}
         theme="thin"
       >

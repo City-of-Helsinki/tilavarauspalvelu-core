@@ -52,12 +52,12 @@ const Page1 = ({ applicationRound, onNext }: Props): JSX.Element | null => {
 
   const applicationEvents = watch("applicationEvents");
 
-  const isAccordianOpen = (formKey: string) => {
+  const isAccordionOpen = (formKey: string) => {
     const index = applicationEvents?.findIndex((ae) => ae?.formKey === formKey);
     if (index == null) {
       return false;
     }
-    return watch(`applicationEvents.${index}.accordianOpen`);
+    return watch(`applicationEvents.${index}.accordionOpen`);
   };
 
   const handleToggleAccordion = (formKey: string) => {
@@ -65,8 +65,8 @@ const Page1 = ({ applicationRound, onNext }: Props): JSX.Element | null => {
     if (index == null) {
       return;
     }
-    const val = watch(`applicationEvents.${index}.accordianOpen`);
-    setValue(`applicationEvents.${index}.accordianOpen`, !val);
+    const val = watch(`applicationEvents.${index}.accordionOpen`);
+    setValue(`applicationEvents.${index}.accordionOpen`, !val);
   };
 
   const handleDeleteEvent = (formKey: string) => {
@@ -106,7 +106,7 @@ const Page1 = ({ applicationRound, onNext }: Props): JSX.Element | null => {
     setValue(`applicationEvents.${nextIndex}.name`, "");
     setValue(`applicationEvents.${nextIndex}.eventsPerWeek`, 1);
     setValue(`applicationEvents.${nextIndex}.biweekly`, false);
-    setValue(`applicationEvents.${nextIndex}.accordianOpen`, false);
+    setValue(`applicationEvents.${nextIndex}.accordionOpen`, true);
     setValue(`applicationEvents.${nextIndex}.formKey`, `NEW-${nextIndex}`);
   };
 
@@ -133,8 +133,8 @@ const Page1 = ({ applicationRound, onNext }: Props): JSX.Element | null => {
               unitOptions,
             }}
             onDeleteEvent={() => handleDeleteEvent(event.formKey)}
-            onToggleAccordian={() => handleToggleAccordion(event.formKey)}
-            isVisible={isAccordianOpen(event.formKey)}
+            onToggleAccordion={() => handleToggleAccordion(event.formKey)}
+            isVisible={isAccordionOpen(event.formKey)}
           />
         ) : null
       )}
