@@ -45,13 +45,13 @@ import {
 import { breakpoints } from "common/src/common/style";
 import { ReservationUnitByPkType } from "common/types/gql-types";
 import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
-import { MediumButton, truncatedText } from "../../styles/util";
-import { ReservationProps } from "../../context/DataContext";
-import { getDurationOptions } from "../../modules/reservation";
-import { getReservationUnitPrice } from "../../modules/reservationUnit";
+import { MediumButton, truncatedText } from "@/styles/util";
+import { ReservationProps } from "@/context/DataContext";
+import { getDurationOptions } from "@/modules/reservation";
+import { getReservationUnitPrice } from "@/modules/reservationUnit";
 import LoginFragment from "../LoginFragment";
-import { useDebounce } from "../../hooks/useDebounce";
-import { capitalize, formatDurationMinutes } from "../../modules/util";
+import { useDebounce } from "@/hooks/useDebounce";
+import { capitalize, formatDurationMinutes } from "@/modules/util";
 
 type Props<T> = {
   reservationUnit: ReservationUnitByPkType;

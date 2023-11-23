@@ -31,10 +31,10 @@ import { getLocalizationLang } from "common/src/helpers";
 import {
   canReservationTimeBeChanged,
   isReservationReservable,
-} from "../../modules/reservation";
-import { getReservationUnitPrice } from "../../modules/reservationUnit";
-import { formatDurationMinutes, isTouchDevice } from "../../modules/util";
-import { BlackButton, MediumButton } from "../../styles/util";
+} from "@/modules/reservation";
+import { getReservationUnitPrice } from "@/modules/reservationUnit";
+import { formatDurationMinutes, isTouchDevice } from "@/modules/util";
+import { BlackButton, MediumButton } from "@/styles/util";
 import Legend from "../calendar/Legend";
 import ReservationCalendarControls from "../calendar/ReservationCalendarControls";
 import { CalendarWrapper } from "../reservation-unit/ReservationUnitStyles";
