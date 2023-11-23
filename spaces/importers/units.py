@@ -152,12 +152,10 @@ class UnitImporter:
 class UnitHaukiResourceIdImporter:
     resource_id_map: dict[str, str]
     response_page_counter: int
-    hauki_api_client: HaukiAPIClient
 
     def __init__(self):
         self.resource_id_map = {}
         self.response_page_counter = 0
-        self.hauki_api_client = HaukiAPIClient()
 
     def read_response(self, data):
         self.response_page_counter += 1
@@ -181,7 +179,7 @@ class UnitHaukiResourceIdImporter:
 
         logger.info(f"Importing units {units} resource ids from Hauki...")
 
-        response = HaukiAPIClient().get_resources(
+        response = HaukiAPIClient.get_resources(
             hauki_resource_ids=[],
             data_source="tprek",
             origin_id_exists=True,

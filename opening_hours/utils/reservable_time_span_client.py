@@ -152,7 +152,7 @@ class ReservableTimeSpanClient:
             )
 
     def _get_opening_hours_from_hauki_api(self) -> HaukiAPIOpeningHoursResponseItem:
-        return HaukiAPIClient().get_resource_opening_hours(
+        return HaukiAPIClient.get_resource_opening_hours(
             hauki_resource_id=self.origin_hauki_resource.id,
             start_date=self.start_date,
             end_date=self.end_date,

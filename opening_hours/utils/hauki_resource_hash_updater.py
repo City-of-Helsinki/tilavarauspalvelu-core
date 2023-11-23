@@ -52,9 +52,7 @@ class HaukiResourceHashUpdater:
 
     def _fetch_hauki_resources(self):
         """Fetch resources from Hauki API based on the given resource ids."""
-        hauki_api_client = HaukiAPIClient()
-
-        response = hauki_api_client.get_resources(hauki_resource_ids=self.hauki_resource_ids)
+        response = HaukiAPIClient.get_resources(hauki_resource_ids=self.hauki_resource_ids)
 
         self.fetched_hauki_resources: list[HaukiAPIResource] = response["results"]
 
@@ -63,7 +61,7 @@ class HaukiResourceHashUpdater:
         while response.get("next", None):
             resource_page_counter += 1
             logger.info(f"Fetching from Hauki. Page number: {resource_page_counter}")
-            response: HaukiAPIResourceListResponse = hauki_api_client.get(url=response["next"])
+            response: HaukiAPIResourceListResponse = HaukiAPIClient.get(url=response["next"])
             self.fetched_hauki_resources.extend(response["results"])
 
         logger.info(f"Fetched {len(self.fetched_hauki_resources)} hauki resources in total.")

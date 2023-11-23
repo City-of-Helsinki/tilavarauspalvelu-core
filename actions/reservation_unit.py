@@ -10,7 +10,6 @@ from reservation_units.models import ReservationUnit
 class ReservationUnitHaukiExporter:
     def __init__(self, reservation_unit: ReservationUnit):
         self.reservation_unit = reservation_unit
-        self.hauki_api_client = HaukiAPIClient()
 
     def send_reservation_unit_to_hauki(self) -> None:
         # Initialise data for the Hauki API
@@ -79,7 +78,7 @@ class ReservationUnitHaukiExporter:
 
         unit_origin_resource_id = f"tprek:{parent_unit.tprek_id}"
         try:
-            resource_data = self.hauki_api_client.get_resource(hauki_resource_id=unit_origin_resource_id)
+            resource_data = HaukiAPIClient.get_resource(hauki_resource_id=unit_origin_resource_id)
             return resource_data["id"]
         except (HaukiAPIError, HaukiRequestError, KeyError, IndexError, TypeError):
             return None
@@ -87,7 +86,7 @@ class ReservationUnitHaukiExporter:
     def _create_hauki_resource(self, hauki_resource_data):
         """Create a new HaukiResource in Hauki API for the ReservationUnit."""
         # New Hauki Resource, create it in Hauki API and update the reservation unit
-        response_data: HaukiAPIResource = self.hauki_api_client.create_resource(data=hauki_resource_data)
+        response_data: HaukiAPIResource = HaukiAPIClient.create_resource(data=hauki_resource_data)
 
         if not response_data["id"]:
             raise HaukiValueError("Hauki API did not return a resource id.")
@@ -103,4 +102,4 @@ class ReservationUnitHaukiExporter:
         hauki_resource_data["id"] = self.reservation_unit.origin_hauki_resource.id
 
         # Existing Hauki Resource, update it in Hauki API
-        self.hauki_api_client.update_resource(data=hauki_resource_data)
+        HaukiAPIClient.update_resource(data=hauki_resource_data)
