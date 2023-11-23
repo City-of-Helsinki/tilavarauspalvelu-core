@@ -316,8 +316,7 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
     const selectedAppEvents = selectorData
       .map((cell) => cellsToApplicationEventSchedules(cell))
       .map((aes) =>
-        aes
-          .filter((ae) => ae.priority === 300 || ae.priority === 200)
+        aes.filter((ae) => ae.priority === 300 || ae.priority === 200)
       )
       .flat();
     if (selectedAppEvents.length === 0) {
