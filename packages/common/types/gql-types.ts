@@ -4804,6 +4804,8 @@ export type UserType = Node & {
   generalRoles?: Maybe<Array<Maybe<GeneralRoleType>>>;
   /** The ID of the object */
   id: Scalars["ID"]["output"];
+  isAdAuthenticated?: Maybe<Scalars["Boolean"]["output"]>;
+  isStronglyAuthenticated?: Maybe<Scalars["Boolean"]["output"]>;
   /** Antaa käyttäjälle kaikki oikeudet ilman, että niitä täytyy erikseen luetella. */
   isSuperuser: Scalars["Boolean"]["output"];
   lastName: Scalars["String"]["output"];

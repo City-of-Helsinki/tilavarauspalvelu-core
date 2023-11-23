@@ -1516,7 +1516,7 @@ type Query {
     unit: [Int]
     applicant: Int
 
-    """Järjestys"""
+    """Järjestä"""
     orderBy: String
   ): ApplicationNodeConnection
   applicationEvents(
@@ -1543,7 +1543,7 @@ type Query {
     purpose: [Int]
     textSearch: String
 
-    """Järjestys"""
+    """Järjestä"""
     orderBy: String
   ): ApplicationEventNodeConnection
   applicationRounds(
@@ -1555,7 +1555,7 @@ type Query {
     name_Istartswith: String
     pk: [Int]
 
-    """Järjestys"""
+    """Järjestä"""
     orderBy: String
   ): ApplicationRoundNodeConnection
   reservations(
@@ -1587,7 +1587,7 @@ type Query {
     user: ID
     textSearch: String
 
-    """Järjestys"""
+    """Järjestä"""
     orderBy: String
   ): ReservationTypeConnection
   reservationByPk(pk: Int): ReservationType
@@ -1611,7 +1611,7 @@ type Query {
     reservationUnit: [ID]
     reservationUnitType: [ID]
 
-    """Järjestys"""
+    """Järjestä"""
     orderBy: String
   ): RecurringReservationTypeConnection
   reservationCancelReasons(offset: Int, before: String, after: String, first: Int, last: Int, reason: String): ReservationCancelReasonTypeConnection
@@ -1651,7 +1651,7 @@ type Query {
     reservationState: [String]
     onlyWithPermission: Boolean
 
-    """Järjestys"""
+    """Järjestä"""
     orderBy: String
   ): ReservationUnitTypeConnection
   reservationUnit(
@@ -1668,7 +1668,7 @@ type Query {
     first: Int
     last: Int
 
-    """Järjestys"""
+    """Järjestä"""
     orderBy: String
   ): ReservationUnitTypeTypeConnection
   resources(offset: Int, before: String, after: String, first: Int, last: Int, onlyWithPermission: Boolean): ResourceTypeConnection
@@ -1687,7 +1687,7 @@ type Query {
     rankGte: Decimal
     rankLte: Decimal
 
-    """Järjestys"""
+    """Järjestä"""
     orderBy: String
   ): EquipmentTypeConnection
   equipment(
@@ -1709,7 +1709,7 @@ type Query {
     last: Int
     onlyWithPermission: Boolean
 
-    """Järjestys"""
+    """Järjestä"""
     orderBy: String
   ): SpaceTypeConnection
   space(
@@ -1733,7 +1733,7 @@ type Query {
     publishedReservationUnits: Boolean
     ownReservations: Boolean
 
-    """Järjestys"""
+    """Järjestä"""
     orderBy: String
   ): UnitTypeConnection
   unit(
@@ -1753,7 +1753,7 @@ type Query {
     first: Int
     last: Int
 
-    """Järjestys"""
+    """Järjestä"""
     orderBy: String
   ): PurposeTypeConnection
   qualifiers(offset: Int, before: String, after: String, first: Int, last: Int, nameFi: String, nameEn: String, nameSv: String): QualifierTypeConnection
@@ -1779,7 +1779,7 @@ type Query {
     isActive: Boolean
     isVisible: Boolean
 
-    """Järjestys"""
+    """Järjestä"""
     orderBy: String
   ): BannerNotificationNodeConnection
 }
@@ -3071,24 +3071,24 @@ input ReservationUnitCreateMutationInput {
   paymentTypes: [String]
   pricings: [ReservationUnitPricingCreateSerializerInput]
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotSerializerInput]
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
   clientMutationId: String
 }
 
@@ -3196,24 +3196,24 @@ type ReservationUnitCreateMutationPayload {
   paymentTypes: [String]
   pricings: [ReservationUnitPricingType]
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotNode]
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -3745,24 +3745,24 @@ input ReservationUnitUpdateMutationInput {
   paymentTypes: [String]
   pricings: [ReservationUnitPricingUpdateSerializerInput]!
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotSerializerInput]
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
   clientMutationId: String
 }
 
@@ -3869,24 +3869,24 @@ type ReservationUnitUpdateMutationPayload {
   pricingTerms: String
   paymentTypes: [String]
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotNode]
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -4620,12 +4620,12 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
@@ -4638,12 +4638,12 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
@@ -4756,6 +4756,8 @@ type UserType implements Node {
   """The ID of the object"""
   id: ID!
   pk: Int
+  isAdAuthenticated: Boolean
+  isStronglyAuthenticated: Boolean
 }
 
 input UserUpdateMutationInput {

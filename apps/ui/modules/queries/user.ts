@@ -7,7 +7,7 @@ export const CURRENT_USER = gql`
       firstName
       lastName
       email
+      isAdAuthenticated
     }
   }
 `;
-

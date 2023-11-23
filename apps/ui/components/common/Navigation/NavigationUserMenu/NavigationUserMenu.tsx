@@ -118,7 +118,7 @@ const NavigationUserMenu = () => {
   const router = useRouter();
   const { isAuthenticated, user } = useSession();
   const { t } = useTranslation();
-
+  const isAdAuthenticated = user?.isAdAuthenticated;
   const isActive = userMenuItems
     .map((item) => item.path)
     .includes(router.pathname);
@@ -137,7 +137,7 @@ const NavigationUserMenu = () => {
       <NavigationUserMenuUserCard
         user={{ name: userName, email: user?.email }}
       />
-      {env.PROFILE_UI_URL && (
+      {env.PROFILE_UI_URL && isAdAuthenticated && (
         <NavigationUserMenuItem
           href={env.PROFILE_UI_URL}
           icon={<IconLinkExternal aria-hidden />}
