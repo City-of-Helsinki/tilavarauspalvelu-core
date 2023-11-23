@@ -55,7 +55,7 @@ from reservation_units.models import (
 )
 from reservation_units.models import ReservationUnitType as ReservationUnitTypeModel
 from reservations.models import Reservation
-from spaces.models import Space, Unit
+from spaces.models import Space
 from tilavarauspalvelu.utils.date_util import end_of_day, start_of_day
 from utils.query_performance import QueryPerformanceOptimizerMixin
 
@@ -637,8 +637,8 @@ class ReservationUnitByPkType(ReservationUnitType, ReservationUnitWithReservatio
     hauki_url = graphene.Field(ReservationUnitHaukiUrlType)
     reservable_time_spans = graphene.List(
         ReservableTimeSpanType,
-        start_date=graphene.Date(),
-        end_date=graphene.Date(),
+        start_date=graphene.Date(required=True),
+        end_date=graphene.Date(required=True),
     )
 
     class Meta:
@@ -696,20 +696,16 @@ class ReservationUnitByPkType(ReservationUnitType, ReservationUnitWithReservatio
         interfaces = (graphene.relay.Node,)
         connection_class = TVPBaseConnection
 
-    def resolve_hauki_url(self, info):
-        return self
+    def resolve_hauki_url(root, info):
+        return root
 
     def resolve_reservable_time_spans(
-        self: ReservationUnit | Unit,
+        root: ReservationUnit,
         info,
-        start_date: datetime.date | None = None,
-        end_date: datetime.date | None = None,
+        start_date: datetime.date,
+        end_date: datetime.date,
     ) -> list[ReservableTimeSpanType] | None:
-        # All parameters are required to get reservable time spans
-        if not (start_date and end_date):
-            return None
-
-        origin_hauki_resource = self.origin_hauki_resource
+        origin_hauki_resource = root.origin_hauki_resource
 
         if not origin_hauki_resource:
             return None

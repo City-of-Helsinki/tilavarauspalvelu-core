@@ -76,9 +76,6 @@ class GQLResponse:
     def __contains__(self, item: str) -> bool:
         return item not in self.json
 
-    def get(self, name: str, *, default: Any = None) -> dict[str, Any] | None:
-        return (self.data or {}).get(name, default)
-
     @property
     def queries(self) -> list[str]:
         """Return a list of the database queries that were executed."""
