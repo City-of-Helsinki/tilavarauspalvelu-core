@@ -50,7 +50,7 @@ def test__gql__reservation_unit__reservable_time_spans__no_origin_hauki_resource
 
     response = graphql(reservation_unit_time_spans_query(pk=reservation_unit.id))
 
-    assert response.get("errors") is None
+    assert not response.has_errors
     assert response.data == {
         "reservationUnitByPk": {
             "reservableTimeSpans": None,
@@ -66,12 +66,9 @@ def test__gql__reservation_unit__reservable_time_spans__no_start_date(graphql, r
         )
     )
 
-    assert response.get("errors") is None
-    assert response.data == {
-        "reservationUnitByPk": {
-            "reservableTimeSpans": None,
-        }
-    }
+    assert response.has_errors
+    message = "Field 'reservableTimeSpans' argument 'startDate' of type 'Date!' is required, but it was not provided."
+    assert response.errors[0].get("message") == message
 
 
 def test__gql__reservation_unit__reservable_time_spans__no_end_date(graphql, reservation_unit):
@@ -82,18 +79,15 @@ def test__gql__reservation_unit__reservable_time_spans__no_end_date(graphql, res
         )
     )
 
-    assert response.get("errors") is None
-    assert response.data == {
-        "reservationUnitByPk": {
-            "reservableTimeSpans": None,
-        }
-    }
+    assert response.has_errors
+    message = "Field 'reservableTimeSpans' argument 'endDate' of type 'Date!' is required, but it was not provided."
+    assert response.errors[0].get("message") == message
 
 
 def test__gql__reservation_unit__reservable_time_spans__no_results(graphql, reservation_unit):
     response = graphql(reservation_unit_time_spans_query(pk=reservation_unit.id))
 
-    assert response.get("errors") is None
+    assert not response.has_errors
     assert response.data == {
         "reservationUnitByPk": {
             "reservableTimeSpans": [],
@@ -120,7 +114,7 @@ def test__gql__reservation_unit__reservable_time_spans__multiple_days(graphql, r
 
     response = graphql(reservation_unit_time_spans_query(pk=reservation_unit.id))
 
-    assert response.get("errors") is None
+    assert not response.has_errors
     assert response.data["reservationUnitByPk"]["reservableTimeSpans"] == [
         {
             "startDatetime": f"2023-05-01T00:00:00+{UTCOFFSET}",
@@ -161,7 +155,7 @@ def test__gql__reservation_unit__reservable_time_spans__multiple_spans_in_same_d
 
     response = graphql(reservation_unit_time_spans_query(pk=reservation_unit.id))
 
-    assert response.get("errors") is None
+    assert not response.has_errors
     assert response.data["reservationUnitByPk"]["reservableTimeSpans"] == [
         {
             "startDatetime": f"2023-05-01T10:00:00+{UTCOFFSET}",
@@ -191,7 +185,7 @@ def test__gql__reservation_unit__reservable_time_spans__full_day(graphql, reserv
 
     response = graphql(reservation_unit_time_spans_query(pk=reservation_unit.id))
 
-    assert response.get("errors") is None
+    assert not response.has_errors
     assert response.data["reservationUnitByPk"]["reservableTimeSpans"] == [
         {
             "startDatetime": f"2023-05-04T00:00:00+{UTCOFFSET}",
@@ -209,7 +203,7 @@ def test__gql__reservation_unit__reservable_time_spans__multiple_days_long_time_
 
     response = graphql(reservation_unit_time_spans_query(pk=reservation_unit.id))
 
-    assert response.get("errors") is None
+    assert not response.has_errors
     assert response.data["reservationUnitByPk"]["reservableTimeSpans"] == [
         {
             "startDatetime": f"2023-05-10T12:00:00+{UTCOFFSET}",
@@ -237,7 +231,7 @@ def test__gql__reservation_unit__reservable_time_spans__all_timezones_are_in_def
 
     response = graphql(reservation_unit_time_spans_query(pk=reservation_unit.id))
 
-    assert response.get("errors") is None
+    assert not response.has_errors
     assert response.data["reservationUnitByPk"]["reservableTimeSpans"] == [
         {
             "startDatetime": rts1.start_datetime.astimezone(DEFAULT_TIMEZONE).isoformat(),
