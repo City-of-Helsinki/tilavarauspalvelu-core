@@ -109,7 +109,7 @@
       "contactInfo": "Yhteyshenkilön tiedot"
     },
     "as": {
-      "prefix": "Varaan",
+      "prefix": "Luon hakemuksen",
       "type": {
         "ASSOCIATION": "järjestön, ryhmän tai yhteisön puolesta",
         "COMPANY": "yrityksen puolesta",
