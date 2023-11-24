@@ -145,13 +145,17 @@ export const isSlotWithinTimeframe = (
   const isLegalTimeframe =
     isAfter(start, new Date()) &&
     isSlotWithinReservationTime(start, reservationBegins, reservationEnds);
-  const isAfterMinDaysBefore = !isAfter(
-    start,
-    addDays(new Date(), reservationsMaxDaysBefore)
+  const latest = addDays(new Date(), reservationsMaxDaysBefore);
+  // if max days === 0 => latest = today
+  const isBeforeMaxDaysBefore =
+    reservationsMaxDaysBefore === 0 || !isAfter(start, latest);
+  const earliestReservationStart = addDays(
+    new Date(),
+    reservationsMinDaysBefore
   );
-  const isBeforeMaxDaysBefore = !isBefore(
+  const isAfterMinDaysBefore = !isBefore(
     start,
-    startOfDay(addDays(new Date(), reservationsMinDaysBefore))
+    startOfDay(earliestReservationStart)
   );
   return isLegalTimeframe && isAfterMinDaysBefore && isBeforeMaxDaysBefore;
 };
@@ -256,22 +260,28 @@ export const isRangeReservable = ({
 }): boolean => {
   const slots = generateSlots(range[0], range[1], reservationStartInterval);
 
-  return (
-    slots.every((slot) =>
-      areOpeningTimesAvailable(openingHours, slot, false)
-    ) &&
-    range.every(
-      (slot) =>
-        isSlotWithinTimeframe(
-          slot,
-          reservationsMinDaysBefore,
-          reservationsMaxDaysBefore,
-          reservationBegins,
-          reservationEnds
-        ) &&
-        !doesSlotCollideWithApplicationRounds(slot, activeApplicationRounds)
-    )
-  );
+  if (
+    !slots.every((slot) => areOpeningTimesAvailable(openingHours, slot, false))
+  ) {
+    return false;
+  }
+
+  const isSlotReservable = (slot: Date) => {
+    const isInFrame = isSlotWithinTimeframe(
+      slot,
+      reservationsMinDaysBefore,
+      reservationsMaxDaysBefore,
+      reservationBegins,
+      reservationEnds
+    );
+    const collides = doesSlotCollideWithApplicationRounds(
+      slot,
+      activeApplicationRounds
+    );
+    return isInFrame && !collides;
+  };
+
+  return range.every((slot) => isSlotReservable(slot));
 };
 
 export const doReservationsCollide = (
