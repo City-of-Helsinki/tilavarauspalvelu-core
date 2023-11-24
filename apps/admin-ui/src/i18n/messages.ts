@@ -866,10 +866,7 @@ const translations: ITranslations = {
     reservationUnitReadMore: ["Lue lisää varausyksiköistä"],
     hierarchyReadMore: ["Lue lisää tilojen hierarkiasta"],
     reservationUnitCreate: ["Luo uusi varausyksikkö"],
-    noReservationUnitsTitle: ["Ei vielä luotuja varausyksiköitä."],
-    noReservationUnitsInfo: [
-      "Tarkista ennen varausyksiköiden luontia, että olet luonut toimipisteelle aukioloajat sekä tarvittavat tilat ja resurssit.",
-    ],
+    noReservationUnitsTitle: ["Ei luotuja varausyksiköitä."],
     address: ["Osoite"],
     noAddress: ["Osoite puuttuu"],
     location: ["Toimipisteen sijainti"],

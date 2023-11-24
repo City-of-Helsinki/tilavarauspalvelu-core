@@ -13,7 +13,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { H1 } from "common/src/common/typography";
+import { H1, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
   Query,
@@ -131,16 +131,6 @@ const ReservationUnits = styled.div`
   align-items: center;
   justify-content: center;
   padding: var(--spacing-m);
-`;
-
-const NoReservationUnitsTitle = styled.p`
-  font-family: var(--tilavaraus-admin-font-bold);
-  text-align: center;
-`;
-
-const NoReservationUnitsInfo = styled.p`
-  font-size: var(--fontsize-body-s);
-  text-align: center;
 `;
 
 const Unit = (): JSX.Element | null => {
@@ -294,14 +284,7 @@ const Unit = (): JSX.Element | null => {
           />
         ) : (
           <ReservationUnits>
-            <div>
-              <NoReservationUnitsTitle>
-                {t("Unit.noReservationUnitsTitle")}
-              </NoReservationUnitsTitle>
-              <NoReservationUnitsInfo>
-                {t("Unit.noReservationUnitsInfo")}
-              </NoReservationUnitsInfo>
-            </div>
+            <H3 as="p">{t("Unit.noReservationUnitsTitle")}</H3>
           </ReservationUnits>
         )}
       </Container>
