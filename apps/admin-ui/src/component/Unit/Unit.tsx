@@ -7,6 +7,7 @@ import {
   IconLocate,
   IconMap,
   IconPlusCircleFill,
+  Notification,
 } from "hds-react";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -20,26 +21,24 @@ import {
   ReservationUnitType,
   UnitByPkType,
 } from "common/types/gql-types";
-import { StyledNotification } from "@/styles/util";
-import { UNIT_QUERY } from "../../common/queries";
-import { parseAddress } from "../../common/util";
-import { useModal } from "../../context/ModalContext";
-import { ContentContainer, IngressContainer } from "../../styles/layout";
-import { BasicLink } from "../../styles/util";
+import { UNIT_QUERY } from "@/common/queries";
+import { parseAddress } from "@/common/util";
+import { publicUrl } from "@/common/const";
+import { useNotification } from "@/context/NotificationContext";
+import { useModal } from "@/context/ModalContext";
+import { Container } from "@/styles/layout";
+import { BasicLink } from "@/styles/util";
 import Loader from "../Loader";
 import ReservationUnitList from "./ReservationUnitList";
 import ExternalLink from "./ExternalLink";
 import InfoModalContent from "./InfoModalContent";
-import { publicUrl } from "../../common/const";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
-import { useNotification } from "../../context/NotificationContext";
 
 interface IProps {
   [key: string]: string;
   unitPk: string;
 }
 
-const Wrapper = styled.div``;
 const Name = styled(H1).attrs({ $legacy: true })`
   line-height: 46px;
   margin-bottom: 0;
@@ -144,8 +143,6 @@ const NoReservationUnitsInfo = styled.p`
   text-align: center;
 `;
 
-const NoReservationUnits = styled.div``;
-
 const Unit = (): JSX.Element | null => {
   const { notifyError } = useNotification();
   const [isLoading, setIsLoading] = useState(true);
@@ -187,13 +184,24 @@ const Unit = (): JSX.Element | null => {
       ?.filter((x): x is ReservationUnitType => x != null)
       .filter((x) => !x.isArchived) ?? [];
 
+  const route = [
+    {
+      alias: t("breadcrumb.spaces-n-settings"),
+      slug: "",
+    },
+    {
+      alias: t("breadcrumb.units"),
+      slug: `${publicUrl}/premises-and-settings/units`,
+    },
+    {
+      slug: "",
+      alias: unit?.nameFi || "-",
+    },
+  ];
   return (
-    <Wrapper>
-      <BreadcrumbWrapper
-        route={["spaces-n-settings", `${publicUrl}/units`, "route"]}
-        aliases={[{ slug: "route", title: unit?.nameFi || "" }]}
-      />
-      <ContentContainer>
+    <>
+      <BreadcrumbWrapper route={route} />
+      <Container>
         <Links>
           <BasicLink to={`/unit/${unitPk}/map`}>
             <IconMap style={{ marginTop: "-2px" }} /> {t("Unit.showOnMap")}
@@ -209,8 +217,6 @@ const Unit = (): JSX.Element | null => {
             {t("Unit.showConfiguration")}
           </BasicLink>
         </Links>
-      </ContentContainer>
-      <IngressContainer>
         <Ingress>
           <Image src="https://tilavaraus.hel.fi/v1/media/reservation_unit_images/liikumistila2.jfif.250x250_q85_crop.jpg" />
           <div>
@@ -232,7 +238,7 @@ const Unit = (): JSX.Element | null => {
           </div>
         </Ingress>
         {!hasSpacesResources ? (
-          <StyledNotification
+          <Notification
             type="alert"
             label={t("Unit.noSpacesResourcesTitle")}
             size="large"
@@ -241,7 +247,7 @@ const Unit = (): JSX.Element | null => {
             <BasicLink to={`/unit/${unit.pk}/spacesResources`}>
               {t("Unit.createSpaces")}
             </BasicLink>
-          </StyledNotification>
+          </Notification>
         ) : null}
         <div style={{ margin: "var(--spacing-s) 0" }}>
           <ExternalLink
@@ -281,29 +287,25 @@ const Unit = (): JSX.Element | null => {
             {t("Unit.reservationUnitCreate")}
           </StyledBoldButton>
         </Info>
-      </IngressContainer>
-      {reservationUnits.length > 0 ? (
-        <ReservationUnitList
-          reservationUnits={reservationUnits}
-          unitId={unitPk}
-        />
-      ) : (
-        <ContentContainer>
+        {reservationUnits.length > 0 ? (
+          <ReservationUnitList
+            reservationUnits={reservationUnits}
+            unitId={unitPk}
+          />
+        ) : (
           <ReservationUnits>
-            <NoReservationUnits>
-              <div>
-                <NoReservationUnitsTitle>
-                  {t("Unit.noReservationUnitsTitle")}
-                </NoReservationUnitsTitle>
-                <NoReservationUnitsInfo>
-                  {t("Unit.noReservationUnitsInfo")}
-                </NoReservationUnitsInfo>
-              </div>
-            </NoReservationUnits>
+            <div>
+              <NoReservationUnitsTitle>
+                {t("Unit.noReservationUnitsTitle")}
+              </NoReservationUnitsTitle>
+              <NoReservationUnitsInfo>
+                {t("Unit.noReservationUnitsInfo")}
+              </NoReservationUnitsInfo>
+            </div>
           </ReservationUnits>
-        </ContentContainer>
-      )}
-    </Wrapper>
+        )}
+      </Container>
+    </>
   );
 };
 

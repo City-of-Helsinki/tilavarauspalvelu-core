@@ -9,7 +9,6 @@ import { filterData } from "../../common/util";
 import FilterContainer, { FilterBtn } from "../FilterContainer";
 import FilterControls from "../FilterControls";
 import ReservationUnitCard from "./ReservationUnitCard";
-import { ContentContainer } from "../../styles/layout";
 
 interface IProps {
   reservationUnits: ReservationUnitType[];
@@ -86,15 +85,13 @@ const ReservationUnitList = ({
           />
         </>
       </FilterContainer>
-      <ContentContainer>
-        {filteredResults.map((resUnit) => (
-          <ReservationUnitCard
-            reservationUnit={resUnit}
-            unitId={unitId}
-            key={resUnit.pk}
-          />
-        ))}
-      </ContentContainer>
+      {filteredResults.map((resUnit) => (
+        <ReservationUnitCard
+          reservationUnit={resUnit}
+          unitId={unitId}
+          key={resUnit.pk}
+        />
+      ))}
     </>
   );
 };
