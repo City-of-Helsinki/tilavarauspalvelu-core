@@ -242,6 +242,11 @@ const LegendLabel = styled.div`
   white-space: nowrap;
 `;
 
+// scrollable block inside a grid breaks responsivity (grid doesn't)
+const Wrapper = styled.div`
+  display: grid;
+`;
+
 type TimeSelectorProps = {
   applicationEvent: ApplicationEventNode;
 };
@@ -263,9 +268,8 @@ const TimeSelector = ({ applicationEvent }: TimeSelectorProps): JSX.Element => {
       label: t("TimeSelector.secondary"),
     },
   ];
-
   return (
-    <div>
+    <Wrapper>
       <CalendarContainer>
         {weekdays.map((c, i) => (
           <Day key={`day-${c}`} head={t(`calendar.${c}`)} cells={cells[i]} />
@@ -282,7 +286,7 @@ const TimeSelector = ({ applicationEvent }: TimeSelectorProps): JSX.Element => {
           ))}
         </div>
       </LegendContainer>
-    </div>
+    </Wrapper>
   );
 };
 
