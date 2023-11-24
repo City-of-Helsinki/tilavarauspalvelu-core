@@ -1,13 +1,8 @@
-from typing import ParamSpec, TypeVar
-
 import pytest
 from django.core.mail import EmailMessage
 from rest_framework.test import APIClient
 
 from tests.helpers import GraphQLClient
-
-T = TypeVar("T")
-P = ParamSpec("P")
 
 
 @pytest.fixture()
