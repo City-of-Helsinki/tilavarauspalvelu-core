@@ -97,6 +97,17 @@ button {
   color: var(--color-black);
 }
 
+[class*="button_hds-button--primary"] {
+    border-color: var(--color-black-90) !important;
+    background-color: var(--color-black-90) !important;
+    color: var(--color-white) !important;
+}
+
+[class*="button_hds-button--secondary"] {
+  border-color: var(--color-black-90) !important;
+  color: var(--color-black-90) !important;
+}
+
 // cookiehub overrides
 .ch2 {
   color: hotpink;

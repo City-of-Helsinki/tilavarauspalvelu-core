@@ -17,12 +17,8 @@ export const MediumButton = styled(Button)`
 `;
 
 export const BlackButton = styled(Button)`
-  &&& {
-    color: var(--color-black-90);
-    border-color: var(--color-black-90);
-    font-size: var(--fontsize-body-m);
-    ${fontMedium};
-  }
+  font-size: var(--fontsize-body-m);
+  ${fontMedium};
 `;
 
 export const SupplementaryButton = styled(Button).attrs({
