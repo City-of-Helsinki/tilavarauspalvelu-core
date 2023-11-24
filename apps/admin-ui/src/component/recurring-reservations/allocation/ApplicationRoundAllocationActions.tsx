@@ -6,7 +6,6 @@ import { Strong, Strongish } from "common/src/common/typography";
 import styled from "styled-components";
 import type {
   ApplicationEventNode,
-  ApplicationNode,
   ReservationUnitByPkType,
 } from "common/types/gql-types";
 import { ShowAllContainer } from "common/src/components/";
@@ -22,7 +21,6 @@ import {
 import { ApplicationEventScheduleCard } from "./ApplicationEventScheduleCard";
 
 type Props = {
-  applications: ApplicationNode[];
   applicationEvents: ApplicationEventNode[] | null;
   reservationUnit: ReservationUnitByPkType;
   paintedApplicationEvents: ApplicationEventNode[];
@@ -121,7 +119,6 @@ const getTimeLabel = (selection: string[], t: TFunction): string => {
 // TODO this allows allocating when the applicationEvent is already in allocated / failed state
 // which causes a mutation error
 const ApplicationRoundAllocationActions = ({
-  applications,
   applicationEvents,
   reservationUnit,
   paintedApplicationEvents,
@@ -261,7 +258,6 @@ const ApplicationRoundAllocationActions = ({
             primaryApplicationEvents?.map((applicationEvent) => (
               <ApplicationEventScheduleCard
                 key={applicationEvent.pk}
-                applications={applications}
                 applicationEvent={applicationEvent}
                 reservationUnit={reservationUnit}
                 selection={selection}
@@ -284,7 +280,6 @@ const ApplicationRoundAllocationActions = ({
           {otherApplicationEvents.map((applicationEvent) => (
             <ApplicationEventScheduleCard
               key={applicationEvent.pk}
-              applications={applications}
               applicationEvent={applicationEvent}
               reservationUnit={reservationUnit}
               selection={selection}

@@ -80,6 +80,87 @@ export const APPLICATIONS_QUERY = gql`
   }
 `;
 
+// TODO naming
+// TODO query filters
+// TODO priority vs preferredOrder, preferredOrder is the selected reservationUnit order, priority is the primary / secondary
+// TODO check if we can remove some of the fields (and move them to the filter query, ex unit / reservationUnit)
+export const APPLICATION_EVENTS_FOR_ALLOCATION = gql`
+  query getApplicationEvents(
+    $applicationRound: Int
+    $applicationStatus: [ApplicationStatusChoice]
+    $unit: [Int]
+    $preferredOrder: [Int]
+    $priority: [Int]
+    $reservationUnit: [Int]
+  ) {
+    applicationEvents(
+      applicationRound: $applicationRound,
+      applicationStatus: $applicationStatus
+      unit: $unit
+      preferredOrder: $preferredOrder
+      priority: $priority
+      reservationUnit: $reservationUnit
+    ) {
+      edges {
+        node {
+          pk
+          eventsPerWeek
+          minDuration
+          maxDuration
+          eventsPerWeek
+          name
+          status
+          ageGroup {
+            minimum
+            maximum
+          }
+          applicationEventSchedules {
+            pk
+            priority
+            day
+            begin
+            end
+            allocatedReservationUnit {
+              pk
+            }
+            allocatedDay
+            allocatedBegin
+            allocatedEnd
+          }
+          eventReservationUnits {
+            preferredOrder
+            reservationUnit {
+              pk
+              nameFi
+              unit {
+                pk
+                nameFi
+              }
+            }
+          }
+          application {
+            pk
+            status
+            applicant {
+              name
+            }
+            applicantType
+            contactPerson {
+              firstName
+              lastName
+            }
+            organisation {
+              name
+              organisationType
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+// TODO refactor (it's used on the applications page, but it should not require all the deeply nested fields)
 export const APPLICATIONS_BY_APPLICATION_ROUND_QUERY = gql`
   query getApplicationsByPk(
     $applicationRound: Int

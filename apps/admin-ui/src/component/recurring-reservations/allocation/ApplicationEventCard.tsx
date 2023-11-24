@@ -5,7 +5,6 @@ import styled from "styled-components";
 import { Strong } from "common/src/common/typography";
 import {
   ApplicationEventNode,
-  ApplicationNode,
   ReservationUnitByPkType,
 } from "common/types/gql-types";
 import { publicUrl } from "@/common/const";
@@ -18,7 +17,6 @@ type Props = {
   applicationEvent: ApplicationEventNode;
   selectedApplicationEvent?: ApplicationEventNode;
   setSelectedApplicationEvent: (val?: ApplicationEventNode) => void;
-  applications: ApplicationNode[];
   reservationUnit: ReservationUnitByPkType;
   type: AllocationApplicationEventCardType;
 };
@@ -108,7 +106,6 @@ const ApplicationEventCard = ({
   applicationEvent,
   selectedApplicationEvent,
   setSelectedApplicationEvent,
-  applications,
   reservationUnit,
   type,
 }: Props): JSX.Element | null => {
@@ -116,13 +113,17 @@ const ApplicationEventCard = ({
 
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // WHY? don't we already have application? or would it be a circular reference in gql
-  // also can we just refactor this so that applicantName + pk is passed here instead of applications?
-  const application = applications?.find((app) =>
-    app.applicationEvents?.find((ae) => ae?.pk === applicationEvent.pk)
-  );
+  const application = applicationEvent.application ?? null;
 
-  if (!application || !applicationEvent) {
+  // TODO can we pass through without application?
+  if (application?.pk == null) {
+    // eslint-disable-next-line no-console
+    console.warn("ApplicationEventCard: application is missing");
+    return null;
+  }
+  if (!applicationEvent) {
+    // eslint-disable-next-line no-console
+    console.warn("ApplicationEventCard: applicationEvent is missing");
     return null;
   }
 

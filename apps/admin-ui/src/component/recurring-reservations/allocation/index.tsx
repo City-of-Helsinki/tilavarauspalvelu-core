@@ -1,30 +1,37 @@
 import React, { useEffect, useState } from "react";
-import { useQuery as useApolloQuery } from "@apollo/client";
-import { Select, Tabs } from "hds-react";
+import { gql, useQuery } from "@apollo/client";
+import { Select, Tabs, TextInput } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { uniqBy } from "lodash";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import { H1, Strongish } from "common/src/common/typography";
 import {
-  type QueryApplicationsArgs,
   type Query,
-  type ApplicationEventNode,
   ApplicationStatusChoice,
   type ReservationUnitByPkType,
+  type QueryApplicationEventsArgs,
+  type UnitType,
+  type QueryApplicationsArgs,
+  ApplicantTypeChoice,
 } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { AutoGrid, Container } from "@/styles/layout";
-import { OptionType } from "@/common/types";
 import { useNotification } from "@/context/NotificationContext";
 import { useAllocationContext } from "@/context/AllocationContext";
 import Loader from "@/component/Loader";
 import LinkPrev from "@/component/LinkPrev";
 import usePermission from "@/hooks/usePermission";
 import { Permission } from "@/modules/permissionHelper";
-import { APPLICATIONS_BY_APPLICATION_ROUND_QUERY } from "../queries";
-import { getFilteredApplicationEvents } from "./modules/applicationRoundAllocation";
+import { APPLICATION_EVENTS_FOR_ALLOCATION } from "../queries";
 import { ApplicationEvents } from "./ApplicationEvents";
+
+const ALLOCATION_APPLICATION_STATUSES = [
+  ApplicationStatusChoice.Received,
+  ApplicationStatusChoice.Handled,
+  ApplicationStatusChoice.ResultsSent,
+  ApplicationStatusChoice.InAllocation,
+];
 
 type IParams = {
   applicationRoundId: string;
@@ -45,10 +52,43 @@ const Tab = styled(Tabs.Tab)`
   }
 `;
 
+// Separate minimal query to find all possible values for filters
+const APPLICATION_ROUND_QUERY = gql`
+  query Applications($applicationRound: Int!, $status: [ApplicationStatusChoice]!){
+    applications(applicationRound: $applicationRound, status: $status) {
+      edges {
+        node {
+          applicationRound {
+            nameFi
+          }
+          applicationEvents {
+            eventReservationUnits {
+              reservationUnit {
+                pk
+                nameFi
+                unit {
+                  pk
+                  nameFi
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 function ApplicationRoundAllocation({
   applicationRoundId,
+  units,
+  reservationUnits,
+  roundName,
 }: {
   applicationRoundId: number;
+  units: UnitType[];
+  reservationUnits: ReservationUnitByPkType[];
+  roundName: string;
 }): JSX.Element {
   const { refreshApplicationEvents, setRefreshApplicationEvents } =
     useAllocationContext();
@@ -56,29 +96,59 @@ function ApplicationRoundAllocation({
   const [selectedReservationUnit, setSelectedReservationUnit] =
     useState<ReservationUnitByPkType | null>(null);
 
-  const [unitFilter, setUnitFilter] = useState<OptionType | null>(null);
-  const [timeFilter, setTimeFilter] = useState<OptionType[]>([]);
-  const [orderFilter, setOrderFilter] = useState<OptionType[]>([]);
+  type TimeFilterOptions = { label: string; value: 200 | 300 };
+  const [unitFilter, setUnitFilter] = useState<number | null>(null);
+  const [timeFilter, setTimeFilter] = useState<TimeFilterOptions['value'] | null>(null);
+  // TODO change the translation of this
+  const [orderFilter, setOrderFilter] = useState<number | null>(null);
+  // TODO add text search option (hakemus or varaus)
+  // TODO add kotikunta, asiakastyyppi, ikaryhma, kayttotarkoitus
+  const [nameFilter, setNameFilter] = useState<string>("");
+  // TODO requires us to do an options query for all the possible values
+  // pk
+  const [ageGroupFilter, setAgeGroupFilter] = useState<number | null>(null);
+  // TODO rename this to applicantTypeFilter
+  const [customerTypeFilter, setCustomerTypeFilter] = useState<ApplicantTypeChoice | null>(null);
+  // pk
+  const [cityFilter, setCityFilter] = useState<number | null>(null);
+  // pk
+  const [purposeFilter, setPurposeFilter] = useState<number | null>(null);
 
   const { t } = useTranslation();
 
+  const customerFilterOptions = Object.keys(ApplicantTypeChoice).map((value) => ({
+    label: t(`common:applicantType.${value}`),
+    value: value as ApplicantTypeChoice,
+  }));
+  console.log('customerFilterOptions ', customerFilterOptions);
+  // TODO options (move the useOptions hook to common)
+  const cityOptions: { label: string; value: number }[] = []
+  const purposeOptions: { label: string; value: number }[] = []
+  const ageGroupOptions: { label: string; value: number }[] = []
+
+  // TODO filter values should be gotten from the base applicationRound (not calculated from the events, because the events
+  // keep changing based on the filters, so we would always get smaller and smaller amount of options)
   // TODO pagination
   const {
-    loading: loadingApplications,
-    data: applicationsData,
+    data,
     refetch,
-  } = useApolloQuery<Query, QueryApplicationsArgs>(
-    APPLICATIONS_BY_APPLICATION_ROUND_QUERY,
+  } = useQuery<Query, QueryApplicationEventsArgs>(APPLICATION_EVENTS_FOR_ALLOCATION,
     {
       skip: !applicationRoundId,
       variables: {
         applicationRound: applicationRoundId,
-        status: [
-          ApplicationStatusChoice.Received,
-          ApplicationStatusChoice.Handled,
-          ApplicationStatusChoice.ResultsSent,
-          ApplicationStatusChoice.InAllocation,
-        ],
+        ...(unitFilter != null ? { unit: [unitFilter] } : {}),
+        ...(timeFilter != null ? { priority: [timeFilter] } : {}),
+        ...(orderFilter != null ? { preferredOrder: [orderFilter] } : {}),
+        ...(nameFilter != null ? { textSearch: nameFilter } : {}),
+        ...(cityFilter != null ? { homeCity: [cityFilter] } : {}),
+        ...(customerTypeFilter != null ? { applicantType: [customerTypeFilter] } : {}),
+        ...(purposeFilter != null ? { purpose: [purposeFilter] } : {}),
+        ...(ageGroupFilter != null ? { ageGroup: [ageGroupFilter] } : {}),
+        reservationUnit: selectedReservationUnit?.pk != null ? [selectedReservationUnit.pk] : [],
+        /* TODO what is the status we are looking for here? event status
+         * or do we want to use applicationStatus instead */
+        applicationStatus: ALLOCATION_APPLICATION_STATUSES,
       },
       onError: () => {
         notifyError(t("errors.errorFetchingData"));
@@ -86,28 +156,23 @@ function ApplicationRoundAllocation({
     }
   );
 
-  const applications = filterNonNullable(
-    applicationsData?.applications?.edges.map((e) => e?.node)
-  );
+  // TODO if unit selection changes and new list doesn't include the selected reservation unit, clear the selection
 
-  const unitData = filterNonNullable(
-    applications.flatMap((application) =>
-      application?.applicationEvents?.flatMap((ae) =>
-        ae?.eventReservationUnits?.flatMap((eru) => eru?.reservationUnit?.unit)
-      )
-    )
-  );
-  const { hasUnitPermission } = usePermission();
-  const units = uniqBy(unitData, "pk").filter((unit) =>
-    hasUnitPermission(Permission.CAN_VALIDATE_APPLICATIONS, unit)
-  );
+  const applicationEvents = filterNonNullable(data?.applicationEvents?.edges.map((e) => e?.node));
 
   const unitOptions = units.map((unit) => ({
     value: unit.pk ?? 0,
     label: unit.nameFi ?? "",
   }));
 
-  const timeOptions = [300, 200].map((n) => ({
+  useEffect(() => {
+    if (units.length > 0 && unitFilter == null) {
+      setUnitFilter(units[0].pk ?? 0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- this is the correct list, but should be refactored
+  }, [units]);
+
+  const timeOptions = ([300, 200] as const).map((n) => ({
     value: n,
     label: t(`ApplicationEvent.priority.${n}`),
   }));
@@ -131,18 +196,7 @@ function ApplicationRoundAllocation({
     },
   ];
 
-  const allResUnits =
-    applications
-      .flatMap((a) =>
-        a.applicationEvents?.flatMap((ae) =>
-          ae.eventReservationUnits?.flatMap((evtRu) => evtRu?.reservationUnit)
-        )
-      )
-      .filter((ru): ru is ReservationUnitByPkType => ru != null) ?? [];
-
-  const reservationUnits: ReservationUnitByPkType[] = uniqBy(allResUnits, "pk")
-    .filter((ru) => unitFilter?.value === ru?.unit?.pk)
-    .filter((ru): ru is ReservationUnitByPkType => ru != null);
+  const tabResUnits = reservationUnits.filter((ru) => ru?.unit?.pk === unitFilter);
 
   // NOTE rather sketchy: this is the context event listener
   useEffect(() => {
@@ -152,75 +206,104 @@ function ApplicationRoundAllocation({
     }
   }, [refetch, refreshApplicationEvents, setRefreshApplicationEvents]);
 
-  useEffect(() => {
-    if (unitFilter == null && unitOptions.length > 0) {
-      setUnitFilter(unitOptions[0]);
-    }
-  }, [unitOptions, unitFilter]);
-
-  const applicationEvents: ApplicationEventNode[] =
-    getFilteredApplicationEvents(
-      applications,
-      unitFilter,
-      timeFilter,
-      orderFilter,
-      selectedReservationUnit || reservationUnits[0]
-    );
-
-  if (loadingApplications) {
-    return <Loader />;
-  }
 
   return (
     <Container>
       <LinkPrev />
       <H1 $legacy>{t("Allocation.allocationTitle")}</H1>
-      <Ingress>{applications[0]?.applicationRound?.nameFi}</Ingress>
-      <AutoGrid>
+      <Ingress>{roundName}</Ingress>
+      <AutoGrid $minWidth="14rem">
         <Select
           clearButtonAriaLabel={t("common.clearAllSelections")}
           label={t("Allocation.filters.unit")}
-          onChange={(val: OptionType) => {
-            setUnitFilter(val);
+          onChange={(val: { label: string; value: number }) => {
+            setUnitFilter(val.value ?? null);
+            // TODO this is wrong, unless we have a hook that resets the selectedReservationUnit
+            // because it is always selected in the UI (or we have to add all option to the Tab list)
             setSelectedReservationUnit(null);
           }}
-          options={unitOptions as OptionType[]}
-          value={unitFilter}
+          options={unitOptions}
+          value={unitOptions.find((v) => v.value === unitFilter) ?? null}
           placeholder={t("Allocation.filters.selectUnits")}
           selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
         />
+        {/* TODO is this multi select or just no select is all? */}
         <Select
-          onChange={(val) => {
-            setTimeFilter(val);
-          }}
+          onChange={(val?: TimeFilterOptions) => setTimeFilter(val?.value ?? null)}
           options={timeOptions}
-          multiselect
-          value={[...timeFilter]}
+          clearable
+          value={timeOptions.find((v) => v.value === timeFilter) ?? null}
           label={t("Allocation.filters.schedules")}
           placeholder={t("Allocation.filters.selectSchedules")}
           clearButtonAriaLabel={t("common.clearAllSelections")}
           selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
         />
         <Select
-          onChange={(val) => {
-            setOrderFilter(val);
-          }}
+          onChange={(val?: (typeof orderOptions)[0]) => setOrderFilter(val?.value ?? null)}
           label={t("Allocation.filters.reservationUnitOrder")}
-          multiselect
+          clearable
           options={orderOptions}
-          value={[...orderFilter]}
+          value={orderOptions.find((v) => v.value === orderFilter) ?? null}
           placeholder={t("Allocation.filters.selectReservationUnitOrder")}
+          clearButtonAriaLabel={t("common.clearAllSelections")}
+          selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
+        />
+        <TextInput
+          id="search"
+          label={t("Allocation.filters.search")}
+          onChange={(e) => setNameFilter(e.target.value)}
+          value={nameFilter}
+          placeholder={t("Allocation.filters.searchPlaceholder")}
+        />
+        {/* TODO homeCity */}
+        <Select
+          label={t("Allocation.filters.homeCity")}
+          onChange={(val?: (typeof cityOptions)[0]) => setCityFilter(val?.value ?? null)}
+          options={cityOptions}
+          value={cityOptions.find((v) => v.value === cityFilter) ?? null}
+          placeholder={t("Allocation.filters.placeholder.homeCity")}
+          clearButtonAriaLabel={t("common.clearAllSelections")}
+          selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
+        />
+        {/* TODO customer type */}
+       <Select
+          label={t("Allocation.filters.reservationUnitOrder")}
+          onChange={(val?: (typeof customerFilterOptions)[0]) => setCustomerTypeFilter(val?.value ?? null)}
+          options={customerFilterOptions}
+          value={customerFilterOptions.find((v) => v.value === customerTypeFilter) ?? null}
+          placeholder={t("Allocation.filters.placeholder.customerType")}
+          clearButtonAriaLabel={t("common.clearAllSelections")}
+          selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
+        />
+        {/* TODO age group */}
+        <Select
+          label={t("Allocation.filters.ageGroup")}
+          onChange={(val?: (typeof ageGroupOptions)[0]) => setAgeGroupFilter(val?.value ?? null)}
+          options={ageGroupOptions}
+          value={ageGroupOptions.find((v) => v.value === ageGroupFilter) ?? null}
+          placeholder={t("Allocation.filters.placeholder.ageGroup")}
+          clearButtonAriaLabel={t("common.clearAllSelections")}
+          selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
+        />
+        {/* TODO purpose */}
+        <Select
+          label={t("Allocation.filters.purpose")}
+          onChange={(val?: (typeof purposeOptions)[0]) => setPurposeFilter(val?.value ?? null)}
+          options={purposeOptions}
+          value={purposeOptions.find((v) => v.value === purposeFilter) ?? null}
+          placeholder={t("Allocation.filters.placeholder.purpose")}
           clearButtonAriaLabel={t("common.clearAllSelections")}
           selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
         />
       </AutoGrid>
       <Tabs>
         <TabList>
-          {reservationUnits?.map((reservationUnit) => (
+          {/* TODO check if this is correct, it changed from two tabs to one after the filter change
+            * it did improve the usability though (loading state), or it seems like
+            */}
+          {tabResUnits.map((reservationUnit) => (
             <Tab
-              onClick={() => {
-                setSelectedReservationUnit(reservationUnit);
-              }}
+              onClick={() => setSelectedReservationUnit(reservationUnit)}
               key={reservationUnit?.pk}
             >
               {reservationUnit?.nameFi}
@@ -230,14 +313,66 @@ function ApplicationRoundAllocation({
         {/* NOTE: we want the tabs as buttons, without this the HDS tabs break */}
         <Tabs.TabPanel />
       </Tabs>
-      {applicationEvents && applicationEvents.length && unitFilter ? (
-        <ApplicationEvents
-          applications={applications}
-          applicationEvents={applicationEvents}
-          reservationUnit={selectedReservationUnit || reservationUnits[0]}
-        />
-      ) : null}
+      <ApplicationEvents
+        applicationEvents={applicationEvents}
+        reservationUnit={selectedReservationUnit || reservationUnits[0]}
+      />
     </Container>
+  );
+}
+
+// Do a single full query to get filter / page data
+function AllocationWrapper({
+  applicationRoundId,
+}: {
+  applicationRoundId: number;
+}): JSX.Element {
+  const { loading, error, data } = useQuery<Query, QueryApplicationsArgs>(
+    APPLICATION_ROUND_QUERY,
+    {
+      skip: !applicationRoundId,
+      variables: {
+        applicationRound: applicationRoundId ?? 0,
+        status: ALLOCATION_APPLICATION_STATUSES,
+      },
+    }
+  );
+
+  const { hasUnitPermission } = usePermission();
+
+  // TODO don't use spinners, skeletons are better
+  // also this blocks the sub component query (the initial with zero filters) which slows down the page load
+  if (loading) {
+    return <Loader />;
+  }
+  // TODO improve this (disabled filters if error, notify the user, but don't block the whole page)
+  if (error) {
+    console.log('error', error);
+    return <p>Error</p>;
+  }
+
+  const applications = filterNonNullable(data?.applications?.edges?.map((edge) => edge?.node));
+
+  const reservationUnits = applications
+    .flatMap((a) => a.applicationEvents)
+    .flatMap((ae) => ae?.eventReservationUnits?.flatMap((eru) => eru?.reservationUnit))
+  const unitData = reservationUnits.map((ru) => ru?.unit);
+
+  // TODO sort by name (they are in a random order because of the nested structure)
+  const units = uniqBy(filterNonNullable(unitData), "pk").filter((unit) =>
+    hasUnitPermission(Permission.CAN_VALIDATE_APPLICATIONS, unit)
+  );
+
+  const roundName = applications?.[0]?.applicationRound?.nameFi ?? "";
+
+  const resUnits = uniqBy(filterNonNullable(reservationUnits), "pk")
+  return (
+    <ApplicationRoundAllocation
+      applicationRoundId={applicationRoundId}
+      units={units}
+      reservationUnits={resUnits}
+      roundName={roundName}
+    />
   );
 }
 
@@ -249,7 +384,7 @@ function ApplicationRoundAllocationRouted(): JSX.Element {
     return <div>{t("errors.router.invalidApplicationRoundNumber")}</div>;
   }
   return (
-    <ApplicationRoundAllocation
+    <AllocationWrapper
       applicationRoundId={Number(applicationRoundId)}
     />
   );

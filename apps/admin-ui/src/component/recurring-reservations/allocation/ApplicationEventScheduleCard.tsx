@@ -5,7 +5,6 @@ import { Strong } from "common/src/common/typography";
 import { useMutation } from "@apollo/client";
 import {
   ApplicationEventNode,
-  ApplicationNode,
   ReservationUnitByPkType,
   Mutation,
   MutationApproveApplicationEventScheduleArgs,
@@ -26,7 +25,6 @@ import { APPROVE_APPLICATION_EVENT_SCHEDULE } from "../queries";
 
 type Props = {
   applicationEvent: ApplicationEventNode;
-  applications: ApplicationNode[];
   reservationUnit: ReservationUnitByPkType;
   selection: string[];
   applicationEventScheduleResultStatuses: ApplicationEventScheduleResultStatuses;
@@ -76,7 +74,6 @@ const Actions = styled.div`
 
 const ApplicationEventScheduleCard = ({
   applicationEvent,
-  applications,
   reservationUnit,
   selection,
   applicationEventScheduleResultStatuses,
@@ -167,9 +164,7 @@ const ApplicationEventScheduleCard = ({
 
   // WHY? don't we already have application? or would it be a circular reference in gql
   // also can we just refactor this so that applicantName is passed here instead of applications?
-  const application = applications?.find((app) =>
-    app.applicationEvents?.find((ae) => ae?.pk === applicationEvent.pk)
-  );
+  const application = applicationEvent.application ?? null;
   const applicantName =
     application != null ? getApplicantName(application) : "-";
   const isReservable = !selection.some((slot) =>

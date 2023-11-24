@@ -21,6 +21,8 @@ const parseApplicationEventScheduleTime = (
   )}-${Number(applicationEventSchedule.end.substring(0, 2))}`;
 };
 
+/// @deprecated - use backend query params
+/// Can be removed after we move the filters to query (unused)
 export const getFilteredApplicationEvents = (
   applications: ApplicationNode[],
   unitFilter: OptionType | null,

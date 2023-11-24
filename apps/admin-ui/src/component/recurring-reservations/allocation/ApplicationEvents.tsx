@@ -3,13 +3,9 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { sortBy } from "lodash";
 import { H5 } from "common/src/common/typography";
-import {
-  ApplicationEventNode,
-  ApplicationNode,
-  ReservationUnitByPkType,
-} from "common/types/gql-types";
 import { Accordion } from "@/component/Accordion";
-import { AllocationApplicationEventCardType } from "@/common/types";
+import type { ApplicationEventNode, ReservationUnitByPkType } from "common/types/gql-types";
+import type { AllocationApplicationEventCardType } from "@/common/types";
 import AllocationCalendar from "./AllocationCalendar";
 import ApplicationRoundAllocationActions from "./ApplicationRoundAllocationActions";
 import ApplicationEventCard from "./ApplicationEventCard";
@@ -49,11 +45,12 @@ const StyledAccordion = styled(Accordion)`
   }
 `;
 
+/// @deprecated - this is awful we need to remove applications from here
+/// the new query returns only application events (they do include their own application if needed)
 const EventGroupList = ({
   applicationEvents,
   selectedApplicationEvent,
   setSelectedApplicationEvent,
-  applications,
   reservationUnit,
   type,
 }: {
@@ -62,7 +59,6 @@ const EventGroupList = ({
   setSelectedApplicationEvent: (
     applicationEvent?: ApplicationEventNode
   ) => void;
-  applications: ApplicationNode[];
   reservationUnit: ReservationUnitByPkType;
   type: AllocationApplicationEventCardType;
 }): JSX.Element => {
@@ -77,7 +73,6 @@ const EventGroupList = ({
           applicationEvent={applicationEvent}
           selectedApplicationEvent={selectedApplicationEvent}
           setSelectedApplicationEvent={setSelectedApplicationEvent}
-          applications={applications}
           reservationUnit={reservationUnit}
           type={type}
         />
@@ -87,14 +82,12 @@ const EventGroupList = ({
 };
 
 type ApplicationEventsProps = {
-  applications: ApplicationNode[];
   applicationEvents: ApplicationEventNode[] | null;
   reservationUnit: ReservationUnitByPkType;
 };
 
 /// TODO what is this doing? when is it shown and what does it look like?
 function ApplicationEvents({
-  applications,
   applicationEvents,
   reservationUnit,
 }: ApplicationEventsProps): JSX.Element {
@@ -156,7 +149,6 @@ function ApplicationEvents({
             applicationEvents={unallocatedApplicationEvents}
             selectedApplicationEvent={selectedApplicationEvent}
             setSelectedApplicationEvent={setSelectedApplicationEvent}
-            applications={applications}
             reservationUnit={reservationUnit}
             type="unallocated"
           />
@@ -166,7 +158,6 @@ function ApplicationEvents({
               applicationEvents={allocatedApplicationEvents}
               selectedApplicationEvent={selectedApplicationEvent}
               setSelectedApplicationEvent={setSelectedApplicationEvent}
-              applications={applications}
               reservationUnit={reservationUnit}
               type="allocated"
             />
@@ -197,7 +188,6 @@ function ApplicationEvents({
         }
       />
       <ApplicationRoundAllocationActions
-        applications={applications}
         applicationEvents={applicationEvents}
         reservationUnit={reservationUnit}
         paintedApplicationEvents={paintedApplicationEvents}
