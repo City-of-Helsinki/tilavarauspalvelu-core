@@ -4,10 +4,6 @@ on:
   # Trigger when any action on a pull request is taken.
   pull_request_target:
 
-env:
-  # PRs created by these bots are auto approved and merged if tests pass.
-  bots: '["dependabot[bot]", "pre-commit-ci[bot]"]'
-
 jobs:
   approve:
     runs-on: ubuntu-latest
@@ -15,8 +11,9 @@ jobs:
       pull-requests: write  # allows approving the PR
       contents: write  # allows merging the PR
 
-    # Only run if one of the selected authors is the pull request author.
-    if: contains(fromJSON(env.bots), github.event.pull_request.user.login)
+    # Only run if one of the defined bots is the pull request author.
+    # https://github.com/City-of-Helsinki/tilavarauspalvelu-core/settings/variables/actions
+    if: contains(fromJSON(vars.BOTS), github.event.pull_request.user.login)
 
     steps:
       - name: "Check out repository"
