@@ -9,7 +9,7 @@ import type {
   ApplicationEventScheduleNode,
   ApplicationNode,
   Query,
-  QueryApplicationRoundsArgs,
+  QueryReservationByPkArgs,
 } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { useQuery } from "@apollo/client";
@@ -216,16 +216,16 @@ const getApplicationEventsWhichMinDurationsIsNotFulfilled = (
 
 const Page2 = ({ application, onNext }: Props): JSX.Element => {
   const { t } = useTranslation();
-  const { data: applicationRound } = useQuery<
-    Query,
-    QueryApplicationRoundsArgs
-  >(RESERVATION_UNIT, {
-    variables: {
-      pk: [application.applicationRound.pk ?? 0],
-    },
-    skip: !application.applicationRound.pk,
-    fetchPolicy: "no-cache",
-  });
+  const { data: applicationRound } = useQuery<Query, QueryReservationByPkArgs>(
+    RESERVATION_UNIT,
+    {
+      variables: {
+        pk: application.applicationRound.pk ?? 0,
+      },
+      skip: !application.applicationRound.pk,
+      fetchPolicy: "no-cache",
+    }
+  );
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [minDurationMsg, setMinDurationMsg] = useState(true);
