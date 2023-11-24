@@ -1,6 +1,5 @@
 import pytest
 
-from actions.reservation_unit import ReservationUnitHaukiExporter
 from opening_hours.errors import HaukiAPIError
 from opening_hours.utils.hauki_api_client import HaukiAPIClient
 from reservation_units.models import ReservationUnit
@@ -32,8 +31,7 @@ def reservation_unit() -> ReservationUnit:
 # Parent ID got from ReservationUnit.unit.origin_hauki_resource
 def test__hauki_exporter__get_parent_id__ok__unit_has_origin_hauki_resource(reservation_unit):
     assert reservation_unit.unit.origin_hauki_resource.id == 888
-    exporter = ReservationUnitHaukiExporter(reservation_unit)
-    parent_id = exporter._get_parent_resource_id()
+    parent_id = reservation_unit.actions._get_parent_resource_id()
 
     assert parent_id == 888
 
@@ -41,16 +39,14 @@ def test__hauki_exporter__get_parent_id__ok__unit_has_origin_hauki_resource(rese
 @patch_method(HaukiAPIClient.get_resource, return_value={"id": 1})
 def test__hauki_exporter__get_parent_id__ok__fetched_from_hauki_api(reservation_unit):
     reservation_unit.unit.origin_hauki_resource = None
-    exporter = ReservationUnitHaukiExporter(reservation_unit)
-    parent_id = exporter._get_parent_resource_id()
+    parent_id = reservation_unit.actions._get_parent_resource_id()
 
     assert parent_id == 1
 
 
 def test__hauki_exporter__get_parent_id__fail__no_unit(reservation_unit):
     reservation_unit.unit = None
-    exporter = ReservationUnitHaukiExporter(reservation_unit)
-    parent_id = exporter._get_parent_resource_id()
+    parent_id = reservation_unit.actions._get_parent_resource_id()
 
     assert parent_id is None
 
@@ -58,8 +54,7 @@ def test__hauki_exporter__get_parent_id__fail__no_unit(reservation_unit):
 @patch_method(HaukiAPIClient.get_resource, return_value=None)
 def test__hauki_exporter__get_parent_id__fail__does_not_exist_in_hauki_api(reservation_unit):
     reservation_unit.unit.origin_hauki_resource = None
-    exporter = ReservationUnitHaukiExporter(reservation_unit)
-    parent_id = exporter._get_parent_resource_id()
+    parent_id = reservation_unit.actions._get_parent_resource_id()
 
     assert parent_id is None
 
@@ -67,8 +62,7 @@ def test__hauki_exporter__get_parent_id__fail__does_not_exist_in_hauki_api(reser
 @patch_method(HaukiAPIClient.get_resource, side_effect=HaukiAPIError())
 def test__hauki_exporter__get_parent_id__fail__hauki_api_error(reservation_unit):
     reservation_unit.unit.origin_hauki_resource = None
-    exporter = ReservationUnitHaukiExporter(reservation_unit)
-    parent_id = exporter._get_parent_resource_id()
+    parent_id = reservation_unit.actions._get_parent_resource_id()
 
     assert parent_id is None
 
@@ -80,8 +74,7 @@ def test__hauki_exporter__get_parent_id__fail__hauki_api_error(reservation_unit)
 
 @patch_method(HaukiAPIClient.get_resource, return_value={"id": 1})
 def test__hauki_exporter__convert_reservation_unit_to_hauki_resource(reservation_unit):
-    exporter = ReservationUnitHaukiExporter(reservation_unit)
-    res_object = exporter._convert_reservation_unit_to_hauki_resource_data()
+    res_object = reservation_unit.actions._convert_reservation_unit_to_hauki_resource_data()
 
     assert res_object is not None
 
@@ -115,7 +108,7 @@ _mocked_send_return_value = {
 def test__hauki_exporter__send_reservation_unit_to_hauki__create_new_resource(reservation_unit):
     reservation_unit.origin_hauki_resource = None
 
-    ReservationUnitHaukiExporter(reservation_unit).send_reservation_unit_to_hauki()
+    reservation_unit.actions.send_reservation_unit_to_hauki()
 
     assert HaukiAPIClient.create_resource.call_count > 0
     assert ReservationUnit.objects.first().origin_hauki_resource.id == 222
@@ -123,6 +116,6 @@ def test__hauki_exporter__send_reservation_unit_to_hauki__create_new_resource(re
 
 @patch_method(HaukiAPIClient.update_resource, return_value=_mocked_send_return_value)
 def test__hauki_exporter__send_reservation_unit_to_hauki__update_existing_resource(reservation_unit):
-    ReservationUnitHaukiExporter(reservation_unit).send_reservation_unit_to_hauki()
+    reservation_unit.actions.send_reservation_unit_to_hauki()
 
     assert HaukiAPIClient.update_resource.call_count > 0

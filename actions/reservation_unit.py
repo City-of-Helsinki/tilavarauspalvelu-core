@@ -1,15 +1,26 @@
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from opening_hours.errors import HaukiAPIError, HaukiRequestError, HaukiValueError
 from opening_hours.models import OriginHaukiResource
 from opening_hours.utils.hauki_api_client import HaukiAPIClient
 from opening_hours.utils.hauki_api_types import HaukiAPIResource, HaukiTranslatedField
-from reservation_units.models import ReservationUnit
+
+if TYPE_CHECKING:
+    from reservation_units.models import ReservationUnit
+
+__all__ = [
+    "ReservationUnitActions",
+]
 
 
 class ReservationUnitHaukiExporter:
-    def __init__(self, reservation_unit: ReservationUnit):
-        self.reservation_unit = reservation_unit
+    """
+    Contains methods for sending ReservationUnit data to Hauki API.
+
+    Kept separate from ReservationUnitActions to keep the class smaller and easier to read.
+    """
+
+    reservation_unit: "ReservationUnit"
 
     def send_reservation_unit_to_hauki(self) -> None:
         # Initialise data for the Hauki API
@@ -103,3 +114,8 @@ class ReservationUnitHaukiExporter:
 
         # Existing Hauki Resource, update it in Hauki API
         HaukiAPIClient.update_resource(data=hauki_resource_data)
+
+
+class ReservationUnitActions(ReservationUnitHaukiExporter):
+    def __init__(self, reservation_unit: "ReservationUnit"):
+        self.reservation_unit = reservation_unit

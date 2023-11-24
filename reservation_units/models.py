@@ -17,6 +17,7 @@ from elasticsearch_django.models import (
     SearchResultsQuerySet,
 )
 
+from common.connectors import ReservationUnitActionsConnector
 from merchants.models import PaymentAccounting, PaymentMerchant, PaymentProduct
 from reservation_units.enums import ReservationState, ReservationUnitState
 from reservation_units.tasks import (
@@ -537,6 +538,7 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
     )
 
     objects = ReservationUnitManager.from_queryset(ReservationUnitQuerySet)()
+    actions = ReservationUnitActionsConnector()
 
     class Meta:
         base_manager_name = "objects"
