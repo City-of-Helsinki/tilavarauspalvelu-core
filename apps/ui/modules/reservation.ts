@@ -1,4 +1,4 @@
-import { addMinutes, isAfter, isValid } from "date-fns";
+import { addMinutes, addSeconds, isAfter, isValid } from "date-fns";
 import camelCase from "lodash/camelCase";
 import { secondsToHms } from "common/src/common/util";
 import {
@@ -75,12 +75,12 @@ export const isReservationWithinCancellationPeriod = (
   reservation: ReservationType
 ): boolean => {
   const reservationUnit = reservation.reservationUnits?.[0];
-  let now = new Date().getTime() / 1000;
-  const begin = new Date(reservation.begin).getTime() / 1000;
-  if (reservationUnit?.cancellationRule?.canBeCancelledTimeBefore)
-    now += reservationUnit.cancellationRule.canBeCancelledTimeBefore;
+  const begin = new Date(reservation.begin)
 
-  return now > begin;
+  const minutesBeforeCancel = reservationUnit?.cancellationRule?.canBeCancelledTimeBefore ?? 0;
+  const cancelLatest = addSeconds(new Date(), minutesBeforeCancel);
+
+  return cancelLatest > begin;
 };
 
 export const canUserCancelReservation = (

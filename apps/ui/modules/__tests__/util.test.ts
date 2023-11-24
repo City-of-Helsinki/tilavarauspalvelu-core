@@ -1,9 +1,5 @@
 import { ApolloError } from "@apollo/client";
 import {
-  ApplicationEventSchedulePriority,
-  Cell,
-} from "common";
-import {
   getComboboxValues,
   getReadableList,
   printErrorMessages,
@@ -17,16 +13,6 @@ jest.mock("next-i18next", () => ({
     },
   },
 }));
-
-const cell = (
-  hour: number,
-  state: ApplicationEventSchedulePriority | false
-): Cell => ({
-  label: "cell",
-  key: "key",
-  hour,
-  state,
-});
 
 test("getComboboxValues", () => {
   const optionsAbc = [

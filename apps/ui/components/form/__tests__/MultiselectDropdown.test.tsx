@@ -40,7 +40,7 @@ const title = "test title";
 const inputPlaceholder = "Kirjoita hakusana";
 const toggleInputTestId = "multiselect-dropdown-toggle";
 
-const defaultProps: MultiselectDropdownProps = {
+const defaultProps: MultiSelectDropdownProps = {
   id: "test",
   checkboxName: "multiselect-dropdown",
   icon: <div />,
@@ -52,7 +52,7 @@ const defaultProps: MultiselectDropdownProps = {
   title,
   value: [],
 };
-const renderComponent = (props?: Partial<MultiselectDropdownProps>) =>
+const renderComponent = (props?: Partial<MultiSelectDropdownProps>) =>
   render(<MultiSelectDropdown {...defaultProps} {...props} />);
 
 test("for accessibility violations", async () => {
@@ -108,9 +108,7 @@ test("should reset keyboard navigation position after a new search", async () =>
 
   arrowDownKeyPressHelper();
 
-  const checkbox = await (
-    await screen.findByRole("checkbox", { name: options[0].label })
-  ).parentElement.parentElement;
+  const checkbox = (await screen.findByRole("checkbox", { name: options[0].label })).parentElement?.parentElement;
   expect(checkbox).toHaveClass("dropdownItem--isFocused");
 
   // Find something, then reset the search to ensure that all results are listed
@@ -122,7 +120,7 @@ test("should reset keyboard navigation position after a new search", async () =>
   // No element should have focus
   allOptions.forEach((label) => {
     expect(
-      screen.getByRole("checkbox", { name: label }).parentElement.parentElement
+      screen.getByRole("checkbox", { name: label }).parentElement?.parentElement
     ).not.toHaveClass("dropdownItem--isFocused");
   });
 });
@@ -139,7 +137,7 @@ describe("ArrowUp, ArrowDown", () => {
 
     const checkbox1 = (
       await screen.findByRole("checkbox", { name: options[1].label })
-    ).parentElement.parentElement;
+    ).parentElement?.parentElement;
 
     expect(checkbox1).toHaveClass("dropdownItem--isFocused");
 
@@ -147,7 +145,7 @@ describe("ArrowUp, ArrowDown", () => {
 
     const checkbox0 = (
       await screen.findByRole("checkbox", { name: options[0].label })
-    ).parentElement.parentElement;
+    ).parentElement?.parentElement;
 
     expect(checkbox0).toHaveClass("dropdownItem--isFocused");
   });
@@ -162,7 +160,7 @@ describe("ArrowUp, ArrowDown", () => {
 
     const checkboxLast = screen.getByRole("checkbox", {
       name: options[options.length - 1].label,
-    }).parentElement.parentElement;
+    }).parentElement?.parentElement;
 
     expect(checkboxLast).toHaveClass("dropdownItem--isFocused");
   });
@@ -231,7 +229,7 @@ test("should not open dropdown when user focuses toggle button", async () => {
   const toggleButton = await screen.findByTestId(toggleInputTestId);
   fireEvent.focus(toggleButton);
 
-  const checkbox = await screen.queryByRole("checkbox", {
+  const checkbox = screen.queryByRole("checkbox", {
     name: options[0].label,
   });
 
@@ -257,7 +255,7 @@ test("should call onChange when clicking checkbox", async () => {
   await userEvent.click(toggleButton);
 
   const checkbox = screen.queryByRole("checkbox", { name: options[0].label });
-  await userEvent.click(checkbox);
+  await userEvent.click(checkbox!);
 
   expect(onChange).toBeCalledWith([options[0].value]);
 });
@@ -269,7 +267,7 @@ test("should uncheck option", async () => {
   await userEvent.click(toggleButton);
 
   const checkbox = screen.queryByRole("checkbox", { name: options[0].label });
-  await userEvent.click(checkbox);
+  await userEvent.click(checkbox!);
 
   expect(onChange).toBeCalledWith([]);
 });

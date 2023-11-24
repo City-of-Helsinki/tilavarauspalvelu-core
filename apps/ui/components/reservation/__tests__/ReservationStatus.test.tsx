@@ -5,17 +5,20 @@ import { render, screen } from "../../../test/testUtils";
 import ReservationStatus, { Props } from "../ReservationStatus";
 import mockTranslations from "../../../public/locales/fi/reservations.json";
 
+// TODO use a proper mocking solution in setup
 jest.mock("next-i18next", () => ({
   useTranslation: () => {
     return {
       t: (str: string, params?: Record<string, string | number>) => {
         const path = str.replace("reservations:", "");
         const key =
+          // @ts-expect-error
           mockGet(mockTranslations, `${path}_other`) && params?.count > 1
             ? `${path}_other`
             : path;
         return mockGet(mockTranslations, key)?.replace(
           /{{(.*?)}}/g,
+          // @ts-expect-error
           (val, paramKey) => (params[paramKey] ? params[paramKey] : val)
         );
       },

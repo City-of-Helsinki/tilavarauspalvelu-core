@@ -4,17 +4,20 @@ import { render, screen } from "../../../test/testUtils";
 import ListWithPagination, { Props } from "../ListWithPagination";
 import mockTranslations from "../../../public/locales/fi/searchResultList.json";
 
+// TODO use a proper mocking solution in setup
 jest.mock("next-i18next", () => ({
   useTranslation: () => {
     return {
       t: (str: string, params?: Record<string, string | number>) => {
         const path = str.replace("searchResultList:", "");
         const key =
+          // @ts-expect-error
           mockGet(mockTranslations, `${path}_other`) && params?.count > 1
             ? `${path}_other`
             : path;
         return mockGet(mockTranslations, key)?.replace(
           /{{(.*?)}}/g,
+          // @ts-expect-error
           (val, paramKey) => (params[paramKey] ? params[paramKey] : val)
         );
       },
@@ -37,7 +40,7 @@ const defaultProps: Props = {
 };
 
 const getItems = (length: number): JSX.Element[] => {
-  return Array.from({ length }, (val, i) => <div key={i}>{i + 1}</div>);
+  return Array.from({ length }, (_val, i) => <div key={i}>{i + 1}</div>);
 };
 
 const renderComponent = (props?: Partial<Props>) =>
@@ -59,7 +62,7 @@ describe("ListWithPagination", () => {
     expect(
       screen
         .queryByTestId("list-with-pagination__list--container")
-        .querySelectorAll("div")
+        ?.querySelectorAll("div")
     ).toHaveLength(itemCount);
     expect(screen.queryByTestId("loading-spinner")).toBeNull();
     expect(
@@ -84,7 +87,7 @@ describe("ListWithPagination", () => {
     expect(
       screen
         .queryByTestId("list-with-pagination__list--container")
-        .querySelectorAll("div")
+        ?.querySelectorAll("div")
     ).toHaveLength(itemCount);
     expect(screen.queryByTestId("loading-spinner")).toBeNull();
     expect(
@@ -136,7 +139,7 @@ describe("ListWithPagination", () => {
     expect(
       screen
         .queryByTestId("list-with-pagination__list--container")
-        .querySelectorAll("div")
+        ?.querySelectorAll("div")
     ).toHaveLength(10);
     expect(
       screen.queryByTestId("list-with-pagination__hit-count")
