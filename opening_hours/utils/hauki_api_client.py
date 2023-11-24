@@ -1,6 +1,6 @@
 import datetime
 import json
-from typing import TypedDict
+from typing import NotRequired, TypedDict, Unpack
 
 from django.conf import settings
 from requests import Response, request
@@ -24,14 +24,14 @@ logger = logging.getLogger(__name__)
 
 
 class HaukiGetResourcesParams(TypedDict):
-    resource_ids: str  # Comma separated list of UUIDs. Supports [data_source_id]:[origin_id] style ids
-    parent: str  # ID of the parent resource
-    child: str  # ID of a child resource
-    data_source: str  # ID of the data source
-    origin_id_exists: bool  # Filter by existing/missing origin_id
-    ordering: str
-    page: int
-    page_size: int
+    resource_ids: NotRequired[str]  # Comma separated list of UUIDs. Supports [data_source_id]:[origin_id] style ids
+    parent: NotRequired[str]  # ID of the parent resource
+    child: NotRequired[str]  # ID of a child resource
+    data_source: NotRequired[str]  # ID of the data source
+    origin_id_exists: NotRequired[bool]  # Filter by existing/missing origin_id
+    ordering: NotRequired[str]
+    page: NotRequired[int]
+    page_size: NotRequired[int]
 
 
 class HaukiAPIClient:
@@ -44,7 +44,7 @@ class HaukiAPIClient:
         cls,
         *,
         hauki_resource_ids: list[int],
-        **kwargs: HaukiGetResourcesParams,
+        **kwargs: Unpack[HaukiGetResourcesParams],
     ) -> HaukiAPIResourceListResponse:
         # Prepare the URL
         url = cls._build_url("resource")
