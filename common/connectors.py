@@ -1,10 +1,11 @@
 from django.db import models
 
 __all__ = [
+    "ApplicationActionsConnector",
     "ApplicationEventActionsConnector",
     "ApplicationEventScheduleActionsConnector",
-    "ApplicationActionsConnector",
     "ApplicationRoundActionsConnector",
+    "ReservationUnitActionsConnector",
 ]
 
 
@@ -18,6 +19,14 @@ def _raise_if_accessed_on_class(instance: models.Model | None) -> None:
 # This also helps keep the actual model class smaller and thus easier to read.
 #
 # There is a bit of repetition in the connectors, but it is/seems necessary to for better autocomplete.
+
+
+class ApplicationActionsConnector:
+    def __get__(self, instance, _):
+        _raise_if_accessed_on_class(instance)
+        from actions.application import ApplicationActions
+
+        return ApplicationActions(instance)
 
 
 class ApplicationEventActionsConnector:
@@ -36,17 +45,17 @@ class ApplicationEventScheduleActionsConnector:
         return ApplicationEventScheduleActions(instance)
 
 
-class ApplicationActionsConnector:
-    def __get__(self, instance, _):
-        _raise_if_accessed_on_class(instance)
-        from actions.application import ApplicationActions
-
-        return ApplicationActions(instance)
-
-
 class ApplicationRoundActionsConnector:
     def __get__(self, instance, _):
         _raise_if_accessed_on_class(instance)
         from actions.application_round import ApplicationRoundActions
 
         return ApplicationRoundActions(instance)
+
+
+class ReservationUnitActionsConnector:
+    def __get__(self, instance, _):
+        _raise_if_accessed_on_class(instance)
+        from actions.reservation_unit import ReservationUnitActions
+
+        return ReservationUnitActions(instance)

@@ -7,7 +7,6 @@ from graphene_file_upload.scalars import Upload
 from graphql import GraphQLError
 from rest_framework.generics import get_object_or_404
 
-from actions.reservation_unit import ReservationUnitHaukiExporter
 from api.graphql.extensions.legacy_helpers import OldAuthDeleteMutation, OldAuthSerializerMutation
 from api.graphql.types.reservation_units.permissions import (
     EquipmentCategoryPermission,
@@ -154,9 +153,8 @@ class ReservationUnitMutationMixin:
         if not settings.HAUKI_EXPORTS_ENABLED:
             return mutation_response
 
-        exporter = ReservationUnitHaukiExporter(reservation_unit)
         try:
-            exporter.send_reservation_unit_to_hauki()
+            reservation_unit.actions.send_reservation_unit_to_hauki()
         except (HaukiRequestError, HaukiAPIError):
             raise GraphQLError("Sending reservation unit as resource to HAUKI failed.")
 
