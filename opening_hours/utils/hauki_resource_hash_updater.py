@@ -1,4 +1,7 @@
+from datetime import datetime, time
+
 from django.utils import timezone
+from django.utils.timezone import get_default_timezone
 
 from opening_hours.errors import ReservableTimeSpanClientNothingToDoError, ReservableTimeSpanClientValueError
 from opening_hours.models import OriginHaukiResource
@@ -8,6 +11,8 @@ from opening_hours.utils.reservable_time_span_client import ReservableTimeSpanCl
 from tilavarauspalvelu.utils.logging import getLogger
 
 logger = getLogger(__name__)
+
+DEFAULT_TIMEZONE = get_default_timezone()
 
 
 class HaukiResourceHashUpdater:
@@ -91,7 +96,13 @@ class HaukiResourceHashUpdater:
 
             # Delete all new reservable time spans for the resource.
             # Old time spans are not deleted, as they are kept for archival purposes.
-            origin_hauki_resource.reservable_time_spans.filter(end_datetime__gte=cutoff_date).delete()
+            origin_hauki_resource.reservable_time_spans.filter(start_datetime__gte=cutoff_date).delete()
+
+            # If there are any ReservableTimeSpans that overlap with the cutoff date, have them end at the cutoff date.
+            # This way we can keep all past data, and have the new data start from the cutoff date.
+            origin_hauki_resource.reservable_time_spans.filter(end_datetime__gte=cutoff_date).update(
+                end_datetime=datetime.combine(cutoff_date, time.min, tzinfo=DEFAULT_TIMEZONE)
+            )
 
             self.resources_updated.append(origin_hauki_resource)
 

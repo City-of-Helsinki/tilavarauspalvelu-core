@@ -2,6 +2,7 @@ import datetime
 
 import freezegun
 import pytest
+from django.utils.timezone import get_default_timezone
 
 from opening_hours.models import OriginHaukiResource, ReservableTimeSpan
 from opening_hours.utils.hauki_api_client import HaukiAPIClient
@@ -14,6 +15,8 @@ from tests.helpers import patch_method
 pytestmark = [
     pytest.mark.django_db,
 ]
+
+DEFAULT_TIMEZONE = get_default_timezone()
 
 ############
 # __init__ #
@@ -105,20 +108,23 @@ def test__HaukiResourceHashUpdater__update_reservation_units_hashes__hash_update
         latest_fetched_date=datetime.date(2019, 12, 31),
     )
 
+    # In the past: Should be kept as is
     rts1 = ReservableTimeSpanFactory(
         resource=origin_hauki_resource,
-        start_datetime=datetime.datetime(2019, 12, 1),
-        end_datetime=datetime.datetime(2019, 12, 31),
+        start_datetime=datetime.datetime(2019, 12, 1, 10, tzinfo=DEFAULT_TIMEZONE),
+        end_datetime=datetime.datetime(2019, 12, 31, 20, tzinfo=DEFAULT_TIMEZONE),
     )
+    # Overlaps with the cutoff date: should be shortened to cutoff date
     rts2 = ReservableTimeSpanFactory(
         resource=origin_hauki_resource,
-        start_datetime=datetime.datetime(2019, 12, 31),
-        end_datetime=datetime.datetime(2020, 1, 1),
+        start_datetime=datetime.datetime(2019, 12, 31, 10, tzinfo=DEFAULT_TIMEZONE),
+        end_datetime=datetime.datetime(2020, 1, 1, 20, tzinfo=DEFAULT_TIMEZONE),
     )
+    # In the future: should be deleted
     rts3 = ReservableTimeSpanFactory(
         resource=origin_hauki_resource,
-        start_datetime=datetime.datetime(2020, 1, 1),
-        end_datetime=datetime.datetime(2020, 2, 1),
+        start_datetime=datetime.datetime(2020, 1, 1, 10, tzinfo=DEFAULT_TIMEZONE),
+        end_datetime=datetime.datetime(2020, 2, 1, 20, tzinfo=DEFAULT_TIMEZONE),
     )
 
     updater = HaukiResourceHashUpdater()
@@ -133,8 +139,13 @@ def test__HaukiResourceHashUpdater__update_reservation_units_hashes__hash_update
     # All future reservable time spans are deleted
     existing_ids = ReservableTimeSpan.objects.values_list("id", flat=True)
     assert rts1.id in existing_ids
-    assert rts2.id not in existing_ids
+    assert rts2.id in existing_ids
     assert rts3.id not in existing_ids
+
+    # The existing reservable time span is shortened to the cutoff date
+    rts2.refresh_from_db()
+    assert rts2.start_datetime == datetime.datetime(2019, 12, 31, 10, tzinfo=DEFAULT_TIMEZONE)
+    assert rts2.end_datetime == datetime.datetime(2020, 1, 1, 0, tzinfo=DEFAULT_TIMEZONE)
 
     assert updater.resources_updated == [origin_hauki_resource]
 
