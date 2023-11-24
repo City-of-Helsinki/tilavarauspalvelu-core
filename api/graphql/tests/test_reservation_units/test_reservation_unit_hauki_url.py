@@ -1,7 +1,6 @@
 import json
 
 import snapshottest
-from django.test import override_settings
 from freezegun import freeze_time
 
 from api.graphql.tests.base import GrapheneTestCaseBase
@@ -16,11 +15,6 @@ from permissions.models import (
 from tests.factories import ReservationUnitFactory, ServiceSectorFactory, UnitFactory
 
 
-@override_settings(
-    HAUKI_SECRET="HAUKISECRET",
-    HAUKI_ADMIN_UI_URL="https://test.com",
-    HAUKI_ORIGIN_ID="origin",
-)
 @freeze_time("2021-05-03")
 class ReservationUnitHaukiUrlTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
     @classmethod

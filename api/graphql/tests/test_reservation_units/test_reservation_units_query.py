@@ -3,7 +3,6 @@ import json
 from unittest import mock
 from uuid import UUID
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import override_settings
 from django.utils.timezone import get_default_timezone
@@ -232,9 +231,6 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         assert content.get("data").get("reservationUnitByPk").get("authentication") == "WEAK"
 
     def test_getting_hauki_url_is_none_when_regular_user(self):
-        settings.HAUKI_SECRET = "HAUKISECRET"
-        settings.HAUKI_ADMIN_UI_URL = "https://test.com"
-        settings.HAUKI_ORIGIN_ID = "origin"
         self.reservation_unit.unit.tprek_department_id = "ORGANISATION"
         self.reservation_unit.unit.save()
         self.maxDiff = None
@@ -257,9 +253,6 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_hauki_url_for_admin(self):
-        settings.HAUKI_SECRET = "HAUKISECRET"
-        settings.HAUKI_ADMIN_UI_URL = "https://test.com"
-        settings.HAUKI_ORIGIN_ID = "origin"
         self.reservation_unit.unit.tprek_department_id = "ORGANISATION"
         self.reservation_unit.unit.save()
         self.maxDiff = None
@@ -284,9 +277,6 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_hauki_url_for_unit_manager(self):
-        settings.HAUKI_SECRET = "HAUKISECRET"
-        settings.HAUKI_ADMIN_UI_URL = "https://test.com"
-        settings.HAUKI_ORIGIN_ID = "origin"
         self.reservation_unit.unit.tprek_department_id = "ORGANISATION"
         self.reservation_unit.unit.save()
         self.maxDiff = None
