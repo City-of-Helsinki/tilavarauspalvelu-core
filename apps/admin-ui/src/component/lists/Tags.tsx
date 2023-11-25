@@ -25,6 +25,8 @@ export type Action<T> =
   | { type: "deleteTag"; field: keyof T; value?: string }
   | { type: "reset" };
 
+/// @deprecated -- use SearchTags instead
+/// this is very type unsafe, it uses a reducer, it doesn't support url params
 export const toTags = <T,>(
   state: object & T,
   t: TFunction,

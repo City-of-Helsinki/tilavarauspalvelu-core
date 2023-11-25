@@ -94,7 +94,7 @@ export const APPLICATION_EVENTS_FOR_ALLOCATION = gql`
     $reservationUnit: [Int]
   ) {
     applicationEvents(
-      applicationRound: $applicationRound,
+      applicationRound: $applicationRound
       applicationStatus: $applicationStatus
       unit: $unit
       preferredOrder: $preferredOrder
