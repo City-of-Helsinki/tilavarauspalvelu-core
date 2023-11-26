@@ -134,6 +134,7 @@ const IconButton = ({
     href,
     target: openInNewTab ? "_blank" : undefined,
     rel: openInNewTab ? "noopener noreferrer" : undefined,
+    role: openInNewTab ? "link" : "button",
     ...rest,
   };
 
