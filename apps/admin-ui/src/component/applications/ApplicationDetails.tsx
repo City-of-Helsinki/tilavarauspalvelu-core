@@ -109,6 +109,7 @@ const EventProps = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-l);
+  word-break: break-all;
 `;
 
 const DefinitionList = styled.div`
