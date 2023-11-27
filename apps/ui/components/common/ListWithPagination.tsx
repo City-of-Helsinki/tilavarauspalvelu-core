@@ -59,17 +59,12 @@ const HitCountSummary = styled(HitCount)`
 
 const PaginationButton = styled(Button)`
   && {
-    &:disabled {
-      gap: var(--spacing-2-xs);
-    }
-
     font-family: var(--font-medium);
     font-weight: 500;
     display: flex;
     width: fit-content;
     background-color: transparent;
     margin: 0 auto;
-    --color: var(--color-bus);
   }
 `;
 
@@ -115,6 +110,7 @@ const ListWithPagination = ({
             {shouldShowPaginationButton && (
               <PaginationButton
                 onClick={() => fetchMore(endCursor)}
+                variant="secondary"
                 data-test-id="list-with-pagination__button--paginate"
               >
                 {t("common:showMore")}

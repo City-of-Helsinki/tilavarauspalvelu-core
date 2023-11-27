@@ -97,24 +97,17 @@ button {
   color: var(--color-black);
 }
 
-[class*="button_hds-button"] {
-  --background-color: var(--color-black) !important;
-  --background-color-hover: var(--color-black-80) !important;
-  --background-color-focus: var(--background-color-hover) !important;
-  --background-color-hover-focus: var(--background-color-hover) !important;
-  --border-color: var(--background-color) !important;
-  --border-color-hover: var(--background-color-hover) !important;
-  --border-color-focus: var(--background-color-focus) !important;
-  --border-color-hover-focus: var(--background-color-focus) !important;
-  &[class*="--secondary"] {
-    color: var(--color-black) !important;
-    --background-color: var(--color-white) !important;
-    --background-color-hover: var(--color-black-20) !important;
-    --border-color: var(--color-black) !important;
-    --border-color-hover: var(--border-color) !important;
-    --border-color-focus: var(--border-color) !important;
-    --border-color-hover-focus: var(--border-color) !important;
-  }
+[class*="button_hds-button--secondary"]:not(:disabled) {
+  font-family: var(--font-bold);
+  --color: var(--color-black) !important;
+  color: var(--color) !important;
+  border-color: var(--color-black) !important;
+  --background-color: var(--color-white) !important;
+  --background-color-hover: var(--color-black-20) !important;
+  --border-color: var(--color-black) !important;
+  --border-color-hover: var(--border-color) !important;
+  --border-color-focus: var(--border-color) !important;
+  --border-color-hover-focus: var(--border-color) !important;
 }
 
 // cookiehub overrides
