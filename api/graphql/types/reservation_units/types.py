@@ -535,7 +535,7 @@ class ReservationUnitType(
                 },
             ),
             "pricingTerms": ("select", "pricing_terms"),
-            "cancelationTerms": ("select", "cancellation_terms"),
+            "cancellationTerms": ("select", "cancellation_terms"),
             "cancellationRule": ("select", "cancellation_rule"),
         }
 
