@@ -168,6 +168,8 @@ const translations: ITranslations = {
     reservationUnit: ["Varausyksikkö"],
     remove: ["Poista"],
     restore: ["Palauta"],
+    selectPlaceholder: ["Valitse"],
+    textSearchPlaceHolder: ["Hae"],
   },
   errors: {
     router: {
@@ -1662,6 +1664,13 @@ const translations: ITranslations = {
       },
     },
   },
+  // common terms used in filters (reused in multiple places)
+  // TODO key prefix is questionable (it's not only filters)
+  filters: {
+    homeCity: ["Kotipaikka"],
+    purpose: ["Käyttötarkoitus"],
+    ageGroup: ["Ikäryhmä"],
+  },
   RequestedReservation: {
     heading: ["Varauksen tarkastelu"],
     calendar: ["Varauskalenteri"],
@@ -1687,11 +1696,8 @@ const translations: ITranslations = {
     reservationDetails: ["Varauksen tiedot"],
     name: ["Varauksen nimi"],
     description: ["Kuvaus"],
-    purpose: ["Käyttötarkoitus"],
     numPersons: ["Osallistujamäärä"],
-    ageGroup: ["Ikäryhmä"],
     id: ["Varaustunnus"],
-    homeCity: ["Kotipaikka"],
     ageGroupSuffix: ["vuotiaat"],
     reserveeDetails: ["Varauksen tekijä"],
     reserveeFirstName: ["Etunimi"],
@@ -1822,7 +1828,9 @@ const translations: ITranslations = {
       unit: ["Toimipiste"],
       selectUnits: ["Valitse toimipisteet"],
       schedules: ["Aikatoive"],
+      search: ["Hae hakijaa"],
       selectSchedules: ["Valitse aikatoive"],
+      applicantType: ["Asiakastyyppi"],
       reservationUnitApplication: ["Tilatoive"],
       reservationUnitOrder: ["Tilatoivejärjestys"],
       selectReservationUnitOrder: ["Valitse tilatoivejärjestys"],

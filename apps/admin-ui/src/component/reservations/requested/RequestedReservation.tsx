@@ -174,20 +174,20 @@ const ReservationSummary = ({
   const type =
     reservation.reserveeType != null
       ? {
-          l: "reserveeType",
+          l: "RequestedReservation.reserveeType",
           v: translateType(reservation, t),
         }
       : undefined;
 
   const numPersons =
     reservation.numPersons != null
-      ? { l: "numPersons", v: reservation.numPersons }
+      ? { l: "RequestedReservation.numPersons", v: reservation.numPersons }
       : undefined;
 
   const ageGroupParams =
     reservation.ageGroup != null
       ? {
-          l: "ageGroup",
+          l: "filters.ageGroup",
           v: `${ageGroup(reservation.ageGroup)} ${t(
             "RequestedReservation.ageGroupSuffix"
           )}`,
@@ -196,16 +196,16 @@ const ReservationSummary = ({
 
   const purpose =
     reservation.purpose?.nameFi != null
-      ? { l: "purpose", v: reservation.purpose.nameFi }
+      ? { l: "filters.purpose", v: reservation.purpose.nameFi }
       : undefined;
 
   const description = reservation.description
-    ? { l: "description", v: reservation.description }
+    ? { l: "RequestedReservation.description", v: reservation.description }
     : undefined;
 
   const price = !isFree
     ? {
-        l: "price",
+        l: "RequestedReservation.price",
         v: `${reservationPrice(reservation, t)}${
           reservation.applyingForFreeOfCharge
             ? `, ${t("RequestedReservation.appliesSubvention")}`
@@ -217,14 +217,14 @@ const ReservationSummary = ({
   const cancelReasonString =
     reservation.state === ReservationsReservationStateChoices.Cancelled
       ? {
-          l: "cancelReason",
+          l: "RequestedReservation.cancelReason",
           v: reservation?.cancelReason?.reasonFi || "-",
         }
       : undefined;
   const rejectionReasonString =
     reservation.state === ReservationsReservationStateChoices.Denied
       ? {
-          l: "denyReason",
+          l: "RequestedReservation.denyReason",
           v: reservation?.denyReason?.reasonFi || "-",
         }
       : undefined;
@@ -239,7 +239,12 @@ const ReservationSummary = ({
     ...(cancelReasonString != null ? [cancelReasonString] : []),
     ...(rejectionReasonString != null ? [rejectionReasonString] : []),
     ...(reservation.handlingDetails != null
-      ? [{ l: "handlingDetails", v: reservation.handlingDetails }]
+      ? [
+          {
+            l: "RequestedReservation.handlingDetails",
+            v: reservation.handlingDetails,
+          },
+        ]
       : []),
   ];
 
@@ -252,9 +257,9 @@ const ReservationSummary = ({
       {summary.map((e) => (
         <ApplicationProp
           key={e.l}
-          label={t(`RequestedReservation.${e.l}`)}
+          label={t(e.l)}
           data={e.v}
-          wide={e.l === "handlingDetails"}
+          wide={e.l === "RequestedReservation.handlingDetails"}
         />
       ))}
     </Summary>
@@ -457,14 +462,14 @@ const RequestedReservation = ({
               />
               {reservation.ageGroup && (
                 <ApplicationData
-                  label={t("RequestedReservation.ageGroup")}
+                  label={t("filters.ageGroup")}
                   data={`${ageGroup(reservation.ageGroup)} ${t(
                     "RequestedReservation.ageGroupSuffix"
                   )}`}
                 />
               )}
               <ApplicationData
-                label={t("RequestedReservation.purpose")}
+                label={t("filters.purpose")}
                 data={reservation.purpose?.nameFi}
               />
               <ApplicationData
@@ -493,7 +498,7 @@ const RequestedReservation = ({
                 data={reservation.reserveeOrganisationName}
               />
               <ApplicationData
-                label={t("RequestedReservation.homeCity")}
+                label={t("filters.homeCity")}
                 data={reservation.homeCity?.nameFi}
               />
               <ApplicationData

@@ -6,6 +6,7 @@ import { uniqBy } from "lodash";
 import { useParams, useSearchParams } from "react-router-dom";
 import styled from "styled-components";
 import { H1, Strongish } from "common/src/common/typography";
+import { ShowAllContainer } from "common/src/components";
 import {
   type Query,
   ApplicationStatusChoice,
@@ -17,7 +18,7 @@ import {
 } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { SearchTags } from "app/component/SearchTags";
-import { AutoGrid, Container } from "@/styles/layout";
+import { Container } from "@/styles/layout";
 import { useNotification } from "@/context/NotificationContext";
 import { useAllocationContext } from "@/context/AllocationContext";
 import Loader from "@/component/Loader";
@@ -26,6 +27,7 @@ import usePermission from "@/hooks/usePermission";
 import { Permission } from "@/modules/permissionHelper";
 import { APPLICATION_EVENTS_FOR_ALLOCATION } from "../queries";
 import { ApplicationEvents } from "./ApplicationEvents";
+import { useOptions } from "@/component/my-units/hooks";
 
 const ALLOCATION_APPLICATION_STATUSES = [
   ApplicationStatusChoice.Received,
@@ -38,9 +40,12 @@ type IParams = {
   applicationRoundId: string;
 };
 
+const StyledH1 = styled(H1).attrs({ $legacy: true })`
+  margin: 0;
+`;
 const Ingress = styled.p`
   font-size: var(--fontsize-body-xl);
-  margin-bottom: var(--spacing-xl);
+  margin: 0;
 `;
 
 const TabList = styled(Tabs.TabList)`
@@ -83,7 +88,38 @@ const APPLICATION_ROUND_QUERY = gql`
   }
 `;
 
-// TODO fix the translations for filters
+const transformApplicantType = (value: string | null) => {
+  if (value == null) {
+    return null;
+  }
+  switch (value) {
+    case "Individual":
+      return ApplicantTypeChoice.Individual;
+    case "Community":
+      return ApplicantTypeChoice.Community;
+    case "Association":
+      return ApplicantTypeChoice.Association;
+    case "Company":
+      return ApplicantTypeChoice.Company;
+  }
+  return null;
+};
+
+// TODO make the grid thing into AutoGridCss that can be imported
+const MoreWrapper = styled(ShowAllContainer)`
+  .ShowAllContainer__ToggleButton {
+    color: var(--color-bus);
+  }
+  .ShowAllContainer__Content {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+    align-items: baseline;
+    gap: var(--spacing-m);
+  }
+`;
+
+type TimeFilterOptions = { label: string; value: 200 | 300 };
+
 function ApplicationRoundAllocation({
   applicationRoundId,
   units,
@@ -102,20 +138,19 @@ function ApplicationRoundAllocation({
   const [selectedReservationUnit, setSelectedReservationUnit] =
     useState<ReservationUnitByPkType | null>(null);
 
-  type TimeFilterOptions = { label: string; value: 200 | 300 };
-
   const { t } = useTranslation();
 
   const customerFilterOptions = Object.keys(ApplicantTypeChoice).map(
     (value) => ({
-      label: t(`common:applicantType.${value}`),
+      label: t(`Application.applicantTypes.${value.toUpperCase()}`),
       value: value as ApplicantTypeChoice,
     })
   );
-  // TODO options (move the useOptions hook to common)
-  const cityOptions: { label: string; value: number }[] = [];
-  const purposeOptions: { label: string; value: number }[] = [];
-  const ageGroupOptions: { label: string; value: number }[] = [];
+
+  const options = useOptions();
+  const purposeOptions = options.purpose;
+  const cityOptions = options.homeCity;
+  const ageGroupOptions = options.ageGroup;
 
   const [searchParams, setParams] = useSearchParams();
 
@@ -218,6 +253,8 @@ function ApplicationRoundAllocation({
     APPLICATION_EVENTS_FOR_ALLOCATION,
     {
       skip: !applicationRoundId,
+      // NOTE required otherwise this returns stale data when filters change
+      fetchPolicy: "cache-and-network",
       variables: {
         applicationRound: applicationRoundId,
         ...(unitFilter != null ? { unit: [Number(unitFilter)] } : {}),
@@ -229,7 +266,7 @@ function ApplicationRoundAllocation({
         ...(cityFilter != null ? { homeCity: [Number(cityFilter)] } : {}),
         // TODO conversion
         ...(applicantTypeFilter != null
-          ? { applicantType: [applicantTypeFilter as ApplicantTypeChoice] }
+          ? { applicantType: [transformApplicantType(applicantTypeFilter)] }
           : {}),
         ...(purposeFilter != null ? { purpose: [Number(purposeFilter)] } : {}),
         ...(ageGroupFilter != null
@@ -299,60 +336,99 @@ function ApplicationRoundAllocation({
     }
   }, [refetch, refreshApplicationEvents, setRefreshApplicationEvents]);
 
-  // FIXME this broke when we moved filters to the URL (it's empty always)
+  const translateTag = (key: string, value: string) => {
+    switch (key) {
+      case "city":
+        return cityOptions.find((o) => String(o.value) === value)?.label ?? "";
+      case "textSearch":
+        return value;
+      case "applicantType":
+        return t(`Application.applicantTypes.${value.toUpperCase()}`);
+      case "purpose":
+        return (
+          purposeOptions.find((o) => String(o.value) === value)?.label ?? ""
+        );
+      case "ageGroup":
+        return (
+          ageGroupOptions.find((o) => String(o.value) === value)?.label ?? ""
+        );
+      case "time":
+        return timeOptions.find((o) => String(o.value) === value)?.label ?? "";
+      case "order":
+        return orderOptions.find((o) => String(o.value) === value)?.label ?? "";
+      default:
+        return key;
+    }
+  };
+
   const tabResUnits = reservationUnits.filter(
-    (ru) => ru?.unit?.pk === unitFilter
+    (ru) => ru.unit?.pk != null && ru?.unit?.pk === Number(unitFilter)
   );
 
   return (
+    // TODO top gap is 2rem but the rest of the page is something else so can't change the container directly
     <Container>
+      {/* TODO this can't be prev link because it uses history.pop not history('..')
+          so it doesn't work with search params properly
+          TODO it also has wrong margins (compared to other pages)
+      */}
       <LinkPrev />
-      <H1 $legacy>{t("Allocation.allocationTitle")}</H1>
-      <Ingress>{roundName}</Ingress>
+      {/* TODO these look like they have wrong margins */}
+      <div>
+        <StyledH1>{t("Allocation.allocationTitle")}</StyledH1>
+        <Ingress>{roundName}</Ingress>
+      </div>
       {/* TODO abstract this to a component? and use the query params to save the state instead of useState */}
-      <AutoGrid $minWidth="14rem">
+      <MoreWrapper
+        showAllLabel={t("ReservationUnitsSearch.moreFilters")}
+        showLessLabel={t("ReservationUnitsSearch.lessFilters")}
+        maximumNumber={4}
+      >
         <Select
           clearButtonAriaLabel={t("common.clearAllSelections")}
           label={t("Allocation.filters.unit")}
+          options={unitOptions}
+          disabled={unitOptions.length === 0}
+          value={
+            unitOptions.find((v) => v.value === Number(unitFilter)) ?? null
+          }
           onChange={(val: { label: string; value: number }) => {
             setUnitFilter(val.value ?? null);
             // TODO this is wrong, unless we have a hook that resets the selectedReservationUnit
             // because it is always selected in the UI (or we have to add all option to the Tab list)
             setSelectedReservationUnit(null);
           }}
-          options={unitOptions}
-          value={
-            unitOptions.find((v) => v.value === Number(unitFilter)) ?? null
-          }
-          placeholder={t("Allocation.filters.selectUnits")}
+          placeholder={t("common.selectPlaceholder")}
           selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
         />
         {/* TODO is this multi select or just no select is all? */}
         <Select
-          onChange={(val?: TimeFilterOptions) =>
-            setTimeFilter(val?.value ?? null)
-          }
-          options={timeOptions}
+          label={t("Allocation.filters.schedules")}
           clearable
+          options={timeOptions}
+          disabled={timeOptions.length === 0}
           value={
             timeOptions.find((v) => v.value === Number(timeFilter)) ?? null
           }
-          label={t("Allocation.filters.schedules")}
-          placeholder={t("Allocation.filters.selectSchedules")}
+          onChange={(val?: TimeFilterOptions) =>
+            setTimeFilter(val?.value ?? null)
+          }
+          placeholder={t("common.selectPlaceholder")}
           clearButtonAriaLabel={t("common.clearAllSelections")}
           selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
         />
         <Select
-          onChange={(val?: (typeof orderOptions)[0]) =>
-            setOrderFilter(val?.value ?? null)
-          }
           label={t("Allocation.filters.reservationUnitOrder")}
           clearable
           options={orderOptions}
+          disabled={orderOptions.length === 0}
           value={
             orderOptions.find((v) => v.value === Number(orderFilter)) ?? null
           }
-          placeholder={t("Allocation.filters.selectReservationUnitOrder")}
+          onChange={(val?: (typeof orderOptions)[0]) =>
+            setOrderFilter(val?.value ?? null)
+          }
+          placeholder={t("common.selectPlaceholder")}
           clearButtonAriaLabel={t("common.clearAllSelections")}
           selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
         />
@@ -362,70 +438,73 @@ function ApplicationRoundAllocation({
           label={t("Allocation.filters.search")}
           onChange={(e) => setNameFilter(e.target.value)}
           value={nameFilter ?? ""}
-          placeholder={t("Allocation.filters.searchPlaceholder")}
+          placeholder={t("common.textSearchPlaceHolder")}
         />
-        {/* TODO homeCity */}
         <Select
-          label={t("Allocation.filters.homeCity")}
-          onChange={(val?: (typeof cityOptions)[0]) =>
-            setCityFilter(val?.value ?? null)
-          }
+          label={t("filters.homeCity")}
           options={cityOptions}
+          disabled={cityOptions.length === 0}
+          clearable
           value={
             cityOptions.find((v) => v.value === Number(cityFilter)) ?? null
           }
-          placeholder={t("Allocation.filters.placeholder.homeCity")}
+          onChange={(val?: (typeof cityOptions)[0]) =>
+            setCityFilter(val?.value ?? null)
+          }
+          placeholder={t("common.textSearchPlaceHolder")}
           clearButtonAriaLabel={t("common.clearAllSelections")}
           selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
         />
-        {/* TODO customer type */}
         <Select
-          label={t("Allocation.filters.reservationUnitOrder")}
-          onChange={(val?: (typeof customerFilterOptions)[0]) =>
-            setApplicantType(val?.value ?? null)
-          }
+          label={t("Allocation.filters.applicantType")}
           options={customerFilterOptions}
+          disabled={customerFilterOptions.length === 0}
+          clearable
           value={
             customerFilterOptions.find(
               (v) => v.value === applicantTypeFilter
             ) ?? null
           }
-          placeholder={t("Allocation.filters.placeholder.customerType")}
+          onChange={(val?: (typeof customerFilterOptions)[0]) =>
+            setApplicantType(val?.value ?? null)
+          }
+          placeholder={t("common.selectPlaceholder")}
           clearButtonAriaLabel={t("common.clearAllSelections")}
           selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
         />
-        {/* TODO age group */}
         <Select
-          label={t("Allocation.filters.ageGroup")}
-          onChange={(val?: (typeof ageGroupOptions)[0]) =>
-            setAgeGroupFilter(val?.value ?? null)
-          }
+          label={t("filters.ageGroup")}
           options={ageGroupOptions}
+          disabled={ageGroupOptions.length === 0}
+          clearable
           value={
             ageGroupOptions.find((v) => v.value === Number(ageGroupFilter)) ??
             null
           }
-          placeholder={t("Allocation.filters.placeholder.ageGroup")}
+          onChange={(val?: (typeof ageGroupOptions)[0]) =>
+            setAgeGroupFilter(val?.value ?? null)
+          }
+          placeholder={t("common.selectPlaceholder")}
           clearButtonAriaLabel={t("common.clearAllSelections")}
           selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
         />
-        {/* TODO purpose */}
         <Select
-          label={t("Allocation.filters.purpose")}
-          onChange={(val?: (typeof purposeOptions)[0]) =>
-            setPurposeFilter(val?.value ?? null)
-          }
+          label={t("filters.purpose")}
           options={purposeOptions}
+          disabled={purposeOptions.length === 0}
           value={
             purposeOptions.find((v) => v.value === Number(purposeFilter)) ??
             null
           }
-          placeholder={t("Allocation.filters.placeholder.purpose")}
+          onChange={(val?: (typeof purposeOptions)[0]) =>
+            setPurposeFilter(val?.value ?? null)
+          }
+          placeholder={t("common.selectPlaceholder")}
           clearButtonAriaLabel={t("common.clearAllSelections")}
           selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
         />
-      </AutoGrid>
-      <SearchTags hide={["unit"]} />
+      </MoreWrapper>
+      <SearchTags hide={["unit"]} translateTag={translateTag} />
       <Tabs>
         <TabList>
           {/* TODO check if this is correct, it changed from two tabs to one after the filter change

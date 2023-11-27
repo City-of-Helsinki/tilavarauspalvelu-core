@@ -81,25 +81,30 @@ export const APPLICATIONS_QUERY = gql`
 `;
 
 // TODO naming
-// TODO query filters
+// TODO query filters (homeCity, ageGroup, purpose)
 // TODO priority vs preferredOrder, preferredOrder is the selected reservationUnit order, priority is the primary / secondary
 // TODO check if we can remove some of the fields (and move them to the filter query, ex unit / reservationUnit)
+// TODO check the search string (is it correct)
 export const APPLICATION_EVENTS_FOR_ALLOCATION = gql`
   query getApplicationEvents(
     $applicationRound: Int
     $applicationStatus: [ApplicationStatusChoice]
     $unit: [Int]
     $preferredOrder: [Int]
+    $textSearch: String
     $priority: [Int]
     $reservationUnit: [Int]
+    $applicantType: [ApplicantTypeChoice]
   ) {
     applicationEvents(
       applicationRound: $applicationRound
       applicationStatus: $applicationStatus
       unit: $unit
+      name_Istartswith: $textSearch
       preferredOrder: $preferredOrder
       priority: $priority
       reservationUnit: $reservationUnit
+      applicantType: $applicantType
     ) {
       edges {
         node {

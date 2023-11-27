@@ -23,7 +23,13 @@ const DeleteTag = styled(HDSTag)`
 /// Creates tags from the search params (uses react-router-dom)
 /// TODO allow passing keys here that are not supposed to be shown / reset
 /// TODO create a wrapper that allows us switching the router (next / react-router)
-export function SearchTags({ hide = [] }: { hide?: string[] }): JSX.Element {
+export function SearchTags({
+  translateTag,
+  hide = [],
+}: {
+  translateTag: (key: string, val: string) => string;
+  hide?: string[];
+}): JSX.Element {
   const { t } = useTranslation();
   const [params, setParams] = useSearchParams();
   const handleDelete = (tag: string) => {
@@ -40,10 +46,22 @@ export function SearchTags({ hide = [] }: { hide?: string[] }): JSX.Element {
   };
 
   const tags: { key: string; value: string }[] = [];
-  params.forEach((value, key) => tags.push({ key, value }));
+  params.forEach((value, key) =>
+    !hide.includes(key) ? tags.push({ key, value }) : null
+  );
   // TODO translate the tags t('key.${tag.key}', { value: tag.value })
   // Return empty div if no tags so there is no CLS
   // TODO should reserve space for one row of tags by default (less shift in the layout)
+  // TODO
+  // Lets think the tag name
+  // for homeCity the value is a pk, but we need the tag to be a name (that is tied to the pk, not available during compile time)
+  // for search string the value is the tag directly
+  // (val: string | null) => homeCity.options.find((o) => String(o.value) === val)?.label ?? null
+  // for selects the value is a pk, but the name
+  // (val: string) => val
+  // for other selects the values are pks, but the end result is translated enum (though it's tied to the select options)
+  // (val: string | null) => options.find((o) => String(o.value) === val)?.label ?? null
+  // so all of these would need to be functions?
   return (
     <TagWrapper>
       {tags.map((tag) => (
@@ -52,7 +70,7 @@ export function SearchTags({ hide = [] }: { hide?: string[] }): JSX.Element {
           onDelete={() => handleDelete(tag.key)}
           key={tag.key}
         >
-          {tag.value}
+          {translateTag(tag.key, tag.value)}
         </StyledTag>
       ))}
       {tags.length > 0 && (
