@@ -4,8 +4,8 @@ export interface FormValues {
   equipments: string | null;
   timeBegin: string | null;
   timeEnd: string | null;
-  dateBegin: string | null;
-  dateEnd: string | null;
+  startDate: string | null;
+  endDate: string | null;
   duration: number | null;
   minPersons: string | null;
   maxPersons: string | null;

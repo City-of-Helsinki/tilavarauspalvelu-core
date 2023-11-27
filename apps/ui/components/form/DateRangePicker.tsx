@@ -1,15 +1,14 @@
+import { type FC, type FocusEvent, useState, useEffect } from "react";
 /* eslint-disable import/no-duplicates */
-import { parse } from "date-fns";
-import isBefore from "date-fns/isBefore";
+import { parse, isBefore } from "date-fns";
 import isValidDate from "date-fns/isValid";
 /* eslint-enable import/no-duplicates */
 import { DateInput } from "hds-react";
-import React, { useEffect } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { toUIDate } from "common/src/common/util";
 import { getLocalizationLang } from "common/src/helpers";
-import { isValidDateString } from "../../modules/util";
+import { isValidDateString } from "@/modules/util";
 
 const initDate = (date: Date | null): string => {
   if (date == null) return "";
@@ -43,7 +42,7 @@ const Wrapper = styled.div`
   }
 `;
 
-const DateRangePicker: React.FC<DateRangePickerProps> = ({
+const DateRangePicker: FC<DateRangePickerProps> = ({
   endDate,
   startDate,
   onChangeEndDate,
@@ -54,10 +53,11 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
   limits,
 }) => {
   const [internalStartDateString, setInternalStartDateString] =
-    React.useState<string>(() => initDate(startDate));
-  const [internalEndDateString, setInternalEndDateString] =
-    React.useState<string>(() => initDate(endDate));
-  const [errors, setErrors] = React.useState({
+    useState<string>(() => initDate(startDate));
+  const [internalEndDateString, setInternalEndDateString] = useState<string>(
+    () => initDate(endDate)
+  );
+  const [errors, setErrors] = useState({
     startDateIsInvalid: false,
     endDateIsInvalid: false,
   });
@@ -71,13 +71,14 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
     new Date()
   );
   const internalEndDate = parse(internalEndDateString, "d.M.yyyy", new Date());
+  // console.log(internalStartDate, internalStartDateString, internalEndDate, internalEndDateString);
 
   const endDateIsBeforeStartDate =
     isValidDate(internalStartDate) &&
     isValidDate(internalEndDate) &&
     isBefore(internalEndDate, internalStartDate);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const startDateIsValid = isValidDateString(internalStartDateString);
     const endDateIsValid = isValidDateString(internalEndDateString);
     const startDateObj = parse(internalStartDateString, "d.M.yyyy", new Date());
@@ -118,14 +119,14 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
     setInternalStartDateString(initDate(startDate));
     setInternalEndDateString(initDate(endDate));
   }, [startDate, endDate]);
-  const handleStartDateValidation = (e: React.FocusEvent<HTMLInputElement>) => {
+  const handleStartDateValidation = (e: FocusEvent<HTMLInputElement>) => {
     setErrors({
       ...errors,
       startDateIsInvalid: !isValidDateString(e.target.value),
     });
   };
 
-  const handleEndDateValidation = (e: React.FocusEvent<HTMLInputElement>) => {
+  const handleEndDateValidation = (e: FocusEvent<HTMLInputElement>) => {
     setErrors({
       ...errors,
       endDateIsInvalid: !isValidDateString(e.target.value),

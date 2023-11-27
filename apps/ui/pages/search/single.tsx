@@ -81,6 +81,15 @@ const processVariables = (values: Record<string, string>, language: string) => {
   const sortCriteria = ["name", "unitName"].includes(values.sort)
     ? `${values.sort}${capitalize(language)}`
     : values.sort;
+  const startArray = values.startDate ? values.startDate.split(".") : [];
+  const endArray = values.endDate ? values.endDate.split(".") : [];
+  // Add leading zero to day and month if needed
+  for (let i = 0; i < 2; i += 1) {
+    if (startArray[i] && startArray[i].length === 1)
+      startArray[i] = `0${startArray[i]}`;
+    if (endArray[i] && endArray[i].length === 1)
+      endArray[i] = `0${endArray[i]}`;
+  }
   return {
     ...omit(values, [
       "order",
@@ -91,8 +100,8 @@ const processVariables = (values: Record<string, string>, language: string) => {
       "unit",
       "reservationUnitType",
       "equipments",
-      "dateBegin",
-      "dateEnd",
+      "startDate",
+      "endDate",
       "duration",
     ]),
     ...(values.minPersons && {
@@ -113,18 +122,12 @@ const processVariables = (values: Record<string, string>, language: string) => {
     ...(values.equipments && {
       equipments: values.equipments.split(",").map(Number),
     }),
-    ...(values.dateBegin && {
-      dateBegin: `${values.dateBegin
-        .split(".")
-        .reverse()
-        .join("-")}T00:00:00+00:00`,
-    }),
-    ...(values.dateEnd && {
-      dateEnd: `${values.dateEnd
-        .split(".")
-        .reverse()
-        .join("-")}T23:59:59+00:00`,
-    }),
+    reservableTimeSpans: {
+      startTime: values.startDate ? startArray.reverse().join("-") : null,
+      endTime: values.endDate ? endArray.reverse().join("-") : null,
+    },
+    startDate: values.startDate ? startArray.reverse().join("-") : null,
+    endDate: values.endDate ? endArray.reverse().join("-") : null,
     ...(values.duration && {
       duration: parseInt(values.duration, 10) * 60,
     }),
@@ -140,23 +143,20 @@ const processVariables = (values: Record<string, string>, language: string) => {
 const SearchSingle = (): JSX.Element => {
   const { t, i18n } = useTranslation();
 
-  const sortingOptions = useMemo(
-    () => [
-      {
-        label: t("search:sorting.label.name"),
-        value: "name",
-      },
-      {
-        label: t("search:sorting.label.type"),
-        value: "typeRank",
-      },
-      {
-        label: t("search:sorting.label.unit"),
-        value: "unitName",
-      },
-    ],
-    [t]
-  );
+  const sortingOptions = [
+    {
+      label: t("search:sorting.label.name"),
+      value: "name",
+    },
+    {
+      label: t("search:sorting.label.type"),
+      value: "typeRank",
+    },
+    {
+      label: t("search:sorting.label.unit"),
+      value: "unitName",
+    },
+  ];
 
   const [searchValues, setSearchValues] = useState(
     {} as Record<string, string>
@@ -174,8 +174,13 @@ const SearchSingle = (): JSX.Element => {
     fetchPolicy: "network-only",
     skip: Object.keys(searchValues).length === 0,
     notifyOnNetworkStatusChange: true,
+    onCompleted: (data1) =>
+      console.log(data1, processVariables(searchValues, i18n.language)),
+    onError: (error1) =>
+      console.warn(error1, processVariables(searchValues, i18n.language)),
   });
 
+  console.log(data?.reservationUnitByPk);
   const reservationUnits: ReservationUnitType[] = filterNonNullable(
     data?.reservationUnits?.edges?.map((e) => e?.node)
   );

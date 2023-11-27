@@ -10,6 +10,7 @@ export const RESERVATION_UNIT = gql`
       nameEn
       nameSv
       isDraft
+      isDraft
       images {
         imageUrl
         largeUrl
@@ -153,11 +154,11 @@ export const RESERVATION_UNITS = gql`
     $applicationRound: [Int]
     $minPersons: Decimal
     $maxPersons: Decimal
-    $unit: [Int]
-    $reservationUnitType: [Int]
-    $purposes: [Int]
+    $unit: [ID]
+    $reservationUnitType: [ID]
+    $purposes: [ID]
+    $equipments: [ID]
     $first: Int
-    $equipments: [Int]
     $before: String
     $after: String
     $orderBy: String
@@ -173,10 +174,10 @@ export const RESERVATION_UNITS = gql`
       minPersonsGte: $minPersons
       maxPersonsLte: $maxPersons
       minPersonsLte: $maxPersons
+      unit: $unit
       reservationUnitType: $reservationUnitType
       purposes: $purposes
       equipments: $equipments
-      unit: $unit
       first: $first
       after: $after
       before: $before

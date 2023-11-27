@@ -26,8 +26,8 @@
     "unit": "{{value}}",
     "minPersons": "Vähintään {{value}} hlö",
     "maxPersons": "Enintään {{value}} hlö",
-    "dateBegin": "Alkaen {{value}}",
-    "dateEnd": "{{value}} asti",
+    "startDate": "Alkaen {{value}}",
+    "endDate": "{{value}} asti",
     "timeBegin": "Aikaisintaan {{value}}",
     "timeEnd": "Viimeistään {{value}}",
     "duration": "Vähintään {{unit}}"

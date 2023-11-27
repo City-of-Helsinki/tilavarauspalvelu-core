@@ -26,8 +26,8 @@
     "minPersons_other": "Min. {{value}} persons",
     "maxPersons_one": "Max. {{value}} person",
     "maxPersons_other": "Max. {{value}} persons",
-    "dateBegin": "From {{value}}",
-    "dateEnd": "Until {{value}}",
+    "startDate": "From {{value}}",
+    "endDate": "Until {{value}}",
     "timeBegin": "After {{value}}",
     "timeEnd": "Before {{value}}",
     "duration": "Minimum {{unit}}"
