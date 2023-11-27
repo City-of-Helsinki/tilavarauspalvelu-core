@@ -38,5 +38,5 @@
   "selectedElement": "Selection",
   "searchForValue": "Search",
   "removeFilter": "Remove filter \"{{value}}\"",
-  "showOnlyAvailableLabel": "Show only available spaces"
+  "showOnlyReservableLabel": "Show only available spaces"
 }

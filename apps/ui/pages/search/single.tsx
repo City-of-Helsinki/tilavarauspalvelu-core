@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useTranslation } from "next-i18next";
 import { NetworkStatus, useQuery } from "@apollo/client";
 import { GetServerSideProps } from "next";
@@ -81,15 +81,15 @@ const processVariables = (values: Record<string, string>, language: string) => {
   const sortCriteria = ["name", "unitName"].includes(values.sort)
     ? `${values.sort}${capitalize(language)}`
     : values.sort;
-  const startArray = values.startDate ? values.startDate.split(".") : [];
-  const endArray = values.endDate ? values.endDate.split(".") : [];
+  const startArray = values.startDate?.split(".");
+  const endArray = values.endDate?.split(".");
   // Add leading zero to day and month if needed
   for (let i = 0; i < 2; i += 1) {
-    if (startArray[i] && startArray[i].length === 1)
-      startArray[i] = `0${startArray[i]}`;
-    if (endArray[i] && endArray[i].length === 1)
-      endArray[i] = `0${endArray[i]}`;
+    if (startArray[i]?.length === 1) startArray[i] = `0${startArray[i]}`;
+    if (endArray[i]?.length === 1) endArray[i] = `0${endArray[i]}`;
   }
+  const replaceIfExists = (condition: string | boolean, returnObject: object) =>
+    condition && returnObject;
   return {
     ...omit(values, [
       "order",
@@ -102,34 +102,50 @@ const processVariables = (values: Record<string, string>, language: string) => {
       "equipments",
       "startDate",
       "endDate",
+      "timeBegin",
+      "timeEnd",
       "duration",
+      "showOnlyReservable",
     ]),
-    ...(values.minPersons && {
+    ...replaceIfExists(values.minPersons, {
       minPersons: parseInt(values.minPersons, 10),
     }),
-    ...(values.maxPersons && {
+    ...replaceIfExists(values.maxPersons, {
       maxPersons: parseInt(values.maxPersons, 10),
     }),
-    ...(values.purposes && {
+    ...replaceIfExists(values.purposes, {
       purposes: values.purposes.split(",").map(Number),
     }),
-    ...(values.unit && {
+    ...replaceIfExists(values.unit, {
       unit: values.unit.split(",").map(Number),
     }),
-    ...(values.reservationUnitType && {
+    ...replaceIfExists(values.reservationUnitType, {
       reservationUnitType: values.reservationUnitType.split(",").map(Number),
     }),
-    ...(values.equipments && {
+    ...replaceIfExists(values.equipments, {
       equipments: values.equipments.split(",").map(Number),
     }),
-    reservableTimeSpans: {
-      startTime: values.startDate ? startArray.reverse().join("-") : null,
-      endTime: values.endDate ? endArray.reverse().join("-") : null,
-    },
-    startDate: values.startDate ? startArray.reverse().join("-") : null,
-    endDate: values.endDate ? endArray.reverse().join("-") : null,
-    ...(values.duration && {
-      duration: parseInt(values.duration, 10) * 60,
+    ...replaceIfExists(values.startDate, {
+      reservableDateStart: values.startDate
+        ? startArray.toReversed().join("-")
+        : null,
+    }),
+    ...replaceIfExists(values.endDate, {
+      reservableDateEnd: values.endDate
+        ? endArray.toReversed().join("-")
+        : null,
+    }),
+    ...replaceIfExists(values.timeBegin, {
+      reservableTimeStart: values.timeBegin,
+    }),
+    ...replaceIfExists(values.timeBegin, {
+      reservableTimeEnd: values.timeEnd,
+    }),
+    ...replaceIfExists(values.duration, {
+      reservableMinimumDurationMinutes: parseInt(values.duration, 10),
+    }),
+    ...replaceIfExists(values.showOnlyReservable === "true", {
+      showOnlyReservable: !!values.showOnlyReservable,
     }),
     first: pagingLimit,
     orderBy: values.order === "desc" ? `-${sortCriteria}` : sortCriteria,
@@ -174,13 +190,11 @@ const SearchSingle = (): JSX.Element => {
     fetchPolicy: "network-only",
     skip: Object.keys(searchValues).length === 0,
     notifyOnNetworkStatusChange: true,
-    onCompleted: (data1) =>
-      console.log(data1, processVariables(searchValues, i18n.language)),
     onError: (error1) =>
+      // eslint-disable-next-line no-console
       console.warn(error1, processVariables(searchValues, i18n.language)),
   });
 
-  console.log(data?.reservationUnitByPk);
   const reservationUnits: ReservationUnitType[] = filterNonNullable(
     data?.reservationUnits?.edges?.map((e) => e?.node)
   );
@@ -284,7 +298,7 @@ const SearchSingle = (): JSX.Element => {
         textSearch:
           !key || key.includes("textSearch")
             ? ""
-            : searchValues.textSearch || "",
+            : searchValues.textSearch ?? "",
       })
     );
   };

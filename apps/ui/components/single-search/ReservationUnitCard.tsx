@@ -257,7 +257,7 @@ const ReservationUnitCard = ({ reservationUnit }: PropsT): JSX.Element => {
       <StyledLink href={link}>
         <Image
           alt={name}
-          src={getMainImage(reservationUnit)?.smallUrl || pixel}
+          src={getMainImage(reservationUnit)?.smallUrl ?? pixel}
         />
       </StyledLink>
       <MainContent>

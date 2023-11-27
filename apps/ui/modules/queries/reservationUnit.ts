@@ -154,10 +154,16 @@ export const RESERVATION_UNITS = gql`
     $applicationRound: [Int]
     $minPersons: Decimal
     $maxPersons: Decimal
-    $unit: [ID]
-    $reservationUnitType: [ID]
-    $purposes: [ID]
-    $equipments: [ID]
+    $unit: [Int]
+    $reservationUnitType: [Int]
+    $purposes: [Int]
+    $equipments: [Int]
+    $reservableDateStart: Date
+    $reservableDateEnd: Date
+    $reservableTimeStart: TimeString
+    $reservableTimeEnd: TimeString
+    $reservableMinimumDurationMinutes: Decimal
+    $showOnlyReservable: Boolean
     $first: Int
     $before: String
     $after: String
@@ -178,6 +184,12 @@ export const RESERVATION_UNITS = gql`
       reservationUnitType: $reservationUnitType
       purposes: $purposes
       equipments: $equipments
+      reservableDateStart: $reservableDateStart
+      reservableDateEnd: $reservableDateEnd
+      reservableTimeStart: $reservableTimeStart
+      reservableTimeEnd: $reservableTimeEnd
+      reservableMinimumDurationMinutes: $reservableMinimumDurationMinutes
+      showOnlyReservable: $showOnlyReservable
       first: $first
       after: $after
       before: $before

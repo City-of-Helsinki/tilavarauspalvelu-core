@@ -40,5 +40,5 @@
   "openCombobox": "Öppna kryssrutan",
   "searchForValue": "Sök",
   "removeFilter": "Redigera \"{{value}}\"",
-  "showOnlyAvailableLabel": "Visa endast lediga utrymmen"
+  "showOnlyReservableLabel": "Visa endast lediga utrymmen"
 }

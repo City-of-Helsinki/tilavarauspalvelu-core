@@ -10,6 +10,6 @@ export interface FormValues {
   minPersons: string | null;
   maxPersons: string | null;
   reservationUnitType: string;
-  showOnlyAvailable?: boolean;
+  showOnlyReservable?: boolean;
   textSearch?: string;
 }

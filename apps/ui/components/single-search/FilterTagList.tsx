@@ -17,10 +17,10 @@ const FilterTagList = ({
 }: FilterTagProps) => {
   const filterOrder = [
     "textSearch",
-    "begin",
-    "end",
-    "after",
-    "before",
+    "timeBegin",
+    "timeEnd",
+    "startDate",
+    "endDate",
     "duration",
     "minPersons",
     "maxPersons",
@@ -48,9 +48,10 @@ const FilterTagList = ({
   return (
     <FilterTags data-test-id="search-form__filter--tags">
       {formValueKeys
-        .sort((a, b) => filterOrder.indexOf(a) - filterOrder.indexOf(b))
+        .toSorted((a, b) => filterOrder.indexOf(a) - filterOrder.indexOf(b))
         .map((formValueKey) => {
-          if (formValueKey === "showOnlyAvailable") return null;
+          // we don't want to show "showOnlyReservable" as a FilterTag, as it has its own checkbox in the form
+          if (formValueKey === "showOnlyReservable") return null;
           const label = t(`searchForm:filters.${formValueKey}`, {
             label: formValueKey,
             value: formValues[formValueKey],
@@ -60,12 +61,8 @@ const FilterTagList = ({
             (formValues[formValueKey] ?? "").split(",").map((subValue) => (
               <StyledTag
                 id={`filter-tag__${formValueKey}-${subValue}`}
-                onClick={() =>
-                  removeValue && removeValue([subValue], formValueKey)
-                }
-                onDelete={() =>
-                  removeValue && removeValue([subValue], formValueKey)
-                }
+                onClick={() => removeValue?.([subValue], formValueKey)}
+                onDelete={() => removeValue?.([subValue], formValueKey)}
                 key={`${formValueKey}-${subValue}`}
                 deleteButtonAriaLabel={t(`searchForm:removeFilter`, {
                   value: getFormSubValueLabel(formValueKey, subValue),
@@ -77,7 +74,7 @@ const FilterTagList = ({
           ) : (
             <StyledTag
               id={`filter-tag__${formValueKey}`}
-              onDelete={() => removeValue && removeValue([formValueKey])}
+              onDelete={() => removeValue?.([formValueKey])}
               key={formValueKey}
               deleteButtonAriaLabel={t(`searchForm:removeFilter`, {
                 value: label,
@@ -90,11 +87,11 @@ const FilterTagList = ({
             </StyledTag>
           );
         })}
-      {formValueKeys.filter((key) => key !== "showOnlyAvailable").length >
+      {formValueKeys.filter((key) => key !== "showOnlyReservable").length >
         0 && (
         <ResetButton
-          onClick={() => removeValue && removeValue()}
-          onDelete={() => removeValue && removeValue()}
+          onClick={() => removeValue?.()}
+          onDelete={() => removeValue?.()}
           data-test-id="search-form__reset-button"
         >
           {t("searchForm:resetForm")}

@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useTranslation } from "next-i18next";
 import { IconSearch, Select } from "hds-react";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { type FieldValues, type SubmitHandler, useForm } from "react-hook-form";
 import styled from "styled-components";
 import { DocumentNode, useQuery } from "@apollo/client";
 import { sortBy } from "lodash";
@@ -40,14 +40,12 @@ type Props = {
   removeValue?: (key?: string[], subItemKey?: string) => void;
 };
 
-const desktopBreakpoint = "840px";
-
 const TopContainer = styled.div`
   display: flex;
   flex-flow: column nowrap;
   gap: var(--spacing-m);
 
-  @media (min-width: ${desktopBreakpoint}) {
+  @media (min-width: ${breakpoints.m}) {
     grid-template-columns: 1fr 154px;
   }
 `;
@@ -95,8 +93,6 @@ const StyledSelect = styled(Select<OptionType>)`
 
 const StyledCheckBox = styled(Checkbox)`
   &&& {
-    /* TODO: Remove the following style declaration once backend supports showing only available results */
-    display: none !important;
     @media (min-width: ${breakpoints.m}) {
       margin-top: -70px;
       grid-column: 3 / span 1;
@@ -317,7 +313,7 @@ const SearchForm = ({
     minPersons: "",
     maxPersons: "",
     reservationUnitType: "",
-    showOnlyAvailable: true,
+    showOnlyReservable: true,
     textSearch: "",
   };
 
@@ -342,15 +338,15 @@ const SearchForm = ({
     register("maxPersons");
     register("reservationUnitType");
     register("textSearch");
-    register("showOnlyAvailable");
+    register("showOnlyReservable");
   }, [register]);
 
-  // TODO this is awful, don't set a random KeyValue map, use form.reset with a typed JS object
+  // FIXME this is awful, don't set a random KeyValue map, use form.reset with a typed JS object
   useEffect(() => {
     Object.keys(formValues).forEach((p) =>
       setValue(
         p as keyof FormValues,
-        p === "showOnlyAvailable"
+        p === "showOnlyReservable"
           ? formValues[p as keyof FormValues] !== "false"
           : formValues[p as keyof FormValues]
       )
@@ -409,7 +405,7 @@ const SearchForm = ({
             options={purposeOptions}
             showSearch
             title={t("searchForm:purposesFilter")}
-            value={watch("purposes")?.split(",") || [""]}
+            value={watch("purposes")?.split(",") ?? [""]}
           />
           <MultiSelectDropdown
             id="unitFilter"
@@ -421,7 +417,7 @@ const SearchForm = ({
             options={unitOptions}
             showSearch
             title={t("searchForm:unitFilter")}
-            value={watch("unit")?.split(",") || [""]}
+            value={watch("unit")?.split(",") ?? [""]}
           />
           <MultiSelectDropdown
             id="reservationUnitEquipmentsFilter"
@@ -436,7 +432,7 @@ const SearchForm = ({
             options={equipmentsOptions}
             showSearch
             title={t("searchForm:equipmentsFilter")}
-            value={watch("equipments")?.split(",") || [""]}
+            value={watch("equipments")?.split(",") ?? [""]}
           />
 
           <DateRangeWrapper>
@@ -576,24 +572,20 @@ const SearchForm = ({
               label={t("searchForm:textSearchLabel")}
               placeholder={t("searchForm:searchTermPlaceholder")}
               onEnterKeyPress={() => handleSubmit(search)()}
-              defaultValue={
-                formValues.textSearch != null
-                  ? formValues.textSearch
-                  : undefined
-              }
+              defaultValue={formValues.textSearch ?? undefined}
             />
           </OptionalFilters>
           <StyledCheckBox
-            id="showOnlyAvailable"
-            name="showOnlyAvailable"
-            label={t("searchForm:showOnlyAvailableLabel")}
+            id="showOnlyReservable"
+            name="showOnlyReservable"
+            label={t("searchForm:showOnlyReservableLabel")}
             onChange={() =>
               setValue(
-                "showOnlyAvailable",
-                Boolean(!getValues("showOnlyAvailable"))
+                "showOnlyReservable",
+                Boolean(!getValues("showOnlyReservable"))
               )
             }
-            checked={Boolean(watch("showOnlyAvailable"))}
+            checked={Boolean(watch("showOnlyReservable"))}
           />
         </Filters>
       </TopContainer>

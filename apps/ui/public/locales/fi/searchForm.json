@@ -38,5 +38,5 @@
   "selectedElement": "Valinta",
   "searchForValue": "Hae",
   "removeFilter": "Poista hakuehto \"{{value}}\"",
-  "showOnlyAvailableLabel": "Näytä vain vapaana olevat tilat"
+  "showOnlyReservableLabel": "Näytä vain vapaana olevat tilat"
 }

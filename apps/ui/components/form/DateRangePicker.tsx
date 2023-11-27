@@ -34,6 +34,10 @@ export interface DateRangePickerProps {
     endMinDate?: Date;
     endMaxDate?: Date;
   };
+  placeholder?: {
+    begin?: string;
+    end?: string;
+  };
 }
 
 const Wrapper = styled.div`
@@ -51,6 +55,7 @@ const DateRangePicker: FC<DateRangePickerProps> = ({
   labels,
   required,
   limits,
+  placeholder,
 }) => {
   const [internalStartDateString, setInternalStartDateString] =
     useState<string>(() => initDate(startDate));
@@ -133,6 +138,16 @@ const DateRangePicker: FC<DateRangePickerProps> = ({
     });
   };
 
+  const errorText = (
+    path: "startDateIsInvalid" | "endDateIsInvalid",
+    text: string
+  ) => {
+    if (errors[path]) {
+      return text;
+    }
+    return "";
+  };
+
   return (
     <Wrapper className="date-range-input__wrapper">
       <DateInput
@@ -151,12 +166,12 @@ const DateRangePicker: FC<DateRangePickerProps> = ({
         aria-label={labels?.ariaBegin ?? t("dateSelector:labelStartDate")}
         language={getLocalizationLang(i18n.language)}
         onChange={(date) => setInternalStartDateString(date)}
-        errorText={
-          errors.startDateIsInvalid
-            ? t("dateSelector:errorDateFormat")
-            : undefined
-        }
+        errorText={errorText(
+          "startDateIsInvalid",
+          t("dateSelector:errorDateFormat")
+        )}
         required={required?.begin ?? true}
+        placeholder={placeholder?.begin ?? t("dateSelector:placeholderBegin")}
       />
       <DateInput
         autoComplete="off"
@@ -181,11 +196,10 @@ const DateRangePicker: FC<DateRangePickerProps> = ({
         errorText={
           endDateIsBeforeStartDate
             ? t("dateSelector:errorEndDateBeforeStartDate")
-            : errors.endDateIsInvalid
-              ? t("dateSelector:errorDateFormat")
-              : undefined
+            : errorText("endDateIsInvalid", t("dateSelector:errorDateFormat"))
         }
         required={required?.end ?? true}
+        placeholder={placeholder?.end ?? t("dateSelector:placeholderEnd")}
       />
     </Wrapper>
   );
