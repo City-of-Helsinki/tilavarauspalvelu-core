@@ -1165,13 +1165,13 @@ requests = ["requests (>=2.4.0,<3.0.0)"]
 
 [[package]]
 name = "elasticsearch-django"
-version = "8.5.1"
+version = "8.5.2"
 description = "Elasticsearch Django app."
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "elasticsearch_django-8.5.1-py3-none-any.whl", hash = "sha256:406062dc2915023ec8e70452c5ebc122150e4af5ded1cd6d7a2121326057c5ee"},
-    {file = "elasticsearch_django-8.5.1.tar.gz", hash = "sha256:2ec7dc06e39b8b11469a27d306d24de5f42c79fa0ffaee4620ef58168207b6e7"},
+    {file = "elasticsearch_django-8.5.2-py3-none-any.whl", hash = "sha256:6c91d506c3df6d232924e182cdd94171c5450d0a527a47fbee25dd41d8259183"},
+    {file = "elasticsearch_django-8.5.2.tar.gz", hash = "sha256:c80b34f4e33255fd95627f7525832096d6e6c81585b8afc1be0ac38875cd75fc"},
 ]
 
 [package.dependencies]
@@ -3132,4 +3132,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<3.12"
-content-hash = "18f549aa1bd7c209758024d8dbc46405e7b94180a802549181c94f1361d2f5e9"
+content-hash = "2f7657f890b0ade23346d16dd1757433d567e4a1ee89feb28e4140424bc48eac"
