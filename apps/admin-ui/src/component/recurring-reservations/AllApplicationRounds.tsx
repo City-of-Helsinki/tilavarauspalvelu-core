@@ -1,23 +1,26 @@
 import React from "react";
 import { ApolloError, useQuery } from "@apollo/client";
-import { groupBy, orderBy } from "lodash";
+import { orderBy } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { H1 } from "common/src/common/typography";
-import type { ApplicationRoundNode, Query } from "common/types/gql-types";
+import {
+  ApplicationRoundStatusChoice,
+  type ApplicationRoundNode,
+  type Query,
+} from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
-import { applicationRoundUrl } from "../../common/urls";
-import { formatDate } from "../../common/util";
-import { useNotification } from "../../context/NotificationContext";
-import { Container } from "../../styles/layout";
+import { applicationRoundUrl } from "@/common/urls";
+import { formatDate } from "@/common/util";
+import { Accordion } from "@/common/hds-fork/Accordion";
+import { useNotification } from "@/context/NotificationContext";
+import { Container } from "@/styles/layout";
+import { truncate } from "@/helpers";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import Loader from "../Loader";
 import ApplicationRoundCard from "./ApplicationRoundCard";
-import { getApplicationRoundStatus } from "./ApplicationRoundStatusTag";
 import { TableLink, CustomTable } from "./CustomTable";
 import { APPLICATION_ROUNDS_QUERY } from "./queries";
-import { truncate } from "@/helpers";
-import { Accordion } from "../../common/hds-fork/Accordion";
 
 const AccordionContainer = styled.div`
   display: flex;
@@ -82,18 +85,30 @@ function AllApplicationRounds(): JSX.Element | null {
   const allApplicationRounds = filterNonNullable(
     data?.applicationRounds?.edges?.map((ar) => ar?.node)
   );
-  const applicationRounds = groupBy(
-    allApplicationRounds,
-    (round) => getApplicationRoundStatus(round.status ?? undefined).group
-  );
 
   if (loading) {
     return <Loader />;
   }
 
-  if (!applicationRounds) {
+  if (!allApplicationRounds) {
     return null;
   }
+
+  const currentApplicationRounds = allApplicationRounds.filter(
+    (ar) => ar.status === ApplicationRoundStatusChoice.InAllocation
+  );
+  const openApplicationRounds = allApplicationRounds.filter(
+    (ar) => ar.status === ApplicationRoundStatusChoice.Open
+  );
+  const sentApplicationRounds = allApplicationRounds.filter(
+    (ar) => ar.status === ApplicationRoundStatusChoice.ResultsSent
+  );
+  const upcomingApplicationRounds = allApplicationRounds.filter(
+    (ar) => ar.status === ApplicationRoundStatusChoice.Upcoming
+  );
+  const handledApplicationRounds = allApplicationRounds.filter(
+    (ar) => ar.status === ApplicationRoundStatusChoice.Handled
+  );
 
   return (
     <>
@@ -108,7 +123,7 @@ function AllApplicationRounds(): JSX.Element | null {
           name={t("ApplicationRound.groupLabel.handling")}
           rounds={
             orderBy(
-              applicationRounds.g1,
+              currentApplicationRounds,
               ["status", "applicationPeriodEnd"],
               ["asc", "asc"]
             ) || []
@@ -116,7 +131,7 @@ function AllApplicationRounds(): JSX.Element | null {
         />
         <RoundsAccordion
           name={t("ApplicationRound.groupLabel.notSent")}
-          rounds={applicationRounds.g2 || []}
+          rounds={handledApplicationRounds}
           hideIfEmpty
           initiallyOpen
         />
@@ -124,7 +139,7 @@ function AllApplicationRounds(): JSX.Element | null {
           name={t("ApplicationRound.groupLabel.open")}
           rounds={
             orderBy(
-              applicationRounds.g3,
+              openApplicationRounds,
               ["applicationPeriodEnd", "asc"],
               []
             ) || []
@@ -136,7 +151,7 @@ function AllApplicationRounds(): JSX.Element | null {
           name={t("ApplicationRound.groupLabel.opening")}
           rounds={
             orderBy(
-              applicationRounds.g4,
+              upcomingApplicationRounds,
               ["applicationPeriodBegin"],
               ["asc"]
             ) || []
@@ -201,7 +216,7 @@ function AllApplicationRounds(): JSX.Element | null {
             ]}
             indexKey="pk"
             rows={
-              orderBy(applicationRounds.g5, ["statusTimestamp"], ["desc"]).map(
+              orderBy(sentApplicationRounds, ["statusTimestamp"], ["desc"]).map(
                 (a) => ({
                   ...a,
                   statusTimestampSort: new Date(

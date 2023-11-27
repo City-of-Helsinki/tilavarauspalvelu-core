@@ -9,7 +9,7 @@ type RoundStatus = {
   group: string;
 };
 
-export const getApplicationRoundStatus = (
+const getApplicationRoundStatus = (
   status: ApplicationRoundStatusChoice | undefined
 ): RoundStatus => {
   switch (status) {
