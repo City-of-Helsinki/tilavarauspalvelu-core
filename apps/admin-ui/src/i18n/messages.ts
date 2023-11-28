@@ -761,6 +761,10 @@ const translations: ITranslations = {
           "Alkamisajan tulee olla tulevaisuudessa",
         ],
         "Number must be greater than or equal to 1": ["Pitää olla vähintään 1"],
+        "Expected number, received null": ["Pakollinen"],
+        "Max persons must be greater than min persons": [
+          "Maksimi henkilömäärä pitää olla suurempi kuin minimi henkilömäärä",
+        ],
       },
     },
     level: {
@@ -1118,6 +1122,7 @@ const translations: ITranslations = {
       reservationStartInterval: ["Varauksen aloitukset"],
       reservationsMinDaysBefore: ["Varattavissa viimeistään (vrk ennen)"],
       reservationsMaxDaysBefore: ["Varattavissa alkaen"],
+      maxReservationsPerUser: ["Varauksia enintään per käyttäjä"],
       lowestPrice: ["Alin hinta (sis. alv)"],
       lowestPriceNet: ["Alin hinta (alviton)"],
       highestPrice: ["Ylin hinta (sis. alv)"],
@@ -1438,6 +1443,7 @@ const translations: ITranslations = {
     equipmentsPlaceholder: ["Valitse varusteet"],
     reservationUnitTypePlaceholder: ["Valitse tilatyyppi"],
     reservationUnitTypeHelperText: ["Valitse tilaa parhaiten kuvaava tyyppi"],
+    maxReservationsPerUserHelperText: [""],
     purposesLabel: ["Käyttötarkoitus"],
     purposesPlaceholder: ["Valitse mitä tarkoitusta tuetaan"],
     qualifiersLabel: ["Tarkenne"],
@@ -1451,6 +1457,8 @@ const translations: ITranslations = {
     maxPersonsHelperText: [
       "Tilojen yhteenlaskettua enimmäishenkilömäärää ei voi ylittää",
     ],
+    minPersonsHelperText: [""],
+    reservationsMinDaysBeforeHelperText: [""],
     errorNoSpaces: ["Toimipisteeseen ei ole liitetty yhtään tilaa"],
     errorDataHeading: ["Datavirhe"],
     errorParamsNotAvailable: [
@@ -1517,7 +1525,6 @@ const translations: ITranslations = {
     cancellationSettings: ["Varauksen peruutus"],
     reservationBegins: ["Avaa varauskalenteri alkaen"],
     reservationEnds: ["Sulje varauskalenteri alkaen"],
-    maxReservationsPerUser: ["Varauksia enintään per käyttäjä"],
   },
   ImageEditor: {
     imageType: ["Kuvan tyyppi"],

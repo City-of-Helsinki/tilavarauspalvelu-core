@@ -140,11 +140,11 @@ export const ReservationUnitEditSchema = z
     // because if they are set (non undefined) we should show the active checkbox
     bufferTimeAfter: z.number(),
     bufferTimeBefore: z.number(),
-    maxReservationsPerUser: z.number().min(1).nullable(),
-    maxPersons: z.number().min(1).nullable(),
-    minPersons: z.number().min(1).nullable(),
-    maxReservationDuration: z.number().min(1).nullable(),
-    minReservationDuration: z.number().min(1).nullable(),
+    maxReservationsPerUser: z.number().nullable(),
+    maxPersons: z.number().nullable(),
+    minPersons: z.number().nullable(),
+    maxReservationDuration: z.number().nullable(),
+    minReservationDuration: z.number().nullable(),
     pk: z.number(),
     // Date in string format
     publishBeginsDate: z.string(),
@@ -330,6 +330,16 @@ export const ReservationUnitEditSchema = z
         message: "Required",
         path: ["descriptionFi"],
       });
+    }
+
+    if (v.maxPersons && v.minPersons) {
+      if (v.maxPersons < v.minPersons) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Max persons must be greater than min persons",
+          path: ["maxPersons"],
+        });
+      }
     }
 
     // refine pricing only if not draft and the pricing is enabled

@@ -568,6 +568,67 @@ const getMinSurfaceArea = (spaceList: NonNullable<SpaceType>[]) => {
   return Math.floor(area);
 };
 
+// Wrapper around NumberInput so it sends nulls instead of NaNs
+// set some page specific defaults for translations
+function CustomNumberInput({
+  name,
+  min,
+  max,
+  required,
+  form,
+}: {
+  name:
+    | "maxPersons"
+    | "minPersons"
+    | "surfaceArea"
+    | "reservationsMinDaysBefore"
+    | "maxReservationsPerUser";
+  form: UseFormReturn<ReservationUnitEditFormValues>;
+  max?: number;
+  min?: number;
+  required?: boolean;
+}) {
+  const { t } = useTranslation();
+  const { formState, control } = form;
+  const { errors } = formState;
+  const errMsg = errors[name]?.message;
+
+  const label = t(`ReservationUnitEditor.label.${name}`);
+  const tooltipText = t(`ReservationUnitEditor.tooltip.${name}`);
+  const helperText = t(`ReservationUnitEditor.${name}HelperText`);
+
+  // NOTE controller is needed otherwise the values default to 0 instead of null
+  return (
+    <Controller
+      name={name}
+      control={control}
+      render={({ field: { value, onChange } }) => (
+        <NumberInput
+          value={value ?? ""}
+          onChange={(e) =>
+            onChange(
+              e.target.value === "" ? null : parseInt(e.target.value, 10)
+            )
+          }
+          required={required}
+          id={name}
+          label={label}
+          minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
+          plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
+          step={1}
+          type="number"
+          min={min}
+          max={max}
+          helperText={helperText}
+          errorText={getTranslatedError(errMsg, t)}
+          invalid={errMsg != null}
+          tooltipText={tooltipText}
+        />
+      )}
+    />
+  );
+}
+
 function BasicSection({
   form,
   spaces,
@@ -703,54 +764,23 @@ function BasicSection({
             />
           )}
         />
-        <NumberInput
-          {...register("surfaceArea", {
-            required: true,
-            valueAsNumber: true,
-          })}
-          id="surfaceArea"
-          label={t("ReservationUnitEditor.label.surfaceArea")}
-          helperText={t("ReservationUnitEditor.surfaceAreaHelperText")}
-          minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
-          plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
-          step={1}
-          type="number"
+        <CustomNumberInput
+          name="surfaceArea"
           min={minSurfaceArea}
           max={undefined}
-          required
-          errorText={getTranslatedError(errors.surfaceArea?.message, t)}
-          invalid={errors.surfaceArea?.message != null}
-          tooltipText={t("ReservationUnitEditor.tooltip.surfaceArea")}
+          form={form}
         />
-        <NumberInput
-          {...register("maxPersons", { required: true, valueAsNumber: true })}
-          id="maxPersons"
-          label={t("ReservationUnitEditor.label.maxPersons")}
-          minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
-          plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
-          step={1}
-          type="number"
-          min={1}
+        <CustomNumberInput
+          name="maxPersons"
+          min={undefined}
           max={maxPersons}
-          helperText={t("ReservationUnitEditor.maxPersonsHelperText")}
-          errorText={getTranslatedError(errors.maxPersons?.message, t)}
-          invalid={errors.maxPersons?.message != null}
-          required
-          tooltipText={t("ReservationUnitEditor.tooltip.maxPersons")}
+          form={form}
         />
-        <NumberInput
-          {...register("minPersons", { required: true, valueAsNumber: true })}
-          id="minPersons"
-          label={t("ReservationUnitEditor.label.minPersons")}
-          minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
-          plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
-          step={1}
-          type="number"
-          min={0}
+        <CustomNumberInput
+          name="minPersons"
+          min={undefined}
           max={watch("maxPersons") || 1}
-          errorText={getTranslatedError(errors.minPersons?.message, t)}
-          invalid={errors.minPersons?.message != null}
-          tooltipText={t("ReservationUnitEditor.tooltip.minPersons")}
+          form={form}
         />
       </AutoGrid>
     </Accordion>
@@ -766,7 +796,7 @@ function ReservationUnitSettings({
   parametersData: Query | undefined;
 }) {
   const { t } = useTranslation();
-  const { control, register, watch, formState, setValue } = form;
+  const { control, watch, formState, setValue } = form;
   const { errors } = formState;
 
   const reservationStartIntervalOptions = Object.values(
@@ -997,25 +1027,12 @@ function ReservationUnitSettings({
             />
           )}
         />
-        <NumberInput
-          {...register("reservationsMinDaysBefore", { required: true })}
-          id="reservationsMinDaysBefore"
-          label={t("ReservationUnitEditor.label.reservationsMinDaysBefore")}
-          minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
-          plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
-          step={1}
-          type="number"
+        <CustomNumberInput
+          name="reservationsMinDaysBefore"
           max={watch("reservationsMaxDaysBefore")}
           min={0}
+          form={form}
           required
-          errorText={getTranslatedError(
-            errors.reservationsMinDaysBefore?.message,
-            t
-          )}
-          invalid={errors.reservationsMinDaysBefore?.message != null}
-          tooltipText={t(
-            "ReservationUnitEditor.tooltip.reservationsMinDaysBefore"
-          )}
         />
         <Controller
           control={control}
@@ -1196,27 +1213,7 @@ function ReservationUnitSettings({
             />
           )}
         />
-        <NumberInput
-          {...register("maxReservationsPerUser", {
-            setValueAs: (v) => (v !== "" ? Number(v) : null),
-          })}
-          id="maxReservationsPerUser"
-          label={t("ReservationUnitEditor.maxReservationsPerUser")}
-          minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
-          plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
-          min={1}
-          max={undefined}
-          step={1}
-          errorText={getTranslatedError(
-            errors.maxReservationsPerUser?.message,
-            t
-          )}
-          invalid={errors.maxReservationsPerUser?.message != null}
-          type="number"
-          tooltipText={t(
-            "ReservationUnitEditor.tooltip.maxReservationsPerUser"
-          )}
-        />
+        <CustomNumberInput name="maxReservationsPerUser" min={1} form={form} />
         <FieldGroup
           heading={t("ReservationUnitEditor.introductionSettings")}
           tooltip={t("ReservationUnitEditor.tooltip.introductionSettings")}
