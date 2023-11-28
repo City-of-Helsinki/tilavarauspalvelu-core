@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Button, TextArea } from "hds-react";
+import styled from "styled-components";
 import { FetchResult, useMutation } from "@apollo/client";
 import {
   type ApplicationUpdateMutationInput,
@@ -8,11 +9,17 @@ import {
 } from "common/types/gql-types";
 import { useTranslation } from "next-i18next";
 import { useNotification } from "@/context/NotificationContext";
-import { HorisontalFlex } from "@/styles/layout";
 import {
   UPDATE_RESERVATION_WORKING_MEMO,
   UPDATE_APPLICATION_WORKING_MEMO,
 } from "./queries";
+
+const ButtonContainer = styled.div`
+  display: flex;
+  gap: var(--spacing-m);
+  justify-content: flex-end;
+  margin-top: var(--spacing-m);
+`;
 
 // TODO split into two variations with different mutations
 // one for application and other for reservation
@@ -44,7 +51,7 @@ function WorkingMemo({
         value={workingMemo}
         onChange={(e) => setWorkingMemo(e.target.value)}
       />
-      <HorisontalFlex style={{ justifyContent: "flex-end" }}>
+      <ButtonContainer>
         <Button
           size="small"
           variant="secondary"
@@ -56,7 +63,7 @@ function WorkingMemo({
         <Button size="small" onClick={handleSave}>
           {t("RequestedReservation.save")}
         </Button>
-      </HorisontalFlex>
+      </ButtonContainer>
     </>
   );
 }
