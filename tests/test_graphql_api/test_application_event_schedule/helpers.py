@@ -4,6 +4,13 @@ from tests.helpers import build_mutation, build_query
 
 schedules_query = partial(
     build_query,
+    "applicationEventSchedules",
+    connection=True,
+    order_by="pk",
+)
+
+events_with_schedules_query = partial(
+    build_query,
     "applicationEvents",
     fields="applicationEventSchedules { pk }",
     connection=True,

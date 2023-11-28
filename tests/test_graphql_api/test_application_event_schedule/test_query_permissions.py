@@ -2,7 +2,7 @@ import pytest
 
 from tests.factories import ApplicationEventScheduleFactory
 from tests.helpers import UserType
-from tests.test_graphql_api.test_application_event_schedule.helpers import schedules_query
+from tests.test_graphql_api.test_application_event_schedule.helpers import events_with_schedules_query
 
 # Applied to all tests
 pytestmark = [
@@ -35,7 +35,7 @@ def test_staff_user_can_see_schedule_allocation_data(graphql):
 
     # when:
     # - User tries to access allocation data on application event schedules
-    response = graphql(schedules_query(fields=ALLOCATION_FIELDS))
+    response = graphql(events_with_schedules_query(fields=ALLOCATION_FIELDS))
 
     # then:
     # - The data is returned in the response
@@ -77,7 +77,7 @@ def test_application_owner_cannot_see_schedule_allocation_data(graphql, field):
     # when:
     # - User tries to access the given allocation data field
     fields = "applicationEventSchedules { %s }" % field
-    response = graphql(schedules_query(fields=fields))
+    response = graphql(events_with_schedules_query(fields=fields))
 
     # then:
     # - The response contains errors about permissions
@@ -94,7 +94,7 @@ def test_regular_user_cannot_see_schedule_allocation_data(graphql):
 
     # when:
     # - User tries to access allocation data on application event schedules
-    response = graphql(schedules_query(fields=ALLOCATION_FIELDS))
+    response = graphql(events_with_schedules_query(fields=ALLOCATION_FIELDS))
 
     # then:
     # - The response is empty, since events are filtered to those the user has access to
