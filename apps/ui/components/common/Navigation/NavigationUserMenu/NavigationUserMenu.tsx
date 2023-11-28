@@ -137,7 +137,7 @@ const NavigationUserMenu = () => {
       <NavigationUserMenuUserCard
         user={{ name: userName, email: user?.email }}
       />
-      {env.PROFILE_UI_URL && isAdAuthenticated && (
+      {isAuthenticated && !isAdAuthenticated && env.PROFILE_UI_URL && (
         <NavigationUserMenuItem
           href={env.PROFILE_UI_URL}
           icon={<IconLinkExternal aria-hidden />}
