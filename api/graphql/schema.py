@@ -26,6 +26,7 @@ from api.graphql.types.application_event_schedule.mutations import (
     ApplicationEventScheduleApproveMutation,
     ApplicationEventScheduleDeclineMutation,
 )
+from api.graphql.types.application_event_schedule.types import ApplicationEventScheduleNode
 from api.graphql.types.application_round.types import ApplicationRoundNode
 from api.graphql.types.banner_notification.mutations import (
     BannerNotificationCreateMutation,
@@ -162,9 +163,10 @@ from users.models import User
 
 
 class Query(graphene.ObjectType):
+    application_rounds = ApplicationRoundNode.Connection()
     applications = ApplicationNode.Connection()
     application_events = ApplicationEventNode.Connection()
-    application_rounds = ApplicationRoundNode.Connection()
+    application_event_schedules = ApplicationEventScheduleNode.Connection()
 
     reservations = ReservationsFilter(ReservationType, filterset_class=ReservationFilterSet)
     reservation_by_pk = Field(ReservationType, pk=graphene.Int())
