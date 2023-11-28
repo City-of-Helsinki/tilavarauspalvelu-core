@@ -93,6 +93,7 @@ export const APPLICATION_EVENTS_FOR_ALLOCATION = gql`
     $preferredOrder: [Int]
     $textSearch: String
     $priority: [Int]
+    $purpose: [Int]
     $reservationUnit: [Int]
     $applicantType: [ApplicantTypeChoice]
   ) {
@@ -103,6 +104,7 @@ export const APPLICATION_EVENTS_FOR_ALLOCATION = gql`
       name_Istartswith: $textSearch
       preferredOrder: $preferredOrder
       priority: $priority
+      purpose: $purpose
       reservationUnit: $reservationUnit
       applicantType: $applicantType
     ) {

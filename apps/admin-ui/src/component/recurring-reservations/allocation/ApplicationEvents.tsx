@@ -3,11 +3,11 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { sortBy } from "lodash";
 import { H5 } from "common/src/common/typography";
-import { Accordion } from "@/component/Accordion";
 import type {
   ApplicationEventNode,
   ReservationUnitByPkType,
 } from "common/types/gql-types";
+import { Accordion } from "@/component/Accordion";
 import type { AllocationApplicationEventCardType } from "@/common/types";
 import AllocationCalendar from "./AllocationCalendar";
 import ApplicationRoundAllocationActions from "./ApplicationRoundAllocationActions";

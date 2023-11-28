@@ -32,9 +32,9 @@ export function SearchTags({
 }): JSX.Element {
   const { t } = useTranslation();
   const [params, setParams] = useSearchParams();
-  const handleDelete = (tag: string) => {
+  const handleDelete = (tag: { key: string; value: string }) => {
     const vals = new URLSearchParams(params);
-    vals.delete(tag);
+    vals.delete(tag.key, tag.value);
     setParams(vals);
   };
   const handleReset = () => {
@@ -67,7 +67,7 @@ export function SearchTags({
       {tags.map((tag) => (
         <StyledTag
           id={tag.key}
-          onDelete={() => handleDelete(tag.key)}
+          onDelete={() => handleDelete(tag)}
           key={tag.key}
         >
           {translateTag(tag.key, tag.value)}
