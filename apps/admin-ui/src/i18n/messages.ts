@@ -1494,6 +1494,9 @@ const translations: ITranslations = {
     saveFailed: [
       "Valitettavasti varausyksikön tallennus / julkaisu ei juuri nyt onnistu, kokeile myöhemmin uudelleen. ({{error}})",
     ],
+    imageSaveFailed: [
+      "Varausyksikön tallennus onnistui, mutta kuvien tallennus epäonnistui.",
+    ],
     saveAndPublish: ["Julkaise"],
     settings: ["Varausasetukset"],
     cancellationIsPossible: ["Peruutus mahdollista"],

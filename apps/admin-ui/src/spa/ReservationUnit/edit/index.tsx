@@ -1945,13 +1945,15 @@ const ReservationUnitEditor = ({
               : "ReservationUnitEditor.reservationUnitUpdatedNotification";
           notifySuccess(t(tkey, { name: getValues("nameFi") }));
         } else {
-          // FIXME error
-          notifyError("failed to save images");
+          notifyError("ReservationUnitEditor.imageSaveFailed");
           return undefined;
         }
       } else {
-        // FIXME error
-        notifyError("ei tullut pk");
+        // eslint-disable-next-line no-console
+        console.warn(
+          "saved but, pk was not defined in mutation response: so images are not saved"
+        );
+        notifyError("ReservationUnitEditor.imageSaveFailed");
         return undefined;
       }
       refetch();
