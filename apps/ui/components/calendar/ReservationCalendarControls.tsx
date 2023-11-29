@@ -521,7 +521,7 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
         return isSlotReservable(d, e);
       })
       .map((n) => ({
-        label: trimStart(n.substring(0, 5).replace(":", "."), "0"),
+        label: trimStart(n.substring(0, 5), "0"),
         value: trimStart(n.substring(0, 5), "0"),
       }));
   }, [
