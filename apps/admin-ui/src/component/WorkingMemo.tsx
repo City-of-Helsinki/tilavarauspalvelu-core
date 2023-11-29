@@ -21,23 +21,61 @@ const ButtonContainer = styled.div`
   margin-top: var(--spacing-m);
 `;
 
-// TODO split into two variations with different mutations
-// one for application and other for reservation
 function WorkingMemo({
   initialValue,
   onMutate,
+  onSuccess,
 }: {
   initialValue: string;
   onMutate: (memo: string) => Promise<FetchResult<Mutation>>;
+  onSuccess: () => void;
 }) {
   const [workingMemo, setWorkingMemo] = useState<string>(initialValue);
-  const { notifyError } = useNotification();
+  const { notifyError, notifySuccess } = useNotification();
   const { t } = useTranslation();
 
   const handleSave = async () => {
+    // TODO awful error handling code, real problem is the lack of error design
+    // compounded with using two separate mutations here
     try {
-      await onMutate(workingMemo);
+      const res = await onMutate(workingMemo);
+      if (res.errors != null) {
+        throw new Error(res.errors[0].message);
+      }
+      const { data } = res;
+      if (
+        data?.updateReservationWorkingMemo == null &&
+        data?.updateApplication == null
+      ) {
+        throw new Error("No data returned");
+      }
+      const { updateReservationWorkingMemo, updateApplication } = data;
+      if (updateReservationWorkingMemo != null) {
+        const { errors: errs } = updateReservationWorkingMemo;
+        if (errs != null) {
+          throw new Error(errs[0]?.messages.find((m) => m != null));
+        }
+      }
+      if (updateApplication != null) {
+        const { errors: errs } = updateApplication;
+        if (errs != null) {
+          throw new Error(errs[0]?.messages.find((m) => m != null));
+        }
+      }
+      notifySuccess(t("RequestedReservation.savedWorkingMemo"));
+      onSuccess();
     } catch (ex) {
+      if (ex instanceof Error) {
+        const { message } = ex;
+        if (message === "No permission to mutate.") {
+          notifyError(t("errors.noPermission"));
+          return;
+        }
+        if (message === "No data returned") {
+          notifyError(t("errors.mutationNoDataReturned"));
+          return;
+        }
+      }
       notifyError(t("RequestedReservation.errorSavingWorkingMemo"));
     }
   };
@@ -77,27 +115,23 @@ export function ReservationWorkingMemo({
   refetch: () => void;
   initialValue: string;
 }) {
-  const { t } = useTranslation();
-  const { notifyError, notifySuccess } = useNotification();
   const [updateWorkingMemo] = useMutation<
     Mutation,
     ReservationWorkingMemoMutationInput
-  >(UPDATE_RESERVATION_WORKING_MEMO, {
-    onCompleted: () => {
-      refetch();
-      notifySuccess(t("RequestedReservation.savedWorkingMemo"));
-    },
-    onError: () => {
-      notifyError(t("RequestedReservation.errorSavingWorkingMemo"));
-    },
-  });
+  >(UPDATE_RESERVATION_WORKING_MEMO);
 
   const updateMemo = (memo: string) =>
     updateWorkingMemo({
       variables: { pk: reservationPk, workingMemo: memo },
     });
 
-  return <WorkingMemo onMutate={updateMemo} initialValue={initialValue} />;
+  return (
+    <WorkingMemo
+      onMutate={updateMemo}
+      initialValue={initialValue}
+      onSuccess={refetch}
+    />
+  );
 }
 
 export function ApplicationWorkingMemo({
@@ -109,25 +143,21 @@ export function ApplicationWorkingMemo({
   refetch: () => void;
   initialValue: string;
 }) {
-  const { t } = useTranslation();
-  const { notifyError, notifySuccess } = useNotification();
   const [updateWorkingMemo] = useMutation<
     Mutation,
     ApplicationUpdateMutationInput
-  >(UPDATE_APPLICATION_WORKING_MEMO, {
-    onCompleted: () => {
-      refetch();
-      notifySuccess(t("RequestedReservation.savedWorkingMemo"));
-    },
-    onError: () => {
-      notifyError(t("RequestedReservation.errorSavingWorkingMemo"));
-    },
-  });
+  >(UPDATE_APPLICATION_WORKING_MEMO);
 
   const updateMemo = (memo: string) =>
     updateWorkingMemo({
       variables: { pk: applicationPk, workingMemo: memo },
     });
 
-  return <WorkingMemo onMutate={updateMemo} initialValue={initialValue} />;
+  return (
+    <WorkingMemo
+      onMutate={updateMemo}
+      initialValue={initialValue}
+      onSuccess={refetch}
+    />
+  );
 }

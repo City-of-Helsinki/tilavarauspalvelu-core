@@ -186,6 +186,7 @@ const translations: ITranslations = {
       "Virhe. Varaus tehty, mutta sen näyttäminen epäonnistui.",
     ],
     noPermission: ["Sinulla ei ole käyttöoikeutta."],
+    mutationNoDataReturned: ["Odottamaton vastaus."],
     descriptive: {
       "Reservation overlaps with reservation before due to buffer time.": [
         "Varaus menee päällekkäin edellisen varauksen kanssa tauon takia.",
