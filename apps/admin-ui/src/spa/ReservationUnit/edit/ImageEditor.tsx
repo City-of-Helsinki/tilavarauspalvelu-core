@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Button, FileInput } from "hds-react";
 import { ReservationUnitsReservationUnitImageImageTypeChoices } from "common/types/gql-types";
 import { AutoGrid } from "@/styles/layout";
-import { Image } from "./types";
+import { type ImageFormType } from "./form";
 
 const Actions = styled.div`
   display: flex;
@@ -20,7 +20,7 @@ const StyledImage = styled.img`
   object-fit: cover;
 `;
 
-function RUImage({ image }: { image: Image }): JSX.Element {
+function RUImage({ image }: { image: ImageFormType }): JSX.Element {
   // medium url seems to work when deployed but locally it's not available
   const [imageUrl, setImageUrl] = useState<string>(
     image.mediumUrl || image.imageUrl || ""
@@ -83,7 +83,7 @@ function ReservationUnitImage({
 }: {
   makeIntoMainImage: (pk: number) => void;
   deleteImage: (pk: number) => void;
-  image: Image;
+  image: ImageFormType;
 }) {
   const isMain =
     image.imageType ===
@@ -117,8 +117,8 @@ function ReservationUnitImage({
 }
 
 type Props = {
-  images: Image[];
-  setImages: (images: Image[]) => void;
+  images: ImageFormType[];
+  setImages: (images: ImageFormType[]) => void;
 };
 
 export function ImageEditor({ images, setImages }: Props): JSX.Element {
@@ -130,7 +130,7 @@ export function ImageEditor({ images, setImages }: Props): JSX.Element {
         ? ReservationUnitsReservationUnitImageImageTypeChoices.Main
         : ReservationUnitsReservationUnitImageImageTypeChoices.Other;
 
-    const newImage: Image = {
+    const newImage: ImageFormType = {
       pk: fakePk,
       imageType,
       bytes: files[0],

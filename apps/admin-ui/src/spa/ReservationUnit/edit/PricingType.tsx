@@ -16,8 +16,7 @@ import {
 import { Controller, UseFormReturn } from "react-hook-form";
 import { addDays } from "date-fns";
 import { AutoGrid } from "@/styles/layout";
-import { ReservationUnitEditFormValues } from "./form";
-import { PaymentTypes } from "./types";
+import { type ReservationUnitEditFormValues, PaymentTypes } from "./form";
 
 const Error = styled.div`
   margin-top: var(--spacing-3-xs);

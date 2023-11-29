@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import {
   Button,
@@ -82,7 +82,6 @@ import { ArchiveDialog } from "./ArchiveDialog";
 import { ReservationStateTag, ReservationUnitStateTag } from "./tags";
 import { ActivationGroup } from "./ActivationGroup";
 import { ImageEditor } from "./ImageEditor";
-import { Image } from "./types";
 import { PricingType } from "./PricingType";
 import { GenericDialog } from "./GenericDialog";
 import {
@@ -90,6 +89,7 @@ import {
   ReservationUnitEditSchema,
   convertReservationUnit,
   transformReservationUnit,
+  type ImageFormType,
 } from "./form";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { reservationUnitsUrl } from "@/common/urls";
@@ -442,7 +442,7 @@ const useImageMutations = () => {
 
   const reconcileImageChanges = async (
     resUnitPk: number,
-    images: Image[]
+    images: ImageFormType[]
   ): Promise<boolean> => {
     // delete deleted images
     try {
@@ -1631,16 +1631,12 @@ function DescriptionSection({
   purposes,
   qualifiers,
   reservationUnitTypes,
-  images,
-  handleImageChange,
 }: {
   form: UseFormReturn<ReservationUnitEditFormValues>;
   equipments: EquipmentType[];
   purposes: PurposeType[];
   qualifiers: QualifierType[];
   reservationUnitTypes: ReservationUnitTypeType[];
-  images: Image[];
-  handleImageChange: (images: Image[]) => void;
 }) {
   const { t } = useTranslation();
   const { control, formState } = form;
@@ -1793,7 +1789,13 @@ function DescriptionSection({
           )
         )}
         <Span12>
-          <ImageEditor images={images} setImages={handleImageChange} />
+          <Controller
+            control={control}
+            name="images"
+            render={({ field: { value, onChange } }) => (
+              <ImageEditor images={value} setImages={onChange} />
+            )}
+          />
         </Span12>
       </Grid>
     </Accordion>
@@ -1817,8 +1819,6 @@ const ReservationUnitEditor = ({
   const { notifySuccess, notifyError } = useNotification();
   const { setModalContent } = useModal();
   const [reconcileImageChanges] = useImageMutations();
-  // TODO images should be inside the form, otherwise changes to them don't mark the form dirty
-  const [images, setImages] = useState<Image[]>(reservationUnit?.images ?? []);
 
   const [updateMutation] = useMutation<
     Mutation,
@@ -1900,10 +1900,6 @@ const ReservationUnitEditor = ({
     watch("reservationKind") === "DIRECT_AND_SEASON";
 
   // ----------------------------- Callbacks ----------------------------------
-  const handleImageChange = (imgs: Image[]) => {
-    setImages(imgs);
-  };
-
   const onSubmit = async (formValues: ReservationUnitEditFormValues) => {
     const input = transformReservationUnit(formValues);
     try {
@@ -1935,6 +1931,7 @@ const ReservationUnitEditor = ({
         data?.updateReservationUnit?.pk ?? data?.createReservationUnit?.pk;
 
       if (pk) {
+        const { images } = formValues;
         // res unit is saved, we can save changes to images
         const success = await reconcileImageChanges(pk, images);
         if (success) {
@@ -2031,8 +2028,6 @@ const ReservationUnitEditor = ({
           purposes={purposes}
           qualifiers={qualifiers}
           reservationUnitTypes={reservationUnitTypes}
-          images={images}
-          handleImageChange={handleImageChange}
         />
         {isDirect && (
           <ReservationUnitSettings

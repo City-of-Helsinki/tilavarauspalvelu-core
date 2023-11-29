@@ -16,10 +16,14 @@ import {
   type ReservationUnitPricingType,
   type ReservationUnitUpdateMutationInput,
   type ReservationUnitCreateMutationInput,
+  ReservationUnitsReservationUnitImageImageTypeChoices,
+  type ReservationUnitImageType,
 } from "common/types/gql-types";
 import { addDays, format } from "date-fns";
 import { z } from "zod";
 import { setTimeOnDate } from "@/component/reservations/utils";
+
+export const PaymentTypes = ["ONLINE", "INVOICE", "ON_SITE"] as const;
 
 export const PricingFormSchema = z.object({
   // pk === 0 means new pricing good decission?
@@ -131,6 +135,21 @@ const refinePricing = (
   }
 };
 
+const ImageFormSchema = z.object({
+  pk: z.number().optional(),
+  mediumUrl: z.string().optional(),
+  imageUrl: z.string().optional(),
+  imageType: z
+    .nativeEnum(ReservationUnitsReservationUnitImageImageTypeChoices)
+    .optional(),
+  originalImageType: z
+    .nativeEnum(ReservationUnitsReservationUnitImageImageTypeChoices)
+    .optional(),
+  bytes: z.instanceof(File).optional(),
+  deleted: z.boolean().optional(),
+});
+export type ImageFormType = z.infer<typeof ImageFormSchema>;
+
 export const ReservationUnitEditSchema = z
   .object({
     authentication: z.nativeEnum(
@@ -206,6 +225,7 @@ export const ReservationUnitEditSchema = z
     serviceSpecificTermsPk: z.string().nullable(),
     metadataSetPk: z.number().nullable(),
     surfaceArea: z.number(),
+    images: z.array(ImageFormSchema),
     // internal values
     isDraft: z.boolean(),
     isArchived: z.boolean(),
@@ -445,6 +465,17 @@ const convertPricingList = (
   return [active, future].map(convertPricing);
 };
 
+const convertImage = (image?: ReservationUnitImageType): ImageFormType => {
+  return {
+    pk: image?.pk ?? 0,
+    imageUrl: image?.imageUrl ?? undefined,
+    mediumUrl: image?.mediumUrl ?? undefined,
+    imageType: image?.imageType ?? undefined,
+    originalImageType: image?.imageType ?? undefined,
+    bytes: undefined,
+  };
+};
+
 export const convertReservationUnit = (
   data?: ReservationUnitByPkType
 ): ReservationUnitEditFormValues => {
@@ -541,6 +572,7 @@ export const convertReservationUnit = (
     cancellationRulePk: data?.cancellationRule?.pk ?? null,
     paymentTypes: filterNonNullable(data?.paymentTypes?.map((pt) => pt?.code)),
     pricings: convertPricingList(filterNonNullable(data?.pricings)),
+    images: filterNonNullable(data?.images).map((i) => convertImage(i)),
     isDraft: data?.isArchived ?? false,
     isArchived: data?.isArchived ?? false,
     hasFuturePricing:
@@ -606,6 +638,7 @@ export function transformReservationUnit(
     termsOfUseEn,
     termsOfUseFi,
     termsOfUseSv,
+    images, // images are updated with a separate mutation
     ...vals
   } = values;
 
