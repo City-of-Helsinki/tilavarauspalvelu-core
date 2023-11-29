@@ -162,10 +162,13 @@ function ApplicationRoundAllocation({
     setParams(vals);
   };
 
-  const setUnitFilter = (value: number | null) => {
-    setSingleValueSearchParam("unit", value?.toString() ?? null);
-    // FIXME can't do it like this, both params need to be set in one go
-    // setSelectedReservationUnit(null);
+  const setUnitFilter = (value: number) => {
+    // NOTE different logic because values are not atomic and we need to set two params
+    const vals = new URLSearchParams(searchParams);
+    vals.set("unit", value.toString());
+    // TODO how to find the default reservation unit for the selected unit?
+    vals.delete("reservation-unit");
+    setParams(vals);
   };
 
   // TODO if unit selection changes and new list doesn't include the selected reservation unit, clear the selection
@@ -183,8 +186,7 @@ function ApplicationRoundAllocation({
     // TODO this conflicts with the setUnitFilter
     // should be fine to enable if they are never called from same event handler
     // eslint-disable-next-line no-console -- TODO
-    console.log("NOT IMPLEMENTED setSelectedReservationUnit", value);
-    // setSingleValueSearchParam("reservation-unit", value?.toString() ?? null);
+    setSingleValueSearchParam("reservation-unit", value?.toString() ?? null);
   };
 
   const nameFilter = searchParams.get("name");
@@ -252,8 +254,6 @@ function ApplicationRoundAllocation({
     );
   };
 
-  // TODO filter values should be gotten from the base applicationRound (not calculated from the events, because the events
-  // keep changing based on the filters, so we would always get smaller and smaller amount of options)
   // TODO pagination
   const { data, refetch } = useQuery<Query, QueryApplicationEventsArgs>(
     APPLICATION_EVENTS_FOR_ALLOCATION,
@@ -264,9 +264,12 @@ function ApplicationRoundAllocation({
       variables: {
         applicationRound: applicationRoundId,
         ...(unitFilter != null ? { unit: [Number(unitFilter)] } : {}),
+        // TODO timeFilter in null state should show nothing
         ...(timeFilter != null
           ? { priority: timeFilter.map((x) => Number(x)) }
           : {}),
+        // TODO how to do a negative query here? we want everything over 10
+        // it's includePreferredOrder10OrHigher boolean filter in the query
         ...(orderFilter != null
           ? { preferredOrder: orderFilter.map((x) => Number(x)) }
           : {}),
@@ -274,7 +277,6 @@ function ApplicationRoundAllocation({
         ...(cityFilter != null
           ? { homeCity: cityFilter.map((x) => Number(x)) }
           : {}),
-        // TODO conversion
         ...(applicantTypeFilter != null
           ? {
               applicantType: applicantTypeFilter.map((x) =>
@@ -324,24 +326,17 @@ function ApplicationRoundAllocation({
     label: t(`ApplicationEvent.priority.${n}`),
   }));
 
-  const orderOptions = [
-    {
-      value: 1,
-      label: `1. ${t("Allocation.filters.reservationUnitApplication")}`,
-    },
-    {
-      value: 2,
-      label: `2. ${t("Allocation.filters.reservationUnitApplication")}`,
-    },
-    {
-      value: 3,
-      label: `3. ${t("Allocation.filters.reservationUnitApplication")}`,
-    },
-    {
-      value: 4,
-      label: `4. ${t("Allocation.filters.reservationUnitApplication")}`,
-    },
-  ];
+  const orderOptions = Array.from(Array(10).keys())
+    .map((n) => ({
+      value: n + 1,
+      label: `${n + 1}. ${t("Allocation.filters.reservationUnitApplication")}`,
+    }))
+    .concat([
+      {
+        value: 11,
+        label: `${t("Allocation.filters.reservationUnitApplicationOthers")}`,
+      },
+    ]);
 
   const translateTag = (key: string, value: string) => {
     switch (key) {
@@ -373,6 +368,7 @@ function ApplicationRoundAllocation({
   );
 
   // TODO replace with Combobox over Select
+  // TODO show the total number and the filtered number of application events
   return (
     // TODO top gap is 2rem but the rest of the page is something else so can't change the container directly
     <Container>
@@ -393,8 +389,7 @@ function ApplicationRoundAllocation({
         maximumNumber={4}
       >
         <Select
-          clearButtonAriaLabel={t("common.clearAllSelections")}
-          label={t("Allocation.filters.unit")}
+          label={t("Allocation.filters.label.unit")}
           options={unitOptions}
           disabled={unitOptions.length === 0}
           value={
@@ -404,11 +399,12 @@ function ApplicationRoundAllocation({
             setUnitFilter(val.value ?? null)
           }
           placeholder={t("common.selectPlaceholder")}
+          clearButtonAriaLabel={t("common.clearAllSelections")}
           selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
         />
         {/* TODO is this multi select or just no select is all? */}
         <Select
-          label={t("Allocation.filters.schedules")}
+          label={t("Allocation.filters.label.schedules")}
           clearable
           multiselect
           /* @ts-expect-error - multiselect issues */
@@ -422,12 +418,12 @@ function ApplicationRoundAllocation({
           onChange={(val?: TimeFilterOptions[]) =>
             setTimeFilter(val?.map((x) => x.value) ?? null)
           }
-          placeholder={t("common.selectPlaceholder")}
+          placeholder={t("Allocation.filters.placeholder.time")}
           clearButtonAriaLabel={t("common.clearAllSelections")}
           selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
         />
         <Select
-          label={t("Allocation.filters.reservationUnitOrder")}
+          label={t("Allocation.filters.label.reservationUnitOrder")}
           clearable
           multiselect
           /* @ts-expect-error - multiselect issues */
@@ -441,20 +437,20 @@ function ApplicationRoundAllocation({
           onChange={(val?: typeof orderOptions) =>
             setOrderFilter(val?.map((x) => x.value) ?? null)
           }
-          placeholder={t("common.selectPlaceholder")}
+          placeholder={t("Allocation.filters.placeholder.order")}
           clearButtonAriaLabel={t("common.clearAllSelections")}
           selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
         />
         {/* TODO debounce this before updates */}
         <TextInput
           id="search"
-          label={t("Allocation.filters.search")}
+          label={t("Allocation.filters.label.search")}
           onChange={(e) => setNameFilter(e.target.value)}
           value={nameFilter ?? ""}
-          placeholder={t("common.textSearchPlaceHolder")}
+          placeholder={t("Allocation.filters.placeholder.search")}
         />
         <Select
-          label={t("filters.homeCity")}
+          label={t("Allocation.filters.label.homeCity")}
           clearable
           multiselect
           /* @ts-expect-error - multiselect issues */
@@ -468,12 +464,12 @@ function ApplicationRoundAllocation({
           onChange={(val?: typeof cityOptions) =>
             setCityFilter(val?.map((x) => x.value) ?? null)
           }
-          placeholder={t("common.textSearchPlaceHolder")}
+          placeholder={t("Allocation.filters.placeholder.homeCity")}
           clearButtonAriaLabel={t("common.clearAllSelections")}
           selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
         />
         <Select
-          label={t("Allocation.filters.applicantType")}
+          label={t("Allocation.filters.label.applicantType")}
           clearable
           multiselect
           /* @ts-expect-error - multiselect issues */
@@ -487,7 +483,7 @@ function ApplicationRoundAllocation({
           onChange={(val?: typeof customerFilterOptions) =>
             setApplicantType(val?.map((x) => x.value) ?? null)
           }
-          placeholder={t("common.selectPlaceholder")}
+          placeholder={t("Allocation.filters.placeholder.applicantType")}
           clearButtonAriaLabel={t("common.clearAllSelections")}
           selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
         />
@@ -506,7 +502,7 @@ function ApplicationRoundAllocation({
           onChange={(val?: typeof ageGroupOptions) =>
             setAgeGroupFilter(val?.map((x) => x.value) ?? null)
           }
-          placeholder={t("common.selectPlaceholder")}
+          placeholder={t("Allocation.filters.placeholder.ageGroup")}
           clearButtonAriaLabel={t("common.clearAllSelections")}
           selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
         />
@@ -525,13 +521,22 @@ function ApplicationRoundAllocation({
           onChange={(val?: typeof purposeOptions) =>
             setPurposeFilter(val?.map((x) => x.value) ?? null)
           }
-          placeholder={t("common.selectPlaceholder")}
+          placeholder={t("Allocation.filters.placeholder.purpose")}
           clearButtonAriaLabel={t("common.clearAllSelections")}
           selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
         />
       </MoreWrapper>
-      <SearchTags hide={["unit"]} translateTag={translateTag} />
-      <Tabs>
+      <SearchTags
+        hide={["unit", "reservation-unit"]}
+        translateTag={translateTag}
+      />
+      <Tabs
+        initiallyActiveTab={
+          tabResUnits.findIndex(
+            (x) => x.pk != null && x.pk.toString() === selectedReservationUnit
+          ) ?? 0
+        }
+      >
         <TabList>
           {/* TODO check if this is correct, it changed from two tabs to one after the filter change
            * it did improve the usability though (loading state), or it seems like
