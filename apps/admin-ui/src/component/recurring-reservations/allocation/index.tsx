@@ -205,7 +205,7 @@ function ApplicationRoundAllocation({
     if (value == null || value.length === 0) {
       vals.delete(param);
     } else {
-      // TODO this doesn't remove a value if there are more than one value
+      vals.set(param, value[0]);
       value.forEach((v) => {
         if (!vals.has(param, v)) {
           vals.append(param, v);
@@ -264,7 +264,6 @@ function ApplicationRoundAllocation({
       variables: {
         applicationRound: applicationRoundId,
         ...(unitFilter != null ? { unit: [Number(unitFilter)] } : {}),
-        // TODO timeFilter in null state should show nothing
         ...(timeFilter != null
           ? { priority: timeFilter.map((x) => Number(x)) }
           : {}),
