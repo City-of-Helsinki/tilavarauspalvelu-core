@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { gql, useQuery } from "@apollo/client";
-import { Select, Tabs, TextInput } from "hds-react";
+import { Combobox, SearchInput, Select, Tabs } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { uniqBy } from "lodash";
 import { useParams, useSearchParams } from "react-router-dom";
@@ -22,7 +22,7 @@ import { Container } from "@/styles/layout";
 import { useNotification } from "@/context/NotificationContext";
 import { useAllocationContext } from "@/context/AllocationContext";
 import Loader from "@/component/Loader";
-import LinkPrev from "@/component/LinkPrev";
+import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import usePermission from "@/hooks/usePermission";
 import { Permission } from "@/modules/permissionHelper";
 import { APPLICATION_EVENTS_FOR_ALLOCATION } from "../queries";
@@ -366,16 +366,10 @@ function ApplicationRoundAllocation({
     (ru) => ru.unit?.pk != null && ru?.unit?.pk === Number(unitFilter)
   );
 
-  // TODO replace with Combobox over Select
   // TODO show the total number and the filtered number of application events
   return (
     // TODO top gap is 2rem but the rest of the page is something else so can't change the container directly
     <Container>
-      {/* TODO this can't be prev link because it uses history.pop not history('..')
-          so it doesn't work with search params properly
-          TODO it also has wrong margins (compared to other pages)
-      */}
-      <LinkPrev />
       {/* TODO these look like they have wrong margins */}
       <div>
         <StyledH1>{t("Allocation.allocationTitle")}</StyledH1>
@@ -402,7 +396,7 @@ function ApplicationRoundAllocation({
           selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
         />
         {/* TODO is this multi select or just no select is all? */}
-        <Select
+        <Combobox<typeof timeOptions>
           label={t("Allocation.filters.label.schedules")}
           clearable
           multiselect
@@ -421,7 +415,7 @@ function ApplicationRoundAllocation({
           clearButtonAriaLabel={t("common.clearAllSelections")}
           selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
         />
-        <Select
+        <Combobox<typeof orderOptions>
           label={t("Allocation.filters.label.reservationUnitOrder")}
           clearable
           multiselect
@@ -441,14 +435,14 @@ function ApplicationRoundAllocation({
           selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
         />
         {/* TODO debounce this before updates */}
-        <TextInput
-          id="search"
+        <SearchInput
           label={t("Allocation.filters.label.search")}
-          onChange={(e) => setNameFilter(e.target.value)}
+          onChange={(str) => setNameFilter(str)}
+          onSubmit={() => {}}
           value={nameFilter ?? ""}
           placeholder={t("Allocation.filters.placeholder.search")}
         />
-        <Select
+        <Combobox<typeof cityOptions>
           label={t("Allocation.filters.label.homeCity")}
           clearable
           multiselect
@@ -467,7 +461,7 @@ function ApplicationRoundAllocation({
           clearButtonAriaLabel={t("common.clearAllSelections")}
           selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
         />
-        <Select
+        <Combobox<typeof customerFilterOptions>
           label={t("Allocation.filters.label.applicantType")}
           clearable
           multiselect
@@ -486,7 +480,7 @@ function ApplicationRoundAllocation({
           clearButtonAriaLabel={t("common.clearAllSelections")}
           selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
         />
-        <Select
+        <Combobox<typeof ageGroupOptions>
           label={t("filters.ageGroup")}
           clearable
           multiselect
@@ -505,7 +499,7 @@ function ApplicationRoundAllocation({
           clearButtonAriaLabel={t("common.clearAllSelections")}
           selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
         />
-        <Select
+        <Combobox<typeof purposeOptions>
           label={t("filters.purpose")}
           clearable
           multiselect
@@ -615,12 +609,15 @@ function AllocationWrapper({
 
   const resUnits = uniqBy(filterNonNullable(reservationUnits), "pk");
   return (
-    <ApplicationRoundAllocation
-      applicationRoundId={applicationRoundId}
-      units={units}
-      reservationUnits={resUnits}
-      roundName={roundName}
-    />
+    <>
+      <BreadcrumbWrapper backLink=".." />
+      <ApplicationRoundAllocation
+        applicationRoundId={applicationRoundId}
+        units={units}
+        reservationUnits={resUnits}
+        roundName={roundName}
+      />
+    </>
   );
 }
 

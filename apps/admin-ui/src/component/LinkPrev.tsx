@@ -26,6 +26,7 @@ function LinkPrev({ route, style, className }: IProps): JSX.Element {
   return (
     <StyledLink
       to={route || "#"}
+      relative="path"
       style={style}
       className={className}
       data-testid="link__previous"

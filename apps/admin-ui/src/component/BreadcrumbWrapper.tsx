@@ -13,11 +13,17 @@ type Alias = {
   title: string | undefined;
 };
 
+// Enforce either route or backLink has to be defined
+// TODO could do more extensive checks to remove route and aliases from LinkOnlyProps
 type Props = {
   route: string[] | Array<{ slug: string; alias?: string }>;
   aliases?: Alias[];
   backLink?: string;
 };
+
+type LinkOnlyProps = {
+  backLink: string;
+} & Partial<Omit<Props, "backLink">>;
 
 const Wrapper = styled.div`
   display: block;
@@ -45,11 +51,8 @@ const LinkWrapper = styled.div`
  * @param aliases - deprecated, use route instead
  * @param backLink - if set, renders a back link instead of breadcrumb
  */
-const BreadcrumbWrapper = ({
-  route,
-  aliases,
-  backLink,
-}: Props): JSX.Element => {
+const BreadcrumbWrapper = (props: Props | LinkOnlyProps): JSX.Element => {
+  const { route, aliases, backLink } = props;
   const { t } = useTranslation();
   const isMobile = useMedia(`(max-width: ${breakpoints.s})`, true);
 
