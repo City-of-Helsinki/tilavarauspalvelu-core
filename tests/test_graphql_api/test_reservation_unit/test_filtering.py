@@ -21,7 +21,7 @@ QUERY = """
 """
 
 
-def test_filter_reservation_units_by_one_equipment(graphql):
+def test_reservation_unit__filter__by_equipment(graphql):
     # given:
     # - There are two reservation units with different equipments
     equipment_1 = EquipmentFactory.create(name="foo")
@@ -45,7 +45,7 @@ def test_filter_reservation_units_by_one_equipment(graphql):
     assert response.node(0) == {"nameFi": "fizz"}
 
 
-def test_filter_reservation_units_by_multiple_equipments(graphql):
+def test_reservation_unit__filter__by_equipment__multiple(graphql):
     # given:
     # - There are two reservation units with different equipments, and one with both
     equipment_1 = EquipmentFactory.create(name="foo")
@@ -70,7 +70,7 @@ def test_filter_reservation_units_by_multiple_equipments(graphql):
     assert response.node(0) == {"nameFi": "1"}
 
 
-def test_filter_reservation_units_by_multiple_equipments__none_match(graphql):
+def test_reservation_unit__filter__by_equipment__multiple__none_match(graphql):
     # given:
     # - There are two reservation units with different equipments
     equipment_1 = EquipmentFactory.create(name="foo")
