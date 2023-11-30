@@ -1,4 +1,4 @@
-from tests.helpers import build_mutation
+from tests.gql_builders import build_mutation
 
 TIMESLOTS_QUERY = """
     query {

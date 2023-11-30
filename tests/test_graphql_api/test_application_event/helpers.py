@@ -6,7 +6,7 @@ from applications.choices import WeekdayChoice
 from applications.models import Application, ApplicationEvent
 from common.utils import timedelta_to_json
 from tests.factories import AbilityGroupFactory, AgeGroupFactory, ReservationPurposeFactory, ReservationUnitFactory
-from tests.helpers import build_mutation, build_query
+from tests.gql_builders import build_mutation, build_query
 
 events_query = partial(build_query, "applicationEvents", connection=True, order_by="pk")
 

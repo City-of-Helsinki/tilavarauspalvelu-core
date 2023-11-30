@@ -1,6 +1,6 @@
 from functools import partial
 
-from tests.helpers import build_mutation, build_query
+from tests.gql_builders import build_mutation, build_query
 
 spaces_query = partial(build_query, "spaces", connection=True, order_by="pk")
 

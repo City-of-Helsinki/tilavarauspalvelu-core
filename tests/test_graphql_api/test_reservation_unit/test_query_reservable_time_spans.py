@@ -11,7 +11,7 @@ from tests.factories import (
     ReservableTimeSpanFactory,
     ReservationUnitFactory,
 )
-from tests.helpers import build_query
+from tests.gql_builders import build_query
 
 # Applied to all tests
 pytestmark = [
