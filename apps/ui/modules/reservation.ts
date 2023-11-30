@@ -1,10 +1,7 @@
 import { addMinutes, addSeconds, isAfter, isValid } from "date-fns";
 import camelCase from "lodash/camelCase";
 import { secondsToHms } from "common/src/common/util";
-import {
-  OptionType,
-  PendingReservation,
-} from "common/types/common";
+import { OptionType, PendingReservation } from "common/types/common";
 import {
   PaymentOrderType,
   ReservationsReservationReserveeTypeChoices,
@@ -24,6 +21,7 @@ import {
   isStartTimeWithinInterval,
 } from "common/src/calendar/util";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
+import { filterNonNullable } from "common/src/helpers";
 import { getTranslation } from "./util";
 
 export const getDurationOptions = (
@@ -53,7 +51,7 @@ export const getDurationOptions = (
     const minute = String(hms.m).padEnd(2, "0");
     return {
       label: `${hms.h}:${minute}`,
-      value: `${hms.h}:${minute}`,
+      value: n/3600,
     };
   });
 
@@ -75,9 +73,10 @@ export const isReservationWithinCancellationPeriod = (
   reservation: ReservationType
 ): boolean => {
   const reservationUnit = reservation.reservationUnits?.[0];
-  const begin = new Date(reservation.begin)
+  const begin = new Date(reservation.begin);
 
-  const minutesBeforeCancel = reservationUnit?.cancellationRule?.canBeCancelledTimeBefore ?? 0;
+  const minutesBeforeCancel =
+    reservationUnit?.cancellationRule?.canBeCancelledTimeBefore ?? 0;
   const cancelLatest = addSeconds(new Date(), minutesBeforeCancel);
 
   return cancelLatest > begin;
@@ -208,7 +207,7 @@ export const isReservationReservable = ({
     reservations,
     bufferTimeBefore,
     bufferTimeAfter,
-    openingHours,
+    reservableTimeSpans,
     maxReservationDuration,
     minReservationDuration,
     reservationStartInterval,
@@ -218,11 +217,12 @@ export const isReservationReservable = ({
     reservationEnds,
   } = reservationUnit;
 
-  if ( !isValid(start) || !isValid(end)) {
+  if (!isValid(start) || !isValid(end)) {
     return false;
   }
 
-  const reservationsArr = reservations?.filter((r): r is NonNullable<typeof r> => r !== null) ?? []
+  const reservationsArr =
+    reservations?.filter((r): r is NonNullable<typeof r> => r != null) ?? [];
   if (
     doBuffersCollide(
       {
@@ -232,24 +232,22 @@ export const isReservationReservable = ({
         bufferTimeBefore: bufferTimeBefore ?? 0,
         bufferTimeAfter: bufferTimeAfter ?? 0,
       },
-      reservationsArr,
-    )) {
+      reservationsArr
+    )
+  ) {
     return false;
   }
 
-  const openingTimes = openingHours?.openingTimes?.filter((n): n is NonNullable<typeof n> => n !== null) ?? [];
+  const reservableTimes = filterNonNullable(reservableTimeSpans) ?? [];
   if (
-    !isStartTimeWithinInterval(
-      start,
-      openingTimes,
-      reservationStartInterval
-    )) {
+    !isStartTimeWithinInterval(start, reservableTimes, reservationStartInterval)
+  ) {
     return false;
   }
   if (
     !isRangeReservable({
       range: [new Date(start), normalizedEnd],
-      openingHours: openingTimes,
+      reservableTimes,
       reservationBegins: reservationBegins
         ? new Date(reservationBegins)
         : undefined,
@@ -258,7 +256,8 @@ export const isReservationReservable = ({
       reservationsMinDaysBefore: reservationsMinDaysBefore ?? 0,
       activeApplicationRounds,
       reservationStartInterval,
-    })) {
+    })
+  ) {
     return false;
   }
   if (
@@ -334,7 +333,8 @@ export const canReservationTimeBeChanged = ({
     }
 
     //  new reservation is valid
-    if (reservationUnit != null &&
+    if (
+      reservationUnit != null &&
       !isReservationReservable({
         reservationUnit,
         activeApplicationRounds,
@@ -374,7 +374,7 @@ export const getReservationValue = (
       if (reservation.purpose != null) {
         return getTranslation(reservation.purpose, "name");
       }
-      return null
+      return null;
     }
     case "homeCity": {
       if (reservation.homeCity == null) {
@@ -390,7 +390,7 @@ export const getReservationValue = (
         const val = reservation[key as keyof ReservationType];
         if (typeof val === "string" || typeof val === "number") {
           return val;
-          }
+        }
       }
       return null;
     }
@@ -415,7 +415,6 @@ export const getCheckoutUrl = (
       const baseUrl = `${origin}${pathname}`;
       return `${baseUrl}/paymentmethod?user=${userId}&lang=${lang}`;
     }
-  } catch (e) {
-  }
+  } catch (e) {}
   return undefined;
 };

@@ -299,28 +299,17 @@ export const RELATED_RESERVATION_UNITS = gql`
 export const OPENING_HOURS = gql`
   query ReservationUnitOpeningHours(
     $pk: Int
-    $startDate: Date
-    $endDate: Date
+    $startDate: Date!
+    $endDate: Date!
     $from: Date
     $to: Date
     $state: [String]
     $includeWithSameComponents: Boolean
   ) {
     reservationUnitByPk(pk: $pk) {
-      openingHours(
-        openingTimes: true
-        periods: false
-        startDate: $startDate
-        endDate: $endDate
-      ) {
-        openingTimes {
-          date
-          startTime
-          endTime
-          state
-          periods
-          isReservable
-        }
+      reservableTimeSpans(startDate: $startDate, endDate: $endDate) {
+        startDatetime
+        endDatetime
       }
       reservations(
         state: $state

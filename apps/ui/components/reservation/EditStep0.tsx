@@ -269,12 +269,14 @@ const EditStep0 = ({
     if (!reservationUnit) {
       return undefined;
     }
-    const openingHours =
-      reservationUnit.openingHours?.openingTimes?.filter(
-        (n): n is NonNullable<typeof n> => n != null
-      ) ?? [];
+    const reservableTimes =
+      reservationUnit.reservableTimeSpans != null
+        ? reservationUnit.reservableTimeSpans.filter(
+            (n): n is NonNullable<typeof n> => n != null
+          )
+        : [];
     return getSlotPropGetter({
-      openingHours,
+      reservableTimes,
       activeApplicationRounds,
       reservationBegins: reservationUnit.reservationBegins
         ? new Date(reservationUnit.reservationBegins)

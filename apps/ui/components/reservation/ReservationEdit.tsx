@@ -17,7 +17,7 @@ import {
   ReservationsReservationTypeChoices,
   type ReservationType,
   type ReservationUnitByPkType,
-  type ReservationUnitByPkTypeOpeningHoursArgs,
+  type ReservationUnitByPkTypeReservableTimeSpansArgs,
   type ReservationUnitByPkTypeReservationsArgs,
 } from "common/types/gql-types";
 import { pick } from "lodash";
@@ -37,21 +37,21 @@ import {
   ADJUST_RESERVATION_TIME,
   GET_RESERVATION,
   LIST_RESERVATIONS,
-} from "../../modules/queries/reservation";
-import { JustForDesktop, JustForMobile } from "../../modules/style/layout";
+} from "@/modules/queries/reservation";
+import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
 import { getTranslation } from "../../modules/util";
 import Sanitize from "../common/Sanitize";
 import ReservationInfoCard from "./ReservationInfoCard";
 import {
   OPENING_HOURS,
   RESERVATION_UNIT,
-} from "../../modules/queries/reservationUnit";
-import { mockOpeningTimes } from "../../modules/reservationUnit";
+} from "@/modules/queries/reservationUnit";
+import { mockOpeningTimes } from "@/modules/reservationUnit";
 import EditStep0 from "./EditStep0";
 import EditStep1 from "./EditStep1";
-import { reservationsPrefix } from "../../modules/const";
-import { APPLICATION_ROUNDS } from "../../modules/queries/applicationRound";
-import { Toast } from "../../styles/util";
+import { reservationsPrefix } from "@/modules/const";
+import { APPLICATION_ROUNDS } from "@/modules/queries/applicationRound";
+import { Toast } from "@/styles/util";
 
 type Props = {
   id: number;
@@ -207,7 +207,7 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
   const [fetchAdditionalData, { data: additionalData }] = useLazyQuery<
     Query,
     QueryReservationUnitByPkArgs &
-      ReservationUnitByPkTypeOpeningHoursArgs &
+      ReservationUnitByPkTypeReservableTimeSpansArgs &
       ReservationUnitByPkTypeReservationsArgs
   >(OPENING_HOURS, {
     fetchPolicy: "no-cache",
@@ -219,8 +219,8 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
       fetchAdditionalData({
         variables: {
           pk: reservationUnitByPk?.pk,
-          startDate: toApiDate(new Date(now)),
-          endDate: toApiDate(addYears(new Date(), 1)),
+          startDate: String(toApiDate(new Date(now))),
+          endDate: String(toApiDate(addYears(new Date(), 1))),
           from: toApiDate(new Date(now)),
           to: toApiDate(addYears(new Date(), 1)),
           state: allowedReservationStates,
@@ -240,13 +240,13 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
     }
     setReservationUnit({
       ...reservationUnitData?.reservationUnitByPk,
-      openingHours: {
-        ...reservationUnitData?.reservationUnitByPk?.openingHours,
-        openingTimes: allowReservationsWithoutOpeningHours
+      reservableTimeSpans: {
+        ...reservationUnitData?.reservationUnitByPk?.reservableTimeSpans,
+        ...(allowReservationsWithoutOpeningHours
           ? mockOpeningTimes
-          : additionalData?.reservationUnitByPk?.openingHours?.openingTimes?.filter(
-              (n) => n?.isReservable
-            ) || [],
+          : additionalData?.reservationUnitByPk?.reservableTimeSpans?.filter(
+              (n) => n?.startDatetime != null && n?.endDatetime != null
+            ) || []),
       },
       reservations: additionalData?.reservationUnitByPk?.reservations,
     });

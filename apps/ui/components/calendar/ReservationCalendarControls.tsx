@@ -370,7 +370,7 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
       const {
         bufferTimeBefore,
         bufferTimeAfter,
-        openingHours,
+        reservableTimeSpans,
         reservationsMinDaysBefore,
         reservationsMaxDaysBefore,
         reservations,
@@ -419,13 +419,13 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
         setErrorMsg(t("reservationCalendar:errors.bufferCollision"));
       }
 
-      const openingTimes = filterNonNullable(openingHours?.openingTimes) ?? [];
+      const reservableTimes = filterNonNullable(reservableTimeSpans) ?? [];
       if (doReservationsCollide({ start: startDate, end: endDate }, res)) {
         setErrorMsg(t(`reservationCalendar:errors.collision`));
       } else if (
         !isRangeReservable({
           range: [startDate, addMinutes(endDate, -1)],
-          openingHours: openingTimes,
+          reservableTimes,
           reservationBegins: reservationBegins
             ? new Date(reservationBegins)
             : undefined,
@@ -462,9 +462,12 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
     endTime: dayEndTime,
   }: { startTime?: string; endTime?: string } = useMemo(() => {
     const timeframes = filterNonNullable(
-      reservationUnit.openingHours?.openingTimes
+      reservationUnit.reservableTimeSpans
     ).filter(
-      (n) => n?.date != null && date != null && n.date === toApiDate(date)
+      (n) =>
+        n?.startDatetime != null &&
+        date != null &&
+        n.startDatetime === toApiDate(date)
     );
 
     if (timeframes.length === 0) {
@@ -475,11 +478,11 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
     }
 
     const possibleStartTimes = timeframes
-      .map((n) => n.startTime != null && new Date(n.startTime))
+      .map((n) => n.startDatetime != null && new Date(n.startDatetime))
       .filter((n): n is Date => n != null);
     const first = min(possibleStartTimes);
     const possibleEndTimes = timeframes
-      .map((n) => n.endTime && new Date(n.endTime))
+      .map((n) => n.endDatetime && new Date(n.endDatetime))
       .filter((n): n is Date => n != null);
     const last = max(possibleEndTimes);
 
@@ -487,7 +490,7 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
       startTime: first ? first.toISOString() : undefined,
       endTime: last ? last.toISOString() : undefined,
     };
-  }, [reservationUnit.openingHours?.openingTimes, date]);
+  }, [reservationUnit?.reservableTimeSpans, date]);
 
   const startingTimesOptions: OptionType[] = useMemo(() => {
     const durations = durationOptions
@@ -592,8 +595,8 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
       : undefined;
 
   const lastOpeningDate = maxBy(
-    reservationUnit.openingHours?.openingTimes,
-    (n) => n?.date
+    reservationUnit.reservableTimeSpans,
+    (n) => n?.startDatetime
   );
 
   const submitButton = createReservation ? (
@@ -698,8 +701,8 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
               language={getLocalizationLang(i18n.language)}
               minDate={new Date()}
               maxDate={
-                lastOpeningDate?.date
-                  ? new Date(lastOpeningDate.date)
+                lastOpeningDate?.startDatetime
+                  ? new Date(lastOpeningDate.startDatetime)
                   : new Date()
               }
             />

@@ -9,13 +9,14 @@ import {
   getISODay,
   isAfter,
   isBefore,
+  isSameDay,
   isWithinInterval,
   roundToNearestMinutes,
   startOfDay,
 } from "date-fns";
 import { TFunction } from "next-i18next";
 import {
-  type OpeningTimesType,
+  type ReservableTimeSpanType,
   type ReservationType,
   type ReservationUnitByPkType,
   type ReservationUnitsReservationUnitReservationStartIntervalChoices,
@@ -36,9 +37,9 @@ import {
   parseDate,
   secondsToHms,
   startOfWeek,
-  toApiDate,
   toUIDate,
 } from "../common/util";
+import { filterNonNullable } from "../helpers";
 
 export const longDate = (date: Date, t: TFunction): string =>
   t("common:dateLong", {
@@ -105,22 +106,22 @@ export const isReservationLongEnough = (
   return reservationDuration >= minDuration;
 };
 
-export const areOpeningTimesAvailable = (
-  openingHours: OpeningTimesType[],
+export const areReservableTimesAvailable = (
+  reservableTimes: ReservableTimeSpanType[],
   slotDate: Date,
   validateEnding = false
 ): boolean => {
-  return !!openingHours?.some((oh) => {
-    const { startTime, endTime, isReservable } = oh;
+  return !!reservableTimes?.some((oh) => {
+    const { startDatetime, endDatetime } = oh;
 
-    if (!isReservable || !startTime || !endTime) return false;
+    if (!startDatetime || !endDatetime) return false;
 
-    const startDate = new Date(startTime);
-    const endDate = new Date(endTime);
+    const startDate = new Date(startDatetime);
+    const endDate = new Date(endDatetime);
 
     return validateEnding
       ? startDate <= slotDate && endDate >= slotDate
-      : startDate <= slotDate && endDate > slotDate;
+      : startDate <= slotDate;
   });
 };
 
@@ -214,7 +215,7 @@ export const generateSlots = (
 
 export const areSlotsReservable = (
   slots: Date[],
-  openingHours: OpeningTimesType[],
+  reservableTimes: ReservableTimeSpanType[],
   reservationsMinDaysBefore: number,
   reservationsMaxDaysBefore: number,
   reservationBegins?: Date,
@@ -226,7 +227,7 @@ export const areSlotsReservable = (
     const slotDate = new Date(slot);
 
     return (
-      areOpeningTimesAvailable(openingHours, slotDate, validateEnding) &&
+      areReservableTimesAvailable(reservableTimes, slotDate, validateEnding) &&
       isSlotWithinTimeframe(
         slotDate,
         reservationsMinDaysBefore,
@@ -241,7 +242,7 @@ export const areSlotsReservable = (
 
 export const isRangeReservable = ({
   range,
-  openingHours,
+  reservableTimes,
   reservationBegins,
   reservationEnds,
   reservationsMinDaysBefore = 0,
@@ -250,7 +251,7 @@ export const isRangeReservable = ({
   reservationStartInterval,
 }: {
   range: Date[];
-  openingHours: OpeningTimesType[];
+  reservableTimes: ReservableTimeSpanType[];
   reservationsMinDaysBefore: number;
   reservationsMaxDaysBefore: number;
   reservationBegins?: Date;
@@ -261,7 +262,9 @@ export const isRangeReservable = ({
   const slots = generateSlots(range[0], range[1], reservationStartInterval);
 
   if (
-    !slots.every((slot) => areOpeningTimesAvailable(openingHours, slot, false))
+    !slots.every((slot) =>
+      areReservableTimesAvailable(reservableTimes, slot, true)
+    )
   ) {
     return false;
   }
@@ -342,37 +345,31 @@ export const getDayIntervals = (
 
 export const isStartTimeWithinInterval = (
   start: Date,
-  openingTimes: OpeningTimesType[],
+  reservableTimeSpans: ReservableTimeSpanType[],
   interval?: ReservationUnitsReservationUnitReservationStartIntervalChoices
 ): boolean => {
-  if (openingTimes?.length < 1) return false;
+  if (reservableTimeSpans?.length < 1) return false;
   if (!interval) return true;
 
   const startHMS = `${toUIDate(start, "HH:mm")}:00`;
-
-  const timeframe: OpeningTimesType =
-    openingTimes?.find((n) => {
-      if (!n.startTime || !n.endTime) return false;
-      const startTime = `${toUIDate(new Date(n.startTime), "HH:mm")}:00`;
+  const timeframe: ReservableTimeSpanType =
+    reservableTimeSpans?.find((n) => {
+      if (!n.startDatetime || !n.endDatetime) return false;
+      const startTime = `${toUIDate(new Date(n.startDatetime), "HH:mm")}:00`;
       const endTime = `${toUIDate(
-        addMinutes(new Date(n.endTime), -1),
+        addMinutes(new Date(n.endDatetime), -1),
         "HH:mm"
       )}:00`;
 
-      return (
-        n.isReservable &&
-        n.date === toApiDate(start) &&
-        startTime <= startHMS &&
-        endTime > startHMS
-      );
+      return startTime <= startHMS && endTime > startHMS;
     }) || {};
 
   return (
-    !!timeframe.startTime &&
-    !!timeframe.endTime &&
+    !!timeframe.startDatetime &&
+    !!timeframe.endDatetime &&
     getDayIntervals(
-      format(new Date(timeframe.startTime), "HH:mm"),
-      format(new Date(timeframe.endTime), "HH:mm"),
+      format(new Date(timeframe.startDatetime), "HH:mm"),
+      format(new Date(timeframe.endDatetime), "HH:mm"),
       interval
     ).includes(startHMS)
   );
@@ -424,7 +421,7 @@ export const getValidEndingTime = ({
 
 export const getSlotPropGetter =
   ({
-    openingHours,
+    reservableTimes,
     activeApplicationRounds,
     reservationBegins,
     reservationEnds,
@@ -433,7 +430,7 @@ export const getSlotPropGetter =
     currentDate,
     customValidation,
   }: {
-    openingHours: OpeningTimesType[];
+    reservableTimes: ReservableTimeSpanType[];
     activeApplicationRounds: RoundPeriod[];
     reservationsMinDaysBefore: number;
     reservationsMaxDaysBefore: number;
@@ -443,12 +440,13 @@ export const getSlotPropGetter =
     reservationEnds?: Date;
   }) =>
   (date: Date): SlotProps => {
-    const hours = openingHours.filter((n) => {
-      if (!n.date) return false;
+    const hours = reservableTimes?.filter((n) => {
+      if (!n.startDatetime || !n.endDatetime) return false;
       const start = startOfWeek(currentDate);
       const end = endOfWeek(currentDate);
-      const nDate = new Date(n.date);
-      return nDate >= start && nDate <= end;
+      const nStartDate = new Date(n.startDatetime);
+      const nEndDate = new Date(n.endDatetime);
+      return nStartDate >= start && nEndDate <= end;
     });
     switch (
       areSlotsReservable(
@@ -595,11 +593,11 @@ export const isReservationUnitReservable = (
         : null;
       const hasSupportedFields =
         (reservationUnit.metadataSet?.supportedFields?.length ?? 0) > 0;
-      const hasOpeningTimes =
-        (reservationUnit.openingHours?.openingTimes?.length ?? 0) > 0;
+      const hasReservableTimes =
+        (reservationUnit.reservableTimeSpans?.length ?? 0) > 0;
       return (
         hasSupportedFields &&
-        hasOpeningTimes &&
+        hasReservableTimes &&
         (!resBegins || resBegins < new Date()) &&
         !!minReservationDuration &&
         !!maxReservationDuration
@@ -642,34 +640,35 @@ export const parseTimeframeLength = (begin: string, end: string): string => {
   return formatSecondDuration(diff);
 };
 
+// Returns an timeslot array (in HH:mm format) with the time-slots that are
+// available for reservation on the given date
 export const getAvailableTimes = (
   reservationUnit: ReservationUnitByPkType,
   date: Date
 ): string[] => {
   const allTimes: string[] = [];
-  const { openingHours, reservationStartInterval } = reservationUnit;
+  const { reservableTimeSpans, reservationStartInterval } = reservationUnit;
+  filterNonNullable(reservableTimeSpans)
+    ?.filter(({ startDatetime }) => {
+      if (!startDatetime) return false;
+      const startDate = new Date(startDatetime);
+      return isSameDay(new Date(date), startDate);
+    })
+    ?.forEach((rts) => {
+      if (!rts?.startDatetime || !rts?.endDatetime) return;
+      const intervals = getDayIntervals(
+        format(new Date(rts.startDatetime), "HH:mm"),
+        format(new Date(rts.endDatetime), "HH:mm"),
+        reservationStartInterval
+      );
 
-  const openingTimes = openingHours?.openingTimes?.filter(
-    (n) => n?.isReservable && n?.date === toUIDate(date, "yyyy-MM-dd")
-  );
+      const times: string[] = intervals.map((val) => {
+        const [startHours, startMinutes] = val.split(":");
 
-  openingTimes?.forEach((openingTime) => {
-    if (!openingTime?.startTime || !openingTime?.endTime) return;
-
-    const intervals = getDayIntervals(
-      format(new Date(openingTime.startTime), "HH:mm"),
-      format(new Date(openingTime.endTime), "HH:mm"),
-      reservationStartInterval
-    );
-
-    const times: string[] = intervals.map((val) => {
-      const [startHours, startMinutes] = val.split(":");
-
-      return `${startHours}:${startMinutes}`;
+        return `${startHours}:${startMinutes}`;
+      });
+      allTimes.push(...times);
     });
-
-    allTimes.push(...times);
-  });
 
   return allTimes;
 };
@@ -677,13 +676,13 @@ export const getAvailableTimes = (
 export const getOpenDays = (
   reservationUnit: ReservationUnitByPkType
 ): Date[] => {
-  const { openingHours } = reservationUnit;
+  const { reservableTimeSpans } = reservationUnit;
 
   const openDays: Date[] = [];
 
-  openingHours?.openingTimes?.forEach((openingTime) => {
-    if (openingTime && openingTime.isReservable) {
-      const date = new Date(openingTime?.date as string);
+  reservableTimeSpans?.forEach((reservableTime) => {
+    if (reservableTime) {
+      const date = new Date(String(reservableTime.startDatetime));
       openDays.push(date);
     }
   });

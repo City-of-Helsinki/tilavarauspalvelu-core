@@ -1,6 +1,4 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { getAvailableTimes } from "common/src/calendar/util";
-import { chunkArray, toUIDate } from "common/src/common/util";
 import type { OptionType, PendingReservation } from "common/types/common";
 import {
   addDays,
@@ -12,19 +10,22 @@ import {
   isValid,
 } from "date-fns";
 import { DateInput, IconAngleDown, Select, TimeInput } from "hds-react";
-import { maxBy, padStart } from "lodash";
+import { padStart } from "lodash";
 import { useTranslation } from "next-i18next";
 import { useLocalStorage } from "react-use";
 import styled from "styled-components";
+import { getAvailableTimes } from "common/src/calendar/util";
+import { chunkArray, toUIDate } from "common/src/common/util";
 import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
 import { fontBold, fontMedium, H4 } from "common/src/common/typography";
 import ClientOnly from "common/src/ClientOnly";
 import { ReservationUnitByPkType } from "common/types/gql-types";
-import { ReservationProps } from "../../context/DataContext";
-import { getDurationOptions } from "../../modules/reservation";
-import { getReservationUnitPrice } from "../../modules/reservationUnit";
-import { formatDate } from "../../modules/util";
-import { MediumButton } from "../../styles/util";
+import { breakpoints } from "common";
+import { type ReservationProps } from "@/context/DataContext";
+import { getDurationOptions } from "@/modules/reservation";
+import { getReservationUnitPrice } from "@/modules/reservationUnit";
+import { formatDate } from "@/modules/util";
+import { MediumButton } from "@/styles/util";
 import Carousel from "../Carousel";
 import LoginFragment from "../LoginFragment";
 
@@ -52,7 +53,6 @@ type Props = {
   subventionSuffix?: (arg: string) => JSX.Element;
 };
 
-const mobileBreakpoint = "400px";
 const timeItems = 24;
 
 const Wrapper = styled.div`
@@ -89,7 +89,7 @@ const Selects = styled.div`
     ${fontMedium};
   }
 
-  @media (min-width: ${mobileBreakpoint}) {
+  @media (min-width: ${breakpoints.s}) {
     & > *:first-child {
       grid-column: unset;
     }
@@ -146,7 +146,7 @@ const SlotGroup = styled.ul`
   gap: var(--spacing-s) var(--spacing-2-xs);
   justify-content: center;
 
-  @media (min-width: ${mobileBreakpoint}) {
+  @media (min-width: ${breakpoints.s}) {
     gap: var(--spacing-s) var(--spacing-s);
   }
 `;
@@ -214,64 +214,74 @@ const ActionWrapper = styled.div`
   justify-content: flex-end;
 `;
 
+// Returns a Date object with the first day of the given array of Dates
 function dayMin(days: Array<Date | undefined>): Date | undefined {
   return filterNonNullable(days).reduce<Date | undefined>((acc, day) => {
     return acc ? (isBefore(acc, day) ? acc : day) : day;
   }, undefined);
 }
 
-function getLastPossibleReservationDate(ru: ReservationUnitByPkType) {
-  if (!ru) {
+// Returns the last possible reservation date for the given reservation unit
+function getLastPossibleReservationDate(
+  reservationUnit: ReservationUnitByPkType
+) {
+  if (!reservationUnit || !reservationUnit.reservableTimeSpans?.length) {
     return undefined;
   }
+
+  /*
+  // TODO: This return statement would be enough, if the API would take into account the limits and reservableTimeSpans is already filtered.
+
+  return new Date(reservationUnit.reservableTimeSpans.at(-1).startDatetime);
+   */
   const lastPossibleReservationDate =
-    ru.reservationsMaxDaysBefore != null && ru.reservationsMaxDaysBefore > 0
-      ? addDays(new Date(), ru.reservationsMaxDaysBefore)
+    reservationUnit.reservationsMaxDaysBefore != null &&
+    reservationUnit.reservationsMaxDaysBefore > 0
+      ? addDays(new Date(), reservationUnit.reservationsMaxDaysBefore)
       : undefined;
-  const reservationUnitNotReservable = ru.reservationEnds
-    ? new Date(ru.reservationEnds)
+  const reservationUnitNotReservable = reservationUnit.reservationEnds
+    ? new Date(reservationUnit.reservationEnds)
     : undefined;
-  const lastOpeningDate =
-    maxBy(ru.openingHours?.openingTimes, (n) => n?.date) ?? undefined;
-  const lastOpenDate = lastOpeningDate?.date
-    ? new Date(lastOpeningDate.date)
+  const lastOpeningDate = reservationUnit.reservableTimeSpans
+    ? new Date(
+        String(reservationUnit?.reservableTimeSpans.at(-1)?.startDatetime)
+      )
     : new Date();
   return dayMin([
     reservationUnitNotReservable,
     lastPossibleReservationDate,
-    lastOpenDate,
+    lastOpeningDate,
   ]);
 }
 
 type AvailableTimesProps = {
   day: Date;
-  duration: string;
+  duration: number;
   time: string;
   isSlotReservable: (start: Date, end: Date) => boolean;
   fromStartOfDay?: boolean;
-  ru?: ReservationUnitByPkType;
+  reservationUnit?: ReservationUnitByPkType;
 };
+
+// Returns an array of available times for the given duration and day
 // TODO this is really slow (especially if called from a loop)
 const availableTimes = ({
   day,
   duration,
   time,
   isSlotReservable,
-  ru,
+  reservationUnit,
   fromStartOfDay = false,
 }: AvailableTimesProps): string[] => {
-  if (ru == null) {
-    return [];
-  }
-
-  const [durationHours, durationMinutes] =
-    duration?.split(":").map(Number) || [];
+  if (reservationUnit == null) return [];
+  const durationHours = Math.floor(duration);
+  const durationMinutes = Math.floor((duration - durationHours) * 60);
   const [timeHours, timeMinutesRaw] = fromStartOfDay
     ? [0, 0]
-    : time.split(":").map(Number);
+    : (!time ? "0:0" : time).split(":").map(Number);
 
   const timeMinutes = timeMinutesRaw > 59 ? 59 : timeMinutesRaw;
-  return getAvailableTimes(ru, day)
+  return getAvailableTimes(reservationUnit, day)
     .map((n) => {
       const [slotHours, slotMinutes] = n.split(":").map(Number);
       const start = new Date(day);
@@ -287,37 +297,27 @@ const availableTimes = ({
     .filter((n): n is NonNullable<typeof n> => n != null);
 };
 
+// Returns the next available time, after the given time (Date object)
 const getNextAvailableTime = (
   props: {
     after: Date;
   } & Omit<AvailableTimesProps, "day">
 ): Date | null => {
-  const { after, ru } = props;
-  if (ru == null) {
+  const { after, reservationUnit } = props;
+  if (reservationUnit == null) {
     return null;
   }
-  const { openingHours } = ru;
+  const { reservableTimeSpans } = reservationUnit;
 
   const today = new Date();
-  const possibleEndDay = getLastPossibleReservationDate(ru);
+  const possibleEndDay = getLastPossibleReservationDate(reservationUnit);
   const endDay = possibleEndDay ? addDays(possibleEndDay, 1) : undefined;
-  const openDays: Date[] = filterNonNullable(openingHours?.openingTimes)
-    .filter((openingTime) => openingTime.isReservable)
-    .map((openingTime) =>
-      openingTime?.date != null ? new Date(openingTime.date) : null
-    )
-    .filter((n): n is NonNullable<typeof n> => n != null)
+  const openDays: Date[] = filterNonNullable(reservableTimeSpans)
+    .map((openingTime) => new Date(String(openingTime.startDatetime)))
     .filter((date) => {
-      if (!isAfter(date, after)) {
-        return false;
-      }
-      if (!isAfter(date, today)) {
-        return false;
-      }
-      if (endDay && isAfter(date, endDay)) {
-        return false;
-      }
-      return true;
+      if (!isAfter(date, after)) return false;
+      if (!isAfter(date, today)) return false;
+      return !(endDay && isAfter(date, endDay));
     });
   // Already sorted by date
 
@@ -327,7 +327,7 @@ const getNextAvailableTime = (
       ...props,
       day,
       fromStartOfDay: true,
-      ru,
+      reservationUnit,
     });
     if (availableTimesForDay.length > 0) {
       const [hours, minutes] = availableTimesForDay[0].split(":").map(Number);
@@ -399,7 +399,7 @@ const QuickReservation = ({
     formatDate(nextHour.toISOString(), "HH:mm")
   );
   const [duration, setDuration] = useState<OptionType | undefined>(
-    durationOptions.find((n) => n.value === "1:00") || durationOptions[0]
+    durationOptions.find((n) => n.value === 1) || durationOptions[0]
   );
   const [slot, setSlot] = useState<string | null>(null);
   const [isReserving, setIsReserving] = useState(false);
@@ -428,9 +428,11 @@ const QuickReservation = ({
     [duration?.value, reservationUnit, date]
   );
 
+  // Store the reservation in local storage
   const [storedReservation, setStoredReservation, removeStoredReservation] =
     useLocalStorage<ReservationProps | null>("reservation");
 
+  // If a stored reservation is found, set the according values and activate the slot
   useEffect(() => {
     if (storedReservation?.begin && storedReservation?.end) {
       const { begin, end } = storedReservation;
@@ -460,10 +462,13 @@ const QuickReservation = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // If the user selects a slot, set local reservation and quick reservation slot
   useEffect(() => {
     if (date && duration?.value && slot) {
-      const [durationHours, durationMinutes] =
-        duration?.value.toString().split(":").map(Number) || [];
+      const durationHours = Math.floor(Number(duration.value));
+      const durationMinutes = Math.floor(
+        (Number(duration.value) - durationHours) * 60
+      );
       const [slotHours, slotMinutes] = slot.split(":").map(Number);
       const begin = new Date(date);
       begin.setHours(slotHours, slotMinutes, 0, 0);
@@ -484,53 +489,58 @@ const QuickReservation = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [date, duration, slot, reservationUnit?.pk, setQuickReservationSlot]);
 
+  // If the parent component unselects the slot, unselect it here as well
   useEffect(() => {
     if (shouldUnselect) setSlot(null);
   }, [shouldUnselect]);
 
+  // A map of all available times for the day, chunked into groups of 8
   const timeChunks: string[][] = useMemo(() => {
     const itemsPerChunk = 8;
     const availableTimesForDay = availableTimes({
       day: date,
-      duration: duration?.value?.toString() ?? "00:00",
+      duration: Number(duration?.value) ?? 0,
       time,
       isSlotReservable,
-      ru: reservationUnit ?? undefined,
+      reservationUnit: reservationUnit ?? undefined,
     });
+
     return chunkArray(availableTimesForDay, itemsPerChunk).slice(
       0,
       timeItems / itemsPerChunk
     );
   }, [date, reservationUnit, time, duration, isSlotReservable]);
 
+  // the next available time after the selected time
   const nextAvailableTime = useMemo(
     () =>
       reservationUnit != null
         ? getNextAvailableTime({
             after: date,
-            ru: reservationUnit,
-            duration: duration?.value?.toString() ?? "00:00",
             time,
+            duration: Number(duration?.value) ?? 0,
             isSlotReservable,
+            reservationUnit,
           })
         : null,
     [date, reservationUnit, time, duration, isSlotReservable]
   );
 
+  // the available times for the selected day
   const dayTimes = useMemo(
     () =>
       availableTimes({
         day: date,
-        duration: duration?.value?.toString() ?? "00:00",
         time,
+        duration: Number(duration?.value) ?? 0,
         isSlotReservable,
-        ru: reservationUnit ?? undefined,
+        reservationUnit: reservationUnit ?? undefined,
       }),
-    [date, reservationUnit, time, duration, isSlotReservable]
+    [date, time, duration, isSlotReservable, reservationUnit]
   );
 
   if (
-    !reservationUnit?.openingHours ||
+    !reservationUnit?.reservableTimeSpans ||
     !minReservationDuration ||
     !maxReservationDuration
   ) {
@@ -553,10 +563,10 @@ const QuickReservation = ({
               setSlot(null);
               const times = availableTimes({
                 day: valueAsDate,
-                duration: duration?.value?.toString() ?? "00:00",
+                duration: Number(duration?.value) ?? 0,
                 time,
                 isSlotReservable,
-                ru: reservationUnit ?? undefined,
+                reservationUnit: reservationUnit ?? undefined,
                 fromStartOfDay: true,
               });
               setDate(valueAsDate);

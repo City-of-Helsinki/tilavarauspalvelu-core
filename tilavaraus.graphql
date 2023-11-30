@@ -1243,20 +1243,6 @@ interface Node {
   id: ID!
 }
 
-type OpeningHoursType {
-  openingTimes: [OpeningTimesType]
-  openingTimePeriods: [PeriodType]
-}
-
-type OpeningTimesType {
-  date: Date
-  startTime: DateTime
-  endTime: DateTime
-  state: String
-  periods: [Int]
-  isReservable: Boolean
-}
-
 """An enumeration."""
 enum organisation_type {
   """Company"""
@@ -1365,20 +1351,6 @@ type PaymentProductType implements Node {
   id: ID!
   pk: String
   merchantPk: String
-}
-
-type PeriodType {
-  periodId: Int
-  startDate: Date
-  endDate: Date
-  resourceState: String
-  timeSpans: [TimeSpanType]
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
 }
 
 type PersonNode implements Node {
@@ -1957,6 +1929,11 @@ type RefreshOrderMutationPayload {
   status: String
   reservationPk: Int
   clientMutationId: String
+}
+
+type ReservableTimeSpanType {
+  startDatetime: DateTime
+  endDatetime: DateTime
 }
 
 input ReservationAdjustTimeMutationInput {
@@ -2930,7 +2907,6 @@ type ReservationUnitByPkType implements Node {
   """The ID of the object"""
   id: ID!
   reservations(from: Date, to: Date, state: [String], includeWithSameComponents: Boolean): [ReservationType]
-  openingHours(openingTimes: Boolean, periods: Boolean, startDate: Date, endDate: Date): OpeningHoursType
   pk: Int
   qualifiers: [QualifierType]
   location: LocationType
@@ -2943,8 +2919,8 @@ type ReservationUnitByPkType implements Node {
   paymentProduct: PaymentProductType
   pricings: [ReservationUnitPricingType]
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotNode!]
-  nextAvailableSlot: DateTime @deprecated(reason: "Old deprecated scalar. Does not yield any return.")
   haukiUrl: ReservationUnitHaukiUrlType
+  reservableTimeSpans(startDate: Date!, endDate: Date!): [ReservableTimeSpanType]
 }
 
 type ReservationUnitCancellationRuleType implements Node {
@@ -3071,21 +3047,21 @@ input ReservationUnitCreateMutationInput {
   paymentTypes: [String]
   pricings: [ReservationUnitPricingCreateSerializerInput]
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotSerializerInput]
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
@@ -3196,21 +3172,21 @@ type ReservationUnitCreateMutationPayload {
   paymentTypes: [String]
   pricings: [ReservationUnitPricingType]
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotNode]
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
@@ -3745,21 +3721,21 @@ input ReservationUnitUpdateMutationInput {
   paymentTypes: [String]
   pricings: [ReservationUnitPricingUpdateSerializerInput]!
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotSerializerInput]
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
@@ -3869,21 +3845,21 @@ type ReservationUnitUpdateMutationPayload {
   pricingTerms: String
   paymentTypes: [String]
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotNode]
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
@@ -4504,20 +4480,6 @@ type TimeSlotType {
   end: TimeString!
 }
 
-type TimeSpanType {
-  startTime: Time
-  endTime: Time
-  weekdays: [Int]
-  resourceState: String
-  endTimeOnNextDay: Boolean
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-}
-
 """Time scalar that can parse time-strings from database."""
 scalar TimeString
 
@@ -4538,7 +4500,6 @@ type UnitByPkType implements Node {
 
   """The ID of the object"""
   id: ID!
-  openingHours(openingTimes: Boolean, periods: Boolean, startDate: Date, endDate: Date): OpeningHoursType
   pk: Int
   reservationUnits: [ReservationUnitType]
   spaces: [SpaceType]
@@ -4620,15 +4581,15 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   clientMutationId: String
 }
 
@@ -4638,15 +4599,15 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]

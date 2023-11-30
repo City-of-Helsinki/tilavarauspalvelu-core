@@ -20,7 +20,7 @@ import {
   isStartTimeWithinInterval,
 } from "../util";
 import {
-  OpeningHoursType,
+  ReservableTimeSpanType,
   ReservationType,
   ReservationUnitByPkType,
   ReservationUnitsReservationUnitReservationStartIntervalChoices,
@@ -1144,7 +1144,7 @@ describe("getNormalizedReservationBeginTime", () => {
 
 describe("getAvailableTimes", () => {
   test("get correct times", () => {
-    const openingHours: OpeningHoursType = {
+    const openingHours: ReservableTimeSpanType = {
       openingTimePeriods: [],
       openingTimes: [
         {
@@ -1182,7 +1182,7 @@ describe("getAvailableTimes", () => {
   });
 
   test("get correct times", () => {
-    const openingHours: OpeningHoursType = {
+    const openingHours: ReservableTimeSpanType = {
       openingTimePeriods: [],
       openingTimes: [
         {
@@ -1219,7 +1219,7 @@ describe("getAvailableTimes", () => {
 
 describe("getOpenDays", () => {
   test("correct output", () => {
-    const openingHours: OpeningHoursType = {
+    const openingHours: ReservableTimeSpanType = {
       openingTimePeriods: [],
       openingTimes: [
         {

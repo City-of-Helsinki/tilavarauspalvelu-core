@@ -25,6 +25,7 @@ import {
   isReservationInThePast,
 } from "../reservation";
 import mockTranslations from "../../public/locales/fi/prices.json";
+import {toApiDate} from "common/src/common/util";
 
 jest.mock("next-i18next", () => ({
   i18n: {
@@ -112,19 +113,12 @@ const reservationUnit: ReservationUnitByPkType = {
   reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins,
   reservationBegins: addDays(new Date(), -1).toISOString(),
   reservationEnds: undefined, // addDays(new Date(), 200).toISOString(),
-  openingHours: {
-    openingTimes: Array.from(Array(100)).map((_val, index) => {
-      const date = format(addDays(new Date(), index), "yyyy-MM-dd");
+  reservableTimeSpans: Array.from(Array(100)).map((_val, index) => {
       return {
-        date,
-        startTime: `${date}T07:00:00+00:00`,
-        endTime: `${date}T20:00:00+00:00`,
-        state: "open",
-        periods: null,
-        isReservable: true,
+        startDatetime: `${toApiDate(addDays(new Date(), index))}T07:00:00+00:00`,
+        endDatetime: `${toApiDate(addDays(new Date(), index))}T20:00:00+00:00`,
       };
-    })
-  },
+    }),
   cancellationRule: {
     id: "fr8ejifod",
     needsHandling: false,
@@ -627,9 +621,7 @@ describe("canReservationBeChanged", () => {
           },
           reservationUnit: {
             ...reservationUnit,
-            openingHours: {
-              openingTimes: [],
-            },
+            reservableTimeSpans: [],
           },
           activeApplicationRounds: [],
         })

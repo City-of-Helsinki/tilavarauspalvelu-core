@@ -1,14 +1,21 @@
-import { addDays, addMinutes, endOfWeek, set } from "date-fns";
+import {
+  addDays,
+  addMinutes,
+  endOfWeek,
+  isAfter,
+  isBefore,
+  set,
+} from "date-fns";
 import { graphql } from "msw";
 import { toApiDate, toUIDate } from "common/src/common/util";
 import {
-  OpeningTimesType,
+  ReservableTimeSpanType,
   Query,
   QueryReservationUnitByPkArgs,
   QueryReservationUnitsArgs,
   ReservationType,
   ReservationUnitByPkType,
-  ReservationUnitByPkTypeOpeningHoursArgs,
+  ReservationUnitByPkTypeReservableTimeSpansArgs,
   ReservationUnitByPkTypeReservationsArgs,
   ReservationUnitImageType,
   ReservationUnitTypeConnection,
@@ -912,7 +919,7 @@ const selectedReservationUnitQuery = graphql.query<
 const openingHoursQuery = graphql.query<
   Query,
   QueryReservationUnitByPkArgs &
-    ReservationUnitByPkTypeOpeningHoursArgs &
+    ReservationUnitByPkTypeReservableTimeSpansArgs &
     ReservationUnitByPkTypeReservationsArgs
 >("ReservationUnitOpeningHours", async (req, res, ctx) => {
   const { startDate, endDate, from, to, state } = req.variables;
@@ -920,16 +927,10 @@ const openingHoursQuery = graphql.query<
   const reservationUnitOpeningHours = {
     data: {
       reservationUnit: {
-        openingHours: {
-          openingTimes: Array.from(Array(100)).map((_val, index) => ({
-            date: toApiDate(addDays(new Date(), index)),
-            startTime: "07:00:00+00:00",
-            endTime: "20:00:00+00:00",
-            state: "open",
-            periods: null,
-            isReservable: true,
-          })),
-        },
+        reservableTimeSpans: Array.from(Array(100)).map((_val, index) => ({
+          startDatetime: `${toApiDate(addDays(new Date(), index))}T07:00:00+00:00`,
+          endDatetime: `${toApiDate(addDays(new Date(), index))}T20:00:00+00:00`,
+        })),
         reservations: [
           {
             id: "UmVzZXJ2YXRpb25UeXBlOjU=",
@@ -1050,14 +1051,8 @@ const openingHoursQuery = graphql.query<
     },
   };
 
-  const openingTimes: OpeningTimesType[] =
-    reservationUnitOpeningHours.data.reservationUnit.openingHours.openingTimes.filter(
-      (openingTime: OpeningTimesType) => {
-        if (openingTime.date != null && startDate != null && endDate != null) {
-          return openingTime.date >= startDate && openingTime.date <= endDate;
-        }
-      }
-    );
+  const reservableTimeSpans: ReservableTimeSpanType[] =
+    reservationUnitOpeningHours.data.reservationUnit.reservableTimeSpans;
 
   const reservations: ReservationType[] =
     reservationUnitOpeningHours.data.reservationUnit.reservations.filter(
@@ -1092,7 +1087,7 @@ const openingHoursQuery = graphql.query<
         nameSv: "",
         requireIntroduction: false,
         uuid: "",
-        openingHours: { openingTimes },
+        reservableTimeSpans,
         reservations,
       } as ReservationUnitByPkType,
     })
@@ -1418,7 +1413,7 @@ const termsOfUseData: TermsOfUseTypeConnection = {
   pageInfo: {
     hasNextPage: false,
     hasPreviousPage: false,
-  }
+  },
 };
 
 export const termsOfUse = graphql.query<Query, QueryTermsOfUseArgs>(
@@ -1550,7 +1545,7 @@ const purposeData: PurposeTypeConnection = {
   pageInfo: {
     hasNextPage: false,
     hasPreviousPage: false,
-  }
+  },
 };
 
 export const reservationUnitPurposes = graphql.query<Query, QueryPurposesArgs>(

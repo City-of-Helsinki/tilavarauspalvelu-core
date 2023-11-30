@@ -1454,22 +1454,6 @@ export type Node = {
   id: Scalars["ID"]["output"];
 };
 
-export type OpeningHoursType = {
-  __typename?: "OpeningHoursType";
-  openingTimePeriods?: Maybe<Array<Maybe<PeriodType>>>;
-  openingTimes?: Maybe<Array<Maybe<OpeningTimesType>>>;
-};
-
-export type OpeningTimesType = {
-  __typename?: "OpeningTimesType";
-  date?: Maybe<Scalars["Date"]["output"]>;
-  endTime?: Maybe<Scalars["DateTime"]["output"]>;
-  isReservable?: Maybe<Scalars["Boolean"]["output"]>;
-  periods?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
-  startTime?: Maybe<Scalars["DateTime"]["output"]>;
-  state?: Maybe<Scalars["String"]["output"]>;
-};
-
 export type OrganisationNode = Node & {
   __typename?: "OrganisationNode";
   activeMembers?: Maybe<Scalars["Int"]["output"]>;
@@ -1553,21 +1537,6 @@ export type PaymentProductType = Node & {
   id: Scalars["ID"]["output"];
   merchantPk?: Maybe<Scalars["String"]["output"]>;
   pk?: Maybe<Scalars["String"]["output"]>;
-};
-
-export type PeriodType = {
-  __typename?: "PeriodType";
-  descriptionEn?: Maybe<Scalars["String"]["output"]>;
-  descriptionFi?: Maybe<Scalars["String"]["output"]>;
-  descriptionSv?: Maybe<Scalars["String"]["output"]>;
-  endDate?: Maybe<Scalars["Date"]["output"]>;
-  nameEn?: Maybe<Scalars["String"]["output"]>;
-  nameFi?: Maybe<Scalars["String"]["output"]>;
-  nameSv?: Maybe<Scalars["String"]["output"]>;
-  periodId?: Maybe<Scalars["Int"]["output"]>;
-  resourceState?: Maybe<Scalars["String"]["output"]>;
-  startDate?: Maybe<Scalars["Date"]["output"]>;
-  timeSpans?: Maybe<Array<Maybe<TimeSpanType>>>;
 };
 
 export type PersonNode = Node & {
@@ -2328,6 +2297,12 @@ export type RefreshOrderMutationPayload = {
   orderUuid?: Maybe<Scalars["UUID"]["output"]>;
   reservationPk?: Maybe<Scalars["Int"]["output"]>;
   status?: Maybe<Scalars["String"]["output"]>;
+};
+
+export type ReservableTimeSpanType = {
+  __typename?: "ReservableTimeSpanType";
+  endDatetime?: Maybe<Scalars["DateTime"]["output"]>;
+  startDatetime?: Maybe<Scalars["DateTime"]["output"]>;
 };
 
 export type ReservationAdjustTimeMutationInput = {
@@ -3119,9 +3094,6 @@ export type ReservationUnitByPkType = Node & {
   nameEn?: Maybe<Scalars["String"]["output"]>;
   nameFi?: Maybe<Scalars["String"]["output"]>;
   nameSv?: Maybe<Scalars["String"]["output"]>;
-  /** @deprecated Old deprecated scalar. Does not yield any return. */
-  nextAvailableSlot?: Maybe<Scalars["DateTime"]["output"]>;
-  openingHours?: Maybe<OpeningHoursType>;
   paymentMerchant?: Maybe<PaymentMerchantType>;
   paymentProduct?: Maybe<PaymentProductType>;
   paymentTerms?: Maybe<TermsOfUseType>;
@@ -3140,6 +3112,7 @@ export type ReservationUnitByPkType = Node & {
   requireIntroduction: Scalars["Boolean"]["output"];
   /** Does reservations of this reservation unit need to be handled before they're confirmed. */
   requireReservationHandling: Scalars["Boolean"]["output"];
+  reservableTimeSpans?: Maybe<Array<Maybe<ReservableTimeSpanType>>>;
   /** Time when making reservations become possible for this reservation unit. */
   reservationBegins?: Maybe<Scalars["DateTime"]["output"]>;
   reservationCancelledInstructionsEn?: Maybe<Scalars["String"]["output"]>;
@@ -3184,11 +3157,9 @@ export type ReservationUnitByPkTypeApplicationRoundsArgs = {
   active?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
-export type ReservationUnitByPkTypeOpeningHoursArgs = {
-  endDate?: InputMaybe<Scalars["Date"]["input"]>;
-  openingTimes?: InputMaybe<Scalars["Boolean"]["input"]>;
-  periods?: InputMaybe<Scalars["Boolean"]["input"]>;
-  startDate?: InputMaybe<Scalars["Date"]["input"]>;
+export type ReservationUnitByPkTypeReservableTimeSpansArgs = {
+  endDate: Scalars["Date"]["input"];
+  startDate: Scalars["Date"]["input"];
 };
 
 export type ReservationUnitByPkTypeReservationsArgs = {
@@ -4563,21 +4534,6 @@ export type TimeSlotType = {
   end: Scalars["TimeString"]["output"];
 };
 
-export type TimeSpanType = {
-  __typename?: "TimeSpanType";
-  descriptionEn?: Maybe<Scalars["String"]["output"]>;
-  descriptionFi?: Maybe<Scalars["String"]["output"]>;
-  descriptionSv?: Maybe<Scalars["String"]["output"]>;
-  endTime?: Maybe<Scalars["Time"]["output"]>;
-  endTimeOnNextDay?: Maybe<Scalars["Boolean"]["output"]>;
-  nameEn?: Maybe<Scalars["String"]["output"]>;
-  nameFi?: Maybe<Scalars["String"]["output"]>;
-  nameSv?: Maybe<Scalars["String"]["output"]>;
-  resourceState?: Maybe<Scalars["String"]["output"]>;
-  startTime?: Maybe<Scalars["Time"]["output"]>;
-  weekdays?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
-};
-
 export type UnitByPkType = Node & {
   __typename?: "UnitByPkType";
   descriptionEn?: Maybe<Scalars["String"]["output"]>;
@@ -4590,7 +4546,6 @@ export type UnitByPkType = Node & {
   nameEn?: Maybe<Scalars["String"]["output"]>;
   nameFi?: Maybe<Scalars["String"]["output"]>;
   nameSv?: Maybe<Scalars["String"]["output"]>;
-  openingHours?: Maybe<OpeningHoursType>;
   paymentMerchant?: Maybe<PaymentMerchantType>;
   phone: Scalars["String"]["output"];
   pk?: Maybe<Scalars["Int"]["output"]>;
@@ -4602,13 +4557,6 @@ export type UnitByPkType = Node & {
   spaces?: Maybe<Array<Maybe<SpaceType>>>;
   tprekId?: Maybe<Scalars["String"]["output"]>;
   webPage: Scalars["String"]["output"];
-};
-
-export type UnitByPkTypeOpeningHoursArgs = {
-  endDate?: InputMaybe<Scalars["Date"]["input"]>;
-  openingTimes?: InputMaybe<Scalars["Boolean"]["input"]>;
-  periods?: InputMaybe<Scalars["Boolean"]["input"]>;
-  startDate?: InputMaybe<Scalars["Date"]["input"]>;
 };
 
 export type UnitGroupType = Node & {

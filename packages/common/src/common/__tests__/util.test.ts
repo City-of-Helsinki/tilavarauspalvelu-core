@@ -1,9 +1,9 @@
 import {
-  OpeningTimesType,
+  ReservableTimeSpanType,
   ReservationUnitsReservationUnitReservationStartIntervalChoices,
 } from "../../../types/gql-types";
 import {
-  areOpeningTimesAvailable,
+  areReservableTimesAvailable,
   getIntervalMinutes,
   getMinReservation,
   getValidEndingTime,
@@ -172,16 +172,15 @@ describe("getValidEndingTime", () => {
 
 describe("areOpeningTimesAvailable", () => {
   test("should return true if opening times are available", () => {
-    const openingHours: OpeningTimesType[] = [
+    const openingHours: ReservableTimeSpanType[] = [
       {
-        startTime: "2022-02-02T10:00:00+00:00",
-        endTime: "2022-02-02T12:00:00+00:00",
-        isReservable: true,
+        startDatetime: "2022-02-02T10:00:00+00:00",
+        endDatetime: "2022-02-02T12:00:00+00:00",
       },
     ];
 
     expect(
-      areOpeningTimesAvailable(
+      areReservableTimesAvailable(
         openingHours,
         new Date("2022-02-02T10:00:00+00:00")
       )
@@ -189,16 +188,15 @@ describe("areOpeningTimesAvailable", () => {
   });
 
   test("should return true if opening times are available", () => {
-    const openingHours: OpeningTimesType[] = [
+    const openingHours: ReservableTimeSpanType[] = [
       {
-        startTime: "2022-02-02T10:00:00+00:00",
-        endTime: "2022-02-02T12:00:00+00:00",
-        isReservable: true,
+        startDatetime: "2022-02-02T10:00:00+00:00",
+        endDatetime: "2022-02-02T12:00:00+00:00",
       },
     ];
 
     expect(
-      areOpeningTimesAvailable(
+      areReservableTimesAvailable(
         openingHours,
         new Date("2022-02-02T12:00:00+00:00")
       )
@@ -206,16 +204,15 @@ describe("areOpeningTimesAvailable", () => {
   });
 
   test("should return true if opening times are available", () => {
-    const openingHours: OpeningTimesType[] = [
+    const openingHours: ReservableTimeSpanType[] = [
       {
-        startTime: "2022-02-02T10:00:00+00:00",
-        endTime: "2022-02-02T12:00:00+00:00",
-        isReservable: true,
+        startDatetime: "2022-02-02T10:00:00+00:00",
+        endDatetime: "2022-02-02T12:00:00+00:00",
       },
     ];
 
     expect(
-      areOpeningTimesAvailable(
+      areReservableTimesAvailable(
         openingHours,
         new Date("2022-02-02T12:00:00+00:00"),
         true
@@ -224,21 +221,19 @@ describe("areOpeningTimesAvailable", () => {
   });
 
   test("should work for multiday ", () => {
-    const openingHours: OpeningTimesType[] = [
+    const openingHours: ReservableTimeSpanType[] = [
       {
-        startTime: "2022-02-02T20:00:00+00:00",
-        endTime: "2022-02-02T22:00:00+00:00",
-        isReservable: true,
+        startDatetime: "2022-02-02T10:00:00+00:00",
+        endDatetime: "2022-02-02T12:00:00+00:00",
       },
       {
-        startTime: "2022-02-03T07:00:00+00:00",
-        endTime: "2022-02-03T22:00:00+00:00",
-        isReservable: true,
+        startDatetime: "2022-02-02T10:00:00+00:00",
+        endDatetime: "2022-02-02T12:00:00+00:00",
       },
     ];
 
     expect(
-      areOpeningTimesAvailable(
+      areReservableTimesAvailable(
         openingHours,
         new Date("2022-02-02T22:00:00+00:00"),
         true
@@ -246,7 +241,7 @@ describe("areOpeningTimesAvailable", () => {
     ).toBe(true);
 
     expect(
-      areOpeningTimesAvailable(
+      areReservableTimesAvailable(
         openingHours,
         new Date("2022-02-02T22:30:00+00:00"),
         true
@@ -254,7 +249,7 @@ describe("areOpeningTimesAvailable", () => {
     ).toBe(false);
 
     expect(
-      areOpeningTimesAvailable(
+      areReservableTimesAvailable(
         openingHours,
         new Date("2022-02-03T06:30:00+00:00"),
         true
@@ -262,7 +257,7 @@ describe("areOpeningTimesAvailable", () => {
     ).toBe(false);
 
     expect(
-      areOpeningTimesAvailable(
+      areReservableTimesAvailable(
         openingHours,
         new Date("2022-02-03T07:00:00+00:00"),
         true

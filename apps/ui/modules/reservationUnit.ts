@@ -294,12 +294,8 @@ export const getReservationUnitPrice = (
 export const mockOpeningTimes = Array.from(Array(100)).map((_, index) => {
   const date = toApiDate(addDays(new Date(), index));
   return {
-    date,
-    startTime: `${date}T04:00:00+00:00`,
-    endTime: `${date}T20:00:00+00:00`,
-    state: "open",
-    periods: null,
-    isReservable: true,
+    startDatetime: `${date}T04:00:00+00:00`,
+    endDatetime: `${date}T20:00:00+00:00`,
   };
 });
 

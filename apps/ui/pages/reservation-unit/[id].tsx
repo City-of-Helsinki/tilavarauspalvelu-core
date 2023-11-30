@@ -50,7 +50,7 @@ import {
   ReservationsReservationStateChoices,
   ReservationType,
   ReservationUnitByPkType,
-  ReservationUnitByPkTypeOpeningHoursArgs,
+  ReservationUnitByPkTypeReservableTimeSpansArgs,
   ReservationUnitByPkTypeReservationsArgs,
   ReservationUnitsReservationUnitPricingPricingTypeChoices,
   ReservationUnitType,
@@ -113,7 +113,7 @@ import {
 } from "@/components/reservation-unit/ReservationUnitStyles";
 import { Toast } from "@/components/common/Toast";
 import QuickReservation, {
-  QuickReservationSlotProps,
+  type QuickReservationSlotProps,
 } from "@/components/reservation-unit/QuickReservation";
 import ReservationInfoContainer from "@/components/reservation-unit/ReservationInfoContainer";
 import { useCurrentUser } from "@/hooks/user";
@@ -202,20 +202,21 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         .filter((n): n is NonNullable<typeof n> => n != null)
         .find((edge) => edge.pk === genericTermsVariant.BOOKING) ?? null;
 
+    const startDate = today;
     const endDate = addYears(today, 2);
     const { data: additionalData } = await apolloClient.query<
       Query,
       QueryReservationUnitByPkArgs &
-        ReservationUnitByPkTypeOpeningHoursArgs &
+        ReservationUnitByPkTypeReservableTimeSpansArgs &
         ReservationUnitByPkTypeReservationsArgs
     >({
       query: OPENING_HOURS,
       fetchPolicy: "no-cache",
       variables: {
         pk: id,
-        startDate: toApiDate(today),
-        endDate: toApiDate(endDate),
-        from: toApiDate(today),
+        startDate: String(toApiDate(startDate)),
+        endDate: String(toApiDate(endDate)),
+        from: toApiDate(startDate),
         to: toApiDate(endDate),
         state: allowedReservationStates,
         includeWithSameComponents: true,
@@ -260,13 +261,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         ...(await serverSideTranslations(locale ?? "fi")),
         reservationUnit: {
           ...reservationUnitData?.reservationUnitByPk,
-          openingHours: {
-            openingTimes: allowReservationsWithoutOpeningHours
-              ? mockOpeningTimes
-              : additionalData.reservationUnitByPk?.openingHours?.openingTimes?.filter(
-                  (n) => n?.isReservable
-                ) || [],
-          },
+          reservableTimeSpans: allowReservationsWithoutOpeningHours
+            ? additionalData.reservationUnitByPk?.reservableTimeSpans ?? []
+            : mockOpeningTimes,
           reservations:
             additionalData?.reservationUnitByPk?.reservations?.filter(
               (n) => n
@@ -384,7 +381,7 @@ const ClientOnlyCalendar = ({
   </ClientOnly>
 );
 
-const TimeSlot = styled.div`
+const StyledApplicationRoundScheduleDay = styled.div`
   span:first-child {
     display: inline-block;
     font-weight: bold;
@@ -393,8 +390,8 @@ const TimeSlot = styled.div`
   }
 `;
 
-// Returns an element for a weekday in the application round time slots, with up to two time slots
-const ApplicationRoundTimeSlotDay = ({
+// Returns an element for a weekday in the application round timetable, with up to two timespans
+const ApplicationRoundScheduleDay = ({
   weekday,
   closed,
   reservableTimes,
@@ -408,7 +405,7 @@ const ApplicationRoundTimeSlotDay = ({
         )}`
       : "";
   return (
-    <TimeSlot>
+    <StyledApplicationRoundScheduleDay>
       {/* eslint-disable react/no-unknown-property */}
       <span test-dataid="application-round-time-slot__weekday">
         {t(`common:weekDayLong.${weekday}`)}
@@ -424,7 +421,7 @@ const ApplicationRoundTimeSlotDay = ({
         )
       )}
       {/* eslint-enable react/no-unknown-property */}
-    </TimeSlot>
+    </StyledApplicationRoundScheduleDay>
   );
 };
 
@@ -512,13 +509,13 @@ const ReservationUnit = ({
   const userReservations = filterNonNullable(
     userReservationsData?.reservations?.edges?.map((e) => e?.node)
   );
-
+  const reservableTimes = useMemo(
+    () => filterNonNullable(reservationUnit?.reservableTimeSpans),
+    [reservationUnit?.reservableTimeSpans]
+  );
   const slotPropGetter = useMemo(() => {
-    const openingHours = filterNonNullable(
-      reservationUnit?.openingHours?.openingTimes
-    );
     return getSlotPropGetter({
-      openingHours,
+      reservableTimes,
       activeApplicationRounds,
       reservationBegins: reservationUnit?.reservationBegins
         ? new Date(reservationUnit.reservationBegins)
@@ -533,7 +530,7 @@ const ReservationUnit = ({
       currentDate: focusDate,
     });
   }, [
-    reservationUnit?.openingHours?.openingTimes,
+    reservableTimes,
     activeApplicationRounds,
     reservationUnit?.reservationBegins,
     reservationUnit?.reservationEnds,
@@ -858,11 +855,11 @@ const ReservationUnit = ({
 
   // Update the calendar to reflect a selected quick reservation slot
   useEffect(() => {
-    if (quickReservationSlot != null)
-      handleCalendarEventChange({
-        start: quickReservationSlot.start,
-        end: quickReservationSlot.end,
-      });
+    if (quickReservationSlot == null) return;
+    handleCalendarEventChange({
+      start: quickReservationSlot.start,
+      end: quickReservationSlot.end,
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [handleCalendarEventChange, quickReservationSlot]);
 
@@ -1158,7 +1155,7 @@ const ReservationUnit = ({
                 <PaddedContent>
                   <p>{t("reservationUnit:recurringBody")}</p>
                   {orderedApplicationRoundTimeSlots.map((day) => (
-                    <ApplicationRoundTimeSlotDay key={day.weekday} {...day} />
+                    <ApplicationRoundScheduleDay key={day.weekday} {...day} />
                   ))}
                 </PaddedContent>
               </Accordion>
