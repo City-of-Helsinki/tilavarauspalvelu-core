@@ -32,7 +32,6 @@ resources:
       type: git
       # project/repository
       name: tilavarauspalvelu/tilavarauspalvelu-pipelines
-      ref: turborepo
 
 extends:
   template: azure-pipelines-tilavarauspalvelu-ui.yml@tilavarauspalvelu-pipelines
