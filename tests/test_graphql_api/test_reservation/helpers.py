@@ -3,7 +3,8 @@ from functools import partial
 from typing import Any
 from unittest.mock import patch
 
-from tests.helpers import ResponseMock, build_mutation, build_query
+from tests.gql_builders import build_mutation, build_query
+from tests.helpers import ResponseMock
 
 reservations_query = partial(build_query, "reservations", connection=True, order_by="pk")
 

@@ -13,18 +13,16 @@ from django import db
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse
 from django.test import Client
-from graphene.utils.str_converters import to_camel_case
 from graphene_django.utils.testing import graphql_query
 
 __all__ = [
-    "build_mutation",
-    "build_query",
     "capture_database_queries",
     "GraphQLClient",
     "parametrize_helper",
     "ResponseMock",
     "UserType",
 ]
+
 
 TNamedTuple = TypeVar("TNamedTuple", bound=NamedTuple)
 
@@ -307,47 +305,6 @@ class ResponseMock:
 
     def json(self) -> dict[str, Any]:
         return self.json_data
-
-
-def _format_for_query(value: Any) -> str:
-    if isinstance(value, Enum):
-        return value.value
-    if isinstance(value, list) and all(isinstance(item, Enum) for item in value):
-        return f"[{', '.join(str(item.value) for item in value)}]"
-    return json.dumps(value)
-
-
-def _build_query_definition(query_def: str, /, **filter_params: Any) -> str:
-    if filter_params:
-        data = (f"{to_camel_case(key)}: {_format_for_query(value)}" for key, value in filter_params.items())
-        query_def += f"({', '.join(data)})"
-    return query_def
-
-
-def build_query(__name: str, *, fields: str = "pk", connection: bool = False, **filter_params: Any) -> str:
-    """
-    Build a GraphQL query with the given field selections and filter parameters.
-
-    :param __name: Name of the QueryObject the query is for, e.g., `applicationEvents`.
-    :param fields: Field selections as a GraphQL string.
-    :param connection: Whether to build a Relay connection query or basic one.
-    :param filter_params: Parameters to use in the query. Will be converted to camelCase.
-    """
-    query_def = _build_query_definition(__name, **filter_params)
-    if connection:
-        fields = f"edges {{ node {{ {fields} }} }}"
-    return f"query {{ {query_def} {{ {fields} }} }}"
-
-
-def build_mutation(name: str, input_name: str, selections: str = "pk errors { messages field }") -> str:
-    """
-    Build a GraphqQL mutation with the given field selections.
-
-    :param name: Name of the QueryObject the mutation is for, e.g., `createApplicationEvent`.
-    :param input_name: Name of the mutation input object, e.g., `ApplicationEventCreateMutationInput`.
-    :param selections: Field selections as a GraphQL string.
-    """
-    return f"mutation {name}($input: {input_name}!) {{ {name}(input: $input) {{ {selections} }} }}"
 
 
 @contextmanager

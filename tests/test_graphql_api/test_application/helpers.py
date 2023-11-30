@@ -12,7 +12,7 @@ from tests.factories import (
     ReservationPurposeFactory,
     ReservationUnitFactory,
 )
-from tests.helpers import build_mutation, build_query
+from tests.gql_builders import build_mutation, build_query
 
 applications_query = partial(build_query, "applications", connection=True, order_by="pk")
 applications_query_no_order = partial(build_query, "applications", connection=True)
