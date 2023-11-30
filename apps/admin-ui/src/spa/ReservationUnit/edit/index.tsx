@@ -637,7 +637,7 @@ function BasicSection({
   spaces: SpaceType[];
 }) {
   const { t } = useTranslation();
-  const { control, formState, register, watch } = form;
+  const { control, formState, register, watch, setValue } = form;
   const { errors } = formState;
 
   const spaceOptions = spaces.map((s) => ({
@@ -648,8 +648,6 @@ function BasicSection({
     spaces.flatMap((s) => s?.resources)
   ).map((r) => ({ label: String(r?.nameFi), value: Number(r?.pk) }));
 
-  // TODO this doesn't update the form values
-  // but if we add that then the user changes are discarded on load
   const spacePks = watch("spacePks");
   const selectedSpaces = filterNonNullable(
     spacePks.map((pk) => spaces.find((s) => s.pk === pk))
@@ -736,7 +734,22 @@ function BasicSection({
               placeholder={t("ReservationUnitEditor.spacesPlaceholder")}
               options={spaceOptions}
               disabled={spaceOptions.length === 0}
-              onChange={(vals) => onChange(vals.map((y) => y.value))}
+              onChange={(vals) => {
+                // recalculate the min surface area and max persons after update
+                const sPks = vals.map((y) => y.value);
+                const sspaces = filterNonNullable(
+                  sPks.map((pk) => spaces.find((s) => s.pk === pk))
+                );
+                onChange(sPks);
+                const minArea = getMinSurfaceArea(sspaces);
+                const maxPer = getMaxPersons(sspaces);
+                if (minArea > 0) {
+                  setValue("surfaceArea", minArea);
+                }
+                if (maxPer > 0) {
+                  setValue("maxPersons", maxPer);
+                }
+              }}
               value={spaceOptions.filter((x) => value.includes(x.value))}
               error={errors.spacePks?.message}
               invalid={errors.spacePks?.message != null}
@@ -1051,7 +1064,7 @@ function ReservationUnitSettings({
               onChange={(val: {
                 value: ReservationUnitsReservationUnitReservationStartIntervalChoices;
                 label: string;
-              }) => onChange(val)}
+              }) => onChange(val.value)}
               error={getTranslatedError(
                 errors.reservationStartInterval?.message,
                 t
