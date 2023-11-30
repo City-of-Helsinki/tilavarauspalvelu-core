@@ -16,7 +16,7 @@ import { maxBy, padStart } from "lodash";
 import { useTranslation } from "next-i18next";
 import { useLocalStorage } from "react-use";
 import styled from "styled-components";
-import { getLocalizationLang } from "common/src/helpers";
+import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
 import { fontBold, fontMedium, H4 } from "common/src/common/typography";
 import ClientOnly from "common/src/ClientOnly";
 import { ReservationUnitByPkType } from "common/types/gql-types";
@@ -214,6 +214,12 @@ const ActionWrapper = styled.div`
   justify-content: flex-end;
 `;
 
+const dayMin = (days: Array<Date | undefined>): Date | undefined => {
+  return filterNonNullable(days).reduce<Date | undefined>((acc, day) => {
+    return acc ? (isBefore(acc, day) ? acc : day) : day;
+  }, undefined);
+};
+
 const QuickReservation = ({
   isSlotReservable,
   isReservationUnitReservable,
@@ -410,7 +416,7 @@ const QuickReservation = ({
 
       // TODO refactor
       let nextAvailableTime: Date | null | undefined;
-      for (let i = 0; nextAvailableTime === undefined; i++) {
+      for (let i = 0; nextAvailableTime === undefined && i < 1000; i++) {
         const day = addDays(after, i);
         day.setHours(0, 0, 0, 0);
         const availableTimesForDay = availableTimes(day, true);
@@ -427,7 +433,7 @@ const QuickReservation = ({
         }
       }
 
-      return nextAvailableTime;
+      return nextAvailableTime ?? null;
     },
     [availableTimes, reservationUnit]
   );
@@ -459,6 +465,23 @@ const QuickReservation = ({
     return null;
   }
 
+  const lastPossibleReservationDate =
+    reservationUnit.reservationsMaxDaysBefore != null &&
+    reservationUnit.reservationsMaxDaysBefore > 0
+      ? addDays(new Date(), reservationUnit.reservationsMaxDaysBefore)
+      : undefined;
+  const reservationUnitNotReservable = reservationUnit.reservationEnds
+    ? new Date(reservationUnit.reservationEnds)
+    : undefined;
+  const lastOpenDate = lastOpeningDate?.date
+    ? new Date(lastOpeningDate.date)
+    : new Date();
+  const lastPossibleDate = dayMin([
+    reservationUnitNotReservable,
+    lastPossibleReservationDate,
+    lastOpenDate,
+  ]);
+
   return (
     <Wrapper id={`quick-reservation-${idPrefix}`}>
       <Heading>{t("reservationCalendar:quickReservation.heading")}</Heading>
@@ -480,9 +503,7 @@ const QuickReservation = ({
           }}
           value={toUIDate(date)}
           minDate={new Date()}
-          maxDate={
-            lastOpeningDate?.date ? new Date(lastOpeningDate.date) : new Date()
-          }
+          maxDate={lastPossibleDate}
         />
         <StyledTimeInput
           key={`timeInput-${time}`}
