@@ -14,7 +14,7 @@ pytestmark = [
 ]
 
 
-def test_query_reservation_unit_timeslots(graphql):
+def test_reservation_unit__query__timeslots(graphql):
     # given:
     # - There is a reservation unit with timeslots
     # - A superuser is using the system
@@ -52,7 +52,7 @@ def test_query_reservation_unit_timeslots(graphql):
     }
 
 
-def test_query_reservation_unit_timeslots__not_found(graphql):
+def test_reservation_unit__query__timeslots__not_found(graphql):
     # given:
     # - There is a reservation unit without any timeslots
     # - A superuser is using the system
