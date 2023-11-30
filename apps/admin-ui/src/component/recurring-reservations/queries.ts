@@ -96,6 +96,8 @@ export const APPLICATION_EVENTS_FOR_ALLOCATION = gql`
     $purpose: [Int]
     $reservationUnit: [Int]
     $applicantType: [ApplicantTypeChoice]
+    $homeCity: [Int]
+    $includePreferredOrder10OrHigher: Boolean
   ) {
     applicationEvents(
       applicationRound: $applicationRound
@@ -107,6 +109,8 @@ export const APPLICATION_EVENTS_FOR_ALLOCATION = gql`
       purpose: $purpose
       reservationUnit: $reservationUnit
       applicantType: $applicantType
+      homeCity: $homeCity
+      includePreferredOrder10OrHigher: $includePreferredOrder10OrHigher
     ) {
       edges {
         node {

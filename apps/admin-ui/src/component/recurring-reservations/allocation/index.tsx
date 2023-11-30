@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { uniqBy } from "lodash";
 import { useParams, useSearchParams } from "react-router-dom";
 import styled from "styled-components";
-import { H1, Strongish } from "common/src/common/typography";
+import { H1, fontBold, fontMedium } from "common/src/common/typography";
 import { ShowAllContainer } from "common/src/components";
 import {
   type Query,
@@ -49,13 +49,35 @@ const Ingress = styled.p`
 `;
 
 const TabList = styled(Tabs.TabList)`
-  ${Strongish};
+  ${fontMedium};
 `;
 
 const Tab = styled(Tabs.Tab)`
   && > span:before {
     z-index: 1;
   }
+`;
+
+const NumberOfResultsContainer = styled.div`
+  --color-focus-outline: #0072c6;
+  display: flex;
+  gap: var(--spacing-s);
+  & button {
+    border: none;
+    text-decoration: underline;
+    background-color: transparent;
+    &:hover {
+      cursor: pointer;
+    }
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px var(--color-focus-outline);
+      transition: box-shadow 0.4s ease-in-out;
+    }
+  }
+`;
+const NumberOfResults = styled.span`
+  ${fontBold}
 `;
 
 // Separate minimal query to find all possible values for filters
@@ -80,6 +102,34 @@ const APPLICATION_ROUND_QUERY = gql`
                   nameFi
                 }
               }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+// Query the count of the application events for that specific unit + reservationUnit
+const ALL_EVENTS_PER_UNIT_QUERY = gql`
+  query AllApplicationEvents(
+    $applicationRound: Int!
+    $applicationStatus: [ApplicationStatusChoice]!
+    $unit: [Int]!
+    $reservationUnit: [Int]!
+  ) {
+    applicationEvents(
+      applicationRound: $applicationRound
+      reservationUnit: $reservationUnit
+      unit: $unit
+      applicationStatus: $applicationStatus
+    ) {
+      edges {
+        node {
+          eventReservationUnits {
+            reservationUnit {
+              pk
+              nameFi
             }
           }
         }
@@ -254,7 +304,6 @@ function ApplicationRoundAllocation({
     );
   };
 
-  // TODO pagination
   const { data, refetch } = useQuery<Query, QueryApplicationEventsArgs>(
     APPLICATION_EVENTS_FOR_ALLOCATION,
     {
@@ -265,13 +314,26 @@ function ApplicationRoundAllocation({
         applicationRound: applicationRoundId,
         ...(unitFilter != null ? { unit: [Number(unitFilter)] } : {}),
         ...(timeFilter != null
-          ? { priority: timeFilter.map((x) => Number(x)) }
+          ? {
+              priority: timeFilter
+                .map((x) => Number(x))
+                .reduce<number[]>(
+                  (acc, x) => (x === 200 ? [...acc, 200, 100] : [...acc, x]),
+                  []
+                ),
+            }
           : {}),
-        // TODO how to do a negative query here? we want everything over 10
-        // it's includePreferredOrder10OrHigher boolean filter in the query
-        ...(orderFilter != null
-          ? { preferredOrder: orderFilter.map((x) => Number(x)) }
+        ...(orderFilter != null &&
+        orderFilter.filter((x) => Number(x) <= 10).length > 0
+          ? {
+              preferredOrder: orderFilter
+                .map((x) => Number(x))
+                .filter((x) => x <= 10),
+            }
           : {}),
+        includePreferredOrder10OrHigher:
+          orderFilter != null &&
+          orderFilter.filter((x) => Number(x) > 10).length > 0,
         ...(nameFilter != null ? { textSearch: nameFilter } : {}),
         ...(cityFilter != null
           ? { homeCity: cityFilter.map((x) => Number(x)) }
@@ -293,8 +355,6 @@ function ApplicationRoundAllocation({
           selectedReservationUnit != null
             ? [Number(selectedReservationUnit)]
             : [],
-        /* TODO what is the status we are looking for here? event status
-         * or do we want to use applicationStatus instead */
         applicationStatus: ALLOCATION_APPLICATION_STATUSES,
       },
       onError: () => {
@@ -302,6 +362,25 @@ function ApplicationRoundAllocation({
       },
     }
   );
+
+  // TODO this can be combined with the above query (but requires casting the alias)
+  const { data: allEventsData } = useQuery<Query, QueryApplicationEventsArgs>(
+    ALL_EVENTS_PER_UNIT_QUERY,
+    {
+      skip: !applicationRoundId || !selectedReservationUnit || !unitFilter,
+      variables: {
+        applicationRound: applicationRoundId,
+        // cast constructor is ok because of the skip
+        reservationUnit: [Number(selectedReservationUnit)],
+        unit: [Number(unitFilter)],
+        applicationStatus: ALLOCATION_APPLICATION_STATUSES,
+      },
+    }
+  );
+  const allEvents = filterNonNullable(
+    allEventsData?.applicationEvents?.edges.map((e) => e?.node)
+  );
+  const totalNumberOfEvents = allEvents.length;
 
   // NOTE rather sketchy: this is the context event listener
   useEffect(() => {
@@ -365,6 +444,17 @@ function ApplicationRoundAllocation({
   const tabResUnits = reservationUnits.filter(
     (ru) => ru.unit?.pk != null && ru?.unit?.pk === Number(unitFilter)
   );
+
+  const hideSearchTags = ["unit", "reservation-unit"];
+
+  const handleResetFilters = () => {
+    const newParams = hideSearchTags.reduce<typeof searchParams>(
+      (acc, s) =>
+        searchParams.get(s) ? { ...acc, [s]: searchParams.get(s) } : acc,
+      new URLSearchParams()
+    );
+    setParams(newParams);
+  };
 
   // TODO show the total number and the filtered number of application events
   return (
@@ -519,10 +609,7 @@ function ApplicationRoundAllocation({
           selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
         />
       </MoreWrapper>
-      <SearchTags
-        hide={["unit", "reservation-unit"]}
-        translateTag={translateTag}
-      />
+      <SearchTags hide={hideSearchTags} translateTag={translateTag} />
       <Tabs
         initiallyActiveTab={
           tabResUnits.findIndex(
@@ -548,6 +635,21 @@ function ApplicationRoundAllocation({
         {/* NOTE: we want the tabs as buttons, without this the HDS tabs break */}
         <Tabs.TabPanel />
       </Tabs>
+      <NumberOfResultsContainer>
+        {applicationEvents.length === totalNumberOfEvents ? (
+          t("Allocation.countAllResults", { count: totalNumberOfEvents })
+        ) : (
+          <>
+            <NumberOfResults>
+              {applicationEvents.length} / {totalNumberOfEvents}
+            </NumberOfResults>
+            {t("Allocation.countResultsPostfix")}
+            <button type="button" onClick={handleResetFilters}>
+              {t("Allocation.clearFiltersButton")}
+            </button>
+          </>
+        )}
+      </NumberOfResultsContainer>
       <ApplicationEvents
         applicationEvents={applicationEvents}
         reservationUnit={

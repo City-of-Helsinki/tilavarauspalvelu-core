@@ -1824,6 +1824,9 @@ const translations: ITranslations = {
     acceptSlot: ["Jaa {{duration}} vuoro"],
     acceptingSlot: ["Jaetaan vuoroa.."],
     acceptingSuccess: ['Vuoro varaukselle "{{applicationEvent}}" jaettu.'],
+    countResultsPostfix: ["tuloksesta näytetty"],
+    countAllResults: ["Kaikki {{ count }}  tulosta näytetty"],
+    clearFiltersButton: ["Tyhjennä suodattimet"],
     filters: {
       placeholder: {
         time: ["Valitse aikatoive"],
