@@ -34,10 +34,8 @@ const ResourceEditorView = dynamic(
   () => import("./component/Resources/resource-editor/ResourceEditorView")
 );
 
-const APPLICATIONS_PATH = "./component/applications";
-const Applications = dynamic(() => import(`${APPLICATIONS_PATH}/Applications`));
 const ApplicationDetails = dynamic(
-  () => import(`${APPLICATIONS_PATH}/ApplicationDetails`)
+  () => import("./component/applications/ApplicationDetails")
 );
 
 const ReservationUnits = dynamic(
@@ -96,7 +94,6 @@ const ApplicationRouter = () => (
 const ApplicationRoundsRouter = () => (
   <Routes>
     <Route index element={<AllApplicationRounds />} />
-    <Route path=":applicationRoundId/applications" element={<Applications />} />
     <Route path=":applicationRoundId/criteria" element={<Criteria />} />
     <Route
       path=":applicationRoundId/allocation"

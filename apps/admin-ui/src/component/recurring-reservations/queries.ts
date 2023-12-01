@@ -1,25 +1,31 @@
 import { gql } from "@apollo/client";
-import { ApplicationStatusChoice } from "common/types/gql-types";
+
+const APPLICATION_ROUND_FRAGMENT = gql`
+  fragment ApplicationRoundFragment on ApplicationRoundNode {
+    pk
+    nameFi
+    status
+    applicationPeriodBegin
+    applicationPeriodEnd
+  }
+`;
 
 export const APPLICATION_ROUNDS_QUERY = gql`
+  ${APPLICATION_ROUND_FRAGMENT}
   query applicationRounds {
     applicationRounds {
       edges {
         node {
+          ...ApplicationRoundFragment
+          reservationPeriodBegin
+          reservationPeriodEnd
+          applicationsCount
+          reservationUnitCount
+          statusTimestamp
           serviceSector {
             pk
             nameFi
           }
-          pk
-          nameFi
-          applicationPeriodBegin
-          applicationPeriodEnd
-          reservationPeriodBegin
-          reservationPeriodEnd
-          status
-          applicationsCount
-          reservationUnitCount
-          statusTimestamp
         }
       }
     }
@@ -28,15 +34,12 @@ export const APPLICATION_ROUNDS_QUERY = gql`
 
 // TODO combine with APPLICATION_ROUNDS_QUERY
 export const APPLICATION_ROUD_QUERY = gql`
+  ${APPLICATION_ROUND_FRAGMENT}
   query ApplicationRoundCriteria($pk: [Int]!) {
     applicationRounds(pk: $pk) {
       edges {
         node {
-          pk
-          nameFi
-          status
-          applicationPeriodBegin
-          applicationPeriodEnd
+          ...ApplicationRoundFragment
           reservationUnits {
             pk
           }
@@ -47,9 +50,7 @@ export const APPLICATION_ROUD_QUERY = gql`
 `;
 
 // Separate minimal query to find all possible values for filters
-// TODO combine with APPLICATION_ROUD_QUERY
-// TODO rename to applicationEvents by applicationRound
-export const MINIMAL_APPLICATION_ROUND_QUERY = gql`
+export const MINIMAL_APPLICATION_QUERY = gql`
   query Applications(
     $applicationRound: Int!
     $status: [ApplicationStatusChoice]!
@@ -106,45 +107,9 @@ export const ALL_EVENTS_PER_UNIT_QUERY = gql`
   }
 `;
 
-export const APPLICATIONS_QUERY = gql`
-  query getApplications {
-    applications(status: ${ApplicationStatusChoice.Received}) {
-      edges {
-        node {
-          pk
-          status
-          contactPerson {
-            firstName
-            lastName
-          }
-          organisation {
-            name
-            organisationType
-          }
-          applicationEvents {
-            eventsPerWeek
-            minDuration
-            name
-            eventReservationUnits {
-              preferredOrder
-              reservationUnit {
-                unit {
-                  nameFi
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-
-// TODO naming
-// TODO query filters (homeCity, ageGroup, purpose)
+// TODO query filters (ageGroup)
 // TODO priority vs preferredOrder, preferredOrder is the selected reservationUnit order, priority is the primary / secondary
 // TODO check if we can remove some of the fields (and move them to the filter query, ex unit / reservationUnit)
-// TODO check the search string (is it correct)
 export const APPLICATION_EVENTS_FOR_ALLOCATION = gql`
   query getApplicationEvents(
     $applicationRound: Int
@@ -223,75 +188,6 @@ export const APPLICATION_EVENTS_FOR_ALLOCATION = gql`
             organisation {
               name
               organisationType
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-
-// TODO refactor (it's used on the applications page, but it should not require all the deeply nested fields)
-export const APPLICATIONS_BY_APPLICATION_ROUND_QUERY = gql`
-  query getApplicationsByPk(
-    $applicationRound: Int
-    $status: [ApplicationStatusChoice]
-  ) {
-    applications(applicationRound: $applicationRound, status: $status) {
-      edges {
-        node {
-          pk
-          status
-          applicant {
-            name
-          }
-          applicantType
-          contactPerson {
-            firstName
-            lastName
-          }
-          organisation {
-            name
-            organisationType
-          }
-          applicationRound {
-            nameFi
-          }
-          applicationEvents {
-            pk
-            eventsPerWeek
-            minDuration
-            maxDuration
-            eventsPerWeek
-            name
-            status
-            ageGroup {
-              minimum
-              maximum
-            }
-            applicationEventSchedules {
-              pk
-              priority
-              day
-              begin
-              end
-              allocatedReservationUnit {
-                pk
-              }
-              allocatedDay
-              allocatedBegin
-              allocatedEnd
-            }
-            eventReservationUnits {
-              preferredOrder
-              reservationUnit {
-                pk
-                nameFi
-                unit {
-                  pk
-                  nameFi
-                }
-              }
             }
           }
         }

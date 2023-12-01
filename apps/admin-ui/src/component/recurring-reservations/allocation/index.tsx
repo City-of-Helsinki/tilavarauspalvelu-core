@@ -29,7 +29,7 @@ import { Permission } from "@/modules/permissionHelper";
 import {
   ALL_EVENTS_PER_UNIT_QUERY,
   APPLICATION_EVENTS_FOR_ALLOCATION,
-  MINIMAL_APPLICATION_ROUND_QUERY,
+  MINIMAL_APPLICATION_QUERY,
 } from "../queries";
 import { ApplicationEvents } from "./ApplicationEvents";
 
@@ -614,7 +614,7 @@ function AllocationWrapper({
   applicationRoundId: number;
 }): JSX.Element {
   const { loading, error, data } = useQuery<Query, QueryApplicationsArgs>(
-    MINIMAL_APPLICATION_ROUND_QUERY,
+    MINIMAL_APPLICATION_QUERY,
     {
       skip: !applicationRoundId,
       variables: {
