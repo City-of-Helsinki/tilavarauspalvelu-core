@@ -1,7 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { memoize, orderBy, uniqBy } from "lodash";
-import styled from "styled-components";
 import { TFunction } from "i18next";
 import { IconLinkExternal } from "hds-react";
 import type {
@@ -12,8 +11,8 @@ import { publicUrl } from "@/common/const";
 import { applicationDetailsUrl } from "@/common/urls";
 import { truncate } from "@/helpers";
 import { getApplicantName } from "@/component/applications/util";
-import StatusCell from "@/component/StatusCell";
-import { CustomTable, ExternalTableLink } from "../../lists/components";
+import { CustomTable, ExternalTableLink } from "@/component/lists/components";
+import { ApplicationStatusCell } from "./StatusCell";
 
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
@@ -101,13 +100,6 @@ const getColConfig = (t: TFunction) => [
   },
 ];
 
-const StyledStatusCell = styled(StatusCell)`
-  gap: 0 !important;
-  > div {
-    gap: 0 !important;
-  }
-`;
-
 const appMapper = (app: ApplicationNode, t: TFunction): ApplicationView => {
   const applicationEvents = (app.applicationEvents || [])
     .flatMap((ae) => ae?.eventReservationUnits)
@@ -139,10 +131,9 @@ const appMapper = (app: ApplicationNode, t: TFunction): ApplicationView => {
     name,
     status,
     statusView: (
-      <StyledStatusCell
+      <ApplicationStatusCell
         status={status}
         text={`Application.statuses.${status}`}
-        type="application"
         withArrow={false}
       />
     ),

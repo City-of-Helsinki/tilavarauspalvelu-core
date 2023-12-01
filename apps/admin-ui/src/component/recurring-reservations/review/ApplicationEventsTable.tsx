@@ -1,6 +1,5 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import styled from "styled-components";
 import { TFunction } from "i18next";
 import { memoize, orderBy, trim, uniqBy } from "lodash";
 import { IconLinkExternal } from "hds-react";
@@ -11,10 +10,10 @@ import { formatters as getFormatters } from "common";
 import { publicUrl } from "@/common/const";
 import { truncate } from "@/helpers";
 import { applicationDetailsUrl } from "@/common/urls";
-import StatusCell from "@/component/StatusCell";
 import { getApplicantName } from "@/component/applications/util";
 import { formatNumber } from "@/common/util";
-import { CustomTable, ExternalTableLink } from "../../lists/components";
+import { CustomTable, ExternalTableLink } from "@/component/lists/components";
+import { ApplicationEventStatusCell } from "./StatusCell";
 
 const formatters = getFormatters("fi");
 
@@ -66,13 +65,6 @@ type ApplicationEventView = {
   statusView: JSX.Element;
   applicationCount: string;
 };
-
-const StyledStatusCell = styled(StatusCell)`
-  gap: 0 !important;
-  > div {
-    gap: 0 !important;
-  }
-`;
 
 const appEventMapper = (
   appEvent: ApplicationEventNode
@@ -127,10 +119,9 @@ const appEventMapper = (
       " / "
     ),
     statusView: (
-      <StyledStatusCell
+      <ApplicationEventStatusCell
         status={status}
         text={`Application.statuses.${status}`}
-        type="applicationEvent"
         withArrow={false}
       />
     ),

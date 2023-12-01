@@ -9,7 +9,7 @@ import {
 import {
   getApplicationEventStatusColor,
   getApplicationStatusColor,
-} from "./applications/util";
+} from "@/component//applications/util";
 
 const StatusDot = styled.div<{
   status: ApplicationStatusChoice;
@@ -114,4 +114,26 @@ const StatusCell = ({
   );
 };
 
-export default StatusCell;
+const StyledStatusCell = styled(StatusCell)`
+  gap: 0 !important;
+  > div {
+    gap: 0 !important;
+  }
+`;
+
+// Define separate components to make the refactoring easier
+// the type parameter and dynamic switching is very error prone and hard to grep for in the source code
+const ApplicationStatusCell = (
+  props: Omit<IStatusCellProps, "type">
+): JSX.Element => <StyledStatusCell {...props} type="application" />;
+
+const ApplicationEventStatusCell = (
+  props: Omit<IStatusCellProps, "type">
+): JSX.Element => <StyledStatusCell {...props} type="applicationEvent" />;
+
+export {
+  ApplicationStatusCell,
+  ApplicationEventStatusCell,
+  // old export
+  StyledStatusCell as StatusCell,
+};
