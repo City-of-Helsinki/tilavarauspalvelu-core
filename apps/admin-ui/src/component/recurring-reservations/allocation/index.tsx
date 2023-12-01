@@ -9,7 +9,6 @@ import { H1, fontBold, fontMedium } from "common/src/common/typography";
 import { ShowAllContainer } from "common/src/components";
 import {
   type Query,
-  ApplicationStatusChoice,
   type ReservationUnitByPkType,
   type QueryApplicationEventsArgs,
   type UnitType,
@@ -17,24 +16,18 @@ import {
   ApplicantTypeChoice,
 } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
-import { SearchTags } from "app/component/SearchTags";
+import { SearchTags } from "@/component/SearchTags";
+import Loader from "@/component/Loader";
+import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
+import { useOptions } from "@/component/my-units/hooks";
 import { Container } from "@/styles/layout";
 import { useNotification } from "@/context/NotificationContext";
 import { useAllocationContext } from "@/context/AllocationContext";
-import Loader from "@/component/Loader";
-import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
+import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import usePermission from "@/hooks/usePermission";
 import { Permission } from "@/modules/permissionHelper";
 import { APPLICATION_EVENTS_FOR_ALLOCATION } from "../queries";
 import { ApplicationEvents } from "./ApplicationEvents";
-import { useOptions } from "@/component/my-units/hooks";
-
-const ALLOCATION_APPLICATION_STATUSES = [
-  ApplicationStatusChoice.Received,
-  ApplicationStatusChoice.Handled,
-  ApplicationStatusChoice.ResultsSent,
-  ApplicationStatusChoice.InAllocation,
-];
 
 type IParams = {
   applicationRoundId: string;
@@ -355,7 +348,7 @@ function ApplicationRoundAllocation({
           selectedReservationUnit != null
             ? [Number(selectedReservationUnit)]
             : [],
-        applicationStatus: ALLOCATION_APPLICATION_STATUSES,
+        applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,
       },
       onError: () => {
         notifyError(t("errors.errorFetchingData"));
@@ -373,7 +366,7 @@ function ApplicationRoundAllocation({
         // cast constructor is ok because of the skip
         reservationUnit: [Number(selectedReservationUnit)],
         unit: [Number(unitFilter)],
-        applicationStatus: ALLOCATION_APPLICATION_STATUSES,
+        applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,
       },
     }
   );
@@ -674,7 +667,7 @@ function AllocationWrapper({
       skip: !applicationRoundId,
       variables: {
         applicationRound: applicationRoundId ?? 0,
-        status: ALLOCATION_APPLICATION_STATUSES,
+        status: VALID_ALLOCATION_APPLICATION_STATUSES,
       },
     }
   );

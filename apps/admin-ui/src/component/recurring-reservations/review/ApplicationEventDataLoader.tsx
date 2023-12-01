@@ -1,12 +1,15 @@
 import React from "react";
 import { ApolloError, useQuery } from "@apollo/client";
 import type {
-  ApplicationEventNode,
   ApplicationRoundNode,
   Query,
   QueryApplicationEventsArgs,
 } from "common/types/gql-types";
-import { LIST_PAGE_SIZE } from "@/common/const";
+import { filterNonNullable } from "common/src/helpers";
+import {
+  LIST_PAGE_SIZE,
+  VALID_ALLOCATION_APPLICATION_STATUSES,
+} from "@/common/const";
 import { combineResults } from "@/common/util";
 import { useNotification } from "@/context/NotificationContext";
 import { APPLICATIONS_EVENTS_QUERY } from "./queries";
@@ -67,6 +70,7 @@ const ApplicationEventDataLoader = ({
     variables: {
       ...mapFilterParams(filters),
       applicationRound: applicationRound.pk ?? 0,
+      applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,
       offset: 0,
       first: LIST_PAGE_SIZE,
       orderBy: sortString,
@@ -81,10 +85,9 @@ const ApplicationEventDataLoader = ({
     return <Loader />;
   }
 
-  const applicationEvents =
-    data?.applicationEvents?.edges
-      .map((edge) => edge?.node)
-      .filter((n): n is ApplicationEventNode => n != null) ?? [];
+  const applicationEvents = filterNonNullable(
+    data?.applicationEvents?.edges.map((edge) => edge?.node)
+  );
 
   return (
     <>

@@ -1,4 +1,5 @@
 import { env } from "app/env.mjs";
+import { ApplicationStatusChoice } from "common/types/gql-types";
 
 export const defaultLanguage = "fi";
 
@@ -80,3 +81,10 @@ export const getSignInUrl = (callBackUrl: string): string => {
 export const getSignOutUrl = (): string => {
   return `${AUTH_URL}/logout`;
 };
+
+export const VALID_ALLOCATION_APPLICATION_STATUSES = [
+  ApplicationStatusChoice.Received,
+  ApplicationStatusChoice.Handled,
+  ApplicationStatusChoice.ResultsSent,
+  ApplicationStatusChoice.InAllocation,
+];
