@@ -223,8 +223,15 @@ function ApplicationRoundAllocation({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- this is the correct list, but should be refactored
   }, [units]);
 
+  const unitReservationUnits = reservationUnits.filter(
+    (ru) => ru.unit?.pk != null && ru?.unit?.pk === Number(unitFilter)
+  );
+
   // TODO default value here instead of the JSX
-  const selectedReservationUnit = searchParams.get("reservation-unit");
+  const selectedReservationUnit =
+    searchParams.get("reservation-unit") ??
+    unitReservationUnits?.[0]?.pk?.toString() ??
+    null;
   const setSelectedReservationUnit = (value: number | null) => {
     // TODO this conflicts with the setUnitFilter
     // should be fine to enable if they are never called from same event handler
@@ -434,10 +441,6 @@ function ApplicationRoundAllocation({
     }
   };
 
-  const tabResUnits = reservationUnits.filter(
-    (ru) => ru.unit?.pk != null && ru?.unit?.pk === Number(unitFilter)
-  );
-
   const hideSearchTags = ["unit", "reservation-unit"];
 
   const handleResetFilters = () => {
@@ -448,6 +451,11 @@ function ApplicationRoundAllocation({
     );
     setParams(newParams);
   };
+
+  // TODO findIndex returns -1 if not found, so we can't do || or ?? on it
+  const initiallyActiveTab = unitReservationUnits.findIndex(
+    (x) => x.pk != null && x.pk.toString() === selectedReservationUnit
+  );
 
   // TODO show the total number and the filtered number of application events
   return (
@@ -603,25 +611,23 @@ function ApplicationRoundAllocation({
         />
       </MoreWrapper>
       <SearchTags hide={hideSearchTags} translateTag={translateTag} />
-      <Tabs
-        initiallyActiveTab={
-          tabResUnits.findIndex(
-            (x) => x.pk != null && x.pk.toString() === selectedReservationUnit
-          ) ?? 0
-        }
-      >
+      {/* TODO this can't be updated from outside or is there something else than initiallyActiveTab?
+          the unit changes but we can't update the index
+          (ex. select index 5 then switch to unit with less than 5 reservation units the selection disappears)
+          ui only issue
+          A workaround would be to use unit pk as a React key to force remounting.
+      */}
+      <Tabs initiallyActiveTab={initiallyActiveTab}>
         <TabList>
           {/* TODO check if this is correct, it changed from two tabs to one after the filter change
            * it did improve the usability though (loading state), or it seems like
            */}
-          {tabResUnits.map((reservationUnit) => (
+          {unitReservationUnits.map((ru) => (
             <Tab
-              onClick={() =>
-                setSelectedReservationUnit(reservationUnit.pk ?? null)
-              }
-              key={reservationUnit?.pk}
+              onClick={() => setSelectedReservationUnit(ru.pk ?? null)}
+              key={ru?.pk}
             >
-              {reservationUnit?.nameFi}
+              {ru?.nameFi}
             </Tab>
           ))}
         </TabList>
@@ -646,9 +652,9 @@ function ApplicationRoundAllocation({
       <ApplicationEvents
         applicationEvents={applicationEvents}
         reservationUnit={
-          tabResUnits.find(
+          unitReservationUnits.find(
             (x) => x.pk != null && x.pk.toString() === selectedReservationUnit
-          ) || reservationUnits[0]
+          ) || unitReservationUnits[0]
         }
       />
     </Container>
@@ -696,13 +702,17 @@ function AllocationWrapper({
   const unitData = reservationUnits.map((ru) => ru?.unit);
 
   // TODO sort by name (they are in a random order because of the nested structure)
-  const units = uniqBy(filterNonNullable(unitData), "pk").filter((unit) =>
-    hasUnitPermission(Permission.CAN_VALIDATE_APPLICATIONS, unit)
-  );
+  const units = uniqBy(filterNonNullable(unitData), "pk")
+    .filter((unit) =>
+      hasUnitPermission(Permission.CAN_VALIDATE_APPLICATIONS, unit)
+    )
+    .sort((a, b) => a?.nameFi?.localeCompare(b?.nameFi ?? "") ?? 0);
 
   const roundName = applications?.[0]?.applicationRound?.nameFi ?? "";
 
-  const resUnits = uniqBy(filterNonNullable(reservationUnits), "pk");
+  const resUnits = uniqBy(filterNonNullable(reservationUnits), "pk").sort(
+    (a, b) => a?.nameFi?.localeCompare(b?.nameFi ?? "") ?? 0
+  );
   return (
     <>
       <BreadcrumbWrapper backLink=".." />
