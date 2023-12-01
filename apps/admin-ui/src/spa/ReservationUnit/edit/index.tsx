@@ -2193,12 +2193,19 @@ function EditorWrapper() {
   if (unitPk == null || Number(unitPk) === 0 || Number.isNaN(Number(unitPk))) {
     return <Error404 />;
   }
+
   // we use null for "new" units (could also be "new" slug)
-  if (reservationUnitPk != null && Number.isNaN(Number(reservationUnitPk))) {
+  const isNew = reservationUnitPk == null;
+  // TODO the unitPk should be removed from the url, not needed since the reservationUnitPk is unique
+  // without this we'd move the reservation unit to another unit on save
+  if (!isNew && reservationUnit?.unit?.pk !== Number(unitPk)) {
+    return <Error404 message={t("errors.router.unitPkMismatch")} />;
+  }
+  if (!isNew && Number.isNaN(Number(reservationUnitPk))) {
     return <Error404 />;
   }
   // the pk is valid but not found in the backend
-  if (reservationUnitPk != null && reservationUnit == null) {
+  if (!isNew && reservationUnit == null) {
     return <Error404 />;
   }
 

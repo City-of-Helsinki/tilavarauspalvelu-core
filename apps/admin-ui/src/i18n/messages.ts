@@ -173,6 +173,7 @@ const translations: ITranslations = {
     router: {
       invalidApplicationNumber: ["Virheellinen hakemusnumero"],
       invalidApplicationRoundNumber: ["Virheellinen hakukierroksen numero"],
+      unitPkMismatch: ["Varausyksikkö ei kuulu osoitteen yksikköön"],
     },
     applicationRoundNotFound: ["Haettua hakukierrosta ei löydy"],
     errorFetchingData: ["Virhe haettaessa tietoja"],
