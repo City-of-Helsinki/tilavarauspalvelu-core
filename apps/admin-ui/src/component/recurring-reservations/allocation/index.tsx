@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { Combobox, SearchInput, Select, Tabs } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { uniqBy } from "lodash";
@@ -26,7 +26,11 @@ import { useAllocationContext } from "@/context/AllocationContext";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import usePermission from "@/hooks/usePermission";
 import { Permission } from "@/modules/permissionHelper";
-import { APPLICATION_EVENTS_FOR_ALLOCATION } from "../queries";
+import {
+  ALL_EVENTS_PER_UNIT_QUERY,
+  APPLICATION_EVENTS_FOR_ALLOCATION,
+  MINIMAL_APPLICATION_ROUND_QUERY,
+} from "../queries";
 import { ApplicationEvents } from "./ApplicationEvents";
 
 type IParams = {
@@ -71,64 +75,6 @@ const NumberOfResultsContainer = styled.div`
 `;
 const NumberOfResults = styled.span`
   ${fontBold}
-`;
-
-// Separate minimal query to find all possible values for filters
-const APPLICATION_ROUND_QUERY = gql`
-  query Applications(
-    $applicationRound: Int!
-    $status: [ApplicationStatusChoice]!
-  ) {
-    applications(applicationRound: $applicationRound, status: $status) {
-      edges {
-        node {
-          applicationRound {
-            nameFi
-          }
-          applicationEvents {
-            eventReservationUnits {
-              reservationUnit {
-                pk
-                nameFi
-                unit {
-                  pk
-                  nameFi
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-
-// Query the count of the application events for that specific unit + reservationUnit
-const ALL_EVENTS_PER_UNIT_QUERY = gql`
-  query AllApplicationEvents(
-    $applicationRound: Int!
-    $applicationStatus: [ApplicationStatusChoice]!
-    $unit: [Int]!
-    $reservationUnit: [Int]!
-  ) {
-    applicationEvents(
-      applicationRound: $applicationRound
-      reservationUnit: $reservationUnit
-      unit: $unit
-      applicationStatus: $applicationStatus
-    ) {
-      edges {
-        node {
-          eventReservationUnits {
-            reservationUnit {
-              pk
-              nameFi
-            }
-          }
-        }
-      }
-    }
-  }
 `;
 
 const transformApplicantType = (value: string | null) => {
@@ -668,7 +614,7 @@ function AllocationWrapper({
   applicationRoundId: number;
 }): JSX.Element {
   const { loading, error, data } = useQuery<Query, QueryApplicationsArgs>(
-    APPLICATION_ROUND_QUERY,
+    MINIMAL_APPLICATION_ROUND_QUERY,
     {
       skip: !applicationRoundId,
       variables: {

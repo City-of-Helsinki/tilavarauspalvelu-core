@@ -46,6 +46,66 @@ export const APPLICATION_ROUD_QUERY = gql`
   }
 `;
 
+// Separate minimal query to find all possible values for filters
+// TODO combine with APPLICATION_ROUD_QUERY
+// TODO rename to applicationEvents by applicationRound
+export const MINIMAL_APPLICATION_ROUND_QUERY = gql`
+  query Applications(
+    $applicationRound: Int!
+    $status: [ApplicationStatusChoice]!
+  ) {
+    applications(applicationRound: $applicationRound, status: $status) {
+      edges {
+        node {
+          applicationRound {
+            nameFi
+          }
+          applicationEvents {
+            eventReservationUnits {
+              reservationUnit {
+                pk
+                nameFi
+                unit {
+                  pk
+                  nameFi
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+// Query the count of the application events for that specific unit + reservationUnit
+export const ALL_EVENTS_PER_UNIT_QUERY = gql`
+  query AllApplicationEvents(
+    $applicationRound: Int!
+    $applicationStatus: [ApplicationStatusChoice]!
+    $unit: [Int]!
+    $reservationUnit: [Int]!
+  ) {
+    applicationEvents(
+      applicationRound: $applicationRound
+      reservationUnit: $reservationUnit
+      unit: $unit
+      applicationStatus: $applicationStatus
+    ) {
+      edges {
+        node {
+          eventReservationUnits {
+            reservationUnit {
+              pk
+              nameFi
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const APPLICATIONS_QUERY = gql`
   query getApplications {
     applications(status: ${ApplicationStatusChoice.Received}) {
