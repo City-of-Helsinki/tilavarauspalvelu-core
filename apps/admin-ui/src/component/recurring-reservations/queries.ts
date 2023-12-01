@@ -32,7 +32,6 @@ export const APPLICATION_ROUNDS_QUERY = gql`
   }
 `;
 
-// TODO combine with APPLICATION_ROUNDS_QUERY
 export const APPLICATION_ROUD_QUERY = gql`
   ${APPLICATION_ROUND_FRAGMENT}
   query ApplicationRoundCriteria($pk: [Int]!) {
@@ -40,6 +39,7 @@ export const APPLICATION_ROUD_QUERY = gql`
       edges {
         node {
           ...ApplicationRoundFragment
+          applicationsCount
           reservationUnits {
             pk
           }

@@ -1,5 +1,5 @@
 import React from "react";
-import { useQuery, gql } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { type Query } from "common/types/gql-types";
@@ -8,27 +8,7 @@ import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import { publicUrl } from "@/common/const";
 import Loader from "@/component/Loader";
 import Review from "./review/Review";
-
-// TODO pick the fields we need
-const APPLICATION_ROUD_QUERY = gql`
-  query ApplicationRoundCriteria($pk: [Int]!) {
-    applicationRounds(pk: $pk) {
-      edges {
-        node {
-          pk
-          nameFi
-          status
-          applicationPeriodBegin
-          applicationPeriodEnd
-          applicationsCount
-          reservationUnits {
-            pk
-          }
-        }
-      }
-    }
-  }
-`;
+import { APPLICATION_ROUD_QUERY } from "./queries";
 
 function ApplicationRound({
   applicationRoundId,

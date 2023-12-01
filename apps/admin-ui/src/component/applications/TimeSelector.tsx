@@ -6,7 +6,7 @@ import {
   ApplicationEventNode,
   ApplicationEventScheduleNode,
 } from "common/types/gql-types";
-import { weekdays } from "../../../common/const";
+import { weekdays } from "@/common/const";
 
 type Cell = {
   hour: number;

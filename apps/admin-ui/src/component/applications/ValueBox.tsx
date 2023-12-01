@@ -19,20 +19,18 @@ interface IValueBoxProps {
   label: string;
   value: string | undefined | null | JSX.Element;
   style?: React.CSSProperties;
+  className?: string;
 }
 
-function ValueBox({
+export function ValueBox({
   label,
   value,
-  style,
   ...rest
 }: IValueBoxProps): JSX.Element {
   return (
-    <Wrapper style={style} {...rest}>
+    <Wrapper {...rest}>
       <Label>{label}</Label>
       <Value>{value || "-"}</Value>
     </Wrapper>
   );
 }
-
-export default ValueBox;

@@ -34,12 +34,12 @@ import Loader from "@/component/Loader";
 import { ApplicationWorkingMemo } from "@/component/WorkingMemo";
 import ShowWhenTargetInvisible from "@/component/ShowWhenTargetInvisible";
 import { Container } from "@/styles/layout";
-import ValueBox from "./ValueBox";
+import { ValueBox } from "./ValueBox";
 import { getApplicantName, getApplicationStatusColor } from "./util";
-import { TimeSelector } from "./time-selector/TimeSelector";
+import { TimeSelector } from "./TimeSelector";
 import StickyHeader from "../StickyHeader";
 import StatusBlock from "../StatusBlock";
-import { APPLICATION_QUERY } from "./queries";
+import { APPLICATION_ADMIN_QUERY } from "./queries";
 import { BirthDate } from "../BirthDate";
 
 const parseApplicationEventSchedules = (
@@ -393,7 +393,7 @@ function ApplicationDetails({
     data,
     loading: isLoading,
     refetch,
-  } = useQuery<Query>(APPLICATION_QUERY, {
+  } = useQuery<Query>(APPLICATION_ADMIN_QUERY, {
     skip: applicationPk === 0,
     variables: { pk: [applicationPk] },
     onError: () => {
