@@ -785,13 +785,13 @@ function BasicSection({
         />
         <CustomNumberInput
           name="maxPersons"
-          min={undefined}
+          min={0}
           max={maxPersons}
           form={form}
         />
         <CustomNumberInput
           name="minPersons"
-          min={undefined}
+          min={0}
           max={watch("maxPersons") || 1}
           form={form}
         />
@@ -1868,7 +1868,7 @@ const ReservationUnitEditor = ({
 
   // ----------------------------- Constants ---------------------------------
   const { getValues, setValue, watch, formState, handleSubmit } = form;
-  const { isDirty, isSubmitting } = formState;
+  const { isDirty: hasChanges, isSubmitting: isSaving } = formState;
 
   const paymentTermsOptions = makeTermsOptions(
     parametersData,
@@ -2017,13 +2017,31 @@ const ReservationUnitEditor = ({
     }
   };
 
-  const isSaving = isSubmitting;
-  const hasChanges = isDirty;
+  const handleBack = () => {
+    if (hasChanges) {
+      setModalContent(
+        <DiscardChangesDialog
+          onAccept={() => {
+            setModalContent(null);
+            history(-1);
+          }}
+          onClose={() => setModalContent(null)}
+        />,
+        true
+      );
+    } else {
+      history(-1);
+    }
+  };
+
   const previewDisabled =
     isSaving ||
     !reservationUnit?.pk ||
     !reservationUnit?.uuid ||
     !previewUrlPrefix;
+  const draftEnabled = hasChanges || !watch("isDraft");
+  const publishEnabled = hasChanges || watch("isDraft");
+  const archiveEnabled = watch("pk") !== 0 && !watch("isArchived");
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -2069,9 +2087,7 @@ const ReservationUnitEditor = ({
           <ArchiveButton
             onClick={handleArchiveButtonClick}
             variant="secondary"
-            disabled={
-              isSaving || getValues("pk") === 0 || getValues("isArchived")
-            }
+            disabled={isSaving || !archiveEnabled}
             theme="black"
           >
             {t("ReservationUnitEditor.archive")}
@@ -2084,18 +2100,7 @@ const ReservationUnitEditor = ({
           disabled={isSaving}
           variant="supplementary"
           iconLeft={<IconArrowLeft />}
-          onClick={() =>
-            setModalContent(
-              <DiscardChangesDialog
-                onAccept={() => {
-                  setModalContent(null);
-                  history(-1);
-                }}
-                onClose={() => setModalContent(null)}
-              />,
-              true
-            )
-          }
+          onClick={handleBack}
         >
           {t("common.prev")}
         </WhiteButton>
@@ -2116,7 +2121,7 @@ const ReservationUnitEditor = ({
         <WhiteButton
           size="small"
           variant="secondary"
-          disabled={isSaving || !hasChanges}
+          disabled={isSaving || !draftEnabled}
           isLoading={isSaving && watch("isDraft")}
           type="button"
           loadingText={t("ReservationUnitEditor.saving")}
@@ -2126,7 +2131,7 @@ const ReservationUnitEditor = ({
         </WhiteButton>
         <WhiteButton
           variant="primary"
-          disabled={isSaving || !hasChanges}
+          disabled={isSaving || !publishEnabled}
           isLoading={isSaving && !watch("isDraft")}
           loadingText={t("ReservationUnitEditor.saving")}
           type="button"

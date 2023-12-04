@@ -22,6 +22,7 @@ import {
 import { addDays, format } from "date-fns";
 import { z } from "zod";
 import { setTimeOnDate } from "@/component/reservations/utils";
+import { checkLengthWithoutHtml } from "@/schemas";
 
 export const PaymentTypes = ["ONLINE", "INVOICE", "ON_SITE"] as const;
 
@@ -160,8 +161,8 @@ export const ReservationUnitEditSchema = z
     bufferTimeAfter: z.number(),
     bufferTimeBefore: z.number(),
     maxReservationsPerUser: z.number().nullable(),
-    maxPersons: z.number().nullable(),
-    minPersons: z.number().nullable(),
+    maxPersons: z.number().min(0).nullable(),
+    minPersons: z.number().min(0).nullable(),
     maxReservationDuration: z.number().nullable(),
     minReservationDuration: z.number().nullable(),
     pk: z.number(),
@@ -330,27 +331,9 @@ export const ReservationUnitEditSchema = z
         path: ["nameSv"],
       });
     }
-    if (v.descriptionEn === "") {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Required",
-        path: ["descriptionEn"],
-      });
-    }
-    if (v.descriptionSv === "") {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Required",
-        path: ["descriptionSv"],
-      });
-    }
-    if (v.descriptionFi === "") {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Required",
-        path: ["descriptionFi"],
-      });
-    }
+    checkLengthWithoutHtml(v.descriptionEn, ctx, "descriptionEn", 1);
+    checkLengthWithoutHtml(v.descriptionFi, ctx, "descriptionFi", 1);
+    checkLengthWithoutHtml(v.descriptionSv, ctx, "descriptionSv", 1);
 
     if (v.maxPersons && v.minPersons) {
       if (v.maxPersons < v.minPersons) {
@@ -573,7 +556,7 @@ export const convertReservationUnit = (
     paymentTypes: filterNonNullable(data?.paymentTypes?.map((pt) => pt?.code)),
     pricings: convertPricingList(filterNonNullable(data?.pricings)),
     images: filterNonNullable(data?.images).map((i) => convertImage(i)),
-    isDraft: data?.isArchived ?? false,
+    isDraft: data?.isDraft ?? false,
     isArchived: data?.isArchived ?? false,
     hasFuturePricing:
       data?.pricings?.some(

@@ -767,6 +767,7 @@ const translations: ITranslations = {
         "Max persons must be greater than min persons": [
           "Maksimi henkilömäärä pitää olla suurempi kuin minimi henkilömäärä",
         ],
+        "Number must be greater than or equal to 0": ["Pitää olla vähintään 0"],
       },
     },
     level: {
