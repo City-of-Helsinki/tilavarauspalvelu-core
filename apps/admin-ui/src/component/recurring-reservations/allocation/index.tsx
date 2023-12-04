@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useQuery } from "@apollo/client";
 import { Combobox, SearchInput, Select, Tabs } from "hds-react";
 import { useTranslation } from "react-i18next";
-import { uniqBy } from "lodash";
+import { debounce, uniqBy } from "lodash";
 import { useParams, useSearchParams } from "react-router-dom";
 import styled from "styled-components";
 import { H1, fontBold, fontMedium } from "common/src/common/typography";
@@ -174,14 +174,13 @@ function ApplicationRoundAllocation({
   );
 
   // TODO default value here instead of the JSX
+  // because otherwise we the query returns all the reservation units if the filter is not set
   const selectedReservationUnit =
     searchParams.get("reservation-unit") ??
     unitReservationUnits?.[0]?.pk?.toString() ??
     null;
+
   const setSelectedReservationUnit = (value: number | null) => {
-    // TODO this conflicts with the setUnitFilter
-    // should be fine to enable if they are never called from same event handler
-    // eslint-disable-next-line no-console -- TODO
     setSingleValueSearchParam("reservation-unit", value?.toString() ?? null);
   };
 
@@ -382,6 +381,8 @@ function ApplicationRoundAllocation({
         return timeOptions.find((o) => String(o.value) === value)?.label ?? "";
       case "order":
         return orderOptions.find((o) => String(o.value) === value)?.label ?? "";
+      case "name":
+        return value;
       default:
         return key;
     }
@@ -398,12 +399,11 @@ function ApplicationRoundAllocation({
     setParams(newParams);
   };
 
-  // TODO findIndex returns -1 if not found, so we can't do || or ?? on it
+  // NOTE findIndex returns -1 if not found
   const initiallyActiveTab = unitReservationUnits.findIndex(
     (x) => x.pk != null && x.pk.toString() === selectedReservationUnit
   );
 
-  // TODO show the total number and the filtered number of application events
   return (
     // TODO top gap is 2rem but the rest of the page is something else so can't change the container directly
     <Container>
@@ -412,7 +412,6 @@ function ApplicationRoundAllocation({
         <StyledH1>{t("Allocation.allocationTitle")}</StyledH1>
         <Ingress>{roundName}</Ingress>
       </div>
-      {/* TODO abstract this to a component? and use the query params to save the state instead of useState */}
       <MoreWrapper
         showAllLabel={t("ReservationUnitsSearch.moreFilters")}
         showLessLabel={t("ReservationUnitsSearch.lessFilters")}
@@ -432,7 +431,6 @@ function ApplicationRoundAllocation({
           clearButtonAriaLabel={t("common.clearAllSelections")}
           selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
         />
-        {/* TODO is this multi select or just no select is all? */}
         <Combobox<typeof timeOptions>
           label={t("Allocation.filters.label.schedules")}
           clearable
@@ -471,10 +469,11 @@ function ApplicationRoundAllocation({
           clearButtonAriaLabel={t("common.clearAllSelections")}
           selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
         />
-        {/* TODO debounce this before updates */}
         <SearchInput
           label={t("Allocation.filters.label.search")}
-          onChange={(str) => setNameFilter(str)}
+          onChange={debounce((str) => setNameFilter(str), 100, {
+            leading: true,
+          })}
           onSubmit={() => {}}
           value={nameFilter ?? ""}
           placeholder={t("Allocation.filters.placeholder.search")}
@@ -557,17 +556,14 @@ function ApplicationRoundAllocation({
         />
       </MoreWrapper>
       <SearchTags hide={hideSearchTags} translateTag={translateTag} />
-      {/* TODO this can't be updated from outside or is there something else than initiallyActiveTab?
-          the unit changes but we can't update the index
-          (ex. select index 5 then switch to unit with less than 5 reservation units the selection disappears)
-          ui only issue
-          A workaround would be to use unit pk as a React key to force remounting.
-      */}
-      <Tabs initiallyActiveTab={initiallyActiveTab}>
+      {/* using a key here is a hack to force remounting the tabs
+       * remount causes flickering but HDS doesn't allow programmatically changing the active tab
+       */}
+      <Tabs
+        initiallyActiveTab={initiallyActiveTab >= 0 ? initiallyActiveTab : 0}
+        key={unitFilter ?? "unit-none"}
+      >
         <TabList>
-          {/* TODO check if this is correct, it changed from two tabs to one after the filter change
-           * it did improve the usability though (loading state), or it seems like
-           */}
           {unitReservationUnits.map((ru) => (
             <Tab
               onClick={() => setSelectedReservationUnit(ru.pk ?? null)}
