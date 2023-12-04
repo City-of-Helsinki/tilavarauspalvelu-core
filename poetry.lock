@@ -637,12 +637,12 @@ bcrypt = ["bcrypt"]
 
 [[package]]
 name = "django-admin-extra-buttons"
-version = "1.5.6"
+version = "1.5.7"
 description = "Django mixin to easily add buttons to any ModelAdmin"
 optional = false
 python-versions = "*"
 files = [
-    {file = "django-admin-extra-buttons-1.5.6.tar.gz", hash = "sha256:9616ae96e51cbdd60428bd5e1d2803ae0760a274ed777a56c2c3b2f23ffb872a"},
+    {file = "django-admin-extra-buttons-1.5.7.tar.gz", hash = "sha256:08dd070cbd46dfe1cb46d7676495a943860e68f99bac85ab5b164cbeb5e73dae"},
 ]
 
 [package.extras]
@@ -3132,4 +3132,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<3.12"
-content-hash = "d4f532f5e3ab94772d7087706f6d005b80965ca8bb654446bfee79b0d9770865"
+content-hash = "8e766c89f11739dfb9674472fa56c05e74ee84dbd34190f45e5755198ac69113"
