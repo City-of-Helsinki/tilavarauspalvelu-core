@@ -107,7 +107,6 @@ export const ALL_EVENTS_PER_UNIT_QUERY = gql`
   }
 `;
 
-// TODO query filters (ageGroup)
 // TODO priority vs preferredOrder, preferredOrder is the selected reservationUnit order, priority is the primary / secondary
 // TODO check if we can remove some of the fields (and move them to the filter query, ex unit / reservationUnit)
 export const APPLICATION_EVENTS_FOR_ALLOCATION = gql`
@@ -117,10 +116,12 @@ export const APPLICATION_EVENTS_FOR_ALLOCATION = gql`
     $unit: [Int]
     $preferredOrder: [Int]
     $textSearch: String
+    $name_Istartswith: String
     $priority: [Int]
     $purpose: [Int]
     $reservationUnit: [Int]
     $applicantType: [ApplicantTypeChoice]
+    $ageGroup: [Int]
     $homeCity: [Int]
     $includePreferredOrder10OrHigher: Boolean
   ) {
@@ -128,12 +129,14 @@ export const APPLICATION_EVENTS_FOR_ALLOCATION = gql`
       applicationRound: $applicationRound
       applicationStatus: $applicationStatus
       unit: $unit
-      name_Istartswith: $textSearch
+      name_Istartswith: $name_Istartswith
+      textSearch: $textSearch
       preferredOrder: $preferredOrder
       priority: $priority
       purpose: $purpose
       reservationUnit: $reservationUnit
       applicantType: $applicantType
+      ageGroup: $ageGroup
       homeCity: $homeCity
       includePreferredOrder10OrHigher: $includePreferredOrder10OrHigher
     ) {

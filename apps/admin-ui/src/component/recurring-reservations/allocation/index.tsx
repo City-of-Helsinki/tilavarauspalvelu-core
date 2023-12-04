@@ -279,7 +279,12 @@ function ApplicationRoundAllocation({
         includePreferredOrder10OrHigher:
           orderFilter != null &&
           orderFilter.filter((x) => Number(x) > 10).length > 0,
-        ...(nameFilter != null ? { textSearch: nameFilter } : {}),
+        ...(nameFilter != null && Number.isNaN(Number(nameFilter))
+          ? { name_Istartswith: nameFilter }
+          : {}),
+        ...(nameFilter != null && !Number.isNaN(Number(nameFilter))
+          ? { textSearch: nameFilter }
+          : {}),
         ...(cityFilter != null
           ? { homeCity: cityFilter.map((x) => Number(x)) }
           : {}),
@@ -294,7 +299,7 @@ function ApplicationRoundAllocation({
           ? { purpose: purposeFilter.map((x) => Number(x)) }
           : {}),
         ...(ageGroupFilter != null
-          ? { ageGroup: [Number(ageGroupFilter)] }
+          ? { ageGroup: ageGroupFilter.map((ag) => Number(ag)) }
           : {}),
         reservationUnit:
           selectedReservationUnit != null
