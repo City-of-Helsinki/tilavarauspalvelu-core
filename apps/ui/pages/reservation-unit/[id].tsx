@@ -114,9 +114,9 @@ import {
 import { Toast } from "@/components/common/Toast";
 import QuickReservation, {
   QuickReservationSlotProps,
-} from "../../components/reservation-unit/QuickReservation";
-import ReservationInfoContainer from "../../components/reservation-unit/ReservationInfoContainer";
-import { useCurrentUser } from "~/hooks/user";
+} from "@/components/reservation-unit/QuickReservation";
+import ReservationInfoContainer from "@/components/reservation-unit/ReservationInfoContainer";
+import { useCurrentUser } from "@/hooks/user";
 import { genericTermsVariant } from "@/modules/const";
 import { APPLICATION_ROUNDS_PERIODS } from "@/modules/queries/applicationRound";
 
@@ -145,7 +145,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const today = new Date();
   const apolloClient = createApolloClient(ctx);
 
-  let relatedReservationUnits = [] as ReservationUnitType[];
+  let relatedReservationUnits: ReservationUnitType[] = [];
 
   // TODO does this return only possible rounds or do we need to do frontend filtering on them?
   const { data } = await apolloClient.query<Query>({
@@ -256,8 +256,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
     return {
       props: {
-        ...(await serverSideTranslations(locale ?? "fi")),
         key: `${id}-${locale}`,
+        ...(await serverSideTranslations(locale ?? "fi")),
         reservationUnit: {
           ...reservationUnitData?.reservationUnitByPk,
           openingHours: {
@@ -281,6 +281,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   return {
     props: {
+      key: `${id}-${locale}`,
       ...(await serverSideTranslations(locale ?? "fi")),
       paramsId: id,
     },
