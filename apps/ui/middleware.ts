@@ -4,10 +4,19 @@ import { getSignInUrl } from "@/modules/const";
 
 function redirectProtectedRoute (req: NextRequest) {
   // TODO check that the cookie is valid not just present
-  const { cookies } = req
+  const { cookies, headers } = req
   const hasSession = cookies.has('sessionid');
   if (!hasSession) {
+    // on the server we are behind a gateway so get the forwarded headers
+    // localhost has no headers
     const currentUrl = req.url
+    const protocol = headers.get('x-forwarded-proto') ?? 'http'
+    const host = headers.get('x-forwarded-host')
+    const originalUrl = headers.get('x-original-url')
+    if (host && originalUrl) {
+      const origin = `${protocol}://${host}`
+      return getSignInUrl(originalUrl, origin)
+    }
     return getSignInUrl(currentUrl)
   }
   return undefined;
@@ -26,26 +35,18 @@ const authenticatedRoutes = [
   'application', //:path*',
   'success',
 ];
-// ugly url matcher that is very specific to our case
+// url matcher that is very specific to our case
 const doesUrlMatch = (url: string, route: string) => {
-  const ref: string[] = url.split('/') // ?.[1]?.split('/')?.[0]
+  const ref: string[] = url.split('/')
   return ref.includes(route)
 }
+
 export const middleware = async (req: NextRequest) => {
   if (authenticatedRoutes.some(route => doesUrlMatch(req.url, route))) {
-    // eslint-disable-next-line no-console -- debug stuff
-    console.log('middleware', req.url)
-    // eslint-disable-next-line no-console -- debug stuff
-    console.log('headers: ', req.headers)
     const redirect = redirectProtectedRoute(req);
     if (redirect) {
-      // eslint-disable-next-line no-console -- debug stuff
-      console.log('redirecting to: ', redirect)
       return NextResponse.redirect(new URL(redirect, req.url))
     }
-  } else {
-    // eslint-disable-next-line no-console -- debug stuff
-    console.log('middleware NOT run: ', req.url)
   }
   return NextResponse.next();
 };

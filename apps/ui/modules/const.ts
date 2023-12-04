@@ -178,27 +178,18 @@ const hostUrl = shouldModifyLocalhost
 export const GRAPHQL_URL = `${hostUrl}${
   hostUrl.endsWith("/") ? "" : "/"
 }graphql/`;
+
 export const REST_API_URL = `${hostUrl}${hostUrl.endsWith("/") ? "" : "/"}v1/`;
 
 const AUTH_URL = apiBaseUrl != null ? `${apiBaseUrl}/helauth` : "/helauth";
-const PUBLIC_URL: string = "";
 
-const getCleanPublicUrl = () => {
-  const hasPublicUrl =
-    PUBLIC_URL != null && PUBLIC_URL !== "/" && PUBLIC_URL !== "";
-  const publicUrlNoSlash =
-    PUBLIC_URL && hasPublicUrl ? PUBLIC_URL.replace(/\/$/, "") : "";
-  const cleanPublicUrl = publicUrlNoSlash.startsWith("/")
-    ? publicUrlNoSlash
-    : `/${publicUrlNoSlash}`;
-  return cleanPublicUrl;
-};
 // Returns href url for sign in dialog when given redirect url as parameter
-export const getSignInUrl = (callBackUrl: string): string => {
+// @param callBackUrl - url to redirect after successful login
+// @param originOverride - when behind a gateway on a server the url.origin is incorrect
+export const getSignInUrl = (callBackUrl: string, originOverride?: string): string => {
   if (callBackUrl.includes(`/logout`)) {
-    const baseUrl = new URL(callBackUrl).origin;
-    const cleanPublicUrl = getCleanPublicUrl();
-    return `${AUTH_URL}/login?next=${baseUrl}${cleanPublicUrl}`;
+    const baseUrl = originOverride != null ? originOverride : new URL(callBackUrl).origin;
+    return `${AUTH_URL}/login?next=${baseUrl}`;
   }
   return `${AUTH_URL}/login?next=${callBackUrl}`;
 };
