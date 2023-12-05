@@ -802,6 +802,50 @@ def test_can_filter_application_event__by_text_search__event_name(graphql):
     assert response.node(0) == {"pk": event_1.pk}
 
 
+def test_can_filter_application_event__by_text_search__event_name__prefix(graphql):
+    # given:
+    # - There is an application with two application events
+    # - A superuser is using the system
+    application = ApplicationFactory.create_in_status_draft(organisation=None, contact_person=None, user=None)
+    event_1 = ApplicationEventFactory.create_in_status_unallocated(application=application, name="foo")
+    ApplicationEventFactory.create_in_status_unallocated(application=application, name="bar")
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    # when:
+    # - User tries to filter application events with a text search, which is only a prefix match
+    query = events_query(text_search="fo")
+    response = graphql(query)
+
+    # then:
+    # - The response contains no errors
+    # - The response contains the right application events
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"pk": event_1.pk}
+
+
+def test_can_filter_application_event__by_text_search__event_name__has_quotes(graphql):
+    # given:
+    # - There is an application with two application events
+    # - A superuser is using the system
+    application = ApplicationFactory.create_in_status_draft(organisation=None, contact_person=None, user=None)
+    event_1 = ApplicationEventFactory.create_in_status_unallocated(application=application, name="Moe's Bar")
+    ApplicationEventFactory.create_in_status_unallocated(application=application, name="Bar")
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    # when:
+    # - User tries to filter application events with a text search, which is only a partial match
+    query = events_query(text_search="Moe's")
+    response = graphql(query)
+
+    # then:
+    # - The response contains no errors
+    # - The response contains the right application events
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"pk": event_1.pk}
+
+
 def test_can_filter_application_event__by_text_search__applicant__organisation_name(graphql):
     # given:
     # - There is an application with two application events
@@ -929,6 +973,51 @@ def test_can_filter_application_event__by_text_search__applicant__user_last_name
     assert response.has_errors is False, response
     assert len(response.edges) == 1, response
     assert response.node(0) == {"pk": event.pk}
+
+
+def test_can_filter_application_event__by_text_search__event_id(graphql):
+    # given:
+    # - There is an application with two application events
+    # - A superuser is using the system
+    application = ApplicationFactory.create_in_status_draft(organisation=None, contact_person=None, user=None)
+    event_1 = ApplicationEventFactory.create_in_status_unallocated(application=application, name="foo")
+    ApplicationEventFactory.create_in_status_unallocated(application=application, name="bar")
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    # when:
+    # - User tries to filter application events with a text search
+    query = events_query(text_search=f"{event_1.pk}")
+    response = graphql(query)
+
+    # then:
+    # - The response contains no errors
+    # - The response contains the right application events
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"pk": event_1.pk}
+
+
+def test_can_filter_application_event__by_text_search__application_id(graphql):
+    # given:
+    # - There are two applications with one application events each
+    # - A superuser is using the system
+    application_1 = ApplicationFactory.create_in_status_draft(organisation=None, contact_person=None, user=None)
+    application_2 = ApplicationFactory.create_in_status_draft(organisation=None, contact_person=None, user=None)
+    event_1 = ApplicationEventFactory.create_in_status_unallocated(application=application_1, name="foo")
+    ApplicationEventFactory.create_in_status_unallocated(application=application_2, name="bar")
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    # when:
+    # - User tries to filter application events with a text search
+    query = events_query(text_search=f"{application_1.pk}")
+    response = graphql(query)
+
+    # then:
+    # - The response contains no errors
+    # - The response contains the right application events
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"pk": event_1.pk}
 
 
 def test_can_filter_application_event__by_text_search__not_found(graphql):
