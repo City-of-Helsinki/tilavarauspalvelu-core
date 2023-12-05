@@ -1,7 +1,7 @@
 from typing import TypedDict
 
 import django_filters
-from django.contrib.postgres.search import SearchVector
+from django.contrib.postgres.search import SearchQuery, SearchVector
 from django.db import models
 from django.db.models import QuerySet
 
@@ -83,4 +83,12 @@ class ApplicationEventFilterSet(BaseModelFilterSet):
     def filter_text_search(qs: ApplicationEventQuerySet, name: str, value: str) -> QuerySet:
         # If this becomes slow, look into optimisation strategies here:
         # https://docs.djangoproject.com/en/4.2/ref/contrib/postgres/search/#performance
-        return qs.annotate(search=SearchVector("application__id", "id", "name", "applicant")).filter(search=value)
+        vector = SearchVector("application__id", "id", "name", "applicant")
+        # Create a query that searches for each word separately and matched partial words if match is a prefix.
+        # Remove any whitespace and replace any single quote mark with two quote marks.
+        # https://www.postgresql.org/docs/current/datatype-textsearch.html#DATATYPE-TSQUERY
+        terms = " | ".join(
+            f"'{val}':*" for value in value.split(" ") if (val := value.strip().replace("'", "''")) != ""
+        )
+        query = SearchQuery(terms, search_type="raw")
+        return qs.annotate(search=vector).filter(search=query)
