@@ -1,19 +1,24 @@
-import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import {
+  FetchResult,
+  useLazyQuery,
+  useMutation,
+  useQuery,
+} from "@apollo/client";
 import { breakpoints } from "common/src/common/style";
 import { H2 } from "common/src/common/typography";
 import {
-  ApplicationRoundNode,
-  Query,
-  QueryReservationsArgs,
-  QueryReservationUnitByPkArgs,
-  ReservationAdjustTimeMutationInput,
-  ReservationAdjustTimeMutationPayload,
+  type ApplicationRoundNode,
+  type Mutation,
+  type MutationAdjustReservationTimeArgs,
+  type Query,
+  type QueryReservationsArgs,
+  type QueryReservationUnitByPkArgs,
   ReservationsReservationStateChoices,
   ReservationsReservationTypeChoices,
-  ReservationType,
-  ReservationUnitByPkType,
-  ReservationUnitByPkTypeOpeningHoursArgs,
-  ReservationUnitByPkTypeReservationsArgs,
+  type ReservationType,
+  type ReservationUnitByPkType,
+  type ReservationUnitByPkTypeOpeningHoursArgs,
+  type ReservationUnitByPkTypeReservationsArgs,
 } from "common/types/gql-types";
 import { pick } from "lodash";
 import { useRouter } from "next/router";
@@ -28,7 +33,6 @@ import { Subheading } from "common/src/reservation-form/styles";
 import { Container } from "common";
 import { filterNonNullable } from "common/src/helpers";
 import { useCurrentUser } from "@/hooks/user";
-
 import {
   ADJUST_RESERVATION_TIME,
   GET_RESERVATION,
@@ -291,18 +295,41 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
   }, [applicationRoundsData, reservationUnit]);
 
   const [
-    adjustReservationTime,
+    adjustReservationTimeMutation,
     {
       data: adjustReservationTimeData,
       error: adjustReservationTimeError,
       loading: adjustReservationTimeLoading,
     },
-  ] = useMutation<
-    { adjustReservationTime: ReservationAdjustTimeMutationPayload },
-    { input: ReservationAdjustTimeMutationInput }
-  >(ADJUST_RESERVATION_TIME, {
-    errorPolicy: "all",
-  });
+  ] = useMutation<Mutation, MutationAdjustReservationTimeArgs>(
+    ADJUST_RESERVATION_TIME,
+    {
+      errorPolicy: "all",
+    }
+  );
+
+  // TODO should rework this so we don't pass a string here (use Dates till we do the mutation)
+  const adjustReservationTime = (
+    input: MutationAdjustReservationTimeArgs["input"]
+  ): Promise<FetchResult<Mutation>> => {
+    // NOTE backend throws errors in some cases if we accidentally send seconds or milliseconds that are not 0
+    const { begin, end, ...rest } = input;
+    const beginDate = new Date(begin);
+    beginDate.setSeconds(0);
+    beginDate.setMilliseconds(0);
+    const endDate = new Date(end);
+    endDate.setSeconds(0);
+    endDate.setMilliseconds(0);
+    return adjustReservationTimeMutation({
+      variables: {
+        input: {
+          begin: beginDate.toISOString(),
+          end: endDate.toISOString(),
+          ...rest,
+        },
+      },
+    });
+  };
 
   useEffect(() => {
     if (adjustReservationTimeError) {
@@ -411,13 +438,9 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
                     reservation.pk
                   ) {
                     adjustReservationTime({
-                      variables: {
-                        input: {
-                          pk: reservation.pk,
-                          begin: initialReservation.begin,
-                          end: initialReservation.end,
-                        },
-                      },
+                      pk: reservation.pk,
+                      begin: initialReservation.begin,
+                      end: initialReservation.end,
                     });
                   }
                 }}
