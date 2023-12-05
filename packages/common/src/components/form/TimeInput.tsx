@@ -1,5 +1,7 @@
 import React, { Ref, forwardRef } from "react";
 import styled from "styled-components";
+import { IconAlertCircleFill } from "hds-react";
+import { breakpoints } from "../../common/style";
 
 const TimeInputContainer = styled.div`
   --border-width: 2px;
@@ -10,6 +12,7 @@ const TimeInputContainer = styled.div`
 
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
 
   /* stylelint-disable-next-line property-no-vendor-prefix -- iOS problems */
   -webkit-appearance: none;
@@ -42,11 +45,41 @@ const TimeInputContainer = styled.div`
       background-color: var(--color-black-5);
     }
   }
+
+  /* mobile scale to full width inside a parent
+   * desktop define a minimum size that shows HH:mm
+   */
+  & > input {
+    max-width: none;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  @media (min-width: ${breakpoints.m}) {
+    & > input {
+      min-width: 9ch;
+      max-width: unset;
+    }
+  }
 `;
+
+// NOTE Extra div around the svg is required because of scaling issues with multi line text
+const ErrorText = styled.div`
+  display: flex;
+  color: var(--color-error);
+  & > div {
+    margin-right: var(--spacing-3-xs);
+  }
+  margin-right: var(--spacing-3-xs);
+`;
+
+const isValid = (value: string): boolean => {
+  return /^[0-9]{1,2}(:[0-9]{0,2})?$/.test(value);
+};
 
 type TimeInputProps = {
   value: string;
   label: string;
+  error?: string;
 } & React.InputHTMLAttributes<HTMLInputElement>;
 
 /// Custom component because
@@ -54,15 +87,9 @@ type TimeInputProps = {
 /// this breaks all react-hook-forms because they rely on resetting the value (both controlled / uncontrolled)
 /// TODO if you use this on ui side check accessibility
 export const TimeInput = forwardRef(function TimeInput(
-  props: TimeInputProps,
+  { error, label, className, style, ...props }: TimeInputProps,
   ref: Ref<HTMLInputElement>
 ) {
-  const { label } = props;
-
-  const isValid = (value: string): boolean => {
-    return /^[0-9]{1,2}(:[0-9]{0,2})?$/.test(value);
-  };
-
   // block if the input is not a number or :
   // allow overwriting selection
   // automatic adding of : if the user types 3 numbers
@@ -142,19 +169,27 @@ export const TimeInput = forwardRef(function TimeInput(
   };
 
   return (
-    <TimeInputContainer>
+    <TimeInputContainer className={className} style={style}>
       <label htmlFor={props.name}>{label}</label>
       <input
         {...props}
         // use numeric keyboard on mobile
         inputMode="numeric"
         pattern="[0-9]:*"
-        placeholder="hh:mm"
+        placeholder="tt:mm"
         ref={ref}
-        size={6}
+        // setting size={X} breaks css styling... because of course it does
         onPaste={onPaste}
         onKeyDown={onKeyDown}
       />
+      {error && (
+        <ErrorText>
+          <div>
+            <IconAlertCircleFill />
+          </div>
+          <span>{error}</span>
+        </ErrorText>
+      )}
     </TimeInputContainer>
   );
 });

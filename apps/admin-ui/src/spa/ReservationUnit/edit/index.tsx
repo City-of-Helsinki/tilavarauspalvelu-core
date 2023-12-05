@@ -90,9 +90,11 @@ import {
   convertReservationUnit,
   transformReservationUnit,
   type ImageFormType,
+  getTranslatedError,
 } from "./form";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { reservationUnitsUrl } from "@/common/urls";
+import { SeasonalSection } from "./SeasonalSection";
 
 const RichTextInput = dynamic(
   () => import("../../../component/RichTextInput"),
@@ -100,6 +102,15 @@ const RichTextInput = dynamic(
     ssr: false,
   }
 );
+
+// Override the Accordion style: force border even if the accordion is open
+// because the last section is not an accordion but a button and it looks funny otherwise
+const StyledContainerMedium = styled(ContainerMedium)`
+  & > div:nth-last-of-type(2) > div {
+    /* stylelint-disable-next-line csstools/value-no-unknown-custom-properties */
+    border-bottom: 1px solid var(--border-color);
+  }
+`;
 
 // NOTE some magic values so the sticky buttons don't hide the bottom of the page
 const Wrapper = styled.div`
@@ -518,14 +529,6 @@ const useImageMutations = () => {
   };
 
   return [reconcileImageChanges];
-};
-
-const getTranslatedError = (error: string | undefined, t: TFunction) => {
-  if (error == null) {
-    return undefined;
-  }
-  // TODO use a common translation key for these
-  return t(`Notifications.form.errors.${error}`);
 };
 
 // For these fields only Fi has tooltips
@@ -1908,10 +1911,6 @@ const ReservationUnitEditor = ({
     parametersData?.reservationUnitTypes?.edges?.map((e) => e?.node)
   );
 
-  const isDirect =
-    watch("reservationKind") === "DIRECT" ||
-    watch("reservationKind") === "DIRECT_AND_SEASON";
-
   // ----------------------------- Callbacks ----------------------------------
   const onSubmit = async (formValues: ReservationUnitEditFormValues) => {
     const input = transformReservationUnit(formValues);
@@ -2034,6 +2033,13 @@ const ReservationUnitEditor = ({
     }
   };
 
+  const isDirect =
+    watch("reservationKind") === "DIRECT" ||
+    watch("reservationKind") === "DIRECT_AND_SEASON";
+  const isSeasonal =
+    watch("reservationKind") === "SEASON" ||
+    watch("reservationKind") === "DIRECT_AND_SEASON";
+
   const previewDisabled =
     isSaving ||
     !reservationUnit?.pk ||
@@ -2045,7 +2051,7 @@ const ReservationUnitEditor = ({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
-      <ContainerMedium>
+      <StyledContainerMedium>
         <DisplayUnit
           heading={
             reservationUnit?.nameFi ?? t("ReservationUnitEditor.defaultHeading")
@@ -2083,6 +2089,7 @@ const ReservationUnitEditor = ({
         )}
         <CommunicationSection form={form} />
         <OpeningHoursSection reservationUnit={reservationUnit} />
+        {isSeasonal && <SeasonalSection form={form} />}
         <div>
           <ArchiveButton
             onClick={handleArchiveButtonClick}
@@ -2093,7 +2100,7 @@ const ReservationUnitEditor = ({
             {t("ReservationUnitEditor.archive")}
           </ArchiveButton>
         </div>
-      </ContainerMedium>
+      </StyledContainerMedium>
       <ButtonsStripe>
         <WhiteButton
           size="small"

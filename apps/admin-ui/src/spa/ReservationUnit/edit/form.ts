@@ -21,8 +21,9 @@ import {
 } from "common/types/gql-types";
 import { addDays, format } from "date-fns";
 import { z } from "zod";
+import { TFunction } from "i18next";
 import { setTimeOnDate } from "@/component/reservations/utils";
-import { checkLengthWithoutHtml } from "@/schemas";
+import { checkLengthWithoutHtml, checkTimeStringFormat } from "@/schemas";
 
 export const PaymentTypes = ["ONLINE", "INVOICE", "ON_SITE"] as const;
 
@@ -45,8 +46,7 @@ export const PricingFormSchema = z.object({
     .nativeEnum(ReservationUnitsReservationUnitPricingPriceUnitChoices)
     .nullable(),
   status: z.nativeEnum(ReservationUnitsReservationUnitPricingStatusChoices),
-  // TODO this has to be a string because of HDS date input
-  // in ui format: "d.M.yyyy"
+  // NOTE this has to be a string because of HDS date input in ui format: "d.M.yyyy"
   begins: z.string(),
 });
 
@@ -151,6 +151,126 @@ const ImageFormSchema = z.object({
 });
 export type ImageFormType = z.infer<typeof ImageFormSchema>;
 
+// Time is saved in a string format "HH:mm:ss" backend accepts also "HH:mm"
+const ReservableTimeSchema = z.object({
+  begin: z.string(),
+  end: z.string(),
+});
+
+const SeasonalFormSchema = z.object({
+  pk: z.number(),
+  closed: z.boolean(),
+  weekday: z.number().min(0).max(6),
+  // unregister leaves undefined in the array
+  // undefined => not rendered, not saved
+  // empty => rendered as empty, not saved
+  // valid => rendered as valid, saved
+  reservableTimes: z.array(ReservableTimeSchema.optional()),
+});
+type SeasonalFormType = z.infer<typeof SeasonalFormSchema>;
+
+function validateSeasonalTimes(
+  data: SeasonalFormType[],
+  ctx: z.RefinementCtx
+): void {
+  data.forEach((season, index) => {
+    // pass empties and "" because they are never sent
+    let lastEnd: number | null = null;
+    season.reservableTimes.forEach((reservableTime, i) => {
+      if (reservableTime == null) {
+        return;
+      }
+      // check both begin and end
+      if (reservableTime.begin == null && reservableTime.end == null) {
+        return;
+      }
+      if (reservableTime.begin === "" && reservableTime.end === "") {
+        return;
+      }
+      const path = `seasons[${index}].reservableTimes[${i}]`;
+      checkTimeStringFormat(
+        reservableTime?.begin,
+        ctx,
+        `${path}.begin`,
+        "time"
+      );
+      checkTimeStringFormat(reservableTime?.end, ctx, `${path}.end`, "time");
+
+      const [h1, m1] = reservableTime.begin.split(":");
+      const [h2, m2] = reservableTime.end.split(":");
+      const begin = { hours: parseInt(h1, 10), minutes: parseInt(m1, 10) };
+      const end = { hours: parseInt(h2, 10), minutes: parseInt(m2, 10) };
+
+      const beginTimeMinutes = begin.hours * 60 + begin.minutes;
+      const endTimeMinutes = end.hours * 60 + end.minutes;
+      // this corresponds to the backend error: "Timeslot 1 begin and end time must be at 30 minute intervals."
+      if (beginTimeMinutes % 30 !== 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "time must be at 30 minute intervals",
+          path: [`${path}.begin`],
+        });
+      }
+      if (endTimeMinutes % 30 !== 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "time must be at 30 minute intervals",
+          path: [`${path}.end`],
+        });
+      }
+
+      // check that the begin is before the end
+      if (begin != null && end != null) {
+        const t1 = begin.hours * 60 + begin.minutes;
+        const t2 = end.hours * 60 + end.minutes;
+        if (t1 >= t2 && t2 !== 0) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Begin must be before end",
+            path: [`${path}.end`],
+          });
+        }
+      }
+
+      // check that the first can't end after the second begins
+      if (i > 0) {
+        if (lastEnd != null) {
+          const t2 = begin.hours * 60 + begin.minutes;
+
+          if (lastEnd === t2) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: "Previous end can't be the same as next begin",
+              // NOTE design has it the other way around
+              path: [`${path}.begin`],
+            });
+          }
+          if (lastEnd === 0 || lastEnd > t2) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: "Previous end must be before next begin",
+              // NOTE design has it the other way around
+              path: [`${path}.begin`],
+            });
+          }
+        }
+        if (lastEnd == null && begin != null) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Not allowed to add a second time without first",
+            path: [`${path}.begin`],
+          });
+        }
+      }
+
+      if (end != null) {
+        const t2 = end.hours * 60 + end.minutes;
+        lastEnd = t2;
+      }
+    });
+  });
+}
+
 export const ReservationUnitEditSchema = z
   .object({
     authentication: z.nativeEnum(
@@ -215,7 +335,7 @@ export const ReservationUnitEditSchema = z
     qualifierPks: z.array(z.number()),
     paymentTypes: z.array(z.string()),
     pricings: z.array(PricingFormSchema),
-    // TODO
+    seasons: z.array(SeasonalFormSchema),
     // "Not draft reservation unit must have a reservation unit type."
     reservationUnitTypePk: z.number().nullable(),
     cancellationRulePk: z.number().nullable(),
@@ -243,7 +363,19 @@ export const ReservationUnitEditSchema = z
     hasCancellationRule: z.boolean(),
   })
   .superRefine((v, ctx) => {
-    if (v.isDraft || v.isArchived) {
+    if (v.isArchived) {
+      return;
+    }
+
+    // Drafts also require seasonal times validation
+    if (
+      v.reservationKind !==
+      ReservationUnitsReservationUnitReservationKindChoices.Direct
+    ) {
+      validateSeasonalTimes(v.seasons, ctx);
+    }
+
+    if (v.isDraft) {
       return;
     }
 
@@ -469,6 +601,41 @@ const convertImage = (image?: ReservationUnitImageType): ImageFormType => {
   };
 };
 
+/// Primary use case is to clip out seconds from backend time strings
+/// Assumed only to be used for backend time strings which are in format HH:MM or HH:MM:SS
+/// NOTE does not handle incorrect time strings (ex. bar:foo)
+/// NOTE does not have any boundary checks (ex. 25:99 is allowed)
+const convertTime = (t?: string) => {
+  if (t == null || t === "") {
+    return "";
+  }
+  // NOTE split has incorrect typing
+  const [h, m, _]: Array<string | undefined> = t.split(":");
+  return `${h ?? "00"}:${m ?? "00"}`;
+};
+
+// Always return all 7 days
+// Always return at least one reservableTime
+function convertSeasonalList(
+  data: NonNullable<ReservationUnitByPkType["applicationRoundTimeSlots"]>
+): ReservationUnitEditFormValues["seasons"] {
+  const days = [0, 1, 2, 3, 4, 5, 6];
+  return days.map((d) => {
+    const season = data.find((s) => s.weekday === d);
+
+    const times = filterNonNullable(season?.reservableTimes).map((rt) => ({
+      begin: convertTime(rt.begin),
+      end: convertTime(rt?.end),
+    }));
+    return {
+      pk: season?.pk ?? 0,
+      weekday: d,
+      closed: season?.closed ?? false,
+      reservableTimes: times.length > 0 ? times : [{ begin: "", end: "" }],
+    };
+  });
+}
+
 export const convertReservationUnit = (
   data?: ReservationUnitByPkType
 ): ReservationUnitEditFormValues => {
@@ -481,7 +648,6 @@ export const convertReservationUnit = (
     maxReservationDuration: data?.maxReservationDuration ?? null,
     minReservationDuration: data?.minReservationDuration ?? null,
     pk: data?.pk ?? 0,
-    // TODO
     // Date split for ui components
     publishBeginsDate: data?.publishBegins
       ? format(new Date(data.publishBegins), "d.M.yyyy")
@@ -568,6 +734,9 @@ export const convertReservationUnit = (
     images: filterNonNullable(data?.images).map((i) => convertImage(i)),
     isDraft: data?.isDraft ?? false,
     isArchived: data?.isArchived ?? false,
+    seasons: convertSeasonalList(
+      filterNonNullable(data?.applicationRoundTimeSlots)
+    ),
     hasFuturePricing:
       data?.pricings?.some(
         (p) =>
@@ -631,6 +800,7 @@ export function transformReservationUnit(
     termsOfUseEn,
     termsOfUseFi,
     termsOfUseSv,
+    seasons,
     images, // images are updated with a separate mutation
     ...vals
   } = values;
@@ -638,6 +808,19 @@ export function transformReservationUnit(
   const shouldSavePricing = (p: PricingFormValues) =>
     hasFuturePricing ||
     p.status === ReservationUnitsReservationUnitPricingStatusChoices.Active;
+
+  const isReservableTime = (t?: SeasonalFormType["reservableTimes"][0]) =>
+    t && t.begin && t.end;
+  // NOTE mutation doesn't support pks (even if changing not adding) unlike other mutations
+  const applicationRoundTimeSlots = seasons
+    .filter((s) => s.reservableTimes.filter(isReservableTime).length > 0)
+    .map((s) => ({
+      weekday: s.weekday,
+      closed: s.closed,
+      reservableTimes: !s.closed
+        ? filterNonNullable(s.reservableTimes.filter(isReservableTime))
+        : [],
+    }));
 
   return {
     ...vals,
@@ -682,5 +865,14 @@ export function transformReservationUnit(
           ? { taxPercentagePk: p.taxPercentage.pk }
           : {}),
       })),
+    applicationRoundTimeSlots,
   };
+}
+
+export function getTranslatedError(error: string | undefined, t: TFunction) {
+  if (error == null) {
+    return undefined;
+  }
+  // TODO use a common translation key for these
+  return t(`Notifications.form.errors.${error}`);
 }

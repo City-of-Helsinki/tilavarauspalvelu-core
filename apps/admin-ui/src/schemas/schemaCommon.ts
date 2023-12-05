@@ -77,7 +77,8 @@ export const checkValidFutureDate = (
 export const checkTimeStringFormat = (
   data: string | undefined,
   ctx: z.RefinementCtx,
-  path: string
+  path: string,
+  errorKey?: string
 ) => {
   if (!data) {
     ctx.addIssue({
@@ -89,13 +90,13 @@ export const checkTimeStringFormat = (
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: [path],
-      message: `${path} is not in time format.`,
+      message: `${errorKey ?? path} is not in time format.`,
     });
   } else if (Number(data.replace(":", ".")) >= 24) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: [path],
-      message: `${path} can't be more than 24 hours.`,
+      message: `${errorKey ?? path} can't be more than 24 hours.`,
     });
   }
 };

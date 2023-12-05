@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { fontMedium } from "../common/typography";
 
 interface IconButtonProps {
@@ -24,7 +24,25 @@ const Container = styled.div`
   text-decoration: none !important;
 `;
 
-const linkStyles = `
+const focusStyles = css`
+  --background-color-focus: transparent;
+  --color-focus: var(--color-black);
+  --focus-outline-color: var(--color-focus-outline);
+  --outline-width: 3px;
+
+  &:focus-within,
+  &:focus-visible {
+    transition-property: background-color, border-color, color;
+    transition-duration: 85ms;
+    transition-timing-function: ease-out;
+    background-color: var(--background-color-focus, transparent);
+    color: var(--color-focus);
+    outline: none;
+    box-shadow: 0 0 2px var(--outline-width) var(--focus-outline-color);
+  }
+`;
+
+const linkStyles = css`
   color: var(--color-black);
   text-decoration: none;
   &:hover {
@@ -43,6 +61,11 @@ const StyledLinkButton = styled.button`
   -webkit-appearance: none;
   padding: 0;
   ${linkStyles}
+  ${focusStyles}
+
+  &:disabled {
+    color: var(--color-black-50);
+  }
 `;
 
 const Anchor = styled.a`
@@ -56,15 +79,12 @@ const HoverWrapper = styled.div`
   border-bottom: 1px solid transparent;
   align-items: center;
   cursor: pointer;
+  ${focusStyles}
   &:hover {
     border-color: var(--color-black-30);
   }
-  &:focus,
   &:active {
     border-width: 2px;
-  }
-  &:focus {
-    border-color: var(--color-bus);
   }
   &:active {
     border-color: var(--color-black);

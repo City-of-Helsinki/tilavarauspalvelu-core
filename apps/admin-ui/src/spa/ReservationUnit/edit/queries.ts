@@ -135,6 +135,16 @@ export const RESERVATIONUNIT_QUERY = gql`
         status
         pk
       }
+      applicationRoundTimeSlots {
+        pk
+        closed
+        weekday
+        closed
+        reservableTimes {
+          begin
+          end
+        }
+      }
     }
   }
 `;

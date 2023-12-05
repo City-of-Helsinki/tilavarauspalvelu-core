@@ -161,6 +161,7 @@ const translations: ITranslations = {
     weekday: ["Viikonpäivä"],
     date: ["Päivämäärä"],
     time: ["Kellonaika"],
+    and: ["ja"],
     // TODO AriaLabel is not needed in the key value
     increaseByOneAriaLabel: ["Lisää yhdellä"],
     decreaseByOneAriaLabel: ["Vähennä yhdellä"],
@@ -773,6 +774,23 @@ const translations: ITranslations = {
         "Min reservation duration must be less than max duration": [
           "Minimikesto pitää olla pienempi kuin maksimikesto",
         ],
+        "time is not in time format.": ["Aika on ilmoitettava muodossa tt:mm"],
+        "Begin must be before end": ["Valitse myöhäisempi päättymisaika."],
+        "Previous end must be before next begin": [
+          "Aikajakso ei voi alkaa ennen kuin edellinen aikajakso on päättynyt.",
+        ],
+        "time must be at 30 minute intervals": [
+          "Aikajakson tulee alkaa tasalta tai puolelta.",
+        ],
+        "time can't be more than 24 hours.": [
+          "Aika on ilmoitettava muodossa tt:mm",
+        ],
+        "Previous end can't be the same as next begin": [
+          "Aikajakson päättymisaika ei voi olla sama kuin toisen aikajakson alkamisaika.",
+        ],
+        "Not allowed to add a second time without first": [
+          "Aikajakso ei voi alkaa ennen kuin edellinen aikajakso on päättynyt.",
+        ],
       },
     },
     level: {
@@ -1189,6 +1207,8 @@ const translations: ITranslations = {
         FREE: ["Maksuton"],
       },
       priceChange: ["Hintaan on tulossa muutos"],
+      openingTime: ["Alkamisaika"],
+      closingTime: ["Päättymisaika"],
     },
     tooltip: {
       reservationKind: [
@@ -1435,6 +1455,14 @@ const translations: ITranslations = {
         `Lisää nimesi ja yhteystietosi, jotta palvelusi tuoteomistaja tai Varaamon ylläpito tietää kehen tarvittaessa yhteyttä.`,
       ],
     },
+    closed: ["Suljettu"],
+    seasonalTimesTitle: ["Kausivarattavat ajat"],
+    seasonalTimesDescription: [
+      "Kausivarattavat ajat näkyvät hakuaikana varausyksikön sivulla. Tässä syötetyt ajat ohjaavat vain hakulomakkeen aikatoiveita ja vuorojenjakotyökalua. Anna ajat 30 min tarkkuudella, esim. 9:00 tai 9:30. Lopulliset varattavissaoloajat täytetään aukiolosovelluksessa.",
+    ],
+    clearSeasonalTimes: ["Tyhjennä ajat"],
+    addSeasonalTime: ["Lisää aikaväli"],
+    removeSeasonalTime: ["Poista aikaväli"],
     cancelledSubAccordion: ["Täydennä peruutusviestiä"],
     pendingExpandLink: ["Täydennä alustavan varauksen viestiä"],
     authenticationLabel: ["Tunnistautuminen"],
@@ -1488,7 +1516,7 @@ const translations: ITranslations = {
     openingTimesExternalLink: ["Siirry aukiolosovellukseen"],
     previewCalendarLink: ["Siirry varaamon kalenterinäkymään"],
     cancel: ["Palaa tallentamatta muutoksia"],
-    archive: ["Arkistoi"],
+    archive: ["Arkistoi varausyksikkö"],
     save: ["Tallenna tiedot"],
     preview: ["Esikatsele"],
     saving: ["Tallennetaan..."],
