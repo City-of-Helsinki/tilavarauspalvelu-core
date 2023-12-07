@@ -9,7 +9,7 @@ pytestmark = [
 ]
 
 QUERY = """
-    query ($equipments: [ID]) {
+    query ($equipments: [Int]) {
         reservationUnits(equipments: $equipments) {
             edges {
                 node {

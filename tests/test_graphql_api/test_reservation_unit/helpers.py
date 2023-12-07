@@ -1,23 +1,14 @@
-from tests.gql_builders import build_mutation
+from functools import partial
 
-TIMESLOTS_QUERY = """
-    query {
-        reservationUnits {
-            edges {
-                node {
-                    applicationRoundTimeSlots {
-                        weekday
-                        closed
-                        reservableTimes {
-                            begin
-                            end
-                        }
-                    }
-                }
-            }
-        }
-    }
-"""
+from tests.gql_builders import build_mutation, build_query
+
+TIMESLOTS_QUERY = build_query(
+    "reservationUnits",
+    connection=True,
+    fields="applicationRoundTimeSlots {weekday closed reservableTimes{begin end}}",
+)
+
+reservation_units_query = partial(build_query, "reservationUnits", connection=True)
 
 CREATE_MUTATION = build_mutation(
     "createReservationUnit",
