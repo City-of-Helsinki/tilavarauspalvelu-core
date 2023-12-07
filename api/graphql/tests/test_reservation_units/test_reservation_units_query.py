@@ -603,24 +603,6 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
-    def test_filtering_by_type_not_found(self):
-        response = self.query(
-            """
-            query {
-                reservationUnits(reservationUnitType:345987){
-                edges {
-                    node {
-                        nameFi
-                    }
-                }
-                }
-            }
-            """
-        )
-
-        content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_empty()
-
     def test_filtering_by_max_persons_gte_within_limit(self):
         response = self.query(
             """
@@ -867,22 +849,6 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
-
-        response = self.query(
-            f"query {{"
-            f"reservationUnits( keywordGroups:{keyword_group.id+214979}){{"
-            f"edges {{"
-            f"node {{"
-            f"nameFi\n"
-            f"keywordGroups{{nameFi}}"
-            f"}}"
-            f"}}"
-            f"}}"
-            f"}}"
-        )
-
-        content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_empty()
 
     def test_filtering_by_multiple_keyword_groups(self):
         category = KeywordCategoryFactory()
@@ -1848,23 +1814,6 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
-
-    def test_that_filter_by_invalid_pk_returns_error(self):
-        response = self.query(
-            """
-            query {
-                reservationUnits(pk: 5) {
-                    edges {
-                        node {
-                            nameFi
-                        }
-                    }
-                }
-            }
-            """
-        )
-        content = json.loads(response.content)
-        assert len(content.get("errors")) > 0
 
     def test_that_state_is_draft(self):
         self.reservation_unit.name = "This should be draft"

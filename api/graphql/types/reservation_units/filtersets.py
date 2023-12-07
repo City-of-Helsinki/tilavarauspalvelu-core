@@ -6,19 +6,15 @@ from django.db.models import Expression, F, Q
 from django.utils import timezone
 from elasticsearch_django.models import SearchQuery
 
-from applications.models import ApplicationRound
+from common.filtersets import BaseModelFilterSet, IntMultipleChoiceFilter
 from elastic_django.reservation_units.query_builder import (
     ReservationUnitQueryBuilderMixin,
 )
 from reservation_units.enums import ReservationState, ReservationUnitState
 from reservation_units.models import (
     Equipment,
-    KeywordGroup,
-    Purpose,
-    Qualifier,
     ReservationKind,
     ReservationUnit,
-    ReservationUnitType,
 )
 from reservation_units.utils.reservation_unit_reservation_state_helper import (
     ReservationUnitReservationStateHelper,
@@ -29,14 +25,11 @@ from reservation_units.utils.reservation_unit_state_helper import (
 from spaces.models import Unit
 
 
-class ReservationUnitsFilterSet(django_filters.FilterSet, ReservationUnitQueryBuilderMixin):
-    pk = django_filters.ModelMultipleChoiceFilter(
-        field_name="pk", method="filter_by_pk", queryset=ReservationUnit.objects.all()
-    )
-    unit = django_filters.ModelMultipleChoiceFilter(field_name="unit", queryset=Unit.objects.all())
-    reservation_unit_type = django_filters.ModelMultipleChoiceFilter(
-        field_name="reservation_unit_type", queryset=ReservationUnitType.objects.all()
-    )
+class ReservationUnitsFilterSet(BaseModelFilterSet, ReservationUnitQueryBuilderMixin):
+    pk = IntMultipleChoiceFilter()
+    unit = IntMultipleChoiceFilter()
+    reservation_unit_type = IntMultipleChoiceFilter()
+
     min_persons_gte = django_filters.NumberFilter(field_name="min_persons", method="get_min_persons_gte")
     min_persons_lte = django_filters.NumberFilter(field_name="min_persons", method="get_min_persons_lte")
     max_persons_gte = django_filters.NumberFilter(field_name="max_persons", method="get_max_persons_gte")
@@ -44,27 +37,15 @@ class ReservationUnitsFilterSet(django_filters.FilterSet, ReservationUnitQueryBu
 
     text_search = django_filters.CharFilter(method="get_text_search")
 
-    keyword_groups = django_filters.ModelMultipleChoiceFilter(
-        field_name="keyword_groups", queryset=KeywordGroup.objects.all()
-    )
+    keyword_groups = IntMultipleChoiceFilter()
+    purposes = IntMultipleChoiceFilter()
+    qualifiers = IntMultipleChoiceFilter()
+    equipments = IntMultipleChoiceFilter(conjoined=True)
 
-    purposes = django_filters.ModelMultipleChoiceFilter(field_name="purposes", queryset=Purpose.objects.all())
-
-    qualifiers = django_filters.ModelMultipleChoiceFilter(field_name="qualifiers", queryset=Qualifier.objects.all())
-
-    equipments = django_filters.ModelMultipleChoiceFilter(
-        field_name="equipments",
-        queryset=Equipment.objects.all(),
-        conjoined=True,
-    )
-
-    is_draft = django_filters.BooleanFilter(field_name="is_draft")
-
+    is_draft = django_filters.BooleanFilter()
     is_visible = django_filters.BooleanFilter(method="get_is_visible")
 
-    application_round = django_filters.ModelMultipleChoiceFilter(
-        field_name="application_rounds", queryset=ApplicationRound.objects.all()
-    )
+    application_round = IntMultipleChoiceFilter(field_name="application_rounds")
 
     name_fi = django_filters.CharFilter(field_name="name_fi", lookup_expr="istartswith")
     name_en = django_filters.CharFilter(field_name="name_en", lookup_expr="istartswith")
@@ -83,24 +64,13 @@ class ReservationUnitsFilterSet(django_filters.FilterSet, ReservationUnitQueryBu
 
     state = django_filters.MultipleChoiceFilter(
         method="get_state",
-        choices=tuple(
-            (
-                state.value,  # Must use upper case characters to comply with GraphQL Enum
-                state.value,
-            )
-            for state in ReservationUnitState
-        ),
+        # Must use upper case characters for value to comply with GraphQL Enum
+        choices=tuple((state.value, state.value) for state in ReservationUnitState),
     )
 
     reservation_state = django_filters.MultipleChoiceFilter(
         method="get_reservation_state",
-        choices=tuple(
-            (
-                state.name,
-                state.value,
-            )
-            for state in ReservationState
-        ),
+        choices=tuple((state.name, state.value) for state in ReservationState),
     )
 
     only_with_permission = django_filters.BooleanFilter(method="get_only_with_permission")
@@ -125,7 +95,7 @@ class ReservationUnitsFilterSet(django_filters.FilterSet, ReservationUnitQueryBu
 
     class Meta:
         model = ReservationUnit
-        fields = ["pk", "unit", "keyword_groups"]
+        fields = ["pk", "unit", "keyword_groups"]  # TODO : Remove or clear
 
     def get_text_search(self, qs, property, value: str):
         query_str = self.build_elastic_query_str(value)
@@ -133,12 +103,6 @@ class ReservationUnitsFilterSet(django_filters.FilterSet, ReservationUnitQueryBu
         sq = SearchQuery.do_search("reservation_units", {"query_string": {"query": query_str}})
 
         return ReservationUnit.objects.from_search_results(sq)
-
-    def filter_by_pk(self, qs, property, value):
-        if value:
-            return qs.filter(id__in=[model.id for model in value])
-
-        return qs
 
     def get_max_persons_gte(self, qs, property, value):
         filters = Q(max_persons__gte=value) | Q(max_persons__isnull=True)
