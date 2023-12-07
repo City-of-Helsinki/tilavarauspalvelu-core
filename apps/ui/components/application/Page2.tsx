@@ -8,11 +8,8 @@ import type { ApplicationEventSchedulePriority } from "common/types/common";
 import type {
   ApplicationEventScheduleNode,
   ApplicationNode,
-  Query,
-  QueryReservationByPkArgs,
 } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
-import { useQuery } from "@apollo/client";
 import { MediumButton } from "@/styles/util";
 import { getReadableList } from "@/modules/util";
 import { AccordionWithState as Accordion } from "../common/Accordion";
@@ -23,7 +20,6 @@ import type {
   ApplicationEventScheduleFormType,
   ApplicationFormValues,
 } from "./Form";
-import { RESERVATION_UNIT } from "@/modules/queries/reservationUnit";
 
 type Props = {
   application: ApplicationNode;
@@ -216,23 +212,14 @@ const getApplicationEventsWhichMinDurationsIsNotFulfilled = (
 
 const Page2 = ({ application, onNext }: Props): JSX.Element => {
   const { t } = useTranslation();
-  const { data: applicationRound } = useQuery<Query, QueryReservationByPkArgs>(
-    RESERVATION_UNIT,
-    {
-      variables: {
-        pk: application.applicationRound.pk ?? 0,
-      },
-      skip: !application.applicationRound.pk,
-      fetchPolicy: "no-cache",
-    }
-  );
+
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [minDurationMsg, setMinDurationMsg] = useState(true);
   const router = useRouter();
   const openingHours =
-    applicationRound?.reservationUnitByPk?.applicationRoundTimeSlots ?? [];
-
+    filterNonNullable(application.applicationRound.reservationUnits)[0]
+      .applicationRoundTimeSlots ?? [];
   const { getValues, setValue, watch, handleSubmit } =
     useFormContext<ApplicationFormValues>();
 

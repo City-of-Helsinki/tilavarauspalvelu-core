@@ -29,6 +29,12 @@ const APPLICATION_FRAGMENT = gql`
         nameEn
         minPersons
         maxPersons
+        applicationRoundTimeSlots {
+          reservableTimes {
+            begin
+            end
+          }
+        }
         images {
           imageType
           mediumUrl
