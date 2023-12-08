@@ -22,6 +22,12 @@ snapshots['ReservationUnitsFilterReservationStateTestCase::test_filtering_by_mix
                         'nameFi': "Yey! I'm reservable!",
                         'reservationState': 'RESERVABLE'
                     }
+                },
+                {
+                    'node': {
+                        'nameFi': "I'm also reservable since I'm free!",
+                        'reservationState': 'RESERVABLE'
+                    }
                 }
             ]
         }
@@ -35,6 +41,12 @@ snapshots['ReservationUnitsFilterReservationStateTestCase::test_filtering_by_res
                 {
                     'node': {
                         'nameFi': "Yey! I'm reservable!",
+                        'reservationState': 'RESERVABLE'
+                    }
+                },
+                {
+                    'node': {
+                        'nameFi': "I'm also reservable since I'm free!",
                         'reservationState': 'RESERVABLE'
                     }
                 }
