@@ -3,10 +3,8 @@ import json
 
 from django.utils.timezone import get_default_timezone
 
-from api.graphql.tests.test_reservation_units.base import (
-    ReservationUnitQueryTestCaseBase,
-)
-from tests.factories import ReservationUnitFactory
+from api.graphql.tests.test_reservation_units.base import ReservationUnitQueryTestCaseBase
+from tests.factories import PaymentProductFactory, ReservationUnitFactory
 
 
 class ReservationUnitsFilterReservationStateTestCase(ReservationUnitQueryTestCaseBase):
@@ -21,6 +19,7 @@ class ReservationUnitsFilterReservationStateTestCase(ReservationUnitQueryTestCas
         )
         cls.reservable_reservation_unit = ReservationUnitFactory(
             name="Yey! I'm reservable!",
+            payment_product=PaymentProductFactory.create(),
         )
         cls.scheduled_period = ReservationUnitFactory(
             name="I am scheduled period",
@@ -55,8 +54,8 @@ class ReservationUnitsFilterReservationStateTestCase(ReservationUnitQueryTestCas
         )
 
         content = json.loads(response.content)
-        assert not self.content_is_empty(content)
         assert content.get("errors") is None
+        assert not self.content_is_empty(content)
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_reservable(self):
@@ -76,8 +75,8 @@ class ReservationUnitsFilterReservationStateTestCase(ReservationUnitQueryTestCas
         )
 
         content = json.loads(response.content)
-        assert not self.content_is_empty(content)
         assert content.get("errors") is None
+        assert not self.content_is_empty(content)
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_mixed(self):
@@ -97,8 +96,8 @@ class ReservationUnitsFilterReservationStateTestCase(ReservationUnitQueryTestCas
         )
 
         content = json.loads(response.content)
-        assert not self.content_is_empty(content)
         assert content.get("errors") is None
+        assert not self.content_is_empty(content)
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_scheduled_period(self):
@@ -118,8 +117,8 @@ class ReservationUnitsFilterReservationStateTestCase(ReservationUnitQueryTestCas
         )
 
         content = json.loads(response.content)
-        assert not self.content_is_empty(content)
         assert content.get("errors") is None
+        assert not self.content_is_empty(content)
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_scheduled_closing(self):
@@ -139,8 +138,8 @@ class ReservationUnitsFilterReservationStateTestCase(ReservationUnitQueryTestCas
         )
 
         content = json.loads(response.content)
-        assert not self.content_is_empty(content)
         assert content.get("errors") is None
+        assert not self.content_is_empty(content)
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_reservation_closed(self):
@@ -160,6 +159,6 @@ class ReservationUnitsFilterReservationStateTestCase(ReservationUnitQueryTestCas
         )
 
         content = json.loads(response.content)
-        assert not self.content_is_empty(content)
         assert content.get("errors") is None
+        assert not self.content_is_empty(content)
         self.assertMatchSnapshot(content)

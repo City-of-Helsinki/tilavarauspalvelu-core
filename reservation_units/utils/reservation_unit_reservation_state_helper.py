@@ -61,7 +61,6 @@ class ReservationUnitReservationStateHelper:
 
     @classmethod
     def __is_reservable(cls, reservation_unit: ReservationUnit) -> bool:
-        """Returns True if reservation unit has reservation_begins set in the past and no reservation_ends."""
         now = datetime.datetime.now(tz=get_default_timezone())
 
         return (
@@ -73,23 +72,25 @@ class ReservationUnitReservationStateHelper:
                     or reservation_unit.reservation_begins is None
                 )
             )
-            or reservation_unit.reservation_ends <= now
-            and reservation_unit.reservation_begins
-            and now >= reservation_unit.reservation_begins > reservation_unit.reservation_ends
+            or (
+                reservation_unit.reservation_ends <= now
+                and reservation_unit.reservation_begins
+                and now >= reservation_unit.reservation_begins > reservation_unit.reservation_ends
+            )
+            and reservation_unit.payment_product is not None
         )
 
     @classmethod
     def __get_is_reservable_query(cls) -> Q:
         now = datetime.datetime.now(tz=get_default_timezone())
 
-        return Q(
+        return (
             Q(reservation_ends__isnull=True) & (Q(reservation_begins__lte=now) | Q(reservation_begins__isnull=True))
-            | Q(
-                reservation_ends__lte=now,
-                reservation_begins__lte=now,
-                reservation_begins__gt=F("reservation_ends"),
-            )
-        )
+        ) | Q(
+            reservation_ends__lte=now,
+            reservation_begins__lte=now,
+            reservation_begins__gt=F("reservation_ends"),
+        ) & Q(payment_product__isnull=False)
 
     @classmethod
     def __is_scheduled_closing(cls, reservation_unit: ReservationUnit) -> bool:
