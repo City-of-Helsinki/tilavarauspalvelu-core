@@ -88,14 +88,8 @@ from reservations.models import (
 )
 from resources.models import Resource
 from services.models import Service
-from spaces.models import (
-    COORDINATE_SYSTEM_ID,
-    Location,
-    ServiceSector,
-    Space,
-    Unit,
-    UnitGroup,
-)
+from spaces.models import Location, ServiceSector, Space, Unit, UnitGroup
+from spaces.models.location import COORDINATE_SYSTEM_ID
 from terms_of_use.models import TermsOfUse
 from tilavarauspalvelu.utils.commons import WEEKDAYS
 from users.models import User
