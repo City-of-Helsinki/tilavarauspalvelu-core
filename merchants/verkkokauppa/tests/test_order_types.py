@@ -119,6 +119,7 @@ class OrderTypesTestCase(TestCase):
         "subscriptionId": None,
         "checkoutUrl": "http://localhost:1234/79ccf2c7-afcf-3e49-80bd-38867c586f8f",
         "receiptUrl": "http://localhost:1234/c1c55d55-4ef6-4a4c-8195-4f5022ad8ed8",
+        "loggedInCheckoutUrl": "http://localhost:1234/79ccf2c7-afcf-3e49-80bd-38867c586f8f",
         "priceNet": "100",
         "priceVat": "24",
         "priceTotal": "124",

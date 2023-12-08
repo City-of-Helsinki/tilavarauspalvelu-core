@@ -152,7 +152,7 @@ class Order:
                 price_net=Decimal(json["priceNet"]),
                 price_vat=Decimal(json["priceVat"]),
                 price_total=Decimal(json["priceTotal"]),
-                checkout_url=json["checkoutUrl"],
+                checkout_url=json["loggedInCheckoutUrl"],
                 receipt_url=json["receiptUrl"],
                 customer=OrderCustomer(
                     first_name=json["customer"]["firstName"],

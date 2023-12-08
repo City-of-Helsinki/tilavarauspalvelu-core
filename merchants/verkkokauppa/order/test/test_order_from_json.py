@@ -52,6 +52,7 @@ order_json = {
     "priceTotal": "12.4",
     "checkoutUrl": "https://checkout.url",
     "receiptUrl": "https://receipt.url",
+    "loggedInCheckoutUrl": "https://checkout.url",
     "customer": {"firstName": "Foo", "lastName": "Bar", "email": "", "phone": "123456"},
     "status": "pending",
     "subscriptionId": "b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6",
