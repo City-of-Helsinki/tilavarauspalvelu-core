@@ -2,7 +2,7 @@ import operator
 from functools import reduce
 
 import django_filters
-from django.db.models import F, Q
+from django.db.models import Expression, F, Q
 from django.utils import timezone
 from elasticsearch_django.models import SearchQuery
 
@@ -185,11 +185,13 @@ class ReservationUnitsFilterSet(django_filters.FilterSet, ReservationUnitQueryBu
         return qs.filter(query).distinct()
 
     def get_reservation_state(self, qs, property, value: list[str]):
-        queries = []
+        query: Q = Q()
+        aliases: dict[str, Expression | F] = {}
         for state in value:
-            queries.append(ReservationUnitReservationStateHelper.get_state_query(state))
-        query = reduce(operator.or_, (query for query in queries))
-        return qs.filter(query).distinct()
+            query_state = ReservationUnitReservationStateHelper.get_state_query(state)
+            query |= query_state.filters
+            aliases |= query_state.aliases
+        return qs.alias(**aliases).filter(query).distinct()
 
     def get_only_with_permission(self, qs, property, value):
         """Returns reservation units where the user has any kind of permissions in its unit"""

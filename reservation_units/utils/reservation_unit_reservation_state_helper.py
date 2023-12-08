@@ -1,10 +1,18 @@
 import datetime
+from dataclasses import dataclass, field
 
-from django.db.models import F, Q
+from django.db.models import Expression, F, OuterRef, Q, Subquery
 from django.utils.timezone import get_default_timezone
 
 from reservation_units.enums import ReservationState
-from reservation_units.models import ReservationUnit
+from reservation_units.models import PricingStatus, PricingType, ReservationUnit, ReservationUnitPricing
+from reservation_units.utils.reservation_unit_pricing_helper import ReservationUnitPricingHelper
+
+
+@dataclass
+class QueryState:
+    filters: Q = field(default_factory=Q)
+    aliases: dict[str, Expression | F] = field(default_factory=dict)
 
 
 class ReservationUnitReservationStateHelper:
@@ -20,15 +28,17 @@ class ReservationUnitReservationStateHelper:
         )
 
     @classmethod
-    def __get_is_scheduled_reservation_query(cls) -> Q:
+    def __get_is_scheduled_reservation_query(cls) -> QueryState:
         now = datetime.datetime.now(tz=get_default_timezone())
 
-        return Q(
-            Q(
-                reservation_begins__isnull=False,
-                reservation_begins__gt=now,
-            )
-            & Q(Q(reservation_ends__isnull=True) | Q(reservation_ends__lt=now))
+        return QueryState(
+            filters=Q(
+                Q(
+                    reservation_begins__isnull=False,
+                    reservation_begins__gt=now,
+                )
+                & Q(Q(reservation_ends__isnull=True) | Q(reservation_ends__lt=now))
+            ),
         )
 
     @classmethod
@@ -48,20 +58,24 @@ class ReservationUnitReservationStateHelper:
         )
 
     @classmethod
-    def __get_is_scheduled_period_query(cls) -> Q:
+    def __get_is_scheduled_period_query(cls) -> QueryState:
         now = datetime.datetime.now(tz=get_default_timezone())
 
-        return Q(
-            reservation_begins__isnull=False,
-            reservation_begins__gt=now,
-            reservation_ends__isnull=False,
-            reservation_ends__gt=now,
-            reservation_begins__lt=F("reservation_ends"),
+        return QueryState(
+            filters=Q(
+                reservation_begins__isnull=False,
+                reservation_begins__gt=now,
+                reservation_ends__isnull=False,
+                reservation_ends__gt=now,
+                reservation_begins__lt=F("reservation_ends"),
+            ),
         )
 
     @classmethod
     def __is_reservable(cls, reservation_unit: ReservationUnit) -> bool:
         now = datetime.datetime.now(tz=get_default_timezone())
+
+        active_price = ReservationUnitPricingHelper.get_active_price(reservation_unit)
 
         return (
             (
@@ -77,20 +91,52 @@ class ReservationUnitReservationStateHelper:
                 and reservation_unit.reservation_begins
                 and now >= reservation_unit.reservation_begins > reservation_unit.reservation_ends
             )
-            and reservation_unit.payment_product is not None
+            and (
+                (
+                    active_price is not None
+                    and active_price.pricing_type == PricingType.PAID
+                    and reservation_unit.payment_product is not None
+                )
+                or (active_price is not None and active_price.pricing_type == PricingType.FREE)
+            )
         )
 
     @classmethod
-    def __get_is_reservable_query(cls) -> Q:
+    def __get_is_reservable_query(cls) -> QueryState:
         now = datetime.datetime.now(tz=get_default_timezone())
 
-        return (
-            Q(reservation_ends__isnull=True) & (Q(reservation_begins__lte=now) | Q(reservation_begins__isnull=True))
-        ) | Q(
-            reservation_ends__lte=now,
-            reservation_begins__lte=now,
-            reservation_begins__gt=F("reservation_ends"),
-        ) & Q(payment_product__isnull=False)
+        return QueryState(
+            aliases={
+                "active_pricing_type": Subquery(
+                    queryset=(
+                        ReservationUnitPricing.objects.filter(
+                            reservation_unit=OuterRef("pk"),
+                            status=PricingStatus.PRICING_STATUS_ACTIVE,
+                        ).values("pricing_type")[:1]
+                    ),
+                ),
+            },
+            filters=(
+                (
+                    Q(reservation_ends__isnull=True)
+                    & (Q(reservation_begins__lte=now) | Q(reservation_begins__isnull=True))
+                )
+                | Q(
+                    reservation_ends__lte=now,
+                    reservation_begins__lte=now,
+                    reservation_begins__gt=F("reservation_ends"),
+                )
+                & (
+                    Q(
+                        active_pricing_type=PricingType.PAID,
+                        payment_product__isnull=False,
+                    )
+                    | Q(
+                        active_pricing_type=PricingType.FREE,
+                    )
+                )
+            ),
+        )
 
     @classmethod
     def __is_scheduled_closing(cls, reservation_unit: ReservationUnit) -> bool:
@@ -110,10 +156,14 @@ class ReservationUnitReservationStateHelper:
         )
 
     @classmethod
-    def __get_is_scheduled_closing_query(cls) -> Q:
+    def __get_is_scheduled_closing_query(cls) -> QueryState:
         now = datetime.datetime.now(tz=get_default_timezone())
 
-        return Q(reservation_ends__gt=now) & (Q(reservation_begins__lte=now) | Q(reservation_begins__isnull=True))
+        return QueryState(
+            filters=(
+                Q(reservation_ends__gt=now) & (Q(reservation_begins__lte=now) | Q(reservation_begins__isnull=True))
+            ),
+        )
 
     @classmethod
     def __is_reservation_closed(cls, reservation_unit: ReservationUnit) -> bool:
@@ -143,32 +193,26 @@ class ReservationUnitReservationStateHelper:
         )
 
     @classmethod
-    def __get_is_reservation_closed_query(cls) -> Q:
+    def __get_is_reservation_closed_query(cls) -> QueryState:
         now = datetime.datetime.now(tz=get_default_timezone())
 
-        return Q(
-            Q(
-                Q(reservation_ends__lte=now)
-                & (
-                    Q(Q(reservation_begins__lte=now) & Q(reservation_begins__lte=F("reservation_ends")))
-                    | Q(reservation_begins__isnull=True)
+        return QueryState(
+            filters=(
+                Q(
+                    Q(
+                        Q(reservation_ends__lte=now)
+                        & (
+                            Q(Q(reservation_begins__lte=now) & Q(reservation_begins__lte=F("reservation_ends")))
+                            | Q(reservation_begins__isnull=True)
+                        )
+                    )
+                    | Q(
+                        reservation_ends__gt=now,
+                        reservation_begins__gt=now,
+                        reservation_begins=F("reservation_ends"),
+                    )
                 )
-            )
-            | Q(
-                reservation_ends__gt=now,
-                reservation_begins__gt=now,
-                reservation_begins=F("reservation_ends"),
-            )
-        )
-
-    @classmethod
-    def __get_undefined_query(cls) -> Q:
-        return ~Q(
-            Q(cls.__get_is_scheduled_reservation_query())
-            | Q(cls.__get_is_reservable_query())
-            | Q(cls.__get_is_reservation_closed_query())
-            | Q(cls.__get_is_scheduled_closing_query())
-            | Q(cls.__get_is_scheduled_period_query())
+            ),
         )
 
     @classmethod
@@ -186,7 +230,7 @@ class ReservationUnitReservationStateHelper:
         return None
 
     @classmethod
-    def get_state_query(cls, state: str) -> Q:
+    def get_state_query(cls, state: str) -> QueryState:
         """Get matching filter query based on the Reservation Unit state (as string)"""
         state = ReservationState(state)
         if state == ReservationState.SCHEDULED_RESERVATION:
@@ -200,4 +244,4 @@ class ReservationUnitReservationStateHelper:
         elif state == ReservationState.RESERVATION_CLOSED:
             return cls.__get_is_reservation_closed_query()
 
-        return cls.__get_undefined_query()
+        raise ValueError("Unknown ReservationState")

@@ -4,6 +4,7 @@ import json
 from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservation_units.base import ReservationUnitQueryTestCaseBase
+from reservation_units.models import PricingType
 from tests.factories import PaymentProductFactory, ReservationUnitFactory
 
 
@@ -20,6 +21,11 @@ class ReservationUnitsFilterReservationStateTestCase(ReservationUnitQueryTestCas
         cls.reservable_reservation_unit = ReservationUnitFactory(
             name="Yey! I'm reservable!",
             payment_product=PaymentProductFactory.create(),
+            pricings__pricing_type=PricingType.PAID,
+        )
+        cls.reservable_reservation_unit = ReservationUnitFactory(
+            name="I'm also reservable since I'm free!",
+            pricings__pricing_type=PricingType.FREE,
         )
         cls.scheduled_period = ReservationUnitFactory(
             name="I am scheduled period",
