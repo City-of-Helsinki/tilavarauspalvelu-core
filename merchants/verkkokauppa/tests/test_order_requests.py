@@ -124,6 +124,7 @@ class OrderRequestsTestCaseBase(TestCase):
         "subscriptionId": None,
         "checkoutUrl": "http://localhost:1234/79ccf2c7-afcf-3e49-80bd-38867c586f8f",
         "receiptUrl": "http://localhost:12344/c1c55d55-4ef6-4a4c-8195-4f5022ad8ed8",
+        "loggedInCheckoutUrl": "http://localhost:1234/79ccf2c7-afcf-3e49-80bd-38867c586f8f",
         "priceNet": "100",
         "priceVat": "24",
         "priceTotal": "124",
@@ -179,6 +180,7 @@ class OrderRequestsTestCaseBase(TestCase):
         "subscriptionId": None,
         "checkoutUrl": "http://localhost:1234/79ccf2c7-afcf-3e49-80bd-38867c586f8f",
         "receiptUrl": "http://localhost:12344/c1c55d55-4ef6-4a4c-8195-4f5022ad8ed8",
+        "loggedInCheckoutUrl": "http://localhost:1234/79ccf2c7-afcf-3e49-80bd-38867c586f8f",
         "priceNet": "100",
         "priceVat": "24",
         "priceTotal": "124",
@@ -288,9 +290,9 @@ class CreateOrderRequestsTestCase(OrderRequestsTestCaseBase):
         with pytest.raises(CreateOrderError):
             create_order(self.create_order_params, mock_post(response))
 
-    def test_create_order_raises_exception_if_checkout_url_is_missing(self):
+    def test_create_order_raises_exception_if_logger_in_checkout_url_is_missing(self):
         response = self.create_order_response.copy()
-        response.pop("checkoutUrl")
+        response.pop("loggedInCheckoutUrl")
         with pytest.raises(CreateOrderError):
             create_order(self.create_order_params, mock_post(response))
 
@@ -346,9 +348,9 @@ class GetOrderRequestsTestCase(OrderRequestsTestCaseBase):
                 mock_get(response),
             )
 
-    def test_get_order_raises_exception_if_checkout_url_is_missing(self):
+    def test_get_order_raises_exception_if_logger_in_checkout_url_is_missing(self):
         response = self.get_order_response.copy()
-        response.pop("checkoutUrl")
+        response.pop("loggedInCheckoutUrl")
         with pytest.raises(GetOrderError):
             get_order(
                 UUID(response["orderId"]),
