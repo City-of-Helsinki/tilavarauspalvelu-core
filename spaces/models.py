@@ -210,7 +210,12 @@ class Space(MPTTModel):
         super().save(*args, **kwargs)
 
         tree_id = self.parent.tree_id if self.parent else self.tree_id
-        self.__class__.objects.partial_rebuild(tree_id)
+        try:
+            self.__class__.objects.partial_rebuild(tree_id)
+        except RuntimeError:
+            # If the tree now has more than one root node,
+            # we need to rebuild the whole tree.
+            self.__class__.objects.rebuild()
 
 
 class Location(models.Model):
