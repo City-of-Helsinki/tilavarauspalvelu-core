@@ -15,9 +15,9 @@ class ReservationUnitSelectFormTestCase(TestCase):
         form = ReservationUnitSelectForm()
         assert_that(form.fields["reservation_unit"].choices).is_equal_to(
             [
-                (runit1.pk, runit1.name_fi),
-                (runit2.pk, runit2.name_fi),
-                (runit3.pk, runit3.name_fi),
+                (runit1.pk, f"{runit1.name_fi} - {runit1.unit.name_fi}"),
+                (runit2.pk, f"{runit2.name_fi} - {runit2.unit.name_fi}"),
+                (runit3.pk, f"{runit3.name_fi} - {runit3.unit.name_fi}"),
             ]
         )
 
