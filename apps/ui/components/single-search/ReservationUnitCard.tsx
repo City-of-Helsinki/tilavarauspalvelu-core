@@ -1,4 +1,4 @@
-import { IconGlyphEuro, IconGroup } from "hds-react";
+import { IconGlyphEuro, IconGroup, Tag } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import Link from "next/link";
@@ -8,20 +8,18 @@ import styled from "styled-components";
 import { H5, Strongish } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { ReservationUnitType } from "common/types/gql-types";
-import {
-  getAddressAlt,
-  getMainImage,
-  getTranslation,
-} from "../../modules/util";
+import { addDays, format, isToday, isTomorrow } from "date-fns";
+import { toUIDate } from "common/src/common/util";
+import { getAddressAlt, getMainImage, getTranslation } from "@/modules/util";
 import IconWithText from "../common/IconWithText";
-import { MediumButton, pixel, truncatedText } from "../../styles/util";
+import { MediumButton, pixel, truncatedText } from "@/styles/util";
 import {
   getActivePricing,
   getPrice,
   getReservationUnitName,
   getUnitName,
-} from "../../modules/reservationUnit";
-import { reservationUnitPrefix } from "../../modules/const";
+} from "@/modules/reservationUnit";
+import { reservationUnitPrefix } from "@/modules/const";
 
 interface Props {
   reservationUnit: ReservationUnitType;
@@ -41,6 +39,7 @@ const Container = styled.div`
 const MainContent = styled.div`
   display: grid;
   margin: var(--spacing-s);
+  position: relative;
 
   @media (min-width: ${breakpoints.s}) and (max-width: ${breakpoints.m}) {
     margin-bottom: 0;
@@ -149,6 +148,62 @@ const StyledIconWithText = styled(IconWithText)`
   }
 `;
 
+const StyledTag = styled(Tag)`
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
+  /* TODO: Remove the && block when API is ready */
+  && {
+    display: none;
+  }
+  &.available {
+    background: var(--color-success-light);
+  }
+  &.no-times {
+    background: var(--color-error-light);
+  }
+  &.closed {
+    background: var(--tag-background);
+  }
+`;
+
+const StatusTag = ({
+  data,
+}: {
+  data: { closed: boolean; availableAt?: Date };
+}): JSX.Element => {
+  const { t } = useTranslation();
+
+  if (data.closed) {
+    return (
+      <StyledTag className="closed">
+        {t("reservationUnitCard:closed")}
+      </StyledTag>
+    );
+  }
+
+  if (!data.availableAt) {
+    return (
+      <StyledTag className="no-times">
+        {t("reservationUnitCard:noTimes")}
+      </StyledTag>
+    );
+  }
+
+  let dayText = "";
+  const timeText = format(data.availableAt, "HH:mm");
+  if (isToday(data.availableAt)) {
+    dayText = `${t("common:today")}`;
+  } else if (isTomorrow(data.availableAt)) {
+    dayText = `${t("common:tomorrow")}`;
+  } else dayText = `${toUIDate(data.availableAt)} `;
+
+  return (
+    <StyledTag className="available">{`${dayText} ${timeText}`}</StyledTag>
+  );
+};
+
 const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
   const { t } = useTranslation();
 
@@ -170,6 +225,33 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
       ? getTranslation(reservationUnit.reservationUnitType, "name")
       : undefined;
 
+  const getMockData = (): { closed: boolean; availableAt?: Date } => {
+    const today = new Date();
+    today.setHours(12, 34);
+    const mockData = [
+      {
+        closed: true,
+      },
+      {
+        closed: false,
+        availableAt: today,
+      },
+      {
+        closed: false,
+        availableAt: addDays(today, 1),
+      },
+      {
+        closed: false,
+        availableAt: addDays(today, 2),
+      },
+      {
+        closed: false,
+        availableAt: addDays(today, 3),
+      },
+    ];
+    return mockData[Math.floor(Math.random() * mockData.length)];
+  };
+
   return (
     <Container>
       <StyledLink href={link}>
@@ -182,6 +264,7 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
         <Name>
           <StyledInlineLink href={link}>{name}</StyledInlineLink>
         </Name>
+        <StatusTag data={getMockData()} />
         <Description>
           {unitName}
           {addressString && (

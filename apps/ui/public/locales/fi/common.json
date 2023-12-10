@@ -13,6 +13,7 @@
   "timeWithPrefix": "{{date, 'klo' H.mm}}",
   "timeWithPrefixInForm": "{{date, 'klo' H:mm}}",
   "today": "Tänään",
+  "tomorrow": "Huomenna",
   "day": "Päivä",
   "week": "Viikko",
   "month": "Kuukausi",

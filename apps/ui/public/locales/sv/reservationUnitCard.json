@@ -8,5 +8,8 @@
   },
   "address": "Adress",
   "type": "",
-  "seeMore": "Visa mer"
+  "seeMore": "Visa mer",
+  "available": "Ledigt",
+  "noTimes": "Inga lediga tider",
+  "closed": "Stängt"
 }

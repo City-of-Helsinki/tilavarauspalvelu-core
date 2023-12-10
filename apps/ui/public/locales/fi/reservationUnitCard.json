@@ -9,5 +9,8 @@
   },
   "address": "Katuosoite",
   "type": "Palvelun tyyppi",
-  "seeMore": "Katso lisää"
+  "seeMore": "Katso lisää",
+  "available": "Vapaa",
+  "noTimes": "Ei vapaita aikoja",
+  "closed": "Suljettu"
 }

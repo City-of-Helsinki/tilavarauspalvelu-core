@@ -13,6 +13,7 @@
   "timeWithPrefix": "{{date, 'kl' H.mm}}",
   "timeWithPrefixInForm": "{{date, 'kl' H:mm}}",
   "today": "I dag",
+  "tomorrow": "I morgon",
   "day": "Dag",
   "week": "Vecka",
   "month": "Månad",

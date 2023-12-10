@@ -13,6 +13,7 @@
   "timeWithPrefix": "{{date, ',' H.mm}}",
   "timeWithPrefixInForm": "{{date, ',' H:mm}}",
   "today": "Today",
+  "tomorrow": "Tomorrow",
   "day": "Day",
   "week": "Week",
   "month": "Month",
