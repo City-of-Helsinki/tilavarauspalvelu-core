@@ -533,7 +533,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             )
 
     def test_create_succeed_when_start_time_does_not_match_reservation_start_interval_and_opening_hours_are_ignored(
-        self
+        self,
     ):
         self.reservation_unit.allow_reservations_without_opening_hours = True
         self.reservation_unit.save()
