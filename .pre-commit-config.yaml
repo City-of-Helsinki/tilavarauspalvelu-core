@@ -15,13 +15,13 @@ repos:
         args: ["--markdown-linebreak-ext=md"]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.1.6
+    rev: v0.1.7
     hooks:
       - id: ruff
       - id: ruff-format
 
   - repo: https://github.com/pycqa/bandit
-    rev: 1.7.5
+    rev: 1.7.6
     hooks:
       - id: bandit
         args: ["-c", "pyproject.toml"]
