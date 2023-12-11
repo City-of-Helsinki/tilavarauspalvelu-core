@@ -122,9 +122,7 @@ class ReservableTimeSpanClient:
         reservable_time_spans, closed_time_spans = self._split_to_reservable_and_closed_time_spans(parsed_time_spans)
 
         # Normalise the parsed time spans into a list of clean reservable TimeSpanElements.
-        normalised_time_spans = self._override_reservable_with_closed_time_spans(
-            reservable_time_spans, closed_time_spans
-        )
+        normalised_time_spans = override_reservable_with_closed_time_spans(reservable_time_spans, closed_time_spans)
 
         created_reservable_time_spans = self._create_reservable_time_spans(normalised_time_spans)
 
@@ -230,126 +228,6 @@ class ReservableTimeSpanClient:
 
         return reservable_time_spans, closed_time_spans
 
-    @staticmethod
-    def _override_reservable_with_closed_time_spans(
-        reservable_time_spans: list[TimeSpanElement | None],
-        closed_time_spans: list[TimeSpanElement],
-    ) -> list[TimeSpanElement]:
-        """
-        Go through all the time spans and normalise them into a list of clean reservable TimeSpanElements.
-
-        The Hauki data may contain conflicting data, such as overlapping time spans with different states,
-        so we need to clean it before it can be used.
-
-        When time spans of different states overlap, the closed time spans always override the reservable time spans.
-        If the closed time span is fully inside the reservable time span, the reservable time span is split in two,
-        otherwise the reservable time span is shortened from the beginning or end.
-
-        We have no way to know if this is actually the correct way to handle conflicts, but it's our best assumption.
-        e.g. Normally open every weekday, but closed on friday due to a public holiday.
-        """
-        i: int
-        reservable_time_span: TimeSpanElement
-        for closed_time_span in closed_time_spans:
-            for i, reservable_time_span in enumerate(reservable_time_spans):
-                if reservable_time_span is None:
-                    continue
-
-                # Skip the closed time spans that are fully outside the reservable time span.
-                # ┌────────────────────────┬────────────┐
-                # │    ooo    ->    ooo    │            │
-                # │ xx        ->           │ Skipped    │
-                # │  xxx      ->  xxx      │ Ok         │
-                # │    xxx    ->    xxx    │ Ok         │
-                # │      xxx  ->      xxx  │ Ok         │
-                # │        xx ->           │ Skipped    │
-                # └────────────────────────┴────────────┘
-                if (
-                    reservable_time_span.start_datetime > closed_time_span.end_datetime
-                    or reservable_time_span.end_datetime < closed_time_span.start_datetime
-                ):
-                    continue
-
-                # The reservable time span is fully inside the closed time span, remove it.
-                # ┌──────────────────────────┬───────────────────────────────────┐
-                # │    ooo     ->            │ Reservable fully inside closed    │
-                # │  xxxxxxx   ->  xxxxxxx   │ Reservable time removed           │
-                # ├──────────────────────────┼───────────────────────────────────┤
-                # │   oooo     ->            │ Reservable fully inside closed    │
-                # │   xxxx     ->   xxxx     │ Reservable time removed           │
-                # └──────────────────────────┴───────────────────────────────────┘
-                if (
-                    closed_time_span.start_datetime <= reservable_time_span.start_datetime
-                    and closed_time_span.end_datetime >= reservable_time_span.end_datetime
-                ):
-                    reservable_time_spans[i] = None
-
-                # Closed time span is fully inside the reservable time span, split the reservable time span
-                # ┌────────────────────┬───────────────────────────────────────────────┐
-                # │ ooooooo -> oo   oo │ Closed time span inside reservable time span. │
-                # │   xxx   ->   xxx   │ Reservable time span is split in two          │
-                # ├────────────────────┼───────────────────────────────────────────────┤
-                # │ ooooooo -> o  o  o │ Multiple closed time spans overlap            │
-                # │  xx     ->  xx     │ reservable time span is split in three.       │
-                # │     xx  ->     xx  │ (in different loops)                          │
-                # └────────────────────┴───────────────────────────────────────────────┘
-                elif (
-                    reservable_time_span.start_datetime < closed_time_span.start_datetime
-                    and reservable_time_span.end_datetime > closed_time_span.end_datetime
-                ):
-                    new_reservable_time_span = copy(reservable_time_span)
-                    reservable_time_span.end_datetime = closed_time_span.start_datetime
-                    new_reservable_time_span.start_datetime = closed_time_span.end_datetime
-                    reservable_time_spans.append(new_reservable_time_span)
-
-                # Reservable time span starts inside the closed time span.
-                # Shorten the reservable time span from the beginning
-                # ┌──────────────────────────┬───────────────────────────────────┐
-                # │     oooo   ->       oo   │                                   │
-                # │   xxxx     ->   xxxx     │ Reservable time span is shortened │
-                # ├──────────────────────────┼───────────────────────────────────┤
-                # │     oooo   ->     oooo   │ Not overlapping (or start == end) │
-                # │ xxxx       -> xxxx       │ Untouched                         │
-                # ├──────────────────────────┼───────────────────────────────────┤
-                # │     oooo   ->     oooo   │ Overlapping from the beginning    │
-                # │       xxxx ->       xxxx │ Handled later in the next step    │
-                # └──────────────────────────┴───────────────────────────────────┘
-                elif (
-                    closed_time_span.start_datetime
-                    <= reservable_time_span.start_datetime
-                    < closed_time_span.end_datetime
-                ):
-                    reservable_time_span.start_datetime = closed_time_span.end_datetime
-
-                # Reservable time span ends inside the closed time span.
-                # Shorten the reservable time span from the end
-                # ┌──────────────────────────┬───────────────────────────────────┐
-                # │   oooo     ->   oo       │                                   │
-                # │     xxxx   ->     xxxx   │ Reservable time span is shortened │
-                # ├──────────────────────────┼───────────────────────────────────┤
-                # │   oooo     ->   oooo     │ Not overlapping (or end == start) │
-                # │       xxxx ->       xxxx │ Untouched                         │
-                # ├──────────────────────────┼───────────────────────────────────┤
-                # │   oooo     ->   oooo     │ Overlapping from the beginning    │
-                # │ xxxx       -> xxxx       │ Already handled in last step      │
-                # └──────────────────────────┴───────────────────────────────────┘
-                elif (
-                    closed_time_span.start_datetime < reservable_time_span.end_datetime <= closed_time_span.end_datetime
-                ):
-                    reservable_time_span.end_datetime = closed_time_span.start_datetime
-
-                # If the duration of the reservable time span is negative or zero after adjustments, remove it.
-                if reservable_time_span.start_datetime >= reservable_time_span.end_datetime:
-                    reservable_time_spans[i] = None
-
-        # Filter out all None values
-        reservable_time_spans[:] = [ts for ts in reservable_time_spans if ts is not None]
-
-        # Sort the time spans once more to ensure they are in correct order.
-        reservable_time_spans[:] = sorted(reservable_time_spans, key=lambda ts: ts.start_datetime)
-
-        return reservable_time_spans
-
     def _create_reservable_time_spans(self, normalised_time_spans: list[TimeSpanElement]) -> list[ReservableTimeSpan]:
         if not normalised_time_spans:
             return []
@@ -374,3 +252,117 @@ class ReservableTimeSpanClient:
         ]
 
         return ReservableTimeSpan.objects.bulk_create(reservable_time_spans)
+
+
+def override_reservable_with_closed_time_spans(
+    reservable_time_spans: list[TimeSpanElement | None],
+    closed_time_spans: list[TimeSpanElement],
+) -> list[TimeSpanElement]:
+    """
+    Go through all the time spans and normalise them into a list of clean reservable TimeSpanElements.
+
+    The Hauki data may contain conflicting data, such as overlapping time spans with different states,
+    so we need to clean it before it can be used.
+
+    When time spans of different states overlap, the closed time spans always override the reservable time spans.
+    If the closed time span is fully inside the reservable time span, the reservable time span is split in two,
+    otherwise the reservable time span is shortened from the beginning or end.
+
+    We have no way to know if this is actually the correct way to handle conflicts, but it's our best assumption.
+    e.g. Normally open every weekday, but closed on friday due to a public holiday.
+    """
+    i: int
+    reservable_time_span: TimeSpanElement
+    for closed_time_span in closed_time_spans:
+        for i, reservable_time_span in enumerate(reservable_time_spans):
+            if reservable_time_span is None:
+                continue
+
+            # Skip the closed time spans that are fully outside the reservable time span.
+            # ┌────────────────────────┬────────────┐
+            # │    ooo    ->    ooo    │            │
+            # │ xx        ->           │ Skipped    │
+            # │  xxx      ->  xxx      │ Ok         │
+            # │    xxx    ->    xxx    │ Ok         │
+            # │      xxx  ->      xxx  │ Ok         │
+            # │        xx ->           │ Skipped    │
+            # └────────────────────────┴────────────┘
+            if (
+                reservable_time_span.start_datetime > closed_time_span.end_datetime
+                or reservable_time_span.end_datetime < closed_time_span.start_datetime
+            ):
+                continue
+
+            # The reservable time span is fully inside the closed time span, remove it.
+            # ┌──────────────────────────┬───────────────────────────────────┐
+            # │    ooo     ->            │ Reservable fully inside closed    │
+            # │  xxxxxxx   ->  xxxxxxx   │ Reservable time removed           │
+            # ├──────────────────────────┼───────────────────────────────────┤
+            # │   oooo     ->            │ Reservable fully inside closed    │
+            # │   xxxx     ->   xxxx     │ Reservable time removed           │
+            # └──────────────────────────┴───────────────────────────────────┘
+            if (
+                closed_time_span.start_datetime <= reservable_time_span.start_datetime
+                and closed_time_span.end_datetime >= reservable_time_span.end_datetime
+            ):
+                reservable_time_spans[i] = None
+
+            # Closed time span is fully inside the reservable time span, split the reservable time span
+            # ┌────────────────────┬───────────────────────────────────────────────┐
+            # │ ooooooo -> oo   oo │ Closed time span inside reservable time span. │
+            # │   xxx   ->   xxx   │ Reservable time span is split in two          │
+            # ├────────────────────┼───────────────────────────────────────────────┤
+            # │ ooooooo -> o  o  o │ Multiple closed time spans overlap            │
+            # │  xx     ->  xx     │ reservable time span is split in three.       │
+            # │     xx  ->     xx  │ (in different loops)                          │
+            # └────────────────────┴───────────────────────────────────────────────┘
+            elif (
+                reservable_time_span.start_datetime < closed_time_span.start_datetime
+                and reservable_time_span.end_datetime > closed_time_span.end_datetime
+            ):
+                new_reservable_time_span = copy(reservable_time_span)
+                reservable_time_span.end_datetime = closed_time_span.start_datetime
+                new_reservable_time_span.start_datetime = closed_time_span.end_datetime
+                reservable_time_spans.append(new_reservable_time_span)
+
+            # Reservable time span starts inside the closed time span.
+            # Shorten the reservable time span from the beginning
+            # ┌──────────────────────────┬───────────────────────────────────┐
+            # │     oooo   ->       oo   │                                   │
+            # │   xxxx     ->   xxxx     │ Reservable time span is shortened │
+            # ├──────────────────────────┼───────────────────────────────────┤
+            # │     oooo   ->     oooo   │ Not overlapping (or start == end) │
+            # │ xxxx       -> xxxx       │ Untouched                         │
+            # ├──────────────────────────┼───────────────────────────────────┤
+            # │     oooo   ->     oooo   │ Overlapping from the beginning    │
+            # │       xxxx ->       xxxx │ Handled later in the next step    │
+            # └──────────────────────────┴───────────────────────────────────┘
+            elif closed_time_span.start_datetime <= reservable_time_span.start_datetime < closed_time_span.end_datetime:
+                reservable_time_span.start_datetime = closed_time_span.end_datetime
+
+            # Reservable time span ends inside the closed time span.
+            # Shorten the reservable time span from the end
+            # ┌──────────────────────────┬───────────────────────────────────┐
+            # │   oooo     ->   oo       │                                   │
+            # │     xxxx   ->     xxxx   │ Reservable time span is shortened │
+            # ├──────────────────────────┼───────────────────────────────────┤
+            # │   oooo     ->   oooo     │ Not overlapping (or end == start) │
+            # │       xxxx ->       xxxx │ Untouched                         │
+            # ├──────────────────────────┼───────────────────────────────────┤
+            # │   oooo     ->   oooo     │ Overlapping from the beginning    │
+            # │ xxxx       -> xxxx       │ Already handled in last step      │
+            # └──────────────────────────┴───────────────────────────────────┘
+            elif closed_time_span.start_datetime < reservable_time_span.end_datetime <= closed_time_span.end_datetime:
+                reservable_time_span.end_datetime = closed_time_span.start_datetime
+
+            # If the duration of the reservable time span is negative or zero after adjustments, remove it.
+            if reservable_time_span.start_datetime >= reservable_time_span.end_datetime:
+                reservable_time_spans[i] = None
+
+    # Filter out all None values
+    reservable_time_spans[:] = [ts for ts in reservable_time_spans if ts is not None]
+
+    # Sort the time spans once more to ensure they are in correct order.
+    reservable_time_spans[:] = sorted(reservable_time_spans, key=lambda ts: ts.start_datetime)
+
+    return reservable_time_spans

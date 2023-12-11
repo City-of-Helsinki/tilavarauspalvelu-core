@@ -17,7 +17,11 @@ from opening_hours.utils.hauki_api_types import (
     HaukiAPIOpeningHoursResponseTime,
     HaukiTranslatedField,
 )
-from opening_hours.utils.reservable_time_span_client import ReservableTimeSpanClient, TimeSpanElement
+from opening_hours.utils.reservable_time_span_client import (
+    ReservableTimeSpanClient,
+    TimeSpanElement,
+    override_reservable_with_closed_time_spans,
+)
 from tests.helpers import patch_method
 
 # Applied to all tests
@@ -405,24 +409,20 @@ def test__ReservableTimeSpanClient__split_to_reservable_and_closed_time_spans__r
     assert closed_time_spans == []
 
 
-########################################################################
-# ReservableTimeSpanClient._override_reservable_with_closed_time_spans #
-########################################################################
+###############################################
+# _override_reservable_with_closed_time_spans #
+###############################################
 
 
-def test__ReservableTimeSpanClient__override_reservable_with_closed_time_spans(reservation_unit):
-    client = ReservableTimeSpanClient(reservation_unit.origin_hauki_resource)
-
+def test__override_reservable_with_closed_time_spans(reservation_unit):
     reservable_time_spans, closed_time_spans = _get_reservable_and_closed_time_spans()
 
-    normalised_time_spans = client._override_reservable_with_closed_time_spans(reservable_time_spans, closed_time_spans)
+    normalised_time_spans = override_reservable_with_closed_time_spans(reservable_time_spans, closed_time_spans)
 
     assert normalised_time_spans == _get_normalised_time_spans()
 
 
-def test__ReservableTimeSpanClient__override_reservable_with_closed_time_spans__not_overlapping(reservation_unit):
-    client = ReservableTimeSpanClient(reservation_unit.origin_hauki_resource)
-
+def test__override_reservable_with_closed_time_spans__not_overlapping(reservation_unit):
     reservable_time_spans = [
         TimeSpanElement(
             start_datetime=_get_date(day=1, hour=10),
@@ -439,7 +439,7 @@ def test__ReservableTimeSpanClient__override_reservable_with_closed_time_spans__
         ),
     ]
 
-    normalised_time_spans = client._override_reservable_with_closed_time_spans(reservable_time_spans, closed_time_spans)
+    normalised_time_spans = override_reservable_with_closed_time_spans(reservable_time_spans, closed_time_spans)
 
     assert normalised_time_spans == [
         TimeSpanElement(
@@ -450,11 +450,9 @@ def test__ReservableTimeSpanClient__override_reservable_with_closed_time_spans__
     ]
 
 
-def test__ReservableTimeSpanClient__override_reservable_with_closed_time_spans__partial_overlap_same_start_or_end(
+def test__override_reservable_with_closed_time_spans__partial_overlap_same_start_or_end(
     reservation_unit,
 ):
-    client = ReservableTimeSpanClient(reservation_unit.origin_hauki_resource)
-
     reservable_time_spans = [
         TimeSpanElement(
             start_datetime=_get_date(day=1, hour=10),
@@ -494,7 +492,7 @@ def test__ReservableTimeSpanClient__override_reservable_with_closed_time_spans__
         ),
     ]
 
-    normalised_time_spans = client._override_reservable_with_closed_time_spans(reservable_time_spans, closed_time_spans)
+    normalised_time_spans = override_reservable_with_closed_time_spans(reservable_time_spans, closed_time_spans)
 
     assert normalised_time_spans == [
         TimeSpanElement(
@@ -510,11 +508,9 @@ def test__ReservableTimeSpanClient__override_reservable_with_closed_time_spans__
     ]
 
 
-def test__ReservableTimeSpanClient__override_reservable_with_closed_time_spans__full_overlap_same_start_or_end(
+def test__override_reservable_with_closed_time_spans__full_overlap_same_start_or_end(
     reservation_unit,
 ):
-    client = ReservableTimeSpanClient(reservation_unit.origin_hauki_resource)
-
     reservable_time_spans = [
         TimeSpanElement(
             start_datetime=_get_date(day=1, hour=10),
@@ -564,16 +560,14 @@ def test__ReservableTimeSpanClient__override_reservable_with_closed_time_spans__
         ),
     ]
 
-    normalised_time_spans = client._override_reservable_with_closed_time_spans(reservable_time_spans, closed_time_spans)
+    normalised_time_spans = override_reservable_with_closed_time_spans(reservable_time_spans, closed_time_spans)
 
     assert normalised_time_spans == []
 
 
-def test__ReservableTimeSpanClient__override_reservable_with_closed_time_spans__reservable_split_into_many_parts(
+def test__override_reservable_with_closed_time_spans__reservable_split_into_many_parts(
     reservation_unit,
 ):
-    client = ReservableTimeSpanClient(reservation_unit.origin_hauki_resource)
-
     reservable_time_spans = [
         TimeSpanElement(
             start_datetime=_get_date(day=1, hour=10),
@@ -610,7 +604,7 @@ def test__ReservableTimeSpanClient__override_reservable_with_closed_time_spans__
         ),
     ]
 
-    normalised_time_spans = client._override_reservable_with_closed_time_spans(reservable_time_spans, closed_time_spans)
+    normalised_time_spans = override_reservable_with_closed_time_spans(reservable_time_spans, closed_time_spans)
 
     assert normalised_time_spans == [
         TimeSpanElement(
