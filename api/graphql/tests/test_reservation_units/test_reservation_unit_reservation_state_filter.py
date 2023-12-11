@@ -34,6 +34,7 @@ class ReservationUnitsFilterReservationStateTestCase(ReservationUnitQueryTestCas
         )
         cls.scheduled_closing = ReservationUnitFactory(
             name="I am scheduled closing",
+            pricings__pricing_type=PricingType.FREE,
             reservation_begins=(now - datetime.timedelta(days=1)),
             reservation_ends=(now + datetime.timedelta(days=1)),
         )

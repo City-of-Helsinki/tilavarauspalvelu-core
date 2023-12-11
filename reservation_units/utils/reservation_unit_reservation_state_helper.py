@@ -91,14 +91,13 @@ class ReservationUnitReservationStateHelper:
                 and reservation_unit.reservation_begins
                 and now >= reservation_unit.reservation_begins > reservation_unit.reservation_ends
             )
-            and (
-                (
-                    active_price is not None
-                    and active_price.pricing_type == PricingType.PAID
-                    and reservation_unit.payment_product is not None
-                )
-                or (active_price is not None and active_price.pricing_type == PricingType.FREE)
+        ) and (
+            (
+                active_price is not None
+                and active_price.pricing_type == PricingType.PAID
+                and reservation_unit.payment_product is not None
             )
+            or (active_price is not None and active_price.pricing_type == PricingType.FREE)
         )
 
     @classmethod
@@ -146,12 +145,22 @@ class ReservationUnitReservationStateHelper:
         """
         now = datetime.datetime.now(tz=get_default_timezone())
 
+        active_price = ReservationUnitPricingHelper.get_active_price(reservation_unit)
+
         return (
             reservation_unit.reservation_ends
             and reservation_unit.reservation_ends > now
             and (
                 reservation_unit.reservation_begins is None
                 or (reservation_unit.reservation_begins and reservation_unit.reservation_begins <= now)
+            )
+            and (
+                (
+                    active_price is not None
+                    and active_price.pricing_type == PricingType.PAID
+                    and reservation_unit.payment_product is not None
+                )
+                or (active_price is not None and active_price.pricing_type == PricingType.FREE)
             )
         )
 
@@ -160,8 +169,28 @@ class ReservationUnitReservationStateHelper:
         now = datetime.datetime.now(tz=get_default_timezone())
 
         return QueryState(
+            aliases={
+                "active_pricing_type": Subquery(
+                    queryset=(
+                        ReservationUnitPricing.objects.filter(
+                            reservation_unit=OuterRef("pk"),
+                            status=PricingStatus.PRICING_STATUS_ACTIVE,
+                        ).values("pricing_type")[:1]
+                    ),
+                ),
+            },
             filters=(
-                Q(reservation_ends__gt=now) & (Q(reservation_begins__lte=now) | Q(reservation_begins__isnull=True))
+                Q(reservation_ends__gt=now)
+                & (Q(reservation_begins__isnull=True) | Q(reservation_begins__lte=now))
+                & (
+                    Q(
+                        active_pricing_type=PricingType.PAID,
+                        payment_product__isnull=False,
+                    )
+                    | Q(
+                        active_pricing_type=PricingType.FREE,
+                    )
+                )
             ),
         )
 
