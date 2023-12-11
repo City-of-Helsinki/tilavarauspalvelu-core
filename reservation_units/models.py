@@ -6,7 +6,6 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import QuerySet
-from django.utils.timezone import get_default_timezone
 from django.utils.translation import gettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
 from easy_thumbnails.fields import ThumbnailerImageField
@@ -14,12 +13,12 @@ from easy_thumbnails.files import get_thumbnailer
 from elasticsearch_django.models import (
     SearchDocumentManagerMixin,
     SearchDocumentMixin,
-    SearchResultsQuerySet,
 )
 
 from common.connectors import ReservationUnitActionsConnector
 from merchants.models import PaymentAccounting, PaymentMerchant, PaymentProduct
 from reservation_units.enums import ReservationState, ReservationUnitState
+from reservation_units.querysets import ReservationUnitQuerySet
 from reservation_units.tasks import (
     purge_image_cache,
     refresh_reservation_unit_product_mapping,
@@ -193,18 +192,6 @@ class ReservationUnitPaymentType(models.Model):
 
     def __str__(self):
         return self.code
-
-
-class ReservationUnitQuerySet(SearchResultsQuerySet):
-    def scheduled_for_publishing(self):
-        now = datetime.datetime.now(tz=get_default_timezone())
-        return self.filter(
-            Q(is_archived=False, is_draft=False)
-            & (
-                Q(publish_begins__isnull=False, publish_begins__gt=now)
-                | Q(publish_ends__isnull=False, publish_ends__lte=now)
-            )
-        )
 
 
 class ReservationUnitManager(SearchDocumentManagerMixin):
