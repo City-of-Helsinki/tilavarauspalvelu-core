@@ -200,11 +200,7 @@ const getApplicationEventsWhichMinDurationsIsNotFulfilled = (
   const selectedHours = getLongestChunks(selectorData);
   return applicationEvents
     .map((applicationEvent, index) => {
-      const minDuration =
-        applicationEvent.minDuration ??
-        0; /* applicationEvent.minDuration != null
-        ? convertHMSToSeconds(applicationEvent.minDuration)
-        : 0 */
+      const minDuration = applicationEvent.minDuration ?? 0;
       return selectedHours[index] < minDuration / 3600 ? index : null;
     })
     .filter((n): n is NonNullable<typeof n> => n != null);
@@ -217,9 +213,10 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
   const [errorMsg, setErrorMsg] = useState("");
   const [minDurationMsg, setMinDurationMsg] = useState(true);
   const router = useRouter();
-  const openingHours =
-    filterNonNullable(application.applicationRound.reservationUnits)[0]
-      .applicationRoundTimeSlots ?? [];
+  const openingHours = filterNonNullable(
+    application?.applicationEvents?.[0]?.eventReservationUnits?.[0]
+      ?.reservationUnit.applicationRoundTimeSlots
+  );
   const { getValues, setValue, watch, handleSubmit } =
     useFormContext<ApplicationFormValues>();
 

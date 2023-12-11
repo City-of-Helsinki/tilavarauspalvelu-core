@@ -29,12 +29,6 @@ const APPLICATION_FRAGMENT = gql`
         nameEn
         minPersons
         maxPersons
-        applicationRoundTimeSlots {
-          reservableTimes {
-            begin
-            end
-          }
-        }
         images {
           imageType
           mediumUrl
@@ -123,6 +117,12 @@ const APPLICATION_FRAGMENT = gql`
         pk
         preferredOrder
         reservationUnit {
+          applicationRoundTimeSlots {
+            reservableTimes {
+              begin
+              end
+            }
+          }
           pk
           nameFi
           nameEn
