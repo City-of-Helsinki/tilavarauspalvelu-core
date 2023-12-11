@@ -71,7 +71,7 @@ jobs:
           sudo apt install -y --no-install-recommends gdal-bin
 
       - name: "Set up python"
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           cache: "poetry"
           python-version: "3.11"
