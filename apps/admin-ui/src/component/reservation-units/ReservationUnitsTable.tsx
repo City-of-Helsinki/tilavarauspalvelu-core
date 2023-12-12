@@ -1,10 +1,10 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { truncate } from "lodash";
-import { ReservationUnitType } from "common/types/gql-types";
 import { TFunction } from "i18next";
+import { ReservationUnitType } from "common/types/gql-types";
+import { truncate } from "@/helpers";
+import { reservationUnitUrl } from "@/common/urls";
 import { CustomTable, TableLink } from "../lists/components";
-import { reservationUnitUrl } from "../../common/urls";
 
 export type Sort = {
   field: string;
@@ -17,16 +17,14 @@ type Props = {
   reservationUnits: ReservationUnitType[];
 };
 
+const MAX_NAME_LENGTH = 22;
 const getColConfig = (t: TFunction) => [
   {
     headerName: t("ReservationUnits.headings.name"),
     key: "nameFi",
     transform: ({ nameFi, pk, unit }: ReservationUnitType) => (
       <TableLink href={reservationUnitUrl(pk ?? 0, unit?.pk ?? 0)}>
-        {truncate(nameFi ?? "-", {
-          length: 22,
-          omission: "...",
-        })}
+        {truncate(nameFi ?? "-", MAX_NAME_LENGTH)}
       </TableLink>
     ),
     isSortable: true,

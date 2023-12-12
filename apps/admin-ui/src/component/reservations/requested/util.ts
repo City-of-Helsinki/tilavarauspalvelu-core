@@ -1,10 +1,4 @@
 import {
-  formatters as getFormatters,
-  getReservationPrice,
-  getUnRoundedReservationVolume,
-} from "common";
-
-import {
   differenceInHours,
   differenceInMinutes,
   format,
@@ -12,7 +6,12 @@ import {
   isSameDay,
 } from "date-fns";
 import { TFunction } from "i18next";
-import { trim, truncate } from "lodash";
+import { trim } from "lodash";
+import {
+  formatters as getFormatters,
+  getReservationPrice,
+  getUnRoundedReservationVolume,
+} from "common";
 import {
   AgeGroupType,
   Maybe,
@@ -26,6 +25,7 @@ import {
 } from "common/types/gql-types";
 import { fromApiDate } from "common/src/common/util";
 import { toMondayFirst } from "common/src/helpers";
+import { truncate } from "@/helpers";
 import { DATE_FORMAT, formatDate, formatTime } from "@/common/util";
 
 export const reservationDateTime = (
@@ -212,8 +212,7 @@ export const getTranslationKeyForReserveeType = (
 export const getReserveeName = (
   reservation: ReservationType,
   length = 50
-): string =>
-  truncate(reservation.reserveeName?.trim() ?? "", { length, omission: "…" });
+): string => truncate(reservation.reserveeName?.trim() ?? "-", length);
 
 export const getName = (reservation: ReservationType, t: TFunction) => {
   if (reservation.name) {

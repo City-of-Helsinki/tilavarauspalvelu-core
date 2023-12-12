@@ -26,12 +26,15 @@ import { useAllocationContext } from "@/context/AllocationContext";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import usePermission from "@/hooks/usePermission";
 import { Permission } from "@/modules/permissionHelper";
+import { truncate } from "@/helpers";
 import {
   ALL_EVENTS_PER_UNIT_QUERY,
   APPLICATION_EVENTS_FOR_ALLOCATION,
   ALLOCATION_UNFILTERED_QUERY,
 } from "../queries";
 import { ApplicationEvents } from "./ApplicationEvents";
+
+const MAX_RES_UNIT_NAME_LENGTH = 35;
 
 type IParams = {
   applicationRoundId: string;
@@ -572,7 +575,7 @@ function ApplicationRoundAllocation({
                 onClick={() => setSelectedReservationUnit(ru.pk ?? null)}
                 key={ru?.pk}
               >
-                {ru?.nameFi}
+                {truncate(ru?.nameFi ?? "-", MAX_RES_UNIT_NAME_LENGTH)}
               </Tab>
             ))}
           </TabList>

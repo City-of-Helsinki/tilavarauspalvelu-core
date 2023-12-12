@@ -1,12 +1,13 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
-import { memoize, truncate } from "lodash";
+import { memoize } from "lodash";
 import { ReservationType } from "common/types/gql-types";
+import { truncate } from "@/helpers";
+import { reservationUrl } from "@/common/urls";
+import { formatDateTime } from "@/common/util";
 import { CustomTable, TableLink } from "../lists/components";
-import { reservationUrl } from "../../common/urls";
 import { getReserveeName, reservationDateTimeString } from "./requested/util";
-import { formatDateTime } from "../../common/util";
 
 export type Sort = {
   field: string;
@@ -26,6 +27,7 @@ type Props = {
   reservations: ReservationType[];
 };
 
+const MAX_NAME_LENGTH = 22;
 const getColConfig = (t: TFunction): ReservationTableColumn[] => [
   {
     headerName: t("Reservations.headings.id"),
@@ -47,20 +49,14 @@ const getColConfig = (t: TFunction): ReservationTableColumn[] => [
     key: "reservation_unit_name_fi",
     isSortable: true,
     transform: ({ reservationUnits }: ReservationType) =>
-      truncate(reservationUnits?.[0]?.nameFi || "-", {
-        length: 22,
-        omission: "...",
-      }),
+      truncate(reservationUnits?.[0]?.nameFi || "-", MAX_NAME_LENGTH),
   },
   {
     headerName: t("Reservations.headings.unit"),
     key: "unit_name_fi",
     isSortable: true,
     transform: ({ reservationUnits }: ReservationType) =>
-      truncate(reservationUnits?.[0]?.unit?.nameFi || "-", {
-        length: 22,
-        omission: "...",
-      }),
+      truncate(reservationUnits?.[0]?.unit?.nameFi || "-", MAX_NAME_LENGTH),
   },
   {
     headerName: t("Reservations.headings.datetime"),
@@ -74,7 +70,7 @@ const getColConfig = (t: TFunction): ReservationTableColumn[] => [
     key: "created_at",
     isSortable: true,
     transform: ({ createdAt }: ReservationType) =>
-      formatDateTime(createdAt as string),
+      createdAt ? formatDateTime(createdAt) : "-",
   },
   {
     headerName: t("Reservations.headings.paymentStatus"),

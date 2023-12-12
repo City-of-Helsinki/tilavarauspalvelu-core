@@ -3,8 +3,9 @@ import { useTranslation } from "react-i18next";
 import { memoize } from "lodash";
 import { UnitType } from "common/types/gql-types";
 import { TFunction } from "i18next";
-import { myUnitUrl, unitUrl } from "../../common/urls";
-import { CustomTable, TableLink } from "../lists/components";
+import { truncate } from "@/helpers";
+import { myUnitUrl, unitUrl } from "@/common/urls";
+import { CustomTable, TableLink } from "@/component/lists/components";
 
 export type Sort = {
   field: string;
@@ -18,14 +19,6 @@ type Props = {
   isMyUnits?: boolean;
 };
 
-function truncateMaybeString(
-  str: string | undefined,
-  maxLength: number
-): string {
-  if (!str) return "";
-  return str.length > maxLength ? `${str.slice(0, maxLength)}...` : str;
-}
-
 const MAX_NAME_LENGTH = 40;
 
 const getColConfig = (t: TFunction, isMyUnits?: boolean) => [
@@ -34,7 +27,7 @@ const getColConfig = (t: TFunction, isMyUnits?: boolean) => [
     key: "nameFi",
     transform: ({ nameFi, pk }: UnitType) => (
       <TableLink href={isMyUnits ? myUnitUrl(pk ?? 0) : unitUrl(pk ?? 0)}>
-        {truncateMaybeString(nameFi ?? undefined, MAX_NAME_LENGTH)}
+        {truncate(nameFi ?? "-", MAX_NAME_LENGTH)}
       </TableLink>
     ),
     width: "50%",

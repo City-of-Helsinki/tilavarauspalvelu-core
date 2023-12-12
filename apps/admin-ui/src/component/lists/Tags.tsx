@@ -1,9 +1,10 @@
 import React, { Dispatch } from "react";
 import { Tag as HDSTag } from "hds-react";
-import { get, omit, truncate } from "lodash";
-import { TFunction } from "i18next";
+import { get, omit } from "lodash";
+import type { TFunction } from "i18next";
 import styled from "styled-components";
-import { OptionType } from "../../common/types";
+import { truncate } from "@/helpers";
+import type { OptionType } from "@/common/types";
 
 export type Tag<T> = {
   key: string;
@@ -40,7 +41,7 @@ export const toTags = <T,>(
         (v: OptionType) =>
           ({
             key: `${String(key)}.${v.value}`,
-            value: truncate(v.label, { length: 25 }),
+            value: truncate(v.label, 25),
             ac: { type: "deleteTag", field: key, value: v.value },
           } as Tag<T>)
       );
