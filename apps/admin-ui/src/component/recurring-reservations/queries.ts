@@ -63,16 +63,12 @@ export const ALLOCATION_UNFILTERED_QUERY = gql`
         node {
           applicationRound {
             nameFi
-          }
-          applicationEvents {
-            eventReservationUnits {
-              reservationUnit {
+            reservationUnits {
+              pk
+              nameFi
+              unit {
                 pk
                 nameFi
-                unit {
-                  pk
-                  nameFi
-                }
               }
             }
           }

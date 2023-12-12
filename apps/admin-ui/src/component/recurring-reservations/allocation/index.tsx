@@ -643,11 +643,8 @@ function AllocationWrapper({
     data?.applications?.edges?.map((edge) => edge?.node)
   );
 
-  const reservationUnits = applications
-    .flatMap((a) => a.applicationEvents)
-    .flatMap((ae) =>
-      ae?.eventReservationUnits?.flatMap((eru) => eru?.reservationUnit)
-    );
+  const appRound = applications?.[0]?.applicationRound ?? undefined;
+  const reservationUnits = filterNonNullable(appRound?.reservationUnits);
   const unitData = reservationUnits.map((ru) => ru?.unit);
 
   // TODO sort by name (they are in a random order because of the nested structure)
