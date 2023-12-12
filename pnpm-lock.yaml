@@ -72,8 +72,8 @@ importers:
         specifier: ^4.17.21
         version: 4.17.21
       mapbox-gl:
-        specifier: ^2.15.0
-        version: 2.15.0
+        specifier: ^3.0.1
+        version: 3.0.1
       next:
         specifier: 13.5.6
         version: 13.5.6(@babel/core@7.23.6)(react-dom@18.2.0)(react@18.2.0)(sass@1.69.5)
@@ -99,8 +99,8 @@ importers:
         specifier: ^13.3.1
         version: 13.3.1(i18next@23.6.0)(react-dom@18.2.0)(react-native@0.73.0)(react@18.2.0)
       react-map-gl:
-        specifier: 7.0.20
-        version: 7.0.20(mapbox-gl@2.15.0)(react@18.2.0)
+        specifier: ^7.1.6
+        version: 7.1.6(mapbox-gl@3.0.1)(react-dom@18.2.0)(react@18.2.0)
       react-quill:
         specifier: 2.0.0
         version: 2.0.0(react-dom@18.2.0)(react@18.2.0)
@@ -184,8 +184,8 @@ importers:
         specifier: 18.0.10
         version: 18.0.10
       '@types/react-map-gl':
-        specifier: 6.1.3
-        version: 6.1.3
+        specifier: ^6.1.6
+        version: 6.1.6
       '@types/react-router-dom':
         specifier: ^5.3.3
         version: 5.3.3
@@ -298,8 +298,8 @@ importers:
         specifier: ^4.17.21
         version: 4.17.21
       mapbox-gl:
-        specifier: ^2.15.0
-        version: 2.15.0
+        specifier: ^3.0.1
+        version: 3.0.1
       next:
         specifier: 13.5.6
         version: 13.5.6(@babel/core@7.23.6)(react-dom@18.2.0)(react@18.2.0)(sass@1.69.5)
@@ -332,7 +332,7 @@ importers:
         version: 13.3.1(i18next@23.6.0)(react-dom@18.2.0)(react-native@0.73.0)(react@18.2.0)
       react-map-gl:
         specifier: ^7.1.6
-        version: 7.1.6(mapbox-gl@2.15.0)(react-dom@18.2.0)(react@18.2.0)
+        version: 7.1.6(mapbox-gl@3.0.1)(react-dom@18.2.0)(react@18.2.0)
       react-transition-group:
         specifier: ^4.4.5
         version: 4.4.5(react-dom@18.2.0)(react@18.2.0)
@@ -401,8 +401,8 @@ importers:
         specifier: 18.0.10
         version: 18.0.10
       '@types/react-map-gl':
-        specifier: ^6.1.5
-        version: 6.1.5
+        specifier: ^6.1.6
+        version: 6.1.6
       '@types/react-transition-group':
         specifier: ^4.4.8
         version: 4.4.8
@@ -6476,8 +6476,8 @@ packages:
     resolution: {integrity: sha512-dMJJqBqyhsfJKuK7p7HyyNmki7qj1AlwhUKWx6KrU7i1K2T2SPsUsSUTWFmr/sEM1q8rfR8j5IyUmYrDbrhfjQ==}
     dev: true
 
-  /@types/geojson@7946.0.10:
-    resolution: {integrity: sha512-Nmh0K3iWQJzniTuPRcJn5hxXkfB1T1pgB89SBig5PlJQU5yocazeu4jATJlaA0GYFKWMqDdvYemoSnF2pXgLVA==}
+  /@types/geojson@7946.0.13:
+    resolution: {integrity: sha512-bmrNrgKMOhM3WsafmbGmC+6dsF2Z308vLFsQ3a/bT8X8Sv5clVYpPars/UPq+sAaJP+5OoLAYgwbkS5QEJdLUQ==}
 
   /@types/graceful-fs@4.1.6:
     resolution: {integrity: sha512-Sig0SNORX9fdW+bQuTEovKj3uHcUL6LQKbCrrqb1X7J6/ReAbhCXRAhc+SMejhLELFj2QcyuxmUooZ4bt5ReSw==}
@@ -6574,10 +6574,10 @@ packages:
     resolution: {integrity: sha512-YI/M/4HRImtNf3pJgbF+W6FrXovqj+T+/HpENLTooK9PnkacBsDpeP3IpHab40CClUfhNmdM2WTNP2sa2dni5Q==}
     dev: true
 
-  /@types/mapbox-gl@2.7.13:
-    resolution: {integrity: sha512-qNffhTdYkeFl8QG9Q1zPPJmcs8PvHgmLa1PcwP1rxvcfMsIgcFr/FnrCttG0ZnH7Kzdd7xfECSRNTWSr4jC3PQ==}
+  /@types/mapbox-gl@2.7.19:
+    resolution: {integrity: sha512-pkRdlhQJNbtwcKJSVC4uuOA6M3OlOObIMhNecqHB991oeaDF5XkjSIRaTE0lh5p4KClptSCxW6MBiREVRHrl2A==}
     dependencies:
-      '@types/geojson': 7946.0.10
+      '@types/geojson': 7946.0.13
 
   /@types/minimist@1.2.2:
     resolution: {integrity: sha512-jhuKLIRrhvCPLqwPcx6INqmKeiA5EWrsCOPhrlFSrbrmU4ZMPjj5Ul/oLCMDO98XRUIwVm78xICz4EPCektzeQ==}
@@ -6629,22 +6629,13 @@ packages:
       '@types/react': 18.0.27
     dev: true
 
-  /@types/react-map-gl@6.1.3:
-    resolution: {integrity: sha512-22R7vE/XT/S+Nwu7245llMW+vO8ITPQJHaiRCO9RxmUUdV2kio7mQWaL8M5ko3XMt+7Hyz5ComNI4AopXZsxMA==}
+  /@types/react-map-gl@6.1.6:
+    resolution: {integrity: sha512-nrczNIcLmyhj53sYdAGqqAzRJg0lnGUZKdp1YohJfAzM5ialyo2iQxVxo0zpPPXe6oRfxlUTzHMjWGL2wt+EFA==}
     dependencies:
-      '@types/geojson': 7946.0.10
-      '@types/mapbox-gl': 2.7.13
+      '@types/geojson': 7946.0.13
+      '@types/mapbox-gl': 2.7.19
       '@types/react': 18.0.27
-      '@types/viewport-mercator-project': 6.1.2
-    dev: true
-
-  /@types/react-map-gl@6.1.5:
-    resolution: {integrity: sha512-6IwEM/ncci7TDo3AxLE2yBeNdds85nFZWO83kHjmqKwR0DeWv3xaYb5yL0OYvrSjHaV2CO7GnlqTAje94AZEgw==}
-    dependencies:
-      '@types/geojson': 7946.0.10
-      '@types/mapbox-gl': 2.7.13
-      '@types/react': 18.0.27
-      '@types/viewport-mercator-project': 6.1.2
+      '@types/viewport-mercator-project': 6.1.6
     dev: true
 
   /@types/react-reconciler@0.26.7:
@@ -6735,8 +6726,8 @@ packages:
     resolution: {integrity: sha512-Q5vtl1W5ue16D+nIaW8JWebSSraJVlK+EthKn7e7UcD4KWsaSJ8BqGPXNaPghgtcn/fhvrN17Tv8ksUsQpiplw==}
     dev: true
 
-  /@types/viewport-mercator-project@6.1.2:
-    resolution: {integrity: sha512-21U4s61ZMUx95F2Uc9DpXBlcSKlrkeChM+hbGWmpz8HtL+zwl/zP5pJarJmxKv/764iR9xf5870jYZ8Mby5xuQ==}
+  /@types/viewport-mercator-project@6.1.6:
+    resolution: {integrity: sha512-uWrbqhRXFeiT6CAvRjf0BkQKRkKED+ofrPhglKpUktQML3463dEPiA4iwe7cZQs6m49Zo/g03rL7ChMLiE5Z8w==}
     dependencies:
       gl-matrix: 3.4.3
     dev: true
@@ -8180,6 +8171,10 @@ packages:
   /chardet@0.7.0:
     resolution: {integrity: sha512-mT8iDcrh03qDGRRmoA2hmBJnxpllMR+0/0qlzjqZES6NdiWDcZkCNAk4rPFZ9Q85r27unkiNNg8ZOiwZXBHwcA==}
     dev: true
+
+  /cheap-ruler@3.0.2:
+    resolution: {integrity: sha512-02T332h1/HTN6cDSufLP8x4JzDs2+VC+8qZ/N0kWIVPyc2xUkWwWh3B2fJxR7raXkL4Mq7k554mfuM9ofv/vGg==}
+    dev: false
 
   /check-more-types@2.24.0:
     resolution: {integrity: sha512-Pj779qHxV2tuapviy1bSZNEL1maXr13bPYpsvSDB68HlYcYuhlDrmGd63i0JHMCLKzc7rUSNIrpdJlhVlNwrxA==}
@@ -13025,8 +13020,8 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /mapbox-gl@2.15.0:
-    resolution: {integrity: sha512-fjv+aYrd5TIHiL7wRa+W7KjtUqKWziJMZUkK5hm8TvJ3OLeNPx4NmW/DgfYhd/jHej8wWL+QJBDbdMMAKvNC0A==}
+  /mapbox-gl@3.0.1:
+    resolution: {integrity: sha512-o7C6sAlj6Hkdd4xQVEgQflgJYNYyZOAtYahhIOb9m8chI8umtWcCp8Ie0iGLYJvce1WHRMa3WGzs69ggwuWlDA==}
     dependencies:
       '@mapbox/geojson-rewind': 0.5.2
       '@mapbox/jsonlint-lines-primitives': 2.0.2
@@ -13036,6 +13031,7 @@ packages:
       '@mapbox/unitbezier': 0.0.1
       '@mapbox/vector-tile': 1.3.1
       '@mapbox/whoots-js': 3.1.0
+      cheap-ruler: 3.0.2
       csscolorparser: 1.0.3
       earcut: 2.2.4
       geojson-vt: 3.2.1
@@ -15084,18 +15080,7 @@ packages:
     resolution: {integrity: sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==}
     dev: false
 
-  /react-map-gl@7.0.20(mapbox-gl@2.15.0)(react@18.2.0):
-    resolution: {integrity: sha512-Q1formrWEdt9vY5DyW2vgdmAPuSMH2TFn8xKMlA+cmBlyS8veQvVTGoq4lAm8p3Hb/90ZpNmMtI4s107r931vQ==}
-    peerDependencies:
-      mapbox-gl: '*'
-      react: '>=16.3.0'
-    dependencies:
-      '@types/mapbox-gl': 2.7.13
-      mapbox-gl: 2.15.0
-      react: 18.2.0
-    dev: false
-
-  /react-map-gl@7.1.6(mapbox-gl@2.15.0)(react-dom@18.2.0)(react@18.2.0):
+  /react-map-gl@7.1.6(mapbox-gl@3.0.1)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-9XbrvpFF67Fyi+e6vRLJFnGpo3UF6ZHifIa8cS/wUYSsnv9sVyzGsN++FJy57zkz3Jh3kmf0xKZemR8K0FZLVw==}
     peerDependencies:
       mapbox-gl: '>=1.13.0'
@@ -15109,8 +15094,8 @@ packages:
         optional: true
     dependencies:
       '@maplibre/maplibre-gl-style-spec': 19.3.3
-      '@types/mapbox-gl': 2.7.13
-      mapbox-gl: 2.15.0
+      '@types/mapbox-gl': 2.7.19
+      mapbox-gl: 3.0.1
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
     dev: false
