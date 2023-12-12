@@ -15,6 +15,7 @@ import {
   type QueryApplicationsArgs,
   ApplicantTypeChoice,
 } from "common/types/gql-types";
+import { breakpoints } from "common";
 import { filterNonNullable } from "common/src/helpers";
 import { SearchTags } from "@/component/SearchTags";
 import Loader from "@/component/Loader";
@@ -100,6 +101,17 @@ const MoreWrapper = styled(ShowAllContainer)`
   }
   .ShowAllContainer__Content {
     ${autoGridCss}
+  }
+`;
+
+// Tab causes horizontal overflow without this
+// because it's inside a grid so an element with fixed width and no max-width breaks the grid
+const TabWrapper = styled.div`
+  max-width: 95vw;
+  @media (width > ${breakpoints.m}) {
+    max-width: calc(
+      95vw - var(--main-menu-width) - 2 * var(--spacing-layout-m)
+    );
   }
 `;
 
@@ -550,23 +562,25 @@ function ApplicationRoundAllocation({
       {/* using a key here is a hack to force remounting the tabs
        * remount causes flickering but HDS doesn't allow programmatically changing the active tab
        */}
-      <Tabs
-        initiallyActiveTab={initiallyActiveTab >= 0 ? initiallyActiveTab : 0}
-        key={unitFilter ?? "unit-none"}
-      >
-        <TabList>
-          {unitReservationUnits.map((ru) => (
-            <Tab
-              onClick={() => setSelectedReservationUnit(ru.pk ?? null)}
-              key={ru?.pk}
-            >
-              {ru?.nameFi}
-            </Tab>
-          ))}
-        </TabList>
-        {/* NOTE: we want the tabs as buttons, without this the HDS tabs break */}
-        <Tabs.TabPanel />
-      </Tabs>
+      <TabWrapper>
+        <Tabs
+          initiallyActiveTab={initiallyActiveTab >= 0 ? initiallyActiveTab : 0}
+          key={unitFilter ?? "unit-none"}
+        >
+          <TabList>
+            {unitReservationUnits.map((ru) => (
+              <Tab
+                onClick={() => setSelectedReservationUnit(ru.pk ?? null)}
+                key={ru?.pk}
+              >
+                {ru?.nameFi}
+              </Tab>
+            ))}
+          </TabList>
+          {/* NOTE: we want the tabs as buttons, without this the HDS tabs break */}
+          <Tabs.TabPanel />
+        </Tabs>
+      </TabWrapper>
       <NumberOfResultsContainer>
         {applicationEvents.length === totalNumberOfEvents ? (
           t("Allocation.countAllResults", { count: totalNumberOfEvents })
