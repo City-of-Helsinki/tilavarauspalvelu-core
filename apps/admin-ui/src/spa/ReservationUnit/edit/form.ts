@@ -302,6 +302,16 @@ export const ReservationUnitEditSchema = z
       }
     }
 
+    if (v.minReservationDuration != null && v.maxReservationDuration != null) {
+      if (v.minReservationDuration > v.maxReservationDuration) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Min reservation duration must be less than max duration",
+          path: ["maxReservationDuration"],
+        });
+      }
+    }
+
     // the backend error on mutation: "Not draft state reservation unit must have one or more space or resource",
     if (v.spacePks.length === 0 && v.resourcePks.length === 0) {
       ctx.addIssue({

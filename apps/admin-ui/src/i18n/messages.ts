@@ -770,6 +770,9 @@ const translations: ITranslations = {
           "Maksimi henkilömäärä pitää olla suurempi kuin minimi henkilömäärä",
         ],
         "Number must be greater than or equal to 0": ["Pitää olla vähintään 0"],
+        "Min reservation duration must be less than max duration": [
+          "Minimikesto pitää olla pienempi kuin maksimikesto",
+        ],
       },
     },
     level: {
