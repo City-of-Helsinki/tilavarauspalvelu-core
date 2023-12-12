@@ -1,11 +1,9 @@
-import { get, orderBy, padStart, sortBy, uniqBy } from "lodash";
+import { orderBy, padStart, sortBy, uniqBy } from "lodash";
 import {
   type ApplicationEventScheduleNode,
   type ApplicationEventNode,
   ApplicationsApplicationApplicantTypeChoices,
   type ApplicationNode,
-  type ReservationUnitType,
-  type ReservationUnitByPkType,
 } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import type { ApplicationEventSchedulePriority } from "common/types/common";
@@ -19,65 +17,6 @@ const parseApplicationEventScheduleTime = (
   return `${weekday} ${Number(
     applicationEventSchedule.begin.substring(0, 2)
   )}-${Number(applicationEventSchedule.end.substring(0, 2))}`;
-};
-
-/// @deprecated - use backend query params
-/// Can be removed after we move the filters to query (unused)
-export const getFilteredApplicationEvents = (
-  applications: ApplicationNode[],
-  unitFilter: OptionType | null,
-  timeFilter: OptionType[],
-  orderFilter: OptionType[],
-  reservationUnitFilter: ReservationUnitType | ReservationUnitByPkType | null
-): ApplicationEventNode[] => {
-  if (applications?.length < 1 || !reservationUnitFilter) {
-    return [];
-  }
-
-  let applicationEvents = applications
-    .flatMap((application) => application.applicationEvents)
-    .filter((e): e is NonNullable<typeof e> => e != null);
-
-  if (orderFilter?.length) {
-    const order = orderFilter.map((n) => (n.value as number) - 1);
-    applicationEvents = applicationEvents.filter((applicationEvent) =>
-      order.every(
-        (o) =>
-          get(applicationEvent, `applicationEventSchedules[${o}]`) !== undefined
-      )
-    );
-  }
-
-  if (unitFilter) {
-    applicationEvents = applicationEvents.filter((applicationEvent) =>
-      applicationEvent.eventReservationUnits?.some((eventReservationUnit) => {
-        const unitId = eventReservationUnit?.reservationUnit?.unit?.pk || 0;
-        return unitFilter.value === unitId;
-      })
-    );
-  }
-
-  if (timeFilter.length) {
-    const priorities = timeFilter.map((n) => n.value);
-    applicationEvents = applicationEvents.filter((applicationEvent) =>
-      applicationEvent.applicationEventSchedules?.some(
-        (applicationEventSchedule) =>
-          applicationEventSchedule?.priority &&
-          priorities.includes(applicationEventSchedule?.priority)
-      )
-    );
-  }
-
-  if (reservationUnitFilter) {
-    applicationEvents = applicationEvents.filter((applicationEvent) =>
-      applicationEvent.eventReservationUnits?.some(
-        (eventReservationUnit) =>
-          eventReservationUnit?.reservationUnit?.pk === reservationUnitFilter.pk
-      )
-    );
-  }
-
-  return applicationEvents || [];
 };
 
 export type Cell = {

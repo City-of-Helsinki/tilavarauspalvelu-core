@@ -20,7 +20,7 @@ import { SearchTags } from "@/component/SearchTags";
 import Loader from "@/component/Loader";
 import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import { useOptions } from "@/component/my-units/hooks";
-import { Container } from "@/styles/layout";
+import { Container, autoGridCss } from "@/styles/layout";
 import { useNotification } from "@/context/NotificationContext";
 import { useAllocationContext } from "@/context/AllocationContext";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
@@ -29,7 +29,7 @@ import { Permission } from "@/modules/permissionHelper";
 import {
   ALL_EVENTS_PER_UNIT_QUERY,
   APPLICATION_EVENTS_FOR_ALLOCATION,
-  MINIMAL_APPLICATION_QUERY,
+  ALLOCATION_UNFILTERED_QUERY,
 } from "../queries";
 import { ApplicationEvents } from "./ApplicationEvents";
 
@@ -94,16 +94,12 @@ const transformApplicantType = (value: string | null) => {
   return null;
 };
 
-// TODO make the grid thing into AutoGridCss that can be imported
 const MoreWrapper = styled(ShowAllContainer)`
   .ShowAllContainer__ToggleButton {
     color: var(--color-bus);
   }
   .ShowAllContainer__Content {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
-    align-items: baseline;
-    gap: var(--spacing-m);
+    ${autoGridCss}
   }
 `;
 
@@ -155,13 +151,10 @@ function ApplicationRoundAllocation({
     // NOTE different logic because values are not atomic and we need to set two params
     const vals = new URLSearchParams(searchParams);
     vals.set("unit", value.toString());
-    // TODO how to find the default reservation unit for the selected unit?
     vals.delete("reservation-unit");
     setParams(vals);
   };
 
-  // TODO if unit selection changes and new list doesn't include the selected reservation unit, clear the selection
-  // TODO if the units change while we have an active filter but it doesn't match any of the new units, clear the filter
   useEffect(() => {
     if (units.length > 0 && unitFilter == null) {
       setUnitFilter(units[0].pk ?? 0);
@@ -173,8 +166,6 @@ function ApplicationRoundAllocation({
     (ru) => ru.unit?.pk != null && ru?.unit?.pk === Number(unitFilter)
   );
 
-  // TODO default value here instead of the JSX
-  // because otherwise we the query returns all the reservation units if the filter is not set
   const selectedReservationUnit =
     searchParams.get("reservation-unit") ??
     unitReservationUnits?.[0]?.pk?.toString() ??
@@ -279,12 +270,7 @@ function ApplicationRoundAllocation({
         includePreferredOrder10OrHigher:
           orderFilter != null &&
           orderFilter.filter((x) => Number(x) > 10).length > 0,
-        ...(nameFilter != null && Number.isNaN(Number(nameFilter))
-          ? { name_Istartswith: nameFilter }
-          : {}),
-        ...(nameFilter != null && !Number.isNaN(Number(nameFilter))
-          ? { textSearch: nameFilter }
-          : {}),
+        ...(nameFilter != null ? { textSearch: nameFilter } : {}),
         ...(cityFilter != null
           ? { homeCity: cityFilter.map((x) => Number(x)) }
           : {}),
@@ -356,7 +342,7 @@ function ApplicationRoundAllocation({
 
   const orderOptions = Array.from(Array(10).keys())
     .map((n) => ({
-      value: n + 1,
+      value: n,
       label: `${n + 1}. ${t("Allocation.filters.reservationUnitApplication")}`,
     }))
     .concat([
@@ -615,7 +601,7 @@ function AllocationWrapper({
   applicationRoundId: number;
 }): JSX.Element {
   const { loading, error, data } = useQuery<Query, QueryApplicationsArgs>(
-    MINIMAL_APPLICATION_QUERY,
+    ALLOCATION_UNFILTERED_QUERY,
     {
       skip: !applicationRoundId,
       variables: {
@@ -625,6 +611,7 @@ function AllocationWrapper({
     }
   );
 
+  const { t } = useTranslation();
   const { hasUnitPermission } = usePermission();
 
   // TODO don't use spinners, skeletons are better
@@ -634,7 +621,9 @@ function AllocationWrapper({
   }
   // TODO improve this (disabled filters if error, notify the user, but don't block the whole page)
   if (error) {
-    return <p>Error</p>;
+    // eslint-disable-next-line no-console
+    console.error("Error: ", error);
+    return <p>{t("errors.errorFetchingData")}</p>;
   }
 
   const applications = filterNonNullable(

@@ -12,7 +12,7 @@ export const FilterTags = styled.div`
 `;
 
 export const StyledTag = styled(Tag)`
-  font-size: var(--fontsize-body-m);
+  --tag-font-size: var(--fontsize-body-s);
   svg {
     scale: 0.8;
   }

@@ -8,7 +8,7 @@ import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import { publicUrl } from "@/common/const";
 import Loader from "@/component/Loader";
 import Review from "./review/Review";
-import { APPLICATION_ROUD_QUERY } from "./queries";
+import { APPLICATION_ROUND_QUERY } from "./queries";
 
 function ApplicationRound({
   applicationRoundId,
@@ -18,15 +18,18 @@ function ApplicationRound({
   const { notifyError } = useNotification();
   const { t } = useTranslation();
 
-  const { data, loading: isLoading } = useQuery<Query>(APPLICATION_ROUD_QUERY, {
-    skip: !applicationRoundId,
-    variables: {
-      pk: [applicationRoundId],
-    },
-    onError: () => {
-      notifyError(t("errors.errorFetchingData"));
-    },
-  });
+  const { data, loading: isLoading } = useQuery<Query>(
+    APPLICATION_ROUND_QUERY,
+    {
+      skip: !applicationRoundId,
+      variables: {
+        pk: [applicationRoundId],
+      },
+      onError: () => {
+        notifyError(t("errors.errorFetchingData"));
+      },
+    }
+  );
   const applicationRound = data?.applicationRounds?.edges?.[0]?.node;
 
   if (isLoading) {

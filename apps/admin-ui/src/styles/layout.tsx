@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { breakpoints } from "common/src/common/style";
 
 export const ContentContainer = styled.div`
@@ -166,6 +166,13 @@ export const Content = styled.div`
 `;
 
 Content.displayName = "Content";
+
+export const autoGridCss = css`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  align-items: baseline;
+  gap: var(--spacing-m);
+`;
 
 export const AutoGrid = styled.div<{ $minWidth?: string }>`
   display: grid;

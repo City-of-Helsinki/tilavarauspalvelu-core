@@ -32,7 +32,7 @@ export const APPLICATION_ROUNDS_QUERY = gql`
   }
 `;
 
-export const APPLICATION_ROUD_QUERY = gql`
+export const APPLICATION_ROUND_QUERY = gql`
   ${APPLICATION_ROUND_FRAGMENT}
   query ApplicationRoundCriteria($pk: [Int]!) {
     applicationRounds(pk: $pk) {
@@ -49,8 +49,11 @@ export const APPLICATION_ROUD_QUERY = gql`
   }
 `;
 
-// Separate minimal query to find all possible values for filters
-export const MINIMAL_APPLICATION_QUERY = gql`
+/* minimal query for allocation page to populate the unit filter and reservation-units tabs
+ * only needs to be done once when landing on the page
+ * filtered queries only include the reservation-units that match the filters
+ */
+export const ALLOCATION_UNFILTERED_QUERY = gql`
   query Applications(
     $applicationRound: Int!
     $status: [ApplicationStatusChoice]!
@@ -107,8 +110,6 @@ export const ALL_EVENTS_PER_UNIT_QUERY = gql`
   }
 `;
 
-// TODO priority vs preferredOrder, preferredOrder is the selected reservationUnit order, priority is the primary / secondary
-// TODO check if we can remove some of the fields (and move them to the filter query, ex unit / reservationUnit)
 export const APPLICATION_EVENTS_FOR_ALLOCATION = gql`
   query getApplicationEvents(
     $applicationRound: Int
@@ -116,7 +117,6 @@ export const APPLICATION_EVENTS_FOR_ALLOCATION = gql`
     $unit: [Int]
     $preferredOrder: [Int]
     $textSearch: String
-    $name_Istartswith: String
     $priority: [Int]
     $purpose: [Int]
     $reservationUnit: [Int]
@@ -129,7 +129,6 @@ export const APPLICATION_EVENTS_FOR_ALLOCATION = gql`
       applicationRound: $applicationRound
       applicationStatus: $applicationStatus
       unit: $unit
-      name_Istartswith: $name_Istartswith
       textSearch: $textSearch
       preferredOrder: $preferredOrder
       priority: $priority
