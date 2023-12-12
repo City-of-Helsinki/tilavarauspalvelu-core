@@ -410,15 +410,12 @@ export const getCheckoutUrl = (
   }
 
   try {
-    const { origin, pathname, searchParams } = new URL(checkoutUrl) || {};
-    const userId = searchParams?.get("user");
-
-    if (userId && lang) {
-      const baseUrl = `${origin}${pathname}`;
-      return `${baseUrl}/paymentmethod?user=${userId}&lang=${lang}`;
-    }
+    const { origin, pathname } = new URL(checkoutUrl) || {};
+    const baseUrl = `${origin}${pathname}`;
+    return `${baseUrl}/paymentmethod?lang=${lang}`;
   } catch (e) {
-    // noop
+    // eslint-disable-next-line no-console
+    console.error(e);
   }
   return undefined;
 };
