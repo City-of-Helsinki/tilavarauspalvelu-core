@@ -20,8 +20,8 @@
     "codegen": "turbo codegen"
   },
   "devDependencies": {
-    "npkill": "^0.10.0",
-    "turbo": "^1.10.16"
+    "npkill": "^0.11.3",
+    "turbo": "^1.11.1"
   },
   "packageManager": "pnpm@8.6.10"
 }
