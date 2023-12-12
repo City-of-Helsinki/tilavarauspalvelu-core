@@ -1,39 +1,32 @@
-import {
-  getReservationPrice,
-  formatters as getFormatters,
-  PendingReservation,
-} from "common";
-import { breakpoints } from "common/src/common/style";
-import { H4, Strong } from "common/src/common/typography";
-import { differenceInMinutes, parseISO } from "date-fns";
-import Link from "next/link";
-import { trim } from "lodash";
 import React, { useMemo } from "react";
+import Link from "next/link";
+import { differenceInMinutes, parseISO } from "date-fns";
+import { trim } from "lodash";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import {
-  ReservationType,
-  ReservationUnitByPkType,
-  ReservationUnitType,
-} from "common/types/gql-types";
-import { getReservationUnitPrice } from "../../modules/reservationUnit";
+  getReservationPrice,
+  formatters as getFormatters,
+  type PendingReservation,
+  type ReservationUnitNode,
+} from "common";
+import { breakpoints } from "common/src/common/style";
+import { H4, Strong } from "common/src/common/typography";
+import type { ReservationType } from "common/types/gql-types";
+import { getReservationUnitPrice } from "@/modules/reservationUnit";
 import {
   capitalize,
   formatDurationMinutes,
   getMainImage,
   getTranslation,
-} from "../../modules/util";
-import { reservationUnitPath } from "../../modules/const";
+} from "@/modules/util";
+import { reservationUnitPath } from "@/modules/const";
 
 type Type = "pending" | "confirmed" | "complete";
 
 type Props = {
   reservation: ReservationType | PendingReservation;
-  reservationUnit:
-    | ReservationUnitType
-    | ReservationUnitByPkType
-    | null
-    | undefined;
+  reservationUnit: ReservationUnitNode | null;
   type: Type;
   shouldDisplayReservationUnitPrice?: boolean;
 };

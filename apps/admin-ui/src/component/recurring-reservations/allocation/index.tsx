@@ -9,13 +9,12 @@ import { H1, fontBold, fontMedium } from "common/src/common/typography";
 import { ShowAllContainer } from "common/src/components";
 import {
   type Query,
-  type ReservationUnitByPkType,
   type QueryApplicationEventsArgs,
   type UnitType,
   type QueryApplicationsArgs,
   ApplicantTypeChoice,
 } from "common/types/gql-types";
-import { breakpoints } from "common";
+import { type ReservationUnitNode, breakpoints } from "common";
 import { filterNonNullable } from "common/src/helpers";
 import { SearchTags } from "@/component/SearchTags";
 import Loader from "@/component/Loader";
@@ -125,7 +124,7 @@ function ApplicationRoundAllocation({
 }: {
   applicationRoundId: number;
   units: UnitType[];
-  reservationUnits: ReservationUnitByPkType[];
+  reservationUnits: ReservationUnitNode[];
   roundName: string;
 }): JSX.Element {
   const { refreshApplicationEvents, setRefreshApplicationEvents } =

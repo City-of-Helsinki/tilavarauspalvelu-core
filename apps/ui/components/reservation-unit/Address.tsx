@@ -2,18 +2,14 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { H4 } from "common/src/common/typography";
-import {
-  LocationType,
-  ReservationUnitByPkType,
-  ReservationUnitType,
-  UnitType,
-} from "common/types/gql-types";
+import type { LocationType, UnitType } from "common/types/gql-types";
 import { IconLinkExternal } from "hds-react";
 import { IconButton } from "common/src/components";
+import type { ReservationUnitNode } from "common";
 import { getTranslation } from "../../modules/util";
 
 type Props = {
-  reservationUnit: ReservationUnitByPkType | ReservationUnitType;
+  reservationUnit: ReservationUnitNode;
 };
 
 const Container = styled.div`

@@ -1,24 +1,22 @@
-import { formatters as getFormatters, getReservationVolume } from "common";
+import { type ReservationUnitNode, formatters as getFormatters, getReservationVolume } from "common";
 import { flatten, trim, uniq } from "lodash";
 import { addDays } from "date-fns";
 import { i18n } from "next-i18next";
 import { toApiDate, toUIDate } from "common/src/common/util";
 import { RoundPeriod, isSlotWithinReservationTime } from "common/src/calendar/util";
 import {
-  EquipmentType,
+  type EquipmentType,
   ReservationsReservationStateChoices,
-  ReservationUnitByPkType,
-  ReservationUnitPricingType,
+  type ReservationUnitPricingType,
   ReservationUnitsReservationUnitPricingPricingTypeChoices,
   ReservationUnitsReservationUnitPricingStatusChoices,
   ReservationUnitState,
-  ReservationUnitType,
-  UnitType,
+  type UnitType,
 } from "common/types/gql-types";
 import { capitalize, getTranslation } from "./util";
 
 export const isReservationUnitPublished = (
-  reservationUnit?: ReservationUnitType | ReservationUnitByPkType
+  reservationUnit?: ReservationUnitNode
 ): boolean => {
   if (!reservationUnit) {
     return false;
@@ -90,7 +88,7 @@ export const getEquipmentList = (equipment: EquipmentType[]): string[] => {
 };
 
 export const getReservationUnitName = (
-  reservationUnit?: ReservationUnitType | ReservationUnitByPkType,
+  reservationUnit?: ReservationUnitNode,
   language: string = i18n?.language ?? "fi"
 ): string | undefined => {
   if (!reservationUnit) {
@@ -143,13 +141,13 @@ export const getReservationUnitInstructionsKey = (
 };
 
 export const getDurationRange = (
-  reservationUnit: ReservationUnitType | ReservationUnitByPkType
+  reservationUnit: ReservationUnitNode
 ): string => {
   return `${reservationUnit.minReservationDuration} - ${reservationUnit.maxReservationDuration}`;
 };
 
 export const getActivePricing = (
-  reservationUnit: ReservationUnitType | ReservationUnitByPkType
+  reservationUnit: ReservationUnitNode
 ): ReservationUnitPricingType | undefined => {
   const { pricings } = reservationUnit;
 
@@ -161,7 +159,7 @@ export const getActivePricing = (
 };
 
 export const getFuturePricing = (
-  reservationUnit: ReservationUnitByPkType,
+  reservationUnit: ReservationUnitNode,
   applicationRounds: RoundPeriod[] = [],
   reservationDate?: Date
 ): ReservationUnitPricingType | undefined => {
@@ -259,7 +257,7 @@ export const getPrice = (props: GetPriceType): string => {
 };
 
 export type GetReservationUnitPriceProps = {
-  reservationUnit?: ReservationUnitType | ReservationUnitByPkType;
+  reservationUnit?: ReservationUnitNode;
   pricingDate?: Date;
   minutes?: number;
   trailingZeros?: boolean;
@@ -270,19 +268,17 @@ export const getReservationUnitPrice = (
   props: GetReservationUnitPriceProps
 ): string | undefined => {
   const {
-    reservationUnit,
+    reservationUnit: ru,
     pricingDate,
     minutes,
     trailingZeros = false,
     asInt = false,
   } = props;
 
-  if (!reservationUnit) {
+  if (!ru) {
     return undefined;
   }
 
-  // NOTE cast is mandatory because the Union doesn't overlap even though it has identical fields
-  const ru = reservationUnit as ReservationUnitByPkType
   const pricing: ReservationUnitPricingType | undefined = pricingDate
     ? getFuturePricing(ru, [], pricingDate) || getActivePricing(ru)
     : getActivePricing(ru);

@@ -218,9 +218,7 @@ const ReservationCancellation = ({ id }: Props): JSX.Element => {
     register("description");
   }, [register]);
 
-  const reservationUnit = reservation?.reservationUnits
-    ? reservation.reservationUnits[0]
-    : undefined;
+  const reservationUnit = reservation?.reservationUnits?.[0] ?? null;
 
   const bylineContent = useMemo(() => {
     return (

@@ -13,10 +13,12 @@ import {
 } from "common/types/gql-types";
 import { type Maybe } from "graphql/jsutils/Maybe";
 import { z } from "zod";
-import { ApplicationEventSchedulePriority } from "common";
+import type {
+  ApplicationEventSchedulePriority,
+  ReservationUnitNode,
+} from "common";
 import { toApiDate } from "common/src/common/util";
 import { apiDateToUIDate, fromUIDate } from "@/modules/util";
-import { ReservationUnitUnion } from "@/hooks/useReservationUnitList";
 
 // NOTE the zod schemas have a lot of undefineds because the form is split into four pages
 // so you can't trust some of the zod validation (e.g. mandatory fields)
@@ -323,7 +325,7 @@ export const transformApplication = (
 
 export const convertApplicationToForm = (
   app: Maybe<ApplicationNode> | undefined,
-  reservationUnits: ReservationUnitUnion[]
+  reservationUnits: ReservationUnitNode[]
 ): ApplicationFormValues => {
   const formAes = filterNonNullable(app?.applicationEvents).map((ae) =>
     transformApplicationEventToForm(ae)

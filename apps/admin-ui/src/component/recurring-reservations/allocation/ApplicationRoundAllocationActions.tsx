@@ -4,11 +4,9 @@ import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import { Strong, Strongish } from "common/src/common/typography";
 import styled from "styled-components";
-import type {
-  ApplicationEventNode,
-  ReservationUnitByPkType,
-} from "common/types/gql-types";
+import type { ApplicationEventNode } from "common/types/gql-types";
 import { ShowAllContainer } from "common/src/components/";
+import type { ReservationUnitNode } from "common";
 import { ALLOCATION_CALENDAR_TIMES } from "@/common/const";
 import { OptionType } from "@/common/types";
 import { Accordion } from "@/component/Accordion";
@@ -22,7 +20,7 @@ import { ApplicationEventScheduleCard } from "./ApplicationEventScheduleCard";
 
 type Props = {
   applicationEvents: ApplicationEventNode[] | null;
-  reservationUnit: ReservationUnitByPkType;
+  reservationUnit: ReservationUnitNode;
   paintedApplicationEvents: ApplicationEventNode[];
   paintApplicationEvents: (val: ApplicationEventNode[]) => void;
   selection: string[] | null;

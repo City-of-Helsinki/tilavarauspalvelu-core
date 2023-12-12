@@ -28,7 +28,6 @@ import {
   ReservationPurposeType,
   ReservationsReservationReserveeTypeChoices,
   ReservationType,
-  ReservationUnitByPkType,
   ReservationUnitType,
   ReservationUpdateMutationInput,
   ReservationUpdateMutationPayload,
@@ -251,7 +250,7 @@ const ReservationUnitReservationWithReservationProp = ({
 
   const steps: ReservationStep[] = useMemo(() => {
     const price = getReservationUnitPrice({
-      reservationUnit: reservationUnit as unknown as ReservationUnitByPkType,
+      reservationUnit,
       pricingDate: reservation?.begin
         ? new Date(reservation?.begin)
         : undefined,

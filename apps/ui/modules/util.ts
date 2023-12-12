@@ -9,13 +9,11 @@ import {
   isValidDate,
   getTranslation,
 } from "common/src/common/util";
-import type { OptionType, ReducedApplicationStatus } from "common/types/common";
+import type { OptionType, ReducedApplicationStatus, ReservationUnitNode } from "common/types/common";
 import {
   type ReservationUnitImageType,
-  type ReservationUnitType,
   ApplicationStatusChoice,
-  type ReservationUnitByPkType,
-  AgeGroupType,
+  type AgeGroupType,
 } from "common/types/gql-types";
 import {
   searchPrefix,
@@ -207,7 +205,7 @@ const imagePriority = ["main", "map", "ground_plan", "other"].map((n) =>
 );
 
 export const getMainImage = (
-  ru?: ReservationUnitType | ReservationUnitByPkType
+  ru?: ReservationUnitNode
 ): ReservationUnitImageType | null => {
   if (!ru || !ru.images || ru.images.length === 0) {
     return null;
@@ -236,7 +234,7 @@ export const orderImages = (
   return result;
 };
 
-export const getAddressAlt = (ru: ReservationUnitType): string | null => {
+export const getAddressAlt = (ru: ReservationUnitNode): string | null => {
   const { location } = ru.unit || {};
 
   if (!location) {

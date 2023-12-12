@@ -3,13 +3,13 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Strong } from "common/src/common/typography";
 import { useMutation } from "@apollo/client";
-import {
+import type {
   ApplicationEventNode,
-  ReservationUnitByPkType,
   Mutation,
   MutationApproveApplicationEventScheduleArgs,
 } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
+import type { ReservationUnitNode } from "common";
 import { getApplicantName } from "@/component/applications/util";
 import { formatDuration } from "@/common/util";
 import { SmallRoundButton } from "@/styles/buttons";
@@ -25,7 +25,7 @@ import { APPROVE_APPLICATION_EVENT_SCHEDULE } from "../queries";
 
 type Props = {
   applicationEvent: ApplicationEventNode;
-  reservationUnit: ReservationUnitByPkType;
+  reservationUnit: ReservationUnitNode;
   selection: string[];
   applicationEventScheduleResultStatuses: ApplicationEventScheduleResultStatuses;
 };

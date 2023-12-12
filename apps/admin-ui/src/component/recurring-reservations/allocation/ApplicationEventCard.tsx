@@ -3,12 +3,10 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Strong } from "common/src/common/typography";
-import {
-  ApplicationEventNode,
-  ReservationUnitByPkType,
-} from "common/types/gql-types";
+import type { ApplicationEventNode } from "common/types/gql-types";
+import type { ReservationUnitNode } from "common";
+import type { AllocationApplicationEventCardType } from "@/common/types";
 import { publicUrl } from "@/common/const";
-import { AllocationApplicationEventCardType } from "@/common/types";
 import { formatDuration } from "@/common/util";
 import { getApplicantName } from "@/component/applications/util";
 import { ageGroup } from "@/component/reservations/requested/util";
@@ -17,7 +15,7 @@ type Props = {
   applicationEvent: ApplicationEventNode;
   selectedApplicationEvent?: ApplicationEventNode;
   setSelectedApplicationEvent: (val?: ApplicationEventNode) => void;
-  reservationUnit: ReservationUnitByPkType;
+  reservationUnit: ReservationUnitNode;
   type: AllocationApplicationEventCardType;
 };
 

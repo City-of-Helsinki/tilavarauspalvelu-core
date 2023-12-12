@@ -3,10 +3,8 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { sortBy } from "lodash";
 import { H5 } from "common/src/common/typography";
-import type {
-  ApplicationEventNode,
-  ReservationUnitByPkType,
-} from "common/types/gql-types";
+import type { ApplicationEventNode } from "common/types/gql-types";
+import { ReservationUnitNode } from "common";
 import { Accordion } from "@/component/Accordion";
 import type { AllocationApplicationEventCardType } from "@/common/types";
 import AllocationCalendar from "./AllocationCalendar";
@@ -62,7 +60,7 @@ const EventGroupList = ({
   setSelectedApplicationEvent: (
     applicationEvent?: ApplicationEventNode
   ) => void;
-  reservationUnit: ReservationUnitByPkType;
+  reservationUnit: ReservationUnitNode;
   type: AllocationApplicationEventCardType;
 }): JSX.Element => {
   if (applicationEvents.length < 1) {
@@ -86,7 +84,7 @@ const EventGroupList = ({
 
 type ApplicationEventsProps = {
   applicationEvents: ApplicationEventNode[] | null;
-  reservationUnit: ReservationUnitByPkType;
+  reservationUnit: ReservationUnitNode;
 };
 
 /// TODO what is this doing? when is it shown and what does it look like?

@@ -20,7 +20,6 @@ import {
   type ReservationType,
   type ReservationUnitByPkType,
   type ReservationUnitsReservationUnitReservationStartIntervalChoices,
-  type ReservationUnitType,
   ReservationState,
 } from "../../types/gql-types";
 import {
@@ -29,6 +28,7 @@ import {
   type ApplicationEvent,
   type OptionType,
   type PendingReservation,
+  type ReservationUnitNode,
 } from "../../types/common";
 import {
   convertHMSToSeconds,
@@ -609,7 +609,7 @@ export const isReservationUnitReservable = (
 };
 
 export const isReservationStartInFuture = (
-  reservationUnit: ReservationUnitType | ReservationUnitByPkType,
+  reservationUnit: ReservationUnitNode,
   now = new Date()
 ): boolean => {
   const bufferDays = reservationUnit.reservationsMaxDaysBefore || 0;
@@ -622,7 +622,7 @@ export const isReservationStartInFuture = (
 };
 
 export const getNormalizedReservationBeginTime = (
-  reservationUnit: ReservationUnitType | ReservationUnitByPkType
+  reservationUnit: ReservationUnitNode
 ): string => {
   const bufferDays = reservationUnit.reservationsMaxDaysBefore || 0;
   const negativeBuffer = Math.abs(bufferDays) * -1;
@@ -695,7 +695,7 @@ export const getNewReservation = ({
   end,
   reservationUnit,
 }: {
-  reservationUnit: ReservationUnitByPkType;
+  reservationUnit: ReservationUnitNode;
   start: Date;
   end: Date;
 }): PendingReservation => {

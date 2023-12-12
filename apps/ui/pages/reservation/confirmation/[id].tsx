@@ -102,7 +102,7 @@ const ReservationSuccess = ({ reservationPk }: Props) => {
     );
   }
 
-  const reservationUnit = reservation?.reservationUnits?.[0] ?? undefined;
+  const reservationUnit = reservation?.reservationUnits?.[0] ?? null;
 
   return (
     <StyledContainer size="s">

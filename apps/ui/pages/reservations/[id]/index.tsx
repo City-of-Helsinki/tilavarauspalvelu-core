@@ -268,7 +268,7 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
     orderUuid: reservation?.orderUuid ?? "",
   });
 
-  const reservationUnit = reservation?.reservationUnits?.[0];
+  const reservationUnit = reservation?.reservationUnits?.[0] ?? null;
   const instructionsKey =
     reservation?.state != null
       ? getReservationUnitInstructionsKey(reservation.state)

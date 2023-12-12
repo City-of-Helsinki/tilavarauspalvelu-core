@@ -1,32 +1,29 @@
 import { useSessionStorage } from "react-use";
-import {
-  ReservationUnitByPkType,
-  ReservationUnitType,
-} from "common/types/gql-types";
+import type { ReservationUnitNode } from "common";
 
-export type ReservationUnitUnion = ReservationUnitType | ReservationUnitByPkType
+// export type ReservationUnitUnion = ReservationUnitType | ReservationUnitByPkType
 export type ReservationUnitList = {
-  reservationUnits: ReservationUnitUnion[];
-  selectReservationUnit: (ru: ReservationUnitUnion) => void;
-  containsReservationUnit: (ru: ReservationUnitUnion) => boolean;
-  removeReservationUnit: (ru: ReservationUnitUnion) => void;
+  reservationUnits: ReservationUnitNode[];
+  selectReservationUnit: (ru: ReservationUnitNode) => void;
+  containsReservationUnit: (ru: ReservationUnitNode) => boolean;
+  removeReservationUnit: (ru: ReservationUnitNode) => void;
   clearSelections: () => void;
 };
 
 const useReservationUnitsList = (): ReservationUnitList => {
-  const [reservationUnits, setReservationUnits] = useSessionStorage<ReservationUnitUnion[]>(
+  const [reservationUnits, setReservationUnits] = useSessionStorage<ReservationUnitNode[]>(
     "reservationUnitList",
     []
   );
 
-  const selectReservationUnit = (reservationUnit: ReservationUnitUnion) => {
+  const selectReservationUnit = (reservationUnit: ReservationUnitNode) => {
     setReservationUnits([
       ...(reservationUnits),
       reservationUnit,
     ]);
   };
 
-  const removeReservationUnit = (reservationUnit: ReservationUnitUnion) => {
+  const removeReservationUnit = (reservationUnit: ReservationUnitNode) => {
     if (!reservationUnits) {
       return;
     }
@@ -40,7 +37,7 @@ const useReservationUnitsList = (): ReservationUnitList => {
   };
 
   const containsReservationUnit = (
-    reservationUnit: ReservationUnitUnion
+    reservationUnit: ReservationUnitNode
   ): boolean =>
     reservationUnits
       ? reservationUnits.some((ru) => ru.pk === reservationUnit.pk)

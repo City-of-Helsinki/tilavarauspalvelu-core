@@ -1,3 +1,8 @@
+import type { ReservationUnitByPkType, ReservationUnitType } from "./gql-types";
+
+// backend / generation problem: there is separate types for list and singular queries
+// these types have 100% overlap but are not compatible
+export type ReservationUnitNode = ReservationUnitByPkType | ReservationUnitType;
 export type CalendarBufferEvent = {
   state: "BUFFER";
 };
