@@ -246,7 +246,7 @@ const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
       },
       {
         closed: false,
-        availableAt: addDays(today, 3),
+        availableAt: undefined,
       },
     ];
     return mockData[Math.floor(Math.random() * mockData.length)];
