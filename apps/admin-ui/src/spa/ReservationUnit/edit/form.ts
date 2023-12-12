@@ -477,7 +477,7 @@ export const convertReservationUnit = (
       ? format(new Date(data.publishBegins), "d.M.yyyy")
       : "",
     publishBeginsTime: data?.publishBegins
-      ? format(new Date(data.publishBegins), "h:mm")
+      ? format(new Date(data.publishBegins), "H:mm")
       : "",
     publishEndsDate: data?.publishEnds
       ? format(new Date(data.publishEnds), "d.M.yyyy")
