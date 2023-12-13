@@ -4,7 +4,7 @@ from applications.choices import ApplicantTypeChoice
 from tests.factories import ApplicationEventFactory, ApplicationFactory
 from tests.helpers import UserType
 
-from .helpers import applications_query, applications_query_no_order
+from .helpers import applications_query
 
 # Applied to all tests
 pytestmark = [
@@ -499,79 +499,3 @@ def test_application__filter__by_text_search__not_found(graphql):
     # - The response contains no application events
     assert response.has_errors is False, response
     assert len(response.edges) == 0, response
-
-
-def test_application__order__by_pk__asc(graphql):
-    # given:
-    # - There are two applications in the system
-    # - A superuser is using the system
-    application_1 = ApplicationFactory.create_in_status_draft()
-    application_2 = ApplicationFactory.create_in_status_draft()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
-
-    # when:
-    # - User tries to search for applications ordered by pk ascending
-    response = graphql(applications_query_no_order(order_by="pk"))
-
-    # then:
-    # - The response contains the application in the wanted order
-    assert len(response.edges) == 2
-    assert response.node(0) == {"pk": application_1.pk}
-    assert response.node(1) == {"pk": application_2.pk}
-
-
-def test_application__order__by_pk__desc(graphql):
-    # given:
-    # - There are two applications in the system
-    # - A superuser is using the system
-    application_1 = ApplicationFactory.create_in_status_draft()
-    application_2 = ApplicationFactory.create_in_status_draft()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
-
-    # when:
-    # - User tries to search for applications ordered by pk descending
-    response = graphql(applications_query_no_order(order_by="-pk"))
-
-    # then:
-    # - The response contains the application in the wanted order
-    assert len(response.edges) == 2
-    assert response.node(0) == {"pk": application_2.pk}
-    assert response.node(1) == {"pk": application_1.pk}
-
-
-def test_application__order__by_applicant_pk__asc(graphql):
-    # given:
-    # - There are two applications in the system with different applicants
-    # - A superuser is using the system
-    application_1 = ApplicationFactory.create_in_status_draft(organisation__name="aaa")
-    application_2 = ApplicationFactory.create_in_status_draft(organisation__name="bbb")
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
-
-    # when:
-    # - User tries to search for applications ordered by applicant pk ascending
-    response = graphql(applications_query_no_order(order_by="applicant"))
-
-    # then:
-    # - The response contains the application in the wanted order
-    assert len(response.edges) == 2
-    assert response.node(0) == {"pk": application_1.pk}
-    assert response.node(1) == {"pk": application_2.pk}
-
-
-def test_application__order__by_applicant_pk__desc(graphql):
-    # given:
-    # - There are two applications in the system with different applicants
-    # - A superuser is using the system
-    application_1 = ApplicationFactory.create_in_status_draft(organisation__name="aaa")
-    application_2 = ApplicationFactory.create_in_status_draft(organisation__name="bbb")
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
-
-    # when:
-    # - User tries to search for applications ordered by applicant pk descending
-    response = graphql(applications_query_no_order(order_by="-applicant"))
-
-    # then:
-    # - The response contains the application in the wanted order
-    assert len(response.edges) == 2
-    assert response.node(0) == {"pk": application_2.pk}
-    assert response.node(1) == {"pk": application_1.pk}

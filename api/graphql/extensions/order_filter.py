@@ -1,32 +1,45 @@
-from typing import Any
+from typing import Protocol
 
 import django_filters
 from django.db.models import QuerySet
 from django_filters.constants import EMPTY_VALUES
 
 
-class CustomOrderingFilter(django_filters.OrderingFilter):
-    """Ordering filter for handling custom 'order_by' filters."""
+class OrderingFunc(Protocol):
+    def __call__(self, qs: QuerySet, *, desc: bool) -> QuerySet:
+        """Custom ordering function."""
 
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        self.custom_fields: dict[str, str] = self.normalize_fields(kwargs.pop("custom_fields", {}))
-        super().__init__(*args, **kwargs)
-        self.extra["choices"] += self.build_choices(self.custom_fields, {})
+
+class CustomOrderingFilter(django_filters.OrderingFilter):
+    """
+    Ordering filter for handling custom orderings by defining `order_by_{name}`
+    functions on its subclasses or filtersets that include the filter.
+    """
 
     def filter(self, qs: QuerySet, value: list[str]) -> QuerySet:
         if value in EMPTY_VALUES:
             return qs
 
-        for item in value.copy():
-            desc: bool = False
-            if item.startswith("-"):
-                item = item.removeprefix("-")
-                desc = True
-
-            if item not in self.custom_fields:
+        ordering: list[str] = []
+        for param in value:
+            if param in EMPTY_VALUES:
                 continue
 
-            value.remove(f"-{item}" if desc else item)
-            qs = getattr(self, f"order_by_{item}")(qs, desc=desc)
+            func_name = f"order_by_{param.removeprefix('-')}"
 
-        return super().filter(qs, value)
+            # Try to find an `ordering_func` on the `OrderingFilter` class or its `FilterSet` class.
+            ordering_func: OrderingFunc | None = getattr(self, func_name, None)
+            if ordering_func is None and hasattr(self, "parent"):
+                ordering_func = getattr(self.parent, func_name, None)
+
+            # If no `ordering_func` was found, just order by the given field name.
+            if ordering_func is None or not callable(ordering_func):
+                ordering.append(self.get_ordering_value(param))
+                continue
+
+            qs = ordering_func(qs, desc=param.startswith("-"))
+            # Save the order_by value wince the last `qs.order_by(*ordering)`
+            # will clear all ordering when set called.
+            ordering.extend(qs.query.order_by)
+
+        return qs.order_by(*ordering)
