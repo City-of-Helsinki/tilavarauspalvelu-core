@@ -9,6 +9,7 @@ from tests.factories import AbilityGroupFactory, AgeGroupFactory, ReservationPur
 from tests.gql_builders import build_mutation, build_query
 
 events_query = partial(build_query, "applicationEvents", connection=True, order_by="pk")
+events_query_no_ordering = partial(build_query, "applicationEvents", connection=True)
 
 CREATE_MUTATION = build_mutation(
     "createApplicationEvent",

@@ -19,7 +19,7 @@ pytestmark = [
 ]
 
 
-def test_can_filter_application_event__by_pk(graphql):
+def test_application_event__filter__by_pk(graphql):
     # given:
     # - There is draft application in an open application round with two application events
     # - The owner of the application is using the system
@@ -39,7 +39,7 @@ def test_can_filter_application_event__by_pk(graphql):
     assert response.node(0) == {"pk": event_1.pk}
 
 
-def test_can_filter_application_event__by_pk__multiple(graphql):
+def test_application_event__filter__by_pk__multiple(graphql):
     # given:
     # - There is draft application in an open application round with two application events
     # - The owner of the application is using the system
@@ -60,7 +60,7 @@ def test_can_filter_application_event__by_pk__multiple(graphql):
     assert response.node(1) == {"pk": event_2.pk}
 
 
-def test_can_filter_application_event__by_name(graphql):
+def test_application_event__filter__by_name(graphql):
     # given:
     # - There is a draft application in an application round with three application events
     # - A superuser is using the system
@@ -82,7 +82,7 @@ def test_can_filter_application_event__by_name(graphql):
     assert response.node(1) == {"pk": event_2.pk}
 
 
-def test_can_filter_application_event__by_application(graphql):
+def test_application_event__filter__by_application(graphql):
     # given:
     # - There are two draft application in the same application round with one application event each
     # - A superuser is using the system
@@ -103,7 +103,7 @@ def test_can_filter_application_event__by_application(graphql):
     assert response.node(0) == {"pk": event_1.pk}
 
 
-def test_can_filter_application_event__by_application_round(graphql):
+def test_application_event__filter__by_application_round(graphql):
     # given:
     # - There are two draft application in different application rounds with one application event each
     # - A superuser is using the system
@@ -124,7 +124,7 @@ def test_can_filter_application_event__by_application_round(graphql):
     assert response.node(0) == {"pk": event_1.pk}
 
 
-def test_can_filter_application_event__by_unit(graphql):
+def test_application_event__filter__by_unit(graphql):
     # given:
     # - There is a draft application in an application round with two application events
     # - A superuser is using the system
@@ -152,7 +152,7 @@ def test_can_filter_application_event__by_unit(graphql):
     assert response.node(0) == {"pk": event_1.pk}
 
 
-def test_can_filter_application_event__by_unit__multiple(graphql):
+def test_application_event__filter__by_unit__multiple(graphql):
     # given:
     # - There is a draft application in an application round with two application events
     # - A superuser is using the system
@@ -187,7 +187,7 @@ def test_can_filter_application_event__by_unit__multiple(graphql):
     assert response.node(1) == {"pk": event_2.pk}
 
 
-def test_can_filter_application_event__by_reservation_unit(graphql):
+def test_application_event__filter__by_reservation_unit(graphql):
     # given:
     # - There is a draft application in an application round with two application events
     # - A superuser is using the system
@@ -215,7 +215,7 @@ def test_can_filter_application_event__by_reservation_unit(graphql):
     assert response.node(0) == {"pk": event_1.pk}
 
 
-def test_can_filter_application_event__by_reservation_unit__multiple(graphql):
+def test_application_event__filter__by_reservation_unit__multiple(graphql):
     # given:
     # - There is a draft application in an application round with two application events
     # - A superuser is using the system
@@ -250,7 +250,7 @@ def test_can_filter_application_event__by_reservation_unit__multiple(graphql):
     assert response.node(1) == {"pk": event_2.pk}
 
 
-def test_can_filter_application_event__by_user(graphql):
+def test_application_event__filter__by_user(graphql):
     # given:
     # - There is a draft application in an application round with three application events
     # - A superuser is using the system
@@ -271,7 +271,7 @@ def test_can_filter_application_event__by_user(graphql):
     assert response.node(0) == {"pk": event_1.pk}
 
 
-def test_can_filter_application_event__by_applicant_type(graphql):
+def test_application_event__filter__by_applicant_type(graphql):
     # given:
     # - There is a draft application in an application round with three application events
     # - A superuser is using the system
@@ -292,7 +292,7 @@ def test_can_filter_application_event__by_applicant_type(graphql):
     assert response.node(0) == {"pk": event_1.pk}
 
 
-def test_can_filter_application_event__by_applicant_type__multiple(graphql):
+def test_application_event__filter__by_applicant_type__multiple(graphql):
     # given:
     # - There is a draft application in an application round with three application events
     # - A superuser is using the system
@@ -314,7 +314,7 @@ def test_can_filter_application_event__by_applicant_type__multiple(graphql):
     assert response.node(1) == {"pk": event_2.pk}
 
 
-def test_can_filter_application_event__by_status(graphql):
+def test_application_event__filter__by_status(graphql):
     # given:
     # - There is a draft application in an application round with two application events with different statuses
     # - A superuser is using the system
@@ -341,7 +341,7 @@ def test_can_filter_application_event__by_status(graphql):
     assert response.node(0) == {"pk": event_1.pk}
 
 
-def test_can_filter_application_event__by_status__multiple(graphql):
+def test_application_event__filter__by_status__multiple(graphql):
     # given:
     # - There is a draft application in an application round with two application events with different statuses
     # - A superuser is using the system
@@ -369,7 +369,7 @@ def test_can_filter_application_event__by_status__multiple(graphql):
     assert response.node(1) == {"pk": event_2.pk}
 
 
-def test_can_filter_application_event__by_application_status(graphql):
+def test_application_event__filter__by_application_status(graphql):
     # given:
     # - There are two applications in different statuses in the same application round with one application event each
     # - A superuser is using the system
@@ -397,7 +397,7 @@ def test_can_filter_application_event__by_application_status(graphql):
     assert response.node(0) == {"pk": event_1.pk}
 
 
-def test_can_filter_application_event__by_application_status__multiple(graphql):
+def test_application_event__filter__by_application_status__multiple(graphql):
     # given:
     # - There are two applications in different statuses in the same application round with one application event each
     # - A superuser is using the system
@@ -426,7 +426,7 @@ def test_can_filter_application_event__by_application_status__multiple(graphql):
     assert response.node(1) == {"pk": event_2.pk}
 
 
-def test_can_filter_application_event__by_priority(graphql):
+def test_application_event__filter__by_priority(graphql):
     # given:
     # - There is a draft application with application events with different priorities
     # - A superuser is using the system
@@ -458,7 +458,7 @@ def test_can_filter_application_event__by_priority(graphql):
     assert response.node(0) == {"pk": event_1.pk}
 
 
-def test_can_filter_application_event__by_priority__multiple(graphql):
+def test_application_event__filter__by_priority__multiple(graphql):
     # given:
     # - There is a draft application with application events with different priorities
     # - A superuser is using the system
@@ -491,7 +491,7 @@ def test_can_filter_application_event__by_priority__multiple(graphql):
     assert response.node(1) == {"pk": event_2.pk}
 
 
-def test_can_filter_application_event__by_preferred_order(graphql):
+def test_application_event__filter__by_preferred_order(graphql):
     # given:
     # - There is a draft application with application events with different preferred orders
     # - A superuser is using the system
@@ -523,7 +523,7 @@ def test_can_filter_application_event__by_preferred_order(graphql):
     assert response.node(0) == {"pk": event_1.pk}
 
 
-def test_can_filter_application_event__by_preferred_order__multiple(graphql):
+def test_application_event__filter__by_preferred_order__multiple(graphql):
     # given:
     # - There is a draft application with application events with different preferred orders
     # - A superuser is using the system
@@ -556,7 +556,7 @@ def test_can_filter_application_event__by_preferred_order__multiple(graphql):
     assert response.node(1) == {"pk": event_2.pk}
 
 
-def test_can_filter_application_event__by_include_preferred_order_10_or_higher(graphql):
+def test_application_event__filter__by_include_preferred_order_10_or_higher(graphql):
     # given:
     # - There is a draft application with application events with different preferred orders (some of which are 10+)
     # - A superuser is using the system
@@ -593,7 +593,7 @@ def test_can_filter_application_event__by_include_preferred_order_10_or_higher(g
     assert response.node(1) == {"pk": event_4.pk}
 
 
-def test_can_filter_application_event__by_include_preferred_order_10_or_higher__with_higher(graphql):
+def test_application_event__filter__by_include_preferred_order_10_or_higher__with_higher(graphql):
     # given:
     # - There is a draft application with application events with different preferred orders (some of which are 10+)
     # - A superuser is using the system
@@ -631,7 +631,7 @@ def test_can_filter_application_event__by_include_preferred_order_10_or_higher__
     assert response.node(2) == {"pk": event_4.pk}
 
 
-def test_can_filter_application_event__by_home_city(graphql):
+def test_application_event__filter__by_home_city(graphql):
     # given:
     # - There are two application with different home cities, each with one application event
     # - A superuser is using the system
@@ -656,7 +656,7 @@ def test_can_filter_application_event__by_home_city(graphql):
     assert response.node(0) == {"pk": event_1.pk}
 
 
-def test_can_filter_application_event__by_home_city__multiple(graphql):
+def test_application_event__filter__by_home_city__multiple(graphql):
     # given:
     # - There are two application with different home cities, each with one application event
     # - A superuser is using the system
@@ -682,7 +682,7 @@ def test_can_filter_application_event__by_home_city__multiple(graphql):
     assert response.node(1) == {"pk": event_2.pk}
 
 
-def test_can_filter_application_event__by_age_group(graphql):
+def test_application_event__filter__by_age_group(graphql):
     # given:
     # - There is an application with two application events with different age groups
     # - A superuser is using the system
@@ -706,7 +706,7 @@ def test_can_filter_application_event__by_age_group(graphql):
     assert response.node(0) == {"pk": event_1.pk}
 
 
-def test_can_filter_application_event__by_age_group__multiple(graphql):
+def test_application_event__filter__by_age_group__multiple(graphql):
     # given:
     # - There is an application with two application events with different age groups
     # - A superuser is using the system
@@ -731,7 +731,7 @@ def test_can_filter_application_event__by_age_group__multiple(graphql):
     assert response.node(1) == {"pk": event_2.pk}
 
 
-def test_can_filter_application_event__by_purpose(graphql):
+def test_application_event__filter__by_purpose(graphql):
     # given:
     # - There is an application with two application events with different reservation purposes
     # - A superuser is using the system
@@ -755,7 +755,7 @@ def test_can_filter_application_event__by_purpose(graphql):
     assert response.node(0) == {"pk": event_1.pk}
 
 
-def test_can_filter_application_event__by_purpose__multiple(graphql):
+def test_application_event__filter__by_purpose__multiple(graphql):
     # given:
     # - There is an application with two application events with different reservation purposes
     # - A superuser is using the system
@@ -780,7 +780,7 @@ def test_can_filter_application_event__by_purpose__multiple(graphql):
     assert response.node(1) == {"pk": event_2.pk}
 
 
-def test_can_filter_application_event__by_text_search__event_name(graphql):
+def test_application_event__filter__by_text_search__event_name(graphql):
     # given:
     # - There is an application with two application events
     # - A superuser is using the system
@@ -802,7 +802,7 @@ def test_can_filter_application_event__by_text_search__event_name(graphql):
     assert response.node(0) == {"pk": event_1.pk}
 
 
-def test_can_filter_application_event__by_text_search__event_name__prefix(graphql):
+def test_application_event__filter__by_text_search__event_name__prefix(graphql):
     # given:
     # - There is an application with two application events
     # - A superuser is using the system
@@ -824,7 +824,7 @@ def test_can_filter_application_event__by_text_search__event_name__prefix(graphq
     assert response.node(0) == {"pk": event_1.pk}
 
 
-def test_can_filter_application_event__by_text_search__event_name__has_quotes(graphql):
+def test_application_event__filter__by_text_search__event_name__has_quotes(graphql):
     # given:
     # - There is an application with two application events
     # - A superuser is using the system
@@ -846,7 +846,7 @@ def test_can_filter_application_event__by_text_search__event_name__has_quotes(gr
     assert response.node(0) == {"pk": event_1.pk}
 
 
-def test_can_filter_application_event__by_text_search__applicant__organisation_name(graphql):
+def test_application_event__filter__by_text_search__applicant__organisation_name(graphql):
     # given:
     # - There is an application with two application events
     # - A superuser is using the system
@@ -871,7 +871,7 @@ def test_can_filter_application_event__by_text_search__applicant__organisation_n
     assert response.node(0) == {"pk": event.pk}
 
 
-def test_can_filter_application_event__by_text_search__applicant__contact_person_first_name(graphql):
+def test_application_event__filter__by_text_search__applicant__contact_person_first_name(graphql):
     # given:
     # - There is an application with two application events
     # - A superuser is using the system
@@ -897,7 +897,7 @@ def test_can_filter_application_event__by_text_search__applicant__contact_person
     assert response.node(0) == {"pk": event.pk}
 
 
-def test_can_filter_application_event__by_text_search__applicant__contact_person_last_name(graphql):
+def test_application_event__filter__by_text_search__applicant__contact_person_last_name(graphql):
     # given:
     # - There is an application with two application events
     # - A superuser is using the system
@@ -923,7 +923,7 @@ def test_can_filter_application_event__by_text_search__applicant__contact_person
     assert response.node(0) == {"pk": event.pk}
 
 
-def test_can_filter_application_event__by_text_search__applicant__user_first_name(graphql):
+def test_application_event__filter__by_text_search__applicant__user_first_name(graphql):
     # given:
     # - There is an application with two application events
     # - A superuser is using the system
@@ -949,7 +949,7 @@ def test_can_filter_application_event__by_text_search__applicant__user_first_nam
     assert response.node(0) == {"pk": event.pk}
 
 
-def test_can_filter_application_event__by_text_search__applicant__user_last_name(graphql):
+def test_application_event__filter__by_text_search__applicant__user_last_name(graphql):
     # given:
     # - There is an application with two application events
     # - A superuser is using the system
@@ -975,7 +975,7 @@ def test_can_filter_application_event__by_text_search__applicant__user_last_name
     assert response.node(0) == {"pk": event.pk}
 
 
-def test_can_filter_application_event__by_text_search__event_id(graphql):
+def test_application_event__filter__by_text_search__event_id(graphql):
     # given:
     # - There is an application with two application events
     # - A superuser is using the system
@@ -997,7 +997,7 @@ def test_can_filter_application_event__by_text_search__event_id(graphql):
     assert response.node(0) == {"pk": event_1.pk}
 
 
-def test_can_filter_application_event__by_text_search__application_id(graphql):
+def test_application_event__filter__by_text_search__application_id(graphql):
     # given:
     # - There are two applications with one application events each
     # - A superuser is using the system
@@ -1020,7 +1020,7 @@ def test_can_filter_application_event__by_text_search__application_id(graphql):
     assert response.node(0) == {"pk": event_1.pk}
 
 
-def test_can_filter_application_event__by_text_search__not_found(graphql):
+def test_application_event__filter__by_text_search__not_found(graphql):
     # given:
     # - There is an application with two application events
     # - A superuser is using the system
