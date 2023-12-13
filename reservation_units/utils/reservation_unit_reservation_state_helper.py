@@ -134,7 +134,7 @@ class ReservationUnitReservationStateHelper:
                 and reservation_unit.reservation_begins <= now
             )
             # Reservations begin somewhere in the past (or right now),
-            # and end in the past, but begin before they end
+            # and end in the past, but begin after they end
             or (
                 reservation_unit.reservation_ends is not None
                 and reservation_unit.reservation_begins is not None
