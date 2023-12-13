@@ -20,6 +20,6 @@ def raw_prefixed_query(text: str) -> SearchQuery:
     https://www.postgresql.org/docs/current/datatype-textsearch.html#DATATYPE-TSQUERY
     """
     return SearchQuery(
-        " | ".join(f"'{val}':*" for value in text.split(" ") if (val := value.strip().replace("'", "''")) != ""),
+        " | ".join(f"""'{value.replace("'", "''")}':*""" for value in text.split(" ") if value != ""),
         search_type="raw",
     )
