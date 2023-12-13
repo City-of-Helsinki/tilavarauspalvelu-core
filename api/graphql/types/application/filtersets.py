@@ -2,7 +2,9 @@ import django_filters
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.search import SearchVector
 from django.db import models
+from django.db.models import QuerySet
 
+from api.graphql.extensions.order_filter import CustomOrderingFilter
 from applications.choices import ApplicantTypeChoice, ApplicationStatusChoice
 from applications.models import Application
 from applications.querysets.application import ApplicationQuerySet
@@ -22,13 +24,23 @@ class ApplicationFilterSet(BaseModelFilterSet):
 
     text_search = django_filters.CharFilter(method="filter_by_text_search")
 
-    order_by = django_filters.OrderingFilter(fields=["pk", "applicant"])
+    order_by = CustomOrderingFilter(
+        fields=[
+            "pk",
+            "applicant",
+            "applicant_type",
+            "preferred_unit_name_fi",
+            "preferred_unit_name_en",
+            "preferred_unit_name_sv",
+            "application_status",
+        ]
+    )
 
     class Meta:
         model = Application
         fields = []
 
-    def filter_queryset(self, queryset: ApplicationQuerySet) -> ApplicationQuerySet:
+    def filter_queryset(self, queryset: ApplicationQuerySet) -> QuerySet:
         return super().filter_queryset(queryset.with_applicant_alias())
 
     @staticmethod
@@ -40,5 +52,25 @@ class ApplicationFilterSet(BaseModelFilterSet):
         return qs.annotate(search=vector).filter(search=query)
 
     @staticmethod
-    def filter_by_status(qs: ApplicationQuerySet, name: str, value: list[str]) -> ApplicationQuerySet:
+    def filter_by_status(qs: ApplicationQuerySet, name: str, value: list[str]) -> QuerySet:
         return qs.has_status_in(value)
+
+    @staticmethod
+    def order_by_applicant_type(qs: ApplicationQuerySet, desc: bool) -> QuerySet:
+        return qs.order_by_applicant_type(desc)
+
+    @staticmethod
+    def order_by_preferred_unit_name_fi(qs: ApplicationQuerySet, desc: bool) -> QuerySet:
+        return qs.order_by_preferred_unit_name(lang="fi", desc=desc)
+
+    @staticmethod
+    def order_by_preferred_unit_name_en(qs: ApplicationQuerySet, desc: bool) -> QuerySet:
+        return qs.order_by_preferred_unit_name(lang="en", desc=desc)
+
+    @staticmethod
+    def order_by_preferred_unit_name_sv(qs: ApplicationQuerySet, desc: bool) -> QuerySet:
+        return qs.order_by_preferred_unit_name(lang="sv", desc=desc)
+
+    @staticmethod
+    def order_by_application_status(qs: ApplicationQuerySet, desc: bool) -> QuerySet:
+        return qs.order_by_application_status(desc=desc)

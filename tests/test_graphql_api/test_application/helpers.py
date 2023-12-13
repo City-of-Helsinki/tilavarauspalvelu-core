@@ -15,7 +15,6 @@ from tests.factories import (
 from tests.gql_builders import build_mutation, build_query
 
 applications_query = partial(build_query, "applications", connection=True, order_by="pk")
-applications_query_no_order = partial(build_query, "applications", connection=True)
 
 CREATE_MUTATION = build_mutation(
     "createApplication",
