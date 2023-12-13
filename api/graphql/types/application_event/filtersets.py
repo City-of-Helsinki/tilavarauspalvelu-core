@@ -1,13 +1,14 @@
 from typing import TypedDict
 
 import django_filters
-from django.contrib.postgres.search import SearchQuery, SearchVector
+from django.contrib.postgres.search import SearchVector
 from django.db import models
 from django.db.models import QuerySet
 
 from applications.choices import ApplicantTypeChoice, ApplicationEventStatusChoice, ApplicationStatusChoice
 from applications.models import ApplicationEvent
 from applications.querysets.application_event import ApplicationEventQuerySet
+from common.db import raw_prefixed_query
 from common.filtersets import (
     BaseModelFilterSet,
     EnumMultipleChoiceFilter,
@@ -84,11 +85,5 @@ class ApplicationEventFilterSet(BaseModelFilterSet):
         # If this becomes slow, look into optimisation strategies here:
         # https://docs.djangoproject.com/en/4.2/ref/contrib/postgres/search/#performance
         vector = SearchVector("application__id", "id", "name", "applicant")
-        # Create a query that searches for each word separately and matched partial words if match is a prefix.
-        # Remove any whitespace and replace any single quote mark with two quote marks.
-        # https://www.postgresql.org/docs/current/datatype-textsearch.html#DATATYPE-TSQUERY
-        terms = " | ".join(
-            f"'{val}':*" for value in value.split(" ") if (val := value.strip().replace("'", "''")) != ""
-        )
-        query = SearchQuery(terms, search_type="raw")
+        query = raw_prefixed_query(value)
         return qs.annotate(search=vector).filter(search=query)
