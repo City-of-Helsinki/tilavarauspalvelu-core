@@ -5,6 +5,7 @@ from django.contrib.postgres.search import SearchVector
 from django.db import models
 from django.db.models import QuerySet
 
+from api.graphql.extensions.order_filter import CustomOrderingFilter
 from applications.choices import ApplicantTypeChoice, ApplicationEventStatusChoice, ApplicationStatusChoice
 from applications.models import ApplicationEvent
 from applications.querysets.application_event import ApplicationEventQuerySet
@@ -43,7 +44,21 @@ class ApplicationEventFilterSet(BaseModelFilterSet):
 
     text_search = django_filters.CharFilter(method="filter_text_search")
 
-    order_by = django_filters.OrderingFilter(fields=["pk", "applicant", "name_fi", "name_en", "name_sv"])
+    order_by = CustomOrderingFilter(
+        fields=[
+            "pk",
+            ("application__id", "application_id"),
+            "applicant",
+            "name_fi",
+            "name_en",
+            "name_sv",
+            "status",
+            "application_status",
+            "preferred_unit_name_fi",
+            "preferred_unit_name_en",
+            "preferred_unit_name_sv",
+        ],
+    )
 
     class Meta:
         model = ApplicationEvent
@@ -87,3 +102,23 @@ class ApplicationEventFilterSet(BaseModelFilterSet):
         vector = SearchVector("application__id", "id", "name", "applicant")
         query = raw_prefixed_query(value)
         return qs.annotate(search=vector).filter(search=query)
+
+    @staticmethod
+    def order_by_status(qs: ApplicationEventQuerySet, desc: bool) -> QuerySet:
+        return qs.order_by_application_event_status(desc=desc)
+
+    @staticmethod
+    def order_by_application_status(qs: ApplicationEventQuerySet, desc: bool) -> QuerySet:
+        return qs.order_by_application_status(desc=desc)
+
+    @staticmethod
+    def order_by_preferred_unit_name_fi(qs: ApplicationEventQuerySet, desc: bool) -> QuerySet:
+        return qs.order_by_preferred_unit_name(lang="fi", desc=desc)
+
+    @staticmethod
+    def order_by_preferred_unit_name_en(qs: ApplicationEventQuerySet, desc: bool) -> QuerySet:
+        return qs.order_by_preferred_unit_name(lang="en", desc=desc)
+
+    @staticmethod
+    def order_by_preferred_unit_name_sv(qs: ApplicationEventQuerySet, desc: bool) -> QuerySet:
+        return qs.order_by_preferred_unit_name(lang="sv", desc=desc)

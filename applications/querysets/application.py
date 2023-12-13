@@ -40,27 +40,15 @@ class ApplicationQuerySet(models.QuerySet):
             models.OrderBy(models.F("preferred_unit_name"), descending=desc),
         )
 
-    def preferred_unit_name_alias(self, lang: Literal["fi", "en", "sv"]) -> Self:
-        from applications.models import ApplicationEvent, EventReservationUnit
+    def preferred_unit_name_alias(self, *, lang: Literal["fi", "en", "sv"]) -> Self:
+        from applications.models import ApplicationEvent
 
         return self.alias(
             preferred_unit_name=Subquery(
                 queryset=(
                     ApplicationEvent.objects.filter(application=models.OuterRef("pk"))
-                    .annotate(
-                        preferred_unit_name=Subquery(
-                            queryset=(
-                                EventReservationUnit.objects.filter(
-                                    application_event=models.OuterRef("pk"),
-                                    preferred_order=0,
-                                )
-                                .select_related("reservation_unit__unit")
-                                # Name of the unit of the preferred reservation unit
-                                .values(f"reservation_unit__unit__name_{lang}")[:1]
-                            ),
-                            output_field=models.CharField(),
-                        ),
-                    )
+                    .preferred_unit_name_alias(lang=lang)
+                    .annotate(preferred_unit_name=models.F("preferred_unit_name"))
                     # Name of the unit of the preferred reservation unit
                     # of the first event created for this application
                     .order_by("pk")
