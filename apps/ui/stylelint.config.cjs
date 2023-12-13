@@ -1,9 +1,5 @@
 module.exports ={
-  processors: ["stylelint-processor-styled-components"],
-  extends: [
-    "stylelint-config-standard",
-    "stylelint-config-styled-components",
-  ],
+  extends: ["stylelint-config-standard"],
   customSyntax: "postcss-styled-syntax",
   ignore: [
     "hooks",
@@ -11,6 +7,7 @@ module.exports ={
   ],
   rules: {
     // temp rules after upgrade
+    "no-empty-source": null,
     "media-query-no-invalid": null,
     "selector-pseudo-element-colon-notation": null,
     "alpha-value-notation": "number",

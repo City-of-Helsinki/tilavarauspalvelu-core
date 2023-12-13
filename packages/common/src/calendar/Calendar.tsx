@@ -259,7 +259,7 @@ const StyledCalendar = styled(BigCalendar)<{
               content: "";
               position: absolute;
               width: calc(100% + 4px);
-              top: 0px;
+              top: 0;
               left: -4px;
             }
           }
@@ -286,8 +286,7 @@ const StyledCalendar = styled(BigCalendar)<{
   }
 
   .rbc-time-view {
-    overflow-x: scroll;
-    overflow-y: hidden;
+    overflow: scroll hidden;
 
     @media (min-width: ${(props) => props.overflowBreakpoint}) {
       overflow-x: auto;

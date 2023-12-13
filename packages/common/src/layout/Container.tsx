@@ -15,11 +15,13 @@ const Wrapper = styled.div.attrs(() => ({}))<{ $size: Size }>`
   margin: 0 auto;
   padding-right: var(--spacing-s);
   padding-left: var(--spacing-s);
+
   --spacing-hz: var(--spacing-s);
 
   @media (min-width: ${breakpoints.m}) {
     padding-right: var(--spacing-m);
     padding-left: var(--spacing-m);
+
     --spacing-hz: var(--spacing-m);
   }
 `;

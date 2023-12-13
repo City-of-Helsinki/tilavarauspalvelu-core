@@ -39,6 +39,7 @@ const StyledLink = styled(Link)`
 const StyledLinkButton = styled.button`
   background: none;
   border: none;
+  /* stylelint-disable-next-line property-no-vendor-prefix -- iOS problems */
   -webkit-appearance: none;
   padding: 0;
   ${linkStyles}

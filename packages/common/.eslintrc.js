@@ -12,7 +12,13 @@ module.exports = {
     jest: true,
     node: true,
   },
-  ignorePatterns: ["node_modules", "dist", "email", "types/gql-types.ts"],
+  ignorePatterns: [
+    "node_modules",
+    "dist",
+    "email",
+    "types/gql-types.ts",
+    "stylelint.config.js",
+  ],
   overrides: [
     {
       files: [".eslintrc.js", ".eslintrc.cjs"],

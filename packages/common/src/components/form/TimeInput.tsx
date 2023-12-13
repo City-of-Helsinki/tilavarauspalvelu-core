@@ -11,7 +11,7 @@ const TimeInputContainer = styled.div`
   display: flex;
   flex-direction: column;
 
-  /* iOS problems */
+  /* stylelint-disable-next-line property-no-vendor-prefix -- iOS problems */
   -webkit-appearance: none;
   border-radius: 0;
 

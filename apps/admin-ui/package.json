@@ -95,12 +95,11 @@
     "jest-environment-jsdom": "^29.7.0",
     "lint-staged": "^13.3.0",
     "postcss-scss": "^4.0.9",
-    "postcss-styled-syntax": "^0.4.0",
+    "postcss-styled-syntax": "^0.5.0",
     "prettier": "^2.8.8",
-    "stylelint": "^15.11.0",
-    "stylelint-config-standard": "^34.0.0",
+    "stylelint": "^16.0.2",
+    "stylelint-config-standard": "^35.0.0",
     "stylelint-config-styled-components": "^0.1.1",
-    "stylelint-value-no-unknown-custom-properties": "^4.0.0",
     "ts-jest": "^29.1.1",
     "typescript": "^5.2.2"
   }

@@ -300,15 +300,15 @@ const ToggleVisibilityBtn = styled(Button).attrs({
   iconLeft: <IconOpenAll aria-hidden />,
   style: BTN_STYLE,
 })<{ $isActive?: boolean }>`
+  svg {
+    ${({ $isActive }): string | false =>
+      $isActive ? "transform: rotate(180deg);" : ""}
+  }
+
   &:disabled {
     svg {
       opacity: 0.5;
     }
-  }
-
-  svg {
-    ${({ $isActive }): string | false =>
-      $isActive ? "transform: rotate(180deg);" : ""}
   }
 
   @media (min-width: ${breakpoints.xl}) {

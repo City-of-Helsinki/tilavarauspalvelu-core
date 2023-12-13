@@ -11,7 +11,7 @@
     "preinstall": "npx -y only-allow pnpm",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "lint:css": "echo 'FIXME stylelint'",
+    "lint:css": "stylelint './src/**/*.tsx'",
     "test": "echo 'FIXME common tests are broken'",
     "format": "prettier --ignore-path \"../.prettierignore\" --write \"**/*.{js,jsx,ts,tsx,json}\"",
     "generate-email-templates": "node ./email/convertToHTML.mjs",
@@ -71,10 +71,9 @@
     "jest-environment-jsdom": "^29.7.0",
     "mkdirp": "^1.0.4",
     "prettier": "^2.8.8",
-    "stylelint": "^14.16.1",
-    "stylelint-config-recommended": "^9.0.0",
+    "stylelint": "^16.0.2",
+    "stylelint-config-standard": "^35.0.0",
     "stylelint-config-styled-components": "^0.1.1",
-    "stylelint-processor-styled-components": "^1.10.0",
     "ts-jest": "^29.1.1",
     "typescript": "^5.2.2"
   }

@@ -20,10 +20,7 @@ const Wrapper = styled.div`
     content: "";
     display: block;
     position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: -5px;
+    inset: 0 0 0 -5px;
     z-index: 21;
   }
 
@@ -54,7 +51,7 @@ const Wrapper = styled.div`
     width: 100%;
     height: 50px;
 
-    @media (min-width: 810px) {
+    @media (width > 810px) {
       order: unset;
       width: 40%;
       height: unset;
@@ -122,7 +119,7 @@ const Wrapper = styled.div`
       width: 33.333%;
     }
 
-    @media (min-width: 400px) {
+    @media (width > 400px) {
       width: unset;
 
       button {
@@ -137,7 +134,7 @@ const ButtonWrapper = styled.div`
   gap: var(--spacing-s);
   order: 2;
 
-  @media (min-width: 400px) {
+  @media (width > 400px) {
     order: unset;
   }
 `;
