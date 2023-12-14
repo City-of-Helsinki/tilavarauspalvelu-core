@@ -3,7 +3,6 @@ from datetime import date, datetime, time, timedelta
 from django.db.models import QuerySet
 from django.utils.timezone import get_default_timezone
 
-from applications.choices import ApplicationRoundStatusChoice
 from opening_hours.models import ReservableTimeSpan
 from reservation_units.models import ReservationUnit
 
@@ -69,7 +68,7 @@ class ReservationUnitReservationScheduler:
             reservation_period_end__gte=end,
             reservation_period_begin__lte=start,
         ):
-            if app_round.status != ApplicationRoundStatusChoice.RESULTS_SENT:
+            if app_round.status.is_ongoing:
                 return app_round
 
         return None
