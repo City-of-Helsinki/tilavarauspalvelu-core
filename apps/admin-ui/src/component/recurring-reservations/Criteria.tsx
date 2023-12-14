@@ -9,7 +9,6 @@ import { type Query } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { Container } from "@/styles/layout";
 import { formatDate } from "@/common/util";
-import { publicUrl } from "@/common/const";
 import { useNotification } from "@/context/NotificationContext";
 import Loader from "@/component/Loader";
 import { Accordion } from "@/component/Accordion";
@@ -178,11 +177,11 @@ function Criteria({
     },
     {
       alias: t("breadcrumb.application-rounds"),
-      slug: `${publicUrl}/recurring-reservations/application-rounds`,
+      slug: `/recurring-reservations/application-rounds`,
     },
     {
       alias: title,
-      slug: `${publicUrl}/recurring-reservations/application-rounds/${applicationRound.pk}`,
+      slug: `/recurring-reservations/application-rounds/${applicationRound.pk}`,
     },
     {
       alias: t("breadcrumb.criteria"),

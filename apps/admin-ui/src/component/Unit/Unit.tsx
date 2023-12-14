@@ -23,7 +23,6 @@ import {
 } from "common/types/gql-types";
 import { UNIT_QUERY } from "@/common/queries";
 import { parseAddress } from "@/common/util";
-import { publicUrl } from "@/common/const";
 import { useNotification } from "@/context/NotificationContext";
 import { useModal } from "@/context/ModalContext";
 import { Container } from "@/styles/layout";
@@ -181,13 +180,14 @@ const Unit = (): JSX.Element | null => {
     },
     {
       alias: t("breadcrumb.units"),
-      slug: `${publicUrl}/premises-and-settings/units`,
+      slug: `/premises-and-settings/units`,
     },
     {
       slug: "",
       alias: unit?.nameFi || "-",
     },
   ];
+
   return (
     <>
       <BreadcrumbWrapper route={route} />

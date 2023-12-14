@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next";
 import { type Query } from "common/types/gql-types";
 import { useNotification } from "@/context/NotificationContext";
 import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
-import { publicUrl } from "@/common/const";
 import Loader from "@/component/Loader";
 import Review from "./review/Review";
 import { APPLICATION_ROUND_QUERY } from "./queries";
@@ -40,18 +39,24 @@ function ApplicationRound({
     return <div>{t("errors.applicationRoundNotFound")}</div>;
   }
 
+  const route = [
+    {
+      alias: t("breadcrumb.recurring-reservations"),
+      slug: "",
+    },
+    {
+      alias: t("breadcrumb.application-rounds"),
+      slug: `/recurring-reservations/application-rounds`,
+    },
+    {
+      alias: applicationRound.nameFi ?? "-",
+      slug: "",
+    },
+  ];
+
   return (
     <>
-      <BreadcrumbWrapper
-        route={[
-          "recurring-reservations",
-          `${publicUrl}/recurring-reservations/application-rounds`,
-          "application-round",
-        ]}
-        aliases={[
-          { slug: "application-round", title: applicationRound.nameFi ?? "-" },
-        ]}
-      />
+      <BreadcrumbWrapper route={route} />
       <Review applicationRound={applicationRound} />;
     </>
   );

@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { Button, Tabs as HDSTabs } from "hds-react";
 import { breakpoints } from "common/src/common/style";
-import { publicUrl } from "../../common/const";
 import { parseAddress } from "../../common/util";
 import { Container } from "../../styles/layout";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
@@ -79,12 +78,20 @@ const MyUnitView = () => {
     parseInt(unitId, 10)
   )}/recurring-reservation`;
 
+  const routes = [
+    {
+      slug: "/my-units",
+      alias: t("breadcrumb.my-units"),
+    },
+    {
+      slug: "",
+      alias: unit.nameFi ?? "unnamed unit",
+    },
+  ];
+
   return (
     <>
-      <BreadcrumbWrapper
-        route={[`${publicUrl}/my-units`, "unit"]}
-        aliases={[{ slug: "unit", title: unit.nameFi ?? "unnamed unit" }]}
-      />
+      <BreadcrumbWrapper route={routes} />
       <ContainerHack>
         <ContainerWithSpacing>
           <H1 $legacy>{unit?.nameFi}</H1>

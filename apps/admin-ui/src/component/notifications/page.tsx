@@ -35,7 +35,6 @@ import { fromUIDate } from "common/src/common/util";
 import { breakpoints } from "common";
 import { Container } from "app/styles/layout";
 import BreadcrumbWrapper from "app/component/BreadcrumbWrapper";
-import { publicUrl } from "app/common/const";
 import Loader from "app/component/Loader";
 import { useNotification } from "app/context/NotificationContext";
 import { ButtonLikeLink } from "app/component/ButtonLikeLink";
@@ -810,22 +809,25 @@ const PageWrapped = ({ pk }: { pk?: number }) => {
   const isNew = pk === 0;
   const name = getName(isNew, isLoading, notification?.name, t);
 
+  const route = [
+    {
+      slug: "",
+      alias: t("breadcrumb.messaging"),
+    },
+    {
+      slug: `/messaging/notifications`,
+      alias: t("breadcrumb.notifications"),
+    },
+    {
+      slug: "",
+      alias: name,
+    },
+  ];
+
   return (
     <>
       {/* TODO if new page should show "Back" button instead of breadcrumb */}
-      <BreadcrumbWrapper
-        route={[
-          { slug: "messaging" },
-          {
-            slug: `${publicUrl}/messaging/notifications`,
-            alias: t("breadcrumb.notifications"),
-          },
-          {
-            slug: "",
-            alias: name,
-          },
-        ]}
-      />
+      <BreadcrumbWrapper route={route} />
       <Container>
         {isLoading ? (
           <Loader />

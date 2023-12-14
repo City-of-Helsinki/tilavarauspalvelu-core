@@ -1,5 +1,5 @@
 import React, { ElementType, Fragment } from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { IconAngleLeft, IconAngleRight } from "hds-react";
 
 export type RouteItem = {
@@ -83,20 +83,14 @@ const Anchor = styled.a<{ $current?: boolean; $isMobile?: boolean }>`
   white-space: nowrap;
 `;
 
+const currentCss = css`
+  color: var(--color-black);
+  font-family: HelsinkiGrotesk-Medium, var(--font-default);
+  font-weight: 500;
+`;
+
 const Slug = styled.span<{ $current?: boolean }>`
-  ${({ $current }) => {
-    switch ($current) {
-      case true:
-        return `
-          color: var(--color-black);
-          font-family: HelsinkiGrotesk-Medium, var(--font-default);
-          font-weight: 500;
-        `;
-      case false:
-      default:
-        return ``;
-    }
-  }}
+  ${({ $current }) => $current && currentCss}
 
   white-space: nowrap;
 `;

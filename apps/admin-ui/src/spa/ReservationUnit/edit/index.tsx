@@ -49,7 +49,7 @@ import { filterNonNullable } from "common/src/helpers";
 import { H1, H4, fontBold } from "common/src/common/typography";
 import { breakpoints } from "common";
 import { addDays } from "date-fns";
-import { previewUrlPrefix, publicUrl } from "@/common/const";
+import { previewUrlPrefix } from "@/common/const";
 import { UNIT_WITH_SPACES_AND_RESOURCES } from "@/common/queries";
 import {
   ContainerMedium,
@@ -2217,12 +2217,13 @@ function EditorWrapper() {
   const route = [
     { slug: "", alias: t("breadcrumb.spaces-n-settings") },
     {
-      slug: `${publicUrl}${reservationUnitsUrl}`,
+      slug: reservationUnitsUrl,
       alias: t("breadcrumb.reservation-units"),
     },
     { slug: "", alias: reservationUnit?.nameFi || "-" },
   ];
   const backLink = reservationUnitPk == null ? `/unit/${unitPk}` : undefined;
+
   return (
     <Wrapper>
       <BreadcrumbWrapper route={route} backLink={backLink} />

@@ -5,19 +5,13 @@ import { Breadcrumb } from "common";
 import { useTranslation } from "react-i18next";
 import { trim } from "lodash";
 import { breakpoints } from "common/src/common/style";
-import { publicUrl } from "../common/const";
+import { Link } from "react-router-dom";
 import LinkPrev from "./LinkPrev";
-
-type Alias = {
-  slug: string;
-  title: string | undefined;
-};
 
 // Enforce either route or backLink has to be defined
 // TODO could do more extensive checks to remove route and aliases from LinkOnlyProps
 type Props = {
   route: string[] | Array<{ slug: string; alias?: string }>;
-  aliases?: Alias[];
   backLink?: string;
 };
 
@@ -46,13 +40,16 @@ const LinkWrapper = styled.div`
   padding-left: var(--spacing-m);
 `;
 
+function RouterLink(props: { href: string; children: React.ReactNode }) {
+  return <Link to={props.href}>{props.children}</Link>;
+}
+
 /**
  * @param route - array of strings or objects with slug and alias
- * @param aliases - deprecated, use route instead
  * @param backLink - if set, renders a back link instead of breadcrumb
  */
-const BreadcrumbWrapper = (props: Props | LinkOnlyProps): JSX.Element => {
-  const { route, aliases, backLink } = props;
+function BreadcrumbWrapper(props: Props | LinkOnlyProps): JSX.Element {
+  const { route, backLink } = props;
   const { t } = useTranslation();
   const isMobile = useMedia(`(max-width: ${breakpoints.s})`, true);
 
@@ -67,10 +64,7 @@ const BreadcrumbWrapper = (props: Props | LinkOnlyProps): JSX.Element => {
 
       const title = n.split("/").pop();
       return {
-        title:
-          aliases?.find((alias) => alias.slug === title)?.title ||
-          t(`breadcrumb.${trim(title, "/")}`) ||
-          "",
+        title: t(`breadcrumb.${trim(title, "/")}`) || "",
         slug: n.includes("/") ? n : "",
       };
     }) || [];
@@ -86,14 +80,12 @@ const BreadcrumbWrapper = (props: Props | LinkOnlyProps): JSX.Element => {
   return (
     <Wrapper>
       <StyledBreadcrumb
-        routes={[
-          { title: t("breadcrumb.frontpage"), slug: publicUrl ?? "/" },
-          ...routes,
-        ]}
+        linkComponent={RouterLink}
+        routes={[{ title: t("breadcrumb.frontpage"), slug: "/" }, ...routes]}
         isMobile={isMobile}
       />
     </Wrapper>
   );
-};
+}
 
 export default BreadcrumbWrapper;

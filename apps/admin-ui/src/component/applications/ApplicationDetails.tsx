@@ -24,7 +24,7 @@ import {
   formatDurationShort,
   secondsToHms,
 } from "@/common/util";
-import { publicUrl, weekdays } from "@/common/const";
+import { weekdays } from "@/common/const";
 import { useNotification } from "@/context/NotificationContext";
 import ScrollIntoView from "@/common/ScrollIntoView";
 import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
@@ -439,11 +439,11 @@ function ApplicationDetails({
       alias: t("breadcrumb.recurring-reservations"),
     },
     {
-      slug: `${publicUrl}/recurring-reservations/application-rounds`,
+      slug: `/recurring-reservations/application-rounds`,
       alias: t("breadcrumb.application-rounds"),
     },
     {
-      slug: `${publicUrl}/recurring-reservations/application-rounds/${applicationRound.pk}`,
+      slug: `/recurring-reservations/application-rounds/${applicationRound.pk}`,
       alias: applicationRound.nameFi ?? "-",
     },
     {

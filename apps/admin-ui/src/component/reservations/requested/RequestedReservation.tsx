@@ -17,7 +17,6 @@ import {
   ReservationsReservationStateChoices,
 } from "common/types/gql-types";
 import { Permission } from "@/modules/permissionHelper";
-import { publicUrl } from "@/common/const";
 import { useNotification } from "@/context/NotificationContext";
 import Loader from "@/component/Loader";
 import { useModal } from "@/context/ModalContext";
@@ -386,22 +385,24 @@ const RequestedReservation = ({
 
   const reservationTagline = createTagString(reservation, t);
 
+  const route = [
+    {
+      alias: t("breadcrumb.reservations"),
+      slug: "",
+    },
+    {
+      alias: t("breadcrumb.requested-reservations"),
+      slug: `/reservations/requested`,
+    },
+    {
+      slug: "",
+      alias: getName(reservation, t),
+    },
+  ];
+
   return (
     <>
-      <BreadcrumbWrapper
-        route={[
-          "reservations",
-          `${publicUrl}/reservations/requested`,
-          "requested-reservation",
-        ]}
-        aliases={[
-          {
-            slug: "requested",
-            title: t("breadcrumb.requested-reservations"),
-          },
-          { slug: "requested-reservation", title: getName(reservation, t) },
-        ]}
-      />
+      <BreadcrumbWrapper route={route} />
       <ShowWhenTargetInvisible target={ref}>
         <StickyHeader
           name={getName(reservation, t)}
