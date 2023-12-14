@@ -34,10 +34,9 @@ class TimeSpanElement:
     is_reservable: bool
 
     def __repr__(self):
-        return (
-            f"TimeSpanElement(start_datetime={self.start_datetime}, "
-            f"end_datetime={self.end_datetime}, is_reservable={self.is_reservable})"
-        )
+        reservable_str = "Reservable" if self.is_reservable else "Closed"
+
+        return f"<TimeSpanElement({self._get_datetime_str()}, {reservable_str})>"
 
     def __copy__(self) -> "TimeSpanElement":
         return TimeSpanElement(
@@ -45,6 +44,24 @@ class TimeSpanElement:
             end_datetime=self.end_datetime,
             is_reservable=self.is_reservable,
         )
+
+    def _get_datetime_str(self) -> str:
+        strformat = "%Y-%m-%d %H:%M"
+
+        start = self.start_datetime.astimezone(DEFAULT_TIMEZONE)
+        end = self.end_datetime.astimezone(DEFAULT_TIMEZONE)
+
+        start_str = "min" if start.date() == datetime.date.min else start.strftime(strformat)
+        if end.date() == datetime.date.max:
+            end_str = "max"
+        elif start.date() == end.date():
+            end_str = end.strftime("%H:%M")
+        elif end.date() == start.date() + datetime.timedelta(days=1) and end.time() == datetime.time.min:
+            end_str = "24:00"
+        else:
+            end_str = end.strftime(strformat)
+
+        return f"{start_str}-{end_str}"
 
     @classmethod
     def create_from_time_element(
@@ -88,6 +105,27 @@ class TimeSpanElement:
             end_datetime=end_datetime.astimezone(DEFAULT_TIMEZONE),
             is_reservable=time_element_state.is_reservable,
         )
+
+    @property
+    def duration_minutes(self) -> float:
+        return (self.end_datetime - self.start_datetime).total_seconds() / 60
+
+    def get_dates_range(self) -> list[datetime.date]:
+        """
+        Return a list of dates that are covered by this time span.
+
+        >>> time_span = TimeSpanElement(
+        ...     start_datetime=datetime.datetime(2021, 1, 1, 10, 0),
+        ...     end_datetime=datetime.datetime(2021, 1, 3, 10, 0),
+        ...     is_reservable=True,
+        ... )
+        >>> time_span.get_dates_range()
+        [datetime.date(2021, 1, 1), datetime.date(2021, 1, 2), datetime.date(2021, 1, 3)]
+        """
+        return [
+            self.start_datetime.date() + datetime.timedelta(i)
+            for i in range(int((self.end_datetime.date() - self.start_datetime.date()).days) + 1)
+        ]
 
 
 class ReservableTimeSpanClient:
@@ -288,6 +326,8 @@ def override_reservable_with_closed_time_spans(
 
     We have no way to know if this is actually the correct way to handle conflicts, but it's our best assumption.
     e.g. Normally open every weekday, but closed on friday due to a public holiday.
+
+    The reservable and closed time spans are not required to be chronological order.
     """
     i: int
     reservable_time_span: TimeSpanElement
