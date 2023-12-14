@@ -229,11 +229,6 @@ function getLastPossibleReservationDate(
     return undefined;
   }
 
-  /*
-  // TODO: This return statement would be enough, if the API would take into account the limits and reservableTimeSpans is already filtered.
-
-  return new Date(reservationUnit.reservableTimeSpans.at(-1).startDatetime);
-   */
   const lastPossibleReservationDate =
     reservationUnit.reservationsMaxDaysBefore != null &&
     reservationUnit.reservationsMaxDaysBefore > 0
@@ -406,17 +401,11 @@ const QuickReservation = ({
 
   const getPrice = useCallback(
     (asInt = false) => {
-      const [hours, minutes] =
-        duration?.value?.toString().split(":").map(Number) || [];
-      if (
-        reservationUnit == null ||
-        date == null ||
-        hours == null ||
-        minutes == null
-      ) {
+      const hours = Number.isNaN(duration?.value) ? 0 : Number(duration?.value);
+      if (reservationUnit == null || date == null || hours == null) {
         return null;
       }
-      const length = hours * 60 + minutes;
+      const length = hours * 60;
       return getReservationUnitPrice({
         reservationUnit,
         pricingDate: date,
@@ -466,9 +455,7 @@ const QuickReservation = ({
   useEffect(() => {
     if (date && duration?.value && slot) {
       const durationHours = Math.floor(Number(duration.value));
-      const durationMinutes = Math.floor(
-        (Number(duration.value) - durationHours) * 60
-      );
+      const durationMinutes = (Number(duration.value) % 1) * 60;
       const [slotHours, slotMinutes] = slot.split(":").map(Number);
       const begin = new Date(date);
       begin.setHours(slotHours, slotMinutes, 0, 0);

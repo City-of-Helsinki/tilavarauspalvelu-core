@@ -10,6 +10,7 @@ import {
   min,
   parseISO,
   addMinutes,
+  isSameDay,
 } from "date-fns";
 import {
   Button,
@@ -21,12 +22,7 @@ import {
 } from "hds-react";
 import { maxBy, trim, trimStart } from "lodash";
 import { CalendarEvent } from "common/src/calendar/Calendar";
-import {
-  convertHMSToSeconds,
-  secondsToHms,
-  toApiDate,
-  toUIDate,
-} from "common/src/common/util";
+import { secondsToHms, toUIDate } from "common/src/common/util";
 import { useLocalStorage } from "react-use";
 import { Transition } from "react-transition-group";
 import {
@@ -467,7 +463,7 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
       (n) =>
         n?.startDatetime != null &&
         date != null &&
-        n.startDatetime === toApiDate(date)
+        isSameDay(new Date(n.startDatetime), date)
     );
 
     if (timeframes.length === 0) {
@@ -496,18 +492,17 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
     const durations = durationOptions
       .filter((n) => n.label !== "")
       .map((n) => n.value);
-    const durationValue = durations[0]?.toString();
 
     if (
       date == null ||
       dayStartTime == null ||
       dayEndTime == null ||
-      durationValue == null
+      durations == null
     ) {
       return [];
     }
 
-    const [endHours, endMinutes] = durationValue.split(":").map(Number);
+    const durationInMinutes = (durations[0] as number) * 60;
 
     return getDayIntervals(
       format(new Date(dayStartTime), "HH:mm"),
@@ -520,7 +515,7 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
 
         const d = new Date(date);
         d.setHours(hours, minutes);
-        const e = addMinutes(d, endHours * 60 + endMinutes);
+        const e = addMinutes(d, durationInMinutes);
         return isSlotReservable(d, e);
       })
       .map((n) => ({
@@ -583,7 +578,7 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
   })();
 
   const minutes =
-    (convertHMSToSeconds(`0${duration?.value ?? 0}:00`) ?? 0) / 60;
+    (Number.isNaN(Number(duration?.value)) ? 0 : Number(duration?.value)) * 60;
   const price =
     date != null
       ? getReservationUnitPrice({
