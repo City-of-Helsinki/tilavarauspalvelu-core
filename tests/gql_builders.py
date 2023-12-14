@@ -144,7 +144,7 @@ def _build_field_filter_params(field_filter_params: dict[str, Any]) -> dict[str,
         plain_key, lookup_field = _split_lookups(key)
         parts = plain_key.split(LOOKUP_SEP)
         last_index = len(parts) - 1
-        params[to_camel_case(parts[0])] = current_params = FieldFilterParams()
+        current_params = params.setdefault(to_camel_case(parts[0]), FieldFilterParams())
 
         for i, part in enumerate(parts[1:], start=1):
             if i != last_index:
