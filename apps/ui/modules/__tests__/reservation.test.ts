@@ -51,23 +51,23 @@ describe("getDurationOptions", () => {
     expect( getDurationOptions( 1800, 5400, interval15)).toEqual([
       {
         label: "0:30",
-        value: 0.5,
+        value: "0:30",
       },
       {
         label: "0:45",
-        value: 0.75,
+        value: "0:45",
       },
       {
         label: "1:00",
-        value: 1,
+        value: "1:00",
       },
       {
         label: "1:15",
-        value: 1.25,
+        value: "1:15",
       },
       {
         label: "1:30",
-        value: 1.5,
+        value: "1:30",
       },
     ]);
   });
@@ -77,23 +77,23 @@ describe("getDurationOptions", () => {
     expect( getDurationOptions( 1800, 30600, interval90)).toEqual([
       {
         label: "1:30",
-        value: 1.5,
+        value: "1:30",
       },
       {
         label: "3:00",
-        value: 3,
+        value: "3:00",
       },
       {
         label: "4:30",
-        value: 4.5,
+        value: "4:30",
       },
       {
         label: "6:00",
-        value: 6,
+        value: "6:00",
       },
       {
         label: "7:30",
-        value: 7.5,
+        value: "7:30",
       },
     ]);
   });

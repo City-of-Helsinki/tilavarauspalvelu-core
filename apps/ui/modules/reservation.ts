@@ -29,31 +29,27 @@ export const getDurationOptions = (
   maxReservationDuration: number | undefined,
   reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices
 ): OptionType[] => {
-  const durationStep = getIntervalMinutes(reservationStartInterval) * 60;
+  const intervalSeconds = getIntervalMinutes(reservationStartInterval) * 60;
 
-  if (!minReservationDuration || !maxReservationDuration || !durationStep)
+  if (!minReservationDuration || !maxReservationDuration || !intervalSeconds)
     return [];
 
-  const durationSteps = [];
+  const timeOptions = [];
   for (
     let i =
-      minReservationDuration > durationStep
+      minReservationDuration > intervalSeconds
         ? minReservationDuration
-        : durationStep;
+        : intervalSeconds;
     i <= maxReservationDuration;
-    i += durationStep
+    i += intervalSeconds
   ) {
-    durationSteps.push(i);
-  }
-
-  const timeOptions = durationSteps.map((n) => {
-    const hms = secondsToHms(n);
+    const hms = secondsToHms(i);
     const minute = String(hms.m).padEnd(2, "0");
-    return {
+    timeOptions.push({
       label: `${hms.h}:${minute}`,
-      value: n/3600,
-    };
-  });
+      value: `${hms.h}:${minute}`,
+    });
+  }
 
   return timeOptions;
 };

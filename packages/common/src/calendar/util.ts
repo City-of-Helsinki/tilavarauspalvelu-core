@@ -111,8 +111,8 @@ export const areReservableTimesAvailable = (
   slotDate: Date,
   validateEnding = false
 ): boolean => {
-  return !!reservableTimes?.some((oh) => {
-    const { startDatetime, endDatetime } = oh;
+  return !!reservableTimes?.some((rt) => {
+    const { startDatetime, endDatetime } = rt;
 
     if (!startDatetime || !endDatetime) return false;
 
@@ -448,7 +448,7 @@ export const getSlotPropGetter =
       const nEndDate = new Date(n.endDatetime);
       return nStartDate >= start && nEndDate <= end;
     });
-    switch (
+    if (
       areSlotsReservable(
         [date],
         hours,
@@ -460,13 +460,12 @@ export const getSlotPropGetter =
       ) &&
       (customValidation ? customValidation(date) : true)
     ) {
-      case true:
-        return {};
-      default:
-        return {
-          className: "rbc-timeslot-inactive",
-        };
+      return {};
     }
+
+    return {
+      className: "rbc-timeslot-inactive",
+    };
   };
 
 // TimeSlots change the Calendar view. How many intervals are shown i.e. every half an hour, every hour

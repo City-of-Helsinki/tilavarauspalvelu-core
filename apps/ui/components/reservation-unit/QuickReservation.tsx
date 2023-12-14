@@ -251,7 +251,7 @@ function getLastPossibleReservationDate(
 
 type AvailableTimesProps = {
   day: Date;
-  duration: number;
+  duration: string;
   time: string;
   isSlotReservable: (start: Date, end: Date) => boolean;
   fromStartOfDay?: boolean;
@@ -269,8 +269,8 @@ const availableTimes = ({
   fromStartOfDay = false,
 }: AvailableTimesProps): string[] => {
   if (reservationUnit == null) return [];
-  const durationHours = Math.floor(duration);
-  const durationMinutes = Math.floor((duration - durationHours) * 60);
+  const [durationHours, durationMinutes] =
+    duration?.split(":").map(Number) || [];
   const [timeHours, timeMinutesRaw] = fromStartOfDay
     ? [0, 0]
     : (!time ? "0:0" : time).split(":").map(Number);
@@ -394,18 +394,24 @@ const QuickReservation = ({
     formatDate(nextHour.toISOString(), "HH:mm")
   );
   const [duration, setDuration] = useState<OptionType | undefined>(
-    durationOptions.find((n) => n.value === 1) || durationOptions[0]
+    durationOptions.find((n) => n.value === "1:00") || durationOptions[0]
   );
   const [slot, setSlot] = useState<string | null>(null);
   const [isReserving, setIsReserving] = useState(false);
 
   const getPrice = useCallback(
     (asInt = false) => {
-      const hours = Number.isNaN(duration?.value) ? 0 : Number(duration?.value);
-      if (reservationUnit == null || date == null || hours == null) {
+      const [hours, minutes] =
+        duration?.value?.toString().split(":").map(Number) || [];
+      if (
+        reservationUnit == null ||
+        date == null ||
+        hours == null ||
+        minutes == null
+      ) {
         return null;
       }
-      const length = hours * 60;
+      const length = hours * 60 + minutes;
       return getReservationUnitPrice({
         reservationUnit,
         pricingDate: date,
@@ -454,8 +460,8 @@ const QuickReservation = ({
   // If the user selects a slot, set local reservation and quick reservation slot
   useEffect(() => {
     if (date && duration?.value && slot) {
-      const durationHours = Math.floor(Number(duration.value));
-      const durationMinutes = (Number(duration.value) % 1) * 60;
+      const [durationHours, durationMinutes] =
+        duration?.value.toString().split(":").map(Number) || [];
       const [slotHours, slotMinutes] = slot.split(":").map(Number);
       const begin = new Date(date);
       begin.setHours(slotHours, slotMinutes, 0, 0);
@@ -486,7 +492,7 @@ const QuickReservation = ({
     const itemsPerChunk = 8;
     const availableTimesForDay = availableTimes({
       day: date,
-      duration: Number(duration?.value) ?? 0,
+      duration: duration?.value?.toString() ?? "00:00",
       time,
       isSlotReservable,
       reservationUnit: reservationUnit ?? undefined,
@@ -505,7 +511,7 @@ const QuickReservation = ({
         ? getNextAvailableTime({
             after: date,
             time,
-            duration: Number(duration?.value) ?? 0,
+            duration: duration?.value?.toString() ?? "00:00",
             isSlotReservable,
             reservationUnit,
           })
@@ -519,7 +525,7 @@ const QuickReservation = ({
       availableTimes({
         day: date,
         time,
-        duration: Number(duration?.value) ?? 0,
+        duration: duration?.value?.toString() ?? "00:00",
         isSlotReservable,
         reservationUnit: reservationUnit ?? undefined,
       }),
@@ -550,7 +556,7 @@ const QuickReservation = ({
               setSlot(null);
               const times = availableTimes({
                 day: valueAsDate,
-                duration: Number(duration?.value) ?? 0,
+                duration: duration?.value?.toString() ?? "00:00",
                 time,
                 isSlotReservable,
                 reservationUnit: reservationUnit ?? undefined,

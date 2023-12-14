@@ -22,7 +22,11 @@ import {
 } from "hds-react";
 import { maxBy, trim, trimStart } from "lodash";
 import { CalendarEvent } from "common/src/calendar/Calendar";
-import { secondsToHms, toUIDate } from "common/src/common/util";
+import {
+  convertHMSToSeconds,
+  secondsToHms,
+  toUIDate,
+} from "common/src/common/util";
 import { useLocalStorage } from "react-use";
 import { Transition } from "react-transition-group";
 import {
@@ -493,16 +497,18 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
       .filter((n) => n.label !== "")
       .map((n) => n.value);
 
+    const durationValue = durations[0]?.toString();
+
     if (
       date == null ||
       dayStartTime == null ||
       dayEndTime == null ||
-      durations == null
+      durationValue == null
     ) {
       return [];
     }
 
-    const durationInMinutes = (durations[0] as number) * 60;
+    const [endHours, endMinutes] = durationValue.split(":").map(Number);
 
     return getDayIntervals(
       format(new Date(dayStartTime), "HH:mm"),
@@ -515,7 +521,7 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
 
         const d = new Date(date);
         d.setHours(hours, minutes);
-        const e = addMinutes(d, durationInMinutes);
+        const e = addMinutes(d, endHours * 60 + endMinutes);
         return isSlotReservable(d, e);
       })
       .map((n) => ({
@@ -578,7 +584,7 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
   })();
 
   const minutes =
-    (Number.isNaN(Number(duration?.value)) ? 0 : Number(duration?.value)) * 60;
+    (convertHMSToSeconds(`0${duration?.value ?? 0}:00`) ?? 0) / 60;
   const price =
     date != null
       ? getReservationUnitPrice({
