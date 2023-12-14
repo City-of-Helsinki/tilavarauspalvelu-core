@@ -417,6 +417,9 @@ class ReservationUnitType(
 
     application_round_time_slots = DjangoListField(ApplicationRoundTimeSlotNode)
 
+    is_closed = graphene.Boolean()
+    first_reservable_datetime = graphene.DateTime()
+
     class Meta:
         model = ReservationUnit
         fields = [
@@ -470,6 +473,8 @@ class ReservationUnitType(
             "payment_merchant",
             "payment_product",
             "application_round_time_slots",
+            "is_closed",
+            "first_reservable_datetime",
         ] + get_all_translatable_fields(model)
         filter_fields = {
             "name_fi": ["exact", "icontains", "istartswith"],
@@ -620,6 +625,20 @@ class ReservationUnitType(
         if can_modify_reservation_unit(info.context.user, self):
             return self.payment_product
         return None
+
+    def resolve_is_closed(root: ReservationUnit, info: GQLInfo) -> bool:
+        # 'is_closed' is annotated by ReservationUnitFilterSet
+        if hasattr(root, "is_closed"):
+            return root.is_closed
+
+        raise GraphQLError("Unexpected error: 'is_closed' should have been calculated but wasn't.")
+
+    def resolve_first_reservable_datetime(root: ReservationUnit, info: GQLInfo) -> datetime.datetime | None:
+        # 'first_reservable_datetime' is annotated by ReservationUnitFilterSet
+        if hasattr(root, "first_reservable_datetime"):
+            return root.first_reservable_datetime
+
+        raise GraphQLError("Unexpected error: 'first_reservable_datetime' should have been calculated but wasn't.")
 
 
 class ReservableTimeSpanType(graphene.ObjectType):

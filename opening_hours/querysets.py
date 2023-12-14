@@ -6,7 +6,7 @@ from django.utils.timezone import get_default_timezone
 DEFAULT_TIMEZONE = get_default_timezone()
 
 
-def _normalize_datetime(value: date | datetime, timedelta_days=0) -> datetime:
+def _normalize_datetime(value: date | datetime, timedelta_days: int = 0) -> datetime:
     if isinstance(value, datetime):
         return value
     return datetime.combine(value, time.min, tzinfo=DEFAULT_TIMEZONE) + timedelta(days=timedelta_days)
@@ -16,8 +16,8 @@ class ReservableTimeSpanQuerySet(QuerySet):
     def filter_period(self, start: datetime | date, end: datetime | date):
         """Filter reservable time spans that overlap with the given period."""
         # Convert dates to datetimes to include timezone information
-        start = _normalize_datetime(start)
-        end = _normalize_datetime(end, timedelta_days=1)
+        start: datetime = _normalize_datetime(start)
+        end: datetime = _normalize_datetime(end, timedelta_days=1)
         return self.filter(start_datetime__lt=end, end_datetime__gt=start)
 
     def filter_day(self, selected_date: datetime | date):

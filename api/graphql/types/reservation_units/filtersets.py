@@ -1,27 +1,20 @@
 import operator
+from datetime import date, time
+from decimal import Decimal
 from functools import reduce
+from typing import Any
 
 import django_filters
-from django.db.models import Expression, F, Q
+from django.db.models import Expression, F, Q, QuerySet
 from django.utils import timezone
 from elasticsearch_django.models import SearchQuery
 
 from common.filtersets import BaseModelFilterSet, IntMultipleChoiceFilter
-from elastic_django.reservation_units.query_builder import (
-    ReservationUnitQueryBuilderMixin,
-)
+from elastic_django.reservation_units.query_builder import ReservationUnitQueryBuilderMixin
 from reservation_units.enums import ReservationState, ReservationUnitState
-from reservation_units.models import (
-    Equipment,
-    ReservationKind,
-    ReservationUnit,
-)
-from reservation_units.utils.reservation_unit_reservation_state_helper import (
-    ReservationUnitReservationStateHelper,
-)
-from reservation_units.utils.reservation_unit_state_helper import (
-    ReservationUnitStateHelper,
-)
+from reservation_units.models import Equipment, ReservationKind, ReservationUnit, ReservationUnitQuerySet
+from reservation_units.utils.reservation_unit_reservation_state_helper import ReservationUnitReservationStateHelper
+from reservation_units.utils.reservation_unit_state_helper import ReservationUnitStateHelper
 from spaces.models import Unit
 
 
@@ -75,6 +68,13 @@ class ReservationUnitsFilterSet(BaseModelFilterSet, ReservationUnitQueryBuilderM
 
     only_with_permission = django_filters.BooleanFilter(method="get_only_with_permission")
 
+    reservable_date_start = django_filters.DateFilter(method="get_filter_reservable")
+    reservable_date_end = django_filters.DateFilter(method="get_filter_reservable")
+    reservable_time_start = django_filters.TimeFilter(method="get_filter_reservable")
+    reservable_time_end = django_filters.TimeFilter(method="get_filter_reservable")
+    reservable_minimum_duration_minutes = django_filters.NumberFilter(method="get_filter_reservable")
+    show_only_reservable = django_filters.BooleanFilter(method="get_filter_reservable")
+
     order_by = django_filters.OrderingFilter(
         fields=(
             "name_fi",
@@ -95,7 +95,10 @@ class ReservationUnitsFilterSet(BaseModelFilterSet, ReservationUnitQueryBuilderM
 
     class Meta:
         model = ReservationUnit
-        fields = ["pk", "unit", "keyword_groups"]  # TODO : Remove or clear
+        fields = []  # Must be defined but is not needed
+        combination_methods = [
+            "get_filter_reservable",
+        ]
 
     def get_text_search(self, qs, property, value: str):
         query_str = self.build_elastic_query_str(value)
@@ -178,6 +181,43 @@ class ReservationUnitsFilterSet(BaseModelFilterSet, ReservationUnitQueryBuilderM
                 )
             )
         ).distinct()
+
+    def get_filter_reservable(
+        self,
+        qs: ReservationUnitQuerySet,
+        name: str,
+        value: dict[str, Any],
+    ) -> QuerySet[ReservationUnit]:
+        """
+        Filter reservation units by their reservability.
+
+        Always annotates the queryset with `first_reservable_datetime` and `is_closed` fields.
+
+        If 'show_only_reservable' is True, then only reservation units, which are reservable with the given filters
+        are returned. Otherwise, all reservation units are returned.
+        """
+        date_start: date | None = value["reservable_date_start"]
+        date_end: date | None = value["reservable_date_end"]
+        time_start: time | None = value["reservable_time_start"]
+        time_end: time | None = value["reservable_time_end"]
+        minimum_duration_minutes: Decimal | None = value["reservable_minimum_duration_minutes"]
+
+        # Annotate all ReservationUnits with `first_reservable_datetime` since we need the info in the GraphQL object.
+        # If the GQL field is not selected for the query, then this is unnecessary, but if we do not annotate the info
+        # here, the object type we would need to fetch this info one item at a time, which is inefficient.
+        qs = qs.with_first_reservable_time(
+            filter_date_start=date_start,
+            filter_date_end=date_end,
+            filter_time_start=time_start,
+            filter_time_end=time_end,
+            minimum_duration_minutes=minimum_duration_minutes,
+        )
+
+        show_everything: bool = not value.get("show_only_reservable", True)
+        if show_everything:
+            return qs
+
+        return qs.exclude(first_reservable_datetime=None)
 
 
 class EquipmentFilterSet(django_filters.FilterSet):
