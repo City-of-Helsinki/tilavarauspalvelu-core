@@ -1044,3 +1044,31 @@ def test_application_event__filter__by_text_search__not_found(graphql):
     # - The response contains no application events
     assert response.has_errors is False, response
     assert len(response.edges) == 0, response
+
+
+def test_application_event__filter__event_reservation_units__preferred_order(graphql):
+    # given:
+    # - There is draft application in an open application round with two application events
+    # - The owner of the application is using the system
+    application = ApplicationFactory.create_in_status_draft()
+    event_1 = ApplicationEventFactory.create_in_status_unallocated(
+        application=application,
+        event_reservation_units__preferred_order=0,
+    )
+    event_2 = ApplicationEventFactory.create_in_status_unallocated(
+        application=application,
+        event_reservation_units__preferred_order=1,
+    )
+    graphql.force_login(application.user)
+
+    # when:
+    # - User tries to filter only event reservation units with preferred order of 0
+    fields = "pk eventReservationUnits { preferredOrder }"
+    query = events_query(fields=fields, event_reservation_units__preferred_order=0)
+    response = graphql(query)
+
+    # then:
+    # - The response contains only the event reservation units with the given preferred order
+    assert len(response.edges) == 2, response
+    assert response.node(0) == {"pk": event_1.pk, "eventReservationUnits": [{"preferredOrder": 0}]}
+    assert response.node(1) == {"pk": event_2.pk, "eventReservationUnits": []}

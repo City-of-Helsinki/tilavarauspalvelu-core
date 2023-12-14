@@ -1,3 +1,5 @@
+from typing import Any
+
 import graphene
 from django.db import models
 from graphene_permissions.permissions import AllowAuthenticated
@@ -9,7 +11,7 @@ from api.graphql.types.application_event.permissions import ApplicationEventPerm
 from api.graphql.types.application_event_schedule.types import ApplicationEventScheduleNode
 from applications.choices import ApplicationEventStatusChoice
 from applications.models import ApplicationEvent, EventReservationUnit
-from common.typing import AnyUser
+from common.typing import AnyUser, GQLInfo
 from permissions.helpers import get_service_sectors_where_can_view_applications, get_units_where_can_view_applications
 
 
@@ -31,7 +33,7 @@ class ApplicationEventNode(DjangoAuthNode):
     max_duration = Duration()
 
     application_event_schedules = ApplicationEventScheduleNode.ListField()
-    event_reservation_units = EventReservationUnitNode.ListField()
+    event_reservation_units = EventReservationUnitNode.ListField(preferred_order=graphene.Int())
 
     class Meta:
         model = ApplicationEvent
@@ -68,3 +70,9 @@ class ApplicationEventNode(DjangoAuthNode):
             | models.Q(event_reservation_units__reservation_unit__unit__in=units)
             | models.Q(application__user=user)
         ).distinct()
+
+    def resolve_event_reservation_units(root: ApplicationEvent, info: GQLInfo, **kwargs: Any) -> models.QuerySet:
+        preferred_order: int | None = kwargs.get("preferred_order")
+        if preferred_order is not None:
+            return root.event_reservation_units.filter(preferred_order=preferred_order)
+        return root.event_reservation_units.all()
