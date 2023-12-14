@@ -6,7 +6,7 @@ import { type Query } from "common/types/gql-types";
 import { useNotification } from "@/context/NotificationContext";
 import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import Loader from "@/component/Loader";
-import Review from "./review/Review";
+import { Review } from "./review/Review";
 import { APPLICATION_ROUND_QUERY } from "../queries";
 
 function ApplicationRound({

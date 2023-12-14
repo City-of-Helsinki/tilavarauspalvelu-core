@@ -1,85 +1,140 @@
-import React, { useEffect, useReducer } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
-import { OptionType } from "@/common/types";
-import Tags, { getReducer, toTags } from "@/component/lists/Tags";
 import { AutoGrid, FullRow } from "@/styles/layout";
-import { SortedSelect } from "@/component/SortedSelect";
-
-export type FilterArguments = {
-  unit: OptionType[];
-};
-
-export const emptyFilterState = { unit: [] };
-
-const multivaledFields = ["unit"];
+import { SearchInput, Select } from "hds-react";
+import { useSearchParams } from "react-router-dom";
+import { SearchTags } from "@/component/SearchTags";
+import { VALID_ALLOCATION_APPLICATION_STATUSES } from "app/common/const";
+import { ApplicantTypeChoice } from "common/types/gql-types";
+import { debounce } from "lodash";
 
 export type UnitPkName = {
   pk: number;
   nameFi: string;
 };
 
-const ReviewUnitFilter = ({
-  units,
-  value,
-  onChange,
+// TODO don't template this yet, make specialized versions firsts
+// so the one we typically use is int (pk)
+// { label: string; value: number }
+function MultiSelectFilter({
+  name,
+  options,
 }: {
+  name: string;
+  // TODO don't like the union (proper generics force the whole chain to be the same type unions don't)
+  // what I want is to template T where T is one of string | number
+  options: { label: string; value: number | string }[];
+}): JSX.Element {
+  const { t } = useTranslation();
+  const [params, setParams] = useSearchParams();
+
+  const filter = params.getAll(name);
+
+  // TODO copy paste from allocation/index.tsx
+  // TODO recheck that this is equal to the above before removing it
+  const setFilter = (value: string[] | null) => {
+    const vals = new URLSearchParams(params);
+    if (value == null || value.length === 0) {
+      vals.delete(name);
+    } else {
+      vals.set(name, value[0]);
+      value.forEach((v) => {
+        if (!vals.has(name, v)) {
+          vals.append(name, v);
+        }
+      });
+    }
+    setParams(vals);
+  };
+
+  // TODO common namespace for these and separate the labels / placeholders
+  const label = t(`filters.label.${name}`);
+  const placeholder = t(`filters.placeholder.${name}`);
+  return (
+    <Select
+      label={label}
+      multiselect
+      placeholder={placeholder}
+      // @ts-expect-error -- multiselect problems
+      options={options}
+      disabled={options.length === 0}
+      value={options.filter((v) => filter.includes(v.value.toString())) ?? null}
+      onChange={(val?: typeof options) =>
+        setFilter(val?.map((x) => x.value.toString()) ?? null)
+      }
+    />
+  );
+}
+
+type Props = {
   units: UnitPkName[];
-  onChange: (units: OptionType[]) => void;
-  value: OptionType[];
-}) => {
+};
+
+export function Filters({ units }: Props): JSX.Element {
   const { t } = useTranslation();
 
-  const opts: OptionType[] = units.map((unit) => ({
+  const unitOptions = units.map((unit) => ({
     label: unit?.nameFi ?? "",
     value: unit?.pk ?? "",
   }));
 
-  return (
-    <SortedSelect
-      label={t("ReservationUnitsSearch.unitLabel")}
-      multiselect
-      placeholder={t("ReservationUnitsSearch.unitPlaceHolder")}
-      options={opts}
-      value={value}
-      onChange={onChange}
-      id="reservation-unit-combobox"
-    />
-  );
-};
+  const statusOptions = VALID_ALLOCATION_APPLICATION_STATUSES.map((status) => ({
+    label: t(`Application.statuses.${status}`),
+    value: status,
+  }));
 
-type Props = {
-  onSearch: (args: FilterArguments) => void;
-  units: UnitPkName[];
-};
-
-const Filters = ({ onSearch, units }: Props): JSX.Element => {
-  const { t } = useTranslation();
-  const [state, dispatch] = useReducer(
-    getReducer<FilterArguments>(emptyFilterState),
-    emptyFilterState
+  const applicantOptions = Object.values(ApplicantTypeChoice).map(
+    (applicant) => ({
+      label: t(`Application.applicantTypes.${applicant}`),
+      value: applicant,
+    })
   );
 
-  useEffect(() => {
-    onSearch(state);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state]);
+  const translateTag = (key: string, value: string) => {
+    switch (key) {
+      case "unit":
+        return unitOptions.find((u) => u.value === Number(value))?.label ?? "-";
+      case "status":
+        return t(`Application.statuses.${value}`);
+      case "applicant":
+        return t(`Application.applicantTypes.${value}`);
+      default:
+        return value;
+    }
+  };
 
-  const tags = toTags(state, t, multivaledFields, []);
+  const [params, setParams] = useSearchParams();
+  const nameFilter = params.get("name");
+  const setNameFilter = (value: string | null) => {
+    const vals = new URLSearchParams(params);
+    if (value == null || value.length === 0) {
+      vals.delete("name");
+    } else {
+      vals.set("name", value);
+    }
+    setParams(vals);
+  };
+
+  const hideSearchTags: string[] = ["tab"];
 
   return (
     <AutoGrid>
-      <div>
-        <ReviewUnitFilter
-          units={units}
-          onChange={(e) => dispatch({ type: "set", value: { unit: e } })}
-          value={state.unit}
-        />
-      </div>
+      <MultiSelectFilter name="unit" options={unitOptions} />
+      <MultiSelectFilter name="status" options={statusOptions} />
+      <MultiSelectFilter name="applicant" options={applicantOptions} />
+      <SearchInput
+        // TODO can we use a common label for this?
+        label={t("Allocation.filters.label.search")}
+        placeholder={t("Allocation.filters.placeholder.search")}
+        onChange={debounce((str) => setNameFilter(str), 100, {
+          leading: true,
+        })}
+        onSubmit={() => {}}
+        value={nameFilter ?? ""}
+      />
       <FullRow>
-        <Tags tags={tags} t={t} dispatch={dispatch} />
+        <SearchTags hide={hideSearchTags} translateTag={translateTag} />
       </FullRow>
     </AutoGrid>
   );
-};
-
-export default Filters;
+}

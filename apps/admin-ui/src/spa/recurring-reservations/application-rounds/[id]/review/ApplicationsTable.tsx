@@ -134,7 +134,6 @@ const appMapper = (app: ApplicationNode, t: TFunction): ApplicationView => {
       <ApplicationStatusCell
         status={status}
         text={`Application.statuses.${status}`}
-        withArrow={false}
       />
     ),
     statusType: app.status ?? undefined,
@@ -148,17 +147,17 @@ type ApplicationsTableProps = {
   applications: ApplicationNode[];
 };
 
-const ApplicationsTable = ({
+export function ApplicationsTable({
   sort,
   sortChanged: onSortChanged,
   applications,
-}: ApplicationsTableProps): JSX.Element => {
+}: ApplicationsTableProps): JSX.Element {
   const { t } = useTranslation();
 
   const cols = memoize(() => getColConfig(t))();
-  const views = applications.map((app) => appMapper(app, t));
+  const rows = applications.map((app) => appMapper(app, t));
 
-  if (views.length === 0) {
+  if (rows.length === 0) {
     return <div>{t("ReservationUnits.noFilteredReservationUnits")}</div>;
   }
 
@@ -166,7 +165,7 @@ const ApplicationsTable = ({
     <CustomTable
       setSort={onSortChanged}
       indexKey="pk"
-      rows={views}
+      rows={rows}
       cols={cols}
       initialSortingColumnKey={sort === undefined ? undefined : sort.field}
       initialSortingOrder={
@@ -174,6 +173,4 @@ const ApplicationsTable = ({
       }
     />
   );
-};
-
-export default ApplicationsTable;
+}

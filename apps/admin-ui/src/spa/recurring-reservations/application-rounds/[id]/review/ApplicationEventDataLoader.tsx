@@ -1,42 +1,19 @@
 import React from "react";
 import { ApolloError, useQuery } from "@apollo/client";
-import type {
-  ApplicationRoundNode,
-  Query,
-  QueryApplicationEventsArgs,
+import { useSearchParams } from "react-router-dom";
+import {
+  type Query,
+  type QueryApplicationEventsArgs,
 } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
-import {
-  LIST_PAGE_SIZE,
-  VALID_ALLOCATION_APPLICATION_STATUSES,
-} from "@/common/const";
+import { LIST_PAGE_SIZE } from "@/common/const";
 import { combineResults } from "@/common/util";
 import { useNotification } from "@/context/NotificationContext";
 import Loader from "@/component/Loader";
 import { More } from "@/component/lists/More";
 import { APPLICATIONS_EVENTS_QUERY } from "./queries";
-import { FilterArguments } from "./Filters";
 import ApplicationEventsTable from "./ApplicationEventsTable";
-
-export type Sort = {
-  field: string;
-  sort: boolean;
-};
-
-type Props = {
-  applicationRound: ApplicationRoundNode;
-  filters: FilterArguments;
-  sort?: Sort;
-  sortChanged: (field: string) => void;
-};
-
-const mapFilterParams = (params: FilterArguments) => ({
-  ...params,
-  unit: params.unit
-    ?.map((u) => u.value)
-    .filter((u) => u != null)
-    .map(Number),
-});
+import { transformApplicantType, transformApplicationStatuses } from "./utils";
 
 const updateQuery = (
   previousResult: Query,
@@ -49,31 +26,41 @@ const updateQuery = (
   return combineResults(previousResult, fetchMoreResult, "applicationEvents");
 };
 
-const ApplicationEventDataLoader = ({
-  applicationRound,
-  filters,
-  sort,
-  sortChanged: onSortChanged,
-}: Props): JSX.Element => {
+type Props = {
+  applicationRoundPk: number;
+};
+
+export function ApplicationEventDataLoader({
+  applicationRoundPk,
+}: Props): JSX.Element {
   const { notifyError } = useNotification();
 
-  let sortString;
-  if (sort) {
-    sortString = (sort?.sort ? "" : "-") + sort.field;
-  }
+  const [searchParams] = useSearchParams();
+  const unitFilter = searchParams.getAll("unit");
+  const statusFilter = searchParams.getAll("status");
+  const applicantFilter = searchParams.getAll("applicant");
 
   const { fetchMore, loading, data } = useQuery<
     Query,
     QueryApplicationEventsArgs
   >(APPLICATIONS_EVENTS_QUERY, {
-    skip: !applicationRound.pk,
+    skip: !applicationRoundPk,
     variables: {
-      ...mapFilterParams(filters),
-      applicationRound: applicationRound.pk ?? 0,
-      applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,
+      unit: unitFilter.map(Number),
+      applicationRound: applicationRoundPk,
+      applicationStatus: transformApplicationStatuses(statusFilter),
+      applicantType: transformApplicantType(applicantFilter),
       offset: 0,
       first: LIST_PAGE_SIZE,
-      orderBy: sortString,
+      // TODO query params for filters
+      /* TODO query params
+      orderBy:
+        sort?.sort != null
+          ? sort?.sort
+            ? sort.field
+            : `-${sort?.field}`
+          : undefined,
+      */
     },
     onError: (err: ApolloError) => {
       notifyError(err.message);
@@ -81,7 +68,7 @@ const ApplicationEventDataLoader = ({
     fetchPolicy: "cache-and-network",
   });
 
-  if (loading) {
+  if (loading && !data) {
     return <Loader />;
   }
 
@@ -89,12 +76,18 @@ const ApplicationEventDataLoader = ({
     data?.applicationEvents?.edges.map((edge) => edge?.node)
   );
 
+  // TODO
+  const sort = undefined;
+  const handleSortChanged = (field: string) => {
+    console.warn("TODO: handleSortChanged", field);
+  };
+
   return (
     <>
       <ApplicationEventsTable
         applicationEvents={applicationEvents}
         sort={sort}
-        sortChanged={onSortChanged}
+        sortChanged={handleSortChanged}
       />
       <More
         key={applicationEvents.length}
@@ -111,6 +104,4 @@ const ApplicationEventDataLoader = ({
       />
     </>
   );
-};
-
-export default ApplicationEventDataLoader;
+}

@@ -1,10 +1,6 @@
 import React from "react";
 import { ApolloError, useQuery } from "@apollo/client";
-import type {
-  ApplicationRoundNode,
-  Query,
-  QueryApplicationEventsArgs,
-} from "common/types/gql-types";
+import type { Query, QueryApplicationEventsArgs } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import {
   LIST_PAGE_SIZE,
@@ -13,7 +9,6 @@ import {
 import { combineResults } from "@/common/util";
 import { useNotification } from "@/context/NotificationContext";
 import { APPLICATIONS_EVENTS_QUERY } from "./queries";
-import { FilterArguments } from "./Filters";
 import Loader from "@/component/Loader";
 import { More } from "@/component/lists/More";
 import ApplicationEventsTable from "./ApplicationEventsTable";
@@ -24,19 +19,8 @@ export type Sort = {
 };
 
 type Props = {
-  applicationRound: ApplicationRoundNode;
-  filters: FilterArguments;
-  sort?: Sort;
-  sortChanged: (field: string) => void;
+  applicationRoundPk: number;
 };
-
-const mapFilterParams = (params: FilterArguments) => ({
-  ...params,
-  unit: params.unit
-    ?.map((u) => u.value)
-    .filter((u) => u != null)
-    .map(Number),
-});
 
 const updateQuery = (
   previousResult: Query,
@@ -50,30 +34,21 @@ const updateQuery = (
 };
 
 const AllocatedEventDataLoader = ({
-  applicationRound,
-  filters,
-  sort,
-  sortChanged: onSortChanged,
+  applicationRoundPk,
 }: Props): JSX.Element => {
   const { notifyError } = useNotification();
-
-  let sortString;
-  if (sort) {
-    sortString = (sort?.sort ? "" : "-") + sort.field;
-  }
 
   const { fetchMore, loading, data } = useQuery<
     Query,
     QueryApplicationEventsArgs
   >(APPLICATIONS_EVENTS_QUERY, {
-    skip: !applicationRound.pk,
+    skip: !applicationRoundPk,
     variables: {
-      ...mapFilterParams(filters),
-      applicationRound: applicationRound.pk ?? 0,
+      applicationRound: applicationRoundPk,
       applicationStatus: VALID_ALLOCATED_APPLICATION_STATUSES,
       offset: 0,
       first: LIST_PAGE_SIZE,
-      orderBy: sortString,
+      // orderBy: sortString,
     },
     onError: (err: ApolloError) => {
       notifyError(err.message);
@@ -89,12 +64,18 @@ const AllocatedEventDataLoader = ({
     data?.applicationEvents?.edges.map((edge) => edge?.node)
   );
 
+  // TODO
+  const sort = undefined;
+  const handleSortChanged = (field: string) => {
+    console.warn("TODO: handleSortChanged", field);
+  };
+
   return (
     <>
       <ApplicationEventsTable
         applicationEvents={applicationEvents}
         sort={sort}
-        sortChanged={onSortChanged}
+        sortChanged={handleSortChanged}
       />
       <More
         key={applicationEvents.length}

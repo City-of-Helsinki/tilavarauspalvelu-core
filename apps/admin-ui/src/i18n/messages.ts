@@ -418,6 +418,7 @@ const translations: ITranslations = {
       additionalInformation: ["Lisätiedot (yksityishenkilö)"],
       userBirthDate: ["Syntymäaika"],
     },
+    // TODO move the enum under key: {EnumName}.{key}
     statuses: {
       draft: ["Luonnos"],
       in_review: ["Tarkastuksessa"],
@@ -454,6 +455,7 @@ const translations: ITranslations = {
     contactPersonEmail: ["Sähköpostiosoite"],
     contactPersonPhoneNumber: ["Puhelinnumero"],
     contactInformation: ["Yhteystiedot"],
+    // TODO move enum under key: {EnumName}.{key}
     applicantTypes: {
       INDIVIDUAL: ["Yksityishenkilö"],
       COMPANY: ["Yritys"],
@@ -1729,6 +1731,16 @@ const translations: ITranslations = {
     homeCity: ["Kotipaikka"],
     purpose: ["Käyttötarkoitus"],
     ageGroup: ["Ikäryhmä"],
+    placeholder: {
+      unit: ["Valitse toimipiste"],
+      applicant: ["Valitse asiakastyyppi"],
+      status: ["Valitse käsittelyn vaihe"],
+    },
+    label: {
+      unit: ["Toimipiste"],
+      applicant: ["Asiakastyyppi"],
+      status: ["Käsittelyn vaihe"],
+    },
   },
   RequestedReservation: {
     heading: ["Varauksen tarkastelu"],
@@ -1896,6 +1908,7 @@ const translations: ITranslations = {
         purpose: ["Valitse käyttötarkoitus"],
         homeCity: ["Valitse kotikunta"],
       },
+
       label: {
         unit: ["Toimipiste"],
         selectUnits: ["Valitse toimipisteet"],

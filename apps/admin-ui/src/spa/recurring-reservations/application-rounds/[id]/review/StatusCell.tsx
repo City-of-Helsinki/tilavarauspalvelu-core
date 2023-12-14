@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import styled from "styled-components";
-import { IconArrowRight, IconCheck, IconEnvelope } from "hds-react";
+import { IconArrowRight, IconCheck } from "hds-react";
 import { useTranslation } from "react-i18next";
 import {
   ApplicationEventStatusChoice,
@@ -34,13 +34,6 @@ const ApplicationEventStatusDot = styled.div<{
     getApplicationEventStatusColor(status, "s")};
 `;
 
-interface IStatusCellProps {
-  text: string;
-  status?: ApplicationStatusChoice | ApplicationEventStatusChoice;
-  type: "application" | "applicationEvent";
-  withArrow?: boolean;
-}
-
 const Wrapper = styled.div`
   display: flex;
   align-items: center;
@@ -57,46 +50,15 @@ const Status = styled.div`
   align-items: center;
 `;
 
-const StatusCell = ({
-  text,
-  status,
-  type,
-  withArrow = true,
-}: IStatusCellProps): JSX.Element => {
-  const { t } = useTranslation();
+interface IStatusCellProps {
+  text: string;
+  icon: ReactNode;
+  linkText: string;
+}
 
-  let icon: ReactNode;
-  let linkText = "";
-  switch (type) {
-    case "applicationEvent":
-      icon = (
-        <ApplicationEventStatusDot
-          status={status as ApplicationEventStatusChoice}
-          size={12}
-        />
-      );
-      linkText = "ApplicationEvent.gotoLink";
-      break;
-    case "application":
-      if (status === ApplicationStatusChoice.Received) {
-        icon = <IconEnvelope aria-hidden />;
-      } else if (status === ApplicationStatusChoice.Handled) {
-        icon = (
-          <IconCheck aria-hidden style={{ color: "var(--color-success)" }} />
-        );
-      } else {
-        icon = (
-          <StatusDot
-            aria-hidden
-            status={status as ApplicationStatusChoice}
-            size={12}
-          />
-        );
-      }
-      linkText = "Application.gotoLink";
-      break;
-    default:
-  }
+function StatusCell({ text, icon, linkText }: IStatusCellProps): JSX.Element {
+  const { t } = useTranslation();
+  const withArrow = false;
 
   return (
     <Wrapper>
@@ -112,7 +74,7 @@ const StatusCell = ({
       )}
     </Wrapper>
   );
-};
+}
 
 const StyledStatusCell = styled(StatusCell)`
   gap: 0 !important;
@@ -121,19 +83,41 @@ const StyledStatusCell = styled(StatusCell)`
   }
 `;
 
+type StatusCellProps = {
+  text: string;
+};
+
 // Define separate components to make the refactoring easier
 // the type parameter and dynamic switching is very error prone and hard to grep for in the source code
-const ApplicationStatusCell = (
-  props: Omit<IStatusCellProps, "type">
-): JSX.Element => <StyledStatusCell {...props} type="application" />;
+export function ApplicationStatusCell(
+  props: StatusCellProps & { status?: ApplicationStatusChoice }
+): JSX.Element {
+  let icon: ReactNode;
+  const linkText = "Application.gotoLink";
 
-const ApplicationEventStatusCell = (
-  props: Omit<IStatusCellProps, "type">
-): JSX.Element => <StyledStatusCell {...props} type="applicationEvent" />;
+  if (props.status == null) {
+    icon = null;
+  } else if (props.status === ApplicationStatusChoice.Handled) {
+    icon = <IconCheck aria-hidden style={{ color: "var(--color-success)" }} />;
+  } else {
+    icon = <StatusDot aria-hidden status={props.status} size={12} />;
+  }
 
-export {
-  ApplicationStatusCell,
-  ApplicationEventStatusCell,
-  // old export
-  StyledStatusCell as StatusCell,
-};
+  return <StyledStatusCell {...props} icon={icon} linkText={linkText} />;
+}
+
+export function ApplicationEventStatusCell(
+  props: StatusCellProps & { status?: ApplicationEventStatusChoice }
+): JSX.Element {
+  return (
+    <StyledStatusCell
+      {...props}
+      icon={
+        props.status && (
+          <ApplicationEventStatusDot status={props.status} size={12} />
+        )
+      }
+      linkText="ApplicationEvent.gotoLink"
+    />
+  );
+}

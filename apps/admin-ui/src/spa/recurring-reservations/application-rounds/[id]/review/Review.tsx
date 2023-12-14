@@ -1,30 +1,23 @@
-import React, { useState } from "react";
+import React from "react";
 import { Button, Tabs } from "hds-react";
-import { debounce, uniqBy } from "lodash";
+import { uniqBy } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
-import { gql, useQuery } from "@apollo/client";
+import { Link, useSearchParams } from "react-router-dom";
 import { H2 } from "common/src/common/typography";
 import {
-  type Query,
   type ApplicationRoundNode,
   ApplicationRoundStatusChoice,
 } from "common/types/gql-types";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { Container } from "@/styles/layout";
-import { GQL_MAX_RESULTS_PER_QUERY } from "@/common/const";
 import { ApplicationRoundStatusTag } from "../../ApplicationRoundStatusTag";
 import TimeframeStatus from "../../TimeframeStatus";
-import ApplicationDataLoader from "./ApplicationDataLoader";
-import { type Sort } from "./ApplicationsTable";
-import Filters, {
-  emptyFilterState,
-  type FilterArguments,
-  type UnitPkName,
-} from "./Filters";
-import ApplicationEventDataLoader from "./ApplicationEventDataLoader";
+import { ApplicationDataLoader } from "./ApplicationDataLoader";
+import { Filters } from "./Filters";
+import { ApplicationEventDataLoader } from "./ApplicationEventDataLoader";
 import AllocatedEventDataLoader from "./AllocatedEventDataLoader";
+import { filterNonNullable } from "common/src/helpers";
 
 const Header = styled.div`
   margin-top: var(--spacing-l);
@@ -47,71 +40,35 @@ const TabContent = styled.div`
   line-height: 1;
 `;
 
-const APPLICATION_RESERVATION_UNITS_QUERY = gql`
-  query reservationUnits($offset: Int, $count: Int, $pks: [Int]) {
-    reservationUnits(
-      onlyWithPermission: true
-      offset: $offset
-      first: $count
-      pk: $pks
-    ) {
-      edges {
-        node {
-          unit {
-            pk
-            nameFi
-          }
-        }
-      }
-      totalCount
-    }
-  }
-`;
-
-interface ReviewProps {
+type ReviewProps = {
   applicationRound: ApplicationRoundNode;
-}
+};
 
-function Review({ applicationRound }: ReviewProps): JSX.Element | null {
-  const [search, setSearch] = useState<FilterArguments>(emptyFilterState);
-  const [sort, setSort] = useState<Sort>();
-  const debouncedSearch = debounce((value) => setSearch(value), 300);
-
-  const onSortChanged = (sortField: string) => {
-    setSort({
-      field: sortField,
-      sort: sort?.field === sortField ? !sort?.sort : true,
-    });
-  };
-
+export function Review({ applicationRound }: ReviewProps): JSX.Element | null {
   const { t } = useTranslation();
 
-  // TODO this should not require an extra graphql call pass them directly here instead
-  // TODO this doesn't fetch more than 100 elements
-  const ruPks =
-    applicationRound.reservationUnits
-      ?.map((x) => x?.pk)
-      .filter((x): x is NonNullable<typeof x> => x != null) ?? [];
+  const [searchParams, setParams] = useSearchParams();
 
-  // Copy-paste from ReservationUnitFilter (same issues etc.)
-  const { data } = useQuery<Query>(APPLICATION_RESERVATION_UNITS_QUERY, {
-    variables: {
-      offset: 0,
-      count: GQL_MAX_RESULTS_PER_QUERY,
-      pks: ruPks,
-    },
-  });
+  const selectedTab = searchParams.get("tab") ?? "applications";
+  const handleTabChange = (tab: string) => {
+    const vals = new URLSearchParams(searchParams);
+    vals.set("tab", tab);
+    setParams(vals);
+  };
 
-  const ds =
-    data?.reservationUnits?.edges
-      ?.map((x) => x?.node?.unit)
+  const ds = filterNonNullable(
+    applicationRound?.reservationUnits
+      ?.flatMap((x) => x)
+      ?.map((x) => x?.unit)
       .map((x) =>
         x?.pk != null && x.nameFi != null
           ? { pk: x.pk, nameFi: x.nameFi }
           : null
       )
-      .filter((x): x is UnitPkName => x != null) ?? [];
-  const unitPks = uniqBy(ds, (unit) => unit.pk);
+  );
+  const unitPks = uniqBy(ds, (unit) => unit.pk).sort((a, b) =>
+    a.nameFi.localeCompare(b.nameFi)
+  );
 
   const isAllocationEnabled =
     applicationRound.status === ApplicationRoundStatusChoice.InAllocation &&
@@ -144,45 +101,39 @@ function Review({ applicationRound }: ReviewProps): JSX.Element | null {
           )}
         </AlignEndContainer>
       </Header>
-      <Tabs>
+      <Tabs initiallyActiveTab={selectedTab === "events" ? 1 : 0}>
         <Tabs.TabList>
-          <Tabs.Tab>{t("ApplicationRound.applications")}</Tabs.Tab>
-          <Tabs.Tab>{t("ApplicationRound.appliedReservations")}</Tabs.Tab>
-          <Tabs.Tab>{t("ApplicationRound.allocatedReservations")}</Tabs.Tab>
+          <Tabs.Tab onClick={() => handleTabChange("applications")}>
+            {t("ApplicationRound.applications")}
+          </Tabs.Tab>
+          <Tabs.Tab onClick={() => handleTabChange("events")}>
+            {t("ApplicationRound.appliedReservations")}
+          </Tabs.Tab>
+          <Tabs.Tab onClick={() => handleTabChange("allocated")}>
+            {t("ApplicationRound.allocatedReservations")}
+          </Tabs.Tab>
         </Tabs.TabList>
         <Tabs.TabPanel>
           <TabContent>
-            <Filters onSearch={debouncedSearch} units={unitPks} />
+            <Filters units={unitPks} />
             <ApplicationDataLoader
-              applicationRound={applicationRound}
-              key={JSON.stringify({ ...search, ...sort })}
-              filters={search}
-              sort={sort}
-              sortChanged={onSortChanged}
+              applicationRoundPk={applicationRound.pk ?? 0}
             />
           </TabContent>
         </Tabs.TabPanel>
         <Tabs.TabPanel>
           <TabContent>
-            <Filters onSearch={debouncedSearch} units={unitPks} />
+            <Filters units={unitPks} />
             <ApplicationEventDataLoader
-              applicationRound={applicationRound}
-              key={JSON.stringify({ ...search, ...sort })}
-              filters={search}
-              sort={sort}
-              sortChanged={onSortChanged}
+              applicationRoundPk={applicationRound.pk ?? 0}
             />
           </TabContent>
         </Tabs.TabPanel>
         <Tabs.TabPanel>
           <TabContent>
-            <Filters onSearch={debouncedSearch} units={unitPks} />
+            <Filters units={unitPks} />
             <AllocatedEventDataLoader
-              applicationRound={applicationRound}
-              key={JSON.stringify({ ...search, ...sort })}
-              filters={search}
-              sort={sort}
-              sortChanged={onSortChanged}
+              applicationRoundPk={applicationRound.pk ?? 0}
             />
           </TabContent>
         </Tabs.TabPanel>
@@ -190,5 +141,3 @@ function Review({ applicationRound }: ReviewProps): JSX.Element | null {
     </Container>
   );
 }
-
-export default Review;

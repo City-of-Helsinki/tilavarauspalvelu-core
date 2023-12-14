@@ -120,7 +120,9 @@ function Stat({ value, label }: { value: number; label: string }): JSX.Element {
   );
 }
 
-export function ApplicationRoundCard({ applicationRound }: IProps): JSX.Element {
+export function ApplicationRoundCard({
+  applicationRound,
+}: IProps): JSX.Element {
   const { t } = useTranslation();
 
   return (

@@ -49,9 +49,12 @@ const HomePage = dynamic(() => import("./spa/HomePage"));
 const AllApplicationRounds = dynamic(
   () => import(`./spa/recurring-reservations/application-rounds/index`)
 );
-const Criteria = dynamic(() => import(`./spa/recurring-reservations/application-rounds/[id]/criteria`))
+const Criteria = dynamic(
+  () => import(`./spa/recurring-reservations/application-rounds/[id]/criteria`)
+);
 const ApplicationRoundAllocation = dynamic(
-  () => import(`./spa/recurring-reservations/application-rounds/[id]/allocation`)
+  () =>
+    import(`./spa/recurring-reservations/application-rounds/[id]/allocation`)
 );
 
 const withAuthorization = (component: JSX.Element, permission?: Permission) => (

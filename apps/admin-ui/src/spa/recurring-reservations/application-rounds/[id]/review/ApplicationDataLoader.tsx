@@ -1,32 +1,16 @@
 import React from "react";
 import { ApolloError, useQuery } from "@apollo/client";
-import {
-  type ApplicationRoundNode,
-  type ApplicationNode,
-  type Query,
-  type QueryApplicationsArgs,
-} from "common/types/gql-types";
+import { useSearchParams } from "react-router-dom";
+import { type Query, type QueryApplicationsArgs } from "common/types/gql-types";
+import { filterNonNullable } from "common/src/helpers";
 import { LIST_PAGE_SIZE } from "@/common/const";
 import { combineResults } from "@/common/util";
 import { useNotification } from "@/context/NotificationContext";
 import Loader from "@/component/Loader";
 import { More } from "@/component/lists/More";
 import { APPLICATIONS_QUERY } from "./queries";
-import { FilterArguments } from "./Filters";
-import ApplicationsTable from "./ApplicationsTable";
-
-export type Sort = {
-  field: string;
-  sort: boolean;
-};
-
-const mapFilterParams = (params: FilterArguments) => ({
-  ...params,
-  unit: params.unit
-    ?.map((u) => u.value)
-    .filter((u) => u != null)
-    .map(Number),
-});
+import { ApplicationsTable } from "./ApplicationsTable";
+import { transformApplicantType, transformApplicationStatuses } from "./utils";
 
 const updateQuery = (
   previousResult: Query,
@@ -40,34 +24,39 @@ const updateQuery = (
 };
 
 type Props = {
-  applicationRound: ApplicationRoundNode;
-  filters: FilterArguments;
-  sort?: Sort;
-  sortChanged: (field: string) => void;
+  applicationRoundPk: number;
 };
 
-const ApplicationDataLoader = ({
-  applicationRound,
-  filters,
-  sort,
-  sortChanged: onSortChanged,
-}: Props): JSX.Element => {
+export function ApplicationDataLoader({
+  applicationRoundPk,
+}: Props): JSX.Element {
   const { notifyError } = useNotification();
 
-  let sortString = "";
-  if (sort) {
-    sortString = (sort?.sort ? "" : "-") + sort.field;
-  }
+  const [searchParams] = useSearchParams();
+  const unitFilter = searchParams.getAll("unit");
+  const statusFilter = searchParams.getAll("status");
+  const applicantFilter = searchParams.getAll("applicant");
 
   const { fetchMore, loading, data } = useQuery<Query, QueryApplicationsArgs>(
     APPLICATIONS_QUERY,
     {
+      skip: !applicationRoundPk,
       variables: {
-        ...mapFilterParams(filters),
-        applicationRound: applicationRound.pk ?? 0,
+        unit: unitFilter.map(Number),
+        applicationRound: applicationRoundPk,
         offset: 0,
         first: LIST_PAGE_SIZE,
-        orderBy: sortString,
+        status: transformApplicationStatuses(statusFilter),
+        applicantType: transformApplicantType(applicantFilter),
+        // TODO order by doesn't work
+        /*
+        orderBy:
+          sort?.sort != null
+            ? sort?.sort
+              ? sort.field
+              : `-${sort?.field}`
+            : undefined,
+        */
       },
       onError: (err: ApolloError) => {
         notifyError(err.message);
@@ -76,20 +65,26 @@ const ApplicationDataLoader = ({
     }
   );
 
-  if (loading) {
+  if (loading && !data) {
     return <Loader />;
   }
 
-  const applications = (data?.applications?.edges || [])
-    .map((edge) => edge?.node)
-    .filter((node): node is ApplicationNode => node != null);
+  const applications = filterNonNullable(
+    data?.applications?.edges?.map((edge) => edge?.node)
+  );
+
+  // TODO use query params for sort
+  const sort = undefined;
+  const handleSortChanged = (field: string) => {
+    console.warn("TODO: sort changed", field);
+  };
 
   return (
     <>
       <ApplicationsTable
         applications={applications}
         sort={sort}
-        sortChanged={onSortChanged}
+        sortChanged={handleSortChanged}
       />
       <More
         key={applications.length}
@@ -106,6 +101,4 @@ const ApplicationDataLoader = ({
       />
     </>
   );
-};
-
-export default ApplicationDataLoader;
+}

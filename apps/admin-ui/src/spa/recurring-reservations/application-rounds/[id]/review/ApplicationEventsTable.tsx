@@ -124,7 +124,6 @@ const appEventMapper = (
       <ApplicationEventStatusCell
         status={status}
         text={`Application.statuses.${status}`}
-        withArrow={false}
       />
     ),
   };
