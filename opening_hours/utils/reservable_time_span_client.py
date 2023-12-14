@@ -182,7 +182,7 @@ class ReservableTimeSpanClient:
         Split the time spans into reservable and closed time spans.
 
         The parsed time spans may contain overlapping time spans with the same state.
-        We can simplify them, by combining them into a single longer time span.
+        We can simplify them here, by combining them into a single longer time span.
         """
         reservable_time_spans: list[TimeSpanElement] = []
         closed_time_spans: list[TimeSpanElement] = []
@@ -191,41 +191,11 @@ class ReservableTimeSpanClient:
         for current_time_span in sorted(parsed_time_spans, key=lambda x: x.start_datetime):
             # Select which list is used
             selected_list = reservable_time_spans if current_time_span.is_reservable else closed_time_spans
-
-            # If the selected_list is empty, simply append the current time span
-            if not selected_list:
-                selected_list.append(current_time_span)
-                continue
-
-            # If the selected_list contains a time span that overlaps with the current time span, combine them.
-            # The only time span that can overlap with the current time span is the last time span in the list.
-            # ┌────────────────────────┬─────────────────────────────────────────────┐
-            # │  xxxx     ->  xxxxxxx  │ Overlapping                                 │
-            # │    xxxxx  ->           │ The last time span is extended              │
-            # ├────────────────────────┼─────────────────────────────────────────────┤
-            # │  xxxx     ->  xxxxxxx  │ Current ends at the same time last ends     │
-            # │      xxx  ->           │ The last time span is extended              │
-            # ├────────────────────────┼─────────────────────────────────────────────┤
-            # │  xxxxxxx  ->  xxxxxxx  │ Time span is fully inside the last one      │
-            # │    xxx    ->           │                                             │
-            # └────────────────────────┴─────────────────────────────────────────────┘
-            last_time_span = selected_list[-1]
-            # Last time span can maybe be extended
-            if last_time_span.end_datetime >= current_time_span.start_datetime:
-                # Last time span fully contains this time span, skip it.
-                if last_time_span.end_datetime > current_time_span.end_datetime:
-                    continue
-                # Last time span is expanded
-                last_time_span.end_datetime = current_time_span.end_datetime
-                continue
-
-            # No overlapping time spans, add the current time span to the tracked list.
-            # ┌────────────────────────┬─────────────────────────────────────────────┐
-            # │  xxxx     ->  xxxx     │ Not overlapping                             │
-            # │       xx  ->       xx  │ Current time span is added to tracked list  │
-            # └────────────────────────┴─────────────────────────────────────────────┘
             selected_list.append(current_time_span)
 
+        # Merge overlapping time spans in both lists
+        reservable_time_spans = merge_overlapping_time_span_elements(reservable_time_spans)
+        closed_time_spans = merge_overlapping_time_span_elements(closed_time_spans)
         return reservable_time_spans, closed_time_spans
 
     def _create_reservable_time_spans(self, normalised_time_spans: list[TimeSpanElement]) -> list[ReservableTimeSpan]:
@@ -252,6 +222,54 @@ class ReservableTimeSpanClient:
         ]
 
         return ReservableTimeSpan.objects.bulk_create(reservable_time_spans)
+
+
+def merge_overlapping_time_span_elements(time_span_elements: list[TimeSpanElement]) -> list[TimeSpanElement]:
+    """
+    Merge overlapping time spans into a single time span.
+
+    The time spans must be in chronological order.
+    """
+    if not time_span_elements:
+        return []
+
+    merged_time_span_elements: list[TimeSpanElement] = []
+    for current_time_span in time_span_elements:
+        # If the selected_list is empty, simply append the current time span
+        if not merged_time_span_elements:
+            merged_time_span_elements.append(current_time_span)
+            continue
+
+        # If the selected_list contains a time span that overlaps with the current time span, combine them.
+        # The only time span that can overlap with the current time span is the last time span in the list.
+        # ┌────────────────────────┬─────────────────────────────────────────────┐
+        # │  xxxx     ->  xxxxxxx  │ Overlapping                                 │
+        # │    xxxxx  ->           │ The last time span is extended              │
+        # ├────────────────────────┼─────────────────────────────────────────────┤
+        # │  xxxx     ->  xxxxxxx  │ Current ends at the same time last ends     │
+        # │      xxx  ->           │ The last time span is extended              │
+        # ├────────────────────────┼─────────────────────────────────────────────┤
+        # │  xxxxxxx  ->  xxxxxxx  │ Time span is fully inside the last one      │
+        # │    xxx    ->           │                                             │
+        # └────────────────────────┴─────────────────────────────────────────────┘
+        last_time_span = merged_time_span_elements[-1]
+        # Last time span can maybe be extended
+        if last_time_span.end_datetime >= current_time_span.start_datetime:
+            # Last time span fully contains this time span, skip it.
+            if last_time_span.end_datetime > current_time_span.end_datetime:
+                continue
+            # Last time span is expanded
+            last_time_span.end_datetime = current_time_span.end_datetime
+            continue
+
+        # No overlapping time spans, add the current time span to the list.
+        # ┌────────────────────────┬─────────────────────────────────────┐
+        # │  xxxx     ->  xxxx     │ Not overlapping                     │
+        # │       xx  ->       xx  │ Current time span is added to list  │
+        # └────────────────────────┴─────────────────────────────────────┘
+        merged_time_span_elements.append(current_time_span)
+
+    return merged_time_span_elements
 
 
 def override_reservable_with_closed_time_spans(
