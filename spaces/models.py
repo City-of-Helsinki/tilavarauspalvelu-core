@@ -2,10 +2,12 @@ from django.conf import settings
 from django.contrib.gis.db.models import PointField
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from mptt.managers import TreeManager
 from mptt.models import MPTTModel, TreeForeignKey
 
 from merchants.models import PaymentAccounting, PaymentMerchant
 from reservation_units.tasks import refresh_reservation_unit_product_mapping
+from spaces.querysets import SpaceQuerySet
 
 # SRID 4326 - Spatial Reference System Identifier number 4326.
 # EPSG:4326 - It's the same thing, but EPSG is the name of the authority maintaining an SRID reference.
@@ -162,6 +164,10 @@ class Building(models.Model):
         return f"{self.name}"
 
 
+class SpaceManager(models.Manager.from_queryset(SpaceQuerySet), TreeManager):
+    pass
+
+
 class Space(MPTTModel):
     name = models.CharField(verbose_name=_("Name"), max_length=255)
     parent = TreeForeignKey(
@@ -202,6 +208,8 @@ class Space(MPTTModel):
         blank=True,
         default="",
     )
+
+    objects = SpaceManager()
 
     def __str__(self):
         return f"{self.name} ({getattr(self.building, 'name', '')})"
