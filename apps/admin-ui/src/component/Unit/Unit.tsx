@@ -1,14 +1,5 @@
 import { useQuery } from "@apollo/client";
-import {
-  Button,
-  IconClock,
-  IconGlobe,
-  IconInfoCircleFill,
-  IconLocate,
-  IconMap,
-  IconPlusCircleFill,
-  Notification,
-} from "hds-react";
+import { Button, IconPlusCircleFill, Notification } from "hds-react";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "react-router-dom";
@@ -24,13 +15,11 @@ import {
 import { UNIT_QUERY } from "@/common/queries";
 import { parseAddress } from "@/common/util";
 import { useNotification } from "@/context/NotificationContext";
-import { useModal } from "@/context/ModalContext";
 import { Container } from "@/styles/layout";
 import { BasicLink } from "@/styles/util";
 import Loader from "../Loader";
 import ReservationUnitList from "./ReservationUnitList";
 import ExternalLink from "./ExternalLink";
-import InfoModalContent from "./InfoModalContent";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 
 interface IProps {
@@ -69,15 +58,6 @@ const Image = styled.img`
 const Ingress = styled.div`
   display: flex;
   gap: var(--spacing-m);
-`;
-
-const Props = styled.div`
-  padding: var(--spacing-xs) 0;
-  @media (min-width: ${breakpoints.s}) {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--spacing-m);
-  }
 `;
 
 const Prop = styled.div<{ $disabled: boolean }>`
@@ -158,8 +138,6 @@ const Unit = (): JSX.Element | null => {
     },
   });
 
-  const { setModalContent } = useModal();
-
   if (isLoading) {
     return <Loader />;
   }
@@ -193,18 +171,8 @@ const Unit = (): JSX.Element | null => {
       <BreadcrumbWrapper route={route} />
       <Container>
         <Links>
-          <BasicLink to={`/unit/${unitPk}/map`}>
-            <IconMap style={{ marginTop: "-2px" }} /> {t("Unit.showOnMap")}
-          </BasicLink>
-          <BasicLink to={`/unit/${unitPk}/openingHours`}>
-            <IconClock style={{ marginTop: "-2px" }} />{" "}
-            {t("Unit.showOpeningHours")}
-          </BasicLink>
           <BasicLink to={`/unit/${unitPk}/spacesResources`}>
             {t("Unit.showSpacesAndResources")}
-          </BasicLink>
-          <BasicLink to={`/unit/${unitPk}/configuration`}>
-            {t("Unit.showConfiguration")}
           </BasicLink>
         </Links>
         <Ingress>
@@ -216,15 +184,6 @@ const Unit = (): JSX.Element | null => {
             ) : (
               <Prop $disabled>{t("Unit.noAddress")}</Prop>
             )}
-            <Props>
-              <Prop $disabled>
-                <IconGlobe /> {t("Unit.noArea")}
-              </Prop>
-              <Prop $disabled>
-                <IconLocate />
-                {t("Unit.noService")}
-              </Prop>
-            </Props>
           </div>
         </Ingress>
         {!hasSpacesResources ? (
@@ -249,15 +208,6 @@ const Unit = (): JSX.Element | null => {
         <HeadingLarge>{t("Unit.reservationUnitTitle")}</HeadingLarge>
         <Info>
           <div>
-            <StyledButton
-              variant="supplementary"
-              iconRight={<IconInfoCircleFill />}
-              onClick={() =>
-                setModalContent && setModalContent(<InfoModalContent />)
-              }
-            >
-              {t("Unit.reservationUnitReadMore")}
-            </StyledButton>
             {reservationUnits.length > 0 ? (
               <ResourceUnitCount>
                 {t("Unit.reservationUnits", {

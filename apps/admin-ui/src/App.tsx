@@ -19,7 +19,6 @@ import Error404 from "./common/Error404";
 const UNIT_PATH = "./component/Unit";
 const Units = dynamic(() => import(`${UNIT_PATH}/Units`));
 const Unit = dynamic(() => import(`${UNIT_PATH}/Unit`));
-const UnitMap = dynamic(() => import(`${UNIT_PATH}/UnitMap`));
 const SpacesResources = dynamic(import(`${UNIT_PATH}/SpacesResources`));
 
 const SpacesList = dynamic(() => import("./component/Spaces/SpacesList"));
@@ -64,7 +63,6 @@ const withAuthorization = (component: JSX.Element, permission?: Permission) => (
 
 const UnitsRouter = () => (
   <Routes>
-    <Route path=":unitPk/map" element={<UnitMap />} />
     <Route path=":unitPk/spacesResources" element={<SpacesResources />} />
     <Route path=":unitPk/space/edit/:spacePk" element={<SpaceEditorView />} />
     <Route

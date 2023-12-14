@@ -71,9 +71,6 @@ importers:
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
-      mapbox-gl:
-        specifier: ^3.0.1
-        version: 3.0.1
       next:
         specifier: 13.5.6
         version: 13.5.6(@babel/core@7.23.6)(react-dom@18.2.0)(react@18.2.0)(sass@1.69.5)
@@ -98,9 +95,6 @@ importers:
       react-i18next:
         specifier: ^13.3.1
         version: 13.3.1(i18next@23.6.0)(react-dom@18.2.0)(react-native@0.73.0)(react@18.2.0)
-      react-map-gl:
-        specifier: ^7.1.6
-        version: 7.1.6(mapbox-gl@3.0.1)(react-dom@18.2.0)(react@18.2.0)
       react-quill:
         specifier: 2.0.0
         version: 2.0.0(react-dom@18.2.0)(react@18.2.0)
@@ -171,9 +165,6 @@ importers:
       '@types/react-dom':
         specifier: 18.0.10
         version: 18.0.10
-      '@types/react-map-gl':
-        specifier: ^6.1.6
-        version: 6.1.6
       '@types/react-router-dom':
         specifier: ^5.3.3
         version: 5.3.3
