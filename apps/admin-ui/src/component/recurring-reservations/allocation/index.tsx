@@ -31,7 +31,7 @@ import {
   ALL_EVENTS_PER_UNIT_QUERY,
   APPLICATION_EVENTS_FOR_ALLOCATION,
   ALLOCATION_UNFILTERED_QUERY,
-} from "../queries";
+} from "./queries";
 import { ApplicationEvents } from "./ApplicationEvents";
 
 const MAX_RES_UNIT_NAME_LENGTH = 35;

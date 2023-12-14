@@ -7,7 +7,7 @@ import { useNotification } from "@/context/NotificationContext";
 import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import Loader from "@/component/Loader";
 import Review from "./review/Review";
-import { APPLICATION_ROUND_QUERY } from "./queries";
+import { APPLICATION_ROUND_QUERY } from "../queries";
 
 function ApplicationRound({
   applicationRoundId,

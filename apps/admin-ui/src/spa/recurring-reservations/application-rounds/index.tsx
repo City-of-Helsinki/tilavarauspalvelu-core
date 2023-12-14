@@ -16,9 +16,9 @@ import { Accordion } from "@/common/hds-fork/Accordion";
 import { useNotification } from "@/context/NotificationContext";
 import { Container } from "@/styles/layout";
 import { truncate } from "@/helpers";
-import BreadcrumbWrapper from "../BreadcrumbWrapper";
-import Loader from "../Loader";
-import ApplicationRoundCard from "./ApplicationRoundCard";
+import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
+import Loader from "@/component/Loader";
+import { ApplicationRoundCard } from "./ApplicationRoundCard";
 import { TableLink, CustomTable } from "./CustomTable";
 import { APPLICATION_ROUNDS_QUERY } from "./queries";
 

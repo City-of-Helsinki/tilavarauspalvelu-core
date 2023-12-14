@@ -12,10 +12,10 @@ import {
 } from "@/common/const";
 import { combineResults } from "@/common/util";
 import { useNotification } from "@/context/NotificationContext";
+import Loader from "@/component/Loader";
+import { More } from "@/component/lists/More";
 import { APPLICATIONS_EVENTS_QUERY } from "./queries";
 import { FilterArguments } from "./Filters";
-import Loader from "../../Loader";
-import { More } from "../../lists/More";
 import ApplicationEventsTable from "./ApplicationEventsTable";
 
 export type Sort = {

@@ -13,7 +13,7 @@ import { useNotification } from "@/context/NotificationContext";
 import Loader from "@/component/Loader";
 import { Accordion } from "@/component/Accordion";
 import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
-import TimeframeStatus from "./TimeframeStatus";
+import TimeframeStatus from "../TimeframeStatus";
 
 interface IRouteParams {
   [key: string]: string;

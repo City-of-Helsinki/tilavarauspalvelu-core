@@ -21,7 +21,7 @@ import {
   getApplicationEventScheduleTimeString,
   timeSlotKeyToScheduleTime,
 } from "./modules/applicationRoundAllocation";
-import { APPROVE_APPLICATION_EVENT_SCHEDULE } from "../queries";
+import { APPROVE_APPLICATION_EVENT_SCHEDULE } from "./queries";
 
 type Props = {
   applicationEvent: ApplicationEventNode;

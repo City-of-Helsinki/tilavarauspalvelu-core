@@ -3,7 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import dynamic from "next/dynamic";
 
 import { Permission } from "app/modules/permissionHelper";
-import ApplicationRound from "./component/recurring-reservations/ApplicationRound";
+import ApplicationRound from "./spa/recurring-reservations/application-rounds/[id]";
 import PageWrapper from "./component/PageWrapper";
 import "./i18n";
 import { publicUrl } from "./common/const";
@@ -46,13 +46,12 @@ const ReservationUnitEditor = dynamic(
 
 const HomePage = dynamic(() => import("./spa/HomePage"));
 
-const RECURRING_PATH = "./component/recurring-reservations";
 const AllApplicationRounds = dynamic(
-  () => import(`${RECURRING_PATH}/AllApplicationRounds`)
+  () => import(`./spa/recurring-reservations/application-rounds/index`)
 );
-const Criteria = dynamic(() => import(`${RECURRING_PATH}/Criteria`));
+const Criteria = dynamic(() => import(`./spa/recurring-reservations/application-rounds/[id]/criteria`))
 const ApplicationRoundAllocation = dynamic(
-  () => import(`${RECURRING_PATH}/allocation/index`)
+  () => import(`./component/recurring-reservations/allocation/index`)
 );
 
 const withAuthorization = (component: JSX.Element, permission?: Permission) => (

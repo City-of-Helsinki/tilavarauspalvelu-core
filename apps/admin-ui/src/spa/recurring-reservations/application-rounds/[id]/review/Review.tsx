@@ -14,8 +14,8 @@ import {
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { Container } from "@/styles/layout";
 import { GQL_MAX_RESULTS_PER_QUERY } from "@/common/const";
-import { ApplicationRoundStatusTag } from "../ApplicationRoundStatusTag";
-import TimeframeStatus from "../TimeframeStatus";
+import { ApplicationRoundStatusTag } from "../../ApplicationRoundStatusTag";
+import TimeframeStatus from "../../TimeframeStatus";
 import ApplicationDataLoader from "./ApplicationDataLoader";
 import { type Sort } from "./ApplicationsTable";
 import Filters, {
@@ -24,7 +24,7 @@ import Filters, {
   type UnitPkName,
 } from "./Filters";
 import ApplicationEventDataLoader from "./ApplicationEventDataLoader";
-import AllocatedEventDataLoader from "@/component/recurring-reservations/review/AllocatedEventDataLoader";
+import AllocatedEventDataLoader from "./AllocatedEventDataLoader";
 
 const Header = styled.div`
   margin-top: var(--spacing-l);

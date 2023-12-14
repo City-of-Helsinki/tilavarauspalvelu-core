@@ -5,8 +5,8 @@ import styled from "styled-components";
 import { Card, IconArrowRight, IconCalendar } from "hds-react";
 import { ApplicationRoundNode } from "common/types/gql-types";
 import { breakpoints } from "common/src/common/style";
-import { formatDate } from "../../common/util";
-import { applicationRoundUrl } from "../../common/urls";
+import { formatDate } from "@/common/util";
+import { applicationRoundUrl } from "@/common/urls";
 import { ApplicationRoundStatusTag } from "./ApplicationRoundStatusTag";
 import TimeframeStatus from "./TimeframeStatus";
 
@@ -120,7 +120,7 @@ function Stat({ value, label }: { value: number; label: string }): JSX.Element {
   );
 }
 
-function ApplicationRoundCard({ applicationRound }: IProps): JSX.Element {
+export function ApplicationRoundCard({ applicationRound }: IProps): JSX.Element {
   const { t } = useTranslation();
 
   return (
@@ -168,5 +168,3 @@ function ApplicationRoundCard({ applicationRound }: IProps): JSX.Element {
     </StyledCard>
   );
 }
-
-export default ApplicationRoundCard;
