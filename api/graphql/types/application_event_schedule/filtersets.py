@@ -2,6 +2,7 @@ import django_filters
 from django.contrib.postgres.search import SearchVector
 from django.db.models import QuerySet
 
+from api.graphql.extensions.order_filter import CustomOrderingFilter
 from applications.choices import ApplicantTypeChoice, ApplicationEventStatusChoice
 from applications.models import ApplicationEventSchedule
 from applications.querysets.application_event_schedule import ApplicationEventScheduleQuerySet
@@ -33,11 +34,24 @@ class ApplicationEventScheduleFilterSet(BaseModelFilterSet):
 
     text_search = django_filters.CharFilter(method="filter_text_search")
 
-    order_by = django_filters.OrderingFilter(
+    order_by = CustomOrderingFilter(
         fields=[
             "pk",
             ("application_event__id", "application_event_id"),
             ("application_event__application__id", "application_id"),
+            "applicant",
+            ("application_event__name_fi", "application_event_name_fi"),
+            ("application_event__name_en", "application_event_name_en"),
+            ("application_event__name_sv", "application_event_name_sv"),
+            ("allocated_reservation_unit__unit__name_fi", "allocated_unit_name_fi"),
+            ("allocated_reservation_unit__unit__name_en", "allocated_unit_name_en"),
+            ("allocated_reservation_unit__unit__name_sv", "allocated_unit_name_sv"),
+            ("allocated_reservation_unit__name_fi", "allocated_reservation_unit_name_fi"),
+            ("allocated_reservation_unit__name_en", "allocated_reservation_unit_name_en"),
+            ("allocated_reservation_unit__name_sv", "allocated_reservation_unit_name_sv"),
+            "allocated_time_of_week",
+            "application_status",
+            "application_event_status",
         ]
     )
 
@@ -64,3 +78,15 @@ class ApplicationEventScheduleFilterSet(BaseModelFilterSet):
         )
         query = raw_prefixed_query(value)
         return qs.annotate(search=vector).filter(search=query)
+
+    @staticmethod
+    def order_by_allocated_time_of_week(qs: ApplicationEventScheduleQuerySet, desc: bool) -> QuerySet:
+        return qs.order_by_allocated_time_of_week(desc=desc)
+
+    @staticmethod
+    def order_by_application_status(qs: ApplicationEventScheduleQuerySet, desc: bool) -> QuerySet:
+        return qs.order_by_application_status(desc=desc)
+
+    @staticmethod
+    def order_by_application_event_status(qs: ApplicationEventScheduleQuerySet, desc: bool) -> QuerySet:
+        return qs.order_by_application_event_status(desc=desc)
