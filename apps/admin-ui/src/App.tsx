@@ -51,7 +51,7 @@ const AllApplicationRounds = dynamic(
 );
 const Criteria = dynamic(() => import(`./spa/recurring-reservations/application-rounds/[id]/criteria`))
 const ApplicationRoundAllocation = dynamic(
-  () => import(`./component/recurring-reservations/allocation/index`)
+  () => import(`./spa/recurring-reservations/application-rounds/[id]/allocation`)
 );
 
 const withAuthorization = (component: JSX.Element, permission?: Permission) => (
