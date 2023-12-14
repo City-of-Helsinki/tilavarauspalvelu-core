@@ -17,7 +17,7 @@ const Units = (): JSX.Element => {
 
   const { t } = useTranslation();
 
-  const onSortChanged = (sortField: string) => {
+  const handleSortChanged = (sortField: string) => {
     setSort({
       field: sortField,
       sort: sort?.field === sortField ? !sort?.sort : true,
@@ -45,10 +45,9 @@ const Units = (): JSX.Element => {
         <Filters onSearch={debouncedSearch} />
         <HR />
         <UnitsDataLoader
-          key={JSON.stringify({ ...search, ...sort })}
           filters={search}
           sort={sort}
-          sortChanged={onSortChanged}
+          onSortChanged={handleSortChanged}
         />
       </Container>
     </>

@@ -131,7 +131,7 @@ const ReservationsDataLoader = ({
     sort
   );
 
-  if (loading) {
+  if (loading && !data) {
     return <Loader />;
   }
 

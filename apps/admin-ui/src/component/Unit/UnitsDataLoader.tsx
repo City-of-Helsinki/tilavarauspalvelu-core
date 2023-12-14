@@ -1,13 +1,14 @@
 import React from "react";
-import { ApolloError, useQuery } from "@apollo/client";
-import { Query, QueryUnitsArgs, UnitType } from "common/types/gql-types";
+import { type ApolloError, useQuery } from "@apollo/client";
+import type { Query, QueryUnitsArgs } from "common/types/gql-types";
+import { filterNonNullable } from "common/src/helpers";
+import { useNotification } from "@/context/NotificationContext";
+import { LARGE_LIST_PAGE_SIZE } from "@/common/const";
+import { combineResults } from "@/common/util";
 import { FilterArguments } from "./Filters";
-import { useNotification } from "../../context/NotificationContext";
 import Loader from "../Loader";
 import UnitsTable from "./UnitsTable";
-import { LARGE_LIST_PAGE_SIZE } from "../../common/const";
 import { More } from "../lists/More";
-import { combineResults } from "../../common/util";
 import { UNITS_QUERY } from "./queries";
 
 export type Sort = {
@@ -18,13 +19,16 @@ export type Sort = {
 type Props = {
   filters: FilterArguments;
   sort?: Sort;
-  sortChanged: (field: string) => void;
+  onSortChanged: (field: string) => void;
   isMyUnits?: boolean;
 };
 
 const mapFilterParams = (params: FilterArguments) => ({
   nameFi: params.nameFi,
-  serviceSector: params.serviceSector?.value as number,
+  serviceSector:
+    params.serviceSector?.value != null
+      ? Number(params.serviceSector?.value)
+      : undefined,
 });
 
 const updateQuery = (
@@ -41,7 +45,7 @@ const updateQuery = (
 const UnitsDataLoader = ({
   filters,
   sort,
-  sortChanged: onSortChanged,
+  onSortChanged,
   isMyUnits,
 }: Props): JSX.Element => {
   const { notifyError } = useNotification();
@@ -67,12 +71,12 @@ const UnitsDataLoader = ({
     }
   );
 
-  if (loading) {
+  if (loading && !data) {
     return <Loader />;
   }
 
-  const units = (data?.units?.edges || []).map(
-    (edge) => edge?.node as UnitType
+  const units = filterNonNullable(
+    data?.units?.edges?.map((edge) => edge?.node)
   );
 
   return (

@@ -17,7 +17,7 @@ const MyUnits = () => {
 
   const { t } = useTranslation();
 
-  const onSortChanged = (sortField: string) => {
+  const handleSortChanged = (sortField: string) => {
     setSort({
       field: sortField,
       sort: sort?.field === sortField ? !sort?.sort : true,
@@ -37,7 +37,7 @@ const MyUnits = () => {
         <UnitsDataLoader
           filters={search}
           sort={sort}
-          sortChanged={onSortChanged}
+          onSortChanged={handleSortChanged}
           isMyUnits
         />
       </Container>
