@@ -74,9 +74,9 @@ class ApplicationRound(models.Model):
             return ApplicationRoundStatusChoice.RESULTS_SENT
         if self.handled_date is not None:
             return ApplicationRoundStatusChoice.HANDLED
-        if self.application_period_begin > timezone.now():
+        if self.application_period_begin > timezone.localtime():
             return ApplicationRoundStatusChoice.UPCOMING
-        if self.application_period_end > timezone.now():
+        if self.application_period_end > timezone.localtime():
             return ApplicationRoundStatusChoice.OPEN
         return ApplicationRoundStatusChoice.IN_ALLOCATION
 

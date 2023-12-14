@@ -61,6 +61,10 @@ class ApplicationRoundStatusChoice(models.TextChoices):
             ApplicationRoundStatusChoice.OPEN,
         ]
 
+    @DynamicClassAttribute
+    def is_ongoing(self) -> bool:
+        return self is not ApplicationRoundStatusChoice.RESULTS_SENT
+
 
 class ApplicationStatusChoice(models.TextChoices):
     DRAFT = "DRAFT"
