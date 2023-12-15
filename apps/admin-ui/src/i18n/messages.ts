@@ -1785,9 +1785,9 @@ const translations: ITranslations = {
         radioLabel: ["Palauta rahat"],
         returnChoice: ["Palauta maksu {{ price }} €"],
         noReturnChoice: ["Ei palautusta"],
-        mutationSuccess: ["Varaus peruttu ja rahat palautettu."],
+        mutationSuccess: ["Varaus hylätty ja rahat palautetaan."],
         mutationFailure: [
-          "Varaus peruttu, mutta rahojen palautus epäonnistui.",
+          "Varaus hylätty, mutta rahojen palautus epäonnistui.",
         ],
       },
     },
