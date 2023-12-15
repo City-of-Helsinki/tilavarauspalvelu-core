@@ -21,7 +21,7 @@ import {
 } from "@/modules/reservationUnit";
 import { reservationUnitPrefix } from "@/modules/const";
 
-interface Props {
+interface PropsT {
   reservationUnit: ReservationUnitType;
 }
 
@@ -204,7 +204,7 @@ const StatusTag = ({
   );
 };
 
-const ReservationUnitCard = ({ reservationUnit }: Props): JSX.Element => {
+const ReservationUnitCard = ({ reservationUnit }: PropsT): JSX.Element => {
   const { t } = useTranslation();
 
   const router = useRouter();

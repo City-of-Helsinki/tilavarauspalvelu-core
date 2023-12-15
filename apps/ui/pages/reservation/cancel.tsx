@@ -80,7 +80,7 @@ const Cancel = () => {
 
   // return general error
   if (
-    deleted === false &&
+    !deleted &&
     (!deleteError ||
       deleteError?.message !== "No Reservation matches the given query.")
   ) {

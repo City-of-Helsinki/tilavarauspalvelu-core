@@ -4,15 +4,15 @@ import styled, { css, FlattenSimpleInterpolation } from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { truncatedText } from "../../styles/util";
 
-type Props = {
-  items?: LegendItem[];
-};
-
-type LegendItem = {
+type LegendItemT = {
   title: string;
   color?: string;
   border?: string;
   css?: FlattenSimpleInterpolation;
+};
+
+type Props = {
+  items?: LegendItemT[];
 };
 
 const Wrapper = styled.div`
@@ -72,7 +72,7 @@ const LegendTitle = styled.div`
   ${truncatedText}
 `;
 
-const defaultItems: LegendItem[] = [
+const defaultItems: LegendItemT[] = [
   {
     title: "initial",
     color: "var(--tilavaraus-event-initial-color)",

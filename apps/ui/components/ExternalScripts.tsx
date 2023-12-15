@@ -19,7 +19,6 @@ const ExternalScripts = (): JSX.Element | null => {
           id="cookiehub"
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{
-            // eslint-disable-next-line
             __html: `
 var cpm = {
   cookie: {
@@ -46,7 +45,6 @@ d.parentNode.insertBefore(e,d);
           strategy="afterInteractive"
           id="matomo"
           dangerouslySetInnerHTML={{
-            // eslint-disable-next-line
             __html: `
 (function () {
   var _paq = (window._paq = window._paq || []);
@@ -75,7 +73,6 @@ d.parentNode.insertBefore(e,d);
           data-consent="analytics"
           type="text/plain"
           dangerouslySetInnerHTML={{
-            // eslint-disable-next-line
             __html: `
 (function(h,o,t,j,a,r){
   h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};

@@ -54,8 +54,8 @@ const ReservationFail = ({ type }: Props) => {
     type === "reservation"
       ? "reservationExpired"
       : type === "order"
-      ? "orderInvalid"
-      : null;
+        ? "orderInvalid"
+        : null;
 
   return (
     <StyledContainer>

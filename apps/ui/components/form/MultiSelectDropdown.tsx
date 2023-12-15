@@ -318,8 +318,9 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
   };
 
   const selectedText = React.useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/require-array-sort-compare
     const valueLabels = value
-      ?.map((val) => {
+      .map((val) => {
         if (renderOptionText) {
           return renderOptionText(val);
         }
@@ -410,10 +411,8 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
           return (
             <ScrollIntoViewWithFocus
               className={classNames("dropdownItem", {
-                /* eslint-disable @typescript-eslint/naming-convention */
                 "dropdownItem--first": index === 0,
                 "dropdownItem--isFocused": isFocused,
-                /* eslint-enable */
               })}
               key={option.value}
               isFocused={isFocused}

@@ -36,7 +36,7 @@ const Weekdays = ({
           .map(
             (cur) =>
               `${Number(cur.begin.substring(0, 2))}-${Number(
-                cur.end.substring(0, 2) === "00" ? 24 : cur.end.substring(0, 2)
+                cur.end.startsWith("00") ? 24 : cur.end.substring(0, 2)
               )}`
           )
           .join(", ");

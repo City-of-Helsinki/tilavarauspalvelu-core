@@ -233,7 +233,7 @@ export type ApplicationFormPage3Values = z.infer<
 export type ApplicationFormValues = z.infer<typeof ApplicationFormSchema>;
 
 /// form -> API transformers, enforce return types so API changes cause type errors
-/* eslint-enable @typescript-eslint/explicit-function-return-type */
+
 const transformDateString = (date?: string | null): string | undefined =>
   date != null && toApiDate(fromUIDate(date)) != null
     ? toApiDate(fromUIDate(date))

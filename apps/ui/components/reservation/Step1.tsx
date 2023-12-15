@@ -106,8 +106,8 @@ const Step1 = ({
           reservationUnit.cancellationTerms && reservationUnit.paymentTerms
             ? "cancellationPaymentTerms"
             : reservationUnit.cancellationTerms
-            ? "cancellationTerms"
-            : "paymentTerms"
+              ? "cancellationTerms"
+              : "paymentTerms"
         }`
       ),
       id: "cancellation-and-payment-terms",
@@ -116,8 +116,8 @@ const Step1 = ({
           reservationUnit.cancellationTerms && reservationUnit.paymentTerms
             ? "termsCancellationPayment"
             : reservationUnit.cancellationTerms
-            ? "termsCancellation"
-            : "termsPayment"
+              ? "termsCancellation"
+              : "termsPayment"
         }`
       ),
     },
@@ -164,8 +164,8 @@ const Step1 = ({
                         (option) => option.value === rawValue
                       )?.label
                     : typeof rawValue === "boolean"
-                    ? t(`common:${String(rawValue)}`)
-                    : rawValue;
+                      ? t(`common:${String(rawValue)}`)
+                      : rawValue;
                   return (
                     <ParagraphAlt
                       key={`summary_${key}`}
@@ -216,8 +216,8 @@ const Step1 = ({
                 ? get(options, key).find((option) => option.value === rawValue)
                     ?.label
                 : typeof rawValue === "boolean"
-                ? t(`common:${String(rawValue)}`)
-                : rawValue;
+                  ? t(`common:${String(rawValue)}`)
+                  : rawValue;
               return (
                 <ParagraphAlt key={`summary_${key}`}>
                   <PreviewLabel>
@@ -318,8 +318,11 @@ const Step1 = ({
               {!areServiceSpecificTermsAccepted && (
                 <li>
                   <ErrorAnchor
-                    href="javascript:void(0);"
-                    onClick={() => scrollToBox(box[0].id)}
+                    href="#!"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      scrollToBox(box[0].id);
+                    }}
                   >
                     {box[0].heading}
                   </ErrorAnchor>
@@ -328,8 +331,11 @@ const Step1 = ({
               {!areTermsSpaceAccepted && (
                 <li>
                   <ErrorAnchor
-                    href="javascript:void(0);"
-                    onClick={() => scrollToBox(box[1].id)}
+                    href="#!"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      scrollToBox(box[1].id);
+                    }}
                   >
                     {box[1].heading}
                   </ErrorAnchor>

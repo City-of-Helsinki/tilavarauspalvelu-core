@@ -163,10 +163,11 @@ const Step0 = ({
                 ? "common"
                 : reserveeType?.toLocaleLowerCase() || "individual";
               return (
-                <li>
+                <li key={key}>
                   <ErrorAnchor
-                    href="javascript:void(0);"
-                    onClick={() => {
+                    href="#!"
+                    onClick={(e) => {
+                      e.preventDefault();
                       const element =
                         document.getElementById(key) ||
                         document.getElementById(`${key}-label`);

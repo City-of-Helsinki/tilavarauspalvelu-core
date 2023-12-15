@@ -29,12 +29,10 @@ const Footer = (): JSX.Element => {
     <Wrapper
       title={t("common:applicationName")}
       theme={{
-        /* eslint-disable @typescript-eslint/naming-convention */
         "--footer-background": "var(--tilavaraus-footer-background-color)",
         "--footer-color": "var(--tilavaraus-footer-color)",
         "--footer-divider-color": "var(--tilavaraus-footer-color)",
         "--footer-focus-outline-color": "var(--color-white)",
-        /* eslint-enable */
       }}
     >
       <HDSFooter.Navigation

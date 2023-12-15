@@ -860,7 +860,6 @@ const ReservationUnit = ({
       start: quickReservationSlot.start,
       end: quickReservationSlot.end,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [handleCalendarEventChange, quickReservationSlot]);
 
   // Update quickReservation widget to reflect a changed calendar time, thus unselecting any quick reservation slot

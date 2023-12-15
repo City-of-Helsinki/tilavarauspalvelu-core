@@ -316,8 +316,7 @@ const getNextAvailableTime = (
     });
   // Already sorted by date
 
-  for (let i = 0; i < openDays.length; i++) {
-    const day = openDays[i];
+  for (const day of openDays) {
     const availableTimesForDay = availableTimes({
       ...props,
       day,
@@ -666,6 +665,7 @@ const QuickReservation = ({
             <span>{t("reservationCalendar:quickReservation.noTimes")}</span>
             {nextAvailableTime && (
               <span>
+                {/* eslint-disable-next-line jsx-a11y/anchor-is-valid -- FIXME */}
                 <a
                   data-testid="quick-reservation-next-available-time"
                   href="#"

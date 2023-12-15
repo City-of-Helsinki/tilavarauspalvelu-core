@@ -208,15 +208,18 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
       if (!parsed.sort) parsed.sort = "name";
       if (!parsed.order) parsed.order = "asc";
 
-      const newValues = Object.keys(parsed).reduce((p, key) => {
-        if (parsed[key]) {
-          return { ...p, [key]: parsed[key]?.toString() } as Record<
-            string,
-            string
-          >;
-        }
-        return p;
-      }, {} as Record<string, string>);
+      const newValues = Object.keys(parsed).reduce<Record<string, string>>(
+        (p, key) => {
+          if (parsed[key]) {
+            return { ...p, [key]: parsed[key]?.toString() } as Record<
+              string,
+              string
+            >;
+          }
+          return p;
+        },
+        {}
+      );
 
       if (!isEqual(values, newValues)) {
         setValues(newValues);

@@ -73,7 +73,7 @@ const Left = styled.div`
 const DeleteButton = styled(Button).attrs({
   variant: "primary",
   iconLeft: <IconCross />,
-  // eslint-disable-next-line @typescript-eslint/naming-convention
+
   "data-testid": "start-application-bar__button--clear-selections",
 })`
   ${truncatedText}

@@ -93,7 +93,10 @@ const ReservationUnitList = ({
   }, [reservationUnits, minSize]);
 
   const handleAdd = (ru: ReservationUnitType) => {
-    setReservationUnits([...reservationUnits, ru.pk!]);
+    if (ru.pk == null) {
+      return;
+    }
+    setReservationUnits([...reservationUnits, ru.pk]);
   };
 
   const move = (units: number[], from: number, to: number): number[] => {
@@ -111,13 +114,19 @@ const ReservationUnitList = ({
   };
 
   const moveUp = (reservationUnit: ReservationUnitType) => {
-    const from = reservationUnits.indexOf(reservationUnit.pk!);
+    if (reservationUnit.pk == null) {
+      return;
+    }
+    const from = reservationUnits.indexOf(reservationUnit.pk);
     const to = from - 1;
     setReservationUnits(move(reservationUnits, from, to));
   };
 
   const moveDown = (reservationUnit: ReservationUnitType) => {
-    const from = reservationUnits.indexOf(reservationUnit.pk!);
+    if (reservationUnit.pk == null) {
+      return;
+    }
+    const from = reservationUnits.indexOf(reservationUnit.pk);
     const to = from + 1;
     setReservationUnits(move(reservationUnits, from, to));
   };

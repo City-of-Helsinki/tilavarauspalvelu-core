@@ -151,8 +151,8 @@ const EditStep1 = ({
       return get(rawValue, "pk")
         ? getTranslation(rawValue, "name")
         : typeof rawValue === "boolean"
-        ? t(`common:${String(rawValue)}`)
-        : rawValue;
+          ? t(`common:${String(rawValue)}`)
+          : rawValue;
     },
     [reservation, t]
   );
@@ -261,8 +261,8 @@ const EditStep1 = ({
               reservationUnit.cancellationTerms && reservationUnit.paymentTerms
                 ? "cancellationPaymentTerms"
                 : reservationUnit.cancellationTerms
-                ? "cancellationTerms"
-                : "paymentTerms"
+                  ? "cancellationTerms"
+                  : "paymentTerms"
             }`
           )}
           body={
@@ -288,8 +288,8 @@ const EditStep1 = ({
               reservationUnit.cancellationTerms && reservationUnit.paymentTerms
                 ? "termsCancellationPayment"
                 : reservationUnit.cancellationTerms
-                ? "termsCancellation"
-                : "termsPayment"
+                  ? "termsCancellation"
+                  : "termsPayment"
             }`
           )}
           accepted={areServiceSpecificTermsAccepted}

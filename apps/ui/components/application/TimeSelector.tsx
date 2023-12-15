@@ -34,7 +34,7 @@ type Props = {
   resetCells: () => void;
   summaryData: [
     ApplicationEventScheduleFormType[],
-    ApplicationEventScheduleFormType[]
+    ApplicationEventScheduleFormType[],
   ];
 };
 
@@ -74,7 +74,7 @@ const TimeSelectionButton = styled.button<{
     border-bottom-color: var(--color-black-60);
   `
       : props.state === 200
-      ? `
+        ? `
     &:after {
       ${arrowDown}
       left: 4px;
@@ -85,7 +85,7 @@ const TimeSelectionButton = styled.button<{
     color: var(--color-black);
     font-weight: bold;
   `
-      : `
+        : `
     background: ${
       props.state === 100 ? "var(--color-white)" : "var(--color-black-10)"
     };
@@ -304,7 +304,6 @@ const ButtonContainer = styled.div`
 
 const ResetButton = styled(SupplementaryButton).attrs({
   style: {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     "--color-bus": "var(--color-black)",
   } as CSSProperties,
 })`

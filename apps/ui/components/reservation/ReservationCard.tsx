@@ -34,7 +34,7 @@ import ReservationStatus from "./ReservationStatus";
 
 type CardType = "upcoming" | "past" | "cancelled";
 
-interface Props {
+interface PropsT {
   reservation: ReservationType;
   type?: CardType;
 }
@@ -73,7 +73,6 @@ const StatusContainer = styled.div`
   align-items: flex-start;
 `;
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 const Name = styled.span.attrs({ "data-testid": "reservation-card__name" })`
   font-size: var(--fontsize-heading-m);
   font-family: var(--font-bold);
@@ -158,7 +157,7 @@ const Image = styled.img`
   }
 `;
 
-const ReservationCard = ({ reservation, type }: Props): JSX.Element => {
+const ReservationCard = ({ reservation, type }: PropsT): JSX.Element => {
   const { t, i18n } = useTranslation();
 
   const reservationUnit = reservation.reservationUnits?.[0] ?? undefined;

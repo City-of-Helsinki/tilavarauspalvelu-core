@@ -31,9 +31,7 @@ const Sanitize = ({ html, style }: Props): JSX.Element | null =>
   html ? (
     <StyledContent
       style={style}
-      // eslint-disable-next-line react/no-danger
       dangerouslySetInnerHTML={{
-        // eslint-disable-next-line @typescript-eslint/naming-convention
         __html: sanitizeHtml(html, config),
       }}
     />

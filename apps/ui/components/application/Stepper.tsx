@@ -97,7 +97,7 @@ const Stepper = ({
   const pages = steps.map((step) => step.slug);
 
   const handleStepClick = (page: string) => {
-    const isCurrent = asPath.indexOf(page) !== -1;
+    const isCurrent = asPath.includes(page);
     if (isCurrent) {
       return;
     }
@@ -115,7 +115,7 @@ const Stepper = ({
   return (
     <Container aria-label={t("common:applicationNavigationName")}>
       {pages.map((page, step) => {
-        const isCurrent = asPath.indexOf(page) !== -1;
+        const isCurrent = asPath.includes(page);
         const isDisabled = step > completedStep;
         const isReady = step < completedStep;
         return (

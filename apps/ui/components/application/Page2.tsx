@@ -253,7 +253,7 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
           // The default will never happen (it's already filtered)
           // TODO type this better
           priority: appEvent.priority,
-          day: day as Day,
+          day,
         };
       });
       setValue(`applicationEvents.${i}.applicationEventSchedules`, val);

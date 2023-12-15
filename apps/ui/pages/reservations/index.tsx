@@ -39,7 +39,6 @@ const Heading = styled.div`
 
 const StyledTabList = styled(TabList).attrs({
   style: {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     "--tablist-border-color": "white",
   } as React.CSSProperties,
 })`

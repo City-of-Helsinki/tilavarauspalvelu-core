@@ -55,7 +55,7 @@ import { Toast } from "@/styles/util";
 
 type Props = {
   id: number;
-  // eslint-disable-next-line react/no-unused-prop-types
+
   logout?: () => void;
 };
 
@@ -285,10 +285,11 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
     if (applicationRoundsData && reservationUnit) {
       const appRounds = filterNonNullable(
         applicationRoundsData?.applicationRounds?.edges?.map((e) => e?.node)
-      ).filter((applicationRound) =>
-        applicationRound.reservationUnits
-          ?.map((n) => n?.pk)
-          .includes(reservationUnit.pk)
+      ).filter(
+        (applicationRound) =>
+          applicationRound.reservationUnits
+            ?.map((n) => n?.pk)
+            .includes(reservationUnit.pk)
       );
       setActiveApplicationRounds(appRounds);
     }

@@ -198,7 +198,6 @@ const ResetButton = styled(Button).attrs({
   variant: "supplementary",
   iconLeft: <IconCross aria-hidden />,
   style: {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     "--color": "var(--color-black)",
   } as CSSProperties,
 })<{ $isLast: boolean }>`
@@ -323,7 +322,6 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
   );
   const [areControlsVisible, setAreControlsVisible] = useState(false);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/naming-convention
   const [_, setStoredReservation] =
     useLocalStorage<ReservationProps>("reservation");
 

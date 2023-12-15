@@ -21,7 +21,6 @@ interface Props {
   applicationRound: ApplicationRoundNode;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const StyledCard = styled(Card)`
   && {
     --background-color: var(--color-black-8);
@@ -116,12 +115,12 @@ const ApplicationRoundCard = ({ applicationRound }: Props): JSX.Element => {
                 }),
               })
             : state === ApplicationRoundStatusChoice.Open
-            ? t("applicationRound:card.open", {
-                until: parseISO(applicationRound.applicationPeriodEnd),
-              })
-            : t("applicationRound:card.past", {
-                closingDate: parseISO(applicationRound.applicationPeriodEnd),
-              })}
+              ? t("applicationRound:card.open", {
+                  until: parseISO(applicationRound.applicationPeriodEnd),
+                })
+              : t("applicationRound:card.past", {
+                  closingDate: parseISO(applicationRound.applicationPeriodEnd),
+                })}
         </StatusMessage>
         <StyledLink
           href={`/criteria/${applicationRound.pk}`}

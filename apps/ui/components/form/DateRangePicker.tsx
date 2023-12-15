@@ -1,6 +1,8 @@
+/* eslint-disable import/no-duplicates */
 import { parse } from "date-fns";
 import isBefore from "date-fns/isBefore";
 import isValidDate from "date-fns/isValid";
+/* eslint-enable import/no-duplicates */
 import { DateInput } from "hds-react";
 import React, { useEffect } from "react";
 import { useTranslation } from "next-i18next";
@@ -179,8 +181,8 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
           endDateIsBeforeStartDate
             ? t("dateSelector:errorEndDateBeforeStartDate")
             : errors.endDateIsInvalid
-            ? t("dateSelector:errorDateFormat")
-            : undefined
+              ? t("dateSelector:errorDateFormat")
+              : undefined
         }
         required={required?.end ?? true}
       />

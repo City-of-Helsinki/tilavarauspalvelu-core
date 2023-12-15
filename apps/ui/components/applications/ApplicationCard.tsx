@@ -53,8 +53,8 @@ const Tag = styled(HdsTag)<{ $style: "normal" | "yellow" | "green" }>`
       $style === "green"
         ? "var(--tilavaraus-green)"
         : $style === "yellow"
-        ? "var(--tilavaraus-yellow)"
-        : "var(--tilavaraus-blue)"};
+          ? "var(--tilavaraus-yellow)"
+          : "var(--tilavaraus-blue)"};
     font-family: var(--font-regular);
   }
 `;
@@ -202,8 +202,8 @@ const ApplicationCard = ({
     reducedApplicationStatus === "draft"
       ? "yellow"
       : reducedApplicationStatus === "sent"
-      ? "green"
-      : "normal";
+        ? "green"
+        : "normal";
 
   return (
     <Card border key={application.pk} data-testid="applications__card--wrapper">

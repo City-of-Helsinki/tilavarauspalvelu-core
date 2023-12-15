@@ -134,7 +134,7 @@ const DateSelectorMenu = ({
   const { t } = useTranslation();
 
   const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>) => {
-    if (dateTypes.indexOf(event.target.value) !== -1) {
+    if (dateTypes.includes(event.target.value)) {
       onChangeDateTypes(
         dateTypes.filter((item) => item !== event.target.value)
       );
@@ -155,7 +155,7 @@ const DateSelectorMenu = ({
             return (
               <Checkbox
                 key={option}
-                checked={dateTypes.indexOf(option) !== -1}
+                checked={dateTypes.includes(option)}
                 id={`name_${option}`}
                 label={t(
                   `dateSelector:dateType${startCase(camelCase(option)).replace(
