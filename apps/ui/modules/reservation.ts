@@ -200,7 +200,7 @@ export const isReservationReservable = ({
     reservations,
     bufferTimeBefore,
     bufferTimeAfter,
-    reservableTimeSpans,
+    reservableTimeSpans: reservableTimes,
     maxReservationDuration,
     minReservationDuration,
     reservationStartInterval,
@@ -231,16 +231,21 @@ export const isReservationReservable = ({
     return false;
   }
 
-  const reservableTimes = filterNonNullable(reservableTimeSpans) ?? [];
+  const reservableTimeSpans = filterNonNullable(reservableTimes) ?? [];
   if (
-    !isStartTimeWithinInterval(start, reservableTimes, reservationStartInterval)
+    !isStartTimeWithinInterval(
+      start,
+      reservableTimeSpans,
+      reservationStartInterval
+    )
   ) {
     return false;
   }
+
   if (
     !isRangeReservable({
       range: [new Date(start), normalizedEnd],
-      reservableTimes,
+      reservableTimeSpans,
       reservationBegins: reservationBegins
         ? new Date(reservationBegins)
         : undefined,

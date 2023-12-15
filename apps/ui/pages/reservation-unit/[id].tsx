@@ -509,13 +509,14 @@ const ReservationUnit = ({
   const userReservations = filterNonNullable(
     userReservationsData?.reservations?.edges?.map((e) => e?.node)
   );
-  const reservableTimes = useMemo(
+  const reservableTimeSpans = useMemo(
     () => filterNonNullable(reservationUnit?.reservableTimeSpans),
     [reservationUnit?.reservableTimeSpans]
   );
+
   const slotPropGetter = useMemo(() => {
     return getSlotPropGetter({
-      reservableTimes,
+      reservableTimeSpans,
       activeApplicationRounds,
       reservationBegins: reservationUnit?.reservationBegins
         ? new Date(reservationUnit.reservationBegins)
@@ -528,9 +529,10 @@ const ReservationUnit = ({
       reservationsMaxDaysBefore:
         reservationUnit?.reservationsMaxDaysBefore ?? 0,
       currentDate: focusDate,
+      validateEnding: true,
     });
   }, [
-    reservableTimes,
+    reservableTimeSpans,
     activeApplicationRounds,
     reservationUnit?.reservationBegins,
     reservationUnit?.reservationEnds,

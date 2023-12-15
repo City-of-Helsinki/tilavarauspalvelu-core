@@ -417,13 +417,12 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
         setErrorMsg(t("reservationCalendar:errors.bufferCollision"));
       }
 
-      const reservableTimes = filterNonNullable(reservableTimeSpans) ?? [];
       if (doReservationsCollide({ start: startDate, end: endDate }, res)) {
         setErrorMsg(t(`reservationCalendar:errors.collision`));
       } else if (
         !isRangeReservable({
           range: [startDate, addMinutes(endDate, -1)],
-          reservableTimes,
+          reservableTimeSpans: filterNonNullable(reservableTimeSpans) ?? [],
           reservationBegins: reservationBegins
             ? new Date(reservationBegins)
             : undefined,

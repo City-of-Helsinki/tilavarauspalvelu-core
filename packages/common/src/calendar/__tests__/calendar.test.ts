@@ -415,7 +415,9 @@ describe("isStartTimeWithinInterval", () => {
   });
 
   test("returns true without interval", () => {
-    expect(isStartTimeWithinInterval(new Date(), reservableTimeSpans)).toBe(true);
+    expect(isStartTimeWithinInterval(new Date(), reservableTimeSpans)).toBe(
+      true
+    );
   });
 
   test("returns false without reservable times", () => {

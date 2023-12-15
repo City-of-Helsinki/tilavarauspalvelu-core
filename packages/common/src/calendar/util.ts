@@ -107,21 +107,22 @@ export const isReservationLongEnough = (
 };
 
 export const areReservableTimesAvailable = (
-  reservableTimes: ReservableTimeSpanType[],
+  reservableTimeSpans: ReservableTimeSpanType[],
   slotDate: Date,
   validateEnding = false
 ): boolean => {
-  return !!reservableTimes?.some((rt) => {
-    const { startDatetime, endDatetime } = rt;
+  return reservableTimeSpans?.some((rts) => {
+    const { startDatetime, endDatetime } = rts;
 
     if (!startDatetime || !endDatetime) return false;
 
     const startDate = new Date(startDatetime);
     const endDate = new Date(endDatetime);
 
-    return validateEnding
-      ? startDate <= slotDate && endDate >= slotDate
-      : startDate <= slotDate;
+    if (validateEnding) {
+      return startDate <= slotDate && endDate >= slotDate;
+    }
+    return startDate <= slotDate;
   });
 };
 
@@ -215,7 +216,7 @@ export const generateSlots = (
 
 export const areSlotsReservable = (
   slots: Date[],
-  reservableTimes: ReservableTimeSpanType[],
+  reservableTimeSpans: ReservableTimeSpanType[],
   reservationsMinDaysBefore: number,
   reservationsMaxDaysBefore: number,
   reservationBegins?: Date,
@@ -223,11 +224,13 @@ export const areSlotsReservable = (
   activeApplicationRounds: RoundPeriod[] = [],
   validateEnding = false
 ): boolean => {
-  return slots.every((slot) => {
-    const slotDate = new Date(slot);
-
-    return (
-      areReservableTimesAvailable(reservableTimes, slotDate, validateEnding) &&
+  return slots.every(
+    (slotDate) =>
+      areReservableTimesAvailable(
+        reservableTimeSpans,
+        slotDate,
+        validateEnding
+      ) &&
       isSlotWithinTimeframe(
         slotDate,
         reservationsMinDaysBefore,
@@ -235,14 +238,13 @@ export const areSlotsReservable = (
         reservationBegins,
         reservationEnds
       ) &&
-      !doesSlotCollideWithApplicationRounds(slot, activeApplicationRounds)
-    );
-  });
+      !doesSlotCollideWithApplicationRounds(slotDate, activeApplicationRounds)
+  );
 };
 
 export const isRangeReservable = ({
   range,
-  reservableTimes,
+  reservableTimeSpans,
   reservationBegins,
   reservationEnds,
   reservationsMinDaysBefore = 0,
@@ -251,7 +253,7 @@ export const isRangeReservable = ({
   reservationStartInterval,
 }: {
   range: Date[];
-  reservableTimes: ReservableTimeSpanType[];
+  reservableTimeSpans: ReservableTimeSpanType[];
   reservationsMinDaysBefore: number;
   reservationsMaxDaysBefore: number;
   reservationBegins?: Date;
@@ -263,7 +265,7 @@ export const isRangeReservable = ({
 
   if (
     !slots.every((slot) =>
-      areReservableTimesAvailable(reservableTimes, slot, true)
+      areReservableTimesAvailable(reservableTimeSpans, slot, true)
     )
   ) {
     return false;
@@ -421,7 +423,7 @@ export const getValidEndingTime = ({
 
 export const getSlotPropGetter =
   ({
-    reservableTimes,
+    reservableTimeSpans,
     activeApplicationRounds,
     reservationBegins,
     reservationEnds,
@@ -429,8 +431,9 @@ export const getSlotPropGetter =
     reservationsMaxDaysBefore,
     currentDate,
     customValidation,
+    validateEnding,
   }: {
-    reservableTimes: ReservableTimeSpanType[];
+    reservableTimeSpans: ReservableTimeSpanType[];
     activeApplicationRounds: RoundPeriod[];
     reservationsMinDaysBefore: number;
     reservationsMaxDaysBefore: number;
@@ -438,9 +441,10 @@ export const getSlotPropGetter =
     customValidation?: (arg: Date) => boolean;
     reservationBegins?: Date;
     reservationEnds?: Date;
+    validateEnding?: boolean;
   }) =>
   (date: Date): SlotProps => {
-    const hours = reservableTimes?.filter((n) => {
+    const hours = reservableTimeSpans?.filter((n) => {
       if (!n.startDatetime || !n.endDatetime) return false;
       const start = startOfWeek(currentDate);
       const end = endOfWeek(currentDate);
@@ -456,7 +460,8 @@ export const getSlotPropGetter =
         reservationsMaxDaysBefore,
         reservationBegins,
         reservationEnds,
-        activeApplicationRounds
+        activeApplicationRounds,
+        validateEnding
       ) &&
       (customValidation ? customValidation(date) : true)
     ) {

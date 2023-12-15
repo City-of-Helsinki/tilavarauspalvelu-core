@@ -308,7 +308,7 @@ const getNextAvailableTime = (
   const possibleEndDay = getLastPossibleReservationDate(reservationUnit);
   const endDay = possibleEndDay ? addDays(possibleEndDay, 1) : undefined;
   const openDays: Date[] = filterNonNullable(reservableTimeSpans)
-    .map((openingTime) => new Date(String(openingTime.startDatetime)))
+    .map((rt) => new Date(String(rt.startDatetime)))
     .filter((date) => {
       if (!isAfter(date, after)) return false;
       if (!isAfter(date, today)) return false;
