@@ -7,9 +7,10 @@ import type {
 import { UPDATE_APPLICATION_MUTATION } from "@/modules/queries/application";
 
 export const useApplicationUpdate = () => {
-  const [mutate, { error, loading: isLoading }] = useMutation<Mutation, MutationUpdateApplicationArgs>(
-    UPDATE_APPLICATION_MUTATION,
- );
+  const [mutate, { error, loading: isLoading }] = useMutation<
+    Mutation,
+    MutationUpdateApplicationArgs
+  >(UPDATE_APPLICATION_MUTATION);
 
   const update = async (input: ApplicationUpdateMutationInput) => {
     try {
@@ -37,9 +38,7 @@ export const useApplicationUpdate = () => {
       console.error("Error thrown while saving application: ", e);
       return 0;
     }
-  }
+  };
 
   return [update, { error, isLoading }] as const;
-}
-
-
+};

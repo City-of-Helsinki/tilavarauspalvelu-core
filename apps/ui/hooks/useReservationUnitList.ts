@@ -11,16 +11,12 @@ export type ReservationUnitList = {
 };
 
 const useReservationUnitsList = (): ReservationUnitList => {
-  const [reservationUnits, setReservationUnits] = useSessionStorage<ReservationUnitNode[]>(
-    "reservationUnitList",
-    []
-  );
+  const [reservationUnits, setReservationUnits] = useSessionStorage<
+    ReservationUnitNode[]
+  >("reservationUnitList", []);
 
   const selectReservationUnit = (reservationUnit: ReservationUnitNode) => {
-    setReservationUnits([
-      ...(reservationUnits),
-      reservationUnit,
-    ]);
+    setReservationUnits([...reservationUnits, reservationUnit]);
   };
 
   const removeReservationUnit = (reservationUnit: ReservationUnitNode) => {

@@ -12,7 +12,8 @@ import {
   ReservationDeleteMutationPayload,
   ReservationType,
   ReservationsReservationStateChoices,
-  UserType, ReservationsReservationTypeChoices,
+  UserType,
+  ReservationsReservationTypeChoices,
 } from "common/types/gql-types";
 import {
   DELETE_RESERVATION,
@@ -21,6 +22,7 @@ import {
   LIST_RESERVATIONS,
   REFRESH_ORDER,
 } from "../modules/queries/reservation";
+import { filterNonNullable } from "common/src/helpers";
 
 type UseOrderProps = {
   orderUuid?: string;
@@ -63,7 +65,10 @@ export const useOrder = ({
       fetchPolicy: "no-cache",
       variables: { input: { orderUuid: orderUuid ?? "" } },
       onCompleted: (res) => {
-        const newData = data != null ? { ...data, status: res.refreshOrder.status } : undefined;
+        const newData =
+          data != null
+            ? { ...data, status: res.refreshOrder.status }
+            : undefined;
         setData(newData);
       },
       // catch all thrown errors so we don't crash
@@ -167,9 +172,9 @@ export const useReservations = ({
     }
   );
 
-  const reservations = data?.reservations?.edges.map((edge) => edge?.node)
-    .filter((n): n is ReservationType => n != null)
-    ?? [];
+  const reservations = filterNonNullable(
+    data?.reservations?.edges.map((e) => e?.node)
+  );
 
   return {
     reservations,

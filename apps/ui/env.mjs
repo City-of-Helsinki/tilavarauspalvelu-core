@@ -15,7 +15,7 @@ const ServerSchema = z.object({
   // TODO enum?
   SENTRY_ENVIRONMENT: z.string().optional(),
   ENABLE_FETCH_HACK: coerceBoolean.optional(),
-  SKIP_ENV_VALIDATION : coerceBoolean.optional(),
+  SKIP_ENV_VALIDATION: coerceBoolean.optional(),
 });
 
 const ClientSchema = z.object({
@@ -32,18 +32,20 @@ const ClientSchema = z.object({
 
 const createEnv = () => {
   // TODO this causes type issues for example booleans are typed as strings
-  /* eslint-disable-next-line import/no-mutable-exports */
+
   // let { env } = process;
   const skipValidation = coerceBoolean.parse(process.env.SKIP_ENV_VALIDATION);
   const isServer = typeof window === "undefined";
 
-  const serverConfig = isServer ?
-    skipValidation ? ServerSchema.partial().safeParse(process.env) :
-      ServerSchema.safeParse(process.env) : null;
-    if (isServer && !serverConfig?.success) {
-      // eslint-disable-next-line no-console
-      console.error("Server env validation failed", serverConfig?.error);
-    }
+  const serverConfig = isServer
+    ? skipValidation
+      ? ServerSchema.partial().safeParse(process.env)
+      : ServerSchema.safeParse(process.env)
+    : null;
+  if (isServer && !serverConfig?.success) {
+    // eslint-disable-next-line no-console
+    console.error("Server env validation failed", serverConfig?.error);
+  }
 
   const clientSchema = skipValidation ? ClientSchema.partial() : ClientSchema;
 
@@ -69,7 +71,7 @@ const createEnv = () => {
     ...(isServer && serverConfig?.success ? serverConfig.data : {}),
     ...(clientConfig.success ? clientConfig.data : {}),
   };
-}
+};
 
 const env = createEnv();
 

@@ -1,9 +1,16 @@
-import { type ReservationUnitNode, formatters as getFormatters, getReservationVolume } from "common";
+import {
+  type ReservationUnitNode,
+  formatters as getFormatters,
+  getReservationVolume,
+} from "common";
 import { flatten, trim, uniq } from "lodash";
 import { addDays } from "date-fns";
 import { i18n } from "next-i18next";
 import { toApiDate, toUIDate } from "common/src/common/util";
-import { RoundPeriod, isSlotWithinReservationTime } from "common/src/calendar/util";
+import {
+  RoundPeriod,
+  isSlotWithinReservationTime,
+} from "common/src/calendar/util";
 import {
   type EquipmentType,
   ReservationsReservationStateChoices,
@@ -76,10 +83,13 @@ export const getEquipmentList = (equipment: EquipmentType[]): string[] => {
       const eq: EquipmentType[] = [...equipment].filter(
         (n) =>
           n.category?.nameFi === category ||
-          (category === "Muu" && n.category?.nameFi &&
+          (category === "Muu" &&
+            n.category?.nameFi &&
             !equipmentCategoryOrder.includes(n.category?.nameFi))
       );
-      eq.sort((a, b) => a.nameFi && b.nameFi ? a.nameFi.localeCompare(b.nameFi) : 0);
+      eq.sort((a, b) =>
+        a.nameFi && b.nameFi ? a.nameFi.localeCompare(b.nameFi) : 0
+      );
       return eq;
     })
   );
@@ -96,7 +106,7 @@ export const getReservationUnitName = (
   }
   const key = `name${capitalize(language)}`;
   if (key in reservationUnit) {
-    // NOTE some silly magic to avoid implicit any type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- silly magic to avoid implicit any type
     const val: unknown = (reservationUnit as any)[key];
     if (typeof val === "string" && val.length > 0) {
       return val;
@@ -114,7 +124,7 @@ export const getUnitName = (
   }
   const key = `name${capitalize(language)}`;
   if (key in unit) {
-    // NOTE some silly magic to avoid implicit any type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- silly magic to avoid implicit any type
     const val: unknown = (unit as any)[key];
     if (typeof val === "string" && val.length > 0) {
       return val;
@@ -283,9 +293,10 @@ export const getReservationUnitPrice = (
     ? getFuturePricing(ru, [], pricingDate) || getActivePricing(ru)
     : getActivePricing(ru);
 
-  return pricing ? getPrice({ pricing, minutes, trailingZeros, asInt }) : undefined;
+  return pricing
+    ? getPrice({ pricing, minutes, trailingZeros, asInt })
+    : undefined;
 };
-
 
 export const mockOpeningTimes = Array.from(Array(100)).map((_, index) => {
   const date = toApiDate(addDays(new Date(), index));

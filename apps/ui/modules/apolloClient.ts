@@ -1,27 +1,23 @@
-import {
-  ApolloClient,
-  HttpLink,
-  InMemoryCache,
-  from,
-} from "@apollo/client";
+import { ApolloClient, HttpLink, InMemoryCache, from } from "@apollo/client";
 import { getCookie } from "typescript-cookie";
 import { relayStylePagination } from "@apollo/client/utilities";
 import { onError } from "@apollo/client/link/error";
 import { GraphQLError } from "graphql";
-import qs from 'querystring';
+import qs, { ParsedUrlQuery } from "node:querystring";
 import { GRAPHQL_URL, isBrowser } from "./const";
 import { GetServerSidePropsContext, PreviewData } from "next";
-import { ParsedUrlQuery } from "querystring";
-import { IncomingHttpHeaders } from "http";
+import { IncomingHttpHeaders } from "node:http";
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
     graphQLErrors.forEach(async (error: GraphQLError) => {
+      // eslint-disable-next-line no-console
       console.error(`GQL_ERROR: ${error.message}`);
     });
   }
 
   if (networkError) {
+    // eslint-disable-next-line no-console
     console.error(`NETWORK_ERROR: ${networkError.message}`);
   }
 });
@@ -33,8 +29,8 @@ const getServerCrsfToken = (headers?: IncomingHttpHeaders) => {
     console.warn("cookie not found in headers", headers);
     return null;
   }
-  const decoded =  qs.decode(cookie, '; ')
-  const token  = decoded?.csrftoken;
+  const decoded = qs.decode(cookie, "; ");
+  const token = decoded?.csrftoken;
   if (token == null) {
     // eslint-disable-next-line no-console
     console.warn("csrftoken not found in cookie", decoded);
@@ -46,29 +42,33 @@ const getServerCrsfToken = (headers?: IncomingHttpHeaders) => {
     return token[0];
   }
   return token;
-}
+};
 
-export function createApolloClient(ctx?: GetServerSidePropsContext<ParsedUrlQuery, PreviewData>) {
+export function createApolloClient(
+  ctx?: GetServerSidePropsContext<ParsedUrlQuery, PreviewData>
+) {
   const isServer = typeof window === "undefined";
-  const csrfToken = isServer ? getServerCrsfToken(ctx?.req?.headers) : getCookie("csrftoken")
+  const csrfToken = isServer
+    ? getServerCrsfToken(ctx?.req?.headers)
+    : getCookie("csrftoken");
 
   const enchancedFetch = (url: RequestInfo | URL, init?: RequestInit) =>
     fetch(url, {
       ...init,
       headers: {
         ...(init?.headers != null ? init.headers : {}),
-        ...(csrfToken != null ? { 'X-Csrftoken': csrfToken } : {}),
+        ...(csrfToken != null ? { "X-Csrftoken": csrfToken } : {}),
         // NOTE server requests don't include cookies by default
         // TODO include session cookie here also when we use SSR for user specific requests
-        ...(csrfToken != null ? { Cookie: "csrftoken=" + csrfToken } : {}),
+        ...(csrfToken != null ? { Cookie: `csrftoken=${csrfToken}` } : {}),
       },
-    })
+    });
 
   const httpLink = new HttpLink({
-      uri: GRAPHQL_URL,
-      credentials: "include",
-      fetch: enchancedFetch,
-    });
+    uri: GRAPHQL_URL,
+    credentials: "include",
+    fetch: enchancedFetch,
+  });
 
   return new ApolloClient({
     ssrMode: isServer,
@@ -90,6 +90,6 @@ export function createApolloClient(ctx?: GetServerSidePropsContext<ParsedUrlQuer
           },
         },
       },
-    })
+    }),
   });
 }

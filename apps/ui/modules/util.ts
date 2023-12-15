@@ -9,7 +9,11 @@ import {
   isValidDate,
   getTranslation,
 } from "common/src/common/util";
-import type { OptionType, ReducedApplicationStatus, ReservationUnitNode } from "common/types/common";
+import type {
+  OptionType,
+  ReducedApplicationStatus,
+  ReservationUnitNode,
+} from "common/types/common";
 import {
   type ReservationUnitImageType,
   ApplicationStatusChoice,
@@ -60,7 +64,7 @@ export const apiDateToUIDate = (date: string): string => {
 };
 
 export const uiDateToApiDate = (date: string): string | undefined => {
-  if (date.indexOf(".") === -1) {
+  if (!date.includes(".")) {
     return date;
   }
   return toApiDate(fromUIDate(date));
@@ -82,21 +86,23 @@ export const formatApiDate = (date: string): string | undefined => {
   return toApiDate(parseISO(date));
 };
 
-type ParameterType = {
-  pk: number;
-  nameFi: string;
-  nameEn?: string;
-  nameSv?: string;
-} | { pk:number; name: string; };
+type ParameterType =
+  | {
+      pk: number;
+      nameFi: string;
+      nameEn?: string;
+      nameSv?: string;
+    }
+  | { pk: number; name: string };
 
 export const getLabel = (
   parameter: ParameterType | AgeGroupType,
   lang: LocalizationLanguages = "fi"
 ): string => {
-  if ('minimum' in parameter) {
+  if ("minimum" in parameter) {
     return `${parameter.minimum || ""} - ${parameter.maximum || ""}`;
   }
-  if ('name' in parameter) {
+  if ("name" in parameter) {
     return parameter.name;
   }
   if (parameter.nameFi && lang === "fi") {
@@ -118,16 +124,15 @@ export const getLabel = (
 export const mapOptions = (
   src: ParameterType[] | AgeGroupType[],
   emptyOptionLabel?: string,
-  lang: LocalizationLanguages = "fi",
+  lang: LocalizationLanguages = "fi"
 ): OptionType[] => {
   const r: OptionType[] = [
     ...(emptyOptionLabel ? [{ label: emptyOptionLabel, value: 0 }] : []),
-    ...(src.map((v) => ({
-        label: getLabel(v, lang),
-        value: v.pk ?? 0,
-      }))
-    ),
-  ]
+    ...src.map((v) => ({
+      label: getLabel(v, lang),
+      value: v.pk ?? 0,
+    })),
+  ];
   return r;
 };
 
@@ -335,7 +340,8 @@ export const printErrorMessages = (error: ApolloError): string => {
   return errors
     .reduce((acc, cur) => {
       const code = cur?.extensions?.error_code
-        ? i18n?.t(`errors:${cur?.extensions?.error_code}`)
+        ? // eslint-disable-next-line @typescript-eslint/no-base-to-string -- FIXME
+          i18n?.t(`errors:${cur?.extensions?.error_code}`)
         : "";
       const message =
         code === cur?.extensions?.error_code || !cur?.extensions?.error_code

@@ -769,9 +769,12 @@ const listReservations = graphql.query<Query, QueryReservationsArgs>(
               canApplyFreeOfCharge: false,
               requireIntroduction: false,
               requireReservationHandling: false,
-              authentication: ReservationUnitsReservationUnitAuthenticationChoices.Weak,
-              reservationKind: ReservationUnitsReservationUnitReservationKindChoices.DirectAndSeason,
-              reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_30Mins,
+              authentication:
+                ReservationUnitsReservationUnitAuthenticationChoices.Weak,
+              reservationKind:
+                ReservationUnitsReservationUnitReservationKindChoices.DirectAndSeason,
+              reservationStartInterval:
+                ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_30Mins,
               nameFi: "Studiohuone 1 + soittimet",
               nameEn: undefined,
               nameSv: undefined,
@@ -1650,7 +1653,9 @@ const listReservations = graphql.query<Query, QueryReservationsArgs>(
 
     const edges = reservationData.filter((reservationEdge) =>
       req.variables?.state
-        ? req.variables.state.find((s) => s != null && s === reservationEdge.node?.state?.toString())
+        ? req.variables.state.find(
+            (s) => s != null && s === reservationEdge.node?.state?.toString()
+          )
         : reservationEdge
     );
 

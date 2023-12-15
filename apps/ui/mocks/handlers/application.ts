@@ -7,17 +7,16 @@ import {
   QueryApplicationsArgs,
 } from "common/types/gql-types";
 
-            const applicationCommonCancelled = {
-                applicationRound: { pk: 2 },
-                status: ApplicationStatusChoice.Cancelled,
-                applicant: {
-                  name: "Matti Virtanen",
-                },
-                applicantType: null,
-                contactPerson: null,
-                organisation: null,
-            }
-
+const applicationCommonCancelled = {
+  applicationRound: { pk: 2 },
+  status: ApplicationStatusChoice.Cancelled,
+  applicant: {
+    name: "Matti Virtanen",
+  },
+  applicantType: null,
+  contactPerson: null,
+  organisation: null,
+};
 
 const applications = graphql.query<Query, QueryApplicationsArgs>(
   "Applications",
@@ -184,7 +183,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
                 pk: 21,
                 ...applicationCommonCancelled,
                 applicant: {
-                  name: null
+                  name: null,
                 },
                 status: ApplicationStatusChoice.Draft,
                 applicantType:
@@ -202,7 +201,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
                 pk: 26,
                 ...applicationCommonCancelled,
                 applicant: {
-                  name: null
+                  name: null,
                 },
                 status: ApplicationStatusChoice.InAllocation,
                 applicantType:
@@ -224,7 +223,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
                 pk: 32,
                 ...applicationCommonCancelled,
                 applicant: {
-                  name: null
+                  name: null,
                 },
                 status: ApplicationStatusChoice.Draft,
                 applicantType:
@@ -472,7 +471,8 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
               node: {
                 pk: 53,
                 ...applicationCommonCancelled,
-                applicantType: ApplicationsApplicationApplicantTypeChoices.Individual,
+                applicantType:
+                  ApplicationsApplicationApplicantTypeChoices.Individual,
                 contactPerson: {
                   id: "UGVyc29uVHlwZTo1MA==",
                   firstName: "123",
@@ -495,7 +495,7 @@ const applications = graphql.query<Query, QueryApplicationsArgs>(
                 lastModifiedDate: "2022-05-13T06:06:13.774740+00:00",
               },
             },
-           {
+            {
               node: {
                 pk: 27,
                 ...applicationCommonCancelled,

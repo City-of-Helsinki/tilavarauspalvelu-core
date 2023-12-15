@@ -87,10 +87,7 @@ export const canUserCancelReservation = (
     return false;
   if (!reservationUnit?.cancellationRule) return false;
   if (reservationUnit?.cancellationRule?.needsHandling) return false;
-  if (
-    skipTimeCheck === false &&
-    isReservationWithinCancellationPeriod(reservation)
-  )
+  if (!skipTimeCheck && isReservationWithinCancellationPeriod(reservation))
     return false;
 
   return true;
@@ -395,7 +392,7 @@ export const getReservationValue = (
 
 export const getCheckoutUrl = (
   order?: PaymentOrderType,
-  lang: string = "fi"
+  lang = "fi"
 ): string | undefined => {
   const { checkoutUrl } = order ?? {};
 
@@ -411,6 +408,8 @@ export const getCheckoutUrl = (
       const baseUrl = `${origin}${pathname}`;
       return `${baseUrl}/paymentmethod?user=${userId}&lang=${lang}`;
     }
-  } catch (e) {}
+  } catch (e) {
+    // noop
+  }
   return undefined;
 };

@@ -57,7 +57,7 @@ export const emptyOption = (
 
 export const participantCountOptions = [
   1, 2, 5, 10, 15, 20, 25, 30, 40, 50, 60, 80, 100, 150, 200,
-].map((v) => ({ label: `${v}`, value: v } as OptionType));
+].map((v) => ({ label: `${v}`, value: v }) as OptionType);
 
 export const DATE_TYPES = {
   TODAY: "today",
@@ -68,15 +68,18 @@ export const DATE_TYPES = {
 
 /// @return options array with value in seconds
 // TODO use of i18n.t is bad (loading of translations)
-export const getDurationNumberOptions = (): Array<{ label: string; value: number }> => {
+export const getDurationNumberOptions = (): Array<{
+  label: string;
+  value: number;
+}> => {
   const result: Array<{ label: string; value: number }> = [];
   let h = 1;
   let m = 0;
   // why are we doing till 45?
   for (let i = 0; i < 45; i += 1) {
     const label = `${i18n?.t("common:abbreviations.hour", { count: h })} ${
-          m ? `${i18n?.t("common:abbreviations.minute", { count: m })}` : ""
-        }`
+      m ? `${i18n?.t("common:abbreviations.minute", { count: m })}` : ""
+    }`;
     result.push({ label, value: (h * 60 + m) * 60 });
     m += 15;
     if (m === 60) {
@@ -134,10 +137,13 @@ export const isBrowser = typeof window !== "undefined";
 
 // TODO these might be broken because they should be booleans but they are typed as strings
 // NOTE booleans are incorrectly typed in env.mjs
-export const cookiehubEnabled = env.NEXT_PUBLIC_COOKIEHUB_ENABLED as unknown as boolean
-export const matomoEnabled = env.NEXT_PUBLIC_MATOMO_ENABLED as unknown as boolean
-export const hotjarEnabled = env.NEXT_PUBLIC_HOTJAR_ENABLED as unknown as boolean
-export const mapboxToken = env.NEXT_PUBLIC_MAPBOX_TOKEN
+export const cookiehubEnabled =
+  env.NEXT_PUBLIC_COOKIEHUB_ENABLED as unknown as boolean;
+export const matomoEnabled =
+  env.NEXT_PUBLIC_MATOMO_ENABLED as unknown as boolean;
+export const hotjarEnabled =
+  env.NEXT_PUBLIC_HOTJAR_ENABLED as unknown as boolean;
+export const mapboxToken = env.NEXT_PUBLIC_MAPBOX_TOKEN;
 const apiBaseUrl = env.NEXT_PUBLIC_TILAVARAUS_API_URL;
 
 // console.log("baseUrl", baseUrl);
@@ -155,7 +161,8 @@ if (!isBrowser && !env.SKIP_ENV_VALIDATION) {
   */
   // this could be a transformation on the base value in env.mjs and a warning
   // throwing here because we'd have to fix all baseurls
-  if (apiBaseUrl != null &&
+  if (
+    apiBaseUrl != null &&
     (apiBaseUrl.match("localhost") || apiBaseUrl.match("127.0.0.1")) &&
     apiBaseUrl.startsWith("https://")
   ) {
@@ -169,9 +176,8 @@ const apiUrl = env.NEXT_PUBLIC_TILAVARAUS_API_URL ?? "";
 
 // a hack to workaround node-fetch dns problems with localhost
 // this will not work with authentication so when we add authentication to the SSR we need to fix it properly
-const shouldModifyLocalhost = env.ENABLE_FETCH_HACK &&
-  !isBrowser &&
-  apiUrl.includes("localhost");
+const shouldModifyLocalhost =
+  env.ENABLE_FETCH_HACK && !isBrowser && apiUrl.includes("localhost");
 const hostUrl = shouldModifyLocalhost
   ? apiUrl.replace("localhost", "127.0.0.1")
   : apiUrl;
@@ -186,9 +192,13 @@ const AUTH_URL = apiBaseUrl != null ? `${apiBaseUrl}/helauth` : "/helauth";
 // Returns href url for sign in dialog when given redirect url as parameter
 // @param callBackUrl - url to redirect after successful login
 // @param originOverride - when behind a gateway on a server the url.origin is incorrect
-export const getSignInUrl = (callBackUrl: string, originOverride?: string): string => {
+export const getSignInUrl = (
+  callBackUrl: string,
+  originOverride?: string
+): string => {
   if (callBackUrl.includes(`/logout`)) {
-    const baseUrl = originOverride != null ? originOverride : new URL(callBackUrl).origin;
+    const baseUrl =
+      originOverride != null ? originOverride : new URL(callBackUrl).origin;
     return `${AUTH_URL}/login?next=${baseUrl}`;
   }
   return `${AUTH_URL}/login?next=${callBackUrl}`;
