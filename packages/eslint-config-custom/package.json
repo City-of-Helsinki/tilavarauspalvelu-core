@@ -4,11 +4,10 @@
   "version": "0.0.0",
   "private": true,
   "devDependencies": {
-    "@vercel/style-guide": "^5.0.1",
-    "eslint-config-turbo": "^1.10.12",
-    "eslint": "^8.52.0",
+    "@vercel/style-guide": "^5.1.0",
+    "eslint": "^8.55.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-jsx-a11y": "^6.7.1",
+    "eslint-config-turbo": "^1.10.12",
     "eslint-plugin-prettier": "^5.0.1",
     "prettier-eslint": "^16.1.2"
   }
