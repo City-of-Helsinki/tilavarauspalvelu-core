@@ -81,7 +81,7 @@ const CenterContent = styled.div`
 `;
 
 const stripTimeZeros = (time: string) =>
-  time.substring(0, 1) === "0" ? time.substring(1) : time;
+  time.startsWith("0") ? time.substring(1) : time;
 
 const getStatus = (x: NewReservationListItem) => {
   if (x.isOverlapping) {

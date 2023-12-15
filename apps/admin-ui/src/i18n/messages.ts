@@ -1936,11 +1936,8 @@ const traverse = (
       const key = `${prefix}.${k}`;
       const values = <string[]>obj[k];
       const [valFi, valEn, valSv] = values;
-      // eslint-disable-next-line no-param-reassign
       target.fi.translation[key] = valFi;
-      // eslint-disable-next-line no-param-reassign
       target.en.translation[key] = valEn || `${valFi} en`;
-      // eslint-disable-next-line no-param-reassign
       target.sv.translation[key] = valSv || `${valFi} sv`;
     }
   });

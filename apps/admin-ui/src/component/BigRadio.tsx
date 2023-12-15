@@ -1,21 +1,21 @@
 import React, { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { Button } from "hds-react";
+import { Button as HDSButton } from "hds-react";
 import { breakpoints } from "common/src/common/style";
 
-interface IProps {
-  buttons: Button[];
-  activeKey?: string;
-  setActiveKey: Dispatch<SetStateAction<string>>;
-  className?: string;
-}
-
-interface Button {
+interface ButtonT {
   key: string;
   text: string;
   callback?: () => void;
   disabled?: boolean;
+}
+
+interface IProps {
+  buttons: ButtonT[];
+  activeKey?: string;
+  setActiveKey: Dispatch<SetStateAction<string>>;
+  className?: string;
 }
 
 interface IButtonProps {
@@ -28,7 +28,7 @@ const Wrapper = styled.div`
   }
 `;
 
-const StyledButton = styled(Button).attrs(({ $active }: IButtonProps) => ({
+const StyledButton = styled(HDSButton).attrs(({ $active }: IButtonProps) => ({
   style: {
     "--border-color": "var(--color-black)",
     "--color-bus": $active ? "var(--color-black)" : "var(--color-white)",

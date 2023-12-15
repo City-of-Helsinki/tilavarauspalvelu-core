@@ -248,15 +248,16 @@ export const getSlotApplicationEvents = (
 ): ApplicationEventNode[] => {
   if (!slots) return [];
   return (
-    applicationEvents?.filter((applicationEvent) =>
-      applicationEvent?.applicationEventSchedules?.some(
-        (applicationEventSchedule) =>
-          applicationEventSchedule &&
-          doSomeSlotsFitApplicationEventSchedule(
-            applicationEventSchedule,
-            slots
-          )
-      )
+    applicationEvents?.filter(
+      (applicationEvent) =>
+        applicationEvent?.applicationEventSchedules?.some(
+          (applicationEventSchedule) =>
+            applicationEventSchedule &&
+            doSomeSlotsFitApplicationEventSchedule(
+              applicationEventSchedule,
+              slots
+            )
+        )
     ) || []
   );
 };
@@ -290,14 +291,18 @@ export const getSelectedApplicationEvents = (
   if (!selection || !applicationEvents) return [];
 
   return orderBy(
-    applicationEvents.filter((applicationEvent) =>
-      applicationEvent.applicationEventSchedules?.some(
-        (applicationEventSchedule) =>
-          applicationEventSchedule?.priority === priority &&
-          getTimeSlots([applicationEventSchedule]).some((timeSlot) =>
-            selection?.some((selectionItem) => timeSlot.includes(selectionItem))
-          )
-      )
+    applicationEvents.filter(
+      (applicationEvent) =>
+        applicationEvent.applicationEventSchedules?.some(
+          (applicationEventSchedule) =>
+            applicationEventSchedule?.priority === priority &&
+            getTimeSlots([applicationEventSchedule]).some(
+              (timeSlot) =>
+                selection?.some((selectionItem) =>
+                  timeSlot.includes(selectionItem)
+                )
+            )
+        )
     ),
     [
       (o) =>

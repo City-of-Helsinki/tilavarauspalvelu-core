@@ -47,8 +47,8 @@ export const FilterBtn = styled(Button).attrs(
       "--filter-button-color": $filtersActive
         ? "var(--tilavaraus-admin-blue-dark)"
         : $filterControlsAreOpen
-        ? "var(--color-silver)"
-        : "transparent",
+          ? "var(--color-silver)"
+          : "transparent",
       "--color-bus": "var(--filter-button-color)",
       "--color-bus-dark": "var(--filter-button-color)",
       "--color-white": $filtersActive

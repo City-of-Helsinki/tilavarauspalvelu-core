@@ -49,7 +49,6 @@ export default class MyDocument extends Document {
         <Head>
           <style
             data-used-styles
-            // eslint-disable-next-line react/no-danger, @typescript-eslint/naming-convention
             dangerouslySetInnerHTML={{ __html: hdsCriticalRules }}
           />
         </Head>

@@ -142,7 +142,6 @@ const ApplicationRoundAllocationActions = ({
   const timeSlotStartOptions = getOptions("start");
   const timeSlotEndOptions = getOptions("end");
 
-  // eslint-disable-next-line consistent-return
   const setSelectedTime = (startValue?: string, endValue?: string): void => {
     if (!selection) return undefined;
     const start = startValue || selection[0];

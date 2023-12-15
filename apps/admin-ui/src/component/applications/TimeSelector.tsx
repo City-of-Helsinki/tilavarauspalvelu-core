@@ -119,7 +119,7 @@ const TimeSelectionButton = styled.div<{
     border-bottom-color: var(--color-black-60);
   `
       : $priority === 200
-      ? `
+        ? `
     &:after {
       ${arrowDown}
       left: 4px;
@@ -129,7 +129,7 @@ const TimeSelectionButton = styled.div<{
     background: var(--tilavaraus-calendar-selected-secondary);
     color: var(--color-black);
   `
-      : `
+        : `
     background: #e5e5e5;
     color: var(--color-black);
   `};

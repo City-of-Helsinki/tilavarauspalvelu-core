@@ -30,7 +30,7 @@ const Stages = styled.div`
   border-left: 1px solid var(--color-black);
 `;
 
-const Stage = styled.div<{ $active: boolean }>`
+const StageDiv = styled.div<{ $active: boolean }>`
   ${({ $active }) =>
     $active &&
     `
@@ -104,14 +104,14 @@ function StageInfo({
       <H1 $legacy>{t("StageInfo.stagesOfHandling")}</H1>
       <Stages>
         {stages.map((stage) => (
-          <Stage
+          <StageDiv
             id={`stage-info__stage-${stage.id}`}
             key={`stage-${stage.id}`}
             $active={stage.id === activeStage}
           >
             <H3>{t(`StageInfo.stage${stage.id}.title`)}</H3>
             <p>{t(`StageInfo.stage${stage.id}.body`, { data: stage.data })}</p>
-          </Stage>
+          </StageDiv>
         ))}
       </Stages>
     </Wrapper>

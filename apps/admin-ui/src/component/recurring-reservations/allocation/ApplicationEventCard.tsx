@@ -34,8 +34,8 @@ const Card = styled.button<{ $type: AllocationApplicationEventCardType }>`
     $type === "allocated"
       ? "var(--color-gold-medium-light)"
       : $type === "declined"
-      ? "var(--color-black-10)"
-      : "transparent"};
+        ? "var(--color-black-10)"
+        : "transparent"};
 `;
 
 const StyledRadioButton = styled(RadioButton)`

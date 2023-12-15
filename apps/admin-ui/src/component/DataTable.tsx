@@ -701,7 +701,7 @@ function DataTable({
                     <Cell
                       as="th"
                       key={col.key}
-                      onClick={(): void | false =>
+                      onClick={() =>
                         actionsEnabled &&
                         !col.disableSorting &&
                         setSortingAndOrder(col.key)

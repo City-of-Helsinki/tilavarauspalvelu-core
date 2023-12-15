@@ -1441,8 +1441,8 @@ function TermsSection({
             name === "serviceSpecificTermsPk"
               ? serviceSpecificTermsOptions
               : name === "cancellationTermsPk"
-              ? cancellationTermsOptions
-              : paymentTermsOptions;
+                ? cancellationTermsOptions
+                : paymentTermsOptions;
           return (
             <Controller
               control={control}

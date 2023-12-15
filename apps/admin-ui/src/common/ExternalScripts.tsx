@@ -19,7 +19,6 @@ const ExternalScripts = (): JSX.Element | null => {
           id="cookiehub"
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{
-            // eslint-disable-next-line
             __html: `
             var cpm = {
               cookie: {
@@ -44,7 +43,6 @@ const ExternalScripts = (): JSX.Element | null => {
           data-consent="analytics"
           type="text/plain"
           dangerouslySetInnerHTML={{
-            // eslint-disable-next-line
             __html: `
             (function(h,o,t,j,a,r){
               h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};

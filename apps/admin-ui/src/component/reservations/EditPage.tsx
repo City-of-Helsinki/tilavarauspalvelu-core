@@ -174,7 +174,6 @@ const EditReservation = ({
       ...flattenedMetadataSetValues,
     };
 
-    // eslint-disable-next-line consistent-return
     return changeStaffReservation(toSubmit);
   };
 

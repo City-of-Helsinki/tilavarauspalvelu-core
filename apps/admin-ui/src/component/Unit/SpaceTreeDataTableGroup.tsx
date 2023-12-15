@@ -142,45 +142,42 @@ function SpaceTreeDataTableGroup({
   cellConfig,
 }: IProps): JSX.Element {
   const history = useNavigate();
-  if (hasGrouping === false) {
+  if (!hasGrouping) {
     return <> {children} </>;
   }
   const groupChildren = (
     group.data.length > 1 ? group.data.slice(1) : group.data
-  ).map(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (row: SpaceType): JSX.Element => {
-      const rowKey = get(row, cellConfig.index);
+  ).map((row: SpaceType): JSX.Element => {
+    const rowKey = get(row, cellConfig.index);
 
-      const prefixWidth = PREFIX_DEPTH_WIDTH_PX * depth(row);
-      const isChildRow = row.parent != null;
+    const prefixWidth = PREFIX_DEPTH_WIDTH_PX * depth(row);
+    const isChildRow = row.parent != null;
 
-      return (
-        <StyledRow
-          $isChildren={isChildRow}
-          key={rowKey}
-          onClick={(): void => {
-            if (cellConfig.rowLink) {
-              history(cellConfig.rowLink(row));
-            }
-          }}
-          $clickable={!!cellConfig.rowLink}
-          $disabled={false}
-          $columnCount={cellConfig.cols.length}
-        >
-          {cellConfig.cols.map((col, index) =>
-            renderColumn(
-              row,
-              cellConfig,
-              index,
-              (index === 0 && prefixWidth) || 0,
-              isChildRow
-            )
-          )}
-        </StyledRow>
-      );
-    }
-  );
+    return (
+      <StyledRow
+        $isChildren={isChildRow}
+        key={rowKey}
+        onClick={(): void => {
+          if (cellConfig.rowLink) {
+            history(cellConfig.rowLink(row));
+          }
+        }}
+        $clickable={!!cellConfig.rowLink}
+        $disabled={false}
+        $columnCount={cellConfig.cols.length}
+      >
+        {cellConfig.cols.map((col, index) =>
+          renderColumn(
+            row,
+            cellConfig,
+            index,
+            (index === 0 && prefixWidth) || 0,
+            isChildRow
+          )
+        )}
+      </StyledRow>
+    );
+  });
 
   const root = group.data[0];
   const colCount = cellConfig.cols.length;

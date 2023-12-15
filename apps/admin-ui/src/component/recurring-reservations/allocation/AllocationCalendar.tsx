@@ -68,28 +68,28 @@ const Slot = styled.div<{
           background-color: var(--color-gold-dark);
         `
       : $eventCount && $eventCount > 3
-      ? css`
-          background-color: var(--color-summer-medium-light);
-        `
-      : $eventCount && $eventCount > 1
-      ? css`
-          background-color: var(--color-summer-light);
-        `
-      : $eventCount && $eventCount > 0
-      ? css`
-          background-color: var(--color-tram-light);
-        `
-      : $isDeclined
-      ? css`
-          background-color: var(--color-black-30);
-          color: var(--color-black);
-        `
-      : $isAccepted
-      ? css`
-          background-color: var(--color-success);
-          color: var(--color-white);
-        `
-      : css``}
+        ? css`
+            background-color: var(--color-summer-medium-light);
+          `
+        : $eventCount && $eventCount > 1
+          ? css`
+              background-color: var(--color-summer-light);
+            `
+          : $eventCount && $eventCount > 0
+            ? css`
+                background-color: var(--color-tram-light);
+              `
+            : $isDeclined
+              ? css`
+                  background-color: var(--color-black-30);
+                  color: var(--color-black);
+                `
+              : $isAccepted
+                ? css`
+                    background-color: var(--color-success);
+                    color: var(--color-white);
+                  `
+                : css``}
 `;
 
 const Selection = styled.div<{ $isFirst: boolean; $isLast: boolean }>`

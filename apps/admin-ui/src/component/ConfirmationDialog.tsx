@@ -29,7 +29,7 @@ const ConfirmationDialog = forwardRef(
       },
     }));
 
-    if (state.open !== true) {
+    if (!state.open) {
       return null;
     }
     return (

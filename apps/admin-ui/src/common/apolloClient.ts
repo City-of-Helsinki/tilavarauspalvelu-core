@@ -51,7 +51,6 @@ const authLink = new ApolloLink((operation, forward) => {
   return forward(operation);
 });
 
-// eslint-disable-next-line consistent-return
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
     graphQLErrors.forEach(async (error: GraphQLError) => {

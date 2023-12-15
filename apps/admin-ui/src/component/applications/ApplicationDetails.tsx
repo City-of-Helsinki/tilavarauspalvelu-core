@@ -514,6 +514,7 @@ function ApplicationDetails({
           <ApplicationEventDetails
             applicationEvent={applicationEvent}
             application={application}
+            key={applicationEvent.pk}
           />
         ))}
         <H4>{t("Application.customerBasicInfo")}</H4>

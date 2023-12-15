@@ -190,7 +190,7 @@ it("success if single reservation fails once and then succeeds", async () => {
   await user.click(btn);
 
   await waitFor(() => expect(cb).toHaveBeenCalledTimes(1));
-  expect(cb).toBeCalledWith(successRetVal);
+  expect(cb).toHaveBeenCalledWith(successRetVal);
 });
 
 const failureRetVal = Array.from({ length: N_DAYS }, (_, i) => ({
@@ -210,5 +210,5 @@ it("report a single failure if single reservation fails twice", async () => {
   await user.click(btn);
 
   await waitFor(() => expect(cb).toHaveBeenCalledTimes(1));
-  expect(cb).toBeCalledWith(failureRetVal);
+  expect(cb).toHaveBeenCalledWith(failureRetVal);
 });

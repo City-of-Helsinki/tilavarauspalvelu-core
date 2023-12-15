@@ -241,10 +241,8 @@ export const Table = ({
       "--background-color is deprecated, and will be removed in a future release. Please use --header-background-color instead"
     );
 
-    /* eslint-disable no-param-reassign */
     theme["--header-background-color"] = theme["--background-color"];
     delete theme["--background-color"];
-    /* eslint-enable no-param-reassign */
   }
 
   const sorting = initialSortingColumnKey;

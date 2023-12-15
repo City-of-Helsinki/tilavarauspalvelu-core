@@ -3,7 +3,6 @@ import { MockedProvider } from "@apollo/client/testing";
 import { render, waitFor, within } from "@testing-library/react";
 import { MemoryRouter, Route, Routes, generatePath } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
-// eslint-disable-next-line import/no-extraneous-dependencies
 import * as router from "react-router";
 import { ReservationsReservationReserveeTypeChoices } from "common/types/gql-types";
 import NotificationContextMock, {

@@ -111,10 +111,11 @@ function ApplicationEvents({
   useEffect(() => setSelection([]), [selectedApplicationEvent]);
   useEffect(() => setSelection([]), [reservationUnit]);
 
-  const allocatedUnsorted = applicationEvents?.filter((applicationEvent) =>
-    applicationEvent?.applicationEventSchedules?.some(
-      (aes) => aes?.allocatedBegin != null
-    )
+  const allocatedUnsorted = applicationEvents?.filter(
+    (applicationEvent) =>
+      applicationEvent?.applicationEventSchedules?.some(
+        (aes) => aes?.allocatedBegin != null
+      )
   );
   const allocatedApplicationEvents: ApplicationEventNode[] = sortBy(
     allocatedUnsorted,
@@ -124,10 +125,11 @@ function ApplicationEvents({
   // const declinedApplicationEvents: ApplicationEventNode[] = []
 
   // take certain states and omit colliding application events
-  const ununsorted = applicationEvents?.filter((applicationEvent) =>
-    applicationEvent?.applicationEventSchedules?.some(
-      (aes) => aes?.allocatedBegin == null
-    )
+  const ununsorted = applicationEvents?.filter(
+    (applicationEvent) =>
+      applicationEvent?.applicationEventSchedules?.some(
+        (aes) => aes?.allocatedBegin == null
+      )
   );
   const unallocatedApplicationEvents = sortBy(ununsorted, "name");
 

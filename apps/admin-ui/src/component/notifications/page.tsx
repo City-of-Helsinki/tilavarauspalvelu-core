@@ -90,7 +90,6 @@ const BANNER_NOTIFICATIONS_DELETE = gql`
 `;
 
 // helpers so we get typechecking without casting
-// eslint-disable-next-line consistent-return -- end of switch is unreachable
 const convertLevel = (level: "EXCEPTION" | "NORMAL" | "WARNING"): Level => {
   switch (level) {
     case "EXCEPTION":
@@ -102,7 +101,6 @@ const convertLevel = (level: "EXCEPTION" | "NORMAL" | "WARNING"): Level => {
   }
 };
 
-// eslint-disable-next-line consistent-return -- end of switch is unreachable
 const convertTarget = (target: "ALL" | "STAFF" | "USER"): Target => {
   switch (target) {
     case "ALL":
@@ -123,7 +121,6 @@ function BannerNotificationStateTag({
 }: {
   state: BannerNotificationState;
 }) {
-  // eslint-disable-next-line consistent-return -- end of switch is unreachable
   const color = ((s: BannerNotificationState) => {
     switch (s) {
       case BannerNotificationState.Draft:

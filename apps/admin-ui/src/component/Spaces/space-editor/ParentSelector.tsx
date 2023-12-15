@@ -70,10 +70,10 @@ const ParentSelector = ({
 
         const additionalOptions = unitSpaces
           .filter((space) => space.pk !== spacePk)
-          .filter((space) => children.indexOf(space.pk) === -1)
+          .filter((space) => children.includes(space.pk))
           .map((space) => ({
-            label: space.nameFi as string,
-            value: space.pk as number,
+            label: space.nameFi ?? "-",
+            value: space.pk ?? null,
           }));
 
         const options = [] as {

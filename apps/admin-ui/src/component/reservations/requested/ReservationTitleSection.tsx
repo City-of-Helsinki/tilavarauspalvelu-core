@@ -72,7 +72,6 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
             <AlignVertically>
               {reservation.orderStatus && (
                 <Tag
-                  // eslint-disable-next-line @typescript-eslint/naming-convention
                   theme={{ "--tag-background": "var(--color-engel-light)" }}
                   id="orderStatus"
                 >

@@ -50,7 +50,7 @@ const initialSpace = (parentPk: number | null, unitPk: number) =>
     surfaceArea: 1,
     maxPersons: 1,
     parentPk,
-  } as SpaceMutationInputWithKey<SpaceCreateMutationInput>);
+  }) as SpaceMutationInputWithKey<SpaceCreateMutationInput>;
 
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {

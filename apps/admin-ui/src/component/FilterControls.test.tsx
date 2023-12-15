@@ -56,8 +56,8 @@ test("Filter Controls", async () => {
   expect(submitButton).toBeDisabled();
   expect(group1Filters.length).toBe(2);
   expect(group2Filters.length).toBe(1);
-  group1Filters.forEach((filter) => expect(filter).not.toBeVisible);
-  group2Filters.forEach((filter) => expect(filter).not.toBeVisible);
+  group1Filters.forEach((filter) => expect(filter).not.toBeVisible());
+  group2Filters.forEach((filter) => expect(filter).not.toBeVisible());
 
   fireEvent.click(groups[0]);
   fireEvent.click(group1Filters[0]);
@@ -69,14 +69,14 @@ test("Filter Controls", async () => {
     expect(group1Filters[1]).not.toBeChecked();
   });
 
-  group1Filters.forEach((filter) => expect(filter).toBeVisible);
-  group2Filters.forEach((filter) => expect(filter).not.toBeVisible);
+  group1Filters.forEach((filter) => expect(filter).toBeVisible());
+  group2Filters.forEach((filter) => expect(filter).not.toBeVisible());
 
   fireEvent.click(groups[0]);
   fireEvent.click(groups[1]);
 
   await waitFor(() => {
-    group1Filters.forEach((filter) => expect(filter).not.toBeVisible);
+    group1Filters.forEach((filter) => expect(filter).not.toBeVisible());
     group2Filters.forEach((filter) => {
       expect(filter).not.toBeChecked();
     });

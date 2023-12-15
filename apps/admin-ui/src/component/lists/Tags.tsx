@@ -43,7 +43,7 @@ export const toTags = <T,>(
             key: `${String(key)}.${v.value}`,
             value: truncate(v.label, 25),
             ac: { type: "deleteTag", field: key, value: v.value },
-          } as Tag<T>)
+          }) as Tag<T>
       );
     }
 
