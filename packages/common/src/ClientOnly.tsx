@@ -10,7 +10,6 @@ const ClientOnly = ({ children }: { children: React.ReactNode }) => {
     return null;
   }
 
-  // eslint-disable-next-line react/jsx-no-useless-fragment
   return <>{children}</>;
 };
 

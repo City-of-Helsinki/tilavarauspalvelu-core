@@ -1,3 +1,4 @@
+/* eslint-disable import/no-duplicates */
 import {
   parseISO,
   startOfWeek as dateFnsStartOfWeek,
@@ -8,6 +9,7 @@ import {
   parse,
 } from "date-fns";
 import { fi } from "date-fns/locale";
+/* eslint-enable import/no-duplicates */
 import { capitalize, isNumber } from "lodash";
 import { i18n } from "next-i18next";
 import { HMS } from "../../types/common";

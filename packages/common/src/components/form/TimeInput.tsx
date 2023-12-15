@@ -73,6 +73,7 @@ const ErrorText = styled.div`
 `;
 
 const isValid = (value: string): boolean => {
+  // eslint-disable-next-line prefer-named-capture-group -- TODO
   return value === "" || /^[0-9]{1,2}(:[0-9]{0,2})?$/.test(value);
 };
 
@@ -154,11 +155,11 @@ export const TimeInput = forwardRef(function TimeInput(
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.currentTarget;
     // automatically add ':' after the user types 2 numbers
-    if (value.length === 2 && value.indexOf(":") === -1) {
+    if (value.length === 2 && !value.includes(":")) {
       e.currentTarget.value = `${value}:`;
     }
     // add the : automatically if it's missing and more than 2 numbers are added (primarily paste 0000 => 00:00)
-    else if (value.indexOf(":") === -1 && value.length > 2) {
+    else if (!value.includes(":") && value.length > 2) {
       const modVal = `${value.slice(0, 2)}:${value.slice(2)}`;
       if (isValid(modVal)) {
         e.currentTarget.value = modVal;

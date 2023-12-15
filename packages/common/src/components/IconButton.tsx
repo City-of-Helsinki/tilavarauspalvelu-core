@@ -127,7 +127,7 @@ type LinkWrapperProps = {
   href: string;
 };
 const LinkWrapper = ({ label, icon, href, ...rest }: LinkWrapperProps) =>
-  String(href).substring(0, 4) !== "http" ? (
+  href.startsWith("http") ? (
     <StyledLink {...rest} href={href}>
       <LinkElement label={label} icon={icon} />
     </StyledLink>
@@ -150,7 +150,7 @@ const IconButton = ({
   icon,
   label,
   href,
-  openInNewTab = !!href && href.substring(0, 4) === "http", // open external links in a new tab by default
+  openInNewTab = !!href && href.startsWith("http"), // open external links in a new tab by default
   ...rest
 }: IconButtonProps): JSX.Element => {
   const linkOptions = {

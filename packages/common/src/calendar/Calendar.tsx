@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+/* eslint-disable import/no-duplicates */
 import {
   addHours,
   endOfMonth,
@@ -11,6 +12,7 @@ import {
 import fi from "date-fns/locale/fi";
 import en from "date-fns/locale/en-GB";
 import sv from "date-fns/locale/sv";
+/* eslint-enable import/no-duplicates */
 import {
   Calendar as BigCalendar,
   dateFnsLocalizer,
@@ -384,7 +386,7 @@ const StyledCalendar = styled(BigCalendar)<{
     overflow: visible !important;
 
     .rbc-addons-dnd-resize-ns-anchor {
-      ${({ $isDraggable }) => $isDraggable === false && "display: none;"}
+      ${({ $isDraggable }) => !$isDraggable && "display: none;"}
 
       &:first-child {
         top: -10px;

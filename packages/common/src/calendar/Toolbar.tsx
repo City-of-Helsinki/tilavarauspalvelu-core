@@ -1,8 +1,10 @@
 import React from "react";
 import { IconAngleLeft, IconAngleRight } from "hds-react";
 import classNames from "classnames";
+/* eslint-disable import/no-duplicates */
 import { format, startOfWeek, endOfWeek } from "date-fns";
 import fi from "date-fns/locale/fi";
+/* eslint-enable import/no-duplicates */
 import styled from "styled-components";
 import type { NavigateAction, View } from "react-big-calendar";
 import { useTranslation } from "react-i18next";
@@ -222,7 +224,6 @@ const Toolbar = ({
       <div className="rbc-btn-group">
         <button
           className={classNames("", {
-            // eslint-disable-next-line @typescript-eslint/naming-convention
             "rbc-active": view === "day",
           })}
           type="button"
@@ -237,7 +238,6 @@ const Toolbar = ({
         </button>
         <button
           className={classNames("", {
-            // eslint-disable-next-line @typescript-eslint/naming-convention
             "rbc-active": view === "week",
           })}
           type="button"

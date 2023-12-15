@@ -150,8 +150,8 @@ const Breadcrumb = ({
                       ? `${item.title.slice(0, limits.current)}...`
                       : item.title
                     : item.title.length > limits.default
-                    ? `${item.title.slice(0, limits.default)}...`
-                    : item.title}
+                      ? `${item.title.slice(0, limits.default)}...`
+                      : item.title}
                 </Anchor>
               </Link>
             ) : (
@@ -161,8 +161,8 @@ const Breadcrumb = ({
                     ? `${item.title.slice(0, limits.current)}...`
                     : item.title
                   : item.title.length > limits.default
-                  ? `${item.title.slice(0, limits.default)}...`
-                  : item.title}
+                    ? `${item.title.slice(0, limits.default)}...`
+                    : item.title}
               </Slug>
             )}
           </Item>

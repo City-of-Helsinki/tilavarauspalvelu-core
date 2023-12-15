@@ -67,7 +67,6 @@ const WrappedComponent = ({
   </Wrapper>
 );
 
-// describe("Text fields", () => {
 // Text fields
 test("Renders required text field", async () => {
   const fieldName = "name";

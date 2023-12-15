@@ -377,7 +377,7 @@ test("doReservationsCollide", () => {
 });
 
 describe("getDayIntervals", () => {
-  test("outputs sane results with 15min interval ", () => {
+  test("outputs sane results with 15min interval", () => {
     const result = getDayIntervals(
       "09:00:00",
       "12:00:00",

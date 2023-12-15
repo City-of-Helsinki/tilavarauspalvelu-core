@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { breakpoints } from "../common/style";
 import { H6 } from "../common/typography";
 
-type Link = {
+type LinkT = {
   href: string;
   text: string;
 };
@@ -13,7 +13,7 @@ export type Props = {
   id?: string;
   heading: string;
   body?: string | JSX.Element;
-  links?: Link[];
+  links?: LinkT[];
   acceptLabel?: string;
   accepted?: boolean;
   setAccepted?: (accepted: boolean) => void;

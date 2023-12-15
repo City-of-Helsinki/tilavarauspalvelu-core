@@ -220,7 +220,7 @@ describe("areOpeningTimesAvailable", () => {
     ).toBe(true);
   });
 
-  test("should work for multiday ", () => {
+  test("should work for multiday", () => {
     const openingHours: ReservableTimeSpanType[] = [
       {
         startDatetime: "2022-02-02T10:00:00+00:00",

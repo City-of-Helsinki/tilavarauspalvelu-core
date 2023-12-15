@@ -96,7 +96,6 @@ const NotificationsListItem = ({
         {notification && (
           <BannerNotificationText
             dangerouslySetInnerHTML={{
-              // eslint-disable-next-line @typescript-eslint/naming-convention
               __html: getTranslation(notification, "message", {
                 fallbackLang: "fi",
               }),
