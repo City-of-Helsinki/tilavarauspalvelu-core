@@ -1,7 +1,8 @@
 // @ts-check
 import { join } from "node:path";
 import * as url from "node:url";
-import i18nconfig from "./next-i18next.config";
+// eslint-disable-next-line import/extensions -- removing extension breaks build
+import i18nconfig from "./next-i18next.config.js";
 import { withSentryConfig } from "@sentry/nextjs";
 import { env } from "./env.mjs";
 

@@ -3,7 +3,8 @@ import { getCookie } from "typescript-cookie";
 import { relayStylePagination } from "@apollo/client/utilities";
 import { onError } from "@apollo/client/link/error";
 import { GraphQLError } from "graphql";
-import qs, { ParsedUrlQuery } from "node:querystring";
+// eslint-disable-next-line unicorn/prefer-node-protocol -- node:querystring breaks the app
+import qs, { ParsedUrlQuery } from "querystring";
 import { GRAPHQL_URL, isBrowser } from "./const";
 import { GetServerSidePropsContext, PreviewData } from "next";
 import { IncomingHttpHeaders } from "node:http";

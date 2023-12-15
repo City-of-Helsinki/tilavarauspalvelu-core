@@ -108,7 +108,9 @@ test("should reset keyboard navigation position after a new search", async () =>
 
   arrowDownKeyPressHelper();
 
-  const checkbox = (await screen.findByRole("checkbox", { name: options[0].label })).parentElement?.parentElement;
+  const checkbox = (
+    await screen.findByRole("checkbox", { name: options[0].label })
+  ).parentElement?.parentElement;
   expect(checkbox).toHaveClass("dropdownItem--isFocused");
 
   // Find something, then reset the search to ensure that all results are listed
@@ -255,9 +257,10 @@ test("should call onChange when clicking checkbox", async () => {
   await userEvent.click(toggleButton);
 
   const checkbox = screen.queryByRole("checkbox", { name: options[0].label });
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   await userEvent.click(checkbox!);
 
-  expect(onChange).toBeCalledWith([options[0].value]);
+  expect(onChange).toHaveBeenCalledWith([options[0].value]);
 });
 
 test("should uncheck option", async () => {
@@ -267,9 +270,10 @@ test("should uncheck option", async () => {
   await userEvent.click(toggleButton);
 
   const checkbox = screen.queryByRole("checkbox", { name: options[0].label });
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   await userEvent.click(checkbox!);
 
-  expect(onChange).toBeCalledWith([]);
+  expect(onChange).toHaveBeenCalledWith([]);
 });
 
 test("should show selected text for single value", () => {

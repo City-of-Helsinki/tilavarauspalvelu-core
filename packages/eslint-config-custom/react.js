@@ -1,8 +1,5 @@
 const { resolve } = require('node:path');
 
-// TODO this is a copy from next.js config
-// combine them and inherit (the only difference is the inclusion of vercel/style-guide/eslint/next)
-
 const project = resolve(process.cwd(), "tsconfig.json");
 
 module.exports = {

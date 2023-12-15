@@ -72,7 +72,7 @@ test("should add date type", async () => {
   const menu = await screen.findByTestId(testIds.menu);
   expect(menu).toBeInTheDocument();
 
-  const checkbox = await await screen.findByRole("checkbox", {
+  const checkbox = await screen.findByRole("checkbox", {
     name: mockTranslations.dateTypeToday,
   });
   await userEvent.click(checkbox);
@@ -127,7 +127,7 @@ test("should remove date type", async () => {
 
   await userEvent.click(checkbox);
 
-  expect(onChangeDateTypes).toBeCalledWith([DATE_TYPES.TOMORROW]);
+  expect(onChangeDateTypes).toHaveBeenCalledWith([DATE_TYPES.TOMORROW]);
 });
 
 describe("should open menu with", () => {

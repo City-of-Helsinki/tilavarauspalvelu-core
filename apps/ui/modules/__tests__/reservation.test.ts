@@ -1,5 +1,5 @@
 import { get as mockGet } from "lodash";
-import { addDays, addHours, addMinutes, format, startOfToday } from "date-fns";
+import { addDays, addHours, addMinutes, startOfToday } from "date-fns";
 import {
   PaymentOrderType,
   ReservationsReservationReserveeTypeChoices,
@@ -25,7 +25,7 @@ import {
   isReservationInThePast,
 } from "../reservation";
 import mockTranslations from "../../public/locales/fi/prices.json";
-import {toApiDate} from "common/src/common/util";
+import { toApiDate } from "common/src/common/util";
 
 jest.mock("next-i18next", () => ({
   i18n: {
@@ -39,16 +39,19 @@ jest.mock("next-i18next", () => ({
 
 describe("getDurationOptions", () => {
   test("empty inputs", () => {
-    const interval90 = ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_90Mins
-    const interval60 = ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_60Mins
-    expect(getDurationOptions( 0, 5400, interval90)).toEqual([]);
+    const interval90 =
+      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_90Mins;
+    const interval60 =
+      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_60Mins;
+    expect(getDurationOptions(0, 5400, interval90)).toEqual([]);
     expect(getDurationOptions(5400, 0, interval60)).toEqual([]);
-    expect(getDurationOptions( 0, 0, interval90)).toEqual([]);
+    expect(getDurationOptions(0, 0, interval90)).toEqual([]);
   });
 
   test("with 15 min intervals", () => {
-    const interval15 = ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
-    expect( getDurationOptions( 1800, 5400, interval15)).toEqual([
+    const interval15 =
+      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins;
+    expect(getDurationOptions(1800, 5400, interval15)).toEqual([
       {
         label: "0:30",
         value: "0:30",
@@ -73,8 +76,9 @@ describe("getDurationOptions", () => {
   });
 
   test("with 90 min intervals", () => {
-    const interval90 = ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_90Mins
-    expect( getDurationOptions( 1800, 30600, interval90)).toEqual([
+    const interval90 =
+      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_90Mins;
+    expect(getDurationOptions(1800, 30600, interval90)).toEqual([
       {
         label: "1:30",
         value: "1:30",
@@ -110,15 +114,16 @@ const reservationUnit: ReservationUnitByPkType = {
   isDraft: false,
   requireIntroduction: false,
   reservationKind: ReservationUnitsReservationUnitReservationKindChoices.Direct,
-  reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins,
+  reservationStartInterval:
+    ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins,
   reservationBegins: addDays(new Date(), -1).toISOString(),
   reservationEnds: undefined, // addDays(new Date(), 200).toISOString(),
   reservableTimeSpans: Array.from(Array(100)).map((_val, index) => {
-      return {
-        startDatetime: `${toApiDate(addDays(new Date(), index))}T07:00:00+00:00`,
-        endDatetime: `${toApiDate(addDays(new Date(), index))}T20:00:00+00:00`,
-      };
-    }),
+    return {
+      startDatetime: `${toApiDate(addDays(new Date(), index))}T07:00:00+00:00`,
+      endDatetime: `${toApiDate(addDays(new Date(), index))}T20:00:00+00:00`,
+    };
+  }),
   cancellationRule: {
     id: "fr8ejifod",
     needsHandling: false,
@@ -154,7 +159,7 @@ describe("canUserCancelReservation", () => {
           } as ReservationUnitCancellationRuleType,
         } as ReservationUnitType,
       ],
-    } ;
+    };
     expect(canUserCancelReservation(res)).toBe(false);
   });
 
@@ -176,7 +181,7 @@ describe("canUserCancelReservation", () => {
   });
 
   test("that does not need handling", () => {
-    const reservation = {
+    const reservation_ = {
       begin: new Date().toISOString(),
       state: ReservationsReservationStateChoices.Confirmed,
       reservationUnits: [
@@ -187,11 +192,11 @@ describe("canUserCancelReservation", () => {
         },
       ],
     } as ReservationType;
-    expect(canUserCancelReservation(reservation)).toBe(true);
+    expect(canUserCancelReservation(reservation_)).toBe(true);
   });
 
   test("with non-confirmed state", () => {
-    const reservation = {
+    const reservation_ = {
       begin: new Date().toISOString(),
       state: ReservationsReservationStateChoices.RequiresHandling,
       reservationUnits: [
@@ -202,11 +207,11 @@ describe("canUserCancelReservation", () => {
         },
       ],
     } as ReservationType;
-    expect(canUserCancelReservation(reservation)).toBe(false);
+    expect(canUserCancelReservation(reservation_)).toBe(false);
   });
 
   test("with 0 secs of buffer time", () => {
-    const reservation = {
+    const reservation_ = {
       begin: new Date().toISOString(),
       state: ReservationsReservationStateChoices.Confirmed,
       reservationUnits: [
@@ -218,11 +223,11 @@ describe("canUserCancelReservation", () => {
         },
       ],
     } as ReservationType;
-    expect(canUserCancelReservation(reservation)).toBe(true);
+    expect(canUserCancelReservation(reservation_)).toBe(true);
   });
 
   test("with 1 sec of buffer time", () => {
-    const reservation = {
+    const reservation_ = {
       begin: new Date().toISOString(),
       reservationUnits: [
         {
@@ -233,15 +238,15 @@ describe("canUserCancelReservation", () => {
         },
       ],
     } as ReservationType;
-    expect(canUserCancelReservation(reservation)).toBe(false);
+    expect(canUserCancelReservation(reservation_)).toBe(false);
   });
 
   test("without cancellation rule", () => {
-    const reservation = {
+    const reservation_ = {
       begin: new Date().toISOString(),
       reservationUnits: [{}],
     } as ReservationType;
-    expect(canUserCancelReservation(reservation)).toBe(false);
+    expect(canUserCancelReservation(reservation_)).toBe(false);
   });
 });
 
@@ -383,12 +388,12 @@ describe("getReservationCancellationReason", () => {
         begin: addHours(startOfToday(), 34).toISOString(),
         end: addHours(startOfToday(), 35).toISOString(),
         reservationUnits: [resUnit],
-      } )
+      })
     ).toBe(null);
   });
 
   test("can't cancel if the reservation is too close to the start time", () => {
-    const resUnit: ReservationUnitType= {
+    const resUnit: ReservationUnitType = {
       ...reservationUnit,
       cancellationRule: {
         ...reservationUnit.cancellationRule,
@@ -467,21 +472,21 @@ describe("getNormalizedReservationOrderStatus", () => {
 });
 
 describe("canReservationBeChanged", () => {
-
-
   test("returns false with incomplete data", () => {
     expect(canReservationTimeBeChanged({})).toStrictEqual([false]);
   });
 
   test("returns true with default data", () => {
-    expect(
-      canReservationTimeBeChanged({ reservation, })).toStrictEqual([true]);
+    expect(canReservationTimeBeChanged({ reservation })).toStrictEqual([true]);
   });
 
   test("returns false with non-confirmed reservation", () => {
     expect(
       canReservationTimeBeChanged({
-        reservation: { ...reservation, state: ReservationsReservationStateChoices.Created },
+        reservation: {
+          ...reservation,
+          state: ReservationsReservationStateChoices.Created,
+        },
       })
     ).toStrictEqual([false, "RESERVATION_MODIFICATION_NOT_ALLOWED"]);
   });
@@ -734,7 +739,9 @@ describe("getCheckoutUrl", () => {
   });
 
   test("returns undefined with falsy input", () => {
-    expect(getCheckoutUrl({ ...order, checkoutUrl: undefined })).not.toBeDefined();
+    expect(
+      getCheckoutUrl({ ...order, checkoutUrl: undefined })
+    ).not.toBeDefined();
 
     expect(
       getCheckoutUrl({

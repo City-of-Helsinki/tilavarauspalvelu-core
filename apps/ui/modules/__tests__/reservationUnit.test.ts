@@ -764,9 +764,11 @@ describe("getFuturePricing", () => {
     }
     expect(getFuturePricing(data)).toEqual(data.pricings[2]);
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     data.pricings[1]!.begins = toUIDate(addDays(new Date(), 3), "yyyy-MM-dd");
     expect(getFuturePricing(data)).toEqual(data.pricings[1]);
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     data.pricings[2]!.begins = toUIDate(addDays(new Date(), 2), "yyyy-MM-dd");
     expect(getFuturePricing(data)).toEqual(data.pricings[2]);
   });
@@ -779,10 +781,13 @@ describe("getFuturePricing", () => {
 
     expect(getFuturePricing(data)).toEqual(data.pricings[2]);
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     data.pricings[0]!.status =
       ReservationUnitsReservationUnitPricingStatusChoices.Past;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     data.pricings[1]!.status =
       ReservationUnitsReservationUnitPricingStatusChoices.Active;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     data.pricings[2]!.status =
       ReservationUnitsReservationUnitPricingStatusChoices.Past;
     expect(getFuturePricing(data)).toBeUndefined();
@@ -840,7 +845,7 @@ describe("getFuturePricing", () => {
     if (data.pricings == null || data.pricings.length < 2) {
       throw new Error("Invalid test data");
     }
-    const applicationRounds = [{} as RoundPeriod]
+    const applicationRounds = [{} as RoundPeriod];
 
     expect(getFuturePricing(data, applicationRounds)).toEqual(data.pricings[2]);
 
