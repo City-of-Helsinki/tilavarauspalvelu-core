@@ -11,7 +11,7 @@ const main = () => {
     let html;
     let fileContent;
 
-    fs.mkdirSync(path.join(__dirname, "/html/"), { recursive: true } );
+    fs.mkdirSync(path.join(__dirname, "/html/"), { recursive: true });
     files.forEach((file) => {
       fileContent = fs.readFileSync(
         path.join(__dirname, "../email/templates", file)
@@ -19,7 +19,7 @@ const main = () => {
       fileContent = mjml(fileContent.toString());
       html = path.join(
         __dirname,
-        "../email/html/" + file.replace(".template.mjml", ".html")
+        `../email/html/${file.replace(".template.mjml", ".html")}`
       );
 
       fs.writeFileSync(html, fileContent.html);

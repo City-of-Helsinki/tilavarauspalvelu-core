@@ -73,7 +73,6 @@ const ErrorText = styled.div`
 `;
 
 const isValid = (value: string): boolean => {
-  // eslint-disable-next-line prefer-named-capture-group -- TODO
   return value === "" || /^[0-9]{1,2}(:[0-9]{0,2})?$/.test(value);
 };
 
