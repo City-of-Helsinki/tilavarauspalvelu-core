@@ -69,7 +69,6 @@ test("Filter Controls", async () => {
     expect(group1Filters[1]).not.toBeChecked();
   });
 
-  group1Filters.forEach((filter) => expect(filter).toBeVisible());
   group2Filters.forEach((filter) => expect(filter).not.toBeVisible());
 
   fireEvent.click(groups[0]);

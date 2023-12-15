@@ -6,7 +6,7 @@ import { withSentryConfig } from "@sentry/nextjs";
 import { env } from "./src/env.mjs";
 
 // @ts-expect-error -- This works because it's only run on node (not browser)
-await import ("./src/env.mjs");
+await import("./src/env.mjs");
 
 const ROOT_PATH = url.fileURLToPath(new URL(".", import.meta.url));
 
@@ -15,14 +15,14 @@ const withBundleAnalyzer = analyser({
 });
 
 /** @type {import('next').NextConfig} */
-const config ={
+const config = {
   reactStrictMode: true,
   transpilePackages: ["common"],
   // create a smaller bundle
-  output: 'standalone',
+  output: "standalone",
   experimental: {
     // this includes files from the monorepo base two directories up
-    outputFileTracingRoot: join(ROOT_PATH, '../../'),
+    outputFileTracingRoot: join(ROOT_PATH, "../../"),
   },
   // don't block builds use a separate CI step for this
   typescript: {
@@ -35,8 +35,8 @@ const config ={
     includePaths: [join(ROOT_PATH, "src")],
   },
   i18n: {
-    locales: ['fi'],
-    defaultLocale: 'fi',
+    locales: ["fi"],
+    defaultLocale: "fi",
   },
   basePath: env.NEXT_PUBLIC_BASE_URL,
   async rewrites() {
@@ -92,7 +92,7 @@ const config ={
   },
 };
 
-const nextConfig = withBundleAnalyzer(config)
+const nextConfig = withBundleAnalyzer(config);
 
 const sentryWebpackPluginOptions = {
   hideSourceMaps: true,
@@ -103,4 +103,5 @@ const sentryWebpackPluginOptions = {
 // Make sure adding Sentry options is the last code to run before exporting, to
 // ensure that your source maps include changes from all other Webpack plugins
 export default env.SENTRY_ENVIRONMENT
-  ? withSentryConfig(nextConfig, sentryWebpackPluginOptions) : nextConfig;
+  ? withSentryConfig(nextConfig, sentryWebpackPluginOptions)
+  : nextConfig;
