@@ -2178,7 +2178,7 @@ function EditorWrapper() {
   // NOTE override the unitPk from the url for new units
   // there is no harm in doing it to existing units either (since it should be valid)
   const form = useForm<ReservationUnitEditFormValues>({
-    mode: "onSubmit",
+    mode: "onBlur",
     // NOTE disabling because it throws an error when submitting because it can't focus the field
     // this happens for field errors in the zod schema where the field is created using an array
     // for example termsOfUseEn, termsOfUseFi, termsOfUseSv

@@ -73,7 +73,7 @@ const ErrorText = styled.div`
 `;
 
 const isValid = (value: string): boolean => {
-  return /^[0-9]{1,2}(:[0-9]{0,2})?$/.test(value);
+  return value === "" || /^[0-9]{1,2}(:[0-9]{0,2})?$/.test(value);
 };
 
 type TimeInputProps = {
@@ -87,13 +87,21 @@ type TimeInputProps = {
 /// this breaks all react-hook-forms because they rely on resetting the value (both controlled / uncontrolled)
 /// TODO if you use this on ui side check accessibility
 export const TimeInput = forwardRef(function TimeInput(
-  { error, label, className, style, ...props }: TimeInputProps,
+  {
+    error,
+    label,
+    className,
+    style,
+    onChange,
+    onKeyDown,
+    ...props
+  }: TimeInputProps,
   ref: Ref<HTMLInputElement>
 ) {
   // block if the input is not a number or :
   // allow overwriting selection
   // automatic adding of : if the user types 3 numbers
-  const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     const isNumber = !Number.isNaN(Number(e.key));
     const { value, selectionStart, selectionEnd } = e.currentTarget;
 
@@ -110,8 +118,13 @@ export const TimeInput = forwardRef(function TimeInput(
     ) {
       // noop
     } else if (e.key === "Backspace") {
-      // TODO use selection, and check if the last char is : or not
-      if (value.length === 3) {
+      // automatically delete ':' - To simplify the logic we only care non selected variation here
+      // there are issues when user selects ':' + other numbers around it (getting blocked by the validator)
+      if (
+        value.length === 3 &&
+        (selectionStart === 2 || selectionStart === 3) &&
+        selectionEnd === 3
+      ) {
         e.currentTarget.value = value.slice(0, 2);
       }
     } else if (e.key === "Delete") {
@@ -128,44 +141,36 @@ export const TimeInput = forwardRef(function TimeInput(
       // noop
     } else if (e.key !== ":" && !isNumber) {
       e.preventDefault();
-    } else {
-      const newValue =
-        value.slice(0, selectionStart ?? value.length) +
-        e.key +
-        value.slice(selectionEnd ?? value.length);
-      // automatically add ':' after the user types 2 numbers
-      if (newValue.length === 2 && newValue.indexOf(":") === -1) {
-        e.currentTarget.value = `${value}${e.key}:`;
-        e.preventDefault();
-      }
-      if (!isValid(newValue)) {
-        e.preventDefault();
-      }
     }
+    onKeyDown?.(e);
   };
 
-  const onPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
-    const value = e.clipboardData.getData("text");
-    const {
-      value: currentValue,
-      selectionStart,
-      selectionEnd,
-    } = e.currentTarget;
-    const val =
-      currentValue.slice(0, selectionStart ?? currentValue.length) +
-      value +
-      currentValue.slice(selectionEnd ?? currentValue.length);
-    if (isValid(val)) {
-      return;
+  // Separate onChange handler for validation and modification of the value
+  // NOTE without calling onChange (e.g. preventDefault) the value in react-hook-form is not updated
+  // Known issues:
+  // user can select and delete the ':' character but it's recreated instantly (ex. 11:1 -> 11 -> 11:)
+  // user can try to delete ':' in the middle (ex. 11:11) but it's blocked
+  // deleting first two numbers while leaving the ':' doesn't work (proper solution is to automatically delete ':')
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.currentTarget;
+    // automatically add ':' after the user types 2 numbers
+    if (value.length === 2 && value.indexOf(":") === -1) {
+      e.currentTarget.value = `${value}:`;
     }
     // add the : automatically if it's missing and more than 2 numbers are added (primarily paste 0000 => 00:00)
-    if (val.indexOf(":") === -1) {
-      const modVal = `${val.slice(0, 2)}:${val.slice(2)}`;
+    else if (value.indexOf(":") === -1 && value.length > 2) {
+      const modVal = `${value.slice(0, 2)}:${value.slice(2)}`;
       if (isValid(modVal)) {
         e.currentTarget.value = modVal;
+      } else {
+        e.preventDefault();
+        return;
       }
+    } else if (!isValid(value)) {
+      e.preventDefault();
+      return;
     }
-    e.preventDefault();
+    onChange?.(e);
   };
 
   return (
@@ -179,8 +184,8 @@ export const TimeInput = forwardRef(function TimeInput(
         placeholder="tt:mm"
         ref={ref}
         // setting size={X} breaks css styling... because of course it does
-        onPaste={onPaste}
-        onKeyDown={onKeyDown}
+        onKeyDown={handleKeyDown}
+        onChange={handleOnChange}
       />
       {error && (
         <ErrorText>

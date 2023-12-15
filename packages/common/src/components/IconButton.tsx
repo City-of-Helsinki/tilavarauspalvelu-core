@@ -65,6 +65,10 @@ const StyledLinkButton = styled.button`
 
   &:disabled {
     color: var(--color-black-50);
+    & * :hover {
+      cursor: not-allowed;
+      border-color: transparent;
+    }
   }
 `;
 

@@ -138,7 +138,8 @@ function SeasonRow({
   form: UseFormReturn<ReservationUnitEditFormValues>;
   index: number;
 }): JSX.Element {
-  const { control, unregister, register, setValue, watch, formState } = form;
+  const { control, unregister, register, setValue, trigger, watch, formState } =
+    form;
   const { errors } = formState;
   const { t } = useTranslation();
 
@@ -193,13 +194,16 @@ function SeasonRow({
               <Controller
                 control={control}
                 name={`seasons.${index}.reservableTimes.${i}.begin`}
-                render={({ field: { value, onChange } }) => (
+                render={({ field: { onBlur, ...field } }) => (
                   <StyledTimeInput
-                    id={`seasons.${index}.begin`}
+                    {...field}
+                    onBlur={() => {
+                      onBlur();
+                      trigger();
+                    }}
+                    // id={`seasons.${index}.begin`}
                     disabled={isClosed}
                     label={t("ReservationUnitEditor.label.openingTime")}
-                    value={value}
-                    onChange={onChange}
                     error={getTranslatedError(
                       errors.seasons?.[index]?.reservableTimes?.[i]?.begin
                         ?.message,
@@ -211,13 +215,16 @@ function SeasonRow({
               <Controller
                 control={control}
                 name={`seasons.${index}.reservableTimes.${i}.end`}
-                render={({ field: { value, onChange } }) => (
+                render={({ field: { onBlur, ...field } }) => (
                   <StyledTimeInput
-                    id={`seasons.${index}.end`}
+                    {...field}
+                    onBlur={() => {
+                      onBlur();
+                      trigger();
+                    }}
+                    // id={`seasons.${index}.end`}
                     disabled={isClosed}
                     label={t("ReservationUnitEditor.label.closingTime")}
-                    value={value}
-                    onChange={onChange}
                     error={getTranslatedError(
                       errors.seasons?.[index]?.reservableTimes?.[i]?.end
                         ?.message,
@@ -234,12 +241,17 @@ function SeasonRow({
         <Controller
           control={control}
           name={`seasons.${index}.closed`}
-          render={({ field: { value, onChange } }) => (
+          render={({ field: { value, onChange, onBlur } }) => (
             <Checkbox
               id={`seasons.${index}.closed`}
               label={t("ReservationUnitEditor.closed")}
               checked={value}
-              onChange={(e) => onChange(e.target.checked)}
+              onChange={(e) => {
+                onChange(e.target.checked);
+                // need to trigger validation manually because this affects the whole day row
+                form.trigger();
+              }}
+              onBlur={onBlur}
             />
           )}
         />
@@ -266,7 +278,10 @@ function SeasonRow({
 const SeasonalInnerWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-2-xl);
+  gap: var(--spacing-m);
+  @media (width > ${breakpoints.xl}) {
+    gap: var(--spacing-2-xl);
+  }
 `;
 
 export function SeasonalSection({
@@ -290,7 +305,11 @@ export function SeasonalSection({
       closed: false,
       reservableTimes: [{ begin: "", end: "" }],
     }));
-    setValue("seasons", val, { shouldDirty: true, shouldTouch: true });
+    setValue("seasons", val, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
   };
 
   return (

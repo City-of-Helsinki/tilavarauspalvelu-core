@@ -174,6 +174,10 @@ function validateSeasonalTimes(
   ctx: z.RefinementCtx
 ): void {
   data.forEach((season, index) => {
+    // closed don't need validation (time is not saved)
+    if (season.closed) {
+      return;
+    }
     // pass empties and "" because they are never sent
     let lastEnd: number | null = null;
     season.reservableTimes.forEach((reservableTime, i) => {
@@ -813,7 +817,9 @@ export function transformReservationUnit(
     t && t.begin && t.end;
   // NOTE mutation doesn't support pks (even if changing not adding) unlike other mutations
   const applicationRoundTimeSlots = seasons
-    .filter((s) => s.reservableTimes.filter(isReservableTime).length > 0)
+    .filter(
+      (s) => s.reservableTimes.filter(isReservableTime).length > 0 || s.closed
+    )
     .map((s) => ({
       weekday: s.weekday,
       closed: s.closed,
