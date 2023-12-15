@@ -93,41 +93,14 @@ describe("areSlotsReservable", () => {
   const date1 = format(addDays(new Date(), 7), "yyyy-MM-dd");
   const date2 = format(addDays(new Date(), 8), "yyyy-MM-dd");
 
-  const openingTimesReservable = [
+  const reservableTimeSpans = [
     {
-      date: date1,
-      startTime: `${date1}T09:00:00+${tzOffsetHoursStr}:00`,
-      endTime: `${date1}T21:00:00+${tzOffsetHoursStr}:00`,
-      periods: null,
-      state: "open",
-      isReservable: true,
+      startDatetime: `${date1}T09:00:00+${tzOffsetHoursStr}:00`,
+      endDatetime: `${date1}T21:00:00+${tzOffsetHoursStr}:00`,
     },
     {
-      date: date2,
-      startTime: `${date2}T09:00:00+${tzOffsetHoursStr}:00`,
-      endTime: `${date2}T21:00:00+${tzOffsetHoursStr}:00`,
-      periods: null,
-      state: "open",
-      isReservable: true,
-    },
-  ];
-
-  const openingTimesNotReservable = [
-    {
-      date: date1,
-      startTime: `${date1}T09:00:00+${tzOffsetHoursStr}:00`,
-      endTime: `${date1}T21:00:00+${tzOffsetHoursStr}:00`,
-      periods: null,
-      state: "open",
-      isReservable: false,
-    },
-    {
-      date: date2,
-      startTime: `${date2}T09:00:00+${tzOffsetHoursStr}:00`,
-      endTime: `${date2}T21:00:00+${tzOffsetHoursStr}:00`,
-      periods: null,
-      state: "open",
-      isReservable: false,
+      startDatetime: `${date2}T09:00:00+${tzOffsetHoursStr}:00`,
+      endDatetime: `${date2}T21:00:00+${tzOffsetHoursStr}:00`,
     },
   ];
 
@@ -143,7 +116,7 @@ describe("areSlotsReservable", () => {
     expect(
       areSlotsReservable(
         [addDays(new Date().setUTCHours(hours), 7)],
-        openingTimesReservable,
+        reservableTimeSpans,
         undefined,
         undefined,
         undefined,
@@ -157,7 +130,7 @@ describe("areSlotsReservable", () => {
     expect(
       areSlotsReservable(
         [addDays(new Date().setUTCHours(hours), 7)],
-        openingTimesReservable,
+        reservableTimeSpans,
         undefined,
         undefined,
         undefined,
@@ -171,7 +144,7 @@ describe("areSlotsReservable", () => {
     expect(
       areSlotsReservable(
         [addDays(new Date().setUTCHours(hours), 8)],
-        openingTimesReservable,
+        reservableTimeSpans,
         undefined,
         undefined,
         undefined,
@@ -185,7 +158,7 @@ describe("areSlotsReservable", () => {
     expect(
       areSlotsReservable(
         [addDays(new Date().setUTCHours(hours), 8)],
-        openingTimesReservable,
+        reservableTimeSpans,
         undefined,
         undefined,
         undefined,
@@ -198,7 +171,7 @@ describe("areSlotsReservable", () => {
     expect(
       areSlotsReservable(
         [addDays(new Date(), 10)],
-        openingTimesReservable,
+        reservableTimeSpans,
         undefined,
         undefined,
         undefined,
@@ -212,7 +185,7 @@ describe("areSlotsReservable", () => {
     expect(
       areSlotsReservable(
         [addDays(new Date().setUTCHours(hours), 7)],
-        openingTimesReservable,
+        reservableTimeSpans,
         undefined,
         undefined,
         7,
@@ -223,7 +196,7 @@ describe("areSlotsReservable", () => {
     expect(
       areSlotsReservable(
         [addDays(new Date().setUTCHours(hours), 7)],
-        openingTimesReservable,
+        reservableTimeSpans,
         addDays(new Date(), 8),
         undefined,
         7,
@@ -233,7 +206,7 @@ describe("areSlotsReservable", () => {
     expect(
       areSlotsReservable(
         [addDays(new Date().setUTCHours(hours), 7)],
-        openingTimesReservable,
+        reservableTimeSpans,
         undefined,
         addDays(new Date(), 6),
         7,
@@ -244,89 +217,13 @@ describe("areSlotsReservable", () => {
     expect(
       areSlotsReservable(
         [addDays(new Date().setUTCHours(hours), 7)],
-        openingTimesReservable,
+        reservableTimeSpans,
         undefined,
         undefined,
         8,
         []
       )
     ).toBe(false);
-  });
-
-  describe("Closed days", () => {
-    test("Plus 7 days 09:00", () => {
-      const hours = 11 + tzOffset;
-      expect(
-        areSlotsReservable(
-          [addDays(new Date().setUTCHours(hours), 7)],
-          openingTimesNotReservable,
-          undefined,
-          undefined,
-          undefined,
-          []
-        )
-      ).toBe(false);
-    });
-
-    test("Plus 7 days 10:00", () => {
-      const hours = 12 + tzOffset;
-      expect(
-        areSlotsReservable(
-          [addDays(new Date().setUTCHours(hours), 7)],
-          openingTimesNotReservable,
-          undefined,
-          undefined,
-          undefined,
-          []
-        )
-      ).toBe(false);
-    });
-
-    test("Buffer days", () => {
-      const hours = 11 + tzOffset;
-      expect(
-        areSlotsReservable(
-          [addDays(new Date().setUTCHours(hours), 7)],
-          openingTimesNotReservable,
-          undefined,
-          undefined,
-          7,
-          []
-        )
-      ).toBe(false);
-
-      expect(
-        areSlotsReservable(
-          [addDays(new Date().setUTCHours(hours), 7)],
-          openingTimesNotReservable,
-          addDays(new Date(), 8),
-          undefined,
-          7,
-          []
-        )
-      ).toBe(false);
-      expect(
-        areSlotsReservable(
-          [addDays(new Date().setUTCHours(hours), 7)],
-          openingTimesNotReservable,
-          undefined,
-          addDays(new Date(), 6),
-          7,
-          []
-        )
-      ).toBe(false);
-
-      expect(
-        areSlotsReservable(
-          [addDays(new Date().setUTCHours(hours), 7)],
-          openingTimesNotReservable,
-          undefined,
-          undefined,
-          8,
-          []
-        )
-      ).toBe(false);
-    });
   });
 });
 
@@ -448,38 +345,19 @@ describe("isStartTimeWithinInterval", () => {
     .toString()
     .padStart(2, "0");
 
-  const openingTimes = [
+  const reservableTimeSpans = [
     {
-      date: "2019-09-21",
-      startTime: `2019-09-21T06:00:00+${timeZoneHours}:00`,
-      endTime: `2019-09-21T18:00:00+${timeZoneHours}:00`,
-      state: "open",
-      isReservable: true,
-      periods: [38600],
+      startDatetime: `2019-09-21T06:00:00+${timeZoneHours}:00`,
+      endDatetime: `2019-09-21T18:00:00+${timeZoneHours}:00`,
     },
     {
-      date: "2019-09-22",
-      startTime: `2019-09-22T06:00:00+${timeZoneHours}:00`,
-      endTime: `2019-09-22T18:00:00+${timeZoneHours}:00`,
-      state: "open",
-      isReservable: true,
-      periods: [38600],
-    },
-    {
-      date: "2019-09-24",
-      startTime: `06:00:00+${timeZoneHours}:00`,
-      endTime: `18:00:00+${timeZoneHours}:00`,
-      state: "open",
-      isReservable: false,
-      periods: [38600],
+      startDatetime: `2019-09-22T06:00:00+${timeZoneHours}:00`,
+      endDatetime: `2019-09-22T18:00:00+${timeZoneHours}:00`,
     },
     {
       date: "2019-09-28",
-      startTime: `2019-09-28T06:00:00+${timeZoneHours}:00`,
-      endTime: `2019-09-28T18:00:00+${timeZoneHours}:00`,
-      state: "open",
-      isReservable: true,
-      periods: [38600],
+      startDatetime: `2019-09-28T06:00:00+${timeZoneHours}:00`,
+      endDatetime: `2019-09-28T18:00:00+${timeZoneHours}:00`,
     },
   ];
 
@@ -487,7 +365,7 @@ describe("isStartTimeWithinInterval", () => {
     expect(
       isStartTimeWithinInterval(
         new Date(`2019-09-22T12:15:00+${timeZoneHours}:00`),
-        openingTimes,
+        reservableTimeSpans,
         ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
       )
     ).toBe(true);
@@ -495,7 +373,7 @@ describe("isStartTimeWithinInterval", () => {
     expect(
       isStartTimeWithinInterval(
         new Date(`2019-09-22T12:15:00+${timeZoneHours}:00`),
-        openingTimes,
+        reservableTimeSpans,
         ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
       )
     ).toBe(true);
@@ -503,7 +381,7 @@ describe("isStartTimeWithinInterval", () => {
     expect(
       isStartTimeWithinInterval(
         new Date(`2019-09-24T12:15:00+${timeZoneHours}:00`),
-        openingTimes,
+        reservableTimeSpans,
         ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
       )
     ).toBe(false);
@@ -513,7 +391,7 @@ describe("isStartTimeWithinInterval", () => {
     expect(
       isStartTimeWithinInterval(
         new Date(`2019-09-22T12:10:00+${timeZoneHours}:00`),
-        openingTimes,
+        reservableTimeSpans,
         ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
       )
     ).toBe(false);
@@ -530,17 +408,17 @@ describe("isStartTimeWithinInterval", () => {
     expect(
       isStartTimeWithinInterval(
         new Date(`2019-09-22T11:30:00+${tz}:00`),
-        openingTimes,
+        reservableTimeSpans,
         ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_90Mins
       )
     ).toBe(false);
   });
 
   test("returns true without interval", () => {
-    expect(isStartTimeWithinInterval(new Date(), openingTimes)).toBe(true);
+    expect(isStartTimeWithinInterval(new Date(), reservableTimeSpans)).toBe(true);
   });
 
-  test("returns false without opening times", () => {
+  test("returns false without reservable times", () => {
     expect(
       isStartTimeWithinInterval(
         new Date(),
@@ -551,19 +429,15 @@ describe("isStartTimeWithinInterval", () => {
   });
 
   test("with multiple slots in one day", () => {
-    openingTimes.push({
-      date: "2019-09-28",
-      startTime: `2019-09-28T19:15:00+${timeZoneHours}:00`,
-      endTime: `2019-09-28T21:00:00+${timeZoneHours}:00`,
-      state: "open",
-      isReservable: true,
-      periods: [38600],
+    reservableTimeSpans.push({
+      startDatetme: `2019-09-28T19:15:00+${timeZoneHours}:00`,
+      endDatetime: `2019-09-28T21:00:00+${timeZoneHours}:00`,
     });
 
     expect(
       isStartTimeWithinInterval(
         new Date(`2019-09-28T11:00:00+${timeZoneHours}:00`),
-        openingTimes,
+        reservableTimeSpans,
         ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_60Mins
       )
     ).toBe(true);
@@ -571,7 +445,7 @@ describe("isStartTimeWithinInterval", () => {
     expect(
       isStartTimeWithinInterval(
         new Date(`2019-09-28T19:20:00+${timeZoneHours}:00`),
-        openingTimes,
+        reservableTimeSpans,
         ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
       )
     ).toBe(false);
@@ -579,7 +453,7 @@ describe("isStartTimeWithinInterval", () => {
     expect(
       isStartTimeWithinInterval(
         new Date(`2019-09-28T19:15:00+${timeZoneHours}:00`),
-        openingTimes,
+        reservableTimeSpans,
         ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
       )
     ).toBe(true);
@@ -587,7 +461,7 @@ describe("isStartTimeWithinInterval", () => {
     expect(
       isStartTimeWithinInterval(
         new Date(`2019-09-28T21:00:00+${timeZoneHours}:00`),
-        openingTimes,
+        reservableTimeSpans,
         ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
       )
     ).toBe(false);
@@ -830,7 +704,6 @@ describe("getEventBuffers", () => {
 });
 
 describe("isReservationUnitReservable", () => {
-  const dateTime = new Date().toISOString();
   const date = new Date().toISOString().split("T")[0];
   const reservationUnit: ReservationUnitByPkType = {
     id: "1234",
@@ -848,18 +721,12 @@ describe("isReservationUnitReservable", () => {
       ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins,
     uuid: "1234",
     images: [],
-    openingHours: {
-      openingTimes: [
-        {
-          date: dateTime,
-          startTime: `${date}T04:00:00+00:00`,
-          endTime: `${date}T20:00:00+00:00`,
-          state: "open",
-          isReservable: true,
-          periods: null,
-        },
-      ],
-    },
+    reservableTimeSpans: [
+      {
+        startDatetime: `${date}T04:00:00+00:00`,
+        endDatetime: `${date}T20:00:00+00:00`,
+      },
+    ],
   };
 
   test("returns true for a unit that is reservable", () => {
@@ -898,7 +765,7 @@ describe("isReservationUnitReservable", () => {
         ...reservationUnit,
         minReservationDuration: 3600,
         maxReservationDuration: 3600,
-        openingHours: undefined,
+        reservableTimeSpans: undefined,
         metadataSet: {
           id: "1234",
           name: "Test",
@@ -996,7 +863,7 @@ describe("isReservationUnitReservable", () => {
         ...reservationUnit,
         reservationBegins: addDays(new Date(), 5).toISOString(),
         reservationsMaxDaysBefore: 4,
-        openingHours: undefined,
+        reservableTimeSpans: undefined,
         metadataSet: {
           id: "1234",
           name: "Test",
@@ -1144,24 +1011,17 @@ describe("getNormalizedReservationBeginTime", () => {
 
 describe("getAvailableTimes", () => {
   test("get correct times", () => {
-    const openingHours: ReservableTimeSpanType = {
-      openingTimePeriods: [],
-      openingTimes: [
-        {
-          date: "2022-11-14",
-          startTime: "2022-11-14T04:00:00+02:00",
-          endTime: "2022-11-14T20:00:00+02:00",
-          state: "open",
-          isReservable: true,
-          periods: null,
-        },
-      ],
-    };
+    const reservableTimeSpans: ReservableTimeSpanType = [
+      {
+        startDatetime: "2022-11-14T04:00:00+02:00",
+        endDatetime: "2022-11-14T20:00:00+02:00",
+      },
+    ];
 
     expect(
       getAvailableTimes(
         {
-          openingHours,
+          reservableTimeSpans,
           reservationStartInterval: "INTERVAL_90_MINS",
         } as ReservationUnitByPkType,
         new Date("2022-11-14T00:00:00+02:00")
@@ -1182,24 +1042,17 @@ describe("getAvailableTimes", () => {
   });
 
   test("get correct times", () => {
-    const openingHours: ReservableTimeSpanType = {
-      openingTimePeriods: [],
-      openingTimes: [
-        {
-          date: "2022-11-14",
-          startTime: "2022-11-14T04:00:00+02:00",
-          endTime: "2022-11-14T06:00:00+02:00",
-          state: "open",
-          isReservable: true,
-          periods: null,
-        },
-      ],
-    };
+    const reservableTimeSpans: ReservableTimeSpanType = [
+      {
+        startDatetime: "2022-11-14T04:00:00+02:00",
+        endDatetime: "2022-11-14T06:00:00+02:00",
+      },
+    ];
 
     expect(
       getAvailableTimes(
         {
-          openingHours,
+          reservableTimeSpans,
           reservationStartInterval: "INTERVAL_15_MINS",
         } as ReservationUnitByPkType,
         new Date("2022-11-14T00:00:00+02:00")
@@ -1219,53 +1072,28 @@ describe("getAvailableTimes", () => {
 
 describe("getOpenDays", () => {
   test("correct output", () => {
-    const openingHours: ReservableTimeSpanType = {
-      openingTimePeriods: [],
-      openingTimes: [
-        {
-          date: "2022-09-14",
-          startTime: "04:00:00+00:00",
-          endTime: "06:00:00+00:00",
-          state: "open",
-          isReservable: true,
-          periods: null,
-        },
-        {
-          date: "2022-08-14",
-          startTime: "04:00:00+00:00",
-          endTime: "06:00:00+00:00",
-          state: "open",
-          isReservable: true,
-          periods: null,
-        },
-        {
-          date: "2022-08-13",
-          startTime: "04:00:00+00:00",
-          endTime: "06:00:00+00:00",
-          state: "open",
-          isReservable: false,
-          periods: null,
-        },
-        {
-          date: "2022-08-12",
-          startTime: "04:00:00+00:00",
-          endTime: "06:00:00+00:00",
-          state: "open",
-          isReservable: true,
-          periods: null,
-        },
-        {
-          date: "2022-08-10",
-          startTime: "04:00:00+00:00",
-          endTime: "06:00:00+00:00",
-          state: "open",
-          isReservable: true,
-          periods: null,
-        },
-      ],
-    };
+    const reservableTimeSpans: ReservableTimeSpanType = [
+      {
+        startDatetime: "2022-09-14T04:00:00+00:00",
+        endDatetime: "2022-09-14T06:00:00+00:00",
+      },
+      {
+        startDatetime: "2022-08-14T04:00:00+00:00",
+        endDatetime: "2022-08-14T06:00:00+00:00",
+      },
+      {
+        startDatetime: "2022-08-12T04:00:00+00:00",
+        endDatetime: "2022-08-12T06:00:00+00:00",
+      },
+      {
+        startDatetime: "2022-08-10T04:00:00+00:00",
+        endDatetime: "2022-08-10T06:00:00+00:00",
+      },
+    ];
 
-    expect(getOpenDays({ openingHours } as ReservationUnitByPkType)).toEqual([
+    expect(
+      getOpenDays({ reservableTimeSpans } as ReservationUnitByPkType)
+    ).toEqual([
       new Date("2022-08-10T00:00:00.000Z"),
       new Date("2022-08-12T00:00:00.000Z"),
       new Date("2022-08-14T00:00:00.000Z"),
