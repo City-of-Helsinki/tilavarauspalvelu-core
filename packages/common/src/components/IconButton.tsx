@@ -89,8 +89,6 @@ const HoverWrapper = styled.div`
   }
   &:active {
     border-width: 2px;
-  }
-  &:active {
     border-color: var(--color-black);
   }
 `;

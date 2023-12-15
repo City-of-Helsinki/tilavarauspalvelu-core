@@ -12,6 +12,7 @@ import { Accordion } from "@/component/Accordion";
 
 const SeasonRowWrapper = styled.div`
   display: grid;
+
   /* mobile layout is row heavy */
   grid-template-areas:
     "day day"
@@ -25,14 +26,16 @@ const SeasonRowWrapper = styled.div`
     "controls controls";
 
   grid-template-columns: repeat(2, auto);
+  /* stylelint-disable-next-line declaration-block-no-redundant-longhand-properties */
   grid-template-rows:
     [day] auto
     [a0] auto auto auto
     [a1] auto auto auto
     [controls] auto auto;
 
-  /* can't use gap because it applies to invisible columns also so it creates 3 x gap for some columns */
-  /* can't use row gap either because that creates weird 1rem spacing on mobile */
+  /* can't use gap because it applies to invisible columns also so it creates 3 x gap for some columns
+   * can't use row gap either because that creates weird 1rem spacing on mobile
+   */
   gap: 0;
 
   /* difference between xl and l is huge, but l is not enough here
@@ -46,6 +49,7 @@ const SeasonRowWrapper = styled.div`
     /* three rows used by the subgrid, label + content + error */
     grid-template-rows: auto auto 1fr;
 
+    /* stylelint-disable-next-line declaration-block-no-redundant-longhand-properties */
     grid-template-columns:
       [day] 11ch
       [a0] min-content
@@ -80,6 +84,7 @@ const StyledTimeInput = styled(TimeInput)`
     display: grid;
     grid: subgrid / subgrid;
     grid-row-end: span 3;
+
     /* increase min-width for error message */
     & > input {
       min-width: 11ch;

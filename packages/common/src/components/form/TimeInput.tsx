@@ -31,6 +31,14 @@ const TimeInputContainer = styled.div`
     font-size: 1.125rem;
     margin-right: auto;
     outline: none;
+
+    /* mobile scale to full width inside a parent
+     * desktop define a minimum size that shows HH:mm
+     */
+    max-width: none;
+    width: 100%;
+    box-sizing: border-box;
+
     &:focus-within {
       border-color: var(--input-border-color-focus);
       box-shadow: 0 0 0 var(--outline-width) var(--color-focus-outline);
@@ -46,14 +54,6 @@ const TimeInputContainer = styled.div`
     }
   }
 
-  /* mobile scale to full width inside a parent
-   * desktop define a minimum size that shows HH:mm
-   */
-  & > input {
-    max-width: none;
-    width: 100%;
-    box-sizing: border-box;
-  }
   @media (min-width: ${breakpoints.m}) {
     & > input {
       min-width: 9ch;
