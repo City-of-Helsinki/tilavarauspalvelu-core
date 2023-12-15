@@ -2,8 +2,10 @@ import React, { type FC } from "react";
 import { ApolloProvider } from "@apollo/client";
 import { appWithTranslation } from "next-i18next";
 import type { AppProps } from "next/app";
+/* eslint-disable import/no-duplicates */
 import { fi } from "date-fns/locale";
 import { format, isValid } from "date-fns";
+/* eslint-enable import/no-duplicates */
 import { ThemeProvider } from "styled-components";
 import { theme } from "common";
 import PageWrapper from "../components/common/PageWrapper";
@@ -15,7 +17,6 @@ import { TrackingWrapper } from "../modules/tracking";
 import nextI18NextConfig from "../next-i18next.config";
 import "../styles/global.scss";
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 const MyApp = ({ Component, pageProps }: AppProps) => {
   return (
     <>

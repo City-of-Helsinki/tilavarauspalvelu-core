@@ -12,7 +12,7 @@ import { BlackButton, MediumButton, pixel, truncatedText } from "@/styles/util";
 import { reservationUnitPrefix } from "@/modules/const";
 import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
 
-interface Props {
+interface IProps {
   reservationUnit: ReservationUnitType;
   selectReservationUnit: (reservationUnit: ReservationUnitType) => void;
   containsReservationUnit: (reservationUnit: ReservationUnitType) => boolean;
@@ -139,7 +139,7 @@ const ReservationUnitCard = ({
   selectReservationUnit,
   containsReservationUnit,
   removeReservationUnit,
-}: Props): JSX.Element => {
+}: IProps): JSX.Element => {
   const { t, i18n } = useTranslation();
 
   const name = getReservationUnitName(reservationUnit);

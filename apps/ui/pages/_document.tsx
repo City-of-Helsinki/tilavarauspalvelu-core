@@ -19,7 +19,6 @@ export default class MyDocument extends Document {
     try {
       ctx.renderPage = () =>
         originalRenderPage({
-          // eslint-disable-next-line @typescript-eslint/naming-convention -- TODO: App should be a valid name in lint
           enhanceApp: (App) => (props) =>
             sheet.collectStyles(<App {...props} />),
         });
