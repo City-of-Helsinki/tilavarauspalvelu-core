@@ -20,7 +20,7 @@ class CustomOrderingFilter(django_filters.OrderingFilter):
         if value in EMPTY_VALUES:
             return qs
 
-        ordering: list[str] = []
+        ordering: list[str] = list(qs.query.order_by)
         for param in value:
             if param in EMPTY_VALUES:
                 continue
