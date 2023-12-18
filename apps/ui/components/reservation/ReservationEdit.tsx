@@ -240,14 +240,16 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
     }
     setReservationUnit({
       ...reservationUnitData?.reservationUnitByPk,
-      reservableTimeSpans: {
-        ...reservationUnitData?.reservationUnitByPk?.reservableTimeSpans,
+      reservableTimeSpans: [
+        ...filterNonNullable(
+          reservationUnitData?.reservationUnitByPk?.reservableTimeSpans
+        ),
         ...(allowReservationsWithoutOpeningHours
           ? mockOpeningTimes
           : additionalData?.reservationUnitByPk?.reservableTimeSpans?.filter(
               (n) => n?.startDatetime != null && n?.endDatetime != null
             ) || []),
-      },
+      ],
       reservations: additionalData?.reservationUnitByPk?.reservations,
     });
   }, [additionalData, reservationUnitData?.reservationUnitByPk]);

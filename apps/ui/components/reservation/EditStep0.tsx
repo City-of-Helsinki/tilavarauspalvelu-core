@@ -27,7 +27,7 @@ import { useTranslation } from "next-i18next";
 import { useMedia } from "react-use";
 import styled from "styled-components";
 import { Toolbar } from "common/src/calendar/Toolbar";
-import { getLocalizationLang } from "common/src/helpers";
+import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
 import {
   canReservationTimeBeChanged,
   isReservationReservable,
@@ -269,12 +269,9 @@ const EditStep0 = ({
     if (!reservationUnit) {
       return undefined;
     }
-    const reservableTimeSpans =
-      reservationUnit.reservableTimeSpans != null
-        ? reservationUnit.reservableTimeSpans.filter(
-            (n): n is NonNullable<typeof n> => n != null
-          )
-        : [];
+    const reservableTimeSpans = filterNonNullable(
+      reservationUnit.reservableTimeSpans
+    );
     return getSlotPropGetter({
       reservableTimeSpans,
       activeApplicationRounds,
