@@ -19,7 +19,7 @@ from reservations.choices import CustomerTypeChoice, ReservationStateChoice, Res
 from reservations.models import RecurringReservation, Reservation, User
 from spaces.models import Unit
 
-EMAIL_DOMAIN_PATTERN = re.compile(r"^@\w+[.\w]*$")
+EMAIL_DOMAIN_PATTERN = re.compile(r"^@\w[.\w]{0,254}$")
 """
 Matches email domains like:
 - @email.com
