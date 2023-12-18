@@ -1,11 +1,14 @@
 import operator
+import re
 from functools import reduce
 
 import django_filters
-from django.db.models import Case, CharField, F, Q, When
-from django.db.models import Value as V
+from django.contrib.postgres.search import SearchRank, SearchVector
+from django.db.models import Case, CharField, F, Q, QuerySet, Value, When
 from django.db.models.functions import Concat
 
+from api.graphql.extensions.order_filter import CustomOrderingFilter
+from common.db import raw_prefixed_query
 from merchants.models import OrderStatus
 from permissions.helpers import (
     get_service_sectors_where_can_view_reservations,
@@ -15,6 +18,14 @@ from reservation_units.models import ReservationUnit, ReservationUnitType
 from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import RecurringReservation, Reservation, User
 from spaces.models import Unit
+
+EMAIL_DOMAIN_PATTERN = re.compile(r"^@\w+[.\w]*$")
+"""
+Matches email domains like:
+- @email.com
+- @email.co.uk
+- @localhost
+"""
 
 
 class ReservationFilterSet(django_filters.FilterSet):
@@ -81,7 +92,7 @@ class ReservationFilterSet(django_filters.FilterSet):
 
     text_search = django_filters.CharFilter(method="get_text_search")
 
-    order_by = django_filters.OrderingFilter(
+    order_by = CustomOrderingFilter(
         fields=(
             "created_at",
             "state",
@@ -105,7 +116,7 @@ class ReservationFilterSet(django_filters.FilterSet):
         model = Reservation
         fields = ["begin", "end"]
 
-    def filter_queryset(self, queryset):
+    def filter_queryset(self, queryset: QuerySet) -> QuerySet:
         queryset = queryset.alias(
             reservee_name=Case(
                 When(
@@ -120,22 +131,22 @@ class ReservationFilterSet(django_filters.FilterSet):
                     reservee_type=CustomerTypeChoice.INDIVIDUAL,
                     then=Concat(
                         "reservee_first_name",
-                        V(" "),
+                        Value(" "),
                         "reservee_last_name",
                     ),
                 ),
-                default=V(""),
+                default=Value(""),
                 output_field=CharField(),
             )
         )
 
         return super().filter_queryset(queryset)
 
-    def get_only_with_permission(self, qs, property, value: bool):
+    def get_only_with_permission(root: Reservation, qs: QuerySet, name: str, value: bool) -> QuerySet:
         if not value:
             return qs
 
-        user = self.request.user
+        user = root.request.user
         viewable_units = get_units_where_can_view_reservations(user)
         viewable_service_sectors = get_service_sectors_where_can_view_reservations(user)
         if user.is_anonymous:
@@ -146,20 +157,20 @@ class ReservationFilterSet(django_filters.FilterSet):
             | Q(user=user)
         ).distinct()
 
-    def get_requested(self, qs, property, value: str):
+    def get_requested(root: Reservation, qs: QuerySet, name, value: str) -> QuerySet:
         query = Q(state=ReservationStateChoice.REQUIRES_HANDLING) | Q(handled_at__isnull=False)
         if value:
             return qs.filter(query)
         return qs.exclude(query)
 
-    def get_reservation_unit(self, qs, property, value):
+    def get_reservation_unit(root: Reservation, qs, property, value):
         if not value:
             return qs
 
         return qs.filter(reservation_unit__in=value)
 
-    def get_reservation_unit_name(self, qs, property: str, value: str):
-        language = property[-2:]
+    def get_reservation_unit_name(root: Reservation, qs: QuerySet, name: str, value: str) -> QuerySet:
+        language = name[-2:]
         words = value.split(",")
         queries = []
         for word in words:
@@ -174,40 +185,48 @@ class ReservationFilterSet(django_filters.FilterSet):
         query = reduce(operator.or_, (query for query in queries))
         return qs.filter(query).distinct()
 
-    def get_reservation_unit_type(self, qs, property, value):
+    def get_reservation_unit_type(root: Reservation, qs: QuerySet, name: str, value: list[str]) -> QuerySet:
         if not value:
             return qs
         return qs.filter(reservation_unit__reservation_unit_type__in=value)
 
-    def get_text_search(self, qs, property, value: str):
+    def get_text_search(root: Reservation, qs: QuerySet, name: str, value: str) -> QuerySet:
+        value = value.strip()
         if not value:
             return qs
 
-        if value.isnumeric():
-            return qs.filter(pk=value)
+        # Shortcut for searching only emails
+        if EMAIL_DOMAIN_PATTERN.match(value):
+            return qs.filter(Q(user__email__icontains=value) | Q(reservee_email__icontains=value))
 
-        queryset = qs.alias(
-            reservee_name=Case(
-                When(
-                    reservee_type=CustomerTypeChoice.BUSINESS,
-                    then=F("reservee_organisation_name"),
-                ),
-                When(
-                    reservee_type=CustomerTypeChoice.NONPROFIT,
-                    then=F("reservee_organisation_name"),
-                ),
-                When(
-                    reservee_type=CustomerTypeChoice.INDIVIDUAL,
-                    then=Concat("reservee_first_name", V(" "), "reservee_last_name"),
-                ),
-                default=V(""),
-                output_field=CharField(),
+        if len(value) >= 3:
+            vector = SearchVector(
+                "pk",
+                "name",
+                "reservee_id",
+                "reservee_email",
+                "reservee_first_name",
+                "reservee_last_name",
+                "reservee_organisation_name",
+                "user__email",
+                "user__first_name",
+                "user__last_name",
+                "recurring_reservation__name",
             )
-        )
+            query = raw_prefixed_query(value)
+            text_search_rank = SearchRank(vector, query)
+            return (
+                qs.annotate(search=vector, text_search_rank=text_search_rank)
+                .filter(search=query)
+                .order_by("-text_search_rank")  # most relevant first
+            )
 
-        return queryset.filter(Q(name__icontains=value) | Q(reservee_name__icontains=value))
+        elif value.isnumeric():
+            return qs.filter(pk=int(value))
 
-    def get_unit(self, qs, property, value):
+        return qs
+
+    def get_unit(root: Reservation, qs: QuerySet, name: str, value: list[int]) -> QuerySet:
         if not value:
             return qs
 
