@@ -403,14 +403,14 @@ export const getCheckoutUrl = (
   order?: PaymentOrderType,
   lang = "fi"
 ): string | undefined => {
-  const { checkoutUrl } = order ?? {};
+  const { loggedInCheckoutUrl } = order ?? {};
 
-  if (!checkoutUrl) {
+  if (!loggedInCheckoutUrl) {
     return undefined;
   }
 
   try {
-    const { origin, pathname } = new URL(checkoutUrl) || {};
+    const { origin, pathname } = new URL(loggedInCheckoutUrl) || {};
     const baseUrl = `${origin}${pathname}`;
     return `${baseUrl}/paymentmethod?lang=${lang}`;
   } catch (e) {
