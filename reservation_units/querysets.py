@@ -57,6 +57,7 @@ def _get_hard_closed_time_spans_for_reservation_unit(reservation_unit: "Reservat
             )
         )
 
+    # The `RESULTS_SENT` status ApplicationRounds already excluded in the queryset Prefetch
     for application_round in reservation_unit.application_rounds.all():
         reservation_unit_closed_time_spans.append(
             TimeSpanElement(
@@ -79,10 +80,12 @@ def _get_soft_closed_time_spans_for_reservation_unit(reservation_unit: "Reservat
     reservation_unit_closed_time_spans: list[TimeSpanElement] = []
 
     if reservation_unit.reservations_min_days_before:
+        # Minimum days before is calculated from the start of the day
         reservation_unit_closed_time_spans.append(
             TimeSpanElement(
                 start_datetime=datetime.min.replace(tzinfo=DEFAULT_TIMEZONE),
-                end_datetime=now + timedelta(days=reservation_unit.reservations_min_days_before),
+                end_datetime=datetime.combine(now.date(), time.min, tzinfo=DEFAULT_TIMEZONE)
+                + timedelta(days=reservation_unit.reservations_min_days_before),
                 is_reservable=False,
             )
         )
@@ -190,7 +193,7 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
         """
         Annotate the queryset with `first_reservable_datetime` and `is_closed` fields.
 
-        Date and Time filters are used to filter a range of dates and time when the reservation must be within.
+        Date and Time filters are used to filter a range of dates and time that the reservation must be within.
 
         This method works by first generating a list of closed time spans for each ReservationUnit and then one by one
         checking the reservable time spans for a time span that is not overlapping with closed time spans and still
@@ -204,7 +207,8 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
         After removing the closed time spans, the first reservable time span that is long enough to fit the minimum
         duration is selected as the `first_reservable_datetime`.
 
-        Variables which affect the first reservable time span and cause the ReservationUnit to be "closed":
+        Variables which affect the first reservable time span and also can cause the ReservationUnit to be "closed"
+        if no valid reservable times are found because of them:
         - Date filter range
         - Time filter range
         - ReservationUnit `reservation_begins`
@@ -213,7 +217,8 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
         - ApplicationRound `reservation_period_begin`
         - ApplicationRound `reservation_period_end`
 
-        Variables which only affect the first reservable time span and allow the ReservationUnit to be "open":
+        Variables which only affect the first reservable time span, but allow the ReservationUnit to be "open"
+        if there would otherwise be valid time spans on the filtered date range:
         - Minimum duration filter
         - ReservationUnit `min_reservation_duration`
         - ReservationUnit `max_reservation_duration`
@@ -224,7 +229,7 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
         """
         now = timezone.localtime()
         today = now.date()
-        two_years_from_now = today + timedelta(days=730)
+        two_years_from_now = today + timedelta(days=731)  # 2 years + 1 day as a buffer
 
         #########################
         # Default filter values #

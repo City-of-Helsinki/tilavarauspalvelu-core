@@ -388,14 +388,19 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
         ),
     )
 
-    reservations_max_days_before = models.PositiveIntegerField(
-        verbose_name=_("Maximum number of days before reservations can be made"),
+    # In calculations this is interpreted as the beginning of the calculated day.
+    # e.g. current_date = 2023-10-10
+    # min_days_before = 1, earliest reservation that can be made is 2023-10-11 00:00
+    # min_days_before = 2, earliest reservation that can be made is 2023-10-12 00:00
+    reservations_min_days_before = models.PositiveIntegerField(
+        verbose_name=_("Minimum days before reservations can be made"),
         null=True,
         blank=True,
     )
 
-    reservations_min_days_before = models.PositiveIntegerField(
-        verbose_name=_("Minimum days before reservations can be made"),
+    # The latest reservation that can be made is calculated as now + max_days_before. No time interpretation made.
+    reservations_max_days_before = models.PositiveIntegerField(
+        verbose_name=_("Maximum number of days before reservations can be made"),
         null=True,
         blank=True,
     )
