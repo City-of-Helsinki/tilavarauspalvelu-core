@@ -1,18 +1,9 @@
 import userEvent from "@testing-library/user-event";
-// import { utcToZonedTime } from "date-fns-tz";
 import { advanceTo } from "jest-date-mock";
 import { get as mockGet } from "lodash";
 import React from "react";
-import mockTranslations from "../../../public/locales/fi/dateSelector.json";
-
-import {
-  // act,
-  // actWait,
-  configure,
-  render,
-  screen,
-  // waitFor,
-} from "../../../test/testUtils";
+import mockTranslations from "@/public/locales/fi/dateSelector.json";
+import { act, configure, render, screen } from "@/test/testUtils";
 import DateRangePicker, { DateRangePickerProps } from "../DateRangePicker";
 
 jest.mock("next-i18next", () => ({
@@ -45,21 +36,30 @@ const renderComponent = (props?: Partial<DateRangePickerProps>) =>
 
 test("should show error start date must be before end date", async () => {
   renderComponent();
+  const user = userEvent.setup();
 
   const startDateInput = screen.getByRole("textbox", {
     name: /alkamispäivä/i,
   });
-  await userEvent.type(startDateInput, "23.6.2021");
+  await act(async () => {
+    await user.type(startDateInput, "23.6.2021");
+  });
 
   const endDateInput = screen.getByRole("textbox", {
     name: /loppumispäivä/i,
   });
-  await userEvent.type(endDateInput, "22.6.2021");
+  await act(async () => {
+    await user.type(endDateInput, "22.6.2021");
+  });
 
   screen.queryByText(/Alkamispäivän on oltava ennen loppumispäivää/i);
 
-  await userEvent.clear(endDateInput);
-  await userEvent.type(endDateInput, "24.6.2021");
+  await act(async () => {
+    await user.clear(endDateInput);
+  });
+  await act(async () => {
+    await user.type(endDateInput, "24.6.2021");
+  });
 
   const start = screen.queryByText(
     /Alkamispäivän on oltava ennen loppumispäivää/i

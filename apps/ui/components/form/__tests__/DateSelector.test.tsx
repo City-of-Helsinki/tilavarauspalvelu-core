@@ -1,7 +1,7 @@
 import * as React from "react";
 import { get as mockGet } from "lodash";
-
 import {
+  act,
   arrowDownKeyPressHelper,
   arrowUpKeyPressHelper,
   escKeyPressHelper,
@@ -9,9 +9,9 @@ import {
   screen,
   userEvent,
   waitFor,
-} from "../../../test/testUtils";
-import { DATE_TYPES } from "../../../modules/const";
-import mockTranslations from "../../../public/locales/fi/dateSelector.json";
+} from "@/test/testUtils";
+import { DATE_TYPES } from "@/modules/const";
+import mockTranslations from "@/public/locales/fi/dateSelector.json";
 import DateSelector, { DateSelectorProps } from "../DateSelector";
 import { testIds } from "../DateSelectorMenu";
 
@@ -63,11 +63,12 @@ test("should add date type", async () => {
     dateTypes: [],
     onChangeDateTypes,
   });
+  const user = userEvent.setup();
 
   const toggleButton = screen.getByRole("button", {
     name: mockTranslations.title,
   });
-  userEvent.click(toggleButton);
+  await act(() => user.click(toggleButton));
 
   const menu = await screen.findByTestId(testIds.menu);
   expect(menu).toBeInTheDocument();
@@ -75,7 +76,7 @@ test("should add date type", async () => {
   const checkbox = await screen.findByRole("checkbox", {
     name: mockTranslations.dateTypeToday,
   });
-  await userEvent.click(checkbox);
+  await user.click(checkbox);
 
   expect(onChangeDateTypes).toHaveBeenCalledWith([DATE_TYPES.TODAY]);
 });
@@ -86,12 +87,12 @@ test("should call toggleIsCustomDate function", async () => {
     dateTypes: [],
     toggleIsCustomDate,
   });
+  const user = userEvent.setup();
 
   const toggleButton = screen.getByRole("button", {
     name: mockTranslations.title,
   });
-
-  await userEvent.click(toggleButton);
+  await act(() => user.click(toggleButton));
 
   const menu = await screen.findByTestId(testIds.menu);
   expect(menu).toBeInTheDocument();
@@ -100,7 +101,7 @@ test("should call toggleIsCustomDate function", async () => {
     name: mockTranslations.menu.buttonCustom,
   });
 
-  await userEvent.click(customDatesButton);
+  await user.click(customDatesButton);
 
   expect(toggleIsCustomDate).toHaveBeenCalled();
 });
@@ -111,12 +112,12 @@ test("should remove date type", async () => {
     dateTypes: [DATE_TYPES.TODAY, DATE_TYPES.TOMORROW],
     onChangeDateTypes,
   });
+  const user = userEvent.setup();
 
   const toggleButton = screen.getByRole("button", {
     name: mockTranslations.title,
   });
-
-  await userEvent.click(toggleButton);
+  await act(() => user.click(toggleButton));
 
   const menu = await screen.findByTestId(testIds.menu);
   expect(menu).toBeInTheDocument();
@@ -125,7 +126,7 @@ test("should remove date type", async () => {
     name: mockTranslations.dateTypeToday,
   });
 
-  await userEvent.click(checkbox);
+  await user.click(checkbox);
 
   expect(onChangeDateTypes).toHaveBeenCalledWith([DATE_TYPES.TOMORROW]);
 });
@@ -133,12 +134,12 @@ test("should remove date type", async () => {
 describe("should open menu with", () => {
   const getClosedMenu = async () => {
     renderComponent();
+    const user = userEvent.setup();
 
     const toggleButton = screen.getByRole("button", {
       name: mockTranslations.title,
     });
-
-    await userEvent.click(toggleButton);
+    await act(() => user.click(toggleButton));
 
     const menu = await screen.findByTestId(testIds.menu);
     expect(menu).toBeInTheDocument();
