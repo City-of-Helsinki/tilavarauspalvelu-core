@@ -86,11 +86,11 @@ import {
   LIST_RESERVATIONS,
 } from "@/modules/queries/reservation";
 import {
+  createMockOpeningTimes,
   getFuturePricing,
   getPrice,
   isReservationUnitPaidInFuture,
   isReservationUnitPublished,
-  mockOpeningTimes,
 } from "@/modules/reservationUnit";
 import EquipmentList from "../../components/reservation-unit/EquipmentList";
 import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
@@ -253,15 +253,19 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       reservationUnitData?.reservationUnitByPk
         ?.allowReservationsWithoutOpeningHours;
 
+    const timespans = filterNonNullable(
+      additionalData.reservationUnitByPk?.reservableTimeSpans
+    );
+    const reservableTimeSpans = !allowReservationsWithoutOpeningHours
+      ? timespans
+      : createMockOpeningTimes(id);
     return {
       props: {
         key: `${id}-${locale}`,
         ...(await serverSideTranslations(locale ?? "fi")),
         reservationUnit: {
           ...reservationUnitData?.reservationUnitByPk,
-          reservableTimeSpans: allowReservationsWithoutOpeningHours
-            ? additionalData.reservationUnitByPk?.reservableTimeSpans ?? []
-            : mockOpeningTimes,
+          reservableTimeSpans,
           reservations:
             additionalData?.reservationUnitByPk?.reservations?.filter(
               (n) => n
@@ -526,8 +530,6 @@ const ReservationUnit = ({
         reservationUnit?.reservationsMinDaysBefore ?? 0,
       reservationsMaxDaysBefore:
         reservationUnit?.reservationsMaxDaysBefore ?? 0,
-      currentDate: focusDate,
-      validateEnding: true,
     });
   }, [
     reservableTimeSpans,
@@ -536,7 +538,6 @@ const ReservationUnit = ({
     reservationUnit?.reservationEnds,
     reservationUnit?.reservationsMinDaysBefore,
     reservationUnit?.reservationsMaxDaysBefore,
-    focusDate,
   ]);
 
   const isReservationQuotaReached = useMemo(() => {
@@ -822,7 +823,7 @@ const ReservationUnit = ({
     [addReservation, reservationUnit?.pk, setInitialReservation]
   );
 
-  const isReservable = isReservationUnitReservable(reservationUnit);
+  const [isReservable, _reason] = isReservationUnitReservable(reservationUnit);
 
   const termsOfUseContent = reservationUnit
     ? getTranslation(reservationUnit, "termsOfUse")
@@ -1023,15 +1024,11 @@ const ReservationUnit = ({
                   <Calendar<ReservationType>
                     events={[...calendarEvents, ...eventBuffers]}
                     begin={currentDate}
-                    onNavigate={(d: Date) => {
-                      setFocusDate(d);
-                    }}
+                    onNavigate={(d: Date) => setFocusDate(d)}
                     eventStyleGetter={(event) =>
                       eventStyleGetter(
                         event,
-                        userReservations
-                          ?.map((n) => n?.pk)
-                          .filter((n): n is number => n != null) ?? [],
+                        filterNonNullable(userReservations?.map((n) => n?.pk)),
                         !isReservationQuotaReached
                       )
                     }

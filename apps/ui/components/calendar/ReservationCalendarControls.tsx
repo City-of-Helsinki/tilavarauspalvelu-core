@@ -596,7 +596,6 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
     reservationUnit.reservableTimeSpans,
     (n) => n?.endDatetime
   );
-  console.log("lastOpeningDate", lastOpeningDate);
 
   const submitButton = createReservation ? (
     <SubmitButtonWrapper>

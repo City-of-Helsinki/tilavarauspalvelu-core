@@ -298,13 +298,28 @@ export const getReservationUnitPrice = (
     : undefined;
 };
 
-export const mockOpeningTimes = Array.from(Array(100)).map((_, index) => {
-  const date = toApiDate(addDays(new Date(), index));
-  return {
-    startDatetime: `${date}T04:00:00+00:00`,
-    endDatetime: `${date}T20:00:00+00:00`,
-  };
-});
+// Create multiple mock opening times for reservation unit
+// if pk is even, return one 4 year span (tests the case of 24 / 7 open)
+// if pk is odd, return 100 days from 12:00 to 20:00
+// assuming that the backend will add TZ info to the dates
+export const createMockOpeningTimes = (pk: number) => {
+  if (pk % 2 === 0) {
+    return [
+      {
+        startDatetime: "2023-01-01T04:00:00+02:00",
+        endDatetime: "2027-12-31T20:00:00+02:00",
+      },
+    ];
+  }
+  return Array.from(Array(100)).map((_, index) => {
+    const start = toApiDate(addDays(new Date(), index));
+    const end = toApiDate(addDays(new Date(), index));
+    return {
+      startDatetime: `${start}T12:00:00+02:00`,
+      endDatetime: `${end}T20:00:00+02:00`,
+    };
+  });
+};
 
 export const isReservationUnitPaidInFuture = (
   pricings: ReservationUnitPricingType[]

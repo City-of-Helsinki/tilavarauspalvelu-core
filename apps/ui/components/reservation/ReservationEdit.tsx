@@ -46,7 +46,7 @@ import {
   OPENING_HOURS,
   RESERVATION_UNIT,
 } from "@/modules/queries/reservationUnit";
-import { mockOpeningTimes } from "@/modules/reservationUnit";
+import { createMockOpeningTimes } from "@/modules/reservationUnit";
 import EditStep0 from "./EditStep0";
 import EditStep1 from "./EditStep1";
 import { reservationsPrefix } from "@/modules/const";
@@ -204,6 +204,7 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
     },
   });
 
+  // TODO why is this needed? why isn't it part of the reservationUnit query?
   const [fetchAdditionalData, { data: additionalData }] = useLazyQuery<
     Query,
     QueryReservationUnitByPkArgs &
@@ -231,28 +232,31 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
   }, [reservationUnitData, fetchAdditionalData, now]);
 
   useEffect(() => {
-    const allowReservationsWithoutOpeningHours =
-      reservationUnitData?.reservationUnitByPk
-        ?.allowReservationsWithoutOpeningHours;
-
     if (reservationUnitData?.reservationUnitByPk == null) {
       return;
     }
+
+    const { allowReservationsWithoutOpeningHours } =
+      reservationUnitData?.reservationUnitByPk ?? {};
+
+    const timespans = filterNonNullable(
+      reservationUnitData?.reservationUnitByPk?.reservableTimeSpans
+    );
+    const moreTimespans = filterNonNullable(
+      additionalData?.reservationUnitByPk?.reservableTimeSpans
+    ).filter((n) => n?.startDatetime != null && n?.endDatetime != null);
+    const reservableTimeSpans = [
+      ...timespans,
+      ...(allowReservationsWithoutOpeningHours
+        ? createMockOpeningTimes(id)
+        : moreTimespans),
+    ];
     setReservationUnit({
       ...reservationUnitData?.reservationUnitByPk,
-      reservableTimeSpans: [
-        ...filterNonNullable(
-          reservationUnitData?.reservationUnitByPk?.reservableTimeSpans
-        ),
-        ...(allowReservationsWithoutOpeningHours
-          ? mockOpeningTimes
-          : additionalData?.reservationUnitByPk?.reservableTimeSpans?.filter(
-              (n) => n?.startDatetime != null && n?.endDatetime != null
-            ) || []),
-      ],
+      reservableTimeSpans,
       reservations: additionalData?.reservationUnitByPk?.reservations,
     });
-  }, [additionalData, reservationUnitData?.reservationUnitByPk]);
+  }, [additionalData, reservationUnitData?.reservationUnitByPk, id]);
 
   const { data: userReservationsData } = useQuery<Query, QueryReservationsArgs>(
     LIST_RESERVATIONS,
@@ -269,29 +273,27 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
   );
 
   useEffect(() => {
-    const reservations = userReservationsData?.reservations?.edges
-      ?.map((e) => e?.node)
-      .filter(
-        (n): n is ReservationType =>
-          n != null && n.type === ReservationsReservationTypeChoices.Normal
-      )
+    const reservations = filterNonNullable(
+      userReservationsData?.reservations?.edges?.map((e) => e?.node)
+    )
+      .filter((n) => n.type === ReservationsReservationTypeChoices.Normal)
       .filter((n) => allowedReservationStates.includes(n.state));
-    setUserReservations(reservations || []);
+    setUserReservations(reservations);
   }, [userReservationsData]);
 
+  // TODO this should be redundant, use the reservationUnit.applicationRounds instead
   const { data: applicationRoundsData } = useQuery<Query>(APPLICATION_ROUNDS, {
     fetchPolicy: "no-cache",
   });
 
   useEffect(() => {
+    // TODO this is bad, we can get the application rounds from the reservationUnit
     if (applicationRoundsData && reservationUnit) {
       const appRounds = filterNonNullable(
         applicationRoundsData?.applicationRounds?.edges?.map((e) => e?.node)
       ).filter(
-        (applicationRound) =>
-          applicationRound.reservationUnits
-            ?.map((n) => n?.pk)
-            .includes(reservationUnit.pk)
+        (ar) =>
+          ar.reservationUnits?.map((n) => n?.pk).includes(reservationUnit.pk)
       );
       setActiveApplicationRounds(appRounds);
     }
@@ -355,12 +357,8 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
     ];
   }, [t, step]);
 
-  if (
-    !reservation ||
-    !reservationUnit ||
-    !additionalData ||
-    activeApplicationRounds == null
-  ) {
+  const isLoading = !reservation || !reservationUnit || !additionalData;
+  if (isLoading) {
     return (
       <Wrapper>
         <Content>
@@ -369,6 +367,21 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
       </Wrapper>
     );
   }
+
+  const handleSubmit = () => {
+    const pk = reservation.pk;
+    // TODO refactor: using initial reservation when we only need time information is bad
+    const begin = initialReservation?.begin;
+    const end = initialReservation?.end;
+    if (pk && begin && end) {
+      adjustReservationTime({ pk, begin, end });
+    }
+  };
+
+  const title =
+    step === 0
+      ? "reservations:editReservationTime"
+      : "reservationCalendar:heading.pendingReservation";
 
   return (
     <Wrapper>
@@ -385,15 +398,7 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
             </JustForDesktop>
           </div>
           <div>
-            <Heading>
-              {t(
-                `${
-                  step === 0
-                    ? "reservations:editReservationTime"
-                    : "reservationCalendar:heading.pendingReservation"
-                }`
-              )}
-            </Heading>
+            <Heading>{t(title)}</Heading>
             <StyledStepper
               language={i18n.language}
               selectedStep={step}
@@ -425,7 +430,7 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
                 setInitialReservation={setInitialReservation}
                 activeApplicationRounds={activeApplicationRounds}
                 setErrorMsg={setErrorMsg}
-                setStep={setStep}
+                nextStep={() => setStep(1)}
               />
             )}
             {step === 1 && (
@@ -434,19 +439,7 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
                 reservationUnit={reservationUnit}
                 setErrorMsg={setErrorMsg}
                 setStep={setStep}
-                handleSubmit={() => {
-                  if (
-                    initialReservation?.begin &&
-                    initialReservation?.end &&
-                    reservation.pk
-                  ) {
-                    adjustReservationTime({
-                      pk: reservation.pk,
-                      begin: initialReservation.begin,
-                      end: initialReservation.end,
-                    });
-                  }
-                }}
+                handleSubmit={handleSubmit}
                 isSubmitting={adjustReservationTimeLoading}
               />
             )}

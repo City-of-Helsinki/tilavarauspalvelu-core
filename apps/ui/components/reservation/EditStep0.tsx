@@ -22,7 +22,13 @@ import {
 import classNames from "classnames";
 import { IconArrowRight, IconCross } from "hds-react";
 import { useRouter } from "next/router";
-import React, { Children, useCallback, useMemo, useState } from "react";
+import React, {
+  CSSProperties,
+  Children,
+  useCallback,
+  useMemo,
+  useState,
+} from "react";
 import { useTranslation } from "next-i18next";
 import { useMedia } from "react-use";
 import styled from "styled-components";
@@ -49,7 +55,7 @@ type Props = {
   >;
   activeApplicationRounds: ApplicationRoundNode[];
   setErrorMsg: React.Dispatch<React.SetStateAction<string | null>>;
-  setStep: React.Dispatch<React.SetStateAction<number>>;
+  nextStep: () => void;
 };
 
 type ReservationStateWithInitial = string;
@@ -86,16 +92,16 @@ const Actions = styled.div`
 
 const eventStyleGetter = (
   { event }: CalendarEvent<ReservationType>,
-  ownReservations: number[],
-  draggable = true
+  ownReservations: number[]
 ): { style: React.CSSProperties; className?: string } => {
-  const style = {
+  const draggable = true;
+  const style: CSSProperties = {
     borderRadius: "0px",
     opacity: "0.8",
     color: "var(--color-white)",
     display: "block",
     borderColor: "transparent",
-  } as Record<string, string>;
+  };
   let className = "";
 
   const eventPk: number | undefined =
@@ -139,7 +145,7 @@ const eventStyleGetter = (
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO type calendar props
-const EventWrapperComponent = (props: any) => {
+const EventWrapperComponent = (props: any): JSX.Element => {
   const { event } = props;
   let isSmall = false;
   let isMedium = false;
@@ -152,6 +158,20 @@ const EventWrapperComponent = (props: any) => {
   return <div {...props} className={classNames({ isSmall, isMedium })} />;
 };
 
+const TouchCellWrapper = ({
+  children,
+  value,
+  onSelectSlot,
+}: // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO type calendar props
+any): JSX.Element => {
+  return React.cloneElement(Children.only(children), {
+    onTouchEnd: () => onSelectSlot({ action: "click", slots: [value] }),
+    style: {
+      className: `${children}`,
+    },
+  });
+};
+
 const EditStep0 = ({
   reservation,
   reservationUnit,
@@ -160,7 +180,7 @@ const EditStep0 = ({
   setInitialReservation,
   activeApplicationRounds,
   setErrorMsg,
-  setStep,
+  nextStep,
 }: Props): JSX.Element => {
   const { t, i18n } = useTranslation();
   const router = useRouter();
@@ -224,6 +244,8 @@ const EditStep0 = ({
     reservation.end,
   ]);
 
+  // Why are we modifying the reservation unit, instead of splitting the reservations out
+  // and filtering that list
   const normalizedReservationUnit = useMemo(() => {
     return {
       ...reservationUnit,
@@ -283,24 +305,9 @@ const EditStep0 = ({
         : undefined,
       reservationsMinDaysBefore: reservationUnit.reservationsMinDaysBefore ?? 0,
       reservationsMaxDaysBefore: reservationUnit.reservationsMaxDaysBefore ?? 0,
-      currentDate: focusDate,
       customValidation: (date) => isSlotFree(date),
     });
-  }, [activeApplicationRounds, reservationUnit, isSlotFree, focusDate]);
-
-  const TouchCellWrapper = ({
-    children,
-    value,
-    onSelectSlot,
-  }: // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO type calendar props
-  any): JSX.Element => {
-    return React.cloneElement(Children.only(children), {
-      onTouchEnd: () => onSelectSlot({ action: "click", slots: [value] }),
-      style: {
-        className: `${children}`,
-      },
-    });
-  };
+  }, [activeApplicationRounds, reservationUnit, isSlotFree]);
 
   const isSlotReservable = useCallback(
     (start: Date, end: Date, skipLengthCheck = false): boolean => {
@@ -387,26 +394,21 @@ const EditStep0 = ({
   );
 
   const currentDate = focusDate || new Date();
-
   const dayStartTime = addHours(startOfDay(currentDate), 6);
+  const events = [...calendarEvents, ...eventBuffers];
 
   return (
     <>
       <CalendarWrapper>
         <div aria-hidden>
           <Calendar<ReservationType>
-            events={[...calendarEvents, ...eventBuffers]}
+            events={events}
             begin={currentDate}
-            onNavigate={(d: Date) => {
-              setFocusDate(d);
-            }}
+            onNavigate={(d: Date) => setFocusDate(d)}
             eventStyleGetter={(event) =>
               eventStyleGetter(
                 event,
-                userReservations
-                  ?.map((n) => n?.pk)
-                  .filter((pk): pk is number => pk != null) ?? [],
-                true
+                filterNonNullable(userReservations?.map((n) => n?.pk))
               )
             }
             slotPropGetter={slotPropGetter}
@@ -508,7 +510,7 @@ const EditStep0 = ({
                 t(`reservations:modifyTimeReasons.${validationError}`)
               );
             } else if (isNewReservationValid) {
-              setStep(1);
+              nextStep();
             }
           }}
           data-testid="reservation-edit__button--continue"

@@ -221,16 +221,11 @@ export const areSlotsReservable = (
   reservationsMaxDaysBefore: number,
   reservationBegins?: Date,
   reservationEnds?: Date,
-  activeApplicationRounds: RoundPeriod[] = [],
-  validateEnding = false
+  activeApplicationRounds: RoundPeriod[] = []
 ): boolean => {
   return slots.every(
     (slotDate) =>
-      areReservableTimesAvailable(
-        reservableTimeSpans,
-        slotDate,
-        validateEnding
-      ) &&
+      areReservableTimesAvailable(reservableTimeSpans, slotDate, true) &&
       isSlotWithinTimeframe(
         slotDate,
         reservationsMinDaysBefore,
@@ -429,39 +424,26 @@ export const getSlotPropGetter =
     reservationEnds,
     reservationsMinDaysBefore,
     reservationsMaxDaysBefore,
-    currentDate,
     customValidation,
-    validateEnding,
   }: {
     reservableTimeSpans: ReservableTimeSpanType[];
     activeApplicationRounds: RoundPeriod[];
     reservationsMinDaysBefore: number;
     reservationsMaxDaysBefore: number;
-    currentDate: Date;
     customValidation?: (arg: Date) => boolean;
     reservationBegins?: Date;
     reservationEnds?: Date;
-    validateEnding?: boolean;
   }) =>
   (date: Date): SlotProps => {
-    const hours = reservableTimeSpans?.filter((n) => {
-      if (!n.startDatetime || !n.endDatetime) return false;
-      const start = startOfWeek(currentDate);
-      const end = endOfWeek(currentDate);
-      const nStartDate = new Date(n.startDatetime);
-      const nEndDate = new Date(n.endDatetime);
-      return nStartDate >= start && nEndDate <= end;
-    });
     if (
       areSlotsReservable(
         [date],
-        hours,
+        reservableTimeSpans,
         reservationsMinDaysBefore,
         reservationsMaxDaysBefore,
         reservationBegins,
         reservationEnds,
-        activeApplicationRounds,
-        validateEnding
+        activeApplicationRounds
       ) &&
       (customValidation ? customValidation(date) : true)
     ) {
@@ -582,9 +564,9 @@ export const getEventBuffers = (
 
 export const isReservationUnitReservable = (
   reservationUnit?: ReservationUnitByPkType | null
-): boolean => {
+): [false, string] | [true] => {
   if (!reservationUnit) {
-    return false;
+    return [false, "reservationUnit is null"];
   }
   const { reservationState, minReservationDuration, maxReservationDuration } =
     reservationUnit;
@@ -599,16 +581,25 @@ export const isReservationUnitReservable = (
         (reservationUnit.metadataSet?.supportedFields?.length ?? 0) > 0;
       const hasReservableTimes =
         (reservationUnit.reservableTimeSpans?.length ?? 0) > 0;
-      return (
-        hasSupportedFields &&
-        hasReservableTimes &&
-        (!resBegins || resBegins < new Date()) &&
-        !!minReservationDuration &&
-        !!maxReservationDuration
-      );
+      if (!hasSupportedFields) {
+        return [false, "reservationUnit has no supported fields"];
+      }
+      if (!hasReservableTimes) {
+        return [false, "reservationUnit has no reservable times"];
+      }
+      if (!resBegins) {
+        return [false, "reservationUnit has no reservation begins"];
+      }
+      if (resBegins > new Date()) {
+        return [false, "reservationUnit reservation begins in future"];
+      }
+      if (!minReservationDuration || !maxReservationDuration) {
+        return [false, "reservationUnit has no min/max reservation duration"];
+      }
+      return [true];
     }
     default:
-      return false;
+      return [false, "reservationUnit is not reservable"];
   }
 };
 

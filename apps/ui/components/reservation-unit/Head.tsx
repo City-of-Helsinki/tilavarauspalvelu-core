@@ -235,6 +235,9 @@ const Head = ({
                 !isReservationStartInFuture(reservationUnit) && (
                   <StyledAltNotification
                     text={t(
+                      // TODO this is skechy it falls back to onlyRecurring
+                      // even though there might be other problems
+                      // ex. DirectAndSeason but still not reservable for some reason (some other parameter is wrong)
                       `reservationUnit:notifications.${
                         reservationUnit.reservationKind ===
                         ReservationUnitsReservationUnitReservationKindChoices.Direct

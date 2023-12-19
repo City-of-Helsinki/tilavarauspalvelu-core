@@ -732,147 +732,137 @@ describe("isReservationUnitReservable", () => {
   };
 
   test("returns true for a unit that is reservable", () => {
-    expect(
-      isReservationUnitReservable({
-        ...reservationUnit,
-        minReservationDuration: 3600,
-        maxReservationDuration: 3600,
-        metadataSet: {
-          id: "1234",
-          name: "Test",
-          supportedFields: ["name"],
-        },
-        reservationState: ReservationState.Reservable,
-      })
-    ).toBe(true);
+    const [res1] = isReservationUnitReservable({
+      ...reservationUnit,
+      minReservationDuration: 3600,
+      maxReservationDuration: 3600,
+      metadataSet: {
+        id: "1234",
+        name: "Test",
+        supportedFields: ["name"],
+      },
+      reservationState: ReservationState.Reservable,
+    });
+    expect(res1).toBe(true);
 
-    expect(
-      isReservationUnitReservable({
-        ...reservationUnit,
-        minReservationDuration: 3600,
-        maxReservationDuration: 3600,
-        metadataSet: {
-          id: "1234",
-          name: "Test",
-          supportedFields: ["name"],
-        },
-        reservationState: ReservationState.ScheduledClosing,
-      })
-    ).toBe(true);
+    const [res2] = isReservationUnitReservable({
+      ...reservationUnit,
+      minReservationDuration: 3600,
+      maxReservationDuration: 3600,
+      metadataSet: {
+        id: "1234",
+        name: "Test",
+        supportedFields: ["name"],
+      },
+      reservationState: ReservationState.ScheduledClosing,
+    });
+    expect(res2).toBe(true);
   });
 
   test("returns false for a unit that is not reservable", () => {
-    expect(
-      isReservationUnitReservable({
-        ...reservationUnit,
-        minReservationDuration: 3600,
-        maxReservationDuration: 3600,
-        reservableTimeSpans: undefined,
-        metadataSet: {
-          id: "1234",
-          name: "Test",
-          supportedFields: ["name"],
-        },
-        reservationState: ReservationState.ReservationClosed,
-      })
-    ).toBe(false);
+    const [res1] = isReservationUnitReservable({
+      ...reservationUnit,
+      minReservationDuration: 3600,
+      maxReservationDuration: 3600,
+      reservableTimeSpans: undefined,
+      metadataSet: {
+        id: "1234",
+        name: "Test",
+        supportedFields: ["name"],
+      },
+      reservationState: ReservationState.ReservationClosed,
+    });
+    expect(res1).toBe(false);
 
-    expect(
-      isReservationUnitReservable({
-        ...reservationUnit,
-        metadataSet: {
-          id: "1234",
-          name: "Test",
-          supportedFields: ["name"],
-        },
-        reservationState: ReservationState.ReservationClosed,
-      })
-    ).toBe(false);
+    const [res2] = isReservationUnitReservable({
+      ...reservationUnit,
+      metadataSet: {
+        id: "1234",
+        name: "Test",
+        supportedFields: ["name"],
+      },
+      reservationState: ReservationState.ReservationClosed,
+    });
+    expect(res2).toBe(false);
 
-    expect(
-      isReservationUnitReservable({
-        ...reservationUnit,
-        minReservationDuration: 3600,
-        metadataSet: {
-          id: "1234",
-          name: "Test",
-          supportedFields: ["name"],
-        },
-        reservationState: ReservationState.Reservable,
-      })
-    ).toBe(false);
+    const [res3] = isReservationUnitReservable({
+      ...reservationUnit,
+      minReservationDuration: 3600,
+      metadataSet: {
+        id: "1234",
+        name: "Test",
+        supportedFields: ["name"],
+      },
+      reservationState: ReservationState.Reservable,
+    });
+    expect(res3).toBe(false);
 
-    expect(
-      isReservationUnitReservable({
-        ...reservationUnit,
-        maxReservationDuration: 3600,
-        metadataSet: {
-          id: "1234",
-          name: "Test",
-          supportedFields: ["name"],
-        },
-        reservationState: ReservationState.Reservable,
-      })
-    ).toBe(false);
+    const [res4] = isReservationUnitReservable({
+      ...reservationUnit,
+      maxReservationDuration: 3600,
+      metadataSet: {
+        id: "1234",
+        name: "Test",
+        supportedFields: ["name"],
+      },
+      reservationState: ReservationState.Reservable,
+    });
+    expect(res4).toBe(false);
 
-    expect(
-      isReservationUnitReservable({
-        ...reservationUnit,
-        minReservationDuration: 3600,
-        maxReservationDuration: 3600,
-        metadataSet: {
-          id: "1234",
-          name: "Test",
-          supportedFields: ["name"],
-        },
-        reservationState: ReservationState.ScheduledReservation,
-      })
-    ).toBe(false);
+    const [res5] = isReservationUnitReservable({
+      ...reservationUnit,
+      minReservationDuration: 3600,
+      maxReservationDuration: 3600,
+      metadataSet: {
+        id: "1234",
+        name: "Test",
+        supportedFields: ["name"],
+      },
+      reservationState: ReservationState.ScheduledReservation,
+    });
+    expect(res5).toBe(false);
 
-    expect(
-      isReservationUnitReservable({
-        ...reservationUnit,
-        minReservationDuration: 3600,
-        maxReservationDuration: 3600,
-        metadataSet: {
-          id: "1234",
-          name: "Test",
-          supportedFields: ["name"],
-        },
-        reservationState: ReservationState.ScheduledPeriod,
-      })
-    ).toBe(false);
+    const [res6] = isReservationUnitReservable({
+      ...reservationUnit,
+      minReservationDuration: 3600,
+      maxReservationDuration: 3600,
+      metadataSet: {
+        id: "1234",
+        name: "Test",
+        supportedFields: ["name"],
+      },
+      reservationState: ReservationState.ScheduledPeriod,
+    });
+    expect(res6).toBe(false);
   });
 
   test("returns correct value with buffer days", () => {
-    expect(
-      isReservationUnitReservable({
-        ...reservationUnit,
-        minReservationDuration: 3600,
-        maxReservationDuration: 3600,
-        reservationBegins: addDays(new Date(), 5).toISOString(),
-        reservationsMaxDaysBefore: 5,
-        metadataSet: {
-          id: "1234",
-          name: "Test",
-          supportedFields: ["name"],
-        },
-      })
-    ).toBe(false);
+    const [res1] = isReservationUnitReservable({
+      ...reservationUnit,
+      minReservationDuration: 3600,
+      maxReservationDuration: 3600,
+      reservationBegins: addDays(new Date(), 5).toISOString(),
+      reservationsMaxDaysBefore: 5,
+      metadataSet: {
+        id: "1234",
+        name: "Test",
+        supportedFields: ["name"],
+      },
+    });
+    expect(res1).toBe(false);
 
-    expect(
-      isReservationUnitReservable({
-        ...reservationUnit,
-        reservationBegins: addDays(new Date(), 5).toISOString(),
-        reservationsMaxDaysBefore: 4,
-        reservableTimeSpans: undefined,
-        metadataSet: {
-          id: "1234",
-          name: "Test",
-          supportedFields: ["name"],
-        },
-      })
-    ).toBe(false);
+    const [res2] = isReservationUnitReservable({
+      ...reservationUnit,
+      reservationBegins: addDays(new Date(), 5).toISOString(),
+      reservationsMaxDaysBefore: 4,
+      reservableTimeSpans: undefined,
+      metadataSet: {
+        id: "1234",
+        name: "Test",
+        supportedFields: ["name"],
+      },
+    });
+    expect(res2).toBe(false);
   });
 });
 

@@ -6,6 +6,7 @@ import { useTranslation } from "next-i18next";
 import { useSession } from "@/hooks/auth";
 import ReservationCancellation from "../../components/reservation/ReservationCancellation";
 import ReservationEdit from "../../components/reservation/ReservationEdit";
+import Error from "next/error";
 
 type Props = {
   id: number;
@@ -44,11 +45,14 @@ const ReservationParams = (props: Props): JSX.Element | null => {
     return <div>{t("common:error.notAuthenticated")}</div>;
   }
 
-  // TODO this is awful, use /cancel&... and /edit&... with separate cancel.tsx and edit.tsx instead
-  const Component =
-    mode === "cancel" ? ReservationCancellation : ReservationEdit;
-
-  return <Component {...props} />;
+  // TODO should use separate files for file routing (e.g. /reservation/edit/[id]/cancel.tsx)
+  if (mode !== "cancel" && mode !== "edit") {
+    return <Error statusCode={404} />;
+  }
+  if (mode === "cancel") {
+    return <ReservationCancellation {...props} />;
+  }
+  return <ReservationEdit {...props} />;
 };
 
 export default ReservationParams;

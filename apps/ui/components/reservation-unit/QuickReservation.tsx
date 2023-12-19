@@ -237,11 +237,9 @@ function getLastPossibleReservationDate(
   const reservationUnitNotReservable = reservationUnit.reservationEnds
     ? new Date(reservationUnit.reservationEnds)
     : undefined;
-  const lastOpeningDate = reservationUnit.reservableTimeSpans
-    ? new Date(
-        String(reservationUnit?.reservableTimeSpans.at(-1)?.startDatetime)
-      )
-    : new Date();
+  const endDateTime =
+    reservationUnit?.reservableTimeSpans.at(-1)?.endDatetime ?? undefined;
+  const lastOpeningDate = endDateTime ? new Date(endDateTime) : new Date();
   return dayMin([
     reservationUnitNotReservable,
     lastPossibleReservationDate,
