@@ -208,6 +208,8 @@ export const RESERVATION_UNITS = gql`
           nameFi
           reservationBegins
           reservationEnds
+          isClosed
+          firstReservableDatetime
           reservationUnitType {
             id: pk
             nameFi

@@ -8,7 +8,7 @@ import styled from "styled-components";
 import { H5, Strongish } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { ReservationUnitType } from "common/types/gql-types";
-import { addDays, format, isToday, isTomorrow } from "date-fns";
+import { format, isToday, isTomorrow } from "date-fns";
 import { toUIDate } from "common/src/common/util";
 import { getAddressAlt, getMainImage, getTranslation } from "@/modules/util";
 import IconWithText from "../common/IconWithText";
@@ -153,10 +153,7 @@ const StyledTag = styled(Tag)`
   top: 0;
   right: 0;
   z-index: 1;
-  /* TODO: Remove the && block when API is ready */
-  && {
-    display: none;
-  }
+
   &.available {
     background: var(--color-success-light);
   }
@@ -168,14 +165,13 @@ const StyledTag = styled(Tag)`
   }
 `;
 
-const StatusTag = ({
-  data,
-}: {
-  data: { closed: boolean; availableAt?: Date };
+const StatusTag = (ru: {
+  data: { closed: boolean; availableAt: string };
 }): JSX.Element => {
   const { t } = useTranslation();
+  const { closed, availableAt } = ru.data;
 
-  if (data.closed) {
+  if (closed) {
     return (
       <StyledTag className="closed">
         {t("reservationUnitCard:closed")}
@@ -183,7 +179,7 @@ const StatusTag = ({
     );
   }
 
-  if (!data.availableAt) {
+  if (!availableAt) {
     return (
       <StyledTag className="no-times">
         {t("reservationUnitCard:noTimes")}
@@ -192,12 +188,12 @@ const StatusTag = ({
   }
 
   let dayText = "";
-  const timeText = format(data.availableAt, "HH:mm");
-  if (isToday(data.availableAt)) {
+  const timeText = format(new Date(availableAt), "HH:mm");
+  if (isToday(new Date(availableAt))) {
     dayText = `${t("common:today")}`;
-  } else if (isTomorrow(data.availableAt)) {
+  } else if (isTomorrow(new Date(availableAt))) {
     dayText = `${t("common:tomorrow")}`;
-  } else dayText = `${toUIDate(data.availableAt)} `;
+  } else dayText = `${toUIDate(new Date(availableAt))} `;
 
   return (
     <StyledTag className="available">{`${dayText} ${timeText}`}</StyledTag>
@@ -225,33 +221,6 @@ const ReservationUnitCard = ({ reservationUnit }: PropsT): JSX.Element => {
       ? getTranslation(reservationUnit.reservationUnitType, "name")
       : undefined;
 
-  const getMockData = (): { closed: boolean; availableAt?: Date } => {
-    const today = new Date();
-    today.setHours(12, 34);
-    const mockData = [
-      {
-        closed: true,
-      },
-      {
-        closed: false,
-        availableAt: today,
-      },
-      {
-        closed: false,
-        availableAt: addDays(today, 1),
-      },
-      {
-        closed: false,
-        availableAt: addDays(today, 2),
-      },
-      {
-        closed: false,
-        availableAt: undefined,
-      },
-    ];
-    return mockData[Math.floor(Math.random() * mockData.length)];
-  };
-
   return (
     <Container>
       <StyledLink href={link}>
@@ -264,7 +233,12 @@ const ReservationUnitCard = ({ reservationUnit }: PropsT): JSX.Element => {
         <Name>
           <StyledInlineLink href={link}>{name}</StyledInlineLink>
         </Name>
-        <StatusTag data={getMockData()} />
+        <StatusTag
+          data={{
+            closed: reservationUnit.isClosed ?? false,
+            availableAt: reservationUnit.firstReservableDatetime ?? "",
+          }}
+        />
         <Description>
           {unitName}
           {addressString && (
