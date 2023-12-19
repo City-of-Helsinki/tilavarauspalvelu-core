@@ -1,3 +1,5 @@
+from admin_extra_buttons.decorators import button
+from admin_extra_buttons.mixins import ExtraButtonsMixin
 from django import forms
 from django.contrib import admin
 from django.db.models import Count, QuerySet
@@ -68,18 +70,18 @@ class OriginHaukiResourceAdminForm(forms.ModelForm):
         }
 
 
-def update_reservable_time_spans(modeladmin, request, queryset: QuerySet[OriginHaukiResource]):
+def _update_reservable_time_spans_action(modeladmin, request, queryset: QuerySet[OriginHaukiResource]):
     ids: list[int] = queryset.values_list("id", flat=True)
     HaukiResourceHashUpdater(ids).run(force_refetch=True)
     modeladmin.message_user(request, _("Reservable Time Spans updated."))
 
 
 @admin.register(OriginHaukiResource)
-class OriginHaukiResourceAdmin(admin.ModelAdmin):
+class OriginHaukiResourceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
     model = OriginHaukiResource
 
     # List
-    actions = [update_reservable_time_spans]
+    actions = [_update_reservable_time_spans_action]
     list_display = ["id", "linked_reservation_units", "reservable_time_spans_count", "latest_fetched_date"]
     ordering = ["id"]
 
@@ -109,3 +111,13 @@ class OriginHaukiResourceAdmin(admin.ModelAdmin):
 
     def linked_reservation_units(self, obj):
         return ", ".join(obj.reservation_units.values_list("name_fi", flat=True))
+
+    @button(label="Update All Reservable Time Spans", change_list=True)
+    def update_all_hauki_resources_reservable_time_spans(self, request):
+        HaukiResourceHashUpdater().run(force_refetch=True)
+        self.message_user(request, _("Reservable Time Spans updated."))
+
+    @button(label="Update Reservable Time Spans", change_form=True)
+    def update_single_hauki_resource_reservable_times_pans(self, request, pk):
+        HaukiResourceHashUpdater([pk]).run(force_refetch=True)
+        self.message_user(request, _("Reservable Time Spans updated."))
