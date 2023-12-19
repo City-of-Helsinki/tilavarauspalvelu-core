@@ -1,4 +1,3 @@
-from admin_extra_buttons.mixins import ExtraButtonsMixin
 from adminsortable2.admin import SortableAdminMixin
 from django.contrib import admin, messages
 from django.http import FileResponse
@@ -26,7 +25,7 @@ class ApplicationRoundTimeSlotInline(admin.TabularInline):
 
 
 @admin.register(ReservationUnit)
-class ReservationUnitAdmin(ExtraButtonsMixin, SortableAdminMixin, admin.ModelAdmin):
+class ReservationUnitAdmin(SortableAdminMixin, admin.ModelAdmin):
     model = ReservationUnit
     form = ReservationUnitAdminForm
     actions = [
