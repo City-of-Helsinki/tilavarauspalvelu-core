@@ -594,8 +594,9 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
 
   const lastOpeningDate = maxBy(
     reservationUnit.reservableTimeSpans,
-    (n) => n?.startDatetime
+    (n) => n?.endDatetime
   );
+  console.log("lastOpeningDate", lastOpeningDate);
 
   const submitButton = createReservation ? (
     <SubmitButtonWrapper>
@@ -699,8 +700,8 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
               language={getLocalizationLang(i18n.language)}
               minDate={new Date()}
               maxDate={
-                lastOpeningDate?.startDatetime
-                  ? new Date(lastOpeningDate.startDatetime)
+                lastOpeningDate?.endDatetime
+                  ? new Date(lastOpeningDate.endDatetime)
                   : new Date()
               }
             />
