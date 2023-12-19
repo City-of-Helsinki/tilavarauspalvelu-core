@@ -112,7 +112,7 @@ const APPLICATION_ROUND_QUERY = gql`
 
 // TODO combine with APPLICATION_RESERVATION_UNITS_QUERY
 const RESERVATION_UNIT_QUERY = gql`
-  query ReservationUnit($applicationRound: [ID]!) {
+  query ReservationUnit($applicationRound: [Int]!) {
     reservationUnits(applicationRound: $applicationRound) {
       edges {
         node {
