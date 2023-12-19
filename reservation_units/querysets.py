@@ -117,7 +117,7 @@ def _get_closed_time_spans_for_time_span(
     for day in time_span.get_dates_range():
         # Add closed time spans for the time range outside of the given filter range
         # e.g. Filter time range is 10:00-14:00, add closed time spans for 00:00-10:00 and 14:00-00:00
-        if filter_time_start:
+        if filter_time_start and filter_time_start != time.min:
             closed_time_spans.append(
                 TimeSpanElement(
                     start_datetime=datetime.combine(day, time.min, tzinfo=DEFAULT_TIMEZONE),
@@ -125,7 +125,7 @@ def _get_closed_time_spans_for_time_span(
                     is_reservable=False,
                 )
             )
-        if filter_time_end:
+        if filter_time_end and filter_time_end != time.min:
             closed_time_spans.append(
                 TimeSpanElement(
                     start_datetime=datetime.combine(day, filter_time_end, tzinfo=DEFAULT_TIMEZONE),
