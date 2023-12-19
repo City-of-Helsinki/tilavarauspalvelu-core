@@ -21,8 +21,12 @@ const SingleReservationUnitFilter = ({
   const { data, loading } = useQuery<Query, QueryReservationUnitsArgs>(
     RESERVATION_UNITS_QUERY,
     {
-      variables: { unit: [unitPk ?? ""] },
-      skip: !unitPk,
+      variables: { unit: [Number(unitPk)] },
+      skip:
+        !unitPk ||
+        unitPk === "" ||
+        Number(unitPk) === 0 ||
+        Number.isNaN(Number(unitPk)),
     }
   );
 

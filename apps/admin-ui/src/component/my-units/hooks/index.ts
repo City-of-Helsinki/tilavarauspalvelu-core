@@ -95,7 +95,7 @@ export const useReservationUnitQuery = (unitPk?: number) => {
   const { data, loading } = useQuery<Query, QueryReservationUnitsArgs>(
     RESERVATION_UNIT_QUERY,
     {
-      variables: { pk: [`${unitPk}`] },
+      variables: { pk: [unitPk ?? 0] },
       skip: unitPk === undefined,
     }
   );
@@ -131,8 +131,9 @@ export const useUnitResources = (
     Query,
     QueryReservationUnitsArgs & ReservationUnitByPkTypeReservationsArgs
   >(RESERVATION_UNITS_BY_UNIT, {
+    skip: unitPk === "" || Number.isNaN(Number(unitPk)) || Number(unitPk) === 0,
     variables: {
-      unit: [unitPk],
+      unit: [Number(unitPk)],
       from: toApiDate(begin),
       to: toApiDate(begin),
       includeWithSameComponents: true,

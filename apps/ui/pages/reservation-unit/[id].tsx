@@ -230,19 +230,17 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       >({
         query: RELATED_RESERVATION_UNITS,
         variables: {
-          unit: [String(reservationUnitData.reservationUnitByPk.unit.pk)],
+          unit: [reservationUnitData.reservationUnitByPk.unit.pk],
           isDraft: false,
           isVisible: true,
         },
       });
 
-      relatedReservationUnits =
-        relatedReservationUnitsData?.reservationUnits?.edges
-          ?.map((n) => n?.node)
-          .filter((n): n is ReservationUnitType => n != null)
-          .filter(
-            (n) => n?.pk !== reservationUnitData.reservationUnitByPk?.pk
-          ) ?? [];
+      relatedReservationUnits = filterNonNullable(
+        relatedReservationUnitsData?.reservationUnits?.edges?.map(
+          (n) => n?.node
+        )
+      ).filter((n) => n?.pk !== reservationUnitData.reservationUnitByPk?.pk);
     }
 
     if (!reservationUnitData.reservationUnitByPk?.pk) {

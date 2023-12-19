@@ -15,7 +15,7 @@ export const RESERVATION_UNIT_TYPES_QUERY = gql`
 `;
 
 export const RESERVATION_UNITS_QUERY = gql`
-  query reservationUnits($offset: Int, $unit: [ID], $count: Int) {
+  query reservationUnits($offset: Int, $unit: [Int], $count: Int) {
     reservationUnits(
       offset: $offset
       onlyWithPermission: true

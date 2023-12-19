@@ -185,7 +185,7 @@ export const mocks = [
   {
     request: {
       query: RESERVATION_UNIT_QUERY,
-      variables: { pk: ["1"] },
+      variables: { pk: [1] },
     },
     result: {
       data: {

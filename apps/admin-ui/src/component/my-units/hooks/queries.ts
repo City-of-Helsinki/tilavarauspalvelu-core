@@ -34,6 +34,7 @@ export const OPTIONS_QUERY = gql`
   }
 `;
 
+// NOTE old pk: ID type
 export const UNIT_QUERY = gql`
   query units($pk: [ID]) {
     units(pk: $pk, onlyWithPermission: true) {
@@ -64,7 +65,7 @@ export const UNIT_QUERY = gql`
 export const RESERVATION_UNITS_BY_UNIT = gql`
   ${RESERVATIONUNIT_RESERVATIONS_FRAGMENT}
   query reservationUnitsByUnit(
-    $unit: [ID]
+    $unit: [Int]
     $from: Date
     $to: Date
     $includeWithSameComponents: Boolean
@@ -92,7 +93,7 @@ export const RESERVATION_UNITS_BY_UNIT = gql`
 
 export const RESERVATION_UNIT_QUERY = gql`
   ${RESERVATION_UNIT_FRAGMENT}
-  query reservationUnits($pk: [ID]) {
+  query reservationUnits($pk: [Int]) {
     reservationUnits(onlyWithPermission: true, pk: $pk) {
       edges {
         node {

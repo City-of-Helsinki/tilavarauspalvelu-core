@@ -276,7 +276,7 @@ type ApplicationEventNode implements Node {
   ageGroup: AgeGroupType
   abilityGroup: AbilityGroupType
   purpose: ReservationPurposeType
-  eventReservationUnits: [EventReservationUnitNode!]
+  eventReservationUnits(preferredOrder: Int): [EventReservationUnitNode!]
   applicationEventSchedules: [ApplicationEventScheduleNode!]
 
   """The ID of the object"""
@@ -365,6 +365,26 @@ type ApplicationEventScheduleNode implements Node {
   """May contain more than one error for same field."""
   errors: [ErrorType]
   pk: Int
+}
+
+type ApplicationEventScheduleNodeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [ApplicationEventScheduleNodeEdge]!
+  totalCount: Int
+}
+
+"""
+A Relay edge containing a `ApplicationEventScheduleNode` and its cursor.
+"""
+type ApplicationEventScheduleNodeEdge {
+  """The item at the end of the edge"""
+  node: ApplicationEventScheduleNode
+
+  """A cursor for use in pagination"""
+  cursor: String!
 }
 
 """An enumeration."""
@@ -783,8 +803,8 @@ type BuildingType implements Node {
   nameFi: String
   nameEn: String
   nameSv: String
-  realEstate: RealEstateType
   surfaceArea: Decimal
+  realEstate: RealEstateType
 
   """The ID of the object"""
   id: ID!
@@ -1475,6 +1495,18 @@ type QualifierTypeEdge {
 }
 
 type Query {
+  applicationRounds(
+    offset: Int
+    before: String
+    after: String
+    first: Int
+    last: Int
+    name_Istartswith: String
+    pk: [Int]
+
+    """Järjestä"""
+    orderBy: String
+  ): ApplicationRoundNodeConnection
   applications(
     offset: Int
     before: String
@@ -1487,6 +1519,7 @@ type Query {
     status: [ApplicationStatusChoice]
     unit: [Int]
     applicant: Int
+    textSearch: String
 
     """Järjestä"""
     orderBy: String
@@ -1518,18 +1551,24 @@ type Query {
     """Järjestä"""
     orderBy: String
   ): ApplicationEventNodeConnection
-  applicationRounds(
+  applicationEventSchedules(
     offset: Int
     before: String
     after: String
     first: Int
     last: Int
-    name_Istartswith: String
     pk: [Int]
+    applicationRound: Int
+    applicationEventStatus: [ApplicationEventStatusChoice]
+    applicantType: [ApplicantTypeChoice]
+    allocatedUnit: [Int]
+    allocatedReservationUnit: [Int]
+    allocatedDay: [Int]
+    textSearch: String
 
     """Järjestä"""
     orderBy: String
-  ): ApplicationRoundNodeConnection
+  ): ApplicationEventScheduleNodeConnection
   reservations(
     offset: Int
     before: String
@@ -1573,8 +1612,8 @@ type Query {
     end: DateTime
     beginDate: Date
     endDate: Date
-    beginTime: Time
-    endTime: Time
+    beginTime: TimeString
+    endTime: TimeString
     user: ID
     reservationUnitNameFi: String
     reservationUnitNameEn: String
@@ -1594,21 +1633,21 @@ type Query {
     after: String
     first: Int
     last: Int
-    pk: [ID]
-    unit: [ID]
-    keywordGroups: [ID]
-    reservationUnitType: [ID]
+    pk: [Int]
+    unit: [Int]
+    reservationUnitType: [Int]
     minPersonsGte: Decimal
     minPersonsLte: Decimal
     maxPersonsGte: Decimal
     maxPersonsLte: Decimal
     textSearch: String
-    purposes: [ID]
-    qualifiers: [ID]
-    equipments: [ID]
+    keywordGroups: [Int]
+    purposes: [Int]
+    qualifiers: [Int]
+    equipments: [Int]
     isDraft: Boolean
     isVisible: Boolean
-    applicationRound: [ID]
+    applicationRound: [Int]
     nameFi: String
     nameEn: String
     nameSv: String
@@ -1622,6 +1661,12 @@ type Query {
     state: [String]
     reservationState: [String]
     onlyWithPermission: Boolean
+    reservableDateStart: Date
+    reservableDateEnd: Date
+    reservableTimeStart: TimeString
+    reservableTimeEnd: TimeString
+    reservableMinimumDurationMinutes: Decimal
+    showOnlyReservable: Boolean
 
     """Järjestä"""
     orderBy: String
@@ -2919,6 +2964,8 @@ type ReservationUnitByPkType implements Node {
   paymentProduct: PaymentProductType
   pricings: [ReservationUnitPricingType]
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotNode!]
+  isClosed: Boolean
+  firstReservableDatetime: DateTime
   haukiUrl: ReservationUnitHaukiUrlType
   reservableTimeSpans(startDate: Date!, endDate: Date!): [ReservableTimeSpanType]
 }
@@ -3047,24 +3094,24 @@ input ReservationUnitCreateMutationInput {
   paymentTypes: [String]
   pricings: [ReservationUnitPricingCreateSerializerInput]
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotSerializerInput]
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
   clientMutationId: String
 }
 
@@ -3172,24 +3219,24 @@ type ReservationUnitCreateMutationPayload {
   paymentTypes: [String]
   pricings: [ReservationUnitPricingType]
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotNode]
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -3580,6 +3627,8 @@ type ReservationUnitType implements Node {
   keywordGroups: [KeywordGroupType]
   state: ReservationUnitState
   reservationState: ReservationState
+  isClosed: Boolean
+  firstReservableDatetime: DateTime
 }
 
 type ReservationUnitTypeConnection {
@@ -3721,24 +3770,24 @@ input ReservationUnitUpdateMutationInput {
   paymentTypes: [String]
   pricings: [ReservationUnitPricingUpdateSerializerInput]!
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotSerializerInput]
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
   clientMutationId: String
 }
 
@@ -3845,24 +3894,24 @@ type ReservationUnitUpdateMutationPayload {
   pricingTerms: String
   paymentTypes: [String]
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotNode]
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -4284,12 +4333,12 @@ type SpaceType implements Node {
   nameFi: String
   nameEn: String
   nameSv: String
-  parent: SpaceType
-  building: BuildingType
-  unit: UnitByPkType
   surfaceArea: Int
   maxPersons: Int
   code: String!
+  parent: SpaceType
+  building: BuildingType
+  unit: UnitByPkType
 
   """The ID of the object"""
   id: ID!
@@ -4581,15 +4630,15 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   clientMutationId: String
 }
 
@@ -4599,15 +4648,15 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  nameFi: String
-  nameEn: String
-  nameSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]

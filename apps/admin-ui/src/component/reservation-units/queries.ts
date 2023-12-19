@@ -8,8 +8,8 @@ export const SEARCH_RESERVATION_UNITS_QUERY = gql`
     $maxPersonsLte: Decimal
     $surfaceAreaGte: Decimal
     $surfaceAreaLte: Decimal
-    $unit: [ID]
-    $reservationUnitType: [ID]
+    $unit: [Int]
+    $reservationUnitType: [Int]
     $orderBy: String
     $offset: Int
     $first: Int

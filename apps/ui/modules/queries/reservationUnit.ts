@@ -149,15 +149,15 @@ export const RESERVATION_UNIT = gql`
 export const RESERVATION_UNITS = gql`
   query SearchReservationUnits(
     $textSearch: String
-    $pk: [ID]
-    $applicationRound: [ID]
+    $pk: [Int]
+    $applicationRound: [Int]
     $minPersons: Decimal
     $maxPersons: Decimal
-    $unit: [ID]
-    $reservationUnitType: [ID]
-    $purposes: [ID]
+    $unit: [Int]
+    $reservationUnitType: [Int]
+    $purposes: [Int]
     $first: Int
-    $equipments: [ID]
+    $equipments: [Int]
     $before: String
     $after: String
     $orderBy: String
@@ -242,7 +242,7 @@ export const RESERVATION_UNITS = gql`
 
 export const RELATED_RESERVATION_UNITS = gql`
   query RelatedReservationUnits(
-    $unit: [ID]!
+    $unit: [Int]!
     $isDraft: Boolean
     $isVisible: Boolean
   ) {

@@ -28,17 +28,20 @@ type Props = {
 const numberOrUndefined = (input?: string) =>
   input ? Number(input) : undefined;
 
-const mapFilterParams = (params: FilterArguments) => ({
+const mapFilterParams = ({
+  reservationUnitStates,
+  ...params
+}: FilterArguments) => ({
   ...params,
   maxPersonsLte: numberOrUndefined(params.maxPersonsLte),
   maxPersonsGte: numberOrUndefined(params.maxPersonsGte),
   surfaceAreaLte: numberOrUndefined(params.surfaceAreaLte),
   surfaceAreaGte: numberOrUndefined(params.surfaceAreaGte),
-  unit: params.unit?.map((u) => u.value as string),
-  state: params.reservationUnitStates?.map((u) => u.value as string),
-  reservationUnitType: params.reservationUnitType?.map(
-    (u) => u.value as string
-  ),
+  unit: params.unit.map((u) => u.value).map(Number),
+  state: reservationUnitStates.map((u) => u.value).map(String),
+  reservationUnitType: params.reservationUnitType
+    .map((u) => u.value)
+    .map(Number),
 });
 
 const updateQuery = (

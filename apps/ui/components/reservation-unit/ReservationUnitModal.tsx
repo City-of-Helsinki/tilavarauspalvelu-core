@@ -321,13 +321,14 @@ const ReservationUnitModal = ({
     {
       skip: !applicationRound.pk,
       variables: {
-        applicationRound: [applicationRound.pk?.toString() ?? ""],
+        applicationRound: [applicationRound.pk ?? 0],
         textSearch: searchTerm,
         maxPersonsGte: Number(maxPersons?.value),
-        reservationUnitType: reservationUnitType?.value
-          ? [reservationUnitType?.value?.toString()]
-          : [],
-        unit: unit?.value ? [unit?.value?.toString()] : [],
+        reservationUnitType:
+          reservationUnitType?.value != null
+            ? [Number(reservationUnitType?.value)]
+            : [],
+        unit: unit?.value != null ? [Number(unit?.value)] : [],
         orderBy: "nameFi",
         isDraft: false,
         isVisible: true,

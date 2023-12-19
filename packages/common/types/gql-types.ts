@@ -12,7 +12,7 @@ export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
 };
 export type MakeEmpty<
   T extends { [key: string]: unknown },
-  K extends keyof T
+  K extends keyof T,
 > = { [_ in K]?: never };
 export type Incremental<T> =
   | T
@@ -337,6 +337,10 @@ export type ApplicationEventNode = Node & {
   uuid: Scalars["UUID"]["output"];
 };
 
+export type ApplicationEventNodeEventReservationUnitsArgs = {
+  preferredOrder?: InputMaybe<Scalars["Int"]["input"]>;
+};
+
 export type ApplicationEventNodeConnection = {
   __typename?: "ApplicationEventNodeConnection";
   /** Contains the nodes in this connection. */
@@ -413,6 +417,24 @@ export type ApplicationEventScheduleNode = Node & {
   id: Scalars["ID"]["output"];
   pk?: Maybe<Scalars["Int"]["output"]>;
   priority: Scalars["Int"]["output"];
+};
+
+export type ApplicationEventScheduleNodeConnection = {
+  __typename?: "ApplicationEventScheduleNodeConnection";
+  /** Contains the nodes in this connection. */
+  edges: Array<Maybe<ApplicationEventScheduleNodeEdge>>;
+  /** Pagination data for this connection. */
+  pageInfo: PageInfo;
+  totalCount?: Maybe<Scalars["Int"]["output"]>;
+};
+
+/** A Relay edge containing a `ApplicationEventScheduleNode` and its cursor. */
+export type ApplicationEventScheduleNodeEdge = {
+  __typename?: "ApplicationEventScheduleNodeEdge";
+  /** A cursor for use in pagination */
+  cursor: Scalars["String"]["output"];
+  /** The item at the end of the edge */
+  node?: Maybe<ApplicationEventScheduleNode>;
 };
 
 /** An enumeration. */
@@ -1661,6 +1683,7 @@ export type QualifierTypeEdge = {
 export type Query = {
   __typename?: "Query";
   ageGroups?: Maybe<AgeGroupTypeConnection>;
+  applicationEventSchedules?: Maybe<ApplicationEventScheduleNodeConnection>;
   applicationEvents?: Maybe<ApplicationEventNodeConnection>;
   applicationRounds?: Maybe<ApplicationRoundNodeConnection>;
   applications?: Maybe<ApplicationNodeConnection>;
@@ -1716,6 +1739,27 @@ export type QueryAgeGroupsArgs = {
   offset?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
+export type QueryApplicationEventSchedulesArgs = {
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  allocatedDay?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  allocatedReservationUnit?: InputMaybe<
+    Array<InputMaybe<Scalars["Int"]["input"]>>
+  >;
+  allocatedUnit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  applicantType?: InputMaybe<Array<InputMaybe<ApplicantTypeChoice>>>;
+  applicationEventStatus?: InputMaybe<
+    Array<InputMaybe<ApplicationEventStatusChoice>>
+  >;
+  applicationRound?: InputMaybe<Scalars["Int"]["input"]>;
+  before?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  last?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  orderBy?: InputMaybe<Scalars["String"]["input"]>;
+  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  textSearch?: InputMaybe<Scalars["String"]["input"]>;
+};
+
 export type QueryApplicationEventsArgs = {
   after?: InputMaybe<Scalars["String"]["input"]>;
   ageGroup?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
@@ -1765,6 +1809,7 @@ export type QueryApplicationsArgs = {
   orderBy?: InputMaybe<Scalars["String"]["input"]>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   status?: InputMaybe<Array<InputMaybe<ApplicationStatusChoice>>>;
+  textSearch?: InputMaybe<Scalars["String"]["input"]>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
@@ -1908,10 +1953,10 @@ export type QueryRecurringReservationsArgs = {
   before?: InputMaybe<Scalars["String"]["input"]>;
   begin?: InputMaybe<Scalars["DateTime"]["input"]>;
   beginDate?: InputMaybe<Scalars["Date"]["input"]>;
-  beginTime?: InputMaybe<Scalars["Time"]["input"]>;
+  beginTime?: InputMaybe<Scalars["TimeString"]["input"]>;
   end?: InputMaybe<Scalars["DateTime"]["input"]>;
   endDate?: InputMaybe<Scalars["Date"]["input"]>;
-  endTime?: InputMaybe<Scalars["Time"]["input"]>;
+  endTime?: InputMaybe<Scalars["TimeString"]["input"]>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   last?: InputMaybe<Scalars["Int"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
@@ -1991,13 +2036,13 @@ export type QueryReservationUnitTypesArgs = {
 
 export type QueryReservationUnitsArgs = {
   after?: InputMaybe<Scalars["String"]["input"]>;
-  applicationRound?: InputMaybe<Array<InputMaybe<Scalars["ID"]["input"]>>>;
+  applicationRound?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   before?: InputMaybe<Scalars["String"]["input"]>;
-  equipments?: InputMaybe<Array<InputMaybe<Scalars["ID"]["input"]>>>;
+  equipments?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   isDraft?: InputMaybe<Scalars["Boolean"]["input"]>;
   isVisible?: InputMaybe<Scalars["Boolean"]["input"]>;
-  keywordGroups?: InputMaybe<Array<InputMaybe<Scalars["ID"]["input"]>>>;
+  keywordGroups?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   last?: InputMaybe<Scalars["Int"]["input"]>;
   maxPersonsGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   maxPersonsLte?: InputMaybe<Scalars["Decimal"]["input"]>;
@@ -2009,21 +2054,27 @@ export type QueryReservationUnitsArgs = {
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Scalars["String"]["input"]>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["ID"]["input"]>>>;
-  purposes?: InputMaybe<Array<InputMaybe<Scalars["ID"]["input"]>>>;
-  qualifiers?: InputMaybe<Array<InputMaybe<Scalars["ID"]["input"]>>>;
+  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  purposes?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  qualifiers?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   rankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   rankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  reservableDateEnd?: InputMaybe<Scalars["Date"]["input"]>;
+  reservableDateStart?: InputMaybe<Scalars["Date"]["input"]>;
+  reservableMinimumDurationMinutes?: InputMaybe<Scalars["Decimal"]["input"]>;
+  reservableTimeEnd?: InputMaybe<Scalars["TimeString"]["input"]>;
+  reservableTimeStart?: InputMaybe<Scalars["TimeString"]["input"]>;
   reservationKind?: InputMaybe<Scalars["String"]["input"]>;
   reservationState?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
-  reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["ID"]["input"]>>>;
+  reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  showOnlyReservable?: InputMaybe<Scalars["Boolean"]["input"]>;
   state?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
   surfaceAreaGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   surfaceAreaLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
   typeRankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   typeRankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  unit?: InputMaybe<Array<InputMaybe<Scalars["ID"]["input"]>>>;
+  unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type QueryReservationsArgs = {
@@ -3076,12 +3127,14 @@ export type ReservationUnitByPkType = Node & {
   descriptionFi?: Maybe<Scalars["String"]["output"]>;
   descriptionSv?: Maybe<Scalars["String"]["output"]>;
   equipment?: Maybe<Array<Maybe<EquipmentType>>>;
+  firstReservableDatetime?: Maybe<Scalars["DateTime"]["output"]>;
   haukiUrl?: Maybe<ReservationUnitHaukiUrlType>;
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   images: Array<ReservationUnitImageType>;
   /** Is reservation unit archived. */
   isArchived: Scalars["Boolean"]["output"];
+  isClosed?: Maybe<Scalars["Boolean"]["output"]>;
   isDraft: Scalars["Boolean"]["output"];
   keywordGroups?: Maybe<Array<Maybe<KeywordGroupType>>>;
   location?: Maybe<LocationType>;
@@ -3548,11 +3601,13 @@ export type ReservationUnitType = Node & {
   descriptionFi?: Maybe<Scalars["String"]["output"]>;
   descriptionSv?: Maybe<Scalars["String"]["output"]>;
   equipment?: Maybe<Array<Maybe<EquipmentType>>>;
+  firstReservableDatetime?: Maybe<Scalars["DateTime"]["output"]>;
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   images: Array<ReservationUnitImageType>;
   /** Is reservation unit archived. */
   isArchived: Scalars["Boolean"]["output"];
+  isClosed?: Maybe<Scalars["Boolean"]["output"]>;
   isDraft: Scalars["Boolean"]["output"];
   keywordGroups?: Maybe<Array<Maybe<KeywordGroupType>>>;
   location?: Maybe<LocationType>;

@@ -102,16 +102,16 @@ const processVariables = (values: Record<string, string>, language: string) => {
       maxPersons: parseInt(values.maxPersons, 10),
     }),
     ...(values.purposes && {
-      purposes: values.purposes.split(","),
+      purposes: values.purposes.split(",").map(Number),
     }),
     ...(values.unit && {
-      unit: values.unit.split(","),
+      unit: values.unit.split(",").map(Number),
     }),
     ...(values.reservationUnitType && {
-      reservationUnitType: values.reservationUnitType.split(","),
+      reservationUnitType: values.reservationUnitType.split(",").map(Number),
     }),
     ...(values.equipments && {
-      equipments: values.equipments.split(","),
+      equipments: values.equipments.split(",").map(Number),
     }),
     ...(values.dateBegin && {
       dateBegin: `${values.dateBegin
@@ -243,12 +243,12 @@ const SearchSingle = (): JSX.Element => {
 
   const loadingMore = networkStatus === NetworkStatus.fetchMore;
 
+  // TODO type this properly
   const onSearch = async (criteria: Record<string, string>) => {
     const sortingCriteria = pick(queryString.parse(searchParams), [
       "sort",
       "order",
     ]);
-    // TODO: fix this
     router.replace(singleSearchUrl({ ...criteria, ...sortingCriteria }));
   };
 

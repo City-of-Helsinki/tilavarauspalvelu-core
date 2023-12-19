@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import { RESERVATIONUNIT_RESERVATIONS_FRAGMENT } from "../reservations/fragments";
 
+// NOTE old pk: ID type
 export const RECURRING_RESERVATION_UNIT_QUERY = gql`
   query units($pk: [ID]) {
     units(pk: $pk, onlyWithPermission: true) {
@@ -24,7 +25,7 @@ export const RECURRING_RESERVATION_UNIT_QUERY = gql`
 export const RESERVATIONS_BY_RESERVATIONUNITS = gql`
   ${RESERVATIONUNIT_RESERVATIONS_FRAGMENT}
   query ReservationUnits(
-    $pk: ID
+    $pk: Int
     $from: Date
     $to: Date
     $includeWithSameComponents: Boolean

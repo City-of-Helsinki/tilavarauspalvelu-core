@@ -129,16 +129,16 @@ const processVariables = (values: Record<string, string>, language: string) => {
       maxPersons: parseInt(values.maxPersons, 10),
     }),
     ...(values.purposes && {
-      purposes: values.purposes.split(","),
+      purposes: values.purposes.split(",").map(Number),
     }),
     ...(values.unit && {
-      unit: values.unit.split(","),
+      unit: values.unit.split(",").map(Number),
     }),
     ...(values.reservationUnitType && {
-      reservationUnitType: values.reservationUnitType.split(","),
+      reservationUnitType: values.reservationUnitType.split(",").map(Number),
     }),
     ...(values.applicationRound && {
-      applicationRound: values.applicationRound.split(","),
+      applicationRound: values.applicationRound.split(",").map(Number),
     }),
     first: pagingLimit,
     orderBy: values.order === "desc" ? `-${sortCriteria}` : sortCriteria,
@@ -240,13 +240,14 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
 
   const history = useRouter();
 
-  const onSearch = async (criteria: QueryReservationUnitsArgs) => {
+  // TODO: the TS type needs fixing
+  // the form SearchForm sends Record type, but it should be typed to match the form values
+  const onSearch = async (criteria: Record<string, string>) => {
     const sortingCriteria = pick(queryString.parse(searchParams), [
       "sort",
       "order",
     ]);
     history.replace(
-      // TODO: fix this
       searchUrl({
         ...criteria,
         ...sortingCriteria,
