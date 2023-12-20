@@ -331,7 +331,7 @@ describe("getReservationCancellationReason", () => {
         ...reservation2,
         reservationUnits: [],
       })
-    ).toBe(null);
+    ).toBe("NO_CANCELLATION_RULE");
   });
 
   test("with no cancellation rule", () => {
@@ -372,6 +372,7 @@ describe("getReservationCancellationReason", () => {
     ).toBe(null);
   });
 
+  // TODO this looks sketchy unless there is something that overrides system clock
   test("can be cancelled when the reservation is outside the cancellation buffer", () => {
     const resUnit = {
       ...reservationUnit,
@@ -397,7 +398,7 @@ describe("getReservationCancellationReason", () => {
       ...reservationUnit,
       cancellationRule: {
         ...reservationUnit.cancellationRule,
-        canBeCancelledTimeBefore: 3600,
+        canBeCancelledTimeBefore: 24 * 60 * 60, // 24 hours
       } as ReservationUnitCancellationRuleType,
     } as ReservationUnitType;
 

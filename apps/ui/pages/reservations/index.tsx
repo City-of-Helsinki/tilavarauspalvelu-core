@@ -102,7 +102,7 @@ const Reservations = (): JSX.Element | null => {
               ReservationsReservationStateChoices.WaitingForPayment,
               ReservationsReservationStateChoices.Denied,
             ],
-      orderBy: "-begin",
+      orderBy: tab !== "past" ? "begin" : "-begin",
       user: currentUser?.pk?.toString(),
       // valid values: "normal", "behalf", "staff", "blocked"
       reservationType: [

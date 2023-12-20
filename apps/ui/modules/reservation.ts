@@ -138,9 +138,13 @@ export const getReservationCancellationReason = (
 ): ReservationCancellationReason | null => {
   const reservationUnit = reservation.reservationUnits?.[0];
 
-  if (!reservationUnit) return null;
+  if (!reservationUnit) {
+    return "NO_CANCELLATION_RULE";
+  }
 
-  if (isReservationInThePast(reservation)) return "PAST";
+  if (isReservationInThePast(reservation)) {
+    return "PAST";
+  }
 
   if (!reservationUnit.cancellationRule) {
     return "NO_CANCELLATION_RULE";
