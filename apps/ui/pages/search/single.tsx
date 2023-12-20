@@ -146,8 +146,8 @@ const processVariables = (values: Record<string, string>, language: string) => {
     ...replaceIfExists(values.duration, {
       reservableMinimumDurationMinutes: parseInt(values.duration, 10),
     }),
-    ...replaceIfExists(values.showOnlyReservable === "true", {
-      showOnlyReservable: !!values.showOnlyReservable,
+    ...replaceIfExists(values.showOnlyReservable !== "false", {
+      showOnlyReservable: true,
     }),
     first: pagingLimit,
     orderBy: values.order === "desc" ? `-${sortCriteria}` : sortCriteria,

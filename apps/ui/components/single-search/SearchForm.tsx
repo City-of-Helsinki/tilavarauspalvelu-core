@@ -388,6 +388,7 @@ const SearchForm = ({
     }, {});
     onSearch(searchCriteria);
   };
+
   const areOptionsLoaded =
     !unitsLoading && !purposesLoading && !typesLoading && !equipmentsLoading;
 
