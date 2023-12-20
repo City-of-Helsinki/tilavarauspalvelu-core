@@ -33,6 +33,7 @@ from applications.models import (
 )
 from applications.typing import TimeSlotDB
 from common.choices import BannerNotificationLevel, BannerNotificationTarget
+from common.management.commands._create_caisa import _create_caisa
 from common.management.commands._utils import (
     Paragraphs,
     SetName,
@@ -180,6 +181,8 @@ def create_test_data(flush: bool = True) -> None:
         spaces,
     )
     _create_pricings(reservation_units)
+
+    _create_caisa(metadata_sets)
 
     age_groups = _create_age_groups()
     reservation_purposes = _create_reservation_purposes()
