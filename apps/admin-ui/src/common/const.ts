@@ -84,7 +84,12 @@ export const getSignOutUrl = (): string => {
 
 export const VALID_ALLOCATION_APPLICATION_STATUSES = [
   ApplicationStatusChoice.Received,
+  ApplicationStatusChoice.InAllocation,
   ApplicationStatusChoice.Handled,
   ApplicationStatusChoice.ResultsSent,
-  ApplicationStatusChoice.InAllocation,
+];
+
+export const VALID_ALLOCATED_APPLICATION_STATUSES = [
+  ApplicationStatusChoice.Handled,
+  ApplicationStatusChoice.ResultsSent,
 ];

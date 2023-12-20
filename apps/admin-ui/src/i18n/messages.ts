@@ -501,6 +501,7 @@ const translations: ITranslations = {
     applicants: ["Hakukierroksen hakijat"],
     listHandlingTitle: ["Käsittely"],
     appliedReservations: ["Haetut vuorot"],
+    allocatedReservations: ["Jaetut vuorot"],
     applications: ["Hakemukset"],
     roundCriteria: ["Kierroksen kriteerit"],
     // TODO this is used in Criteria page
@@ -558,7 +559,7 @@ const translations: ITranslations = {
     headings: {
       id: ["Id"],
       customer: ["Hakija"],
-      name: ["Vuoro"],
+      name: ["Nimi"],
       unit: ["Toimipiste"],
       stats: ["Haettu"],
       phase: ["Vaihe"],

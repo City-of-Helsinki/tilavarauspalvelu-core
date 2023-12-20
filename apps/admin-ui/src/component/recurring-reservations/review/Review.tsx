@@ -24,6 +24,7 @@ import Filters, {
   type UnitPkName,
 } from "./Filters";
 import ApplicationEventDataLoader from "./ApplicationEventDataLoader";
+import AllocatedEventDataLoader from "@/component/recurring-reservations/review/AllocatedEventDataLoader";
 
 const Header = styled.div`
   margin-top: var(--spacing-l);
@@ -47,7 +48,7 @@ const TabContent = styled.div`
 `;
 
 const APPLICATION_RESERVATION_UNITS_QUERY = gql`
-  query reservationUnits($offset: Int, $count: Int, $pks: [ID]) {
+  query reservationUnits($offset: Int, $count: Int, $pks: [Int]) {
     reservationUnits(
       onlyWithPermission: true
       offset: $offset
@@ -147,6 +148,7 @@ function Review({ applicationRound }: ReviewProps): JSX.Element | null {
         <Tabs.TabList>
           <Tabs.Tab>{t("ApplicationRound.applications")}</Tabs.Tab>
           <Tabs.Tab>{t("ApplicationRound.appliedReservations")}</Tabs.Tab>
+          <Tabs.Tab>{t("ApplicationRound.allocatedReservations")}</Tabs.Tab>
         </Tabs.TabList>
         <Tabs.TabPanel>
           <TabContent>
@@ -164,6 +166,18 @@ function Review({ applicationRound }: ReviewProps): JSX.Element | null {
           <TabContent>
             <Filters onSearch={debouncedSearch} units={unitPks} />
             <ApplicationEventDataLoader
+              applicationRound={applicationRound}
+              key={JSON.stringify({ ...search, ...sort })}
+              filters={search}
+              sort={sort}
+              sortChanged={onSortChanged}
+            />
+          </TabContent>
+        </Tabs.TabPanel>
+        <Tabs.TabPanel>
+          <TabContent>
+            <Filters onSearch={debouncedSearch} units={unitPks} />
+            <AllocatedEventDataLoader
               applicationRound={applicationRound}
               key={JSON.stringify({ ...search, ...sort })}
               filters={search}
