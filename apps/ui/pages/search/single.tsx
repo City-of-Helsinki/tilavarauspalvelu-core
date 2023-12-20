@@ -85,8 +85,10 @@ const processVariables = (values: Record<string, string>, language: string) => {
   const endArray = values.endDate?.split(".");
   // Add leading zero to day and month if needed
   for (let i = 0; i < 2; i += 1) {
-    if (startArray[i]?.length === 1) startArray[i] = `0${startArray[i]}`;
-    if (endArray[i]?.length === 1) endArray[i] = `0${endArray[i]}`;
+    if (startArray && startArray.length >= i && startArray[i]?.length === 1)
+      startArray[i] = `0${startArray[i]}`;
+    if (endArray && endArray.length >= i && endArray[i]?.length === 1)
+      endArray[i] = `0${endArray[i]}`;
   }
   const replaceIfExists = (condition: string | boolean, returnObject: object) =>
     condition && returnObject;
@@ -114,16 +116,16 @@ const processVariables = (values: Record<string, string>, language: string) => {
       maxPersons: parseInt(values.maxPersons, 10),
     }),
     ...replaceIfExists(values.purposes, {
-      purposes: values.purposes.split(",").map(Number),
+      purposes: values.purposes?.split(",").map(Number),
     }),
     ...replaceIfExists(values.unit, {
-      unit: values.unit.split(",").map(Number),
+      unit: values.unit?.split(",").map(Number),
     }),
     ...replaceIfExists(values.reservationUnitType, {
-      reservationUnitType: values.reservationUnitType.split(",").map(Number),
+      reservationUnitType: values.reservationUnitType?.split(",").map(Number),
     }),
     ...replaceIfExists(values.equipments, {
-      equipments: values.equipments.split(",").map(Number),
+      equipments: values.equipments?.split(",").map(Number),
     }),
     ...replaceIfExists(values.startDate, {
       reservableDateStart: values.startDate
