@@ -5,13 +5,12 @@ from datetime import UTC, date, datetime, time, timedelta
 from decimal import Decimal
 from enum import Enum
 from itertools import cycle
-from types import DynamicClassAttribute
 from typing import Any, Literal, NamedTuple, TypedDict, TypeVar
 
 from django.contrib.auth.hashers import make_password
 from django.contrib.gis.geos import Point
 from django.core.management import BaseCommand, call_command
-from django.utils.timezone import now
+from django.utils.timezone import localtime
 
 from applications.choices import (
     ApplicantTypeChoice,
@@ -35,6 +34,8 @@ from applications.models import (
 from applications.typing import TimeSlotDB
 from common.choices import BannerNotificationLevel, BannerNotificationTarget
 from common.management.commands._utils import (
+    Paragraphs,
+    SetName,
     batched,
     faker_en,
     faker_fi,
@@ -126,24 +127,6 @@ class UserType(str, Enum):
     all = "Ylläpitäjä"
 
 
-class SetName(str, Enum):
-    set_1 = "Lomake 1"
-    set_2 = "Lomake 2"
-    set_3 = "Lomake 3"
-    set_4 = "Lomake 4"
-    set_5 = "Lomake 5"
-    set_6 = "Lomake 6"
-    set_all = "All Fields"
-
-    @classmethod
-    def applying_free_of_charge(cls) -> list["SetName"]:
-        return [cls.set_5, cls.set_6]
-
-    @DynamicClassAttribute
-    def for_applying_free_of_charge(self) -> bool:
-        return self in self.applying_free_of_charge()
-
-
 class FieldCombination(NamedTuple):
     supported: list[str]
     required: list[str]
@@ -181,8 +164,10 @@ def create_test_data(flush: bool = True) -> None:
     purposes = _create_purposes()
     services = _create_services()
 
+    _rename_empty_units(units[-3:])  # leave few units without reservation units
+
     reservation_units = _create_reservation_units(
-        units,
+        units[:-3],  # leave few units without reservation units
         reservation_unit_types,
         terms_of_use,
         cancellation_rules,
@@ -216,7 +201,6 @@ def create_test_data(flush: bool = True) -> None:
         reservation_units,
         reservation_purposes,
         service_sectors,
-        users[0],
     )
     _create_applications(
         application_rounds,
@@ -227,6 +211,15 @@ def create_test_data(flush: bool = True) -> None:
         cities,
     )
     _create_banner_notifications()
+
+
+def _rename_empty_units(units: list[Unit]) -> None:
+    for i, unit in enumerate(units):
+        unit.name = f"Empty unit {i}"
+        unit.name_fi = f"Empty unit {i}"
+        unit.name_en = f"Empty unit {i}"
+        unit.name_sv = f"Empty unit {i}"
+        unit.save()
 
 
 @with_logs(
@@ -576,7 +569,7 @@ def _create_service_sector_roles(
     text_entering="Creating units...",
     text_exiting="Units created!",
 )
-def _create_units(*, number: int = 10) -> list[Unit]:
+def _create_units(*, number: int = 15) -> list[Unit]:
     # Some actual tprek identifiers for Hauki testing
     tprek_ids = {
         # Oodin nuorisotila - Oodin nuorisotila
@@ -640,15 +633,25 @@ def _create_locations_for_units(units: list[Unit]) -> list[Location]:
     text_exiting="Unit group created!",
 )
 def _create_unit_groups_for_units(units: list[Unit]) -> list[UnitGroup]:
-    # Currently just one group is created
-    unit_group = UnitGroup.objects.create(
+    unit_group_1 = UnitGroup.objects.create(
         name="Unit Group 1",
         name_fi="Unit Group 1",
         name_en="Unit Group 1",
         name_sv="Unit Group 1",
     )
-    unit_group.units.add(*units)
-    return [unit_group]
+    # Add first half of units to unit group 1
+    unit_group_1.units.add(*units[: len(units) // 2])
+
+    unit_group_2 = UnitGroup.objects.create(
+        name="Unit Group 2",
+        name_fi="Unit Group 2",
+        name_en="Unit Group 2",
+        name_sv="Unit Group 2",
+    )
+    # Add second half of units to unit group 2
+    unit_group_1.units.add(*units[len(units) // 2 :])
+
+    return [unit_group_1, unit_group_2]
 
 
 @with_logs(
@@ -684,25 +687,49 @@ def _create_service_sectors(
     text_entering="Creating spaces...",
     text_exiting="Spaces created!",
 )
-def _create_spaces(units: list[Unit], *, number: int = 3) -> list[Space]:
-    units_loop = cycle(units)
+def _create_spaces(units: list[Unit]) -> list[Space]:
+    is_without_unit_created: bool = False
 
     spaces: list[Space] = []
-    for i in range(number):
-        space = Space(
-            name=f"Space {i}",
-            name_fi=f"Space {i}",
-            name_sv=f"Space {i}",
-            name_en=f"Space {i}",
-            unit=next(units_loop),
-            lft=1,
-            rght=2,
-            tree_id=i,
-            level=0,
-        )
-        spaces.append(space)
+    linked: int = 0
 
-    return Space.objects.bulk_create(spaces)
+    # Can bulk create spaces since we need to
+    # link them to each other to form the space hierarchy.
+    for i, unit in enumerate(units):
+        if not is_without_unit_created:
+            space = Space.objects.create(
+                name=f"Space {i}",
+                name_fi=f"Space {i}",
+                name_sv=f"Space {i}",
+                name_en=f"Space {i}",
+            )
+            spaces.append(space)
+            is_without_unit_created = True
+            continue
+
+        # Add 1-3 spaces to each unit
+        for _ in range(random.randint(1, 3)):
+            # 20% chance to add a parent space
+            parent: Space | None = None
+            has_parent = weighted_choice([True, False], [1, 4])
+            if has_parent:
+                linked += 1
+                parent = random.choice(spaces)
+
+            space = Space.objects.create(
+                name=f"Space {i} - {unit.name}",
+                name_fi=f"Space {i} - {unit.name}",
+                name_sv=f"Space {i} - {unit.name}",
+                name_en=f"Space {i} - {unit.name}",
+                unit=unit,
+                parent=parent,
+            )
+            spaces.append(space)
+
+    Space.objects.rebuild()
+    print(f"Linked {linked} spaces to other spaces")  # noqa: T201, RUF100
+
+    return list(Space.objects.all())
 
 
 @with_logs(
@@ -729,15 +756,55 @@ def _create_reservation_unit_types(*, number: int = 3) -> list[ReservationUnitTy
     text_exiting="Terms of use created!",
 )
 def _create_terms_of_use() -> dict[str, TermsOfUse]:
+    #
+    # Create general terms
+    #
+    generic_terms = ["accessibility", "booking", "privacy", "service"]
+    term_names = [
+        Paragraphs(fi="Saavutettavuusseloste", en="Accessibility Statement", sv="Tillgänglighet"),
+        Paragraphs(fi="Yleiset sopimusehdot", en="General Terms and Conditions", sv="Allmänna villkor"),
+        Paragraphs(fi="Tietosuojaseloste", en="Privacy Statement", sv="Dataskyddspolicy"),
+        Paragraphs(fi="Palvelun yleiset käyttöehdot", en="General Terms of Service", sv="Allmänna användarvillkor"),
+    ]
+
+    for term_id, names in zip(generic_terms, term_names, strict=True):
+        text_fi = faker_fi.text()
+        text_sv = faker_sv.text()
+        text_en = faker_en.text()
+
+        TermsOfUse.objects.create(
+            id=term_id,
+            name=names.fi,
+            name_fi=names.fi,
+            name_sv=names.em,
+            name_en=names.sv,
+            text=text_fi,
+            text_fi=text_fi,
+            text_sv=text_sv,
+            text_en=text_en,
+            terms_type=TermsOfUse.TERMS_TYPE_GENERIC,
+        )
+
+    #
+    # Create other kinds of terms
+    #
     terms_of_use: list[TermsOfUse] = []
-    for i, (term_type, _) in enumerate(TermsOfUse.TERMS_TYPES):
+    term_types: list[str] = [
+        TermsOfUse.TERMS_TYPE_PAYMENT,
+        TermsOfUse.TERMS_TYPE_CANCELLATION,
+        TermsOfUse.TERMS_TYPE_RECURRING,
+        TermsOfUse.TERMS_TYPE_SERVICE,
+        TermsOfUse.TERMS_TYPE_PRICING,
+    ]
+    for term_type in term_types:
         name = term_type.replace("_", " ").title()
+
         text_fi = faker_fi.text()
         text_sv = faker_sv.text()
         text_en = faker_en.text()
 
         terms = TermsOfUse(
-            id=i + 1,
+            id=f"{term_type}_1",
             name=name,
             name_fi=name,
             name_sv=name,
@@ -1119,18 +1186,28 @@ def _create_purposes(*, number: int = 10) -> list[Purpose]:
     text_exiting="Resources created!",
 )
 def _create_resources(spaces: list[Space], *, number: int = 10) -> list[Resource]:
+    is_without_space_created: bool = False
+
     resources: list[Resource] = []
     for i in range(number):
         buffer_after = weighted_choice([0, 1], weights=[5, 1])
         buffer_before = weighted_choice([0, 1], weights=[5, 1])
 
+        if not is_without_space_created:
+            is_without_space_created = True
+            space = None
+            name = "Resource without space"
+        else:
+            space = random.choice(spaces)
+            name = f"Resource {i} - {space.name}"
+
         reservation_purpose = Resource(
-            name=f"Resource {i}",
-            name_fi=f"Resource {i}",
-            name_sv=f"Resource {i}",
-            name_en=f"Resource {i}",
+            name=name,
+            name_fi=name,
+            name_sv=name,
+            name_en=name,
             location_type=random.choice(Resource.LOCATION_TYPES)[0],
-            space=random.choice(spaces),
+            space=space,
             buffer_time_after=timedelta(hours=buffer_after),
             buffer_time_before=timedelta(hours=buffer_before),
         )
@@ -1224,6 +1301,12 @@ def _create_reservation_units(
             while set_name.for_applying_free_of_charge:
                 set_name, metadata_set = next(metadata_set_loop)
 
+        reservation_kind = weighted_choice(ReservationKind.values, weights=[1, 1, 10])
+
+        name = f"Reservation Unit {i}"
+        if reservation_kind == ReservationKind.SEASON:
+            name += ", vain kausivarattava"
+
         reservation_unit = ReservationUnit(
             allow_reservations_without_opening_hours=True,
             authentication=weighted_choice(
@@ -1247,10 +1330,10 @@ def _create_reservation_units(
             metadata_set=metadata_set,
             min_persons=min_persons,
             min_reservation_duration=timedelta(hours=min_duration),
-            name=f"Reservation Unit {i}",
-            name_en=f"Reservation Unit {i}",
-            name_fi=f"Reservation Unit {i}",
-            name_sv=f"Reservation Unit {i}",
+            name=name,
+            name_en=f"{name} EN",
+            name_fi=f"{name} FI",
+            name_sv=f"{name} SV",
             payment_terms=terms_of_use[TermsOfUse.TERMS_TYPE_PAYMENT],
             pricing_terms=terms_of_use[TermsOfUse.TERMS_TYPE_PRICING],
             rank=i,
@@ -1263,10 +1346,7 @@ def _create_reservation_units(
             reservation_confirmed_instructions_en=confirmed.en,
             reservation_confirmed_instructions_fi=confirmed.fi,
             reservation_confirmed_instructions_sv=confirmed.sv,
-            reservation_kind=weighted_choice(
-                ReservationKind.values,
-                weights=[1, 1, 10],
-            ),
+            reservation_kind=reservation_kind,
             reservation_pending_instructions=pending.fi,
             reservation_pending_instructions_en=pending.en,
             reservation_pending_instructions_fi=pending.fi,
@@ -1290,14 +1370,24 @@ def _create_reservation_units(
 
     payment_types = _create_reservation_payment_types()
 
+    is_empty_created: bool = False
     for reservation_unit in reservation_units:
         reservation_unit.equipments.add(*random_subset(equipments))
         reservation_unit.purposes.add(*random_subset(purposes))
         reservation_unit.qualifiers.add(*random_subset(qualifiers))
-        reservation_unit.resources.add(*random_subset(resources))
         reservation_unit.services.add(*random_subset(services))
-        reservation_unit.spaces.add(*random_subset(spaces))
         reservation_unit.payment_types.add(*random_subset(payment_types))
+
+        if not is_empty_created:
+            reservation_unit.name = f"Empty {reservation_unit.name}"
+            reservation_unit.name_fi = reservation_unit.name
+            reservation_unit.name_en = f"Empty {reservation_unit.name_en}"
+            reservation_unit.name_sv = f"Empty {reservation_unit.name_sv}"
+            is_empty_created = True
+            continue
+
+        reservation_unit.resources.add(*random_subset(resources))
+        reservation_unit.spaces.add(*random_subset(spaces))
 
     _create_application_round_time_slots(reservation_units)
 
@@ -1448,57 +1538,42 @@ def _create_deny_reasons(*, number: int = 10) -> list[ReservationDenyReason]:
 def _create_pricings(
     reservation_units: list[ReservationUnit],
 ) -> list[ReservationUnitPricing]:
-    tax_percentages = _create_tax_percentages()
-    zero_tax = next(tax for tax in tax_percentages if int(tax.value) == 0)
+    tax_percentages: dict[int, TaxPercentage] = {int(tax.value): tax for tax in _create_tax_percentages()}
+    zero_tax: TaxPercentage = tax_percentages.pop(0)
+
+    pricing_options: list[int] = [0, 10, 49, 77]
 
     pricings: list[ReservationUnitPricing] = []
     for reservation_unit in reservation_units:
-        pricing_type = random.choice(PricingType.values)
+        highest_price = weighted_choice(pricing_options, weights=[5, 1, 1, 3])
+        tax = zero_tax if highest_price == 0 else random.choice(list(tax_percentages.values()))
+        pricing_type = PricingType.FREE if highest_price == 0 else PricingType.PAID
+
+        lowest_price: int = 0
+        if pricing_type == PricingType.PAID:
+            lowest_price = random.randint(1, highest_price - 1)
 
         pricing = ReservationUnitPricing(
             begins=date(2021, 1, 1),
             pricing_type=pricing_type,
             price_unit=random.choice(PriceUnit.values),
-            lowest_price=0,
-            lowest_price_net=0,
-            highest_price=0,
-            highest_price_net=0,
-            tax_percentage=zero_tax,
+            lowest_price=lowest_price,
+            lowest_price_net=lowest_price / (1 + tax.value / 100),
+            highest_price=highest_price,
+            highest_price_net=highest_price / (1 + tax.value / 100),
             status=PricingStatus.PRICING_STATUS_ACTIVE.value,
             reservation_unit=reservation_unit,
+            tax_percentage=tax,
         )
         pricings.append(pricing)
+        addendum = "maksuton" if pricing_type == PricingType.FREE else "maksullinen"
 
-        # Around 1/5 of the reservation units have two pricings
-        add_another: bool = weighted_choice([True, False], weights=[1, 5])
-        if not add_another:
-            continue
+        reservation_unit.name = f"{reservation_unit.name}, {addendum}"
+        reservation_unit.name_fi = reservation_unit.name
+        reservation_unit.name_en = f"{reservation_unit.name_en}, {addendum}"
+        reservation_unit.name_sv = f"{reservation_unit.name_sv}, {addendum}"
 
-        tax_percentage: TaxPercentage = random.choice(tax_percentages)
-        multiplier = Decimal(f"1.{int(tax_percentage.value)}")
-
-        lowest_net = random.randint(0, 100)
-        highest_net = random.randint(lowest_net, 1000)
-        lowest = float(lowest_net * multiplier)
-        highest = float(highest_net * multiplier)
-
-        # Around 1/10 of the pricings are inactive
-        pricing_status: str = weighted_choice(PricingStatus.values, weights=[1, 10, 0])
-
-        pricing = ReservationUnitPricing(
-            begins=date(2021, 1, 1),
-            pricing_type=pricing_type,
-            price_unit=random.choice(PriceUnit.values),
-            lowest_price=lowest,
-            lowest_price_net=lowest_net,
-            highest_price=highest,
-            highest_price_net=highest_net,
-            tax_percentage=tax_percentage,
-            status=pricing_status,
-            reservation_unit=reservation_unit,
-        )
-        pricings.append(pricing)
-
+    ReservationUnit.objects.bulk_update(reservation_units, fields=["name", "name_fi", "name_en", "name_sv"])
     return ReservationUnitPricing.objects.bulk_create(pricings)
 
 
@@ -1681,7 +1756,6 @@ def _create_application_rounds(
     reservation_units: list[ReservationUnit],
     reservation_purposes: list[ReservationPurpose],
     service_sectors: list[ServiceSector],
-    user: User,
     *,
     number: int = 15,
 ) -> list[ApplicationRound]:
@@ -1768,6 +1842,7 @@ def _create_applications(
 
     items: zip[tuple[Person, Address, tuple[str, Organisation | None]]]
     items = zip(contact_persons, billing_addresses, organisations, strict=True)
+
     for contact_person, billing_address, (applicant_type, organisation) in items:
         # User is the overall admin mode often, but other users are also possible
         weights = [len(users)] + ([1] * (len(users) - 1))
@@ -2022,7 +2097,9 @@ def _create_application_event_schedules(
     text_exiting="Banner notifications created!",
 )
 def _create_banner_notifications():
-    today = now()
+    today: datetime = localtime()
+    with_link_created: bool = False
+    with_bold_created: bool = False
     banner_notifications: list[BannerNotification] = []
     for target in BannerNotificationTarget.values:
         for level in BannerNotificationLevel.values:
@@ -2030,6 +2107,20 @@ def _create_banner_notifications():
             active_message_fi = faker_fi.sentence()
             scheduled_message_fi = faker_fi.sentence()
             past_message_fi = faker_fi.sentence()
+
+            if not with_link_created:
+                draft_message_fi += f" {faker_fi.url()}"
+                active_message_fi += f" {faker_fi.url()}"
+                scheduled_message_fi += f" {faker_fi.url()}"
+                past_message_fi += f" {faker_fi.url()}"
+                with_link_created = True
+
+            elif not with_bold_created:
+                draft_message_fi = f"<b>{draft_message_fi}</b>"
+                active_message_fi = f"<b>{active_message_fi}</b>"
+                scheduled_message_fi = f"<b>{scheduled_message_fi}</b>"
+                past_message_fi = f"<b>{past_message_fi}</b>"
+                with_bold_created = True
 
             banner_notifications += [
                 BannerNotification(
