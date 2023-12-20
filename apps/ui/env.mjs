@@ -27,7 +27,7 @@ const ClientSchema = z.object({
   NEXT_PUBLIC_MATOMO_ENABLED: coerceBoolean,
   NEXT_PUBLIC_SENTRY_DSN: z.string().optional(),
   NEXT_PUBLIC_SENTRY_ENVIRONMENT: z.string().optional(),
-  PROFILE_UI_URL: z.string(),
+  PROFILE_UI_URL: z.string().url().or(z.string().length(0)).optional(),
 });
 
 const createEnv = () => {

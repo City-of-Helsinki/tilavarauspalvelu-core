@@ -84,6 +84,7 @@ See `.env.local.example` and Azure DevOps library for values.
 | ------------------------------ | --------------------------------------------------------------- |
 | NEXT_PUBLIC_BASE_URL           | application baseUrl                                             |
 | NEXT_PUBLIC_TILAVARAUS_API_URL | tilavaraus-core base url                                        |
+| NEXT_PUBLIC_PROFILE_UI_URL     | helsinki profile frontend url for a link                        |
 | NEXT_PUBLIC_MAPBOX_TOKEN       | token tor mapbox service                                        |
 | NEXT_PUBLIC_SENTRY_DSN         | Sentry dsn                                                      |
 | NEXT_PUBLIC_SENTRY_ENVIRONMENT | Sentry environment, for example 'test', 'prod'                  |
