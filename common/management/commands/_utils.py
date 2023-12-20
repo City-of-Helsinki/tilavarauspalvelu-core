@@ -1,6 +1,8 @@
 import random
 from collections.abc import Callable, Generator, Sequence
+from enum import Enum
 from functools import wraps
+from types import DynamicClassAttribute
 from typing import Any, NamedTuple, ParamSpec, TypeVar
 
 from faker import Faker
@@ -75,3 +77,21 @@ def with_logs(
         return wrapper
 
     return decorator
+
+
+class SetName(str, Enum):
+    set_1 = "Lomake 1"
+    set_2 = "Lomake 2"
+    set_3 = "Lomake 3"
+    set_4 = "Lomake 4"
+    set_5 = "Lomake 5"
+    set_6 = "Lomake 6"
+    set_all = "All Fields"
+
+    @classmethod
+    def applying_free_of_charge(cls) -> list["SetName"]:
+        return [cls.set_5, cls.set_6]
+
+    @DynamicClassAttribute
+    def for_applying_free_of_charge(self) -> bool:
+        return self in self.applying_free_of_charge()
