@@ -257,7 +257,11 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       additionalData.reservationUnitByPk?.reservableTimeSpans
     );
     const reservableTimeSpans = !allowReservationsWithoutOpeningHours
-      ? timespans
+      ? [
+          ...timespans,
+          ...(reservationUnitData.reservationUnitByPk?.reservableTimeSpans ??
+            []),
+        ]
       : createMockOpeningTimes(id);
     return {
       props: {
@@ -823,7 +827,11 @@ const ReservationUnit = ({
     [addReservation, reservationUnit?.pk, setInitialReservation]
   );
 
-  const [isReservable, _reason] = isReservationUnitReservable(reservationUnit);
+  const [isReservable, reason] = isReservationUnitReservable(reservationUnit);
+  if (!isReservable) {
+    // eslint-disable-next-line no-console
+    console.warn("not reservable because: ", reason);
+  }
 
   const termsOfUseContent = reservationUnit
     ? getTranslation(reservationUnit, "termsOfUse")

@@ -587,10 +587,7 @@ export const isReservationUnitReservable = (
       if (!hasReservableTimes) {
         return [false, "reservationUnit has no reservable times"];
       }
-      if (!resBegins) {
-        return [false, "reservationUnit has no reservation begins"];
-      }
-      if (resBegins > new Date()) {
+      if (resBegins && resBegins > new Date()) {
         return [false, "reservationUnit reservation begins in future"];
       }
       if (!minReservationDuration || !maxReservationDuration) {
