@@ -188,7 +188,11 @@ const DateRangePicker: FC<DateRangePickerProps> = ({
         }
         minDate={limits?.endMinDate ?? new Date()}
         maxDate={limits?.endMaxDate}
-        initialMonth={startDate ?? new Date()}
+        initialMonth={
+          isValidDate(internalStartDate)
+            ? new Date(internalStartDateString)
+            : new Date()
+        }
         label={labels?.end ?? t("dateSelector:labelEndDate")}
         aria-label={labels?.ariaEnd ?? t("dateSelector:labelEndDate")}
         language={getLocalizationLang(i18n.language)}
