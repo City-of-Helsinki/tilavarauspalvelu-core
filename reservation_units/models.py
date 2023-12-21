@@ -5,32 +5,24 @@ from decimal import Decimal
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import models
-from django.db.models import QuerySet
+from django.db.models import Q, QuerySet
 from django.utils.translation import gettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
 from easy_thumbnails.fields import ThumbnailerImageField
 from easy_thumbnails.files import get_thumbnailer
-from elasticsearch_django.models import (
-    SearchDocumentManagerMixin,
-    SearchDocumentMixin,
-)
+from elasticsearch_django.models import SearchDocumentManagerMixin, SearchDocumentMixin
 
 from common.connectors import ReservationUnitActionsConnector
 from merchants.models import PaymentAccounting, PaymentMerchant, PaymentProduct
 from reservation_units.enums import ReservationState, ReservationUnitState
 from reservation_units.querysets import ReservationUnitQuerySet
-from reservation_units.tasks import (
-    purge_image_cache,
-    refresh_reservation_unit_product_mapping,
-    update_urls,
-)
+from reservation_units.tasks import purge_image_cache, refresh_reservation_unit_product_mapping, update_urls
 from resources.models import Resource
 from services.models import Service
 from spaces.models import Space, Unit
 from terms_of_use.models import TermsOfUse
 from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 
-Q = models.Q
 User = get_user_model()
 
 
@@ -570,7 +562,7 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
         from reservations.models import Reservation
 
         qs = Reservation.objects.filter(
-            reservation_unit__in=self.reservation_units_with_same_components,
+            reservation_unit__in=self.reservation_units_with_common_hierarchy,
             end__gt=start_time,
             begin__lt=end_time,
         ).exclude(state__in=[ReservationStateChoice.CANCELLED, ReservationStateChoice.DENIED])
@@ -591,7 +583,7 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
         from reservations.models import Reservation
 
         qs = Reservation.objects.filter(
-            reservation_unit__in=self.reservation_units_with_same_components,
+            reservation_unit__in=self.reservation_units_with_common_hierarchy,
             begin__gte=end_time,
         ).exclude(state__in=[ReservationStateChoice.CANCELLED, ReservationStateChoice.DENIED])
 
@@ -613,7 +605,7 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
         from reservations.models import Reservation
 
         qs = Reservation.objects.filter(
-            reservation_unit__in=self.reservation_units_with_same_components,
+            reservation_unit__in=self.reservation_units_with_common_hierarchy,
             end__lte=start_time,
         ).exclude(state__in=[ReservationStateChoice.CANCELLED, ReservationStateChoice.DENIED])
 
@@ -626,18 +618,27 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
         return qs.order_by("-end").first()
 
     @property
-    def reservation_units_with_same_components(self):
-        spaces = []
-        for space in self.spaces.all():
-            spaces += list(space.get_family())
+    def reservation_units_with_common_hierarchy(self) -> ReservationUnitQuerySet:
+        """
+        Find all "related" ReservationUnits where any one of these is true:
+        1) There are common resources
+        2) There are spaces belonging to the same "family"/hierarchy
+           (see. `spaces.querysets.space.SpaceQuerySet.all_space_ids_though_hierarchy`)
 
-        return ReservationUnit.objects.filter(Q(resources__in=self.resources.all()) | Q(spaces__in=spaces)).distinct()
+        This method is used for finding all ReservationUnits that influence the availability of this ReservationUnit.
+
+        Before making a new reservation, we need to ensure there are no overlapping reservations on any
+        "related" ReservationUnits. For a new reservation to be allowed on a ReservationUnit, all its spaces and
+        resources must be available during the reservation's time. If any "related" ReservationUnits already have
+        reservations overlapping with the new one, the new reservation can not be made.
+        """
+        space_ids: set[int] = self.spaces.all_space_ids_though_hierarchy()
+        resource_ids: set[int] = set(self.resources.all())
+        return ReservationUnit.objects.filter(Q(resources__in=resource_ids) | Q(spaces__in=space_ids)).distinct()
 
     @property
     def state(self) -> ReservationUnitState:
-        from reservation_units.utils.reservation_unit_state_helper import (
-            ReservationUnitStateHelper,
-        )
+        from reservation_units.utils.reservation_unit_state_helper import ReservationUnitStateHelper
 
         return ReservationUnitStateHelper.get_state(self)
 

@@ -58,6 +58,21 @@ class SubqueryArray(models.Subquery):
         super().__init__(queryset, self.output_field, **kwargs)
 
 
+class ArrayRemove(models.Func):
+    """
+    Removes all elements equal to the given value (arg 2) from the given array (arg 1).
+    The array must be one-dimensional. Comparisons are done using `IS NOT DISTINCT FROM` semantics,
+    so it is possible to remove NULLs.
+
+    See: https://www.postgresql.org/docs/current/functions-array.html
+
+    >>> ReservationUnit.objects.annotate(ids=ArrayRemove(ArrayAgg("spaces__id"), None))
+    """
+
+    function = "ARRAY_REMOVE"
+    arity = 2
+
+
 def raw_prefixed_query(text: str) -> SearchQuery:
     """
     Create a query that searches for each word separately and matched partial words if match is a prefix.
