@@ -24,3 +24,12 @@ class SpaceQuerySet(ExtendedTreeQuerySet):
         Returns a completely new queryset, so all annotations etc. are lost.
         """
         return self.model.objects.filter(pk__in=self.all_space_ids_though_hierarchy())
+
+    def space_to_family(self: Self) -> dict[int, set[int]]:
+        """
+        Map each space in the queryset with their space "family"/hierarchy.
+        These are all the spaces whose reservations could block reservations for the reservation units
+        the spaces in the queryset are attached to.
+        """
+        qs = self.with_family(include_self=True).values("pk", "family")
+        return {space["pk"]: set(space["family"]) for space in qs}
