@@ -45,6 +45,9 @@ class TimeSpanElement:
             is_reservable=self.is_reservable,
         )
 
+    def __hash__(self) -> int:
+        return hash((self.start_datetime, self.end_datetime, self.is_reservable))
+
     def _get_datetime_str(self) -> str:
         strformat = "%Y-%m-%d %H:%M"
 

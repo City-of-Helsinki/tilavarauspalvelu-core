@@ -2,7 +2,7 @@ from copy import copy
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 from math import ceil
-from typing import TYPE_CHECKING, Self, TypedDict
+from typing import TYPE_CHECKING, Self
 
 from django.db import models
 from django.db.models import Case, Prefetch, Q, Value, When
@@ -163,12 +163,6 @@ def _get_next_valid_start_datetime(
     delta_minutes = (selected_start_datetime - time_span.start_datetime).total_seconds() / 60
     delta_to_next_interval = timedelta(minutes=interval) * ceil(delta_minutes / interval)
     return time_span.start_datetime + delta_to_next_interval
-
-
-class ReservationUnitInfo(TypedDict):
-    pk: int
-    space_ids: list[int]
-    resource_ids: list[int]
 
 
 class ReservationUnitQuerySet(SearchResultsQuerySet):
