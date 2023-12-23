@@ -18,7 +18,10 @@ from opening_hours.utils.reservable_time_span_client import TimeSpanElement, ove
 if TYPE_CHECKING:
     from opening_hours.models import ReservationUnit
 
+
 DEFAULT_TIMEZONE = get_default_timezone()
+
+ReservationUnitPK = int
 
 INTERVAL_TO_MINUTES: dict[str, int] = {
     "interval_15_mins": 15,
@@ -197,7 +200,7 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
         - Given filter value
         - ReservationUnit settings
         - ReservationUnit's ApplicationRounds
-        - Reservations from ReservationUnit's TILAHIERARKIA TODO
+        - Reservations from ReservationUnits with common hierarchy
         After removing the closed time spans, the first reservable time span that is long enough to fit the minimum
         duration is selected as the `first_reservable_datetime`.
 
@@ -219,8 +222,10 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
         - ReservationUnit `reservation_start_interval`
         - ReservationUnit `reservations_min_days_before`
         - ReservationUnit `reservations_max_days_before`
-        - Reservations from ReservationUnit TILAHIERARKIA TODO
+        - Reservations from ReservationUnits with common hierarchy
         """
+        from reservations.models import Reservation
+
         now = timezone.localtime()
         today = now.date()
         two_years_from_now = today + timedelta(days=731)  # 2 years + 1 day as a buffer
@@ -288,6 +293,14 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
             ),
         )
 
+        reservation_closed_time_spans_map: dict[
+            ReservationUnitPK, set[TimeSpanElement]
+        ] = Reservation.objects.get_affecting_reservations_as_closed_time_spans(
+            reservation_unit_queryset=self.exclude(origin_hauki_resource__isnull=True),
+            start_date=filter_date_start,
+            end_date=filter_date_end,
+        )
+
         # Closed time spans that are shared by all ReservationUnits
         shared_closed_time_spans: list[TimeSpanElement] = [
             TimeSpanElement(
@@ -303,7 +316,6 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
         ]
 
         # Store values in a dict, so we can add them back to the original queryset later
-        ReservationUnitPK = int
         reservation_unit_to_first_reservable_time: dict[ReservationUnitPK, datetime] = {}
         reservation_unit_to_closed_status: dict[ReservationUnitPK, bool] = {}
 
@@ -360,9 +372,10 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
                 ):
                     break
 
+                reservations = reservation_closed_time_spans_map.get(reservation_unit.pk, [])
                 # These time spans have no effect on the closed status of the ReservationUnit,
                 # meaning that the ReservationUnit can be shown as open, even if there are no reservable time spans.
-                soft_closed_time_spans = reservation_unit_soft_closed_time_spans
+                soft_closed_time_spans = reservation_unit_soft_closed_time_spans + list(reservations)
 
                 # Apply more closed time spans to the normalised time spans to find the first reservable time span.
                 soft_normalised_time_spans = override_reservable_with_closed_time_spans(
