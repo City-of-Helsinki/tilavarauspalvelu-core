@@ -13,7 +13,10 @@ from tests.factories import (
     ApplicationRoundFactory,
     OriginHaukiResourceFactory,
     ReservableTimeSpanFactory,
+    ReservationFactory,
     ReservationUnitFactory,
+    ResourceFactory,
+    SpaceFactory,
 )
 from tests.helpers import parametrize_helper
 
@@ -921,6 +924,113 @@ def test__query_reservation_unit_reservable__filters__application_round(
     assert response.node(0) == {
         "isClosed": result.is_closed,
         "firstReservableDatetime": result.first_reservable_datetime,
+    }
+
+
+########################################################################################################################
+
+
+@freezegun.freeze_time(NOW)
+def test__query_reservation_unit_reservable__reservations__own_reservation(graphql, reservation_unit):
+    ReservationFactory(
+        begin=_datetime(day=20, hour=10),
+        end=_datetime(day=20, hour=12),
+        reservation_unit=[reservation_unit],
+    )
+
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(day=20, hour=10),
+        end_datetime=_datetime(day=20, hour=12),
+    )
+
+    response = graphql(reservation_units_reservable_query())
+
+    assert response.has_errors is False, response
+    assert response.node(0) == {
+        "isClosed": False,
+        "firstReservableDatetime": None,
+    }
+
+
+@freezegun.freeze_time(NOW)
+def test__query_reservation_unit_reservable__reservations__not_in_common_hierarchy(graphql, reservation_unit):
+    reservation_unit_2: ReservationUnit = ReservationUnitFactory()
+
+    ReservationFactory(
+        begin=_datetime(day=20, hour=10),
+        end=_datetime(day=20, hour=12),
+        reservation_unit=[reservation_unit_2],
+    )
+
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(day=20, hour=10),
+        end_datetime=_datetime(day=20, hour=12),
+    )
+
+    response = graphql(reservation_units_reservable_query())
+
+    assert response.has_errors is False, response
+    assert response.node(0) == {
+        "isClosed": False,
+        "firstReservableDatetime": _datetime(day=20, hour=10).isoformat(),
+    }
+
+
+@freezegun.freeze_time(NOW)
+def test__query_reservation_unit_reservable__reservations__in_common_hierarchy__by_space(graphql, reservation_unit):
+    reservation_unit_2: ReservationUnit = ReservationUnitFactory(spaces=[SpaceFactory()])
+    reservation_unit.unit = reservation_unit_2.unit
+    reservation_unit.spaces.set(reservation_unit_2.spaces.all())
+    reservation_unit.save()
+
+    ReservationFactory(
+        begin=_datetime(day=20, hour=10),
+        end=_datetime(day=20, hour=12),
+        reservation_unit=[reservation_unit_2],
+    )
+
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(day=20, hour=10),
+        end_datetime=_datetime(day=20, hour=12),
+    )
+
+    response = graphql(reservation_units_reservable_query())
+
+    assert response.has_errors is False, response
+    assert response.node(0) == {
+        "isClosed": False,
+        "firstReservableDatetime": None,
+    }
+
+
+@freezegun.freeze_time(NOW)
+def test__query_reservation_unit_reservable__reservations__in_common_hierarchy__by_resource(graphql, reservation_unit):
+    reservation_unit_2: ReservationUnit = ReservationUnitFactory(resources=[ResourceFactory()])
+    reservation_unit.unit = reservation_unit_2.unit
+    reservation_unit.resources.set(reservation_unit_2.resources.all())
+    reservation_unit.save()
+
+    ReservationFactory(
+        begin=_datetime(day=20, hour=10),
+        end=_datetime(day=20, hour=12),
+        reservation_unit=[reservation_unit_2],
+    )
+
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(day=20, hour=10),
+        end_datetime=_datetime(day=20, hour=12),
+    )
+
+    response = graphql(reservation_units_reservable_query())
+
+    assert response.has_errors is False, response
+    assert response.node(0) == {
+        "isClosed": False,
+        "firstReservableDatetime": None,
     }
 
 
