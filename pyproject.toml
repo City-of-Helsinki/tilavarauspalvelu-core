@@ -67,7 +67,7 @@ markers = "sys_platform != 'win32'"
 [tool.poetry.group.test.dependencies]
 assertpy = "^1.1"
 freezegun = "^1.4.0"
-pytest = "^7.4.0"
+pytest = "^7.4.4"
 pytest-cov = "^4.1.0"
 pytest-django = "^4.5.2"
 pytest-xdist = "^3.5.0"
