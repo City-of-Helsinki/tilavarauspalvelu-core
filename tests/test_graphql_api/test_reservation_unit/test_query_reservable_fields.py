@@ -911,3 +911,72 @@ def test__query_reservation_unit_reservable__filters__application_round(
 
 
 ########################################################################################################################
+
+
+@freezegun.freeze_time(NOW)
+def test__query_reservation_unit_reservable__filters__application_round__start_date_at_round_last_day(
+    graphql, reservation_unit
+):
+    """
+    This is a regression tests that was found during manual testing.
+    Simply recreate the exact scenario instead of using the above test cases.
+    """
+    ApplicationRoundFactory.create_in_status_open(
+        reservation_period_begin=date(year=2024, month=3, day=1),
+        reservation_period_end=date(year=2024, month=3, day=30),
+        reservation_units=[reservation_unit],
+    )
+
+    # 2024-03-29 09:00 - 11:00 (2h)
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(year=2024, month=3, day=29, hour=9),
+        end_datetime=_datetime(year=2024, month=3, day=29, hour=11),
+    )
+
+    # 2024-03-29 12:00 - 20:00 (8h)
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(year=2024, month=3, day=29, hour=12),
+        end_datetime=_datetime(year=2024, month=3, day=29, hour=20),
+    )
+
+    # 2024-03-30 11:00 - 12:00 (1h)
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(year=2024, month=3, day=30, hour=11),
+        end_datetime=_datetime(year=2024, month=3, day=30, hour=12),
+    )
+
+    # 2024-03-30 13:00 - 18:00 (5h)
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(year=2024, month=3, day=30, hour=13),
+        end_datetime=_datetime(year=2024, month=3, day=30, hour=18),
+    )
+
+    # 2024-03-31 11:00 - 12:00 (1h)
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(year=2024, month=3, day=31, hour=11),
+        end_datetime=_datetime(year=2024, month=3, day=31, hour=12),
+    )
+
+    # 2024-03-31 13:00 - 18:00 (5h)
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(year=2024, month=3, day=31, hour=13),
+        end_datetime=_datetime(year=2024, month=3, day=31, hour=18),
+    )
+
+    query = reservation_units_reservable_query(
+        reservable_date_start="2024-03-30",
+        reservable_date_end="2024-03-31",
+    )
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert response.node(0) == {
+        "isClosed": False,
+        "firstReservableDatetime": _datetime(year=2024, month=3, day=31, hour=11).isoformat(),
+    }
