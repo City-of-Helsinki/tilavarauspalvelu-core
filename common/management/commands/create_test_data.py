@@ -779,7 +779,7 @@ def _create_terms_of_use() -> dict[str, TermsOfUse]:
             id=term_id,
             name=names.fi,
             name_fi=names.fi,
-            name_sv=names.em,
+            name_sv=names.en,
             name_en=names.sv,
             text=text_fi,
             text_fi=text_fi,
