@@ -283,7 +283,7 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
                 ApplicationRound.objects.with_round_status()
                 .filter(
                     reservation_period_begin__lte=filter_date_end,
-                    reservation_period_end__gt=filter_date_start,
+                    reservation_period_end__gte=filter_date_start,
                 )
                 .exclude(round_status=ApplicationRoundStatusChoice.RESULTS_SENT),
             ),
