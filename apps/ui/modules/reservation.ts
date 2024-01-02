@@ -403,17 +403,17 @@ export const getCheckoutUrl = (
   order?: PaymentOrderType,
   lang = "fi"
 ): string | undefined => {
-  // TODO: remove this renaming when backend is updated
-  const { checkoutUrl: loggedInCheckoutUrl } = order ?? {};
+  const { checkoutUrl } = order ?? {};
 
-  if (!loggedInCheckoutUrl) {
+  if (!checkoutUrl) {
     return undefined;
   }
 
   try {
-    const { origin, pathname } = new URL(loggedInCheckoutUrl) || {};
+    const { origin, pathname, searchParams } = new URL(checkoutUrl);
     const baseUrl = `${origin}${pathname}`;
-    return `${baseUrl}${lang !== "fi" ? `/${lang}` : ""}/webstore-callback`;
+    searchParams.set("lang", lang);
+    return `${baseUrl}/paymentmethod?${searchParams.toString()}`;
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
