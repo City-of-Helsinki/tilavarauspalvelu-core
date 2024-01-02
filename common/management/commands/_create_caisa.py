@@ -41,7 +41,7 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]):
             "Vuonna 1996 perustettu kulttuurikeskus, joka edistää taiteen ja "
             "kulttuurin keinoin Helsingin kehittymistä monimuotoiseksi kaupungiksi."
         ),
-        web_page="http://www.caisa.fi/",
+        web_page="http://www.caisa.fi/",  # NOSONAR
         phone="+358 9 310 37500",
     )
 
