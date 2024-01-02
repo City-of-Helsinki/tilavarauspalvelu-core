@@ -4,6 +4,7 @@ from decimal import Decimal
 from typing import Any, Literal
 from uuid import UUID
 
+from django.conf import settings
 from sentry_sdk import capture_exception, push_scope
 
 from merchants.verkkokauppa.order.exceptions import ParseOrderError
@@ -152,7 +153,7 @@ class Order:
                 price_net=Decimal(json["priceNet"]),
                 price_vat=Decimal(json["priceVat"]),
                 price_total=Decimal(json["priceTotal"]),
-                checkout_url=json["loggedInCheckoutUrl"],
+                checkout_url=json["loggedInCheckoutUrl"] if settings.VERKKOKAUPPA_NEW_LOGIN else json["checkoutUrl"],
                 receipt_url=json["receiptUrl"],
                 customer=OrderCustomer(
                     first_name=json["customer"]["firstName"],
