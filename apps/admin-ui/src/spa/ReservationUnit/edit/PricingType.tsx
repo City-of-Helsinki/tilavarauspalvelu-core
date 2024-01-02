@@ -1,7 +1,6 @@
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import type { TFunction } from "next-i18next";
 import {
   DateInput,
   IconAlertCircleFill,
@@ -16,7 +15,11 @@ import {
 import { Controller, UseFormReturn } from "react-hook-form";
 import { addDays } from "date-fns";
 import { AutoGrid } from "@/styles/layout";
-import { type ReservationUnitEditFormValues, PaymentTypes } from "./form";
+import {
+  type ReservationUnitEditFormValues,
+  PaymentTypes,
+  getTranslatedError,
+} from "./form";
 
 const Error = styled.div`
   margin-top: var(--spacing-3-xs);
@@ -33,14 +36,6 @@ type Props = {
   index: number;
   form: UseFormReturn<ReservationUnitEditFormValues>;
   taxPercentageOptions: { label: string; value: number }[];
-};
-
-const getTranslatedError = (error: string | undefined, t: TFunction) => {
-  if (error == null) {
-    return undefined;
-  }
-  // TODO use a common translation key for these
-  return t(`Notifications.form.errors.${error}`);
 };
 
 function PaidPricingPart({
@@ -107,8 +102,8 @@ function PaidPricingPart({
             }
             tooltipText={t("ReservationUnitEditor.tooltip.priceUnit")}
             error={getTranslatedError(
-              errors.pricings?.[index]?.priceUnit?.message,
-              t
+              t,
+              errors.pricings?.[index]?.priceUnit?.message
             )}
             invalid={errors.pricings?.[index]?.priceUnit?.message != null}
           />
@@ -144,8 +139,8 @@ function PaidPricingPart({
               ) ?? null
             }
             error={getTranslatedError(
-              errors.pricings?.[index]?.taxPercentage?.message,
-              t
+              t,
+              errors.pricings?.[index]?.taxPercentage?.message
             )}
             invalid={errors.pricings?.[index]?.taxPercentage?.message != null}
           />
@@ -174,8 +169,8 @@ function PaidPricingPart({
         min={0}
         max={undefined}
         errorText={getTranslatedError(
-          errors.pricings?.[index]?.lowestPriceNet?.message,
-          t
+          t,
+          errors.pricings?.[index]?.lowestPriceNet?.message
         )}
         invalid={errors.pricings?.[index]?.lowestPriceNet?.message != null}
       />
@@ -202,8 +197,8 @@ function PaidPricingPart({
         min={0}
         max={undefined}
         errorText={getTranslatedError(
-          errors.pricings?.[index]?.lowestPrice?.message,
-          t
+          t,
+          errors.pricings?.[index]?.lowestPrice?.message
         )}
         invalid={errors.pricings?.[index]?.lowestPrice?.message != null}
         tooltipText={t("ReservationUnitEditor.tooltip.lowestPrice")}
@@ -231,8 +226,8 @@ function PaidPricingPart({
         min={0}
         max={undefined}
         errorText={getTranslatedError(
-          errors.pricings?.[index]?.highestPriceNet?.message,
-          t
+          t,
+          errors.pricings?.[index]?.highestPriceNet?.message
         )}
         invalid={errors.pricings?.[index]?.highestPriceNet?.message != null}
       />
@@ -259,8 +254,8 @@ function PaidPricingPart({
         min={0}
         max={undefined}
         errorText={getTranslatedError(
-          errors.pricings?.[index]?.highestPrice?.message,
-          t
+          t,
+          errors.pricings?.[index]?.highestPrice?.message
         )}
         invalid={errors.pricings?.[index]?.highestPrice?.message != null}
         tooltipText={t("ReservationUnitEditor.tooltip.highestPrice")}
@@ -286,7 +281,7 @@ function PaidPricingPart({
             )}
             label={t("ReservationUnitEditor.label.paymentTypes")}
             tooltipText={t("ReservationUnitEditor.tooltip.paymentTypes")}
-            error={getTranslatedError(errors.paymentTypes?.message, t)}
+            error={getTranslatedError(t, errors.paymentTypes?.message)}
             invalid={errors.paymentTypes?.message != null}
           />
         )}
@@ -326,8 +321,8 @@ export function PricingType({
               minDate={addDays(new Date(), 1)}
               invalid={errors.pricings?.[index]?.begins?.message != null}
               errorText={getTranslatedError(
-                errors.pricings?.[index]?.begins?.message,
-                t
+                t,
+                errors.pricings?.[index]?.begins?.message
               )}
             />
           )}
@@ -355,7 +350,7 @@ export function PricingType({
       {errors.pricings?.message != null && (
         <Error>
           <IconAlertCircleFill />
-          <span>{getTranslatedError(errors.pricings.message, t)}</span>
+          <span>{getTranslatedError(t, errors.pricings.message)}</span>
         </Error>
       )}
       {pricing?.pricingType === "PAID" && (

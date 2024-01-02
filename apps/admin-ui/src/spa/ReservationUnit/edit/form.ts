@@ -276,6 +276,96 @@ function validateSeasonalTimes(
   });
 }
 
+function constructApiDate(date: string, time: string): string | null {
+  if (date === "" || time === "") {
+    return null;
+  }
+  const d = fromUIDate(date);
+  if (!d) {
+    return null;
+  }
+  const d2 = setTimeOnDate(d, time);
+  return d2.toISOString();
+}
+
+function validateDateTimeInterval({
+  beginDate,
+  beginTime,
+  endDate,
+  endTime,
+  ctx,
+  path,
+}: {
+  beginDate: string;
+  beginTime: string;
+  endDate: string;
+  endTime: string;
+  ctx: z.RefinementCtx;
+  path: {
+    beginDate: string;
+    endDate: string;
+    beginTime: string;
+    endTime: string;
+  };
+}) {
+  if (beginDate !== "" && beginTime === "") {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Required",
+      path: [path.beginTime],
+    });
+  }
+  if (beginDate === "" && beginTime !== "") {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Required",
+      path: [path.beginDate],
+    });
+  }
+
+  if (endDate !== "" && endTime === "") {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Required",
+      path: [path.endTime],
+    });
+  }
+  if (endDate === "" && endTime !== "") {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Required",
+      path: [path.endDate],
+    });
+  }
+
+  // TODO if the above checks fail this doesn't need to be checked, right?
+  if (endDate !== "" && beginDate !== "") {
+    const begin = constructApiDate(beginDate, beginTime);
+    const end = constructApiDate(endDate, endTime);
+    if (begin == null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Invalid date",
+        path: [path.beginDate],
+      });
+    }
+    if (end == null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Invalid date",
+        path: [path.endDate],
+      });
+    }
+    if (begin && end && begin >= end) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `${path.beginDate} must be before end`,
+        path: [path.beginDate],
+      });
+    }
+  }
+}
+
 export const ReservationUnitEditSchema = z
   .object({
     authentication: z.nativeEnum(
@@ -449,6 +539,37 @@ export const ReservationUnitEditSchema = z
       }
     }
 
+    if (v.hasScheduledPublish) {
+      validateDateTimeInterval({
+        beginDate: v.publishBeginsDate,
+        beginTime: v.publishBeginsTime,
+        endDate: v.publishEndsDate,
+        endTime: v.publishEndsTime,
+        ctx,
+        path: {
+          beginDate: "publishBeginsDate",
+          endDate: "publishEndsDate",
+          beginTime: "publishBeginsTime",
+          endTime: "publishEndsTime",
+        },
+      });
+    }
+    if (v.hasScheduledReservation) {
+      validateDateTimeInterval({
+        beginDate: v.reservationBeginsDate,
+        beginTime: v.reservationBeginsTime,
+        endDate: v.reservationEndsDate,
+        endTime: v.reservationEndsTime,
+        ctx,
+        path: {
+          beginDate: "reservationBeginsDate",
+          endDate: "reservationEndsDate",
+          beginTime: "reservationBeginsTime",
+          endTime: "reservationEndsTime",
+        },
+      });
+    }
+
     // the backend error on mutation: "Not draft state reservation unit must have one or more space or resource",
     if (v.spacePks.length === 0 && v.resourcePks.length === 0) {
       ctx.addIssue({
@@ -478,9 +599,30 @@ export const ReservationUnitEditSchema = z
         path: ["nameSv"],
       });
     }
-    checkLengthWithoutHtml(v.descriptionEn, ctx, "descriptionEn", 1);
-    checkLengthWithoutHtml(v.descriptionFi, ctx, "descriptionFi", 1);
-    checkLengthWithoutHtml(v.descriptionSv, ctx, "descriptionSv", 1);
+    checkLengthWithoutHtml(
+      v.descriptionEn,
+      ctx,
+      "descriptionEn",
+      1,
+      undefined,
+      "description"
+    );
+    checkLengthWithoutHtml(
+      v.descriptionFi,
+      ctx,
+      "descriptionFi",
+      1,
+      undefined,
+      "description"
+    );
+    checkLengthWithoutHtml(
+      v.descriptionSv,
+      ctx,
+      "descriptionSv",
+      1,
+      undefined,
+      "description"
+    );
 
     if (v.maxPersons && v.minPersons) {
       if (v.maxPersons < v.minPersons) {
@@ -763,18 +905,6 @@ export const convertReservationUnit = (
   };
 };
 
-const constructApiDate = (date: string, time: string) => {
-  if (date === "" || time === "") {
-    return null;
-  }
-  const d = fromUIDate(date);
-  if (!d) {
-    return null;
-  }
-  const d2 = setTimeOnDate(d, time);
-  return d2.toISOString();
-};
-
 export function transformReservationUnit(
   values: ReservationUnitEditFormValues
 ): ReservationUnitUpdateMutationInput | ReservationUnitCreateMutationInput {
@@ -837,18 +967,22 @@ export function transformReservationUnit(
     ...(pk ? { pk } : {}),
     surfaceArea:
       surfaceArea != null && surfaceArea > 0 ? Math.floor(surfaceArea) : null,
-    reservationBegins: hasReservationBegins
-      ? constructApiDate(reservationBeginsDate, reservationBeginsTime)
-      : null,
-    reservationEnds: hasReservationEnds
-      ? constructApiDate(reservationEndsDate, reservationEndsTime)
-      : null,
-    publishBegins: hasPublishBegins
-      ? constructApiDate(publishBeginsDate, publishBeginsTime)
-      : null,
-    publishEnds: hasPublishEnds
-      ? constructApiDate(publishEndsDate, publishEndsTime)
-      : null,
+    reservationBegins:
+      hasScheduledReservation && hasReservationBegins
+        ? constructApiDate(reservationBeginsDate, reservationBeginsTime)
+        : null,
+    reservationEnds:
+      hasScheduledReservation && hasReservationEnds
+        ? constructApiDate(reservationEndsDate, reservationEndsTime)
+        : null,
+    publishBegins:
+      hasScheduledPublish && hasPublishBegins
+        ? constructApiDate(publishBeginsDate, publishBeginsTime)
+        : null,
+    publishEnds:
+      hasScheduledPublish && hasPublishEnds
+        ? constructApiDate(publishEndsDate, publishEndsTime)
+        : null,
     bufferTimeAfter: hasBufferTimeAfter ? bufferTimeAfter : null,
     bufferTimeBefore: hasBufferTimeBefore ? bufferTimeBefore : null,
     isDraft,
@@ -879,7 +1013,7 @@ export function transformReservationUnit(
   };
 }
 
-export function getTranslatedError(error: string | undefined, t: TFunction) {
+export function getTranslatedError(t: TFunction, error: string | undefined) {
   if (error == null) {
     return undefined;
   }

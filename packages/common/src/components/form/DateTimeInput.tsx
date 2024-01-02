@@ -22,6 +22,7 @@ interface DateTimeProps<T extends FieldValues>
   minDate?: Date;
   required?: boolean;
   disabled?: boolean;
+  translateError?: (error?: string) => string | undefined;
 }
 
 /// or if not it's so dump it should be in the form itself
@@ -35,29 +36,35 @@ const DateTimeInput = <T extends FieldValues>({
   required,
   minDate,
   disabled,
+  translateError,
 }: DateTimeProps<T>): JSX.Element => {
   const { t } = useTranslation();
 
-  const { field: dateField } = useController({
+  const { field: dateField, fieldState: dateFieldState } = useController({
     control,
     name: name.date,
     rules: { required },
   });
+  const { error: dateError } = dateFieldState;
 
-  const { field: timeField } = useController({
+  const { field: timeField, fieldState: timeFieldState } = useController({
     control,
     name: name.time,
     rules: { required },
   });
+  const { error: timeError } = timeFieldState;
 
   const handleTimeChange = (evt: React.FormEvent<HTMLInputElement>) => {
     timeField.onChange(evt.currentTarget.value);
+    // touch the date field to clear errors
+    dateField.onBlur();
   };
 
   return (
     <DateTimeWrapper>
       <DateInput
         language="fi"
+        ref={dateField.ref}
         required={required}
         disabled={disabled}
         minDate={minDate}
@@ -66,9 +73,12 @@ const DateTimeInput = <T extends FieldValues>({
         id={name.date}
         value={dateField.value}
         onChange={(v) => dateField.onChange(v)}
+        errorText={translateError?.(dateError?.message) ?? dateError?.message}
+        invalid={!!dateError?.message}
       />
       <TimeInput
         name={name.time}
+        ref={timeField.ref}
         required={required}
         disabled={disabled}
         // label={t("common.time")}
@@ -77,6 +87,7 @@ const DateTimeInput = <T extends FieldValues>({
         value={timeField.value}
         label={t("common.time")}
         onChange={handleTimeChange}
+        error={translateError?.(timeError?.message) ?? timeError?.message}
       />
     </DateTimeWrapper>
   );

@@ -6,6 +6,7 @@ import {
   IconAlertCircleFill,
   IconArrowLeft,
   IconLinkExternal,
+  Notification,
   NumberInput,
   RadioButton,
   Select,
@@ -48,7 +49,6 @@ import { DateTimeInput } from "common/src/components/form/DateTimeInput";
 import { filterNonNullable } from "common/src/helpers";
 import { H1, H4, fontBold } from "common/src/common/typography";
 import { breakpoints } from "common";
-import { addDays } from "date-fns";
 import { previewUrlPrefix } from "@/common/const";
 import { UNIT_WITH_SPACES_AND_RESOURCES } from "@/common/queries";
 import {
@@ -623,7 +623,7 @@ function CustomNumberInput({
           min={min}
           max={max}
           helperText={helperText}
-          errorText={getTranslatedError(errMsg, t)}
+          errorText={getTranslatedError(t, errMsg)}
           invalid={errMsg != null}
           tooltipText={tooltipText}
         />
@@ -685,7 +685,7 @@ function BasicSection({
             <FullRow>
               <IconAlertCircleFill />
               <span>
-                {getTranslatedError(errors.reservationKind.message, t)}
+                {getTranslatedError(t, errors.reservationKind.message)}
               </span>
             </FullRow>
           )}
@@ -717,7 +717,7 @@ function BasicSection({
               required
               id={fieldName}
               label={t(`ReservationUnitEditor.label.${fieldName}`)}
-              errorText={getTranslatedError(errors[fieldName]?.message, t)}
+              errorText={getTranslatedError(t, errors[fieldName]?.message)}
               invalid={errors[fieldName]?.message != null}
               // tooltipText={ lang === "fi" ? t("ReservationUnitEditor.tooltip.nameFi") : undefined }
             />
@@ -754,8 +754,8 @@ function BasicSection({
                 }
               }}
               value={spaceOptions.filter((x) => value.includes(x.value))}
-              error={errors.spacePks?.message}
               invalid={errors.spacePks?.message != null}
+              error={getTranslatedError(t, errors.spacePks?.message)}
               tooltipText={t("ReservationUnitEditor.tooltip.spacePks")}
             />
           )}
@@ -774,7 +774,7 @@ function BasicSection({
               disabled={resourceOptions.length === 0}
               onChange={(vals) => onChange(vals.map((y) => y.value))}
               value={resourceOptions.filter((x) => value.includes(x.value))}
-              error={getTranslatedError(errors.resourcePks?.message, t)}
+              error={getTranslatedError(t, errors.resourcePks?.message)}
               invalid={errors.resourcePks?.message != null}
               tooltipText={t("ReservationUnitEditor.tooltip.resourcePks")}
             />
@@ -812,7 +812,7 @@ function ReservationUnitSettings({
   parametersData: Query | undefined;
 }) {
   const { t } = useTranslation();
-  const { control, watch, formState, setValue } = form;
+  const { control, watch, formState } = form;
   const { errors } = formState;
 
   const reservationStartIntervalOptions = Object.values(
@@ -864,21 +864,16 @@ function ReservationUnitSettings({
           style={{ gridColumn: "1 / span 1" }}
         >
           <ActivationGroup
-            id="useScheduledPublishing"
             label={t("ReservationUnitEditor.scheduledPublishing")}
-            open={watch("hasScheduledPublish")}
-            onChange={() =>
-              setValue("hasScheduledPublish", !watch("hasScheduledPublish"))
-            }
+            control={control}
+            name="hasScheduledPublish"
           >
             <DenseVerticalFlex>
+              {/* TODO the Two DateInputs need to touch each other to rerun common validation code */}
               <ActivationGroup
-                id="publishBegins"
                 label={t("ReservationUnitEditor.publishBegins")}
-                open={watch("hasPublishBegins")}
-                onChange={() =>
-                  setValue("hasPublishBegins", !watch("hasPublishBegins"))
-                }
+                control={control}
+                name="hasPublishBegins"
                 noIndent
                 noMargin
               >
@@ -888,22 +883,20 @@ function ReservationUnitSettings({
                     date: "publishBeginsDate",
                     time: "publishBeginsTime",
                   }}
+                  translateError={(err) => getTranslatedError(t, err)}
                 />
               </ActivationGroup>
-
               <ActivationGroup
-                id="publishEnds"
                 label={t("ReservationUnitEditor.publishEnds")}
-                open={watch("hasPublishEnds")}
-                onChange={() =>
-                  setValue("hasPublishEnds", !watch("hasPublishEnds"))
-                }
+                control={control}
+                name="hasPublishEnds"
                 noIndent
                 noMargin
               >
                 <DateTimeInput
                   control={control}
                   name={{ date: "publishEndsDate", time: "publishEndsTime" }}
+                  translateError={(err) => getTranslatedError(t, err)}
                 />
               </ActivationGroup>
             </DenseVerticalFlex>
@@ -915,23 +908,15 @@ function ReservationUnitSettings({
           style={{ gridColumn: "1 / span 1" }}
         >
           <ActivationGroup
-            id="useScheduledReservation"
             label={t("ReservationUnitEditor.scheduledReservation")}
-            open={watch("hasScheduledReservation")}
-            onChange={() =>
-              setValue(
-                "hasScheduledReservation",
-                !watch("hasScheduledReservation")
-              )
-            }
+            control={control}
+            name="hasScheduledReservation"
           >
+            {/* TODO the Two DateInputs need to touch each other to rerun common validation code */}
             <ActivationGroup
-              id="reservationBegins"
               label={t("ReservationUnitEditor.reservationBegins")}
-              open={watch("hasReservationBegins")}
-              onChange={() =>
-                setValue("hasReservationBegins", !watch("hasReservationBegins"))
-              }
+              control={control}
+              name="hasReservationBegins"
               noIndent
             >
               <DateTimeInput
@@ -940,16 +925,14 @@ function ReservationUnitSettings({
                   date: "reservationBeginsDate",
                   time: "reservationBeginsTime",
                 }}
-                minDate={addDays(new Date(), 1)}
+                minDate={new Date()}
+                translateError={(err) => getTranslatedError(t, err)}
               />
             </ActivationGroup>
             <ActivationGroup
-              id="reservationEnds"
               label={t("ReservationUnitEditor.reservationEnds")}
-              open={watch("hasReservationEnds")}
-              onChange={() =>
-                setValue("hasReservationEnds", !watch("hasReservationEnds"))
-              }
+              control={control}
+              name="hasReservationEnds"
               noIndent
             >
               <DateTimeInput
@@ -958,7 +941,8 @@ function ReservationUnitSettings({
                   date: "reservationEndsDate",
                   time: "reservationEndsTime",
                 }}
-                minDate={addDays(new Date(), 1)}
+                minDate={new Date()}
+                translateError={(err) => getTranslatedError(t, err)}
               />
             </ActivationGroup>
           </ActivationGroup>
@@ -966,8 +950,9 @@ function ReservationUnitSettings({
         <Controller
           control={control}
           name="minReservationDuration"
-          render={({ field: { value, onChange } }) => (
+          render={({ field: { value, onChange, ...field } }) => (
             <Select
+              {...field}
               id="minReservationDuration"
               options={durationOptions}
               placeholder={t("common.select")}
@@ -979,8 +964,8 @@ function ReservationUnitSettings({
               }
               value={durationOptions.find((o) => o.value === value) ?? null}
               error={getTranslatedError(
-                errors.minReservationDuration?.message,
-                t
+                t,
+                errors.minReservationDuration?.message
               )}
               invalid={errors.minReservationDuration?.message != null}
               tooltipText={t(
@@ -992,8 +977,9 @@ function ReservationUnitSettings({
         <Controller
           control={control}
           name="maxReservationDuration"
-          render={({ field: { value, onChange } }) => (
+          render={({ field: { value, onChange, ...field } }) => (
             <Select
+              {...field}
               id="maxReservationDuration"
               placeholder={t("common.select")}
               required
@@ -1004,8 +990,8 @@ function ReservationUnitSettings({
               value={durationOptions.find((o) => o.value === value) ?? null}
               label={t("ReservationUnitEditor.label.maxReservationDuration")}
               error={getTranslatedError(
-                errors.maxReservationDuration?.message,
-                t
+                t,
+                errors.maxReservationDuration?.message
               )}
               invalid={errors.maxReservationDuration?.message != null}
               tooltipText={t(
@@ -1033,8 +1019,8 @@ function ReservationUnitSettings({
                 ) ?? null
               }
               error={getTranslatedError(
-                errors.reservationsMaxDaysBefore?.message,
-                t
+                t,
+                errors.reservationsMaxDaysBefore?.message
               )}
               invalid={errors.reservationsMaxDaysBefore?.message != null}
               tooltipText={t(
@@ -1069,8 +1055,8 @@ function ReservationUnitSettings({
                 label: string;
               }) => onChange(val.value)}
               error={getTranslatedError(
-                errors.reservationStartInterval?.message,
-                t
+                t,
+                errors.reservationStartInterval?.message
               )}
               invalid={errors.reservationStartInterval?.message != null}
               label={t("ReservationUnitEditor.label.reservationStartInterval")}
@@ -1088,12 +1074,9 @@ function ReservationUnitSettings({
           <Grid>
             <Span6>
               <ActivationGroup
-                id="bufferTimeBeforeGroup"
                 label={t("ReservationUnitEditor.bufferTimeBefore")}
-                open={watch("hasBufferTimeBefore")}
-                onChange={() =>
-                  setValue("hasBufferTimeBefore", !watch("hasBufferTimeBefore"))
-                }
+                control={control}
+                name="hasBufferTimeBefore"
               >
                 <Controller
                   control={control}
@@ -1118,12 +1101,9 @@ function ReservationUnitSettings({
             </Span6>
             <Span6>
               <ActivationGroup
-                id="bufferTimeAfterGroup"
                 label={t("ReservationUnitEditor.bufferTimeAfter")}
-                open={watch("hasBufferTimeAfter")}
-                onChange={() =>
-                  setValue("hasBufferTimeAfter", !watch("hasBufferTimeAfter"))
-                }
+                control={control}
+                name="hasBufferTimeAfter"
               >
                 <Controller
                   control={control}
@@ -1154,12 +1134,9 @@ function ReservationUnitSettings({
           style={{ gridColumn: "1 / -1" }}
         >
           <ActivationGroup
-            id="cancellationIsPossible"
             label={t("ReservationUnitEditor.cancellationIsPossible")}
-            open={watch("hasCancellationRule")}
-            onChange={() =>
-              setValue("hasCancellationRule", !watch("hasCancellationRule"))
-            }
+            control={control}
+            name="hasCancellationRule"
           >
             <Controller
               control={control}
@@ -1169,8 +1146,8 @@ function ReservationUnitSettings({
                   required
                   label={t("ReservationUnitEditor.cancellationGroupLabel")}
                   errorText={getTranslatedError(
-                    errors.cancellationRulePk?.message,
-                    t
+                    t,
+                    errors.cancellationRulePk?.message
                   )}
                 >
                   {cancellationRuleOptions.map((o) => (
@@ -1202,7 +1179,7 @@ function ReservationUnitSettings({
                 onChange(v.value)
               }
               value={metadataOptions.find((o) => o.value === value) ?? null}
-              error={getTranslatedError(errors.metadataSetPk?.message, t)}
+              error={getTranslatedError(t, errors.metadataSetPk?.message)}
               invalid={errors.metadataSetPk?.message != null}
               tooltipText={t("ReservationUnitEditor.tooltip.metadataSetPk")}
             />
@@ -1393,7 +1370,7 @@ function PricingSection({
                 onChange={(val?: { value: string; label: string }) =>
                   onChange(val?.value ?? null)
                 }
-                error={getTranslatedError(errors.pricingTerms?.message, t)}
+                error={getTranslatedError(t, errors.pricingTerms?.message)}
                 invalid={!!errors.pricingTerms}
                 tooltipText={t("ReservationUnitEditor.tooltip.pricingTermsPk")}
               />
@@ -1477,7 +1454,7 @@ function TermsSection({
                   required
                   id={fieldName}
                   label={t(`ReservationUnitEditor.label.${fieldName}`)}
-                  errorText={getTranslatedError(errors[fieldName]?.message, t)}
+                  errorText={getTranslatedError(t, errors[fieldName]?.message)}
                   style={{ gridColumn: "1 / -1" }}
                   tooltipText={getTranslatedTooltipTex(t, fieldName)}
                 />
@@ -1520,7 +1497,7 @@ function CommunicationSection({
                 {...field}
                 id={fieldName}
                 label={t(`ReservationUnitEditor.label.${fieldName}`)}
-                errorText={getTranslatedError(errors[fieldName]?.message, t)}
+                errorText={getTranslatedError(t, errors[fieldName]?.message)}
                 invalid={errors[fieldName]?.message != null}
                 tooltipText={getTranslatedTooltipTex(t, fieldName)}
               />
@@ -1544,7 +1521,7 @@ function CommunicationSection({
                 {...field}
                 id={fieldName}
                 label={t(`ReservationUnitEditor.label.${fieldName}`)}
-                errorText={getTranslatedError(errors[fieldName]?.message, t)}
+                errorText={getTranslatedError(t, errors[fieldName]?.message)}
                 invalid={errors[fieldName]?.message != null}
                 tooltipText={getTranslatedTooltipTex(t, fieldName)}
               />
@@ -1573,7 +1550,7 @@ function CommunicationSection({
                   {...field}
                   id={fieldName}
                   label={t(`ReservationUnitEditor.label.${fieldName}`)}
-                  errorText={getTranslatedError(errors[fieldName]?.message, t)}
+                  errorText={getTranslatedError(t, errors[fieldName]?.message)}
                   invalid={errors[fieldName]?.message != null}
                   tooltipText={getTranslatedTooltipTex(t, fieldName)}
                 />
@@ -1713,8 +1690,8 @@ function DescriptionSection({
                   "ReservationUnitEditor.reservationUnitTypeHelperText"
                 )}
                 error={getTranslatedError(
-                  errors.reservationUnitTypePk?.message,
-                  t
+                  t,
+                  errors.reservationUnitTypePk?.message
                 )}
                 invalid={errors.reservationUnitTypePk?.message != null}
                 tooltipText={t(
@@ -1766,9 +1743,10 @@ function DescriptionSection({
           <Controller
             control={control}
             name="qualifierPks"
-            render={({ field: { value, onChange } }) => (
+            render={({ field: { value, onChange, ...field } }) => (
               // @ts-expect-error - HDS multiselect has weird typings
               <Select<{ label: string; value: number }>
+                {...field}
                 multiselect
                 label={t("ReservationUnitEditor.qualifiersLabel")}
                 placeholder={t("ReservationUnitEditor.qualifiersPlaceholder")}
@@ -1787,15 +1765,15 @@ function DescriptionSection({
               <Controller
                 control={control}
                 name={fieldName}
-                render={({ field }) => (
+                render={({ field: { ...field } }) => (
                   <RichTextInput
                     {...field}
                     required
                     id={fieldName}
                     label={t(`ReservationUnitEditor.label.${fieldName}`)}
                     errorText={getTranslatedError(
-                      errors[fieldName]?.message,
-                      t
+                      t,
+                      errors[fieldName]?.message
                     )}
                     tooltipText={getTranslatedTooltipTex(t, fieldName)}
                   />
@@ -1815,6 +1793,67 @@ function DescriptionSection({
         </Span12>
       </Grid>
     </Accordion>
+  );
+}
+
+function ErrorInfo({
+  form,
+}: {
+  form: UseFormReturn<ReservationUnitEditFormValues>;
+}): JSX.Element | null {
+  const { t } = useTranslation();
+
+  const {
+    formState: { errors },
+  } = form;
+  const hasErrors = Object.keys(errors).length > 0;
+  const { pricings, ...otherErrors } = errors;
+
+  if (!hasErrors) {
+    return null;
+  }
+
+  // NOTE the type information for pricings errors is too complex to handle (hence runtime checks)
+  const nonNullPricings =
+    pricings != null && Array.isArray(pricings) ? pricings : [];
+  const pricingErrors =
+    nonNullPricings
+      .map((pricing) =>
+        Object.entries(pricing ?? {})
+          .map(([key, value]) => {
+            if (
+              value != null &&
+              typeof value === "object" &&
+              "message" in value
+            ) {
+              if (value?.message == null || typeof value.message !== "string") {
+                return null;
+              }
+              const label = t(`ReservationUnitEditor.label.${key}`);
+              const errMsg = getTranslatedError(t, value.message);
+              return `${label} : ${errMsg}`;
+            }
+            return null;
+          })
+          .filter((x): x is string => x != null)
+      )
+      .flat() ?? [];
+
+  // TODO errors should be sorted based on the order of the form fields
+  return (
+    <Notification label={t("FormErrorSummary.label")} type="error">
+      <ol>
+        {Object.entries(otherErrors).map(([key, value]) => (
+          <li key={key}>
+            {t(`ReservationUnitEditor.label.${key}`)}:{" "}
+            {getTranslatedError(t, value?.message)}
+          </li>
+        ))}
+        {pricingErrors.map((error) => (
+          <li key={error}>{error}</li>
+        ))}
+      </ol>
+    </Notification>
   );
 }
 
@@ -2060,6 +2099,7 @@ const ReservationUnitEditor = ({
           reservationState={reservationUnit?.reservationState ?? undefined}
           unitState={reservationUnit?.state ?? undefined}
         />
+        <ErrorInfo form={form} />
         <BasicSection form={form} spaces={spaces} />
         <DescriptionSection
           form={form}

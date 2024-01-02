@@ -210,9 +210,9 @@ function SeasonRow({
                     disabled={isClosed}
                     label={t("ReservationUnitEditor.label.openingTime")}
                     error={getTranslatedError(
+                      t,
                       errors.seasons?.[index]?.reservableTimes?.[i]?.begin
-                        ?.message,
-                      t
+                        ?.message
                     )}
                   />
                 )}
@@ -231,9 +231,9 @@ function SeasonRow({
                     disabled={isClosed}
                     label={t("ReservationUnitEditor.label.closingTime")}
                     error={getTranslatedError(
+                      t,
                       errors.seasons?.[index]?.reservableTimes?.[i]?.end
-                        ?.message,
-                      t
+                        ?.message
                     )}
                   />
                 )}

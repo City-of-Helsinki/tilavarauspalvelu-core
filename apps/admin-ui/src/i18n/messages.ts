@@ -792,6 +792,13 @@ const translations: ITranslations = {
         "Not allowed to add a second time without first": [
           "Aikajakso ei voi alkaa ennen kuin edellinen aikajakso on päättynyt.",
         ],
+        "description cannot be shorter than 1 characters": ["Pakollinen"],
+        "publishBeginsDate must be before end": [
+          "Julkaisuajan tulee alkaa ennen kuin se päättyy.",
+        ],
+        "reservationBeginsDate must be before end": [
+          "Varausajan tulee alkaa ennen kuin se päättyy.",
+        ],
       },
     },
     level: {
@@ -1130,6 +1137,7 @@ const translations: ITranslations = {
     statusFilter: ["Tila"],
   },
   ReservationUnitEditor: {
+    // NOTE the labels are used in a dynamic error summary (even if the key can't be found)
     label: {
       reservationKind: ["Varaustyyppi"],
       nameFi: ["Varausyksikön nimi fi"],
@@ -1146,6 +1154,14 @@ const translations: ITranslations = {
       descriptionEn: ["Kuvaus en"],
       minReservationDuration: ["Varauksen kesto vähintään"],
       maxReservationDuration: ["Varauksen kesto enintään"],
+      publishBeginsDate: ["Julkaisu alkaa"],
+      publishEndsDate: ["Julkaisu päättyy"],
+      publishBeginsTime: ["Julkaisu alkaa"],
+      publishEndsTime: ["Julkaisu päättyy"],
+      reservationBeginsDate: ["Varauksen alkamispäivä"],
+      reservationBeginsTime: ["Varauksen alkamisaika"],
+      reservationEndsDate: ["Varauksen päättymispäivä"],
+      reservationEndsTime: ["Varauksen päättymisaika"],
       reservationStartInterval: ["Varauksen aloitukset"],
       reservationsMinDaysBefore: ["Varattavissa viimeistään (vrk ennen)"],
       reservationsMaxDaysBefore: ["Varattavissa alkaen"],
@@ -1167,7 +1183,9 @@ const translations: ITranslations = {
       paymentTermsPk: ["Maksuehdot"],
       paymentTypes: ["Maksutapa"],
       priceUnit: ["Hinnan yksikkö"],
+      // TODO deprecated (rename it in the code)
       taxPercentagePk: ["Hinnan alv%"],
+      taxPercentage: ["Hinnan alv%"],
       reservationPendingInstructionsEn: [
         "Varausvahvistuksen lisäohjeteksti englanniksi",
       ],

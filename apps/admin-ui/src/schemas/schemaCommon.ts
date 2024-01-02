@@ -106,7 +106,8 @@ export const checkLengthWithoutHtml = (
   ctx: z.RefinementCtx,
   path: string,
   min?: number,
-  max?: number
+  max?: number,
+  name?: string
 ) => {
   const stripped = str.replaceAll(/<[^>]*>/g, "");
 
@@ -114,14 +115,14 @@ export const checkLengthWithoutHtml = (
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: [path],
-      message: `Message cannot be shorter than ${min} characters`,
+      message: `${name ?? "Message"} cannot be shorter than ${min} characters`,
     });
   }
   if (max != null && stripped.length > max) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: [path],
-      message: `Message cannot be longer than ${max} characters`,
+      message: `${name ?? "Message"} cannot be longer than ${max} characters`,
     });
   }
 };
