@@ -347,7 +347,7 @@ class ReservationUnitWithReservationsMixin:
     )
 
     def resolve_reservations(
-        self,
+        self: ReservationUnit,
         info: GQLInfo,
         from_: datetime.date | None = None,
         to: datetime.date | None = None,

@@ -13,7 +13,7 @@ class SpaceQuerySet(ExtendedTreeQuerySet):
         Get ids of all spaces that are accessible though the space hierarchy
         for the spaces currently in the queryset.
         """
-        all_families: list[list[int]] = self.with_family().values_list("family", flat=True)
+        all_families: list[list[int]] = self.with_family(include_self=True).values_list("family", flat=True)
 
         return {pk for family in all_families for pk in family}
 
