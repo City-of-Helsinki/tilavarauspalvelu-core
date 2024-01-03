@@ -140,8 +140,8 @@ class ReservationQuerySet(QuerySet):
         return (
             self.with_buffered_begin_and_end()
             .filter(
-                buffered_begin__date__lt=end_date,
-                buffered_end__date__gt=start_date,
+                buffered_begin__date__lte=end_date,
+                buffered_end__date__gte=start_date,
             )
             .distinct()
             .order_by("buffered_begin")

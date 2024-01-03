@@ -1050,7 +1050,7 @@ def test__query_reservation_unit_reservable__filters__application_round__start_d
     graphql, reservation_unit
 ):
     """
-    This is a regression tests that was found during manual testing.
+    This is a regression test for a bug that was found during manual testing.
     Simply recreate the exact scenario instead of using the above test cases.
     """
     ApplicationRoundFactory.create_in_status_open(
@@ -1111,4 +1111,47 @@ def test__query_reservation_unit_reservable__filters__application_round__start_d
     assert response.node(0) == {
         "isClosed": False,
         "firstReservableDatetime": _datetime(year=2024, month=3, day=31, hour=11).isoformat(),
+    }
+
+
+@freezegun.freeze_time(datetime(2024, 1, 3, tzinfo=DEFAULT_TIMEZONE))
+def test__query_reservation_unit_reservable__reservations__start_and_end_same_day(graphql, reservation_unit):
+    """
+    This is a regression test for a bug that was found during manual testing.
+    Simply recreate the exact scenario instead of using the above test cases.
+    """
+    # Monday | 2024-01-08 | 08:00 - 11:00 (2h)
+    ReservationFactory.create(
+        begin=_datetime(year=2024, month=1, day=8, hour=8),
+        end=_datetime(year=2024, month=1, day=8, hour=11),
+        reservation_unit=[reservation_unit],
+    )
+    # Monday | 2024-01-08 | 12:00 - 17:00 (5h)
+    ReservationFactory.create(
+        begin=_datetime(year=2024, month=1, day=8, hour=12),
+        end=_datetime(year=2024, month=1, day=8, hour=17),
+        reservation_unit=[reservation_unit],
+    )
+
+    # Monday | 2024-01-08 | 08:00 - 20:30 (12.5h)
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(year=2024, month=1, day=8, hour=8),
+        end_datetime=_datetime(year=2024, month=1, day=8, hour=20, minute=30),
+    )
+
+    query = reservation_units_reservable_query(
+        reservable_date_start="2024-01-08",
+        reservable_date_end="2024-01-08",
+        reservable_time_start="12:00:00",
+        reservable_time_end="17:00:00",
+    )
+
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {
+        "isClosed": False,
+        "firstReservableDatetime": None,
     }
