@@ -49,12 +49,13 @@ def batched(iterable: list[T], *, batch_size: int) -> Generator[list[T], Any, No
 def random_subset(
     sequence: Sequence[T],
     *,
+    min_size: int = 0,
     max_size: int = 0,
     counts: list[int] | None = None,
 ) -> list[T]:
     if max_size < 1:
         max_size = len(sequence)
-    size = random.randint(0, max_size)
+    size = random.randint(min_size, max_size)
     return random.sample(sequence, counts=counts, k=size)
 
 
