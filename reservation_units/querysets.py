@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from copy import copy
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
@@ -16,7 +17,7 @@ from opening_hours.models import ReservableTimeSpan
 from opening_hours.utils.reservable_time_span_client import TimeSpanElement, override_reservable_with_closed_time_spans
 
 if TYPE_CHECKING:
-    from opening_hours.models import ReservationUnit
+    from reservation_units.models import ReservationUnit
 
 
 DEFAULT_TIMEZONE = get_default_timezone()
@@ -272,6 +273,7 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
 
         # Get ReservableTimeSpans for each ReservationUnit
         # When ReservableTimeSpans are accessed later, they are already filtered by date range
+        reservation_units_with_annotated_time_spans: Iterable["ReservationUnit"]
         reservation_units_with_annotated_time_spans = self.exclude(
             origin_hauki_resource__isnull=True,
         ).prefetch_related(
@@ -293,10 +295,9 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
             ),
         )
 
-        reservation_closed_time_spans_map: dict[
-            ReservationUnitPK, set[TimeSpanElement]
-        ] = Reservation.objects.get_affecting_reservations_as_closed_time_spans(
-            reservation_unit_queryset=self.exclude(origin_hauki_resource__isnull=True),
+        reservation_closed_time_spans_map: dict[ReservationUnitPK, set[TimeSpanElement]]
+        reservation_closed_time_spans_map = Reservation.objects.get_affecting_reservations_as_closed_time_spans(
+            reservation_unit_queryset=self,
             start_date=filter_date_start,
             end_date=filter_date_end,
         )
