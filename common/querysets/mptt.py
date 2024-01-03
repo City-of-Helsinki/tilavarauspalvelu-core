@@ -1,6 +1,7 @@
 from typing import Self
 
 from django.db.models import OuterRef, Q
+from django.db.models.functions import Coalesce
 from mptt.models import MPTTOptions
 from mptt.querysets import TreeQuerySet
 
@@ -48,7 +49,7 @@ class ExtendedTreeQuerySet(TreeQuerySet):
             qs = qs.exclude(pk=OuterRef("pk"))
 
         return self.annotate(
-            ancestors=ArrayRemove(SubqueryArray(qs.values("id"), agg_field="id"), None),
+            ancestors=Coalesce(ArrayRemove(SubqueryArray(qs.values("id"), agg_field="id"), None), []),
         )
 
     def with_descendants(self, *, include_self: bool = False) -> Self:
@@ -59,7 +60,7 @@ class ExtendedTreeQuerySet(TreeQuerySet):
             qs = qs.exclude(pk=OuterRef("pk"))
 
         return self.annotate(
-            descendants=ArrayRemove(SubqueryArray(qs.values("id"), agg_field="id"), None),
+            descendants=Coalesce(ArrayRemove(SubqueryArray(qs.values("id"), agg_field="id"), None), []),
         )
 
     def with_family(self, *, include_self: bool = False) -> Self:
@@ -75,5 +76,5 @@ class ExtendedTreeQuerySet(TreeQuerySet):
             qs = qs.exclude(pk=OuterRef("pk"))
 
         return self.annotate(
-            family=ArrayRemove(SubqueryArray(qs.values("id"), agg_field="id"), None),
+            family=Coalesce(ArrayRemove(SubqueryArray(qs.values("id"), agg_field="id"), None), []),
         )
