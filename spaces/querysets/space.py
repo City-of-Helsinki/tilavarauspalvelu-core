@@ -10,7 +10,7 @@ __all__ = [
 class SpaceQuerySet(ExtendedTreeQuerySet):
     def all_space_ids_though_hierarchy(self: Self) -> set[int]:
         """
-        Get ids of all spaces that are accessible though the space hierarchy
+        Get ids for all spaces that are accessible though the space hierarchy
         for the spaces currently in the queryset.
         """
         all_families: list[list[int]] = self.with_family(include_self=True).values_list("family", flat=True)

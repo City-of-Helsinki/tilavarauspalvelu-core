@@ -75,7 +75,7 @@ def _validate_time_spans(
 def test__get_affecting_reservations__only_resources():
     # Resource 1 <- ReservationUnit 1, 2
     # Resource 2 <- ReservationUnit 3, 4
-    # Resource 2 <- ReservationUnit 5
+    # Resource 3 <- ReservationUnit 5
     resource_1 = ResourceFactory.create()
     resource_2 = ResourceFactory.create()
     resource_3 = ResourceFactory.create()
