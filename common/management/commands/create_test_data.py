@@ -210,7 +210,6 @@ def create_test_data(flush: bool = True) -> None:
         users,
         age_groups,
         reservation_purposes,
-        reservation_units,
         cities,
     )
     _create_banner_notifications()
@@ -1762,6 +1761,9 @@ def _create_application_rounds(
     *,
     number: int = 15,
 ) -> list[ApplicationRound]:
+    # Create at least 9 application rounds so that there are past
+    # application rounds with different sent and handled dates
+    number = max(number, 9)
     service_sectors_loop = cycle(service_sectors)
     period_options = cycle(
         [
@@ -1785,10 +1787,30 @@ def _create_application_rounds(
 
     application_rounds: list[ApplicationRound] = []
 
+    skip_first: bool = True
+    sent_created: bool = False
+    handled_created: bool = False
+
     for i in range(number):
         criteria = get_paragraphs()
 
         period = next(period_options)
+
+        # First past application round has not been sent or handled
+        # Second past application round has been sent
+        # Third past application round has been sent and handled
+        sent_date: datetime | None = None
+        handled_date: datetime | None = None
+        if period[1] < datetime.now(tz=UTC):
+            if skip_first:
+                skip_first = False
+            elif not sent_created:
+                sent_date = period[0] - timedelta(days=1)
+                sent_created = True
+            elif not handled_created:
+                sent_date = period[0] - timedelta(days=1)
+                handled_date = period[0] + timedelta(days=1)
+                handled_created = True
 
         application_round = ApplicationRound(
             name=f"Application Round {i}",
@@ -1807,18 +1829,20 @@ def _create_application_rounds(
             criteria_fi=criteria.fi,
             criteria_en=criteria.en,
             criteria_sv=criteria.sv,
+            sent_date=sent_date,
+            handled_date=handled_date,
         )
+        status = application_round.status.value
+        application_round.name += f" - {status}"
+        application_round.name_en += f" - {status}"
+        application_round.name_sv += f" - {status}"
         application_rounds.append(application_round)
 
     application_rounds = ApplicationRound.objects.bulk_create(application_rounds)
 
     for application_round in application_rounds:
-        application_round.reservation_units.add(
-            *random_subset(reservation_units, max_size=10),
-        )
-        application_round.purposes.add(
-            *random_subset(reservation_purposes, max_size=5),
-        )
+        application_round.reservation_units.add(*random_subset(reservation_units, min_size=1, max_size=10))
+        application_round.purposes.add(*random_subset(reservation_purposes, max_size=5))
 
     return application_rounds
 
@@ -1832,48 +1856,65 @@ def _create_applications(
     users: list[User],
     age_groups: list[AgeGroup],
     reservation_purposes: list[ReservationPurpose],
-    reservation_units: list[ReservationUnit],
     cities: list[City],
     *,
     number: int = 20,
 ) -> list[Application]:
+    now = datetime.now(tz=UTC)
+
     contact_persons = _create_persons(number=number)
     billing_addresses = _create_addresses(number=number)
     organisations = _create_organisation(billing_addresses)
+
     applications: list[Application] = []
-    now = datetime.now(tz=UTC)
 
-    items: zip[tuple[Person, Address, tuple[str, Organisation | None]]]
-    items = zip(contact_persons, billing_addresses, organisations, strict=True)
+    # The first past and present application rounds have "a lot" of applications
+    application_counts = iter([200, 200] + ([number] * (len(application_rounds) - 2)))
 
-    for contact_person, billing_address, (applicant_type, organisation) in items:
-        # User is the overall admin mode often, but other users are also possible
-        weights = [len(users)] + ([1] * (len(users) - 1))
-        user: User = weighted_choice(users, weights=weights)
+    for application_round in application_rounds:
+        # Create N application per application round
+        for _ in range(next(application_counts)):
+            # No application for future application rounds
+            if application_round.application_period_begin > now:
+                break
 
-        # No application for future application rounds
-        application_round: ApplicationRound = random.choice(application_rounds)
-        while application_round.application_period_begin > now:
-            application_round = random.choice(application_rounds)
+            # User is the overall admin mode often, but other users are also possible
+            weights = [len(users)] + ([1] * (len(users) - 1))
+            user = weighted_choice(users, weights=weights)
 
-        application = Application(
-            applicant_type=applicant_type,
-            contact_person=contact_person,
-            user=user,
-            organisation=organisation,
-            application_round=application_round,
-            billing_address=billing_address,
-            home_city=random.choice(cities),
-            additional_information=faker_fi.sentence(),
-        )
-        applications.append(application)
+            applicant_type, organisation = random.choice(organisations)
+
+            # 2/3 of applications have been sent
+            # For open application rounds, this means application is a draft
+            # For past application rounds, this means application is sent (and not expired)
+            sent_date: datetime | None = None
+            cancelled_date: datetime | None = None
+            if weighted_choice([True, False], weights=[2, 1]):
+                sent_date = application_round.application_period_end - timedelta(days=1)
+
+            # 1/3 of unsent application have been cancelled
+            elif weighted_choice([True, False], weights=[1, 2]):
+                cancelled_date = application_round.application_period_end - timedelta(days=1)
+
+            application = Application(
+                applicant_type=applicant_type,
+                contact_person=random.choice(contact_persons),
+                user=user,
+                organisation=organisation,
+                application_round=application_round,
+                billing_address=random.choice(billing_addresses),
+                home_city=random.choice(cities),
+                additional_information=faker_fi.sentence(),
+                sent_date=sent_date,
+                cancelled_date=cancelled_date,
+            )
+            applications.append(application)
 
     applications = Application.objects.bulk_create(applications)
     _create_application_events(
         applications,
         age_groups,
         reservation_purposes,
-        reservation_units,
     )
     return applications
 
@@ -2010,12 +2051,24 @@ def _create_application_events(
     applications: list[Application],
     age_groups: list[AgeGroup],
     reservation_purposes: list[ReservationPurpose],
-    reservation_units: list[ReservationUnit],
 ) -> list[ApplicationEvent]:
     application_events: list[ApplicationEvent] = []
 
+    now = datetime.now(tz=UTC)
+    huge_application_created: bool = False
+
     for application in applications:
-        for _ in range(random.randint(1, 3)):
+        #
+        # Add one application in the first past application round with "a lot" of application events
+        # Note this in application working memo.
+        application_event_count: int = random.randint(1, 3)
+        if not huge_application_created and application.application_round.application_period_end < now:
+            application_event_count = 30
+            application.working_memo = "Massive application"
+            application.save(update_fields=["working_memo"])
+            huge_application_created = True
+
+        for _ in range(application_event_count):
             name = faker_fi.word()
             min_duration = random.randint(1, 2)
             max_duration = random.randint(min_duration, 5)
@@ -2029,7 +2082,7 @@ def _create_application_events(
                 age_group=random.choice(age_groups),
                 min_duration=timedelta(hours=min_duration),
                 max_duration=timedelta(hours=max_duration),
-                events_per_week=random.randint(1, 10),
+                events_per_week=weighted_choice(range(1, 8), weights=[10, 7, 4, 2, 1, 1, 1]),
                 biweekly=weighted_choice([True, False], weights=[1, 5]),
                 begin=application.application_round.reservation_period_begin,
                 end=application.application_round.reservation_period_end,
@@ -2039,7 +2092,7 @@ def _create_application_events(
             application_events.append(event)
 
     application_events = ApplicationEvent.objects.bulk_create(application_events)
-    _create_event_reservation_units(application_events, reservation_units)
+    _create_event_reservation_units(application_events)
     _create_application_event_schedules(application_events)
     return application_events
 
@@ -2050,14 +2103,14 @@ def _create_application_events(
 )
 def _create_event_reservation_units(
     application_events: list[ApplicationEvent],
-    reservation_units: list[ReservationUnit],
 ) -> list[EventReservationUnit]:
     event_units: list[EventReservationUnit] = []
     for application_event in application_events:
-        amount = random.randint(1, 4)
-        units: list[ReservationUnit] = random.sample(reservation_units, k=amount)
+        reservation_units = list(application_event.application.application_round.reservation_units.all())
+        amount = random.randint(1, min(len(reservation_units), 4))
+        selected_units: list[ReservationUnit] = random.sample(reservation_units, k=amount)
 
-        for i, unit in enumerate(units):
+        for i, unit in enumerate(selected_units):
             event_unit = EventReservationUnit(
                 preferred_order=i,
                 application_event=application_event,
@@ -2078,10 +2131,12 @@ def _create_application_event_schedules(
     schedules: list[ApplicationEventSchedule] = []
     for application_event in application_events:
         weekdays: list[int] = [choice for choice, _ in WEEKDAYS.CHOICES]
-        for _ in range(random.randint(1, 4)):
+        amount = random.randint(1, application_event.events_per_week)
+
+        for _ in range(amount):
             weekday = weekdays.pop(random.randint(0, len(weekdays) - 1))
             begin = random.randint(8, 20)
-            end = random.randint(begin + 1, 21)
+            end = random.randint(begin + 1, min(begin + random.randint(1, 6), 22))
 
             schedule = ApplicationEventSchedule(
                 day=weekday,
