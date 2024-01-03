@@ -218,8 +218,7 @@ export const isReservationReservable = ({
     return false;
   }
 
-  const reservationsArr =
-    reservations?.filter((r): r is NonNullable<typeof r> => r != null) ?? [];
+  const reservationsArr = filterNonNullable(reservations);
   if (
     doBuffersCollide(
       {

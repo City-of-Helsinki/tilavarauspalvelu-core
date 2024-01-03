@@ -492,6 +492,7 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
   const { start: dayStartTime, end: dayEndTime }: { start?: Date; end?: Date } =
     timeIntervalForDay ?? {};
 
+  // FIXME there is an issue with pk 110 (no startTime available), others work
   const startingTimesOptions: OptionType[] = useMemo(() => {
     const durations = durationOptions
       .filter((n) => n.label !== "")

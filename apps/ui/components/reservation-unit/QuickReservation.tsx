@@ -10,6 +10,7 @@ import {
   isBefore,
   isSameDay,
   isValid,
+  set,
 } from "date-fns";
 import { DateInput, IconAngleDown, Select, TimeInput } from "hds-react";
 import { padStart } from "lodash";
@@ -226,21 +227,21 @@ function dayMin(days: Array<Date | undefined>): Date | undefined {
 // Returns the last possible reservation date for the given reservation unit
 function getLastPossibleReservationDate(
   reservationUnit: ReservationUnitByPkType
-) {
-  if (!reservationUnit || !reservationUnit.reservableTimeSpans?.length) {
+): Date | undefined {
+  const { reservationsMaxDaysBefore, reservableTimeSpans, reservationEnds } =
+    reservationUnit;
+  if (!reservableTimeSpans?.length) {
     return undefined;
   }
 
   const lastPossibleReservationDate =
-    reservationUnit.reservationsMaxDaysBefore != null &&
-    reservationUnit.reservationsMaxDaysBefore > 0
-      ? addDays(new Date(), reservationUnit.reservationsMaxDaysBefore)
+    reservationsMaxDaysBefore != null && reservationsMaxDaysBefore > 0
+      ? addDays(new Date(), reservationsMaxDaysBefore)
       : undefined;
-  const reservationUnitNotReservable = reservationUnit.reservationEnds
-    ? new Date(reservationUnit.reservationEnds)
+  const reservationUnitNotReservable = reservationEnds
+    ? new Date(reservationEnds)
     : undefined;
-  const endDateTime =
-    reservationUnit?.reservableTimeSpans.at(-1)?.endDatetime ?? undefined;
+  const endDateTime = reservableTimeSpans.at(-1)?.endDatetime ?? undefined;
   const lastOpeningDate = endDateTime ? new Date(endDateTime) : new Date();
   return dayMin([
     reservationUnitNotReservable,
@@ -258,6 +259,27 @@ type AvailableTimesProps = {
   reservationUnit?: ReservationUnitByPkType;
 };
 
+/// Returns true if the given time is 'inside' the time span
+/// inside in this case means it's either the same day or the time span is multiple days
+/// TODO should rewrite this to work on dates since we want to do that conversion first anyway
+function isInTimeSpan(
+  date: Date,
+  timeSpan: NonNullable<ReservationUnitByPkType["reservableTimeSpans"]>[0]
+) {
+  const { startDatetime, endDatetime } = timeSpan ?? {};
+
+  if (!startDatetime) return false;
+  if (!endDatetime) return false;
+  const startDate = new Date(startDatetime);
+  const endDate = new Date(endDatetime);
+  // either we have per day open time, or we have a span of multiple days
+  // another option would be to move the starting time to 00:00
+  if (isSameDay(date, startDate)) return true;
+  if (isBefore(date, startDate)) return false;
+  if (isAfter(date, endDate)) return false;
+  return true;
+}
+
 // Returns an timeslot array (in HH:mm format) with the time-slots that are
 // available for reservation on the given date
 // TODO should rewrite the timespans to be NonNullable and dates (and do the conversion early, not on each component render)
@@ -268,23 +290,19 @@ function getAvailableTimes(
 ): string[] {
   const allTimes: string[] = [];
   filterNonNullable(reservableTimeSpans)
-    .filter(({ startDatetime, endDatetime }) => {
-      if (!startDatetime) return false;
-      if (!endDatetime) return false;
-      const startDate = new Date(startDatetime);
-      const endDate = new Date(endDatetime);
-      // either we have per day open time, or we have a span of multiple days
-      // another option would be to move the starting time to 00:00
-      if (isSameDay(date, startDate)) return true;
-      if (isBefore(date, startDate)) return false;
-      if (isAfter(date, endDate)) return false;
-      return true;
-    })
-    ?.forEach((rts) => {
+    .filter((x) => isInTimeSpan(date, x))
+    .forEach((rts) => {
       if (!rts?.startDatetime || !rts?.endDatetime) return;
+      const begin = isSameDay(new Date(rts.startDatetime), date)
+        ? new Date(rts.startDatetime)
+        : set(date, { hours: 0, minutes: 0 });
+      const end = isSameDay(new Date(rts.endDatetime), date)
+        ? new Date(rts.endDatetime)
+        : set(date, { hours: 23, minutes: 59 });
+      // TODO I hate this function, don't manipulate strings
       const intervals = getDayIntervals(
-        format(new Date(rts.startDatetime), "HH:mm"),
-        format(new Date(rts.endDatetime), "HH:mm"),
+        format(begin, "HH:mm"),
+        format(end, "HH:mm"),
         reservationStartInterval
       );
 
@@ -328,6 +346,7 @@ function availableTimes({
       const startTime = new Date(day);
       startTime.setHours(timeHours, timeMinutes, 0, 0);
 
+      // FIXME isSlotReservable breaks on weird cases
       return isSlotReservable(start, end) && !isBefore(start, startTime)
         ? n
         : null;
@@ -336,12 +355,9 @@ function availableTimes({
 }
 
 // Returns the next available time, after the given time (Date object)
-const getNextAvailableTime = (
-  props: {
-    after: Date;
-  } & Omit<AvailableTimesProps, "day">
-): Date | null => {
-  const { after, reservationUnit } = props;
+// FIXME this isn't working (compared to the availableTimes function), ex. unit 104 locally
+const getNextAvailableTime = (props: AvailableTimesProps): Date | null => {
+  const { day: after, reservationUnit } = props;
   if (reservationUnit == null) {
     return null;
   }
@@ -548,7 +564,7 @@ const QuickReservation = ({
 
   // the next available time after the selected time
   const nextAvailableTime = getNextAvailableTime({
-    after: date,
+    day: date,
     time,
     duration: duration?.value?.toString() ?? "00:00",
     isSlotReservable,
@@ -586,6 +602,7 @@ const QuickReservation = ({
           onChange={(_val, valueAsDate) => {
             if (isValid(valueAsDate) && valueAsDate.getFullYear() > 1970) {
               setSlot(null);
+              /* TODO what is the purpose of this? */
               const times = availableTimes({
                 day: valueAsDate,
                 duration: duration?.value?.toString() ?? "00:00",

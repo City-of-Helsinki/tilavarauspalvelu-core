@@ -303,14 +303,18 @@ export const getReservationUnitPrice = (
 // if pk is odd, return 100 days from 12:00 to 20:00
 // assuming that the backend will add TZ info to the dates
 export const createMockOpeningTimes = (pk: number) => {
-  if (pk % 2 === 0) {
+  // A weird case where the end time < start time (different days)
+  if (pk % 5 === 0) {
+    const start = toApiDate(addDays(new Date(), -4));
+    const end = toApiDate(addDays(new Date(), 4));
     return [
       {
-        startDatetime: "2023-01-01T04:00:00+02:00",
-        endDatetime: "2027-12-31T20:00:00+02:00",
+        startDatetime: `${start}T23:00:00+02:00`,
+        endDatetime: `${end}T01:00:00+02:00`,
       },
     ];
   }
+
   if (pk % 3 === 0) {
     return Array.from(Array(100)).map((_, index) => {
       const start = toApiDate(addDays(new Date(), index));
@@ -322,6 +326,14 @@ export const createMockOpeningTimes = (pk: number) => {
     });
   }
 
+  if (pk % 2 === 0) {
+    return [
+      {
+        startDatetime: "2023-01-01T04:00:00+02:00",
+        endDatetime: "2027-12-31T20:00:00+02:00",
+      },
+    ];
+  }
   return Array.from(Array(100)).map((_, index) => {
     const start = toApiDate(addDays(new Date(), index));
     const end = toApiDate(addDays(new Date(), index));

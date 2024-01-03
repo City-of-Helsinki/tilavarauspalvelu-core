@@ -9,8 +9,10 @@ import {
   getISODay,
   isAfter,
   isBefore,
+  isSameDay,
   isWithinInterval,
   roundToNearestMinutes,
+  set,
   startOfDay,
 } from "date-fns";
 import { TFunction } from "next-i18next";
@@ -346,28 +348,52 @@ export const isStartTimeWithinInterval = (
   if (reservableTimeSpans?.length < 1) return false;
   if (!interval) return true;
 
-  const startHMS = `${toUIDate(start, "HH:mm")}:00`;
-  const timeframe: ReservableTimeSpanType =
-    reservableTimeSpans?.find((n) => {
+  // TODO this is awfully similar to the one in QuickReservation
+  const timeframeArr = reservableTimeSpans.filter(
+    (n) => {
       if (!n.startDatetime || !n.endDatetime) return false;
-      const startTime = `${toUIDate(new Date(n.startDatetime), "HH:mm")}:00`;
-      const endTime = `${toUIDate(
-        addMinutes(new Date(n.endDatetime), -1),
-        "HH:mm"
-      )}:00`;
 
-      return startTime <= startHMS && endTime > startHMS;
-    }) || {};
+      const begin = isSameDay(new Date(n.startDatetime), start)
+        ? new Date(n.startDatetime)
+        : set(start, { hours: 0, minutes: 0 });
+      const end = isSameDay(new Date(n.endDatetime), start)
+        ? new Date(n.endDatetime)
+        : set(start, { hours: 23, minutes: 59 });
 
-  return (
-    !!timeframe.startDatetime &&
-    !!timeframe.endDatetime &&
-    getDayIntervals(
-      format(new Date(timeframe.startDatetime), "HH:mm"),
-      format(new Date(timeframe.endDatetime), "HH:mm"),
-      interval
-    ).includes(startHMS)
+      return isWithinInterval(start, { start: begin, end });
+    }
   );
+  type TimeFrame = { start: Date; end: Date };
+  const timeframe = timeframeArr
+    .map((n) =>
+      n.startDatetime != null && n.endDatetime != null
+        ? { start: new Date(n.startDatetime), end: new Date(n.endDatetime) }
+        : null
+    )
+    .filter((n): n is NonNullable<typeof n> => n != null)
+    .reduce<TimeFrame | null>((acc, curr) => {
+      const begin = isSameDay(new Date(curr.start), start)
+        ? new Date(curr.start)
+        : set(start, { hours: 0, minutes: 0 });
+      const end = isSameDay(new Date(curr.end), start)
+        ? new Date(curr.end)
+        : set(start, { hours: 23, minutes: 59 });
+      return {
+        start: acc?.start && acc.start < begin ? acc.start : begin,
+        end: acc?.end && acc.end > end ? acc.end : end,
+      };
+    }, null);
+
+  if (timeframe?.start == null || timeframe.end == null) {
+    return false;
+  }
+
+  const startHMS = `${toUIDate(start, "HH:mm")}:00`;
+  return getDayIntervals(
+    format(timeframe.start, "HH:mm"),
+    format(timeframe.end, "HH:mm"),
+    interval
+  ).includes(startHMS);
 };
 
 export const getMinReservation = ({
