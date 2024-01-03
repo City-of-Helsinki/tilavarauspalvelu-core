@@ -56,7 +56,7 @@ class ReservationInfo:
 
 class ReservationQuerySet(QuerySet):
     def get_affecting_reservations_as_closed_time_spans(
-        self: Self,
+        self,
         reservation_unit_queryset: ReservationUnitQuerySet,
         start_date: date,
         end_date: date,
@@ -64,16 +64,15 @@ class ReservationQuerySet(QuerySet):
         from spaces.models import Space
 
         reservation_unit_queryset = (
-            reservation_unit_queryset.order_by("pk")
-            .distinct()
+            reservation_unit_queryset.distinct()
+            .order_by("pk")
             .annotate(
                 space_ids=ArrayRemove(ArrayAgg("spaces__id"), None),
                 resource_ids=ArrayRemove(ArrayAgg("resources__id"), None),
             )
-        ).values("pk", "space_ids", "resource_ids")
-        reservation_unit_infos: list[ReservationUnitInfo] = [
-            ReservationUnitInfo(item) for item in reservation_unit_queryset
-        ]
+            .values("pk", "space_ids", "resource_ids")
+        )
+        reservation_unit_infos = [ReservationUnitInfo(item) for item in reservation_unit_queryset]
 
         # Sets that contain all space and resource ids from the reservation units.
         direct_space_ids: set[SpacePK] = {pk for item in reservation_unit_infos for pk in item.space_ids}
@@ -88,7 +87,7 @@ class ReservationQuerySet(QuerySet):
         reservation_queryset = (
             self.filter_buffered_reservations_period(start_date=start_date, end_date=end_date)
             .filter(
-                Q(reservation_unit__id__in=[values["pk"] for values in reservation_unit_queryset])
+                Q(reservation_unit__id__in=[info.pk for info in reservation_unit_infos])
                 | Q(reservation_unit__spaces__in=space_ids)
                 | Q(reservation_unit__resources__in=resource_ids),
             )
@@ -98,7 +97,7 @@ class ReservationQuerySet(QuerySet):
             )
             .values("buffered_begin", "buffered_end", "reservation_unit__id", "space_ids", "resource_ids")
         )
-        reservation_infos: list[ReservationInfo] = [ReservationInfo(item) for item in reservation_queryset]
+        reservation_infos = [ReservationInfo(item) for item in reservation_queryset]
 
         closed_time_spans: dict[ReservationUnitPK, set[TimeSpanElement]] = {}
 
