@@ -10,6 +10,8 @@ import {
   min,
   parseISO,
   addMinutes,
+  isBefore,
+  isAfter,
   isSameDay,
 } from "date-fns";
 import {
@@ -454,40 +456,41 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
     setInitialReservation(null);
   }, [setInitialReservation]);
 
-  const {
-    startTime: dayStartTime,
-    endTime: dayEndTime,
-  }: { startTime?: string; endTime?: string } = useMemo(() => {
-    const timeframes = filterNonNullable(
-      reservationUnit.reservableTimeSpans
-    ).filter(
-      (n) =>
-        n?.startDatetime != null &&
-        date != null &&
-        isSameDay(new Date(n.startDatetime), date)
-    );
-
-    if (timeframes.length === 0) {
-      return {
-        startTime: undefined,
-        endTime: undefined,
-      };
+  const timeIntervalForDay = useMemo(() => {
+    if (date == null) {
+      return undefined;
     }
 
-    const possibleStartTimes = timeframes
-      .map((n) => n.startDatetime != null && new Date(n.startDatetime))
-      .filter((n): n is Date => n != null);
-    const first = min(possibleStartTimes);
-    const possibleEndTimes = timeframes
-      .map((n) => n.endDatetime && new Date(n.endDatetime))
-      .filter((n): n is Date => n != null);
-    const last = max(possibleEndTimes);
+    // TODO the conversions and null filters should be done before this component (page or SSR)
+    // TODO this is also very similar to the one in QuickReservation
+    const timeframes = filterNonNullable(reservationUnit.reservableTimeSpans)
+      .map((x) => (x.startDatetime && x.endDatetime ? x : null))
+      .filter(
+        (x): x is { startDatetime: string; endDatetime: string } => x != null
+      )
+      .map((x) => ({
+        startDatetime: new Date(x.startDatetime),
+        endDatetime: new Date(x.endDatetime),
+      }))
+      .filter((n) => {
+        if (isSameDay(date, n.startDatetime)) return true;
+        if (isBefore(date, n.startDatetime)) return false;
+        if (isAfter(date, n.endDatetime)) return false;
+        return true;
+      });
+
+    if (timeframes.length === 0) {
+      return undefined;
+    }
 
     return {
-      startTime: first ? first.toISOString() : undefined,
-      endTime: last ? last.toISOString() : undefined,
+      start: min(timeframes.map((n) => n.startDatetime)),
+      end: max(timeframes.map((n) => n.endDatetime)),
     };
   }, [reservationUnit?.reservableTimeSpans, date]);
+
+  const { start: dayStartTime, end: dayEndTime }: { start?: Date; end?: Date } =
+    timeIntervalForDay ?? {};
 
   const startingTimesOptions: OptionType[] = useMemo(() => {
     const durations = durationOptions
@@ -508,8 +511,8 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
     const [endHours, endMinutes] = durationValue.split(":").map(Number);
 
     return getDayIntervals(
-      format(new Date(dayStartTime), "HH:mm"),
-      format(new Date(dayEndTime), "HH:mm"),
+      format(dayStartTime, "HH:mm"),
+      format(dayEndTime, "HH:mm"),
       reservationUnit.reservationStartInterval
     )
       .filter((n) => {
@@ -536,10 +539,9 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
 
   const isReservable = useMemo(
     () =>
-      !!duration &&
-      !!initialReservation &&
-      initialReservation?.begin &&
-      initialReservation?.end &&
+      duration != null &&
+      initialReservation?.begin != null &&
+      initialReservation.end != null &&
       isSlotReservable(
         new Date(initialReservation.begin),
         new Date(initialReservation.end)
@@ -713,7 +715,9 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
                 }
               }}
               options={startingTimesOptions}
-              value={startingTimesOptions.find((n) => n.value === startTime)}
+              value={
+                startingTimesOptions.find((n) => n.value === startTime) ?? null
+              }
             />
             <div data-testid="reservation__input--duration">
               <StyledSelect

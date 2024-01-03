@@ -9,7 +9,6 @@ import {
   getISODay,
   isAfter,
   isBefore,
-  isSameDay,
   isWithinInterval,
   roundToNearestMinutes,
   startOfDay,
@@ -39,7 +38,6 @@ import {
   startOfWeek,
   toUIDate,
 } from "../common/util";
-import { filterNonNullable } from "../helpers";
 
 export const longDate = (date: Date, t: TFunction): string =>
   t("common:dateLong", {
@@ -630,39 +628,6 @@ export const parseTimeframeLength = (begin: string, end: string): string => {
   const endDate = new Date(end);
   const diff = differenceInSeconds(endDate, beginDate);
   return formatSecondDuration(diff);
-};
-
-// Returns an timeslot array (in HH:mm format) with the time-slots that are
-// available for reservation on the given date
-export const getAvailableTimes = (
-  reservationUnit: ReservationUnitByPkType,
-  date: Date
-): string[] => {
-  const allTimes: string[] = [];
-  const { reservableTimeSpans, reservationStartInterval } = reservationUnit;
-  filterNonNullable(reservableTimeSpans)
-    ?.filter(({ startDatetime }) => {
-      if (!startDatetime) return false;
-      const startDate = new Date(startDatetime);
-      return isSameDay(new Date(date), startDate);
-    })
-    ?.forEach((rts) => {
-      if (!rts?.startDatetime || !rts?.endDatetime) return;
-      const intervals = getDayIntervals(
-        format(new Date(rts.startDatetime), "HH:mm"),
-        format(new Date(rts.endDatetime), "HH:mm"),
-        reservationStartInterval
-      );
-
-      const times: string[] = intervals.map((val) => {
-        const [startHours, startMinutes] = val.split(":");
-
-        return `${startHours}:${startMinutes}`;
-      });
-      allTimes.push(...times);
-    });
-
-  return allTimes;
 };
 
 export const getOpenDays = (

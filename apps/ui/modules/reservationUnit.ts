@@ -311,6 +311,17 @@ export const createMockOpeningTimes = (pk: number) => {
       },
     ];
   }
+  if (pk % 3 === 0) {
+    return Array.from(Array(100)).map((_, index) => {
+      const start = toApiDate(addDays(new Date(), index));
+      const end = toApiDate(addDays(new Date(), index));
+      return {
+        startDatetime: `${start}T00:00:00+02:00`,
+        endDatetime: `${end}T23:59:00+02:00`,
+      };
+    });
+  }
+
   return Array.from(Array(100)).map((_, index) => {
     const start = toApiDate(addDays(new Date(), index));
     const end = toApiDate(addDays(new Date(), index));

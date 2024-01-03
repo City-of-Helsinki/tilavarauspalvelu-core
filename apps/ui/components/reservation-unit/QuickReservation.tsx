@@ -5,8 +5,10 @@ import {
   addHours,
   addMinutes,
   differenceInMinutes,
+  format,
   isAfter,
   isBefore,
+  isSameDay,
   isValid,
 } from "date-fns";
 import { DateInput, IconAngleDown, Select, TimeInput } from "hds-react";
@@ -14,7 +16,7 @@ import { padStart } from "lodash";
 import { useTranslation } from "next-i18next";
 import { useLocalStorage } from "react-use";
 import styled from "styled-components";
-import { getAvailableTimes } from "common/src/calendar/util";
+import { getDayIntervals } from "common/src/calendar/util";
 import { chunkArray, toUIDate } from "common/src/common/util";
 import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
 import { fontBold, fontMedium, H4 } from "common/src/common/typography";
@@ -256,16 +258,57 @@ type AvailableTimesProps = {
   reservationUnit?: ReservationUnitByPkType;
 };
 
+// Returns an timeslot array (in HH:mm format) with the time-slots that are
+// available for reservation on the given date
+// TODO should rewrite the timespans to be NonNullable and dates (and do the conversion early, not on each component render)
+function getAvailableTimes(
+  reservableTimeSpans: ReservationUnitByPkType["reservableTimeSpans"],
+  reservationStartInterval: ReservationUnitByPkType["reservationStartInterval"],
+  date: Date
+): string[] {
+  const allTimes: string[] = [];
+  filterNonNullable(reservableTimeSpans)
+    .filter(({ startDatetime, endDatetime }) => {
+      if (!startDatetime) return false;
+      if (!endDatetime) return false;
+      const startDate = new Date(startDatetime);
+      const endDate = new Date(endDatetime);
+      // either we have per day open time, or we have a span of multiple days
+      // another option would be to move the starting time to 00:00
+      if (isSameDay(date, startDate)) return true;
+      if (isBefore(date, startDate)) return false;
+      if (isAfter(date, endDate)) return false;
+      return true;
+    })
+    ?.forEach((rts) => {
+      if (!rts?.startDatetime || !rts?.endDatetime) return;
+      const intervals = getDayIntervals(
+        format(new Date(rts.startDatetime), "HH:mm"),
+        format(new Date(rts.endDatetime), "HH:mm"),
+        reservationStartInterval
+      );
+
+      const times: string[] = intervals.map((val) => {
+        const [startHours, startMinutes] = val.split(":");
+
+        return `${startHours}:${startMinutes}`;
+      });
+      allTimes.push(...times);
+    });
+
+  return allTimes;
+}
+
 // Returns an array of available times for the given duration and day
 // TODO this is really slow (especially if called from a loop)
-const availableTimes = ({
+function availableTimes({
   day,
   duration,
   time,
   isSlotReservable,
   reservationUnit,
   fromStartOfDay = false,
-}: AvailableTimesProps): string[] => {
+}: AvailableTimesProps): string[] {
   if (reservationUnit == null) return [];
   const [durationHours, durationMinutes] =
     duration?.split(":").map(Number) || [];
@@ -274,7 +317,9 @@ const availableTimes = ({
     : (!time ? "0:0" : time).split(":").map(Number);
 
   const timeMinutes = timeMinutesRaw > 59 ? 59 : timeMinutesRaw;
-  return getAvailableTimes(reservationUnit, day)
+  const { reservableTimeSpans: spans, reservationStartInterval: interval } =
+    reservationUnit;
+  return getAvailableTimes(spans, interval, day)
     .map((n) => {
       const [slotHours, slotMinutes] = n.split(":").map(Number);
       const start = new Date(day);
@@ -288,7 +333,7 @@ const availableTimes = ({
         : null;
     })
     .filter((n): n is NonNullable<typeof n> => n != null);
-};
+}
 
 // Returns the next available time, after the given time (Date object)
 const getNextAvailableTime = (
@@ -502,32 +547,22 @@ const QuickReservation = ({
   }, [date, reservationUnit, time, duration, isSlotReservable]);
 
   // the next available time after the selected time
-  const nextAvailableTime = useMemo(
-    () =>
-      reservationUnit != null
-        ? getNextAvailableTime({
-            after: date,
-            time,
-            duration: duration?.value?.toString() ?? "00:00",
-            isSlotReservable,
-            reservationUnit,
-          })
-        : null,
-    [date, reservationUnit, time, duration, isSlotReservable]
-  );
+  const nextAvailableTime = getNextAvailableTime({
+    after: date,
+    time,
+    duration: duration?.value?.toString() ?? "00:00",
+    isSlotReservable,
+    reservationUnit: reservationUnit ?? undefined,
+  });
 
   // the available times for the selected day
-  const dayTimes = useMemo(
-    () =>
-      availableTimes({
-        day: date,
-        time,
-        duration: duration?.value?.toString() ?? "00:00",
-        isSlotReservable,
-        reservationUnit: reservationUnit ?? undefined,
-      }),
-    [date, time, duration, isSlotReservable, reservationUnit]
-  );
+  const dayTimes = availableTimes({
+    day: date,
+    time,
+    duration: duration?.value?.toString() ?? "00:00",
+    isSlotReservable,
+    reservationUnit: reservationUnit ?? undefined,
+  });
 
   if (
     !reservationUnit?.reservableTimeSpans ||

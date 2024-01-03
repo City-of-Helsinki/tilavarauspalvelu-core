@@ -4,7 +4,6 @@ import {
   doBuffersCollide,
   doesBufferCollide,
   doReservationsCollide,
-  getAvailableTimes,
   getBufferedEventTimes,
   getDayIntervals,
   getEventBuffers,
@@ -16,7 +15,6 @@ import {
   isReservationStartInFuture,
   isReservationUnitReservable,
   isSlotWithinReservationTime,
-  isSlotWithinTimeframe,
   isStartTimeWithinInterval,
 } from "../util";
 import {
@@ -76,14 +74,6 @@ test("isReservationLongEnough", () => {
       5400
     )
   ).toBe(true);
-});
-
-test("isSlotWithinTimeframe", () => {
-  expect(isSlotWithinTimeframe(new Date(2021, 9, 9))).toBe(false);
-  expect(isSlotWithinTimeframe(new Date())).toBe(false);
-  expect(isSlotWithinTimeframe(new Date(), undefined, undefined, -1)).toBe(
-    true
-  );
 });
 
 describe("areSlotsReservable", () => {
@@ -1001,70 +991,9 @@ describe("getNormalizedReservationBeginTime", () => {
   });
 });
 
-describe("getAvailableTimes", () => {
-  test("get correct times", () => {
-    const reservableTimeSpans: ReservableTimeSpanType = [
-      {
-        startDatetime: "2022-11-14T04:00:00+02:00",
-        endDatetime: "2022-11-14T20:00:00+02:00",
-      },
-    ];
-
-    expect(
-      getAvailableTimes(
-        {
-          reservableTimeSpans,
-          reservationStartInterval: "INTERVAL_90_MINS",
-        } as ReservationUnitByPkType,
-        new Date("2022-11-14T00:00:00+02:00")
-      )
-    ).toEqual([
-      "04:00",
-      "05:30",
-      "07:00",
-      "08:30",
-      "10:00",
-      "11:30",
-      "13:00",
-      "14:30",
-      "16:00",
-      "17:30",
-      "19:00",
-    ]);
-  });
-
-  test("get correct times", () => {
-    const reservableTimeSpans: ReservableTimeSpanType = [
-      {
-        startDatetime: "2022-11-14T04:00:00+02:00",
-        endDatetime: "2022-11-14T06:00:00+02:00",
-      },
-    ];
-
-    expect(
-      getAvailableTimes(
-        {
-          reservableTimeSpans,
-          reservationStartInterval: "INTERVAL_15_MINS",
-        } as ReservationUnitByPkType,
-        new Date("2022-11-14T00:00:00+02:00")
-      )
-    ).toEqual([
-      "04:00",
-      "04:15",
-      "04:30",
-      "04:45",
-      "05:00",
-      "05:15",
-      "05:30",
-      "05:45",
-    ]);
-  });
-});
-
 describe("getOpenDays", () => {
   test("correct output", () => {
-    const reservableTimeSpans: ReservableTimeSpanType = [
+    const reservableTimeSpans = [
       {
         startDatetime: "2022-09-14T04:00:00+00:00",
         endDatetime: "2022-09-14T06:00:00+00:00",
@@ -1081,7 +1010,7 @@ describe("getOpenDays", () => {
         startDatetime: "2022-08-10T04:00:00+00:00",
         endDatetime: "2022-08-10T06:00:00+00:00",
       },
-    ];
+    ] as ReservableTimeSpanType[];
 
     expect(
       getOpenDays({ reservableTimeSpans } as ReservationUnitByPkType)
