@@ -932,12 +932,14 @@ def test__query_reservation_unit_reservable__filters__application_round(
 
 @freezegun.freeze_time(NOW)
 def test__query_reservation_unit_reservable__reservations__own_reservation(graphql, reservation_unit):
-    ReservationFactory(
+    # 2023-05-20 10:00 - 12:00 (2h)
+    ReservationFactory.create(
         begin=_datetime(day=20, hour=10),
         end=_datetime(day=20, hour=12),
         reservation_unit=[reservation_unit],
     )
 
+    # 2023-05-20 10:00 - 12:00 (2h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(day=20, hour=10),
@@ -957,12 +959,14 @@ def test__query_reservation_unit_reservable__reservations__own_reservation(graph
 def test__query_reservation_unit_reservable__reservations__not_in_common_hierarchy(graphql, reservation_unit):
     reservation_unit_2: ReservationUnit = ReservationUnitFactory()
 
-    ReservationFactory(
+    # 2023-05-20 10:00 - 12:00 (2h)
+    ReservationFactory.create(
         begin=_datetime(day=20, hour=10),
         end=_datetime(day=20, hour=12),
         reservation_unit=[reservation_unit_2],
     )
 
+    # 2023-05-20 10:00 - 12:00 (2h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(day=20, hour=10),
@@ -985,12 +989,14 @@ def test__query_reservation_unit_reservable__reservations__in_common_hierarchy__
     reservation_unit.spaces.set(reservation_unit_2.spaces.all())
     reservation_unit.save()
 
-    ReservationFactory(
+    # 2023-05-20 10:00 - 12:00 (2h)
+    ReservationFactory.create(
         begin=_datetime(day=20, hour=10),
         end=_datetime(day=20, hour=12),
         reservation_unit=[reservation_unit_2],
     )
 
+    # 2023-05-20 10:00 - 12:00 (2h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(day=20, hour=10),
@@ -1008,17 +1014,19 @@ def test__query_reservation_unit_reservable__reservations__in_common_hierarchy__
 
 @freezegun.freeze_time(NOW)
 def test__query_reservation_unit_reservable__reservations__in_common_hierarchy__by_resource(graphql, reservation_unit):
-    reservation_unit_2: ReservationUnit = ReservationUnitFactory(resources=[ResourceFactory()])
+    reservation_unit_2: ReservationUnit = ReservationUnitFactory.create(resources=[ResourceFactory()])
     reservation_unit.unit = reservation_unit_2.unit
     reservation_unit.resources.set(reservation_unit_2.resources.all())
     reservation_unit.save()
 
-    ReservationFactory(
+    # 2023-05-20 10:00 - 12:00 (2h)
+    ReservationFactory.create(
         begin=_datetime(day=20, hour=10),
         end=_datetime(day=20, hour=12),
         reservation_unit=[reservation_unit_2],
     )
 
+    # 2023-05-20 10:00 - 12:00 (2h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(day=20, hour=10),
