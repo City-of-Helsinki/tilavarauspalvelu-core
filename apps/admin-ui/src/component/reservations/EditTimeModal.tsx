@@ -223,8 +223,14 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
   const formEndTime = watch("endTime");
   const formStartTime = watch("startTime");
 
-  const newStartTime = setTimeOnDate(fromUIDate(formDate), formStartTime);
-  const newEndTime = setTimeOnDate(fromUIDate(formDate), formEndTime);
+  const newStartTime = setTimeOnDate(
+    fromUIDate(formDate) ?? new Date(),
+    formStartTime
+  );
+  const newEndTime = setTimeOnDate(
+    fromUIDate(formDate) ?? new Date(),
+    formEndTime
+  );
   const { hasCollisions, isLoading } = useCheckCollisions({
     reservationPk: reservation.pk ?? 0,
     reservationUnitPk: reservationUnit?.pk ?? 0,
@@ -256,8 +262,14 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
 
   const onSubmit = (values: FormValueType) => {
     if (values.date && values.startTime && values.endTime) {
-      const start = setTimeOnDate(fromUIDate(values.date), values.startTime);
-      const end = setTimeOnDate(fromUIDate(values.date), values.endTime);
+      const start = setTimeOnDate(
+        fromUIDate(values.date) ?? new Date(),
+        values.startTime
+      );
+      const end = setTimeOnDate(
+        fromUIDate(values.date) ?? new Date(),
+        values.endTime
+      );
       changeTime(start, end, {
         before: values.bufferTimeBefore ? bufferBefore : 0,
         after: values.bufferTimeAfter ? bufferAfter : 0,

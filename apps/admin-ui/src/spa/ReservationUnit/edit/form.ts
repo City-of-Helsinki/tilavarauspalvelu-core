@@ -67,14 +67,15 @@ const refinePricing = (
         code: z.ZodIssueCode.custom,
       });
     }
-    if (Number.isNaN(fromUIDate(data.begins).getTime())) {
+    const date = fromUIDate(data.begins);
+    if (date == null || Number.isNaN(date.getTime())) {
       ctx.addIssue({
         message: "Invalid date",
         path: [`${path}.begins`],
         code: z.ZodIssueCode.custom,
       });
     }
-    if (fromUIDate(data.begins) < new Date()) {
+    if (date != null && date < new Date()) {
       ctx.addIssue({
         message: "Begin needs to be in the future",
         path: [`${path}.begins`],
@@ -767,6 +768,9 @@ const constructApiDate = (date: string, time: string) => {
     return null;
   }
   const d = fromUIDate(date);
+  if (!d) {
+    return null;
+  }
   const d2 = setTimeOnDate(d, time);
   return d2.toISOString();
 };
@@ -858,7 +862,7 @@ export function transformReservationUnit(
     pricings: filterNonNullable(pricings)
       .filter(shouldSavePricing)
       .map((p) => ({
-        begins: toApiDate(fromUIDate(p.begins)) ?? "",
+        begins: toApiDate(fromUIDate(p.begins) ?? new Date()) ?? "",
         highestPrice: Number(p.highestPrice),
         highestPriceNet: Number(p.highestPriceNet),
         lowestPrice: Number(p.lowestPrice),

@@ -20,7 +20,11 @@ import {
 } from "common/types/gql-types";
 import type { UseFormReturn } from "react-hook-form";
 import type { RecurringReservationForm } from "app/schemas";
-import { toApiDate, fromUIDate, toApiDateUnsafe } from "common/src/common/util";
+import {
+  toApiDate,
+  toApiDateUnsafe,
+  fromUIDateUnsafe,
+} from "common/src/common/util";
 import { addDays } from "date-fns";
 import {
   CollisionInterval,
@@ -354,9 +358,9 @@ export const useCreateRecurringReservation = () => {
 
     const input: RecurringReservationCreateMutationInput = {
       reservationUnitPk: unitPk,
-      beginDate: toApiDateUnsafe(fromUIDate(data.startingDate)),
+      beginDate: toApiDateUnsafe(fromUIDateUnsafe(data.startingDate)),
       beginTime: data.startTime,
-      endDate: toApiDateUnsafe(fromUIDate(data.endingDate)),
+      endDate: toApiDateUnsafe(fromUIDateUnsafe(data.endingDate)),
       endTime: data.endTime,
       weekdays: data.repeatOnDays,
       recurrenceInDays: data.repeatPattern.value === "weekly" ? 7 : 14,

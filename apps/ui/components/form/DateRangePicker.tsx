@@ -1,19 +1,10 @@
-import { type FC, type FocusEvent, useState, useEffect } from "react";
-/* eslint-disable import/no-duplicates */
-import { parse, isBefore } from "date-fns";
-import isValidDate from "date-fns/isValid";
-/* eslint-enable import/no-duplicates */
+import { type FC, useState, useEffect } from "react";
+import { isBefore } from "date-fns";
 import { DateInput } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { toUIDate } from "common/src/common/util";
+import { fromUIDate, toUIDate, isValidDate } from "common/src/common/util";
 import { getLocalizationLang } from "common/src/helpers";
-import { isValidDateString } from "@/modules/util";
-
-const initDate = (date: Date | null): string => {
-  if (date == null) return "";
-  return toUIDate(date);
-};
 
 export interface DateRangePickerProps {
   endDate: Date | null;
@@ -58,9 +49,9 @@ const DateRangePicker: FC<DateRangePickerProps> = ({
   placeholder,
 }) => {
   const [internalStartDateString, setInternalStartDateString] =
-    useState<string>(() => initDate(startDate));
+    useState<string>(() => toUIDate(startDate));
   const [internalEndDateString, setInternalEndDateString] = useState<string>(
-    () => initDate(endDate)
+    () => toUIDate(endDate)
   );
   const [errors, setErrors] = useState({
     startDateIsInvalid: false,
@@ -68,77 +59,59 @@ const DateRangePicker: FC<DateRangePickerProps> = ({
   });
 
   const { t, i18n } = useTranslation();
-  const helperText = t("dateSelector:infoDate");
 
-  const internalStartDate = parse(
-    internalStartDateString,
-    "d.M.yyyy",
-    new Date()
-  );
-  const internalEndDate = parse(internalEndDateString, "d.M.yyyy", new Date());
-  // console.log(internalStartDate, internalStartDateString, internalEndDate, internalEndDateString);
+  // Pass params instead of state because React state updates are async
+  const validateAndUpdateUpstream = ({
+    start,
+    end,
+  }: {
+    start: string;
+    end: string;
+  }) => {
+    const sd = fromUIDate(start);
+    const ed = fromUIDate(end);
 
-  const endDateIsBeforeStartDate =
-    isValidDate(internalStartDate) &&
-    isValidDate(internalEndDate) &&
-    isBefore(internalEndDate, internalStartDate);
-
-  useEffect(() => {
-    const startDateIsValid = isValidDateString(internalStartDateString);
-    const endDateIsValid = isValidDateString(internalEndDateString);
-    const startDateObj = parse(internalStartDateString, "d.M.yyyy", new Date());
-    const endDateObj = parse(internalEndDateString, "d.M.yyyy", new Date());
+    const errs = { startDateIsInvalid: false, endDateIsInvalid: false };
+    if ((sd == null || !isValidDate(sd)) && start !== "") {
+      errs.startDateIsInvalid = true;
+      onChangeStartDate(null);
+    } else {
+      onChangeStartDate(sd || null);
+    }
     if (
-      startDateIsValid &&
-      endDateIsValid &&
-      isBefore(endDateObj, startDateObj)
+      end !== "" &&
+      (ed == null || !isValidDate(ed) || (sd != null && isBefore(ed, sd)))
     ) {
-      onChangeStartDate(startDateObj);
+      errs.endDateIsInvalid = true;
       onChangeEndDate(null);
-      return;
+    } else {
+      onChangeEndDate(ed || null);
     }
-
-    if (startDateIsValid) {
-      setErrors({
-        ...errors,
-        startDateIsInvalid: false,
-      });
-      onChangeStartDate(startDateObj);
-    }
-    if (!startDateIsValid) onChangeStartDate(null);
-
-    if (endDateIsValid) {
-      setErrors({
-        ...errors,
-        endDateIsInvalid: false,
-      });
-      onChangeEndDate(endDateObj);
-    }
-    if (!endDateIsValid) onChangeEndDate(null);
-
-    // ignore change handlers to avoid infinite loops (if func changes on every render)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [internalStartDateString, internalEndDateString, setErrors]);
+    setErrors(errs);
+  };
 
   useEffect(() => {
-    setInternalStartDateString(initDate(startDate));
-    setInternalEndDateString(initDate(endDate));
+    setInternalStartDateString(toUIDate(startDate));
+    setInternalEndDateString(toUIDate(endDate));
   }, [startDate, endDate]);
-  const handleStartDateValidation = (e: FocusEvent<HTMLInputElement>) => {
-    setErrors({
-      ...errors,
-      startDateIsInvalid: !isValidDateString(e.target.value),
+
+  const handleStartDateChange = (date: string) => {
+    setInternalStartDateString(date);
+    validateAndUpdateUpstream({
+      start: date,
+      end: internalEndDateString,
     });
   };
 
-  const handleEndDateValidation = (e: FocusEvent<HTMLInputElement>) => {
-    setErrors({
-      ...errors,
-      endDateIsInvalid: !isValidDateString(e.target.value),
+  const handleEndDateChange = (date: string) => {
+    setInternalEndDateString(date);
+    validateAndUpdateUpstream({
+      start: internalStartDateString,
+      end: date,
     });
   };
 
-  const errorText = (
+  const getErrorText = (
     path: "startDateIsInvalid" | "endDateIsInvalid",
     text: string
   ) => {
@@ -148,13 +121,22 @@ const DateRangePicker: FC<DateRangePickerProps> = ({
     return "";
   };
 
+  const helperText = t("dateSelector:infoDate");
+  const internalStartDate = fromUIDate(internalStartDateString);
+  const internalEndDate = fromUIDate(internalEndDateString);
+
+  const endDateIsBeforeStartDate =
+    internalEndDate != null &&
+    internalStartDate != null &&
+    isBefore(internalEndDate, internalStartDate);
+
   return (
     <Wrapper className="date-range-input__wrapper">
       <DateInput
         autoComplete="off"
         id="start-date"
         value={internalStartDateString}
-        onBlur={handleStartDateValidation}
+        onChange={handleStartDateChange}
         disableConfirmation
         helperText={
           showHelperText && !errors.startDateIsInvalid ? helperText : undefined
@@ -165,8 +147,7 @@ const DateRangePicker: FC<DateRangePickerProps> = ({
         label={labels?.begin ?? t("dateSelector:labelStartDate")}
         aria-label={labels?.ariaBegin ?? t("dateSelector:labelStartDate")}
         language={getLocalizationLang(i18n.language)}
-        onChange={(date) => setInternalStartDateString(date)}
-        errorText={errorText(
+        errorText={getErrorText(
           "startDateIsInvalid",
           t("dateSelector:errorDateFormat")
         )}
@@ -177,7 +158,7 @@ const DateRangePicker: FC<DateRangePickerProps> = ({
         autoComplete="off"
         id="end-date"
         value={internalEndDateString}
-        onBlur={handleEndDateValidation}
+        onChange={handleEndDateChange}
         disableConfirmation
         helperText={
           showHelperText &&
@@ -189,18 +170,20 @@ const DateRangePicker: FC<DateRangePickerProps> = ({
         minDate={limits?.endMinDate ?? new Date()}
         maxDate={limits?.endMaxDate}
         initialMonth={
-          isValidDate(internalStartDate)
-            ? new Date(internalStartDateString)
+          internalStartDate != null && isValidDate(internalStartDate)
+            ? internalStartDate
             : new Date()
         }
         label={labels?.end ?? t("dateSelector:labelEndDate")}
         aria-label={labels?.ariaEnd ?? t("dateSelector:labelEndDate")}
         language={getLocalizationLang(i18n.language)}
-        onChange={(date) => setInternalEndDateString(date)}
         errorText={
           endDateIsBeforeStartDate
             ? t("dateSelector:errorEndDateBeforeStartDate")
-            : errorText("endDateIsInvalid", t("dateSelector:errorDateFormat"))
+            : getErrorText(
+                "endDateIsInvalid",
+                t("dateSelector:errorDateFormat")
+              )
         }
         required={required?.end ?? true}
         placeholder={placeholder?.end ?? t("dateSelector:placeholderEnd")}

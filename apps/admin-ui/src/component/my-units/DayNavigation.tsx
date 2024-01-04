@@ -60,7 +60,9 @@ const DayNavigation = ({ date, onDateChange }: Props): JSX.Element => {
         initialMonth={d}
         language="fi"
         required
-        onChange={(value) => onDateChange({ date: fromUIDate(value) })}
+        onChange={(value) =>
+          onDateChange({ date: fromUIDate(value) ?? new Date() })
+        }
         value={toUIDate(d)}
       />
       <Button

@@ -110,14 +110,15 @@ export const getReservatinUnitPricing = (
 
   reservationUnit.pricings.sort((a, b) =>
     a?.begins && b?.begins
-      ? fromApiDate(a.begins).getTime() - fromApiDate(b.begins).getTime()
+      ? (fromApiDate(a.begins)?.getTime() ?? 0) -
+        (fromApiDate(b.begins)?.getTime() ?? 0)
       : 1
   );
 
   return (
     (reservationUnit.pricings || []) as ReservationUnitPricingType[]
   ).reduce((prev, current) => {
-    if (fromApiDate(current?.begins) < reservationDate) {
+    if ((fromApiDate(current?.begins) ?? 0) < reservationDate) {
       return current;
     }
     return prev;

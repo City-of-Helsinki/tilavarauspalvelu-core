@@ -1,4 +1,4 @@
-import { isAfter, parseISO, isBefore, parse } from "date-fns";
+import { isAfter, parseISO, isBefore } from "date-fns";
 import { i18n, TFunction } from "next-i18next";
 import queryString from "query-string";
 import { trim } from "lodash";
@@ -6,8 +6,9 @@ import { ApolloError } from "@apollo/client";
 import {
   toApiDate,
   toUIDate,
-  isValidDate,
   getTranslation,
+  fromApiDate as fromAPIDate,
+  fromUIDate,
 } from "common/src/common/util";
 import type {
   OptionType,
@@ -28,8 +29,10 @@ import {
 } from "./const";
 import type { LocalizationLanguages } from "common/src/helpers";
 
+export { fromAPIDate, fromUIDate };
 export { getTranslation };
 
+// TODO don't use parseISO unless the function specifies that it only accepts dates as ISO strings
 export const isActive = (startDate: string, endDate: string): boolean => {
   const now = new Date().getTime();
   return (
@@ -38,14 +41,8 @@ export const isActive = (startDate: string, endDate: string): boolean => {
   );
 };
 
-export const parseDate = (date: string): Date => parseISO(date);
-
-// Returns a Date from a string in format "yyyy-MM-dd"
-const fromAPIDate = (date: string): Date => {
-  const d = parse(date, "yyyy-MM-dd", new Date());
-  return d;
-};
-
+// TODO why? where is this used? why not use toUIDate(new Date(string))
+// TODO why return "-" instead of null or ""?
 export const formatDate = (date: string, formatStr?: string): string => {
   if (!date) {
     return "-";
@@ -53,37 +50,35 @@ export const formatDate = (date: string, formatStr?: string): string => {
   return toUIDate(parseISO(date), formatStr);
 };
 
-// Takes a date string in format "yyyy-MM-dd" and returns a Date-object with the same date
-export const fromUIDate = (date: string): Date => {
-  return parse(date, "d.M.yyyy", new Date());
-};
-
 // Takes a date string in format "yyyy-MM-dd" and returns a string in format "d.M.yyyy"
+// @deprecated just use the separate functions
 export const apiDateToUIDate = (date: string): string => {
-  return toUIDate(fromAPIDate(date));
+  const d = fromAPIDate(date);
+  return d ? toUIDate(d) : "";
 };
 
-export const uiDateToApiDate = (date: string): string | undefined => {
+export const uiDateToApiDate = (date: string): string | null => {
+  // TODO this is awful (unspecified special case) but there is probably a use case that depends on it
   if (!date.includes(".")) {
     return date;
   }
-  return toApiDate(fromUIDate(date));
+  const d = fromUIDate(date);
+  if (!d) {
+    return null;
+  }
+  return toApiDate(d);
+};
+
+// @deprecated use toApiDate(new Date(string))
+export const formatApiDate = (date: string): string | null => {
+  if (!date) {
+    return null;
+  }
+  return toApiDate(parseISO(date));
 };
 
 export const capitalize = (s: string): string => {
   return s.charAt(0).toUpperCase() + s.slice(1);
-};
-
-export const isValidDateString = (date: string | null): boolean => {
-  if (!date) return false;
-  return isValidDate(parse(date, "d.M.yyyy", new Date()));
-};
-
-export const formatApiDate = (date: string): string | undefined => {
-  if (!date) {
-    return undefined;
-  }
-  return toApiDate(parseISO(date));
 };
 
 type ParameterType =

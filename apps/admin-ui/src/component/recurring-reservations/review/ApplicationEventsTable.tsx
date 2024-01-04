@@ -95,11 +95,13 @@ const appEventMapper = (
         )
       : 0;
 
+  const begin = appEvent.begin ? fromApiDate(appEvent.begin) : undefined;
+  const end = appEvent.end ? fromApiDate(appEvent.end) : undefined;
   const totalHours =
-    appEvent.begin && appEvent.end
+    begin && end
       ? appEventHours(
-          fromApiDate(appEvent.begin).toISOString(),
-          fromApiDate(appEvent.end).toISOString(),
+          begin.toISOString(),
+          end.toISOString(),
           appEvent.biweekly,
           appEvent.eventsPerWeek ?? 0,
           appEvent.minDuration ?? 0

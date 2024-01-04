@@ -71,7 +71,6 @@ import {
   formatDurationMinutes,
   getTranslation,
   isTouchDevice,
-  parseDate,
   printErrorMessages,
 } from "@/modules/util";
 import {
@@ -742,8 +741,8 @@ const ReservationUnit = ({
                 ? `${t("reservationCalendar:prefixForCancelled")}: `
                 : suffix
             }`,
-            start: n.begin != null ? parseDate(n.begin) : new Date(),
-            end: n.end != null ? parseDate(n.end) : new Date(),
+            start: n.begin != null ? new Date(n.begin) : new Date(),
+            end: n.end != null ? new Date(n.end) : new Date(),
             allDay: false,
             // TODO refactor and remove modifying the state
             event: n as ReservationType,

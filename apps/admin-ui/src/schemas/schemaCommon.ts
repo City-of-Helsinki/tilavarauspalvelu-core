@@ -13,7 +13,7 @@ export const OptionSchema = z.object({
 });
 
 export const checkDateNotInPast = (
-  date: Date | undefined,
+  date: Date | null,
   ctx: z.RefinementCtx,
   path: string
 ): void => {
@@ -27,7 +27,7 @@ export const checkDateNotInPast = (
 };
 
 export const checkDateWithinThreeYears = (
-  date: Date | undefined,
+  date: Date | null,
   ctx: z.RefinementCtx,
   path: string
 ): void => {
@@ -45,7 +45,7 @@ export const checkDateWithinThreeYears = (
 
 // TODO doesn't check for valid days or months i.e. 2024-02-31 and 2024-13-41 are valid
 export const checkValidDate = (
-  date: Date | undefined,
+  date: Date | null,
   ctx: z.RefinementCtx,
   path: string
 ): void => {
@@ -66,7 +66,7 @@ export const checkValidDate = (
 };
 
 export const checkValidFutureDate = (
-  date: Date | undefined,
+  date: Date | null,
   ctx: z.RefinementCtx,
   path: string
 ): void => {

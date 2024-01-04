@@ -196,8 +196,8 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
   const checkedReservations = useFilteredReservationList({
     items: newReservations.reservations,
     reservationUnitPk: reservationUnit?.pk ?? undefined,
-    begin: fromUIDate(getValues("startingDate")),
-    end: fromUIDate(getValues("endingDate")),
+    begin: fromUIDate(getValues("startingDate")) ?? new Date(),
+    end: fromUIDate(getValues("endingDate")) ?? new Date(),
     reservationType: reservationType as ReservationsReservationTypeChoices,
   });
 

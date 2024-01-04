@@ -12,7 +12,7 @@ import {
 } from "common/types/gql-types";
 import styled from "styled-components";
 import { camelCase, get } from "lodash";
-import { format } from "date-fns";
+import { format, isValid as isDateValid } from "date-fns";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ErrorBoundary } from "react-error-boundary";
 import {
@@ -108,16 +108,17 @@ const useCheckFormCollisions = ({
       ? reservationUnit.bufferTimeAfter
       : 0;
 
+  const d = fromUIDate(formDate);
   const { hasCollisions } = useCheckCollisions({
     reservationPk: undefined,
     reservationUnitPk: reservationUnit?.pk ?? 0,
     start:
-      formDate && formStartTime
-        ? setTimeOnDate(fromUIDate(formDate), formStartTime)
+      d && isDateValid(d) && formStartTime
+        ? setTimeOnDate(d, formStartTime)
         : undefined,
     end:
-      formDate && formEndTime
-        ? setTimeOnDate(fromUIDate(formDate), formEndTime)
+      d && isDateValid(d) && formEndTime
+        ? setTimeOnDate(d, formEndTime)
         : undefined,
     buffers: {
       before: bufferBeforeSeconds,

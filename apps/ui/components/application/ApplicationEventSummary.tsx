@@ -4,7 +4,7 @@ import React from "react";
 import { Trans, useTranslation, TFunction } from "next-i18next";
 import styled from "styled-components";
 import { H5 } from "common/src/common/typography";
-import { fromUIDate } from "../../modules/util";
+import { fromUIDate } from "common/src/common/util";
 import IconWithText from "../common/IconWithText";
 import { ApplicationEventFormValue } from "./Form";
 
@@ -46,9 +46,12 @@ const numHours = (
   if (!startDate || !endDate) {
     return 0;
   }
-  const numWeeks =
-    differenceInWeeks(fromUIDate(endDate), fromUIDate(startDate)) /
-    (biweekly ? 2 : 1);
+  const sd = fromUIDate(startDate);
+  const ed = fromUIDate(endDate);
+  if (!sd || !ed) {
+    return 0;
+  }
+  const numWeeks = differenceInWeeks(ed, sd) / (biweekly ? 2 : 1);
 
   const hours = (numWeeks * eventsPerWeek * minDurationMinutes) / 60;
   return hours;

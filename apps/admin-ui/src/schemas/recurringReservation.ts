@@ -60,10 +60,10 @@ export const RecurringReservationFormSchema = z
     }
   );
 
-const convertToDate = (date?: string): Date | undefined =>
-  date ? fromUIDate(date) : undefined;
+const convertToDate = (date?: string): Date | null =>
+  date ? fromUIDate(date) : null;
 
-const dateIsBefore = (date?: Date, other?: Date) =>
+const dateIsBefore = (date: Date | null, other: Date | null) =>
   date && other && date.getTime() < other.getTime();
 
 export const timeSelectionSchema = (

@@ -37,6 +37,18 @@ export type ApplicationEventScheduleFormType = z.infer<
   typeof ApplicationEventScheduleFormTypeSchema
 >;
 
+function lessThanMaybeDate(a?: string | null, b?: string | null): boolean {
+  if (a == null || b == null) {
+    return false;
+  }
+  const aDate = fromUIDate(a);
+  const bDate = fromUIDate(b);
+  if (aDate == null || bDate == null) {
+    return false;
+  }
+  return aDate < bDate;
+}
+
 const ApplicationEventFormValueSchema = z
   .object({
     pk: z.number().optional(),
@@ -68,7 +80,7 @@ const ApplicationEventFormValueSchema = z
     path: ["maxDuration"],
     message: "Maximum duration must be greater than minimum duration",
   })
-  .refine((s) => s.begin && s.end && fromUIDate(s.begin) < fromUIDate(s.end), {
+  .refine((s) => lessThanMaybeDate(s.begin, s.end), {
     path: ["end"],
     message: "End date must be after begin date",
   });
@@ -234,10 +246,16 @@ export type ApplicationFormValues = z.infer<typeof ApplicationFormSchema>;
 
 /// form -> API transformers, enforce return types so API changes cause type errors
 
-const transformDateString = (date?: string | null): string | undefined =>
-  date != null && toApiDate(fromUIDate(date)) != null
-    ? toApiDate(fromUIDate(date))
-    : undefined;
+function transformDateString(date?: string | null): string | null {
+  if (date == null) {
+    return null;
+  }
+  const d = fromUIDate(date);
+  if (d != null) {
+    return toApiDate(d);
+  }
+  return null;
+}
 
 type ApplicationEventScheduleFormValues = Omit<
   NonNullable<

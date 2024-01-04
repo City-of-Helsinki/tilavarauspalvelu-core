@@ -86,37 +86,55 @@ export const formatSecondDuration = (
 
 // Returns a string in specified format (default: "yyyy-MM-dd") from a Date object,
 // pass a format string as a second parameter to change the format
-export const toApiDate = (
-  date: Date,
-  formatStr = "yyyy-MM-dd"
-): string | undefined => {
+// TODO rename to API
+export function toApiDate(date: Date, formatStr = "yyyy-MM-dd"): string | null {
   if (!date || Number.isNaN(date.getTime())) {
-    return undefined;
+    return null;
   }
   try {
     return format(date, formatStr);
   } catch (e) {
-    return undefined;
+    return null;
   }
-};
+}
 
 // May crash on invalid dates
+// TODO rename to API
 export const toApiDateUnsafe = (date: Date, formatStr = "yyyy-MM-dd") =>
   format(date, formatStr);
 
-// Returns a Date object from a string in format "yyyy-MM-dd"
-export const fromApiDate = (date: string): Date =>
-  parse(date, "yyyy-MM-dd", new Date());
+// Returns a Date from a string in format "yyyy-MM-dd"
+// TODO rename to API
+export function fromApiDate(date: string): Date | null {
+  try {
+    return parse(date, "yyyy-MM-dd", new Date());
+  } catch (e) {
+    return null;
+  }
+}
+
+export function fromUIDateUnsafe(date: string): Date {
+  return parse(date, "d.M.yyyy", new Date());
+}
 
 // Returns a Date object from a string in format "d.M.yyyy"
-export const fromUIDate = (date: string): Date =>
-  parse(date, "d.M.yyyy", new Date());
+export function fromUIDate(date: string): Date | null {
+  try {
+    return parse(date, "d.M.yyyy", new Date());
+  } catch (e) {
+    return null;
+  }
+}
 
+// Returns true if the date is not NaN and after year 1000
+// this is used to check date after string conversion
+// another option: combine it to the date conversion functions (return null on invalid dates) => better with TS
 export const isValidDate = (date: Date): boolean =>
   isValid(date) && isAfter(date, new Date("1000-01-01"));
 
 // Returns a string in "d.M.yyyy" format from a Date object
-export const toUIDate = (date: Date, formatStr = "d.M.yyyy"): string => {
+// TODO returning undefined would be preferably (specificity) but breaks the users of this function
+export const toUIDate = (date: Date | null, formatStr = "d.M.yyyy"): string => {
   if (!date || !isValidDate(date)) {
     return "";
   }
