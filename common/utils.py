@@ -1,5 +1,4 @@
 from collections.abc import Sequence
-from datetime import datetime, timedelta
 from typing import Any, Literal
 
 from django.conf import settings
@@ -11,8 +10,6 @@ __all__ = [
     "get_field_to_related_field_mapping",
     "get_nested",
     "get_translation_fields",
-    "timedelta_from_json",
-    "timedelta_to_json",
 ]
 
 
@@ -42,19 +39,6 @@ def get_nested(obj: dict | list | None, /, *args: str | int, default: Any = None
 
     obj = obj or {}
     return get_nested(obj.get(arg), *args, default=default)
-
-
-def timedelta_to_json(delta: timedelta) -> str:
-    return str(delta).zfill(8)
-
-
-def timedelta_from_json(delta: str) -> timedelta:
-    try:
-        time_ = datetime.strptime(delta, "%H:%M:%S")
-    except ValueError:
-        time_ = datetime.strptime(delta, "%H:%M")
-
-    return timedelta(hours=time_.hour, minutes=time_.minute, seconds=time_.second)
 
 
 def comma_sep_str(values: Sequence[str]) -> str:
