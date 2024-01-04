@@ -58,7 +58,12 @@ class Space(MPTTModel):
         base_manager_name = "objects"
 
     def __str__(self) -> str:
-        return f"{self.name} ({getattr(self.building, 'name', '')})"
+        value = self.name
+        if self.building is not None:
+            value += f" ({self.building.name})"
+        if self.unit is not None:
+            value += f", {self.unit.name}"
+        return value
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
