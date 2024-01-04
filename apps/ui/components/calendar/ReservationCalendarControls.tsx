@@ -4,7 +4,6 @@ import styled, { CSSProperties } from "styled-components";
 import {
   differenceInMinutes,
   differenceInSeconds,
-  format,
   isValid,
   max,
   min,
@@ -13,6 +12,7 @@ import {
   isBefore,
   isAfter,
   isSameDay,
+  startOfDay,
 } from "date-fns";
 import {
   Button,
@@ -22,7 +22,7 @@ import {
   IconCross,
   Select,
 } from "hds-react";
-import { maxBy, trim, trimStart } from "lodash";
+import { maxBy, trim } from "lodash";
 import { CalendarEvent } from "common/src/calendar/Calendar";
 import {
   convertHMSToSeconds,
@@ -35,7 +35,6 @@ import {
   RoundPeriod,
   doBuffersCollide,
   doReservationsCollide,
-  getDayIntervals,
   isRangeReservable,
 } from "common/src/calendar/util";
 import type { OptionType, PendingReservation } from "common/types/common";
@@ -50,7 +49,10 @@ import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
 import { MediumButton, truncatedText } from "@/styles/util";
 import { ReservationProps } from "@/context/DataContext";
 import { getDurationOptions } from "@/modules/reservation";
-import { getReservationUnitPrice } from "@/modules/reservationUnit";
+import {
+  getPossibleTimesForDay,
+  getReservationUnitPrice,
+} from "@/modules/reservationUnit";
 import LoginFragment from "../LoginFragment";
 import { useDebounce } from "@/hooks/useDebounce";
 import { capitalize, formatDurationMinutes } from "@/modules/util";
@@ -492,7 +494,8 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
   const { start: dayStartTime, end: dayEndTime }: { start?: Date; end?: Date } =
     timeIntervalForDay ?? {};
 
-  // FIXME there is an issue with pk 110 (no startTime available), others work
+  // TODO this doesn't respect the duration selection and vice versa
+  // so there are error situations where the duration and startTime are selectable but invalid
   const startingTimesOptions: OptionType[] = useMemo(() => {
     const durations = durationOptions
       .filter((n) => n.label !== "")
@@ -511,28 +514,28 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
 
     const [endHours, endMinutes] = durationValue.split(":").map(Number);
 
-    return getDayIntervals(
-      format(dayStartTime, "HH:mm"),
-      format(dayEndTime, "HH:mm"),
-      reservationUnit.reservationStartInterval
-    )
-      .filter((n) => {
+    // TODO this is very similar to the one in QuickReservation
+    const { reservableTimeSpans: spans, reservationStartInterval: interval } =
+      reservationUnit;
+    return getPossibleTimesForDay(spans, interval, date)
+      .map((n) => {
         const [hours, minutes] = n.split(":").map(Number);
-        if (hours == null || minutes == null) return false;
-
-        const d = new Date(date);
-        d.setHours(hours, minutes);
-        const e = addMinutes(d, endHours * 60 + endMinutes);
-        return isSlotReservable(d, e);
+        if (hours == null || minutes == null) return null;
+        const start = new Date(date);
+        start.setHours(hours, minutes);
+        const e = addMinutes(start, endHours * 60 + endMinutes);
+        return isSlotReservable(start, e) ? n : null;
       })
+      .filter((n): n is NonNullable<typeof n> => n != null)
+      .map((n) => (n.startsWith("0") ? n.substring(1) : n))
       .map((n) => ({
-        label: trimStart(n.substring(0, 5), "0"),
-        value: trimStart(n.substring(0, 5), "0"),
+        label: n,
+        value: n,
       }));
   }, [
     dayStartTime,
     dayEndTime,
-    reservationUnit.reservationStartInterval,
+    reservationUnit,
     durationOptions,
     isSlotReservable,
     date,
@@ -688,7 +691,11 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
           <Content className={state} $isAnimated={isAnimated}>
             <DateInput
               onChange={(val, valueAsDate) => {
-                if (!val || !isValid(valueAsDate) || valueAsDate < new Date()) {
+                if (
+                  !val ||
+                  !isValid(valueAsDate) ||
+                  valueAsDate < startOfDay(new Date())
+                ) {
                   setInitialReservation(null);
                 } else {
                   setDate(valueAsDate);
