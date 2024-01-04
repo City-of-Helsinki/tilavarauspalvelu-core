@@ -1155,3 +1155,47 @@ def test__query_reservation_unit_reservable__reservations__start_and_end_same_da
         "isClosed": False,
         "firstReservableDatetime": None,
     }
+
+
+@freezegun.freeze_time(datetime(2024, 1, 4, tzinfo=DEFAULT_TIMEZONE))
+def test__query_reservation_unit_reservable__reservations__filter_start_time_at_reservation_start(
+    graphql,
+    reservation_unit,
+):
+    """
+    This is a regression test for a bug that was found during manual testing.
+    Simply recreate the exact scenario instead of using the above test cases.
+    """
+    reservation_unit.reservation_start_interval = ReservationUnit.RESERVATION_START_INTERVAL_30_MINUTES
+    reservation_unit.save()
+
+    # Monday | 2024-01-09 | 14:00 - 15:30 (1.5h)
+    ReservationFactory.create(
+        begin=_datetime(year=2024, month=1, day=9, hour=14),
+        end=_datetime(year=2024, month=1, day=9, hour=15, minute=30),
+        reservation_unit=[reservation_unit],
+    )
+
+    # Monday | 2024-01-09 | 08:00 - 20:30 (12.5h)
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(year=2024, month=1, day=9, hour=8),
+        end_datetime=_datetime(year=2024, month=1, day=9, hour=20, minute=30),
+    )
+
+    query = reservation_units_reservable_query(
+        reservable_date_start="2024-01-09",
+        reservable_date_end="2024-01-09",
+        reservable_time_start="14:00:00",
+        reservable_time_end="18:00:00",
+        reservable_minimum_duration_minutes=60,
+    )
+
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {
+        "isClosed": False,
+        "firstReservableDatetime": _datetime(year=2024, month=1, day=9, hour=15, minute=30).isoformat(),
+    }
