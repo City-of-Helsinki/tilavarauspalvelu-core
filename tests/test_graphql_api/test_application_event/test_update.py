@@ -4,7 +4,7 @@ import pytest
 
 from applications.choices import ApplicationEventStatusChoice
 from applications.models import ApplicationEvent
-from common.utils import timedelta_from_json
+from common.date_utils import timedelta_from_json
 from tests.factories import ApplicationEventFactory, EventReservationUnitFactory
 from tests.test_graphql_api.test_application_event.helpers import UPDATE_MUTATION, get_application_event_update_data
 

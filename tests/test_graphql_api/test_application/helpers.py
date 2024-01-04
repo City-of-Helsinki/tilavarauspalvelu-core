@@ -4,7 +4,7 @@ from typing import Any
 
 from applications.choices import ApplicantTypeChoice, WeekdayChoice
 from applications.models import Application, ApplicationRound
-from common.utils import timedelta_to_json
+from common.date_utils import timedelta_to_json
 from tests.factories import (
     AbilityGroupFactory,
     AgeGroupFactory,
