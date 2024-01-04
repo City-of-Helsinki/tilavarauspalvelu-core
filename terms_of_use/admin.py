@@ -28,3 +28,5 @@ class TermsOfUseAdminForm(ModelForm):
 class TermsOfUseAdmin(admin.ModelAdmin):
     model = TermsOfUse
     form = TermsOfUseAdminForm
+    list_display = ("__str__", "terms_type")
+    list_filter = ("terms_type",)
