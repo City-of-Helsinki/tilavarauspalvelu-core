@@ -120,7 +120,7 @@ export const areReservableTimesAvailable = (
     const endDate = new Date(endDatetime);
 
     if (validateEnding) {
-      return startDate <= slotDate && endDate >= slotDate;
+      return startDate <= slotDate && endDate > slotDate;
     }
     return startDate <= slotDate;
   });
@@ -139,26 +139,19 @@ export const isSlotWithinReservationTime = (
 
 export const isSlotWithinTimeframe = (
   start: Date,
-  reservationsMinDaysBefore: number,
-  reservationsMaxDaysBefore: number,
+  minDaysBefore: number,
+  maxDaysBefore: number,
   reservationBegins?: Date,
   reservationEnds?: Date
 ) => {
   const isLegalTimeframe =
     isAfter(start, new Date()) &&
     isSlotWithinReservationTime(start, reservationBegins, reservationEnds);
-  const latest = addDays(new Date(), reservationsMaxDaysBefore);
+  const maxDay = addDays(new Date(), maxDaysBefore);
   // if max days === 0 => latest = today
-  const isBeforeMaxDaysBefore =
-    reservationsMaxDaysBefore === 0 || !isAfter(start, latest);
-  const earliestReservationStart = addDays(
-    new Date(),
-    reservationsMinDaysBefore
-  );
-  const isAfterMinDaysBefore = !isBefore(
-    start,
-    startOfDay(earliestReservationStart)
-  );
+  const isBeforeMaxDaysBefore = maxDaysBefore === 0 || !isAfter(start, maxDay);
+  const minDay = addDays(new Date(), minDaysBefore);
+  const isAfterMinDaysBefore = !isBefore(start, startOfDay(minDay));
   return isLegalTimeframe && isAfterMinDaysBefore && isBeforeMaxDaysBefore;
 };
 
