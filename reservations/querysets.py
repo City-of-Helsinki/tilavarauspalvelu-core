@@ -5,19 +5,16 @@ from typing import Annotated, Any, Self
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models import DurationField, F, Manager, Q, QuerySet, Sum
 from django.db.models.functions import Coalesce
-from django.utils import timezone
-from django.utils.timezone import get_current_timezone
 from helsinki_gdpr.models import SerializableMixin
 
 from applications.models import ApplicationRound
+from common.date_utils import local_datetime
 from common.db import ArrayRemove
 from merchants.models import OrderStatus
 from opening_hours.utils.reservable_time_span_client import TimeSpanElement
 from reservation_units.models import ReservationUnit
 from reservation_units.querysets import ReservationUnitQuerySet
 from reservations.choices import ReservationStateChoice
-
-DEFAULT_TIMEZONE = get_current_timezone()
 
 ReservationUnitPK = Annotated[int, "ReservationUnit PK"]
 SpacePK = Annotated[int, "Space PK"]
@@ -180,12 +177,12 @@ class ReservationQuerySet(QuerySet):
         )
 
     def active(self: Self) -> Self:
-        return self.going_to_occur().filter(end__gte=timezone.now())
+        return self.going_to_occur().filter(end__gte=local_datetime())
 
     def inactive(self: Self, older_than_minutes: int) -> Self:
         return self.filter(
             state=ReservationStateChoice.CREATED,
-            created_at__lte=timezone.localtime() - timedelta(minutes=older_than_minutes),
+            created_at__lte=local_datetime() - timedelta(minutes=older_than_minutes),
         )
 
     def with_same_components(
@@ -207,7 +204,7 @@ class ReservationQuerySet(QuerySet):
             state=ReservationStateChoice.WAITING_FOR_PAYMENT,
             payment_order__remote_id__isnull=False,
             payment_order__status__in=[OrderStatus.EXPIRED, OrderStatus.CANCELLED],
-            payment_order__created_at__lte=timezone.localtime() - timedelta(minutes=older_than_minutes),
+            payment_order__created_at__lte=local_datetime() - timedelta(minutes=older_than_minutes),
         )
 
 

@@ -7,20 +7,25 @@ from typing import TYPE_CHECKING, Self
 
 from django.db import models
 from django.db.models import Case, Prefetch, Q, Value, When
-from django.utils import timezone
-from django.utils.timezone import get_default_timezone
 from elasticsearch_django.models import SearchResultsQuerySet
 
 from applications.choices import ApplicationRoundStatusChoice
 from applications.models import ApplicationRound
+from common.date_utils import (
+    combine,
+    local_datetime,
+    local_datetime_max,
+    local_datetime_min,
+    local_time_min,
+    local_timezone,
+    times_equal,
+)
 from opening_hours.models import ReservableTimeSpan
 from opening_hours.utils.reservable_time_span_client import TimeSpanElement, override_reservable_with_closed_time_spans
 
 if TYPE_CHECKING:
     from reservation_units.models import ReservationUnit
 
-
-DEFAULT_TIMEZONE = get_default_timezone()
 
 ReservationUnitPK = int
 
@@ -34,11 +39,12 @@ INTERVAL_TO_MINUTES: dict[str, int] = {
 
 def _get_hard_closed_time_spans_for_reservation_unit(reservation_unit: "ReservationUnit") -> list[TimeSpanElement]:
     reservation_unit_closed_time_spans: list[TimeSpanElement] = []
+    local_tz = local_timezone()
 
     if reservation_unit.reservation_begins:
         reservation_unit_closed_time_spans.append(
             TimeSpanElement(
-                start_datetime=datetime.min.replace(tzinfo=DEFAULT_TIMEZONE),
+                start_datetime=datetime.min.replace(tzinfo=local_tz),
                 end_datetime=reservation_unit.reservation_begins,
                 is_reservable=False,
             )
@@ -47,7 +53,7 @@ def _get_hard_closed_time_spans_for_reservation_unit(reservation_unit: "Reservat
         reservation_unit_closed_time_spans.append(
             TimeSpanElement(
                 start_datetime=reservation_unit.reservation_ends,
-                end_datetime=datetime.max.replace(tzinfo=DEFAULT_TIMEZONE),
+                end_datetime=datetime.max.replace(tzinfo=local_tz),
                 is_reservable=False,
             )
         )
@@ -56,7 +62,7 @@ def _get_hard_closed_time_spans_for_reservation_unit(reservation_unit: "Reservat
         reservation_unit_closed_time_spans.append(
             TimeSpanElement(
                 start_datetime=reservation_unit.publish_ends,
-                end_datetime=datetime.max.replace(tzinfo=DEFAULT_TIMEZONE),
+                end_datetime=datetime.max.replace(tzinfo=local_tz),
                 is_reservable=False,
             )
         )
@@ -65,13 +71,8 @@ def _get_hard_closed_time_spans_for_reservation_unit(reservation_unit: "Reservat
     for application_round in reservation_unit.application_rounds.all():
         reservation_unit_closed_time_spans.append(
             TimeSpanElement(
-                start_datetime=datetime.combine(
-                    application_round.reservation_period_begin, time.min, tzinfo=DEFAULT_TIMEZONE
-                ),
-                end_datetime=datetime.combine(
-                    application_round.reservation_period_end, time.min, tzinfo=DEFAULT_TIMEZONE
-                )
-                + timedelta(days=1),
+                start_datetime=combine(application_round.reservation_period_begin, local_time_min()),
+                end_datetime=combine(application_round.reservation_period_end, local_time_min()) + timedelta(days=1),
                 is_reservable=False,
             )
         )
@@ -80,16 +81,18 @@ def _get_hard_closed_time_spans_for_reservation_unit(reservation_unit: "Reservat
 
 
 def _get_soft_closed_time_spans_for_reservation_unit(reservation_unit: "ReservationUnit") -> list[TimeSpanElement]:
-    now = timezone.localtime()
+    now = local_datetime()
     reservation_unit_closed_time_spans: list[TimeSpanElement] = []
 
     if reservation_unit.reservations_min_days_before:
         # Minimum days before is calculated from the start of the day
         reservation_unit_closed_time_spans.append(
             TimeSpanElement(
-                start_datetime=datetime.min.replace(tzinfo=DEFAULT_TIMEZONE),
-                end_datetime=datetime.combine(now.date(), time.min, tzinfo=DEFAULT_TIMEZONE)
-                + timedelta(days=reservation_unit.reservations_min_days_before),
+                start_datetime=local_datetime_min(),
+                end_datetime=(
+                    combine(now.date(), local_time_min())
+                    + timedelta(days=reservation_unit.reservations_min_days_before)
+                ),
                 is_reservable=False,
             )
         )
@@ -97,7 +100,7 @@ def _get_soft_closed_time_spans_for_reservation_unit(reservation_unit: "Reservat
         reservation_unit_closed_time_spans.append(
             TimeSpanElement(
                 start_datetime=now + timedelta(days=reservation_unit.reservations_max_days_before),
-                end_datetime=datetime.max.replace(tzinfo=DEFAULT_TIMEZONE),
+                end_datetime=local_datetime_max(),
                 is_reservable=False,
             )
         )
@@ -122,21 +125,21 @@ def _get_closed_time_spans_for_time_span(
 
     # Loop through every day between the start and end date of this time span
     for day in time_span.get_dates_range():
-        # Add closed time spans for the time range outside of the given filter range
+        # Add closed time spans for the time range outside the given filter range
         # e.g. Filter time range is 10:00-14:00, add closed time spans for 00:00-10:00 and 14:00-00:00
-        if filter_time_start and filter_time_start != time.min:
+        if filter_time_start and not times_equal(filter_time_start, local_time_min()):
             closed_time_spans.append(
                 TimeSpanElement(
-                    start_datetime=datetime.combine(day, time.min, tzinfo=DEFAULT_TIMEZONE),
-                    end_datetime=datetime.combine(day, filter_time_start, tzinfo=DEFAULT_TIMEZONE),
+                    start_datetime=combine(day, local_time_min()),
+                    end_datetime=combine(day, filter_time_start),
                     is_reservable=False,
                 )
             )
-        if filter_time_end and filter_time_end != time.min:
+        if filter_time_end and not times_equal(filter_time_end, local_time_min()):
             closed_time_spans.append(
                 TimeSpanElement(
-                    start_datetime=datetime.combine(day, filter_time_end, tzinfo=DEFAULT_TIMEZONE),
-                    end_datetime=datetime.combine(day, time.min, tzinfo=DEFAULT_TIMEZONE) + timedelta(days=1),
+                    start_datetime=combine(day, filter_time_end),
+                    end_datetime=combine(day, local_time_min()) + timedelta(days=1),
                     is_reservable=False,
                 )
             )
@@ -159,10 +162,8 @@ def _get_next_valid_start_datetime(
     """
     interval = INTERVAL_TO_MINUTES[reservation_unit.reservation_start_interval]
 
-    if filter_time_start and selected_start_datetime.time() < filter_time_start:
-        selected_start_datetime = datetime.combine(
-            selected_start_datetime.date(), filter_time_start, tzinfo=DEFAULT_TIMEZONE
-        )
+    if filter_time_start and selected_start_datetime.timetz() < filter_time_start:
+        selected_start_datetime = combine(selected_start_datetime.date(), filter_time_start)
 
     delta_minutes = (selected_start_datetime - time_span.start_datetime).total_seconds() / 60
     delta_to_next_interval = timedelta(minutes=interval) * ceil(delta_minutes / interval)
@@ -171,7 +172,7 @@ def _get_next_valid_start_datetime(
 
 class ReservationUnitQuerySet(SearchResultsQuerySet):
     def scheduled_for_publishing(self):
-        now = datetime.now(tz=DEFAULT_TIMEZONE)
+        now = local_datetime()
         return self.filter(
             Q(is_archived=False, is_draft=False)
             & (
@@ -227,7 +228,8 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
         """
         from reservations.models import Reservation
 
-        now = timezone.localtime()
+        now = local_datetime()
+        local_tz = now.tzinfo
         today = now.date()
         two_years_from_now = today + timedelta(days=731)  # 2 years + 1 day as a buffer
 
@@ -240,10 +242,11 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
         if filter_date_end is None:
             filter_date_end = two_years_from_now
 
+        # Time inputs without timezone information are interpreted as local time
         if filter_time_start is not None:
-            filter_time_start = filter_time_start.replace(tzinfo=DEFAULT_TIMEZONE)
+            filter_time_start = filter_time_start.replace(tzinfo=local_tz)
         if filter_time_end is not None:
-            filter_time_end = filter_time_end.replace(tzinfo=DEFAULT_TIMEZONE)
+            filter_time_end = filter_time_end.replace(tzinfo=local_tz)
 
         ##########################
         # Validate filter values #
@@ -305,13 +308,13 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
         # Closed time spans that are shared by all ReservationUnits
         shared_closed_time_spans: list[TimeSpanElement] = [
             TimeSpanElement(
-                start_datetime=datetime.min.replace(tzinfo=DEFAULT_TIMEZONE),
-                end_datetime=max(datetime.combine(filter_date_start, time.min, tzinfo=DEFAULT_TIMEZONE), now),
+                start_datetime=local_datetime_min(),
+                end_datetime=max(combine(filter_date_start, local_time_min()), now),
                 is_reservable=False,
             ),
             TimeSpanElement(
-                start_datetime=datetime.combine(filter_date_end, time.min, tzinfo=DEFAULT_TIMEZONE) + timedelta(days=1),
-                end_datetime=datetime.max.replace(tzinfo=DEFAULT_TIMEZONE),
+                start_datetime=combine(filter_date_end, local_time_min()) + timedelta(days=1),
+                end_datetime=local_datetime_max(),
                 is_reservable=False,
             ),
         ]
@@ -338,8 +341,8 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
 
             for reservable_time_span in reservation_unit.origin_hauki_resource.reservable_time_spans.all():
                 time_span = TimeSpanElement(
-                    start_datetime=reservable_time_span.start_datetime.astimezone(DEFAULT_TIMEZONE),
-                    end_datetime=reservable_time_span.end_datetime.astimezone(DEFAULT_TIMEZONE),
+                    start_datetime=reservable_time_span.start_datetime.astimezone(local_tz),
+                    end_datetime=reservable_time_span.end_datetime.astimezone(local_tz),
                     is_reservable=True,
                 )
 
@@ -354,8 +357,9 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
                 # This will also split reservable time spans into multiple time spans if needed.
                 # What is left is a list of time spans that are reservable and within the given filter parameters.
                 hard_normalised_time_spans = override_reservable_with_closed_time_spans(
-                    [copy(time_span)],  # Use copy() to avoid changes to the original time span in the function.
-                    hard_closed_time_spans,
+                    # Use copy() to avoid changes to the original time spans in the function.
+                    reservable_time_spans=[copy(time_span)],
+                    closed_time_spans=hard_closed_time_spans,
                 )
 
                 # No reservable time spans left means the ReservationUnit is closed, continue to next ReservableTimeSpan
@@ -380,7 +384,9 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
 
                 # Apply more closed time spans to the normalised time spans to find the first reservable time span.
                 soft_normalised_time_spans = override_reservable_with_closed_time_spans(
-                    hard_normalised_time_spans, soft_closed_time_spans
+                    # Use copy() to avoid changes to the original time spans in the function.
+                    reservable_time_spans=[copy(ts) for ts in hard_normalised_time_spans],
+                    closed_time_spans=soft_closed_time_spans,
                 )
 
                 # Loop through the normalised time spans to find one that is long enough to fit the minimum duration
