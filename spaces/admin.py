@@ -40,6 +40,8 @@ class UnitAdmin(SortableAdminMixin, admin.ModelAdmin):
     inlines = [LocationInline]
     actions = ["update_from_tprek"]
     search_fields = ["name", "tprek_id"]
+    list_display = ("__str__", "payment_merchant", "payment_accounting")
+    list_filter = ("payment_merchant", "payment_accounting")
 
     @admin.action
     def update_from_tprek(self, request, queryset):
