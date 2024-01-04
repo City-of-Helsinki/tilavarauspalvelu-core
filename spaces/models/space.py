@@ -59,8 +59,6 @@ class Space(MPTTModel):
 
     def __str__(self) -> str:
         value = self.name
-        if self.building is not None:
-            value += f" ({self.building.name})"
         if self.unit is not None:
             value += f", {self.unit.name}"
         return value
