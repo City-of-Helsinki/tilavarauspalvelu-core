@@ -60,7 +60,7 @@ class Space(MPTTModel):
     def __str__(self) -> str:
         value = self.name
         if self.unit is not None:
-            value += f", {self.unit.name}"
+            value += f", {self.unit!s}"
         return value
 
     def save(self, *args, **kwargs):
