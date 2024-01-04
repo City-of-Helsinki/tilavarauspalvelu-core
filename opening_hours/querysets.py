@@ -9,20 +9,56 @@ DEFAULT_TIMEZONE = get_default_timezone()
 def _normalize_datetime(value: date | datetime, timedelta_days: int = 0) -> datetime:
     if isinstance(value, datetime):
         return value
+    # Convert dates to datetimes to include timezone information
     return datetime.combine(value, time.min, tzinfo=DEFAULT_TIMEZONE) + timedelta(days=timedelta_days)
 
 
 class ReservableTimeSpanQuerySet(QuerySet):
-    def filter_period(self, start: datetime | date, end: datetime | date):
-        """Filter reservable time spans that overlap with the given period."""
-        # Convert dates to datetimes to include timezone information
+    def overlapping_with_period(self, start: datetime | date, end: datetime | date):
+        """
+        Filter to reservable time spans that overlap with the given period.
+
+                 <---period--->
+        ------  |              |           # No
+        --------|              |           # No
+        --------|--            |           # Yes
+        --------|--------------|           # Yes
+                |              |           #
+                |  ----------  |           # Yes
+                |--------------|           # Yes
+        --------|--------------|--------   # Yes
+                |              |           #
+                |--------------|--------   # Yes
+                |            --|--------   # Yes
+                |              |--------   # No
+                |              |  ------   # No
+        """
         start: datetime = _normalize_datetime(start)
         end: datetime = _normalize_datetime(end, timedelta_days=1)
         return self.filter(start_datetime__lt=end, end_datetime__gt=start)
 
-    def filter_day(self, selected_date: datetime | date):
-        """Filter reservable time spans that overlap with the given date."""
-        return self.filter_period(start=selected_date, end=selected_date)
+    def fully_fill_period(self, start: datetime | date, end: datetime | date):
+        """
+        Filter to reservable time spans that can fully fill in the given period.
+
+                 <---period--->
+        ------  |              |           # No
+        --------|              |           # No
+        --------|--            |           # No
+        --------|--------------|           # Yes
+                |              |           #
+                |  ----------  |           # No
+                |--------------|           # Yes
+        --------|--------------|--------   # Yes
+                |              |           #
+                |--------------|--------   # Yes
+                |            --|--------   # No
+                |              |--------   # No
+                |              |  ------   # No
+        """
+        start: datetime = _normalize_datetime(start)
+        end: datetime = _normalize_datetime(end, timedelta_days=1)
+        return self.filter(start_datetime__lte=start, end_datetime__gte=end)
 
     def truncated_start_and_end_datetimes_for_period(self, start: datetime | date, end: datetime | date):
         """
@@ -33,7 +69,7 @@ class ReservableTimeSpanQuerySet(QuerySet):
         """
         start = _normalize_datetime(start)
         end = _normalize_datetime(end, timedelta_days=1)
-        return self.filter_period(
+        return self.overlapping_with_period(
             start=start,
             end=end,
         ).annotate(

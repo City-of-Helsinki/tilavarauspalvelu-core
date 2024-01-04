@@ -86,7 +86,10 @@ class ReservationUnitReservationScheduler:
         interval_minutes: int,
     ) -> set[datetime]:
         resource = self.reservation_unit.origin_hauki_resource
-        reservable_time_spans: QuerySet[ReservableTimeSpan] = resource.reservable_time_spans.filter_day(selected_date)
+        reservable_time_spans: QuerySet[ReservableTimeSpan] = resource.reservable_time_spans.filter(
+            start_datetime__date=selected_date,
+            end_datetime__date=selected_date,
+        )
 
         possible_start_times = set()
         start_time = datetime.combine(selected_date, time.min, tzinfo=DEFAULT_TIMEZONE)

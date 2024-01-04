@@ -729,7 +729,9 @@ class ReservationUnitByPkType(ReservationUnitType, ReservationUnitWithReservatio
         if not origin_hauki_resource:
             return None
 
-        time_span_qs = origin_hauki_resource.reservable_time_spans.filter_period(start=start_date, end=end_date)
+        time_span_qs = origin_hauki_resource.reservable_time_spans.overlapping_with_period(
+            start=start_date, end=end_date
+        )
         return [
             ReservableTimeSpanType(
                 start_datetime=time_span.start_datetime.astimezone(DEFAULT_TIMEZONE),

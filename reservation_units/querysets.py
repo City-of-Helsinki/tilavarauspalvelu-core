@@ -279,7 +279,7 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
         ).prefetch_related(
             Prefetch(
                 "origin_hauki_resource__reservable_time_spans",
-                ReservableTimeSpan.objects.filter_period(
+                ReservableTimeSpan.objects.overlapping_with_period(
                     start=filter_date_start,
                     end=filter_date_end,
                 ).order_by("start_datetime"),

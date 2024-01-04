@@ -22,7 +22,7 @@ class OriginHaukiResource(models.Model):
         return str(self.id)
 
     def is_reservable(self, start_datetime: datetime, end_datetime: datetime) -> bool:
-        return self.reservable_time_spans.filter_period(start=start_datetime, end=end_datetime).exists()
+        return self.reservable_time_spans.fully_fill_period(start=start_datetime, end=end_datetime).exists()
 
 
 class ReservableTimeSpan(models.Model):
