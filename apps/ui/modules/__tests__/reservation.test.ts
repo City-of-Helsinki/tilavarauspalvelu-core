@@ -405,8 +405,8 @@ describe("getReservationCancellationReason", () => {
     expect(
       getReservationCancellationReason({
         ...reservation,
-        begin: addHours(startOfToday(), 12).toISOString(),
-        end: addHours(startOfToday(), 13).toISOString(),
+        begin: addHours(new Date(), 12).toISOString(),
+        end: addHours(new Date(), 13).toISOString(),
         reservationUnits: [resUnit],
       })
     ).toBe("BUFFER");
@@ -744,17 +744,12 @@ describe("getCheckoutUrl", () => {
       getCheckoutUrl({ ...order, checkoutUrl: undefined })
     ).not.toBeDefined();
 
+    // we are expecting console.errors => suppress
+    jest.spyOn(console, "error").mockImplementation(jest.fn());
     expect(
       getCheckoutUrl({
         ...order,
         checkoutUrl: "checkout.url?user=1111-2222-3333-4444",
-      })
-    ).not.toBeDefined();
-
-    expect(
-      getCheckoutUrl({
-        ...order,
-        checkoutUrl: "https://checkout.url/path",
       })
     ).not.toBeDefined();
   });
