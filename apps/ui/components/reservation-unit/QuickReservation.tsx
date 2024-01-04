@@ -5,19 +5,15 @@ import {
   addHours,
   addMinutes,
   differenceInMinutes,
-  format,
   isAfter,
   isBefore,
-  isSameDay,
   isValid,
-  set,
 } from "date-fns";
 import { DateInput, IconAngleDown, Select, TimeInput } from "hds-react";
 import { padStart } from "lodash";
 import { useTranslation } from "next-i18next";
 import { useLocalStorage } from "react-use";
 import styled from "styled-components";
-import { getDayIntervals } from "common/src/calendar/util";
 import { chunkArray, toUIDate } from "common/src/common/util";
 import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
 import { fontBold, fontMedium, H4 } from "common/src/common/typography";
@@ -26,7 +22,11 @@ import { ReservationUnitByPkType } from "common/types/gql-types";
 import { breakpoints } from "common";
 import { type ReservationProps } from "@/context/DataContext";
 import { getDurationOptions } from "@/modules/reservation";
-import { getReservationUnitPrice } from "@/modules/reservationUnit";
+import {
+  getPossibleTimesForDay,
+  getReservationUnitPrice,
+  isInTimeSpan,
+} from "@/modules/reservationUnit";
 import { formatDate } from "@/modules/util";
 import { MediumButton } from "@/styles/util";
 import Carousel from "../Carousel";
@@ -217,10 +217,28 @@ const ActionWrapper = styled.div`
   justify-content: flex-end;
 `;
 
+function pickMaybeDay(
+  a: Date | undefined,
+  b: Date | undefined,
+  compF: (a: Date, b: Date) => boolean
+): Date | undefined {
+  if (!a) {
+    return b;
+  }
+  if (!b) {
+    return a;
+  }
+  return compF(a, b) ? a : b;
+}
 // Returns a Date object with the first day of the given array of Dates
 function dayMin(days: Array<Date | undefined>): Date | undefined {
   return filterNonNullable(days).reduce<Date | undefined>((acc, day) => {
-    return acc ? (isBefore(acc, day) ? acc : day) : day;
+    return pickMaybeDay(acc, day, isBefore);
+  }, undefined);
+}
+function dayMax(days: Array<Date | undefined>): Date | undefined {
+  return filterNonNullable(days).reduce<Date | undefined>((acc, day) => {
+    return pickMaybeDay(acc, day, isAfter);
   }, undefined);
 }
 
@@ -259,67 +277,9 @@ type AvailableTimesProps = {
   reservationUnit?: ReservationUnitByPkType;
 };
 
-/// Returns true if the given time is 'inside' the time span
-/// inside in this case means it's either the same day or the time span is multiple days
-/// TODO should rewrite this to work on dates since we want to do that conversion first anyway
-function isInTimeSpan(
-  date: Date,
-  timeSpan: NonNullable<ReservationUnitByPkType["reservableTimeSpans"]>[0]
-) {
-  const { startDatetime, endDatetime } = timeSpan ?? {};
-
-  if (!startDatetime) return false;
-  if (!endDatetime) return false;
-  const startDate = new Date(startDatetime);
-  const endDate = new Date(endDatetime);
-  // either we have per day open time, or we have a span of multiple days
-  // another option would be to move the starting time to 00:00
-  if (isSameDay(date, startDate)) return true;
-  if (isBefore(date, startDate)) return false;
-  if (isAfter(date, endDate)) return false;
-  return true;
-}
-
-// Returns an timeslot array (in HH:mm format) with the time-slots that are
-// available for reservation on the given date
-// TODO should rewrite the timespans to be NonNullable and dates (and do the conversion early, not on each component render)
-function getAvailableTimes(
-  reservableTimeSpans: ReservationUnitByPkType["reservableTimeSpans"],
-  reservationStartInterval: ReservationUnitByPkType["reservationStartInterval"],
-  date: Date
-): string[] {
-  const allTimes: string[] = [];
-  filterNonNullable(reservableTimeSpans)
-    .filter((x) => isInTimeSpan(date, x))
-    .forEach((rts) => {
-      if (!rts?.startDatetime || !rts?.endDatetime) return;
-      const begin = isSameDay(new Date(rts.startDatetime), date)
-        ? new Date(rts.startDatetime)
-        : set(date, { hours: 0, minutes: 0 });
-      const end = isSameDay(new Date(rts.endDatetime), date)
-        ? new Date(rts.endDatetime)
-        : set(date, { hours: 23, minutes: 59 });
-      // TODO I hate this function, don't manipulate strings
-      const intervals = getDayIntervals(
-        format(begin, "HH:mm"),
-        format(end, "HH:mm"),
-        reservationStartInterval
-      );
-
-      const times: string[] = intervals.map((val) => {
-        const [startHours, startMinutes] = val.split(":");
-
-        return `${startHours}:${startMinutes}`;
-      });
-      allTimes.push(...times);
-    });
-
-  return allTimes;
-}
-
 // Returns an array of available times for the given duration and day
 // TODO this is really slow (especially if called from a loop)
-function availableTimes({
+function getAvailableTimesForDay({
   day,
   duration,
   time,
@@ -337,7 +297,7 @@ function availableTimes({
   const timeMinutes = timeMinutesRaw > 59 ? 59 : timeMinutesRaw;
   const { reservableTimeSpans: spans, reservationStartInterval: interval } =
     reservationUnit;
-  return getAvailableTimes(spans, interval, day)
+  return getPossibleTimesForDay(spans, interval, day)
     .map((n) => {
       const [slotHours, slotMinutes] = n.split(":").map(Number);
       const start = new Date(day);
@@ -346,7 +306,6 @@ function availableTimes({
       const startTime = new Date(day);
       startTime.setHours(timeHours, timeMinutes, 0, 0);
 
-      // FIXME isSlotReservable breaks on weird cases
       return isSlotReservable(start, end) && !isBefore(start, startTime)
         ? n
         : null;
@@ -355,28 +314,42 @@ function availableTimes({
 }
 
 // Returns the next available time, after the given time (Date object)
-// FIXME this isn't working (compared to the availableTimes function), ex. unit 104 locally
 const getNextAvailableTime = (props: AvailableTimesProps): Date | null => {
   const { day: after, reservationUnit } = props;
   if (reservationUnit == null) {
     return null;
   }
-  const { reservableTimeSpans } = reservationUnit;
+  const {
+    reservableTimeSpans,
+    reservationsMinDaysBefore,
+    reservationsMaxDaysBefore,
+  } = reservationUnit;
 
-  const today = new Date();
+  const today = addDays(new Date(), reservationsMinDaysBefore ?? 0);
   const possibleEndDay = getLastPossibleReservationDate(reservationUnit);
   const endDay = possibleEndDay ? addDays(possibleEndDay, 1) : undefined;
-  const openDays: Date[] = filterNonNullable(reservableTimeSpans)
-    .map((rt) => new Date(String(rt.startDatetime)))
-    .filter((date) => {
-      if (!isAfter(date, after)) return false;
-      if (!isAfter(date, today)) return false;
-      return !(endDay && isAfter(date, endDay));
-    });
-  // Already sorted by date
+  const minDay = dayMax([today, after]) ?? today;
 
-  for (const day of openDays) {
-    const availableTimesForDay = availableTimes({
+  // Find the first possible day
+  const interval = filterNonNullable(reservableTimeSpans).find((x) =>
+    isInTimeSpan(minDay, x)
+  );
+  if (!interval?.startDatetime || !interval.endDatetime) {
+    return null;
+  }
+  if (endDay && endDay < new Date(interval.endDatetime) && endDay < minDay) {
+    return null;
+  }
+
+  const startDay = dayMax([new Date(interval.startDatetime), minDay]) ?? minDay;
+  const daysToGenerate = reservationsMaxDaysBefore ?? 180;
+  const days = Array.from({ length: daysToGenerate }, (_, i) =>
+    addDays(startDay, i)
+  );
+
+  // Find the first possible time for that day, continue for each day until we find one
+  for (const day of days) {
+    const availableTimesForDay = getAvailableTimesForDay({
       ...props,
       day,
       fromStartOfDay: true,
@@ -388,6 +361,7 @@ const getNextAvailableTime = (props: AvailableTimesProps): Date | null => {
       return day;
     }
   }
+
   return null;
 };
 
@@ -548,7 +522,7 @@ const QuickReservation = ({
   // A map of all available times for the day, chunked into groups of 8
   const timeChunks: string[][] = useMemo(() => {
     const itemsPerChunk = 8;
-    const availableTimesForDay = availableTimes({
+    const availableTimesForDay = getAvailableTimesForDay({
       day: date,
       duration: duration?.value?.toString() ?? "00:00",
       time,
@@ -572,7 +546,7 @@ const QuickReservation = ({
   });
 
   // the available times for the selected day
-  const dayTimes = availableTimes({
+  const dayTimes = getAvailableTimesForDay({
     day: date,
     time,
     duration: duration?.value?.toString() ?? "00:00",
@@ -603,7 +577,7 @@ const QuickReservation = ({
             if (isValid(valueAsDate) && valueAsDate.getFullYear() > 1970) {
               setSlot(null);
               /* TODO what is the purpose of this? */
-              const times = availableTimes({
+              const times = getAvailableTimesForDay({
                 day: valueAsDate,
                 duration: duration?.value?.toString() ?? "00:00",
                 time,

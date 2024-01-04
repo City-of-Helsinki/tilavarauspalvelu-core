@@ -349,20 +349,18 @@ export const isStartTimeWithinInterval = (
   if (!interval) return true;
 
   // TODO this is awfully similar to the one in QuickReservation
-  const timeframeArr = reservableTimeSpans.filter(
-    (n) => {
-      if (!n.startDatetime || !n.endDatetime) return false;
+  const timeframeArr = reservableTimeSpans.filter((n) => {
+    if (!n.startDatetime || !n.endDatetime) return false;
 
-      const begin = isSameDay(new Date(n.startDatetime), start)
-        ? new Date(n.startDatetime)
-        : set(start, { hours: 0, minutes: 0 });
-      const end = isSameDay(new Date(n.endDatetime), start)
-        ? new Date(n.endDatetime)
-        : set(start, { hours: 23, minutes: 59 });
+    const begin = isSameDay(new Date(n.startDatetime), start)
+      ? new Date(n.startDatetime)
+      : set(start, { hours: 0, minutes: 0 });
+    const end = isSameDay(new Date(n.endDatetime), start)
+      ? new Date(n.endDatetime)
+      : set(start, { hours: 23, minutes: 59 });
 
-      return isWithinInterval(start, { start: begin, end });
-    }
-  );
+    return isWithinInterval(start, { start: begin, end });
+  });
   type TimeFrame = { start: Date; end: Date };
   const timeframe = timeframeArr
     .map((n) =>
