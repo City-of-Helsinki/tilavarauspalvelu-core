@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+import { ReservationsReservationTypeChoices } from "common/types/gql-types";
 
 export const CREATE_RESERVATION = gql`
   mutation createReservation($input: ReservationCreateMutationInput!) {
@@ -107,6 +108,10 @@ export const CONFIRM_RESERVATION = gql`
   }
 `;
 
+// NOTE hard coded NORMAL type so only ment to be used in client ui.
+// reservationType valid values: "normal", "behalf", "staff", "blocked"
+// even though the ReservationsReservationTypeChoices says they are uppercase
+// NOTE bang user ID so this doesn't get abused (don't use it without a user)
 export const LIST_RESERVATIONS = gql`
   query listReservations(
     $before: String
@@ -116,10 +121,9 @@ export const LIST_RESERVATIONS = gql`
     $begin: DateTime
     $end: DateTime
     $state: [String]
-    $user: ID
+    $user: ID!
     $reservationUnit: [ID]
     $orderBy: String
-    $reservationType: [String]
   ) {
     reservations(
       before: $before
@@ -132,7 +136,7 @@ export const LIST_RESERVATIONS = gql`
       user: $user
       reservationUnit: $reservationUnit
       orderBy: $orderBy
-      reservationType: $reservationType
+      reservationType: "${ReservationsReservationTypeChoices.Normal.toLowerCase()}"
     ) {
       edges {
         node {
@@ -146,7 +150,6 @@ export const LIST_RESERVATIONS = gql`
           bufferTimeAfter
           orderUuid
           isBlocked
-          type
           reservationUnits {
             pk
             nameFi

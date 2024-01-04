@@ -506,8 +506,6 @@ const ReservationUnit = ({
         user: currentUser?.pk?.toString(),
         reservationUnit: [reservationUnit?.pk?.toString() ?? ""],
         state: allowedReservationStates,
-        // valid values: "normal", "behalf", "staff", "blocked"
-        reservationType: ["normal"],
       },
     }
   );

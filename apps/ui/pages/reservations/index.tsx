@@ -12,7 +12,6 @@ import {
   type Query,
   type QueryReservationsArgs,
   ReservationsReservationStateChoices,
-  ReservationsReservationTypeChoices,
 } from "common/types/gql-types";
 import { Container } from "common";
 import { filterNonNullable } from "common/src/helpers";
@@ -104,10 +103,6 @@ const Reservations = (): JSX.Element | null => {
             ],
       orderBy: tab === "upcoming" ? "begin" : "-begin",
       user: currentUser?.pk?.toString(),
-      // valid values: "normal", "behalf", "staff", "blocked"
-      reservationType: [
-        ReservationsReservationTypeChoices.Normal.toLowerCase(),
-      ],
       begin: tab === "upcoming" ? today.toISOString() : undefined,
       end: tab === "past" ? today.toISOString() : undefined,
     },
