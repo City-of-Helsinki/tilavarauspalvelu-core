@@ -58,8 +58,18 @@ class UnitAdmin(SortableAdminMixin, admin.ModelAdmin):
 class UnitGroupAdmin(admin.ModelAdmin):
     model = UnitGroup
     search_fields = ["name"]
+    list_display = ("__str__", "number_of_units")
+
+    @staticmethod
+    def number_of_units(obj: UnitGroup) -> int:
+        return obj.units.count()
 
 
 @admin.register(ServiceSector)
 class ServiceSectorAdmin(admin.ModelAdmin):
     model = ServiceSector
+    list_display = ("__str__", "number_of_units")
+
+    @staticmethod
+    def number_of_units(obj: ServiceSector) -> int:
+        return obj.units.count()
