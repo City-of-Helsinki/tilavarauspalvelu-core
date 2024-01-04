@@ -44,7 +44,9 @@ class ApplicationEventScheduleActions:
             raise ValueError(f"ReservationUnit {self.schedule.allocated_reservation_unit} has no OriginHaukiResource")
 
         reservable_time_spans: list[ReservableTimeSpan] = list(
-            ReservableTimeSpan.objects.filter(resource=origin_hauki_resource).filter_period(
+            ReservableTimeSpan.objects.filter(
+                resource=origin_hauki_resource,
+            ).overlapping_with_period(
                 start=reservation_date,
                 end=application_event.end,
             )
