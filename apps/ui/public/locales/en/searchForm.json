@@ -17,6 +17,7 @@
   "dateFilter": "Date",
   "timeFilter": "Time",
   "durationFilter": "Duration",
+  "beginTimeIsBeforeEndTime": "The start time must be before the end time",
   "resetForm": "Clear",
   "filters": {
     "applicationRound": "{{label}}",

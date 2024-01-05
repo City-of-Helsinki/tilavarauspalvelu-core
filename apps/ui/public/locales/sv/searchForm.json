@@ -29,8 +29,8 @@
     "maxPersons_other": "Upp till {{value}} personer",
     "startDate": "Från {{value}}",
     "endDate": "Till {{value}}",
-    "timeBegin": "Tidigast kl.{{value}}",
-    "timeEnd": "Senast kl.{{value}}",
+    "timeBegin": "Tidigast kl. {{value}}",
+    "timeEnd": "Senast kl. {{value}}",
     "duration": "Minst {{unit}}"
   },
   "all": "Alla",
