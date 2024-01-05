@@ -5,10 +5,10 @@
   "private": true,
   "devDependencies": {
     "@vercel/style-guide": "^5.1.0",
-    "eslint": "^8.55.0",
+    "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-config-turbo": "^1.10.12",
-    "eslint-plugin-prettier": "^5.0.1",
-    "prettier-eslint": "^16.1.2"
+    "eslint-config-turbo": "^1.11.3",
+    "eslint-plugin-prettier": "^5.1.2",
+    "prettier-eslint": "^16.2.0"
   }
 }
