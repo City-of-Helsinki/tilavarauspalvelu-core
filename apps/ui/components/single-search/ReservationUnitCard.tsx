@@ -5,12 +5,12 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import NextImage from "next/image";
 import styled from "styled-components";
-import { H5, Strongish } from "common/src/common/typography";
+import { H5 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { ReservationUnitType } from "common/types/gql-types";
 import { format, isToday, isTomorrow } from "date-fns";
 import { toUIDate } from "common/src/common/util";
-import { getAddressAlt, getMainImage, getTranslation } from "@/modules/util";
+import { getMainImage, getTranslation } from "@/modules/util";
 import IconWithText from "../common/IconWithText";
 import { MediumButton, pixel, truncatedText } from "@/styles/util";
 import {
@@ -38,6 +38,7 @@ const Container = styled.div`
 
 const MainContent = styled.div`
   display: grid;
+  gap: var(--spacing-s);
   margin: var(--spacing-s);
   position: relative;
 
@@ -61,7 +62,6 @@ const Description = styled.span`
   font-family: var(--font-regular);
   font-size: var(--fontsize-body-m);
   flex-grow: 1;
-  height: 40px;
 
   @media (min-width: ${breakpoints.m}) {
     height: unset;
@@ -148,21 +148,24 @@ const StyledIconWithText = styled(IconWithText)`
   }
 `;
 
-const StyledTag = styled(Tag)`
-  position: absolute;
-  top: 0;
-  right: 0;
-  z-index: 1;
+const StyledTag = styled(Tag)<{ $status: "available" | "no-times" | "closed" }>`
+  @media (min-width: ${breakpoints.s}) {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 1;
+  }
 
-  &.available {
-    background: var(--color-success-light);
-  }
-  &.no-times {
-    background: var(--color-error-light);
-  }
-  &.closed {
-    background: var(--tag-background);
-  }
+  background: ${({ $status }) => {
+    switch ($status) {
+      case "available":
+        return "var(--color-success-light)";
+      case "no-times":
+        return "var(--color-error-light)";
+      case "closed":
+        return "var(--tag-background)";
+    }
+  }};
 `;
 
 const StatusTag = (ru: {
@@ -173,15 +176,13 @@ const StatusTag = (ru: {
 
   if (closed) {
     return (
-      <StyledTag className="closed">
-        {t("reservationUnitCard:closed")}
-      </StyledTag>
+      <StyledTag $status="closed">{t("reservationUnitCard:closed")}</StyledTag>
     );
   }
 
   if (!availableAt) {
     return (
-      <StyledTag className="no-times">
+      <StyledTag $status="no-times">
         {t("reservationUnitCard:noTimes")}
       </StyledTag>
     );
@@ -195,9 +196,7 @@ const StatusTag = (ru: {
     dayText = `${t("common:tomorrow")}`;
   } else dayText = `${toUIDate(new Date(availableAt))} `;
 
-  return (
-    <StyledTag className="available">{`${dayText} ${timeText}`}</StyledTag>
-  );
+  return <StyledTag $status="available">{`${dayText} ${timeText}`}</StyledTag>;
 };
 
 const ReservationUnitCard = ({ reservationUnit }: PropsT): JSX.Element => {
@@ -206,8 +205,6 @@ const ReservationUnitCard = ({ reservationUnit }: PropsT): JSX.Element => {
   const router = useRouter();
 
   const name = getReservationUnitName(reservationUnit);
-
-  const addressString = getAddressAlt(reservationUnit);
 
   const link = `${reservationUnitPrefix}/${reservationUnit.pk}`;
 
@@ -233,21 +230,15 @@ const ReservationUnitCard = ({ reservationUnit }: PropsT): JSX.Element => {
         <Name>
           <StyledInlineLink href={link}>{name}</StyledInlineLink>
         </Name>
-        <StatusTag
-          data={{
-            closed: reservationUnit.isClosed ?? false,
-            availableAt: reservationUnit.firstReservableDatetime ?? "",
-          }}
-        />
-        <Description>
-          {unitName}
-          {addressString && (
-            <>
-              {", "}
-              <Strongish>{addressString}</Strongish>
-            </>
-          )}
-        </Description>
+        <Description>{unitName}</Description>
+        <div>
+          <StatusTag
+            data={{
+              closed: reservationUnit.isClosed ?? false,
+              availableAt: reservationUnit.firstReservableDatetime ?? "",
+            }}
+          />
+        </div>
         <Bottom>
           <Props>
             {reservationUnitTypeName && (
