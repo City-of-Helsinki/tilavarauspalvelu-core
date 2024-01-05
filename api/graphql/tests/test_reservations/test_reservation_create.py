@@ -13,12 +13,12 @@ from api.graphql.tests.test_reservations.base import DEFAULT_TIMEZONE, Reservati
 from applications.choices import PriorityChoice
 from applications.models import City
 from opening_hours.models import ReservableTimeSpan
+from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import (
     PriceUnit,
     PricingStatus,
     PricingType,
     ReservationKind,
-    ReservationUnit,
 )
 from reservations.choices import ReservationStateChoice, ReservationTypeChoice
 from reservations.models import AgeGroup, Reservation
@@ -94,7 +94,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         self.reservation_unit = ReservationUnitFactory(
             spaces=[self.space],
             name="resunit",
-            reservation_start_interval=ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES,
+            reservation_start_interval=ReservationStartInterval.INTERVAL_15_MINUTES.value,
             buffer_time_before=datetime.timedelta(minutes=30),
             buffer_time_after=datetime.timedelta(minutes=30),
             origin_hauki_resource=self.reservation_unit.origin_hauki_resource,
@@ -495,7 +495,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
 
     def test_create_succeeds_when_start_time_matches_reservation_start_interval(self):
         self.client.force_login(self.regular_joe)
-        intervals = [value for value, _ in ReservationUnit.RESERVATION_START_INTERVAL_CHOICES]
+        intervals = list(ReservationStartInterval.values)
         for interval, interval_minutes in zip(intervals, [15, 30, 60, 90]):
             input_data = self.get_valid_input_data()
             self.reservation_unit.reservation_start_interval = interval
@@ -512,7 +512,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
 
     def test_create_fails_when_start_time_does_not_match_reservation_start_interval(self):
         self.client.force_login(self.regular_joe)
-        intervals = [value for value, _ in ReservationUnit.RESERVATION_START_INTERVAL_CHOICES]
+        intervals = list(ReservationStartInterval.values)
         for interval, interval_minutes in zip(intervals, [15, 30, 60, 90]):
             input_data = self.get_valid_input_data()
             self.reservation_unit.reservation_start_interval = interval
@@ -539,7 +539,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         self.reservation_unit.save()
 
         self.client.force_login(self.regular_joe)
-        intervals = [value for value, _ in ReservationUnit.RESERVATION_START_INTERVAL_CHOICES]
+        intervals = list(ReservationStartInterval.values)
         for interval, interval_minutes in zip(intervals, [15, 90]):
             input_data = self.get_valid_input_data()
             self.reservation_unit.reservation_start_interval = interval
@@ -758,7 +758,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         other_reservation_unit = ReservationUnitFactory(
             spaces=[self.space],
             name="other resunit",
-            reservation_start_interval=ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES,
+            reservation_start_interval=ReservationStartInterval.INTERVAL_15_MINUTES.value,
             buffer_time_before=datetime.timedelta(minutes=30),
             buffer_time_after=datetime.timedelta(minutes=30),
         )
@@ -1098,7 +1098,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         second_unit = ReservationUnitFactory(
             spaces=[self.space],
             name="second_unit",
-            reservation_start_interval=ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES,
+            reservation_start_interval=ReservationStartInterval.INTERVAL_15_MINUTES.value,
             buffer_time_before=datetime.timedelta(minutes=30),
             buffer_time_after=datetime.timedelta(minutes=30),
             sku=sku,

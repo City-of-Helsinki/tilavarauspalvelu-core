@@ -11,11 +11,11 @@ from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from applications.models import City
+from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import (
     PriceUnit,
     PricingStatus,
     PricingType,
-    ReservationUnit,
 )
 from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import (
@@ -739,7 +739,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
             spaces=[self.space],
             unit=self.unit,
             name="new_unit",
-            reservation_start_interval=ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES,
+            reservation_start_interval=ReservationStartInterval.INTERVAL_15_MINUTES.value,
             reservation_unit_type=self.reservation_unit_type,
             sku=self.reservation_unit.sku,
         )

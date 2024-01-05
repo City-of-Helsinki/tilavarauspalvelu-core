@@ -3,6 +3,7 @@ from django.contrib.admin import AdminSite
 from django.test import RequestFactory, TestCase
 
 from reservation_units.admin.reservation_unit import ReservationUnitAdmin
+from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import ReservationKind, ReservationUnit
 from terms_of_use.models import TermsOfUse
 from tests.factories import ReservationUnitFactory, TermsOfUseFactory
@@ -71,7 +72,7 @@ class ReservationUnitAdminTermsValidationTestCase(TestCase):
         return {
             "name": "test",
             "description": "testing besthing",
-            "reservation_start_interval": ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES,
+            "reservation_start_interval": ReservationStartInterval.INTERVAL_15_MINUTES.value,
             "authentication": "weak",
             "reservation_kind": ReservationKind.DIRECT_AND_SEASON,
         }

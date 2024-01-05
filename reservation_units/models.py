@@ -14,7 +14,7 @@ from elasticsearch_django.models import SearchDocumentManagerMixin, SearchDocume
 
 from common.connectors import ReservationUnitActionsConnector
 from merchants.models import PaymentAccounting, PaymentMerchant, PaymentProduct
-from reservation_units.enums import ReservationState, ReservationUnitState
+from reservation_units.enums import ReservationStartInterval, ReservationState, ReservationUnitState
 from reservation_units.querysets import ReservationUnitQuerySet
 from reservation_units.tasks import purge_image_cache, refresh_reservation_unit_product_mapping, update_urls
 from resources.models import Resource
@@ -338,9 +338,17 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
         null=True,
     )
 
-    buffer_time_before = models.DurationField(verbose_name=_("Buffer time before reservation"), blank=True, null=True)
+    buffer_time_before: datetime.timedelta | None = models.DurationField(
+        verbose_name=_("Buffer time before reservation"),
+        blank=True,
+        null=True,
+    )
 
-    buffer_time_after = models.DurationField(verbose_name=_("Buffer time after reservation"), blank=True, null=True)
+    buffer_time_after: datetime.timedelta | None = models.DurationField(
+        verbose_name=_("Buffer time after reservation"),
+        blank=True,
+        null=True,
+    )
 
     origin_hauki_resource = models.ForeignKey(
         "opening_hours.OriginHaukiResource",
@@ -357,26 +365,16 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
         on_delete=models.PROTECT,
     )
 
-    RESERVATION_START_INTERVAL_15_MINUTES = "interval_15_mins"
-    RESERVATION_START_INTERVAL_30_MINUTES = "interval_30_mins"
-    RESERVATION_START_INTERVAL_60_MINUTES = "interval_60_mins"
-    RESERVATION_START_INTERVAL_90_MINUTES = "interval_90_mins"
-    RESERVATION_START_INTERVAL_CHOICES = (
-        (RESERVATION_START_INTERVAL_15_MINUTES, _("15 minutes")),
-        (RESERVATION_START_INTERVAL_30_MINUTES, _("30 minutes")),
-        (RESERVATION_START_INTERVAL_60_MINUTES, _("60 minutes")),
-        (RESERVATION_START_INTERVAL_90_MINUTES, _("90 minutes")),
-    )
-    reservation_start_interval = models.CharField(
+    reservation_start_interval: str = models.CharField(
         max_length=20,
         verbose_name=_("Reservation start interval"),
-        choices=RESERVATION_START_INTERVAL_CHOICES,
-        default=RESERVATION_START_INTERVAL_15_MINUTES,
+        choices=ReservationStartInterval.choices,
+        default=ReservationStartInterval.INTERVAL_15_MINUTES.value,
         help_text=(
             "Determines the interval for the start time of the reservation. "
             "For example an interval of 15 minutes means a reservation can "
             "begin at minutes 15, 30, 60, or 90. Possible values are "
-            f"{', '.join(value[0] for value in RESERVATION_START_INTERVAL_CHOICES)}."
+            f"{', '.join(value for value in ReservationStartInterval.names)}."
         ),
     )
 

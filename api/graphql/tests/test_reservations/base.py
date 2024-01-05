@@ -6,6 +6,7 @@ from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.base import GrapheneTestCaseBase
 from permissions.models import UnitRole, UnitRoleChoice, UnitRolePermission
+from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import PaymentType, ReservationUnit
 from reservations.models import ReservationMetadataField, ReservationMetadataSet
 from tests.factories import (
@@ -41,7 +42,7 @@ class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
             spaces=[cls.space],
             unit=cls.unit,
             name="resunit",
-            reservation_start_interval=ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES,
+            reservation_start_interval=ReservationStartInterval.INTERVAL_15_MINUTES.value,
             reservation_unit_type=cls.reservation_unit_type,
             payment_merchant=cls.payment_merchant,
             payment_product=cls.payment_product,

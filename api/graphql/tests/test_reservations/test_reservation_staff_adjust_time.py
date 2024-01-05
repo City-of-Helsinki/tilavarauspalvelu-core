@@ -12,7 +12,7 @@ from django.utils.timezone import get_default_timezone
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from email_notification.models import EmailType
 from permissions.models import UnitRole, UnitRoleChoice, UnitRolePermission
-from reservation_units.models import ReservationUnit
+from reservation_units.enums import ReservationStartInterval
 from reservations.choices import ReservationStateChoice, ReservationTypeChoice
 from tests.factories import EmailTemplateFactory, ReservationFactory
 
@@ -339,7 +339,7 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
     def test_reservation_start_time_not_within_the_interval_fails(self):
-        self.reservation_unit.reservation_start_interval = ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES
+        self.reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_15_MINUTES.value
         self.reservation_unit.save()
 
         data = self.get_valid_adjust_data()
@@ -358,7 +358,7 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
     def test_reservation_start_interval_interpretation_60_allows_30_intervals(self):
-        self.reservation_unit.reservation_start_interval = ReservationUnit.RESERVATION_START_INTERVAL_60_MINUTES
+        self.reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_60_MINUTES.value
         self.reservation_unit.save()
 
         expected_change = self.reservation_begin + datetime.timedelta(minutes=30)
@@ -375,7 +375,7 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.begin).is_equal_to(expected_change)
 
     def test_reservation_start_interval_interpretation_90_allows_30_intervals(self):
-        self.reservation_unit.reservation_start_interval = ReservationUnit.RESERVATION_START_INTERVAL_90_MINUTES
+        self.reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_90_MINUTES.value
         self.reservation_unit.save()
 
         expected_change = self.reservation_begin + datetime.timedelta(minutes=30)
