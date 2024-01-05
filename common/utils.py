@@ -1,5 +1,5 @@
-from collections.abc import Sequence
-from typing import Any, Literal
+from collections.abc import Generator, Sequence
+from typing import Any, Generic, Literal, TypeVar
 
 from django.conf import settings
 from django.db import models
@@ -10,7 +10,11 @@ __all__ = [
     "get_field_to_related_field_mapping",
     "get_nested",
     "get_translation_fields",
+    "with_indices",
 ]
+
+
+T = TypeVar("T")
 
 
 def get_nested(obj: dict | list | None, /, *args: str | int, default: Any = None) -> Any:
@@ -75,3 +79,55 @@ def get_translation_fields(model: type[models.Model], fields: list[str] | Litera
     return [
         f"{field}_{language}" for field in translatable_fields for language, _ in settings.LANGUAGES if field in fields
     ]
+
+
+class with_indices(Generic[T]):  # noqa: N801, RUF100
+    """
+    Iterate list items with indexes in a way that is safe for deletion.
+    This can be used as a deletion safe replacement for `enumerate()`.
+
+    When deleting items, must set the `item_deleted` attribute to `True`.
+    Only one item can be deleted per iteration.
+
+    >>> items = [1, 2, 2, 3, 4, 5, 5, 6, 8, 7]
+    >>> for i, item in (gen := with_indices(items)):
+    ...    if item % 2 == 0:
+    ...        del items[i]
+    ...        # Set when item has been deleted.
+    ...        gen.item_deleted = True
+    ...    if item % 3 == 0:
+    ...        # Added items will be handled at the end
+    ...        items.append(10)
+    ...
+    >>> items
+    [1, 3, 5, 5, 7]
+    """
+
+    def __init__(self, _seq: list[T], /) -> None:
+        self.seq = _seq
+        self.item_deleted: bool = False
+
+    def __iter__(self) -> Generator[tuple[int, T], None, None]:
+        i: int = 0
+        next_item: T = None
+        gen = enumerate(self.seq)
+        while True:
+            if next_item is not None:
+                item = next_item
+                next_item = None
+                yield i, item
+
+            else:
+                try:
+                    i, item = next(gen)
+                except StopIteration:
+                    return
+
+                yield i, item
+
+            if self.item_deleted:
+                self.item_deleted = False
+                try:
+                    next_item = self.seq[i]
+                except IndexError:  # last item was deleted, exit
+                    return
