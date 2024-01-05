@@ -22,7 +22,7 @@
   },
   "validation": {
     "Required": "Required",
-    "End date must be after begin date": "End date must be after begin date",
+    "End date must be after begin date": "End date must be after start date",
     "Expected number, received nan": "Has to be a number",
     "Number must be greater than or equal to 1": "Has to be at least 1",
     "Maximum duration must be greater than minimum duration": "Maximum duration must be greater than minimum duration",

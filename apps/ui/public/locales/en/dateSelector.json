@@ -7,7 +7,7 @@
   "infoDate": "dd.mm.yyyy",
   "labelEndDate": "End date",
   "labelStartDate": "Start date",
-  "errorEndDateBeforeStartDate": "End date must be after begin date",
+  "errorEndDateBeforeStartDate": "End date must be after start date",
   "errorDateFormat": "The date must be in the format dd.mm.yyyy",
   "menu": {
     "buttonBack": "Back",
