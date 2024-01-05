@@ -156,16 +156,18 @@ const StyledTag = styled(Tag)<{ $status: "available" | "no-times" | "closed" }>`
     z-index: 1;
   }
 
-  background: ${({ $status }) => {
-    switch ($status) {
-      case "available":
-        return "var(--color-success-light)";
-      case "no-times":
-        return "var(--color-error-light)";
-      case "closed":
-        return "var(--tag-background)";
-    }
-  }};
+  && {
+    --tag-background: ${({ $status }) => {
+      switch ($status) {
+        case "available":
+          return "var(--color-success-light)";
+        case "no-times":
+          return "var(--color-error-light)";
+        case "closed":
+          return "var(--color-black-10)";
+      }
+    }};
+  }
 `;
 
 const StatusTag = (ru: {
