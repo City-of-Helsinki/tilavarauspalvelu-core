@@ -147,8 +147,7 @@ def datetimes_equal(_dt_1: datetime.datetime, _dt_2: datetime.datetime, /, *, ch
     """
     Check if two timezone-aware datetime objects are equal.
 
-    This is needed because equals checks for datetime objects can give false results
-    if `zoneinfo.ZoneInfo` objects are used for `tzinfo`:
+    This is needed because == / != checks for datetime objects don't check for timezone-awareness:
 
     ```python 3.11
     import zoneinfo
@@ -156,19 +155,21 @@ def datetimes_equal(_dt_1: datetime.datetime, _dt_2: datetime.datetime, /, *, ch
 
     tz = zoneinfo.ZoneInfo("Europe/Helsinki")
 
-    dt_1 = datetime.datetime(2021, 1, 1, tzinfo=tz)
-    dt_2 = datetime.datetime(2021, 1, 1, tzinfo=datetime.UTC)
-    dt_3 = datetime.datetime(2021, 1, 1)
+    dt_zi = datetime.datetime(2021, 1, 1, tzinfo=tz)
+    dt_tz = datetime.datetime(2021, 1, 1, tzinfo=datetime.UTC)
+    dt_naive = datetime.datetime(2021, 1, 1)
 
-    assert dt_1 >= dt_3  # Works
-    assert dt_1 <= dt_3  # Works??? This should be False, right?
-    assert dt_2 >= dt_3  # raises "TypeError: can't compare offset-naive and offset-aware times"
+    # There might not be true, since on datetime is timezone-aware and the other is not.
+    assert dt_zi != dt_naive
+    assert dt_tz != dt_naive
     ```
     """
     if _dt_1.utcoffset() is None:
-        raise ValueError("First datetime must be timezone-aware using `datetime.timezone` objects.")
+        msg = "First datetime must be timezone-aware using `datetime.timezone` objects."
+        raise ValueError(msg)
     if _dt_2.utcoffset() is None:
-        raise ValueError("Second datetime must be timezone-aware using `datetime.timezone` objects.")
+        msg = "Second datetime must be timezone-aware using `datetime.timezone` objects."
+        raise ValueError(msg)
     if check_same_tz and _dt_1.tzname() != _dt_2.tzname():
         msg = f"Timezones of both datetimes must be the same. Got: {_dt_1.tzname()} and {_dt_2.tzname()}"
         raise ValueError(msg)
@@ -179,8 +180,8 @@ def times_equal(_t_1: datetime.time, _t_2: datetime.time, /, *, check_same_tz: b
     """
     Check if two timezone-aware time objects are equal.
 
-    This is needed because equals checks for time objects can give false results
-    if `zoneinfo.ZoneInfo` objects are used for `tzinfo`:
+    This is needed because == / != checks for time objects don't check for timezone-awareness,
+    and / < / <= / > / >= checks can give false results if `zoneinfo.ZoneInfo` objects are used for `tzinfo`:
 
     ```python 3.11
     import zoneinfo
@@ -188,13 +189,13 @@ def times_equal(_t_1: datetime.time, _t_2: datetime.time, /, *, check_same_tz: b
 
     tz = zoneinfo.ZoneInfo("Europe/Helsinki")
 
-    t_1 = datetime.time(tzinfo=tz)
-    t_2 = datetime.time(tzinfo=datetime.UTC)
-    t_3 = datetime.time()
+    t_zi = datetime.time(tzinfo=tz)
+    t_tz = datetime.time(tzinfo=datetime.UTC)
+    t_naive = datetime.time()
 
-    assert t_1 >= t_3  # Works
-    assert t_1 <= t_3  # Works??? This should be False, right?
-    assert t_2 >= t_3  # raises "TypeError: can't compare offset-naive and offset-aware times"
+    assert t_zi >= t_naive  # Works
+    assert t_zi <= t_naive  # Works??? This should be False, right?
+    assert t_tz >= t_naive  # raises "TypeError: can't compare offset-naive and offset-aware times"
     ```
     """
     if _t_1.utcoffset() is None:
