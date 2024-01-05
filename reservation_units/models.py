@@ -374,7 +374,7 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
             "Determines the interval for the start time of the reservation. "
             "For example an interval of 15 minutes means a reservation can "
             "begin at minutes 15, 30, 60, or 90. Possible values are "
-            f"{', '.join(value for value in ReservationStartInterval.names)}."
+            f"{', '.join(values for values in ReservationStartInterval.values)}."
         ),
     )
 

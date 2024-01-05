@@ -1,5 +1,6 @@
 import datetime
 import zoneinfo
+from functools import singledispatch
 
 from django.conf import settings
 
@@ -54,10 +55,7 @@ def local_timezone() -> datetime.timezone:
     assert t_1 < t_2  # raises "TypeError: can't compare offset-naive and offset-aware times"
     ```
     """
-    return datetime.timezone(
-        zoneinfo.ZoneInfo(settings.TIME_ZONE).utcoffset(datetime.datetime.utcnow()),
-        name=settings.TIME_ZONE,
-    )
+    return timezone_from_name(settings.TIME_ZONE)
 
 
 def local_datetime() -> datetime.datetime:
@@ -210,6 +208,14 @@ def times_equal(_t_1: datetime.time, _t_2: datetime.time, /, *, check_same_tz: b
     return _t_1 == _t_2
 
 
+def timezone_from_name(name: str) -> datetime.timezone:
+    """Get `datetime.timezone` from timezone name, e.g. "Europe/Helsinki"."""
+    return datetime.timezone(
+        zoneinfo.ZoneInfo(name).utcoffset(datetime.datetime.utcnow()),
+        name=name,
+    )
+
+
 def timedelta_to_json(delta: datetime.timedelta) -> str:
     return str(delta).zfill(8)
 
@@ -221,3 +227,24 @@ def timedelta_from_json(delta: str) -> datetime.timedelta:
         time_ = datetime.datetime.strptime(delta, "%H:%M")
 
     return datetime.timedelta(hours=time_.hour, minutes=time_.minute, seconds=time_.second)
+
+
+@singledispatch
+def time_as_timedelta(_input: datetime.datetime | datetime.time, /) -> datetime.timedelta:
+    """Convert datetime/time to timedelta as measured form the start of the day."""
+    raise TypeError(f"Unsupported type: {_input.__class__.__name__}")
+
+
+@time_as_timedelta.register
+def _(_input: datetime.datetime, /) -> datetime.timedelta:
+    return _input - _input.replace(hour=0, minute=0, second=0, microsecond=0)
+
+
+@time_as_timedelta.register
+def _(_input: datetime.time, /) -> datetime.timedelta:
+    return datetime.timedelta(
+        hours=_input.hour,
+        minutes=_input.minute,
+        seconds=_input.second,
+        microseconds=_input.microsecond,
+    )

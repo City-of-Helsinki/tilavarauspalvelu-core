@@ -1,8 +1,6 @@
 from collections.abc import Iterable
-from copy import copy
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
-from math import ceil
 from typing import TYPE_CHECKING, Self
 
 from django.db import models
@@ -18,7 +16,6 @@ from common.date_utils import (
     local_datetime_min,
     local_time_min,
     local_timezone,
-    times_equal,
 )
 from opening_hours.models import ReservableTimeSpan
 from opening_hours.utils.reservable_time_span_client import TimeSpanElement, override_reservable_with_closed_time_spans
@@ -28,13 +25,6 @@ if TYPE_CHECKING:
 
 
 ReservationUnitPK = int
-
-INTERVAL_TO_MINUTES: dict[str, int] = {
-    "interval_15_mins": 15,
-    "interval_30_mins": 30,
-    "interval_60_mins": 60,
-    "interval_90_mins": 90,
-}
 
 
 def _get_hard_closed_time_spans_for_reservation_unit(reservation_unit: "ReservationUnit") -> list[TimeSpanElement]:
@@ -108,68 +98,6 @@ def _get_soft_closed_time_spans_for_reservation_unit(reservation_unit: "Reservat
     return reservation_unit_closed_time_spans
 
 
-def _get_closed_time_spans_for_time_span(
-    time_span: TimeSpanElement,
-    filter_time_start: time | None,
-    filter_time_end: time | None,
-) -> list[TimeSpanElement]:
-    """
-    Generate a list of closed time spans for a time span based on given filter time values.
-
-    This list will contain at most two time spans for every day between the start and end date of this time span.
-    """
-    closed_time_spans: list[TimeSpanElement] = []
-
-    if not filter_time_start and not filter_time_end:
-        return closed_time_spans
-
-    # Loop through every day between the start and end date of this time span
-    for day in time_span.get_dates_range():
-        # Add closed time spans for the time range outside the given filter range
-        # e.g. Filter time range is 10:00-14:00, add closed time spans for 00:00-10:00 and 14:00-00:00
-        if filter_time_start and not times_equal(filter_time_start, local_time_min()):
-            closed_time_spans.append(
-                TimeSpanElement(
-                    start_datetime=combine(day, local_time_min()),
-                    end_datetime=combine(day, filter_time_start),
-                    is_reservable=False,
-                )
-            )
-        if filter_time_end and not times_equal(filter_time_end, local_time_min()):
-            closed_time_spans.append(
-                TimeSpanElement(
-                    start_datetime=combine(day, filter_time_end),
-                    end_datetime=combine(day, local_time_min()) + timedelta(days=1),
-                    is_reservable=False,
-                )
-            )
-
-    return closed_time_spans
-
-
-def _get_next_valid_start_datetime(
-    reservation_unit: "ReservationUnit",
-    time_span: TimeSpanElement,
-    filter_time_start: time | None,
-    selected_start_datetime: datetime,
-) -> datetime:
-    """
-    Get the next valid start time for a ReservationUnit.
-
-    For a reservation to be valid, its start time must be at an interval that is valid for the ReservationUnit.
-    e.g. When ReservationUnit.reservation_start_interval is 30 minutes,
-    a reservation must start at 00:00, 00:30, 01:00, 01:30 from the start of the time span.
-    """
-    interval = INTERVAL_TO_MINUTES[reservation_unit.reservation_start_interval]
-
-    if filter_time_start and selected_start_datetime.timetz() < filter_time_start:
-        selected_start_datetime = combine(selected_start_datetime.date(), filter_time_start)
-
-    delta_minutes = (selected_start_datetime - time_span.start_datetime).total_seconds() / 60
-    delta_to_next_interval = timedelta(minutes=interval) * ceil(delta_minutes / interval)
-    return time_span.start_datetime + delta_to_next_interval
-
-
 class ReservationUnitQuerySet(SearchResultsQuerySet):
     def scheduled_for_publishing(self):
         now = local_datetime()
@@ -225,6 +153,8 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
         - ReservationUnit `reservations_min_days_before`
         - ReservationUnit `reservations_max_days_before`
         - Reservations from ReservationUnits with common hierarchy
+        - ReservationUnit `buffer_time_before` (when comparing with Reservations)
+        - ReservationUnit `buffer_time_after` (when comparing with Reservations)
         """
         from reservations.models import Reservation
 
@@ -320,8 +250,8 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
         ]
 
         # Store values in a dict, so we can add them back to the original queryset later
-        reservation_unit_to_first_reservable_time: dict[ReservationUnitPK, datetime] = {}
-        reservation_unit_to_closed_status: dict[ReservationUnitPK, bool] = {}
+        first_reservable_times: dict[ReservationUnitPK, datetime] = {}
+        reservation_unit_closed_statuses: dict[ReservationUnitPK, bool] = {}
 
         ###########################
         # Do the important stuffs #
@@ -329,20 +259,13 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
 
         # Loop through ReservationUnits and find the first reservable time and closed status span for each
         for reservation_unit in reservation_units_with_annotated_time_spans:
-            # Minimum duration of a reservation for this ReservationUnit
-            reservation_unit_minimum_duration_minutes = (
-                minimum_duration_minutes
-                if not reservation_unit.min_reservation_duration
-                else max(reservation_unit.min_reservation_duration.total_seconds() / 60, minimum_duration_minutes)
-            )
-
             reservation_unit_hard_closed_time_spans = _get_hard_closed_time_spans_for_reservation_unit(reservation_unit)
             reservation_unit_soft_closed_time_spans = _get_soft_closed_time_spans_for_reservation_unit(reservation_unit)
 
-            for reservable_time_span in reservation_unit.origin_hauki_resource.reservable_time_spans.all():
-                time_span = TimeSpanElement(
-                    start_datetime=reservable_time_span.start_datetime.astimezone(local_tz),
-                    end_datetime=reservable_time_span.end_datetime.astimezone(local_tz),
+            for element in reservation_unit.origin_hauki_resource.reservable_time_spans.all():
+                reservable_time_span = TimeSpanElement(
+                    start_datetime=element.start_datetime.astimezone(local_tz),
+                    end_datetime=element.end_datetime.astimezone(local_tz),
                     is_reservable=True,
                 )
 
@@ -350,24 +273,26 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
                 hard_closed_time_spans: list[TimeSpanElement] = (
                     shared_closed_time_spans
                     + reservation_unit_hard_closed_time_spans
-                    + _get_closed_time_spans_for_time_span(time_span, filter_time_start, filter_time_end)
+                    + reservable_time_span.get_as_closed_time_spans(
+                        filter_time_start=filter_time_start,
+                        filter_time_end=filter_time_end,
+                    )
                 )
 
                 # Remove closed time spans from the reservable time spans.
                 # This will also split reservable time spans into multiple time spans if needed.
                 # What is left is a list of time spans that are reservable and within the given filter parameters.
-                hard_normalised_time_spans = override_reservable_with_closed_time_spans(
-                    # Use copy() to avoid changes to the original time spans in the function.
-                    reservable_time_spans=[copy(time_span)],
+                hard_normalised_reservable_time_spans = override_reservable_with_closed_time_spans(
+                    reservable_time_spans=[reservable_time_span],
                     closed_time_spans=hard_closed_time_spans,
                 )
 
                 # No reservable time spans left means the ReservationUnit is closed, continue to next ReservableTimeSpan
-                if not hard_normalised_time_spans:
+                if not hard_normalised_reservable_time_spans:
                     continue
 
                 # ReservationUnit has a reservable time span on the filter date range, so it's not closed.
-                reservation_unit_to_closed_status[reservation_unit.pk] = False
+                reservation_unit_closed_statuses[reservation_unit.pk] = False
 
                 # Validate `reservation_unit.max_reservation_duration`
                 # Minimum requested duration is longer than the maximum allowed duration, skip this ReservationUnit
@@ -377,37 +302,34 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
                 ):
                     break
 
-                reservations = reservation_closed_time_spans_map.get(reservation_unit.pk, [])
+                reservation_closed_time_spans = list(reservation_closed_time_spans_map.get(reservation_unit.pk, set()))
+
                 # These time spans have no effect on the closed status of the ReservationUnit,
                 # meaning that the ReservationUnit can be shown as open, even if there are no reservable time spans.
-                soft_closed_time_spans = reservation_unit_soft_closed_time_spans + list(reservations)
+                soft_closed_time_spans = reservation_unit_soft_closed_time_spans + reservation_closed_time_spans
 
-                # Apply more closed time spans to the normalised time spans to find the first reservable time span.
-                soft_normalised_time_spans = override_reservable_with_closed_time_spans(
-                    # Use copy() to avoid changes to the original time spans in the function.
-                    reservable_time_spans=[copy(ts) for ts in hard_normalised_time_spans],
+                soft_normalised_reservable_time_spans = override_reservable_with_closed_time_spans(
+                    reservable_time_spans=hard_normalised_reservable_time_spans,
                     closed_time_spans=soft_closed_time_spans,
                 )
 
                 # Loop through the normalised time spans to find one that is long enough to fit the minimum duration
-                for ts in soft_normalised_time_spans:
+                for normalized_reservable_time_span in soft_normalised_reservable_time_spans:
                     # Move time span start time to the next valid start time
-                    ts.start_datetime = _get_next_valid_start_datetime(
-                        reservation_unit=reservation_unit,
-                        time_span=time_span,
-                        filter_time_start=filter_time_start,
-                        selected_start_datetime=ts.start_datetime,
-                    )
+                    normalized_reservable_time_span.move_to_next_valid_start_time(reservation_unit)
 
                     # If the normalised time span is not long enough to fit the minimum duration, skip it.
-                    if ts.duration_minutes < reservation_unit_minimum_duration_minutes:
+                    if not normalized_reservable_time_span.can_fit_reservation_for_reservation_unit(
+                        reservation_unit=reservation_unit,
+                        minimum_duration_minutes=minimum_duration_minutes,
+                    ):
                         continue
 
-                    reservation_unit_to_first_reservable_time[reservation_unit.pk] = ts.start_datetime
+                    first_reservable_times[reservation_unit.pk] = normalized_reservable_time_span.start_datetime
                     break
 
                 # Suitable timespan was found, select and continue to next reservation unit
-                if reservation_unit_to_first_reservable_time.get(reservation_unit.pk) is not None:
+                if first_reservable_times.get(reservation_unit.pk) is not None:
                     break
 
         ###################################
@@ -416,11 +338,10 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
 
         # Create When statements for the queryset annotation
         first_reservable_time_whens: list[When] = [
-            When(pk=pk, then=Value(start_datetime))
-            for pk, start_datetime in reservation_unit_to_first_reservable_time.items()
+            When(pk=pk, then=Value(start_datetime)) for pk, start_datetime in first_reservable_times.items()
         ]
         is_closed_whens: list[When] = [
-            When(pk=pk, then=Value(is_closed)) for pk, is_closed in reservation_unit_to_closed_status.items()
+            When(pk=pk, then=Value(is_closed)) for pk, is_closed in reservation_unit_closed_statuses.items()
         ]
 
         return self.annotate(
