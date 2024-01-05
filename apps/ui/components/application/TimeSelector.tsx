@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import styled, { CSSProperties } from "styled-components";
+import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { IconCross, Select } from "hds-react";
 import type {
@@ -302,11 +302,9 @@ const ButtonContainer = styled.div`
   margin-bottom: var(--spacing-layout-s);
 `;
 
-const ResetButton = styled(SupplementaryButton).attrs({
-  style: {
-    "--color-bus": "var(--color-black)",
-  } as CSSProperties,
-})`
+const ResetButton = styled(SupplementaryButton)`
+  --color-bus: var(--color-black);
+
   & > span {
     display: flex;
     gap: var(--spacing-2-xs);

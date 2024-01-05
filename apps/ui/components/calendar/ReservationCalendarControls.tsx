@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useTranslation } from "next-i18next";
-import styled, { CSSProperties } from "styled-components";
+import styled from "styled-components";
 import {
   differenceInMinutes,
   differenceInSeconds,
@@ -205,10 +205,9 @@ const Price = styled.div`
 const ResetButton = styled(Button).attrs({
   variant: "supplementary",
   iconLeft: <IconCross aria-hidden />,
-  style: {
-    "--color": "var(--color-black)",
-  } as CSSProperties,
 })<{ $isLast: boolean }>`
+  --color: var(--color-black);
+
   white-space: nowrap;
   order: 1;
 

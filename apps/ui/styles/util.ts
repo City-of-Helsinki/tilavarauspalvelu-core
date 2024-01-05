@@ -1,6 +1,6 @@
 import { fontMedium } from "common/src/common/typography";
 import { Button, Notification } from "hds-react";
-import styled, { css, CSSProperties } from "styled-components";
+import styled, { css } from "styled-components";
 
 export const truncatedText = css`
   white-space: nowrap;
@@ -21,9 +21,7 @@ export const BlackButton = styled(Button)`
   ${fontMedium};
 `;
 
-export const SupplementaryButton = styled(Button).attrs({
-  style: {} as CSSProperties,
-})`
+export const SupplementaryButton = styled(Button)`
   &&& {
     --color-bus: transparent;
     --border-color: transparent;
