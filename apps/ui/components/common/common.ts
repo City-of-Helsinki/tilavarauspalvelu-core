@@ -62,8 +62,6 @@ export const HorisontalRule = styled.div`
   margin-top: var(--spacing-layout-m);
 `;
 
-export const CenterSpinner = styled(LoadingSpinner).attrs({
-  "data-testid": "loading-spinner",
-})`
+export const CenterSpinner = styled(LoadingSpinner)`
   margin: 0 auto var(--spacing-2-xl) auto;
 `;

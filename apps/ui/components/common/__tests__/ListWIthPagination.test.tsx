@@ -64,7 +64,6 @@ describe("ListWithPagination", () => {
         .queryByTestId("list-with-pagination__list--container")
         ?.querySelectorAll("div")
     ).toHaveLength(itemCount);
-    expect(screen.queryByTestId("loading-spinner")).toBeNull();
     expect(
       screen.queryByTestId("list-with-pagination__pagination--summary")
     ).toHaveTextContent("30 tulosta 100 tuloksesta näytetty");
@@ -89,7 +88,6 @@ describe("ListWithPagination", () => {
         .queryByTestId("list-with-pagination__list--container")
         ?.querySelectorAll("div")
     ).toHaveLength(itemCount);
-    expect(screen.queryByTestId("loading-spinner")).toBeNull();
     expect(
       screen.queryByTestId("list-with-pagination__pagination--summary")
     ).toHaveTextContent("Kaikki 30 tulosta näytetty");
@@ -106,7 +104,6 @@ describe("ListWithPagination", () => {
     expect(
       screen.queryByTestId("list-with-pagination__list--container")
     ).toBeNull();
-    expect(screen.queryByTestId("loading-spinner")).toBeNull();
     expect(
       screen.queryByTestId("list-with-pagination__pagination--summary")
     ).toBeNull();
@@ -123,7 +120,6 @@ describe("ListWithPagination", () => {
       screen.queryByTestId("list-with-pagination__list--container")
     ).toBeNull();
     expect(screen.queryByTestId("list-with-pagination__hit-count")).toBeNull();
-    expect(screen.queryByTestId("loading-spinner")).toBeTruthy();
     expect(
       screen.queryByTestId("list-with-pagination__pagination--summary")
     ).toBeNull();

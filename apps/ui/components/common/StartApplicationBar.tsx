@@ -73,8 +73,6 @@ const Left = styled.div`
 const DeleteButton = styled(Button).attrs({
   variant: "primary",
   iconLeft: <IconCross />,
-
-  "data-testid": "start-application-bar__button--clear-selections",
 })`
   ${truncatedText}
 `;
@@ -113,7 +111,11 @@ const StartApplicationBar = ({
                 </JustForMobile>
               </ReservationUnitCount>
             </CountWrapper>
-            <DeleteButton onClick={clearSelections} size="small">
+            <DeleteButton
+              onClick={clearSelections}
+              size="small"
+              data-testid="start-application-bar__button--clear-selections"
+            >
               <JustForDesktop>
                 {t("shoppingCart:deleteSelections")}
               </JustForDesktop>

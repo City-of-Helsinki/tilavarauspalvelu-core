@@ -41,25 +41,23 @@ interface IFilterBtn {
   $filtersActive: boolean;
 }
 
-export const FilterBtn = styled(Button).attrs(
-  ({ $filterControlsAreOpen, $filtersActive }: IFilterBtn) => ({
-    style: {
-      "--filter-button-color": $filtersActive
-        ? "var(--tilavaraus-admin-blue-dark)"
-        : $filterControlsAreOpen
-          ? "var(--color-silver)"
-          : "transparent",
-      "--color-bus": "var(--filter-button-color)",
-      "--color-bus-dark": "var(--filter-button-color)",
-      "--color-white": $filtersActive
-        ? "white"
-        : "var(--tilavaraus-admin-content-text-color)",
-      "--background-color-disabled": "transparent",
-      "--border-color-disabled": "transparent",
-      "--color-disabled": "var(--color-black-50)",
-    } as React.CSSProperties,
-  })
-)<IFilterBtn>`
+export const FilterBtn = styled(Button)<IFilterBtn>`
+  --background-color-disabled: transparent;
+  --border-color-disabled: transparent;
+  --color-disabled: var(--color-black-50);
+  --color-bus: var(--filter-button-color);
+  --color-bus-dark: var(--filter-button-color);
+
+  /* TODO this is weird why are we overriding colour-white? */
+  --color-white: ${({ $filtersActive }) =>
+    $filtersActive ? "white" : "var(--tilavaraus-admin-content-text-color)"};
+  --filter-button-color: ${({ $filtersActive, $filterControlsAreOpen }) =>
+    $filtersActive
+      ? "var(--tilavaraus-admin-blue-dark)"
+      : $filterControlsAreOpen
+        ? "var(--color-silver)"
+        : "transparent"};
+
   ${({ $filtersActive }) =>
     $filtersActive &&
     `

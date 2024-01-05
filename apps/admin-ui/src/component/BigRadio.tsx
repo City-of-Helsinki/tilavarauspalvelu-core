@@ -18,24 +18,21 @@ interface IProps {
   className?: string;
 }
 
-interface IButtonProps {
-  $active: boolean;
-}
-
 const Wrapper = styled.div`
   @media (min-width: ${breakpoints.m}) {
     white-space: nowrap;
   }
 `;
 
-const StyledButton = styled(HDSButton).attrs(({ $active }: IButtonProps) => ({
-  style: {
-    "--border-color": "var(--color-black)",
-    "--color-bus": $active ? "var(--color-black)" : "var(--color-white)",
-    "--color": $active ? "var(--color-white)" : "var(--color-black)",
-    "--color-focus": $active ? "var(--color-white)" : "var(--color-black)",
-  } as React.CSSProperties,
-}))<{ $active: boolean }>`
+const StyledButton = styled(HDSButton)<{ $active: boolean }>`
+  --border-color: var(--color-black);
+  --color-bus: ${({ $active }) =>
+    $active ? "var(--color-black)" : "var(--color-white)"};
+  --color: ${({ $active }) =>
+    $active ? "var(--color-white)" : "var(--color-black)"};
+  --color-focus: ${({ $active }) =>
+    $active ? "var(--color-white)" : "var(--color-black)"};
+
   display: block;
   width: 100%;
 

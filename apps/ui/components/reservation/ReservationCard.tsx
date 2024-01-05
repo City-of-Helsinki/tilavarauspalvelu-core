@@ -73,7 +73,7 @@ const StatusContainer = styled.div`
   align-items: flex-start;
 `;
 
-const Name = styled.span.attrs({ "data-testid": "reservation-card__name" })`
+const Name = styled.span`
   font-size: var(--fontsize-heading-m);
   font-family: var(--font-bold);
   font-weight: 700;

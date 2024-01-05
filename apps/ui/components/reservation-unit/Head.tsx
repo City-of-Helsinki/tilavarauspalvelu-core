@@ -57,9 +57,7 @@ const RightContainer = styled.div`
   }
 `;
 
-const StyledIconWithText = styled(IconWithText).attrs({
-  "data-testid": "icon-with-text",
-})`
+const StyledIconWithText = styled(IconWithText)`
   display: grid;
   align-items: flex-start;
   white-space: pre-line;

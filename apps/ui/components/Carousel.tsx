@@ -13,7 +13,6 @@ type Props = {
   cellSpacing?: number;
   wrapAround?: boolean;
   hideCenterControls?: boolean;
-  buttonVariant?: "medium" | "small";
 };
 
 const Button = styled(MediumButton).attrs({
@@ -41,11 +40,7 @@ const Button = styled(MediumButton).attrs({
   }
 `;
 
-const SmallArrowButton = styled(Button).attrs({
-  "data-testid": "slot-carousel-button",
-})<{
-  $disabled: boolean;
-}>`
+const SmallArrowButton = styled(Button)<{ $disabled: boolean }>`
   &&& {
     --color-bus: transparent;
     --color-bus-dark: transparent;
@@ -74,42 +69,6 @@ const SmallArrowButton = styled(Button).attrs({
   }
 `;
 
-const MediumArrowButton = styled(Button).attrs({
-  "data-testid": "slot-carousel-button",
-})<{
-  $disabled: boolean;
-}>`
-  ${({ $disabled }) =>
-    $disabled
-      ? `
-    display: none !important;
-  `
-      : `
-    &:hover {
-      opacity: 1;
-    }
-    opacity: 0.5;
-  `};
-
-  @media (width > calc(${breakpoints.xl} + 130px)) {
-    &:hover {
-      opacity: 0.5;
-    }
-
-    &:active {
-      opacity: 1;
-    }
-
-    opacity: 1;
-    background-color: transparent !important;
-    color: var(--color-black-90) !important;
-
-    svg {
-      --icon-size: var(--spacing-2-xl) !important;
-    }
-  }
-`;
-
 const StyledCarousel = styled(NukaCarousel)<{
   children: React.ReactNode;
 }>`
@@ -132,16 +91,11 @@ const Carousel = ({
   cellSpacing = 1,
   wrapAround = true,
   hideCenterControls = false,
-  buttonVariant = "medium",
   ...rest
 }: Props): JSX.Element => {
   const { t } = useTranslation();
-  const ButtonVariants = {
-    medium: MediumArrowButton,
-    small: SmallArrowButton,
-  };
 
-  const ButtonComponent = ButtonVariants[buttonVariant];
+  const ButtonComponent = SmallArrowButton;
 
   return (
     <StyledCarousel
@@ -151,8 +105,9 @@ const Carousel = ({
           type="button"
           onClick={previousSlide}
           aria-label={t("common:prev")}
+          data-testid="slot-carousel-button"
         >
-          <IconAngleLeft aria-label={t("common:prev")} />
+          <IconAngleLeft />
         </ButtonComponent>
       )}
       renderCenterRightControls={({ nextSlide, nextDisabled }) => (
@@ -161,8 +116,9 @@ const Carousel = ({
           type="button"
           onClick={nextSlide}
           aria-label={t("common:next")}
+          data-testid="slot-carousel-button"
         >
-          <IconAngleRight aria-label={t("common:next")} />
+          <IconAngleRight />
         </ButtonComponent>
       )}
       wrapAround={wrapAround}
