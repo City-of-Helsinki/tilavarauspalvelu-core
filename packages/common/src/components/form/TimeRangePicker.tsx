@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { Select } from "hds-react";
+import { IconAlertCircleFill, Select } from "hds-react";
 import {
   type FieldValues,
   Path,
@@ -43,10 +43,11 @@ const StyledSelect = styled(Select<OptionType>)`
   }
 `;
 
-const StartBeforeEndError = styled.span`
+const StartBeforeEndError = styled.div`
   grid-column: span 2;
   color: var(--color-error);
   margin-top: var(--spacing-2-xs);
+  display: flex;
 `;
 
 /*
@@ -159,7 +160,8 @@ const TimeRangePicker = <T extends FieldValues>({
       />
       {!!endTimeIsBeforeStartTime && (
         <StartBeforeEndError>
-          {t("searchForm:beginTimeIsBeforeEndTime")}
+          <IconAlertCircleFill />
+          <span>{t("searchForm:beginTimeIsBeforeEndTime")}</span>
         </StartBeforeEndError>
       )}
     </>
