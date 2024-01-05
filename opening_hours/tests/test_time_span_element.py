@@ -4,6 +4,7 @@ from typing import Any, NamedTuple
 import pytest
 from django.utils.timezone import get_default_timezone
 
+from common.date_utils import local_timezone
 from opening_hours.enums import HaukiResourceState
 from opening_hours.tests.test_reservable_time_spans_client import _get_date
 from opening_hours.utils.hauki_api_types import HaukiAPIOpeningHoursResponseTime
@@ -105,7 +106,7 @@ def test__TimeSpanElement__create_from_time_element(time_element_changes, expect
 
     time_span = TimeSpanElement.create_from_time_element(
         date=datetime.date(2023, 1, 1),
-        timezone=DEFAULT_TIMEZONE,
+        timezone=local_timezone(),
         time_element=HaukiAPIOpeningHoursResponseTime(**time_element_kwargs),
     )
 

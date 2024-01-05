@@ -380,6 +380,11 @@ class ReservationSchedulingMixin:
     @staticmethod
     def check_reservation_intervals_for_staff_reservation(reservation_unit, begin):
         interval_minutes = ReservationStartInterval(reservation_unit.reservation_start_interval).as_number
+
+        # Staff reservations ignore 60 and 90 minute intervals
+        if interval_minutes in (60, 90):
+            interval_minutes = 30
+
         interval_timedelta = datetime.timedelta(minutes=interval_minutes)
         possible_start_times = set()
 

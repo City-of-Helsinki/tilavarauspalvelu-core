@@ -42,9 +42,11 @@ class ReservationInfo:
 
     def __init__(self, reservation_values: dict[str, Any]):
         self.time_span = TimeSpanElement(
-            start_datetime=reservation_values["buffered_begin"],
-            end_datetime=reservation_values["buffered_end"],
+            start_datetime=reservation_values["begin"],
+            end_datetime=reservation_values["end"],
             is_reservable=False,
+            buffer_time_before=reservation_values["buffer_time_before"],
+            buffer_time_after=reservation_values["buffer_time_after"],
         )
         self.reservation_unit_id = reservation_values["reservation_unit__id"]
         self.space_ids = set(reservation_values["space_ids"])
@@ -93,7 +95,15 @@ class ReservationQuerySet(QuerySet):
                 space_ids=ArrayRemove(ArrayAgg("reservation_unit__spaces__id", distinct=True), None),
                 resource_ids=ArrayRemove(ArrayAgg("reservation_unit__resources__id", distinct=True), None),
             )
-            .values("buffered_begin", "buffered_end", "reservation_unit__id", "space_ids", "resource_ids")
+            .values(
+                "begin",
+                "end",
+                "buffer_time_before",
+                "buffer_time_after",
+                "reservation_unit__id",
+                "space_ids",
+                "resource_ids",
+            )
         )
         reservation_infos = [ReservationInfo(item) for item in reservation_queryset]
 

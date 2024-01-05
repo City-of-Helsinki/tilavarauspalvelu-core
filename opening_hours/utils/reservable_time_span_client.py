@@ -2,12 +2,21 @@ import calendar
 import datetime
 from copy import copy
 from dataclasses import dataclass
-from typing import Optional
-from zoneinfo import ZoneInfo
+from math import ceil
+from typing import TYPE_CHECKING, Optional
 
-from django.utils import timezone
-from django.utils.timezone import get_default_timezone
+from django.conf import settings
 
+from common.date_utils import (
+    combine,
+    local_date,
+    local_time_min,
+    local_timezone,
+    time_as_timedelta,
+    times_equal,
+    timezone_from_name,
+)
+from common.utils import with_indices
 from opening_hours.enums import HaukiResourceState
 from opening_hours.errors import (
     ReservableTimeSpanClientNothingToDoError,
@@ -19,8 +28,11 @@ from opening_hours.utils.hauki_api_types import (
     HaukiAPIOpeningHoursResponseItem,
     HaukiAPIOpeningHoursResponseTime,
 )
+from reservation_units.enums import ReservationStartInterval
 
-DEFAULT_TIMEZONE = get_default_timezone()
+if TYPE_CHECKING:
+    from reservation_units.models import ReservationUnit
+
 
 # Hash value for when there are never any opening hours
 # See https://github.com/City-of-Helsinki/hauki `hours.models.Resource._get_date_periods_as_hash`
@@ -32,45 +44,67 @@ class TimeSpanElement:
     start_datetime: datetime.datetime
     end_datetime: datetime.datetime
     is_reservable: bool
+    buffer_time_after: datetime.timedelta | None = None
+    buffer_time_before: datetime.timedelta | None = None
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         reservable_str = "Reservable" if self.is_reservable else "Closed"
+        return f"<{self.__class__.__name__}({self._get_datetime_str()}, {reservable_str})>"
 
-        return f"<TimeSpanElement({self._get_datetime_str()}, {reservable_str})>"
+    def _get_datetime_str(self) -> str:
+        strformat = "%Y-%m-%d %H:%M"
+
+        start = self.start_datetime.astimezone(local_timezone())
+        end = self.end_datetime.astimezone(local_timezone())
+
+        start_date = start.date()
+        end_date = end.date()
+
+        start_str = "min" if start_date == datetime.date.min else start.strftime(strformat)
+
+        if end_date == datetime.date.max:
+            end_str = "max"
+        elif end_date == start_date:
+            end_str = end.strftime("%H:%M")
+        elif end_date == start_date + datetime.timedelta(days=1) and end_date == datetime.time.min:
+            end_str = "24:00"
+        else:
+            end_str = end.strftime(strformat)
+
+        duration_str = f"{start_str}-{end_str}"
+
+        if self.buffer_time_before:
+            duration_str += f", -{str(self.buffer_time_before).zfill(8)[:5]}"
+        if self.buffer_time_after:
+            duration_str += f", +{str(self.buffer_time_after).zfill(8)[:5]}"
+
+        return duration_str
 
     def __copy__(self) -> "TimeSpanElement":
         return TimeSpanElement(
             start_datetime=self.start_datetime,
             end_datetime=self.end_datetime,
             is_reservable=self.is_reservable,
+            buffer_time_after=self.buffer_time_after,
+            buffer_time_before=self.buffer_time_before,
         )
 
     def __hash__(self) -> int:
-        return hash((self.start_datetime, self.end_datetime, self.is_reservable))
-
-    def _get_datetime_str(self) -> str:
-        strformat = "%Y-%m-%d %H:%M"
-
-        start = self.start_datetime.astimezone(DEFAULT_TIMEZONE)
-        end = self.end_datetime.astimezone(DEFAULT_TIMEZONE)
-
-        start_str = "min" if start.date() == datetime.date.min else start.strftime(strformat)
-        if end.date() == datetime.date.max:
-            end_str = "max"
-        elif start.date() == end.date():
-            end_str = end.strftime("%H:%M")
-        elif end.date() == start.date() + datetime.timedelta(days=1) and end.time() == datetime.time.min:
-            end_str = "24:00"
-        else:
-            end_str = end.strftime(strformat)
-
-        return f"{start_str}-{end_str}"
+        return hash(
+            (
+                self.start_datetime,
+                self.end_datetime,
+                self.is_reservable,
+                self.buffer_time_after,
+                self.buffer_time_before,
+            )
+        )
 
     @classmethod
     def create_from_time_element(
         cls,
         date: datetime.date,
-        timezone: ZoneInfo,
+        timezone: datetime.timezone,
         time_element: HaukiAPIOpeningHoursResponseTime,
     ) -> Optional["TimeSpanElement"]:
         # We only care if the resource is reservable or closed on the time frame.
@@ -79,39 +113,241 @@ class TimeSpanElement:
         if not time_element_state.is_reservable and not time_element_state.is_closed:
             return None
 
-        start_time: str = time_element["start_time"]
-        end_time: str = time_element["end_time"]
-
-        full_day: bool = time_element["full_day"] or (start_time is None and end_time is None)
+        full_day: bool = time_element["full_day"] or (
+            time_element["start_time"] is None and time_element["end_time"] is None
+        )
 
         start_time: datetime.time = (
-            datetime.time(0)
-            if (full_day or not start_time)
-            else datetime.datetime.strptime(start_time, "%H:%M:%S").time()
-        )
-        start_datetime = datetime.datetime.combine(date, start_time, tzinfo=timezone)
+            datetime.time()
+            if full_day or time_element["start_time"] is None
+            else datetime.datetime.strptime(time_element["start_time"], "%H:%M:%S").time()
+        ).replace(tzinfo=timezone)
+
+        start_datetime = combine(date, start_time)
 
         if time_element["end_time_on_next_day"] or full_day:
             date += datetime.timedelta(days=1)
 
         end_time: datetime.time = (
-            datetime.time(0) if (full_day or not end_time) else datetime.datetime.strptime(end_time, "%H:%M:%S").time()
-        )
-        end_datetime = datetime.datetime.combine(date, end_time, tzinfo=timezone)
+            datetime.time()
+            if full_day or time_element["end_time"] is None
+            else datetime.datetime.strptime(time_element["end_time"], "%H:%M:%S").time()
+        ).replace(tzinfo=timezone)
+
+        end_datetime = combine(date, end_time)
 
         # If the time span duration would be zero or negative, return None.
         if start_datetime >= end_datetime:
             return None
 
         return TimeSpanElement(
-            start_datetime=start_datetime.astimezone(DEFAULT_TIMEZONE),
-            end_datetime=end_datetime.astimezone(DEFAULT_TIMEZONE),
+            start_datetime=start_datetime.astimezone(local_timezone()),
+            end_datetime=end_datetime.astimezone(local_timezone()),
             is_reservable=time_element_state.is_reservable,
         )
 
     @property
+    def buffered_start_datetime(self) -> datetime.datetime:
+        return self.start_datetime - (self.buffer_time_before if self.buffer_time_before else datetime.timedelta())
+
+    @property
+    def buffered_end_datetime(self) -> datetime.datetime:
+        return self.end_datetime + (self.buffer_time_after if self.buffer_time_after else datetime.timedelta())
+
+    @property
     def duration_minutes(self) -> float:
         return (self.end_datetime - self.start_datetime).total_seconds() / 60
+
+    @property
+    def buffered_duration_minutes(self) -> float:
+        return (self.buffered_end_datetime - self.buffered_start_datetime).total_seconds() / 60
+
+    def overlaps_with(self, other: "TimeSpanElement") -> bool:
+        """
+        Does this time spans overlap with the other time span?
+
+                     other
+                 <--timespan-->
+        ------  |              |           # No
+        --------|              |           # No
+        --------|--            |           # Yes
+        --------|--------------|           # Yes
+                |              |           #
+                |  ----------  |           # Yes
+                |--------------|           # Yes
+        --------|--------------|--------   # Yes
+                |              |           #
+                |--------------|--------   # Yes
+                |            --|--------   # Yes
+                |              |--------   # No
+                |              |  ------   # No
+        """
+        return (
+            self.buffered_start_datetime < other.buffered_end_datetime
+            and self.buffered_end_datetime > other.buffered_start_datetime
+        )
+
+    def fully_inside_of(self, other: "TimeSpanElement") -> bool:
+        """
+        Does this time spans fully overlap with the other time span?
+
+                     other
+                 <--timespan-->
+        ------  |              |           # No
+        --------|              |           # No
+        --------|--            |           # No
+        --------|--------------|           # No
+                |              |           #
+                |  ----------  |           # Yes
+                |--------------|           # Yes
+        --------|--------------|--------   # No
+                |              |           #
+                |--------------|--------   # No
+                |            --|--------   # No
+                |              |--------   # No
+                |              |  ------   # No
+        """
+        return (
+            self.buffered_start_datetime >= other.buffered_start_datetime
+            and self.buffered_end_datetime <= other.buffered_end_datetime
+        )
+
+    def starts_inside_of(self, other: "TimeSpanElement") -> bool:
+        """
+        Does this time spans start inside the other time span?
+
+                     other
+                 <--timespan-->
+        ------  |              |           # No
+        --------|              |           # No
+        --------|--            |           # No
+        --------|--------------|           # No
+                |              |           #
+                |  ----------  |           # Yes
+                |--------------|           # Yes
+        --------|--------------|--------   # No
+                |              |           #
+                |--------------|--------   # Yes
+                |            --|--------   # Yes
+                |              |--------   # No
+                |              |  ------   # No
+        """
+        return other.buffered_start_datetime <= self.buffered_start_datetime < other.buffered_end_datetime
+
+    def ends_inside_of(self, other: "TimeSpanElement") -> bool:
+        """
+        Does this time spans end inside the other time span?
+
+                     other
+                 <--timespan-->
+        ------  |              |           # No
+        --------|              |           # No
+        --------|--            |           # Yes
+        --------|--------------|           # Yes
+                |              |           #
+                |  ----------  |           # Yes
+                |--------------|           # Yes
+        --------|--------------|--------   # No
+                |              |           #
+                |--------------|--------   # No
+                |            --|--------   # No
+                |              |--------   # No
+                |              |  ------   # No
+        """
+        return other.buffered_start_datetime < self.buffered_end_datetime <= other.buffered_end_datetime
+
+    def can_fit_reservation_for_reservation_unit(
+        self,
+        reservation_unit: "ReservationUnit",
+        minimum_duration_minutes: int,
+    ) -> bool:
+        """Is this timespan long enough for a reservation for the given ReservationUnit?"""
+        # Minimum duration of a reservation for this ReservationUnit
+        reservation_unit_minimum_duration_minutes = (
+            minimum_duration_minutes
+            if not reservation_unit.min_reservation_duration
+            else max(reservation_unit.min_reservation_duration.total_seconds() / 60, minimum_duration_minutes)
+        )
+
+        # Minimum duration of a reservation for this ReservationUnit, including buffer times
+        buffered_reservation_unit_minimum_duration_minutes = reservation_unit_minimum_duration_minutes
+        if reservation_unit.buffer_time_before is not None:
+            buffered_reservation_unit_minimum_duration_minutes += (
+                reservation_unit.buffer_time_before.total_seconds() / 60
+            )
+        if reservation_unit.buffer_time_after is not None:
+            buffered_reservation_unit_minimum_duration_minutes += (
+                reservation_unit.buffer_time_after.total_seconds() / 60
+            )
+
+        return (
+            self.duration_minutes >= reservation_unit_minimum_duration_minutes
+            and self.buffered_duration_minutes >= buffered_reservation_unit_minimum_duration_minutes
+        )
+
+    def move_to_next_valid_start_time(self, reservation_unit: "ReservationUnit") -> None:
+        """
+        Move reservable time span start time to the next valid start time based on the
+        given reservation unit's settings and filter time start.
+
+        For a reservation to be valid, its start time must be at an interval that is valid for the ReservationUnit.
+        e.g. When ReservationUnit.reservation_start_interval is 30 minutes,
+        a reservation must start at 00:00, 00:30, 01:00, 01:30 from the start of the time span.
+        """
+        # If a buffer was added to the reservable time span, but the reservation units buffer is
+        # longer, we need to move the start time forward to account for the difference.
+        if self.buffer_time_before is not None and self.buffer_time_before < (
+            reservation_unit.buffer_time_before or datetime.timedelta()
+        ):
+            self.start_datetime += reservation_unit.buffer_time_before - self.buffer_time_before
+            self.buffer_time_before = reservation_unit.buffer_time_before
+
+        interval = ReservationStartInterval(reservation_unit.reservation_start_interval).as_number
+
+        overflow_minutes = ceil((time_as_timedelta(self.start_datetime).total_seconds() / 60) % interval)
+        if overflow_minutes == 0:
+            return
+
+        delta_to_next_interval = datetime.timedelta(minutes=interval - overflow_minutes)
+        self.start_datetime += delta_to_next_interval
+
+    def get_as_closed_time_spans(
+        self,
+        filter_time_start: datetime.time | None,
+        filter_time_end: datetime.time | None,
+    ) -> list["TimeSpanElement"]:
+        """
+        Generate a list of closed time spans for a time span based on given filter time values.
+
+        This list will contain at most two time spans for every day between the start and end date of this time span.
+        """
+        closed_time_spans: list[TimeSpanElement] = []
+
+        if not filter_time_start and not filter_time_end:
+            return closed_time_spans
+
+        # Loop through every day between the start and end date of this time span
+        for day in self.get_dates_range():
+            # Add closed time spans for the time range outside the given filter range
+            # e.g. Filter time range is 10:00-14:00, add closed time spans for 00:00-10:00 and 14:00-00:00
+            if filter_time_start and not times_equal(filter_time_start, local_time_min()):
+                closed_time_spans.append(
+                    TimeSpanElement(
+                        start_datetime=combine(day, local_time_min()),
+                        end_datetime=combine(day, filter_time_start),
+                        is_reservable=False,
+                    )
+                )
+            if filter_time_end and not times_equal(filter_time_end, local_time_min()):
+                closed_time_spans.append(
+                    TimeSpanElement(
+                        start_datetime=combine(day, filter_time_end),
+                        end_datetime=combine(day, local_time_min()) + datetime.timedelta(days=1),
+                        is_reservable=False,
+                    )
+                )
+
+        return closed_time_spans
 
     def get_dates_range(self) -> list[datetime.date]:
         """
@@ -126,8 +362,8 @@ class TimeSpanElement:
         [datetime.date(2021, 1, 1), datetime.date(2021, 1, 2), datetime.date(2021, 1, 3)]
         """
         return [
-            self.start_datetime.date() + datetime.timedelta(i)
-            for i in range(int((self.end_datetime.date() - self.start_datetime.date()).days) + 1)
+            self.buffered_start_datetime.date() + datetime.timedelta(i)
+            for i in range(int((self.buffered_end_datetime.date() - self.buffered_start_datetime.date()).days) + 1)
         ]
 
 
@@ -162,7 +398,8 @@ class ReservableTimeSpanClient:
         # Split the time spans into reservable and closed time spans.
         reservable_time_spans, closed_time_spans = self._split_to_reservable_and_closed_time_spans(parsed_time_spans)
 
-        # Normalise the parsed time spans into a list of clean reservable TimeSpanElements.
+        # The Hauki data may contain conflicting data, such as overlapping reservable and closed time spans,
+        # so we normalise the reservable timespans by the closed timespans.
         normalised_time_spans = override_reservable_with_closed_time_spans(reservable_time_spans, closed_time_spans)
 
         created_reservable_time_spans = self._create_reservable_time_spans(normalised_time_spans)
@@ -173,7 +410,7 @@ class ReservableTimeSpanClient:
         return created_reservable_time_spans
 
     def _init_date_range(self):
-        today = timezone.now().date()
+        today = local_date()
         if self.origin_hauki_resource.latest_fetched_date:
             # Start fetching from the next day after the latest fetched date.
             self.start_date = self.origin_hauki_resource.latest_fetched_date + datetime.timedelta(days=1)
@@ -200,7 +437,7 @@ class ReservableTimeSpanClient:
     @staticmethod
     def _parse_opening_hours(opening_hours_response: HaukiAPIOpeningHoursResponseItem) -> list[TimeSpanElement]:
         """Parse the Hauki API response into a simplified list of TimeSpanDayElements."""
-        resource_timezone = ZoneInfo(opening_hours_response["resource"].get("timezone", DEFAULT_TIMEZONE.key))
+        resource_timezone = timezone_from_name(opening_hours_response["resource"].get("timezone", settings.TIME_ZONE))
 
         time_span_list: list[TimeSpanElement] = []
         for day in opening_hours_response["opening_hours"]:
@@ -314,59 +551,35 @@ def merge_overlapping_time_span_elements(time_span_elements: list[TimeSpanElemen
 
 
 def override_reservable_with_closed_time_spans(
-    reservable_time_spans: list[TimeSpanElement | None],
+    reservable_time_spans: list[TimeSpanElement],
     closed_time_spans: list[TimeSpanElement],
 ) -> list[TimeSpanElement]:
     """
-    Go through all the time spans and normalise them into a list of clean reservable TimeSpanElements.
-
-    The Hauki data may contain conflicting data, such as overlapping time spans with different states,
-    so we need to clean it before it can be used.
-
-    When time spans of different states overlap, the closed time spans always override the reservable time spans.
-    If the closed time span is fully inside the reservable time span, the reservable time span is split in two,
-    otherwise the reservable time span is shortened from the beginning or end.
+    Normalize the given reservable timespans by shortening/splitting/removing them depending on if and how they
+    overlap with any of the given closed time spans.
 
     We have no way to know if this is actually the correct way to handle conflicts, but it's our best assumption.
     e.g. Normally open every weekday, but closed on friday due to a public holiday.
 
     The reservable and closed time spans are not required to be chronological order.
+    The reservable time spans should not have any overlapping timespans at this stage.
+
+    Returned reservable timespans are in chronological order.
     """
-    i: int
-    reservable_time_span: TimeSpanElement
     for closed_time_span in closed_time_spans:
-        for i, reservable_time_span in enumerate(reservable_time_spans):
+        for reservable_index, reservable_time_span in (gen := with_indices(reservable_time_spans)):
             if reservable_time_span is None:
                 continue
 
             # Skip the closed time spans that are fully outside the reservable time span.
-            # ┌────────────────────────┬────────────┐
-            # │    ooo    ->    ooo    │            │
-            # │ xx        ->           │ Skipped    │
-            # │  xxx      ->  xxx      │ Ok         │
-            # │    xxx    ->    xxx    │ Ok         │
-            # │      xxx  ->      xxx  │ Ok         │
-            # │        xx ->           │ Skipped    │
-            # └────────────────────────┴────────────┘
-            if (
-                reservable_time_span.start_datetime > closed_time_span.end_datetime
-                or reservable_time_span.end_datetime < closed_time_span.start_datetime
-            ):
+            if not reservable_time_span.overlaps_with(closed_time_span):
                 continue
 
             # The reservable time span is fully inside the closed time span, remove it.
-            # ┌──────────────────────────┬───────────────────────────────────┐
-            # │    ooo     ->            │ Reservable fully inside closed    │
-            # │  xxxxxxx   ->  xxxxxxx   │ Reservable time removed           │
-            # ├──────────────────────────┼───────────────────────────────────┤
-            # │   oooo     ->            │ Reservable fully inside closed    │
-            # │   xxxx     ->   xxxx     │ Reservable time removed           │
-            # └──────────────────────────┴───────────────────────────────────┘
-            if (
-                closed_time_span.start_datetime <= reservable_time_span.start_datetime
-                and closed_time_span.end_datetime >= reservable_time_span.end_datetime
-            ):
-                reservable_time_spans[i] = None
+            if reservable_time_span.fully_inside_of(closed_time_span):
+                del reservable_time_spans[reservable_index]
+                gen.item_deleted = True
+                continue
 
             # Closed time span is fully inside the reservable time span, split the reservable time span
             # ┌────────────────────┬───────────────────────────────────────────────┐
@@ -377,14 +590,16 @@ def override_reservable_with_closed_time_spans(
             # │  xx     ->  xx     │ reservable time span is split in three.       │
             # │     xx  ->     xx  │ (in different loops)                          │
             # └────────────────────┴───────────────────────────────────────────────┘
-            elif (
-                reservable_time_span.start_datetime < closed_time_span.start_datetime
-                and reservable_time_span.end_datetime > closed_time_span.end_datetime
-            ):
+            elif closed_time_span.fully_inside_of(reservable_time_span):
                 new_reservable_time_span = copy(reservable_time_span)
-                reservable_time_span.end_datetime = closed_time_span.start_datetime
-                new_reservable_time_span.start_datetime = closed_time_span.end_datetime
                 reservable_time_spans.append(new_reservable_time_span)
+                # Split the reservable time span in two
+                # Save the buffers on the reservable times, so that we can check if another buffered timespan
+                # (i.e. a reservation's timespan) would fit between this and the next/previous time span
+                reservable_time_span.end_datetime = closed_time_span.buffered_start_datetime
+                new_reservable_time_span.start_datetime = closed_time_span.buffered_end_datetime
+                reservable_time_span.buffer_time_after = closed_time_span.buffer_time_before
+                new_reservable_time_span.buffer_time_before = closed_time_span.buffer_time_after
 
             # Reservable time span starts inside the closed time span.
             # Shorten the reservable time span from the beginning
@@ -398,8 +613,11 @@ def override_reservable_with_closed_time_spans(
             # │     oooo   ->     oooo   │ Overlapping from the beginning    │
             # │       xxxx ->       xxxx │ Handled later in the next step    │
             # └──────────────────────────┴───────────────────────────────────┘
-            elif closed_time_span.start_datetime <= reservable_time_span.start_datetime < closed_time_span.end_datetime:
-                reservable_time_span.start_datetime = closed_time_span.end_datetime
+            elif reservable_time_span.starts_inside_of(closed_time_span):
+                # Save the buffer on the reservable time, so that we can check if another buffered timespan
+                # (i.e. a reservation's timespan) would fit between this and the previous time span
+                reservable_time_span.start_datetime = closed_time_span.buffered_end_datetime
+                reservable_time_span.buffer_time_before = closed_time_span.buffer_time_after
 
             # Reservable time span ends inside the closed time span.
             # Shorten the reservable time span from the end
@@ -413,17 +631,24 @@ def override_reservable_with_closed_time_spans(
             # │   oooo     ->   oooo     │ Overlapping from the beginning    │
             # │ xxxx       -> xxxx       │ Already handled in last step      │
             # └──────────────────────────┴───────────────────────────────────┘
-            elif closed_time_span.start_datetime < reservable_time_span.end_datetime <= closed_time_span.end_datetime:
-                reservable_time_span.end_datetime = closed_time_span.start_datetime
+            elif reservable_time_span.ends_inside_of(closed_time_span):
+                # Save the buffer on the reservable time, so that we can check if another buffered timespan
+                # (i.e. a reservation's timespan) would fit between this and the next time span
+                reservable_time_span.end_datetime = closed_time_span.buffered_start_datetime
+                reservable_time_span.buffer_time_after = closed_time_span.buffer_time_before
 
-            # If the duration of the reservable time span is negative or zero after adjustments, remove it.
+            # If the duration of the reservable time span is negative or zero after adjustments
+            # (buffered time is ignored here), remove it.
             if reservable_time_span.start_datetime >= reservable_time_span.end_datetime:
-                reservable_time_spans[i] = None
+                del reservable_time_spans[reservable_index]
+                gen.item_deleted = True
+                continue
 
-    # Filter out all None values
-    reservable_time_spans[:] = [ts for ts in reservable_time_spans if ts is not None]
-
-    # Sort the time spans once more to ensure they are in correct order.
-    reservable_time_spans[:] = sorted(reservable_time_spans, key=lambda ts: ts.start_datetime)
+    # Sort the time spans once more to ensure they are in chronological order.
+    # Remove any timespans that have a duration of zero (or less).
+    reservable_time_spans[:] = sorted(
+        (ts for ts in reservable_time_spans if ts.start_datetime < ts.end_datetime),
+        key=lambda ts: ts.start_datetime,
+    )
 
     return reservable_time_spans
