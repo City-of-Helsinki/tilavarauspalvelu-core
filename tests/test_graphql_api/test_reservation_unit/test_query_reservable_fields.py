@@ -8,6 +8,7 @@ import pytest
 from django.utils.timezone import get_default_timezone
 
 from applications.choices import ApplicationRoundStatusChoice
+from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import ReservationUnit
 from reservations.choices import ReservationStateChoice
 from tests.factories import (
@@ -52,7 +53,7 @@ def reservation_unit() -> ReservationUnit:
     )
     reservation_unit = ReservationUnitFactory(
         origin_hauki_resource=origin_hauki_resource,
-        reservation_start_interval=ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES,
+        reservation_start_interval=ReservationStartInterval.INTERVAL_15_MINUTES.value,
         reservation_begins=None,
         reservation_ends=None,
         reservations_min_days_before=None,
@@ -719,7 +720,7 @@ def test__query_reservation_unit_reservable__filter__reservation_unit_settings(
             ),
             "Advanced | Next interval is a non-default value": RU_ReservableParams(
                 reservation_unit_settings=ReservationUnitOverrides(
-                    reservation_start_interval=ReservationUnit.RESERVATION_START_INTERVAL_30_MINUTES,
+                    reservation_start_interval=ReservationStartInterval.INTERVAL_30_MINUTES.value,
                 ),
                 filters=ReservableFilters(
                     reservable_time_start="13:01:00",
@@ -728,7 +729,7 @@ def test__query_reservation_unit_reservable__filter__reservation_unit_settings(
             ),
             "Advanced | Next interval doesn't leave enough duration for the minimum duration": RU_ReservableParams(
                 reservation_unit_settings=ReservationUnitOverrides(
-                    reservation_start_interval=ReservationUnit.RESERVATION_START_INTERVAL_30_MINUTES,
+                    reservation_start_interval=ReservationStartInterval.INTERVAL_30_MINUTES.value,
                 ),
                 filters=ReservableFilters(
                     reservable_time_start="13:01:00",
@@ -738,7 +739,7 @@ def test__query_reservation_unit_reservable__filter__reservation_unit_settings(
             ),
             "Advanced | Next interval is at the end of the time span": RU_ReservableParams(
                 reservation_unit_settings=ReservationUnitOverrides(
-                    reservation_start_interval=ReservationUnit.RESERVATION_START_INTERVAL_60_MINUTES,
+                    reservation_start_interval=ReservationStartInterval.INTERVAL_60_MINUTES.value,
                 ),
                 filters=ReservableFilters(
                     reservable_time_start="13:01:00",
@@ -747,12 +748,12 @@ def test__query_reservation_unit_reservable__filter__reservation_unit_settings(
             ),
             "Advanced | Next interval is outside time span": RU_ReservableParams(
                 reservation_unit_settings=ReservationUnitOverrides(
-                    reservation_start_interval=ReservationUnit.RESERVATION_START_INTERVAL_90_MINUTES,
+                    reservation_start_interval=ReservationStartInterval.INTERVAL_90_MINUTES.value,
                 ),
                 filters=ReservableFilters(
-                    reservable_time_start="13:01:00",
+                    reservable_time_start="13:31:00",
                 ),
-                result=ReservableNode(is_closed=False, first_reservable_datetime=_datetime(day=20, hour=17)),
+                result=ReservableNode(is_closed=False, first_reservable_datetime=_datetime(day=20, hour=18)),
             ),
         }
     )
@@ -1173,7 +1174,7 @@ def test__query_reservation_unit_reservable__reservations__filter_start_time_at_
     This is a regression test for a bug that was found during manual testing.
     Simply recreate the exact scenario instead of using the above test cases.
     """
-    reservation_unit.reservation_start_interval = ReservationUnit.RESERVATION_START_INTERVAL_30_MINUTES
+    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_30_MINUTES.value
     reservation_unit.save()
 
     # Monday | 2024-01-09 | 14:00 - 15:30 (1.5h)

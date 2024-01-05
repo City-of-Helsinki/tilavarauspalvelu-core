@@ -8,7 +8,8 @@ from rest_framework.test import APIClient
 
 from api.graphql.tests.base import GrapheneTestCaseBase
 from merchants.verkkokauppa.product.types import Product
-from reservation_units.models import PaymentType, ReservationUnit, TaxPercentage
+from reservation_units.enums import ReservationStartInterval
+from reservation_units.models import PaymentType, TaxPercentage
 from terms_of_use.models import TermsOfUse
 from tests.factories import (
     PurposeFactory,
@@ -72,7 +73,7 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
             reservation_confirmed_instructions_sv="Ytterligare instruktioner för den godkända reservationen",
             reservation_confirmed_instructions_en="Additional instructions for the approved reservation",
             is_draft=False,
-            reservation_start_interval=ReservationUnit.RESERVATION_START_INTERVAL_30_MINUTES,
+            reservation_start_interval=ReservationStartInterval.INTERVAL_30_MINUTES.value,
             reservation_begins=datetime.datetime.now(tz=TIMEZONE),
             reservation_ends=datetime.datetime.now(tz=TIMEZONE),
             publish_begins=datetime.datetime.now(tz=TIMEZONE),

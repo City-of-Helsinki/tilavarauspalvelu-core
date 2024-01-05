@@ -8,7 +8,7 @@ from django.utils.timezone import get_default_timezone
 
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from api.graphql.types.reservations.types import ReservationType
-from reservation_units.enums import ReservationUnitState
+from reservation_units.enums import ReservationStartInterval, ReservationUnitState
 from reservation_units.models import PriceUnit, PricingType, ReservationUnit
 from reservation_units.utils.reservation_unit_pricing_helper import (
     ReservationUnitPricingHelper,
@@ -338,14 +338,7 @@ class ReservationSchedulingMixin:
         if scheduler.reservation_unit.allow_reservations_without_opening_hours:
             return
 
-        interval_to_minutes = {
-            ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES: 15,
-            ReservationUnit.RESERVATION_START_INTERVAL_30_MINUTES: 30,
-            ReservationUnit.RESERVATION_START_INTERVAL_60_MINUTES: 60,
-            ReservationUnit.RESERVATION_START_INTERVAL_90_MINUTES: 90,
-        }
-        interval = scheduler.reservation_unit.reservation_start_interval
-        interval_minutes = interval_to_minutes[interval]
+        interval_minutes = ReservationStartInterval(scheduler.reservation_unit.reservation_start_interval).as_number
         possible_start_times = scheduler.get_reservation_unit_possible_start_times(begin.date(), interval_minutes)
         if begin not in possible_start_times:
             raise ValidationErrorWithCode(
@@ -386,14 +379,7 @@ class ReservationSchedulingMixin:
 
     @staticmethod
     def check_reservation_intervals_for_staff_reservation(reservation_unit, begin):
-        interval_to_minutes = {
-            ReservationUnit.RESERVATION_START_INTERVAL_15_MINUTES: 15,
-            ReservationUnit.RESERVATION_START_INTERVAL_30_MINUTES: 30,
-            ReservationUnit.RESERVATION_START_INTERVAL_60_MINUTES: 30,
-            ReservationUnit.RESERVATION_START_INTERVAL_90_MINUTES: 30,
-        }
-        interval = reservation_unit.reservation_start_interval or ReservationUnit.RESERVATION_START_INTERVAL_30_MINUTES
-        interval_minutes = interval_to_minutes[interval]
+        interval_minutes = ReservationStartInterval(reservation_unit.reservation_start_interval).as_number
         interval_timedelta = datetime.timedelta(minutes=interval_minutes)
         possible_start_times = set()
 

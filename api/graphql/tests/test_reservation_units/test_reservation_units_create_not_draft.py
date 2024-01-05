@@ -9,6 +9,7 @@ from api.graphql.tests.test_reservation_units.base import (
     ReservationUnitMutationsTestCaseBase,
 )
 from opening_hours.errors import HaukiAPIError
+from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import (
     PriceUnit,
     PricingStatus,
@@ -65,7 +66,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
             "bufferTimeAfter": 3600,
             "bufferTimeBefore": 3600,
             "cancellationRulePk": self.rule.pk,
-            "reservationStartInterval": ReservationUnit.RESERVATION_START_INTERVAL_60_MINUTES.upper(),
+            "reservationStartInterval": ReservationStartInterval.INTERVAL_60_MINUTES.value.upper(),
             "publishBegins": "2021-05-03T00:00:00+00:00",
             "publishEnds": "2021-05-03T00:00:00+00:00",
             "reservationBegins": "2021-05-03T00:00:00+00:00",

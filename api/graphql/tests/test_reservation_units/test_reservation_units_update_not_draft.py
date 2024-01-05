@@ -9,6 +9,7 @@ from api.graphql.tests.test_reservation_units.base import (
 )
 from merchants.models import PaymentType
 from opening_hours.errors import HaukiAPIError
+from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import ReservationUnit
 from tests.factories import OriginHaukiResourceFactory, ReservationUnitFactory
 from tests.helpers import patch_method
@@ -333,7 +334,7 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         assert self.res_unit.reservation_unit_type is not None
 
     def test_update_reservation_start_interval(self):
-        expected_interval = ReservationUnit.RESERVATION_START_INTERVAL_60_MINUTES
+        expected_interval = ReservationStartInterval.INTERVAL_60_MINUTES.value
         data = self.get_valid_update_data()
         data["reservationStartInterval"] = expected_interval.upper()
         update_query = """

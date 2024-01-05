@@ -20,6 +20,7 @@ from api.legacy_rest_api.serializers import ReservationUnitSerializer
 from applications.choices import WeekdayChoice
 from applications.models import ApplicationRoundTimeSlot
 from common.fields.serializer import IntegerPrimaryKeyField
+from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import (
     Equipment,
     EquipmentCategory,
@@ -260,12 +261,12 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, OldPrimaryKeySe
     )
     reservation_start_interval = OldChoiceCharField(
         required=False,
-        choices=ReservationUnit.RESERVATION_START_INTERVAL_CHOICES,
+        choices=ReservationStartInterval.choices,
         help_text=(
             "Determines the interval for the start time of the reservation. "
             "For example an interval of 15 minutes means a reservation can "
             "begin at minutes 0, 15, 30, or 45. Possible values are "
-            f"{', '.join(value[0].upper() for value in ReservationUnit.RESERVATION_START_INTERVAL_CHOICES)}."
+            f"{', '.join(value.upper() for value in ReservationStartInterval.names)}."
         ),
     )
     metadata_set_pk = IntegerPrimaryKeyField(

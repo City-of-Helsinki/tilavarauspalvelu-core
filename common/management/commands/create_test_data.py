@@ -60,6 +60,7 @@ from permissions.models import (
     UnitRoleChoice,
     UnitRolePermission,
 )
+from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import (
     Equipment,
     EquipmentCategory,
@@ -1270,7 +1271,7 @@ def _create_reservation_units(
             reservation_pending_instructions_en=pending.en,
             reservation_pending_instructions_fi=pending.fi,
             reservation_pending_instructions_sv=pending.sv,
-            reservation_start_interval=random.choice(ReservationUnit.RESERVATION_START_INTERVAL_CHOICES)[0],
+            reservation_start_interval=random.choice(ReservationStartInterval.values),
             reservation_unit_type=next(reservation_unit_types_loop),
             reservations_max_days_before=max_before,
             reservations_min_days_before=min_before,
