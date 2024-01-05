@@ -8,7 +8,6 @@ import {
   useController,
   UseControllerProps,
 } from "react-hook-form";
-import { type OptionType } from "../../../types/common";
 import { truncatedText } from "../../../styles/styledComponentUtils";
 import { removeRefParam } from "../../reservation-form/util";
 
@@ -29,6 +28,10 @@ interface PopulateTimesProps {
   intervalMinutes?: number;
 }
 
+type OptionType = {
+  label: string;
+  value: number;
+};
 const StyledSelect = styled(Select<OptionType>)`
   button {
     display: grid;
@@ -83,8 +86,8 @@ const TimeRangePicker = <T extends FieldValues>({
   const getSelectedOption = (
     optionValue: string | null,
     optionList: OptionType[]
-  ): OptionType | undefined => {
-    return optionList.find((o) => o.label === optionValue);
+  ): OptionType | null => {
+    return optionList.find((o) => o.label === optionValue) ?? null;
   };
   const populateTimes = (
     populateTimesProps?: PopulateTimesProps
