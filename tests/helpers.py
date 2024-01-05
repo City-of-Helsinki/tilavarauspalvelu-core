@@ -57,10 +57,11 @@ class QueryData:
 
 
 class GQLResponse:
-    def __init__(self, response: HttpResponse, query_data: QueryData) -> None:
+    def __init__(self, response: HttpResponse, query_data: QueryData, query: str) -> None:
         # 'django.test.client.Client.request' sets json attribute on the response.
         self.json: dict[str, Any] = response.json()  # type: ignore
         self.query_data = query_data
+        self.query = query
 
     def __str__(self) -> str:
         return json.dumps(self.json, indent=2, sort_keys=True, default=str)
@@ -250,7 +251,7 @@ class GraphQLClient(Client):
                 headers=headers,
                 client=self,
             )
-        return GQLResponse(response, results)
+        return GQLResponse(response, results, query)
 
     def login_user_based_on_type(self, user_type: UserType) -> User | None:
         """Login user specific type of user in the client."""
