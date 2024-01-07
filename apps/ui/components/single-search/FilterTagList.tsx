@@ -45,48 +45,50 @@ const FilterTagList = ({
     }
     return t("searchForm:filters.duration", { unit });
   };
+
+  const sortedValues = [...formValueKeys].sort(
+    (a, b) => filterOrder.indexOf(a) - filterOrder.indexOf(b)
+  );
   return (
     <FilterTags data-test-id="search-form__filter--tags">
-      {formValueKeys
-        .toSorted((a, b) => filterOrder.indexOf(a) - filterOrder.indexOf(b))
-        .map((formValueKey) => {
-          // we don't want to show "showOnlyReservable" as a FilterTag, as it has its own checkbox in the form
-          if (formValueKey === "showOnlyReservable") return null;
-          const label = t(`searchForm:filters.${formValueKey}`, {
-            label: formValueKey,
-            value: formValues[formValueKey],
-            count: Number(formValues[formValueKey]),
-          });
-          return multiSelectFilters.includes(formValueKey) ? (
-            (formValues[formValueKey] ?? "").split(",").map((subValue) => (
-              <StyledTag
-                id={`filter-tag__${formValueKey}-${subValue}`}
-                onClick={() => removeValue?.([subValue], formValueKey)}
-                onDelete={() => removeValue?.([subValue], formValueKey)}
-                key={`${formValueKey}-${subValue}`}
-                deleteButtonAriaLabel={t(`searchForm:removeFilter`, {
-                  value: getFormSubValueLabel(formValueKey, subValue),
-                })}
-              >
-                {getFormSubValueLabel(formValueKey, subValue)}
-              </StyledTag>
-            ))
-          ) : (
+      {sortedValues.map((formValueKey) => {
+        // we don't want to show "showOnlyReservable" as a FilterTag, as it has its own checkbox in the form
+        if (formValueKey === "showOnlyReservable") return null;
+        const label = t(`searchForm:filters.${formValueKey}`, {
+          label: formValueKey,
+          value: formValues[formValueKey],
+          count: Number(formValues[formValueKey]),
+        });
+        return multiSelectFilters.includes(formValueKey) ? (
+          (formValues[formValueKey] ?? "").split(",").map((subValue) => (
             <StyledTag
-              id={`filter-tag__${formValueKey}`}
-              onDelete={() => removeValue?.([formValueKey])}
-              key={formValueKey}
+              id={`filter-tag__${formValueKey}-${subValue}`}
+              onClick={() => removeValue?.([subValue], formValueKey)}
+              onDelete={() => removeValue?.([subValue], formValueKey)}
+              key={`${formValueKey}-${subValue}`}
               deleteButtonAriaLabel={t(`searchForm:removeFilter`, {
-                value: label,
+                value: getFormSubValueLabel(formValueKey, subValue),
               })}
             >
-              {formValueKey === "duration" &&
-              !Number.isNaN(Number(formValues.duration))
-                ? durationTranslation(Number(formValues.duration))
-                : label}
+              {getFormSubValueLabel(formValueKey, subValue)}
             </StyledTag>
-          );
-        })}
+          ))
+        ) : (
+          <StyledTag
+            id={`filter-tag__${formValueKey}`}
+            onDelete={() => removeValue?.([formValueKey])}
+            key={formValueKey}
+            deleteButtonAriaLabel={t(`searchForm:removeFilter`, {
+              value: label,
+            })}
+          >
+            {formValueKey === "duration" &&
+            !Number.isNaN(Number(formValues.duration))
+              ? durationTranslation(Number(formValues.duration))
+              : label}
+          </StyledTag>
+        );
+      })}
       {formValueKeys.filter((key) => key !== "showOnlyReservable").length >
         0 && (
         <ResetButton

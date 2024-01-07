@@ -21,7 +21,7 @@ import {
 } from "common/types/gql-types";
 import { Container } from "common";
 import { filterNonNullable } from "common/src/helpers";
-import { capitalize, singleSearchUrl } from "@/modules/util";
+import { capitalize, fromUIDate, singleSearchUrl } from "@/modules/util";
 import { isBrowser } from "@/modules/const";
 import { RESERVATION_UNITS } from "@/modules/queries/reservationUnit";
 import SearchForm from "@/components/single-search/SearchForm";
@@ -29,6 +29,7 @@ import Sorting from "@/components/form/Sorting";
 import ListWithPagination from "@/components/common/ListWithPagination";
 import ReservationUnitCard from "@/components/single-search/ReservationUnitCard";
 import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
+import { toApiDate } from "common/src/common/util";
 
 const pagingLimit = 36;
 
@@ -81,15 +82,10 @@ const processVariables = (values: Record<string, string>, language: string) => {
   const sortCriteria = ["name", "unitName"].includes(values.sort)
     ? `${values.sort}${capitalize(language)}`
     : values.sort;
-  const startArray = values.startDate?.split(".");
-  const endArray = values.endDate?.split(".");
-  // Add leading zero to day and month if needed
-  for (let i = 0; i < 2; i += 1) {
-    if (startArray && startArray.length >= i && startArray[i]?.length === 1)
-      startArray[i] = `0${startArray[i]}`;
-    if (endArray && endArray.length >= i && endArray[i]?.length === 1)
-      endArray[i] = `0${endArray[i]}`;
-  }
+
+  const startDate = fromUIDate(values.startDate);
+  const endDate = fromUIDate(values.endDate);
+
   const replaceIfExists = (condition: string | boolean, returnObject: object) =>
     condition && returnObject;
   return {
@@ -128,14 +124,10 @@ const processVariables = (values: Record<string, string>, language: string) => {
       equipments: values.equipments?.split(",").map(Number),
     }),
     ...replaceIfExists(values.startDate, {
-      reservableDateStart: values.startDate
-        ? startArray.toReversed().join("-")
-        : null,
+      reservableDateStart: startDate ? toApiDate(startDate) : null,
     }),
     ...replaceIfExists(values.endDate, {
-      reservableDateEnd: values.endDate
-        ? endArray.toReversed().join("-")
-        : null,
+      reservableDateEnd: endDate ? toApiDate(endDate) : null,
     }),
     ...replaceIfExists(values.timeBegin, {
       reservableTimeStart: values.timeBegin,
