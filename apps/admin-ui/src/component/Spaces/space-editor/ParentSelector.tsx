@@ -1,98 +1,58 @@
-import React, { useState } from "react";
+import React from "react";
 import { useQuery } from "@apollo/client";
 import { Select } from "hds-react";
 import i18next from "i18next";
-import {
-  Maybe,
-  Query,
-  QueryUnitByPkArgs,
-  SpaceType,
-} from "common/types/gql-types";
+import type { Query, QueryUnitByPkArgs } from "common/types/gql-types";
+import { filterNonNullable } from "common/src/helpers";
 import { SPACE_HIERARCHY_QUERY } from "./queries";
 import { spacesAsHierarchy } from "./util";
 
 type Props = {
   unitPk: number;
-  spacePk?: number | null;
-  parentPk: number | null;
+  value: number | null;
   label: string;
   placeholder?: string;
   helperText?: string;
-  disableNull?: boolean;
+  noParentless?: boolean;
   errorText?: string;
+  // TODO why is the label sent upstream?
   onChange: (val: number | null, name?: string) => void;
 };
 
 type ParentType = { label: string; value: number | null };
 
-const getChildrenFor = (spacePk: number, hierarchy: SpaceType[]) => {
-  return hierarchy.filter((s) => s.parent?.pk === spacePk);
-};
-
-const getChildrenRecursive = (spacePk: number, hierarchy: SpaceType[]) => {
-  const newChildren = getChildrenFor(spacePk, hierarchy);
-  return newChildren.concat(
-    newChildren.flatMap((s) => getChildrenFor(s.pk as number, hierarchy))
-  );
-};
-
-const independentSpaceOption = {
+const parentLessOption = {
+  // TODO don't use floating i18n.t (use the hook)
   label: i18next.t("SpaceEditor.noParent"),
   value: null,
 };
 
-const getParent = (v: Maybe<number> | undefined, options: ParentType[]) =>
-  options.find((po) => po.value === v) || options[0];
-
 const ParentSelector = ({
   unitPk,
-  spacePk,
   onChange,
-  parentPk,
+  value,
   label,
   placeholder,
-  disableNull = false,
+  noParentless = false,
   helperText,
   errorText,
 }: Props): JSX.Element | null => {
-  const [parentOptions, setParentOptions] = useState([] as ParentType[]);
-
-  useQuery<Query, QueryUnitByPkArgs>(SPACE_HIERARCHY_QUERY, {
+  const { data } = useQuery<Query, QueryUnitByPkArgs>(SPACE_HIERARCHY_QUERY, {
     variables: { pk: unitPk },
-    onCompleted: ({ unitByPk }) => {
-      const parentSpaces = unitByPk?.spaces?.map((s) => s as SpaceType);
-      if (parentSpaces) {
-        const unitSpaces = spacesAsHierarchy(parentSpaces, "\u2007");
-
-        const children = spacePk
-          ? getChildrenRecursive(spacePk, unitSpaces).map((s) => s.pk)
-          : [];
-
-        const additionalOptions = unitSpaces
-          .filter((space) => space.pk !== spacePk)
-          .filter((space) => children.includes(space.pk))
-          .map((space) => ({
-            label: space.nameFi ?? "-",
-            value: space.pk ?? null,
-          }));
-
-        const options = [] as {
-          label: string;
-          value: number | null;
-        }[];
-
-        if (!disableNull) {
-          options.push(independentSpaceOption);
-        }
-
-        setParentOptions(options.concat(additionalOptions));
-      }
-    },
+    skip: !unitPk,
   });
 
-  if (parentOptions.length === 0) {
-    return null;
-  }
+  const parentSpaces = filterNonNullable(data?.unitByPk?.spaces);
+  const unitSpaces = spacesAsHierarchy(parentSpaces, "\u2007");
+
+  // NOTE there used to be children filtering, but it filtered out all possible options
+
+  const opts = unitSpaces.map((space) => ({
+    label: space.nameFi ?? "-",
+    value: space.pk ?? null,
+  }));
+
+  const options = noParentless ? opts : [...opts, parentLessOption];
 
   return (
     <Select
@@ -101,12 +61,9 @@ const ParentSelector = ({
       placeholder={placeholder}
       required
       helper={helperText}
-      options={parentOptions}
-      value={
-        parentPk || !disableNull
-          ? getParent(parentPk, parentOptions)
-          : undefined
-      }
+      options={options}
+      disabled={options.length === 0}
+      value={options.find((po) => po.value === value) ?? null}
       onChange={(selected: ParentType) =>
         onChange(selected.value, selected.label)
       }

@@ -174,10 +174,10 @@ const NewResourceModal = ({
               <ParentSelector
                 label={t("ResourceModal.selectSpace")}
                 onChange={(parent) => setValue("spacePk", parent)}
-                unitPk={unit.pk as number}
-                parentPk={null}
+                unitPk={unit.pk ?? 0}
+                value={state.resource.spacePk ?? null}
                 placeholder={t("ResourceModal.selectSpace")}
-                disableNull
+                noParentless
                 errorText={getValidationError("spacePk")}
               />
 
