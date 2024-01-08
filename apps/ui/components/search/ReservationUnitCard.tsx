@@ -1,14 +1,20 @@
-import { IconGroup, IconCheck, IconPlus, IconLinkExternal } from "hds-react";
+import {
+  IconGroup,
+  IconCheck,
+  IconPlus,
+  IconLinkExternal,
+  Button,
+} from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import NextImage from "next/image";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
-import { H5, Strongish } from "common/src/common/typography";
+import { H5, fontMedium } from "common/src/common/typography";
 import { ReservationUnitType } from "common/types/gql-types";
-import { getAddressAlt, getMainImage, getTranslation } from "@/modules/util";
-import IconWithText from "../common/IconWithText";
-import { BlackButton, MediumButton, pixel, truncatedText } from "@/styles/util";
+import { getMainImage, getTranslation } from "@/modules/util";
+import IconWithText from "@/components/common/IconWithText";
+import { pixel, truncatedText } from "@/styles/util";
 import { reservationUnitPrefix } from "@/modules/const";
 import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
 
@@ -54,15 +60,10 @@ const Description = styled.span`
   font-family: var(--font-regular);
   font-size: var(--fontsize-body-m);
   flex-grow: 1;
-  height: 40px;
-
-  @media (min-width: ${breakpoints.m}) {
-    height: unset;
-  }
 `;
 
-const Bottom = styled.span`
-  display: block;
+const Bottom = styled.div`
+  display: flex;
 
   > div {
     :last-child {
@@ -70,16 +71,17 @@ const Bottom = styled.span`
     }
   }
 
-  @media (min-width: ${breakpoints.l}) {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: var(--spacing-l);
+  flex-direction: column;
+  align-items: flex-start;
+
+  @media (min-width: ${breakpoints.s}) {
+    flex-direction: row;
+    align-items: center;
   }
 `;
 
 const Props = styled.div`
   display: block;
-  margin-bottom: var(--spacing-s);
 
   @media (min-width: ${breakpoints.m}) {
     display: flex;
@@ -92,6 +94,8 @@ const Actions = styled.div`
   flex-direction: column;
   padding: var(--spacing-s) 0 var(--spacing-s) 0;
   gap: var(--spacing-s);
+  flex-grow: 1;
+  width: 100%;
 
   > button {
     white-space: nowrap;
@@ -99,6 +103,7 @@ const Actions = styled.div`
 
   @media (min-width: ${breakpoints.m}) {
     flex-direction: row;
+    width: auto;
     padding: 0;
     justify-content: flex-end;
   }
@@ -134,6 +139,13 @@ const StyledIconWithText = styled(IconWithText)`
   }
 `;
 
+/* TODO something is overriding button font-family to be bold */
+const StyledButton = styled(Button).attrs({ size: "small" })`
+  && {
+    ${fontMedium}
+  }
+`;
+
 const ReservationUnitCard = ({
   reservationUnit,
   selectReservationUnit,
@@ -144,7 +156,6 @@ const ReservationUnitCard = ({
 
   const name = getReservationUnitName(reservationUnit);
 
-  const addressString = getAddressAlt(reservationUnit);
   const localeString = i18n.language === "fi" ? "" : `/${i18n.language}`;
   const link = `${localeString}${reservationUnitPrefix}/${reservationUnit.pk}`;
 
@@ -157,23 +168,15 @@ const ReservationUnitCard = ({
       ? getTranslation(reservationUnit.reservationUnitType, "name")
       : undefined;
 
+  const img = getMainImage(reservationUnit);
+  const imgSrc = img?.smallUrl || img?.imageUrl || pixel;
+
   return (
     <Container>
-      <Image
-        alt={name}
-        src={getMainImage(reservationUnit)?.smallUrl || pixel}
-      />
+      <Image alt={name} src={imgSrc} />
       <MainContent>
         <Name>{name}</Name>
-        <Description>
-          {unitName}
-          {addressString && (
-            <>
-              {", "}
-              <Strongish>{addressString}</Strongish>
-            </>
-          )}
-        </Description>
+        <Description>{unitName}</Description>
         <Bottom>
           <Props>
             {reservationUnitTypeName && (
@@ -208,31 +211,31 @@ const ReservationUnitCard = ({
           </Props>
           <Actions>
             {containsReservationUnit(reservationUnit) ? (
-              <MediumButton
+              <StyledButton
                 iconRight={<IconCheck />}
                 onClick={() => removeReservationUnit(reservationUnit)}
                 data-testid="reservation-unit-card__button--select"
               >
                 {t("common:removeReservationUnit")}
-              </MediumButton>
+              </StyledButton>
             ) : (
-              <BlackButton
+              <StyledButton
+                variant="secondary"
                 iconRight={<IconPlus />}
                 onClick={() => selectReservationUnit(reservationUnit)}
-                variant="secondary"
                 data-testid="reservation-unit-card__button--select"
               >
                 {t("common:selectReservationUnit")}
-              </BlackButton>
+              </StyledButton>
             )}
-            <BlackButton
+            <StyledButton
               variant="secondary"
               iconRight={<IconLinkExternal aria-hidden />}
               onClick={() => window.open(link, "_blank")}
               data-testid="reservation-unit-card__button--link"
             >
               {t("reservationUnitCard:seeMore")}
-            </BlackButton>
+            </StyledButton>
           </Actions>
         </Bottom>
       </MainContent>
