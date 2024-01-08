@@ -10,12 +10,12 @@ from elasticsearch_django.models import SearchResultsQuerySet
 from applications.choices import ApplicationRoundStatusChoice
 from applications.models import ApplicationRound
 from common.date_utils import (
+    as_local_timezone,
     combine,
     local_datetime,
     local_datetime_max,
     local_datetime_min,
     local_time_min,
-    local_timezone,
 )
 from opening_hours.models import ReservableTimeSpan
 from opening_hours.utils.reservable_time_span_client import TimeSpanElement, override_reservable_with_closed_time_spans
@@ -29,12 +29,11 @@ ReservationUnitPK = int
 
 def _get_hard_closed_time_spans_for_reservation_unit(reservation_unit: "ReservationUnit") -> list[TimeSpanElement]:
     reservation_unit_closed_time_spans: list[TimeSpanElement] = []
-    local_tz = local_timezone()
 
     if reservation_unit.reservation_begins:
         reservation_unit_closed_time_spans.append(
             TimeSpanElement(
-                start_datetime=datetime.min.replace(tzinfo=local_tz),
+                start_datetime=local_datetime_min(),
                 end_datetime=reservation_unit.reservation_begins,
                 is_reservable=False,
             )
@@ -43,7 +42,7 @@ def _get_hard_closed_time_spans_for_reservation_unit(reservation_unit: "Reservat
         reservation_unit_closed_time_spans.append(
             TimeSpanElement(
                 start_datetime=reservation_unit.reservation_ends,
-                end_datetime=datetime.max.replace(tzinfo=local_tz),
+                end_datetime=local_datetime_max(),
                 is_reservable=False,
             )
         )
@@ -52,7 +51,7 @@ def _get_hard_closed_time_spans_for_reservation_unit(reservation_unit: "Reservat
         reservation_unit_closed_time_spans.append(
             TimeSpanElement(
                 start_datetime=reservation_unit.publish_ends,
-                end_datetime=datetime.max.replace(tzinfo=local_tz),
+                end_datetime=local_datetime_max(),
                 is_reservable=False,
             )
         )
@@ -159,7 +158,6 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
         from reservations.models import Reservation
 
         now = local_datetime()
-        local_tz = now.tzinfo
         today = now.date()
         two_years_from_now = today + timedelta(days=731)  # 2 years + 1 day as a buffer
 
@@ -174,9 +172,15 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
 
         # Time inputs without timezone information are interpreted as local time
         if filter_time_start is not None:
-            filter_time_start = filter_time_start.replace(tzinfo=local_tz)
+            filter_time_start = as_local_timezone(
+                filter_time_start,
+                ref=datetime.combine(filter_date_start, filter_time_start),
+            )
         if filter_time_end is not None:
-            filter_time_end = filter_time_end.replace(tzinfo=local_tz)
+            filter_time_end = as_local_timezone(
+                filter_time_end,
+                ref=datetime.combine(filter_date_end, filter_time_end),
+            )
 
         ##########################
         # Validate filter values #
@@ -264,8 +268,8 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
 
             for element in reservation_unit.origin_hauki_resource.reservable_time_spans.all():
                 reservable_time_span = TimeSpanElement(
-                    start_datetime=element.start_datetime.astimezone(local_tz),
-                    end_datetime=element.end_datetime.astimezone(local_tz),
+                    start_datetime=as_local_timezone(element.start_datetime),
+                    end_datetime=as_local_timezone(element.end_datetime),
                     is_reservable=True,
                 )
 
