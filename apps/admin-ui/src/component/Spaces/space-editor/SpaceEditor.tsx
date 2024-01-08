@@ -349,8 +349,7 @@ const SpaceEditor = ({ space, unit }: Props): JSX.Element | null => {
                 helperText={t("SpaceModal.page1.parentHelperText")}
                 label={t("SpaceModal.page1.parentLabel")}
                 onChange={(parentPk) => setValue({ parentPk })}
-                parentPk={state.spaceEdit?.parentPk as number}
-                spacePk={space}
+                value={state.spaceEdit?.parentPk ?? null}
                 placeholder={t("SpaceModal.page1.parentPlaceholder")}
                 unitPk={unit}
               />

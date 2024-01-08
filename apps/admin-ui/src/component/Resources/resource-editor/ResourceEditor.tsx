@@ -218,8 +218,8 @@ const ResourceEditor = ({ resourcePk, unitPk }: Props) => {
               label={t("ResourceModal.selectSpace")}
               onChange={(parent) => setValue("spacePk", parent)}
               unitPk={unitPk}
-              parentPk={state.resourceEdit.spacePk as number}
-              disableNull
+              value={state.resourceEdit.spacePk ?? null}
+              noParentless
             />
             {languages.map((lang) => {
               const fieldName = `name${upperFirst(lang)}`;
