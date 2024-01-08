@@ -1,4 +1,5 @@
 import datetime
+import re
 import zoneinfo
 
 import freezegun
@@ -6,7 +7,8 @@ import pytest
 
 from common.date_utils import (
     combine,
-    datetimes_equal,
+    compare_datetimes,
+    compare_times,
     local_date,
     local_datetime,
     local_datetime_max,
@@ -14,8 +16,6 @@ from common.date_utils import (
     local_time,
     local_time_max,
     local_time_min,
-    local_timezone,
-    times_equal,
     utc_date,
     utc_datetime,
     utc_datetime_max,
@@ -103,49 +103,100 @@ def test_localized_short_weekday_en():
 # with comparing timezone-aware and timezone-naive datetimes/times. The date utils are needed because
 # of these bugs, so check that they still hold true. If they start failing, the helpers might
 # have become unnecessary.
-TIMEZONE = zoneinfo.ZoneInfo("Europe/Helsinki")
 
 
-@freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC))
-def test_date_utils__local_timezone(settings):
-    tz = local_timezone()
-    assert tz.utcoffset(None) == datetime.timedelta(seconds=7200)
-    assert tz.tzname(None) == settings.TIME_ZONE
+def test_compare_datetimes():
+    dt_zi = datetime.datetime(2024, 1, 1, tzinfo=zoneinfo.ZoneInfo("Europe/Helsinki"))
+    dt_utc = datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC)
+    dt_naive = datetime.datetime(2024, 1, 1)
 
-    # These should be the same, but aren't, so check that this is still the case.
-    assert tz.utcoffset(None) != TIMEZONE.utcoffset(None)
-    assert tz.tzname(None) != TIMEZONE.tzname(None)
+    # Comparing equals and not equals with datetime naive object
+    # does not raise an error, but comparing lt/gt/lte/gte does.
+    assert dt_zi != dt_naive
+    assert dt_utc != dt_naive
+    assert not (dt_zi == dt_naive)  # noqa: SIM201
+    assert not (dt_utc == dt_naive)  # noqa: SIM201
+
+    msg = "can't compare offset-naive and offset-aware datetimes"
+    with pytest.raises(TypeError, match=re.escape(msg)):
+        assert dt_zi > dt_naive
+
+    with pytest.raises(TypeError, match=re.escape(msg)):
+        assert dt_utc > dt_naive
+
+    # This comparison object will complain about mixing timezone-aware and timezone-naive datetimes.
+    msg = "Input 1 must be timezone-aware using `zoneinfo.ZoneInfo` objects or `datetime.UTC`."
+    with pytest.raises(ValueError, match=re.escape(msg)):
+        assert compare_datetimes(dt_naive, dt_utc)
+
+    msg = "Input 2 must be timezone-aware using `zoneinfo.ZoneInfo` objects or `datetime.UTC`."
+    with pytest.raises(ValueError, match=re.escape(msg)):
+        assert compare_datetimes(dt_zi, dt_naive)
+
+    msg = "Input 2 must be a `datetime.datetime` object."
+    with pytest.raises(ValueError, match=re.escape(msg)):
+        assert compare_datetimes(dt_utc, None)
+
+    # Check for safeguards against comparing the comparison object directly.
+    msg = "Cannot compare 'compare_datetimes' object directly. Did you forget to call a comparison method?"
+    with pytest.raises(RuntimeError, match=re.escape(msg)):
+        assert compare_datetimes(dt_utc, dt_zi)
+
+
+def test_compare_times():
+    t_zi = datetime.time(tzinfo=zoneinfo.ZoneInfo("Europe/Helsinki"))
+    t_utc = datetime.time(tzinfo=datetime.UTC)
+    t_naive = datetime.time()
+
+    # Comparing equals and not equals with datetime naive object
+    # does not raise an error, but comparing lt/gt/lte/gte does.
+    assert t_zi == t_naive
+    assert t_utc != t_naive
+    assert not (t_zi != t_naive)  # noqa: SIM202
+    assert not (t_utc == t_naive)  # noqa: SIM201
+
+    # Comparing lt/gt/lte/gte with datetime naive object and zoneinfo.ZoneInfo object
+    # does not raise an error, but comparing lt/gt/lte/gte with datetime naive object
+    # and datetime.UTC does.
+    assert t_zi >= t_naive
+    msg = "can't compare offset-naive and offset-aware times"
+    with pytest.raises(TypeError, match=re.escape(msg)):
+        assert t_utc >= t_naive
+
+    # This comparison object will complain about mixing timezone-aware and timezone-naive datetimes.
+    msg = "Input 1 must be timezone-aware using `zoneinfo.ZoneInfo` objects or `datetime.UTC`."
+    with pytest.raises(ValueError, match=re.escape(msg)):
+        assert compare_times(t_naive, t_utc)
+
+    msg = "Input 2 must be timezone-aware using `zoneinfo.ZoneInfo` objects or `datetime.UTC`."
+    with pytest.raises(ValueError, match=re.escape(msg)):
+        assert compare_times(t_utc, t_naive)
+
+    msg = (
+        "Input 1 cannot be a timezone-aware time using `zoneinfo.ZoneInfo` objects, "
+        "since there is no way to know if the time is in daylight savings time or not."
+    )
+    with pytest.raises(ValueError, match=re.escape(msg)):
+        assert compare_times(t_zi, t_utc)
+
+    msg = "Input 2 must be a `datetime.datetime` or `datetime.time` object."
+    with pytest.raises(ValueError, match=re.escape(msg)):
+        assert compare_times(t_utc, None)
+
+    # Check that datetime objects can also be used
+    msg = "Input 2 must be timezone-aware using `zoneinfo.ZoneInfo` objects or `datetime.UTC`."
+    with pytest.raises(ValueError, match=re.escape(msg)):
+        assert compare_times(t_utc, datetime.datetime.now())
+
+    # Check for safeguards against comparing the comparison object directly.
+    msg = "Cannot compare 'compare_times' object directly. Did you forget to call a comparison method?"
+    with pytest.raises(RuntimeError, match=re.escape(msg)):
+        assert compare_times(t_utc, t_utc)
 
 
 @freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC))
 def test_date_utils__local_datetime():
-    tz = local_timezone()
-    dt_1 = local_datetime()
-    dt_2 = datetime.datetime(2024, 1, 1, hour=2, tzinfo=tz)
-    dt_3 = datetime.datetime(2024, 1, 1, hour=2, tzinfo=TIMEZONE)
-    dt_4 = datetime.datetime(2024, 1, 1, hour=2)
-
-    msg = "can't compare offset-naive and offset-aware datetimes"
-
-    assert dt_1 == dt_2
-    assert dt_1 >= dt_2
-    assert dt_1 <= dt_2
-
-    assert dt_1 == dt_3
-    assert dt_1 >= dt_3
-    assert dt_1 <= dt_3
-
-    assert dt_1 != dt_4
-    with pytest.raises(TypeError, match=msg):
-        assert dt_1 >= dt_4
-    with pytest.raises(TypeError, match=msg):
-        assert dt_1 <= dt_4
-
-    assert dt_3 != dt_4
-    with pytest.raises(TypeError, match=msg):
-        assert dt_3 >= dt_4
-    with pytest.raises(TypeError, match=msg):
-        assert dt_3 <= dt_4
+    assert local_datetime() == datetime.datetime(2024, 1, 1, 2, tzinfo=zoneinfo.ZoneInfo("Europe/Helsinki"))
 
 
 @freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC))
@@ -155,165 +206,28 @@ def test_date_utils__local_date():
 
 @freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC))
 def test_date_utils__local_time():
-    tz = local_timezone()
-
-    t_1 = local_time()
-    t_2 = datetime.time(hour=2, tzinfo=tz)
-    t_3 = datetime.time(hour=2, tzinfo=TIMEZONE)
-    t_4 = datetime.time(hour=2)
-
-    msg = "can't compare offset-naive and offset-aware times"
-
-    assert t_1 == t_2
-    assert t_1 >= t_2
-    assert t_1 <= t_2
-
-    assert t_1 != t_3  # Should be equal, but isn't, so check that this is still the case.
-    with pytest.raises(TypeError, match=msg):  # Should not raise, but does, so check that this is still the case.
-        assert t_1 >= t_3
-    with pytest.raises(TypeError, match=msg):  # Should not raise, but does, so check that this is still the case.
-        assert t_1 <= t_3
-
-    assert t_1 != t_4
-    with pytest.raises(TypeError, match=msg):
-        assert t_1 >= t_4
-    with pytest.raises(TypeError, match=msg):
-        assert t_1 <= t_4
-
-    assert t_3 == t_4  # This should not be equal, but is, so check that this is still the case.
-    assert t_3 >= t_4  # This should raise a TypeError, but doesn't, so check that this is still the case.
-    assert t_3 <= t_4  # This should raise a TypeError, but doesn't, so check that this is still the case.
+    assert local_time() == datetime.time(2, tzinfo=zoneinfo.ZoneInfo("Europe/Helsinki"))
 
 
-@freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC))
 def test_date_utils__local_datetime_min():
-    tz = local_timezone()
-    dt_min_1 = local_datetime_min()
-    dt_min_2 = datetime.datetime.min.replace(tzinfo=tz)
-    dt_min_3 = datetime.datetime.min.replace(tzinfo=TIMEZONE)
-    dt_min_4 = datetime.datetime.min
-
-    msg = "can't compare offset-naive and offset-aware datetimes"
-
-    assert dt_min_1 == dt_min_2
-    assert dt_min_1 >= dt_min_2
-    assert dt_min_1 <= dt_min_2
-
-    assert dt_min_1 != dt_min_3  # Should be equal, but isn't, so check that this is still the case.
-    assert not (dt_min_1 >= dt_min_3)  # Should be true, but isn't, so check that this is still the case.
-    assert dt_min_1 <= dt_min_3
-
-    assert dt_min_1 != dt_min_4
-    with pytest.raises(TypeError, match=msg):
-        assert dt_min_1 >= dt_min_4
-    with pytest.raises(TypeError, match=msg):
-        assert dt_min_1 <= dt_min_4
-
-    assert dt_min_3 != dt_min_4
-    with pytest.raises(TypeError, match=msg):
-        assert dt_min_3 >= dt_min_4
-    with pytest.raises(TypeError, match=msg):
-        assert dt_min_3 <= dt_min_4
+    assert local_datetime_min() == datetime.datetime.min.replace(tzinfo=zoneinfo.ZoneInfo("Europe/Helsinki"))
 
 
-@freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC))
 def test_date_utils__local_datetime_max():
-    tz = local_timezone()
-    dt_max_1 = local_datetime_max()
-    dt_max_2 = datetime.datetime.max.replace(tzinfo=tz)
-    dt_max_3 = datetime.datetime.max.replace(tzinfo=TIMEZONE)
-    dt_max_4 = datetime.datetime.max
-
-    msg = "can't compare offset-naive and offset-aware datetimes"
-
-    assert dt_max_1 == dt_max_2
-    assert dt_max_1 >= dt_max_2
-    assert dt_max_1 <= dt_max_2
-
-    assert dt_max_1 == dt_max_3
-    assert dt_max_1 >= dt_max_3
-    assert dt_max_1 <= dt_max_3
-
-    assert dt_max_1 != dt_max_4
-    with pytest.raises(TypeError, match=msg):
-        assert dt_max_1 >= dt_max_4
-    with pytest.raises(TypeError, match=msg):
-        assert dt_max_1 <= dt_max_4
-
-    assert dt_max_3 != dt_max_4
-    with pytest.raises(TypeError, match=msg):
-        assert dt_max_3 >= dt_max_4
-    with pytest.raises(TypeError, match=msg):
-        assert dt_max_3 <= dt_max_4
+    assert local_datetime_max() == datetime.datetime.max.replace(tzinfo=zoneinfo.ZoneInfo("Europe/Helsinki"))
 
 
-@freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC))
 def test_date_utils__local_time_min():
-    tz = local_timezone()
-    t_min_1 = local_time_min()
-    t_min_2 = datetime.time.min.replace(tzinfo=tz)
-    t_min_3 = datetime.time.min.replace(tzinfo=TIMEZONE)
-    t_min_4 = datetime.time.min
-
-    msg = "can't compare offset-naive and offset-aware times"
-
-    assert t_min_1 == t_min_2
-    assert t_min_1 >= t_min_2
-    assert t_min_1 <= t_min_2
-
-    assert t_min_1 != t_min_3  # Should be equal, but isn't, so check that this is still the case.
-    with pytest.raises(TypeError, match=msg):  # Should not raise, but does, so check that this is still the case.
-        assert t_min_1 >= t_min_3
-    with pytest.raises(TypeError, match=msg):  # Should not raise, but does, so check that this is still the case.
-        assert t_min_1 <= t_min_3
-
-    assert t_min_1 != t_min_4
-    with pytest.raises(TypeError, match=msg):
-        assert t_min_1 >= t_min_4
-    with pytest.raises(TypeError, match=msg):
-        assert t_min_1 <= t_min_4
-
-    assert t_min_3 == t_min_4  # This should not be equal, but is, so check that this is still the case.
-    assert t_min_3 >= t_min_4  # This should raise a TypeError, but doesn't, so check that this is still the case.
-    assert t_min_3 <= t_min_4  # This should raise a TypeError, but doesn't, so check that this is still the case.
+    assert local_time_min() == datetime.time.min.replace(tzinfo=zoneinfo.ZoneInfo("Europe/Helsinki"))
 
 
-@freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC))
 def test_date_utils__local_time_max():
-    tz = local_timezone()
-    t_max_1 = local_time_max()
-    t_max_2 = datetime.time.max.replace(tzinfo=tz)
-    t_max_3 = datetime.time.max.replace(tzinfo=TIMEZONE)
-    t_max_4 = datetime.time.max
-
-    msg = "can't compare offset-naive and offset-aware times"
-
-    assert t_max_1 == t_max_2
-    assert t_max_1 >= t_max_2
-    assert t_max_1 <= t_max_2
-
-    assert t_max_1 != t_max_3  # Should be equal, but isn't, so check that this is still the case.
-    with pytest.raises(TypeError, match=msg):  # Should not raise, but does, so check that this is still the case.
-        assert t_max_1 >= t_max_3
-    with pytest.raises(TypeError, match=msg):  # Should not raise, but does, so check that this is still the case.
-        assert t_max_1 <= t_max_3
-
-    assert t_max_1 != t_max_4
-    with pytest.raises(TypeError, match=msg):
-        assert t_max_1 >= t_max_4
-    with pytest.raises(TypeError, match=msg):
-        assert t_max_1 <= t_max_4
-
-    assert t_max_3 == t_max_4  # This should not be equal, but is, so check that this is still the case.
-    assert t_max_3 >= t_max_4  # This should raise a TypeError, but doesn't, so check that this is still the case.
-    assert t_max_3 <= t_max_4  # This should raise a TypeError, but doesn't, so check that this is still the case.
+    assert local_time_max() == datetime.time.max.replace(tzinfo=zoneinfo.ZoneInfo("Europe/Helsinki"))
 
 
 @freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC))
 def test_date_utils__utc_datetime():
     assert utc_datetime() == datetime.datetime.now(tz=datetime.UTC)
-    assert utc_datetime() >= datetime.datetime.now(tz=datetime.UTC)
-    assert utc_datetime() <= datetime.datetime.now(tz=datetime.UTC)
 
 
 @freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC))
@@ -324,44 +238,26 @@ def test_date_utils__utc_date():
 @freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC))
 def test_date_utils__utc_time():
     assert utc_time() == datetime.datetime.now(tz=datetime.UTC).timetz()
-    assert utc_time() >= datetime.datetime.now(tz=datetime.UTC).timetz()
-    assert utc_time() <= datetime.datetime.now(tz=datetime.UTC).timetz()
-
-    msg = "can't compare offset-naive and offset-aware times"
-
-    assert utc_time() != datetime.datetime.now(tz=datetime.UTC).time()
-    with pytest.raises(TypeError, match=msg):
-        assert utc_time() >= datetime.datetime.now(tz=datetime.UTC).time()
-    with pytest.raises(TypeError, match=msg):
-        assert utc_time() <= datetime.datetime.now(tz=datetime.UTC).time()
 
 
 @freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC))
 def test_date_utils__utc_datetime_min():
     assert utc_datetime_min() == datetime.datetime.min.replace(tzinfo=datetime.UTC)
-    assert utc_datetime_min() >= datetime.datetime.min.replace(tzinfo=datetime.UTC)
-    assert utc_datetime_min() <= datetime.datetime.min.replace(tzinfo=datetime.UTC)
 
 
 @freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC))
 def test_date_utils__utc_datetime_max():
     assert utc_datetime_max() == datetime.datetime.max.replace(tzinfo=datetime.UTC)
-    assert utc_datetime_max() >= datetime.datetime.max.replace(tzinfo=datetime.UTC)
-    assert utc_datetime_max() <= datetime.datetime.max.replace(tzinfo=datetime.UTC)
 
 
 @freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC))
 def test_date_utils__utc_time_min():
     assert utc_time_min() == datetime.time.min.replace(tzinfo=datetime.UTC)
-    assert utc_time_min() >= datetime.time.min.replace(tzinfo=datetime.UTC)
-    assert utc_time_min() <= datetime.time.min.replace(tzinfo=datetime.UTC)
 
 
 @freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC))
 def test_date_utils__utc_time_max():
     assert utc_time_max() == datetime.time.max.replace(tzinfo=datetime.UTC)
-    assert utc_time_max() >= datetime.time.max.replace(tzinfo=datetime.UTC)
-    assert utc_time_max() <= datetime.time.max.replace(tzinfo=datetime.UTC)
 
 
 @freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC))
@@ -369,71 +265,9 @@ def test_date_utils__combine():
     dt = combine(utc_date(), utc_time())
     assert dt == datetime.datetime.now(tz=datetime.UTC)
 
-    msg = "Time must be timezone-aware using `datetime.timezone` objects."
+    msg = "Must give `tzinfo` or time must be timezone-aware using `zoneinfo.ZoneInfo` objects or `datetime.UTC`."
     with pytest.raises(ValueError, match=msg):
         combine(utc_date(), datetime.time.min)
 
-
-@freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC))
-def test_date_utils__datetimes_equal():
-    dt_zi = datetime.datetime(2021, 1, 1, tzinfo=TIMEZONE)
-    dt_tz = datetime.datetime(2021, 1, 1, tzinfo=datetime.UTC)
-    dt_naive = datetime.datetime(2021, 1, 1)
-
-    msg = "can't compare offset-naive and offset-aware datetimes"
-
-    with pytest.raises(TypeError, match=msg):
-        assert dt_zi >= dt_naive
-    with pytest.raises(TypeError, match=msg):
-        assert dt_zi <= dt_naive
-    with pytest.raises(TypeError, match=msg):
-        assert dt_tz >= dt_naive
-    with pytest.raises(TypeError, match=msg):
-        assert dt_tz <= dt_naive
-
-    assert dt_zi != dt_naive  # Comparing timezone aware and naive times, so this should raise, but doesn't.
-    assert dt_tz != dt_naive  # Comparing timezone aware and naive times, so this should raise, but doesn't.
-
-    msg = "First datetime must be timezone-aware using `datetime.timezone` objects."
-    with pytest.raises(ValueError, match=msg):
-        datetimes_equal(dt_naive, dt_tz)
-
-    datetimes_equal(dt_zi, dt_tz)
-
-    msg = "Second datetime must be timezone-aware using `datetime.timezone` objects."
-    with pytest.raises(ValueError, match=msg):
-        datetimes_equal(dt_tz, dt_naive)
-
-    datetimes_equal(dt_tz, dt_zi)
-
-
-@freezegun.freeze_time(datetime.datetime(2024, 1, 1, tzinfo=datetime.UTC))
-def test_date_utils__times_equal():
-    t_zi = datetime.time(tzinfo=TIMEZONE)
-    t_tz = datetime.time(tzinfo=datetime.UTC)
-    t_naive = datetime.time()
-
-    msg = "can't compare offset-naive and offset-aware times"
-
-    assert t_zi >= t_naive  # Comparing timezone aware and naive times, so this should raise, but doesn't.
-    assert t_zi <= t_naive  # Comparing timezone aware and naive times, so this should raise, but doesn't.
-
-    with pytest.raises(TypeError, match=msg):
-        assert t_tz >= t_naive
-    with pytest.raises(TypeError, match=msg):
-        assert t_tz <= t_naive
-
-    assert t_zi == t_naive  # Comparing timezone aware and naive times, so this should raise, but doesn't.
-    assert t_tz != t_naive  # Comparing timezone aware and naive times, so this should raise, but doesn't.
-
-    msg = "First time must be timezone-aware using `datetime.timezone` objects."
-    with pytest.raises(ValueError, match=msg):
-        times_equal(t_naive, t_tz)
-    with pytest.raises(ValueError, match=msg):
-        times_equal(t_zi, t_tz)  # Should not raise, but does, so check that this is still the case.
-
-    msg = "Second time must be timezone-aware using `datetime.timezone` objects."
-    with pytest.raises(ValueError, match=msg):
-        times_equal(t_tz, t_naive)
-    with pytest.raises(ValueError, match=msg):
-        times_equal(t_tz, t_zi)  # Should not raise, but does, so check that this is still the case.
+    dt = combine(utc_date(), datetime.time.min, tzinfo=datetime.UTC)
+    assert dt == datetime.datetime.combine(utc_date(), datetime.time.min, tzinfo=datetime.UTC)

@@ -7,7 +7,7 @@ import freezegun
 import pytest
 
 from applications.choices import ApplicationRoundStatusChoice
-from common.date_utils import as_local_timezone
+from common.date_utils import DEFAULT_TIMEZONE
 from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import ReservationUnit
 from reservations.choices import ReservationStateChoice
@@ -35,7 +35,7 @@ reservation_units_reservable_query = partial(reservation_units_query, fields="is
 
 def _datetime(year=2023, month=5, day=1, hour=0, minute=0) -> datetime:
     # Convert to UTC to match timezone returned by GQL endpoint
-    return as_local_timezone(datetime(year, month, day, hour, minute)).astimezone(UTC)
+    return datetime(year, month, day, hour, minute).astimezone(DEFAULT_TIMEZONE).astimezone(UTC)
 
 
 def _date(year=2023, month=5, day=1) -> date:
@@ -1141,7 +1141,7 @@ def test__query_reservation_unit_reservable__filters__application_round__start_d
     }
 
 
-@freezegun.freeze_time(as_local_timezone(datetime(2024, 1, 3)))
+@freezegun.freeze_time(datetime(2024, 1, 3, tzinfo=UTC))
 def test__query_reservation_unit_reservable__reservations__start_and_end_same_day(graphql, reservation_unit):
     """
     This is a regression test for a bug that was found during manual testing.
@@ -1186,7 +1186,7 @@ def test__query_reservation_unit_reservable__reservations__start_and_end_same_da
     }
 
 
-@freezegun.freeze_time(as_local_timezone(datetime(2024, 1, 4)))
+@freezegun.freeze_time(datetime(2024, 1, 4, tzinfo=UTC))
 def test__query_reservation_unit_reservable__reservations__filter_start_time_at_reservation_start(
     graphql,
     reservation_unit,
@@ -1235,7 +1235,7 @@ def test__query_reservation_unit_reservable__reservations__filter_start_time_at_
     "state",
     [ReservationStateChoice.CANCELLED, ReservationStateChoice.DENIED],
 )
-@freezegun.freeze_time(as_local_timezone(datetime(2024, 1, 4)))
+@freezegun.freeze_time(datetime(2024, 1, 4, tzinfo=UTC))
 def test__query_reservation_unit_reservable__reservations__dont_include_cancelled_or_denied_reservations(
     graphql,
     reservation_unit,
@@ -1274,7 +1274,7 @@ def test__query_reservation_unit_reservable__reservations__dont_include_cancelle
     }
 
 
-@freezegun.freeze_time(as_local_timezone(datetime(2024, 1, 4)))
+@freezegun.freeze_time(datetime(2024, 1, 4, tzinfo=UTC))
 def test__query_reservation_unit_reservable__reservations__overlapping_buffers_of_different_lengths(
     graphql, reservation_unit
 ):
