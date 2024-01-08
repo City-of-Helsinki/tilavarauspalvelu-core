@@ -232,6 +232,7 @@ export const RESERVATION_UNITS = gql`
             imageType
             smallUrl
             mediumUrl
+            imageUrl
           }
           pricings {
             begins

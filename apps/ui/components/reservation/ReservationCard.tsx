@@ -238,15 +238,14 @@ const ReservationCard = ({ reservation, type }: PropsT): JSX.Element => {
   );
 
   const name = reservationUnit ? getTranslation(reservationUnit, "name") : "-";
+  const img = getMainImage(reservationUnit);
+  const imgSrc =
+    img?.mediumUrl ||
+    img?.imageUrl ||
+    "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
   return (
     <Container data-testid="reservation-card__container">
-      <Image
-        alt={name}
-        src={
-          getMainImage(reservationUnit)?.mediumUrl ||
-          "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-        }
-      />
+      <Image alt={name} src={imgSrc} />
       <MainContent>
         <Top>
           <Name>{title}</Name>

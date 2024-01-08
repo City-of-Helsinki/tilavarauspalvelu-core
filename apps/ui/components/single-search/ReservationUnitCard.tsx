@@ -227,13 +227,13 @@ const ReservationUnitCard = ({ reservationUnit }: PropsT): JSX.Element => {
       ? getTranslation(reservationUnit.reservationUnitType, "name")
       : undefined;
 
+  const img = getMainImage(reservationUnit);
+  const imgSrc = img?.smallUrl || img?.imageUrl || pixel;
+
   return (
     <Container>
       <StyledLink href={link}>
-        <Image
-          alt={name}
-          src={getMainImage(reservationUnit)?.smallUrl ?? pixel}
-        />
+        <Image alt={name} src={imgSrc} />
       </StyledLink>
       <MainContent>
         <Name>
