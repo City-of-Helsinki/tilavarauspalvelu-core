@@ -111,8 +111,9 @@ const MoreWrapper = styled(ShowAllContainer)`
 const TabWrapper = styled.div`
   max-width: 95vw;
   @media (width > ${breakpoints.m}) {
-    max-width: calc(
-      95vw - var(--main-menu-width) - 2 * var(--spacing-layout-m)
+    max-width: min(
+      calc(95vw - var(--main-menu-width) - 2 * var(--spacing-layout-m)),
+      var(--container-width-xl)
     );
   }
 `;
