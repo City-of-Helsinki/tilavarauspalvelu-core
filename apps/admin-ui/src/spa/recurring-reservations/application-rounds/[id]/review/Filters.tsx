@@ -7,6 +7,7 @@ import { SearchTags } from "@/component/SearchTags";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "app/common/const";
 import { ApplicantTypeChoice } from "common/types/gql-types";
 import { debounce } from "lodash";
+import { HR } from "app/component/lists/components";
 
 export type UnitPkName = {
   pk: number;
@@ -133,8 +134,13 @@ export function Filters({ units }: Props): JSX.Element {
         value={nameFilter ?? ""}
       />
       <FullRow>
+        <HR />
+      </FullRow>
+      {/*
+      <FullRow>
         <SearchTags hide={hideSearchTags} translateTag={translateTag} />
       </FullRow>
+      */}
     </AutoGrid>
   );
 }

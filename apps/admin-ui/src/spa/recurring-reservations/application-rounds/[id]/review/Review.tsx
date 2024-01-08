@@ -75,6 +75,8 @@ export function Review({ applicationRound }: ReviewProps): JSX.Element | null {
     applicationRound.applicationsCount != null &&
     applicationRound.applicationsCount > 0;
 
+  const activeTabIndex = selectedTab === "events" ? 1 : selectedTab === "allocated" ? 2 : 0;
+
   return (
     <Container>
       <Header>
@@ -101,7 +103,7 @@ export function Review({ applicationRound }: ReviewProps): JSX.Element | null {
           )}
         </AlignEndContainer>
       </Header>
-      <Tabs initiallyActiveTab={selectedTab === "events" ? 1 : 0}>
+      <Tabs initiallyActiveTab={activeTabIndex}>
         <Tabs.TabList>
           <Tabs.Tab onClick={() => handleTabChange("applications")}>
             {t("ApplicationRound.applications")}

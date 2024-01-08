@@ -70,6 +70,8 @@ export const APPLICATIONS_EVENTS_QUERY = gql`
     $applicationRound: Int!
     $applicationStatus: [ApplicationStatusChoice]!
     $unit: [Int]
+    $applicantType: [ApplicantTypeChoice]
+    $textSearch: String
   ) {
     applicationEvents(
       first: $first
@@ -77,6 +79,8 @@ export const APPLICATIONS_EVENTS_QUERY = gql`
       unit: $unit
       applicationRound: $applicationRound
       applicationStatus: $applicationStatus
+      applicantType: $applicantType
+      textSearch: $textSearch
     ) {
       edges {
         node {
@@ -108,6 +112,49 @@ export const APPLICATIONS_EVENTS_QUERY = gql`
                 pk
                 nameFi
               }
+            }
+          }
+        }
+      }
+      totalCount
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+    }
+  }
+`;
+
+export const APPLICATIONS_EVENTS_SCHEDULE_QUERY = gql`
+  query getApplicationEventsSchedule (
+    $offset: Int
+    $first: Int
+    $applicationRound: Int!
+    $allocatedUnit: [Int]
+    $applicantType: [ApplicantTypeChoice]
+    $textSearch: String
+  ) {
+    applicationEventSchedules (
+      first: $first
+      offset: $offset
+      applicationRound: $applicationRound
+      allocatedUnit: $allocatedUnit
+      applicantType: $applicantType
+      textSearch: $textSearch
+    ) {
+      edges {
+        node {
+          pk
+          declined
+          allocatedDay
+          day
+          begin
+          end
+          allocatedReservationUnit {
+            nameFi
+            unit {
+              nameFi
+              pk
             }
           }
         }

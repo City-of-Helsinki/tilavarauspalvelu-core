@@ -1,17 +1,17 @@
 import React from "react";
 import { ApolloError, useQuery } from "@apollo/client";
-import type { Query, QueryApplicationEventsArgs } from "common/types/gql-types";
+import type { Query, QueryApplicationEventSchedulesArgs } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
-import {
-  LIST_PAGE_SIZE,
-  VALID_ALLOCATED_APPLICATION_STATUSES,
-} from "@/common/const";
+import { LIST_PAGE_SIZE } from "@/common/const";
 import { combineResults } from "@/common/util";
 import { useNotification } from "@/context/NotificationContext";
-import { APPLICATIONS_EVENTS_QUERY } from "./queries";
+import { APPLICATIONS_EVENTS_SCHEDULE_QUERY } from "./queries";
 import Loader from "@/component/Loader";
 import { More } from "@/component/lists/More";
-import ApplicationEventsTable from "./ApplicationEventsTable";
+import { useTranslation } from "react-i18next";
+import { transformApplicantType } from "./utils";
+import { useSearchParams } from "react-router-dom";
+import { AllocatedEventsTable } from "./AllocatedEventsTable";
 
 export type Sort = {
   field: string;
@@ -38,14 +38,24 @@ const AllocatedEventDataLoader = ({
 }: Props): JSX.Element => {
   const { notifyError } = useNotification();
 
+  const [searchParams] = useSearchParams();
+  const unitFilter = searchParams.getAll("unit");
+  const applicantFilter = searchParams.getAll("applicant");
+  const nameFilter = searchParams.get("name");
+
   const { fetchMore, loading, data } = useQuery<
     Query,
-    QueryApplicationEventsArgs
-  >(APPLICATIONS_EVENTS_QUERY, {
+    QueryApplicationEventSchedulesArgs
+  >(APPLICATIONS_EVENTS_SCHEDULE_QUERY, {
     skip: !applicationRoundPk,
     variables: {
+      allocatedUnit: unitFilter.map(Number),
       applicationRound: applicationRoundPk,
-      applicationStatus: VALID_ALLOCATED_APPLICATION_STATUSES,
+      // TODO there is no applicationStatus filter
+      // applicationStatus: VALID_ALLOCATED_APPLICATION_STATUSES,
+      // applicationStatus: transformApplicationStatuses(statusFilter),
+      applicantType: transformApplicantType(applicantFilter),
+      textSearch: nameFilter,
       offset: 0,
       first: LIST_PAGE_SIZE,
       // orderBy: sortString,
@@ -56,13 +66,18 @@ const AllocatedEventDataLoader = ({
     fetchPolicy: "cache-and-network",
   });
 
+  const { t } = useTranslation();
+
   if (loading) {
     return <Loader />;
   }
 
-  const applicationEvents = filterNonNullable(
-    data?.applicationEvents?.edges.map((edge) => edge?.node)
+  // FIXME this includes unallocated events (it should not)
+  // can we backend filter the unallocated events out of the result?
+  const aes = filterNonNullable(
+    data?.applicationEventSchedules?.edges.map((edge) => edge?.node)
   );
+  const totalCount = data?.applicationEventSchedules?.totalCount ?? 0;
 
   // TODO
   const sort = undefined;
@@ -72,19 +87,21 @@ const AllocatedEventDataLoader = ({
 
   return (
     <>
-      <ApplicationEventsTable
-        applicationEvents={applicationEvents}
+      <span><b>{data?.applicationEvents?.totalCount} {t("ApplicationRound.applicationEventCount")}</b></span>
+      {/* TODO ScheduleTable */}
+      <AllocatedEventsTable
+        schedules={aes}
         sort={sort}
         sortChanged={handleSortChanged}
       />
       <More
-        key={applicationEvents.length}
-        totalCount={data?.applicationEvents?.totalCount || 0}
-        count={applicationEvents.length}
+        key={aes.length}
+        totalCount={totalCount}
+        count={aes.length}
         fetchMore={() =>
           fetchMore({
             variables: {
-              offset: data?.applicationEvents?.edges.length,
+              offset: data?.applicationEventSchedules?.edges.length ?? 0,
             },
             updateQuery,
           })

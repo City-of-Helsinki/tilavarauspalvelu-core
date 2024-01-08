@@ -14,6 +14,7 @@ import { More } from "@/component/lists/More";
 import { APPLICATIONS_EVENTS_QUERY } from "./queries";
 import ApplicationEventsTable from "./ApplicationEventsTable";
 import { transformApplicantType, transformApplicationStatuses } from "./utils";
+import { useTranslation } from "react-i18next";
 
 const updateQuery = (
   previousResult: Query,
@@ -39,6 +40,7 @@ export function ApplicationEventDataLoader({
   const unitFilter = searchParams.getAll("unit");
   const statusFilter = searchParams.getAll("status");
   const applicantFilter = searchParams.getAll("applicant");
+  const nameFilter = searchParams.get("name");
 
   const { fetchMore, loading, data } = useQuery<
     Query,
@@ -50,6 +52,7 @@ export function ApplicationEventDataLoader({
       applicationRound: applicationRoundPk,
       applicationStatus: transformApplicationStatuses(statusFilter),
       applicantType: transformApplicantType(applicantFilter),
+      textSearch: nameFilter,
       offset: 0,
       first: LIST_PAGE_SIZE,
       // TODO query params for filters
@@ -65,8 +68,12 @@ export function ApplicationEventDataLoader({
     onError: (err: ApolloError) => {
       notifyError(err.message);
     },
-    fetchPolicy: "cache-and-network",
+    // TODO cache-and-network doesn't work because it appends the network-results on top of the cache
+    // need to add custom caching merge with uniq before changing this
+    fetchPolicy: "network-only",
   });
+
+  const { t } = useTranslation();
 
   if (loading && !data) {
     return <Loader />;
@@ -84,6 +91,7 @@ export function ApplicationEventDataLoader({
 
   return (
     <>
+      <span><b>{data?.applicationEvents?.totalCount} {t("ApplicationRound.applicationEventCount")}</b></span>
       <ApplicationEventsTable
         applicationEvents={applicationEvents}
         sort={sort}

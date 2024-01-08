@@ -25,7 +25,7 @@ export function transformApplicationStatuses(
           undefined;
       }
     })
-    .filter((f) => f != null) as ApplicationStatusChoice[];
+    .filter((asc): asc is NonNullable<typeof asc> => asc != null)
 }
 
 export function transformApplicantType(
@@ -37,12 +37,12 @@ export function transformApplicantType(
         case ApplicantTypeChoice.Individual:
           return ApplicantTypeChoice.Individual;
         case ApplicantTypeChoice.Company:
-          return ApplicantTypeChoice.Association;
+          return ApplicantTypeChoice.Company;
         case ApplicantTypeChoice.Community:
           return ApplicantTypeChoice.Community;
-        default:
-          undefined;
+        case ApplicantTypeChoice.Association:
+          return ApplicantTypeChoice.Association;
       }
     })
-    .filter((f) => f != null) as ApplicantTypeChoice[];
+    .filter((at): at is NonNullable<typeof at> => at != null);
 }

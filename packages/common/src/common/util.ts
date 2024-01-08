@@ -107,7 +107,11 @@ export const toApiDateUnsafe = (date: Date, formatStr = "yyyy-MM-dd") =>
 // TODO rename to API
 export function fromApiDate(date: string): Date | null {
   try {
-    return parse(date, "yyyy-MM-dd", new Date());
+    const d = parse(date, "yyyy-MM-dd", new Date());
+    if (Number.isNaN(d.getTime())) {
+      return null;
+    }
+    return d;
   } catch (e) {
     return null;
   }

@@ -504,6 +504,7 @@ const translations: ITranslations = {
     ],
     allocate: ["Jaa vuoroja"],
     applicationCount: ["hakemusta"],
+    applicationEventCount: ["vuoroa"],
     reservationUnitCount: ["varausyksikköä"],
     applicants: ["Hakukierroksen hakijat"],
     listHandlingTitle: ["Käsittely"],
@@ -542,6 +543,13 @@ const translations: ITranslations = {
     usedReservationUnits: ["Kierrokselle liitetyt varausyksiköt"],
     // TODO used in TimerFrameStatus.tsx instead
     resolutionDate: ["Päätös tehty {{date}}"],
+  },
+  ApplicationEventSchedules: {
+    headings: {
+      "reservationUnit": ["Varausyksikkö"],
+      "eventName": ["Varauksen nimi"],
+      "time": ["Vuoro"],
+    },
   },
   ApplicationEvent: {
     name: ["Vakiovuoron nimi"],

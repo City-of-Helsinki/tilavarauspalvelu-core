@@ -1,45 +1,16 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
-import { memoize, orderBy, trim, uniqBy } from "lodash";
+import { memoize } from "lodash";
 import { IconLinkExternal } from "hds-react";
-import { differenceInWeeks } from "date-fns";
-import { fromApiDate } from "common/src/common/util";
-import type { ApplicationEventNode } from "common/types/gql-types";
-import { formatters as getFormatters } from "common";
+import type { ApplicationEventScheduleNode } from "common/types/gql-types";
 import { publicUrl } from "@/common/const";
 import { truncate } from "@/helpers";
 import { applicationDetailsUrl } from "@/common/urls";
-import { getApplicantName } from "@/component/applications/util";
-import { formatNumber } from "@/common/util";
 import { CustomTable, ExternalTableLink } from "@/component/lists/components";
-import { ApplicationEventStatusCell } from "./StatusCell";
-
-const formatters = getFormatters("fi");
 
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
-
-const numTurns = (
-  startDate: string,
-  endDate: string,
-  biWeekly: boolean,
-  eventsPerWeek: number
-): number =>
-  (differenceInWeeks(new Date(endDate), new Date(startDate)) /
-    (biWeekly ? 2 : 1)) *
-  eventsPerWeek;
-
-const appEventHours = (
-  startDate: string,
-  endDate: string,
-  biWeekly: boolean,
-  eventsPerWeek: number,
-  minDuration: number
-): number => {
-  const turns = numTurns(startDate, endDate, biWeekly, eventsPerWeek);
-  return (turns * minDuration) / 3600;
-};
 
 export type Sort = {
   field: string;
@@ -49,84 +20,46 @@ export type Sort = {
 type Props = {
   sort?: Sort;
   sortChanged: (field: string) => void;
-  applicationEvents: ApplicationEventNode[];
+  schedules: ApplicationEventScheduleNode[];
 };
 
-type UnitType = {
-  pk: number;
-  name: string;
-};
-type ApplicationEventView = {
+type ApplicationScheduleView = {
   applicationPk?: number;
   pk?: number;
   applicantName?: string;
   name: string;
-  units: UnitType[];
+  unitName?: string;
+  allocatedReservationUnitName?: string;
+  time: string;
   statusView: JSX.Element;
-  applicationCount: string;
 };
 
-const appEventMapper = (
-  appEvent: ApplicationEventNode
-): ApplicationEventView => {
-  const resUnits = appEvent.eventReservationUnits?.flatMap((eru) => ({
-    ...eru?.reservationUnit?.unit,
-    priority: eru?.preferredOrder ?? 0,
-  }));
-  const units = orderBy(uniqBy(resUnits, "pk"), "priority", "asc")
-    .map((unit) => ({
-      pk: unit.pk ?? 0,
-      name: unit.nameFi,
-    }))
-    .filter((unit): unit is UnitType => !!unit.pk && !!unit.name);
+const appScheduleMapper = (
+  aes: ApplicationEventScheduleNode
+): ApplicationScheduleView => {
+  const isDeclined = aes.declined
+  const allocatedReservationUnit = aes.allocatedReservationUnit?.nameFi ?? "-"
+  const allocatedUnit = aes.allocatedReservationUnit?.unit?.nameFi ?? "-"
 
-  const status = appEvent.status ?? undefined;
-  const name = appEvent.name || "-";
+  // TODO there is no application in the schedule
+  const applicantName = "-" //  getApplicantName(appEvent.application);
 
-  const applicantName = getApplicantName(appEvent.application);
-
-  const turns =
-    appEvent.begin && appEvent.end
-      ? numTurns(
-          appEvent.begin,
-          appEvent.end,
-          appEvent.biweekly,
-          appEvent.eventsPerWeek ?? 0
-        )
-      : 0;
-
-  const begin = appEvent.begin ? fromApiDate(appEvent.begin) : undefined;
-  const end = appEvent.end ? fromApiDate(appEvent.end) : undefined;
-  const totalHours =
-    begin && end
-      ? appEventHours(
-          begin.toISOString(),
-          end.toISOString(),
-          appEvent.biweekly,
-          appEvent.eventsPerWeek ?? 0,
-          appEvent.minDuration ?? 0
-        )
-      : 0;
+  const { begin, end } = aes;
+  const timeString = `${begin} - ${end}`
+  const isAllocated = aes.allocatedBegin && aes.allocatedEnd;
+  const status = isDeclined ? "declined" : isAllocated ?  "allocated" : "-";
 
   return {
-    applicationPk: appEvent.application.pk ?? undefined,
-    pk: appEvent.pk ?? undefined,
+    // TODO missing
+    applicationPk: 0,
+    pk: aes.pk ?? undefined,
     applicantName,
-    units,
-    name,
-    applicationCount: trim(
-      `${formatNumber(turns, "")} / ${formatters.oneDecimal.format(
-        totalHours
-      )} t`,
-      " / "
-    ),
-    statusView: (
-      <ApplicationEventStatusCell
-        status={status}
-        text={`Application.statuses.${status}`}
-        withArrow={false}
-      />
-    ),
+    allocatedReservationUnitName: allocatedReservationUnit,
+    unitName: allocatedUnit,
+    time: timeString,
+    name: "foobar",
+    // TODO implement the JSX element
+    statusView: <span>{status}</span>,
   };
 };
 
@@ -135,13 +68,13 @@ const getColConfig = (t: TFunction) => [
     headerName: t("ApplicationEvent.headings.id"),
     isSortable: true,
     key: "pk",
-    transform: ({ pk }: ApplicationEventView) => String(pk),
+    transform: ({ pk, applicationPk }: ApplicationScheduleView) => `${applicationPk}-${pk}`,
   },
   {
     headerName: t("ApplicationEvent.headings.customer"),
     isSortable: true,
     key: "applicant",
-    transform: ({ applicantName, applicationPk, pk }: ApplicationEventView) => (
+    transform: ({ applicantName, applicationPk, pk }: ApplicationScheduleView) => (
       <ExternalTableLink
         href={`${publicUrl}${applicationDetailsUrl(applicationPk ?? 0)}#${
           pk ?? 0
@@ -155,48 +88,50 @@ const getColConfig = (t: TFunction) => [
     ),
   },
   {
-    headerName: t("ApplicationEvent.headings.name"),
+    headerName: t("ApplicationEventSchedules.headings.eventName"),
     key: "name",
   },
   {
     headerName: t("ApplicationEvent.headings.unit"),
     key: "units",
-    transform: ({ units }: ApplicationEventView) => {
-      const allUnits = units.map((u) => u.name).join(", ");
-
+    transform: ({ unitName }: ApplicationScheduleView) => {
       return (
-        <span title={allUnits}>
-          {truncate(
-            units
-              .filter((_u, i) => i < 2)
-              .map((u) => u.name)
-              .join(", "),
-            unitsTruncateLen
-          )}
+        <span>
+          {truncate(unitName ?? "-", unitsTruncateLen)}
         </span>
       );
     },
   },
   {
-    headerName: t("ApplicationEvent.headings.stats"),
-    key: "applicationCount",
-    transform: ({ applicationCount }: ApplicationEventView) => applicationCount,
+    headerName: t("ApplicationEventSchedules.headings.reservationUnit"),
+    key: "reservationUnit",
+    transform: ({ allocatedReservationUnitName }: ApplicationScheduleView) => {
+      return (
+        <span>
+          {truncate(allocatedReservationUnitName ?? "-", unitsTruncateLen)}
+        </span>
+      );
+    },
+  },
+  {
+    headerName: t("ApplicationEventSchedules.headings.time"),
+    key: "time",
   },
   {
     headerName: t("ApplicationEvent.headings.phase"),
     key: "status",
-    transform: ({ statusView }: ApplicationEventView) => statusView,
+    transform: ({ statusView }: ApplicationScheduleView) => statusView,
   },
 ];
 
-const AllocatedEventsTable = ({
+export function AllocatedEventsTable({
   sort,
   sortChanged: onSortChanged,
-  applicationEvents,
-}: Props): JSX.Element => {
+  schedules,
+}: Props): JSX.Element {
   const { t } = useTranslation();
 
-  const views = applicationEvents.map((ae) => appEventMapper(ae));
+  const views = schedules.map((aes) => appScheduleMapper(aes));
 
   const cols = memoize(() => getColConfig(t))();
 
@@ -216,6 +151,4 @@ const AllocatedEventsTable = ({
       }
     />
   );
-};
-
-export default AllocatedEventsTable;
+}

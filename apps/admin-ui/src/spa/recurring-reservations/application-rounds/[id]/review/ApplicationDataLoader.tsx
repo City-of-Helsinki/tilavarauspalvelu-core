@@ -11,6 +11,7 @@ import { More } from "@/component/lists/More";
 import { APPLICATIONS_QUERY } from "./queries";
 import { ApplicationsTable } from "./ApplicationsTable";
 import { transformApplicantType, transformApplicationStatuses } from "./utils";
+import { useTranslation } from "react-i18next";
 
 const updateQuery = (
   previousResult: Query,
@@ -36,6 +37,7 @@ export function ApplicationDataLoader({
   const unitFilter = searchParams.getAll("unit");
   const statusFilter = searchParams.getAll("status");
   const applicantFilter = searchParams.getAll("applicant");
+  const nameFilter = searchParams.get("name");
 
   const { fetchMore, loading, data } = useQuery<Query, QueryApplicationsArgs>(
     APPLICATIONS_QUERY,
@@ -48,6 +50,7 @@ export function ApplicationDataLoader({
         first: LIST_PAGE_SIZE,
         status: transformApplicationStatuses(statusFilter),
         applicantType: transformApplicantType(applicantFilter),
+        textSearch: nameFilter,
         // TODO order by doesn't work
         /*
         orderBy:
@@ -61,9 +64,13 @@ export function ApplicationDataLoader({
       onError: (err: ApolloError) => {
         notifyError(err.message);
       },
-      fetchPolicy: "cache-and-network",
+      // TODO cache-and-network doesn't work because it appends the network-results on top of the cache
+      // need to add custom caching merge with uniq before changing this
+      fetchPolicy: "network-only",
     }
   );
+
+  const { t } = useTranslation();
 
   if (loading && !data) {
     return <Loader />;
@@ -81,6 +88,7 @@ export function ApplicationDataLoader({
 
   return (
     <>
+      <span><b>{data?.applications?.totalCount} {t("ApplicationRound.applicationCount")}</b></span>
       <ApplicationsTable
         applications={applications}
         sort={sort}
