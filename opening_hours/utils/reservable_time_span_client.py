@@ -159,7 +159,24 @@ class TimeSpanElement:
 
     @property
     def buffered_duration_minutes(self) -> float:
+        """Duration of the time span, including buffer times."""
         return (self.buffered_end_datetime - self.buffered_start_datetime).total_seconds() / 60
+
+    @property
+    def front_buffered_duration_minutes(self) -> float:
+        """Duration of the time span, including buffer times before the start."""
+        return (
+            (self.end_datetime - self.start_datetime)
+            + (self.buffer_time_before if self.buffer_time_before else datetime.timedelta())
+        ).total_seconds() / 60
+
+    @property
+    def back_buffered_duration_minutes(self) -> float:
+        """Duration of the time span, including buffer times after the end."""
+        return (
+            (self.end_datetime - self.start_datetime)
+            + (self.buffer_time_after if self.buffer_time_after else datetime.timedelta())
+        ).total_seconds() / 60
 
     def overlaps_with(self, other: "TimeSpanElement") -> bool:
         """
@@ -268,20 +285,21 @@ class TimeSpanElement:
             else max(reservation_unit.min_reservation_duration.total_seconds() / 60, minimum_duration_minutes)
         )
 
-        # Minimum duration of a reservation for this ReservationUnit, including buffer times
-        buffered_reservation_unit_minimum_duration_minutes = reservation_unit_minimum_duration_minutes
+        front_buffered_reservation_unit_minimum_duration_minutes = reservation_unit_minimum_duration_minutes
+        back_buffered_reservation_unit_minimum_duration_minutes = reservation_unit_minimum_duration_minutes
         if reservation_unit.buffer_time_before is not None:
-            buffered_reservation_unit_minimum_duration_minutes += (
+            front_buffered_reservation_unit_minimum_duration_minutes += (
                 reservation_unit.buffer_time_before.total_seconds() / 60
             )
         if reservation_unit.buffer_time_after is not None:
-            buffered_reservation_unit_minimum_duration_minutes += (
+            back_buffered_reservation_unit_minimum_duration_minutes += (
                 reservation_unit.buffer_time_after.total_seconds() / 60
             )
 
         return (
             self.duration_minutes >= reservation_unit_minimum_duration_minutes
-            and self.buffered_duration_minutes >= buffered_reservation_unit_minimum_duration_minutes
+            and self.front_buffered_duration_minutes >= front_buffered_reservation_unit_minimum_duration_minutes
+            and self.back_buffered_duration_minutes >= back_buffered_reservation_unit_minimum_duration_minutes
         )
 
     def move_to_next_valid_start_time(self, reservation_unit: "ReservationUnit") -> None:
