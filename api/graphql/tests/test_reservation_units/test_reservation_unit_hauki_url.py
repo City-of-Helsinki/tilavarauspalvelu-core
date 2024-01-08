@@ -4,6 +4,7 @@ import snapshottest
 from freezegun import freeze_time
 
 from api.graphql.tests.base import GrapheneTestCaseBase
+from api.graphql.tests.test_reservation_units.conftest import reservation_unit_hauki_url_query
 from permissions.models import (
     GeneralRoleChoice,
     GeneralRolePermission,
@@ -29,29 +30,17 @@ class ReservationUnitHaukiUrlTestCase(GrapheneTestCaseBase, snapshottest.TestCas
         cls.unit = UnitFactory(tprek_department_id="depid")
         cls.reservation_unit = ReservationUnitFactory(unit=cls.unit, uuid="3774af34-9916-40f2-acc7-68db5a627710")
         cls.target_runit = ReservationUnitFactory(unit=cls.unit, uuid="3774af34-9916-40f2-acc7-68db5a627711")
-        cls.target_reservation_unit_ids = [str(cls.target_runit.id)]
         cls.service_sector = ServiceSectorFactory(units=[cls.unit])
 
-    def get_query(self, res_unit_id=None, target_reservation_unit_ids=None):
-        target_reservation_unit_ids = target_reservation_unit_ids or self.target_reservation_unit_ids
-
-        target_res_units = ",".join(list(target_reservation_unit_ids))
-
-        res_unit_id = res_unit_id or self.reservation_unit.id
-
-        return f"""
-            query {{
-                reservationUnitHaukiUrl(pk: {res_unit_id} reservationUnits: [{target_res_units}]) {{
-                    url
-                }}
-            }}
-        """
-
     def test_admin_can_get_the_url(self):
-        self.maxDiff = None
         self.client.force_login(self.general_admin)
 
-        response = self.query(self.get_query())
+        response = self.query(
+            reservation_unit_hauki_url_query(
+                pk=self.reservation_unit.id,
+                reservationUnits=[self.target_runit.id],
+            )
+        )
 
         content = json.loads(response.content)
 
@@ -66,7 +55,12 @@ class ReservationUnitHaukiUrlTestCase(GrapheneTestCaseBase, snapshottest.TestCas
             permission="can_manage_units",
         )
 
-        response = self.query(self.get_query())
+        response = self.query(
+            reservation_unit_hauki_url_query(
+                pk=self.reservation_unit.id,
+                reservationUnits=[self.target_runit.id],
+            )
+        )
 
         content = json.loads(response.content)
 
@@ -81,7 +75,12 @@ class ReservationUnitHaukiUrlTestCase(GrapheneTestCaseBase, snapshottest.TestCas
             permission="can_manage_units",
         )
 
-        response = self.query(self.get_query())
+        response = self.query(
+            reservation_unit_hauki_url_query(
+                pk=self.reservation_unit.id,
+                reservationUnits=[self.target_runit.id],
+            )
+        )
 
         content = json.loads(response.content)
 
@@ -91,7 +90,13 @@ class ReservationUnitHaukiUrlTestCase(GrapheneTestCaseBase, snapshottest.TestCas
 
     def test_getting_url_raises_error_if_reservation_unit_not_exist(self):
         self.client.force_login(self.general_admin)
-        response = self.query(self.get_query(res_unit_id="666"))
+
+        response = self.query(
+            reservation_unit_hauki_url_query(
+                pk=666,
+                reservationUnits=[self.target_runit.id],
+            )
+        )
 
         content = json.loads(response.content)
 
@@ -101,7 +106,13 @@ class ReservationUnitHaukiUrlTestCase(GrapheneTestCaseBase, snapshottest.TestCas
 
     def test_getting_url_raises_error_if_one_of_target_reservation_unit_not_exist(self):
         self.client.force_login(self.general_admin)
-        response = self.query(self.get_query(target_reservation_unit_ids=["666"]))
+
+        response = self.query(
+            reservation_unit_hauki_url_query(
+                pk=self.reservation_unit.id,
+                reservationUnits=[666],
+            )
+        )
 
         content = json.loads(response.content)
 
@@ -112,8 +123,13 @@ class ReservationUnitHaukiUrlTestCase(GrapheneTestCaseBase, snapshottest.TestCas
     def test_url_does_not_contain_reservation_unit_not_in_same_unit(self):
         self.client.force_login(self.general_admin)
         res_unit = ReservationUnitFactory(unit=UnitFactory())
-        target_res_units = self.target_reservation_unit_ids + [str(res_unit.id)]
-        response = self.query(self.get_query(target_reservation_unit_ids=target_res_units))
+
+        response = self.query(
+            reservation_unit_hauki_url_query(
+                pk=self.reservation_unit.id,
+                reservationUnits=[self.target_runit.id, res_unit.id],
+            )
+        )
 
         content = json.loads(response.content)
 
@@ -130,7 +146,12 @@ class ReservationUnitHaukiUrlTestCase(GrapheneTestCaseBase, snapshottest.TestCas
     def test_regular_user_gets_none_url(self):
         self.client.force_login(self.regular_joe)
 
-        response = self.query(self.get_query())
+        response = self.query(
+            reservation_unit_hauki_url_query(
+                pk=self.reservation_unit.id,
+                reservationUnits=[self.target_runit.id],
+            )
+        )
 
         content = json.loads(response.content)
 

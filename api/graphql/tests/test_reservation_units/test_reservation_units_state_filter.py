@@ -6,6 +6,7 @@ from django.utils.timezone import get_default_timezone
 from api.graphql.tests.test_reservation_units.base import (
     ReservationUnitQueryTestCaseBase,
 )
+from api.graphql.tests.test_reservation_units.conftest import reservation_units_query
 from tests.factories import ReservationUnitFactory
 
 
@@ -52,18 +53,10 @@ class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):
     # Archived reservation units are always hidden
     def test_filtering_by_archived_returns_nothing(self):
         response = self.query(
-            """
-            query {
-                reservationUnits(state:"ARCHIVED"){
-                    edges {
-                        node {
-                            nameFi
-                            state
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                state="ARCHIVED",
+                fields="nameFi state",
+            )
         )
 
         content = json.loads(response.content)
@@ -73,18 +66,10 @@ class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):
 
     def test_filtering_by_draft(self):
         response = self.query(
-            """
-            query {
-                reservationUnits(state:"DRAFT"){
-                    edges {
-                        node {
-                            nameFi
-                            state
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                state="DRAFT",
+                fields="nameFi state",
+            )
         )
 
         content = json.loads(response.content)
@@ -94,18 +79,10 @@ class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):
 
     def test_filtering_by_scheduled_publishing(self):
         response = self.query(
-            """
-            query {
-                reservationUnits(state:"SCHEDULED_PUBLISHING"){
-                    edges {
-                        node {
-                            nameFi
-                            state
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                state="SCHEDULED_PUBLISHING",
+                fields="nameFi state",
+            )
         )
 
         content = json.loads(response.content)
@@ -115,18 +92,10 @@ class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):
 
     def test_filtering_by_published(self):
         response = self.query(
-            """
-            query {
-                reservationUnits(state:"PUBLISHED"){
-                    edges {
-                        node {
-                            nameFi
-                            state
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                state="PUBLISHED",
+                fields="nameFi state",
+            )
         )
 
         content = json.loads(response.content)
@@ -136,18 +105,10 @@ class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):
 
     def test_filtering_by_mixed(self):
         response = self.query(
-            """
-            query {
-                reservationUnits(state:["DRAFT", "SCHEDULED_PUBLISHING"]){
-                    edges {
-                        node {
-                            nameFi
-                            state
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                state=["DRAFT", "SCHEDULED_PUBLISHING"],
+                fields="nameFi state",
+            )
         )
 
         content = json.loads(response.content)
@@ -157,18 +118,10 @@ class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):
 
     def test_filtering_by_scheduled_period(self):
         response = self.query(
-            """
-            query {
-                reservationUnits(state:"SCHEDULED_PERIOD"){
-                    edges {
-                        node {
-                            nameFi
-                            state
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                state="SCHEDULED_PERIOD",
+                fields="nameFi state",
+            )
         )
 
         content = json.loads(response.content)
@@ -178,18 +131,10 @@ class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):
 
     def test_filtering_by_scheduled_hiding(self):
         response = self.query(
-            """
-            query {
-                reservationUnits(state:"SCHEDULED_HIDING"){
-                    edges {
-                        node {
-                            nameFi
-                            state
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                state="SCHEDULED_HIDING",
+                fields="nameFi state",
+            )
         )
 
         content = json.loads(response.content)
@@ -199,18 +144,10 @@ class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):
 
     def test_filtering_by_hidden(self):
         response = self.query(
-            """
-            query {
-                reservationUnits(state:"HIDDEN"){
-                    edges {
-                        node {
-                            nameFi
-                            state
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                state="HIDDEN",
+                fields="nameFi state",
+            )
         )
 
         content = json.loads(response.content)
@@ -229,18 +166,10 @@ class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):
             publish_ends=(now + datetime.timedelta(days=1)),
         )
         response = self.query(
-            """
-            query {
-                reservationUnits(state:"SCHEDULED_PUBLISHING"){
-                    edges {
-                        node {
-                            nameFi
-                            state
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                state="SCHEDULED_PUBLISHING",
+                fields="nameFi state",
+            )
         )
 
         content = json.loads(response.content)
