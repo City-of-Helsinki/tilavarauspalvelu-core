@@ -9,6 +9,7 @@ from django.utils.timezone import get_default_timezone
 
 from applications.choices import ApplicationRoundStatusChoice
 from reservation_units.models import ReservationUnit
+from reservations.choices import ReservationStateChoice
 from tests.factories import (
     ApplicationRoundFactory,
     OriginHaukiResourceFactory,
@@ -937,6 +938,7 @@ def test__query_reservation_unit_reservable__reservations__own_reservation(graph
         begin=_datetime(day=20, hour=10),
         end=_datetime(day=20, hour=12),
         reservation_unit=[reservation_unit],
+        state=ReservationStateChoice.CREATED,
     )
 
     # 2023-05-20 10:00 - 12:00 (2h)
@@ -964,6 +966,7 @@ def test__query_reservation_unit_reservable__reservations__not_in_common_hierarc
         begin=_datetime(day=20, hour=10),
         end=_datetime(day=20, hour=12),
         reservation_unit=[reservation_unit_2],
+        state=ReservationStateChoice.CREATED,
     )
 
     # 2023-05-20 10:00 - 12:00 (2h)
@@ -994,6 +997,7 @@ def test__query_reservation_unit_reservable__reservations__in_common_hierarchy__
         begin=_datetime(day=20, hour=10),
         end=_datetime(day=20, hour=12),
         reservation_unit=[reservation_unit_2],
+        state=ReservationStateChoice.CREATED,
     )
 
     # 2023-05-20 10:00 - 12:00 (2h)
@@ -1024,6 +1028,7 @@ def test__query_reservation_unit_reservable__reservations__in_common_hierarchy__
         begin=_datetime(day=20, hour=10),
         end=_datetime(day=20, hour=12),
         reservation_unit=[reservation_unit_2],
+        state=ReservationStateChoice.CREATED,
     )
 
     # 2023-05-20 10:00 - 12:00 (2h)
@@ -1125,12 +1130,14 @@ def test__query_reservation_unit_reservable__reservations__start_and_end_same_da
         begin=_datetime(year=2024, month=1, day=8, hour=8),
         end=_datetime(year=2024, month=1, day=8, hour=11),
         reservation_unit=[reservation_unit],
+        state=ReservationStateChoice.CREATED,
     )
     # Monday | 2024-01-08 | 12:00 - 17:00 (5h)
     ReservationFactory.create(
         begin=_datetime(year=2024, month=1, day=8, hour=12),
         end=_datetime(year=2024, month=1, day=8, hour=17),
         reservation_unit=[reservation_unit],
+        state=ReservationStateChoice.CREATED,
     )
 
     # Monday | 2024-01-08 | 08:00 - 20:30 (12.5h)
@@ -1174,6 +1181,7 @@ def test__query_reservation_unit_reservable__reservations__filter_start_time_at_
         begin=_datetime(year=2024, month=1, day=9, hour=14),
         end=_datetime(year=2024, month=1, day=9, hour=15, minute=30),
         reservation_unit=[reservation_unit],
+        state=ReservationStateChoice.CREATED,
     )
 
     # Monday | 2024-01-09 | 08:00 - 20:30 (12.5h)
@@ -1198,4 +1206,47 @@ def test__query_reservation_unit_reservable__reservations__filter_start_time_at_
     assert response.node(0) == {
         "isClosed": False,
         "firstReservableDatetime": _datetime(year=2024, month=1, day=9, hour=15, minute=30).isoformat(),
+    }
+
+
+@pytest.mark.parametrize(
+    "state",
+    [ReservationStateChoice.CANCELLED, ReservationStateChoice.DENIED],
+)
+@freezegun.freeze_time(datetime(2024, 1, 4, tzinfo=DEFAULT_TIMEZONE))
+def test__query_reservation_unit_reservable__reservations__dont_include_cancelled_or_denied_reservations(
+    graphql,
+    reservation_unit,
+    state,
+):
+    reservation_unit.reservation_start_interval = ReservationUnit.RESERVATION_START_INTERVAL_30_MINUTES
+    reservation_unit.save()
+
+    # Monday | 2024-01-09 | 10:00 - 12:00 (2h)
+    ReservationFactory.create(
+        begin=_datetime(year=2024, month=1, day=9, hour=10),
+        end=_datetime(year=2024, month=1, day=9, hour=12),
+        reservation_unit=[reservation_unit],
+        state=state,
+    )
+
+    # Monday | 2024-01-09 | 10:00 - 20:30 (12.5h)
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(year=2024, month=1, day=9, hour=10),
+        end_datetime=_datetime(year=2024, month=1, day=9, hour=20),
+    )
+
+    query = reservation_units_reservable_query(
+        reservable_date_start="2024-01-09",
+        reservable_date_end="2024-01-09",
+    )
+
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {
+        "isClosed": False,
+        "firstReservableDatetime": _datetime(year=2024, month=1, day=9, hour=10).isoformat(),
     }
