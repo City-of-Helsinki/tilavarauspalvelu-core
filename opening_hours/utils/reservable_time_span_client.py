@@ -8,10 +8,10 @@ from typing import TYPE_CHECKING, Optional
 from django.conf import settings
 
 from common.date_utils import (
+    as_local_timezone,
     combine,
     local_date,
     local_time_min,
-    local_timezone,
     time_as_timedelta,
     times_equal,
     timezone_from_name,
@@ -54,8 +54,8 @@ class TimeSpanElement:
     def _get_datetime_str(self) -> str:
         strformat = "%Y-%m-%d %H:%M"
 
-        start = self.start_datetime.astimezone(local_timezone())
-        end = self.end_datetime.astimezone(local_timezone())
+        start = as_local_timezone(self.start_datetime)
+        end = as_local_timezone(self.end_datetime)
 
         start_date = start.date()
         end_date = end.date()
@@ -141,8 +141,8 @@ class TimeSpanElement:
             return None
 
         return TimeSpanElement(
-            start_datetime=start_datetime.astimezone(local_timezone()),
-            end_datetime=end_datetime.astimezone(local_timezone()),
+            start_datetime=as_local_timezone(start_datetime),
+            end_datetime=as_local_timezone(end_datetime),
             is_reservable=time_element_state.is_reservable,
         )
 

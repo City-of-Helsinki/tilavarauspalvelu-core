@@ -6,6 +6,7 @@ from django.conf import settings
 
 __all__ = [
     "local_timezone",
+    "as_local_timezone",
     "local_datetime",
     "local_date",
     "local_time",
@@ -29,7 +30,7 @@ __all__ = [
 ### LOCAL TIME ###########################################################################################
 
 
-def local_timezone() -> datetime.timezone:
+def local_timezone(*, ref: datetime.datetime | None = None) -> datetime.timezone:
     """
     Fetch local timezone used to convert naive datetimes to aware datetimes.
 
@@ -55,7 +56,33 @@ def local_timezone() -> datetime.timezone:
     assert t_1 < t_2  # raises "TypeError: can't compare offset-naive and offset-aware times"
     ```
     """
-    return timezone_from_name(settings.TIME_ZONE)
+    return timezone_from_name(settings.TIME_ZONE, ref=ref)
+
+
+@singledispatch
+def as_local_timezone(
+    _input: datetime.datetime | datetime.time,
+    /,
+    *,
+    ref: datetime.datetime | None = None,
+) -> datetime.datetime | datetime.time:
+    """
+    Convert a datetime to local timezone.
+
+    Use this instead of `datetime.astimezone()` or `datetime.datetime(..., tzinfo=local_timezone())`
+    to avoid issues with daylight savings time.
+    """
+    raise TypeError(f"Unsupported type: {_input.__class__.__name__}")
+
+
+@as_local_timezone.register
+def _(_input: datetime.datetime, /, *, ref: datetime.datetime | None = None) -> datetime.datetime:
+    return _input.astimezone(local_timezone(ref=_input))
+
+
+@as_local_timezone.register
+def _(_input: datetime.time, /, *, ref: datetime.datetime | None = None) -> datetime.time:
+    return _input.replace(tzinfo=local_timezone(ref=ref))
 
 
 def local_datetime() -> datetime.datetime:
@@ -208,10 +235,10 @@ def times_equal(_t_1: datetime.time, _t_2: datetime.time, /, *, check_same_tz: b
     return _t_1 == _t_2
 
 
-def timezone_from_name(name: str) -> datetime.timezone:
+def timezone_from_name(name: str, *, ref: datetime.datetime | None = None) -> datetime.timezone:
     """Get `datetime.timezone` from timezone name, e.g. "Europe/Helsinki"."""
     return datetime.timezone(
-        zoneinfo.ZoneInfo(name).utcoffset(datetime.datetime.utcnow()),
+        zoneinfo.ZoneInfo(name).utcoffset(ref or datetime.datetime.utcnow()),
         name=name,
     )
 

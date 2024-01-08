@@ -5,9 +5,9 @@ from typing import NamedTuple
 
 import freezegun
 import pytest
-from django.utils.timezone import get_default_timezone
 
 from applications.choices import ApplicationRoundStatusChoice
+from common.date_utils import as_local_timezone
 from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import ReservationUnit
 from reservations.choices import ReservationStateChoice
@@ -33,12 +33,13 @@ pytestmark = [
 reservation_units_reservable_query = partial(reservation_units_query, fields="isClosed firstReservableDatetime")
 
 
-DEFAULT_TIMEZONE = get_default_timezone()
-
-
 def _datetime(year=2023, month=5, day=1, hour=0, minute=0) -> datetime:
     # Convert to UTC to match timezone returned by GQL endpoint
-    return datetime(year, month, day, hour, minute, tzinfo=DEFAULT_TIMEZONE).astimezone(UTC)
+    return as_local_timezone(datetime(year, month, day, hour, minute)).astimezone(UTC)
+
+
+def _date(year=2023, month=5, day=1) -> date:
+    return date(year, month, day)
 
 
 NOW = _datetime(year=2023, month=5, day=10, hour=13, minute=0)
@@ -800,8 +801,8 @@ def test__query_reservation_unit_reservable__filters__advanced(
             "ApplicationRound | Period overlaps, Status=OPEN, ReservationUnit not part of round": AR_ReservableParams(
                 application_round_params=ApplicationStatusParams(
                     status=ApplicationRoundStatusChoice.OPEN,
-                    reservation_period_begin=_datetime(day=1).astimezone(DEFAULT_TIMEZONE).date(),
-                    reservation_period_end=_datetime(day=20).astimezone(DEFAULT_TIMEZONE).date(),
+                    reservation_period_begin=_date(day=1),
+                    reservation_period_end=_date(day=20),
                     reservation_units=[],
                 ),
                 filters=ReservableFilters(),
@@ -810,8 +811,8 @@ def test__query_reservation_unit_reservable__filters__advanced(
             "ApplicationRound | Period overlaps, STATUS=UPCOMING": AR_ReservableParams(
                 application_round_params=ApplicationStatusParams(
                     status=ApplicationRoundStatusChoice.UPCOMING,
-                    reservation_period_begin=_datetime(day=1).astimezone(DEFAULT_TIMEZONE).date(),
-                    reservation_period_end=_datetime(day=20).astimezone(DEFAULT_TIMEZONE).date(),
+                    reservation_period_begin=_date(day=1),
+                    reservation_period_end=_date(day=20),
                 ),
                 filters=ReservableFilters(),
                 result=ReservableNode(is_closed=True, first_reservable_datetime=None),
@@ -819,8 +820,8 @@ def test__query_reservation_unit_reservable__filters__advanced(
             "ApplicationRound | Period overlaps, Status=OPEN": AR_ReservableParams(
                 application_round_params=ApplicationStatusParams(
                     status=ApplicationRoundStatusChoice.OPEN,
-                    reservation_period_begin=_datetime(day=1).astimezone(DEFAULT_TIMEZONE).date(),
-                    reservation_period_end=_datetime(day=20).astimezone(DEFAULT_TIMEZONE).date(),
+                    reservation_period_begin=_date(day=1),
+                    reservation_period_end=_date(day=20),
                 ),
                 filters=ReservableFilters(),
                 result=ReservableNode(is_closed=True, first_reservable_datetime=None),
@@ -828,8 +829,8 @@ def test__query_reservation_unit_reservable__filters__advanced(
             "ApplicationRound | Period overlaps, Status=IN_ALLOCATION": AR_ReservableParams(
                 application_round_params=ApplicationStatusParams(
                     status=ApplicationRoundStatusChoice.IN_ALLOCATION,
-                    reservation_period_begin=_datetime(day=1).astimezone(DEFAULT_TIMEZONE).date(),
-                    reservation_period_end=_datetime(day=20).astimezone(DEFAULT_TIMEZONE).date(),
+                    reservation_period_begin=_date(day=1),
+                    reservation_period_end=_date(day=20),
                 ),
                 filters=ReservableFilters(),
                 result=ReservableNode(is_closed=True, first_reservable_datetime=None),
@@ -837,8 +838,8 @@ def test__query_reservation_unit_reservable__filters__advanced(
             "ApplicationRound | Period overlaps, Status=HANDLED": AR_ReservableParams(
                 application_round_params=ApplicationStatusParams(
                     status=ApplicationRoundStatusChoice.HANDLED,
-                    reservation_period_begin=_datetime(day=1).astimezone(DEFAULT_TIMEZONE).date(),
-                    reservation_period_end=_datetime(day=20).astimezone(DEFAULT_TIMEZONE).date(),
+                    reservation_period_begin=_date(day=1),
+                    reservation_period_end=_date(day=20),
                 ),
                 filters=ReservableFilters(),
                 result=ReservableNode(is_closed=True, first_reservable_datetime=None),
@@ -846,8 +847,8 @@ def test__query_reservation_unit_reservable__filters__advanced(
             "ApplicationRound | Period overlaps, Status=RESULTS_SENT": AR_ReservableParams(
                 application_round_params=ApplicationStatusParams(
                     status=ApplicationRoundStatusChoice.RESULTS_SENT,
-                    reservation_period_begin=_datetime(day=1).astimezone(DEFAULT_TIMEZONE).date(),
-                    reservation_period_end=_datetime(day=20).astimezone(DEFAULT_TIMEZONE).date(),
+                    reservation_period_begin=_date(day=1),
+                    reservation_period_end=_date(day=20),
                 ),
                 filters=ReservableFilters(),
                 result=ReservableNode(is_closed=False, first_reservable_datetime=_datetime(day=15, hour=12)),
@@ -855,8 +856,8 @@ def test__query_reservation_unit_reservable__filters__advanced(
             "ApplicationRound | Not overlapping, Period in the past, Status=UPCOMING": AR_ReservableParams(
                 application_round_params=ApplicationStatusParams(
                     status=ApplicationRoundStatusChoice.UPCOMING,
-                    reservation_period_begin=_datetime(day=1).astimezone(DEFAULT_TIMEZONE).date(),
-                    reservation_period_end=_datetime(day=10).astimezone(DEFAULT_TIMEZONE).date(),
+                    reservation_period_begin=_date(day=1),
+                    reservation_period_end=_date(day=10),
                 ),
                 filters=ReservableFilters(),
                 result=ReservableNode(is_closed=False, first_reservable_datetime=_datetime(day=15, hour=12)),
@@ -864,8 +865,8 @@ def test__query_reservation_unit_reservable__filters__advanced(
             "ApplicationRound | Not overlapping, Period in the future, Status=OPEN": AR_ReservableParams(
                 application_round_params=ApplicationStatusParams(
                     status=ApplicationRoundStatusChoice.OPEN,
-                    reservation_period_begin=_datetime(day=20).astimezone(DEFAULT_TIMEZONE).date(),
-                    reservation_period_end=_datetime(day=30).astimezone(DEFAULT_TIMEZONE).date(),
+                    reservation_period_begin=_date(day=20),
+                    reservation_period_end=_date(day=30),
                 ),
                 filters=ReservableFilters(),
                 result=ReservableNode(is_closed=False, first_reservable_datetime=_datetime(day=15, hour=12)),
@@ -873,8 +874,8 @@ def test__query_reservation_unit_reservable__filters__advanced(
             "ApplicationRound | Period partially overlaps, Status=OPEN": AR_ReservableParams(
                 application_round_params=ApplicationStatusParams(
                     status=ApplicationRoundStatusChoice.OPEN,
-                    reservation_period_begin=_datetime(day=14).astimezone(DEFAULT_TIMEZONE).date(),
-                    reservation_period_end=_datetime(day=15).astimezone(DEFAULT_TIMEZONE).date(),
+                    reservation_period_begin=_date(day=14),
+                    reservation_period_end=_date(day=15),
                 ),
                 filters=ReservableFilters(),
                 result=ReservableNode(is_closed=False, first_reservable_datetime=_datetime(day=16, hour=0)),
@@ -882,8 +883,8 @@ def test__query_reservation_unit_reservable__filters__advanced(
             "ApplicationRound | Period partially overlaps, Status=OPEN, Min duration too long": AR_ReservableParams(
                 application_round_params=ApplicationStatusParams(
                     status=ApplicationRoundStatusChoice.OPEN,
-                    reservation_period_begin=_datetime(day=14).astimezone(DEFAULT_TIMEZONE).date(),
-                    reservation_period_end=_datetime(day=15).astimezone(DEFAULT_TIMEZONE).date(),
+                    reservation_period_begin=_date(day=14),
+                    reservation_period_end=_date(day=15),
                 ),
                 filters=ReservableFilters(
                     reservable_minimum_duration_minutes=61,
@@ -893,8 +894,8 @@ def test__query_reservation_unit_reservable__filters__advanced(
             "ApplicationRound | Period ends on the day of time span, STATUS=OPEN": AR_ReservableParams(
                 application_round_params=ApplicationStatusParams(
                     status=ApplicationRoundStatusChoice.OPEN,
-                    reservation_period_begin=_datetime(day=14).astimezone(DEFAULT_TIMEZONE).date(),
-                    reservation_period_end=_datetime(day=16).astimezone(DEFAULT_TIMEZONE).date(),
+                    reservation_period_begin=_date(day=14),
+                    reservation_period_end=_date(day=16),
                 ),
                 filters=ReservableFilters(),
                 result=ReservableNode(is_closed=True, first_reservable_datetime=None),
@@ -1140,7 +1141,7 @@ def test__query_reservation_unit_reservable__filters__application_round__start_d
     }
 
 
-@freezegun.freeze_time(datetime(2024, 1, 3, tzinfo=DEFAULT_TIMEZONE))
+@freezegun.freeze_time(as_local_timezone(datetime(2024, 1, 3)))
 def test__query_reservation_unit_reservable__reservations__start_and_end_same_day(graphql, reservation_unit):
     """
     This is a regression test for a bug that was found during manual testing.
@@ -1185,7 +1186,7 @@ def test__query_reservation_unit_reservable__reservations__start_and_end_same_da
     }
 
 
-@freezegun.freeze_time(datetime(2024, 1, 4, tzinfo=DEFAULT_TIMEZONE))
+@freezegun.freeze_time(as_local_timezone(datetime(2024, 1, 4)))
 def test__query_reservation_unit_reservable__reservations__filter_start_time_at_reservation_start(
     graphql,
     reservation_unit,
@@ -1234,7 +1235,7 @@ def test__query_reservation_unit_reservable__reservations__filter_start_time_at_
     "state",
     [ReservationStateChoice.CANCELLED, ReservationStateChoice.DENIED],
 )
-@freezegun.freeze_time(datetime(2024, 1, 4, tzinfo=DEFAULT_TIMEZONE))
+@freezegun.freeze_time(as_local_timezone(datetime(2024, 1, 4)))
 def test__query_reservation_unit_reservable__reservations__dont_include_cancelled_or_denied_reservations(
     graphql,
     reservation_unit,
@@ -1273,7 +1274,7 @@ def test__query_reservation_unit_reservable__reservations__dont_include_cancelle
     }
 
 
-@freezegun.freeze_time(datetime(2024, 1, 4, tzinfo=DEFAULT_TIMEZONE))
+@freezegun.freeze_time(as_local_timezone(datetime(2024, 1, 4)))
 def test__query_reservation_unit_reservable__reservations__overlapping_buffers_of_different_lengths(
     graphql, reservation_unit
 ):
@@ -1316,7 +1317,7 @@ def test__query_reservation_unit_reservable__reservations__overlapping_buffers_o
         state=ReservationStateChoice.CREATED,
     )
 
-    # Monday | 2024-01-09 | 12:00 - 20:00 (10h)
+    # Monday | 2024-01-09 | 10:00 - 20:00 (10h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_datetime(year=2024, month=1, day=9, hour=10),
