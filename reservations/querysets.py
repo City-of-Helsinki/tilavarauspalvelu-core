@@ -83,6 +83,7 @@ class ReservationQuerySet(QuerySet):
         # Reservations that are on the given period and contain any of the given spaces or resources.
         reservation_queryset = (
             self.filter_buffered_reservations_period(start_date=start_date, end_date=end_date)
+            .going_to_occur()
             .filter(
                 Q(reservation_unit__id__in=[info.pk for info in reservation_unit_infos])
                 | Q(reservation_unit__spaces__in=space_ids)

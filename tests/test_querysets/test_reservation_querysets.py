@@ -5,6 +5,7 @@ from django.utils.timezone import get_current_timezone
 
 from opening_hours.utils.reservable_time_span_client import TimeSpanElement
 from reservation_units.models import ReservationUnit
+from reservations.choices import ReservationStateChoice
 from reservations.models import Reservation
 from tests.factories import (
     ReservationFactory,
@@ -43,6 +44,7 @@ def _create_test_reservations_for_all_reservation_units() -> None:
             end=_datetime(minute=0),
             reservation_unit=[reservation_unit],
             user=None,
+            state=ReservationStateChoice.CREATED,
         )
 
 
