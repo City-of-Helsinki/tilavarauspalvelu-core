@@ -10,12 +10,11 @@ from elasticsearch_django.models import SearchResultsQuerySet
 from applications.choices import ApplicationRoundStatusChoice
 from applications.models import ApplicationRound
 from common.date_utils import (
-    as_local_timezone,
-    combine,
+    DEFAULT_TIMEZONE,
     local_datetime,
     local_datetime_max,
     local_datetime_min,
-    local_time_min,
+    local_start_of_day,
 )
 from opening_hours.models import ReservableTimeSpan
 from opening_hours.utils.reservable_time_span_client import TimeSpanElement, override_reservable_with_closed_time_spans
@@ -60,8 +59,8 @@ def _get_hard_closed_time_spans_for_reservation_unit(reservation_unit: "Reservat
     for application_round in reservation_unit.application_rounds.all():
         reservation_unit_closed_time_spans.append(
             TimeSpanElement(
-                start_datetime=combine(application_round.reservation_period_begin, local_time_min()),
-                end_datetime=combine(application_round.reservation_period_end, local_time_min()) + timedelta(days=1),
+                start_datetime=local_start_of_day(application_round.reservation_period_begin),
+                end_datetime=local_start_of_day(application_round.reservation_period_end) + timedelta(days=1),
                 is_reservable=False,
             )
         )
@@ -79,8 +78,7 @@ def _get_soft_closed_time_spans_for_reservation_unit(reservation_unit: "Reservat
             TimeSpanElement(
                 start_datetime=local_datetime_min(),
                 end_datetime=(
-                    combine(now.date(), local_time_min())
-                    + timedelta(days=reservation_unit.reservations_min_days_before)
+                    local_start_of_day(now.date()) + timedelta(days=reservation_unit.reservations_min_days_before)
                 ),
                 is_reservable=False,
             )
@@ -170,17 +168,14 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
         if filter_date_end is None:
             filter_date_end = two_years_from_now
 
-        # Time inputs without timezone information are interpreted as local time
+        # Time inputs are interpreted as local time even if they have timezone information.
+        # This is because we cannot know whether the time might be daylight saving time or not.
+        # Still, we remove any timezone information from the time input, so that time comparisons work correctly.
+        # (See. TODO)
         if filter_time_start is not None:
-            filter_time_start = as_local_timezone(
-                filter_time_start,
-                ref=datetime.combine(filter_date_start, filter_time_start),
-            )
+            filter_time_start = filter_time_start.replace(tzinfo=None)
         if filter_time_end is not None:
-            filter_time_end = as_local_timezone(
-                filter_time_end,
-                ref=datetime.combine(filter_date_end, filter_time_end),
-            )
+            filter_time_end = filter_time_end.replace(tzinfo=None)
 
         ##########################
         # Validate filter values #
@@ -243,11 +238,11 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
         shared_closed_time_spans: list[TimeSpanElement] = [
             TimeSpanElement(
                 start_datetime=local_datetime_min(),
-                end_datetime=max(combine(filter_date_start, local_time_min()), now),
+                end_datetime=max(local_start_of_day(filter_date_start), now),
                 is_reservable=False,
             ),
             TimeSpanElement(
-                start_datetime=combine(filter_date_end, local_time_min()) + timedelta(days=1),
+                start_datetime=local_start_of_day(filter_date_end) + timedelta(days=1),
                 end_datetime=local_datetime_max(),
                 is_reservable=False,
             ),
@@ -268,8 +263,8 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
 
             for element in reservation_unit.origin_hauki_resource.reservable_time_spans.all():
                 reservable_time_span = TimeSpanElement(
-                    start_datetime=as_local_timezone(element.start_datetime),
-                    end_datetime=as_local_timezone(element.end_datetime),
+                    start_datetime=element.start_datetime.astimezone(DEFAULT_TIMEZONE),
+                    end_datetime=element.end_datetime.astimezone(DEFAULT_TIMEZONE),
                     is_reservable=True,
                 )
 

@@ -1,10 +1,11 @@
 import datetime
+import zoneinfo
 
 import pytest
 from django.utils import timezone
 from freezegun import freeze_time
 
-from common.date_utils import local_timezone, timezone_from_name
+from common.date_utils import DEFAULT_TIMEZONE
 from opening_hours.enums import HaukiResourceState
 from opening_hours.errors import ReservableTimeSpanClientNothingToDoError
 from opening_hours.models import ReservableTimeSpan
@@ -29,8 +30,8 @@ pytestmark = [
 ]
 
 
-def _get_date(*, day: int = 1, hour: int = 0, tzinfo: datetime.timezone | None = None):
-    return datetime.datetime(2023, 1, day, hour, 0, 0, tzinfo=tzinfo or local_timezone())
+def _get_date(*, day: int = 1, hour: int = 0, tzinfo: zoneinfo.ZoneInfo | None = None):
+    return datetime.datetime(2023, 1, day, hour, 0, 0, tzinfo=tzinfo or DEFAULT_TIMEZONE)
 
 
 def _get_resource_opening_hours() -> HaukiAPIOpeningHoursResponseItem:
@@ -683,7 +684,7 @@ def test__ReservableTimeSpanClient__create_reservable_time_spans__overlapping_wi
 def test__ReservableTimeSpanClient__run__timezones_are_preserved(reservation_unit):
     client = ReservableTimeSpanClient(reservation_unit.origin_hauki_resource)
 
-    ny_tz = timezone_from_name("America/New_York")
+    ny_tz = zoneinfo.ZoneInfo("America/New_York")
 
     return_value = _get_resource_opening_hours()
     return_value["resource"]["timezone"] = str(ny_tz)
@@ -692,7 +693,7 @@ def test__ReservableTimeSpanClient__run__timezones_are_preserved(reservation_uni
     created_time_spans = client.run()
 
     assert len(created_time_spans) == 2
-    assert created_time_spans[0].start_datetime == _get_date(day=1, hour=10, tzinfo=ny_tz).astimezone(local_timezone())
-    assert created_time_spans[0].end_datetime == _get_date(day=1, hour=14, tzinfo=ny_tz).astimezone(local_timezone())
-    assert created_time_spans[1].start_datetime == _get_date(day=2, hour=20, tzinfo=ny_tz).astimezone(local_timezone())
-    assert created_time_spans[1].end_datetime == _get_date(day=3, hour=6, tzinfo=ny_tz).astimezone(local_timezone())
+    assert created_time_spans[0].start_datetime == _get_date(day=1, hour=10, tzinfo=ny_tz).astimezone(DEFAULT_TIMEZONE)
+    assert created_time_spans[0].end_datetime == _get_date(day=1, hour=14, tzinfo=ny_tz).astimezone(DEFAULT_TIMEZONE)
+    assert created_time_spans[1].start_datetime == _get_date(day=2, hour=20, tzinfo=ny_tz).astimezone(DEFAULT_TIMEZONE)
+    assert created_time_spans[1].end_datetime == _get_date(day=3, hour=6, tzinfo=ny_tz).astimezone(DEFAULT_TIMEZONE)

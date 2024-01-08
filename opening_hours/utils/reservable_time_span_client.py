@@ -1,5 +1,6 @@
 import calendar
 import datetime
+import zoneinfo
 from copy import copy
 from dataclasses import dataclass
 from math import ceil
@@ -8,13 +9,11 @@ from typing import TYPE_CHECKING, Optional
 from django.conf import settings
 
 from common.date_utils import (
-    as_local_timezone,
+    DEFAULT_TIMEZONE,
     combine,
     local_date,
-    local_time_min,
+    local_start_of_day,
     time_as_timedelta,
-    times_equal,
-    timezone_from_name,
 )
 from common.utils import with_indices
 from opening_hours.enums import HaukiResourceState
@@ -54,8 +53,8 @@ class TimeSpanElement:
     def _get_datetime_str(self) -> str:
         strformat = "%Y-%m-%d %H:%M"
 
-        start = as_local_timezone(self.start_datetime)
-        end = as_local_timezone(self.end_datetime)
+        start = self.start_datetime.astimezone(DEFAULT_TIMEZONE)
+        end = self.end_datetime.astimezone(DEFAULT_TIMEZONE)
 
         start_date = start.date()
         end_date = end.date()
@@ -104,7 +103,7 @@ class TimeSpanElement:
     def create_from_time_element(
         cls,
         date: datetime.date,
-        timezone: datetime.timezone,
+        timezone: zoneinfo.ZoneInfo,
         time_element: HaukiAPIOpeningHoursResponseTime,
     ) -> Optional["TimeSpanElement"]:
         # We only care if the resource is reservable or closed on the time frame.
@@ -121,9 +120,9 @@ class TimeSpanElement:
             datetime.time()
             if full_day or time_element["start_time"] is None
             else datetime.datetime.strptime(time_element["start_time"], "%H:%M:%S").time()
-        ).replace(tzinfo=timezone)
+        )
 
-        start_datetime = combine(date, start_time)
+        start_datetime = combine(date, start_time, tzinfo=timezone)
 
         if time_element["end_time_on_next_day"] or full_day:
             date += datetime.timedelta(days=1)
@@ -132,17 +131,17 @@ class TimeSpanElement:
             datetime.time()
             if full_day or time_element["end_time"] is None
             else datetime.datetime.strptime(time_element["end_time"], "%H:%M:%S").time()
-        ).replace(tzinfo=timezone)
+        )
 
-        end_datetime = combine(date, end_time)
+        end_datetime = combine(date, end_time, tzinfo=timezone)
 
         # If the time span duration would be zero or negative, return None.
         if start_datetime >= end_datetime:
             return None
 
         return TimeSpanElement(
-            start_datetime=as_local_timezone(start_datetime),
-            end_datetime=as_local_timezone(end_datetime),
+            start_datetime=start_datetime.astimezone(DEFAULT_TIMEZONE),
+            end_datetime=end_datetime.astimezone(DEFAULT_TIMEZONE),
             is_reservable=time_element_state.is_reservable,
         )
 
@@ -326,23 +325,28 @@ class TimeSpanElement:
         if not filter_time_start and not filter_time_end:
             return closed_time_spans
 
+        if filter_time_start and filter_time_start.tzinfo is not None:
+            raise ValueError("`filter_time_start` must be timezone naive.")
+        if filter_time_end and filter_time_end.tzinfo is not None:
+            raise ValueError("`filter_time_end` must be timezone naive.")
+
         # Loop through every day between the start and end date of this time span
         for day in self.get_dates_range():
             # Add closed time spans for the time range outside the given filter range
             # e.g. Filter time range is 10:00-14:00, add closed time spans for 00:00-10:00 and 14:00-00:00
-            if filter_time_start and not times_equal(filter_time_start, local_time_min()):
+            if filter_time_start and filter_time_start != datetime.datetime.min:
                 closed_time_spans.append(
                     TimeSpanElement(
-                        start_datetime=combine(day, local_time_min()),
-                        end_datetime=combine(day, filter_time_start),
+                        start_datetime=local_start_of_day(day),
+                        end_datetime=combine(day, filter_time_start, tzinfo=DEFAULT_TIMEZONE),
                         is_reservable=False,
                     )
                 )
-            if filter_time_end and not times_equal(filter_time_end, local_time_min()):
+            if filter_time_end and filter_time_end != datetime.datetime.min:
                 closed_time_spans.append(
                     TimeSpanElement(
-                        start_datetime=combine(day, filter_time_end),
-                        end_datetime=combine(day, local_time_min()) + datetime.timedelta(days=1),
+                        start_datetime=combine(day, filter_time_end, tzinfo=DEFAULT_TIMEZONE),
+                        end_datetime=local_start_of_day(day) + datetime.timedelta(days=1),
                         is_reservable=False,
                     )
                 )
@@ -437,7 +441,7 @@ class ReservableTimeSpanClient:
     @staticmethod
     def _parse_opening_hours(opening_hours_response: HaukiAPIOpeningHoursResponseItem) -> list[TimeSpanElement]:
         """Parse the Hauki API response into a simplified list of TimeSpanDayElements."""
-        resource_timezone = timezone_from_name(opening_hours_response["resource"].get("timezone", settings.TIME_ZONE))
+        resource_timezone = zoneinfo.ZoneInfo(opening_hours_response["resource"].get("timezone", settings.TIME_ZONE))
 
         time_span_list: list[TimeSpanElement] = []
         for day in opening_hours_response["opening_hours"]:
