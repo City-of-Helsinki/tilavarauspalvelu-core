@@ -8,6 +8,7 @@ from actions.reservation_unit import ReservationUnitHaukiExporter
 from api.graphql.tests.test_reservation_units.base import (
     ReservationUnitMutationsTestCaseBase,
 )
+from api.graphql.tests.test_reservation_units.conftest import reservation_unit_update_mutation
 from reservation_units.models import ReservationUnit
 from terms_of_use.models import TermsOfUse
 from tests.factories import (
@@ -33,15 +34,6 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
             unit=cls.unit,
         )
 
-    def get_update_query(self):
-        return """
-            mutation updateReservationUnit($input: ReservationUnitUpdateMutationInput!) {
-                updateReservationUnit(input: $input){
-                    pk
-                }
-            }
-            """
-
     def get_valid_update_data(self):
         return {"pk": self.res_unit.pk, "pricings": []}
 
@@ -49,7 +41,7 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         data = self.get_valid_update_data()
         data["nameFi"] = "New name"
 
-        response = self.query(self.get_update_query(), input_data=data)
+        response = self.query(reservation_unit_update_mutation(), input_data=data)
         assert response.status_code == 200
         content = json.loads(response.content)
         assert content.get("errors") is None
@@ -61,7 +53,7 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         metadata_set = ReservationMetadataSetFactory(name="New form")
         data = self.get_valid_update_data()
         data["metadataSetPk"] = metadata_set.pk
-        response = self.query(self.get_update_query(), input_data=data)
+        response = self.query(reservation_unit_update_mutation(), input_data=data)
         assert response.status_code == 200
         content = json.loads(response.content)
         assert content.get("errors") is None
@@ -71,7 +63,7 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
     def test_update_with_null_metadata_set(self):
         data = self.get_valid_update_data()
         data["metadataSetPk"] = None
-        response = self.query(self.get_update_query(), input_data=data)
+        response = self.query(reservation_unit_update_mutation(), input_data=data)
         assert response.status_code == 200
         content = json.loads(response.content)
         assert content.get("errors") is None
@@ -87,7 +79,7 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         data["cancellationTermsPk"] = cancellation_terms.pk
         data["serviceSpecificTermsPk"] = service_specific_terms.pk
 
-        response = self.query(self.get_update_query(), input_data=data)
+        response = self.query(reservation_unit_update_mutation(), input_data=data)
         assert response.status_code == 200
 
         content = json.loads(response.content)
@@ -103,7 +95,7 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         data = self.get_valid_update_data()
         data["authentication"] = "STRONG"
 
-        response = self.query(self.get_update_query(), input_data=data)
+        response = self.query(reservation_unit_update_mutation(), input_data=data)
         assert response.status_code == 200
 
         content = json.loads(response.content)
@@ -115,7 +107,7 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
     def test_update_errors_with_invalid_authentication(self):
         data = self.get_valid_update_data()
         data["authentication"] = "invalid"
-        response = self.query(self.get_update_query(), input_data=data)
+        response = self.query(reservation_unit_update_mutation(), input_data=data)
         assert response.status_code == 200
         content = json.loads(response.content)
         assert content.get("errors") is not None
@@ -128,7 +120,7 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         data = self.get_valid_update_data()
         data["nameFi"] = ""
 
-        response = self.query(self.get_update_query(), input_data=data)
+        response = self.query(reservation_unit_update_mutation(), input_data=data)
         assert response.status_code == 200
 
         content = json.loads(response.content)
@@ -142,7 +134,7 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         self.client.force_login(self.regular_joe)
         data = self.get_valid_update_data()
         data["nameFi"] = "Better name in my opinion."
-        response = self.query(self.get_update_query(), input_data=data)
+        response = self.query(reservation_unit_update_mutation(), input_data=data)
 
         assert response.status_code == 200
         content = json.loads(response.content)
@@ -158,7 +150,7 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         self.res_unit.save()
 
         data = self.get_valid_update_data()
-        response = self.query(self.get_update_query(), input_data=data)
+        response = self.query(reservation_unit_update_mutation(), input_data=data)
 
         assert response.status_code == 200
         content = json.loads(response.content)
@@ -169,7 +161,7 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
     @override_settings(HAUKI_EXPORTS_ENABLED=False)
     def test_send_resource_to_hauki_not_called_when_exports_disabled(self):
         data = self.get_valid_update_data()
-        response = self.query(self.get_update_query(), input_data=data)
+        response = self.query(reservation_unit_update_mutation(), input_data=data)
 
         assert response.status_code == 200
         content = json.loads(response.content)
@@ -181,7 +173,7 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         data["isArchived"] = True
         data["contactInformation"] = "Liu Kang"
 
-        response = self.query(self.get_update_query(), input_data=data)
+        response = self.query(reservation_unit_update_mutation(), input_data=data)
         assert response.status_code == 200
         content = json.loads(response.content)
         assert content.get("errors") is None
@@ -203,7 +195,7 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         data["isArchived"] = True
         data["contactInformation"] = "Liu Kang"
 
-        response = self.query(self.get_update_query(), input_data=data)
+        response = self.query(reservation_unit_update_mutation(), input_data=data)
         assert response.status_code == 200
         content = json.loads(response.content)
         assert content.get("errors") is None
@@ -216,7 +208,7 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         data = self.get_valid_update_data()
         data["pricingTermsPk"] = self.pricing_term.pk
 
-        response = self.query(self.get_update_query(), input_data=data)
+        response = self.query(reservation_unit_update_mutation(), input_data=data)
         assert response.status_code == 200
 
         content = json.loads(response.content)
@@ -240,7 +232,7 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         data["reservationCancelledInstructionsSv"] = "Cancelled instructions updated sv"
         data["reservationCancelledInstructionsEn"] = "Cancelled instructions updated en"
 
-        response = self.query(self.get_update_query(), input_data=data)
+        response = self.query(reservation_unit_update_mutation(), input_data=data)
         assert response.status_code == 200
 
         content = json.loads(response.content)

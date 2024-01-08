@@ -12,6 +12,7 @@ from api.graphql.tests.test_reservation_units.base import (
     ReservationUnitQueryTestCaseBase,
     mock_create_product,
 )
+from api.graphql.tests.test_reservation_units.conftest import reservation_unit_by_pk_query, reservation_units_query
 from permissions.models import (
     GeneralRoleChoice,
     GeneralRolePermission,
@@ -51,133 +52,126 @@ DEFAULT_TIMEZONE = get_default_timezone()
 @freeze_time("2021-05-03")
 class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
     def test_getting_reservation_units(self):
-        self.maxDiff = None
         self.client.force_login(self.regular_joe)
         response = self.query(
-            """
-            query {
-                reservationUnits {
-                    edges {
-                        node {
-                            nameFi
-                            descriptionFi
-                            spaces {
-                              nameFi
-                            }
-                            resources {
-                              nameFi
-                            }
-                            services {
-                              nameFi
-                              bufferTimeBefore
-                              bufferTimeAfter
-                            }
-                            requireIntroduction
-                            purposes {
-                              nameFi
-                            }
-                            qualifiers {
-                                nameFi
-                            }
-                            images {
-                              imageUrl
-                              mediumUrl
-                              smallUrl
-                            }
-                            location {
-                              longitude
-                              latitude
-                            }
-                            maxPersons
-                            minPersons
-                            surfaceArea
-                            reservationUnitType {
-                              nameFi
-                            }
-                            termsOfUseFi
-                            equipment {
-                              nameFi
-                            }
-                            contactInformation
-                            reservationPendingInstructionsFi
-                            reservationPendingInstructionsSv
-                            reservationPendingInstructionsEn
-                            reservationConfirmedInstructionsFi
-                            reservationConfirmedInstructionsSv
-                            reservationConfirmedInstructionsEn
-                            reservationCancelledInstructionsFi
-                            reservationCancelledInstructionsSv
-                            reservationCancelledInstructionsEn
-                            reservations {
-                              begin
-                              end
-                              state
-                            }
-                            applicationRounds {
-                              nameFi
-                              targetGroup
-                              applicationPeriodBegin
-                              applicationPeriodEnd
-                              reservationPeriodBegin
-                              reservationPeriodEnd
-                              publicDisplayBegin
-                              publicDisplayEnd
-                              criteriaFi
-                            }
-                            cancellationRule {
-                                nameFi
-                                nameEn
-                                nameSv
-                            }
-                            reservationStartInterval
-                            reservationBegins
-                            reservationEnds
-                            publishBegins
-                            publishEnds
-                            bufferTimeBefore
-                            bufferTimeAfter
-                            minReservationDuration
-                            maxReservationDuration
-                            metadataSet {
-                              name
-                              supportedFields
-                              requiredFields
-                            }
-                            maxReservationsPerUser
-                            requireReservationHandling
-                            authentication
-                            reservationKind
-                            canApplyFreeOfCharge
-                            reservationsMaxDaysBefore
-                            reservationsMinDaysBefore
-                            allowReservationsWithoutOpeningHours
-                            isArchived
-                            state
-                            pricingTerms {
-                                termsType
-                            }
-                            paymentTypes {
-                                code
-                            }
-                            pricings {
-                                begins
-                                pricingType
-                                priceUnit
-                                lowestPrice
-                                highestPrice
-                                taxPercentage {
-                                    value
-                                }
-                                status
-                            }
-                            paymentMerchant {
-                                name
-                            }
-                          }
-                        }
+            reservation_units_query(
+                fields="""
+                    nameFi
+                    descriptionFi
+                    spaces {
+                      nameFi
                     }
-                }
-            """
+                    resources {
+                      nameFi
+                    }
+                    services {
+                      nameFi
+                      bufferTimeBefore
+                      bufferTimeAfter
+                    }
+                    requireIntroduction
+                    purposes {
+                      nameFi
+                    }
+                    qualifiers {
+                        nameFi
+                    }
+                    images {
+                      imageUrl
+                      mediumUrl
+                      smallUrl
+                    }
+                    location {
+                      longitude
+                      latitude
+                    }
+                    maxPersons
+                    minPersons
+                    surfaceArea
+                    reservationUnitType {
+                      nameFi
+                    }
+                    termsOfUseFi
+                    equipment {
+                      nameFi
+                    }
+                    contactInformation
+                    reservationPendingInstructionsFi
+                    reservationPendingInstructionsSv
+                    reservationPendingInstructionsEn
+                    reservationConfirmedInstructionsFi
+                    reservationConfirmedInstructionsSv
+                    reservationConfirmedInstructionsEn
+                    reservationCancelledInstructionsFi
+                    reservationCancelledInstructionsSv
+                    reservationCancelledInstructionsEn
+                    reservations {
+                      begin
+                      end
+                      state
+                    }
+                    applicationRounds {
+                      nameFi
+                      targetGroup
+                      applicationPeriodBegin
+                      applicationPeriodEnd
+                      reservationPeriodBegin
+                      reservationPeriodEnd
+                      publicDisplayBegin
+                      publicDisplayEnd
+                      criteriaFi
+                    }
+                    cancellationRule {
+                        nameFi
+                        nameEn
+                        nameSv
+                    }
+                    reservationStartInterval
+                    reservationBegins
+                    reservationEnds
+                    publishBegins
+                    publishEnds
+                    bufferTimeBefore
+                    bufferTimeAfter
+                    minReservationDuration
+                    maxReservationDuration
+                    metadataSet {
+                      name
+                      supportedFields
+                      requiredFields
+                    }
+                    maxReservationsPerUser
+                    requireReservationHandling
+                    authentication
+                    reservationKind
+                    canApplyFreeOfCharge
+                    reservationsMaxDaysBefore
+                    reservationsMinDaysBefore
+                    allowReservationsWithoutOpeningHours
+                    isArchived
+                    state
+                    pricingTerms {
+                        termsType
+                    }
+                    paymentTypes {
+                        code
+                    }
+                    pricings {
+                        begins
+                        pricingType
+                        priceUnit
+                        lowestPrice
+                        highestPrice
+                        taxPercentage {
+                            value
+                        }
+                        status
+                    }
+                    paymentMerchant {
+                        name
+                    }
+                """
+            ),
         )
 
         content = json.loads(response.content)
@@ -190,18 +184,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             is_archived=True,
         )
         response = self.query(
-            """
-            query {
-                reservationUnits {
-                    edges {
-                        node {
-                            nameFi
-                            isArchived
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(fields="nameFi isArchived"),
         )
 
         content = json.loads(response.content)
@@ -209,8 +192,12 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_should_be_able_to_find_by_pk(self):
-        query = f"{{\nreservationUnitByPk(pk: {self.reservation_unit.id}) {{\nid nameFi pk\n}}}}"
-        response = self.query(query)
+        response = self.query(
+            reservation_unit_by_pk_query(
+                pk=self.reservation_unit.id,
+                fields="id nameFi pk",
+            )
+        )
 
         content = json.loads(response.content)
         assert content.get("errors") is None
@@ -218,14 +205,12 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
     def test_getting_authentication_by_pk(self):
         response = self.query(
-            f"""
-            {{
-                reservationUnitByPk(pk: {self.reservation_unit.id}) {{
-                    authentication
-                }}
-            }}
-            """
+            reservation_unit_by_pk_query(
+                pk=self.reservation_unit.id,
+                fields="authentication",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         assert content.get("data").get("reservationUnitByPk").get("authentication") == "WEAK"
@@ -233,20 +218,13 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
     def test_getting_hauki_url_is_none_when_regular_user(self):
         self.reservation_unit.unit.tprek_department_id = "ORGANISATION"
         self.reservation_unit.unit.save()
-        self.maxDiff = None
         self.client.force_login(self.regular_joe)
-        query = (
-            """
-            query {
-                reservationUnitByPk(pk: %i) {
-                    nameFi
-                    haukiUrl {url}
-                }
-            }
-            """
-            % self.reservation_unit.id
+        response = self.query(
+            reservation_unit_by_pk_query(
+                pk=self.reservation_unit.id,
+                fields="nameFi haukiUrl {url}",
+            )
         )
-        response = self.query(query)
 
         content = json.loads(response.content)
         assert content.get("errors") is None
@@ -255,22 +233,15 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
     def test_hauki_url_for_admin(self):
         self.reservation_unit.unit.tprek_department_id = "ORGANISATION"
         self.reservation_unit.unit.save()
-        self.maxDiff = None
         gen_role_choice = GeneralRoleChoice.objects.get(code="admin")
         GeneralRolePermission.objects.create(role=gen_role_choice, permission="can_manage_units")
         self.client.force_login(self.general_admin)
-        query = (
-            """
-                query {
-                    reservationUnitByPk(pk: %i) {
-                        nameFi
-                        haukiUrl {url}
-                    }
-                }
-                """
-            % self.reservation_unit.id
+        response = self.query(
+            reservation_unit_by_pk_query(
+                pk=self.reservation_unit.id,
+                fields="nameFi haukiUrl {url}",
+            )
         )
-        response = self.query(query)
 
         content = json.loads(response.content)
         assert content.get("errors") is None
@@ -279,7 +250,6 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
     def test_hauki_url_for_unit_manager(self):
         self.reservation_unit.unit.tprek_department_id = "ORGANISATION"
         self.reservation_unit.unit.save()
-        self.maxDiff = None
         unit_manager = get_user_model().objects.create(
             username="res_admin",
             first_name="unit",
@@ -291,26 +261,24 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         unit_role.unit.add(self.reservation_unit.unit)
         UnitRolePermission.objects.create(role=unit_role_choice, permission="can_manage_units")
         self.client.force_login(unit_manager)
-        query = (
-            """
-                query {
-                    reservationUnitByPk(pk: %i) {
-                        nameFi
-                        haukiUrl {url}
-                    }
-                }
-                """
-            % self.reservation_unit.id
+        response = self.query(
+            reservation_unit_by_pk_query(
+                pk=self.reservation_unit.id,
+                fields="nameFi haukiUrl {url}",
+            )
         )
-        response = self.query(query)
 
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_should_error_when_not_found_by_pk(self):
-        query = f"{{\nreservationUnitByPk(pk: {self.reservation_unit.id + 666}) {{\nid\n}}}}"
-        response = self.query(query)
+        response = self.query(
+            reservation_unit_by_pk_query(
+                pk=self.reservation_unit.id + 666,
+                fields="id",
+            )
+        )
 
         content = json.loads(response.content)
         errors = content.get("errors")
@@ -344,18 +312,12 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         )
         self.client.force_login(self.general_admin)
         response = self.query(
-            f"""
-            {{
-                reservationUnitByPk(pk: {self.reservation_unit.id}) {{
-                    reservations(from: "2023-01-02", to: "2023-01-03") {{
-                        begin
-                        end
-                        name
-                    }}
-                }}
-            }}
-            """
+            reservation_unit_by_pk_query(
+                pk=self.reservation_unit.id,
+                fields='reservations(from: "2023-01-02", to: "2023-01-03"){begin end name}',
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
 
@@ -367,20 +329,10 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
     def test_filtering_by_unit(self):
         ReservationUnitFactory(unit=UnitFactory())  # should be excluded
         response = self.query(
-            f"""
-            query {{
-                reservationUnits(unit: {self.reservation_unit.unit.pk}) {{
-                    edges {{
-                        node {{
-                            nameFi
-                            unit {{
-                                nameFi
-                            }}
-                        }}
-                    }}
-                }}
-            }}
-            """
+            reservation_units_query(
+                unit=self.reservation_unit.unit.id,
+                fields="nameFi unit {nameFi}",
+            )
         )
 
         content = json.loads(response.content)
@@ -392,20 +344,10 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         other_unit = UnitFactory(name_fi="Other unit")
         ReservationUnitFactory(name_fi="Other reservation unit", unit=other_unit)
         response = self.query(
-            f"""
-            query {{
-                reservationUnits(unit: [{self.reservation_unit.unit.pk},{other_unit.pk}]) {{
-                    edges {{
-                        node {{
-                            nameFi
-                            unit {{
-                                nameFi
-                            }}
-                        }}
-                    }}
-                }}
-            }}
-            """
+            reservation_units_query(
+                unit=[self.reservation_unit.unit.pk, other_unit.pk],
+                fields="nameFi unit {nameFi}",
+            )
         )
 
         content = json.loads(response.content)
@@ -419,17 +361,10 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         app_round = ApplicationRoundFactory(reservation_units=[res_unit])
         app_round_too = ApplicationRoundFactory(reservation_units=[other_res_unit])
         response = self.query(
-            f"""
-            query {{
-                reservationUnits(applicationRound: [{app_round.id},{app_round_too.id}]) {{
-                    edges {{
-                        node {{
-                            nameFi
-                        }}
-                    }}
-                }}
-            }}
-            """
+            reservation_units_query(
+                applicationRound=[app_round.id, app_round_too.id],
+                fields="nameFi",
+            )
         )
 
         content = json.loads(response.content)
@@ -438,18 +373,10 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
     def test_filtering_by_type(self):
         response = self.query(
-            f"query {{"
-            f"reservationUnits(reservationUnitType:{self.type.id}){{"
-            f"edges {{"
-            f"node {{"
-            f"nameFi "
-            f"reservationUnitType {{"
-            f"nameFi"
-            f"}}"
-            f"}}"
-            f"}}"
-            f"}}"
-            f"}}"
+            reservation_units_query(
+                reservationUnitType=self.type.id,
+                fields="nameFi reservationUnitType {nameFi}",
+            )
         )
 
         content = json.loads(response.content)
@@ -466,20 +393,10 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             is_draft=True,
         )
         response = self.query(
-            f"""
-            query {{
-                reservationUnits(reservationUnitType: [{self.type.id},{other_type.id}]) {{
-                    edges {{
-                        node {{
-                            nameFi
-                            reservationUnitType {{
-                                nameFi
-                            }}
-                        }}
-                    }}
-                }}
-            }}
-            """
+            reservation_units_query(
+                reservationUnitType=[self.type.id, other_type.id],
+                fields="nameFi reservationUnitType {nameFi}",
+            )
         )
 
         content = json.loads(response.content)
@@ -490,19 +407,10 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         purpose = PurposeFactory(name="Test purpose")
         self.reservation_unit.purposes.set([purpose])
         response = self.query(
-            f"""
-            query {{
-                reservationUnits(purposes: {purpose.pk}) {{
-                    edges {{
-                        node {{
-                            nameFi purposes {{
-                                nameFi
-                            }}
-                        }}
-                    }}
-                }}
-            }}
-            """
+            reservation_units_query(
+                purposes=purpose.pk,
+                fields="nameFi purposes {nameFi}",
+            )
         )
 
         content = json.loads(response.content)
@@ -516,20 +424,10 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         other_purpose = PurposeFactory(name="Other purpose")
         self.reservation_unit.purposes.set([purpose])
         response = self.query(
-            f"""
-            query {{
-                reservationUnits(purposes: [{purpose.pk},{other_purpose.pk}]) {{
-                    edges {{
-                        node {{
-                            nameFi
-                            purposes {{
-                                nameFi
-                            }}
-                        }}
-                    }}
-                }}
-            }}
-            """
+            reservation_units_query(
+                purposes=[purpose.pk, other_purpose.pk],
+                fields="nameFi purposes {nameFi}",
+            )
         )
 
         content = json.loads(response.content)
@@ -540,19 +438,10 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         qualifier = QualifierFactory(name="Filter test qualifier")
         self.reservation_unit.qualifiers.set([qualifier])
         response = self.query(
-            f"""
-            query {{
-                reservationUnits(qualifiers: {qualifier.pk}) {{
-                    edges {{
-                        node {{
-                            nameFi qualifiers {{
-                                nameFi
-                            }}
-                        }}
-                    }}
-                }}
-            }}
-            """
+            reservation_units_query(
+                qualifiers=qualifier.pk,
+                fields="nameFi qualifiers {nameFi}",
+            )
         )
 
         content = json.loads(response.content)
@@ -572,20 +461,10 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         other_reservation_unit.qualifiers.set([other_qualifier])
 
         response = self.query(
-            f"""
-            query {{
-                reservationUnits(qualifiers: [{qualifier.pk},{other_qualifier.pk}]) {{
-                    edges {{
-                        node {{
-                            nameFi
-                            qualifiers {{
-                                nameFi
-                            }}
-                        }}
-                    }}
-                }}
-            }}
-            """
+            reservation_units_query(
+                qualifiers=[qualifier.pk, other_qualifier.pk],
+                fields="nameFi qualifiers {nameFi}",
+            )
         )
 
         content = json.loads(response.content)
@@ -594,36 +473,24 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
     def test_filtering_by_max_persons_gte_within_limit(self):
         response = self.query(
-            """
-            query {
-                reservationUnits(maxPersonsGte: 200) {
-                    edges {
-                        node {
-                            nameFi maxPersons
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                maxPersonsGte=200,
+                fields="nameFi maxPersons",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_max_persons_gte_outside_limit(self):
         response = self.query(
-            """
-            query {
-                reservationUnits(maxPersonsGte: 201) {
-                    edges {
-                        node {
-                            nameFi maxPersons
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                maxPersonsGte=201,
+                fields="nameFi maxPersons",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
@@ -632,54 +499,36 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.reservation_unit.max_persons = None
         self.reservation_unit.save()
         response = self.query(
-            """
-            query {
-                reservationUnits(maxPersonsGte: 201) {
-                    edges {
-                        node {
-                            nameFi maxPersons
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                maxPersonsGte=201,
+                fields="nameFi maxPersons",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_max_persons_lte_within_limit(self):
         response = self.query(
-            """
-            query {
-                reservationUnits(maxPersonsLte: 200) {
-                    edges {
-                        node {
-                            nameFi maxPersons
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                maxPersonsLte=200,
+                fields="nameFi maxPersons",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_max_persons_lte_outside_limit(self):
         response = self.query(
-            """
-            query {
-                reservationUnits(maxPersonsLte: 199) {
-                    edges {
-                        node {
-                            nameFi maxPersons
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                maxPersonsLte=199,
+                fields="nameFi maxPersons",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
@@ -688,54 +537,36 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.reservation_unit.max_persons = None
         self.reservation_unit.save()
         response = self.query(
-            """
-            query {
-                reservationUnits(maxPersonsLte: 199) {
-                    edges {
-                        node {
-                            nameFi maxPersons
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                maxPersonsLte=199,
+                fields="nameFi maxPersons",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_min_persons_gte_within_limit(self):
         response = self.query(
-            """
-            query {
-                reservationUnits(minPersonsGte: 10) {
-                    edges {
-                        node {
-                            nameFi minPersons
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                minPersonsGte=10,
+                fields="nameFi minPersons",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_min_persons_gte_outside_limit(self):
         response = self.query(
-            """
-            query {
-                reservationUnits(minPersonsGte: 11) {
-                    edges {
-                        node {
-                            nameFi minPersons
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                minPersonsGte=11,
+                fields="nameFi minPersons",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
@@ -744,54 +575,36 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.reservation_unit.min_persons = None
         self.reservation_unit.save()
         response = self.query(
-            """
-            query {
-                reservationUnits(minPersonsGte: 11) {
-                    edges {
-                        node {
-                            nameFi minPersons
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                minPersonsGte=11,
+                fields="nameFi minPersons",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_min_persons_lte_within_limit(self):
         response = self.query(
-            """
-            query {
-                reservationUnits(minPersonsLte: 10) {
-                    edges {
-                        node {
-                            nameFi minPersons
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                minPersonsLte=10,
+                fields="nameFi minPersons",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_min_persons_lte_outside_limit(self):
         response = self.query(
-            """
-            query {
-                reservationUnits(minPersonsLte: 9) {
-                    edges {
-                        node {
-                            nameFi minPersons
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                minPersonsLte=9,
+                fields="nameFi minPersons",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
@@ -800,39 +613,26 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.reservation_unit.min_persons = None
         self.reservation_unit.save()
         response = self.query(
-            """
-            query {
-                reservationUnits(minPersonsLte: 9) {
-                    edges {
-                        node {
-                            nameFi minPersons
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                minPersonsLte=9,
+                fields="nameFi minPersons",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_keyword_group(self):
         category = KeywordCategoryFactory()
-
         keyword_group = KeywordGroupFactory(keyword_category=category, name="Sports")
         self.reservation_unit.keyword_groups.set([keyword_group])
         self.reservation_unit.save()
         response = self.query(
-            f"query {{"
-            f"reservationUnits( keywordGroups:{keyword_group.id}){{"
-            f"edges {{"
-            f"node {{"
-            f"nameFi\n"
-            f"keywordGroups{{nameFi}}"
-            f"}}"
-            f"}}"
-            f"}}"
-            f"}}"
+            reservation_units_query(
+                keywordGroups=keyword_group.id,
+                fields="nameFi keywordGroups{nameFi}",
+            )
         )
 
         content = json.loads(response.content)
@@ -847,20 +647,10 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         other_keyword_group = KeywordGroupFactory(name="Other group", keyword_category=category)
         self.reservation_unit.keyword_groups.set([keyword_group])
         response = self.query(
-            f"""
-            query {{
-                reservationUnits(keywordGroups: [{keyword_group.pk},{other_keyword_group.pk}]) {{
-                    edges {{
-                        node {{
-                            nameFi
-                            keywordGroups {{
-                                nameFi
-                            }}
-                        }}
-                    }}
-                }}
-            }}
-            """
+            reservation_units_query(
+                keywordGroups=[keyword_group.id, other_keyword_group.pk],
+                fields="nameFi keywordGroups{nameFi}",
+            )
         )
 
         content = json.loads(response.content)
@@ -871,18 +661,12 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         ReservationUnit.objects.exclude(id=self.reservation_unit.id).delete()
         ReservationUnitFactory(name_fi="show only me")
         response = self.query(
-            """
-            query {
-                reservationUnits(nameFi: "show") {
-                    edges {
-                        node{
-                            nameFi
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                nameFi="show",
+                fields="nameFi",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
@@ -895,18 +679,13 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         ReservationUnitFactory(surface_area=60)
         ReservationUnitFactory(surface_area=59)  # Do not include
         response = self.query(
-            """
-            query {
-                reservationUnits(surfaceAreaLte:120, surfaceAreaGte:60) {
-                    edges {
-                        node{
-                            surfaceArea
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                surfaceAreaLte=120,
+                surfaceAreaGte=60,
+                fields="surfaceArea",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
@@ -919,17 +698,11 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         ReservationUnitFactory(rank=4)
         ReservationUnitFactory(rank=5)  # Do not include
         response = self.query(
-            """
-            query {
-                reservationUnits(rankLte:4, rankGte:2) {
-                    edges {
-                        node{
-                            rank
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                rankLte=4,
+                rankGte=2,
+                fields="rank",
+            )
         )
         content = json.loads(response.content)
         assert content.get("errors") is None
@@ -948,20 +721,11 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         ReservationUnitFactory(reservation_unit_type=rank4, name_fi="Rank 4")
         ReservationUnitFactory(reservation_unit_type=rank5, name_fi="Rank 5")  # Do not include
         response = self.query(
-            """
-            query {
-                reservationUnits(typeRankLte:4, typeRankGte:2) {
-                    edges {
-                        node{
-                            nameFi
-                            reservationUnitType {
-                                rank
-                            }
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                typeRankLte=4,
+                typeRankGte=2,
+                fields="nameFi reservationUnitType{rank}",
+            )
         )
         content = json.loads(response.content)
         assert content.get("errors") is None
@@ -984,22 +748,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         self.client.force_login(self.regular_joe)
         response = self.query(
-            """
-            query {
-                reservationUnits {
-                    edges {
-                        node {
-                            nameFi
-                            reservations(from: "2021-05-03", to: "2021-05-04") {
-                                begin
-                                end
-                                state
-                            }
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                fields='nameFi reservations(from: "2021-05-03", to: "2021-05-04"){begin end state}',
+            )
         )
 
         content = json.loads(response.content)
@@ -1008,7 +759,6 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_reservation_state(self):
-        self.maxDiff = None
         now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
         one_hour = datetime.timedelta(hours=1)
         matching_reservation = ReservationFactory(
@@ -1025,22 +775,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.reservation_unit.save()
         self.client.force_login(self.regular_joe)
         response = self.query(
-            """
-            query {
-                reservationUnits {
-                    edges {
-                        node {
-                            nameFi
-                            reservations(state: "created") {
-                                begin
-                                end
-                                state
-                            }
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                fields='nameFi reservations(state: "created"){begin end state}',
+            )
         )
 
         content = json.loads(response.content)
@@ -1066,22 +803,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         self.client.force_login(self.regular_joe)
         response = self.query(
-            """
-            query {
-                reservationUnits {
-                    edges {
-                        node {
-                            nameFi
-                            reservations(state: ["created", "confirmed"]) {
-                                begin
-                                end
-                                state
-                            }
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                fields='nameFi reservations(state: ["created", "confirmed"]){begin end state}',
+            )
         )
 
         content = json.loads(response.content)
@@ -1104,19 +828,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.reservation_unit.application_rounds.set([matching_round, other_round])
         self.reservation_unit.save()
         response = self.query(
-            """
-            query {
-              reservationUnits {
-                edges {
-                  node {
-                    applicationRounds(active: true) {
-                      nameFi
-                    }
-                  }
-                }
-              }
-            }
-            """
+            reservation_units_query(
+                fields="applicationRounds(active: true){nameFi}",
+            )
         )
 
         content = json.loads(response.content)
@@ -1125,23 +839,12 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_is_draft_true(self):
-        ReservationUnitFactory(
-            name="Draft reservation unit",
-            is_draft=True,
-        )
+        ReservationUnitFactory(name="Draft reservation unit", is_draft=True)
         response = self.query(
-            """
-            query {
-                reservationUnits(isDraft: true) {
-                    edges {
-                        node {
-                            nameFi
-                            isDraft
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                isDraft=True,
+                fields="nameFi isDraft",
+            )
         )
 
         content = json.loads(response.content)
@@ -1150,19 +853,12 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
     def test_filtering_by_is_draft_false(self):
         response = self.query(
-            """
-            query {
-                reservationUnits(isDraft: false) {
-                    edges {
-                        node {
-                            nameFi
-                            isDraft
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                isDraft=False,
+                fields="nameFi isDraft",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
@@ -1171,42 +867,36 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         today = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
         # No publish times should be included in results.
         ReservationUnitFactory(name_fi="show me")
-
         # Publish begins before today should be included.
         ReservationUnitFactory(
             name_fi="show me too!",
             publish_begins=today - datetime.timedelta(days=5),
             publish_ends=today + datetime.timedelta(days=10),
         )
-
         # Publish begins after today should not be included.
         ReservationUnitFactory(
             name_fi="I'm invisible",
             publish_begins=today + datetime.timedelta(days=5),
             publish_ends=today + datetime.timedelta(days=10),
         )
-
         # Publish begin before and end time null should be included.
         ReservationUnitFactory(
             name_fi="Take me in!",
             publish_begins=today - datetime.timedelta(days=5),
             publish_ends=None,
         )
-
         # Publish end after today and begin time null should be included.
         ReservationUnitFactory(
             name_fi="Take me in too!",
             publish_ends=today + datetime.timedelta(days=5),
             publish_begins=None,
         )
-
         # Publish end after before today and begin time null shouldn't be included.
         ReservationUnitFactory(
             name_fi="I shouldn't be included!",
             publish_ends=today - datetime.timedelta(days=1),
             publish_begins=None,
         )
-
         # Archived units shouldn't be included
         ReservationUnitFactory(
             name_fi="I shouldn't be included because I'm archived!",
@@ -1214,22 +904,13 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             publish_ends=today + datetime.timedelta(days=10),
             is_archived=True,
         )
-
         response = self.query(
-            """
-            query {
-                reservationUnits(isVisible: true) {
-                    edges {
-                        node {
-                            nameFi
-                            publishBegins
-                            publishEnds
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                isVisible=True,
+                fields="nameFi publishBegins publishEnds",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
@@ -1237,205 +918,124 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
     def test_filtering_by_is_visible_false(self):
         # No publish time shouldn't include
         ReservationUnitFactory(name_fi="testing is besthing")
-
         response = self.query(
-            """
-            query {
-                reservationUnits(isVisible: false) {
-                    edges {
-                        node {
-                            nameFi
-                            publishBegins
-                            publishEnds
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                isVisible=False,
+                fields="nameFi publishBegins publishEnds",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_reservation_kind_direct(self):
         ReservationUnitFactory(reservation_kind=ReservationKind.DIRECT, name_fi="show me")
-        ReservationUnitFactory(
-            reservation_kind=ReservationKind.DIRECT_AND_SEASON,
-            name_fi="show me as well",
-        )
+        ReservationUnitFactory(reservation_kind=ReservationKind.DIRECT_AND_SEASON, name_fi="show me as well")
         ReservationUnitFactory(reservation_kind=ReservationKind.SEASON, name_fi="Don't you ever show me")
-
         response = self.query(
-            """
-            query {
-                reservationUnits(reservationKind: "DIRECT") {
-                    edges {
-                        node {
-                            nameFi
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                reservationKind="DIRECT",
+                fields="nameFi",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_reservation_kind_season(self):
         ReservationUnitFactory(reservation_kind=ReservationKind.SEASON, name_fi="show me")
-        ReservationUnitFactory(
-            reservation_kind=ReservationKind.DIRECT_AND_SEASON,
-            name_fi="show me as well",
-        )
+        ReservationUnitFactory(reservation_kind=ReservationKind.DIRECT_AND_SEASON, name_fi="show me as well")
         ReservationUnitFactory(reservation_kind=ReservationKind.DIRECT, name_fi="Don't you ever show me")
-
         response = self.query(
-            """
-            query {
-                reservationUnits(reservationKind: "SEASON") {
-                    edges {
-                        node {
-                            nameFi
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                reservationKind="SEASON",
+                fields="nameFi",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_order_by_name_fi(self):
-        ReservationUnitFactory(
-            name="name_fi",
-            name_fi="name_fi",
-        )
+        ReservationUnitFactory(name="name_fi", name_fi="name_fi")
         response = self.query(
-            """
-            query {
-                reservationUnits(orderBy: "nameFi") {
-                    edges {
-                        node {
-                            nameFi
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                orderBy="nameFi",
+                fields="nameFi",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_order_by_name_en(self):
-        ReservationUnitFactory(
-            name="name_en",
-            name_en="name_en",
-        )
+        ReservationUnitFactory(name="name_en", name_en="name_en")
         response = self.query(
-            """
-            query {
-                reservationUnits(orderBy: "nameEn") {
-                    edges {
-                        node {
-                            nameEn
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                orderBy="nameEn",
+                fields="nameEn",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_order_by_name_sv(self):
-        ReservationUnitFactory(
-            name="name_sv",
-            name_sv="name_sv",
-        )
+        ReservationUnitFactory(name="name_sv", name_sv="name_sv")
         response = self.query(
-            """
-            query {
-                reservationUnits(orderBy: "nameSv") {
-                    edges {
-                        node {
-                            nameSv
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                orderBy="nameSv",
+                fields="nameSv",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_order_by_type_fi(self):
-        self.maxDiff = None
         res_type = ReservationUnitTypeFactory(name="name_fi", name_fi="name_fi")
-        ReservationUnitFactory(
-            reservation_unit_type=res_type,
-        )
+        ReservationUnitFactory(reservation_unit_type=res_type)
         response = self.query(
-            """
-            query {
-                reservationUnits(orderBy: "typeFi") {
-                    edges {
-                        node {
-                            reservationUnitType {nameFi}
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                orderBy="typeFi",
+                fields="reservationUnitType {nameFi}",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_order_by_type_en(self):
         res_type = ReservationUnitTypeFactory(name="name_en", name_fi="name_en")
-        ReservationUnitFactory(
-            reservation_unit_type=res_type,
-        )
+        ReservationUnitFactory(reservation_unit_type=res_type)
         response = self.query(
-            """
-            query {
-                reservationUnits(orderBy: "typeEn") {
-                    edges {
-                        node {
-                            reservationUnitType {nameEn}
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                orderBy="typeEn",
+                fields="reservationUnitType {nameEn}",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
 
     def test_order_by_type_sv(self):
         res_type = ReservationUnitTypeFactory(name="name_sv", name_fi="name_sv")
-        ReservationUnitFactory(
-            reservation_unit_type=res_type,
-        )
+        ReservationUnitFactory(reservation_unit_type=res_type)
         response = self.query(
-            """
-            query {
-                reservationUnits(orderBy: "typeSv") {
-                    edges {
-                        node {
-                            reservationUnitType {nameSv}
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                orderBy="typeSv",
+                fields="reservationUnitType {nameSv}",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
@@ -1449,22 +1049,12 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         ReservationUnitFactory(unit=UnitFactory(name_fi="1", name_sv="_", name_en="_"))
         self.client.force_login(self.regular_joe)
         response = self.query(
-            """
-            query {
-                reservationUnits(orderBy: "unitNameFi,unitNameSv,unitNameEn") {
-                    edges {
-                        node {
-                            unit {
-                                nameFi
-                                nameSv
-                                nameEn
-                            }
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                orderBy="unitNameFi,unitNameSv,unitNameEn",
+                fields="unit {nameFi nameSv nameEn}",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
@@ -1478,22 +1068,12 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         ReservationUnitFactory(unit=UnitFactory(name_fi="1", name_sv="_", name_en="_"))
         self.client.force_login(self.regular_joe)
         response = self.query(
-            """
-            query {
-                reservationUnits(orderBy: "-unitNameFi,-unitNameSv,-unitNameEn") {
-                    edges {
-                        node {
-                            unit {
-                                nameFi
-                                nameSv
-                                nameEn
-                            }
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                orderBy="-unitNameFi,-unitNameSv,-unitNameEn",
+                fields="unit {nameFi nameSv nameEn}",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
@@ -1507,18 +1087,12 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         ReservationUnitFactory(max_persons=5)
         self.client.force_login(self.regular_joe)
         response = self.query(
-            """
-            query {
-                reservationUnits(orderBy: "maxPersons") {
-                    edges {
-                        node {
-                            maxPersons
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                orderBy="maxPersons",
+                fields="maxPersons",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
@@ -1532,18 +1106,12 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         ReservationUnitFactory(max_persons=5)
         self.client.force_login(self.regular_joe)
         response = self.query(
-            """
-            query {
-                reservationUnits(orderBy: "-maxPersons") {
-                    edges {
-                        node {
-                            maxPersons
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                orderBy="-maxPersons",
+                fields="maxPersons",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
@@ -1557,18 +1125,12 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         ReservationUnitFactory(surface_area=5)
         self.client.force_login(self.regular_joe)
         response = self.query(
-            """
-            query {
-                reservationUnits(orderBy: "surfaceArea") {
-                    edges {
-                        node {
-                            surfaceArea
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                orderBy="surfaceArea",
+                fields="surfaceArea",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
@@ -1582,18 +1144,12 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         ReservationUnitFactory(surface_area=5)
         self.client.force_login(self.regular_joe)
         response = self.query(
-            """
-            query {
-                reservationUnits(orderBy: "-surfaceArea") {
-                    edges {
-                        node {
-                            surfaceArea
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                orderBy="-surfaceArea",
+                fields="surfaceArea",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
@@ -1607,21 +1163,12 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         ReservationUnitFactory(name="b", unit=UnitFactory(name_fi="1"))
         self.client.force_login(self.regular_joe)
         response = self.query(
-            """
-            query {
-                reservationUnits(orderBy: "nameFi,unitNameFi") {
-                    edges {
-                        node {
-                            nameFi
-                            unit {
-                                nameFi
-                            }
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                orderBy="nameFi,unitNameFi",
+                fields="nameFi, unit {nameFi}",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
@@ -1635,21 +1182,12 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         ReservationUnitFactory(name="b", unit=UnitFactory(name_fi="1"))
         self.client.force_login(self.regular_joe)
         response = self.query(
-            """
-            query {
-                reservationUnits(orderBy: "-nameFi,-unitNameFi") {
-                    edges {
-                        node {
-                            nameFi
-                            unit {
-                                nameFi
-                            }
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                orderBy="-nameFi,-unitNameFi",
+                fields="nameFi, unit {nameFi}",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
@@ -1664,18 +1202,12 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         self.client.force_login(self.regular_joe)
         response = self.query(
-            """
-            query {
-                reservationUnits(orderBy: "rank") {
-                    edges {
-                        node {
-                            rank
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                orderBy="rank",
+                fields="rank",
+            )
         )
+
         content = json.loads(response.content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
@@ -1695,19 +1227,10 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         self.client.force_login(self.regular_joe)
         response = self.query(
-            """
-            query {
-                reservationUnits(orderBy: "typeRank") {
-                    edges {
-                        node {
-                            reservationUnitType {
-                                rank
-                            }
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                orderBy="typeRank",
+                fields="reservationUnitType{rank}",
+            )
         )
         content = json.loads(response.content)
         assert content.get("errors") is None
@@ -1717,18 +1240,11 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.reservation_unit.surface_area = 500
         self.reservation_unit.save()
         response = self.query(
-            """
-            query {
-                reservationUnits {
-                    edges {
-                        node {
-                            surfaceArea
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                fields="surfaceArea",
+            )
         )
+
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
@@ -1746,19 +1262,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         )
         self.reservation_unit.save()
         response = self.query(
-            """
-            query {
-                reservationUnits {
-                    edges {
-                        node {
-                            paymentTerms { textFi }
-                            cancellationTerms { textFi }
-                            serviceSpecificTerms { textFi }
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                fields="paymentTerms{textFi} cancellationTerms{textFi} serviceSpecificTerms{textFi}",
+            )
         )
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
@@ -1767,18 +1273,12 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
     def test_filter_by_pk_single_value(self):
         response = self.query(
-            f"""
-            query {{
-                reservationUnits(pk: {self.reservation_unit.id}) {{
-                    edges {{
-                        node {{
-                            nameFi
-                        }}
-                    }}
-                }}
-            }}
-            """
+            reservation_units_query(
+                pk=self.reservation_unit.id,
+                fields="nameFi",
+            )
         )
+
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
@@ -1787,18 +1287,12 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
     def test_filter_by_pk_multiple_values(self):
         second_reservation_unit = ReservationUnitFactory(name_fi="Second unit")
         response = self.query(
-            f"""
-            query {{
-                reservationUnits(pk: [{self.reservation_unit.id}, {second_reservation_unit.id}]) {{
-                    edges {{
-                        node {{
-                            nameFi
-                        }}
-                    }}
-                }}
-            }}
-            """
+            reservation_units_query(
+                pk=[self.reservation_unit.id, second_reservation_unit.id],
+                fields="nameFi",
+            )
         )
+
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
@@ -1809,19 +1303,12 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.reservation_unit.is_draft = True
         self.reservation_unit.save()
         response = self.query(
-            f"""
-            query {{
-                reservationUnits(pk: {self.reservation_unit.id}) {{
-                    edges {{
-                        node {{
-                            nameFi
-                            state
-                        }}
-                    }}
-                }}
-            }}
-            """
+            reservation_units_query(
+                pk=self.reservation_unit.id,
+                fields="nameFi state",
+            )
         )
+
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
@@ -1829,7 +1316,6 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
     def test_that_state_is_scheduled_publishing(self):
         now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
-
         self.reservation_unit.name = "This should be scheduled publishing"
         self.reservation_unit.is_draft = False
         self.reservation_unit.is_archived = False
@@ -1837,19 +1323,12 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.reservation_unit.publish_ends = None
         self.reservation_unit.save()
         response = self.query(
-            f"""
-            query {{
-                reservationUnits(pk: {self.reservation_unit.id}) {{
-                    edges {{
-                        node {{
-                            nameFi
-                            state
-                        }}
-                    }}
-                }}
-            }}
-            """
+            reservation_units_query(
+                pk=self.reservation_unit.id,
+                fields="nameFi state",
+            )
         )
+
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
@@ -1857,7 +1336,6 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
     def test_that_state_is_scheduled_hiding(self):
         now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
-
         self.reservation_unit.name = "This should be scheduled hiding"
         self.reservation_unit.is_draft = False
         self.reservation_unit.is_archived = False
@@ -1865,19 +1343,12 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.reservation_unit.publish_ends = now + datetime.timedelta(days=2)
         self.reservation_unit.save()
         response = self.query(
-            f"""
-            query {{
-                reservationUnits(pk: {self.reservation_unit.id}) {{
-                    edges {{
-                        node {{
-                            nameFi
-                            state
-                        }}
-                    }}
-                }}
-            }}
-            """
+            reservation_units_query(
+                pk=self.reservation_unit.id,
+                fields="nameFi state",
+            )
         )
+
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
@@ -1885,7 +1356,6 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
     def test_that_state_is_hidden(self):
         now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
-
         self.reservation_unit.name = "This should be state hidden"
         self.reservation_unit.is_draft = False
         self.reservation_unit.is_archived = False
@@ -1893,19 +1363,12 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.reservation_unit.publish_ends = now - datetime.timedelta(days=1)
         self.reservation_unit.save()
         response = self.query(
-            f"""
-            query {{
-                reservationUnits(pk: {self.reservation_unit.id}) {{
-                    edges {{
-                        node {{
-                            nameFi
-                            state
-                        }}
-                    }}
-                }}
-            }}
-            """
+            reservation_units_query(
+                pk=self.reservation_unit.id,
+                fields="nameFi state",
+            )
         )
+
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
@@ -1913,7 +1376,6 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
     def test_that_state_is_scheduled_period(self):
         now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
-
         self.reservation_unit.name = "This should be scheduled period"
         self.reservation_unit.is_draft = False
         self.reservation_unit.is_archived = False
@@ -1921,19 +1383,12 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.reservation_unit.publish_ends = now + datetime.timedelta(days=3)
         self.reservation_unit.save()
         response = self.query(
-            f"""
-            query {{
-                reservationUnits(pk: {self.reservation_unit.id}) {{
-                    edges {{
-                        node {{
-                            nameFi
-                            state
-                        }}
-                    }}
-                }}
-            }}
-            """
+            reservation_units_query(
+                pk=self.reservation_unit.id,
+                fields="nameFi state",
+            )
         )
+
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
@@ -1947,22 +1402,14 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.reservation_unit.publish_ends = None
         self.reservation_unit.reservation_begins = None
         self.reservation_unit.reservation_ends = None
-
         self.reservation_unit.save()
         response = self.query(
-            f"""
-            query {{
-                reservationUnits(pk: {self.reservation_unit.id}) {{
-                    edges {{
-                        node {{
-                            nameFi
-                            state
-                        }}
-                    }}
-                }}
-            }}
-            """
+            reservation_units_query(
+                pk=self.reservation_unit.id,
+                fields="nameFi state",
+            )
         )
+
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
@@ -1997,17 +1444,10 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.client.force_login(unit_group_admin)
 
         response = self.query(
-            """
-            query {
-                reservationUnits(onlyWithPermission: true) {
-                    edges {
-                        node {
-                            nameFi
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                onlyWithPermission=True,
+                fields="nameFi",
+            )
         )
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
@@ -2041,18 +1481,12 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.client.force_login(service_sector_admin)
 
         response = self.query(
-            """
-            query {
-                reservationUnits(onlyWithPermission: true) {
-                    edges {
-                        node {
-                            nameFi
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                onlyWithPermission=True,
+                fields="nameFi",
+            )
         )
+
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
@@ -2060,22 +1494,14 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
     def test_filter_only_with_permission_general_admin_admin(self):
         ReservationUnitFactory(name_fi="I'm in the results with the other one too.")
-
         self.client.force_login(self.general_admin)
-
         response = self.query(
-            """
-            query {
-                reservationUnits(onlyWithPermission: true) {
-                    edges {
-                        node {
-                            nameFi
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                onlyWithPermission=True,
+                fields="nameFi",
+            )
         )
+
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
@@ -2114,47 +1540,38 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         )
 
         response = self.query(
-            """
-            query {
-                reservationUnits {
-                    edges {
-                        node {
-                            reservations {
-                                user { email dateOfBirth }
-                                reserveeLastName
-                                reserveeFirstName
-                                reserveePhone
-                                workingMemo
-                                handlingDetails
-                                reserveeEmail
-                                reserveeAddressStreet
-                                reserveeAddressCity
-                                reserveeAddressZip
-                                reserveeOrganisationName
-                                freeOfChargeReason
-                                billingFirstName
-                                billingLastName
-                                billingAddressStreet
-                                billingAddressCity
-                                billingAddressZip
-                                billingPhone
-                                billingEmail
-                                description
-                                reserveeId
-                                cancelDetails
-                                cancelReason {
-                                    reason
-                                }
-                                denyReason {
-                                    reason
-                                }
-                            }
-                        }
+            reservation_units_query(
+                fields="""
+                    reservations {
+                        user {email dateOfBirth}
+                        reserveeLastName
+                        reserveeFirstName
+                        reserveePhone
+                        workingMemo
+                        handlingDetails
+                        reserveeEmail
+                        reserveeAddressStreet
+                        reserveeAddressCity
+                        reserveeAddressZip
+                        reserveeOrganisationName
+                        freeOfChargeReason
+                        billingFirstName
+                        billingLastName
+                        billingAddressStreet
+                        billingAddressCity
+                        billingAddressZip
+                        billingPhone
+                        billingEmail
+                        description
+                        reserveeId
+                        cancelDetails
+                        cancelReason{reason}
+                        denyReason{reason}
                     }
-                }
-            }
-            """
+                """,
+            )
         )
+
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
@@ -2194,47 +1611,38 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         )
 
         response = self.query(
-            """
-            query {
-                reservationUnits {
-                    edges {
-                        node {
-                            reservations {
-                                reserveeLastName
-                                reserveeFirstName
-                                reserveePhone
-                                workingMemo
-                                handlingDetails
-                                reserveeEmail
-                                reserveeAddressStreet
-                                reserveeAddressCity
-                                reserveeAddressZip
-                                reserveeOrganisationName
-                                freeOfChargeReason
-                                billingFirstName
-                                billingLastName
-                                billingAddressStreet
-                                billingAddressCity
-                                billingAddressZip
-                                billingPhone
-                                billingEmail
-                                description
-                                reserveeId
-                                cancelDetails
-                                user { dateOfBirth }
-                                cancelReason {
-                                    reason
-                                }
-                                denyReason {
-                                    reason
-                                }
-                            }
-                        }
+            reservation_units_query(
+                fields="""
+                    reservations {
+                        reserveeLastName
+                        reserveeFirstName
+                        reserveePhone
+                        workingMemo
+                        handlingDetails
+                        reserveeEmail
+                        reserveeAddressStreet
+                        reserveeAddressCity
+                        reserveeAddressZip
+                        reserveeOrganisationName
+                        freeOfChargeReason
+                        billingFirstName
+                        billingLastName
+                        billingAddressStreet
+                        billingAddressCity
+                        billingAddressZip
+                        billingPhone
+                        billingEmail
+                        description
+                        reserveeId
+                        cancelDetails
+                        user{dateOfBirth}
+                        cancelReason{reason}
+                        denyReason{reason}
                     }
-                }
-            }
-            """
+                """,
+            )
         )
+
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
@@ -2245,26 +1653,15 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
     def test_show_payment_merchant_from_reservation_unit(self, mock_product):
         merchant = PaymentMerchantFactory.create(name="Test Merchant")
         self.client.force_login(self.general_admin)
-
         self.reservation_unit.payment_merchant = merchant
         self.reservation_unit.save()
-
         response = self.query(
-            """
-            query {
-                reservationUnits {
-                    edges {
-                        node {
-                            nameFi
-                            paymentMerchant {
-                                name
-                            }
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                onlyWithPermission=True,
+                fields="nameFi paymentMerchant{name}",
+            )
         )
+
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
@@ -2273,27 +1670,15 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
     @mock.patch("reservation_units.tasks.create_product", return_value=mock_create_product())
     def test_show_payment_merchant_from_unit(self, mock_create_product):
         self.client.force_login(self.general_admin)
-
         merchant = PaymentMerchantFactory.create(name="Test Merchant")
         self.unit.payment_merchant = merchant
         self.unit.save()
-
         response = self.query(
-            """
-            query {
-                reservationUnits {
-                    edges {
-                        node {
-                            nameFi
-                            paymentMerchant {
-                                name
-                            }
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                fields="nameFi paymentMerchant{name}",
+            )
         )
+
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
@@ -2302,26 +1687,14 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
     @mock.patch("reservation_units.tasks.create_product", return_value=mock_create_product())
     def test_hide_payment_merchant_without_permissions(self, mock_product):
         merchant = PaymentMerchantFactory.create(name="Test Merchant")
-
         self.reservation_unit.payment_merchant = merchant
         self.reservation_unit.save()
-
         response = self.query(
-            """
-            query {
-                reservationUnits {
-                    edges {
-                        node {
-                            nameFi
-                            paymentMerchant {
-                                name
-                            }
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                fields="nameFi paymentMerchant{name}",
+            )
         )
+
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
@@ -2344,19 +1717,10 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         self.client.force_login(self.regular_joe)
         response = self.query(
-            """
-            query {
-                reservationUnitByPk(pk: %i) {
-                    nameFi
-                    reservations(from: "2021-05-03", to: "2021-05-04") {
-                        begin
-                        end
-                        state
-                    }
-                }
-            }
-            """
-            % self.reservation_unit.id
+            reservation_unit_by_pk_query(
+                pk=self.reservation_unit.id,
+                fields='nameFi reservations(from: "2021-05-03", to: "2021-05-04"){begin end state}',
+            )
         )
 
         content = json.loads(response.content)
@@ -2374,24 +1738,12 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         self.reservation_unit.payment_merchant = merchant
         self.reservation_unit.save()
-
         response = self.query(
-            """
-            query {
-                reservationUnits {
-                    edges {
-                        node {
-                            nameFi
-                            paymentProduct {
-                                pk
-                                merchantPk
-                            }
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                fields="nameFi paymentProduct{pk merchantPk}",
+            )
         )
+
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
@@ -2407,22 +1759,11 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.reservation_unit.save()
 
         response = self.query(
-            """
-            query {
-                reservationUnits {
-                    edges {
-                        node {
-                            nameFi
-                            paymentProduct {
-                                pk
-                                merchantPk
-                            }
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                fields="nameFi paymentProduct{pk merchantPk}",
+            )
         )
+
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None

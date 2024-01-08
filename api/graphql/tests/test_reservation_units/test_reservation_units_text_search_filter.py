@@ -3,6 +3,7 @@ import json
 from api.graphql.tests.test_reservation_units.base import (
     ReservationUnitQueryTestCaseBase,
 )
+from api.graphql.tests.test_reservation_units.conftest import reservation_units_query
 from tests.factories import SpaceFactory
 
 
@@ -24,20 +25,10 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
 
     def test_filtering_by_type_fi(self):
         response = self.query(
-            """
-            query {
-                reservationUnits(textSearch:"Test type fi"){
-                    edges {
-                        node {
-                            nameFi
-                            reservationUnitType {
-                                nameFi
-                            }
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                textSearch="Test type fi",
+                fields="nameFi reservationUnitType{nameFi}",
+            )
         )
 
         content = json.loads(response.content)
@@ -49,17 +40,10 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         assert reservation_unit["reservationUnitType"]["nameFi"] == "test type fi"
 
         response = self.query(
-            """
-            query {
-                reservationUnits(textSearch:"Nonexisting type"){
-                    edges {
-                        node {
-                            nameFi
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                textSearch="Nonexisting type",
+                fields="nameFi",
+            )
         )
 
         content = json.loads(response.content)
@@ -67,20 +51,10 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
 
     def test_filtering_by_type_en(self):
         response = self.query(
-            """
-            query {
-                reservationUnits(textSearch:"Test type en"){
-                    edges {
-                        node {
-                            nameFi
-                            reservationUnitType {
-                                nameEn
-                            }
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                textSearch="Test type en",
+                fields="nameFi reservationUnitType{nameEn}",
+            )
         )
 
         content = json.loads(response.content)
@@ -93,20 +67,10 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
 
     def test_filtering_by_type_sv(self):
         response = self.query(
-            """
-            query {
-                reservationUnits(textSearch:"Test type sv"){
-                    edges {
-                        node {
-                            nameFi
-                            reservationUnitType {
-                                nameSv
-                            }
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                textSearch="Test type sv",
+                fields="nameFi reservationUnitType{nameSv}",
+            )
         )
 
         content = json.loads(response.content)
@@ -119,17 +83,10 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
 
     def test_filtering_by_reservation_unit_name_fi(self):
         response = self.query(
-            """
-            query {
-                reservationUnits(textSearch:"Test name fi"){
-                    edges {
-                        node {
-                            nameFi
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                textSearch="Test name fi",
+                fields="nameFi",
+            )
         )
 
         content = json.loads(response.content)
@@ -140,17 +97,10 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         assert reservation_unit["nameFi"] == "test name fi"
 
         response = self.query(
-            """
-            query {
-                reservationUnits(textSearch:"Nonexisting name"){
-                    edges {
-                        node {
-                            nameFi
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                textSearch="Nonexisting name",
+                fields="nameFi",
+            )
         )
 
         content = json.loads(response.content)
@@ -158,17 +108,10 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
 
     def test_filtering_by_reservation_unit_name_en(self):
         response = self.query(
-            """
-            query {
-                reservationUnits(textSearch:"Test name en"){
-                    edges {
-                        node {
-                            nameEn
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                textSearch="Test name en",
+                fields="nameEn",
+            )
         )
 
         content = json.loads(response.content)
@@ -180,17 +123,10 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
 
     def test_filtering_by_reservation_unit_name_sv(self):
         response = self.query(
-            """
-            query {
-                reservationUnits(textSearch:"Test name sv"){
-                    edges {
-                        node {
-                            nameSv
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                textSearch="Test name sv",
+                fields="nameSv",
+            )
         )
 
         content = json.loads(response.content)
@@ -202,18 +138,10 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
 
     def test_filtering_by_reservation_unit_description_fi(self):
         response = self.query(
-            """
-            query {
-                reservationUnits(textSearch:"Lorem ipsum fi"){
-                    edges {
-                        node {
-                            nameFi
-                            descriptionFi
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                textSearch="Lorem ipsum fi",
+                fields="nameFi descriptionFi",
+            )
         )
 
         content = json.loads(response.content)
@@ -225,17 +153,10 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         assert reservation_unit["descriptionFi"] == "Lorem ipsum fi"
 
         response = self.query(
-            """
-            query {
-                reservationUnits(textSearch:"Dolor sit"){
-                    edges {
-                        node {
-                            nameFi
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                textSearch="Dolor sit",
+                fields="nameFi",
+            )
         )
 
         content = json.loads(response.content)
@@ -243,18 +164,10 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
 
     def test_filtering_by_reservation_unit_description_en(self):
         response = self.query(
-            """
-            query {
-                reservationUnits(textSearch:"Lorem ipsum en"){
-                    edges {
-                        node {
-                            nameFi
-                            descriptionEn
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                textSearch="Lorem ipsum en",
+                fields="nameFi descriptionEn",
+            )
         )
 
         content = json.loads(response.content)
@@ -267,18 +180,10 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
 
     def test_filtering_by_reservation_unit_description_sv(self):
         response = self.query(
-            """
-            query {
-                reservationUnits(textSearch:"Lorem ipsum sv"){
-                    edges {
-                        node {
-                            nameFi
-                            descriptionSv
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                textSearch="Lorem ipsum sv",
+                fields="nameFi descriptionSv",
+            )
         )
 
         content = json.loads(response.content)
@@ -295,18 +200,10 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         self.reservation_unit.save()
 
         response = self.query(
-            """
-            query {
-                reservationUnits(textSearch:"space name fi"){
-                    edges {
-                        node {
-                            nameFi
-                            spaces{nameFi}
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                textSearch="space name fi",
+                fields="nameFi spaces{nameFi}",
+            )
         )
 
         content = json.loads(response.content)
@@ -318,17 +215,10 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         assert reservation_unit["spaces"][0]["nameFi"] == "space name fi"
 
         response = self.query(
-            """
-            query {
-                reservationUnits(textSearch:"not a space name"){
-                    edges {
-                        node {
-                            nameFi
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                textSearch="not a space name",
+                fields="nameFi",
+            )
         )
 
         content = json.loads(response.content)
@@ -336,18 +226,10 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
 
     def test_filtering_by_space_name_en(self):
         response = self.query(
-            """
-            query {
-                reservationUnits(textSearch:"space name en"){
-                    edges {
-                        node {
-                            nameFi
-                            spaces{nameEn}
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                textSearch="space name en",
+                fields="nameFi spaces{nameEn}",
+            )
         )
 
         content = json.loads(response.content)
@@ -364,18 +246,10 @@ class ReservationUnitsFilterTextSearchTestCase(ReservationUnitQueryTestCaseBase)
         self.reservation_unit.save()
 
         response = self.query(
-            """
-            query {
-                reservationUnits(textSearch:"space name sv"){
-                    edges {
-                        node {
-                            nameFi
-                            spaces{nameSv}
-                        }
-                    }
-                }
-            }
-            """
+            reservation_units_query(
+                textSearch="space name sv",
+                fields="nameFi spaces{nameSv}",
+            )
         )
 
         content = json.loads(response.content)

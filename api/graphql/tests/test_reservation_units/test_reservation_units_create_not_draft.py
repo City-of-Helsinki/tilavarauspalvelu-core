@@ -8,6 +8,7 @@ from actions.reservation_unit import ReservationUnitHaukiExporter
 from api.graphql.tests.test_reservation_units.base import (
     ReservationUnitMutationsTestCaseBase,
 )
+from api.graphql.tests.test_reservation_units.conftest import reservation_unit_create_mutation
 from opening_hours.errors import HaukiAPIError
 from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import (
@@ -31,20 +32,6 @@ from utils.decimal_utils import round_decimal
 
 
 class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBase):
-    """For publish"""
-
-    def get_create_query(self):
-        return """
-        mutation createReservationUnit($input: ReservationUnitCreateMutationInput!) {
-            createReservationUnit(input: $input){
-                pk
-                errors {
-                    messages field
-                }
-            }
-        }
-        """
-
     def get_valid_data(self):
         return {
             "isDraft": False,
@@ -96,7 +83,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
 
     def test_create(self):
         data = self.get_valid_data()
-        response = self.query(self.get_create_query(), input_data=data)
+        response = self.query(reservation_unit_create_mutation, input_data=data)
         assert response.status_code == 200
         content = json.loads(response.content)
         res_unit_data = content.get("data").get("createReservationUnit")
@@ -158,7 +145,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
     @override_settings(HAUKI_EXPORTS_ENABLED=True)
     def test_send_resource_to_hauki_called(self):
         data = self.get_valid_data()
-        response = self.query(self.get_create_query(), input_data=data)
+        response = self.query(reservation_unit_create_mutation, input_data=data)
 
         assert response.status_code == 200
         content = json.loads(response.content)
@@ -171,7 +158,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
     @patch_method(ReservationUnitHaukiExporter.send_reservation_unit_to_hauki, side_effect=HaukiAPIError())
     def test_send_resource_to_hauki_errors_returns_error_message(self):
         data = self.get_valid_data()
-        response = self.query(self.get_create_query(), input_data=data)
+        response = self.query(reservation_unit_create_mutation, input_data=data)
 
         assert response.status_code == 200
         content = json.loads(response.content)
@@ -188,7 +175,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         data["nameEn"] = ""
         data["nameSv"] = ""
 
-        response = self.query(self.get_create_query(), input_data=data)
+        response = self.query(reservation_unit_create_mutation, input_data=data)
         assert response.status_code == 200
         content = json.loads(response.content)
         assert content.get("errors") is not None
@@ -200,7 +187,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         data.pop("nameSv")
         data.pop("nameEn")
 
-        response = self.query(self.get_create_query(), input_data=data)
+        response = self.query(reservation_unit_create_mutation, input_data=data)
         assert response.status_code == 200
         content = json.loads(response.content)
         assert content.get("errors") is not None
@@ -213,7 +200,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         data["descriptionSv"] = ""
         data["descriptionEn"] = ""
 
-        response = self.query(self.get_create_query(), input_data=data)
+        response = self.query(reservation_unit_create_mutation, input_data=data)
         assert response.status_code == 200
         content = json.loads(response.content)
         assert content.get("errors") is not None
@@ -226,7 +213,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         data.pop("descriptionEn")
         data.pop("descriptionSv")
 
-        response = self.query(self.get_create_query(), input_data=data)
+        response = self.query(reservation_unit_create_mutation, input_data=data)
         assert response.status_code == 200
         content = json.loads(response.content)
         assert content.get("errors") is not None
@@ -238,7 +225,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         data.pop("resourcePks")
         data["spacePks"] = []
 
-        response = self.query(self.get_create_query(), input_data=data)
+        response = self.query(reservation_unit_create_mutation, input_data=data)
         assert response.status_code == 200
         content = json.loads(response.content)
         assert content.get("errors") is not None
@@ -252,7 +239,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         data.pop("spacePks")
         data["resourcePks"] = []
 
-        response = self.query(self.get_create_query(), input_data=data)
+        response = self.query(reservation_unit_create_mutation, input_data=data)
         assert response.status_code == 200
         content = json.loads(response.content)
         assert content.get("errors") is not None
@@ -266,7 +253,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         data["resourcePks"] = []
         data["spacePks"] = []
 
-        response = self.query(self.get_create_query(), input_data=data)
+        response = self.query(reservation_unit_create_mutation, input_data=data)
         assert response.status_code == 200
         content = json.loads(response.content)
         assert content.get("errors") is not None
@@ -280,7 +267,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         data.pop("resourcePks")
         data.pop("spacePks")
 
-        response = self.query(self.get_create_query(), input_data=data)
+        response = self.query(reservation_unit_create_mutation, input_data=data)
         assert response.status_code == 200
         content = json.loads(response.content)
         assert content.get("errors") is not None
@@ -293,7 +280,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         data = self.get_valid_data()
         data["spacePks"] = "b"
 
-        response = self.query(self.get_create_query(), input_data=data)
+        response = self.query(reservation_unit_create_mutation, input_data=data)
         assert response.status_code == 400
         content = json.loads(response.content)
         assert content.get("errors") is not None
@@ -302,7 +289,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         data = self.get_valid_data()
         data["resourcePks"] = "b"
 
-        response = self.query(self.get_create_query(), input_data=data)
+        response = self.query(reservation_unit_create_mutation, input_data=data)
         assert response.status_code == 400
         content = json.loads(response.content)
         assert content.get("errors") is not None
@@ -311,7 +298,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         data = self.get_valid_data()
         data.pop("reservationUnitTypePk")
 
-        response = self.query(self.get_create_query(), input_data=data)
+        response = self.query(reservation_unit_create_mutation, input_data=data)
         assert response.status_code == 200
         content = json.loads(response.content)
         assert content.get("errors") is not None
@@ -322,7 +309,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         data = self.get_valid_data()
         data["reservationUnitTypePk"] = -15
 
-        response = self.query(self.get_create_query(), input_data=data)
+        response = self.query(reservation_unit_create_mutation, input_data=data)
         assert response.status_code == 200
         content = json.loads(response.content)
         assert content.get("errors") is not None
@@ -333,7 +320,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         data = self.get_valid_data()
         data["spacePks"] = [self.space.id, space_too.id]
 
-        response = self.query(self.get_create_query(), input_data=data)
+        response = self.query(reservation_unit_create_mutation, input_data=data)
         assert response.status_code == 200
         content = json.loads(response.content)
         res_unit_data = content.get("data").get("createReservationUnit")
@@ -351,7 +338,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         data = self.get_valid_data()
         data["purposePks"] = [purpose.id for purpose in purposes]
 
-        response = self.query(self.get_create_query(), input_data=data)
+        response = self.query(reservation_unit_create_mutation, input_data=data)
         assert response.status_code == 200
         content = json.loads(response.content)
         res_unit_data = content.get("data").get("createReservationUnit")
@@ -368,7 +355,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         data = self.get_valid_data()
         data["purposePks"] = ["b"]
 
-        response = self.query(self.get_create_query(), input_data=data)
+        response = self.query(reservation_unit_create_mutation, input_data=data)
         assert response.status_code == 400
         content = json.loads(response.content)
         assert content.get("errors") is not None
@@ -378,7 +365,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         data = self.get_valid_data()
         data["qualifierPks"] = [qualifier.id for qualifier in qualifiers]
 
-        response = self.query(self.get_create_query(), input_data=data)
+        response = self.query(reservation_unit_create_mutation, input_data=data)
         assert response.status_code == 200
         content = json.loads(response.content)
         res_unit_data = content.get("data").get("createReservationUnit")
@@ -395,7 +382,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         data = self.get_valid_data()
         data["qualifierPks"] = ["q"]
 
-        response = self.query(self.get_create_query(), input_data=data)
+        response = self.query(reservation_unit_create_mutation, input_data=data)
         assert response.status_code == 400
         content = json.loads(response.content)
         assert content.get("errors") is not None
@@ -405,7 +392,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         data = self.get_valid_data()
         data["servicePks"] = [purpose.id for purpose in purposes]
 
-        response = self.query(self.get_create_query(), input_data=data)
+        response = self.query(reservation_unit_create_mutation, input_data=data)
         assert response.status_code == 200
         content = json.loads(response.content)
         res_unit_data = content.get("data").get("createReservationUnit")
@@ -422,7 +409,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         data = self.get_valid_data()
         data["servicePks"] = ["b"]
 
-        response = self.query(self.get_create_query(), input_data=data)
+        response = self.query(reservation_unit_create_mutation, input_data=data)
         assert response.status_code == 400
         content = json.loads(response.content)
         assert content.get("errors") is not None
@@ -432,7 +419,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         data = self.get_valid_data()
         data["resourcePks"] = [self.resource.id, resource.id]
 
-        response = self.query(self.get_create_query(), input_data=data)
+        response = self.query(reservation_unit_create_mutation, input_data=data)
         assert response.status_code == 200
         content = json.loads(response.content)
         res_unit_data = content.get("data").get("createReservationUnit")
@@ -450,7 +437,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         data = self.get_valid_data()
         data["equipmentPks"] = [equipment.id for equipment in equipments]
 
-        response = self.query(self.get_create_query(), input_data=data)
+        response = self.query(reservation_unit_create_mutation, input_data=data)
         assert response.status_code == 200
         content = json.loads(response.content)
         res_unit_data = content.get("data").get("createReservationUnit")
@@ -467,7 +454,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         data = self.get_valid_data()
         data["equipmentPks"] = ["b"]
 
-        response = self.query(self.get_create_query(), input_data=data)
+        response = self.query(reservation_unit_create_mutation, input_data=data)
         assert response.status_code == 400
         content = json.loads(response.content)
         assert content.get("errors") is not None
@@ -475,7 +462,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
     def test_regular_user_cannot_create(self):
         self.client.force_login(self.regular_joe)
         data = self.get_valid_data()
-        response = self.query(self.get_create_query(), input_data=data)
+        response = self.query(reservation_unit_create_mutation, input_data=data)
 
         assert response.status_code == 200
         content = json.loads(response.content)
@@ -488,7 +475,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         data = self.get_valid_data()
         data["minPersons"] = 11
 
-        response = self.query(self.get_create_query(), input_data=data)
+        response = self.query(reservation_unit_create_mutation, input_data=data)
         assert response.status_code == 200
         content = json.loads(response.content)
         assert content.get("errors") is not None
@@ -498,7 +485,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
     def test_reservation_kind_defaults_to_direct_and_season(self):
         data = self.get_valid_data()
         data.pop("reservationKind")
-        response = self.query(self.get_create_query(), input_data=data)
+        response = self.query(reservation_unit_create_mutation, input_data=data)
         assert response.status_code == 200
         content = json.loads(response.content)
         res_unit_data = content.get("data").get("createReservationUnit")
@@ -522,7 +509,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
         data["reservationCancelledInstructionsSv"] = "Cancelled instructions sv"
         data["reservationCancelledInstructionsEn"] = "Cancelled instructions en"
 
-        response = self.query(self.get_create_query(), input_data=data)
+        response = self.query(reservation_unit_create_mutation, input_data=data)
         assert response.status_code == 200
 
         content = json.loads(response.content)

@@ -25,8 +25,8 @@ snapshots['ReservationUnitHaukiUrlTestCase::test_getting_url_raises_error_if_one
         {
             'locations': [
                 {
-                    'column': 21,
-                    'line': 4
+                    'column': 70,
+                    'line': 1
                 }
             ],
             'message': 'Wrong identifier for reservation unit in url generation.',
@@ -46,8 +46,8 @@ snapshots['ReservationUnitHaukiUrlTestCase::test_getting_url_raises_error_if_res
         {
             'locations': [
                 {
-                    'column': 17,
-                    'line': 3
+                    'column': 9,
+                    'line': 1
                 }
             ],
             'message': 'No ReservationUnit matches the given query.',
