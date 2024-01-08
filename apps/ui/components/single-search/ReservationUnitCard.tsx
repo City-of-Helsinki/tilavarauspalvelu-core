@@ -110,7 +110,6 @@ const Actions = styled.div`
   & > a {
     display: flex;
     flex-grow: 1;
-    max-height: 40px;
   }
 
   @media (min-width: ${breakpoints.s}) {

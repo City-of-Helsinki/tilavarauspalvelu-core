@@ -2,7 +2,6 @@ import React, { useMemo } from "react";
 import { IconGlyphEuro, IconCross, IconArrowRight } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { differenceInMinutes, parseISO } from "date-fns";
-import router from "next/router";
 import styled from "styled-components";
 import { getReservationPrice } from "common";
 import { trim } from "lodash";
@@ -16,21 +15,22 @@ import {
   getMainImage,
   getTranslation,
   reservationsUrl,
-} from "../../modules/util";
-import IconWithText from "../common/IconWithText";
-import { BlackButton } from "../../styles/util";
+} from "@/modules/util";
+import { pixel } from "@/styles/util";
 import {
   canUserCancelReservation,
   getNormalizedReservationOrderStatus,
-} from "../../modules/reservation";
+} from "@/modules/reservation";
 import {
   getReservationUnitName,
   getReservationUnitPrice,
   getUnitName,
-} from "../../modules/reservationUnit";
-import { JustForDesktop, JustForMobile } from "../../modules/style/layout";
+} from "@/modules/reservationUnit";
+import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
+import IconWithText from "@/components/common/IconWithText";
 import ReservationOrderStatus from "./ReservationOrderStatus";
 import ReservationStatus from "./ReservationStatus";
+import { ButtonLikeLink } from "../common/ButtonLikeLink";
 
 type CardType = "upcoming" | "past" | "cancelled";
 
@@ -131,11 +131,6 @@ const ActionButtons = styled.div`
   display: flex;
   gap: var(--spacing-s);
 `;
-
-const ActionButton = styled(BlackButton).attrs({
-  size: "small",
-  variant: "secondary",
-})``;
 
 const Image = styled.img`
   width: 100%;
@@ -239,10 +234,8 @@ const ReservationCard = ({ reservation, type }: PropsT): JSX.Element => {
 
   const name = reservationUnit ? getTranslation(reservationUnit, "name") : "-";
   const img = getMainImage(reservationUnit);
-  const imgSrc =
-    img?.mediumUrl ||
-    img?.imageUrl ||
-    "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
+  const imgSrc = img?.mediumUrl || img?.imageUrl || pixel;
+
   return (
     <Container data-testid="reservation-card__container">
       <Image alt={name} src={imgSrc} />
@@ -281,23 +274,21 @@ const ReservationCard = ({ reservation, type }: PropsT): JSX.Element => {
           <Actions>
             <ActionButtons>
               {type === "upcoming" && canUserCancelReservation(reservation) && (
-                <ActionButton
-                  iconRight={<IconCross aria-hidden />}
-                  onClick={() =>
-                    router.push(`${reservationsUrl}${reservation.pk}/cancel`)
-                  }
+                <ButtonLikeLink
+                  href={`${reservationsUrl}${reservation.pk}/cancel`}
                   data-testid="reservation-card__button--cancel-reservation"
                 >
                   {t("reservations:cancelReservationAbbreviated")}
-                </ActionButton>
+                  <IconCross aria-hidden />
+                </ButtonLikeLink>
               )}
-              <ActionButton
-                iconRight={<IconArrowRight aria-hidden />}
-                onClick={() => router.push(link)}
+              <ButtonLikeLink
+                href={link}
                 data-testid="reservation-card__button--goto-reservation"
               >
                 {t("reservationList:seeMore")}
-              </ActionButton>
+                <IconArrowRight aria-hidden />
+              </ButtonLikeLink>
             </ActionButtons>
           </Actions>
         </Bottom>
