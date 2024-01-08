@@ -1,7 +1,6 @@
 import json
 from typing import Any
 
-from assertpy import assert_that
 from django.test import override_settings
 
 from actions.reservation_unit import ReservationUnitHaukiExporter
@@ -116,7 +115,9 @@ class ReservationUnitCreateAsDraftTestCase(ReservationUnitMutationsTestCaseBase)
         created_unit = ReservationUnit.objects.get(pk=content.get("data").get("createReservationUnit").get("pk"))
         unit_payment_type_codes = [ptype.code for ptype in created_unit.payment_types.all()]
         assert created_unit is not None
-        assert_that(unit_payment_type_codes).contains_only(PaymentType.ON_SITE.value, PaymentType.INVOICE.value)
+        assert len(unit_payment_type_codes) == 2
+        assert PaymentType.ON_SITE.value in unit_payment_type_codes
+        assert PaymentType.INVOICE.value in unit_payment_type_codes
 
     def test_create_with_instructions(self):
         data = self.get_valid_data()

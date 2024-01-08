@@ -1,6 +1,5 @@
 from datetime import UTC, datetime, timedelta
 
-from assertpy import assert_that
 from django.test import TestCase
 from freezegun import freeze_time
 
@@ -33,20 +32,20 @@ class GetPreviousReservationTestCase(TestCase):
 
     def test_get_previous_reservation(self):
         previous_reservation = self.reservation_unit.get_previous_reservation(self.now)
-        assert_that(previous_reservation).is_not_none()
-        assert_that(previous_reservation.name).is_equal_to(self.reservation_blocked.name)
+        assert previous_reservation is not None
+        assert previous_reservation.name == self.reservation_blocked.name
 
     def test_get_previous_reservation_ignored_given_reservation(self):
         previous_reservation = self.reservation_unit.get_previous_reservation(
             self.now, reservation=self.reservation_blocked
         )
-        assert_that(previous_reservation).is_not_none()
-        assert_that(previous_reservation.name).is_equal_to(self.reservation.name)
+        assert previous_reservation is not None
+        assert previous_reservation.name == self.reservation.name
 
     def test_get_previous_reservation_ignores_blocked(self):
         previous_reservation = self.reservation_unit.get_previous_reservation(self.now, exclude_blocked=True)
-        assert_that(previous_reservation).is_not_none()
-        assert_that(previous_reservation.name).is_equal_to(self.reservation.name)
+        assert previous_reservation is not None
+        assert previous_reservation.name == self.reservation.name
 
 
 @freeze_time("2023-05-25 12:23:00")
@@ -72,15 +71,15 @@ class GetNextReservationTestCase(TestCase):
 
     def test_get_next_reservation(self):
         next_reservation = self.reservation_unit.get_next_reservation(self.now)
-        assert_that(next_reservation).is_not_none()
-        assert_that(next_reservation.name).is_equal_to(self.reservation_blocked.name)
+        assert next_reservation is not None
+        assert next_reservation.name == self.reservation_blocked.name
 
     def test_get_next_reservation_ignored_given_reservation(self):
         next_reservation = self.reservation_unit.get_next_reservation(self.now, reservation=self.reservation_blocked)
-        assert_that(next_reservation).is_not_none()
-        assert_that(next_reservation.name).is_equal_to(self.reservation.name)
+        assert next_reservation is not None
+        assert next_reservation.name == self.reservation.name
 
     def test_get_next_reservation_ignores_blocked(self):
         next_reservation = self.reservation_unit.get_next_reservation(self.now, exclude_blocked=True)
-        assert_that(next_reservation).is_not_none()
-        assert_that(next_reservation.name).is_equal_to(self.reservation.name)
+        assert next_reservation is not None
+        assert next_reservation.name == self.reservation.name
