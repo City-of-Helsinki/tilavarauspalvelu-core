@@ -1,7 +1,6 @@
 from io import BytesIO
 from unittest import mock
 
-from assertpy import assert_that
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
@@ -24,7 +23,7 @@ class ReservationUnitImageSaveTestCase(TestCase):
 
         image.save()
 
-        assert_that(mock.delay.call_count).is_equal_to(1)
+        assert mock.delay.call_count == 1
 
     @mock.patch("reservation_units.models.purge_image_cache.delay")
     @override_settings(IMAGE_CACHE_ENABLED=True)

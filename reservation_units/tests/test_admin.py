@@ -1,4 +1,3 @@
-from assertpy import assert_that
 from django.contrib.admin import AdminSite
 from django.test import RequestFactory, TestCase
 
@@ -33,13 +32,13 @@ class ReservationUnitAdminApplicationRoundTestCase(TestCase):
 
         queryset, _ = self.radmin.get_search_results(get_request, self.queryset, "")
 
-        assert_that(queryset.count()).is_equal_to(5)
+        assert queryset.count() == 5
 
         for r in self.include_these:
-            assert_that(queryset.filter(pk=r.pk).exists()).is_true()
+            assert queryset.filter(pk=r.pk).exists()
 
         for r in self.exclude_these:
-            assert_that(queryset.filter(pk=r.pk).exists()).is_false()
+            assert not queryset.filter(pk=r.pk).exists()
 
     def test_requests_from_not_application_round_results_all(self):
         get_request = self.req_factory.get(
@@ -53,10 +52,10 @@ class ReservationUnitAdminApplicationRoundTestCase(TestCase):
 
         queryset, _ = self.radmin.get_search_results(get_request, self.queryset, "")
 
-        assert_that(queryset.count()).is_equal_to(9)
+        assert queryset.count() == 9
 
         for r in self.include_these + self.exclude_these:
-            assert_that(queryset.filter(pk=r.pk).exists()).is_true()
+            assert queryset.filter(pk=r.pk).exists()
 
 
 class ReservationUnitAdminTermsValidationTestCase(TestCase):
@@ -88,7 +87,7 @@ class ReservationUnitAdminTermsValidationTestCase(TestCase):
         ReservationUnitModelForm = self.runit_admin.get_form(request, obj=self.reservation_unit)
         form = ReservationUnitModelForm(instance=self.reservation_unit, data=data)
 
-        assert_that(form.is_valid()).is_true()
+        assert form.is_valid()
 
     def test_pricing_terms_errors_when_type_not_pricing(self):
         wrong_terms = TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_GENERIC)
@@ -101,7 +100,7 @@ class ReservationUnitAdminTermsValidationTestCase(TestCase):
         ReservationUnitModelForm = self.runit_admin.get_form(request, obj=self.reservation_unit)
         form = ReservationUnitModelForm(instance=self.reservation_unit, data=data)
 
-        assert_that(form.is_valid()).is_false()
+        assert not form.is_valid()
 
     def test_payment_terms_accepts_type_payment(self):
         payment_terms = TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_PAYMENT)
@@ -114,7 +113,7 @@ class ReservationUnitAdminTermsValidationTestCase(TestCase):
         ReservationUnitModelForm = self.runit_admin.get_form(request, obj=self.reservation_unit)
         form = ReservationUnitModelForm(instance=self.reservation_unit, data=data)
 
-        assert_that(form.is_valid()).is_true()
+        assert form.is_valid()
 
     def test_payment_terms_errors_when_type_not_payment(self):
         wrong_terms = TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_GENERIC)
@@ -127,7 +126,7 @@ class ReservationUnitAdminTermsValidationTestCase(TestCase):
         ReservationUnitModelForm = self.runit_admin.get_form(request, obj=self.reservation_unit)
         form = ReservationUnitModelForm(instance=self.reservation_unit, data=data)
 
-        assert_that(form.is_valid()).is_false()
+        assert not form.is_valid()
 
     def test_cancellation_terms_accepts_type_cancellation(self):
         cancellation_terms = TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_CANCELLATION)
@@ -140,7 +139,7 @@ class ReservationUnitAdminTermsValidationTestCase(TestCase):
         ReservationUnitModelForm = self.runit_admin.get_form(request, obj=self.reservation_unit)
         form = ReservationUnitModelForm(instance=self.reservation_unit, data=data)
 
-        assert_that(form.is_valid()).is_true()
+        assert form.is_valid()
 
     def test_cancellation_terms_errors_when_type_not_cancellation(self):
         wrong_terms = TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_GENERIC)
@@ -153,7 +152,7 @@ class ReservationUnitAdminTermsValidationTestCase(TestCase):
         ReservationUnitModelForm = self.runit_admin.get_form(request, obj=self.reservation_unit)
         form = ReservationUnitModelForm(instance=self.reservation_unit, data=data)
 
-        assert_that(form.is_valid()).is_false()
+        assert not form.is_valid()
 
     def test_service_specific_terms_accepts_type_service(self):
         service_specific_terms = TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_SERVICE)
@@ -166,7 +165,7 @@ class ReservationUnitAdminTermsValidationTestCase(TestCase):
         ReservationUnitModelForm = self.runit_admin.get_form(request, obj=self.reservation_unit)
         form = ReservationUnitModelForm(instance=self.reservation_unit, data=data)
 
-        assert_that(form.is_valid()).is_true()
+        assert form.is_valid()
 
     def test_service_specific_terms_errors_when_type_not_service(self):
         wrong_terms = TermsOfUseFactory(terms_type=TermsOfUse.TERMS_TYPE_GENERIC)
@@ -179,4 +178,4 @@ class ReservationUnitAdminTermsValidationTestCase(TestCase):
         ReservationUnitModelForm = self.runit_admin.get_form(request, obj=self.reservation_unit)
         form = ReservationUnitModelForm(instance=self.reservation_unit, data=data)
 
-        assert_that(form.is_valid()).is_false()
+        assert not form.is_valid()

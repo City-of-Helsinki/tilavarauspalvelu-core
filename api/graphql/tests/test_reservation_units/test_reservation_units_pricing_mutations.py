@@ -2,8 +2,6 @@ import datetime
 import json
 from typing import Any
 
-from assertpy import assert_that
-
 from api.graphql.tests.test_reservation_units.base import (
     ReservationUnitMutationsTestCaseBase,
 )
@@ -152,7 +150,7 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         content = json.loads(response.content)
 
         assert content.get("errors") is not None
-        assert_that(content.get("errors")[0].get("message")).starts_with("ACTIVE pricing must be in")
+        assert content.get("errors")[0].get("message").startswith("ACTIVE pricing must be in")
 
         res_unit = ReservationUnit.objects.first()
         assert res_unit is None
@@ -167,7 +165,7 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         content = json.loads(response.content)
 
         assert content.get("errors") is not None
-        assert_that(content.get("errors")[0].get("message")).starts_with("FUTURE pricing must be in")
+        assert content.get("errors")[0].get("message").startswith("FUTURE pricing must be in")
 
         res_unit = ReservationUnit.objects.first()
         assert res_unit is None
@@ -190,17 +188,17 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         assert res_unit_data.get("errors") is None
 
         res_unit = ReservationUnit.objects.first()
-        assert_that(res_unit.pricings.count()).is_equal_to(1)
+        assert res_unit.pricings.count() == 1
 
         pricing = res_unit.pricings.first()
-        assert_that(pricing.begins).is_equal_to(datetime.date.today())
-        assert_that(pricing.pricing_type).is_equal_to(PricingType.FREE)
-        assert_that(pricing.status).is_equal_to(PricingStatus.PRICING_STATUS_ACTIVE)
-        assert_that(pricing.lowest_price).is_zero()
-        assert_that(pricing.highest_price).is_zero()
-        assert_that(pricing.lowest_price_net).is_zero()
-        assert_that(pricing.highest_price_net).is_zero()
-        assert_that(pricing.tax_percentage.value).is_zero()
+        assert pricing.begins == datetime.date.today()
+        assert pricing.pricing_type == PricingType.FREE
+        assert pricing.status == PricingStatus.PRICING_STATUS_ACTIVE
+        assert pricing.lowest_price == 0
+        assert pricing.highest_price == 0
+        assert pricing.lowest_price_net == 0
+        assert pricing.highest_price_net == 0
+        assert pricing.tax_percentage.value == 0
 
     def test_active_pricing_can_be_created_on_update(self):
         create_data = self.get_valid_data(True)
@@ -224,7 +222,7 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         assert content.get("errors") is None
 
         updated_resunit = ReservationUnit.objects.get(pk=resunit_pk)
-        assert_that(updated_resunit.pricings.count()).is_equal_to(1)
+        assert updated_resunit.pricings.count() == 1
 
     def test_future_pricing_can_be_created_on_update(self):
         create_data = self.get_valid_data(False)
@@ -260,7 +258,7 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         assert res_unit_data.get("errors") is None
 
         updated_resunit = ReservationUnit.objects.get(pk=resunit_pk)
-        assert_that(updated_resunit.pricings.count()).is_equal_to(2)
+        assert updated_resunit.pricings.count() == 2
 
     def test_update_cannot_add_another_active_pricing(self):
         create_data = self.get_valid_data(False)
@@ -348,4 +346,4 @@ class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBa
         assert res_unit_data.get("errors") is None
 
         updated_resunit = ReservationUnit.objects.get(pk=resunit_pk)
-        assert_that(updated_resunit.pricings.count()).is_equal_to(0)
+        assert updated_resunit.pricings.count() == 0

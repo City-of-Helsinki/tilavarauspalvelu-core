@@ -3,7 +3,6 @@ import json
 from unittest import mock
 from uuid import UUID
 
-from assertpy import assert_that
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import override_settings
@@ -216,7 +215,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        assert_that(content.get("data").get("reservationUnitByPk").get("pk")).is_equal_to(self.reservation_unit.id)
+        assert content.get("data").get("reservationUnitByPk").get("pk") == self.reservation_unit.id
 
     def test_getting_authentication_by_pk(self):
         response = self.query(
@@ -230,7 +229,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         )
         content = json.loads(response.content)
         assert content.get("errors") is None
-        assert_that(content.get("data").get("reservationUnitByPk").get("authentication")).is_equal_to("WEAK")
+        assert content.get("data").get("reservationUnitByPk").get("authentication") == "WEAK"
 
     def test_getting_hauki_url_is_none_when_regular_user(self):
         settings.HAUKI_SECRET = "HAUKISECRET"
@@ -325,8 +324,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         errors = content.get("errors")
-        assert_that(len(errors)).is_equal_to(1)
-        assert_that(errors[0].get("message")).is_equal_to("No ReservationUnit matches the given query.")
+        assert len(errors) == 1
+        assert errors[0].get("message") == "No ReservationUnit matches the given query."
 
     def test_reservations_date_filter(self):
         ReservationFactory(
@@ -371,9 +370,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         assert content.get("errors") is None
 
         reservations = content.get("data").get("reservationUnitByPk").get("reservations")
-        assert_that(len(reservations)).is_equal_to(2)
-        assert_that(reservations[0]["name"]).contains("Show me")
-        assert_that(reservations[1]["name"]).contains("Show me too")
+        assert len(reservations) == 2
+        assert reservations[0]["name"] == "Show me"
+        assert reservations[1]["name"] == "Show me too"
 
     def test_filtering_by_unit(self):
         ReservationUnitFactory(unit=UnitFactory())  # should be excluded
@@ -2250,7 +2249,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
         self.assertMatchSnapshot(content)
-        assert_that(PersonalInfoViewLog.objects.all().count()).is_equal_to(1)
+        assert PersonalInfoViewLog.objects.all().count() == 1
 
     @mock.patch("reservation_units.tasks.create_product", return_value=mock_create_product())
     def test_show_payment_merchant_from_reservation_unit(self, mock_product):

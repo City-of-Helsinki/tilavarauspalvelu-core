@@ -1,7 +1,6 @@
 from unittest import mock
 from uuid import uuid4
 
-from assertpy import assert_that
 from django.test import TestCase, override_settings
 
 from merchants.verkkokauppa.product.types import Product
@@ -36,15 +35,15 @@ class ReservationUnitProductMappingTestCase(TestCase):
         self.runit.save()
 
         self.runit.refresh_from_db()
-        assert_that(self.runit.payment_product).is_not_none()
-        assert_that(self.runit.payment_product.id).is_equal_to(product_id)
+        assert self.runit.payment_product is not None
+        assert self.runit.payment_product.id == product_id
 
     def test_mapping_is_not_created_if_merchant_is_missing(self, mock_product):
         self.runit.payment_merchant = None
         self.runit.save()
 
         self.runit.refresh_from_db()
-        assert_that(self.runit.payment_product).is_none()
+        assert self.runit.payment_product is None
 
     def test_mapping_is_not_created_if_unit_is_not_paid(self, mock_product):
         self.runit.pricings.set([])
@@ -52,17 +51,17 @@ class ReservationUnitProductMappingTestCase(TestCase):
         self.runit.save()
 
         self.runit.refresh_from_db()
-        assert_that(self.runit.payment_product).is_none()
+        assert self.runit.payment_product is None
 
     def test_mapping_is_removed_if_merchant_is_removed(self, mock_product):
         self.runit.payment_merchant = self.payment_merchant
         self.runit.save()
 
         self.runit.refresh_from_db()
-        assert_that(self.runit.payment_product).is_not_none()
+        assert self.runit.payment_product is not None
 
         self.runit.payment_merchant = None
         self.runit.save()
 
         self.runit.refresh_from_db()
-        assert_that(self.runit.payment_product).is_none()
+        assert self.runit.payment_product is None

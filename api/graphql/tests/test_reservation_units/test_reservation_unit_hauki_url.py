@@ -1,7 +1,6 @@
 import json
 
 import snapshottest
-from assertpy import assert_that
 from django.test import override_settings
 from freezegun import freeze_time
 
@@ -127,12 +126,10 @@ class ReservationUnitHaukiUrlTestCase(GrapheneTestCaseBase, snapshottest.TestCas
         assert content.get("errors") is None
 
         url = content.get("data").get("reservationUnitHaukiUrl").get("url")
-        assert_that(url).is_not_empty()
+        assert url is not None
 
-        assert_that(url).does_not_contain(str(res_unit.uuid))
-        assert_that(url).contains(str(self.target_runit.uuid))
-
-        assert_that(content.get(""))
+        assert str(res_unit.uuid) not in url
+        assert str(self.target_runit.uuid) in url
 
         self.assertMatchSnapshot(content)
 

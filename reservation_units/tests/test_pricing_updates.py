@@ -1,6 +1,5 @@
 from datetime import date
 
-from assertpy import assert_that
 from django.test import TestCase
 
 from reservation_units.models import PricingStatus
@@ -45,7 +44,8 @@ class PricingUpdatesTestCase(TestCase):
     def test_update_reservation_unit_pricings(self):
         today = date(2022, 9, 19)
         num_updated = update_reservation_unit_pricings(today)
-        assert_that(num_updated).is_equal_to(1)
+
+        assert num_updated == 1
 
         self.runit_1.refresh_from_db()
         self.runit_2.refresh_from_db()
@@ -54,20 +54,20 @@ class PricingUpdatesTestCase(TestCase):
         active_pricing_1 = self.runit_1.pricings.filter(status=PricingStatus.PRICING_STATUS_ACTIVE).first()
         future_pricing_1 = self.runit_1.pricings.filter(status=PricingStatus.PRICING_STATUS_FUTURE).first()
         past_pricing_1 = self.runit_1.pricings.filter(status=PricingStatus.PRICING_STATUS_PAST).first()
-        assert_that(active_pricing_1.begins).is_equal_to(today)
-        assert_that(future_pricing_1).is_none()
-        assert_that(past_pricing_1.begins).is_equal_to(date(2022, 1, 1))
+        assert active_pricing_1.begins == today
+        assert future_pricing_1 is None
+        assert past_pricing_1.begins == date(2022, 1, 1)
 
         active_pricing_2 = self.runit_2.pricings.filter(status=PricingStatus.PRICING_STATUS_ACTIVE).first()
         future_pricing_2 = self.runit_2.pricings.filter(status=PricingStatus.PRICING_STATUS_FUTURE).first()
         past_pricing_2 = self.runit_2.pricings.filter(status=PricingStatus.PRICING_STATUS_PAST).first()
-        assert_that(active_pricing_2.begins).is_equal_to(date(2022, 1, 1))
-        assert_that(future_pricing_2.begins).is_equal_to(date(2022, 9, 20))
-        assert_that(past_pricing_2).is_none()
+        assert active_pricing_2.begins == date(2022, 1, 1)
+        assert future_pricing_2.begins == date(2022, 9, 20)
+        assert past_pricing_2 is None
 
         active_pricing_3 = self.runit_3.pricings.filter(status=PricingStatus.PRICING_STATUS_ACTIVE).first()
         future_pricing_3 = self.runit_3.pricings.filter(status=PricingStatus.PRICING_STATUS_FUTURE).first()
         past_pricing_3 = self.runit_3.pricings.filter(status=PricingStatus.PRICING_STATUS_PAST).first()
-        assert_that(active_pricing_3.begins).is_equal_to(date(2022, 1, 1))
-        assert_that(future_pricing_3).is_none()
-        assert_that(past_pricing_3).is_none()
+        assert active_pricing_3.begins == date(2022, 1, 1)
+        assert future_pricing_3 is None
+        assert past_pricing_3 is None

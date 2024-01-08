@@ -1,6 +1,5 @@
 import json
 
-from assertpy import assert_that
 from auditlog.models import LogEntry
 from django.contrib.contenttypes.models import ContentType
 from django.test import override_settings
@@ -111,7 +110,7 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         assert content.get("errors") is None
 
         self.res_unit.refresh_from_db()
-        assert_that(self.res_unit.authentication).is_equal_to("strong")
+        assert self.res_unit.authentication == "strong"
 
     def test_update_errors_with_invalid_authentication(self):
         data = self.get_valid_update_data()
@@ -121,7 +120,7 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         content = json.loads(response.content)
         assert content.get("errors") is not None
 
-        assert_that(content.get("errors")[0].get("message")).contains('Choice "invalid" is not allowed.')
+        assert 'Choice "invalid" is not allowed.' in content.get("errors")[0].get("message")
         self.res_unit.refresh_from_db()
         assert self.res_unit.authentication != "invalid"
 
@@ -134,10 +133,10 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is not None
-        assert_that(content.get("errors")[0].get("message")).contains("nameFi is required for draft reservation units")
+        assert "nameFi is required for draft reservation units" in content.get("errors")[0].get("message")
 
         self.res_unit.refresh_from_db()
-        assert_that(self.res_unit.name_fi).is_not_empty()
+        assert self.res_unit.name_fi == "Resunit name"
 
     def test_regular_user_cannot_update(self):
         self.client.force_login(self.regular_joe)
@@ -150,7 +149,7 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         assert content.get("errors") is not None
 
         self.res_unit.refresh_from_db()
-        assert_that(self.res_unit.name).is_equal_to("Resunit name")
+        assert self.res_unit.name == "Resunit name"
 
     @patch_method(ReservationUnitHaukiExporter.send_reservation_unit_to_hauki)
     @override_settings(HAUKI_EXPORTS_ENABLED=True)
