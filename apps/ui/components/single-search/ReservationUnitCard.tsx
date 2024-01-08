@@ -1,8 +1,7 @@
-import { IconGlyphEuro, IconGroup, Tag } from "hds-react";
+import { IconArrowRight, IconGlyphEuro, IconGroup, Tag } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import NextImage from "next/image";
 import styled from "styled-components";
 import { H5 } from "common/src/common/typography";
@@ -12,7 +11,7 @@ import { format, isToday, isTomorrow } from "date-fns";
 import { toUIDate } from "common/src/common/util";
 import { getMainImage, getTranslation } from "@/modules/util";
 import IconWithText from "../common/IconWithText";
-import { MediumButton, pixel, truncatedText } from "@/styles/util";
+import { pixel, truncatedText } from "@/styles/util";
 import {
   getActivePricing,
   getPrice,
@@ -20,6 +19,7 @@ import {
   getUnitName,
 } from "@/modules/reservationUnit";
 import { reservationUnitPrefix } from "@/modules/const";
+import { ButtonLikeLink } from "../common/ButtonLikeLink";
 
 interface PropsT {
   reservationUnit: ReservationUnitType;
@@ -90,6 +90,10 @@ const Props = styled.div`
   flex-direction: column;
   align-items: start;
 
+  @media (min-width: ${breakpoints.s}) {
+    gap: var(--spacing-3-xs);
+  }
+
   @media (min-width: ${breakpoints.l}) {
     flex-direction: row;
     gap: var(--spacing-l);
@@ -98,11 +102,19 @@ const Props = styled.div`
 `;
 
 const Actions = styled.div`
-  display: block;
-  padding: var(--spacing-s) var(--spacing-s) var(--spacing-s) 0;
+  display: flex;
+  padding: var(--spacing-m) var(--spacing-s) var(--spacing-s) 0;
+  width: 100%;
 
-  > button {
-    white-space: nowrap;
+  /* ButtonLikeLink doesn't scale to max-width on mobile */
+  & > a {
+    display: flex;
+    flex-grow: 1;
+    max-height: 40px;
+  }
+
+  @media (min-width: ${breakpoints.s}) {
+    padding-top: var(--spacing-s);
   }
 
   @media (min-width: ${breakpoints.m}) {
@@ -211,8 +223,6 @@ const StatusTag = (ru: {
 const ReservationUnitCard = ({ reservationUnit }: PropsT): JSX.Element => {
   const { t } = useTranslation();
 
-  const router = useRouter();
-
   const name = getReservationUnitName(reservationUnit);
 
   const link = `${reservationUnitPrefix}/${reservationUnit.pk}`;
@@ -291,10 +301,10 @@ const ReservationUnitCard = ({ reservationUnit }: PropsT): JSX.Element => {
             ) : null}
           </Props>
           <Actions>
-            <div style={{ flexGrow: 1 }} />
-            <MediumButton variant="secondary" onClick={() => router.push(link)}>
+            <ButtonLikeLink href={link}>
               {t("reservationUnitCard:seeMore")}
-            </MediumButton>
+              <IconArrowRight aria-hidden="true" />
+            </ButtonLikeLink>
           </Actions>
         </Bottom>
       </MainContent>
