@@ -38,7 +38,6 @@ const Container = styled.div`
 
 const MainContent = styled.div`
   display: grid;
-  gap: var(--spacing-s);
   margin: var(--spacing-s);
   position: relative;
 
@@ -62,9 +61,10 @@ const Description = styled.span`
   font-family: var(--font-regular);
   font-size: var(--fontsize-body-m);
   flex-grow: 1;
+  margin-bottom: var(--spacing-s);
 
-  @media (min-width: ${breakpoints.m}) {
-    height: unset;
+  @media (min-width: ${breakpoints.l}) {
+    margin-bottom: 0;
   }
 `;
 
@@ -85,11 +85,15 @@ const Bottom = styled.span`
 `;
 
 const Props = styled.div`
-  display: block;
+  display: flex;
+  gap: var(--spacing-s);
+  flex-direction: column;
+  align-items: start;
 
   @media (min-width: ${breakpoints.l}) {
-    display: flex;
+    flex-direction: row;
     gap: var(--spacing-l);
+    align-items: end;
   }
 `;
 
@@ -139,7 +143,7 @@ const StyledInlineLink = styled(StyledLink)`
 `;
 
 const StyledIconWithText = styled(IconWithText)`
-  margin-top: var(--spacing-xs);
+  margin: 0;
 
   span {
     margin-left: var(--spacing-2-xs);
@@ -149,11 +153,14 @@ const StyledIconWithText = styled(IconWithText)`
 `;
 
 const StyledTag = styled(Tag)<{ $status: "available" | "no-times" | "closed" }>`
+  margin-bottom: var(--spacing-s);
+
   @media (min-width: ${breakpoints.s}) {
     position: absolute;
     top: 0;
     right: 0;
     z-index: 1;
+    margin: 0;
   }
 
   && {
