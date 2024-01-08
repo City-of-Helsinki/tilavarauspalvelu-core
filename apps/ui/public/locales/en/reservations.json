@@ -20,6 +20,7 @@
   "saveNewTimeSuccess": "Time of the booking has been changed",
   "cancelReservation": "Cancel booking",
   "cancelReservationCancellation": "Undo the cancelling",
+  "cancelReservationAbbreviated": "Cancel",
   "cancelApplication": "Cancel application",
   "cancelReservationBody": "You are about to cancel your booking.",
   "redoReservation": "Make a new booking",
