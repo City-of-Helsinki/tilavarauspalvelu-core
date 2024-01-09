@@ -9,7 +9,7 @@ from django.test import override_settings
 from django.utils.timezone import get_default_timezone
 
 from api.graphql.extensions.validation_errors import ValidationErrorCodes
-from api.graphql.tests.test_reservations.base import DEFAULT_TIMEZONE, ReservationTestCaseBase
+from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from applications.choices import PriorityChoice
 from applications.models import City
 from opening_hours.models import ReservableTimeSpan
@@ -31,6 +31,8 @@ from tests.factories import (
     ReservationUnitPricingFactory,
     TaxPercentageFactory,
 )
+
+DEFAULT_TIMEZONE = get_default_timezone()
 
 
 def get_profile_data():

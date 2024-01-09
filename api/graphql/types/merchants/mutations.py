@@ -15,7 +15,7 @@ from merchants.verkkokauppa.payment.requests import get_payment
 from reservations.choices import ReservationStateChoice
 from reservations.email_utils import send_confirmation_email
 
-TIMEZONE = get_default_timezone()
+DEFAULT_TIMEZONE = get_default_timezone()
 
 
 class RefreshOrderMutation(relay.ClientIDMutation, AuthMutation):
@@ -70,7 +70,7 @@ class RefreshOrderMutation(relay.ClientIDMutation, AuthMutation):
             ) from err
 
         payment_order.payment_id = payment.payment_id
-        payment_order.processed_at = datetime.now().astimezone(TIMEZONE)
+        payment_order.processed_at = datetime.now().astimezone(DEFAULT_TIMEZONE)
 
         if payment.status == "payment_cancelled" and payment_order.status is not OrderStatus.CANCELLED:
             payment_order.status = OrderStatus.CANCELLED

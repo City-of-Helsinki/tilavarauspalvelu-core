@@ -14,11 +14,11 @@ from reservations.choices import ReservationStateChoice
 from reservations.email_utils import send_confirmation_email
 from reservations.models import Reservation
 
-TIMEZONE = get_default_timezone()
+DEFAULT_TIMEZONE = get_default_timezone()
 
 
 def update_expired_orders(older_than_minutes: int) -> None:
-    expired_datetime = datetime.now(tz=TIMEZONE) - timedelta(minutes=older_than_minutes)
+    expired_datetime = datetime.now(tz=DEFAULT_TIMEZONE) - timedelta(minutes=older_than_minutes)
     expired_orders = PaymentOrder.objects.filter(
         status=OrderStatus.DRAFT,
         created_at__lte=expired_datetime,
@@ -44,7 +44,7 @@ def update_expired_orders(older_than_minutes: int) -> None:
                 order.status = OrderStatus.EXPIRED
                 cancel_order(order.remote_id, order.reservation_user_uuid)
 
-            order.processed_at = datetime.now(tz=TIMEZONE)
+            order.processed_at = datetime.now(tz=DEFAULT_TIMEZONE)
             order.save()
 
             # Confirm the reservation and send confirmation email

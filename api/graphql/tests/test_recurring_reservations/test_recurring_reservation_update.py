@@ -3,12 +3,14 @@ import json
 
 import freezegun
 from assertpy import assert_that
+from django.utils.timezone import get_default_timezone
 
 from api.graphql.extensions.validation_errors import ValidationErrorCodes
 from api.graphql.tests.base import GrapheneTestCaseBase
-from api.graphql.tests.test_reservations.base import DEFAULT_TIMEZONE
 from reservations.models import RecurringReservation
 from tests.factories import RecurringReservationFactory, ReservationUnitFactory, ServiceSectorFactory, UnitFactory
+
+DEFAULT_TIMEZONE = get_default_timezone()
 
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")

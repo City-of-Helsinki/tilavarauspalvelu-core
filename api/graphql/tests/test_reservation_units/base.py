@@ -26,7 +26,7 @@ from tests.factories import (
     UnitFactory,
 )
 
-TIMEZONE = get_default_timezone()
+DEFAULT_TIMEZONE = get_default_timezone()
 
 
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True, UPDATE_PRODUCT_MAPPING=True)
@@ -74,10 +74,10 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
             reservation_confirmed_instructions_en="Additional instructions for the approved reservation",
             is_draft=False,
             reservation_start_interval=ReservationStartInterval.INTERVAL_30_MINUTES.value,
-            reservation_begins=datetime.datetime.now(tz=TIMEZONE),
-            reservation_ends=datetime.datetime.now(tz=TIMEZONE),
-            publish_begins=datetime.datetime.now(tz=TIMEZONE),
-            publish_ends=datetime.datetime.now(tz=TIMEZONE) + datetime.timedelta(days=7),
+            reservation_begins=datetime.datetime.now(tz=DEFAULT_TIMEZONE),
+            reservation_ends=datetime.datetime.now(tz=DEFAULT_TIMEZONE),
+            publish_begins=datetime.datetime.now(tz=DEFAULT_TIMEZONE),
+            publish_ends=datetime.datetime.now(tz=DEFAULT_TIMEZONE) + datetime.timedelta(days=7),
             buffer_time_before=datetime.timedelta(minutes=15),
             buffer_time_after=datetime.timedelta(minutes=15),
             min_reservation_duration=datetime.timedelta(minutes=10),
