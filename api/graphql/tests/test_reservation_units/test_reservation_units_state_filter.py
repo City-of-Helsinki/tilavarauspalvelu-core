@@ -62,7 +62,7 @@ class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == []
 
     def test_filtering_by_draft(self):
         response = self.query(
@@ -75,7 +75,9 @@ class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "I am a draft!", "state": "DRAFT"}}
+        ]
 
     def test_filtering_by_scheduled_publishing(self):
         response = self.query(
@@ -88,7 +90,9 @@ class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "I am scheduled for publishing!", "state": "SCHEDULED_PUBLISHING"}}
+        ]
 
     def test_filtering_by_published(self):
         response = self.query(
@@ -101,7 +105,9 @@ class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "Yey! I'm published!", "state": "PUBLISHED"}}
+        ]
 
     def test_filtering_by_mixed(self):
         response = self.query(
@@ -114,7 +120,10 @@ class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "I am a draft!", "state": "DRAFT"}},
+            {"node": {"nameFi": "I am scheduled for publishing!", "state": "SCHEDULED_PUBLISHING"}},
+        ]
 
     def test_filtering_by_scheduled_period(self):
         response = self.query(
@@ -127,7 +136,9 @@ class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "I am scheduled period", "state": "SCHEDULED_PERIOD"}}
+        ]
 
     def test_filtering_by_scheduled_hiding(self):
         response = self.query(
@@ -140,7 +151,10 @@ class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "test name fi", "state": "SCHEDULED_HIDING"}},
+            {"node": {"nameFi": "I am scheduled hiding", "state": "SCHEDULED_HIDING"}},
+        ]
 
     def test_filtering_by_hidden(self):
         response = self.query(
@@ -153,7 +167,9 @@ class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "I am hidden", "state": "HIDDEN"}}
+        ]
 
     def test_filtering_by_scheduled_publishing_when_begin_after_end(self):
         now = datetime.datetime.now(tz=get_default_timezone())
@@ -175,4 +191,12 @@ class ReservationUnitsFilterStateTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "I am scheduled for publishing!", "state": "SCHEDULED_PUBLISHING"}},
+            {
+                "node": {
+                    "nameFi": "I'm scheduled for publishing and my begins is after end.",
+                    "state": "SCHEDULED_PUBLISHING",
+                }
+            },
+        ]

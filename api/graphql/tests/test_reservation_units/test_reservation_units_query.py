@@ -176,7 +176,75 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {
+                "node": {
+                    "allowReservationsWithoutOpeningHours": False,
+                    "applicationRounds": [],
+                    "authentication": "WEAK",
+                    "bufferTimeAfter": 900,
+                    "bufferTimeBefore": 900,
+                    "canApplyFreeOfCharge": False,
+                    "cancellationRule": {"nameEn": "en", "nameFi": "fi", "nameSv": "sv"},
+                    "contactInformation": "",
+                    "descriptionFi": "",
+                    "equipment": [],
+                    "images": [],
+                    "isArchived": False,
+                    "location": None,
+                    "maxPersons": 200,
+                    "maxReservationDuration": 86400,
+                    "maxReservationsPerUser": 5,
+                    "metadataSet": {"name": "Test form", "requiredFields": [], "supportedFields": []},
+                    "minPersons": 10,
+                    "minReservationDuration": 600,
+                    "nameFi": "test name fi",
+                    "paymentMerchant": None,
+                    "paymentTypes": [{"code": "ONLINE"}],
+                    "pricingTerms": {"termsType": "PRICING_TERMS"},
+                    "pricings": [
+                        {
+                            "begins": "2021-01-01",
+                            "highestPrice": "10.00",
+                            "lowestPrice": "5.00",
+                            "priceUnit": "PER_15_MINS",
+                            "pricingType": "PAID",
+                            "status": "ACTIVE",
+                            "taxPercentage": {"value": "10.00"},
+                        }
+                    ],
+                    "publishBegins": "2021-05-03T00:00:00+00:00",
+                    "publishEnds": "2021-05-10T00:00:00+00:00",
+                    "purposes": [],
+                    "qualifiers": [{"nameFi": "Test Qualifier"}],
+                    "requireIntroduction": False,
+                    "requireReservationHandling": False,
+                    "reservationBegins": "2021-05-03T00:00:00+00:00",
+                    "reservationCancelledInstructionsEn": "",
+                    "reservationCancelledInstructionsFi": "",
+                    "reservationCancelledInstructionsSv": "",
+                    "reservationConfirmedInstructionsEn": "Additional instructions for the approved reservation",
+                    "reservationConfirmedInstructionsFi": "Hyväksytyn varauksen lisäohjeita",
+                    "reservationConfirmedInstructionsSv": "Ytterligare instruktioner för den godkända reservationen",
+                    "reservationEnds": "2021-05-03T00:00:00+00:00",
+                    "reservationKind": "DIRECT_AND_SEASON",
+                    "reservationPendingInstructionsEn": "",
+                    "reservationPendingInstructionsFi": "",
+                    "reservationPendingInstructionsSv": "",
+                    "reservationStartInterval": "INTERVAL_30_MINS",
+                    "reservationUnitType": {"nameFi": "test type fi"},
+                    "reservations": [],
+                    "reservationsMaxDaysBefore": 360,
+                    "reservationsMinDaysBefore": 1,
+                    "resources": [],
+                    "services": [{"bufferTimeAfter": 1800, "bufferTimeBefore": 900, "nameFi": "Test Service"}],
+                    "spaces": [{"nameFi": "Large space"}, {"nameFi": "Small space"}],
+                    "state": "SCHEDULED_HIDING",
+                    "surfaceArea": 150,
+                    "termsOfUseFi": None,
+                }
+            }
+        ]
 
     def test_should_not_return_archived_reservation_units(self):
         ReservationUnitFactory(
@@ -189,7 +257,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"isArchived": False, "nameFi": "test name fi"}}
+        ]
 
     def test_should_be_able_to_find_by_pk(self):
         response = self.query(
@@ -228,7 +298,10 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnitByPk") == {
+            "haukiUrl": {"url": None},
+            "nameFi": "test name fi",
+        }
 
     def test_hauki_url_for_admin(self):
         self.reservation_unit.unit.tprek_department_id = "ORGANISATION"
@@ -245,7 +318,20 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnitByPk") == {
+            "haukiUrl": {
+                "url": "https://test.com/resource/origin%3A3774af34-9916-40f2-acc7-68db5a627710/"
+                "?hsa_source=origin"
+                "&hsa_username=amin.general%40foo.com"
+                "&hsa_organization=tprek%3AORGANISATION"
+                "&hsa_created_at=2021-05-03T03%3A00%3A00%2B03%3A00"
+                "&hsa_valid_until=2021-05-03T03%3A30%3A00%2B03%3A00"
+                "&hsa_resource=origin%3A3774af34-9916-40f2-acc7-68db5a627710"
+                "&hsa_has_organization_rights=true"
+                "&hsa_signature=ed303be8a365c5f7c13b69135f5306a288103373a6b6932512f352db9daffb42"
+            },
+            "nameFi": "test name fi",
+        }
 
     def test_hauki_url_for_unit_manager(self):
         self.reservation_unit.unit.tprek_department_id = "ORGANISATION"
@@ -270,7 +356,20 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnitByPk") == {
+            "haukiUrl": {
+                "url": "https://test.com/resource/origin%3A3774af34-9916-40f2-acc7-68db5a627710/"
+                "?hsa_source=origin"
+                "&hsa_username=unit.admin%40foo.com"
+                "&hsa_organization=tprek%3AORGANISATION"
+                "&hsa_created_at=2021-05-03T03%3A00%3A00%2B03%3A00"
+                "&hsa_valid_until=2021-05-03T03%3A30%3A00%2B03%3A00"
+                "&hsa_resource=origin%3A3774af34-9916-40f2-acc7-68db5a627710"
+                "&hsa_has_organization_rights=true"
+                "&hsa_signature=8b9a2bb12d735b498c5b3e2fccb6c56c0fa3d4ef30a891f12f2c2991be7e1432"
+            },
+            "nameFi": "test name fi",
+        }
 
     def test_should_error_when_not_found_by_pk(self):
         response = self.query(
@@ -337,7 +436,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "test name fi", "unit": {"nameFi": "test unit fi"}}}
+        ]
 
     def test_filtering_by_multiple_units(self):
         ReservationUnitFactory(unit=UnitFactory())  # should be excluded
@@ -352,7 +453,10 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "test name fi", "unit": {"nameFi": "test unit fi"}}},
+            {"node": {"nameFi": "Other reservation unit", "unit": {"nameFi": "Other unit"}}},
+        ]
 
     def test_filtering_by_multiple_application_round(self):
         res_unit = ReservationUnitFactory(name_fi="Reservation unit")
@@ -369,7 +473,10 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "Reservation unit"}},
+            {"node": {"nameFi": "The Other reservation unit"}},
+        ]
 
     def test_filtering_by_type(self):
         response = self.query(
@@ -381,7 +488,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "test name fi", "reservationUnitType": {"nameFi": "test type fi"}}}
+        ]
 
     def test_filtering_by_multiple_types(self):
         ReservationUnitFactory(unit=UnitFactory())  # should be excluded
@@ -401,7 +510,10 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "test name fi", "reservationUnitType": {"nameFi": "test type fi"}}},
+            {"node": {"nameFi": "Other reservation unit", "reservationUnitType": {"nameFi": "Other type"}}},
+        ]
 
     def test_filtering_by_purpose(self):
         purpose = PurposeFactory(name="Test purpose")
@@ -415,7 +527,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "test name fi", "purposes": [{"nameFi": "Test purpose"}]}}
+        ]
 
     def test_filtering_by_multiple_purposes(self):
         excluded = ReservationUnitFactory()  # should be excluded
@@ -432,7 +546,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "test name fi", "purposes": [{"nameFi": "Test purpose"}]}}
+        ]
 
     def test_filtering_by_qualifier(self):
         qualifier = QualifierFactory(name="Filter test qualifier")
@@ -446,7 +562,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "test name fi", "qualifiers": [{"nameFi": "Filter test qualifier"}]}}
+        ]
 
     def test_filtering_by_multiple_qualifiers(self):
         excluded = ReservationUnitFactory()  # should be excluded
@@ -469,7 +587,10 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "test name fi", "qualifiers": [{"nameFi": "Filter test qualifier"}]}},
+            {"node": {"nameFi": "Other reservation unit", "qualifiers": [{"nameFi": "Other filter test qualifier"}]}},
+        ]
 
     def test_filtering_by_max_persons_gte_within_limit(self):
         response = self.query(
@@ -481,7 +602,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"maxPersons": 200, "nameFi": "test name fi"}}
+        ]
 
     def test_filtering_by_max_persons_gte_outside_limit(self):
         response = self.query(
@@ -493,7 +616,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == []
 
     def test_filtering_by_max_persons_gte_not_set(self):
         self.reservation_unit.max_persons = None
@@ -507,7 +630,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"maxPersons": None, "nameFi": "test name fi"}}
+        ]
 
     def test_filtering_by_max_persons_lte_within_limit(self):
         response = self.query(
@@ -519,7 +644,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"maxPersons": 200, "nameFi": "test name fi"}}
+        ]
 
     def test_filtering_by_max_persons_lte_outside_limit(self):
         response = self.query(
@@ -531,7 +658,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == []
 
     def test_filtering_by_max_persons_lte_not_set(self):
         self.reservation_unit.max_persons = None
@@ -545,7 +672,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"maxPersons": None, "nameFi": "test name fi"}}
+        ]
 
     def test_filtering_by_min_persons_gte_within_limit(self):
         response = self.query(
@@ -557,7 +686,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"minPersons": 10, "nameFi": "test name fi"}}
+        ]
 
     def test_filtering_by_min_persons_gte_outside_limit(self):
         response = self.query(
@@ -569,7 +700,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == []
 
     def test_filtering_by_min_persons_gte_not_set(self):
         self.reservation_unit.min_persons = None
@@ -583,7 +714,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"minPersons": None, "nameFi": "test name fi"}}
+        ]
 
     def test_filtering_by_min_persons_lte_within_limit(self):
         response = self.query(
@@ -595,7 +728,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"minPersons": 10, "nameFi": "test name fi"}}
+        ]
 
     def test_filtering_by_min_persons_lte_outside_limit(self):
         response = self.query(
@@ -607,7 +742,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == []
 
     def test_filtering_by_min_persons_lte_not_set(self):
         self.reservation_unit.min_persons = None
@@ -621,7 +756,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"minPersons": None, "nameFi": "test name fi"}}
+        ]
 
     def test_filtering_by_keyword_group(self):
         category = KeywordCategoryFactory()
@@ -637,7 +774,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"keywordGroups": [{"nameFi": "Sports"}], "nameFi": "test name fi"}}
+        ]
 
     def test_filtering_by_multiple_keyword_groups(self):
         category = KeywordCategoryFactory()
@@ -655,7 +794,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"keywordGroups": [{"nameFi": "Test group"}], "nameFi": "test name fi"}}
+        ]
 
     def test_filtering_by_name_fi(self):
         ReservationUnit.objects.exclude(id=self.reservation_unit.id).delete()
@@ -669,7 +810,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [{"node": {"nameFi": "show only me"}}]
 
     def test_filtering_by_surface_area(self):
         ReservationUnit.objects.exclude(id=self.reservation_unit.id).delete()
@@ -688,7 +829,11 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"surfaceArea": 120}},
+            {"node": {"surfaceArea": 90}},
+            {"node": {"surfaceArea": 60}},
+        ]
 
     def test_filtering_by_rank(self):
         ReservationUnit.objects.exclude(id=self.reservation_unit.id).delete()
@@ -706,7 +851,11 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         )
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"rank": 2}},
+            {"node": {"rank": 3}},
+            {"node": {"rank": 4}},
+        ]
 
     def test_filtering_by_type_rank(self):
         ReservationUnit.objects.exclude(id=self.reservation_unit.id).delete()
@@ -729,7 +878,11 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         )
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "Rank 2", "reservationUnitType": {"rank": 2}}},
+            {"node": {"nameFi": "Rank 3", "reservationUnitType": {"rank": 3}}},
+            {"node": {"nameFi": "Rank 4", "reservationUnitType": {"rank": 4}}},
+        ]
 
     def test_filtering_by_reservation_timestamps(self):
         now = datetime.datetime.now(DEFAULT_TIMEZONE)
@@ -756,7 +909,16 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {
+                "node": {
+                    "nameFi": "test name fi",
+                    "reservations": [
+                        {"begin": "2021-05-03T00:00:00+00:00", "end": "2021-05-03T01:00:00+00:00", "state": "CREATED"}
+                    ],
+                }
+            }
+        ]
 
     def test_filtering_by_reservation_state(self):
         now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
@@ -783,7 +945,16 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {
+                "node": {
+                    "nameFi": "test name fi",
+                    "reservations": [
+                        {"begin": "2021-05-03T00:00:00+00:00", "end": "2021-05-03T01:00:00+00:00", "state": "CREATED"}
+                    ],
+                }
+            }
+        ]
 
     def test_filtering_by_multiple_reservation_states(self):
         now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
@@ -811,7 +982,21 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {
+                "node": {
+                    "nameFi": "test name fi",
+                    "reservations": [
+                        {"begin": "2021-05-03T00:00:00+00:00", "end": "2021-05-03T01:00:00+00:00", "state": "CREATED"},
+                        {
+                            "begin": "2021-05-03T01:00:00+00:00",
+                            "end": "2021-05-03T02:00:00+00:00",
+                            "state": "CONFIRMED",
+                        },
+                    ],
+                }
+            }
+        ]
 
     def test_filtering_by_active_application_rounds(self):
         now = datetime.datetime.now().astimezone()
@@ -836,7 +1021,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"applicationRounds": [{"nameFi": "Test Round"}]}}
+        ]
 
     def test_filtering_by_is_draft_true(self):
         ReservationUnitFactory(name="Draft reservation unit", is_draft=True)
@@ -849,7 +1036,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"isDraft": True, "nameFi": "Draft reservation unit"}}
+        ]
 
     def test_filtering_by_is_draft_false(self):
         response = self.query(
@@ -861,7 +1050,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"isDraft": False, "nameFi": "test name fi"}}
+        ]
 
     def test_filtering_by_is_visible_true(self):
         today = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
@@ -913,7 +1104,25 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {
+                "node": {
+                    "nameFi": "test name fi",
+                    "publishBegins": "2021-05-03T00:00:00+00:00",
+                    "publishEnds": "2021-05-10T00:00:00+00:00",
+                }
+            },
+            {"node": {"nameFi": "show me", "publishBegins": None, "publishEnds": None}},
+            {
+                "node": {
+                    "nameFi": "show me too!",
+                    "publishBegins": "2021-04-28T00:00:00+00:00",
+                    "publishEnds": "2021-05-13T00:00:00+00:00",
+                }
+            },
+            {"node": {"nameFi": "Take me in!", "publishBegins": "2021-04-28T00:00:00+00:00", "publishEnds": None}},
+            {"node": {"nameFi": "Take me in too!", "publishBegins": None, "publishEnds": "2021-05-08T00:00:00+00:00"}},
+        ]
 
     def test_filtering_by_is_visible_false(self):
         # No publish time shouldn't include
@@ -927,7 +1136,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == []
 
     def test_filtering_by_reservation_kind_direct(self):
         ReservationUnitFactory(reservation_kind=ReservationKind.DIRECT, name_fi="show me")
@@ -942,7 +1151,11 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "test name fi"}},
+            {"node": {"nameFi": "show me"}},
+            {"node": {"nameFi": "show me as well"}},
+        ]
 
     def test_filtering_by_reservation_kind_season(self):
         ReservationUnitFactory(reservation_kind=ReservationKind.SEASON, name_fi="show me")
@@ -957,7 +1170,11 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "test name fi"}},
+            {"node": {"nameFi": "show me"}},
+            {"node": {"nameFi": "show me as well"}},
+        ]
 
     def test_order_by_name_fi(self):
         ReservationUnitFactory(name="name_fi", name_fi="name_fi")
@@ -970,7 +1187,10 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "name_fi"}},
+            {"node": {"nameFi": "test name fi"}},
+        ]
 
     def test_order_by_name_en(self):
         ReservationUnitFactory(name="name_en", name_en="name_en")
@@ -983,7 +1203,10 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameEn": "name_en"}},
+            {"node": {"nameEn": "test name en"}},
+        ]
 
     def test_order_by_name_sv(self):
         ReservationUnitFactory(name="name_sv", name_sv="name_sv")
@@ -996,7 +1219,10 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameSv": "name_sv"}},
+            {"node": {"nameSv": "test name sv"}},
+        ]
 
     def test_order_by_type_fi(self):
         res_type = ReservationUnitTypeFactory(name="name_fi", name_fi="name_fi")
@@ -1010,7 +1236,10 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"reservationUnitType": {"nameFi": "name_fi"}}},
+            {"node": {"reservationUnitType": {"nameFi": "test type fi"}}},
+        ]
 
     def test_order_by_type_en(self):
         res_type = ReservationUnitTypeFactory(name="name_en", name_fi="name_en")
@@ -1024,7 +1253,10 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"reservationUnitType": {"nameEn": "test type en"}}},
+            {"node": {"reservationUnitType": {"nameEn": None}}},
+        ]
 
     def test_order_by_type_sv(self):
         res_type = ReservationUnitTypeFactory(name="name_sv", name_fi="name_sv")
@@ -1038,7 +1270,10 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"reservationUnitType": {"nameSv": "test type sv"}}},
+            {"node": {"reservationUnitType": {"nameSv": None}}},
+        ]
 
     def test_order_by_unit(self):
         ReservationUnit.objects.exclude(id=self.reservation_unit.id).delete()
@@ -1057,7 +1292,14 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"unit": {"nameEn": "_", "nameFi": "1", "nameSv": "_"}}},
+            {"node": {"unit": {"nameEn": "_", "nameFi": "2", "nameSv": "1"}}},
+            {"node": {"unit": {"nameEn": "_", "nameFi": "2", "nameSv": "2"}}},
+            {"node": {"unit": {"nameEn": "1", "nameFi": "3", "nameSv": "_"}}},
+            {"node": {"unit": {"nameEn": "2", "nameFi": "3", "nameSv": "_"}}},
+            {"node": {"unit": {"nameEn": "test unit en", "nameFi": "test unit fi", "nameSv": "test unit sv"}}},
+        ]
 
     def test_order_by_unit_reverse_order(self):
         ReservationUnit.objects.exclude(id=self.reservation_unit.id).delete()
@@ -1076,7 +1318,14 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"unit": {"nameEn": "test unit en", "nameFi": "test unit fi", "nameSv": "test unit sv"}}},
+            {"node": {"unit": {"nameEn": "2", "nameFi": "3", "nameSv": "_"}}},
+            {"node": {"unit": {"nameEn": "1", "nameFi": "3", "nameSv": "_"}}},
+            {"node": {"unit": {"nameEn": "_", "nameFi": "2", "nameSv": "2"}}},
+            {"node": {"unit": {"nameEn": "_", "nameFi": "2", "nameSv": "1"}}},
+            {"node": {"unit": {"nameEn": "_", "nameFi": "1", "nameSv": "_"}}},
+        ]
 
     def test_order_by_max_persons(self):
         ReservationUnit.objects.exclude(id=self.reservation_unit.id).delete()
@@ -1095,7 +1344,14 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"maxPersons": 1}},
+            {"node": {"maxPersons": 2}},
+            {"node": {"maxPersons": 3}},
+            {"node": {"maxPersons": 4}},
+            {"node": {"maxPersons": 5}},
+            {"node": {"maxPersons": 200}},
+        ]
 
     def test_order_by_max_persons_reverse_order(self):
         ReservationUnit.objects.exclude(id=self.reservation_unit.id).delete()
@@ -1114,7 +1370,14 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"maxPersons": 200}},
+            {"node": {"maxPersons": 5}},
+            {"node": {"maxPersons": 4}},
+            {"node": {"maxPersons": 3}},
+            {"node": {"maxPersons": 2}},
+            {"node": {"maxPersons": 1}},
+        ]
 
     def test_order_by_surface_area(self):
         ReservationUnit.objects.exclude(id=self.reservation_unit.id).delete()
@@ -1133,7 +1396,14 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"surfaceArea": 1}},
+            {"node": {"surfaceArea": 2}},
+            {"node": {"surfaceArea": 3}},
+            {"node": {"surfaceArea": 4}},
+            {"node": {"surfaceArea": 5}},
+            {"node": {"surfaceArea": 150.0}},
+        ]
 
     def test_order_by_surface_area_reverse_order(self):
         ReservationUnit.objects.exclude(id=self.reservation_unit.id).delete()
@@ -1152,7 +1422,14 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"surfaceArea": 150}},
+            {"node": {"surfaceArea": 5}},
+            {"node": {"surfaceArea": 4}},
+            {"node": {"surfaceArea": 3}},
+            {"node": {"surfaceArea": 2}},
+            {"node": {"surfaceArea": 1}},
+        ]
 
     def test_order_by_name_and_unit_name(self):
         ReservationUnit.objects.exclude(id=self.reservation_unit.id).delete()
@@ -1171,7 +1448,14 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "a", "unit": {"nameFi": "2"}}},
+            {"node": {"nameFi": "a", "unit": {"nameFi": "3"}}},
+            {"node": {"nameFi": "b", "unit": {"nameFi": "1"}}},
+            {"node": {"nameFi": "b", "unit": {"nameFi": "2"}}},
+            {"node": {"nameFi": "b", "unit": {"nameFi": "3"}}},
+            {"node": {"nameFi": "test name fi", "unit": {"nameFi": "test unit fi"}}},
+        ]
 
     def test_order_by_name_and_unit_name_reversed(self):
         ReservationUnit.objects.exclude(id=self.reservation_unit.id).delete()
@@ -1190,7 +1474,14 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "test name fi", "unit": {"nameFi": "test unit fi"}}},
+            {"node": {"nameFi": "b", "unit": {"nameFi": "3"}}},
+            {"node": {"nameFi": "b", "unit": {"nameFi": "2"}}},
+            {"node": {"nameFi": "b", "unit": {"nameFi": "1"}}},
+            {"node": {"nameFi": "a", "unit": {"nameFi": "3"}}},
+            {"node": {"nameFi": "a", "unit": {"nameFi": "2"}}},
+        ]
 
     def test_order_by_rank(self):
         ReservationUnit.objects.exclude(id=self.reservation_unit.id).delete()
@@ -1210,7 +1501,14 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"rank": 1}},
+            {"node": {"rank": 2}},
+            {"node": {"rank": 3}},
+            {"node": {"rank": 4}},
+            {"node": {"rank": 5}},
+            {"node": {"rank": None}},
+        ]
 
     def test_order_by_type_rank(self):
         ReservationUnit.objects.exclude(id=self.reservation_unit.id).delete()
@@ -1234,7 +1532,14 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         )
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"reservationUnitType": {"rank": 1}}},
+            {"node": {"reservationUnitType": {"rank": 2}}},
+            {"node": {"reservationUnitType": {"rank": 3}}},
+            {"node": {"reservationUnitType": {"rank": 4}}},
+            {"node": {"reservationUnitType": {"rank": 5}}},
+            {"node": {"reservationUnitType": {"rank": None}}},
+        ]
 
     def test_getting_manually_given_surface_area(self):
         self.reservation_unit.surface_area = 500
@@ -1248,7 +1553,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [{"node": {"surfaceArea": 500}}]
 
     def test_getting_terms(self):
         self.reservation_unit.payment_terms = TermsOfUseFactory(
@@ -1269,7 +1574,15 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {
+                "node": {
+                    "cancellationTerms": {"textFi": "Cancellation terms"},
+                    "paymentTerms": {"textFi": "Payment terms"},
+                    "serviceSpecificTerms": {"textFi": "Service-specific terms"},
+                }
+            }
+        ]
 
     def test_filter_by_pk_single_value(self):
         response = self.query(
@@ -1282,7 +1595,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [{"node": {"nameFi": "test name fi"}}]
 
     def test_filter_by_pk_multiple_values(self):
         second_reservation_unit = ReservationUnitFactory(name_fi="Second unit")
@@ -1296,7 +1609,10 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "test name fi"}},
+            {"node": {"nameFi": "Second unit"}},
+        ]
 
     def test_that_state_is_draft(self):
         self.reservation_unit.name = "This should be draft"
@@ -1312,7 +1628,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "This should be draft", "state": "DRAFT"}}
+        ]
 
     def test_that_state_is_scheduled_publishing(self):
         now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
@@ -1332,7 +1650,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "This should be scheduled publishing", "state": "SCHEDULED_PUBLISHING"}}
+        ]
 
     def test_that_state_is_scheduled_hiding(self):
         now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
@@ -1352,7 +1672,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "This should be scheduled hiding", "state": "SCHEDULED_HIDING"}}
+        ]
 
     def test_that_state_is_hidden(self):
         now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
@@ -1372,7 +1694,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "This should be state hidden", "state": "HIDDEN"}}
+        ]
 
     def test_that_state_is_scheduled_period(self):
         now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
@@ -1392,7 +1716,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "This should be scheduled period", "state": "SCHEDULED_PERIOD"}}
+        ]
 
     def test_that_state_is_published(self):
         self.reservation_unit.name = "This should be published"
@@ -1413,7 +1739,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "This should be published", "state": "PUBLISHED"}}
+        ]
 
     def test_filter_only_with_permission_unit_admin(self):
         unit = UnitFactory()
@@ -1452,7 +1780,10 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "I'm in result since i'm in the group"}},
+            {"node": {"nameFi": "I should be in the result"}},
+        ]
 
     def test_filter_only_with_permission_service_sector_admin(self):
         service_sector = ServiceSectorFactory()
@@ -1490,7 +1821,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "I should be in the result"}}
+        ]
 
     def test_filter_only_with_permission_general_admin_admin(self):
         ReservationUnitFactory(name_fi="I'm in the results with the other one too.")
@@ -1505,7 +1838,10 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "test name fi"}},
+            {"node": {"nameFi": "I'm in the results with the other one too."}},
+        ]
 
     def test_other_reservations_does_not_show_sensitive_information(self):
         self.client.force_login(self.regular_joe)
@@ -1575,7 +1911,40 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {
+                "node": {
+                    "reservations": [
+                        {
+                            "billingAddressCity": None,
+                            "billingAddressStreet": None,
+                            "billingAddressZip": None,
+                            "billingEmail": None,
+                            "billingFirstName": None,
+                            "billingLastName": None,
+                            "billingPhone": None,
+                            "cancelDetails": None,
+                            "cancelReason": None,
+                            "denyReason": None,
+                            "description": None,
+                            "freeOfChargeReason": None,
+                            "handlingDetails": "",
+                            "reserveeAddressCity": None,
+                            "reserveeAddressStreet": None,
+                            "reserveeAddressZip": None,
+                            "reserveeEmail": None,
+                            "reserveeFirstName": None,
+                            "reserveeId": None,
+                            "reserveeLastName": None,
+                            "reserveeOrganisationName": None,
+                            "reserveePhone": None,
+                            "user": None,
+                            "workingMemo": None,
+                        }
+                    ]
+                }
+            }
+        ]
 
     @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
     def test_admin_sees_reservations_sensitive_information(self):
@@ -1646,7 +2015,40 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {
+                "node": {
+                    "reservations": [
+                        {
+                            "billingAddressCity": "city",
+                            "billingAddressStreet": "addr",
+                            "billingAddressZip": "zip",
+                            "billingEmail": "email",
+                            "billingFirstName": "Joe",
+                            "billingLastName": "Reggie",
+                            "billingPhone": "phone",
+                            "cancelDetails": "cancdetails",
+                            "cancelReason": {"reason": "secret"},
+                            "denyReason": {"reason": "secret"},
+                            "description": "description",
+                            "freeOfChargeReason": "reason",
+                            "handlingDetails": "Handling details",
+                            "reserveeAddressCity": "city",
+                            "reserveeAddressStreet": "address",
+                            "reserveeAddressZip": "zip",
+                            "reserveeEmail": "email@localhost",
+                            "reserveeFirstName": "Joe",
+                            "reserveeId": "residee",
+                            "reserveeLastName": "Reggie",
+                            "reserveeOrganisationName": "org name",
+                            "reserveePhone": "123435",
+                            "user": {"dateOfBirth": "2020-01-01"},
+                            "workingMemo": "Working this memo",
+                        }
+                    ]
+                }
+            }
+        ]
         assert PersonalInfoViewLog.objects.all().count() == 1
 
     @mock.patch("reservation_units.tasks.create_product", return_value=mock_create_product())
@@ -1665,7 +2067,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "test name fi", "paymentMerchant": {"name": "Test Merchant"}}}
+        ]
 
     @mock.patch("reservation_units.tasks.create_product", return_value=mock_create_product())
     def test_show_payment_merchant_from_unit(self, mock_create_product):
@@ -1682,7 +2086,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "test name fi", "paymentMerchant": {"name": "Test Merchant"}}}
+        ]
 
     @mock.patch("reservation_units.tasks.create_product", return_value=mock_create_product())
     def test_hide_payment_merchant_without_permissions(self, mock_product):
@@ -1698,7 +2104,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "test name fi", "paymentMerchant": None}}
+        ]
 
     def test_by_pk_has_reservations(self):
         now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
@@ -1725,7 +2133,12 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnitByPk") == {
+            "nameFi": "test name fi",
+            "reservations": [
+                {"begin": "2021-05-03T00:00:00+00:00", "end": "2021-05-03T01:00:00+00:00", "state": "CREATED"}
+            ],
+        }
 
     @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
     @mock.patch("reservation_units.tasks.create_product", return_value=mock_create_product())
@@ -1747,7 +2160,17 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {
+                "node": {
+                    "nameFi": "test name fi",
+                    "paymentProduct": {
+                        "merchantPk": "3828ac38-3e26-4501-8556-ba2ea3442627",
+                        "pk": "1018cabd-d693-41c1-8ddc-dc5c08829048",
+                    },
+                }
+            }
+        ]
 
     @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
     @mock.patch("reservation_units.tasks.create_product", return_value=mock_create_product())
@@ -1767,4 +2190,6 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
-        self.assertMatchSnapshot(content)
+        assert content.get("data").get("reservationUnits").get("edges") == [
+            {"node": {"nameFi": "test name fi", "paymentProduct": None}}
+        ]
