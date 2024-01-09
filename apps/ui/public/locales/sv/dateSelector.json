@@ -7,8 +7,12 @@
   "infoDate": "dd.mm.åååå",
   "labelEndDate": "Slutdatum",
   "labelStartDate": "Startdatum",
-  "errorEndDateBeforeStartDate": "Startdatumet måste vara före slutdatumet",
-  "errorDateFormat": "Datumet måste vara i formatet dd.mm.åååå",
+  "errors": {
+    "endDateBeforeStartDate": "Startdatumet måste vara före slutdatumet",
+    "dateInvalid": "Datumet måste vara i formatet dd.mm.åååå",
+    "dateIsTooSmall": "Datumet måste vara efter {{minDate}}",
+    "dateIsTooBig": "Datumet måste vara före {{maxDate}}"
+  },
   "menu": {
     "buttonBack": "Tillbaka",
     "buttonClose": "Stäng",

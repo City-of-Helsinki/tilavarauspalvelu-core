@@ -202,6 +202,7 @@ const DateSelectorMenu = ({
             onChangeEndDate={onChangeEndDate}
             onChangeStartDate={onChangeStartDate}
             startDate={startDate}
+            required={{ begin: true, end: true }}
           />
         </CustomDateWrapper>
       )}

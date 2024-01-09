@@ -8,7 +8,7 @@ import { sortBy } from "lodash";
 import { OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
 import { Query, QueryUnitsArgs } from "common/types/gql-types";
-import { addYears } from "date-fns";
+import { addYears, startOfDay } from "date-fns";
 import { ShowAllContainer } from "common/src/components";
 import { TextInput, TimeRangePicker } from "common/src/components/form";
 import { toUIDate } from "common/src/common/util";
@@ -453,15 +453,14 @@ const SearchForm = ({
                 begin: t("searchForm:dateFilter"),
                 end: " ",
               }}
-              required={{ begin: false, end: false }}
               placeholder={{
                 begin: t("common:beginLabel"),
                 end: t("common:endLabel"),
               }}
               limits={{
-                startMinDate: new Date(),
+                startMinDate: startOfDay(new Date()),
                 startMaxDate: addYears(new Date(), 2),
-                endMinDate: new Date(),
+                endMinDate: startOfDay(new Date()),
                 endMaxDate: addYears(new Date(), 2),
               }}
             />

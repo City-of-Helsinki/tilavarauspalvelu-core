@@ -7,8 +7,12 @@
   "infoDate": "dd.mm.yyyy",
   "labelEndDate": "End date",
   "labelStartDate": "Start date",
-  "errorEndDateBeforeStartDate": "End date must be after start date",
-  "errorDateFormat": "The date must be in the format dd.mm.yyyy",
+  "errors": {
+    "endDateBeforeStartDate": "End date must be after start date",
+    "dateInvalid": "The date must be in the format dd.mm.yyyy",
+    "dateIsTooSmall": "The date must be after {{minDate}}",
+    "dateIsTooBig": "The date must be before {{maxDate}}"
+  },
   "menu": {
     "buttonBack": "Back",
     "buttonClose": "Close",

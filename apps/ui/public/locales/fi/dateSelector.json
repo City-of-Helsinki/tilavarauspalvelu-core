@@ -7,8 +7,12 @@
   "infoDate": "pp.kk.vvvv",
   "labelEndDate": "Loppumispäivä",
   "labelStartDate": "Alkamispäivä",
-  "errorEndDateBeforeStartDate": "Alkamispäivän on oltava ennen loppumispäivää",
-  "errorDateFormat": "Päivämäärän on oltava muotoa pp.kk.vvvv",
+  "errors": {
+    "endDateBeforeStartDate": "Alkamispäivän on oltava ennen loppumispäivää",
+    "dateInvalid": "Päivämäärän on oltava muotoa pp.kk.vvvv",
+    "dateIsTooSmall": "Päivämäärän on oltava jälkeen {{minDate}}",
+    "dateIsTooBig": "Päivämäärän on oltava ennen {{maxDate}}"
+  },
   "menu": {
     "buttonBack": "Takaisin",
     "buttonClose": "Sulje",
