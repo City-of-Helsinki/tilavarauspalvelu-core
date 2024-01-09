@@ -171,8 +171,8 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
 
         # Time inputs are interpreted as local time even if they have timezone information.
         # This is because we cannot know whether the time might be daylight saving time or not.
-        # Still, we remove any timezone information from the time input, so that time comparisons work correctly.
-        # (See. TODO)
+        # Still, we remove any timezone information from the time input and add it back when we need it.
+        # (See. `tests.test_utils.test_date_util.test_compare_times`)
         if filter_time_start is not None:
             filter_time_start = filter_time_start.replace(tzinfo=None)
         if filter_time_end is not None:
