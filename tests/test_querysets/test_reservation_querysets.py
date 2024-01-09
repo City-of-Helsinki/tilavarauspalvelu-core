@@ -3,7 +3,7 @@ from datetime import UTC, datetime
 import pytest
 from django.utils.timezone import get_current_timezone
 
-from opening_hours.utils.reservable_time_span_client import TimeSpanElement
+from opening_hours.utils.time_span_element import TimeSpanElement
 from reservation_units.models import ReservationUnit
 from reservations.choices import ReservationStateChoice
 from reservations.models import Reservation

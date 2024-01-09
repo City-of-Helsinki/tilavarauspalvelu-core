@@ -19,9 +19,9 @@ from opening_hours.utils.hauki_api_types import (
 )
 from opening_hours.utils.reservable_time_span_client import (
     ReservableTimeSpanClient,
-    TimeSpanElement,
     override_reservable_with_closed_time_spans,
 )
+from opening_hours.utils.time_span_element import TimeSpanElement
 from tests.helpers import patch_method
 
 # Applied to all tests
