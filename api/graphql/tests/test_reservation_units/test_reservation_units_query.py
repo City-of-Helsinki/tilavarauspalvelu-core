@@ -47,7 +47,7 @@ from tests.factories import (
 )
 from users.models import PersonalInfoViewLog
 
-TIMEZONE = get_default_timezone()
+DEFAULT_TIMEZONE = get_default_timezone()
 
 
 @freeze_time("2021-05-03")
@@ -332,26 +332,26 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         ReservationFactory(
             name="Hide me",
             reservation_unit=[self.reservation_unit],
-            begin=datetime.datetime(2023, 1, 1, 15, 0, 0, tzinfo=TIMEZONE),
-            end=datetime.datetime(2023, 1, 1, 16, 0, 0, tzinfo=TIMEZONE),
+            begin=datetime.datetime(2023, 1, 1, 15, 0, 0, tzinfo=DEFAULT_TIMEZONE),
+            end=datetime.datetime(2023, 1, 1, 16, 0, 0, tzinfo=DEFAULT_TIMEZONE),
         )
         ReservationFactory(
             name="Show me",
             reservation_unit=[self.reservation_unit],
-            begin=datetime.datetime(2023, 1, 2, 0, 0, 0, tzinfo=TIMEZONE),
-            end=datetime.datetime(2023, 1, 2, 1, 0, 0, tzinfo=TIMEZONE),
+            begin=datetime.datetime(2023, 1, 2, 0, 0, 0, tzinfo=DEFAULT_TIMEZONE),
+            end=datetime.datetime(2023, 1, 2, 1, 0, 0, tzinfo=DEFAULT_TIMEZONE),
         )
         ReservationFactory(
             name="Show me too",
             reservation_unit=[self.reservation_unit],
-            begin=datetime.datetime(2023, 1, 3, 23, 00, 00, tzinfo=TIMEZONE),
-            end=datetime.datetime(2023, 1, 3, 23, 59, 59, tzinfo=TIMEZONE),
+            begin=datetime.datetime(2023, 1, 3, 23, 00, 00, tzinfo=DEFAULT_TIMEZONE),
+            end=datetime.datetime(2023, 1, 3, 23, 59, 59, tzinfo=DEFAULT_TIMEZONE),
         )
         ReservationFactory(
             name="Hide me too",
             reservation_unit=[self.reservation_unit],
-            begin=datetime.datetime(2023, 1, 4, 0, 0, 0, tzinfo=TIMEZONE),
-            end=datetime.datetime(2023, 1, 4, 1, 0, 0, tzinfo=TIMEZONE),
+            begin=datetime.datetime(2023, 1, 4, 0, 0, 0, tzinfo=DEFAULT_TIMEZONE),
+            end=datetime.datetime(2023, 1, 4, 1, 0, 0, tzinfo=DEFAULT_TIMEZONE),
         )
         self.client.force_login(self.general_admin)
         response = self.query(
@@ -979,7 +979,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_reservation_timestamps(self):
-        now = datetime.datetime.now(TIMEZONE)
+        now = datetime.datetime.now(DEFAULT_TIMEZONE)
         one_hour = datetime.timedelta(hours=1)
         matching_reservation = ReservationFactory(
             begin=now,
@@ -1020,7 +1020,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
 
     def test_filtering_by_reservation_state(self):
         self.maxDiff = None
-        now = datetime.datetime.now(tz=TIMEZONE)
+        now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
         one_hour = datetime.timedelta(hours=1)
         matching_reservation = ReservationFactory(
             begin=now,
@@ -1060,7 +1060,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_multiple_reservation_states(self):
-        now = datetime.datetime.now(tz=TIMEZONE)
+        now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
         one_hour = datetime.timedelta(hours=1)
         two_hours = datetime.timedelta(hours=2)
         matching_reservations = [
@@ -1179,7 +1179,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_filtering_by_is_visible_true(self):
-        today = datetime.datetime.now(tz=TIMEZONE)
+        today = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
         # No publish times should be included in results.
         ReservationUnitFactory(name_fi="show me")
 
@@ -1839,7 +1839,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_that_state_is_scheduled_publishing(self):
-        now = datetime.datetime.now(tz=TIMEZONE)
+        now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
 
         self.reservation_unit.name = "This should be scheduled publishing"
         self.reservation_unit.is_draft = False
@@ -1867,7 +1867,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_that_state_is_scheduled_hiding(self):
-        now = datetime.datetime.now(tz=TIMEZONE)
+        now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
 
         self.reservation_unit.name = "This should be scheduled hiding"
         self.reservation_unit.is_draft = False
@@ -1895,7 +1895,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_that_state_is_hidden(self):
-        now = datetime.datetime.now(tz=TIMEZONE)
+        now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
 
         self.reservation_unit.name = "This should be state hidden"
         self.reservation_unit.is_draft = False
@@ -1923,7 +1923,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_that_state_is_scheduled_period(self):
-        now = datetime.datetime.now(tz=TIMEZONE)
+        now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
 
         self.reservation_unit.name = "This should be scheduled period"
         self.reservation_unit.is_draft = False
@@ -2339,7 +2339,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.assertMatchSnapshot(content)
 
     def test_by_pk_has_reservations(self):
-        now = datetime.datetime.now(tz=TIMEZONE)
+        now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
         one_hour = datetime.timedelta(hours=1)
         matching_reservation = ReservationFactory(
             begin=now,
@@ -2347,8 +2347,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             state=ReservationStateChoice.CREATED,
         )
         other_reservation = ReservationFactory(
-            begin=datetime.datetime(2021, 1, 1, tzinfo=TIMEZONE),
-            end=datetime.datetime(2021, 1, 2, tzinfo=TIMEZONE),
+            begin=datetime.datetime(2021, 1, 1, tzinfo=DEFAULT_TIMEZONE),
+            end=datetime.datetime(2021, 1, 2, tzinfo=DEFAULT_TIMEZONE),
         )
         self.reservation_unit.reservation_set.set([matching_reservation, other_reservation])
         self.reservation_unit.save()
