@@ -460,12 +460,8 @@ const SearchForm = ({
               }}
               limits={{
                 startMinDate: new Date(),
-                startMaxDate: getValues("endDate")
-                  ? fromUIDate(String(getValues("endDate"))) ?? undefined
-                  : undefined,
-                endMinDate: getValues("startDate")
-                  ? fromUIDate(String(getValues("startDate"))) ?? undefined
-                  : undefined,
+                startMaxDate: addYears(new Date(), 2),
+                endMinDate: new Date(),
                 endMaxDate: addYears(new Date(), 2),
               }}
             />
