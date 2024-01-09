@@ -17,7 +17,8 @@ from common.date_utils import (
     local_start_of_day,
 )
 from opening_hours.models import ReservableTimeSpan
-from opening_hours.utils.reservable_time_span_client import TimeSpanElement, override_reservable_with_closed_time_spans
+from opening_hours.utils.reservable_time_span_client import override_reservable_with_closed_time_spans
+from opening_hours.utils.time_span_element import TimeSpanElement
 
 if TYPE_CHECKING:
     from reservation_units.models import ReservationUnit

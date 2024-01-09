@@ -7,7 +7,7 @@ from django.utils.timezone import get_default_timezone
 from opening_hours.enums import HaukiResourceState
 from opening_hours.tests.test_reservable_time_spans_client import _get_date
 from opening_hours.utils.hauki_api_types import HaukiAPIOpeningHoursResponseTime
-from opening_hours.utils.reservable_time_span_client import TimeSpanElement
+from opening_hours.utils.time_span_element import TimeSpanElement
 from tests.helpers import parametrize_helper
 
 DEFAULT_TIMEZONE = get_default_timezone()

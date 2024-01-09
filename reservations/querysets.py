@@ -11,7 +11,7 @@ from applications.models import ApplicationRound
 from common.date_utils import local_datetime
 from common.db import ArrayRemove
 from merchants.models import OrderStatus
-from opening_hours.utils.reservable_time_span_client import TimeSpanElement
+from opening_hours.utils.time_span_element import TimeSpanElement
 from reservation_units.models import ReservationUnit
 from reservation_units.querysets import ReservationUnitQuerySet
 from reservations.choices import ReservationStateChoice
