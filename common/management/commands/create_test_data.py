@@ -1982,9 +1982,9 @@ def _create_applications(
 
             applicant_type, organisation = random.choice(organisations)
 
-            # 2/3 of applications have been sent
-            # For open application rounds, this means application is a draft
-            # For past application rounds, this means application is sent (and not expired)
+            # 2/3 of applications have been sent by the user
+            # For open application rounds, this means application has been received for handling (and is not a draft)
+            # For past application rounds, this means application is sent and handled (and not expired)
             sent_date: datetime | None = None
             cancelled_date: datetime | None = None
             if weighted_choice([True, False], weights=[2, 1]):
