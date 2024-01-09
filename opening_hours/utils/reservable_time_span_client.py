@@ -599,8 +599,7 @@ def override_reservable_with_closed_time_spans(
 
             # The reservable time span is fully inside the closed time span, remove it.
             if reservable_time_span.fully_inside_of(closed_time_span):
-                del reservable_time_spans[reservable_index]
-                gen.item_deleted = True
+                gen.delete_item(reservable_index)
                 continue
 
             # Closed time span is fully inside the reservable time span, split the reservable time span
@@ -662,8 +661,7 @@ def override_reservable_with_closed_time_spans(
             # If the duration of the reservable time span is negative or zero after adjustments
             # (buffered time is ignored here), remove it.
             if reservable_time_span.start_datetime >= reservable_time_span.end_datetime:
-                del reservable_time_spans[reservable_index]
-                gen.item_deleted = True
+                gen.delete_item(reservable_index)
                 continue
 
     # Sort the time spans once more to ensure they are in chronological order.

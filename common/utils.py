@@ -131,3 +131,7 @@ class with_indices(Generic[T]):  # noqa: N801, RUF100
                     next_item = self.seq[i]
                 except IndexError:  # last item was deleted, exit
                     return
+
+    def delete_item(self, i: int) -> None:
+        del self.seq[i]
+        self.item_deleted = True
