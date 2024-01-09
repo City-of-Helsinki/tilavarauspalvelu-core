@@ -1,6 +1,7 @@
 import math
 import random
 import uuid
+import zoneinfo
 from datetime import UTC, date, datetime, time, timedelta
 from decimal import Decimal
 from enum import Enum
@@ -48,6 +49,7 @@ from common.management.commands._utils import (
     with_logs,
 )
 from common.models import BannerNotification
+from opening_hours.models import OriginHaukiResource, ReservableTimeSpan
 from permissions.models import (
     GENERAL_PERMISSIONS,
     SERVICE_SECTOR_PERMISSIONS,
@@ -164,6 +166,7 @@ def create_test_data(flush: bool = True) -> None:
     qualifiers = _create_qualifiers()
     purposes = _create_purposes()
     services = _create_services()
+    hauki_resources = _create_hauki_resources()
 
     _rename_empty_units(units[-3:])  # leave few units without reservation units
 
@@ -179,6 +182,7 @@ def create_test_data(flush: bool = True) -> None:
         resources,
         services,
         spaces,
+        hauki_resources,
     )
     _create_pricings(reservation_units)
 
@@ -1243,6 +1247,98 @@ def _create_services(*, number: int = 10) -> list[Service]:
 
 
 @with_logs(
+    text_entering="Creating hauki resources...",
+    text_exiting="Hauki resources created!",
+)
+def _create_hauki_resources() -> list[OriginHaukiResource]:
+    hauki_resources: list[OriginHaukiResource] = []
+    time_options: list[list[dict[str, str]]] = [
+        [
+            {
+                "start_time": "09:00:00",
+                "end_time": "11:00:00",
+            },
+            {
+                "start_time": "12:00:00",
+                "end_time": "20:00:00",
+            },
+        ],
+        [
+            {
+                "overnight": True,
+                "start_time": "22:00:00",
+                "end_time": "03:00:00",
+            },
+        ],
+        [
+            {
+                "full_day": True,
+            },
+        ],
+        [
+            {
+                "start_time": "10:00:00",
+                "end_time": "20:00:00",
+            },
+        ],
+    ]
+
+    for i in range(len(time_options)):
+        hauki_resource = OriginHaukiResource(
+            id=i,
+            opening_hours_hash="",
+            latest_fetched_date=None,
+        )
+        hauki_resources.append(hauki_resource)
+
+    hauki_resources = OriginHaukiResource.objects.bulk_create(hauki_resources)
+
+    local_timezone = zoneinfo.ZoneInfo("Europe/Helsinki")
+    today = datetime.now(tz=local_timezone).date()
+
+    timespans: list[ReservableTimeSpan] = []
+    for i, hauki_resource in enumerate(hauki_resources):
+        for option in time_options[i]:
+            if option.get("full_day"):
+                timespans.append(
+                    ReservableTimeSpan(
+                        resource=hauki_resource,
+                        start_datetime=datetime.combine(
+                            date=today,
+                            time=time.fromisoformat("00:00:00"),
+                            tzinfo=local_timezone,
+                        ),
+                        end_datetime=datetime.combine(
+                            date=today + timedelta(days=721),
+                            time=time.fromisoformat("00:00:00"),
+                            tzinfo=local_timezone,
+                        ),
+                    ),
+                )
+                continue
+
+            timespans += [
+                ReservableTimeSpan(
+                    resource=hauki_resource,
+                    start_datetime=datetime.combine(
+                        date=today + timedelta(days=day),
+                        time=time.fromisoformat(option["start_time"]),
+                        tzinfo=local_timezone,
+                    ),
+                    end_datetime=datetime.combine(
+                        date=today + timedelta(days=day + (1 if option.get("overnight") else 0)),
+                        time=time.fromisoformat(option["end_time"]),
+                        tzinfo=local_timezone,
+                    ),
+                )
+                for day in range(721)
+            ]
+
+    ReservableTimeSpan.objects.bulk_create(timespans)
+    return hauki_resources
+
+
+@with_logs(
     text_entering="Creating reservation units...",
     text_exiting="Reservation units created!",
 )
@@ -1258,6 +1354,7 @@ def _create_reservation_units(
     resources: list[Resource],
     services: list[Service],
     spaces: list[Space],
+    hauki_resources: list[OriginHaukiResource],
     *,
     number: int = 300,
 ) -> list[ReservationUnit]:
@@ -1336,6 +1433,7 @@ def _create_reservation_units(
             name_en=f"{name} EN",
             name_fi=f"{name} FI",
             name_sv=f"{name} SV",
+            origin_hauki_resource=random.choice(hauki_resources),
             payment_terms=terms_of_use[TermsOfUse.TERMS_TYPE_PAYMENT],
             pricing_terms=terms_of_use[TermsOfUse.TERMS_TYPE_PRICING],
             rank=i,
