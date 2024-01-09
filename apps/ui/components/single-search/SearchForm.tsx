@@ -256,17 +256,23 @@ const SearchForm = ({
 }: Props): JSX.Element | null => {
   const formValueKeys = Object.keys(formValues);
   const { t } = useTranslation();
-  const { options: unitOptions, isLoading: unitsLoading } = useMappedOptions(
+  const { options: unitOptions } = useMappedOptions(
     SEARCH_FORM_PARAMS_UNIT,
     "units",
     { publishedReservationUnits: true }
   );
-  const { options: purposeOptions, isLoading: purposesLoading } =
-    useMappedOptions(SEARCH_FORM_PARAMS_PURPOSE, "purposes");
-  const { options: unitTypeOptions, isLoading: typesLoading } =
-    useMappedOptions(RESERVATION_UNIT_TYPES, "reservationUnitTypes");
-  const { options: equipmentsOptions, isLoading: equipmentsLoading } =
-    useMappedOptions(SEARCH_FORM_PARAMS_EQUIPMENT, "equipments");
+  const { options: purposeOptions } = useMappedOptions(
+    SEARCH_FORM_PARAMS_PURPOSE,
+    "purposes"
+  );
+  const { options: unitTypeOptions } = useMappedOptions(
+    RESERVATION_UNIT_TYPES,
+    "reservationUnitTypes"
+  );
+  const { options: equipmentsOptions } = useMappedOptions(
+    SEARCH_FORM_PARAMS_EQUIPMENT,
+    "equipments"
+  );
   const durationMinuteOptions = () => {
     const durations: OptionType[] = [];
     let minute = 15; // no zero duration option, as all available reservations have a positive/non-zero duration
@@ -388,9 +394,6 @@ const SearchForm = ({
     }, {});
     onSearch(searchCriteria);
   };
-
-  const areOptionsLoaded =
-    !unitsLoading && !purposesLoading && !typesLoading && !equipmentsLoading;
 
   return (
     <>
@@ -592,14 +595,12 @@ const SearchForm = ({
       </TopContainer>
 
       <BottomContainer>
-        {areOptionsLoaded && formValueKeys.length > 0 && (
-          <FilterTagList
-            formValueKeys={formValueKeys}
-            formValues={formValues}
-            removeValue={removeValue}
-            getFormSubValueLabel={getFormSubValueLabel}
-          />
-        )}
+        <FilterTagList
+          formValueKeys={formValueKeys}
+          formValues={formValues}
+          removeValue={removeValue}
+          getFormSubValueLabel={getFormSubValueLabel}
+        />
         <SubmitButton
           id="searchButton"
           onClick={handleSubmit(search) as SubmitHandler<FieldValues>}
