@@ -262,19 +262,21 @@ class TimeSpanElement:
 
         front_buffered_reservation_unit_minimum_duration_minutes = reservation_unit_minimum_duration_minutes
         back_buffered_reservation_unit_minimum_duration_minutes = reservation_unit_minimum_duration_minutes
+        buffered_reservation_unit_minimum_duration_minutes = reservation_unit_minimum_duration_minutes
         if reservation_unit.buffer_time_before is not None:
-            front_buffered_reservation_unit_minimum_duration_minutes += (
-                reservation_unit.buffer_time_before.total_seconds() / 60
-            )
+            front_buffer = reservation_unit.buffer_time_before.total_seconds() / 60
+            front_buffered_reservation_unit_minimum_duration_minutes += front_buffer
+            buffered_reservation_unit_minimum_duration_minutes += front_buffer
         if reservation_unit.buffer_time_after is not None:
-            back_buffered_reservation_unit_minimum_duration_minutes += (
-                reservation_unit.buffer_time_after.total_seconds() / 60
-            )
+            back_buffer = reservation_unit.buffer_time_after.total_seconds() / 60
+            back_buffered_reservation_unit_minimum_duration_minutes += back_buffer
+            buffered_reservation_unit_minimum_duration_minutes += back_buffer
 
         return (
             self.duration_minutes >= reservation_unit_minimum_duration_minutes
             and self.front_buffered_duration_minutes >= front_buffered_reservation_unit_minimum_duration_minutes
             and self.back_buffered_duration_minutes >= back_buffered_reservation_unit_minimum_duration_minutes
+            and self.buffered_duration_minutes >= buffered_reservation_unit_minimum_duration_minutes
         )
 
     def move_to_next_valid_start_time(self, reservation_unit: "ReservationUnit") -> None:
