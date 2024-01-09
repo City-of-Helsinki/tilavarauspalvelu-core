@@ -69,9 +69,17 @@ function MultiSelectFilter({
 
 type Props = {
   units: UnitPkName[];
+  enableWeekday?: boolean;
+  enableReservationUnit?: boolean;
+  reservationUnits?: UnitPkName[];
 };
 
-export function Filters({ units }: Props): JSX.Element {
+export function Filters({
+  units,
+  enableWeekday = false,
+  enableReservationUnit = false,
+  reservationUnits = [],
+}: Props): JSX.Element {
   const { t } = useTranslation();
 
   const unitOptions = units.map((unit) => ({
@@ -118,11 +126,27 @@ export function Filters({ units }: Props): JSX.Element {
 
   const hideSearchTags: string[] = ["tab"];
 
+  const weekdayOptions = Array.from(Array(7)).map((_, i) => ({
+    label: t(`dayLong.${i}`),
+    value: i,
+  }));
+
+  const reservationUnitOptions = reservationUnits.map((unit) => ({
+    label: unit?.nameFi ?? "",
+    value: unit?.pk ?? "",
+  }))
+
   return (
     <AutoGrid>
       <MultiSelectFilter name="unit" options={unitOptions} />
       <MultiSelectFilter name="status" options={statusOptions} />
       <MultiSelectFilter name="applicant" options={applicantOptions} />
+      {enableWeekday && (
+        <MultiSelectFilter name="weekday" options={weekdayOptions} />
+      )}
+      {enableReservationUnit && (
+        <MultiSelectFilter name="reservationUnit" options={reservationUnitOptions} />
+      )}
       <SearchInput
         // TODO can we use a common label for this?
         label={t("Allocation.filters.label.search")}

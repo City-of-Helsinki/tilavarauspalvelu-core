@@ -56,10 +56,9 @@ export function Review({ applicationRound }: ReviewProps): JSX.Element | null {
     setParams(vals);
   };
 
+  const resUnits = filterNonNullable(applicationRound?.reservationUnits?.flatMap((x) => x));
   const ds = filterNonNullable(
-    applicationRound?.reservationUnits
-      ?.flatMap((x) => x)
-      ?.map((x) => x?.unit)
+    resUnits.map((x) => x?.unit)
       .map((x) =>
         x?.pk != null && x.nameFi != null
           ? { pk: x.pk, nameFi: x.nameFi }
@@ -76,6 +75,13 @@ export function Review({ applicationRound }: ReviewProps): JSX.Element | null {
     applicationRound.applicationsCount > 0;
 
   const activeTabIndex = selectedTab === "events" ? 1 : selectedTab === "allocated" ? 2 : 0;
+
+  const reseevationUnitOptions = filterNonNullable(resUnits.map((x) => (
+    x.pk != null && x.nameFi != null ? {
+      nameFi: x.nameFi,
+      pk: x.pk,
+    } : null
+  )));
 
   return (
     <Container>
@@ -133,7 +139,11 @@ export function Review({ applicationRound }: ReviewProps): JSX.Element | null {
         </Tabs.TabPanel>
         <Tabs.TabPanel>
           <TabContent>
-            <Filters units={unitPks} />
+            <Filters units={unitPks}
+              reservationUnits={reseevationUnitOptions}
+              enableWeekday
+              enableReservationUnit
+            />
             <AllocatedEventDataLoader
               applicationRoundPk={applicationRound.pk ?? 0}
             />

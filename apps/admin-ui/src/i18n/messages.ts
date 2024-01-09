@@ -1741,13 +1741,17 @@ const translations: ITranslations = {
     ageGroup: ["Ikäryhmä"],
     placeholder: {
       unit: ["Valitse toimipiste"],
+      reservationUnit: ["Valitse varausyksikkö"],
       applicant: ["Valitse asiakastyyppi"],
       status: ["Valitse käsittelyn vaihe"],
+      weekday: ["Valitse viikonpäivä"],
     },
     label: {
       unit: ["Toimipiste"],
+      reservationUnit: ["Varausyksikkö"],
       applicant: ["Asiakastyyppi"],
       status: ["Käsittelyn vaihe"],
+      weekday: ["Viikonpäivä"],
     },
   },
   RequestedReservation: {

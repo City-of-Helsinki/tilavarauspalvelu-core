@@ -42,6 +42,7 @@ export const APPLICATION_ROUND_QUERY = gql`
           applicationsCount
           reservationUnits {
             pk
+            nameFi
             unit {
               pk
               nameFi
