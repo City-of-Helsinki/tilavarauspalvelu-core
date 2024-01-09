@@ -137,7 +137,7 @@ const DateRangePicker: FC<DateRangePickerProps> = ({
         id="start-date"
         value={internalStartDateString}
         onChange={handleStartDateChange}
-        disableConfirmation
+        // disableConfirmation: is not accessible
         helperText={
           showHelperText && !errors.startDateIsInvalid ? helperText : undefined
         }
@@ -159,7 +159,7 @@ const DateRangePicker: FC<DateRangePickerProps> = ({
         id="end-date"
         value={internalEndDateString}
         onChange={handleEndDateChange}
-        disableConfirmation
+        // disableConfirmation: is not accessible
         helperText={
           showHelperText &&
           !endDateIsBeforeStartDate &&

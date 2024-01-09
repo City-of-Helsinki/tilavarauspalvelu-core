@@ -290,7 +290,7 @@ const ApplicationEventInner = ({
       </CheckboxWrapper>
       <PeriodContainer>
         <DateInput
-          disableConfirmation
+          // disableConfirmation: is not accessible
           language={getLocalizationLang(i18n.language)}
           {...register(`applicationEvents.${index}.begin`)}
           onChange={(v) => {
@@ -315,7 +315,7 @@ const ApplicationEventInner = ({
         />
         <DateInput
           {...register(`applicationEvents.${index}.end`)}
-          disableConfirmation
+          // disableConfirmation: is not accessible
           language={getLocalizationLang(i18n.language)}
           onChange={(v) => {
             clearErrors([
