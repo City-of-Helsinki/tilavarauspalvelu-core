@@ -30,6 +30,7 @@ import ListWithPagination from "@/components/common/ListWithPagination";
 import ReservationUnitCard from "@/components/single-search/ReservationUnitCard";
 import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
 import { toApiDate } from "common/src/common/util";
+import { startOfDay } from "date-fns";
 
 const pagingLimit = 36;
 
@@ -85,6 +86,7 @@ const processVariables = (values: Record<string, string>, language: string) => {
 
   const startDate = fromUIDate(values.startDate);
   const endDate = fromUIDate(values.endDate);
+  const today = startOfDay(new Date());
 
   const replaceIfExists = (condition: string | boolean, returnObject: object) =>
     condition && returnObject;
@@ -124,10 +126,12 @@ const processVariables = (values: Record<string, string>, language: string) => {
       equipments: values.equipments?.split(",").map(Number),
     }),
     ...replaceIfExists(values.startDate, {
-      reservableDateStart: startDate ? toApiDate(startDate) : null,
+      reservableDateStart:
+        startDate && startDate >= today ? toApiDate(startDate) : null,
     }),
     ...replaceIfExists(values.endDate, {
-      reservableDateEnd: endDate ? toApiDate(endDate) : null,
+      reservableDateEnd:
+        endDate && endDate >= today ? toApiDate(endDate) : null,
     }),
     ...replaceIfExists(values.timeBegin, {
       reservableTimeStart: values.timeBegin,
