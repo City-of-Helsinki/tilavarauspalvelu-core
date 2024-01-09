@@ -98,7 +98,11 @@ class OriginHaukiResourceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
             super()
             .get_queryset(request)
             .annotate(reservable_time_spans_count=Count("reservable_time_spans"))
-            .prefetch_related("reservation_units")
+            .prefetch_related(
+                "reservation_units",
+                "reservation_units__unit",
+                "reservable_time_spans",
+            )
         )
 
     def get_readonly_fields(self, request, obj=None):
