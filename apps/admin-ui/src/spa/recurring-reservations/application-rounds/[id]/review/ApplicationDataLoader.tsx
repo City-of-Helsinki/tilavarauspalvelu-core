@@ -80,15 +80,20 @@ export function ApplicationDataLoader({
     data?.applications?.edges?.map((edge) => edge?.node)
   );
 
-  // TODO use query params for sort
   const sort = undefined;
   const handleSortChanged = (field: string) => {
+    // eslint-disable-next-line no-console
     console.warn("TODO: sort changed", field);
   };
 
   return (
     <>
-      <span><b>{data?.applications?.totalCount} {t("ApplicationRound.applicationCount")}</b></span>
+      <span>
+        <b>
+          {data?.applications?.totalCount}{" "}
+          {t("ApplicationRound.applicationCount")}
+        </b>
+      </span>
       <ApplicationsTable
         applications={applications}
         sort={sort}

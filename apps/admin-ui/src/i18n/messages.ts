@@ -420,31 +420,13 @@ const translations: ITranslations = {
     },
     // TODO move the enum under key: {EnumName}.{key}
     statuses: {
-      draft: ["Luonnos"],
-      in_review: ["Tarkastuksessa"],
-      review_done: ["Vastaanotettu"],
-      allocating: ["Varauksessa"],
-      allocated: ["Käsittelemättä"],
-      validated: ["Hyväksytty"],
-      handled: ["Käsitelty"],
-      declined: ["Hylätty"],
-      cancelled: ["Peruutettu"],
-      approved: ["Päatös tehty"],
-      sent: ["Päatös lähetetty"],
-      // New statuses (directly from GQL enums)
       RECEIVED: ["Vastaanotettu"],
       HANDLED: ["Käsitelty"],
       DRAFT: ["Luonnos"],
       CANCELLED: ["Peruutettu"],
       EXPIRED: ["Vanhentunut"],
-      IN_ALLOCATION: ["Varauksessa"],
-      RESULTS_SENT: ["Päätös lähetetty"],
-      // TODO these are actually ApplicationEventStatuses. tr key is wrong
-      UNALLOCATED: ["Käsittelemättä"],
-      RESERVED: ["Varattu"],
-      FAILED: ["Epäonnistunut"],
-      DECLINED: ["Hylätty"],
-      APPROVED: ["Hyväksytty"],
+      IN_ALLOCATION: ["Käsittelyssä"],
+      RESULTS_SENT: ["Lähetetty"],
     },
     // TODO these are in ApplicationDetaiils
     customerBasicInfo: ["Varaajan perustiedot"],
@@ -546,9 +528,9 @@ const translations: ITranslations = {
   },
   ApplicationEventSchedules: {
     headings: {
-      "reservationUnit": ["Varausyksikkö"],
-      "eventName": ["Varauksen nimi"],
-      "time": ["Vuoro"],
+      reservationUnit: ["Varausyksikkö"],
+      eventName: ["Varauksen nimi"],
+      time: ["Vuoro"],
     },
   },
   ApplicationEvent: {
@@ -566,6 +548,13 @@ const translations: ITranslations = {
     primarySchedules: ["Ensisijaiset aikatoiveet"],
     secondarySchedules: ["Muut aikatoiveet"],
     noSchedule: ["ei aikatoiveita"],
+    statuses: {
+      APPROVED: ["Hyväksytty"],
+      DECLINED: ["Hylätty"],
+      UNALLOCATED: ["Käsittelyssä"],
+      FAILED: ["Epäonnistunut"],
+      RESERVED: ["Varattu"],
+    },
     priority: {
       300: ["Ensisijaiset aikatoiveet"],
       200: ["Muut aikatoiveet"],
@@ -1743,7 +1732,9 @@ const translations: ITranslations = {
       unit: ["Valitse toimipiste"],
       reservationUnit: ["Valitse varausyksikkö"],
       applicant: ["Valitse asiakastyyppi"],
+      // NOTE on purpose duplicating the translation, the filter is separate but we want same labels
       status: ["Valitse käsittelyn vaihe"],
+      event_status: ["Valitse käsittelyn vaihe"],
       weekday: ["Valitse viikonpäivä"],
     },
     label: {
@@ -1751,6 +1742,7 @@ const translations: ITranslations = {
       reservationUnit: ["Varausyksikkö"],
       applicant: ["Asiakastyyppi"],
       status: ["Käsittelyn vaihe"],
+      event_status: ["Käsittelyn vaihe"],
       weekday: ["Viikonpäivä"],
     },
   },

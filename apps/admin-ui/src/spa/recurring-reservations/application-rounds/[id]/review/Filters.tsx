@@ -5,7 +5,10 @@ import { SearchInput, Select } from "hds-react";
 import { useSearchParams } from "react-router-dom";
 import { SearchTags } from "@/component/SearchTags";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "app/common/const";
-import { ApplicantTypeChoice } from "common/types/gql-types";
+import {
+  ApplicantTypeChoice,
+  ApplicationEventStatusChoice,
+} from "common/types/gql-types";
 import { debounce } from "lodash";
 import { HR } from "app/component/lists/components";
 
@@ -69,6 +72,7 @@ function MultiSelectFilter({
 
 type Props = {
   units: UnitPkName[];
+  statusOption?: "application" | "event" | "eventShort";
   enableWeekday?: boolean;
   enableReservationUnit?: boolean;
   reservationUnits?: UnitPkName[];
@@ -76,6 +80,7 @@ type Props = {
 
 export function Filters({
   units,
+  statusOption = "application",
   enableWeekday = false,
   enableReservationUnit = false,
   reservationUnits = [],
@@ -107,6 +112,14 @@ export function Filters({
         return t(`Application.statuses.${value}`);
       case "applicant":
         return t(`Application.applicantTypes.${value}`);
+      case "weekday":
+        return t(`dayLong.${value}`);
+      case "reservationUnit":
+        return (
+          reservationUnits.find((u) => u.pk === Number(value))?.nameFi ?? "-"
+        );
+      case "event_status":
+        return t(`ApplicationEvent.statuses.${value}`);
       default:
         return value;
     }
@@ -124,7 +137,13 @@ export function Filters({
     setParams(vals);
   };
 
-  const hideSearchTags: string[] = ["tab"];
+  // Hide the tags that don't have associated filter on the current tab
+  const hideSearchTags: string[] = [
+    "tab",
+    ...(statusOption !== "application" ? ["status"] : ["event_status"]),
+    ...(!enableWeekday ? ["weekday"] : []),
+    ...(!enableReservationUnit ? ["reservationUnit"] : []),
+  ];
 
   const weekdayOptions = Array.from(Array(7)).map((_, i) => ({
     label: t(`dayLong.${i}`),
@@ -134,18 +153,40 @@ export function Filters({
   const reservationUnitOptions = reservationUnits.map((unit) => ({
     label: unit?.nameFi ?? "",
     value: unit?.pk ?? "",
-  }))
+  }));
+
+  // event status is shared on two tabs, but allocated only has two options
+  const eventStatusArrayLong = Object.values(
+    ApplicationEventStatusChoice
+  ).filter((x) => x !== ApplicationEventStatusChoice.Failed);
+  const eventStatusArrayShort = [
+    ApplicationEventStatusChoice.Approved,
+    ApplicationEventStatusChoice.Declined,
+  ];
+  const eventStatusOptions = (
+    statusOption === "eventShort" ? eventStatusArrayShort : eventStatusArrayLong
+  ).map((status) => ({
+    label: t(`ApplicationEvent.statuses.${status}`),
+    value: status,
+  }));
 
   return (
     <AutoGrid>
       <MultiSelectFilter name="unit" options={unitOptions} />
-      <MultiSelectFilter name="status" options={statusOptions} />
+      {statusOption !== "application" ? (
+        <MultiSelectFilter name="event_status" options={eventStatusOptions} />
+      ) : (
+        <MultiSelectFilter name="status" options={statusOptions} />
+      )}
       <MultiSelectFilter name="applicant" options={applicantOptions} />
       {enableWeekday && (
         <MultiSelectFilter name="weekday" options={weekdayOptions} />
       )}
       {enableReservationUnit && (
-        <MultiSelectFilter name="reservationUnit" options={reservationUnitOptions} />
+        <MultiSelectFilter
+          name="reservationUnit"
+          options={reservationUnitOptions}
+        />
       )}
       <SearchInput
         // TODO can we use a common label for this?
@@ -158,13 +199,11 @@ export function Filters({
         value={nameFilter ?? ""}
       />
       <FullRow>
-        <HR />
-      </FullRow>
-      {/*
-      <FullRow>
         <SearchTags hide={hideSearchTags} translateTag={translateTag} />
       </FullRow>
-      */}
+      <FullRow>
+        <HR />
+      </FullRow>
     </AutoGrid>
   );
 }

@@ -16,7 +16,7 @@ import TimeframeStatus from "../../TimeframeStatus";
 import { ApplicationDataLoader } from "./ApplicationDataLoader";
 import { Filters } from "./Filters";
 import { ApplicationEventDataLoader } from "./ApplicationEventDataLoader";
-import AllocatedEventDataLoader from "./AllocatedEventDataLoader";
+import { AllocatedEventDataLoader } from "./AllocatedEventDataLoader";
 import { filterNonNullable } from "common/src/helpers";
 
 const Header = styled.div`
@@ -56,9 +56,12 @@ export function Review({ applicationRound }: ReviewProps): JSX.Element | null {
     setParams(vals);
   };
 
-  const resUnits = filterNonNullable(applicationRound?.reservationUnits?.flatMap((x) => x));
+  const resUnits = filterNonNullable(
+    applicationRound?.reservationUnits?.flatMap((x) => x)
+  );
   const ds = filterNonNullable(
-    resUnits.map((x) => x?.unit)
+    resUnits
+      .map((x) => x?.unit)
       .map((x) =>
         x?.pk != null && x.nameFi != null
           ? { pk: x.pk, nameFi: x.nameFi }
@@ -74,14 +77,19 @@ export function Review({ applicationRound }: ReviewProps): JSX.Element | null {
     applicationRound.applicationsCount != null &&
     applicationRound.applicationsCount > 0;
 
-  const activeTabIndex = selectedTab === "events" ? 1 : selectedTab === "allocated" ? 2 : 0;
+  const activeTabIndex =
+    selectedTab === "events" ? 1 : selectedTab === "allocated" ? 2 : 0;
 
-  const reseevationUnitOptions = filterNonNullable(resUnits.map((x) => (
-    x.pk != null && x.nameFi != null ? {
-      nameFi: x.nameFi,
-      pk: x.pk,
-    } : null
-  )));
+  const reseevationUnitOptions = filterNonNullable(
+    resUnits.map((x) =>
+      x.pk != null && x.nameFi != null
+        ? {
+            nameFi: x.nameFi,
+            pk: x.pk,
+          }
+        : null
+    )
+  );
 
   return (
     <Container>
@@ -131,7 +139,7 @@ export function Review({ applicationRound }: ReviewProps): JSX.Element | null {
         </Tabs.TabPanel>
         <Tabs.TabPanel>
           <TabContent>
-            <Filters units={unitPks} />
+            <Filters units={unitPks} statusOption="event" />
             <ApplicationEventDataLoader
               applicationRoundPk={applicationRound.pk ?? 0}
             />
@@ -139,10 +147,12 @@ export function Review({ applicationRound }: ReviewProps): JSX.Element | null {
         </Tabs.TabPanel>
         <Tabs.TabPanel>
           <TabContent>
-            <Filters units={unitPks}
+            <Filters
+              units={unitPks}
               reservationUnits={reseevationUnitOptions}
               enableWeekday
               enableReservationUnit
+              statusOption="eventShort"
             />
             <AllocatedEventDataLoader
               applicationRoundPk={applicationRound.pk ?? 0}

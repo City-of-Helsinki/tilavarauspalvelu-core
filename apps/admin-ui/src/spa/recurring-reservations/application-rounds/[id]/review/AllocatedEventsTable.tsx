@@ -8,6 +8,7 @@ import { publicUrl } from "@/common/const";
 import { truncate } from "@/helpers";
 import { applicationDetailsUrl } from "@/common/urls";
 import { CustomTable, ExternalTableLink } from "@/component/lists/components";
+import { getApplicantName } from "app/component/applications/util";
 
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
@@ -34,47 +35,54 @@ type ApplicationScheduleView = {
   statusView: JSX.Element;
 };
 
-const appScheduleMapper = (
+function aesMapper(
+  t: TFunction,
   aes: ApplicationEventScheduleNode
-): ApplicationScheduleView => {
-  const isDeclined = aes.declined
-  const allocatedReservationUnit = aes.allocatedReservationUnit?.nameFi ?? "-"
-  const allocatedUnit = aes.allocatedReservationUnit?.unit?.nameFi ?? "-"
+): ApplicationScheduleView {
+  const isDeclined = aes.declined;
+  const allocatedReservationUnit = aes.allocatedReservationUnit?.nameFi ?? "-";
+  const allocatedUnit = aes.allocatedReservationUnit?.unit?.nameFi ?? "-";
 
-  // TODO there is no application in the schedule
-  const applicantName = "-" //  getApplicantName(appEvent.application);
+  const ae = aes.applicationEvent;
+  const application = ae?.application;
+  const applicantName = getApplicantName(application);
 
-  const { begin, end } = aes;
-  const timeString = `${begin} - ${end}`
+  // TODO replace day with allocatedDay when we have test material
+  const { day, begin, end } = aes;
+  const timeString = `${t(`dayShort.${day}`)} ${begin} - ${end}`;
   const isAllocated = aes.allocatedBegin && aes.allocatedEnd;
-  const status = isDeclined ? "declined" : isAllocated ?  "allocated" : "-";
+  const status = isDeclined ? "declined" : isAllocated ? "allocated" : "-";
 
   return {
-    // TODO missing
-    applicationPk: 0,
-    pk: aes.pk ?? undefined,
+    applicationPk: application?.pk ?? 0,
+    pk: aes.applicationEvent.pk ?? 0,
     applicantName,
     allocatedReservationUnitName: allocatedReservationUnit,
     unitName: allocatedUnit,
     time: timeString,
-    name: "foobar",
+    name: ae.name ?? "-",
     // TODO implement the JSX element
     statusView: <span>{status}</span>,
   };
-};
+}
 
 const getColConfig = (t: TFunction) => [
   {
     headerName: t("ApplicationEvent.headings.id"),
     isSortable: true,
     key: "pk",
-    transform: ({ pk, applicationPk }: ApplicationScheduleView) => `${applicationPk}-${pk}`,
+    transform: ({ pk, applicationPk }: ApplicationScheduleView) =>
+      `${applicationPk}-${pk}`,
   },
   {
     headerName: t("ApplicationEvent.headings.customer"),
     isSortable: true,
     key: "applicant",
-    transform: ({ applicantName, applicationPk, pk }: ApplicationScheduleView) => (
+    transform: ({
+      applicantName,
+      applicationPk,
+      pk,
+    }: ApplicationScheduleView) => (
       <ExternalTableLink
         href={`${publicUrl}${applicationDetailsUrl(applicationPk ?? 0)}#${
           pk ?? 0
@@ -95,11 +103,7 @@ const getColConfig = (t: TFunction) => [
     headerName: t("ApplicationEvent.headings.unit"),
     key: "units",
     transform: ({ unitName }: ApplicationScheduleView) => {
-      return (
-        <span>
-          {truncate(unitName ?? "-", unitsTruncateLen)}
-        </span>
-      );
+      return <span>{truncate(unitName ?? "-", unitsTruncateLen)}</span>;
     },
   },
   {
@@ -131,7 +135,7 @@ export function AllocatedEventsTable({
 }: Props): JSX.Element {
   const { t } = useTranslation();
 
-  const views = schedules.map((aes) => appScheduleMapper(aes));
+  const views = schedules.map((aes) => aesMapper(t, aes));
 
   const cols = memoize(() => getColConfig(t))();
 

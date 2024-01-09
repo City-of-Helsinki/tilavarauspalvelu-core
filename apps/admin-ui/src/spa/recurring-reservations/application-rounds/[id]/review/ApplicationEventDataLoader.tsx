@@ -6,14 +6,20 @@ import {
   type QueryApplicationEventsArgs,
 } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
-import { LIST_PAGE_SIZE } from "@/common/const";
+import {
+  LIST_PAGE_SIZE,
+  VALID_ALLOCATION_APPLICATION_STATUSES,
+} from "@/common/const";
 import { combineResults } from "@/common/util";
 import { useNotification } from "@/context/NotificationContext";
 import Loader from "@/component/Loader";
 import { More } from "@/component/lists/More";
 import { APPLICATIONS_EVENTS_QUERY } from "./queries";
 import ApplicationEventsTable from "./ApplicationEventsTable";
-import { transformApplicantType, transformApplicationStatuses } from "./utils";
+import {
+  transformApplicantType,
+  transformApplicationEventStatus,
+} from "./utils";
 import { useTranslation } from "react-i18next";
 
 const updateQuery = (
@@ -38,9 +44,9 @@ export function ApplicationEventDataLoader({
 
   const [searchParams] = useSearchParams();
   const unitFilter = searchParams.getAll("unit");
-  const statusFilter = searchParams.getAll("status");
   const applicantFilter = searchParams.getAll("applicant");
   const nameFilter = searchParams.get("name");
+  const eventStatusFilter = searchParams.getAll("event_status");
 
   const { fetchMore, loading, data } = useQuery<
     Query,
@@ -50,7 +56,8 @@ export function ApplicationEventDataLoader({
     variables: {
       unit: unitFilter.map(Number),
       applicationRound: applicationRoundPk,
-      applicationStatus: transformApplicationStatuses(statusFilter),
+      applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,
+      status: transformApplicationEventStatus(eventStatusFilter),
       applicantType: transformApplicantType(applicantFilter),
       textSearch: nameFilter,
       offset: 0,
@@ -83,15 +90,20 @@ export function ApplicationEventDataLoader({
     data?.applicationEvents?.edges.map((edge) => edge?.node)
   );
 
-  // TODO
   const sort = undefined;
   const handleSortChanged = (field: string) => {
+    // eslint-disable-next-line no-console
     console.warn("TODO: handleSortChanged", field);
   };
 
   return (
     <>
-      <span><b>{data?.applicationEvents?.totalCount} {t("ApplicationRound.applicationEventCount")}</b></span>
+      <span>
+        <b>
+          {data?.applicationEvents?.totalCount}{" "}
+          {t("ApplicationRound.applicationEventCount")}
+        </b>
+      </span>
       <ApplicationEventsTable
         applicationEvents={applicationEvents}
         sort={sort}

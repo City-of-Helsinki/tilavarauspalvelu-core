@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
-import styled from "styled-components";
-import { IconArrowRight, IconCheck } from "hds-react";
+import styled, { css } from "styled-components";
+import { IconCheck } from "hds-react";
 import { useTranslation } from "react-i18next";
 import {
   ApplicationEventStatusChoice,
@@ -11,14 +11,19 @@ import {
   getApplicationStatusColor,
 } from "@/component//applications/util";
 
-const StatusDot = styled.div<{
-  status: ApplicationStatusChoice;
+const dotCss = css<{
   size: number;
 }>`
   display: inline-block;
   width: ${({ size }) => size && `${size}px`};
   height: ${({ size }) => size && `${size}px`};
   border-radius: 50%;
+`;
+const StatusDot = styled.div<{
+  status: ApplicationStatusChoice;
+  size: number;
+}>`
+  ${dotCss}
   background-color: ${({ status }) => getApplicationStatusColor(status, "s")};
 `;
 
@@ -26,10 +31,7 @@ const ApplicationEventStatusDot = styled.div<{
   status: ApplicationEventStatusChoice;
   size: number;
 }>`
-  display: inline-block;
-  width: ${({ size }) => size && `${size}px`};
-  height: ${({ size }) => size && `${size}px`};
-  border-radius: 50%;
+  ${dotCss}
   background-color: ${({ status }) =>
     getApplicationEventStatusColor(status, "s")};
 `;
@@ -37,12 +39,8 @@ const ApplicationEventStatusDot = styled.div<{
 const Wrapper = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 0.625em;
   color: var(--tilavaraus-admin-content-text-color);
-
-  ${StatusDot} {
-    margin-right: 0.625em;
-  }
 `;
 
 const Status = styled.div`
@@ -53,25 +51,15 @@ const Status = styled.div`
 interface IStatusCellProps {
   text: string;
   icon: ReactNode;
-  linkText: string;
 }
 
-function StatusCell({ text, icon, linkText }: IStatusCellProps): JSX.Element {
+function StatusCell({ text, icon }: IStatusCellProps): JSX.Element {
   const { t } = useTranslation();
-  const withArrow = false;
 
   return (
     <Wrapper>
-      <Status>
-        {icon}
-        <span>{t(text)}</span>
-      </Status>
-      {withArrow && (
-        <IconArrowRight
-          aria-label={t(linkText)}
-          data-testid="status-cell__link--icon"
-        />
-      )}
+      <Status>{icon}</Status>
+      <span>{t(text)}</span>
     </Wrapper>
   );
 }
@@ -93,8 +81,9 @@ export function ApplicationStatusCell(
   props: StatusCellProps & { status?: ApplicationStatusChoice }
 ): JSX.Element {
   let icon: ReactNode;
-  const linkText = "Application.gotoLink";
 
+  // TODO there is a few icons we want, not the envelope but Cross and Check for ApplicationEvents
+  // nothing for Application though
   if (props.status == null) {
     icon = null;
   } else if (props.status === ApplicationStatusChoice.Handled) {
@@ -103,7 +92,7 @@ export function ApplicationStatusCell(
     icon = <StatusDot aria-hidden status={props.status} size={12} />;
   }
 
-  return <StyledStatusCell {...props} icon={icon} linkText={linkText} />;
+  return <StyledStatusCell {...props} icon={icon} />;
 }
 
 export function ApplicationEventStatusCell(
@@ -117,7 +106,6 @@ export function ApplicationEventStatusCell(
           <ApplicationEventStatusDot status={props.status} size={12} />
         )
       }
-      linkText="ApplicationEvent.gotoLink"
     />
   );
 }

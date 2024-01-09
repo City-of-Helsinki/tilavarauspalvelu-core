@@ -357,6 +357,7 @@ type ApplicationEventScheduleNode implements Node {
   allocatedEnd: TimeString
   declined: Boolean!
   priority: Int!
+  applicationEvent: ApplicationEventNode!
   allocatedReservationUnit: ReservationUnitType
 
   """The ID of the object"""
@@ -2898,8 +2899,8 @@ type ReservationUnitByPkType implements Node {
   interval_90_mins.
   """
   reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices!
-  reservationsMaxDaysBefore: Int
   reservationsMinDaysBefore: Int
+  reservationsMaxDaysBefore: Int
 
   """
   Time when making reservations become possible for this reservation unit.
@@ -3038,8 +3039,8 @@ input ReservationUnitCreateMutationInput {
   """
   Determines the interval for the start time of the reservation. For example an
   interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or
-  45. Possible values are INTERVAL_15_MINS, INTERVAL_30_MINS, INTERVAL_60_MINS,
-  INTERVAL_90_MINS.
+  45. Possible values are INTERVAL_15_MINUTES, INTERVAL_30_MINUTES,
+  INTERVAL_60_MINUTES, INTERVAL_90_MINUTES.
   """
   reservationStartInterval: String
 
@@ -3094,21 +3095,21 @@ input ReservationUnitCreateMutationInput {
   paymentTypes: [String]
   pricings: [ReservationUnitPricingCreateSerializerInput]
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotSerializerInput]
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
   nameFi: String
   nameEn: String
   nameSv: String
@@ -3164,8 +3165,8 @@ type ReservationUnitCreateMutationPayload {
   """
   Determines the interval for the start time of the reservation. For example an
   interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or
-  45. Possible values are INTERVAL_15_MINS, INTERVAL_30_MINS, INTERVAL_60_MINS,
-  INTERVAL_90_MINS.
+  45. Possible values are INTERVAL_15_MINUTES, INTERVAL_30_MINUTES,
+  INTERVAL_60_MINUTES, INTERVAL_90_MINUTES.
   """
   reservationStartInterval: String
 
@@ -3219,21 +3220,21 @@ type ReservationUnitCreateMutationPayload {
   paymentTypes: [String]
   pricings: [ReservationUnitPricingType]
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotNode]
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
   nameFi: String
   nameEn: String
   nameSv: String
@@ -3562,8 +3563,8 @@ type ReservationUnitType implements Node {
   interval_90_mins.
   """
   reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices!
-  reservationsMaxDaysBefore: Int
   reservationsMinDaysBefore: Int
+  reservationsMaxDaysBefore: Int
 
   """
   Time when making reservations become possible for this reservation unit.
@@ -3714,8 +3715,8 @@ input ReservationUnitUpdateMutationInput {
   """
   Determines the interval for the start time of the reservation. For example an
   interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or
-  45. Possible values are INTERVAL_15_MINS, INTERVAL_30_MINS, INTERVAL_60_MINS,
-  INTERVAL_90_MINS.
+  45. Possible values are INTERVAL_15_MINUTES, INTERVAL_30_MINUTES,
+  INTERVAL_60_MINUTES, INTERVAL_90_MINUTES.
   """
   reservationStartInterval: String
 
@@ -3770,21 +3771,21 @@ input ReservationUnitUpdateMutationInput {
   paymentTypes: [String]
   pricings: [ReservationUnitPricingUpdateSerializerInput]!
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotSerializerInput]
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
   nameFi: String
   nameEn: String
   nameSv: String
@@ -3840,8 +3841,8 @@ type ReservationUnitUpdateMutationPayload {
   """
   Determines the interval for the start time of the reservation. For example an
   interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or
-  45. Possible values are INTERVAL_15_MINS, INTERVAL_30_MINS, INTERVAL_60_MINS,
-  INTERVAL_90_MINS.
+  45. Possible values are INTERVAL_15_MINUTES, INTERVAL_30_MINUTES,
+  INTERVAL_60_MINUTES, INTERVAL_90_MINUTES.
   """
   reservationStartInterval: String
 
@@ -3894,21 +3895,21 @@ type ReservationUnitUpdateMutationPayload {
   pricingTerms: String
   paymentTypes: [String]
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotNode]
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   reservationConfirmedInstructionsFi: String
   reservationConfirmedInstructionsEn: String
   reservationConfirmedInstructionsSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
   termsOfUseFi: String
   termsOfUseEn: String
   termsOfUseSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
   nameFi: String
   nameEn: String
   nameSv: String
@@ -4630,12 +4631,12 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
@@ -4648,12 +4649,12 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String

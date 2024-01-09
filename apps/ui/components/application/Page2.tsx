@@ -127,12 +127,18 @@ type Cell = {
   key: string;
 };
 
+// TODO why declined? why are we using id here (it's normally gql id)
+type ApplicationEventScheduleType = Pick<
+  ApplicationEventScheduleNode,
+  "id" | "begin" | "end" | "priority" | "day" | "declined"
+>;
+
 // TODO the return type is not good (it's gql type, but it doesn't really match the data)
 // better to use a custom type here and convert it when sending / receiving from backend
 const cellsToApplicationEventSchedules = (
   cells: Cell[][]
-): ApplicationEventScheduleNode[] => {
-  const daySchedules: ApplicationEventScheduleNode[] = [];
+): ApplicationEventScheduleType[] => {
+  const daySchedules: ApplicationEventScheduleType[] = [];
   for (let day = 0; day < cells.length; day += 1) {
     const dayCells = cells[day];
     dayCells

@@ -123,7 +123,7 @@ const appEventMapper = (
     statusView: (
       <ApplicationEventStatusCell
         status={status}
-        text={`Application.statuses.${status}`}
+        text={`ApplicationEvent.statuses.${status}`}
       />
     ),
   };

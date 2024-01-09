@@ -1,5 +1,19 @@
 import { gql } from "@apollo/client";
 
+const APPLICANT_NAME_FRAGMENT = gql`
+  fragment ApplicationNameFragment on ApplicationNode {
+    applicantType
+    contactPerson {
+      lastName
+      firstName
+    }
+    organisation {
+      name
+      organisationType
+    }
+  }
+`;
+
 // TODO is the status correct? and it's just a singular (the backend doesn't allow an array)
 // TODO add search params
 // TODO move this to where the current applications query is i.e. APPLICATIONS_QUERY
@@ -8,6 +22,7 @@ import { gql } from "@apollo/client";
 // applicantType (multifield)
 // textSearch
 export const APPLICATIONS_QUERY = gql`
+  ${APPLICANT_NAME_FRAGMENT}
   query getApplications(
     $offset: Int
     $first: Int
@@ -30,15 +45,7 @@ export const APPLICATIONS_QUERY = gql`
         node {
           pk
           status
-          applicantType
-          contactPerson {
-            firstName
-            lastName
-          }
-          organisation {
-            name
-            organisationType
-          }
+          ...ApplicationNameFragment
           applicationEvents {
             name
             pk
@@ -64,11 +71,13 @@ export const APPLICATIONS_QUERY = gql`
 `;
 
 export const APPLICATIONS_EVENTS_QUERY = gql`
+  ${APPLICANT_NAME_FRAGMENT}
   query getApplicationEvents(
     $offset: Int
     $first: Int
     $applicationRound: Int!
     $applicationStatus: [ApplicationStatusChoice]!
+    $status: [ApplicationEventStatusChoice]
     $unit: [Int]
     $applicantType: [ApplicantTypeChoice]
     $textSearch: String
@@ -79,6 +88,7 @@ export const APPLICATIONS_EVENTS_QUERY = gql`
       unit: $unit
       applicationRound: $applicationRound
       applicationStatus: $applicationStatus
+      status: $status
       applicantType: $applicantType
       textSearch: $textSearch
     ) {
@@ -95,15 +105,7 @@ export const APPLICATIONS_EVENTS_QUERY = gql`
           application {
             pk
             status
-            applicantType
-            contactPerson {
-              firstName
-              lastName
-            }
-            organisation {
-              name
-              organisationType
-            }
+            ...ApplicationNameFragment
           }
           eventReservationUnits {
             preferredOrder
@@ -126,20 +128,23 @@ export const APPLICATIONS_EVENTS_QUERY = gql`
 `;
 
 export const APPLICATIONS_EVENTS_SCHEDULE_QUERY = gql`
-  query getApplicationEventsSchedule (
+  ${APPLICANT_NAME_FRAGMENT}
+  query getApplicationEventsSchedule(
     $offset: Int
     $first: Int
     $applicationRound: Int!
     $allocatedUnit: [Int]
     $applicantType: [ApplicantTypeChoice]
+    $applicationEventStatus: [ApplicationEventStatusChoice]
     $textSearch: String
   ) {
-    applicationEventSchedules (
+    applicationEventSchedules(
       first: $first
       offset: $offset
       applicationRound: $applicationRound
       allocatedUnit: $allocatedUnit
       applicantType: $applicantType
+      applicationEventStatus: $applicationEventStatus
       textSearch: $textSearch
     ) {
       edges {
@@ -155,6 +160,14 @@ export const APPLICATIONS_EVENTS_SCHEDULE_QUERY = gql`
             unit {
               nameFi
               pk
+            }
+          }
+          applicationEvent {
+            name
+            pk
+            application {
+              pk
+              ...ApplicationNameFragment
             }
           }
         }

@@ -1,6 +1,10 @@
 import React from "react";
 import { ApolloError, useQuery } from "@apollo/client";
-import type { Query, QueryApplicationEventSchedulesArgs } from "common/types/gql-types";
+import {
+  ApplicationEventStatusChoice,
+  type Query,
+  type QueryApplicationEventSchedulesArgs,
+} from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { LIST_PAGE_SIZE } from "@/common/const";
 import { combineResults } from "@/common/util";
@@ -9,7 +13,10 @@ import { APPLICATIONS_EVENTS_SCHEDULE_QUERY } from "./queries";
 import Loader from "@/component/Loader";
 import { More } from "@/component/lists/More";
 import { useTranslation } from "react-i18next";
-import { transformApplicantType } from "./utils";
+import {
+  transformApplicantType,
+  transformApplicationEventStatus,
+} from "./utils";
 import { useSearchParams } from "react-router-dom";
 import { AllocatedEventsTable } from "./AllocatedEventsTable";
 
@@ -33,16 +40,25 @@ const updateQuery = (
   return combineResults(previousResult, fetchMoreResult, "applicationEvents");
 };
 
-const AllocatedEventDataLoader = ({
+export function AllocatedEventDataLoader({
   applicationRoundPk,
-}: Props): JSX.Element => {
+}: Props): JSX.Element {
   const { notifyError } = useNotification();
 
   const [searchParams] = useSearchParams();
   const unitFilter = searchParams.getAll("unit");
   const applicantFilter = searchParams.getAll("applicant");
   const nameFilter = searchParams.get("name");
+  const appEventStatusFilter = searchParams.getAll("event_status");
 
+  const aesFilter = transformApplicationEventStatus(appEventStatusFilter);
+  const POSSIBLE_EVENT_STATUSES = [
+    ApplicationEventStatusChoice.Approved,
+    ApplicationEventStatusChoice.Declined,
+  ];
+  const filteredAes = POSSIBLE_EVENT_STATUSES.filter(
+    (s) => aesFilter.filter((aes) => aes === s).length > 0
+  );
   const { fetchMore, loading, data } = useQuery<
     Query,
     QueryApplicationEventSchedulesArgs
@@ -51,10 +67,9 @@ const AllocatedEventDataLoader = ({
     variables: {
       allocatedUnit: unitFilter.map(Number),
       applicationRound: applicationRoundPk,
-      // TODO there is no applicationStatus filter
-      // applicationStatus: VALID_ALLOCATED_APPLICATION_STATUSES,
-      // applicationStatus: transformApplicationStatuses(statusFilter),
       applicantType: transformApplicantType(applicantFilter),
+      applicationEventStatus:
+        filteredAes.length === 0 ? POSSIBLE_EVENT_STATUSES : filteredAes,
       textSearch: nameFilter,
       offset: 0,
       first: LIST_PAGE_SIZE,
@@ -72,23 +87,25 @@ const AllocatedEventDataLoader = ({
     return <Loader />;
   }
 
-  // FIXME this includes unallocated events (it should not)
-  // can we backend filter the unallocated events out of the result?
   const aes = filterNonNullable(
     data?.applicationEventSchedules?.edges.map((edge) => edge?.node)
   );
   const totalCount = data?.applicationEventSchedules?.totalCount ?? 0;
 
-  // TODO
   const sort = undefined;
   const handleSortChanged = (field: string) => {
+    // eslint-disable-next-line no-console
     console.warn("TODO: handleSortChanged", field);
   };
 
+  const count = data?.applicationEventSchedules?.totalCount ?? 0;
   return (
     <>
-      <span><b>{data?.applicationEvents?.totalCount} {t("ApplicationRound.applicationEventCount")}</b></span>
-      {/* TODO ScheduleTable */}
+      <span>
+        <b>
+          {count} {t("ApplicationRound.applicationEventCount")}
+        </b>
+      </span>
       <AllocatedEventsTable
         schedules={aes}
         sort={sort}
@@ -109,6 +126,4 @@ const AllocatedEventDataLoader = ({
       />
     </>
   );
-};
-
-export default AllocatedEventDataLoader;
+}

@@ -407,6 +407,7 @@ export type ApplicationEventScheduleNode = Node & {
   allocatedDay?: Maybe<Scalars["Int"]["output"]>;
   allocatedEnd?: Maybe<Scalars["TimeString"]["output"]>;
   allocatedReservationUnit?: Maybe<ReservationUnitType>;
+  applicationEvent: ApplicationEventNode;
   begin: Scalars["TimeString"]["output"];
   day: Scalars["Int"]["output"];
   declined: Scalars["Boolean"]["output"];
@@ -3326,8 +3327,8 @@ export type ReservationUnitCreateMutationInput = {
   /**
    * Determines the interval for the start time of the reservation. For example an
    * interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or
-   * 45. Possible values are INTERVAL_15_MINS, INTERVAL_30_MINS, INTERVAL_60_MINS,
-   * INTERVAL_90_MINS.
+   * 45. Possible values are INTERVAL_15_MINUTES, INTERVAL_30_MINUTES,
+   * INTERVAL_60_MINUTES, INTERVAL_90_MINUTES.
    */
   reservationStartInterval?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitTypePk?: InputMaybe<Scalars["Int"]["input"]>;
@@ -3415,8 +3416,8 @@ export type ReservationUnitCreateMutationPayload = {
   /**
    * Determines the interval for the start time of the reservation. For example an
    * interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or
-   * 45. Possible values are INTERVAL_15_MINS, INTERVAL_30_MINS, INTERVAL_60_MINS,
-   * INTERVAL_90_MINS.
+   * 45. Possible values are INTERVAL_15_MINUTES, INTERVAL_30_MINUTES,
+   * INTERVAL_60_MINUTES, INTERVAL_90_MINUTES.
    */
   reservationStartInterval?: Maybe<Scalars["String"]["output"]>;
   reservationUnit?: Maybe<ReservationUnitType>;
@@ -3809,8 +3810,8 @@ export type ReservationUnitUpdateMutationInput = {
   /**
    * Determines the interval for the start time of the reservation. For example an
    * interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or
-   * 45. Possible values are INTERVAL_15_MINS, INTERVAL_30_MINS, INTERVAL_60_MINS,
-   * INTERVAL_90_MINS.
+   * 45. Possible values are INTERVAL_15_MINUTES, INTERVAL_30_MINUTES,
+   * INTERVAL_60_MINUTES, INTERVAL_90_MINUTES.
    */
   reservationStartInterval?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitTypePk?: InputMaybe<Scalars["Int"]["input"]>;
@@ -3897,8 +3898,8 @@ export type ReservationUnitUpdateMutationPayload = {
   /**
    * Determines the interval for the start time of the reservation. For example an
    * interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or
-   * 45. Possible values are INTERVAL_15_MINS, INTERVAL_30_MINS, INTERVAL_60_MINS,
-   * INTERVAL_90_MINS.
+   * 45. Possible values are INTERVAL_15_MINUTES, INTERVAL_30_MINUTES,
+   * INTERVAL_60_MINUTES, INTERVAL_90_MINUTES.
    */
   reservationStartInterval?: Maybe<Scalars["String"]["output"]>;
   reservationUnit?: Maybe<ReservationUnitType>;
