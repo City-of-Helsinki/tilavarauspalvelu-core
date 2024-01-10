@@ -919,7 +919,6 @@ const translations: ITranslations = {
     ],
     reservationUnitTitle: ["Varausyksiköt"],
     reservationUnitReadMore: ["Lue lisää varausyksiköistä"],
-    hierarchyReadMore: ["Lue lisää tilojen hierarkiasta"],
     reservationUnitCreate: ["Luo uusi varausyksikkö"],
     noReservationUnitsTitle: ["Ei luotuja varausyksiköitä."],
     address: ["Osoite"],

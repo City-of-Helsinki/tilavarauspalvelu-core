@@ -1,9 +1,4 @@
-import {
-  Button,
-  IconInfoCircleFill,
-  IconPlusCircleFill,
-  Notification,
-} from "hds-react";
+import { Button, IconPlusCircleFill, Notification } from "hds-react";
 import React, { useReducer, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
@@ -18,14 +13,12 @@ import {
   UnitType,
 } from "common/types/gql-types";
 import { StyledNotification } from "@/styles/util";
-import { useModal } from "@/context/ModalContext";
 import {
   ContentContainer,
   IngressContainer,
   WideContainer,
 } from "@/styles/layout";
 import Loader from "../Loader";
-import InfoModalContent from "./InfoModalContent";
 import ResourcesTable from "./ResourcesTable";
 import SpacesTable from "./SpacesTable";
 import SubPageHead from "./SubPageHead";
@@ -102,18 +95,6 @@ const reducer = (state: State, action: Action): State => {
 
 const Wrapper = styled.div``;
 
-const Info = styled.div`
-  display: flex;
-`;
-
-const StyledButton = styled(Button)`
-  padding: 0;
-  span {
-    padding: 0;
-    color: var(--color-black);
-  }
-`;
-
 const TableHead = styled.div`
   display: flex;
   margin: 2em 0;
@@ -137,7 +118,6 @@ const ActionButton = styled(Button)`
 
 const SpacesResources = (): JSX.Element | null => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { setModalContent } = useModal();
 
   const { t } = useTranslation();
   const unitPk = Number(useParams<IProps>().unitPk);
@@ -295,15 +275,6 @@ const SpacesResources = (): JSX.Element | null => {
             {t(state.notification.text)}
           </StyledNotification>
         ) : null}
-        <Info>
-          <StyledButton
-            variant="supplementary"
-            iconRight={<IconInfoCircleFill />}
-            onClick={() => setModalContent(<InfoModalContent />)}
-          >
-            {t("Unit.hierarchyReadMore")}
-          </StyledButton>
-        </Info>
       </IngressContainer>
       <WideContainer>
         <TableHead>
