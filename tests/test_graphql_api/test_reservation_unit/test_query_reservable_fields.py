@@ -1069,6 +1069,58 @@ def test__query_reservation_unit_reservable__reservations__in_common_hierarchy__
     }
 
 
+@freezegun.freeze_time(NOW)
+def test__query_reservation_unit_reservable__reservations__in_common_hierarchy__by_resource__additional_filters(
+    graphql, reservation_unit
+):
+    """
+    This is a regression test for a bug that was found during manual testing.
+    Simply recreate the exact scenario instead of using the above test cases.
+
+    The error occurred when the ReservationUnit GQL query had additional filters that filtered out ReservationUnits
+    which were related in common hierarchy by Resource and had a Space which was not related in common hierarcy.
+    """
+    common_resource = ResourceFactory()
+    reservation_unit_2: ReservationUnit = ReservationUnitFactory.create(
+        resources=[common_resource],
+        spaces=[SpaceFactory()],
+        origin_hauki_resource=reservation_unit.origin_hauki_resource,
+    )
+    reservation_unit.resources.set([common_resource])
+    reservation_unit.spaces.set([SpaceFactory()])
+    reservation_unit.save()
+
+    # 2023-05-20 10:00 - 12:00 (2h)
+    ReservationFactory.create(
+        begin=_datetime(day=20, hour=10),
+        end=_datetime(day=20, hour=12),
+        reservation_unit=[reservation_unit_2],
+        state=ReservationStateChoice.CREATED,
+    )
+
+    # 2023-05-20 10:00 - 12:00 (2h)
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(day=20, hour=10),
+        end_datetime=_datetime(day=20, hour=12),
+    )
+
+    response = graphql(
+        reservation_units_reservable_query(
+            pk=reservation_unit.pk,
+            fields="pk isClosed firstReservableDatetime",
+        )
+    )
+
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {
+        "pk": reservation_unit.pk,
+        "isClosed": False,
+        "firstReservableDatetime": None,
+    }
+
+
 ########################################################################################################################
 
 

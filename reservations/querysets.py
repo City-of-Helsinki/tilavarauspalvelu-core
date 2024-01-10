@@ -121,6 +121,10 @@ class ReservationQuerySet(QuerySet):
                 # Get the full family of the space.
                 family: set[SpacePK] = space_to_family.get(space_id)
 
+                # Space is not related in common hierarchy with any of the reservation units, skip it.
+                if family is None:
+                    continue
+
                 for reservation_unit_info in reservation_unit_infos:
                     # If any space from the family is a direct space on the reservation unit,
                     # add a timespan from the reservation to the reservation unit, but only once.
