@@ -10,6 +10,7 @@ from api.graphql.extensions.legacy_helpers import (
 )
 from api.legacy_rest_api.base_serializers import OldTranslatedModelSerializer
 from common.fields.serializer import IntegerPrimaryKeyField
+from resources.choices import ResourceLocationType
 from resources.models import Resource
 from spaces.models import Space
 
@@ -90,13 +91,8 @@ class ResourceCreateSerializer(ResourceSerializer, OldPrimaryKeySerializer):
 
     def validate(self, data):
         location_type = data.get("location_type")
-        if not location_type or location_type not in (
-            Resource.LOCATION_FIXED,
-            Resource.LOCATION_MOVABLE,
-        ):
-            raise GraphQLError(
-                f"Wrong type of location type. Values are {Resource.LOCATION_FIXED, Resource.LOCATION_MOVABLE}"
-            )
+        if not location_type or location_type not in ResourceLocationType.values:
+            raise GraphQLError(f"Wrong type of location type. Values are: {ResourceLocationType.values}")
 
         errors = self.validate_for_publish(data)
         if errors:
@@ -108,7 +104,7 @@ class ResourceCreateSerializer(ResourceSerializer, OldPrimaryKeySerializer):
         """Validates necessary fields for published resources."""
         validation_errors = {}
 
-        if data.get("location_type") == Resource.LOCATION_FIXED and not data.get("space"):
+        if data.get("location_type") == ResourceLocationType.FIXED.value and not data.get("space"):
             validation_errors["space"] = GraphQLError("Location type 'fixed' needs a space to be defined.")
 
         return validation_errors
@@ -121,13 +117,8 @@ class ResourceUpdateSerializer(OldPrimaryKeyUpdateSerializer, ResourceCreateSeri
     def validate(self, data):
         if "location_type" in data:
             location_type = data.get("location_type")
-            if location_type not in (
-                Resource.LOCATION_FIXED,
-                Resource.LOCATION_MOVABLE,
-            ):
-                raise GraphQLError(
-                    f"Wrong type of location type. Values are {Resource.LOCATION_FIXED, Resource.LOCATION_MOVABLE}"
-                )
+            if location_type not in ResourceLocationType.values:
+                raise GraphQLError(f"Wrong type of location type. Values are: {ResourceLocationType.values}")
 
         for field, value in data.items():
             if field == "name_fi" and (not value or value == "" or value.isspace()):
@@ -137,7 +128,7 @@ class ResourceUpdateSerializer(OldPrimaryKeyUpdateSerializer, ResourceCreateSeri
                 location_type = data.get("location_type")
                 if not location_type:
                     location_type = self.instance.location_type
-                if not data.get("space") and location_type == Resource.LOCATION_FIXED:
+                if not data.get("space") and location_type == ResourceLocationType.FIXED.value:
                     raise GraphQLError("Location type 'fixed' needs a space to be defined.")
 
         return data

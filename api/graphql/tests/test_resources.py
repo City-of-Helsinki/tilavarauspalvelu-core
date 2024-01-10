@@ -17,6 +17,7 @@ from permissions.models import (
     UnitRoleChoice,
     UnitRolePermission,
 )
+from resources.choices import ResourceLocationType
 from resources.models import Resource
 from tests.factories import ResourceFactory, ServiceSectorFactory, SpaceFactory, UnitFactory, UnitGroupFactory
 
@@ -338,7 +339,7 @@ class ResourceCreateForPublishGraphQLTestCase(ResourceGraphQLBase):
             "nameEn": "enna",
             "nameSv": "svna",
             "spacePk": self.space.id,
-            "locationType": Resource.LOCATION_FIXED,
+            "locationType": ResourceLocationType.FIXED.value,
         }
 
     def test_resource_created(self):
@@ -408,7 +409,7 @@ class ResourceCreateForPublishGraphQLTestCase(ResourceGraphQLBase):
     def test_created_when_no_space_and_movable_location(self):
         data = self.get_valid_input_data()
         data.pop("spacePk")
-        data["locationType"] = Resource.LOCATION_MOVABLE
+        data["locationType"] = ResourceLocationType.MOVABLE.value
         response = self.query(
             self.get_create_query(),
             input_data=data,
@@ -459,7 +460,7 @@ class ResourceCreateAsDraftGraphQLTestCase(ResourceGraphQLBase):
             "nameEn": "enna",
             "nameSv": "svna",
             "spacePk": self.space.id,
-            "locationType": Resource.LOCATION_FIXED,
+            "locationType": ResourceLocationType.FIXED.value,
         }
 
     def test_resource_created(self):
@@ -540,7 +541,7 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
             "nameEn": "enna",
             "nameSv": "svna",
             "spacePk": self.space.id,
-            "locationType": Resource.LOCATION_FIXED,
+            "locationType": ResourceLocationType.FIXED.value,
         }
 
     def test_resource_updated(self):
@@ -602,7 +603,7 @@ class ResourceUpdateForPublishGraphQLTestCase(ResourceGraphQLBase):
     def test_update_space_null_and_location_movable(self):
         data = self.get_valid_input_data()
         data["spacePk"] = None
-        data["locationType"] = Resource.LOCATION_MOVABLE
+        data["locationType"] = ResourceLocationType.MOVABLE.value
         response = self.query(self.get_update_query(), input_data=data)
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
