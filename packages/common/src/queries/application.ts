@@ -13,7 +13,7 @@ const APPLICATION_FRAGMENT = gql`
     applicant {
       name
       email
-      dateOfBirth
+      pk
     }
     applicationRound {
       pk

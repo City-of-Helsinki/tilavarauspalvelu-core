@@ -26,6 +26,7 @@ import ShowWhenTargetInvisible from "@/component/ShowWhenTargetInvisible";
 import StickyHeader from "@/component/StickyHeader";
 import { ReservationWorkingMemo } from "@/component/WorkingMemo";
 import { Accordion } from "@/common/hds-fork/Accordion";
+import { BirthDate } from "@/component/BirthDate";
 import {
   ageGroup,
   createTagString,
@@ -35,7 +36,6 @@ import {
   reservationPrice,
 } from "./util";
 import Calendar from "./Calendar";
-import ReservationUserBirthDate from "./ReservationUserBirthDate";
 import VisibleIfPermission from "./VisibleIfPermission";
 import ApprovalButtons from "./ApprovalButtons";
 import RecurringReservationsView from "./RecurringReservationsView";
@@ -576,13 +576,7 @@ const RequestedReservation = ({
               />
               <ApplicationData
                 label={t("RequestedReservation.birthDate")}
-                data={
-                  <ReservationUserBirthDate
-                    reservationPk={reservation.pk as number}
-                    showLabel={t("RequestedReservation.showBirthDate")}
-                    hideLabel={t("RequestedReservation.hideBirthDate")}
-                  />
-                }
+                data={<BirthDate userPk={reservation?.user?.pk ?? 0} />}
               />
               <ApplicationData
                 label={t("RequestedReservation.addressStreet")}

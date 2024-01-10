@@ -1,15 +1,5 @@
 import { gql } from "@apollo/client";
 
-export const GET_BIRTHDATE_BY_RESERVATION_PK = gql`
-  query reservationUserBirthDate($pk: Int) {
-    reservationByPk(pk: $pk) {
-      user {
-        dateOfBirth
-      }
-    }
-  }
-`;
-
 export const APPROVE_RESERVATION = gql`
   mutation approveReservation($input: ReservationApproveMutationInput!) {
     approveReservation(input: $input) {

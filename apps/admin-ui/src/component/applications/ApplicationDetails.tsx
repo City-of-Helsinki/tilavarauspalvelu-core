@@ -552,13 +552,7 @@ function ApplicationDetails({
           />
           <ValueBox
             label={t("Application.headings.userBirthDate")}
-            value={
-              <BirthDate
-                dateOfBirth={application.applicant?.dateOfBirth ?? ""}
-                showLabel={t("RequestedReservation.showBirthDate")}
-                hideLabel={t("RequestedReservation.hideBirthDate")}
-              />
-            }
+            value={<BirthDate userPk={application.applicant?.pk ?? 0} />}
           />
         </EventProps>
         <H4>{t("Application.contactPersonInformation")}</H4>

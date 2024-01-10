@@ -102,6 +102,8 @@ const translations: ITranslations = {
     accordion: ["sisältö"],
     search: ["Hae"],
     noResults: ["Ei tuloksia"],
+    loading: ["Ladataan..."],
+    error: ["Virhe"],
     select: ["Valitse"],
     filter: ["Suodata"],
     filtered: ["Suodatettu"],
