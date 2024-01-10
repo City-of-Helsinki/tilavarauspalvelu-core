@@ -36,6 +36,7 @@ class ReservationUnitAdmin(SortableAdminMixin, admin.ModelAdmin):
         ReservationUnitPricingInline,
         ApplicationRoundTimeSlotInline,
     ]
+    list_filter = ["is_archived", "is_draft"]
     readonly_fields = [
         "uuid",
         "payment_product",
