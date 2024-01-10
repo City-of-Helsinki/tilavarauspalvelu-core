@@ -91,6 +91,7 @@ from reservations.models import (
     ReservationMetadataSet,
     ReservationPurpose,
 )
+from resources.choices import ResourceLocationType
 from resources.models import Resource
 from services.models import Service
 from spaces.models import Location, ServiceSector, Space, Unit, UnitGroup
@@ -1212,7 +1213,7 @@ def _create_resources(spaces: list[Space], *, number: int = 10) -> list[Resource
             name_fi=name,
             name_sv=name,
             name_en=name,
-            location_type=random.choice(Resource.LOCATION_TYPES)[0],
+            location_type=random.choice(ResourceLocationType.values),
             space=space,
             buffer_time_after=timedelta(hours=buffer_after),
             buffer_time_before=timedelta(hours=buffer_before),

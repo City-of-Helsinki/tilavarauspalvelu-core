@@ -1,15 +1,16 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from resources.choices import ResourceLocationType
 from spaces.models import Space
 
 
 class Resource(models.Model):
-    LOCATION_FIXED = "fixed"
-    LOCATION_MOVABLE = "movable"
-
-    LOCATION_TYPES = ((LOCATION_FIXED, _("Fixed")), (LOCATION_MOVABLE, _("Movable")))
-    location_type = models.CharField(max_length=20, choices=LOCATION_TYPES, default=LOCATION_FIXED)
+    location_type = models.CharField(
+        max_length=20,
+        choices=ResourceLocationType.choices,
+        default=ResourceLocationType.FIXED.value,
+    )
     name = models.CharField(verbose_name=_("Name"), max_length=255)
     space = models.ForeignKey(Space, verbose_name="Space", on_delete=models.SET_NULL, null=True, blank=True)
     buffer_time_before = models.DurationField(verbose_name=_("Buffer time before"), blank=True, null=True)
