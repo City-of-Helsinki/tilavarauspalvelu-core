@@ -338,7 +338,7 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]):
     ###########################################################################################################
 
     payment_merchant_library_ita, _ = PaymentMerchant.objects.get_or_create(
-        id="0f1bbdf4-ca14-4643-a666-95a4ce44d24a",
+        id="418a4349-a561-4e0f-aee7-57947a77de6e",
         defaults={"name": "Itäkeskuksen kirjasto"},
     )
     payment_merchant_library_pih, _ = PaymentMerchant.objects.get_or_create(
