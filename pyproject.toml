@@ -221,3 +221,8 @@ omit = [
     "*snapshots*",
     "*tests*",
 ]
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "def __repr__",
+    "def __str__",
+]
