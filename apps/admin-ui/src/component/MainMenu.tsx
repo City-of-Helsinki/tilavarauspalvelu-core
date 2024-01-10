@@ -261,16 +261,6 @@ const getFilteredMenu = (
         route: `/premises-and-settings${prefixes.reservationUnits}`,
       },
       {
-        permission: Permission.CAN_MANAGE_SPACES,
-        title: "MainMenu.spaces",
-        route: "/premises-and-settings/spaces",
-      },
-      {
-        permission: Permission.CAN_MANAGE_RESOURCES,
-        title: "MainMenu.resources",
-        route: "/premises-and-settings/resources",
-      },
-      {
         permission: Permission.CAN_MANAGE_UNITS,
         title: "MainMenu.units",
         route: "/premises-and-settings/units",
