@@ -28,10 +28,6 @@ const AccordionContainer = styled.div`
   gap: var(--spacing-l);
 `;
 
-const StyledH1 = styled(H1).attrs({ $legacy: true })`
-  margin-top: 0;
-`;
-
 // NOTE fix table overflowing the page on mobile
 const StyledAccordion = styled(Accordion)`
   & > div > div {
@@ -116,7 +112,10 @@ function AllApplicationRounds(): JSX.Element | null {
         route={["recurring-reservations", "application-rounds"]}
       />
       <Container>
-        <StyledH1>{t("MainMenu.applicationRounds")}</StyledH1>
+        <div>
+          <H1 $legacy>{t("MainMenu.applicationRounds")}</H1>
+          <p>{t("ApplicationRound.description")}</p>
+        </div>
         <RoundsAccordion
           initiallyOpen
           hideIfEmpty

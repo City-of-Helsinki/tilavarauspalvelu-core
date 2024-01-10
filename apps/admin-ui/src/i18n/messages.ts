@@ -310,7 +310,7 @@ const translations: ITranslations = {
   MyUnits: {
     heading: ["Omat toimipisteet"],
     description: [
-      "Alla näet kaikki toimipisteet, joihin sinulla on käyttöoikeudet.",
+      "Alla näet kaikki toimipisteet, joihin sinulla on käyttöoikeus. Voit tarkastella varauskalentereita ja tehdä varauksia toimipisteen sivulla.",
     ],
     Calendar: {
       Tabs: {
@@ -495,6 +495,9 @@ const translations: ITranslations = {
     errors: {
       noApplicationRound: ["Hakukierrosta ei löytynyt"],
     },
+    description: [
+      "Alla näet kaikki hakukierrokset, joihin sinulla on käsittelyoikeus. Noudata kausivarausten käsittelyssä palvelukohtaisia käsittelyperiaatteita ja -aikatauluja.",
+    ],
     allocate: ["Jaa vuoroja"],
     applicationCount: ["hakemusta"],
     reservationUnitCount: ["varausyksikköä"],
@@ -870,7 +873,9 @@ const translations: ITranslations = {
     },
   },
   Units: {
-    description: ["Toimipisteen tietoja hallitaan"],
+    description: [
+      "Alla näet kaikki toimipisteet, joihin sinulla on käyttöoikeus. Voit luoda ja hallita tiloja, resursseja sekä varausyksiköitä toimipisteen sivulta. Toimipisteen tietoja hallitaan",
+    ],
     descriptionLinkLabel: ["toimipisterekisterin kautta"],
     descriptionLinkHref: ["https://asiointi.hel.fi/tprperhe/etusivu/"],
     filters: {
@@ -897,6 +902,9 @@ const translations: ITranslations = {
     reservationUnits_one: ["{{count}} varausyksikkö"],
     reservationUnits_other: ["{{count}} varausyksikköä"],
     noReservationUnits: ["Ei varausyksiköitä"],
+    noFilteredUnits: [
+      "Valitsemillasi suodattimilla ei löytynyt yhtään toimipistettä. Muuta rajausta tai tyhjennä kaikki suodattimet.",
+    ],
     noArea: ["Alue puuttuu"],
     noService: ["Palvelu puuttuu"],
     unitCount_one: ["{{count}} toimipiste"],
@@ -1046,7 +1054,7 @@ const translations: ITranslations = {
     startingDate: ["Aloituspäivä"],
     endingDate: ["Päättymispäivä"],
     startTime: ["Aloitusaika"],
-    endTime: ["Lopetusaika"],
+    endTime: ["Päättymisaika"],
     // dialog specific
     title: ["Varaa {{reservationUnit}}"],
     accept: ["Varaa"],
@@ -1056,10 +1064,10 @@ const translations: ITranslations = {
   ReservationUnits: {
     reservationUnitListHeading: ["Varausyksiköt"],
     reservationUnitListDescription: [
-      "Alla näet kaikki luodut varausyksiköt, jotka sinulla on oikeus nähdä. Uusia varausyksiköitä luodaan toimipisteisiin tai alueisiin liittyen.",
+      "Alla näet kaikki luodut varausyksiköt, joihin sinulla on käyttöoikeus. Voit luoda uuden varausyksikön toimipisteen sivulta.",
     ],
     noFilteredReservationUnits: [
-      "Valituilla suodattimilla ei löytynyt yhtään varausyksikköä. Valitse suodattimia uudelleen tai tyhjennä kaikki suodattimet.",
+      "Valitsemillasi suodattimilla ei löytynyt yhtään varausyksikköä. Muuta rajausta tai tyhjennä kaikki suodattimet.",
     ],
     state: {
       ARCHIVED: ["Arkistoitu"],
@@ -1109,10 +1117,10 @@ const translations: ITranslations = {
     moreFilters: ["Näytä lisää suodattimia"],
     lessFilters: ["Näytä vähemmän suodattimia"],
     filters: {
-      maxPersonsGteTag: ["Vähintään {{value}} hlö."],
-      maxPersonsLteTag: ["Enintään {{value}} hlö."],
-      surfaceAreaGteTag: ["Vähintään {{value}} m²."],
-      surfaceAreaLteTag: ["Enintään {{value}} m²."],
+      maxPersonsGteTag: ["Vähintään {{value}} hlö"],
+      maxPersonsLteTag: ["Enintään {{value}} hlö"],
+      surfaceAreaGteTag: ["Vähintään {{value}} m²"],
+      surfaceAreaLteTag: ["Enintään {{value}} m²"],
     },
   },
   ReservationUnitsFilter: {
@@ -1664,14 +1672,14 @@ const translations: ITranslations = {
   Reservations: {
     reservationListHeading: ["Varaustoiveet"],
     noFilteredReservations: [
-      "Valituilla suodattimilla ei löytynyt yhtään varausta. Valitse suodattimia uudelleen tai tyhjennä kaikki suodattimet.",
+      "Valitsemillasi suodattimilla ei löytynyt yhtään varausta. Muuta rajausta tai tyhjennä kaikki suodattimet.",
     ],
     reservationListDescription: [
-      "Alla näet kaikki käsiteltävät varaustoiveet.",
+      "Alla näet kaikki käsittelemättömät varaustoiveet. Klikkaamalla varaajan nimeä pääset käsittelemään varauksen.",
     ],
     allReservationListHeading: ["Kaikki varaukset"],
     allReservationListDescription: [
-      "Alla näet kaikki tulevat varaukset ja käsittelemättömät varaustoiveet. Voit hakea tai suodattaa varauksia. Klikkaa varauksen nimeä nähdäksesi tarkemmat tiedot varauksesta.",
+      "Alla näet kaikki tulevat varaukset ja käsittelemättömät varaustoiveet. Voit tarkastella varauksia tarkemmin klikkaamalla varaajan nimeä.",
     ],
     headings: {
       id: ["id"],

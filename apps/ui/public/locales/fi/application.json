@@ -22,7 +22,7 @@
   },
   "validation": {
     "Required": "Pakollinen",
-    "End date must be after begin date": "Lopetuspäivä on aloituspäivän jälkeen",
+    "End date must be after begin date": "Päättymispäivän pitää olla aloituspäivän jälkeen",
     "Expected number, received nan": "Pitää olla numero",
     "Number must be greater than or equal to 1": "Pitää olla vähintään 1",
     "Maximum duration must be greater than minimum duration": "Enimmäiskeston pitää olla suurempi kuin vähimmäiskesto",

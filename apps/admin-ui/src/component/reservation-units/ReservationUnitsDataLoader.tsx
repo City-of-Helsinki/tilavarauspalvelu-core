@@ -1,10 +1,7 @@
 import React from "react";
-import { ApolloError, useQuery } from "@apollo/client";
-import {
-  Query,
-  QueryReservationUnitsArgs,
-  ReservationUnitType,
-} from "common/types/gql-types";
+import { type ApolloError, useQuery } from "@apollo/client";
+import type { Query, QueryReservationUnitsArgs } from "common/types/gql-types";
+import { filterNonNullable } from "common/src/helpers";
 import { SEARCH_RESERVATION_UNITS_QUERY } from "./queries";
 import { FilterArguments } from "./Filters";
 import { useNotification } from "../../context/NotificationContext";
@@ -86,9 +83,9 @@ const ReservationUnitsDataReader = ({
     return <Loader />;
   }
 
-  const reservationUnits = (data?.reservationUnits?.edges || [])
-    .map((edge) => edge?.node)
-    .filter((x): x is ReservationUnitType => x != null);
+  const reservationUnits = filterNonNullable(
+    data?.reservationUnits?.edges.map((edge) => edge?.node)
+  );
 
   return (
     <>

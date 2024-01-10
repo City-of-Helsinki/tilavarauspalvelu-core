@@ -158,7 +158,7 @@ const translateType = (res: ReservationType, t: TFunction) => {
     res.reserveeType ?? undefined,
     res.reserveeIsUnregisteredAssociation ?? false
   );
-  return `${t(part1)}${part2 ? `${t(part2)}` : ""}`;
+  return `${t(part1)}${part2 ? ` ${t(part2)}` : ""}`;
 };
 
 const ReservationSummary = ({

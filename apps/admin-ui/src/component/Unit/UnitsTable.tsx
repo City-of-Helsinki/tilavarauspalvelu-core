@@ -6,6 +6,7 @@ import { TFunction } from "i18next";
 import { truncate } from "@/helpers";
 import { myUnitUrl, unitUrl } from "@/common/urls";
 import { CustomTable, TableLink } from "@/component/lists/components";
+import styled from "styled-components";
 
 export type Sort = {
   field: string;
@@ -52,6 +53,12 @@ const getColConfig = (t: TFunction, isMyUnits?: boolean) => [
   },
 ];
 
+const StyledCustomTable = styled(CustomTable)`
+  th {
+    text-align: left;
+  }
+`;
+
 const UnitsTable = ({
   sort,
   sortChanged: onSortChanged,
@@ -63,10 +70,10 @@ const UnitsTable = ({
   const cols = memoize(() => getColConfig(t, isMyUnits))();
 
   if (units.length === 0) {
-    return <div>{t("ReservationUnits.noFilteredReservationUnits")}</div>;
+    return <div>{t("Unit.noFilteredUnits")}</div>;
   }
   return (
-    <CustomTable
+    <StyledCustomTable
       setSort={onSortChanged}
       indexKey="pk"
       rows={units}
