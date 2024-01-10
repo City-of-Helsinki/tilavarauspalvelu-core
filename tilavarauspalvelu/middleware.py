@@ -1,4 +1,5 @@
 from django.conf import settings
+from sentry_sdk import capture_exception
 
 
 class MultipleProxyMiddleware:
@@ -29,3 +30,12 @@ class MultipleProxyMiddleware:
         if "HTTP_X_ORIGINAL_HOST" in request.META:
             request.META["HTTP_X_FORWARDED_HOST"] = request.META["HTTP_X_ORIGINAL_HOST"]
         return self.get_response(request)
+
+
+class GraphQLSentryMiddleware:
+    def resolve(self, next, root, info, **kwargs):
+        try:
+            return next(root, info, **kwargs)
+        except Exception as err:
+            capture_exception(err)
+            return err

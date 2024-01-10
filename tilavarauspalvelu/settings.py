@@ -217,7 +217,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     # Make sure PrometheusBeforeMiddleware is the first one
     "django_prometheus.middleware.PrometheusBeforeMiddleware",
-    "tilavarauspalvelu.multi_proxy_middleware.MultipleProxyMiddleware",
+    "tilavarauspalvelu.middleware.MultipleProxyMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     # Keep this after security middleware, correct place according to whitenoise documentation
@@ -463,6 +463,7 @@ GRAPHENE = {
     "SCHEMA": "api.graphql.schema.schema",
     "MIDDLEWARE": [
         "graphql_jwt.middleware.JSONWebTokenMiddleware",
+        "tilavarauspalvelu.middleware.GraphQLSentryMiddleware",
     ],
     "TESTING_ENDPOINT": "/graphql/",
 }
