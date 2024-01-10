@@ -1,6 +1,5 @@
 import React from "react";
 import { ApolloError, useQuery } from "@apollo/client";
-import { parse } from "date-fns";
 import { trim, values } from "lodash";
 import {
   Query,
@@ -14,6 +13,7 @@ import Loader from "../Loader";
 import { FilterArguments } from "./Filters";
 import { RESERVATIONS_QUERY } from "./queries";
 import ReservationsTable from "./ReservationsTable";
+import { fromUIDate } from "common/src/common/util";
 
 export type Sort = {
   field: string;
@@ -27,13 +27,17 @@ type Props = {
   defaultFiltering: QueryReservationsArgs;
 };
 
-const parseDate = (hdsDate: string) => {
+function parseDate(hdsDate: string): string | null {
   if (trim(hdsDate) === "") {
-    return undefined;
+    return null;
   }
 
-  return parse(hdsDate, "d.M.yyyy", new Date()).toISOString();
-};
+  const d = fromUIDate(hdsDate);
+  if (d && !isNaN(d.getTime())) {
+    return d.toISOString();
+  }
+  return null;
+}
 
 const mapFilterParams = (
   params: FilterArguments,
