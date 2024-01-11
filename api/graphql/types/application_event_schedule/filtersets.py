@@ -34,6 +34,7 @@ class ApplicationEventScheduleFilterSet(BaseModelFilterSet):
     allocated_day = IntMultipleChoiceFilter()
     accepted = django_filters.BooleanFilter(method="filter_accepted")
     declined = django_filters.BooleanFilter()
+    unallocated = django_filters.BooleanFilter(method="filter_unallocated")
 
     text_search = django_filters.CharFilter(method="filter_text_search")
 
@@ -87,6 +88,29 @@ class ApplicationEventScheduleFilterSet(BaseModelFilterSet):
                     allocated_end__isnull=True,
                     allocated_day__isnull=True,
                     allocated_reservation_unit__isnull=True,
+                )
+            )
+        )
+
+    @staticmethod
+    def filter_unallocated(qs: ApplicationEventScheduleQuerySet, name: str, value: bool) -> QuerySet:
+        return (
+            qs.filter(
+                declined=False,
+                allocated_begin__isnull=True,
+                allocated_end__isnull=True,
+                allocated_day__isnull=True,
+                allocated_reservation_unit__isnull=True,
+            )
+            if value
+            else qs.filter(
+                models.Q(declined=True)
+                | models.Q(
+                    declined=False,
+                    allocated_begin__isnull=False,
+                    allocated_end__isnull=False,
+                    allocated_day__isnull=False,
+                    allocated_reservation_unit__isnull=False,
                 )
             )
         )
