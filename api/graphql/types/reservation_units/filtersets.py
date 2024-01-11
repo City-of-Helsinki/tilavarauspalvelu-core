@@ -102,10 +102,8 @@ class ReservationUnitsFilterSet(BaseModelFilterSet, ReservationUnitQueryBuilderM
 
     def get_text_search(self, qs, property, value: str):
         query_str = self.build_elastic_query_str(value)
-
         sq = SearchQuery.do_search("reservation_units", {"query_string": {"query": query_str}})
-
-        return ReservationUnit.objects.from_search_results(sq)
+        return qs.from_search_results(sq)
 
     def get_max_persons_gte(self, qs, property, value):
         filters = Q(max_persons__gte=value) | Q(max_persons__isnull=True)
