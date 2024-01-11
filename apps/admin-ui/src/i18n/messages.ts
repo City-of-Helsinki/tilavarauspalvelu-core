@@ -1734,7 +1734,7 @@ const translations: ITranslations = {
       applicant: ["Valitse asiakastyyppi"],
       // NOTE on purpose duplicating the translation, the filter is separate but we want same labels
       status: ["Valitse käsittelyn vaihe"],
-      event_status: ["Valitse käsittelyn vaihe"],
+      eventStatus: ["Valitse käsittelyn vaihe"],
       weekday: ["Valitse viikonpäivä"],
     },
     label: {
@@ -1742,7 +1742,7 @@ const translations: ITranslations = {
       reservationUnit: ["Varausyksikkö"],
       applicant: ["Asiakastyyppi"],
       status: ["Käsittelyn vaihe"],
-      event_status: ["Käsittelyn vaihe"],
+      eventStatus: ["Käsittelyn vaihe"],
       weekday: ["Viikonpäivä"],
     },
   },

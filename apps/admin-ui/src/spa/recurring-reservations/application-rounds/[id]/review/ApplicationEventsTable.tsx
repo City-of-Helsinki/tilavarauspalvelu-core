@@ -120,12 +120,7 @@ const appEventMapper = (
       )} t`,
       " / "
     ),
-    statusView: (
-      <ApplicationEventStatusCell
-        status={status}
-        text={`ApplicationEvent.statuses.${status}`}
-      />
-    ),
+    statusView: <ApplicationEventStatusCell status={status} />,
   };
 };
 

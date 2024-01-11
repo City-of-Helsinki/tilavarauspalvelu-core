@@ -49,12 +49,17 @@ export function AllocatedEventDataLoader({
   const unitFilter = searchParams.getAll("unit");
   const applicantFilter = searchParams.getAll("applicant");
   const nameFilter = searchParams.get("name");
-  const appEventStatusFilter = searchParams.getAll("event_status");
+  const appEventStatusFilter = searchParams.getAll("eventStatus");
+  const weekDayFilter = searchParams.getAll("weekday");
+  const reservationUnitFilter = searchParams.getAll("reservationUnit");
 
   const aesFilter = transformApplicationEventStatus(appEventStatusFilter);
+  // Unallocated should be never shown in this table
   const POSSIBLE_EVENT_STATUSES = [
     ApplicationEventStatusChoice.Approved,
     ApplicationEventStatusChoice.Declined,
+    ApplicationEventStatusChoice.Failed,
+    ApplicationEventStatusChoice.Reserved,
   ];
   const filteredAes = POSSIBLE_EVENT_STATUSES.filter(
     (s) => aesFilter.filter((aes) => aes === s).length > 0
@@ -65,11 +70,18 @@ export function AllocatedEventDataLoader({
   >(APPLICATIONS_EVENTS_SCHEDULE_QUERY, {
     skip: !applicationRoundPk,
     variables: {
-      allocatedUnit: unitFilter.map(Number),
+      allocatedUnit: unitFilter.map(Number).filter(Number.isFinite),
       applicationRound: applicationRoundPk,
       applicantType: transformApplicantType(applicantFilter),
       applicationEventStatus:
         filteredAes.length === 0 ? POSSIBLE_EVENT_STATUSES : filteredAes,
+      allocatedDay: weekDayFilter
+        .map(Number)
+        .filter(Number.isFinite)
+        .filter((n) => n >= 0 && n <= 6),
+      allocatedReservationUnit: reservationUnitFilter
+        .map(Number)
+        .filter(Number.isFinite),
       textSearch: nameFilter,
       offset: 0,
       first: LIST_PAGE_SIZE,
@@ -78,7 +90,9 @@ export function AllocatedEventDataLoader({
     onError: (err: ApolloError) => {
       notifyError(err.message);
     },
-    fetchPolicy: "cache-and-network",
+    // TODO cache-and-network doesn't work because it appends the network-results on top of the cache
+    // need to add custom caching merge with uniq before changing this
+    fetchPolicy: "network-only",
   });
 
   const { t } = useTranslation();
@@ -87,9 +101,13 @@ export function AllocatedEventDataLoader({
     return <Loader />;
   }
 
-  const aes = filterNonNullable(
+  // eventSchedule returns based on if the event is allocated or not
+  // so there are schedules that are not allocated but the event itself is allocated
+  // requires new backend filter to remove the array.filter
+  const aeSchedules = filterNonNullable(
     data?.applicationEventSchedules?.edges.map((edge) => edge?.node)
-  );
+  ).filter((aes) => aes.allocatedDay != null || aes.declined);
+  // TODO totalCount is not correct because of frontend filtering
   const totalCount = data?.applicationEventSchedules?.totalCount ?? 0;
 
   const sort = undefined;
@@ -98,23 +116,24 @@ export function AllocatedEventDataLoader({
     console.warn("TODO: handleSortChanged", field);
   };
 
-  const count = data?.applicationEventSchedules?.totalCount ?? 0;
   return (
     <>
       <span>
         <b>
-          {count} {t("ApplicationRound.applicationEventCount")}
+          {totalCount} {t("ApplicationRound.applicationEventCount")}
         </b>
       </span>
       <AllocatedEventsTable
-        schedules={aes}
+        schedules={aeSchedules}
         sort={sort}
         sortChanged={handleSortChanged}
       />
       <More
-        key={aes.length}
+        // TODO why does this need a key?
+        // key={aeSchedules.length}
         totalCount={totalCount}
-        count={aes.length}
+        count={aeSchedules.length}
+        // TODO this throws
         fetchMore={() =>
           fetchMore({
             variables: {

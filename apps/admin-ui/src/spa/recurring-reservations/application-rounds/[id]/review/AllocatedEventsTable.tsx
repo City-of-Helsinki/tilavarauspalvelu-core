@@ -3,12 +3,16 @@ import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import { memoize } from "lodash";
 import { IconLinkExternal } from "hds-react";
-import type { ApplicationEventScheduleNode } from "common/types/gql-types";
+import {
+  ApplicationEventStatusChoice,
+  type ApplicationEventScheduleNode,
+} from "common/types/gql-types";
 import { publicUrl } from "@/common/const";
 import { truncate } from "@/helpers";
 import { applicationDetailsUrl } from "@/common/urls";
 import { CustomTable, ExternalTableLink } from "@/component/lists/components";
 import { getApplicantName } from "app/component/applications/util";
+import { ApplicationEventStatusCell } from "./StatusCell";
 
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
@@ -47,11 +51,14 @@ function aesMapper(
   const application = ae?.application;
   const applicantName = getApplicantName(application);
 
-  // TODO replace day with allocatedDay when we have test material
-  const { day, begin, end } = aes;
+  const { allocatedDay: day, allocatedBegin: begin, allocatedEnd: end } = aes;
   const timeString = `${t(`dayShort.${day}`)} ${begin} - ${end}`;
   const isAllocated = aes.allocatedBegin && aes.allocatedEnd;
-  const status = isDeclined ? "declined" : isAllocated ? "allocated" : "-";
+  const status = isDeclined
+    ? ApplicationEventStatusChoice.Declined
+    : isAllocated
+      ? ApplicationEventStatusChoice.Approved
+      : undefined;
 
   return {
     applicationPk: application?.pk ?? 0,
@@ -61,8 +68,7 @@ function aesMapper(
     unitName: allocatedUnit,
     time: timeString,
     name: ae.name ?? "-",
-    // TODO implement the JSX element
-    statusView: <span>{status}</span>,
+    statusView: <ApplicationEventStatusCell status={status} />,
   };
 }
 

@@ -44,7 +44,7 @@ export function ApplicationDataLoader({
     {
       skip: !applicationRoundPk,
       variables: {
-        unit: unitFilter.map(Number),
+        unit: unitFilter.map(Number).filter(Number.isFinite),
         applicationRound: applicationRoundPk,
         offset: 0,
         first: LIST_PAGE_SIZE,

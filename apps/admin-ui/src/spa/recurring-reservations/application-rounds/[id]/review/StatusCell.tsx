@@ -71,41 +71,41 @@ const StyledStatusCell = styled(StatusCell)`
   }
 `;
 
-type StatusCellProps = {
-  text: string;
-};
-
 // Define separate components to make the refactoring easier
 // the type parameter and dynamic switching is very error prone and hard to grep for in the source code
-export function ApplicationStatusCell(
-  props: StatusCellProps & { status?: ApplicationStatusChoice }
-): JSX.Element {
-  let icon: ReactNode;
+export function ApplicationStatusCell({
+  status,
+}: {
+  status?: ApplicationStatusChoice;
+}): JSX.Element {
+  // TODO this can return undefined
+  const text = `Application.statuses.${status}`;
 
   // TODO there is a few icons we want, not the envelope but Cross and Check for ApplicationEvents
   // nothing for Application though
-  if (props.status == null) {
+  let icon: ReactNode;
+  if (status == null) {
     icon = null;
-  } else if (props.status === ApplicationStatusChoice.Handled) {
+  } else if (status === ApplicationStatusChoice.Handled) {
     icon = <IconCheck aria-hidden style={{ color: "var(--color-success)" }} />;
   } else {
-    icon = <StatusDot aria-hidden status={props.status} size={12} />;
+    icon = <StatusDot aria-hidden status={status} size={12} />;
   }
 
-  return <StyledStatusCell {...props} icon={icon} />;
+  return <StyledStatusCell text={text} icon={icon} />;
 }
 
-export function ApplicationEventStatusCell(
-  props: StatusCellProps & { status?: ApplicationEventStatusChoice }
-): JSX.Element {
+export function ApplicationEventStatusCell({
+  status,
+}: {
+  status?: ApplicationEventStatusChoice;
+}): JSX.Element {
+  // TODO this can return undefined
+  const text = `ApplicationEvent.statuses.${status}`;
   return (
     <StyledStatusCell
-      {...props}
-      icon={
-        props.status && (
-          <ApplicationEventStatusDot status={props.status} size={12} />
-        )
-      }
+      text={text}
+      icon={status && <ApplicationEventStatusDot status={status} size={12} />}
     />
   );
 }

@@ -130,12 +130,7 @@ const appMapper = (app: ApplicationNode, t: TFunction): ApplicationView => {
     units,
     name,
     status,
-    statusView: (
-      <ApplicationStatusCell
-        status={status}
-        text={`Application.statuses.${status}`}
-      />
-    ),
+    statusView: <ApplicationStatusCell status={status} />,
     statusType: app.status ?? undefined,
     applicationCount: "NA",
   };

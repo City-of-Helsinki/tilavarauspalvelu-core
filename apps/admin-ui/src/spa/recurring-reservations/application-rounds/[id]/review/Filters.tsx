@@ -118,7 +118,7 @@ export function Filters({
         return (
           reservationUnits.find((u) => u.pk === Number(value))?.nameFi ?? "-"
         );
-      case "event_status":
+      case "eventStatus":
         return t(`ApplicationEvent.statuses.${value}`);
       default:
         return value;
@@ -140,7 +140,7 @@ export function Filters({
   // Hide the tags that don't have associated filter on the current tab
   const hideSearchTags: string[] = [
     "tab",
-    ...(statusOption !== "application" ? ["status"] : ["event_status"]),
+    ...(statusOption !== "application" ? ["status"] : ["eventStatus"]),
     ...(!enableWeekday ? ["weekday"] : []),
     ...(!enableReservationUnit ? ["reservationUnit"] : []),
   ];
@@ -174,7 +174,7 @@ export function Filters({
     <AutoGrid>
       <MultiSelectFilter name="unit" options={unitOptions} />
       {statusOption !== "application" ? (
-        <MultiSelectFilter name="event_status" options={eventStatusOptions} />
+        <MultiSelectFilter name="eventStatus" options={eventStatusOptions} />
       ) : (
         <MultiSelectFilter name="status" options={statusOptions} />
       )}

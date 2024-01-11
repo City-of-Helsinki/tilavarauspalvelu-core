@@ -46,7 +46,7 @@ export function ApplicationEventDataLoader({
   const unitFilter = searchParams.getAll("unit");
   const applicantFilter = searchParams.getAll("applicant");
   const nameFilter = searchParams.get("name");
-  const eventStatusFilter = searchParams.getAll("event_status");
+  const eventStatusFilter = searchParams.getAll("eventStatus");
 
   const { fetchMore, loading, data } = useQuery<
     Query,
@@ -54,7 +54,7 @@ export function ApplicationEventDataLoader({
   >(APPLICATIONS_EVENTS_QUERY, {
     skip: !applicationRoundPk,
     variables: {
-      unit: unitFilter.map(Number),
+      unit: unitFilter.map(Number).filter(Number.isFinite),
       applicationRound: applicationRoundPk,
       applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,
       status: transformApplicationEventStatus(eventStatusFilter),

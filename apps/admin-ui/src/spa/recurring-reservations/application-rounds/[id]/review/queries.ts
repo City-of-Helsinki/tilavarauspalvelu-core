@@ -136,6 +136,8 @@ export const APPLICATIONS_EVENTS_SCHEDULE_QUERY = gql`
     $allocatedUnit: [Int]
     $applicantType: [ApplicantTypeChoice]
     $applicationEventStatus: [ApplicationEventStatusChoice]
+    $allocatedReservationUnit: [Int]
+    $allocatedDay: [Int]
     $textSearch: String
   ) {
     applicationEventSchedules(
@@ -145,6 +147,8 @@ export const APPLICATIONS_EVENTS_SCHEDULE_QUERY = gql`
       allocatedUnit: $allocatedUnit
       applicantType: $applicantType
       applicationEventStatus: $applicationEventStatus
+      allocatedReservationUnit: $allocatedReservationUnit
+      allocatedDay: $allocatedDay
       textSearch: $textSearch
     ) {
       edges {
@@ -152,9 +156,8 @@ export const APPLICATIONS_EVENTS_SCHEDULE_QUERY = gql`
           pk
           declined
           allocatedDay
-          day
-          begin
-          end
+          allocatedBegin
+          allocatedEnd
           allocatedReservationUnit {
             nameFi
             unit {
