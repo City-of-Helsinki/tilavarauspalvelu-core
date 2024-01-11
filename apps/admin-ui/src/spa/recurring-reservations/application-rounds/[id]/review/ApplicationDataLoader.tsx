@@ -32,6 +32,7 @@ export function ApplicationDataLoader({
   applicationRoundPk,
 }: Props): JSX.Element {
   const { notifyError } = useNotification();
+  const { t } = useTranslation();
 
   const [searchParams] = useSearchParams();
   const unitFilter = searchParams.getAll("unit");
@@ -70,8 +71,6 @@ export function ApplicationDataLoader({
     }
   );
 
-  const { t } = useTranslation();
-
   if (loading && !data) {
     return <Loader />;
   }
@@ -100,7 +99,6 @@ export function ApplicationDataLoader({
         sortChanged={handleSortChanged}
       />
       <More
-        key={applications.length}
         totalCount={data?.applications?.totalCount || 0}
         count={applications.length}
         fetchMore={() =>

@@ -110,7 +110,6 @@ export function ApplicationEventDataLoader({
         sortChanged={handleSortChanged}
       />
       <More
-        key={applicationEvents.length}
         totalCount={data?.applicationEvents?.totalCount || 0}
         count={applicationEvents.length}
         fetchMore={() =>

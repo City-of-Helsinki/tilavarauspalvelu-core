@@ -149,7 +149,6 @@ const ReservationsDataLoader = ({
       <More
         totalCount={totalCount || 0}
         count={data.length}
-        isLoading={loading}
         fetchMore={() => fetchMore({ variables: { offset } })}
       />
     </>

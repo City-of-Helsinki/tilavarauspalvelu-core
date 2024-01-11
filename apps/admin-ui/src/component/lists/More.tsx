@@ -2,6 +2,8 @@ import React from "react";
 import styled from "styled-components";
 import { Button } from "hds-react";
 import { useTranslation } from "react-i18next";
+import type { ApolloQueryResult } from "@apollo/client";
+import type { Query } from "common/types/gql-types";
 
 const Wrapper = styled.div`
   display: flex;
@@ -15,17 +17,18 @@ const Counts = styled.div`
 type Props = {
   count: number;
   totalCount: number;
-  fetchMore: () => void;
-  isLoading?: boolean;
+  fetchMore: () => Promise<ApolloQueryResult<Query>>;
 };
 
-export const More = ({
-  count,
-  totalCount,
-  isLoading,
-  fetchMore,
-}: Props): JSX.Element => {
+export function More({ count, totalCount, fetchMore }: Props): JSX.Element {
   const { t } = useTranslation();
+  const [isFetching, setIsFetching] = React.useState(false);
+
+  const handleClick = async () => {
+    setIsFetching(true);
+    await fetchMore();
+    setIsFetching(false);
+  };
 
   return (
     <Wrapper>
@@ -37,7 +40,11 @@ export const More = ({
               totalCount,
             })}
           </Counts>
-          <Button isLoading={isLoading} variant="secondary" onClick={fetchMore}>
+          <Button
+            isLoading={isFetching}
+            variant="secondary"
+            onClick={handleClick}
+          >
             {t("common.showMore")}
           </Button>
         </div>
@@ -52,4 +59,4 @@ export const More = ({
       )}
     </Wrapper>
   );
-};
+}
