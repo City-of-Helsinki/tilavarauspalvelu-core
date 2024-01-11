@@ -43,8 +43,8 @@ function aesMapper(
   t: TFunction,
   aes: ApplicationEventScheduleNode
 ): ApplicationScheduleView {
-  const isDeclined = aes.declined;
-  const allocatedReservationUnit = aes.allocatedReservationUnit?.nameFi ?? "-";
+  const allocatedReservationUnitName =
+    aes.allocatedReservationUnit?.nameFi ?? "-";
   const allocatedUnit = aes.allocatedReservationUnit?.unit?.nameFi ?? "-";
 
   const ae = aes.applicationEvent;
@@ -52,19 +52,24 @@ function aesMapper(
   const applicantName = getApplicantName(application);
 
   const { allocatedDay: day, allocatedBegin: begin, allocatedEnd: end } = aes;
-  const timeString = `${t(`dayShort.${day}`)} ${begin} - ${end}`;
+
   const isAllocated = aes.allocatedBegin && aes.allocatedEnd;
+  const isDeclined = aes.declined;
   const status = isDeclined
     ? ApplicationEventStatusChoice.Declined
     : isAllocated
       ? ApplicationEventStatusChoice.Approved
       : undefined;
 
+  const timeString = isAllocated
+    ? `${t(`dayShort.${day}`)} ${begin} - ${end}`
+    : "-";
+
   return {
     applicationPk: application?.pk ?? 0,
     pk: aes.applicationEvent.pk ?? 0,
     applicantName,
-    allocatedReservationUnitName: allocatedReservationUnit,
+    allocatedReservationUnitName,
     unitName: allocatedUnit,
     time: timeString,
     name: ae.name ?? "-",

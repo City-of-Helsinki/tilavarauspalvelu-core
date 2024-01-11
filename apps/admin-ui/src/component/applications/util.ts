@@ -19,12 +19,12 @@ export const getApplicationStatusColor = (
   size: "s" | "l"
 ): string => {
   switch (status) {
+    case ApplicationStatusChoice.Handled:
+      return "var(--color-info)";
+    case ApplicationStatusChoice.InAllocation:
+      return "var(--color-alert-dark)";
     case ApplicationStatusChoice.Received:
     case ApplicationStatusChoice.Draft:
-      return "var(--color-info)";
-    case ApplicationStatusChoice.Handled:
-    case ApplicationStatusChoice.InAllocation:
-      return "var(--color-success)";
     case ApplicationStatusChoice.ResultsSent:
       return "var(--color-white)";
     case ApplicationStatusChoice.Expired:
@@ -47,10 +47,9 @@ export const getApplicationEventStatusColor = (
   switch (status) {
     case ApplicationEventStatusChoice.Reserved:
     case ApplicationEventStatusChoice.Unallocated:
-      return "var(--color-info)";
+      return "var(--color-alert-dark)";
     case ApplicationEventStatusChoice.Approved:
       return "var(--color-success)";
-    // return "var(--color-alert-light)";
     case ApplicationEventStatusChoice.Failed:
     case ApplicationEventStatusChoice.Declined:
     default:

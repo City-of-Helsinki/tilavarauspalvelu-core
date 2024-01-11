@@ -1,6 +1,6 @@
-import React, { ReactNode } from "react";
+import React, { type ReactNode } from "react";
 import styled, { css } from "styled-components";
-import { IconCheck } from "hds-react";
+import { IconCheckCircleFill, IconCrossCircleFill } from "hds-react";
 import { useTranslation } from "react-i18next";
 import {
   ApplicationEventStatusChoice,
@@ -11,17 +11,18 @@ import {
   getApplicationStatusColor,
 } from "@/component//applications/util";
 
-const dotCss = css<{
-  size: number;
-}>`
+const dotCss = css`
   display: inline-block;
-  width: ${({ size }) => size && `${size}px`};
-  height: ${({ size }) => size && `${size}px`};
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
+
+  /* icons have 24px rect around, add margin to match them */
+  margin: 4px;
 `;
+
 const StatusDot = styled.div<{
   status: ApplicationStatusChoice;
-  size: number;
 }>`
   ${dotCss}
   background-color: ${({ status }) => getApplicationStatusColor(status, "s")};
@@ -29,7 +30,6 @@ const StatusDot = styled.div<{
 
 const ApplicationEventStatusDot = styled.div<{
   status: ApplicationEventStatusChoice;
-  size: number;
 }>`
   ${dotCss}
   background-color: ${({ status }) =>
@@ -64,12 +64,43 @@ function StatusCell({ text, icon }: IStatusCellProps): JSX.Element {
   );
 }
 
-const StyledStatusCell = styled(StatusCell)`
-  gap: 0 !important;
-  > div {
-    gap: 0 !important;
+function ApplicationStatusIcon({
+  status,
+}: {
+  status?: ApplicationStatusChoice;
+}): JSX.Element | null {
+  if (status == null) {
+    return null;
   }
-`;
+  return <StatusDot aria-hidden status={status} />;
+}
+
+function ApplicationEventStatusIcon({
+  status,
+}: {
+  status?: ApplicationEventStatusChoice;
+}): JSX.Element | null {
+  if (status == null) {
+    return null;
+  }
+  if (status === ApplicationEventStatusChoice.Approved) {
+    return (
+      <IconCheckCircleFill
+        aria-hidden
+        style={{ color: "var(--color-success)" }}
+      />
+    );
+  }
+  if (status === ApplicationEventStatusChoice.Declined) {
+    return (
+      <IconCrossCircleFill
+        aria-hidden
+        style={{ color: "var(--color-error)" }}
+      />
+    );
+  }
+  return <ApplicationEventStatusDot aria-hidden status={status} />;
+}
 
 // Define separate components to make the refactoring easier
 // the type parameter and dynamic switching is very error prone and hard to grep for in the source code
@@ -81,18 +112,9 @@ export function ApplicationStatusCell({
   // TODO this can return undefined
   const text = `Application.statuses.${status}`;
 
-  // TODO there is a few icons we want, not the envelope but Cross and Check for ApplicationEvents
-  // nothing for Application though
-  let icon: ReactNode;
-  if (status == null) {
-    icon = null;
-  } else if (status === ApplicationStatusChoice.Handled) {
-    icon = <IconCheck aria-hidden style={{ color: "var(--color-success)" }} />;
-  } else {
-    icon = <StatusDot aria-hidden status={status} size={12} />;
-  }
-
-  return <StyledStatusCell text={text} icon={icon} />;
+  return (
+    <StatusCell text={text} icon={<ApplicationStatusIcon status={status} />} />
+  );
 }
 
 export function ApplicationEventStatusCell({
@@ -103,9 +125,9 @@ export function ApplicationEventStatusCell({
   // TODO this can return undefined
   const text = `ApplicationEvent.statuses.${status}`;
   return (
-    <StyledStatusCell
+    <StatusCell
       text={text}
-      icon={status && <ApplicationEventStatusDot status={status} size={12} />}
+      icon={<ApplicationEventStatusIcon status={status} />}
     />
   );
 }
