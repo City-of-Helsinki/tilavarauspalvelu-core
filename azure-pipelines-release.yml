@@ -1,0 +1,27 @@
+# Build and deploy to the test environment after merging to the main branch.
+
+resources:
+  repositories:
+  # Azure DevOps repository.
+  - repository: tilavarauspalvelu-pipelines
+    type: git
+    # Azure DevOps project/repository.
+    name: tilavarauspalvelu/tilavarauspalvelu-pipelines
+
+trigger:
+  batch: false
+  tags:
+    include:
+    - v*
+    - release-*
+    - hotfix-*
+
+# Don't use Azure pipelines for PRs.
+pr: none
+
+# By default, use self-hosted agents.
+pool: Default
+
+extends:
+  # Filename for pipeline to extend from the Azure DevOps Repository.
+  template: azure-pipelines-build-tilavarauspalvelu-core-release.yml@tilavarauspalvelu-pipelines
