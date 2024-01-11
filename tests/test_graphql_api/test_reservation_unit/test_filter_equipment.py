@@ -2,23 +2,13 @@ import pytest
 
 from tests.factories import EquipmentFactory, ReservationUnitFactory
 
+from .helpers import reservation_units_query
+
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
     pytest.mark.usefixtures("_disable_elasticsearch"),
 ]
-
-QUERY = """
-    query ($equipments: [Int]) {
-        reservationUnits(equipments: $equipments) {
-            edges {
-                node {
-                    nameFi
-                }
-            }
-        }
-    }
-"""
 
 
 def test_reservation_unit__filter__by_equipment(graphql):
@@ -31,12 +21,8 @@ def test_reservation_unit__filter__by_equipment(graphql):
 
     # when:
     # - The user requests reservation units with a specific equipment
-    response = graphql(
-        QUERY,
-        variables={
-            "equipments": [equipment_1.pk],
-        },
-    )
+    query = reservation_units_query(fields="nameFi", equipments=[equipment_1.pk])
+    response = graphql(query)
 
     # then:
     # - The response contains only the expected reservation unit
@@ -56,12 +42,8 @@ def test_reservation_unit__filter__by_equipment__multiple(graphql):
 
     # when:
     # - The user requests reservation units with a multiple equipments
-    response = graphql(
-        QUERY,
-        variables={
-            "equipments": [equipment_1.pk, equipment_2.pk],
-        },
-    )
+    query = reservation_units_query(fields="nameFi", equipments=[equipment_1.pk, equipment_2.pk])
+    response = graphql(query)
 
     # then:
     # - The response contains only the reservation unit with all equipments
@@ -80,12 +62,8 @@ def test_reservation_unit__filter__by_equipment__multiple__none_match(graphql):
 
     # when:
     # - The user requests reservation units with a multiple equipments
-    response = graphql(
-        QUERY,
-        variables={
-            "equipments": [equipment_1.pk, equipment_2.pk],
-        },
-    )
+    query = reservation_units_query(fields="nameFi", equipments=[equipment_1.pk, equipment_2.pk])
+    response = graphql(query)
 
     # then:
     # - The response does not contain any reservation units
