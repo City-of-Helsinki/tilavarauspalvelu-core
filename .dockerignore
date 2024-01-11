@@ -15,8 +15,8 @@ fixtures/
 .gitattributes
 .gitignore
 .pre-commit-config.yaml
-azure-pipelines-devtest.yml
-azure-pipelines-stageprod.yml
+azure-pipelines-dev.yml
+azure-pipelines-release.yml
 docker-compose.yml
 docker/Dockerfile
 docker/Dockerfile.final
