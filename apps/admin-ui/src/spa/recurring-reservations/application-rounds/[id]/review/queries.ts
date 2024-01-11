@@ -138,6 +138,9 @@ export const APPLICATIONS_EVENTS_SCHEDULE_QUERY = gql`
     $applicationEventStatus: [ApplicationEventStatusChoice]
     $allocatedReservationUnit: [Int]
     $allocatedDay: [Int]
+    $accepted: Boolean
+    $declined: Boolean
+    $unallocated: Boolean
     $textSearch: String
   ) {
     applicationEventSchedules(
@@ -149,6 +152,9 @@ export const APPLICATIONS_EVENTS_SCHEDULE_QUERY = gql`
       applicationEventStatus: $applicationEventStatus
       allocatedReservationUnit: $allocatedReservationUnit
       allocatedDay: $allocatedDay
+      accepted: $accepted
+      declined: $declined
+      unallocated: $unallocated
       textSearch: $textSearch
     ) {
       edges {

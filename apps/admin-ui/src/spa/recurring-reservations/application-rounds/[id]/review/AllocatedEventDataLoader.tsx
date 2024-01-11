@@ -54,16 +54,14 @@ export function AllocatedEventDataLoader({
   const reservationUnitFilter = searchParams.getAll("reservationUnit");
 
   const aesFilter = transformApplicationEventStatus(appEventStatusFilter);
-  // Unallocated should be never shown in this table
-  const POSSIBLE_EVENT_STATUSES = [
-    ApplicationEventStatusChoice.Approved,
-    ApplicationEventStatusChoice.Declined,
-    ApplicationEventStatusChoice.Failed,
-    ApplicationEventStatusChoice.Reserved,
-  ];
-  const filteredAes = POSSIBLE_EVENT_STATUSES.filter(
-    (s) => aesFilter.filter((aes) => aes === s).length > 0
-  );
+  // accepted and declined are mutually exclusive
+  const onlyAccepted =
+    aesFilter.length === 1 &&
+    aesFilter[0] === ApplicationEventStatusChoice.Approved;
+  const onlyDeclined =
+    aesFilter.length === 1 &&
+    aesFilter[0] === ApplicationEventStatusChoice.Declined;
+
   const { fetchMore, loading, data } = useQuery<
     Query,
     QueryApplicationEventSchedulesArgs
@@ -73,8 +71,6 @@ export function AllocatedEventDataLoader({
       allocatedUnit: unitFilter.map(Number).filter(Number.isFinite),
       applicationRound: applicationRoundPk,
       applicantType: transformApplicantType(applicantFilter),
-      applicationEventStatus:
-        filteredAes.length === 0 ? POSSIBLE_EVENT_STATUSES : filteredAes,
       allocatedDay: weekDayFilter
         .map(Number)
         .filter(Number.isFinite)
@@ -82,6 +78,9 @@ export function AllocatedEventDataLoader({
       allocatedReservationUnit: reservationUnitFilter
         .map(Number)
         .filter(Number.isFinite),
+      unallocated: false,
+      accepted: onlyAccepted ? true : undefined,
+      declined: onlyDeclined ? true : undefined,
       textSearch: nameFilter,
       offset: 0,
       first: LIST_PAGE_SIZE,
@@ -101,13 +100,10 @@ export function AllocatedEventDataLoader({
     return <Loader />;
   }
 
-  // eventSchedule returns based on if the event is allocated or not
-  // so there are schedules that are not allocated but the event itself is allocated
-  // requires new backend filter to remove the array.filter
-  const aeSchedules = filterNonNullable(
+  const aes = filterNonNullable(
     data?.applicationEventSchedules?.edges.map((edge) => edge?.node)
-  ).filter((aes) => aes.allocatedDay != null || aes.declined);
-  // TODO totalCount is not correct because of frontend filtering
+  );
+
   const totalCount = data?.applicationEventSchedules?.totalCount ?? 0;
 
   const sort = undefined;
@@ -124,16 +120,13 @@ export function AllocatedEventDataLoader({
         </b>
       </span>
       <AllocatedEventsTable
-        schedules={aeSchedules}
+        schedules={aes}
         sort={sort}
         sortChanged={handleSortChanged}
       />
       <More
-        // TODO why does this need a key?
-        // key={aeSchedules.length}
         totalCount={totalCount}
-        count={aeSchedules.length}
-        // TODO this throws
+        count={aes.length}
         fetchMore={() =>
           fetchMore({
             variables: {

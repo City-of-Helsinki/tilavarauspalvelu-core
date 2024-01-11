@@ -1741,6 +1741,7 @@ export type QueryAgeGroupsArgs = {
 };
 
 export type QueryApplicationEventSchedulesArgs = {
+  accepted?: InputMaybe<Scalars["Boolean"]["input"]>;
   after?: InputMaybe<Scalars["String"]["input"]>;
   allocatedDay?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   allocatedReservationUnit?: InputMaybe<
@@ -1753,12 +1754,14 @@ export type QueryApplicationEventSchedulesArgs = {
   >;
   applicationRound?: InputMaybe<Scalars["Int"]["input"]>;
   before?: InputMaybe<Scalars["String"]["input"]>;
+  declined?: InputMaybe<Scalars["Boolean"]["input"]>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   last?: InputMaybe<Scalars["Int"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   orderBy?: InputMaybe<Scalars["String"]["input"]>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
+  unallocated?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
 export type QueryApplicationEventsArgs = {
