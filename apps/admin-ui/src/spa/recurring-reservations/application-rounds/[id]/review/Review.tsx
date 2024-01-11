@@ -53,7 +53,7 @@ export function Review({ applicationRound }: ReviewProps): JSX.Element | null {
   const handleTabChange = (tab: string) => {
     const vals = new URLSearchParams(searchParams);
     vals.set("tab", tab);
-    setParams(vals);
+    setParams(vals, { replace: true });
   };
 
   const resUnits = filterNonNullable(

@@ -159,7 +159,7 @@ function ApplicationRoundAllocation({
     } else {
       vals.set(param, value);
     }
-    setParams(vals);
+    setParams(vals, { replace: true });
   };
 
   const setUnitFilter = (value: number) => {
@@ -167,7 +167,7 @@ function ApplicationRoundAllocation({
     const vals = new URLSearchParams(searchParams);
     vals.set("unit", value.toString());
     vals.delete("reservation-unit");
-    setParams(vals);
+    setParams(vals, { replace: true });
   };
 
   useEffect(() => {
@@ -198,7 +198,7 @@ function ApplicationRoundAllocation({
     } else {
       vals.set("name", value);
     }
-    setParams(vals);
+    setParams(vals, { replace: true });
   };
 
   const setMultivalueSearchParam = (param: string, value: string[] | null) => {
@@ -213,7 +213,7 @@ function ApplicationRoundAllocation({
         }
       });
     }
-    setParams(vals);
+    setParams(vals, { replace: true });
   };
 
   const applicantTypeFilter = searchParams.getAll("applicantType");
@@ -402,7 +402,7 @@ function ApplicationRoundAllocation({
         searchParams.get(s) ? { ...acc, [s]: searchParams.get(s) } : acc,
       new URLSearchParams()
     );
-    setParams(newParams);
+    setParams(newParams, { replace: true });
   };
 
   // NOTE findIndex returns -1 if not found

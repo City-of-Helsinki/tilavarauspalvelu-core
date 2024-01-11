@@ -48,7 +48,7 @@ function MultiSelectFilter({
         }
       });
     }
-    setParams(vals);
+    setParams(vals, { replace: true });
   };
 
   // TODO common namespace for these and separate the labels / placeholders
@@ -134,7 +134,7 @@ export function Filters({
     } else {
       vals.set("name", value);
     }
-    setParams(vals);
+    setParams(vals, { replace: true });
   };
 
   // Hide the tags that don't have associated filter on the current tab
