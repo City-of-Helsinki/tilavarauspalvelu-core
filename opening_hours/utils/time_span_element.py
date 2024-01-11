@@ -298,6 +298,9 @@ class TimeSpanElement:
 
         interval = ReservationStartInterval(reservation_unit.reservation_start_interval).as_number
 
+        if self.start_datetime.microsecond > 0 or self.start_datetime.second > 0:
+            self.start_datetime = self.start_datetime.replace(second=0, microsecond=0) + datetime.timedelta(minutes=1)
+
         overflow_minutes = ceil((time_as_timedelta(self.start_datetime).total_seconds() / 60) % interval)
         if overflow_minutes == 0:
             return
