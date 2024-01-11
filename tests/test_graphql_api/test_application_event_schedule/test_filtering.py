@@ -310,6 +310,93 @@ def test_application_event_schedules__filter__by_allocated_day__multiple(graphql
     assert response.node(1) == {"pk": schedule_2.pk}
 
 
+def test_application__filter__by_text_search__accepted(graphql):
+    # given:
+    # - There are two application event schedules
+    # - A superuser is using the system
+    schedule = ApplicationEventScheduleFactory.create_allocated()
+    ApplicationEventScheduleFactory.create()
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    # when:
+    # - User tries to filter applications event schedules
+    query = schedules_query(accepted=True)
+    response = graphql(query)
+
+    # then:
+    # - The response contains no errors
+    # - The response contains the right application schedule
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"pk": schedule.pk}
+
+
+def test_application__filter__by_text_search__accepted__negative(graphql):
+    # given:
+    # - There are two application event schedules
+    # - A superuser is using the system
+    ApplicationEventScheduleFactory.create_allocated()
+    schedule = ApplicationEventScheduleFactory.create()
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    # when:
+    # - User tries to filter applications event schedules
+    query = schedules_query(accepted=False)
+    response = graphql(query)
+
+    # then:
+    # - The response contains no errors
+    # - The response contains the right application schedule
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"pk": schedule.pk}
+
+
+def test_application__filter__by_text_search__declined(graphql):
+    # given:
+    # - There are two application event schedules
+    # - A superuser is using the system
+    schedule = ApplicationEventScheduleFactory.create(declined=True)
+    ApplicationEventScheduleFactory.create()
+    ApplicationEventScheduleFactory.create_allocated()
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    # when:
+    # - User tries to filter applications event schedules
+    query = schedules_query(declined=True)
+    response = graphql(query)
+
+    # then:
+    # - The response contains no errors
+    # - The response contains the right application schedule
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"pk": schedule.pk}
+
+
+def test_application__filter__by_text_search__declined__negative(graphql):
+    # given:
+    # - There are two application event schedules
+    # - A superuser is using the system
+    ApplicationEventScheduleFactory.create(declined=True)
+    schedule_1 = ApplicationEventScheduleFactory.create()
+    schedule_2 = ApplicationEventScheduleFactory.create_allocated()
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    # when:
+    # - User tries to filter applications event schedules
+    query = schedules_query(declined=False)
+    response = graphql(query)
+
+    # then:
+    # - The response contains no errors
+    # - The response contains the right application schedule
+    assert response.has_errors is False, response
+    assert len(response.edges) == 2, response
+    assert response.node(0) == {"pk": schedule_1.pk}
+    assert response.node(1) == {"pk": schedule_2.pk}
+
+
 def test_application__filter__by_text_search__event_name(graphql):
     # given:
     # - There are two application event schedules

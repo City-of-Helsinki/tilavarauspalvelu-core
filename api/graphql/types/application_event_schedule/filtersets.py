@@ -1,5 +1,6 @@
 import django_filters
 from django.contrib.postgres.search import SearchVector
+from django.db import models
 from django.db.models import QuerySet
 
 from api.graphql.extensions.order_filter import CustomOrderingFilter
@@ -31,6 +32,8 @@ class ApplicationEventScheduleFilterSet(BaseModelFilterSet):
     allocated_unit = IntMultipleChoiceFilter(field_name="allocated_reservation_unit__unit")
     allocated_reservation_unit = IntMultipleChoiceFilter()
     allocated_day = IntMultipleChoiceFilter()
+    accepted = django_filters.BooleanFilter(method="filter_accepted")
+    declined = django_filters.BooleanFilter()
 
     text_search = django_filters.CharFilter(method="filter_text_search")
 
@@ -65,6 +68,28 @@ class ApplicationEventScheduleFilterSet(BaseModelFilterSet):
     @staticmethod
     def filter_by_event_status(qs: ApplicationEventScheduleQuerySet, name: str, value: list[str]) -> QuerySet:
         return qs.has_event_status_in(value)
+
+    @staticmethod
+    def filter_accepted(qs: ApplicationEventScheduleQuerySet, name: str, value: bool) -> QuerySet:
+        return (
+            qs.filter(
+                declined=False,
+                allocated_begin__isnull=False,
+                allocated_end__isnull=False,
+                allocated_day__isnull=False,
+                allocated_reservation_unit__isnull=False,
+            )
+            if value
+            else qs.filter(
+                models.Q(declined=True)
+                | models.Q(
+                    allocated_begin__isnull=True,
+                    allocated_end__isnull=True,
+                    allocated_day__isnull=True,
+                    allocated_reservation_unit__isnull=True,
+                )
+            )
+        )
 
     @staticmethod
     def filter_text_search(qs: ApplicationEventScheduleQuerySet, name: str, value: str) -> QuerySet:
