@@ -1,6 +1,7 @@
 import React from "react";
 import { ApolloError, useQuery } from "@apollo/client";
 import { useSearchParams } from "react-router-dom";
+import { useTranslation } from "next-i18next";
 import { type Query, type QueryApplicationsArgs } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { LIST_PAGE_SIZE } from "@/common/const";
@@ -8,10 +9,10 @@ import { combineResults } from "@/common/util";
 import { useNotification } from "@/context/NotificationContext";
 import Loader from "@/component/Loader";
 import { More } from "@/component/lists/More";
+import { useSort } from "@/hooks/useSort";
 import { APPLICATIONS_QUERY } from "./queries";
-import { ApplicationsTable } from "./ApplicationsTable";
+import { ApplicationsTable, SORT_KEYS } from "./ApplicationsTable";
 import { transformApplicantType, transformApplicationStatuses } from "./utils";
-import { useTranslation } from "react-i18next";
 
 const updateQuery = (
   previousResult: Query,
@@ -33,6 +34,7 @@ export function ApplicationDataLoader({
 }: Props): JSX.Element {
   const { notifyError } = useNotification();
   const { t } = useTranslation();
+  const [orderBy, handleSortChanged] = useSort(SORT_KEYS);
 
   const [searchParams] = useSearchParams();
   const unitFilter = searchParams.getAll("unit");
@@ -52,15 +54,7 @@ export function ApplicationDataLoader({
         status: transformApplicationStatuses(statusFilter),
         applicantType: transformApplicantType(applicantFilter),
         textSearch: nameFilter,
-        // TODO order by doesn't work
-        /*
-        orderBy:
-          sort?.sort != null
-            ? sort?.sort
-              ? sort.field
-              : `-${sort?.field}`
-            : undefined,
-        */
+        orderBy,
       },
       onError: (err: ApolloError) => {
         notifyError(err.message);
@@ -78,28 +72,22 @@ export function ApplicationDataLoader({
   const applications = filterNonNullable(
     data?.applications?.edges?.map((edge) => edge?.node)
   );
-
-  const sort = undefined;
-  const handleSortChanged = (field: string) => {
-    // eslint-disable-next-line no-console
-    console.warn("TODO: sort changed", field);
-  };
+  const totalCount = data?.applications?.totalCount ?? 0;
 
   return (
     <>
       <span>
         <b>
-          {data?.applications?.totalCount}{" "}
-          {t("ApplicationRound.applicationCount")}
+          {totalCount} {t("ApplicationRound.applicationCount")}
         </b>
       </span>
       <ApplicationsTable
         applications={applications}
-        sort={sort}
+        sort={orderBy}
         sortChanged={handleSortChanged}
       />
       <More
-        totalCount={data?.applications?.totalCount || 0}
+        totalCount={totalCount}
         count={applications.length}
         fetchMore={() =>
           fetchMore({

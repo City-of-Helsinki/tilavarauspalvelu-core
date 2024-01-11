@@ -5,6 +5,7 @@ import {
   type Query,
   type QueryApplicationEventSchedulesArgs,
 } from "common/types/gql-types";
+import { useTranslation } from "next-i18next";
 import { filterNonNullable } from "common/src/helpers";
 import { LIST_PAGE_SIZE } from "@/common/const";
 import { combineResults } from "@/common/util";
@@ -12,13 +13,13 @@ import { useNotification } from "@/context/NotificationContext";
 import { APPLICATIONS_EVENTS_SCHEDULE_QUERY } from "./queries";
 import Loader from "@/component/Loader";
 import { More } from "@/component/lists/More";
-import { useTranslation } from "react-i18next";
+import { useSort } from "@/hooks/useSort";
 import {
   transformApplicantType,
   transformApplicationEventStatus,
 } from "./utils";
 import { useSearchParams } from "react-router-dom";
-import { AllocatedEventsTable } from "./AllocatedEventsTable";
+import { AllocatedEventsTable, SORT_KEYS } from "./AllocatedEventsTable";
 
 export type Sort = {
   field: string;
@@ -44,6 +45,7 @@ export function AllocatedEventDataLoader({
   applicationRoundPk,
 }: Props): JSX.Element {
   const { notifyError } = useNotification();
+  const [orderBy, handleSortChanged] = useSort(SORT_KEYS);
 
   const [searchParams] = useSearchParams();
   const unitFilter = searchParams.getAll("unit");
@@ -84,7 +86,7 @@ export function AllocatedEventDataLoader({
       textSearch: nameFilter,
       offset: 0,
       first: LIST_PAGE_SIZE,
-      // orderBy: sortString,
+      orderBy,
     },
     onError: (err: ApolloError) => {
       notifyError(err.message);
@@ -100,17 +102,10 @@ export function AllocatedEventDataLoader({
     return <Loader />;
   }
 
+  const totalCount = data?.applicationEventSchedules?.totalCount ?? 0;
   const aes = filterNonNullable(
     data?.applicationEventSchedules?.edges.map((edge) => edge?.node)
   );
-
-  const totalCount = data?.applicationEventSchedules?.totalCount ?? 0;
-
-  const sort = undefined;
-  const handleSortChanged = (field: string) => {
-    // eslint-disable-next-line no-console
-    console.warn("TODO: handleSortChanged", field);
-  };
 
   return (
     <>
@@ -121,7 +116,7 @@ export function AllocatedEventDataLoader({
       </span>
       <AllocatedEventsTable
         schedules={aes}
-        sort={sort}
+        sort={orderBy}
         sortChanged={handleSortChanged}
       />
       <More

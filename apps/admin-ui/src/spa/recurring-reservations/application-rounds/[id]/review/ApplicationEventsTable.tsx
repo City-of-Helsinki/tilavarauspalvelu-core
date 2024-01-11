@@ -20,34 +20,8 @@ const formatters = getFormatters("fi");
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
 
-const numTurns = (
-  startDate: string,
-  endDate: string,
-  biWeekly: boolean,
-  eventsPerWeek: number
-): number =>
-  (differenceInWeeks(new Date(endDate), new Date(startDate)) /
-    (biWeekly ? 2 : 1)) *
-  eventsPerWeek;
-
-const appEventHours = (
-  startDate: string,
-  endDate: string,
-  biWeekly: boolean,
-  eventsPerWeek: number,
-  minDuration: number
-): number => {
-  const turns = numTurns(startDate, endDate, biWeekly, eventsPerWeek);
-  return (turns * minDuration) / 3600;
-};
-
-export type Sort = {
-  field: string;
-  sort: boolean;
-};
-
 type Props = {
-  sort?: Sort;
+  sort: string | null;
   sortChanged: (field: string) => void;
   applicationEvents: ApplicationEventNode[];
 };
@@ -60,7 +34,7 @@ type ApplicationEventView = {
   applicationPk?: number;
   pk?: number;
   applicantName?: string;
-  name: string;
+  nameFi: string;
   units: UnitType[];
   statusView: JSX.Element;
   applicationCount: string;
@@ -85,35 +59,25 @@ const appEventMapper = (
 
   const applicantName = getApplicantName(appEvent.application);
 
-  const turns =
-    appEvent.begin && appEvent.end
-      ? numTurns(
-          appEvent.begin,
-          appEvent.end,
-          appEvent.biweekly,
-          appEvent.eventsPerWeek ?? 0
-        )
-      : 0;
-
   const begin = appEvent.begin ? fromApiDate(appEvent.begin) : undefined;
   const end = appEvent.end ? fromApiDate(appEvent.end) : undefined;
-  const totalHours =
+
+  const biW = appEvent.biweekly;
+  const evtPerW = appEvent.eventsPerWeek ?? 0;
+  const turns =
     begin && end
-      ? appEventHours(
-          begin.toISOString(),
-          end.toISOString(),
-          appEvent.biweekly,
-          appEvent.eventsPerWeek ?? 0,
-          appEvent.minDuration ?? 0
-        )
+      ? (differenceInWeeks(end, begin) / (biW ? 2 : 1)) * evtPerW
       : 0;
+
+  const minDuration = appEvent.minDuration ?? 0;
+  const totalHours = (turns * minDuration) / 3600;
 
   return {
     applicationPk: appEvent.application.pk ?? undefined,
     pk: appEvent.pk ?? undefined,
     applicantName,
     units,
-    name,
+    nameFi: name,
     applicationCount: trim(
       `${formatNumber(turns, "")} / ${formatters.oneDecimal.format(
         totalHours
@@ -124,15 +88,16 @@ const appEventMapper = (
   };
 };
 
-const getColConfig = (t: TFunction) => [
+const COLS = [
   {
-    headerName: t("ApplicationEvent.headings.id"),
+    headerTKey: "ApplicationEvent.headings.id",
     isSortable: true,
-    key: "pk",
-    transform: ({ pk }: ApplicationEventView) => String(pk),
+    key: "application_id,pk",
+    transform: ({ pk, applicationPk }: ApplicationEventView) =>
+      `${applicationPk}-${pk}`,
   },
   {
-    headerName: t("ApplicationEvent.headings.customer"),
+    headerTKey: "ApplicationEvent.headings.customer",
     isSortable: true,
     key: "applicant",
     transform: ({ applicantName, applicationPk, pk }: ApplicationEventView) => (
@@ -149,12 +114,14 @@ const getColConfig = (t: TFunction) => [
     ),
   },
   {
-    headerName: t("ApplicationEvent.headings.name"),
-    key: "name",
+    headerTKey: "ApplicationEvent.headings.name",
+    isSortable: true,
+    key: "nameFi",
   },
   {
-    headerName: t("ApplicationEvent.headings.unit"),
-    key: "units",
+    headerTKey: "ApplicationEvent.headings.unit",
+    isSortable: true,
+    key: "preferredUnitNameFi",
     transform: ({ units }: ApplicationEventView) => {
       const allUnits = units.map((u) => u.name).join(", ");
 
@@ -172,22 +139,30 @@ const getColConfig = (t: TFunction) => [
     },
   },
   {
-    headerName: t("ApplicationEvent.headings.stats"),
+    headerTKey: "ApplicationEvent.headings.stats",
     key: "applicationCount",
     transform: ({ applicationCount }: ApplicationEventView) => applicationCount,
   },
   {
-    headerName: t("ApplicationEvent.headings.phase"),
+    headerTKey: "ApplicationEvent.headings.phase",
+    isSortable: true,
     key: "status",
     transform: ({ statusView }: ApplicationEventView) => statusView,
   },
 ];
 
-const ApplicationEventsTable = ({
+const getColConfig = (t: TFunction) =>
+  COLS.map(({ headerTKey, ...col }) => ({
+    ...col,
+    headerName: t(headerTKey),
+  }));
+export const SORT_KEYS = COLS.filter((c) => c.isSortable).map((c) => c.key);
+
+export function ApplicationEventsTable({
   sort,
   sortChanged: onSortChanged,
   applicationEvents,
-}: Props): JSX.Element => {
+}: Props): JSX.Element {
   const { t } = useTranslation();
 
   const views = applicationEvents.map((ae) => appEventMapper(ae));
@@ -198,18 +173,16 @@ const ApplicationEventsTable = ({
     return <div>{t("ReservationUnits.noFilteredReservationUnits")}</div>;
   }
 
+  const sortField = sort?.replaceAll("-", "") ?? "";
+  const sortDirection = sort?.startsWith("-") ? "desc" : "asc";
   return (
     <CustomTable
       setSort={onSortChanged}
       indexKey="pk"
       rows={views}
       cols={cols}
-      initialSortingColumnKey={sort === undefined ? undefined : sort.field}
-      initialSortingOrder={
-        sort === undefined ? undefined : (sort.sort && "asc") || "desc"
-      }
+      initialSortingColumnKey={sortField}
+      initialSortingOrder={sortDirection}
     />
   );
-};
-
-export default ApplicationEventsTable;
+}

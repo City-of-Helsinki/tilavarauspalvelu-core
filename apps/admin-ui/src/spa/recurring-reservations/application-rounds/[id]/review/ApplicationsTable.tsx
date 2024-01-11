@@ -17,11 +17,6 @@ import { ApplicationStatusCell } from "./StatusCell";
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
 
-export type Sort = {
-  field: string;
-  sort: boolean;
-};
-
 type UnitType = {
   pk: number;
   name: string;
@@ -32,7 +27,7 @@ type ApplicationView = {
   key: string;
   applicantName?: string;
   name: string;
-  type: string;
+  applicantType: string;
   units: UnitType[];
   applicationCount: string;
   status?: ApplicationStatusChoice;
@@ -40,15 +35,15 @@ type ApplicationView = {
   statusType?: ApplicationStatusChoice;
 };
 
-const getColConfig = (t: TFunction) => [
+const COLS = [
   {
-    headerName: t("Application.headings.id"),
+    headerTKey: "Application.headings.id",
     isSortable: true,
-    key: "id",
+    key: "pk",
     transform: ({ pk }: ApplicationView) => String(pk),
   },
   {
-    headerName: t("Application.headings.customer"),
+    headerTKey: "Application.headings.customer",
     isSortable: true,
     key: "applicant",
     transform: ({ applicantName, pk }: ApplicationView) =>
@@ -66,12 +61,14 @@ const getColConfig = (t: TFunction) => [
       ),
   },
   {
-    headerName: t("Application.headings.applicantType"),
-    key: "type",
+    headerTKey: "Application.applicantType",
+    isSortable: true,
+    key: "applicantType",
   },
   {
-    headerName: t("Application.headings.unit"),
-    key: "unitsSort",
+    headerTKey: "Application.headings.unit",
+    isSortable: true,
+    key: "preferredUnitNameFi",
     transform: ({ units }: ApplicationView) => {
       const allUnits = units.map((u) => u.name).join(", ");
 
@@ -89,16 +86,24 @@ const getColConfig = (t: TFunction) => [
     },
   },
   {
-    headerName: t("Application.headings.applicationCount"),
+    headerTKey: "Application.headings.applicationCount",
     key: "applicationCountSort",
     transform: ({ applicationCount }: ApplicationView) => applicationCount,
   },
   {
-    headerName: t("Application.headings.phase"),
-    key: "status",
+    headerTKey: "Application.headings.phase",
+    isSortable: true,
+    key: "application_status",
     transform: ({ statusView }: ApplicationView) => statusView,
   },
 ];
+
+const getColConfig = (t: TFunction) =>
+  COLS.map(({ headerTKey, ...col }) => ({
+    ...col,
+    headerName: t(headerTKey),
+  }));
+export const SORT_KEYS = COLS.filter((c) => c.isSortable).map((c) => c.key);
 
 const appMapper = (app: ApplicationNode, t: TFunction): ApplicationView => {
   const applicationEvents = (app.applicationEvents || [])
@@ -124,7 +129,7 @@ const appMapper = (app: ApplicationNode, t: TFunction): ApplicationView => {
     pk: app.pk ?? 0,
     eventPk,
     applicantName,
-    type: app.applicantType
+    applicantType: app.applicantType
       ? t(`Application.applicantTypes.${app.applicantType}`)
       : "",
     units,
@@ -137,7 +142,7 @@ const appMapper = (app: ApplicationNode, t: TFunction): ApplicationView => {
 };
 
 type ApplicationsTableProps = {
-  sort?: Sort;
+  sort: string | null;
   sortChanged: (field: string) => void;
   applications: ApplicationNode[];
 };
@@ -156,16 +161,17 @@ export function ApplicationsTable({
     return <div>{t("ReservationUnits.noFilteredReservationUnits")}</div>;
   }
 
+  const sortField = sort?.replace(/-/, "") ?? "";
+  const sortDirection = sort?.startsWith("-") ? "desc" : "asc";
   return (
     <CustomTable
       setSort={onSortChanged}
       indexKey="pk"
       rows={rows}
       cols={cols}
-      initialSortingColumnKey={sort === undefined ? undefined : sort.field}
-      initialSortingOrder={
-        sort === undefined ? undefined : (sort.sort && "asc") || "desc"
-      }
+      // TODO refactor maybe so we can use a string, -field for desc, field for asc
+      initialSortingColumnKey={sortField}
+      initialSortingOrder={sortDirection}
     />
   );
 }

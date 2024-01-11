@@ -17,13 +17,8 @@ import { ApplicationEventStatusCell } from "./StatusCell";
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
 
-export type Sort = {
-  field: string;
-  sort: boolean;
-};
-
 type Props = {
-  sort?: Sort;
+  sort: string | null;
   sortChanged: (field: string) => void;
   schedules: ApplicationEventScheduleNode[];
 };
@@ -77,16 +72,16 @@ function aesMapper(
   };
 }
 
-const getColConfig = (t: TFunction) => [
+const COLS = [
   {
-    headerName: t("ApplicationEvent.headings.id"),
+    headerTKey: "ApplicationEvent.headings.id",
     isSortable: true,
-    key: "pk",
+    key: "application_id,application_event_id",
     transform: ({ pk, applicationPk }: ApplicationScheduleView) =>
       `${applicationPk}-${pk}`,
   },
   {
-    headerName: t("ApplicationEvent.headings.customer"),
+    headerTKey: "ApplicationEvent.headings.customer",
     isSortable: true,
     key: "applicant",
     transform: ({
@@ -107,19 +102,25 @@ const getColConfig = (t: TFunction) => [
     ),
   },
   {
-    headerName: t("ApplicationEventSchedules.headings.eventName"),
-    key: "name",
+    headerTKey: "ApplicationEventSchedules.headings.eventName",
+    isSortable: true,
+    key: "application_event_name_fi",
+    transform: ({ name }: ApplicationScheduleView) => {
+      return <span>{truncate(name ?? "-", unitsTruncateLen)}</span>;
+    },
   },
   {
-    headerName: t("ApplicationEvent.headings.unit"),
-    key: "units",
+    headerTKey: "ApplicationEvent.headings.unit",
+    isSortable: true,
+    key: "allocated_unit_name_fi",
     transform: ({ unitName }: ApplicationScheduleView) => {
       return <span>{truncate(unitName ?? "-", unitsTruncateLen)}</span>;
     },
   },
   {
-    headerName: t("ApplicationEventSchedules.headings.reservationUnit"),
-    key: "reservationUnit",
+    headerTKey: "ApplicationEventSchedules.headings.reservationUnit",
+    isSortable: true,
+    key: "allocated_reservation_unit_name_fi",
     transform: ({ allocatedReservationUnitName }: ApplicationScheduleView) => {
       return (
         <span>
@@ -129,15 +130,25 @@ const getColConfig = (t: TFunction) => [
     },
   },
   {
-    headerName: t("ApplicationEventSchedules.headings.time"),
-    key: "time",
+    headerTKey: "ApplicationEventSchedules.headings.time",
+    isSortable: true,
+    key: "allocated_time_of_week",
+    transform: ({ time }: ApplicationScheduleView) => time,
   },
   {
-    headerName: t("ApplicationEvent.headings.phase"),
-    key: "status",
+    headerTKey: "ApplicationEvent.headings.phase",
+    isSortable: true,
+    key: "application_event_status",
     transform: ({ statusView }: ApplicationScheduleView) => statusView,
   },
 ];
+
+const getColConfig = (t: TFunction) =>
+  COLS.map(({ headerTKey, ...col }) => ({
+    ...col,
+    headerName: t(headerTKey),
+  }));
+export const SORT_KEYS = COLS.filter((c) => c.isSortable).map((c) => c.key);
 
 export function AllocatedEventsTable({
   sort,
@@ -154,16 +165,16 @@ export function AllocatedEventsTable({
     return <div>{t("ReservationUnits.noFilteredReservationUnits")}</div>;
   }
 
+  const sortField = sort?.replaceAll("-", "") ?? "";
+  const sortDirection = sort?.startsWith("-") ? "desc" : "asc";
   return (
     <CustomTable
       setSort={onSortChanged}
       indexKey="pk"
       rows={views}
       cols={cols}
-      initialSortingColumnKey={sort === undefined ? undefined : sort.field}
-      initialSortingOrder={
-        sort === undefined ? undefined : (sort.sort && "asc") || "desc"
-      }
+      initialSortingColumnKey={sortField}
+      initialSortingOrder={sortDirection}
     />
   );
 }

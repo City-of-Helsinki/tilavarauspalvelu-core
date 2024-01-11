@@ -5,6 +5,7 @@ import {
   type Query,
   type QueryApplicationEventsArgs,
 } from "common/types/gql-types";
+import { useTranslation } from "next-i18next";
 import { filterNonNullable } from "common/src/helpers";
 import {
   LIST_PAGE_SIZE,
@@ -14,13 +15,13 @@ import { combineResults } from "@/common/util";
 import { useNotification } from "@/context/NotificationContext";
 import Loader from "@/component/Loader";
 import { More } from "@/component/lists/More";
+import { useSort } from "@/hooks/useSort";
 import { APPLICATIONS_EVENTS_QUERY } from "./queries";
-import ApplicationEventsTable from "./ApplicationEventsTable";
+import { ApplicationEventsTable, SORT_KEYS } from "./ApplicationEventsTable";
 import {
   transformApplicantType,
   transformApplicationEventStatus,
 } from "./utils";
-import { useTranslation } from "react-i18next";
 
 const updateQuery = (
   previousResult: Query,
@@ -42,6 +43,7 @@ export function ApplicationEventDataLoader({
 }: Props): JSX.Element {
   const { notifyError } = useNotification();
 
+  const [orderBy, handleSortChanged] = useSort(SORT_KEYS);
   const [searchParams] = useSearchParams();
   const unitFilter = searchParams.getAll("unit");
   const applicantFilter = searchParams.getAll("applicant");
@@ -54,23 +56,15 @@ export function ApplicationEventDataLoader({
   >(APPLICATIONS_EVENTS_QUERY, {
     skip: !applicationRoundPk,
     variables: {
+      offset: 0,
+      first: LIST_PAGE_SIZE,
       unit: unitFilter.map(Number).filter(Number.isFinite),
       applicationRound: applicationRoundPk,
       applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,
       status: transformApplicationEventStatus(eventStatusFilter),
       applicantType: transformApplicantType(applicantFilter),
       textSearch: nameFilter,
-      offset: 0,
-      first: LIST_PAGE_SIZE,
-      // TODO query params for filters
-      /* TODO query params
-      orderBy:
-        sort?.sort != null
-          ? sort?.sort
-            ? sort.field
-            : `-${sort?.field}`
-          : undefined,
-      */
+      orderBy,
     },
     onError: (err: ApolloError) => {
       notifyError(err.message);
@@ -89,28 +83,22 @@ export function ApplicationEventDataLoader({
   const applicationEvents = filterNonNullable(
     data?.applicationEvents?.edges.map((edge) => edge?.node)
   );
-
-  const sort = undefined;
-  const handleSortChanged = (field: string) => {
-    // eslint-disable-next-line no-console
-    console.warn("TODO: handleSortChanged", field);
-  };
+  const totalCount = data?.applicationEvents?.totalCount ?? 0;
 
   return (
     <>
       <span>
         <b>
-          {data?.applicationEvents?.totalCount}{" "}
-          {t("ApplicationRound.applicationEventCount")}
+          {totalCount} {t("ApplicationRound.applicationEventCount")}
         </b>
       </span>
       <ApplicationEventsTable
         applicationEvents={applicationEvents}
-        sort={sort}
+        sort={orderBy}
         sortChanged={handleSortChanged}
       />
       <More
-        totalCount={data?.applicationEvents?.totalCount || 0}
+        totalCount={totalCount}
         count={applicationEvents.length}
         fetchMore={() =>
           fetchMore({

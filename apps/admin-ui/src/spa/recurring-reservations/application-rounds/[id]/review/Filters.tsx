@@ -140,6 +140,7 @@ export function Filters({
   // Hide the tags that don't have associated filter on the current tab
   const hideSearchTags: string[] = [
     "tab",
+    "orderBy",
     ...(statusOption !== "application" ? ["status"] : ["eventStatus"]),
     ...(!enableWeekday ? ["weekday"] : []),
     ...(!enableReservationUnit ? ["reservationUnit"] : []),

@@ -31,6 +31,7 @@ export const APPLICATIONS_QUERY = gql`
     $applicantType: [ApplicantTypeChoice]
     $status: [ApplicationStatusChoice]!
     $textSearch: String
+    $orderBy: String
   ) {
     applications(
       first: $first
@@ -40,6 +41,7 @@ export const APPLICATIONS_QUERY = gql`
       applicantType: $applicantType
       status: $status
       textSearch: $textSearch
+      orderBy: $orderBy
     ) {
       edges {
         node {
@@ -81,6 +83,7 @@ export const APPLICATIONS_EVENTS_QUERY = gql`
     $unit: [Int]
     $applicantType: [ApplicantTypeChoice]
     $textSearch: String
+    $orderBy: String
   ) {
     applicationEvents(
       first: $first
@@ -91,6 +94,7 @@ export const APPLICATIONS_EVENTS_QUERY = gql`
       status: $status
       applicantType: $applicantType
       textSearch: $textSearch
+      orderBy: $orderBy
     ) {
       edges {
         node {
@@ -142,6 +146,7 @@ export const APPLICATIONS_EVENTS_SCHEDULE_QUERY = gql`
     $declined: Boolean
     $unallocated: Boolean
     $textSearch: String
+    $orderBy: String
   ) {
     applicationEventSchedules(
       first: $first
@@ -156,6 +161,7 @@ export const APPLICATIONS_EVENTS_SCHEDULE_QUERY = gql`
       declined: $declined
       unallocated: $unallocated
       textSearch: $textSearch
+      orderBy: $orderBy
     ) {
       edges {
         node {
