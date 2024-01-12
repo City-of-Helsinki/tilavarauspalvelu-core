@@ -17,9 +17,3 @@ export type OptionType = {
 };
 
 export type ReservationPriority = 100 | 200 | 300;
-
-/// @deprecated
-export type AllocationApplicationEventCardType =
-  | "unallocated"
-  | "allocated"
-  | "declined";

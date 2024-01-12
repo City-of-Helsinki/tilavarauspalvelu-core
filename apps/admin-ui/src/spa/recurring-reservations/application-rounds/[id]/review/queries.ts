@@ -75,18 +75,32 @@ export const APPLICATIONS_EVENTS_QUERY = gql`
     $status: [ApplicationEventStatusChoice]
     $unit: [Int]
     $applicantType: [ApplicantTypeChoice]
+    $preferredOrder: [Int]
     $textSearch: String
+    $priority: [Int]
+    $purpose: [Int]
+    $reservationUnit: [Int]
+    $ageGroup: [Int]
+    $homeCity: [Int]
+    $includePreferredOrder10OrHigher: Boolean
     $orderBy: String
   ) {
     applicationEvents(
       first: $first
       offset: $offset
-      unit: $unit
       applicationRound: $applicationRound
       applicationStatus: $applicationStatus
       status: $status
+      unit: $unit
       applicantType: $applicantType
+      preferredOrder: $preferredOrder
       textSearch: $textSearch
+      priority: $priority
+      purpose: $purpose
+      reservationUnit: $reservationUnit
+      ageGroup: $ageGroup
+      homeCity: $homeCity
+      includePreferredOrder10OrHigher: $includePreferredOrder10OrHigher
       orderBy: $orderBy
     ) {
       edges {
@@ -99,9 +113,33 @@ export const APPLICATIONS_EVENTS_QUERY = gql`
           biweekly
           eventsPerWeek
           minDuration
+          maxDuration
+          ageGroup {
+            minimum
+            maximum
+          }
+          numPersons
+          applicationEventSchedules(priority: $priority) {
+            pk
+            priority
+            day
+            begin
+            end
+            allocatedReservationUnit {
+              pk
+              nameFi
+            }
+            allocatedDay
+            allocatedBegin
+            allocatedEnd
+            declined
+          }
           application {
             pk
             status
+            applicant {
+              name
+            }
             ...ApplicationNameFragment
           }
           eventReservationUnits {
@@ -111,6 +149,8 @@ export const APPLICATIONS_EVENTS_QUERY = gql`
                 pk
                 nameFi
               }
+              pk
+              nameFi
             }
           }
         }

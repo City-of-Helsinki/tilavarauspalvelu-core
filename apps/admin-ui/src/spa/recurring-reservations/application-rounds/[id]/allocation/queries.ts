@@ -57,96 +57,8 @@ export const ALL_EVENTS_PER_UNIT_QUERY = gql`
   }
 `;
 
-export const APPLICATION_EVENTS_FOR_ALLOCATION = gql`
-  query getApplicationEvents(
-    $applicationRound: Int
-    $applicationStatus: [ApplicationStatusChoice]
-    $unit: [Int]
-    $preferredOrder: [Int]
-    $textSearch: String
-    $priority: [Int]
-    $purpose: [Int]
-    $reservationUnit: [Int]
-    $applicantType: [ApplicantTypeChoice]
-    $ageGroup: [Int]
-    $homeCity: [Int]
-    $includePreferredOrder10OrHigher: Boolean
-  ) {
-    applicationEvents(
-      applicationRound: $applicationRound
-      applicationStatus: $applicationStatus
-      unit: $unit
-      textSearch: $textSearch
-      preferredOrder: $preferredOrder
-      priority: $priority
-      purpose: $purpose
-      reservationUnit: $reservationUnit
-      applicantType: $applicantType
-      ageGroup: $ageGroup
-      homeCity: $homeCity
-      includePreferredOrder10OrHigher: $includePreferredOrder10OrHigher
-    ) {
-      edges {
-        node {
-          pk
-          eventsPerWeek
-          minDuration
-          maxDuration
-          eventsPerWeek
-          name
-          status
-          ageGroup {
-            minimum
-            maximum
-          }
-          applicationEventSchedules {
-            pk
-            priority
-            day
-            begin
-            end
-            allocatedReservationUnit {
-              pk
-            }
-            allocatedDay
-            allocatedBegin
-            allocatedEnd
-          }
-          eventReservationUnits {
-            preferredOrder
-            reservationUnit {
-              pk
-              nameFi
-              unit {
-                pk
-                nameFi
-              }
-            }
-          }
-          application {
-            pk
-            status
-            applicant {
-              name
-            }
-            applicantType
-            contactPerson {
-              firstName
-              lastName
-            }
-            organisation {
-              name
-              organisationType
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-
 export const DECLINE_APPLICATION_EVENT_SCHEDULE = gql`
-  mutation ($input: ApplicationEventDeclineMutationInput!) {
+  mutation ($input: ApplicationEventScheduleDeclineMutationInput!) {
     declineApplicationEventSchedule(input: $input) {
       pk
       errors {
@@ -165,6 +77,18 @@ export const APPROVE_APPLICATION_EVENT_SCHEDULE = gql`
       allocatedDay
       allocatedBegin
       allocatedEnd
+      errors {
+        field
+        messages
+      }
+    }
+  }
+`;
+
+export const RESET_APPLICATION_EVENT_SCHEDULE = gql`
+  mutation ($input: ApplicationEventScheduleResetMutationInput!) {
+    resetApplicationEventSchedule(input: $input) {
+      pk
       errors {
         field
         messages

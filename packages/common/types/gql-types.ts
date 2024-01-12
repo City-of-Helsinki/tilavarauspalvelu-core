@@ -337,6 +337,10 @@ export type ApplicationEventNode = Node & {
   uuid: Scalars["UUID"]["output"];
 };
 
+export type ApplicationEventNodeApplicationEventSchedulesArgs = {
+  priority?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+};
+
 export type ApplicationEventNodeEventReservationUnitsArgs = {
   preferredOrder?: InputMaybe<Scalars["Int"]["input"]>;
 };
@@ -436,6 +440,19 @@ export type ApplicationEventScheduleNodeEdge = {
   cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
   node?: Maybe<ApplicationEventScheduleNode>;
+};
+
+export type ApplicationEventScheduleResetMutationInput = {
+  clientMutationId?: InputMaybe<Scalars["String"]["input"]>;
+  pk: Scalars["Int"]["input"];
+};
+
+export type ApplicationEventScheduleResetMutationPayload = {
+  __typename?: "ApplicationEventScheduleResetMutationPayload";
+  clientMutationId?: Maybe<Scalars["String"]["output"]>;
+  /** May contain more than one error for same field. */
+  errors?: Maybe<Array<Maybe<ErrorType>>>;
+  pk?: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** An enumeration. */
@@ -1243,6 +1260,7 @@ export type Mutation = {
   refreshOrder?: Maybe<RefreshOrderMutationPayload>;
   refundReservation?: Maybe<ReservationRefundMutationPayload>;
   requireHandlingForReservation?: Maybe<ReservationRequiresHandlingMutationPayload>;
+  resetApplicationEventSchedule?: Maybe<ApplicationEventScheduleResetMutationPayload>;
   sendApplication?: Maybe<ApplicationSendMutationPayload>;
   staffAdjustReservationTime?: Maybe<ReservationStaffAdjustTimeMutationPayload>;
   staffReservationModify?: Maybe<ReservationStaffModifyMutationPayload>;
@@ -1397,6 +1415,10 @@ export type MutationRefundReservationArgs = {
 
 export type MutationRequireHandlingForReservationArgs = {
   input: ReservationRequiresHandlingMutationInput;
+};
+
+export type MutationResetApplicationEventScheduleArgs = {
+  input: ApplicationEventScheduleResetMutationInput;
 };
 
 export type MutationSendApplicationArgs = {

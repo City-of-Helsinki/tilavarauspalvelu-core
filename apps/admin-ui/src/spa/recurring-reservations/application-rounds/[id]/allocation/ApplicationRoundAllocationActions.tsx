@@ -2,31 +2,28 @@ import { IconCross, Select } from "hds-react";
 import React, { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
-import { Strong, Strongish } from "common/src/common/typography";
+import { fontMedium } from "common/src/common/typography";
 import styled from "styled-components";
-import type { ApplicationEventNode } from "common/types/gql-types";
+import type {
+  ApplicationEventNode,
+  ApplicationEventScheduleNode,
+} from "common/types/gql-types";
 import { ShowAllContainer } from "common/src/components/";
 import type { ReservationUnitNode } from "common";
 import { ALLOCATION_CALENDAR_TIMES } from "@/common/const";
-import { OptionType } from "@/common/types";
-import { Accordion } from "@/component/Accordion";
 import {
-  ApplicationEventScheduleResultStatuses,
-  getSelectedApplicationEvents,
+  getApplicationEventsInsideSelection,
   getSlotApplicationEvents,
   getTimeSlotOptions,
+  isSlotAccepted,
 } from "./modules/applicationRoundAllocation";
 import { ApplicationEventScheduleCard } from "./ApplicationEventScheduleCard";
 
 type Props = {
   applicationEvents: ApplicationEventNode[] | null;
-  reservationUnit: ReservationUnitNode;
-  paintedApplicationEvents: ApplicationEventNode[];
-  paintApplicationEvents: (val: ApplicationEventNode[]) => void;
+  reservationUnit?: ReservationUnitNode;
   selection: string[] | null;
   setSelection: (val: string[]) => void;
-  isSelecting: boolean;
-  applicationEventScheduleResultStatuses: ApplicationEventScheduleResultStatuses;
 };
 
 const Wrapper = styled.div`
@@ -35,6 +32,8 @@ const Wrapper = styled.div`
   margin-top: var(--spacing-layout-l);
   padding: var(--spacing-s);
   height: fit-content;
+  width: 100%;
+  max-width: 300px;
 `;
 
 const CloseBtn = styled.button`
@@ -63,7 +62,7 @@ const TimeSelectWrapper = styled.div`
   }
 
   label {
-    ${Strongish};
+    ${fontMedium};
     margin-bottom: 0;
   }
 `;
@@ -71,27 +70,9 @@ const TimeSelectWrapper = styled.div`
 const TimeLabel = styled.div`
   background-color: var(--color-black-5);
   padding: var(--spacing-3-xs) var(--spacing-xs);
-  ${Strongish};
+  ${fontMedium};
   font-size: var(--fontsize-body-m);
   display: inline-block;
-`;
-
-const Heading = styled.div`
-  ${Strong};
-  font-size: var(--fontsize-body-m);
-  margin: var(--spacing-xs) 0 var(--spacing-s);
-  padding-bottom: 0;
-`;
-
-const StyledAccordion = styled(Accordion)`
-  --border-color: transparent;
-
-  > div {
-    &:nth-of-type(2) {
-      padding: 0;
-    }
-    margin: 0;
-  }
 `;
 
 const EmptyState = styled.div`
@@ -100,6 +81,9 @@ const EmptyState = styled.div`
 `;
 
 const getTimeLabel = (selection: string[], t: TFunction): string => {
+  if (!selection || selection.length < 1) {
+    return "";
+  }
   const [startDay, startHour, startMinute] = selection[0].split("-");
   const [, endHour, endMinute] = selection[selection.length - 1].split("-");
 
@@ -112,20 +96,13 @@ const getTimeLabel = (selection: string[], t: TFunction): string => {
   }:${endMinute === "30" ? "00" : "30"}`;
 };
 
-// TODO if the round status === RECEIVED (or draft etc.) we need to block all changes (and maybe the whole page)
-// because mutations (approveSchedule) are not possible
-// TODO this allows allocating when the applicationEvent is already in allocated / failed state
-// which causes a mutation error
-const ApplicationRoundAllocationActions = ({
-  applicationEvents,
-  reservationUnit,
-  paintedApplicationEvents,
-  paintApplicationEvents,
+function TimeSelection({
   selection,
   setSelection,
-  isSelecting,
-  applicationEventScheduleResultStatuses,
-}: Props): JSX.Element | null => {
+}: {
+  selection: string[] | null;
+  setSelection: (val: string[]) => void;
+}): JSX.Element {
   const { t } = useTranslation();
 
   const getOptions = useCallback(
@@ -143,7 +120,9 @@ const ApplicationRoundAllocationActions = ({
   const timeSlotEndOptions = getOptions("end");
 
   const setSelectedTime = (startValue?: string, endValue?: string): void => {
-    if (!selection) return undefined;
+    if (!selection) {
+      return undefined;
+    }
     const start = startValue || selection[0];
     const end = endValue || selection[selection.length - 1];
     const [, startHours, startMinutes] = start
@@ -155,144 +134,135 @@ const ApplicationRoundAllocationActions = ({
       Number(startHours),
       Number(startMinutes),
       Number(endHours)
-    ).map((n) => n.value as string);
+    ).map((n) => n.value);
 
     if (endValue && endMinutes === "00") timeSlots.pop();
     setSelection(timeSlots);
-    paintApplicationEvents(
-      getSlotApplicationEvents(timeSlots, applicationEvents)
-    );
   };
 
-  const primaryApplicationEvents = getSelectedApplicationEvents(
-    paintedApplicationEvents,
+  return (
+    <TimeSelectWrapper>
+      <Select
+        label={t("Allocation.startingTime")}
+        options={timeSlotStartOptions}
+        value={
+          timeSlotStartOptions.find((n) => n.value === selection?.[0]) ?? null
+        }
+        onChange={(val: (typeof timeSlotStartOptions)[0]) => {
+          const [startHours, startMinutes] = val.label.split(":").map(Number);
+          const startTime = new Date().setHours(startHours, startMinutes);
+          const endOption = timeSlotEndOptions.find(
+            (n) => n.value === selection?.[selection.length - 1]
+          );
+          if (!endOption) {
+            return;
+          }
+          // TODO this is unsafe
+          const [endHours, endMinutes] = endOption.label.split(":").map(Number);
+          const endTime = new Date().setHours(endHours, endMinutes);
+
+          const startIndex = timeSlotStartOptions.indexOf(val);
+          const endValue =
+            startTime >= endTime
+              ? timeSlotEndOptions[startIndex + 1].value
+              : timeSlotEndOptions.find(
+                  (n) => n.value === selection?.[selection.length - 1]
+                )?.value;
+          if (endValue != null && val.value != null) {
+            setSelectedTime(val.value, endValue);
+          }
+        }}
+      />
+      <Select
+        label={t("Allocation.endingTime")}
+        options={timeSlotEndOptions}
+        value={
+          timeSlotEndOptions.find(
+            (n) => n.value === selection?.[selection.length - 1]
+          ) ?? null
+        }
+        onChange={(val: (typeof timeSlotEndOptions)[0]) =>
+          setSelectedTime(undefined, val.value)
+        }
+        isOptionDisabled={(option) => {
+          const firstOption = timeSlotStartOptions.find(
+            (n) => n.value === selection?.[0]
+          );
+          if (!firstOption) {
+            return false;
+          }
+          const [startHours, startMinutes] = firstOption.label
+            .split(":")
+            .map(Number);
+          const startTime = new Date().setHours(startHours, startMinutes);
+          const [endHours, endMinutes] = option.label.split(":").map(Number);
+          const endTime = new Date().setHours(endHours, endMinutes);
+
+          return endTime <= startTime && endHours !== 0;
+        }}
+      />
+    </TimeSelectWrapper>
+  );
+}
+
+// TODO if the round status === RECEIVED (or draft etc.) we need to block all changes (and maybe the whole page)
+// because mutations (approveSchedule) are not possible
+// TODO this allows allocating when the applicationEvent is already in allocated / failed state
+// which causes a mutation error
+// TODO this should be renamed, it's the whole right hand side section (not just actions)
+// that includes cards + time selection
+export function ApplicationRoundAllocationActions({
+  applicationEvents,
+  reservationUnit,
+  selection,
+  setSelection,
+}: Props): JSX.Element | null {
+  const { t } = useTranslation();
+
+  const painted = getSlotApplicationEvents(selection, applicationEvents);
+  const aeList = getApplicationEventsInsideSelection(
+    painted,
     selection,
-    300
+    reservationUnit?.pk ?? 0
   );
 
-  const otherApplicationEvents = getSelectedApplicationEvents(
-    paintedApplicationEvents,
-    selection,
-    200
-  );
+  // check if something is already allocated and push it down to the Card components
+  const isSlotAlreadyAllocated = (slot: string): boolean =>
+    !!painted
+      .flatMap((aes) => aes.applicationEventSchedules)
+      .filter((aes): aes is ApplicationEventScheduleNode => aes != null)
+      .filter((aes) => aes.allocatedDay != null)
+      .find((aes) => isSlotAccepted(aes, slot));
+  const isSelectionAlreadyAllocated =
+    selection?.every((slot) => !isSlotAlreadyAllocated(slot)) ?? false;
+  const hasSelection = selection != null && selection.length > 0;
+  const canAllocate = hasSelection && isSelectionAlreadyAllocated;
 
-  if (isSelecting) {
-    return null;
-  }
-
-  if (!selection || selection.length < 1) {
-    return null;
-  }
-
+  // TODO empty state when no selection (current is ok placeholder), don't remove from DOM
   return (
     <Wrapper>
       <CloseBtn type="button" onClick={() => setSelection([])}>
         <IconCross />
       </CloseBtn>
-      <TimeLabel>{getTimeLabel(selection, t)}</TimeLabel>
+      <TimeLabel>{getTimeLabel(selection ?? [], t)}</TimeLabel>
       <StyledShowAllContainer
         showAllLabel={t("Allocation.changeTime")}
         maximumNumber={0}
       >
-        <TimeSelectWrapper>
-          <Select
-            label={t("Allocation.startingTime")}
-            options={timeSlotStartOptions}
-            value={timeSlotStartOptions.find((n) => n.value === selection[0])}
-            onChange={(val: OptionType) => {
-              const [startHours, startMinutes] = val.label
-                .split(":")
-                .map(Number);
-              const startTime = new Date().setHours(startHours, startMinutes);
-              const endOption = timeSlotEndOptions.find(
-                (n) => n.value === selection[selection.length - 1]
-              ) as OptionType;
-              const [endHours, endMinutes] = endOption?.label
-                ?.split(":")
-                .map(Number) as number[];
-              const endTime = new Date().setHours(endHours, endMinutes);
-
-              const startIndex = timeSlotStartOptions.indexOf(val);
-              const endValue =
-                startTime >= endTime
-                  ? (timeSlotEndOptions[startIndex + 1].value as string)
-                  : (timeSlotEndOptions.find(
-                      (n) => n.value === selection[selection.length - 1]
-                    )?.value as string);
-              setSelectedTime(val.value as string, endValue);
-            }}
-          />
-          <Select
-            label={t("Allocation.endingTime")}
-            options={timeSlotEndOptions}
-            value={timeSlotEndOptions.find(
-              (n) => n.value === selection[selection.length - 1]
-            )}
-            onChange={(val: OptionType) =>
-              setSelectedTime(undefined, val.value as string)
-            }
-            isOptionDisabled={(option) => {
-              const [startHours, startMinutes] = timeSlotStartOptions
-                .find((n) => n.value === selection[0])
-                ?.label?.split(":")
-                .map(Number) as number[];
-              const startTime = new Date().setHours(startHours, startMinutes);
-              const [endHours, endMinutes] = option.label
-                .split(":")
-                .map(Number);
-              const endTime = new Date().setHours(endHours, endMinutes);
-
-              return endTime <= startTime && endHours !== 0;
-            }}
-          />
-        </TimeSelectWrapper>
+        <TimeSelection selection={selection} setSelection={setSelection} />
       </StyledShowAllContainer>
-      {(primaryApplicationEvents?.length > 0 ||
-        otherApplicationEvents?.length > 0) && (
-        <>
-          <Heading>{t("Allocation.primaryItems")}</Heading>
-          {primaryApplicationEvents?.length > 0 ? (
-            primaryApplicationEvents?.map((applicationEvent) => (
-              <ApplicationEventScheduleCard
-                key={applicationEvent.pk}
-                applicationEvent={applicationEvent}
-                reservationUnit={reservationUnit}
-                selection={selection}
-                applicationEventScheduleResultStatuses={
-                  applicationEventScheduleResultStatuses
-                }
-              />
-            ))
-          ) : (
-            <EmptyState>{t("Allocation.noPrimaryItems")}</EmptyState>
-          )}
-        </>
+      {aeList.map((applicationEvent) => (
+        <ApplicationEventScheduleCard
+          key={applicationEvent.pk}
+          applicationEvent={applicationEvent}
+          reservationUnit={reservationUnit}
+          selection={selection ?? []}
+          isAllocationEnabled={canAllocate}
+        />
+      ))}
+      {aeList.length === 0 && (
+        <EmptyState>{t("Allocation.noRequestedTimes")}</EmptyState>
       )}
-      {otherApplicationEvents?.length > 0 && (
-        <StyledAccordion
-          heading={t("Allocation.secondaryItems")}
-          initiallyOpen={primaryApplicationEvents?.length === 0}
-          key={selection.join("-")}
-        >
-          {otherApplicationEvents.map((applicationEvent) => (
-            <ApplicationEventScheduleCard
-              key={applicationEvent.pk}
-              applicationEvent={applicationEvent}
-              reservationUnit={reservationUnit}
-              selection={selection}
-              applicationEventScheduleResultStatuses={
-                applicationEventScheduleResultStatuses
-              }
-            />
-          ))}
-        </StyledAccordion>
-      )}
-      {primaryApplicationEvents?.length === 0 &&
-        otherApplicationEvents?.length === 0 && (
-          <EmptyState>{t("Allocation.noRequestedTimes")}</EmptyState>
-        )}
     </Wrapper>
   );
-};
-
-export default ApplicationRoundAllocationActions;
+}

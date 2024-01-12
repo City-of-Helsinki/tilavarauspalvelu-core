@@ -20,7 +20,7 @@ import { SearchTags } from "@/component/SearchTags";
 import Loader from "@/component/Loader";
 import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import { useOptions } from "@/component/my-units/hooks";
-import { Container, autoGridCss } from "@/styles/layout";
+import { Container as BaseContainer, autoGridCss } from "@/styles/layout";
 import { useNotification } from "@/context/NotificationContext";
 import { useAllocationContext } from "@/context/AllocationContext";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
@@ -29,16 +29,21 @@ import { Permission } from "@/modules/permissionHelper";
 import { truncate } from "@/helpers";
 import {
   ALL_EVENTS_PER_UNIT_QUERY,
-  APPLICATION_EVENTS_FOR_ALLOCATION,
   ALLOCATION_UNFILTERED_QUERY,
 } from "./queries";
 import { ApplicationEvents } from "./ApplicationEvents";
+import { APPLICATIONS_EVENTS_QUERY } from "../review/queries";
 
 const MAX_RES_UNIT_NAME_LENGTH = 35;
 
 type IParams = {
   applicationRoundId: string;
 };
+
+/* TODO is the gap everywhere 24px? i.e. can we remove the override */
+const Container = styled(BaseContainer)`
+  gap: var(--spacing-layout-xs);
+`;
 
 const StyledH1 = styled(H1).attrs({ $legacy: true })`
   margin: 0;
@@ -255,8 +260,22 @@ function ApplicationRoundAllocation({
     );
   };
 
+  // TODO sanitize all other query filters similar to this
+  // backend returns an error on invalid filter values, but user can cause them by manipulating the url
+  // TODO rename time => priority
+  const priorityFilter_ = timeFilter
+    ?.map((x) => Number(x))
+    .reduce<Array<200 | 300>>((acc, x) => {
+      if (x === 200 || x === 300) {
+        return [...acc, x];
+      }
+      return acc;
+    }, []);
+
+  const priorityFilterQuery =
+    priorityFilter_.length > 0 ? priorityFilter_ : [300, 200];
   const { data, refetch } = useQuery<Query, QueryApplicationEventsArgs>(
-    APPLICATION_EVENTS_FOR_ALLOCATION,
+    APPLICATIONS_EVENTS_QUERY,
     {
       skip: !applicationRoundId,
       // NOTE required otherwise this returns stale data when filters change
@@ -264,16 +283,8 @@ function ApplicationRoundAllocation({
       variables: {
         applicationRound: applicationRoundId,
         ...(unitFilter != null ? { unit: [Number(unitFilter)] } : {}),
-        ...(timeFilter != null
-          ? {
-              priority: timeFilter
-                .map((x) => Number(x))
-                .reduce<number[]>(
-                  (acc, x) => (x === 200 ? [...acc, 200, 100] : [...acc, x]),
-                  []
-                ),
-            }
-          : {}),
+        // NOTE there is an extra option of priority 100, which should never be used (old data)
+        priority: priorityFilterQuery,
         ...(orderFilter != null &&
         orderFilter.filter((x) => Number(x) <= 10).length > 0
           ? {
@@ -342,7 +353,6 @@ function ApplicationRoundAllocation({
       setRefreshApplicationEvents(false);
     }
   }, [refetch, refreshApplicationEvents, setRefreshApplicationEvents]);
-
   const applicationEvents = filterNonNullable(
     data?.applicationEvents?.edges.map((e) => e?.node)
   );
@@ -396,7 +406,7 @@ function ApplicationRoundAllocation({
     }
   };
 
-  const hideSearchTags = ["unit", "reservation-unit"];
+  const hideSearchTags = ["unit", "reservation-unit", "aes"];
 
   const handleResetFilters = () => {
     const newParams = hideSearchTags.reduce<typeof searchParams>(

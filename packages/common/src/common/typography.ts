@@ -16,6 +16,10 @@ export const fontBold = css`
   font-weight: 700;
 `;
 
+export const SemiBold = styled.span`
+  ${fontMedium}
+`;
+
 export const Strongish = styled.span`
   ${fontMedium}
 `;
