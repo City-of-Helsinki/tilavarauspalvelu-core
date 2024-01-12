@@ -333,47 +333,56 @@ export const getDayIntervals = (
   return intervals.filter((n) => n.substring(0, 5) !== normalizedEndTime);
 };
 
+/// TODO this function is still a performance problem (looking at the flame graph)
+/// The filtering helps, but the real solution would be to refactor the TimeSpan construction
+/// to the Page load: do 7 / 30 days at a time, not all intervals (2 years)
 export const isStartTimeWithinInterval = (
   start: Date,
   reservableTimeSpans: ReservableTimeSpanType[],
   interval?: ReservationUnitsReservationUnitReservationStartIntervalChoices
 ): boolean => {
-  if (reservableTimeSpans?.length < 1) return false;
+  if (reservableTimeSpans.length < 1) return false;
   if (!interval) return true;
 
   // TODO this is awfully similar to the one in QuickReservation
-  const timeframeArr = reservableTimeSpans.filter((n) => {
-    if (!n.startDatetime || !n.endDatetime) return false;
-
-    const begin = isSameDay(new Date(n.startDatetime), start)
-      ? new Date(n.startDatetime)
-      : set(start, { hours: 0, minutes: 0 });
-    const end = isSameDay(new Date(n.endDatetime), start)
-      ? new Date(n.endDatetime)
-      : set(start, { hours: 23, minutes: 59 });
-
-    return isWithinInterval(start, { start: begin, end });
-  });
+  // TODO could early break if the start is after the last interval
+  // TODO this part should be refactored to either the Node backend or on Page load
+  // split the intervals into days so we can just do a hash table search
   type TimeFrame = { start: Date; end: Date };
-  const timeframe = timeframeArr
+  const timeframeArr = reservableTimeSpans
     .map((n) =>
       n.startDatetime != null && n.endDatetime != null
         ? { start: new Date(n.startDatetime), end: new Date(n.endDatetime) }
         : null
     )
     .filter((n): n is NonNullable<typeof n> => n != null)
-    .reduce<TimeFrame | null>((acc, curr) => {
-      const begin = isSameDay(new Date(curr.start), start)
-        ? new Date(curr.start)
+    .filter((n) => {
+      if (n.start > start) return false;
+      if (n.end < start) return false;
+      return true;
+    })
+    .filter((n) => {
+      const begin = isSameDay(n.start, start)
+        ? n.start
         : set(start, { hours: 0, minutes: 0 });
-      const end = isSameDay(new Date(curr.end), start)
-        ? new Date(curr.end)
+      const end = isSameDay(n.end, start)
+        ? new Date(n.end)
         : set(start, { hours: 23, minutes: 59 });
-      return {
-        start: acc?.start && acc.start < begin ? acc.start : begin,
-        end: acc?.end && acc.end > end ? acc.end : end,
-      };
-    }, null);
+      return isWithinInterval(start, { start: begin, end });
+    });
+
+  const timeframe = timeframeArr.reduce<TimeFrame | null>((acc, curr) => {
+    const begin = isSameDay(new Date(curr.start), start)
+      ? new Date(curr.start)
+      : set(start, { hours: 0, minutes: 0 });
+    const end = isSameDay(new Date(curr.end), start)
+      ? new Date(curr.end)
+      : set(start, { hours: 23, minutes: 59 });
+    return {
+      start: acc?.start && acc.start < begin ? acc.start : begin,
+      end: acc?.end && acc.end > end ? acc.end : end,
+    };
+  }, null);
 
   if (timeframe?.start == null || timeframe.end == null) {
     return false;
