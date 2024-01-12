@@ -11,7 +11,6 @@ import {
   LIST_PAGE_SIZE,
   VALID_ALLOCATION_APPLICATION_STATUSES,
 } from "@/common/const";
-import { combineResults } from "@/common/util";
 import { useNotification } from "@/context/NotificationContext";
 import Loader from "@/component/Loader";
 import { More } from "@/component/lists/More";
@@ -22,17 +21,6 @@ import {
   transformApplicantType,
   transformApplicationEventStatus,
 } from "./utils";
-
-const updateQuery = (
-  previousResult: Query,
-  { fetchMoreResult }: { fetchMoreResult: Query }
-): Query => {
-  if (!fetchMoreResult) {
-    return previousResult;
-  }
-
-  return combineResults(previousResult, fetchMoreResult, "applicationEvents");
-};
 
 type Props = {
   applicationRoundPk: number;
@@ -50,7 +38,7 @@ export function ApplicationEventDataLoader({
   const nameFilter = searchParams.get("name");
   const eventStatusFilter = searchParams.getAll("eventStatus");
 
-  const { fetchMore, loading, data } = useQuery<
+  const { fetchMore, previousData, loading, data } = useQuery<
     Query,
     QueryApplicationEventsArgs
   >(APPLICATIONS_EVENTS_QUERY, {
@@ -69,22 +57,24 @@ export function ApplicationEventDataLoader({
     onError: (err: ApolloError) => {
       notifyError(err.message);
     },
-    // TODO cache-and-network doesn't work because it appends the network-results on top of the cache
-    // need to add custom caching merge with uniq before changing this
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-and-network",
+    nextFetchPolicy: "cache-first",
   });
 
   const { t } = useTranslation();
 
-  if (loading && !data) {
+  const dataToUse = data ?? previousData;
+  if (loading && !dataToUse) {
     return <Loader />;
   }
 
   const applicationEvents = filterNonNullable(
-    data?.applicationEvents?.edges.map((edge) => edge?.node)
+    dataToUse?.applicationEvents?.edges.map((edge) => edge?.node)
   );
-  const totalCount = data?.applicationEvents?.totalCount ?? 0;
+  const totalCount = dataToUse?.applicationEvents?.totalCount ?? 0;
 
+  // TODO add subtle loading indicator when using the previousData
+  // something that doesn't cause Page Layout changes e.g. overlay on top of the table
   return (
     <>
       <span>
@@ -105,7 +95,6 @@ export function ApplicationEventDataLoader({
             variables: {
               offset: data?.applicationEvents?.edges.length,
             },
-            updateQuery,
           })
         }
       />

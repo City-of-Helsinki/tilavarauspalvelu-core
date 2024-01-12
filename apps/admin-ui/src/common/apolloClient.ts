@@ -13,8 +13,10 @@ import { GraphQLError } from "graphql/error/GraphQLError";
 import type {
   ReservationTypeConnection,
   BannerNotificationNodeConnection,
+  ApplicationNodeConnection,
+  ApplicationEventNodeConnection,
+  ApplicationEventScheduleNodeConnection,
 } from "common/types/gql-types";
-
 import { GRAPQL_API_URL, isBrowser } from "./const";
 import { CustomFormData } from "./CustomFormData";
 
@@ -89,6 +91,95 @@ const client = new ApolloClient({
                 ),
               };
               return merged;
+            },
+          },
+          applicationEventSchedules: {
+            keyArgs: [
+              "applicationRound",
+              "allocatedUnit",
+              "applicantType",
+              "applicationEventStatus",
+              "allocatedReservationUnit",
+              "allocatedDay",
+              "accepted",
+              "declined",
+              "unallocated",
+              "textSearch",
+              "orderBy",
+            ],
+            read(existing: ApplicationEventScheduleNodeConnection) {
+              return existing;
+            },
+            merge(
+              existing: ApplicationEventScheduleNodeConnection,
+              incoming: ApplicationEventScheduleNodeConnection
+            ) {
+              return {
+                ...incoming,
+                edges: uniqBy(
+                  [...(existing?.edges ?? []), ...incoming.edges],
+                  (x) => x?.node?.pk
+                ),
+              };
+            },
+          },
+          applicationEvents: {
+            keyArgs: [
+              "unit",
+              "applicationRound",
+              "applicationStatus",
+              "status",
+              "applicantType",
+              "textSearch",
+              "orderBy",
+              "preferredOrder",
+              "priority",
+              "purpose",
+              "reservationUnit",
+              "applicantType",
+              "ageGroup",
+              "homeCity",
+              "includePreferredOrder10OrHigher",
+            ],
+            read(existing: ApplicationEventNodeConnection) {
+              return existing;
+            },
+            merge(
+              existing: ApplicationEventNodeConnection,
+              incoming: ApplicationEventNodeConnection
+            ) {
+              return {
+                ...incoming,
+                edges: uniqBy(
+                  [...(existing?.edges ?? []), ...incoming.edges],
+                  (x) => x?.node?.pk
+                ),
+              };
+            },
+          },
+          applications: {
+            keyArgs: [
+              "orderBy",
+              "applicationRound",
+              "unit",
+              "status",
+              "applicantType",
+              "textSearch",
+            ],
+            read(existing: ApplicationNodeConnection) {
+              return existing;
+            },
+            merge(
+              existing: ApplicationNodeConnection,
+              incoming: ApplicationNodeConnection
+            ) {
+              return {
+                ...incoming,
+                edges: uniqBy(
+                  [...(existing?.edges ?? []), ...incoming.edges],
+                  (x) => x?.node?.pk
+                ),
+              };
             },
           },
           reservations: {

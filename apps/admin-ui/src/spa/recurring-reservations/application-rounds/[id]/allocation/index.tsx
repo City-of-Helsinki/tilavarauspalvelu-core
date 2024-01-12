@@ -326,6 +326,8 @@ function ApplicationRoundAllocation({
         unit: [Number(unitFilter)],
         applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,
       },
+      // NOTE returns incorrectly filtered data if we enable cache
+      fetchPolicy: "no-cache",
     }
   );
   const allEvents = filterNonNullable(

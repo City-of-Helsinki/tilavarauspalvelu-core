@@ -8,7 +8,6 @@ import {
 import { useTranslation } from "next-i18next";
 import { filterNonNullable } from "common/src/helpers";
 import { LIST_PAGE_SIZE } from "@/common/const";
-import { combineResults } from "@/common/util";
 import { useNotification } from "@/context/NotificationContext";
 import { APPLICATIONS_EVENTS_SCHEDULE_QUERY } from "./queries";
 import Loader from "@/component/Loader";
@@ -28,17 +27,6 @@ export type Sort = {
 
 type Props = {
   applicationRoundPk: number;
-};
-
-const updateQuery = (
-  previousResult: Query,
-  { fetchMoreResult }: { fetchMoreResult: Query }
-): Query => {
-  if (!fetchMoreResult) {
-    return previousResult;
-  }
-
-  return combineResults(previousResult, fetchMoreResult, "applicationEvents");
 };
 
 export function AllocatedEventDataLoader({
@@ -64,7 +52,7 @@ export function AllocatedEventDataLoader({
     aesFilter.length === 1 &&
     aesFilter[0] === ApplicationEventStatusChoice.Declined;
 
-  const { fetchMore, loading, data } = useQuery<
+  const { fetchMore, previousData, loading, data } = useQuery<
     Query,
     QueryApplicationEventSchedulesArgs
   >(APPLICATIONS_EVENTS_SCHEDULE_QUERY, {
@@ -91,22 +79,24 @@ export function AllocatedEventDataLoader({
     onError: (err: ApolloError) => {
       notifyError(err.message);
     },
-    // TODO cache-and-network doesn't work because it appends the network-results on top of the cache
-    // need to add custom caching merge with uniq before changing this
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-and-network",
+    nextFetchPolicy: "cache-first",
   });
 
   const { t } = useTranslation();
 
-  if (loading) {
+  const dataToUse = data ?? previousData;
+  if (loading && !dataToUse) {
     return <Loader />;
   }
 
-  const totalCount = data?.applicationEventSchedules?.totalCount ?? 0;
+  const totalCount = dataToUse?.applicationEventSchedules?.totalCount ?? 0;
   const aes = filterNonNullable(
-    data?.applicationEventSchedules?.edges.map((edge) => edge?.node)
+    dataToUse?.applicationEventSchedules?.edges.map((edge) => edge?.node)
   );
 
+  // TODO add subtle loading indicator when using the previousData
+  // something that doesn't cause Page Layout changes e.g. overlay on top of the table
   return (
     <>
       <span>
@@ -127,7 +117,6 @@ export function AllocatedEventDataLoader({
             variables: {
               offset: data?.applicationEventSchedules?.edges.length ?? 0,
             },
-            updateQuery,
           })
         }
       />
