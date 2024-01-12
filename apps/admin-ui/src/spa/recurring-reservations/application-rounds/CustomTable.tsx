@@ -1,6 +1,5 @@
 import { Table, TableProps } from "hds-react";
 import React from "react";
-import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 
@@ -38,7 +37,10 @@ const TableWrapper = styled.div<TableWrapperProps>`
   }
 `;
 
-export const CustomTable = (props: TableProps): JSX.Element => (
+/// Styled version of HDS Table
+/// Compared to the StyledTable in components.tsx, this version uses HDS, while that one is custom code
+/// Leaving this primarily because we want to remove the custom implementation if possible
+export const StyledHDSTable = (props: TableProps): JSX.Element => (
   <TableWrapper
     $headingBackground="var(--color-black-10)"
     $tableBackground="var(--color-white)"
@@ -46,7 +48,3 @@ export const CustomTable = (props: TableProps): JSX.Element => (
     <Table {...props} />
   </TableWrapper>
 );
-
-export const TableLink = styled(Link)`
-  color: black;
-`;

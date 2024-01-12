@@ -19,7 +19,8 @@ import { truncate } from "@/helpers";
 import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import Loader from "@/component/Loader";
 import { ApplicationRoundCard } from "./ApplicationRoundCard";
-import { TableLink, CustomTable } from "./CustomTable";
+import { TableLink } from "@/component/lists/components";
+import { StyledHDSTable } from "./CustomTable";
 import { APPLICATION_ROUNDS_QUERY } from "./queries";
 
 const AccordionContainer = styled.div`
@@ -164,7 +165,7 @@ function AllApplicationRounds(): JSX.Element | null {
         <StyledAccordion
           heading={t("ApplicationRound.groupLabel.previousRounds")}
         >
-          <CustomTable
+          <StyledHDSTable
             ariaLabelSortButtonAscending="Sorted in ascending order"
             ariaLabelSortButtonDescending="Sorted in descending order"
             ariaLabelSortButtonUnset="Not sorted"
@@ -176,7 +177,7 @@ function AllApplicationRounds(): JSX.Element | null {
                 headerName: t("ApplicationRound.headings.name"),
                 transform: (applicationRound: ApplicationRoundNode) => (
                   <TableLink
-                    to={applicationRoundUrl(Number(applicationRound.pk))}
+                    href={applicationRoundUrl(Number(applicationRound.pk))}
                   >
                     <span title={applicationRound.nameFi ?? ""}>
                       {truncate(applicationRound.nameFi ?? "", 20)}
