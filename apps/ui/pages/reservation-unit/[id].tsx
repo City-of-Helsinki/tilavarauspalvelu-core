@@ -118,6 +118,7 @@ import ReservationInfoContainer from "@/components/reservation-unit/ReservationI
 import { useCurrentUser } from "@/hooks/user";
 import { genericTermsVariant } from "@/modules/const";
 import { APPLICATION_ROUNDS_PERIODS } from "@/modules/queries/applicationRound";
+import { CenterSpinner } from "@/components/common/common";
 
 type Props = {
   reservationUnit: ReservationUnitByPkType | null;
@@ -369,18 +370,9 @@ const EventWrapperComponent = ({
   );
 };
 
-const ClientOnlyCalendar = ({
-  children,
-  ref,
-}: {
-  children: React.ReactNode;
-  ref: React.Ref<HTMLDivElement>;
-}) => (
+const ClientOnlyCalendar = ({ children }: { children: React.ReactNode }) => (
   <ClientOnly>
-    <CalendarWrapper
-      ref={ref}
-      data-testid="reservation-unit__calendar--wrapper"
-    >
+    <CalendarWrapper data-testid="reservation-unit__calendar--wrapper">
       {children}
     </CalendarWrapper>
   </ClientOnly>
@@ -430,6 +422,20 @@ const ApplicationRoundScheduleDay = ({
   );
 };
 
+const TouchCellWrapper = ({
+  children,
+  value,
+  onSelectSlot,
+}: // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO Calendar prop typing
+any): JSX.Element => {
+  return React.cloneElement(Children.only(children), {
+    onTouchEnd: () => onSelectSlot({ action: "click", slots: [value] }),
+    style: {
+      className: `${children}`,
+    },
+  });
+};
+
 const ReservationUnit = ({
   reservationUnit,
   relatedReservationUnits,
@@ -445,7 +451,7 @@ const ReservationUnit = ({
   const [, setPendingReservation] =
     useSessionStorage<PendingReservation | null>("pendingReservation", null);
 
-  const now = useMemo(() => new Date().toISOString(), []);
+  const now = useMemo(() => new Date(), []);
 
   const [focusDate, setFocusDate] = useState(new Date());
   const [calendarViewType, setCalendarViewType] = useState<WeekOptions>("week");
@@ -465,15 +471,14 @@ const ReservationUnit = ({
   const isClientATouchDevice = isTouchDevice();
 
   useEffect(() => {
-    const scrollToCalendar = () =>
-      window.scroll({
-        top:
-          calendarRef.current != null
-            ? calendarRef.current.offsetTop - 20
-            : undefined,
-        left: 0,
-        behavior: "smooth",
-      });
+    const scrollToCalendar = () => {
+      if (calendarRef?.current?.parentElement?.offsetTop != null) {
+        window.scroll({
+          top: calendarRef.current.parentElement.offsetTop - 20,
+          behavior: "smooth",
+        });
+      }
+    };
 
     if (
       storedReservation?.reservationUnitPk === reservationUnit?.pk &&
@@ -501,7 +506,7 @@ const ReservationUnit = ({
       fetchPolicy: "no-cache",
       skip: !currentUser || !reservationUnit?.pk,
       variables: {
-        begin: now,
+        begin: now.toISOString(),
         user: currentUser?.pk?.toString(),
         reservationUnit: [reservationUnit?.pk?.toString() ?? ""],
         state: allowedReservationStates,
@@ -675,20 +680,6 @@ const ReservationUnit = ({
       setInitialReservation,
     ]
   );
-
-  const TouchCellWrapper = ({
-    children,
-    value,
-    onSelectSlot,
-  }: // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO Calendar prop typing
-  any): JSX.Element => {
-    return React.cloneElement(Children.only(children), {
-      onTouchEnd: () => onSelectSlot({ action: "click", slots: [value] }),
-      style: {
-        className: `${children}`,
-      },
-    });
-  };
 
   useEffect(() => {
     setCalendarViewType(isMobile ? "day" : "week");
@@ -885,12 +876,7 @@ const ReservationUnit = ({
       setShouldUnselect((prev) => prev + 1);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    // quickReservationSlot,
-    initialReservation,
-    setShouldUnselect,
-    setQuickReservationSlot,
-  ]);
+  }, [initialReservation, setShouldUnselect, setQuickReservationSlot]);
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -907,44 +893,16 @@ const ReservationUnit = ({
     reservationUnit != null
       ? getFuturePricing(reservationUnit, activeApplicationRounds)
       : undefined;
-
   const formatters = getFormatters(i18n.language);
-
-  const currentDate = focusDate || new Date();
-
+  const currentDate = focusDate ?? now;
   const dayStartTime = addHours(startOfDay(currentDate), 6);
+  const equipment = filterNonNullable(reservationUnit?.equipment);
 
-  const equipment =
-    reservationUnit?.equipment?.filter(
-      (n): n is NonNullable<typeof n> => n != null
-    ) ?? [];
+  if (reservationUnit == null) {
+    return <CenterSpinner />;
+  }
 
-  const quickReservationProps = {
-    isSlotReservable,
-    isReservationUnitReservable: !isReservationQuotaReached,
-    createReservation,
-    scrollPosition: calendarRef?.current?.offsetTop
-      ? calendarRef.current.offsetTop - 20
-      : 0,
-    reservationUnit,
-    calendarRef,
-    setErrorMsg,
-    subventionSuffix: reservationUnit?.canApplyFreeOfCharge
-      ? () => (
-          <SubventionSuffix
-            placement="quick-reservation"
-            ref={openPricingTermsRef}
-            setIsDialogOpen={setIsDialogOpen}
-          />
-        )
-      : undefined,
-    shouldUnselect,
-    quickReservationSlot,
-    setQuickReservationSlot,
-    setInitialReservation,
-  };
-
-  return reservationUnit ? (
+  return (
     <Wrapper>
       <Head
         reservationUnit={reservationUnit}
@@ -962,25 +920,36 @@ const ReservationUnit = ({
       <Container>
         <Columns>
           <div>
+            {!isReservationStartInFuture(reservationUnit) && isReservable && (
+              <QuickReservation
+                isSlotReservable={isSlotReservable}
+                isReservationUnitReservable={!isReservationQuotaReached}
+                createReservation={createReservation}
+                reservationUnit={reservationUnit}
+                calendarRef={calendarRef}
+                setErrorMsg={setErrorMsg}
+                subventionSuffix={
+                  reservationUnit?.canApplyFreeOfCharge
+                    ? () => (
+                        <SubventionSuffix
+                          placement="quick-reservation"
+                          ref={openPricingTermsRef}
+                          setIsDialogOpen={setIsDialogOpen}
+                        />
+                      )
+                    : undefined
+                }
+                shouldUnselect={shouldUnselect}
+                quickReservationSlot={quickReservationSlot}
+                setQuickReservationSlot={setQuickReservationSlot}
+                setInitialReservation={setInitialReservation}
+              />
+            )}
             <JustForDesktop customBreakpoint={breakpoints.l}>
-              {!isReservationStartInFuture(reservationUnit) && isReservable && (
-                <QuickReservation
-                  {...quickReservationProps}
-                  idPrefix="desktop"
-                />
-              )}
               <Address reservationUnit={reservationUnit} />
             </JustForDesktop>
           </div>
           <Left>
-            <JustForMobile customBreakpoint={breakpoints.l}>
-              {!isReservationStartInFuture(reservationUnit) && isReservable && (
-                <QuickReservation
-                  {...quickReservationProps}
-                  idPrefix="mobile"
-                />
-              )}
-            </JustForMobile>
             <Subheading>{t("reservationUnit:description")}</Subheading>
             <Content data-testid="reservation-unit__description">
               <Sanitize html={getTranslation(reservationUnit, "description")} />
@@ -994,7 +963,7 @@ const ReservationUnit = ({
               </>
             )}
             {isReservable && (
-              <ClientOnlyCalendar ref={calendarRef}>
+              <ClientOnlyCalendar>
                 <Subheading>
                   {t("reservations:reservationCalendar", {
                     title: getTranslation(reservationUnit, "name"),
@@ -1025,7 +994,7 @@ const ReservationUnit = ({
                       </span>
                     </StyledNotification>
                   )}
-                <div aria-hidden>
+                <div aria-hidden ref={calendarRef}>
                   <Calendar<ReservationType>
                     events={[...calendarEvents, ...eventBuffers]}
                     begin={currentDate}
@@ -1085,9 +1054,7 @@ const ReservationUnit = ({
                         reservationUnit={reservationUnit}
                         initialReservation={initialReservation}
                         setInitialReservation={setInitialReservation}
-                        isSlotReservable={(startDate, endDate) =>
-                          isSlotReservable(startDate, endDate)
-                        }
+                        isSlotReservable={isSlotReservable}
                         isReserving={isReserving}
                         setCalendarFocusDate={setFocusDate}
                         activeApplicationRounds={activeApplicationRounds}
@@ -1262,7 +1229,7 @@ const ReservationUnit = ({
         </Toast>
       )}
     </Wrapper>
-  ) : null;
+  );
 };
 
 export default ReservationUnit;

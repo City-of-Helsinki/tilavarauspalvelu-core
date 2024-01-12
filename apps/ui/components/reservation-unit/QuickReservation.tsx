@@ -49,10 +49,9 @@ type Props = {
     React.SetStateAction<QuickReservationSlotProps | null>
   >;
   reservationUnit: ReservationUnitByPkType | null;
-  scrollPosition: number;
   isSlotReservable: (arg1: Date, arg2: Date, arg3?: boolean) => boolean;
   setErrorMsg: (arg: string) => void;
-  idPrefix: string;
+  calendarRef: React.RefObject<HTMLDivElement>;
   subventionSuffix?: (arg: string) => JSX.Element;
 };
 
@@ -244,12 +243,15 @@ function dayMax(days: Array<Date | undefined>): Date | undefined {
 
 // Returns the last possible reservation date for the given reservation unit
 function getLastPossibleReservationDate(
-  reservationUnit: ReservationUnitByPkType
-): Date | undefined {
+  reservationUnit?: ReservationUnitByPkType
+): Date | null {
+  if (!reservationUnit) {
+    return null;
+  }
   const { reservationsMaxDaysBefore, reservableTimeSpans, reservationEnds } =
     reservationUnit;
   if (!reservableTimeSpans?.length) {
-    return undefined;
+    return null;
   }
 
   const lastPossibleReservationDate =
@@ -261,11 +263,13 @@ function getLastPossibleReservationDate(
     : undefined;
   const endDateTime = reservableTimeSpans.at(-1)?.endDatetime ?? undefined;
   const lastOpeningDate = endDateTime ? new Date(endDateTime) : new Date();
-  return dayMin([
-    reservationUnitNotReservable,
-    lastPossibleReservationDate,
-    lastOpeningDate,
-  ]);
+  return (
+    dayMin([
+      reservationUnitNotReservable,
+      lastPossibleReservationDate,
+      lastOpeningDate,
+    ]) ?? null
+  );
 }
 
 type AvailableTimesProps = {
@@ -370,13 +374,12 @@ const QuickReservation = ({
   isReservationUnitReservable,
   createReservation,
   reservationUnit,
-  scrollPosition,
   setErrorMsg,
-  idPrefix,
   subventionSuffix,
   shouldUnselect,
   setInitialReservation,
   quickReservationSlot,
+  calendarRef,
   setQuickReservationSlot,
 }: Props): JSX.Element | null => {
   const { t, i18n } = useTranslation();
@@ -406,6 +409,7 @@ const QuickReservation = ({
     reservationStartInterval,
   ]);
 
+  // TODO this should be on a timer
   const nextHour: Date = useMemo(() => {
     const now = new Date();
     now.setMinutes(0);
@@ -536,40 +540,46 @@ const QuickReservation = ({
     );
   }, [date, reservationUnit, time, duration, isSlotReservable]);
 
+  // NOTE useMemo has the same overhead as calling these multiple times during initial render
+  // might be faster when user is interacting with the page because
+  // a user action -> triggers render 6 times
+
   // the next available time after the selected time
-  const nextAvailableTime = getNextAvailableTime({
-    day: date,
-    time,
-    duration: duration?.value?.toString() ?? "00:00",
-    isSlotReservable,
-    reservationUnit: reservationUnit ?? undefined,
-  });
+  const nextAvailableTime = useMemo(
+    () =>
+      getNextAvailableTime({
+        day: date,
+        time,
+        duration: duration?.value?.toString() ?? "00:00",
+        isSlotReservable,
+        reservationUnit: reservationUnit ?? undefined,
+      }),
+    [date, time, duration, isSlotReservable, reservationUnit]
+  );
 
   // the available times for the selected day
-  const dayTimes = getAvailableTimesForDay({
-    day: date,
-    time,
-    duration: duration?.value?.toString() ?? "00:00",
-    isSlotReservable,
-    reservationUnit: reservationUnit ?? undefined,
-  });
+  const dayTimes = useMemo(
+    () =>
+      getAvailableTimesForDay({
+        day: date,
+        time,
+        duration: duration?.value?.toString() ?? "00:00",
+        isSlotReservable,
+        reservationUnit: reservationUnit ?? undefined,
+      }),
+    [date, time, duration, isSlotReservable, reservationUnit]
+  );
 
-  if (
-    !reservationUnit?.reservableTimeSpans ||
-    !minReservationDuration ||
-    !maxReservationDuration
-  ) {
-    return null;
-  }
-
-  const lastPossibleDate = getLastPossibleReservationDate(reservationUnit);
+  const lastPossibleDate = getLastPossibleReservationDate(
+    reservationUnit ?? undefined
+  );
 
   return (
-    <Wrapper id={`quick-reservation-${idPrefix}`}>
+    <Wrapper id="quick-reservation">
       <Heading>{t("reservationCalendar:quickReservation.heading")}</Heading>
       <Selects>
         <DateInput
-          id={`${idPrefix}-quick-reservation-date`}
+          id="quick-reservation-date"
           label={t("reservationCalendar:quickReservation.date")}
           initialMonth={new Date()}
           language={getLocalizationLang(i18n.language)}
@@ -593,11 +603,11 @@ const QuickReservation = ({
           }}
           value={toUIDate(date)}
           minDate={new Date()}
-          maxDate={lastPossibleDate}
+          maxDate={lastPossibleDate ?? undefined}
         />
         <StyledTimeInput
           key={`timeInput-${time}`}
-          id={`${idPrefix}-quick-reservation-time`}
+          id="quick-reservation-time"
           label={t("reservationCalendar:quickReservation.time")}
           hoursLabel={t("common:hours")}
           minutesLabel={t("common:minutes")}
@@ -616,7 +626,7 @@ const QuickReservation = ({
         />
         <StyledSelect
           key={`durationSelect-${duration?.value}`}
-          id={`${idPrefix}-quick-reservation-duration`}
+          id="quick-reservation-duration"
           label={t("reservationCalendar:quickReservation.duration")}
           options={durationOptions}
           onChange={(val: OptionType) => setDuration(val)}
@@ -668,7 +678,7 @@ const QuickReservation = ({
                         onClick={(e) => {
                           e.preventDefault();
                           window.scroll({
-                            top: scrollPosition,
+                            top: calendarRef?.current?.parentElement?.offsetTop,
                             left: 0,
                             behavior: "smooth",
                           });
