@@ -3,11 +3,10 @@ import { formatISO, parse, startOfDay } from "date-fns";
 import { Button } from "hds-react";
 import React, { useReducer, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useLocation } from "react-use";
 import styled from "styled-components";
 import { AutoGrid, VerticalFlex } from "app/styles/layout";
-import { useQueryParams } from "../../common/hooks";
 import { OptionType } from "../../common/types";
 import ReservationUnitTypeFilter from "../filters/ReservationUnitTypeFilter";
 import Tags, { getReducer, toTags } from "../lists/Tags";
@@ -29,7 +28,7 @@ type Params = {
 
 const UnitReservationsView = (): JSX.Element => {
   const { hash } = useLocation();
-  const queryParams = useQueryParams();
+  const [queryParams] = useSearchParams();
   const initialDate = queryParams.get("date")
     ? parse(queryParams.get("date") || "", "d.M.yyyy", new Date())
     : new Date();
