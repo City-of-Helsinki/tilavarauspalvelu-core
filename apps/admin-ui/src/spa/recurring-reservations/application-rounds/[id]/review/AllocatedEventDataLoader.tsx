@@ -95,8 +95,6 @@ export function AllocatedEventDataLoader({
     dataToUse?.applicationEventSchedules?.edges.map((edge) => edge?.node)
   );
 
-  // TODO add subtle loading indicator when using the previousData
-  // something that doesn't cause Page Layout changes e.g. overlay on top of the table
   return (
     <>
       <span>
@@ -108,6 +106,7 @@ export function AllocatedEventDataLoader({
         schedules={aes}
         sort={orderBy}
         sortChanged={handleSortChanged}
+        isLoading={loading}
       />
       <More
         totalCount={totalCount}

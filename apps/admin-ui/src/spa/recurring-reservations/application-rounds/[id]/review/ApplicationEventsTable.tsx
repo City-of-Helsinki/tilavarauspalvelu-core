@@ -24,6 +24,7 @@ type Props = {
   sort: string | null;
   sortChanged: (field: string) => void;
   applicationEvents: ApplicationEventNode[];
+  isLoading?: boolean;
 };
 
 type UnitType = {
@@ -162,6 +163,7 @@ export function ApplicationEventsTable({
   sort,
   sortChanged: onSortChanged,
   applicationEvents,
+  isLoading,
 }: Props): JSX.Element {
   const { t } = useTranslation();
 
@@ -179,6 +181,7 @@ export function ApplicationEventsTable({
     <CustomTable
       setSort={onSortChanged}
       indexKey="pk"
+      isLoading={isLoading}
       rows={views}
       cols={cols}
       initialSortingColumnKey={sortField}

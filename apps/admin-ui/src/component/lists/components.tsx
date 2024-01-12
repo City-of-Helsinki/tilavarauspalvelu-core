@@ -46,12 +46,21 @@ const StyledTable = styled(Table)<TableWrapperProps>`
   }
 `;
 
-export const CustomTable = (
-  props: TableProps & { setSort: (col: string) => void }
-): JSX.Element => (
+type Props = TableProps & {
+  setSort?: (col: string) => void;
+  isLoading?: boolean;
+};
+
+// @param isLoading - if true, table is rendered with a loading overlay
+// TODO overlay and spinner for loading would be preferable over colour switching
+export const CustomTable = ({ isLoading, ...props }: Props): JSX.Element => (
   <StyledTable
-    $headingBackground="var(--color-black-10)"
-    $tableBackground="var(--color-white)"
+    $headingBackground={
+      isLoading ? "var(--color-black-20)" : "var(--color-black-10)"
+    }
+    $tableBackground={
+      isLoading ? "var(--color-black-10)" : "var(--color-white)"
+    }
     $colWidths={
       props?.cols ? props.cols.map((col) => get(col, "width", "auto")) : []
     }

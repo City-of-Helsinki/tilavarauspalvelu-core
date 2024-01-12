@@ -21,6 +21,7 @@ type Props = {
   sort: string | null;
   sortChanged: (field: string) => void;
   schedules: ApplicationEventScheduleNode[];
+  isLoading?: boolean;
 };
 
 type ApplicationScheduleView = {
@@ -154,6 +155,7 @@ export function AllocatedEventsTable({
   sort,
   sortChanged: onSortChanged,
   schedules,
+  isLoading,
 }: Props): JSX.Element {
   const { t } = useTranslation();
 
@@ -171,6 +173,7 @@ export function AllocatedEventsTable({
     <CustomTable
       setSort={onSortChanged}
       indexKey="pk"
+      isLoading={isLoading}
       rows={views}
       cols={cols}
       initialSortingColumnKey={sortField}

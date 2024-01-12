@@ -73,8 +73,6 @@ export function ApplicationEventDataLoader({
   );
   const totalCount = dataToUse?.applicationEvents?.totalCount ?? 0;
 
-  // TODO add subtle loading indicator when using the previousData
-  // something that doesn't cause Page Layout changes e.g. overlay on top of the table
   return (
     <>
       <span>
@@ -86,6 +84,7 @@ export function ApplicationEventDataLoader({
         applicationEvents={applicationEvents}
         sort={orderBy}
         sortChanged={handleSortChanged}
+        isLoading={loading}
       />
       <More
         totalCount={totalCount}

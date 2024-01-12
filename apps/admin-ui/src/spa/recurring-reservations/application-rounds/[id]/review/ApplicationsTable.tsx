@@ -145,12 +145,14 @@ type ApplicationsTableProps = {
   sort: string | null;
   sortChanged: (field: string) => void;
   applications: ApplicationNode[];
+  isLoading?: boolean;
 };
 
 export function ApplicationsTable({
   sort,
   sortChanged: onSortChanged,
   applications,
+  isLoading,
 }: ApplicationsTableProps): JSX.Element {
   const { t } = useTranslation();
 
@@ -167,6 +169,7 @@ export function ApplicationsTable({
     <CustomTable
       setSort={onSortChanged}
       indexKey="pk"
+      isLoading={isLoading}
       rows={rows}
       cols={cols}
       // TODO refactor maybe so we can use a string, -field for desc, field for asc
