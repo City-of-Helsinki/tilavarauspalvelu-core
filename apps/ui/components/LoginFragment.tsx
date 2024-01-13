@@ -3,7 +3,6 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { signIn, useSession } from "~/hooks/auth";
-import { isBrowser } from "../modules/const";
 import { MediumButton } from "../styles/util";
 
 type Props = {
@@ -55,16 +54,6 @@ const LoginFragment = ({
   const { isAuthenticated } = useSession();
   const { t } = useTranslation();
 
-  const [shouldLogin, setShouldLogin] = React.useState(false);
-
-  if (!isBrowser) {
-    return null;
-  }
-
-  if (shouldLogin) {
-    signIn();
-  }
-
   return !isAuthenticated ? (
     <Wrapper>
       <SubmitButton
@@ -72,7 +61,7 @@ const LoginFragment = ({
           if (actionCallback) {
             actionCallback();
           }
-          setShouldLogin(true);
+          signIn();
         }}
         aria-label={t("reservationCalendar:loginAndReserve")}
         className="login-fragment__button--login"

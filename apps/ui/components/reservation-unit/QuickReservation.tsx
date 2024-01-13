@@ -17,8 +17,7 @@ import styled from "styled-components";
 import { chunkArray, toUIDate } from "common/src/common/util";
 import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
 import { fontBold, fontMedium, H4 } from "common/src/common/typography";
-import ClientOnly from "common/src/ClientOnly";
-import { ReservationUnitByPkType } from "common/types/gql-types";
+import type { ReservationUnitByPkType } from "common/types/gql-types";
 import { breakpoints } from "common";
 import { type ReservationProps } from "@/context/DataContext";
 import { getDurationOptions } from "@/modules/reservation";
@@ -748,8 +747,4 @@ const QuickReservation = ({
   );
 };
 
-export default (props: Props) => (
-  <ClientOnly>
-    <QuickReservation {...props} />
-  </ClientOnly>
-);
+export default QuickReservation;
