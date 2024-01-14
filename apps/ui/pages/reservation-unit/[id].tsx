@@ -35,7 +35,6 @@ import { breakpoints } from "common/src/common/style";
 import Calendar, { CalendarEvent } from "common/src/calendar/Calendar";
 import { Toolbar } from "common/src/calendar/Toolbar";
 import classNames from "classnames";
-import ClientOnly from "common/src/ClientOnly";
 import { PendingReservation } from "common/types/common";
 import {
   ApplicationRoundStatusChoice,
@@ -369,14 +368,6 @@ const EventWrapperComponent = ({
     <EventWrapper {...props} className={classNames({ isSmall, isMedium })} />
   );
 };
-
-const ClientOnlyCalendar = ({ children }: { children: React.ReactNode }) => (
-  <ClientOnly>
-    <CalendarWrapper data-testid="reservation-unit__calendar--wrapper">
-      {children}
-    </CalendarWrapper>
-  </ClientOnly>
-);
 
 const StyledApplicationRoundScheduleDay = styled.div`
   span:first-child {
@@ -963,7 +954,7 @@ const ReservationUnit = ({
               </>
             )}
             {isReservable && (
-              <ClientOnlyCalendar>
+              <CalendarWrapper data-testid="reservation-unit__calendar--wrapper">
                 <Subheading>
                   {t("reservations:reservationCalendar", {
                     title: getTranslation(reservationUnit, "name"),
@@ -1073,7 +1064,7 @@ const ReservationUnit = ({
                     </CalendarFooter>
                   )}
                 <Legend />
-              </ClientOnlyCalendar>
+              </CalendarWrapper>
             )}
             <ReservationInfoContainer
               reservationUnit={reservationUnit}

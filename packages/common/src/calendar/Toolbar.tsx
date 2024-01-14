@@ -7,7 +7,7 @@ import fi from "date-fns/locale/fi";
 /* eslint-enable import/no-duplicates */
 import styled from "styled-components";
 import type { NavigateAction, View } from "react-big-calendar";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "next-i18next";
 
 export type ToolbarProps = {
   onNavigate: (n: NavigateAction) => void;

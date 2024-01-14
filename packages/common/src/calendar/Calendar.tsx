@@ -466,7 +466,7 @@ const localizer = (locale: LocalizationLanguages) =>
     locales,
   });
 
-const Calendar = <T extends Record<string, unknown>>({
+function Calendar<T extends Record<string, unknown>>({
   events,
   begin,
   eventStyleGetter,
@@ -496,7 +496,8 @@ const Calendar = <T extends Record<string, unknown>>({
   culture = "fi",
   longPressThreshold = 250,
   underlineEvents = false,
-}: Props<T>): JSX.Element => {
+}: Props<T>): JSX.Element {
+  // FIXME this breaks TS type ckecking => replace with prop spreading
   const Component: React.ElementType = draggable
     ? StyledCalendarDND
     : StyledCalendar;
@@ -546,6 +547,6 @@ const Calendar = <T extends Record<string, unknown>>({
       $underlineEvents={underlineEvents}
     />
   );
-};
+}
 
 export default Calendar;
