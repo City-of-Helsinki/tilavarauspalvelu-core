@@ -62,14 +62,17 @@ const menuItems: MenuItem[] = [
   },
 ];
 
+// TODO cmd / shift + click doesn't open link in new tab
 const Navigation = () => {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
-  const handleNavigationTitleClick = () =>
+  const handleNavigationTitleClick = (e?: Event) => {
+    e?.preventDefault();
     router.push("/", "/", {
       locale: router.locale,
     });
+  };
 
   const handleLanguageChange = (
     e: MouseEvent<HTMLAnchorElement>,
@@ -94,10 +97,11 @@ const Navigation = () => {
         {menuItems.map((item) => (
           <NavigationMenuItem
             key={item.title}
-            href="#"
-            onClick={() =>
-              router.push(item.path, item.path, { locale: router.locale })
-            }
+            href={item.path}
+            onClick={(e: MouseEvent<HTMLAnchorElement>) => {
+              e.preventDefault();
+              router.push(item.path, item.path, { locale: router.locale });
+            }}
             className={router.pathname === item.path ? "active" : ""}
             data-testid={`navigation__${item.title}`}
           >
@@ -115,7 +119,7 @@ const Navigation = () => {
               key={languageOption.value}
               lang={languageOption.value}
               label={languageOption.label}
-              href="#"
+              href={`/${languageOption.value}`}
               onClick={(e) => handleLanguageChange(e, languageOption.value)}
             />
           ))}

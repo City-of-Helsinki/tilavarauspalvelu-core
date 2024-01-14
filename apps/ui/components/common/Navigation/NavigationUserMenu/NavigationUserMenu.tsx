@@ -151,11 +151,13 @@ const NavigationUserMenu = () => {
       )}
       {userMenuItems.map((item) => (
         <NavigationUserMenuItem
-          href="#"
+          href={item.path}
           key={item.path}
-          onClick={() =>
-            router.push(item.path, item.path, { locale: router.locale })
-          }
+          onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
+            // TODO cmd / shift + click doesn't open link in new tab (would require replacing with Link component)
+            e.preventDefault();
+            router.push(item.path, item.path, { locale: router.locale });
+          }}
           data-testid={`navigation__user-${item.title}`}
         >
           {t(`navigation:Item.${item.title}`)}
