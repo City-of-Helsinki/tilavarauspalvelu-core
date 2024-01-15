@@ -3,6 +3,7 @@ from api.graphql.types.application_event_schedule.permissions import Application
 from api.graphql.types.application_event_schedule.serializers import (
     ApplicationEventScheduleApproveSerializer,
     ApplicationEventScheduleDeclineSerializer,
+    ApplicationEventScheduleResetSerializer,
 )
 
 
@@ -15,4 +16,10 @@ class ApplicationEventScheduleApproveMutation(UpdateAuthMutation):
 class ApplicationEventScheduleDeclineMutation(UpdateAuthMutation):
     class Meta:
         serializer_class = ApplicationEventScheduleDeclineSerializer
+        permission_classes = (ApplicationEventScheduleAllocationPermission,)
+
+
+class ApplicationEventScheduleResetMutation(UpdateAuthMutation):
+    class Meta:
+        serializer_class = ApplicationEventScheduleResetSerializer
         permission_classes = (ApplicationEventScheduleAllocationPermission,)
