@@ -288,8 +288,8 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
 
         assert content.get("errors") is not None
-        assert content.get("errors")[0]["message"] == ("Overlapping reservations are not allowed.")
-        assert content.get("errors")[0]["extensions"]["error_code"] == ("OVERLAPPING_RESERVATIONS")
+        assert content.get("errors")[0]["message"] == "Overlapping reservations are not allowed."
+        assert content.get("errors")[0]["extensions"]["error_code"] == "OVERLAPPING_RESERVATIONS"
 
     def test_create_fails_when_buffer_time_overlaps_reservation_before(self):
         begin = datetime.datetime.now(tz=DEFAULT_TIMEZONE) - datetime.timedelta(hours=2)
@@ -310,7 +310,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert content.get("errors")[0]["message"] == (
             "Reservation overlaps with reservation before due to buffer time."
         )
-        assert content.get("errors")[0]["extensions"]["error_code"] == ("RESERVATION_OVERLAP")
+        assert content.get("errors")[0]["extensions"]["error_code"] == "RESERVATION_OVERLAP"
 
     def test_create_succeed_when_buffer_time_overlaps_blocked_reservation_before(self):
         begin = datetime.datetime.now(tz=DEFAULT_TIMEZONE) - datetime.timedelta(hours=2)
@@ -349,7 +349,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert content.get("errors")[0]["message"] == (
             "Reservation overlaps with reservation after due to buffer time."
         )
-        assert content.get("errors")[0]["extensions"]["error_code"] == ("RESERVATION_OVERLAP")
+        assert content.get("errors")[0]["extensions"]["error_code"] == "RESERVATION_OVERLAP"
 
     def test_create_succeed_when_buffer_time_overlaps_block_reservation_after(self):
         begin = datetime.datetime.now(tz=DEFAULT_TIMEZONE) + datetime.timedelta(hours=2)
@@ -389,7 +389,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert content.get("errors")[0]["message"] == (
             "Reservation overlaps with reservation before due to buffer time."
         )
-        assert content.get("errors")[0]["extensions"]["error_code"] == ("RESERVATION_OVERLAP")
+        assert content.get("errors")[0]["extensions"]["error_code"] == "RESERVATION_OVERLAP"
 
     def test_create_fails_when_reservation_unit_buffer_time_overlaps_with_existing_reservation_after(self):
         self.reservation_unit.buffer_time_after = datetime.timedelta(hours=1, minutes=1)
@@ -411,7 +411,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert content.get("errors")[0]["message"] == (
             "Reservation overlaps with reservation after due to buffer time."
         )
-        assert content.get("errors")[0]["extensions"]["error_code"] == ("RESERVATION_OVERLAP")
+        assert content.get("errors")[0]["extensions"]["error_code"] == "RESERVATION_OVERLAP"
 
     def test_create_fails_when_reservation_unit_closed_on_selected_time(self):
         input_data = self.get_valid_input_data()
@@ -426,8 +426,8 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
 
         assert content.get("errors") is not None
-        assert content.get("errors")[0]["message"] == ("Reservation unit is not open within desired reservation time.")
-        assert content.get("errors")[0]["extensions"]["error_code"] == ("RESERVATION_UNIT_IS_NOT_OPEN")
+        assert content.get("errors")[0]["message"] == "Reservation unit is not open within desired reservation time."
+        assert content.get("errors")[0]["extensions"]["error_code"] == "RESERVATION_UNIT_IS_NOT_OPEN"
 
     def test_create_succeed_when_reservation_unit_closed_on_selected_time_and_opening_hours_are_ignored(self):
         self.reservation_unit.allow_reservations_without_opening_hours = True
@@ -570,7 +570,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
 
         assert content.get("errors") is not None
-        assert content.get("errors")[0]["message"] == ("Reservation unit is not reservable at current time.")
+        assert content.get("errors")[0]["message"] == "Reservation unit is not reservable at current time."
         assert content.get("errors")[0]["extensions"]["error_code"] == "RESERVATION_UNIT_NOT_RESERVABLE"
 
     def test_create_fails_when_reservation_unit_publish_begins_in_future(self):
@@ -582,7 +582,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
 
         assert content.get("errors") is not None
-        assert content.get("errors")[0]["message"] == ("Reservation unit is not reservable at current time.")
+        assert content.get("errors")[0]["message"] == "Reservation unit is not reservable at current time."
         assert content.get("errors")[0]["extensions"]["error_code"] == "RESERVATION_UNIT_NOT_RESERVABLE"
 
     def test_create_fails_when_reservation_unit_reservation_ends_in_past(self):
@@ -595,7 +595,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         response = self.query(self.get_create_query(), input_data=self.get_valid_input_data())
         content = json.loads(response.content)
         assert content.get("errors") is not None
-        assert content.get("errors")[0]["message"] == ("Reservation unit is not reservable at current time.")
+        assert content.get("errors")[0]["message"] == "Reservation unit is not reservable at current time."
         assert content.get("errors")[0]["extensions"]["error_code"] == "RESERVATION_UNIT_NOT_RESERVABLE"
 
     def test_create_fails_reservation_unit_state_is_archived(self):
@@ -733,7 +733,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert content.get("errors")[0]["message"] == (
             "Maximum number of active reservations for this reservation unit exceeded."
         )
-        assert content.get("errors")[0]["extensions"]["error_code"] == ("MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED")
+        assert content.get("errors")[0]["extensions"]["error_code"] == "MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED"
         assert_that(Reservation.objects.exclude(pk=existing_reservation.pk).exists()).is_false()
 
     def test_old_reservations_are_not_counted_towards_max_reservations_per_user(self):
@@ -826,8 +826,8 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
 
         assert content.get("errors") is not None
-        assert content.get("errors")[0]["message"] == ("An ambiguous SKU cannot be assigned for this reservation.")
-        assert content.get("errors")[0]["extensions"]["error_code"] == ("AMBIGUOUS_SKU")
+        assert content.get("errors")[0]["message"] == "An ambiguous SKU cannot be assigned for this reservation."
+        assert content.get("errors")[0]["extensions"]["error_code"] == "AMBIGUOUS_SKU"
 
     def test_create_fails_when_reservation_unit_reservations_max_days_before_exceeds(self):
         res_begin = datetime.datetime.now() + datetime.timedelta(days=181)
@@ -849,7 +849,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
 
         assert content.get("errors") is not None
         assert_that(content.get("errors")[0]["message"]).contains("Reservation start time is earlier than")
-        assert content.get("errors")[0]["extensions"]["error_code"] == ("RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE")
+        assert content.get("errors")[0]["extensions"]["error_code"] == "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE"
 
     def test_create_succeed_when_reservation_unit_reservations_max_days_before_in_limits(self):
         self.reservation_unit.reservations_max_days_before = 180
@@ -875,7 +875,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
 
         assert content.get("errors") is not None
         assert_that(content.get("errors")[0]["message"]).contains("Reservation start time is less than")
-        assert content.get("errors")[0]["extensions"]["error_code"] == ("RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE")
+        assert content.get("errors")[0]["extensions"]["error_code"] == "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE"
 
     def test_create_succeed_when_reservation_is_done_less_than_one_full_day_before(self):
         reservation_begin = datetime.datetime(2021, 10, 13, 0, 0, 0, tzinfo=get_default_timezone())
@@ -932,7 +932,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
 
         assert content.get("errors") is not None
         assert_that(content.get("errors")[0]["message"]).contains("reservation kind is SEASON")
-        assert content.get("errors")[0]["extensions"]["error_code"] == ("RESERVATION_UNIT_TYPE_IS_SEASON")
+        assert content.get("errors")[0]["extensions"]["error_code"] == "RESERVATION_UNIT_TYPE_IS_SEASON"
 
     def test_creating_reservation_type_to_staff_succeed(self):
         self.client.force_login(self.general_admin)
