@@ -234,6 +234,9 @@ export type GetPriceType = {
   asInt?: boolean;
 };
 
+// TODO refactor: this is over complex and does weird things
+// asInt and trailingZeros should be split to separate functions
+// bad: combining the actual price calculation and formatting
 export const getPrice = (props: GetPriceType): string => {
   const { pricing, minutes, trailingZeros = false, asInt = false } = props;
 
@@ -242,7 +245,9 @@ export const getPrice = (props: GetPriceType): string => {
 
   const formatters = getFormatters("fi");
 
-  if (pricing.pricingType === "PAID" && pricing.highestPrice) {
+  const lowestPrice = parseFloat(pricing.lowestPrice);
+  const highestPrice = parseFloat(pricing.highestPrice);
+  if (pricing.pricingType === "PAID" && highestPrice > 0) {
     const volume = getReservationVolume(minutes ?? 0, pricing.priceUnit);
     const unitStr =
       pricing.priceUnit === "FIXED" || minutes
@@ -250,19 +255,18 @@ export const getPrice = (props: GetPriceType): string => {
         : i18n?.t(`prices:priceUnits.${pricing.priceUnit}`);
 
     if (pricing.priceUnit === "FIXED") {
-      return formatters[currencyFormatter].format(pricing.highestPrice);
+      return formatters[currencyFormatter].format(highestPrice);
     }
-
-    const lowestPrice = parseFloat(pricing.lowestPrice?.toString())
-      ? formatters[floatFormatter].format(pricing.lowestPrice * volume)
+    const fLowestPrice = parseFloat(pricing.lowestPrice?.toString())
+      ? formatters[floatFormatter].format(lowestPrice * volume)
       : 0;
-    const highestPrice = formatters[currencyFormatter].format(
-      pricing.highestPrice * volume
+    const fHighestPrice = formatters[currencyFormatter].format(
+      highestPrice * volume
     );
     const price =
-      pricing.lowestPrice === pricing.highestPrice
-        ? formatters[currencyFormatter].format(pricing.lowestPrice * volume)
-        : `${lowestPrice} - ${highestPrice}`;
+      lowestPrice === highestPrice
+        ? formatters[currencyFormatter].format(lowestPrice * volume)
+        : `${fLowestPrice} - ${fHighestPrice}`;
     return trim(`${price} / ${unitStr}`, " / ");
   }
 

@@ -196,8 +196,9 @@ const ReservationInfoCard = ({
           {taxPercentageValue &&
             shouldDisplayTaxPercentage &&
             `(${t("common:inclTax", {
-              taxPercentage:
-                formatters.strippedDecimal.format(taxPercentageValue),
+              taxPercentage: formatters.strippedDecimal.format(
+                parseFloat(taxPercentageValue)
+              ),
             })})`}
         </Value>
       </Content>

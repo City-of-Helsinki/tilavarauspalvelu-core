@@ -147,17 +147,19 @@ export const getReservationPriceDetails = (
   const maxPrice =
     pricing.pricingType ===
     ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid
-      ? pricing.highestPrice
+      ? parseFloat(pricing.highestPrice)
       : 0;
   const formatters = getFormatters("fi");
 
+  const taxP = parseFloat(pricing.taxPercentage?.value);
+  const taxPercentage = Number.isNaN(taxP) ? 0 : taxP;
   return priceUnit ===
     ReservationUnitsReservationUnitPricingPriceUnitChoices.Fixed
     ? getReservationPrice(maxPrice, t("RequestedReservation.noPrice"))
     : t("RequestedReservation.ApproveDialog.priceBreakdown", {
         volume: formatters.strippedDecimal.format(volume),
         units: t(`RequestedReservation.ApproveDialog.priceUnits.${priceUnit}`),
-        vatPercent: formatters.whole.format(pricing.taxPercentage.value),
+        vatPercent: formatters.whole.format(taxPercentage),
         unit: t(`RequestedReservation.ApproveDialog.priceUnit.${priceUnit}`),
         unitPrice: getReservationPrice(maxPrice, ""),
         price: getReservationPrice(

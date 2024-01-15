@@ -323,7 +323,7 @@ const ReservationUnitModal = ({
       variables: {
         applicationRound: [applicationRound.pk ?? 0],
         textSearch: searchTerm,
-        maxPersonsGte: Number(maxPersons?.value),
+        maxPersonsGte: maxPersons?.value?.toString(),
         reservationUnitType:
           reservationUnitType?.value != null
             ? [Number(reservationUnitType?.value)]

@@ -39,7 +39,7 @@ export type Scalars = {
    */
   DateTime: { input: string; output: string };
   /** The `Decimal` scalar type represents a python Decimal. */
-  Decimal: { input: number; output: number };
+  Decimal: { input: string; output: string };
   /**
    * The `Duration` scalar type represents a duration value as an integer in seconds.
    * For example, a value of 900 means a duration of 15 minutes.

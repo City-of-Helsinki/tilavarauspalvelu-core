@@ -120,49 +120,49 @@ const selectedReservationUnitQuery = graphql.query<
     pricings: [
       {
         begins: toUIDate(addDays(new Date(), 2), "yyyy-MM-dd"),
-        lowestPrice: 10,
-        lowestPriceNet: 10 / 1.2,
-        highestPrice: 30,
-        highestPriceNet: 30 / 1.2,
+        lowestPrice: "10",
+        lowestPriceNet: String(10 / 1.2),
+        highestPrice: "30",
+        highestPriceNet: String(30 / 1.2),
         priceUnit:
           ReservationUnitsReservationUnitPricingPriceUnitChoices.PerHour,
         pricingType:
           ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid,
         taxPercentage: {
           id: "goier1",
-          value: 20,
+          value: "20",
         },
         status: ReservationUnitsReservationUnitPricingStatusChoices.Future,
       },
       {
         begins: toUIDate(new Date(), "yyyy-MM-dd"),
-        lowestPrice: 20,
-        lowestPriceNet: 20 / 1.2,
-        highestPrice: 20,
-        highestPriceNet: 20 / 1.2,
+        lowestPrice: "20",
+        lowestPriceNet: String(20 / 1.2),
+        highestPrice: "20",
+        highestPriceNet: String(20 / 1.2),
         priceUnit:
           ReservationUnitsReservationUnitPricingPriceUnitChoices.PerHour,
         pricingType:
           ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid,
         taxPercentage: {
           id: "goier2",
-          value: 20,
+          value: "20",
         },
         status: ReservationUnitsReservationUnitPricingStatusChoices.Active,
       },
       {
         begins: toUIDate(addDays(new Date(), 3), "yyyy-MM-dd"),
-        lowestPrice: 20,
-        lowestPriceNet: 20 / 1.24,
-        highestPrice: 50,
-        highestPriceNet: 50 / 1.24,
+        lowestPrice: "20",
+        lowestPriceNet: String(20 / 1.24),
+        highestPrice: "50",
+        highestPriceNet: String(50 / 1.24),
         priceUnit:
           ReservationUnitsReservationUnitPricingPriceUnitChoices.Per_15Mins,
         pricingType:
           ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid,
         taxPercentage: {
           id: "goier3",
-          value: 24,
+          value: "24",
         },
         status: ReservationUnitsReservationUnitPricingStatusChoices.Future,
       },
@@ -733,17 +733,17 @@ const relatedReservationUnitsData: ReservationUnitTypeConnection = {
         pricings: [
           {
             begins: toUIDate(new Date(), "yyyy-MM-dd"),
-            lowestPrice: 12.34,
-            lowestPriceNet: 12.34 / 1.2,
-            highestPrice: 20,
-            highestPriceNet: 20 / 1.2,
+            lowestPrice: "12.34",
+            lowestPriceNet: String(12.34 / 1.2),
+            highestPrice: "20",
+            highestPriceNet: String(20 / 1.2),
             priceUnit:
               ReservationUnitsReservationUnitPricingPriceUnitChoices.PerHour,
             pricingType:
               ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid,
             taxPercentage: {
               id: "goier1",
-              value: 20,
+              value: "20",
             },
             status: ReservationUnitsReservationUnitPricingStatusChoices.Active,
           },
@@ -825,17 +825,17 @@ const relatedReservationUnitsData: ReservationUnitTypeConnection = {
         pricings: [
           {
             begins: toUIDate(new Date(), "yyyy-MM-dd"),
-            lowestPrice: 3.34,
-            lowestPriceNet: 3.34 / 1.2,
-            highestPrice: 30,
-            highestPriceNet: 30 / 1.2,
+            lowestPrice: "3.34",
+            lowestPriceNet: String(3.34 / 1.2),
+            highestPrice: "30",
+            highestPriceNet: String(30 / 1.2),
             priceUnit:
               ReservationUnitsReservationUnitPricingPriceUnitChoices.PerWeek,
             pricingType:
               ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid,
             taxPercentage: {
               id: "goier1",
-              value: 24,
+              value: "24",
             },
             status: ReservationUnitsReservationUnitPricingStatusChoices.Active,
           },

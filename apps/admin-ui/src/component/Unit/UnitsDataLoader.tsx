@@ -27,7 +27,7 @@ const mapFilterParams = (params: FilterArguments) => ({
   nameFi: params.nameFi,
   serviceSector:
     params.serviceSector?.value != null
-      ? Number(params.serviceSector?.value)
+      ? String(params.serviceSector?.value)
       : undefined,
 });
 

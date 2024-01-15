@@ -22,18 +22,15 @@ type Props = {
   sortChanged: (field: string) => void;
 };
 
-const numberOrUndefined = (input?: string) =>
-  input ? Number(input) : undefined;
-
 const mapFilterParams = ({
   reservationUnitStates,
   ...params
 }: FilterArguments) => ({
   ...params,
-  maxPersonsLte: numberOrUndefined(params.maxPersonsLte),
-  maxPersonsGte: numberOrUndefined(params.maxPersonsGte),
-  surfaceAreaLte: numberOrUndefined(params.surfaceAreaLte),
-  surfaceAreaGte: numberOrUndefined(params.surfaceAreaGte),
+  maxPersonsLte: params.maxPersonsLte,
+  maxPersonsGte: params.maxPersonsGte,
+  surfaceAreaLte: params.surfaceAreaLte,
+  surfaceAreaGte: params.surfaceAreaGte,
   unit: params.unit.map((u) => u.value).map(Number),
   state: reservationUnitStates.map((u) => u.value).map(String),
   reservationUnitType: params.reservationUnitType

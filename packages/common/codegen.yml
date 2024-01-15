@@ -17,7 +17,7 @@ generates:
       scalars:
         Date: string
         DateTime: string
-        Decimal: number
+        Decimal: string
         Duration: number
         JSON: string
         Long: number

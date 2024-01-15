@@ -381,7 +381,7 @@ const RequestedReservation = ({
   const isNonFree =
     pricing?.pricingType ===
       ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid &&
-    pricing.highestPrice >= 0;
+    parseFloat(pricing.highestPrice) >= 0;
 
   const reservationTagline = createTagString(reservation, t);
 

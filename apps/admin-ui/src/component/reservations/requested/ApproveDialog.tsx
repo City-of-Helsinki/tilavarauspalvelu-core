@@ -36,9 +36,10 @@ const ActionButtons = styled(Dialog.ActionButtons)`
 
 const parseNumber = (n: string): number => Number(n.replace(",", "."));
 const calcPriceNet = (price: string, taxPercentageValue?: number | null) => {
-  const priceNet = taxPercentageValue
-    ? Number(price) / ((1 + taxPercentageValue) / 100)
-    : Number(price);
+  const priceNet =
+    taxPercentageValue != null && taxPercentageValue > 0
+      ? Number(price) / ((1 + taxPercentageValue) / 100)
+      : Number(price);
 
   return Number(priceNet.toFixed(2));
 };
@@ -92,10 +93,11 @@ const DialogContent = ({
   const priceIsValid = !hasPrice || !Number.isNaN(parseNumber(price));
 
   const handleApprove = () => {
+    const taxP = reservation.taxPercentageValue ?? "0";
     approveReservation({
       pk: reservation.pk,
       price: parseNumber(price),
-      priceNet: calcPriceNet(price, reservation.taxPercentageValue),
+      priceNet: calcPriceNet(price, parseFloat(taxP)),
       handlingDetails,
     });
   };

@@ -985,19 +985,19 @@ describe("isReservationUnitPaidInFuture", () => {
       {
         pricingType:
           ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid,
-        lowestPrice: 0,
-        lowestPriceNet: 0,
-        highestPrice: 20,
-        highestPriceNet: 20,
+        lowestPrice: "0",
+        lowestPriceNet: "0",
+        highestPrice: "20",
+        highestPriceNet: "20",
         status: ReservationUnitsReservationUnitPricingStatusChoices.Future,
       },
       {
         pricingType:
           ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid,
-        lowestPrice: 0,
-        lowestPriceNet: 0,
-        highestPrice: 10,
-        highestPriceNet: 10,
+        lowestPrice: "0",
+        lowestPriceNet: "0",
+        highestPrice: "10",
+        highestPriceNet: "10",
         status: ReservationUnitsReservationUnitPricingStatusChoices.Active,
       },
     ] as ReservationUnitPricingType[];
@@ -1010,19 +1010,19 @@ describe("isReservationUnitPaidInFuture", () => {
       {
         pricingType:
           ReservationUnitsReservationUnitPricingPricingTypeChoices.Free,
-        lowestPrice: 0,
-        lowestPriceNet: 0,
-        highestPrice: 0,
-        highestPriceNet: 0,
+        lowestPrice: "0",
+        lowestPriceNet: "0",
+        highestPrice: "0",
+        highestPriceNet: "0",
         status: ReservationUnitsReservationUnitPricingStatusChoices.Future,
       },
       {
         pricingType:
           ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid,
-        lowestPrice: 0,
-        lowestPriceNet: 0,
-        highestPrice: 10,
-        highestPriceNet: 10,
+        lowestPrice: "0",
+        lowestPriceNet: "0",
+        highestPrice: "10",
+        highestPriceNet: "10",
         status: ReservationUnitsReservationUnitPricingStatusChoices.Active,
       },
     ] as ReservationUnitPricingType[];
@@ -1035,19 +1035,19 @@ describe("isReservationUnitPaidInFuture", () => {
       {
         pricingType:
           ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid,
-        lowestPrice: 0,
-        lowestPriceNet: 0,
-        highestPrice: 20,
-        highestPriceNet: 20,
+        lowestPrice: "0",
+        lowestPriceNet: "0",
+        highestPrice: "20",
+        highestPriceNet: "20",
         status: ReservationUnitsReservationUnitPricingStatusChoices.Future,
       },
       {
         pricingType:
           ReservationUnitsReservationUnitPricingPricingTypeChoices.Free,
-        lowestPrice: 0,
-        lowestPriceNet: 0,
-        highestPrice: 0,
-        highestPriceNet: 0,
+        lowestPrice: "0",
+        lowestPriceNet: "0",
+        highestPrice: "0",
+        highestPriceNet: "0",
         status: ReservationUnitsReservationUnitPricingStatusChoices.Active,
       },
     ] as ReservationUnitPricingType[];
@@ -1060,19 +1060,19 @@ describe("isReservationUnitPaidInFuture", () => {
       {
         pricingType:
           ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid,
-        lowestPrice: 0,
-        lowestPriceNet: 0,
-        highestPrice: 0,
-        highestPriceNet: 0,
+        lowestPrice: "0",
+        lowestPriceNet: "0",
+        highestPrice: "0",
+        highestPriceNet: "0",
         status: ReservationUnitsReservationUnitPricingStatusChoices.Future,
       },
       {
         pricingType:
           ReservationUnitsReservationUnitPricingPricingTypeChoices.Free,
-        lowestPrice: 0,
-        lowestPriceNet: 0,
-        highestPrice: 0,
-        highestPriceNet: 0,
+        lowestPrice: "0",
+        lowestPriceNet: "0",
+        highestPrice: "0",
+        highestPriceNet: "0",
         status: ReservationUnitsReservationUnitPricingStatusChoices.Active,
       },
     ] as ReservationUnitPricingType[];
@@ -1085,19 +1085,19 @@ describe("isReservationUnitPaidInFuture", () => {
       {
         pricingType:
           ReservationUnitsReservationUnitPricingPricingTypeChoices.Free,
-        lowestPrice: 0,
-        lowestPriceNet: 0,
-        highestPrice: 20,
-        highestPriceNet: 20,
+        lowestPrice: "0",
+        lowestPriceNet: "0",
+        highestPrice: "20",
+        highestPriceNet: "20",
         status: ReservationUnitsReservationUnitPricingStatusChoices.Future,
       },
       {
         pricingType:
           ReservationUnitsReservationUnitPricingPricingTypeChoices.Free,
-        lowestPrice: 0,
-        lowestPriceNet: 0,
-        highestPrice: 20,
-        highestPriceNet: 20,
+        lowestPrice: "0",
+        lowestPriceNet: "0",
+        highestPrice: "20",
+        highestPriceNet: "20",
         status: ReservationUnitsReservationUnitPricingStatusChoices.Active,
       },
     ] as ReservationUnitPricingType[];

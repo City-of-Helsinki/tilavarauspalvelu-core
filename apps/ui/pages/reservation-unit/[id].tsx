@@ -1097,11 +1097,11 @@ const ReservationUnit = ({
                       />
                       {futurePricing.pricingType ===
                         ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid &&
-                        futurePricing.taxPercentage?.value > 0 && (
+                        parseFloat(futurePricing.taxPercentage?.value) > 0 && (
                           <strong>
                             {t("reservationUnit:futurePriceNoticeTax", {
                               tax: formatters.strippedDecimal.format(
-                                futurePricing.taxPercentage.value
+                                parseFloat(futurePricing.taxPercentage.value)
                               ),
                             })}
                           </strong>

@@ -81,7 +81,7 @@ const createReservation = graphql.mutation<
     ctx.data({
       createReservation: {
         pk: getPk(resUnitPk),
-        price: getPrice(resUnitPk),
+        price: getPrice(resUnitPk).toString(),
         errors: null,
       },
     })
@@ -555,10 +555,10 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
       data.reservationUnits[0].pricings = [
         {
           begins: addDays(new Date(), -10).toISOString(),
-          lowestPrice: 0,
-          lowestPriceNet: 0,
-          highestPrice: 0,
-          highestPriceNet: 0,
+          lowestPrice: "0",
+          lowestPriceNet: "0",
+          highestPrice: "0",
+          highestPriceNet: "0",
           priceUnit:
             ReservationUnitsReservationUnitPricingPriceUnitChoices.PerHour,
           pricingType:
@@ -566,15 +566,15 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
           status: ReservationUnitsReservationUnitPricingStatusChoices.Active,
           taxPercentage: {
             id: "fawoifhj",
-            value: 24.0,
+            value: "24.0",
           },
         },
         {
           begins: addDays(new Date(), 10).toISOString(),
-          lowestPrice: 0,
-          lowestPriceNet: 0,
-          highestPrice: 20,
-          highestPriceNet: 15,
+          lowestPrice: "0",
+          lowestPriceNet: "0",
+          highestPrice: "20",
+          highestPriceNet: "15",
           priceUnit:
             ReservationUnitsReservationUnitPricingPriceUnitChoices.PerHour,
           pricingType:
@@ -582,7 +582,7 @@ const reservationByPk = graphql.query<Query, QueryReservationUnitByPkArgs>(
           status: ReservationUnitsReservationUnitPricingStatusChoices.Future,
           taxPercentage: {
             id: "fawoifhj",
-            value: 24.0,
+            value: "24.0",
           },
         },
       ];

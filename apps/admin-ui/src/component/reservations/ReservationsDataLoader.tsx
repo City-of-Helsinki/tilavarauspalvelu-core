@@ -63,8 +63,8 @@ const mapFilterParams = (
     textSearch: params.textSearch || undefined,
     begin: parseDate(params.begin) || defaults.begin,
     end: parseDate(params.end),
-    priceGte: params.minPrice !== "" ? Number(params.minPrice) : undefined,
-    priceLte: params.maxPrice !== "" ? Number(params.maxPrice) : undefined,
+    priceGte: params.minPrice !== "" ? params.minPrice : undefined,
+    priceLte: params.maxPrice !== "" ? params.maxPrice : undefined,
     orderStatus: params.paymentStatuses
       ?.map((status) => status.value)
       .map((x) => (x != null ? String(x) : null)),
