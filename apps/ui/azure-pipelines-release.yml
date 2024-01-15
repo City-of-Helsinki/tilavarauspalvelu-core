@@ -1,0 +1,31 @@
+# Build and deploy to the test environment after creating a tag with the given pattern.
+
+resources:
+  repositories:
+    # Azure DevOps repository.
+    - repository: tilavarauspalvelu-pipelines
+      type: git
+      # Azure DevOps project/repository.
+      name: tilavarauspalvelu/tilavarauspalvelu-pipelines
+
+trigger:
+  batch: false
+  tags:
+    # Trigger when creating tags like v1.0.0, release-1.0.0, hotfix-1.0.0, release-1.0.0-ui,
+    # but not when creating tags like v1.0.0-admin, etc.
+    include:
+      - "v*"
+      - "release-*"
+      - "hotfix-*"
+    exclude:
+      - "*-admin"
+
+# Don't use Azure pipelines for PRs.
+pr: none
+
+# By default, use self-hosted agents.
+pool: Default
+
+extends:
+  # Filename for pipeline to extend from the Azure DevOps Repository.
+  template: azure-pipelines-build-tilavarauspalvelu-ui-release.yml@tilavarauspalvelu-pipelines
