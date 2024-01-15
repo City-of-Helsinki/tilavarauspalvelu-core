@@ -432,6 +432,40 @@ class Reservation(ExportModelOperationsMixin("reservation"), SerializableMixin, 
             self.reservation_unit.filter(require_reservation_handling=True).exists() or self.applying_for_free_of_charge
         )
 
+    @property
+    def reservee_name(self) -> str:
+        # Internal recurring reservations are created by STAFF
+        if self.type == ReservationTypeChoice.STAFF.value and self.recurring_reservation is not None:
+            return self.recurring_reservation.name
+
+        # Blocking reservation
+        if self.type == ReservationTypeChoice.BLOCKED.value:
+            return _("Closed")
+
+        if self.reservee_type is not None:
+            # Organisation reservee
+            if (
+                self.reservee_type in [CustomerTypeChoice.BUSINESS.value, CustomerTypeChoice.NONPROFIT.value]
+                and self.reservee_organisation_name
+            ):
+                return self.reservee_organisation_name
+            # Individual reservee
+            elif self.reservee_type == CustomerTypeChoice.INDIVIDUAL.value and (
+                self.reservee_first_name or self.reservee_last_name
+            ):
+                return f"{self.reservee_first_name} {self.reservee_last_name}".strip()
+
+        # Use reservation name when reservee name as first fallback
+        if self.name:
+            return self.name
+
+        # No name found yet, try the name of the User who made the reservation as second fallback
+        if self.user is not None and (user_display_name := self.user.get_display_name()):
+            return user_display_name
+
+        # No proper name found
+        return _("Unnamed reservation")
+
     def get_location_string(self):
         locations = []
         for reservation_unit in self.reservation_unit.all():

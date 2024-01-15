@@ -5,6 +5,7 @@ from django.test import TestCase
 from django.utils.timezone import get_default_timezone
 
 from email_notification.models import EmailType
+from reservations.choices import CustomerTypeChoice
 from tests.factories import (
     EmailTemplateFactory,
     LocationFactory,
@@ -53,6 +54,7 @@ class ReservationEmailBaseTestCase(TestCase):
             reservee_first_name="Let it",
             reservee_last_name="Snow",
             reservee_email="reservee@testing.isbesthing",
+            reservee_organisation_name="Snowman Company",
             name="Dance time!",
             reservation_unit=[cls.reservation_unit],
             end=cls.end,
@@ -62,4 +64,5 @@ class ReservationEmailBaseTestCase(TestCase):
             price_net=Decimal("52") / Decimal("1.10"),
             price=Decimal("52.00"),
             tax_percentage_value=Decimal("10"),
+            reservee_type=CustomerTypeChoice.INDIVIDUAL,
         )

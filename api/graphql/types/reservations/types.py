@@ -27,7 +27,6 @@ from api.graphql.types.users.types import UserType
 from api.legacy_rest_api.utils import hmac_signature
 from applications.models import City
 from common.typing import GQLInfo
-from reservations.choices import CustomerTypeChoice
 from reservations.choices import ReservationTypeChoice as ReservationTypeField
 from reservations.models import (
     AbilityGroup,
@@ -353,14 +352,8 @@ class ReservationType(AuthNode, OldPrimaryKeyObjectType):
         return root.reservee_last_name
 
     @reservation_non_public_field
-    def resolve_reservee_name(root: Reservation, info: GQLInfo) -> str | None:
-        if root.reservee_type in [
-            CustomerTypeChoice.BUSINESS,
-            CustomerTypeChoice.NONPROFIT,
-        ]:
-            return root.reservee_organisation_name
-        else:
-            return f"{root.reservee_first_name} {root.reservee_last_name}"
+    def resolve_reservee_name(root: Reservation, info: GQLInfo) -> str:
+        return root.reservee_name
 
     @reservation_non_public_field
     def resolve_reservee_phone(root: Reservation, info: GQLInfo) -> str | None:

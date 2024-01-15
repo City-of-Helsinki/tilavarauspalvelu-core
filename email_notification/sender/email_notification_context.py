@@ -88,8 +88,9 @@ class EmailNotificationContext:
         """Build context from reservation"""
         context = EmailNotificationContext()
 
+        # Intentionally don't use reservation.reservee_name here
         if not reservation.reservee_type or reservation.reservee_type == CustomerTypeChoice.INDIVIDUAL.value:
-            context.reservee_name = f"{reservation.reservee_first_name} {reservation.reservee_last_name}"
+            context.reservee_name = f"{reservation.reservee_first_name} {reservation.reservee_last_name}".strip()
         else:
             context.reservee_name = reservation.reservee_organisation_name
 
