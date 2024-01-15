@@ -296,8 +296,8 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
         )
 
         data = self.get_valid_adjust_data()
-        data["begin"] = (self.reservation_begin).strftime("%Y%m%dT%H%M%S%zZ")
-        data["end"] = (self.reservation_end).strftime("%Y%m%dT%H%M%S%zZ")
+        data["begin"] = self.reservation_begin.strftime("%Y%m%dT%H%M%S%zZ")
+        data["end"] = self.reservation_end.strftime("%Y%m%dT%H%M%S%zZ")
         data["bufferTimeBefore"] = "01:01:00"
 
         self.client.force_login(self.general_admin)
@@ -322,8 +322,8 @@ class ReservationStaffAdjustTimeTestCase(ReservationTestCaseBase):
         )
 
         data = self.get_valid_adjust_data()
-        data["begin"] = (self.reservation_begin).strftime("%Y%m%dT%H%M%S%zZ")
-        data["end"] = (self.reservation_end).strftime("%Y%m%dT%H%M%S%zZ")
+        data["begin"] = self.reservation_begin.strftime("%Y%m%dT%H%M%S%zZ")
+        data["end"] = self.reservation_end.strftime("%Y%m%dT%H%M%S%zZ")
         data["bufferTimeAfter"] = "01:01:00"
 
         self.client.force_login(self.general_admin)

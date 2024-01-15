@@ -2,7 +2,6 @@ import datetime
 from decimal import Decimal
 
 import pytest
-from assertpy import assert_that
 from django.conf import settings
 from django.test import override_settings
 from django.utils import timezone
@@ -28,69 +27,69 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
 
     def test_get_reservee_name(self):
         reservee_name_str = f"{self.reservation.reservee_first_name} {self.reservation.reservee_last_name}"
-        assert_that(self.get_builder()._get_reservee_name()).is_equal_to(reservee_name_str)
+        assert self.get_builder()._get_reservee_name() == reservee_name_str
 
     def test_get_reservee_name_when_reservee_type_business(self):
         self.reservation.reservee_type = CustomerTypeChoice.BUSINESS
         self.reservation.save()
         reservee_name_str = self.reservation.reservee_organisation_name
-        assert_that(self.get_builder()._get_reservee_name()).is_equal_to(reservee_name_str)
+        assert self.get_builder()._get_reservee_name() == reservee_name_str
 
     def test_get_reservee_name_when_reservee_type_nonprofit(self):
         self.reservation.reservee_type = CustomerTypeChoice.NONPROFIT
         self.reservation.save()
         reservee_name_str = self.reservation.reservee_organisation_name
-        assert_that(self.get_builder()._get_reservee_name()).is_equal_to(reservee_name_str)
+        assert self.get_builder()._get_reservee_name() == reservee_name_str
 
     def test_get_begin_time(self):
-        assert_that(self.get_builder()._get_begin_time()).is_equal_to("10:00")
+        assert self.get_builder()._get_begin_time() == "10:00"
 
     def test_get_begin_time_respects_timezone(self):
         self.reservation.begin = datetime.datetime(2022, 2, 28, 23, 00, tzinfo=timezone.utc)
         self.reservation.save()
 
-        assert_that(self.get_builder()._get_begin_time()).is_equal_to("01:00")
+        assert self.get_builder()._get_begin_time() == "01:00"
 
     def test_get_begin_date(self):
-        assert_that(self.get_builder()._get_begin_date()).is_equal_to("9.2.2022")
+        assert self.get_builder()._get_begin_date() == "9.2.2022"
 
     def test_get_begin_date_respects_timezone(self):
         self.reservation.begin = datetime.datetime(2022, 2, 28, 23, 00, tzinfo=timezone.utc)
         self.reservation.save()
 
-        assert_that(self.get_builder()._get_begin_date()).is_equal_to("1.3.2022")
+        assert self.get_builder()._get_begin_date() == "1.3.2022"
 
     def test_get_end_time(self):
-        assert_that(self.get_builder()._get_end_time()).is_equal_to("12:00")
+        assert self.get_builder()._get_end_time() == "12:00"
 
     def test_get_end_time_respects_timezone(self):
         self.reservation.end = datetime.datetime(2022, 3, 1, 1, 00, tzinfo=timezone.utc)
         self.reservation.save()
 
-        assert_that(self.get_builder()._get_end_time()).is_equal_to("03:00")
+        assert self.get_builder()._get_end_time() == "03:00"
 
     def test_get_end_date(self):
-        assert_that(self.get_builder()._get_end_date()).is_equal_to("9.2.2022")
+        assert self.get_builder()._get_end_date() == "9.2.2022"
 
     def test_get_end_date_respects_timezone(self):
         self.reservation.end = datetime.datetime(2022, 2, 28, 23, 00, tzinfo=timezone.utc)
         self.reservation.save()
 
-        assert_that(self.get_builder()._get_end_date()).is_equal_to("1.3.2022")
+        assert self.get_builder()._get_end_date() == "1.3.2022"
 
     def test_get_reservation_number(self):
         resno = self.reservation.id
-        assert_that(self.get_builder()._get_reservation_number()).is_equal_to(resno)
+        assert self.get_builder()._get_reservation_number() == resno
 
     def test_get_unit_location(self):
         location_str = f"{self.location.address_street} {self.location.address_zip} {self.location.address_city}"
-        assert_that(self.get_builder()._get_unit_location()).is_equal_to(location_str)
+        assert self.get_builder()._get_unit_location() == location_str
 
     def test_get_unit_name(self):
-        assert_that(self.get_builder()._get_unit_name()).is_equal_to(self.unit.name)
+        assert self.get_builder()._get_unit_name() == self.unit.name
 
     def test_get_reservation_unit_when_single(self):
-        assert_that(self.get_builder()._get_reservation_unit()).is_equal_to(self.reservation_unit.name)
+        assert self.get_builder()._get_reservation_unit() == self.reservation_unit.name
 
     def test_get_reservation_unit_when_multiple(self):
         res_unit_one = self.reservation_unit.name
@@ -100,117 +99,126 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         res_unit_too = res_unit.name
 
         self.reservation.reservation_unit.add(res_unit)
-        assert_that(self.get_builder()._get_reservation_unit()).is_equal_to(f"{res_unit_one}, {res_unit_too}")
+        assert self.get_builder()._get_reservation_unit() == f"{res_unit_one}, {res_unit_too}"
 
     def test_get_price(self):
-        assert_that(self.get_builder()._get_price()).is_equal_to(self.reservation.price)
+        assert self.get_builder()._get_price() == self.reservation.price
 
     def test_get_non_subsidised_price(self):
-        assert_that(self.get_builder()._get_non_subsidised_price()).is_equal_to(self.reservation.non_subsidised_price)
+        assert self.get_builder()._get_non_subsidised_price() == self.reservation.non_subsidised_price
 
     def test_get_tax_percentage(self):
-        assert_that(self.get_builder()._get_tax_percentage()).is_equal_to(self.reservation.tax_percentage_value)
+        assert self.get_builder()._get_tax_percentage() == self.reservation.tax_percentage_value
 
     def test_get_current_year(self):
         now = datetime.datetime.now(timezone.get_default_timezone())
-        assert_that(self.get_builder()._get_current_year()).is_equal_to(now.year)
+        assert self.get_builder()._get_current_year() == now.year
 
     def test_get_confirmed_instructions(self):
-        assert_that(self.get_builder()._get_confirmed_instructions()).contains(
+        assert (
             self.reservation.reservation_unit.first().reservation_confirmed_instructions
+            in self.get_builder()._get_confirmed_instructions()
         )
 
     def test_get_confirmed_instructions_en(self):
         builder = self.get_builder(LANGUAGES.EN)
-        assert_that(builder._get_confirmed_instructions()).contains(
+        assert (
             self.reservation.reservation_unit.first().reservation_confirmed_instructions_en
+            in builder._get_confirmed_instructions()
         )
 
     def test_get_pending_instructions(self):
-        assert_that(self.get_builder()._get_pending_instructions()).contains(
+        assert (
             self.reservation.reservation_unit.first().reservation_pending_instructions
+            in self.get_builder()._get_pending_instructions()
         )
 
     def test_get_pending_instructions_en(self):
         builder = self.get_builder(LANGUAGES.EN)
-        assert_that(builder._get_pending_instructions()).contains(
+        assert (
             self.reservation.reservation_unit.first().reservation_pending_instructions_en
+            in builder._get_pending_instructions()
         )
 
     def test_get_cancelled_instructions(self):
-        assert_that(self.get_builder()._get_cancelled_instructions()).contains(
+        assert (
             self.reservation.reservation_unit.first().reservation_cancelled_instructions
+            in self.get_builder()._get_cancelled_instructions()
         )
 
     def test_get_cancelled_instructions_en(self):
         builder = self.get_builder(LANGUAGES.EN)
-        assert_that(builder._get_cancelled_instructions()).contains(
+        assert (
             self.reservation.reservation_unit.first().reservation_cancelled_instructions_en
+            in builder._get_cancelled_instructions()
         )
 
     def test_get_deny_reason(self):
-        assert_that(self.get_builder()._get_deny_reason()).is_equal_to(self.reservation.deny_reason.reason)
+        assert self.get_builder()._get_deny_reason() == self.reservation.deny_reason.reason
 
     def test_get_deny_reason_en(self):
         builder = self.get_builder(LANGUAGES.EN)
-        assert_that(builder._get_deny_reason()).is_equal_to(self.reservation.deny_reason.reason_en)
+        assert builder._get_deny_reason() == self.reservation.deny_reason.reason_en
 
     def test_get_cancel_reason(self):
-        assert_that(self.get_builder()._get_cancel_reason()).is_equal_to(self.reservation.cancel_reason.reason)
+        assert self.get_builder()._get_cancel_reason() == self.reservation.cancel_reason.reason
 
     def test_get_cancel_reason_en(self):
         builder = self.get_builder(LANGUAGES.EN)
-        assert_that(builder._get_cancel_reason()).is_equal_to(self.reservation.cancel_reason.reason_en)
+        assert builder._get_cancel_reason() == self.reservation.cancel_reason.reason_en
 
     @override_settings(EMAIL_VARAAMO_EXT_LINK="https://thesite.com")
     def test_get_my_reservations_ext_link_fi(self):
         builder = self.get_builder(LANGUAGES.FI)
-        assert_that(builder._get_my_reservations_ext_link()).is_equal_to("https://thesite.com/reservations")
+        assert builder._get_my_reservations_ext_link() == "https://thesite.com/reservations"
 
     @override_settings(EMAIL_VARAAMO_EXT_LINK="https://thesite.com")
     def test_get_my_reservations_ext_link_en(self):
         builder = self.get_builder(LANGUAGES.EN)
-        assert_that(builder._get_my_reservations_ext_link()).is_equal_to("https://thesite.com/en/reservations")
+        assert builder._get_my_reservations_ext_link() == "https://thesite.com/en/reservations"
 
     @override_settings(EMAIL_VARAAMO_EXT_LINK="https://thesite.com")
     def test_get_my_reservations_ext_link_sv(self):
         builder = self.get_builder(LANGUAGES.SV)
-        assert_that(builder._get_my_reservations_ext_link()).is_equal_to("https://thesite.com/sv/reservations")
+        assert builder._get_my_reservations_ext_link() == "https://thesite.com/sv/reservations"
 
     @override_settings(EMAIL_VARAAMO_EXT_LINK="https://thesite.com")
     def test_get_varaamo_ext_link(self):
         builder = self.get_builder(LANGUAGES.FI)
-        assert_that(builder._get_varaamo_ext_link()).is_equal_to("https://thesite.com")
+        assert builder._get_varaamo_ext_link() == "https://thesite.com"
 
     @override_settings(EMAIL_VARAAMO_EXT_LINK="https://thesite.com")
     def test_get_varaamo_ext_link_en(self):
         builder = self.get_builder(LANGUAGES.EN)
-        assert_that(builder._get_varaamo_ext_link()).is_equal_to("https://thesite.com/en")
+        assert builder._get_varaamo_ext_link() == "https://thesite.com/en"
 
     @override_settings(EMAIL_VARAAMO_EXT_LINK="https://thesite.com")
     def test_get_varaamo_ext_link_sv(self):
         builder = self.get_builder(LANGUAGES.SV)
-        assert_that(builder._get_varaamo_ext_link()).is_equal_to("https://thesite.com/sv")
+        assert builder._get_varaamo_ext_link() == "https://thesite.com/sv"
 
     @override_settings(EMAIL_FEEDBACK_EXT_LINK="https://feedback.com/forms/")
     def get_feedback_ext_link_fi(self):
         builder = self.get_builder(LANGUAGES.FI)
-        assert_that(builder._get_feedback_ext_link()).is_equal_to(
-            "https://feedback.com/forms/?site=varaamopalaute&lang=fi&ref=https://tilavaraus.hel.fi"
+        assert (
+            builder._get_feedback_ext_link()
+            == "https://feedback.com/forms/?site=varaamopalaute&lang=fi&ref=https://tilavaraus.hel.fi"
         )
 
     @override_settings(EMAIL_FEEDBACK_EXT_LINK="https://feedback.com/forms/")
     def get_feedback_ext_link_sv(self):
         builder = self.get_builder(LANGUAGES.SV)
-        assert_that(builder._get_feedback_ext_link()).is_equal_to(
-            "https://feedback.com/forms/?site=varaamopalaute&lang=sv&ref=https://tilavaraus.hel.fi"
+        assert (
+            builder._get_feedback_ext_link()
+            == "https://feedback.com/forms/?site=varaamopalaute&lang=sv&ref=https://tilavaraus.hel.fi"
         )
 
     @override_settings(EMAIL_FEEDBACK_EXT_LINK="https://feedback.com/forms/")
     def get_feedback_ext_link_en(self):
         self.builder._set_language(LANGUAGES.EN)
-        assert_that(self.builder._get_feedback_ext_link()).is_equal_to(
-            "https://feedback.com/forms/?site=varaamopalaute&lang=en&ref=https://tilavaraus.hel.fi"
+        assert (
+            self.builder._get_feedback_ext_link()
+            == "https://feedback.com/forms/?site=varaamopalaute&lang=en&ref=https://tilavaraus.hel.fi"
         )
 
     @override_settings(EMAIL_TEMPLATE_CONTEXT_VARIABLES=settings.EMAIL_TEMPLATE_CONTEXT_VARIABLES + ["imnotdefined"])
@@ -242,7 +250,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
 
         template = EmailTemplateFactory(type=EmailType.RESERVATION_CANCELLED, subject=subject, content="content")
         builder = ReservationEmailNotificationBuilder(self.reservation, template)
-        assert_that(builder.get_subject()).is_equal_to(compiled_subject)
+        assert builder.get_subject() == compiled_subject
 
     @override_settings(
         EMAIL_FEEDBACK_EXT_LINK="https://feedtheback.com/survey/",
@@ -285,7 +293,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         """
         template = EmailTemplateFactory(type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject")
         builder = ReservationEmailNotificationBuilder(self.reservation, template)
-        assert_that(builder.get_content()).is_equal_to(compiled_content)
+        assert builder.get_content() == compiled_content
 
     def test_padding_does_not_matter_in_curly_brackets(self):
         EmailTemplate.objects.all().delete()
@@ -298,9 +306,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         )
         builder = ReservationEmailNotificationBuilder(self.reservation, template)
         actual_compiled_content_with_space_in_brackets = builder.get_content()
-        assert_that(actual_compiled_content_with_space_in_brackets).is_equal_to(
-            compiled_content_with_space_inside_braces
-        )
+        assert actual_compiled_content_with_space_in_brackets == compiled_content_with_space_inside_braces
 
         content_without_space_in_brackets = "I have {{reservation_number}} padding"
         compiled_content_without_space_in_brackets = f"I have {self.reservation.id} padding"
@@ -308,21 +314,17 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         template.save()
         builder = ReservationEmailNotificationBuilder(self.reservation, template)
         actual_compiled_content_without_space_in_brackets = builder.get_content()
-        assert_that(actual_compiled_content_without_space_in_brackets).is_equal_to(
-            compiled_content_without_space_in_brackets
-        )
+        assert actual_compiled_content_without_space_in_brackets == compiled_content_without_space_in_brackets
 
         # Assert actually does not matter
-        assert_that(actual_compiled_content_without_space_in_brackets).is_equal_to(
-            actual_compiled_content_with_space_in_brackets
-        )
+        assert actual_compiled_content_without_space_in_brackets == actual_compiled_content_with_space_in_brackets
 
     def test_language_defaults_to_fi_when_content_not_translated(self):
         builder = self.get_builder()
         builder.template.content_sv = None
         builder._set_language(LANGUAGES.SV)
-        assert_that(builder.language).is_equal_to(LANGUAGES.FI)
-        assert_that(builder._get_deny_reason()).is_equal_to(self.reservation.deny_reason.reason_fi)
+        assert builder.language == LANGUAGES.FI
+        assert builder._get_deny_reason() == self.reservation.deny_reason.reason_fi
 
     def test_confirmed_instructions_renders(self):
         content = """
@@ -341,7 +343,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         """
         template = EmailTemplateFactory(type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject")
         builder = ReservationEmailNotificationBuilder(self.reservation, template)
-        assert_that(builder.get_content()).is_equal_to(compiled_content)
+        assert builder.get_content() == compiled_content
 
     def test_pending_instructions_renders(self):
         content = """
@@ -360,7 +362,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         """
         template = EmailTemplateFactory(type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject")
         builder = ReservationEmailNotificationBuilder(self.reservation, template)
-        assert_that(builder.get_content()).is_equal_to(compiled_content)
+        assert builder.get_content() == compiled_content
 
     def test_cancel_instructions_renders(self):
         content = """
@@ -379,7 +381,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         """
         template = EmailTemplateFactory(type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject")
         builder = ReservationEmailNotificationBuilder(self.reservation, template)
-        assert_that(builder.get_content()).is_equal_to(compiled_content)
+        assert builder.get_content() == compiled_content
 
     def test_if_else_elif_expressions_supported(self):
         content = """
@@ -398,7 +400,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
                 """
         template = EmailTemplateFactory(type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject")
         builder = ReservationEmailNotificationBuilder(self.reservation, template)
-        assert_that(builder.get_content()).is_equal_to(compiled_content)
+        assert builder.get_content() == compiled_content
 
     def test_for_loop_not_supported(self):
         content = """
@@ -420,7 +422,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
 
         template = EmailTemplateFactory(type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject")
         builder = ReservationEmailNotificationBuilder(self.reservation, template)
-        assert_that(builder.get_content()).is_equal_to(compiled_content)
+        assert builder.get_content() == compiled_content
 
     def test_currency_filter_thousand_separator_is_space(self):
         self.reservation.price = Decimal("10000")
@@ -430,7 +432,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
 
         template = EmailTemplateFactory(type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject")
         builder = ReservationEmailNotificationBuilder(self.reservation, template)
-        assert_that(builder.get_content()).is_equal_to(compiled_content)
+        assert builder.get_content() == compiled_content
 
     def test_subsidised_price(self):
         content = (
@@ -447,7 +449,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
 
         template = EmailTemplateFactory(type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject")
         builder = ReservationEmailNotificationBuilder(self.reservation, template)
-        assert_that(builder.get_content()).is_equal_to(compiled_content)
+        assert builder.get_content() == compiled_content
 
     def test_subsidised_price_from_price_calc(self):
         self.reservation.applying_for_free_of_charge = True
@@ -466,4 +468,4 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
 
         template = EmailTemplateFactory(type=EmailType.RESERVATION_MODIFIED, content=content, subject="subject")
         builder = ReservationEmailNotificationBuilder(self.reservation, template)
-        assert_that(builder.get_content()).is_equal_to(compiled_content)
+        assert builder.get_content() == compiled_content
