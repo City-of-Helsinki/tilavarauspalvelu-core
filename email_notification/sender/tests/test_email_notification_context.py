@@ -35,6 +35,7 @@ class EmailNotificationContextTestCase(TestCase):
             reservation_unit=[self.reservation_unit],
             deny_reason=self.deny_reason,
             cancel_reason=self.cancel_reason,
+            reservee_type=CustomerTypeChoice.INDIVIDUAL,
         )
 
     def test_with_mock_data(self):
