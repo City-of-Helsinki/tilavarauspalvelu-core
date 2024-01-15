@@ -56,9 +56,7 @@ class ApplicationEventScheduleDeclineSerializer(TranslatedModelSerializer):
 
     class Meta:
         model = ApplicationEventSchedule
-        fields = [
-            "pk",
-        ]
+        fields = ["pk"]
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         errors: dict[str, list[str]] = defaultdict(list)
@@ -81,4 +79,39 @@ class ApplicationEventScheduleDeclineSerializer(TranslatedModelSerializer):
 
     def update(self, instance: ApplicationEventSchedule, validated_data: dict[str, Any]):
         instance.declined = True
+        return super().update(instance, validated_data)
+
+
+class ApplicationEventScheduleResetSerializer(TranslatedModelSerializer):
+    instance: ApplicationEventSchedule
+
+    class Meta:
+        model = ApplicationEventSchedule
+        fields = ["pk"]
+
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
+        errors: dict[str, list[str]] = defaultdict(list)
+
+        event_status = self.instance.application_event.status
+        application_status = self.instance.application_event.application.status
+
+        if not event_status.can_reset:
+            msg = f"Schedule cannot be reset for event in status: '{event_status.value}'"
+            errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+
+        if not application_status.can_reset:
+            msg = f"Schedule cannot be reset for application in status: '{application_status.value}'"
+            errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+
+        if errors:
+            raise serializers.ValidationError(errors)
+
+        return data
+
+    def update(self, instance: ApplicationEventSchedule, validated_data: dict[str, Any]):
+        instance.allocated_day = None
+        instance.allocated_begin = None
+        instance.allocated_end = None
+        instance.allocated_reservation_unit = None
+        instance.declined = False
         return super().update(instance, validated_data)

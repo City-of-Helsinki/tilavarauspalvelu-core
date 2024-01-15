@@ -120,6 +120,13 @@ class ApplicationStatusChoice(models.TextChoices):
             ApplicationStatusChoice.RESULTS_SENT,
         ]
 
+    @DynamicClassAttribute
+    def can_reset(self) -> bool:
+        return self in [
+            ApplicationStatusChoice.IN_ALLOCATION,
+            ApplicationStatusChoice.HANDLED,
+        ]
+
 
 class ApplicationEventStatusChoice(models.TextChoices):
     UNALLOCATED = "UNALLOCATED", _("Unallocated")
@@ -140,14 +147,22 @@ class ApplicationEventStatusChoice(models.TextChoices):
     @DynamicClassAttribute
     def can_decline(self) -> bool:
         return self in [
-            ApplicationEventStatusChoice.UNALLOCATED,
             ApplicationEventStatusChoice.APPROVED,
             ApplicationEventStatusChoice.FAILED,
+            ApplicationEventStatusChoice.UNALLOCATED,
         ]
 
     @DynamicClassAttribute
     def can_approve(self) -> bool:
         return self == ApplicationEventStatusChoice.UNALLOCATED
+
+    @DynamicClassAttribute
+    def can_reset(self) -> bool:
+        return self in [
+            ApplicationEventStatusChoice.APPROVED,
+            ApplicationEventStatusChoice.DECLINED,
+            ApplicationEventStatusChoice.UNALLOCATED,
+        ]
 
 
 class TargetGroupChoice(models.TextChoices):

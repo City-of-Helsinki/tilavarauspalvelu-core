@@ -25,6 +25,7 @@ from api.graphql.types.application_event.types import ApplicationEventNode
 from api.graphql.types.application_event_schedule.mutations import (
     ApplicationEventScheduleApproveMutation,
     ApplicationEventScheduleDeclineMutation,
+    ApplicationEventScheduleResetMutation,
 )
 from api.graphql.types.application_event_schedule.types import ApplicationEventScheduleNode
 from api.graphql.types.application_round.types import ApplicationRoundNode
@@ -328,6 +329,7 @@ class Mutation(graphene.ObjectType):
 
     approve_application_event_schedule = ApplicationEventScheduleApproveMutation.Field()
     decline_application_event_schedule = ApplicationEventScheduleDeclineMutation.Field()
+    reset_application_event_schedule = ApplicationEventScheduleResetMutation.Field()
 
     create_recurring_reservation = RecurringReservationCreateMutation.Field()
     update_recurring_reservation = RecurringReservationUpdateMutation.Field()

@@ -27,3 +27,8 @@ DECLINE_MUTATION = build_mutation(
     "declineApplicationEventSchedule",
     "ApplicationEventScheduleDeclineMutationInput",
 )
+
+RESET_MUTATION = build_mutation(
+    "resetApplicationEventSchedule",
+    "ApplicationEventScheduleResetMutationInput",
+)
