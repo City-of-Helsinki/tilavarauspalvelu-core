@@ -17,17 +17,17 @@ export type UnitPkName = {
   nameFi: string;
 };
 
-// TODO don't template this yet, make specialized versions firsts
-// so the one we typically use is int (pk)
-// { label: string; value: number }
-function MultiSelectFilter({
+// TODO is the T param good enough for type safety?
+// arrays of unions can be broken (ex. pushing a number to string[])
+// Discriminated Union can't be broken, but are unwieldy to use in this case
+// We want any type compatible with string | number be accepted
+// but never accept a combination of any of those types ex. [{label: "foo", value: 1}, {label: "bar", value: "baz"}]
+function MultiSelectFilter<T extends string | number>({
   name,
   options,
 }: {
   name: string;
-  // TODO don't like the union (proper generics force the whole chain to be the same type unions don't)
-  // what I want is to template T where T is one of string | number
-  options: { label: string; value: number | string }[];
+  options: { label: string; value: T }[];
 }): JSX.Element {
   const { t } = useTranslation();
   const [params, setParams] = useSearchParams();
@@ -35,7 +35,6 @@ function MultiSelectFilter({
   const filter = params.getAll(name);
 
   // TODO copy paste from allocation/index.tsx
-  // TODO recheck that this is equal to the above before removing it
   const setFilter = (value: string[] | null) => {
     const vals = new URLSearchParams(params);
     if (value == null || value.length === 0) {
@@ -51,7 +50,6 @@ function MultiSelectFilter({
     setParams(vals, { replace: true });
   };
 
-  // TODO common namespace for these and separate the labels / placeholders
   const label = t(`filters.label.${name}`);
   const placeholder = t(`filters.placeholder.${name}`);
   return (
@@ -190,7 +188,6 @@ export function Filters({
         />
       )}
       <SearchInput
-        // TODO can we use a common label for this?
         label={t("Allocation.filters.label.search")}
         placeholder={t("Allocation.filters.placeholder.search")}
         onChange={debounce((str) => setNameFilter(str), 100, {

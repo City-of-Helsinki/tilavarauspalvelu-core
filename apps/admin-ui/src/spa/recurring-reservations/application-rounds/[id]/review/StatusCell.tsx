@@ -109,7 +109,6 @@ export function ApplicationStatusCell({
 }: {
   status?: ApplicationStatusChoice;
 }): JSX.Element {
-  // TODO this can return undefined
   const text = `Application.statuses.${status}`;
 
   return (
@@ -122,7 +121,6 @@ export function ApplicationEventStatusCell({
 }: {
   status?: ApplicationEventStatusChoice;
 }): JSX.Element {
-  // TODO this can return undefined
   const text = `ApplicationEvent.statuses.${status}`;
   return (
     <StatusCell

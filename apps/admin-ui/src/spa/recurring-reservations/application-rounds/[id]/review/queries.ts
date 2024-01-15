@@ -14,13 +14,6 @@ const APPLICANT_NAME_FRAGMENT = gql`
   }
 `;
 
-// TODO is the status correct? and it's just a singular (the backend doesn't allow an array)
-// TODO add search params
-// TODO move this to where the current applications query is i.e. APPLICATIONS_QUERY
-// unit pks (multifield)
-// status (never includes DRAFT or CANCELLED) (multi field)
-// applicantType (multifield)
-// textSearch
 export const APPLICATIONS_QUERY = gql`
   ${APPLICANT_NAME_FRAGMENT}
   query getApplications(

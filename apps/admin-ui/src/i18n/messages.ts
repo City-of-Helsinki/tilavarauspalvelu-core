@@ -427,6 +427,8 @@ const translations: ITranslations = {
       EXPIRED: ["Vanhentunut"],
       IN_ALLOCATION: ["Käsittelyssä"],
       RESULTS_SENT: ["Lähetetty"],
+      // a ui error (missing query or a null check)
+      undefined: ["Ei määritelty"],
     },
     // TODO these are in ApplicationDetaiils
     customerBasicInfo: ["Varaajan perustiedot"],

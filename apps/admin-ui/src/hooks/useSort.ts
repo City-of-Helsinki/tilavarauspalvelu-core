@@ -8,7 +8,13 @@ function validSort(keys: string[], sort: string | null): boolean {
   return keys.includes(cleanSort);
 }
 
-// TODO move to common, reuse in the two other tabs
+/// store sorting order in orderBy query param
+/// @param validSortKeys - list of valid sort keys
+/// @returns [orderBy, handleSortChanged]
+/// supports single sort keys (e.g. pk) or combined keys (e.g. application_id,pk), one at a time
+/// matching keys are updated to be reversed (e.g. pk -> -pk)
+/// new keys replace existing keys (e.g. pk -> application_id)
+/// all state is stored in the URL only
 export function useSort(
   validSortKeys: string[]
 ): [string | null, (field: string) => void] {
