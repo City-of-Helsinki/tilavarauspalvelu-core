@@ -706,35 +706,39 @@ const ReservationUnit = ({
         : 0;
     const duration = diff >= 90 ? `(${formatDurationMinutes(diff)})` : "";
 
-    if (userReservations && reservationUnit?.reservations) {
-      return [
-        ...reservationUnit.reservations,
-        {
-          ...initialReservation,
-          state: "INITIAL",
-        },
-      ]
-        .filter((n): n is NonNullable<typeof n> => n != null)
-        .map((n) => {
-          const suffix = n.state === "INITIAL" ? duration : "";
-          const event: CalendarEvent<ReservationType> = {
-            title: `${
-              n.state === "CANCELLED"
-                ? `${t("reservationCalendar:prefixForCancelled")}: `
-                : suffix
-            }`,
-            start: n.begin != null ? new Date(n.begin) : new Date(),
-            end: n.end != null ? new Date(n.end) : new Date(),
-            allDay: false,
-            // TODO refactor and remove modifying the state
-            event: n as ReservationType,
-          };
+    const existingReservations = filterNonNullable(
+      reservationUnit?.reservations
+    );
+    return [
+      ...existingReservations,
+      ...(initialReservation != null
+        ? [
+            {
+              ...initialReservation,
+              state: "INITIAL",
+            },
+          ]
+        : []),
+    ]
+      .filter((n): n is NonNullable<typeof n> => n != null)
+      .map((n) => {
+        const suffix = n.state === "INITIAL" ? duration : "";
+        const event: CalendarEvent<ReservationType> = {
+          title: `${
+            n.state === "CANCELLED"
+              ? `${t("reservationCalendar:prefixForCancelled")}: `
+              : suffix
+          }`,
+          start: n.begin != null ? new Date(n.begin) : new Date(),
+          end: n.end != null ? new Date(n.end) : new Date(),
+          allDay: false,
+          // TODO refactor and remove modifying the state
+          event: n as ReservationType,
+        };
 
-          return event;
-        });
-    }
-    return [];
-  }, [reservationUnit, t, initialReservation, userReservations]);
+        return event;
+      });
+  }, [reservationUnit, t, initialReservation]);
 
   const eventBuffers = useMemo(() => {
     return getEventBuffers([
