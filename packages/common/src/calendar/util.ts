@@ -218,7 +218,7 @@ export const areSlotsReservable = (
 ): boolean => {
   return slots.every(
     (slotDate) =>
-      areReservableTimesAvailable(reservableTimeSpans, slotDate, true) &&
+      // NOTE seems that the order of checks improves performance
       isSlotWithinTimeframe(
         slotDate,
         reservationsMinDaysBefore,
@@ -226,6 +226,7 @@ export const areSlotsReservable = (
         reservationBegins,
         reservationEnds
       ) &&
+      areReservableTimesAvailable(reservableTimeSpans, slotDate, true) &&
       !doesSlotCollideWithApplicationRounds(slotDate, activeApplicationRounds)
   );
 };
