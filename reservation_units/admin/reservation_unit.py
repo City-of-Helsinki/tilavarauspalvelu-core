@@ -3,6 +3,7 @@ from django.contrib import admin, messages
 from django.http import FileResponse
 
 from applications.models import ApplicationRoundTimeSlot
+from opening_hours.utils.hauki_resource_hash_updater import HaukiResourceHashUpdater
 from reservation_units.models import ReservationKind, ReservationUnit, ReservationUnitImage, ReservationUnitPricing
 from reservation_units.utils.export_data import ReservationUnitExporter
 
@@ -72,3 +73,10 @@ class ReservationUnitAdmin(SortableAdminMixin, admin.ModelAdmin):
             # Filehandler needs to be left open for Django to be able to stream the file
             # Should fix the exporter to use an in-memory stream instead of writing to a file.
             return FileResponse(open(path, "rb"))  # noqa: SIM115
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+
+        # Update ReservableTimeSpans for HaukiResource when ReservationUnit is saved
+        if obj.origin_hauki_resource_id:
+            HaukiResourceHashUpdater(hauki_resource_ids=[obj.origin_hauki_resource.id]).run(force_refetch=True)

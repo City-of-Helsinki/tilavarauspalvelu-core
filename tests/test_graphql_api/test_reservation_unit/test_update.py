@@ -121,7 +121,7 @@ def test_update_reservation_unit__remove_all_timeslots(graphql):
     assert len(time_slots) == 0
 
 
-def test_create_reservation_unit_with_timeslots__weekday_required(graphql):
+def test_update_reservation_unit_with_timeslots__weekday_required(graphql):
     # given:
     # - There is a draft reservation unit with no timeslots
     # - A superuser is using the system
@@ -151,7 +151,7 @@ def test_create_reservation_unit_with_timeslots__weekday_required(graphql):
     assert "Field 'weekday' of required" in response.error_message()
 
 
-def test_create_reservation_unit_with_timeslots__begin_before_end(graphql):
+def test_update_reservation_unit_with_timeslots__begin_before_end(graphql):
     # given:
     # - There is a draft reservation unit with no timeslots
     # - A superuser is using the system
@@ -182,7 +182,7 @@ def test_create_reservation_unit_with_timeslots__begin_before_end(graphql):
     assert response.error_message() == "Timeslot 1 begin time must be before end time."
 
 
-def test_create_reservation_unit_with_timeslots__overlapping_reservable_times(graphql):
+def test_update_reservation_unit_with_timeslots__overlapping_reservable_times(graphql):
     # given:
     # - There is a draft reservation unit with no timeslots
     # - A superuser is using the system
@@ -216,7 +216,7 @@ def test_create_reservation_unit_with_timeslots__overlapping_reservable_times(gr
     )
 
 
-def test_create_reservation_unit_with_timeslots__two_for_same_day(graphql):
+def test_update_reservation_unit_with_timeslots__two_for_same_day(graphql):
     # given:
     # - There is a draft reservation unit with no timeslots
     # - A superuser is using the system
@@ -251,7 +251,7 @@ def test_create_reservation_unit_with_timeslots__two_for_same_day(graphql):
     assert response.error_message() == "Got multiple timeslots for Monday."
 
 
-def test_create_reservation_unit_with_timeslots__open_has_no_reservable_times(graphql):
+def test_update_reservation_unit_with_timeslots__open_has_no_reservable_times(graphql):
     # given:
     # - There is a draft reservation unit with no timeslots
     # - A superuser is using the system
@@ -280,7 +280,7 @@ def test_create_reservation_unit_with_timeslots__open_has_no_reservable_times(gr
     assert response.error_message() == "Open timeslots must have reservable times."
 
 
-def test_create_reservation_unit_with_timeslots__closed_has_reservable_times(graphql):
+def test_update_reservation_unit_with_timeslots__closed_has_reservable_times(graphql):
     # given:
     # - There is a draft reservation unit with no timeslots
     # - A superuser is using the system

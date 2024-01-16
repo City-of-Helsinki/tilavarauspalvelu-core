@@ -10,6 +10,7 @@ from api.graphql.tests.test_reservation_units.base import (
 from api.graphql.tests.test_reservation_units.conftest import reservation_unit_update_mutation
 from merchants.models import PaymentType
 from opening_hours.errors import HaukiAPIError
+from opening_hours.utils.hauki_resource_hash_updater import HaukiResourceHashUpdater
 from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import ReservationUnit
 from tests.factories import OriginHaukiResourceFactory, ReservationUnitFactory
@@ -84,6 +85,7 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         assert ReservationUnitHaukiExporter.send_reservation_unit_to_hauki.call_count == 1
 
     @patch_method(ReservationUnitHaukiExporter.send_reservation_unit_to_hauki)
+    @patch_method(HaukiResourceHashUpdater.run)
     @override_settings(HAUKI_EXPORTS_ENABLED=True)
     def test_send_resource_to_hauki_called_when_resource_id_exists(self):
         self.res_unit.origin_hauki_resource = OriginHaukiResourceFactory(id=1)
@@ -98,6 +100,7 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         assert content.get("errors") is None
         assert res_unit_data.get("errors") is None
         assert ReservationUnitHaukiExporter.send_reservation_unit_to_hauki.call_count == 1
+        assert HaukiResourceHashUpdater.run.call_count == 1
 
     @override_settings(HAUKI_EXPORTS_ENABLED=True)
     @patch_method(ReservationUnitHaukiExporter.send_reservation_unit_to_hauki, side_effect=HaukiAPIError())

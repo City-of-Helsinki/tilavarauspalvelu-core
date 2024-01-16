@@ -9,6 +9,7 @@ from api.graphql.tests.test_reservation_units.base import (
     ReservationUnitMutationsTestCaseBase,
 )
 from api.graphql.tests.test_reservation_units.conftest import reservation_unit_update_mutation
+from opening_hours.utils.hauki_resource_hash_updater import HaukiResourceHashUpdater
 from reservation_units.models import ReservationUnit
 from terms_of_use.models import TermsOfUse
 from tests.factories import (
@@ -144,6 +145,7 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         assert self.res_unit.name == "Resunit name"
 
     @patch_method(ReservationUnitHaukiExporter.send_reservation_unit_to_hauki)
+    @patch_method(HaukiResourceHashUpdater.run)
     @override_settings(HAUKI_EXPORTS_ENABLED=True)
     def test_send_resource_to_hauki_called_when_resource_id_exists(self):
         self.res_unit.origin_hauki_resource = OriginHaukiResourceFactory(id=1)
@@ -156,6 +158,7 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         content = json.loads(response.content)
         assert content.get("errors") is None
         assert ReservationUnitHaukiExporter.send_reservation_unit_to_hauki.call_count == 1
+        assert HaukiResourceHashUpdater.run.call_count == 1
 
     @patch_method(ReservationUnitHaukiExporter.send_reservation_unit_to_hauki)
     @override_settings(HAUKI_EXPORTS_ENABLED=False)
