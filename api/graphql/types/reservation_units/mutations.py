@@ -35,6 +35,7 @@ from api.graphql.types.reservation_units.types import (
     ReservationUnitType,
 )
 from opening_hours.errors import HaukiAPIError, HaukiRequestError
+from opening_hours.utils.hauki_resource_hash_updater import HaukiResourceHashUpdater
 from reservation_units.models import (
     Equipment,
     EquipmentCategory,
@@ -149,14 +150,17 @@ class ReservationUnitMutationMixin:
         was published and thus should be sent to HAUKI and do it here.
         """
         mutation_response = super().perform_mutate(serializer, info)
-        reservation_unit = serializer.instance
-        if not settings.HAUKI_EXPORTS_ENABLED:
-            return mutation_response
 
-        try:
-            reservation_unit.actions.send_reservation_unit_to_hauki()
-        except (HaukiRequestError, HaukiAPIError):
-            raise GraphQLError("Sending reservation unit as resource to HAUKI failed.")
+        reservation_unit = serializer.instance
+
+        if reservation_unit.origin_hauki_resource is not None:
+            HaukiResourceHashUpdater([reservation_unit.origin_hauki_resource.id]).run(force_refetch=True)
+
+        if settings.HAUKI_EXPORTS_ENABLED:
+            try:
+                reservation_unit.actions.send_reservation_unit_to_hauki()
+            except (HaukiRequestError, HaukiAPIError):
+                raise GraphQLError("Sending reservation unit as resource to HAUKI failed.")
 
         return mutation_response
 
