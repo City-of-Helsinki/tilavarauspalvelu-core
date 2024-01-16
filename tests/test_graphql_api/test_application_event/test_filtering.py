@@ -5,6 +5,7 @@ from applications.models import ApplicationEvent, EventReservationUnit
 from tests.factories import (
     AgeGroupFactory,
     ApplicationEventFactory,
+    ApplicationEventScheduleFactory,
     ApplicationFactory,
     CityFactory,
     ReservationPurposeFactory,
@@ -489,6 +490,39 @@ def test_application_event__filter__by_priority__multiple(graphql):
     assert len(response.edges) == 2, response
     assert response.node(0) == {"pk": event_1.pk}
     assert response.node(1) == {"pk": event_2.pk}
+
+
+def test_application_event__filter__schedule_priority(graphql):
+    # given:
+    # - There is an application event with schedules of different priorities
+    # - A superuser is using the system
+    schedule_high = ApplicationEventScheduleFactory.create(priority=PriorityChoice.HIGH)
+    ApplicationEventScheduleFactory.create(
+        application_event=schedule_high.application_event, priority=PriorityChoice.MEDIUM
+    )
+    schedule_low = ApplicationEventScheduleFactory.create(
+        application_event=schedule_high.application_event, priority=PriorityChoice.LOW
+    )
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    # when:
+    # - User tries to filter application event schedules with a specific priority
+    query = events_query(
+        fields="pk applicationEventSchedules { pk priority }",
+        application_event_schedules__priority=[PriorityChoice.HIGH.value, PriorityChoice.LOW.value],
+    )
+    response = graphql(query)
+
+    # then:
+    # - The response contains no errors
+    # - The response contains the right application event with only the requested schedules
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1, response
+    assert response.node(0)["pk"] == schedule_high.application_event.pk
+    assert response.node(0)["applicationEventSchedules"] == [
+        {"pk": schedule_high.pk, "priority": PriorityChoice.HIGH},
+        {"pk": schedule_low.pk, "priority": PriorityChoice.LOW},
+    ]
 
 
 def test_application_event__filter__by_preferred_order(graphql):

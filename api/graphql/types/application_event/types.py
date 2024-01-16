@@ -32,7 +32,7 @@ class ApplicationEventNode(DjangoAuthNode):
     min_duration = Duration()
     max_duration = Duration()
 
-    application_event_schedules = ApplicationEventScheduleNode.ListField()
+    application_event_schedules = ApplicationEventScheduleNode.ListField(priority=graphene.List(graphene.Int))
     event_reservation_units = EventReservationUnitNode.ListField(preferred_order=graphene.Int())
 
     class Meta:
@@ -70,6 +70,12 @@ class ApplicationEventNode(DjangoAuthNode):
             | models.Q(event_reservation_units__reservation_unit__unit__in=units)
             | models.Q(application__user=user)
         ).distinct()
+
+    def resolve_application_event_schedules(root: ApplicationEvent, info: GQLInfo, **kwargs: Any) -> models.QuerySet:
+        priority: list[int] | None = kwargs.get("priority")
+        if priority is not None:
+            return root.application_event_schedules.filter(priority__in=priority)
+        return root.application_event_schedules.all()
 
     def resolve_event_reservation_units(root: ApplicationEvent, info: GQLInfo, **kwargs: Any) -> models.QuerySet:
         preferred_order: int | None = kwargs.get("preferred_order")
