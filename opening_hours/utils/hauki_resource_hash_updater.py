@@ -83,11 +83,12 @@ class HaukiResourceHashUpdater:
                 logger.info(f"OriginHaukiResource with ID '{resource['id']}' was not found.")
                 continue
 
-            if not force_refetch and origin_hauki_resource.opening_hours_hash == resource["date_periods_hash"]:
-                logger.info(f"OriginHaukiResource '{resource['id']}' date periods hash is unchanged, skipping.")
-                continue
-
-            logger.info(f"Updating opening hours hash is changed for resource '{resource['id']}'.")
+            if origin_hauki_resource.opening_hours_hash == resource["date_periods_hash"]:
+                if not force_refetch:
+                    logger.info(f"OriginHaukiResource '{resource['id']}' date periods hash is unchanged, skipping.")
+                    continue
+            else:
+                logger.info(f"Updating 'Opening Hours Hash' for resource '{resource['id']}'.")
 
             # Update the hash and set the latest fetched date to None
             origin_hauki_resource.opening_hours_hash = resource["date_periods_hash"]
