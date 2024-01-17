@@ -78,9 +78,7 @@ def _get_soft_closed_time_spans_for_reservation_unit(reservation_unit: "Reservat
         reservation_unit_closed_time_spans.append(
             TimeSpanElement(
                 start_datetime=local_datetime_min(),
-                end_datetime=(
-                    local_start_of_day(now.date()) + timedelta(days=reservation_unit.reservations_min_days_before)
-                ),
+                end_datetime=(local_start_of_day(now) + timedelta(days=reservation_unit.reservations_min_days_before)),
                 is_reservable=False,
             )
         )
