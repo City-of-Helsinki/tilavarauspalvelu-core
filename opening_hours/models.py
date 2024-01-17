@@ -6,6 +6,7 @@ from django.utils.timezone import get_default_timezone
 from django.utils.translation import gettext_lazy as _
 
 from opening_hours.querysets import ReservableTimeSpanQuerySet
+from opening_hours.utils.time_span_element import TimeSpanElement
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
@@ -62,3 +63,10 @@ class ReservableTimeSpan(models.Model):
             return f"{start.strftime(strformat)}-{end.strftime('%H:%M')}"
         else:
             return f"{start.strftime(strformat)}-{end.strftime(strformat)}"
+
+    def as_time_span_element(self) -> TimeSpanElement:
+        return TimeSpanElement(
+            start_datetime=self.start_datetime.astimezone(DEFAULT_TIMEZONE),
+            end_datetime=self.end_datetime.astimezone(DEFAULT_TIMEZONE),
+            is_reservable=True,
+        )
