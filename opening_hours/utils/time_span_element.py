@@ -272,6 +272,27 @@ class TimeSpanElement:
             back_buffered_reservation_unit_minimum_duration_minutes += back_buffer
             buffered_reservation_unit_minimum_duration_minutes += back_buffer
 
+        #
+        # x = varauksen kautta suljettu aika
+        # . = aukioloaikojen kautta suljettu aika
+        # o = varattava aika
+        # - = varauksen bufferi
+        #
+        # Reservable timespan stuff
+        #
+        #   -----ooooo-----
+        #   -----oooooxxxxx
+        #   xxxxxooooo-----
+        #   xxxxxoooooxxxxx
+        #   .....oooooxxxxx  # not included yet
+        #   xxxxxooooo.....  # not included yet
+        #
+        # Reservation unit stuff
+        #   -----xxxxx-----
+        #   -----xxxxx
+        #        xxxxx-----
+        #        xxxxx
+        #
         return (
             self.duration_minutes >= reservation_unit_minimum_duration_minutes
             and self.front_buffered_duration_minutes >= front_buffered_reservation_unit_minimum_duration_minutes

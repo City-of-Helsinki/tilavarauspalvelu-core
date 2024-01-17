@@ -1621,3 +1621,327 @@ def test__query_reservation_unit_reservable__reservations__non_even_current_time
         "isClosed": False,
         "firstReservableDatetime": _datetime(year=2024, month=1, day=9, hour=10, minute=15).isoformat(),
     }
+
+
+@freezegun.freeze_time(datetime(2024, 1, 4, tzinfo=UTC))
+def test__query_reservation_unit_reservable__reservations__start_and_end_same_time_but_different_after_buffers(
+    graphql, reservation_unit
+):
+    """
+    This is a regression test for a bug that was found during manual testing.
+    Simply recreate the exact scenario instead of using the above test cases.
+    """
+    parent_space = SpaceFactory.create()
+    child_space_1 = SpaceFactory.create(parent=parent_space)
+    child_space_2 = SpaceFactory.create(parent=parent_space)
+
+    reservation_unit_2: ReservationUnit = ReservationUnitFactory.create(
+        buffer_time_after=timedelta(minutes=60),
+        reservation_start_interval=ReservationStartInterval.INTERVAL_30_MINUTES.value,
+        origin_hauki_resource=reservation_unit.origin_hauki_resource,
+        spaces=[child_space_1],
+        unit=child_space_1.unit,
+    )
+
+    parent_reservation_unit: ReservationUnit = ReservationUnitFactory.create(
+        reservation_start_interval=ReservationStartInterval.INTERVAL_30_MINUTES.value,
+        origin_hauki_resource=reservation_unit.origin_hauki_resource,
+        spaces=[parent_space],
+        unit=parent_space.unit,
+    )
+
+    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_30_MINUTES.value
+    reservation_unit.buffer_time_after = timedelta(minutes=30)
+    reservation_unit.spaces.set([child_space_2])
+    reservation_unit.unit = child_space_2.unit
+    reservation_unit.save()
+
+    # Monday | 2024-01-09 | 10:00 - 11:30 (1.5h) + 30 in buffer after
+    ReservationFactory.create(
+        begin=_datetime(year=2024, month=1, day=9, hour=10),
+        end=_datetime(year=2024, month=1, day=9, hour=11, minute=30),
+        buffer_time_before=reservation_unit.buffer_time_before,
+        buffer_time_after=reservation_unit.buffer_time_after,
+        reservation_unit=[reservation_unit],
+        state=ReservationStateChoice.CREATED,
+    )
+
+    # Monday | 2024-01-09 | 10:00 - 11:30 (1.5h) + 60 in buffer after
+    ReservationFactory.create(
+        begin=_datetime(year=2024, month=1, day=9, hour=10),
+        end=_datetime(year=2024, month=1, day=9, hour=11, minute=30),
+        buffer_time_before=reservation_unit_2.buffer_time_before,
+        buffer_time_after=reservation_unit_2.buffer_time_after,
+        reservation_unit=[reservation_unit_2],
+        state=ReservationStateChoice.CREATED,
+    )
+
+    # Monday | 2024-01-09 | 10:00 - 20:00 (10h)
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(year=2024, month=1, day=9, hour=10),
+        end_datetime=_datetime(year=2024, month=1, day=9, hour=20),
+    )
+
+    query = reservation_units_reservable_query(
+        fields="pk isClosed firstReservableDatetime",
+        reservable_date_start="2024-01-09",
+        reservable_date_end="2024-01-09",
+    )
+
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert len(response.edges) == 3, response
+    assert response.node(0) == {
+        "pk": reservation_unit.pk,
+        "isClosed": False,
+        "firstReservableDatetime": _datetime(year=2024, month=1, day=9, hour=12).isoformat(),
+    }
+    assert response.node(1) == {
+        "pk": reservation_unit_2.pk,
+        "isClosed": False,
+        "firstReservableDatetime": _datetime(year=2024, month=1, day=9, hour=12, minute=30).isoformat(),
+    }
+    assert response.node(2) == {
+        "pk": parent_reservation_unit.pk,
+        "isClosed": False,
+        "firstReservableDatetime": _datetime(year=2024, month=1, day=9, hour=12, minute=30).isoformat(),
+    }
+
+
+@freezegun.freeze_time(datetime(2024, 1, 4, tzinfo=UTC))
+def test__query_reservation_unit_reservable__reservations__different_before_buffers__before_reservation(
+    graphql, reservation_unit
+):
+    """
+    This is a regression test for a bug that was found during manual testing.
+    Simply recreate the exact scenario instead of using the above test cases.
+    """
+    parent_space = SpaceFactory.create()
+    child_space_1 = SpaceFactory.create(parent=parent_space)
+    child_space_2 = SpaceFactory.create(parent=parent_space)
+
+    # 60 min buffered
+    reservation_unit_2: ReservationUnit = ReservationUnitFactory.create(
+        buffer_time_before=timedelta(minutes=60),
+        buffer_time_after=None,
+        reservation_start_interval=ReservationStartInterval.INTERVAL_30_MINUTES.value,
+        origin_hauki_resource=reservation_unit.origin_hauki_resource,
+        spaces=[child_space_1],
+        unit=child_space_1.unit,
+    )
+
+    # No buffered
+    parent_reservation_unit: ReservationUnit = ReservationUnitFactory.create(
+        buffer_time_before=None,
+        buffer_time_after=None,
+        reservation_start_interval=ReservationStartInterval.INTERVAL_30_MINUTES.value,
+        origin_hauki_resource=reservation_unit.origin_hauki_resource,
+        spaces=[parent_space],
+        unit=parent_space.unit,
+    )
+
+    # 30 min buffered
+    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_30_MINUTES.value
+    reservation_unit.buffer_time_before = timedelta(minutes=30)
+    reservation_unit.buffer_time_after = None
+    reservation_unit.spaces.set([child_space_2])
+    reservation_unit.unit = child_space_2.unit
+    reservation_unit.save()
+
+    # Monday | 2024-01-09 | 10:00 - 10:30 (0.5h) | parent
+    ReservationFactory.create(
+        begin=_datetime(year=2024, month=1, day=9, hour=10),
+        end=_datetime(year=2024, month=1, day=9, hour=10, minute=30),
+        buffer_time_before=parent_reservation_unit.buffer_time_before,
+        buffer_time_after=parent_reservation_unit.buffer_time_after,
+        reservation_unit=[parent_reservation_unit],
+        state=ReservationStateChoice.CREATED,
+    )
+
+    # Monday | 2024-01-09 | 12:00 - 13:00 (1h) | 11:30 - 12:00 buffer | res 1
+    ReservationFactory.create(
+        begin=_datetime(year=2024, month=1, day=9, hour=12),
+        end=_datetime(year=2024, month=1, day=9, hour=13),
+        buffer_time_before=reservation_unit.buffer_time_before,
+        buffer_time_after=reservation_unit.buffer_time_after,
+        reservation_unit=[reservation_unit],
+        state=ReservationStateChoice.CREATED,
+    )
+
+    # Monday | 2024-01-09 | 12:00 - 13:00 (1h) | 11:00 - 12:00 buffer | res 2
+    ReservationFactory.create(
+        begin=_datetime(year=2024, month=1, day=9, hour=12),
+        end=_datetime(year=2024, month=1, day=9, hour=13),
+        buffer_time_before=reservation_unit_2.buffer_time_before,
+        buffer_time_after=reservation_unit_2.buffer_time_after,
+        reservation_unit=[reservation_unit_2],
+        state=ReservationStateChoice.CREATED,
+    )
+
+    # Monday | 2024-01-09 | 10:00 - 20:00 (10h)
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(year=2024, month=1, day=9, hour=10),
+        end_datetime=_datetime(year=2024, month=1, day=9, hour=20),
+    )
+
+    # x = varauksen kautta suljettu aika
+    # . = aukioloaikojen kautta suljettu aika
+    # o = varattava aika
+    # - = varauksen bufferi
+    #
+    #          10   :30   11    :30   12    :30   13                      20
+    # ........|ooooo|ooooo|ooooo|ooooo|ooooo|ooooo|ooooooooooooooooooooooo|.........
+    #         xxxxxx  # parent
+    #                           ------xxxxxxxxxxxx  # res 1 -> res 1, parent
+    #                     ------------xxxxxxxxxxxx  # res 2 -> res 2, parent
+    #
+    # ..............oooooooooooo------            oooooooooooooooooooooooo
+    #
+    #         ------xxxxxx   # res 1  Wrong!
+    #               ------xxxxxx   # res 1  Correct!
+    #
+    #   ------------xxxxxx   # res 2
+    #
+    #               xxxxxx   # parent
+    query = reservation_units_reservable_query(
+        fields="pk isClosed firstReservableDatetime",
+        reservable_date_start="2024-01-09",
+        reservable_date_end="2024-01-09",
+        reservable_minimum_duration_minutes=30,
+    )
+
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert len(response.edges) == 3, response
+    assert response.node(0) == {
+        "pk": reservation_unit.pk,
+        "isClosed": False,
+        "firstReservableDatetime": _datetime(year=2024, month=1, day=9, hour=11).isoformat(),
+    }
+    assert response.node(1) == {
+        "pk": reservation_unit_2.pk,
+        "isClosed": False,
+        "firstReservableDatetime": _datetime(year=2024, month=1, day=9, hour=14).isoformat(),
+    }
+    assert response.node(2) == {
+        "pk": parent_reservation_unit.pk,
+        "isClosed": False,
+        "firstReservableDatetime": _datetime(year=2024, month=1, day=9, hour=10, minute=30).isoformat(),
+    }
+
+
+@freezegun.freeze_time(datetime(2024, 1, 4, tzinfo=UTC))
+def test__query_reservation_unit_reservable__reservations__different_before_buffers__before_closed_time(
+    graphql, reservation_unit
+):
+    """
+    This is a regression test for a bug that was found during manual testing.
+    Simply recreate the exact scenario instead of using the above test cases.
+    """
+    parent_space = SpaceFactory.create()
+    child_space_1 = SpaceFactory.create(parent=parent_space)
+    child_space_2 = SpaceFactory.create(parent=parent_space)
+
+    reservation_unit_2: ReservationUnit = ReservationUnitFactory.create(
+        buffer_time_before=timedelta(minutes=60),
+        buffer_time_after=None,
+        reservation_start_interval=ReservationStartInterval.INTERVAL_30_MINUTES.value,
+        origin_hauki_resource=reservation_unit.origin_hauki_resource,
+        spaces=[child_space_1],
+        unit=child_space_1.unit,
+    )
+
+    parent_reservation_unit: ReservationUnit = ReservationUnitFactory.create(
+        buffer_time_before=None,
+        buffer_time_after=None,
+        reservation_start_interval=ReservationStartInterval.INTERVAL_30_MINUTES.value,
+        origin_hauki_resource=reservation_unit.origin_hauki_resource,
+        spaces=[parent_space],
+        unit=parent_space.unit,
+    )
+
+    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_30_MINUTES.value
+    reservation_unit.buffer_time_before = timedelta(minutes=30)
+    reservation_unit.buffer_time_after = None
+    reservation_unit.spaces.set([child_space_2])
+    reservation_unit.unit = child_space_2.unit
+    reservation_unit.save()
+
+    # Monday | 2024-01-09 | 12:00 - 13:00 (1h) | 11:30 - 12:00 buffer
+    ReservationFactory.create(
+        begin=_datetime(year=2024, month=1, day=9, hour=12),
+        end=_datetime(year=2024, month=1, day=9, hour=13),
+        buffer_time_before=reservation_unit.buffer_time_before,
+        buffer_time_after=reservation_unit.buffer_time_after,
+        reservation_unit=[reservation_unit],
+        state=ReservationStateChoice.CREATED,
+    )
+
+    # Monday | 2024-01-09 | 12:00 - 13:00 (1h) | 11:00 - 12:00 buffer
+    ReservationFactory.create(
+        begin=_datetime(year=2024, month=1, day=9, hour=12),
+        end=_datetime(year=2024, month=1, day=9, hour=13),
+        buffer_time_before=reservation_unit_2.buffer_time_before,
+        buffer_time_after=reservation_unit_2.buffer_time_after,
+        reservation_unit=[reservation_unit_2],
+        state=ReservationStateChoice.CREATED,
+    )
+
+    # Monday | 2024-01-09 | 10:30 - 20:00 (9.5h)
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(year=2024, month=1, day=9, hour=10, minute=30),
+        end_datetime=_datetime(year=2024, month=1, day=9, hour=20),
+    )
+
+    #
+    # x = varauksen kautta suljettu aika
+    # . = aukioloaikojen kautta suljettu aika
+    # o = varattava aika
+    # - = varauksen bufferi
+    #
+    #          10   :30   11    :30   12    :30   13                      20
+    # ..............|ooooo|ooooo|ooooo|ooooo|ooooo|ooooooooooooooooooooooo|.........
+    #
+    #                           ------xxxxxxxxxxxx  # res 1 -> res 1, parent
+    #                     ------------xxxxxxxxxxxx  # res 2 -> res 2, parent
+    #
+    # ...xxxxx......oooooooooooo------            oooooooooooooooooooooooo
+    #
+    #         ------xxxxxx   # res 1  Correct!
+    #               ------xxxxxx   # res 1  Wrong!
+    #
+    #   ------------xxxxxx   # res 2
+    #
+    #               xxxxxx   # parent
+    #
+    query = reservation_units_reservable_query(
+        fields="pk isClosed firstReservableDatetime",
+        reservable_date_start="2024-01-09",
+        reservable_date_end="2024-01-09",
+        reservable_minimum_duration_minutes=30,
+    )
+
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert len(response.edges) == 3, response
+    assert response.node(0) == {
+        "pk": reservation_unit.pk,
+        "isClosed": False,
+        "firstReservableDatetime": _datetime(year=2024, month=1, day=9, hour=10, minute=30).isoformat(),
+    }
+    assert response.node(1) == {
+        "pk": reservation_unit_2.pk,
+        "isClosed": False,
+        "firstReservableDatetime": _datetime(year=2024, month=1, day=9, hour=10, minute=30).isoformat(),
+    }
+    assert response.node(2) == {
+        "pk": parent_reservation_unit.pk,
+        "isClosed": False,
+        "firstReservableDatetime": _datetime(year=2024, month=1, day=9, hour=10, minute=30).isoformat(),
+    }

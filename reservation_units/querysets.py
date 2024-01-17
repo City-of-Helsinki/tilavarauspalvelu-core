@@ -1,4 +1,5 @@
 from collections.abc import Iterable
+from copy import deepcopy
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 from typing import TYPE_CHECKING, Self
@@ -283,7 +284,7 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
                 # This will also split reservable time spans into multiple time spans if needed.
                 # What is left is a list of time spans that are reservable and within the given filter parameters.
                 hard_normalised_reservable_time_spans = override_reservable_with_closed_time_spans(
-                    reservable_time_spans=[reservable_time_span],
+                    reservable_time_spans=[deepcopy(reservable_time_span)],
                     closed_time_spans=hard_closed_time_spans,
                 )
 
@@ -309,11 +310,12 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
                 soft_closed_time_spans = reservation_unit_soft_closed_time_spans + reservation_closed_time_spans
 
                 soft_normalised_reservable_time_spans = override_reservable_with_closed_time_spans(
-                    reservable_time_spans=hard_normalised_reservable_time_spans,
+                    reservable_time_spans=deepcopy(hard_normalised_reservable_time_spans),
                     closed_time_spans=soft_closed_time_spans,
                 )
 
                 # Loop through the normalised time spans to find one that is long enough to fit the minimum duration
+                # TODO: Can't compare one at a time because of buffers?
                 for normalized_reservable_time_span in soft_normalised_reservable_time_spans:
                     # Move time span start time to the next valid start time
                     normalized_reservable_time_span.move_to_next_valid_start_time(reservation_unit)
