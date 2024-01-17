@@ -339,7 +339,10 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
 
             # Go through each ReservableTimeSpan individually one-by-one
             for reservable_time_span in reservation_unit.origin_hauki_resource.reservable_time_spans.all():
-                current_time_span = reservable_time_span.as_time_span_element()
+                current_time_span = reservable_time_span.as_time_span_element(
+                    buffer_time_before=reservation_unit.buffer_time_before,
+                    buffer_time_after=reservation_unit.buffer_time_after,
+                )
 
                 # Combine all Hard-Closed time spans into one list
                 hard_closed_time_spans: list[TimeSpanElement] = (

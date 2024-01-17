@@ -178,10 +178,7 @@ class TimeSpanElement:
              │            │═════ # No
              │            │  ═══ # No
         """
-        return (
-            self.buffered_start_datetime < other.buffered_end_datetime
-            and self.buffered_end_datetime > other.buffered_start_datetime
-        )
+        return self.start_datetime < other.buffered_end_datetime and self.end_datetime > other.buffered_start_datetime
 
     def fully_inside_of(self, other: "TimeSpanElement") -> bool:
         """
@@ -203,10 +200,7 @@ class TimeSpanElement:
              │            │═════ # No
              │            │  ═══ # No
         """
-        return (
-            self.buffered_start_datetime >= other.buffered_start_datetime
-            and self.buffered_end_datetime <= other.buffered_end_datetime
-        )
+        return self.start_datetime >= other.buffered_start_datetime and self.end_datetime <= other.buffered_end_datetime
 
     def starts_inside_of(self, other: "TimeSpanElement") -> bool:
         """
@@ -228,7 +222,7 @@ class TimeSpanElement:
              │            │═════ # No
              │            │  ═══ # No
         """
-        return other.buffered_start_datetime <= self.buffered_start_datetime < other.buffered_end_datetime
+        return other.buffered_start_datetime <= self.start_datetime < other.buffered_end_datetime
 
     def ends_inside_of(self, other: "TimeSpanElement") -> bool:
         """
@@ -250,7 +244,7 @@ class TimeSpanElement:
              │            │═════ # No
              │            │  ═══ # No
         """
-        return other.buffered_start_datetime < self.buffered_end_datetime <= other.buffered_end_datetime
+        return other.buffered_start_datetime < self.end_datetime <= other.buffered_end_datetime
 
     def can_fit_reservation_for_reservation_unit(
         self,
