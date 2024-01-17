@@ -279,9 +279,21 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
 
         # Loop through ReservationUnits and find the first reservable time and closed status span for each
         for reservation_unit in reservation_units_with_prefetched_related_objects:
-            reservation_unit_hard_closed_time_spans = _get_hard_closed_time_spans_for_reservation_unit(reservation_unit)
+            reservation_unit_hard_closed_time_spans = (
+                _get_hard_closed_time_spans_for_reservation_unit(reservation_unit) + shared_hard_closed_time_spans
+            )
             reservation_unit_soft_closed_time_spans = _get_soft_closed_time_spans_for_reservation_unit(reservation_unit)
+            reservation_unit_reservation_closed_time_spans = list(
+                reservation_closed_time_spans_map.get(reservation_unit.pk, set())
+            )
 
+            # These time spans have no effect on the closed status of the ReservationUnit,
+            # meaning that the ReservationUnit can be shown as open, even if there are no reservable time spans.
+            soft_closed_time_spans = (
+                reservation_unit_soft_closed_time_spans + reservation_unit_reservation_closed_time_spans
+            )
+
+            # Go through each ReservableTimeSpan individually one-by-one
             for element in reservation_unit.origin_hauki_resource.reservable_time_spans.all():
                 reservable_time_span = TimeSpanElement(
                     start_datetime=element.start_datetime.astimezone(DEFAULT_TIMEZONE),
@@ -291,8 +303,7 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
 
                 # Closed time spans that cause the ReservationUnit to be shown as closed
                 hard_closed_time_spans: list[TimeSpanElement] = (
-                    shared_hard_closed_time_spans
-                    + reservation_unit_hard_closed_time_spans
+                    reservation_unit_hard_closed_time_spans
                     + reservable_time_span.generate_closed_time_spans_outside_filter(
                         filter_time_start=filter_time_start,
                         filter_time_end=filter_time_end,
@@ -321,12 +332,6 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
                     and reservation_unit.max_reservation_duration < timedelta(minutes=minimum_duration_minutes)
                 ):
                     break
-
-                reservation_closed_time_spans = list(reservation_closed_time_spans_map.get(reservation_unit.pk, set()))
-
-                # These time spans have no effect on the closed status of the ReservationUnit,
-                # meaning that the ReservationUnit can be shown as open, even if there are no reservable time spans.
-                soft_closed_time_spans = reservation_unit_soft_closed_time_spans + reservation_closed_time_spans
 
                 soft_normalised_reservable_time_spans = override_reservable_with_closed_time_spans(
                     reservable_time_spans=hard_normalised_reservable_time_spans,
