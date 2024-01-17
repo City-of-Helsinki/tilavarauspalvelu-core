@@ -11,6 +11,10 @@ updates:
       interval: "weekly"
     pull-request-branch-name:
       separator: "-"
+    groups:
+      github-actions-dependencies:
+        patterns:
+          - "*"
 
   # Update Poetry dependencies
   - package-ecosystem: "pip"  # yes, this is correct
@@ -19,6 +23,10 @@ updates:
       interval: "weekly"
     pull-request-branch-name:
       separator: "-"
+    groups:
+      python-dependencies:
+        patterns:
+          - "*"
 
   # Update Docker dependencies
   - package-ecosystem: "docker"
@@ -27,3 +35,7 @@ updates:
       interval: "weekly"
     pull-request-branch-name:
       separator: "-"
+    groups:
+      docker-dependencies:
+        patterns:
+          - "*"
