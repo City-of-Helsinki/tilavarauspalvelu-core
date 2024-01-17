@@ -27,7 +27,25 @@ if TYPE_CHECKING:
 ReservationUnitPK = int
 
 
+def _get_shared_hard_closed_time_spans(filter_date_start: date, filter_date_end: date) -> list[TimeSpanElement]:
+    now = local_datetime()
+
+    return [
+        TimeSpanElement(
+            start_datetime=local_datetime_min(),
+            end_datetime=max(local_start_of_day(filter_date_start), now),
+            is_reservable=False,
+        ),
+        TimeSpanElement(
+            start_datetime=local_start_of_day(filter_date_end) + timedelta(days=1),
+            end_datetime=local_datetime_max(),
+            is_reservable=False,
+        ),
+    ]
+
+
 def _get_hard_closed_time_spans_for_reservation_unit(reservation_unit: "ReservationUnit") -> list[TimeSpanElement]:
+    """Get a list of closed time spans that cause the ReservationUnit to be shown as closed"""
     reservation_unit_closed_time_spans: list[TimeSpanElement] = []
 
     if reservation_unit.reservation_begins:
@@ -70,6 +88,7 @@ def _get_hard_closed_time_spans_for_reservation_unit(reservation_unit: "Reservat
 
 
 def _get_soft_closed_time_spans_for_reservation_unit(reservation_unit: "ReservationUnit") -> list[TimeSpanElement]:
+    """Get a list of closed time spans that have no effect on the closed status of the ReservationUnit"""
     now = local_datetime()
     reservation_unit_closed_time_spans: list[TimeSpanElement] = []
 
@@ -103,6 +122,34 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
                 Q(publish_begins__isnull=False, publish_begins__gt=now)
                 | Q(publish_ends__isnull=False, publish_ends__lte=now)
             )
+        )
+
+    def _prefetch_related_for_with_first_reservable_time(self, filter_date_start: date, filter_date_end: date) -> Self:
+        """
+        Prefetch ReservableTimeSpans and ApplicationRounds for each ReservationUnit and filter them by date range
+
+        When the ReservableTimeSpans or ApplicationRounds are accessed later,
+        they are already filtered by date range, so we don't need to query the database again.
+        """
+        return self.exclude(
+            origin_hauki_resource__isnull=True,
+        ).prefetch_related(
+            Prefetch(
+                "origin_hauki_resource__reservable_time_spans",
+                ReservableTimeSpan.objects.overlapping_with_period(
+                    start=filter_date_start,
+                    end=filter_date_end,
+                ).order_by("start_datetime"),
+            ),
+            Prefetch(
+                "application_rounds",
+                ApplicationRound.objects.with_round_status()
+                .filter(
+                    reservation_period_begin__lte=filter_date_end,
+                    reservation_period_end__gte=filter_date_start,
+                )
+                .exclude(round_status=ApplicationRoundStatusChoice.RESULTS_SENT),
+            ),
         )
 
     def with_first_reservable_time(
@@ -198,65 +245,40 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
         # Shortest possible reservation unit interval is 15 minutes, so it's used as the default value
         minimum_duration_minutes = int(minimum_duration_minutes) if minimum_duration_minutes else 15
 
-        ##################################
-        # Initialise important variables #
-        ##################################
+        ##########################################
+        # Get required objects from the database #
+        ##########################################
 
-        # Get ReservableTimeSpans for each ReservationUnit
-        # When ReservableTimeSpans are accessed later, they are already filtered by date range
-        reservation_units_with_annotated_time_spans: Iterable["ReservationUnit"]
-        reservation_units_with_annotated_time_spans = self.exclude(
-            origin_hauki_resource__isnull=True,
-        ).prefetch_related(
-            Prefetch(
-                "origin_hauki_resource__reservable_time_spans",
-                ReservableTimeSpan.objects.overlapping_with_period(
-                    start=filter_date_start,
-                    end=filter_date_end,
-                ).order_by("start_datetime"),
-            ),
-            Prefetch(
-                "application_rounds",
-                ApplicationRound.objects.with_round_status()
-                .filter(
-                    reservation_period_begin__lte=filter_date_end,
-                    reservation_period_end__gte=filter_date_start,
-                )
-                .exclude(round_status=ApplicationRoundStatusChoice.RESULTS_SENT),
-            ),
+        reservation_units_with_prefetched_related_objects: Iterable["ReservationUnit"]
+        reservation_units_with_prefetched_related_objects = self._prefetch_related_for_with_first_reservable_time(
+            filter_date_start=filter_date_start,
+            filter_date_end=filter_date_end,
         )
 
         reservation_closed_time_spans_map: dict[ReservationUnitPK, set[TimeSpanElement]]
         reservation_closed_time_spans_map = Reservation.objects.get_affecting_reservations_as_closed_time_spans(
-            reservation_unit_queryset=self,
+            reservation_unit_queryset=self.exclude(origin_hauki_resource__isnull=True),
             start_date=filter_date_start,
             end_date=filter_date_end,
         )
 
-        # Closed time spans that are shared by all ReservationUnits
-        shared_closed_time_spans: list[TimeSpanElement] = [
-            TimeSpanElement(
-                start_datetime=local_datetime_min(),
-                end_datetime=max(local_start_of_day(filter_date_start), now),
-                is_reservable=False,
-            ),
-            TimeSpanElement(
-                start_datetime=local_start_of_day(filter_date_end) + timedelta(days=1),
-                end_datetime=local_datetime_max(),
-                is_reservable=False,
-            ),
-        ]
+        ##################################
+        # Initialise important variables #
+        ##################################
 
         # Store values in a dict, so we can add them back to the original queryset later
         first_reservable_times: dict[ReservationUnitPK, datetime] = {}
         reservation_unit_closed_statuses: dict[ReservationUnitPK, bool] = {}
+
+        # Closed time spans that are shared by all ReservationUnits
+        shared_hard_closed_time_spans = _get_shared_hard_closed_time_spans(filter_date_start, filter_date_end)
 
         ###########################
         # Do the important stuffs #
         ###########################
 
         # Loop through ReservationUnits and find the first reservable time and closed status span for each
-        for reservation_unit in reservation_units_with_annotated_time_spans:
+        for reservation_unit in reservation_units_with_prefetched_related_objects:
             reservation_unit_hard_closed_time_spans = _get_hard_closed_time_spans_for_reservation_unit(reservation_unit)
             reservation_unit_soft_closed_time_spans = _get_soft_closed_time_spans_for_reservation_unit(reservation_unit)
 
@@ -269,7 +291,7 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
 
                 # Closed time spans that cause the ReservationUnit to be shown as closed
                 hard_closed_time_spans: list[TimeSpanElement] = (
-                    shared_closed_time_spans
+                    shared_hard_closed_time_spans
                     + reservation_unit_hard_closed_time_spans
                     + reservable_time_span.generate_closed_time_spans_outside_filter(
                         filter_time_start=filter_time_start,
