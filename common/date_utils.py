@@ -148,8 +148,10 @@ def local_time_max():
     return datetime.time.max.replace(tzinfo=DEFAULT_TIMEZONE)
 
 
-def local_start_of_day(_date: datetime.date, /) -> datetime.datetime:
+def local_start_of_day(_date: datetime.date | datetime.datetime, /) -> datetime.datetime:
     """Get the start of day (00:00:00) as datetime for the given date in local timezone."""
+    if isinstance(_date, datetime.datetime):
+        _date = _date.astimezone(DEFAULT_TIMEZONE).date()
     return datetime.datetime.combine(_date, datetime.time.min, tzinfo=DEFAULT_TIMEZONE)
 
 
