@@ -1462,29 +1462,24 @@ def test__query_reservation_unit_reservable__reservations__overlapping_buffers_a
     }
 
 
-@freezegun.freeze_time(datetime(2024, 1, 4, tzinfo=UTC))
+@freezegun.freeze_time(NOW)
 def test__query_reservation_unit_reservable__reservations__buffered_goes_over_timespan(graphql, reservation_unit):
-    """
-    This is a regression test for a bug that was found during manual testing.
-    Simply recreate the exact scenario instead of using the above test cases.
-    """
+    """ReservationUnits before/after buffers should not prevent a Reservation from being created"""
     reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_30_MINUTES.value
     reservation_unit.buffer_time_before = timedelta(minutes=60)
     reservation_unit.buffer_time_after = timedelta(minutes=60)
     reservation_unit.min_reservation_duration = timedelta(minutes=30)
     reservation_unit.save()
 
-    # Monday | 2024-01-09 | 10:00 - 11:30 (1.5h)
+    # 2023-05-11 | 10:00-12:00 (2h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
-        start_datetime=_datetime(year=2024, month=1, day=9, hour=10),
-        end_datetime=_datetime(year=2024, month=1, day=9, hour=12),
+        start_datetime=_datetime(day=11, hour=10),
+        end_datetime=_datetime(day=11, hour=12),
     )
 
     query = reservation_units_reservable_query(
         fields="pk isClosed firstReservableDatetime",
-        reservable_date_start="2024-01-09",
-        reservable_date_end="2024-01-09",
         reservable_minimum_duration_minutes=30,
     )
 
@@ -1495,7 +1490,7 @@ def test__query_reservation_unit_reservable__reservations__buffered_goes_over_ti
     assert response.node(0) == {
         "pk": reservation_unit.pk,
         "isClosed": False,
-        "firstReservableDatetime": None,
+        "firstReservableDatetime": _datetime(day=11, hour=10).isoformat(),
     }
 
 
