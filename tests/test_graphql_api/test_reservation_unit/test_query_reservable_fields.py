@@ -936,11 +936,10 @@ def test__query_reservation_unit_reservable__filters__application_round(
 @freezegun.freeze_time(NOW)
 def test__query_reservation_unit_reservable__reservations__own_reservation(graphql, reservation_unit):
     # 2023-05-20 10:00 - 12:00 (2h)
-    ReservationFactory.create(
+    ReservationFactory.create_for_reservation_unit(
+        reservation_unit=reservation_unit,
         begin=_datetime(day=20, hour=10),
         end=_datetime(day=20, hour=12),
-        reservation_unit=[reservation_unit],
-        state=ReservationStateChoice.CREATED,
     )
 
     # 2023-05-20 10:00 - 12:00 (2h)
@@ -964,11 +963,10 @@ def test__query_reservation_unit_reservable__reservations__not_in_common_hierarc
     reservation_unit_2: ReservationUnit = ReservationUnitFactory()
 
     # 2023-05-20 10:00 - 12:00 (2h)
-    ReservationFactory.create(
+    ReservationFactory.create_for_reservation_unit(
+        reservation_unit=reservation_unit_2,
         begin=_datetime(day=20, hour=10),
         end=_datetime(day=20, hour=12),
-        reservation_unit=[reservation_unit_2],
-        state=ReservationStateChoice.CREATED,
     )
 
     # 2023-05-20 10:00 - 12:00 (2h)
@@ -998,11 +996,10 @@ def test__query_reservation_unit_reservable__reservations__in_common_hierarchy__
     reservation_unit.save()
 
     # 2023-05-20 10:00 - 12:00 (2h)
-    ReservationFactory.create(
+    ReservationFactory.create_for_reservation_unit(
+        reservation_unit=reservation_unit_2,
         begin=_datetime(day=20, hour=10),
         end=_datetime(day=20, hour=12),
-        reservation_unit=[reservation_unit_2],
-        state=ReservationStateChoice.CREATED,
     )
 
     # 2023-05-20 10:00 - 12:00 (2h)
@@ -1039,11 +1036,10 @@ def test__query_reservation_unit_reservable__reservations__in_common_hierarchy__
     reservation_unit.save()
 
     # 2023-05-20 10:00 - 12:00 (2h)
-    ReservationFactory.create(
+    ReservationFactory.create_for_reservation_unit(
+        reservation_unit=reservation_unit_2,
         begin=_datetime(day=20, hour=10),
         end=_datetime(day=20, hour=12),
-        reservation_unit=[reservation_unit_2],
-        state=ReservationStateChoice.CREATED,
     )
 
     # 2023-05-20 10:00 - 12:00 (2h)
@@ -1091,11 +1087,10 @@ def test__query_reservation_unit_reservable__reservations__in_common_hierarchy__
     reservation_unit.save()
 
     # 2023-05-20 10:00 - 12:00 (2h)
-    ReservationFactory.create(
+    ReservationFactory.create_for_reservation_unit(
+        reservation_unit=reservation_unit_2,
         begin=_datetime(day=20, hour=10),
         end=_datetime(day=20, hour=12),
-        reservation_unit=[reservation_unit_2],
-        state=ReservationStateChoice.CREATED,
     )
 
     # 2023-05-20 10:00 - 12:00 (2h)
@@ -1200,18 +1195,16 @@ def test__query_reservation_unit_reservable__reservations__start_and_end_same_da
     Simply recreate the exact scenario instead of using the above test cases.
     """
     # Monday | 2024-01-08 | 08:00 - 11:00 (2h)
-    ReservationFactory.create(
+    ReservationFactory.create_for_reservation_unit(
+        reservation_unit=reservation_unit,
         begin=_datetime(year=2024, month=1, day=8, hour=8),
         end=_datetime(year=2024, month=1, day=8, hour=11),
-        reservation_unit=[reservation_unit],
-        state=ReservationStateChoice.CREATED,
     )
     # Monday | 2024-01-08 | 12:00 - 17:00 (5h)
-    ReservationFactory.create(
+    ReservationFactory.create_for_reservation_unit(
+        reservation_unit=reservation_unit,
         begin=_datetime(year=2024, month=1, day=8, hour=12),
         end=_datetime(year=2024, month=1, day=8, hour=17),
-        reservation_unit=[reservation_unit],
-        state=ReservationStateChoice.CREATED,
     )
 
     # Monday | 2024-01-08 | 08:00 - 20:30 (12.5h)
@@ -1251,11 +1244,10 @@ def test__query_reservation_unit_reservable__reservations__filter_start_time_at_
     reservation_unit.save()
 
     # Monday | 2024-01-09 | 14:00 - 15:30 (1.5h)
-    ReservationFactory.create(
+    ReservationFactory.create_for_reservation_unit(
+        reservation_unit=reservation_unit,
         begin=_datetime(year=2024, month=1, day=9, hour=14),
         end=_datetime(year=2024, month=1, day=9, hour=15, minute=30),
-        reservation_unit=[reservation_unit],
-        state=ReservationStateChoice.CREATED,
     )
 
     # Monday | 2024-01-09 | 08:00 - 20:30 (12.5h)
@@ -1297,10 +1289,10 @@ def test__query_reservation_unit_reservable__reservations__dont_include_cancelle
     reservation_unit.save()
 
     # Monday | 2024-01-09 | 10:00 - 12:00 (2h)
-    ReservationFactory.create(
+    ReservationFactory.create_for_reservation_unit(
+        reservation_unit=reservation_unit,
         begin=_datetime(year=2024, month=1, day=9, hour=10),
         end=_datetime(year=2024, month=1, day=9, hour=12),
-        reservation_unit=[reservation_unit],
         state=state,
     )
 
@@ -1350,23 +1342,17 @@ def test__query_reservation_unit_reservable__reservations__overlapping_buffers_o
     reservation_unit.save()
 
     # Monday | 2024-01-09 | 10:00 - 11:30 (1.5h) + 30 in buffer before/after
-    ReservationFactory.create(
+    ReservationFactory.create_for_reservation_unit(
+        reservation_unit=reservation_unit,
         begin=_datetime(year=2024, month=1, day=9, hour=10),
         end=_datetime(year=2024, month=1, day=9, hour=11, minute=30),
-        buffer_time_before=reservation_unit.buffer_time_before,
-        buffer_time_after=reservation_unit.buffer_time_after,
-        reservation_unit=[reservation_unit],
-        state=ReservationStateChoice.CREATED,
     )
 
     # Monday | 2024-01-09 | 13:00 - 15:30 (1.5h) + 30 in buffer before/after
-    ReservationFactory.create(
+    ReservationFactory.create_for_reservation_unit(
+        reservation_unit=reservation_unit,
         begin=_datetime(year=2024, month=1, day=9, hour=13),
         end=_datetime(year=2024, month=1, day=9, hour=15, minute=30),
-        buffer_time_before=reservation_unit.buffer_time_before,
-        buffer_time_after=reservation_unit.buffer_time_after,
-        reservation_unit=[reservation_unit],
-        state=ReservationStateChoice.CREATED,
     )
 
     # Monday | 2024-01-09 | 10:00 - 20:00 (10h)
@@ -1427,23 +1413,17 @@ def test__query_reservation_unit_reservable__reservations__overlapping_buffers_a
     reservation_unit.save()
 
     # Monday | 2024-01-09 | 10:00 - 11:30 (1.5h) + 30 in buffer before/after
-    ReservationFactory.create(
+    ReservationFactory.create_for_reservation_unit(
+        reservation_unit=reservation_unit,
         begin=_datetime(year=2024, month=1, day=9, hour=10),
         end=_datetime(year=2024, month=1, day=9, hour=11, minute=30),
-        buffer_time_before=reservation_unit.buffer_time_before,
-        buffer_time_after=reservation_unit.buffer_time_after,
-        reservation_unit=[reservation_unit],
-        state=ReservationStateChoice.CREATED,
     )
 
     # Monday | 2024-01-09 | 13:00 - 15:30 (1.5h) + 30 in buffer before/after
-    ReservationFactory.create(
+    ReservationFactory.create_for_reservation_unit(
+        reservation_unit=reservation_unit,
         begin=_datetime(year=2024, month=1, day=9, hour=13),
         end=_datetime(year=2024, month=1, day=9, hour=15, minute=30),
-        buffer_time_before=reservation_unit.buffer_time_before,
-        buffer_time_after=reservation_unit.buffer_time_after,
-        reservation_unit=[reservation_unit],
-        state=ReservationStateChoice.CREATED,
     )
 
     # Monday | 2024-01-09 | 10:00 - 20:00 (10h)
@@ -1538,23 +1518,17 @@ def test__query_reservation_unit_reservable__reservations__buffered_goes_over_ti
     reservation_unit.save()
 
     # Monday | 2024-01-09 | 10:00 - 11:30 (1.5h) + 30 in buffer before/after
-    ReservationFactory.create(
+    ReservationFactory.create_for_reservation_unit(
+        reservation_unit=reservation_unit,
         begin=_datetime(year=2024, month=1, day=9, hour=10),
         end=_datetime(year=2024, month=1, day=9, hour=11, minute=30),
-        buffer_time_before=reservation_unit.buffer_time_before,
-        buffer_time_after=reservation_unit.buffer_time_after,
-        reservation_unit=[reservation_unit],
-        state=ReservationStateChoice.CREATED,
     )
 
     # Monday | 2024-01-09 | 13:00 - 15:30 (1.5h) + 30 in buffer before/after
-    ReservationFactory.create(
+    ReservationFactory.create_for_reservation_unit(
+        reservation_unit=reservation_unit,
         begin=_datetime(year=2024, month=1, day=9, hour=13),
         end=_datetime(year=2024, month=1, day=9, hour=15, minute=30),
-        buffer_time_before=reservation_unit.buffer_time_before,
-        buffer_time_after=reservation_unit.buffer_time_after,
-        reservation_unit=[reservation_unit],
-        state=ReservationStateChoice.CREATED,
     )
 
     # Monday | 2024-01-09 | 10:00 - 20:00 (10h)
