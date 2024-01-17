@@ -10,7 +10,6 @@ from elasticsearch_django.models import SearchResultsQuerySet
 from applications.choices import ApplicationRoundStatusChoice
 from applications.models import ApplicationRound
 from common.date_utils import (
-    DEFAULT_TIMEZONE,
     local_datetime,
     local_datetime_max,
     local_datetime_min,
@@ -294,17 +293,13 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
             )
 
             # Go through each ReservableTimeSpan individually one-by-one
-            for element in reservation_unit.origin_hauki_resource.reservable_time_spans.all():
-                reservable_time_span = TimeSpanElement(
-                    start_datetime=element.start_datetime.astimezone(DEFAULT_TIMEZONE),
-                    end_datetime=element.end_datetime.astimezone(DEFAULT_TIMEZONE),
-                    is_reservable=True,
-                )
+            for reservable_time_span in reservation_unit.origin_hauki_resource.reservable_time_spans.all():
+                current_time_span = reservable_time_span.as_time_span_element()
 
                 # Closed time spans that cause the ReservationUnit to be shown as closed
                 hard_closed_time_spans: list[TimeSpanElement] = (
                     reservation_unit_hard_closed_time_spans
-                    + reservable_time_span.generate_closed_time_spans_outside_filter(
+                    + current_time_span.generate_closed_time_spans_outside_filter(
                         filter_time_start=filter_time_start,
                         filter_time_end=filter_time_end,
                     )
@@ -314,7 +309,7 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
                 # This will also split reservable time spans into multiple time spans if needed.
                 # What is left is a list of time spans that are reservable and within the given filter parameters.
                 hard_normalised_reservable_time_spans = override_reservable_with_closed_time_spans(
-                    reservable_time_spans=[reservable_time_span],
+                    reservable_time_spans=[current_time_span],
                     closed_time_spans=hard_closed_time_spans,
                 )
 
