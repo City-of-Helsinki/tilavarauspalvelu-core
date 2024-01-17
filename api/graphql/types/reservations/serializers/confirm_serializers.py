@@ -5,7 +5,7 @@ from api.graphql.types.reservations.serializers.update_serializers import (
 )
 from merchants.models import Language, OrderStatus, PaymentOrder
 from merchants.verkkokauppa.helpers import create_verkkokauppa_order
-from reservation_units.models import PaymentType, PricingType
+from reservation_units.enums import PaymentType, PricingType
 from reservation_units.utils.reservation_unit_pricing_helper import (
     ReservationUnitPricingHelper,
 )

@@ -13,12 +13,12 @@ from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from applications.choices import PriorityChoice
 from applications.models import City
 from opening_hours.models import ReservableTimeSpan
-from reservation_units.enums import ReservationStartInterval
-from reservation_units.models import (
+from reservation_units.enums import (
     PriceUnit,
     PricingStatus,
     PricingType,
     ReservationKind,
+    ReservationStartInterval,
 )
 from reservations.choices import ReservationStateChoice, ReservationTypeChoice
 from reservations.models import AgeGroup, Reservation

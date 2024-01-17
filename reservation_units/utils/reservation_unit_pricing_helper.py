@@ -4,7 +4,8 @@ from typing import Any
 
 from graphql import GraphQLError
 
-from reservation_units.models import PricingStatus, ReservationUnit, ReservationUnitPricing
+from reservation_units.enums import PricingStatus
+from reservation_units.models import ReservationUnit, ReservationUnitPricing
 from utils.decimal_utils import round_decimal
 
 

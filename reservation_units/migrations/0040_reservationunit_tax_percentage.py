@@ -3,19 +3,25 @@
 import django.db.models.deletion
 from django.db import migrations, models
 
-import reservation_units.models
+from reservation_units.models.reservation_unit_pricing import get_default_tax_percentage
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('reservation_units', '0039_taxpercentage'),
+        ("reservation_units", "0039_taxpercentage"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='reservationunit',
-            name='tax_percentage',
-            field=models.ForeignKey(default=reservation_units.models.get_default_tax_percentage, help_text='The percentage of tax included in the price', on_delete=django.db.models.deletion.PROTECT, related_name='reservation_units', to='reservation_units.taxpercentage', verbose_name='Tax percentage'),
+            model_name="reservationunit",
+            name="tax_percentage",
+            field=models.ForeignKey(
+                default=get_default_tax_percentage,
+                help_text="The percentage of tax included in the price",
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="reservation_units",
+                to="reservation_units.taxpercentage",
+                verbose_name="Tax percentage",
+            ),
         ),
     ]

@@ -3,15 +3,17 @@ from datetime import date, timedelta
 from common.management.commands._utils import SetName, with_logs
 from merchants.models import PaymentAccounting, PaymentMerchant, PaymentProduct
 from opening_hours.models import OriginHaukiResource
-from reservation_units.enums import ReservationStartInterval
-from reservation_units.models import (
-    Equipment,
-    EquipmentCategory,
+from reservation_units.enums import (
     PriceUnit,
     PricingStatus,
     PricingType,
-    Qualifier,
     ReservationKind,
+    ReservationStartInterval,
+)
+from reservation_units.models import (
+    Equipment,
+    EquipmentCategory,
+    Qualifier,
     ReservationUnit,
     ReservationUnitCancellationRule,
     ReservationUnitPaymentType,

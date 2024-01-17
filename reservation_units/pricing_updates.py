@@ -2,7 +2,8 @@ from datetime import date
 
 
 def update_reservation_unit_pricings(today: date) -> int:
-    from reservation_units.models import PricingStatus, ReservationUnitPricing
+    from reservation_units.enums import PricingStatus
+    from reservation_units.models import ReservationUnitPricing
 
     future_pricings = ReservationUnitPricing.objects.filter(status=PricingStatus.PRICING_STATUS_FUTURE, begins=today)
     num_updated = 0

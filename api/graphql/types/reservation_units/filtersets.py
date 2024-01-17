@@ -11,8 +11,9 @@ from elasticsearch_django.models import SearchQuery
 
 from common.filtersets import BaseModelFilterSet, IntMultipleChoiceFilter
 from elastic_django.reservation_units.query_builder import ReservationUnitQueryBuilderMixin
-from reservation_units.enums import ReservationState, ReservationUnitState
-from reservation_units.models import Equipment, ReservationKind, ReservationUnit, ReservationUnitQuerySet
+from reservation_units.enums import ReservationKind, ReservationState, ReservationUnitState
+from reservation_units.models import Equipment, ReservationUnit
+from reservation_units.querysets import ReservationUnitQuerySet
 from reservation_units.utils.reservation_unit_reservation_state_helper import ReservationUnitReservationStateHelper
 from reservation_units.utils.reservation_unit_state_helper import ReservationUnitStateHelper
 from spaces.models import Unit

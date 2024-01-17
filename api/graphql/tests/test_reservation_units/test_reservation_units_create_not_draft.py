@@ -10,15 +10,14 @@ from api.graphql.tests.test_reservation_units.base import (
 )
 from api.graphql.tests.test_reservation_units.conftest import reservation_unit_create_mutation
 from opening_hours.errors import HaukiAPIError
-from reservation_units.enums import ReservationStartInterval
-from reservation_units.models import (
+from reservation_units.enums import (
     PriceUnit,
     PricingStatus,
     PricingType,
     ReservationKind,
-    ReservationUnit,
-    TaxPercentage,
+    ReservationStartInterval,
 )
+from reservation_units.models import ReservationUnit, TaxPercentage
 from tests.factories import (
     EquipmentFactory,
     PurposeFactory,

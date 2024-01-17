@@ -8,7 +8,8 @@ from api.graphql.tests.test_reservation_units.base import (
     ReservationUnitMutationsTestCaseBase,
 )
 from api.graphql.tests.test_reservation_units.conftest import reservation_unit_create_mutation
-from reservation_units.models import PaymentType, ReservationUnit
+from reservation_units.enums import PaymentType
+from reservation_units.models import ReservationUnit
 from tests.helpers import patch_method
 
 

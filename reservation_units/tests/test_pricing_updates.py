@@ -2,7 +2,7 @@ from datetime import date
 
 from django.test import TestCase
 
-from reservation_units.models import PricingStatus
+from reservation_units.enums import PricingStatus
 from reservation_units.pricing_updates import update_reservation_unit_pricings
 from tests.factories import ReservationUnitFactory, ReservationUnitPricingFactory
 

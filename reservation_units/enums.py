@@ -1,7 +1,19 @@
 from enum import Enum
 
+from django.db import models
 from django.db.models import TextChoices
 from django.utils.translation import gettext_lazy as _
+
+__all__ = [
+    "PaymentType",
+    "PriceUnit",
+    "PricingStatus",
+    "PricingType",
+    "ReservationKind",
+    "ReservationStartInterval",
+    "ReservationState",
+    "ReservationUnitState",
+]
 
 
 class ReservationUnitState(Enum):
@@ -31,3 +43,36 @@ class ReservationStartInterval(TextChoices):
     @property
     def as_number(self) -> int:
         return int(self.value.split("_")[1])
+
+
+class ReservationKind(models.TextChoices):
+    DIRECT = "direct"
+    SEASON = "season"
+    DIRECT_AND_SEASON = "direct_and_season"
+
+
+class PricingType(models.TextChoices):
+    PAID = "paid"
+    FREE = "free"
+
+
+class PaymentType(models.TextChoices):
+    ONLINE = "ONLINE"
+    INVOICE = "INVOICE"
+    ON_SITE = "ON_SITE"
+
+
+class PriceUnit(models.TextChoices):
+    PRICE_UNIT_PER_15_MINS = "per_15_mins", _("per 15 minutes")
+    PRICE_UNIT_PER_30_MINS = "per_30_mins", _("per 30 minutes")
+    PRICE_UNIT_PER_HOUR = "per_hour", _("per hour")
+    PRICE_UNIT_PER_HALF_DAY = "per_half_day", _("per half a day")
+    PRICE_UNIT_PER_DAY = "per_day", _("per day")
+    PRICE_UNIT_PER_WEEK = "per_week", _("per week")
+    PRICE_UNIT_FIXED = "fixed", _("fixed")
+
+
+class PricingStatus(models.TextChoices):
+    PRICING_STATUS_PAST = "past", _("past")
+    PRICING_STATUS_ACTIVE = "active", _("active")
+    PRICING_STATUS_FUTURE = "future", _("future")
