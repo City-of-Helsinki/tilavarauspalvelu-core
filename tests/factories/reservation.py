@@ -59,6 +59,18 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         end_dt=datetime(2022, 5, 31, tzinfo=timezone.utc),
     )
 
+    @classmethod
+    def create_for_reservation_unit(cls, reservation_unit: ReservationUnit, **kwargs: Any) -> Reservation:
+        """Create a Reservation for a single ReservationUnit with its buffer times."""
+        kwargs.setdefault("state", ReservationStateChoice.CREATED)
+
+        return cls.create(
+            buffer_time_before=reservation_unit.buffer_time_before,
+            buffer_time_after=reservation_unit.buffer_time_after,
+            reservation_unit=[reservation_unit],
+            **kwargs,
+        )
+
     @factory.post_generation
     def reservation_unit(self, create: bool, reservation_units: list[ReservationUnit], **kwargs: Any):
         if not create:
