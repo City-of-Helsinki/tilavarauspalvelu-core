@@ -18,20 +18,20 @@ class ReservableTimeSpanQuerySet(QuerySet):
         """
         Filter to reservable time spans that overlap with the given period.
 
-                 <---period--->
-        ------  |              |           # No
-        --------|              |           # No
-        --------|--            |           # Yes
-        --------|--------------|           # Yes
-                |              |           #
-                |  ----------  |           # Yes
-                |--------------|           # Yes
-        --------|--------------|--------   # Yes
-                |              |           #
-                |--------------|--------   # Yes
-                |            --|--------   # Yes
-                |              |--------   # No
-                |              |  ------   # No
+             ┌─ Period ─┐
+        ---  │          │      # No
+        -----│          │      # No
+        -----│--        │      # Yes
+        -----│----------│      # Yes
+             │          │
+             │  ------  │      # Yes
+             │----------│      # Yes
+        -----│----------│----- # Yes
+             │          │
+             │----------│----- # Yes
+             │        --│----- # Yes
+             │          │----- # No
+             │          │  --- # No
         """
         start: datetime = _normalize_datetime(start)
         end: datetime = _normalize_datetime(end, timedelta_days=1)
@@ -41,20 +41,20 @@ class ReservableTimeSpanQuerySet(QuerySet):
         """
         Filter to reservable time spans that can fully fill in the given period.
 
-                 <---period--->
-        ------  |              |           # No
-        --------|              |           # No
-        --------|--            |           # No
-        --------|--------------|           # Yes
-                |              |           #
-                |  ----------  |           # No
-                |--------------|           # Yes
-        --------|--------------|--------   # Yes
-                |              |           #
-                |--------------|--------   # Yes
-                |            --|--------   # No
-                |              |--------   # No
-                |              |  ------   # No
+             ┌─ Period ─┐
+        ---  │          │      # No
+        -----│          │      # No
+        -----│--        │      # No
+        -----│----------│      # Yes
+             │          │
+             │  ------  │      # No
+             │----------│      # Yes
+        -----│----------│----- # Yes
+             │          │
+             │----------│----- # Yes
+             │        --│----- # No
+             │          │----- # No
+             │          │  --- # No
         """
         start: datetime = _normalize_datetime(start)
         end: datetime = _normalize_datetime(end, timedelta_days=1)

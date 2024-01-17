@@ -271,7 +271,7 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
                 hard_closed_time_spans: list[TimeSpanElement] = (
                     shared_closed_time_spans
                     + reservation_unit_hard_closed_time_spans
-                    + reservable_time_span.get_as_closed_time_spans(
+                    + reservable_time_span.generate_closed_time_spans_outside_filter(
                         filter_time_start=filter_time_start,
                         filter_time_end=filter_time_end,
                     )
