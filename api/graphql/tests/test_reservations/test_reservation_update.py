@@ -11,11 +11,11 @@ from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from applications.models import City
-from reservation_units.enums import ReservationStartInterval
-from reservation_units.models import (
+from reservation_units.enums import (
     PriceUnit,
     PricingStatus,
     PricingType,
+    ReservationStartInterval,
 )
 from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import (

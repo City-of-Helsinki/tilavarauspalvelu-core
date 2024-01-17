@@ -2,8 +2,8 @@ import datetime
 
 import pytest
 
-from reservation_units.enums import ReservationState
-from reservation_units.models import PricingType, ReservationUnit
+from reservation_units.enums import PricingType, ReservationState
+from reservation_units.models import ReservationUnit
 from reservation_units.utils.reservation_unit_reservation_state_helper import ReservationUnitReservationStateHelper
 from tests.factories import PaymentProductFactory, ReservationUnitFactory, ReservationUnitPricingFactory
 

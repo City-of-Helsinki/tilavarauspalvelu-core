@@ -23,7 +23,8 @@ from permissions.models import (
     UnitRoleChoice,
     UnitRolePermission,
 )
-from reservation_units.models import ReservationKind, ReservationUnit
+from reservation_units.enums import ReservationKind
+from reservation_units.models import ReservationUnit
 from reservations.choices import ReservationStateChoice
 from terms_of_use.models import TermsOfUse
 from tests.factories import (

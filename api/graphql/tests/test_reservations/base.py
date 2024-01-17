@@ -6,8 +6,8 @@ from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.base import GrapheneTestCaseBase
 from permissions.models import UnitRole, UnitRoleChoice, UnitRolePermission
-from reservation_units.enums import ReservationStartInterval
-from reservation_units.models import PaymentType, ReservationUnit
+from reservation_units.enums import PaymentType, ReservationStartInterval
+from reservation_units.models import ReservationUnit
 from reservations.models import ReservationMetadataField, ReservationMetadataSet
 from tests.factories import (
     OriginHaukiResourceFactory,

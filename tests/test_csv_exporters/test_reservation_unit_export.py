@@ -5,7 +5,8 @@ from unittest import mock
 import pytest
 from django.utils import timezone
 
-from reservation_units.models import PricingStatus, ReservationUnit
+from reservation_units.enums import PricingStatus
+from reservation_units.models import ReservationUnit
 from reservation_units.utils.export_data import HEADER_ROW, ReservationUnitExporter
 from tests.factories import ReservationUnitFactory
 from tests.helpers import parametrize_helper

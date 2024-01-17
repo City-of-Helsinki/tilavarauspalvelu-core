@@ -14,7 +14,7 @@ from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from applications.models import City
 from email_notification.models import EmailType
 from merchants.models import OrderStatus, PaymentOrder, PaymentType
-from reservation_units.models import PricingType
+from reservation_units.enums import PricingType
 from reservations.choices import ReservationStateChoice
 from reservations.models import AgeGroup
 from tests.factories import (

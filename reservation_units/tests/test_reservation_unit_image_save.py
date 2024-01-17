@@ -17,7 +17,7 @@ class ReservationUnitImageSaveTestCase(TestCase):
         cls.res_unit = ReservationUnitFactory()
 
     @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
-    @mock.patch("reservation_units.models.update_urls")
+    @mock.patch("reservation_units.models.reservation_unit_image.update_urls")
     def test_update_urls_called_when_save(self, mock):
         image = ReservationUnitImage(reservation_unit=self.res_unit, image_type="main")
 
@@ -25,7 +25,7 @@ class ReservationUnitImageSaveTestCase(TestCase):
 
         assert mock.delay.call_count == 1
 
-    @mock.patch("reservation_units.models.purge_image_cache.delay")
+    @mock.patch("reservation_units.models._mixins.purge_image_cache.delay")
     @override_settings(IMAGE_CACHE_ENABLED=True)
     @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
     def test_image_cache_is_purged_on_save(self, purge):

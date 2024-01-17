@@ -4,7 +4,8 @@ from django.http import FileResponse
 
 from applications.models import ApplicationRoundTimeSlot
 from opening_hours.utils.hauki_resource_hash_updater import HaukiResourceHashUpdater
-from reservation_units.models import ReservationKind, ReservationUnit, ReservationUnitImage, ReservationUnitPricing
+from reservation_units.enums import ReservationKind
+from reservation_units.models import ReservationUnit, ReservationUnitImage, ReservationUnitPricing
 from reservation_units.utils.export_data import ReservationUnitExporter
 
 from .forms.reservation_unit import ApplicationRoundTimeSlotForm, ReservationUnitAdminForm

@@ -8,8 +8,8 @@ from rest_framework.test import APIClient
 
 from api.graphql.tests.base import GrapheneTestCaseBase
 from merchants.verkkokauppa.product.types import Product
-from reservation_units.enums import ReservationStartInterval
-from reservation_units.models import PaymentType, TaxPercentage
+from reservation_units.enums import PaymentType, ReservationStartInterval
+from reservation_units.models import TaxPercentage
 from terms_of_use.models import TermsOfUse
 from tests.factories import (
     PurposeFactory,

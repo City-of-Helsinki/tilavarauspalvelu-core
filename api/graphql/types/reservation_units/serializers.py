@@ -20,16 +20,18 @@ from api.legacy_rest_api.serializers import ReservationUnitSerializer
 from applications.choices import WeekdayChoice
 from applications.models import ApplicationRoundTimeSlot
 from common.fields.serializer import IntegerPrimaryKeyField
-from reservation_units.enums import ReservationStartInterval
-from reservation_units.models import (
-    Equipment,
-    EquipmentCategory,
+from reservation_units.enums import (
     PriceUnit,
     PricingStatus,
     PricingType,
+    ReservationKind,
+    ReservationStartInterval,
+)
+from reservation_units.models import (
+    Equipment,
+    EquipmentCategory,
     Purpose,
     Qualifier,
-    ReservationKind,
     ReservationUnit,
     ReservationUnitCancellationRule,
     ReservationUnitImage,

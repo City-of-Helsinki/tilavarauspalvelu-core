@@ -13,7 +13,7 @@ class ReservationUnitPaymentHelper:
 
     @classmethod
     def requires_product_mapping_update(cls, reservation_unit) -> bool:
-        from reservation_units.models import PricingStatus, PricingType
+        from reservation_units.enums import PricingStatus, PricingType
 
         payment_merchant = cls.get_merchant(reservation_unit)
         if payment_merchant is None:

@@ -4,8 +4,7 @@ from functools import partial
 import pytest
 from django.utils.timezone import get_default_timezone
 
-from reservation_units.enums import ReservationState
-from reservation_units.models import PricingType
+from reservation_units.enums import PricingType, ReservationState
 from tests.factories import PaymentProductFactory, ReservationUnitFactory
 from tests.gql_builders import build_query
 

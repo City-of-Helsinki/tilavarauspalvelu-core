@@ -16,7 +16,8 @@ from api.graphql.types.reservations.serializers.mixins import (
 from applications.models import City
 from common.fields.serializer import IntegerPrimaryKeyField
 from permissions.helpers import can_handle_reservation_with_units
-from reservation_units.models import ReservationKind, ReservationUnit
+from reservation_units.enums import ReservationKind
+from reservation_units.models import ReservationUnit
 from reservation_units.utils.reservation_unit_reservation_scheduler import ReservationUnitReservationScheduler
 from reservations.choices import (
     RESERVEE_LANGUAGE_CHOICES,

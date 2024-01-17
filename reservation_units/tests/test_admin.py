@@ -2,8 +2,8 @@ from django.contrib.admin import AdminSite
 from django.test import RequestFactory, TestCase
 
 from reservation_units.admin.reservation_unit import ReservationUnitAdmin
-from reservation_units.enums import ReservationStartInterval
-from reservation_units.models import ReservationKind, ReservationUnit
+from reservation_units.enums import ReservationKind, ReservationStartInterval
+from reservation_units.models import ReservationUnit
 from terms_of_use.models import TermsOfUse
 from tests.factories import ReservationUnitFactory, TermsOfUseFactory
 

@@ -5,10 +5,8 @@ from assertpy import assert_that
 from django.utils.timezone import get_default_timezone, utc
 
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
-from api.graphql.types.reservations.serializers.mixins import (
-    ReservationPriceMixin,
-)
-from reservation_units.models import PriceUnit, PricingStatus, PricingType
+from api.graphql.types.reservations.serializers.mixins import ReservationPriceMixin
+from reservation_units.enums import PriceUnit, PricingStatus, PricingType
 from tests.factories import ReservationUnitPricingFactory, TaxPercentageFactory
 
 

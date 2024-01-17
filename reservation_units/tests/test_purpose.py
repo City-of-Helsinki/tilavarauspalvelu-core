@@ -12,7 +12,7 @@ from tests.factories import PurposeFactory
 
 
 class PurposeTestCase(TestCase):
-    @mock.patch("reservation_units.models.purge_image_cache.delay")
+    @mock.patch("reservation_units.models._mixins.purge_image_cache.delay")
     @override_settings(IMAGE_CACHE_ENABLED=True)
     @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
     def test_image_purge_on_save(self, purge):

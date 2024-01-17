@@ -9,7 +9,8 @@ from api.graphql.tests.test_reservation_units.conftest import (
     reservation_unit_create_mutation,
     reservation_unit_update_mutation,
 )
-from reservation_units.models import PricingStatus, PricingType, ReservationUnit
+from reservation_units.enums import PricingStatus, PricingType
+from reservation_units.models import ReservationUnit
 
 
 class ReservationUnitPricingMutationsTestCase(ReservationUnitMutationsTestCaseBase):

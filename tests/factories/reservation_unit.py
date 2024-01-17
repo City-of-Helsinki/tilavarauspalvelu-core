@@ -7,11 +7,9 @@ import factory
 from factory import fuzzy
 
 from applications.models import ApplicationRound, ApplicationRoundTimeSlot
+from reservation_units.enums import PriceUnit, PricingStatus, PricingType
 from reservation_units.models import (
     Equipment,
-    PriceUnit,
-    PricingStatus,
-    PricingType,
     Purpose,
     Qualifier,
     ReservationUnit,

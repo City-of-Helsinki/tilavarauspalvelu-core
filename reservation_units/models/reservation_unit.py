@@ -1,193 +1,25 @@
 import datetime
 import uuid
-from decimal import Decimal
 
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.db import models
-from django.db.models import Q, QuerySet
 from django.utils.translation import gettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
-from easy_thumbnails.fields import ThumbnailerImageField
-from easy_thumbnails.files import get_thumbnailer
 from elasticsearch_django.models import SearchDocumentManagerMixin, SearchDocumentMixin
 
 from common.connectors import ReservationUnitActionsConnector
-from merchants.models import PaymentAccounting, PaymentMerchant, PaymentProduct
-from reservation_units.enums import ReservationStartInterval, ReservationState, ReservationUnitState
+from reservation_units.enums import ReservationKind, ReservationStartInterval, ReservationState, ReservationUnitState
 from reservation_units.querysets import ReservationUnitQuerySet
-from reservation_units.tasks import purge_image_cache, refresh_reservation_unit_product_mapping, update_urls
-from resources.models import Resource
-from services.models import Service
-from spaces.models import Space, Unit
-from terms_of_use.models import TermsOfUse
+from reservation_units.tasks import refresh_reservation_unit_product_mapping
 from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 
-User = get_user_model()
+__all__ = [
+    "ReservationUnit",
+]
 
 
-class EquipmentCategory(models.Model):
-    name = models.CharField(verbose_name=_("Name"), max_length=200)
-    rank = models.PositiveIntegerField(
-        blank=True,
-        null=True,
-        verbose_name=_("Order number"),
-        help_text=_("Order number to be used in api sorting."),
-    )
-
-    def __str__(self):
-        return self.name
-
-
-class Equipment(models.Model):
-    name = models.CharField(verbose_name=_("Name"), max_length=200)
-    category = models.ForeignKey(
-        EquipmentCategory,
-        verbose_name=_("Category"),
-        related_name="equipment",
-        on_delete=models.CASCADE,
-        null=False,
-    )
-
-    def __str__(self):
-        return self.name
-
-
-class ReservationUnitType(models.Model):
-    name = models.CharField(verbose_name=_("Name"), max_length=255)
-    rank = models.PositiveIntegerField(
-        blank=True,
-        null=True,
-        verbose_name=_("Order number"),
-        help_text=_("Order number to be used in api sorting."),
-    )
-
-    class Meta:
-        ordering = ["rank"]
-
-    def __str__(self):
-        return self.name
-
-
-class KeywordCategory(models.Model):
-    name = models.CharField(verbose_name=_("Name"), max_length=255)
-
-    def __str__(self):
-        return f"{self.name}"
-
-
-class KeywordGroup(models.Model):
-    name = models.CharField(verbose_name=_("Name"), max_length=255)
-
-    keyword_category = models.ForeignKey(
-        KeywordCategory,
-        verbose_name=_("Keyword category"),
-        related_name="keyword_groups",
-        blank=False,
-        null=False,
-        on_delete=models.PROTECT,
-    )
-
-    def __str__(self):
-        return f"{self.name}"
-
-
-class Keyword(models.Model):
-    name = models.CharField(verbose_name=_("Name"), max_length=255)
-
-    keyword_group = models.ForeignKey(
-        KeywordGroup,
-        verbose_name=_("Keyword group"),
-        related_name="keywords",
-        blank=False,
-        null=False,
-        on_delete=models.PROTECT,
-    )
-
-    def __str__(self):
-        return f"{self.name}"
-
-
-class ReservationUnitCancellationRule(models.Model):
-    name = models.CharField(verbose_name=_("Name for the rule"), max_length=255, null=False, blank=False)
-    can_be_cancelled_time_before = models.DurationField(
-        verbose_name=_("Time before user can cancel reservations of this reservation unit"),
-        blank=True,
-        null=True,
-        default=datetime.timedelta(hours=24),
-        help_text="Seconds before reservations related to this cancellation rule can be cancelled without handling.",
-    )
-    needs_handling = models.BooleanField(
-        default=False,
-        verbose_name=_("Will the cancellation need manual staff handling"),
-    )
-
-    def __str__(self):
-        return self.name
-
-
-class TaxPercentage(models.Model):
-    value = models.DecimalField(
-        verbose_name=_("Tax percentage"),
-        max_digits=5,
-        decimal_places=2,
-        help_text="The tax percentage for a price",
-    )
-
-    def __str__(self) -> str:
-        return f"{self.value}%"
-
-    @property
-    def decimal(self):
-        return self.value / Decimal("100")
-
-
-def get_default_tax_percentage() -> int:
-    return TaxPercentage.objects.order_by("value").first().pk
-
-
-class ReservationKind(models.TextChoices):
-    DIRECT = "direct"
-    SEASON = "season"
-    DIRECT_AND_SEASON = "direct_and_season"
-
-
-class PricingType(models.TextChoices):
-    PAID = "paid"
-    FREE = "free"
-
-
-class PaymentType(models.TextChoices):
-    ONLINE = "ONLINE"
-    INVOICE = "INVOICE"
-    ON_SITE = "ON_SITE"
-
-
-class PriceUnit(models.TextChoices):
-    PRICE_UNIT_PER_15_MINS = "per_15_mins", _("per 15 minutes")
-    PRICE_UNIT_PER_30_MINS = "per_30_mins", _("per 30 minutes")
-    PRICE_UNIT_PER_HOUR = "per_hour", _("per hour")
-    PRICE_UNIT_PER_HALF_DAY = "per_half_day", _("per half a day")
-    PRICE_UNIT_PER_DAY = "per_day", _("per day")
-    PRICE_UNIT_PER_WEEK = "per_week", _("per week")
-    PRICE_UNIT_FIXED = "fixed", _("fixed")
-
-
-class PricingStatus(models.TextChoices):
-    PRICING_STATUS_PAST = "past", _("past")
-    PRICING_STATUS_ACTIVE = "active", _("active")
-    PRICING_STATUS_FUTURE = "future", _("future")
-
-
-class ReservationUnitPaymentType(models.Model):
-    code = models.CharField(verbose_name=_("Code"), max_length=32, blank=False, null=False, primary_key=True)
-
-    def __str__(self):
-        return self.code
-
-
-class ReservationUnitManager(SearchDocumentManagerMixin):
-    def get_search_queryset(self, index: str = "_all") -> QuerySet:
+class ReservationUnitManager(SearchDocumentManagerMixin.from_queryset(ReservationUnitQuerySet)):
+    def get_search_queryset(self, index: str = "_all") -> models.QuerySet:
         return self.get_queryset()
 
 
@@ -195,23 +27,28 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
     sku = models.CharField(verbose_name=_("SKU"), max_length=255, blank=True, default="")
     name = models.CharField(verbose_name=_("Name"), max_length=255)
     description = models.TextField(verbose_name=_("Description"), blank=True, default="")
-    spaces = models.ManyToManyField(Space, verbose_name=_("Spaces"), related_name="reservation_units", blank=True)
+    spaces = models.ManyToManyField(
+        "spaces.Space",
+        verbose_name=_("Spaces"),
+        related_name="reservation_units",
+        blank=True,
+    )
 
     keyword_groups = models.ManyToManyField(
-        KeywordGroup,
+        "reservation_units.KeywordGroup",
         verbose_name=_("Keyword groups"),
         related_name="reservation_units",
         blank=True,
     )
 
     resources = models.ManyToManyField(
-        Resource,
+        "resources.Resource",
         verbose_name=_("Resources"),
         related_name="reservation_units",
         blank=True,
     )
     services = models.ManyToManyField(
-        Service,
+        "services.Service",
         verbose_name=_("Services"),
         related_name="reservation_units",
         blank=True,
@@ -231,7 +68,7 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
     )
 
     reservation_unit_type = models.ForeignKey(
-        ReservationUnitType,
+        "reservation_units.ReservationUnitType",
         verbose_name=_("Type"),
         related_name="reservation_units",
         blank=True,
@@ -240,7 +77,7 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
     )
     require_introduction = models.BooleanField(verbose_name=_("Require introduction"), default=False)
     equipments = models.ManyToManyField(
-        Equipment,
+        "reservation_units.Equipment",
         verbose_name=_("Equipments"),
         blank=True,
     )
@@ -251,7 +88,7 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
         null=True,
     )
     payment_terms = models.ForeignKey(
-        TermsOfUse,
+        "terms_of_use.TermsOfUse",
         related_name="payment_terms_reservation_unit",
         verbose_name=_("Payment terms"),
         blank=True,
@@ -259,7 +96,7 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
         on_delete=models.SET_NULL,
     )
     cancellation_terms = models.ForeignKey(
-        TermsOfUse,
+        "terms_of_use.TermsOfUse",
         related_name="cancellation_terms_reservation_unit",
         verbose_name=_("Cancellation terms"),
         blank=True,
@@ -267,7 +104,7 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
         on_delete=models.SET_NULL,
     )
     service_specific_terms = models.ForeignKey(
-        TermsOfUse,
+        "terms_of_use.TermsOfUse",
         related_name="service_specific_terms_reservation_unit",
         verbose_name=_("Service-specific terms"),
         blank=True,
@@ -275,7 +112,7 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
         on_delete=models.SET_NULL,
     )
     pricing_terms = models.ForeignKey(
-        TermsOfUse,
+        "terms_of_use.TermsOfUse",
         related_name="pricing_terms_reservation_unit",
         verbose_name=_("Pricing terms"),
         blank=True,
@@ -301,7 +138,7 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
     )
 
     unit = models.ForeignKey(
-        Unit,
+        "spaces.Unit",
         verbose_name=_("Unit"),
         blank=True,
         null=True,
@@ -359,7 +196,7 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
     )
 
     cancellation_rule = models.ForeignKey(
-        ReservationUnitCancellationRule,
+        "reservation_units.ReservationUnitCancellationRule",
         blank=True,
         null=True,
         on_delete=models.PROTECT,
@@ -465,7 +302,7 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
         help_text="What kind of reservations are to be booked with this reservation unit.",
     )
 
-    payment_types = models.ManyToManyField(ReservationUnitPaymentType, blank=True)
+    payment_types = models.ManyToManyField("reservation_units.ReservationUnitPaymentType", blank=True)
 
     can_apply_free_of_charge = models.BooleanField(
         blank=True,
@@ -490,7 +327,7 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
     )
 
     payment_merchant = models.ForeignKey(
-        PaymentMerchant,
+        "merchants.PaymentMerchant",
         verbose_name=_("Payment merchant"),
         related_name="reservation_units",
         on_delete=models.PROTECT,
@@ -500,7 +337,7 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
     )
 
     payment_product = models.ForeignKey(
-        PaymentProduct,
+        "merchants.PaymentProduct",
         verbose_name=_("Payment product"),
         related_name="reservation_units",
         on_delete=models.PROTECT,
@@ -510,7 +347,7 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
     )
 
     payment_accounting = models.ForeignKey(
-        PaymentAccounting,
+        "merchants.PaymentAccounting",
         verbose_name=_("Payment accounting"),
         related_name="reservation_units",
         on_delete=models.PROTECT,
@@ -519,7 +356,7 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
         help_text="Payment accounting information",
     )
 
-    objects = ReservationUnitManager.from_queryset(ReservationUnitQuerySet)()
+    objects = ReservationUnitManager()
     actions = ReservationUnitActionsConnector()
 
     class Meta:
@@ -553,6 +390,8 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
         return sum(filter(None, (space.max_persons for space in spaces))) or None
 
     def check_required_introduction(self, user):
+        from .introduction import Introduction
+
         return Introduction.objects.filter(reservation_unit=self, user=user).exists()
 
     def check_reservation_overlap(self, start_time: datetime.datetime, end_time: datetime.datetime, reservation=None):
@@ -616,7 +455,7 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
         return qs.order_by("-end").first()
 
     @property
-    def reservation_units_with_common_hierarchy(self) -> ReservationUnitQuerySet:
+    def reservation_units_with_common_hierarchy(self) -> models.QuerySet:
         """
         Find all "related" ReservationUnits where any one of these is true:
         1) There are common resources
@@ -632,7 +471,9 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
         """
         space_ids: set[int] = self.spaces.all_space_ids_though_hierarchy()
         resource_ids: set[int] = set(self.resources.all())
-        return ReservationUnit.objects.filter(Q(resources__in=resource_ids) | Q(spaces__in=space_ids)).distinct()
+        return ReservationUnit.objects.filter(
+            models.Q(resources__in=resource_ids) | models.Q(spaces__in=space_ids)
+        ).distinct()
 
     @property
     def state(self) -> ReservationUnitState:
@@ -688,203 +529,4 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
         return None
 
 
-class ReservationUnitPricingManager(models.QuerySet):
-    def active(self):
-        return self.filter(status=PricingStatus.PRICING_STATUS_ACTIVE).first()
-
-
-class ReservationUnitPricing(models.Model):
-    begins = models.DateField(
-        verbose_name=_("Date when price is activated"),
-        null=False,
-        blank=False,
-        help_text="When pricing is activated",
-    )
-
-    pricing_type = models.CharField(
-        max_length=20,
-        verbose_name=_("Pricing type"),
-        choices=PricingType.choices,
-        blank=True,
-        null=True,
-        help_text="What kind of pricing types are available with this reservation unit.",
-    )
-
-    price_unit = models.CharField(
-        max_length=20,
-        verbose_name=_("Price unit"),
-        choices=PriceUnit.choices,
-        default=PriceUnit.PRICE_UNIT_PER_HOUR,
-        help_text="Unit of the price",
-    )
-    lowest_price = models.DecimalField(
-        verbose_name=_("Lowest price"),
-        max_digits=10,
-        decimal_places=2,
-        default=0,
-        help_text="Minimum price of the reservation unit including VAT",
-    )
-
-    lowest_price_net = models.DecimalField(
-        verbose_name=_("Lowest net price"),
-        max_digits=20,
-        decimal_places=6,
-        default=0,
-        help_text="Minimum price of the reservation unit excluding VAT",
-    )
-
-    highest_price = models.DecimalField(
-        verbose_name=_("Highest price"),
-        max_digits=10,
-        decimal_places=2,
-        default=0,
-        help_text="Maximum price of the reservation unit including VAT",
-    )
-
-    highest_price_net = models.DecimalField(
-        verbose_name=_("Highest net price"),
-        max_digits=20,
-        decimal_places=6,
-        default=0,
-        help_text="Maximum price of the reservation unit excluding VAT",
-    )
-
-    tax_percentage = models.ForeignKey(
-        TaxPercentage,
-        verbose_name=_("Tax percentage"),
-        related_name="reservation_unit_pricings",
-        on_delete=models.PROTECT,
-        default=get_default_tax_percentage,
-        help_text="The percentage of tax included in the price",
-    )
-
-    status = models.CharField(
-        max_length=20,
-        verbose_name=_("Status"),
-        choices=PricingStatus.choices,
-        help_text="Status of the pricing",
-    )
-
-    reservation_unit = models.ForeignKey(
-        ReservationUnit,
-        verbose_name=_("Reservation unit"),
-        null=True,
-        blank=False,
-        related_name="pricings",
-        on_delete=models.CASCADE,
-    )
-
-    objects = ReservationUnitPricingManager.as_manager()
-
-    class Meta:
-        base_manager_name = "objects"
-
-    def __str__(self) -> str:
-        return f"{self.begins}: {self.lowest_price} - {self.highest_price} ({self.tax_percentage.value})"
-
-
-class PurgeImageCacheMixin:
-    def purge_previous_image_cache(self):
-        previous_data = self.__class__.objects.filter(pk=self.pk).first()
-        if settings.IMAGE_CACHE_ENABLED and previous_data and previous_data.image:
-            aliases = settings.THUMBNAIL_ALIASES[""]
-            for conf_key in list(aliases.keys()):
-                image_path = get_thumbnailer(previous_data.image)[conf_key].url
-                purge_image_cache.delay(image_path)
-
-
-class ReservationUnitImage(models.Model, PurgeImageCacheMixin):
-    TYPES = (
-        ("main", _("Main image")),
-        ("ground_plan", _("Ground plan")),
-        ("map", _("Map")),
-        ("other", _("Other")),
-    )
-
-    image_type = models.CharField(max_length=20, verbose_name=_("Type"), choices=TYPES)
-
-    reservation_unit = models.ForeignKey(
-        ReservationUnit,
-        verbose_name=_("Reservation unit image"),
-        related_name="images",
-        on_delete=models.CASCADE,
-    )
-
-    image = ThumbnailerImageField(
-        upload_to=settings.RESERVATION_UNIT_IMAGES_ROOT,
-        null=True,
-    )
-
-    large_url = models.URLField(null=False, blank=True, max_length=255, default="")
-    medium_url = models.URLField(null=False, blank=True, max_length=255, default="")
-    small_url = models.URLField(null=False, blank=True, max_length=255, default="")
-
-    def __str__(self):
-        return f"{self.reservation_unit.name} ({self.get_image_type_display()})"
-
-    def save(
-        self,
-        force_insert=False,
-        force_update=False,
-        using=None,
-        update_fields=None,
-        update_urls=True,
-    ):
-        self.purge_previous_image_cache()
-
-        super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
-
-        if update_urls:
-            self.update_image_urls()
-
-    def update_image_urls(self):
-        update_urls.delay(self.pk)
-
-
-class Purpose(models.Model, PurgeImageCacheMixin):
-    name = models.CharField(max_length=200)
-
-    image = ThumbnailerImageField(upload_to=settings.RESERVATION_UNIT_PURPOSE_IMAGES_ROOT, null=True)
-
-    rank = models.PositiveIntegerField(
-        blank=True,
-        null=True,
-        verbose_name=_("Order number"),
-        help_text=_("Order number to be used in api sorting."),
-    )
-
-    class Meta:
-        ordering = ["rank"]
-
-    def __str__(self):
-        return self.name
-
-    def save(self, *args, **kwargs) -> None:
-        self.purge_previous_image_cache()
-        super().save(*args, **kwargs)
-
-
-class Qualifier(models.Model):
-    name = models.CharField(max_length=200)
-
-    def __str__(self) -> str:
-        return self.name
-
-
-class Introduction(models.Model):
-    user = models.ForeignKey(
-        User,
-        verbose_name=_("User"),
-        on_delete=models.SET_NULL,
-        null=True,
-    )
-    reservation_unit = models.ForeignKey(ReservationUnit, verbose_name=_("Reservation unit"), on_delete=models.CASCADE)
-
-    completed_at = models.DateTimeField(verbose_name=_("Completed at"))
-
-    def __str__(self):
-        return f"Introduction - {self.user}, {self.reservation_unit} ({self.completed_at})"
-
-
 AuditLogger.register(ReservationUnit)
-AuditLogger.register(ReservationUnitPricing)
