@@ -112,6 +112,29 @@ def _get_soft_closed_time_spans_for_reservation_unit(reservation_unit: "Reservat
     return reservation_unit_closed_time_spans
 
 
+def _find_first_reservable_time_span_for_reservation_unit(
+    reservation_unit: "ReservationUnit",
+    normalised_reservable_time_spans: list[TimeSpanElement],
+    minimum_duration_minutes: int,
+) -> datetime | None:
+    """
+    Find the first reservable time span for the ReservationUnit that is long enough to fit the minimum duration
+
+    Loop through the normalised time spans to find the first one that is long enough to fit the minimum duration
+    """
+    for reservable_time_span in normalised_reservable_time_spans:
+        # Move time span start time to the next valid start time
+        reservable_time_span.move_to_next_valid_start_time(reservation_unit)
+
+        if reservable_time_span.can_fit_reservation_for_reservation_unit(
+            reservation_unit=reservation_unit,
+            minimum_duration_minutes=minimum_duration_minutes,
+        ):
+            return reservable_time_span.start_datetime
+
+    return None
+
+
 class ReservationUnitQuerySet(SearchResultsQuerySet):
     def scheduled_for_publishing(self):
         now = local_datetime()
@@ -278,25 +301,47 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
 
         # Loop through ReservationUnits and find the first reservable time and closed status span for each
         for reservation_unit in reservation_units_with_prefetched_related_objects:
-            reservation_unit_hard_closed_time_spans = (
-                _get_hard_closed_time_spans_for_reservation_unit(reservation_unit) + shared_hard_closed_time_spans
+            # Reservation Unit Hard Closed Time Spans
+            #  Affect closed status
+            #  Can overlap with buffers
+            reservation_unit_hard_closed_time_spans: list[TimeSpanElement] = (
+                _get_hard_closed_time_spans_for_reservation_unit(reservation_unit)  #
+                + shared_hard_closed_time_spans
             )
-            reservation_unit_soft_closed_time_spans = _get_soft_closed_time_spans_for_reservation_unit(reservation_unit)
-            reservation_unit_reservation_closed_time_spans = list(
+
+            # Reservation Unit Soft Closed Time Spans
+            #  Don't affect closed status
+            #  Can overlap with buffers
+            reservation_unit_soft_closed_time_spans: list[TimeSpanElement] = (
+                _get_soft_closed_time_spans_for_reservation_unit(reservation_unit)  #
+            )
+
+            # Reservation Closed Time Spans
+            #  Don't affect closed status
+            #  Can't overlap with buffers
+            reservation_unit_reservation_closed_time_spans: list[TimeSpanElement] = list(
                 reservation_closed_time_spans_map.get(reservation_unit.pk, set())
             )
 
             # These time spans have no effect on the closed status of the ReservationUnit,
             # meaning that the ReservationUnit can be shown as open, even if there are no reservable time spans.
             soft_closed_time_spans = (
-                reservation_unit_soft_closed_time_spans + reservation_unit_reservation_closed_time_spans
+                reservation_unit_soft_closed_time_spans  #
+                + reservation_unit_reservation_closed_time_spans
+            )
+
+            # Check if the ReservationUnits Maximum Reservation Duration is at least as long as the minimum duration.
+            # However, we can't skip the ReservationUnit here yet because it might still be considered Open.
+            is_reservation_unit_max_duration_invalid: bool = (
+                reservation_unit.max_reservation_duration is not None
+                and reservation_unit.max_reservation_duration < timedelta(minutes=minimum_duration_minutes)
             )
 
             # Go through each ReservableTimeSpan individually one-by-one
             for reservable_time_span in reservation_unit.origin_hauki_resource.reservable_time_spans.all():
                 current_time_span = reservable_time_span.as_time_span_element()
 
-                # Closed time spans that cause the ReservationUnit to be shown as closed
+                # Combine all Hard-Closed time spans into one list
                 hard_closed_time_spans: list[TimeSpanElement] = (
                     reservation_unit_hard_closed_time_spans
                     + current_time_span.generate_closed_time_spans_outside_filter(
@@ -304,10 +349,9 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
                         filter_time_end=filter_time_end,
                     )
                 )
-
-                # Remove closed time spans from the reservable time spans.
-                # This will also split reservable time spans into multiple time spans if needed.
+                # Remove Hard-Closed time spans from the reservable time span.
                 # What is left is a list of time spans that are reservable and within the given filter parameters.
+                hard_normalised_reservable_time_spans: list[TimeSpanElement]
                 hard_normalised_reservable_time_spans = override_reservable_with_closed_time_spans(
                     reservable_time_spans=[current_time_span],
                     closed_time_spans=hard_closed_time_spans,
@@ -316,16 +360,10 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
                 # No reservable time spans left means the ReservationUnit is closed, continue to next ReservableTimeSpan
                 if not hard_normalised_reservable_time_spans:
                     continue
-
-                # ReservationUnit has a reservable time span on the filter date range, so it's not closed.
+                # ReservationUnit has a reservable time span on the filter date range, so it's marked as not closed.
                 reservation_unit_closed_statuses[reservation_unit.pk] = False
-
                 # Validate `reservation_unit.max_reservation_duration`
-                # Minimum requested duration is longer than the maximum allowed duration, skip this ReservationUnit
-                if (
-                    reservation_unit.max_reservation_duration is not None
-                    and reservation_unit.max_reservation_duration < timedelta(minutes=minimum_duration_minutes)
-                ):
+                if is_reservation_unit_max_duration_invalid:
                     break
 
                 soft_normalised_reservable_time_spans = override_reservable_with_closed_time_spans(
@@ -333,21 +371,11 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
                     closed_time_spans=soft_closed_time_spans,
                 )
 
-                # Loop through the normalised time spans to find one that is long enough to fit the minimum duration
-                for normalized_reservable_time_span in soft_normalised_reservable_time_spans:
-                    # Move time span start time to the next valid start time
-                    normalized_reservable_time_span.move_to_next_valid_start_time(reservation_unit)
-
-                    # If the normalised time span is not long enough to fit the minimum duration, skip it.
-                    if not normalized_reservable_time_span.can_fit_reservation_for_reservation_unit(
-                        reservation_unit=reservation_unit,
-                        minimum_duration_minutes=minimum_duration_minutes,
-                    ):
-                        continue
-
-                    first_reservable_times[reservation_unit.pk] = normalized_reservable_time_span.start_datetime
-                    break
-
+                first_reservable_times[reservation_unit.pk] = _find_first_reservable_time_span_for_reservation_unit(
+                    reservation_unit=reservation_unit,
+                    normalised_reservable_time_spans=soft_normalised_reservable_time_spans,
+                    minimum_duration_minutes=minimum_duration_minutes,
+                )
                 # Suitable timespan was found, select and continue to next reservation unit
                 if first_reservable_times.get(reservation_unit.pk) is not None:
                     break
