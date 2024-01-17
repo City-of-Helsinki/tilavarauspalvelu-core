@@ -8,7 +8,7 @@ import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import Filters, { emptyFilterState, FilterArguments } from "./Filters";
 import UnitsDataLoader from "./UnitsDataLoader";
 import { Sort } from "./UnitsTable";
-import { HR } from "../lists/components";
+import { HR } from "@/component/Table";
 
 const Units = (): JSX.Element => {
   const [search, setSearch] = useState<FilterArguments>(emptyFilterState);

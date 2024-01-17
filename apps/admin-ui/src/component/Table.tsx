@@ -2,7 +2,7 @@ import { get } from "lodash";
 import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { Table, TableProps } from "../../common/hds-fork/table/Table";
+import { Table, TableProps } from "@/common/hds-fork/table/Table";
 
 type TableWrapperProps = {
   $headingBackground?: string;

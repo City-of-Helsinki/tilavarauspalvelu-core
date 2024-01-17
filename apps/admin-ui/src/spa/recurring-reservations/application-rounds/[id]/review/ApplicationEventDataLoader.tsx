@@ -13,7 +13,7 @@ import {
 } from "@/common/const";
 import { useNotification } from "@/context/NotificationContext";
 import Loader from "@/component/Loader";
-import { More } from "@/component/lists/More";
+import { More } from "@/component/More";
 import { useSort } from "@/hooks/useSort";
 import { APPLICATIONS_EVENTS_QUERY } from "./queries";
 import { ApplicationEventsTable, SORT_KEYS } from "./ApplicationEventsTable";

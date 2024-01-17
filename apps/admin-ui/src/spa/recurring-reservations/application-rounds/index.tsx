@@ -19,7 +19,7 @@ import { truncate } from "@/helpers";
 import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import Loader from "@/component/Loader";
 import { ApplicationRoundCard } from "./ApplicationRoundCard";
-import { TableLink } from "@/component/lists/components";
+import { TableLink } from "@/component/Table";
 import { StyledHDSTable } from "./CustomTable";
 import { APPLICATION_ROUNDS_QUERY } from "./queries";
 

@@ -10,7 +10,7 @@ import {
 import { publicUrl } from "@/common/const";
 import { truncate } from "@/helpers";
 import { applicationDetailsUrl } from "@/common/urls";
-import { CustomTable, ExternalTableLink } from "@/component/lists/components";
+import { CustomTable, ExternalTableLink } from "@/component/Table";
 import { getApplicantName } from "app/component/applications/util";
 import { ApplicationEventStatusCell } from "./StatusCell";
 

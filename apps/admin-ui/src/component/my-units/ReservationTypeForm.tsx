@@ -13,7 +13,7 @@ import {
 import BufferToggles from "./BufferToggles";
 import { Element } from "./MyUnitRecurringReservation/commonStyling";
 import ShowTOS from "./ShowTOS";
-import { HR } from "../lists/components";
+import { HR } from "@/component/Table";
 
 const CommentsTextArea = styled(TextArea)`
   grid-column: 1 / -1;

@@ -4,7 +4,7 @@ import { TFunction } from "i18next";
 import { ReservationUnitType } from "common/types/gql-types";
 import { truncate } from "@/helpers";
 import { reservationUnitUrl } from "@/common/urls";
-import { CustomTable, TableLink } from "../lists/components";
+import { CustomTable, TableLink } from "@/component/Table";
 
 export type Sort = {
   field: string;

@@ -106,6 +106,7 @@ const Wrapper = styled.div`
   flex-wrap: wrap;
 `;
 
+/// @deprecated -- use SearchTags instead
 export default function Tags<T>({
   tags,
   dispatch,

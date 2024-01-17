@@ -6,7 +6,7 @@ import { ReservationType } from "common/types/gql-types";
 import { truncate } from "@/helpers";
 import { reservationUrl } from "@/common/urls";
 import { formatDateTime } from "@/common/util";
-import { CustomTable, TableLink } from "../lists/components";
+import { CustomTable, TableLink } from "@/component/Table";
 import { getReserveeName, reservationDateTimeString } from "./requested/util";
 
 export type Sort = {

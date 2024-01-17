@@ -4,13 +4,13 @@ import { AutoGrid, FullRow } from "@/styles/layout";
 import { SearchInput, Select } from "hds-react";
 import { useSearchParams } from "react-router-dom";
 import { SearchTags } from "@/component/SearchTags";
-import { VALID_ALLOCATION_APPLICATION_STATUSES } from "app/common/const";
+import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import {
   ApplicantTypeChoice,
   ApplicationEventStatusChoice,
 } from "common/types/gql-types";
 import { debounce } from "lodash";
-import { HR } from "app/component/lists/components";
+import { HR } from "@/component/Table";
 
 export type UnitPkName = {
   pk: number;

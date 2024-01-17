@@ -5,10 +5,10 @@ import { filterNonNullable } from "common/src/helpers";
 import { useNotification } from "@/context/NotificationContext";
 import { LARGE_LIST_PAGE_SIZE } from "@/common/const";
 import { combineResults } from "@/common/util";
+import { More } from "@/component/More";
 import { FilterArguments } from "./Filters";
 import Loader from "../Loader";
 import UnitsTable from "./UnitsTable";
-import { More } from "../lists/More";
 import { UNITS_QUERY } from "./queries";
 
 export type Sort = {

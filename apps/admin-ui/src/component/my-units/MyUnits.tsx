@@ -6,7 +6,7 @@ import { Container } from "../../styles/layout";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import { Sort } from "../Unit/UnitsTable";
 import Filters, { FilterArguments, emptyFilterState } from "../Unit/Filters";
-import { HR } from "../lists/components";
+import { HR } from "@/component/Table";
 import UnitsDataLoader from "../Unit/UnitsDataLoader";
 
 // NOTE copy pasta from Unit/Units.tsx

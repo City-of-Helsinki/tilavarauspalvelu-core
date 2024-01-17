@@ -11,7 +11,7 @@ import { LIST_PAGE_SIZE } from "@/common/const";
 import { useNotification } from "@/context/NotificationContext";
 import { APPLICATIONS_EVENTS_SCHEDULE_QUERY } from "./queries";
 import Loader from "@/component/Loader";
-import { More } from "@/component/lists/More";
+import { More } from "@/component/More";
 import { useSort } from "@/hooks/useSort";
 import {
   transformApplicantType,

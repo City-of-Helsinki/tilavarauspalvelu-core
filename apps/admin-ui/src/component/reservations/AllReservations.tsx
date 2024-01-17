@@ -5,9 +5,9 @@ import { H1 } from "common/src/common/typography";
 import Filters, { FilterArguments, emptyState } from "./Filters";
 import ReservationsDataLoader, { Sort } from "./ReservationsDataLoader";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
-import { HR } from "../lists/components";
-import { Container } from "../../styles/layout";
-import { DATE_FORMAT, formatDate } from "../../common/util";
+import { HR } from "@/component/Table";
+import { Container } from "@/styles/layout";
+import { DATE_FORMAT, formatDate } from "@/common/util";
 
 const AllReservations = (): JSX.Element => {
   const [search, setSearch] = useState<FilterArguments>(emptyState);

@@ -1,12 +1,12 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import styled from "styled-components";
 import { memoize } from "lodash";
 import { UnitType } from "common/types/gql-types";
 import { TFunction } from "i18next";
 import { truncate } from "@/helpers";
 import { myUnitUrl, unitUrl } from "@/common/urls";
-import { CustomTable, TableLink } from "@/component/lists/components";
-import styled from "styled-components";
+import { CustomTable, TableLink } from "@/component/Table";
 
 export type Sort = {
   field: string;

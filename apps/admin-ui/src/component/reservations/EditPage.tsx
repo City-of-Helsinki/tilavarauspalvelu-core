@@ -21,7 +21,7 @@ import { useNotification } from "../../context/NotificationContext";
 import { flattenMetadata } from "../my-units/create-reservation/utils";
 import ReservationTypeForm from "../my-units/ReservationTypeForm";
 import Loader from "../Loader";
-import { HR } from "../lists/components";
+import { HR } from "@/component/Table";
 import { useOptions } from "../my-units/hooks";
 import EditPageWrapper from "./EditPageWrapper";
 import { useReservationEditData } from "./requested/hooks";

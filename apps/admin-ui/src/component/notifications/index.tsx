@@ -13,7 +13,7 @@ import Loader from "app/component/Loader";
 import { ButtonLikeLink } from "app/component/ButtonLikeLink";
 import { valueForDateInput, valueForTimeInput } from "app/helpers";
 import { GQL_MAX_RESULTS_PER_QUERY } from "app/common/const";
-import { CustomTable, TableLink } from "../lists/components";
+import { CustomTable, TableLink } from "@/component/Table";
 
 const notificationUrl = (pk: number) => `/messaging/notifications/${pk}`;
 

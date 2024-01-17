@@ -7,7 +7,7 @@ import { FilterArguments } from "./Filters";
 import { useNotification } from "../../context/NotificationContext";
 import Loader from "../Loader";
 import ReservationUnitsTable from "./ReservationUnitsTable";
-import { More } from "../lists/More";
+import { More } from "@/component/More";
 import { LARGE_LIST_PAGE_SIZE } from "../../common/const";
 import { combineResults } from "../../common/util";
 

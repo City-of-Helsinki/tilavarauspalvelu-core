@@ -6,13 +6,13 @@ import { useTranslation } from "react-i18next";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useLocation } from "react-use";
 import styled from "styled-components";
-import { AutoGrid, VerticalFlex } from "app/styles/layout";
+import { AutoGrid, VerticalFlex } from "@/styles/layout";
 import { OptionType } from "../../common/types";
 import ReservationUnitTypeFilter from "../filters/ReservationUnitTypeFilter";
 import Tags, { getReducer, toTags } from "../lists/Tags";
 import DayNavigation from "./DayNavigation";
 import UnitReservations from "./UnitReservations";
-import { HR } from "../lists/components";
+import { HR } from "@/component/Table";
 
 const HorisontalFlexWrapper = styled.div`
   display: flex;

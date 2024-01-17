@@ -11,7 +11,7 @@ import { publicUrl } from "@/common/const";
 import { applicationDetailsUrl } from "@/common/urls";
 import { truncate } from "@/helpers";
 import { getApplicantName } from "@/component/applications/util";
-import { CustomTable, ExternalTableLink } from "@/component/lists/components";
+import { CustomTable, ExternalTableLink } from "@/component/Table";
 import { ApplicationStatusCell } from "./StatusCell";
 
 const unitsTruncateLen = 23;
