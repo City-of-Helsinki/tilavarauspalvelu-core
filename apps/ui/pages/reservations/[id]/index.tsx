@@ -29,7 +29,6 @@ import { useSession } from "@/hooks/auth";
 import { useReservation, useOrder } from "@/hooks/reservation";
 import { genericTermsVariant, reservationUnitPath } from "@/modules/const";
 import { createApolloClient } from "@/modules/apolloClient";
-import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
 import { getTranslation, reservationsUrl } from "@/modules/util";
 import { BlackButton, Toast } from "@/styles/util";
 import { CenterSpinner } from "@/components/common/common";
@@ -50,10 +49,10 @@ import {
   getReservationUnitPrice,
 } from "@/modules/reservationUnit";
 import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
-import ReservationStatus from "@/components/reservation/ReservationStatus";
+import { ReservationStatus } from "@/components/reservation/ReservationStatus";
 import Address from "@/components/reservation-unit/Address";
 import ReservationInfoCard from "@/components/reservation/ReservationInfoCard";
-import ReservationOrderStatus from "@/components/reservation/ReservationOrderStatus";
+import { ReservationOrderStatus } from "@/components/reservation/ReservationOrderStatus";
 
 type Props = {
   termsOfUse: Record<string, TermsOfUseType>;
@@ -146,22 +145,6 @@ const StatusContainer = styled.div`
   gap: var(--spacing-s);
 `;
 
-const Columns = styled.div`
-  grid-template-columns: 1fr;
-  display: grid;
-  align-items: flex-start;
-  gap: var(--spacing-l);
-
-  @media (min-width: ${breakpoints.m}) {
-    & > div:nth-of-type(1) {
-      order: 2;
-    }
-
-    margin-top: var(--spacing-xl);
-    grid-template-columns: 1fr 378px;
-  }
-`;
-
 const Actions = styled.div`
   &:empty {
     display: none;
@@ -170,7 +153,6 @@ const Actions = styled.div`
   display: flex;
   flex-direction: column;
   gap: var(--spacing-m);
-  margin: var(--spacing-m) 0 var(--spacing-m);
 
   @media (min-width: ${breakpoints.s}) {
     button {
@@ -188,7 +170,7 @@ const Reasons = styled.div`
   flex-direction: column;
   gap: var(--spacing-m);
   margin-top: var(--spacing-m);
-  margin-bottom: var(--spacing-layout-m);
+  margin-bottom: var(--spacing-m);
 `;
 
 const ReasonText = styled.div`
@@ -217,6 +199,7 @@ const SecondaryActions = styled.div`
 
 const Content = styled.div`
   font-size: var(--fontsize-body-l);
+  max-width: 65ch;
 `;
 
 const ParagraphHeading = styled(H4).attrs({ as: "h3" })``;
@@ -257,6 +240,21 @@ const AccordionContent = styled.div`
 
 const Terms = styled.div`
   margin-bottom: var(--spacing-xl);
+`;
+
+// TODO top margin is bad, refactor it (also every page should have the same space between Breadcrumb and Heading)
+const HeadingSection = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto auto;
+  grid-gap: var(--spacing-m);
+  justify-content: space-between;
+  margin-top: 0;
+
+  @media (width > ${breakpoints.m}) {
+    margin-top: var(--spacing-xl);
+    grid-template-columns: 2fr 1fr;
+  }
 `;
 
 const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
@@ -307,59 +305,6 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
     reservationUnit?.serviceSpecificTerms != null
       ? getTranslation(reservationUnit?.serviceSpecificTerms, "text")
       : undefined;
-
-  const bylineContent = useMemo(() => {
-    if (!reservation) {
-      return undefined;
-    }
-    return (
-      <>
-        <ReservationInfoCard
-          reservation={reservation}
-          reservationUnit={reservationUnit}
-          type="complete"
-        />
-        <SecondaryActions>
-          {reservation.state ===
-            ReservationsReservationStateChoices.Confirmed && (
-            <BlackButton
-              variant="secondary"
-              iconRight={<IconCalendar aria-hidden />}
-              disabled={!reservation.calendarUrl}
-              data-testid="reservation__button--calendar-link"
-              onClick={() => router.push(reservation.calendarUrl ?? "")}
-            >
-              {t("reservations:saveToCalendar")}
-            </BlackButton>
-          )}
-          {order?.receiptUrl &&
-            // TODO enum comparison (not string)
-            ["PAID", "REFUNDED"].includes(order?.status ?? "") && (
-              <BlackButton
-                data-testid="reservation__confirmation--button__receipt-link"
-                onClick={() =>
-                  window.open(
-                    `${order.receiptUrl}&lang=${i18n.language}`,
-                    "_blank"
-                  )
-                }
-                variant="secondary"
-                iconRight={<IconLinkExternal aria-hidden />}
-              >
-                {t("reservations:downloadReceipt")}
-              </BlackButton>
-            )}
-        </SecondaryActions>
-      </>
-    );
-  }, [
-    reservation,
-    reservationUnit,
-    order?.receiptUrl,
-    order?.status,
-    t,
-    i18n.language,
-  ]);
 
   const [canTimeBeModified, modifyTimeReason] = canReservationTimeBeChanged({
     reservation,
@@ -550,9 +495,9 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
 
   const checkoutUrl = getCheckoutUrl(order, i18n.language);
 
+  const hasCheckoutUrl = !!checkoutUrl;
   const isWaitingForPayment =
-    reservation.state ===
-      ReservationsReservationStateChoices.WaitingForPayment && checkoutUrl;
+    reservation.state === ReservationsReservationStateChoices.WaitingForPayment;
 
   return (
     <Wrapper>
@@ -566,172 +511,215 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
             },
           ]}
         />
-        <Columns>
-          <JustForDesktop>{bylineContent}</JustForDesktop>
-          <div data-testid="reservation__content">
-            <Heading data-testid="reservation__name">
-              {t("reservations:reservationName", { id: reservation.pk })}
-            </Heading>
-            <SubHeading>
-              <Link
-                data-testid="reservation__reservation-unit"
-                href={`${reservationUnitPath(reservationUnit.pk ?? 0)}`}
-              >
-                {getReservationUnitName(reservationUnit)}
-              </Link>
-              <span data-testid="reservation__time">{timeString}</span>
-            </SubHeading>
-            <StatusContainer>
-              <ReservationStatus
-                data-testid="reservation__status"
-                state={reservation.state}
-              />
-              {normalizedOrderStatus && (
-                <ReservationOrderStatus
-                  orderStatus={normalizedOrderStatus}
+        <div data-testid="reservation__content">
+          <HeadingSection>
+            <div style={{ gridColumn: "1 / span 1", gridRow: "1 / span 1" }}>
+              <Heading data-testid="reservation__name">
+                {t("reservations:reservationName", { id: reservation.pk })}
+              </Heading>
+              <SubHeading>
+                <Link
+                  data-testid="reservation__reservation-unit"
+                  href={`${reservationUnitPath(reservationUnit.pk ?? 0)}`}
+                >
+                  {getReservationUnitName(reservationUnit)}
+                </Link>
+                <span data-testid="reservation__time">{timeString}</span>
+              </SubHeading>
+              <StatusContainer>
+                <ReservationStatus
                   data-testid="reservation__status"
+                  state={reservation.state}
                 />
-              )}
-            </StatusContainer>
-            <JustForMobile>{bylineContent}</JustForMobile>
-            <Actions>
-              {isWaitingForPayment && (
-                <BlackButton
-                  variant="secondary"
-                  iconRight={<IconArrowRight aria-hidden />}
-                  onClick={() => {
-                    const url = getCheckoutUrl(order, i18n.language);
-                    if (url) router.push(url);
-                  }}
-                  data-testid="reservation-detail__button--checkout"
-                >
-                  {t("reservations:payReservation")}
-                </BlackButton>
-              )}
-              {canTimeBeModified && (
-                <BlackButton
-                  variant="secondary"
-                  iconRight={<IconCalendar aria-hidden />}
-                  onClick={() => {
-                    router.push(`${reservationsUrl}${reservation.pk}/edit`);
-                  }}
-                  data-testid="reservation-detail__button--edit"
-                >
-                  {t("reservations:modifyReservationTime")}
-                </BlackButton>
-              )}
-              {isReservationCancellable && (
-                <BlackButton
-                  variant="secondary"
-                  iconRight={<IconCross aria-hidden />}
-                  onClick={() =>
-                    router.push(`${reservationsUrl}${reservation.pk}/cancel`)
-                  }
-                  data-testid="reservation-detail__button--cancel"
-                >
-                  {t(
-                    `reservations:cancel${
-                      isBeingHandled ? "Application" : "Reservation"
-                    }`
-                  )}
-                </BlackButton>
-              )}
-            </Actions>
-            <Reasons>
-              {modifyTimeReason && (
-                <ReasonText>
-                  {t(`reservations:modifyTimeReasons:${modifyTimeReason}`)}
-                  {modifyTimeReason ===
-                    "RESERVATION_MODIFICATION_NOT_ALLOWED" &&
-                    isReservationCancellable &&
-                    ` ${t(
-                      "reservations:modifyTimeReasons:RESERVATION_MODIFICATION_NOT_ALLOWED_SUFFIX"
-                    )}`}
-                </ReasonText>
-              )}
-              {cancellationReason && !modifyTimeReason && (
-                <ReasonText>
-                  {t(`reservations:cancellationReasons:${cancellationReason}`)}
-                </ReasonText>
-              )}
-            </Reasons>
-            <Content>
-              {instructionsKey &&
-                getTranslation(reservationUnit, instructionsKey) && (
-                  <ContentContainer>
-                    <ParagraphHeading>
-                      {t("reservations:reservationInfo")}
-                    </ParagraphHeading>
-                    <Paragraph>
-                      {getTranslation(reservationUnit, instructionsKey)}
-                    </Paragraph>
-                  </ContentContainer>
+                {normalizedOrderStatus && (
+                  <ReservationOrderStatus
+                    orderStatus={normalizedOrderStatus}
+                    data-testid="reservation__status"
+                  />
                 )}
-              <ParagraphHeading>
-                {t("reservationApplication:applicationInfo")}
-              </ParagraphHeading>
-              <ContentContainer>{reservationInfo}</ContentContainer>
-              <ParagraphHeading>
-                {t("reservationCalendar:reserverInfo")}
-              </ParagraphHeading>
-              <ContentContainer>{reserveeInfo}</ContentContainer>
-              <Terms>
-                {(paymentTermsContent || cancellationTermsContent) && (
-                  <Accordion
-                    heading={t(
-                      `reservationUnit:${
-                        paymentTermsContent
-                          ? "paymentAndCancellationTerms"
-                          : "cancellationTerms"
+              </StatusContainer>
+            </div>
+            <div style={{ gridRowEnd: "span 2" }}>
+              <ReservationInfoCard
+                reservation={reservation}
+                reservationUnit={reservationUnit}
+                type="complete"
+              />
+              <SecondaryActions>
+                {reservation.state ===
+                  ReservationsReservationStateChoices.Confirmed && (
+                  <BlackButton
+                    variant="secondary"
+                    iconRight={<IconCalendar aria-hidden />}
+                    disabled={!reservation.calendarUrl}
+                    data-testid="reservation__button--calendar-link"
+                    onClick={() => router.push(reservation.calendarUrl ?? "")}
+                  >
+                    {t("reservations:saveToCalendar")}
+                  </BlackButton>
+                )}
+                {order?.receiptUrl &&
+                  // TODO enum comparison (not string)
+                  ["PAID", "REFUNDED"].includes(order?.status ?? "") && (
+                    <BlackButton
+                      data-testid="reservation__confirmation--button__receipt-link"
+                      onClick={() =>
+                        window.open(
+                          `${order.receiptUrl}&lang=${i18n.language}`,
+                          "_blank"
+                        )
+                      }
+                      variant="secondary"
+                      iconRight={<IconLinkExternal aria-hidden />}
+                    >
+                      {t("reservations:downloadReceipt")}
+                    </BlackButton>
+                  )}
+              </SecondaryActions>
+            </div>
+            <div>
+              <Actions>
+                {isWaitingForPayment && (
+                  <BlackButton
+                    variant="secondary"
+                    disabled={!hasCheckoutUrl}
+                    iconRight={<IconArrowRight aria-hidden />}
+                    onClick={() => {
+                      const url = getCheckoutUrl(order, i18n.language);
+                      if (url) router.push(url);
+                    }}
+                    data-testid="reservation-detail__button--checkout"
+                  >
+                    {t("reservations:payReservation")}
+                  </BlackButton>
+                )}
+                {canTimeBeModified && (
+                  <BlackButton
+                    variant="secondary"
+                    iconRight={<IconCalendar aria-hidden />}
+                    onClick={() => {
+                      router.push(`${reservationsUrl}${reservation.pk}/edit`);
+                    }}
+                    data-testid="reservation-detail__button--edit"
+                  >
+                    {t("reservations:modifyReservationTime")}
+                  </BlackButton>
+                )}
+                {isReservationCancellable && (
+                  <BlackButton
+                    variant="secondary"
+                    iconRight={<IconCross aria-hidden />}
+                    onClick={() =>
+                      router.push(`${reservationsUrl}${reservation.pk}/cancel`)
+                    }
+                    data-testid="reservation-detail__button--cancel"
+                  >
+                    {t(
+                      `reservations:cancel${
+                        isBeingHandled ? "Application" : "Reservation"
                       }`
                     )}
-                    theme="thin"
-                    data-testid="reservation__payment-and-cancellation-terms"
-                  >
-                    {paymentTermsContent != null && (
-                      <AccordionContent>
-                        <Sanitize html={paymentTermsContent} />
-                      </AccordionContent>
-                    )}
-                    {cancellationTermsContent != null && (
-                      <AccordionContent>
-                        <Sanitize html={cancellationTermsContent} />
-                      </AccordionContent>
-                    )}
-                  </Accordion>
+                  </BlackButton>
                 )}
-                {shouldDisplayPricingTerms && pricingTermsContent && (
-                  <Accordion
-                    heading={t("reservationUnit:pricingTerms")}
-                    theme="thin"
-                    data-testid="reservation__pricing-terms"
-                  >
-                    <AccordionContent>
-                      <Sanitize html={pricingTermsContent} />
-                    </AccordionContent>
-                  </Accordion>
+              </Actions>
+              <Reasons>
+                {modifyTimeReason && (
+                  <ReasonText>
+                    {t(`reservations:modifyTimeReasons:${modifyTimeReason}`)}
+                    {modifyTimeReason ===
+                      "RESERVATION_MODIFICATION_NOT_ALLOWED" &&
+                      isReservationCancellable &&
+                      ` ${t(
+                        "reservations:modifyTimeReasons:RESERVATION_MODIFICATION_NOT_ALLOWED_SUFFIX"
+                      )}`}
+                  </ReasonText>
                 )}
+                {cancellationReason && !modifyTimeReason && (
+                  <ReasonText>
+                    {t(
+                      `reservations:cancellationReasons:${cancellationReason}`
+                    )}
+                  </ReasonText>
+                )}
+              </Reasons>
+            </div>
+          </HeadingSection>
+          <Content>
+            {instructionsKey &&
+              getTranslation(reservationUnit, instructionsKey) && (
+                <ContentContainer>
+                  <ParagraphHeading>
+                    {t("reservations:reservationInfo")}
+                  </ParagraphHeading>
+                  <Paragraph>
+                    {getTranslation(reservationUnit, instructionsKey)}
+                  </Paragraph>
+                </ContentContainer>
+              )}
+            <ParagraphHeading>
+              {t("reservationApplication:applicationInfo")}
+            </ParagraphHeading>
+            <ContentContainer>{reservationInfo}</ContentContainer>
+            <ParagraphHeading>
+              {t("reservationCalendar:reserverInfo")}
+            </ParagraphHeading>
+            <ContentContainer>{reserveeInfo}</ContentContainer>
+            <Terms>
+              {(paymentTermsContent || cancellationTermsContent) && (
                 <Accordion
-                  heading={t("reservationUnit:termsOfUse")}
+                  heading={t(
+                    `reservationUnit:${
+                      paymentTermsContent
+                        ? "paymentAndCancellationTerms"
+                        : "cancellationTerms"
+                    }`
+                  )}
                   theme="thin"
-                  data-testid="reservation__terms-of-use"
+                  data-testid="reservation__payment-and-cancellation-terms"
                 >
-                  {serviceSpecificTermsContent && (
+                  {paymentTermsContent != null && (
                     <AccordionContent>
-                      <Sanitize html={serviceSpecificTermsContent} />
+                      <Sanitize html={paymentTermsContent} />
                     </AccordionContent>
                   )}
+                  {cancellationTermsContent != null && (
+                    <AccordionContent>
+                      <Sanitize html={cancellationTermsContent} />
+                    </AccordionContent>
+                  )}
+                </Accordion>
+              )}
+              {shouldDisplayPricingTerms && pricingTermsContent && (
+                <Accordion
+                  heading={t("reservationUnit:pricingTerms")}
+                  theme="thin"
+                  data-testid="reservation__pricing-terms"
+                >
                   <AccordionContent>
-                    <Sanitize
-                      html={getTranslation(termsOfUse.genericTerms, "text")}
-                    />
+                    <Sanitize html={pricingTermsContent} />
                   </AccordionContent>
                 </Accordion>
-              </Terms>
-              <Address reservationUnit={reservationUnit} />
-            </Content>
-          </div>
-        </Columns>
+              )}
+              <Accordion
+                heading={t("reservationUnit:termsOfUse")}
+                theme="thin"
+                data-testid="reservation__terms-of-use"
+              >
+                {serviceSpecificTermsContent && (
+                  <AccordionContent>
+                    <Sanitize html={serviceSpecificTermsContent} />
+                  </AccordionContent>
+                )}
+                <AccordionContent>
+                  <Sanitize
+                    html={getTranslation(termsOfUse.genericTerms, "text")}
+                  />
+                </AccordionContent>
+              </Accordion>
+            </Terms>
+            <Address reservationUnit={reservationUnit} />
+          </Content>
+        </div>
       </Container>
     </Wrapper>
   );

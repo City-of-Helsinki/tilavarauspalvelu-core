@@ -1,7 +1,7 @@
 import * as React from "react";
 import { get as mockGet } from "lodash";
 import { render, screen } from "../../../test/testUtils";
-import ReservationOrderStatus, { Props } from "../ReservationOrderStatus";
+import { ReservationOrderStatus, type Props } from "../ReservationOrderStatus";
 import mockTranslations from "../../../public/locales/fi/reservations.json";
 
 // TODO use a proper mocking solution in setup

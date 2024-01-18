@@ -28,8 +28,8 @@ import {
 } from "@/modules/reservationUnit";
 import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
 import IconWithText from "@/components/common/IconWithText";
-import ReservationOrderStatus from "./ReservationOrderStatus";
-import ReservationStatus from "./ReservationStatus";
+import { ReservationOrderStatus } from "./ReservationOrderStatus";
+import { ReservationStatus } from "./ReservationStatus";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
 
 type CardType = "upcoming" | "past" | "cancelled";

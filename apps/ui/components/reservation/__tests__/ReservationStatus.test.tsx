@@ -2,7 +2,7 @@ import * as React from "react";
 import { get as mockGet } from "lodash";
 import { ReservationsReservationStateChoices } from "common/types/gql-types";
 import { render, screen } from "../../../test/testUtils";
-import ReservationStatus, { Props } from "../ReservationStatus";
+import { ReservationStatus, type Props } from "../ReservationStatus";
 import mockTranslations from "../../../public/locales/fi/reservations.json";
 
 // TODO use a proper mocking solution in setup

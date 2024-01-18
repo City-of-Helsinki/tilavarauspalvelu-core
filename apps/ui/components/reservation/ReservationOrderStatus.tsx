@@ -10,7 +10,6 @@ export type Props = {
 
 const Wrapper = styled.div<{ $color: string }>`
   display: inline-block;
-  margin-bottom: var(--spacing-m);
   padding: var(--spacing-3-xs) var(--spacing-2-xs);
   background-color: ${({ $color }) => $color};
   line-height: var(--lineheight-l);
@@ -18,10 +17,10 @@ const Wrapper = styled.div<{ $color: string }>`
   ${truncatedText};
 `;
 
-const ReservationOrderStatus = ({
+export function ReservationOrderStatus({
   orderStatus,
   ...rest
-}: Props): JSX.Element => {
+}: Props): JSX.Element {
   const { t } = useTranslation();
 
   const color = useMemo(() => {
@@ -50,6 +49,4 @@ const ReservationOrderStatus = ({
       {statusText}
     </Wrapper>
   );
-};
-
-export default ReservationOrderStatus;
+}

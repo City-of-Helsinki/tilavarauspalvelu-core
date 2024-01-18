@@ -9,9 +9,9 @@ export type Props = {
   state: ReservationsReservationStateChoices;
 };
 
+// TODO why ? why not use HDS tags?
 const Wrapper = styled.div<{ $color: string }>`
   display: inline-block;
-  margin-bottom: var(--spacing-m);
   padding: var(--spacing-3-xs) var(--spacing-2-xs);
   background-color: ${({ $color }) => $color};
   line-height: var(--lineheight-l);
@@ -19,7 +19,7 @@ const Wrapper = styled.div<{ $color: string }>`
   ${truncatedText};
 `;
 
-const ReservationStatus = ({ state, ...rest }: Props): JSX.Element => {
+export function ReservationStatus({ state, ...rest }: Props): JSX.Element {
   const { t } = useTranslation();
 
   const color = useMemo(() => {
@@ -47,6 +47,4 @@ const ReservationStatus = ({ state, ...rest }: Props): JSX.Element => {
       {statusText}
     </Wrapper>
   );
-};
-
-export default ReservationStatus;
+}
