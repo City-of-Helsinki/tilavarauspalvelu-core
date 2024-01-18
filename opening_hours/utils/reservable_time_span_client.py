@@ -256,12 +256,8 @@ def override_reservable_with_closed_time_spans(
                 new_reservable_time_span = copy(reservable_time_span)
                 reservable_time_spans.append(new_reservable_time_span)
                 # Split the reservable time span in two
-                # Save the buffers on the reservable times, so that we can check if another buffered timespan
-                # (i.e. a reservation's timespan) would fit between this and the next/previous time span
                 reservable_time_span.end_datetime = closed_time_span.buffered_start_datetime
                 new_reservable_time_span.start_datetime = closed_time_span.buffered_end_datetime
-                reservable_time_span.buffer_time_after = closed_time_span.buffer_time_before
-                new_reservable_time_span.buffer_time_before = closed_time_span.buffer_time_after
 
             # Reservable time span starts inside the closed time span.
             # Shorten the reservable time span from the beginning
@@ -276,10 +272,7 @@ def override_reservable_with_closed_time_spans(
             # │       xxxx ->       xxxx │ Handled later in the next step    │
             # └──────────────────────────┴───────────────────────────────────┘
             elif reservable_time_span.starts_inside_of(closed_time_span):
-                # Save the buffer on the reservable time, so that we can check if another buffered timespan
-                # (i.e. a reservation's timespan) would fit between this and the previous time span
                 reservable_time_span.start_datetime = closed_time_span.buffered_end_datetime
-                reservable_time_span.buffer_time_before = closed_time_span.buffer_time_after
 
             # Reservable time span ends inside the closed time span.
             # Shorten the reservable time span from the end
@@ -294,10 +287,7 @@ def override_reservable_with_closed_time_spans(
             # │ xxxx       -> xxxx       │ Already handled in last step      │
             # └──────────────────────────┴───────────────────────────────────┘
             elif reservable_time_span.ends_inside_of(closed_time_span):
-                # Save the buffer on the reservable time, so that we can check if another buffered timespan
-                # (i.e. a reservation's timespan) would fit between this and the next time span
                 reservable_time_span.end_datetime = closed_time_span.buffered_start_datetime
-                reservable_time_span.buffer_time_after = closed_time_span.buffer_time_before
 
             # If the duration of the reservable time span is negative or zero after adjustments
             # (buffered time is ignored here), remove it.
