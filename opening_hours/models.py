@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from django.db import models
 from django.db.models import F, Q
@@ -64,15 +64,9 @@ class ReservableTimeSpan(models.Model):
         else:
             return f"{start.strftime(strformat)}-{end.strftime(strformat)}"
 
-    def as_time_span_element(
-        self,
-        buffer_time_before: timedelta | None = None,
-        buffer_time_after: timedelta | None = None,
-    ) -> TimeSpanElement:
+    def as_time_span_element(self) -> TimeSpanElement:
         return TimeSpanElement(
             start_datetime=self.start_datetime.astimezone(DEFAULT_TIMEZONE),
             end_datetime=self.end_datetime.astimezone(DEFAULT_TIMEZONE),
-            buffer_time_before=buffer_time_before,
-            buffer_time_after=buffer_time_after,
             is_reservable=True,
         )

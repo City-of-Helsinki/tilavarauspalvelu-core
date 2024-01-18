@@ -115,15 +115,74 @@ def _get_soft_closed_time_spans_for_reservation_unit(reservation_unit: "Reservat
 def _find_first_reservable_time_span_for_reservation_unit(
     reservation_unit: "ReservationUnit",
     normalised_reservable_time_spans: list[TimeSpanElement],
+    reservations: list[TimeSpanElement],
     minimum_duration_minutes: int,
 ) -> datetime | None:
     """
-    Find the first reservable time span for the ReservationUnit that is long enough to fit the minimum duration
+    Find the first reservable time span for the ReservationUnit.
 
-    Loop through the normalised time spans to find the first one that is long enough to fit the minimum duration
+    In this function we know that normalised_reservable_time_spans (without buffers) and reservations (with buffers)
+    never overlap due to earlier normalisation.
+    However, normalised_reservable_time_spans (with buffers from reservation_unit) and
+    reservations (without buffers) can overlap, so we need to process the normalised_reservable_time_spans one-by-one
+    and check if they overlap with reservations.
+    If they do, we need to shorten the reservable_time_span so that its buffer doesn't overlap with the reservation,
+    while leaving the buffer size unchanged.
+    After processing, we can check if the reservable_time_span is still long enough to fit the minimum duration.
     """
     for reservable_time_span in normalised_reservable_time_spans:
-        # Move time span start time to the next valid start time
+        if reservable_time_span is None:
+            continue
+
+        reservable_time_span.buffer_time_before = reservation_unit.buffer_time_before
+        reservable_time_span.buffer_time_after = reservation_unit.buffer_time_after
+
+        for reservation in reservations:
+            # Reservation (with buffers) can not overlap with the reservable time span (without buffers).
+            if reservable_time_span.overlaps_with(reservation):
+                raise ValueError("Reservable Time Span overlaps with Reservations buffer, this should never happen.")
+
+            # Only continue forward if a buffered time span overlaps with a reservation (without buffers)
+            if not reservation.overlaps_with(reservable_time_span):
+                # No overlapping, skip
+                continue
+
+            # Reservation is inside the Before-buffer, shorten the reservable time span from the start
+            # ┌──────────────────────────┬─────────────────────────────────────┐
+            # │ ----oooooo ->     ----oo │ Reservation starts in Before-buffer │
+            # │ xxxx       -> xxxx       │                                     │
+            # ├──────────────────────────┼─────────────────────────────────────┤
+            # │     --oooo ->       --oo │ Reservation ends in Before-buffer   │
+            # │   xxxx     ->   xxxx     │                                     │
+            # └──────────────────────────┴─────────────────────────────────────┘
+            elif (
+                reservable_time_span.buffered_start_datetime
+                <= reservation.end_datetime
+                <= reservable_time_span.start_datetime
+            ):
+                overlap = reservation.end_datetime - reservable_time_span.buffered_start_datetime
+                reservable_time_span.start_datetime += overlap
+
+            # Reservation is inside the After-buffer, shorten the reservable time span from the end
+            # ┌──────────────────────────┬─────────────────────────────────────┐
+            # │ oooo----   -> oo----     │ Reservation starts in After-buffer  │
+            # │       xxxx ->       xxxx │                                     │
+            # ├──────────────────────────┼─────────────────────────────────────┤
+            # │ oooooo---- -> oo----     │ Reservation ends in After-buffer    │
+            # │       xxxx ->       xxxx │                                     │
+            # └──────────────────────────┴─────────────────────────────────────┘
+            elif (
+                reservable_time_span.end_datetime
+                <= reservation.start_datetime
+                <= reservable_time_span.buffered_end_datetime
+            ):
+                overlap = reservable_time_span.buffered_end_datetime - reservation.start_datetime
+                reservable_time_span.end_datetime -= overlap
+
+            if reservable_time_span.duration_minutes <= 0:
+                break
+
+        # In case of an invalid start time due to normalisation, move to the next valid start time
         reservable_time_span.move_to_next_valid_start_time(reservation_unit)
 
         if reservable_time_span.can_fit_reservation_for_reservation_unit(
@@ -305,7 +364,7 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
             #  Affect closed status
             #  Can overlap with buffers
             reservation_unit_hard_closed_time_spans: list[TimeSpanElement] = (
-                _get_hard_closed_time_spans_for_reservation_unit(reservation_unit)  #
+                _get_hard_closed_time_spans_for_reservation_unit(reservation_unit)  # Formatting :)
                 + shared_hard_closed_time_spans
             )
 
@@ -313,7 +372,7 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
             #  Don't affect closed status
             #  Can overlap with buffers
             reservation_unit_soft_closed_time_spans: list[TimeSpanElement] = (
-                _get_soft_closed_time_spans_for_reservation_unit(reservation_unit)  #
+                _get_soft_closed_time_spans_for_reservation_unit(reservation_unit)  # Formatting :)
             )
 
             # Reservation Closed Time Spans
@@ -326,7 +385,7 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
             # These time spans have no effect on the closed status of the ReservationUnit,
             # meaning that the ReservationUnit can be shown as open, even if there are no reservable time spans.
             soft_closed_time_spans = (
-                reservation_unit_soft_closed_time_spans  #
+                reservation_unit_soft_closed_time_spans  # Formatting :)
                 + reservation_unit_reservation_closed_time_spans
             )
 
@@ -339,10 +398,7 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
 
             # Go through each ReservableTimeSpan individually one-by-one
             for reservable_time_span in reservation_unit.origin_hauki_resource.reservable_time_spans.all():
-                current_time_span = reservable_time_span.as_time_span_element(
-                    buffer_time_before=reservation_unit.buffer_time_before,
-                    buffer_time_after=reservation_unit.buffer_time_after,
-                )
+                current_time_span = reservable_time_span.as_time_span_element()
 
                 # Combine all Hard-Closed time spans into one list
                 hard_closed_time_spans: list[TimeSpanElement] = (
@@ -377,6 +433,7 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
                 first_reservable_times[reservation_unit.pk] = _find_first_reservable_time_span_for_reservation_unit(
                     reservation_unit=reservation_unit,
                     normalised_reservable_time_spans=soft_normalised_reservable_time_spans,
+                    reservations=reservation_unit_reservation_closed_time_spans,
                     minimum_duration_minutes=minimum_duration_minutes,
                 )
                 # Suitable timespan was found, select and continue to next reservation unit
