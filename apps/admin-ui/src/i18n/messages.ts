@@ -173,6 +173,10 @@ const translations: ITranslations = {
     restore: ["Palauta"],
     selectPlaceholder: ["Valitse"],
     textSearchPlaceHolder: ["Hae"],
+    // TODO there should be key for not common words but common to multiple pages
+    noFilteredResults: [
+      "Valitsemillasi suodattimilla ei löytynyt yhtään {{name}}. Muuta rajausta tai tyhjennä kaikki suodattimet.",
+    ],
   },
   errors: {
     router: {
@@ -399,6 +403,7 @@ const translations: ITranslations = {
     numHours: ["Vuorojen kokonaiskesto"],
     numTurns: ["Vuorojen määrä"],
     authenticatedUser: ["Tunnistautunut käyttäjä"],
+    emptyFilterPageName: ["hakemusta"],
     headings: {
       id: ["id"],
       customer: ["Hakija"],
@@ -902,12 +907,10 @@ const translations: ITranslations = {
       maxPersons: ["Henkilömäärä"],
       area: ["Alue"],
     },
+    emptyFilterPageName: ["toimipistettä"],
     reservationUnits_one: ["{{count}} varausyksikkö"],
     reservationUnits_other: ["{{count}} varausyksikköä"],
     noReservationUnits: ["Ei varausyksiköitä"],
-    noFilteredUnits: [
-      "Valitsemillasi suodattimilla ei löytynyt yhtään toimipistettä. Muuta rajausta tai tyhjennä kaikki suodattimet.",
-    ],
     noArea: ["Alue puuttuu"],
     noService: ["Palvelu puuttuu"],
     unitCount_one: ["{{count}} toimipiste"],
@@ -1069,9 +1072,7 @@ const translations: ITranslations = {
     reservationUnitListDescription: [
       "Alla näet kaikki luodut varausyksiköt, joihin sinulla on käyttöoikeus. Voit luoda uuden varausyksikön toimipisteen sivulta.",
     ],
-    noFilteredReservationUnits: [
-      "Valitsemillasi suodattimilla ei löytynyt yhtään varausyksikköä. Muuta rajausta tai tyhjennä kaikki suodattimet.",
-    ],
+    emptyFilterPageName: ["varausyksikköä"],
     state: {
       ARCHIVED: ["Arkistoitu"],
       DRAFT: ["Luonnos"],
@@ -1674,9 +1675,7 @@ const translations: ITranslations = {
   // TODO this is in RequestedReservations.tsx
   Reservations: {
     reservationListHeading: ["Varaustoiveet"],
-    noFilteredReservations: [
-      "Valitsemillasi suodattimilla ei löytynyt yhtään varausta. Muuta rajausta tai tyhjennä kaikki suodattimet.",
-    ],
+    emptyFilterPageName: ["varausta"],
     reservationListDescription: [
       "Alla näet kaikki käsittelemättömät varaustoiveet. Klikkaamalla varaajan nimeä pääset käsittelemään varauksen.",
     ],

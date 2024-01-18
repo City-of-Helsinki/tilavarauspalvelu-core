@@ -160,7 +160,8 @@ export function ApplicationsTable({
   const rows = applications.map((app) => appMapper(app, t));
 
   if (rows.length === 0) {
-    return <div>{t("ReservationUnits.noFilteredReservationUnits")}</div>;
+    const name = t("Application.emptyFilterPageName");
+    return <div>{t("common.noFilteredResults", { name })}</div>;
   }
 
   const sortField = sort?.replace(/-/, "") ?? "";

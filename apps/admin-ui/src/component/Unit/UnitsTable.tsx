@@ -70,7 +70,8 @@ const UnitsTable = ({
   const cols = memoize(() => getColConfig(t, isMyUnits))();
 
   if (units.length === 0) {
-    return <div>{t("Unit.noFilteredUnits")}</div>;
+    const name = t("Unit.emptyFilterPageName");
+    return <div>{t("common.noFilteredResults", { name })}</div>;
   }
   return (
     <StyledCustomTable

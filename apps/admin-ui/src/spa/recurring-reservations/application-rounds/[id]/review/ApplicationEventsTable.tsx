@@ -172,7 +172,8 @@ export function ApplicationEventsTable({
   const cols = memoize(() => getColConfig(t))();
 
   if (views.length === 0) {
-    return <div>{t("ReservationUnits.noFilteredReservationUnits")}</div>;
+    const name = t("Application.emptyFilterPageName");
+    return <div>{t("common.noFilteredResults", { name })}</div>;
   }
 
   const sortField = sort?.replaceAll("-", "") ?? "";

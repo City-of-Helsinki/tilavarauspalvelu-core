@@ -89,7 +89,8 @@ const ReservationUnitsTable = ({
   const cols = getColConfig(t);
 
   if (reservationUnits.length === 0) {
-    return <div>{t("ReservationUnits.noFilteredReservationUnits")}</div>;
+    const name = t("ReservationUnits.emptyFilterPageName");
+    return <div>{t("common.noFilteredResults", { name })}</div>;
   }
   return (
     <CustomTable

@@ -98,7 +98,8 @@ const ReservationsTable = ({
   const cols = memoize(() => getColConfig(t))();
 
   if (reservations.length === 0) {
-    return <div>{t("Reservations.noFilteredReservations")}</div>;
+    const name = t("Reservations.emptyFilterPageName");
+    return <div>{t("common.noFilteredResults", { name })}</div>;
   }
 
   return (
