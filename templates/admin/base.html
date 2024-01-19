@@ -1,0 +1,10 @@
+{% extends "admin/base.html" %}
+{% load i18n static %}
+
+{% block userlinks %}
+    / <span>Version: {{ version }}</span> /
+    {% if user.has_usable_password %}
+        <a href="{% url 'admin:password_change' %}">{% translate 'Change password' %}</a> /
+    {% endif %}
+    <a href="{% url 'admin:logout' %}">{% translate 'Log out' %}</a>
+{% endblock %}
