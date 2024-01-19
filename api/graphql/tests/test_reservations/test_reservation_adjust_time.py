@@ -342,8 +342,8 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         )
 
         data = self.get_valid_adjust_data()
-        data["begin"] = (self.reservation_begin + datetime.timedelta(hours=3)).strftime("%Y%m%dT%H%M%S%zZ")
-        data["end"] = (self.reservation_end + datetime.timedelta(hours=3)).strftime("%Y%m%dT%H%M%S%zZ")
+        data["begin"] = (self.reservation_begin + datetime.timedelta(hours=3)).isoformat()
+        data["end"] = (self.reservation_end + datetime.timedelta(hours=3)).isoformat()
 
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_update_query(), input_data=data)

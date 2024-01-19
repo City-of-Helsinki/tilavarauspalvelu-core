@@ -6,6 +6,7 @@ __all__ = [
     "ApplicationEventScheduleActionsConnector",
     "ApplicationRoundActionsConnector",
     "ReservationUnitActionsConnector",
+    "ReservationActionsConnector",
 ]
 
 
@@ -59,3 +60,11 @@ class ReservationUnitActionsConnector:
         from actions.reservation_unit import ReservationUnitActions
 
         return ReservationUnitActions(instance)
+
+
+class ReservationActionsConnector:
+    def __get__(self, instance, _):
+        _raise_if_accessed_on_class(instance)
+        from actions.reservation import ReservationActions
+
+        return ReservationActions(instance)

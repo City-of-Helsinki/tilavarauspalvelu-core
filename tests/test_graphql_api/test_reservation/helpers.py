@@ -10,6 +10,10 @@ reservations_query = partial(build_query, "reservations", connection=True, order
 
 
 CREATE_MUTATION = build_mutation("createReservation", "ReservationCreateMutationInput")
+ADJUST_MUTATION = build_mutation("adjustReservationTime", "ReservationAdjustTimeMutationInput")
+CREATE_STAFF_MUTATION = build_mutation("createStaffReservation", "ReservationStaffCreateMutationInput")
+UPDATE_STAFF_MUTATION = build_mutation("staffReservationModify", "ReservationStaffModifyMutationInput")
+ADJUST_STAFF_MUTATION = build_mutation("staffAdjustReservationTime", "ReservationStaffAdjustTimeMutationInput")
 
 
 @contextmanager

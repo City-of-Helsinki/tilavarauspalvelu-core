@@ -137,8 +137,8 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
         self.fields["purpose_pk"].required = False
 
     def validate(self, data, prefill_from_profile=True):
-        begin: datetime.datetime | None = data.get("begin", getattr(self.instance, "begin", None))
-        end: datetime.datetime | None = data.get("end", getattr(self.instance, "end", None))
+        begin: datetime.datetime = data.get("begin", getattr(self.instance, "begin", None))
+        end: datetime.datetime = data.get("end", getattr(self.instance, "end", None))
         begin = begin.astimezone(DEFAULT_TIMEZONE)
         end = end.astimezone(DEFAULT_TIMEZONE)
 
@@ -168,12 +168,8 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
 
         data["sku"] = sku
         data["state"] = ReservationStateChoice.CREATED.value
-        data["buffer_time_before"] = self._get_biggest_buffer_time_from_reservation_units(
-            "buffer_time_before", reservation_units
-        )
-        data["buffer_time_after"] = self._get_biggest_buffer_time_from_reservation_units(
-            "buffer_time_after", reservation_units
-        )
+        data["buffer_time_before"], data["buffer_time_after"] = self._calculate_buffers(begin, end, reservation_units)
+
         user = self.context.get("request").user
         if user.is_anonymous:
             user = None
@@ -201,13 +197,26 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
 
         return data
 
-    def _get_biggest_buffer_time_from_reservation_units(
-        self, field: str, reservation_units: list[ReservationUnit]
-    ) -> [datetime.timedelta]:
-        buffer_times = [
-            getattr(res_unit, field) for res_unit in reservation_units if getattr(res_unit, field, None) is not None
-        ]
-        return max(buffer_times, default=None)
+    @staticmethod
+    def _calculate_buffers(
+        begin: datetime.datetime,
+        end: datetime.datetime,
+        reservation_units: list[ReservationUnit],
+    ) -> tuple[datetime.timedelta, datetime.timedelta]:
+        buffer_time_before: datetime.timedelta = datetime.timedelta()
+        buffer_time_after: datetime.timedelta = datetime.timedelta()
+
+        for reservation_unit in reservation_units:
+            before = reservation_unit.actions.get_actual_before_buffer(begin)
+            after = reservation_unit.actions.get_actual_after_buffer(end)
+
+            if before > buffer_time_before:
+                buffer_time_before = before
+
+            if after > buffer_time_after:
+                buffer_time_after = after
+
+        return buffer_time_before, buffer_time_after
 
     def _prefill_from_from_profile(self, user, data):
         try:

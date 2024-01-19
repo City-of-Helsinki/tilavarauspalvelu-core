@@ -15,6 +15,7 @@ from reservation_units.utils.reservation_unit_pricing_helper import (
 )
 from reservation_units.utils.reservation_unit_reservation_scheduler import ReservationUnitReservationScheduler
 from reservations.choices import ReservationTypeChoice
+from reservations.models import Reservation
 
 
 class PriceCalculationResult:
@@ -182,6 +183,8 @@ class ReservationPriceMixin:
 class ReservationSchedulingMixin:
     """Common mixin class for reservations containing date and scheduling related checks"""
 
+    instance: Reservation | None
+
     @classmethod
     def _get_invalid_begin(cls, reservation_unit, now: datetime.datetime):
         return (reservation_unit.reservation_begins and now < reservation_unit.reservation_begins) or (
@@ -283,58 +286,57 @@ class ReservationSchedulingMixin:
     def check_buffer_times(
         self,
         reservation_unit: ReservationUnit,
-        begin,
-        end,
+        begin: datetime.datetime,
+        end: datetime.datetime,
         reservation_type: ReservationType | None = None,
-        buffer_before: datetime.timedelta | None = None,
-        buffer_after: datetime.timedelta | None = None,
+        new_buffer_before: datetime.timedelta | None = None,
+        new_buffer_after: datetime.timedelta | None = None,
     ):
         current_type = getattr(self.instance, "type", reservation_type)
         if current_type == ReservationTypeChoice.BLOCKED:
             return
 
-        reservation_after = reservation_unit.get_next_reservation(end, self.instance, exclude_blocked=True)
-        reservation_before = reservation_unit.get_previous_reservation(begin, self.instance, exclude_blocked=True)
+        # Can't set buffers for whole day reservations
+        if reservation_unit.reservation_block_whole_day:
+            new_buffer_before = None
+            new_buffer_after = None
 
-        buffer_before = max(
-            [
-                buffer
-                for buffer in (
-                    buffer_before if buffer_before is not None else reservation_unit.buffer_time_before,
-                    getattr(reservation_before, "buffer_time_after", None),
-                )
-                if buffer
-            ],
-            default=None,
+        buffer_before: datetime.timedelta = (
+            new_buffer_before
+            if new_buffer_before is not None
+            else reservation_unit.actions.get_actual_before_buffer(begin)
         )
+        previous_reservation = reservation_unit.get_previous_reservation(begin, self.instance, exclude_blocked=True)
+        if previous_reservation:
+            previous_buffer = previous_reservation.buffer_time_after or datetime.timedelta()
+            if previous_buffer > buffer_before:
+                buffer_before = previous_buffer
 
-        buffer_after = max(
-            [
-                buffer
-                for buffer in (
-                    buffer_after if buffer_after is not None else reservation_unit.buffer_time_after,
-                    getattr(reservation_after, "buffer_time_before", None),
-                    buffer_after,
-                )
-                if buffer
-            ],
-            default=None,
+        buffer_after: datetime.timedelta = (
+            new_buffer_after
+            if new_buffer_after is not None  # for formatting
+            else reservation_unit.actions.get_actual_after_buffer(end)
         )
+        next_reservation = reservation_unit.get_next_reservation(end, self.instance, exclude_blocked=True)
+        if next_reservation:
+            next_buffer = next_reservation.buffer_time_before or datetime.timedelta()
+            if next_buffer > buffer_after:
+                buffer_after = next_buffer
 
-        if reservation_before and buffer_before and (reservation_before.end + buffer_before) > begin:
+        if previous_reservation and buffer_before and (previous_reservation.end + buffer_before) > begin:
             raise ValidationErrorWithCode(
                 "Reservation overlaps with reservation before due to buffer time.",
                 ValidationErrorCodes.RESERVATION_OVERLAP,
             )
 
-        if reservation_after and buffer_after and (reservation_after.begin - buffer_after) < end:
+        if next_reservation and buffer_after and (next_reservation.begin - buffer_after) < end:
             raise ValidationErrorWithCode(
                 "Reservation overlaps with reservation after due to buffer time.",
                 ValidationErrorCodes.RESERVATION_OVERLAP,
             )
 
     @staticmethod
-    def check_reservation_start_time(scheduler, begin: datetime.datetime):
+    def check_reservation_start_time(scheduler: ReservationUnitReservationScheduler, begin: datetime.datetime):
         if scheduler.reservation_unit.allow_reservations_without_opening_hours:
             return
 

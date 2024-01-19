@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import datetime
 import uuid
+from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.db import models
@@ -12,6 +15,10 @@ from reservation_units.enums import ReservationKind, ReservationStartInterval, R
 from reservation_units.querysets import ReservationUnitQuerySet
 from reservation_units.tasks import refresh_reservation_unit_product_mapping
 from tilavarauspalvelu.utils.auditlog_util import AuditLogger
+
+if TYPE_CHECKING:
+    from reservations.models import Reservation
+
 
 __all__ = [
     "ReservationUnit",
@@ -304,6 +311,8 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
 
     payment_types = models.ManyToManyField("reservation_units.ReservationUnitPaymentType", blank=True)
 
+    reservation_block_whole_day = models.BooleanField(blank=True, default=False)
+
     can_apply_free_of_charge = models.BooleanField(
         blank=True,
         default=False,
@@ -413,9 +422,9 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
     def get_next_reservation(
         self,
         end_time: datetime.datetime,
-        reservation=None,
+        reservation: Reservation | None = None,
         exclude_blocked: bool = False,
-    ):
+    ) -> Reservation | None:
         from reservations.choices import ReservationStateChoice, ReservationTypeChoice
         from reservations.models import Reservation
 
@@ -435,9 +444,9 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
     def get_previous_reservation(
         self,
         start_time: datetime.datetime,
-        reservation=None,
+        reservation: Reservation | None = None,
         exclude_blocked: bool = False,
-    ):
+    ) -> Reservation | None:
         from reservations.choices import ReservationStateChoice, ReservationTypeChoice
         from reservations.models import Reservation
 

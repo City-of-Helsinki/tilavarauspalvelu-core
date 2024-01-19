@@ -142,16 +142,18 @@ class ReservationStaffCreateSerializer(OldPrimaryKeySerializer, ReservationSched
         begin = data.get("begin").astimezone(DEFAULT_TIMEZONE)
         end = data.get("end").astimezone(DEFAULT_TIMEZONE)
 
-        reservation_units = data.get(
-            "reservation_unit",
-        )
+        reservation_units: list[ReservationUnit] = data.get("reservation_unit")
 
         self.check_begin(begin, end)
 
-        buffer_before = data.get("buffer_time_before", None)
-        buffer_after = data.get("buffer_time_after", None)
+        buffer_before: datetime.timedelta | None = data.get("buffer_time_before", None)
+        buffer_after: datetime.timedelta | None = data.get("buffer_time_after", None)
 
         for reservation_unit in reservation_units:
+            if reservation_unit.reservation_block_whole_day:
+                data["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(begin)
+                data["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(end)
+
             reservation_type = data.get("type", getattr(self.instance, "type", None))
             self.check_reservation_overlap(reservation_unit, begin, end)
             self.check_buffer_times(
@@ -159,8 +161,8 @@ class ReservationStaffCreateSerializer(OldPrimaryKeySerializer, ReservationSched
                 begin,
                 end,
                 reservation_type=reservation_type,
-                buffer_before=buffer_before,
-                buffer_after=buffer_after,
+                new_buffer_before=buffer_before,
+                new_buffer_after=buffer_after,
             )
             self.check_reservation_intervals_for_staff_reservation(reservation_unit, begin)
 

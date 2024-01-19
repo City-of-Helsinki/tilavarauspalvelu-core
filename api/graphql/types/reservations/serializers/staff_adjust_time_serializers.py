@@ -5,6 +5,7 @@ from django.utils.timezone import get_default_timezone
 from api.graphql.extensions.legacy_helpers import OldPrimaryKeyUpdateSerializer
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from api.graphql.types.reservations.serializers.mixins import ReservationSchedulingMixin
+from reservation_units.models import ReservationUnit
 from reservations.choices import ReservationStateChoice, ReservationTypeChoice
 from reservations.email_utils import send_reservation_modified_email
 from reservations.models import Reservation
@@ -54,20 +55,25 @@ class StaffReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reserv
                 ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED,
             )
 
-        begin = data["begin"]
-        end = data["end"]
+        begin = data["begin"].astimezone(DEFAULT_TIMEZONE)
+        end = data["end"].astimezone(DEFAULT_TIMEZONE)
 
         new_buffer_before = data.get("buffer_time_before", None)
         new_buffer_after = data.get("buffer_time_after", None)
 
+        reservation_unit: ReservationUnit
         for reservation_unit in self.instance.reservation_unit.all():
+            if reservation_unit.reservation_block_whole_day:
+                data["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(begin)
+                data["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(end)
+
             self.check_reservation_overlap(reservation_unit, begin, end)
             self.check_buffer_times(
                 reservation_unit,
                 begin,
                 end,
-                buffer_before=new_buffer_before,
-                buffer_after=new_buffer_after,
+                new_buffer_before=new_buffer_before,
+                new_buffer_after=new_buffer_after,
             )
             self.check_reservation_intervals_for_staff_reservation(reservation_unit, begin)
 

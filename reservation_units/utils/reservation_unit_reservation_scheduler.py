@@ -80,15 +80,11 @@ class ReservationUnitReservationScheduler:
 
         return origin_hauki_resource.is_reservable(start_datetime, end_datetime)
 
-    def get_reservation_unit_possible_start_times(
-        self,
-        selected_date: date,
-        interval_minutes: int,
-    ) -> set[datetime]:
+    def get_reservation_unit_possible_start_times(self, selected_date: date, interval_minutes: int) -> set[datetime]:
         resource = self.reservation_unit.origin_hauki_resource
         reservable_time_spans: QuerySet[ReservableTimeSpan] = resource.reservable_time_spans.filter(
-            start_datetime__date=selected_date,
-            end_datetime__date=selected_date,
+            start_datetime__date__lte=selected_date,
+            end_datetime__date__gte=selected_date,
         )
 
         possible_start_times = set()

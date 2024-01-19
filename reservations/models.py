@@ -11,6 +11,7 @@ from helsinki_gdpr.models import SerializableMixin
 
 from applications.choices import PriorityChoice
 from applications.models import City
+from common.connectors import ReservationActionsConnector
 from reservation_units.models import ReservationUnit
 from reservations.choices import (
     RESERVEE_LANGUAGE_CHOICES,
@@ -411,6 +412,7 @@ class Reservation(ExportModelOperationsMixin("reservation"), SerializableMixin, 
     )
 
     objects = ReservationManager()
+    actions = ReservationActionsConnector()
 
     class Meta:
         base_manager_name = "objects"

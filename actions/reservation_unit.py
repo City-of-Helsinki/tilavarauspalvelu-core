@@ -1,5 +1,7 @@
+import datetime
 from typing import TYPE_CHECKING, Any
 
+from common.date_utils import time_as_timedelta
 from opening_hours.errors import HaukiAPIError, HaukiRequestError, HaukiValueError
 from opening_hours.models import OriginHaukiResource
 from opening_hours.utils.hauki_api_client import HaukiAPIClient
@@ -119,3 +121,16 @@ class ReservationUnitHaukiExporter:
 class ReservationUnitActions(ReservationUnitHaukiExporter):
     def __init__(self, reservation_unit: "ReservationUnit"):
         self.reservation_unit = reservation_unit
+
+    def get_actual_before_buffer(self, reservation_begin: datetime.datetime | datetime.time) -> datetime.timedelta:
+        if self.reservation_unit.reservation_block_whole_day:
+            return time_as_timedelta(reservation_begin)
+        return self.reservation_unit.buffer_time_before or datetime.timedelta()
+
+    def get_actual_after_buffer(self, reservation_end: datetime.datetime | datetime.time) -> datetime.timedelta:
+        if self.reservation_unit.reservation_block_whole_day:
+            delta = time_as_timedelta(reservation_end)
+            if delta == datetime.timedelta():  # midnight
+                return delta
+            return datetime.timedelta(hours=24) - delta
+        return self.reservation_unit.buffer_time_after or datetime.timedelta()

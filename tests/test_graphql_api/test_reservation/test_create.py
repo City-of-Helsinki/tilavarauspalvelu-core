@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import freezegun
 import pytest
@@ -9,9 +9,12 @@ from tests.factories import (
     CityFactory,
     OriginHaukiResourceFactory,
     ReservableTimeSpanFactory,
+    ReservationFactory,
     ReservationUnitFactory,
+    SpaceFactory,
     UserFactory,
 )
+from tests.helpers import UserType
 from users.helauth.utils import ADLoginAMR
 
 from .helpers import CREATE_MUTATION, mock_profile_reader
@@ -157,3 +160,139 @@ def test_create_reservation__prefilled_with_profile_data__ad_login(graphql, sett
     assert reservation.reservee_address_street == ""
     assert reservation.reservee_address_zip == ""
     assert reservation.home_city is None
+
+
+@freezegun.freeze_time("2021-01-01")
+def test_create_reservation__reservation_block_whole_day(graphql):
+    reservation_unit = ReservationUnitFactory.create(
+        origin_hauki_resource=OriginHaukiResourceFactory(id=999),
+        reservation_block_whole_day=True,
+        spaces=[SpaceFactory.create()],
+    )
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=datetime(2023, 1, 1, 6, tzinfo=DEFAULT_TIMEZONE),
+        end_datetime=datetime(2023, 1, 1, 22, tzinfo=DEFAULT_TIMEZONE),
+    )
+
+    graphql.login_user_based_on_type(UserType.REGULAR)
+
+    input_data = {
+        "name": "foo",
+        "description": "bar",
+        "begin": datetime(2023, 1, 1, hour=12, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        "end": datetime(2023, 1, 1, hour=13, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        "reservationUnitPks": [reservation_unit.pk],
+    }
+
+    response = graphql(CREATE_MUTATION, input_data=input_data)
+    assert response.has_errors is False, response.errors
+
+    reservation: Reservation | None = Reservation.objects.filter(name="foo").first()
+    assert reservation is not None
+    assert reservation.begin == datetime(2023, 1, 1, hour=12, tzinfo=DEFAULT_TIMEZONE)
+    assert reservation.end == datetime(2023, 1, 1, hour=13, tzinfo=DEFAULT_TIMEZONE)
+    assert reservation.buffer_time_before == timedelta(hours=12)
+    assert reservation.buffer_time_after == timedelta(hours=11)
+
+
+@freezegun.freeze_time("2021-01-01")
+def test_create_reservation__reservation_block_whole_day__midnight(graphql):
+    reservation_unit = ReservationUnitFactory.create(
+        origin_hauki_resource=OriginHaukiResourceFactory(id=999),
+        reservation_block_whole_day=True,
+        spaces=[SpaceFactory.create()],
+    )
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=datetime(2022, 12, 31, 0, tzinfo=DEFAULT_TIMEZONE),
+        end_datetime=datetime(2023, 1, 3, 0, tzinfo=DEFAULT_TIMEZONE),
+    )
+
+    graphql.login_user_based_on_type(UserType.REGULAR)
+
+    input_data = {
+        "name": "foo",
+        "description": "bar",
+        "begin": datetime(2023, 1, 1, hour=0, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        "end": datetime(2023, 1, 2, hour=0, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        "reservationUnitPks": [reservation_unit.pk],
+    }
+
+    response = graphql(CREATE_MUTATION, input_data=input_data)
+    assert response.has_errors is False, response.errors
+
+    reservation: Reservation | None = Reservation.objects.filter(name="foo").first()
+    assert reservation is not None
+    assert reservation.begin == datetime(2023, 1, 1, hour=0, tzinfo=DEFAULT_TIMEZONE)
+    assert reservation.end == datetime(2023, 1, 2, hour=0, tzinfo=DEFAULT_TIMEZONE)
+    assert reservation.buffer_time_before == timedelta(hours=0)
+    assert reservation.buffer_time_after == timedelta(hours=0)
+
+
+@freezegun.freeze_time("2021-01-01")
+def test_create_reservation__reservation_block_whole_day__previous_reservation_blocks(graphql):
+    reservation_unit = ReservationUnitFactory.create(
+        origin_hauki_resource=OriginHaukiResourceFactory(id=999),
+        reservation_block_whole_day=True,
+        spaces=[SpaceFactory.create()],
+    )
+
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=datetime(2023, 1, 1, 6, tzinfo=DEFAULT_TIMEZONE),
+        end_datetime=datetime(2023, 1, 1, 22, tzinfo=DEFAULT_TIMEZONE),
+    )
+
+    ReservationFactory.create_for_reservation_unit(
+        reservation_unit=reservation_unit,
+        begin=datetime(2023, 1, 1, 8, tzinfo=DEFAULT_TIMEZONE),
+        end=datetime(2023, 1, 1, 9, tzinfo=DEFAULT_TIMEZONE),
+    )
+
+    graphql.login_user_based_on_type(UserType.REGULAR)
+
+    input_data = {
+        "name": "foo",
+        "description": "bar",
+        "begin": datetime(2023, 1, 1, hour=12, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        "end": datetime(2023, 1, 1, hour=13, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        "reservationUnitPks": [reservation_unit.pk],
+    }
+
+    response = graphql(CREATE_MUTATION, input_data=input_data)
+    assert response.error_message() == "Reservation overlaps with reservation before due to buffer time."
+
+
+@freezegun.freeze_time("2021-01-01")
+def test_create_reservation__reservation_block_whole_day__next_reservation_blocks(graphql):
+    reservation_unit = ReservationUnitFactory.create(
+        origin_hauki_resource=OriginHaukiResourceFactory(id=999),
+        reservation_block_whole_day=True,
+        spaces=[SpaceFactory.create()],
+    )
+
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=datetime(2023, 1, 1, 6, tzinfo=DEFAULT_TIMEZONE),
+        end_datetime=datetime(2023, 1, 1, 22, tzinfo=DEFAULT_TIMEZONE),
+    )
+
+    ReservationFactory.create_for_reservation_unit(
+        reservation_unit=reservation_unit,
+        begin=datetime(2023, 1, 1, 16, tzinfo=DEFAULT_TIMEZONE),
+        end=datetime(2023, 1, 1, 17, tzinfo=DEFAULT_TIMEZONE),
+    )
+
+    graphql.login_user_based_on_type(UserType.REGULAR)
+
+    input_data = {
+        "name": "foo",
+        "description": "bar",
+        "begin": datetime(2023, 1, 1, hour=12, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        "end": datetime(2023, 1, 1, hour=13, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        "reservationUnitPks": [reservation_unit.pk],
+    }
+
+    response = graphql(CREATE_MUTATION, input_data=input_data)
+    assert response.error_message() == "Reservation overlaps with reservation after due to buffer time."
