@@ -10,7 +10,7 @@ from api.webhooks.urls import webhook_router
 
 urlpatterns = [
     path("graphql/", csrf_exempt(FileUploadGraphQLView.as_view(graphiql=settings.DEBUG))),  # NOSONAR
-    path("admin/", admin.site.urls),
+    path("admin/", admin.site.urls, {"extra_context": {"version": settings.APP_VERSION}}),
     path("v1/", include(legacy_outer.urls)),
     path("v1/webhook/", include(webhook_router.urls)),
     path("pysocial/", include("social_django.urls", namespace="social")),
