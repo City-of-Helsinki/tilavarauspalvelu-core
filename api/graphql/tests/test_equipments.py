@@ -173,7 +173,7 @@ class EquipmentQueryTestCase(EquipmentBaseTestCase):
         response = self.query(
             """
             query {
-              equipments(rankGte: 1 rankLte: 2) {
+              equipments(rankGte: 1 rankLte: 2 orderBy: "name") {
                 edges {
                   node {
                     nameFi
@@ -187,7 +187,24 @@ class EquipmentQueryTestCase(EquipmentBaseTestCase):
         assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-        self.assertMatchSnapshot(content)
+        assert content["data"]["equipments"]["edges"] == [
+            {
+                "node": {
+                    "category": {
+                        "nameFi": "Test Category 2",
+                    },
+                    "nameFi": "And me 2",
+                },
+            },
+            {
+                "node": {
+                    "category": {
+                        "nameFi": "Test Category 1",
+                    },
+                    "nameFi": "Show me 1",
+                },
+            },
+        ]
 
 
 class EquipmentCategoryCreateTestCase(EquipmentBaseTestCase):

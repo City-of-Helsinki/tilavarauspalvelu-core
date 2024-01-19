@@ -89,6 +89,7 @@ class ReservationUnitAdminForm(forms.ModelForm):
             "authentication",
             "reservation_kind",
             "payment_types",
+            "reservation_block_whole_day",
             "can_apply_free_of_charge",
             "allow_reservations_without_opening_hours",
             "is_archived",

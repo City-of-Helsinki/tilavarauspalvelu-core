@@ -86,8 +86,8 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
             "description": "Test description",
             "numPersons": 1,
             "purposePk": self.purpose.pk,
-            "begin": datetime.datetime.now().strftime("%Y%m%dT%H%M%SZ"),
-            "end": (datetime.datetime.now() + datetime.timedelta(hours=1)).strftime("%Y%m%dT%H%M%SZ"),
+            "begin": datetime.datetime.now(tz=DEFAULT_TIMEZONE).isoformat(),
+            "end": (datetime.datetime.now(tz=DEFAULT_TIMEZONE) + datetime.timedelta(hours=1)).isoformat(),
             "reservationUnitPks": [self.reservation_unit.pk],
         }
 
@@ -394,10 +394,12 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
     def test_create_fails_when_reservation_unit_buffer_time_overlaps_with_existing_reservation_after(self):
         self.reservation_unit.buffer_time_after = datetime.timedelta(hours=1, minutes=1)
         self.reservation_unit.save()
+
         begin = datetime.datetime.now(tz=DEFAULT_TIMEZONE) + datetime.timedelta(hours=2)
         end = begin + datetime.timedelta(hours=1)
-        ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+
+        ReservationFactory.create_for_reservation_unit(
+            reservation_unit=self.reservation_unit,
             begin=begin,
             end=end,
             state=ReservationStateChoice.CONFIRMED,

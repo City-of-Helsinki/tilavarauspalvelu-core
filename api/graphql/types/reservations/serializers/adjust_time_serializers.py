@@ -1,16 +1,13 @@
 import datetime
+from typing import Any
 
 from django.utils.timezone import get_default_timezone
 
 from api.graphql.extensions.legacy_helpers import OldPrimaryKeyUpdateSerializer
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
-from api.graphql.types.reservations.serializers.mixins import (
-    ReservationPriceMixin,
-    ReservationSchedulingMixin,
-)
-from reservation_units.utils.reservation_unit_reservation_scheduler import (
-    ReservationUnitReservationScheduler,
-)
+from api.graphql.types.reservations.serializers.mixins import ReservationPriceMixin, ReservationSchedulingMixin
+from reservation_units.models import ReservationUnit
+from reservation_units.utils.reservation_unit_reservation_scheduler import ReservationUnitReservationScheduler
 from reservations.choices import ReservationStateChoice
 from reservations.email_utils import send_reservation_modified_email
 from reservations.models import Reservation
@@ -19,6 +16,8 @@ DEFAULT_TIMEZONE = get_default_timezone()
 
 
 class ReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, ReservationPriceMixin, ReservationSchedulingMixin):
+    instance: Reservation
+
     class Meta:
         model = Reservation
         fields = [
@@ -32,7 +31,16 @@ class ReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reservation
         super().__init__(*args, **kwargs)
         self.fields["state"].readonly = True
 
-    def save(self, **kwargs):
+    def save(self) -> Reservation:
+        kwargs: dict[str, Any] = {}
+        for res_unit in self.instance.reservation_unit.all():
+            if not res_unit.reservation_block_whole_day:
+                continue
+
+            kwargs["buffer_time_before"] = res_unit.actions.get_actual_before_buffer(self.validated_data["begin"])
+            kwargs["buffer_time_after"] = res_unit.actions.get_actual_after_buffer(self.validated_data["end"])
+            break
+
         instance = super().save(**kwargs)
         send_reservation_modified_email(instance)
         return instance
@@ -51,8 +59,9 @@ class ReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reservation
                 "Reservation has gone through handling and it cannot be changed anymore.",
                 ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED,
             )
-        begin: datetime.datetime = data["begin"]
-        end: datetime.datetime = data["end"]
+
+        begin: datetime.datetime = data["begin"].astimezone(DEFAULT_TIMEZONE)
+        end: datetime.datetime = data["end"].astimezone(DEFAULT_TIMEZONE)
         self.check_begin(begin, end)
 
         for reservation_unit in self.instance.reservation_unit.all():
@@ -96,7 +105,7 @@ class ReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reservation
                 ValidationErrorCodes.RESERVATION_CURRENT_BEGIN_IN_PAST,
             )
 
-    def check_cancellation_rules(self, reservation_unit):
+    def check_cancellation_rules(self, reservation_unit: ReservationUnit) -> None:
         now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
 
         cancel_rule = reservation_unit.cancellation_rule

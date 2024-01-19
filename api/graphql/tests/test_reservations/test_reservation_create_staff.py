@@ -55,8 +55,8 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
     def get_valid_minimum_input_data(self):
         return {
             "type": ReservationTypeChoice.STAFF,
-            "begin": self.res_begin.strftime("%Y%m%dT%H%M%S%z"),
-            "end": self.res_end.strftime("%Y%m%dT%H%M%S%z"),
+            "begin": self.res_begin.isoformat(),
+            "end": self.res_end.isoformat(),
             "reservationUnitPks": [self.reservation_unit.pk],
         }
 
@@ -293,8 +293,8 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
         self.client.force_login(self.general_admin)
         input_data = self.get_valid_minimum_input_data()
         input_data["bufferTimeBefore"] = "01:05:00"
-        ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+        ReservationFactory.create_for_reservation_unit(
+            reservation_unit=self.reservation_unit,
             begin=self.res_begin - datetime.timedelta(hours=2),
             end=self.res_begin - datetime.timedelta(hours=1),
             state=ReservationStateChoice.CONFIRMED,
@@ -335,7 +335,7 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
         self.reservation_unit.buffer_time_after = datetime.timedelta(hours=1)
         self.reservation_unit.save()
 
-        ReservationFactory(
+        ReservationFactory.create(
             reservation_unit=[self.reservation_unit],
             begin=self.res_begin - datetime.timedelta(hours=1),
             end=self.res_begin,

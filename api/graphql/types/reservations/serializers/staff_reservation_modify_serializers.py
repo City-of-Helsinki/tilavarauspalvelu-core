@@ -22,6 +22,8 @@ DEFAULT_TIMEZONE = get_default_timezone()
 
 
 class StaffReservationModifySerializer(OldPrimaryKeyUpdateSerializer, ReservationSchedulingMixin):
+    instance: Reservation
+
     age_group_pk = IntegerPrimaryKeyField(queryset=AgeGroup.objects.all(), source="age_group", allow_null=True)
 
     buffer_time_before = DurationField(required=False)
@@ -145,13 +147,19 @@ class StaffReservationModifySerializer(OldPrimaryKeyUpdateSerializer, Reservatio
                 ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED,
             )
 
-        begin = data.get("begin", self.instance.begin)
-        end = data.get("end", self.instance.end)
+        begin = data.get("begin", self.instance.begin).astimezone(DEFAULT_TIMEZONE)
+        end = data.get("end", self.instance.end).astimezone(DEFAULT_TIMEZONE)
 
-        new_buffer_before = data.get("buffer_time_before", None)
-        new_buffer_after = data.get("buffer_time_after", None)
+        new_buffer_before: datetime.timedelta | None = data.get("buffer_time_before", None)
+        new_buffer_after: datetime.timedelta | None = data.get("buffer_time_after", None)
 
+        reservation_unit: ReservationUnit
         for reservation_unit in self.instance.reservation_unit.all():
+            # Can't set buffers for whole day reservations
+            if reservation_unit.reservation_block_whole_day:
+                data["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(begin)
+                data["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(end)
+
             reservation_type = data.get("type", getattr(self.instance, "type", None))
             self.check_reservation_overlap(reservation_unit, begin, end)
             self.check_buffer_times(
@@ -159,8 +167,8 @@ class StaffReservationModifySerializer(OldPrimaryKeyUpdateSerializer, Reservatio
                 begin,
                 end,
                 reservation_type=reservation_type,
-                buffer_before=new_buffer_before,
-                buffer_after=new_buffer_after,
+                new_buffer_before=new_buffer_before,
+                new_buffer_after=new_buffer_after,
             )
             self.check_reservation_intervals_for_staff_reservation(reservation_unit, begin)
 
