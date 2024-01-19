@@ -40,44 +40,44 @@ import { Subheading } from "common/src/reservation-form/styles";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
 import { Container, PendingReservation } from "common";
 
-import { createApolloClient } from "../../modules/apolloClient";
+import { createApolloClient } from "@/modules/apolloClient";
 import {
   isBrowser,
   reservationUnitPath,
   reservationUnitPrefix,
-} from "../../modules/const";
+} from "@/modules/const";
 import {
   getTranslation,
   printErrorMessages,
   reservationsUrl,
-} from "../../modules/util";
+} from "@/modules/util";
 import {
   RESERVATION_UNIT,
   TERMS_OF_USE,
-} from "../../modules/queries/reservationUnit";
+} from "@/modules/queries/reservationUnit";
 import {
   CONFIRM_RESERVATION,
   DELETE_RESERVATION,
   GET_CITIES,
   GET_RESERVATION,
   UPDATE_RESERVATION,
-} from "../../modules/queries/reservation";
-import Sanitize from "../../components/common/Sanitize";
-import { getReservationUnitPrice } from "../../modules/reservationUnit";
+} from "@/modules/queries/reservation";
+import Sanitize from "@/components/common/Sanitize";
+import { getReservationUnitPrice } from "@/modules/reservationUnit";
 import {
   getCheckoutUrl,
   getReservationApplicationMutationValues,
   profileUserFields,
-} from "../../modules/reservation";
-import { AGE_GROUPS, RESERVATION_PURPOSES } from "../../modules/queries/params";
-import { ReservationProps } from "../../context/DataContext";
-import ReservationInfoCard from "../../components/reservation/ReservationInfoCard";
-import Step0 from "../../components/reservation/Step0";
-import Step1 from "../../components/reservation/Step1";
-import { ReservationStep } from "../../modules/types";
-import { JustForDesktop } from "../../modules/style/layout";
-import { PinkBox } from "../../components/reservation-unit/ReservationUnitStyles";
-import { Toast } from "../../styles/util";
+} from "@/modules/reservation";
+import { AGE_GROUPS, RESERVATION_PURPOSES } from "@/modules/queries/params";
+import { ReservationProps } from "@/context/DataContext";
+import ReservationInfoCard from "@/components/reservation/ReservationInfoCard";
+import Step0 from "@/components/reservation/Step0";
+import Step1 from "@/components/reservation/Step1";
+import { ReservationStep } from "@/modules/types";
+import { JustForDesktop } from "@/modules/style/layout";
+import { PinkBox } from "@/components/reservation-unit/ReservationUnitStyles";
+import { Toast } from "@/styles/util";
 
 type Props = {
   reservationUnit: ReservationUnitType;

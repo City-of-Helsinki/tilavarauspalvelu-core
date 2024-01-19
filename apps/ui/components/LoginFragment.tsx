@@ -3,13 +3,14 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { signIn, useSession } from "~/hooks/auth";
-import { MediumButton } from "../styles/util";
+import { MediumButton } from "@/styles/util";
 
 type Props = {
   text?: string;
   componentIfAuthenticated?: React.ReactNode;
   isActionDisabled?: boolean;
   actionCallback?: () => void;
+  returnUrl?: string;
 };
 
 const Wrapper = styled.div`
@@ -50,6 +51,7 @@ const LoginFragment = ({
   componentIfAuthenticated,
   isActionDisabled,
   actionCallback,
+  returnUrl,
 }: Props): JSX.Element | null => {
   const { isAuthenticated } = useSession();
   const { t } = useTranslation();
@@ -60,6 +62,10 @@ const LoginFragment = ({
         onClick={() => {
           if (actionCallback) {
             actionCallback();
+          }
+          if (returnUrl) {
+            signIn(returnUrl);
+            return;
           }
           signIn();
         }}
