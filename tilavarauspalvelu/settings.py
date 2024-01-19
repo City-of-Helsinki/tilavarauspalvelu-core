@@ -10,7 +10,6 @@ from django.utils.translation import gettext_lazy as _
 from helusers import defaults
 from sentry_sdk.integrations.django import DjangoIntegration
 
-from .utils.get_version import get_git_revision_hash
 from .utils.logging import getLogger
 
 # This is a temporary fix for graphene_permissions to avoid ImportError when importing ResolveInfo
@@ -32,9 +31,9 @@ env = environ.Env(
     CELERY_BROKER_URL=(str, "filesystem://"),
     CELERY_CACHE_BACKEND=(str, "django-cache"),
     CELERY_ENABLED=(bool, True),
-    CELERY_LOG_LEVEL=(str, "INFO"),
-    CELERY_LOG_FILE=(str, "./broker/worker.log"),
     CELERY_FILESYSTEM_BACKEND=(bool, True),
+    CELERY_LOG_FILE=(str, "./broker/worker.log"),
+    CELERY_LOG_LEVEL=(str, "INFO"),
     CELERY_PROCESSED_FOLDER=(str, "./broker/processed/"),
     CELERY_QUEUE_FOLDER_IN=(str, "./broker/queue/"),
     CELERY_QUEUE_FOLDER_OUT=(str, "./broker/queue/"),
@@ -99,6 +98,8 @@ env = environ.Env(
     SENTRY_DSN=(str, ""),
     SENTRY_ENVIRONMENT=(str, "development"),
     SESSION_COOKIE_DOMAIN=(str, None),
+    SOURCE_BRANCH_NAME=(str, ""),
+    SOURCE_VERSION=(str, ""),
     STATIC_ROOT=(root, root("staticroot")),
     STATIC_URL=(str, "/static/"),
     TOKEN_AUTH_ACCEPTED_AUDIENCE=(str, ""),
@@ -135,6 +136,9 @@ ROOT_URLCONF = "tilavarauspalvelu.urls"
 AUTH_USER_MODEL = "users.User"
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 ADMINS = env("ADMINS")
+
+# Either the release tag or git short hash (or "local" if running locally)
+APP_VERSION = env("SOURCE_BRANCH_NAME").replace("main", "") or env("SOURCE_VERSION")[:8] or "local"
 
 if DEBUG is True and env("SECRET_KEY") == "":
     logger.warning("Running in debug mode without proper secret key. Fix if not intentional")
@@ -363,7 +367,7 @@ if env("SENTRY_DSN"):
     sentry_sdk.init(
         dsn=env("SENTRY_DSN"),
         environment=env("SENTRY_ENVIRONMENT"),
-        release=get_git_revision_hash(),
+        release=APP_VERSION,
         integrations=[DjangoIntegration()],
     )
 
