@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-15 10:30+0200\n"
+"POT-Creation-Date: 2024-01-19 17:11+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,7 +20,7 @@ msgstr ""
 
 #: actions/application_event.py:19
 msgid "Cannot decline an event without defined schedules"
-msgstr ""
+msgstr "Ei voi perua hakemuksen ovaa ilman määriteltyjä aikatauluja"
 
 #: actions/application_event.py:26
 #, python-brace-format
@@ -373,59 +373,59 @@ msgstr ""
 msgid "Community"
 msgstr ""
 
-#: applications/choices.py:38 applications/choices.py:160
+#: applications/choices.py:38 applications/choices.py:175
 msgid "Company"
 msgstr ""
 
-#: applications/choices.py:125
+#: applications/choices.py:132
 msgid "Unallocated"
 msgstr ""
 
-#: applications/choices.py:128
+#: applications/choices.py:135
 msgid "Approved"
 msgstr ""
 
-#: applications/choices.py:131
+#: applications/choices.py:138
 msgid "Declined"
 msgstr ""
 
-#: applications/choices.py:134
+#: applications/choices.py:141
 msgid "Reserved"
 msgstr ""
 
-#: applications/choices.py:137
+#: applications/choices.py:144
 msgid "Failed"
 msgstr ""
 
-#: applications/choices.py:154
+#: applications/choices.py:169
 msgid "Internal"
 msgstr ""
 
-#: applications/choices.py:155
+#: applications/choices.py:170
 msgid "Public"
 msgstr ""
 
-#: applications/choices.py:156 common/choices/banner_notification.py:12
+#: applications/choices.py:171 common/choices/banner_notification.py:12
 msgid "All"
 msgstr ""
 
-#: applications/choices.py:161
+#: applications/choices.py:176
 msgid "Registered association"
 msgstr ""
 
-#: applications/choices.py:162
+#: applications/choices.py:177
 msgid "Public association"
 msgstr ""
 
-#: applications/choices.py:163
+#: applications/choices.py:178
 msgid "Unregistered association"
 msgstr ""
 
-#: applications/choices.py:164
+#: applications/choices.py:179
 msgid "Municipality consortium"
 msgstr ""
 
-#: applications/choices.py:165
+#: applications/choices.py:180
 msgid "Religious community"
 msgstr ""
 
@@ -880,7 +880,7 @@ msgctxt "HaukiResourceState"
 msgid "Maintenance"
 msgstr ""
 
-#: opening_hours/models.py:48
+#: opening_hours/models.py:49
 msgid "`start_datetime` must be before `end_datetime`."
 msgstr ""
 

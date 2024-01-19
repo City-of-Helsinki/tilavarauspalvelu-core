@@ -59,28 +59,43 @@ jobs:
       - name: "Checkout code"
         uses: actions/checkout@v4
         with:
-          # Disable shallow cloning to improving relevancy of reporting for SonarCloud
+          # Disable shallow cloning to improve relevancy of reporting in SonarCloud
           fetch-depth: 0
 
-      - name: "Install poetry"
-        run: pipx install "poetry==1.6.0"
-
-      - name: "Install GDAL"
-        run: |
-          sudo apt-get update
-          sudo apt install -y --no-install-recommends gdal-bin
-
       - name: "Set up python"
+        id: setup-python
         uses: actions/setup-python@v5
         with:
-          cache: "poetry"
           python-version: "3.11"
+
+      - name: "Install poetry"
+        run: curl -sSL https://install.python-poetry.org | POETRY_VERSION=1.6.1 python - -y
+
+      - name: "Add poetry to PATH"
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: "Configure poetry"
+        run: poetry config virtualenvs.in-project true
+
+      - name: "Install additional libraries"
+        run: |
+          sudo apt-get update
+          sudo apt install -y --no-install-recommends gdal-bin gettext
+
+      - name: "Load cached poetry environment"
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: cache-venv-python${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}-v1
 
       - name: "Install dependencies"
         run: poetry install
 
       - name: "Test for migration issues"
         run: poetry run python manage.py makemigrations --check --no-color --no-input --dry-run
+
+      #- name: "Test for missing translation"
+      #  run: poetry run python -m tilavarauspalvelu.hooks.translations_done
 
       - name: "Run pytest with coverage"
         run: poetry run pytest --cov=. --cov-report=xml --cov-branch
@@ -90,8 +105,8 @@ jobs:
           DEBUG: true
           SECRET_KEY: build_secret
 
-      # Without this workaround Sonar reports a warning about an incorrect source path; credits to linked-events
-      - name: "Override coverage report source path for Sonar"
+      # Without this workaround, SonarCloud reports a warning about an incorrect source path
+      - name: "Override coverage report source path for SonarCloud"
         run: sed -i 's@'$GITHUB_WORKSPACE'@/github/workspace/@g' coverage.xml
 
       - name: "SonarCloud Scan"
