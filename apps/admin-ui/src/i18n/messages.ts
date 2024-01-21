@@ -1693,6 +1693,10 @@ const translations: ITranslations = {
       paymentStatus: ["Maksutila"],
       state: ["Käsittelytila"],
     },
+    prefixes: {
+      behalf: ["Puolesta| "],
+      staff: ["Sis.| "],
+    },
   },
   ReservationsListButton: {
     changeTime: ["Muuta aikaa"],

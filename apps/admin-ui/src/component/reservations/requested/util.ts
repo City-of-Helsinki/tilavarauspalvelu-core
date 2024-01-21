@@ -214,8 +214,9 @@ export const getTranslationKeyForReserveeType = (
 
 export const getReserveeName = (
   reservation: ReservationType,
-  length = 50
-): string => truncate(reservation.reserveeName?.trim() ?? "-", length);
+  length = 50,
+  prefix = ""
+): string => truncate(prefix + reservation.reserveeName?.trim() ?? "-", length);
 
 export const getName = (reservation: ReservationType, t: TFunction) => {
   if (reservation.name) {
