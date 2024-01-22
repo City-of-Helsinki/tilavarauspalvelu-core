@@ -263,6 +263,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
             []),
         ]
       : createMockOpeningTimes(id);
+
     return {
       props: {
         key: `${id}-${locale}`,
@@ -840,6 +841,7 @@ const ReservationUnit = ({
 
   const [cookiehubBannerHeight, setCookiehubBannerHeight] = useState<number>(0);
 
+  // If returning from login, continue on to reservation details
   useEffect(() => {
     if (
       !!isPostLogin &&

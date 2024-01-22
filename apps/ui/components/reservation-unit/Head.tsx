@@ -19,7 +19,7 @@ import {
   getTranslation,
   orderImages,
   singleSearchUrl,
-} from "../../modules/util";
+} from "@/modules/util";
 import IconWithText from "../common/IconWithText";
 import Images from "./Images";
 import {
@@ -27,7 +27,7 @@ import {
   getPrice,
   getReservationUnitName,
   getUnitName,
-} from "../../modules/reservationUnit";
+} from "@/modules/reservationUnit";
 import BreadcrumbWrapper from "../common/BreadcrumbWrapper";
 import AltNotification from "../common/AltNotification";
 
