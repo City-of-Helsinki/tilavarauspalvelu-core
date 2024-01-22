@@ -131,6 +131,6 @@ stop:
 translations:
 	@echo ""
 	@echo Making translations...
-	@python manage.py maketranslations -l fi -l sv --no-obsolete --omit-header
+	@python manage.py maketranslations -l fi -l sv --no-obsolete --omit-header --add-location file
 	@echo ""
 	@echo Done!
