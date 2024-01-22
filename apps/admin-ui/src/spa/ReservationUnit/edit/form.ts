@@ -541,10 +541,10 @@ export const ReservationUnitEditSchema = z
 
     if (v.hasScheduledPublish) {
       validateDateTimeInterval({
-        beginDate: v.publishBeginsDate,
-        beginTime: v.publishBeginsTime,
-        endDate: v.publishEndsDate,
-        endTime: v.publishEndsTime,
+        beginDate: v.hasPublishBegins ? v.publishBeginsDate : "",
+        beginTime: v.hasPublishBegins ? v.publishBeginsTime : "",
+        endDate: v.hasPublishEnds ? v.publishEndsDate : "",
+        endTime: v.hasPublishEnds ? v.publishEndsTime : "",
         ctx,
         path: {
           beginDate: "publishBeginsDate",
@@ -556,10 +556,10 @@ export const ReservationUnitEditSchema = z
     }
     if (v.hasScheduledReservation) {
       validateDateTimeInterval({
-        beginDate: v.reservationBeginsDate,
-        beginTime: v.reservationBeginsTime,
-        endDate: v.reservationEndsDate,
-        endTime: v.reservationEndsTime,
+        beginDate: v.hasReservationBegins ? v.reservationBeginsDate : "",
+        beginTime: v.hasReservationBegins ? v.reservationBeginsTime : "",
+        endDate: v.hasReservationEnds ? v.reservationEndsDate : "",
+        endTime: v.hasReservationEnds ? v.reservationEndsTime : "",
         ctx,
         path: {
           beginDate: "reservationBeginsDate",
