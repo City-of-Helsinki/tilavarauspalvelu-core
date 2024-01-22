@@ -349,3 +349,13 @@ export const printErrorMessages = (error: ApolloError): string => {
 
 export const isTouchDevice = (): boolean =>
   isBrowser && window?.matchMedia("(any-hover: none)").matches;
+
+export const getPostLoginUrl = () => {
+  if (!isBrowser) {
+    return undefined;
+  }
+  const { origin, pathname, searchParams } = new URL(window.location.href);
+  const params = new URLSearchParams(searchParams);
+  params.set("isPostLogin", "true");
+  return `${origin}${pathname}?${params.toString()}`;
+};

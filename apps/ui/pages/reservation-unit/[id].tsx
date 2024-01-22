@@ -841,7 +841,12 @@ const ReservationUnit = ({
   const [cookiehubBannerHeight, setCookiehubBannerHeight] = useState<number>(0);
 
   useEffect(() => {
-    if (!!isPostLogin && storedReservation && reservationUnit?.pk) {
+    if (
+      !!isPostLogin &&
+      storedReservation &&
+      !isReservationQuotaReached &&
+      reservationUnit?.pk
+    ) {
       const { begin, end } = storedReservation;
       const input: ReservationCreateMutationInput = {
         begin,

@@ -55,8 +55,11 @@ import {
 } from "@/modules/reservationUnit";
 import LoginFragment from "../LoginFragment";
 import { useDebounce } from "@/hooks/useDebounce";
-import { capitalize, formatDurationMinutes } from "@/modules/util";
-import { isBrowser } from "@/modules/const";
+import {
+  capitalize,
+  formatDurationMinutes,
+  getPostLoginUrl,
+} from "@/modules/util";
 
 type Props<T> = {
   reservationUnit: ReservationUnitByPkType;
@@ -603,16 +606,6 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
     reservationUnit.reservableTimeSpans,
     (n) => n?.endDatetime
   );
-
-  const getPostLoginUrl = () => {
-    if (!isBrowser) {
-      return undefined;
-    }
-    const { origin, pathname, searchParams } = new URL(window.location.href);
-    const params = new URLSearchParams(searchParams);
-    params.set("isPostLogin", "true");
-    return `${origin}${pathname}?${params.toString()}`;
-  };
 
   const submitButton = createReservation ? (
     <SubmitButtonWrapper>

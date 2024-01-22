@@ -26,7 +26,7 @@ import {
   getReservationUnitPrice,
   isInTimeSpan,
 } from "@/modules/reservationUnit";
-import { formatDate } from "@/modules/util";
+import { formatDate, getPostLoginUrl } from "@/modules/util";
 import { MediumButton } from "@/styles/util";
 import Carousel from "../Carousel";
 import LoginFragment from "../LoginFragment";
@@ -741,6 +741,7 @@ const QuickReservation = ({
               </MediumButton>
             )
           }
+          returnUrl={getPostLoginUrl()}
         />
       </ActionWrapper>
     </Wrapper>
