@@ -154,7 +154,10 @@ class ApplicationEventStatusChoice(models.TextChoices):
 
     @DynamicClassAttribute
     def can_approve(self) -> bool:
-        return self == ApplicationEventStatusChoice.UNALLOCATED
+        return self in [
+            ApplicationEventStatusChoice.APPROVED,
+            ApplicationEventStatusChoice.UNALLOCATED,
+        ]
 
     @DynamicClassAttribute
     def can_reset(self) -> bool:
