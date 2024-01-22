@@ -610,7 +610,7 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
     }
     const { origin, pathname, searchParams } = new URL(window.location.href);
     const params = new URLSearchParams(searchParams);
-    searchParams.set("isPostLogin", "true");
+    params.set("isPostLogin", "true");
     return `${origin}${pathname}?${params.toString()}`;
   };
 
