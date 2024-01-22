@@ -131,6 +131,6 @@ stop:
 translations:
 	@echo ""
 	@echo Making translations...
-	@python manage.py makemessages -l fi -l sv
+	@python manage.py maketranslations -l fi -l sv --no-obsolete --omit-header
 	@echo ""
 	@echo Done!
