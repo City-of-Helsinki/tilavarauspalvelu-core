@@ -9,7 +9,7 @@ msgstr ""
 
 #: actions/application_event.py
 msgid "Cannot decline an event without defined schedules"
-msgstr "Ei voi perua hakemuksen ovaa ilman määriteltyjä aikatauluja"
+msgstr "Ei voi perua hakemuksen osaa ilman määriteltyjä aikatauluja"
 
 #: actions/application_event.py
 #, python-brace-format
