@@ -34,9 +34,6 @@ class ReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reservation
     def save(self) -> Reservation:
         kwargs: dict[str, Any] = {}
         for res_unit in self.instance.reservation_unit.all():
-            if not res_unit.reservation_block_whole_day:
-                continue
-
             kwargs["buffer_time_before"] = res_unit.actions.get_actual_before_buffer(self.validated_data["begin"])
             kwargs["buffer_time_after"] = res_unit.actions.get_actual_after_buffer(self.validated_data["end"])
             break
