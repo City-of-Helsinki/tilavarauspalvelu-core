@@ -39,7 +39,7 @@ def main() -> int:
     contents_before_sv = polib.pofile(str(path_sv))
 
     with working_directory(BASE_PATH):
-        call_command("makemessages", "-l", "fi", "-l", "sv", "--no-obsolete")
+        call_command("maketranslations", "-l", "fi", "-l", "sv", "--no-obsolete", "--omit-header")
 
     items: list[tuple[LangType, str, polib.POFile]] = [
         ("fi", str(path_fi), contents_before_fi),
