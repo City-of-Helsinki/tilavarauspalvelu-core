@@ -92,6 +92,7 @@ const ReservationNotification = () => {
       centered
       label={t("notification:waitingForPayment.title")}
       closeButtonLabelText={t("common:close")}
+      data-testid="unpaid-reservation-notification__title"
     >
       <NotificationContent>
         <BodyText>{t("notification:waitingForPayment.body")}</BodyText>
