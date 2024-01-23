@@ -7,6 +7,7 @@ import { useSession } from "@/hooks/auth";
 import ReservationCancellation from "../../components/reservation/ReservationCancellation";
 import ReservationEdit from "../../components/reservation/ReservationEdit";
 import Error from "next/error";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 type Props = {
   id: number;
@@ -22,6 +23,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   if (isFinite(id) && slug != null && (slug === "cancel" || slug === "edit")) {
     return {
       props: {
+        ...getCommonServerSideProps(),
         ...(await serverSideTranslations(locale ?? "fi")),
         key: `${id}${slug}${locale}`,
         id,
@@ -32,6 +34,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   return {
     notFound: true,
+    props: {
+      ...getCommonServerSideProps(),
+    },
   };
 };
 

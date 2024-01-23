@@ -63,7 +63,7 @@ const menuItems: MenuItem[] = [
 ];
 
 // TODO cmd / shift + click doesn't open link in new tab
-const Navigation = () => {
+export function Navigation({ profileLink }: { profileLink?: string }) {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
@@ -124,9 +124,8 @@ const Navigation = () => {
             />
           ))}
         </LanguageSelector>
-        <NavigationUserMenu />
+        <NavigationUserMenu profileLink={profileLink} />
       </HDSNavigation.Actions>
     </StyledNavigation>
   );
-};
-export { Navigation };
+}

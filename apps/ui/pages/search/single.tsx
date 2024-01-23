@@ -31,6 +31,7 @@ import ReservationUnitCard from "@/components/single-search/ReservationUnitCard"
 import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
 import { toApiDate } from "common/src/common/util";
 import { startOfDay } from "date-fns";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 const pagingLimit = 36;
 
@@ -72,6 +73,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 }) => {
   return {
     props: {
+      ...getCommonServerSideProps(),
       key: JSON.stringify({ ...query, locale }),
       overrideBackgroundColor: "var(--tilavaraus-gray)",
       ...(await serverSideTranslations(locale ?? "fi")),

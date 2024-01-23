@@ -63,9 +63,9 @@ import Sanitize from "../../components/common/Sanitize";
 import RelatedUnits from "../../components/reservation-unit/RelatedUnits";
 import { AccordionWithState as Accordion } from "../../components/common/Accordion";
 import { createApolloClient } from "@/modules/apolloClient";
-import Map from "../../components/Map";
-import Legend from "../../components/calendar/Legend";
-import ReservationCalendarControls from "../../components/calendar/ReservationCalendarControls";
+import { Map } from "@/components/Map";
+import Legend from "@/components/calendar/Legend";
+import ReservationCalendarControls from "@/components/calendar/ReservationCalendarControls";
 import {
   formatDurationMinutes,
   getTranslation,
@@ -118,6 +118,7 @@ import { useCurrentUser } from "@/hooks/user";
 import { genericTermsVariant } from "@/modules/const";
 import { APPLICATION_ROUNDS_PERIODS } from "@/modules/queries/applicationRound";
 import { CenterSpinner } from "@/components/common/common";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 type Props = {
   reservationUnit: ReservationUnitByPkType | null;
@@ -125,6 +126,7 @@ type Props = {
   activeApplicationRounds: RoundPeriod[];
   termsOfUse: Record<string, TermsOfUseType>;
   isPostLogin?: boolean;
+  mapboxToken?: string;
 };
 
 type WeekOptions = "day" | "week" | "month";
@@ -175,6 +177,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       reservationUnitData?.reservationUnitByPk ?? undefined;
     if (!isReservationUnitPublished(reservationUnit) && !previewPass) {
       return {
+        props: {
+          ...getCommonServerSideProps(),
+        },
         notFound: true,
       };
     }
@@ -182,6 +187,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const isDraft = reservationUnitData.reservationUnitByPk?.isDraft;
     if (isDraft && !previewPass) {
       return {
+        props: {
+          ...getCommonServerSideProps(),
+        },
         notFound: true,
       };
     }
@@ -267,6 +275,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     return {
       props: {
         key: `${id}-${locale}`,
+        ...getCommonServerSideProps(),
         ...(await serverSideTranslations(locale ?? "fi")),
         reservationUnit: {
           ...reservationUnitData?.reservationUnitByPk,
@@ -287,6 +296,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return {
     props: {
       key: `${id}-${locale}`,
+      ...getCommonServerSideProps(),
       ...(await serverSideTranslations(locale ?? "fi")),
       paramsId: id,
     },
@@ -436,6 +446,7 @@ const ReservationUnit = ({
   activeApplicationRounds,
   termsOfUse,
   isPostLogin,
+  mapboxToken,
 }: Props): JSX.Element | null => {
   const { t, i18n } = useTranslation();
 
@@ -1160,6 +1171,7 @@ const ReservationUnit = ({
                     title={getTranslation(reservationUnit.unit, "name")}
                     latitude={Number(reservationUnit.unit.location.latitude)}
                     longitude={Number(reservationUnit.unit.location.longitude)}
+                    mapboxToken={mapboxToken}
                   />
                 </MapWrapper>
               </Accordion>

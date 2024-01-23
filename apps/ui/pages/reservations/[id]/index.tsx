@@ -53,6 +53,7 @@ import { ReservationStatus } from "@/components/reservation/ReservationStatus";
 import Address from "@/components/reservation-unit/Address";
 import ReservationInfoCard from "@/components/reservation/ReservationInfoCard";
 import { ReservationOrderStatus } from "@/components/reservation/ReservationOrderStatus";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 type Props = {
   termsOfUse: Record<string, TermsOfUseType>;
@@ -81,6 +82,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
     return {
       props: {
+        ...getCommonServerSideProps(),
         key: `${id}-${locale}`,
         ...(await serverSideTranslations(locale ?? "fi")),
         overrideBackgroundColor: "var(--tilavaraus-white)",
@@ -94,6 +96,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   return {
     notFound: true,
+    props: {
+      ...getCommonServerSideProps(),
+    },
   };
 };
 

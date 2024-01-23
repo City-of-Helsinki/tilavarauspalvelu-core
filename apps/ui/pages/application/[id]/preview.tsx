@@ -22,6 +22,7 @@ import { createApolloClient } from "@/modules/apolloClient";
 import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
 import { useApplicationQuery } from "@/hooks/useApplicationQuery";
 import { ErrorToast } from "@/components/common/ErrorToast";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 // User has to accept the terms of service then on submit we change the application status
 // This uses separate Send mutation (not update) so no onNext like the other pages
@@ -156,6 +157,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   return {
     props: {
+      ...getCommonServerSideProps(),
       key: locale,
       id: pk,
       tos,

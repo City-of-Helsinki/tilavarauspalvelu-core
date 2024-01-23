@@ -34,6 +34,7 @@ import { useApplicationQuery } from "@/hooks/useApplicationQuery";
 import { useApplicationUpdate } from "@/hooks/useApplicationUpdate";
 import { CenterSpinner } from "@/components/common/common";
 import { ErrorToast } from "@/components/common/ErrorToast";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 const Form = styled.form`
   margin-bottom: var(--spacing-layout-l);
@@ -266,6 +267,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const pk = Number.isNaN(Number(pkstring)) ? undefined : Number(pkstring);
   return {
     props: {
+      ...getCommonServerSideProps(),
       key: locale,
       id: pk,
       ...(await serverSideTranslations(locale ?? "fi")),

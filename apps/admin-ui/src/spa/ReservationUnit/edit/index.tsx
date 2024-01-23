@@ -49,7 +49,6 @@ import { DateTimeInput } from "common/src/components/form/DateTimeInput";
 import { filterNonNullable } from "common/src/helpers";
 import { H1, H4, fontBold } from "common/src/common/typography";
 import { breakpoints } from "common";
-import { previewUrlPrefix } from "@/common/const";
 import { UNIT_WITH_SPACES_AND_RESOURCES } from "@/common/queries";
 import {
   ContainerMedium,
@@ -1572,9 +1571,11 @@ function CommunicationSection({
 
 function OpeningHoursSection({
   reservationUnit,
+  previewUrlPrefix,
 }: {
   // TODO can we simplify this by passing the hauki url only?
   reservationUnit: ReservationUnitByPkType | undefined;
+  previewUrlPrefix?: string;
 }) {
   const { t } = useTranslation();
 
@@ -1862,11 +1863,13 @@ const ReservationUnitEditor = ({
   unitPk,
   form,
   refetch,
+  previewUrlPrefix,
 }: {
   reservationUnit?: ReservationUnitByPkType;
   unitPk: string;
   form: UseFormReturn<ReservationUnitEditFormValues>;
   refetch: () => void;
+  previewUrlPrefix?: string;
 }): JSX.Element | null => {
   // ----------------------------- State and Hooks ----------------------------
   const { t } = useTranslation();
@@ -2128,7 +2131,10 @@ const ReservationUnitEditor = ({
           />
         )}
         <CommunicationSection form={form} />
-        <OpeningHoursSection reservationUnit={reservationUnit} />
+        <OpeningHoursSection
+          reservationUnit={reservationUnit}
+          previewUrlPrefix={previewUrlPrefix}
+        />
         {isSeasonal && <SeasonalSection form={form} />}
         <div>
           <ArchiveButton
@@ -2197,7 +2203,7 @@ type IRouterProps = {
 };
 
 /// Wrap the editor so we never reset the form after async loading (because of HDS TimeInput bug)
-function EditorWrapper() {
+function EditorWrapper({ previewUrlPrefix }: { previewUrlPrefix?: string }) {
   const { reservationUnitPk, unitPk } = useParams<IRouterProps>();
   const { t } = useTranslation();
 
@@ -2279,6 +2285,7 @@ function EditorWrapper() {
         form={form}
         unitPk={unitPk}
         refetch={refetch}
+        previewUrlPrefix={previewUrlPrefix}
       />
     </Wrapper>
   );

@@ -36,6 +36,7 @@ import ReservationUnitCard from "../../components/search/ReservationUnitCard";
 import useReservationUnitsList from "../../hooks/useReservationUnitList";
 import ListWithPagination from "../../components/common/ListWithPagination";
 import StartApplicationBar from "../../components/common/StartApplicationBar";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 type Props = {
   applicationRounds: ApplicationRoundNode[];
@@ -59,6 +60,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return {
     props: {
       key: JSON.stringify({ ...query, locale }),
+      ...getCommonServerSideProps(),
       overrideBackgroundColor: "var(--tilavaraus-gray)",
       applicationRounds,
       ...(await serverSideTranslations(locale ?? "fi")),

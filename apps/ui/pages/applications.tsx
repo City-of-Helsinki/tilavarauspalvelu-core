@@ -20,12 +20,14 @@ import Head from "@/components/applications/Head";
 import ApplicationsGroup from "@/components/applications/ApplicationsGroup";
 import { CenterSpinner } from "@/components/common/common";
 import { APPLICATIONS } from "@/modules/queries/application";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale } = ctx;
 
   return {
     props: {
+      ...getCommonServerSideProps(),
       overrideBackgroundColor: "var(--tilavaraus-gray)",
       ...(await serverSideTranslations(locale ?? "fi")),
     },

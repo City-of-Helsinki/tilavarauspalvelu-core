@@ -23,18 +23,14 @@ export const isBrowser = typeof window !== "undefined";
 export const PUBLIC_URL = env.NEXT_PUBLIC_BASE_URL;
 // @deprecated
 export const publicUrl = PUBLIC_URL;
+// TODO API_BASE_URL should always end in /
+// and the GRAPHQL_API_URL should be be ${API_BASE_URL}graphql/
 export const API_BASE_URL =
   env.NEXT_PUBLIC_TILAVARAUS_API_URL != null
     ? `${env.NEXT_PUBLIC_TILAVARAUS_API_URL}`
     : "";
 
-export const GRAPQL_API_URL =
-  env.NEXT_PUBLIC_TILAVARAUS_API_URL != null
-    ? `${env.NEXT_PUBLIC_TILAVARAUS_API_URL}/graphql/`
-    : "/graphql/";
-
-export const previewUrlPrefix =
-  env.NEXT_PUBLIC_RESERVATION_UNIT_PREVIEW_URL_PREFIX;
+export const GRAPHQL_API_URL = `${API_BASE_URL}/graphql/`;
 
 export const LIST_PAGE_SIZE = 50;
 export const LARGE_LIST_PAGE_SIZE = 100;
@@ -52,10 +48,7 @@ export const HERO_IMAGE_URL = `${publicUrl}/hero-user@1x.jpg`;
 export const LOGO_IMAGE_URL = `${publicUrl}/logo.png`;
 
 // TODO create a clean version of the API_URL and reuse it
-const AUTH_URL =
-  env.NEXT_PUBLIC_TILAVARAUS_API_URL != null
-    ? `${env.NEXT_PUBLIC_TILAVARAUS_API_URL}/helauth`
-    : "/helauth";
+const AUTH_URL = `${API_BASE_URL}/helauth`;
 
 const getCleanPublicUrl = () => {
   const hasPublicUrl =

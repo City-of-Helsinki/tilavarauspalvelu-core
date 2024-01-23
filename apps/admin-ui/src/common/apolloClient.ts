@@ -17,12 +17,11 @@ import type {
   ApplicationEventNodeConnection,
   ApplicationEventScheduleNodeConnection,
 } from "common/types/gql-types";
-import { GRAPQL_API_URL, isBrowser } from "./const";
+import { GRAPHQL_API_URL, isBrowser } from "./const";
 import { CustomFormData } from "./CustomFormData";
 
-const uri = GRAPQL_API_URL;
 const uploadLinkOptions = {
-  uri,
+  uri: GRAPHQL_API_URL,
   credentials: "include",
   FormData: CustomFormData,
 };
@@ -35,7 +34,7 @@ const uploadLinkOptions = {
 // FIXME upload link is broken locally (it succeeds but no new image is available)
 // @ts-expect-error FIXME
 const uploadLink = createUploadLink(uploadLinkOptions) as unknown as ApolloLink;
-const httpLink = new HttpLink({ uri, credentials: "include" });
+const httpLink = new HttpLink({ uri: GRAPHQL_API_URL, credentials: "include" });
 const authLink = new ApolloLink((operation, forward) => {
   // TODO this doesn't work with SSR (use the ui implementation when we add SSR requests)
   if (!isBrowser) {

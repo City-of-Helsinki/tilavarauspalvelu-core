@@ -25,6 +25,7 @@ import useReservationUnitsList from "@/hooks/useReservationUnitList";
 import { useApplicationUpdate } from "@/hooks/useApplicationUpdate";
 import { ErrorToast } from "@/components/common/ErrorToast";
 import { useApplicationQuery } from "@/hooks/useApplicationQuery";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale } = ctx;
@@ -37,6 +38,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   return {
     props: {
+      ...getCommonServerSideProps(),
       key: locale,
       id: pk,
       slug,

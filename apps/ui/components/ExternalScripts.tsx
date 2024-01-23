@@ -1,13 +1,16 @@
 import React from "react";
 import Script from "next/script";
-import {
-  matomoEnabled,
-  cookiehubEnabled,
-  hotjarEnabled,
-  isBrowser,
-} from "../modules/const";
+import { isBrowser } from "@/modules/const";
 
-const ExternalScripts = (): JSX.Element | null => {
+export function ExternalScripts({
+  cookiehubEnabled,
+  matomoEnabled,
+  hotjarEnabled,
+}: {
+  cookiehubEnabled: boolean;
+  matomoEnabled: boolean;
+  hotjarEnabled: boolean;
+}): JSX.Element | null {
   if (!isBrowser) {
     return null;
   }
@@ -88,6 +91,4 @@ d.parentNode.insertBefore(e,d);
       )}
     </>
   );
-};
-
-export default ExternalScripts;
+}

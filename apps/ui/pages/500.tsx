@@ -4,10 +4,12 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { CenteredContainer } from "common/src/layout/Container";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
+      ...getCommonServerSideProps(),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

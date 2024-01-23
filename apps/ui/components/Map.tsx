@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import ReactMapGL, { Marker, NavigationControl, ViewState } from "react-map-gl";
-import { mapboxToken, mapStyle } from "../modules/const";
+import { mapStyle } from "../modules/const";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 type Props = {
   title: string;
+  mapboxToken: string | undefined;
   latitude?: number;
   longitude?: number;
   height?: string;
@@ -17,11 +18,12 @@ const navControlStyle = {
   bottom: 10,
 };
 
-const Map = ({
+export const Map = ({
   title,
   latitude,
   longitude,
   height = "480px",
+  mapboxToken,
 }: Props): JSX.Element | null => {
   const [viewport, setViewport] = useState({
     latitude,
@@ -61,5 +63,3 @@ const Map = ({
     </ReactMapGL>
   );
 };
-
-export default Map;

@@ -23,12 +23,14 @@ import { APPLICATION_ROUNDS } from "@/modules/queries/applicationRound";
 import { CenterSpinner } from "@/components/common/common";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { CREATE_APPLICATION_MUTATION } from "@/modules/queries/application";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale } = ctx;
 
   return {
     props: {
+      ...getCommonServerSideProps(),
       overrideBackgroundColor: "white",
       ...(await serverSideTranslations(locale ?? "fi")),
     },

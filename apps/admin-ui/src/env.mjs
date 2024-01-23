@@ -13,49 +13,52 @@ const ServerSchema = z.object({
   SENTRY_DSN: z.string().optional(),
   // TODO enum?
   SENTRY_ENVIRONMENT: z.string().optional(),
+  COOKIEHUB_ENABLED: coerceBoolean,
+  HOTJAR_ENABLED: coerceBoolean,
+  TUNNISTAMO_URL: z.string().optional(),
+  RESERVATION_UNIT_PREVIEW_URL_PREFIX: z.string().optional(),
 });
 
 const ClientSchema = z.object({
   NEXT_PUBLIC_BASE_URL: z.string(),
-  NEXT_PUBLIC_TILAVARAUS_API_URL: z.string(),
-  NEXT_PUBLIC_TUNNISTAMO_URL: z.string().optional(),
-  NEXT_PUBLIC_RESERVATION_UNIT_PREVIEW_URL_PREFIX: z.string().optional(),
-  NEXT_PUBLIC_COOKIEHUB_ENABLED: coerceBoolean.optional(),
-  NEXT_PUBLIC_HOTJAR_ENABLED: coerceBoolean.optional(),
+  // Don't use API_URL on production, it's only for local development
+  NEXT_PUBLIC_TILAVARAUS_API_URL: z.string().optional(),
 });
 
-/* eslint-disable-next-line import/no-mutable-exports */
-let { env } = process;
-if (!process.env.SKIP_ENV_VALIDATION) {
+// let { env } = process;
+function createEnv() {
+  const skipValidation = coerceBoolean.parse(process.env.SKIP_ENV_VALIDATION);
   const isServer = typeof window === "undefined";
 
-  const serverConfig = isServer ? ServerSchema.safeParse(process.env) : null;
+  const serverConfig = isServer
+    ? skipValidation
+      ? ServerSchema.partial().safeParse(process.env)
+      : ServerSchema.safeParse(process.env)
+    : null;
 
-  if (isServer && serverConfig.error) {
+  if (isServer && !serverConfig?.success) {
     // eslint-disable-next-line no-console
     console.error("Server env validation failed", serverConfig.error);
   }
 
+  const clientSchema = skipValidation ? ClientSchema.partial() : ClientSchema;
   // NOTE NextJs does substitutions for process.env. Not using the full variable breaks it!
-  const clientConfig = ClientSchema.safeParse({
+  const clientConfig = clientSchema.safeParse({
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
     NEXT_PUBLIC_TILAVARAUS_API_URL: process.env.NEXT_PUBLIC_TILAVARAUS_API_URL,
-    NEXT_PUBLIC_TUNNISTAMO_URL: process.env.NEXT_PUBLIC_TUNNISTAMO_URL,
-    NEXT_PUBLIC_RESERVATION_UNIT_PREVIEW_URL_PREFIX:
-      process.env.NEXT_PUBLIC_RESERVATION_UNIT_PREVIEW_URL_PREFIX,
-    NEXT_PUBLIC_COOKIEHUB_ENABLED: process.env.NEXT_PUBLIC_COOKIEHUB_ENABLED,
-    NEXT_PUBLIC_HOTJAR_ENABLED: process.env.NEXT_PUBLIC_HOTJAR_ENABLED,
   });
 
-  if (clientConfig.error) {
+  if (!clientConfig.success) {
     // eslint-disable-next-line no-console
     console.error("Client env validation failed", clientConfig.error);
   }
 
-  env = {
-    ...(isServer && serverConfig.success ? serverConfig.data : {}),
+  return {
+    ...(isServer && serverConfig?.success ? serverConfig.data : {}),
     ...(clientConfig.success ? clientConfig.data : {}),
   };
 }
+
+const env = createEnv();
 
 export { env };

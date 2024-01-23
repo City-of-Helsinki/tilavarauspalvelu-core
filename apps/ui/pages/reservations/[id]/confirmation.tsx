@@ -10,6 +10,7 @@ import type { GetServerSideProps } from "next";
 import ReservationInfoCard from "@/components/reservation/ReservationInfoCard";
 import ReservationConfirmation from "@/components/reservation/ReservationConfirmation";
 import { GET_RESERVATION } from "@/modules/queries/reservation";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 // TODO styles are copies from [...params].tsx
 const StyledContainer = styled(Container)`
@@ -80,6 +81,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   return {
     props: {
+      ...getCommonServerSideProps(),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

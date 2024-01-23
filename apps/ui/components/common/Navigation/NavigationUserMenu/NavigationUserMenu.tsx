@@ -10,7 +10,6 @@ import styled, { css } from "styled-components";
 import { signIn, signOut, useSession } from "~/hooks/auth";
 import { NavigationUserMenuUserCard } from "./NavigationUserMenuUserCard";
 import { MenuItem } from "../types";
-import { env } from "@/env.mjs";
 
 const StyledUserMenu = styled(HDSNavigation.User)<{
   $active?: boolean;
@@ -114,7 +113,7 @@ const userMenuItems: MenuItem[] = [
 const constructName = (firstName?: string, lastName?: string) =>
   firstName || lastName ? `${firstName} ${lastName}` : undefined;
 
-const NavigationUserMenu = () => {
+export function NavigationUserMenu({ profileLink }: { profileLink?: string }) {
   const router = useRouter();
   const { isAuthenticated, user } = useSession();
   const { t } = useTranslation();
@@ -125,6 +124,8 @@ const NavigationUserMenu = () => {
 
   const { firstName, lastName } = user ?? {};
   const userName = constructName(firstName, lastName);
+  const showProfileLink =
+    !!profileLink && isAuthenticated && !isAdAuthenticated;
   return (
     <StyledUserMenu
       userName={userName}
@@ -137,9 +138,9 @@ const NavigationUserMenu = () => {
       <NavigationUserMenuUserCard
         user={{ name: userName, email: user?.email }}
       />
-      {isAuthenticated && !isAdAuthenticated && env.PROFILE_UI_URL && (
+      {showProfileLink && (
         <NavigationUserMenuItem
-          href={env.PROFILE_UI_URL}
+          href={profileLink}
           icon={<IconLinkExternal aria-hidden />}
           label={t("navigation:profileLinkLabel")}
           data-testid="navigation__user-profile-link"
@@ -173,6 +174,4 @@ const NavigationUserMenu = () => {
       />
     </StyledUserMenu>
   );
-};
-
-export { NavigationUserMenu };
+}

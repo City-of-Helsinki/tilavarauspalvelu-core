@@ -14,26 +14,22 @@ const ServerSchema = z.object({
   SENTRY_DSN: z.string().optional(),
   // TODO enum?
   SENTRY_ENVIRONMENT: z.string().optional(),
-  ENABLE_FETCH_HACK: coerceBoolean.optional(),
-  SKIP_ENV_VALIDATION: coerceBoolean.optional(),
+  ENABLE_FETCH_HACK: coerceBoolean,
+  SKIP_ENV_VALIDATION: coerceBoolean,
+  MAPBOX_TOKEN: z.string().optional(),
+  COOKIEHUB_ENABLED: coerceBoolean,
+  HOTJAR_ENABLED: coerceBoolean,
+  MATOMO_ENABLED: coerceBoolean,
+  PROFILE_UI_URL: z.string().url().or(z.string().length(0)).optional(),
 });
 
 const ClientSchema = z.object({
   NEXT_PUBLIC_BASE_URL: z.string().optional(),
-  NEXT_PUBLIC_TILAVARAUS_API_URL: z.string(),
-  NEXT_PUBLIC_MAPBOX_TOKEN: z.string().optional(),
-  NEXT_PUBLIC_COOKIEHUB_ENABLED: coerceBoolean.optional(),
-  NEXT_PUBLIC_HOTJAR_ENABLED: coerceBoolean,
-  NEXT_PUBLIC_MATOMO_ENABLED: coerceBoolean,
-  NEXT_PUBLIC_SENTRY_DSN: z.string().optional(),
-  NEXT_PUBLIC_SENTRY_ENVIRONMENT: z.string().optional(),
-  PROFILE_UI_URL: z.string().url().or(z.string().length(0)).optional(),
+  // Don't use API_URL on production, it's only for local development
+  NEXT_PUBLIC_TILAVARAUS_API_URL: z.string().optional(),
 });
 
 const createEnv = () => {
-  // TODO this causes type issues for example booleans are typed as strings
-
-  // let { env } = process;
   const skipValidation = coerceBoolean.parse(process.env.SKIP_ENV_VALIDATION);
   const isServer = typeof window === "undefined";
 
@@ -53,13 +49,6 @@ const createEnv = () => {
   const clientConfig = clientSchema.safeParse({
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
     NEXT_PUBLIC_TILAVARAUS_API_URL: process.env.NEXT_PUBLIC_TILAVARAUS_API_URL,
-    NEXT_PUBLIC_MAPBOX_TOKEN: process.env.NEXT_PUBLIC_MAPBOX_TOKEN,
-    NEXT_PUBLIC_COOKIEHUB_ENABLED: process.env.NEXT_PUBLIC_COOKIEHUB_ENABLED,
-    NEXT_PUBLIC_HOTJAR_ENABLED: process.env.NEXT_PUBLIC_HOTJAR_ENABLED,
-    NEXT_PUBLIC_MATOMO_ENABLED: process.env.NEXT_PUBLIC_MATOMO_ENABLED,
-    NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
-    NEXT_PUBLIC_SENTRY_ENVIRONMENT: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT,
-    PROFILE_UI_URL: process.env.NEXT_PUBLIC_PROFILE_UI_URL,
   });
 
   if (!clientConfig.success) {

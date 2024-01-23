@@ -9,11 +9,12 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { Container } from "common";
-import ReservationConfirmation from "../../../components/reservation/ReservationConfirmation";
-import ReservationInfoCard from "../../../components/reservation/ReservationInfoCard";
-import { Paragraph } from "../../../components/reservation/styles";
-import { GET_RESERVATION } from "../../../modules/queries/reservation";
-import { useOrder } from "../../../hooks/reservation";
+import ReservationConfirmation from "@/components/reservation/ReservationConfirmation";
+import ReservationInfoCard from "@/components/reservation/ReservationInfoCard";
+import { Paragraph } from "@/components/reservation/styles";
+import { GET_RESERVATION } from "@/modules/queries/reservation";
+import { useOrder } from "@/hooks/reservation";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 type Props = {
   reservationPk: number;
@@ -25,6 +26,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   return {
     props: {
+      ...getCommonServerSideProps(),
       key: `${reservationPk}${locale}`,
       reservationPk: Number.isNaN(reservationPk) ? null : reservationPk,
       ...(await serverSideTranslations(locale ?? "fi")),

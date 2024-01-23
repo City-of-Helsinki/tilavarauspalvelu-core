@@ -63,7 +63,10 @@ const withAuthorization = (component: JSX.Element, permission?: Permission) => (
   </AuthorizationChecker>
 );
 
-const UnitsRouter = () => (
+type Props = {
+  previewUrlPrefix?: string;
+};
+const UnitsRouter = ({ previewUrlPrefix }: Props) => (
   <Routes>
     <Route path=":unitPk/spacesResources" element={<SpacesResources />} />
     <Route path=":unitPk/space/edit/:spacePk" element={<SpaceEditorView />} />
@@ -74,11 +77,11 @@ const UnitsRouter = () => (
     <Route
       index
       path=":unitPk/reservationUnit/edit/"
-      element={<ReservationUnitEditor />}
+      element={<ReservationUnitEditor previewUrlPrefix={previewUrlPrefix} />}
     />
     <Route
       path=":unitPk/reservationUnit/edit/:reservationUnitPk"
-      element={<ReservationUnitEditor />}
+      element={<ReservationUnitEditor previewUrlPrefix={previewUrlPrefix} />}
     />
     <Route path=":unitPk" element={<Unit />} />
   </Routes>
@@ -130,14 +133,13 @@ const PremisesRouter = () => (
   </Routes>
 );
 
-const App = () => {
+function ClientApp({ previewUrlPrefix }: Props) {
   return (
     <BrowserRouter basename={publicUrl}>
       <PageWrapper>
         <Routes>
           <Route path="*" element={<Error404 />} />
           <Route path="/" element={withAuthorization(<HomePage />)} />
-
           <Route
             path={`${prefixes.applications}/*`}
             element={withAuthorization(
@@ -145,7 +147,6 @@ const App = () => {
               Permission.CAN_VALIDATE_APPLICATIONS
             )}
           />
-
           <Route
             path={`${prefixes.recurringReservations}/application-rounds/*`}
             element={withAuthorization(
@@ -153,13 +154,16 @@ const App = () => {
               Permission.CAN_VALIDATE_APPLICATIONS
             )}
           />
-
           <Route
             path="/premises-and-settings/*"
             element={withAuthorization(<PremisesRouter />)}
           />
-
-          <Route path="/unit/*" element={withAuthorization(<UnitsRouter />)} />
+          <Route
+            path="/unit/*"
+            element={withAuthorization(
+              <UnitsRouter previewUrlPrefix={previewUrlPrefix} />
+            )}
+          />
           <Route
             path="/reservations/*"
             element={withAuthorization(<ReservationsRouter />)}
@@ -179,17 +183,15 @@ const App = () => {
       </PageWrapper>
     </BrowserRouter>
   );
-};
+}
 
-const AppWrapper = () => {
+export function App({ previewUrlPrefix }: Props) {
   if (typeof window === "undefined") {
     return null;
   }
   return (
     <GlobalContext>
-      <App />
+      <ClientApp previewUrlPrefix={previewUrlPrefix} />
     </GlobalContext>
   );
-};
-
-export default AppWrapper;
+}

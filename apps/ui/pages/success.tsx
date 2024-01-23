@@ -11,12 +11,14 @@ import { useTranslation } from "next-i18next";
 import { useSession } from "@/hooks/auth";
 import { useOrder, useReservation } from "@/hooks/reservation";
 import ReservationFail from "@/components/reservation/ReservationFail";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale } = ctx;
 
   return {
     props: {
+      ...getCommonServerSideProps(),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

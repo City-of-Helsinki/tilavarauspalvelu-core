@@ -10,11 +10,11 @@ import {
 } from "common/types/gql-types";
 import { H2 } from "common/src/common/typography";
 import { Container } from "common";
-
-import { createApolloClient } from "@/modules/apolloClient";
-import Sanitize from "../../components/common/Sanitize";
-import { getTranslation } from "../../modules/util";
 import { TERMS_OF_USE } from "@/modules/queries/reservationUnit";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { createApolloClient } from "@/modules/apolloClient";
+import Sanitize from "@/components/common/Sanitize";
+import { getTranslation } from "@/modules/util";
 
 type Props = {
   genericTerms: TermsOfUseType;
@@ -36,12 +36,17 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const genericTerms = genericTermsData.termsOfUse?.edges
     ?.map((n) => n?.node)
     .find((n) => n?.pk === genericTermsId);
-  if (!genericTerms)
+  if (!genericTerms) {
     return {
+      props: {
+        ...getCommonServerSideProps(),
+      },
       notFound: true,
     };
+  }
   return {
     props: {
+      ...getCommonServerSideProps(),
       genericTerms,
       ...(await serverSideTranslations(locale ?? "fi")),
     },

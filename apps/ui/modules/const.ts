@@ -135,30 +135,14 @@ export const defaultDurationMins = 90;
 
 export const isBrowser = typeof window !== "undefined";
 
-// TODO these might be broken because they should be booleans but they are typed as strings
-// NOTE booleans are incorrectly typed in env.mjs
-export const cookiehubEnabled =
-  env.NEXT_PUBLIC_COOKIEHUB_ENABLED as unknown as boolean;
-export const matomoEnabled =
-  env.NEXT_PUBLIC_MATOMO_ENABLED as unknown as boolean;
-export const hotjarEnabled =
-  env.NEXT_PUBLIC_HOTJAR_ENABLED as unknown as boolean;
-export const mapboxToken = env.NEXT_PUBLIC_MAPBOX_TOKEN;
 const apiBaseUrl = env.NEXT_PUBLIC_TILAVARAUS_API_URL;
 
-// console.log("baseUrl", baseUrl);
 // TODO the validation needs to go to env.mjs because this reloads the page constantly
 // TODO we should default to this host if the env variable is not set
 // allowing us to host the api and the frontend on the same host without rebuilding the Docker container
 // possible problem: SSR requires absolute url for the api (so get the host url?)
 if (!isBrowser && !env.SKIP_ENV_VALIDATION) {
   // Don't check validity because it should default to same address (both host + port)
-  // is it correct though? on the frontend it is, but on the node server?
-  /*
-  if (!apiBaseUrl) {
-    throw new Error("API_BASE_URL is not defined");
-  }
-  */
   // this could be a transformation on the base value in env.mjs and a warning
   // throwing here because we'd have to fix all baseurls
   if (

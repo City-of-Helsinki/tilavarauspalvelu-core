@@ -39,7 +39,6 @@ import { Inputs } from "common/src/reservation-form/types";
 import { Subheading } from "common/src/reservation-form/styles";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
 import { Container, PendingReservation } from "common";
-
 import { createApolloClient } from "@/modules/apolloClient";
 import {
   isBrowser,
@@ -78,6 +77,7 @@ import { ReservationStep } from "@/modules/types";
 import { JustForDesktop } from "@/modules/style/layout";
 import { PinkBox } from "@/components/reservation-unit/ReservationUnitStyles";
 import { Toast } from "@/styles/util";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 type Props = {
   reservationUnit: ReservationUnitType;
@@ -151,6 +151,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
     return {
       props: {
+        ...getCommonServerSideProps(),
         key: `${reservationUnitPk}${locale}`,
         reservationUnit: reservationUnitData.reservationUnitByPk,
         reservationPurposes,
@@ -163,6 +164,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   }
 
   return {
+    props: {
+      ...getCommonServerSideProps(),
+    },
     notFound: true,
   };
 };

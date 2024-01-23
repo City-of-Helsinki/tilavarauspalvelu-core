@@ -10,16 +10,16 @@ import {
   UnitType,
 } from "common/types/gql-types";
 import { Container } from "common";
-
-import Header from "../components/index/Header";
-import SearchGuides from "../components/index/SearchGuides";
-import Purposes from "../components/index/Purposes";
-import Units from "../components/index/Units";
-import { createApolloClient } from "../modules/apolloClient";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
+import Header from "@/components/index/Header";
+import SearchGuides from "@/components/index/SearchGuides";
+import Purposes from "@/components/index/Purposes";
+import Units from "@/components/index/Units";
+import { createApolloClient } from "@/modules/apolloClient";
 import {
   RESERVATION_UNIT_PURPOSES,
   SEARCH_FORM_PARAMS_UNIT,
-} from "../modules/queries/params";
+} from "@/modules/queries/params";
 
 type Props = {
   purposes: PurposeType[];
@@ -67,6 +67,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   return {
     props: {
+      ...getCommonServerSideProps(),
       purposes,
       units,
       ...(await serverSideTranslations(locale ?? "fi", [

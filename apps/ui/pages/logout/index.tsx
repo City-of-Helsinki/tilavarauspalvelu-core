@@ -3,21 +3,24 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { env } from "@/env.mjs";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
+      ...getCommonServerSideProps(),
+      redirectUrl: env.NEXT_PUBLIC_BASE_URL || "/",
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
 };
 
 // TODO what is the purpose of this page?
-const LogoutPage = () => {
+const LogoutPage = ({ redirectUrl }: { redirectUrl: string }) => {
   const router = useRouter();
 
   useEffect(() => {
-    router.push(env.NEXT_PUBLIC_BASE_URL || "/");
+    router.push(redirectUrl);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

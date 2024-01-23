@@ -9,6 +9,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetServerSideProps } from "next";
 import { applicationsUrl } from "@/modules/util";
 import Head from "@/components/application/Head";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 const Paragraph = styled.p`
   white-space: pre-wrap;
@@ -56,6 +57,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const pk = Number.isNaN(Number(pkstring)) ? undefined : Number(pkstring);
   return {
     props: {
+      ...getCommonServerSideProps(),
       key: locale,
       id: pk,
       ...(await serverSideTranslations(locale ?? "fi")),

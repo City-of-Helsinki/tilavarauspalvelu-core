@@ -9,14 +9,14 @@ import {
   QueryApplicationRoundsArgs,
 } from "common/types/gql-types";
 import { Container } from "common";
-
-import { createApolloClient } from "../../modules/apolloClient";
-import Sanitize from "../../components/common/Sanitize";
-import KorosDefault from "../../components/common/KorosDefault";
-import { getTranslation } from "../../modules/util";
-import { APPLICATION_ROUNDS } from "../../modules/queries/applicationRound";
-import BreadcrumbWrapper from "../../components/common/BreadcrumbWrapper";
-import { getApplicationRoundName } from "../../modules/applicationRound";
+import { createApolloClient } from "@/modules/apolloClient";
+import Sanitize from "@/components/common/Sanitize";
+import KorosDefault from "@/components/common/KorosDefault";
+import { getTranslation } from "@/modules/util";
+import { APPLICATION_ROUNDS } from "@/modules/queries/applicationRound";
+import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
+import { getApplicationRoundName } from "@/modules/applicationRound";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 type Props = {
   applicationRound: ApplicationRoundNode;
@@ -37,6 +37,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   return {
     props: {
+      ...getCommonServerSideProps(),
       key: `${id}${locale}`,
       applicationRound,
       ...(await serverSideTranslations(locale ?? "fi")),

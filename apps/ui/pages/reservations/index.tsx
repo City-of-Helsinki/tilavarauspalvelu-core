@@ -21,12 +21,14 @@ import { LIST_RESERVATIONS } from "@/modules/queries/reservation";
 import ReservationCard from "@/components/reservation/ReservationCard";
 import Head from "@/components/reservations/Head";
 import { CenterSpinner } from "@/components/common/common";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale } = ctx;
 
   return {
     props: {
+      ...getCommonServerSideProps(),
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

@@ -9,19 +9,19 @@ import { format, isValid } from "date-fns";
 import { ThemeProvider } from "styled-components";
 import { theme } from "common";
 import PageWrapper from "../components/common/PageWrapper";
-import ExternalScripts from "../components/ExternalScripts";
+import { ExternalScripts } from "../components/ExternalScripts";
 import { DataContextProvider } from "../context/DataContext";
 import { createApolloClient } from "../modules/apolloClient";
-import { isBrowser } from "../modules/const";
 import { TrackingWrapper } from "../modules/tracking";
 import nextI18NextConfig from "../next-i18next.config";
 import "../styles/global.scss";
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
+  const { hotjarEnabled, matomoEnabled, cookiehubEnabled } = pageProps;
   return (
     <>
       <DataContextProvider>
-        <TrackingWrapper>
+        <TrackingWrapper matomoEnabled={matomoEnabled}>
           {/* TODO is this ever called on the server? then the ctx is not undefined */}
           <ApolloProvider client={createApolloClient(undefined)}>
             <ThemeProvider theme={theme}>
@@ -32,7 +32,11 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
           </ApolloProvider>
         </TrackingWrapper>
       </DataContextProvider>
-      {isBrowser && <ExternalScripts />}
+      <ExternalScripts
+        cookiehubEnabled={cookiehubEnabled}
+        matomoEnabled={matomoEnabled}
+        hotjarEnabled={hotjarEnabled}
+      />
     </>
   );
 };

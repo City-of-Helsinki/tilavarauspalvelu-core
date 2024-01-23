@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { useRouter } from "next/router";
-import { matomoEnabled } from "./const";
 
 const trackPageView = () => {
   try {
@@ -14,10 +13,12 @@ const trackPageView = () => {
 
 type TrackingWrapperProps = {
   children: React.ReactNode;
+  matomoEnabled: boolean;
 };
 
 export const TrackingWrapper = ({
   children,
+  matomoEnabled,
 }: TrackingWrapperProps): JSX.Element => {
   const router = useRouter();
 

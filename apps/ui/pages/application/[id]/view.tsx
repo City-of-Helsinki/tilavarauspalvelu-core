@@ -18,6 +18,7 @@ import { TERMS_OF_USE } from "@/modules/queries/reservationUnit";
 import { ViewInner } from "@/components/application/ViewInner";
 import { ButtonContainer, CenterSpinner } from "@/components/common/common";
 import { useApplicationQuery } from "@/hooks/useApplicationQuery";
+import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 type Props = {
   id?: number;
@@ -88,6 +89,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   return {
     props: {
+      ...getCommonServerSideProps(),
       key: locale,
       id: pk,
       tos,
