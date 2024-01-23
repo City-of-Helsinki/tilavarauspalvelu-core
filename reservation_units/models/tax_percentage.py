@@ -16,6 +16,10 @@ class TaxPercentage(models.Model):
         help_text="The tax percentage for a price",
     )
 
+    class Meta:
+        db_table = "tax_percentage"
+        base_manager_name = "objects"
+
     def __str__(self) -> str:
         return f"{self.value}%"
 

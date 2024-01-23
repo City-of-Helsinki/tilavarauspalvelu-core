@@ -30,12 +30,20 @@ class AgeGroup(models.Model):
     minimum = models.fields.PositiveIntegerField(null=False, blank=False)
     maximum = models.fields.PositiveIntegerField(null=True, blank=True)
 
+    class Meta:
+        db_table = "age_group"
+        base_manager_name = "objects"
+
     def __str__(self) -> str:
         return f"{self.minimum} - {self.maximum}"
 
 
 class AbilityGroup(models.Model):
     name = models.fields.TextField(null=False, blank=False, unique=True)
+
+    class Meta:
+        db_table = "ability_group"
+        base_manager_name = "objects"
 
     def __str__(self) -> str:
         return self.name
@@ -44,12 +52,20 @@ class AbilityGroup(models.Model):
 class ReservationCancelReason(models.Model):
     reason = models.CharField(max_length=255, null=False, blank=False)
 
+    class Meta:
+        db_table = "reservation_cancel_reason"
+        base_manager_name = "objects"
+
     def __str__(self) -> str:
         return self.reason
 
 
 class ReservationDenyReason(models.Model):
     reason = models.CharField(max_length=255, null=False, blank=False)
+
+    class Meta:
+        db_table = "reservation_deny_reason"
+        base_manager_name = "objects"
 
     def __str__(self) -> str:
         return self.reason
@@ -110,6 +126,7 @@ class RecurringReservation(models.Model):
     created: datetime = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        db_table = "recurring_reservation"
         base_manager_name = "objects"
 
     def __str__(self) -> str:
@@ -135,32 +152,6 @@ class RecurringReservation(models.Model):
 
 
 class Reservation(ExportModelOperationsMixin("reservation"), SerializableMixin, models.Model):
-    # For GDPR API
-    serialize_fields = (
-        {"name": "name"},
-        {"name": "description"},
-        {"name": "begin"},
-        {"name": "end"},
-        {"name": "reservee_first_name"},
-        {"name": "reservee_last_name"},
-        {"name": "reservee_email"},
-        {"name": "reservee_phone"},
-        {"name": "reservee_address_zip"},
-        {"name": "reservee_address_city"},
-        {"name": "reservee_address_street"},
-        {"name": "billing_first_name"},
-        {"name": "billing_last_name"},
-        {"name": "billing_email"},
-        {"name": "billing_phone"},
-        {"name": "billing_address_zip"},
-        {"name": "billing_address_city"},
-        {"name": "billing_address_street"},
-        {"name": "reservee_id"},
-        {"name": "reservee_organisation_name"},
-        {"name": "free_of_charge_reason"},
-        {"name": "cancel_details"},
-    )
-
     reservee_type = models.CharField(
         max_length=50,
         choices=CustomerTypeChoice.choices,
@@ -415,7 +406,34 @@ class Reservation(ExportModelOperationsMixin("reservation"), SerializableMixin, 
     actions = ReservationActionsConnector()
 
     class Meta:
+        db_table = "reservation"
         base_manager_name = "objects"
+
+    # For GDPR API
+    serialize_fields = (
+        {"name": "name"},
+        {"name": "description"},
+        {"name": "begin"},
+        {"name": "end"},
+        {"name": "reservee_first_name"},
+        {"name": "reservee_last_name"},
+        {"name": "reservee_email"},
+        {"name": "reservee_phone"},
+        {"name": "reservee_address_zip"},
+        {"name": "reservee_address_city"},
+        {"name": "reservee_address_street"},
+        {"name": "billing_first_name"},
+        {"name": "billing_last_name"},
+        {"name": "billing_email"},
+        {"name": "billing_phone"},
+        {"name": "billing_address_zip"},
+        {"name": "billing_address_city"},
+        {"name": "billing_address_street"},
+        {"name": "reservee_id"},
+        {"name": "reservee_organisation_name"},
+        {"name": "free_of_charge_reason"},
+        {"name": "cancel_details"},
+    )
 
     def __str__(self) -> str:
         return f"{self.name} ({self.type})"
@@ -522,6 +540,10 @@ class Reservation(ExportModelOperationsMixin("reservation"), SerializableMixin, 
 class ReservationPurpose(models.Model):
     name = models.CharField(max_length=200)
 
+    class Meta:
+        db_table = "reservation_purpose"
+        base_manager_name = "objects"
+
     def __str__(self) -> str:
         return self.name
 
@@ -530,6 +552,8 @@ class ReservationMetadataField(models.Model):
     field_name = models.CharField(max_length=100, verbose_name=_("Field name"), unique=True)
 
     class Meta:
+        db_table = "reservation_metadata_field"
+        base_manager_name = "objects"
         verbose_name = _("Reservation metadata field")
         verbose_name_plural = _("Reservation metadata fields")
 
@@ -552,6 +576,8 @@ class ReservationMetadataSet(models.Model):
     )
 
     class Meta:
+        db_table = "reservation_metadata_set"
+        base_manager_name = "objects"
         verbose_name = _("Reservation metadata set")
         verbose_name_plural = _("Reservation metadata sets")
 
@@ -778,6 +804,10 @@ class ReservationStatistic(models.Model):
     )
     primary_unit_name = models.CharField(verbose_name=_("Name"), max_length=255)
 
+    class Meta:
+        db_table = "reservation_statistics"
+        base_manager_name = "objects"
+
     def __str__(self) -> str:
         return f"{self.reservee_uuid} - {self.begin} - {self.end}"
 
@@ -796,6 +826,10 @@ class ReservationStatisticsReservationUnit(models.Model):
     )
     name = models.CharField(verbose_name=_("Name"), max_length=255)
     unit_name = models.CharField(verbose_name=_("Name"), max_length=255)
+
+    class Meta:
+        db_table = "reservation_statistics_reservation_unit"
+        base_manager_name = "objects"
 
     def __str__(self) -> str:
         return f"{self.reservation_statistics} - {self.reservation_unit}"

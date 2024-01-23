@@ -21,5 +21,9 @@ class Introduction(models.Model):
 
     completed_at = models.DateTimeField(verbose_name=_("Completed at"))
 
+    class Meta:
+        db_table = "introduction"
+        base_manager_name = "objects"
+
     def __str__(self):
         return f"Introduction - {self.user}, {self.reservation_unit} ({self.completed_at})"

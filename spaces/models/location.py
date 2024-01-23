@@ -62,6 +62,10 @@ class Location(models.Model):
     )
     coordinates: Point | None = PointField(null=True, srid=COORDINATE_SYSTEM_ID)
 
+    class Meta:
+        db_table = "location"
+        base_manager_name = "objects"
+
     def __str__(self) -> str:
         return f"{self.address_street}, {self.address_city} {self.address_zip}"
 

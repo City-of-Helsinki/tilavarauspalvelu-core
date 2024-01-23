@@ -19,6 +19,10 @@ class OriginHaukiResource(models.Model):
     # Latest date fetched from Hauki opening hours API
     latest_fetched_date = models.DateField(blank=True, null=True)
 
+    class Meta:
+        db_table = "origin_hauki_resource"
+        base_manager_name = "objects"
+
     def __str__(self) -> str:
         return str(self.id)
 
@@ -40,6 +44,7 @@ class ReservableTimeSpan(models.Model):
     objects = ReservableTimeSpanQuerySet.as_manager()
 
     class Meta:
+        db_table = "reservable_time_span"
         base_manager_name = "objects"
         ordering = ["resource", "start_datetime", "end_datetime"]
         constraints = [

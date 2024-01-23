@@ -48,6 +48,8 @@ class Unit(models.Model):
     )
 
     class Meta:
+        db_table = "unit"
+        base_manager_name = "objects"
         ordering = ["rank"]
 
     def __str__(self) -> str:
@@ -79,6 +81,10 @@ class Unit(models.Model):
 class UnitGroup(models.Model):
     name: str = models.CharField(max_length=255)
     units = models.ManyToManyField("spaces.Unit", related_name="unit_groups")
+
+    class Meta:
+        db_table = "unit_group"
+        base_manager_name = "objects"
 
     def __str__(self) -> str:
         return self.name

@@ -14,5 +14,9 @@ class ServiceSector(models.Model):
     name: str = models.CharField(max_length=255)
     units = models.ManyToManyField("spaces.Unit", related_name="service_sectors")
 
+    class Meta:
+        db_table = "service_sector"
+        base_manager_name = "objects"
+
     def __str__(self) -> str:
         return self.name

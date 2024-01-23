@@ -24,14 +24,6 @@ class ApplicationEventManager(SerializableMixin.SerializableManager, Manager.fro
 
 
 class ApplicationEvent(SerializableMixin, models.Model):
-    # For GDPR API
-    serialize_fields = (
-        {"name": "name"},
-        {"name": "name_fi"},
-        {"name": "name_en"},
-        {"name": "name_sv"},
-    )
-
     name: str = models.CharField(max_length=100, null=False, blank=True)
     uuid: UUID = models.UUIDField(default=uuid4, null=False, editable=False, unique=True)
     num_persons: int | None = models.PositiveIntegerField(null=True, blank=True)
@@ -84,7 +76,16 @@ class ApplicationEvent(SerializableMixin, models.Model):
     name_en: str | None
 
     class Meta:
+        db_table = "application_event"
         base_manager_name = "objects"
+
+    # For GDPR API
+    serialize_fields = (
+        {"name": "name"},
+        {"name": "name_fi"},
+        {"name": "name_en"},
+        {"name": "name_sv"},
+    )
 
     def __str__(self) -> str:
         return self.name

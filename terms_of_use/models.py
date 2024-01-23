@@ -34,6 +34,8 @@ class TermsOfUse(models.Model):
     )
 
     class Meta:
+        db_table = "terms_of_use"
+        base_manager_name = "objects"
         verbose_name = pgettext_lazy("singular", "terms of use")
         verbose_name_plural = pgettext_lazy("plural", "terms of use")
 

@@ -25,5 +25,9 @@ class Service(models.Model):
     buffer_time_before = models.DurationField(verbose_name=_("Buffer time before"), blank=True, null=True)
     buffer_time_after = models.DurationField(verbose_name=_("Buffer time after"), blank=True, null=True)
 
+    class Meta:
+        db_table = "services"
+        base_manager_name = "objects"
+
     def __str__(self):
         return f"{self.name} ({self.service_type})"

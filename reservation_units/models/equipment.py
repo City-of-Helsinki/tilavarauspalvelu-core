@@ -16,6 +16,10 @@ class EquipmentCategory(models.Model):
         help_text=_("Order number to be used in api sorting."),
     )
 
+    class Meta:
+        db_table = "equipment_category"
+        base_manager_name = "objects"
+
     def __str__(self):
         return self.name
 
@@ -29,6 +33,10 @@ class Equipment(models.Model):
         on_delete=models.CASCADE,
         null=False,
     )
+
+    class Meta:
+        db_table = "equipment"
+        base_manager_name = "objects"
 
     def __str__(self):
         return self.name

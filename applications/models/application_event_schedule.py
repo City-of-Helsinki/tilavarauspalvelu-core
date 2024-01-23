@@ -61,6 +61,7 @@ class ApplicationEventSchedule(models.Model):
     actions = ApplicationEventScheduleActionsConnector()
 
     class Meta:
+        db_table = "application_event_schedule"
         base_manager_name = "objects"
         ordering = ["application_event", "-priority"]
         indexes = [

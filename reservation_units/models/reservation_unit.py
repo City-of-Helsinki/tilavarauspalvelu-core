@@ -369,11 +369,9 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
     actions = ReservationUnitActionsConnector()
 
     class Meta:
+        db_table = "reservation_unit"
         base_manager_name = "objects"
-        ordering = (
-            "rank",
-            "id",
-        )
+        ordering = ["rank", "id"]
 
     def __str__(self):
         return f"{self.name}, {getattr(self.unit, 'name', '')}"

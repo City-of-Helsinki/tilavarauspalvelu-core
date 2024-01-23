@@ -16,6 +16,8 @@ class ReservationUnitType(models.Model):
     )
 
     class Meta:
+        db_table = "reservation_unit_type"
+        base_manager_name = "objects"
         ordering = ["rank"]
 
     def __str__(self):
