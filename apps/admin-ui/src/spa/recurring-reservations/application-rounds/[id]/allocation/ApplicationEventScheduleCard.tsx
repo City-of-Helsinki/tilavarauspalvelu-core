@@ -203,6 +203,8 @@ export function ApplicationEventScheduleCard({
         "Schedule cannot be approved for application in status: 'HANDLED'";
       const ALREADY_ALLOCATED_ERROR_MSG =
         "Schedule cannot be approved for event in status: 'APPROVED'";
+      const RECEIVED_CANT_ALLOCATE_ERROR_MSG =
+        "Schedule cannot be approved for application in status: 'RECEIVED'";
       const alreadyDeclined = resErrors.find(
         (e) => e?.messages.includes(ALREADY_DECLINED_ERROR_MSG)
       );
@@ -212,6 +214,13 @@ export function ApplicationEventScheduleCard({
       const alreadyHandled = resErrors.find(
         (e) => e?.messages.includes(ALREADY_HANDLED_ERROR_MSG)
       );
+      const isInReceivedState = resErrors.find(
+        (e) => e?.messages.includes(RECEIVED_CANT_ALLOCATE_ERROR_MSG)
+      );
+      if (isInReceivedState) {
+        notifyError(t("Allocation.errors.accepting.receivedCantAllocate"));
+        return;
+      }
       // Using single error messages because allocated / declined => handled if it has a single schedule
       // declined should take precedence because it should have never been shown in the first place
       if (alreadyDeclined) {

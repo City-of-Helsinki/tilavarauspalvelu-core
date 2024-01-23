@@ -5,10 +5,10 @@
   "dateTypeTomorrow": "Huomenna",
   "dateTypeWeekend": "Viikonloppuna",
   "infoDate": "pp.kk.vvvv",
-  "labelEndDate": "Loppumispäivä",
+  "labelEndDate": "Päättymispäivä",
   "labelStartDate": "Alkamispäivä",
   "errors": {
-    "endDateBeforeStartDate": "Alkamispäivän on oltava ennen loppumispäivää",
+    "endDateBeforeStartDate": "Alkamispäivän on oltava ennen päättymispäivää",
     "dateInvalid": "Päivämäärän on oltava muotoa pp.kk.vvvv",
     "dateIsTooSmall": "Päivämäärän on oltava jälkeen {{minDate}}",
     "dateIsTooBig": "Päivämäärän on oltava ennen {{maxDate}}"

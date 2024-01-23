@@ -46,13 +46,13 @@ test("should show error start date must be before end date", async () => {
   });
 
   const endDateInput = screen.getByRole("textbox", {
-    name: /loppumispäivä/i,
+    name: /päättymispäivä/i,
   });
   await act(async () => {
     await user.type(endDateInput, "22.6.2021");
   });
 
-  screen.queryByText(/Alkamispäivän on oltava ennen loppumispäivää/i);
+  screen.queryByText(/Alkamispäivän on oltava ennen päättymispäivää/i);
 
   await act(async () => {
     await user.clear(endDateInput);
@@ -62,7 +62,7 @@ test("should show error start date must be before end date", async () => {
   });
 
   const start = screen.queryByText(
-    /Alkamispäivän on oltava ennen loppumispäivää/i
+    /Alkamispäivän on oltava ennen päättymispäivää/i
   );
 
   expect(start).not.toBeInTheDocument();

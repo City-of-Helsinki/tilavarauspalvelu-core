@@ -172,7 +172,7 @@ export function ApplicationEventsTable({
   const cols = memoize(() => getColConfig(t))();
 
   if (views.length === 0) {
-    const name = t("Application.emptyFilterPageName");
+    const name = t("ApplicationEvent.emptyFilterPageName");
     return <div>{t("common.noFilteredResults", { name })}</div>;
   }
 

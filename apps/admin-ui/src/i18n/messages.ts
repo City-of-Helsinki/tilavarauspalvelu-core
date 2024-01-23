@@ -543,6 +543,10 @@ const translations: ITranslations = {
   },
   ApplicationEvent: {
     name: ["Vakiovuoron nimi"],
+    emptyFilterPageName: ["haettua vuoroa"],
+    allocated: {
+      emptyFilterPageName: ["jaettua vuoroa"],
+    },
     groupSize: ["Ryhmän koko"],
     ageGroup: ["Ikäryhmä"],
     eventDuration: ["Vuoron kesto"],
@@ -571,7 +575,7 @@ const translations: ITranslations = {
     headings: {
       id: ["Id"],
       customer: ["Hakija"],
-      name: ["Nimi"],
+      name: ["Varauksen nimi"],
       unit: ["Toimipiste"],
       stats: ["Haettu"],
       phase: ["Vaihe"],
@@ -1914,6 +1918,7 @@ const translations: ITranslations = {
     acceptSlot: ["Jaa {{duration}} vuoro"],
     acceptingSlot: ["Jaetaan vuoroa.."],
     acceptingSuccess: ['Vuoro varaukselle "{{applicationEvent}}" jaettu.'],
+    resetSuccess: ["Vuoro poistettu"],
     countResultsPostfix: ["tuloksesta näytetty"],
     countAllResults: ["Kaikki {{ count }}  tulosta näytetty"],
     clearFiltersButton: ["Tyhjennä suodattimet"],
@@ -1947,6 +1952,9 @@ const translations: ITranslations = {
         alreadyHandled: ['Varaus "{{name}}" on jo kokonaan jaettu.'],
         generic: [
           'Vuoron jakaminen varaukselle "{{name}}" epäonnistui. Tarkista, ettei kyseiselle ajalle ole jo jaettu vuoroa, tai kokeile myöhemmin uudelleen.',
+        ],
+        receivedCantAllocate: [
+          "Hakukierrokselle ei voi jakaa vuoroja, koska se on vielä avoinna.",
         ],
       },
       remove: {

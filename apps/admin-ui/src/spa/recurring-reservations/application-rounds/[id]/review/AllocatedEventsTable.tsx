@@ -58,7 +58,7 @@ function aesMapper(
       : undefined;
 
   const timeString = isAllocated
-    ? `${t(`dayShort.${day}`)} ${begin} - ${end}`
+    ? `${t(`dayShort.${day}`)} ${begin?.slice(0, 5)} - ${end?.slice(0, 5)}`
     : "-";
 
   return {
@@ -164,7 +164,7 @@ export function AllocatedEventsTable({
   const cols = memoize(() => getColConfig(t))();
 
   if (views.length === 0) {
-    const name = t("Application.emptyFilterPageName");
+    const name = t("ApplicationEvent.allocated.emptyFilterPageName");
     return <div>{t("common.noFilteredResults", { name })}</div>;
   }
 
