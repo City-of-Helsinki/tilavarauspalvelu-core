@@ -89,6 +89,8 @@ const appEventMapper = (
   };
 };
 
+const MAX_NAME_LENGTH = 30;
+
 const COLS = [
   {
     headerTKey: "ApplicationEvent.headings.id",
@@ -118,6 +120,8 @@ const COLS = [
     headerTKey: "ApplicationEvent.headings.name",
     isSortable: true,
     key: "nameFi",
+    transform: ({ nameFi }: ApplicationEventView) =>
+      truncate(nameFi, MAX_NAME_LENGTH),
   },
   {
     headerTKey: "ApplicationEvent.headings.unit",
