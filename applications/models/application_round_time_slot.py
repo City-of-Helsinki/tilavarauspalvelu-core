@@ -29,6 +29,8 @@ class ApplicationRoundTimeSlot(models.Model):
     )
 
     class Meta:
+        db_table = "application_round_time_slot"
+        base_manager_name = "objects"
         ordering = ["reservation_unit", "weekday"]
         constraints = [
             models.UniqueConstraint(

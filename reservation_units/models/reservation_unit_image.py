@@ -35,6 +35,10 @@ class ReservationUnitImage(models.Model, PurgeImageCacheMixin):
     medium_url = models.URLField(null=False, blank=True, max_length=255, default="")
     small_url = models.URLField(null=False, blank=True, max_length=255, default="")
 
+    class Meta:
+        db_table = "reservation_unit_image"
+        base_manager_name = "objects"
+
     def __str__(self):
         return f"{self.reservation_unit.name} ({self.get_image_type_display()})"
 

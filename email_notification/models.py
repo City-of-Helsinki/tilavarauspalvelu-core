@@ -64,6 +64,10 @@ class EmailTemplate(models.Model):
     html_content_en: str | None
     html_content_sv: str | None
 
+    class Meta:
+        db_table = "email_template"
+        base_manager_name = "objects"
+
     def __str__(self):
         choices = dict(EmailType.choices)
         label = choices.get(self.type)

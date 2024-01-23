@@ -30,18 +30,6 @@ def year_not_in_future(year: int | None) -> None:
 
 
 class Organisation(SerializableMixin, models.Model):
-    # For GDPR API
-    serialize_fields = (
-        {"name": "name"},
-        {"name": "identifier"},
-        {"name": "email"},
-        {"name": "core_business"},
-        {"name": "core_business_fi"},
-        {"name": "core_business_en"},
-        {"name": "core_business_sv"},
-        {"name": "address"},
-    )
-
     name: str = models.CharField(null=False, blank=False, max_length=255)
     email: str = models.EmailField(default="", blank=True)
     identifier: str | None = models.CharField(null=True, blank=False, max_length=255, unique=False)
@@ -66,6 +54,22 @@ class Organisation(SerializableMixin, models.Model):
     core_business_fi: str | None
     core_business_en: str | None
     core_business_sv: str | None
+
+    class Meta:
+        db_table = "organisation"
+        base_manager_name = "objects"
+
+    # For GDPR API
+    serialize_fields = (
+        {"name": "name"},
+        {"name": "identifier"},
+        {"name": "email"},
+        {"name": "core_business"},
+        {"name": "core_business_fi"},
+        {"name": "core_business_en"},
+        {"name": "core_business_sv"},
+        {"name": "address"},
+    )
 
     def __str__(self) -> str:
         return self.name

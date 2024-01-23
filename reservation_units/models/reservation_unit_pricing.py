@@ -104,6 +104,7 @@ class ReservationUnitPricing(models.Model):
     objects = ReservationUnitPricingQuerySet.as_manager()
 
     class Meta:
+        db_table = "reservation_unit_pricing"
         base_manager_name = "objects"
 
     def __str__(self) -> str:

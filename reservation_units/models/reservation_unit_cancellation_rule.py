@@ -22,5 +22,9 @@ class ReservationUnitCancellationRule(models.Model):
         verbose_name=_("Will the cancellation need manual staff handling"),
     )
 
+    class Meta:
+        db_table = "reservation_unit_cancellation_rule"
+        base_manager_name = "objects"
+
     def __str__(self):
         return self.name

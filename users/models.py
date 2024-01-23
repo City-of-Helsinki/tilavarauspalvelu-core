@@ -42,6 +42,10 @@ class User(AbstractUser):
 
     profile_id = models.CharField(max_length=255, null=False, blank=True, default="")
 
+    class Meta:
+        db_table = "user"
+        base_manager_name = "objects"
+
     def __str__(self):
         default = super().__str__()
 
@@ -90,6 +94,10 @@ class PersonalInfoViewLog(models.Model):
     viewer_user_email = models.CharField(max_length=255, default="", blank=True)
     viewer_user_full_name = models.CharField(max_length=255, default="", blank=True)
 
+    class Meta:
+        db_table = "personal_info_view_log"
+        base_manager_name = "objects"
+
     def __str__(self) -> str:
         return f"{self.viewer_username} viewed {self.user}'s {self.field} at {self.access_time}"
 
@@ -108,6 +116,9 @@ KeyValueChildrenDict = KeyValueDict | KeyChildrenDict
 
 
 class ProfileUser(SerializableMixin, User):
+    class Meta:
+        proxy = True
+
     # For GDPR API
     serialize_fields = (
         {"name": "user", "accessor": lambda user: user.get_full_name()},
@@ -116,9 +127,6 @@ class ProfileUser(SerializableMixin, User):
         {"name": "reservations"},
         {"name": "applications"},
     )
-
-    class Meta:
-        proxy = True
 
     @property
     def user(self) -> Self:

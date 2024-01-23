@@ -11,5 +11,9 @@ class RealEstate(models.Model):
     name: str = models.CharField(max_length=255)
     surface_area: Decimal | None = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
 
+    class Meta:
+        db_table = "real_estate"
+        base_manager_name = "objects"
+
     def __str__(self) -> str:
         return self.name

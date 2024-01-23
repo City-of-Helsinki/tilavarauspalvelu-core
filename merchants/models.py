@@ -24,6 +24,10 @@ class PaymentMerchant(ExportModelOperationsMixin("payment_merchant"), models.Mod
     )
     name = models.CharField(verbose_name=_("Merchant name"), blank=False, null=False, max_length=128)
 
+    class Meta:
+        db_table = "payment_merchant"
+        base_manager_name = "objects"
+
     def __str__(self) -> str:
         return self.name
 
@@ -47,6 +51,10 @@ class PaymentProduct(ExportModelOperationsMixin("payment_product"), models.Model
         null=True,
         help_text="Merchant used for payments",
     )
+
+    class Meta:
+        db_table = "payment_product"
+        base_manager_name = "objects"
 
     def __str__(self) -> str:
         return str(self.id)
@@ -165,6 +173,10 @@ class PaymentOrder(ExportModelOperationsMixin("payment_order"), models.Model):
         max_length=512,
     )
 
+    class Meta:
+        db_table = "payment_order"
+        base_manager_name = "objects"
+
     def __str__(self) -> str:
         return f"PaymentOrder {self.pk}"
 
@@ -247,6 +259,10 @@ class PaymentAccounting(ExportModelOperationsMixin("payment_accounting"), models
     balance_profit_center = models.CharField(
         verbose_name=_("Balance profit center"), blank=False, null=False, max_length=10
     )
+
+    class Meta:
+        db_table = "payment_accounting"
+        base_manager_name = "objects"
 
     def __str__(self) -> str:
         return self.name

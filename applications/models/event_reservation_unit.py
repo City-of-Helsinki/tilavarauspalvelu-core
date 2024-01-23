@@ -21,6 +21,8 @@ class EventReservationUnit(models.Model):
     )
 
     class Meta:
+        db_table = "event_reservation_unit"
+        base_manager_name = "objects"
         ordering = ["preferred_order"]
         constraints = [
             models.UniqueConstraint(

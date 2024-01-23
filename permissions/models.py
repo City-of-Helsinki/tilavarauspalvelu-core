@@ -239,6 +239,10 @@ class UnitRoleChoice(models.Model):
     verbose_name_sv: str | None
     verbose_name_en: str | None
 
+    class Meta:
+        db_table = "unit_role_choice"
+        base_manager_name = "objects"
+
     def __str__(self):
         return self.verbose_name
 
@@ -251,6 +255,10 @@ class ServiceSectorRoleChoice(models.Model):
     verbose_name_fi: str | None
     verbose_name_sv: str | None
     verbose_name_en: str | None
+
+    class Meta:
+        db_table = "service_sector_role_choice"
+        base_manager_name = "objects"
 
     def __str__(self):
         return self.verbose_name
@@ -265,6 +273,10 @@ class GeneralRoleChoice(models.Model):
     verbose_name_sv: str | None
     verbose_name_en: str | None
 
+    class Meta:
+        db_table = "general_role_choice"
+        base_manager_name = "objects"
+
     def __str__(self):
         return self.verbose_name
 
@@ -277,6 +289,10 @@ class ServiceSectorRolePermission(models.Model):
         on_delete=models.CASCADE,
     )
     permission = models.CharField(verbose_name=_("Permission"), max_length=255, choices=SERVICE_SECTOR_PERMISSIONS)
+
+    class Meta:
+        db_table = "service_sector_role_permission"
+        base_manager_name = "objects"
 
     def __str__(self) -> str:
         return f"ServiceSectorRolePermission {self.role.verbose_name} ({self.permission})"
@@ -291,6 +307,10 @@ class UnitRolePermission(models.Model):
     )
     permission = models.CharField(verbose_name=_("Permission"), max_length=255, choices=UNIT_PERMISSIONS)
 
+    class Meta:
+        db_table = "unit_role_permission"
+        base_manager_name = "objects"
+
     def __str__(self) -> str:
         return f"UnitRolePermission {self.role.verbose_name} ({self.permission})"
 
@@ -303,6 +323,10 @@ class GeneralRolePermission(models.Model):
         on_delete=models.CASCADE,
     )
     permission = models.CharField(verbose_name=_("Permission"), max_length=255, choices=GENERAL_PERMISSIONS)
+
+    class Meta:
+        db_table = "general_role_permission"
+        base_manager_name = "objects"
 
     def __str__(self) -> str:
         return f"GeneralRolePermission {self.role.verbose_name} ({self.permission})"
@@ -330,6 +354,10 @@ class UnitRole(BaseRole):
         on_delete=models.CASCADE,
     )
 
+    class Meta:
+        db_table = "unit_role"
+        base_manager_name = "objects"
+
     def __str__(self):
         return f"{self.role.verbose_name} ({self.user.email})"
 
@@ -351,6 +379,10 @@ class ServiceSectorRole(BaseRole):
         on_delete=models.CASCADE,
     )
 
+    class Meta:
+        db_table = "service_sector_role"
+        base_manager_name = "objects"
+
     def __str__(self):
         return f"{self.role.verbose_name} ({self.user.email})"
 
@@ -363,6 +395,10 @@ class GeneralRole(BaseRole):
         related_name="general_roles",
         on_delete=models.CASCADE,
     )
+
+    class Meta:
+        db_table = "general_role"
+        base_manager_name = "objects"
 
     def __str__(self):
         return f"{self.role.verbose_name} ({self.user.email})"

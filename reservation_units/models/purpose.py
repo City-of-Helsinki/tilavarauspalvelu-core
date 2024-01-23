@@ -23,6 +23,8 @@ class Purpose(models.Model, PurgeImageCacheMixin):
     )
 
     class Meta:
+        db_table = "purpose"
+        base_manager_name = "objects"
         ordering = ["rank"]
 
     def __str__(self):

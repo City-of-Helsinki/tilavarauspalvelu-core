@@ -63,6 +63,7 @@ class ApplicationRound(models.Model):
     criteria_en: str | None
 
     class Meta:
+        db_table = "application_round"
         base_manager_name = "objects"
 
     def __str__(self) -> str:

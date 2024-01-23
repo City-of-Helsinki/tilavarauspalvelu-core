@@ -22,15 +22,6 @@ class ApplicationManager(SerializableMixin.SerializableManager, Manager.from_que
 
 
 class Application(SerializableMixin, models.Model):
-    # For GDPR API
-    serialize_fields = (
-        {"name": "additional_information"},
-        {"name": "application_events"},
-        {"name": "contact_person"},
-        {"name": "organisation"},
-        {"name": "billing_address"},
-    )
-
     applicant_type: str = StrChoiceField(enum=ApplicantTypeChoice, null=True, db_index=True)
     created_date: datetime = models.DateTimeField(auto_now_add=True)
     last_modified_date: datetime = models.DateTimeField(auto_now=True)
@@ -85,7 +76,17 @@ class Application(SerializableMixin, models.Model):
     actions = ApplicationActionsConnector()
 
     class Meta:
+        db_table = "application"
         base_manager_name = "objects"
+
+    # For GDPR API
+    serialize_fields = (
+        {"name": "additional_information"},
+        {"name": "application_events"},
+        {"name": "contact_person"},
+        {"name": "organisation"},
+        {"name": "billing_address"},
+    )
 
     def __str__(self) -> str:
         return f"{self.user} ({self.created_date})"
