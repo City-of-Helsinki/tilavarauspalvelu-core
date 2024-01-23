@@ -22,6 +22,7 @@ const StyledTable = styled(Table)<TableWrapperProps>`
     white-space: nowrap;
     border-collapse: collapse;
     th {
+      text-align: left;
       font-family: var(--font-bold);
       padding: var(--spacing-xs);
       background: ${({ $headingBackground = "var(--color-black-10)" }) =>

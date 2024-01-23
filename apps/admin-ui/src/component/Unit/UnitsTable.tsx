@@ -1,6 +1,5 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import styled from "styled-components";
 import { memoize } from "lodash";
 import { UnitType } from "common/types/gql-types";
 import { TFunction } from "i18next";
@@ -53,12 +52,6 @@ const getColConfig = (t: TFunction, isMyUnits?: boolean) => [
   },
 ];
 
-const StyledCustomTable = styled(CustomTable)`
-  th {
-    text-align: left;
-  }
-`;
-
 const UnitsTable = ({
   sort,
   sortChanged: onSortChanged,
@@ -74,7 +67,7 @@ const UnitsTable = ({
     return <div>{t("common.noFilteredResults", { name })}</div>;
   }
   return (
-    <StyledCustomTable
+    <CustomTable
       setSort={onSortChanged}
       indexKey="pk"
       rows={units}
