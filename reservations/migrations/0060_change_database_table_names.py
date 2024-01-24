@@ -2,6 +2,8 @@
 
 from django.db import migrations
 
+from utils.migration import AlterModelTable
+
 
 class Migration(migrations.Migration):
     dependencies = [
@@ -9,47 +11,47 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="abilitygroup",
             table="ability_group",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="agegroup",
             table="age_group",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="recurringreservation",
             table="recurring_reservation",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="reservation",
             table="reservation",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="reservationcancelreason",
             table="reservation_cancel_reason",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="reservationdenyreason",
             table="reservation_deny_reason",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="reservationmetadatafield",
             table="reservation_metadata_field",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="reservationmetadataset",
             table="reservation_metadata_set",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="reservationpurpose",
             table="reservation_purpose",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="reservationstatistic",
             table="reservation_statistic",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="reservationstatisticsreservationunit",
             table="reservation_statistics_reservation_unit",
         ),

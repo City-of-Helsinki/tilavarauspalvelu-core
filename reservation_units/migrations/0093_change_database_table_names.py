@@ -2,6 +2,8 @@
 
 from django.db import migrations
 
+from utils.migration import AlterModelTable
+
 
 class Migration(migrations.Migration):
     dependencies = [
@@ -9,63 +11,63 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="equipment",
             table="equipment",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="equipmentcategory",
             table="equipment_category",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="introduction",
             table="introduction",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="keyword",
             table="keyword",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="keywordcategory",
             table="keyword_category",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="keywordgroup",
             table="keyword_group",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="purpose",
             table="purpose",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="qualifier",
             table="qualifier",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="reservationunit",
             table="reservation_unit",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="reservationunitcancellationrule",
             table="reservation_unit_cancellation_rule",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="reservationunitimage",
             table="reservation_unit_image",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="reservationunitpaymenttype",
             table="reservation_unit_payment_type",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="reservationunitpricing",
             table="reservation_unit_pricing",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="reservationunittype",
             table="reservation_unit_type",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="taxpercentage",
             table="tax_percentage",
         ),
