@@ -41,7 +41,7 @@ class Migration(migrations.Migration):
                 null=True,
                 on_delete=django.db.models.deletion.SET_NULL,
                 related_name="buildings",
-                to="spaces.realestate",
+                to="spaces.RealEstate",
             ),
         ),
         migrations.AlterField(
@@ -102,7 +102,7 @@ class Migration(migrations.Migration):
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name="location",
-                to="spaces.building",
+                to="spaces.Building",
             ),
         ),
         migrations.AlterField(
@@ -118,7 +118,7 @@ class Migration(migrations.Migration):
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name="location",
-                to="spaces.realestate",
+                to="spaces.RealEstate",
             ),
         ),
         migrations.AlterField(
@@ -129,7 +129,7 @@ class Migration(migrations.Migration):
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name="location",
-                to="spaces.space",
+                to="spaces.Space",
             ),
         ),
         migrations.AlterField(
@@ -140,7 +140,7 @@ class Migration(migrations.Migration):
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name="location",
-                to="spaces.unit",
+                to="spaces.Unit",
             ),
         ),
         migrations.AlterField(
@@ -191,7 +191,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="servicesector",
             name="units",
-            field=models.ManyToManyField(related_name="service_sectors", to="spaces.unit"),
+            field=models.ManyToManyField(related_name="service_sectors", to="spaces.Unit"),
         ),
         migrations.AlterField(
             model_name="space",
@@ -201,7 +201,7 @@ class Migration(migrations.Migration):
                 null=True,
                 on_delete=django.db.models.deletion.SET_NULL,
                 related_name="spaces",
-                to="spaces.building",
+                to="spaces.Building",
             ),
         ),
         migrations.AlterField(
@@ -242,7 +242,7 @@ class Migration(migrations.Migration):
                 null=True,
                 on_delete=django.db.models.deletion.SET_NULL,
                 related_name="children",
-                to="spaces.space",
+                to="spaces.Space",
             ),
         ),
         migrations.AlterField(
@@ -258,7 +258,7 @@ class Migration(migrations.Migration):
                 null=True,
                 on_delete=django.db.models.deletion.SET_NULL,
                 related_name="spaces",
-                to="spaces.unit",
+                to="spaces.Unit",
             ),
         ),
         migrations.AlterField(
@@ -314,7 +314,7 @@ class Migration(migrations.Migration):
                 null=True,
                 on_delete=django.db.models.deletion.PROTECT,
                 related_name="units",
-                to="merchants.paymentaccounting",
+                to="merchants.PaymentAccounting",
             ),
         ),
         migrations.AlterField(
@@ -325,7 +325,7 @@ class Migration(migrations.Migration):
                 null=True,
                 on_delete=django.db.models.deletion.PROTECT,
                 related_name="units",
-                to="merchants.paymentmerchant",
+                to="merchants.PaymentMerchant",
             ),
         ),
         migrations.AlterField(

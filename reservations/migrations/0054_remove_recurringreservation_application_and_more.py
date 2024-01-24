@@ -33,25 +33,30 @@ def add_first_event_schedule(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('applications', '0067_remove_applicationevent_declined_reservation_units'),
-        ('reservations', '0053_alter_recurringreservation_options_and_more'),
+        ("applications", "0067_remove_applicationevent_declined_reservation_units"),
+        ("reservations", "0053_alter_recurringreservation_options_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='recurringreservation',
-            name='application_event_schedule',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='recurring_reservations', to='applications.applicationeventschedule'),
+            model_name="recurringreservation",
+            name="application_event_schedule",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="recurring_reservations",
+                to="applications.ApplicationEventSchedule",
+            ),
         ),
         migrations.RunPython(add_first_event_schedule, migrations.RunPython.noop),
         migrations.RemoveField(
-            model_name='recurringreservation',
-            name='application',
+            model_name="recurringreservation",
+            name="application",
         ),
         migrations.RemoveField(
-            model_name='recurringreservation',
-            name='application_event',
+            model_name="recurringreservation",
+            name="application_event",
         ),
     ]

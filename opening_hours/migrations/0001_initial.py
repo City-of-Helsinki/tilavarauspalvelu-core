@@ -17,6 +17,9 @@ class Migration(migrations.Migration):
                 ("opening_hours_hash", models.CharField(blank=True, max_length=64)),
                 ("latest_fetched_date", models.DateField(blank=True, null=True)),
             ],
+            options={
+                "db_table": "origin_hauki_resource",
+            },
         ),
         migrations.CreateModel(
             name="ReservableTimeSpan",
@@ -29,11 +32,12 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="reservable_time_spans",
-                        to="opening_hours.originhaukiresource",
+                        to="opening_hours.OriginHaukiResource",
                     ),
                 ),
             ],
             options={
+                "db_table": "reservable_time_span",
                 "base_manager_name": "objects",
                 "ordering": ["resource", "start_datetime", "end_datetime"],
             },

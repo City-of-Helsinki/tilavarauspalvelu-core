@@ -5,16 +5,23 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('merchants', '0008_paymentaccounting'),
-        ('spaces', '0025_alter_unit_payment_merchant'),
+        ("merchants", "0008_paymentaccounting"),
+        ("spaces", "0025_alter_unit_payment_merchant"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='unit',
-            name='payment_accounting',
-            field=models.ForeignKey(blank=True, help_text='Payment accounting information', null=True, on_delete=django.db.models.deletion.PROTECT, related_name='units', to='merchants.paymentaccounting', verbose_name='Payment accounting'),
+            model_name="unit",
+            name="payment_accounting",
+            field=models.ForeignKey(
+                blank=True,
+                help_text="Payment accounting information",
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="units",
+                to="merchants.PaymentAccounting",
+                verbose_name="Payment accounting",
+            ),
         ),
     ]

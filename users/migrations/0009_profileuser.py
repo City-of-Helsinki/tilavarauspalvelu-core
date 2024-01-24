@@ -4,21 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0008_alter_user_reservation_notification'),
+        ("users", "0008_alter_user_reservation_notification"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ProfileUser',
-            fields=[
-            ],
+            name="ProfileUser",
+            fields=[],
             options={
-                'proxy': True,
-                'indexes': [],
-                'constraints': [],
+                "proxy": True,
+                "indexes": [],
+                "constraints": [],
             },
-            bases=('users.user', models.Model),
+            bases=("users.user", models.Model),
         ),
     ]

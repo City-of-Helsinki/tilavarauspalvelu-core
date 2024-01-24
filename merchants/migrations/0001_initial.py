@@ -4,18 +4,27 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='PaymentMerchant',
+            name="PaymentMerchant",
             fields=[
-                ('id', models.UUIDField(help_text='Value comes from the Merchant Experience API', primary_key=True, serialize=False, verbose_name='Merchant ID')),
-                ('name', models.CharField(max_length=128, verbose_name='Merchant name')),
+                (
+                    "id",
+                    models.UUIDField(
+                        help_text="Value comes from the Merchant Experience API",
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="Merchant ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=128, verbose_name="Merchant name")),
             ],
+            options={
+                "db_table": "payment_merchant",
+            },
         ),
     ]

@@ -6,103 +6,326 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('spaces', '0013_unitgroup'),
+        ("spaces", "0013_unitgroup"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='GeneralRoleChoice',
+            name="GeneralRoleChoice",
             fields=[
-                ('code', models.CharField(max_length=50, primary_key=True, serialize=False, verbose_name='Code')),
-                ('verbose_name', models.CharField(max_length=255, verbose_name='Verbose name')),
-            ],
-        ),
-        migrations.CreateModel(
-            name='ServiceSectorRoleChoice',
-            fields=[
-                ('code', models.CharField(max_length=50, primary_key=True, serialize=False, verbose_name='Code')),
-                ('verbose_name', models.CharField(max_length=255, verbose_name='Verbose name')),
-            ],
-        ),
-        migrations.CreateModel(
-            name='UnitRoleChoice',
-            fields=[
-                ('code', models.CharField(max_length=50, primary_key=True, serialize=False, verbose_name='Code')),
-                ('verbose_name', models.CharField(max_length=255, verbose_name='Verbose name')),
-            ],
-        ),
-        migrations.CreateModel(
-            name='UnitRolePermission',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('permission', models.CharField(choices=[('can_manage_unit_roles', 'Can modify roles for the unit'), ('can_manage_reservation_units', 'Can create, edit and delete reservation units in the unit'), ('can_manage_reservations', 'Can create, edit and cancel reservations in the unit'), ('can_view_reservations', 'Can view details of all reservations in the unit')], max_length=255, verbose_name='Permission')),
-                ('role', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='permissions', to='permissions.UnitRoleChoice', verbose_name='Role')),
-            ],
-        ),
-        migrations.CreateModel(
-            name='UnitRole',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(auto_now_add=True, verbose_name='Created')),
-                ('modified', models.DateTimeField(auto_now=True, verbose_name='Modified')),
-                ('assigner', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL, verbose_name='Assigner')),
-                ('role', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='permissions.UnitRoleChoice', verbose_name='Role')),
-                ('unit', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='roles', to='spaces.Unit', verbose_name='Unit')),
-                ('unit_group', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='roles', to='spaces.UnitGroup', verbose_name='Unit group')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='unit_roles', to=settings.AUTH_USER_MODEL, verbose_name='User')),
+                ("code", models.CharField(max_length=50, primary_key=True, serialize=False, verbose_name="Code")),
+                ("verbose_name", models.CharField(max_length=255, verbose_name="Verbose name")),
             ],
             options={
-                'abstract': False,
+                "db_table": "general_role_choice",
             },
         ),
         migrations.CreateModel(
-            name='ServiceSectorRolePermission',
+            name="ServiceSectorRoleChoice",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('permission', models.CharField(choices=[('can_manage_service_sector_roles', 'Can modify roles for the service sector'), ('can_manage_unit_roles', 'Can modify roles for units in the service sector'), ('can_manage_reservation_units', 'Can create, edit and delete reservation units in certain unit'), ('can_manage_application_rounds', 'Can create, edit and delete application rounds in the service sector'), ('can_handle_applications', 'Can handle application in the service sector'), ('can_manage_reservations', 'Can create, edit and cancel reservations in the service sector'), ('can_view_reservations', 'Can view details of all reservations in the service sector')], max_length=255, verbose_name='Permission')),
-                ('role', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='permissions', to='permissions.ServiceSectorRoleChoice', verbose_name='Role')),
-            ],
-        ),
-        migrations.CreateModel(
-            name='ServiceSectorRole',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(auto_now_add=True, verbose_name='Created')),
-                ('modified', models.DateTimeField(auto_now=True, verbose_name='Modified')),
-                ('assigner', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL, verbose_name='Assigner')),
-                ('role', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='permissions.ServiceSectorRoleChoice', verbose_name='Role')),
-                ('service_sector', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='roles', to='spaces.ServiceSector', verbose_name='Service sector')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='service_sector_roles', to=settings.AUTH_USER_MODEL, verbose_name='User')),
+                ("code", models.CharField(max_length=50, primary_key=True, serialize=False, verbose_name="Code")),
+                ("verbose_name", models.CharField(max_length=255, verbose_name="Verbose name")),
             ],
             options={
-                'abstract': False,
+                "db_table": "service_sector_role_choice",
             },
         ),
         migrations.CreateModel(
-            name='GeneralRolePermission',
+            name="UnitRoleChoice",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('permission', models.CharField(choices=[('can_manage_general_roles', 'Can manage general roles for the whole system'), ('can_manage_service_sector_roles', 'Can manage roles for service sectorsfor the whole system'), ('can_manage_unit_roles', 'Can manage roles for units in the whole system'), ('can_manage_reservation_units', 'Can create, edit and delete reservation units in the whole system'), ('can_manage_purposes', 'Can create, edit and delete purposes in the whole system'), ('can_manage_age_groups', 'Can create, edit and delete age groups in the whole system'), ('can_manage_districts', 'Can create, edit and delete districts in the whole system'), ('can_manage_ability_groups', 'Can create, edit and delete ability groups in the whole system'), ('can_manage_reservation_unit_types', 'Can create, edit and delete reservation unit types in the whole system'), ('can_manage_equipment_categories', 'Can create, edit and delete equipment_categories in the whole system'), ('can_manage_equipment', 'Can create, edit and delete equipment in the whole system'), ('can_view_reservations', 'Can create, edit and delete equipment in the whole system'), ('can_manage_reservations', 'Can create, edit and delete equipment in the whole system'), ('can_manage_reservations', 'Can create, edit and cancel reservations in the whole system'), ('can_view_reservations', 'Can view details of all reservations in the whole system'), ('can_manage_resources', 'Can create, edit and delete resources in the whole system'), ('can_handle_applications', 'Can handle application in the whole system')], max_length=255, verbose_name='Permission')),
-                ('role', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='permissions', to='permissions.GeneralRoleChoice', verbose_name='Role')),
-            ],
-        ),
-        migrations.CreateModel(
-            name='GeneralRole',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(auto_now_add=True, verbose_name='Created')),
-                ('modified', models.DateTimeField(auto_now=True, verbose_name='Modified')),
-                ('assigner', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL, verbose_name='Assigner')),
-                ('role', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='permissions.GeneralRoleChoice', verbose_name='Role')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='general_roles', to=settings.AUTH_USER_MODEL, verbose_name='User')),
+                ("code", models.CharField(max_length=50, primary_key=True, serialize=False, verbose_name="Code")),
+                ("verbose_name", models.CharField(max_length=255, verbose_name="Verbose name")),
             ],
             options={
-                'abstract': False,
+                "db_table": "unit_role_choice",
+            },
+        ),
+        migrations.CreateModel(
+            name="UnitRolePermission",
+            fields=[
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "permission",
+                    models.CharField(
+                        choices=[
+                            ("can_manage_unit_roles", "Can modify roles for the unit"),
+                            (
+                                "can_manage_reservation_units",
+                                "Can create, edit and delete reservation units in the unit",
+                            ),
+                            ("can_manage_reservations", "Can create, edit and cancel reservations in the unit"),
+                            ("can_view_reservations", "Can view details of all reservations in the unit"),
+                        ],
+                        max_length=255,
+                        verbose_name="Permission",
+                    ),
+                ),
+                (
+                    "role",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="permissions",
+                        to="permissions.UnitRoleChoice",
+                        verbose_name="Role",
+                    ),
+                ),
+            ],
+            options={
+                "db_table": "unit_role_permission",
+            },
+        ),
+        migrations.CreateModel(
+            name="UnitRole",
+            fields=[
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("created", models.DateTimeField(auto_now_add=True, verbose_name="Created")),
+                ("modified", models.DateTimeField(auto_now=True, verbose_name="Modified")),
+                (
+                    "assigner",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="Assigner",
+                    ),
+                ),
+                (
+                    "role",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="permissions.UnitRoleChoice",
+                        verbose_name="Role",
+                    ),
+                ),
+                (
+                    "unit",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="roles",
+                        to="spaces.Unit",
+                        verbose_name="Unit",
+                    ),
+                ),
+                (
+                    "unit_group",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="roles",
+                        to="spaces.UnitGroup",
+                        verbose_name="Unit group",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="unit_roles",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="User",
+                    ),
+                ),
+            ],
+            options={
+                "db_table": "unit_role",
+                "abstract": False,
+            },
+        ),
+        migrations.CreateModel(
+            name="ServiceSectorRolePermission",
+            fields=[
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "permission",
+                    models.CharField(
+                        choices=[
+                            ("can_manage_service_sector_roles", "Can modify roles for the service sector"),
+                            ("can_manage_unit_roles", "Can modify roles for units in the service sector"),
+                            (
+                                "can_manage_reservation_units",
+                                "Can create, edit and delete reservation units in certain unit",
+                            ),
+                            (
+                                "can_manage_application_rounds",
+                                "Can create, edit and delete application rounds in the service sector",
+                            ),
+                            ("can_handle_applications", "Can handle application in the service sector"),
+                            (
+                                "can_manage_reservations",
+                                "Can create, edit and cancel reservations in the service sector",
+                            ),
+                            ("can_view_reservations", "Can view details of all reservations in the service sector"),
+                        ],
+                        max_length=255,
+                        verbose_name="Permission",
+                    ),
+                ),
+                (
+                    "role",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="permissions",
+                        to="permissions.ServiceSectorRoleChoice",
+                        verbose_name="Role",
+                    ),
+                ),
+            ],
+            options={
+                "db_table": "service_sector_role_permission",
+            },
+        ),
+        migrations.CreateModel(
+            name="ServiceSectorRole",
+            fields=[
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("created", models.DateTimeField(auto_now_add=True, verbose_name="Created")),
+                ("modified", models.DateTimeField(auto_now=True, verbose_name="Modified")),
+                (
+                    "assigner",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="Assigner",
+                    ),
+                ),
+                (
+                    "role",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="permissions.ServiceSectorRoleChoice",
+                        verbose_name="Role",
+                    ),
+                ),
+                (
+                    "service_sector",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="roles",
+                        to="spaces.ServiceSector",
+                        verbose_name="Service sector",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="service_sector_roles",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="User",
+                    ),
+                ),
+            ],
+            options={
+                "db_table": "service_sector_role",
+                "abstract": False,
+            },
+        ),
+        migrations.CreateModel(
+            name="GeneralRolePermission",
+            fields=[
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "permission",
+                    models.CharField(
+                        choices=[
+                            ("can_manage_general_roles", "Can manage general roles for the whole system"),
+                            (
+                                "can_manage_service_sector_roles",
+                                "Can manage roles for service sectorsfor the whole system",
+                            ),
+                            ("can_manage_unit_roles", "Can manage roles for units in the whole system"),
+                            (
+                                "can_manage_reservation_units",
+                                "Can create, edit and delete reservation units in the whole system",
+                            ),
+                            ("can_manage_purposes", "Can create, edit and delete purposes in the whole system"),
+                            ("can_manage_age_groups", "Can create, edit and delete age groups in the whole system"),
+                            ("can_manage_districts", "Can create, edit and delete districts in the whole system"),
+                            (
+                                "can_manage_ability_groups",
+                                "Can create, edit and delete ability groups in the whole system",
+                            ),
+                            (
+                                "can_manage_reservation_unit_types",
+                                "Can create, edit and delete reservation unit types in the whole system",
+                            ),
+                            (
+                                "can_manage_equipment_categories",
+                                "Can create, edit and delete equipment_categories in the whole system",
+                            ),
+                            ("can_manage_equipment", "Can create, edit and delete equipment in the whole system"),
+                            ("can_view_reservations", "Can create, edit and delete equipment in the whole system"),
+                            ("can_manage_reservations", "Can create, edit and delete equipment in the whole system"),
+                            ("can_manage_reservations", "Can create, edit and cancel reservations in the whole system"),
+                            ("can_view_reservations", "Can view details of all reservations in the whole system"),
+                            ("can_manage_resources", "Can create, edit and delete resources in the whole system"),
+                            ("can_handle_applications", "Can handle application in the whole system"),
+                        ],
+                        max_length=255,
+                        verbose_name="Permission",
+                    ),
+                ),
+                (
+                    "role",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="permissions",
+                        to="permissions.GeneralRoleChoice",
+                        verbose_name="Role",
+                    ),
+                ),
+            ],
+            options={
+                "db_table": "general_role_permission",
+            },
+        ),
+        migrations.CreateModel(
+            name="GeneralRole",
+            fields=[
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("created", models.DateTimeField(auto_now_add=True, verbose_name="Created")),
+                ("modified", models.DateTimeField(auto_now=True, verbose_name="Modified")),
+                (
+                    "assigner",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="Assigner",
+                    ),
+                ),
+                (
+                    "role",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="permissions.GeneralRoleChoice",
+                        verbose_name="Role",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="general_roles",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="User",
+                    ),
+                ),
+            ],
+            options={
+                "db_table": "general_role",
+                "abstract": False,
             },
         ),
     ]

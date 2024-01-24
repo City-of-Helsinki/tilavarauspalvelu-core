@@ -4,30 +4,43 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='TermsOfUse',
+            name="TermsOfUse",
             fields=[
-                ('id', models.CharField(max_length=100, primary_key=True, serialize=False)),
-                ('name', models.CharField(blank=True, max_length=255, null=True, verbose_name='Name')),
-                ('name_fi', models.CharField(blank=True, max_length=255, null=True, verbose_name='Name')),
-                ('name_en', models.CharField(blank=True, max_length=255, null=True, verbose_name='Name')),
-                ('name_sv', models.CharField(blank=True, max_length=255, null=True, verbose_name='Name')),
-                ('text', models.TextField(verbose_name='Text')),
-                ('text_fi', models.TextField(null=True, verbose_name='Text')),
-                ('text_en', models.TextField(null=True, verbose_name='Text')),
-                ('text_sv', models.TextField(null=True, verbose_name='Text')),
-                ('terms_type', models.CharField(choices=[('generic_terms', 'Generic terms'), ('payment_terms', 'Payment terms'), ('cancellation_terms', 'Cancellation terms'), ('recurring_terms', 'Recurring reservation terms'), ('service_terms', 'Service-specific terms')], default='generic_terms', max_length=40, verbose_name='Terms type')),
+                ("id", models.CharField(max_length=100, primary_key=True, serialize=False)),
+                ("name", models.CharField(blank=True, max_length=255, null=True, verbose_name="Name")),
+                ("name_fi", models.CharField(blank=True, max_length=255, null=True, verbose_name="Name")),
+                ("name_en", models.CharField(blank=True, max_length=255, null=True, verbose_name="Name")),
+                ("name_sv", models.CharField(blank=True, max_length=255, null=True, verbose_name="Name")),
+                ("text", models.TextField(verbose_name="Text")),
+                ("text_fi", models.TextField(null=True, verbose_name="Text")),
+                ("text_en", models.TextField(null=True, verbose_name="Text")),
+                ("text_sv", models.TextField(null=True, verbose_name="Text")),
+                (
+                    "terms_type",
+                    models.CharField(
+                        choices=[
+                            ("generic_terms", "Generic terms"),
+                            ("payment_terms", "Payment terms"),
+                            ("cancellation_terms", "Cancellation terms"),
+                            ("recurring_terms", "Recurring reservation terms"),
+                            ("service_terms", "Service-specific terms"),
+                        ],
+                        default="generic_terms",
+                        max_length=40,
+                        verbose_name="Terms type",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'terms of use',
-                'verbose_name_plural': 'terms of use',
+                "db_table": "terms_of_use",
+                "verbose_name": "terms of use",
+                "verbose_name_plural": "terms of use",
             },
         ),
     ]
