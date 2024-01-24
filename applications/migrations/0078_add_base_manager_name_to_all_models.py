@@ -39,44 +39,4 @@ class Migration(migrations.Migration):
             name="person",
             options={"base_manager_name": "objects"},
         ),
-        migrations.AlterModelTable(
-            name="address",
-            table="address",
-        ),
-        migrations.AlterModelTable(
-            name="application",
-            table="application",
-        ),
-        migrations.AlterModelTable(
-            name="applicationevent",
-            table="application_event",
-        ),
-        migrations.AlterModelTable(
-            name="applicationeventschedule",
-            table="application_event_schedule",
-        ),
-        migrations.AlterModelTable(
-            name="applicationround",
-            table="application_round",
-        ),
-        migrations.AlterModelTable(
-            name="applicationroundtimeslot",
-            table="application_round_time_slot",
-        ),
-        migrations.AlterModelTable(
-            name="city",
-            table="city",
-        ),
-        migrations.AlterModelTable(
-            name="eventreservationunit",
-            table="event_reservation_unit",
-        ),
-        migrations.AlterModelTable(
-            name="organisation",
-            table="organisation",
-        ),
-        migrations.AlterModelTable(
-            name="person",
-            table="person",
-        ),
     ]

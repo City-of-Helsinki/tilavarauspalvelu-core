@@ -13,12 +13,4 @@ class Migration(migrations.Migration):
             name="originhaukiresource",
             options={"base_manager_name": "objects"},
         ),
-        migrations.AlterModelTable(
-            name="originhaukiresource",
-            table="origin_hauki_resource",
-        ),
-        migrations.AlterModelTable(
-            name="reservabletimespan",
-            table="reservable_time_span",
-        ),
     ]

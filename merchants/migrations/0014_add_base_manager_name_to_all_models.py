@@ -25,20 +25,4 @@ class Migration(migrations.Migration):
             name="paymentproduct",
             options={"base_manager_name": "objects"},
         ),
-        migrations.AlterModelTable(
-            name="paymentaccounting",
-            table="payment_accounting",
-        ),
-        migrations.AlterModelTable(
-            name="paymentmerchant",
-            table="payment_merchant",
-        ),
-        migrations.AlterModelTable(
-            name="paymentorder",
-            table="payment_order",
-        ),
-        migrations.AlterModelTable(
-            name="paymentproduct",
-            table="payment_product",
-        ),
     ]

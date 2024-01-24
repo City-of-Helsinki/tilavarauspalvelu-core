@@ -5,16 +5,16 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("resources", "0007_auto_20220616_1006"),
+        ("users", "0010_add_base_manager_name_to_all_models"),
     ]
 
     operations = [
-        migrations.AlterModelOptions(
-            name="resource",
-            options={"base_manager_name": "objects"},
+        migrations.AlterModelTable(
+            name="personalinfoviewlog",
+            table="personal_info_view_log",
         ),
         migrations.AlterModelTable(
-            name="resource",
-            table="resource",
+            name="user",
+            table="user",
         ),
     ]
