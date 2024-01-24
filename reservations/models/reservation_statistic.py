@@ -233,7 +233,7 @@ class ReservationStatistic(models.Model):
     primary_unit_name = models.CharField(verbose_name=_("Name"), max_length=255)
 
     class Meta:
-        db_table = "reservation_statistics"
+        db_table = "reservation_statistic"
         base_manager_name = "objects"
 
     def __str__(self) -> str:

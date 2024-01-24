@@ -95,7 +95,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterModelTable(
             name="qualifier",
-            table="qualifiers",
+            table="qualifier",
         ),
         migrations.AlterModelTable(
             name="reservationunit",

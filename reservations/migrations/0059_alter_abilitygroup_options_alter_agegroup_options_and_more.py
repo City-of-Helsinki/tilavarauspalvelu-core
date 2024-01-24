@@ -91,7 +91,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterModelTable(
             name="reservationstatistic",
-            table="reservation_statistics",
+            table="reservation_statistic",
         ),
         migrations.AlterModelTable(
             name="reservationstatisticsreservationunit",

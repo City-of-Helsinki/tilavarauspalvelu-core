@@ -54,7 +54,7 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={
-                "db_table": "organization",
+                "db_table": "organisation",
             },
         ),
         migrations.CreateModel(
