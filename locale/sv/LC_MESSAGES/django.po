@@ -477,7 +477,7 @@ msgid "Staff"
 msgstr ""
 
 #: common/choices/banner_notification.py permissions/models.py
-#: reservation_units/models/introduction.py reservations/models.py
+#: reservation_units/models/introduction.py reservations/models/reservation.py
 msgid "User"
 msgstr ""
 
@@ -696,7 +696,8 @@ msgstr ""
 msgid "Total amount"
 msgstr ""
 
-#: merchants/models.py reservations/models.py
+#: merchants/models.py reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py
 msgid "Created at"
 msgstr ""
 
@@ -1183,8 +1184,11 @@ msgstr ""
 
 #: reservation_units/models/equipment.py reservation_units/models/keyword.py
 #: reservation_units/models/reservation_unit.py
-#: reservation_units/models/reservation_unit_type.py reservations/models.py
-#: resources/models.py services/models.py terms_of_use/models.py
+#: reservation_units/models/reservation_unit_type.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_metadata.py
+#: reservations/models/reservation_statistic.py resources/models.py
+#: services/models.py terms_of_use/models.py
 msgid "Name"
 msgstr ""
 
@@ -1204,7 +1208,8 @@ msgid "Category"
 msgstr ""
 
 #: reservation_units/models/introduction.py
-#: reservation_units/models/reservation_unit_pricing.py reservations/models.py
+#: reservation_units/models/reservation_unit_pricing.py
+#: reservations/models/reservation.py
 msgid "Reservation unit"
 msgstr ""
 
@@ -1220,11 +1225,13 @@ msgstr ""
 msgid "Keyword group"
 msgstr ""
 
-#: reservation_units/models/reservation_unit.py reservations/models.py
+#: reservation_units/models/reservation_unit.py
+#: reservations/models/reservation.py
 msgid "SKU"
 msgstr ""
 
-#: reservation_units/models/reservation_unit.py reservations/models.py
+#: reservation_units/models/reservation_unit.py
+#: reservations/models/reservation.py
 msgid "Description"
 msgstr ""
 
@@ -1363,7 +1370,8 @@ msgstr ""
 msgid "Time after this reservation unit should not be publicly visible in UI."
 msgstr ""
 
-#: reservation_units/models/reservation_unit.py reservations/models.py
+#: reservation_units/models/reservation_unit.py
+#: reservations/models/reservation_metadata.py
 msgid "Reservation metadata set"
 msgstr ""
 
@@ -1541,243 +1549,266 @@ msgstr ""
 msgid "Behalf"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
 msgid "Reservee first name"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
 msgid "Reservee last name"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
 msgid "Reservee organisation name"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
 msgid "Reservee phone"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
 msgid "Reservee email"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
 msgid "Reservee ID"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py
 msgid "Reservee is an unregistered association"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
 msgid "Reservee address street"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
 msgid "Reservee address city"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
 msgid "Reservee address zip code"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py
 msgid "Preferred language of reservee"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
 msgid "Billing first name"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
 msgid "Billing last name"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
 msgid "Billing phone"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
 msgid "Billing email"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
 msgid "Billing address street"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
 msgid "Billing address city"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
 msgid "Billing address zip code"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py
 msgid "Home city"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py
 msgid "Age group"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py
 msgid "Reservee is applying for a free-of-charge reservation"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
 msgid "Reason for applying for a free-of-charge reservation"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py
 msgid "State"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py
 msgid "Begin time"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py
 msgid "End time"
 msgstr ""
 
-#: reservations/models.py resources/models.py services/models.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py resources/models.py
+#: services/models.py
 msgid "Buffer time before"
 msgstr ""
 
-#: reservations/models.py resources/models.py services/models.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py resources/models.py
+#: services/models.py
 msgid "Buffer time after"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
 msgid "Recurring reservation"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py
 msgid "Number of persons"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py
 msgid "Reservation purpose"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py
 msgid "Reason for cancellation"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
 msgid "Details for this reservation's cancellation"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py
 msgid "Confirmed at"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
 msgid "Unit price"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py
 msgid "Tax percentage value"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py
 msgid "Price"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py
 msgid "Price net"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py
 msgid "Non subsidised price"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py
 msgid "Non subsidised net price"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py
 msgid "Handled at"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py
 msgid "Reason for deny"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
 msgid "Handling details for this reservation"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
 msgid "Working memo"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation.py
 msgid "Closed"
 msgstr "Stängt"
 
-#: reservations/models.py
+#: reservations/models/reservation.py
 msgid "Unnamed reservation"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation_metadata.py
 msgid "Field name"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation_metadata.py
 msgid "Reservation metadata field"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation_metadata.py
 msgid "Reservation metadata fields"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation_metadata.py
 msgid "Supported fields"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation_metadata.py
 msgid "Required fields"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation_metadata.py
 msgid "Reservation metadata sets"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation_statistic.py
 msgid "Statistics updated at"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation_statistic.py
 msgid "Home city name"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation_statistic.py
 msgid "Home city municipality code"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation_statistic.py
 msgid "Is the reservation done through application process."
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation_statistic.py
 msgid "Ability group"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation_statistic.py
 msgid "Reservation duration in minutes"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation_statistic.py
 msgid "The reason text of the cancel reason"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation_statistic.py
 msgid "The reason text of the deny reason"
 msgstr ""
 
-#: reservations/models.py
+#: reservations/models/reservation_statistic.py
 msgid "TPREK id"
 msgstr ""
 
