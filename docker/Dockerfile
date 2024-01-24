@@ -20,6 +20,7 @@ RUN echo "Install common dependencies" \
       gdal-bin \
       gettext \
       libpq5 \
+      postgresql-client \
       make \
     && apt-get clean \
     && echo "Create project directory" \
