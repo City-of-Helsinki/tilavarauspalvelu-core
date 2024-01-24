@@ -55,7 +55,7 @@ class Space(MPTTModel):
     objects = SpaceManager()
 
     class Meta:
-        db_table = "spaces"
+        db_table = "space"
         base_manager_name = "objects"
 
     def __str__(self) -> str:

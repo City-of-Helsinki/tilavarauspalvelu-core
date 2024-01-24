@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterModelTable(
             name="resource",
-            table="resources",
+            table="resource",
         ),
     ]

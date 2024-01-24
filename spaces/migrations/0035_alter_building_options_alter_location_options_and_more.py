@@ -51,7 +51,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterModelTable(
             name="space",
-            table="spaces",
+            table="space",
         ),
         migrations.AlterModelTable(
             name="unit",
