@@ -5,6 +5,7 @@ import { breakpoints } from "../common/style";
 
 type NotificationPropsWithCentering = NotificationProps & {
   centered?: boolean;
+  "data-testid"?: string;
 };
 
 const Wrapper = styled.div<{ $centerContent?: boolean }>`
@@ -19,8 +20,11 @@ const NotificationWrapper = (
 ): JSX.Element | null => {
   const [isVisible, setIsVisible] = React.useState(true);
 
+  // data-testid passed to the HDS component is not passed to the DOM
+  // pass it to the div wrapper instead
+  const testId = props["data-testid"];
   return isVisible ? (
-    <Wrapper $centerContent={props.centered}>
+    <Wrapper $centerContent={props.centered} data-testid={testId}>
       <Notification
         {...props}
         onClose={() => {
