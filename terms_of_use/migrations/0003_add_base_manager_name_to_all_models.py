@@ -17,8 +17,4 @@ class Migration(migrations.Migration):
                 "verbose_name_plural": "terms of use",
             },
         ),
-        migrations.AlterModelTable(
-            name="termsofuse",
-            table="terms_of_use",
-        ),
     ]

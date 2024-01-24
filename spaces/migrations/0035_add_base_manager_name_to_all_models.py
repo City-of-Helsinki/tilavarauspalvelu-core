@@ -33,32 +33,4 @@ class Migration(migrations.Migration):
             name="unitgroup",
             options={"base_manager_name": "objects"},
         ),
-        migrations.AlterModelTable(
-            name="building",
-            table="building",
-        ),
-        migrations.AlterModelTable(
-            name="location",
-            table="location",
-        ),
-        migrations.AlterModelTable(
-            name="realestate",
-            table="real_estate",
-        ),
-        migrations.AlterModelTable(
-            name="servicesector",
-            table="service_sector",
-        ),
-        migrations.AlterModelTable(
-            name="space",
-            table="space",
-        ),
-        migrations.AlterModelTable(
-            name="unit",
-            table="unit",
-        ),
-        migrations.AlterModelTable(
-            name="unitgroup",
-            table="unit_group",
-        ),
     ]

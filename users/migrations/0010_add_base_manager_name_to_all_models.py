@@ -17,12 +17,4 @@ class Migration(migrations.Migration):
             name="user",
             options={"base_manager_name": "objects"},
         ),
-        migrations.AlterModelTable(
-            name="personalinfoviewlog",
-            table="personal_info_view_log",
-        ),
-        migrations.AlterModelTable(
-            name="user",
-            table="user",
-        ),
     ]

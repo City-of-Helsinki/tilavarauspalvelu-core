@@ -5,16 +5,12 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("services", "0002_services_modeltranslation"),
+        ("resources", "0007_auto_20220616_1006"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name="service",
+            name="resource",
             options={"base_manager_name": "objects"},
-        ),
-        migrations.AlterModelTable(
-            name="service",
-            table="service",
         ),
     ]

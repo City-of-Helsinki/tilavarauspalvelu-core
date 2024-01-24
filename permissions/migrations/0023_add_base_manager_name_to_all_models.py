@@ -45,40 +45,4 @@ class Migration(migrations.Migration):
             name="unitrolepermission",
             options={"base_manager_name": "objects"},
         ),
-        migrations.AlterModelTable(
-            name="generalrole",
-            table="general_role",
-        ),
-        migrations.AlterModelTable(
-            name="generalrolechoice",
-            table="general_role_choice",
-        ),
-        migrations.AlterModelTable(
-            name="generalrolepermission",
-            table="general_role_permission",
-        ),
-        migrations.AlterModelTable(
-            name="servicesectorrole",
-            table="service_sector_role",
-        ),
-        migrations.AlterModelTable(
-            name="servicesectorrolechoice",
-            table="service_sector_role_choice",
-        ),
-        migrations.AlterModelTable(
-            name="servicesectorrolepermission",
-            table="service_sector_role_permission",
-        ),
-        migrations.AlterModelTable(
-            name="unitrole",
-            table="unit_role",
-        ),
-        migrations.AlterModelTable(
-            name="unitrolechoice",
-            table="unit_role_choice",
-        ),
-        migrations.AlterModelTable(
-            name="unitrolepermission",
-            table="unit_role_permission",
-        ),
     ]

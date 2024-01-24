@@ -5,14 +5,10 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("email_notification", "0004_add_html_content"),
+        ("email_notification", "0005_add_base_manager_name_to_all_models"),
     ]
 
     operations = [
-        migrations.AlterModelOptions(
-            name="emailtemplate",
-            options={"base_manager_name": "objects"},
-        ),
         migrations.AlterModelTable(
             name="emailtemplate",
             table="email_template",
