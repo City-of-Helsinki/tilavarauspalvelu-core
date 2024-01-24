@@ -68,6 +68,7 @@ export function createApolloClient(
   const httpLink = new HttpLink({
     uri: GRAPHQL_URL,
     credentials: "include",
+    // @ts-expect-error: TODO undici (node fetch) is a mess
     fetch: enchancedFetch,
   });
 
