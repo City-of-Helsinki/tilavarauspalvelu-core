@@ -205,17 +205,17 @@ export function ApplicationEventScheduleCard({
         "Schedule cannot be approved for event in status: 'APPROVED'";
       const RECEIVED_CANT_ALLOCATE_ERROR_MSG =
         "Schedule cannot be approved for application in status: 'RECEIVED'";
-      const alreadyDeclined = resErrors.find(
-        (e) => e?.messages.includes(ALREADY_DECLINED_ERROR_MSG)
+      const alreadyDeclined = resErrors.find((e) =>
+        e?.messages.includes(ALREADY_DECLINED_ERROR_MSG)
       );
-      const alreadyAllocated = resErrors.find(
-        (e) => e?.messages.includes(ALREADY_ALLOCATED_ERROR_MSG)
+      const alreadyAllocated = resErrors.find((e) =>
+        e?.messages.includes(ALREADY_ALLOCATED_ERROR_MSG)
       );
-      const alreadyHandled = resErrors.find(
-        (e) => e?.messages.includes(ALREADY_HANDLED_ERROR_MSG)
+      const alreadyHandled = resErrors.find((e) =>
+        e?.messages.includes(ALREADY_HANDLED_ERROR_MSG)
       );
-      const isInReceivedState = resErrors.find(
-        (e) => e?.messages.includes(RECEIVED_CANT_ALLOCATE_ERROR_MSG)
+      const isInReceivedState = resErrors.find((e) =>
+        e?.messages.includes(RECEIVED_CANT_ALLOCATE_ERROR_MSG)
       );
       if (isInReceivedState) {
         notifyError(t("Allocation.errors.accepting.receivedCantAllocate"));

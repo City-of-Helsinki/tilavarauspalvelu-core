@@ -119,10 +119,14 @@ const TimeRangePicker = <T extends FieldValues>({
   };
 
   const populatedTimeOptions = populateTimes();
-  const beginValue = getSelectedOption(beginField.value, populatedTimeOptions)
-    ?.value;
-  const endValue = getSelectedOption(endField.value, populatedTimeOptions)
-    ?.value;
+  const beginValue = getSelectedOption(
+    beginField.value,
+    populatedTimeOptions
+  )?.value;
+  const endValue = getSelectedOption(
+    endField.value,
+    populatedTimeOptions
+  )?.value;
   const endTimeIsBeforeStartTime =
     !Number.isNaN(Number(beginValue)) &&
     !Number.isNaN(Number(endValue)) &&

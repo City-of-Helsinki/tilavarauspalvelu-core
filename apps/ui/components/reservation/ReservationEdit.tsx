@@ -291,9 +291,8 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
     if (applicationRoundsData && reservationUnit) {
       const appRounds = filterNonNullable(
         applicationRoundsData?.applicationRounds?.edges?.map((e) => e?.node)
-      ).filter(
-        (ar) =>
-          ar.reservationUnits?.map((n) => n?.pk).includes(reservationUnit.pk)
+      ).filter((ar) =>
+        ar.reservationUnits?.map((n) => n?.pk).includes(reservationUnit.pk)
       );
       setActiveApplicationRounds(appRounds);
     }

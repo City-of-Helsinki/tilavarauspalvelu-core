@@ -312,11 +312,10 @@ export function getSlotApplicationEvents(
     return [];
   }
 
-  return filterNonNullable(aes).filter(
-    (ae) =>
-      ae?.applicationEventSchedules?.some((schedule) =>
-        doSomeSlotsFitApplicationEventSchedule(schedule, slots)
-      )
+  return filterNonNullable(aes).filter((ae) =>
+    ae?.applicationEventSchedules?.some((schedule) =>
+      doSomeSlotsFitApplicationEventSchedule(schedule, slots)
+    )
   );
 }
 
@@ -422,10 +421,10 @@ export const getApplicationEventScheduleTimeString = (
   aes: ApplicationEventScheduleNode[],
   priority: ApplicationEventSchedulePriority
 ): string => {
-  const schedules = sortBy(aes?.filter((s) => s?.priority === priority), [
-    "day",
-    "begin",
-  ]);
+  const schedules = sortBy(
+    aes?.filter((s) => s?.priority === priority),
+    ["day", "begin"]
+  );
 
   return filterNonNullable(schedules)
     .map((schedule) => parseApplicationEventScheduleTime(schedule))

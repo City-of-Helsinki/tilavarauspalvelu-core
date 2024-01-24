@@ -150,9 +150,8 @@ export function ApplicationEvents({
 
   const allocated =
     applicationEvents
-      ?.filter(
-        (applicationEvent) =>
-          applicationEvent?.applicationEventSchedules?.every(isAllocated)
+      ?.filter((applicationEvent) =>
+        applicationEvent?.applicationEventSchedules?.every(isAllocated)
       )
       .sort((a, b) => a.name.localeCompare(b.name)) ?? [];
 
@@ -173,9 +172,8 @@ export function ApplicationEvents({
   // take certain states and omit colliding application events
   const unallocatedApplicationEvents =
     applicationEvents
-      ?.filter(
-        (applicationEvent) =>
-          applicationEvent?.applicationEventSchedules?.every(isNotAllocated)
+      ?.filter((applicationEvent) =>
+        applicationEvent?.applicationEventSchedules?.every(isNotAllocated)
       )
       .sort((a, b) => a.name.localeCompare(b.name)) ?? [];
 

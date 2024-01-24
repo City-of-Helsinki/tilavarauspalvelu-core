@@ -22,8 +22,9 @@ export const getPDFTitle = (
   application: Application,
   hasReservations: boolean
 ): string =>
-  `${application.contactPerson?.firstName} ${application.contactPerson
-    ?.lastName} - Paatos - ${
+  `${application.contactPerson?.firstName} ${
+    application.contactPerson?.lastName
+  } - Paatos - ${
     hasReservations ? "Myönnetyt vuorot" : "Ei myönnettyjä vuoroja"
   }`;
 

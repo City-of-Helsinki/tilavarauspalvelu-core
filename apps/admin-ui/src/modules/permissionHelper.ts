@@ -22,8 +22,8 @@ export enum Permission {
 }
 
 const hasGeneralPermission = (permissionName: string, user: UserType) =>
-  user.generalRoles?.find(
-    (x) => x?.permissions?.find((y) => y?.permission === permissionName)
+  user.generalRoles?.find((x) =>
+    x?.permissions?.find((y) => y?.permission === permissionName)
   ) != null;
 
 const hasUnitPermission = (
@@ -36,12 +36,11 @@ const hasUnitPermission = (
 
   const unitGroups =
     unitRoles
-      .map(
-        (x) =>
-          x.unitGroups?.reduce<Array<UnitType | undefined>>(
-            (agv, y) => y?.units?.map((z) => z ?? undefined, agv) ?? [...agv],
-            []
-          )
+      .map((x) =>
+        x.unitGroups?.reduce<Array<UnitType | undefined>>(
+          (agv, y) => y?.units?.map((z) => z ?? undefined, agv) ?? [...agv],
+          []
+        )
       )
       .reduce((agv, x) => [...(agv ?? []), ...(x ?? [])], [])
       ?.map((x) => x?.pk)
