@@ -16,8 +16,9 @@ from permissions.helpers import (
 )
 from reservation_units.models import ReservationUnit, ReservationUnitType
 from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
-from reservations.models import RecurringReservation, Reservation, User
+from reservations.models import RecurringReservation, Reservation
 from spaces.models import Unit
+from users.models import User
 
 EMAIL_DOMAIN_PATTERN = re.compile(r"^@\w[.\w]{0,254}$")
 """

@@ -5,8 +5,9 @@ import django_filters
 from django.db.models import Q
 
 from reservation_units.models import ReservationUnit, ReservationUnitType
-from reservations.models import Reservation, User
+from reservations.models import Reservation
 from spaces.models import Unit
+from users.models import User
 
 
 class RecurringReservationFilterSet(django_filters.FilterSet):
