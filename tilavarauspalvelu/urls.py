@@ -8,6 +8,10 @@ from graphene_file_upload.django import FileUploadGraphQLView
 from api.legacy_rest_api.urls import legacy_outer
 from api.webhooks.urls import webhook_router
 
+# Mock the autocomplete view to be able to include `extra_context` for other pages
+real_autocomplete_view = admin.site.autocomplete_view
+admin.site.autocomplete_view = lambda request, extra_context: real_autocomplete_view(request)
+
 urlpatterns = [
     path("graphql/", csrf_exempt(FileUploadGraphQLView.as_view(graphiql=settings.DEBUG))),  # NOSONAR
     path("admin/", admin.site.urls, {"extra_context": {"version": settings.APP_VERSION}}),
