@@ -4,29 +4,36 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('reservation_units', '0025_reservationunit_hauki_resource_id'),
+        ("reservation_units", "0025_reservationunit_hauki_resource_id"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ReservationUnitPurpose',
+            name="ReservationUnitPurpose",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=200)),
-                ('name_fi', models.CharField(max_length=200, null=True)),
-                ('name_en', models.CharField(max_length=200, null=True)),
-                ('name_sv', models.CharField(max_length=200, null=True)),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("name", models.CharField(max_length=200)),
+                ("name_fi", models.CharField(max_length=200, null=True)),
+                ("name_en", models.CharField(max_length=200, null=True)),
+                ("name_sv", models.CharField(max_length=200, null=True)),
             ],
+            options={
+                "db_table": "reservation_unit_purpose",
+            },
         ),
         migrations.RemoveField(
-            model_name='reservationunit',
-            name='purposes',
+            model_name="reservationunit",
+            name="purposes",
         ),
         migrations.AddField(
-            model_name='reservationunit',
-            name='purposes',
-            field=models.ManyToManyField(blank=True, related_name='reservation_units', to='reservation_units.ReservationUnitPurpose', verbose_name='Purposes'),
+            model_name="reservationunit",
+            name="purposes",
+            field=models.ManyToManyField(
+                blank=True,
+                related_name="reservation_units",
+                to="reservation_units.ReservationUnitPurpose",
+                verbose_name="Purposes",
+            ),
         ),
     ]

@@ -7,6 +7,7 @@ from django.db import migrations, models
 
 def get_default_reservation_unit():
     from reservation_units.models import ReservationUnit
+
     res_unit = ReservationUnit.objects.only("id").first()
 
     if res_unit:
@@ -15,71 +16,101 @@ def get_default_reservation_unit():
     return 1
 
 
-
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('reservation_units', '0082_reservationunit_payment_accounting'),
-        ('applications', '0062_applicationevent_flagged'),
-        ('reservations', '0039_remove_reservationstatistic_staff_event'),
+        ("reservation_units", "0082_reservationunit_payment_accounting"),
+        ("applications", "0062_applicationevent_flagged"),
+        ("reservations", "0039_remove_reservationstatistic_staff_event"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='recurringreservation',
-            name='begin_date',
-            field=models.DateField(null=True, verbose_name='Begin date'),
+            model_name="recurringreservation",
+            name="begin_date",
+            field=models.DateField(null=True, verbose_name="Begin date"),
         ),
         migrations.AddField(
-            model_name='recurringreservation',
-            name='begin_time',
-            field=models.TimeField(null=True, verbose_name='Begin time'),
+            model_name="recurringreservation",
+            name="begin_time",
+            field=models.TimeField(null=True, verbose_name="Begin time"),
         ),
         migrations.AddField(
-            model_name='recurringreservation',
-            name='created',
+            model_name="recurringreservation",
+            name="created",
             field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='recurringreservation',
-            name='end_date',
-            field=models.DateField(null=True, verbose_name='End date'),
+            model_name="recurringreservation",
+            name="end_date",
+            field=models.DateField(null=True, verbose_name="End date"),
         ),
         migrations.AddField(
-            model_name='recurringreservation',
-            name='end_time',
-            field=models.TimeField(null=True, verbose_name='End time'),
+            model_name="recurringreservation",
+            name="end_time",
+            field=models.TimeField(null=True, verbose_name="End time"),
         ),
         migrations.AddField(
-            model_name='recurringreservation',
-            name='interval',
+            model_name="recurringreservation",
+            name="interval",
             field=models.PositiveIntegerField(null=True),
         ),
         migrations.AddField(
-            model_name='recurringreservation',
-            name='name',
-            field=models.CharField(blank=True, default='', max_length=255),
+            model_name="recurringreservation",
+            name="name",
+            field=models.CharField(blank=True, default="", max_length=255),
         ),
         migrations.AddField(
-            model_name='recurringreservation',
-            name='reservation_unit',
-            field=models.ForeignKey(default=get_default_reservation_unit, on_delete=django.db.models.deletion.PROTECT, to='reservation_units.reservationunit', verbose_name='Reservation unit'),
+            model_name="recurringreservation",
+            name="reservation_unit",
+            field=models.ForeignKey(
+                default=get_default_reservation_unit,
+                on_delete=django.db.models.deletion.PROTECT,
+                to="reservation_units.ReservationUnit",
+                verbose_name="Reservation unit",
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='recurringreservation',
-            name='weekdays',
-            field=models.CharField(blank=True, choices=[(0, 'Monday'), (1, 'Tuesday'), (2, 'Wednesday'), (3, 'Thursday'), (4, 'Friday'), (5, 'Saturday'), (6, 'Sunday')], default='', max_length=16),
+            model_name="recurringreservation",
+            name="weekdays",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    (0, "Monday"),
+                    (1, "Tuesday"),
+                    (2, "Wednesday"),
+                    (3, "Thursday"),
+                    (4, "Friday"),
+                    (5, "Saturday"),
+                    (6, "Sunday"),
+                ],
+                default="",
+                max_length=16,
+            ),
         ),
         migrations.AlterField(
-            model_name='recurringreservation',
-            name='application',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='recurring_reservation', to='applications.application', verbose_name='Application'),
+            model_name="recurringreservation",
+            name="application",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="recurring_reservation",
+                to="applications.Application",
+                verbose_name="Application",
+            ),
         ),
         migrations.AlterField(
-            model_name='recurringreservation',
-            name='application_event',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='recurring_reservation', to='applications.applicationevent', verbose_name='Application event'),
+            model_name="recurringreservation",
+            name="application_event",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="recurring_reservation",
+                to="applications.ApplicationEvent",
+                verbose_name="Application event",
+            ),
         ),
     ]

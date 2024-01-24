@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = []
@@ -38,16 +37,15 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "buffer_time_before",
-                    models.DurationField(
-                        blank=True, null=True, verbose_name="Buffer time before"
-                    ),
+                    models.DurationField(blank=True, null=True, verbose_name="Buffer time before"),
                 ),
                 (
                     "buffer_time_after",
-                    models.DurationField(
-                        blank=True, null=True, verbose_name="Buffer time after"
-                    ),
+                    models.DurationField(blank=True, null=True, verbose_name="Buffer time after"),
                 ),
             ],
+            options={
+                "db_table": "service",
+            },
         ),
     ]

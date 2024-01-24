@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 help_text="The percentage of tax included in the price",
                 on_delete=django.db.models.deletion.PROTECT,
                 related_name="reservation_units",
-                to="reservation_units.taxpercentage",
+                to="reservation_units.TaxPercentage",
                 verbose_name="Tax percentage",
             ),
         ),

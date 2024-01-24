@@ -33,137 +33,185 @@ FORM_FIELDS = (
 
 
 def create_reservation_metadata_fields(apps, schema_editor):
-    ReservationMetadataField = apps.get_model('reservations', 'ReservationMetadataField')
+    ReservationMetadataField = apps.get_model("reservations", "ReservationMetadataField")
 
     for field_name in FORM_FIELDS:
         ReservationMetadataField.objects.create(field_name=field_name)
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('reservations', '0018_reservation_price_tax'),
+        ("reservations", "0018_reservation_price_tax"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ReservationMetadataField',
+            name="ReservationMetadataField",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('field_name', models.CharField(max_length=100, unique=True, verbose_name='Field name')),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("field_name", models.CharField(max_length=100, unique=True, verbose_name="Field name")),
             ],
             options={
-                'verbose_name': 'Reservation metadata field',
-                'verbose_name_plural': 'Reservation metadata fields',
+                "db_table": "reservation_metadata_field",
+                "verbose_name": "Reservation metadata field",
+                "verbose_name_plural": "Reservation metadata fields",
             },
         ),
         migrations.CreateModel(
-            name='ReservationMetadataSet',
+            name="ReservationMetadataSet",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100, unique=True, verbose_name='Name')),
-                ('required_fields', models.ManyToManyField(blank=True, related_name='metadata_sets_required', to='reservations.ReservationMetadataField', verbose_name='Required fields')),
-                ('supported_fields', models.ManyToManyField(related_name='metadata_sets_supported', to='reservations.ReservationMetadataField', verbose_name='Supported fields')),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("name", models.CharField(max_length=100, unique=True, verbose_name="Name")),
+                (
+                    "required_fields",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="metadata_sets_required",
+                        to="reservations.ReservationMetadataField",
+                        verbose_name="Required fields",
+                    ),
+                ),
+                (
+                    "supported_fields",
+                    models.ManyToManyField(
+                        related_name="metadata_sets_supported",
+                        to="reservations.ReservationMetadataField",
+                        verbose_name="Supported fields",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Reservation metadata set',
-                'verbose_name_plural': 'Reservation metadata sets',
+                "db_table": "reservation_metadata_set",
+                "verbose_name": "Reservation metadata set",
+                "verbose_name_plural": "Reservation metadata sets",
             },
         ),
         migrations.RunPython(create_reservation_metadata_fields, migrations.RunPython.noop),
         migrations.AddField(
-            model_name='reservation',
-            name='age_group',
-            field=models.ForeignKey(blank=True, null=True, on_delete=models.deletion.SET_NULL, to='reservations.agegroup', verbose_name='Age group'),
+            model_name="reservation",
+            name="age_group",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=models.deletion.SET_NULL,
+                to="reservations.AgeGroup",
+                verbose_name="Age group",
+            ),
         ),
         migrations.AddField(
-            model_name='reservation',
-            name='applying_for_free_of_charge',
-            field=models.BooleanField(blank=True, default=False, verbose_name='Reservee is applying for a free-of-charge reservation'),
+            model_name="reservation",
+            name="applying_for_free_of_charge",
+            field=models.BooleanField(
+                blank=True, default=False, verbose_name="Reservee is applying for a free-of-charge reservation"
+            ),
         ),
         migrations.AddField(
-            model_name='reservation',
-            name='billing_address_city',
-            field=models.CharField(blank=True, default='', max_length=255, verbose_name='Billing address city'),
+            model_name="reservation",
+            name="billing_address_city",
+            field=models.CharField(blank=True, default="", max_length=255, verbose_name="Billing address city"),
         ),
         migrations.AddField(
-            model_name='reservation',
-            name='billing_address_street',
-            field=models.CharField(blank=True, default='', max_length=255, verbose_name='Reservee address street'),
+            model_name="reservation",
+            name="billing_address_street",
+            field=models.CharField(blank=True, default="", max_length=255, verbose_name="Reservee address street"),
         ),
         migrations.AddField(
-            model_name='reservation',
-            name='billing_address_zip',
-            field=models.CharField(blank=True, default='', max_length=255, verbose_name='Reservee address zip code'),
+            model_name="reservation",
+            name="billing_address_zip",
+            field=models.CharField(blank=True, default="", max_length=255, verbose_name="Reservee address zip code"),
         ),
         migrations.AddField(
-            model_name='reservation',
-            name='billing_email',
-            field=models.EmailField(blank=True, max_length=254, null=True, verbose_name='Billing email'),
+            model_name="reservation",
+            name="billing_email",
+            field=models.EmailField(blank=True, max_length=254, null=True, verbose_name="Billing email"),
         ),
         migrations.AddField(
-            model_name='reservation',
-            name='billing_first_name',
-            field=models.CharField(blank=True, default='', max_length=255, verbose_name='Billing first name'),
+            model_name="reservation",
+            name="billing_first_name",
+            field=models.CharField(blank=True, default="", max_length=255, verbose_name="Billing first name"),
         ),
         migrations.AddField(
-            model_name='reservation',
-            name='billing_last_name',
-            field=models.CharField(blank=True, default='', max_length=255, verbose_name='Billing last name'),
+            model_name="reservation",
+            name="billing_last_name",
+            field=models.CharField(blank=True, default="", max_length=255, verbose_name="Billing last name"),
         ),
         migrations.AddField(
-            model_name='reservation',
-            name='billing_phone',
-            field=models.CharField(blank=True, default='', max_length=255, verbose_name='Billing phone'),
+            model_name="reservation",
+            name="billing_phone",
+            field=models.CharField(blank=True, default="", max_length=255, verbose_name="Billing phone"),
         ),
         migrations.AddField(
-            model_name='reservation',
-            name='free_of_charge_reason',
-            field=models.TextField(blank=True, null=True, verbose_name='Reason for applying for a free-of-charge reservation'),
+            model_name="reservation",
+            name="free_of_charge_reason",
+            field=models.TextField(
+                blank=True, null=True, verbose_name="Reason for applying for a free-of-charge reservation"
+            ),
         ),
         migrations.AddField(
-            model_name='reservation',
-            name='home_city',
-            field=models.ForeignKey(blank=True, help_text='Home city of the group or association', null=True, on_delete=models.deletion.SET_NULL, related_name='home_city_reservation', to='applications.city', verbose_name='Home city'),
+            model_name="reservation",
+            name="home_city",
+            field=models.ForeignKey(
+                blank=True,
+                help_text="Home city of the group or association",
+                null=True,
+                on_delete=models.deletion.SET_NULL,
+                related_name="home_city_reservation",
+                to="applications.City",
+                verbose_name="Home city",
+            ),
         ),
         migrations.AddField(
-            model_name='reservation',
-            name='reservee_address_city',
-            field=models.CharField(blank=True, default='', max_length=255, verbose_name='Reservee address city'),
+            model_name="reservation",
+            name="reservee_address_city",
+            field=models.CharField(blank=True, default="", max_length=255, verbose_name="Reservee address city"),
         ),
         migrations.AddField(
-            model_name='reservation',
-            name='reservee_address_street',
-            field=models.CharField(blank=True, default='', max_length=255, verbose_name='Reservee address street'),
+            model_name="reservation",
+            name="reservee_address_street",
+            field=models.CharField(blank=True, default="", max_length=255, verbose_name="Reservee address street"),
         ),
         migrations.AddField(
-            model_name='reservation',
-            name='reservee_address_zip',
-            field=models.CharField(blank=True, default='', max_length=255, verbose_name='Reservee address zip code'),
+            model_name="reservation",
+            name="reservee_address_zip",
+            field=models.CharField(blank=True, default="", max_length=255, verbose_name="Reservee address zip code"),
         ),
         migrations.AddField(
-            model_name='reservation',
-            name='reservee_email',
-            field=models.EmailField(blank=True, max_length=254, null=True, verbose_name='Reservee email'),
+            model_name="reservation",
+            name="reservee_email",
+            field=models.EmailField(blank=True, max_length=254, null=True, verbose_name="Reservee email"),
         ),
         migrations.AddField(
-            model_name='reservation',
-            name='reservee_id',
-            field=models.CharField(blank=True, default='', help_text="Reservee's business or association identity code", max_length=10, verbose_name='Reservee phone'),
+            model_name="reservation",
+            name="reservee_id",
+            field=models.CharField(
+                blank=True,
+                default="",
+                help_text="Reservee's business or association identity code",
+                max_length=10,
+                verbose_name="Reservee phone",
+            ),
         ),
         migrations.AddField(
-            model_name='reservation',
-            name='reservee_is_unregistered_association',
-            field=models.BooleanField(blank=True, default=False, verbose_name='Reservee is an unregistered association'),
+            model_name="reservation",
+            name="reservee_is_unregistered_association",
+            field=models.BooleanField(
+                blank=True, default=False, verbose_name="Reservee is an unregistered association"
+            ),
         ),
         migrations.AddField(
-            model_name='reservation',
-            name='reservee_type',
-            field=models.CharField(blank=True, choices=[('business', 'Business'), ('nonprofit', 'Nonprofit'), ('individual', 'Individual')], help_text='Type of reservee', max_length=50, null=True),
+            model_name="reservation",
+            name="reservee_type",
+            field=models.CharField(
+                blank=True,
+                choices=[("business", "Business"), ("nonprofit", "Nonprofit"), ("individual", "Individual")],
+                help_text="Type of reservee",
+                max_length=50,
+                null=True,
+            ),
         ),
         migrations.AddField(
-            model_name='reservation',
-            name='reservee_organisation_name',
-            field=models.CharField(blank=True, default='', max_length=255, verbose_name='Reservee organisation name'),
+            model_name="reservation",
+            name="reservee_organisation_name",
+            field=models.CharField(blank=True, default="", max_length=255, verbose_name="Reservee organisation name"),
         ),
     ]

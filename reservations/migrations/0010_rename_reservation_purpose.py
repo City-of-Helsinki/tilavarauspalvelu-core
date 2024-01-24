@@ -5,31 +5,38 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('reservation_units', '0027_reservation_unit_purpose_changes'),
-        ('reservations', '0009_reservee_first_and_last_name'),
+        ("reservation_units", "0027_reservation_unit_purpose_changes"),
+        ("reservations", "0009_reservee_first_and_last_name"),
     ]
 
     operations = [
         migrations.RenameModel(
-            old_name='ReservationPurpose',
-            new_name='OldReservationPurpose',
+            old_name="ReservationPurpose",
+            new_name="OldReservationPurpose",
         ),
         migrations.CreateModel(
-            name='ReservationPurpose',
+            name="ReservationPurpose",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=200)),
-                ('name_fi', models.CharField(max_length=200, null=True)),
-                ('name_en', models.CharField(max_length=200, null=True)),
-                ('name_sv', models.CharField(max_length=200, null=True)),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("name", models.CharField(max_length=200)),
+                ("name_fi", models.CharField(max_length=200, null=True)),
+                ("name_en", models.CharField(max_length=200, null=True)),
+                ("name_sv", models.CharField(max_length=200, null=True)),
             ],
+            options={
+                "db_table": "reservation_purpose",
+            },
         ),
         migrations.AddField(
-            model_name='reservation',
-            name='purpose',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL,
-                                    to='reservations.reservationpurpose', verbose_name='Reservation purpose'),
+            model_name="reservation",
+            name="purpose",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="reservations.ReservationPurpose",
+                verbose_name="Reservation purpose",
+            ),
         ),
     ]

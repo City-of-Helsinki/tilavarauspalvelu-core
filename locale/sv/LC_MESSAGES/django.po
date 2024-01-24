@@ -477,7 +477,7 @@ msgid "Staff"
 msgstr ""
 
 #: common/choices/banner_notification.py permissions/models.py
-#: reservation_units/models.py reservations/models.py
+#: reservation_units/models/introduction.py reservations/models.py
 msgid "User"
 msgstr ""
 
@@ -600,7 +600,7 @@ msgstr ""
 msgid "Value comes from the Product Experience API"
 msgstr ""
 
-#: merchants/models.py reservation_units/models.py
+#: merchants/models.py reservation_units/models/reservation_unit.py
 msgid "Payment merchant"
 msgstr ""
 
@@ -1084,7 +1084,8 @@ msgstr ""
 msgid "Can edit unit information in the service sector"
 msgstr ""
 
-#: permissions/models.py reservation_units/models.py
+#: permissions/models.py
+#: reservation_units/models/reservation_unit_payment_type.py
 msgid "Code"
 msgstr ""
 
@@ -1104,7 +1105,7 @@ msgstr ""
 msgid "Unit group"
 msgstr ""
 
-#: permissions/models.py reservation_units/models.py
+#: permissions/models.py reservation_units/models/reservation_unit.py
 msgid "Unit"
 msgstr ""
 
@@ -1140,360 +1141,368 @@ msgstr ""
 msgid "90 minutes"
 msgstr ""
 
-#: reservation_units/models.py reservations/models.py resources/models.py
-#: services/models.py terms_of_use/models.py
-msgid "Name"
-msgstr ""
-
-#: reservation_units/models.py
-msgid "Order number"
-msgstr ""
-
-#: reservation_units/models.py
-msgid "Order number to be used in api sorting."
-msgstr ""
-
-#: reservation_units/models.py
-msgid "Category"
-msgstr ""
-
-#: reservation_units/models.py
-msgid "Keyword category"
-msgstr ""
-
-#: reservation_units/models.py
-msgid "Keyword group"
-msgstr ""
-
-#: reservation_units/models.py
-msgid "Name for the rule"
-msgstr ""
-
-#: reservation_units/models.py
-msgid "Time before user can cancel reservations of this reservation unit"
-msgstr ""
-
-#: reservation_units/models.py
-msgid "Will the cancellation need manual staff handling"
-msgstr ""
-
-#: reservation_units/models.py
-msgid "Tax percentage"
-msgstr ""
-
-#: reservation_units/models.py
+#: reservation_units/enums.py
 msgid "per 15 minutes"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/enums.py
 msgid "per 30 minutes"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/enums.py
 msgid "per hour"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/enums.py
 msgid "per half a day"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/enums.py
 msgid "per day"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/enums.py
 msgid "per week"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/enums.py
 msgid "fixed"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/enums.py
 msgid "past"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/enums.py
 msgid "active"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/enums.py
 msgid "future"
 msgstr ""
 
-#: reservation_units/models.py reservations/models.py
+#: reservation_units/models/equipment.py reservation_units/models/keyword.py
+#: reservation_units/models/reservation_unit.py
+#: reservation_units/models/reservation_unit_type.py reservations/models.py
+#: resources/models.py services/models.py terms_of_use/models.py
+msgid "Name"
+msgstr ""
+
+#: reservation_units/models/equipment.py reservation_units/models/purpose.py
+#: reservation_units/models/reservation_unit.py
+#: reservation_units/models/reservation_unit_type.py
+msgid "Order number"
+msgstr ""
+
+#: reservation_units/models/equipment.py reservation_units/models/purpose.py
+#: reservation_units/models/reservation_unit_type.py
+msgid "Order number to be used in api sorting."
+msgstr ""
+
+#: reservation_units/models/equipment.py
+msgid "Category"
+msgstr ""
+
+#: reservation_units/models/introduction.py
+#: reservation_units/models/reservation_unit_pricing.py reservations/models.py
+msgid "Reservation unit"
+msgstr ""
+
+#: reservation_units/models/introduction.py
+msgid "Completed at"
+msgstr ""
+
+#: reservation_units/models/keyword.py
+msgid "Keyword category"
+msgstr ""
+
+#: reservation_units/models/keyword.py
+msgid "Keyword group"
+msgstr ""
+
+#: reservation_units/models/reservation_unit.py reservations/models.py
 msgid "SKU"
 msgstr ""
 
-#: reservation_units/models.py reservations/models.py
+#: reservation_units/models/reservation_unit.py reservations/models.py
 msgid "Description"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Spaces"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Keyword groups"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Resources"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Services"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Purposes"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Qualifiers"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
+#: reservation_units/models/reservation_unit_image.py
 msgid "Type"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Require introduction"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Equipments"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Terms of use"
 msgstr ""
 
-#: reservation_units/models.py terms_of_use/models.py
+#: reservation_units/models/reservation_unit.py terms_of_use/models.py
 msgid "Payment terms"
 msgstr ""
 
-#: reservation_units/models.py terms_of_use/models.py
+#: reservation_units/models/reservation_unit.py terms_of_use/models.py
 msgid "Cancellation terms"
 msgstr ""
 
-#: reservation_units/models.py terms_of_use/models.py
+#: reservation_units/models/reservation_unit.py terms_of_use/models.py
 msgid "Service-specific terms"
 msgstr ""
 
-#: reservation_units/models.py terms_of_use/models.py
+#: reservation_units/models/reservation_unit.py terms_of_use/models.py
 msgid "Pricing terms"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Additional instructions for pending reservation"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Additional instructions for confirmed reservation"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Additional instructions for cancelled reservations"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Contact information"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Maximum reservation duration"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Minimum reservation duration"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Is this in draft state"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Maximum number of persons"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Minimum number of persons"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Surface area"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Buffer time before reservation"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Buffer time after reservation"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Reservation start interval"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Minimum days before reservations can be made"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Maximum number of days before reservations can be made"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid ""
 "Time when making reservations become possible for this reservation unit."
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid ""
 "Time when making reservations become not possible for this reservation unit"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Time after this reservation unit should be publicly visible in UI."
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Time after this reservation unit should not be publicly visible in UI."
 msgstr ""
 
-#: reservation_units/models.py reservations/models.py
+#: reservation_units/models/reservation_unit.py reservations/models.py
 msgid "Reservation metadata set"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid ""
 "Reservation metadata set that defines the set of supported and required form "
 "fields for this reservation unit."
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Maximum number of active reservations per user"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Does the reservations of this require a handling"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid ""
 "Does reservations of this reservation unit need to be handled before they're "
 "confirmed."
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Weak"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Strong"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Authentication"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Authentication required for reserving this reservation unit."
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Order number to be use in api sorting."
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Reservation kind "
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Can apply free of charge"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid ""
 "Can reservations to this reservation unit be able to apply free of charge."
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Allow reservations without opening hours"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Is reservation unit archived"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Payment product"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit.py
 msgid "Payment accounting"
 msgstr ""
 
-#: reservation_units/models.py
-msgid "Date when price is activated"
+#: reservation_units/models/reservation_unit_cancellation_rule.py
+msgid "Name for the rule"
 msgstr ""
 
-#: reservation_units/models.py
-msgid "Pricing type"
+#: reservation_units/models/reservation_unit_cancellation_rule.py
+msgid "Time before user can cancel reservations of this reservation unit"
 msgstr ""
 
-#: reservation_units/models.py
-msgid "Price unit"
+#: reservation_units/models/reservation_unit_cancellation_rule.py
+msgid "Will the cancellation need manual staff handling"
 msgstr ""
 
-#: reservation_units/models.py
-msgid "Lowest price"
-msgstr ""
-
-#: reservation_units/models.py
-msgid "Lowest net price"
-msgstr ""
-
-#: reservation_units/models.py
-msgid "Highest price"
-msgstr ""
-
-#: reservation_units/models.py
-msgid "Highest net price"
-msgstr ""
-
-#: reservation_units/models.py
-msgid "Status"
-msgstr ""
-
-#: reservation_units/models.py reservations/models.py
-msgid "Reservation unit"
-msgstr ""
-
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit_image.py
 msgid "Main image"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit_image.py
 msgid "Ground plan"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit_image.py
 msgid "Map"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit_image.py
 msgid "Other"
 msgstr ""
 
-#: reservation_units/models.py
+#: reservation_units/models/reservation_unit_image.py
 msgid "Reservation unit image"
 msgstr ""
 
-#: reservation_units/models.py
-msgid "Completed at"
+#: reservation_units/models/reservation_unit_pricing.py
+msgid "Date when price is activated"
+msgstr ""
+
+#: reservation_units/models/reservation_unit_pricing.py
+msgid "Pricing type"
+msgstr ""
+
+#: reservation_units/models/reservation_unit_pricing.py
+msgid "Price unit"
+msgstr ""
+
+#: reservation_units/models/reservation_unit_pricing.py
+msgid "Lowest price"
+msgstr ""
+
+#: reservation_units/models/reservation_unit_pricing.py
+msgid "Lowest net price"
+msgstr ""
+
+#: reservation_units/models/reservation_unit_pricing.py
+msgid "Highest price"
+msgstr ""
+
+#: reservation_units/models/reservation_unit_pricing.py
+msgid "Highest net price"
+msgstr ""
+
+#: reservation_units/models/reservation_unit_pricing.py
+#: reservation_units/models/tax_percentage.py
+msgid "Tax percentage"
+msgstr ""
+
+#: reservation_units/models/reservation_unit_pricing.py
+msgid "Status"
 msgstr ""
 
 #: reservations/admin.py
@@ -1834,6 +1843,14 @@ msgstr ""
 
 #: spaces/admin.py
 msgid "Name of the service sector in Swedish."
+msgstr ""
+
+#: templates/admin/base.html
+msgid "Change password"
+msgstr ""
+
+#: templates/admin/base.html
+msgid "Log out"
 msgstr ""
 
 #: templates/admin/reset_allocation_confirmation.html

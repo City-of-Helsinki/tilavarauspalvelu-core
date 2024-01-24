@@ -12,33 +12,74 @@ import common.fields.model
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('reservation_units', '0085_surface_area_to_integer'),
-        ('applications', '0068_applicationeventschedule_begin_before_end_and_more'),
+        ("reservation_units", "0085_surface_area_to_integer"),
+        ("applications", "0068_applicationeventschedule_begin_before_end_and_more"),
     ]
 
     operations = [
         HStoreExtension(),
         migrations.CreateModel(
-            name='ApplicationRoundTimeSlot',
+            name="ApplicationRoundTimeSlot",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('weekday', common.fields.model.IntChoiceField(enum=applications.choices.WeekdayChoice, validators=[django.core.validators.MinValueValidator(limit_value=0, message='Value must be between 0 and 6.'), django.core.validators.MaxValueValidator(limit_value=6, message='Value must be between 0 and 6.')])),
-                ('closed', models.BooleanField(default=False)),
-                ('reservable_times', django.contrib.postgres.fields.ArrayField(base_field=django.contrib.postgres.fields.hstore.HStoreField(), blank=True, default=list, size=None, validators=[applications.validators.validate_reservable_times])),
-                ('reservation_unit', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='application_round_time_slots', to='reservation_units.reservationunit')),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "weekday",
+                    common.fields.model.IntChoiceField(
+                        enum=applications.choices.WeekdayChoice,
+                        validators=[
+                            django.core.validators.MinValueValidator(
+                                limit_value=0, message="Value must be between 0 and 6."
+                            ),
+                            django.core.validators.MaxValueValidator(
+                                limit_value=6, message="Value must be between 0 and 6."
+                            ),
+                        ],
+                    ),
+                ),
+                ("closed", models.BooleanField(default=False)),
+                (
+                    "reservable_times",
+                    django.contrib.postgres.fields.ArrayField(
+                        base_field=django.contrib.postgres.fields.hstore.HStoreField(),
+                        blank=True,
+                        default=list,
+                        size=None,
+                        validators=[applications.validators.validate_reservable_times],
+                    ),
+                ),
+                (
+                    "reservation_unit",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="application_round_time_slots",
+                        to="reservation_units.ReservationUnit",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['reservation_unit', 'weekday'],
+                "ordering": ["reservation_unit", "weekday"],
+                "db_table": "application_round_time_slot",
             },
         ),
         migrations.AddConstraint(
-            model_name='applicationroundtimeslot',
-            constraint=models.UniqueConstraint(fields=('reservation_unit', 'weekday'), name='unique_reservation_unit_weekday', violation_error_message='A reservation unit can only have one timeslot per weekday.'),
+            model_name="applicationroundtimeslot",
+            constraint=models.UniqueConstraint(
+                fields=("reservation_unit", "weekday"),
+                name="unique_reservation_unit_weekday",
+                violation_error_message="A reservation unit can only have one timeslot per weekday.",
+            ),
         ),
         migrations.AddConstraint(
-            model_name='applicationroundtimeslot',
-            constraint=models.CheckConstraint(check=models.Q(models.Q(('closed', True), ('reservable_times__len', 0)), models.Q(('closed', False), models.Q(('reservable_times__len', 0), _negated=True)), _connector='OR'), name='closed_no_slots_check', violation_error_message='Closed timeslots cannot have reservable times, but open timeslots must.'),
+            model_name="applicationroundtimeslot",
+            constraint=models.CheckConstraint(
+                check=models.Q(
+                    models.Q(("closed", True), ("reservable_times__len", 0)),
+                    models.Q(("closed", False), models.Q(("reservable_times__len", 0), _negated=True)),
+                    _connector="OR",
+                ),
+                name="closed_no_slots_check",
+                violation_error_message="Closed timeslots cannot have reservable times, but open timeslots must.",
+            ),
         ),
     ]

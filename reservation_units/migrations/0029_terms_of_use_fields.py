@@ -5,26 +5,46 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('terms_of_use', '0001_initial'),
-        ('reservation_units', '0028_reservation_unit_cancellation_rule'),
+        ("terms_of_use", "0001_initial"),
+        ("reservation_units", "0028_reservation_unit_cancellation_rule"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='reservationunit',
-            name='cancellation_terms',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='cancellation_terms_reservation_unit', to='terms_of_use.termsofuse', verbose_name='Cancellation terms'),
+            model_name="reservationunit",
+            name="cancellation_terms",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="cancellation_terms_reservation_unit",
+                to="terms_of_use.TermsOfUse",
+                verbose_name="Cancellation terms",
+            ),
         ),
         migrations.AddField(
-            model_name='reservationunit',
-            name='payment_terms',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='payment_terms_reservation_unit', to='terms_of_use.termsofuse', verbose_name='Payment terms'),
+            model_name="reservationunit",
+            name="payment_terms",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="payment_terms_reservation_unit",
+                to="terms_of_use.TermsOfUse",
+                verbose_name="Payment terms",
+            ),
         ),
         migrations.AddField(
-            model_name='reservationunit',
-            name='service_specific_terms',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='service_specific_terms_reservation_unit', to='terms_of_use.termsofuse', verbose_name='Service-specific terms'),
+            model_name="reservationunit",
+            name="service_specific_terms",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="service_specific_terms_reservation_unit",
+                to="terms_of_use.TermsOfUse",
+                verbose_name="Service-specific terms",
+            ),
         ),
     ]
