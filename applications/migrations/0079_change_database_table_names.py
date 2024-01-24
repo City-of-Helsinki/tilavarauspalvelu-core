@@ -2,6 +2,8 @@
 
 from django.db import migrations
 
+from utils.migration import AlterModelTable
+
 
 class Migration(migrations.Migration):
     dependencies = [
@@ -12,43 +14,43 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="address",
             table="address",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="application",
             table="application",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="applicationevent",
             table="application_event",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="applicationeventschedule",
             table="application_event_schedule",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="applicationround",
             table="application_round",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="applicationroundtimeslot",
             table="application_round_time_slot",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="city",
             table="city",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="eventreservationunit",
             table="event_reservation_unit",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="organisation",
             table="organisation",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="person",
             table="person",
         ),

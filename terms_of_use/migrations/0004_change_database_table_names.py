@@ -2,6 +2,8 @@
 
 from django.db import migrations
 
+from utils.migration import AlterModelTable
+
 
 class Migration(migrations.Migration):
     dependencies = [
@@ -9,7 +11,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="termsofuse",
             table="terms_of_use",
         ),

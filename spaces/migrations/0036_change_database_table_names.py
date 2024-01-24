@@ -2,6 +2,8 @@
 
 from django.db import migrations
 
+from utils.migration import AlterModelTable
+
 
 class Migration(migrations.Migration):
     dependencies = [
@@ -9,31 +11,31 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="building",
             table="building",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="location",
             table="location",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="realestate",
             table="real_estate",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="servicesector",
             table="service_sector",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="space",
             table="space",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="unit",
             table="unit",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="unitgroup",
             table="unit_group",
         ),

@@ -2,6 +2,8 @@
 
 from django.db import migrations
 
+from utils.migration import AlterModelTable
+
 
 class Migration(migrations.Migration):
     dependencies = [
@@ -9,11 +11,11 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="originhaukiresource",
             table="origin_hauki_resource",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="reservabletimespan",
             table="reservable_time_span",
         ),

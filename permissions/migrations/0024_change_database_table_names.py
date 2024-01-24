@@ -2,6 +2,8 @@
 
 from django.db import migrations
 
+from utils.migration import AlterModelTable
+
 
 class Migration(migrations.Migration):
     dependencies = [
@@ -9,39 +11,39 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="generalrole",
             table="general_role",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="generalrolechoice",
             table="general_role_choice",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="generalrolepermission",
             table="general_role_permission",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="servicesectorrole",
             table="service_sector_role",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="servicesectorrolechoice",
             table="service_sector_role_choice",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="servicesectorrolepermission",
             table="service_sector_role_permission",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="unitrole",
             table="unit_role",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="unitrolechoice",
             table="unit_role_choice",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="unitrolepermission",
             table="unit_role_permission",
         ),

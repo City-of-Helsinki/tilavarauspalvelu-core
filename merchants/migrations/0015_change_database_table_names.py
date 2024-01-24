@@ -2,6 +2,8 @@
 
 from django.db import migrations
 
+from utils.migration import AlterModelTable
+
 
 class Migration(migrations.Migration):
     dependencies = [
@@ -9,19 +11,19 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="paymentaccounting",
             table="payment_accounting",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="paymentmerchant",
             table="payment_merchant",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="paymentorder",
             table="payment_order",
         ),
-        migrations.AlterModelTable(
+        AlterModelTable(
             name="paymentproduct",
             table="payment_product",
         ),
