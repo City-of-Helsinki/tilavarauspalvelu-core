@@ -2,6 +2,9 @@ import { i18n } from "next-i18next";
 import { OptionType } from "common/types/common";
 import { MapboxStyle } from "react-map-gl";
 
+export { isBrowser } from "common/src/helpers";
+export { getSignInUrl, getSignOutUrl } from "common/src/urlBuilder";
+
 export const weekdays = [
   "monday",
   "tuesday",
@@ -132,8 +135,6 @@ export const daysByMonths: OptionType[] = [
 export const defaultDuration = "01:30:00";
 export const defaultDurationMins = 90;
 
-export const isBrowser = typeof window !== "undefined";
-
 // TODO the validation needs to go to env.mjs because this reloads the page constantly
 // TODO we should default to this host if the env variable is not set
 // allowing us to host the api and the frontend on the same host without rebuilding the Docker container
@@ -154,30 +155,6 @@ if (!isBrowser && !env.SKIP_ENV_VALIDATION) {
   }
 }
 */
-
-// Returns href url for sign in dialog when given redirect url as parameter
-// @param callBackUrl - url to redirect after successful login
-// @param originOverride - when behind a gateway on a server the url.origin is incorrect
-export const getSignInUrl = (
-  apiBaseUrl: string,
-  callBackUrl: string,
-  originOverride?: string
-): string => {
-  const authUrl = `${apiBaseUrl}/helauth`;
-  // TODO why is originOveride only used when on logout?
-  if (callBackUrl.includes(`/logout`)) {
-    const baseUrl =
-      originOverride != null ? originOverride : new URL(callBackUrl).origin;
-    return `${authUrl}/login?next=${baseUrl}`;
-  }
-  return `${authUrl}/login?next=${callBackUrl}`;
-};
-
-// Returns href url for logging out with redirect url to /logout
-export const getSignOutUrl = (apiBaseUrl: string): string => {
-  const authUrl = `${apiBaseUrl}/helauth`;
-  return `${authUrl}/logout`;
-};
 
 export const genericTermsVariant = {
   BOOKING: "booking",

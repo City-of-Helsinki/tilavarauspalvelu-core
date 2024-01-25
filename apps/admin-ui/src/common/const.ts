@@ -1,6 +1,9 @@
 import { env } from "app/env.mjs";
 import { ApplicationStatusChoice } from "common/types/gql-types";
 
+export { isBrowser } from "common/src/helpers";
+export { getSignOutUrl } from "common/src/urlBuilder";
+
 export const defaultLanguage = "fi";
 
 // NOTE this is a dangerous variable, it does not change the frontend language
@@ -17,8 +20,6 @@ export const weekdays = [
   "saturday",
   "sunday",
 ];
-
-export const isBrowser = typeof window !== "undefined";
 
 export const PUBLIC_URL = env.NEXT_PUBLIC_BASE_URL ?? "";
 
@@ -42,6 +43,7 @@ export const LOGO_IMAGE_URL = `${PUBLIC_URL}/logo.png`;
 // TODO make this into utility function
 function getCleanPublicUrl() {
   const publicUrl = PUBLIC_URL;
+  // TODO this seems overly complex for what it should be
   const hasPublicUrl =
     publicUrl != null && publicUrl !== "/" && publicUrl !== "";
   const publicUrlNoSlash =
@@ -52,7 +54,9 @@ function getCleanPublicUrl() {
   return cleanPublicUrl;
 }
 
-// Returns href url for sign in dialog when given redirect url as parameter
+/// Returns href url for sign in dialog when given redirect url as parameter
+/// @returns url to sign in dialog
+/// TODO use the common version in urlBuilder.ts (missing the publicUrl option)
 export function getSignInUrl(apiBaseUrl: string, callBackUrl: string): string {
   const authUrl = `${apiBaseUrl}/helauth`;
   if (callBackUrl.includes(`/logout`)) {
@@ -61,12 +65,6 @@ export function getSignInUrl(apiBaseUrl: string, callBackUrl: string): string {
     return `${authUrl}/login?next=${baseUrl}${cleanPublicUrl}`;
   }
   return `${authUrl}/login?next=${callBackUrl}`;
-}
-
-// Returns href url for logging out with redirect url to /logout
-export function getSignOutUrl(apiBaseUrl: string): string {
-  const authUrl = `${apiBaseUrl}/helauth`;
-  return `${authUrl}/logout`;
 }
 
 export const VALID_ALLOCATION_APPLICATION_STATUSES = [

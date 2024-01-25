@@ -19,7 +19,7 @@ import "../styles/global.scss";
 const MyApp = ({ Component, pageProps }: AppProps) => {
   const { hotjarEnabled, matomoEnabled, cookiehubEnabled, apiBaseUrl } =
     pageProps;
-  const client = createApolloClient(apiBaseUrl, undefined);
+  const client = createApolloClient(apiBaseUrl ?? "", undefined);
   return (
     <>
       <DataContextProvider>

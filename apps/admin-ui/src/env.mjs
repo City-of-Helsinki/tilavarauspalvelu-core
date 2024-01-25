@@ -13,6 +13,7 @@ const ServerSchema = z.object({
   SENTRY_DSN: z.string().optional(),
   // TODO enum?
   SENTRY_ENVIRONMENT: z.string().optional(),
+  ENABLE_FETCH_HACK: coerceBoolean,
   COOKIEHUB_ENABLED: coerceBoolean,
   HOTJAR_ENABLED: coerceBoolean,
   TUNNISTAMO_URL: z.string().optional(),

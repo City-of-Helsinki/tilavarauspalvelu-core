@@ -9,7 +9,7 @@ import { ExternalScripts } from "@/common/ExternalScripts";
 export default function App({ Component, pageProps }: AppProps) {
   // TODO fix typing (type the AppProps)
   const { hotjarEnabled, cookiehubEnabled, apiBaseUrl } = pageProps;
-  const apolloClient = createClient(apiBaseUrl);
+  const apolloClient = createClient(apiBaseUrl ?? "");
   return (
     <>
       <ApolloProvider client={apolloClient}>

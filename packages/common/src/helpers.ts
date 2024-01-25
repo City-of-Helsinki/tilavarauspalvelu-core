@@ -40,3 +40,5 @@ export const getLocalizationLang = (code: string): LocalizationLanguages => {
   }
   return "fi";
 };
+
+export const isBrowser = typeof window !== "undefined";

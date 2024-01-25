@@ -39,7 +39,8 @@
     "react-i18next": "^14.0.1",
     "react-use": "^17.4.2",
     "styled-components": "5.3.11",
-    "tsconfig": "workspace:*"
+    "tsconfig": "workspace:*",
+    "zod": "^3.22.4"
   },
   "peerDependencies": {
     "react": "^18.2.0",

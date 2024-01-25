@@ -17,6 +17,8 @@ import type {
   ApplicationEventNodeConnection,
   ApplicationEventScheduleNodeConnection,
 } from "common/types/gql-types";
+import { buildGraphQLUrl } from "common/src/urlBuilder";
+import { env } from "@/env.mjs";
 import { isBrowser } from "./const";
 import { CustomFormData } from "./CustomFormData";
 
@@ -52,9 +54,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 });
 
 function createClient(apiBaseUrl: string) {
-  // TODO cleanup the url (so there is no double slash)
-  // TODO add an url builder (with the fetch hack boolean) move the ui version to packages/common
-  const uri = `${apiBaseUrl}/graphql/`;
+  const uri = buildGraphQLUrl(apiBaseUrl, env.ENABLE_FETCH_HACK);
   const uploadLinkOptions = {
     uri,
     credentials: "include",
