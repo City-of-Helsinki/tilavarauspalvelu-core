@@ -24,6 +24,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
       cookiehubEnabled: env.COOKIEHUB_ENABLED,
       reservationUnitPreviewUrl: env.RESERVATION_UNIT_PREVIEW_URL_PREFIX ?? "",
       hotjarEnabled: env.HOTJAR_ENABLED,
+      apiBaseUrl: env.TILAVARAUS_API_URL,
       // TODO can't use SSR translations because our translations aren't in public folder
       // ...(await serverSideTranslations(locale ?? "fi")),
     },

@@ -6,7 +6,7 @@ import { Permission } from "app/modules/permissionHelper";
 import ApplicationRound from "./spa/recurring-reservations/application-rounds/[id]";
 import PageWrapper from "./component/PageWrapper";
 import "./i18n";
-import { publicUrl } from "./common/const";
+import { PUBLIC_URL } from "./common/const";
 import { GlobalContext } from "./context/GlobalContexts";
 import { prefixes } from "./common/urls";
 import AuthorizationChecker from "./common/AuthorizationChecker";
@@ -135,7 +135,7 @@ const PremisesRouter = () => (
 
 function ClientApp({ previewUrlPrefix }: Props) {
   return (
-    <BrowserRouter basename={publicUrl}>
+    <BrowserRouter basename={PUBLIC_URL}>
       <PageWrapper>
         <Routes>
           <Route path="*" element={<Error404 />} />

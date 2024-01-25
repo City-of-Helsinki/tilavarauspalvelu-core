@@ -7,7 +7,7 @@ import { differenceInWeeks } from "date-fns";
 import { fromApiDate } from "common/src/common/util";
 import type { ApplicationEventNode } from "common/types/gql-types";
 import { formatters as getFormatters } from "common";
-import { publicUrl } from "@/common/const";
+import { PUBLIC_URL } from "@/common/const";
 import { truncate } from "@/helpers";
 import { applicationDetailsUrl } from "@/common/urls";
 import { getApplicantName } from "@/component/applications/util";
@@ -105,7 +105,8 @@ const COLS = [
     key: "applicant",
     transform: ({ applicantName, applicationPk, pk }: ApplicationEventView) => (
       <ExternalTableLink
-        href={`${publicUrl}${applicationDetailsUrl(applicationPk ?? 0)}#${
+        // TODO use url builder
+        href={`${PUBLIC_URL}${applicationDetailsUrl(applicationPk ?? 0)}#${
           pk ?? 0
         }`}
         target="_blank"

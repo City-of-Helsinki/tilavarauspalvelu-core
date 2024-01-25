@@ -22,7 +22,9 @@ type Props = {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale, params } = ctx;
-  const apolloClient = createApolloClient(ctx);
+  const commonProps = getCommonServerSideProps();
+  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
+
   const genericTermsId = params?.id;
   const { data: genericTermsData } = await apolloClient.query<
     Query,
@@ -39,14 +41,14 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   if (!genericTerms) {
     return {
       props: {
-        ...getCommonServerSideProps(),
+        ...commonProps,
       },
       notFound: true,
     };
   }
   return {
     props: {
-      ...getCommonServerSideProps(),
+      ...commonProps,
       genericTerms,
       ...(await serverSideTranslations(locale ?? "fi")),
     },

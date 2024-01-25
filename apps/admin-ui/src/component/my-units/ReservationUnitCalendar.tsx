@@ -22,7 +22,7 @@ import { useNotification } from "../../context/NotificationContext";
 import Legend from "../reservations/requested/Legend";
 import { RESERVATIONS_BY_RESERVATIONUNITS } from "./queries";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
-import { publicUrl } from "../../common/const";
+import { PUBLIC_URL } from "../../common/const";
 import { getReserveeName } from "../reservations/requested/util";
 
 type Props = {
@@ -171,7 +171,9 @@ const ReservationUnitCalendar = ({
             e.event?.pk &&
             hasPermission(e.event, Permission.CAN_VIEW_RESERVATIONS)
           ) {
-            window.open(publicUrl + reservationUrl(e.event?.pk), "_blank");
+            // TODO this looks dangerous, does public url end in slash or not?
+            // TODO use an url builder
+            window.open(PUBLIC_URL + reservationUrl(e.event?.pk), "_blank");
           }
         }}
         underlineEvents

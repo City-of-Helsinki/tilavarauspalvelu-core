@@ -44,7 +44,8 @@ type Props = {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale, query } = ctx;
-  const apolloClient = createApolloClient(ctx);
+  const commonProps = getCommonServerSideProps();
+  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
   const { data } = await apolloClient.query<Query, QueryApplicationRoundsArgs>({
     fetchPolicy: "no-cache",
@@ -60,7 +61,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return {
     props: {
       key: JSON.stringify({ ...query, locale }),
-      ...getCommonServerSideProps(),
+      ...commonProps,
       overrideBackgroundColor: "var(--tilavaraus-gray)",
       applicationRounds,
       ...(await serverSideTranslations(locale ?? "fi")),

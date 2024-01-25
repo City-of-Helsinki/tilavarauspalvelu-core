@@ -20,17 +20,7 @@ export const weekdays = [
 
 export const isBrowser = typeof window !== "undefined";
 
-export const PUBLIC_URL = env.NEXT_PUBLIC_BASE_URL;
-// @deprecated
-export const publicUrl = PUBLIC_URL;
-// TODO API_BASE_URL should always end in /
-// and the GRAPHQL_API_URL should be be ${API_BASE_URL}graphql/
-export const API_BASE_URL =
-  env.NEXT_PUBLIC_TILAVARAUS_API_URL != null
-    ? `${env.NEXT_PUBLIC_TILAVARAUS_API_URL}`
-    : "";
-
-export const GRAPHQL_API_URL = `${API_BASE_URL}/graphql/`;
+export const PUBLIC_URL = env.NEXT_PUBLIC_BASE_URL ?? "";
 
 export const LIST_PAGE_SIZE = 50;
 export const LARGE_LIST_PAGE_SIZE = 100;
@@ -44,13 +34,14 @@ export const RECURRING_AUTOMATIC_REFETCH_LIMIT = 2000;
 // This is a backend (or library) limit based on testing
 export const GQL_MAX_RESULTS_PER_QUERY = 100;
 
-export const HERO_IMAGE_URL = `${publicUrl}/hero-user@1x.jpg`;
-export const LOGO_IMAGE_URL = `${publicUrl}/logo.png`;
+// TODO PUBLIC_URL should be cleaned up and always end in /
+export const HERO_IMAGE_URL = `${PUBLIC_URL}/hero-user@1x.jpg`;
+export const LOGO_IMAGE_URL = `${PUBLIC_URL}/logo.png`;
 
-// TODO create a clean version of the API_URL and reuse it
-const AUTH_URL = `${API_BASE_URL}/helauth`;
-
-const getCleanPublicUrl = () => {
+// TODO move the url constructors to packages/common
+// TODO make this into utility function
+function getCleanPublicUrl() {
+  const publicUrl = PUBLIC_URL;
   const hasPublicUrl =
     publicUrl != null && publicUrl !== "/" && publicUrl !== "";
   const publicUrlNoSlash =
@@ -59,21 +50,24 @@ const getCleanPublicUrl = () => {
     ? publicUrlNoSlash
     : `/${publicUrlNoSlash}`;
   return cleanPublicUrl;
-};
+}
+
 // Returns href url for sign in dialog when given redirect url as parameter
-export const getSignInUrl = (callBackUrl: string): string => {
+export function getSignInUrl(apiBaseUrl: string, callBackUrl: string): string {
+  const authUrl = `${apiBaseUrl}/helauth`;
   if (callBackUrl.includes(`/logout`)) {
     const baseUrl = new URL(callBackUrl).origin;
     const cleanPublicUrl = getCleanPublicUrl();
-    return `${AUTH_URL}/login?next=${baseUrl}${cleanPublicUrl}`;
+    return `${authUrl}/login?next=${baseUrl}${cleanPublicUrl}`;
   }
-  return `${AUTH_URL}/login?next=${callBackUrl}`;
-};
+  return `${authUrl}/login?next=${callBackUrl}`;
+}
 
 // Returns href url for logging out with redirect url to /logout
-export const getSignOutUrl = (): string => {
-  return `${AUTH_URL}/logout`;
-};
+export function getSignOutUrl(apiBaseUrl: string): string {
+  const authUrl = `${apiBaseUrl}/helauth`;
+  return `${authUrl}/logout`;
+}
 
 export const VALID_ALLOCATION_APPLICATION_STATUSES = [
   ApplicationStatusChoice.Received,

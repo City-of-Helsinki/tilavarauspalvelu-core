@@ -83,14 +83,21 @@ See `.env.local.example` and Azure DevOps library for values.
 | Name                           | Description                                                     |
 | ------------------------------ | --------------------------------------------------------------- |
 | NEXT_PUBLIC_BASE_URL           | application baseUrl                                             |
-| NEXT_PUBLIC_TILAVARAUS_API_URL | tilavaraus-core base url                                        |
-| NEXT_PUBLIC_PROFILE_UI_URL     | helsinki profile frontend url for a link                        |
-| NEXT_PUBLIC_MAPBOX_TOKEN       | token tor mapbox service                                        |
-| NEXT_PUBLIC_SENTRY_DSN         | Sentry dsn                                                      |
-| NEXT_PUBLIC_SENTRY_ENVIRONMENT | Sentry environment, for example 'test', 'prod'                  |
+| TILAVARAUS_API_URL             | tilavaraus-core base url                                        |
+| PROFILE_UI_URL                 | helsinki profile frontend url for a link                        |
+| MAPBOX_TOKEN                   | token tor mapbox service                                        |
+| SENTRY_DSN                     | Sentry dsn                                                      |
+| SENTRY_ENVIRONMENT             | Sentry environment, for example 'test', 'prod'                  |
 | SENTRY_AUTH_TOKEN              | auth token for sentry cli                                       |
-| NEXT_PUBLIC_MATOMO_ENABLED     | 'true' enables matomo tracking                                  |
-| NEXT_PUBLIC_COOKIEHUB_ENABLED  | 'true' enables cookiehub consent module                         |
-| NEXT_PUBLIC_HOTJAR_ENABLED     | 'true' enables hotjar tracking                                  |
+| MATOMO_ENABLED                 | 'true' enables matomo tracking                                  |
+| COOKIEHUB_ENABLED              | 'true' enables cookiehub consent module                         |
+| HOTJAR_ENABLED                 | 'true' enables hotjar tracking                                  |
 | ENABLE_FETCH_HACK              | 'true' to fix localhost dns problem                             |
 | SKIP_ENV_VALIDATION            | 'true' to allow empty env values (especially for build / test)  |
+
+`TILAVARAUS_API_URL` is required to be set because the node server doing SSR can't connect to the backend without it.
+Unlike a pure browser bundle even if they are running on the same host, the SSR is a separate server behind a reverse proxy.
+
+`ENABLE_FETCH_HACK` has no effect if `API_URL` is not localhost but you should NOT enable it on an actual server deployment.
+
+`SKIP_ENV_VALIDATION` should only be used for building and testing.

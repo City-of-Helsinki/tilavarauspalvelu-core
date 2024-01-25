@@ -5,7 +5,7 @@ import React from "react";
 import styled from "styled-components";
 import { H1 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import { publicUrl } from "./const";
+import { PUBLIC_URL } from "./const";
 
 const Wrapper = styled.div`
   margin: 0 var(--spacing-s);
@@ -43,7 +43,7 @@ function Error404({ message }: { message?: string }): JSX.Element {
       <Content>
         <H1 $legacy>404: Sivua ei löytynyt</H1>
         {message && <p>{message}</p>}
-        <Link href={publicUrl ?? "/"}>Siirry etusivulle</Link>
+        <Link href={PUBLIC_URL ?? "/"}>Siirry etusivulle</Link>
       </Content>
     </Wrapper>
   );

@@ -5,10 +5,10 @@ import styled from "styled-components";
 import { UserInfo } from "common";
 import { breakpoints } from "common/src/common/style";
 import { useNavigate } from "react-router-dom";
-import { signIn, signOut, useSession } from "app/hooks/auth";
-import { publicUrl } from "app/common/const";
+import { signIn, signOut, useSession } from "@/hooks/auth";
+import { PUBLIC_URL } from "@/common/const";
+import { StyledHDSNavigation } from "@/styles/util";
 import MainMenu from "./MainMenu";
-import { StyledHDSNavigation } from "../styles/util";
 
 const MobileNavigation = styled.div`
   @media (min-width: ${breakpoints.m}) {
@@ -105,7 +105,7 @@ const WrappedNavigation = ({ disabledRouter = false }) => {
     return (
       <Navigation
         disabledRouter
-        onLogoClick={() => window.location.assign(publicUrl ?? "/")}
+        onLogoClick={() => window.location.assign(PUBLIC_URL ?? "/")}
       />
     );
   }

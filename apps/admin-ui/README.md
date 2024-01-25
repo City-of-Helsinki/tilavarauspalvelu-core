@@ -9,17 +9,18 @@ Use `.env.local` for development, you can copy the defaults from `.env.example`.
 cp .env.example .env.local
 ```
 
-| Name                                            | Description                                                   |
-| ----------------------------------------------- | ------------------------------------------------------------- |
-| NEXT_PUBLIC_TILAVARAUS_API_URL                  | tilavaraus-core base url                                      |
-| NEXT_PUBLIC_RESERVATION_UNIT_PREVIEW_URL_PREFIX | https://tilavaraus.dev.hel.ninja/reservation-unit             |
-| NEXT_PUBLIC_COOKIEHUB_ENABLED                   | Whether Cookiehub should be enabled                           |
-| NEXT_PUBLIC_HOTJAR_ENABLED                      | Whether Hotjar should be enabled                              |
-| NEXT_PUBLIC_BASE_URL                            | The baseUrl to use usually /kasittely                         |
+| Name                                | Description                                                   |
+| ------------------------------------| ------------------------------------------------------------- |
+| NEXT_PUBLIC_BASE_URL                | The baseUrl to use usually /kasittely                         |
+| TILAVARAUS_API_URL                  | tilavaraus-core base url                                      |
+| RESERVATION_UNIT_PREVIEW_URL_PREFIX | https://tilavaraus.dev.hel.ninja/reservation-unit             |
+| COOKIEHUB_ENABLED                   | Whether Cookiehub should be enabled                           |
+| HOTJAR_ENABLED                      | Whether Hotjar should be enabled                              |
 
-NEXT_PUBLIC_TILAVARAUS_API_URL
+`TILAVARAUS_API_URL` is required to be set because the node server doing SSR can't connect to the backend without it.
+Unlike a pure browser bundle even if they are running on the same host, the SSR is a separate server behind a reverse proxy.
 
-local core runs by default in http://127.0.0.1:8000 you can also use the development server that runs in Azure.
+`SKIP_ENV_VALIDATION` should only be used for building and testing.
 
 ## Available Scripts
 

@@ -91,7 +91,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale, params } = ctx;
   const reservationUnitPk = Number(params?.params?.[0]);
   const path = params?.params?.[1];
-  const apolloClient = createApolloClient(ctx);
+  const commonProps = getCommonServerSideProps();
+  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
   if (isFinite(reservationUnitPk) && path === "reservation") {
     const { data: reservationUnitData } = await apolloClient.query<
@@ -151,7 +152,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
     return {
       props: {
-        ...getCommonServerSideProps(),
+        ...commonProps,
         key: `${reservationUnitPk}${locale}`,
         reservationUnit: reservationUnitData.reservationUnitByPk,
         reservationPurposes,
@@ -165,7 +166,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   return {
     props: {
-      ...getCommonServerSideProps(),
+      ...commonProps,
     },
     notFound: true,
   };

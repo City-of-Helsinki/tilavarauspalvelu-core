@@ -5,7 +5,7 @@ import { signOut, useSession } from "app/hooks/auth";
 import styled from "styled-components";
 import { H1 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import { publicUrl } from "./const";
+import { PUBLIC_URL } from "./const";
 
 const Wrapper = styled.div`
   margin: var(--spacing-layout-s);
@@ -74,7 +74,7 @@ const Error403 = ({
         <p>{t("errorPages.accessForbidden.description")}</p>
         {showLogoutSection && <LogoutSection />}
       </div>
-      <Image src={`${publicUrl}/403.png`} />
+      <Image src={`${PUBLIC_URL}/403.png`} />
     </Wrapper>
   );
 };

@@ -68,8 +68,9 @@ const View = ({ id, tos }: Props): JSX.Element => {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale } = ctx;
+  const commonProps = getCommonServerSideProps();
+  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
-  const apolloClient = createApolloClient(ctx);
   const { data: tosData } = await apolloClient.query<
     Query,
     QueryTermsOfUseArgs
@@ -89,7 +90,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   return {
     props: {
-      ...getCommonServerSideProps(),
+      ...commonProps,
       key: locale,
       id: pk,
       tos,

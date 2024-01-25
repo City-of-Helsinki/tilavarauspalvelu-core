@@ -21,15 +21,18 @@ const ServerSchema = z.object({
   HOTJAR_ENABLED: coerceBoolean,
   MATOMO_ENABLED: coerceBoolean,
   PROFILE_UI_URL: z.string().url().or(z.string().length(0)).optional(),
+  // mandatory because the SSR can't connect to the API without it
+  // frontend SSR is running on a different host than the backend
+  TILAVARAUS_API_URL: z.string().url(),
 });
 
+// NOTE if you add a new variable to client it will be fixed in the build
+// and the same build image will be deployed to all environments
 const ClientSchema = z.object({
   NEXT_PUBLIC_BASE_URL: z.string().optional(),
-  // Don't use API_URL on production, it's only for local development
-  NEXT_PUBLIC_TILAVARAUS_API_URL: z.string().optional(),
 });
 
-const createEnv = () => {
+function createEnv() {
   const skipValidation = coerceBoolean.parse(process.env.SKIP_ENV_VALIDATION);
   const isServer = typeof window === "undefined";
 
@@ -48,7 +51,6 @@ const createEnv = () => {
   // NOTE NextJs does substitutions for process.env. Not using the full variable breaks it!
   const clientConfig = clientSchema.safeParse({
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
-    NEXT_PUBLIC_TILAVARAUS_API_URL: process.env.NEXT_PUBLIC_TILAVARAUS_API_URL,
   });
 
   if (!clientConfig.success) {
@@ -60,7 +62,7 @@ const createEnv = () => {
     ...(isServer && serverConfig?.success ? serverConfig.data : {}),
     ...(clientConfig.success ? clientConfig.data : {}),
   };
-};
+}
 
 const env = createEnv();
 

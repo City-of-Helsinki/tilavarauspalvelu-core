@@ -145,7 +145,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const id = Number(params?.id);
   const uuid = query.ru;
   const today = new Date();
-  const apolloClient = createApolloClient(ctx);
+  const commonProps = getCommonServerSideProps();
+  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
   let relatedReservationUnits: ReservationUnitType[] = [];
 
@@ -178,7 +179,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     if (!isReservationUnitPublished(reservationUnit) && !previewPass) {
       return {
         props: {
-          ...getCommonServerSideProps(),
+          ...commonProps,
         },
         notFound: true,
       };
@@ -188,7 +189,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     if (isDraft && !previewPass) {
       return {
         props: {
-          ...getCommonServerSideProps(),
+          ...commonProps,
         },
         notFound: true,
       };
@@ -275,7 +276,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     return {
       props: {
         key: `${id}-${locale}`,
-        ...getCommonServerSideProps(),
+        ...commonProps,
         ...(await serverSideTranslations(locale ?? "fi")),
         reservationUnit: {
           ...reservationUnitData?.reservationUnitByPk,
@@ -296,7 +297,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return {
     props: {
       key: `${id}-${locale}`,
-      ...getCommonServerSideProps(),
+      ...commonProps,
       ...(await serverSideTranslations(locale ?? "fi")),
       paramsId: id,
     },

@@ -6,6 +6,8 @@ function redirectProtectedRoute(req: NextRequest) {
   // TODO check that the cookie is valid not just present
   const { cookies, headers } = req;
   const hasSession = cookies.has("sessionid");
+  const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+
   if (!hasSession) {
     // on the server we are behind a gateway so get the forwarded headers
     // localhost has no headers
@@ -15,9 +17,9 @@ function redirectProtectedRoute(req: NextRequest) {
     const originalUrl = headers.get("x-original-url");
     if (host && originalUrl) {
       const origin = `${protocol}://${host}`;
-      return getSignInUrl(originalUrl, origin);
+      return getSignInUrl(apiBaseUrl, originalUrl, origin);
     }
-    return getSignInUrl(currentUrl);
+    return getSignInUrl(apiBaseUrl, currentUrl);
   }
   return undefined;
 }

@@ -7,7 +7,7 @@ import type {
   ApplicationEventScheduleNode,
 } from "common/types/gql-types";
 import { SemiBold, type ReservationUnitNode, fontMedium } from "common";
-import { publicUrl } from "@/common/const";
+import { PUBLIC_URL } from "@/common/const";
 import { formatDuration } from "@/common/util";
 import { getApplicantName } from "@/component/applications/util";
 import { ageGroup } from "@/component/reservations/requested/util";
@@ -203,7 +203,7 @@ export function ApplicationEventCard({
         )}
         <StyledLink
           // TODO use an url constructor
-          href={`${publicUrl}/application/${application.pk}/details#${applicationEvent.pk}`}
+          href={`${PUBLIC_URL}/application/${application.pk}/details#${applicationEvent.pk}`}
           external
           openInNewTab
           openInExternalDomainAriaLabel={t("common.openToNewTab")}

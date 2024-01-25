@@ -17,13 +17,15 @@ import nextI18NextConfig from "../next-i18next.config";
 import "../styles/global.scss";
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
-  const { hotjarEnabled, matomoEnabled, cookiehubEnabled } = pageProps;
+  const { hotjarEnabled, matomoEnabled, cookiehubEnabled, apiBaseUrl } =
+    pageProps;
+  const client = createApolloClient(apiBaseUrl, undefined);
   return (
     <>
       <DataContextProvider>
         <TrackingWrapper matomoEnabled={matomoEnabled}>
           {/* TODO is this ever called on the server? then the ctx is not undefined */}
-          <ApolloProvider client={createApolloClient(undefined)}>
+          <ApolloProvider client={client}>
             <ThemeProvider theme={theme}>
               <PageWrapper {...pageProps}>
                 <Component {...pageProps} />

@@ -7,11 +7,13 @@ export function getCommonServerSideProps() {
   const matomoEnabled = env.MATOMO_ENABLED ?? false;
   const hotjarEnabled = env.HOTJAR_ENABLED ?? false;
   const profileLink = env.PROFILE_UI_URL ?? "";
+  const apiBaseUrl = env.TILAVARAUS_API_URL ?? "";
 
   return {
     cookiehubEnabled,
     matomoEnabled,
     hotjarEnabled,
     profileLink,
+    apiBaseUrl,
   };
 }

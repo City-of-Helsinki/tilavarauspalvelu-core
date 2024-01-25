@@ -7,7 +7,7 @@ import {
   ApplicationEventStatusChoice,
   type ApplicationEventScheduleNode,
 } from "common/types/gql-types";
-import { publicUrl } from "@/common/const";
+import { PUBLIC_URL } from "@/common/const";
 import { truncate } from "@/helpers";
 import { applicationDetailsUrl } from "@/common/urls";
 import { CustomTable, ExternalTableLink } from "@/component/Table";
@@ -91,7 +91,8 @@ const COLS = [
       pk,
     }: ApplicationScheduleView) => (
       <ExternalTableLink
-        href={`${publicUrl}${applicationDetailsUrl(applicationPk ?? 0)}#${
+        // TODO use url builder
+        href={`${PUBLIC_URL}${applicationDetailsUrl(applicationPk ?? 0)}#${
           pk ?? 0
         }`}
         target="_blank"

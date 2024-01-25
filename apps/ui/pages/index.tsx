@@ -41,7 +41,8 @@ const Home = ({ purposes, units }: Props): JSX.Element => {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { locale } = ctx;
-  const apolloClient = createApolloClient(ctx);
+  const commonProps = getCommonServerSideProps();
+  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
   const { data: purposeData } = await apolloClient.query<
     Query,
@@ -67,7 +68,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   return {
     props: {
-      ...getCommonServerSideProps(),
+      ...commonProps,
       purposes,
       units,
       ...(await serverSideTranslations(locale ?? "fi", [

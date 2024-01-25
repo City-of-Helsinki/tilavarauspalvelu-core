@@ -1,7 +1,6 @@
 import { i18n } from "next-i18next";
 import { OptionType } from "common/types/common";
 import { MapboxStyle } from "react-map-gl";
-import { env } from "@/env.mjs";
 
 export const weekdays = [
   "monday",
@@ -135,12 +134,11 @@ export const defaultDurationMins = 90;
 
 export const isBrowser = typeof window !== "undefined";
 
-const apiBaseUrl = env.NEXT_PUBLIC_TILAVARAUS_API_URL;
-
 // TODO the validation needs to go to env.mjs because this reloads the page constantly
 // TODO we should default to this host if the env variable is not set
 // allowing us to host the api and the frontend on the same host without rebuilding the Docker container
 // possible problem: SSR requires absolute url for the api (so get the host url?)
+/* TODO add checks back probably to env.mjs
 if (!isBrowser && !env.SKIP_ENV_VALIDATION) {
   // Don't check validity because it should default to same address (both host + port)
   // this could be a transformation on the base value in env.mjs and a warning
@@ -155,42 +153,28 @@ if (!isBrowser && !env.SKIP_ENV_VALIDATION) {
     );
   }
 }
-
-const apiUrl = env.NEXT_PUBLIC_TILAVARAUS_API_URL ?? "";
-
-// a hack to workaround node-fetch dns problems with localhost
-// this will not work with authentication so when we add authentication to the SSR we need to fix it properly
-const shouldModifyLocalhost =
-  env.ENABLE_FETCH_HACK && !isBrowser && apiUrl.includes("localhost");
-const hostUrl = shouldModifyLocalhost
-  ? apiUrl.replace("localhost", "127.0.0.1")
-  : apiUrl;
-export const GRAPHQL_URL = `${hostUrl}${
-  hostUrl.endsWith("/") ? "" : "/"
-}graphql/`;
-
-export const REST_API_URL = `${hostUrl}${hostUrl.endsWith("/") ? "" : "/"}v1/`;
-
-const AUTH_URL = apiBaseUrl != null ? `${apiBaseUrl}/helauth` : "/helauth";
+*/
 
 // Returns href url for sign in dialog when given redirect url as parameter
 // @param callBackUrl - url to redirect after successful login
 // @param originOverride - when behind a gateway on a server the url.origin is incorrect
 export const getSignInUrl = (
+  apiBaseUrl: string,
   callBackUrl: string,
   originOverride?: string
 ): string => {
+  // TODO why is originOveride only used when on logout?
   if (callBackUrl.includes(`/logout`)) {
     const baseUrl =
       originOverride != null ? originOverride : new URL(callBackUrl).origin;
-    return `${AUTH_URL}/login?next=${baseUrl}`;
+    return `${apiBaseUrl}/login?next=${baseUrl}`;
   }
-  return `${AUTH_URL}/login?next=${callBackUrl}`;
+  return `${apiBaseUrl}/login?next=${callBackUrl}`;
 };
 
 // Returns href url for logging out with redirect url to /logout
-export const getSignOutUrl = (): string => {
-  return `${AUTH_URL}/logout`;
+export const getSignOutUrl = (apiBaseUrl: string): string => {
+  return `${apiBaseUrl}/logout`;
 };
 
 export const genericTermsVariant = {

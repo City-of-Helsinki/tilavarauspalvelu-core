@@ -7,7 +7,7 @@ import type {
   ApplicationNode,
   ApplicationStatusChoice,
 } from "common/types/gql-types";
-import { publicUrl } from "@/common/const";
+import { PUBLIC_URL } from "@/common/const";
 import { applicationDetailsUrl } from "@/common/urls";
 import { truncate } from "@/helpers";
 import { getApplicantName } from "@/component/applications/util";
@@ -49,7 +49,8 @@ const COLS = [
     transform: ({ applicantName, pk }: ApplicationView) =>
       pk ? (
         <ExternalTableLink
-          href={`${publicUrl}${applicationDetailsUrl(pk)}`}
+          // TODO use urlBuilder
+          href={`${PUBLIC_URL}${applicationDetailsUrl(pk)}`}
           target="_blank"
           rel="noopener noreferrer"
         >

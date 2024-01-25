@@ -5,9 +5,10 @@ import { onError } from "@apollo/client/link/error";
 import { GraphQLError } from "graphql";
 // eslint-disable-next-line unicorn/prefer-node-protocol -- node:querystring breaks the app
 import qs, { ParsedUrlQuery } from "querystring";
-import { GRAPHQL_URL, isBrowser } from "./const";
+import { isBrowser } from "./const";
 import { GetServerSidePropsContext, PreviewData } from "next";
 import { IncomingHttpHeaders } from "node:http";
+import { env } from "@/env.mjs";
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
@@ -23,7 +24,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   }
 });
 
-const getServerCrsfToken = (headers?: IncomingHttpHeaders) => {
+function getServerCrsfToken(headers?: IncomingHttpHeaders) {
   const cookie = headers?.cookie;
   if (cookie == null) {
     // eslint-disable-next-line no-console
@@ -43,15 +44,26 @@ const getServerCrsfToken = (headers?: IncomingHttpHeaders) => {
     return token[0];
   }
   return token;
-};
+}
 
 export function createApolloClient(
+  hostUrl: string,
   ctx?: GetServerSidePropsContext<ParsedUrlQuery, PreviewData>
 ) {
   const isServer = typeof window === "undefined";
   const csrfToken = isServer
     ? getServerCrsfToken(ctx?.req?.headers)
     : getCookie("csrftoken");
+
+  // a hack to workaround node-fetch dns problems with localhost
+  // this will not work with authentication so when we add authentication to the SSR we need to fix it properly
+  const shouldModifyLocalhost =
+    env.ENABLE_FETCH_HACK && !isBrowser && hostUrl.includes("localhost");
+  const apiUrl = shouldModifyLocalhost
+    ? hostUrl.replace("localhost", "127.0.0.1")
+    : hostUrl;
+
+  const uri = `${apiUrl}${apiUrl.endsWith("/") ? "" : "/"}graphql/`;
 
   const enchancedFetch = (url: RequestInfo | URL, init?: RequestInit) =>
     fetch(url, {
@@ -66,7 +78,7 @@ export function createApolloClient(
     });
 
   const httpLink = new HttpLink({
-    uri: GRAPHQL_URL,
+    uri,
     credentials: "include",
     // @ts-expect-error: TODO undici (node fetch) is a mess
     fetch: enchancedFetch,

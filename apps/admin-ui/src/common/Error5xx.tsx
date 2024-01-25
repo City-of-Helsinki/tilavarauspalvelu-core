@@ -3,7 +3,7 @@ import React from "react";
 import styled from "styled-components";
 import { H1 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import { publicUrl } from "./const";
+import { PUBLIC_URL } from "./const";
 
 const Wrapper = styled.div`
   margin: 0 var(--spacing-s);
@@ -61,7 +61,7 @@ const Error5xx = (): JSX.Element => {
           Anna palautetta
         </Link>
       </Content>
-      <Image src={`${publicUrl}/5xx.png`} />
+      <Image src={`${PUBLIC_URL}/5xx.png`} />
     </Wrapper>
   );
 };
