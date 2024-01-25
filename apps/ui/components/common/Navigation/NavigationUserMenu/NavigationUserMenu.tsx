@@ -118,7 +118,7 @@ export function NavigationUserMenu({
   profileLink,
 }: {
   apiBaseUrl: string;
-  profileLink?: string;
+  profileLink: string;
 }) {
   const router = useRouter();
   const { isAuthenticated, user } = useSession();

@@ -68,7 +68,7 @@ export function Navigation({
   profileLink,
 }: {
   apiBaseUrl: string;
-  profileLink?: string;
+  profileLink: string;
 }) {
   const { t, i18n } = useTranslation();
   const router = useRouter();

@@ -68,10 +68,12 @@ const withAuthorization = (
 );
 
 type Props = {
-  previewUrlPrefix?: string;
+  reservationUnitPreviewUrl: string;
   apiBaseUrl: string;
 };
-const UnitsRouter = ({ previewUrlPrefix }: Pick<Props, "previewUrlPrefix">) => (
+const UnitsRouter = ({
+  reservationUnitPreviewUrl,
+}: Pick<Props, "reservationUnitPreviewUrl">) => (
   <Routes>
     <Route path=":unitPk/spacesResources" element={<SpacesResources />} />
     <Route path=":unitPk/space/edit/:spacePk" element={<SpaceEditorView />} />
@@ -82,11 +84,15 @@ const UnitsRouter = ({ previewUrlPrefix }: Pick<Props, "previewUrlPrefix">) => (
     <Route
       index
       path=":unitPk/reservationUnit/edit/"
-      element={<ReservationUnitEditor previewUrlPrefix={previewUrlPrefix} />}
+      element={
+        <ReservationUnitEditor previewUrlPrefix={reservationUnitPreviewUrl} />
+      }
     />
     <Route
       path=":unitPk/reservationUnit/edit/:reservationUnitPk"
-      element={<ReservationUnitEditor previewUrlPrefix={previewUrlPrefix} />}
+      element={
+        <ReservationUnitEditor previewUrlPrefix={reservationUnitPreviewUrl} />
+      }
     />
     <Route path=":unitPk" element={<Unit />} />
   </Routes>
@@ -138,7 +144,7 @@ const PremisesRouter = () => (
   </Routes>
 );
 
-function ClientApp({ previewUrlPrefix, apiBaseUrl }: Props) {
+function ClientApp({ reservationUnitPreviewUrl, apiBaseUrl }: Props) {
   return (
     <BrowserRouter basename={PUBLIC_URL}>
       <PageWrapper apiBaseUrl={apiBaseUrl}>
@@ -169,7 +175,9 @@ function ClientApp({ previewUrlPrefix, apiBaseUrl }: Props) {
           <Route
             path="/unit/*"
             element={withAuthorization(
-              <UnitsRouter previewUrlPrefix={previewUrlPrefix} />,
+              <UnitsRouter
+                reservationUnitPreviewUrl={reservationUnitPreviewUrl}
+              />,
               apiBaseUrl
             )}
           />

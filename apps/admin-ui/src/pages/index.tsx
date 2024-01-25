@@ -22,10 +22,10 @@ export const getServerSideProps: GetServerSideProps = async () => {
   const { env } = await import("@/env.mjs");
   return {
     props: {
-      cookiehubEnabled: env.COOKIEHUB_ENABLED,
+      cookiehubEnabled: env.COOKIEHUB_ENABLED ?? false,
       reservationUnitPreviewUrl: env.RESERVATION_UNIT_PREVIEW_URL_PREFIX ?? "",
-      hotjarEnabled: env.HOTJAR_ENABLED,
-      apiBaseUrl: env.TILAVARAUS_API_URL,
+      hotjarEnabled: env.HOTJAR_ENABLED ?? false,
+      apiBaseUrl: env.TILAVARAUS_API_URL ?? "",
       // TODO can't use SSR translations because our translations aren't in public folder
       // ...(await serverSideTranslations(locale ?? "fi")),
     },

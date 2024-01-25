@@ -126,8 +126,8 @@ type Props = {
   activeApplicationRounds: RoundPeriod[];
   termsOfUse: Record<string, TermsOfUseType>;
   apiBaseUrl: string;
+  mapboxToken: string;
   isPostLogin?: boolean;
-  mapboxToken?: string;
 };
 
 type WeekOptions = "day" | "week" | "month";

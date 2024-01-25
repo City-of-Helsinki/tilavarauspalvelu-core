@@ -11,7 +11,7 @@ interface Props {
   children: React.ReactNode;
   overrideBackgroundColor?: string;
   apiBaseUrl: string;
-  profileLink?: string;
+  profileLink: string;
 }
 
 const Main = styled.main<{ $bgColor?: string }>`

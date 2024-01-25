@@ -1575,13 +1575,13 @@ function OpeningHoursSection({
 }: {
   // TODO can we simplify this by passing the hauki url only?
   reservationUnit: ReservationUnitByPkType | undefined;
-  previewUrlPrefix?: string;
+  previewUrlPrefix: string;
 }) {
   const { t } = useTranslation();
 
   const previewUrl = `${previewUrlPrefix}/${reservationUnit?.pk}?ru=${reservationUnit?.uuid}#calendar`;
   const previewDisabled =
-    !previewUrlPrefix || !reservationUnit?.pk || !reservationUnit?.uuid;
+    previewUrlPrefix !== "" || !reservationUnit?.pk || !reservationUnit?.uuid;
 
   // TODO refactor this to inner wrapper (so we don't have a ternary in the middle)
   return (
@@ -1869,7 +1869,7 @@ const ReservationUnitEditor = ({
   unitPk: string;
   form: UseFormReturn<ReservationUnitEditFormValues>;
   refetch: () => void;
-  previewUrlPrefix?: string;
+  previewUrlPrefix: string;
 }): JSX.Element | null => {
   // ----------------------------- State and Hooks ----------------------------
   const { t } = useTranslation();
@@ -2086,7 +2086,7 @@ const ReservationUnitEditor = ({
     isSaving ||
     !reservationUnit?.pk ||
     !reservationUnit?.uuid ||
-    !previewUrlPrefix;
+    previewUrlPrefix !== "";
   const draftEnabled = hasChanges || !watch("isDraft");
   const publishEnabled = hasChanges || watch("isDraft");
   const archiveEnabled = watch("pk") !== 0 && !watch("isArchived");
@@ -2203,7 +2203,7 @@ type IRouterProps = {
 };
 
 /// Wrap the editor so we never reset the form after async loading (because of HDS TimeInput bug)
-function EditorWrapper({ previewUrlPrefix }: { previewUrlPrefix?: string }) {
+function EditorWrapper({ previewUrlPrefix }: { previewUrlPrefix: string }) {
   const { reservationUnitPk, unitPk } = useParams<IRouterProps>();
   const { t } = useTranslation();
 

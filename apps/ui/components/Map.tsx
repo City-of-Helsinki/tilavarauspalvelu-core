@@ -6,7 +6,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 
 type Props = {
   title: string;
-  mapboxToken: string | undefined;
+  mapboxToken: string;
   latitude?: number;
   longitude?: number;
   height?: string;
