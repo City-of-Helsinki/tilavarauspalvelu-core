@@ -57,12 +57,12 @@ export function createApolloClient(
 
   // a hack to workaround node-fetch dns problems with localhost
   // this will not work with authentication so when we add authentication to the SSR we need to fix it properly
+  // TODO add an url builder (with the fetch hack boolean)
   const shouldModifyLocalhost =
     env.ENABLE_FETCH_HACK && !isBrowser && hostUrl.includes("localhost");
   const apiUrl = shouldModifyLocalhost
     ? hostUrl.replace("localhost", "127.0.0.1")
     : hostUrl;
-
   const uri = `${apiUrl}${apiUrl.endsWith("/") ? "" : "/"}graphql/`;
 
   const enchancedFetch = (url: RequestInfo | URL, init?: RequestInit) =>

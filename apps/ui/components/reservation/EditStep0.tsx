@@ -56,6 +56,7 @@ type Props = {
   activeApplicationRounds: ApplicationRoundNode[];
   setErrorMsg: React.Dispatch<React.SetStateAction<string | null>>;
   nextStep: () => void;
+  apiBaseUrl: string;
 };
 
 type ReservationStateWithInitial = string;
@@ -181,6 +182,7 @@ const EditStep0 = ({
   activeApplicationRounds,
   setErrorMsg,
   nextStep,
+  apiBaseUrl,
 }: Props): JSX.Element => {
   const { t, i18n } = useTranslation();
   const router = useRouter();
@@ -462,6 +464,7 @@ const EditStep0 = ({
             setShouldCalendarControlsBeVisible={
               setShouldCalendarControlsBeVisible
             }
+            apiBaseUrl={apiBaseUrl}
             isAnimated={isMobile}
           />
         </CalendarFooter>

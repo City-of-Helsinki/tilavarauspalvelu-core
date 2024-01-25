@@ -18,6 +18,7 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 type Props = {
   reservationPk: number;
+  apiBaseUrl: string;
 };
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
@@ -58,7 +59,7 @@ const Columns = styled.div`
   }
 `;
 
-const ReservationSuccess = ({ reservationPk }: Props) => {
+const ReservationSuccess = ({ reservationPk, apiBaseUrl }: Props) => {
   const { t } = useTranslation();
 
   const {
@@ -118,6 +119,7 @@ const ReservationSuccess = ({ reservationPk }: Props) => {
         </div>
         {reservationUnit ? (
           <ReservationConfirmation
+            apiBaseUrl={apiBaseUrl}
             reservation={reservation}
             reservationUnit={reservationUnit}
             order={order}

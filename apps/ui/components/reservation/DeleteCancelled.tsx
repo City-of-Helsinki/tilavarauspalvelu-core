@@ -14,6 +14,7 @@ import { singleSearchUrl } from "../../modules/util";
 type Props = {
   reservationPk: string;
   error: boolean;
+  apiBaseUrl: string;
 };
 
 const Heading = styled(H2).attrs({ as: "h1" })``;
@@ -58,7 +59,7 @@ const StyledLink = styled(Link)`
   ${fontMedium}
 `;
 
-const DeleteCancelled = ({ reservationPk, error }: Props) => {
+const DeleteCancelled = ({ reservationPk, error, apiBaseUrl }: Props) => {
   const { t } = useTranslation();
 
   if (!reservationPk && !error) {
@@ -96,7 +97,7 @@ const DeleteCancelled = ({ reservationPk, error }: Props) => {
               {t("common:gotoFrontpage")}
               <IconArrowRight aria-hidden size="m" />
             </StyledLink>
-            <LinkButton onClick={signOut}>
+            <LinkButton onClick={() => signOut(apiBaseUrl)}>
               {t("common:logout")} <IconSignout size="m" aria-hidden />
             </LinkButton>
           </ActionContainer>

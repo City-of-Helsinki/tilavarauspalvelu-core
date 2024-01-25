@@ -37,7 +37,7 @@ const StyledContainer = styled(Container)`
   }
 `;
 
-const ReservationSuccess = () => {
+const ReservationSuccess = ({ apiBaseUrl }: { apiBaseUrl: string }) => {
   const { isAuthenticated } = useSession();
   const router = useRouter();
   const { t } = useTranslation(["common"]);
@@ -139,11 +139,11 @@ const ReservationSuccess = () => {
   }
 
   if (!isOrderFetched) {
-    return <ReservationFail type="order" />;
+    return <ReservationFail apiBaseUrl={apiBaseUrl} type="order" />;
   }
 
   if (!isReservationValid) {
-    return <ReservationFail type="reservation" />;
+    return <ReservationFail apiBaseUrl={apiBaseUrl} type="reservation" />;
   }
 
   // NOTE weird fallback because we use useEffect to redirect on success

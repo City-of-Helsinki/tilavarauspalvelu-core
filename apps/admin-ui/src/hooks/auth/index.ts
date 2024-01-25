@@ -9,22 +9,22 @@ import { getSignOutUrl, getSignInUrl, isBrowser } from "@/common/const";
 
 /// Redirect the user to the sign in dialog and return to the current url after sign in
 /// Thows if called on the server
-export function signIn() {
+export function signIn(apiUrl: string) {
   if (!isBrowser) {
     throw new Error("signIn can only be called in the browser");
   }
   const currentUrl = window.location.href;
-  const url = getSignInUrl("", currentUrl);
+  const url = getSignInUrl(apiUrl, currentUrl);
   window.location.href = url;
 }
 
 /// Log the user out and redirect to route /logout
 /// Thows if called on the server
-export function signOut() {
+export function signOut(apiUrl: string) {
   if (!isBrowser) {
     throw new Error("signOut can only be called in the browser");
   }
-  window.location.href = getSignOutUrl("");
+  window.location.href = getSignOutUrl(apiUrl);
 }
 
 export function useSession() {

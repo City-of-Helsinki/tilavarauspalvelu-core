@@ -34,7 +34,17 @@ const UserMenu = styled(HDSNavigation.User)`
   }
 `;
 
-const Navigation = ({ onLogoClick = () => {}, disabledRouter = false }) => {
+type Props = {
+  apiBaseUrl: string;
+  onLogoClick?: () => void;
+  disabledRouter?: boolean;
+};
+
+const Navigation = ({
+  apiBaseUrl,
+  onLogoClick = () => {},
+  disabledRouter = false,
+}: Props) => {
   const { t } = useTranslation();
 
   const [isMenuOpen, setMenuState] = useState(false);
@@ -73,7 +83,7 @@ const Navigation = ({ onLogoClick = () => {}, disabledRouter = false }) => {
           userName={name}
           authenticated={user != null}
           label={t(user != null ? "Navigation.logging" : "Navigation.login")}
-          onSignIn={signIn}
+          onSignIn={() => signIn(apiBaseUrl)}
         >
           {user && (
             <UserInfo
@@ -84,7 +94,7 @@ const Navigation = ({ onLogoClick = () => {}, disabledRouter = false }) => {
           <HDSNavigation.Item
             className="btn-logout"
             label={t("Navigation.logout")}
-            onClick={signOut}
+            onClick={() => signOut(apiBaseUrl)}
             variant="primary"
           />
         </UserMenu>
@@ -94,22 +104,28 @@ const Navigation = ({ onLogoClick = () => {}, disabledRouter = false }) => {
 };
 
 // NOTE requires both client and react-router context
-const NavigationWithRouter = () => {
+const NavigationWithRouter = ({ apiBaseUrl }: Pick<Props, "apiBaseUrl">) => {
   const history = useNavigate();
-  return <Navigation onLogoClick={() => history("/")} />;
+  return (
+    <Navigation apiBaseUrl={apiBaseUrl} onLogoClick={() => history("/")} />
+  );
 };
 
 // NOTE this is a workaround for SSR and react-router. Checking for window is not enough because of context.
-const WrappedNavigation = ({ disabledRouter = false }) => {
+const WrappedNavigation = ({
+  apiBaseUrl,
+  disabledRouter = false,
+}: Omit<Props, "onLogoClick">) => {
   if (typeof window === "undefined" || disabledRouter) {
     return (
       <Navigation
+        apiBaseUrl={apiBaseUrl}
         disabledRouter
         onLogoClick={() => window.location.assign(PUBLIC_URL ?? "/")}
       />
     );
   }
-  return <NavigationWithRouter />;
+  return <NavigationWithRouter apiBaseUrl={apiBaseUrl} />;
 };
 
 export default WrappedNavigation;

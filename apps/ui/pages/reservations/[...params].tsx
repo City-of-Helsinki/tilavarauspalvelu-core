@@ -12,6 +12,7 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 type Props = {
   id: number;
   mode: "cancel" | "edit";
+  apiBaseUrl: string;
 };
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {

@@ -79,6 +79,7 @@ type Props<T> = {
   customAvailabilityValidation?: (start: Date) => boolean;
   shouldCalendarControlsBeVisible?: boolean;
   setShouldCalendarControlsBeVisible?: (value: boolean) => void;
+  apiBaseUrl: string;
   isAnimated?: boolean;
 };
 
@@ -298,6 +299,7 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
   customAvailabilityValidation,
   shouldCalendarControlsBeVisible,
   setShouldCalendarControlsBeVisible,
+  apiBaseUrl,
   isAnimated = false,
 }: Props<T>): JSX.Element => {
   const { t, i18n } = useTranslation();
@@ -610,6 +612,7 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
     <SubmitButtonWrapper>
       <LoginFragment
         isActionDisabled={!isReservable}
+        apiBaseUrl={apiBaseUrl}
         actionCallback={() => {
           if (reservationUnit.pk != null && initialReservation != null) {
             setStoredReservation({

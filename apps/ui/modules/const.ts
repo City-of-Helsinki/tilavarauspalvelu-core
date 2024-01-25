@@ -163,18 +163,20 @@ export const getSignInUrl = (
   callBackUrl: string,
   originOverride?: string
 ): string => {
+  const authUrl = `${apiBaseUrl}/helauth`;
   // TODO why is originOveride only used when on logout?
   if (callBackUrl.includes(`/logout`)) {
     const baseUrl =
       originOverride != null ? originOverride : new URL(callBackUrl).origin;
-    return `${apiBaseUrl}/login?next=${baseUrl}`;
+    return `${authUrl}/login?next=${baseUrl}`;
   }
-  return `${apiBaseUrl}/login?next=${callBackUrl}`;
+  return `${authUrl}/login?next=${callBackUrl}`;
 };
 
 // Returns href url for logging out with redirect url to /logout
 export const getSignOutUrl = (apiBaseUrl: string): string => {
-  return `${apiBaseUrl}/logout`;
+  const authUrl = `${apiBaseUrl}/helauth`;
+  return `${authUrl}/logout`;
 };
 
 export const genericTermsVariant = {

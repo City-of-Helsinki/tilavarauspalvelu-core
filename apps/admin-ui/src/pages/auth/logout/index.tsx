@@ -36,14 +36,19 @@ const Layout = ({ children }: { children: React.ReactNode }) => (
   </BaseLayout>
 );
 
-const LogoutPage = ({ logoutUrl }: { logoutUrl: string }) => {
+type Props = {
+  apiBaseUrl: string;
+  logoutUrl: string;
+};
+
+function LogoutPage({ apiBaseUrl, logoutUrl }: Props) {
   const { t } = useTranslation(["common", "logout"]);
 
   // Can't use SSR because of translations
   return (
     <Layout>
       <ClientOnly>
-        <Navigation disabledRouter />
+        <Navigation disabledRouter apiBaseUrl={apiBaseUrl} />
         <KorosHeading heroImage={HERO_IMAGE_URL}>
           <Heading>{t("common:applicationName")}</Heading>
           <p style={{ fontSize: "1.8rem" }}>{t("logout:message")}</p>
@@ -55,13 +60,15 @@ const LogoutPage = ({ logoutUrl }: { logoutUrl: string }) => {
       </ClientOnly>
     </Layout>
   );
-};
+}
 
 export const getServerSideProps: GetServerSideProps = async () => {
   const logoutUrl = `${env.TUNNISTAMO_URL}/logout/`;
+  const apiBaseUrl = env.TILAVARAUS_API_URL;
   return {
     props: {
       logoutUrl,
+      apiBaseUrl,
       // TODO can't use SSR translations because our translations aren't in public folder
       // ...(await serverSideTranslations(locale ?? "fi")),
     },

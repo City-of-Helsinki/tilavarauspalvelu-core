@@ -29,6 +29,7 @@ import { signOut } from "@/hooks/auth";
 type Props = {
   reservation: ReservationType;
   reservationUnit: ReservationUnitType;
+  apiBaseUrl: string;
   order?: PaymentOrderType;
 };
 
@@ -71,9 +72,11 @@ const ReturnLinkContainer = styled.div`
 
 const ReturnLinkList = ({
   reservationUnitHome,
+  apiBaseUrl,
   style,
 }: {
   reservationUnitHome: string;
+  apiBaseUrl: string;
   style: React.CSSProperties;
 }): JSX.Element => {
   const { t } = useTranslation();
@@ -91,7 +94,7 @@ const ReturnLinkList = ({
       />
       <IconButton
         icon={<IconSignout aria-hidden />}
-        onClick={() => signOut()}
+        onClick={() => signOut(apiBaseUrl)}
         label={t("common:logout")}
       />
     </ReturnLinkContainer>
@@ -101,6 +104,7 @@ const ReturnLinkList = ({
 const ReservationConfirmation = ({
   reservation,
   reservationUnit,
+  apiBaseUrl,
   order,
 }: Props): JSX.Element => {
   const { t, i18n } = useTranslation();
@@ -173,6 +177,7 @@ const ReservationConfirmation = ({
       )}
       <ReturnLinkList
         reservationUnitHome={reservationUnitPath(Number(reservationUnit.pk))}
+        apiBaseUrl={apiBaseUrl}
         style={{
           marginTop: "var(--spacing-3-xl)",
         }}

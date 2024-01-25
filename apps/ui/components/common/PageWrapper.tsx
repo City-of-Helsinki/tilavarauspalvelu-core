@@ -10,6 +10,7 @@ import UnpaidReservationNotification from "../reservations/UnpaidReservationNoti
 interface Props {
   children: React.ReactNode;
   overrideBackgroundColor?: string;
+  apiBaseUrl: string;
   profileLink?: string;
 }
 
@@ -19,28 +20,32 @@ const Main = styled.main<{ $bgColor?: string }>`
   ${({ $bgColor }) => ($bgColor ? `background: ${$bgColor}` : ``)}
 `;
 
-const PageWrapper = (props: Props): JSX.Element => {
-  const { profileLink } = props;
+function PageWrapper({
+  apiBaseUrl,
+  profileLink,
+  children,
+  overrideBackgroundColor,
+}: Props): JSX.Element {
   return (
     <>
       <Title>Tilavarauspalvelu</Title>
-      <Navigation profileLink={profileLink} />
+      <Navigation apiBaseUrl={apiBaseUrl} profileLink={profileLink} />
       <BannerNotificationsList
         centered
         target={CommonBannerNotificationTargetChoices.User}
       />
       <UnpaidReservationNotification />
       <Main
-        $bgColor={props.overrideBackgroundColor}
+        $bgColor={overrideBackgroundColor}
         id="main"
         style={{ marginBottom: "-14px" }}
       >
-        {props.children}
+        {children}
       </Main>
       <Footer />
       <div id="modal-root" />
     </>
   );
-};
+}
 
 export default PageWrapper;

@@ -57,16 +57,21 @@ const ApplicationRoundAllocation = dynamic(
     import(`./spa/recurring-reservations/application-rounds/[id]/allocation`)
 );
 
-const withAuthorization = (component: JSX.Element, permission?: Permission) => (
-  <AuthorizationChecker permission={permission}>
+const withAuthorization = (
+  component: JSX.Element,
+  apiBaseUrl: string,
+  permission?: Permission
+) => (
+  <AuthorizationChecker permission={permission} apiUrl={apiBaseUrl}>
     {component}
   </AuthorizationChecker>
 );
 
 type Props = {
   previewUrlPrefix?: string;
+  apiBaseUrl: string;
 };
-const UnitsRouter = ({ previewUrlPrefix }: Props) => (
+const UnitsRouter = ({ previewUrlPrefix }: Pick<Props, "previewUrlPrefix">) => (
   <Routes>
     <Route path=":unitPk/spacesResources" element={<SpacesResources />} />
     <Route path=":unitPk/space/edit/:spacePk" element={<SpaceEditorView />} />
@@ -133,13 +138,16 @@ const PremisesRouter = () => (
   </Routes>
 );
 
-function ClientApp({ previewUrlPrefix }: Props) {
+function ClientApp({ previewUrlPrefix, apiBaseUrl }: Props) {
   return (
     <BrowserRouter basename={PUBLIC_URL}>
-      <PageWrapper>
+      <PageWrapper apiBaseUrl={apiBaseUrl}>
         <Routes>
           <Route path="*" element={<Error404 />} />
-          <Route path="/" element={withAuthorization(<HomePage />)} />
+          <Route
+            path="/"
+            element={withAuthorization(<HomePage />, apiBaseUrl)}
+          />
           <Route
             path={`${prefixes.applications}/*`}
             element={withAuthorization(
@@ -156,21 +164,22 @@ function ClientApp({ previewUrlPrefix }: Props) {
           />
           <Route
             path="/premises-and-settings/*"
-            element={withAuthorization(<PremisesRouter />)}
+            element={withAuthorization(<PremisesRouter />, apiBaseUrl)}
           />
           <Route
             path="/unit/*"
             element={withAuthorization(
-              <UnitsRouter previewUrlPrefix={previewUrlPrefix} />
+              <UnitsRouter previewUrlPrefix={previewUrlPrefix} />,
+              apiBaseUrl
             )}
           />
           <Route
             path="/reservations/*"
-            element={withAuthorization(<ReservationsRouter />)}
+            element={withAuthorization(<ReservationsRouter />, apiBaseUrl)}
           />
           <Route
             path="/my-units/*"
-            element={withAuthorization(<MyUnitsRouter />)}
+            element={withAuthorization(<MyUnitsRouter />, apiBaseUrl)}
           />
           <Route
             path="/messaging/notifications/*"
@@ -185,13 +194,13 @@ function ClientApp({ previewUrlPrefix }: Props) {
   );
 }
 
-export function App({ previewUrlPrefix }: Props) {
+export function App(props: Props) {
   if (typeof window === "undefined") {
     return null;
   }
   return (
     <GlobalContext>
-      <ClientApp previewUrlPrefix={previewUrlPrefix} />
+      <ClientApp {...props} />
     </GlobalContext>
   );
 }

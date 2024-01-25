@@ -53,6 +53,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 
 function createClient(apiBaseUrl: string) {
   // TODO cleanup the url (so there is no double slash)
+  // TODO add an url builder (with the fetch hack boolean) move the ui version to packages/common
   const uri = `${apiBaseUrl}/graphql/`;
   const uploadLinkOptions = {
     uri,

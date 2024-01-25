@@ -6,6 +6,7 @@ import { signIn, useSession } from "~/hooks/auth";
 import { MediumButton } from "@/styles/util";
 
 type Props = {
+  apiBaseUrl: string;
   text?: string;
   componentIfAuthenticated?: React.ReactNode;
   isActionDisabled?: boolean;
@@ -47,6 +48,7 @@ const SubmitButton = styled(MediumButton)`
 `;
 
 const LoginFragment = ({
+  apiBaseUrl,
   text,
   componentIfAuthenticated,
   isActionDisabled,
@@ -64,10 +66,10 @@ const LoginFragment = ({
             actionCallback();
           }
           if (returnUrl) {
-            signIn(returnUrl);
+            signIn(apiBaseUrl, returnUrl);
             return;
           }
-          signIn();
+          signIn(apiBaseUrl);
         }}
         aria-label={t("reservationCalendar:loginAndReserve")}
         className="login-fragment__button--login"

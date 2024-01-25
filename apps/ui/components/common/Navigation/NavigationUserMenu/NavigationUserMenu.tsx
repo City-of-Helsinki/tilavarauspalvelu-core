@@ -113,7 +113,13 @@ const userMenuItems: MenuItem[] = [
 const constructName = (firstName?: string, lastName?: string) =>
   firstName || lastName ? `${firstName} ${lastName}` : undefined;
 
-export function NavigationUserMenu({ profileLink }: { profileLink?: string }) {
+export function NavigationUserMenu({
+  apiBaseUrl,
+  profileLink,
+}: {
+  apiBaseUrl: string;
+  profileLink?: string;
+}) {
   const router = useRouter();
   const { isAuthenticated, user } = useSession();
   const { t } = useTranslation();
@@ -131,7 +137,7 @@ export function NavigationUserMenu({ profileLink }: { profileLink?: string }) {
       userName={userName}
       authenticated={isAuthenticated}
       label={t("common:login")}
-      onSignIn={signIn}
+      onSignIn={() => signIn(apiBaseUrl)}
       closeOnItemClick
       $active={isActive}
     >
@@ -166,7 +172,7 @@ export function NavigationUserMenu({ profileLink }: { profileLink?: string }) {
       ))}
       <NavigationUserMenuItem
         href="#"
-        onClick={signOut}
+        onClick={() => signOut(apiBaseUrl)}
         icon={<IconSignout aria-hidden />}
         label={t("common:logout")}
         data-testid="navigation__user-logout"

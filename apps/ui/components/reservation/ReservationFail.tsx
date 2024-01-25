@@ -14,6 +14,7 @@ import { LinkButton } from "../../styles/util";
 
 type Props = {
   type: "reservation" | "order";
+  apiBaseUrl: string;
 };
 
 const StyledContainer = styled(Container)`
@@ -47,7 +48,7 @@ const StyledLink = styled(Link)`
   ${fontMedium}
 `;
 
-const ReservationFail = ({ type }: Props) => {
+const ReservationFail = ({ type, apiBaseUrl }: Props) => {
   const { t } = useTranslation();
 
   const headingKey =
@@ -80,7 +81,7 @@ const ReservationFail = ({ type }: Props) => {
               {t("common:gotoFrontpage")}
               <IconArrowRight aria-hidden size="m" />
             </StyledLink>
-            <LinkButton onClick={signOut}>
+            <LinkButton onClick={() => signOut(apiBaseUrl)}>
               {t("common:logout")} <IconSignout size="m" aria-hidden />
             </LinkButton>
           </ActionContainer>

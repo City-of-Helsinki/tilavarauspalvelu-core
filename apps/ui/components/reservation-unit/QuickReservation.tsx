@@ -52,6 +52,7 @@ type Props = {
   setErrorMsg: (arg: string) => void;
   calendarRef: React.RefObject<HTMLDivElement>;
   subventionSuffix?: (arg: string) => JSX.Element;
+  apiBaseUrl: string;
 };
 
 const timeItems = 24;
@@ -380,6 +381,7 @@ const QuickReservation = ({
   quickReservationSlot,
   calendarRef,
   setQuickReservationSlot,
+  apiBaseUrl,
 }: Props): JSX.Element | null => {
   const { t, i18n } = useTranslation();
 
@@ -721,6 +723,7 @@ const QuickReservation = ({
       <ActionWrapper>
         <LoginFragment
           isActionDisabled={!slot || !isReservationUnitReservable}
+          apiBaseUrl={apiBaseUrl}
           actionCallback={() => {
             setStoredReservation(localReservation);
           }}

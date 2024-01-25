@@ -35,6 +35,7 @@ import { signOut } from "@/hooks/auth";
 
 type Props = {
   id: number;
+  apiBaseUrl: string;
 };
 
 const Spinner = styled(CenterSpinner)`
@@ -131,9 +132,11 @@ const ReturnLinkContainer = styled.div`
 `;
 
 const ReturnLinkList = ({
+  apiBaseUrl,
   style,
 }: {
-  style: React.CSSProperties;
+  apiBaseUrl: string;
+  style?: React.CSSProperties;
 }): JSX.Element => {
   const { t } = useTranslation();
   return (
@@ -150,14 +153,14 @@ const ReturnLinkList = ({
       />
       <IconButton
         icon={<IconSignout aria-hidden />}
-        onClick={() => signOut()}
+        onClick={() => signOut(apiBaseUrl)}
         label={t("common:logout")}
       />
     </ReturnLinkContainer>
   );
 };
 
-const ReservationCancellation = ({ id }: Props): JSX.Element => {
+const ReservationCancellation = ({ id, apiBaseUrl }: Props): JSX.Element => {
   const { t } = useTranslation();
 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -349,6 +352,7 @@ const ReservationCancellation = ({ id }: Props): JSX.Element => {
                       </Paragraph>
                     )}
                     <ReturnLinkList
+                      apiBaseUrl={apiBaseUrl}
                       style={{
                         marginTop: "var(--spacing-3-xl)",
                       }}

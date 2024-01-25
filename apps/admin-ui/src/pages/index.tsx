@@ -7,12 +7,13 @@ type Props = {
   cookieHubEnabled: boolean;
   reservationUnitPreviewUrl: string;
   hotjarEnabled: boolean;
+  apiBaseUrl: string;
 };
 
-export default function Index({ reservationUnitPreviewUrl }: Props) {
+export default function Index(props: Props) {
   return (
     <Layout>
-      <App previewUrlPrefix={reservationUnitPreviewUrl} />
+      <App {...props} />
     </Layout>
   );
 }

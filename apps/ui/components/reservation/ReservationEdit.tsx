@@ -55,7 +55,7 @@ import { Toast } from "@/styles/util";
 
 type Props = {
   id: number;
-
+  apiBaseUrl: string;
   logout?: () => void;
 };
 
@@ -163,7 +163,7 @@ const BylineContent = ({
   );
 };
 
-const ReservationEdit = ({ id }: Props): JSX.Element => {
+const ReservationEdit = ({ id, apiBaseUrl }: Props): JSX.Element => {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
@@ -430,6 +430,7 @@ const ReservationEdit = ({ id }: Props): JSX.Element => {
                 activeApplicationRounds={activeApplicationRounds}
                 setErrorMsg={setErrorMsg}
                 nextStep={() => setStep(1)}
+                apiBaseUrl={apiBaseUrl}
               />
             )}
             {step === 1 && (

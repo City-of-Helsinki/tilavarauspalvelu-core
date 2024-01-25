@@ -35,7 +35,7 @@ const ButtonContainer = styled.div`
   margin-top: var(--spacing-s);
 `;
 
-const LogoutSection = (): JSX.Element => {
+const LogoutSection = ({ apiBaseUrl }: { apiBaseUrl: string }): JSX.Element => {
   const { isAuthenticated } = useSession();
 
   const { t } = useTranslation();
@@ -53,7 +53,9 @@ const LogoutSection = (): JSX.Element => {
       </Link>
       {isAuthenticated && (
         <ButtonContainer>
-          <Button onClick={() => signOut()}>{t("Navigation.logout")}</Button>
+          <Button onClick={() => signOut(apiBaseUrl)}>
+            {t("Navigation.logout")}
+          </Button>
         </ButtonContainer>
       )}
     </>
@@ -61,8 +63,10 @@ const LogoutSection = (): JSX.Element => {
 };
 
 const Error403 = ({
+  apiBaseUrl,
   showLogoutSection,
 }: {
+  apiBaseUrl: string;
   showLogoutSection?: boolean;
 }): JSX.Element => {
   const { t } = useTranslation();
@@ -72,7 +76,7 @@ const Error403 = ({
       <div>
         <H1 $legacy>403 - {t("errorPages.accessForbidden.title")}</H1>
         <p>{t("errorPages.accessForbidden.description")}</p>
-        {showLogoutSection && <LogoutSection />}
+        {showLogoutSection && <LogoutSection apiBaseUrl={apiBaseUrl} />}
       </div>
       <Image src={`${PUBLIC_URL}/403.png`} />
     </Wrapper>

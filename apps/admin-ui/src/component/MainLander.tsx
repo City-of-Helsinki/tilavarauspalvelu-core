@@ -60,14 +60,16 @@ const Ingress = styled(H2).attrs({ $legacy: true })`
   line-height: 1.8125rem;
 `;
 
-function MainLander() {
+export function MainLander({ apiBaseUrl }: { apiBaseUrl: string }) {
   const { t } = useTranslation();
 
   return (
     <>
       <KorosHeading heroImage={HERO_IMAGE_URL}>
         <Heading>{t("common.applicationName")}</Heading>
-        <LoginBtn onClick={signIn}>{t("Navigation.login")}</LoginBtn>
+        <LoginBtn onClick={() => signIn(apiBaseUrl)}>
+          {t("Navigation.login")}
+        </LoginBtn>
       </KorosHeading>
       <Content>
         <Ingress>{t("MainLander.ingress")}</Ingress>
@@ -76,5 +78,3 @@ function MainLander() {
     </>
   );
 }
-
-export default MainLander;

@@ -13,9 +13,10 @@ import GlobalElements from "./GlobalElements";
 import Navigation from "./Navigation";
 import MainMenu from "./MainMenu";
 import Loader from "./Loader";
-import MainLander from "./MainLander";
+import { MainLander } from "./MainLander";
 
 type Props = {
+  apiBaseUrl: string;
   children: React.ReactNode;
 };
 
@@ -40,13 +41,16 @@ const FallbackComponent = (err: unknown) => {
 };
 
 // NOTE client only because Navigation requires react-router-dom
-export default function PageWrapper({ children }: Props): JSX.Element {
+export default function PageWrapper({
+  apiBaseUrl,
+  children,
+}: Props): JSX.Element {
   const { hasAnyPermission, user } = usePermission();
   const hasAccess = user && hasAnyPermission();
   return (
     <ErrorBoundary FallbackComponent={FallbackComponent}>
       <ClientOnly>
-        <Navigation />
+        <Navigation apiBaseUrl={apiBaseUrl} />
         <Wrapper>
           {hasAccess && <MainMenu placement="default" />}
           <Suspense fallback={<Loader />}>
@@ -56,7 +60,7 @@ export default function PageWrapper({ children }: Props): JSX.Element {
                   target={CommonBannerNotificationTargetChoices.Staff}
                 />
               )}
-              {user ? children : <MainLander />}
+              {user ? children : <MainLander apiBaseUrl={apiBaseUrl} />}
             </Content>
           </Suspense>
           <ScrollToTop />

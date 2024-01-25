@@ -125,6 +125,7 @@ type Props = {
   relatedReservationUnits: ReservationUnitType[];
   activeApplicationRounds: RoundPeriod[];
   termsOfUse: Record<string, TermsOfUseType>;
+  apiBaseUrl: string;
   isPostLogin?: boolean;
   mapboxToken?: string;
 };
@@ -448,6 +449,7 @@ const ReservationUnit = ({
   termsOfUse,
   isPostLogin,
   mapboxToken,
+  apiBaseUrl,
 }: Props): JSX.Element | null => {
   const { t, i18n } = useTranslation();
 
@@ -977,6 +979,7 @@ const ReservationUnit = ({
                 quickReservationSlot={quickReservationSlot}
                 setQuickReservationSlot={setQuickReservationSlot}
                 setInitialReservation={setInitialReservation}
+                apiBaseUrl={apiBaseUrl}
               />
             )}
             <JustForDesktop customBreakpoint={breakpoints.l}>
@@ -1102,6 +1105,7 @@ const ReservationUnit = ({
                         setShouldCalendarControlsBeVisible={
                           setShouldCalendarControlsBeVisible
                         }
+                        apiBaseUrl={apiBaseUrl}
                         isAnimated={isMobile}
                       />
                     </CalendarFooter>

@@ -9,24 +9,26 @@ function cleanupUrlParam(url: unknown): string | undefined {
   }
   return undefined;
 }
+
 // Redirect the user to the sign in dialog and return to returnUrl (or
 // current url if none is provided) after sign in
-export function signIn(returnUrl?: unknown) {
-  if (isBrowser) {
+export function signIn(apiBaseUrl: string, returnUrl?: unknown) {
+  if (!isBrowser) {
     throw new Error("signIn can only be called in the browser");
   }
   const returnUrlParam = cleanupUrlParam(returnUrl);
   const returnTo = returnUrlParam ?? window.location.href;
-  const url = getSignInUrl("", returnTo);
+  const url = getSignInUrl(apiBaseUrl, returnTo);
   window.location.href = url;
 }
 
 // Log the user out and redirect to route /logout
-export function signOut() {
+// TODO need the backend url here
+export function signOut(apiBaseUrl: string) {
   if (!isBrowser) {
     throw new Error("signIn can only be called in the browser");
   }
-  window.location.href = getSignOutUrl("");
+  window.location.href = getSignOutUrl(apiBaseUrl);
 }
 
 export function useSession() {

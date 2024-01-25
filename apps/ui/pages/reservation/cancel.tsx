@@ -34,7 +34,7 @@ const StyledContainer = styled(Container)`
     margin-bottom: var(--spacing-layout-l);
   }
 `;
-const Cancel = () => {
+const Cancel = ({ apiBaseUrl }: { apiBaseUrl: string }) => {
   const { isAuthenticated } = useSession();
   const router = useRouter();
   const { orderId } = router.query;
@@ -77,7 +77,7 @@ const Cancel = () => {
 
   // return invalid order id error
   if (!order || !order.reservationPk) {
-    return <ReservationFail type="order" />;
+    return <ReservationFail apiBaseUrl={apiBaseUrl} type="order" />;
   }
 
   // return general error
@@ -86,13 +86,23 @@ const Cancel = () => {
     (!deleteError ||
       deleteError?.message !== "No Reservation matches the given query.")
   ) {
-    return <DeleteCancelled reservationPk={order?.reservationPk} error />;
+    return (
+      <DeleteCancelled
+        reservationPk={order?.reservationPk}
+        error
+        apiBaseUrl={apiBaseUrl}
+      />
+    );
   }
 
   // return success report - even if deletion failed
   return (
     <StyledContainer>
-      <DeleteCancelled reservationPk={order?.reservationPk} error={false} />
+      <DeleteCancelled
+        reservationPk={order?.reservationPk}
+        error={false}
+        apiBaseUrl={apiBaseUrl}
+      />
     </StyledContainer>
   );
 };

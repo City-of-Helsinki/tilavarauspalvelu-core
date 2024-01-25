@@ -37,7 +37,7 @@ const Columns = styled.div`
   }
 `;
 
-function Confirmation() {
+function Confirmation({ apiBaseUrl }: { apiBaseUrl: string }) {
   const router = useRouter();
   const { id } = router.query;
   const { data, loading } = useQuery<Query, QueryReservationByPkArgs>(
@@ -68,6 +68,7 @@ function Confirmation() {
           type="confirmed"
         />
         <ReservationConfirmation
+          apiBaseUrl={apiBaseUrl}
           reservation={reservation}
           reservationUnit={reservationUnit}
         />
@@ -87,8 +88,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   };
 };
 
-export default () => (
+export default (props: { apiBaseUrl: string }) => (
   <ClientOnly>
-    <Confirmation />
+    <Confirmation {...props} />
   </ClientOnly>
 );
