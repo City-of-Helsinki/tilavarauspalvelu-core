@@ -1,11 +1,15 @@
-import { GetServerSideProps } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { env } from "@/env.mjs";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+
+export const getServerSideProps = async ({
+  locale,
+}: GetServerSidePropsContext) => {
   return {
     props: {
       ...getCommonServerSideProps(),
@@ -16,7 +20,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
 };
 
 // TODO what is the purpose of this page?
-const LogoutPage = ({ redirectUrl }: { redirectUrl: string }) => {
+const LogoutPage = ({ redirectUrl }: Props) => {
   const router = useRouter();
 
   useEffect(() => {

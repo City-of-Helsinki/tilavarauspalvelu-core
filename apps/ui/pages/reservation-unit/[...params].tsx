@@ -6,14 +6,12 @@ import { useRouter } from "next/router";
 import { useLocalStorage, useSessionStorage } from "react-use";
 import { Stepper } from "hds-react";
 import { FormProvider, useForm } from "react-hook-form";
-import { GetServerSideProps } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { isFinite, omit, pick } from "lodash";
 import { useTranslation } from "next-i18next";
 import { breakpoints } from "common/src/common/style";
 import { fontRegular, H2 } from "common/src/common/typography";
 import {
-  AgeGroupType,
-  CityNode,
   Query,
   QueryAgeGroupsArgs,
   QueryCitiesArgs,
@@ -25,13 +23,10 @@ import {
   ReservationConfirmMutationPayload,
   ReservationDeleteMutationInput,
   ReservationDeleteMutationPayload,
-  ReservationPurposeType,
   ReservationsReservationReserveeTypeChoices,
   ReservationType,
-  ReservationUnitType,
   ReservationUpdateMutationInput,
   ReservationUpdateMutationPayload,
-  TermsOfUseType,
   TermsOfUseTermsOfUseTermsTypeChoices,
   ReservationsReservationStateChoices,
 } from "common/types/gql-types";
@@ -78,7 +73,9 @@ import { JustForDesktop } from "@/modules/style/layout";
 import { PinkBox } from "@/components/reservation-unit/ReservationUnitStyles";
 import { Toast } from "@/styles/util";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { filterNonNullable } from "common/src/helpers";
 
+/*
 type Props = {
   reservationUnit: ReservationUnitType;
   reservationPurposes: ReservationPurposeType[];
@@ -86,8 +83,10 @@ type Props = {
   cities: CityNode[];
   termsOfUse: Record<string, TermsOfUseType>;
 };
+*/
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { locale, params } = ctx;
   const reservationUnitPk = Number(params?.params?.[0]);
   const path = params?.params?.[1];
@@ -117,7 +116,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const genericTerms =
       genericTermsData.termsOfUse?.edges
         ?.map((n) => n?.node)
-        .find((n) => n?.pk === "booking") || {};
+        .find((n) => n?.pk === "booking") ?? null;
 
     const { data: reservationPurposesData } = await apolloClient.query<
       Query,
@@ -127,11 +126,11 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       fetchPolicy: "no-cache",
     });
 
-    const reservationPurposes =
+    const reservationPurposes = filterNonNullable(
       reservationPurposesData.reservationPurposes?.edges?.map(
         (edge) => edge?.node
-      ) || [];
-
+      )
+    );
     const { data: ageGroupsData } = await apolloClient.query<
       Query,
       QueryAgeGroupsArgs
@@ -139,7 +138,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       query: AGE_GROUPS,
       fetchPolicy: "no-cache",
     });
-    const ageGroups = ageGroupsData.ageGroups?.edges?.map((edge) => edge?.node);
+    const ageGroups = filterNonNullable(
+      ageGroupsData.ageGroups?.edges?.map((edge) => edge?.node)
+    );
 
     const { data: citiesData } = await apolloClient.query<
       Query,
@@ -148,13 +149,15 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       query: GET_CITIES,
       fetchPolicy: "no-cache",
     });
-    const cities = citiesData.cities?.edges?.map((edge) => edge?.node);
+    const cities = filterNonNullable(
+      citiesData.cities?.edges?.map((edge) => edge?.node)
+    );
 
     return {
       props: {
         ...commonProps,
         key: `${reservationUnitPk}${locale}`,
-        reservationUnit: reservationUnitData.reservationUnitByPk,
+        reservationUnit: reservationUnitData.reservationUnitByPk ?? null,
         reservationPurposes,
         ageGroups,
         cities,
@@ -167,6 +170,13 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return {
     props: {
       ...commonProps,
+      key: `${reservationUnitPk}${locale}`,
+      reservationUnit: null,
+      reservationPurposes: [],
+      ageGroups: [],
+      cities: [],
+      termsOfUse: null,
+      ...(await serverSideTranslations(locale ?? "fi")),
     },
     notFound: true,
   };
@@ -249,7 +259,7 @@ const ReservationUnitReservationWithReservationProp = ({
   const reserveeType = watch("reserveeType");
 
   const requireHandling =
-    reservationUnit.requireReservationHandling ||
+    reservationUnit?.requireReservationHandling ||
     reservation?.applyingForFreeOfCharge;
 
   const steps: ReservationStep[] = useMemo(() => {
@@ -284,11 +294,11 @@ const ReservationUnitReservationWithReservationProp = ({
     errorPolicy: "all",
     onCompleted: () => {
       setPendingReservation(null);
-      router.push(`${reservationUnitPrefix}/${reservationUnit.pk}`);
+      router.push(`${reservationUnitPrefix}/${reservationUnit?.pk}`);
     },
     onError: () => {
       setPendingReservation(null);
-      router.push(`${reservationUnitPrefix}/${reservationUnit.pk}`);
+      router.push(`${reservationUnitPrefix}/${reservationUnit?.pk}`);
     },
   });
 
@@ -300,7 +310,7 @@ const ReservationUnitReservationWithReservationProp = ({
     onCompleted: (data) => {
       if (data.updateReservation?.reservation?.state === "CANCELLED") {
         setPendingReservation(null);
-        router.push(`${reservationUnitPrefix}/${reservationUnit.pk}`);
+        router.push(`${reservationUnitPrefix}/${reservationUnit?.pk}`);
       } else {
         const payload = {
           ...omit(data.updateReservation.reservation, "__typename"),
@@ -404,10 +414,9 @@ const ReservationUnitReservationWithReservationProp = ({
   }, [step, t]);
 
   // TODO all this is copy pasta from EditStep1
-  const supportedFields =
-    reservationUnit.metadataSet?.supportedFields?.filter(
-      (n): n is NonNullable<typeof n> => !!n
-    ) ?? [];
+  const supportedFields = filterNonNullable(
+    reservationUnit?.metadataSet?.supportedFields
+  );
   const generalFields = getReservationApplicationFields({
     supportedFields,
     reserveeType: "common",
@@ -483,7 +492,7 @@ const ReservationUnitReservationWithReservationProp = ({
   useEffect(() => {
     router.beforePopState(({ as }) => {
       if (
-        reservationUnit.pk != null &&
+        reservationUnit?.pk != null &&
         as === reservationUnitPath(reservationUnit.pk)
       ) {
         cancelReservation();
@@ -494,7 +503,7 @@ const ReservationUnitReservationWithReservationProp = ({
     return () => {
       router.beforePopState(() => true);
     };
-  }, [router, reservationUnit.pk, cancelReservation]);
+  }, [router, reservationUnit?.pk, cancelReservation]);
 
   const shouldDisplayReservationUnitPrice = useMemo(() => {
     switch (step) {
@@ -512,7 +521,10 @@ const ReservationUnitReservationWithReservationProp = ({
     }
   }, [step, generalFields, reservation, reservationUnit]);
 
-  const termsOfUseContent = getTranslation(reservationUnit, "termsOfUse");
+  const termsOfUseContent =
+    reservationUnit != null
+      ? getTranslation(reservationUnit, "termsOfUse")
+      : null;
 
   if (!isBrowser) {
     return null;
@@ -566,7 +578,7 @@ const ReservationUnitReservationWithReservationProp = ({
                 />
               )}
             </div>
-            {step === 0 && (
+            {step === 0 && reservationUnit != null && (
               <Step0
                 reservationUnit={reservationUnit}
                 handleSubmit={handleSubmit(onSubmitStep0)}
@@ -576,20 +588,23 @@ const ReservationUnitReservationWithReservationProp = ({
                 options={options}
               />
             )}
-            {step === 1 && reservation != null && (
-              <Step1
-                reservation={reservation}
-                reservationUnit={reservationUnit}
-                handleSubmit={handleSubmit(onSubmitStep1)}
-                generalFields={generalFields}
-                reservationApplicationFields={reservationApplicationFields}
-                options={options}
-                reserveeType={reserveeType}
-                steps={steps}
-                setStep={setStep}
-                termsOfUse={termsOfUse}
-              />
-            )}
+            {step === 1 &&
+              reservation != null &&
+              reservationUnit != null &&
+              termsOfUse?.genericTerms != null && (
+                <Step1
+                  reservation={reservation}
+                  reservationUnit={reservationUnit}
+                  handleSubmit={handleSubmit(onSubmitStep1)}
+                  generalFields={generalFields}
+                  reservationApplicationFields={reservationApplicationFields}
+                  options={options}
+                  reserveeType={reserveeType}
+                  steps={steps}
+                  setStep={setStep}
+                  genericTerms={termsOfUse.genericTerms}
+                />
+              )}
           </FormProvider>
         </BodyContainer>
       </Columns>

@@ -1,13 +1,9 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { GetServerSideProps } from "next";
+import type { GetServerSidePropsContext } from "next";
 import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import {
-  ApplicationRoundNode,
-  Query,
-  QueryApplicationRoundsArgs,
-} from "common/types/gql-types";
+import type { Query, QueryApplicationRoundsArgs } from "common/types/gql-types";
 import { Container } from "common";
 import { createApolloClient } from "@/modules/apolloClient";
 import Sanitize from "@/components/common/Sanitize";
@@ -18,11 +14,9 @@ import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 
-type Props = {
-  applicationRound: ApplicationRoundNode;
-};
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { locale, params } = ctx;
   const id = Number(params?.id);
   const commonProps = getCommonServerSideProps();
@@ -32,11 +26,13 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     fetchPolicy: "no-cache",
     query: APPLICATION_ROUNDS,
   });
-  const applicationRound = data?.applicationRounds?.edges
-    .map((n) => n?.node)
-    .find((n) => n?.pk === id);
+  const applicationRound =
+    data?.applicationRounds?.edges
+      .map((n) => n?.node)
+      .find((n) => n?.pk === id) ?? null;
 
   return {
+    notFound: applicationRound == null,
     props: {
       ...commonProps,
       key: `${id}${locale}`,
@@ -68,8 +64,12 @@ const Content = styled.div`
   font-size: var(--fontsize-body-l);
 `;
 
-const Criteria = ({ applicationRound }: Props): JSX.Element => {
+const Criteria = ({ applicationRound }: Props): JSX.Element | null => {
   const { t } = useTranslation();
+
+  if (!applicationRound) {
+    return null;
+  }
 
   return (
     <>

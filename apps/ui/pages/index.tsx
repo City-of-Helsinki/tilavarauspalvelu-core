@@ -1,13 +1,11 @@
 import React from "react";
-import { GetServerSideProps } from "next";
+import { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
-import {
-  PurposeType,
+import type {
   Query,
   QueryPurposesArgs,
   QueryUnitsArgs,
-  UnitType,
 } from "common/types/gql-types";
 import { Container } from "common";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
@@ -20,11 +18,9 @@ import {
   RESERVATION_UNIT_PURPOSES,
   SEARCH_FORM_PARAMS_UNIT,
 } from "@/modules/queries/params";
+import { filterNonNullable } from "common/src/helpers";
 
-type Props = {
-  purposes: PurposeType[];
-  units: UnitType[];
-};
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
 const Home = ({ purposes, units }: Props): JSX.Element => {
   const { t } = useTranslation(["home", "common"]);
@@ -39,7 +35,7 @@ const Home = ({ purposes, units }: Props): JSX.Element => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { locale } = ctx;
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
@@ -54,7 +50,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       orderBy: "rank",
     },
   });
-  const purposes = purposeData?.purposes?.edges.map((edge) => edge?.node) ?? [];
+  const purposes = filterNonNullable(
+    purposeData?.purposes?.edges.map((edge) => edge?.node)
+  );
 
   const { data: unitData } = await apolloClient.query<Query, QueryUnitsArgs>({
     query: SEARCH_FORM_PARAMS_UNIT,
@@ -64,7 +62,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       orderBy: "rank",
     },
   });
-  const units = unitData?.units?.edges?.map((edge) => edge?.node) ?? [];
+  const units = filterNonNullable(
+    unitData?.units?.edges?.map((edge) => edge?.node)
+  );
 
   return {
     props: {

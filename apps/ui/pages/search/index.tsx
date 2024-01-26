@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { GetServerSideProps } from "next";
+import type { GetServerSidePropsContext } from "next";
 import queryString from "query-string";
 import { useLocalStorage } from "react-use";
 import { Notification } from "hds-react";
@@ -13,7 +13,6 @@ import { OptionType } from "common/types/common";
 import { H2 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
-  ApplicationRoundNode,
   ApplicationRoundStatusChoice,
   Query,
   QueryApplicationRoundsArgs,
@@ -38,11 +37,9 @@ import ListWithPagination from "../../components/common/ListWithPagination";
 import StartApplicationBar from "../../components/common/StartApplicationBar";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 
-type Props = {
-  applicationRounds: ApplicationRoundNode[];
-};
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { locale, query } = ctx;
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);

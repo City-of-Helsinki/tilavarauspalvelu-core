@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { LoadingSpinner } from "hds-react";
-import { type GetServerSideProps } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
@@ -13,7 +13,9 @@ import { useOrder, useReservation } from "@/hooks/reservation";
 import ReservationFail from "@/components/reservation/ReservationFail";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { locale } = ctx;
 
   return {
@@ -37,7 +39,7 @@ const StyledContainer = styled(Container)`
   }
 `;
 
-const ReservationSuccess = ({ apiBaseUrl }: { apiBaseUrl: string }) => {
+const ReservationSuccess = ({ apiBaseUrl }: Props) => {
   const { isAuthenticated } = useSession();
   const router = useRouter();
   const { t } = useTranslation(["common"]);

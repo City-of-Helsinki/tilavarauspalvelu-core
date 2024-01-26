@@ -8,7 +8,7 @@ import {
 } from "common/types/gql-types";
 import { useTranslation } from "next-i18next";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
-import { GetServerSideProps } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 import { Maybe } from "graphql/jsutils/Maybe";
@@ -151,7 +151,7 @@ const Page3 = (): JSX.Element | null => {
   }
 };
 
-const Page3Wrapped = (props: { id: number | null }): JSX.Element | null => {
+const Page3Wrapped = (props: Props): JSX.Element | null => {
   const { id } = props;
   const router = useRouter();
   const {
@@ -257,7 +257,9 @@ const Page3Wrapped = (props: { id: number | null }): JSX.Element | null => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { locale } = ctx;
 
   // TODO should fetch on SSR but we need authentication for it

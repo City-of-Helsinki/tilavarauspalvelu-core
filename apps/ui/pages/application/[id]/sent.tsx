@@ -6,7 +6,7 @@ import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { Container } from "common";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { GetServerSideProps } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { applicationsUrl } from "@/modules/util";
 import Head from "@/components/application/Head";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
@@ -47,7 +47,7 @@ const Sent = (): JSX.Element => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { locale } = ctx;
 
   // TODO should fetch on SSR but we need authentication for it
@@ -56,10 +56,11 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const pkstring = Array.isArray(id) ? id[0] : id;
   const pk = Number.isNaN(Number(pkstring)) ? undefined : Number(pkstring);
   return {
+    notFound: pk == null,
     props: {
       ...getCommonServerSideProps(),
-      key: locale,
-      id: pk,
+      key: locale ?? "fi",
+      id: pk ?? null,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

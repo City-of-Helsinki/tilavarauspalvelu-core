@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useMutation, useQuery } from "@apollo/client";
-import { type GetServerSideProps } from "next";
+import type { GetServerSidePropsContext } from "next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { filterNonNullable } from "common/src/helpers";
@@ -25,7 +25,7 @@ import { getApplicationRoundName } from "@/modules/applicationRound";
 import { CREATE_APPLICATION_MUTATION } from "@/modules/queries/application";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { locale } = ctx;
 
   return {

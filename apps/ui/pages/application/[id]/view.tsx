@@ -2,13 +2,9 @@ import React from "react";
 import Error from "next/error";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
-import type {
-  Query,
-  QueryTermsOfUseArgs,
-  TermsOfUseType,
-} from "common/types/gql-types";
+import type { Query, QueryTermsOfUseArgs } from "common/types/gql-types";
 import { getTranslation } from "common/src/common/util";
-import { GetServerSideProps } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { filterNonNullable } from "common/src/helpers";
 import { BlackButton } from "@/styles/util";
@@ -20,16 +16,13 @@ import { ButtonContainer, CenterSpinner } from "@/components/common/common";
 import { useApplicationQuery } from "@/hooks/useApplicationQuery";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 
-type Props = {
-  id?: number;
-  tos: TermsOfUseType[];
-};
-
 const View = ({ id, tos }: Props): JSX.Element => {
   const { t } = useTranslation();
 
   const router = useRouter();
-  const { application, error, isLoading } = useApplicationQuery(id);
+  const { application, error, isLoading } = useApplicationQuery(
+    id ?? undefined
+  );
 
   if (id == null) {
     return <Error statusCode={404} />;
@@ -66,7 +59,9 @@ const View = ({ id, tos }: Props): JSX.Element => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { locale } = ctx;
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
@@ -91,8 +86,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return {
     props: {
       ...commonProps,
-      key: locale,
-      id: pk,
+      key: locale ?? "fi",
+      id: pk ?? null,
       tos,
       ...(await serverSideTranslations(locale ?? "fi")),
     },

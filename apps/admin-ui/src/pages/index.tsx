@@ -1,14 +1,8 @@
 import React from "react";
 import { App } from "@/App";
 import Layout from "./layout";
-import { type GetServerSideProps } from "next";
 
-type Props = {
-  cookieHubEnabled: boolean;
-  reservationUnitPreviewUrl: string;
-  hotjarEnabled: boolean;
-  apiBaseUrl: string;
-};
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
 export default function Index(props: Props) {
   return (
@@ -18,7 +12,7 @@ export default function Index(props: Props) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps = async () => {
   const { env } = await import("@/env.mjs");
   return {
     props: {

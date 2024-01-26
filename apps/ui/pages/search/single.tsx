@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useTranslation } from "next-i18next";
 import { NetworkStatus, useQuery } from "@apollo/client";
-import { GetServerSideProps } from "next";
+import type { GetServerSidePropsContext } from "next";
 import styled from "styled-components";
 import queryString, { type ParsedQuery } from "query-string";
 import { useRouter } from "next/router";
@@ -14,10 +14,10 @@ import { type OptionType } from "common/types/common";
 import { H2 } from "common/src/common/typography";
 import ClientOnly from "common/src/ClientOnly";
 import {
-  Query,
-  QueryReservationUnitsArgs,
+  type Query,
+  type QueryReservationUnitsArgs,
   ReservationUnitsReservationUnitReservationKindChoices,
-  ReservationUnitType,
+  type ReservationUnitType,
 } from "common/types/gql-types";
 import { Container } from "common";
 import { filterNonNullable } from "common/src/helpers";
@@ -67,10 +67,10 @@ const StyledSorting = styled(Sorting)`
   }
 `;
 
-export const getServerSideProps: GetServerSideProps = async ({
+export const getServerSideProps = async ({
   locale,
   query,
-}) => {
+}: GetServerSidePropsContext) => {
   return {
     props: {
       ...getCommonServerSideProps(),

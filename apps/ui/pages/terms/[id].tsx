@@ -1,11 +1,10 @@
 import React from "react";
-import { GetServerSideProps } from "next";
+import type { GetServerSidePropsContext } from "next";
 import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import {
-  QueryTermsOfUseArgs,
-  TermsOfUseType,
-  Query,
+  type QueryTermsOfUseArgs,
+  type Query,
   TermsOfUseTermsOfUseTermsTypeChoices,
 } from "common/types/gql-types";
 import { H2 } from "common/src/common/typography";
@@ -16,11 +15,9 @@ import { createApolloClient } from "@/modules/apolloClient";
 import Sanitize from "@/components/common/Sanitize";
 import { getTranslation } from "@/modules/util";
 
-type Props = {
-  genericTerms: TermsOfUseType;
-};
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { locale, params } = ctx;
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
@@ -42,6 +39,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     return {
       props: {
         ...commonProps,
+        genericTerms: null,
       },
       notFound: true,
     };
@@ -62,6 +60,9 @@ const Wrapper = styled(Container).attrs({ size: "s" })`
 const Heading = styled(H2).attrs({ as: "h1" })``;
 
 const GenericTerms = ({ genericTerms }: Props): JSX.Element => {
+  if (genericTerms == null) {
+    return <div>404</div>;
+  }
   return (
     <Wrapper>
       <Heading>{getTranslation(genericTerms, "name")}</Heading>

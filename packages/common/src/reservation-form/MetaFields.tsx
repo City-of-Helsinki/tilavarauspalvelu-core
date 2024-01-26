@@ -14,18 +14,15 @@ import styled from "styled-components";
 import camelCase from "lodash/camelCase";
 import { Controller, useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-
 import {
-  ReservationMetadataSetType,
+  type ReservationMetadataSetType,
   ReservationsReservationReserveeTypeChoices,
-  ReservationUnitType,
 } from "../../types/gql-types";
 import ReservationFormField from "./ReservationFormField";
 import { Inputs, Reservation } from "./types";
 import RadioButtonWithImage from "./RadioButtonWithImage";
 import { fontMedium, fontRegular } from "../common/typography";
-import { OptionType } from "../../types/common";
-
+import type { OptionType, ReservationUnitNode } from "../../types/common";
 import { GroupHeading, Subheading, TwoColumnContainer } from "./styles";
 import IconPremises from "../icons/IconPremises";
 
@@ -38,7 +35,7 @@ type CommonProps = {
 
 type Field = string;
 type Props = CommonProps & {
-  reservationUnit: ReservationUnitType;
+  reservationUnit: ReservationUnitNode;
   generalFields: Field[];
   reservationApplicationFields: Field[];
 };
@@ -211,7 +208,7 @@ export const ReservationMetaFields = ({
   noHeadingMarginal,
 }: {
   fields: string[];
-  reservationUnit: ReservationUnitType;
+  reservationUnit: ReservationUnitNode;
   options: Record<string, OptionType[]>;
   data?: {
     termsForDiscount?: JSX.Element | string;
@@ -295,7 +292,7 @@ export const ReserverMetaFields = ({
   data,
 }: {
   fields: string[];
-  reservationUnit: ReservationUnitType;
+  reservationUnit: ReservationUnitNode;
   options: Record<string, OptionType[]>;
   data?: {
     termsForDiscount?: JSX.Element | string;

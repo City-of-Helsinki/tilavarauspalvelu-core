@@ -6,7 +6,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { GetServerSideProps } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { Trans, useTranslation } from "next-i18next";
 import { useMutation, useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
@@ -120,6 +120,10 @@ import { APPLICATION_ROUNDS_PERIODS } from "@/modules/queries/applicationRound";
 import { CenterSpinner } from "@/components/common/common";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 
+// TODO infered types don't cast them
+// type Props = Awaited<ReturnType<typeof getServerSideProps>>['props']
+// Problem is that the logic in getServerSideProps is too complicated
+// the tripple early return returns different types
 type Props = {
   reservationUnit: ReservationUnitByPkType | null;
   relatedReservationUnits: ReservationUnitType[];
@@ -141,7 +145,7 @@ const allowedReservationStates: ReservationsReservationStateChoices[] = [
   ReservationsReservationStateChoices.WaitingForPayment,
 ];
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { params, query, locale } = ctx;
   const id = Number(params?.id);
   const uuid = query.ru;

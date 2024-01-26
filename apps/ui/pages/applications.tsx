@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { GetServerSideProps } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useQuery } from "@apollo/client";
 import { Notification } from "hds-react";
@@ -22,7 +22,7 @@ import { CenterSpinner } from "@/components/common/common";
 import { APPLICATIONS } from "@/modules/queries/application";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { locale } = ctx;
 
   return {

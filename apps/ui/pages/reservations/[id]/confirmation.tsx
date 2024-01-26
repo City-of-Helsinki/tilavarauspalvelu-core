@@ -6,7 +6,7 @@ import styled from "styled-components";
 import { breakpoints, Container } from "common";
 import ClientOnly from "common/src/ClientOnly";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import type { GetServerSideProps } from "next";
+import type { GetServerSidePropsContext } from "next";
 import ReservationInfoCard from "@/components/reservation/ReservationInfoCard";
 import ReservationConfirmation from "@/components/reservation/ReservationConfirmation";
 import { GET_RESERVATION } from "@/modules/queries/reservation";
@@ -37,7 +37,7 @@ const Columns = styled.div`
   }
 `;
 
-function Confirmation({ apiBaseUrl }: { apiBaseUrl: string }) {
+function Confirmation({ apiBaseUrl }: Props) {
   const router = useRouter();
   const { id } = router.query;
   const { data, loading } = useQuery<Query, QueryReservationByPkArgs>(
@@ -77,7 +77,9 @@ function Confirmation({ apiBaseUrl }: { apiBaseUrl: string }) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { locale } = ctx;
 
   return {
@@ -88,7 +90,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   };
 };
 
-export default (props: { apiBaseUrl: string }) => (
+export default (props: Props) => (
   <ClientOnly>
     <Confirmation {...props} />
   </ClientOnly>

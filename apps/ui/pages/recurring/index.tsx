@@ -1,12 +1,11 @@
 import React from "react";
 import styled from "styled-components";
-import { GetServerSideProps } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { H2, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
-  type ApplicationRoundNode,
   ApplicationRoundStatusChoice,
   type Query,
   type QueryApplicationRoundsArgs,
@@ -20,11 +19,9 @@ import { APPLICATION_ROUNDS } from "@/modules/queries/applicationRound";
 import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 
-type Props = {
-  applicationRounds: ApplicationRoundNode[];
-};
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const now = new Date();
   const { locale } = ctx;
   const commonProps = getCommonServerSideProps();

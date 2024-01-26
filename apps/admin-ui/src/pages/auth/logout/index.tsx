@@ -10,7 +10,6 @@ import { env } from "app/env.mjs";
 import BaseLayout from "../../layout";
 // NOTE not using App.tsx so need to import i18n here also
 import "app/i18n";
-import { type GetServerSideProps } from "next";
 
 // TODO move these to a common layout (PageWrapper, copies from)
 const Wrapper = styled.main`
@@ -36,11 +35,6 @@ const Layout = ({ children }: { children: React.ReactNode }) => (
   </BaseLayout>
 );
 
-type Props = {
-  apiBaseUrl: string;
-  logoutUrl: string;
-};
-
 function LogoutPage({ apiBaseUrl, logoutUrl }: Props) {
   const { t } = useTranslation(["common", "logout"]);
 
@@ -62,9 +56,11 @@ function LogoutPage({ apiBaseUrl, logoutUrl }: Props) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async () => {
-  const logoutUrl = `${env.TUNNISTAMO_URL}/logout/`;
-  const apiBaseUrl = env.TILAVARAUS_API_URL;
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+
+export const getServerSideProps = async () => {
+  const logoutUrl = env.TUNNISTAMO_URL ? `${env.TUNNISTAMO_URL}/logout/` : "";
+  const apiBaseUrl = env.TILAVARAUS_API_URL ?? "";
   return {
     props: {
       logoutUrl,

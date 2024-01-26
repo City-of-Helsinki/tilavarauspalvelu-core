@@ -7,9 +7,8 @@ import type {
   MutationSendApplicationArgs,
   QueryTermsOfUseArgs,
   Query,
-  TermsOfUseType,
 } from "common/types/gql-types";
-import { GetServerSideProps } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Error from "next/error";
 import { filterNonNullable } from "common/src/helpers";
@@ -27,10 +26,7 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 // User has to accept the terms of service then on submit we change the application status
 // This uses separate Send mutation (not update) so no onNext like the other pages
 // we could also remove the FormContext here
-const Preview = (props: {
-  id: number | null;
-  tos: TermsOfUseType[];
-}): JSX.Element | null => {
+const Preview = (props: Props): JSX.Element => {
   const { id, tos } = props;
 
   const { application, error, isLoading } = useApplicationQuery(
@@ -134,7 +130,9 @@ const Preview = (props: {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { locale } = ctx;
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);

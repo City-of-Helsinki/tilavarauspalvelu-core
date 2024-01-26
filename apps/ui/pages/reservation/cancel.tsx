@@ -1,4 +1,4 @@
-import { GetServerSideProps } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import React, { useEffect } from "react";
@@ -13,7 +13,9 @@ import DeleteCancelled from "@/components/reservation/DeleteCancelled";
 import ReservationFail from "@/components/reservation/ReservationFail";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { locale } = ctx;
 
   return {
@@ -34,7 +36,8 @@ const StyledContainer = styled(Container)`
     margin-bottom: var(--spacing-layout-l);
   }
 `;
-const Cancel = ({ apiBaseUrl }: { apiBaseUrl: string }) => {
+
+const Cancel = ({ apiBaseUrl }: Props): JSX.Element => {
   const { isAuthenticated } = useSession();
   const router = useRouter();
   const { orderId } = router.query;

@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { GetServerSideProps } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import router from "next/router";
@@ -14,10 +14,9 @@ import { useTranslation } from "next-i18next";
 import { H2, H4, fontRegular } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
-  Query,
-  QueryTermsOfUseArgs,
+  type Query,
+  type QueryTermsOfUseArgs,
   ReservationsReservationReserveeTypeChoices,
-  TermsOfUseType,
   TermsOfUseTermsOfUseTermsTypeChoices,
   ReservationsReservationStateChoices,
 } from "common/types/gql-types";
@@ -55,12 +54,9 @@ import ReservationInfoCard from "@/components/reservation/ReservationInfoCard";
 import { ReservationOrderStatus } from "@/components/reservation/ReservationOrderStatus";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 
-type Props = {
-  termsOfUse: Record<string, TermsOfUseType>;
-  id: number;
-};
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { locale, params } = ctx;
   const id = Number(params?.id);
   const commonProps = getCommonServerSideProps();
@@ -98,6 +94,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     notFound: true,
     props: {
       ...commonProps,
+      termsOfUse: null,
+      id: null,
     },
   };
 };
@@ -266,7 +264,9 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
   const { t, i18n } = useTranslation();
   const { isAuthenticated } = useSession();
 
-  const { reservation, loading, error } = useReservation({ reservationPk: id });
+  const { reservation, loading, error } = useReservation({
+    reservationPk: id ?? 0,
+  });
   const { order, isLoading: orderLoading } = useOrder({
     orderUuid: reservation?.orderUuid ?? "",
   });
@@ -716,9 +716,11 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
                   </AccordionContent>
                 )}
                 <AccordionContent>
-                  <Sanitize
-                    html={getTranslation(termsOfUse.genericTerms, "text")}
-                  />
+                  {termsOfUse?.genericTerms != null && (
+                    <Sanitize
+                      html={getTranslation(termsOfUse.genericTerms, "text")}
+                    />
+                  )}
                 </AccordionContent>
               </Accordion>
             </Terms>

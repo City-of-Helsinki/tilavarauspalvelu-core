@@ -2,7 +2,7 @@
  *  First part of the Reservation process form
  *  This component needs to be wrapped inside a Form context
  */
-import { OptionType } from "common/types/common";
+import type { OptionType, ReservationUnitNode } from "common/types/common";
 import { IconArrowLeft, IconArrowRight } from "hds-react";
 import { useFormContext } from "react-hook-form";
 import React from "react";
@@ -10,7 +10,6 @@ import { Trans, useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { fontMedium, fontRegular } from "common/src/common/typography";
 import MetaFields from "common/src/reservation-form/MetaFields";
-import { ReservationUnitType } from "common/types/gql-types";
 import { MediumButton } from "../../styles/util";
 import { ActionContainer } from "./styles";
 import { getTranslation } from "../../modules/util";
@@ -26,7 +25,7 @@ import {
 import Sanitize from "../common/Sanitize";
 
 type Props = {
-  reservationUnit: ReservationUnitType;
+  reservationUnit: ReservationUnitNode;
   handleSubmit: () => void;
   generalFields: string[];
   reservationApplicationFields: string[];

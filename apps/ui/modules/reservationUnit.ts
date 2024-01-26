@@ -274,7 +274,7 @@ export const getPrice = (props: GetPriceType): string => {
 };
 
 export type GetReservationUnitPriceProps = {
-  reservationUnit?: ReservationUnitNode;
+  reservationUnit?: ReservationUnitNode | null;
   pricingDate?: Date;
   minutes?: number;
   trailingZeros?: boolean;

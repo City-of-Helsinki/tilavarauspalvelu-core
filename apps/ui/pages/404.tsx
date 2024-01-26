@@ -1,12 +1,12 @@
 import React from "react";
-import { GetStaticProps } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { CenteredContainer } from "common/src/layout/Container";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getStaticProps = async ({ locale }: GetServerSidePropsContext) => {
   return {
     props: {
       ...getCommonServerSideProps(),

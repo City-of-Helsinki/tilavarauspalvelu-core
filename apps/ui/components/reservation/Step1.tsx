@@ -1,4 +1,4 @@
-import { OptionType } from "common/types/common";
+import type { OptionType, ReservationUnitNode } from "common/types/common";
 import { get } from "lodash";
 import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
@@ -7,7 +7,6 @@ import { IconArrowLeft, IconArrowRight } from "hds-react";
 import {
   ReservationsReservationReserveeTypeChoices,
   ReservationType,
-  ReservationUnitType,
   TermsOfUseType,
 } from "common/types/gql-types";
 import TermsBox from "common/src/termsbox/TermsBox";
@@ -30,7 +29,7 @@ import {
 
 type Props = {
   reservation: ReservationType;
-  reservationUnit: ReservationUnitType;
+  reservationUnit: ReservationUnitNode;
   handleSubmit: () => void;
   generalFields: string[];
   reservationApplicationFields: string[];
@@ -38,7 +37,7 @@ type Props = {
   reserveeType: ReservationsReservationReserveeTypeChoices;
   steps: ReservationStep[];
   setStep: React.Dispatch<React.SetStateAction<number>>;
-  termsOfUse: Record<string, TermsOfUseType>;
+  genericTerms: TermsOfUseType | null;
 };
 
 const Form = styled.form`
@@ -88,7 +87,7 @@ const Step1 = ({
   reserveeType,
   steps,
   setStep,
-  termsOfUse,
+  genericTerms,
 }: Props): JSX.Element => {
   const { t } = useTranslation();
 
@@ -278,12 +277,14 @@ const Step1 = ({
           ) : undefined
         }
         links={
-          termsOfUse.genericTerms && [
-            {
-              href: "/terms/booking",
-              text: t("reservationCalendar:heading.generalTerms"),
-            },
-          ]
+          genericTerms != null
+            ? [
+                {
+                  href: "/terms/booking",
+                  text: t("reservationCalendar:heading.generalTerms"),
+                },
+              ]
+            : []
         }
         acceptLabel={box[1].acceptLabel}
         accepted={areTermsSpaceAccepted}

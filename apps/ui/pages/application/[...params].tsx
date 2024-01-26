@@ -3,7 +3,7 @@ import Error from "next/error";
 import { FormProvider, useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
-import { type GetServerSideProps } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type {
@@ -27,7 +27,9 @@ import { ErrorToast } from "@/components/common/ErrorToast";
 import { useApplicationQuery } from "@/hooks/useApplicationQuery";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { locale } = ctx;
 
   // TODO should fetch on SSR but we need authentication for it
@@ -151,13 +153,7 @@ const ApplicationRootPage = ({
   );
 };
 
-const ApplicationPageWithQuery = ({
-  id,
-  slug,
-}: {
-  id: number | null;
-  slug: string;
-}): JSX.Element | null => {
+const ApplicationPageWithQuery = ({ id, slug }: Props): JSX.Element | null => {
   const router = useRouter();
   const { t } = useTranslation();
 

@@ -4,7 +4,7 @@ import { breakpoints } from "common/src/common/style";
 import { H2 } from "common/src/common/typography";
 import { Query, QueryReservationByPkArgs } from "common/types/gql-types";
 import { LoadingSpinner } from "hds-react";
-import { GetServerSideProps } from "next";
+import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
@@ -16,12 +16,9 @@ import { GET_RESERVATION } from "@/modules/queries/reservation";
 import { useOrder } from "@/hooks/reservation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 
-type Props = {
-  reservationPk: number;
-  apiBaseUrl: string;
-};
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { locale, params } = ctx;
   const reservationPk = Number(params?.id);
 
