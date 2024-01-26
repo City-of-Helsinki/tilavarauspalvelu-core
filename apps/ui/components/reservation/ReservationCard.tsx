@@ -241,7 +241,7 @@ const ReservationCard = ({ reservation, type }: PropsT): JSX.Element => {
       <Image alt={name} src={imgSrc} />
       <MainContent>
         <Top>
-          <Name>{title}</Name>
+          <Name data-testid="reservation-card__name">{title}</Name>
           <JustForDesktop customBreakpoint={breakpoints.l}>
             {statusTags({
               state: reservation.state,
