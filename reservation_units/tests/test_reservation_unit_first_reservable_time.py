@@ -7,7 +7,7 @@ from django.utils.timezone import get_default_timezone
 
 from opening_hours.utils.time_span_element import TimeSpanElement
 from reservation_units.enums import ReservationStartInterval
-from reservation_units.querysets import _find_first_reservable_time_span_for_reservation_unit
+from reservation_units.utils.first_reservable_time import find_first_reservable_time_span_for_reservation_unit
 from tests.factories import (
     ReservationUnitFactory,
 )
@@ -219,7 +219,7 @@ def test__find_first_reservable_time_span_for_reservation_unit__different_buffer
         ),
     ]
 
-    result = _find_first_reservable_time_span_for_reservation_unit(
+    result = find_first_reservable_time_span_for_reservation_unit(
         reservation_unit=reservation_unit,
         normalised_reservable_time_spans=reservable_time_spans,
         reservations=reservations,
@@ -270,7 +270,7 @@ def test__find_first_reservable_time_span_for_reservation_unit__buffer_goes_thro
         ),
     ]
 
-    result = _find_first_reservable_time_span_for_reservation_unit(
+    result = find_first_reservable_time_span_for_reservation_unit(
         reservation_unit=reservation_unit,
         normalised_reservable_time_spans=reservable_time_spans,
         reservations=reservations,
