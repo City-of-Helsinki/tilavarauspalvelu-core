@@ -144,7 +144,7 @@ class EmailNotificationContextTestCase(TestCase):
     def test_from_reservation_no_location(self):
         self.location.delete()
         context = EmailNotificationContext.from_reservation(self.reservation)
-        assert context.unit_location is None
+        assert context.unit_location == ""
 
     def test_from_reservation_unit_name_is_reservee_langauge(self):
         self.reservation.reservee_language = "sv"
