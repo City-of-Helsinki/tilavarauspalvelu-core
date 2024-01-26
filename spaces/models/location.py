@@ -67,7 +67,7 @@ class Location(models.Model):
         base_manager_name = "objects"
 
     def __str__(self) -> str:
-        return f"{self.address_street}, {self.address_city} {self.address_zip}"
+        return f"{self.address_street}, {self.address_zip} {self.address_city}"
 
     @property
     def lat(self) -> float | None:
