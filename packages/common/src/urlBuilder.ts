@@ -34,14 +34,14 @@ export function getSignInUrl(
   if (callBackUrl.includes(`/logout`)) {
     const baseUrl =
       originOverride != null ? originOverride : new URL(callBackUrl).origin;
-    return `${authUrl}/login?next=${baseUrl}`;
+    return `${authUrl}login?next=${baseUrl}`;
   }
-  return `${authUrl}/login?next=${callBackUrl}`;
+  return `${authUrl}login?next=${callBackUrl}`;
 }
 
 /// @param apiBaseUrl - base url for api (hostname typically)
 /// @return url for logging out with redirect url to /logout
 export function getSignOutUrl(apiBaseUrl: string): string {
   const authUrl = buildAuthUrl(apiBaseUrl);
-  return `${authUrl}/logout`;
+  return `${authUrl}logout`;
 }

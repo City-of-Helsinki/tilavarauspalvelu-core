@@ -11,6 +11,7 @@ export const defaultLanguage = "fi";
 // Changing it without changing the backend will break all form submits.
 export const languages = ["fi", "sv", "en"];
 
+// @deprecated TODO this should be removed use numbers or translations instead
 export const weekdays = [
   "monday",
   "tuesday",
@@ -39,15 +40,19 @@ export const GQL_MAX_RESULTS_PER_QUERY = 100;
 export const HERO_IMAGE_URL = `${PUBLIC_URL}/hero-user@1x.jpg`;
 export const LOGO_IMAGE_URL = `${PUBLIC_URL}/logo.png`;
 
+// Why?
+// not sure actually, since we are using the RAW PUBLIC_URL for static data
+// one reason is that localhost:3000 gets turned into localhost:3000/folder when returning from login
 // TODO move the url constructors to packages/common
 // TODO make this into utility function
+// TODO this seems overly complex for what it should be
 function getCleanPublicUrl() {
   const publicUrl = PUBLIC_URL;
-  // TODO this seems overly complex for what it should be
-  const hasPublicUrl =
-    publicUrl != null && publicUrl !== "/" && publicUrl !== "";
+  const hasPublicUrl = publicUrl !== "/" && publicUrl !== "";
+  // Remove the endslash, so folder/ => folder
   const publicUrlNoSlash =
     publicUrl && hasPublicUrl ? publicUrl.replace(/\/$/, "") : "";
+  // Add slash to the beginning so folder => /folder
   const cleanPublicUrl = publicUrlNoSlash.startsWith("/")
     ? publicUrlNoSlash
     : `/${publicUrlNoSlash}`;
@@ -58,13 +63,13 @@ function getCleanPublicUrl() {
 /// @returns url to sign in dialog
 /// TODO use the common version in urlBuilder.ts (missing the publicUrl option)
 export function getSignInUrl(apiBaseUrl: string, callBackUrl: string): string {
-  const authUrl = `${apiBaseUrl}/helauth`;
+  const authUrl = `${apiBaseUrl}/helauth/`;
   if (callBackUrl.includes(`/logout`)) {
     const baseUrl = new URL(callBackUrl).origin;
     const cleanPublicUrl = getCleanPublicUrl();
-    return `${authUrl}/login?next=${baseUrl}${cleanPublicUrl}`;
+    return `${authUrl}login?next=${baseUrl}${cleanPublicUrl}`;
   }
-  return `${authUrl}/login?next=${callBackUrl}`;
+  return `${authUrl}login?next=${callBackUrl}`;
 }
 
 export const VALID_ALLOCATION_APPLICATION_STATUSES = [
