@@ -82,7 +82,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         assert self.get_builder()._get_reservation_number() == resno
 
     def test_get_unit_location(self):
-        location_str = f"{self.location.address_street} {self.location.address_zip} {self.location.address_city}"
+        location_str = f"{self.location.address_street}, {self.location.address_zip} {self.location.address_city}"
         assert self.get_builder()._get_unit_location() == location_str
 
     def test_get_unit_name(self):

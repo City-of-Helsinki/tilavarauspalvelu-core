@@ -16,6 +16,7 @@ from email_notification.sender.email_notification_builder import (
 )
 from email_notification.sender.senders import send_test_emails
 from reservation_units.models import ReservationUnit
+from spaces.models import Location
 
 
 def get_initial_values(request) -> dict[str, Any]:
@@ -43,9 +44,9 @@ def get_initial_values(request) -> dict[str, Any]:
 
     initial_values["unit_name"] = getattr(runit.unit, "name", "")
 
-    location = getattr(runit.unit, "location", None)
-    if location:
-        initial_values["unit_location"] = f"{location.address_street} {location.address_zip} {location.address_city}"
+    location: Location | None = getattr(runit.unit, "location", None)
+    if location is not None:
+        initial_values["unit_location"] = str(location)
 
     return initial_values
 

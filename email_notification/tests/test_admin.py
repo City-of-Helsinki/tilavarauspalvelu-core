@@ -48,7 +48,7 @@ class GetInitialValuesTestCase(TestCase):
                 "recipient": "test@example.com",
                 "reservation_unit_name": "Test reservation unit",
                 "unit_name": "Test unit",
-                "unit_location": "Test street 15 01000 Helsinki",
+                "unit_location": "Test street 15, 01000 Helsinki",
                 "confirmed_instructions_fi": "Confirmed FI",
                 "confirmed_instructions_en": "Confirmed EN",
                 "confirmed_instructions_sv": "Confirmed SV",

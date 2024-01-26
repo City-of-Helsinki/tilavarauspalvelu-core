@@ -94,7 +94,7 @@ class EmailNotificationContextTestCase(TestCase):
         assert context.end_datetime == self.reservation.end.astimezone(get_default_timezone())
         assert context.reservation_number == self.reservation.id
         assert context.unit_location == (
-            f"{self.location.address_street} {self.location.address_zip} {self.location.address_city}"
+            f"{self.location.address_street}, {self.location.address_zip} {self.location.address_city}"
         )
         assert context.unit_name == self.unit.name
         assert context.price == self.reservation.price

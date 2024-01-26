@@ -7,6 +7,7 @@ from django.utils.timezone import get_default_timezone
 from email_notification.email_tester import EmailTestForm
 from reservations.choices import CustomerTypeChoice
 from reservations.models import Reservation
+from spaces.models import Location
 
 
 class EmailNotificationContext:
@@ -88,6 +89,13 @@ class EmailNotificationContext:
         """Build context from reservation"""
         context = EmailNotificationContext()
 
+        context.reservation_name = reservation.name
+
+        context.reservee_language = reservation.reservee_language
+        language = reservation.reservee_language or getattr(
+            reservation.user, "preferred_language", settings.LANGUAGE_CODE
+        )
+
         # Intentionally don't use reservation.reservee_name here
         if not reservation.reservee_type or reservation.reservee_type == CustomerTypeChoice.INDIVIDUAL.value:
             context.reservee_name = f"{reservation.reservee_first_name} {reservation.reservee_last_name}".strip()
@@ -99,15 +107,6 @@ class EmailNotificationContext:
         context.reservation_number = reservation.id
 
         res_unit = reservation.reservation_unit.filter(unit__isnull=False).first()
-        location = getattr(res_unit.unit, "location", None)
-        if location:
-            context.unit_location = f"{location.address_street} {location.address_zip} {location.address_city}"
-        else:
-            context.unit_location = None
-
-        language = reservation.reservee_language or getattr(
-            reservation.user, "preferred_language", settings.LANGUAGE_CODE
-        )
 
         if res_unit:
             context.unit_name = getattr(
@@ -115,8 +114,8 @@ class EmailNotificationContext:
                 f"name_{language}",
                 res_unit.unit.name,
             )
-
-        context.reservation_name = reservation.name
+        location: Location | None = getattr(res_unit.unit, "location", None)
+        context.unit_location = str(location) if location is not None else None
 
         if reservation.reservation_unit.count() > 1:
             context.reservation_unit_name = ", ".join(
@@ -132,9 +131,7 @@ class EmailNotificationContext:
         if not reservation.applying_for_free_of_charge:
             context.subsidised_price = reservation.price
         else:
-            from api.graphql.types.reservations.serializers.mixins import (
-                ReservationPriceMixin,
-            )
+            from api.graphql.types.reservations.serializers.mixins import ReservationPriceMixin
 
             calculator = ReservationPriceMixin()
             prices = calculator.calculate_price(
@@ -145,7 +142,6 @@ class EmailNotificationContext:
             context.subsidised_price = prices.subsidised_price
 
         context.tax_percentage = reservation.tax_percentage_value
-        context.reservee_language = reservation.reservee_language
         context.confirmed_instructions = {
             "fi": context._get_reservation_unit_instruction_field(
                 reservation, "reservation_confirmed_instructions", "fi"
