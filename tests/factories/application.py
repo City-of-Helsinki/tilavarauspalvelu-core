@@ -228,6 +228,8 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
             application_round = ApplicationRoundFactory.create_in_status_in_allocation(
                 reservation_units=[reservation_unit],
             )
+        elif reservation_unit not in application_round.reservation_units.all():
+            application_round.reservation_units.add(reservation_unit)
 
         this_moment = now()
         application = cls.create(

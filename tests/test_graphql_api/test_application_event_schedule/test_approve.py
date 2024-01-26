@@ -4,13 +4,13 @@ from typing import Any
 import pytest
 from django.utils.timezone import get_default_timezone
 
-from applications.choices import ApplicationEventStatusChoice, WeekdayChoice
+from applications.choices import ApplicationEventStatusChoice, ApplicationStatusChoice, WeekdayChoice
 from applications.models import Application, ApplicationEvent, ApplicationEventSchedule
 from reservation_units.models import ReservationUnit
 from tests.factories import (
-    ApplicationEventFactory,
     ApplicationEventScheduleFactory,
     ApplicationFactory,
+    ApplicationRoundFactory,
     ReservationUnitFactory,
     SpaceFactory,
 )
@@ -40,81 +40,61 @@ def approve_data(application: Application, *, begin: str, end: str, force: bool 
     }
 
 
-def test_approve_schedule__can_approve_event_in_allocation(graphql):
+def test_approve_schedule__can_approve_unallocated_event_schedule(graphql):
     # given:
     # - There is an allocatable application event schedule
     # - A superuser is using the system
-    reservation_unit = ReservationUnitFactory.create()
-    application = ApplicationFactory.create_in_status_in_allocation(
-        application_events__event_reservation_units__reservation_unit=reservation_unit,
-    )
-    event: ApplicationEvent = application.application_events.first()
-    schedule: ApplicationEventSchedule = event.application_event_schedules.first()
+    application = ApplicationFactory.create_application_ready_for_allocation()
     graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    event = application.application_events.first()
+    assert event.status == ApplicationEventStatusChoice.UNALLOCATED
 
     # when:
     # - The application event schedule is approved
-    input_data = {
-        "pk": schedule.pk,
-        "allocatedDay": schedule.day,
-        "allocatedBegin": schedule.begin.isoformat(),
-        "allocatedEnd": schedule.end.isoformat(),
-        "allocatedReservationUnit": reservation_unit.pk,
-    }
+    input_data = approve_data(application, begin="10:00:00", end="12:00:00")
     response = graphql(APPROVE_MUTATION, input_data=input_data)
 
     # then:
     # - There are no errors in the response
-    # - Allocation data has been set on the application event schedule
     # - The application event status has changed to ALLOCATED
     assert response.has_errors is False, response
-
-    schedule.refresh_from_db()
-    assert schedule.allocated_day == schedule.day
-    assert schedule.allocated_begin == schedule.begin
-    assert schedule.allocated_end == schedule.end
-    assert schedule.allocated_reservation_unit == reservation_unit
 
     event.refresh_from_db()
     assert event.status == ApplicationEventStatusChoice.APPROVED
 
 
-def test_approve_schedule__can_approve_already_approved_event(graphql):
+def test_approve_schedule__can_approve_approved_event_schedule(graphql):
     # given:
     # - There is an application event with one approved and one unallocated schedule
     # - A superuser is using the system
-    reservation_unit = ReservationUnitFactory.create()
-    event: ApplicationEvent = ApplicationEventFactory.create_in_status_approved(
-        event_reservation_units__reservation_unit=reservation_unit,
-        events_per_week=2,
-    )
-    schedule: ApplicationEventSchedule = ApplicationEventScheduleFactory.create(application_event=event)
+    application = ApplicationFactory.create_application_ready_for_allocation(events_per_week=1, pre_allocated=True)
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
-    assert event.application_event_schedules.count() == 2
+    # Un-allocate one of the approved schedule
+    event = application.application_events.first()
+    schedule: ApplicationEventSchedule = event.application_event_schedules.first()
+    schedule.allocated_day = None
+    schedule.allocated_begin = None
+    schedule.allocated_end = None
+    schedule.allocated_reservation_unit = None
+    schedule.save()
+
+    # Event is still approved because there is another approved schedule
     assert event.status == ApplicationEventStatusChoice.APPROVED
 
     # when:
     # - The unallocated application event schedule is approved
-    input_data = {
-        "pk": schedule.pk,
-        "allocatedDay": schedule.day,
-        "allocatedBegin": schedule.begin.isoformat(),
-        "allocatedEnd": schedule.end.isoformat(),
-        "allocatedReservationUnit": reservation_unit.pk,
-    }
+    input_data = approve_data(application, begin="10:00:00", end="12:00:00")
     response = graphql(APPROVE_MUTATION, input_data=input_data)
 
     # then:
     # - There are no errors in the response
-    # - Allocation data has been set on the application event schedule
+    # - The event is still approved
     assert response.has_errors is False, response
 
-    schedule.refresh_from_db()
-    assert schedule.allocated_day == schedule.day
-    assert schedule.allocated_begin == schedule.begin
-    assert schedule.allocated_end == schedule.end
-    assert schedule.allocated_reservation_unit == reservation_unit
+    event.refresh_from_db()
+    assert event.status == ApplicationEventStatusChoice.APPROVED
 
 
 @pytest.mark.parametrize(
@@ -125,23 +105,12 @@ def test_approve_schedule__incomplete_data(graphql, missing_key):
     # given:
     # - There is an allocatable application event schedule
     # - A superuser is using the system
-    reservation_unit = ReservationUnitFactory.create()
-    application: Application = ApplicationFactory.create_in_status_in_allocation(
-        application_events__event_reservation_units__reservation_unit=reservation_unit,
-    )
-    event: ApplicationEvent = application.application_events.first()
-    schedule: ApplicationEventSchedule = event.application_event_schedules.first()
+    application = ApplicationFactory.create_application_ready_for_allocation()
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     # when:
     # - The application event schedule is approved
-    input_data = {
-        "pk": schedule.pk,
-        "allocatedDay": schedule.day,
-        "allocatedBegin": schedule.begin.isoformat(),
-        "allocatedEnd": schedule.end.isoformat(),
-        "allocatedReservationUnit": reservation_unit.pk,
-    }
+    input_data = approve_data(application, begin="10:00:00", end="12:00:00")
     input_data.pop(missing_key)
     response = graphql(APPROVE_MUTATION, input_data=input_data)
 
@@ -154,23 +123,15 @@ def test_approve_schedule__application_not_yet_in_allocation(graphql):
     # given:
     # - There is an open application that has been sent, but is not allocatable yet
     # - A superuser is using the system
-    reservation_unit = ReservationUnitFactory.create()
-    application: Application = ApplicationFactory.create_in_status_received(
-        application_events__event_reservation_units__reservation_unit=reservation_unit,
-    )
-    event: ApplicationEvent = application.application_events.first()
-    schedule: ApplicationEventSchedule = event.application_event_schedules.first()
+    application_round = ApplicationRoundFactory.create_in_status_upcoming()
+    application = ApplicationFactory.create_application_ready_for_allocation(application_round)
     graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    assert application.status == ApplicationStatusChoice.RECEIVED
 
     # when:
     # - The application event schedule is approved
-    input_data = {
-        "pk": schedule.pk,
-        "allocatedDay": schedule.day,
-        "allocatedBegin": schedule.begin.isoformat(),
-        "allocatedEnd": schedule.end.isoformat(),
-        "allocatedReservationUnit": reservation_unit.pk,
-    }
+    input_data = approve_data(application, begin="10:00:00", end="12:00:00")
     response = graphql(APPROVE_MUTATION, input_data=input_data)
 
     # then:
@@ -184,21 +145,15 @@ def test_approve_schedule__application_not_in_allocation_anymore(graphql):
     # given:
     # - There is an application event that has already been approved
     # - A superuser is using the system
-    reservation_unit = ReservationUnitFactory.create()
-    application: Application = ApplicationFactory.create_in_status_handled()
-    event: ApplicationEvent = application.application_events.first()
-    schedule: ApplicationEventSchedule = event.application_event_schedules.first()
+    application_round = ApplicationRoundFactory.create_in_status_handled()
+    application = ApplicationFactory.create_application_ready_for_allocation(application_round)
     graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    assert application.status == ApplicationStatusChoice.HANDLED
 
     # when:
     # - The application event schedule is approved
-    input_data = {
-        "pk": schedule.pk,
-        "allocatedDay": schedule.day,
-        "allocatedBegin": schedule.begin.isoformat(),
-        "allocatedEnd": schedule.end.isoformat(),
-        "allocatedReservationUnit": reservation_unit.pk,
-    }
+    input_data = approve_data(application, begin="10:00:00", end="12:00:00")
     response = graphql(APPROVE_MUTATION, input_data=input_data)
 
     # then:

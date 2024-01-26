@@ -189,7 +189,7 @@ class ApplicationEventFactory(GenericDjangoModelFactory[ApplicationEvent]):
         )
         kwargs.setdefault(
             "application_event_schedules__allocated_end",
-            datetime.time(12, 0, tzinfo=get_default_timezone()),
+            datetime.time(13, 0, tzinfo=get_default_timezone()),
         )
         unit_key = "application_event_schedules__allocated_reservation_unit"
         if unit_key not in kwargs:
