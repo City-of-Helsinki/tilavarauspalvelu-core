@@ -10,9 +10,7 @@ from api.graphql.extensions.validation_errors import ValidationErrorCodes, Valid
 from api.graphql.types.reservations.types import ReservationType
 from reservation_units.enums import PriceUnit, PricingType, ReservationStartInterval, ReservationUnitState
 from reservation_units.models import ReservationUnit
-from reservation_units.utils.reservation_unit_pricing_helper import (
-    ReservationUnitPricingHelper,
-)
+from reservation_units.utils.reservation_unit_pricing_helper import ReservationUnitPricingHelper
 from reservation_units.utils.reservation_unit_reservation_scheduler import ReservationUnitReservationScheduler
 from reservations.choices import ReservationTypeChoice
 from reservations.models import Reservation

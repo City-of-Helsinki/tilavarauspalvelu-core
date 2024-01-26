@@ -7,6 +7,7 @@ from modeltranslation.manager import get_translatable_fields_for_model
 
 __all__ = [
     "comma_sep_str",
+    "get_attr_by_language",
     "get_field_to_related_field_mapping",
     "get_nested",
     "get_translation_fields",
@@ -135,3 +136,11 @@ class with_indices(Generic[T]):  # noqa: N801, RUF100
     def delete_item(self, i: int) -> None:
         del self.seq[i]
         self.item_deleted = True
+
+
+def get_attr_by_language(instance: Any, field: str, language: str) -> str | None:
+    """Get field value by language, or fallback to default language"""
+    localised_value = getattr(instance, f"{field}_{language}", None)
+    if localised_value:
+        return localised_value
+    return getattr(instance, field, None)

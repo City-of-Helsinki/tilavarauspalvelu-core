@@ -1,9 +1,11 @@
 import datetime
 from decimal import Decimal
+from typing import Literal
 
 from django.conf import settings
 from django.utils.timezone import get_default_timezone
 
+from common.utils import get_attr_by_language
 from email_notification.email_tester import EmailTestForm
 from reservations.choices import CustomerTypeChoice
 from reservations.models import Reservation
@@ -30,16 +32,28 @@ class EmailNotificationContext:
     cancel_reason: dict[str, str]
     reservee_language: str
 
-    @staticmethod
-    def _get_by_language(instance, field, language):
-        return getattr(instance, f"{field}_{language}", getattr(instance, field, ""))
+    def _get_reservation_unit_instruction_fields(
+        self,
+        reservation: Reservation,
+        name: Literal["confirmed", "pending", "cancelled"],
+    ) -> dict[str, str]:
+        """Get reservation unit instruction fields for all languages"""
+        all_instructions: dict[str, str] = {
+            "fi": "",
+            "sv": "",
+            "en": "",
+        }
+        reservation_units = reservation.reservation_unit.all()
 
-    def _get_reservation_unit_instruction_field(self, reservation, name, language):
-        instructions = []
-        for res_unit in reservation.reservation_unit.all():
-            instructions.append(self._get_by_language(res_unit, name, language))
+        for language in all_instructions:
+            language_instructions: list[str] = []
 
-        return "\n-\n".join(instructions)
+            for ru in reservation_units:
+                language_instructions.append(get_attr_by_language(ru, f"reservation_{name}_instructions", language))
+
+            all_instructions[language] = "\n-\n".join(language_instructions)
+
+        return all_instructions
 
     @staticmethod
     def with_mock_data() -> "EmailNotificationContext":
@@ -107,23 +121,15 @@ class EmailNotificationContext:
         context.reservation_number = reservation.id
 
         res_unit = reservation.reservation_unit.filter(unit__isnull=False).first()
+        if res_unit is not None:
+            context.unit_name = get_attr_by_language(res_unit.unit, "name", language)
 
-        if res_unit:
-            context.unit_name = getattr(
-                res_unit.unit,
-                f"name_{language}",
-                res_unit.unit.name,
-            )
         location: Location | None = getattr(res_unit.unit, "location", None)
         context.unit_location = str(location) if location is not None else None
 
-        if reservation.reservation_unit.count() > 1:
-            context.reservation_unit_name = ", ".join(
-                reservation.reservation_unit.values_list(f"name_{language}", flat=True)
-            )
-        else:
-            res_unit = reservation.reservation_unit.first()
-            context.reservation_unit_name = getattr(res_unit, f"name_{language}", res_unit.name)
+        context.reservation_unit_name = ", ".join(
+            [get_attr_by_language(ru, "name", language) for ru in reservation.reservation_unit.all()]
+        )
 
         context.price = reservation.price
         context.non_subsidised_price = reservation.non_subsidised_price
@@ -142,48 +148,19 @@ class EmailNotificationContext:
             context.subsidised_price = prices.subsidised_price
 
         context.tax_percentage = reservation.tax_percentage_value
-        context.confirmed_instructions = {
-            "fi": context._get_reservation_unit_instruction_field(
-                reservation, "reservation_confirmed_instructions", "fi"
-            ),
-            "sv": context._get_reservation_unit_instruction_field(
-                reservation, "reservation_confirmed_instructions", "sv"
-            ),
-            "en": context._get_reservation_unit_instruction_field(
-                reservation, "reservation_confirmed_instructions", "en"
-            ),
-        }
-        context.pending_instructions = {
-            "fi": context._get_reservation_unit_instruction_field(
-                reservation, "reservation_pending_instructions", "fi"
-            ),
-            "sv": context._get_reservation_unit_instruction_field(
-                reservation, "reservation_pending_instructions", "sv"
-            ),
-            "en": context._get_reservation_unit_instruction_field(
-                reservation, "reservation_pending_instructions", "en"
-            ),
-        }
-        context.cancelled_instructions = {
-            "fi": context._get_reservation_unit_instruction_field(
-                reservation, "reservation_cancelled_instructions", "fi"
-            ),
-            "sv": context._get_reservation_unit_instruction_field(
-                reservation, "reservation_cancelled_instructions", "sv"
-            ),
-            "en": context._get_reservation_unit_instruction_field(
-                reservation, "reservation_cancelled_instructions", "en"
-            ),
-        }
+
+        context.confirmed_instructions = context._get_reservation_unit_instruction_fields(reservation, "confirmed")
+        context.pending_instructions = context._get_reservation_unit_instruction_fields(reservation, "pending")
+        context.cancelled_instructions = context._get_reservation_unit_instruction_fields(reservation, "cancelled")
         context.deny_reason = {
-            "fi": context._get_by_language(reservation.deny_reason, "reason", "fi"),
-            "sv": context._get_by_language(reservation.deny_reason, "reason", "sv"),
-            "en": context._get_by_language(reservation.deny_reason, "reason", "en"),
+            "fi": get_attr_by_language(reservation.deny_reason, "reason", "fi"),
+            "sv": get_attr_by_language(reservation.deny_reason, "reason", "sv"),
+            "en": get_attr_by_language(reservation.deny_reason, "reason", "en"),
         }
         context.cancel_reason = {
-            "fi": context._get_by_language(reservation.cancel_reason, "reason", "fi"),
-            "sv": context._get_by_language(reservation.cancel_reason, "reason", "sv"),
-            "en": context._get_by_language(reservation.cancel_reason, "reason", "en"),
+            "fi": get_attr_by_language(reservation.cancel_reason, "reason", "fi"),
+            "sv": get_attr_by_language(reservation.cancel_reason, "reason", "sv"),
+            "en": get_attr_by_language(reservation.cancel_reason, "reason", "en"),
         }
         return context
 

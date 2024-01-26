@@ -28,9 +28,22 @@ class EmailNotificationContextTestCase(TestCase):
             address_zip="0100",
             address_city="Rovaniemi",
         )
-        self.reservation_unit = ReservationUnitFactory.create(unit=self.unit)
-        self.deny_reason = ReservationDenyReasonFactory.create()
-        self.cancel_reason = ReservationCancelReasonFactory.create()
+        self.reservation_unit = ReservationUnitFactory.create(
+            name_fi="ReservationUnit Name FI",
+            name_sv="ReservationUnit Name SV",
+            name_en="ReservationUnit Name EN",
+            unit=self.unit,
+        )
+        self.deny_reason = ReservationDenyReasonFactory.create(
+            reason_fi="Reason FI",
+            reason_sv="Reason SV",
+            reason_en=None,  # None should use fi as fallback
+        )
+        self.cancel_reason = ReservationCancelReasonFactory.create(
+            reason_fi="Reason FI",
+            reason_sv="Reason SV",
+            reason_en="",  # empty string should use fi as fallback
+        )
         self.reservation = ReservationFactory.create(
             reservation_unit=[self.reservation_unit],
             deny_reason=self.deny_reason,
@@ -113,10 +126,12 @@ class EmailNotificationContextTestCase(TestCase):
         assert context.cancelled_instructions["en"] == self.reservation_unit.reservation_cancelled_instructions_en
         assert context.deny_reason["fi"] == self.deny_reason.reason_fi
         assert context.deny_reason["sv"] == self.deny_reason.reason_sv
-        assert context.deny_reason["en"] == self.deny_reason.reason_en
+        assert self.deny_reason.reason_en is None
+        assert context.deny_reason["en"] == self.deny_reason.reason_fi
         assert context.cancel_reason["fi"] == self.cancel_reason.reason_fi
         assert context.cancel_reason["sv"] == self.cancel_reason.reason_sv
-        assert context.cancel_reason["en"] == self.cancel_reason.reason_en
+        assert self.cancel_reason.reason_en == ""
+        assert context.cancel_reason["en"] == self.cancel_reason.reason_fi
 
     def test_from_reservation_organisation_name(self):
         self.reservation.reservee_type = CustomerTypeChoice.BUSINESS
