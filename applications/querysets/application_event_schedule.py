@@ -1,3 +1,4 @@
+import datetime
 from typing import Self
 
 from django.db import models
@@ -19,9 +20,11 @@ class ApplicationEventScheduleQuerySet(models.QuerySet):
         order_by = models.OrderBy(models.F(alias), descending=desc)
         return self.alias(**{alias: expression}).order_by(order_by)
 
-    def allocated(self) -> Self:
+    def accepted(self) -> Self:
+        """Schedules that have been allocated, but not declined"""
         return self.exclude(
-            models.Q(allocated_begin__isnull=True)
+            models.Q(declined=True)
+            | models.Q(allocated_begin__isnull=True)
             | models.Q(allocated_end__isnull=True)
             | models.Q(allocated_day__isnull=True)
             | models.Q(allocated_reservation_unit__isnull=True)
@@ -94,3 +97,60 @@ class ApplicationEventScheduleQuerySet(models.QuerySet):
             expression=APPLICATION_EVENT_STATUS_SORT_ORDER,
             desc=desc,
         )
+
+    @staticmethod
+    def merge_periods(
+        time_periods: list[dict[str, datetime.time]],
+        *,
+        begin_key: str,
+        end_key: str,
+    ) -> list[dict[str, datetime.time]]:
+        """
+        Merge periods that overlap or touch each other.
+        Time periods should be in chronological order, and on the same day.
+        """
+        merged_periods = time_periods[:1]
+
+        # Go through all periods in order.
+        for period in time_periods[1:]:
+            last_period = merged_periods[-1]
+            # If time periods overlap, or are next to each other -> merge them and continue.
+            if last_period[end_key] >= period[begin_key]:
+                last_period[end_key] = max(period[end_key], last_period[end_key])
+                continue
+
+            # Otherwise the periods are not contiguous -> append the period and continue.
+            merged_periods.append(period)
+        return merged_periods
+
+    def allocation_fits_in_wished_periods(self, day: int, begin: datetime.time, end: datetime.time) -> bool:
+        """
+        Check if allocation can be made on the given day and time period
+        to the wished days and time periods of schedules in this queryset.
+        """
+        time_periods = list(self.filter(day=day).order_by("begin").values("begin", "end"))
+        merged_periods = self.merge_periods(time_periods, begin_key="begin", end_key="end")
+
+        for period in merged_periods:  # noqa: SIM110
+            # If the allocated period fits in any of the merged periods, it can be allocated.
+            if begin >= period["begin"] and end <= period["end"]:
+                return True
+        # Otherwise it cannot be allocated.
+        return False
+
+    def has_overlapping_allocations(self, day: int, begin: datetime.time, end: datetime.time) -> bool:
+        """Does this queryset have any approved schedules that overlap with the given day and time period?"""
+        time_periods = list(
+            self.filter(allocated_day=day)
+            .exclude(allocated_begin__isnull=True, allocated_end__isnull=True)
+            .order_by("allocated_begin")
+            .values("allocated_begin", "allocated_end")
+        )
+        merged_periods = self.merge_periods(time_periods, begin_key="allocated_begin", end_key="allocated_end")
+
+        for period in merged_periods:  # noqa: SIM110
+            # If the allocated period overlaps with any of the merged periods, it cannot be allocated.
+            if period["allocated_end"] > begin and period["allocated_begin"] < end:
+                return True
+        # Otherwise, it can be allocated.
+        return False

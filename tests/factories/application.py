@@ -1,12 +1,15 @@
+import datetime
 from collections.abc import Iterable
+from datetime import timedelta
 from typing import Any
 
 import factory
-from django.utils.timezone import now
+from django.utils.timezone import get_default_timezone, now
 from factory import fuzzy
 
-from applications.choices import ApplicantTypeChoice, ApplicationStatusChoice
-from applications.models import Application, ApplicationEvent
+from applications.choices import ApplicantTypeChoice, ApplicationStatusChoice, PriorityChoice, WeekdayChoice
+from applications.models import Application, ApplicationEvent, ApplicationRound
+from reservation_units.models import ReservationUnit
 
 from ._base import GenericDjangoModelFactory
 
@@ -191,6 +194,77 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
         """Create a cancelled application."""
         kwargs.setdefault("cancelled_date", now())
         return cls.create(**kwargs)
+
+    @classmethod
+    def create_application_ready_for_allocation(
+        cls,
+        application_round: ApplicationRound | None = None,
+        reservation_unit: ReservationUnit | None = None,
+        *,
+        events_per_week: int = 2,
+        schedules_to_create: int = 2,
+        min_duration_hours: int = 1,
+        max_duration_hours: int = 2,
+        pre_allocated: bool = False,
+    ) -> Application:
+        """
+        Create an application with a single application event in an application round in the allocation stage.
+        - The application round has a single reservation unit.
+        - The same reservation unit is included in the application event's event reservation units.
+        - By default, the application has 2 schedules from 10:00-14:00 (Monday & Tuesday).
+        - By default, the application event can have 2 events per week.
+        - By default, the application event has a minimum duration of 1 hour and a maximum duration of 2 hours.
+        """
+        from .application_event import ApplicationEventFactory
+        from .application_event_schedule import ApplicationEventScheduleFactory
+        from .application_round import ApplicationRoundFactory
+        from .reservation_unit import ReservationUnitFactory
+        from .space import SpaceFactory
+
+        if reservation_unit is None:
+            reservation_unit = ReservationUnitFactory.create(spaces=[SpaceFactory.create()])
+
+        if application_round is None:
+            application_round = ApplicationRoundFactory.create_in_status_in_allocation(
+                reservation_units=[reservation_unit],
+            )
+
+        this_moment = now()
+        application = cls.create(
+            cancelled_date=None,
+            sent_date=this_moment - timedelta(days=2),
+            application_round=application_round,
+        )
+        application_event = ApplicationEventFactory.create(
+            application=application,
+            event_reservation_units__reservation_unit=reservation_unit,
+            events_per_week=events_per_week,
+            min_duration=datetime.timedelta(hours=min_duration_hours),
+            max_duration=datetime.timedelta(hours=max_duration_hours),
+            begin=this_moment.date(),
+            end=(this_moment + datetime.timedelta(days=7)).date(),
+        )
+
+        weekdays = iter(WeekdayChoice.values)
+        schedules_to_create = min(schedules_to_create, 7)
+        while schedules_to_create > 0:
+            day = next(weekdays)
+            ApplicationEventScheduleFactory.create(
+                application_event=application_event,
+                day=day,
+                begin=datetime.time(10, 0, tzinfo=get_default_timezone()),
+                end=datetime.time(14, 0, tzinfo=get_default_timezone()),
+                priority=PriorityChoice.HIGH,
+                allocated_day=day if pre_allocated else None,
+                allocated_begin=datetime.time(10, 0, tzinfo=get_default_timezone()) if pre_allocated else None,
+                allocated_end=(
+                    datetime.time(10 + max_duration_hours, 0, tzinfo=get_default_timezone()) if pre_allocated else None
+                ),
+                allocated_reservation_unit=reservation_unit if pre_allocated else None,
+            )
+            schedules_to_create -= 1
+
+        return application
 
     @factory.post_generation
     def application_events(

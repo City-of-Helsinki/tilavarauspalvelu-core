@@ -26,5 +26,5 @@ class ApplicationEventActions:
             raise ValidationError(_(f"Cannot create reservations for event based on its status: '{status.value}'"))
 
         schedule: "ApplicationEventSchedule"
-        for schedule in self.application_event.application_event_schedules.all().allocated():
+        for schedule in self.application_event.application_event_schedules.all().accepted():
             schedule.actions.create_reservation_for_schedule()

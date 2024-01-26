@@ -31,6 +31,7 @@ __all__ = [
     "timedelta_to_json",
     "timedelta_from_json",
     "time_as_timedelta",
+    "time_difference",
 ]
 
 
@@ -236,3 +237,12 @@ def time_as_timedelta(_input: datetime.datetime | datetime.time, /) -> datetime.
         seconds=_input.second,
         microseconds=_input.microsecond,
     )
+
+
+def time_difference(
+    _input_1: datetime.datetime | datetime.time,
+    _input_2: datetime.datetime | datetime.time,
+    /,
+) -> datetime.timedelta:
+    """Difference between two datetimes/times as timedelta."""
+    return time_as_timedelta(_input_1) - time_as_timedelta(_input_2)
