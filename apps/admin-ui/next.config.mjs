@@ -94,14 +94,21 @@ const config = {
 
 const nextConfig = withBundleAnalyzer(config);
 
-const sentryWebpackPluginOptions = {
-  hideSourceMaps: true,
-  dryRun: env.SENTRY_AUTH_TOKEN === undefined,
-  silent: true,
-};
+export default withSentryConfig(nextConfig, {
+  // For all available options, see:
+  // https://github.com/getsentry/sentry-webpack-plugin#options
+  org: "city-of-helsinki",
+  project: "tilavaraus-admin-ui",
+  sentryUrl: "https://sentry.test.hel.ninja/",
+  authToken: env.SENTRY_AUTH_TOKEN,
+  // Only print logs for uploading source maps in CI
+  silent: !process.env.CI,
+  // For all available options, see:
+  // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 
-// Make sure adding Sentry options is the last code to run before exporting, to
-// ensure that your source maps include changes from all other Webpack plugins
-export default env.SENTRY_ENVIRONMENT
-  ? withSentryConfig(nextConfig, sentryWebpackPluginOptions)
-  : nextConfig;
+  // Hides source maps from generated client bundles
+  hideSourceMaps: true,
+
+  // Automatically tree-shake Sentry logger statements to reduce bundle size
+  disableLogger: true,
+});

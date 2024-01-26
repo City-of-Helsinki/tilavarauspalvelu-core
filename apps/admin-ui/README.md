@@ -14,6 +14,9 @@ cp .env.example .env.local
 | NEXT_PUBLIC_BASE_URL                | The baseUrl to use usually /kasittely                         |
 | TILAVARAUS_API_URL                  | tilavaraus-core base url                                      |
 | RESERVATION_UNIT_PREVIEW_URL_PREFIX | https://tilavaraus.dev.hel.ninja/reservation-unit             |
+| SENTRY_DSN                          | Sentry dsn                                                    |
+| SENTRY_ENVIRONMENT                  | Sentry environment, for example 'test', 'prod'                |
+| SENTRY_AUTH_TOKEN                   | auth token for sentry cli                                     |
 
 `TILAVARAUS_API_URL` is required to be set because the node server doing SSR can't connect to the backend without it.
 Unlike a pure browser bundle even if they are running on the same host, the SSR is a separate server behind a reverse proxy.

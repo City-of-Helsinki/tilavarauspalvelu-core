@@ -27,6 +27,8 @@ const ServerSchema = z.object({
 // and the same build image will be deployed to all environments
 const ClientSchema = z.object({
   NEXT_PUBLIC_BASE_URL: z.string(),
+  NEXT_PUBLIC_SOURCE_BRANCH_NAME: z.string().optional(),
+  NEXT_PUBLIC_SOURCE_VERSION: z.string().optional(),
 });
 
 function createEnv() {
@@ -48,6 +50,8 @@ function createEnv() {
   // NOTE NextJs does substitutions for process.env. Not using the full variable breaks it!
   const clientConfig = clientSchema.safeParse({
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
+    NEXT_PUBLIC_SOURCE_BRANCH_NAME: process.env.NEXT_PUBLIC_SOURCE_BRANCH_NAME,
+    NEXT_PUBLIC_SOURCE_VERSION: process.env.NEXT_PUBLIC_SOURCE_VERSION,
   });
 
   if (!clientConfig.success) {

@@ -13,6 +13,7 @@ interface Props {
   apiBaseUrl: string;
   profileLink: string;
   feedbackUrl: string;
+  version: string;
 }
 
 const Main = styled.main<{ $bgColor?: string }>`
@@ -27,11 +28,13 @@ function PageWrapper({
   feedbackUrl,
   children,
   overrideBackgroundColor,
+  version,
 }: Props): JSX.Element {
   return (
     <>
       <Head>
         <title>Tilavarauspalvelu</title>
+        <meta name="version" content={version} />
       </Head>
       <Navigation apiBaseUrl={apiBaseUrl} profileLink={profileLink} />
       <BannerNotificationsList

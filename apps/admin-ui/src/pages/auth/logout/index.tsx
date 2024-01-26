@@ -2,14 +2,15 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import ClientOnly from "common/src/ClientOnly";
-import KorosHeading, { Heading } from "app/component/KorosHeading";
-import { HERO_IMAGE_URL } from "app/common/const";
-import Footer from "app/component/Footer";
-import Navigation from "app/component/Navigation";
-import { env } from "app/env.mjs";
+import KorosHeading, { Heading } from "@/component/KorosHeading";
+import { HERO_IMAGE_URL } from "@/common/const";
+import Footer from "@/component/Footer";
+import Navigation from "@/component/Navigation";
+import { env } from "@/env.mjs";
 import BaseLayout from "../../layout";
 // NOTE not using App.tsx so need to import i18n here also
-import "app/i18n";
+import "@/i18n";
+import { getVersion } from "@/helpers/serverUtils";
 
 // TODO move these to a common layout (PageWrapper, copies from)
 const Wrapper = styled.main`
@@ -29,18 +30,21 @@ const Ingress = styled.p`
   flex-grow: 1;
 `;
 
-const Layout = ({ children }: { children: React.ReactNode }) => (
-  <BaseLayout>
-    <Wrapper>{children}</Wrapper>
-  </BaseLayout>
-);
+function Layout(props: { children: React.ReactNode } & Pick<Props, "version">) {
+  const { children, version } = props;
+  return (
+    <BaseLayout version={version}>
+      <Wrapper>{children}</Wrapper>
+    </BaseLayout>
+  );
+}
 
-function LogoutPage({ apiBaseUrl, logoutUrl }: Props) {
+function LogoutPage({ apiBaseUrl, logoutUrl, version }: Props) {
   const { t } = useTranslation(["common", "logout"]);
 
   // Can't use SSR because of translations
   return (
-    <Layout>
+    <Layout version={version}>
       <ClientOnly>
         <Navigation disabledRouter apiBaseUrl={apiBaseUrl} />
         <KorosHeading heroImage={HERO_IMAGE_URL}>
@@ -58,17 +62,18 @@ function LogoutPage({ apiBaseUrl, logoutUrl }: Props) {
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
-export const getServerSideProps = async () => {
+export async function getServerSideProps() {
   const logoutUrl = env.TUNNISTAMO_URL ? `${env.TUNNISTAMO_URL}/logout/` : "";
   const apiBaseUrl = env.TILAVARAUS_API_URL ?? "";
   return {
     props: {
       logoutUrl,
       apiBaseUrl,
+      version: getVersion(),
       // TODO can't use SSR translations because our translations aren't in public folder
       // ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
-};
+}
 
 export default LogoutPage;

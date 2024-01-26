@@ -32,7 +32,7 @@
     "@n8tb1t/use-scroll-position": "^2.0.3",
     "@next/bundle-analyzer": "^14.2.3",
     "@next/eslint-plugin-next": "^14.2.3",
-    "@sentry/nextjs": "^7.109.0",
+    "@sentry/nextjs": "^8.13.0",
     "apollo-upload-client": "17.0.0",
     "classnames": "^2.5.1",
     "common": "workspace:*",

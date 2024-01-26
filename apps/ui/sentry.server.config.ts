@@ -1,18 +1,20 @@
 // This file configures the initialization of Sentry on the server.
 // The config you add here will be used whenever the server handles a request.
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
-
 import * as Sentry from "@sentry/nextjs";
+import { env } from "@/env.mjs";
+import { getVersion } from "@/modules/serverUtils";
 
-const SENTRY_DSN = process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN;
-const SENTRY_ENVIRONMENT =
-  process.env.SENTRY_ENVIRONMENT || process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT;
-const VERSION = process.env.npm_package_version;
+const { SENTRY_DSN, SENTRY_ENVIRONMENT } = env;
+const VERSION = getVersion();
+const APP_NAME = "tilavarauspalvelu-ui";
 
-SENTRY_DSN &&
-  SENTRY_ENVIRONMENT &&
+if (SENTRY_DSN) {
   Sentry.init({
     dsn: SENTRY_DSN,
     environment: SENTRY_ENVIRONMENT,
-    release: `tilavarauspalvelu-ui@${VERSION}`,
+    release: `${APP_NAME}@${VERSION}`,
+    tracesSampleRate: 0.2,
+    debug: false,
   });
+}

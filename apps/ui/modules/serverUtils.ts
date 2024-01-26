@@ -8,6 +8,14 @@ import {
 } from "@gql/gql-types";
 import { genericTermsVariant } from "./const";
 
+export function getVersion(): string {
+  return (
+    env.NEXT_PUBLIC_SOURCE_BRANCH_NAME?.replace("main", "") ||
+    env.NEXT_PUBLIC_SOURCE_VERSION?.slice(0, 8) ||
+    "local"
+  );
+}
+
 export function getCommonServerSideProps() {
   // NOTE don't return undefined here, it breaks JSON.stringify used by getServerSideProps
   // use null or default value instead
@@ -17,6 +25,9 @@ export function getCommonServerSideProps() {
   const profileLink = env.PROFILE_UI_URL ?? "";
   const apiBaseUrl = env.TILAVARAUS_API_URL ?? "";
   const feedbackUrl = env.EMAIL_VARAAMO_EXT_LINK ?? "";
+  const sentryDsn = env.SENTRY_DSN ?? "";
+  const sentryEnvironment = env.SENTRY_ENVIRONMENT ?? "";
+  const version = getVersion();
 
   return {
     cookiehubEnabled,
@@ -25,6 +36,9 @@ export function getCommonServerSideProps() {
     profileLink,
     apiBaseUrl,
     feedbackUrl,
+    sentryDsn,
+    sentryEnvironment,
+    version,
   };
 }
 
