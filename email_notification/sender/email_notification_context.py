@@ -121,11 +121,10 @@ class EmailNotificationContext:
         context.reservation_number = reservation.id
 
         res_unit = reservation.reservation_unit.filter(unit__isnull=False).first()
-        if res_unit is not None:
-            context.unit_name = get_attr_by_language(res_unit.unit, "name", language)
+        context.unit_name = get_attr_by_language(res_unit.unit, "name", language) or ""
 
         location: Location | None = getattr(res_unit.unit, "location", None)
-        context.unit_location = str(location) if location is not None else None
+        context.unit_location = str(location) if location is not None else ""
 
         context.reservation_unit_name = ", ".join(
             [get_attr_by_language(ru, "name", language) for ru in reservation.reservation_unit.all()]
