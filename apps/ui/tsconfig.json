@@ -32,11 +32,5 @@
     // ignore tests till this is added to all test files
     // import {expect, jest, test} from '@jest/globals';
     // "**/*.spec.ts",
-    // Cypress breaks jest expect types
-    "cypress.config.ts",
-    "cypress/**/*"
-    // "**/*.test.ts",
-    // "**/*.spec.tsx",
-    // "**/*.test.tsx"
   ]
 }

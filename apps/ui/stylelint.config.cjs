@@ -3,7 +3,6 @@ module.exports ={
   customSyntax: "postcss-styled-syntax",
   ignore: [
     "hooks",
-    "cypress"
   ],
   rules: {
     // temp rules after upgrade
