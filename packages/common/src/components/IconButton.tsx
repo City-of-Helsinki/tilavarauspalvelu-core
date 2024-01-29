@@ -72,20 +72,28 @@ const StyledLinkButton = styled.button`
   }
 `;
 
+/* allow disabled links */
 const Anchor = styled.a`
-  color: var(--color-black) !important;
+  && {
+    color: var(--color-black-30);
+    cursor: default;
+    &:link {
+      color: var(--color-black);
+      cursor: pointer;
+    }
+  }
 `;
 
-const HoverWrapper = styled.div`
+const HoverWrapper = styled.div<{ $disabled?: boolean }>`
   display: flex;
   gap: var(--spacing-xs);
   padding-bottom: var(--spacing-3-xs);
   border-bottom: 1px solid transparent;
   align-items: center;
-  cursor: pointer;
   ${focusStyles}
+  ${({ $disabled }) => $disabled && "pointer-events: none;"}
   &:hover {
-    border-color: var(--color-black-30);
+    ${({ $disabled }) => !$disabled && "border-color: var(--color-black-30);"}
   }
   &:active {
     border-width: 2px;
@@ -109,12 +117,14 @@ const IconContainer = styled.div`
 const LinkElement = ({
   label,
   icon,
+  disabled,
 }: {
   label: string;
   icon: React.ReactNode;
+  disabled?: boolean;
 }) => (
   <Container>
-    <HoverWrapper>
+    <HoverWrapper $disabled={disabled}>
       <Label>{label}</Label>
       {icon && <IconContainer>{icon}</IconContainer>}
     </HoverWrapper>
@@ -126,16 +136,32 @@ type LinkWrapperProps = {
   icon: React.ReactNode;
   href: string;
 };
-const LinkWrapper = ({ label, icon, href, ...rest }: LinkWrapperProps) =>
-  href.startsWith("http") ? (
+
+const LinkWrapper = ({ label, icon, href, ...rest }: LinkWrapperProps) => {
+  const isExternal = href.startsWith("http");
+
+  // next/link doesn't work with empty hrefs
+  if (href === "") {
+    return (
+      <Anchor {...rest}>
+        <LinkElement label={label} icon={icon} disabled />
+      </Anchor>
+    );
+  }
+  if (isExternal) {
+    return (
+      <Anchor {...rest} href={href}>
+        <LinkElement label={label} icon={icon} />
+      </Anchor>
+    );
+  }
+  return (
     <StyledLink {...rest} href={href}>
       <LinkElement label={label} icon={icon} />
     </StyledLink>
-  ) : (
-    <Anchor {...rest} href={href}>
-      <LinkElement label={label} icon={icon} />
-    </Anchor>
   );
+};
+
 /*
  *  @param {string} label - the button label text (required)
  *  @param {React.ReactNode} icon - an HDS-icon element (required)
@@ -157,7 +183,7 @@ const IconButton = ({
     href,
     target: openInNewTab ? "_blank" : undefined,
     rel: openInNewTab ? "noopener noreferrer" : undefined,
-    role: openInNewTab ? "link" : "button",
+    // role: openInNewTab ? "link" : "button",
     ...rest,
   };
 
@@ -169,4 +195,5 @@ const IconButton = ({
     <LinkWrapper {...linkOptions} href={href} label={label} icon={icon} />
   );
 };
+
 export default IconButton;
