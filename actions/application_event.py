@@ -65,7 +65,7 @@ class ApplicationEventActions:
                 application_event_schedules__allocated_reservation_unit__isnull=False,
                 application_event_schedules__allocated_reservation_unit__id__in=models.F("_affecting_ids"),
                 # Allocation period overlaps with this event's period.
-                application_event_schedules__application_event__begin__lt=self.application_event.end,
-                application_event_schedules__application_event__end__gt=self.application_event.begin,
+                application_event_schedules__application_event__begin__lte=self.application_event.end,
+                application_event_schedules__application_event__end__gte=self.application_event.begin,
             )
         )
