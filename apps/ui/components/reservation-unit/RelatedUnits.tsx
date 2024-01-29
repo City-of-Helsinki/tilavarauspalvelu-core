@@ -9,7 +9,11 @@ import { useMedia } from "react-use";
 import { breakpoints } from "common/src/common/style";
 import { ReservationUnitType } from "common/types/gql-types";
 import { reservationUnitPath } from "../../modules/const";
-import { getMainImage, getTranslation } from "../../modules/util";
+import {
+  getImageSource,
+  getMainImage,
+  getTranslation,
+} from "../../modules/util";
 import IconWithText from "../common/IconWithText";
 import Carousel from "../Carousel";
 import {
@@ -126,15 +130,10 @@ const RelatedUnits = ({ units }: PropsType): JSX.Element | null => {
               ? getTranslation(unit.reservationUnitType, "name")
               : undefined;
           const img = getMainImage(unit);
+          const imgSrc = getImageSource(img, "medium");
           return (
             <Unit key={unit.pk}>
-              {img?.mediumUrl != null && (
-                <Image
-                  src={img.mediumUrl}
-                  alt={name}
-                  style={{ marginTop: 0 }}
-                />
-              )}
+              <Image src={imgSrc} alt={name} style={{ marginTop: 0 }} />
               <Content>
                 {unit.pk != null ? (
                   <Link href={reservationUnitPath(unit.pk)}>

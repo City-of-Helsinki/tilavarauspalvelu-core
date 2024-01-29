@@ -12,11 +12,11 @@ import {
 } from "common/types/gql-types";
 import {
   capitalize,
+  getImageSource,
   getMainImage,
   getTranslation,
   reservationsUrl,
 } from "@/modules/util";
-import { pixel } from "@/styles/util";
 import {
   canUserCancelReservation,
   getNormalizedReservationOrderStatus,
@@ -234,7 +234,7 @@ const ReservationCard = ({ reservation, type }: PropsT): JSX.Element => {
 
   const name = reservationUnit ? getTranslation(reservationUnit, "name") : "-";
   const img = getMainImage(reservationUnit);
-  const imgSrc = img?.mediumUrl || img?.imageUrl || pixel;
+  const imgSrc = getImageSource(img, "medium");
 
   return (
     <Container data-testid="reservation-card__container">

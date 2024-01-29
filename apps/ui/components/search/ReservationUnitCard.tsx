@@ -12,9 +12,9 @@ import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { H5, fontMedium } from "common/src/common/typography";
 import { ReservationUnitType } from "common/types/gql-types";
-import { getMainImage, getTranslation } from "@/modules/util";
+import { getImageSource, getMainImage, getTranslation } from "@/modules/util";
 import IconWithText from "@/components/common/IconWithText";
-import { pixel, truncatedText } from "@/styles/util";
+import { truncatedText } from "@/styles/util";
 import { reservationUnitPrefix } from "@/modules/const";
 import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
 
@@ -169,7 +169,7 @@ const ReservationUnitCard = ({
       : undefined;
 
   const img = getMainImage(reservationUnit);
-  const imgSrc = img?.smallUrl || img?.imageUrl || pixel;
+  const imgSrc = getImageSource(img, "small");
 
   return (
     <Container>

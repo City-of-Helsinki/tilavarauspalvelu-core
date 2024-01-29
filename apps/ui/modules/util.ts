@@ -3,6 +3,7 @@ import { i18n, TFunction } from "next-i18next";
 import queryString from "query-string";
 import { trim } from "lodash";
 import { ApolloError } from "@apollo/client";
+import { pixel } from "@/styles/util";
 import {
   toApiDate,
   toUIDate,
@@ -359,3 +360,35 @@ export const getPostLoginUrl = () => {
   params.set("isPostLogin", "true");
   return `${origin}${pathname}?${params.toString()}`;
 };
+
+/// Always return an image because the Design and process should not allow imageless reservation units
+/// On production returns the cached medium image url
+/// On development we don't have image cache so we return the full image url
+/// If image is null or undefined returns a static pixel
+export function getImageSource(
+  image: ReservationUnitImageType | null,
+  size: "small" | "large" | "medium" | "full" = "medium"
+): string {
+  if (!image) {
+    return pixel;
+  }
+  return getImageSourceWithoutDefault(image, size) || image?.imageUrl || pixel;
+}
+
+function getImageSourceWithoutDefault(
+  image: ReservationUnitImageType,
+  size: "small" | "large" | "medium" | "full"
+): string | null {
+  switch (size) {
+    case "small":
+      return image.smallUrl ?? null;
+    case "large":
+      return image.largeUrl ?? null;
+    case "medium":
+      return image.mediumUrl ?? null;
+    case "full":
+      return image.imageUrl ?? null;
+    default:
+      return null;
+  }
+}

@@ -11,7 +11,11 @@ import styled from "styled-components";
 import { fontBold, H6 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { ReservationUnitType } from "common/types/gql-types";
-import { getMainImage, getTranslation } from "../../modules/util";
+import {
+  getImageSource,
+  getMainImage,
+  getTranslation,
+} from "../../modules/util";
 import { MediumButton } from "../../styles/util";
 import { getReservationUnitName } from "../../modules/reservationUnit";
 
@@ -175,9 +179,12 @@ const ReservationUnitCard = ({
 }: Props): JSX.Element => {
   const { t } = useTranslation();
 
-  const mainImageSrc = getMainImage(reservationUnit)?.mediumUrl ?? undefined;
   const { unit } = reservationUnit;
   const unitName = unit ? getTranslation(unit, "name") : "-";
+
+  const img = getMainImage(reservationUnit);
+  const imgSrc = getImageSource(img, "medium");
+
   return (
     <NameCardContainer>
       <PreCardLabel>
@@ -190,7 +197,7 @@ const ReservationUnitCard = ({
       ) : null}
       <CardButtonContainer>
         <CardContainer>
-          <ImageCell $src={mainImageSrc} />
+          <ImageCell $src={imgSrc} />
           <ExtraPaddedCell>
             <Name>{getReservationUnitName(reservationUnit)}</Name>
             <UnitName>{unitName}</UnitName>

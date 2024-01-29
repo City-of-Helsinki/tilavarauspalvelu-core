@@ -24,8 +24,13 @@ import {
 } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { reservationUnitPath } from "@/modules/const";
-import { getAddressAlt, getMainImage, getTranslation } from "@/modules/util";
-import { MediumButton, pixel } from "@/styles/util";
+import {
+  getAddressAlt,
+  getImageSource,
+  getMainImage,
+  getTranslation,
+} from "@/modules/util";
+import { MediumButton } from "@/styles/util";
 import { RESERVATION_UNITS } from "@/modules/queries/reservationUnit";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
@@ -145,7 +150,7 @@ const ReservationUnitCard = ({
   const buttonText = isSelected
     ? t("reservationUnitModal:unSelectReservationUnit")
     : t("reservationUnitModal:selectReservationUnit");
-  const reservationUnitName = getReservationUnitName(reservationUnit);
+  const name = getReservationUnitName(reservationUnit);
   const reservationUnitTypeName = reservationUnit.reservationUnitType
     ? getTranslation(reservationUnit.reservationUnitType, "name")
     : undefined;
@@ -153,14 +158,14 @@ const ReservationUnitCard = ({
     ? getUnitName(reservationUnit.unit)
     : undefined;
 
+  const img = getMainImage(reservationUnit);
+  const imgSrc = getImageSource(img, "small");
+
   return (
     <Container>
-      <Image
-        alt={reservationUnitName}
-        src={getMainImage(reservationUnit)?.smallUrl || pixel}
-      />
+      <Image alt={name} src={imgSrc} />
       <Main>
-        <Name>{reservationUnitName}</Name>
+        <Name>{name}</Name>
         <Unit>{unitName}</Unit>
         <Link
           // TODO link should be disabled if no pk

@@ -9,9 +9,9 @@ import { breakpoints } from "common/src/common/style";
 import { ReservationUnitType } from "common/types/gql-types";
 import { format, isToday, isTomorrow } from "date-fns";
 import { toUIDate } from "common/src/common/util";
-import { getMainImage, getTranslation } from "@/modules/util";
+import { getImageSource, getMainImage, getTranslation } from "@/modules/util";
 import IconWithText from "../common/IconWithText";
-import { pixel, truncatedText } from "@/styles/util";
+import { truncatedText } from "@/styles/util";
 import {
   getActivePricing,
   getPrice,
@@ -237,7 +237,7 @@ const ReservationUnitCard = ({ reservationUnit }: PropsT): JSX.Element => {
       : undefined;
 
   const img = getMainImage(reservationUnit);
-  const imgSrc = img?.smallUrl || img?.imageUrl || pixel;
+  const imgSrc = getImageSource(img, "small");
 
   return (
     <Container>

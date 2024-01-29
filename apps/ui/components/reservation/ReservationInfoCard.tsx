@@ -17,6 +17,7 @@ import { getReservationUnitPrice } from "@/modules/reservationUnit";
 import {
   capitalize,
   formatDurationMinutes,
+  getImageSource,
   getMainImage,
   getTranslation,
 } from "@/modules/util";
@@ -115,13 +116,17 @@ const ReservationInfoCard = ({
     }${endTime}`,
     " - "
   );
+  const formatters = useMemo(
+    () => getFormatters(i18n.language),
+    [i18n.language]
+  );
 
-  const mainImage =
-    reservationUnit != null ? getMainImage(reservationUnit) : null;
+  if (!reservation || !reservationUnit) {
+    return null;
+  }
 
   const price: string | undefined =
     begin &&
-    reservationUnit != null &&
     (reservation?.state === "REQUIRES_HANDLING" ||
       shouldDisplayReservationUnitPrice)
       ? getReservationUnitPrice({
@@ -138,9 +143,7 @@ const ReservationInfoCard = ({
         );
 
   const shouldDisplayTaxPercentage: boolean =
-    reservationUnit != null &&
-    reservation?.state === "REQUIRES_HANDLING" &&
-    begin
+    reservation.state === "REQUIRES_HANDLING" && begin
       ? getReservationUnitPrice({
           reservationUnit,
           pricingDate: new Date(begin),
@@ -149,28 +152,20 @@ const ReservationInfoCard = ({
         }) !== "0"
       : Number(reservation?.price) > 0;
 
-  const formatters = useMemo(
-    () => getFormatters(i18n.language),
-    [i18n.language]
-  );
-
-  if (!reservation || !reservationUnit) return null;
+  const name = getTranslation(reservationUnit, "name");
+  const img = getMainImage(reservationUnit);
+  const imgSrc = getImageSource(img, "medium");
 
   return (
     <Wrapper $type={type}>
-      {mainImage?.mediumUrl && (
-        <MainImage
-          src={mainImage?.mediumUrl}
-          alt={getTranslation(reservationUnit, "name")}
-        />
-      )}
+      <MainImage src={imgSrc} alt={name} />
       <Content data-testid="reservation__reservation-info-card__content">
         <Heading>
           <StyledLink
             data-testid="reservation__reservation-info-card__reservationUnit"
             href={reservationUnitPath(Number(reservationUnit.pk))}
           >
-            {getTranslation(reservationUnit, "name")}
+            {name}
           </StyledLink>
         </Heading>
         {["confirmed", "complete"].includes(type) && (
