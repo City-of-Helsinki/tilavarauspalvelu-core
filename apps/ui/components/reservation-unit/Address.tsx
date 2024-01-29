@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { H4 } from "common/src/common/typography";
-import type { LocationType, UnitType } from "common/types/gql-types";
+import type { LocationType, Maybe, UnitType } from "common/types/gql-types";
 import { IconLinkExternal } from "hds-react";
 import { IconButton } from "common/src/components";
 import type { ReservationUnitNode } from "common";
@@ -28,14 +28,30 @@ const Links = styled.div`
   font-family: var(--font-medium);
   font-weight: 500;
 
+  display: flex;
+  flex-direction: column;
+
+  /* IconButton includes too much padding */
+  gap: var(--spacing-xs);
+  && > * > * {
+    margin: 0;
+  }
+
   a {
     color: var(--color-black-90);
   }
 `;
 
-const hslUrl = (locale: string, location: LocationType): string | undefined => {
+/// Common type for url constructors
+/// Always returns a string, but can be empty => empty url is rendered as a disabled link
+type UrlReturn = string;
+
+function createHslUrl(
+  locale: string,
+  location?: Maybe<LocationType>
+): UrlReturn {
   if (!location) {
-    return undefined;
+    return "";
   }
 
   const addressStreet =
@@ -48,14 +64,14 @@ const hslUrl = (locale: string, location: LocationType): string | undefined => {
     : "-";
 
   return `https://reittiopas.hsl.fi/reitti/-/${destination}/?locale=${locale}`;
-};
+}
 
-const googleUrl = (
+function createGoogleUrl(
   locale: string,
-  location?: LocationType
-): string | undefined => {
+  location?: Maybe<LocationType>
+): UrlReturn {
   if (!location) {
-    return undefined;
+    return "";
   }
 
   const addressStreet =
@@ -68,28 +84,28 @@ const googleUrl = (
     : "";
 
   return `https://www.google.com/maps/dir/?api=1&hl=${locale}&destination=${destination}`;
-};
+}
 
-const mapUrl = (locale: string, unit: UnitType): string | undefined => {
+function createMapUrl(locale: string, unit?: Maybe<UnitType>): string {
   if (!unit?.tprekId) {
-    return undefined;
+    return "";
   }
 
   return `https://palvelukartta.hel.fi/${locale}/unit/${unit.tprekId}`;
-};
+}
 
-const accessibilityUrl = (
+function createAccessibilityUrl(
   locale: string,
-  unit?: UnitType
-): string | undefined => {
+  unit?: Maybe<UnitType>
+): UrlReturn {
   if (!unit?.tprekId) {
-    return undefined;
+    return "";
   }
 
   return `https://palvelukartta.hel.fi/${locale}/unit/${unit.tprekId}?p=1&t=accessibilityDetails`;
-};
+}
 
-const Address = ({ reservationUnit }: Props): JSX.Element => {
+export function AddressSection({ reservationUnit }: Props): JSX.Element {
   const { t, i18n } = useTranslation();
 
   const location = reservationUnit.unit?.location;
@@ -100,9 +116,13 @@ const Address = ({ reservationUnit }: Props): JSX.Element => {
     (location && getTranslation(location, "addressCity")) ||
     location?.addressCityFi;
 
-  if (!location || !addressStreet || !addressCity) {
-    return <div />;
-  }
+  const unitMapUrl = createMapUrl(i18n.language, reservationUnit?.unit);
+  const googleUrl = createGoogleUrl(i18n.language, location);
+  const hslUrl = createHslUrl(i18n.language, location);
+  const accessibilityUrl = createAccessibilityUrl(
+    i18n.language,
+    reservationUnit.unit
+  );
 
   return (
     <Container data-testid="reservation-unit__address--container">
@@ -113,35 +133,26 @@ const Address = ({ reservationUnit }: Props): JSX.Element => {
       )}
       <Links>
         <IconButton
-          href={
-            reservationUnit?.unit
-              ? mapUrl(i18n.language, reservationUnit?.unit)
-              : undefined
-          }
+          href={unitMapUrl}
           label={t("reservationUnit:linkMap")}
           icon={<IconLinkExternal aria-hidden />}
         />
         <IconButton
-          href={googleUrl(i18n.language, location)}
+          href={googleUrl}
           label={t("reservationUnit:linkGoogle")}
           icon={<IconLinkExternal aria-hidden />}
         />
         <IconButton
-          href={hslUrl(i18n.language, location)}
+          href={hslUrl}
           label={t("reservationUnit:linkHSL")}
           icon={<IconLinkExternal aria-hidden />}
         />
         <IconButton
-          href={accessibilityUrl(
-            i18n.language,
-            reservationUnit.unit ?? undefined
-          )}
+          href={accessibilityUrl}
           label={t("reservationUnit:linkAccessibility")}
           icon={<IconLinkExternal aria-hidden />}
         />
       </Links>
     </Container>
   );
-};
-
-export default Address;
+}

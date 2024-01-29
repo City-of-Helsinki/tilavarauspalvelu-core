@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { useMedia } from "react-use";
-import Breadcrumb from "common/src/breadcrumb/Breadcrumb";
+import Breadcrumb, { RouteItem } from "common/src/breadcrumb/Breadcrumb";
 import { useTranslation } from "next-i18next";
 import { breakpoints } from "common/src/common/style";
 import Link, { LinkProps } from "next/link";
@@ -13,7 +13,7 @@ type Alias = {
 };
 
 type Props = {
-  route: string[];
+  route: Array<string | RouteItem>;
   aliases?: Alias[];
   className?: string;
 };
@@ -38,13 +38,17 @@ const BreadcrumbWrapper = ({
   const { t } = useTranslation();
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
 
-  const routes =
-    route.map((n) => ({
+  const routes = route.map((n) => {
+    if (typeof n === "object") {
+      return n;
+    }
+    return {
       title:
         aliases?.find((alias) => alias.slug === n)?.title ||
         t(`breadcrumb:${trim(n, "/")}`),
       ...(n.includes("/") && { slug: n }),
-    })) || [];
+    };
+  });
 
   return (
     <Wrapper>

@@ -58,7 +58,7 @@ import {
 } from "common/types/gql-types";
 import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
 import Head from "../../components/reservation-unit/Head";
-import Address from "../../components/reservation-unit/Address";
+import { AddressSection } from "../../components/reservation-unit/Address";
 import Sanitize from "../../components/common/Sanitize";
 import RelatedUnits from "../../components/reservation-unit/RelatedUnits";
 import { AccordionWithState as Accordion } from "../../components/common/Accordion";
@@ -987,7 +987,7 @@ const ReservationUnit = ({
               />
             )}
             <JustForDesktop customBreakpoint={breakpoints.l}>
-              <Address reservationUnit={reservationUnit} />
+              <AddressSection reservationUnit={reservationUnit} />
             </JustForDesktop>
           </div>
           <Left>
@@ -1173,7 +1173,7 @@ const ReservationUnit = ({
             {reservationUnit.unit?.location && (
               <Accordion heading={t("common:location")} theme="thin" open>
                 <JustForMobile customBreakpoint={breakpoints.l}>
-                  <Address reservationUnit={reservationUnit} />
+                  <AddressSection reservationUnit={reservationUnit} />
                 </JustForMobile>
                 <MapWrapper>
                   <Map

@@ -49,7 +49,7 @@ import {
 } from "@/modules/reservationUnit";
 import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
 import { ReservationStatus } from "@/components/reservation/ReservationStatus";
-import Address from "@/components/reservation-unit/Address";
+import { AddressSection } from "@/components/reservation-unit/Address";
 import ReservationInfoCard from "@/components/reservation/ReservationInfoCard";
 import { ReservationOrderStatus } from "@/components/reservation/ReservationOrderStatus";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
@@ -100,18 +100,18 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   };
 };
 
-const Spinner = styled(CenterSpinner)`
-  margin: var(--spacing-layout-xl) auto;
-`;
-
 const StyledBreadcrumbWrapper = styled(BreadcrumbWrapper)`
   padding: 0;
 `;
 
+// TODO not needed anymore? why would this be a thing any case?
+// in what world do we want to override the primary background color for a single page?
+// TODO can be removed completely?
 const Wrapper = styled.div`
-  background-color: var(--color-white);
+  /* background-color: var(--color-white); */
 `;
 
+// TODO this has margin issues on mobile, there is zero margin on top because some element (breadcrumbs?) is removed on mobile
 const Heading = styled(H2).attrs({ as: "h1" })`
   margin-top: 0;
   margin-bottom: var(--spacing-m);
@@ -148,6 +148,7 @@ const StatusContainer = styled.div`
   gap: var(--spacing-s);
 `;
 
+/* use empty liberally to remove empty elements that add spacing because of margins */
 const Actions = styled.div`
   &:empty {
     display: none;
@@ -169,6 +170,10 @@ const Actions = styled.div`
 `;
 
 const Reasons = styled.div`
+  &:empty {
+    display: none;
+  }
+
   display: flex;
   flex-direction: column;
   gap: var(--spacing-m);
@@ -182,6 +187,10 @@ const ReasonText = styled.div`
 `;
 
 const SecondaryActions = styled.div`
+  &:empty {
+    display: none;
+  }
+
   margin-top: var(--spacing-l);
   display: flex;
   gap: var(--spacing-m);
@@ -246,10 +255,10 @@ const Terms = styled.div`
 `;
 
 // TODO top margin is bad, refactor it (also every page should have the same space between Breadcrumb and Heading)
-const HeadingSection = styled.div`
+const PageContent = styled.div`
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: auto auto auto;
+  grid-template-rows: repeat(4, auto);
   grid-gap: var(--spacing-m);
   justify-content: space-between;
   margin-top: 0;
@@ -352,7 +361,7 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
     : null;
 
   if (loading || orderLoading) {
-    return <Spinner />;
+    return <CenterSpinner />;
   }
 
   if (!reservation || !reservationUnit) {
@@ -504,151 +513,150 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
   const isWaitingForPayment =
     reservation.state === ReservationsReservationStateChoices.WaitingForPayment;
 
+  const routes = [
+    {
+      slug: "/reservations",
+      title: t("breadcrumb:reservations"),
+    },
+    {
+      slug: "reservationName",
+      title: t("reservations:reservationName", { id: reservation.pk }),
+    },
+  ];
+
   return (
     <Wrapper>
       <Container>
-        <StyledBreadcrumbWrapper
-          route={["", "/reservations", "reservationName"]}
-          aliases={[
-            {
-              slug: "reservationName",
-              title: t("reservations:reservationName", { id: reservation.pk }),
-            },
-          ]}
-        />
-        <div data-testid="reservation__content">
-          <HeadingSection>
-            <div style={{ gridColumn: "1 / span 1", gridRow: "1 / span 1" }}>
-              <Heading data-testid="reservation__name">
-                {t("reservations:reservationName", { id: reservation.pk })}
-              </Heading>
-              <SubHeading>
-                <Link
-                  data-testid="reservation__reservation-unit"
-                  href={`${reservationUnitPath(reservationUnit.pk ?? 0)}`}
-                >
-                  {getReservationUnitName(reservationUnit)}
-                </Link>
-                <span data-testid="reservation__time">{timeString}</span>
-              </SubHeading>
-              <StatusContainer>
-                <ReservationStatus
-                  data-testid="reservation__status"
-                  state={reservation.state}
-                />
-                {normalizedOrderStatus && (
-                  <ReservationOrderStatus
-                    orderStatus={normalizedOrderStatus}
-                    data-testid="reservation__status"
-                  />
-                )}
-              </StatusContainer>
-            </div>
-            <div style={{ gridRowEnd: "span 2" }}>
-              <ReservationInfoCard
-                reservation={reservation}
-                reservationUnit={reservationUnit}
-                type="complete"
+        <StyledBreadcrumbWrapper route={routes} />
+        <PageContent data-testid="reservation__content">
+          <div style={{ gridColumn: "1 / span 1", gridRow: "1 / span 1" }}>
+            <Heading data-testid="reservation__name">
+              {t("reservations:reservationName", { id: reservation.pk })}
+            </Heading>
+            <SubHeading>
+              <Link
+                data-testid="reservation__reservation-unit"
+                href={`${reservationUnitPath(reservationUnit.pk ?? 0)}`}
+              >
+                {getReservationUnitName(reservationUnit)}
+              </Link>
+              <span data-testid="reservation__time">{timeString}</span>
+            </SubHeading>
+            <StatusContainer>
+              <ReservationStatus
+                data-testid="reservation__status"
+                state={reservation.state}
               />
-              <SecondaryActions>
-                {reservation.state ===
-                  ReservationsReservationStateChoices.Confirmed && (
+              {normalizedOrderStatus && (
+                <ReservationOrderStatus
+                  orderStatus={normalizedOrderStatus}
+                  data-testid="reservation__status"
+                />
+              )}
+            </StatusContainer>
+          </div>
+          <div style={{ gridRowEnd: "span 3" }}>
+            <ReservationInfoCard
+              reservation={reservation}
+              reservationUnit={reservationUnit}
+              type="complete"
+            />
+            <SecondaryActions>
+              {reservation.state ===
+                ReservationsReservationStateChoices.Confirmed && (
+                <BlackButton
+                  variant="secondary"
+                  iconRight={<IconCalendar aria-hidden />}
+                  disabled={!reservation.calendarUrl}
+                  data-testid="reservation__button--calendar-link"
+                  onClick={() => router.push(reservation.calendarUrl ?? "")}
+                >
+                  {t("reservations:saveToCalendar")}
+                </BlackButton>
+              )}
+              {order?.receiptUrl &&
+                // TODO enum comparison (not string)
+                ["PAID", "REFUNDED"].includes(order?.status ?? "") && (
                   <BlackButton
-                    variant="secondary"
-                    iconRight={<IconCalendar aria-hidden />}
-                    disabled={!reservation.calendarUrl}
-                    data-testid="reservation__button--calendar-link"
-                    onClick={() => router.push(reservation.calendarUrl ?? "")}
-                  >
-                    {t("reservations:saveToCalendar")}
-                  </BlackButton>
-                )}
-                {order?.receiptUrl &&
-                  // TODO enum comparison (not string)
-                  ["PAID", "REFUNDED"].includes(order?.status ?? "") && (
-                    <BlackButton
-                      data-testid="reservation__confirmation--button__receipt-link"
-                      onClick={() =>
-                        window.open(
-                          `${order.receiptUrl}&lang=${i18n.language}`,
-                          "_blank"
-                        )
-                      }
-                      variant="secondary"
-                      iconRight={<IconLinkExternal aria-hidden />}
-                    >
-                      {t("reservations:downloadReceipt")}
-                    </BlackButton>
-                  )}
-              </SecondaryActions>
-            </div>
-            <div>
-              <Actions>
-                {isWaitingForPayment && (
-                  <BlackButton
-                    variant="secondary"
-                    disabled={!hasCheckoutUrl}
-                    iconRight={<IconArrowRight aria-hidden />}
-                    onClick={() => {
-                      const url = getCheckoutUrl(order, i18n.language);
-                      if (url) router.push(url);
-                    }}
-                    data-testid="reservation-detail__button--checkout"
-                  >
-                    {t("reservations:payReservation")}
-                  </BlackButton>
-                )}
-                {canTimeBeModified && (
-                  <BlackButton
-                    variant="secondary"
-                    iconRight={<IconCalendar aria-hidden />}
-                    onClick={() => {
-                      router.push(`${reservationsUrl}${reservation.pk}/edit`);
-                    }}
-                    data-testid="reservation-detail__button--edit"
-                  >
-                    {t("reservations:modifyReservationTime")}
-                  </BlackButton>
-                )}
-                {isReservationCancellable && (
-                  <BlackButton
-                    variant="secondary"
-                    iconRight={<IconCross aria-hidden />}
+                    data-testid="reservation__confirmation--button__receipt-link"
                     onClick={() =>
-                      router.push(`${reservationsUrl}${reservation.pk}/cancel`)
+                      window.open(
+                        `${order.receiptUrl}&lang=${i18n.language}`,
+                        "_blank"
+                      )
                     }
-                    data-testid="reservation-detail__button--cancel"
+                    variant="secondary"
+                    iconRight={<IconLinkExternal aria-hidden />}
                   >
-                    {t(
-                      `reservations:cancel${
-                        isBeingHandled ? "Application" : "Reservation"
-                      }`
-                    )}
+                    {t("reservations:downloadReceipt")}
                   </BlackButton>
                 )}
-              </Actions>
-              <Reasons>
-                {modifyTimeReason && (
-                  <ReasonText>
-                    {t(`reservations:modifyTimeReasons:${modifyTimeReason}`)}
-                    {modifyTimeReason ===
-                      "RESERVATION_MODIFICATION_NOT_ALLOWED" &&
-                      isReservationCancellable &&
-                      ` ${t(
-                        "reservations:modifyTimeReasons:RESERVATION_MODIFICATION_NOT_ALLOWED_SUFFIX"
-                      )}`}
-                  </ReasonText>
-                )}
-                {cancellationReason && !modifyTimeReason && (
-                  <ReasonText>
-                    {t(
-                      `reservations:cancellationReasons:${cancellationReason}`
-                    )}
-                  </ReasonText>
-                )}
-              </Reasons>
-            </div>
-          </HeadingSection>
+            </SecondaryActions>
+          </div>
+          <div>
+            <Actions>
+              {isWaitingForPayment && (
+                <BlackButton
+                  variant="secondary"
+                  disabled={!hasCheckoutUrl}
+                  iconRight={<IconArrowRight aria-hidden />}
+                  onClick={() => {
+                    const url = getCheckoutUrl(order, i18n.language);
+                    if (url) router.push(url);
+                  }}
+                  data-testid="reservation-detail__button--checkout"
+                >
+                  {t("reservations:payReservation")}
+                </BlackButton>
+              )}
+              {canTimeBeModified && (
+                <BlackButton
+                  variant="secondary"
+                  iconRight={<IconCalendar aria-hidden />}
+                  onClick={() => {
+                    router.push(`${reservationsUrl}${reservation.pk}/edit`);
+                  }}
+                  data-testid="reservation-detail__button--edit"
+                >
+                  {t("reservations:modifyReservationTime")}
+                </BlackButton>
+              )}
+              {isReservationCancellable && (
+                <BlackButton
+                  variant="secondary"
+                  iconRight={<IconCross aria-hidden />}
+                  onClick={() =>
+                    router.push(`${reservationsUrl}${reservation.pk}/cancel`)
+                  }
+                  data-testid="reservation-detail__button--cancel"
+                >
+                  {t(
+                    `reservations:cancel${
+                      isBeingHandled ? "Application" : "Reservation"
+                    }`
+                  )}
+                </BlackButton>
+              )}
+            </Actions>
+            <Reasons>
+              {modifyTimeReason && (
+                <ReasonText>
+                  {t(`reservations:modifyTimeReasons:${modifyTimeReason}`)}
+                  {modifyTimeReason ===
+                    "RESERVATION_MODIFICATION_NOT_ALLOWED" &&
+                    isReservationCancellable &&
+                    ` ${t(
+                      "reservations:modifyTimeReasons:RESERVATION_MODIFICATION_NOT_ALLOWED_SUFFIX"
+                    )}`}
+                </ReasonText>
+              )}
+              {cancellationReason && !modifyTimeReason && (
+                <ReasonText>
+                  {t(`reservations:cancellationReasons:${cancellationReason}`)}
+                </ReasonText>
+              )}
+            </Reasons>
+          </div>
           <Content>
             {instructionsKey &&
               getTranslation(reservationUnit, instructionsKey) && (
@@ -724,9 +732,9 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
                 </AccordionContent>
               </Accordion>
             </Terms>
-            <Address reservationUnit={reservationUnit} />
+            <AddressSection reservationUnit={reservationUnit} />
           </Content>
-        </div>
+        </PageContent>
       </Container>
     </Wrapper>
   );
