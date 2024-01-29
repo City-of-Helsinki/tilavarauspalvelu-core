@@ -45,7 +45,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         assert self.get_builder()._get_begin_time() == "10:00"
 
     def test_get_begin_time_respects_timezone(self):
-        self.reservation.begin = datetime.datetime(2022, 2, 28, 23, 00, tzinfo=timezone.utc)
+        self.reservation.begin = datetime.datetime(2022, 2, 28, 23, 00, tzinfo=datetime.UTC)
         self.reservation.save()
 
         assert self.get_builder()._get_begin_time() == "01:00"
@@ -54,7 +54,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         assert self.get_builder()._get_begin_date() == "9.2.2022"
 
     def test_get_begin_date_respects_timezone(self):
-        self.reservation.begin = datetime.datetime(2022, 2, 28, 23, 00, tzinfo=timezone.utc)
+        self.reservation.begin = datetime.datetime(2022, 2, 28, 23, 00, tzinfo=datetime.UTC)
         self.reservation.save()
 
         assert self.get_builder()._get_begin_date() == "1.3.2022"
@@ -63,7 +63,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         assert self.get_builder()._get_end_time() == "12:00"
 
     def test_get_end_time_respects_timezone(self):
-        self.reservation.end = datetime.datetime(2022, 3, 1, 1, 00, tzinfo=timezone.utc)
+        self.reservation.end = datetime.datetime(2022, 3, 1, 1, 00, tzinfo=datetime.UTC)
         self.reservation.save()
 
         assert self.get_builder()._get_end_time() == "03:00"
@@ -72,7 +72,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         assert self.get_builder()._get_end_date() == "9.2.2022"
 
     def test_get_end_date_respects_timezone(self):
-        self.reservation.end = datetime.datetime(2022, 2, 28, 23, 00, tzinfo=timezone.utc)
+        self.reservation.end = datetime.datetime(2022, 2, 28, 23, 00, tzinfo=datetime.UTC)
         self.reservation.save()
 
         assert self.get_builder()._get_end_date() == "1.3.2022"

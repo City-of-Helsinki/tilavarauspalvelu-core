@@ -5,7 +5,6 @@ import datetime
 import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
-from django.utils.timezone import utc
 
 
 class Migration(migrations.Migration):
@@ -33,7 +32,8 @@ class Migration(migrations.Migration):
             model_name="applicationevent",
             name="begin",
             field=models.DateField(
-                default=datetime.datetime(2020, 12, 15, 9, 27, 53, 990937, tzinfo=utc), verbose_name="Start date"
+                default=datetime.datetime(2020, 12, 15, 9, 27, 53, 990937, tzinfo=datetime.UTC),
+                verbose_name="Start date",
             ),
             preserve_default=False,
         ),
@@ -46,7 +46,7 @@ class Migration(migrations.Migration):
             model_name="applicationevent",
             name="end",
             field=models.DateField(
-                default=datetime.datetime(2021, 3, 25, 9, 28, 12, 456921, tzinfo=utc), verbose_name="End date"
+                default=datetime.datetime(2021, 3, 25, 9, 28, 12, 456921, tzinfo=datetime.UTC), verbose_name="End date"
             ),
             preserve_default=False,
         ),
