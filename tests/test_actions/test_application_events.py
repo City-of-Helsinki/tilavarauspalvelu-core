@@ -33,10 +33,10 @@ def test_application_events_affecting_allocations(query_counter):
     ApplicationFactory.create_application_ready_for_allocation(reservation_unit=common_unit)
 
     # This application is allocated for the same unit, but for a different period -> Not affecting.
-    begin = datetime.date(2022, 1, 1)
-    end = datetime.date(2022, 2, 1)
+    begin_date = datetime.date(2022, 1, 1)
+    end_date = datetime.date(2022, 2, 1)
     ApplicationFactory.create_application_ready_for_allocation(
-        reservation_unit=common_unit, begin=begin, end=end, pre_allocated=True
+        reservation_unit=common_unit, begin_date=begin_date, end_date=end_date, pre_allocated=True
     )
 
     # This application is allocated for a parent unit -> Affecting.
