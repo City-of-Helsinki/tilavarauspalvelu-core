@@ -73,7 +73,7 @@ def test_approve_schedule__can_approve_approved_event_schedule(graphql):
 
     # Un-allocate one of the approved schedule
     event = application.application_events.first()
-    schedule: ApplicationEventSchedule = event.application_event_schedules.first()
+    schedule: ApplicationEventSchedule = event.application_event_schedules.order_by("pk").first()
     schedule.allocated_day = None
     schedule.allocated_begin = None
     schedule.allocated_end = None
