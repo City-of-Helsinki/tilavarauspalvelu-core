@@ -38,7 +38,6 @@ import {
   GET_RESERVATION,
   LIST_RESERVATIONS,
 } from "@/modules/queries/reservation";
-import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
 import { getTranslation } from "../../modules/util";
 import Sanitize from "../common/Sanitize";
 import ReservationInfoCard from "./ReservationInfoCard";
@@ -71,29 +70,24 @@ const Wrapper = styled.div`
 `;
 
 const Content = styled(Container)`
-  display: block;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(4, auto);
+  grid-gap: var(--spacing-m);
+  justify-content: space-between;
+  margin-top: 0;
+
+  @media (width > ${breakpoints.m}) {
+    margin-top: var(--spacing-xl);
+    grid-template-columns: 2fr 1fr;
+  }
 `;
 
 const Heading = styled(H2).attrs({ as: "h1" })``;
 
-const Columns = styled.div`
-  display: block;
-
-  @media (min-width: ${breakpoints.l}) {
-    & > div:nth-of-type(1) {
-      order: 2;
-    }
-
-    display: grid;
-    align-items: flex-start;
-    gap: var(--spacing-l);
-    margin-top: var(--spacing-xl);
-    grid-template-columns: 7fr 390px;
-  }
-`;
-
 const BylineWrapper = styled.div`
-  max-width: 390px;
+  /* max-width: 390px; */
+  order: 1;
 `;
 
 const StyledStepper = styled(Stepper)`
@@ -104,11 +98,13 @@ const StyledStepper = styled(Stepper)`
   }
 `;
 
+// TODO rewrite this css
 const PinkBox = styled.div`
-  margin-top: var(--spacing-m);
   padding: 1px var(--spacing-m) var(--spacing-m);
   background-color: var(--color-suomenlinna-light);
 
+  /*
+  margin-top: var(--spacing-m);
   p {
     &:last-of-type {
       margin-bottom: 0;
@@ -124,6 +120,38 @@ const PinkBox = styled.div`
   @media (max-width: ${breakpoints.m}) {
     display: block;
   }
+*/
+`;
+
+const HeadingSection = styled.div`
+  grid-column: 1 / -1;
+  grid-row: 1;
+  @media (min-width: ${breakpoints.l}) {
+    grid-column: 1 / span 2;
+  }
+`;
+
+const BylineSection = styled.div`
+  grid-row: 2;
+  @media (min-width: ${breakpoints.l}) {
+    grid-row: 1;
+    grid-column-start: -1;
+  }
+`;
+
+const EditCalendarSection = styled.div`
+  grid-column: 1 / -1;
+  grid-row: 4 / -1;
+
+  @media (min-width: ${breakpoints.l}) {
+    grid-column: 1 / span 2;
+    grid-row: 2 / -1;
+  }
+
+  /* flex inside a grid breaks responsiveness, the sub component should be refactored */
+  & .rbc-calendar {
+    display: grid !important;
+  }
 `;
 
 const BylineContent = ({
@@ -137,13 +165,10 @@ const BylineContent = ({
   step: number;
   initialReservation: PendingReservation | null;
 }) => {
-  const { t } = useTranslation();
-
   const reservationData =
     step === 1
       ? { ...reservation, ...pick(initialReservation, ["begin", "end"]) }
       : reservation;
-  const termsOfUse = getTranslation(reservationUnit, "termsOfUse");
 
   return (
     <BylineWrapper>
@@ -153,12 +178,6 @@ const BylineContent = ({
         reservationUnit={reservationUnit}
         type="confirmed"
       />
-      {step === 0 && termsOfUse && (
-        <PinkBox>
-          <Subheading>{t("reservations:reservationInfoBoxHeading")}</Subheading>
-          <Sanitize html={termsOfUse} />
-        </PinkBox>
-      )}
     </BylineWrapper>
   );
 };
@@ -382,69 +401,70 @@ const ReservationEdit = ({ id, apiBaseUrl }: Props): JSX.Element => {
       ? "reservations:editReservationTime"
       : "reservationCalendar:heading.pendingReservation";
 
+  const termsOfUse = getTranslation(reservationUnit, "termsOfUse");
+
   return (
     <Wrapper>
       <Content>
-        <Columns>
-          <div>
-            <JustForDesktop customBreakpoint={breakpoints.l}>
-              <BylineContent
-                reservation={reservation}
-                reservationUnit={reservationUnit}
-                initialReservation={initialReservation}
-                step={step}
-              />
-            </JustForDesktop>
-          </div>
-          <div>
-            <Heading>{t(title)}</Heading>
-            <StyledStepper
-              language={i18n.language}
-              selectedStep={step}
-              onStepClick={(e) => {
-                const target = e.currentTarget;
-                const s = target
-                  .getAttribute("data-testid")
-                  ?.replace("hds-stepper-step-", "");
-                if (s != null) {
-                  setStep(parseInt(s, 10));
-                }
-              }}
-              steps={steps}
+        <HeadingSection>
+          <Heading style={{ gridColumn: "1 / -1" }}>{t(title)}</Heading>
+          <StyledStepper
+            language={i18n.language}
+            selectedStep={step}
+            onStepClick={(e) => {
+              const target = e.currentTarget;
+              const s = target
+                .getAttribute("data-testid")
+                ?.replace("hds-stepper-step-", "");
+              if (s != null) {
+                setStep(parseInt(s, 10));
+              }
+            }}
+            steps={steps}
+          />
+        </HeadingSection>
+        <BylineSection>
+          <BylineContent
+            reservation={reservation}
+            reservationUnit={reservationUnit}
+            initialReservation={initialReservation}
+            step={step}
+          />
+        </BylineSection>
+        {/* TODO on mobile in the design this is after the calendar but before action buttons */}
+        {step === 0 && termsOfUse && (
+          <PinkBox>
+            <Subheading>
+              {t("reservations:reservationInfoBoxHeading")}
+            </Subheading>
+            <Sanitize html={termsOfUse} />
+          </PinkBox>
+        )}
+        <EditCalendarSection>
+          {step === 0 && (
+            <EditStep0
+              reservation={reservation}
+              reservationUnit={reservationUnit}
+              userReservations={userReservations}
+              initialReservation={initialReservation}
+              setInitialReservation={setInitialReservation}
+              activeApplicationRounds={activeApplicationRounds}
+              setErrorMsg={setErrorMsg}
+              nextStep={() => setStep(1)}
+              apiBaseUrl={apiBaseUrl}
             />
-            <JustForMobile customBreakpoint={breakpoints.l}>
-              <BylineContent
-                reservation={reservation}
-                reservationUnit={reservationUnit}
-                initialReservation={initialReservation}
-                step={step}
-              />
-            </JustForMobile>
-            {step === 0 && (
-              <EditStep0
-                reservation={reservation}
-                reservationUnit={reservationUnit}
-                userReservations={userReservations}
-                initialReservation={initialReservation}
-                setInitialReservation={setInitialReservation}
-                activeApplicationRounds={activeApplicationRounds}
-                setErrorMsg={setErrorMsg}
-                nextStep={() => setStep(1)}
-                apiBaseUrl={apiBaseUrl}
-              />
-            )}
-            {step === 1 && (
-              <EditStep1
-                reservation={reservation}
-                reservationUnit={reservationUnit}
-                setErrorMsg={setErrorMsg}
-                setStep={setStep}
-                handleSubmit={handleSubmit}
-                isSubmitting={adjustReservationTimeLoading}
-              />
-            )}
-          </div>
-        </Columns>
+          )}
+          {step === 1 && (
+            <EditStep1
+              reservation={reservation}
+              reservationUnit={reservationUnit}
+              setErrorMsg={setErrorMsg}
+              setStep={setStep}
+              handleSubmit={handleSubmit}
+              isSubmitting={adjustReservationTimeLoading}
+            />
+          )}
+        </EditCalendarSection>
       </Content>
       {errorMsg && (
         <Toast
