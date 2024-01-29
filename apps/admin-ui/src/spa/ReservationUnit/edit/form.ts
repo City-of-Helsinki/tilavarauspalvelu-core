@@ -375,6 +375,10 @@ export const ReservationUnitEditSchema = z
     // because if they are set (non undefined) we should show the active checkbox
     bufferTimeAfter: z.number(),
     bufferTimeBefore: z.number(),
+    reservationBlockWholeDay: z
+      .literal("no-buffer")
+      .or(z.literal("blocks-whole-day"))
+      .or(z.literal("buffer-times-set")),
     maxReservationsPerUser: z.number().nullable(),
     maxPersons: z.number().min(0).nullable(),
     minPersons: z.number().min(0).nullable(),
@@ -787,6 +791,12 @@ export const convertReservationUnit = (
   data?: ReservationUnitByPkType
 ): ReservationUnitEditFormValues => {
   return {
+    reservationBlockWholeDay:
+      data?.reservationBlockWholeDay === true
+        ? "blocks-whole-day"
+        : data?.bufferTimeAfter || data?.bufferTimeBefore
+          ? "buffer-times-set"
+          : "no-buffer",
     bufferTimeAfter: data?.bufferTimeAfter ?? 0,
     bufferTimeBefore: data?.bufferTimeBefore ?? 0,
     maxReservationsPerUser: data?.maxReservationsPerUser ?? null,
@@ -899,8 +909,8 @@ export const convertReservationUnit = (
     hasPublishEnds: data?.publishEnds != null,
     hasReservationBegins: data?.reservationBegins != null,
     hasReservationEnds: data?.reservationEnds != null,
-    hasBufferTimeBefore: data?.bufferTimeBefore != null,
-    hasBufferTimeAfter: data?.bufferTimeAfter != null,
+    hasBufferTimeBefore: !!data?.bufferTimeBefore,
+    hasBufferTimeAfter: !!data?.bufferTimeAfter,
     hasCancellationRule: data?.cancellationRule != null,
   };
 };
@@ -932,6 +942,7 @@ export function transformReservationUnit(
     hasBufferTimeBefore,
     hasBufferTimeAfter,
     hasCancellationRule,
+    reservationBlockWholeDay,
     bufferTimeAfter,
     bufferTimeBefore,
     cancellationRulePk,
@@ -983,8 +994,9 @@ export function transformReservationUnit(
       hasScheduledPublish && hasPublishEnds
         ? constructApiDate(publishEndsDate, publishEndsTime)
         : null,
-    bufferTimeAfter: hasBufferTimeAfter ? bufferTimeAfter : null,
-    bufferTimeBefore: hasBufferTimeBefore ? bufferTimeBefore : null,
+    reservationBlockWholeDay: reservationBlockWholeDay === "blocks-whole-day",
+    bufferTimeAfter,
+    bufferTimeBefore,
     isDraft,
     isArchived,
     termsOfUseEn: termsOfUseEn !== "" ? termsOfUseEn : null,

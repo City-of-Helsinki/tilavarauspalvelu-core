@@ -109,6 +109,7 @@ export const RESERVATIONUNIT_QUERY = gql`
       serviceSpecificTerms {
         pk
       }
+      reservationBlockWholeDay
       bufferTimeBefore
       bufferTimeAfter
       reservationBegins

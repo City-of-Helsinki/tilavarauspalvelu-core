@@ -153,6 +153,19 @@ const SubAccordion = styled(Accordion)`
   }
 `;
 
+const BufferWrapper = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-column: 2 / -1;
+  [class*="ActivationGroup"] {
+    margin-top: 0;
+    [class*="ActivationGroup"] {
+      margin-top: var(--spacing-s);
+      margin-bottom: var(--spacing-s);
+    }
+  }
+`;
+
 const Preview = styled.a<{ $disabled: boolean }>`
   display: flex;
   place-items: center;
@@ -336,8 +349,8 @@ const FieldGroupWrapper = styled.div`
 // NOTE using span for easier css selectors
 const FieldGroupHeading = styled.span`
   padding-bottom: var(--spacing-xs);
-  ${fontBold}
   display: block;
+  ${fontBold}
 `;
 
 const FieldGroup = ({
@@ -1071,60 +1084,100 @@ function ReservationUnitSettings({
           style={{ gridColumn: "1 / -1" }}
         >
           <Grid>
-            <Span6>
-              <ActivationGroup
-                label={t("ReservationUnitEditor.bufferTimeBefore")}
+            <Span12>
+              <Controller
                 control={control}
-                name="hasBufferTimeBefore"
-              >
-                <Controller
-                  control={control}
-                  name="bufferTimeBefore"
-                  render={({ field: { value, onChange } }) => (
-                    <Select
-                      id="bufferTimeBefore"
-                      options={bufferTimeOptions}
-                      label={t(
-                        "ReservationUnitEditor.bufferTimeBeforeDuration"
-                      )}
-                      onChange={(v: { value: number; label: string }) =>
-                        onChange(v.value)
-                      }
-                      value={
-                        bufferTimeOptions.find((o) => o.value === value) ?? null
-                      }
+                name="reservationBlockWholeDay"
+                render={({ field: { value, onChange } }) => (
+                  <SelectionGroup
+                    errorText={getTranslatedError(
+                      t,
+                      errors.reservationBlockWholeDay?.message
+                    )}
+                    defaultValue="no-buffer"
+                  >
+                    <RadioButton
+                      id="no-buffer"
+                      value="no-buffer"
+                      label={t("ReservationUnitEditor.noBuffer")}
+                      onChange={(e) => onChange(e.target.value)}
+                      checked={value != null && value === "no-buffer"}
                     />
-                  )}
-                />
-              </ActivationGroup>
-            </Span6>
-            <Span6>
-              <ActivationGroup
-                label={t("ReservationUnitEditor.bufferTimeAfter")}
-                control={control}
-                name="hasBufferTimeAfter"
-              >
-                <Controller
-                  control={control}
-                  name="bufferTimeAfter"
-                  render={({ field: { value, onChange } }) => (
-                    <Select
-                      id="bufferTimeAfter"
-                      label={t("ReservationUnitEditor.bufferTimeAfterDuration")}
-                      options={bufferTimeOptions}
-                      onChange={(v: { value: number; label: string }) =>
-                        onChange(v.value)
-                      }
-                      value={
-                        bufferTimeOptions.find(
-                          (option) => option.value === value
-                        ) ?? null
-                      }
+                    <RadioButton
+                      id="blocks-whole-day"
+                      value="blocks-whole-day"
+                      label={t("ReservationUnitEditor.blocksWholeDay")}
+                      onChange={(e) => onChange(e.target.value)}
+                      checked={value != null && value === "blocks-whole-day"}
                     />
-                  )}
-                />
-              </ActivationGroup>
-            </Span6>
+                    <RadioButton
+                      id="buffer-times-set"
+                      value="buffer-times-set"
+                      label={t("ReservationUnitEditor.setBufferTime")}
+                      onChange={(e) => onChange(e.target.value)}
+                      checked={value != null && value === "buffer-times-set"}
+                    />
+                  </SelectionGroup>
+                )}
+              />
+            </Span12>
+            {watch("reservationBlockWholeDay") === "buffer-times-set" && (
+              <BufferWrapper>
+                <ActivationGroup
+                  label={t("ReservationUnitEditor.bufferTimeBefore")}
+                  control={control}
+                  name="hasBufferTimeBefore"
+                >
+                  <Controller
+                    control={control}
+                    name="bufferTimeBefore"
+                    render={({ field: { value, onChange } }) => (
+                      <Select
+                        id="bufferTimeBefore"
+                        options={bufferTimeOptions}
+                        label={t(
+                          "ReservationUnitEditor.bufferTimeBeforeDuration"
+                        )}
+                        onChange={(v: { value: number; label: string }) =>
+                          onChange(v.value)
+                        }
+                        value={
+                          bufferTimeOptions.find((o) => o.value === value) ??
+                          null
+                        }
+                      />
+                    )}
+                  />
+                </ActivationGroup>
+                <ActivationGroup
+                  label={t("ReservationUnitEditor.bufferTimeAfter")}
+                  control={control}
+                  name="hasBufferTimeAfter"
+                >
+                  <Controller
+                    control={control}
+                    name="bufferTimeAfter"
+                    render={({ field: { value, onChange } }) => (
+                      <Select
+                        id="bufferTimeAfter"
+                        label={t(
+                          "ReservationUnitEditor.bufferTimeAfterDuration"
+                        )}
+                        options={bufferTimeOptions}
+                        onChange={(v: { value: number; label: string }) =>
+                          onChange(v.value)
+                        }
+                        value={
+                          bufferTimeOptions.find(
+                            (option) => option.value === value
+                          ) ?? null
+                        }
+                      />
+                    )}
+                  />
+                </ActivationGroup>
+              </BufferWrapper>
+            )}
           </Grid>
         </FieldGroup>
         <FieldGroup

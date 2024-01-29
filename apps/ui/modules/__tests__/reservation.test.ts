@@ -131,6 +131,7 @@ const reservationUnit: ReservationUnitByPkType = {
   reservations: [],
   allowReservationsWithoutOpeningHours: false,
   requireReservationHandling: false,
+  reservationBlockWholeDay: false,
 };
 
 const reservation: ReservationType = {

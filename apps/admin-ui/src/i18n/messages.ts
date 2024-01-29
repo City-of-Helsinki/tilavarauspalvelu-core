@@ -1380,7 +1380,8 @@ const translations: ITranslations = {
         `Voit asettaa automaattiset tauot varauksen alkuun tai loppuun, mikäli haluat esim. tuulettaa tai tarkistaa tilan varausten välissä. Tauko lisätään jokaiseen varaukseen ja seuraava varaus voi alkaa vasta tauon päätyttyä.
       Esimerkki:
       Varaus tehdään 12.00-13.00 ja vuoron jälkeen on asetettu 30min tauko. Seuraava varaus voi alkaa vasta 13.30.
-      suositus:
+      Vain yksi varaus vuorokaudessa: varaukselle asetetaan tauot automaattisesti siten, että jos varaus tehdään esim. 8.00-16.00, niin sitä ennen muodostuu tauko 0.00-8.00 ja sen jälkeen 16.00-24.00, joilloin samalle vuorokaudelle ei voi tehdä enempää varauksia.
+      Suositus:
       tauotusta ei käytetä`,
       ],
       cancellationSettings: [
@@ -1581,9 +1582,12 @@ const translations: ITranslations = {
     contactInformationPlaceholder: ["Vastuuhenkilön yhteystiedot"],
     noPreviewUnsavedChangesTooltip: ["Tallenna ensin muutokset"],
     previewTooltip: ["Varausyksikön esikatselu"],
-    bufferTimeBefore: ["Aseta ennen vuoroa tauko"],
+    noBuffer: ["Tauotusta ei käytetä"],
+    blocksWholeDay: ["Vain yksi varaus vuorokaudessa"],
+    setBufferTime: ["Aseta varaukselle tauot"],
+    bufferTimeBefore: ["Aseta tauko ennen vuoroa"],
     bufferTimeBeforeDuration: ["Tauon kesto"],
-    bufferTimeAfter: ["Aseta vuoron jälkeen tauko"],
+    bufferTimeAfter: ["Aseta tauko vuoron jälkeen"],
     bufferTimeAfterDuration: ["Tauon kesto"],
     scheduledPublishing: ["Ajasta varausyksikön julkaisu tai piilotus"],
     publishingSettings: ["Julkaisun ajastus"],

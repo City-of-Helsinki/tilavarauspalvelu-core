@@ -18,6 +18,7 @@ const unitCommon = {
   allowReservationsWithoutOpeningHours: true,
   authentication: ReservationUnitsReservationUnitAuthenticationChoices.Weak,
   canApplyFreeOfCharge: false,
+  reservationBlockWholeDay: false,
   bufferTimeBefore: null,
   bufferTimeAfter: null,
   __typename: "ReservationUnitType",
