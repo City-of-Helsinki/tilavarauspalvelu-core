@@ -476,8 +476,8 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
         resources must be available during the reservation's time. If any "related" ReservationUnits already have
         reservations overlapping with the new one, the new reservation can not be made.
         """
-        space_ids: set[int] = self.spaces.all_space_ids_though_hierarchy()
-        resource_ids: set[int] = set(self.resources.all())
+        space_ids: set[int] = self.spaces.all().all_space_ids_though_hierarchy()
+        resource_ids: set[int] = set(self.resources.all().values_list("id", flat=True))
         return ReservationUnit.objects.filter(
             models.Q(resources__in=resource_ids) | models.Q(spaces__in=space_ids)
         ).distinct()

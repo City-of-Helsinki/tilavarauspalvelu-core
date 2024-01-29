@@ -10,6 +10,7 @@ from elasticsearch_django.models import SearchResultsQuerySet
 from applications.choices import ApplicationRoundStatusChoice
 from applications.models import ApplicationRound
 from common.date_utils import local_datetime
+from common.db import ArrayUnnest, SubqueryArray
 from opening_hours.models import ReservableTimeSpan
 from opening_hours.utils.reservable_time_span_client import override_reservable_with_closed_time_spans
 from opening_hours.utils.time_span_element import TimeSpanElement
@@ -19,6 +20,8 @@ from reservation_units.utils.first_reservable_time import (
     get_shared_hard_closed_time_spans,
     get_soft_closed_time_spans_for_reservation_unit,
 )
+from resources.models import Resource
+from spaces.models import Space
 
 if TYPE_CHECKING:
     from reservation_units.models import ReservationUnit
@@ -297,3 +300,50 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
                 output_field=models.BooleanField(),
             ),
         )
+
+    def with_reservation_unit_ids_affecting_reservations(self) -> Self:
+        """Annotate queryset with reservation ids for all reservation units that affect its reservations."""
+        from reservation_units.models import ReservationUnit
+
+        return self.alias(
+            spaces_affecting_reservations=models.Subquery(
+                queryset=(
+                    Space.objects.filter(reservation_units__id=models.OuterRef("id"))
+                    .with_family(include_self=True)
+                    .annotate(all_families=ArrayUnnest("family"))
+                    .values("all_families")
+                ),
+            ),
+            resources_affecting_reservations=models.Subquery(
+                queryset=Resource.objects.filter(reservation_units__id=models.OuterRef("id")).values("id"),
+            ),
+        ).annotate(
+            reservation_units_affecting_reservations=SubqueryArray(
+                queryset=(
+                    ReservationUnit.objects.distinct()
+                    .filter(
+                        Q(spaces__in=models.OuterRef("spaces_affecting_reservations"))
+                        | Q(resources__in=models.OuterRef("resources_affecting_reservations"))
+                    )
+                    .values("id")
+                ),
+                agg_field="id",
+            ),
+        )
+
+    def reservation_units_with_common_hierarchy(self) -> Self:
+        """
+        Get a new queryset of reservation units that share a common hierarchy
+        with any reservation unit in the original queryset.
+        """
+        from reservation_units.models import ReservationUnit
+
+        return ReservationUnit.objects.alias(
+            _ids=models.Subquery(
+                queryset=(
+                    self.with_reservation_unit_ids_affecting_reservations()
+                    .annotate(_found_ids=ArrayUnnest("reservation_units_affecting_reservations"))
+                    .values("_found_ids")
+                )
+            )
+        ).filter(pk__in=models.F("_ids"))

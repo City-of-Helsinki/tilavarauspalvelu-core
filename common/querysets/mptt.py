@@ -1,11 +1,10 @@
 from typing import Self
 
 from django.db.models import OuterRef, Q
-from django.db.models.functions import Coalesce
 from mptt.models import MPTTOptions
 from mptt.querysets import TreeQuerySet
 
-from common.db import ArrayRemove, SubqueryArray
+from common.db import SubqueryArray
 
 
 class ExtendedTreeQuerySet(TreeQuerySet):
@@ -48,9 +47,7 @@ class ExtendedTreeQuerySet(TreeQuerySet):
         if not include_self:
             qs = qs.exclude(pk=OuterRef("pk"))
 
-        return self.annotate(
-            ancestors=Coalesce(ArrayRemove(SubqueryArray(qs.values("id"), agg_field="id"), None), []),
-        )
+        return self.annotate(ancestors=SubqueryArray(qs.values("id"), agg_field="id"))
 
     def with_descendants(self, *, include_self: bool = False) -> Self:
         """Annotate a list of all "descendants" of the object to the queryset."""
@@ -59,9 +56,7 @@ class ExtendedTreeQuerySet(TreeQuerySet):
         if not include_self:
             qs = qs.exclude(pk=OuterRef("pk"))
 
-        return self.annotate(
-            descendants=Coalesce(ArrayRemove(SubqueryArray(qs.values("id"), agg_field="id"), None), []),
-        )
+        return self.annotate(descendants=SubqueryArray(qs.values("id"), agg_field="id"))
 
     def with_family(self, *, include_self: bool = False) -> Self:
         """
@@ -75,6 +70,4 @@ class ExtendedTreeQuerySet(TreeQuerySet):
         if not include_self:
             qs = qs.exclude(pk=OuterRef("pk"))
 
-        return self.annotate(
-            family=Coalesce(ArrayRemove(SubqueryArray(qs.values("id"), agg_field="id"), None), []),
-        )
+        return self.annotate(family=SubqueryArray(qs.values("id"), agg_field="id"))

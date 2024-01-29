@@ -2,12 +2,18 @@ import pytest
 from django.core.mail import EmailMessage
 from rest_framework.test import APIClient
 
-from tests.helpers import GraphQLClient
+from tests.helpers import GraphQLClient, capture_database_queries
 
 
 @pytest.fixture()
 def graphql() -> GraphQLClient:
     return GraphQLClient()
+
+
+@pytest.fixture()
+def query_counter(settings):
+    settings.DEBUG = True
+    return capture_database_queries
 
 
 @pytest.fixture()

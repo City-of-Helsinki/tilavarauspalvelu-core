@@ -33,6 +33,7 @@ class ApplicationEventNode(DjangoAuthNode):
     max_duration = Duration()
 
     application_event_schedules = ApplicationEventScheduleNode.ListField(priority=graphene.List(graphene.Int))
+    related_application_events = graphene.List(lambda: ApplicationEventNode)
     event_reservation_units = EventReservationUnitNode.ListField(preferred_order=graphene.Int())
 
     class Meta:
@@ -76,6 +77,9 @@ class ApplicationEventNode(DjangoAuthNode):
         if priority is not None:
             return root.application_event_schedules.filter(priority__in=priority)
         return root.application_event_schedules.all()
+
+    def resolve_related_application_events(root: ApplicationEvent, info: GQLInfo, **kwargs: Any) -> models.QuerySet:
+        return root.actions.application_events_affecting_allocations()
 
     def resolve_event_reservation_units(root: ApplicationEvent, info: GQLInfo, **kwargs: Any) -> models.QuerySet:
         preferred_order: int | None = kwargs.get("preferred_order")

@@ -1,7 +1,8 @@
 import pytest
 
 from applications.models import ApplicationEventSchedule
-from tests.factories import ApplicationEventFactory, ApplicationFactory
+from tests.factories import ApplicationEventFactory, ApplicationFactory, ReservationUnitFactory, SpaceFactory
+from tests.helpers import UserType
 from tests.test_graphql_api.test_application_event.helpers import events_query
 
 # Applied to all tests
@@ -11,7 +12,7 @@ pytestmark = [
 ]
 
 
-def test_can_query_application_event__all_fields(graphql):
+def test_application_event__query__all_fields(graphql):
     # given:
     # - There is draft application in an open application round with two application events
     # - The owner of the application is using the system
@@ -100,4 +101,46 @@ def test_can_query_application_event__all_fields(graphql):
             },
         ],
         "status": event_1.status.value,
+    }
+
+
+def test_application_event__query__affecting_application_events(graphql):
+    # given:
+    # - There are two applications for the same reservation unit, at the same time
+    # - One of the applications has been allocated
+    # - A superuser is using the system
+    common_unit = ReservationUnitFactory.create(spaces=[SpaceFactory.create()])
+    application_1 = ApplicationFactory.create_application_ready_for_allocation(reservation_unit=common_unit)
+    application_2 = ApplicationFactory.create_application_ready_for_allocation(
+        reservation_unit=common_unit, pre_allocated=True
+    )
+    event_1 = application_1.application_events.first()
+    event_2 = application_2.application_events.first()
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    fields = """
+        pk
+        relatedApplicationEvents {
+            pk
+        }
+    """
+
+    # when:
+    # - User tries to search for application events and their related application events
+    query = events_query(fields=fields)
+    response = graphql(query)
+
+    # then:
+    # - The response contains the related application events
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 2, response
+    assert response.node(0) == {
+        "pk": event_1.pk,
+        "relatedApplicationEvents": [
+            {"pk": event_2.pk},
+        ],
+    }
+    assert response.node(1) == {
+        "pk": event_2.pk,
+        "relatedApplicationEvents": [],
     }
