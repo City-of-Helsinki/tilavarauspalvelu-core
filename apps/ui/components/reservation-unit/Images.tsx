@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { breakpoints } from "common/src/common/style";
 import { ReservationUnitImageType } from "common/types/gql-types";
 import Carousel from "../Carousel";
-import { pixel } from "../../styles/util";
+import { getImageSource } from "@/modules/util";
 
 const Modal = dynamic(() => import("../common/Modal"));
 type Props = {
@@ -91,7 +91,7 @@ const LargeImage = styled.img`
   max-width: 100%;
 `;
 
-const Images = ({ images, contextName }: Props): JSX.Element => {
+export function Images({ images, contextName }: Props): JSX.Element {
   const { t } = useTranslation();
   const [showModal, setShowModal] = useState(false);
   const [currentImage, setCurrentImage] = useState<ReservationUnitImageType>();
@@ -105,11 +105,11 @@ const Images = ({ images, contextName }: Props): JSX.Element => {
       <StyledCarousel>
         {images?.map((image, index) => (
           <CarouselImage
-            key={image.smallUrl}
+            key={image.imageUrl}
             alt={`${t("common:imgAltForSpace", { name: contextName })} #${
               index + 1
             }`}
-            src={image.largeUrl || pixel}
+            src={getImageSource(image, "large")}
             onClick={() => {
               setCurrentImage(image);
               setShowModal(true);
@@ -131,13 +131,13 @@ const Images = ({ images, contextName }: Props): JSX.Element => {
           {currentImage ? (
             <LargeImage
               alt={t("common:imgAltForSpace")}
-              src={currentImage.largeUrl ?? undefined}
+              src={getImageSource(currentImage, "large")}
             />
           ) : null}
           <ModalImages>
             {images?.map((image) => (
               <ThumbnailButton
-                key={image.smallUrl}
+                key={image.imageUrl}
                 type="button"
                 onClick={() => {
                   setCurrentImage(image);
@@ -145,7 +145,7 @@ const Images = ({ images, contextName }: Props): JSX.Element => {
               >
                 <ThumbnailImage
                   alt={t("common:imgAltForSpace")}
-                  src={image.smallUrl ?? undefined}
+                  src={getImageSource(image, "small")}
                 />
               </ThumbnailButton>
             ))}
@@ -154,6 +154,4 @@ const Images = ({ images, contextName }: Props): JSX.Element => {
       </Modal>
     </>
   );
-};
-
-export default Images;
+}

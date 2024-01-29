@@ -21,7 +21,7 @@ import {
   singleSearchUrl,
 } from "@/modules/util";
 import IconWithText from "../common/IconWithText";
-import Images from "./Images";
+import { Images } from "./Images";
 import {
   getActivePricing,
   getPrice,
