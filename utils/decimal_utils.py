@@ -1,6 +1,12 @@
 from decimal import ROUND_HALF_UP, Decimal
 
 
-def round_decimal(decimal: Decimal, ndigits: int) -> Decimal:
-    exp = Decimal(f"1.{'0' * ndigits}") if ndigits > 1 else Decimal("1")
-    return decimal.quantize(exp, rounding=ROUND_HALF_UP)
+def round_decimal(value: Decimal, precision: int) -> Decimal:
+    """
+    Round Decimal to given precision.
+
+    This method should be used instead of round(Decimal) because round() uses ROUND_HALF_EVEN rounding mode.
+    """
+    if precision <= 0:
+        return value.quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+    return value.quantize(Decimal("1." + "0" * precision), rounding=ROUND_HALF_UP)

@@ -2,7 +2,6 @@ import datetime
 import json
 
 import snapshottest
-from assertpy import assert_that
 from django.contrib.auth import get_user_model
 from django.test import override_settings
 from django.utils.timezone import get_default_timezone
@@ -72,21 +71,21 @@ class UpdateUserTestCase(UserTestCaseBase):
     def test_update_fails_when_user_is_not_logged_in(self):
         data = {"pk": 1, "reservationNotification": "NONE"}
         response = self.query(self.get_update_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0]["message"]).is_equal_to("No permission to mutate")
-        assert_that(content["data"]["updateUser"]).is_none()
+        assert content.get("errors") is not None
+        assert content.get("errors")[0]["message"] == "No permission to mutate"
+        assert content["data"]["updateUser"] is None
 
     def test_update_fails_when_user_tries_to_update_other_user(self):
         self.client.force_login(self.super_user)
         data = {"pk": self.staff_user.pk + 1, "reservationNotification": "NONE"}
         response = self.query(self.get_update_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0]["message"]).is_equal_to("No permission to mutate")
-        assert_that(content["data"]["updateUser"]).is_none()
+        assert content.get("errors") is not None
+        assert content.get("errors")[0]["message"] == "No permission to mutate"
+        assert content["data"]["updateUser"] is None
 
     def test_update_fails_when_user_has_no_roles(self):
         no_roles_user = get_user_model().objects.create(
@@ -101,50 +100,50 @@ class UpdateUserTestCase(UserTestCaseBase):
         self.client.force_login(no_roles_user)
         data = {"pk": no_roles_user.pk, "reservationNotification": "ALL"}
         response = self.query(self.get_update_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
-        assert_that(content.get("errors")[0]["message"]).is_equal_to("No permission to mutate")
-        assert_that(content["data"]["updateUser"]).is_none()
+        assert content.get("errors") is not None
+        assert content.get("errors")[0]["message"] == "No permission to mutate"
+        assert content["data"]["updateUser"] is None
 
     def test_update_by_staff_with_roles_succeeds(self):
         self.client.force_login(self.staff_user)
         data = {"pk": self.staff_user.pk, "reservationNotification": "NONE"}
         response = self.query(self.get_update_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(content["data"]["updateUser"]["errors"]).is_none()
-        assert_that(content["data"]["updateUser"]["pk"]).is_equal_to(self.staff_user.pk)
+        assert content.get("errors") is None
+        assert content["data"]["updateUser"]["errors"] is None
+        assert content["data"]["updateUser"]["pk"] == self.staff_user.pk
 
         updated_user = User.objects.get(pk=self.staff_user.pk)
-        assert_that(updated_user.reservation_notification).is_equal_to("none")
+        assert updated_user.reservation_notification == "none"
 
     def test_update_by_non_staff_with_roles_succeeds(self):
         self.client.force_login(self.non_staff_user)
         data = {"pk": self.non_staff_user.pk, "reservationNotification": "NONE"}
         response = self.query(self.get_update_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(content["data"]["updateUser"]["errors"]).is_none()
-        assert_that(content["data"]["updateUser"]["pk"]).is_equal_to(self.non_staff_user.pk)
+        assert content.get("errors") is None
+        assert content["data"]["updateUser"]["errors"] is None
+        assert content["data"]["updateUser"]["pk"] == self.non_staff_user.pk
 
         updated_user = User.objects.get(pk=self.non_staff_user.pk)
-        assert_that(updated_user.reservation_notification).is_equal_to("none")
+        assert updated_user.reservation_notification == "none"
 
     def test_update_by_superuser_succeeds(self):
         self.client.force_login(self.super_user)
         data = {"pk": self.super_user.pk, "reservationNotification": "NONE"}
         response = self.query(self.get_update_query(), input_data=data)
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(content["data"]["updateUser"]["errors"]).is_none()
-        assert_that(content["data"]["updateUser"]["pk"]).is_equal_to(self.super_user.pk)
+        assert content.get("errors") is None
+        assert content["data"]["updateUser"]["errors"] is None
+        assert content["data"]["updateUser"]["pk"] == self.super_user.pk
 
         updated_user = User.objects.get(pk=self.super_user.pk)
-        assert_that(updated_user.reservation_notification).is_equal_to("none")
+        assert updated_user.reservation_notification == "none"
 
 
 class UsersQueryTestCase(UserTestCaseBase):
@@ -169,7 +168,7 @@ class UsersQueryTestCase(UserTestCaseBase):
         self.client.force_login(self.general_admin)
         response = self.query(self.get_query(self.non_staff_user))
 
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
         self.assertMatchSnapshot(content)
 
@@ -178,7 +177,7 @@ class UsersQueryTestCase(UserTestCaseBase):
         self.client.force_login(service_sector_admin)
         response = self.query(self.get_query(self.non_staff_user))
 
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
         self.assertMatchSnapshot(content)
 
@@ -187,7 +186,7 @@ class UsersQueryTestCase(UserTestCaseBase):
         self.client.force_login(unit_admin)
         response = self.query(self.get_query(self.non_staff_user))
 
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
         self.assertMatchSnapshot(content)
 
@@ -211,16 +210,16 @@ class UsersQueryTestCase(UserTestCaseBase):
 
         response = self.query(query)
 
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
         self.assertMatchSnapshot(content)
-        assert_that(content["errors"]).is_not_none()
+        assert content["errors"] is not None
 
     def test_regular_user_cant_read_other(self):
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_query(self.non_staff_user))
 
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
         self.assertMatchSnapshot(content)
 
@@ -228,13 +227,13 @@ class UsersQueryTestCase(UserTestCaseBase):
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_query(self.regular_joe))
 
-        assert_that(response.status_code).is_equal_to(200)
+        assert response.status_code == 200
         content = json.loads(response.content)
         self.assertMatchSnapshot(content)
 
     @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
     def test_date_of_birth_read_is_logged(self):
-        assert_that(PersonalInfoViewLog.objects.count()).is_zero()
+        assert PersonalInfoViewLog.objects.count() == 0
         query = (
             """
                 query {
@@ -254,15 +253,14 @@ class UsersQueryTestCase(UserTestCaseBase):
         self.client.force_login(self.general_admin)
         response = self.query(query)
 
-        assert_that(response.status_code).is_equal_to(200)
-        assert_that(PersonalInfoViewLog.objects.count()).is_equal_to(1)
+        assert response.status_code == 200
+        assert PersonalInfoViewLog.objects.count() == 1
 
         view_log = PersonalInfoViewLog.objects.first()
-        assert_that(view_log.user).is_equal_to(self.regular_joe)
-        assert_that(view_log.viewer_user).is_equal_to(self.general_admin)
-        assert_that(view_log.viewer_username).is_equal_to(self.general_admin.username)
-        assert_that(view_log.access_time).is_close_to(
-            datetime.datetime.now(tz=get_default_timezone()),
-            datetime.timedelta(seconds=5),
-        )
-        assert_that(view_log.field).is_equal_to("User.date_of_birth")
+        assert view_log.user == self.regular_joe
+        assert view_log.viewer_user == self.general_admin
+        assert view_log.viewer_username == self.general_admin.username
+        now = datetime.datetime.now(tz=get_default_timezone())
+        assert now - datetime.timedelta(seconds=5) <= view_log.access_time <= now  # Within the last 5 seconds
+
+        assert view_log.field == "User.date_of_birth"
