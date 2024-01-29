@@ -2,7 +2,7 @@ import datetime
 from decimal import Decimal
 
 from assertpy import assert_that
-from django.utils.timezone import get_default_timezone, utc
+from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from api.graphql.types.reservations.serializers.mixins import ReservationPriceMixin
@@ -74,7 +74,7 @@ class ReservationPricingTestCase(ReservationTestCaseBase):
         self.reservation_unit.save()
 
         tax_percentage = TaxPercentageFactory(value=Decimal("0.0"))
-        begin = datetime.datetime.now(tz=utc).astimezone(get_default_timezone())
+        begin = datetime.datetime.now(tz=datetime.UTC).astimezone(get_default_timezone())
         end = begin + datetime.timedelta(hours=1, minutes=15)
 
         pricing = ReservationUnitPricingFactory(
@@ -98,7 +98,7 @@ class ReservationPricingTestCase(ReservationTestCaseBase):
         self.reservation_unit.save()
 
         tax_percentage = TaxPercentageFactory(value=Decimal("0.0"))
-        begin = datetime.datetime.now(tz=utc).astimezone(get_default_timezone())
+        begin = datetime.datetime.now(tz=datetime.UTC).astimezone(get_default_timezone())
         end = begin + datetime.timedelta(hours=14)
 
         pricing = ReservationUnitPricingFactory(
@@ -122,7 +122,7 @@ class ReservationPricingTestCase(ReservationTestCaseBase):
         self.reservation_unit.save()
 
         tax_percentage = TaxPercentageFactory(value=Decimal("0.0"))
-        begin = datetime.datetime.now(tz=utc).astimezone(get_default_timezone())
+        begin = datetime.datetime.now(tz=datetime.UTC).astimezone(get_default_timezone())
         end = begin + datetime.timedelta(days=1)
 
         pricing = ReservationUnitPricingFactory(

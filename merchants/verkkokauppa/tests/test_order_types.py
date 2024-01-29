@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any
 from uuid import UUID
@@ -7,7 +7,6 @@ import pytest
 from assertpy import assert_that
 from django.conf import settings
 from django.test.testcases import TestCase
-from django.utils.timezone import utc
 
 from merchants.verkkokauppa.order.exceptions import ParseOrderError
 from merchants.verkkokauppa.order.types import (
@@ -29,7 +28,7 @@ class OrderTypesTestCase(TestCase):
         price_net=Decimal("100.0"),
         price_vat=Decimal("24.0"),
         price_total=Decimal("124.0"),
-        last_valid_purchase_datetime=datetime(2022, 11, 24, 12, 0, 0, tzinfo=utc),
+        last_valid_purchase_datetime=datetime(2022, 11, 24, 12, 0, 0, tzinfo=UTC),
         items=[
             OrderItemParams(
                 product_id=UUID("306ab20a-6b30-3ce3-95e8-fef818e6c30e"),

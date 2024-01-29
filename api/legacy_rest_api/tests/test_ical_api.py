@@ -1,8 +1,8 @@
+import datetime
 import io
 
 import pytest
 from assertpy import assert_that
-from django.utils import timezone
 from rest_framework.reverse import reverse
 
 from api.legacy_rest_api.utils import hmac_signature
@@ -23,8 +23,8 @@ def test_getting_reservation_calendar(
 
     expected_summary = "SUMMARY:" + reservation.get_ical_summary().replace("\n", "\\n")
     expected_description = "DESCRIPTION:" + reservation.get_ical_description().replace("\n", "\\n")
-    expected_start = f"DTSTART:{reservation.begin.astimezone(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}"
-    unexpected_start = f"DTSTART:{reservation_in_second_unit.begin.astimezone(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}"
+    expected_start = f"DTSTART:{reservation.begin.astimezone(datetime.UTC).strftime('%Y%m%dT%H%M%SZ')}"
+    unexpected_start = f"DTSTART:{reservation_in_second_unit.begin.astimezone(datetime.UTC).strftime('%Y%m%dT%H%M%SZ')}"
 
     assert_that(zip_content).contains(expected_summary)
     assert_that(zip_content).contains(expected_description)
