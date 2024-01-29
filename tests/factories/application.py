@@ -205,8 +205,8 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
         schedules_to_create: int = 2,
         min_duration_hours: int = 1,
         max_duration_hours: int = 2,
-        begin: datetime.date | None = None,
-        end: datetime.date | None = None,
+        begin_date: datetime.date | None = None,
+        end_date: datetime.date | None = None,
         pre_allocated: bool = False,
     ) -> Application:
         """
@@ -245,8 +245,8 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
             events_per_week=events_per_week,
             min_duration=datetime.timedelta(hours=min_duration_hours),
             max_duration=datetime.timedelta(hours=max_duration_hours),
-            begin=begin or this_moment.date(),
-            end=end or (this_moment + datetime.timedelta(days=7)).date(),
+            begin=begin_date or this_moment.date(),
+            end=end_date or (this_moment + datetime.timedelta(days=7)).date(),
         )
 
         weekdays = iter(WeekdayChoice.values)
