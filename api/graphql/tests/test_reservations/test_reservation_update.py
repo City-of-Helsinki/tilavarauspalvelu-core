@@ -639,8 +639,6 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
             price_unit=PriceUnit.PRICE_UNIT_FIXED,
             lowest_price=1.0,
             highest_price=3.0,
-            highest_price_net=Decimal(3) / (1 + tax_percentage.decimal),
-            lowest_price_net=Decimal(1) / (1 + tax_percentage.decimal),
             tax_percentage=tax_percentage,
             status=PricingStatus.PRICING_STATUS_ACTIVE,
             reservation_unit=self.reservation_unit,
@@ -659,7 +657,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert self.reservation.price == 3.0
         assert self.reservation.unit_price == 3.0
         assert self.reservation.tax_percentage_value == tax_percentage.value
-        assert self.reservation.price_net == round_decimal(self.reservation.price / (1 + tax_percentage.decimal), 6)
+        assert self.reservation.price_net == round_decimal(self.reservation.price / tax_percentage.multiplier, 6)
         assert self.reservation.non_subsidised_price == round_decimal(self.reservation.price, 6)
         assert self.reservation.non_subsidised_price_net == self.reservation.price_net
 
@@ -674,8 +672,6 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
             price_unit=PriceUnit.PRICE_UNIT_FIXED,
             lowest_price=1.0,
             highest_price=3.0,
-            highest_price_net=Decimal(3) / (1 + tax_percentage.decimal),
-            lowest_price_net=Decimal(1) / (1 + tax_percentage.decimal),
             tax_percentage=tax_percentage,
             status=PricingStatus.PRICING_STATUS_ACTIVE,
             reservation_unit=self.reservation_unit,
@@ -694,7 +690,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert self.reservation.price == 3.0
         assert self.reservation.unit_price == 3.0
         assert self.reservation.tax_percentage_value == tax_percentage.value
-        assert self.reservation.price_net == round_decimal(self.reservation.price / (1 + tax_percentage.decimal), 6)
+        assert self.reservation.price_net == round_decimal(self.reservation.price / tax_percentage.multiplier, 6)
         assert self.reservation.non_subsidised_price == round_decimal(self.reservation.price, 6)
         assert self.reservation.non_subsidised_price_net == self.reservation.price_net
 
@@ -736,8 +732,6 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
             price_unit=PriceUnit.PRICE_UNIT_FIXED,
             lowest_price=2.0,
             highest_price=4.0,
-            highest_price_net=Decimal(4) / (1 + tax_percentage.decimal),
-            lowest_price_net=Decimal(2) / (1 + tax_percentage.decimal),
             tax_percentage=tax_percentage,
             status=PricingStatus.PRICING_STATUS_ACTIVE,
             reservation_unit=new_unit,
@@ -759,7 +753,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert self.reservation.price == 4.0
         assert self.reservation.unit_price == 4.0
         assert self.reservation.tax_percentage_value == tax_percentage.value
-        assert self.reservation.price_net == round_decimal(self.reservation.price / (1 + tax_percentage.decimal), 6)
+        assert self.reservation.price_net == round_decimal(self.reservation.price / tax_percentage.multiplier, 6)
         assert self.reservation.non_subsidised_price == round_decimal(self.reservation.price, 6)
         assert self.reservation.non_subsidised_price_net == self.reservation.price_net
 
@@ -788,8 +782,6 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
             price_unit=PriceUnit.PRICE_UNIT_FIXED,
             lowest_price=4.0,
             highest_price=6.0,
-            highest_price_net=Decimal(6) / (1 + tax_percentage.decimal),
-            lowest_price_net=Decimal(4) / (1 + tax_percentage.decimal),
             tax_percentage=tax_percentage,
             status=PricingStatus.PRICING_STATUS_FUTURE,
             reservation_unit=self.reservation_unit,
@@ -808,7 +800,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert self.reservation.price == 6.0
         assert self.reservation.unit_price == 6.0
         assert self.reservation.tax_percentage_value == tax_percentage.value
-        assert self.reservation.price_net == round_decimal(self.reservation.price / (1 + tax_percentage.decimal), 6)
+        assert self.reservation.price_net == round_decimal(self.reservation.price / tax_percentage.multiplier, 6)
         assert self.reservation.non_subsidised_price == round_decimal(self.reservation.price, 6)
         assert self.reservation.non_subsidised_price_net == self.reservation.price_net
 

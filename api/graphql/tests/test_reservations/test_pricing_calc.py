@@ -6,6 +6,7 @@ from django.utils.timezone import get_default_timezone
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from api.graphql.types.reservations.serializers.mixins import ReservationPriceMixin
 from reservation_units.enums import PriceUnit, PricingStatus, PricingType
+from reservation_units.models import ReservationUnitPricing
 from tests.factories import ReservationUnitPricingFactory, TaxPercentageFactory
 from utils.decimal_utils import round_decimal
 
@@ -16,14 +17,12 @@ class ReservationPricingTestCase(ReservationTestCaseBase):
         self.reservation_unit.save()
 
         tax_percentage = TaxPercentageFactory()
-        pricing = ReservationUnitPricingFactory(
+        pricing: ReservationUnitPricing = ReservationUnitPricingFactory(
             begins=datetime.date.today(),
             pricing_type=PricingType.PAID,
             price_unit=PriceUnit.PRICE_UNIT_FIXED,
             lowest_price=Decimal("1.0"),
             highest_price=Decimal("3.0"),
-            lowest_price_net=Decimal("1") / (1 + tax_percentage.decimal),
-            highest_price_net=Decimal("3") / (1 + tax_percentage.decimal),
             tax_percentage=tax_percentage,
             status=PricingStatus.PRICING_STATUS_ACTIVE,
             reservation_unit=self.reservation_unit,
@@ -38,21 +37,17 @@ class ReservationPricingTestCase(ReservationTestCaseBase):
         assert prices.subsidised_price == pricing.lowest_price
         assert prices.subsidised_price_net == round_decimal(pricing.lowest_price_net, 6)
 
-    def test_reservation_subsidised_price_is_equal_to_lowest_price_time_based_calc(
-        self,
-    ):
+    def test_reservation_subsidised_price_is_equal_to_lowest_price_time_based_calc(self):
         self.reservation_unit.allow_reservations_without_opening_hours = True
         self.reservation_unit.save()
 
         tax_percentage = TaxPercentageFactory()
-        pricing = ReservationUnitPricingFactory(
+        pricing: ReservationUnitPricing = ReservationUnitPricingFactory(
             begins=datetime.date.today(),
             pricing_type=PricingType.PAID,
             price_unit=PriceUnit.PRICE_UNIT_PER_HOUR,
             lowest_price=Decimal("1.0"),
             highest_price=Decimal("3.0"),
-            lowest_price_net=Decimal("1") / (1 + tax_percentage.decimal),
-            highest_price_net=Decimal("3") / (1 + tax_percentage.decimal),
             tax_percentage=tax_percentage,
             status=PricingStatus.PRICING_STATUS_ACTIVE,
             reservation_unit=self.reservation_unit,
@@ -63,13 +58,11 @@ class ReservationPricingTestCase(ReservationTestCaseBase):
 
         prices = price_calc.calculate_price(begin, end, [self.reservation_unit])
 
-        assert prices.reservation_price == round_decimal(pricing.highest_price * Decimal("2"), 6)
+        assert round_decimal(prices.reservation_price, 6) == round_decimal(pricing.highest_price * Decimal("2"), 6)
         assert prices.subsidised_price == round_decimal(pricing.lowest_price * Decimal("2"), 6)
         assert prices.subsidised_price_net == round_decimal(pricing.lowest_price_net * Decimal("2"), 6)
 
-    def test_pricing_is_calculated_per_15mins_with_pricing_type_less_than_half_day(
-        self,
-    ):
+    def test_pricing_is_calculated_per_15mins_with_pricing_type_less_than_half_day(self):
         self.reservation_unit.allow_reservations_without_opening_hours = True
         self.reservation_unit.save()
 
@@ -77,14 +70,12 @@ class ReservationPricingTestCase(ReservationTestCaseBase):
         begin = datetime.datetime.now(tz=datetime.UTC).astimezone(get_default_timezone())
         end = begin + datetime.timedelta(hours=1, minutes=15)
 
-        pricing = ReservationUnitPricingFactory(
+        pricing: ReservationUnitPricing = ReservationUnitPricingFactory(
             begins=begin.date(),
             pricing_type=PricingType.PAID,
             price_unit=PriceUnit.PRICE_UNIT_PER_HOUR,
             lowest_price=Decimal("40.0"),
             highest_price=Decimal("40.0"),
-            lowest_price_net=Decimal("40.0") / (1 + tax_percentage.decimal),
-            highest_price_net=Decimal("40.0") / (1 + tax_percentage.decimal),
             tax_percentage=tax_percentage,
             status=PricingStatus.PRICING_STATUS_ACTIVE,
             reservation_unit=self.reservation_unit,
@@ -101,14 +92,12 @@ class ReservationPricingTestCase(ReservationTestCaseBase):
         begin = datetime.datetime.now(tz=datetime.UTC).astimezone(get_default_timezone())
         end = begin + datetime.timedelta(hours=14)
 
-        pricing = ReservationUnitPricingFactory(
+        pricing: ReservationUnitPricing = ReservationUnitPricingFactory(
             begins=begin.date(),
             pricing_type=PricingType.PAID,
             price_unit=PriceUnit.PRICE_UNIT_PER_HALF_DAY,
             lowest_price=Decimal("100.0"),
             highest_price=Decimal("100.0"),
-            lowest_price_net=Decimal("100.0") / (1 + tax_percentage.decimal),
-            highest_price_net=Decimal("100.0") / (1 + tax_percentage.decimal),
             tax_percentage=tax_percentage,
             status=PricingStatus.PRICING_STATUS_ACTIVE,
             reservation_unit=self.reservation_unit,
@@ -125,14 +114,12 @@ class ReservationPricingTestCase(ReservationTestCaseBase):
         begin = datetime.datetime.now(tz=datetime.UTC).astimezone(get_default_timezone())
         end = begin + datetime.timedelta(days=1)
 
-        pricing = ReservationUnitPricingFactory(
+        pricing: ReservationUnitPricing = ReservationUnitPricingFactory(
             begins=begin.date(),
             pricing_type=PricingType.PAID,
             price_unit=PriceUnit.PRICE_UNIT_PER_HALF_DAY,
             lowest_price=Decimal("100.0"),
             highest_price=Decimal("100.0"),
-            lowest_price_net=Decimal("100.0") / (1 + tax_percentage.decimal),
-            highest_price_net=Decimal("100.0") / (1 + tax_percentage.decimal),
             tax_percentage=tax_percentage,
             status=PricingStatus.PRICING_STATUS_ACTIVE,
             reservation_unit=self.reservation_unit,

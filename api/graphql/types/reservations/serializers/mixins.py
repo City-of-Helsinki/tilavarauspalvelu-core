@@ -1,7 +1,8 @@
 import datetime
-import math
 from collections.abc import Iterable
 from decimal import Decimal
+from math import ceil
+from typing import Any
 
 from django.utils import timezone
 from django.utils.timezone import get_default_timezone
@@ -9,47 +10,56 @@ from django.utils.timezone import get_default_timezone
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from api.graphql.types.reservations.types import ReservationType
 from reservation_units.enums import PriceUnit, PricingType, ReservationStartInterval, ReservationUnitState
-from reservation_units.models import ReservationUnit
+from reservation_units.models import ReservationUnit, ReservationUnitPricing
 from reservation_units.utils.reservation_unit_pricing_helper import ReservationUnitPricingHelper
 from reservation_units.utils.reservation_unit_reservation_scheduler import ReservationUnitReservationScheduler
 from reservations.choices import ReservationTypeChoice
 from reservations.models import Reservation
+from utils.decimal_utils import round_decimal
 
 
 class PriceCalculationResult:
     reservation_price: Decimal = Decimal("0")
-    reservation_price_net: Decimal = Decimal("0")
     unit_price: Decimal = Decimal("0")
-    tax_percentage: Decimal = Decimal("0")
+    tax_percentage_value: Decimal = Decimal("0")
     non_subsidised_price: Decimal = Decimal("0")
-    non_subsidised_price_net: Decimal = Decimal("0")
     subsidised_price: Decimal = Decimal("0")
 
     def __init__(
         self,
         reservation_price: Decimal,
-        reservation_price_net: Decimal,
         unit_price: Decimal,
-        tax_percentage: Decimal,
+        tax_percentage_value: Decimal,
         non_subsidised_price: Decimal,
-        non_subsidised_price_net: Decimal,
         subsidised_price: Decimal,
-        subsidised_price_net: Decimal,
     ) -> None:
         self.reservation_price = reservation_price
-        self.reservation_price_net = reservation_price_net
         self.unit_price = unit_price
-        self.tax_percentage = tax_percentage
+        self.tax_percentage_value = tax_percentage_value
         self.non_subsidised_price = non_subsidised_price
-        self.non_subsidised_price_net = non_subsidised_price_net
         self.subsidised_price = subsidised_price
-        self.subsidised_price_net = subsidised_price_net
+
+    @property
+    def _tax_percentage_multiplier(self) -> Decimal:
+        return 1 + self.tax_percentage_value / 100
+
+    @property
+    def reservation_price_net(self) -> Decimal:
+        return round_decimal(self.reservation_price / self._tax_percentage_multiplier, 6)
+
+    @property
+    def non_subsidised_price_net(self) -> Decimal:
+        return round_decimal(self.non_subsidised_price / self._tax_percentage_multiplier, 6)
+
+    @property
+    def subsidised_price_net(self) -> Decimal:
+        return round_decimal(self.subsidised_price / self._tax_percentage_multiplier, 6)
 
 
 class ReservationPriceMixin:
     """Validation methods for pricing related operations"""
 
-    def requires_price_calculation(self, data):
+    def requires_price_calculation(self, data: dict[str, Any]) -> bool:
         # If pk is not given, this is a create request -> price is always calculated
         if "pk" not in data:
             return True
@@ -76,8 +86,8 @@ class ReservationPriceMixin:
 
     @staticmethod
     def calculate_price(
-        begin: datetime.datetime,
-        end: datetime.datetime,
+        begin_datetime: datetime.datetime,
+        end_datetime: datetime.datetime,
         reservation_units: Iterable[ReservationUnit],
     ) -> PriceCalculationResult:
         price_unit_to_minutes = {
@@ -96,86 +106,54 @@ class ReservationPriceMixin:
             PriceUnit.PRICE_UNIT_PER_WEEK,
         ]
 
-        total_reservation_price: Decimal = Decimal("0")
-        total_reservation_price_net: Decimal = Decimal("0")
-
-        total_reservation_subsidised_price: Decimal = Decimal("0")
-        total_reservation_subsidised_price_net: Decimal = Decimal("0")
-
-        first_paid_unit_price: Decimal = Decimal("0")
-        first_paid_unit_tax_percentage: Decimal = Decimal("0")
-        is_first_paid_set = False
+        calculation_result = PriceCalculationResult(
+            reservation_price=Decimal("0"),
+            unit_price=Decimal("0"),
+            tax_percentage_value=Decimal("0"),
+            non_subsidised_price=Decimal("0"),
+            subsidised_price=Decimal("0"),
+        )
 
         for reservation_unit in reservation_units:
-            pricing = ReservationUnitPricingHelper.get_price_by_date(reservation_unit, begin.date())
-            # If unit pricing type is not PAID, there is no need for calculations. Skip.
-            if pricing is None or pricing.pricing_type != PricingType.PAID:
-                break
-
-            max_price = max(pricing.lowest_price, pricing.highest_price)
-            reservation_unit_price = unit_price = max_price
-
-            # Use same equivalent net price that with vat price.
-            # This is merely a cautionary check since this should be highest_price_net.
-            reservation_unit_price_net = (
-                pricing.highest_price_net if max_price == pricing.highest_price else pricing.lowest_price_net
+            pricing: ReservationUnitPricing | None = ReservationUnitPricingHelper.get_price_by_date(
+                reservation_unit=reservation_unit,
+                by_date=begin_datetime.date(),
             )
 
-            # Subsidised price is always the lowest price.
-            reservation_unit_subsidised_price = pricing.lowest_price
-            reservation_unit_subsidised_price_net = pricing.lowest_price_net
+            # If unit pricing type is not PAID, there is no need for calculations, skip to next reservation unit
+            if pricing is None or pricing.pricing_type != PricingType.PAID:
+                continue
+
+            price = pricing.highest_price
+            subsidised_price = pricing.lowest_price  # Subsidised price is always the lowest price.
 
             # Time-based calculation is needed only if price unit is not fixed.
             # Otherwise, we can just use the price defined in the reservation unit
             if pricing.price_unit not in fixed_price_units:
-                reservation_duration_in_minutes = (end - begin).seconds / Decimal("60")
+                duration_minutes = (end_datetime - begin_datetime).total_seconds() / 60
+                # Price calculations use duration rounded to the next 15 minutes
+                duration_minutes = Decimal(ceil(duration_minutes / 15) * 15)
 
-                # Prices are calculated based on the 15 minutes intervals rounded up
-                reservation_duration_in_15mins = math.ceil(reservation_duration_in_minutes / Decimal("15"))
+                price_unit_minutes: int = price_unit_to_minutes.get(pricing.price_unit)
+                price_per_minute = price / price_unit_minutes
+                subsidised_price_per_minute = subsidised_price / price_unit_minutes
 
-                reservation_unit_price_unit_minutes = price_unit_to_minutes.get(pricing.price_unit)
-                reservation_unit_price_per_15min = (
-                    reservation_unit_price_net / reservation_unit_price_unit_minutes * Decimal("15")
-                )
+                price = duration_minutes * price_per_minute
+                subsidised_price = duration_minutes * subsidised_price_per_minute
 
-                reservation_unit_price_net = Decimal(reservation_duration_in_15mins * reservation_unit_price_per_15min)
-
-                reservation_unit_price = reservation_unit_price_net * (1 + pricing.tax_percentage.decimal)
-
-                reservation_unit_subsidised_price_net = Decimal(
-                    reservation_duration_in_15mins * reservation_unit_price_per_15min
-                )
-
-                reservation_unit_subsidised_price = reservation_unit_subsidised_price_net * (
-                    1 + pricing.tax_percentage.decimal
-                )
+            # Add the reservation unit calculated price to the total price
+            calculation_result.reservation_price += price
+            calculation_result.non_subsidised_price += price
+            calculation_result.subsidised_price += subsidised_price
 
             # It was agreed in TILA-1765 that when multiple units are given,
-            # unit price and tax percentage are fetched from the FIRST unit.
+            # unit price and tax percentage are fetched from the FIRST reservation unit.
             # https://helsinkisolutionoffice.atlassian.net/browse/TILA-1765
-            if not is_first_paid_set:
-                first_paid_unit_price = unit_price
-                first_paid_unit_tax_percentage = pricing.tax_percentage.value
-                is_first_paid_set = True
+            if not calculation_result.unit_price:
+                calculation_result.unit_price = pricing.highest_price
+                calculation_result.tax_percentage_value = pricing.tax_percentage.value
 
-            total_reservation_price += reservation_unit_price
-            total_reservation_price_net += reservation_unit_price_net
-            total_reservation_subsidised_price += reservation_unit_subsidised_price
-            total_reservation_subsidised_price_net += reservation_unit_subsidised_price_net
-
-        non_subsidised_price = total_reservation_price
-        non_subsidised_price_net = total_reservation_price_net
-
-        return PriceCalculationResult(
-            total_reservation_price,
-            total_reservation_price_net,
-            first_paid_unit_price,
-            first_paid_unit_tax_percentage,
-            non_subsidised_price,
-            non_subsidised_price_net,
-            total_reservation_subsidised_price,
-            total_reservation_subsidised_price_net,
-        )
+        return calculation_result
 
 
 class ReservationSchedulingMixin:
@@ -251,21 +229,20 @@ class ReservationSchedulingMixin:
             )
 
     @staticmethod
-    def check_reservation_duration(reservation_unit: ReservationUnit, begin, end):
-        duration = end - begin
-        if (
-            reservation_unit.max_reservation_duration
-            and duration.total_seconds() > reservation_unit.max_reservation_duration.total_seconds()
-        ):
+    def check_reservation_duration(
+        reservation_unit: ReservationUnit,
+        begin: datetime.datetime,
+        end: datetime.datetime,
+    ) -> None:
+        duration: datetime.timedelta = end - begin
+
+        if reservation_unit.max_reservation_duration and duration > reservation_unit.max_reservation_duration:
             raise ValidationErrorWithCode(
                 "Reservation duration exceeds one or more reservation unit's maximum duration.",
                 ValidationErrorCodes.RESERVATION_UNITS_MAX_DURATION_EXCEEDED,
             )
 
-        if (
-            reservation_unit.min_reservation_duration
-            and duration.total_seconds() < reservation_unit.min_reservation_duration.total_seconds()
-        ):
+        if reservation_unit.min_reservation_duration and duration < reservation_unit.min_reservation_duration:
             raise ValidationErrorWithCode(
                 "Reservation duration less than one or more reservation unit's minimum duration.",
                 ValidationErrorCodes.RESERVATION_UNIT_MIN_DURATION_NOT_EXCEEDED,
@@ -289,7 +266,7 @@ class ReservationSchedulingMixin:
         reservation_type: ReservationType | None = None,
         new_buffer_before: datetime.timedelta | None = None,
         new_buffer_after: datetime.timedelta | None = None,
-    ):
+    ) -> None:
         current_type = getattr(self.instance, "type", reservation_type)
         if current_type == ReservationTypeChoice.BLOCKED:
             return
@@ -336,7 +313,7 @@ class ReservationSchedulingMixin:
             )
 
     @staticmethod
-    def check_reservation_start_time(scheduler: ReservationUnitReservationScheduler, begin: datetime.datetime):
+    def check_reservation_start_time(scheduler: ReservationUnitReservationScheduler, begin: datetime.datetime) -> None:
         if scheduler.reservation_unit.allow_reservations_without_opening_hours:
             return
 
@@ -349,7 +326,7 @@ class ReservationSchedulingMixin:
             )
 
     @staticmethod
-    def check_reservation_days_before(begin, reservation_unit):
+    def check_reservation_days_before(begin: datetime.datetime, reservation_unit: ReservationUnit) -> None:
         now = datetime.datetime.now().astimezone(get_default_timezone())
         start_of_the_day = datetime.datetime.combine(now, datetime.time.min).astimezone(get_default_timezone())
 
@@ -370,7 +347,11 @@ class ReservationSchedulingMixin:
             )
 
     @staticmethod
-    def check_open_application_round(scheduler: ReservationUnitReservationScheduler, begin, end):
+    def check_open_application_round(
+        scheduler: ReservationUnitReservationScheduler,
+        begin: datetime.datetime,
+        end: datetime.datetime,
+    ) -> None:
         open_app_round = scheduler.get_conflicting_open_application_round(begin.date(), end.date())
 
         if open_app_round:
@@ -380,7 +361,10 @@ class ReservationSchedulingMixin:
             )
 
     @staticmethod
-    def check_reservation_intervals_for_staff_reservation(reservation_unit, begin):
+    def check_reservation_intervals_for_staff_reservation(
+        reservation_unit: ReservationUnit,
+        begin: datetime.datetime,
+    ) -> None:
         interval_minutes = ReservationStartInterval(reservation_unit.reservation_start_interval).as_number
 
         # Staff reservations ignore 60 and 90 minute intervals

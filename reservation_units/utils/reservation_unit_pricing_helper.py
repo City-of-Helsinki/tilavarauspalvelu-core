@@ -79,23 +79,33 @@ class ReservationUnitPricingHelper:
     @classmethod
     def calculate_vat_prices(cls, data: dict[str, Any]) -> dict[str, Any]:
         """Calculates vat prices from net prices and returns a dict of pricing data."""
-        pricings = data.get("pricings", [])
+        pricings = data.get("pricings", {})
 
         for pricing in pricings:
-            highest_price_net = pricing.get("highest_price_net", 0)
-            lowest_price_net = pricing.get("lowest_price_net", 0)
+            highest_price = pricing.get("highest_price")
+            lowest_price = pricing.get("lowest_price")
 
-            if highest_price_net < lowest_price_net:
-                raise GraphQLError("Highest price cannot be less than lowest price.")
+            # If both vat prices are given, skip calculating vat prices from net prices.
+            if lowest_price is not None and highest_price is not None:
+                continue
 
-            tax_percentage = pricing.get("tax_percentage")
+            highest_price_net = pricing.get("highest_price_net")
+            lowest_price_net = pricing.get("lowest_price_net")
 
-            if not tax_percentage or tax_percentage.value == 0:
-                pricing["highest_price"] = highest_price_net
-                pricing["lowest_price"] = lowest_price_net
-            else:
-                pricing["highest_price"] = round_decimal(Decimal(highest_price_net * (1 + tax_percentage.decimal)), 2)
-                pricing["lowest_price"] = round_decimal(Decimal(lowest_price_net * (1 + tax_percentage.decimal)), 2)
+            if lowest_price_net or highest_price_net:
+                if lowest_price_net is None or highest_price_net is None:
+                    raise GraphQLError("Both lowest and highest price net must be given or neither.")
+                if highest_price_net < lowest_price_net:
+                    raise GraphQLError("Highest price cannot be less than lowest price.")
+
+                tax_percentage = pricing.get("tax_percentage")
+
+                if tax_percentage is None or tax_percentage.value == 0:
+                    pricing["highest_price"] = highest_price_net
+                    pricing["lowest_price"] = lowest_price_net
+                else:
+                    pricing["highest_price"] = round_decimal(Decimal(highest_price_net * tax_percentage.multiplier), 2)
+                    pricing["lowest_price"] = round_decimal(Decimal(lowest_price_net * tax_percentage.multiplier), 2)
 
         return pricings
 

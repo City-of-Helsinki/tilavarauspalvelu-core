@@ -1,6 +1,5 @@
 from collections.abc import Iterable
 from datetime import date
-from decimal import Decimal
 from typing import Any
 
 import factory
@@ -272,8 +271,6 @@ class ReservationUnitPricingFactory(GenericDjangoModelFactory[ReservationUnitPri
     price_unit = PriceUnit.PRICE_UNIT_PER_15_MINS
     lowest_price = 5
     highest_price = 10
-    lowest_price_net = Decimal("5") / Decimal("1.10")
-    highest_price_net = Decimal("10") / Decimal("1.10")
     tax_percentage = factory.SubFactory("tests.factories.TaxPercentageFactory", value=10.0)
     status = PricingStatus.PRICING_STATUS_ACTIVE
 

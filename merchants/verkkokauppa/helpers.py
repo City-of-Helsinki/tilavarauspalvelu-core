@@ -84,10 +84,7 @@ def _get_order_params(reservation: Reservation):
     runit = reservation.reservation_unit.first()
     quantity = 1  # Currently, we don't support quantities larger than 1
     price_net = round_decimal(Decimal(quantity * reservation.price_net), 2)
-    price_vat = round_decimal(
-        Decimal(quantity * reservation.price_net * (reservation.tax_percentage_value / 100)),
-        2,
-    )
+    price_vat = round_decimal(Decimal(quantity * reservation.price_net * (reservation.tax_percentage_value / 100)), 2)
     preferred_language = getattr(reservation, "reservee_language", "fi")
     items = [
         OrderItemParams(

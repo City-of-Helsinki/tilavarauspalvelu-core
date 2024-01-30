@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -7,6 +9,8 @@ from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 __all__ = [
     "ReservationUnitPricing",
 ]
+
+from utils.decimal_utils import round_decimal
 
 
 def get_default_tax_percentage() -> int:
@@ -44,6 +48,7 @@ class ReservationUnitPricing(models.Model):
         default=PriceUnit.PRICE_UNIT_PER_HOUR,
         help_text="Unit of the price",
     )
+
     lowest_price = models.DecimalField(
         verbose_name=_("Lowest price"),
         max_digits=10,
@@ -52,28 +57,12 @@ class ReservationUnitPricing(models.Model):
         help_text="Minimum price of the reservation unit including VAT",
     )
 
-    lowest_price_net = models.DecimalField(
-        verbose_name=_("Lowest net price"),
-        max_digits=20,
-        decimal_places=6,
-        default=0,
-        help_text="Minimum price of the reservation unit excluding VAT",
-    )
-
     highest_price = models.DecimalField(
         verbose_name=_("Highest price"),
         max_digits=10,
         decimal_places=2,
         default=0,
         help_text="Maximum price of the reservation unit including VAT",
-    )
-
-    highest_price_net = models.DecimalField(
-        verbose_name=_("Highest net price"),
-        max_digits=20,
-        decimal_places=6,
-        default=0,
-        help_text="Maximum price of the reservation unit excluding VAT",
     )
 
     tax_percentage = models.ForeignKey(
@@ -107,8 +96,28 @@ class ReservationUnitPricing(models.Model):
         db_table = "reservation_unit_pricing"
         base_manager_name = "objects"
 
+        constraints = [
+            models.CheckConstraint(
+                name="lower_price_greater_than_highest_price",
+                check=models.Q(lowest_price__lte=models.F("highest_price")),
+                violation_error_message="Lowest price can not be greater than highest price.",
+            ),
+        ]
+
     def __str__(self) -> str:
         return f"{self.begins}: {self.lowest_price} - {self.highest_price} ({self.tax_percentage.value})"
+
+    @property
+    def lowest_price_net(self) -> Decimal:
+        if self.tax_percentage == 0:
+            return self.lowest_price
+        return round_decimal(self.lowest_price / self.tax_percentage.multiplier, 6)
+
+    @property
+    def highest_price_net(self) -> Decimal:
+        if self.tax_percentage == 0:
+            return self.highest_price
+        return round_decimal(self.highest_price / self.tax_percentage.multiplier, 6)
 
 
 AuditLogger.register(ReservationUnitPricing)
