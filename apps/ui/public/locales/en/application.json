@@ -111,9 +111,9 @@
     "as": {
       "prefix": "I create the application...",
       "type": {
-        "organisation": "on behalf of an organisation, group or community",
-        "company": "on behalf of the company",
-        "individual": "as a private person"
+        "ASSOCIATION": "on behalf of an organisation, group or community",
+        "COMPANY": "on behalf of the company",
+        "INDIVIDUAL": "as a private person"
       }
     },
     "contactPerson": {
