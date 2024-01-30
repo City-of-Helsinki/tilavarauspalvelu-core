@@ -1065,9 +1065,9 @@ const ReservationUnit = ({
                     // @ts-expect-error: TODO: fix this
                     eventWrapperComponent={EventWrapperComponent}
                     resizable={!isReservationQuotaReached}
-                    draggable={
-                      !isReservationQuotaReached && !isClientATouchDevice
-                    }
+                    // NOTE there was logic here to disable dragging on mobile
+                    // it breaks SSR render because it swaps the whole Calendar component
+                    draggable
                     onEventDrop={handleCalendarEventChange}
                     onEventResize={handleCalendarEventChange}
                     onSelectSlot={handleSlotClick}
