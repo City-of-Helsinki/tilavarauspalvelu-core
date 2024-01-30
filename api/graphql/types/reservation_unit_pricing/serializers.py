@@ -41,9 +41,10 @@ class ReservationUnitPricingCreateSerializer(OldPrimaryKeySerializer):
     )
 
     lowest_price = DecimalField(default=0)
-    lowest_price_net = DecimalField(default=0)
     highest_price = DecimalField(default=0)
-    highest_price_net = DecimalField(default=0)
+
+    lowest_price_net = DecimalField(default=0, read_only=True)
+    highest_price_net = DecimalField(default=0, read_only=True)
 
     class Meta:
         model = ReservationUnitPricing

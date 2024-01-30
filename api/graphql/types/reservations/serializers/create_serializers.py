@@ -180,7 +180,7 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
             price_calculation_result = self.calculate_price(begin, end, reservation_units)
             data["price"] = price_calculation_result.reservation_price
             data["unit_price"] = price_calculation_result.unit_price
-            data["tax_percentage_value"] = price_calculation_result.tax_percentage
+            data["tax_percentage_value"] = price_calculation_result.tax_percentage_value
             data["price_net"] = price_calculation_result.reservation_price_net
             data["non_subsidised_price"] = price_calculation_result.non_subsidised_price
             data["non_subsidised_price_net"] = price_calculation_result.non_subsidised_price_net

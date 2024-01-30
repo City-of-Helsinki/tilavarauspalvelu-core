@@ -71,9 +71,7 @@ class ReservationUnitCreateAsNotDraftTestCase(ReservationUnitMutationsTestCaseBa
                     "pricingType": PricingType.PAID,
                     "priceUnit": PriceUnit.PRICE_UNIT_PER_15_MINS,
                     "lowestPrice": 10.5,
-                    "lowestPriceNet": float(round_decimal(Decimal("10.5") / (1 + self.tax_percentage.decimal), 6)),
                     "highestPrice": 18.8,
-                    "highestPriceNet": float(round_decimal(Decimal("18.8") / (1 + self.tax_percentage.decimal), 6)),
                     "taxPercentagePk": self.tax_percentage.id,
                     "status": PricingStatus.PRICING_STATUS_ACTIVE,
                 }

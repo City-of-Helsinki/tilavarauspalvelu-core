@@ -1493,15 +1493,7 @@ msgid "Lowest price"
 msgstr ""
 
 #: reservation_units/models/reservation_unit_pricing.py
-msgid "Lowest net price"
-msgstr ""
-
-#: reservation_units/models/reservation_unit_pricing.py
 msgid "Highest price"
-msgstr ""
-
-#: reservation_units/models/reservation_unit_pricing.py
-msgid "Highest net price"
 msgstr ""
 
 #: reservation_units/models/reservation_unit_pricing.py
