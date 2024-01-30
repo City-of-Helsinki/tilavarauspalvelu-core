@@ -31,19 +31,19 @@ class GetPreviousReservationTestCase(TestCase):
         )
 
     def test_get_previous_reservation(self):
-        previous_reservation = self.reservation_unit.get_previous_reservation(self.now)
+        previous_reservation = self.reservation_unit.actions.get_previous_reservation(self.now)
         assert previous_reservation is not None
         assert previous_reservation.name == self.reservation_blocked.name
 
     def test_get_previous_reservation_ignored_given_reservation(self):
-        previous_reservation = self.reservation_unit.get_previous_reservation(
+        previous_reservation = self.reservation_unit.actions.get_previous_reservation(
             self.now, reservation=self.reservation_blocked
         )
         assert previous_reservation is not None
         assert previous_reservation.name == self.reservation.name
 
     def test_get_previous_reservation_ignores_blocked(self):
-        previous_reservation = self.reservation_unit.get_previous_reservation(self.now, exclude_blocked=True)
+        previous_reservation = self.reservation_unit.actions.get_previous_reservation(self.now, exclude_blocked=True)
         assert previous_reservation is not None
         assert previous_reservation.name == self.reservation.name
 
@@ -70,16 +70,18 @@ class GetNextReservationTestCase(TestCase):
         )
 
     def test_get_next_reservation(self):
-        next_reservation = self.reservation_unit.get_next_reservation(self.now)
+        next_reservation = self.reservation_unit.actions.get_next_reservation(self.now)
         assert next_reservation is not None
         assert next_reservation.name == self.reservation_blocked.name
 
     def test_get_next_reservation_ignored_given_reservation(self):
-        next_reservation = self.reservation_unit.get_next_reservation(self.now, reservation=self.reservation_blocked)
+        next_reservation = self.reservation_unit.actions.get_next_reservation(
+            self.now, reservation=self.reservation_blocked
+        )
         assert next_reservation is not None
         assert next_reservation.name == self.reservation.name
 
     def test_get_next_reservation_ignores_blocked(self):
-        next_reservation = self.reservation_unit.get_next_reservation(self.now, exclude_blocked=True)
+        next_reservation = self.reservation_unit.actions.get_next_reservation(self.now, exclude_blocked=True)
         assert next_reservation is not None
         assert next_reservation.name == self.reservation.name

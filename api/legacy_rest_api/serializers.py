@@ -273,21 +273,21 @@ class ReservationUnitSerializer(OldTranslatedModelSerializer):
             self.fields.pop("id")
 
     def get_building(self, reservation_unit) -> dict | None:
-        building = reservation_unit.get_building()
+        building = reservation_unit.actions.get_building()
         if building:
             return BuildingSerializer(building).data
 
         return None
 
     def get_location(self, reservation_unit) -> dict | None:
-        location = reservation_unit.get_location()
+        location = reservation_unit.actions.get_location()
         if location:
             return LocationSerializer(location).data
 
         return None
 
     def get_max_persons(self, reservation_unit) -> int:
-        return reservation_unit.get_max_persons()
+        return reservation_unit.actions.get_max_persons()
 
 
 class ReservationSerializer(serializers.ModelSerializer):
@@ -345,7 +345,7 @@ class ReservationSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         for reservation_unit in data["reservation_unit"]:
-            if reservation_unit.check_reservation_overlap(data["begin"], data["end"], self.instance):
+            if reservation_unit.actions.check_reservation_overlap(data["begin"], data["end"], self.instance):
                 raise serializers.ValidationError("Overlapping reservations are not allowed")
         return data
 

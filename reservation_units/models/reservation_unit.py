@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import uuid
-from typing import TYPE_CHECKING
+from typing import Any
 
 from django.conf import settings
 from django.db import models
@@ -15,10 +15,6 @@ from reservation_units.enums import ReservationKind, ReservationStartInterval, R
 from reservation_units.querysets import ReservationUnitQuerySet
 from reservation_units.tasks import refresh_reservation_unit_product_mapping
 from tilavarauspalvelu.utils.auditlog_util import AuditLogger
-
-if TYPE_CHECKING:
-    from reservations.models import Reservation
-
 
 __all__ = [
     "ReservationUnit",
@@ -373,114 +369,13 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
         base_manager_name = "objects"
         ordering = ["rank", "id"]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name}, {getattr(self.unit, 'name', '')}"
 
-    def save(self, *args, **kwargs) -> None:
+    def save(self, *args: Any, **kwargs: Any) -> None:
         super().save(*args, **kwargs)
         if settings.UPDATE_PRODUCT_MAPPING:
             refresh_reservation_unit_product_mapping.delay(self.pk)
-
-    def get_location(self):
-        # For now, we assume that if reservation has multiple spaces they all have same location
-        spaces = self.spaces.all()
-        return next((space.location for space in spaces if hasattr(space, "location")), None)
-
-    def get_building(self):
-        # For now, we assume that if reservation has multiple spaces they all have same building
-        spaces = self.spaces.all()
-        return next((space.building for space in spaces if hasattr(space, "building")), None)
-
-    def get_max_persons(self):
-        # Sum of max persons for all spaces because group can be divided to different spaces
-        spaces = self.spaces.all()
-        return sum(filter(None, (space.max_persons for space in spaces))) or None
-
-    def check_required_introduction(self, user):
-        from .introduction import Introduction
-
-        return Introduction.objects.filter(reservation_unit=self, user=user).exists()
-
-    def check_reservation_overlap(self, start_time: datetime.datetime, end_time: datetime.datetime, reservation=None):
-        from reservations.choices import ReservationStateChoice
-        from reservations.models import Reservation
-
-        qs = Reservation.objects.filter(
-            reservation_unit__in=self.reservation_units_with_common_hierarchy,
-            end__gt=start_time,
-            begin__lt=end_time,
-        ).exclude(state__in=[ReservationStateChoice.CANCELLED, ReservationStateChoice.DENIED])
-
-        # If updating an existing reservation, allow "overlapping" it's old time
-        if reservation:
-            qs = qs.exclude(pk=reservation.pk)
-
-        return qs.exists()
-
-    def get_next_reservation(
-        self,
-        end_time: datetime.datetime,
-        reservation: Reservation | None = None,
-        exclude_blocked: bool = False,
-    ) -> Reservation | None:
-        from reservations.choices import ReservationStateChoice, ReservationTypeChoice
-        from reservations.models import Reservation
-
-        qs = Reservation.objects.filter(
-            reservation_unit__in=self.reservation_units_with_common_hierarchy,
-            begin__gte=end_time,
-        ).exclude(state__in=[ReservationStateChoice.CANCELLED, ReservationStateChoice.DENIED])
-
-        if reservation:
-            qs = qs.exclude(id=reservation.id)
-
-        if exclude_blocked:
-            qs = qs.exclude(type=ReservationTypeChoice.BLOCKED)
-
-        return qs.order_by("begin").first()
-
-    def get_previous_reservation(
-        self,
-        start_time: datetime.datetime,
-        reservation: Reservation | None = None,
-        exclude_blocked: bool = False,
-    ) -> Reservation | None:
-        from reservations.choices import ReservationStateChoice, ReservationTypeChoice
-        from reservations.models import Reservation
-
-        qs = Reservation.objects.filter(
-            reservation_unit__in=self.reservation_units_with_common_hierarchy,
-            end__lte=start_time,
-        ).exclude(state__in=[ReservationStateChoice.CANCELLED, ReservationStateChoice.DENIED])
-
-        if reservation:
-            qs = qs.exclude(id=reservation.id)
-
-        if exclude_blocked:
-            qs = qs.exclude(type=ReservationTypeChoice.BLOCKED)
-
-        return qs.order_by("-end").first()
-
-    @property
-    def reservation_units_with_common_hierarchy(self) -> models.QuerySet:
-        """
-        Find all "related" ReservationUnits where any one of these is true:
-        1) There are common resources
-        2) There are spaces belonging to the same "family"/hierarchy
-           (see. `spaces.querysets.space.SpaceQuerySet.all_space_ids_though_hierarchy`)
-
-        This method is used for finding all ReservationUnits that influence the availability of this ReservationUnit.
-
-        Before making a new reservation, we need to ensure there are no overlapping reservations on any
-        "related" ReservationUnits. For a new reservation to be allowed on a ReservationUnit, all its spaces and
-        resources must be available during the reservation's time. If any "related" ReservationUnits already have
-        reservations overlapping with the new one, the new reservation can not be made.
-        """
-        space_ids: set[int] = self.spaces.all().all_space_ids_though_hierarchy()
-        resource_ids: set[int] = set(self.resources.all().values_list("id", flat=True))
-        return ReservationUnit.objects.filter(
-            models.Q(resources__in=resource_ids) | models.Q(spaces__in=space_ids)
-        ).distinct()
 
     @property
     def state(self) -> ReservationUnitState:

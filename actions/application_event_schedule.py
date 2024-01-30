@@ -62,7 +62,7 @@ class ApplicationEventScheduleActions:
                 get_default_timezone(),
             )
 
-            is_overlapping = self.schedule.allocated_reservation_unit.check_reservation_overlap(
+            is_overlapping = self.schedule.allocated_reservation_unit.actions.check_reservation_overlap(
                 reservations_start,
                 reservations_end,
             )

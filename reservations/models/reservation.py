@@ -358,7 +358,7 @@ class Reservation(ExportModelOperationsMixin("reservation"), SerializableMixin, 
     def get_location_string(self):
         locations = []
         for reservation_unit in self.reservation_unit.all():
-            location = reservation_unit.get_location()
+            location = reservation_unit.actions.get_location()
             if location is not None:
                 locations.append(str(location))
         return f"{', '.join(locations)}"

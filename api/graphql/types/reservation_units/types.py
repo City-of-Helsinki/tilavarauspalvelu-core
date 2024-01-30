@@ -544,62 +544,62 @@ class ReservationUnitType(
             "cancellationRule": ("select", "cancellation_rule"),
         }
 
-    def resolve_location(self, info):
-        return self.get_location()
+    def resolve_location(root: ReservationUnit, info: GQLInfo):
+        return root.actions.get_location()
 
-    def resolve_pricings(self, info):
-        return self.pricings.all()
+    def resolve_pricings(root: ReservationUnit, info: GQLInfo):
+        return root.pricings.all()
 
     @check_resolver_permission(SpacePermission)
-    def resolve_spaces(self, info):
-        return self.spaces.all()
+    def resolve_spaces(root: ReservationUnit, info: GQLInfo):
+        return root.spaces.all()
 
     @check_resolver_permission(ServicePermission)
-    def resolve_services(self, info):
-        return self.services.all()
+    def resolve_services(root: ReservationUnit, info: GQLInfo):
+        return root.services.all()
 
     @check_resolver_permission(PurposePermission)
-    def resolve_purposes(self, info):
-        return self.purposes.all()
+    def resolve_purposes(root: ReservationUnit, info: GQLInfo):
+        return root.purposes.all()
 
     @check_resolver_permission(QualifierPermission)
-    def resolve_qualifiers(self, info):
-        return self.qualifiers.all()
+    def resolve_qualifiers(root: ReservationUnit, info: GQLInfo):
+        return root.qualifiers.all()
 
     @check_resolver_permission(ResourcePermission)
-    def resolve_resources(self, info):
-        return self.resources.all()
+    def resolve_resources(root: ReservationUnit, info: GQLInfo):
+        return root.resources.all()
 
-    def resolve_reservation_unit_type(self, info):
-        return self.reservation_unit_type
+    def resolve_reservation_unit_type(root: ReservationUnit, info: GQLInfo):
+        return root.reservation_unit_type
 
     @check_resolver_permission(EquipmentPermission)
-    def resolve_equipment(self, info):
-        if self.equipments is None:
+    def resolve_equipment(root: ReservationUnit, info: GQLInfo):
+        if root.equipments is None:
             return []
-        return self.equipments.all()
+        return root.equipments.all()
 
     @check_resolver_permission(UnitPermission)
-    def resolve_unit(self, info):
-        return self.unit
+    def resolve_unit(root: ReservationUnit, info: GQLInfo):
+        return root.unit
 
-    def resolve_max_persons(self, info):
-        return self.max_persons
+    def resolve_max_persons(root: ReservationUnit, info: GQLInfo):
+        return root.max_persons
 
-    def resolve_surface_area(self, info):
-        if self.surface_area is not None:
-            return self.surface_area
-        surface_area = self.spaces.aggregate(total_surface_area=Sum("surface_area"))
+    def resolve_surface_area(root: ReservationUnit, info: GQLInfo):
+        if root.surface_area is not None:
+            return root.surface_area
+        surface_area = root.spaces.aggregate(total_surface_area=Sum("surface_area"))
         return surface_area.get("total_surface_area")
 
-    def resolve_keyword_groups(self, info):
-        return KeywordGroup.objects.filter(reservation_units=self.id)
+    def resolve_keyword_groups(root: ReservationUnit, info: GQLInfo):
+        return KeywordGroup.objects.filter(reservation_units=root.id)
 
-    def resolve_payment_types(self, info):
-        return self.payment_types.all()
+    def resolve_payment_types(root: ReservationUnit, info: GQLInfo):
+        return root.payment_types.all()
 
-    def resolve_application_rounds(self, info: GQLInfo, active: bool | None = None) -> QuerySet:
-        application_rounds = self.application_rounds.all()
+    def resolve_application_rounds(root: ReservationUnit, info: GQLInfo, active: bool | None = None) -> QuerySet:
+        application_rounds = root.application_rounds.all()
         if active is None:
             return application_rounds
         now = datetime.datetime.now().astimezone()
@@ -610,20 +610,20 @@ class ReservationUnitType(
         return application_rounds.filter(active_filter if active else ~active_filter)
 
     @check_resolver_permission(ReservationUnitCancellationRulePermission)
-    def resolve_cancellation_rule(self, info: GQLInfo):
-        return self.cancellation_rule
+    def resolve_cancellation_rule(root: ReservationUnit, info: GQLInfo):
+        return root.cancellation_rule
 
-    def resolve_payment_merchant(self, info: GQLInfo):
-        if can_modify_reservation_unit(info.context.user, self):
-            if self.payment_merchant is not None:
-                return self.payment_merchant
-            elif self.unit and self.unit.payment_merchant is not None:
-                return self.unit.payment_merchant
+    def resolve_payment_merchant(root: ReservationUnit, info: GQLInfo):
+        if can_modify_reservation_unit(info.context.user, root):
+            if root.payment_merchant is not None:
+                return root.payment_merchant
+            elif root.unit and root.unit.payment_merchant is not None:
+                return root.unit.payment_merchant
         return None
 
-    def resolve_payment_product(self, info: GQLInfo):
-        if can_modify_reservation_unit(info.context.user, self):
-            return self.payment_product
+    def resolve_payment_product(root: ReservationUnit, info: GQLInfo):
+        if can_modify_reservation_unit(info.context.user, root):
+            return root.payment_product
         return None
 
     def resolve_is_closed(root: ReservationUnit, info: GQLInfo) -> bool:
