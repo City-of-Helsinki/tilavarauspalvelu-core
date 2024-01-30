@@ -208,7 +208,7 @@ class ReservationQuerySet(QuerySet):
     ) -> Self:
         if begin and end:
             return self.filter(
-                reservation_unit__in=reservation_unit.reservation_units_with_common_hierarchy,
+                reservation_unit__in=reservation_unit.actions.reservation_units_with_common_hierarchy,
                 end__lte=end,
                 begin__gte=begin,
             ).exclude(state__in=[ReservationStateChoice.CANCELLED, ReservationStateChoice.DENIED])

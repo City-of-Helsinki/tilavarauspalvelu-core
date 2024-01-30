@@ -233,7 +233,7 @@ class ReservationSchedulingMixin:
             )
 
     def check_reservation_overlap(self, reservation_unit: ReservationUnit, begin, end):
-        if reservation_unit.check_reservation_overlap(begin, end, self.instance):
+        if reservation_unit.actions.check_reservation_overlap(begin, end, self.instance):
             raise ValidationErrorWithCode(
                 "Overlapping reservations are not allowed.",
                 ValidationErrorCodes.OVERLAPPING_RESERVATIONS,
@@ -306,7 +306,9 @@ class ReservationSchedulingMixin:
             if new_buffer_before is not None
             else reservation_unit.actions.get_actual_before_buffer(begin)
         )
-        previous_reservation = reservation_unit.get_previous_reservation(begin, self.instance, exclude_blocked=True)
+        previous_reservation = reservation_unit.actions.get_previous_reservation(
+            begin, self.instance, exclude_blocked=True
+        )
         if previous_reservation:
             previous_buffer = previous_reservation.buffer_time_after or datetime.timedelta()
             if previous_buffer > buffer_before:
@@ -317,7 +319,7 @@ class ReservationSchedulingMixin:
             if new_buffer_after is not None  # for formatting
             else reservation_unit.actions.get_actual_after_buffer(end)
         )
-        next_reservation = reservation_unit.get_next_reservation(end, self.instance, exclude_blocked=True)
+        next_reservation = reservation_unit.actions.get_next_reservation(end, self.instance, exclude_blocked=True)
         if next_reservation:
             next_buffer = next_reservation.buffer_time_before or datetime.timedelta()
             if next_buffer > buffer_after:
