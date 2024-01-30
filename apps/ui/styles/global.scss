@@ -35,7 +35,7 @@ body {
 
 // utils
 
-// adjust kortos svg similary to footer
+// adjust koros svg similary to footer
 .koros > svg {
   left: 50%;
   position: relative;
@@ -115,5 +115,12 @@ button {
   color: hotpink;
   .ch2-dialog {
     min-width: 260px;
+  }
+}
+
+@media print {
+  header,
+  footer {
+    display: none;
   }
 }
