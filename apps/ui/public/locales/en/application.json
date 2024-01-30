@@ -79,7 +79,9 @@
     "legend": {
       "unavailable": "Not available",
       "selected-1": "Preferred time slots",
-      "selected-2": "Other request"
+      "selected-2": "Other request",
+      "within-opening-hours": "Reservable",
+      "outside-opening-hours": "Not for seasonal bookings"
     },
     "primarySchedules": "Preferred time slots",
     "secondarySchedules": "Other time slots",

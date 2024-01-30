@@ -75,7 +75,7 @@ const applicationEventSchedulesToCells = (
           end: t && +t.end.split(":")[0] === 0 ? 24 : t && +t.end.split(":")[0],
         };
       }) ?? [];
-    // state is 50 if the cell is outside of the opening hours, 100 if it's inside
+    // state is 50 if the cell is outside the opening hours, 100 if it's inside
     for (let i = firstSlotStart; i <= lastSlotStart; i += 1) {
       const isAvailable = dayOpeningHours.some(
         (t) => t.begin != null && t.end != null && t?.begin <= i && t?.end > i
@@ -214,15 +214,23 @@ const getApplicationEventsWhichMinDurationsIsNotFulfilled = (
 
 const Page2 = ({ application, onNext }: Props): JSX.Element => {
   const { t } = useTranslation();
-
+  const [selectedReservationUnit, setSelectedReservationUnit] =
+    useState<number>(0);
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [minDurationMsg, setMinDurationMsg] = useState(true);
   const router = useRouter();
   const openingHours = filterNonNullable(
-    application?.applicationEvents?.[0]?.eventReservationUnits?.[0]
-      ?.reservationUnit.applicationRoundTimeSlots
+    application?.applicationEvents?.[0]?.eventReservationUnits?.[
+      selectedReservationUnit
+    ]?.reservationUnit.applicationRoundTimeSlots
   );
+  const reservationUnitOptions = filterNonNullable(
+    application?.applicationEvents?.[0]?.eventReservationUnits?.map(
+      (n, idx) => ({ value: idx, label: n?.reservationUnit.nameFi ?? "" })
+    )
+  );
+
   const { getValues, setValue, watch, handleSubmit } =
     useFormContext<ApplicationFormValues>();
 
@@ -392,6 +400,9 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
               copyCells={applicationEvents.length > 1 ? copyCells : null}
               resetCells={() => resetCells(index)}
               summaryData={[summaryDataPrimary, summaryDataSecondary]}
+              reservationUnitOptions={reservationUnitOptions}
+              selectedReservationUnit={selectedReservationUnit}
+              setSelectedReservationUnit={setSelectedReservationUnit}
             />
           </Accordion>
         );

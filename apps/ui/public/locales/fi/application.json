@@ -79,7 +79,9 @@
     "legend": {
       "unavailable": "Ei varattavissa",
       "selected-1": "Ensisijainen toive",
-      "selected-2": "Muu toive"
+      "selected-2": "Muu toive",
+      "within-opening-hours": "Varattavissa",
+      "outside-opening-hours": "Ei merkitty kausivarattavaksi"
     },
     "primarySchedules": "Ensisijaiset aikatoiveet",
     "secondarySchedules": "Muut aikatoiveet",

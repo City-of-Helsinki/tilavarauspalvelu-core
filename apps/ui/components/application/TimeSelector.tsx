@@ -36,6 +36,9 @@ type Props = {
     ApplicationEventScheduleFormType[],
     ApplicationEventScheduleFormType[],
   ];
+  reservationUnitOptions: OptionType[];
+  selectedReservationUnit: number;
+  setSelectedReservationUnit: (id: number) => void;
 };
 
 const CalendarHead = styled.div`
@@ -199,10 +202,23 @@ const Day = ({
 
 const OptionWrapper = styled.div`
   margin-top: var(--spacing-m);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--spacing-s);
+
+  @media (min-width: ${breakpoints.l}) {
+    flex-direction: row;
+  }
 `;
 
-const PrioritySelect = styled(Select<OptionType>)`
-  max-width: 380px;
+const StyledSelect = styled(Select<OptionType>)`
+  flex-grow: 1;
+  min-width: 300px;
+  &:last-child {
+    flex-grow: 0;
+    min-width: 300px;
+  }
 `;
 
 const CalendarContainer = styled.div`
@@ -276,7 +292,18 @@ const LegendBox = styled.div<{ type: string }>`
 
     background-color: var(--tilavaraus-calendar-selected-secondary);
   `}
-
+  ${(props) =>
+    props.type === "within-opening-hours" &&
+    ` 
+    background-color: var(--color-white);
+    border: 1px solid var(--color-black-50);
+   `}
+  ${(props) =>
+    props.type === "outside-opening-hours" &&
+    ` 
+    background-color: var(--color-black-10);
+    border: 1px solid var(--color-black-50);
+   `}
   margin-right: 1em;
   width: 37px;
   height: 37px;
@@ -323,6 +350,9 @@ const TimeSelector = ({
   resetCells,
   index,
   summaryData,
+  reservationUnitOptions,
+  selectedReservationUnit,
+  setSelectedReservationUnit,
 }: Props): JSX.Element | null => {
   const { t } = useTranslation();
   const [priority, setPriority] =
@@ -340,6 +370,14 @@ const TimeSelector = ({
     {
       type: "selected-2",
       label: t("application:Page2.legend.selected-2"),
+    },
+    {
+      type: "within-opening-hours",
+      label: t("application:Page2.legend.within-opening-hours"),
+    },
+    {
+      type: "outside-opening-hours",
+      label: t("application:Page2.legend.outside-opening-hours"),
     },
   ];
   const priorityOptions: OptionType[] = [300, 200].map((n) => ({
@@ -370,7 +408,16 @@ const TimeSelector = ({
   return (
     <>
       <OptionWrapper>
-        <PrioritySelect
+        <StyledSelect
+          id={`time-selector__select--reservation-unit-${index}`}
+          aria-labelledby={t("appplication:Page2.")}
+          options={reservationUnitOptions}
+          defaultValue={reservationUnitOptions[selectedReservationUnit]}
+          onChange={(val: OptionType) =>
+            setSelectedReservationUnit(val.value as number)
+          }
+        />
+        <StyledSelect
           id={`time-selector__select--priority-${index}`}
           label=""
           options={priorityOptions}

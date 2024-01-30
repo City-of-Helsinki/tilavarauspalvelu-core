@@ -79,7 +79,9 @@
     "legend": {
       "unavailable": "Kan inte bokas",
       "selected-1": "Prioriterat önskemål",
-      "selected-2": "Alternativt önskemål"
+      "selected-2": "Alternativt önskemål",
+      "within-opening-hours": "Kan reserveras",
+      "outside-opening-hours": "Inte för säsongbokning"
     },
     "primarySchedules": "Prioriterade tidsönskemål",
     "secondarySchedules": "Alternativa tidsönskemål",
