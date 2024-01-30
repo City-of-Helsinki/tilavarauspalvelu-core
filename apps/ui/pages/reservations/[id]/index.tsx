@@ -100,13 +100,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   };
 };
 
-// TODO not needed anymore? why would this be a thing any case?
-// in what world do we want to override the primary background color for a single page?
-// TODO can be removed completely?
-const Wrapper = styled.div`
-  /* background-color: var(--color-white); */
-`;
-
 // TODO this has margin issues on mobile, there is zero margin on top because some element (breadcrumbs?) is removed on mobile
 const Heading = styled(H2).attrs({ as: "h1" })`
   margin-top: 0;
@@ -521,7 +514,7 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
   ];
 
   return (
-    <Wrapper>
+    <>
       <BreadcrumbWrapper route={routes} />
       <Container>
         <PageContent data-testid="reservation__content">
@@ -732,7 +725,7 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
           </Content>
         </PageContent>
       </Container>
-    </Wrapper>
+    </>
   );
 };
 
