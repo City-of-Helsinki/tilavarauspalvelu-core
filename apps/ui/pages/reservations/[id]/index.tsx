@@ -100,10 +100,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   };
 };
 
-const StyledBreadcrumbWrapper = styled(BreadcrumbWrapper)`
-  padding: 0;
-`;
-
 // TODO not needed anymore? why would this be a thing any case?
 // in what world do we want to override the primary background color for a single page?
 // TODO can be removed completely?
@@ -261,10 +257,10 @@ const PageContent = styled.div`
   grid-template-rows: repeat(4, auto);
   grid-gap: var(--spacing-m);
   justify-content: space-between;
-  margin-top: 0;
+  margin-top: var(--spacing-s);
 
   @media (width > ${breakpoints.m}) {
-    margin-top: var(--spacing-xl);
+    margin-top: var(--spacing-l);
     grid-template-columns: 2fr 1fr;
   }
 `;
@@ -519,15 +515,15 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
       title: t("breadcrumb:reservations"),
     },
     {
-      slug: "reservationName",
+      // NOTE Don't set slug. It hides the mobile breadcrumb
       title: t("reservations:reservationName", { id: reservation.pk }),
     },
   ];
 
   return (
     <Wrapper>
+      <BreadcrumbWrapper route={routes} />
       <Container>
-        <StyledBreadcrumbWrapper route={routes} />
         <PageContent data-testid="reservation__content">
           <div style={{ gridColumn: "1 / span 1", gridRow: "1 / span 1" }}>
             <Heading data-testid="reservation__name">

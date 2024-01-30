@@ -95,17 +95,25 @@ const Slug = styled.span<{ $current?: boolean }>`
   white-space: nowrap;
 `;
 
-const Breadcrumb = ({
+function Breadcrumb({
   routes = [],
   isMobile,
   linkComponent,
   className,
-}: Props): JSX.Element => {
+}: Props): JSX.Element {
   const Link = linkComponent || Fragment;
 
   const routesWithSlug = routes?.filter((n) => n.slug);
   const lastRoute = routes[routes.length - 1];
   const lastRouteWithSlug = routesWithSlug[routesWithSlug.length - 1];
+
+  // TODO why are we doing this? is there a case where we need to do this?
+  // or would it just be better to pass hideMobileBreadcrumb prop to the component
+  // instead of having hidden logic here?
+  const isMobileEnabled =
+    isMobile &&
+    routesWithSlug.length > 1 &&
+    lastRoute.slug !== lastRouteWithSlug.slug;
 
   return (
     <Wrapper
@@ -113,27 +121,7 @@ const Breadcrumb = ({
       data-testid="breadcrumb__wrapper"
       $isMobile={isMobile}
     >
-      {isMobile &&
-        routesWithSlug.length > 1 &&
-        lastRoute.slug !== lastRouteWithSlug.slug && (
-          <Item>
-            <IconAngleLeft size="s" aria-hidden className="angleLeft" />
-            <Link
-              {...(linkComponent && {
-                href: lastRouteWithSlug?.slug,
-                passHref: true,
-              })}
-            >
-              <Anchor
-                {...(!linkComponent && { href: lastRouteWithSlug?.slug })}
-                $isMobile
-              >
-                {lastRouteWithSlug.title}
-              </Anchor>
-            </Link>
-          </Item>
-        )}
-      {!isMobile &&
+      {!isMobile ? (
         routes?.map((item, index) => (
           <Item key={`${item.title}${item.slug}`}>
             {index > 0 && (
@@ -166,9 +154,27 @@ const Breadcrumb = ({
               </Slug>
             )}
           </Item>
-        ))}
+        ))
+      ) : isMobileEnabled ? (
+        <Item>
+          <IconAngleLeft size="s" aria-hidden className="angleLeft" />
+          <Link
+            {...(linkComponent && {
+              href: lastRouteWithSlug?.slug,
+              passHref: true,
+            })}
+          >
+            <Anchor
+              {...(!linkComponent && { href: lastRouteWithSlug?.slug })}
+              $isMobile
+            >
+              {lastRouteWithSlug.title}
+            </Anchor>
+          </Link>
+        </Item>
+      ) : null}
     </Wrapper>
   );
-};
+}
 
 export default Breadcrumb;
