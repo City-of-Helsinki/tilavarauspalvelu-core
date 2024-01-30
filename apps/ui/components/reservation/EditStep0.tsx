@@ -83,9 +83,6 @@ const Actions = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  /*
-  margin: var(--spacing-layout-m) 0 var(--spacing-layout-l);
-*/
   gap: var(--spacing-m);
 
   @media (min-width: ${breakpoints.s}) {

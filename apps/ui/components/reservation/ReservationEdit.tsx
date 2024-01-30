@@ -65,25 +65,26 @@ const allowedReservationStates: ReservationsReservationStateChoices[] = [
   ReservationsReservationStateChoices.WaitingForPayment,
 ];
 
-const Wrapper = styled.div`
-  background-color: var(--color-white);
-`;
-
+/* TODO margins should be in page layout component, not custom for every page */
 const Content = styled(Container)`
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: repeat(4, auto);
   grid-gap: var(--spacing-m);
   justify-content: space-between;
-  margin-top: 0;
+  margin-top: var(--spacing-l);
 
   @media (width > ${breakpoints.m}) {
-    margin-top: var(--spacing-xl);
+    margin-top: var(--spacing-2-xl);
     grid-template-columns: 2fr 1fr;
   }
 `;
 
-const Heading = styled(H2).attrs({ as: "h1" })``;
+/* There is no breadcrumbs on this page so remove the margin */
+const Heading = styled(H2).attrs({ as: "h1" })`
+  grid-column: 1 / -1;
+  margin-top: 0;
+`;
 
 const BylineWrapper = styled.div`
   /* max-width: 390px; */
@@ -98,29 +99,9 @@ const StyledStepper = styled(Stepper)`
   }
 `;
 
-// TODO rewrite this css
 const PinkBox = styled.div`
   padding: 1px var(--spacing-m) var(--spacing-m);
   background-color: var(--color-suomenlinna-light);
-
-  /*
-  margin-top: var(--spacing-m);
-  p {
-    &:last-of-type {
-      margin-bottom: 0;
-    }
-
-    margin-bottom: var(--spacing-s);
-  }
-
-  ${Subheading} {
-    margin-top: var(--spacing-m);
-  }
-
-  @media (max-width: ${breakpoints.m}) {
-    display: block;
-  }
-*/
 `;
 
 const HeadingSection = styled.div`
@@ -134,7 +115,7 @@ const HeadingSection = styled.div`
 const BylineSection = styled.div`
   grid-row: 2;
   @media (min-width: ${breakpoints.l}) {
-    grid-row: 1;
+    grid-row: 1 / span 2;
     grid-column-start: -1;
   }
 `;
@@ -378,11 +359,9 @@ const ReservationEdit = ({ id, apiBaseUrl }: Props): JSX.Element => {
   const isLoading = !reservation || !reservationUnit || !additionalData;
   if (isLoading) {
     return (
-      <Wrapper>
-        <Content>
-          <LoadingSpinner style={{ margin: "var(--spacing-layout-xl) auto" }} />
-        </Content>
-      </Wrapper>
+      <Content>
+        <LoadingSpinner style={{ margin: "var(--spacing-layout-xl) auto" }} />
+      </Content>
     );
   }
 
@@ -404,10 +383,10 @@ const ReservationEdit = ({ id, apiBaseUrl }: Props): JSX.Element => {
   const termsOfUse = getTranslation(reservationUnit, "termsOfUse");
 
   return (
-    <Wrapper>
+    <>
       <Content>
         <HeadingSection>
-          <Heading style={{ gridColumn: "1 / -1" }}>{t(title)}</Heading>
+          <Heading>{t(title)}</Heading>
           <StyledStepper
             language={i18n.language}
             selectedStep={step}
@@ -495,7 +474,7 @@ const ReservationEdit = ({ id, apiBaseUrl }: Props): JSX.Element => {
           {errorMsg}
         </Toast>
       )}
-    </Wrapper>
+    </>
   );
 };
 
