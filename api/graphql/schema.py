@@ -36,66 +36,60 @@ from api.graphql.types.banner_notification.mutations import (
 )
 from api.graphql.types.banner_notification.types import BannerNotificationNode
 from api.graphql.types.city.types import CityNode
+from api.graphql.types.equipment.field import EquipmentFilter
+from api.graphql.types.equipment.mutations import (
+    EquipmentCreateMutation,
+    EquipmentDeleteMutation,
+    EquipmentUpdateMutation,
+)
+from api.graphql.types.equipment.permissions import EquipmentPermission
+from api.graphql.types.equipment.types import EquipmentType
+from api.graphql.types.equipment_category.field import EquipmentCategoryFilter
+from api.graphql.types.equipment_category.mutations import (
+    EquipmentCategoryCreateMutation,
+    EquipmentCategoryDeleteMutation,
+    EquipmentCategoryUpdateMutation,
+)
+from api.graphql.types.equipment_category.permissions import EquipmentCategoryPermission
+from api.graphql.types.equipment_category.types import EquipmentCategoryType
+from api.graphql.types.keyword.field import KeywordFilter
+from api.graphql.types.keyword.types import KeywordCategoryType, KeywordGroupType, KeywordType
 from api.graphql.types.merchants.mutations import RefreshOrderMutation
 from api.graphql.types.merchants.permissions import PaymentOrderPermission
 from api.graphql.types.merchants.types import PaymentOrderType
+from api.graphql.types.purpose.field import PurposeFilter
+from api.graphql.types.purpose.mutations import PurposeCreateMutation, PurposeUpdateMutation
+from api.graphql.types.purpose.types import PurposeType
+from api.graphql.types.qualifier.field import QualifierFilter
+from api.graphql.types.qualifier.types import QualifierType
 from api.graphql.types.recurring_reservation.fields import RecurringReservationsFilter
 from api.graphql.types.recurring_reservation.filtersets import RecurringReservationFilterSet
 from api.graphql.types.recurring_reservation.mutations import (
     RecurringReservationCreateMutation,
     RecurringReservationUpdateMutation,
 )
-from api.graphql.types.reservation_units.fields import (
-    EquipmentCategoryFilter,
-    EquipmentFilter,
-    KeywordFilter,
-    PurposeFilter,
-    QualifierFilter,
-    ReservationUnitCancellationRulesFilter,
-    ReservationUnitsFilter,
-    ReservationUnitTypesFilter,
-    TaxPercentageFilter,
+from api.graphql.types.reservation_unit_cancellation_rule.field import ReservationUnitCancellationRulesFilter
+from api.graphql.types.reservation_unit_image.mutations import (
+    ReservationUnitImageCreateMutation,
+    ReservationUnitImageDeleteMutation,
+    ReservationUnitImageUpdateMutation,
 )
+from api.graphql.types.reservation_unit_image.types import ReservationUnitCancellationRuleType
+from api.graphql.types.reservation_unit_type.field import ReservationUnitTypesFilter
+from api.graphql.types.reservation_unit_type.types import ReservationUnitTypeType
+from api.graphql.types.reservation_units.fields import ReservationUnitsFilter
 from api.graphql.types.reservation_units.filtersets import (
     EquipmentFilterSet,
     PurposeFilterSet,
     ReservationUnitsFilterSet,
     ReservationUnitTypeFilterSet,
 )
-from api.graphql.types.reservation_units.mutations import (
-    EquipmentCategoryCreateMutation,
-    EquipmentCategoryDeleteMutation,
-    EquipmentCategoryUpdateMutation,
-    EquipmentCreateMutation,
-    EquipmentDeleteMutation,
-    EquipmentUpdateMutation,
-    PurposeCreateMutation,
-    PurposeUpdateMutation,
-    ReservationUnitCreateMutation,
-    ReservationUnitImageCreateMutation,
-    ReservationUnitImageDeleteMutation,
-    ReservationUnitImageUpdateMutation,
-    ReservationUnitUpdateMutation,
-)
-from api.graphql.types.reservation_units.permissions import (
-    EquipmentCategoryPermission,
-    EquipmentPermission,
-    ReservationUnitPermission,
-)
+from api.graphql.types.reservation_units.mutations import ReservationUnitCreateMutation, ReservationUnitUpdateMutation
+from api.graphql.types.reservation_units.permissions import ReservationUnitPermission
 from api.graphql.types.reservation_units.types import (
-    EquipmentCategoryType,
-    EquipmentType,
-    KeywordCategoryType,
-    KeywordGroupType,
-    KeywordType,
-    PurposeType,
-    QualifierType,
     ReservationUnitByPkType,
-    ReservationUnitCancellationRuleType,
     ReservationUnitHaukiUrlType,
     ReservationUnitType,
-    ReservationUnitTypeType,
-    TaxPercentageType,
 )
 from api.graphql.types.reservations.fields import (
     AgeGroupFilter,
@@ -142,6 +136,8 @@ from api.graphql.types.spaces.filtersets import SpaceFilterSet
 from api.graphql.types.spaces.mutations import SpaceCreateMutation, SpaceDeleteMutation, SpaceUpdateMutation
 from api.graphql.types.spaces.permissions import SpacePermission
 from api.graphql.types.spaces.types import ServiceSectorType, SpaceType
+from api.graphql.types.tax_percentage.field import TaxPercentageFilter
+from api.graphql.types.tax_percentage.types import TaxPercentageType
 from api.graphql.types.terms_of_use.fields import TermsOfUseFilter
 from api.graphql.types.terms_of_use.types import TermsOfUseType
 from api.graphql.types.units.fields import UnitsFilter

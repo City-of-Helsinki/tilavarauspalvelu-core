@@ -3,7 +3,6 @@ import datetime
 import graphene
 from django.db.models import Q, QuerySet, Sum
 from django.utils.timezone import get_default_timezone
-from easy_thumbnails.files import get_thumbnailer
 from graphene_django import DjangoListField, DjangoObjectType
 from graphene_permissions.mixins import AuthNode
 from graphql import GraphQLError
@@ -13,16 +12,20 @@ from api.graphql.extensions.duration_field import Duration
 from api.graphql.extensions.legacy_helpers import OldPrimaryKeyObjectType, get_all_translatable_fields
 from api.graphql.extensions.permission_helpers import check_resolver_permission
 from api.graphql.types.application_round_time_slot.types import ApplicationRoundTimeSlotNode
+from api.graphql.types.equipment.permissions import EquipmentPermission
+from api.graphql.types.equipment.types import EquipmentType
+from api.graphql.types.keyword.types import KeywordGroupType
 from api.graphql.types.merchants.types import PaymentMerchantType, PaymentProductType
-from api.graphql.types.reservation_units.permissions import (
-    EquipmentCategoryPermission,
-    EquipmentPermission,
-    PurposePermission,
-    QualifierPermission,
-    ReservationUnitCancellationRulePermission,
-    ReservationUnitHaukiUrlPermission,
-    ReservationUnitPermission,
-)
+from api.graphql.types.purpose.permissions import PurposePermission
+from api.graphql.types.purpose.types import PurposeType
+from api.graphql.types.qualifier.permissions import QualifierPermission
+from api.graphql.types.qualifier.types import QualifierType
+from api.graphql.types.reservation_unit_cancellation_rule.permissions import ReservationUnitCancellationRulePermission
+from api.graphql.types.reservation_unit_image.types import ReservationUnitCancellationRuleType
+from api.graphql.types.reservation_unit_payment_type.types import ReservationUnitPaymentTypeType
+from api.graphql.types.reservation_unit_pricing.types import ReservationUnitPricingType
+from api.graphql.types.reservation_unit_type.types import ReservationUnitTypeType
+from api.graphql.types.reservation_units.permissions import ReservationUnitHaukiUrlPermission, ReservationUnitPermission
 from api.graphql.types.reservations.types import ReservationMetadataSetType, ReservationType
 from api.graphql.types.resources.permissions import ResourcePermission
 from api.graphql.types.resources.types import ResourceType
@@ -38,114 +41,13 @@ from common.typing import GQLInfo
 from opening_hours.utils.hauki_link_generator import generate_hauki_link
 from permissions.helpers import can_manage_units, can_modify_reservation_unit
 from reservation_units.enums import ReservationState, ReservationUnitState
-from reservation_units.models import (
-    Equipment,
-    EquipmentCategory,
-    Keyword,
-    KeywordCategory,
-    KeywordGroup,
-    Purpose,
-    Qualifier,
-    ReservationUnit,
-    ReservationUnitCancellationRule,
-    ReservationUnitImage,
-    ReservationUnitPaymentType,
-    ReservationUnitPricing,
-    TaxPercentage,
-)
-from reservation_units.models import ReservationUnitType as ReservationUnitTypeModel
+from reservation_units.models import KeywordGroup, ReservationUnit, ReservationUnitPricing
 from reservations.models import Reservation
 from spaces.models import Space
 from tilavarauspalvelu.utils.date_util import end_of_day, start_of_day
 from utils.query_performance import QueryPerformanceOptimizerMixin
 
 DEFAULT_TIMEZONE = get_default_timezone()
-
-
-def get_payment_type_codes() -> list[str]:
-    return [payment_type.code for payment_type in ReservationUnitPaymentType.objects.all()]
-
-
-class KeywordType(AuthNode, OldPrimaryKeyObjectType):
-    class Meta:
-        model = Keyword
-        fields = ["pk"] + get_all_translatable_fields(model)
-        filter_fields = ["name_fi", "name_sv", "name_en"]
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
-
-
-class TaxPercentageType(AuthNode, OldPrimaryKeyObjectType):
-    class Meta:
-        model = TaxPercentage
-        fields = ["pk", "value"]
-        filter_fields = ["value"]
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
-
-
-class KeywordGroupType(AuthNode, OldPrimaryKeyObjectType):
-    keywords = graphene.List(KeywordType)
-
-    class Meta:
-        model = KeywordGroup
-        fields = ["pk"] + get_all_translatable_fields(model)
-        filter_fields = ["name_fi", "name_sv", "name_en"]
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
-
-    def resolve_keywords(self, info):
-        return self.keywords.all()
-
-
-class KeywordCategoryType(AuthNode, OldPrimaryKeyObjectType):
-    keyword_groups = graphene.List(KeywordGroupType)
-
-    class Meta:
-        model = KeywordCategory
-        fields = ["pk"] + get_all_translatable_fields(model)
-        filter_fields = ["name_fi", "name_sv", "name_en"]
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
-
-    def resolve_keyword_groups(self, info):
-        return self.keyword_groups.all()
-
-
-class PurposeType(AuthNode, OldPrimaryKeyObjectType):
-    permission_classes = (PurposePermission,)
-
-    image_url = graphene.String()
-    small_url = graphene.String()
-
-    class Meta:
-        model = Purpose
-        fields = ["pk", "image_url", "small_url", "rank"] + get_all_translatable_fields(model)
-        filter_fields = ["name_fi", "name_en", "name_sv"]
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
-
-    def resolve_image_url(self, info):
-        if not self.image:
-            return None
-        return info.context.build_absolute_uri(self.image.url)
-
-    def resolve_small_url(self, info):
-        if not self.image:
-            return None
-        url = get_thumbnailer(self.image)["purpose_image"].url
-        return info.context.build_absolute_uri(url)
-
-
-class QualifierType(AuthNode, OldPrimaryKeyObjectType):
-    permission_classes = (QualifierPermission,)
-
-    class Meta:
-        model = Qualifier
-        fields = ["pk"] + get_all_translatable_fields(model)
-        filter_fields = ["name_fi", "name_en", "name_sv"]
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
 
 
 class ReservationUnitHaukiUrlType(AuthNode, DjangoObjectType):
@@ -194,147 +96,6 @@ class ReservationUnitHaukiUrlType(AuthNode, DjangoObjectType):
                 target_resources=target_uuids,
             )
         return None
-
-
-class ReservationUnitImageType(OldPrimaryKeyObjectType):
-    image_url = graphene.String()
-    medium_url = graphene.String()
-    small_url = graphene.String()
-    large_url = graphene.String()
-
-    class Meta:
-        model = ReservationUnitImage
-        fields = [
-            "pk",
-            "image_url",
-            "large_url",
-            "medium_url",
-            "small_url",
-            "image_type",
-        ]
-        connection_class = TVPBaseConnection
-
-    def resolve_image_url(self, info):
-        if not self.image:
-            return None
-
-        return info.context.build_absolute_uri(self.image.url)
-
-    def resolve_large_url(self, info):
-        if not self.large_url:
-            return None
-
-        return info.context.build_absolute_uri(self.large_url)
-
-    def resolve_small_url(self, info):
-        if not self.small_url:
-            return None
-
-        return info.context.build_absolute_uri(self.small_url)
-
-    def resolve_medium_url(self, info):
-        if not self.medium_url:
-            return None
-
-        return info.context.build_absolute_uri(self.medium_url)
-
-
-class ReservationUnitCancellationRuleType(AuthNode, OldPrimaryKeyObjectType):
-    permission_classes = (ReservationUnitCancellationRulePermission,)
-
-    class Meta:
-        model = ReservationUnitCancellationRule
-        fields = [
-            "pk",
-            "can_be_cancelled_time_before",
-            "needs_handling",
-        ] + get_all_translatable_fields(model)
-        filter_fields = ["name"]
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
-
-    def resolve_can_be_cancelled_time_before(self, info: GQLInfo):
-        if not self.can_be_cancelled_time_before:
-            return None
-        return self.can_be_cancelled_time_before.total_seconds()
-
-
-class ReservationUnitTypeType(OldPrimaryKeyObjectType):
-    class Meta:
-        model = ReservationUnitTypeModel
-        fields = ["pk", "rank"] + get_all_translatable_fields(model)
-        filter_fields = get_all_translatable_fields(model)
-
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
-
-
-class EquipmentCategoryType(AuthNode, OldPrimaryKeyObjectType):
-    permission_classes = (EquipmentCategoryPermission,)
-
-    class Meta:
-        model = EquipmentCategory
-        fields = ["pk"] + get_all_translatable_fields(model)
-
-        filter_fields = {
-            "name_fi": ["exact", "icontains", "istartswith"],
-            "name_sv": ["exact", "icontains", "istartswith"],
-            "name_en": ["exact", "icontains", "istartswith"],
-        }
-
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
-
-
-class EquipmentType(AuthNode, OldPrimaryKeyObjectType):
-    permission_classes = (EquipmentPermission,)
-    category = graphene.Field(EquipmentCategoryType)
-
-    class Meta:
-        model = Equipment
-        fields = ["pk"] + get_all_translatable_fields(model)
-
-        filter_fields = {
-            "name_fi": ["exact", "icontains", "istartswith"],
-            "name_sv": ["exact", "icontains", "istartswith"],
-            "name_en": ["exact", "icontains", "istartswith"],
-        }
-
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
-
-    def resolve_category(self, info):
-        return self.category
-
-
-class ReservationUnitPaymentTypeType(AuthNode, OldPrimaryKeyObjectType):
-    code = graphene.Field(
-        graphene.String,
-        description=f"Available values: {', '.join(value for value in get_payment_type_codes())}",
-    )
-
-    class Meta:
-        model = ReservationUnitPaymentType
-        fields = ["code"]
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
-
-
-class ReservationUnitPricingType(AuthNode, OldPrimaryKeyObjectType):
-    class Meta:
-        model = ReservationUnitPricing
-        fields = [
-            "pk",
-            "begins",
-            "pricing_type",
-            "price_unit",
-            "lowest_price",
-            "lowest_price_net",
-            "highest_price",
-            "highest_price_net",
-            "tax_percentage",
-            "status",
-        ]
 
 
 class ReservationUnitWithReservationsMixin:

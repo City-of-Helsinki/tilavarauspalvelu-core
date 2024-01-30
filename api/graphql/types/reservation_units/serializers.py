@@ -1,12 +1,10 @@
 from typing import Any
 
-from django.core import validators
 from graphene.utils.str_converters import to_camel_case
 from graphql import GraphQLError
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from api.graphql.extensions.decimal_field import DecimalField
 from api.graphql.extensions.duration_field import DurationField
 from api.graphql.extensions.legacy_helpers import (
     OldChoiceCharField,
@@ -16,29 +14,28 @@ from api.graphql.extensions.legacy_helpers import (
 )
 from api.graphql.extensions.validating_list_field import ValidatingListField
 from api.graphql.types.application_round_time_slot.serializers import ApplicationRoundTimeSlotSerializer
+from api.graphql.types.reservation_unit_pricing.serializers import (
+    ReservationUnitPricingCreateSerializer,
+    ReservationUnitPricingUpdateSerializer,
+)
 from api.legacy_rest_api.serializers import ReservationUnitSerializer
 from applications.choices import WeekdayChoice
 from applications.models import ApplicationRoundTimeSlot
 from common.fields.serializer import IntegerPrimaryKeyField
 from reservation_units.enums import (
-    PriceUnit,
     PricingStatus,
-    PricingType,
     ReservationKind,
     ReservationStartInterval,
 )
 from reservation_units.models import (
     Equipment,
-    EquipmentCategory,
     Purpose,
     Qualifier,
     ReservationUnit,
     ReservationUnitCancellationRule,
-    ReservationUnitImage,
     ReservationUnitPaymentType,
     ReservationUnitPricing,
     ReservationUnitType,
-    TaxPercentage,
 )
 from reservation_units.utils.reservation_unit_pricing_helper import ReservationUnitPricingHelper
 from reservations.models import ReservationMetadataSet
@@ -46,135 +43,6 @@ from resources.models import Resource
 from services.models import Service
 from spaces.models import Space, Unit
 from terms_of_use.models import TermsOfUse
-
-
-class EquipmentSerializer(serializers.ModelSerializer):
-    category_id = serializers.PrimaryKeyRelatedField(queryset=EquipmentCategory.objects.all(), source="category")
-
-    class Meta:
-        model = Equipment
-        fields = ["id", "name", "category_id"]
-
-
-class EquipmentCreateSerializer(EquipmentSerializer, OldPrimaryKeySerializer):
-    category_pk = IntegerPrimaryKeyField(queryset=EquipmentCategory.objects.all(), source="category")
-
-    class Meta(EquipmentSerializer.Meta):
-        fields = [
-            "pk",
-            "category_pk",
-        ] + get_all_translatable_fields(EquipmentSerializer.Meta.model)
-
-    def validate(self, data):
-        name_fi = data.get("name_fi", getattr(self.instance, "name_fi", None))
-        no_name_fi = not name_fi or name_fi.isspace()
-        if no_name_fi:
-            raise GraphQLError("nameFi is required.")
-
-        return data
-
-
-class EquipmentUpdateSerializer(OldPrimaryKeyUpdateSerializer, EquipmentCreateSerializer):
-    class Meta(EquipmentCreateSerializer.Meta):
-        fields = EquipmentCreateSerializer.Meta.fields + ["pk"]
-
-
-class EquipmentCategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = EquipmentCategory
-        fields = [
-            "id",
-            "name",
-        ]
-
-
-class EquipmentCategoryCreateSerializer(EquipmentCategorySerializer, OldPrimaryKeySerializer):
-    class Meta(EquipmentCategorySerializer.Meta):
-        fields = ["pk"] + get_all_translatable_fields(EquipmentSerializer.Meta.model)
-
-    def validate(self, data):
-        name_fi = data.get("name_fi", getattr(self.instance, "name_fi", None))
-        no_name_fi = not name_fi or name_fi.isspace()
-        if no_name_fi:
-            raise GraphQLError("nameFi is required.")
-
-        return data
-
-
-class EquipmentCategoryUpdateSerializer(OldPrimaryKeyUpdateSerializer, EquipmentCategoryCreateSerializer):
-    class Meta(EquipmentCategoryCreateSerializer.Meta):
-        fields = EquipmentCategoryCreateSerializer.Meta.fields + ["pk"]
-
-
-class PurposeCreateSerializer(OldPrimaryKeySerializer):
-    class Meta:
-        model = Purpose
-        fields = get_all_translatable_fields(model)
-
-
-class PurposeUpdateSerializer(OldPrimaryKeyUpdateSerializer, PurposeCreateSerializer):
-    class Meta(PurposeCreateSerializer.Meta):
-        fields = ["pk"] + PurposeCreateSerializer.Meta.fields
-
-
-class ReservationUnitPricingCreateSerializer(OldPrimaryKeySerializer):
-    pricing_type = OldChoiceCharField(
-        required=True,
-        choices=PricingType.choices,
-        help_text=(
-            "What kind of pricing type this pricing has. Possible values are "
-            f"{', '.join(value.upper() for value in PricingType)}."
-        ),
-    )
-    price_unit = OldChoiceCharField(
-        required=False,
-        choices=PriceUnit.choices,
-        help_text=(
-            f"Unit of the price. Possible values are {', '.join(value[0].upper() for value in PriceUnit.choices)}."
-        ),
-    )
-
-    tax_percentage_pk = IntegerPrimaryKeyField(
-        queryset=TaxPercentage.objects.all(),
-        source="tax_percentage",
-        required=False,
-    )
-
-    status = OldChoiceCharField(
-        required=True,
-        choices=PricingStatus.choices,
-        help_text=(
-            f"Pricing status. Possible values are {', '.join(value[0].upper() for value in PricingStatus.choices)}."
-        ),
-    )
-
-    lowest_price = DecimalField(default=0)
-    lowest_price_net = DecimalField(default=0)
-    highest_price = DecimalField(default=0)
-    highest_price_net = DecimalField(default=0)
-
-    class Meta:
-        model = ReservationUnitPricing
-        fields = [
-            "begins",
-            "pricing_type",
-            "price_unit",
-            "lowest_price",
-            "lowest_price_net",
-            "highest_price",
-            "highest_price_net",
-            "tax_percentage_pk",
-            "status",
-        ]
-
-
-class ReservationUnitPricingUpdateSerializer(OldPrimaryKeyUpdateSerializer, ReservationUnitPricingCreateSerializer):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["pk"].required = False
-
-    class Meta(ReservationUnitPricingCreateSerializer.Meta):
-        fields = ["pk"] + ReservationUnitPricingCreateSerializer.Meta.fields
 
 
 class ReservationUnitCreateSerializer(ReservationUnitSerializer, OldPrimaryKeySerializer):
@@ -582,63 +450,3 @@ class ReservationUnitUpdateSerializer(OldPrimaryKeyUpdateSerializer, Reservation
         self.handle_pricings(pricings, instance)
         self.handle_timeslots(application_round_time_slots, reservation_unit)
         return reservation_unit
-
-
-class ReservationUnitImageCreateSerializer(OldPrimaryKeySerializer):
-    reservation_unit_pk = IntegerPrimaryKeyField(queryset=ReservationUnit.objects.all(), source="reservation_unit")
-    image_type = serializers.CharField(
-        help_text="Type of image. Value is one of image_type enum values: "
-        f"{', '.join(value[0].upper() for value in ReservationUnitImage.TYPES)}.",
-        required=True,
-    )
-
-    class Meta:
-        model = ReservationUnitImage
-        fields = ["pk", "reservation_unit_pk", "image_type"]
-
-    def validate_image_field(self, image):
-        image_field = serializers.ImageField(
-            source="image",
-            required=True,
-            validators=[validators.validate_image_file_extension],
-        )
-        image_field.run_validators(image)
-
-    def validate_image_type(self, type):
-        return type.lower()
-
-    def validate(self, data):
-        image = self.context.get("request").FILES.get("image")
-        if not image:
-            raise GraphQLError("No image file in request")
-        try:
-            self.validate_image_field(image)
-
-            type_field = serializers.ChoiceField(choices=ReservationUnitImage.TYPES)
-            type_field.run_validation(data["image_type"])
-
-        except serializers.ValidationError as e:
-            raise self.validation_error_to_graphql_error(e)
-
-        data["image"] = image
-
-        return data
-
-
-class ReservationUnitImageUpdateSerializer(OldPrimaryKeyUpdateSerializer):
-    reservation_unit_pk = IntegerPrimaryKeyField(
-        source="reservation_unit",
-        read_only=True,
-    )
-    image_type = OldChoiceCharField(
-        required=False,
-        choices=ReservationUnitImage.TYPES,
-        help_text=(
-            "Type of image. Value is one of image_type enum values: "
-            f"{', '.join(value[0].upper() for value in ReservationUnitImage.TYPES)}."
-        ),
-    )
-
-    class Meta:
-        model = ReservationUnitImage
-        fields = ["pk", "reservation_unit_pk", "image_type"]
