@@ -243,7 +243,7 @@ const Page3Wrapped = (props: Props): JSX.Element | null => {
       {/* TODO general mutation error (not query) */}
       {error != null && <ErrorToast error={`${t("common:error.dataError")}`} />}
       <ApplicationPageWrapper
-        translationKeyPrefix="application:preview"
+        translationKeyPrefix="application:Page3"
         application={application}
         isDirty={isDirty}
       >
