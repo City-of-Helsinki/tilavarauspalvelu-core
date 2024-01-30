@@ -77,13 +77,13 @@ export const getDurationNumberOptions = (): Array<{
   const result: Array<{ label: string; value: number }> = [];
   let h = 1;
   let m = 0;
-  // why are we doing till 45?
-  for (let i = 0; i < 45; i += 1) {
+  // Generate options for 30min intervals, starting from 1h & ending in 12h (=23 options)
+  for (let i = 0; i < 23; i += 1) {
     const label = `${i18n?.t("common:abbreviations.hour", { count: h })} ${
       m ? `${i18n?.t("common:abbreviations.minute", { count: m })}` : ""
     }`;
     result.push({ label, value: (h * 60 + m) * 60 });
-    m += 15;
+    m += 30;
     if (m === 60) {
       m = 0;
       h += 1;
