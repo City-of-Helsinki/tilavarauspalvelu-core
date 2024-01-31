@@ -13,5 +13,6 @@ __all__ = [
 class TaxPercentageFactory(GenericDjangoModelFactory[TaxPercentage]):
     class Meta:
         model = TaxPercentage
+        django_get_or_create = ["value"]
 
     value = FuzzyChoice(choices=(Decimal("10.0"), Decimal("14.0"), Decimal("24.0")))

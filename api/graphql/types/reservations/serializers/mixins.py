@@ -15,7 +15,6 @@ from reservation_units.utils.reservation_unit_pricing_helper import ReservationU
 from reservation_units.utils.reservation_unit_reservation_scheduler import ReservationUnitReservationScheduler
 from reservations.choices import ReservationTypeChoice
 from reservations.models import Reservation
-from utils.decimal_utils import round_decimal
 
 
 class PriceCalculationResult:
@@ -45,15 +44,15 @@ class PriceCalculationResult:
 
     @property
     def reservation_price_net(self) -> Decimal:
-        return round_decimal(self.reservation_price / self._tax_percentage_multiplier, 6)
+        return self.reservation_price / self._tax_percentage_multiplier
 
     @property
     def non_subsidised_price_net(self) -> Decimal:
-        return round_decimal(self.non_subsidised_price / self._tax_percentage_multiplier, 6)
+        return self.non_subsidised_price / self._tax_percentage_multiplier
 
     @property
     def subsidised_price_net(self) -> Decimal:
-        return round_decimal(self.subsidised_price / self._tax_percentage_multiplier, 6)
+        return self.subsidised_price / self._tax_percentage_multiplier
 
 
 class ReservationPriceMixin:

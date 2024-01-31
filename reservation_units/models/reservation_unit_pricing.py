@@ -10,8 +10,6 @@ __all__ = [
     "ReservationUnitPricing",
 ]
 
-from utils.decimal_utils import round_decimal
-
 
 def get_default_tax_percentage() -> int:
     from .tax_percentage import TaxPercentage
@@ -111,13 +109,13 @@ class ReservationUnitPricing(models.Model):
     def lowest_price_net(self) -> Decimal:
         if self.tax_percentage == 0:
             return self.lowest_price
-        return round_decimal(self.lowest_price / self.tax_percentage.multiplier, 6)
+        return self.lowest_price / self.tax_percentage.multiplier
 
     @property
     def highest_price_net(self) -> Decimal:
         if self.tax_percentage == 0:
             return self.highest_price
-        return round_decimal(self.highest_price / self.tax_percentage.multiplier, 6)
+        return self.highest_price / self.tax_percentage.multiplier
 
 
 AuditLogger.register(ReservationUnitPricing)
