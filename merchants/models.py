@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from decimal import Decimal
 
 from django.conf import settings
@@ -67,7 +68,7 @@ class PaymentType(models.TextChoices):
 
 
 class OrderStatus(models.TextChoices):
-    DRAFT = "DRAFT", _("Draft")
+    DRAFT = "DRAFT", _("Draft")  # Unpaid order
     EXPIRED = "EXPIRED", _("Expired")
     CANCELLED = "CANCELLED", _("Cancelled")
     PAID = "PAID", _("Paid")
@@ -180,11 +181,11 @@ class PaymentOrder(ExportModelOperationsMixin("payment_order"), models.Model):
     def __str__(self) -> str:
         return f"PaymentOrder {self.pk}"
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs) -> "PaymentOrder":
         self.full_clean()
         return super().save(*args, **kwargs)
 
-    def clean(self):
+    def clean(self) -> None:
         validation_errors = {}
 
         failsafe_price_net = self.price_net or Decimal("0.0")
@@ -199,6 +200,13 @@ class PaymentOrder(ExportModelOperationsMixin("payment_order"), models.Model):
 
         if validation_errors:
             raise ValidationError(validation_errors)
+
+    @property
+    def expires_at(self) -> datetime | None:
+        if self.status != OrderStatus.DRAFT:
+            return None
+
+        return self.created_at + timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
 
 
 class PaymentAccounting(ExportModelOperationsMixin("payment_accounting"), models.Model):

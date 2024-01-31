@@ -1,15 +1,12 @@
-from datetime import UTC, datetime, timedelta
-
 import graphene
-from django.conf import settings
-from django.utils.timezone import get_default_timezone
 from graphene_permissions.mixins import AuthNode
 
 from api.graphql.extensions.base_types import TVPBaseConnection
 from api.graphql.extensions.legacy_helpers import OldPrimaryKeyObjectType
 from api.graphql.types.merchants.permissions import PaymentOrderPermission
+from common.date_utils import local_datetime
 from common.typing import GQLInfo
-from merchants.models import OrderStatus, PaymentMerchant, PaymentOrder, PaymentProduct
+from merchants.models import PaymentMerchant, PaymentOrder, PaymentProduct
 
 
 class PaymentMerchantType(AuthNode, OldPrimaryKeyObjectType):
@@ -52,6 +49,7 @@ class PaymentOrderType(AuthNode, OldPrimaryKeyObjectType):
     receipt_url = graphene.String()
     reservation_pk = graphene.String()
     refund_id = graphene.String()
+    expires_in_minutes = graphene.Int()
 
     class Meta:
         model = PaymentOrder
@@ -64,6 +62,7 @@ class PaymentOrderType(AuthNode, OldPrimaryKeyObjectType):
             "receipt_url",
             "reservation_pk",
             "refund_id",
+            "expires_in_minutes",
         ]
         interfaces = (graphene.relay.Node,)
         connection_class = TVPBaseConnection
@@ -75,13 +74,19 @@ class PaymentOrderType(AuthNode, OldPrimaryKeyObjectType):
         return root.reservation.pk
 
     def resolve_checkout_url(root: PaymentOrder, info: GQLInfo) -> str | None:
-        if root.status != OrderStatus.DRAFT:
+        expires_at = root.expires_at
+        now = local_datetime()
+
+        if not expires_at or now >= expires_at:
             return None
 
-        now = datetime.now(tz=UTC).astimezone(get_default_timezone())
-        expired = now - timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
+        return root.checkout_url
 
-        if root.created_at > expired:
-            return root.checkout_url
+    def resolve_expires_in_minutes(root: PaymentOrder, info: GQLInfo) -> int | None:
+        expires_at = root.expires_at
+        now = local_datetime()
 
-        return None
+        if not expires_at or now >= expires_at:
+            return None
+
+        return (expires_at - now).seconds // 60

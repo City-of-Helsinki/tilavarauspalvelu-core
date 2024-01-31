@@ -52,6 +52,7 @@ class OrderQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
                     checkoutUrl
                     reservationPk
                     refundId
+                    expiresInMinutes
                 }
             }
             """
@@ -64,6 +65,7 @@ class OrderQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         assert content.get("errors") is None
         assert content.get("data") == {"order": None}
 
+    @override_settings(VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES=5)
     def test_returns_order_when_user_owns_reservation(self):
         self.client.force_login(self.regular_joe)
 
@@ -80,9 +82,11 @@ class OrderQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
                 "receiptUrl": None,
                 "refundId": None,
                 "status": "DRAFT",
+                "expiresInMinutes": 5,
             }
         }
 
+    @override_settings(VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES=5)
     def test_returns_order_when_user_can_handle_reservations(self):
         self.client.force_login(self.general_admin)
 
@@ -99,9 +103,11 @@ class OrderQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
                 "receiptUrl": None,
                 "refundId": None,
                 "status": "DRAFT",
+                "expiresInMinutes": 5,
             }
         }
 
+    @override_settings(VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES=5)
     def test_returns_refund_id_when_it_exists(self):
         self.order.refund_id = UUID("d55db3a0-0786-4259-ab9e-c4211cae162e")
         self.order.save()
@@ -121,6 +127,7 @@ class OrderQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
                 "receiptUrl": None,
                 "refundId": "d55db3a0-0786-4259-ab9e-c4211cae162e",
                 "status": "DRAFT",
+                "expiresInMinutes": 5,
             }
         }
 
@@ -141,7 +148,18 @@ class OrderQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
             response = self.query(self.get_order_query())
             content = json.loads(response.content)
             assert content.get("errors") is None
-            assert content.get("data").get("order").get("checkoutUrl") is None
+            assert content.get("data") == {
+                "order": {
+                    "reservationPk": str(self.reservation.pk),
+                    "checkoutUrl": None,
+                    "orderUuid": "b3fef99e-6c18-422e-943d-cf00702af53e",
+                    "paymentType": "INVOICE",
+                    "receiptUrl": None,
+                    "refundId": None,
+                    "status": "DRAFT",
+                    "expiresInMinutes": None,
+                }
+            }
 
     @override_settings(VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES=5)
     def test_checkout_url_not_visible_when_not_draft(self):
@@ -155,7 +173,45 @@ class OrderQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
 
         content = json.loads(response.content)
         assert content.get("errors") is None
-        assert content.get("data").get("order").get("checkoutUrl") is None
+        assert content.get("data") == {
+            "order": {
+                "reservationPk": str(self.reservation.pk),
+                "checkoutUrl": None,
+                "orderUuid": "b3fef99e-6c18-422e-943d-cf00702af53e",
+                "paymentType": "INVOICE",
+                "receiptUrl": None,
+                "refundId": None,
+                "status": "CANCELLED",
+                "expiresInMinutes": None,
+            }
+        }
+
+    @override_settings(VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES=10)
+    def test_expires_in_minutes_keeps_updating_based_on_current_time(self):
+        self.client.force_login(self.general_admin)
+
+        response = self.query(self.get_order_query())
+        content = json.loads(response.content)
+        assert content.get("errors") is None
+        assert content.get("data").get("order").get("expiresInMinutes") == 10
+
+        with freezegun.freeze_time(NOW + timedelta(minutes=9)):
+            response = self.query(self.get_order_query())
+            content = json.loads(response.content)
+            assert content.get("errors") is None
+            assert content.get("data").get("order").get("expiresInMinutes") == 1
+
+        with freezegun.freeze_time(NOW + timedelta(minutes=9, seconds=59)):
+            response = self.query(self.get_order_query())
+            content = json.loads(response.content)
+            assert content.get("errors") is None
+            assert content.get("data").get("order").get("expiresInMinutes") == 0
+
+        with freezegun.freeze_time(NOW + timedelta(minutes=10)):
+            response = self.query(self.get_order_query())
+            content = json.loads(response.content)
+            assert content.get("errors") is None
+            assert content.get("data").get("order").get("expiresInMinutes") is None
 
 
 class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
