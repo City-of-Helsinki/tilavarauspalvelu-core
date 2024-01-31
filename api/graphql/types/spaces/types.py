@@ -8,6 +8,7 @@ from api.graphql.extensions.permission_helpers import (
 )
 from api.graphql.types.resources.permissions import ResourcePermission
 from api.graphql.types.spaces.permissions import SpacePermission
+from common.typing import GQLInfo
 from spaces.models import Building, Location, RealEstate, ServiceSector, Space
 
 
@@ -61,23 +62,17 @@ class SpaceType(AuthNode, OldPrimaryKeyObjectType):
         interfaces = (graphene.relay.Node,)
         connection_class = TVPBaseConnection
 
-    def resolve_children(self, info):
-        return Space.objects.filter(parent=self)
+    def resolve_children(root: Space, info: GQLInfo):
+        return Space.objects.filter(parent=root)
 
     @check_resolver_permission(ResourcePermission)
-    def resolve_resources(self, info):
-        return self.resource_set.all()
+    def resolve_resources(root: Space, info: GQLInfo):
+        return root.resource_set.all()
 
 
 class LocationType(OldPrimaryKeyObjectType):
     longitude = graphene.String()
     latitude = graphene.String()
-
-    def resolve_longitude(self, obj):
-        return self.lon
-
-    def resolve_latitude(self, obj):
-        return self.lat
 
     class Meta:
         model = Location
@@ -89,6 +84,12 @@ class LocationType(OldPrimaryKeyObjectType):
 
         interfaces = (graphene.relay.Node,)
         connection_class = TVPBaseConnection
+
+    def resolve_longitude(root: Location, info: GQLInfo):
+        return root.lon
+
+    def resolve_latitude(root: Location, info: GQLInfo):
+        return root.lat
 
 
 class ServiceSectorType(OldPrimaryKeyObjectType):

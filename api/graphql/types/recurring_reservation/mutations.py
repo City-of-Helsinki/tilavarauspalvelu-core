@@ -21,7 +21,7 @@ class RecurringReservationCreateMutation(OldAuthSerializerMutation, SerializerMu
         model_operations = ["create"]
         serializer_class = RecurringReservationCreateSerializer
 
-    def resolve_recurring_reservation(self, info: GQLInfo):
+    def resolve_recurring_reservation(self: "RecurringReservationCreateMutation", info: GQLInfo):
         recurring_reservation = RecurringReservation.objects.filter(pk=self.pk).first()
         return recurring_reservation
 
@@ -36,6 +36,6 @@ class RecurringReservationUpdateMutation(OldAuthSerializerMutation, SerializerMu
         lookup_field = "pk"
         serializer_class = RecurringReservationUpdateSerializer
 
-    def resolve_recurring_reservation(self, info: GQLInfo):
+    def resolve_recurring_reservation(self: "RecurringReservationUpdateMutation", info: GQLInfo):
         recurring_reservation = RecurringReservation.objects.filter(pk=self.pk).first()
         return recurring_reservation

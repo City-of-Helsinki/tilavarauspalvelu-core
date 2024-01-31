@@ -8,6 +8,7 @@ from graphene_permissions.mixins import AuthNode
 from api.graphql.extensions.base_types import TVPBaseConnection
 from api.graphql.extensions.legacy_helpers import OldPrimaryKeyObjectType
 from api.graphql.types.merchants.permissions import PaymentOrderPermission
+from common.typing import GQLInfo
 from merchants.models import OrderStatus, PaymentMerchant, PaymentOrder, PaymentProduct
 
 
@@ -36,8 +37,8 @@ class PaymentProductType(AuthNode, OldPrimaryKeyObjectType):
         interfaces = (graphene.relay.Node,)
         connection_class = TVPBaseConnection
 
-    def resolve_merchant_pk(self, info) -> str:
-        return self.merchant.pk
+    def resolve_merchant_pk(root: PaymentProduct, info: GQLInfo) -> str:
+        return root.merchant.pk
 
 
 class PaymentOrderType(AuthNode, OldPrimaryKeyObjectType):
@@ -67,20 +68,20 @@ class PaymentOrderType(AuthNode, OldPrimaryKeyObjectType):
         interfaces = (graphene.relay.Node,)
         connection_class = TVPBaseConnection
 
-    def resolve_order_uuid(self, info) -> str | None:
-        return self.remote_id
+    def resolve_order_uuid(root: PaymentOrder, info: GQLInfo) -> str | None:
+        return root.remote_id
 
-    def resolve_reservation_pk(self, info) -> str:
-        return self.reservation.pk
+    def resolve_reservation_pk(root: PaymentOrder, info: GQLInfo) -> str:
+        return root.reservation.pk
 
-    def resolve_checkout_url(self, info) -> str | None:
-        if self.status != OrderStatus.DRAFT:
+    def resolve_checkout_url(root: PaymentOrder, info: GQLInfo) -> str | None:
+        if root.status != OrderStatus.DRAFT:
             return None
 
         now = datetime.now(tz=UTC).astimezone(get_default_timezone())
         expired = now - timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
 
-        if self.created_at > expired:
-            return self.checkout_url
+        if root.created_at > expired:
+            return root.checkout_url
 
         return None

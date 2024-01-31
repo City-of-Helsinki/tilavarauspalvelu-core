@@ -43,22 +43,22 @@ class UnitType(AuthNode, OldPrimaryKeyObjectType):
         connection_class = TVPBaseConnection
 
     @check_resolver_permission(ReservationUnitPermission)
-    def resolve_reservation_units(self, info):
-        return self.reservationunit_set.all()
+    def resolve_reservation_units(root: Unit, info: GQLInfo):
+        return root.reservationunit_set.all()
 
     @check_resolver_permission(SpacePermission)
-    def resolve_spaces(self, info):
-        return self.spaces.all()
+    def resolve_spaces(root: Unit, info: GQLInfo):
+        return root.spaces.all()
 
-    def resolve_location(self, info):
-        return getattr(self, "location", None)
+    def resolve_location(root: Unit, info: GQLInfo):
+        return getattr(root, "location", None)
 
-    def resolve_service_sectors(self, info):
-        return self.service_sectors.all()
+    def resolve_service_sectors(root: Unit, info: GQLInfo):
+        return root.service_sectors.all()
 
-    def resolve_payment_merchant(self, info):
-        if can_manage_units(info.context.user, self):
-            return self.payment_merchant
+    def resolve_payment_merchant(root: Unit, info: GQLInfo):
+        if can_manage_units(info.context.user, root):
+            return root.payment_merchant
         return None
 
 
@@ -95,5 +95,5 @@ class UnitGroupType(AuthNode, OldPrimaryKeyObjectType):
         interfaces = (graphene.relay.Node,)
         connection_class = TVPBaseConnection
 
-    def resolve_units(self, info: GQLInfo):
-        return self.units.all()
+    def resolve_units(root: UnitGroup, info: GQLInfo):
+        return root.units.all()

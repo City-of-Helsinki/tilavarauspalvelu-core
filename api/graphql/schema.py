@@ -69,12 +69,12 @@ from api.graphql.types.recurring_reservation.mutations import (
     RecurringReservationUpdateMutation,
 )
 from api.graphql.types.reservation_unit_cancellation_rule.field import ReservationUnitCancellationRulesFilter
+from api.graphql.types.reservation_unit_cancellation_rule.types import ReservationUnitCancellationRuleType
 from api.graphql.types.reservation_unit_image.mutations import (
     ReservationUnitImageCreateMutation,
     ReservationUnitImageDeleteMutation,
     ReservationUnitImageUpdateMutation,
 )
-from api.graphql.types.reservation_unit_image.types import ReservationUnitCancellationRuleType
 from api.graphql.types.reservation_unit_type.field import ReservationUnitTypesFilter
 from api.graphql.types.reservation_unit_type.types import ReservationUnitTypeType
 from api.graphql.types.reservation_units.fields import ReservationUnitsFilter
@@ -236,25 +236,25 @@ class Query(graphene.ObjectType):
     if "graphiql_debug_toolbar" in settings.INSTALLED_APPS:
         debug = Field(DjangoDebug, name="_debug")
 
-    def resolve_current_user(self, info, **kwargs):
+    def resolve_current_user(self: None, info: GQLInfo, **kwargs: Any):
         return get_object_or_404(User, pk=info.context.user.pk)
 
     @check_resolver_permission(UserPermission, raise_permission_error=True)
-    def resolve_user(self, info, **kwargs):
+    def resolve_user(self: None, info: GQLInfo, **kwargs: Any):
         pk = kwargs.get("pk")
         return get_object_or_404(User, pk=pk)
 
     @check_resolver_permission(ReservationPermission)
-    def resolve_reservation_by_pk(self, info, **kwargs):
+    def resolve_reservation_by_pk(self: None, info: GQLInfo, **kwargs: Any):
         pk = kwargs.get("pk")
         return get_object_or_404(Reservation, pk=pk)
 
     @check_resolver_permission(ReservationUnitPermission)
-    def resolve_reservation_unit_by_pk(self, info, **kwargs):
+    def resolve_reservation_unit_by_pk(self: None, info: GQLInfo, **kwargs: Any):
         pk = kwargs.get("pk")
         return get_object_or_404(ReservationUnit, pk=pk)
 
-    def resolve_reservation_unit_hauki_url(self, info, **kwargs):
+    def resolve_reservation_unit_hauki_url(self: None, info: GQLInfo, **kwargs: Any):
         pk = kwargs.get("pk")
 
         reservation_unit = get_object_or_404(ReservationUnit, pk=pk)
@@ -267,32 +267,32 @@ class Query(graphene.ObjectType):
         return url_type
 
     @check_resolver_permission(ResourcePermission)
-    def resolve_resource_by_pk(self, info, **kwargs):
+    def resolve_resource_by_pk(self: None, info: GQLInfo, **kwargs: Any):
         pk = kwargs.get("pk")
         return get_object_or_404(Resource, pk=pk)
 
     @check_resolver_permission(UnitPermission)
-    def resolve_unit_by_pk(self, info, **kwargs):
+    def resolve_unit_by_pk(self: None, info: GQLInfo, **kwargs: Any):
         pk = kwargs.get("pk")
         return get_object_or_404(Unit, pk=pk)
 
     @check_resolver_permission(SpacePermission)
-    def resolve_space_by_pk(self, info, **kwargs):
+    def resolve_space_by_pk(self: None, info: GQLInfo, **kwargs: Any):
         pk = kwargs.get("pk")
         return get_object_or_404(Space, pk=pk)
 
     @check_resolver_permission(EquipmentPermission)
-    def resolve_equipment_by_pk(self, info, **kwargs):
+    def resolve_equipment_by_pk(self: None, info: GQLInfo, **kwargs: Any):
         pk = kwargs.get("pk")
         return get_object_or_404(Equipment, pk=pk)
 
     @check_resolver_permission(EquipmentCategoryPermission)
-    def resolve_equipment_category_by_pk(self, info, **kwargs):
+    def resolve_equipment_category_by_pk(self: None, info: GQLInfo, **kwargs: Any):
         pk = kwargs.get("pk")
         return get_object_or_404(EquipmentCategory, pk=pk)
 
     @check_resolver_permission(PaymentOrderPermission)
-    def resolve_order(self, info, **kwargs):
+    def resolve_order(self: None, info: GQLInfo, **kwargs: Any):
         remote_id = kwargs.get("order_uuid")
         order = get_object_or_404(PaymentOrder, remote_id=remote_id)
         if (

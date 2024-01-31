@@ -56,8 +56,8 @@ class ReservationCreateMutation(OldAuthSerializerMutation, SerializerMutation):
         model_operations = ["create"]
         serializer_class = ReservationCreateSerializer
 
-    def resolve_reservation(self, info: GQLInfo):
-        reservation = Reservation.objects.filter(pk=self.pk).first()
+    def resolve_reservation(root: Reservation, info: GQLInfo):
+        reservation = Reservation.objects.filter(pk=root.pk).first()
         return reservation
 
 
@@ -71,8 +71,8 @@ class ReservationUpdateMutation(OldAuthSerializerMutation, SerializerMutation):
         lookup_field = "pk"
         serializer_class = ReservationUpdateSerializer
 
-    def resolve_reservation(self, info: GQLInfo):
-        reservation = Reservation.objects.filter(pk=self.pk).first()
+    def resolve_reservation(root: Reservation, info: GQLInfo):
+        reservation = Reservation.objects.filter(pk=root.pk).first()
         return reservation
 
 
@@ -84,8 +84,8 @@ class ReservationConfirmMutation(OldAuthSerializerMutation, SerializerMutation):
         lookup_field = "pk"
         serializer_class = ReservationConfirmSerializer
 
-    def resolve_order(self, info):
-        payment_order = PaymentOrder.objects.filter(reservation__pk=self.pk).first()
+    def resolve_order(root: Reservation, info: GQLInfo):
+        payment_order = PaymentOrder.objects.filter(reservation__pk=root.pk).first()
         return payment_order
 
 
@@ -207,6 +207,6 @@ class ReservationStaffCreateMutation(OldAuthSerializerMutation, SerializerMutati
         model_operations = ["create"]
         serializer_class = ReservationStaffCreateSerializer
 
-    def resolve_reservation(self, info: GQLInfo):
-        reservation = Reservation.objects.filter(pk=self.pk).first()
+    def resolve_reservation(root: Reservation, info: GQLInfo):
+        reservation = Reservation.objects.filter(pk=root.pk).first()
         return reservation

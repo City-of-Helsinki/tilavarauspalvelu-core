@@ -5,6 +5,7 @@ from graphene_permissions.mixins import AuthNode
 from api.graphql.extensions.base_types import TVPBaseConnection
 from api.graphql.extensions.legacy_helpers import OldPrimaryKeyObjectType, get_all_translatable_fields
 from api.graphql.types.purpose.permissions import PurposePermission
+from common.typing import GQLInfo
 from reservation_units.models import Purpose
 
 
@@ -21,13 +22,13 @@ class PurposeType(AuthNode, OldPrimaryKeyObjectType):
         interfaces = (graphene.relay.Node,)
         connection_class = TVPBaseConnection
 
-    def resolve_image_url(self, info):
-        if not self.image:
+    def resolve_image_url(root: Purpose, info: GQLInfo):
+        if not root.image:
             return None
-        return info.context.build_absolute_uri(self.image.url)
+        return info.context.build_absolute_uri(root.image.url)
 
-    def resolve_small_url(self, info):
-        if not self.image:
+    def resolve_small_url(root: Purpose, info: GQLInfo):
+        if not root.image:
             return None
-        url = get_thumbnailer(self.image)["purpose_image"].url
+        url = get_thumbnailer(root.image)["purpose_image"].url
         return info.context.build_absolute_uri(url)
