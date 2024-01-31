@@ -85,6 +85,9 @@ export function Navigation({
     language: string
   ) => {
     e.preventDefault();
+    // NOTE have to do both, otherwise the i18n and router are out of sync and
+    // navigation uses translations for the previous language
+    i18n.changeLanguage(language);
     router.replace(router.pathname, router.asPath, {
       locale: language,
     });
