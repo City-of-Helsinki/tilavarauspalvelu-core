@@ -19,6 +19,7 @@ jobs:
   dry-run:
     runs-on: ubuntu-latest
     env:
+      # TODO why is this named so? why isn't it just GIT_HASH?
       TURBO_REF_FILTER: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
     outputs:
       changed_packages: ${{ steps.output-changed-packages.outputs.changed_packages }}
@@ -33,13 +34,17 @@ jobs:
       - name: Changeset
         id: changeset
         run: |
+          echo 'Generating a changeset for ' $TURBO_REF_FILTER
           echo 'result<<CHANGESET_DELIMITER' >> $GITHUB_OUTPUT
+          # TODO why is there a global-deps flag? removing it didn't fix the issue
+          # FIXME this part is probably broken (the next step fails on CI)
           echo "$(npx -y turbo build --dry-run=json --filter=...[$TURBO_REF_FILTER]  --global-deps=.github/*)" >> $GITHUB_OUTPUT
           echo 'CHANGESET_DELIMITER' >> $GITHUB_OUTPUT
 
       - name: Output changed packages
         id: output-changed-packages
         run: |
+          echo 'Saving the changeset for ' $TURBO_REF_FILTER
           echo 'changed_packages<<CHANGED_PACKAGES_DELIMITER' >> $GITHUB_OUTPUT
           echo "${{ toJSON(fromJSON(steps.changeset.outputs.result).packages) }}" >> $GITHUB_OUTPUT
           echo 'CHANGED_PACKAGES_DELIMITER' >> $GITHUB_OUTPUT

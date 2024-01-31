@@ -20,15 +20,16 @@ env:
   REGISTRY: "ghcr.io"
 
 jobs:
-  changed-packages:
-    name: Determine which apps changed
-    uses: ./.github/workflows/changed-packages.yml
+  # Disabled because it broke, and no idea why.
+  #changed-packages:
+  #  name: Determine which apps changed
+  #  uses: ./.github/workflows/changed-packages.yml
 
   lint-admin-ui:
     name: Lint admin ui
     runs-on: ubuntu-latest
-    needs: [changed-packages]
-    if: needs.changed-packages.outputs.admin_changed == 'true'
+    #needs: [changed-packages]
+    # if: needs.changed-packages.outputs.admin_changed == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -51,8 +52,8 @@ jobs:
   build-admin-ui:
     name: Build admin ui
     runs-on: ubuntu-latest
-    needs: [changed-packages]
-    if: needs.changed-packages.outputs.admin_changed == 'true'
+    #needs: [changed-packages]
+    # if: needs.changed-packages.outputs.admin_changed == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -74,8 +75,8 @@ jobs:
   test-admin-ui:
     name: Test admin ui
     runs-on: ubuntu-latest
-    needs: [changed-packages]
-    if: needs.changed-packages.outputs.admin_changed == 'true'
+    # needs: [changed-packages]
+    # if: needs.changed-packages.outputs.admin_changed == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -95,8 +96,8 @@ jobs:
   lint-ui:
     name: Lint ui
     runs-on: ubuntu-latest
-    needs: [changed-packages]
-    if: needs.changed-packages.outputs.ui_changed == 'true'
+    # needs: [changed-packages]
+    # if: needs.changed-packages.outputs.ui_changed == 'true'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -120,8 +121,8 @@ jobs:
   build-ui:
     name: Build ui
     runs-on: ubuntu-latest
-    needs: [changed-packages]
-    if: needs.changed-packages.outputs.ui_changed == 'true'
+    # needs: [changed-packages]
+    # if: needs.changed-packages.outputs.ui_changed == 'true'
     env:
       SKIP_ENV_VALIDATION: 'true'
     steps:
@@ -143,8 +144,8 @@ jobs:
   test-ui:
     name: Unit tests ui
     runs-on: ubuntu-latest
-    needs: [changed-packages]
-    if: needs.changed-packages.outputs.ui_changed == 'true'
+    # needs: [changed-packages]
+    # if: needs.changed-packages.outputs.ui_changed == 'true'
     env:
       SKIP_ENV_VALIDATION: 'true'
     steps:
