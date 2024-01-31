@@ -1,3 +1,5 @@
+from typing import Any
+
 import graphene
 from graphene_permissions.mixins import AuthNode
 from rest_framework.exceptions import PermissionDenied
@@ -28,9 +30,9 @@ class RoleType(graphene.ObjectType):
 
 
 class IncludePermissionsMixin:
-    def resolve_permissions(self, info: GQLInfo):
-        if info.context.user == self.user or can_view_users(info.context.user):
-            return self.role.permissions.all()
+    def resolve_permissions(root: Any, info: GQLInfo):
+        if info.context.user == root.user or can_view_users(info.context.user):
+            return root.role.permissions.all()
 
         raise PermissionDenied("No permission to view permissions.")
 
@@ -107,8 +109,8 @@ class UnitRoleType(AuthNode, OldPrimaryKeyObjectType, IncludePermissionsMixin):
         interfaces = (graphene.relay.Node,)
         connection_class = TVPBaseConnection
 
-    def resolve_units(self, info: GQLInfo):
-        return self.unit.all()
+    def resolve_units(root: UnitRole, info: GQLInfo):
+        return root.unit.all()
 
-    def resolve_unit_groups(self, info: GQLInfo):
-        return self.unit_group.all()
+    def resolve_unit_groups(root: UnitRole, info: GQLInfo):
+        return root.unit_group.all()

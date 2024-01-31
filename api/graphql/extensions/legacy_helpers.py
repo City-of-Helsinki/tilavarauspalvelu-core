@@ -1,3 +1,5 @@
+from typing import Any
+
 import graphene
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -12,6 +14,8 @@ from modeltranslation.manager import get_translatable_fields_for_model
 from rest_framework import serializers
 from rest_framework.exceptions import ErrorDetail, PermissionDenied
 from rest_framework.generics import get_object_or_404
+
+from common.typing import GQLInfo
 
 
 class OldPrimaryKeySerializerBase(serializers.ModelSerializer):
@@ -128,8 +132,8 @@ class OldPrimaryKeyObjectType(DjangoObjectType):
     class Meta:
         abstract = True
 
-    def resolve_pk(self, info):
-        return self.id
+    def resolve_pk(root: Any, info: GQLInfo):
+        return root.id
 
 
 @deconstructible

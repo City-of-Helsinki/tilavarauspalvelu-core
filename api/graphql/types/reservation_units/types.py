@@ -21,7 +21,7 @@ from api.graphql.types.purpose.types import PurposeType
 from api.graphql.types.qualifier.permissions import QualifierPermission
 from api.graphql.types.qualifier.types import QualifierType
 from api.graphql.types.reservation_unit_cancellation_rule.permissions import ReservationUnitCancellationRulePermission
-from api.graphql.types.reservation_unit_image.types import ReservationUnitCancellationRuleType
+from api.graphql.types.reservation_unit_cancellation_rule.types import ReservationUnitCancellationRuleType
 from api.graphql.types.reservation_unit_payment_type.types import ReservationUnitPaymentTypeType
 from api.graphql.types.reservation_unit_pricing.types import ReservationUnitPricingType
 from api.graphql.types.reservation_unit_type.types import ReservationUnitTypeType
@@ -75,10 +75,10 @@ class ReservationUnitHaukiUrlType(AuthNode, DjangoObjectType):
             self.unit = instance.unit
             self.include_reservation_units = include_reservation_units
 
-    def resolve_url(self, info, **kwargs):
-        if can_manage_units(info.context.user, self.unit):
+    def resolve_url(root: ReservationUnit, info, **kwargs):
+        if can_manage_units(info.context.user, root.unit):
             target_uuids = []
-            include_reservation_units = getattr(self, "include_reservation_units", None)
+            include_reservation_units = getattr(root, "include_reservation_units", None)
 
             if include_reservation_units:
                 res_units_in_db = ReservationUnit.objects.filter(id__in=include_reservation_units)
@@ -87,12 +87,12 @@ class ReservationUnitHaukiUrlType(AuthNode, DjangoObjectType):
 
                 if difference:
                     raise GraphQLError("Wrong identifier for reservation unit in url generation.")
-                target_uuids = res_units_in_db.filter(unit=self.unit).values_list("uuid", flat=True)
+                target_uuids = res_units_in_db.filter(unit=root.unit).values_list("uuid", flat=True)
 
             return generate_hauki_link(
-                self.uuid,
+                root.uuid,
                 getattr(info.context.user, "email", ""),
-                self.unit.hauki_department_id,
+                root.unit.hauki_department_id,
                 target_resources=target_uuids,
             )
         return None
@@ -407,10 +407,10 @@ class ReservableTimeSpanType(graphene.ObjectType):
     start_datetime = graphene.DateTime()
     end_datetime = graphene.DateTime()
 
-    def resolve_start_datetime(self, info: GQLInfo):
+    def resolve_start_datetime(self: "ReservableTimeSpanType", info: GQLInfo):
         return self.start_datetime
 
-    def resolve_end_datetime(self, info: GQLInfo):
+    def resolve_end_datetime(self: "ReservableTimeSpanType", info: GQLInfo):
         return self.end_datetime
 
 
@@ -478,12 +478,12 @@ class ReservationUnitByPkType(ReservationUnitType, ReservationUnitWithReservatio
         interfaces = (graphene.relay.Node,)
         connection_class = TVPBaseConnection
 
-    def resolve_hauki_url(root, info):
+    def resolve_hauki_url(root: ReservationUnit, info: GQLInfo):
         return root
 
     def resolve_reservable_time_spans(
         root: ReservationUnit,
-        info,
+        info: GQLInfo,
         start_date: datetime.date,
         end_date: datetime.date,
     ) -> list[ReservableTimeSpanType] | None:

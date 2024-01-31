@@ -5,6 +5,7 @@ from api.graphql.extensions.base_types import TVPBaseConnection
 from api.graphql.extensions.legacy_helpers import OldPrimaryKeyObjectType, get_all_translatable_fields
 from api.graphql.types.equipment.permissions import EquipmentPermission
 from api.graphql.types.equipment_category.types import EquipmentCategoryType
+from common.typing import GQLInfo
 from reservation_units.models import Equipment
 
 
@@ -25,5 +26,5 @@ class EquipmentType(AuthNode, OldPrimaryKeyObjectType):
         interfaces = (graphene.relay.Node,)
         connection_class = TVPBaseConnection
 
-    def resolve_category(self, info):
-        return self.category
+    def resolve_category(root: Equipment, info: GQLInfo):
+        return root.category

@@ -37,5 +37,5 @@ class BannerNotificationNode(DjangoAuthNode):
         permission_classes = (BannerNotificationPermission,)
 
     @private_field(can_manage_banner_notifications)
-    def resolve_state(self: BannerNotification, info: GQLInfo) -> BannerNotificationState:
-        return self.state
+    def resolve_state(root: BannerNotification, info: GQLInfo) -> BannerNotificationState:
+        return root.state

@@ -11,6 +11,7 @@ from api.graphql.types.reservation_unit_image.serializers import (
     ReservationUnitImageUpdateSerializer,
 )
 from api.graphql.types.reservation_unit_image.types import ReservationUnitImageType
+from common.typing import GQLInfo
 from reservation_units.models import ReservationUnitImage
 
 
@@ -26,9 +27,9 @@ class ReservationUnitImageCreateMutation(OldAuthSerializerMutation, SerializerMu
         model_operations = ["create"]
         serializer_class = ReservationUnitImageCreateSerializer
 
-    def resolve_reservation_unit_image(self, info):
-        if self.pk:
-            return get_object_or_404(ReservationUnitImage, pk=self.pk)
+    def resolve_reservation_unit_image(root: ReservationUnitImage, info: GQLInfo):
+        if root.pk:
+            return get_object_or_404(ReservationUnitImage, pk=root.pk)
         return None
 
 

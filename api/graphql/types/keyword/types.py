@@ -1,8 +1,10 @@
 import graphene
+from django.db.models import QuerySet
 from graphene_permissions.mixins import AuthNode
 
 from api.graphql.extensions.base_types import TVPBaseConnection
 from api.graphql.extensions.legacy_helpers import OldPrimaryKeyObjectType, get_all_translatable_fields
+from common.typing import GQLInfo
 from reservation_units.models import Keyword, KeywordCategory, KeywordGroup
 
 
@@ -25,8 +27,8 @@ class KeywordGroupType(AuthNode, OldPrimaryKeyObjectType):
         interfaces = (graphene.relay.Node,)
         connection_class = TVPBaseConnection
 
-    def resolve_keywords(self, info):
-        return self.keywords.all()
+    def resolve_keywords(root: KeywordGroup, info: GQLInfo) -> QuerySet[Keyword]:
+        return root.keywords.all()
 
 
 class KeywordCategoryType(AuthNode, OldPrimaryKeyObjectType):
@@ -39,5 +41,5 @@ class KeywordCategoryType(AuthNode, OldPrimaryKeyObjectType):
         interfaces = (graphene.relay.Node,)
         connection_class = TVPBaseConnection
 
-    def resolve_keyword_groups(self, info):
-        return self.keyword_groups.all()
+    def resolve_keyword_groups(root: KeywordCategory, info: GQLInfo) -> QuerySet[KeywordGroup]:
+        return root.keyword_groups.all()

@@ -1,11 +1,9 @@
 import graphene
-from graphene_permissions.mixins import AuthNode
 
 from api.graphql.extensions.base_types import TVPBaseConnection
-from api.graphql.extensions.legacy_helpers import OldPrimaryKeyObjectType, get_all_translatable_fields
-from api.graphql.types.reservation_unit_cancellation_rule.permissions import ReservationUnitCancellationRulePermission
+from api.graphql.extensions.legacy_helpers import OldPrimaryKeyObjectType
 from common.typing import GQLInfo
-from reservation_units.models import ReservationUnitCancellationRule, ReservationUnitImage
+from reservation_units.models import ReservationUnitImage
 
 
 class ReservationUnitImageType(OldPrimaryKeyObjectType):
@@ -26,46 +24,26 @@ class ReservationUnitImageType(OldPrimaryKeyObjectType):
         ]
         connection_class = TVPBaseConnection
 
-    def resolve_image_url(self, info):
-        if not self.image:
+    def resolve_image_url(root: ReservationUnitImage, info: GQLInfo):
+        if not root.image:
             return None
 
-        return info.context.build_absolute_uri(self.image.url)
+        return info.context.build_absolute_uri(root.image.url)
 
-    def resolve_large_url(self, info):
-        if not self.large_url:
+    def resolve_large_url(root: ReservationUnitImage, info: GQLInfo):
+        if not root.large_url:
             return None
 
-        return info.context.build_absolute_uri(self.large_url)
+        return info.context.build_absolute_uri(root.large_url)
 
-    def resolve_small_url(self, info):
-        if not self.small_url:
+    def resolve_small_url(root: ReservationUnitImage, info: GQLInfo):
+        if not root.small_url:
             return None
 
-        return info.context.build_absolute_uri(self.small_url)
+        return info.context.build_absolute_uri(root.small_url)
 
-    def resolve_medium_url(self, info):
-        if not self.medium_url:
+    def resolve_medium_url(root: ReservationUnitImage, info: GQLInfo):
+        if not root.medium_url:
             return None
 
-        return info.context.build_absolute_uri(self.medium_url)
-
-
-class ReservationUnitCancellationRuleType(AuthNode, OldPrimaryKeyObjectType):
-    permission_classes = (ReservationUnitCancellationRulePermission,)
-
-    class Meta:
-        model = ReservationUnitCancellationRule
-        fields = [
-            "pk",
-            "can_be_cancelled_time_before",
-            "needs_handling",
-        ] + get_all_translatable_fields(model)
-        filter_fields = ["name"]
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
-
-    def resolve_can_be_cancelled_time_before(self, info: GQLInfo):
-        if not self.can_be_cancelled_time_before:
-            return None
-        return self.can_be_cancelled_time_before.total_seconds()
+        return info.context.build_absolute_uri(root.medium_url)
