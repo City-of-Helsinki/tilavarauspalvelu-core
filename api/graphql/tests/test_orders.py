@@ -51,7 +51,7 @@ class OrderQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
                     receiptUrl
                     checkoutUrl
                     reservationPk
-                    refundId
+                    refundUuid
                     expiresInMinutes
                 }
             }
@@ -80,7 +80,7 @@ class OrderQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
                 "orderUuid": "b3fef99e-6c18-422e-943d-cf00702af53e",
                 "paymentType": "INVOICE",
                 "receiptUrl": None,
-                "refundId": None,
+                "refundUuid": None,
                 "status": "DRAFT",
                 "expiresInMinutes": 5,
             }
@@ -101,7 +101,7 @@ class OrderQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
                 "orderUuid": "b3fef99e-6c18-422e-943d-cf00702af53e",
                 "paymentType": "INVOICE",
                 "receiptUrl": None,
-                "refundId": None,
+                "refundUuid": None,
                 "status": "DRAFT",
                 "expiresInMinutes": 5,
             }
@@ -125,7 +125,7 @@ class OrderQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
                 "orderUuid": "b3fef99e-6c18-422e-943d-cf00702af53e",
                 "paymentType": "INVOICE",
                 "receiptUrl": None,
-                "refundId": "d55db3a0-0786-4259-ab9e-c4211cae162e",
+                "refundUuid": "d55db3a0-0786-4259-ab9e-c4211cae162e",
                 "status": "DRAFT",
                 "expiresInMinutes": 5,
             }
@@ -155,7 +155,7 @@ class OrderQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
                     "orderUuid": "b3fef99e-6c18-422e-943d-cf00702af53e",
                     "paymentType": "INVOICE",
                     "receiptUrl": None,
-                    "refundId": None,
+                    "refundUuid": None,
                     "status": "DRAFT",
                     "expiresInMinutes": None,
                 }
@@ -180,7 +180,7 @@ class OrderQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
                 "orderUuid": "b3fef99e-6c18-422e-943d-cf00702af53e",
                 "paymentType": "INVOICE",
                 "receiptUrl": None,
-                "refundId": None,
+                "refundUuid": None,
                 "status": "CANCELLED",
                 "expiresInMinutes": None,
             }
