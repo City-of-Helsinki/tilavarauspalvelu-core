@@ -28,7 +28,7 @@ class ReservationWorkingMemoWriteTestCase(ReservationTestCaseBase):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.reservation = ReservationFactory(
-            reservation_unit=[cls.reservation_unit],
+            reservation_units=[cls.reservation_unit],
             begin=datetime.datetime.now(tz=get_default_timezone()),
             end=(datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=1)),
             state=ReservationStateChoice.REQUIRES_HANDLING,
@@ -165,7 +165,7 @@ class ReservationWorkingMemoWriteTestCase(ReservationTestCaseBase):
 
     def test_working_memo_saves_when_staff_and_own_reservation(self):
         staff_reserver = self.create_staff_reserver_for_unit(self.unit)
-        res = ReservationFactory(user=staff_reserver, reservation_unit=[self.reservation_unit])
+        res = ReservationFactory(user=staff_reserver, reservation_units=[self.reservation_unit])
 
         input_data = self.get_valid_update_data()
         input_data["pk"] = res.id

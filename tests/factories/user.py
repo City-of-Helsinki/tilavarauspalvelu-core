@@ -6,12 +6,12 @@ from collections.abc import Iterable
 from typing import Any
 
 import factory
-from django.conf import settings
 from django.utils.crypto import get_random_string
 from social_django.models import UserSocialAuth
 
 from permissions.models import GENERAL_PERMISSIONS, SERVICE_SECTOR_PERMISSIONS, UNIT_PERMISSIONS
 from spaces.models import ServiceSector, Unit, UnitGroup
+from tilavarauspalvelu.utils.commons import Language
 from users.helauth.utils import IDToken
 from users.models import User
 
@@ -48,7 +48,7 @@ class UserFactory(GenericDjangoModelFactory[User]):
     username = factory.LazyAttribute(lambda user: f"{user.first_name.lower()}_{user.last_name.lower()}")
     email = factory.LazyAttribute(lambda user: f"{user.first_name.lower()}.{user.last_name.lower()}@example.com")
     date_of_birth = factory.Faker("date_of_birth", minimum_age=18, maximum_age=100)
-    preferred_language = settings.LANGUAGES[0][0]
+    preferred_language = Language.FI.value
 
     @classmethod
     def create_superuser(cls, **kwargs: Any) -> User:

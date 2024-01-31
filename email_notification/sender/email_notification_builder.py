@@ -16,7 +16,7 @@ from email_notification.sender.email_notification_context import (
 )
 from email_notification.templatetags.email_template_filters import format_currency
 from reservations.models import Reservation
-from tilavarauspalvelu.utils.commons import LANGUAGES
+from tilavarauspalvelu.utils.commons import Language
 
 FILTERS_MAP = {"currency": format_currency}
 
@@ -176,7 +176,7 @@ class ReservationEmailNotificationBuilder:
 
     def _get_reservation_unit_instruction_field(self, name):
         instructions = []
-        for res_unit in self.reservation.reservation_unit.all():
+        for res_unit in self.reservation.reservation_units.all():
             instructions.append(self._get_by_language(res_unit, name))
 
         return "\n-\n".join(instructions)
@@ -228,7 +228,7 @@ class ReservationEmailNotificationBuilder:
         if getattr(self.template, f"content_{lang}", None):
             self.language = lang
         else:
-            self.language = LANGUAGES.FI
+            self.language = Language.FI.value
 
     def _init_context_attr_map(self):
         self.context_attr_map = {}

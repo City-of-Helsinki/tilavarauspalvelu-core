@@ -45,7 +45,7 @@ class EmailNotificationContextTestCase(TestCase):
             reason_en="",  # empty string should use fi as fallback
         )
         self.reservation = ReservationFactory.create(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             deny_reason=self.deny_reason,
             cancel_reason=self.cancel_reason,
             reservee_type=CustomerTypeChoice.INDIVIDUAL,

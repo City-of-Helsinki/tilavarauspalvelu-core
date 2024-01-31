@@ -238,10 +238,10 @@ def reservation(reservation_unit, user) -> Reservation:
         description="Test description",
         begin=begin_time,
         end=end_time,
-        state="created",
+        state="CREATED",
         user=user,
     )
-    reservation.reservation_unit.set([reservation_unit])
+    reservation.reservation_units.set([reservation_unit])
     return reservation
 
 
@@ -249,8 +249,8 @@ def reservation(reservation_unit, user) -> Reservation:
 def confirmed_reservation(reservation_unit, user) -> Reservation:
     begin_time = timezone.datetime(2020, 12, 1, 0, 0, 0).astimezone()
     end_time = begin_time + datetime.timedelta(hours=1)
-    reservation = Reservation.objects.create(begin=begin_time, end=end_time, state="confirmed", user=user)
-    reservation.reservation_unit.set([reservation_unit])
+    reservation = Reservation.objects.create(begin=begin_time, end=end_time, state="CONFIRMED", user=user)
+    reservation.reservation_units.set([reservation_unit])
     return reservation
 
 
@@ -258,8 +258,8 @@ def confirmed_reservation(reservation_unit, user) -> Reservation:
 def reservation_in_second_unit(reservation_unit2, user) -> Reservation:
     begin_time = timezone.datetime(2020, 12, 2, 0, 0, 0).astimezone()
     end_time = begin_time + datetime.timedelta(hours=1)
-    reservation = Reservation.objects.create(begin=begin_time, end=end_time, state="created", user=user)
-    reservation.reservation_unit.set([reservation_unit2])
+    reservation = Reservation.objects.create(begin=begin_time, end=end_time, state="CREATED", user=user)
+    reservation.reservation_units.set([reservation_unit2])
     return reservation
 
 
@@ -271,7 +271,7 @@ def valid_reservation_data(reservation_unit):
         "end": "2020-11-10T09:30",
         "buffer_time_before": "10",
         "buffer_time_after": "10",
-        "reservation_unit": [reservation_unit.id],
+        "reservation_units": [reservation_unit.id],
     }
 
 

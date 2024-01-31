@@ -305,7 +305,7 @@ def can_view_reservation(user: AnyUser, reservation: "Reservation", needs_staff_
     from spaces.models import ServiceSector, Unit
 
     permission = "can_view_reservations"
-    reservation_units = reservation.reservation_unit.all()
+    reservation_units = reservation.reservation_units.all()
 
     if user.is_anonymous:
         return False
@@ -336,7 +336,7 @@ def can_modify_reservation(user: AnyUser, reservation: "Reservation") -> bool:
     from spaces.models import ServiceSector, Unit
 
     permission = "can_manage_reservations"
-    reservation_units = reservation.reservation_unit.all()
+    reservation_units = reservation.reservation_units.all()
 
     units = Unit.objects.filter(reservationunit__in=reservation_units)
     service_sectors = ServiceSector.objects.filter(units__in=units)
@@ -354,7 +354,7 @@ def can_handle_reservation(user: AnyUser, reservation: "Reservation") -> bool:
     from spaces.models import ServiceSector, Unit
 
     permission = "can_manage_reservations"
-    reservation_units = reservation.reservation_unit.all()
+    reservation_units = reservation.reservation_units.all()
 
     units = Unit.objects.filter(reservationunit__in=reservation_units)
     service_sectors = ServiceSector.objects.filter(units__in=units)
@@ -371,7 +371,7 @@ def can_comment_reservation(user: AnyUser, reservation: "Reservation") -> bool:
     from spaces.models import ServiceSector, Unit
 
     permission = "can_comment_reservations"
-    units = Unit.objects.filter(reservationunit__in=reservation.reservation_unit.all())
+    units = Unit.objects.filter(reservationunit__in=reservation.reservation_units.all())
     service_sectors = ServiceSector.objects.filter(units__in=units)
 
     return (
@@ -410,7 +410,7 @@ def can_view_recurring_reservation(user: AnyUser, recurring_reservation: "Recurr
 
     if user.is_anonymous:
         return False
-    res_unit_ids = recurring_reservation.reservations.values_list("reservation_unit", flat=True)
+    res_unit_ids = recurring_reservation.reservations.values_list("reservation_units", flat=True)
     reservation_units = ReservationUnit.objects.filter(id__in=res_unit_ids)
     units = Unit.objects.filter(reservationunit__in=reservation_units)
     service_sectors = ServiceSector.objects.filter(units__in=units)

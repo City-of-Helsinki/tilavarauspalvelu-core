@@ -37,7 +37,7 @@ class GetNotificationRecipientsTestCase(TestCase):
         cls.runit1 = ReservationUnitFactory(unit=cls.unit1)
         cls.runit2 = ReservationUnitFactory(unit=cls.unit2)
 
-        cls.reservation = ReservationFactory(reservation_unit=[cls.runit1, cls.runit2])
+        cls.reservation = ReservationFactory(reservation_units=[cls.runit1, cls.runit2])
 
         cls.unit_role_choice = UnitRoleChoice.objects.create(code="reservation_manager")
 

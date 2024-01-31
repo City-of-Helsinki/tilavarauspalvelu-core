@@ -24,7 +24,7 @@ class ReservationApproveTestCase(ReservationTestCaseBase):
         self.reservation_unit.metadata_set = metadata
         self.reservation_unit.save()
         self.reservation = ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=1),
             end=(datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=2)),
             state=ReservationStateChoice.REQUIRES_HANDLING,

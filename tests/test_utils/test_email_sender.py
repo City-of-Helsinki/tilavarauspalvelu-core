@@ -26,7 +26,7 @@ def test_send_email__success__reservee_email(outbox):
     reservation: Reservation = ReservationFactory.create(
         reservee_email="example@email.com",
         user=None,
-        reservation_unit__unit__name="foo",
+        reservation_units__unit__name="foo",
     )
 
     send_reservation_email_notification(email_template.type, reservation)
@@ -41,7 +41,7 @@ def test_send_email__success__reservation_user_email(outbox):
     email_template: EmailTemplate = EmailTemplateFactory.create(type=EmailType.RESERVATION_CONFIRMED)
     reservation: Reservation = ReservationFactory.create(
         user__email="example@email.com",
-        reservation_unit__unit__name="foo",
+        reservation_units__unit__name="foo",
     )
 
     send_reservation_email_notification(email_template.type, reservation)
@@ -57,7 +57,7 @@ def test_send_email__success__reservee_and_user_email(outbox):
     reservation: Reservation = ReservationFactory.create(
         reservee_email="example1@email.com",
         user__email="example2@email.com",
-        reservation_unit__unit__name="foo",
+        reservation_units__unit__name="foo",
     )
 
     send_reservation_email_notification(email_template.type, reservation)
@@ -71,7 +71,7 @@ def test_send_email__success__reservee_and_user_email(outbox):
 def test_send_email__with_multiple_recipients__success(outbox):
     email_template: EmailTemplate = EmailTemplateFactory.create(type=EmailType.RESERVATION_CONFIRMED)
     reservation: Reservation = ReservationFactory.create(
-        reservation_unit__unit__name="foo",
+        reservation_units__unit__name="foo",
     )
 
     recipients = [
@@ -92,7 +92,7 @@ def test_send_email__with_multiple_recipients__too_many_recipients(outbox, setti
     settings.EMAIL_MAX_RECIPIENTS = 3
 
     email_template: EmailTemplate = EmailTemplateFactory.create(type=EmailType.RESERVATION_CONFIRMED)
-    reservation: Reservation = ReservationFactory.create(reservation_unit__unit__name="foo")
+    reservation: Reservation = ReservationFactory.create(reservation_units__unit__name="foo")
 
     recipients = [
         "liu.kang@earthrealm.com",
@@ -123,7 +123,7 @@ def test_send_email__reservation_language_is_used(outbox, lang):
         subject_sv="sv",
         content_sv="sv",
     )
-    reservation: Reservation = ReservationFactory.create(reservation_unit__unit__name="foo", reservee_language=lang)
+    reservation: Reservation = ReservationFactory.create(reservation_units__unit__name="foo", reservee_language=lang)
 
     send_reservation_email_notification(EmailType.RESERVATION_CONFIRMED, reservation)
 

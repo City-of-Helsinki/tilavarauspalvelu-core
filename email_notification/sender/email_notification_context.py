@@ -43,7 +43,7 @@ class EmailNotificationContext:
             "sv": "",
             "en": "",
         }
-        reservation_units = reservation.reservation_unit.all()
+        reservation_units = reservation.reservation_units.all()
 
         for language in all_instructions:
             language_instructions: list[str] = []
@@ -120,14 +120,14 @@ class EmailNotificationContext:
         context.end_datetime = reservation.end.astimezone(get_default_timezone())
         context.reservation_number = reservation.id
 
-        res_unit = reservation.reservation_unit.filter(unit__isnull=False).first()
+        res_unit = reservation.reservation_units.filter(unit__isnull=False).first()
         context.unit_name = get_attr_by_language(res_unit.unit, "name", language) or ""
 
         location: Location | None = getattr(res_unit.unit, "location", None)
         context.unit_location = str(location) if location is not None else ""
 
         context.reservation_unit_name = ", ".join(
-            [get_attr_by_language(ru, "name", language) for ru in reservation.reservation_unit.all()]
+            [get_attr_by_language(ru, "name", language) for ru in reservation.reservation_units.all()]
         )
 
         context.price = reservation.price
@@ -142,7 +142,7 @@ class EmailNotificationContext:
             prices = calculator.calculate_price(
                 reservation.begin,
                 reservation.end,
-                reservation.reservation_unit.all(),
+                reservation.reservation_units.all(),
             )
             context.subsidised_price = prices.subsidised_price
 

@@ -1844,7 +1844,7 @@ def _create_reservations(  # NOSONAR (python:S3776)
 
     reservations = Reservation.objects.bulk_create(reservations)
     for reservation, reservation_unit in zip(reservations, reservation_units_chosen, strict=True):
-        reservation.reservation_unit.add(reservation_unit)
+        reservation.reservation_units.add(reservation_unit)
 
     return reservations
 

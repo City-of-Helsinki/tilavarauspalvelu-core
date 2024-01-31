@@ -41,7 +41,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         self.reservation_begin = datetime.datetime.now(tz=get_default_timezone())
         self.reservation_end = datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=1)
         self.reservation = ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=self.reservation_begin,
             end=self.reservation_end,
             state=ReservationStateChoice.CREATED,
@@ -145,7 +145,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
 
     def test_update_fails_when_overlapping_reservation(self):
         ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=datetime.datetime.now(tz=get_default_timezone()),
             end=datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=2),
             state=ReservationStateChoice.CONFIRMED,
@@ -163,7 +163,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         begin = datetime.datetime.now(tz=get_default_timezone()) - datetime.timedelta(hours=2)
         end = begin + datetime.timedelta(hours=1)
         ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=begin,
             end=end,
             buffer_time_after=datetime.timedelta(hours=1, minutes=1),
@@ -187,7 +187,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         begin = datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=2)
         end = begin + datetime.timedelta(hours=1)
         ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=begin,
             end=end,
             buffer_time_before=datetime.timedelta(hours=1, minutes=1),
@@ -208,7 +208,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         begin = self.reservation_begin - datetime.timedelta(hours=2)
         end = begin + datetime.timedelta(hours=1)
         ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=begin,
             end=end,
             state=ReservationStateChoice.CONFIRMED,
@@ -231,7 +231,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         begin = datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=2)
         end = begin + datetime.timedelta(hours=1)
         ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=begin,
             end=end,
             state=ReservationStateChoice.CONFIRMED,
@@ -345,7 +345,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
             email="zen.citi@foo.com",
         )
         res = ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=datetime.datetime.now(tz=get_default_timezone()),
             end=datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=2),
             state=ReservationStateChoice.CREATED,
@@ -695,13 +695,16 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert self.reservation.non_subsidised_price_net == self.reservation.price_net
 
     @patch(
-        "reservation_units.utils.reservation_unit_reservation_scheduler.ReservationUnitReservationScheduler.is_reservation_unit_open"
+        "reservation_units.utils.reservation_unit_reservation_scheduler."
+        "ReservationUnitReservationScheduler.is_reservation_unit_open"
     )
     @patch(
-        "reservation_units.utils.reservation_unit_reservation_scheduler.ReservationUnitReservationScheduler.get_conflicting_open_application_round"
+        "reservation_units.utils.reservation_unit_reservation_scheduler."
+        "ReservationUnitReservationScheduler.get_conflicting_open_application_round"
     )
     @patch(
-        "reservation_units.utils.reservation_unit_reservation_scheduler.ReservationUnitReservationScheduler.get_reservation_unit_possible_start_times"
+        "reservation_units.utils.reservation_unit_reservation_scheduler."
+        "ReservationUnitReservationScheduler.get_reservation_unit_possible_start_times"
     )
     def test_update_reservation_price_calculation_when_unit_changes(
         self,

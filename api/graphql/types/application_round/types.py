@@ -4,15 +4,15 @@ from graphene_django import DjangoListField
 from api.graphql.extensions.base_types import DjangoAuthNode
 from api.graphql.types.application_round.filtersets import ApplicationRoundFilterSet
 from api.graphql.types.application_round.permissions import ApplicationRoundPermission
+from api.graphql.types.reservation_purpose.types import ReservationPurposeNode
 from api.graphql.types.reservation_units.types import ReservationUnitType
-from api.graphql.types.reservations.types import ReservationPurposeType
 from applications.choices import ApplicationRoundStatusChoice
 from applications.models import ApplicationRound
 from common.typing import GQLInfo
 
 
 class ApplicationRoundNode(DjangoAuthNode):
-    purposes = DjangoListField(ReservationPurposeType)
+    purposes = ReservationPurposeNode.ListField()
     reservation_units = DjangoListField(ReservationUnitType)
 
     status = graphene.Field(graphene.Enum.from_enum(ApplicationRoundStatusChoice))

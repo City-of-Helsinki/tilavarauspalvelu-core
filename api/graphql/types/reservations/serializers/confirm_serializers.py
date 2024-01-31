@@ -10,7 +10,6 @@ from reservation_units.utils.reservation_unit_pricing_helper import (
     ReservationUnitPricingHelper,
 )
 from reservations.choices import ReservationStateChoice
-from reservations.email_utils import send_confirmation_email
 from utils.decimal_utils import round_decimal
 
 
@@ -37,7 +36,7 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
         fields = ["payment_type"] + ReservationUpdateSerializer.Meta.fields
 
     def _get_default_payment_type(self):
-        reservation_unit = self.instance.reservation_unit.first()
+        reservation_unit = self.instance.reservation_units.first()
         payment_types = reservation_unit.payment_types
 
         if payment_types.count() == 0:
@@ -67,7 +66,7 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
                 ValidationErrorCodes.CHANGES_NOT_ALLOWED,
             )
 
-        if self.instance.reservation_unit.count() > 1:
+        if self.instance.reservation_units.count() > 1:
             raise ValidationErrorWithCode(
                 "Reservations with multiple reservation units are not supported.",
                 ValidationErrorCodes.MULTIPLE_RESERVATION_UNITS,
@@ -75,7 +74,7 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
 
         if not self.instance.requires_handling:
             payment_type = data.get("payment_type", "").upper()
-            reservation_unit = self.instance.reservation_unit.first()
+            reservation_unit = self.instance.reservation_units.first()
 
             active_price = ReservationUnitPricingHelper.get_active_price(reservation_unit)
             if active_price.pricing_type == PricingType.PAID or self.instance.price_net > 0:
@@ -154,5 +153,5 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
                 )
 
         instance = super().save(**kwargs)
-        send_confirmation_email(instance)
+        instance.actions.send_confirmation_email()
         return instance

@@ -57,7 +57,7 @@ class ReservationStatisticsCreateTestCase(TestCase):
             "non_subsidised_price_net": Decimal("8.87"),
             "recurring_reservation": cls.recurring,
         }
-        cls.reservation = ReservationFactory(reservation_unit=[cls.reservation_unit], **cls.reservation_data)
+        cls.reservation = ReservationFactory(reservation_units=[cls.reservation_unit], **cls.reservation_data)
 
     def test_statistics_create_on_creation(self):
         self.reservation.save()
@@ -82,7 +82,7 @@ class ReservationStatisticsCreateTestCase(TestCase):
         assert_that(stat.age_group).is_equal_to(self.reservation.age_group)
         assert_that(stat.age_group_name).is_equal_to(str(self.reservation.age_group))
         assert_that(stat.is_applied).is_false()
-        assert_that(stat.ability_group).is_none()
+        assert_that(stat.ability_group).is_not_none()
         assert_that(stat.begin).is_equal_to(self.reservation.begin)
         assert_that(stat.end).is_equal_to(self.reservation.end)
         assert_that(stat.duration_minutes).is_equal_to(120)
@@ -143,9 +143,9 @@ class ReservationStatisticsCreateTestCase(TestCase):
         assert_that(stat.ability_group_name).is_equal_to(self.reservation.recurring_reservation.ability_group.name)
 
     def test_reservation_units_removed(self):
-        self.reservation.reservation_unit.remove(self.reservation_unit)
+        self.reservation.reservation_units.remove(self.reservation_unit)
         resu = ReservationUnitFactory()
-        self.reservation.reservation_unit.add(resu)
+        self.reservation.reservation_units.add(resu)
         self.reservation.save()
 
         stat = ReservationStatistic.objects.first()

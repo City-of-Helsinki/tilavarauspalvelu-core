@@ -32,7 +32,7 @@ def mock_order_payment_api(remote_id: uuid.UUID, payment_id: uuid.UUID, namespac
     )
     with (
         mock.patch("api.webhooks.views.get_payment", return_value=order),
-        mock.patch("api.webhooks.views.send_confirmation_email"),
+        mock.patch("actions.reservation.ReservationActions.send_confirmation_email"),
     ):
         yield
 

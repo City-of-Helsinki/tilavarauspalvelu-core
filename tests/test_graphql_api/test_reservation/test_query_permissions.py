@@ -25,7 +25,7 @@ def test_reservation__query__regular_user_cannot_see_working_memo_for_other_user
 
     assert response.has_errors is False, response
     assert len(response.edges) == 1
-    assert response.node(0) == {"pk": reservation.pk, "workingMemo": None}
+    assert response.node(0) == {"pk": reservation.pk, "workingMemo": ""}
 
 
 def test_reservation__query__staff_user_can_see_working_memo_for_own_reservation(graphql):
@@ -71,7 +71,7 @@ def test_reservation__query__unit_admin_can_see_working_memo_for_reservations_in
     unit = UnitFactory.create()
     reservation_unit = ReservationUnitFactory.create(unit=unit)
     admin = UserFactory.create_with_unit_permissions(unit=unit, perms=["can_view_reservations"])
-    reservation = ReservationFactory.create(working_memo="foo", reservation_unit=[reservation_unit])
+    reservation = ReservationFactory.create(working_memo="foo", reservation_units=[reservation_unit])
 
     graphql.force_login(admin)
     query = reservations_query(fields="pk workingMemo")
@@ -86,7 +86,7 @@ def test_reservation__query__unit_admin_cannot_see_working_memo_for_reservations
     unit = UnitFactory.create()
     reservation_unit = ReservationUnitFactory.create()
     admin = UserFactory.create_with_unit_permissions(unit=unit, perms=["can_view_reservations"])
-    reservation = ReservationFactory.create(working_memo="foo", reservation_unit=[reservation_unit])
+    reservation = ReservationFactory.create(working_memo="foo", reservation_units=[reservation_unit])
 
     graphql.force_login(admin)
     query = reservations_query(fields="pk workingMemo")
@@ -94,7 +94,7 @@ def test_reservation__query__unit_admin_cannot_see_working_memo_for_reservations
 
     assert response.has_errors is False, response
     assert len(response.edges) == 1
-    assert response.node(0) == {"pk": reservation.pk, "workingMemo": None}
+    assert response.node(0) == {"pk": reservation.pk, "workingMemo": ""}
 
 
 def test_reservation__query__regular_user_cannot_see_personal_information_from_other_reservations(graphql):
@@ -160,7 +160,7 @@ def test_reservation__query__regular_user_cannot_see_personal_information_from_o
         "billingPhone": None,
         "cancelDetails": None,
         "description": None,
-        "freeOfChargeReason": None,
+        "freeOfChargeReason": "",
         "homeCity": None,
         "isHandled": None,
         "name": None,
@@ -247,7 +247,7 @@ def test_reservation__query__fields_requiring_staff_permissions__regular_user(gr
         "pk": reservation.pk,
         "staffEvent": None,
         "type": None,
-        "workingMemo": None,
+        "workingMemo": "",
         "handlingDetails": "",
         "handledAt": None,
     }

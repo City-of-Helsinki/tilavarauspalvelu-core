@@ -7,7 +7,6 @@ from api.graphql.extensions.validation_errors import ValidationErrorCodes, Valid
 from api.graphql.types.reservations.serializers.mixins import ReservationSchedulingMixin
 from reservation_units.models import ReservationUnit
 from reservations.choices import ReservationStateChoice, ReservationTypeChoice
-from reservations.email_utils import send_reservation_modified_email
 from reservations.models import Reservation
 
 DEFAULT_TIMEZONE = get_default_timezone()
@@ -42,7 +41,7 @@ class StaffReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reserv
 
         now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
         if instance.type == ReservationTypeChoice.NORMAL and instance.end > now:
-            send_reservation_modified_email(instance)
+            instance.actions.send_reservation_modified_email()
 
         return instance
 
@@ -62,7 +61,7 @@ class StaffReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reserv
         new_buffer_after = data.get("buffer_time_after", None)
 
         reservation_unit: ReservationUnit
-        for reservation_unit in self.instance.reservation_unit.all():
+        for reservation_unit in self.instance.reservation_units.all():
             if reservation_unit.reservation_block_whole_day:
                 data["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(begin)
                 data["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(end)

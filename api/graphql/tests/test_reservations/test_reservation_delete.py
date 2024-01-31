@@ -21,7 +21,7 @@ class ReservationDeleteTestCase(ReservationTestCaseBase):
         super().setUpTestData()
 
         cls.reservation = ReservationFactory(
-            reservation_unit=[cls.reservation_unit],
+            reservation_units=[cls.reservation_unit],
             begin=datetime.datetime.now(tz=get_default_timezone()),
             end=(datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=1)),
             state=ReservationStateChoice.CREATED,

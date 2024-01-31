@@ -19,14 +19,14 @@ class GetPreviousReservationTestCase(TestCase):
         self.reservation_blocked = ReservationFactory(
             begin=(self.now - timedelta(hours=2)),
             end=(self.now - timedelta(hours=1)),
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             type=ReservationTypeChoice.BLOCKED,
             state=ReservationStateChoice.CONFIRMED,
         )
         self.reservation = ReservationFactory(
             begin=(self.now - timedelta(hours=3)),
             end=(self.now - timedelta(hours=2)),
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             state=ReservationStateChoice.CONFIRMED,
         )
 
@@ -58,14 +58,14 @@ class GetNextReservationTestCase(TestCase):
         self.reservation_blocked = ReservationFactory(
             begin=(self.now + timedelta(hours=1)),
             end=(self.now + timedelta(hours=2)),
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             type=ReservationTypeChoice.BLOCKED,
             state=ReservationStateChoice.CONFIRMED,
         )
         self.reservation = ReservationFactory(
             begin=(self.now + timedelta(hours=2)),
             end=(self.now + timedelta(hours=3)),
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             state=ReservationStateChoice.CONFIRMED,
         )
 

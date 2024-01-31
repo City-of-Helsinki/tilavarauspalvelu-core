@@ -1,11 +1,8 @@
 import datetime
+from decimal import Decimal
 
 from django.db import models
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
-
-from applications.choices import PriorityChoice
-from reservations.choices import CustomerTypeChoice
 
 __all__ = [
     "ReservationStatistic",
@@ -14,233 +11,114 @@ __all__ = [
 
 
 class ReservationStatistic(models.Model):
-    reservation = models.OneToOneField("reservations.Reservation", on_delete=models.SET_NULL, null=True)
+    num_persons: int | None = models.PositiveIntegerField(null=True, blank=True)
 
-    reservation_created_at = models.DateTimeField(verbose_name=_("Created at"), null=True, default=timezone.now)
+    priority: int = models.IntegerField()  # no enum (old statuses)
+    reservation_type: str = models.CharField(max_length=255, null=True)  # no enum (old statuses)
+    state: str = models.CharField(max_length=255)  # no enum (old statuses)
 
-    reservation_handled_at = models.DateTimeField(
-        verbose_name=_("Handled at"),
+    begin: datetime.datetime = models.DateTimeField()
+    end: datetime.datetime = models.DateTimeField()
+    buffer_time_before: datetime.timedelta | None = models.DurationField(blank=True, null=True)
+    buffer_time_after: datetime.timedelta | None = models.DurationField(blank=True, null=True)
+    reservation_created_at: datetime.timedelta | None = models.DateTimeField(null=True, default=timezone.now)
+    reservation_handled_at: datetime.timedelta | None = models.DateTimeField(null=True, blank=True)
+    reservation_confirmed_at = models.DateTimeField(null=True)
+
+    duration_minutes: int = models.IntegerField()
+
+    updated_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True, auto_now=True)
+
+    reservee_type: str | None = models.CharField(max_length=255, null=True, blank=True)  # no enum (old statuses)
+    reservee_uuid: str = models.CharField(max_length=255, blank=True, default="")
+    reservee_is_unregistered_association: bool | None = models.BooleanField(null=True, default=False, blank=True)
+    reservee_language: str | None = models.CharField(max_length=255, null=True, blank=True)  # no enum (old statuses)
+
+    price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    price_net: Decimal = models.DecimalField(max_digits=20, decimal_places=6, default=0)
+    non_subsidised_price: Decimal = models.DecimalField(max_digits=20, decimal_places=2, default=0)
+    non_subsidised_price_net: Decimal = models.DecimalField(max_digits=20, decimal_places=6, default=0)
+    tax_percentage_value: Decimal = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+
+    applying_for_free_of_charge: bool = models.BooleanField(default=False, blank=True)
+
+    deny_reason_text: str = models.CharField(max_length=255)
+    cancel_reason_text: str = models.CharField(max_length=255)
+
+    is_applied: bool = models.BooleanField(default=False, blank=True)  # gone through the application process
+    is_recurring: bool = models.BooleanField(default=False, blank=True)
+    is_subsidised: bool = models.BooleanField(default=False, blank=True)
+
+    ability_group_name: str = models.fields.TextField()
+    age_group_name: str = models.fields.CharField(max_length=255, default="", blank=True)
+    home_city_municipality_code: str = models.CharField(default="", max_length=30)
+    home_city_name: str = models.CharField(max_length=100, default="", blank=True)
+    primary_reservation_unit_name: str = models.CharField(max_length=255)
+    primary_unit_name: str = models.CharField(max_length=255)
+    primary_unit_tprek_id: str | None = models.CharField(max_length=255, null=True)
+    priority_name: str = models.CharField(max_length=255, default="", blank=True)
+    purpose_name: str = models.CharField(max_length=200, default="", blank=True)
+
+    recurrence_begin_date: datetime.date | None = models.DateField(null=True)
+    recurrence_end_date: datetime.date | None = models.DateField(null=True)
+    recurrence_uuid: str = models.CharField(max_length=255, default="", blank=True)
+
+    # Relations
+    reservation = models.OneToOneField(
+        "reservations.Reservation",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="reservation_statistic",
+    )
+    primary_reservation_unit = models.ForeignKey(
+        "reservation_units.ReservationUnit",
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        help_text="When this reservation was handled.",
+        related_name="reservation_statistics",
     )
-
-    reservation_confirmed_at = models.DateTimeField(verbose_name=_("Confirmed at"), null=True)
-
-    buffer_time_before: datetime.timedelta = models.DurationField(
-        verbose_name=_("Buffer time before"),
-        default=datetime.timedelta(),
-        blank=True,
-    )
-    buffer_time_after: datetime.timedelta = models.DurationField(
-        verbose_name=_("Buffer time after"),
-        default=datetime.timedelta(),
-        blank=True,
-    )
-
-    updated_at = models.DateTimeField(verbose_name=_("Statistics updated at"), null=True, blank=True, auto_now=True)
-
-    reservee_type = models.CharField(
-        max_length=50,
-        choices=CustomerTypeChoice.choices,
-        null=True,
-        blank=True,
-        help_text="Type of reservee",
-    )
-
-    applying_for_free_of_charge = models.BooleanField(
-        verbose_name=_("Reservee is applying for a free-of-charge reservation"),
-        null=False,
-        default=False,
-        blank=True,
-    )
-
-    reservee_language = models.CharField(
-        verbose_name=_("Preferred language of reservee"),
-        max_length=255,
-        blank=True,
-        default="",
-    )
-
-    num_persons = models.fields.PositiveIntegerField(verbose_name=_("Number of persons"), null=True, blank=True)
-
-    priority = models.IntegerField(choices=PriorityChoice.choices, default=PriorityChoice.MEDIUM)
-
-    priority_name = models.CharField(max_length=255, null=False, default="", blank=True)
-
     home_city = models.ForeignKey(
         "applications.City",
-        verbose_name=_("Home city"),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name="reservation_statistics",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        help_text="Home city of the group or association",
     )
-
-    home_city_name = models.CharField(
-        verbose_name=_("Home city name"),
-        max_length=100,
-        null=False,
-        default="",
-        blank=True,
-    )
-
-    home_city_municipality_code = models.CharField(
-        verbose_name=_("Home city municipality code"), default="", max_length=30
-    )
-
-    purpose = models.ForeignKey(
-        "ReservationPurpose",
-        verbose_name=_("Reservation purpose"),
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-    )
-
-    purpose_name = models.CharField(max_length=200, null=False, default="", blank=True)
-
     age_group = models.ForeignKey(
         "reservations.AgeGroup",
-        verbose_name=_("Age group"),
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
+        related_name="reservation_statistics",
     )
-
-    age_group_name = models.fields.CharField(max_length=255, null=False, default="", blank=True)
-
-    is_applied = models.BooleanField(
-        default=False,
-        blank=True,
-        verbose_name=_("Is the reservation done through application process."),
-    )
-
     ability_group = models.ForeignKey(
         "reservations.AbilityGroup",
-        verbose_name=_("Ability group"),
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
+        related_name="reservation_statistics",
+    )
+    purpose = models.ForeignKey(
+        "reservations.ReservationPurpose",
         on_delete=models.SET_NULL,
-    )
-
-    ability_group_name = models.fields.TextField(
-        verbose_name=_("Name"),
-        null=False,
-        blank=False,
-    )
-
-    begin = models.DateTimeField(verbose_name=_("Begin time"))
-
-    end = models.DateTimeField(verbose_name=_("End time"))
-
-    duration_minutes = models.IntegerField(null=False, verbose_name=_("Reservation duration in minutes"))
-
-    reservation_type = models.CharField(
-        max_length=50,
         null=True,
-        blank=False,
-        help_text="Type of reservation",
+        blank=True,
+        related_name="reservation_statistics",
     )
-
-    state = models.CharField(
-        max_length=32,
-        verbose_name=_("State"),
-    )
-
     cancel_reason = models.ForeignKey(
         "reservations.ReservationCancelReason",
-        verbose_name=_("Reason for cancellation"),
-        related_name="reservation_statistics",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
+        related_name="reservation_statistics",
     )
-
-    cancel_reason_text = models.CharField(
-        max_length=255,
-        null=False,
-        blank=False,
-        verbose_name=_("The reason text of the cancel reason"),
-    )
-
     deny_reason = models.ForeignKey(
         "reservations.ReservationDenyReason",
-        verbose_name=_("Reason for deny"),
-        related_name="reservation_statistics",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
+        related_name="reservation_statistics",
     )
-
-    deny_reason_text = models.CharField(
-        max_length=255,
-        null=False,
-        blank=False,
-        verbose_name=_("The reason text of the deny reason"),
-    )
-
-    price = models.DecimalField(
-        verbose_name=_("Price"),
-        max_digits=10,
-        decimal_places=2,
-        default=0,
-        help_text="The price of this particular reservation",
-    )
-
-    price_net = models.DecimalField(
-        verbose_name=_("Price net"),
-        max_digits=20,
-        decimal_places=6,
-        default=0,
-        help_text="The price of this particular reservation excluding VAT",
-    )
-
-    non_subsidised_price = models.DecimalField(
-        verbose_name=_("Non subsidised price"),
-        max_digits=20,
-        decimal_places=2,
-        default=0,
-        help_text="The non subsidised price of the reservation excluding VAT",
-    )
-    non_subsidised_price_net = models.DecimalField(
-        verbose_name=_("Non subsidised net price"),
-        max_digits=20,
-        decimal_places=6,
-        default=0,
-        help_text="The non subsidised price of the reservation excluding VAT",
-    )
-    is_subsidised = models.BooleanField(help_text="Is the reservation price subsidised", default=False)
-    is_recurring = models.BooleanField(help_text="Is the reservation recurring", default=False)
-    recurrence_begin_date = models.DateField(verbose_name="Recurrence begin date", null=True)
-    recurrence_end_date = models.DateField(verbose_name="Recurrence end date", null=True)
-    recurrence_uuid = models.CharField(verbose_name="Recurrence UUID", max_length=255, default="", blank=True)
-    reservee_is_unregistered_association = models.BooleanField(
-        verbose_name=_("Reservee is an unregistered association"),
-        null=True,
-        default=False,
-        blank=True,
-    )
-    reservee_uuid = models.CharField(verbose_name="Reservee UUID", max_length=255, default="", blank=True)
-    tax_percentage_value = models.DecimalField(
-        verbose_name=_("Tax percentage value"),
-        max_digits=5,
-        decimal_places=2,
-        default=0,
-        help_text="The value of the tax percentage for this particular reservation",
-    )
-
-    primary_reservation_unit = models.ForeignKey(
-        "reservation_units.ReservationUnit", null=True, on_delete=models.SET_NULL
-    )
-
-    primary_reservation_unit_name = models.CharField(verbose_name=_("Name"), max_length=255)
-    primary_unit_tprek_id = models.CharField(
-        verbose_name=_("TPREK id"),
-        max_length=255,
-        null=True,
-    )
-    primary_unit_name = models.CharField(verbose_name=_("Name"), max_length=255)
 
     class Meta:
         db_table = "reservation_statistic"
@@ -251,19 +129,21 @@ class ReservationStatistic(models.Model):
 
 
 class ReservationStatisticsReservationUnit(models.Model):
+    name: str = models.CharField(max_length=255)
+    unit_tprek_id: str | None = models.CharField(max_length=255, null=True)
+    unit_name: str = models.CharField(max_length=255)
+
     reservation_statistics = models.ForeignKey(
-        "reservations.ReservationStatistic",
+        ReservationStatistic,
         on_delete=models.CASCADE,
         related_name="reservation_stats_reservation_units",
     )
-    reservation_unit = models.ForeignKey("reservation_units.ReservationUnit", null=True, on_delete=models.SET_NULL)
-    unit_tprek_id = models.CharField(
-        verbose_name=_("TPREK id"),
-        max_length=255,
+    reservation_unit = models.ForeignKey(
+        "reservation_units.ReservationUnit",
         null=True,
+        on_delete=models.SET_NULL,
+        related_name="reservation_stats_reservation_units",
     )
-    name = models.CharField(verbose_name=_("Name"), max_length=255)
-    unit_name = models.CharField(verbose_name=_("Name"), max_length=255)
 
     class Meta:
         db_table = "reservation_statistics_reservation_unit"

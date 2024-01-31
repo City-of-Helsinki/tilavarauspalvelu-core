@@ -1,5 +1,4 @@
 import django_filters
-from django.contrib.auth import get_user_model
 from django.contrib.postgres.search import SearchVector
 from django.db import models
 from django.db.models import QuerySet
@@ -10,8 +9,6 @@ from applications.models import Application
 from applications.querysets.application import ApplicationQuerySet
 from common.db import raw_prefixed_query
 from common.filtersets import BaseModelFilterSet, EnumMultipleChoiceFilter, IntChoiceFilter, IntMultipleChoiceFilter
-
-User = get_user_model()
 
 
 class ApplicationFilterSet(BaseModelFilterSet):
@@ -40,7 +37,7 @@ class ApplicationFilterSet(BaseModelFilterSet):
         model = Application
         fields = []
 
-    def filter_queryset(self, queryset: ApplicationQuerySet) -> QuerySet:
+    def filter_queryset(self, queryset: ApplicationQuerySet) -> models.QuerySet:
         return super().filter_queryset(queryset.with_applicant_alias())
 
     @staticmethod
@@ -52,7 +49,7 @@ class ApplicationFilterSet(BaseModelFilterSet):
         return qs.annotate(search=vector).filter(search=query)
 
     @staticmethod
-    def filter_by_status(qs: ApplicationQuerySet, name: str, value: list[str]) -> QuerySet:
+    def filter_by_status(qs: ApplicationQuerySet, name: str, value: list[str]) -> models.QuerySet:
         return qs.has_status_in(value)
 
     @staticmethod

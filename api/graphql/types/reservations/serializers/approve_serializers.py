@@ -7,7 +7,6 @@ from api.graphql.extensions.decimal_field import DecimalField
 from api.graphql.extensions.legacy_helpers import OldPrimaryKeySerializer
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from reservations.choices import ReservationStateChoice
-from reservations.email_utils import send_approve_email
 from reservations.models import Reservation
 
 DEFAULT_TIMEZONE = get_default_timezone()
@@ -56,5 +55,5 @@ class ReservationApproveSerializer(OldPrimaryKeySerializer):
 
     def save(self, **kwargs):
         instance = super().save(**kwargs)
-        send_approve_email(instance)
+        instance.actions.send_approve_email()
         return instance

@@ -6,10 +6,10 @@ import graphql
 import sentry_sdk
 from django.conf import global_settings
 from django.utils.log import DEFAULT_LOGGING
-from django.utils.translation import gettext_lazy as _
 from helusers import defaults
 from sentry_sdk.integrations.django import DjangoIntegration
 
+from .utils.commons import Language
 from .utils.logging import getLogger
 
 # This is a temporary fix for graphene_permissions to avoid ImportError when importing ResolveInfo
@@ -374,7 +374,7 @@ if env("SENTRY_DSN"):
 # ----- Internationalization ---------------------------------------------------------------------------
 
 LANGUAGE_CODE = "fi"
-LANGUAGES = (("fi", _("Finnish")), ("en", _("English")), ("sv", _("Swedish")))
+LANGUAGES = Language.choices
 LOCALE_PATHS = [BASE_DIR / "locale"]
 TIME_ZONE = "Europe/Helsinki"
 USE_I18N = True

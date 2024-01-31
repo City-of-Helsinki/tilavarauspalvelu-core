@@ -15,7 +15,6 @@ from merchants.verkkokauppa.payment.exceptions import GetPaymentError, GetRefund
 from merchants.verkkokauppa.payment.requests import get_payment, get_refund_status
 from merchants.verkkokauppa.payment.types import PaymentStatus, RefundStatus
 from reservations.choices import ReservationStateChoice
-from reservations.email_utils import send_confirmation_email
 from reservations.models import Reservation
 
 from .permissions import WebhookPermission
@@ -76,7 +75,7 @@ class WebhookOrderPaidViewSet(viewsets.GenericViewSet):
         if reservation is not None and reservation.state == ReservationStateChoice.WAITING_FOR_PAYMENT:
             reservation.state = ReservationStateChoice.CONFIRMED
             reservation.save()
-            send_confirmation_email(reservation)
+            reservation.actions.send_confirmation_email()
 
         return Response(data={"message": "Order payment completed successfully"}, status=200)
 

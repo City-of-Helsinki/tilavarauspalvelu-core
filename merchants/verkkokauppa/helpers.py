@@ -81,7 +81,7 @@ def create_verkkokauppa_order(reservation: Reservation):
 
 
 def _get_order_params(reservation: Reservation):
-    runit = reservation.reservation_unit.first()
+    runit = reservation.reservation_units.first()
     quantity = 1  # Currently, we don't support quantities larger than 1
     price_net = round_decimal(Decimal(quantity * reservation.price_net), 2)
     price_vat = round_decimal(Decimal(quantity * reservation.price_net * (reservation.tax_percentage_value / 100)), 2)

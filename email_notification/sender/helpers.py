@@ -14,7 +14,7 @@ def get_staff_notification_recipients(
     have matching notification setting are not the reservation creator
     """
     notification_recipients: list[str] = []
-    reservation_units = reservation.reservation_unit.all()
+    reservation_units = reservation.reservation_units.all()
     units = Unit.objects.filter(reservationunit__in=reservation_units)
 
     users = User.objects.filter(Q(unit_roles__isnull=False) & ~Q(reservation_notification="NONE"))

@@ -84,14 +84,14 @@ def test_reservation__query__include_reservations_with_same_components(graphql):
         name="foo",
         begin=datetime.datetime(2024, 1, 1, hour=12, tzinfo=datetime.UTC),
         end=datetime.datetime(2024, 1, 1, hour=14, tzinfo=datetime.UTC),
-        reservation_unit=[reservation_unit_1],
+        reservation_units=[reservation_unit_1],
         state=ReservationStateChoice.CONFIRMED,
     )
     reservation_2: Reservation = ReservationFactory.create(
         name="bar",
         begin=datetime.datetime(2024, 1, 2, hour=13, tzinfo=datetime.UTC),
         end=datetime.datetime(2024, 1, 2, hour=15, tzinfo=datetime.UTC),
-        reservation_unit=[reservation_unit_2],
+        reservation_units=[reservation_unit_2],
         state=ReservationStateChoice.CONFIRMED,
     )
 

@@ -26,8 +26,8 @@ from .person import PersonFactory
 from .purpose import PurposeFactory
 from .qualifier import QualifierFactory
 from .real_estate import RealEstateFactory
+from .recurring_reservation import RecurringReservationFactory
 from .reservation import (
-    RecurringReservationFactory,
     ReservationCancelReasonFactory,
     ReservationDenyReasonFactory,
     ReservationFactory,

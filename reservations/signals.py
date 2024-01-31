@@ -1,12 +1,18 @@
+from typing import Any
+
 from django.db.models.signals import m2m_changed, post_save
 from django.dispatch import receiver
 
 from reservations.models import Reservation
-from reservations.statistic_utils import create_or_update_reservation_statistics
 
 
 @receiver(post_save, sender=Reservation, dispatch_uid="update_reservation_statistics_on_save")
-def update_reservation_statistics_on_save(sender, instance=None, raw=False, **kwargs):
+def update_reservation_statistics_on_save(
+    sender,
+    instance: Reservation | None = None,
+    raw: bool = False,
+    **kwargs: Any,
+):
     if raw:
         return
 
@@ -21,15 +27,22 @@ def update_reservation_statistics_on_save(sender, instance=None, raw=False, **kw
     # one can be defined. If in the future we truly support reservations with multiple reservation units,
     # we need to change this implementation so that we either have multiple reservation units in the statistics
     # or we have better way to indicate which one is the primary unit.
-    create_or_update_reservation_statistics(instance.pk)
+    reservation: Reservation = Reservation.objects.get(pk=instance.pk)
+    reservation.actions.create_or_update_reservation_statistics()
 
 
 @receiver(
     m2m_changed,
-    sender=Reservation.reservation_unit.through,
+    sender=Reservation.reservation_units.through,
     dispatch_uid="update_reservation_statistics_on_runit_change",
 )
-def update_reservation_statistics_on_runit_change(sender, instance=None, action="", reverse=False, **kwargs):
+def update_reservation_statistics_on_runit_change(
+    sender,
+    instance: Reservation | None = None,
+    action: str = "",
+    reverse: bool = False,
+    **kwargs: Any,
+):
     raw = kwargs.get("raw", False)
     if action == "post_add" and reverse is False and raw is False:
-        create_or_update_reservation_statistics(instance.pk)
+        instance.actions.create_or_update_reservation_statistics()

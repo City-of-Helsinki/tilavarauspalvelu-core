@@ -1,6 +1,7 @@
-from django.conf import settings
 from modeltranslation.manager import get_translatable_fields_for_model
 from rest_framework import serializers
+
+from tilavarauspalvelu.utils.commons import Language
 
 
 class OldTranslatedFieldSerializer(serializers.Serializer):
@@ -31,7 +32,7 @@ class OldTranslatedFieldSerializer(serializers.Serializer):
         original_field_class = kwargs.pop("field_class", None)
         if original_field_name is None:
             raise AssertionError("Translated fields must specify source field in kwargs")
-        for language_code in [x[0] for x in settings.LANGUAGES]:
+        for language_code in Language.values:
             translated_field_name = f"{original_field_name}_{language_code}"
             field_kwargs = kwargs.copy()
             field_kwargs["source"] = translated_field_name

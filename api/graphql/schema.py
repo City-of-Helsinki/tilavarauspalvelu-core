@@ -7,6 +7,8 @@ from graphene_django.debug import DjangoDebug
 from rest_framework.generics import get_object_or_404
 
 from api.graphql.extensions.permission_helpers import check_resolver_permission
+from api.graphql.types.ability_group.types import AbilityGroupNode
+from api.graphql.types.age_group.types import AgeGroupNode
 from api.graphql.types.application.mutations import (
     ApplicationCancelMutation,
     ApplicationCreateMutation,
@@ -62,12 +64,16 @@ from api.graphql.types.purpose.mutations import PurposeCreateMutation, PurposeUp
 from api.graphql.types.purpose.types import PurposeType
 from api.graphql.types.qualifier.field import QualifierFilter
 from api.graphql.types.qualifier.types import QualifierType
-from api.graphql.types.recurring_reservation.fields import RecurringReservationsFilter
-from api.graphql.types.recurring_reservation.filtersets import RecurringReservationFilterSet
 from api.graphql.types.recurring_reservation.mutations import (
     RecurringReservationCreateMutation,
     RecurringReservationUpdateMutation,
 )
+from api.graphql.types.recurring_reservation.types import RecurringReservationNode
+from api.graphql.types.reservation_cancel_reason.types import ReservationCancelReasonNode
+from api.graphql.types.reservation_deny_reason.types import ReservationDenyReasonNode
+from api.graphql.types.reservation_metadataset.fields import ReservationMetadataSetFilter
+from api.graphql.types.reservation_metadataset.types import ReservationMetadataSetType
+from api.graphql.types.reservation_purpose.types import ReservationPurposeNode
 from api.graphql.types.reservation_unit_cancellation_rule.field import ReservationUnitCancellationRulesFilter
 from api.graphql.types.reservation_unit_image.mutations import (
     ReservationUnitImageCreateMutation,
@@ -91,14 +97,7 @@ from api.graphql.types.reservation_units.types import (
     ReservationUnitHaukiUrlType,
     ReservationUnitType,
 )
-from api.graphql.types.reservations.fields import (
-    AgeGroupFilter,
-    ReservationCancelReasonFilter,
-    ReservationDenyReasonFilter,
-    ReservationMetadataSetFilter,
-    ReservationPurposeFilter,
-    ReservationsFilter,
-)
+from api.graphql.types.reservations.fields import ReservationsFilter
 from api.graphql.types.reservations.filtersets import ReservationFilterSet
 from api.graphql.types.reservations.mutations import (
     ReservationAdjustTimeMutation,
@@ -117,15 +116,7 @@ from api.graphql.types.reservations.mutations import (
     ReservationWorkingMemoMutation,
 )
 from api.graphql.types.reservations.permissions import ReservationPermission
-from api.graphql.types.reservations.types import (
-    AgeGroupType,
-    RecurringReservationType,
-    ReservationCancelReasonType,
-    ReservationDenyReasonType,
-    ReservationMetadataSetType,
-    ReservationPurposeType,
-    ReservationType,
-)
+from api.graphql.types.reservations.types import ReservationType
 from api.graphql.types.resources.fields import ResourcesFilter
 from api.graphql.types.resources.filtersets import ResourceFilterSet
 from api.graphql.types.resources.mutations import ResourceCreateMutation, ResourceDeleteMutation, ResourceUpdateMutation
@@ -165,16 +156,17 @@ class Query(graphene.ObjectType):
     application_events = ApplicationEventNode.Connection()
     application_event_schedules = ApplicationEventScheduleNode.Connection()
 
+    # TODO: REFACTOR
     reservations = ReservationsFilter(ReservationType, filterset_class=ReservationFilterSet)
     reservation_by_pk = Field(ReservationType, pk=graphene.Int())
+    # TODO: REFACTOR
 
-    recurring_reservations = RecurringReservationsFilter(
-        RecurringReservationType, filterset_class=RecurringReservationFilterSet
-    )
-
-    reservation_cancel_reasons = ReservationCancelReasonFilter(ReservationCancelReasonType)
-
-    reservation_deny_reasons = ReservationDenyReasonFilter(ReservationDenyReasonType)
+    age_groups = AgeGroupNode.Connection()
+    ability_groups = AbilityGroupNode.Connection()
+    recurring_reservations = RecurringReservationNode.Connection()
+    reservation_cancel_reasons = ReservationCancelReasonNode.Connection()
+    reservation_deny_reasons = ReservationDenyReasonNode.Connection()
+    reservation_purposes = ReservationPurposeNode.Connection()
 
     reservation_units = ReservationUnitsFilter(ReservationUnitType, filterset_class=ReservationUnitsFilterSet)
     reservation_unit = relay.Node.Field(ReservationUnitType)
@@ -220,11 +212,9 @@ class Query(graphene.ObjectType):
 
     purposes = PurposeFilter(PurposeType, filterset_class=PurposeFilterSet)
     qualifiers = QualifierFilter(QualifierType)
-    reservation_purposes = ReservationPurposeFilter(ReservationPurposeType)
 
     terms_of_use = TermsOfUseFilter(TermsOfUseType)
     tax_percentages = TaxPercentageFilter(TaxPercentageType)
-    age_groups = AgeGroupFilter(AgeGroupType)
     cities = CityNode.Connection()
     metadata_sets = ReservationMetadataSetFilter(ReservationMetadataSetType)
 
@@ -330,6 +320,7 @@ class Mutation(graphene.ObjectType):
     create_recurring_reservation = RecurringReservationCreateMutation.Field()
     update_recurring_reservation = RecurringReservationUpdateMutation.Field()
 
+    # TODO: REFACTOR
     create_reservation = ReservationCreateMutation.Field()
     create_staff_reservation = ReservationStaffCreateMutation.Field()
     update_reservation = ReservationUpdateMutation.Field()
@@ -344,6 +335,7 @@ class Mutation(graphene.ObjectType):
     adjust_reservation_time = ReservationAdjustTimeMutation.Field()
     staff_adjust_reservation_time = ReservationStaffAdjustTimeMutation.Field()
     staff_reservation_modify = ReservationStaffModifyMutation.Field()
+    # TODO: REFACTOR
 
     create_reservation_unit = ReservationUnitCreateMutation.Field()
     update_reservation_unit = ReservationUnitUpdateMutation.Field()

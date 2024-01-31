@@ -10,10 +10,7 @@ from django.db.models.functions import Concat
 from api.graphql.extensions.order_filter import CustomOrderingFilter
 from common.db import raw_prefixed_query
 from merchants.models import OrderStatus
-from permissions.helpers import (
-    get_service_sectors_where_can_view_reservations,
-    get_units_where_can_view_reservations,
-)
+from permissions.helpers import get_service_sectors_where_can_view_reservations, get_units_where_can_view_reservations
 from reservation_units.models import ReservationUnit, ReservationUnitType
 from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import RecurringReservation, Reservation
@@ -102,12 +99,12 @@ class ReservationFilterSet(django_filters.FilterSet):
             "name",
             "price",
             "pk",
-            ("reservation_unit__name_fi", "reservation_unit_name_fi"),
-            ("reservation_unit__name_en", "reservation_unit_name_en"),
-            ("reservation_unit__name_sv", "reservation_unit_name_sv"),
-            ("reservation_unit__unit__name_fi", "unit_name_fi"),
-            ("reservation_unit__unit__name_en", "unit_name_en"),
-            ("reservation_unit__unit__name_sv", "unit_name_sv"),
+            ("reservation_units__name_fi", "reservation_unit_name_fi"),
+            ("reservation_units__name_en", "reservation_unit_name_en"),
+            ("reservation_units__name_sv", "reservation_unit_name_sv"),
+            ("reservation_units__unit__name_fi", "unit_name_fi"),
+            ("reservation_units__unit__name_en", "unit_name_en"),
+            ("reservation_units__unit__name_sv", "unit_name_sv"),
             "reservee_name",
             ("payment_order__status", "order_status"),
         )
@@ -153,8 +150,8 @@ class ReservationFilterSet(django_filters.FilterSet):
         if user.is_anonymous:
             return qs.none()
         return qs.filter(
-            Q(reservation_unit__unit__in=viewable_units)
-            | Q(reservation_unit__unit__service_sectors__in=viewable_service_sectors)
+            Q(reservation_units__unit__in=viewable_units)
+            | Q(reservation_units__unit__service_sectors__in=viewable_service_sectors)
             | Q(user=user)
         ).distinct()
 
@@ -168,7 +165,7 @@ class ReservationFilterSet(django_filters.FilterSet):
         if not value:
             return qs
 
-        return qs.filter(reservation_unit__in=value)
+        return qs.filter(reservation_units__in=value)
 
     def get_reservation_unit_name(root: Reservation, qs: QuerySet, name: str, value: str) -> QuerySet:
         language = name[-2:]
@@ -177,11 +174,11 @@ class ReservationFilterSet(django_filters.FilterSet):
         for word in words:
             word = word.strip()
             if language == "en":
-                queries.append(Q(reservation_unit__name_en__istartswith=word))
+                queries.append(Q(reservation_units__name_en__istartswith=word))
             elif language == "sv":
-                queries.append(Q(reservation_unit__name_sv__istartswith=word))
+                queries.append(Q(reservation_units__name_sv__istartswith=word))
             else:
-                queries.append(Q(reservation_unit__name_fi__istartswith=word))
+                queries.append(Q(reservation_units__name_fi__istartswith=word))
 
         query = reduce(operator.or_, (query for query in queries))
         return qs.filter(query).distinct()
@@ -189,7 +186,7 @@ class ReservationFilterSet(django_filters.FilterSet):
     def get_reservation_unit_type(root: Reservation, qs: QuerySet, name: str, value: list[str]) -> QuerySet:
         if not value:
             return qs
-        return qs.filter(reservation_unit__reservation_unit_type__in=value)
+        return qs.filter(reservation_units__reservation_unit_type__in=value)
 
     def get_text_search(root: Reservation, qs: QuerySet, name: str, value: str) -> QuerySet:
         value = value.strip()
@@ -231,4 +228,4 @@ class ReservationFilterSet(django_filters.FilterSet):
         if not value:
             return qs
 
-        return qs.filter(reservation_unit__unit__in=value)
+        return qs.filter(reservation_units__unit__in=value)

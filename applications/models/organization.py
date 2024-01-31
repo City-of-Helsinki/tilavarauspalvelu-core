@@ -36,11 +36,7 @@ class Organisation(SerializableMixin, models.Model):
     year_established: int | None = models.PositiveIntegerField(validators=[year_not_in_future], null=True, blank=True)
     active_members: int | None = models.PositiveIntegerField(null=True, blank=False)
     core_business: str = models.TextField(blank=True)
-
-    organisation_type: OrganizationTypeChoice = StrChoiceField(
-        enum=OrganizationTypeChoice,
-        default=OrganizationTypeChoice.COMPANY,
-    )
+    organisation_type: str = StrChoiceField(enum=OrganizationTypeChoice, default=OrganizationTypeChoice.COMPANY)
 
     address = models.ForeignKey(
         "applications.Address",

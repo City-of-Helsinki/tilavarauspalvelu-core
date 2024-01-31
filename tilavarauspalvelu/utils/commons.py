@@ -1,19 +1,11 @@
-from django.conf import settings
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
-class LANGUAGES:
-    FI: str
-    SV: str
-    EN: str
-
-
-def _build_languages():
-    for lang in settings.LANGUAGES:
-        setattr(LANGUAGES, lang[0].upper(), lang[0])
-
-
-_build_languages()
+class Language(models.TextChoices):
+    FI = "fi", _("Finnish")
+    SV = "sv", _("Swedish")
+    EN = "en", _("English")
 
 
 class WEEKDAYS:

@@ -2,12 +2,14 @@ import uuid
 from functools import cached_property
 from typing import Self, TypedDict, Union
 
-from django.conf import settings
 from django.db import models
 from django.utils.timezone import get_default_timezone
 from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
 from helusers.models import AbstractUser
+
+from tilavarauspalvelu.utils.commons import Language
+from users.helauth.utils import get_id_token, is_ad_login, is_strong_login
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
@@ -25,7 +27,7 @@ class User(AbstractUser):
         null=True,
         blank=True,
         verbose_name=_("Preferred UI language"),
-        choices=settings.LANGUAGES,
+        choices=Language.choices,
     )
 
     reservation_notification = models.CharField(
@@ -59,7 +61,7 @@ class User(AbstractUser):
 
     def get_preferred_language(self):
         if not self.preferred_language:
-            return settings.LANGUAGES[0][0]
+            return Language.FI.value
         else:
             return self.preferred_language
 
@@ -71,6 +73,20 @@ class User(AbstractUser):
             or self.service_sector_roles.exists()
             or self.unit_roles.exists()
         )
+
+    @cached_property
+    def is_ad_authenticated(self) -> bool:
+        token = get_id_token(self)
+        if token is None:
+            return False
+        return is_ad_login(token)
+
+    @cached_property
+    def is_strongly_authenticated(self) -> bool:
+        token = get_id_token(self)
+        if token is None:
+            return False
+        return is_strong_login(token)
 
 
 class PersonalInfoViewLog(models.Model):

@@ -12,20 +12,15 @@ def update_created_and_reservation_units(apps, schema_editor):
             if reservation.created_at:
                 recurring.created = reservation.created_at
 
-            recurring.reservation_unit = reservation.reservation_unit.first()
+            recurring.reservation_unit = reservation.reservation_units.first()
             recurring.save()
         else:
             recurring.delete()
 
 
-
-
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('reservations', '0040_recurring_reservation_fields_changes'),
+        ("reservations", "0040_recurring_reservation_fields_changes"),
     ]
 
-    operations = [
-        migrations.RunPython(update_created_and_reservation_units, migrations.RunPython.noop)
-    ]
+    operations = [migrations.RunPython(update_created_and_reservation_units, migrations.RunPython.noop)]
