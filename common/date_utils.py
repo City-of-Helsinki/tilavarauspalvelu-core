@@ -129,22 +129,22 @@ def local_time() -> datetime.time:
     return local_datetime().timetz()
 
 
-def local_datetime_min():
+def local_datetime_min() -> datetime.datetime:
     """Get the minimum datetime of the day in the local timezone."""
     return datetime.datetime.min.replace(tzinfo=DEFAULT_TIMEZONE)
 
 
-def local_datetime_max():
+def local_datetime_max() -> datetime.datetime:
     """Get the maximum datetime of the day in the local timezone."""
     return datetime.datetime.max.replace(tzinfo=DEFAULT_TIMEZONE)
 
 
-def local_time_min():
+def local_time_min() -> datetime.time:
     """Get the minimum time of the day in the local timezone."""
     return datetime.time.min.replace(tzinfo=DEFAULT_TIMEZONE)
 
 
-def local_time_max():
+def local_time_max() -> datetime.time:
     """Get the maximum time of the day in the local timezone."""
     return datetime.time.max.replace(tzinfo=DEFAULT_TIMEZONE)
 
@@ -174,22 +174,22 @@ def utc_time() -> datetime.time:
     return utc_datetime().timetz()
 
 
-def utc_datetime_min():
+def utc_datetime_min() -> datetime.datetime:
     """Get the minimum datetime of the day in UTC."""
     return datetime.datetime.min.replace(tzinfo=datetime.UTC)
 
 
-def utc_datetime_max():
+def utc_datetime_max() -> datetime.datetime:
     """Get the maximum datetime of the day in UTC."""
     return datetime.datetime.max.replace(tzinfo=datetime.UTC)
 
 
-def utc_time_min():
+def utc_time_min() -> datetime.time:
     """Get the minimum time of the day in UTC."""
     return datetime.time.min.replace(tzinfo=datetime.UTC)
 
 
-def utc_time_max():
+def utc_time_max() -> datetime.time:
     """Get the maximum time of the day in UTC."""
     return datetime.time.max.replace(tzinfo=datetime.UTC)
 
