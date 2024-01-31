@@ -48,7 +48,7 @@ class PaymentOrderType(AuthNode, OldPrimaryKeyObjectType):
     checkout_url = graphene.String()
     receipt_url = graphene.String()
     reservation_pk = graphene.String()
-    refund_id = graphene.String()
+    refund_uuid = graphene.String()
     expires_in_minutes = graphene.Int()
 
     class Meta:
@@ -61,7 +61,7 @@ class PaymentOrderType(AuthNode, OldPrimaryKeyObjectType):
             "checkout_url",
             "receipt_url",
             "reservation_pk",
-            "refund_id",
+            "refund_uuid",
             "expires_in_minutes",
         ]
         interfaces = (graphene.relay.Node,)
@@ -69,6 +69,9 @@ class PaymentOrderType(AuthNode, OldPrimaryKeyObjectType):
 
     def resolve_order_uuid(root: PaymentOrder, info: GQLInfo) -> str | None:
         return root.remote_id
+
+    def resolve_refund_uuid(root: PaymentOrder, info: GQLInfo) -> str | None:
+        return root.refund_id
 
     def resolve_reservation_pk(root: PaymentOrder, info: GQLInfo) -> str:
         return root.reservation.pk
