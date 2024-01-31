@@ -1,4 +1,5 @@
 import datetime
+from decimal import Decimal
 from uuid import UUID
 
 import snapshottest
@@ -92,7 +93,12 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
         )
         cls.reservation_unit.qualifiers.set([qualifier])
         cls.reservation_unit.payment_types.set([PaymentType.ONLINE])
-        cls.reservation_unit.pricings.add(ReservationUnitPricingFactory(reservation_unit=cls.reservation_unit))
+        cls.reservation_unit.pricings.add(
+            ReservationUnitPricingFactory(
+                reservation_unit=cls.reservation_unit,
+                tax_percentage__value=Decimal("10.0"),
+            )
+        )
 
         cls.api_client = APIClient()
 

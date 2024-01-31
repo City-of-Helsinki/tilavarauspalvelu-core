@@ -271,7 +271,7 @@ class ReservationUnitPricingFactory(GenericDjangoModelFactory[ReservationUnitPri
     price_unit = PriceUnit.PRICE_UNIT_PER_15_MINS
     lowest_price = 5
     highest_price = 10
-    tax_percentage = factory.SubFactory("tests.factories.TaxPercentageFactory", value=10.0)
+    tax_percentage = factory.SubFactory("tests.factories.TaxPercentageFactory")
     status = PricingStatus.PRICING_STATUS_ACTIVE
 
     class Meta:
