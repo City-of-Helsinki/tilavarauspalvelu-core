@@ -125,9 +125,7 @@ def test_reservation__query__regular_user_cannot_see_personal_information_from_o
         description
         reserveeId
         cancelDetails
-        orderUuid
-        orderStatus
-        refundUuid
+        order { orderUuid status paymentType receiptUrl checkoutUrl reservationPk refundUuid expiresInMinutes }
         homeCity { name }
         reserveeType
         reserveeIsUnregisteredAssociation
@@ -165,12 +163,10 @@ def test_reservation__query__regular_user_cannot_see_personal_information_from_o
         "isHandled": None,
         "name": None,
         "numPersons": None,
-        "orderStatus": None,
-        "orderUuid": None,
+        "order": None,
         "price": None,
         "priceNet": None,
         "purpose": None,
-        "refundUuid": None,
         "reserveeAddressCity": None,
         "reserveeAddressStreet": None,
         "reserveeAddressZip": None,
