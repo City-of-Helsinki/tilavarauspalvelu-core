@@ -310,7 +310,7 @@ class ReservationSchedulingMixin:
             begin, self.instance, exclude_blocked=True
         )
         if previous_reservation:
-            previous_buffer = previous_reservation.buffer_time_after or datetime.timedelta()
+            previous_buffer = previous_reservation.buffer_time_after
             if previous_buffer > buffer_before:
                 buffer_before = previous_buffer
 
@@ -321,7 +321,7 @@ class ReservationSchedulingMixin:
         )
         next_reservation = reservation_unit.actions.get_next_reservation(end, self.instance, exclude_blocked=True)
         if next_reservation:
-            next_buffer = next_reservation.buffer_time_before or datetime.timedelta()
+            next_buffer = next_reservation.buffer_time_before
             if next_buffer > buffer_after:
                 buffer_after = next_buffer
 

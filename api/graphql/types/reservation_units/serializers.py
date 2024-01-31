@@ -54,8 +54,8 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, OldPrimaryKeySe
     name_en = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     max_reservation_duration = DurationField(required=False, allow_null=True)
     min_reservation_duration = DurationField(required=False, allow_null=True)
-    buffer_time_before = DurationField(required=False, allow_null=True)
-    buffer_time_after = DurationField(required=False, allow_null=True)
+    buffer_time_before = DurationField(required=False)
+    buffer_time_after = DurationField(required=False)
     max_persons = serializers.IntegerField(required=False, allow_null=True)
     space_pks = serializers.ListField(
         child=IntegerPrimaryKeyField(queryset=Space.objects.all()),

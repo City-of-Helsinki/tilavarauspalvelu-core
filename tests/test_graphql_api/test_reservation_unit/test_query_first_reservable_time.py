@@ -62,8 +62,8 @@ def reservation_unit() -> ReservationUnit:
         reservations_max_days_before=None,
         min_reservation_duration=None,
         max_reservation_duration=None,
-        buffer_time_before=None,
-        buffer_time_after=None,
+        buffer_time_before=timedelta(),
+        buffer_time_after=timedelta(),
     )
     return reservation_unit
 
@@ -81,8 +81,8 @@ def create_child_for_reservation_unit(reservation_unit: ReservationUnit) -> Rese
     child_space = SpaceFactory.create(parent=parent_space)
 
     return ReservationUnitFactory.create(
-        buffer_time_before=None,
-        buffer_time_after=None,
+        buffer_time_before=timedelta(),
+        buffer_time_after=timedelta(),
         reservation_start_interval=ReservationStartInterval.INTERVAL_30_MINUTES.value,
         origin_hauki_resource=reservation_unit.origin_hauki_resource,
         spaces=[child_space],
@@ -1548,7 +1548,7 @@ def test__query_reservation_unit__first_reservable_time__buffers__goes_over_clos
             ),
             "Buffers | Asymmetric different length buffers are overlapping": RU_ReservableParams(
                 reservation_unit_settings=ReservationUnitOverrides(
-                    buffer_time_before=None,
+                    buffer_time_before=timedelta(),
                     buffer_time_after=timedelta(minutes=60),
                 ),
                 result=ReservableNode(first_reservable_datetime=_datetime(hour=16)),
@@ -1667,13 +1667,13 @@ def test__query_reservation_unit__first_reservable_time__buffers__start_and_end_
     """
     reservation_unit_30: ReservationUnit = create_child_for_reservation_unit(reservation_unit)
     reservation_unit_30.name = "ReservationUnit 30 min buffer"
-    reservation_unit_30.buffer_time_before = None
+    reservation_unit_30.buffer_time_before = timedelta()
     reservation_unit_30.buffer_time_after = timedelta(minutes=30)
     reservation_unit_30.save()
 
     reservation_unit_60: ReservationUnit = create_child_for_reservation_unit(reservation_unit)
     reservation_unit_60.name = "ReservationUnit 60 min buffer"
-    reservation_unit_60.buffer_time_before = None
+    reservation_unit_60.buffer_time_before = timedelta()
     reservation_unit_60.buffer_time_after = timedelta(minutes=60)
     reservation_unit_60.save()
 
@@ -1755,13 +1755,13 @@ def test__query_reservation_unit__first_reservable_time__buffers__different_befo
     reservation_unit_30: ReservationUnit = create_child_for_reservation_unit(reservation_unit)
     reservation_unit_30.name = "ReservationUnit 30 min buffer"
     reservation_unit_30.buffer_time_before = timedelta(minutes=30)
-    reservation_unit_30.buffer_time_after = None
+    reservation_unit_30.buffer_time_after = timedelta()
     reservation_unit_30.save()
 
     reservation_unit_60: ReservationUnit = create_child_for_reservation_unit(reservation_unit)
     reservation_unit_60.name = "ReservationUnit 60 min buffer"
     reservation_unit_60.buffer_time_before = timedelta(minutes=60)
-    reservation_unit_60.buffer_time_after = None
+    reservation_unit_60.buffer_time_after = timedelta()
     reservation_unit_60.save()
 
     # 2024-01-01 10:00 - 20:00 (10h)
@@ -1848,13 +1848,13 @@ def test__query_reservation_unit__first_reservable_time__buffers__different_befo
     reservation_unit_30: ReservationUnit = create_child_for_reservation_unit(reservation_unit)
     reservation_unit_30.name = "ReservationUnit 30 min buffer"
     reservation_unit_30.buffer_time_before = timedelta(minutes=30)
-    reservation_unit_30.buffer_time_after = None
+    reservation_unit_30.buffer_time_after = timedelta()
     reservation_unit_30.save()
 
     reservation_unit_60: ReservationUnit = create_child_for_reservation_unit(reservation_unit)
     reservation_unit_60.name = "ReservationUnit 60 min buffer"
     reservation_unit_60.buffer_time_before = timedelta(minutes=60)
-    reservation_unit_60.buffer_time_after = None
+    reservation_unit_60.buffer_time_after = timedelta()
     reservation_unit_60.save()
 
     # 2024-01-01 10:30-20:00 (9h 30min)

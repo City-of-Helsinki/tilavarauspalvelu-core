@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -25,8 +27,16 @@ class ReservationStatistic(models.Model):
 
     reservation_confirmed_at = models.DateTimeField(verbose_name=_("Confirmed at"), null=True)
 
-    buffer_time_before = models.DurationField(verbose_name=_("Buffer time before"), blank=True, null=True)
-    buffer_time_after = models.DurationField(verbose_name=_("Buffer time after"), blank=True, null=True)
+    buffer_time_before: datetime.timedelta = models.DurationField(
+        verbose_name=_("Buffer time before"),
+        default=datetime.timedelta(),
+        blank=True,
+    )
+    buffer_time_after: datetime.timedelta = models.DurationField(
+        verbose_name=_("Buffer time after"),
+        default=datetime.timedelta(),
+        blank=True,
+    )
 
     updated_at = models.DateTimeField(verbose_name=_("Statistics updated at"), null=True, blank=True, auto_now=True)
 

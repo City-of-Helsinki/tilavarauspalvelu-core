@@ -178,16 +178,16 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
         null=True,
     )
 
-    buffer_time_before: datetime.timedelta | None = models.DurationField(
+    buffer_time_before: datetime.timedelta = models.DurationField(
         verbose_name=_("Buffer time before reservation"),
+        default=datetime.timedelta(),
         blank=True,
-        null=True,
     )
 
-    buffer_time_after: datetime.timedelta | None = models.DurationField(
+    buffer_time_after: datetime.timedelta = models.DurationField(
         verbose_name=_("Buffer time after reservation"),
+        default=datetime.timedelta(),
         blank=True,
-        null=True,
     )
 
     origin_hauki_resource = models.ForeignKey(

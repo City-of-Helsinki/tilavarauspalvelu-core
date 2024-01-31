@@ -3,6 +3,7 @@ import datetime
 import pytest
 
 from reservations.choices import ReservationTypeChoice
+from reservations.models import Reservation
 from tests.factories import (
     ReservationFactory,
     ReservationUnitFactory,
@@ -27,7 +28,7 @@ def test_reservation__query__all_fields(graphql):
     # given:
     # - There is a reservation in the system
     # - A superuser is using the system
-    reservation = ReservationFactory.create(name="")
+    reservation: Reservation = ReservationFactory.create(name="")
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     # when:
@@ -106,8 +107,8 @@ def test_reservation__query__all_fields(graphql):
         "billingFirstName": reservation.billing_first_name,
         "billingLastName": reservation.billing_last_name,
         "billingPhone": reservation.billing_phone,
-        "bufferTimeAfter": reservation.buffer_time_after,
-        "bufferTimeBefore": reservation.buffer_time_before,
+        "bufferTimeAfter": int(reservation.buffer_time_after.total_seconds()),
+        "bufferTimeBefore": int(reservation.buffer_time_before.total_seconds()),
         "cancelDetails": reservation.cancel_details,
         "cancelReason": None,
         "denyReason": None,
