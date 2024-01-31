@@ -8,7 +8,6 @@ from .helpers import CREATE_MUTATION
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_disable_elasticsearch"),
 ]
 
 

@@ -23,7 +23,6 @@ DEFAULT_TIMEZONE = get_default_timezone()
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_disable_elasticsearch"),
     pytest.mark.usefixtures("_disable_reservation_email_sending"),
 ]
 

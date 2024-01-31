@@ -7,7 +7,6 @@ from tests.test_graphql_api.test_reservation_unit.helpers import reservation_uni
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_disable_elasticsearch"),
     pytest.mark.usefixtures("_disable_hauki_export"),
 ]
 

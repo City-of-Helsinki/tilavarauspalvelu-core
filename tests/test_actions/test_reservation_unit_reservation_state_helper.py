@@ -9,7 +9,6 @@ from tests.factories import PaymentProductFactory, ReservationUnitFactory, Reser
 
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_disable_elasticsearch"),
 ]
 
 

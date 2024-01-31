@@ -7,6 +7,7 @@ from .helpers import reservation_units_query
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
+    pytest.mark.usefixtures("_enable_elasticsearch"),
 ]
 
 

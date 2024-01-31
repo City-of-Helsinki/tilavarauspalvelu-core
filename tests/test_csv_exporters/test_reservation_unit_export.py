@@ -16,7 +16,6 @@ from .helpers import Missing, MissingParams, get_writes
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_disable_elasticsearch"),
 ]
 
 

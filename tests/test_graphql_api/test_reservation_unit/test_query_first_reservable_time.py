@@ -27,7 +27,6 @@ from .helpers import reservation_units_query
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_disable_elasticsearch"),
 ]
 
 reservation_units_reservable_query = partial(reservation_units_query, fields="isClosed firstReservableDatetime")
