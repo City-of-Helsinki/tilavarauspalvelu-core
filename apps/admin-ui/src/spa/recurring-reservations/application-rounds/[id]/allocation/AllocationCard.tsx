@@ -162,7 +162,7 @@ function isOutsideOfAllocatedTimes(
 
 /// Right hand side single card
 /// Contains the single applicationScheduleEvent and its actions (accept / decline etc.)
-export function ApplicationEventScheduleCard({
+export function AllocationCard({
   applicationEvent,
   reservationUnit,
   selection,

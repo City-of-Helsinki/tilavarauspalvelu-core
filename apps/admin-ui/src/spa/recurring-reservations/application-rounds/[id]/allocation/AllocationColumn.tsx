@@ -17,7 +17,7 @@ import {
   getTimeSlotOptions,
   isSlotAccepted,
 } from "./modules/applicationRoundAllocation";
-import { ApplicationEventScheduleCard } from "./ApplicationEventScheduleCard";
+import { AllocationCard } from "./AllocationCard";
 
 type Props = {
   applicationEvents: ApplicationEventNode[] | null;
@@ -211,7 +211,7 @@ function TimeSelection({
 // which causes a mutation error
 // TODO this should be renamed, it's the whole right hand side section (not just actions)
 // that includes cards + time selection
-export function ApplicationRoundAllocationActions({
+export function AllocationColumn({
   applicationEvents,
   reservationUnit,
   selection,
@@ -252,7 +252,7 @@ export function ApplicationRoundAllocationActions({
         <TimeSelection selection={selection} setSelection={setSelection} />
       </StyledShowAllContainer>
       {aeList.map((applicationEvent) => (
-        <ApplicationEventScheduleCard
+        <AllocationCard
           key={applicationEvent.pk}
           applicationEvent={applicationEvent}
           reservationUnit={reservationUnit}

@@ -10,11 +10,12 @@ import type {
 import { ReservationUnitNode, breakpoints } from "common";
 import { Accordion } from "@/component/Accordion";
 import { AllocationCalendar } from "./AllocationCalendar";
-import { ApplicationRoundAllocationActions } from "./ApplicationRoundAllocationActions";
+import { AllocationColumn } from "./AllocationColumn";
 import {
   type AllocationApplicationEventCardType,
   ApplicationEventCard,
 } from "./ApplicationEventCard";
+import { useFocusApplicationEvent } from "./hooks";
 
 // TODO max-width for the grid columns (315px, 480px, 332px)
 // TODO not perfect (aligment issues with the last columns and grid end),
@@ -121,14 +122,17 @@ export function ApplicationEvents({
   applicationEvents,
   reservationUnit,
 }: ApplicationEventsProps): JSX.Element {
-  const { t } = useTranslation();
-
+  const [params] = useSearchParams();
+  // TODO move this to query params (selected begin, selected end), maybe even selected day separately
   const [selectedSlots, setSelectedSlots] = useState<string[]>([]);
-  const [params, setParams] = useSearchParams();
-  const [focusedApplicationEvent, setFocusedApplicationEvent] = useState<
-    ApplicationEventNode | undefined
-  >(undefined);
 
+  const [focused, setFocusedApplicationEvent] = useFocusApplicationEvent();
+  const focusedApplicationEvent = applicationEvents?.find(
+    (ae) => ae.pk === focused
+  );
+
+  // When selected reservation unit changes, remove any focused application event that's not in the new reservation unit
+  // TODO could include it in the hook or wrap it inside it's own
   useEffect(() => {
     const selectedAeasPk = params.get("aes");
     if (selectedAeasPk) {
@@ -139,13 +143,48 @@ export function ApplicationEvents({
     } else {
       setFocusedApplicationEvent(undefined);
     }
-  }, [reservationUnit, applicationEvents, params]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- We only care if reservationUnit changes, and adding the rest causes an infinite loop
+  }, [reservationUnit, params]);
 
   // TODO this is not great
   // we should grep the selected application event where it's used not use an intermediate state for it
   useEffect(
     () => setSelectedSlots([]),
     [focusedApplicationEvent, reservationUnit]
+  );
+
+  // TODO should use mobile menu layout if the screen is small (this page probably requires  >= 1200px)
+  return (
+    <Content>
+      <ApplicationEventColumn
+        applicationEvents={applicationEvents}
+        reservationUnit={reservationUnit}
+      />
+      <AllocationCalendar
+        applicationEvents={applicationEvents}
+        focusedApplicationEvent={focusedApplicationEvent}
+        selection={selectedSlots}
+        setSelection={setSelectedSlots}
+        reservationUnitPk={reservationUnit?.pk ?? 0}
+      />
+      <AllocationColumn
+        applicationEvents={applicationEvents}
+        reservationUnit={reservationUnit}
+        selection={selectedSlots}
+        setSelection={setSelectedSlots}
+      />
+    </Content>
+  );
+}
+
+function ApplicationEventColumn({
+  applicationEvents,
+  reservationUnit,
+}: ApplicationEventsProps): JSX.Element {
+  const { t } = useTranslation();
+  const [focused, setFocusedApplicationEvent] = useFocusApplicationEvent();
+  const focusedApplicationEvent = applicationEvents?.find(
+    (ae) => ae.pk === focused
   );
 
   const allocated =
@@ -177,102 +216,74 @@ export function ApplicationEvents({
       )
       .sort((a, b) => a.name.localeCompare(b.name)) ?? [];
 
-  // TODO this can be removed if we move this to a hook and reuse it in the other component
-  // the state is already in a query param
   const handleSelectApplicationEvent = (aes?: ApplicationEventNode) => {
     setFocusedApplicationEvent(aes);
-    // TODO if the applicationEvent is completely allocated => remove the selection
-    if (aes?.pk != null) {
-      const p = new URLSearchParams(params);
-      p.set("aes", aes.pk.toString());
-      setParams(p);
-    } else {
-      const p = new URLSearchParams(params);
-      p.delete("aes");
-      setParams(p);
-    }
   };
 
-  // TODO should use mobile menu layout if the screen is small (this page probably requires  >= 1200px)
   return (
-    <Content>
-      <ApplicationEventList>
-        <ApplicationEventsContainer>
-          <StyledAccordion
-            initiallyOpen
-            $fontLarge
-            headingLevel="h3"
-            heading={t("Allocation.inAllocationHeader")}
-          >
-            <p>{t("Allocation.selectApplicant")}</p>
-            <EventGroupList
-              applicationEvents={unallocatedApplicationEvents}
-              focusedApplicationEvent={focusedApplicationEvent}
-              setFocusedApplicationEvent={handleSelectApplicationEvent}
-              reservationUnit={reservationUnit}
-              type="unallocated"
-            />
-          </StyledAccordion>
-          <H4 as="h2" style={{ margin: 0 }}>
-            {t("Allocation.allocatedHeader")}
-          </H4>
-          <StyledAccordion
-            headingLevel="h3"
-            heading={t("Allocation.partiallyAllocatedHeader")}
-            disabled={partiallyAllocated.length === 0}
-            initiallyOpen
-          >
-            <EventGroupList
-              applicationEvents={partiallyAllocated}
-              focusedApplicationEvent={focusedApplicationEvent}
-              setFocusedApplicationEvent={handleSelectApplicationEvent}
-              reservationUnit={reservationUnit}
-              type="partial"
-            />
-          </StyledAccordion>
-          <StyledAccordion
-            headingLevel="h3"
-            heading={t("Allocation.allocatedApplicants")}
-            disabled={allocated.length === 0}
-            initiallyOpen
-          >
-            <EventGroupList
-              applicationEvents={allocated}
-              focusedApplicationEvent={focusedApplicationEvent}
-              setFocusedApplicationEvent={handleSelectApplicationEvent}
-              reservationUnit={reservationUnit}
-              type="allocated"
-            />
-          </StyledAccordion>
-          <StyledAccordion
-            headingLevel="h3"
-            heading={t("Allocation.declinedApplicants")}
-            disabled={declined.length === 0}
-            initiallyOpen
-          >
-            <EventGroupList
-              applicationEvents={declined}
-              focusedApplicationEvent={focusedApplicationEvent}
-              setFocusedApplicationEvent={handleSelectApplicationEvent}
-              reservationUnit={reservationUnit}
-              type="declined"
-            />
-          </StyledAccordion>
-        </ApplicationEventsContainer>
-      </ApplicationEventList>
-      <AllocationCalendar
-        applicationEvents={applicationEvents}
-        focusedApplicationEvent={focusedApplicationEvent}
-        selection={selectedSlots}
-        setSelection={setSelectedSlots}
-        reservationUnitPk={reservationUnit?.pk ?? 0}
-      />
-      <ApplicationRoundAllocationActions
-        applicationEvents={applicationEvents}
-        reservationUnit={reservationUnit}
-        selection={selectedSlots}
-        setSelection={setSelectedSlots}
-      />
-    </Content>
+    <ApplicationEventList>
+      <ApplicationEventsContainer>
+        <StyledAccordion
+          initiallyOpen
+          $fontLarge
+          headingLevel="h3"
+          heading={t("Allocation.inAllocationHeader")}
+        >
+          <p>{t("Allocation.selectApplicant")}</p>
+          <EventGroupList
+            applicationEvents={unallocatedApplicationEvents}
+            focusedApplicationEvent={focusedApplicationEvent}
+            setFocusedApplicationEvent={handleSelectApplicationEvent}
+            reservationUnit={reservationUnit}
+            type="unallocated"
+          />
+        </StyledAccordion>
+        <H4 as="h2" style={{ margin: 0 }}>
+          {t("Allocation.allocatedHeader")}
+        </H4>
+        <StyledAccordion
+          headingLevel="h3"
+          heading={t("Allocation.partiallyAllocatedHeader")}
+          disabled={partiallyAllocated.length === 0}
+          initiallyOpen
+        >
+          <EventGroupList
+            applicationEvents={partiallyAllocated}
+            focusedApplicationEvent={focusedApplicationEvent}
+            setFocusedApplicationEvent={handleSelectApplicationEvent}
+            reservationUnit={reservationUnit}
+            type="partial"
+          />
+        </StyledAccordion>
+        <StyledAccordion
+          headingLevel="h3"
+          heading={t("Allocation.allocatedApplicants")}
+          disabled={allocated.length === 0}
+          initiallyOpen
+        >
+          <EventGroupList
+            applicationEvents={allocated}
+            focusedApplicationEvent={focusedApplicationEvent}
+            setFocusedApplicationEvent={handleSelectApplicationEvent}
+            reservationUnit={reservationUnit}
+            type="allocated"
+          />
+        </StyledAccordion>
+        <StyledAccordion
+          headingLevel="h3"
+          heading={t("Allocation.declinedApplicants")}
+          disabled={declined.length === 0}
+          initiallyOpen
+        >
+          <EventGroupList
+            applicationEvents={declined}
+            focusedApplicationEvent={focusedApplicationEvent}
+            setFocusedApplicationEvent={handleSelectApplicationEvent}
+            reservationUnit={reservationUnit}
+            type="declined"
+          />
+        </StyledAccordion>
+      </ApplicationEventsContainer>
+    </ApplicationEventList>
   );
 }

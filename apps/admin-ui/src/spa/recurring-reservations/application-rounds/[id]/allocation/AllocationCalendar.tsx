@@ -393,6 +393,7 @@ function Day({
     }
   };
 
+  // TODO there is an issue here if a slot that wasn't requested is accepted it's shown on gray (not green with a check)
   return (
     <DayWrapper key={`day-${day}`}>
       <DayLabel>{t(`dayShort.${day}`)}</DayLabel>
