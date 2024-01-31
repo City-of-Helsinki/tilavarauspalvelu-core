@@ -4,19 +4,15 @@ from django.utils.timezone import get_default_timezone
 from rest_framework import serializers
 
 from api.graphql.extensions.duration_field import DurationField
-from api.graphql.extensions.legacy_helpers import OldChoiceCharField, OldPrimaryKeyUpdateSerializer
+from api.graphql.extensions.legacy_helpers import OldChoiceValidator, OldPrimaryKeyUpdateSerializer
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from api.graphql.types.reservations.serializers.mixins import ReservationSchedulingMixin
 from applications.models import City
 from common.fields.serializer import IntegerPrimaryKeyField
 from reservation_units.models import ReservationUnit
-from reservations.choices import (
-    RESERVEE_LANGUAGE_CHOICES,
-    CustomerTypeChoice,
-    ReservationStateChoice,
-    ReservationTypeChoice,
-)
+from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import AgeGroup, Reservation, ReservationPurpose
+from tilavarauspalvelu.utils.commons import Language
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
@@ -32,14 +28,16 @@ class StaffReservationModifySerializer(OldPrimaryKeyUpdateSerializer, Reservatio
     home_city_pk = IntegerPrimaryKeyField(queryset=City.objects.all(), source="home_city", allow_null=True)
     priority = serializers.IntegerField(required=False)
     purpose_pk = IntegerPrimaryKeyField(queryset=ReservationPurpose.objects.all(), source="purpose", allow_null=True)
-    reservee_type = OldChoiceCharField(choices=CustomerTypeChoice.choices)
+    reservee_type = serializers.ChoiceField(choices=CustomerTypeChoice.choices)
     reservation_unit_pks = serializers.ListField(
         child=IntegerPrimaryKeyField(queryset=ReservationUnit.objects.all()),
-        source="reservation_unit",
+        source="reservation_units",
     )
-    reservee_language = OldChoiceCharField(choices=RESERVEE_LANGUAGE_CHOICES, required=False, default="")
-    state = OldChoiceCharField(choices=ReservationStateChoice.choices)
-    type = OldChoiceCharField(required=False, choices=ReservationTypeChoice.choices)
+    reservee_language = serializers.CharField(
+        required=False, default=None, validators=[OldChoiceValidator(Language.choices)]
+    )
+    state = serializers.CharField(required=True, validators=[OldChoiceValidator(ReservationStateChoice.choices)])
+    type = serializers.CharField(required=False, validators=[OldChoiceValidator(ReservationTypeChoice.choices)])
 
     class Meta:
         model = Reservation
@@ -154,7 +152,7 @@ class StaffReservationModifySerializer(OldPrimaryKeyUpdateSerializer, Reservatio
         new_buffer_after: datetime.timedelta | None = data.get("buffer_time_after", None)
 
         reservation_unit: ReservationUnit
-        for reservation_unit in self.instance.reservation_unit.all():
+        for reservation_unit in self.instance.reservation_units.all():
             # Can't set buffers for whole day reservations
             if reservation_unit.reservation_block_whole_day:
                 data["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(begin)

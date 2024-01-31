@@ -106,7 +106,7 @@ class ApplicationEventScheduleActions:
                 billing_address_city=getattr(billing_address, "city", ""),
                 billing_address_zip=getattr(billing_address, "post_code", ""),
             )
-            reservation.reservation_unit.add(self.schedule.allocated_reservation_unit)
+            reservation.reservation_units.add(self.schedule.allocated_reservation_unit)
 
             reservation_date += datetime.timedelta(days=interval)
 

@@ -348,10 +348,10 @@ class UnitsQueryTestCase(UnitTestCaseBase):
         resu_d = ReservationUnitFactory(unit=d_unit)
         resu_too_d = ReservationUnitFactory(unit=d_unit)
 
-        ReservationFactory(reservation_unit=[resu_a], user=self.regular_joe)
-        ReservationFactory(reservation_unit=[resu_b], user=self.regular_joe)
-        ReservationFactory(reservation_unit=[resu_d], user=other_user)
-        ReservationFactory(reservation_unit=[resu_too_d], user=other_user)
+        ReservationFactory(reservation_units=[resu_a], user=self.regular_joe)
+        ReservationFactory(reservation_units=[resu_b], user=self.regular_joe)
+        ReservationFactory(reservation_units=[resu_d], user=other_user)
+        ReservationFactory(reservation_units=[resu_too_d], user=other_user)
 
         self.client.force_login(self.regular_joe)
         response = self.query(
@@ -390,10 +390,10 @@ class UnitsQueryTestCase(UnitTestCaseBase):
         resu_d = ReservationUnitFactory(unit=d_unit)
         resu_too_d = ReservationUnitFactory(unit=d_unit)
 
-        ReservationFactory(reservation_unit=[resu_a], user=self.regular_joe)
-        ReservationFactory(reservation_unit=[resu_b], user=self.regular_joe)
-        ReservationFactory(reservation_unit=[resu_d], user=other_user)
-        ReservationFactory(reservation_unit=[resu_too_d], user=other_user)
+        ReservationFactory(reservation_units=[resu_a], user=self.regular_joe)
+        ReservationFactory(reservation_units=[resu_b], user=self.regular_joe)
+        ReservationFactory(reservation_units=[resu_d], user=other_user)
+        ReservationFactory(reservation_units=[resu_too_d], user=other_user)
 
         self.client.force_login(self.regular_joe)
         response = self.query(
@@ -435,11 +435,11 @@ class UnitsQueryTestCase(UnitTestCaseBase):
         resu_too_d = ReservationUnitFactory(unit=l_unit)
         no_resu = ReservationUnitFactory(unit=no_unit)
 
-        ReservationFactory.create_batch(4, reservation_unit=[resu_a], user=self.regular_joe)
-        ReservationFactory.create_batch(3, reservation_unit=[resu_b], user=self.regular_joe)
-        ReservationFactory(reservation_unit=[resu_d], user=self.regular_joe)
-        ReservationFactory.create_batch(3, reservation_unit=[resu_too_d], user=other_user)
-        ReservationFactory(reservation_unit=[no_resu], user=other_user)
+        ReservationFactory.create_batch(4, reservation_units=[resu_a], user=self.regular_joe)
+        ReservationFactory.create_batch(3, reservation_units=[resu_b], user=self.regular_joe)
+        ReservationFactory(reservation_units=[resu_d], user=self.regular_joe)
+        ReservationFactory.create_batch(3, reservation_units=[resu_too_d], user=other_user)
+        ReservationFactory(reservation_units=[no_resu], user=other_user)
         self.client.force_login(self.regular_joe)
         response = self.query(
             """

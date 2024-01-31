@@ -18,7 +18,7 @@ from permissions.models import (
     UnitRoleChoice,
     UnitRolePermission,
 )
-from reservations.choices import ReservationStateChoice, ReservationTypeChoice
+from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import AgeGroup, Reservation
 from tests.factories import RecurringReservationFactory, ReservationFactory
 
@@ -66,7 +66,7 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
             "begin": self.res_begin.strftime("%Y%m%dT%H%M%S%z"),
             "end": self.res_end.strftime("%Y%m%dT%H%M%S%z"),
             "reservationUnitPks": [self.reservation_unit.pk],
-            "reserveeType": "individual",
+            "reserveeType": CustomerTypeChoice.INDIVIDUAL,
             "reserveeFirstName": "John",
             "reserveeLastName": "Doe",
             "reserveeOrganisationName": "Test Organisation ry",
@@ -110,7 +110,7 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
         assert_that(reservation.type).is_equal_to(ReservationTypeChoice.STAFF)
         assert_that(reservation.begin).is_equal_to(self.res_begin)
         assert_that(reservation.end).is_equal_to(self.res_end)
-        assert_that(reservation.reservation_unit.first()).is_equal_to(self.reservation_unit)
+        assert_that(reservation.reservation_units.first()).is_equal_to(self.reservation_unit)
         assert_that(reservation.buffer_time_after).is_equal_to(datetime.timedelta())
         assert_that(reservation.buffer_time_before).is_equal_to(datetime.timedelta())
 
@@ -132,7 +132,7 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
         assert_that(reservation.type).is_equal_to(ReservationTypeChoice.STAFF)
         assert_that(reservation.begin).is_equal_to(self.res_begin)
         assert_that(reservation.end).is_equal_to(self.res_end)
-        assert_that(reservation.reservation_unit.first()).is_equal_to(self.reservation_unit)
+        assert_that(reservation.reservation_units.first()).is_equal_to(self.reservation_unit)
         assert_that(reservation.buffer_time_after).is_equal_to(datetime.timedelta())
         assert_that(reservation.buffer_time_before).is_equal_to(datetime.timedelta())
 
@@ -154,7 +154,7 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
         assert_that(reservation.type).is_equal_to(ReservationTypeChoice.STAFF)
         assert_that(reservation.begin).is_equal_to(self.res_begin)
         assert_that(reservation.end).is_equal_to(self.res_end)
-        assert_that(reservation.reservation_unit.first()).is_equal_to(self.reservation_unit)
+        assert_that(reservation.reservation_units.first()).is_equal_to(self.reservation_unit)
         assert_that(reservation.buffer_time_after).is_equal_to(datetime.timedelta())
         assert_that(reservation.buffer_time_before).is_equal_to(datetime.timedelta())
 
@@ -242,7 +242,7 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
         assert_that(reservation.type).is_equal_to(ReservationTypeChoice.BLOCKED)
         assert_that(reservation.begin).is_equal_to(self.res_begin)
         assert_that(reservation.end).is_equal_to(self.res_end)
-        assert_that(reservation.reservation_unit.first()).is_equal_to(self.reservation_unit)
+        assert_that(reservation.reservation_units.first()).is_equal_to(self.reservation_unit)
         assert_that(reservation.user).is_equal_to(self.general_admin)
         assert_that(reservation.state).is_equal_to(ReservationStateChoice.CONFIRMED)
         assert_that(reservation.reservee_first_name).is_equal_to(input_data["reserveeFirstName"])
@@ -258,7 +258,7 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
     def test_reservation_overlapping_fails(self):
         self.client.force_login(self.general_admin)
         ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=self.res_begin,
             end=self.res_end,
             state=ReservationStateChoice.CONFIRMED,
@@ -275,7 +275,7 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
         self.client.force_login(self.general_admin)
         input_data = self.get_valid_minimum_input_data()
         ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=self.res_begin - datetime.timedelta(hours=2),
             end=self.res_begin - datetime.timedelta(hours=1),
             buffer_time_after=datetime.timedelta(hours=1, minutes=30),
@@ -311,8 +311,8 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
         self.client.force_login(self.general_admin)
         input_data = self.get_valid_minimum_input_data()
         input_data["bufferTimeAfter"] = "01:05:00"
-        ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+        ReservationFactory.create(
+            reservation_units=[self.reservation_unit],
             begin=self.res_begin + datetime.timedelta(hours=1),
             end=self.res_begin + datetime.timedelta(hours=2),
             state=ReservationStateChoice.CONFIRMED,
@@ -336,7 +336,7 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
         self.reservation_unit.save()
 
         ReservationFactory.create(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=self.res_begin - datetime.timedelta(hours=1),
             end=self.res_begin,
             state=ReservationStateChoice.CONFIRMED,
@@ -368,7 +368,7 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
 
         assert_that(reservation.begin).is_equal_to(self.res_begin)
         assert_that(reservation.end).is_equal_to(self.res_end)
-        assert_that(reservation.reservation_unit.first()).is_equal_to(self.reservation_unit)
+        assert_that(reservation.reservation_units.first()).is_equal_to(self.reservation_unit)
         assert_that(reservation.buffer_time_after).is_equal_to(datetime.timedelta())
         assert_that(reservation.buffer_time_before).is_equal_to(datetime.timedelta())
 
@@ -415,6 +415,6 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
         assert_that(reservation.type).is_equal_to(ReservationTypeChoice.BEHALF)
         assert_that(reservation.begin).is_equal_to(self.res_begin)
         assert_that(reservation.end).is_equal_to(self.res_end)
-        assert_that(reservation.reservation_unit.first()).is_equal_to(self.reservation_unit)
+        assert_that(reservation.reservation_units.first()).is_equal_to(self.reservation_unit)
         assert_that(reservation.buffer_time_after).is_equal_to(datetime.timedelta())
         assert_that(reservation.buffer_time_before).is_equal_to(datetime.timedelta())

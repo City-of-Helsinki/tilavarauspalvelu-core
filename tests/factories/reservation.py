@@ -1,5 +1,4 @@
-from collections.abc import Iterable
-from datetime import UTC, datetime
+import datetime
 from typing import Any
 
 import factory
@@ -9,7 +8,6 @@ from applications.choices import PriorityChoice
 from reservation_units.models import ReservationUnit
 from reservations.choices import ReservationStateChoice
 from reservations.models import (
-    RecurringReservation,
     Reservation,
     ReservationCancelReason,
     ReservationDenyReason,
@@ -23,7 +21,6 @@ __all__ = [
     "ReservationFactory",
     "ReservationCancelReasonFactory",
     "ReservationDenyReasonFactory",
-    "RecurringReservationFactory",
     "ReservationPurposeFactory",
     "ReservationMetadataSetFactory",
 ]
@@ -35,6 +32,7 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
 
     reservee_first_name = fuzzy.FuzzyText()
     reservee_last_name = fuzzy.FuzzyText()
+    reservee_language = None
     sku = fuzzy.FuzzyText()
     name = fuzzy.FuzzyText()
     description = fuzzy.FuzzyText()
@@ -50,12 +48,12 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
     user = factory.SubFactory("tests.factories.UserFactory")
     priority = fuzzy.FuzzyInteger(low=PriorityChoice.LOW, high=PriorityChoice.HIGH, step=100)
     begin = fuzzy.FuzzyDateTime(
-        start_dt=datetime(2021, 1, 1, tzinfo=UTC),
-        end_dt=datetime(2022, 5, 31, tzinfo=UTC),
+        start_dt=datetime.datetime(2021, 1, 1, tzinfo=datetime.UTC),
+        end_dt=datetime.datetime(2022, 5, 31, tzinfo=datetime.UTC),
     )
     end = fuzzy.FuzzyDateTime(
-        start_dt=datetime(2021, 1, 1, tzinfo=UTC),
-        end_dt=datetime(2022, 5, 31, tzinfo=UTC),
+        start_dt=datetime.datetime(2021, 1, 1, tzinfo=datetime.UTC),
+        end_dt=datetime.datetime(2022, 5, 31, tzinfo=datetime.UTC),
     )
 
     @classmethod
@@ -71,17 +69,17 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         )
 
     @factory.post_generation
-    def reservation_unit(self, create: bool, reservation_units: list[ReservationUnit], **kwargs: Any):
+    def reservation_units(self, create: bool, reservation_units: list[ReservationUnit], **kwargs: Any):
         if not create:
             return
 
         if not reservation_units and kwargs:
             from .reservation_unit import ReservationUnitFactory
 
-            self.reservation_unit.add(ReservationUnitFactory.create(**kwargs))
+            self.reservation_units.add(ReservationUnitFactory.create(**kwargs))
 
         for reservation_unit in reservation_units or []:
-            self.reservation_unit.add(reservation_unit)
+            self.reservation_units.add(reservation_unit)
 
 
 class ReservationCancelReasonFactory(GenericDjangoModelFactory[ReservationCancelReason]):
@@ -92,30 +90,6 @@ class ReservationCancelReasonFactory(GenericDjangoModelFactory[ReservationCancel
 class ReservationDenyReasonFactory(GenericDjangoModelFactory[ReservationDenyReason]):
     class Meta:
         model = ReservationDenyReason
-
-
-class RecurringReservationFactory(GenericDjangoModelFactory[RecurringReservation]):
-    class Meta:
-        model = RecurringReservation
-
-    application_event_schedule = factory.SubFactory("tests.factories.ApplicationEventScheduleFactory")
-    reservation_unit = factory.SubFactory("tests.factories.ReservationUnitFactory")
-
-    @factory.post_generation
-    def reservations(
-        self,
-        create: bool,
-        reservations: Iterable[Reservation] | None,
-        **kwargs: Any,
-    ):
-        if not create:
-            return
-
-        if not reservations and kwargs:
-            self.reservations.add(ReservationFactory.create(**kwargs))
-
-        for reservation in reservations or []:
-            self.reservations.add(reservation)
 
 
 class ReservationPurposeFactory(GenericDjangoModelFactory[ReservationPurpose]):

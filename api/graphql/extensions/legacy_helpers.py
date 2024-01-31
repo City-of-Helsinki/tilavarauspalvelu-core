@@ -1,5 +1,4 @@
 import graphene
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.models import Model
 from django.utils.deconstruct import deconstructible
@@ -12,6 +11,8 @@ from modeltranslation.manager import get_translatable_fields_for_model
 from rest_framework import serializers
 from rest_framework.exceptions import ErrorDetail, PermissionDenied
 from rest_framework.generics import get_object_or_404
+
+from tilavarauspalvelu.utils.commons import Language
 
 
 class OldPrimaryKeySerializerBase(serializers.ModelSerializer):
@@ -186,15 +187,12 @@ class OldChoiceIntegerField(serializers.IntegerField):
         self.validators.append(choice_validator)
 
 
-LANGUAGE_CODES = [x[0] for x in settings.LANGUAGES]
-
-
 def get_all_translatable_fields(model: type[Model]) -> list[str]:
     fields = []
 
     translatable_fields = get_translatable_fields_for_model(model) or []
 
     for field in translatable_fields:
-        for language in LANGUAGE_CODES:
+        for language in Language.values:
             fields.append(f"{field}_{language}")
     return fields

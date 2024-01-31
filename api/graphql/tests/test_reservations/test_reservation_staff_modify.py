@@ -26,7 +26,7 @@ class ReservationStaffModifyTestCase(ReservationTestCaseBase):
         cls.reservation = ReservationFactory(
             name="Original name",
             description="Original description",
-            reservation_unit=[cls.reservation_unit],
+            reservation_units=[cls.reservation_unit],
             reservee_email=cls.regular_joe.email,
             begin=cls.reservation_begin,
             end=cls.reservation_end,
@@ -313,7 +313,7 @@ class ReservationStaffModifyTestCase(ReservationTestCaseBase):
         data["bufferTimeBefore"] = 60 * 65
 
         ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=self.reservation.begin - datetime.timedelta(hours=2),
             end=self.reservation.begin - datetime.timedelta(hours=1),
             state=ReservationStateChoice.CONFIRMED,
@@ -332,7 +332,7 @@ class ReservationStaffModifyTestCase(ReservationTestCaseBase):
         data["bufferTimeAfter"] = 60 * 65
 
         ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=self.reservation.begin + datetime.timedelta(hours=1),
             end=self.reservation.begin + datetime.timedelta(hours=2),
             state=ReservationStateChoice.CONFIRMED,

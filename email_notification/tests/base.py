@@ -56,7 +56,7 @@ class ReservationEmailBaseTestCase(TestCase):
             reservee_email="reservee@testing.isbesthing",
             reservee_organisation_name="Snowman Company",
             name="Dance time!",
-            reservation_unit=[cls.reservation_unit],
+            reservation_units=[cls.reservation_unit],
             end=cls.end,
             begin=cls.begin,
             deny_reason=deny_reason,

@@ -29,7 +29,7 @@ class HelpersTestCase(TestCase):
         begin = datetime.now().astimezone(timezone.get_default_timezone())
         end = begin + timedelta(hours=2)
         self.reservation = ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             user=self.user,
             begin=begin,
             end=end,
@@ -76,13 +76,13 @@ class HelpersTestCase(TestCase):
             name_sv="Namn",
         )
         reservation_en = ReservationFactory(
-            reservation_unit=[runit],
+            reservation_units=[runit],
             user=user,
             reservee_type=CustomerTypeChoice.INDIVIDUAL,
             reservee_language="en",
         )
         reservation_sv = ReservationFactory(
-            reservation_unit=[runit],
+            reservation_units=[runit],
             user=user,
             reservee_type=CustomerTypeChoice.INDIVIDUAL,
             reservee_language="sv",

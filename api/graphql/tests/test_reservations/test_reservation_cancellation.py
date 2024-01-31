@@ -37,7 +37,7 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
         self.reservation_unit.cancellation_rule = self.cancel_rule
         self.reservation_unit.save()
         self.reservation = ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=datetime.datetime.now(tz=get_default_timezone()),
             end=(datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=1)),
             state=ReservationStateChoice.CONFIRMED,
@@ -194,7 +194,7 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
 
         now = datetime.datetime.now(tz=get_default_timezone())
         reservation = ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=now + datetime.timedelta(hours=1),
             end=(now + datetime.timedelta(hours=2)),
             state=ReservationStateChoice.CONFIRMED,
@@ -216,7 +216,7 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
     def test_cancel_reservation_fails_when_reservation_in_past(self):
         now = datetime.datetime.now(tz=get_default_timezone())
         reservation = ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=now - datetime.timedelta(hours=2),
             end=now - datetime.timedelta(hours=1),
             state=ReservationStateChoice.CONFIRMED,

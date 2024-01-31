@@ -29,7 +29,7 @@ class OrderQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         cls.reservation_unit = ReservationUnitFactory.create(name="Test reservation unit")
         cls.reservation = ReservationFactory.create(
             name="Test reservation",
-            reservation_unit=[cls.reservation_unit],
+            reservation_units=[cls.reservation_unit],
             user=cls.regular_joe,
         )
         cls.order = PaymentOrderFactory.create(
@@ -147,7 +147,7 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         cls.reservation_unit = ReservationUnitFactory.create(name="Test reservation unit")
         cls.reservation = ReservationFactory.create(
             name="Test reservation",
-            reservation_unit=[cls.reservation_unit],
+            reservation_units=[cls.reservation_unit],
             user=cls.regular_joe,
             state=ReservationStateChoice.CREATED,
         )
@@ -245,7 +245,7 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         order = PaymentOrder.objects.get(pk=self.payment_order.pk)
         assert_that(order.status).is_equal_to(OrderStatus.CANCELLED)
 
-    @mock.patch("api.graphql.types.merchants.mutations.send_confirmation_email")
+    @mock.patch("actions.reservation.ReservationActions.send_confirmation_email")
     @mock.patch("api.graphql.types.merchants.mutations.get_payment")
     def test_status_paid_online_cause_paid_marking_and_no_notification(self, mock_get_payment, mock_send_email):
         mock_get_payment.return_value = PaymentFactory.create(status="payment_paid_online")
@@ -263,7 +263,7 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         order = PaymentOrder.objects.get(pk=self.payment_order.pk)
         assert_that(order.status).is_equal_to(OrderStatus.PAID)
 
-    @mock.patch("api.graphql.types.merchants.mutations.send_confirmation_email")
+    @mock.patch("actions.reservation.ReservationActions.send_confirmation_email")
     @mock.patch("api.graphql.types.merchants.mutations.get_payment")
     def test_status_paid_online_sends_notification_if_reservation_waiting_for_payment(
         self, mock_get_payment, mock_send_email

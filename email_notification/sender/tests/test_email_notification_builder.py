@@ -16,7 +16,7 @@ class EmailNotificationBuilderTestCase(TestCase):
     def setUp(self) -> None:
         self.unit = UnitFactory(name="Test unit")
         self.reservation_unit = ReservationUnitFactory(name="Test reservation unit", unit=self.unit)
-        self.reservation = ReservationFactory(name="Test reservation", reservation_unit=[self.reservation_unit])
+        self.reservation = ReservationFactory(name="Test reservation", reservation_units=[self.reservation_unit])
 
     def test_constructor_raises_error_on_invalid_text_content(self):
         template = EmailTemplateFactory(name="Test template", content_fi="Text content FI {{invalid_tag}}")

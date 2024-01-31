@@ -8,7 +8,6 @@ from api.graphql.extensions.validation_errors import ValidationErrorCodes, Valid
 from common.fields.serializer import IntegerPrimaryKeyField
 from merchants.models import OrderStatus, PaymentOrder
 from reservations.choices import ReservationStateChoice
-from reservations.email_utils import send_cancellation_email
 from reservations.models import Reservation, ReservationCancelReason
 from reservations.tasks import refund_paid_reservation_task
 
@@ -60,7 +59,7 @@ class ReservationCancellationSerializer(OldPrimaryKeyUpdateSerializer):
                 "Reservation cannot be cancelled when begin time is in past.",
                 ValidationErrorCodes.CANCELLATION_NOT_ALLOWED,
             )
-        for reservation_unit in self.instance.reservation_unit.all():
+        for reservation_unit in self.instance.reservation_units.all():
             cancel_rule = reservation_unit.cancellation_rule
             if not cancel_rule:
                 raise ValidationErrorWithCode(
@@ -92,5 +91,5 @@ class ReservationCancellationSerializer(OldPrimaryKeyUpdateSerializer):
         if payment_is_refundable and self.instance.price_net > 0:
             refund_paid_reservation_task.delay(self.instance.pk)
 
-        send_cancellation_email(instance)
+        instance.actions.send_cancellation_email()
         return instance

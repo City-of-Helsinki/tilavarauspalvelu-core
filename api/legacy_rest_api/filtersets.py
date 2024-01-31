@@ -17,8 +17,8 @@ class ReservationFilter(filters.FilterSet):
     # Effectively active or inactive only reservations
     active = filters.BooleanFilter(method="is_active", help_text="Show only confirmed and active reservations.")
 
-    reservation_unit = filters.ModelMultipleChoiceFilter(
-        field_name="reservation_unit",
+    reservation_units = filters.ModelMultipleChoiceFilter(
+        field_name="reservation_units",
         queryset=ReservationUnit.objects.all(),
         help_text="Show only reservations to certain reservation units.",
     )
@@ -26,8 +26,8 @@ class ReservationFilter(filters.FilterSet):
     def is_active(self, queryset, value, *args, **kwargs):
         active_only = bool(args[0])
         if active_only:
-            return queryset.filter(state="confirmed")
-        return queryset.exclude(state="confirmed")
+            return queryset.filter(state=ReservationStateChoice.CONFIRMED)
+        return queryset.exclude(state=ReservationStateChoice.CONFIRMED)
 
     class Meta:
         model = Reservation

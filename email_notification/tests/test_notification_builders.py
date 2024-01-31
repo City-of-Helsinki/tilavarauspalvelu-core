@@ -15,11 +15,11 @@ from email_notification.sender.email_notification_builder import (
 from email_notification.tests.base import ReservationEmailBaseTestCase
 from reservations.choices import CustomerTypeChoice
 from tests.factories import EmailTemplateFactory, ReservationUnitFactory
-from tilavarauspalvelu.utils.commons import LANGUAGES
+from tilavarauspalvelu.utils.commons import Language
 
 
 class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
-    def get_builder(self, language: LANGUAGES | None = None) -> ReservationEmailNotificationBuilder:
+    def get_builder(self, language: Language | None = None) -> ReservationEmailNotificationBuilder:
         builder = ReservationEmailNotificationBuilder(self.reservation, self.email_template)
         if language:
             builder._set_language(language)
@@ -98,7 +98,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         )
         res_unit_too = res_unit.name
 
-        self.reservation.reservation_unit.add(res_unit)
+        self.reservation.reservation_units.add(res_unit)
         assert self.get_builder()._get_reservation_unit() == f"{res_unit_one}, {res_unit_too}"
 
     def test_get_price(self):
@@ -116,40 +116,40 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
 
     def test_get_confirmed_instructions(self):
         assert (
-            self.reservation.reservation_unit.first().reservation_confirmed_instructions
+            self.reservation.reservation_units.first().reservation_confirmed_instructions
             in self.get_builder()._get_confirmed_instructions()
         )
 
     def test_get_confirmed_instructions_en(self):
-        builder = self.get_builder(LANGUAGES.EN)
+        builder = self.get_builder(Language.EN.value)
         assert (
-            self.reservation.reservation_unit.first().reservation_confirmed_instructions_en
+            self.reservation.reservation_units.first().reservation_confirmed_instructions_en
             in builder._get_confirmed_instructions()
         )
 
     def test_get_pending_instructions(self):
         assert (
-            self.reservation.reservation_unit.first().reservation_pending_instructions
+            self.reservation.reservation_units.first().reservation_pending_instructions
             in self.get_builder()._get_pending_instructions()
         )
 
     def test_get_pending_instructions_en(self):
-        builder = self.get_builder(LANGUAGES.EN)
+        builder = self.get_builder(Language.EN.value)
         assert (
-            self.reservation.reservation_unit.first().reservation_pending_instructions_en
+            self.reservation.reservation_units.first().reservation_pending_instructions_en
             in builder._get_pending_instructions()
         )
 
     def test_get_cancelled_instructions(self):
         assert (
-            self.reservation.reservation_unit.first().reservation_cancelled_instructions
+            self.reservation.reservation_units.first().reservation_cancelled_instructions
             in self.get_builder()._get_cancelled_instructions()
         )
 
     def test_get_cancelled_instructions_en(self):
-        builder = self.get_builder(LANGUAGES.EN)
+        builder = self.get_builder(Language.EN.value)
         assert (
-            self.reservation.reservation_unit.first().reservation_cancelled_instructions_en
+            self.reservation.reservation_units.first().reservation_cancelled_instructions_en
             in builder._get_cancelled_instructions()
         )
 
@@ -157,49 +157,49 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
         assert self.get_builder()._get_deny_reason() == self.reservation.deny_reason.reason
 
     def test_get_deny_reason_en(self):
-        builder = self.get_builder(LANGUAGES.EN)
+        builder = self.get_builder(Language.EN.value)
         assert builder._get_deny_reason() == self.reservation.deny_reason.reason_en
 
     def test_get_cancel_reason(self):
         assert self.get_builder()._get_cancel_reason() == self.reservation.cancel_reason.reason
 
     def test_get_cancel_reason_en(self):
-        builder = self.get_builder(LANGUAGES.EN)
+        builder = self.get_builder(Language.EN.value)
         assert builder._get_cancel_reason() == self.reservation.cancel_reason.reason_en
 
     @override_settings(EMAIL_VARAAMO_EXT_LINK="https://thesite.com")
     def test_get_my_reservations_ext_link_fi(self):
-        builder = self.get_builder(LANGUAGES.FI)
+        builder = self.get_builder(Language.EN.value)
         assert builder._get_my_reservations_ext_link() == "https://thesite.com/reservations"
 
     @override_settings(EMAIL_VARAAMO_EXT_LINK="https://thesite.com")
     def test_get_my_reservations_ext_link_en(self):
-        builder = self.get_builder(LANGUAGES.EN)
+        builder = self.get_builder(Language.EN.value)
         assert builder._get_my_reservations_ext_link() == "https://thesite.com/en/reservations"
 
     @override_settings(EMAIL_VARAAMO_EXT_LINK="https://thesite.com")
     def test_get_my_reservations_ext_link_sv(self):
-        builder = self.get_builder(LANGUAGES.SV)
+        builder = self.get_builder(Language.SV.value)
         assert builder._get_my_reservations_ext_link() == "https://thesite.com/sv/reservations"
 
     @override_settings(EMAIL_VARAAMO_EXT_LINK="https://thesite.com")
     def test_get_varaamo_ext_link(self):
-        builder = self.get_builder(LANGUAGES.FI)
+        builder = self.get_builder(Language.EN.value)
         assert builder._get_varaamo_ext_link() == "https://thesite.com"
 
     @override_settings(EMAIL_VARAAMO_EXT_LINK="https://thesite.com")
     def test_get_varaamo_ext_link_en(self):
-        builder = self.get_builder(LANGUAGES.EN)
+        builder = self.get_builder(Language.EN.value)
         assert builder._get_varaamo_ext_link() == "https://thesite.com/en"
 
     @override_settings(EMAIL_VARAAMO_EXT_LINK="https://thesite.com")
     def test_get_varaamo_ext_link_sv(self):
-        builder = self.get_builder(LANGUAGES.SV)
+        builder = self.get_builder(Language.SV.value)
         assert builder._get_varaamo_ext_link() == "https://thesite.com/sv"
 
     @override_settings(EMAIL_FEEDBACK_EXT_LINK="https://feedback.com/forms/")
     def get_feedback_ext_link_fi(self):
-        builder = self.get_builder(LANGUAGES.FI)
+        builder = self.get_builder(Language.EN.value)
         assert (
             builder._get_feedback_ext_link()
             == "https://feedback.com/forms/?site=varaamopalaute&lang=fi&ref=https://tilavaraus.hel.fi"
@@ -207,7 +207,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
 
     @override_settings(EMAIL_FEEDBACK_EXT_LINK="https://feedback.com/forms/")
     def get_feedback_ext_link_sv(self):
-        builder = self.get_builder(LANGUAGES.SV)
+        builder = self.get_builder(Language.SV.value)
         assert (
             builder._get_feedback_ext_link()
             == "https://feedback.com/forms/?site=varaamopalaute&lang=sv&ref=https://tilavaraus.hel.fi"
@@ -215,7 +215,7 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
 
     @override_settings(EMAIL_FEEDBACK_EXT_LINK="https://feedback.com/forms/")
     def get_feedback_ext_link_en(self):
-        self.builder._set_language(LANGUAGES.EN)
+        self.builder._set_language(Language.EN.value)
         assert (
             self.builder._get_feedback_ext_link()
             == "https://feedback.com/forms/?site=varaamopalaute&lang=en&ref=https://tilavaraus.hel.fi"
@@ -322,8 +322,8 @@ class ReservationEmailNotificationBuilderTestCase(ReservationEmailBaseTestCase):
     def test_language_defaults_to_fi_when_content_not_translated(self):
         builder = self.get_builder()
         builder.template.content_sv = None
-        builder._set_language(LANGUAGES.SV)
-        assert builder.language == LANGUAGES.FI
+        builder._set_language(Language.SV.value)
+        assert builder.language == Language.EN.value
         assert builder._get_deny_reason() == self.reservation.deny_reason.reason_fi
 
     def test_confirmed_instructions_renders(self):

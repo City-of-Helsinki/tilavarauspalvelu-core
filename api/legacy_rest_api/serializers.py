@@ -291,7 +291,7 @@ class ReservationUnitSerializer(OldTranslatedModelSerializer):
 
 
 class ReservationSerializer(serializers.ModelSerializer):
-    reservation_unit = PresentablePrimaryKeyRelatedField(
+    reservation_units = PresentablePrimaryKeyRelatedField(
         presentation_serializer=ReservationUnitSerializer,
         many=True,
         queryset=ReservationUnit.objects.all(),
@@ -320,7 +320,7 @@ class ReservationSerializer(serializers.ModelSerializer):
             "buffer_time_after",
             "application_event_name",
             "reservation_user",
-            "reservation_unit",
+            "reservation_units",
             "recurring_reservation",
             "type",
         ]
@@ -344,7 +344,7 @@ class ReservationSerializer(serializers.ModelSerializer):
         return instance.user.get_full_name()
 
     def validate(self, data):
-        for reservation_unit in data["reservation_unit"]:
+        for reservation_unit in data["reservation_units"]:
             if reservation_unit.actions.check_reservation_overlap(data["begin"], data["end"], self.instance):
                 raise serializers.ValidationError("Overlapping reservations are not allowed")
         return data

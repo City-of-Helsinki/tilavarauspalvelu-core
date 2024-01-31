@@ -1,7 +1,6 @@
 from collections.abc import Generator, Sequence
 from typing import Any, Generic, Literal, TypeVar
 
-from django.conf import settings
 from django.db import models
 from modeltranslation.manager import get_translatable_fields_for_model
 
@@ -14,6 +13,7 @@ __all__ = [
     "with_indices",
 ]
 
+from tilavarauspalvelu.utils.commons import Language
 
 T = TypeVar("T")
 
@@ -77,9 +77,7 @@ def get_translation_fields(model: type[models.Model], fields: list[str] | Litera
     translatable_fields = get_translatable_fields_for_model(model) or []
     if fields == "__all__":
         fields = translatable_fields
-    return [
-        f"{field}_{language}" for field in translatable_fields for language, _ in settings.LANGUAGES if field in fields
-    ]
+    return [f"{field}_{language}" for field in translatable_fields for language in Language.values if field in fields]
 
 
 class with_indices(Generic[T]):  # noqa: N801, RUF100

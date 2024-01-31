@@ -51,7 +51,7 @@ class ReservationUpdateSerializer(OldPrimaryKeyUpdateSerializer, ReservationCrea
         data = super().validate(data, prefill_from_profile)
         data["state"] = new_state
 
-        reservation_units = data.get("reservation_unit", getattr(self.instance, "reservation_unit", None))
+        reservation_units = data.get("reservation_units", getattr(self.instance, "reservation_units", None))
         if hasattr(reservation_units, "all"):
             reservation_units = reservation_units.all()
 
@@ -88,7 +88,7 @@ class ReservationUpdateSerializer(OldPrimaryKeyUpdateSerializer, ReservationCrea
         required_fields = metadata_set.required_fields.order_by("field_name").all() if metadata_set else []
 
         reservee_type = data.get("reservee_type", getattr(self.instance, "reservee_type", None))
-        if required_fields and reservee_type == CustomerTypeChoice.INDIVIDUAL.value.lower():
+        if required_fields and reservee_type == CustomerTypeChoice.INDIVIDUAL.value:
             required_fields = metadata_set.required_fields.exclude(field_name__in=non_mandatory_fields_for_person)
 
         for required_field in required_fields:

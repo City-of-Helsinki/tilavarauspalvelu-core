@@ -28,7 +28,7 @@ class ReservationDenyTestCase(ReservationTestCaseBase):
         self.reservation_unit.metadata_set = metadata
         self.reservation_unit.save()
         self.reservation = ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=1),
             end=(datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=2)),
             state=ReservationStateChoice.REQUIRES_HANDLING,
@@ -173,7 +173,7 @@ class ReservationDenyTestCase(ReservationTestCaseBase):
 
         assert_that(content.get("errors")).is_not_none()
         assert_that(content.get("errors")[0]["message"]).is_equal_to(
-            "Only reservations with state as requires_handling, confirmed can be denied."
+            "Only reservations with state as REQUIRES_HANDLING, CONFIRMED can be denied."
         )
         assert_that(content.get("errors")[0]["extensions"]["error_code"]).is_equal_to("DENYING_NOT_ALLOWED")
 

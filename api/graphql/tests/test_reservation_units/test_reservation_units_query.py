@@ -8,10 +8,7 @@ from django.test import override_settings
 from django.utils.timezone import get_default_timezone
 from freezegun import freeze_time
 
-from api.graphql.tests.test_reservation_units.base import (
-    ReservationUnitQueryTestCaseBase,
-    mock_create_product,
-)
+from api.graphql.tests.test_reservation_units.base import ReservationUnitQueryTestCaseBase, mock_create_product
 from api.graphql.tests.test_reservation_units.conftest import reservation_unit_by_pk_query, reservation_units_query
 from permissions.models import (
     GeneralRoleChoice,
@@ -388,25 +385,25 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
     def test_reservations_date_filter(self):
         ReservationFactory(
             name="Hide me",
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=datetime.datetime(2023, 1, 1, 15, 0, 0, tzinfo=DEFAULT_TIMEZONE),
             end=datetime.datetime(2023, 1, 1, 16, 0, 0, tzinfo=DEFAULT_TIMEZONE),
         )
         ReservationFactory(
             name="Show me",
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=datetime.datetime(2023, 1, 2, 0, 0, 0, tzinfo=DEFAULT_TIMEZONE),
             end=datetime.datetime(2023, 1, 2, 1, 0, 0, tzinfo=DEFAULT_TIMEZONE),
         )
         ReservationFactory(
             name="Show me too",
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=datetime.datetime(2023, 1, 3, 23, 00, 00, tzinfo=DEFAULT_TIMEZONE),
             end=datetime.datetime(2023, 1, 3, 23, 59, 59, tzinfo=DEFAULT_TIMEZONE),
         )
         ReservationFactory(
             name="Hide me too",
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=datetime.datetime(2023, 1, 4, 0, 0, 0, tzinfo=DEFAULT_TIMEZONE),
             end=datetime.datetime(2023, 1, 4, 1, 0, 0, tzinfo=DEFAULT_TIMEZONE),
         )
@@ -897,7 +894,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             begin=datetime.datetime(2021, 1, 1),
             end=datetime.datetime(2021, 1, 2),
         )
-        self.reservation_unit.reservation_set.set([matching_reservation, other_reservation])
+        self.reservation_unit.reservations.set([matching_reservation, other_reservation])
         self.reservation_unit.save()
 
         self.client.force_login(self.regular_joe)
@@ -934,12 +931,13 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             end=now + one_hour + one_hour,
             state=ReservationStateChoice.CANCELLED,
         )
-        self.reservation_unit.reservation_set.set([matching_reservation, other_reservation])
+        self.reservation_unit.reservations.set([matching_reservation, other_reservation])
         self.reservation_unit.save()
         self.client.force_login(self.regular_joe)
         response = self.query(
             reservation_units_query(
-                fields='nameFi reservations(state: "created"){begin end state}',
+                fields="nameFi reservations { begin end state }",
+                reservations__state=ReservationStateChoice.CREATED.value,
             )
         )
 
@@ -970,13 +968,14 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             end=now + two_hours + one_hour,
             state=ReservationStateChoice.CANCELLED,
         )
-        self.reservation_unit.reservation_set.set(matching_reservations + [other_reservation])
+        self.reservation_unit.reservations.set(matching_reservations + [other_reservation])
         self.reservation_unit.save()
 
         self.client.force_login(self.regular_joe)
         response = self.query(
             reservation_units_query(
-                fields='nameFi reservations(state: ["created", "confirmed"]){begin end state}',
+                fields="nameFi reservations { begin end state }",
+                reservations__state=[ReservationStateChoice.CREATED.value, ReservationStateChoice.CONFIRMED.value],
             )
         )
 
@@ -1849,7 +1848,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.general_admin.date_of_birth = datetime.date(2020, 1, 1)
         self.general_admin.save()
         ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             user=self.general_admin,
             reservee_last_name="Admin",
             reservee_first_name="General",
@@ -1928,7 +1927,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                             "cancelReason": None,
                             "denyReason": None,
                             "description": None,
-                            "freeOfChargeReason": None,
+                            "freeOfChargeReason": "",
                             "handlingDetails": "",
                             "reserveeAddressCity": None,
                             "reserveeAddressStreet": None,
@@ -1940,7 +1939,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
                             "reserveeOrganisationName": None,
                             "reserveePhone": None,
                             "user": None,
-                            "workingMemo": None,
+                            "workingMemo": "",
                         }
                     ]
                 }
@@ -1952,8 +1951,8 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.client.force_login(self.general_admin)
         self.regular_joe.date_of_birth = datetime.date(2020, 1, 1)
         self.regular_joe.save()
-        ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+        ReservationFactory.create(
+            reservation_units=[self.reservation_unit],
             user=self.regular_joe,
             reservee_last_name="Reggie",
             reservee_first_name="Joe",
@@ -2121,7 +2120,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             begin=datetime.datetime(2021, 1, 1, tzinfo=DEFAULT_TIMEZONE),
             end=datetime.datetime(2021, 1, 2, tzinfo=DEFAULT_TIMEZONE),
         )
-        self.reservation_unit.reservation_set.set([matching_reservation, other_reservation])
+        self.reservation_unit.reservations.set([matching_reservation, other_reservation])
         self.reservation_unit.save()
 
         self.client.force_login(self.regular_joe)
@@ -2183,14 +2182,90 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         self.reservation_unit.save()
 
         response = self.query(
-            reservation_units_query(
-                fields="nameFi paymentProduct{pk merchantPk}",
-            )
+            """
+            query {
+                reservationUnits {
+                    edges {
+                        node {
+                            nameFi
+                            paymentProduct {
+                                pk
+                                merchantPk
+                            }
+                        }
+                    }
+                }
+            }
+            """
         )
+        content = json.loads(response.content)
+        assert not self.content_is_empty(content)
+        assert content.get("errors") is None
+        self.assertMatchSnapshot(content)
+
+    def test_include_reservations_with_same_components(self):
+        now = datetime.datetime.now(DEFAULT_TIMEZONE)
+        one_hour = datetime.timedelta(hours=1)
+        ReservationFactory(
+            begin=now,
+            end=now + one_hour,
+            state=ReservationStateChoice.CREATED,
+            reservation_units=[self.reservation_unit],
+        )
+
+        res_unit = ReservationUnitFactory(
+            name_fi="conflicting reservation unit with same space",
+            spaces=[self.small_space],
+        )
+
+        ReservationFactory(
+            begin=datetime.datetime(2021, 1, 1),
+            end=datetime.datetime(2021, 1, 2),
+            reservation_units=[res_unit],
+        )
+
+        self.client.force_login(self.regular_joe)
+        query = reservation_units_query(
+            fields="""
+                nameFi
+                reservations {
+                    begin
+                    end
+                    state
+                }
+            """,
+            reservations__from="2021-05-03",
+            reservations__to="2021-05-04",
+            reservations__include_with_same_components=True,
+        )
+        response = self.query(query)
 
         content = json.loads(response.content)
         assert not self.content_is_empty(content)
         assert content.get("errors") is None
         assert content.get("data").get("reservationUnits").get("edges") == [
-            {"node": {"nameFi": "test name fi", "paymentProduct": None}}
+            {
+                "node": {
+                    "nameFi": "test name fi",
+                    "reservations": [
+                        {
+                            "begin": "2021-05-03T00:00:00+00:00",
+                            "end": "2021-05-03T01:00:00+00:00",
+                            "state": "CREATED",
+                        }
+                    ],
+                }
+            },
+            {
+                "node": {
+                    "nameFi": "conflicting reservation unit with same space",
+                    "reservations": [
+                        {
+                            "begin": "2021-05-03T00:00:00+00:00",
+                            "end": "2021-05-03T01:00:00+00:00",
+                            "state": "CREATED",
+                        }
+                    ],
+                }
+            },
         ]

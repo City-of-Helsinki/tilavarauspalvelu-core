@@ -24,12 +24,12 @@ def reservation_unit_calendar(reservation_unit: ReservationUnit):
 
 def export_reservation_events(reservation: Reservation, site_name: str, cal: Calendar):
     ical_event = Event()
-    ical_event.add("summary", reservation.get_ical_summary())
+    ical_event.add("summary", reservation.actions.get_ical_summary())
     ical_event.add("dtstart", reservation.begin)
     ical_event.add("dtend", reservation.end)
     ical_event.add("dtstamp", datetime.datetime.now(tz=get_default_timezone()))
-    ical_event.add("description", reservation.get_ical_description())
-    ical_event.add("location", reservation.get_location_string())
+    ical_event.add("description", reservation.actions.get_ical_description())
+    ical_event.add("location", reservation.actions.get_location_string())
     ical_event["uid"] = f"{reservation.pk}.event.events.{site_name}"
     cal.add_component(ical_event)
     return cal

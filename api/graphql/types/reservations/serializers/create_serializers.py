@@ -7,7 +7,7 @@ from rest_framework import serializers
 from sentry_sdk import capture_exception as log_exception_to_sentry
 
 from api.graphql.extensions.duration_field import DurationField
-from api.graphql.extensions.legacy_helpers import OldChoiceCharField, OldPrimaryKeySerializer
+from api.graphql.extensions.legacy_helpers import OldChoiceValidator, OldPrimaryKeySerializer
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from api.graphql.types.reservations.serializers.mixins import (
     ReservationPriceMixin,
@@ -19,13 +19,9 @@ from permissions.helpers import can_handle_reservation_with_units
 from reservation_units.enums import ReservationKind
 from reservation_units.models import ReservationUnit
 from reservation_units.utils.reservation_unit_reservation_scheduler import ReservationUnitReservationScheduler
-from reservations.choices import (
-    RESERVEE_LANGUAGE_CHOICES,
-    CustomerTypeChoice,
-    ReservationStateChoice,
-    ReservationTypeChoice,
-)
+from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import AgeGroup, Reservation, ReservationPurpose
+from tilavarauspalvelu.utils.commons import Language
 from users.helauth.utils import get_id_token, is_ad_login
 from users.utils.open_city_profile.basic_info_resolver import ProfileReadError, ProfileUserInfoReader
 
@@ -33,20 +29,22 @@ DEFAULT_TIMEZONE = get_default_timezone()
 
 
 class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin, ReservationSchedulingMixin):
-    state = OldChoiceCharField(choices=ReservationStateChoice.choices)
+    state = serializers.ChoiceField(choices=ReservationStateChoice.choices)
     reservation_unit_pks = serializers.ListField(
         child=IntegerPrimaryKeyField(queryset=ReservationUnit.objects.all()),
-        source="reservation_unit",
+        source="reservation_units",
     )
     priority = serializers.IntegerField(required=False)
     purpose_pk = IntegerPrimaryKeyField(queryset=ReservationPurpose.objects.all(), source="purpose", allow_null=True)
     home_city_pk = IntegerPrimaryKeyField(queryset=City.objects.all(), source="home_city", allow_null=True)
     age_group_pk = IntegerPrimaryKeyField(queryset=AgeGroup.objects.all(), source="age_group", allow_null=True)
-    reservee_type = OldChoiceCharField(choices=CustomerTypeChoice.choices)
-    reservee_language = OldChoiceCharField(choices=RESERVEE_LANGUAGE_CHOICES, required=False, default="")
+    reservee_type = serializers.ChoiceField(choices=CustomerTypeChoice.choices)
+    reservee_language = serializers.CharField(
+        required=False, default=None, validators=[OldChoiceValidator(Language.choices)]
+    )
+    type = serializers.CharField(required=False, validators=[OldChoiceValidator(ReservationTypeChoice.choices)])
     buffer_time_before = DurationField(required=False)
     buffer_time_after = DurationField(required=False)
-    type = OldChoiceCharField(required=False, choices=ReservationTypeChoice.choices)
 
     class Meta:
         model = Reservation
@@ -142,7 +140,7 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
         begin = begin.astimezone(DEFAULT_TIMEZONE)
         end = end.astimezone(DEFAULT_TIMEZONE)
 
-        reservation_units = data.get("reservation_unit", getattr(self.instance, "reservation_unit", None))
+        reservation_units = data.get("reservation_units", getattr(self.instance, "reservation_units", None))
         if hasattr(reservation_units, "all"):
             reservation_units = reservation_units.all()
 
@@ -260,9 +258,10 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
         if max_count is not None:
             current_reservation_pk = getattr(self.instance, "pk", None)
             reservation_count = (
-                Reservation.objects.filter(user=user, reservation_unit=reservation_unit)
+                Reservation.objects.filter(user=user, reservation_units__id=reservation_unit.pk)
                 .exclude(pk=current_reservation_pk)
                 .active()
+                .distinct()
                 .count()
             )
             if reservation_count >= max_count:

@@ -3,25 +3,21 @@ from decimal import Decimal
 
 import graphene
 from graphene_permissions.mixins import AuthNode
-from graphene_permissions.permissions import AllowAuthenticated
 from rest_framework.reverse import reverse
 
 from api.graphql.extensions.base_types import TVPBaseConnection
 from api.graphql.extensions.duration_field import Duration
-from api.graphql.extensions.legacy_helpers import OldPrimaryKeyObjectType, get_all_translatable_fields
+from api.graphql.extensions.legacy_helpers import OldPrimaryKeyObjectType
 from api.graphql.extensions.permission_helpers import (
     check_resolver_permission,
-    recurring_reservation_non_public_field,
     reservation_non_public_field,
     reservation_staff_field,
 )
+from api.graphql.types.age_group.types import AgeGroupNode
+from api.graphql.types.recurring_reservation.types import RecurringReservationNode
 from api.graphql.types.reservation_units.permissions import ReservationUnitPermission
 from api.graphql.types.reservations.permissions import (
-    AbilityGroupPermission,
-    AgeGroupPermission,
-    RecurringReservationPermission,
     ReservationPermission,
-    ReservationPurposePermission,
 )
 from api.graphql.types.users.types import UserType
 from api.legacy_rest_api.utils import hmac_signature
@@ -29,97 +25,18 @@ from applications.models import City
 from common.typing import GQLInfo
 from reservations.choices import ReservationTypeChoice as ReservationTypeField
 from reservations.models import (
-    AbilityGroup,
     AgeGroup,
-    RecurringReservation,
     Reservation,
     ReservationCancelReason,
     ReservationDenyReason,
-    ReservationMetadataSet,
     ReservationPurpose,
 )
-
-
-class AgeGroupType(AuthNode, OldPrimaryKeyObjectType):
-    permission_classes = (AgeGroupPermission,)
-
-    class Meta:
-        model = AgeGroup
-        fields = ["minimum", "maximum"]
-        filter_fields = []
-        interfaces = (graphene.relay.Node,)
-
-
-class AbilityGroupType(AuthNode, OldPrimaryKeyObjectType):
-    permission_classes = (AbilityGroupPermission,)
-
-    class Meta:
-        model = AbilityGroup
-        fields = ["name"]
-
-
-class RecurringReservationType(AuthNode, OldPrimaryKeyObjectType):
-    permission_classes = (RecurringReservationPermission,)
-
-    user = graphene.String()
-    application_event_schedule = graphene.Int()
-    age_group = graphene.Field(AgeGroupType)
-    ability_group = graphene.Field(AbilityGroupType)
-    weekdays = graphene.List(graphene.Int)
-
-    class Meta:
-        model = RecurringReservation
-        fields = [
-            "user",
-            "application_event_schedule",
-            "age_group",
-            "ability_group",
-            "name",
-            "description",
-            "reservation_unit",
-            "begin_time",
-            "end_time",
-            "begin_date",
-            "end_date",
-            "recurrence_in_days",
-            "weekdays",
-            "created",
-        ]
-
-        filter_fields = ["name"]
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
-
-    @recurring_reservation_non_public_field
-    def resolve_user(root: RecurringReservation, info: GQLInfo) -> str | None:
-        if not root.user:
-            return None
-        return root.user.email
-
-    @recurring_reservation_non_public_field
-    def resolve_application_event_schedule(root: RecurringReservation, info: GQLInfo) -> int | None:
-        if not root.application_event_schedule:
-            return None
-        return root.application_event_schedule.pk
-
-    def resolve_weekdays(root: RecurringReservation, info: GQLInfo) -> list[graphene.List]:
-        return root.weekday_list
-
-
-class ReservationPurposeType(AuthNode, OldPrimaryKeyObjectType):
-    permission_classes = (ReservationPurposePermission,)
-
-    class Meta:
-        model = ReservationPurpose
-        fields = ["pk"] + get_all_translatable_fields(model)
-        filter_fields = ["name_fi", "name_en", "name_sv"]
-        interfaces = (graphene.relay.Node,)
 
 
 class ReservationType(AuthNode, OldPrimaryKeyObjectType):
     permission_classes = (ReservationPermission,)
 
-    age_group = graphene.Field(AgeGroupType)
+    age_group = graphene.Field(AgeGroupNode)
     applying_for_free_of_charge = graphene.Boolean()
     buffer_time_before = Duration()
     buffer_time_after = Duration()
@@ -141,7 +58,7 @@ class ReservationType(AuthNode, OldPrimaryKeyObjectType):
     price = graphene.Float()
     price_net = graphene.Decimal()
     reservation_units = graphene.List("api.graphql.types.reservation_units.types.ReservationUnitType")
-    recurring_reservation = graphene.Field(RecurringReservationType)
+    recurring_reservation = RecurringReservationNode.Field()
     refund_uuid = graphene.String()
     reservee_first_name = graphene.String()
     reservee_last_name = graphene.String()
@@ -288,7 +205,7 @@ class ReservationType(AuthNode, OldPrimaryKeyObjectType):
     def resolve_description(root: Reservation, info: GQLInfo) -> str | None:
         return root.description
 
-    @reservation_non_public_field
+    @reservation_non_public_field(default="")
     def resolve_free_of_charge_reason(root: Reservation, info: GQLInfo) -> str | None:
         return root.free_of_charge_reason
 
@@ -393,7 +310,7 @@ class ReservationType(AuthNode, OldPrimaryKeyObjectType):
 
     @check_resolver_permission(ReservationUnitPermission)
     def resolve_reservation_units(root: Reservation, info: GQLInfo):
-        return root.reservation_unit.all()
+        return root.reservation_units.all()
 
     @reservation_staff_field
     def resolve_staff_event(root: Reservation, info: GQLInfo) -> bool | None:
@@ -417,8 +334,8 @@ class ReservationType(AuthNode, OldPrimaryKeyObjectType):
             return None
         return root.user
 
-    @reservation_staff_field
-    def resolve_working_memo(root: Reservation, info: GQLInfo) -> str | None:
+    @reservation_staff_field(default="")
+    def resolve_working_memo(root: Reservation, info: GQLInfo) -> str:
         return root.working_memo
 
     @reservation_staff_field(default="")
@@ -432,42 +349,3 @@ class ReservationType(AuthNode, OldPrimaryKeyObjectType):
     @reservation_non_public_field
     def resolve_deny_reason(root: Reservation, info: GQLInfo) -> ReservationDenyReason:
         return root.deny_reason
-
-
-class ReservationCancelReasonType(AuthNode, OldPrimaryKeyObjectType):
-    permission_classes = (AllowAuthenticated,)
-
-    class Meta:
-        model = ReservationCancelReason
-        fields = ["pk", "reason", "reason_fi", "reason_en", "reason_sv"]
-        filter_fields = ["reason"]
-        interfaces = (graphene.relay.Node,)
-
-
-class ReservationDenyReasonType(AuthNode, OldPrimaryKeyObjectType):
-    permission_classes = (AllowAuthenticated,)
-
-    class Meta:
-        model = ReservationDenyReason
-        fields = ["pk", "reason", "reason_fi", "reason_en", "reason_sv"]
-        filter_fields = ["reason"]
-        interfaces = (graphene.relay.Node,)
-
-
-class ReservationMetadataSetType(AuthNode, OldPrimaryKeyObjectType):
-    permission_classes = (AllowAuthenticated,)
-
-    supported_fields = graphene.List(graphene.String)
-    required_fields = graphene.List(graphene.String)
-
-    def resolve_supported_fields(root: ReservationMetadataSet, info: GQLInfo):
-        return root.supported_fields.all()
-
-    def resolve_required_fields(root: ReservationMetadataSet, info: GQLInfo):
-        return root.required_fields.all()
-
-    class Meta:
-        model = ReservationMetadataSet
-        fields = ["pk", "name", "supported_fields", "required_fields"]
-        filter_fields = []
-        interfaces = (graphene.relay.Node,)

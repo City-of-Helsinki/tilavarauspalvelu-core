@@ -42,7 +42,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         cls.reservation_begin = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
         cls.reservation_end = datetime.datetime.now(tz=DEFAULT_TIMEZONE) + datetime.timedelta(hours=1)
         cls.reservation = ReservationFactory.create(
-            reservation_unit=[cls.reservation_unit],
+            reservation_units=[cls.reservation_unit],
             reservee_email=cls.regular_joe.email,
             begin=cls.reservation_begin,
             end=cls.reservation_end,
@@ -282,7 +282,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
 
     def test_new_time_overlaps_another_fails(self):
         ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=self.reservation_begin + datetime.timedelta(hours=1),
             end=self.reservation_end + datetime.timedelta(hours=1),
             state=ReservationStateChoice.CONFIRMED,
@@ -334,7 +334,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
 
     def test_overlaps_with_buffer_time_fails(self):
         ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=self.reservation_begin + datetime.timedelta(hours=2),
             end=self.reservation_end + datetime.timedelta(hours=2),
             state=ReservationStateChoice.CONFIRMED,

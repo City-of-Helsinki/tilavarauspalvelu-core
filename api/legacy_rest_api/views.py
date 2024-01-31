@@ -35,7 +35,7 @@ class ReservationIcalViewset(ViewSet):
     queryset = Reservation.objects.all()
 
     def get_object(self):
-        return Reservation.objects.filter(pk=self.kwargs["pk"]).prefetch_related("reservation_unit").first()
+        return Reservation.objects.filter(pk=self.kwargs["pk"]).prefetch_related("reservation_units").first()
 
     def retrieve(self, request, *args, **kwargs):
         hash_pram = request.query_params.get("hash", None)
@@ -55,7 +55,7 @@ class ReservationIcalViewset(ViewSet):
             export_reservation_events(
                 instance,
                 get_host(request),
-                reservation_unit_calendar(instance.reservation_unit),
+                reservation_unit_calendar(instance.reservation_units),
             ).to_ical()
         )
         buffer.seek(0)
@@ -86,7 +86,7 @@ class RecurringReservationViewSet(viewsets.ReadOnlyModelViewSet):
                     )
                     .prefetch_related(
                         Prefetch(
-                            "reservation_unit",
+                            "reservation_units",
                             queryset=(
                                 ReservationUnit.objects.all()
                                 .select_related("reservation_unit_type", "unit")
@@ -126,10 +126,10 @@ class RecurringReservationViewSet(viewsets.ReadOnlyModelViewSet):
         user = self.request.user
 
         can_view_units_reservations = Q(
-            reservations__reservation_unit__unit__in=get_units_where_can_view_reservations(user)
+            reservations__reservation_units__unit__in=get_units_where_can_view_reservations(user)
         )
         can_view_service_sectors_reservations = Q(
-            reservations__reservation_unit__unit__service_sectors__in=get_service_sectors_where_can_view_reservations(
+            reservations__reservation_units__unit__service_sectors__in=get_service_sectors_where_can_view_reservations(
                 user
             )
         )
@@ -210,7 +210,7 @@ class ReservationUnitViewSet(viewsets.ModelViewSet):
         for res_unit in reservation_unit_qs:
             total_duration = (
                 Reservation.objects.going_to_occur()
-                .filter(reservation_unit=res_unit)
+                .filter(reservation_units=[res_unit])
                 .within_period(period_start=period_start_date, period_end=period_end_date)
                 .total_duration()
             ).get("total_duration")
@@ -248,7 +248,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
         )
         .prefetch_related(
             Prefetch(
-                "reservation_unit",
+                "reservation_units",
                 queryset=(
                     ReservationUnit.objects.all()
                     .select_related("reservation_unit_type", "unit")
@@ -279,7 +279,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
 
         user = self.request.user
         return queryset.filter(
-            Q(reservation_unit__unit__in=get_units_where_can_view_reservations(user))
-            | Q(reservation_unit__unit__service_sectors__in=get_service_sectors_where_can_view_reservations(user))
+            Q(reservation_units__unit__in=get_units_where_can_view_reservations(user))
+            | Q(reservation_units__unit__service_sectors__in=get_service_sectors_where_can_view_reservations(user))
             | Q(user=user)
         ).order_by("begin")

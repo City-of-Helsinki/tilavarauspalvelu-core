@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import re
 from collections.abc import Callable
 from functools import wraps
 from itertools import chain
 from typing import TYPE_CHECKING, Any, Literal, ParamSpec, Self, TypeVar
 
+from django.apps import apps
 from django.contrib.auth.models import AnonymousUser
 from django.db import IntegrityError, models, transaction
 from django.db.models.fields.related_descriptors import ManyToManyDescriptor, ReverseManyToOneDescriptor
@@ -28,6 +30,25 @@ __all__ = [
 TModel = TypeVar("TModel", bound=models.Model)
 P = ParamSpec("P")
 
+CONSTRAINT_ERROR_PATTERN = re.compile(
+    r'^new row for relation "(?P<relation>\w+)" violates (check|unique) constraint "(?P<constraint>\w+)"',
+)
+
+
+def get_constraint_message(message: str) -> str:
+    """Try to get the error message for a constraint violation from the model meta constraints."""
+    match = CONSTRAINT_ERROR_PATTERN.match(message)
+    if match is None:
+        return message
+
+    relation: str = match.group("relation")
+    model: type[models.Model] | None = next((m for m in apps.get_models() if m._meta.db_table == relation), None)
+    if model is None:
+        return message
+
+    constraint: str = match.group("constraint")
+    return next((c.violation_error_message for c in model._meta.constraints if c.name == constraint), message)
+
 
 def handle_related(func: Callable[P, TModel]) -> Callable[P, TModel]:
     """Handle related models before and after creating or updating the main model."""
@@ -46,8 +67,8 @@ def handle_related(func: Callable[P, TModel]) -> Callable[P, TModel]:
                 if related_serializers:
                     self._handle_to_many(instance, related_serializers)
         except IntegrityError as error:
-            raise ValidationError(error.args[0]) from error
-
+            msg = get_constraint_message(error.args[0])
+            raise ValidationError(msg) from error
         return instance
 
     return wrapper
@@ -160,7 +181,14 @@ class BaseModelSerializer(serializers.ModelSerializer):
         return field_class, field_kwargs
 
     def get_or_default(self, field: str, attrs: dict[str, Any]) -> Any:
+        """
+        Meant for use in the `validate` method.
+        Get value from the `validated_data`, defaulting first to the instance value
+        and then to the model field default value.
+        """
         default = self.Meta.model._meta.get_field(field).default
+        if callable(default):
+            default = default()
         default = getattr(self.instance, field, default)
         return attrs.get(field, default)
 

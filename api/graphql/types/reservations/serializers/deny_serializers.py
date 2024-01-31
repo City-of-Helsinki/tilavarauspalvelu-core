@@ -7,11 +7,7 @@ from api.graphql.extensions.legacy_helpers import OldPrimaryKeySerializer
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from common.fields.serializer import IntegerPrimaryKeyField
 from reservations.choices import ReservationStateChoice, ReservationTypeChoice
-from reservations.email_utils import send_deny_email
-from reservations.models import (
-    Reservation,
-    ReservationDenyReason,
-)
+from reservations.models import Reservation, ReservationDenyReason
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
@@ -85,6 +81,6 @@ class ReservationDenySerializer(OldPrimaryKeySerializer):
 
         # Send the notification email only for normal reservations which has not ended.
         if instance.type == ReservationTypeChoice.NORMAL and instance.end > now:
-            send_deny_email(instance)
+            instance.actions.send_deny_email()
 
         return instance

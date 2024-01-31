@@ -24,7 +24,7 @@ class UnitsFilterSet(django_filters.FilterSet):
     order_by = django_filters.OrderingFilter(fields=("name_fi", "name_en", "name_sv", "rank", "reservation_count"))
 
     def filter_queryset(self, queryset):
-        queryset = queryset.annotate(reservation_count=Count("reservationunit__reservation"))
+        queryset = queryset.annotate(reservation_count=Count("reservationunit__reservations"))
 
         return super().filter_queryset(queryset)
 
@@ -90,7 +90,7 @@ class UnitsFilterSet(django_filters.FilterSet):
         if user.is_anonymous:
             return qs.none()
 
-        units_with_reservations = Q(reservationunit__reservation__user=user)
+        units_with_reservations = Q(reservationunit__reservations__user=user)
 
         if value:
             return qs.filter(units_with_reservations)

@@ -186,7 +186,7 @@ class AnonymizationTestCase(TestCase):
         """Test also that the audit logger instances gets anonymized"""
         self.reservation.name = ""
         self.reservation.description = ""
-        self.reservation.free_of_charge_reason = None
+        self.reservation.free_of_charge_reason = ""
         self.reservation.save()
 
         anonymize_user_reservations(self.mr_anonymous)
@@ -194,4 +194,4 @@ class AnonymizationTestCase(TestCase):
 
         assert_that(self.reservation.name).is_equal_to("")
         assert_that(self.reservation.description).is_equal_to("")
-        assert_that(self.reservation.free_of_charge_reason).is_none()
+        assert_that(self.reservation.free_of_charge_reason).is_equal_to("")

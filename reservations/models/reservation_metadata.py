@@ -8,7 +8,7 @@ __all__ = [
 
 
 class ReservationMetadataField(models.Model):
-    field_name = models.CharField(max_length=100, verbose_name=_("Field name"), unique=True)
+    field_name = models.CharField(max_length=100, unique=True)
 
     class Meta:
         db_table = "reservation_metadata_field"
@@ -21,15 +21,14 @@ class ReservationMetadataField(models.Model):
 
 
 class ReservationMetadataSet(models.Model):
-    name = models.CharField(max_length=100, verbose_name=_("Name"), unique=True)
+    name = models.CharField(max_length=100, unique=True)
+
     supported_fields = models.ManyToManyField(
         "reservations.ReservationMetadataField",
-        verbose_name=_("Supported fields"),
         related_name="metadata_sets_supported",
     )
     required_fields = models.ManyToManyField(
         "reservations.ReservationMetadataField",
-        verbose_name=_("Required fields"),
         related_name="metadata_sets_required",
         blank=True,
     )

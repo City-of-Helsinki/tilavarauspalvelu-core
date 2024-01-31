@@ -65,7 +65,7 @@ def test_reservation__query__all_fields(graphql):
         priceNet
         priority
         purpose { nameFi }
-        recurringReservation { user }
+        recurringReservation { name }
         refundUuid
         reservationUnits { nameFi }
         reserveeAddressCity
@@ -126,7 +126,7 @@ def test_reservation__query__all_fields(graphql):
         "orderUuid": None,
         "price": float(reservation.price),
         "priceNet": "0.000000",
-        "priority": f"A_{reservation.priority}",
+        "priority": reservation.priority,
         "purpose": None,
         "recurringReservation": None,
         "refundUuid": None,
@@ -202,7 +202,7 @@ def test_reservation__query__reservee_date_of_birth_is_show_but_logged__unit_adm
 
     unit = UnitFactory.create()
     reservation_unit = ReservationUnitFactory.create(unit=unit)
-    reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
+    reservation = ReservationFactory.create(reservation_units=[reservation_unit])
     admin = UserFactory.create_with_unit_permissions(unit=unit, perms=["can_view_reservations"])
 
     graphql.force_login(admin)
@@ -232,7 +232,7 @@ def test_reservation__query__reservee_date_of_birth_is_show_but_logged__unit_gro
     unit_group = UnitGroupFactory.create()
     unit = UnitFactory.create(unit_groups=[unit_group])
     reservation_unit = ReservationUnitFactory.create(unit=unit)
-    reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
+    reservation = ReservationFactory.create(reservation_units=[reservation_unit])
     admin = UserFactory.create_with_unit_group_permissions(unit_group=unit_group, perms=["can_view_reservations"])
 
     graphql.force_login(admin)
@@ -262,7 +262,7 @@ def test_reservation__query__reservee_date_of_birth_is_show_but_logged__service_
     sector = ServiceSectorFactory.create()
     unit = UnitFactory.create(service_sectors=[sector])
     reservation_unit = ReservationUnitFactory.create(unit=unit)
-    reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
+    reservation = ReservationFactory.create(reservation_units=[reservation_unit])
     admin = UserFactory.create_with_service_sector_permissions(service_sector=sector, perms=["can_view_reservations"])
 
     graphql.force_login(admin)

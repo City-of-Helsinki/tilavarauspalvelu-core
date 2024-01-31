@@ -20,13 +20,14 @@ from api.graphql.types.purpose.permissions import PurposePermission
 from api.graphql.types.purpose.types import PurposeType
 from api.graphql.types.qualifier.permissions import QualifierPermission
 from api.graphql.types.qualifier.types import QualifierType
+from api.graphql.types.reservation_metadataset.types import ReservationMetadataSetType
 from api.graphql.types.reservation_unit_cancellation_rule.permissions import ReservationUnitCancellationRulePermission
 from api.graphql.types.reservation_unit_image.types import ReservationUnitCancellationRuleType
 from api.graphql.types.reservation_unit_payment_type.types import ReservationUnitPaymentTypeType
 from api.graphql.types.reservation_unit_pricing.types import ReservationUnitPricingType
 from api.graphql.types.reservation_unit_type.types import ReservationUnitTypeType
 from api.graphql.types.reservation_units.permissions import ReservationUnitHaukiUrlPermission, ReservationUnitPermission
-from api.graphql.types.reservations.types import ReservationMetadataSetType, ReservationType
+from api.graphql.types.reservations.types import ReservationType
 from api.graphql.types.resources.permissions import ResourcePermission
 from api.graphql.types.resources.types import ResourceType
 from api.graphql.types.services.permissions import ServicePermission
@@ -121,7 +122,7 @@ class ReservationUnitWithReservationsMixin:
         if include_with_same_components:
             reservations = Reservation.objects.with_same_components(self, from_, to)
         else:
-            reservations = self.reservation_set.all()
+            reservations = self.reservations.all()
 
             if from_ is not None:
                 reservations = reservations.filter(begin__gte=from_)
@@ -129,8 +130,7 @@ class ReservationUnitWithReservationsMixin:
                 reservations = reservations.filter(end__lte=to)
 
         if state is not None:
-            states = [s.lower() for s in state]
-            reservations = reservations.filter(state__in=states)
+            reservations = reservations.filter(state__in=state)
 
         return reservations.order_by("begin")
 

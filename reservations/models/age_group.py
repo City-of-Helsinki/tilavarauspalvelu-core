@@ -6,12 +6,12 @@ __all__ = [
 
 
 class AgeGroup(models.Model):
-    minimum = models.fields.PositiveIntegerField(null=False, blank=False)
-    maximum = models.fields.PositiveIntegerField(null=True, blank=True)
+    minimum: str = models.fields.PositiveIntegerField()
+    maximum: str | None = models.fields.PositiveIntegerField(null=True, blank=True)
 
     class Meta:
         db_table = "age_group"
         base_manager_name = "objects"
 
     def __str__(self) -> str:
-        return f"{self.minimum} - {self.maximum}"
+        return f"{self.minimum} - {self.maximum or ''}"

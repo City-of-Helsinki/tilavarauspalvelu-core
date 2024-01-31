@@ -19,7 +19,7 @@ from reservation_units.enums import (
     ReservationKind,
     ReservationStartInterval,
 )
-from reservations.choices import ReservationStateChoice, ReservationTypeChoice
+from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import AgeGroup, Reservation
 from tests.factories import (
     ApplicationRoundFactory,
@@ -30,6 +30,7 @@ from tests.factories import (
     ReservationUnitPricingFactory,
     TaxPercentageFactory,
 )
+from tilavarauspalvelu.utils.commons import Language
 from utils.decimal_utils import round_decimal
 
 DEFAULT_TIMEZONE = get_default_timezone()
@@ -60,7 +61,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
 
     def get_valid_input_data(self):
         return {
-            "reserveeType": "individual",
+            "reserveeType": CustomerTypeChoice.INDIVIDUAL.value,
             "reserveeFirstName": "John",
             "reserveeLastName": "Doe",
             "reserveeOrganisationName": "Test Organisation ry",
@@ -158,7 +159,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
     def test_creating_reservation_with_reservation_language_succeed(self):
         self.client.force_login(self.regular_joe)
         input_data = self.get_valid_input_data()
-        input_data["reserveeLanguage"] = "fi"
+        input_data["reserveeLanguage"] = Language.FI.value
         response = self.query(self.get_create_query(), input_data=input_data)
         content = json.loads(response.content)
 
@@ -277,7 +278,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
 
     def test_create_fails_when_overlapping_reservation(self):
         ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=datetime.datetime.now(tz=DEFAULT_TIMEZONE),
             end=datetime.datetime.now(tz=DEFAULT_TIMEZONE) + datetime.timedelta(hours=2),
             state=ReservationStateChoice.CONFIRMED,
@@ -295,7 +296,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         begin = datetime.datetime.now(tz=DEFAULT_TIMEZONE) - datetime.timedelta(hours=2)
         end = begin + datetime.timedelta(hours=1)
         ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=begin,
             end=end,
             buffer_time_after=datetime.timedelta(hours=1, minutes=1),
@@ -316,7 +317,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         begin = datetime.datetime.now(tz=DEFAULT_TIMEZONE) - datetime.timedelta(hours=2)
         end = begin + datetime.timedelta(hours=1)
         ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=begin,
             end=end,
             buffer_time_after=datetime.timedelta(hours=1, minutes=1),
@@ -334,7 +335,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         begin = datetime.datetime.now(tz=DEFAULT_TIMEZONE) + datetime.timedelta(hours=2)
         end = begin + datetime.timedelta(hours=1)
         ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=begin,
             end=end,
             buffer_time_before=datetime.timedelta(hours=1, minutes=1),
@@ -355,7 +356,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         begin = datetime.datetime.now(tz=DEFAULT_TIMEZONE) + datetime.timedelta(hours=2)
         end = begin + datetime.timedelta(hours=1)
         ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=begin,
             end=end,
             buffer_time_before=datetime.timedelta(hours=1, minutes=1),
@@ -375,7 +376,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         begin = datetime.datetime.now(tz=DEFAULT_TIMEZONE) - datetime.timedelta(hours=2)
         end = begin + datetime.timedelta(hours=1)
         ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=begin,
             end=end,
             state=ReservationStateChoice.CONFIRMED,
@@ -399,7 +400,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         end = begin + datetime.timedelta(hours=1)
 
         ReservationFactory.create_for_reservation_unit(
-            reservation_unit=self.reservation_unit,
+            reservation_units=self.reservation_unit,
             begin=begin,
             end=end,
             state=ReservationStateChoice.CONFIRMED,
@@ -722,7 +723,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         self.reservation_unit.max_reservations_per_user = 1
         self.reservation_unit.save(update_fields=["max_reservations_per_user"])
         existing_reservation = ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=datetime.datetime.now() + datetime.timedelta(hours=24),
             end=datetime.datetime.now() + datetime.timedelta(hours=25),
             state=ReservationStateChoice.CONFIRMED,
@@ -742,7 +743,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         self.reservation_unit.max_reservations_per_user = 1
         self.reservation_unit.save(update_fields=["max_reservations_per_user"])
         ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=datetime.datetime.now() - datetime.timedelta(hours=25),
             end=datetime.datetime.now() - datetime.timedelta(hours=24),
             state=ReservationStateChoice.CONFIRMED,
@@ -768,7 +769,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         )
 
         ReservationFactory(
-            reservation_unit=[other_reservation_unit],
+            reservation_units=[other_reservation_unit],
             begin=datetime.datetime.now() + datetime.timedelta(hours=24),
             end=datetime.datetime.now() + datetime.timedelta(hours=25),
             state=ReservationStateChoice.CONFIRMED,
@@ -776,7 +777,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         )
 
         ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=datetime.datetime.now() - datetime.timedelta(hours=25),
             end=datetime.datetime.now() - datetime.timedelta(hours=24),
             state=ReservationStateChoice.CONFIRMED,

@@ -21,8 +21,8 @@ def test_getting_reservation_calendar(
     assert response.status_code == 200
     zip_content = io.BytesIO(b"".join(response.streaming_content)).read().decode("utf-8")
 
-    expected_summary = "SUMMARY:" + reservation.get_ical_summary().replace("\n", "\\n")
-    expected_description = "DESCRIPTION:" + reservation.get_ical_description().replace("\n", "\\n")
+    expected_summary = "SUMMARY:" + reservation.actions.get_ical_summary().replace("\n", "\\n")
+    expected_description = "DESCRIPTION:" + reservation.actions.get_ical_description().replace("\n", "\\n")
     expected_start = f"DTSTART:{reservation.begin.astimezone(datetime.UTC).strftime('%Y%m%dT%H%M%SZ')}"
     unexpected_start = f"DTSTART:{reservation_in_second_unit.begin.astimezone(datetime.UTC).strftime('%Y%m%dT%H%M%SZ')}"
 

@@ -29,7 +29,7 @@ class RequireHandlingForReservationTestCase(ReservationTestCaseBase):
         self.reservation_unit.save()
         reservation_unit = ReservationUnitFactory()
         self.confirmed_reservation = ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=1),
             end=(datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=2)),
             state=ReservationStateChoice.CONFIRMED,
@@ -37,7 +37,7 @@ class RequireHandlingForReservationTestCase(ReservationTestCaseBase):
             reservee_email="email@reservee",
         )
         self.denied_reservation = ReservationFactory(
-            reservation_unit=[reservation_unit],
+            reservation_units=[reservation_unit],
             begin=datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=1),
             end=(datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=2)),
             state=ReservationStateChoice.DENIED,

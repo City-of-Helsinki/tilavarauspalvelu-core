@@ -42,7 +42,7 @@ class UpdateExpiredOrderTestCase(TestCase):
         order.refresh_from_db()
         assert_that(order.status).is_equal_to(OrderStatus.CANCELLED)
 
-    @mock.patch("merchants.pruning.send_confirmation_email")
+    @mock.patch("actions.reservation.ReservationActions.send_confirmation_email")
     @mock.patch("merchants.pruning.get_payment")
     def test_handle_paid_orders(self, mock_get_payment, mock_confirmation_email):
         mock_get_payment.return_value = PaymentFactory(status=WebShopPaymentStatus.PAID_ONLINE.value)

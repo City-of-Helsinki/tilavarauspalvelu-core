@@ -13,7 +13,6 @@ from merchants.models import OrderStatus, PaymentOrder
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError
 from merchants.verkkokauppa.payment.requests import get_payment
 from reservations.choices import ReservationStateChoice
-from reservations.email_utils import send_confirmation_email
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
@@ -83,7 +82,7 @@ class RefreshOrderMutation(relay.ClientIDMutation, AuthMutation):
             if payment_order.reservation.state == ReservationStateChoice.WAITING_FOR_PAYMENT:
                 payment_order.reservation.state = ReservationStateChoice.CONFIRMED
                 payment_order.reservation.save()
-                send_confirmation_email(payment_order.reservation)
+                payment_order.reservation.actions.send_confirmation_email()
 
         return RefreshOrderMutation(
             order_uuid=payment_order.remote_id,

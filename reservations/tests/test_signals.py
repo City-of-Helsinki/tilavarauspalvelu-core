@@ -13,7 +13,7 @@ class ReservationSignalTestCase(TestCase):
         cls.reservation_unit = ReservationUnitFactory(name="Test reservation unit", unit=cls.unit)
 
     def test_creating_reservation_creates_statistics(self):
-        reservation = ReservationFactory(name="Test reservation", reservation_unit=[self.reservation_unit])
+        reservation = ReservationFactory(name="Test reservation", reservation_units=[self.reservation_unit])
         statistics = ReservationStatistic.objects.first()
 
         assert_that(reservation).is_not_none()
@@ -29,8 +29,8 @@ class ReservationSignalTestCase(TestCase):
         new_unit = UnitFactory(name="Another unit")
         new_reservation_unit = ReservationUnitFactory(name="Another reservation unit", unit=new_unit)
 
-        reservation = ReservationFactory(name="Test reservation", reservation_unit=[self.reservation_unit])
-        reservation.reservation_unit.set([new_reservation_unit])
+        reservation = ReservationFactory(name="Test reservation", reservation_units=[self.reservation_unit])
+        reservation.reservation_units.set([new_reservation_unit])
         reservation.save()
 
         statistics = ReservationStatistic.objects.first()

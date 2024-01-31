@@ -97,7 +97,7 @@ class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCa
         cls.api_client = APIClient()
 
     def content_is_empty(self, content):
-        return len(content["data"]["reservationUnits"]["edges"]) == 0
+        return len(((content.get("data") or {}).get("reservationUnits") or {}).get("edges", [])) == 0
 
 
 class ReservationUnitMutationsTestCaseBase(GrapheneTestCaseBase):

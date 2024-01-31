@@ -32,7 +32,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
     def setUp(self):
         super().setUp()
         self.reservation = ReservationFactory(
-            reservation_unit=[self.reservation_unit],
+            reservation_units=[self.reservation_unit],
             begin=datetime.datetime.now(tz=get_default_timezone()),
             end=(datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=1)),
             state=ReservationStateChoice.CREATED,

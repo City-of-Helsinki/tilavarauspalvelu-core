@@ -26,7 +26,7 @@ class CreateOrderParamsToJsonTestCase(TestCase):
         )
 
         reservation = ReservationFactory(
-            reservation_unit=[reservation_unit],
+            reservation_units=[reservation_unit],
             user=user,
             price_net=Decimal("10.12"),
             price=Decimal("12.5488"),
@@ -60,9 +60,9 @@ class CreateOrderParamsToJsonTestCase(TestCase):
         )
         assert_that(json["items"]).is_length(1)
         assert_that(json["items"][0]["productId"]).is_equal_to(
-            str(reservation.reservation_unit.first().payment_product.id)
+            str(reservation.reservation_units.first().payment_product.id)
         )
-        assert_that(json["items"][0]["productName"]).is_equal_to(reservation.reservation_unit.first().name_fi)
+        assert_that(json["items"][0]["productName"]).is_equal_to(reservation.reservation_units.first().name_fi)
         assert_that(json["items"][0]["quantity"]).is_equal_to(1)
         assert_that(json["items"][0]["unit"]).is_equal_to("pcs")
         assert_that(json["items"][0]["rowPriceNet"]).is_equal_to("10.12")
@@ -74,7 +74,7 @@ class CreateOrderParamsToJsonTestCase(TestCase):
         assert_that(json["items"][0]["vatPercentage"]).is_equal_to("24")  # Note this needs to be 24, not 24.00.
         assert_that(json["items"][0]["meta"]).is_length(3)
         assert_that(json["items"][0]["meta"][0]["key"]).is_equal_to("namespaceProductId")
-        assert_that(json["items"][0]["meta"][0]["value"]).is_equal_to(str(reservation.reservation_unit.first().uuid))
+        assert_that(json["items"][0]["meta"][0]["value"]).is_equal_to(str(reservation.reservation_units.first().uuid))
         assert_that(json["items"][0]["meta"][0]["label"]).is_none()
         assert_that(json["items"][0]["meta"][0]["visibleInCheckout"]).is_false()
         assert_that(json["items"][0]["meta"][0]["ordinal"]).is_equal_to("0")
@@ -96,7 +96,7 @@ class CreateOrderParamsToJsonTestCase(TestCase):
         )
 
         reservation = ReservationFactory(
-            reservation_unit=[reservation_unit],
+            reservation_units=[reservation_unit],
             user=user,
             price_net=Decimal("10.12"),
             price=Decimal("12.5488"),

@@ -36,6 +36,15 @@ def _disable_elasticsearch(settings):
 
 
 @pytest.fixture()
+def _disable_hauki_exports(settings):
+    """
+    Disable syncing reservation unit to hauki resource for the duration of the test.
+    Use with '@pytest.mark.usefixtures' decorator.
+    """
+    settings.HAUKI_EXPORTS_ENABLED = False
+
+
+@pytest.fixture()
 def _disable_reservation_email_sending(settings):
     """
     Disable sending emails for the duration of the test.
