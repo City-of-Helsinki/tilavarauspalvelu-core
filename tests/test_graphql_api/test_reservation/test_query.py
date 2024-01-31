@@ -1,10 +1,13 @@
 import datetime
 
+import freezegun
 import pytest
+from django.test import override_settings
 
 from reservations.choices import ReservationTypeChoice
 from reservations.models import Reservation
 from tests.factories import (
+    PaymentOrderFactory,
     ReservationFactory,
     ReservationUnitFactory,
     ServiceSectorFactory,
@@ -59,14 +62,12 @@ def test_reservation__query__all_fields(graphql):
         isHandled
         name
         numPersons
-        orderStatus
-        orderUuid
+        order { orderUuid status paymentType receiptUrl checkoutUrl reservationPk refundUuid expiresInMinutes }
         price
         priceNet
         priority
         purpose { nameFi }
         recurringReservation { user }
-        refundUuid
         reservationUnits { nameFi }
         reserveeAddressCity
         reserveeAddressStreet
@@ -122,14 +123,12 @@ def test_reservation__query__all_fields(graphql):
         "isHandled": False,
         "name": reservation.name,
         "numPersons": reservation.num_persons,
-        "orderStatus": None,
-        "orderUuid": None,
+        "order": None,
         "price": float(reservation.price),
         "priceNet": "0.000000",
         "priority": f"A_{reservation.priority}",
         "purpose": None,
         "recurringReservation": None,
-        "refundUuid": None,
         "reservationUnits": [],
         "reserveeAddressCity": reservation.reservee_address_city,
         "reserveeAddressStreet": reservation.reservee_address_street,
@@ -326,3 +325,33 @@ def test_reservation__query__is_blocked(graphql):
     assert response.has_errors is False, response
     assert len(response.edges) == 1
     assert response.node(0) == {"pk": reservation.pk, "isBlocked": True}
+
+
+@freezegun.freeze_time()  # Freeze time for consistent 'expiresInMinutes' result
+@override_settings(VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES=5)
+def test_reservation__query__order__all_fields(graphql):
+    reservation = ReservationFactory.create()
+    PaymentOrderFactory.create(
+        reservation=reservation,
+        remote_id="b3fef99e-6c18-422e-943d-cf00702af53e",
+    )
+
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    query = reservations_query(
+        fields="order {orderUuid status paymentType receiptUrl checkoutUrl reservationPk refundUuid expiresInMinutes}"
+    )
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert response.node(0) == {
+        "order": {
+            "reservationPk": str(reservation.pk),
+            "checkoutUrl": None,
+            "orderUuid": "b3fef99e-6c18-422e-943d-cf00702af53e",
+            "paymentType": "INVOICE",
+            "receiptUrl": None,
+            "refundUuid": None,
+            "status": "DRAFT",
+            "expiresInMinutes": 5,
+        }
+    }

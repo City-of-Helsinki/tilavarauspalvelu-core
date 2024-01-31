@@ -15,6 +15,7 @@ from api.graphql.extensions.permission_helpers import (
     reservation_non_public_field,
     reservation_staff_field,
 )
+from api.graphql.types.merchants.types import PaymentOrderType
 from api.graphql.types.reservation_units.permissions import ReservationUnitPermission
 from api.graphql.types.reservations.permissions import (
     AbilityGroupPermission,
@@ -27,6 +28,7 @@ from api.graphql.types.users.types import UserType
 from api.legacy_rest_api.utils import hmac_signature
 from applications.models import City
 from common.typing import GQLInfo
+from merchants.models import PaymentOrder
 from reservations.choices import ReservationTypeChoice as ReservationTypeField
 from reservations.models import (
     AbilityGroup,
@@ -136,13 +138,11 @@ class ReservationType(AuthNode, OldPrimaryKeyObjectType):
     is_blocked = graphene.Boolean()
     is_handled = graphene.Boolean()
     name = graphene.String()
-    order_uuid = graphene.String()
-    order_status = graphene.String()
+    order = graphene.Field(PaymentOrderType)
     price = graphene.Float()
     price_net = graphene.Decimal()
     reservation_units = graphene.List("api.graphql.types.reservation_units.types.ReservationUnitType")
     recurring_reservation = graphene.Field(RecurringReservationType)
-    refund_uuid = graphene.String()
     reservee_first_name = graphene.String()
     reservee_last_name = graphene.String()
     reservee_address_street = graphene.String()
@@ -187,14 +187,12 @@ class ReservationType(AuthNode, OldPrimaryKeyObjectType):
             "is_handled",
             "name",
             "num_persons",
-            "order_status",
-            "order_uuid",
+            "order",
             "price",
             "price_net",
             "priority",
             "purpose",
             "recurring_reservation",
-            "refund_uuid",
             "reservation_units",
             "reservee_address_city",
             "reservee_address_street",
@@ -316,15 +314,8 @@ class ReservationType(AuthNode, OldPrimaryKeyObjectType):
         return root.num_persons
 
     @reservation_non_public_field
-    def resolve_order_uuid(root: Reservation, info: GQLInfo) -> str | None:
-        payment_order = root.payment_order.first()
-        uuid = getattr(payment_order, "remote_id", None)
-        return uuid
-
-    @reservation_non_public_field
-    def resolve_order_status(root: Reservation, info: GQLInfo) -> str | None:
-        payment_order = root.payment_order.first()
-        return payment_order.status if payment_order else None
+    def resolve_order(root: Reservation, info: GQLInfo) -> PaymentOrder | None:
+        return root.payment_order.first()
 
     @reservation_non_public_field
     def resolve_purpose(root: Reservation, info: GQLInfo) -> ReservationPurpose | None:
@@ -337,11 +328,6 @@ class ReservationType(AuthNode, OldPrimaryKeyObjectType):
     @reservation_non_public_field
     def resolve_price_net(root: Reservation, info: GQLInfo) -> Decimal | None:
         return root.price_net
-
-    @reservation_non_public_field
-    def resolve_refund_uuid(root: Reservation, info: GQLInfo) -> str | None:
-        payment_order = root.payment_order.first()
-        return getattr(payment_order, "refund_id", None)
 
     @reservation_non_public_field
     def resolve_reservee_first_name(root: Reservation, info: GQLInfo) -> str | None:
