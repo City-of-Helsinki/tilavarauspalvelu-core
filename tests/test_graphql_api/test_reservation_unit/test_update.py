@@ -310,3 +310,21 @@ def test_update_reservation_unit_with_timeslots__closed_has_reservable_times(gra
     # - The response contains no errors about closed timeslot having reservable times
     assert response.has_errors is True, response
     assert response.error_message() == "Closed timeslots cannot have reservable times."
+
+
+def test_reservation_unit__update__reservation_block_whole_day(graphql):
+    reservation_unit = ReservationUnitFactory.create(is_draft=True, reservation_block_whole_day=False)
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    data = {
+        "pk": reservation_unit.pk,
+        "reservationBlockWholeDay": True,
+        "pricings": [],
+    }
+
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response
+
+    reservation_unit.refresh_from_db()
+    assert reservation_unit.reservation_block_whole_day is True
