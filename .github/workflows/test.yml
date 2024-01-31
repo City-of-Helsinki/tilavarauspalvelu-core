@@ -18,7 +18,7 @@ jobs:
     name: "Run tests and SonarCloud scan"
     runs-on: ubuntu-latest
     env:
-      POETRY_VERSION: 1.6.1
+      POETRY_VERSION: 1.7.1
 
     services:
       postgres:
@@ -77,7 +77,7 @@ jobs:
           path: |
             /home/runner/.local/share/pypoetry
             /home/runner/.local/bin
-          key: cache-poetry-${{ env.POETRY_VERSION }}-v1
+          key: cache-poetry-${{ env.POETRY_VERSION }}-python${{ steps.setup-python.outputs.python-version }}-v1
 
       - name: "Install poetry"
         if: steps.poetry-cache.outputs.cache-hit != 'true'
@@ -109,20 +109,8 @@ jobs:
       #- name: "Test for missing translation"
       #  run: poetry run python -m tilavarauspalvelu.hooks.translations_done
 
-      - name: "Load cached postgres dump"
-        uses: actions/cache@v4
-        with:
-          path: data_dump
-          key: cache-postgres-v1
-
-      - name: "Load postgres test data dump"
-        if: ${{ hashFiles('data_dump/tvp.sql') != '' }}  # only if dump was loaded from cache
-        run: |
-          PGPASSWORD=tvp createdb -U tvp --no-password -h localhost -T template0 test_tvp
-          PGPASSWORD=tvp psql -U tvp --no-password -h localhost -d test_tvp --quiet < data_dump/tvp.sql
-
       - name: "Run pytest with coverage"
-        run: poetry run pytest --reuse-db --cov=. --cov-report=xml --cov-branch
+        run: poetry run pytest --cov=. --cov-report=xml --cov-branch
         env:
           CACHE_LOCATION: redis://localhost:6379/0
           DATABASE_URL: postgis://tvp:tvp@localhost/tvp
@@ -141,8 +129,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-      - name: "Dump postgres test data"
-        run: |
-          mkdir -p data_dump
-          PGPASSWORD=tvp pg_dump -U tvp --no-password -h localhost -d test_tvp > data_dump/tvp.sql
