@@ -36,8 +36,8 @@ class ReservationBuffers:
 
 
 class ReservationUnitAndReservationBufferParams(NamedTuple):
-    buffer_time_before: timedelta | None
-    buffer_time_after: timedelta | None
+    buffer_time_before: timedelta
+    buffer_time_after: timedelta
     first_reservable_time: datetime
     reservation_buffers: list[ReservationBuffers] = [ReservationBuffers(None, None), ReservationBuffers(None, None)]
 
@@ -60,8 +60,8 @@ class ReservationUnitAndReservationBufferParams(NamedTuple):
             # │ ░░░░████▁▁▁▁▁▁▁▁████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░ │
             # │         ══                                  │
             "ReservationUnit -0+0": ReservationUnitAndReservationBufferParams(
-                buffer_time_before=None,
-                buffer_time_after=None,
+                buffer_time_before=timedelta(),
+                buffer_time_after=timedelta(),
                 first_reservable_time=_time(hour=2, minute=0),
             ),
             # ┌─────────────────────────────────────────────┐
@@ -70,7 +70,7 @@ class ReservationUnitAndReservationBufferParams(NamedTuple):
             # │         ──══                                │
             "ReservationUnit -30+0": ReservationUnitAndReservationBufferParams(
                 buffer_time_before=timedelta(minutes=30),
-                buffer_time_after=None,
+                buffer_time_after=timedelta(),
                 first_reservable_time=_time(hour=2, minute=30),
             ),
             # ┌─────────────────────────────────────────────┐
@@ -79,7 +79,7 @@ class ReservationUnitAndReservationBufferParams(NamedTuple):
             # │                     ────────══              │
             "ReservationUnit -120+0": ReservationUnitAndReservationBufferParams(
                 buffer_time_before=timedelta(minutes=120),
-                buffer_time_after=None,
+                buffer_time_after=timedelta(),
                 first_reservable_time=_time(hour=7, minute=0),
             ),
             # ┌─────────────────────────────────────────────┐
@@ -87,7 +87,7 @@ class ReservationUnitAndReservationBufferParams(NamedTuple):
             # │ ░░░░████▁▁▁▁▁▁▁▁████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░ │
             # │         ══──                                │
             "ReservationUnit -0+30": ReservationUnitAndReservationBufferParams(
-                buffer_time_before=None,
+                buffer_time_before=timedelta(),
                 buffer_time_after=timedelta(minutes=30),
                 first_reservable_time=_time(hour=2, minute=0),
             ),
@@ -96,7 +96,7 @@ class ReservationUnitAndReservationBufferParams(NamedTuple):
             # │ ░░░░████▁▁▁▁▁▁▁▁████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░ │
             # │                     ══────────              │
             "ReservationUnit -0+120": ReservationUnitAndReservationBufferParams(
-                buffer_time_before=None,
+                buffer_time_before=timedelta(),
                 buffer_time_after=timedelta(minutes=120),
                 first_reservable_time=_time(hour=5, minute=0),
             ),
@@ -133,7 +133,7 @@ class ReservationUnitAndReservationBufferParams(NamedTuple):
             # │         ──══                                │
             "ReservationUnit -30+0 | Reservation -0+0, -30+0": ReservationUnitAndReservationBufferParams(
                 buffer_time_before=timedelta(minutes=30),
-                buffer_time_after=None,
+                buffer_time_after=timedelta(),
                 first_reservable_time=_time(hour=2, minute=30),
                 reservation_buffers=[ReservationBuffers(None, None), ReservationBuffers(30, None)],
             ),
@@ -143,7 +143,7 @@ class ReservationUnitAndReservationBufferParams(NamedTuple):
             # │                     ──══                    │
             "ReservationUnit -30+0 | Reservation -0+0, -90+0": ReservationUnitAndReservationBufferParams(
                 buffer_time_before=timedelta(minutes=30),
-                buffer_time_after=None,
+                buffer_time_after=timedelta(),
                 first_reservable_time=_time(hour=5, minute=30),
                 reservation_buffers=[ReservationBuffers(None, None), ReservationBuffers(90, None)],
             ),
@@ -153,7 +153,7 @@ class ReservationUnitAndReservationBufferParams(NamedTuple):
             # │                     ────══                  │
             "ReservationUnit -60+0 | Reservation -0+0, -60+0": ReservationUnitAndReservationBufferParams(
                 buffer_time_before=timedelta(minutes=60),
-                buffer_time_after=None,
+                buffer_time_after=timedelta(),
                 first_reservable_time=_time(hour=6, minute=0),
                 reservation_buffers=[ReservationBuffers(None, None), ReservationBuffers(60, None)],
             ),
@@ -163,7 +163,7 @@ class ReservationUnitAndReservationBufferParams(NamedTuple):
             # │         ────══                              │
             "ReservationUnit -60+0 | Reservation -0+60, -0+0": ReservationUnitAndReservationBufferParams(
                 buffer_time_before=timedelta(minutes=60),
-                buffer_time_after=None,
+                buffer_time_after=timedelta(),
                 first_reservable_time=_time(hour=3, minute=0),
                 reservation_buffers=[ReservationBuffers(None, 60), ReservationBuffers(0, None)],
             ),

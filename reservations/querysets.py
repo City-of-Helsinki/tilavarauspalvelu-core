@@ -3,8 +3,7 @@ from datetime import date, datetime, timedelta
 from typing import Annotated, Any, Self
 
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models import DurationField, F, Manager, Q, QuerySet, Sum
-from django.db.models.functions import Coalesce
+from django.db.models import F, Manager, Q, QuerySet, Sum
 from helsinki_gdpr.models import SerializableMixin
 
 from applications.models import ApplicationRound
@@ -143,8 +142,8 @@ class ReservationQuerySet(QuerySet):
     def with_buffered_begin_and_end(self: Self) -> Self:
         """Annotate the queryset with buffered begin and end times."""
         return self.annotate(
-            buffered_begin=F("begin") - Coalesce("buffer_time_before", timedelta(), output_field=DurationField()),
-            buffered_end=F("end") + Coalesce("buffer_time_after", timedelta(), output_field=DurationField()),
+            buffered_begin=F("begin") - F("buffer_time_before"),
+            buffered_end=F("end") + F("buffer_time_after"),
         )
 
     def filter_buffered_reservations_period(self: Self, start_date: date, end_date: date) -> Self:

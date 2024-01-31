@@ -1,6 +1,6 @@
 import datetime
 import zoneinfo
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from math import ceil
 from typing import TYPE_CHECKING, Optional
 
@@ -18,8 +18,8 @@ class TimeSpanElement:
     start_datetime: datetime.datetime
     end_datetime: datetime.datetime
     is_reservable: bool
-    buffer_time_after: datetime.timedelta | None = None
-    buffer_time_before: datetime.timedelta | None = None
+    buffer_time_after: datetime.timedelta = field(default_factory=datetime.timedelta)
+    buffer_time_before: datetime.timedelta = field(default_factory=datetime.timedelta)
 
     def __repr__(self) -> str:
         reservable_str = "Reservable" if self.is_reservable else "Closed"
@@ -264,14 +264,14 @@ class TimeSpanElement:
 
         # Validate duration with front buffers
         buffer_front_minutes = 0
-        if reservation_unit.buffer_time_before is not None:
+        if reservation_unit.buffer_time_before:
             buffer_front_minutes = reservation_unit.buffer_time_before.total_seconds() / 60
             if self.front_buffered_duration_minutes < (buffer_front_minutes + minimum_duration_minutes):
                 return False
 
         # Validate duration with back buffers
         buffer_back_minutes = 0
-        if reservation_unit.buffer_time_after is not None:
+        if reservation_unit.buffer_time_after:
             buffer_back_minutes = reservation_unit.buffer_time_after.total_seconds() / 60
             if self.back_buffered_duration_minutes < (minimum_duration_minutes + buffer_back_minutes):
                 return False
@@ -295,9 +295,7 @@ class TimeSpanElement:
         """
         # If a buffer was added to the reservable time span, but the reservation units buffer is
         # longer, we need to move the start time forward to account for the difference.
-        if self.buffer_time_before is not None and self.buffer_time_before < (
-            reservation_unit.buffer_time_before or datetime.timedelta()
-        ):
+        if self.buffer_time_before < reservation_unit.buffer_time_before:
             self.start_datetime += reservation_unit.buffer_time_before - self.buffer_time_before
             self.buffer_time_before = reservation_unit.buffer_time_before
 

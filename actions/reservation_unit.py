@@ -136,7 +136,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         """
         if self.reservation_unit.reservation_block_whole_day:
             return time_as_timedelta(reservation_begin)
-        return self.reservation_unit.buffer_time_before or datetime.timedelta()
+        return self.reservation_unit.buffer_time_before
 
     def get_actual_after_buffer(self, reservation_end: datetime.datetime | datetime.time) -> datetime.timedelta:
         """
@@ -150,7 +150,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
             if delta == datetime.timedelta():  # midnight
                 return delta
             return datetime.timedelta(hours=24) - delta
-        return self.reservation_unit.buffer_time_after or datetime.timedelta()
+        return self.reservation_unit.buffer_time_after
 
     def get_location(self) -> Location:
         # For now, we assume that if reservation has multiple spaces they all have same location

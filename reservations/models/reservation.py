@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -152,8 +154,16 @@ class Reservation(ExportModelOperationsMixin("reservation"), SerializableMixin, 
     begin = models.DateTimeField(verbose_name=_("Begin time"))
     end = models.DateTimeField(verbose_name=_("End time"))
 
-    buffer_time_before = models.DurationField(verbose_name=_("Buffer time before"), blank=True, null=True)
-    buffer_time_after = models.DurationField(verbose_name=_("Buffer time after"), blank=True, null=True)
+    buffer_time_before: datetime.timedelta = models.DurationField(
+        verbose_name=_("Buffer time before"),
+        default=datetime.timedelta(),
+        blank=True,
+    )
+    buffer_time_after: datetime.timedelta = models.DurationField(
+        verbose_name=_("Buffer time after"),
+        default=datetime.timedelta(),
+        blank=True,
+    )
 
     reservation_unit = models.ManyToManyField("reservation_units.ReservationUnit", verbose_name=_("Reservation unit"))
 

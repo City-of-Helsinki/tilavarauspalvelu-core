@@ -111,8 +111,8 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
         assert_that(reservation.begin).is_equal_to(self.res_begin)
         assert_that(reservation.end).is_equal_to(self.res_end)
         assert_that(reservation.reservation_unit.first()).is_equal_to(self.reservation_unit)
-        assert_that(reservation.buffer_time_after).is_none()
-        assert_that(reservation.buffer_time_before).is_none()
+        assert_that(reservation.buffer_time_after).is_equal_to(datetime.timedelta())
+        assert_that(reservation.buffer_time_before).is_equal_to(datetime.timedelta())
 
     def test_service_sector_admin_can_create(self):
         self.client.force_login(self.create_service_sector_admin(self.service_sector))
@@ -133,8 +133,8 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
         assert_that(reservation.begin).is_equal_to(self.res_begin)
         assert_that(reservation.end).is_equal_to(self.res_end)
         assert_that(reservation.reservation_unit.first()).is_equal_to(self.reservation_unit)
-        assert_that(reservation.buffer_time_after).is_none()
-        assert_that(reservation.buffer_time_before).is_none()
+        assert_that(reservation.buffer_time_after).is_equal_to(datetime.timedelta())
+        assert_that(reservation.buffer_time_before).is_equal_to(datetime.timedelta())
 
     def test_unit_admin_can_create(self):
         self.client.force_login(self.create_unit_admin(self.unit))
@@ -155,8 +155,8 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
         assert_that(reservation.begin).is_equal_to(self.res_begin)
         assert_that(reservation.end).is_equal_to(self.res_end)
         assert_that(reservation.reservation_unit.first()).is_equal_to(self.reservation_unit)
-        assert_that(reservation.buffer_time_after).is_none()
-        assert_that(reservation.buffer_time_before).is_none()
+        assert_that(reservation.buffer_time_after).is_equal_to(datetime.timedelta())
+        assert_that(reservation.buffer_time_before).is_equal_to(datetime.timedelta())
 
     def test_regular_user_cannot_create(self):
         self.client.force_login(self.regular_joe)
@@ -369,8 +369,8 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
         assert_that(reservation.begin).is_equal_to(self.res_begin)
         assert_that(reservation.end).is_equal_to(self.res_end)
         assert_that(reservation.reservation_unit.first()).is_equal_to(self.reservation_unit)
-        assert_that(reservation.buffer_time_after).is_none()
-        assert_that(reservation.buffer_time_before).is_none()
+        assert_that(reservation.buffer_time_after).is_equal_to(datetime.timedelta())
+        assert_that(reservation.buffer_time_before).is_equal_to(datetime.timedelta())
 
     def test_interval_not_respected_fails(self):
         self.client.force_login(self.general_admin)
@@ -416,5 +416,5 @@ class ReservationCreateStaffTestCase(ReservationTestCaseBase):
         assert_that(reservation.begin).is_equal_to(self.res_begin)
         assert_that(reservation.end).is_equal_to(self.res_end)
         assert_that(reservation.reservation_unit.first()).is_equal_to(self.reservation_unit)
-        assert_that(reservation.buffer_time_after).is_none()
-        assert_that(reservation.buffer_time_before).is_none()
+        assert_that(reservation.buffer_time_after).is_equal_to(datetime.timedelta())
+        assert_that(reservation.buffer_time_before).is_equal_to(datetime.timedelta())

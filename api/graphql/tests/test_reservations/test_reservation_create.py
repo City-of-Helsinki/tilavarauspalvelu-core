@@ -195,11 +195,11 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         self.reservation_unit.save(update_fields=["sku"])
         res_unit_too = ReservationUnitFactory(
             buffer_time_before=datetime.timedelta(minutes=90),
-            buffer_time_after=None,
+            buffer_time_after=datetime.timedelta(),
             sku=sku,
         )
         res_unit_another = ReservationUnitFactory(
-            buffer_time_before=None,
+            buffer_time_before=datetime.timedelta(),
             buffer_time_after=datetime.timedelta(minutes=15),
             sku=sku,
         )
