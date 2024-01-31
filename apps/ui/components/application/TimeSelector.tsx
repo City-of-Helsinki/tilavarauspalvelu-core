@@ -463,6 +463,7 @@ const TimeSelector = ({
           variant="supplementary"
           onClick={() => resetCells()}
           iconLeft={<IconCross />}
+          disabled={!cells.some((day) => day.some((cell) => cell.state > 100))}
         >
           {t("application:Page2.resetTimes")}
         </ResetButton>
