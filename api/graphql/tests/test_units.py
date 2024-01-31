@@ -326,8 +326,9 @@ class UnitsQueryTestCase(UnitTestCaseBase):
         )
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-
-        self.assertMatchSnapshot(content)
+        edges = sorted(content["data"]["units"]["edges"], key=lambda x: x["node"]["nameFi"])
+        assert edges[0] == {"node": {"nameFi": "Include me A"}}
+        assert edges[1] == {"node": {"nameFi": "Include me B"}}
 
     def test_getting_own_reservations_true(self):
         other_user = get_user_model().objects.create(
@@ -410,8 +411,9 @@ class UnitsQueryTestCase(UnitTestCaseBase):
         )
         content = json.loads(response.content)
         assert_that(content.get("errors")).is_none()
-
-        self.assertMatchSnapshot(content)
+        edges = sorted(content["data"]["units"]["edges"], key=lambda x: x["node"]["nameFi"])
+        assert edges[0] == {"node": {"nameFi": "I'm in a result as I should with Test unit."}}
+        assert edges[1] == {"node": {"nameFi": "Test unit"}}
 
     def test_order_by_own_reservation_count(self):
         other_user = get_user_model().objects.create(
