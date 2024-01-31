@@ -48,10 +48,10 @@ class ApplicationEventScheduleApproveSerializer(TranslatedModelSerializer):
             errors,
         )
         self.validate_no_events_on_the_same_day(data["allocated_day"], errors)
+        self.validate_events_per_week(errors)
 
         if not force:
             self.validate_duration(data["allocated_begin"], data["allocated_end"], errors)
-            self.validate_with_events_accepted_schedules(data["allocated_day"], errors)
             self.validate_within_wished_period(
                 data["allocated_day"],
                 data["allocated_begin"],
@@ -157,7 +157,7 @@ class ApplicationEventScheduleApproveSerializer(TranslatedModelSerializer):
             msg = "Allocation duration must be a multiple of 15 minutes."
             errors["allocated_end"].append(msg)
 
-    def validate_with_events_accepted_schedules(self, day: int, errors: dict[str, list[str]]) -> None:
+    def validate_events_per_week(self, errors: dict[str, list[str]]) -> None:
         events_schedules = self.instance.application_event.application_event_schedules.all()
         other_schedules = events_schedules.exclude(pk=self.instance.pk)
 

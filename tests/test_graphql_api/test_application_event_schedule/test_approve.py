@@ -275,7 +275,8 @@ def test_approve_schedule__can_approve_duration_not_multiple_of_15_minutes_with_
     assert response.has_errors is False, response
 
 
-def test_approve_schedule__cannot_approve_more_events_than_events_per_week(graphql):
+@pytest.mark.parametrize("force", [True, False])
+def test_approve_schedule__cannot_approve_more_events_than_events_per_week(graphql, force):
     # given:
     # - There is an allocatable application event schedule
     # - A superuser is using the system
@@ -290,7 +291,7 @@ def test_approve_schedule__cannot_approve_more_events_than_events_per_week(graph
     # when:
     # - The user tries to allocate the schedule, but there are already
     #   maximum number of schedules allocated.
-    input_data = approve_data(application, begin="12:00:00", end="14:00:00")
+    input_data = approve_data(application, begin="12:00:00", end="14:00:00", force=force)
     response = graphql(APPROVE_MUTATION, input_data=input_data)
 
     # then:
@@ -298,29 +299,6 @@ def test_approve_schedule__cannot_approve_more_events_than_events_per_week(graph
     assert response.field_error_messages() == [
         "Cannot allocate more schedules for this event. Maximum allowed is 2.",
     ]
-
-
-def test_approve_schedule__can_approve_more_events_than_events_per_week_with_force_flag(graphql):
-    # given:
-    # - There is an allocatable application event schedule
-    # - A superuser is using the system
-    application = ApplicationFactory.create_application_ready_for_allocation(pre_allocated=True)
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
-
-    ApplicationEventScheduleFactory.create(
-        day=WeekdayChoice.WEDNESDAY,
-        application_event=application.application_events.first(),
-    )
-
-    # when:
-    # - The user tries to allocate the schedule, but there are already
-    #   maximum number of schedules allocated, but uses the force flag.
-    input_data = approve_data(application, begin="12:00:00", end="14:00:00", force=True)
-    response = graphql(APPROVE_MUTATION, input_data=input_data)
-
-    # then:
-    # - The allocation is successful
-    assert response.has_errors is False, response
 
 
 def test_approve_schedule__cannot_approve_event_outside_of_wished_period(graphql):
