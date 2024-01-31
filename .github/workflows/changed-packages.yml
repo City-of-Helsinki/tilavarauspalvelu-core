@@ -26,7 +26,7 @@ jobs:
       ui_changed: ${{ steps.ui-changed.outputs.result }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 

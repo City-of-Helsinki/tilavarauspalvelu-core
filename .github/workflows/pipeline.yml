@@ -31,7 +31,7 @@ jobs:
     if: needs.changed-packages.outputs.admin_changed == 'true'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - uses: pnpm/action-setup@v2
         with:
           version: 8
@@ -55,7 +55,7 @@ jobs:
     if: needs.changed-packages.outputs.admin_changed == 'true'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: "Set up Docker Buildx"
         uses: docker/setup-buildx-action@v2
       - uses: pnpm/action-setup@v2
@@ -78,7 +78,7 @@ jobs:
     if: needs.changed-packages.outputs.admin_changed == 'true'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - uses: pnpm/action-setup@v2
         with:
           version: 8
@@ -99,7 +99,7 @@ jobs:
     if: needs.changed-packages.outputs.ui_changed == 'true'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - uses: pnpm/action-setup@v2
         with:
           version: 8
@@ -126,7 +126,7 @@ jobs:
       SKIP_ENV_VALIDATION: 'true'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - uses: pnpm/action-setup@v2
         with:
           version: 8
@@ -149,7 +149,7 @@ jobs:
       SKIP_ENV_VALIDATION: 'true'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - uses: pnpm/action-setup@v2
         with:
           version: 8
