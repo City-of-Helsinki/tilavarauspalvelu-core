@@ -19,7 +19,7 @@ from reservation_units.utils.reservation_unit_state_helper import ReservationUni
 from spaces.models import Unit
 
 
-class ReservationUnitsFilterSet(BaseModelFilterSet, ReservationUnitQueryBuilderMixin):
+class ReservationUnitFilterSet(BaseModelFilterSet, ReservationUnitQueryBuilderMixin):
     pk = IntMultipleChoiceFilter()
     unit = IntMultipleChoiceFilter()
     reservation_unit_type = IntMultipleChoiceFilter()
