@@ -127,7 +127,7 @@ class EmailTemplateAdmin(ExtraButtonsMixin, admin.ModelAdmin):
     exclude = ["html_content"]
 
     @button(label="Email Template Testing")
-    def template_tester(self, request):
+    def template_tester(self, request, extra_context=None):
         context = self.admin_site.each_context(request)
 
         if request.method == "POST":
