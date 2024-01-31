@@ -162,13 +162,15 @@ export const chunkArray = <T>(array: T[], size: number): T[][] => {
 };
 
 /// @param options.fallbackLang - use a fallback language instead of returning an empty string
-export const getTranslation = (
+/// @deprecated use getTranslationSafe instead this doesn't play well with SSR and useTranslation hook
+/// cause of the problem is the direct use of i18n?.language, it might or might not return the previous language
+export function getTranslation(
   parent: Record<string, unknown>,
   key: string,
   options?: {
     fallbackLang?: "fi" | "sv" | "en";
   }
-): string => {
+): string {
   const keyString = `${key}${capitalize(i18n?.language)}`;
   if (parent && parent[keyString]) {
     if (typeof parent[keyString] === "string") {
@@ -184,4 +186,38 @@ export const getTranslation = (
   }
 
   return "";
-};
+}
+
+/// Find a translation from a gql query result
+/// @param lang - language to use, use useTranslation hook in get the current language inside a component
+// TODO go through all the files and replace the old getTranslation with this one
+// TODO rename to getTranslation when the other one is removed
+// TODO Records are bad, use a query result type instead?
+export function getTranslationSafe(
+  parent: Record<string, unknown>,
+  key: string,
+  lang: "fi" | "sv" | "en"
+): string {
+  const keyString = `${key}${capitalize(lang)}`;
+  if (parent && parent[keyString]) {
+    if (typeof parent[keyString] === "string") {
+      return String(parent[keyString]);
+    }
+  }
+  const fallback = "fi";
+  const fallbackKeyString = `${key}${capitalize(fallback)}`;
+  if (parent && parent[fallbackKeyString]) {
+    if (typeof parent[fallbackKeyString] === "string") {
+      return String(parent[fallbackKeyString]);
+    }
+  }
+
+  return "";
+}
+
+export function convertLanguageCode(lang: string): "fi" | "sv" | "en" {
+  if (lang === "sv" || lang === "en" || lang === "fi") {
+    return lang;
+  }
+  return "fi";
+}

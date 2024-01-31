@@ -2,6 +2,7 @@ import React from "react";
 import type { GetServerSidePropsContext } from "next";
 import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next";
 import {
   type QueryTermsOfUseArgs,
   type Query,
@@ -13,7 +14,10 @@ import { TERMS_OF_USE } from "@/modules/queries/reservationUnit";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 import Sanitize from "@/components/common/Sanitize";
-import { getTranslation } from "@/modules/util";
+import {
+  convertLanguageCode,
+  getTranslationSafe,
+} from "common/src/common/util";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
@@ -60,16 +64,20 @@ const Wrapper = styled(Container).attrs({ size: "s" })`
 const Heading = styled(H2).attrs({ as: "h1" })``;
 
 const GenericTerms = ({ genericTerms }: Props): JSX.Element => {
+  const { i18n } = useTranslation();
+
   if (genericTerms == null) {
     return <div>404</div>;
   }
+
+  const lang = convertLanguageCode(i18n.language);
+  const title = getTranslationSafe(genericTerms, "name", lang);
+  const text = getTranslationSafe(genericTerms, "text", lang);
+
   return (
     <Wrapper>
-      <Heading>{getTranslation(genericTerms, "name")}</Heading>
-      <Sanitize
-        html={getTranslation(genericTerms, "text")}
-        style={{ whiteSpace: "pre-wrap" }}
-      />
+      <Heading>{title} </Heading>
+      <Sanitize html={text} style={{ whiteSpace: "pre-wrap" }} />
     </Wrapper>
   );
 };
