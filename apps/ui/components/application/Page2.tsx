@@ -38,10 +38,6 @@ type DailyOpeningHours =
     }[]
   | null;
 
-const SubHeading = styled.p`
-  margin-top: var(--spacing-2-xs);
-`;
-
 const StyledNotification = styled(Notification)`
   margin-top: var(--spacing-m);
 `;
@@ -214,21 +210,24 @@ const getApplicationEventsWhichMinDurationsIsNotFulfilled = (
 
 const Page2 = ({ application, onNext }: Props): JSX.Element => {
   const { t } = useTranslation();
-  const [selectedReservationUnit, setSelectedReservationUnit] =
-    useState<number>(0);
+  const [reservationUnitPk, setReservationUnitPk] = useState<number>(
+    application?.applicationEvents?.[0]?.eventReservationUnits?.[0]
+      ?.reservationUnit.pk ?? 0
+  );
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [minDurationMsg, setMinDurationMsg] = useState(true);
   const router = useRouter();
   const openingHours = filterNonNullable(
-    application?.applicationEvents?.[0]?.eventReservationUnits?.[
-      selectedReservationUnit
-    ]?.reservationUnit.applicationRoundTimeSlots
+    application?.applicationEvents?.[0]?.eventReservationUnits?.find(
+      (n) => n.reservationUnit.pk === reservationUnitPk
+    )?.reservationUnit.applicationRoundTimeSlots
   );
   const reservationUnitOptions = filterNonNullable(
-    application?.applicationEvents?.[0]?.eventReservationUnits?.map(
-      (n, idx) => ({ value: idx, label: n?.reservationUnit.nameFi ?? "" })
-    )
+    application?.applicationEvents?.[0]?.eventReservationUnits?.map((n) => ({
+      value: n?.reservationUnit.pk ?? 0,
+      label: n?.reservationUnit.nameFi ?? "",
+    }))
   );
 
   const { getValues, setValue, watch, handleSubmit } =
@@ -385,7 +384,6 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
             heading={event.name || undefined}
             theme="thin"
           >
-            <SubHeading>{t("application:Page2.subHeading")}</SubHeading>
             <StyledNotification
               label={t("application:Page2.info")}
               size="small"
@@ -401,8 +399,8 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
               resetCells={() => resetCells(index)}
               summaryData={[summaryDataPrimary, summaryDataSecondary]}
               reservationUnitOptions={reservationUnitOptions}
-              selectedReservationUnit={selectedReservationUnit}
-              setSelectedReservationUnit={setSelectedReservationUnit}
+              reservationUnitPk={reservationUnitPk}
+              setReservationUnitPk={setReservationUnitPk}
             />
           </Accordion>
         );

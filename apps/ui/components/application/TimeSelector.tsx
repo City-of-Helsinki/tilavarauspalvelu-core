@@ -1,21 +1,16 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
-import { IconCross, Select } from "hds-react";
+import { Button, IconCross, Select } from "hds-react";
 import type {
   ApplicationEventSchedulePriority,
   OptionType,
 } from "common/types/common";
-import { fontRegular } from "common/src/common/typography";
+import { fontBold, fontRegular } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { fromMondayFirstUnsafe } from "common/src/helpers";
 import { weekdays } from "@/modules/const";
-import {
-  arrowDown,
-  arrowUp,
-  MediumButton,
-  SupplementaryButton,
-} from "@/styles/util";
+import { arrowDown, arrowUp, MediumButton } from "@/styles/util";
 import { TimePreview } from "./TimePreview";
 import { type ApplicationEventScheduleFormType } from "./Form";
 
@@ -37,8 +32,8 @@ type Props = {
     ApplicationEventScheduleFormType[],
   ];
   reservationUnitOptions: OptionType[];
-  selectedReservationUnit: number;
-  setSelectedReservationUnit: (id: number) => void;
+  reservationUnitPk: number;
+  setReservationUnitPk: (pk: number) => void;
 };
 
 const CalendarHead = styled.div`
@@ -86,7 +81,6 @@ const TimeSelectionButton = styled.button<{
     }
     background: var(--tilavaraus-calendar-selected-secondary);
     color: var(--color-black);
-    font-weight: bold;
   `
         : `
     background: ${
@@ -144,14 +138,12 @@ const Day = ({
           case 200:
             ariaLabel = t("application:Page2.legend.selected-2");
             break;
-          /* TODO: use aria-labels for priority 100 & 50 once we have them
           case 100:
-            ariaLabel = t("application:Page2.legend.available");
+            ariaLabel = t("application:Page2.legend.within-opening-hours");
             break;
           case 50:
-            ariaLabel = t("application:Page2.legend.unavailable");
+            ariaLabel = t("application:Page2.legend.outside-opening-hours");
             break;
-          */
           default:
         }
 
@@ -202,22 +194,22 @@ const Day = ({
 
 const OptionWrapper = styled.div`
   margin-top: var(--spacing-m);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr;
   gap: var(--spacing-s);
-
-  @media (min-width: ${breakpoints.l}) {
-    flex-direction: row;
+  @media (min-width: ${breakpoints.s}) {
+    grid-template-columns: repeat(2, 1fr);
   }
 `;
 
 const StyledSelect = styled(Select<OptionType>)`
-  flex-grow: 1;
-  min-width: 300px;
-  &:last-child {
-    flex-grow: 0;
-    min-width: 300px;
+  label {
+    ${fontBold};
+  }
+  [class*="buttonLabel"] {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 `;
 
@@ -239,24 +231,28 @@ const CalendarContainer = styled.div`
 const LegendContainer = styled.div`
   display: block;
   margin-top: var(--spacing-m);
+  margin-bottom: var(--spacing-m);
 
   @media (min-width: ${breakpoints.m}) {
     & > div {
       display: flex;
-      justify-content: space-between;
     }
 
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
   }
 `;
 
-const Legend = styled.div`
+const Legend = styled.div<{ $idx: number }>`
   display: flex;
   align-items: center;
   margin-right: 3em;
   margin-bottom: var(--spacing-xs);
-
+  /* position the legend items correctly (in relation to the reset button):
+  the first two are on the first row, and even ones are in the first column */
+  ${(props) => props.$idx < 2 && "grid-row: 1;"}
+  ${(props) => props.$idx % 2 === 0 && "grid-column: 1;"}
   @media (min-width: ${breakpoints.m}) {
     margin-bottom: 0;
   }
@@ -277,7 +273,6 @@ const LegendBox = styled.div<{ type: string }>`
       top: 6px;
       border-bottom-color: var(--color-white);
     }
-
     background-color: var(--tilavaraus-calendar-selected);
   `}
   ${(props) =>
@@ -329,9 +324,10 @@ const ButtonContainer = styled.div`
   margin-bottom: var(--spacing-layout-s);
 `;
 
-const ResetButton = styled(SupplementaryButton)`
+const ResetButton = styled(Button)`
   --color-bus: var(--color-black);
-
+  grid-row: 1;
+  grid-column: 3;
   & > span {
     display: flex;
     gap: var(--spacing-2-xs);
@@ -351,8 +347,8 @@ const TimeSelector = ({
   index,
   summaryData,
   reservationUnitOptions,
-  selectedReservationUnit,
-  setSelectedReservationUnit,
+  reservationUnitPk,
+  setReservationUnitPk,
 }: Props): JSX.Element | null => {
   const { t } = useTranslation();
   const [priority, setPriority] =
@@ -364,20 +360,20 @@ const TimeSelector = ({
 
   const cellTypes = [
     {
-      type: "selected-1",
-      label: t("application:Page2.legend.selected-1"),
-    },
-    {
-      type: "selected-2",
-      label: t("application:Page2.legend.selected-2"),
-    },
-    {
       type: "within-opening-hours",
       label: t("application:Page2.legend.within-opening-hours"),
     },
     {
       type: "outside-opening-hours",
       label: t("application:Page2.legend.outside-opening-hours"),
+    },
+    {
+      type: "selected-1",
+      label: t("application:Page2.legend.selected-1"),
+    },
+    {
+      type: "selected-2",
+      label: t("application:Page2.legend.selected-2"),
     },
   ];
   const priorityOptions: OptionType[] = [300, 200].map((n) => ({
@@ -409,22 +405,26 @@ const TimeSelector = ({
     <>
       <OptionWrapper>
         <StyledSelect
-          id={`time-selector__select--reservation-unit-${index}`}
-          aria-labelledby={t("appplication:Page2.")}
-          options={reservationUnitOptions}
-          defaultValue={reservationUnitOptions[selectedReservationUnit]}
-          onChange={(val: OptionType) =>
-            setSelectedReservationUnit(val.value as number)
-          }
-        />
-        <StyledSelect
           id={`time-selector__select--priority-${index}`}
-          label=""
+          label={t("application:Page2.prioritySelectLabel")}
           options={priorityOptions}
-          value={priorityOptions.find((n) => n.value === priority)}
+          value={priorityOptions.find((n) => n.value === priority) ?? null}
           defaultValue={priorityOptions[0]}
           onChange={(val: OptionType) =>
             setPriority(val.value as ApplicationEventSchedulePriority)
+          }
+        />
+        <StyledSelect
+          id={`time-selector__select--reservation-unit-${index}`}
+          label={t("application:Page2.reservationUnitSelectLabel")}
+          options={reservationUnitOptions}
+          value={
+            reservationUnitOptions.find((n) => n.value === reservationUnitPk) ??
+            null
+          }
+          defaultValue={reservationUnitOptions[0]}
+          onChange={(val: OptionType) =>
+            setReservationUnitPk(val.value as number)
           }
         />
       </OptionWrapper>
@@ -452,14 +452,12 @@ const TimeSelector = ({
         ))}
       </CalendarContainer>
       <LegendContainer>
-        <div>
-          {cellTypes.map((cell) => (
-            <Legend key={cell.label}>
-              <LegendBox type={cell.type} />
-              <LegendLabel>{cell.label}</LegendLabel>
-            </Legend>
-          ))}
-        </div>
+        {cellTypes.map((cell, idx) => (
+          <Legend key={cell.label} $idx={idx}>
+            <LegendBox type={cell.type} />
+            <LegendLabel>{cell.label}</LegendLabel>
+          </Legend>
+        ))}
         <ResetButton
           id={`time-selector__button--reset-${index}`}
           variant="supplementary"

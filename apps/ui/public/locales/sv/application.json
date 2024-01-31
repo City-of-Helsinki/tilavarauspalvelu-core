@@ -66,12 +66,13 @@
   },
   "Page2": {
     "heading": "2. Välj bokningens tidpunkt",
-    "subHeading": "Ange alla lämpliga tider som passar dig. Kontrollera öppettiderna i lokalens beskrivning.",
     "info": "Välj både de tider som du i första hand önskar och också tider som alternativt passar för dig. Att ange flera önskemål om lokaler och tider förbättrar dina chanser att få de lokaler och tider du vill ha.",
     "text": "Ange de tidpunkter du önskar för säsongbokningen",
     "copyTimes": "Kopiera tiderna till alla önskemål",
     "resetTimes": "Töm kalendern",
     "summary": "Sammanfattning",
+    "prioritySelectLabel": "Typ av tidsönskemål",
+    "reservationUnitSelectLabel": "Säsongbokningstider",
     "priorityLabels": {
       "300": "Välj prioriterade tidsönskemål",
       "200": "Välj alternativa tidsönskemål"
