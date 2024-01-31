@@ -227,6 +227,7 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, OldPrimaryKeySe
             "require_reservation_handling",
             "authentication",
             "reservation_kind",
+            "reservation_block_whole_day",
             "can_apply_free_of_charge",
             "reservations_max_days_before",
             "reservations_min_days_before",
