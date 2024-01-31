@@ -487,7 +487,7 @@ def test_approve_schedule__cannot_approve_if_overlapping_with_another_approved_i
     # - The response complains about the there being another allocation already.
     assert response.field_error_messages() == [
         "Cannot allocate schedule for this day and time period. "
-        "Given time period has already been allocated for another event with the same reservation unit.",
+        "Given time period has already been allocated for another event with a related reservation unit.",
     ]
 
 
@@ -534,4 +534,33 @@ def test_approve_schedule__cannot_approve_if_event_doesnt_have_begin_and_end_dat
     # - The response complains about event begin and end dates
     assert response.field_error_messages() == [
         "Cannot allocate schedule for this day and time period. Event begin and end dates must be set."
+    ]
+
+
+@pytest.mark.parametrize("force", [True, False])
+def test_approve_schedule__cannot_approve_if_overlapping_in_related_reservation_unit(graphql, force):
+    # given:
+    # - There are two reservation units, one being a child of the other
+    # - There is an allocatable application event schedule for the parent unit
+    # - There is an overlapping approved schedule for the child unit
+    # - A superuser is using the system
+    parent_space = SpaceFactory.create()
+    child_space = SpaceFactory.create(parent=parent_space)
+    parent_unit = ReservationUnitFactory.create(spaces=[parent_space])
+    child_unit = ReservationUnitFactory.create(spaces=[child_space])
+
+    application = ApplicationFactory.create_application_ready_for_allocation(reservation_unit=parent_unit)
+    ApplicationFactory.create_application_ready_for_allocation(reservation_unit=child_unit, pre_allocated=True)
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    # when:
+    # - The user tries to allocate the schedule for the parent units application event.
+    input_data = approve_data(application, begin="10:00:00", end="11:00:00", force=force)
+    response = graphql(APPROVE_MUTATION, input_data=input_data)
+
+    # then:
+    # - The response complains about the there being another allocation already.
+    assert response.field_error_messages() == [
+        "Cannot allocate schedule for this day and time period. "
+        "Given time period has already been allocated for another event with a related reservation unit.",
     ]

@@ -301,10 +301,7 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
             ),
         )
 
-    def with_reservation_unit_ids_affecting_reservations(self) -> Self:
-        """Annotate queryset with reservation ids for all reservation units that affect its reservations."""
-        from reservation_units.models import ReservationUnit
-
+    def with_affecting_spaces_alias(self):
         return self.alias(
             spaces_affecting_reservations=models.Subquery(
                 queryset=(
@@ -314,21 +311,35 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
                     .values("all_families")
                 ),
             ),
+        )
+
+    def with_affecting_resources_alias(self):
+        return self.alias(
             resources_affecting_reservations=models.Subquery(
                 queryset=Resource.objects.filter(reservation_units__id=models.OuterRef("id")).values("id"),
             ),
-        ).annotate(
-            reservation_units_affecting_reservations=SubqueryArray(
-                queryset=(
-                    ReservationUnit.objects.distinct()
-                    .filter(
-                        Q(spaces__in=models.OuterRef("spaces_affecting_reservations"))
-                        | Q(resources__in=models.OuterRef("resources_affecting_reservations"))
-                    )
-                    .values("id")
+        )
+
+    def with_reservation_unit_ids_affecting_reservations(self) -> Self:
+        """Annotate queryset with reservation ids for all reservation units that affect its reservations."""
+        from reservation_units.models import ReservationUnit
+
+        return (
+            self.with_affecting_spaces_alias()
+            .with_affecting_resources_alias()
+            .annotate(
+                reservation_units_affecting_reservations=SubqueryArray(
+                    queryset=(
+                        ReservationUnit.objects.distinct()
+                        .filter(
+                            Q(spaces__in=models.OuterRef("spaces_affecting_reservations"))
+                            | Q(resources__in=models.OuterRef("resources_affecting_reservations"))
+                        )
+                        .values("id")
+                    ),
+                    agg_field="id",
                 ),
-                agg_field="id",
-            ),
+            )
         )
 
     def reservation_units_with_common_hierarchy(self) -> Self:
