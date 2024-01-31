@@ -170,7 +170,8 @@ export const getTimeSlots = (
 };
 
 export type TimeSlot = { day: number; hour: number };
-function decodeTimeSlot(slot: string): TimeSlot {
+
+export function decodeTimeSlot(slot: string): TimeSlot {
   const [day, hour, min] = slot.split("-").map(Number);
   return { day, hour: hour + min / 60 };
 }

@@ -1965,6 +1965,18 @@ const translations: ITranslations = {
         generic: ['Vuoron poistaminen varaukselta "{{name}}" epäonnistui.'],
       },
       noPermission: ["Sinulla ei ole riittäviä oikeuksia jakaa vuoroa."],
+      allocatedDurationIsIncorrect: [
+        "Jaettu vuoro ei vastaa hakijan toiveita.",
+      ],
+      requestedDurationIsIncorrect: [
+        "Valittu kesto ei vastaa hakijan toiveita.",
+      ],
+      allocatedOutsideOfRequestedTimes: [
+        "Jaettu vuoro on toiveen ulkopuolella.",
+      ],
+      selectionOutsideOfRequestedTimes: [
+        "Valittu aika on toiveiden ulkopuolella.",
+      ],
     },
   },
   validation: {

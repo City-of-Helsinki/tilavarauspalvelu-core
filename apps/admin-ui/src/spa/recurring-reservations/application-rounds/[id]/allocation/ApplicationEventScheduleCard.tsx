@@ -12,6 +12,7 @@ import type {
   MutationResetApplicationEventScheduleArgs,
 } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
+import { NotificationInline } from "common/src/components/NotificationInline";
 import { SemiBold, type ReservationUnitNode } from "common";
 import { getApplicantName } from "@/component/applications/util";
 import { formatDuration } from "@/common/util";
@@ -24,6 +25,7 @@ import {
   getApplicationEventScheduleTimeString,
   parseApiTime,
   timeSlotKeyToScheduleTime,
+  decodeTimeSlot,
 } from "./modules/applicationRoundAllocation";
 import {
   APPROVE_APPLICATION_EVENT_SCHEDULE,
@@ -102,7 +104,61 @@ const StyledAccordion = styled(Accordion)`
 
 const DetailContainer = styled.div`
   padding-top: var(--spacing-2-xs);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2-xs);
 `;
+
+// TODO refactor the selection to time slots after we refactor the core selection type
+function isOutsideOfRequestedTimes(
+  aes: ApplicationEventScheduleNode | undefined,
+  selection: string[]
+) {
+  const { begin, end, day } = aes ?? {};
+  const beginHours = parseApiTime(begin ?? "");
+  const endHours = parseApiTime(end ?? "");
+
+  // Selection doesn't allow selecting multiple days
+  const timeSlots = selection.map(decodeTimeSlot);
+  const selectedDay = timeSlots[0].day;
+  const hasRequestedTimes = beginHours != null && endHours != null;
+  if (!hasRequestedTimes) {
+    return false;
+  }
+  return (
+    selectedDay !== day ||
+    beginHours > timeSlots[0].hour ||
+    endHours < timeSlots[timeSlots.length - 1].hour + 0.5
+  );
+}
+
+function isOutsideOfAllocatedTimes(
+  aes: ApplicationEventScheduleNode | undefined
+) {
+  const { allocatedBegin, allocatedEnd, allocatedDay, day, begin, end } =
+    aes ?? {};
+  if (allocatedBegin == null || allocatedEnd == null || allocatedDay == null) {
+    return false;
+  }
+  const allocatedBeginHours = parseApiTime(allocatedBegin ?? "");
+  const allocatedEndHours = parseApiTime(allocatedEnd ?? "");
+  const beginHours = parseApiTime(begin ?? "");
+  const endHours = parseApiTime(end ?? "");
+
+  const isAllocated = allocatedBeginHours != null && allocatedEndHours != null;
+  const hasRequestedTimes = beginHours != null && endHours != null;
+  if (!isAllocated || !hasRequestedTimes) {
+    return false;
+  }
+
+  return (
+    allocatedDay !== day ||
+    allocatedBeginHours > beginHours ||
+    allocatedEndHours < endHours ||
+    allocatedBeginHours > endHours ||
+    allocatedEndHours < beginHours
+  );
+}
 
 /// Right hand side single card
 /// Contains the single applicationScheduleEvent and its actions (accept / decline etc.)
@@ -113,36 +169,19 @@ export function ApplicationEventScheduleCard({
   isAllocationEnabled,
 }: Props): JSX.Element {
   const { setRefreshApplicationEvents } = useAllocationContext();
-  const { notifyError, notifySuccess } = useNotification();
+  const { notifySuccess } = useNotification();
   const { t } = useTranslation();
+  const [error, setError] = React.useState<string | null>(null);
 
   const [acceptApplicationEvent] = useMutation<
     Mutation,
     MutationApproveApplicationEventScheduleArgs
-  >(APPROVE_APPLICATION_EVENT_SCHEDULE, {
-    onCompleted: () => {
-      notifySuccess(
-        t("Allocation.acceptingSuccess", {
-          applicationEvent: applicationEvent.name,
-        })
-      );
-    },
-  });
+  >(APPROVE_APPLICATION_EVENT_SCHEDULE);
 
   const [resetApplicationEvent] = useMutation<
     Mutation,
     MutationResetApplicationEventScheduleArgs
-  >(RESET_APPLICATION_EVENT_SCHEDULE, {
-    onCompleted: () => {
-      notifySuccess(
-        t("Allocation.resetSuccess", {
-          applicationEvent: applicationEvent.name,
-        })
-      );
-    },
-  });
-
-  const selectionDuration = formatDuration(selection.length * 30 * 60);
+  >(RESET_APPLICATION_EVENT_SCHEDULE);
 
   const aes = filterNonNullable(applicationEvent?.applicationEventSchedules);
   const matchingSchedules = aes.filter((ae) =>
@@ -158,12 +197,13 @@ export function ApplicationEventScheduleCard({
     matchingSchedules.length > 0 ? matchingSchedules[0] : undefined;
 
   const handleAcceptSlot = async () => {
+    setError(null);
     if (
       selection.length === 0 ||
       reservationUnit?.pk == null ||
       matchingApplicationEventSchedule?.pk == null
     ) {
-      notifyError(t("Allocation.errors.accepting.generic"));
+      setError(t("Allocation.errors.accepting.generic"));
       return;
     }
     const allocatedBegin = timeSlotKeyToScheduleTime(selection[0]);
@@ -186,7 +226,7 @@ export function ApplicationEventScheduleCard({
     });
     if (errors) {
       // TODO have unkown error message
-      notifyError(
+      setError(
         t("Allocation.errors.accepting.generic", {
           name: applicationEvent.name,
         })
@@ -218,13 +258,13 @@ export function ApplicationEventScheduleCard({
         e?.messages.includes(RECEIVED_CANT_ALLOCATE_ERROR_MSG)
       );
       if (isInReceivedState) {
-        notifyError(t("Allocation.errors.accepting.receivedCantAllocate"));
+        setError(t("Allocation.errors.accepting.receivedCantAllocate"));
         return;
       }
       // Using single error messages because allocated / declined => handled if it has a single schedule
       // declined should take precedence because it should have never been shown in the first place
       if (alreadyDeclined) {
-        notifyError(
+        setError(
           t("Allocation.errors.accepting.alreadyDeclined", {
             name: applicationEvent.name,
           })
@@ -232,7 +272,7 @@ export function ApplicationEventScheduleCard({
         return;
       }
       if (alreadyHandled) {
-        notifyError(
+        setError(
           t("Allocation.errors.accepting.alreadyHandled", {
             name: applicationEvent.name,
           })
@@ -240,26 +280,30 @@ export function ApplicationEventScheduleCard({
         return;
       }
       if (alreadyAllocated) {
-        notifyError(
+        setError(
           t("Allocation.errors.accepting.alreadyAllocated", {
             name: applicationEvent.name,
           })
         );
         return;
       }
-      notifyError(
+      setError(
         t("Allocation.errors.accepting.generic", {
           name: applicationEvent.name,
         })
       );
       return;
     }
+    const aen = applicationEvent.name;
+    const msg = t("Allocation.acceptingSuccess", { applicationEvent: aen });
+    notifySuccess(msg);
     setRefreshApplicationEvents(true);
   };
 
   const handleRemoveAllocation = async () => {
+    setError(null);
     if (matchingApplicationEventSchedule?.pk == null) {
-      notifyError(
+      setError(
         t("Allocation.errors.remove.generic", {
           name: applicationEvent.name,
         })
@@ -274,7 +318,7 @@ export function ApplicationEventScheduleCard({
       },
     });
     if (errors) {
-      notifyError(
+      setError(
         t("Allocation.errors.remove.generic", {
           name: applicationEvent.name,
         })
@@ -284,13 +328,16 @@ export function ApplicationEventScheduleCard({
     const res = data?.approveApplicationEventSchedule;
     const { errors: resErrors } = res || {};
     if (resErrors) {
-      notifyError(
+      setError(
         t("Allocation.errors.remove.generic", {
           name: applicationEvent.name,
         })
       );
       return;
     }
+    const aen = applicationEvent.name;
+    const msg = t("Allocation.resetSuccess", { applicationEvent: aen });
+    notifySuccess(msg);
     setRefreshApplicationEvents(true);
   };
 
@@ -328,6 +375,38 @@ export function ApplicationEventScheduleCard({
     }
   }
 
+  // TODO cleanup and reorganise
+  // Time interval checks
+  const selectionDurationMins = selection.length * 30;
+  const beginSeconds = applicationEvent.minDuration ?? 0;
+  const endSeconds = applicationEvent.maxDuration ?? 0;
+  const selectionDurationString = formatDuration(selectionDurationMins * 60);
+  const isRequestedTimeMismatch = isOutsideOfRequestedTimes(
+    matchingApplicationEventSchedule,
+    selection
+  );
+  const isAllocatedTimeMismatch = isOutsideOfAllocatedTimes(
+    matchingApplicationEventSchedule
+  );
+  const isTimeMismatch = isAllocated
+    ? isAllocatedTimeMismatch
+    : isRequestedTimeMismatch;
+
+  // Duration checks
+  const isTooShort = selectionDurationMins < beginSeconds / 60;
+  const isTooLong = selectionDurationMins > endSeconds / 60;
+  // FIXME don't call parseApiTime with invalid values (causes warnings)
+  // wrap it in a function and do null checks first
+  const allocationBegin =
+    parseApiTime(matchingApplicationEventSchedule?.allocatedBegin ?? "") ?? 0;
+  const allocationEnd =
+    parseApiTime(matchingApplicationEventSchedule?.allocatedEnd ?? "") ?? 0;
+  const allocatedDurationMins = (allocationEnd - allocationBegin) * 60;
+  const durationIsInvalid = isAllocated
+    ? allocatedDurationMins < beginSeconds / 60 ||
+      allocatedDurationMins > endSeconds / 60
+    : isTooShort || isTooLong;
+
   return (
     <Wrapper>
       <ApplicationEventName>{applicationEvent.name}</ApplicationEventName>
@@ -347,6 +426,29 @@ export function ApplicationEventScheduleCard({
           <TimeRequested applicationEvent={applicationEvent} />
         </DetailContainer>
       )}
+      <DetailContainer>
+        {/* logic: if in edit mode / not allocated -> check against selection
+         * if allocated -> check against allocated time
+         * always show error
+         */}
+        {error ? (
+          <NotificationInline type="error">{error}</NotificationInline>
+        ) : null}
+        {isTimeMismatch ? (
+          <NotificationInline type="alert">
+            {isAllocated
+              ? t("Allocation.errors.allocatedOutsideOfRequestedTimes")
+              : t("Allocation.errors.selectionOutsideOfRequestedTimes")}
+          </NotificationInline>
+        ) : null}
+        {durationIsInvalid ? (
+          <NotificationInline type="alert">
+            {isAllocated
+              ? t("Allocation.errors.allocatedDurationIsIncorrect")
+              : t("Allocation.errors.requestedDurationIsIncorrect")}
+          </NotificationInline>
+        ) : null}
+      </DetailContainer>
       <Actions>
         {isAllocated ? (
           <>
@@ -369,7 +471,7 @@ export function ApplicationEventScheduleCard({
             disabled={isDisabled || isAllocated}
             onClick={handleAcceptSlot}
           >
-            {t("Allocation.acceptSlot", { duration: selectionDuration })}
+            {t("Allocation.acceptSlot", { duration: selectionDurationString })}
           </Button>
         )}
       </Actions>
@@ -377,31 +479,39 @@ export function ApplicationEventScheduleCard({
   );
 }
 
+function getDurationFromApiTimeInHours(begin: string, end: string) {
+  const bh = parseApiTime(begin);
+  const eh = parseApiTime(end);
+  if (bh == null || eh == null) {
+    return undefined;
+  }
+  return eh - bh;
+}
+
 function AllocatedDetails({ aes }: { aes: ApplicationEventScheduleNode }) {
   const { t } = useTranslation();
 
-  const allocatedBegin = aes?.allocatedBegin ?? undefined;
-  const allocatedEnd = aes?.allocatedEnd ?? undefined;
-  const allocatedDay = aes?.allocatedDay ?? undefined;
-  const getDurationInHours = (begin: string, end: string) => {
-    const bh = parseApiTime(begin);
-    const eh = parseApiTime(end);
-    if (bh == null || eh == null) {
-      return undefined;
-    }
-    return eh - bh;
-  };
-  const allocationDuration =
-    allocatedBegin && allocatedEnd && allocatedDay
-      ? getDurationInHours(allocatedBegin, allocatedEnd)
-      : undefined;
+  const allocatedBegin = aes?.allocatedBegin ?? "";
+  const allocatedEnd = aes?.allocatedEnd ?? "";
+  const allocatedDay = aes?.allocatedDay ?? "";
 
-  const allocatedTimeString =
-    allocatedBegin && allocatedEnd && allocatedDay
-      ? `${t(`dayShort.${allocatedDay}`)} ${formatTime(
-          allocatedBegin
-        )} - ${formatTime(allocatedEnd)}`
-      : undefined;
+  const allocationDuration = getDurationFromApiTimeInHours(
+    allocatedBegin,
+    allocatedEnd
+  );
+  if (allocationDuration == null) {
+    // eslint-disable-next-line no-console
+    console.warn("Allocation duration is undefined", { aes });
+  }
+
+  const allocatedTimeString = `${t(`dayShort.${allocatedDay}`)} ${formatTime(allocatedBegin)} - ${formatTime(allocatedEnd)}`;
+
+  if (allocatedTimeString == null || allocationDuration == null) {
+    // eslint-disable-next-line no-console
+    console.warn("Allocated time string or duration is undefined", {
+      aes,
+    });
+  }
 
   const durString = t("common.hoursUnit", { count: allocationDuration });
 
@@ -421,24 +531,23 @@ function TimeRequested({
   applicationEvent: ApplicationEventNode;
 }) {
   const { t } = useTranslation();
+  const { minDuration, maxDuration, eventsPerWeek } = applicationEvent;
 
   const parsedDuration =
-    applicationEvent.minDuration === applicationEvent.maxDuration
-      ? formatDuration(applicationEvent.minDuration)
-      : `${formatDuration(applicationEvent.minDuration)} - ${formatDuration(
-          applicationEvent.maxDuration
-        )}`;
+    minDuration === maxDuration
+      ? formatDuration(minDuration)
+      : `${formatDuration(minDuration)} - ${formatDuration(maxDuration)}`;
 
   const aes = filterNonNullable(applicationEvent?.applicationEventSchedules);
   const primaryTimes = getApplicationEventScheduleTimeString(aes, 300);
   const secondaryTimes = getApplicationEventScheduleTimeString(aes, 200);
 
   return (
-    <>
+    <div>
       <DetailRow>
         <span>{t("Allocation.applicationsWeek")}:</span>
         <SemiBold>
-          {parsedDuration}, {applicationEvent.eventsPerWeek}x
+          {parsedDuration}, {eventsPerWeek}x
         </SemiBold>
       </DetailRow>
       <DetailRow>
@@ -449,6 +558,6 @@ function TimeRequested({
         <span>{t("Allocation.secondaryTimes")}:</span>
         <SemiBold>{secondaryTimes || "-"}</SemiBold>
       </DetailRow>
-    </>
+    </div>
   );
 }
