@@ -5,7 +5,6 @@ from uuid import UUID
 
 import freezegun
 import snapshottest
-from assertpy import assert_that
 from django.contrib.auth import get_user_model
 from django.test import override_settings
 from django.utils.timezone import get_default_timezone
@@ -61,32 +60,47 @@ class OrderQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
 
     def test_returns_none_when_not_authenticated(self):
         response = self.query(self.get_order_query())
-        assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        self.assertMatchSnapshot(content)
+        assert content.get("errors") is None
+        assert content.get("data") == {"order": None}
 
     def test_returns_order_when_user_owns_reservation(self):
         self.client.force_login(self.regular_joe)
 
         response = self.query(self.get_order_query())
-        assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         assert "reservationPk" in content["data"]["order"]
-        del content["data"]["order"]["reservationPk"]  # Ignore ID to allow db reuse
-        self.assertMatchSnapshot(content)
+        assert content.get("data") == {
+            "order": {
+                "reservationPk": str(self.reservation.pk),
+                "checkoutUrl": None,
+                "orderUuid": "b3fef99e-6c18-422e-943d-cf00702af53e",
+                "paymentType": "INVOICE",
+                "receiptUrl": None,
+                "refundId": None,
+                "status": "DRAFT",
+            }
+        }
 
     def test_returns_order_when_user_can_handle_reservations(self):
         self.client.force_login(self.general_admin)
 
         response = self.query(self.get_order_query())
-        assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
+        assert content.get("errors") is None
         assert "reservationPk" in content["data"]["order"]
-        del content["data"]["order"]["reservationPk"]  # Ignore ID to allow db reuse
-        self.assertMatchSnapshot(content)
+        assert content.get("data") == {
+            "order": {
+                "reservationPk": str(self.reservation.pk),
+                "checkoutUrl": None,
+                "orderUuid": "b3fef99e-6c18-422e-943d-cf00702af53e",
+                "paymentType": "INVOICE",
+                "receiptUrl": None,
+                "refundId": None,
+                "status": "DRAFT",
+            }
+        }
 
     def test_returns_refund_id_when_it_exists(self):
         self.order.refund_id = UUID("d55db3a0-0786-4259-ab9e-c4211cae162e")
@@ -95,12 +109,20 @@ class OrderQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
         self.client.force_login(self.general_admin)
 
         response = self.query(self.get_order_query())
-        assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
         assert "reservationPk" in content["data"]["order"]
-        del content["data"]["order"]["reservationPk"]  # Ignore ID to allow db reuse
-        assert_that(content.get("errors")).is_none()
-        self.assertMatchSnapshot(content)
+        assert content.get("errors") is None
+        assert content.get("data") == {
+            "order": {
+                "reservationPk": str(self.reservation.pk),
+                "checkoutUrl": None,
+                "orderUuid": "b3fef99e-6c18-422e-943d-cf00702af53e",
+                "paymentType": "INVOICE",
+                "receiptUrl": None,
+                "refundId": "d55db3a0-0786-4259-ab9e-c4211cae162e",
+                "status": "DRAFT",
+            }
+        }
 
     @override_settings(VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES=5)
     def test_checkout_url_not_visible_when_expired(self):
@@ -111,17 +133,15 @@ class OrderQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
 
         response = self.query(self.get_order_query())
 
-        assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(content.get("data").get("order").get("checkoutUrl")).is_equal_to("https://example.url/checkout")
+        assert content.get("errors") is None
+        assert content.get("data").get("order").get("checkoutUrl") == "https://example.url/checkout"
 
         with freezegun.freeze_time(NOW + timedelta(minutes=6)):
             response = self.query(self.get_order_query())
-            assert_that(response.status_code).is_equal_to(200)
             content = json.loads(response.content)
-            assert_that(content.get("errors")).is_none()
-            assert_that(content.get("data").get("order").get("checkoutUrl")).is_none()
+            assert content.get("errors") is None
+            assert content.get("data").get("order").get("checkoutUrl") is None
 
     @override_settings(VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES=5)
     def test_checkout_url_not_visible_when_not_draft(self):
@@ -133,10 +153,9 @@ class OrderQueryTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
 
         response = self.query(self.get_order_query())
 
-        assert_that(response.status_code).is_equal_to(200)
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        assert_that(content.get("data").get("order").get("checkoutUrl")).is_none()
+        assert content.get("errors") is None
+        assert content.get("data").get("order").get("checkoutUrl") is None
 
 
 class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
@@ -176,11 +195,17 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
     def test_payment_order_not_found_returns_error(self):
         self.payment_order.delete()
         response = self.query(self.get_refresh_order_query(), input_data=self.get_valid_data())
-        assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
-        self.assertMatchSnapshot(content)
+        assert content.get("errors") == [
+            {
+                "extensions": {"error_code": "NO_PERMISSION", "field": "nonFieldError"},
+                "locations": [{"column": 17, "line": 3}],
+                "message": "No permission to refresh the order",
+                "path": ["refreshOrder"],
+            }
+        ]
+        assert content.get("data") == {"refreshOrder": None}
 
     @mock.patch("api.graphql.types.merchants.mutations.capture_message")
     @mock.patch("api.graphql.types.merchants.mutations.get_payment")
@@ -189,16 +214,22 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
 
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_refresh_order_query(), input_data=self.get_valid_data())
-        assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
-        self.assertMatchSnapshot(content)
+        assert content.get("errors") == [
+            {
+                "extensions": {"error_code": "NOT_FOUND", "field": "nonFieldError"},
+                "locations": [{"column": 17, "line": 3}],
+                "message": "Unable to check order payment",
+                "path": ["refreshOrder"],
+            }
+        ]
+        assert content.get("data") == {"refreshOrder": None}
 
-        assert_that(mock_capture.called).is_true()
+        assert mock_capture.called is True
 
         order = PaymentOrder.objects.get(pk=self.payment_order.pk)
-        assert_that(order.status).is_equal_to(self.payment_order.status)
+        assert order.status == self.payment_order.status
 
     @mock.patch("api.graphql.types.merchants.mutations.get_payment")
     def test_status_created_cause_no_changes(self, mock_get_payment):
@@ -206,14 +237,18 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
 
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_refresh_order_query(), input_data=self.get_valid_data())
-        assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        self.assertMatchSnapshot(content)
+        assert content.get("errors") is None
+        assert content.get("data") == {
+            "refreshOrder": {
+                "orderUuid": "b3fef99e-6c18-422e-943d-cf00702af53e",
+                "status": "DRAFT",
+            }
+        }
 
         order = PaymentOrder.objects.get(pk=self.payment_order.pk)
-        assert_that(order.status).is_equal_to(self.payment_order.status)
+        assert order.status == self.payment_order.status
 
     @mock.patch("api.graphql.types.merchants.mutations.get_payment")
     def test_status_authorized_cause_no_changes(self, mock_get_payment):
@@ -221,14 +256,18 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
 
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_refresh_order_query(), input_data=self.get_valid_data())
-        assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        self.assertMatchSnapshot(content)
+        assert content.get("errors") is None
+        assert content.get("data") == {
+            "refreshOrder": {
+                "orderUuid": "b3fef99e-6c18-422e-943d-cf00702af53e",
+                "status": "DRAFT",
+            }
+        }
 
         order = PaymentOrder.objects.get(pk=self.payment_order.pk)
-        assert_that(order.status).is_equal_to(self.payment_order.status)
+        assert order.status == self.payment_order.status
 
     @mock.patch("api.graphql.types.merchants.mutations.get_payment")
     def test_status_payment_cancelled_cause_cancellation(self, mock_get_payment):
@@ -236,14 +275,18 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
 
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_refresh_order_query(), input_data=self.get_valid_data())
-        assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        self.assertMatchSnapshot(content)
+        assert content.get("errors") is None
+        assert content.get("data") == {
+            "refreshOrder": {
+                "orderUuid": "b3fef99e-6c18-422e-943d-cf00702af53e",
+                "status": "CANCELLED",
+            }
+        }
 
         order = PaymentOrder.objects.get(pk=self.payment_order.pk)
-        assert_that(order.status).is_equal_to(OrderStatus.CANCELLED)
+        assert order.status == OrderStatus.CANCELLED
 
     @mock.patch("api.graphql.types.merchants.mutations.send_confirmation_email")
     @mock.patch("api.graphql.types.merchants.mutations.get_payment")
@@ -252,16 +295,20 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
 
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_refresh_order_query(), input_data=self.get_valid_data())
-        assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        self.assertMatchSnapshot(content)
+        assert content.get("errors") is None
+        assert content.get("data") == {
+            "refreshOrder": {
+                "orderUuid": "b3fef99e-6c18-422e-943d-cf00702af53e",
+                "status": "PAID",
+            }
+        }
 
-        assert_that(mock_send_email.called).is_false()
+        assert mock_send_email.called is False
 
         order = PaymentOrder.objects.get(pk=self.payment_order.pk)
-        assert_that(order.status).is_equal_to(OrderStatus.PAID)
+        assert order.status == OrderStatus.PAID
 
     @mock.patch("api.graphql.types.merchants.mutations.send_confirmation_email")
     @mock.patch("api.graphql.types.merchants.mutations.get_payment")
@@ -275,16 +322,20 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
 
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_refresh_order_query(), input_data=self.get_valid_data())
-        assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        self.assertMatchSnapshot(content)
+        assert content.get("errors") is None
+        assert content.get("data") == {
+            "refreshOrder": {
+                "orderUuid": "b3fef99e-6c18-422e-943d-cf00702af53e",
+                "status": "PAID",
+            }
+        }
 
-        assert_that(mock_send_email.called).is_true()
+        assert mock_send_email.called is True
 
         order = PaymentOrder.objects.get(pk=self.payment_order.pk)
-        assert_that(order.status).is_equal_to(OrderStatus.PAID)
+        assert order.status == OrderStatus.PAID
 
     @mock.patch("api.graphql.types.merchants.mutations.capture_exception")
     @mock.patch("api.graphql.types.merchants.mutations.get_payment")
@@ -293,16 +344,22 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
 
         self.client.force_login(self.regular_joe)
         response = self.query(self.get_refresh_order_query(), input_data=self.get_valid_data())
-        assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
-        self.assertMatchSnapshot(content)
+        assert content.get("errors") == [
+            {
+                "extensions": {"error_code": "EXTERNAL_SERVICE_ERROR", "field": "nonFieldError"},
+                "locations": [{"column": 17, "line": 3}],
+                "message": "Unable to check order payment: problem with external service",
+                "path": ["refreshOrder"],
+            }
+        ]
+        assert content.get("data") == {"refreshOrder": None}
 
-        assert_that(mock_capture.called).is_true()
+        assert mock_capture.called is True
 
         order = PaymentOrder.objects.get(pk=self.payment_order.pk)
-        assert_that(order.status).is_equal_to(self.payment_order.status)
+        assert order.status == self.payment_order.status
 
     @mock.patch("api.graphql.types.merchants.mutations.get_payment")
     def test_reservation_managers_can_call(self, mock_get_payment):
@@ -310,25 +367,35 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
 
         self.client.force_login(self.general_admin)
         response = self.query(self.get_refresh_order_query(), input_data=self.get_valid_data())
-        assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_none()
-        self.assertMatchSnapshot(content)
+        assert content.get("errors") is None
+        assert content.get("data") == {
+            "refreshOrder": {
+                "orderUuid": "b3fef99e-6c18-422e-943d-cf00702af53e",
+                "status": "DRAFT",
+            }
+        }
 
         order = PaymentOrder.objects.get(pk=self.payment_order.pk)
-        assert_that(order.status).is_equal_to(self.payment_order.status)
+        assert order.status == self.payment_order.status
 
     def test_unauthenticated_call_returns_an_error(self):
         response = self.query(self.get_refresh_order_query(), input_data=self.get_valid_data())
-        assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
-        self.assertMatchSnapshot(content)
+        assert content.get("errors") == [
+            {
+                "extensions": {"error_code": "NO_PERMISSION", "field": "nonFieldError"},
+                "locations": [{"column": 17, "line": 3}],
+                "message": "No permission to refresh the order",
+                "path": ["refreshOrder"],
+            }
+        ]
+        assert content.get("data") == {"refreshOrder": None}
 
         order = PaymentOrder.objects.get(pk=self.payment_order.pk)
-        assert_that(order.status).is_equal_to(self.payment_order.status)
+        assert order.status == self.payment_order.status
 
     def test_unauthorized_call_returns_an_error(self):
         other_user = get_user_model().objects.create(
@@ -340,11 +407,17 @@ class RefreshOrderMutationTestCase(GrapheneTestCaseBase, snapshottest.TestCase):
 
         self.client.force_login(other_user)
         response = self.query(self.get_refresh_order_query(), input_data=self.get_valid_data())
-        assert_that(response.status_code).is_equal_to(200)
 
         content = json.loads(response.content)
-        assert_that(content.get("errors")).is_not_none()
-        self.assertMatchSnapshot(content)
+        assert content.get("errors") == [
+            {
+                "extensions": {"error_code": "NO_PERMISSION", "field": "nonFieldError"},
+                "locations": [{"column": 17, "line": 3}],
+                "message": "No permission to refresh the order",
+                "path": ["refreshOrder"],
+            }
+        ]
+        assert content.get("data") == {"refreshOrder": None}
 
         order = PaymentOrder.objects.get(pk=self.payment_order.pk)
-        assert_that(order.status).is_equal_to(self.payment_order.status)
+        assert order.status == self.payment_order.status
