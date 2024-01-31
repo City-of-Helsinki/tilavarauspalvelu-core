@@ -248,8 +248,4 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         """
         from reservation_units.models import ReservationUnit
 
-        space_ids: set[int] = self.reservation_unit.spaces.all().all_space_ids_though_hierarchy()
-        resource_ids: set[int] = set(self.reservation_unit.resources.all().values_list("id", flat=True))
-        return ReservationUnit.objects.filter(
-            models.Q(resources__in=resource_ids) | models.Q(spaces__in=space_ids)
-        ).distinct()
+        return ReservationUnit.objects.filter(pk=self.reservation_unit.pk).reservation_units_with_common_hierarchy()

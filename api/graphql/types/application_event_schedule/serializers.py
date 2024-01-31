@@ -107,8 +107,7 @@ class ApplicationEventScheduleApproveSerializer(TranslatedModelSerializer):
                 # see `opening_hours.utils.time_span_element.TimeSpanElement.overlaps_with`
                 application_event__begin__lt=max_day,
                 application_event__end__gt=min_day,
-                # TODO: [TILA-2904] can't be overlapping with common resource or space hierarchy.
-                allocated_reservation_unit=reservation_unit,
+                allocated_reservation_unit__in=reservation_unit.actions.reservation_units_with_common_hierarchy,
             )
             .has_overlapping_allocations(day=day, begin=begin, end=end)
         )
@@ -117,7 +116,7 @@ class ApplicationEventScheduleApproveSerializer(TranslatedModelSerializer):
             msg = (
                 "Cannot allocate schedule for this day and time period. "
                 "Given time period has already been allocated for another event "
-                "with the same reservation unit."
+                "with a related reservation unit."
             )
             errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
 
