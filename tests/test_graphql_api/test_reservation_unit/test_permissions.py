@@ -10,7 +10,6 @@ from .helpers import CREATE_MUTATION, TIMESLOTS_QUERY, UPDATE_MUTATION
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_disable_elasticsearch"),
     pytest.mark.usefixtures("_disable_hauki_export"),
 ]
 

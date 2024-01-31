@@ -12,7 +12,6 @@ from tests.test_webhooks.helpers import mock_order_refund_api
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_disable_elasticsearch"),
 ]
 
 

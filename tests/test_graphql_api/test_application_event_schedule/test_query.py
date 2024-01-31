@@ -8,7 +8,6 @@ from .helpers import events_with_schedules_query, schedules_query
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_disable_elasticsearch"),
 ]
 
 

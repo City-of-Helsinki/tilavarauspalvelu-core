@@ -7,7 +7,6 @@ from tests.test_graphql_api.test_application_round.helpers import rounds_query
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_disable_elasticsearch"),
 ]
 
 

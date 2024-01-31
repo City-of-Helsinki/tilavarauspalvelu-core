@@ -11,7 +11,6 @@ from tests.gql_builders import build_query
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_disable_elasticsearch"),
 ]
 
 
