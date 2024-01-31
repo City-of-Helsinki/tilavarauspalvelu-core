@@ -16,7 +16,6 @@ from tests.test_graphql_api.test_application_event.helpers import events_query
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_disable_elasticsearch"),
 ]
 
 

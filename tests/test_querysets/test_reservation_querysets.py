@@ -18,7 +18,6 @@ from tests.factories import (
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_disable_elasticsearch"),
 ]
 
 DEFAULT_TIMEZONE = get_current_timezone()

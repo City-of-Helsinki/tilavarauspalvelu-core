@@ -21,18 +21,23 @@ def api_client() -> APIClient:
     return APIClient()
 
 
-@pytest.fixture()
+@pytest.fixture(autouse=True)
 def _disable_elasticsearch(settings):
+    """Disable Elasticsearch for the duration of the test."""
+    settings.SEARCH_SETTINGS["settings"]["auto_sync"] = False
+
+
+@pytest.fixture()
+def _enable_elasticsearch(settings):
     """
-    Disable syncing to Elasticsearch for the duration of the test.
-    Use with '@pytest.mark.usefixtures' decorator.
+    Enable syncing to Elasticsearch for the duration of the test.
+    This should be used for all tests that require Elasticsearch.
     """
-    original = settings.SEARCH_SETTINGS["settings"]["auto_sync"]
     try:
-        settings.SEARCH_SETTINGS["settings"]["auto_sync"] = False
+        settings.SEARCH_SETTINGS["settings"]["auto_sync"] = True
         yield
     finally:
-        settings.SEARCH_SETTINGS["settings"]["auto_sync"] = original
+        settings.SEARCH_SETTINGS["settings"]["auto_sync"] = False
 
 
 @pytest.fixture()

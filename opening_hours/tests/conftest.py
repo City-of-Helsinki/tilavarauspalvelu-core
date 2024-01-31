@@ -7,6 +7,11 @@ from tests.factories import OriginHaukiResourceFactory, ReservationUnitFactory
 
 
 @pytest.fixture(autouse=True)
+def _disable_elasticsearch(settings):
+    settings.SEARCH_SETTINGS["settings"]["auto_sync"] = False
+
+
+@pytest.fixture(autouse=True)
 def _use_hauki_env_variables(settings):
     settings.HAUKI_API_URL = "url"
     settings.HAUKI_API_KEY = "secret_key"

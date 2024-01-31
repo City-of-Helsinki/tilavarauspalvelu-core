@@ -6,7 +6,6 @@ from tests.factories import ApplicationEventFactory
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_disable_elasticsearch"),
 ]
 
 
