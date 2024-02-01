@@ -5,7 +5,7 @@ from django.conf import settings
 from django.utils.timezone import get_default_timezone
 from graphene import relay
 from graphene_permissions.mixins import AuthMutation
-from sentry_sdk import capture_exception, capture_message, push_scope
+from sentry_sdk import capture_message
 
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from api.graphql.types.merchants.permissions import OrderRefreshPermission
@@ -14,6 +14,7 @@ from merchants.verkkokauppa.payment.exceptions import GetPaymentError
 from merchants.verkkokauppa.payment.requests import get_payment
 from reservations.choices import ReservationStateChoice
 from reservations.email_utils import send_confirmation_email
+from utils.sentry import log_exception_to_sentry
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
@@ -60,10 +61,7 @@ class RefreshOrderMutation(relay.ClientIDMutation, AuthMutation):
                 )
                 raise ValidationErrorWithCode("Unable to check order payment", ValidationErrorCodes.NOT_FOUND)
         except GetPaymentError as err:
-            with push_scope() as scope:
-                scope.set_extra("details", "Order payment check failed")
-                scope.set_extra("remote-id", remote_id)
-                capture_exception(err)
+            log_exception_to_sentry(err, details="Order payment check failed", remote_id=remote_id)
             raise ValidationErrorWithCode(
                 "Unable to check order payment: problem with external service",
                 ValidationErrorCodes.EXTERNAL_SERVICE_ERROR,

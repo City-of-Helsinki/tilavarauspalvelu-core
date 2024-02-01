@@ -151,10 +151,10 @@ class ReservationDeleteTestCase(ReservationTestCaseBase):
         payment_order.refresh_from_db()
         assert payment_order.status == OrderStatus.DRAFT
 
-    @mock.patch("api.graphql.types.reservations.mutations.capture_exception")
+    @mock.patch("api.graphql.types.reservations.mutations.log_exception_to_sentry")
     @mock.patch("api.graphql.types.reservations.mutations.cancel_order")
     def test_log_error_on_cancel_order_failure_but_mark_order_cancelled(
-        self, mock_cancel_order, mock_capture_exceptions
+        self, mock_cancel_order, mock_log_exception_to_sentrys
     ):
         mock_cancel_order.side_effect = CancelOrderError("mock-error")
 
@@ -177,7 +177,7 @@ class ReservationDeleteTestCase(ReservationTestCaseBase):
         assert payment_order.status == OrderStatus.CANCELLED
 
         assert mock_cancel_order.called is True
-        assert mock_capture_exceptions.called is True
+        assert mock_log_exception_to_sentrys.called is True
 
     def test_cannot_delete_when_status_not_created_nor_waiting_for_payment(self):
         self.client.force_login(self.general_admin)

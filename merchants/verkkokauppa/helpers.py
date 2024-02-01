@@ -3,7 +3,6 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.utils.timezone import get_default_timezone
-from sentry_sdk import capture_exception, push_scope
 
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from merchants.verkkokauppa.exceptions import UnsupportedMetaKey
@@ -18,6 +17,7 @@ from merchants.verkkokauppa.order.types import (
 from reservations.models import Reservation
 from tilavarauspalvelu.utils.date_util import localized_short_weekday
 from utils.decimal_utils import round_decimal
+from utils.sentry import log_exception_to_sentry
 
 
 def parse_datetime(string: str | None) -> datetime | None:
@@ -64,15 +64,12 @@ def get_meta_label(key: str, reservation: Reservation) -> str:
 
 
 def create_verkkokauppa_order(reservation: Reservation):
-    order_params = _get_order_params(reservation)
+    order_params: CreateOrderParams = _get_order_params(reservation)
 
     try:
         payment_order = create_order(order_params)
     except CreateOrderError as err:
-        with push_scope() as scope:
-            scope.set_extra("details", "Creating order in Verkkokauppa failed")
-            scope.set_extra("reservation-id", reservation.pk)
-            capture_exception(err)
+        log_exception_to_sentry(err, details="Creating order in Verkkokauppa failed", reservation_id=reservation.pk)
         raise ValidationErrorWithCode(
             "Upstream service call failed. Unable to confirm the reservation.",
             ValidationErrorCodes.UPSTREAM_CALL_FAILED,
@@ -80,7 +77,7 @@ def create_verkkokauppa_order(reservation: Reservation):
     return payment_order
 
 
-def _get_order_params(reservation: Reservation):
+def _get_order_params(reservation: Reservation) -> CreateOrderParams:
     runit = reservation.reservation_unit.first()
     quantity = 1  # Currently, we don't support quantities larger than 1
     price_net = round_decimal(Decimal(quantity * reservation.price_net), 2)

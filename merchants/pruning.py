@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.utils.timezone import get_default_timezone
-from sentry_sdk import capture_exception, push_scope
 
 from merchants.models import OrderStatus, PaymentOrder
 from merchants.verkkokauppa.order.exceptions import CancelOrderError
@@ -13,6 +12,7 @@ from merchants.verkkokauppa.payment.types import PaymentStatus as WebShopPayment
 from reservations.choices import ReservationStateChoice
 from reservations.email_utils import send_confirmation_email
 from reservations.models import Reservation
+from utils.sentry import log_exception_to_sentry
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
@@ -55,12 +55,6 @@ def update_expired_orders(older_than_minutes: int) -> None:
                 send_confirmation_email(reservation)
 
         except GetPaymentError as err:
-            with push_scope() as scope:
-                scope.set_extra("details", "Fetching order payment failed")
-                scope.set_extra("remote-id", order.remote_id)
-                capture_exception(err)
+            log_exception_to_sentry(err, details="Fetching order payment failed.", remote_id=order.remote_id)
         except CancelOrderError as err:
-            with push_scope() as scope:
-                scope.set_extra("details", "Canceling order failed")
-                scope.set_extra("remote-id", order.remote_id)
-                capture_exception(err)
+            log_exception_to_sentry(err, details="Canceling order failed.", remote_id=order.remote_id)

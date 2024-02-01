@@ -6,9 +6,9 @@ from typing import Any
 from uuid import UUID
 
 from django.conf import settings
-from sentry_sdk import capture_exception, push_scope
 
 from merchants.verkkokauppa.payment.exceptions import ParsePaymentError, ParseRefundError, ParseRefundStatusError
+from utils.sentry import log_exception_to_sentry
 
 
 class PaymentStatus(Enum):
@@ -68,8 +68,9 @@ class Payment:
                 timestamp=cls._parse_datetime(json["timestamp"]),
                 payment_method_label=json["paymentMethodLabel"],
             )
-        except (KeyError, ValueError) as e:
-            raise ParsePaymentError("Could not parse payment") from e
+        except (KeyError, ValueError) as err:
+            log_exception_to_sentry(err, details="Parsing refund failed", json=json)
+            raise ParsePaymentError(f"Could not parse payment: {err!s}") from err
 
     @classmethod
     def _parse_datetime(cls, string: str) -> datetime:
@@ -109,10 +110,7 @@ class Refund:
                 refund_reason=json.get("refundReason"),
             )
         except (KeyError, ValueError) as err:
-            with push_scope() as scope:
-                scope.set_extra("details", "Parsing refund failed")
-                scope.set_extra("json", json)
-                capture_exception(err)
+            log_exception_to_sentry(err, details="Parsing refund failed", json=json)
             raise ParseRefundError(f"Could not parse refund: {err!s}") from err
 
 
@@ -139,8 +137,5 @@ class RefundStatusResult:
                 created_at=parse_datetime(json["createdAt"]),
             )
         except (KeyError, ValueError) as err:
-            with push_scope() as scope:
-                scope.set_extra("details", "Parsing refund status failed")
-                scope.set_extra("json", json)
-                capture_exception(err)
+            log_exception_to_sentry(err, details="Parsing refund status failed", json=json)
             raise ParseRefundStatusError(f"Could not parse refund status: {err!s}") from err

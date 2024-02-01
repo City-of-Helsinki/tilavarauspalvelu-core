@@ -6,7 +6,7 @@ from django.conf import settings
 from requests import RequestException
 from requests import get as _get
 from requests import post as _post
-from sentry_sdk import capture_exception, capture_message, push_scope
+from sentry_sdk import capture_message
 
 from merchants.verkkokauppa.constants import METRIC_SERVICE_NAME, REQUEST_TIMEOUT_SECONDS
 from merchants.verkkokauppa.exceptions import VerkkokauppaConfigurationError
@@ -20,6 +20,7 @@ from merchants.verkkokauppa.payment.exceptions import (
 )
 from merchants.verkkokauppa.payment.types import Payment, Refund, RefundStatusResult
 from utils.metrics import ExternalServiceMetric
+from utils.sentry import log_exception_to_sentry
 
 
 def _get_base_url():
@@ -133,8 +134,5 @@ def refund_order(order_id: UUID, post=_post) -> Refund | None:
             )
             raise RefundPaymentError(f"Refund response refund count expected to be 1 but was {refund_count}")
     except (RequestException, JSONDecodeError, ParseRefundError) as err:
-        with push_scope() as scope:
-            scope.set_extra("details", "Payment refund failed")
-            scope.set_extra("order-id", order_id)
-            capture_exception(err)
+        log_exception_to_sentry(err, details="Payment refund failed", order_id=order_id)
         raise RefundPaymentError(f"Payment refund failed: {err!s}") from err

@@ -123,7 +123,7 @@ class RefundPaymentRequestsTestCase(TestCase):
         assert refund == expected
 
     @mock.patch("merchants.verkkokauppa.payment.requests.capture_message")
-    def test_refund_order_raises_exception_on_non_200_status_code(self, mock_capture):
+    def test_refund_order_raises_exception_on_non_200_status_code(self, mock_log_exception_to_sentry):
         order_id = UUID(self.refund_response["refunds"][0]["orderId"])
         post = mock_post({}, status_code=500)
 
@@ -131,10 +131,10 @@ class RefundPaymentRequestsTestCase(TestCase):
             refund_order(order_id, post)
 
         assert str(ex.value) == "Payment refund failed: problem with upstream service"
-        assert mock_capture.called is True
+        assert mock_log_exception_to_sentry.called is True
 
     @mock.patch("merchants.verkkokauppa.payment.requests.capture_message")
-    def test_refund_order_raises_exception_on_multi_refund_response(self, mock_capture):
+    def test_refund_order_raises_exception_on_multi_refund_response(self, mock_log_exception_to_sentry):
         order_id = UUID(self.refund_response["refunds"][0]["orderId"])
 
         response = deepcopy(self.refund_response)
@@ -146,10 +146,10 @@ class RefundPaymentRequestsTestCase(TestCase):
             refund_order(order_id, post)
 
         assert str(ex.value) == "Refund response refund count expected to be 1 but was 2"
-        assert mock_capture.called is True
+        assert mock_log_exception_to_sentry.called is True
 
-    @mock.patch("merchants.verkkokauppa.payment.requests.capture_exception")
-    def test_refund_order_raises_exception_on_invalid_response(self, mock_capture):
+    @mock.patch("merchants.verkkokauppa.payment.requests.log_exception_to_sentry")
+    def test_refund_order_raises_exception_on_invalid_response(self, mock_log_exception_to_sentry):
         order_id = UUID(self.refund_response["refunds"][0]["orderId"])
 
         response = deepcopy(self.refund_response)
@@ -162,7 +162,7 @@ class RefundPaymentRequestsTestCase(TestCase):
 
         assert str(ex.value) == "Payment refund failed: Could not parse refund: badly formed hexadecimal UUID string"
 
-        assert mock_capture.called is True
+        assert mock_log_exception_to_sentry.called is True
 
 
 class GetRefundStatusRequestsTestCase(TestCase):

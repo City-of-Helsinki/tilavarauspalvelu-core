@@ -5,9 +5,9 @@ from typing import Any, Literal
 from uuid import UUID
 
 from django.conf import settings
-from sentry_sdk import capture_exception, push_scope
 
 from merchants.verkkokauppa.order.exceptions import ParseOrderError
+from utils.sentry import log_exception_to_sentry
 
 
 @dataclass(frozen=True)
@@ -166,10 +166,7 @@ class Order:
                 type=json["type"],
             )
         except (KeyError, ValueError) as err:
-            with push_scope() as scope:
-                scope.set_extra("details", "Parsing order failed")
-                scope.set_extra("json", json)
-                capture_exception(err)
+            log_exception_to_sentry(err, details="Parsing order failed", json=json)
             raise ParseOrderError(f"Could not parse order: {err!s}") from err
 
 
