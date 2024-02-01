@@ -22,22 +22,11 @@ def api_client() -> APIClient:
 
 
 @pytest.fixture(autouse=True)
-def _disable_elasticsearch(settings):
-    """Disable Elasticsearch for the duration of the test."""
-    settings.SEARCH_SETTINGS["settings"]["auto_sync"] = False
+def _toggle_elasticsearch(request, settings):
+    """Enable or disable syncing to Elasticsearch for the duration of the test."""
+    use_elasticsearch = "elasticsearch" in request.keywords
 
-
-@pytest.fixture()
-def _enable_elasticsearch(settings):
-    """
-    Enable syncing to Elasticsearch for the duration of the test.
-    This should be used for all tests that require Elasticsearch.
-    """
-    try:
-        settings.SEARCH_SETTINGS["settings"]["auto_sync"] = True
-        yield
-    finally:
-        settings.SEARCH_SETTINGS["settings"]["auto_sync"] = False
+    settings.SEARCH_SETTINGS["settings"]["auto_sync"] = use_elasticsearch
 
 
 @pytest.fixture()
@@ -62,3 +51,25 @@ def outbox(settings) -> list[EmailMessage]:
 @pytest.fixture()
 def _disable_hauki_export(settings):
     settings.HAUKI_EXPORTS_ENABLED = None
+
+
+def pytest_addoption(parser):
+    parser.addoption("--skip-elastic", action="store_true", default=False, help="Skip tests that need Elasticsearch.")
+    parser.addoption("--skip-slow", action="store_true", default=False, help="Skip slow running tests.")
+
+
+def pytest_collection_modifyitems(config, items):
+    skip_slow = config.getoption("--skip-slow")
+    skip_elastic = config.getoption("--skip-elastic")
+
+    for item in items:
+        if skip_slow and "slow" in item.keywords:
+            item.add_marker(pytest.mark.skip(reason="Skipped due to --skip-slow option"))
+
+        if "elasticsearch" in item.keywords:
+            # Enable Elasticsearch for this test
+            item.add_marker(pytest.mark.xdist_group(name="elasticsearch"))
+
+            # Skip this test if --noelastic option was given
+            if skip_elastic:
+                item.add_marker(pytest.mark.skip(reason="Skipped due to --skip-elastic"))
