@@ -1,5 +1,5 @@
 import React from "react";
-import { gql, useQuery as useApolloQuery } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
@@ -92,6 +92,7 @@ const ReservationUnit = styled.div`
   }
 `;
 
+// TODO change to non-list query. requires backend to add relay to applicationRounds query
 const APPLICATION_ROUND_QUERY = gql`
   query ApplicationRoundCriteria($pk: [Int]!) {
     applicationRounds(pk: $pk) {
@@ -104,25 +105,15 @@ const APPLICATION_ROUND_QUERY = gql`
           applicationPeriodEnd
           reservationPeriodBegin
           reservationPeriodEnd
-        }
-      }
-    }
-  }
-`;
-
-// TODO combine with APPLICATION_RESERVATION_UNITS_QUERY
-const RESERVATION_UNIT_QUERY = gql`
-  query ReservationUnit($applicationRound: [Int]!) {
-    reservationUnits(applicationRound: $applicationRound) {
-      edges {
-        node {
-          pk
-          nameFi
-          spaces {
+          reservationUnits {
+            pk
             nameFi
-          }
-          unit {
-            nameFi
+            spaces {
+              nameFi
+            }
+            unit {
+              nameFi
+            }
           }
         }
       }
@@ -131,37 +122,30 @@ const RESERVATION_UNIT_QUERY = gql`
 `;
 
 function Criteria({
-  applicationRoundId,
+  applicationRoundPk,
 }: {
-  applicationRoundId: number;
+  applicationRoundPk: number;
 }): JSX.Element {
   const { t } = useTranslation();
   const { notifyError } = useNotification();
 
-  const { data: applicationRoundData, loading: isLoadingApplicationRound } =
-    useApolloQuery<Query>(APPLICATION_ROUND_QUERY, {
-      variables: { pk: [applicationRoundId] },
+  const { data: applicationRoundData, loading: isLoading } = useQuery<Query>(
+    APPLICATION_ROUND_QUERY,
+    {
+      variables: { pk: [applicationRoundPk] },
       onError: () => {
         notifyError(t("errors.errorFetchingData"));
       },
-    });
+    }
+  );
   const applicationRounds = filterNonNullable(
     applicationRoundData?.applicationRounds?.edges?.map((edge) => edge?.node)
   );
   const applicationRound = applicationRounds[0];
-
-  const { data: resUnitData, loading: isLoadingReservationUnits } =
-    useApolloQuery<Query>(RESERVATION_UNIT_QUERY, {
-      variables: { applicationRound: [applicationRoundId] },
-      onError: () => {
-        notifyError(t("errors.errorFetchingData"));
-      },
-    });
   const reservationUnits = filterNonNullable(
-    resUnitData?.reservationUnits?.edges?.map((edge) => edge?.node)
+    applicationRound?.reservationUnits
   );
 
-  const isLoading = isLoadingApplicationRound || isLoadingReservationUnits;
   if (isLoading) {
     return <Loader />;
   }
@@ -264,7 +248,7 @@ function CriteriaRouted(): JSX.Element {
   if (!applicationRoundId || Number.isNaN(applicationRoundPk)) {
     return <div>{t("errors.router.invalidApplicationRoundNumber")}</div>;
   }
-  return <Criteria applicationRoundId={applicationRoundPk} />;
+  return <Criteria applicationRoundPk={applicationRoundPk} />;
 }
 
 export default CriteriaRouted;

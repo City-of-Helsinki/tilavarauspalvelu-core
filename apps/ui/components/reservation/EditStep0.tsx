@@ -11,7 +11,7 @@ import type { PendingReservation } from "common/types/common";
 import {
   ApplicationRoundNode,
   ReservationType,
-  ReservationUnitByPkType,
+  ReservationUnitType,
 } from "common/types/gql-types";
 import {
   addHours,
@@ -42,7 +42,7 @@ import { eventStyleGetter } from "@/components/common/calendarUtils";
 
 type Props = {
   reservation: ReservationType;
-  reservationUnit: ReservationUnitByPkType;
+  reservationUnit: ReservationUnitType;
   userReservations: ReservationType[];
   initialReservation: PendingReservation | null;
   setInitialReservation: React.Dispatch<

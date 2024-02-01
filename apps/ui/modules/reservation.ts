@@ -6,7 +6,7 @@ import {
   ReserveeType,
   State,
   ReservationType,
-  ReservationUnitByPkType,
+  ReservationUnitType,
   ReservationStartInterval,
 } from "common/types/gql-types";
 import {
@@ -206,7 +206,7 @@ export const isReservationReservable = ({
   end,
   skipLengthCheck = false,
 }: {
-  reservationUnit: ReservationUnitByPkType;
+  reservationUnit: ReservationUnitType;
   activeApplicationRounds: RoundPeriod[];
   start: Date;
   end: Date;
@@ -301,7 +301,7 @@ export const isReservationFreeOfCharge = (
 export type CanReservationBeChangedProps = {
   reservation?: ReservationType;
   newReservation?: ReservationType | PendingReservation;
-  reservationUnit?: ReservationUnitByPkType;
+  reservationUnit?: ReservationUnitType;
   activeApplicationRounds?: RoundPeriod[];
 };
 

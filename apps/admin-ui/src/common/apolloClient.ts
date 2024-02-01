@@ -43,13 +43,13 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
     graphQLErrors.forEach(async (error: GraphQLError) => {
       // eslint-disable-next-line no-console
-      console.error(`GQL_ERROR: ${error.message}`);
+      console.error(`GQL_ERROR: ${JSON.stringify(error, null, 2)}`);
     });
   }
 
   if (networkError) {
     // eslint-disable-next-line no-console
-    console.error(`NETWORK_ERROR: ${networkError.message}`);
+    console.error(`NETWORK_ERROR: ${JSON.stringify(networkError, null, 2)}`);
   }
 });
 

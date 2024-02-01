@@ -9,8 +9,8 @@ import {
 } from "../../fragments";
 
 export const RESERVATIONS_BY_RESERVATIONUNIT = gql`
-  query reservationUnitByPk($pk: Int, $from: Date, $to: Date) {
-    reservationUnitByPk(pk: $pk) {
+  query reservationUnit($id: ID!, $from: Date, $to: Date) {
+    reservationUnit(id: $id) {
       reservations(
         from: $from
         to: $to
@@ -70,6 +70,7 @@ const SPECIALISED_SINGLE_RESERVATION_FRAGMENT = gql`
   }
 `;
 
+// TODO replace with relay query
 export const SINGLE_RESERVATION_QUERY = gql`
   ${RESERVATION_META_FRAGMENT}
   ${RESERVATION_UNIT_FRAGMENT}

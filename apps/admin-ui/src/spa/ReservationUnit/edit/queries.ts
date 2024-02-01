@@ -1,10 +1,11 @@
 import { gql } from "@apollo/client";
-import { IMAGE_FRAGMENT } from "common/src/queries/fragments";
+import { PRICING_FRAGMENT, IMAGE_FRAGMENT } from "common/src/queries/fragments";
 
 export const RESERVATIONUNIT_QUERY = gql`
   ${IMAGE_FRAGMENT}
-  query reservationUnit($pk: Int) {
-    reservationUnitByPk(pk: $pk) {
+  ${PRICING_FRAGMENT}
+  query reservationUnit($id: ID!) {
+    reservationUnit(id: $id) {
       pk
       state
       reservationState
@@ -30,10 +31,6 @@ export const RESERVATIONUNIT_QUERY = gql`
         nameFi
       }
       resources {
-        pk
-        nameFi
-      }
-      services {
         pk
         nameFi
       }
@@ -76,13 +73,6 @@ export const RESERVATIONUNIT_QUERY = gql`
         imageType
         imageUrl
       }
-      location {
-        addressStreetFi
-        addressZip
-        addressCityFi
-        longitude
-        latitude
-      }
       equipment {
         pk
         nameFi
@@ -123,18 +113,12 @@ export const RESERVATIONUNIT_QUERY = gql`
         pk
       }
       pricings {
-        begins
-        pricingType
-        priceUnit
-        lowestPrice
+        ...PricingFields
         lowestPriceNet
-        highestPrice
         highestPriceNet
         taxPercentage {
           pk
-          value
         }
-        status
         pk
       }
       applicationRoundTimeSlots {
@@ -232,7 +216,6 @@ export const RESERVATION_UNIT_EDITOR_PARAMETERS = gql`
         }
       }
     }
-
     taxPercentages {
       edges {
         node {

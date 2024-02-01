@@ -8,7 +8,6 @@ import {
 import {
   ReservationStartInterval,
   Authentication,
-  type ReservationUnitByPkType,
   PricingType,
   ReservationKind,
   Status,
@@ -18,6 +17,7 @@ import {
   type ReservationUnitCreateMutationInput,
   ImageType,
   type ReservationUnitImageType,
+  type ReservationUnitType,
 } from "common/types/gql-types";
 import { addDays, format } from "date-fns";
 import { z } from "zod";
@@ -727,7 +727,7 @@ const convertTime = (t?: string) => {
 // Always return all 7 days
 // Always return at least one reservableTime
 function convertSeasonalList(
-  data: NonNullable<ReservationUnitByPkType["applicationRoundTimeSlots"]>
+  data: NonNullable<ReservationUnitType["applicationRoundTimeSlots"]>
 ): ReservationUnitEditFormValues["seasons"] {
   const days = [0, 1, 2, 3, 4, 5, 6];
   return days.map((d) => {
@@ -747,7 +747,7 @@ function convertSeasonalList(
 }
 
 export const convertReservationUnit = (
-  data?: ReservationUnitByPkType
+  data?: ReservationUnitType
 ): ReservationUnitEditFormValues => {
   return {
     reservationBlockWholeDay:

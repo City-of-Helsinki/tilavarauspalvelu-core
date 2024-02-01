@@ -1,6 +1,14 @@
 import { gql } from "@apollo/client";
+import { UNIT_NAME_FRAGMENT } from "app/common/fragments";
+import {
+  RESERVEE_NAME_FRAGMENT,
+  RESERVEE_BILLING_FRAGMENT,
+  PRICING_FRAGMENT,
+} from "common/src/queries/fragments";
 
 export const RESERVATION_META_FRAGMENT = gql`
+  ${RESERVEE_NAME_FRAGMENT}
+  ${RESERVEE_BILLING_FRAGMENT}
   fragment ReservationMetaFields on ReservationType {
     ageGroup {
       minimum
@@ -16,49 +24,26 @@ export const RESERVATION_META_FRAGMENT = gql`
       pk
     }
     numPersons
-    reserveeType
-    reserveeIsUnregisteredAssociation
     name
     description
-    reserveeFirstName
-    reserveeLastName
-    reserveePhone
-    reserveeOrganisationName
-    reserveeEmail
-    reserveeId
-    reserveeIsUnregisteredAssociation
-    reserveeAddressStreet
-    reserveeAddressCity
-    reserveeAddressZip
-    billingFirstName
-    billingLastName
-    billingPhone
-    billingEmail
-    billingAddressStreet
-    billingAddressCity
-    billingAddressZip
+    ...ReserveeNameFields
+    ...ReserveeBillingFields
     freeOfChargeReason
     applyingForFreeOfCharge
   }
 `;
 
 export const RESERVATION_UNIT_PRICING_FRAGMENT = gql`
+  ${PRICING_FRAGMENT}
   fragment ReservationUnitPricing on ReservationUnitType {
     pricings {
-      begins
-      pricingType
-      priceUnit
-      lowestPrice
-      highestPrice
-      taxPercentage {
-        value
-      }
-      status
+      ...PricingFields
     }
   }
 `;
 
 export const RESERVATION_UNIT_FRAGMENT = gql`
+  ${UNIT_NAME_FRAGMENT}
   fragment ReservationUnit on ReservationUnitType {
     pk
     nameFi
@@ -68,11 +53,7 @@ export const RESERVATION_UNIT_FRAGMENT = gql`
     reservationStartInterval
     authentication
     unit {
-      pk
-      nameFi
-      serviceSectors {
-        pk
-      }
+      ...UnitNameFields
     }
     metadataSet {
       name
@@ -135,10 +116,12 @@ export const RESERVATION_COMMON_FRAGMENT = gql`
   }
 `;
 
-// NOTE can't reuse the fragment on a different types without an interface
-// and our schema is borked: having both ReservationUnitType and ReservationUnitByPkType
-// so use only the plural reservationUnits version of the query with this.
+// TODO ReservationCommon has extra fields: [order, createdAt]
+// TODO do we still need the user here?
+// TODO what is the reservation name vs. reserveeName?
+// TODO why do we need the pk of the unit and serviceSector
 export const RESERVATIONUNIT_RESERVATIONS_FRAGMENT = gql`
+  ${RESERVATION_COMMON_FRAGMENT}
   fragment ReservationUnitReservations on ReservationUnitType {
     reservations(
       from: $from
@@ -151,19 +134,10 @@ export const RESERVATIONUNIT_RESERVATIONS_FRAGMENT = gql`
         "WAITING_FOR_PAYMENT"
       ]
     ) {
-      pk
+      ...ReservationCommon
       name
-      type
-      begin
-      end
-      state
       numPersons
       calendarUrl
-      bufferTimeBefore
-      bufferTimeAfter
-      workingMemo
-      reserveeName
-      isBlocked
       reservationUnits {
         pk
         nameFi

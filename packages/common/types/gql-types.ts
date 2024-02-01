@@ -1613,7 +1613,7 @@ export type PersonSerializerInput = {
 
 /** An enumeration. */
 export enum PriceUnit {
-  /** kiinteä */
+  /** per kerta */
   Fixed = "FIXED",
   /** per 15 minuuttia */
   Per_15Mins = "PER_15_MINS",
@@ -1774,12 +1774,12 @@ export type Query = {
   purposes?: Maybe<PurposeTypeConnection>;
   qualifiers?: Maybe<QualifierTypeConnection>;
   recurringReservations?: Maybe<RecurringReservationTypeConnection>;
+  reservation?: Maybe<ReservationType>;
   reservationByPk?: Maybe<ReservationType>;
   reservationCancelReasons?: Maybe<ReservationCancelReasonTypeConnection>;
   reservationDenyReasons?: Maybe<ReservationDenyReasonTypeConnection>;
   reservationPurposes?: Maybe<ReservationPurposeTypeConnection>;
   reservationUnit?: Maybe<ReservationUnitType>;
-  reservationUnitByPk?: Maybe<ReservationUnitByPkType>;
   reservationUnitCancellationRules?: Maybe<ReservationUnitCancellationRuleTypeConnection>;
   reservationUnitHaukiUrl?: Maybe<ReservationUnitHaukiUrlType>;
   reservationUnitTypes?: Maybe<ReservationUnitTypeTypeConnection>;
@@ -2053,6 +2053,10 @@ export type QueryRecurringReservationsArgs = {
   user?: InputMaybe<Scalars["ID"]["input"]>;
 };
 
+export type QueryReservationArgs = {
+  id: Scalars["ID"]["input"];
+};
+
 export type QueryReservationByPkArgs = {
   pk?: InputMaybe<Scalars["Int"]["input"]>;
 };
@@ -2088,10 +2092,6 @@ export type QueryReservationPurposesArgs = {
 
 export type QueryReservationUnitArgs = {
   id: Scalars["ID"]["input"];
-};
-
-export type QueryReservationUnitByPkArgs = {
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type QueryReservationUnitCancellationRulesArgs = {
@@ -2351,7 +2351,7 @@ export type RecurringReservationType = Node & {
   name: Scalars["String"]["output"];
   pk?: Maybe<Scalars["Int"]["output"]>;
   recurrenceInDays?: Maybe<Scalars["Int"]["output"]>;
-  reservationUnit?: Maybe<ReservationUnitByPkType>;
+  reservationUnit?: Maybe<ReservationUnitType>;
   user?: Maybe<Scalars["String"]["output"]>;
   weekdays?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
 };
@@ -3215,122 +3215,6 @@ export type ReservationTypeEdge = {
   node?: Maybe<ReservationType>;
 };
 
-export type ReservationUnitByPkType = Node & {
-  __typename?: "ReservationUnitByPkType";
-  /** Is it possible to reserve this reservation unit when opening hours are not defined. */
-  allowReservationsWithoutOpeningHours: Scalars["Boolean"]["output"];
-  applicationRoundTimeSlots?: Maybe<Array<ApplicationRoundTimeSlotNode>>;
-  applicationRounds?: Maybe<Array<Maybe<ApplicationRoundNode>>>;
-  /** Tunnistautumisen taso joka vaaditaan tämän varausyksikön varaamiseen. */
-  authentication: Authentication;
-  bufferTimeAfter?: Maybe<Scalars["Duration"]["output"]>;
-  bufferTimeBefore?: Maybe<Scalars["Duration"]["output"]>;
-  /** Voivatko tämän varausyksikön varaukset olla alennuskelpoisia. */
-  canApplyFreeOfCharge: Scalars["Boolean"]["output"];
-  cancellationRule?: Maybe<ReservationUnitCancellationRuleType>;
-  cancellationTerms?: Maybe<TermsOfUseType>;
-  contactInformation: Scalars["String"]["output"];
-  descriptionEn?: Maybe<Scalars["String"]["output"]>;
-  descriptionFi?: Maybe<Scalars["String"]["output"]>;
-  descriptionSv?: Maybe<Scalars["String"]["output"]>;
-  equipment?: Maybe<Array<Maybe<EquipmentType>>>;
-  firstReservableDatetime?: Maybe<Scalars["DateTime"]["output"]>;
-  haukiUrl?: Maybe<ReservationUnitHaukiUrlType>;
-  /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  images?: Maybe<Array<ReservationUnitImageType>>;
-  /** Is reservation unit archived. */
-  isArchived: Scalars["Boolean"]["output"];
-  isClosed?: Maybe<Scalars["Boolean"]["output"]>;
-  isDraft: Scalars["Boolean"]["output"];
-  keywordGroups?: Maybe<Array<Maybe<KeywordGroupType>>>;
-  location?: Maybe<LocationType>;
-  maxPersons?: Maybe<Scalars["Int"]["output"]>;
-  maxReservationDuration?: Maybe<Scalars["Duration"]["output"]>;
-  maxReservationsPerUser?: Maybe<Scalars["Int"]["output"]>;
-  metadataSet?: Maybe<ReservationMetadataSetType>;
-  minPersons?: Maybe<Scalars["Int"]["output"]>;
-  minReservationDuration?: Maybe<Scalars["Duration"]["output"]>;
-  nameEn?: Maybe<Scalars["String"]["output"]>;
-  nameFi?: Maybe<Scalars["String"]["output"]>;
-  nameSv?: Maybe<Scalars["String"]["output"]>;
-  paymentMerchant?: Maybe<PaymentMerchantType>;
-  paymentProduct?: Maybe<PaymentProductType>;
-  paymentTerms?: Maybe<TermsOfUseType>;
-  paymentTypes?: Maybe<Array<Maybe<ReservationUnitPaymentTypeType>>>;
-  pk?: Maybe<Scalars["Int"]["output"]>;
-  pricingTerms?: Maybe<TermsOfUseType>;
-  pricings?: Maybe<Array<Maybe<ReservationUnitPricingType>>>;
-  /** Aika, jonka jälkeen tämä varausyksikkö tulee julkisesti näkyville käyttöliittymässä. */
-  publishBegins?: Maybe<Scalars["DateTime"]["output"]>;
-  /** Aika, jonka jälkeen tämä varausyksikkö ei enää ole julkisesti näkyvillä käyttöliittymässä. */
-  publishEnds?: Maybe<Scalars["DateTime"]["output"]>;
-  purposes?: Maybe<Array<Maybe<PurposeType>>>;
-  qualifiers?: Maybe<Array<Maybe<QualifierType>>>;
-  /** Järjestysnumero, jota käytetään rajapinnan järjestämisessä. */
-  rank?: Maybe<Scalars["Int"]["output"]>;
-  requireIntroduction: Scalars["Boolean"]["output"];
-  /** Vaativatko tämän varausyksikön varaukset käsittelyn ennen kuin ne voidaan vahvistaa. */
-  requireReservationHandling: Scalars["Boolean"]["output"];
-  reservableTimeSpans?: Maybe<Array<Maybe<ReservableTimeSpanType>>>;
-  /** Aika, jolloin varauksien tekeminen tulee mahdolliseksi tälle varausyksikölle. */
-  reservationBegins?: Maybe<Scalars["DateTime"]["output"]>;
-  reservationBlockWholeDay: Scalars["Boolean"]["output"];
-  reservationCancelledInstructionsEn?: Maybe<Scalars["String"]["output"]>;
-  reservationCancelledInstructionsFi?: Maybe<Scalars["String"]["output"]>;
-  reservationCancelledInstructionsSv?: Maybe<Scalars["String"]["output"]>;
-  reservationConfirmedInstructionsEn?: Maybe<Scalars["String"]["output"]>;
-  reservationConfirmedInstructionsFi?: Maybe<Scalars["String"]["output"]>;
-  reservationConfirmedInstructionsSv?: Maybe<Scalars["String"]["output"]>;
-  /** Aika, jolloin varauksien tekeminen ei ole enää mahdollista tälle varausyksikölle */
-  reservationEnds?: Maybe<Scalars["DateTime"]["output"]>;
-  /** What kind of reservations are to be booked with this reservation unit. */
-  reservationKind: ReservationKind;
-  reservationPendingInstructionsEn?: Maybe<Scalars["String"]["output"]>;
-  reservationPendingInstructionsFi?: Maybe<Scalars["String"]["output"]>;
-  reservationPendingInstructionsSv?: Maybe<Scalars["String"]["output"]>;
-  /**
-   * Determines the interval for the start time of the reservation. For example an
-   * interval of 15 minutes means a reservation can begin at minutes 15, 30, 60, or
-   * 90. Possible values are interval_15_mins, interval_30_mins, interval_60_mins,
-   * interval_90_mins, interval_120_mins, interval_180_mins, interval_240_mins,
-   * interval_300_mins, interval_360_mins, interval_420_mins.
-   */
-  reservationStartInterval: ReservationStartInterval;
-  reservationState?: Maybe<ReservationState>;
-  reservationUnitType?: Maybe<ReservationUnitTypeType>;
-  reservations?: Maybe<Array<Maybe<ReservationType>>>;
-  reservationsMaxDaysBefore?: Maybe<Scalars["Int"]["output"]>;
-  reservationsMinDaysBefore?: Maybe<Scalars["Int"]["output"]>;
-  resources?: Maybe<Array<Maybe<ResourceType>>>;
-  serviceSpecificTerms?: Maybe<TermsOfUseType>;
-  services?: Maybe<Array<Maybe<ServiceType>>>;
-  spaces?: Maybe<Array<Maybe<SpaceType>>>;
-  state?: Maybe<ReservationUnitState>;
-  surfaceArea?: Maybe<Scalars["Int"]["output"]>;
-  termsOfUseEn?: Maybe<Scalars["String"]["output"]>;
-  termsOfUseFi?: Maybe<Scalars["String"]["output"]>;
-  termsOfUseSv?: Maybe<Scalars["String"]["output"]>;
-  unit?: Maybe<UnitType>;
-  uuid: Scalars["UUID"]["output"];
-};
-
-export type ReservationUnitByPkTypeApplicationRoundsArgs = {
-  active?: InputMaybe<Scalars["Boolean"]["input"]>;
-};
-
-export type ReservationUnitByPkTypeReservableTimeSpansArgs = {
-  endDate: Scalars["Date"]["input"];
-  startDate: Scalars["Date"]["input"];
-};
-
-export type ReservationUnitByPkTypeReservationsArgs = {
-  from?: InputMaybe<Scalars["Date"]["input"]>;
-  includeWithSameComponents?: InputMaybe<Scalars["Boolean"]["input"]>;
-  state?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
-  to?: InputMaybe<Scalars["Date"]["input"]>;
-};
-
 export type ReservationUnitCancellationRuleType = Node & {
   __typename?: "ReservationUnitCancellationRuleType";
   /** Seconds before reservations related to this cancellation rule can be cancelled without handling. */
@@ -3374,7 +3258,6 @@ export type ReservationUnitCreateMutationInput = {
   authentication?: InputMaybe<Scalars["String"]["input"]>;
   bufferTimeAfter?: InputMaybe<Scalars["Int"]["input"]>;
   bufferTimeBefore?: InputMaybe<Scalars["Int"]["input"]>;
-  /** Voivatko tämän varausyksikön varaukset olla alennuskelpoisia. */
   canApplyFreeOfCharge?: InputMaybe<Scalars["Boolean"]["input"]>;
   cancellationRulePk?: InputMaybe<Scalars["Int"]["input"]>;
   cancellationTermsPk?: InputMaybe<Scalars["String"]["input"]>;
@@ -3404,17 +3287,13 @@ export type ReservationUnitCreateMutationInput = {
   pricings?: InputMaybe<
     Array<InputMaybe<ReservationUnitPricingCreateSerializerInput>>
   >;
-  /** Aika, jonka jälkeen tämä varausyksikkö tulee julkisesti näkyville käyttöliittymässä. */
   publishBegins?: InputMaybe<Scalars["DateTime"]["input"]>;
-  /** Aika, jonka jälkeen tämä varausyksikkö ei enää ole julkisesti näkyvillä käyttöliittymässä. */
   publishEnds?: InputMaybe<Scalars["DateTime"]["input"]>;
   purposePks?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   qualifierPks?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   /** Determines if introduction is required in order to reserve this reservation unit. */
   requireIntroduction?: InputMaybe<Scalars["Boolean"]["input"]>;
-  /** Vaativatko tämän varausyksikön varaukset käsittelyn ennen kuin ne voidaan vahvistaa. */
   requireReservationHandling?: InputMaybe<Scalars["Boolean"]["input"]>;
-  /** Aika, jolloin varauksien tekeminen tulee mahdolliseksi tälle varausyksikölle. */
   reservationBegins?: InputMaybe<Scalars["DateTime"]["input"]>;
   reservationBlockWholeDay?: InputMaybe<Scalars["Boolean"]["input"]>;
   reservationCancelledInstructionsEn?: InputMaybe<Scalars["String"]["input"]>;
@@ -3423,7 +3302,6 @@ export type ReservationUnitCreateMutationInput = {
   reservationConfirmedInstructionsEn?: InputMaybe<Scalars["String"]["input"]>;
   reservationConfirmedInstructionsFi?: InputMaybe<Scalars["String"]["input"]>;
   reservationConfirmedInstructionsSv?: InputMaybe<Scalars["String"]["input"]>;
-  /** Aika, jolloin varauksien tekeminen ei ole enää mahdollista tälle varausyksikölle */
   reservationEnds?: InputMaybe<Scalars["DateTime"]["input"]>;
   /**
    * What kind of reservations are to be made to this is reservation unit. Possible
@@ -3466,7 +3344,6 @@ export type ReservationUnitCreateMutationPayload = {
   bufferTimeAfter?: Maybe<Scalars["Int"]["output"]>;
   bufferTimeBefore?: Maybe<Scalars["Int"]["output"]>;
   building?: Maybe<Scalars["String"]["output"]>;
-  /** Voivatko tämän varausyksikön varaukset olla alennuskelpoisia. */
   canApplyFreeOfCharge?: Maybe<Scalars["Boolean"]["output"]>;
   cancellationRulePk?: Maybe<Scalars["Int"]["output"]>;
   clientMutationId?: Maybe<Scalars["String"]["output"]>;
@@ -3496,17 +3373,13 @@ export type ReservationUnitCreateMutationPayload = {
   pk?: Maybe<Scalars["Int"]["output"]>;
   pricingTerms?: Maybe<Scalars["String"]["output"]>;
   pricings?: Maybe<Array<Maybe<ReservationUnitPricingType>>>;
-  /** Aika, jonka jälkeen tämä varausyksikkö tulee julkisesti näkyville käyttöliittymässä. */
   publishBegins?: Maybe<Scalars["DateTime"]["output"]>;
-  /** Aika, jonka jälkeen tämä varausyksikkö ei enää ole julkisesti näkyvillä käyttöliittymässä. */
   publishEnds?: Maybe<Scalars["DateTime"]["output"]>;
   purposes?: Maybe<Array<Maybe<PurposeType>>>;
   qualifierPks?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
   /** Determines if introduction is required in order to reserve this reservation unit. */
   requireIntroduction?: Maybe<Scalars["Boolean"]["output"]>;
-  /** Vaativatko tämän varausyksikön varaukset käsittelyn ennen kuin ne voidaan vahvistaa. */
   requireReservationHandling?: Maybe<Scalars["Boolean"]["output"]>;
-  /** Aika, jolloin varauksien tekeminen tulee mahdolliseksi tälle varausyksikölle. */
   reservationBegins?: Maybe<Scalars["DateTime"]["output"]>;
   reservationBlockWholeDay?: Maybe<Scalars["Boolean"]["output"]>;
   reservationCancelledInstructionsEn?: Maybe<Scalars["String"]["output"]>;
@@ -3515,7 +3388,6 @@ export type ReservationUnitCreateMutationPayload = {
   reservationConfirmedInstructionsEn?: Maybe<Scalars["String"]["output"]>;
   reservationConfirmedInstructionsFi?: Maybe<Scalars["String"]["output"]>;
   reservationConfirmedInstructionsSv?: Maybe<Scalars["String"]["output"]>;
-  /** Aika, jolloin varauksien tekeminen ei ole enää mahdollista tälle varausyksikölle */
   reservationEnds?: Maybe<Scalars["DateTime"]["output"]>;
   /**
    * What kind of reservations are to be made to this is reservation unit. Possible
@@ -3637,7 +3509,7 @@ export type ReservationUnitOptionNode = Node & {
   pk?: Maybe<Scalars["Int"]["output"]>;
   preferredOrder: Scalars["Int"]["output"];
   rejected: Scalars["Boolean"]["output"];
-  reservationUnit?: Maybe<ReservationUnitByPkType>;
+  reservationUnit?: Maybe<ReservationUnitType>;
 };
 
 export type ReservationUnitOptionNodeAllocatedTimeSlotsArgs = {
@@ -3751,15 +3623,12 @@ export enum ReservationUnitState {
 
 export type ReservationUnitType = Node & {
   __typename?: "ReservationUnitType";
-  /** Is it possible to reserve this reservation unit when opening hours are not defined. */
   allowReservationsWithoutOpeningHours: Scalars["Boolean"]["output"];
   applicationRoundTimeSlots?: Maybe<Array<ApplicationRoundTimeSlotNode>>;
   applicationRounds?: Maybe<Array<Maybe<ApplicationRoundNode>>>;
-  /** Tunnistautumisen taso joka vaaditaan tämän varausyksikön varaamiseen. */
   authentication: Authentication;
   bufferTimeAfter?: Maybe<Scalars["Duration"]["output"]>;
   bufferTimeBefore?: Maybe<Scalars["Duration"]["output"]>;
-  /** Voivatko tämän varausyksikön varaukset olla alennuskelpoisia. */
   canApplyFreeOfCharge: Scalars["Boolean"]["output"];
   cancellationRule?: Maybe<ReservationUnitCancellationRuleType>;
   cancellationTerms?: Maybe<TermsOfUseType>;
@@ -3769,10 +3638,10 @@ export type ReservationUnitType = Node & {
   descriptionSv?: Maybe<Scalars["String"]["output"]>;
   equipment?: Maybe<Array<Maybe<EquipmentType>>>;
   firstReservableDatetime?: Maybe<Scalars["DateTime"]["output"]>;
+  haukiUrl?: Maybe<ReservationUnitHaukiUrlType>;
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   images?: Maybe<Array<ReservationUnitImageType>>;
-  /** Is reservation unit archived. */
   isArchived: Scalars["Boolean"]["output"];
   isClosed?: Maybe<Scalars["Boolean"]["output"]>;
   isDraft: Scalars["Boolean"]["output"];
@@ -3794,18 +3663,14 @@ export type ReservationUnitType = Node & {
   pk?: Maybe<Scalars["Int"]["output"]>;
   pricingTerms?: Maybe<TermsOfUseType>;
   pricings?: Maybe<Array<Maybe<ReservationUnitPricingType>>>;
-  /** Aika, jonka jälkeen tämä varausyksikkö tulee julkisesti näkyville käyttöliittymässä. */
   publishBegins?: Maybe<Scalars["DateTime"]["output"]>;
-  /** Aika, jonka jälkeen tämä varausyksikkö ei enää ole julkisesti näkyvillä käyttöliittymässä. */
   publishEnds?: Maybe<Scalars["DateTime"]["output"]>;
   purposes?: Maybe<Array<Maybe<PurposeType>>>;
   qualifiers?: Maybe<Array<Maybe<QualifierType>>>;
-  /** Järjestysnumero, jota käytetään rajapinnan järjestämisessä. */
   rank?: Maybe<Scalars["Int"]["output"]>;
   requireIntroduction: Scalars["Boolean"]["output"];
-  /** Vaativatko tämän varausyksikön varaukset käsittelyn ennen kuin ne voidaan vahvistaa. */
   requireReservationHandling: Scalars["Boolean"]["output"];
-  /** Aika, jolloin varauksien tekeminen tulee mahdolliseksi tälle varausyksikölle. */
+  reservableTimeSpans?: Maybe<Array<Maybe<ReservableTimeSpanType>>>;
   reservationBegins?: Maybe<Scalars["DateTime"]["output"]>;
   reservationBlockWholeDay: Scalars["Boolean"]["output"];
   reservationCancelledInstructionsEn?: Maybe<Scalars["String"]["output"]>;
@@ -3814,20 +3679,11 @@ export type ReservationUnitType = Node & {
   reservationConfirmedInstructionsEn?: Maybe<Scalars["String"]["output"]>;
   reservationConfirmedInstructionsFi?: Maybe<Scalars["String"]["output"]>;
   reservationConfirmedInstructionsSv?: Maybe<Scalars["String"]["output"]>;
-  /** Aika, jolloin varauksien tekeminen ei ole enää mahdollista tälle varausyksikölle */
   reservationEnds?: Maybe<Scalars["DateTime"]["output"]>;
-  /** What kind of reservations are to be booked with this reservation unit. */
   reservationKind: ReservationKind;
   reservationPendingInstructionsEn?: Maybe<Scalars["String"]["output"]>;
   reservationPendingInstructionsFi?: Maybe<Scalars["String"]["output"]>;
   reservationPendingInstructionsSv?: Maybe<Scalars["String"]["output"]>;
-  /**
-   * Determines the interval for the start time of the reservation. For example an
-   * interval of 15 minutes means a reservation can begin at minutes 15, 30, 60, or
-   * 90. Possible values are interval_15_mins, interval_30_mins, interval_60_mins,
-   * interval_90_mins, interval_120_mins, interval_180_mins, interval_240_mins,
-   * interval_300_mins, interval_360_mins, interval_420_mins.
-   */
   reservationStartInterval: ReservationStartInterval;
   reservationState?: Maybe<ReservationState>;
   reservationUnitType?: Maybe<ReservationUnitTypeType>;
@@ -3849,6 +3705,11 @@ export type ReservationUnitType = Node & {
 
 export type ReservationUnitTypeApplicationRoundsArgs = {
   active?: InputMaybe<Scalars["Boolean"]["input"]>;
+};
+
+export type ReservationUnitTypeReservableTimeSpansArgs = {
+  endDate: Scalars["Date"]["input"];
+  startDate: Scalars["Date"]["input"];
 };
 
 export type ReservationUnitTypeReservationsArgs = {
@@ -3918,7 +3779,6 @@ export type ReservationUnitUpdateMutationInput = {
   authentication?: InputMaybe<Scalars["String"]["input"]>;
   bufferTimeAfter?: InputMaybe<Scalars["Int"]["input"]>;
   bufferTimeBefore?: InputMaybe<Scalars["Int"]["input"]>;
-  /** Voivatko tämän varausyksikön varaukset olla alennuskelpoisia. */
   canApplyFreeOfCharge?: InputMaybe<Scalars["Boolean"]["input"]>;
   cancellationRulePk?: InputMaybe<Scalars["Int"]["input"]>;
   cancellationTermsPk?: InputMaybe<Scalars["String"]["input"]>;
@@ -3947,17 +3807,13 @@ export type ReservationUnitUpdateMutationInput = {
   pricingTerms?: InputMaybe<Scalars["String"]["input"]>;
   pricingTermsPk?: InputMaybe<Scalars["String"]["input"]>;
   pricings: Array<InputMaybe<ReservationUnitPricingUpdateSerializerInput>>;
-  /** Aika, jonka jälkeen tämä varausyksikkö tulee julkisesti näkyville käyttöliittymässä. */
   publishBegins?: InputMaybe<Scalars["DateTime"]["input"]>;
-  /** Aika, jonka jälkeen tämä varausyksikkö ei enää ole julkisesti näkyvillä käyttöliittymässä. */
   publishEnds?: InputMaybe<Scalars["DateTime"]["input"]>;
   purposePks?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   qualifierPks?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   /** Determines if introduction is required in order to reserve this reservation unit. */
   requireIntroduction?: InputMaybe<Scalars["Boolean"]["input"]>;
-  /** Vaativatko tämän varausyksikön varaukset käsittelyn ennen kuin ne voidaan vahvistaa. */
   requireReservationHandling?: InputMaybe<Scalars["Boolean"]["input"]>;
-  /** Aika, jolloin varauksien tekeminen tulee mahdolliseksi tälle varausyksikölle. */
   reservationBegins?: InputMaybe<Scalars["DateTime"]["input"]>;
   reservationBlockWholeDay?: InputMaybe<Scalars["Boolean"]["input"]>;
   reservationCancelledInstructionsEn?: InputMaybe<Scalars["String"]["input"]>;
@@ -3966,7 +3822,6 @@ export type ReservationUnitUpdateMutationInput = {
   reservationConfirmedInstructionsEn?: InputMaybe<Scalars["String"]["input"]>;
   reservationConfirmedInstructionsFi?: InputMaybe<Scalars["String"]["input"]>;
   reservationConfirmedInstructionsSv?: InputMaybe<Scalars["String"]["input"]>;
-  /** Aika, jolloin varauksien tekeminen ei ole enää mahdollista tälle varausyksikölle */
   reservationEnds?: InputMaybe<Scalars["DateTime"]["input"]>;
   /**
    * What kind of reservations are to be made to this is reservation unit. Possible
@@ -4009,7 +3864,6 @@ export type ReservationUnitUpdateMutationPayload = {
   bufferTimeAfter?: Maybe<Scalars["Int"]["output"]>;
   bufferTimeBefore?: Maybe<Scalars["Int"]["output"]>;
   building?: Maybe<Scalars["String"]["output"]>;
-  /** Voivatko tämän varausyksikön varaukset olla alennuskelpoisia. */
   canApplyFreeOfCharge?: Maybe<Scalars["Boolean"]["output"]>;
   cancellationRulePk?: Maybe<Scalars["Int"]["output"]>;
   clientMutationId?: Maybe<Scalars["String"]["output"]>;
@@ -4038,17 +3892,13 @@ export type ReservationUnitUpdateMutationPayload = {
   paymentTypes?: Maybe<Array<Maybe<Scalars["String"]["output"]>>>;
   pk?: Maybe<Scalars["Int"]["output"]>;
   pricingTerms?: Maybe<Scalars["String"]["output"]>;
-  /** Aika, jonka jälkeen tämä varausyksikkö tulee julkisesti näkyville käyttöliittymässä. */
   publishBegins?: Maybe<Scalars["DateTime"]["output"]>;
-  /** Aika, jonka jälkeen tämä varausyksikkö ei enää ole julkisesti näkyvillä käyttöliittymässä. */
   publishEnds?: Maybe<Scalars["DateTime"]["output"]>;
   purposes?: Maybe<Array<Maybe<PurposeType>>>;
   qualifierPks?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
   /** Determines if introduction is required in order to reserve this reservation unit. */
   requireIntroduction?: Maybe<Scalars["Boolean"]["output"]>;
-  /** Vaativatko tämän varausyksikön varaukset käsittelyn ennen kuin ne voidaan vahvistaa. */
   requireReservationHandling?: Maybe<Scalars["Boolean"]["output"]>;
-  /** Aika, jolloin varauksien tekeminen tulee mahdolliseksi tälle varausyksikölle. */
   reservationBegins?: Maybe<Scalars["DateTime"]["output"]>;
   reservationBlockWholeDay?: Maybe<Scalars["Boolean"]["output"]>;
   reservationCancelledInstructionsEn?: Maybe<Scalars["String"]["output"]>;
@@ -4057,7 +3907,6 @@ export type ReservationUnitUpdateMutationPayload = {
   reservationConfirmedInstructionsEn?: Maybe<Scalars["String"]["output"]>;
   reservationConfirmedInstructionsFi?: Maybe<Scalars["String"]["output"]>;
   reservationConfirmedInstructionsSv?: Maybe<Scalars["String"]["output"]>;
-  /** Aika, jolloin varauksien tekeminen ei ole enää mahdollista tälle varausyksikölle */
   reservationEnds?: Maybe<Scalars["DateTime"]["output"]>;
   /**
    * What kind of reservations are to be made to this is reservation unit. Possible

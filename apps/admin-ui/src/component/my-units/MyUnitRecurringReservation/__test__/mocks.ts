@@ -207,7 +207,7 @@ export const mocks = [
     },
     result: {
       data: {
-        reservationUnitByPk: {
+        reservationUnit: {
           reservations: reservationsByUnitResponse,
         },
       },

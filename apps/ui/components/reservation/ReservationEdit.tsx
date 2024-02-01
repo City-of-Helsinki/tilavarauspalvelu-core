@@ -12,13 +12,14 @@ import {
   type MutationAdjustReservationTimeArgs,
   type Query,
   type QueryReservationsArgs,
-  type QueryReservationUnitByPkArgs,
   State,
-  type ReservationType,
-  type ReservationUnitByPkType,
-  type ReservationUnitByPkTypeReservableTimeSpansArgs,
-  type ReservationUnitByPkTypeReservationsArgs,
   Type,
+  type ReservationType,
+  type ReservationUnitType,
+  type ReservationUnitTypeReservableTimeSpansArgs,
+  type ReservationUnitTypeReservationsArgs,
+  type QueryReservationUnitArgs,
+  type QueryReservationArgs,
 } from "common/types/gql-types";
 import { pick } from "lodash";
 import { useRouter } from "next/router";
@@ -31,7 +32,7 @@ import { PendingReservation } from "common/types/common";
 import { toApiDate } from "common/src/common/util";
 import { Subheading } from "common/src/reservation-form/styles";
 import { Container } from "common";
-import { filterNonNullable } from "common/src/helpers";
+import { base64encode, filterNonNullable } from "common/src/helpers";
 import { useCurrentUser } from "@/hooks/user";
 import {
   ADJUST_RESERVATION_TIME,
@@ -43,7 +44,7 @@ import Sanitize from "../common/Sanitize";
 import ReservationInfoCard from "./ReservationInfoCard";
 import {
   OPENING_HOURS,
-  RESERVATION_UNIT,
+  RESERVATION_UNIT_QUERY,
 } from "@/modules/queries/reservationUnit";
 import EditStep0 from "./EditStep0";
 import EditStep1 from "./EditStep1";
@@ -148,7 +149,7 @@ const BylineContent = ({
   initialReservation,
 }: {
   reservation: ReservationType;
-  reservationUnit: ReservationUnitByPkType;
+  reservationUnit: ReservationUnitType;
   step: number;
   initialReservation: PendingReservation | null;
 }) => {
@@ -167,12 +168,12 @@ const BylineContent = ({
   );
 };
 
-const ReservationEdit = ({ id, apiBaseUrl }: Props): JSX.Element => {
+const ReservationEdit = ({ id: resPk, apiBaseUrl }: Props): JSX.Element => {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
   const [reservationUnit, setReservationUnit] =
-    useState<ReservationUnitByPkType | null>(null);
+    useState<ReservationUnitType | null>(null);
   const [activeApplicationRounds, setActiveApplicationRounds] = useState<
     ApplicationRoundNode[]
   >([]);
@@ -189,41 +190,55 @@ const ReservationEdit = ({ id, apiBaseUrl }: Props): JSX.Element => {
   const now = useMemo(() => new Date(), []);
   const { currentUser } = useCurrentUser();
 
-  const { data } = useQuery<Query>(GET_RESERVATION, {
+  const resTypename = "ReservationType";
+  const resId = resPk ? base64encode(`${resTypename}:${resPk}`) : undefined;
+  // TODO why are we doing two separate queries? the linked reservationUnit should be part of the reservation query
+  const { data } = useQuery<Query, QueryReservationArgs>(GET_RESERVATION, {
     fetchPolicy: "no-cache",
+    skip: resId == null,
     variables: {
-      pk: id,
+      id: resId ?? "",
     },
   });
-  const reservation = data?.reservationByPk ?? undefined;
+  const reservation = data?.reservation ?? undefined;
 
+  const typename = "ReservationUnitType";
+  const pk = reservation?.reservationUnits?.[0]?.pk;
+  const id = pk ? base64encode(`${typename}:${pk}`) : undefined;
   const { data: reservationUnitData } = useQuery<
     Query,
-    QueryReservationUnitByPkArgs
-  >(RESERVATION_UNIT, {
+    QueryReservationUnitArgs
+  >(RESERVATION_UNIT_QUERY, {
     fetchPolicy: "no-cache",
-    skip: !reservation?.reservationUnits?.[0]?.pk,
+    skip: id == null,
     variables: {
-      pk: reservation?.reservationUnits?.[0]?.pk ?? 0,
+      id: id ?? "",
     },
   });
 
   // TODO why is this needed? why isn't it part of the reservationUnit query?
   const [fetchAdditionalData, { data: additionalData }] = useLazyQuery<
     Query,
-    QueryReservationUnitByPkArgs &
-      ReservationUnitByPkTypeReservableTimeSpansArgs &
-      ReservationUnitByPkTypeReservationsArgs
+    QueryReservationUnitArgs &
+      ReservationUnitTypeReservableTimeSpansArgs &
+      ReservationUnitTypeReservationsArgs
   >(OPENING_HOURS, {
     fetchPolicy: "no-cache",
   });
 
+  // TODO remove this and combine it to the original query
   useEffect(() => {
-    if (reservationUnitData?.reservationUnitByPk) {
-      const { reservationUnitByPk } = reservationUnitData;
+    // TODO why is this necessary? why require a second client side query after the page has loaded?
+    if (reservationUnitData?.reservationUnit) {
+      // TODO this could be changed to fetch the id from the reservationUnitData (instead of pk and constructing it)
+      const typenameUnit = "ReservationUnitType";
+      const { pk: resUnitPk } = reservationUnitData.reservationUnit;
+      const idUnit = resUnitPk
+        ? base64encode(`${typenameUnit}:${resUnitPk}`)
+        : "";
       fetchAdditionalData({
         variables: {
-          pk: reservationUnitByPk?.pk,
+          id: idUnit,
           startDate: String(toApiDate(new Date(now))),
           endDate: String(toApiDate(addYears(new Date(), 1))),
           from: toApiDate(new Date(now)),
@@ -235,24 +250,25 @@ const ReservationEdit = ({ id, apiBaseUrl }: Props): JSX.Element => {
     }
   }, [reservationUnitData, fetchAdditionalData, now]);
 
+  // TODO can we remove this?
   useEffect(() => {
-    if (reservationUnitData?.reservationUnitByPk == null) {
+    if (reservationUnitData?.reservationUnit == null) {
       return;
     }
 
     const timespans = filterNonNullable(
-      reservationUnitData?.reservationUnitByPk?.reservableTimeSpans
+      reservationUnitData?.reservationUnit?.reservableTimeSpans
     );
     const moreTimespans = filterNonNullable(
-      additionalData?.reservationUnitByPk?.reservableTimeSpans
+      additionalData?.reservationUnit?.reservableTimeSpans
     ).filter((n) => n?.startDatetime != null && n?.endDatetime != null);
     const reservableTimeSpans = [...timespans, ...moreTimespans];
     setReservationUnit({
-      ...reservationUnitData?.reservationUnitByPk,
+      ...reservationUnitData?.reservationUnit,
       reservableTimeSpans,
-      reservations: additionalData?.reservationUnitByPk?.reservations,
+      reservations: additionalData?.reservationUnit?.reservations,
     });
-  }, [additionalData, reservationUnitData?.reservationUnitByPk, id]);
+  }, [additionalData, reservationUnitData?.reservationUnit, id]);
 
   const { data: userReservationsData } = useQuery<Query, QueryReservationsArgs>(
     LIST_RESERVATIONS,
@@ -362,12 +378,11 @@ const ReservationEdit = ({ id, apiBaseUrl }: Props): JSX.Element => {
   }
 
   const handleSubmit = () => {
-    const pk = reservation.pk;
     // TODO refactor: using initial reservation when we only need time information is bad
     const begin = initialReservation?.begin;
     const end = initialReservation?.end;
-    if (pk && begin && end) {
-      adjustReservationTime({ pk, begin, end });
+    if (reservation.pk && begin && end) {
+      adjustReservationTime({ pk: reservation.pk, begin, end });
     }
   };
 

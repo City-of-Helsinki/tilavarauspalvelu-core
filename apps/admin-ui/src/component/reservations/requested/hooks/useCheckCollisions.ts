@@ -1,7 +1,7 @@
 import {
   Query,
-  QueryReservationUnitByPkArgs,
   Type,
+  QueryReservationUnitArgs,
   ReservationType,
 } from "common/types/gql-types";
 import { useQuery } from "@apollo/client";
@@ -9,6 +9,7 @@ import { format } from "date-fns";
 import { useNotification } from "app/context/NotificationContext";
 import { doesIntervalCollide, reservationToInterval } from "app/helpers";
 import { RESERVATIONS_BY_RESERVATIONUNIT } from "./queries";
+import { base64encode } from "common/src/helpers";
 
 const useCheckCollisions = ({
   reservationPk,
@@ -30,14 +31,16 @@ const useCheckCollisions = ({
 }) => {
   const { notifyError } = useNotification();
 
+  const typename = "ReservationUnitType";
+  const id = base64encode(`${typename}:${reservationUnitPk}`);
   const { data, loading } = useQuery<
     Query,
-    QueryReservationUnitByPkArgs & { from: string; to: string }
+    QueryReservationUnitArgs & { from: string; to: string }
   >(RESERVATIONS_BY_RESERVATIONUNIT, {
     fetchPolicy: "no-cache",
     skip: !reservationUnitPk || !start || !end,
     variables: {
-      pk: reservationUnitPk,
+      id,
       from: format(start ?? new Date(), "yyyy-MM-dd"),
       to: format(end ?? new Date(), "yyyy-MM-dd"),
     },
@@ -46,7 +49,7 @@ const useCheckCollisions = ({
     },
   });
 
-  const reservations = data?.reservationUnitByPk?.reservations ?? [];
+  const reservations = data?.reservationUnit?.reservations ?? [];
   const collisions =
     end && start
       ? reservations

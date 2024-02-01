@@ -3,6 +3,8 @@ import {
   RESERVATIONUNIT_RESERVATIONS_FRAGMENT,
   RESERVATION_UNIT_FRAGMENT,
 } from "../../reservations/fragments";
+import { LOCATION_FRAGMENT } from "common/src/queries/fragments";
+import { UNIT_NAME_FRAGMENT } from "@/common/fragments";
 
 export const OPTIONS_QUERY = gql`
   query options {
@@ -36,19 +38,15 @@ export const OPTIONS_QUERY = gql`
 
 // NOTE old pk: ID type
 export const UNIT_QUERY = gql`
+  ${LOCATION_FRAGMENT}
+  ${UNIT_NAME_FRAGMENT}
   query units($pk: [ID]) {
     units(pk: $pk, onlyWithPermission: true) {
       edges {
         node {
+          ...UnitNameFields
           location {
-            addressStreetFi
-            addressZip
-            addressCityFi
-          }
-          nameFi
-          pk
-          serviceSectors {
-            nameFi
+            ...LocationFields
           }
           reservationUnits {
             pk

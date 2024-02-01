@@ -1,25 +1,31 @@
 import { gql } from "@apollo/client";
-import { IMAGE_FRAGMENT } from "common/src/queries/fragments";
+import {
+  IMAGE_FRAGMENT,
+  LOCATION_FRAGMENT,
+} from "common/src/queries/fragments";
+import {
+  RESERVATION_UNIT_COMMON_FRAGMENT,
+  RESOURCE_FRAGMENT,
+  SPACE_COMMON_FRAGMENT,
+  SPACE_FRAGMENT,
+} from "./fragments";
 
 export const SPACES_QUERY = gql`
+  ${SPACE_COMMON_FRAGMENT}
   query getSpaces {
     spaces(onlyWithPermission: true) {
       edges {
         node {
-          pk
-          nameFi
+          ...SpaceCommonFields
           unit {
             pk
             nameFi
           }
           parent {
-            nameFi
             building {
               nameFi
             }
           }
-          surfaceArea
-          maxPersons
         }
       }
     }
@@ -27,23 +33,13 @@ export const SPACES_QUERY = gql`
 `;
 
 export const RESOURCES_QUERY = gql`
+  ${RESOURCE_FRAGMENT}
   query getResources {
     resources(onlyWithPermission: true) {
       edges {
         node {
-          pk
-          nameFi
           locationType
-          space {
-            unit {
-              nameFi
-              pk
-            }
-            nameFi
-            unit {
-              nameFi
-            }
-          }
+          ...ResourceFields
         }
       }
     }
@@ -51,21 +47,16 @@ export const RESOURCES_QUERY = gql`
 `;
 
 export const RESERVATION_UNITS_QUERY = gql`
+  ${RESERVATION_UNIT_COMMON_FRAGMENT}
   query reservationUnits {
     reservationUnits(onlyWithPermission: true) {
       edges {
         node {
-          pk
-          nameFi
+          ...ReservationUnitCommonFields
           unit {
             pk
             nameFi
           }
-          reservationUnitType {
-            nameFi
-          }
-          maxPersons
-          surfaceArea
         }
       }
     }
@@ -81,7 +72,10 @@ export const DELETE_SPACE = gql`
 `;
 
 export const UNIT_QUERY = gql`
+  ${SPACE_FRAGMENT}
+  ${RESERVATION_UNIT_COMMON_FRAGMENT}
   ${IMAGE_FRAGMENT}
+  ${LOCATION_FRAGMENT}
   query unit($pk: Int) {
     unitByPk(pk: $pk) {
       pk
@@ -89,17 +83,10 @@ export const UNIT_QUERY = gql`
       tprekId
       shortDescriptionFi
       reservationUnits {
-        pk
-        nameFi
-        maxPersons
-        surfaceArea
+        ...ReservationUnitCommonFields
         isDraft
         isArchived
         purposes {
-          pk
-          nameFi
-        }
-        reservationUnitType {
           pk
           nameFi
         }
@@ -108,56 +95,33 @@ export const UNIT_QUERY = gql`
         }
       }
       spaces {
-        pk
-        nameFi
-        code
-        maxPersons
-        surfaceArea
-        parent {
-          pk
-          nameFi
-        }
-        resources {
-          pk
-          nameFi
-          space {
-            unit {
-              nameFi
-            }
-          }
-        }
+        ...SpaceFields
       }
       location {
-        addressStreetFi
-        addressZip
-        addressCityFi
+        ...LocationFields
         longitude
         latitude
       }
-      nameFi
     }
   }
 `;
 
 export const UNIT_WITH_SPACES_AND_RESOURCES = gql`
+  ${SPACE_COMMON_FRAGMENT}
+  ${LOCATION_FRAGMENT}
   query unit($pk: Int) {
     unitByPk(pk: $pk) {
       pk
       nameFi
       spaces {
-        pk
-        nameFi
-        maxPersons
-        surfaceArea
+        ...SpaceCommonFields
         resources {
           pk
           nameFi
         }
       }
       location {
-        addressStreetFi
-        addressZip
-        addressCityFi
+        ...LocationFields
       }
     }
   }

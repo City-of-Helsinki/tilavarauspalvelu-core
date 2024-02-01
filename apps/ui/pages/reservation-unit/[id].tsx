@@ -41,17 +41,18 @@ import {
   PricingType,
   Query,
   QueryReservationsArgs,
-  QueryReservationUnitByPkArgs,
+  QueryReservationUnitArgs,
   QueryReservationUnitsArgs,
   ReservationCreateMutationInput,
   ReservationCreateMutationPayload,
   ReservationType,
-  ReservationUnitByPkTypeReservableTimeSpansArgs,
-  ReservationUnitByPkTypeReservationsArgs,
   ReservationUnitType,
   State,
+  ReservationUnitTypeReservableTimeSpansArgs,
+  ReservationUnitTypeReservationsArgs,
 } from "common/types/gql-types";
 import {
+  base64encode,
   filterNonNullable,
   fromMondayFirstUnsafe,
   getLocalizationLang,
@@ -74,7 +75,7 @@ import {
 import {
   OPENING_HOURS,
   RELATED_RESERVATION_UNITS,
-  RESERVATION_UNIT,
+  RESERVATION_UNIT_QUERY,
 } from "@/modules/queries/reservationUnit";
 import { ReservationProps } from "@/context/DataContext";
 import {
@@ -134,7 +135,7 @@ const allowedReservationStates: State[] = [
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { params, query, locale } = ctx;
-  const id = Number(params?.id);
+  const pk = Number(params?.id);
   const uuid = query.ru;
   const today = new Date();
   const commonProps = getCommonServerSideProps();
@@ -150,24 +151,25 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     data?.applicationRounds?.edges?.map((e) => e?.node)
   )
     .filter((n) => n.status === ApplicationRoundStatusChoice.Open)
-    .filter((n) => n?.reservationUnits?.find((x) => x?.pk === id));
+    .filter((n) => n?.reservationUnits?.find((x) => x?.pk === pk));
 
-  if (id) {
+  if (pk) {
+    const typename = "ReservationUnitType";
+    const id = base64encode(`${typename}:${pk}`);
     const { data: reservationUnitData } = await apolloClient.query<
       Query,
-      QueryReservationUnitByPkArgs
+      QueryReservationUnitArgs
     >({
-      query: RESERVATION_UNIT,
+      query: RESERVATION_UNIT_QUERY,
       fetchPolicy: "no-cache",
       variables: {
-        pk: id,
+        id,
       },
     });
 
-    const previewPass = uuid === reservationUnitData.reservationUnitByPk?.uuid;
+    const previewPass = uuid === reservationUnitData.reservationUnit?.uuid;
 
-    const reservationUnit =
-      reservationUnitData?.reservationUnitByPk ?? undefined;
+    const reservationUnit = reservationUnitData?.reservationUnit ?? undefined;
     if (!isReservationUnitPublished(reservationUnit) && !previewPass) {
       return {
         props: {
@@ -178,7 +180,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       };
     }
 
-    const isDraft = reservationUnitData.reservationUnitByPk?.isDraft;
+    const isDraft = reservationUnit?.isDraft;
     if (isDraft && !previewPass) {
       return {
         props: {
@@ -193,16 +195,17 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
 
     const startDate = today;
     const endDate = addYears(today, 2);
+    // TODO remove
     const { data: additionalData } = await apolloClient.query<
       Query,
-      QueryReservationUnitByPkArgs &
-        ReservationUnitByPkTypeReservableTimeSpansArgs &
-        ReservationUnitByPkTypeReservationsArgs
+      QueryReservationUnitArgs &
+        ReservationUnitTypeReservableTimeSpansArgs &
+        ReservationUnitTypeReservationsArgs
     >({
       query: OPENING_HOURS,
       fetchPolicy: "no-cache",
       variables: {
-        pk: id,
+        id,
         startDate: String(toApiDate(startDate)),
         endDate: String(toApiDate(endDate)),
         from: toApiDate(startDate),
@@ -212,14 +215,14 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       },
     });
 
-    if (reservationUnitData.reservationUnitByPk?.unit?.pk) {
+    if (reservationUnit?.unit?.pk) {
       const { data: relatedReservationUnitsData } = await apolloClient.query<
         Query,
         QueryReservationUnitsArgs
       >({
         query: RELATED_RESERVATION_UNITS,
         variables: {
-          unit: [reservationUnitData.reservationUnitByPk.unit.pk],
+          unit: [reservationUnit.unit.pk],
           isDraft: false,
           isVisible: true,
         },
@@ -229,10 +232,10 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
         relatedReservationUnitsData?.reservationUnits?.edges?.map(
           (n) => n?.node
         )
-      ).filter((n) => n?.pk !== reservationUnitData.reservationUnitByPk?.pk);
+      ).filter((n) => n?.pk !== reservationUnitData.reservationUnit?.pk);
     }
 
-    if (!reservationUnitData.reservationUnitByPk?.pk) {
+    if (!reservationUnit?.pk) {
       return {
         props: {
           ...commonProps,
@@ -243,23 +246,22 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     }
 
     const timespans = filterNonNullable(
-      additionalData.reservationUnitByPk?.reservableTimeSpans
+      additionalData.reservationUnit?.reservableTimeSpans
     );
     const moreTimespans = filterNonNullable(
-      reservationUnitData.reservationUnitByPk?.reservableTimeSpans
+      reservationUnitData.reservationUnit?.reservableTimeSpans
     );
     const reservableTimeSpans = [...timespans, ...moreTimespans];
-
     const reservations = filterNonNullable(
-      additionalData?.reservationUnitByPk?.reservations
+      additionalData?.reservationUnit?.reservations
     );
     return {
       props: {
-        key: `${id}-${locale}`,
+        key: `${pk}-${locale}`,
         ...commonProps,
         ...(await serverSideTranslations(locale ?? "fi")),
         reservationUnit: {
-          ...reservationUnitData?.reservationUnitByPk,
+          ...reservationUnit,
           reservableTimeSpans,
           reservations,
         },
@@ -273,11 +275,11 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
 
   return {
     props: {
-      key: `${id}-${locale}`,
+      key: `${pk}-${locale}`,
       ...commonProps,
       ...(await serverSideTranslations(locale ?? "fi")),
       notFound: true, // required for type narrowing
-      paramsId: id,
+      paramsId: pk,
     },
     notFound: true,
   };

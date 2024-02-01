@@ -44,7 +44,7 @@ import {
   fontRegular,
 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import { ReservationUnitByPkType } from "common/types/gql-types";
+import { ReservationUnitType } from "common/types/gql-types";
 import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
 import { MediumButton, truncatedText } from "@/styles/util";
 import { ReservationProps } from "@/context/DataContext";
@@ -58,7 +58,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { capitalize, formatDuration, getPostLoginUrl } from "@/modules/util";
 
 type Props<T> = {
-  reservationUnit: ReservationUnitByPkType;
+  reservationUnit: ReservationUnitType;
   initialReservation: PendingReservation | null;
   setInitialReservation: (reservation: PendingReservation | null) => void;
   isSlotReservable: (start: Date, end: Date) => boolean;

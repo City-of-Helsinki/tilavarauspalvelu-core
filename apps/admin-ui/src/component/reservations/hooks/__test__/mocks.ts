@@ -12,6 +12,7 @@ import {
   UPDATE_STAFF_RESERVATION,
 } from "../queries";
 import { RECURRING_RESERVATION_QUERY } from "../../requested/hooks/queries";
+import { base64encode } from "common/src/helpers";
 
 export const CHANGED_WORKING_MEMO = "Sisaisen kommentti";
 
@@ -73,7 +74,11 @@ const createRecurringEdges = (
       begin: getValidInterval(0)[0],
       end: getValidInterval(0)[1],
       pk: startingPk,
-      recurringReservation: { pk: recurringPk },
+      id: base64encode(`ReservationType:${startingPk}`),
+      recurringReservation: {
+        id: base64encode(`RecurringReservationType:${recurringPk}`),
+        pk: recurringPk,
+      },
       state,
     },
   },
@@ -82,7 +87,11 @@ const createRecurringEdges = (
       begin: getValidInterval(7)[0],
       end: getValidInterval(7)[1],
       pk: startingPk + 1,
-      recurringReservation: { pk: recurringPk },
+      id: base64encode(`ReservationType:${startingPk + 1}`),
+      recurringReservation: {
+        id: base64encode(`RecurringReservationType:${recurringPk}`),
+        pk: recurringPk,
+      },
       state,
     },
   },
@@ -259,8 +268,8 @@ export const mockReservation: ReservationType = {
   pk: 1,
   begin: "2024-01-01T10:00:00+00:00",
   end: "2024-01-01T14:00:00+00:00",
-  id: "be4fa7a2-05b7-11ee-be56-0242ac120002",
   state: State.Confirmed,
+  id: base64encode("ReservationType:1"),
   workingMemo: "empty",
   handlingDetails: "",
 };
@@ -268,15 +277,16 @@ export const mockReservation: ReservationType = {
 export const mockRecurringReservation: ReservationType = {
   ...mockReservation,
   pk: 21,
+  id: base64encode("ReservationType:21"),
   recurringReservation: {
     pk: 1,
-    id: "be4fa7a2-05b7-11ee-be56-0242ac120003",
+    id: base64encode("RecurringReservationType:1"),
     name: "recurring",
     description: "",
     created: "2021-09-01T10:00:00+00:00",
     reservationUnit: {
       pk: 1,
-      id: "be4fa7a2-05b7-11ee-be56-0242ac120004",
+      id: base64encode("ReservationUnitType:1"),
       images: [],
       isArchived: false,
       isDraft: false,

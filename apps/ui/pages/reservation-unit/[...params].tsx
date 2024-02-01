@@ -13,8 +13,8 @@ import { breakpoints } from "common/src/common/style";
 import { fontRegular, H2 } from "common/src/common/typography";
 import {
   Query,
-  QueryReservationUnitByPkArgs,
-  QueryReservationByPkArgs,
+  QueryReservationArgs,
+  QueryReservationUnitArgs,
   ReservationConfirmMutationInput,
   ReservationConfirmMutationPayload,
   ReservationDeleteMutationInput,
@@ -36,7 +36,7 @@ import {
   printErrorMessages,
   reservationsUrl,
 } from "@/modules/util";
-import { RESERVATION_UNIT } from "@/modules/queries/reservationUnit";
+import { RESERVATION_UNIT_QUERY } from "@/modules/queries/reservationUnit";
 import {
   CONFIRM_RESERVATION,
   DELETE_RESERVATION,
@@ -61,9 +61,9 @@ import {
   getCommonServerSideProps,
   getGenericTerms,
 } from "@/modules/serverUtils";
-import { filterNonNullable } from "common/src/helpers";
 import { OPTIONS_QUERY } from "@/hooks/useOptions";
 import { useConfirmNavigation } from "@/hooks/useConfirmNavigation";
+import { base64encode, filterNonNullable } from "common/src/helpers";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -75,17 +75,18 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
   if (Number.isFinite(Number(reservationUnitPk)) && path === "reservation") {
+    const typename = "ReservationUnitType";
+    const id = base64encode(`${typename}:${reservationUnitPk}`);
     const { data: reservationUnitData } = await apolloClient.query<
       Query,
-      QueryReservationUnitByPkArgs
+      QueryReservationUnitArgs
     >({
-      query: RESERVATION_UNIT,
-      variables: { pk: Number(reservationUnitPk) },
+      query: RESERVATION_UNIT_QUERY,
+      variables: { id },
       fetchPolicy: "no-cache",
     });
 
     const genericTerms = await getGenericTerms(apolloClient);
-
     const { data: paramsData } = await apolloClient.query<Query>({
       query: OPTIONS_QUERY,
       fetchPolicy: "no-cache",
@@ -105,9 +106,9 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       props: {
         ...commonProps,
         key: `${reservationUnitPk}${locale}`,
-        reservationUnit: reservationUnitData.reservationUnitByPk ?? null,
         // TODO check for NaN
         reservationPk: Number(reservationPk),
+        reservationUnit: reservationUnitData.reservationUnit ?? null,
         reservationPurposes,
         ageGroups,
         cities,
@@ -616,26 +617,29 @@ const ReservationUnitReservation = (props: PropsNarrowed) => {
 
   // TODO show an error if this fails
   // TODO show an error if the pk is not a number
-  const { data, loading } = useQuery<Query, QueryReservationByPkArgs>(
+  // TODO find a typesafe way to do this
+  const typename = "ReservationType";
+  const id = base64encode(`${typename}:${reservationPk}`);
+  const { data, loading } = useQuery<Query, QueryReservationArgs>(
     GET_RESERVATION,
     {
-      variables: { pk: reservationPk },
-      skip: !reservationPk || !Number.isInteger(reservationPk),
+      variables: { id },
+      skip: !reservationPk,
       onError: () => {},
     }
   );
 
   // TODO errors vs loading
-  if (loading || !data?.reservationByPk?.pk) {
+  if (loading || !data?.reservation?.pk) {
     return null;
   }
 
-  const { reservationByPk } = data;
+  const { reservation } = data;
 
   return (
     <ReservationUnitReservationWithReservationProp
       {...props}
-      fetchedReservation={reservationByPk}
+      fetchedReservation={reservation}
     />
   );
 };

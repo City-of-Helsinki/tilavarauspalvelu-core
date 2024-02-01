@@ -4,7 +4,6 @@ import {
   PaymentOrderType,
   State,
   ReservationType,
-  ReservationUnitByPkType,
   ReservationStartInterval,
   Authentication,
   ReservationKind,
@@ -101,7 +100,7 @@ describe("getDurationOptions", () => {
   });
 });
 
-const reservationUnit: ReservationUnitByPkType = {
+const reservationUnit: ReservationUnitType = {
   authentication: Authentication.Weak,
   canApplyFreeOfCharge: false,
   contactInformation: "",

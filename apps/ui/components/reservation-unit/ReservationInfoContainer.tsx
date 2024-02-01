@@ -1,6 +1,6 @@
 import React from "react";
 import { formatDuration } from "common/src/common/util";
-import { ReservationUnitByPkType } from "common/types/gql-types";
+import { ReservationUnitType } from "common/types/gql-types";
 import ClientOnly from "common/src/ClientOnly";
 import { Trans, useTranslation } from "next-i18next";
 import { daysByMonths } from "@/modules/const";
@@ -8,11 +8,11 @@ import { formatDate } from "@/modules/util";
 import { Content, Subheading } from "./ReservationUnitStyles";
 
 type Props = {
-  reservationUnit: ReservationUnitByPkType;
+  reservationUnit: ReservationUnitType;
   isReservable: boolean;
 };
 
-function getStatus(reservationUnit: ReservationUnitByPkType) {
+function getStatus(reservationUnit: ReservationUnitType) {
   const now = new Date().toISOString();
   const { reservationBegins, reservationEnds } = reservationUnit;
 

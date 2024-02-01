@@ -1,4 +1,6 @@
 import { gql } from "@apollo/client";
+import { SPACE_COMMON_FRAGMENT } from "@/common/fragments";
+import { LOCATION_FRAGMENT } from "common/src/queries/fragments";
 
 export const CREATE_SPACE = gql`
   mutation createSpace($input: SpaceCreateMutationInput!) {
@@ -38,29 +40,25 @@ export const SPACE_HIERARCHY_QUERY = gql`
   }
 `;
 
+// TODO why does this query parents up the tree?
 export const SPACE_QUERY = gql`
+  ${SPACE_COMMON_FRAGMENT}
+  ${LOCATION_FRAGMENT}
   query space($pk: Int) {
     spaceByPk(pk: $pk) {
-      pk
-      nameFi
+      ...SpaceCommonFields
       nameSv
       nameEn
-      surfaceArea
-      maxPersons
       code
       unit {
         pk
         nameFi
         descriptionFi
         location {
-          addressStreetFi
-          addressZip
-          addressCityFi
+          ...LocationFields
         }
       }
       parent {
-        pk
-        nameFi
         parent {
           nameFi
           parent {

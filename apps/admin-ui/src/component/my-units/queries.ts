@@ -24,19 +24,15 @@ export const RECURRING_RESERVATION_UNIT_QUERY = gql`
 
 export const RESERVATIONS_BY_RESERVATIONUNITS = gql`
   ${RESERVATIONUNIT_RESERVATIONS_FRAGMENT}
-  query ReservationUnits(
-    $pk: Int
+  query reservationUnitReservations(
+    $id: ID!
     $from: Date
     $to: Date
     $includeWithSameComponents: Boolean
   ) {
-    reservationUnits(pk: [$pk]) {
-      edges {
-        node {
-          pk
-          ...ReservationUnitReservations
-        }
-      }
+    reservationUnit(id: $id) {
+      pk
+      ...ReservationUnitReservations
     }
   }
 `;

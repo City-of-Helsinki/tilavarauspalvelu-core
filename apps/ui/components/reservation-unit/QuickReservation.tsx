@@ -17,7 +17,7 @@ import styled from "styled-components";
 import { chunkArray, toUIDate } from "common/src/common/util";
 import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
 import { fontBold, fontMedium, H4 } from "common/src/common/typography";
-import type { ReservationUnitByPkType } from "common/types/gql-types";
+import type { ReservationUnitType } from "common/types/gql-types";
 import { breakpoints } from "common";
 import { type ReservationProps } from "@/context/DataContext";
 import { getDurationOptions } from "@/modules/reservation";
@@ -47,7 +47,7 @@ type Props = {
   setQuickReservationSlot: React.Dispatch<
     React.SetStateAction<QuickReservationSlotProps | null>
   >;
-  reservationUnit: ReservationUnitByPkType | null;
+  reservationUnit: ReservationUnitType | null;
   isSlotReservable: (arg1: Date, arg2: Date, arg3?: boolean) => boolean;
   setErrorMsg: (arg: string) => void;
   calendarRef: React.RefObject<HTMLDivElement>;
@@ -236,7 +236,7 @@ function dayMax(days: Array<Date | undefined>): Date | undefined {
 
 // Returns the last possible reservation date for the given reservation unit
 function getLastPossibleReservationDate(
-  reservationUnit?: ReservationUnitByPkType
+  reservationUnit?: ReservationUnitType
 ): Date | null {
   if (!reservationUnit) {
     return null;
@@ -270,7 +270,7 @@ type AvailableTimesProps = {
   duration: string;
   isSlotReservable: (start: Date, end: Date) => boolean;
   fromStartOfDay?: boolean;
-  reservationUnit?: ReservationUnitByPkType;
+  reservationUnit?: ReservationUnitType;
 };
 
 // Returns an array of available times for the given duration and day

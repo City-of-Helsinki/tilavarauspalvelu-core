@@ -4,7 +4,7 @@ import {
   PaymentOrderType,
   Query,
   QueryOrderArgs,
-  QueryReservationByPkArgs,
+  QueryReservationArgs,
   QueryReservationsArgs,
   RefreshOrderMutationInput,
   RefreshOrderMutationPayload,
@@ -21,8 +21,8 @@ import {
   LIST_RESERVATIONS,
   REFRESH_ORDER,
 } from "../modules/queries/reservation";
-import { filterNonNullable } from "common/src/helpers";
 import { toApiDate } from "common/src/common/util";
+import { base64encode, filterNonNullable } from "common/src/helpers";
 
 type UseOrderProps = {
   orderUuid?: string;
@@ -114,16 +114,19 @@ export function useReservation({ reservationPk }: UseReservationProps): {
   error?: ApolloError;
   loading: boolean;
 } {
-  const { data, error, loading } = useQuery<Query, QueryReservationByPkArgs>(
+  // TODO typesafe way to get typename
+  const typename = "ReservationType";
+  const id = base64encode(`${typename}:${reservationPk}`);
+  const { data, error, loading } = useQuery<Query, QueryReservationArgs>(
     GET_RESERVATION,
     {
       fetchPolicy: "no-cache",
-      variables: { pk: reservationPk },
+      variables: { id },
       skip: !reservationPk,
     }
   );
 
-  const reservation = data?.reservationByPk ?? undefined;
+  const reservation = data?.reservation ?? undefined;
 
   return {
     reservation,

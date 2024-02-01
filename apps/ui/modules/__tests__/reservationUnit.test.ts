@@ -4,7 +4,6 @@ import { toUIDate } from "common/src/common/util";
 import {
   EquipmentType,
   State,
-  ReservationUnitByPkType,
   ReservationUnitPricingType,
   PriceUnit,
   PricingType,
@@ -267,22 +266,20 @@ describe("getPrice", () => {
 
 describe("isReservationUnitPublished", () => {
   test("without state", () => {
-    expect(isReservationUnitPublished({} as ReservationUnitByPkType)).toBe(
-      false
-    );
+    expect(isReservationUnitPublished({} as ReservationUnitType)).toBe(false);
   });
 
   test("with valid states", () => {
     expect(
       isReservationUnitPublished({
         state: ReservationUnitState.Published,
-      } as unknown as ReservationUnitByPkType)
+      } as unknown as ReservationUnitType)
     ).toBe(true);
 
     expect(
       isReservationUnitPublished({
         state: ReservationUnitState.ScheduledHiding,
-      } as unknown as ReservationUnitByPkType)
+      } as unknown as ReservationUnitType)
     ).toBe(true);
   });
 
@@ -290,31 +287,31 @@ describe("isReservationUnitPublished", () => {
     expect(
       isReservationUnitPublished({
         state: ReservationUnitState.Archived,
-      } as unknown as ReservationUnitByPkType)
+      } as unknown as ReservationUnitType)
     ).toBe(false);
 
     expect(
       isReservationUnitPublished({
         state: ReservationUnitState.Draft,
-      } as unknown as ReservationUnitByPkType)
+      } as unknown as ReservationUnitType)
     ).toBe(false);
 
     expect(
       isReservationUnitPublished({
         state: ReservationUnitState.Hidden,
-      } as unknown as ReservationUnitByPkType)
+      } as unknown as ReservationUnitType)
     ).toBe(false);
 
     expect(
       isReservationUnitPublished({
         state: ReservationUnitState.ScheduledPeriod,
-      } as unknown as ReservationUnitByPkType)
+      } as unknown as ReservationUnitType)
     ).toBe(false);
 
     expect(
       isReservationUnitPublished({
         state: ReservationUnitState.ScheduledPublishing,
-      } as unknown as ReservationUnitByPkType)
+      } as unknown as ReservationUnitType)
     ).toBe(false);
   });
 });
@@ -691,7 +688,7 @@ describe("getReservationUnitInstructionsKey", () => {
 });
 
 describe("getFuturePricing", () => {
-  const reservationUnit: ReservationUnitByPkType = {
+  const reservationUnit: ReservationUnitType = {
     id: "testing",
     pricings: [
       {
@@ -737,7 +734,7 @@ describe("getFuturePricing", () => {
         status: Status.Future,
       },
     ],
-  } as unknown as ReservationUnitByPkType;
+  } as unknown as ReservationUnitType;
 
   it("should sort items correctly", () => {
     const data = cloneDeep(reservationUnit);
@@ -771,7 +768,7 @@ describe("getFuturePricing", () => {
     data.pricings[2]!.status = Status.Past;
     expect(getFuturePricing(data)).toBeUndefined();
 
-    expect(getFuturePricing({} as ReservationUnitByPkType)).toBeUndefined();
+    expect(getFuturePricing({} as ReservationUnitType)).toBeUndefined();
   });
 
   it("with reservation begin time", () => {
@@ -864,7 +861,7 @@ describe("getFuturePricing", () => {
 });
 
 describe("getReservationUnitPrice", () => {
-  const reservationUnit: ReservationUnitByPkType = {
+  const reservationUnit: ReservationUnitType = {
     id: "testing",
     pricings: [
       {
@@ -928,7 +925,7 @@ describe("getReservationUnitPrice", () => {
         status: Status.Active,
       },
     ],
-  } as unknown as ReservationUnitByPkType;
+  } as unknown as ReservationUnitType;
 
   it("returns future data based on date lookup", () => {
     const data = cloneDeep(reservationUnit);

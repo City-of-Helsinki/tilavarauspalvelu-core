@@ -7,7 +7,7 @@ import type {
   QueryReservationUnitsArgs,
   QueryUnitsArgs,
   ReservationType,
-  ReservationUnitByPkTypeReservationsArgs,
+  ReservationUnitTypeReservationsArgs,
   ReservationUnitType,
 } from "common/types/gql-types";
 import { ReserveeType, Type } from "common/types/gql-types";
@@ -122,7 +122,7 @@ export const useUnitResources = (
 
   const { data, ...rest } = useQuery<
     Query,
-    QueryReservationUnitsArgs & ReservationUnitByPkTypeReservationsArgs
+    QueryReservationUnitsArgs & ReservationUnitTypeReservationsArgs
   >(RESERVATION_UNITS_BY_UNIT, {
     skip: unitPk === "" || Number.isNaN(Number(unitPk)) || Number(unitPk) === 0,
     variables: {

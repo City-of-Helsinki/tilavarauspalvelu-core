@@ -4,9 +4,9 @@ import { useTranslation } from "react-i18next";
 import get from "lodash/get";
 import type {
   Query,
-  QueryReservationUnitByPkArgs,
+  QueryReservationUnitArgs,
   QueryUnitsArgs,
-  ReservationUnitByPkTypeReservationsArgs,
+  ReservationUnitTypeReservationsArgs,
   ReservationUnitType,
   ErrorType,
   RecurringReservationCreateMutationInput,
@@ -41,6 +41,7 @@ import { convertToDate } from "./utils";
 import { CREATE_STAFF_RESERVATION } from "../create-reservation/queries";
 import { ReservationMade } from "./RecurringReservationDone";
 import { flattenMetadata } from "../create-reservation/utils";
+import { base64encode } from "common/src/helpers";
 
 export const useMultipleReservation = ({
   form,
@@ -128,11 +129,13 @@ const useReservationsInInterval = ({
   // NOTE backend error, it returns all till 00:00 not 23:59
   const apiEnd = toApiDate(addDays(end, 1));
 
+  const typename = "ReservationUnitType";
+  const id = base64encode(`${typename}:${reservationUnitPk}`);
   // NOTE unlike array fetches this fetches a single element with an included array
   // so it doesn't have the 100 limitation of array fetch nor does it have pagination
   const { loading, data, refetch } = useQuery<
     Query,
-    QueryReservationUnitByPkArgs & ReservationUnitByPkTypeReservationsArgs
+    QueryReservationUnitArgs & ReservationUnitTypeReservationsArgs
   >(GET_RESERVATIONS_IN_INTERVAL, {
     skip:
       !reservationUnitPk ||
@@ -140,7 +143,7 @@ const useReservationsInInterval = ({
       !apiStart ||
       !apiEnd,
     variables: {
-      pk: reservationUnitPk,
+      id,
       from: apiStart,
       to: apiEnd,
     },
@@ -150,7 +153,7 @@ const useReservationsInInterval = ({
     },
   });
 
-  const reservations = (data?.reservationUnitByPk?.reservations ?? [])
+  const reservations = (data?.reservationUnit?.reservations ?? [])
     .map((x) => (x ? reservationToInterval(x, reservationType) : undefined))
     .filter((x): x is CollisionInterval => x != null);
 

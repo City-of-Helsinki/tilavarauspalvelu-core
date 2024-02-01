@@ -1,18 +1,26 @@
 import { gql } from "@apollo/client";
-import { IMAGE_FRAGMENT } from "common/src/queries/fragments";
+import { RESERVATION_UNIT_FRAGMENT, UNIT_NAME_FRAGMENT } from "./fragments";
+import { IMAGE_FRAGMENT, PRICING_FRAGMENT } from "common/src/queries/fragments";
 
-export { TERMS_OF_USE } from "common/src/queries/terms";
+export { TERMS_OF_USE_QUERY as TERMS_OF_USE } from "common/src/queries/queries";
 
-export const RESERVATION_UNIT = gql`
+const RESERVATION_UNIT_TYPE_FRAGMENT = gql`
+  fragment ReservationUnitTypeFields on ReservationUnitTypeType {
+    pk
+    nameFi
+    nameEn
+    nameSv
+  }
+`;
+
+export const RESERVATION_UNIT_QUERY = gql`
   ${IMAGE_FRAGMENT}
-  query ReservationUnit($pk: Int!) {
-    reservationUnitByPk(pk: $pk) {
+  ${RESERVATION_UNIT_FRAGMENT}
+  ${RESERVATION_UNIT_TYPE_FRAGMENT}
+  query ReservationUnit($id: ID!) {
+    reservationUnit(id: $id) {
+      ...ReservationUnitFields
       id
-      pk
-      uuid
-      nameFi
-      nameEn
-      nameSv
       isDraft
       images {
         ...ImageFragment
@@ -28,97 +36,24 @@ export const RESERVATION_UNIT = gql`
       descriptionFi
       descriptionEn
       descriptionSv
-      termsOfUseFi
-      termsOfUseEn
-      termsOfUseSv
       reservationKind
-      reservationPendingInstructionsFi
-      reservationPendingInstructionsEn
-      reservationPendingInstructionsSv
-      reservationConfirmedInstructionsFi
-      reservationConfirmedInstructionsEn
-      reservationConfirmedInstructionsSv
-      reservationCancelledInstructionsFi
-      reservationCancelledInstructionsEn
-      reservationCancelledInstructionsSv
       bufferTimeBefore
       bufferTimeAfter
       reservationStartInterval
-      publishBegins
-      publishEnds
       reservationBegins
       reservationEnds
       canApplyFreeOfCharge
       state
       reservationState
-      serviceSpecificTerms {
-        textFi
-        textEn
-        textSv
-      }
-      cancellationTerms {
-        textFi
-        textEn
-        textSv
-      }
-      paymentTerms {
-        textFi
-        textEn
-        textSv
-      }
       reservationUnitType {
-        nameFi
-        nameEn
-        nameSv
+        ...ReservationUnitTypeFields
       }
-      pricingTerms {
-        nameFi
-        nameEn
-        nameSv
-        textFi
-        textEn
-        textSv
-      }
-      minPersons
-      maxPersons
       minReservationDuration
       maxReservationDuration
       maxReservationsPerUser
       reservationsMinDaysBefore
       reservationsMaxDaysBefore
-      unit {
-        id
-        pk
-        tprekId
-        nameFi
-        nameEn
-        nameSv
-        location {
-          latitude
-          longitude
-          addressStreetFi
-          addressStreetEn
-          addressStreetSv
-          addressZip
-          addressCityFi
-          addressCityEn
-          addressCitySv
-        }
-      }
-      spaces {
-        pk
-        nameFi
-        nameEn
-        nameSv
-      }
       requireReservationHandling
-      metadataSet {
-        id
-        name
-        pk
-        supportedFields
-        requiredFields
-      }
       equipment {
         pk
         nameFi
@@ -131,23 +66,16 @@ export const RESERVATION_UNIT = gql`
         }
       }
       allowReservationsWithoutOpeningHours
-      pricings {
-        begins
-        priceUnit
-        pricingType
-        lowestPrice
-        highestPrice
-        taxPercentage {
-          value
-        }
-        status
-      }
     }
   }
 `;
 
+// TODO why is ids remapped to pk here? that breaks all queries that use it
 export const RESERVATION_UNITS = gql`
+  ${PRICING_FRAGMENT}
   ${IMAGE_FRAGMENT}
+  ${UNIT_NAME_FRAGMENT}
+  ${RESERVATION_UNIT_TYPE_FRAGMENT}
   query SearchReservationUnits(
     $textSearch: String
     $pk: [Int]
@@ -211,36 +139,18 @@ export const RESERVATION_UNITS = gql`
           isClosed
           firstReservableDatetime
           reservationUnitType {
-            id: pk
-            nameFi
-            nameEn
-            nameSv
+            ...ReservationUnitTypeFields
           }
           unit {
+            ...UnitNameFields
             id: pk
-            nameFi
-            nameEn
-            nameSv
-            location {
-              addressStreetFi
-              addressStreetEn
-              addressStreetSv
-            }
           }
           maxPersons
           images {
             ...ImageFragment
           }
           pricings {
-            begins
-            priceUnit
-            pricingType
-            lowestPrice
-            highestPrice
-            taxPercentage {
-              value
-            }
-            status
+            ...PricingFields
           }
         }
       }
@@ -254,7 +164,10 @@ export const RESERVATION_UNITS = gql`
 `;
 
 export const RELATED_RESERVATION_UNITS = gql`
+  ${UNIT_NAME_FRAGMENT}
+  ${PRICING_FRAGMENT}
   ${IMAGE_FRAGMENT}
+  ${RESERVATION_UNIT_TYPE_FRAGMENT}
   query RelatedReservationUnits(
     $unit: [Int]!
     $isDraft: Boolean
@@ -272,35 +185,15 @@ export const RELATED_RESERVATION_UNITS = gql`
             ...ImageFragment
           }
           unit {
-            pk
-            nameFi
-            nameEn
-            nameSv
-            location {
-              addressStreetFi
-              addressStreetEn
-              addressStreetSv
-            }
+            ...UnitNameFields
           }
           reservationUnitType {
-            nameFi
-            nameEn
-            nameSv
+            ...ReservationUnitTypeFields
           }
           maxPersons
-          publishBegins
-          publishEnds
           isDraft
           pricings {
-            begins
-            priceUnit
-            pricingType
-            lowestPrice
-            highestPrice
-            taxPercentage {
-              value
-            }
-            status
+            ...PricingFields
           }
         }
       }
@@ -310,7 +203,7 @@ export const RELATED_RESERVATION_UNITS = gql`
 
 export const OPENING_HOURS = gql`
   query ReservationUnitOpeningHours(
-    $pk: Int
+    $id: ID!
     $startDate: Date!
     $endDate: Date!
     $from: Date
@@ -318,7 +211,7 @@ export const OPENING_HOURS = gql`
     $state: [String]
     $includeWithSameComponents: Boolean
   ) {
-    reservationUnitByPk(pk: $pk) {
+    reservationUnit(id: $id) {
       reservableTimeSpans(startDate: $startDate, endDate: $endDate) {
         startDatetime
         endDatetime
@@ -344,14 +237,12 @@ export const OPENING_HOURS = gql`
 `;
 
 export const RESERVATION_UNIT_TYPES = gql`
+  ${RESERVATION_UNIT_TYPE_FRAGMENT}
   query ReservationUnitTypes {
     reservationUnitTypes {
       edges {
         node {
-          pk
-          nameFi
-          nameEn
-          nameSv
+          ...ReservationUnitTypeFields
         }
       }
     }

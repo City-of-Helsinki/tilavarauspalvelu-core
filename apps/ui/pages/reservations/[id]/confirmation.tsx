@@ -1,6 +1,6 @@
 import React from "react";
 import { useQuery } from "@apollo/client";
-import type { Query, QueryReservationByPkArgs } from "common/types/gql-types";
+import type { Query, QueryReservationArgs } from "common/types/gql-types";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { breakpoints, Container } from "common";
@@ -11,6 +11,9 @@ import ReservationInfoCard from "@/components/reservation/ReservationInfoCard";
 import ReservationConfirmation from "@/components/reservation/ReservationConfirmation";
 import { GET_RESERVATION } from "@/modules/queries/reservation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { base64encode } from "common/src/helpers";
+import { CenterSpinner } from "@/components/common/common";
+import Error from "next/error";
 
 // TODO styles are copies from [...params].tsx
 const StyledContainer = styled(Container)`
@@ -39,24 +42,39 @@ const Columns = styled.div`
 
 function Confirmation({ apiBaseUrl }: Props) {
   const router = useRouter();
-  const { id } = router.query;
-  const { data, loading } = useQuery<Query, QueryReservationByPkArgs>(
-    GET_RESERVATION,
-    {
-      variables: { pk: Number(id) },
-      skip: !id || Number.isNaN(Number(id)),
-      onError: () => {},
-    }
-  );
+  const { id: pk } = router.query;
 
-  if (loading || !data?.reservationByPk?.pk) return null;
+  // TODO check that the pk parameter is valid in getServerSideProps and return 404 if it's not
+  // TODO this could be moved to getServerSideProps
+  // TODO why is there no user check here? are regular users allowed to access a reservation of another user?
+  const typename = "ReservationType";
+  const id = base64encode(`${typename}:${pk}`);
+  const {
+    data,
+    loading: isLoading,
+    error,
+  } = useQuery<Query, QueryReservationArgs>(GET_RESERVATION, {
+    variables: { id },
+    skip: !pk || Number.isNaN(Number(pk)),
+    onError: () => {},
+  });
 
-  const { reservationByPk } = data;
-  const reservation = reservationByPk;
-  const reservationUnit = reservation.reservationUnits?.[0] ?? undefined;
+  const { reservation } = data ?? {};
+  const reservationUnit = reservation?.reservationUnits?.[0] ?? undefined;
 
-  if (reservationUnit == null) {
-    return null;
+  if (isLoading) {
+    return <CenterSpinner />;
+  }
+
+  if (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+    return <Error statusCode={500} />;
+  }
+
+  // TODO show an error page instead of returning null
+  if (reservation == null || reservationUnit == null) {
+    return <Error statusCode={404} />;
   }
 
   return (

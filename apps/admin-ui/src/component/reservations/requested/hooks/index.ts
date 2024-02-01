@@ -3,11 +3,11 @@ import {
   type Query,
   type ReservationType,
   State,
-  type QueryReservationUnitByPkArgs,
   type ReservationDenyReasonType,
   type QueryReservationDenyReasonsArgs,
-  type QueryReservationByPkArgs,
   Type,
+  type QueryReservationUnitArgs,
+  type QueryReservationArgs,
 } from "common/types/gql-types";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@apollo/client";
@@ -21,6 +21,7 @@ import { useNotification } from "../../../../context/NotificationContext";
 import { RESERVATION_DENY_REASONS } from "../queries";
 import { OptionType } from "../../../../common/types";
 import { GQL_MAX_RESULTS_PER_QUERY } from "../../../../common/const";
+import { base64encode } from "common/src/helpers";
 
 export { default as useCheckCollisions } from "./useCheckCollisions";
 
@@ -63,13 +64,15 @@ export const useReservationData = (
   const { notifyError } = useNotification();
   const { t } = useTranslation();
 
+  const typename = "ReservationUnitType";
+  const id = base64encode(`${typename}:${reservationUnitPk}`);
   const { data, ...rest } = useQuery<
     Query,
-    QueryReservationUnitByPkArgs & { from: string; to: string }
+    QueryReservationUnitArgs & { from: string; to: string }
   >(RESERVATIONS_BY_RESERVATIONUNIT, {
     fetchPolicy: "no-cache",
     variables: {
-      pk: Number(reservationUnitPk),
+      id,
       from: toApiDateUnsafe(begin, "yyyy-MM-dd"),
       to: toApiDateUnsafe(end, "yyyy-MM-dd"),
     },
@@ -81,7 +84,7 @@ export const useReservationData = (
   const blockedName = t("ReservationUnits.reservationState.RESERVATION_CLOSED");
 
   const events =
-    data?.reservationUnitByPk?.reservations
+    data?.reservationUnit?.reservations
       ?.filter((r): r is ReservationType => r != null)
       ?.filter((r) => shouldBeShownInTheCalendar(r, reservationPk))
       ?.map((r) => convertReservationToCalendarEvent(r, blockedName)) ?? [];
@@ -212,20 +215,19 @@ export const useDenyReasonOptions = () => {
 /// but the UI makes no distinction between past and present instances of a recurrance.
 /// If we don't get the next valid reservation for edits: the mutations work,
 /// but the UI is not updated to show the changes (since it's looking at a past instance).
-export const useReservationEditData = (id?: string) => {
-  const { data, loading, refetch } = useQuery<Query, QueryReservationByPkArgs>(
+export const useReservationEditData = (pk?: string) => {
+  const typename = "ReservationType";
+  const id = base64encode(`${typename}:${pk}`);
+  const { data, loading, refetch } = useQuery<Query, QueryReservationArgs>(
     SINGLE_RESERVATION_QUERY,
     {
-      skip: !id,
+      skip: !pk,
       fetchPolicy: "no-cache",
-      variables: {
-        pk: Number(id),
-      },
+      variables: { id },
     }
   );
 
-  const recurringPk =
-    data?.reservationByPk?.recurringReservation?.pk ?? undefined;
+  const recurringPk = data?.reservation?.recurringReservation?.pk ?? undefined;
   const { reservations: recurringReservations } =
     useRecurringReservations(recurringPk);
 
@@ -236,23 +238,25 @@ export const useReservationEditData = (id?: string) => {
     .filter((x) => new Date(x.begin) > new Date())
     .filter((x) => x.state === State.Confirmed);
 
+  const nextRecurranceId = base64encode(
+    `${typename}:${possibleReservations?.at(0)?.pk}` ?? 0
+  );
   const { data: nextRecurrance, loading: nextReservationLoading } = useQuery<
     Query,
-    QueryReservationByPkArgs
+    QueryReservationArgs
   >(SINGLE_RESERVATION_QUERY, {
     skip: !possibleReservations?.at(0)?.pk,
     fetchPolicy: "no-cache",
     variables: {
-      pk: possibleReservations?.at(0)?.pk ?? 0,
+      id: nextRecurranceId,
     },
   });
 
   const reservation = recurringPk
-    ? nextRecurrance?.reservationByPk
-    : data?.reservationByPk;
+    ? nextRecurrance?.reservation
+    : data?.reservation;
   const reservationUnit =
-    data?.reservationByPk?.reservationUnits?.find((x) => x != null) ??
-    undefined;
+    data?.reservation?.reservationUnits?.find((x) => x != null) ?? undefined;
 
   return {
     reservation: reservation ?? undefined,

@@ -1,6 +1,6 @@
 import {
   type ReservationType,
-  type ReservationUnitByPkType,
+  type ReservationUnitType,
   ReserveeType,
 } from "common/types/gql-types";
 import { IconArrowLeft, IconCross, LoadingSpinner } from "hds-react";
@@ -25,7 +25,7 @@ import { useGenericTerms } from "common/src/hooks/useGenericTerms";
 
 type Props = {
   reservation: ReservationType;
-  reservationUnit: ReservationUnitByPkType;
+  reservationUnit: ReservationUnitType;
   setErrorMsg: React.Dispatch<React.SetStateAction<string | null>>;
   setStep: React.Dispatch<React.SetStateAction<number>>;
   handleSubmit: () => void;

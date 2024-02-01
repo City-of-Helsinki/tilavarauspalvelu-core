@@ -11,13 +11,14 @@ import NotificationBox from "common/src/common/NotificationBox";
 import { fontMedium, H2 } from "common/src/common/typography";
 import type {
   Query,
+  QueryReservationArgs,
   QueryReservationCancelReasonsArgs,
   ReservationCancellationMutationInput,
   ReservationCancellationMutationPayload,
 } from "common/types/gql-types";
 import { Container as CommonContainer } from "common";
 import { IconButton, ShowAllContainer } from "common/src/components";
-import { filterNonNullable } from "common/src/helpers";
+import { base64encode, filterNonNullable } from "common/src/helpers";
 import Sanitize from "../common/Sanitize";
 import {
   CANCEL_RESERVATION,
@@ -159,21 +160,30 @@ const ReturnLinkList = ({
   );
 };
 
-const ReservationCancellation = ({ id, apiBaseUrl }: Props): JSX.Element => {
+// TODO there is also pages/reservation/cancel.tsx (what is that?)
+// TODO this should be in pages/reservation/[id]/cancel.tsx
+// TODO the prop should be pk not id
+const ReservationCancellation = ({
+  id: pk,
+  apiBaseUrl,
+}: Props): JSX.Element => {
   const { t } = useTranslation();
 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [formState, setFormState] = useState<"unsent" | "sent">("unsent");
 
-  const { data: reservationData } = useQuery(GET_RESERVATION, {
+  const typename = "ReservationType";
+  const id = base64encode(`${typename}:${pk}`);
+  const { data: reservationData, loading } = useQuery<
+    Query,
+    QueryReservationArgs
+  >(GET_RESERVATION, {
     fetchPolicy: "no-cache",
-    skip: !id,
     variables: {
-      pk: id,
+      id,
     },
   });
-
-  const reservation = reservationData?.reservationByPk ?? null;
+  const { reservation } = reservationData || {};
 
   const { data: cancelReasonsData } = useQuery<
     Query,
@@ -182,23 +192,24 @@ const ReservationCancellation = ({ id, apiBaseUrl }: Props): JSX.Element => {
     fetchPolicy: "cache-first",
   });
 
-  const reasons: { label: string; value: number }[] = filterNonNullable(
+  const reasons = filterNonNullable(
     cancelReasonsData?.reservationCancelReasons?.edges.map((edge) => edge?.node)
   ).map((node) => ({
     label: getTranslation(node, "reason"),
-    value: node?.pk != null ? node?.pk : 0,
+    value: node?.pk != null ? node?.pk : "",
   }));
 
-  const [cancelReservation, { data, loading, error }] = useMutation<
-    { cancelReservation: ReservationCancellationMutationPayload },
-    { input: ReservationCancellationMutationInput }
-  >(CANCEL_RESERVATION);
+  const [cancelReservation, { data, loading: isMutationLoading, error }] =
+    useMutation<
+      { cancelReservation: ReservationCancellationMutationPayload },
+      { input: ReservationCancellationMutationInput }
+    >(CANCEL_RESERVATION);
 
   const { register, handleSubmit, getValues, setValue, watch, control } =
     useForm();
 
   useEffect(() => {
-    if (!loading) {
+    if (!isMutationLoading) {
       if (error || Number(data?.cancelReservation?.errors?.length) > 0) {
         setErrorMsg(t("reservations:reservationCancellationFailed"));
       } else if (data) {
@@ -206,7 +217,7 @@ const ReservationCancellation = ({ id, apiBaseUrl }: Props): JSX.Element => {
         window.scrollTo(0, 0);
       }
     }
-  }, [data, loading, error, t]);
+  }, [data, isMutationLoading, error, t]);
 
   useEffect(() => {
     register("reason", { required: true });

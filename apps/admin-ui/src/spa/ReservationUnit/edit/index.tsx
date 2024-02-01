@@ -25,7 +25,7 @@ import type { TFunction } from "next-i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   type Query,
-  type QueryReservationUnitByPkArgs,
+  type QueryReservationUnitArgs,
   type QueryUnitByPkArgs,
   type Mutation,
   ReservationStartInterval,
@@ -35,8 +35,8 @@ import {
   type ReservationState,
   type ReservationUnitState,
   TermsType,
-  type ReservationUnitByPkType,
   Status,
+  type ReservationUnitType,
   type SpaceType,
   type ReservationUnitTypeType,
   type QualifierType,
@@ -46,7 +46,7 @@ import {
   type MutationUpdateReservationUnitArgs,
 } from "common/types/gql-types";
 import { DateTimeInput } from "common/src/components/form/DateTimeInput";
-import { filterNonNullable } from "common/src/helpers";
+import { base64encode, filterNonNullable } from "common/src/helpers";
 import { H1, H4, fontBold } from "common/src/common/typography";
 import { breakpoints } from "common";
 import { UNIT_WITH_SPACES_AND_RESOURCES } from "@/common/queries";
@@ -817,11 +817,12 @@ function BasicSection({
 
 function ReservationUnitSettings({
   form,
-  parametersData,
+  metadataOptions,
+  cancellationRuleOptions,
 }: {
   form: UseFormReturn<ReservationUnitEditFormValues>;
-  // TODO refactor so we don't pass a query result here
-  parametersData: Query | undefined;
+  metadataOptions: Array<{ value: number; label: string }>;
+  cancellationRuleOptions: Array<{ value: number; label: string }>;
 }) {
   const { t } = useTranslation();
   const { control, watch, formState } = form;
@@ -837,19 +838,6 @@ function ReservationUnitSettings({
   const authenticationOptions = Object.values(Authentication).map((choice) => ({
     value: choice,
     label: t(`authentication.${choice}`),
-  }));
-
-  const cancellationRuleOptions = filterNonNullable(
-    parametersData?.reservationUnitCancellationRules?.edges.map((e) => e?.node)
-  ).map((n) => ({
-    value: n?.pk ?? -1,
-    label: n?.nameFi ?? "no-name",
-  }));
-  const metadataOptions = filterNonNullable(
-    parametersData?.metadataSets?.edges.map((e) => e?.node)
-  ).map((n) => ({
-    value: n?.pk ?? -1,
-    label: n?.name ?? "no-name",
   }));
 
   const hasErrors =
@@ -1620,7 +1608,7 @@ function OpeningHoursSection({
   previewUrlPrefix,
 }: {
   // TODO can we simplify this by passing the hauki url only?
-  reservationUnit: ReservationUnitByPkType | undefined;
+  reservationUnit: ReservationUnitType | undefined;
   previewUrlPrefix: string;
 }) {
   const { t } = useTranslation();
@@ -1911,7 +1899,7 @@ const ReservationUnitEditor = ({
   refetch,
   previewUrlPrefix,
 }: {
-  reservationUnit?: ReservationUnitByPkType;
+  reservationUnit?: ReservationUnitType;
   unitPk: string;
   form: UseFormReturn<ReservationUnitEditFormValues>;
   refetch: () => void;
@@ -1998,6 +1986,18 @@ const ReservationUnitEditor = ({
   const reservationUnitTypes = filterNonNullable(
     parametersData?.reservationUnitTypes?.edges?.map((e) => e?.node)
   );
+  const cancellationRuleOptions = filterNonNullable(
+    parametersData?.reservationUnitCancellationRules?.edges.map((e) => e?.node)
+  ).map((n) => ({
+    value: n?.pk ?? -1,
+    label: n?.nameFi ?? "no-name",
+  }));
+  const metadataOptions = filterNonNullable(
+    parametersData?.metadataSets?.edges.map((e) => e?.node)
+  ).map((n) => ({
+    value: n?.pk ?? -1,
+    label: n?.name ?? "no-name",
+  }));
 
   // ----------------------------- Callbacks ----------------------------------
   const onSubmit = async (formValues: ReservationUnitEditFormValues) => {
@@ -2160,7 +2160,8 @@ const ReservationUnitEditor = ({
         {isDirect && (
           <ReservationUnitSettings
             form={form}
-            parametersData={parametersData}
+            metadataOptions={metadataOptions}
+            cancellationRuleOptions={cancellationRuleOptions}
           />
         )}
         <PricingSection
@@ -2253,19 +2254,21 @@ function EditorWrapper({ previewUrlPrefix }: { previewUrlPrefix: string }) {
   const { reservationUnitPk, unitPk } = useParams<IRouterProps>();
   const { t } = useTranslation();
 
+  const typename = "ReservationUnitType";
+  const id = base64encode(`${typename}:${reservationUnitPk}`);
   const {
     data: reservationUnitData,
     loading: isLoading,
     refetch,
-  } = useQuery<Query, QueryReservationUnitByPkArgs>(RESERVATIONUNIT_QUERY, {
-    variables: { pk: Number(reservationUnitPk) },
+  } = useQuery<Query, QueryReservationUnitArgs>(RESERVATIONUNIT_QUERY, {
+    variables: { id },
     skip:
       !reservationUnitPk ||
       Number(reservationUnitPk) === 0 ||
       Number.isNaN(Number(reservationUnitPk)),
   });
 
-  const reservationUnit = reservationUnitData?.reservationUnitByPk ?? undefined;
+  const reservationUnit = reservationUnitData?.reservationUnit ?? undefined;
 
   // NOTE override the unitPk from the url for new units
   // there is no harm in doing it to existing units either (since it should be valid)
@@ -2283,9 +2286,9 @@ function EditorWrapper({ previewUrlPrefix }: { previewUrlPrefix: string }) {
   });
   const { reset } = form;
   useEffect(() => {
-    if (reservationUnitData?.reservationUnitByPk != null) {
+    if (reservationUnitData?.reservationUnit != null) {
       reset({
-        ...convertReservationUnit(reservationUnitData.reservationUnitByPk),
+        ...convertReservationUnit(reservationUnitData.reservationUnit),
         unitPk: Number(unitPk),
       });
     }

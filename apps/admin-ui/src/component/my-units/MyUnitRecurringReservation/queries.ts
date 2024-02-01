@@ -15,8 +15,8 @@ export const CREATE_RECURRING_RESERVATION = gql`
 `;
 
 export const GET_RESERVATIONS_IN_INTERVAL = gql`
-  query ReservationTimesInReservationUnit($pk: Int, $from: Date, $to: Date) {
-    reservationUnitByPk(pk: $pk) {
+  query ReservationTimesInReservationUnit($id: ID!, $from: Date, $to: Date) {
+    reservationUnit(id: $id) {
       reservations(
         from: $from
         to: $to

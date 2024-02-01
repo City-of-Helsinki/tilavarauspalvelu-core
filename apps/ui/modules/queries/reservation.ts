@@ -1,6 +1,12 @@
 import { gql } from "@apollo/client";
-import { IMAGE_FRAGMENT } from "common/src/queries/fragments";
 import { Type } from "common/types/gql-types";
+import {
+  RESERVEE_NAME_FRAGMENT,
+  RESERVEE_BILLING_FRAGMENT,
+  IMAGE_FRAGMENT,
+  PRICING_FRAGMENT,
+} from "common/src/queries/fragments";
+import { RESERVATION_UNIT_FRAGMENT, UNIT_NAME_FRAGMENT } from "./fragments";
 
 export const CREATE_RESERVATION = gql`
   mutation createReservation($input: ReservationCreateMutationInput!) {
@@ -16,6 +22,8 @@ export const CREATE_RESERVATION = gql`
 `;
 
 export const UPDATE_RESERVATION = gql`
+  ${RESERVEE_NAME_FRAGMENT}
+  ${RESERVEE_BILLING_FRAGMENT}
   mutation updateReservation($input: ReservationUpdateMutationInput!) {
     updateReservation(input: $input) {
       reservation {
@@ -34,23 +42,8 @@ export const UPDATE_RESERVATION = gql`
         ageGroup {
           pk
         }
-        reserveeFirstName
-        reserveeLastName
-        reserveeOrganisationName
-        reserveePhone
-        reserveeEmail
-        reserveeId
-        reserveeIsUnregisteredAssociation
-        reserveeAddressStreet
-        reserveeAddressCity
-        reserveeAddressZip
-        billingFirstName
-        billingLastName
-        billingPhone
-        billingEmail
-        billingAddressStreet
-        billingAddressCity
-        billingAddressZip
+        ...ReserveeNameFields
+        ...ReserveeBillingFields
         homeCity {
           pk
         }
@@ -109,12 +102,24 @@ export const CONFIRM_RESERVATION = gql`
   }
 `;
 
+const CANCELLATION_RULE_FRAGMENT = gql`
+  fragment CancellationRuleFields on ReservationUnitType {
+    cancellationRule {
+      canBeCancelledTimeBefore
+      needsHandling
+    }
+  }
+`;
+
 // NOTE hard coded NORMAL type so only ment to be used in client ui.
 // reservationType valid values: "normal", "behalf", "staff", "blocked"
 // even though the ReservationsReservationTypeChoices says they are uppercase
 // NOTE bang user ID so this doesn't get abused (don't use it without a user)
 export const LIST_RESERVATIONS = gql`
+  ${PRICING_FRAGMENT}
   ${IMAGE_FRAGMENT}
+  ${UNIT_NAME_FRAGMENT}
+  ${CANCELLATION_RULE_FRAGMENT}
   query listReservations(
     $before: String
     $after: String
@@ -160,32 +165,14 @@ export const LIST_RESERVATIONS = gql`
             nameEn
             nameSv
             unit {
-              nameFi
-              nameEn
-              nameSv
-              location {
-                addressStreetFi
-                addressStreetEn
-                addressStreetSv
-              }
+              ...UnitNameFields
             }
-            cancellationRule {
-              canBeCancelledTimeBefore
-              needsHandling
-            }
+            ...CancellationRuleFields
             images {
               ...ImageFragment
             }
             pricings {
-              begins
-              priceUnit
-              pricingType
-              lowestPrice
-              highestPrice
-              taxPercentage {
-                value
-              }
-              status
+              ...PricingFields
             }
           }
         }
@@ -196,18 +183,16 @@ export const LIST_RESERVATIONS = gql`
 
 export const GET_RESERVATION = gql`
   ${IMAGE_FRAGMENT}
-  query reservationByPk($pk: Int!) {
-    reservationByPk(pk: $pk) {
+  ${RESERVATION_UNIT_FRAGMENT}
+  ${CANCELLATION_RULE_FRAGMENT}
+  ${RESERVEE_NAME_FRAGMENT}
+  query reservation($id: ID!) {
+    reservation(id: $id) {
       pk
       name
+      ...ReserveeNameFields
       description
-      reserveeFirstName
-      reserveeLastName
-      reserveeEmail
-      reserveePhone
-      reserveeType
       reserveeId
-      reserveeOrganisationName
       bufferTimeBefore
       bufferTimeAfter
       begin
@@ -316,6 +301,8 @@ export const GET_RESERVATION = gql`
           supportedFields
           requiredFields
         }
+        ...ReservationUnitFields
+        ...CancellationRuleFields
       }
       purpose {
         pk
@@ -338,6 +325,8 @@ export const GET_RESERVATION = gql`
   }
 `;
 
+// TODO combine these into params query (similarly to as in admin-ui)
+// where are they even used?
 export const GET_RESERVATION_CANCEL_REASONS = gql`
   query getReservationCancelReasons {
     reservationCancelReasons {

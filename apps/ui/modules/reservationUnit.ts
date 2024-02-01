@@ -17,7 +17,7 @@ import {
   type ReservationUnitPricingType,
   ReservationUnitState,
   type UnitType,
-  type ReservationUnitByPkType,
+  type ReservationUnitType,
   State,
   PricingType,
   Status,
@@ -315,7 +315,7 @@ export const isReservationUnitPaidInFuture = (
 /// TODO should rewrite this to work on dates since we want to do that conversion first anyway
 export function isInTimeSpan(
   date: Date,
-  timeSpan: NonNullable<ReservationUnitByPkType["reservableTimeSpans"]>[0]
+  timeSpan: NonNullable<ReservationUnitType["reservableTimeSpans"]>[0]
 ) {
   const { startDatetime, endDatetime } = timeSpan ?? {};
 
@@ -335,8 +335,8 @@ export function isInTimeSpan(
 // available for reservation on the given date
 // TODO should rewrite the timespans to be NonNullable and dates (and do the conversion early, not on each component render)
 export function getPossibleTimesForDay(
-  reservableTimeSpans: ReservationUnitByPkType["reservableTimeSpans"],
-  reservationStartInterval: ReservationUnitByPkType["reservationStartInterval"],
+  reservableTimeSpans: ReservationUnitType["reservableTimeSpans"],
+  reservationStartInterval: ReservationUnitType["reservationStartInterval"],
   date: Date
 ): string[] {
   const allTimes: string[] = [];
