@@ -2,6 +2,7 @@
 import React from "react";
 import "@testing-library/jest-dom";
 import {
+  act,
   fireEvent,
   render,
   screen,
@@ -54,7 +55,7 @@ test("Render recurring reservation form with all but unit field disabled", async
   expect(resUnitSelectLabel).toBeDefined();
 
   const btn = getReservationUnitBtn();
-  await user.click(btn);
+  await act(() => user.click(btn));
   expect(btn).not.toBeRequired();
 
   const listbox = await view.findByLabelText(/reservationUnit/, {
@@ -101,7 +102,7 @@ const selectUnit = async () => {
   expect(btn).not.toBeDisabled();
   // placeholder check because selects use button text checks
   expect(btn).toHaveTextContent("common.select");
-  await user.click(btn);
+  await act(() => user.click(btn));
 
   const listbox = screen.getByLabelText(/reservationUnit/, {
     selector: "ul",
@@ -148,9 +149,9 @@ test.skip("Submit is blocked if all mandatory fields are not set", async () => {
   const submit = view.getByRole("button", { name: "common.reserve" });
   expect(submit).toBeInTheDocument();
   const user = userEvent.setup();
-  await user.click(submit);
+  await act(() => user.click(submit));
   // check errors printed to the form
-  waitFor(() => {
+  await waitFor(() => {
     expect(
       view.getByText("Array must contain at least 1 element(s)")
     ).toBeInTheDocument();
@@ -172,7 +173,7 @@ test.skip("Form has meta when reservation unit is selected.", async () => {
   const typeStaff = view.getByLabelText(/STAFF/);
   expect(typeStaff).toBeInTheDocument();
   const user = userEvent.setup();
-  await user.click(typeStaff);
+  await act(() => user.click(typeStaff));
 
   // Just checking a single meta field for now
   // TODO use camelCase to convert all the metafields from unit[] and run an array check
@@ -213,7 +214,7 @@ async function fillForm({
   expect(btn).not.toBeDisabled();
   // placeholder check because selects use button text checks
   expect(btn).toHaveTextContent("common.select");
-  await user.click(btn);
+  await act(() => user.click(btn));
 
   const listbox = screen.getByLabelText(/reservationUnit/, {
     selector: "ul",
@@ -265,7 +266,7 @@ async function fillForm({
     name: `dayShort.${dayNumber}`,
   });
   expect(button).toBeInTheDocument();
-  await user.click(button);
+  await act(() => user.click(button));
 
   // NOTE this logic is wrong in the component (should use checked attribute not classes and component state)
   // toBeChecked doesn't work even though the role is checkbox, type is button
@@ -401,13 +402,13 @@ test("Reservations can be removed and restored", async () => {
     expect(x).toHaveTextContent(/common.remove/);
   });
 
-  userEvent.click(removeButtons[0]);
+  await userEvent.click(removeButtons[0]);
   await within(list).findByText(/common.restore/);
   const restore = within(list).getByText(/common.restore/);
   expect(within(list).queryAllByText(/common.remove/)).toHaveLength(3);
 
-  userEvent.click(restore);
-  waitFor(
+  await userEvent.click(restore);
+  await waitFor(
     async () => (await within(list).findAllByText(/common.remove/)).length === 4
   );
 }, 30_000);
