@@ -253,10 +253,6 @@ export const getPrice = (props: GetPriceType): string => {
       pricing.priceUnit === "FIXED" || minutes
         ? ""
         : i18n?.t(`prices:priceUnits.${pricing.priceUnit}`);
-
-    if (pricing.priceUnit === "FIXED") {
-      return formatters[currencyFormatter].format(highestPrice);
-    }
     const fLowestPrice = parseFloat(pricing.lowestPrice?.toString())
       ? formatters[floatFormatter].format(lowestPrice * volume)
       : 0;
