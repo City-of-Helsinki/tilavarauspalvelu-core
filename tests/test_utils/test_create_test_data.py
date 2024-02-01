@@ -104,6 +104,7 @@ models: list[type[Model]] = [
 
 
 @pytest.mark.django_db()
+@pytest.mark.slow()
 def test_create_test_data():
     for model in models:
         if model in [
