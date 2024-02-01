@@ -285,6 +285,7 @@ type ApplicationEventNode implements Node {
   """May contain more than one error for same field."""
   errors: [ErrorType]
   status: ApplicationEventStatusChoice
+  relatedApplicationEvents: [ApplicationEventNode]
   pk: Int
 }
 
@@ -311,6 +312,7 @@ input ApplicationEventScheduleApproveMutationInput {
   allocatedDay: Int!
   allocatedEnd: Time!
   allocatedReservationUnit: Int!
+  force: Boolean
   pk: Int!
   clientMutationId: String
 }
@@ -2951,6 +2953,7 @@ type ReservationUnitByPkType implements Node {
   """What kind of reservations are to be booked with this reservation unit."""
   reservationKind: ReservationUnitsReservationUnitReservationKindChoices!
   paymentTypes: [ReservationUnitPaymentTypeType]
+  reservationBlockWholeDay: Boolean!
 
   """
   Can reservations to this reservation unit be able to apply free of charge.
@@ -3094,6 +3097,7 @@ input ReservationUnitCreateMutationInput {
   values are: DIRECT, SEASON, DIRECT_AND_SEASON.
   """
   reservationKind: String
+  reservationBlockWholeDay: Boolean
 
   """
   Can reservations to this reservation unit be able to apply free of charge.
@@ -3112,24 +3116,24 @@ input ReservationUnitCreateMutationInput {
   paymentTypes: [String]
   pricings: [ReservationUnitPricingCreateSerializerInput]
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotSerializerInput]
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
   clientMutationId: String
 }
 
@@ -3219,6 +3223,7 @@ type ReservationUnitCreateMutationPayload {
   values are: DIRECT, SEASON, DIRECT_AND_SEASON.
   """
   reservationKind: String
+  reservationBlockWholeDay: Boolean
 
   """
   Can reservations to this reservation unit be able to apply free of charge.
@@ -3237,24 +3242,24 @@ type ReservationUnitCreateMutationPayload {
   paymentTypes: [String]
   pricings: [ReservationUnitPricingType]
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotNode]
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -3382,14 +3387,8 @@ type ReservationUnitPricingType {
   """Minimum price of the reservation unit including VAT"""
   lowestPrice: Decimal!
 
-  """Minimum price of the reservation unit excluding VAT"""
-  lowestPriceNet: Decimal!
-
   """Maximum price of the reservation unit including VAT"""
   highestPrice: Decimal!
-
-  """Maximum price of the reservation unit excluding VAT"""
-  highestPriceNet: Decimal!
 
   """The percentage of tax included in the price"""
   taxPercentage: TaxPercentageType!
@@ -3397,6 +3396,8 @@ type ReservationUnitPricingType {
   """Status of the pricing"""
   status: ReservationUnitsReservationUnitPricingStatusChoices!
   pk: Int
+  lowestPriceNet: Decimal
+  highestPriceNet: Decimal
 }
 
 input ReservationUnitPricingUpdateSerializerInput {
@@ -3615,6 +3616,7 @@ type ReservationUnitType implements Node {
   """What kind of reservations are to be booked with this reservation unit."""
   reservationKind: ReservationUnitsReservationUnitReservationKindChoices!
   paymentTypes: [ReservationUnitPaymentTypeType]
+  reservationBlockWholeDay: Boolean!
 
   """
   Can reservations to this reservation unit be able to apply free of charge.
@@ -3632,8 +3634,8 @@ type ReservationUnitType implements Node {
   paymentProduct: PaymentProductType
   applicationRounds(active: Boolean): [ApplicationRoundNode]
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotNode!]
-  pricings: [ReservationUnitPricingType]
   images: [ReservationUnitImageType!]!
+  pricings: [ReservationUnitPricingType]
 
   """The ID of the object"""
   id: ID!
@@ -3770,6 +3772,7 @@ input ReservationUnitUpdateMutationInput {
   values are: DIRECT, SEASON, DIRECT_AND_SEASON.
   """
   reservationKind: String
+  reservationBlockWholeDay: Boolean
 
   """
   Can reservations to this reservation unit be able to apply free of charge.
@@ -3788,24 +3791,24 @@ input ReservationUnitUpdateMutationInput {
   paymentTypes: [String]
   pricings: [ReservationUnitPricingUpdateSerializerInput]!
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotSerializerInput]
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
   clientMutationId: String
 }
 
@@ -3895,6 +3898,7 @@ type ReservationUnitUpdateMutationPayload {
   values are: DIRECT, SEASON, DIRECT_AND_SEASON.
   """
   reservationKind: String
+  reservationBlockWholeDay: Boolean
 
   """
   Can reservations to this reservation unit be able to apply free of charge.
@@ -3912,24 +3916,24 @@ type ReservationUnitUpdateMutationPayload {
   pricingTerms: String
   paymentTypes: [String]
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotNode]
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  reservationCancelledInstructionsFi: String
-  reservationCancelledInstructionsEn: String
-  reservationCancelledInstructionsSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -4648,15 +4652,15 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   clientMutationId: String
 }
 
@@ -4666,15 +4670,15 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   shortDescriptionFi: String
   shortDescriptionEn: String
   shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]

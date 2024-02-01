@@ -333,6 +333,7 @@ export type ApplicationEventNode = Node & {
   numPersons?: Maybe<Scalars["Int"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
   purpose?: Maybe<ReservationPurposeType>;
+  relatedApplicationEvents?: Maybe<Array<Maybe<ApplicationEventNode>>>;
   status?: Maybe<ApplicationEventStatusChoice>;
   uuid: Scalars["UUID"]["output"];
 };
@@ -369,6 +370,7 @@ export type ApplicationEventScheduleApproveMutationInput = {
   allocatedEnd: Scalars["Time"]["input"];
   allocatedReservationUnit: Scalars["Int"]["input"];
   clientMutationId?: InputMaybe<Scalars["String"]["input"]>;
+  force?: InputMaybe<Scalars["Boolean"]["input"]>;
   pk: Scalars["Int"]["input"];
 };
 
@@ -3194,6 +3196,7 @@ export type ReservationUnitByPkType = Node & {
   reservableTimeSpans?: Maybe<Array<Maybe<ReservableTimeSpanType>>>;
   /** Time when making reservations become possible for this reservation unit. */
   reservationBegins?: Maybe<Scalars["DateTime"]["output"]>;
+  reservationBlockWholeDay: Scalars["Boolean"]["output"];
   reservationCancelledInstructionsEn?: Maybe<Scalars["String"]["output"]>;
   reservationCancelledInstructionsFi?: Maybe<Scalars["String"]["output"]>;
   reservationCancelledInstructionsSv?: Maybe<Scalars["String"]["output"]>;
@@ -3333,6 +3336,7 @@ export type ReservationUnitCreateMutationInput = {
   requireReservationHandling?: InputMaybe<Scalars["Boolean"]["input"]>;
   /** Time when making reservations become possible for this reservation unit. */
   reservationBegins?: InputMaybe<Scalars["DateTime"]["input"]>;
+  reservationBlockWholeDay?: InputMaybe<Scalars["Boolean"]["input"]>;
   reservationCancelledInstructionsEn?: InputMaybe<Scalars["String"]["input"]>;
   reservationCancelledInstructionsFi?: InputMaybe<Scalars["String"]["input"]>;
   reservationCancelledInstructionsSv?: InputMaybe<Scalars["String"]["input"]>;
@@ -3422,6 +3426,7 @@ export type ReservationUnitCreateMutationPayload = {
   requireReservationHandling?: Maybe<Scalars["Boolean"]["output"]>;
   /** Time when making reservations become possible for this reservation unit. */
   reservationBegins?: Maybe<Scalars["DateTime"]["output"]>;
+  reservationBlockWholeDay?: Maybe<Scalars["Boolean"]["output"]>;
   reservationCancelledInstructionsEn?: Maybe<Scalars["String"]["output"]>;
   reservationCancelledInstructionsFi?: Maybe<Scalars["String"]["output"]>;
   reservationCancelledInstructionsSv?: Maybe<Scalars["String"]["output"]>;
@@ -3563,12 +3568,10 @@ export type ReservationUnitPricingType = {
   begins: Scalars["Date"]["output"];
   /** Maximum price of the reservation unit including VAT */
   highestPrice: Scalars["Decimal"]["output"];
-  /** Maximum price of the reservation unit excluding VAT */
-  highestPriceNet: Scalars["Decimal"]["output"];
+  highestPriceNet?: Maybe<Scalars["Decimal"]["output"]>;
   /** Minimum price of the reservation unit including VAT */
   lowestPrice: Scalars["Decimal"]["output"];
-  /** Minimum price of the reservation unit excluding VAT */
-  lowestPriceNet: Scalars["Decimal"]["output"];
+  lowestPriceNet?: Maybe<Scalars["Decimal"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
   /** Unit of the price */
   priceUnit: ReservationUnitsReservationUnitPricingPriceUnitChoices;
@@ -3666,6 +3669,7 @@ export type ReservationUnitType = Node & {
   requireReservationHandling: Scalars["Boolean"]["output"];
   /** Time when making reservations become possible for this reservation unit. */
   reservationBegins?: Maybe<Scalars["DateTime"]["output"]>;
+  reservationBlockWholeDay: Scalars["Boolean"]["output"];
   reservationCancelledInstructionsEn?: Maybe<Scalars["String"]["output"]>;
   reservationCancelledInstructionsFi?: Maybe<Scalars["String"]["output"]>;
   reservationCancelledInstructionsSv?: Maybe<Scalars["String"]["output"]>;
@@ -3816,6 +3820,7 @@ export type ReservationUnitUpdateMutationInput = {
   requireReservationHandling?: InputMaybe<Scalars["Boolean"]["input"]>;
   /** Time when making reservations become possible for this reservation unit. */
   reservationBegins?: InputMaybe<Scalars["DateTime"]["input"]>;
+  reservationBlockWholeDay?: InputMaybe<Scalars["Boolean"]["input"]>;
   reservationCancelledInstructionsEn?: InputMaybe<Scalars["String"]["input"]>;
   reservationCancelledInstructionsFi?: InputMaybe<Scalars["String"]["input"]>;
   reservationCancelledInstructionsSv?: InputMaybe<Scalars["String"]["input"]>;
@@ -3904,6 +3909,7 @@ export type ReservationUnitUpdateMutationPayload = {
   requireReservationHandling?: Maybe<Scalars["Boolean"]["output"]>;
   /** Time when making reservations become possible for this reservation unit. */
   reservationBegins?: Maybe<Scalars["DateTime"]["output"]>;
+  reservationBlockWholeDay?: Maybe<Scalars["Boolean"]["output"]>;
   reservationCancelledInstructionsEn?: Maybe<Scalars["String"]["output"]>;
   reservationCancelledInstructionsFi?: Maybe<Scalars["String"]["output"]>;
   reservationCancelledInstructionsSv?: Maybe<Scalars["String"]["output"]>;
