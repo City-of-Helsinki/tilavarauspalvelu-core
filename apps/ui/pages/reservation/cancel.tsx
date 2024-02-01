@@ -8,7 +8,7 @@ import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { Container } from "common";
 import { useSession } from "@/hooks/auth";
-import { useOrder, useReservation } from "@/hooks/reservation";
+import { useDeleteReservation, useOrder } from "@/hooks/reservation";
 import DeleteCancelled from "@/components/reservation/DeleteCancelled";
 import ReservationFail from "@/components/reservation/ReservationFail";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
@@ -45,12 +45,12 @@ const Cancel = ({ apiBaseUrl }: Props): JSX.Element => {
   const uuid = Array.isArray(orderId) ? orderId[0] : orderId;
   const { order, isLoading, called } = useOrder({ orderUuid: uuid });
 
-  const { deleteReservation, deleteError, deleteLoading, deleted } =
-    useReservation({
-      reservationPk: order?.reservationPk
-        ? parseInt(order?.reservationPk, 10)
-        : 0,
-    });
+  const {
+    mutation: deleteReservation,
+    error: deleteError,
+    isLoading: isDeleteLoading,
+    deleted,
+  } = useDeleteReservation();
 
   useEffect(() => {
     const { reservationPk } = order || {};
@@ -70,7 +70,7 @@ const Cancel = ({ apiBaseUrl }: Props): JSX.Element => {
     </StyledContainer>;
   }
 
-  if (isLoading || deleteLoading || !called) {
+  if (isLoading || isDeleteLoading || !called) {
     return (
       <StyledContainer>
         <LoadingSpinner />

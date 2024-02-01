@@ -89,35 +89,30 @@ type UseReservationProps = {
   reservationPk: number;
 };
 
-export const useReservation = ({
-  reservationPk,
-}: UseReservationProps): {
+export function useDeleteReservation() {
+  const [mutation, { data, error, loading }] = useMutation<
+    { deleteReservation: ReservationDeleteMutationPayload },
+    { input: ReservationDeleteMutationInput }
+  >(DELETE_RESERVATION, {
+    // catch all thrown errors so we don't crash
+    onError: () => {},
+  });
+
+  const deleted = data?.deleteReservation.deleted ?? false;
+
+  return {
+    mutation,
+    error,
+    isLoading: loading,
+    deleted,
+  };
+}
+
+export function useReservation({ reservationPk }: UseReservationProps): {
   reservation?: ReservationType;
   error?: ApolloError;
   loading: boolean;
-  deleteReservation: (
-    arg: Record<"variables", Record<"input", Record<"pk", number>>>
-  ) => void;
-  deleteError?: ApolloError;
-  deleteLoading: boolean;
-  deleted: boolean;
-} => {
-  const [deleted, setDeleted] = useState(false);
-
-  const [deleteReservation, { error: deleteError, loading: deleteLoading }] =
-    useMutation<
-      { deleteReservation: ReservationDeleteMutationPayload },
-      { input: ReservationDeleteMutationInput }
-    >(DELETE_RESERVATION, {
-      onCompleted: (res) => {
-        if (res.deleteReservation.deleted) {
-          setDeleted(true);
-        }
-      },
-      // catch all thrown errors so we don't crash
-      onError: () => {},
-    });
-
+} {
   const { data, error, loading } = useQuery<Query, QueryReservationByPkArgs>(
     GET_RESERVATION,
     {
@@ -133,12 +128,8 @@ export const useReservation = ({
     reservation,
     error,
     loading,
-    deleteReservation,
-    deleteError,
-    deleteLoading,
-    deleted,
   };
-};
+}
 
 type UseReservationsProps = {
   currentUser?: UserType;

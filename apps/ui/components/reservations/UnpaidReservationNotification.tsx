@@ -7,7 +7,11 @@ import { ReservationsReservationStateChoices } from "common/types/gql-types";
 import NotificationWrapper from "common/src/components/NotificationWrapper";
 import { useCurrentUser } from "@/hooks/user";
 import { BlackButton, Toast } from "@/styles/util";
-import { useReservations, useReservation, useOrder } from "@/hooks/reservation";
+import {
+  useReservations,
+  useOrder,
+  useDeleteReservation,
+} from "@/hooks/reservation";
 import { getCheckoutUrl } from "@/modules/reservation";
 
 const NotificationContent = styled.div`
@@ -51,8 +55,12 @@ const ReservationNotification = () => {
     orderUuid: reservation?.orderUuid ?? undefined,
   });
 
-  const { deleteReservation, deleteLoading, deleteError, deleted } =
-    useReservation({ reservationPk: reservation?.pk ?? 0 });
+  const {
+    mutation: deleteReservation,
+    deleted,
+    error: deleteError,
+    isLoading: isDeleteLoading,
+  } = useDeleteReservation();
 
   const checkoutUrl = getCheckoutUrl(order, i18n.language);
 
@@ -111,7 +119,7 @@ const ReservationNotification = () => {
                 });
               }
             }}
-            disabled={deleteLoading || !reservation?.pk}
+            disabled={isDeleteLoading || !reservation?.pk}
             data-testid="reservation-notification__button--delete"
           >
             {t("notification:waitingForPayment.cancelReservation")}
