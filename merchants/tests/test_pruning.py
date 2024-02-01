@@ -111,9 +111,9 @@ class UpdateExpiredOrderTestCase(TestCase):
         order.refresh_from_db()
         assert order.status == OrderStatus.EXPIRED
 
-    @mock.patch("merchants.pruning.capture_exception")
+    @mock.patch("merchants.pruning.log_exception_to_sentry")
     @mock.patch("merchants.pruning.get_payment")
-    def test_get_payment_errors_are_logged(self, mock_get_payment, mock_capture_exception):
+    def test_get_payment_errors_are_logged(self, mock_get_payment, mock_log_exception_to_sentry):
         mock_get_payment.side_effect = GetPaymentError("mock-error")
 
         six_minutes_ago = datetime.now() - timedelta(minutes=6)
@@ -129,9 +129,9 @@ class UpdateExpiredOrderTestCase(TestCase):
 
         order.refresh_from_db()
         assert order.status == OrderStatus.DRAFT
-        assert mock_capture_exception.called is True
+        assert mock_log_exception_to_sentry.called is True
 
-    @mock.patch("merchants.pruning.capture_exception")
+    @mock.patch("merchants.pruning.log_exception_to_sentry")
     @mock.patch("merchants.pruning.cancel_order")
     @mock.patch("merchants.pruning.get_payment")
     def test_cancel_error_errors_are_logged(self, mock_get_payment, mock_cancel_order, mock_capture_message):

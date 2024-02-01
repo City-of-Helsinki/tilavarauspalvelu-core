@@ -141,9 +141,9 @@ class ReservationUnitRefreshAccountingTaskTestCase(TaskTestBase):
         refresh_reservation_unit_accounting(0)
         assert mock_capture_message.called is True
 
-    @mock.patch("reservation_units.tasks.capture_exception")
+    @mock.patch("reservation_units.tasks.log_exception_to_sentry")
     def test_accounting_task_captures_api_errors(
-        self, mock_capture_exception, mock_product, mock_create_or_update_accounting
+        self, mock_log_exception_to_sentry, mock_product, mock_create_or_update_accounting
     ):
         mock_create_or_update_accounting.side_effect = CreateOrUpdateAccountingError("mock-error")
 
@@ -151,4 +151,4 @@ class ReservationUnitRefreshAccountingTaskTestCase(TaskTestBase):
         self.runit.save()
 
         refresh_reservation_unit_accounting(self.runit.pk)
-        assert mock_capture_exception.called is True
+        assert mock_log_exception_to_sentry.called is True

@@ -42,8 +42,8 @@ class RefundStatusFromJsonTestCase(TestCase):
             2023, 3, 29, 7, 36, 13, 576000, tzinfo=settings.VERKKOKAUPPA_TIMEZONE
         )
 
-    @mock.patch("merchants.verkkokauppa.payment.types.capture_exception")
-    def test_parsing_fails(self, mock_capture_exception):
+    @mock.patch("merchants.verkkokauppa.payment.types.log_exception_to_sentry")
+    def test_parsing_fails(self, mock_log_exception_to_sentry):
         data = refund_status_json.copy()
         data["orderId"] = "not-a-uuid"
 
@@ -51,4 +51,4 @@ class RefundStatusFromJsonTestCase(TestCase):
             RefundStatusResult.from_json(data)
 
         assert str(ex.value) == "Could not parse refund status: badly formed hexadecimal UUID string"
-        assert mock_capture_exception.called is True
+        assert mock_log_exception_to_sentry.called is True

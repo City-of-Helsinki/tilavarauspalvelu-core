@@ -3,7 +3,6 @@ from django.core.exceptions import ValidationError
 from graphene import ClientIDMutation
 from graphene_django.rest_framework.mutation import SerializerMutation
 from rest_framework.generics import get_object_or_404
-from sentry_sdk import capture_exception, push_scope
 
 from api.graphql.extensions.legacy_helpers import OldAuthDeleteMutation, OldAuthSerializerMutation
 from api.graphql.types.merchants.types import PaymentOrderType
@@ -45,6 +44,7 @@ from merchants.verkkokauppa.order.exceptions import CancelOrderError
 from merchants.verkkokauppa.order.requests import cancel_order
 from reservations.choices import ReservationStateChoice
 from reservations.models import Reservation
+from utils.sentry import log_exception_to_sentry
 
 
 class ReservationCreateMutation(OldAuthSerializerMutation, SerializerMutation):
@@ -186,11 +186,7 @@ class ReservationDeleteMutation(OldAuthDeleteMutation, ClientIDMutation):
                     payment_order.status = OrderStatus.CANCELLED
                     payment_order.save()
             except CancelOrderError as err:
-                with push_scope() as scope:
-                    scope.set_extra("details", "Order cancellation failed")
-                    scope.set_extra("remote-id", payment_order.remote_id)
-                    capture_exception(err)
-
+                log_exception_to_sentry(err, details="Order cancellation failed", remote_id=payment_order.remote_id)
                 payment_order.status = OrderStatus.CANCELLED
                 payment_order.save()
 

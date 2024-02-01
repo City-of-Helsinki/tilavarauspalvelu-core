@@ -6,13 +6,14 @@ from django.conf import settings
 from requests import RequestException
 from requests import get as _get
 from requests import post as _post
-from sentry_sdk import capture_exception, capture_message, push_scope
+from sentry_sdk import capture_message
 
 from merchants.verkkokauppa.constants import METRIC_SERVICE_NAME, REQUEST_TIMEOUT_SECONDS
 from merchants.verkkokauppa.exceptions import VerkkokauppaConfigurationError
 from merchants.verkkokauppa.order.exceptions import CancelOrderError, CreateOrderError, GetOrderError, ParseOrderError
 from merchants.verkkokauppa.order.types import CreateOrderParams, Order
 from utils.metrics import ExternalServiceMetric
+from utils.sentry import log_exception_to_sentry
 
 
 def _get_base_url():
@@ -49,10 +50,7 @@ def create_order(params: CreateOrderParams, post=_post) -> Order:
             raise CreateOrderError(f"Order creation failed: {json.get('errors')}")
         return Order.from_json(json)
     except (RequestException, JSONDecodeError, ParseOrderError) as err:
-        with push_scope() as scope:
-            scope.set_extra("details", "Order creation failed")
-            scope.set_extra("params", params)
-            capture_exception(err)
+        log_exception_to_sentry(err, details="Order creation failed.", params=params)
         raise CreateOrderError(f"Order creation failed: {err!s}") from err
 
 
@@ -76,10 +74,7 @@ def get_order(order_id: UUID, get=_get) -> Order:
             raise GetOrderError(f"Order retrieval failed: {json.get('errors')}")
         return Order.from_json(json)
     except (RequestException, JSONDecodeError, ParseOrderError) as err:
-        with push_scope() as scope:
-            scope.set_extra("details", "Order retrieval failed")
-            scope.set_extra("order-id", order_id)
-            capture_exception(err)
+        log_exception_to_sentry(err, details="Order retrieval failed.", order_id=order_id)
         raise GetOrderError(f"Order retrieval failed: {err!s}") from err
 
 
@@ -114,8 +109,5 @@ def cancel_order(order_id: UUID, user_uuid: UUID, post=_post) -> Order | None:
         return Order.from_json(json["order"])
 
     except (RequestException, JSONDecodeError, ParseOrderError) as err:
-        with push_scope() as scope:
-            scope.set_extra("details", "Order cancellation failed")
-            scope.set_extra("order-id", order_id)
-            capture_exception(err)
+        log_exception_to_sentry(err, details="Order cancellation failed.", order_id=order_id)
         raise CancelOrderError(f"Order cancellation failed: {err!s}") from err

@@ -63,12 +63,12 @@ class RefundFromJsonTestCase(TestCase):
         assert refund.customer_phone is None
         assert refund.refund_reason is None
 
-    @mock.patch("merchants.verkkokauppa.payment.types.capture_exception")
-    def test_parsing_fails(self, mock_capture_exception):
+    @mock.patch("merchants.verkkokauppa.payment.types.log_exception_to_sentry")
+    def test_parsing_fails(self, mock_log_exception_to_sentry):
         data = refund_json.copy()
         data["refundId"] = "not-a-uuid"
         with pytest.raises(ParseRefundError) as ex:
             Refund.from_json(data)
 
         assert str(ex.value) == "Could not parse refund: badly formed hexadecimal UUID string"
-        assert mock_capture_exception.called is True
+        assert mock_log_exception_to_sentry.called is True
