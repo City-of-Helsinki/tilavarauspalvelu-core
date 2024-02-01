@@ -225,7 +225,10 @@ function validateSeasonalTimes(
       }
 
       // check that the begin is before the end
-      if (begin != null && end != null) {
+      if (
+        !Number.isNaN(Number(begin.minutes)) &&
+        !Number.isNaN(Number(begin.hours))
+      ) {
         const t1 = begin.hours * 60 + begin.minutes;
         const t2 = end.hours * 60 + end.minutes;
         if (t1 >= t2 && t2 !== 0) {
@@ -259,7 +262,7 @@ function validateSeasonalTimes(
             });
           }
         }
-        if (lastEnd == null && begin != null) {
+        if (lastEnd == null && !Number.isNaN(Number(begin.minutes))) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: "Not allowed to add a second time without first",
@@ -268,7 +271,7 @@ function validateSeasonalTimes(
         }
       }
 
-      if (end != null) {
+      if (!Number.isNaN(Number(begin.hours))) {
         const t2 = end.hours * 60 + end.minutes;
         lastEnd = t2;
       }
