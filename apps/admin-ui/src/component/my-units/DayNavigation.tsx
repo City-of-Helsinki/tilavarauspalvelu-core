@@ -4,6 +4,7 @@ import { addDays, subDays } from "date-fns";
 import { useTranslation } from "react-i18next";
 import { Button, IconAngleLeft, IconAngleRight, DateInput } from "hds-react";
 import { fromUIDate, toUIDate } from "common/src/common/util";
+import { breakpoints } from "common";
 
 type Props = {
   date: string;
@@ -23,9 +24,18 @@ const Wrapper = styled.div`
   }
 `;
 
+const WeekDay = styled.span`
+  @media (min-width: ${breakpoints.m}) {
+    margin-left: var(--spacing-s);
+  }
+`;
+
 const SimpleDatePicker = styled(DateInput)`
   border-color: transparent;
-
+  max-width: 180px;
+  @media (min-width: ${breakpoints.m}) {
+    margin-right: var(--spacing-s);
+  }
   & input {
     text-align: center;
     border-color: transparent !important;
@@ -54,6 +64,7 @@ const DayNavigation = ({ date, onDateChange }: Props): JSX.Element => {
       >
         {" "}
       </Button>
+      <WeekDay>{`${t(`dayShort.${d.getDay()}`)} `}</WeekDay>
       <SimpleDatePicker
         disableConfirmation
         id="date-input"
