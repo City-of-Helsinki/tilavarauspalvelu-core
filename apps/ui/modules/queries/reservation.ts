@@ -1,5 +1,22 @@
 import { gql } from "@apollo/client";
 import { ReservationsReservationTypeChoices } from "common/types/gql-types";
+import {
+  IMAGE_FRAGMENT,
+  PRICING_FRAGMENT,
+  RESERVATION_UNIT_FRAGMENT,
+  UNIT_NAME_FRAGMENT,
+} from "./fragments";
+
+const RESERVEE_NAME_FRAGMENT = gql`
+  fragment ReserveeNameFields on ReservationType {
+    reserveeFirstName
+    reserveeLastName
+    reserveeEmail
+    reserveePhone
+    reserveeType
+    reserveeOrganisationName
+  }
+`;
 
 export const CREATE_RESERVATION = gql`
   mutation createReservation($input: ReservationCreateMutationInput!) {
@@ -15,6 +32,7 @@ export const CREATE_RESERVATION = gql`
 `;
 
 export const UPDATE_RESERVATION = gql`
+  ${RESERVEE_NAME_FRAGMENT}
   mutation updateReservation($input: ReservationUpdateMutationInput!) {
     updateReservation(input: $input) {
       reservation {
@@ -33,11 +51,7 @@ export const UPDATE_RESERVATION = gql`
         ageGroup {
           pk
         }
-        reserveeFirstName
-        reserveeLastName
-        reserveeOrganisationName
-        reserveePhone
-        reserveeEmail
+        ...ReserveeNameFields
         reserveeId
         reserveeIsUnregisteredAssociation
         reserveeAddressStreet
@@ -108,11 +122,24 @@ export const CONFIRM_RESERVATION = gql`
   }
 `;
 
+const CANCELLATION_RULE_FRAGMENT = gql`
+  fragment CancellationRuleFields on ReservationUnitType {
+    cancellationRule {
+      canBeCancelledTimeBefore
+      needsHandling
+    }
+  }
+`;
+
 // NOTE hard coded NORMAL type so only ment to be used in client ui.
 // reservationType valid values: "normal", "behalf", "staff", "blocked"
 // even though the ReservationsReservationTypeChoices says they are uppercase
 // NOTE bang user ID so this doesn't get abused (don't use it without a user)
 export const LIST_RESERVATIONS = gql`
+  ${PRICING_FRAGMENT}
+  ${IMAGE_FRAGMENT}
+  ${UNIT_NAME_FRAGMENT}
+  ${CANCELLATION_RULE_FRAGMENT}
   query listReservations(
     $before: String
     $after: String
@@ -156,34 +183,14 @@ export const LIST_RESERVATIONS = gql`
             nameEn
             nameSv
             unit {
-              nameFi
-              nameEn
-              nameSv
-              location {
-                addressStreetFi
-                addressStreetEn
-                addressStreetSv
-              }
+              ...UnitNameFields
             }
-            cancellationRule {
-              canBeCancelledTimeBefore
-              needsHandling
-            }
+            ...CancellationRuleFields
             images {
-              imageType
-              imageUrl
-              mediumUrl
+              ...ImageFields
             }
             pricings {
-              begins
-              priceUnit
-              pricingType
-              lowestPrice
-              highestPrice
-              taxPercentage {
-                value
-              }
-              status
+              ...PricingFields
             }
           }
         }
@@ -193,18 +200,16 @@ export const LIST_RESERVATIONS = gql`
 `;
 
 export const GET_RESERVATION = gql`
+  ${RESERVATION_UNIT_FRAGMENT}
+  ${CANCELLATION_RULE_FRAGMENT}
+  ${RESERVEE_NAME_FRAGMENT}
   query reservationByPk($pk: Int!) {
     reservationByPk(pk: $pk) {
       pk
       name
+      ...ReserveeNameFields
       description
-      reserveeFirstName
-      reserveeLastName
-      reserveeEmail
-      reserveePhone
-      reserveeType
       reserveeId
-      reserveeOrganisationName
       begin
       end
       calendarUrl
@@ -218,99 +223,8 @@ export const GET_RESERVATION = gql`
       orderStatus
       orderUuid
       reservationUnits {
-        pk
-        nameFi
-        nameEn
-        nameSv
-        reservationPendingInstructionsFi
-        reservationPendingInstructionsEn
-        reservationPendingInstructionsSv
-        reservationConfirmedInstructionsFi
-        reservationConfirmedInstructionsEn
-        reservationConfirmedInstructionsSv
-        reservationCancelledInstructionsFi
-        reservationCancelledInstructionsEn
-        reservationCancelledInstructionsSv
-        termsOfUseFi
-        termsOfUseEn
-        termsOfUseSv
-        serviceSpecificTerms {
-          textFi
-          textEn
-          textSv
-        }
-        cancellationTerms {
-          textFi
-          textEn
-          textSv
-        }
-        paymentTerms {
-          textFi
-          textEn
-          textSv
-        }
-        pricingTerms {
-          textFi
-          textEn
-          textSv
-        }
-        unit {
-          nameFi
-          nameEn
-          nameSv
-          location {
-            latitude
-            longitude
-            addressStreetFi
-            addressStreetEn
-            addressStreetSv
-            addressZip
-            addressCityFi
-            addressCityEn
-            addressCitySv
-          }
-        }
-        cancellationRule {
-          canBeCancelledTimeBefore
-          needsHandling
-        }
-        spaces {
-          pk
-          nameFi
-          nameEn
-          nameSv
-        }
-        metadataSet {
-          supportedFields
-          requiredFields
-        }
-        images {
-          imageUrl
-          largeUrl
-          mediumUrl
-          smallUrl
-          imageType
-        }
-        pricings {
-          begins
-          priceUnit
-          pricingType
-          lowestPrice
-          highestPrice
-          taxPercentage {
-            value
-          }
-          status
-        }
-        minPersons
-        maxPersons
-        metadataSet {
-          id
-          name
-          pk
-          supportedFields
-          requiredFields
-        }
+        ...ReservationUnitFields
+        ...CancellationRuleFields
       }
       purpose {
         pk
