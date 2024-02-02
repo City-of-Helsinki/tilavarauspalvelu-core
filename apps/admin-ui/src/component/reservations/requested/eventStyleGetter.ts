@@ -10,7 +10,8 @@ import {
   EVENT_STYLE,
   STAFF_RESERVATION,
   WAITING_PAYMENT,
-} from "../../../common/calendarStyling";
+  POST_PAUSE,
+} from "@/common/calendarStyling";
 
 const SELECTED = {
   style: {
@@ -37,6 +38,7 @@ export const legend = [
   },
 ];
 
+// TODO combine with the eventStyleGetter in my-units/eventStyleGetter.ts
 const eventStyleGetter =
   (
     currentReservation?: ReservationType,
@@ -60,6 +62,8 @@ const eventStyleGetter =
 
     const isClosed = event?.type === ReservationsReservationTypeChoices.Blocked;
     const isStaff = event?.type === ReservationsReservationTypeChoices.Staff;
+    // @ts-expect-error: TODO: we are dynamically overriding an enum upstream
+    const isBuffer = event?.state === "BUFFER";
 
     const style = {
       ...EVENT_STYLE,
@@ -73,6 +77,8 @@ const eventStyleGetter =
       Object.assign(style, WAITING_PAYMENT.style);
     } else if (isConfirmed && !isClosed) {
       Object.assign(style, CONFIRMED.style);
+    } else if (isBuffer) {
+      Object.assign(style, { ...POST_PAUSE.style, border: 0 });
     } else {
       Object.assign(style, REST.style);
     }

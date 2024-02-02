@@ -3,12 +3,16 @@ import CommonCalendar from "common/src/calendar/Calendar";
 import { Toolbar } from "common/src/calendar/Toolbar";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { type ReservationType } from "common/types/gql-types";
+import {
+  ReservationsReservationTypeChoices,
+  type ReservationType,
+} from "common/types/gql-types";
 import { useModal } from "app/context/ModalContext";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
 import Legend from "./Legend";
 import EditTimeModal from "../EditTimeModal";
 import { isPossibleToEdit } from "./reservationModificationRules";
+import { getEventBuffers } from "common/src/calendar/util";
 
 type Props = {
   reservation: ReservationType;
@@ -44,6 +48,7 @@ type WeekOptions = "day" | "week" | "month";
 /// @param reservation the current reservation to show in calendar
 /// @param selected (for recurring only) different styling
 /// @param focusDate date to show in the calendar
+// TODO combine with the one in my-unit/ReservationUnitCalendar (without the time change button)
 const Calendar = ({
   reservation,
   selected,
@@ -84,10 +89,18 @@ const Calendar = ({
     !reservation.recurringReservation &&
     isPossibleToEdit(reservation.state, new Date(reservation.end));
 
+  const eventBuffers = events
+    ? getEventBuffers(
+        events
+          .map((e) => e.event)
+          .filter((e) => e?.type !== ReservationsReservationTypeChoices.Blocked)
+      )
+    : [];
+
   return (
     <Container>
       <CommonCalendar<ReservationType>
-        events={events}
+        events={[...events, ...eventBuffers]}
         toolbarComponent={(props) => (
           <Toolbar {...props}>
             {isAllowedToModify && (
