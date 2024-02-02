@@ -20,12 +20,11 @@ import {
 } from "./modules/applicationRoundAllocation";
 import { AllocationCard } from "./AllocationCard";
 import { ApolloQueryResult } from "@apollo/client";
+import { useSlotSelection } from "./hooks";
 
 type Props = {
   applicationEvents: ApplicationEventNode[] | null;
   reservationUnit?: ReservationUnitNode;
-  selection: string[] | null;
-  setSelection: (val: string[]) => void;
   refetchApplicationEvents: () => Promise<ApolloQueryResult<Query>>;
 };
 
@@ -99,14 +98,9 @@ const getTimeLabel = (selection: string[], t: TFunction): string => {
   }:${endMinute === "30" ? "00" : "30"}`;
 };
 
-function TimeSelection({
-  selection,
-  setSelection,
-}: {
-  selection: string[] | null;
-  setSelection: (val: string[]) => void;
-}): JSX.Element {
+function TimeSelection(): JSX.Element {
   const { t } = useTranslation();
+  const [selection, setSelection] = useSlotSelection();
 
   const getOptions = useCallback(
     (type: "start" | "end") => {
@@ -217,11 +211,10 @@ function TimeSelection({
 export function AllocationColumn({
   applicationEvents,
   reservationUnit,
-  selection,
-  setSelection,
   refetchApplicationEvents,
 }: Props): JSX.Element | null {
   const { t } = useTranslation();
+  const [selection, setSelection] = useSlotSelection();
 
   const painted = getSlotApplicationEvents(selection, applicationEvents);
   const aeList = getApplicationEventsInsideSelection(
@@ -253,7 +246,7 @@ export function AllocationColumn({
         showAllLabel={t("Allocation.changeTime")}
         maximumNumber={0}
       >
-        <TimeSelection selection={selection} setSelection={setSelection} />
+        <TimeSelection />
       </StyledShowAllContainer>
       {aeList.map((applicationEvent) => (
         <AllocationCard

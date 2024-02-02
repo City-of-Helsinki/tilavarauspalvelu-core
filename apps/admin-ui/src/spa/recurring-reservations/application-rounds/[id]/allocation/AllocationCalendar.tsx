@@ -20,12 +20,11 @@ import {
 } from "./modules/applicationRoundAllocation";
 import { uniqBy } from "lodash";
 import { breakpoints } from "common";
+import { useSlotSelection } from "./hooks";
 
 type Props = {
   applicationEvents: ApplicationEventNode[] | null;
   focusedApplicationEvent?: ApplicationEventNode;
-  selection: string[];
-  setSelection: (val: string[]) => void;
   reservationUnitPk: number;
 };
 
@@ -227,10 +226,9 @@ const weekdays = [0, 1, 2, 3, 4, 5, 6] as const;
 export function AllocationCalendar({
   applicationEvents,
   focusedApplicationEvent,
-  selection,
-  setSelection,
   reservationUnitPk,
 }: Props): JSX.Element {
+  const [selection, setSelection] = useSlotSelection();
   const [isSelecting, setIsSelecting] = useState(false);
   const [cells] = useState(
     applicationEventSchedulesToCells(

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useSearchParams } from "react-router-dom";
@@ -127,9 +127,9 @@ export function ApplicationEvents({
   refetchApplicationEvents,
 }: ApplicationEventsProps): JSX.Element {
   const [params] = useSearchParams();
-  // TODO move this to query params (selected begin, selected end), maybe even selected day separately
-  const [selectedSlots, setSelectedSlots] = useState<string[]>([]);
-
+  // TODO could also pass the applicationEvents to the hook and let it handle the filtering
+  // and validating that the focused application event is in the list of application events
+  // could also add a reset toggle to the hook, and remove the effect from here
   const [focused, setFocusedApplicationEvent] = useFocusApplicationEvent();
   const focusedApplicationEvent = applicationEvents?.find(
     (ae) => ae.pk === focused
@@ -150,12 +150,18 @@ export function ApplicationEvents({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- We only care if reservationUnit changes, and adding the rest causes an infinite loop
   }, [reservationUnit, params]);
 
-  // TODO this is not great
-  // we should grep the selected application event where it's used not use an intermediate state for it
-  useEffect(
-    () => setSelectedSlots([]),
+  /* TODO: rework / remove
+   * issues
+   * Any time anything is changed in the filters or selection this is going to reset.
+   * Rather make it a higher level hook (on the page level) and reset only for the few things that need it.
+   * Could also include it inside the Selection hook (pass things that should cause side effects to it).
+   * For now NOT reseting at all, add them individually as the client requests not before
+   * 2nd note: when reseting check if the value is valid or makes sense, don't just reset it
+   * 3rd note: make sure landing on the page with query params works as expected (and doesn't just remove them)
+  useEffect( () => setSelectedSlots([]),
     [focusedApplicationEvent, reservationUnit]
   );
+  */
 
   // TODO should use mobile menu layout if the screen is small (this page probably requires  >= 1200px)
   return (
@@ -167,15 +173,11 @@ export function ApplicationEvents({
       <AllocationCalendar
         applicationEvents={applicationEvents}
         focusedApplicationEvent={focusedApplicationEvent}
-        selection={selectedSlots}
-        setSelection={setSelectedSlots}
         reservationUnitPk={reservationUnit?.pk ?? 0}
       />
       <AllocationColumn
         applicationEvents={applicationEvents}
         reservationUnit={reservationUnit}
-        selection={selectedSlots}
-        setSelection={setSelectedSlots}
         refetchApplicationEvents={refetchApplicationEvents}
       />
     </Content>

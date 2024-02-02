@@ -396,7 +396,7 @@ function ApplicationRoundAllocation({
     }
   };
 
-  const hideSearchTags = ["unit", "reservation-unit", "aes"];
+  const hideSearchTags = ["unit", "reservation-unit", "aes", "selectionBegin", "selectionEnd"];
 
   const handleResetFilters = () => {
     const newParams = hideSearchTags.reduce<typeof searchParams>(
