@@ -62,8 +62,12 @@ const BufferToggles = ({
         {t("reservationApplication:buffers.label")}
         <Tooltip>{t("reservationApplication:buffers.tooltip")}</Tooltip>
       </LabelWithTooltip>
-      {before !== 0 && <BufferController name="bufferTimeBefore" seconds={before} />}
-      {after !== 0 && <BufferController name="bufferTimeAfter" seconds={after} />}
+      {before !== 0 && (
+        <BufferController name="bufferTimeBefore" seconds={before} />
+      )}
+      {after !== 0 && (
+        <BufferController name="bufferTimeAfter" seconds={after} />
+      )}
     </Wrapper>
   );
 };

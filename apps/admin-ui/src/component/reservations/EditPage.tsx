@@ -90,8 +90,6 @@ const EditReservation = ({
     ),
     mode: "onChange",
     defaultValues: {
-      bufferTimeBefore: false,
-      bufferTimeAfter: false,
       seriesName: reservation.recurringReservation?.name ?? "",
       comments: reservation.workingMemo ?? undefined,
       type: ReservationTypeSchema.optional().parse(
@@ -165,12 +163,6 @@ const EditReservation = ({
       seriesName: values.seriesName !== "" ? values.seriesName : undefined,
       workingMemo: values.comments,
       type: values.type ?? "",
-      bufferTimeBefore: values.bufferTimeBefore
-        ? reservationUnit.bufferTimeBefore
-        : 0,
-      bufferTimeAfter: values.bufferTimeAfter
-        ? reservationUnit.bufferTimeAfter
-        : 0,
       ...flattenedMetadataSetValues,
     };
 

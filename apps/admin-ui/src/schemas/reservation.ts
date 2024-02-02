@@ -144,8 +144,6 @@ export const ReservationChangeFormSchema = z
     type: ReservationTypeSchema,
     seriesName: z.string().optional(),
     comments: z.string().optional(),
-    bufferTimeAfter: z.boolean().optional(),
-    bufferTimeBefore: z.boolean().optional(),
     showBillingAddress: z.boolean().optional(),
   })
   // passthrough since this is combined to the metafields

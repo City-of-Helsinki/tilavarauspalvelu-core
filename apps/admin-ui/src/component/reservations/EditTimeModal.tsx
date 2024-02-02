@@ -296,7 +296,9 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
       {t("Reservation.EditTime.recurringInfoLabel")}:{" "}
       <Bold>
         {recurringReservationInfoText({
-          weekdays: filterNonNullable(reservation.recurringReservation.weekdays),
+          weekdays: filterNonNullable(
+            reservation.recurringReservation.weekdays
+          ),
           // begin: reservation.recurringReservation.beginDate ?? undefined,
           begin: ((x) => (x != null ? new Date(x) : undefined))(
             reservation.recurringReservation.beginDate
