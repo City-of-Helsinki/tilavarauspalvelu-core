@@ -28,6 +28,7 @@ import { reservationDateTime, reservationDuration } from "./requested/util";
 import ControlledDateInput from "../my-units/components/ControlledDateInput";
 import BufferToggles from "../my-units/BufferToggles";
 import { useCheckCollisions } from "./requested/hooks";
+import { filterNonNullable } from "common/src/helpers";
 
 const StyledForm = styled.form`
   margin-top: var(--spacing-m);
@@ -254,11 +255,9 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
 
   // NOTE 0 => buffer disabled for this reservation, undefined => no buffers selected
   const bufferBefore =
-    (reservation.bufferTimeBefore || reservationUnit?.bufferTimeBefore) ??
-    undefined;
+    (reservation.bufferTimeBefore || reservationUnit?.bufferTimeBefore) ?? 0;
   const bufferAfter =
-    (reservation.bufferTimeAfter || reservationUnit?.bufferTimeAfter) ??
-    undefined;
+    (reservation.bufferTimeAfter || reservationUnit?.bufferTimeAfter) ?? 0;
 
   const onSubmit = (values: FormValueType) => {
     if (values.date && values.startTime && values.endTime) {
@@ -297,10 +296,7 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
       {t("Reservation.EditTime.recurringInfoLabel")}:{" "}
       <Bold>
         {recurringReservationInfoText({
-          weekdays:
-            reservation.recurringReservation.weekdays?.filter(
-              (x): x is number => x != null
-            ) ?? [],
+          weekdays: filterNonNullable(reservation.recurringReservation.weekdays),
           // begin: reservation.recurringReservation.beginDate ?? undefined,
           begin: ((x) => (x != null ? new Date(x) : undefined))(
             reservation.recurringReservation.beginDate
@@ -339,7 +335,7 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
           error={translateError(errors.endTime?.message)}
           required
         />
-        {(bufferAfter || bufferBefore) && (
+        {(bufferAfter !== 0 || bufferBefore !== 0) && (
           <FormProvider {...form}>
             <BufferToggles before={bufferBefore} after={bufferAfter} />
           </FormProvider>

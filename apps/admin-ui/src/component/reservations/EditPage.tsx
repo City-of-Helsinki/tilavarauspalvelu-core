@@ -167,10 +167,10 @@ const EditReservation = ({
       type: values.type ?? "",
       bufferTimeBefore: values.bufferTimeBefore
         ? reservationUnit.bufferTimeBefore
-        : undefined,
+        : 0,
       bufferTimeAfter: values.bufferTimeAfter
         ? reservationUnit.bufferTimeAfter
-        : undefined,
+        : 0,
       ...flattenedMetadataSetValues,
     };
 

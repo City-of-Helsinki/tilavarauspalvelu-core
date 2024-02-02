@@ -52,8 +52,8 @@ const BufferToggles = ({
   before,
   after,
 }: {
-  before?: number;
-  after?: number;
+  before: number;
+  after: number;
 }) => {
   const { t } = useTranslation();
   return (
@@ -62,8 +62,8 @@ const BufferToggles = ({
         {t("reservationApplication:buffers.label")}
         <Tooltip>{t("reservationApplication:buffers.tooltip")}</Tooltip>
       </LabelWithTooltip>
-      {before && <BufferController name="bufferTimeBefore" seconds={before} />}
-      {after && <BufferController name="bufferTimeAfter" seconds={after} />}
+      {before !== 0 && <BufferController name="bufferTimeBefore" seconds={before} />}
+      {after !== 0 && <BufferController name="bufferTimeAfter" seconds={after} />}
     </Wrapper>
   );
 };

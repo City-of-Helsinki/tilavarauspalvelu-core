@@ -109,8 +109,8 @@ const ReservationTypeForm = ({
             (reservationUnit.bufferTimeBefore ||
               reservationUnit.bufferTimeAfter) && (
               <BufferToggles
-                before={reservationUnit.bufferTimeBefore ?? undefined}
-                after={reservationUnit.bufferTimeAfter ?? undefined}
+                before={reservationUnit.bufferTimeBefore ?? 0}
+                after={reservationUnit.bufferTimeAfter ?? 0}
               />
             )}
           {children}
