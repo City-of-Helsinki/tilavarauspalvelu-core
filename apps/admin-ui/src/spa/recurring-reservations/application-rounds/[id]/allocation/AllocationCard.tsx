@@ -118,14 +118,16 @@ function isOutsideOfRequestedTimes(
   selection: string[]
 ) {
   const { begin, end, day } = aes ?? {};
-  const beginHours = parseApiTime(begin ?? "");
-  const endHours = parseApiTime(end ?? "");
+  if (begin == null || end == null || day == null) {
+    return false;
+  }
+  const beginHours = parseApiTime(begin);
+  const endHours = parseApiTime(end);
 
   // Selection doesn't allow selecting multiple days
   const timeSlots = selection.map(decodeTimeSlot);
   const selectedDay = timeSlots[0].day;
-  const hasRequestedTimes = beginHours != null && endHours != null;
-  if (!hasRequestedTimes) {
+  if (beginHours == null || endHours == null) {
     return false;
   }
   return (
@@ -400,10 +402,12 @@ export function AllocationCard({
   const isTooLong = selectionDurationMins > endSeconds / 60;
   // FIXME don't call parseApiTime with invalid values (causes warnings)
   // wrap it in a function and do null checks first
-  const allocationBegin =
-    parseApiTime(matchingApplicationEventSchedule?.allocatedBegin ?? "") ?? 0;
-  const allocationEnd =
-    parseApiTime(matchingApplicationEventSchedule?.allocatedEnd ?? "") ?? 0;
+  const allocationBegin = matchingApplicationEventSchedule?.allocatedBegin
+    ? parseApiTime(matchingApplicationEventSchedule?.allocatedBegin) ?? 0
+    : 0;
+  const allocationEnd = matchingApplicationEventSchedule?.allocatedEnd
+    ? parseApiTime(matchingApplicationEventSchedule?.allocatedEnd ?? "") ?? 0
+    : 0;
   const allocatedDurationMins = (allocationEnd - allocationBegin) * 60;
   const durationIsInvalid = isAllocated
     ? allocatedDurationMins < beginSeconds / 60 ||
