@@ -3,11 +3,12 @@ import { Button } from "hds-react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Strong, fontMedium } from "common/src/common/typography";
-import { useMutation } from "@apollo/client";
+import { ApolloQueryResult, useMutation } from "@apollo/client";
 import type {
   ApplicationEventNode,
   ApplicationEventScheduleNode,
   Mutation,
+  Query,
   MutationApproveApplicationEventScheduleArgs,
   MutationResetApplicationEventScheduleArgs,
 } from "common/types/gql-types";
@@ -17,7 +18,6 @@ import { SemiBold, type ReservationUnitNode } from "common";
 import { getApplicantName } from "@/component/applications/util";
 import { formatDuration } from "@/common/util";
 import { useNotification } from "@/context/NotificationContext";
-import { useAllocationContext } from "@/context/AllocationContext";
 import { Accordion } from "@/component/Accordion";
 import {
   doSomeSlotsFitApplicationEventSchedule,
@@ -37,6 +37,9 @@ type Props = {
   reservationUnit?: ReservationUnitNode;
   selection: string[];
   isAllocationEnabled: boolean;
+  // TODO better solution would be to have a query key (similar to tanstack/react-query) and invalidate the key
+  // so we don't have to prop drill the refetch
+  refetchApplicationEvents: () => Promise<ApolloQueryResult<Query>>;
 };
 
 const Wrapper = styled.div`
@@ -167,8 +170,8 @@ export function AllocationCard({
   reservationUnit,
   selection,
   isAllocationEnabled,
+  refetchApplicationEvents,
 }: Props): JSX.Element {
-  const { setRefreshApplicationEvents } = useAllocationContext();
   const { notifySuccess } = useNotification();
   const { t } = useTranslation();
   const [error, setError] = React.useState<string | null>(null);
@@ -297,7 +300,7 @@ export function AllocationCard({
     const aen = applicationEvent.name;
     const msg = t("Allocation.acceptingSuccess", { applicationEvent: aen });
     notifySuccess(msg);
-    setRefreshApplicationEvents(true);
+    refetchApplicationEvents();
   };
 
   const handleRemoveAllocation = async () => {
@@ -338,7 +341,7 @@ export function AllocationCard({
     const aen = applicationEvent.name;
     const msg = t("Allocation.resetSuccess", { applicationEvent: aen });
     notifySuccess(msg);
-    setRefreshApplicationEvents(true);
+    refetchApplicationEvents();
   };
 
   const handleChangeSlot = async () => {

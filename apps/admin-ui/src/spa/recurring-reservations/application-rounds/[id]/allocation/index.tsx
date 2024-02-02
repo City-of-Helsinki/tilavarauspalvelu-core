@@ -22,7 +22,6 @@ import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import { useOptions } from "@/component/my-units/hooks";
 import { Container as BaseContainer, autoGridCss } from "@/styles/layout";
 import { useNotification } from "@/context/NotificationContext";
-import { useAllocationContext } from "@/context/AllocationContext";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import usePermission from "@/hooks/usePermission";
 import { Permission } from "@/modules/permissionHelper";
@@ -136,8 +135,6 @@ function ApplicationRoundAllocation({
   reservationUnits: ReservationUnitNode[];
   roundName: string;
 }): JSX.Element {
-  const { refreshApplicationEvents, setRefreshApplicationEvents } =
-    useAllocationContext();
   const { notifyError } = useNotification();
 
   const { t } = useTranslation();
@@ -346,13 +343,6 @@ function ApplicationRoundAllocation({
   );
   const totalNumberOfEvents = allEvents.length;
 
-  // NOTE rather sketchy: this is the context event listener
-  useEffect(() => {
-    if (refreshApplicationEvents) {
-      refetch();
-      setRefreshApplicationEvents(false);
-    }
-  }, [refetch, refreshApplicationEvents, setRefreshApplicationEvents]);
   const applicationEvents = filterNonNullable(
     data?.applicationEvents?.edges.map((e) => e?.node)
   );
@@ -618,6 +608,7 @@ function ApplicationRoundAllocation({
             (x) => x.pk != null && x.pk.toString() === selectedReservationUnit
           ) || unitReservationUnits[0]
         }
+        refetchApplicationEvents={refetch}
       />
     </Container>
   );

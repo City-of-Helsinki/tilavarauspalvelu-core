@@ -6,6 +6,7 @@ import { H4, fontMedium } from "common/src/common/typography";
 import type {
   ApplicationEventNode,
   ApplicationEventScheduleNode,
+  Query,
 } from "common/types/gql-types";
 import { ReservationUnitNode, breakpoints } from "common";
 import { Accordion } from "@/component/Accordion";
@@ -16,6 +17,7 @@ import {
   ApplicationEventCard,
 } from "./ApplicationEventCard";
 import { useFocusApplicationEvent } from "./hooks";
+import { ApolloQueryResult } from "@apollo/client";
 
 // TODO max-width for the grid columns (315px, 480px, 332px)
 // TODO not perfect (aligment issues with the last columns and grid end),
@@ -115,12 +117,14 @@ const isNotAllocated = (aes: ApplicationEventScheduleNode) =>
 type ApplicationEventsProps = {
   applicationEvents: ApplicationEventNode[] | null;
   reservationUnit?: ReservationUnitNode;
+  refetchApplicationEvents: () => Promise<ApolloQueryResult<Query>>;
 };
 
 /// TODO rename to something more descriptive
 export function ApplicationEvents({
   applicationEvents,
   reservationUnit,
+  refetchApplicationEvents,
 }: ApplicationEventsProps): JSX.Element {
   const [params] = useSearchParams();
   // TODO move this to query params (selected begin, selected end), maybe even selected day separately
@@ -172,6 +176,7 @@ export function ApplicationEvents({
         reservationUnit={reservationUnit}
         selection={selectedSlots}
         setSelection={setSelectedSlots}
+        refetchApplicationEvents={refetchApplicationEvents}
       />
     </Content>
   );
@@ -180,7 +185,7 @@ export function ApplicationEvents({
 function ApplicationEventColumn({
   applicationEvents,
   reservationUnit,
-}: ApplicationEventsProps): JSX.Element {
+}: Omit<ApplicationEventsProps, "refetchApplicationEvents">): JSX.Element {
   const { t } = useTranslation();
   const [focused, setFocusedApplicationEvent] = useFocusApplicationEvent();
   const focusedApplicationEvent = applicationEvents?.find(

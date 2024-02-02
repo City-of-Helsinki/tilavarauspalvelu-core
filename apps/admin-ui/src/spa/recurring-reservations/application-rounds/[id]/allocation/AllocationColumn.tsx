@@ -7,6 +7,7 @@ import styled from "styled-components";
 import type {
   ApplicationEventNode,
   ApplicationEventScheduleNode,
+  Query,
 } from "common/types/gql-types";
 import { ShowAllContainer } from "common/src/components/";
 import type { ReservationUnitNode } from "common";
@@ -18,12 +19,14 @@ import {
   isSlotAccepted,
 } from "./modules/applicationRoundAllocation";
 import { AllocationCard } from "./AllocationCard";
+import { ApolloQueryResult } from "@apollo/client";
 
 type Props = {
   applicationEvents: ApplicationEventNode[] | null;
   reservationUnit?: ReservationUnitNode;
   selection: string[] | null;
   setSelection: (val: string[]) => void;
+  refetchApplicationEvents: () => Promise<ApolloQueryResult<Query>>;
 };
 
 const Wrapper = styled.div`
@@ -216,6 +219,7 @@ export function AllocationColumn({
   reservationUnit,
   selection,
   setSelection,
+  refetchApplicationEvents,
 }: Props): JSX.Element | null {
   const { t } = useTranslation();
 
@@ -258,6 +262,7 @@ export function AllocationColumn({
           reservationUnit={reservationUnit}
           selection={selection ?? []}
           isAllocationEnabled={canAllocate}
+          refetchApplicationEvents={refetchApplicationEvents}
         />
       ))}
       {aeList.length === 0 && (
