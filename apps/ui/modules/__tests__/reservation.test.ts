@@ -419,28 +419,36 @@ describe("getNormalizedReservationOrderStatus", () => {
     expect(
       getNormalizedReservationOrderStatus({
         state: "CANCELLED",
-        orderStatus: "DRAFT",
+        order: {
+          status: "DRAFT",
+        } as PaymentOrderType,
       } as ReservationType)
     ).toBe("DRAFT");
 
     expect(
       getNormalizedReservationOrderStatus({
         state: "CANCELLED",
-        orderStatus: "PAID",
+        order: {
+          status: "PAID",
+        } as PaymentOrderType,
       } as ReservationType)
     ).toBe("PAID");
 
     expect(
       getNormalizedReservationOrderStatus({
         state: "CONFIRMED",
-        orderStatus: "PAID_MANUALLY",
+        order: {
+          status: "PAID_MANUALLY",
+        } as PaymentOrderType,
       } as ReservationType)
     ).toBe("PAID_MANUALLY");
 
     expect(
       getNormalizedReservationOrderStatus({
         state: "DENIED",
-        orderStatus: "SOMETHING_ELSE",
+        order: {
+          status: "SOMETHING_ELSE",
+        } as PaymentOrderType,
       } as ReservationType)
     ).toBe("SOMETHING_ELSE");
   });
@@ -453,21 +461,27 @@ describe("getNormalizedReservationOrderStatus", () => {
     expect(
       getNormalizedReservationOrderStatus({
         state: "CREATED",
-        orderStatus: "DRAFT",
+        order: {
+          status: "DRAFT",
+        } as PaymentOrderType,
       } as ReservationType)
     ).toBe(null);
 
     expect(
       getNormalizedReservationOrderStatus({
         state: "WAITING_FOR_PAYMENT",
-        orderStatus: "DRAFT",
+        order: {
+          status: "DRAFT",
+        } as PaymentOrderType,
       } as ReservationType)
     ).toBe(null);
 
     expect(
       getNormalizedReservationOrderStatus({
         state: "REQUIRES_HANDLING",
-        orderStatus: "DRAFT",
+        order: {
+          status: "DRAFT",
+        } as PaymentOrderType,
       } as ReservationType)
     ).toBe(null);
   });

@@ -538,9 +538,9 @@ const RequestedReservation = ({
                 <ApplicationData
                   label={t("RequestedReservation.paymentState")}
                   data={
-                    reservation.orderStatus == null
+                    reservation.order?.status == null
                       ? "-"
-                      : t(`Payment.status.${reservation.orderStatus}`)
+                      : t(`Payment.status.${reservation.order?.status}`)
                   }
                 />
                 <ApplicationData

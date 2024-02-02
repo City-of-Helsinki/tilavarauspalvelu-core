@@ -175,7 +175,7 @@ export const getNormalizedReservationOrderStatus = (
     !["CREATED", "WAITING_FOR_PAYMENT", "REQUIRES_HANDLING"].includes(state);
 
   if (shouldShowOrderStatus(reservation.state)) {
-    return reservation.orderStatus ?? null;
+    return reservation.order?.status ?? null;
   }
 
   return null;

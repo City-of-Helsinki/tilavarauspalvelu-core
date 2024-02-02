@@ -266,7 +266,7 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
     reservationPk: id ?? 0,
   });
   const { order, isLoading: orderLoading } = useOrder({
-    orderUuid: reservation?.orderUuid ?? "",
+    orderUuid: reservation?.order?.orderUuid ?? "",
   });
 
   const reservationUnit = reservation?.reservationUnits?.[0] ?? null;

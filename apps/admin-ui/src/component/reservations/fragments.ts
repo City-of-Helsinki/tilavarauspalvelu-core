@@ -122,7 +122,9 @@ export const RESERVATION_COMMON_FRAGMENT = gql`
     isBlocked
     workingMemo
     reserveeName
-    orderStatus
+    order {
+      status
+    }
     bufferTimeBefore
     bufferTimeAfter
   }

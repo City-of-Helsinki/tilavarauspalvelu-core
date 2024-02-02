@@ -52,7 +52,7 @@ const ReservationNotification = () => {
   const reservation = reservations?.[0];
 
   const { order } = useOrder({
-    orderUuid: reservation?.orderUuid ?? undefined,
+    orderUuid: reservation?.order?.orderUuid ?? undefined,
   });
 
   const {

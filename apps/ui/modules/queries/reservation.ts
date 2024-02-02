@@ -148,7 +148,9 @@ export const LIST_RESERVATIONS = gql`
           price
           bufferTimeBefore
           bufferTimeAfter
-          orderUuid
+          order {
+            orderUuid
+          }
           isBlocked
           reservationUnits {
             pk
@@ -217,8 +219,10 @@ export const GET_RESERVATION = gql`
       price
       priceNet
       taxPercentageValue
-      orderStatus
-      orderUuid
+      order {
+        orderUuid
+        status
+      }
       reservationUnits {
         pk
         nameFi

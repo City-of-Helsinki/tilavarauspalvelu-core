@@ -1566,6 +1566,7 @@ export type PaymentMerchantType = Node & {
 export type PaymentOrderType = Node & {
   __typename?: "PaymentOrderType";
   checkoutUrl?: Maybe<Scalars["String"]["output"]>;
+  expiresInMinutes?: Maybe<Scalars["Int"]["output"]>;
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   orderUuid?: Maybe<Scalars["String"]["output"]>;
@@ -1573,7 +1574,7 @@ export type PaymentOrderType = Node & {
   pk?: Maybe<Scalars["Int"]["output"]>;
   processedAt?: Maybe<Scalars["DateTime"]["output"]>;
   receiptUrl?: Maybe<Scalars["String"]["output"]>;
-  refundId?: Maybe<Scalars["String"]["output"]>;
+  refundUuid?: Maybe<Scalars["String"]["output"]>;
   reservationPk?: Maybe<Scalars["String"]["output"]>;
   status?: Maybe<Scalars["String"]["output"]>;
 };
@@ -3083,15 +3084,13 @@ export type ReservationType = Node & {
   isHandled?: Maybe<Scalars["Boolean"]["output"]>;
   name?: Maybe<Scalars["String"]["output"]>;
   numPersons?: Maybe<Scalars["Int"]["output"]>;
-  orderStatus?: Maybe<Scalars["String"]["output"]>;
-  orderUuid?: Maybe<Scalars["String"]["output"]>;
+  order?: Maybe<PaymentOrderType>;
   pk?: Maybe<Scalars["Int"]["output"]>;
   price?: Maybe<Scalars["Float"]["output"]>;
   priceNet?: Maybe<Scalars["Decimal"]["output"]>;
   priority: ReservationsReservationPriorityChoices;
   purpose?: Maybe<ReservationPurposeType>;
   recurringReservation?: Maybe<RecurringReservationType>;
-  refundUuid?: Maybe<Scalars["String"]["output"]>;
   reservationUnits?: Maybe<Array<Maybe<ReservationUnitType>>>;
   reserveeAddressCity?: Maybe<Scalars["String"]["output"]>;
   reserveeAddressStreet?: Maybe<Scalars["String"]["output"]>;

@@ -70,12 +70,12 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
           <H1 $legacy>{overrideTitle ?? getName(reservation, t)}</H1>
           <HorisontalFlex>
             <AlignVertically>
-              {reservation.orderStatus && (
+              {reservation.order?.status && (
                 <Tag
                   theme={{ "--tag-background": "var(--color-engel-light)" }}
                   id="orderStatus"
                 >
-                  {t(`Payment.status.${reservation.orderStatus}`)}
+                  {t(`Payment.status.${reservation.order?.status}`)}
                 </Tag>
               )}
             </AlignVertically>

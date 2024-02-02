@@ -49,18 +49,23 @@ const convertToReturnState: (
   reservations: ReservationType[]
 ) => ReturnAllowedState = (reservations) => {
   const isPriceReturnable = (x: {
-    price?: number;
-    orderStatus?: string;
-    orderUuid?: string;
-    refundUuid?: string;
+    price: number;
+    orderStatus: string | null;
+    orderUuid: string | null;
+    refundUuid: string | null;
   }) =>
-    x.price && x.price > 0 && x.orderStatus === "PAID" && x.orderUuid != null;
+    x.price &&
+    x.price > 0 &&
+    x.orderStatus === "PAID" &&
+    x.orderUuid != null &&
+    x.refundUuid == null;
 
   const payed = reservations
-    .map(({ price, orderStatus, orderUuid }) => ({
+    .map(({ price, order }) => ({
       price: price ?? 0,
-      orderStatus: orderStatus ?? undefined,
-      orderUuid: orderUuid ?? undefined,
+      orderStatus: order?.status ?? null,
+      orderUuid: order?.orderUuid ?? null,
+      refundUuid: order?.refundUuid ?? null,
     }))
     .filter((x) => isPriceReturnable(x));
 
@@ -354,4 +359,5 @@ const DenyDialog = ({
     </Dialog>
   );
 };
+
 export default DenyDialog;
