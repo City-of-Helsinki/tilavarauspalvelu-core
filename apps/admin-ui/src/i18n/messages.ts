@@ -1954,14 +1954,16 @@ const translations: ITranslations = {
         alreadyDeclined: ['Varaukselle "{{name}}" on jo tehty hylkäys.'],
         alreadyAllocated: ['Varaukselle "{{name}}" on jo jaettu vuoro.'],
         alreadyHandled: ['Varaus "{{name}}" on jo kokonaan jaettu.'],
+        title: ["Vuoron jakaminen epäonnistui"],
         generic: [
-          'Vuoron jakaminen varaukselle "{{name}}" epäonnistui. Tarkista, ettei kyseiselle ajalle ole jo jaettu vuoroa, tai kokeile myöhemmin uudelleen.',
+          "Varmista, että hakukierros on käsittelyssä ja että valittu ajankohta on vapaana.",
         ],
         receivedCantAllocate: [
           "Hakukierrokselle ei voi jakaa vuoroja, koska se on vielä avoinna.",
         ],
       },
       remove: {
+        title: ["Vuoron poistaminen epäonnistui"],
         generic: ['Vuoron poistaminen varaukselta "{{name}}" epäonnistui.'],
       },
       noPermission: ["Sinulla ei ole riittäviä oikeuksia jakaa vuoroa."],

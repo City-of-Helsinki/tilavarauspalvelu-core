@@ -175,11 +175,8 @@ export function AllocationCard({
   isAllocationEnabled,
   refetchApplicationEvents,
 }: Props): JSX.Element {
-  const { notifySuccess } = useNotification();
+  const { notifySuccess, notifyError } = useNotification();
   const { t } = useTranslation();
-  // TODO remove this, and replace it back with notifyError
-  // the error in the Card column is supposed to be only for impossible selects (user error, not server error)
-  const [error, setError] = React.useState<string | null>(null);
 
   const [acceptApplicationEvent, { loading: isAcceptLoading }] = useMutation<
     Mutation,
@@ -222,13 +219,12 @@ export function AllocationCard({
   };
 
   const handleAcceptSlot = async () => {
-    setError(null);
     if (
       selection.length === 0 ||
       reservationUnit?.pk == null ||
       matchingApplicationEventSchedule?.pk == null
     ) {
-      setError(t("Allocation.errors.accepting.generic"));
+      notifyError(t("Allocation.errors.accepting.generic"));
       return;
     }
     const allocatedBegin = timeSlotKeyToScheduleTime(selection[0]);
@@ -253,7 +249,7 @@ export function AllocationCard({
     });
     if (errors) {
       // TODO have unkown error message
-      setError(
+      notifyError(
         t("Allocation.errors.accepting.generic", {
           name: applicationEvent.name,
         })
@@ -263,7 +259,8 @@ export function AllocationCard({
     const res = data?.approveApplicationEventSchedule;
     const { errors: resErrors } = res || {};
     if (resErrors) {
-      // TODO better error handling
+      // TODO refactor the error handling code into a separate function
+      // transform the gql errors into a more user friendly format (to a single message or translation key)
       const ALREADY_DECLINED_ERROR_MSG =
         "Schedule cannot be approved for event in status: 'DECLINED'";
       const ALREADY_HANDLED_ERROR_MSG =
@@ -285,39 +282,44 @@ export function AllocationCard({
         e?.messages.includes(RECEIVED_CANT_ALLOCATE_ERROR_MSG)
       );
       if (isInReceivedState) {
-        setError(t("Allocation.errors.accepting.receivedCantAllocate"));
+        notifyError(
+          t("Allocation.errors.accepting.receivedCantAllocate"),
+          t("Allocation.errors.accepting.title")
+        );
         return;
       }
       // Using single error messages because allocated / declined => handled if it has a single schedule
       // declined should take precedence because it should have never been shown in the first place
       if (alreadyDeclined) {
-        setError(
+        notifyError(
           t("Allocation.errors.accepting.alreadyDeclined", {
             name: applicationEvent.name,
-          })
+          }),
+          t("Allocation.errors.accepting.title")
         );
         return;
       }
       if (alreadyHandled) {
-        setError(
+        notifyError(
           t("Allocation.errors.accepting.alreadyHandled", {
             name: applicationEvent.name,
-          })
+          }),
+          t("Allocation.errors.accepting.title")
         );
         return;
       }
       if (alreadyAllocated) {
-        setError(
+        notifyError(
           t("Allocation.errors.accepting.alreadyAllocated", {
             name: applicationEvent.name,
-          })
+          }),
+          t("Allocation.errors.accepting.title")
         );
         return;
       }
-      setError(
-        t("Allocation.errors.accepting.generic", {
-          name: applicationEvent.name,
-        })
+      notifyError(
+        t("Allocation.errors.accepting.generic"),
+        t("Allocation.errors.accepting.title")
       );
       return;
     }
@@ -328,12 +330,12 @@ export function AllocationCard({
   };
 
   const handleRemoveAllocation = async () => {
-    setError(null);
     if (matchingApplicationEventSchedule?.pk == null) {
-      setError(
+      notifyError(
         t("Allocation.errors.remove.generic", {
           name: applicationEvent.name,
-        })
+        }),
+        t("Allocation.errors.remove.title")
       );
       return;
     }
@@ -345,20 +347,22 @@ export function AllocationCard({
       },
     });
     if (errors) {
-      setError(
+      notifyError(
         t("Allocation.errors.remove.generic", {
           name: applicationEvent.name,
-        })
+        }),
+        t("Allocation.errors.remove.title")
       );
       return;
     }
     const res = data?.approveApplicationEventSchedule;
     const { errors: resErrors } = res || {};
     if (resErrors) {
-      setError(
+      notifyError(
         t("Allocation.errors.remove.generic", {
           name: applicationEvent.name,
-        })
+        }),
+        t("Allocation.errors.remove.title")
       );
       return;
     }
@@ -459,10 +463,11 @@ export function AllocationCard({
         {/* logic: if in edit mode / not allocated -> check against selection
          * if allocated -> check against allocated time
          * always show error
+         * TODO error should be shown for some cases where the selection is not valid
          */}
-        {error ? (
+        {/*error ? (
           <NotificationInline type="error">{error}</NotificationInline>
-        ) : null}
+        ) : null*/}
         {isTimeMismatch ? (
           <NotificationInline type="alert">
             {isAllocated
