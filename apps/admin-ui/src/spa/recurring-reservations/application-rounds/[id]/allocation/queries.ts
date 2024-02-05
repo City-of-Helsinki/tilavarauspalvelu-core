@@ -14,6 +14,7 @@ export const ALLOCATION_UNFILTERED_QUERY = gql`
         node {
           applicationRound {
             nameFi
+            status
             reservationUnits {
               pk
               nameFi

@@ -6,6 +6,7 @@ import { H4, fontMedium } from "common/src/common/typography";
 import type {
   ApplicationEventNode,
   ApplicationEventScheduleNode,
+  ApplicationRoundStatusChoice,
   Query,
 } from "common/types/gql-types";
 import { ReservationUnitNode, breakpoints } from "common";
@@ -114,10 +115,12 @@ const isDeclined = (aes: ApplicationEventScheduleNode) => aes.declined;
 const isNotAllocated = (aes: ApplicationEventScheduleNode) =>
   aes.allocatedBegin == null && !aes.declined;
 
+// TODO combine this with the AllocationColumn Props type (it's more or less just passing it through)
 type ApplicationEventsProps = {
   applicationEvents: ApplicationEventNode[] | null;
   reservationUnit?: ReservationUnitNode;
   refetchApplicationEvents: () => Promise<ApolloQueryResult<Query>>;
+  applicationRoundStatus: ApplicationRoundStatusChoice;
 };
 
 /// TODO rename to something more descriptive
@@ -125,6 +128,7 @@ export function ApplicationEvents({
   applicationEvents,
   reservationUnit,
   refetchApplicationEvents,
+  applicationRoundStatus,
 }: ApplicationEventsProps): JSX.Element {
   const [params] = useSearchParams();
   // TODO could also pass the applicationEvents to the hook and let it handle the filtering
@@ -179,6 +183,7 @@ export function ApplicationEvents({
         applicationEvents={applicationEvents}
         reservationUnit={reservationUnit}
         refetchApplicationEvents={refetchApplicationEvents}
+        applicationRoundStatus={applicationRoundStatus}
       />
     </Content>
   );
@@ -187,7 +192,11 @@ export function ApplicationEvents({
 function ApplicationEventColumn({
   applicationEvents,
   reservationUnit,
-}: Omit<ApplicationEventsProps, "refetchApplicationEvents">): JSX.Element {
+  // TODO separate these types (use a union of two types or use Pick to define a new type)
+}: Omit<
+  ApplicationEventsProps,
+  "refetchApplicationEvents" | "applicationRoundStatus"
+>): JSX.Element {
   const { t } = useTranslation();
   const [focused, setFocusedApplicationEvent] = useFocusApplicationEvent();
   const focusedApplicationEvent = applicationEvents?.find(

@@ -13,6 +13,7 @@ import {
   type UnitType,
   type QueryApplicationsArgs,
   ApplicantTypeChoice,
+  ApplicationRoundStatusChoice,
 } from "common/types/gql-types";
 import { type ReservationUnitNode, breakpoints } from "common";
 import { filterNonNullable } from "common/src/helpers";
@@ -129,11 +130,14 @@ function ApplicationRoundAllocation({
   units,
   reservationUnits,
   roundName,
+  applicationRoundStatus,
 }: {
   applicationRoundId: number;
   units: UnitType[];
   reservationUnits: ReservationUnitNode[];
+  // TODO do we want to prop drill these? or include it in every application event?
   roundName: string;
+  applicationRoundStatus: ApplicationRoundStatusChoice;
 }): JSX.Element {
   const { notifyError } = useNotification();
 
@@ -615,6 +619,7 @@ function ApplicationRoundAllocation({
           ) || unitReservationUnits[0]
         }
         refetchApplicationEvents={refetch}
+        applicationRoundStatus={applicationRoundStatus}
       />
     </Container>
   );
@@ -680,6 +685,9 @@ function AllocationWrapper({
         units={units}
         reservationUnits={resUnits}
         roundName={roundName}
+        applicationRoundStatus={
+          appRound?.status ?? ApplicationRoundStatusChoice.Upcoming
+        }
       />
     </>
   );

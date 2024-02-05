@@ -4,10 +4,11 @@ import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import { fontMedium } from "common/src/common/typography";
 import styled from "styled-components";
-import type {
-  ApplicationEventNode,
-  ApplicationEventScheduleNode,
-  Query,
+import {
+  type ApplicationEventNode,
+  type ApplicationEventScheduleNode,
+  ApplicationRoundStatusChoice,
+  type Query,
 } from "common/types/gql-types";
 import { ShowAllContainer } from "common/src/components/";
 import type { ReservationUnitNode } from "common";
@@ -19,13 +20,14 @@ import {
   isSlotAccepted,
 } from "./modules/applicationRoundAllocation";
 import { AllocationCard } from "./AllocationCard";
-import { ApolloQueryResult } from "@apollo/client";
+import { type ApolloQueryResult } from "@apollo/client";
 import { useSlotSelection } from "./hooks";
 
 type Props = {
   applicationEvents: ApplicationEventNode[] | null;
   reservationUnit?: ReservationUnitNode;
   refetchApplicationEvents: () => Promise<ApolloQueryResult<Query>>;
+  applicationRoundStatus: ApplicationRoundStatusChoice;
 };
 
 const Wrapper = styled.div`
@@ -202,16 +204,11 @@ function TimeSelection(): JSX.Element {
   );
 }
 
-// TODO if the round status === RECEIVED (or draft etc.) we need to block all changes (and maybe the whole page)
-// because mutations (approveSchedule) are not possible
-// TODO this allows allocating when the applicationEvent is already in allocated / failed state
-// which causes a mutation error
-// TODO this should be renamed, it's the whole right hand side section (not just actions)
-// that includes cards + time selection
 export function AllocationColumn({
   applicationEvents,
   reservationUnit,
   refetchApplicationEvents,
+  applicationRoundStatus,
 }: Props): JSX.Element | null {
   const { t } = useTranslation();
   const [selection, setSelection] = useSlotSelection();
@@ -230,10 +227,12 @@ export function AllocationColumn({
       .filter((aes): aes is ApplicationEventScheduleNode => aes != null)
       .filter((aes) => aes.allocatedDay != null)
       .find((aes) => isSlotAccepted(aes, slot));
-  const isSelectionAlreadyAllocated =
+  const canAllocateSelection =
     selection?.every((slot) => !isSlotAlreadyAllocated(slot)) ?? false;
   const hasSelection = selection != null && selection.length > 0;
-  const canAllocate = hasSelection && isSelectionAlreadyAllocated;
+  const isRoundAllocable =
+    applicationRoundStatus === ApplicationRoundStatusChoice.InAllocation;
+  const canAllocate = hasSelection && canAllocateSelection && isRoundAllocable;
 
   // TODO empty state when no selection (current is ok placeholder), don't remove from DOM
   return (
