@@ -255,6 +255,8 @@ export const GET_RESERVATION = gql`
           textSv
         }
         unit {
+          pk
+          tprekId
           nameFi
           nameEn
           nameSv
