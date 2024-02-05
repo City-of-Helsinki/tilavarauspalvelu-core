@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 from unittest import mock
 from uuid import uuid4
 
-from assertpy import assert_that
 from django.test import TestCase
 from django.utils.timezone import get_default_timezone
 from freezegun import freeze_time
@@ -40,7 +39,7 @@ class UpdateExpiredOrderTestCase(TestCase):
             update_expired_orders(5)
 
         order.refresh_from_db()
-        assert_that(order.status).is_equal_to(OrderStatus.CANCELLED)
+        assert order.status == OrderStatus.CANCELLED
 
     @mock.patch("merchants.pruning.send_confirmation_email")
     @mock.patch("merchants.pruning.get_payment")
@@ -59,12 +58,12 @@ class UpdateExpiredOrderTestCase(TestCase):
             update_expired_orders(5)
 
         order.refresh_from_db()
-        assert_that(order.status).is_equal_to(OrderStatus.PAID)
+        assert order.status == OrderStatus.PAID
 
         self.reservation.refresh_from_db()
-        assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CONFIRMED)
+        assert self.reservation.state == ReservationStateChoice.CONFIRMED
 
-        assert_that(mock_confirmation_email.called).is_true()
+        assert mock_confirmation_email.called is True
 
     @mock.patch("merchants.pruning.cancel_order")
     @mock.patch("merchants.pruning.get_payment")
@@ -86,10 +85,10 @@ class UpdateExpiredOrderTestCase(TestCase):
         with freeze_time(datetime(2022, 11, 28, 10, 15, 0, tzinfo=DEFAULT_TIMEZONE)):
             update_expired_orders(5)
 
-        assert_that(mock_cancel_order.called).is_true()
+        assert mock_cancel_order.called is True
 
         order.refresh_from_db()
-        assert_that(order.status).is_equal_to(OrderStatus.EXPIRED)
+        assert order.status == OrderStatus.EXPIRED
 
     @mock.patch("merchants.pruning.cancel_order")
     @mock.patch("merchants.pruning.get_payment")
@@ -107,10 +106,10 @@ class UpdateExpiredOrderTestCase(TestCase):
         with freeze_time(datetime(2022, 11, 28, 10, 15, 0, tzinfo=DEFAULT_TIMEZONE)):
             update_expired_orders(5)
 
-        assert_that(mock_cancel_order.called).is_true()
+        assert mock_cancel_order.called is True
 
         order.refresh_from_db()
-        assert_that(order.status).is_equal_to(OrderStatus.EXPIRED)
+        assert order.status == OrderStatus.EXPIRED
 
     @mock.patch("merchants.pruning.capture_exception")
     @mock.patch("merchants.pruning.get_payment")
@@ -129,8 +128,8 @@ class UpdateExpiredOrderTestCase(TestCase):
             update_expired_orders(5)
 
         order.refresh_from_db()
-        assert_that(order.status).is_equal_to(OrderStatus.DRAFT)
-        assert_that(mock_capture_exception.called).is_true()
+        assert order.status == OrderStatus.DRAFT
+        assert mock_capture_exception.called is True
 
     @mock.patch("merchants.pruning.capture_exception")
     @mock.patch("merchants.pruning.cancel_order")
@@ -154,8 +153,8 @@ class UpdateExpiredOrderTestCase(TestCase):
             update_expired_orders(5)
 
         order.refresh_from_db()
-        assert_that(order.status).is_equal_to(OrderStatus.DRAFT)
-        assert_that(mock_capture_message.called).is_true()
+        assert order.status == OrderStatus.DRAFT
+        assert mock_capture_message.called is True
 
     @mock.patch("merchants.pruning.cancel_order")
     @mock.patch("merchants.pruning.get_payment")
@@ -178,8 +177,8 @@ class UpdateExpiredOrderTestCase(TestCase):
         with freeze_time(datetime(2022, 11, 28, 10, 15, 0, tzinfo=DEFAULT_TIMEZONE)):
             update_expired_orders(5)
 
-        assert_that(mock_get_payment.called).is_true()
-        assert_that(mock_cancel_order.called).is_false()
+        assert mock_get_payment.called is True
+        assert mock_cancel_order.called is False
 
         order.refresh_from_db()
-        assert_that(order.status).is_equal_to(OrderStatus.DRAFT)
+        assert order.status == OrderStatus.DRAFT

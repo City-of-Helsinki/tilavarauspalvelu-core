@@ -3,7 +3,6 @@ from unittest import mock
 from uuid import UUID
 
 import pytest
-from assertpy import assert_that
 from django.conf import settings
 from django.test import TestCase
 
@@ -31,19 +30,17 @@ class RefundFromJsonTestCase(TestCase):
     @staticmethod
     def test_refund_from_json():
         refund = Refund.from_json(refund_json)
-        assert_that(refund.refund_id).is_equal_to(UUID("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6"))
-        assert_that(refund.order_id).is_equal_to(UUID("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6"))
-        assert_that(refund.namespace).is_equal_to("tilavaraus")
-        assert_that(refund.user).is_equal_to("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6")
-        assert_that(refund.created_at).is_equal_to(
-            datetime(2021, 2, 25, 10, 22, 59, tzinfo=settings.VERKKOKAUPPA_TIMEZONE)
-        )
-        assert_that(refund.status).is_equal_to("confirmed")
-        assert_that(refund.customer_first_name).is_equal_to("First")
-        assert_that(refund.customer_last_name).is_equal_to("Last")
-        assert_that(refund.customer_email).is_equal_to("test@example.com")
-        assert_that(refund.customer_phone).is_equal_to("+358 50 123 4567")
-        assert_that(refund.refund_reason).is_equal_to("Test reason")
+        assert refund.refund_id == UUID("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6")
+        assert refund.order_id == UUID("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6")
+        assert refund.namespace == "tilavaraus"
+        assert refund.user == "b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6"
+        assert refund.created_at == datetime(2021, 2, 25, 10, 22, 59, tzinfo=settings.VERKKOKAUPPA_TIMEZONE)
+        assert refund.status == "confirmed"
+        assert refund.customer_first_name == "First"
+        assert refund.customer_last_name == "Last"
+        assert refund.customer_email == "test@example.com"
+        assert refund.customer_phone == "+358 50 123 4567"
+        assert refund.refund_reason == "Test reason"
 
     @staticmethod
     def test_optional_fields_not_included():
@@ -55,17 +52,16 @@ class RefundFromJsonTestCase(TestCase):
         data.pop("refundReason")
         refund = Refund.from_json(data)
 
-        assert_that(refund.namespace).is_equal_to("tilavaraus")
-        assert_that(refund.user).is_equal_to("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6")
-        assert_that(refund.created_at).is_equal_to(
-            datetime(2021, 2, 25, 10, 22, 59, tzinfo=settings.VERKKOKAUPPA_TIMEZONE)
-        )
-        assert_that(refund.status).is_equal_to("confirmed")
-        assert_that(refund.customer_first_name).is_none()
-        assert_that(refund.customer_last_name).is_none()
-        assert_that(refund.customer_email).is_none()
-        assert_that(refund.customer_phone).is_none()
-        assert_that(refund.refund_reason).is_none()
+        assert refund.namespace == "tilavaraus"
+        assert refund.user == "b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6"
+        assert refund.created_at == datetime(2021, 2, 25, 10, 22, 59, tzinfo=settings.VERKKOKAUPPA_TIMEZONE)
+
+        assert refund.status == "confirmed"
+        assert refund.customer_first_name is None
+        assert refund.customer_last_name is None
+        assert refund.customer_email is None
+        assert refund.customer_phone is None
+        assert refund.refund_reason is None
 
     @mock.patch("merchants.verkkokauppa.payment.types.capture_exception")
     def test_parsing_fails(self, mock_capture_exception):
@@ -74,5 +70,5 @@ class RefundFromJsonTestCase(TestCase):
         with pytest.raises(ParseRefundError) as ex:
             Refund.from_json(data)
 
-        assert_that(str(ex.value)).is_equal_to("Could not parse refund: badly formed hexadecimal UUID string")
-        assert_that(mock_capture_exception.called).is_true()
+        assert str(ex.value) == "Could not parse refund: badly formed hexadecimal UUID string"
+        assert mock_capture_exception.called is True
