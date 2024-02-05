@@ -11,7 +11,7 @@ classifiers = [
 [tool.poetry.dependencies]
 python = ">=3.12,<3.13"
 celery = {extras = ["redis"], version = "^5.3.6"}
-certifi = "^2023.11.17"
+certifi = "^2024.2.2"
 cryptography = ">=41.0.3"
 Django = "^4.2"
 django-admin-extra-buttons = "^1.5.7"
@@ -72,7 +72,7 @@ pytest-django = "^4.5.2"
 pytest-xdist = "^3.5.0"
 pytest-factoryboy = "^2.5.1"
 requests-mock = "^1.11.0"
-faker = "^22.5.1"
+faker = "^22.7.0"
 django-graphiql-debug-toolbar = "^0.2.0"
 polib = "^1.2.0"
 
