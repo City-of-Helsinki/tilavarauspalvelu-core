@@ -178,12 +178,12 @@ export function AllocationCard({
   const { t } = useTranslation();
   const [error, setError] = React.useState<string | null>(null);
 
-  const [acceptApplicationEvent] = useMutation<
+  const [acceptApplicationEvent, { loading: isAcceptLoading }] = useMutation<
     Mutation,
     MutationApproveApplicationEventScheduleArgs
   >(APPROVE_APPLICATION_EVENT_SCHEDULE);
 
-  const [resetApplicationEvent] = useMutation<
+  const [resetApplicationEvent, { loading: isResetLoading }] = useMutation<
     Mutation,
     MutationResetApplicationEventScheduleArgs
   >(RESET_APPLICATION_EVENT_SCHEDULE);
@@ -200,6 +200,18 @@ export function AllocationCard({
   // There is a backend issue where if event has a single accepted schedule it's not possible to accept another one EVER
   const matchingApplicationEventSchedule =
     matchingSchedules.length > 0 ? matchingSchedules[0] : undefined;
+
+  const [isRefetchLoading, setIsRefetchLoading] = React.useState(false);
+
+  const refresh = () => {
+    // NOTE this is slow so use a loading state to show the user that something is happening
+    // TODO this takes 3s to complete (on my local machine, so more in the cloud),
+    // should update the cache in the mutation instead (or do a single id query instead of refetching all)
+    setIsRefetchLoading(true);
+    refetchApplicationEvents().then(() => {
+      setIsRefetchLoading(false);
+    });
+  };
 
   const handleAcceptSlot = async () => {
     setError(null);
@@ -302,7 +314,7 @@ export function AllocationCard({
     const aen = applicationEvent.name;
     const msg = t("Allocation.acceptingSuccess", { applicationEvent: aen });
     notifySuccess(msg);
-    refetchApplicationEvents();
+    refresh();
   };
 
   const handleRemoveAllocation = async () => {
@@ -343,7 +355,7 @@ export function AllocationCard({
     const aen = applicationEvent.name;
     const msg = t("Allocation.resetSuccess", { applicationEvent: aen });
     notifySuccess(msg);
-    refetchApplicationEvents();
+    refresh();
   };
 
   const handleChangeSlot = async () => {
@@ -380,7 +392,6 @@ export function AllocationCard({
     }
   }
 
-  // TODO cleanup and reorganise
   // Time interval checks
   const selectionDurationMins = selection.length * 30;
   const beginSeconds = applicationEvent.minDuration ?? 0;
@@ -400,8 +411,6 @@ export function AllocationCard({
   // Duration checks
   const isTooShort = selectionDurationMins < beginSeconds / 60;
   const isTooLong = selectionDurationMins > endSeconds / 60;
-  // FIXME don't call parseApiTime with invalid values (causes warnings)
-  // wrap it in a function and do null checks first
   const allocationBegin = matchingApplicationEventSchedule?.allocatedBegin
     ? parseApiTime(matchingApplicationEventSchedule?.allocatedBegin) ?? 0
     : 0;
@@ -413,6 +422,9 @@ export function AllocationCard({
     ? allocatedDurationMins < beginSeconds / 60 ||
       allocatedDurationMins > endSeconds / 60
     : isTooShort || isTooLong;
+
+  const isMutationLoading = isAcceptLoading || isResetLoading;
+  const isLoading = isMutationLoading || isRefetchLoading;
 
   return (
     <Wrapper>
@@ -464,6 +476,8 @@ export function AllocationCard({
               variant="secondary"
               theme="black"
               onClick={handleRemoveAllocation}
+              isLoading={isLoading}
+              disabled={isLoading}
             >
               {t("Allocation.removeAllocation")}
             </Button>
@@ -475,7 +489,8 @@ export function AllocationCard({
           <Button
             variant="primary"
             size="small"
-            disabled={isDisabled || isAllocated}
+            disabled={isDisabled || isAllocated || isLoading}
+            isLoading={isLoading}
             onClick={handleAcceptSlot}
           >
             {t("Allocation.acceptSlot", { duration: selectionDurationString })}

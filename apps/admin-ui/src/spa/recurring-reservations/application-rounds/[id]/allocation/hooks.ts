@@ -56,7 +56,7 @@ export function useSlotSelection(): [string[], (slots: string[]) => void] {
       qp.set("selectionEnd", selectionEnd);
       setParams(qp);
     }
-  }
+  };
 
   // generate a list of strings for each slot based on the interval
   // we can assume the same day for begin and end (so end day is ignored)
@@ -81,7 +81,7 @@ export function useSlotSelection(): [string[], (slots: string[]) => void] {
       }
     }
     return slots;
-  }
+  };
 
   const getSelection = (): string[] => {
     const selectionBegin = params.get("selectionBegin");
@@ -90,12 +90,9 @@ export function useSlotSelection(): [string[], (slots: string[]) => void] {
       return [];
     }
     return generateSelection(selectionBegin, selectionEnd);
-  }
+  };
 
   const selection = getSelection();
 
-  return [
-    selection,
-    setSelectedSlots,
-  ];
+  return [selection, setSelectedSlots];
 }
