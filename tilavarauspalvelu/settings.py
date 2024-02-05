@@ -377,7 +377,7 @@ AUTHENTICATION_BACKENDS = [
 
 LOGIN_REDIRECT_URL = "/admin/"
 LOGOUT_REDIRECT_URL = "/admin/"
-SESSION_SERIALIZER = "django.contrib.sessions.serializers.PickleSerializer"
+SESSION_SERIALIZER = "tilavarauspalvelu.utils.serializers.PickleSerializer"
 
 # See 'oidc_auth/settings.py'
 OIDC_AUTH = {
