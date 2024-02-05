@@ -1,36 +1,35 @@
 from collections.abc import Iterable
-from datetime import date
 from typing import Any
 
 import factory
 from factory import fuzzy
 
 from applications.models import ApplicationRound, ApplicationRoundTimeSlot
-from reservation_units.enums import PriceUnit, PricingStatus, PricingType
 from reservation_units.models import (
     Equipment,
     Purpose,
     Qualifier,
     ReservationUnit,
     ReservationUnitCancellationRule,
-    ReservationUnitImage,
     ReservationUnitPaymentType,
     ReservationUnitPricing,
-    ReservationUnitType,
 )
 from reservations.models import ReservationMetadataSet
 from resources.models import Resource
 from services.models import Service
 from spaces.models import Space
 from terms_of_use.models import TermsOfUse
-from tests.factories.application_round_time_slot import ApplicationRoundTimeSlotFactory
 
 from ._base import GenericDjangoModelFactory
 from .application_round import ApplicationRoundFactory
+from .application_round_time_slot import ApplicationRoundTimeSlotFactory
 from .equipment import EquipmentFactory
 from .purpose import PurposeFactory
 from .qualifier import QualifierFactory
-from .reservation import ReservationMetadataSetFactory
+from .reservation_metadata import ReservationMetadataSetFactory
+from .reservation_unit_cancellation_rule import ReservationUnitCancellationRuleFactory
+from .reservation_unit_payment_type import ReservationUnitPaymentTypeFactory
+from .reservation_unit_pricing import ReservationUnitPricingFactory
 from .resource import ResourceFactory
 from .service import ServiceFactory
 from .space import SpaceFactory
@@ -38,11 +37,6 @@ from .terms_of_use import TermsOfUseFactory
 
 __all__ = [
     "ReservationUnitFactory",
-    "ReservationUnitTypeFactory",
-    "ReservationUnitCancellationRuleFactory",
-    "ReservationUnitImageFactory",
-    "ReservationUnitPricingFactory",
-    "ReservationUnitPaymentTypeFactory",
 ]
 
 
@@ -244,43 +238,3 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
             meta = ReservationMetadataSetFactory.create(**kwargs)
 
         self.metadata_set = meta
-
-
-class ReservationUnitTypeFactory(GenericDjangoModelFactory[ReservationUnitType]):
-    class Meta:
-        model = ReservationUnitType
-
-    name = fuzzy.FuzzyText()
-
-
-class ReservationUnitCancellationRuleFactory(GenericDjangoModelFactory[ReservationUnitCancellationRule]):
-    class Meta:
-        model = ReservationUnitCancellationRule
-
-    name = fuzzy.FuzzyText()
-
-
-class ReservationUnitImageFactory(GenericDjangoModelFactory[ReservationUnitImage]):
-    class Meta:
-        model = ReservationUnitImage
-
-
-class ReservationUnitPricingFactory(GenericDjangoModelFactory[ReservationUnitPricing]):
-    begins = date(2021, 1, 1)
-    pricing_type = PricingType.PAID
-    price_unit = PriceUnit.PRICE_UNIT_PER_15_MINS
-    lowest_price = 5
-    highest_price = 10
-    tax_percentage = factory.SubFactory("tests.factories.TaxPercentageFactory")
-    status = PricingStatus.PRICING_STATUS_ACTIVE
-
-    class Meta:
-        model = ReservationUnitPricing
-
-
-class ReservationUnitPaymentTypeFactory(GenericDjangoModelFactory[ReservationUnitPaymentType]):
-    class Meta:
-        model = ReservationUnitPaymentType
-        django_get_or_create = ["code"]
-
-    code = fuzzy.FuzzyText()

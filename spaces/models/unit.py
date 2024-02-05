@@ -47,6 +47,16 @@ class Unit(models.Model):
         blank=True,
     )
 
+    name_fi: str | None
+    name_en: str | None
+    name_sv: str | None
+    description_fi: str | None
+    description_en: str | None
+    description_sv: str | None
+    short_description_fi: str | None
+    short_description_en: str | None
+    short_description_sv: str | None
+
     class Meta:
         db_table = "unit"
         base_manager_name = "objects"

@@ -156,7 +156,7 @@ class PruneReservationsWithInactivePaymentsTestCase(TestCase):
 
         with freeze_time(five_minutes_ago):
             reservation = ReservationFactory(name="do not delete_me", state=ReservationStateChoice.WAITING_FOR_PAYMENT)
-            PaymentOrderFactory(reservation=reservation, status=OrderStatus.CANCELLED)
+            PaymentOrderFactory(reservation=reservation, status=OrderStatus.CANCELLED, remote_id=None)
 
         with freeze_time(now):
             prune_reservation_with_inactive_payments(older_than_minutes=5)

@@ -1,6 +1,5 @@
 import datetime
 
-import snapshottest
 from django.contrib.auth import get_user_model
 from django.utils.timezone import get_default_timezone
 
@@ -26,7 +25,7 @@ from tests.factories import (
 DEFAULT_TIMEZONE = get_default_timezone()
 
 
-class ReservationTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
+class ReservationTestCaseBase(GrapheneTestCaseBase):
     reservation_unit: ReservationUnit
 
     @classmethod

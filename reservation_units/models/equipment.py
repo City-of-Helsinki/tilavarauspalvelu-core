@@ -16,6 +16,11 @@ class EquipmentCategory(models.Model):
         help_text=_("Order number to be used in api sorting."),
     )
 
+    # Translated field hints
+    name_fi: str | None
+    name_sv: str | None
+    name_en: str | None
+
     class Meta:
         db_table = "equipment_category"
         base_manager_name = "objects"
@@ -33,6 +38,11 @@ class Equipment(models.Model):
         on_delete=models.CASCADE,
         null=False,
     )
+
+    # Translated field hints
+    name_fi: str | None
+    name_sv: str | None
+    name_en: str | None
 
     class Meta:
         db_table = "equipment"

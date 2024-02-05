@@ -2,7 +2,6 @@ import datetime
 from decimal import Decimal
 from uuid import UUID
 
-import snapshottest
 from django.test import override_settings
 from django.utils.timezone import get_default_timezone
 from rest_framework.test import APIClient
@@ -31,7 +30,7 @@ DEFAULT_TIMEZONE = get_default_timezone()
 
 
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True, UPDATE_PRODUCT_MAPPING=True)
-class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase, snapshottest.TestCase):
+class ReservationUnitQueryTestCaseBase(GrapheneTestCaseBase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()

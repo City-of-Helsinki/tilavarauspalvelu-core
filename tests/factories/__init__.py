@@ -26,22 +26,18 @@ from .person import PersonFactory
 from .purpose import PurposeFactory
 from .qualifier import QualifierFactory
 from .real_estate import RealEstateFactory
-from .reservation import (
-    RecurringReservationFactory,
-    ReservationCancelReasonFactory,
-    ReservationDenyReasonFactory,
-    ReservationFactory,
-    ReservationMetadataSetFactory,
-    ReservationPurposeFactory,
-)
-from .reservation_unit import (
-    ReservationUnitCancellationRuleFactory,
-    ReservationUnitFactory,
-    ReservationUnitImageFactory,
-    ReservationUnitPaymentTypeFactory,
-    ReservationUnitPricingFactory,
-    ReservationUnitTypeFactory,
-)
+from .recurring_reservation import RecurringReservationFactory
+from .reservation import ReservationFactory
+from .reservation_cancel_reason import ReservationCancelReasonFactory
+from .reservation_deny_reason import ReservationDenyReasonFactory
+from .reservation_metadata import ReservationMetadataFieldFactory, ReservationMetadataSetFactory
+from .reservation_purpose import ReservationPurposeFactory
+from .reservation_unit import ReservationUnitFactory
+from .reservation_unit_cancellation_rule import ReservationUnitCancellationRuleFactory
+from .reservation_unit_image import ReservationUnitImageFactory
+from .reservation_unit_payment_type import ReservationUnitPaymentTypeFactory
+from .reservation_unit_pricing import ReservationUnitPricingFactory
+from .reservation_unit_type import ReservationUnitTypeFactory
 from .resource import ResourceFactory
 from .role import (
     GeneralRoleChoiceFactory,
@@ -102,6 +98,7 @@ __all__ = [
     "ReservationCancelReasonFactory",
     "ReservationDenyReasonFactory",
     "ReservationFactory",
+    "ReservationMetadataFieldFactory",
     "ReservationMetadataSetFactory",
     "ReservationPurposeFactory",
     "ReservationUnitCancellationRuleFactory",

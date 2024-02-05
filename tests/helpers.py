@@ -11,6 +11,7 @@ import pytest
 import sqlparse
 from django import db
 from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import HttpResponse
 from django.test import Client
 from graphene_django.utils.testing import graphql_query
@@ -23,6 +24,7 @@ __all__ = [
     "UserType",
 ]
 
+from graphene_file_upload.django.testing import file_graphql_query
 
 TNamedTuple = TypeVar("TNamedTuple", bound=NamedTuple)
 
@@ -232,6 +234,7 @@ class GraphQLClient(Client):
         input_data: dict[str, Any] | None = None,
         variables: dict[str, Any] | None = None,
         headers: dict[str, Any] | None = None,
+        files: dict[str, SimpleUploadedFile] | None = None,
     ) -> GQLResponse:
         """
         Make a GraphQL query to the test client.
@@ -243,14 +246,25 @@ class GraphQLClient(Client):
         :params headers: Headers for the query. Keys should in all-caps, and be prepended with "HTTP_".
         """
         with capture_database_queries() as results:
-            response = graphql_query(
-                query=query,
-                operation_name=operation_name,
-                input_data=input_data,
-                variables=variables,
-                headers=headers,
-                client=self,
-            )
+            if files is not None:
+                response = file_graphql_query(
+                    query=query,
+                    op_name=operation_name,
+                    input_data=input_data,
+                    variables=variables,
+                    headers=headers,
+                    files=files,
+                    client=self,
+                )
+            else:
+                response = graphql_query(
+                    query=query,
+                    operation_name=operation_name,
+                    input_data=input_data,
+                    variables=variables,
+                    headers=headers,
+                    client=self,
+                )
         return GQLResponse(response, results, query)
 
     def login_user_based_on_type(self, user_type: UserType) -> User | None:

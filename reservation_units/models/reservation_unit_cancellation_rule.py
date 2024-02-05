@@ -22,6 +22,11 @@ class ReservationUnitCancellationRule(models.Model):
         verbose_name=_("Will the cancellation need manual staff handling"),
     )
 
+    # Translated field hints
+    name_fi: str | None
+    name_en: str | None
+    name_sv: str | None
+
     class Meta:
         db_table = "reservation_unit_cancellation_rule"
         base_manager_name = "objects"

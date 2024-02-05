@@ -41,6 +41,12 @@ def _disable_reservation_email_sending(settings):
 
 
 @pytest.fixture()
+def _in_memory_file_storage(settings):
+    settings.STATICFILES_STORAGE = "django.core.files.storage.memory.InMemoryStorage"
+    settings.DEFAULT_FILE_STORAGE = "django.core.files.storage.memory.InMemoryStorage"
+
+
+@pytest.fixture()
 def outbox(settings) -> list[EmailMessage]:
     settings.EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
     from django.core import mail
@@ -51,6 +57,16 @@ def outbox(settings) -> list[EmailMessage]:
 @pytest.fixture()
 def _disable_hauki_export(settings):
     settings.HAUKI_EXPORTS_ENABLED = None
+
+
+@pytest.fixture()
+def _setup_hauki(settings):
+    settings.HAUKI_API_URL = "url"
+    settings.HAUKI_EXPORTS_ENABLED = None
+    settings.HAUKI_ORIGIN_ID = "origin"
+    settings.HAUKI_SECRET = "HAUKISECRET"  # noqa: S105
+    settings.HAUKI_ORGANISATION_ID = None
+    settings.HAUKI_ADMIN_UI_URL = "https://test.com"
 
 
 def pytest_addoption(parser):

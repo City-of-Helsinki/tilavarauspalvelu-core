@@ -11,6 +11,11 @@ __all__ = [
 class KeywordCategory(models.Model):
     name = models.CharField(verbose_name=_("Name"), max_length=255)
 
+    # Translated field hints
+    name_fi: str | None
+    name_sv: str | None
+    name_en: str | None
+
     class Meta:
         db_table = "keyword_category"
         base_manager_name = "objects"
@@ -31,6 +36,11 @@ class KeywordGroup(models.Model):
         on_delete=models.PROTECT,
     )
 
+    # Translated field hints
+    name_fi: str | None
+    name_sv: str | None
+    name_en: str | None
+
     class Meta:
         db_table = "keyword_group"
         base_manager_name = "objects"
@@ -50,6 +60,11 @@ class Keyword(models.Model):
         null=False,
         on_delete=models.PROTECT,
     )
+
+    # Translated field hints
+    name_fi: str | None
+    name_sv: str | None
+    name_en: str | None
 
     class Meta:
         db_table = "keyword"

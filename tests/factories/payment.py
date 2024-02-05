@@ -76,11 +76,16 @@ class PaymentOrderFactory(GenericDjangoModelFactory[PaymentOrder]):
     class Meta:
         model = PaymentOrder
 
+    reservation = factory.SubFactory("tests.factories.ReservationFactory")
+    remote_id = factory.LazyFunction(uuid4)
+    payment_id = None  # uuid
+    refund_id = None  # uuid
+    payment_type = PaymentType.INVOICE
+    status = OrderStatus.DRAFT
     price_net = Decimal("10.0")
     price_vat = Decimal("2.0")
     price_total = Decimal("12.0")
-    payment_type = PaymentType.INVOICE
-    status = OrderStatus.DRAFT
+    processed_at = None
     language = Language.FI
 
 
@@ -88,6 +93,7 @@ class PaymentAccountingFactory(GenericDjangoModelFactory[PaymentAccounting]):
     class Meta:
         model = PaymentAccounting
 
+    name = fuzzy.FuzzyText()
     company_code = "1234"
     main_ledger_account = "123456"
     vat_code = "AB"
