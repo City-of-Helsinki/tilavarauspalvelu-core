@@ -64,7 +64,7 @@ class ApplicationEventScheduleFactory(GenericDjangoModelFactory[ApplicationEvent
             return
 
         if not recurring_reservations and kwargs:
-            from .reservation import RecurringReservationFactory
+            from . import RecurringReservationFactory
 
             kwargs.setdefault("application_event_schedule", self)
             RecurringReservationFactory.create(**kwargs)

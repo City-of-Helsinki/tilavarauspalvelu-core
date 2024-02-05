@@ -1,4 +1,3 @@
-from collections.abc import Iterable
 from datetime import UTC, datetime
 from typing import Any
 
@@ -9,23 +8,13 @@ from applications.choices import PriorityChoice
 from reservation_units.models import ReservationUnit
 from reservations.choices import ReservationStateChoice
 from reservations.models import (
-    RecurringReservation,
     Reservation,
-    ReservationCancelReason,
-    ReservationDenyReason,
-    ReservationMetadataSet,
-    ReservationPurpose,
 )
 
 from ._base import GenericDjangoModelFactory
 
 __all__ = [
     "ReservationFactory",
-    "ReservationCancelReasonFactory",
-    "ReservationDenyReasonFactory",
-    "RecurringReservationFactory",
-    "ReservationPurposeFactory",
-    "ReservationMetadataSetFactory",
 ]
 
 
@@ -82,52 +71,3 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
 
         for reservation_unit in reservation_units or []:
             self.reservation_unit.add(reservation_unit)
-
-
-class ReservationCancelReasonFactory(GenericDjangoModelFactory[ReservationCancelReason]):
-    class Meta:
-        model = ReservationCancelReason
-
-
-class ReservationDenyReasonFactory(GenericDjangoModelFactory[ReservationDenyReason]):
-    class Meta:
-        model = ReservationDenyReason
-
-
-class RecurringReservationFactory(GenericDjangoModelFactory[RecurringReservation]):
-    class Meta:
-        model = RecurringReservation
-
-    application_event_schedule = factory.SubFactory("tests.factories.ApplicationEventScheduleFactory")
-    reservation_unit = factory.SubFactory("tests.factories.ReservationUnitFactory")
-
-    @factory.post_generation
-    def reservations(
-        self,
-        create: bool,
-        reservations: Iterable[Reservation] | None,
-        **kwargs: Any,
-    ):
-        if not create:
-            return
-
-        if not reservations and kwargs:
-            self.reservations.add(ReservationFactory.create(**kwargs))
-
-        for reservation in reservations or []:
-            self.reservations.add(reservation)
-
-
-class ReservationPurposeFactory(GenericDjangoModelFactory[ReservationPurpose]):
-    class Meta:
-        model = ReservationPurpose
-
-    name = fuzzy.FuzzyText()
-
-
-class ReservationMetadataSetFactory(GenericDjangoModelFactory[ReservationMetadataSet]):
-    class Meta:
-        model = ReservationMetadataSet
-        django_get_or_create = ["name"]
-
-    name = fuzzy.FuzzyText()

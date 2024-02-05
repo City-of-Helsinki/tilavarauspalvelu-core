@@ -364,6 +364,26 @@ class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservati
     objects = ReservationUnitManager()
     actions = ReservationUnitActionsConnector()
 
+    # Translated field hints
+    name_fi: str | None
+    name_sv: str | None
+    name_en: str | None
+    description_fi: str | None
+    description_sv: str | None
+    description_en: str | None
+    terms_of_use_fi: str | None
+    terms_of_use_sv: str | None
+    terms_of_use_en: str | None
+    reservation_pending_instructions_fi: str | None
+    reservation_pending_instructions_sv: str | None
+    reservation_pending_instructions_en: str | None
+    reservation_confirmed_instructions_fi: str | None
+    reservation_confirmed_instructions_sv: str | None
+    reservation_confirmed_instructions_en: str | None
+    reservation_cancelled_instructions_fi: str | None
+    reservation_cancelled_instructions_sv: str | None
+    reservation_cancelled_instructions_en: str | None
+
     class Meta:
         db_table = "reservation_unit"
         base_manager_name = "objects"

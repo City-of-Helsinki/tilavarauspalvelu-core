@@ -1,3 +1,4 @@
+import factory
 from factory import fuzzy
 
 from reservation_units.models import Keyword, KeywordCategory, KeywordGroup
@@ -16,7 +17,7 @@ class KeywordFactory(GenericDjangoModelFactory[Keyword]):
         model = Keyword
 
     name = fuzzy.FuzzyText()
-    keyword_group = None
+    keyword_group = factory.SubFactory("tests.factories.KeywordGroupFactory")
 
 
 class KeywordGroupFactory(GenericDjangoModelFactory[KeywordGroup]):
@@ -24,7 +25,7 @@ class KeywordGroupFactory(GenericDjangoModelFactory[KeywordGroup]):
         model = KeywordGroup
 
     name = fuzzy.FuzzyText()
-    keyword_category = None
+    keyword_category = factory.SubFactory("tests.factories.KeywordCategoryFactory")
 
 
 class KeywordCategoryFactory(GenericDjangoModelFactory[KeywordCategory]):

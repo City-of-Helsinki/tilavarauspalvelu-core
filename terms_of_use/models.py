@@ -33,6 +33,14 @@ class TermsOfUse(models.Model):
         default=TERMS_TYPE_GENERIC,
     )
 
+    # Translated field hints
+    name_fi: str | None
+    name_en: str | None
+    name_sv: str | None
+    text_fi: str | None
+    text_en: str | None
+    text_sv: str | None
+
     class Meta:
         db_table = "terms_of_use"
         base_manager_name = "objects"

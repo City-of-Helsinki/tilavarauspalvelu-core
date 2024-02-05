@@ -82,7 +82,7 @@ class ReservationStatisticsCreateTestCase(TestCase):
         assert_that(stat.age_group).is_equal_to(self.reservation.age_group)
         assert_that(stat.age_group_name).is_equal_to(str(self.reservation.age_group))
         assert_that(stat.is_applied).is_false()
-        assert_that(stat.ability_group).is_none()
+        assert_that(stat.ability_group).is_not_none()
         assert_that(stat.begin).is_equal_to(self.reservation.begin)
         assert_that(stat.end).is_equal_to(self.reservation.end)
         assert_that(stat.duration_minutes).is_equal_to(120)

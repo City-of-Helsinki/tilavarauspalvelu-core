@@ -14,6 +14,11 @@ class ServiceSector(models.Model):
     name: str = models.CharField(max_length=255)
     units = models.ManyToManyField("spaces.Unit", related_name="service_sectors")
 
+    # Translated field hints
+    name_fi: str | None
+    name_sv: str | None
+    name_en: str | None
+
     class Meta:
         db_table = "service_sector"
         base_manager_name = "objects"

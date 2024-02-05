@@ -73,7 +73,6 @@ pytest-django = "^4.5.2"
 pytest-xdist = "^3.5.0"
 pytest-factoryboy = "^2.5.1"
 requests-mock = "^1.11.0"
-snapshottest = "^0.6.0"
 faker = "^22.5.1"
 django-graphiql-debug-toolbar = "^0.2.0"
 polib = "^1.2.0"
@@ -89,7 +88,6 @@ extend-exclude = [
     "migrations",
     "venv",
     "build",
-    "snapshots",
     "api/examples.py",
     "tilavarauspalvelu/settings.py",
     "local_settings.py",
@@ -219,7 +217,6 @@ source = [
 ]
 omit = [
     "*migrations*",
-    "*snapshots*",
     "*tests*",
 ]
 exclude_also = [

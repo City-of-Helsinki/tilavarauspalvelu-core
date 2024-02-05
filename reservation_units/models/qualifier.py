@@ -8,6 +8,11 @@ __all__ = [
 class Qualifier(models.Model):
     name = models.CharField(max_length=200)
 
+    # Translated field hints
+    name_fi: str | None
+    name_sv: str | None
+    name_en: str | None
+
     class Meta:
         db_table = "qualifier"
         base_manager_name = "objects"

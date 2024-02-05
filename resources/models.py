@@ -16,6 +16,11 @@ class Resource(models.Model):
     buffer_time_before = models.DurationField(verbose_name=_("Buffer time before"), blank=True, null=True)
     buffer_time_after = models.DurationField(verbose_name=_("Buffer time after"), blank=True, null=True)
 
+    # Translated field hints
+    name_fi: str | None
+    name_sv: str | None
+    name_en: str | None
+
     class Meta:
         db_table = "resource"
         base_manager_name = "objects"
