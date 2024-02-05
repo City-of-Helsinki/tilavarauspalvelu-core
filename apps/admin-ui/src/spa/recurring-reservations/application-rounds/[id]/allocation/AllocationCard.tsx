@@ -31,6 +31,7 @@ import {
   APPROVE_APPLICATION_EVENT_SCHEDULE,
   RESET_APPLICATION_EVENT_SCHEDULE,
 } from "./queries";
+import { useSlotSelection } from "./hooks";
 
 type Props = {
   applicationEvent: ApplicationEventNode;
@@ -176,6 +177,8 @@ export function AllocationCard({
 }: Props): JSX.Element {
   const { notifySuccess } = useNotification();
   const { t } = useTranslation();
+  // TODO remove this, and replace it back with notifyError
+  // the error in the Card column is supposed to be only for impossible selects (user error, not server error)
   const [error, setError] = React.useState<string | null>(null);
 
   const [acceptApplicationEvent, { loading: isAcceptLoading }] = useMutation<
@@ -187,6 +190,9 @@ export function AllocationCard({
     Mutation,
     MutationResetApplicationEventScheduleArgs
   >(RESET_APPLICATION_EVENT_SCHEDULE);
+
+  const [isRefetchLoading, setIsRefetchLoading] = React.useState(false);
+  const [, setSelection] = useSlotSelection();
 
   const aes = filterNonNullable(applicationEvent?.applicationEventSchedules);
   const matchingSchedules = aes.filter((ae) =>
@@ -201,8 +207,8 @@ export function AllocationCard({
   const matchingApplicationEventSchedule =
     matchingSchedules.length > 0 ? matchingSchedules[0] : undefined;
 
-  const [isRefetchLoading, setIsRefetchLoading] = React.useState(false);
-
+  // TODO this should disable sibling cards allocation while this is loading
+  // atm one can try to allocate multiple cards at the same time and all except the first will fail
   const refresh = () => {
     // NOTE this is slow so use a loading state to show the user that something is happening
     // TODO this takes 3s to complete (on my local machine, so more in the cloud),
@@ -210,6 +216,8 @@ export function AllocationCard({
     setIsRefetchLoading(true);
     refetchApplicationEvents().then(() => {
       setIsRefetchLoading(false);
+      // Close all the cards (requires removing the selection)
+      setSelection([]);
     });
   };
 
@@ -234,6 +242,8 @@ export function AllocationCard({
       allocatedDay: matchingApplicationEventSchedule.day,
       allocatedBegin,
       allocatedEnd,
+      // Disable backend checks
+      force: true,
     };
 
     const { data, errors } = await acceptApplicationEvent({

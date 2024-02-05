@@ -54,16 +54,46 @@ export const applicationEventSchedulesToCells = (
   return cells;
 };
 
+/// Pick allocated or requested time slot
+/// @param aes Application event schedule
+/// @returns null if no time slot is found (invalid data)
+/// TODO should define a data structure for time slots (TimeSlot doesn't work here)
+/// there is too much incosistency in these utility functions
+export function pickTimeSlot(aes: ApplicationEventScheduleNode) {
+  if (aes.allocatedDay && aes.allocatedBegin && aes.allocatedEnd) {
+    return {
+      day: aes.allocatedDay,
+      begin: aes.allocatedBegin,
+      end: aes.allocatedEnd,
+    };
+  }
+  if (aes.allocatedDay || aes.allocatedBegin || aes.allocatedEnd) {
+    // eslint-disable-next-line no-console
+    console.error("Invalid time slot", aes);
+    return null;
+  }
+  if (aes.day && aes.begin && aes.end) {
+    return {
+      day: aes.day,
+      begin: aes.begin,
+      end: aes.end,
+    };
+  }
+  return null;
+}
+
+/// Q: do we want to show the maximum of the two? or only the exact allocated if it's allocated?
+/// TODO replace this function (don't use string encoding)
 export const getApplicationEventScheduleTimes = (
-  applicationEventSchedule: ApplicationEventScheduleNode
-): { begin: string; end: string } => {
+  aes: ApplicationEventScheduleNode
+): { begin: string; end: string } | null => {
+  const { day, begin, end } = pickTimeSlot(aes) ?? {};
+  if (!day || !begin || !end) {
+    return null;
+  }
   return {
-    begin: `${applicationEventSchedule?.day}-${Number(
-      applicationEventSchedule?.begin.substring(0, 2)
-    )}-${applicationEventSchedule?.begin.substring(3, 5)}`,
-    end: `${applicationEventSchedule?.day}-${Number(
-      applicationEventSchedule?.end.substring(0, 2)
-    )}-${applicationEventSchedule?.end.substring(3, 5)}`,
+    begin: `${day}-${Number(begin.substring(0, 2))}-${begin.substring(3, 5)}`,
+    end: `${day}-${Number(end.substring(0, 2))}-${end.substring(3, 5)}`,
   };
 };
 
@@ -76,9 +106,11 @@ export const doSomeSlotsFitApplicationEventSchedule = (
   applicationEventSchedule: ApplicationEventScheduleNode,
   slots: string[]
 ): boolean => {
-  const { begin, end } = getApplicationEventScheduleTimes(
-    applicationEventSchedule
-  );
+  const { begin, end } =
+    getApplicationEventScheduleTimes(applicationEventSchedule) ?? {};
+  if (!begin || !end) {
+    return false;
+  }
 
   return slots.some((slot) => {
     const [slotDay, slotHour, slotMinute] = slot.split("-").map(Number);
@@ -180,18 +212,6 @@ export function encodeTimeSlot(day: number, hour: number): string {
   const h = Math.floor(hour);
   const m = Math.round((hour - h) * 60);
   return `${day}-${h < 10 ? `0${h}` : h}-${m < 10 ? `0${m}` : m}`;
-}
-
-function getRequestedTime(
-  aes: ApplicationEventScheduleNode
-): TimeSlot[] | null {
-  const { day, begin, end } = aes;
-  if (day == null || begin == null || end == null) {
-    // eslint-disable-next-line no-console
-    console.warn("Invalid time slot", aes);
-    return null;
-  }
-  return constructTimeRange(day, begin, end);
 }
 
 function getAllocatedTime(
@@ -359,7 +379,9 @@ export function getApplicationEventsInsideSelection(
       const times =
         ae.applicationEventSchedules
           ?.filter((s) => s.day === day)
-          .map(getRequestedTime) ?? [];
+          .map(pickTimeSlot)
+          .filter((t): t is NonNullable<typeof t> => t != null)
+          .map(({ begin, end }) => constructTimeRange(day, begin, end)) ?? [];
       return times.some(
         (slot) => slot && selectionDecoded.some((item) => isInRange(item, slot))
       );

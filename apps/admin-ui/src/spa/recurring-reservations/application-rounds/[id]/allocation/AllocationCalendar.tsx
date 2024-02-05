@@ -17,6 +17,7 @@ import {
   encodeTimeSlot,
   TimeSlot,
   constructTimeRange,
+  pickTimeSlot,
 } from "./modules/applicationRoundAllocation";
 import { uniqBy } from "lodash";
 import { breakpoints } from "common";
@@ -182,15 +183,20 @@ const isSlotLast = (selection: string[], slot: string): boolean => {
 
 /// Is application event schedule on a cell (time slot)
 /// Assumes that the day is already checked
+/// TODO reuse this?
 function isInRange(aes: ApplicationEventScheduleNode, cell: Cell) {
   const time = cell.hour * 60 + cell.minute;
-  const begin = aes.begin.split(":").map((n) => parseInt(n, 10));
-  const end = aes.end.split(":").map((n) => parseInt(n, 10));
-  if (begin.length < 2 || end.length < 2) {
+  const { day, begin, end } = pickTimeSlot(aes) ?? {};
+  if (!day || !begin || !end) {
     return false;
   }
-  const beginTime = begin[0] * 60 + begin[1];
-  const endTime = end[0] * 60 + end[1];
+  const b = begin.split(":").map((n) => parseInt(n, 10));
+  const e = end.split(":").map((n) => parseInt(n, 10));
+  if (b.length < 2 || e.length < 2) {
+    return false;
+  }
+  const beginTime = b[0] * 60 + b[1];
+  const endTime = e[0] * 60 + e[1];
   return time >= beginTime && time < endTime;
 }
 
@@ -351,6 +357,7 @@ function Day({
 }): JSX.Element {
   const { t } = useTranslation();
 
+  // TODO rename this, it's only the focused application event schedules
   const aesEvt = filterNonNullable(
     focusedApplicationEvent?.applicationEventSchedules
   ).filter(
@@ -391,7 +398,6 @@ function Day({
     }
   };
 
-  // TODO there is an issue here if a slot that wasn't requested is accepted it's shown on gray (not green with a check)
   return (
     <DayWrapper key={`day-${day}`}>
       <DayLabel>{t(`dayShort.${day}`)}</DayLabel>
