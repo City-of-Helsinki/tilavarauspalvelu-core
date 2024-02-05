@@ -110,23 +110,33 @@ def unit_group(unit):
 
 @pytest.fixture()
 def parent_space(location):
-    return Space.objects.create(name="Parent space", location=location)
+    space = Space.objects.create(name="Parent space")
+    location.space = space
+    location.save()
+    return space
 
 
 @pytest.fixture()
 def space(location, parent_space):
-    return Space.objects.create(name="Space", location=location, parent=parent_space)
+    space = Space.objects.create(name="Space", parent=parent_space)
+    location.space = space
+    location.save()
+    return space
 
 
 @pytest.fixture()
 def child_space(location, space):
-    return Space.objects.create(name="Child space", location=location, parent=space)
+    child_space = Space.objects.create(name="Child space", parent=space)
+    location.space = child_space
+    location.save()
+    return child_space
 
 
 @pytest.fixture()
 def reservation_unit_with_parent_space(resource, parent_space):
     reservation_unit = ReservationUnit.objects.create(
-        name="Parent space test reservation unit", require_introduction=False
+        name="Parent space test reservation unit",
+        require_introduction=False,
     )
     reservation_unit.resources.set([resource])
     reservation_unit.spaces.set([parent_space])
@@ -136,7 +146,9 @@ def reservation_unit_with_parent_space(resource, parent_space):
 @pytest.fixture()
 def reservation_unit(resource, space, unit):
     reservation_unit = ReservationUnit.objects.create(
-        name_en="Test reservation unit", require_introduction=False, unit=unit
+        name_en="Test reservation unit",
+        require_introduction=False,
+        unit=unit,
     )
     reservation_unit.resources.set([resource])
     reservation_unit.spaces.set([space])
@@ -146,7 +158,9 @@ def reservation_unit(resource, space, unit):
 @pytest.fixture()
 def reservation_unit_too(resource, unit_too):
     reservation_unit = ReservationUnit.objects.create(
-        name_en="Test reservation unit too", require_introduction=False, unit=unit_too
+        name_en="Test reservation unit too",
+        require_introduction=False,
+        unit=unit_too,
     )
     return reservation_unit
 
@@ -154,7 +168,8 @@ def reservation_unit_too(resource, unit_too):
 @pytest.fixture()
 def reservation_unit_with_child_space(resource, child_space):
     reservation_unit = ReservationUnit.objects.create(
-        name="Child space test reservation unit", require_introduction=False
+        name="Child space test reservation unit",
+        require_introduction=False,
     )
     reservation_unit.spaces.set([child_space])
     return reservation_unit
@@ -163,7 +178,8 @@ def reservation_unit_with_child_space(resource, child_space):
 @pytest.fixture()
 def reservation_unit_with_resource(resource, space):
     reservation_unit = ReservationUnit.objects.create(
-        name="Test reservation unit with resource", require_introduction=False
+        name="Test reservation unit with resource",
+        require_introduction=False,
     )
     reservation_unit.resources.set([resource])
     return reservation_unit
