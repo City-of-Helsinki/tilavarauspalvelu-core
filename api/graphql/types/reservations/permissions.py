@@ -155,7 +155,7 @@ class RecurringReservationPermission(BasePermission):
 
     @classmethod
     def has_mutation_permission(cls, root: Any, info: GQLInfo, input: dict) -> bool:
-        pk = input.get("pk", None)
+        pk = input.get("pk")
 
         if pk:
             recurring_reservation = RecurringReservation.objects.filter(id=pk).first()
@@ -164,7 +164,7 @@ class RecurringReservationPermission(BasePermission):
 
             return can_modify_recurring_reservation(info.context.user, recurring_reservation)
 
-        reservation_unit_id = input.get("reservation_unit_pk", None)
+        reservation_unit_id = input.get("reservation_unit_pk")
 
         if not reservation_unit_id:
             return False
