@@ -6,7 +6,6 @@ from urllib.parse import urljoin
 from uuid import UUID
 
 import pytest
-from assertpy import assert_that
 from django.conf import settings
 from django.test.testcases import TestCase
 from requests import Timeout
@@ -56,7 +55,7 @@ class GetPaymentRequestsTestCase(TestCase):
         namespace = self.get_payment_response["namespace"]
         payment = get_payment(order_id, namespace, mock_get(self.get_payment_response))
         expected = Payment.from_json(self.get_payment_response)
-        assert_that(payment).is_equal_to(expected)
+        assert payment == expected
 
     def test_get_payment_returns_none_when_payment_is_missing(self):
         error_response = {
@@ -70,7 +69,7 @@ class GetPaymentRequestsTestCase(TestCase):
         order_id = UUID(self.get_payment_response["orderId"])
         namespace = self.get_payment_response["namespace"]
         payment = get_payment(order_id, namespace, mock_get(error_response, status_code=500))
-        assert_that(payment).is_none()
+        assert payment is None
 
     def test_get_payment_raises_exception_if_key_is_missing(self):
         response = self.get_payment_response.copy()
@@ -121,7 +120,7 @@ class RefundPaymentRequestsTestCase(TestCase):
         post = mock_post(self.refund_response, status_code=200)
         refund = refund_order(order_id, post)
         expected = Refund.from_json(self.refund_response["refunds"][0])
-        assert_that(refund).is_equal_to(expected)
+        assert refund == expected
 
     @mock.patch("merchants.verkkokauppa.payment.requests.capture_message")
     def test_refund_order_raises_exception_on_non_200_status_code(self, mock_capture):
@@ -131,8 +130,8 @@ class RefundPaymentRequestsTestCase(TestCase):
         with pytest.raises(RefundPaymentError) as ex:
             refund_order(order_id, post)
 
-        assert_that(str(ex.value)).is_equal_to("Payment refund failed: problem with upstream service")
-        assert_that(mock_capture.called).is_true()
+        assert str(ex.value) == "Payment refund failed: problem with upstream service"
+        assert mock_capture.called is True
 
     @mock.patch("merchants.verkkokauppa.payment.requests.capture_message")
     def test_refund_order_raises_exception_on_multi_refund_response(self, mock_capture):
@@ -146,8 +145,8 @@ class RefundPaymentRequestsTestCase(TestCase):
         with pytest.raises(RefundPaymentError) as ex:
             refund_order(order_id, post)
 
-        assert_that(str(ex.value)).is_equal_to("Refund response refund count expected to be 1 but was 2")
-        assert_that(mock_capture.called).is_true()
+        assert str(ex.value) == "Refund response refund count expected to be 1 but was 2"
+        assert mock_capture.called is True
 
     @mock.patch("merchants.verkkokauppa.payment.requests.capture_exception")
     def test_refund_order_raises_exception_on_invalid_response(self, mock_capture):
@@ -161,10 +160,9 @@ class RefundPaymentRequestsTestCase(TestCase):
         with pytest.raises(RefundPaymentError) as ex:
             refund_order(order_id, post)
 
-        assert_that(str(ex.value)).is_equal_to(
-            "Payment refund failed: Could not parse refund: badly formed hexadecimal UUID string"
-        )
-        assert_that(mock_capture.called).is_true()
+        assert str(ex.value) == "Payment refund failed: Could not parse refund: badly formed hexadecimal UUID string"
+
+        assert mock_capture.called is True
 
 
 class GetRefundStatusRequestsTestCase(TestCase):
@@ -192,4 +190,4 @@ class GetRefundStatusRequestsTestCase(TestCase):
         get = mock_get(self.refund_status_response, status_code=200)
         refund_status = get_refund_status(order_id, namespace, get)
         expected = RefundStatusResult.from_json(self.refund_status_response)
-        assert_that(refund_status).is_equal_to(expected)
+        assert refund_status == expected
