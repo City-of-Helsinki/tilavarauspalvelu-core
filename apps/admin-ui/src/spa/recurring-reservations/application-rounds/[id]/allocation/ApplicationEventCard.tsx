@@ -278,19 +278,10 @@ function SchedulesList({
         />
       ))}
       {unallocatedSchedules.length > 0 && (
-        <>
-          <SelectionListCount>
-            {t("Allocation.schedulesWithoutAllocation")}{" "}
-            {unallocatedSchedules.length}/{schedules.length}
-          </SelectionListCount>
-          {unallocatedSchedules.map((schedule) => (
-            <ScheduleSection
-              key={schedule.pk}
-              reservationUnitPk={reservationUnitPk}
-              schedule={schedule}
-            />
-          ))}
-        </>
+        <SelectionListCount>
+          {t("Allocation.schedulesWithoutAllocation")}{" "}
+          {unallocatedSchedules.length}/{schedules.length}
+        </SelectionListCount>
       )}
     </SelectionListContainer>
   );
