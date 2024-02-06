@@ -9,7 +9,7 @@ import type {
   ApplicationEventScheduleNode,
   ApplicationNode,
 } from "common/types/gql-types";
-import { filterNonNullable } from "common/src/helpers";
+import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
 import { MediumButton } from "@/styles/util";
 import { getReadableList } from "@/modules/util";
 import { AccordionWithState as Accordion } from "../common/Accordion";
@@ -20,6 +20,7 @@ import type {
   ApplicationEventScheduleFormType,
   ApplicationFormValues,
 } from "./Form";
+import { getTranslationSafe } from "common/src/common/util";
 
 type Props = {
   application: ApplicationNode;
@@ -209,7 +210,7 @@ const getApplicationEventsWhichMinDurationsIsNotFulfilled = (
 };
 
 const Page2 = ({ application, onNext }: Props): JSX.Element => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [reservationUnitPk, setReservationUnitPk] = useState<number>(
     application?.applicationEvents?.[0]?.eventReservationUnits?.[0]
       ?.reservationUnit.pk ?? 0
@@ -223,10 +224,17 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
       (n) => n.reservationUnit.pk === reservationUnitPk
     )?.reservationUnit.applicationRoundTimeSlots
   );
+
   const reservationUnitOptions = filterNonNullable(
     application?.applicationEvents?.[0]?.eventReservationUnits?.map((n) => ({
       value: n?.reservationUnit.pk ?? 0,
-      label: n?.reservationUnit.nameFi ?? "",
+      label: n
+        ? getTranslationSafe(
+            n.reservationUnit,
+            "name",
+            getLocalizationLang(i18n.language)
+          )
+        : "",
     }))
   );
 
