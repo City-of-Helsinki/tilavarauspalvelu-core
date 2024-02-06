@@ -449,7 +449,7 @@ const translations: ITranslations = {
     applicantTypes: {
       INDIVIDUAL: ["Yksityishenkilö"],
       COMPANY: ["Yritys"],
-      COMMUNITY: ["Yhdistys, rekisteröimäton"],
+      COMMUNITY: ["Yhdistys, rekisteröimätön"],
       ASSOCIATION: ["Yhdistys, rekisteröity"],
     },
     contactPerson: ["Yhteyshenkilö"],
