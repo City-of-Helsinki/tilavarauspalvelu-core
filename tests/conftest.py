@@ -1,8 +1,14 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import pytest
-from django.core.mail import EmailMessage
 from rest_framework.test import APIClient
 
 from tests.helpers import GraphQLClient, capture_database_queries
+
+if TYPE_CHECKING:
+    from django.core.mail import EmailMessage
 
 
 @pytest.fixture()
@@ -69,11 +75,13 @@ def _setup_hauki(settings):
     settings.HAUKI_ADMIN_UI_URL = "https://test.com"
 
 
-def pytest_addoption(parser):
+@pytest.hookimpl()
+def pytest_addoption(parser: pytest.Parser) -> None:
     parser.addoption("--skip-elastic", action="store_true", default=False, help="Skip tests that need Elasticsearch.")
     parser.addoption("--skip-slow", action="store_true", default=False, help="Skip slow running tests.")
 
 
+@pytest.hookimpl()
 def pytest_collection_modifyitems(config, items):
     skip_slow = config.getoption("--skip-slow")
     skip_elastic = config.getoption("--skip-elastic")
