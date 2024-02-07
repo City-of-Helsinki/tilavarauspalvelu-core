@@ -180,6 +180,7 @@ export function ApplicationEventCard({
   return (
     <Card $type={type}>
       <TitleWrapper>
+        {/* TODO Radio button can't be controlled, the typical hds problem, so if we use query params to make it active it doesn't work */}
         <StyledRadioButton
           id={`applicationEvent-${applicationEvent.pk}`}
           label={applicationEvent.name}
@@ -199,6 +200,7 @@ export function ApplicationEventCard({
           <SchedulesList
             schedules={schedules}
             reservationUnitPk={reservationUnit?.pk ?? 0}
+            eventsPerWeek={applicationEvent.eventsPerWeek ?? 0}
           />
         )}
         <StyledLink
@@ -255,9 +257,11 @@ const SelectionListCount = styled.div`
 function SchedulesList({
   schedules,
   reservationUnitPk,
+  eventsPerWeek,
 }: {
   schedules: ApplicationEventScheduleNode[];
   reservationUnitPk: number;
+  eventsPerWeek: number;
 }): JSX.Element {
   const { t } = useTranslation();
 
@@ -280,7 +284,7 @@ function SchedulesList({
       {unallocatedSchedules.length > 0 && (
         <SelectionListCount>
           {t("Allocation.schedulesWithoutAllocation")}{" "}
-          {unallocatedSchedules.length}/{schedules.length}
+          {unallocatedSchedules.length}/{eventsPerWeek}
         </SelectionListCount>
       )}
     </SelectionListContainer>
