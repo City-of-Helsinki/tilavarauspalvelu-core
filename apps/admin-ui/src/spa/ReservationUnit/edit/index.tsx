@@ -153,6 +153,7 @@ const SubAccordion = styled(Accordion)`
   }
 `;
 
+/*
 const BufferWrapper = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -165,6 +166,7 @@ const BufferWrapper = styled.div`
     }
   }
 `;
+*/
 
 const Preview = styled.a<{ $disabled: boolean }>`
   display: flex;
@@ -1078,6 +1080,7 @@ function ReservationUnitSettings({
             />
           )}
         />
+        {/*
         <FieldGroup
           heading={t("ReservationUnitEditor.bufferSettings")}
           tooltip={t("ReservationUnitEditor.tooltip.bufferSettings")}
@@ -1179,7 +1182,8 @@ function ReservationUnitSettings({
               </BufferWrapper>
             )}
           </Grid>
-        </FieldGroup>
+      </FieldGroup>
+      */}
         <FieldGroup
           heading={t("ReservationUnitEditor.cancellationSettings")}
           tooltip={t("ReservationUnitEditor.tooltip.cancellationSettings")}
