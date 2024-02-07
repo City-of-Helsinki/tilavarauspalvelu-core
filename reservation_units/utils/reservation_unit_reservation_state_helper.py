@@ -2,8 +2,8 @@ import datetime
 from dataclasses import dataclass, field
 
 from django.db.models import Expression, F, OuterRef, Q, Subquery
-from django.utils.timezone import get_default_timezone
 
+from common.date_utils import local_datetime
 from reservation_units.enums import PricingStatus, PricingType, ReservationState
 from reservation_units.models import ReservationUnit, ReservationUnitPricing
 from reservation_units.utils.reservation_unit_pricing_helper import ReservationUnitPricingHelper
@@ -19,14 +19,23 @@ class ReservationUnitReservationStateHelper:
     @classmethod
     def __is_scheduled_reservation(cls, reservation_unit: ReservationUnit) -> bool:
         """
-        Support following cases in regard to reservation_begins and reservation_ends:
+        Is ReservationUnit currently not reservable, but scheduled for reservations in the future WITHOUT an end date?
+        - reservation_begins is in the future
+        - reservation_ends is in the past or not set.
 
-                          |---------
-        ---------|        |---------
-        -------------|    |---------
-                     ↑ now
+        ┌────────┬────────┬────────┐
+        │ Begins │  Ends  │ Result │
+        ├────────┼────────┼────────┤
+        │ Never  │ *      │ False  │
+        │ Past   │ *      │ False  │
+        │ Now    │ *      │ False  │
+        │ Future │ Never  │ True   │
+        │ Future │ Past   │ True   │
+        │ Future │ Now    │ True   │
+        │ Future │ Future │ False  │
+        └────────┴────────┴────────┘
         """
-        now = datetime.datetime.now(tz=get_default_timezone())
+        now = local_datetime()
 
         return (
             # Reservations begin in the future
@@ -38,7 +47,7 @@ class ReservationUnitReservationStateHelper:
 
     @classmethod
     def __get_is_scheduled_reservation_query(cls) -> QueryState:
-        now = datetime.datetime.now(tz=get_default_timezone())
+        now = local_datetime()
 
         return QueryState(
             filters=Q(reservation_begins__gt=now) & (Q(reservation_ends__isnull=True) | Q(reservation_ends__lte=now)),
@@ -47,12 +56,27 @@ class ReservationUnitReservationStateHelper:
     @classmethod
     def __is_scheduled_period(cls, reservation_unit: ReservationUnit) -> bool:
         """
-        Support following cases in regard to reservation_begins and reservation_ends:
+        Is ReservationUnit currently not reservable, but scheduled for reservations in the future WITH an end date?
+        - reservation_begins is in the future
+        - reservation_ends is in the future
+        - reservation_begins is before reservation_ends
 
-                          |---------|
-                    ↑ now
+        ┌────────┬────────┬────────┐
+        │ Begins │  Ends  │ Result │
+        ├────────┼────────┼────────┤
+        │ *      │ Never  │ False  │
+        │ Never  │ *      │ False  │
+        │ Past   │ *      │ False  │
+        │ Now    │ Past   │ False  │
+        │ Now    │ Now    │ False  │
+        │ Now    │ Future │ True   │
+        │ Future │ Past   │ False  │
+        │ Future │ Now    │ False  │
+        │ Future │ Future │ False  │ Begins >= Ends
+        │ Future │ Future │ True   │ Begins <  Ends
+        └────────┴────────┴────────┘
         """
-        now = datetime.datetime.now(tz=get_default_timezone())
+        now = local_datetime()
 
         # Reservation begins and ends in the future, and begins before it ends
         return (
@@ -63,7 +87,7 @@ class ReservationUnitReservationStateHelper:
 
     @classmethod
     def __get_is_scheduled_period_query(cls) -> QueryState:
-        now = datetime.datetime.now(tz=get_default_timezone())
+        now = local_datetime()
 
         return QueryState(
             filters=Q(
@@ -108,22 +132,38 @@ class ReservationUnitReservationStateHelper:
 
     @classmethod
     def __is_reservable(cls, reservation_unit: ReservationUnit) -> bool:
-        """
-        Support following cases in regard to reservation_begins and reservation_ends:
-
-        -------------------------------
-                  |--------------------
-                        |--------------
-        ------|   |--------------------
-        ------|         |--------------
-                        ↑ now
-        """
-        now = datetime.datetime.now(tz=get_default_timezone())
+        now = local_datetime()
 
         return cls.__is_reservable_period(now, reservation_unit) and cls.__has_valid_pricing(reservation_unit)
 
     @classmethod
+    def __get_is_reservable_query(cls) -> QueryState:
+        return QueryState(
+            aliases=cls.__active_pricing_type_alias(),
+            filters=(cls.__is_reservable_period_query() & cls.__has_valid_pricing_query()),
+        )
+
+    @classmethod
     def __is_reservable_period(cls, now: datetime.datetime, reservation_unit: ReservationUnit) -> bool:
+        """
+        ┌────────┬────────┬────────┐
+        │ Begins │  Ends  │ Result │
+        ├────────┼────────┼────────┤
+        │ Never  │ Never  │ True   │
+        │ Never  │ Past   │ False  │
+        │ Never  │ Now    │ False  │
+        │ Never  │ Future │ False  │
+        │ Past   │ Never  │ True   │
+        │ Past   │ Past   │ False  │
+        │ Past   │ Now    │ False  │
+        │ Past   │ Future │ False  │
+        │ Now    │ Never  │ True   │
+        │ Now    │ Past   │ True   │
+        │ Now    │ Now    │ False  │
+        │ Now    │ Future │ False  │
+        │ Future │ *      │ False  │
+        └────────┴────────┴────────┘
+        """
         return (
             # Reservations don't begin or end
             (reservation_unit.reservation_ends is None and reservation_unit.reservation_begins is None)
@@ -143,15 +183,8 @@ class ReservationUnitReservationStateHelper:
         )
 
     @classmethod
-    def __get_is_reservable_query(cls) -> QueryState:
-        return QueryState(
-            aliases=cls.__active_pricing_type_alias(),
-            filters=(cls.__is_reservable_period_query() & cls.__has_valid_pricing_query()),
-        )
-
-    @classmethod
     def __is_reservable_period_query(cls) -> Q:
-        now = datetime.datetime.now(tz=get_default_timezone())
+        now = local_datetime()
 
         return (
             Q(reservation_begins__isnull=True, reservation_ends__isnull=True)
@@ -161,21 +194,36 @@ class ReservationUnitReservationStateHelper:
 
     @classmethod
     def __is_scheduled_closing(cls, reservation_unit: ReservationUnit) -> bool:
-        """
-        Support following cases in regard to reservation_begins and reservation_ends:
-
-        ----------------------|
-                 |------------------|
-                       |------------|
-        ----------------------|     |------------
-                       ↑ now
-        """
-        now = datetime.datetime.now(tz=get_default_timezone())
+        now = local_datetime()
 
         return cls.__is_scheduled_closing_period(now, reservation_unit) and cls.__has_valid_pricing(reservation_unit)
 
     @classmethod
+    def __get_is_scheduled_closing_query(cls) -> QueryState:
+        return QueryState(
+            aliases=cls.__active_pricing_type_alias(),
+            filters=(cls.__is_scheduled_closing_period_query() & cls.__has_valid_pricing_query()),
+        )
+
+    @classmethod
     def __is_scheduled_closing_period(cls, now: datetime.datetime, reservation_unit: ReservationUnit) -> bool:
+        """
+        ┌────────┬────────┬────────┐
+        │ Begins │  Ends  │ Result │
+        ├────────┼────────┼────────┤
+        │ *      │ Never  │ False  │
+        │ *      │ Past   │ False  │
+        │ Never  │ Now    │ True   │
+        │ Never  │ Future │ True   │
+        │ Past   │ Now    │ True   │
+        │ Past   │ Future │ True   │
+        │ Now    │ Now    │ True   │
+        │ Now    │ Future │ True   │
+        │ Future │ Now    │ False  │
+        │ Future │ Future │ False  │ Begins < Ends
+        │ Future │ Future │ True   │ Begins > Ends
+        └────────┴────────┴────────┘
+        """
         return (
             # Reservations end in the future
             reservation_unit.reservation_ends is not None
@@ -194,15 +242,8 @@ class ReservationUnitReservationStateHelper:
         )
 
     @classmethod
-    def __get_is_scheduled_closing_query(cls) -> QueryState:
-        return QueryState(
-            aliases=cls.__active_pricing_type_alias(),
-            filters=(cls.__is_scheduled_closing_period_query() & cls.__has_valid_pricing_query()),
-        )
-
-    @classmethod
     def __is_scheduled_closing_period_query(cls) -> Q:
-        now = datetime.datetime.now(tz=get_default_timezone())
+        now = local_datetime()
         return Q(reservation_ends__gt=now) & (
             Q(reservation_begins__isnull=True)
             | Q(reservation_begins__lte=now)
@@ -212,19 +253,29 @@ class ReservationUnitReservationStateHelper:
     @classmethod
     def __is_reservation_closed(cls, reservation_unit: ReservationUnit) -> bool:
         """
-        Support following cases in regard to reservation_begins and reservation_ends:
-
-
-        -------------|
-        ----------------|
-                |----|
-                |-------|
-                |
-                        |
-                                |
-                        ↑ now
+        ┌────────┬────────┬────────┐
+        │ Begins │  Ends  │ Result │
+        ├────────┼────────┼────────┤
+        │ Never  │ Never  │ True   │
+        │ Never  │ Past   │ True   │
+        │ Never  │ Now    │ True   │
+        │ Never  │ Future │ True ? │ from __is_scheduled_closing_period
+        │ Past   │ Never  │ True ? │ from __is_reservable_period
+        │ Past   │ Past   │ True   │
+        │ Past   │ Now    │ True   │
+        │ Past   │ Future │ True ? │ from __is_scheduled_closing_period
+        │ Now    │ Never  │ True ? │ from __is_reservable_period
+        │ Now    │ Past   │ True ? │ from __is_reservable_period
+        │ Now    │ Now    │ True   │
+        │ Now    │ Future │ True ? │ from __is_scheduled_closing_period
+        │ Future │ Never  │ False  │
+        │ Future │ Past   │ False  │
+        │ Future │ Now    │ False  │
+        │ Future │ Future │ False  │ Begins < Ends
+        │ Future │ Future │ True ? │ Begins > Ends, from __is_scheduled_closing_period
+        └────────┴────────┴────────┘
         """
-        now = datetime.datetime.now(tz=get_default_timezone())
+        now = local_datetime()
 
         active_price = ReservationUnitPricingHelper.get_active_price(reservation_unit)
 
@@ -260,7 +311,7 @@ class ReservationUnitReservationStateHelper:
 
     @classmethod
     def __get_is_reservation_closed_query(cls) -> QueryState:
-        now = datetime.datetime.now(tz=get_default_timezone())
+        now = local_datetime()
 
         return QueryState(
             aliases=cls.__active_pricing_type_alias(),
