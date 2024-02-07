@@ -415,9 +415,6 @@ importers:
 
   packages/common:
     dependencies:
-      '@apollo/client':
-        specifier: ^3.8.10
-        version: 3.8.10(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0)
       classnames:
         specifier: ^2.3.2
         version: 2.3.2
@@ -473,6 +470,9 @@ importers:
         specifier: ^3.22.4
         version: 3.22.4
     devDependencies:
+      '@apollo/client':
+        specifier: ^3.8.10
+        version: 3.8.10(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0)
       '@graphql-codegen/cli':
         specifier: ^5.0.0
         version: 5.0.0(graphql@16.8.1)(typescript@5.2.2)
