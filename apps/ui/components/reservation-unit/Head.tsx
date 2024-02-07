@@ -29,13 +29,14 @@ import {
   getUnitName,
 } from "@/modules/reservationUnit";
 import BreadcrumbWrapper from "../common/BreadcrumbWrapper";
-import AltNotification from "../common/AltNotification";
 
 interface PropsType {
   reservationUnit: ReservationUnitByPkType;
   isReservable?: boolean;
   subventionSuffix?: JSX.Element;
 }
+
+type NotificationType = "alert";
 
 const TopContainer = styled.div`
   background-color: white;
@@ -90,8 +91,13 @@ const Props = styled.div`
   }
 `;
 
-const StyledAltNotification = styled(AltNotification)`
+const Wrapper = styled.div<{ $type: NotificationType }>`
+  background-color: ${({ $type }) =>
+    $type === "alert" ? "var(--color-engel-light)" : "transparent"};
+  font-size: var(--fontsize-body-l);
+  padding: var(--spacing-s);
   margin-bottom: var(--spacing-m);
+  display: inline-block;
 `;
 
 const ReservationUnitName = styled(H2).attrs({ as: "h1" })`
@@ -106,6 +112,38 @@ const UnitName = styled(H3).attrs({ as: "h2" })`
     margin-bottom: var(--spacing-l);
   }
 `;
+
+const NonReservableNotification = ({
+  reservationUnit,
+}: {
+  reservationUnit: ReservationUnitByPkType;
+}) => {
+  const { t } = useTranslation();
+  let returnText = t("reservationUnit:notifications.notReservable");
+  const futureOpeningText = t("reservationUnit:notifications.futureOpening", {
+    date: reservationUnit.reservationBegins
+      ? formatDate(reservationUnit.reservationBegins, "d.M.yyyy")
+      : "",
+    time: reservationUnit.reservationBegins
+      ? formatDate(reservationUnit.reservationBegins, "H.mm")
+      : "",
+  });
+  if (
+    reservationUnit.reservationKind ===
+    ReservationUnitsReservationUnitReservationKindChoices.Season
+  ) {
+    returnText = t("reservationUnit:notifications.season");
+  } else if (isReservationStartInFuture(reservationUnit))
+    returnText = futureOpeningText;
+  return (
+    <Wrapper
+      $type="alert"
+      data-testid="reservation-unit--notification__reservation-start"
+    >
+      {returnText}
+    </Wrapper>
+  );
+};
 
 const Head = ({
   reservationUnit,
@@ -227,39 +265,8 @@ const Head = ({
                   />
                 )}
               </Props>
-              {!isReservable &&
-                !isReservationStartInFuture(reservationUnit) && (
-                  <StyledAltNotification
-                    text={t(
-                      // TODO this is skechy it falls back to onlyRecurring
-                      // even though there might be other problems
-                      // ex. DirectAndSeason but still not reservable for some reason (some other parameter is wrong)
-                      `reservationUnit:notifications.${
-                        reservationUnit.reservationKind ===
-                        ReservationUnitsReservationUnitReservationKindChoices.Direct
-                          ? "notReservable"
-                          : "onlyRecurring"
-                      }`
-                    )}
-                    type="alert"
-                  />
-                )}
-              {isReservationStartInFuture(reservationUnit) && (
-                <StyledAltNotification
-                  data-testid="reservation-unit--notification__reservation-start"
-                  text={t("reservationUnit:notifications.futureOpening", {
-                    date: reservationUnit.reservationBegins
-                      ? formatDate(
-                          reservationUnit.reservationBegins,
-                          "d.M.yyyy"
-                        )
-                      : "",
-                    time: reservationUnit.reservationBegins
-                      ? formatDate(reservationUnit.reservationBegins, "H.mm")
-                      : "",
-                  })}
-                  type="alert"
-                />
+              {!isReservable && (
+                <NonReservableNotification reservationUnit={reservationUnit} />
               )}
             </div>
             <Images
