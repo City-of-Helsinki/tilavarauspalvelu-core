@@ -37,12 +37,19 @@ class ReservationUnitReservationStateHelper:
         """
         now = local_datetime()
 
+        if (
+            # Reservations don't ever begin
+            reservation_unit.reservation_begins is None
+            # Reservations have already begun
+            or reservation_unit.reservation_begins <= now
+        ):
+            return False
+
         return (
-            # Reservations begin in the future
-            reservation_unit.reservation_begins is not None and reservation_unit.reservation_begins > now
-        ) and (
-            # Reservations don't end, or have ended somewhere in the past
-            reservation_unit.reservation_ends is None or reservation_unit.reservation_ends <= now
+            # Reservations don't end
+            reservation_unit.reservation_ends is None
+            # Or they have ended in the past
+            or reservation_unit.reservation_ends <= now
         )
 
     @classmethod
@@ -78,12 +85,11 @@ class ReservationUnitReservationStateHelper:
         """
         now = local_datetime()
 
+        if reservation_unit.reservation_begins is None or reservation_unit.reservation_ends is None:
+            return False
+
         # Reservation begins and ends in the future, and begins before it ends
-        return (
-            reservation_unit.reservation_begins is not None
-            and reservation_unit.reservation_ends is not None
-            and now < reservation_unit.reservation_begins < reservation_unit.reservation_ends
-        )
+        return now < reservation_unit.reservation_begins < reservation_unit.reservation_ends
 
     @classmethod
     def __get_is_scheduled_period_query(cls) -> QueryState:
@@ -114,20 +120,23 @@ class ReservationUnitReservationStateHelper:
     def __has_valid_pricing(cls, reservation_unit: ReservationUnit) -> bool:
         active_price = ReservationUnitPricingHelper.get_active_price(reservation_unit)
 
-        return (
-            # There is an active pricing
-            active_price is not None
-            and (
-                # Pricing is paid and there is a payment product, or pricing is free
-                (active_price.pricing_type == PricingType.PAID and reservation_unit.payment_product is not None)
-                or active_price.pricing_type == PricingType.FREE
-            )
-        )
+        if active_price is None:
+            return False
+
+        # Pricing is free
+        if active_price.pricing_type == PricingType.FREE:
+            return True
+        # Pricing is paid and there is a payment product
+        else:
+            return reservation_unit.payment_product is not None
 
     @classmethod
     def __has_valid_pricing_query(cls) -> Q:
-        return Q(active_pricing_type=PricingType.PAID, payment_product__isnull=False) | Q(
-            active_pricing_type=PricingType.FREE
+        return (
+            # Pricing is paid and there is a payment product
+            Q(active_pricing_type=PricingType.PAID, payment_product__isnull=False)
+            # or pricing is free
+            | Q(active_pricing_type=PricingType.FREE)
         )
 
     @classmethod
@@ -164,23 +173,20 @@ class ReservationUnitReservationStateHelper:
         │ Future │ *      │ False  │
         └────────┴────────┴────────┘
         """
-        return (
-            # Reservations don't begin or end
-            (reservation_unit.reservation_ends is None and reservation_unit.reservation_begins is None)
-            # Reservations don't end, but begin somewhere in the past (or right now)
-            or (
-                reservation_unit.reservation_ends is None
-                and reservation_unit.reservation_begins is not None
-                and reservation_unit.reservation_begins <= now
-            )
-            # Reservations begin somewhere in the past (or right now),
-            # and end in the past, but begin after they end
-            or (
-                reservation_unit.reservation_ends is not None
-                and reservation_unit.reservation_begins is not None
-                and reservation_unit.reservation_ends < reservation_unit.reservation_begins <= now
-            )
-        )
+        # Reservations don't have a set beginning or end
+        if reservation_unit.reservation_ends is None and reservation_unit.reservation_begins is None:
+            return True
+
+        # Reservations never begin (but have an end).
+        if reservation_unit.reservation_begins is None:
+            return False
+
+        if reservation_unit.reservation_ends is None:
+            # Or reservations begin in the future
+            return reservation_unit.reservation_begins <= now
+        else:
+            # Reservations have already begun and end in the past, but begin after they end
+            return reservation_unit.reservation_ends < reservation_unit.reservation_begins <= now
 
     @classmethod
     def __is_reservable_period_query(cls) -> Q:
@@ -188,8 +194,8 @@ class ReservationUnitReservationStateHelper:
 
         return (
             Q(reservation_begins__isnull=True, reservation_ends__isnull=True)
-            | Q(reservation_ends__isnull=True, reservation_begins__lte=now)
-            | Q(reservation_begins__lte=now, reservation_begins__gt=F("reservation_ends"))
+            | Q(reservation_begins__lte=now, reservation_ends__isnull=True)
+            | Q(reservation_begins__lte=now, reservation_ends__lt=F("reservation_begins"))
         )
 
     @classmethod
@@ -224,21 +230,17 @@ class ReservationUnitReservationStateHelper:
         │ Future │ Future │ True   │ Begins > Ends
         └────────┴────────┴────────┘
         """
+        # Reservations don't end or end in the past
+        if reservation_unit.reservation_ends is None or reservation_unit.reservation_ends < now:
+            return False
+
         return (
-            # Reservations end in the future
-            reservation_unit.reservation_ends is not None
-            and reservation_unit.reservation_ends > now
-            and (
-                # Reservations don't begin
-                reservation_unit.reservation_begins is None
-                # Reservations begin in the past
-                or (reservation_unit.reservation_begins is not None and reservation_unit.reservation_begins <= now)
-                # Reservations being in the future after they end
-                or (
-                    reservation_unit.reservation_begins is not None
-                    and now < reservation_unit.reservation_ends < reservation_unit.reservation_begins
-                )
-            )
+            # Reservations don't have a beginning
+            reservation_unit.reservation_begins is None
+            # Reservations have begun in the past
+            or reservation_unit.reservation_begins <= now
+            # Reservations begin in the future after they have ended end
+            or now < reservation_unit.reservation_ends < reservation_unit.reservation_begins
         )
 
     @classmethod
@@ -277,36 +279,29 @@ class ReservationUnitReservationStateHelper:
         """
         now = local_datetime()
 
+        # Reservation period would be zero-length
+        if reservation_unit.reservation_begins == reservation_unit.reservation_ends:
+            return True
+
+        if reservation_unit.reservation_ends is not None:
+            # Reservations don't begin, but have already ended
+            if reservation_unit.reservation_begins is None:
+                if reservation_unit.reservation_ends <= now:
+                    return True
+            # Reservations begin in the past, and end in the past (or right now) and begin before they end
+            elif reservation_unit.reservation_begins <= reservation_unit.reservation_ends <= now:
+                return True
+
         active_price = ReservationUnitPricingHelper.get_active_price(reservation_unit)
 
+        # Reservation period would be for reservable or scheduled closing based on reservable period,
+        # but there is no active pricing or pricing is paid and there is no payment product
         return (
-            (
-                # Reservations don't begin, but end in the past (or right now)
-                reservation_unit.reservation_begins is None
-                and reservation_unit.reservation_ends is not None
-                and reservation_unit.reservation_ends <= now
-            )
-            or (
-                # Reservations begin in the past, and end in the past (or right now),
-                # but begin before they end (or at the same time)
-                reservation_unit.reservation_begins is not None
-                and reservation_unit.reservation_ends is not None
-                and reservation_unit.reservation_begins <= reservation_unit.reservation_ends <= now
-            )
-            # Reservation period would be zero-length
-            or reservation_unit.reservation_begins == reservation_unit.reservation_ends
-            or (
-                # Reservation period would be for reservable or scheduled closing based on reservable period,
-                # but there is no active pricing or pricing is paid and there is no payment product
-                (
-                    cls.__is_reservable_period(now, reservation_unit)
-                    or cls.__is_scheduled_closing_period(now, reservation_unit)
-                )
-                and (
-                    active_price is None
-                    or (active_price.pricing_type == PricingType.PAID and reservation_unit.payment_product is None)
-                )
-            )
+            cls.__is_reservable_period(now, reservation_unit)
+            or cls.__is_scheduled_closing_period(now, reservation_unit)
+        ) and (
+            active_price is None
+            or (active_price.pricing_type == PricingType.PAID and reservation_unit.payment_product is None)
         )
 
     @classmethod
