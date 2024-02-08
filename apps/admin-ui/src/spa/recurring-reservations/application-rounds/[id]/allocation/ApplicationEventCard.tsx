@@ -268,10 +268,8 @@ function SchedulesList({
   const allocatedSchedules = schedules
     .filter((schedule) => schedule.allocatedDay != null)
     .sort((a, b) => (a.allocatedDay ?? 0) - (b.allocatedDay ?? 0));
-  const unallocatedSchedules = schedules.filter(
-    (schedule) => schedule.allocatedDay == null
-  );
 
+  const nToAllocate = eventsPerWeek - allocatedSchedules.length;
   return (
     <SelectionListContainer>
       {allocatedSchedules.map((schedule) => (
@@ -281,10 +279,10 @@ function SchedulesList({
           reservationUnitPk={reservationUnitPk}
         />
       ))}
-      {unallocatedSchedules.length > 0 && (
+      {nToAllocate > 0 && (
         <SelectionListCount>
-          {t("Allocation.schedulesWithoutAllocation")}{" "}
-          {unallocatedSchedules.length}/{eventsPerWeek}
+          {t("Allocation.schedulesWithoutAllocation")} {nToAllocate}/
+          {eventsPerWeek}
         </SelectionListCount>
       )}
     </SelectionListContainer>
