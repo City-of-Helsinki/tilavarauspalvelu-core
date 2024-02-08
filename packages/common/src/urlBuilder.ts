@@ -30,13 +30,15 @@ export function getSignInUrl(
   originOverride?: string
 ): string {
   const authUrl = buildAuthUrl(apiBaseUrl);
-  // TODO why is originOveride only used when on logout?
   if (callBackUrl.includes(`/logout`)) {
+    // TODO this is unsound if the callback url is not a full url but this at least redirects to an error page
     const baseUrl =
       originOverride != null ? originOverride : new URL(callBackUrl).origin;
     return `${authUrl}login?next=${baseUrl}`;
   }
-  return `${authUrl}login?next=${callBackUrl}`;
+  const next =
+    originOverride != null ? `${originOverride}/${callBackUrl}` : callBackUrl;
+  return `${authUrl}login?next=${next}`;
 }
 
 /// @param apiBaseUrl - base url for api (hostname typically)

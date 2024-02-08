@@ -1,25 +1,23 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getSignInUrl } from "@/modules/const";
+import { env } from "@/env.mjs";
 
 function redirectProtectedRoute(req: NextRequest) {
   // TODO check that the cookie is valid not just present
   const { cookies, headers } = req;
   const hasSession = cookies.has("sessionid");
-  const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+  const apiBaseUrl = env.TILAVARAUS_API_URL ?? "";
 
   if (!hasSession) {
     // on the server we are behind a gateway so get the forwarded headers
     // localhost has no headers
     const currentUrl = req.url;
+    const url = new URL(currentUrl);
     const protocol = headers.get("x-forwarded-proto") ?? "http";
-    const host = headers.get("x-forwarded-host");
-    const originalUrl = headers.get("x-original-url");
-    if (host && originalUrl) {
-      const origin = `${protocol}://${host}`;
-      return getSignInUrl(apiBaseUrl, originalUrl, origin);
-    }
-    return getSignInUrl(apiBaseUrl, currentUrl);
+    const host = headers.get("x-forwarded-host") ?? url.host;
+    const origin = `${protocol}://${host}`;
+    return getSignInUrl(apiBaseUrl, url.pathname, origin);
   }
   return undefined;
 }
