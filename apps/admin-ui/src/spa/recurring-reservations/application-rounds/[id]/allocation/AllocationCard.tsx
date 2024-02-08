@@ -380,17 +380,15 @@ export function AllocationCard({
   const applicantName = getApplicantName(applicationEvent.application);
 
   // TODO problem with declined is that it should be specific to the reservation unit (backend issue)
+  // TODO should not allow allocating more than maximum of eventsPerWeek (not sure if backend handles the filtering already)
   const isDeclined = applicationEvent.applicationEventSchedules?.every(
     (ae) => ae.declined
-  );
-  const isAccepted = applicationEvent.applicationEventSchedules?.some(
-    (ae) => ae.allocatedDay != null
   );
 
   const isAllocated =
     matchingApplicationEventSchedule?.allocatedReservationUnit != null;
   // TODO need to check if it's allocated here or elsewhere, don't allow changes if it's elsewhere (just show it or not?)
-  const isReservable = !isDeclined && !isAccepted && isAllocationEnabled;
+  const isReservable = !isDeclined && isAllocationEnabled;
   const isDisabled = !reservationUnit?.pk || !isReservable;
 
   if (isAllocated) {
