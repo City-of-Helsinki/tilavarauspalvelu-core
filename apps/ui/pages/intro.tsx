@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import type { GetServerSidePropsContext } from "next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
@@ -24,15 +24,29 @@ import { CenterSpinner } from "@/components/common/common";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { CREATE_APPLICATION_MUTATION } from "@/modules/queries/application";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { createApolloClient } from "@/modules/apolloClient";
+
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { locale } = ctx;
+  const commonProps = getCommonServerSideProps();
+  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
+
+  const { data } = await apolloClient.query<Query, QueryApplicationRoundsArgs>({
+    query: APPLICATION_ROUNDS,
+    fetchPolicy: "no-cache",
+  });
+
+  const applicationRounds = filterNonNullable(
+    data?.applicationRounds?.edges?.map((n) => n?.node)
+  );
 
   return {
     props: {
-      ...getCommonServerSideProps(),
-      overrideBackgroundColor: "white",
+      ...commonProps,
       ...(await serverSideTranslations(locale ?? "fi")),
+      applicationRounds,
     },
   };
 };
@@ -55,25 +69,14 @@ const Container = styled.div`
   }
 `;
 
-const IntroPage = (): JSX.Element => {
+const IntroPage = ({ applicationRounds }: Props): JSX.Element => {
   const { isAuthenticated } = useSession();
+  const history = useRouter();
+  const { t } = useTranslation();
 
   const [error, setError] = useState<string | undefined>(undefined);
   const [applicationRound, setApplicationRound] = useState(0);
 
-  const history = useRouter();
-  const { t } = useTranslation();
-
-  const { data } = useQuery<Query, QueryApplicationRoundsArgs>(
-    APPLICATION_ROUNDS,
-    {
-      fetchPolicy: "no-cache",
-    }
-  );
-
-  const applicationRounds = filterNonNullable(
-    data?.applicationRounds?.edges?.map((n) => n?.node)
-  );
   const applicationRoundOptions =
     applicationRounds
       .filter((ar) => ar.status === ApplicationRoundStatusChoice.Open)
@@ -109,7 +112,10 @@ const IntroPage = (): JSX.Element => {
       history.replace(`/application/${pk}/page1`);
     } else {
       // eslint-disable-next-line no-console
-      console.error("create application mutation failed: ", data);
+      console.error(
+        "create application mutation failed: ",
+        mutResponse?.createApplication
+      );
     }
   };
 
