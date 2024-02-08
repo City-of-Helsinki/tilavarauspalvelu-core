@@ -219,8 +219,8 @@ class CreateOrderParams:
             "priceVat": str(self.price_vat),
             "priceTotal": str(self.price_total),
             "customer": {
-                "firstName": self.customer.first_name,
-                "lastName": self.customer.last_name,
+                "firstName": self.customer.first_name or "-",
+                "lastName": self.customer.last_name or "-",
                 "email": self.customer.email,
                 "phone": self.customer.phone,
             },
