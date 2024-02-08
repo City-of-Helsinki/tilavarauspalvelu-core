@@ -1,13 +1,13 @@
 import { Button, IconArrowRight, IconCross } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { useRouter } from "next/router";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { Container as CommonContainer } from "common";
 import ClientOnly from "common/src/ClientOnly";
 import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
 import { truncatedText } from "@/styles/util";
+import Link from "next/link";
 
 type Props = {
   count: number;
@@ -77,10 +77,12 @@ const DeleteButton = styled(Button).attrs({
   ${truncatedText}
 `;
 
-const SubmitButton = styled(Button)`
+const StyledLink = styled(Link)`
   background-color: var(--color-white);
   color: var(--color-bus);
   ${truncatedText}
+  display: flex;
+  gap: var(--spacing-2-xs);
 `;
 
 const StartApplicationBar = ({
@@ -88,7 +90,6 @@ const StartApplicationBar = ({
   clearSelections,
 }: Props): JSX.Element | null => {
   const { t } = useTranslation();
-  const router = useRouter();
 
   // This breaks SSR because the server knowns nothing about client side stores
   // we can't fix it with CSS since it doesn't update properly
@@ -124,17 +125,11 @@ const StartApplicationBar = ({
               </JustForMobile>
             </DeleteButton>
           </Left>
-          <SubmitButton
-            id="startApplicationButton"
-            variant="primary"
-            iconRight={<IconArrowRight />}
-            onClick={() => {
-              router.push(`/intro`);
-            }}
-          >
+          <StyledLink id="startApplicationButton" href="/intro">
             <JustForDesktop>{t("shoppingCart:next")}</JustForDesktop>
             <JustForMobile>{t("shoppingCart:nextShort")}</JustForMobile>
-          </SubmitButton>
+            <IconArrowRight />
+          </StyledLink>
         </InnerContainer>
       </Container>
     </BackgroundContainer>
