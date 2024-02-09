@@ -237,7 +237,8 @@ class ReservationUnitType(
             "application_round_time_slots",
             "is_closed",
             "first_reservable_datetime",
-        ] + get_all_translatable_fields(model)
+            *get_all_translatable_fields(model),
+        ]
         filter_fields = {
             "name_fi": ["exact", "icontains", "istartswith"],
             "name_sv": ["exact", "icontains", "istartswith"],
@@ -473,7 +474,8 @@ class ReservationUnitByPkType(ReservationUnitType, ReservationUnitWithReservatio
             "state",
             "hauki_url",
             "reservable_time_spans",
-        ] + get_all_translatable_fields(model)
+            *get_all_translatable_fields(model),
+        ]
 
         interfaces = (graphene.relay.Node,)
         connection_class = TVPBaseConnection

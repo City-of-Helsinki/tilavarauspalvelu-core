@@ -24,7 +24,8 @@ class ResourceType(AuthNode, OldPrimaryKeyObjectType):
             "space",
             "buffer_time_before",
             "buffer_time_after",
-        ] + get_all_translatable_fields(model)
+            *get_all_translatable_fields(model),
+        ]
 
         filter_fields = {
             "name_fi": ["exact", "icontains", "istartswith"],

@@ -423,7 +423,7 @@ def test_get_varaamo_feedback_ext_link(language: Literal["fi", "en", "sv"], sett
 
 
 def test_context_attr_map_fails_on_undefined_methods(settings):
-    settings.EMAIL_TEMPLATE_CONTEXT_VARIABLES = settings.EMAIL_TEMPLATE_CONTEXT_VARIABLES + ["not_found"]
+    settings.EMAIL_TEMPLATE_CONTEXT_VARIABLES = [*settings.EMAIL_TEMPLATE_CONTEXT_VARIABLES, "not_found"]
 
     email_template = get_email_template()
     reservation_unit = ReservationUnitFactory.create()

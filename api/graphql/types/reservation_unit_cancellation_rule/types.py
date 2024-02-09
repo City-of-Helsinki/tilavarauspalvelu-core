@@ -13,11 +13,7 @@ class ReservationUnitCancellationRuleType(AuthNode, OldPrimaryKeyObjectType):
 
     class Meta:
         model = ReservationUnitCancellationRule
-        fields = [
-            "pk",
-            "can_be_cancelled_time_before",
-            "needs_handling",
-        ] + get_all_translatable_fields(model)
+        fields = ["pk", "can_be_cancelled_time_before", "needs_handling", *get_all_translatable_fields(model)]
         filter_fields = ["name"]
         interfaces = (graphene.relay.Node,)
         connection_class = TVPBaseConnection

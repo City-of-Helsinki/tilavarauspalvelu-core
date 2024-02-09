@@ -15,7 +15,7 @@ from spaces.models import Building, Location, RealEstate, ServiceSector, Space
 class RealEstateType(OldPrimaryKeyObjectType):
     class Meta:
         model = RealEstate
-        fields = ["pk", "surface_area"] + get_all_translatable_fields(model)
+        fields = ["pk", "surface_area", *get_all_translatable_fields(model)]
         interfaces = (graphene.relay.Node,)
         connection_class = TVPBaseConnection
 
@@ -25,11 +25,7 @@ class BuildingType(OldPrimaryKeyObjectType):
 
     class Meta:
         model = Building
-        fields = [
-            "pk",
-            "real_estate",
-            "surface_area",
-        ] + get_all_translatable_fields(model)
+        fields = ["pk", "real_estate", "surface_area", *get_all_translatable_fields(model)]
         interfaces = (graphene.relay.Node,)
         connection_class = TVPBaseConnection
 
@@ -51,7 +47,8 @@ class SpaceType(AuthNode, OldPrimaryKeyObjectType):
             "code",
             "max_persons",
             "parent",
-        ] + get_all_translatable_fields(model)
+            *get_all_translatable_fields(model),
+        ]
 
         filter_fields = {
             "name_fi": ["exact", "icontains", "istartswith"],
@@ -76,11 +73,7 @@ class LocationType(OldPrimaryKeyObjectType):
 
     class Meta:
         model = Location
-        fields = [
-            "address_zip",
-            "longitude",
-            "latitude",
-        ] + get_all_translatable_fields(model)
+        fields = ["address_zip", "longitude", "latitude", *get_all_translatable_fields(model)]
 
         interfaces = (graphene.relay.Node,)
         connection_class = TVPBaseConnection
@@ -95,7 +88,7 @@ class LocationType(OldPrimaryKeyObjectType):
 class ServiceSectorType(OldPrimaryKeyObjectType):
     class Meta:
         model = ServiceSector
-        fields = ["id"] + get_all_translatable_fields(model)
+        fields = ["id", *get_all_translatable_fields(model)]
         filter_fields = []
         interfaces = (graphene.relay.Node,)
         connection_class = TVPBaseConnection

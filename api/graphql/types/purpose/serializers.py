@@ -14,4 +14,4 @@ class PurposeCreateSerializer(OldPrimaryKeySerializer):
 
 class PurposeUpdateSerializer(OldPrimaryKeyUpdateSerializer, PurposeCreateSerializer):
     class Meta(PurposeCreateSerializer.Meta):
-        fields = ["pk"] + PurposeCreateSerializer.Meta.fields
+        fields = ["pk", *PurposeCreateSerializer.Meta.fields]

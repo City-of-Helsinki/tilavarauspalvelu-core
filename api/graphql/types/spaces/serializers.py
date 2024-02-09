@@ -45,7 +45,8 @@ class SpaceCreateSerializer(SpaceSerializer, OldPrimaryKeySerializer):
             "max_persons",
             "code",
             "unit_pk",
-        ] + get_all_translatable_fields(Space)
+            *get_all_translatable_fields(Space),
+        ]
 
     def validate(self, data):
         name_fi = data.get("name_fi", getattr(self.instance, "name_fi", None))
@@ -62,4 +63,4 @@ class SpaceUpdateSerializer(OldPrimaryKeyUpdateSerializer, SpaceCreateSerializer
         self.fields["name_fi"].required = False
 
     class Meta(SpaceCreateSerializer.Meta):
-        fields = SpaceCreateSerializer.Meta.fields + ["pk"]
+        fields = [*SpaceCreateSerializer.Meta.fields, "pk"]

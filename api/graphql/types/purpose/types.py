@@ -17,7 +17,7 @@ class PurposeType(AuthNode, OldPrimaryKeyObjectType):
 
     class Meta:
         model = Purpose
-        fields = ["pk", "image_url", "small_url", "rank"] + get_all_translatable_fields(model)
+        fields = ["pk", "image_url", "small_url", "rank", *get_all_translatable_fields(model)]
         filter_fields = ["name_fi", "name_en", "name_sv"]
         interfaces = (graphene.relay.Node,)
         connection_class = TVPBaseConnection

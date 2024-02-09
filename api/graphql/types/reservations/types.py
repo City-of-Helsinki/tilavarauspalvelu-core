@@ -113,7 +113,7 @@ class ReservationPurposeType(AuthNode, OldPrimaryKeyObjectType):
 
     class Meta:
         model = ReservationPurpose
-        fields = ["pk"] + get_all_translatable_fields(model)
+        fields = ["pk", *get_all_translatable_fields(model)]
         filter_fields = ["name_fi", "name_en", "name_sv"]
         interfaces = (graphene.relay.Node,)
 

@@ -67,4 +67,4 @@ class ReservationUnitPricingUpdateSerializer(OldPrimaryKeyUpdateSerializer, Rese
         self.fields["pk"].required = False
 
     class Meta(ReservationUnitPricingCreateSerializer.Meta):
-        fields = ["pk"] + ReservationUnitPricingCreateSerializer.Meta.fields
+        fields = ["pk", *ReservationUnitPricingCreateSerializer.Meta.fields]

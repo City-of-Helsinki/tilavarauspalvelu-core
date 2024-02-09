@@ -31,7 +31,8 @@ class UnitType(AuthNode, OldPrimaryKeyObjectType):
             "email",
             "phone",
             "payment_merchant",
-        ] + get_all_translatable_fields(model)
+            *get_all_translatable_fields(model),
+        ]
 
         filter_fields = {
             "name_fi": ["exact", "icontains", "istartswith"],
@@ -67,13 +68,7 @@ class UnitByPkType(UnitType):
 
     class Meta:
         model = Unit
-        fields = [
-            "pk",
-            "tprek_id",
-            "web_page",
-            "email",
-            "phone",
-        ] + get_all_translatable_fields(model)
+        fields = ["pk", "tprek_id", "web_page", "email", "phone", *get_all_translatable_fields(model)]
 
         interfaces = (graphene.relay.Node,)
         connection_class = TVPBaseConnection

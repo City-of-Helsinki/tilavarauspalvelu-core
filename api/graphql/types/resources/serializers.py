@@ -80,7 +80,8 @@ class ResourceCreateSerializer(ResourceSerializer, OldPrimaryKeySerializer):
             "space_pk",
             "buffer_time_before",
             "buffer_time_after",
-        ] + get_all_translatable_fields(Resource)
+            *get_all_translatable_fields(Resource),
+        ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -112,7 +113,7 @@ class ResourceCreateSerializer(ResourceSerializer, OldPrimaryKeySerializer):
 
 class ResourceUpdateSerializer(OldPrimaryKeyUpdateSerializer, ResourceCreateSerializer):
     class Meta(ResourceCreateSerializer.Meta):
-        fields = ResourceCreateSerializer.Meta.fields + ["pk"]
+        fields = [*ResourceCreateSerializer.Meta.fields, "pk"]
 
     def validate(self, data):
         if "location_type" in data:

@@ -14,7 +14,7 @@ class TermsOfUseType(AuthNode, OldPrimaryKeyObjectType):
 
     class Meta:
         model = TermsOfUse
-        fields = ["pk", "terms_type"] + get_all_translatable_fields(model)
+        fields = ["pk", "terms_type", *get_all_translatable_fields(model)]
         filter_fields = ["terms_type"]
         interfaces = (graphene.relay.Node,)
         connection_class = TVPBaseConnection
