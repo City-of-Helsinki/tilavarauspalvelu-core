@@ -153,7 +153,6 @@ const SubAccordion = styled(Accordion)`
   }
 `;
 
-/*
 const BufferWrapper = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -166,7 +165,6 @@ const BufferWrapper = styled.div`
     }
   }
 `;
-*/
 
 const Preview = styled.a<{ $disabled: boolean }>`
   display: flex;
@@ -1080,7 +1078,6 @@ function ReservationUnitSettings({
             />
           )}
         />
-        {/*
         <FieldGroup
           heading={t("ReservationUnitEditor.bufferSettings")}
           tooltip={t("ReservationUnitEditor.tooltip.bufferSettings")}
@@ -1106,6 +1103,7 @@ function ReservationUnitSettings({
                       onChange={(e) => onChange(e.target.value)}
                       checked={value != null && value === "no-buffer"}
                     />
+                    {/*
                     <RadioButton
                       id="blocks-whole-day"
                       value="blocks-whole-day"
@@ -1113,6 +1111,7 @@ function ReservationUnitSettings({
                       onChange={(e) => onChange(e.target.value)}
                       checked={value != null && value === "blocks-whole-day"}
                     />
+                    */}
                     <RadioButton
                       id="buffer-times-set"
                       value="buffer-times-set"
@@ -1182,8 +1181,7 @@ function ReservationUnitSettings({
               </BufferWrapper>
             )}
           </Grid>
-      </FieldGroup>
-      */}
+        </FieldGroup>
         <FieldGroup
           heading={t("ReservationUnitEditor.cancellationSettings")}
           tooltip={t("ReservationUnitEditor.tooltip.cancellationSettings")}

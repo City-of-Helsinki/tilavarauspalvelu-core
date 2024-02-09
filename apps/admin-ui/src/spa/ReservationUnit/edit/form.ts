@@ -998,8 +998,14 @@ export function transformReservationUnit(
         ? constructApiDate(publishEndsDate, publishEndsTime)
         : null,
     reservationBlockWholeDay: reservationBlockWholeDay === "blocks-whole-day",
-    bufferTimeAfter: hasBufferTimeAfter ? bufferTimeAfter : 0,
-    bufferTimeBefore: hasBufferTimeBefore ? bufferTimeBefore : 0,
+    bufferTimeAfter:
+      hasBufferTimeAfter && reservationBlockWholeDay === "buffer-times-set"
+        ? bufferTimeAfter
+        : 0,
+    bufferTimeBefore:
+      hasBufferTimeBefore && reservationBlockWholeDay === "buffer-times-set"
+        ? bufferTimeBefore
+        : 0,
     isDraft,
     isArchived,
     termsOfUseEn: termsOfUseEn !== "" ? termsOfUseEn : null,
