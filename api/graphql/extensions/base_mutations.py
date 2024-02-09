@@ -154,7 +154,7 @@ class ModelSerializerAuthMutation(BaseAuthMutation, ClientIDMutation):
             raise ValueError("Serializer class is required")
 
         if not issubclass(serializer_class, ModelSerializer):
-            raise ValueError("Serializer class needs to be a ModelSerializer")
+            raise TypeError("Serializer class needs to be a ModelSerializer")
 
         if model_operation is None:
             raise ValueError("Model operation is required")

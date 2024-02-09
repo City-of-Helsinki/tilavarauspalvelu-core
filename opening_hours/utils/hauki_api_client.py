@@ -131,8 +131,8 @@ class HaukiAPIClient:
         """
         try:
             response_json = response.json()
-        except ValueError as e:
-            logger.error(f"Could not read Hauki response as json: {e}")
+        except ValueError:
+            logger.exception("Could not read Hauki response as json.")
             raise HaukiRequestError("Parsing Hauki API return data failed")
 
         if not response.ok:
@@ -152,8 +152,8 @@ class HaukiAPIClient:
     def generic(cls, method: str, url: str, **kwargs):
         try:
             response = request(method, url, **kwargs, timeout=REQUESTS_TIMEOUT)
-        except Exception as e:
-            logger.error(f"Request to Hauki API failed: {e}")
+        except Exception:
+            logger.exception("Request to Hauki API failed.")
             raise HaukiRequestError(f"{method.upper()} request to Hauki url: {url} failed")
 
         return cls._hauki_response_json(response)

@@ -134,7 +134,7 @@ def test_compare_datetimes():
         assert compare_datetimes(dt_zi, dt_naive)
 
     msg = "Input 2 must be a `datetime.datetime` object."
-    with pytest.raises(ValueError, match=re.escape(msg)):
+    with pytest.raises(TypeError, match=re.escape(msg)):
         assert compare_datetimes(dt_utc, None)
 
     # Check for safeguards against comparing the comparison object directly.
@@ -176,11 +176,11 @@ def test_compare_times():
         "Input 1 cannot be a timezone-aware time using `zoneinfo.ZoneInfo` objects, "
         "since there is no way to know if the time is in daylight savings time or not."
     )
-    with pytest.raises(ValueError, match=re.escape(msg)):
+    with pytest.raises(TypeError, match=re.escape(msg)):
         assert compare_times(t_zi, t_utc)
 
     msg = "Input 2 must be a `datetime.datetime` or `datetime.time` object."
-    with pytest.raises(ValueError, match=re.escape(msg)):
+    with pytest.raises(TypeError, match=re.escape(msg)):
         assert compare_times(t_utc, None)
 
     # Check that datetime objects can also be used
