@@ -32,7 +32,6 @@ import { useNotification } from "../../../context/NotificationContext";
 import { flattenMetadata } from "./utils";
 import { useReservationUnitQuery } from "../hooks";
 import ReservationTypeForm from "../ReservationTypeForm";
-import { Grid, Element } from "../MyUnitRecurringReservation/commonStyling";
 import ControlledTimeInput from "../components/ControlledTimeInput";
 import ControlledDateInput from "../components/ControlledDateInput";
 
@@ -52,11 +51,6 @@ const ActionButtons = styled(Dialog.ActionButtons)`
   }
 `;
 
-const GridInsideTheModal = styled(Grid)`
-  margin-top: var(--spacing-m);
-  margin-bottom: var(--spacing-m);
-`;
-
 const FixedDialog = styled(Dialog)`
   /* Hack to deal with modal trying to fit content. So an error message -> layout shift */
   width: min(calc(100vw - 2rem), var(--container-width-l)) !important;
@@ -72,10 +66,14 @@ const FixedDialog = styled(Dialog)`
 type FormValueType = ReservationFormType & ReservationFormMeta;
 
 const Form = styled.form`
-  display: flex;
-  justify-content: space-between;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  grid-template-rows: repeat(12, 1fr);
+  gap: var(--spacing-l);
+
   height: 100%;
+  margin-top: var(--spacing-m);
+  margin-bottom: var(--spacing-m);
 `;
 
 const StyledNotification = styled(Notification)`
@@ -312,33 +310,25 @@ const DialogContent = ({
       <Dialog.Content>
         <FormProvider {...form}>
           <Form onSubmit={handleSubmit(onSubmit)}>
-            <GridInsideTheModal>
-              <Element>
-                <ControlledDateInput
-                  name="date"
-                  control={control}
-                  error={translateError(errors.date?.message)}
-                  required
-                />
-              </Element>
-              <Element>
-                <ControlledTimeInput
-                  name="startTime"
-                  control={control}
-                  error={translateError(errors.startTime?.message)}
-                  required
-                />
-              </Element>
-              <Element>
-                <ControlledTimeInput
-                  name="endTime"
-                  control={control}
-                  error={translateError(errors.endTime?.message)}
-                  required
-                />
-              </Element>
-              <ReservationTypeForm reservationUnit={reservationUnit} />
-            </GridInsideTheModal>
+            <ControlledDateInput
+              name="date"
+              control={control}
+              error={translateError(errors.date?.message)}
+              required
+            />
+            <ControlledTimeInput
+              name="startTime"
+              control={control}
+              error={translateError(errors.startTime?.message)}
+              required
+            />
+            <ControlledTimeInput
+              name="endTime"
+              control={control}
+              error={translateError(errors.endTime?.message)}
+              required
+            />
+            <ReservationTypeForm reservationUnit={reservationUnit} />
           </Form>
         </FormProvider>
       </Dialog.Content>
