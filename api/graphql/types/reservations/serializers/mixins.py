@@ -189,7 +189,7 @@ class ReservationSchedulingMixin:
 
     def check_reservation_time(self, reservation_unit: ReservationUnit):
         state = reservation_unit.state
-        if state == ReservationUnitState.DRAFT or state == ReservationUnitState.ARCHIVED:
+        if state in (ReservationUnitState.DRAFT, ReservationUnitState.ARCHIVED):
             raise ValidationErrorWithCode(
                 f"Reservation unit is not reservable due to status is {state}.",
                 ValidationErrorCodes.RESERVATION_UNIT_NOT_RESERVABLE,

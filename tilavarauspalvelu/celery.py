@@ -10,7 +10,7 @@ from celery.app.log import Logging
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "tilavarauspalvelu.settings")
 
 broker_url = os.getenv("CELERY_BROKER_URL", "filesystem://")
-broker_options = os.getenv("CELERY_BROKER_TRANSPORT_OPTIONS", {})
+broker_options = os.getenv("CELERY_BROKER_TRANSPORT_OPTIONS", {})  # noqa: PLW1508
 
 
 class RotatingCeleryLogging(Logging):

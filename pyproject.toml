@@ -97,6 +97,7 @@ lint.select = [
     "W",        # pycodestyle warnings
     "I",        # isort
     "UP",       # pyupgrade
+    "PL",       # pylint
     "ISC",      # flake8-implicit-str-concat
     "S",        # flake8-bandit
     "C4",       # flake8-comprehensions
@@ -107,6 +108,8 @@ lint.select = [
     "RSE",      # flake8-raise
     "SIM",      # flake8-simplify
     "DJ",       # flake8-django
+    "LOG",      # flake8-logging
+    "PIE",      # flake8-pie
     "RET502",   # flake8-return: Do not implicitly return None in function able to return non-None value
     "RET503",   # flake8-return: Missing explicit return at the end of function able to return non-None value
     "D200",     # pydocstyle: One-line docstring should fit on one line
@@ -140,6 +143,13 @@ lint.ignore = [
     "Q002",     # bad-quotes-docstring
     "Q003",     # avoidable-escaped-quote
     "W191",     # tab-indentation
+    "RUF012",   # mutable-class-default
+    "PLR0911",  # too-many-return-statements
+    "PLR0912",  # too-many-branches
+    "PLR0913",  # too-many-arguments
+    "PLR0915",  # too-many-statements
+    "PLR2004",  # magic-value-comparison
+    "PLW2901",  # redefined-loop-name
 ]
 
 [tool.ruff.lint.extend-per-file-ignores]

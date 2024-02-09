@@ -47,5 +47,3 @@ class SpaceDeleteMutation(OldAuthDeleteMutation, ClientIDMutation):
         in_active_round = ApplicationRound.objects.active().filter(reservation_units__spaces=space).exists()
         if in_active_round:
             raise ValidationError("Space occurs in active application round.")
-
-        return None
