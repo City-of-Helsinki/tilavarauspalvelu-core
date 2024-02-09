@@ -46,6 +46,10 @@
   --background-color-focus: var(--color-black-5);
   --focus-outline-color: var(--color-black-80);
 
+  /* links */
+  /* the colour is not a variable in hds, but it's the visited link colour in their component */
+  --link-visited-color: #551a8b;
+
   /* still used in reservation calendar, not my-units */
   --tilavaraus-event-rest-border-color: #1a1a1a;
   --tilavaraus-event-rest-background: rgba(26, 26, 26, 0.1);

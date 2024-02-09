@@ -9,6 +9,7 @@ import { UnitType } from "common/types/gql-types";
 import { IconButton } from "common/src/components";
 import { singleSearchPrefix } from "../../modules/const";
 import { getTranslation } from "../../modules/util";
+import { anchorStyles, focusStyles } from "common/styles/cssFragments";
 
 type Props = {
   units: UnitType[];
@@ -52,16 +53,18 @@ const UnitContainer = styled.div`
 
 const UnitItemLink = styled(Link)`
   &:hover {
-    text-decoration: none;
+    text-decoration: underline;
   }
 
-  color: var(--color-black) !important;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--spacing-xs);
   line-height: var(--lineheight-l);
   font-size: var(--fontsize-body-l);
+
+  ${focusStyles}
+  ${anchorStyles}
 
   svg {
     min-width: 48px;

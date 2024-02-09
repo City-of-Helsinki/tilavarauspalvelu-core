@@ -2,6 +2,11 @@ import React from "react";
 import Link from "next/link";
 import styled, { css } from "styled-components";
 import { fontMedium } from "../common/typography";
+import {
+  anchorStyles,
+  focusStyles,
+  visitedStyles,
+} from "../../styles/cssFragments";
 
 interface IconButtonProps {
   // the button label text
@@ -17,41 +22,30 @@ interface IconButtonProps {
   [rest: string]: unknown; // any other params, like id/aria/testing/etc
 }
 
+// TODO can't define padding for this otherwise it's not aligned properly since we have no border
+// but a bit of padding around the focus outline would be nice
 const Container = styled.div`
-  margin: var(--spacing-s) 0;
   display: flex;
   align-items: center;
-  text-decoration: none !important;
-`;
-
-const focusStyles = css`
-  --background-color-focus: transparent;
-  --color-focus: var(--color-black);
-  --focus-outline-color: var(--color-focus-outline);
-  --outline-width: 3px;
-
-  &:focus-within,
-  &:focus-visible {
-    transition-property: background-color, border-color, color;
-    transition-duration: 85ms;
-    transition-timing-function: ease-out;
-    background-color: var(--background-color-focus, transparent);
-    color: var(--color-focus);
-    outline: none;
-    box-shadow: 0 0 2px var(--outline-width) var(--focus-outline-color);
-  }
 `;
 
 const linkStyles = css`
-  color: var(--color-black);
+  --color-link: var(--color-black);
+  color: var(--color-link);
   text-decoration: none;
   &:hover {
     text-decoration: none;
   }
 `;
 
-const StyledLink = styled(Link)`
+// Allow disabling the visited color so internal links look like buttons without borders
+const StyledLink = styled(Link)<{ $disableVisitedStyles?: boolean }>`
+  ${({ $disableVisitedStyles }) =>
+    $disableVisitedStyles && "--link-visited-color: var(--color-link)"};
   ${linkStyles}
+  ${focusStyles}
+  ${anchorStyles}
+  ${visitedStyles}
 `;
 
 const StyledLinkButton = styled.button`
@@ -63,6 +57,7 @@ const StyledLinkButton = styled.button`
   ${linkStyles}
   ${focusStyles}
 
+  cursor: pointer;
   &:disabled {
     color: var(--color-black-50);
     & * :hover {
@@ -72,16 +67,11 @@ const StyledLinkButton = styled.button`
   }
 `;
 
-/* allow disabled links */
 const Anchor = styled.a`
-  && {
-    color: var(--color-black-30);
-    cursor: default;
-    &:link {
-      color: var(--color-black);
-      cursor: pointer;
-    }
-  }
+  width: fit-content;
+  ${focusStyles}
+  ${anchorStyles}
+  ${visitedStyles}
 `;
 
 const HoverWrapper = styled.div<{ $disabled?: boolean }>`
@@ -156,7 +146,7 @@ const LinkWrapper = ({ label, icon, href, ...rest }: LinkWrapperProps) => {
     );
   }
   return (
-    <StyledLink {...rest} href={href}>
+    <StyledLink {...rest} href={href} $disableVisitedStyles>
       <LinkElement label={label} icon={icon} />
     </StyledLink>
   );
@@ -183,7 +173,6 @@ const IconButton = ({
     href,
     target: openInNewTab ? "_blank" : undefined,
     rel: openInNewTab ? "noopener noreferrer" : undefined,
-    // role: openInNewTab ? "link" : "button",
     ...rest,
   };
 

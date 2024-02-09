@@ -43,7 +43,7 @@ type Props = {
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-2-xs);
+  gap: var(--spacing-s);
 `;
 
 const MoreWrapper = styled(ShowAllContainer)`
@@ -118,131 +118,124 @@ const Filters = ({ onSearch, initialFiltering }: Props): JSX.Element => {
   );
 
   return (
-    <div>
-      <Wrapper>
+    <Wrapper>
+      <AutoGrid>
+        <div>
+          <ReservationUnitTypeFilter
+            onChange={(reservationUnitType) =>
+              dispatch({ type: "set", value: { reservationUnitType } })
+            }
+            value={state.reservationUnitType}
+          />
+        </div>
+        <div>
+          <ReservationStateFilter
+            onChange={(reservationState) =>
+              dispatch({ type: "set", value: { reservationState } })
+            }
+            value={state.reservationState}
+          />
+        </div>
+        <div>
+          <UnitFilter
+            onChange={(unit) => dispatch({ type: "set", value: { unit } })}
+            value={state.unit}
+          />
+        </div>
+        <div>
+          <MyTextInput
+            id="textSearch"
+            dispatch={dispatch}
+            value={state.textSearch || ""}
+          />
+        </div>
+        <div>
+          <PaymentStatusFilter
+            onChange={(paymentStatuses) =>
+              dispatch({ type: "set", value: { paymentStatuses } })
+            }
+            value={state.paymentStatuses || []}
+          />
+        </div>
+        <div>
+          <ReservationUnitFilter
+            onChange={(reservationUnit) =>
+              dispatch({ type: "set", value: { reservationUnit } })
+            }
+            value={state.reservationUnit}
+          />
+        </div>
+        <div>
+          <DateInput
+            language="fi"
+            id="begin"
+            label={t("ReservationsSearch.begin")}
+            onChange={(begin) => dispatch({ type: "set", value: { begin } })}
+            value={state.begin}
+          />
+        </div>
+        <div>
+          <DateInput
+            id="end"
+            language="fi"
+            label={t("ReservationsSearch.end")}
+            onChange={(end) => dispatch({ type: "set", value: { end } })}
+            value={state.end}
+          />
+        </div>
+      </AutoGrid>
+      <MoreWrapper
+        showAllLabel={t("ReservationUnitsSearch.moreFilters")}
+        showLessLabel={t("ReservationUnitsSearch.lessFilters")}
+        maximumNumber={0}
+      >
         <AutoGrid>
           <div>
-            <ReservationUnitTypeFilter
-              onChange={(reservationUnitType) =>
-                dispatch({ type: "set", value: { reservationUnitType } })
+            <NumberInput
+              type="number"
+              value={
+                state.minPrice === "" ? state.minPrice : Number(state.minPrice)
               }
-              value={state.reservationUnitType}
-            />
-          </div>
-          <div>
-            <ReservationStateFilter
-              onChange={(reservationState) =>
-                dispatch({ type: "set", value: { reservationState } })
+              min={0}
+              minusStepButtonAriaLabel={t("common:subtract")}
+              plusStepButtonAriaLabel={t("common:add")}
+              step={1}
+              id="minPrice"
+              label={t("ReservationsSearch.minPrice")}
+              onChange={(e) =>
+                dispatch({
+                  type: "set",
+                  value: { minPrice: e.target.value },
+                })
               }
-              value={state.reservationState}
             />
           </div>
           <div>
-            <UnitFilter
-              onChange={(unit) => dispatch({ type: "set", value: { unit } })}
-              value={state.unit}
-            />
-          </div>
-          <div>
-            <MyTextInput
-              id="textSearch"
-              dispatch={dispatch}
-              value={state.textSearch || ""}
-            />
-          </div>
-          <div>
-            <PaymentStatusFilter
-              onChange={(paymentStatuses) =>
-                dispatch({ type: "set", value: { paymentStatuses } })
+            <NumberInput
+              type="number"
+              value={
+                state.maxPrice === "" ? state.maxPrice : Number(state.maxPrice)
               }
-              value={state.paymentStatuses || []}
-            />
-          </div>
-          <div>
-            <ReservationUnitFilter
-              onChange={(reservationUnit) =>
-                dispatch({ type: "set", value: { reservationUnit } })
-              }
-              value={state.reservationUnit}
-            />
-          </div>
-          <div>
-            <DateInput
-              language="fi"
-              id="begin"
-              label={t("ReservationsSearch.begin")}
-              onChange={(begin) => dispatch({ type: "set", value: { begin } })}
-              value={state.begin}
-            />
-          </div>
-          <div>
-            <DateInput
-              id="end"
-              language="fi"
-              label={t("ReservationsSearch.end")}
-              onChange={(end) => dispatch({ type: "set", value: { end } })}
-              value={state.end}
+              min={0}
+              minusStepButtonAriaLabel={t("common:subtract")}
+              plusStepButtonAriaLabel={t("common:add")}
+              step={1}
+              id="maxPrice"
+              label={t("ReservationsSearch.maxPrice")}
+              onChange={(e) => {
+                dispatch({
+                  type: "set",
+                  value: {
+                    maxPrice: e.target.value,
+                  },
+                });
+              }}
             />
           </div>
         </AutoGrid>
-        <MoreWrapper
-          showAllLabel={t("ReservationUnitsSearch.moreFilters")}
-          showLessLabel={t("ReservationUnitsSearch.lessFilters")}
-          maximumNumber={0}
-        >
-          <AutoGrid>
-            <div>
-              <NumberInput
-                type="number"
-                value={
-                  state.minPrice === ""
-                    ? state.minPrice
-                    : Number(state.minPrice)
-                }
-                min={0}
-                minusStepButtonAriaLabel={t("common:subtract")}
-                plusStepButtonAriaLabel={t("common:add")}
-                step={1}
-                id="minPrice"
-                label={t("ReservationsSearch.minPrice")}
-                onChange={(e) =>
-                  dispatch({
-                    type: "set",
-                    value: { minPrice: e.target.value },
-                  })
-                }
-              />
-            </div>
-            <div>
-              <NumberInput
-                type="number"
-                value={
-                  state.maxPrice === ""
-                    ? state.maxPrice
-                    : Number(state.maxPrice)
-                }
-                min={0}
-                minusStepButtonAriaLabel={t("common:subtract")}
-                plusStepButtonAriaLabel={t("common:add")}
-                step={1}
-                id="maxPrice"
-                label={t("ReservationsSearch.maxPrice")}
-                onChange={(e) => {
-                  dispatch({
-                    type: "set",
-                    value: {
-                      maxPrice: e.target.value,
-                    },
-                  });
-                }}
-              />
-            </div>
-          </AutoGrid>
-        </MoreWrapper>
-      </Wrapper>
-
+      </MoreWrapper>
       <Tags tags={tags} t={t} dispatch={dispatch} />
-    </div>
+    </Wrapper>
   );
 };
 

@@ -8,7 +8,7 @@ import {
   useController,
   UseControllerProps,
 } from "react-hook-form";
-import { truncatedText } from "../../../styles/styledComponentUtils";
+import { truncatedText } from "../../../styles/cssFragments";
 import { removeRefParam } from "../../reservation-form/util";
 
 interface TimeRangePickerProps<T extends FieldValues>

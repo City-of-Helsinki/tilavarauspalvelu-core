@@ -11,6 +11,8 @@ import { ShowAllContainer } from "common/src/components";
 import { singleSearchPrefix } from "../../modules/const";
 import { getTranslation } from "../../modules/util";
 import ReservationUnitSearch from "./ReservationUnitSearch";
+import { anchorStyles, focusStyles } from "common/styles/cssFragments";
+import { pixel } from "@/styles/util";
 
 type Props = {
   purposes: PurposeType[];
@@ -54,12 +56,9 @@ const PurposeContainer = styled(ShowAllContainer)`
 
 const PurposeItem = styled.div`
   &:hover {
-    span {
-      text-decoration: underline;
-    }
+    text-decoration: underline;
   }
 
-  color: var(--color-black) !important;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
@@ -69,6 +68,11 @@ const PurposeItem = styled.div`
   svg {
     min-width: 24px;
   }
+`;
+
+const PurposeLink = styled(Link)`
+  ${focusStyles}
+  ${anchorStyles}
 `;
 
 const Image = styled.img`
@@ -96,6 +100,10 @@ const Purposes = ({ purposes }: Props): JSX.Element => {
 
   const itemLimit = useMemo(() => (isMobile ? 4 : 8), [isMobile]);
 
+  const getImg = (item: PurposeType) => {
+    return item.smallUrl || item.imageUrl || pixel;
+  };
+
   return (
     <Wrapper>
       <Content>
@@ -111,18 +119,18 @@ const Purposes = ({ purposes }: Props): JSX.Element => {
           data-testid="front-page__purposes"
         >
           {purposes?.map((item) => (
-            <Link
+            <PurposeLink
               key={item.pk}
               href={`${singleSearchPrefix}?purposes=${item.pk}#content`}
             >
               <PurposeItem data-testid="front-page__purposes--purpose">
-                <Image src={item.smallUrl ?? ""} alt="" aria-hidden />
+                <Image src={getImg(item)} alt="" aria-hidden />
                 <Title>
                   <span>{getTranslation(item, "name")}</span>
                   <IconArrowRight size="s" aria-hidden />
                 </Title>
               </PurposeItem>
-            </Link>
+            </PurposeLink>
           ))}
         </PurposeContainer>
       </Content>

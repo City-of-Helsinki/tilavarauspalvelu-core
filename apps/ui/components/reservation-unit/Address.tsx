@@ -36,10 +36,6 @@ const Links = styled.div`
   && > * > * {
     margin: 0;
   }
-
-  a {
-    color: var(--color-black-90);
-  }
 `;
 
 /// Common type for url constructors
