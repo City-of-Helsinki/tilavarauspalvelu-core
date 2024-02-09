@@ -14,6 +14,7 @@ import { DataContextProvider } from "../context/DataContext";
 import { createApolloClient } from "../modules/apolloClient";
 import { TrackingWrapper } from "../modules/tracking";
 import nextI18NextConfig from "../next-i18next.config";
+import "common/styles/variables.css";
 import "../styles/global.scss";
 
 const MyApp = ({ Component, pageProps }: AppProps) => {

@@ -1,0 +1,8 @@
+:root {
+  --font-regular: HelsinkiGrotesk, var(--font-default);
+  --font-medium: HelsinkiGrotesk-Medium, var(--font-default);
+  --font-bold: HelsinkiGrotesk-Bold, var(--font-default);
+  --prose-width: 66ch;
+  /* the colour is not a variable in hds, but it's the visited link colour in their component */
+  --link-visited-color: #551a8b;
+}
