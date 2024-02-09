@@ -194,8 +194,6 @@ class ReservationDeleteMutation(OldAuthDeleteMutation, ClientIDMutation):
                 payment_order.status = OrderStatus.CANCELLED
                 payment_order.save()
 
-        return None
-
 
 class ReservationStaffCreateMutation(OldAuthSerializerMutation, SerializerMutation):
     permission_classes = (ReservationStaffCreatePermission,)
