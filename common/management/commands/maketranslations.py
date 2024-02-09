@@ -16,7 +16,7 @@ class Command(makemessages.Command):
         parser.add_argument(
             "--omit-header",
             action="store_true",
-            help='Don’t write header with `msgid ""` entry.',
+            help='Don`t write header with `msgid ""` entry.',
         )
 
     def handle(self, *args: Any, **options: Any) -> Any:

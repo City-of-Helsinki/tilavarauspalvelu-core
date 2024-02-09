@@ -77,7 +77,7 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]):
             "name": "Maksuehto 1 - vain verkkomaksaminen",
             "name_fi": "Maksuehto 1 - vain verkkomaksaminen",
             "name_en": "Term of payment 1: online payment only",
-            "name_sv": "Betalningsvillkor 1 – endast onlinebetalning",
+            "name_sv": "Betalningsvillkor 1 - endast onlinebetalning",
             "text": (
                 "Varaus maksetaan kokonaisuudessaan etukäteen varauksenteon yhteydessä. "
                 "Palvelussa ilmoitetut hinnat sisältävät arvolisäveron. "
@@ -92,7 +92,7 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]):
             "name": "Maksuehto 3 - verkkomaksu + lasku, alennus",
             "name_fi": "Maksuehto 3 - verkkomaksu + lasku, alennus",
             "name_en": "Term of payment 3: online payment + invoice, discount",
-            "name_sv": "Betalningsvillkor 3 – onlinebetalning + faktura, rabatt",
+            "name_sv": "Betalningsvillkor 3 - onlinebetalning + faktura, rabatt",
             "text": (
                 "Varaus maksetaan kokonaisuudessaan etukäteen varauksenteon yhteydessä. "
                 "Maksutonta käyttöä tai alennusta on haettava varaamisen yhteydessä. "
@@ -113,7 +113,7 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]):
             "name": "Maksuehto 4 - verkkomaksu + lasku, käsittely",
             "name_fi": "Maksuehto 4 - verkkomaksu + lasku, käsittely",
             "name_en": "Term of payment 4: online payment + invoice, processing",
-            "name_sv": "Betalningsvillkor 4 – onlinebetalning + faktura, handläggning",
+            "name_sv": "Betalningsvillkor 4 - onlinebetalning + faktura, handläggning",
             "text": (
                 "Varauksesi siirtyy käsittelyyn. Varaus maksetaan kokonaisuudessaan "
                 "varauksen vahvistamisen jälkeen. Maksutonta käyttöä tai alennusta "
