@@ -91,7 +91,7 @@ extend-exclude = [
     "tilavarauspalvelu/settings.py",
     "local_settings.py",
 ]
-select = [
+lint.select = [
     "F",        # pyflakes
     "E",        # pycodestyle errors
     "W",        # pycodestyle warnings
@@ -118,7 +118,7 @@ select = [
     "RUF013",   # Ruff-specific rules: PEP 484 prohibits implicit Optional
     "RUF100",   # Ruff-specific rules: Unused noqa directive
 ]
-ignore = [
+lint.ignore = [
     "S101",     # assert is fine
     "B904",     # bare raise is fine
     "B905",     # zip without strict
@@ -142,7 +142,7 @@ ignore = [
     "W191",     # tab-indentation
 ]
 
-[tool.ruff.extend-per-file-ignores]
+[tool.ruff.lint.extend-per-file-ignores]
 "common/management/commands/create_test_data.py" = [
     "S311",     # pseudo-random generators are fine here.
 ]
@@ -156,13 +156,13 @@ ignore = [
     "S311",     # Pseudo-random generators are fine here.
 ]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 combine-as-imports = false
 known-third-party = [
     "django",
 ]
 
-[tool.ruff.mccabe]
+[tool.ruff.lint.mccabe]
 max-complexity = 10
 
 [tool.bandit]
