@@ -111,6 +111,7 @@ lint.select = [
     "DJ",       # flake8-django
     "LOG",      # flake8-logging
     "PIE",      # flake8-pie
+    "RUF",      # ruff-specific rules
     "RET502",   # flake8-return: Do not implicitly return None in function able to return non-None value
     "RET503",   # flake8-return: Missing explicit return at the end of function able to return non-None value
     "D200",     # pydocstyle: One-line docstring should fit on one line
@@ -118,10 +119,6 @@ lint.select = [
     "D202",     # pydocstyle: No blank lines allowed after function docstring (found {num_lines})
     "D209",     # pydocstyle: Multi-line docstring closing quotes should be on a separate line
     "D213",     # pydocstyle: Multi-line docstring summary should start at the second line
-    "RUF005",   # Ruff-specific rules: Consider {expression} instead of concatenation
-    "RUF010",   # Ruff-specific rules: Use explicit conversion flag
-    "RUF013",   # Ruff-specific rules: PEP 484 prohibits implicit Optional
-    "RUF100",   # Ruff-specific rules: Unused noqa directive
 ]
 lint.ignore = [
     "S101",     # assert is fine
