@@ -75,7 +75,7 @@ class compare_datetimes(_TZComparator[datetime.datetime, datetime.datetime]):  #
     def _validate_input(_input: datetime.datetime, *, name: str) -> datetime.datetime:
         if not isinstance(_input, datetime.datetime):
             msg = f"{name} must be a `datetime.datetime` object."
-            raise ValueError(msg)
+            raise TypeError(msg)
 
         if not (_input.tzinfo == datetime.UTC or isinstance(_input.tzinfo, zoneinfo.ZoneInfo)):
             msg = f"{name} must be timezone-aware using `zoneinfo.ZoneInfo` objects or `datetime.UTC`."
@@ -89,7 +89,7 @@ class compare_times(_TZComparator[datetime.datetime | datetime.time, datetime.ti
     def _validate_input(_input: datetime.datetime | datetime.time, *, name: str) -> datetime.time:
         if not isinstance(_input, datetime.datetime | datetime.time):
             msg = f"{name} must be a `datetime.datetime` or `datetime.time` object."
-            raise ValueError(msg)
+            raise TypeError(msg)
 
         if not (_input.tzinfo == datetime.UTC or isinstance(_input.tzinfo, zoneinfo.ZoneInfo)):
             msg = f"{name} must be timezone-aware using `zoneinfo.ZoneInfo` objects or `datetime.UTC`."
@@ -104,7 +104,7 @@ class compare_times(_TZComparator[datetime.datetime | datetime.time, datetime.ti
                     f"{name} cannot be a timezone-aware time using `zoneinfo.ZoneInfo` objects, "
                     f"since there is no way to know if the time is in daylight savings time or not."
                 )
-                raise ValueError(msg)
+                raise TypeError(msg)
 
         if isinstance(_input, datetime.datetime):
             _input = _input.astimezone(datetime.UTC).time()

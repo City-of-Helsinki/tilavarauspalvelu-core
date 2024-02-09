@@ -97,9 +97,10 @@ def get_merchants(get=_get) -> list[Merchant]:
         result = []
         for merchant_data in json.values():
             result.append(Merchant.from_json(merchant_data))
-        return result
     except (RequestException, JSONDecodeError, ParseMerchantError) as e:
         raise GetMerchantsError("Fetching merchants failed") from e
+
+    return result
 
 
 def get_merchant(merchant_uuid: UUID, get=_get) -> MerchantInfo | None:

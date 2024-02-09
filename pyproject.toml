@@ -98,6 +98,7 @@ lint.select = [
     "I",        # isort
     "UP",       # pyupgrade
     "PL",       # pylint
+    "TRY",      # tryceratops
     "ISC",      # flake8-implicit-str-concat
     "S",        # flake8-bandit
     "C4",       # flake8-comprehensions
@@ -150,6 +151,7 @@ lint.ignore = [
     "PLR0915",  # too-many-statements
     "PLR2004",  # magic-value-comparison
     "PLW2901",  # redefined-loop-name
+    "TRY003",   # raise-vanilla-args
 ]
 
 [tool.ruff.lint.extend-per-file-ignores]
