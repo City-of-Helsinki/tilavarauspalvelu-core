@@ -7,12 +7,11 @@ import styled from "styled-components";
 type BufferControllerProps = {
   name: "bufferTimeBefore" | "bufferTimeAfter";
   seconds: number;
+  control: ReturnType<typeof useFormContext>["control"];
 };
 
-const BufferController = ({ name, seconds }: BufferControllerProps) => {
+function BufferController({ name, seconds, control }: BufferControllerProps) {
   const { t } = useTranslation();
-
-  const { control } = useFormContext();
 
   return (
     <Controller
@@ -34,7 +33,7 @@ const BufferController = ({ name, seconds }: BufferControllerProps) => {
       )}
     />
   );
-};
+}
 
 const Wrapper = styled.div`
   display: flex;
@@ -48,14 +47,20 @@ const LabelWithTooltip = styled.div`
   gap: var(--spacing-xs);
 `;
 
-const BufferToggles = ({
+export function BufferToggles({
   before,
   after,
 }: {
   before: number;
   after: number;
-}) => {
+}) {
   const { t } = useTranslation();
+  const { control } = useFormContext();
+
+  if (before === 0 && after === 0) {
+    return null;
+  }
+
   return (
     <Wrapper>
       <LabelWithTooltip>
@@ -63,13 +68,19 @@ const BufferToggles = ({
         <Tooltip>{t("reservationApplication:buffers.tooltip")}</Tooltip>
       </LabelWithTooltip>
       {before !== 0 && (
-        <BufferController name="bufferTimeBefore" seconds={before} />
+        <BufferController
+          name="bufferTimeBefore"
+          control={control}
+          seconds={before}
+        />
       )}
       {after !== 0 && (
-        <BufferController name="bufferTimeAfter" seconds={after} />
+        <BufferController
+          name="bufferTimeAfter"
+          control={control}
+          seconds={after}
+        />
       )}
     </Wrapper>
   );
-};
-
-export default BufferToggles;
+}

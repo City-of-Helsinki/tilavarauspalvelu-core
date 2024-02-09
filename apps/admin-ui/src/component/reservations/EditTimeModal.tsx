@@ -26,7 +26,7 @@ import { setTimeOnDate } from "./utils";
 import ControlledTimeInput from "../my-units/components/ControlledTimeInput";
 import { reservationDateTime, reservationDuration } from "./requested/util";
 import ControlledDateInput from "../my-units/components/ControlledDateInput";
-import BufferToggles from "../my-units/BufferToggles";
+import { BufferToggles } from "../my-units/BufferToggles";
 import { useCheckCollisions } from "./requested/hooks";
 import { filterNonNullable } from "common/src/helpers";
 
@@ -337,11 +337,9 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
           error={translateError(errors.endTime?.message)}
           required
         />
-        {(bufferAfter !== 0 || bufferBefore !== 0) && (
-          <FormProvider {...form}>
-            <BufferToggles before={bufferBefore} after={bufferAfter} />
-          </FormProvider>
-        )}
+        <FormProvider {...form}>
+          <BufferToggles before={bufferBefore} after={bufferAfter} />
+        </FormProvider>
         <TimeInfoBox $isDisabled={!isDirty || !isValid}>
           {t("Reservation.EditTime.newTime")}: <Bold>{newTime}</Bold>
         </TimeInfoBox>

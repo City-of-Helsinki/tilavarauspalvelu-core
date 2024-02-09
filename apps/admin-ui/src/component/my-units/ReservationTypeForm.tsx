@@ -10,7 +10,7 @@ import {
   ReservationMetadataSetForm,
   ReserverMetadataSetForm,
 } from "./MetadataSetForm";
-import BufferToggles from "./BufferToggles";
+import { BufferToggles } from "./BufferToggles";
 import { Element } from "./MyUnitRecurringReservation/commonStyling";
 import ShowTOS from "./ShowTOS";
 import { HR } from "@/component/Table";
@@ -105,14 +105,12 @@ const ReservationTypeForm = ({
       )}
       {type !== undefined && type !== "BLOCKED" && (
         <>
-          {!disableBufferToggle &&
-            (reservationUnit.bufferTimeBefore ||
-              reservationUnit.bufferTimeAfter) && (
-              <BufferToggles
-                before={reservationUnit.bufferTimeBefore ?? 0}
-                after={reservationUnit.bufferTimeAfter ?? 0}
-              />
-            )}
+          {!disableBufferToggle && (
+            <BufferToggles
+              before={reservationUnit.bufferTimeBefore ?? 0}
+              after={reservationUnit.bufferTimeAfter ?? 0}
+            />
+          )}
           {children}
           <CommentsTextArea
             id="reservationApplication:comment"

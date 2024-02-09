@@ -225,6 +225,7 @@ const DialogContent = ({
 
   const {
     handleSubmit,
+    control,
     formState: { errors },
   } = form;
 
@@ -315,7 +316,7 @@ const DialogContent = ({
               <Element>
                 <ControlledDateInput
                   name="date"
-                  control={form.control}
+                  control={control}
                   error={translateError(errors.date?.message)}
                   required
                 />
@@ -323,7 +324,7 @@ const DialogContent = ({
               <Element>
                 <ControlledTimeInput
                   name="startTime"
-                  control={form.control}
+                  control={control}
                   error={translateError(errors.startTime?.message)}
                   required
                 />
@@ -331,7 +332,7 @@ const DialogContent = ({
               <Element>
                 <ControlledTimeInput
                   name="endTime"
-                  control={form.control}
+                  control={control}
                   error={translateError(errors.endTime?.message)}
                   required
                 />
