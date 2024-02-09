@@ -22,8 +22,8 @@ import {
 import { addDays, format } from "date-fns";
 import { z } from "zod";
 import { TFunction } from "i18next";
-import { setTimeOnDate } from "@/component/reservations/utils";
 import { checkLengthWithoutHtml, checkTimeStringFormat } from "@/schemas";
+import { constructApiDate } from "@/helpers";
 
 export const PaymentTypes = ["ONLINE", "INVOICE", "ON_SITE"] as const;
 
@@ -277,18 +277,6 @@ function validateSeasonalTimes(
       }
     });
   });
-}
-
-function constructApiDate(date: string, time: string): string | null {
-  if (date === "" || time === "") {
-    return null;
-  }
-  const d = fromUIDate(date);
-  if (!d) {
-    return null;
-  }
-  const d2 = setTimeOnDate(d, time);
-  return d2.toISOString();
 }
 
 function validateDateTimeInterval({

@@ -3,6 +3,7 @@ import { fromUIDate } from "common/src/common/util";
 import { ReservationUnitsReservationUnitReservationStartIntervalChoices } from "common/types/gql-types";
 import { intervalToNumber } from "./utils";
 import { checkTimeStringFormat, checkValidFutureDate } from "./schemaCommon";
+import { constructApiDate } from "@/helpers";
 
 export const ReservationTypes = [
   "STAFF",
@@ -90,6 +91,18 @@ const ReservationFormSchemaRefined = (
       checkTimeStringFormat(val.endTime, ctx, "endTime")
     )
     .superRefine((val, ctx) => checkStartEndTime(val, ctx))
+    .superRefine((val, ctx) => {
+      if (val.startTime && val.date) {
+        const d = constructApiDate(val.date, val.startTime);
+        if (d != null && new Date(d) < new Date()) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "startTime must be before now",
+            path: ["startTime"],
+          });
+        }
+      }
+    })
     .superRefine((val, ctx) =>
       checkReservationInterval(
         val.startTime,

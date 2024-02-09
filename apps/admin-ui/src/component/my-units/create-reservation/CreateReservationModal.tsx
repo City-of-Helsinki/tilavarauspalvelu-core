@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm, FormProvider, UseFormReturn } from "react-hook-form";
 import { Button, Dialog, Notification } from "hds-react";
 import { useTranslation } from "react-i18next";
@@ -169,6 +169,8 @@ const ActionContainer = ({
 
   const { hasCollisions } = useCheckFormCollisions({ form, reservationUnit });
 
+  const isDisabled = !isDirty || isSubmitting || !isValid || hasCollisions;
+
   return (
     <ActionButtons>
       <CollisionWarning form={form} reservationUnit={reservationUnit} />
@@ -178,7 +180,7 @@ const ActionContainer = ({
       <Button
         type="button"
         size="small"
-        disabled={!isDirty || isSubmitting || !isValid || hasCollisions}
+        disabled={isDisabled}
         onClick={() => {
           handleSubmit(onSubmit)();
         }}
@@ -225,9 +227,35 @@ const DialogContent = ({
     handleSubmit,
     control,
     formState: { errors },
+    trigger,
+    watch,
+    getFieldState,
   } = form;
 
   const { notifyError, notifySuccess } = useNotification();
+
+  // show errors if the clicked start date is invalid (both previous day and today but in the past)
+  useEffect(() => {
+    if (start < new Date()) {
+      trigger();
+    }
+  }, [start, trigger]);
+
+  // force form vaildation on date change but not on first render
+  useEffect(() => {
+    // Is touched is always false with controller
+    if (getFieldState("date").isDirty) {
+      trigger();
+    }
+  }, [watch("date"), trigger, getFieldState]);
+
+  // force revalidation of end time on start time change
+  useEffect(() => {
+    // Is touched is always false with controller
+    if (getFieldState("endTime").isDirty) {
+      trigger("endTime");
+    }
+  }, [watch("startTime"), trigger, getFieldState]);
 
   const [create] = useMutation<
     { createStaffReservation: ReservationStaffCreateMutationPayload },

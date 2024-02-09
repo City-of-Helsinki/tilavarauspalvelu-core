@@ -3,6 +3,7 @@
     "formNotValid": "Lomakkeessa vikaa.",
     "noReservations": "Valittujen viikonpäivien tulee vastata valittuja päivämääriä.",
     "Invalid date": "Virheellinen päivämäärä.",
+    "startTime must be before now": "Aloitusaika ei voi olla menneisyydessä.",
     "endTime can't be more than 24 hours.": "Päättymisaika ei voi olla yli 24 tuntia.",
     "startTime can't be more than 24 hours.": "Aloitusaika ei voi olla yli 24 tuntia.",
     "startTime has to be in 15 minutes increments.": "Aloitusajan pitää olla 15 minuutin välein.",

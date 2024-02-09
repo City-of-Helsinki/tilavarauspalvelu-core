@@ -1,5 +1,7 @@
 import { parse } from "date-fns";
 import { formatDate } from "../common/util";
+import { fromUIDate } from "common/src/common/util";
+import { setTimeOnDate } from "@/component/reservations/utils";
 
 /* Convert api datetime to date required by date input, defaults to current date */
 export const valueForDateInput = (from: string): string => {
@@ -30,3 +32,18 @@ export const parseDateTimeSafe = (
     return undefined;
   }
 };
+
+// TODO this requires a bit of thought, why are we prefering ISO strings over Date objects?
+// we should have valid Date object for all the checks
+// convert it to ISO string only in mutations after the validation
+export function constructApiDate(date: string, time: string): string | null {
+  if (date === "" || time === "") {
+    return null;
+  }
+  const d = fromUIDate(date);
+  if (!d || Number.isNaN(d.getTime())) {
+    return null;
+  }
+  const d2 = setTimeOnDate(d, time);
+  return d2.toISOString();
+}
