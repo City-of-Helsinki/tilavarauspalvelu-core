@@ -12,12 +12,7 @@ class ServiceType(OldPrimaryKeyObjectType):
 
     class Meta:
         model = Service
-        fields = [
-            "pk",
-            "service_type",
-            "buffer_time_before",
-            "buffer_time_after",
-        ] + get_all_translatable_fields(model)
+        fields = ["pk", "service_type", "buffer_time_before", "buffer_time_after", *get_all_translatable_fields(model)]
 
         interfaces = (graphene.relay.Node,)
         connection_class = TVPBaseConnection

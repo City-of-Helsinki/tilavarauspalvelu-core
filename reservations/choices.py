@@ -25,4 +25,4 @@ class ReservationTypeChoice(models.TextChoices):
     BEHALF = "behalf", _("Behalf")
 
 
-RESERVEE_LANGUAGE_CHOICES = settings.LANGUAGES + (("", ""),)
+RESERVEE_LANGUAGE_CHOICES = (*settings.LANGUAGES, ("", ""))

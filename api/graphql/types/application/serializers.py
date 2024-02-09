@@ -56,9 +56,7 @@ class ApplicationCreateSerializer(TranslatedModelSerializer):
 
 class ApplicationUpdateSerializer(ApplicationCreateSerializer):
     class Meta(ApplicationCreateSerializer.Meta):
-        fields = ApplicationCreateSerializer.Meta.fields + [
-            "working_memo",
-        ]
+        fields = [*ApplicationCreateSerializer.Meta.fields, "working_memo"]
 
     def validate_working_memo(self, value: str) -> str:
         if not can_validate_unit_applications(self.request_user, self.instance.units):

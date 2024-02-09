@@ -11,7 +11,7 @@ from reservation_units.models import Keyword, KeywordCategory, KeywordGroup
 class KeywordType(AuthNode, OldPrimaryKeyObjectType):
     class Meta:
         model = Keyword
-        fields = ["pk"] + get_all_translatable_fields(model)
+        fields = ["pk", *get_all_translatable_fields(model)]
         filter_fields = ["name_fi", "name_sv", "name_en"]
         interfaces = (graphene.relay.Node,)
         connection_class = TVPBaseConnection
@@ -22,7 +22,7 @@ class KeywordGroupType(AuthNode, OldPrimaryKeyObjectType):
 
     class Meta:
         model = KeywordGroup
-        fields = ["pk"] + get_all_translatable_fields(model)
+        fields = ["pk", *get_all_translatable_fields(model)]
         filter_fields = ["name_fi", "name_sv", "name_en"]
         interfaces = (graphene.relay.Node,)
         connection_class = TVPBaseConnection
@@ -36,7 +36,7 @@ class KeywordCategoryType(AuthNode, OldPrimaryKeyObjectType):
 
     class Meta:
         model = KeywordCategory
-        fields = ["pk"] + get_all_translatable_fields(model)
+        fields = ["pk", *get_all_translatable_fields(model)]
         filter_fields = ["name_fi", "name_sv", "name_en"]
         interfaces = (graphene.relay.Node,)
         connection_class = TVPBaseConnection

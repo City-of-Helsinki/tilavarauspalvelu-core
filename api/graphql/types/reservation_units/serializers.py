@@ -239,7 +239,8 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, OldPrimaryKeySe
             "payment_types",
             "pricings",
             "application_round_time_slots",
-        ] + get_all_translatable_fields(ReservationUnit)
+            *get_all_translatable_fields(ReservationUnit),
+        ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -379,7 +380,7 @@ class ReservationUnitUpdateSerializer(OldPrimaryKeyUpdateSerializer, Reservation
         self.fields["pricings"].write_only = True
 
     class Meta(ReservationUnitCreateSerializer.Meta):
-        fields = ReservationUnitCreateSerializer.Meta.fields + ["pk"]
+        fields = [*ReservationUnitCreateSerializer.Meta.fields, "pk"]
 
     def validate(self, data):
         data = super().validate(data)

@@ -15,7 +15,7 @@ class EquipmentType(AuthNode, OldPrimaryKeyObjectType):
 
     class Meta:
         model = Equipment
-        fields = ["pk"] + get_all_translatable_fields(model)
+        fields = ["pk", *get_all_translatable_fields(model)]
 
         filter_fields = {
             "name_fi": ["exact", "icontains", "istartswith"],

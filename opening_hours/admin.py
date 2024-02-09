@@ -107,7 +107,7 @@ class OriginHaukiResourceAdmin(ExtraButtonsMixin, admin.ModelAdmin):
 
     def get_readonly_fields(self, request, obj=None):
         if obj:
-            return ["id"] + self.readonly_fields
+            return ["id", *self.readonly_fields]
         return self.readonly_fields
 
     def reservable_time_spans_count(self, obj):

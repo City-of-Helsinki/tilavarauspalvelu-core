@@ -21,7 +21,7 @@ class EquipmentCategorySerializer(serializers.ModelSerializer):
 
 class EquipmentCategoryCreateSerializer(EquipmentCategorySerializer, OldPrimaryKeySerializer):
     class Meta(EquipmentCategorySerializer.Meta):
-        fields = ["pk"] + get_all_translatable_fields(EquipmentSerializer.Meta.model)
+        fields = ["pk", *get_all_translatable_fields(EquipmentSerializer.Meta.model)]
 
     def validate(self, data):
         name_fi = data.get("name_fi", getattr(self.instance, "name_fi", None))
@@ -34,4 +34,4 @@ class EquipmentCategoryCreateSerializer(EquipmentCategorySerializer, OldPrimaryK
 
 class EquipmentCategoryUpdateSerializer(OldPrimaryKeyUpdateSerializer, EquipmentCategoryCreateSerializer):
     class Meta(EquipmentCategoryCreateSerializer.Meta):
-        fields = EquipmentCategoryCreateSerializer.Meta.fields + ["pk"]
+        fields = [*EquipmentCategoryCreateSerializer.Meta.fields, "pk"]

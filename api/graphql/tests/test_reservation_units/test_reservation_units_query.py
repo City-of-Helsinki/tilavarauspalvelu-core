@@ -970,7 +970,7 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             end=now + two_hours + one_hour,
             state=ReservationStateChoice.CANCELLED,
         )
-        self.reservation_unit.reservation_set.set(matching_reservations + [other_reservation])
+        self.reservation_unit.reservation_set.set([*matching_reservations, other_reservation])
         self.reservation_unit.save()
 
         self.client.force_login(self.regular_joe)

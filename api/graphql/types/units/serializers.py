@@ -47,4 +47,5 @@ class UnitUpdateSerializer(UnitSerializer, OldPrimaryKeyUpdateSerializer):
             "web_page",
             "email",
             "phone",
-        ] + get_all_translatable_fields(UnitSerializer.Meta.model)
+            *get_all_translatable_fields(UnitSerializer.Meta.model),
+        ]

@@ -66,7 +66,7 @@ def _validate_time_spans(
             is_reservable=False,
         )
         for reservation in Reservation.objects.with_buffered_begin_and_end().filter(
-            reservation_unit__pk__in=related_reservation_unit_ids + [reservation_unit_id]
+            reservation_unit__pk__in=[*related_reservation_unit_ids, reservation_unit_id]
         )
     }
 

@@ -34,7 +34,7 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
         self.fields["payment_type"].read_only = False
 
     class Meta(ReservationUpdateSerializer.Meta):
-        fields = ["payment_type"] + ReservationUpdateSerializer.Meta.fields
+        fields = ["payment_type", *ReservationUpdateSerializer.Meta.fields]
 
     def _get_default_payment_type(self):
         reservation_unit = self.instance.reservation_unit.first()

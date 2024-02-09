@@ -118,6 +118,7 @@ lint.select = [
     "D202",     # pydocstyle: No blank lines allowed after function docstring (found {num_lines})
     "D209",     # pydocstyle: Multi-line docstring closing quotes should be on a separate line
     "D213",     # pydocstyle: Multi-line docstring summary should start at the second line
+    "RUF005",   # Ruff-specific rules: Consider {expression} instead of concatenation
     "RUF010",   # Ruff-specific rules: Use explicit conversion flag
     "RUF013",   # Ruff-specific rules: PEP 484 prohibits implicit Optional
     "RUF100",   # Ruff-specific rules: Unused noqa directive
