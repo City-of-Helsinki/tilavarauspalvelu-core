@@ -763,6 +763,16 @@ const ReservationUnit = ({
   }, [reservationUnit, t, initialReservation]);
 
   const eventBuffers = useMemo(() => {
+    const bufferTimeBefore =
+      reservationUnit?.bufferTimeBefore != null &&
+      reservationUnit.bufferTimeBefore !== 0
+        ? reservationUnit?.bufferTimeBefore.toString()
+        : undefined;
+    const bufferTimeAfter =
+      reservationUnit?.bufferTimeAfter != null &&
+      reservationUnit.bufferTimeAfter !== 0
+        ? reservationUnit?.bufferTimeAfter.toString()
+        : undefined;
     return getEventBuffers([
       ...calendarEvents
         .flatMap((e) => e.event)
@@ -771,8 +781,8 @@ const ReservationUnit = ({
         begin: initialReservation?.begin,
         end: initialReservation?.end,
         state: "INITIAL",
-        bufferTimeBefore: reservationUnit?.bufferTimeBefore?.toString(),
-        bufferTimeAfter: reservationUnit?.bufferTimeAfter?.toString(),
+        bufferTimeBefore,
+        bufferTimeAfter,
       } as PendingReservation,
     ]);
   }, [calendarEvents, initialReservation, reservationUnit]);
