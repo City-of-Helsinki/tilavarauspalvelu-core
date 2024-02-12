@@ -205,6 +205,8 @@ export const GET_RESERVATION = gql`
       reserveeType
       reserveeId
       reserveeOrganisationName
+      bufferTimeBefore
+      bufferTimeAfter
       begin
       end
       calendarUrl

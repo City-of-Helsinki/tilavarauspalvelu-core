@@ -260,24 +260,43 @@ const EditStep0 = ({
   }, [reservation.pk, reservationUnit]);
 
   const eventBuffers = useMemo(() => {
+    // TODO refactor
+    // backend sends 0 => front shows 30 min buffer, so has to be undefined
+    // if reservation buffers !== reservationUnit buffers, we want the to show the reservation buffers till user edits the reservation
+    const reservationBufferTimeBefore =
+      reservation?.bufferTimeBefore != null &&
+      reservation.bufferTimeBefore !== 0
+        ? reservation?.bufferTimeBefore.toString()
+        : undefined;
+    const reservationBufferTimeAfter =
+      reservation?.bufferTimeAfter != null && reservation.bufferTimeAfter !== 0
+        ? reservation?.bufferTimeAfter.toString()
+        : undefined;
+
     const bufferTimeBefore =
       reservationUnit?.bufferTimeBefore != null &&
       reservationUnit.bufferTimeBefore !== 0
         ? reservationUnit?.bufferTimeBefore.toString()
-        : undefined;
+        : reservationBufferTimeBefore;
     const bufferTimeAfter =
       reservationUnit?.bufferTimeAfter != null &&
       reservationUnit.bufferTimeAfter !== 0
         ? reservationUnit?.bufferTimeAfter.toString()
-        : undefined;
+        : reservationBufferTimeAfter;
 
     return getEventBuffers([
       ...(calendarEvents.flatMap((e) => e.event) as ReservationType[]),
       {
         begin: initialReservation?.begin || reservation.begin,
         end: initialReservation?.end || reservation.end,
-        bufferTimeBefore,
-        bufferTimeAfter,
+        bufferTimeBefore:
+          initialReservation != null
+            ? bufferTimeBefore
+            : reservationBufferTimeBefore,
+        bufferTimeAfter:
+          initialReservation != null
+            ? bufferTimeAfter
+            : reservationBufferTimeAfter,
       },
     ]);
   }, [
@@ -285,6 +304,8 @@ const EditStep0 = ({
     initialReservation,
     reservation.begin,
     reservation.end,
+    reservation?.bufferTimeAfter,
+    reservation?.bufferTimeBefore,
     reservationUnit?.bufferTimeAfter,
     reservationUnit?.bufferTimeBefore,
   ]);
