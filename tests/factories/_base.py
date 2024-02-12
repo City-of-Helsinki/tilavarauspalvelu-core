@@ -39,6 +39,10 @@ class GenericDjangoModelFactory(DjangoModelFactory, Generic[TModel]):
                 sub_kwargs[kwarg.removeprefix(f"{key}__")] = kwargs.pop(kwarg)
         return sub_kwargs
 
+    @classmethod
+    def has_sub_kwargs(cls: type[Generic[TModel]], key: str, kwargs: dict[str, Any]) -> bool:
+        return any(kwarg == key or kwarg.startswith(f"{key}__") for kwarg in kwargs)
+
 
 class GenericFactory(Factory, Generic[T]):
     @classmethod

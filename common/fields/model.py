@@ -68,3 +68,35 @@ class IntChoiceField(models.IntegerField):
             self.choices = original_choices
 
         return choices
+
+
+class DurationSeconds(models.Transform):  # pragma: no cover
+    """Transform interval to integer seconds."""
+
+    function = "EXTRACT"
+    lookup_name = "seconds"
+    template = "%(function)s(EPOCH FROM %(expressions)s)"
+    output_field = models.IntegerField()
+
+
+class InRange(models.Lookup):  # pragma: no cover
+    """
+    Lookup for checking if a value is in a given range. Takes a range(<int>, <int>, <int>) as input,
+    but unlike range, the end value is inclusive as well!
+    """
+
+    lookup_name = "in_range"
+    prepare_rhs = False
+
+    def get_db_prep_lookup(self, value: range, connection) -> tuple[str, list[int]]:
+        return "%s, %s, %s", [value.start, value.stop, value.step]
+
+    def as_sql(self, compiler, connection) -> tuple[str, list]:
+        _, lhs_params = self.process_lhs(compiler, connection)
+        _, rhs_params = self.process_rhs(compiler, connection)
+        params = lhs_params + rhs_params
+        return "%s in (SELECT num FROM generate_series(%s, %s, %s) as num)", params
+
+
+models.IntegerField.register_lookup(InRange)
+models.DurationField.register_lookup(DurationSeconds)
