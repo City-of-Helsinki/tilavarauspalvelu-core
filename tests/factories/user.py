@@ -60,14 +60,20 @@ class UserFactory(GenericDjangoModelFactory[User]):
         return cls.create_with_general_permissions(**kwargs)
 
     @classmethod
-    def create_with_general_permissions(cls, *, perms: Iterable[str] = (), **kwargs: Any) -> User:
+    def create_with_general_permissions(
+        cls,
+        *,
+        perms: Iterable[str] = (),
+        code: str = "admin",
+        **kwargs: Any,
+    ) -> User:
         diff = set(perms).difference(_GENERAL_PERMISSIONS)
         if diff:
             raise RuntimeError(f"Invalid perms: {diff}")
 
         user = cls.create(**kwargs)
 
-        choice = GeneralRoleChoiceFactory.create(code="admin")
+        choice = GeneralRoleChoiceFactory.create(code=code)
         GeneralRoleFactory.create(role=choice, user=user)
         for perm in perms:
             GeneralRolePermissionFactory.create(role=choice, permission=perm)
@@ -80,6 +86,7 @@ class UserFactory(GenericDjangoModelFactory[User]):
         service_sector: ServiceSector,
         *,
         perms: Iterable[str] = (),
+        code: str = "admin",
         **kwargs: Any,
     ) -> User:
         diff = set(perms).difference(_SERVICE_SECTOR_PERMISSIONS)
@@ -88,7 +95,7 @@ class UserFactory(GenericDjangoModelFactory[User]):
 
         user = cls.create(**kwargs)
 
-        choice = ServiceSectorRoleChoiceFactory.create(code="admin")
+        choice = ServiceSectorRoleChoiceFactory.create(code=code)
         ServiceSectorRoleFactory.create(role=choice, service_sector=service_sector, user=user)
         for perm in perms:
             ServiceSectorRolePermissionFactory.create(role=choice, permission=perm)
@@ -96,14 +103,21 @@ class UserFactory(GenericDjangoModelFactory[User]):
         return user
 
     @classmethod
-    def create_with_unit_permissions(cls, unit: Unit, *, perms: Iterable[str] = (), **kwargs: Any) -> User:
+    def create_with_unit_permissions(
+        cls,
+        unit: Unit,
+        *,
+        perms: Iterable[str] = (),
+        code: str = "admin",
+        **kwargs: Any,
+    ) -> User:
         diff = set(perms).difference(_UNIT_PERMISSIONS)
         if diff:
             raise RuntimeError(f"Invalid perms: {diff}")
 
         user = cls.create(**kwargs)
 
-        choice = UnitRoleChoiceFactory.create(code="admin")
+        choice = UnitRoleChoiceFactory.create(code=code)
         role = UnitRoleFactory.create(role=choice, user=user)
         role.unit.add(unit)
         for perm in perms:
@@ -117,6 +131,7 @@ class UserFactory(GenericDjangoModelFactory[User]):
         unit_group: UnitGroup,
         *,
         perms: Iterable[str] = (),
+        code: str = "admin",
         **kwargs: Any,
     ) -> User:
         diff = set(perms).difference(_UNIT_PERMISSIONS)
@@ -125,7 +140,7 @@ class UserFactory(GenericDjangoModelFactory[User]):
 
         user = cls.create(**kwargs)
 
-        choice = UnitRoleChoiceFactory.create(code="admin")
+        choice = UnitRoleChoiceFactory.create(code=code)
         role = UnitRoleFactory.create(role=choice, user=user)
         role.unit_group.add(unit_group)
         for perm in perms:

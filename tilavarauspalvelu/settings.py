@@ -407,6 +407,8 @@ TUNNISTAMO_BASE_URL = env("TUNNISTAMO_BASE_URL")
 
 # Url where user is redirected after login error or cancellation
 SOCIAL_AUTH_LOGIN_ERROR_URL = env("LOGIN_ERROR_URL")
+# Overridden to get access to user fetching
+SOCIAL_AUTH_STORAGE = "users.models.ProxyDjangoStorage"
 
 SOCIAL_AUTH_TUNNISTAMO_KEY = env("TUNNISTAMO_ADMIN_KEY")
 SOCIAL_AUTH_TUNNISTAMO_SECRET = env("TUNNISTAMO_ADMIN_SECRET")
