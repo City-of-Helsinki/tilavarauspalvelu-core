@@ -15,6 +15,7 @@ from django.utils.timezone import get_default_timezone
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from email_notification.models import EmailType
 from merchants.models import OrderStatus, PaymentType
+from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.choices import ReservationStateChoice
 from tests.factories import (
     EmailTemplateFactory,
@@ -23,6 +24,7 @@ from tests.factories import (
     ReservationFactory,
     ReservationUnitCancellationRuleFactory,
 )
+from tests.helpers import patch_method
 
 pytestmark = [
     pytest.mark.usefixtures("_setup_verkkokauppa_env_variables"),
@@ -286,8 +288,8 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
         CELERY_TASK_ALWAYS_EAGER=True,
         SEND_RESERVATION_NOTIFICATION_EMAILS=False,
     )
-    @mock.patch("reservations.tasks.refund_order")
-    def test_cancellation_starts_refund_process_on_paid_reservation(self, mock_refund_order):
+    @patch_method(VerkkokauppaAPIClient.refund_order)
+    def test_cancellation_starts_refund_process_on_paid_reservation(self):
         self.client.force_login(self.regular_joe)
 
         self.reservation.price_net = Decimal("124.00")
@@ -308,7 +310,7 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
         mock_refund = mock.MagicMock()
         mock_refund.refund_id = refund_id
 
-        mock_refund_order.return_value = mock_refund
+        VerkkokauppaAPIClient.refund_order.return_value = mock_refund
 
         input_data = self.get_valid_cancel_data()
         assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CONFIRMED)
@@ -320,7 +322,7 @@ class ReservationCancellationTestCase(ReservationTestCaseBase):
         cancel_data = content.get("data").get("cancelReservation")
         assert_that(cancel_data.get("errors")).is_none()
 
-        mock_refund_order.assert_called_with(remote_id)
+        VerkkokauppaAPIClient.refund_order.assert_called_with(order_uuid=remote_id)
 
         payment_order.refresh_from_db()
         assert_that(payment_order.refund_id).is_equal_to(refund_id)

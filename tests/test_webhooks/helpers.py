@@ -11,8 +11,13 @@ from merchants.verkkokauppa.payment.types import Payment, PaymentStatus, RefundS
 
 
 @contextmanager
-def mock_order_payment_api(remote_id: uuid.UUID, payment_id: uuid.UUID, status: str = ""):
-    order = Payment(
+def mock_send_confirmation_email():
+    with mock.patch("api.webhooks.views.send_confirmation_email"):
+        yield
+
+
+def get_mock_order_payment_api(remote_id: uuid.UUID, payment_id: uuid.UUID, status: str = "") -> Payment:
+    return Payment(
         payment_id=str(payment_id),
         namespace="tilanvaraus",
         order_id=remote_id,
@@ -29,16 +34,10 @@ def mock_order_payment_api(remote_id: uuid.UUID, payment_id: uuid.UUID, status: 
         timestamp=datetime.now(tz=get_default_timezone()),
         payment_method_label="Visa",
     )
-    with (
-        mock.patch("api.webhooks.views.get_payment", return_value=order),
-        mock.patch("api.webhooks.views.send_confirmation_email"),
-    ):
-        yield
 
 
-@contextmanager
-def mock_order_refund_api(order_id: uuid.UUID, refund_id: uuid.UUID, status: str = ""):
-    order = RefundStatusResult(
+def get_mock_order_refund_api(order_id: uuid.UUID, refund_id: uuid.UUID, status: str = "") -> RefundStatusResult:
+    return RefundStatusResult(
         order_id=order_id,
         refund_payment_id=str(refund_id),
         refund_transaction_id=uuid4(),
@@ -46,5 +45,3 @@ def mock_order_refund_api(order_id: uuid.UUID, refund_id: uuid.UUID, status: str
         status=status or RefundStatus.PAID_ONLINE.value,
         created_at=datetime.now(tz=get_default_timezone()),
     )
-    with mock.patch("api.webhooks.views.get_refund_status", return_value=order):
-        yield

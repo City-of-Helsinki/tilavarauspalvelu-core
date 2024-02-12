@@ -12,8 +12,10 @@ from django.utils.timezone import get_default_timezone
 
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from merchants.models import OrderStatus
+from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.choices import ReservationStateChoice
 from tests.factories import PaymentOrderFactory, ReservationFactory, ReservationMetadataSetFactory
+from tests.helpers import patch_method
 
 pytestmark = [
     pytest.mark.usefixtures("_setup_verkkokauppa_env_variables"),
@@ -60,11 +62,11 @@ class ReservationRefundTestCase(ReservationTestCaseBase):
             "pk": self.reservation.pk,
         }
 
-    @mock.patch("reservations.tasks.refund_order")
-    def test_refund_success_when_admin(self, mock_refund_order):
+    @patch_method(VerkkokauppaAPIClient.refund_order)
+    def test_refund_success_when_admin(self):
         refund = mock.MagicMock()
         refund.refund_id = uuid4()
-        mock_refund_order.return_value = refund
+        VerkkokauppaAPIClient.refund_order.return_value = refund
 
         self.client.force_login(self.general_admin)
 
@@ -76,7 +78,7 @@ class ReservationRefundTestCase(ReservationTestCaseBase):
         refund_data = content.get("data").get("refundReservation")
         assert_that(refund_data.get("errors")).is_none()
 
-        mock_refund_order.assert_called_with(self.payment_order.remote_id)
+        VerkkokauppaAPIClient.refund_order.assert_called_with(order_uuid=self.payment_order.remote_id)
 
         self.payment_order.refresh_from_db()
         assert_that(self.payment_order.refund_id).is_equal_to(refund.refund_id)
@@ -116,15 +118,15 @@ class ReservationRefundTestCase(ReservationTestCaseBase):
         self.payment_order.refresh_from_db()
         assert self.payment_order.refund_id is None
 
-    @mock.patch("reservations.tasks.refund_order")
-    def test_refund_success_when_correct_state_and_not_in_the_past(self, mock_refund_order):
+    @patch_method(VerkkokauppaAPIClient.refund_order)
+    def test_refund_success_when_correct_state_and_not_in_the_past(self):
         self.reservation.state = ReservationStateChoice.CANCELLED
         self.reservation.end = datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=2)
         self.reservation.save()
 
         refund = mock.MagicMock()
         refund.refund_id = uuid4()
-        mock_refund_order.return_value = refund
+        VerkkokauppaAPIClient.refund_order.return_value = refund
 
         self.client.force_login(self.general_admin)
 
@@ -136,20 +138,20 @@ class ReservationRefundTestCase(ReservationTestCaseBase):
         refund_data = content.get("data").get("refundReservation")
         assert_that(refund_data.get("errors")).is_none()
 
-        mock_refund_order.assert_called_with(self.payment_order.remote_id)
+        VerkkokauppaAPIClient.refund_order.assert_called_with(order_uuid=self.payment_order.remote_id)
 
         self.payment_order.refresh_from_db()
         assert_that(self.payment_order.refund_id).is_equal_to(refund.refund_id)
 
-    @mock.patch("reservations.tasks.refund_order")
-    def test_refund_success_when_invalid_state_and_in_the_past(self, mock_refund_order):
+    @patch_method(VerkkokauppaAPIClient.refund_order)
+    def test_refund_success_when_invalid_state_and_in_the_past(self):
         self.reservation.state = ReservationStateChoice.CONFIRMED
         self.reservation.end = datetime.datetime.now(tz=get_default_timezone()) - datetime.timedelta(hours=2)
         self.reservation.save()
 
         refund = mock.MagicMock()
         refund.refund_id = uuid4()
-        mock_refund_order.return_value = refund
+        VerkkokauppaAPIClient.refund_order.return_value = refund
 
         self.client.force_login(self.general_admin)
 
@@ -161,7 +163,7 @@ class ReservationRefundTestCase(ReservationTestCaseBase):
         refund_data = content.get("data").get("refundReservation")
         assert_that(refund_data.get("errors")).is_none()
 
-        mock_refund_order.assert_called_with(self.payment_order.remote_id)
+        VerkkokauppaAPIClient.refund_order.assert_called_with(order_uuid=self.payment_order.remote_id)
 
         self.payment_order.refresh_from_db()
         assert_that(self.payment_order.refund_id).is_equal_to(refund.refund_id)

@@ -1,12 +1,10 @@
 from datetime import datetime, timedelta
 
-from django.conf import settings
 from django.utils.timezone import get_default_timezone
 
 from merchants.models import OrderStatus, PaymentOrder
 from merchants.verkkokauppa.order.exceptions import CancelOrderError
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError
-from merchants.verkkokauppa.payment.requests import get_payment
 from merchants.verkkokauppa.payment.types import PaymentStatus as WebShopPaymentStatus
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.choices import ReservationStateChoice
@@ -26,7 +24,7 @@ def update_expired_orders(older_than_minutes: int) -> None:
     ).all()
     for order in expired_orders:
         try:
-            result = get_payment(order.remote_id, settings.VERKKOKAUPPA_NAMESPACE)
+            result = VerkkokauppaAPIClient.get_payment(order_uuid=order.remote_id)
             if result and result.status == WebShopPaymentStatus.CANCELLED.value:
                 order.status = OrderStatus.CANCELLED
 

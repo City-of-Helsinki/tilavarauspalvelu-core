@@ -35,6 +35,10 @@ class BaseExternalServiceClient:
 
         return response_json
 
+    @classmethod
+    def handle_500_error(cls, response: Response) -> None:
+        raise ExternalServiceRequestError(response, cls.SERVICE_NAME)
+
     ################
     # Base methods #
     ################
@@ -58,7 +62,7 @@ class BaseExternalServiceClient:
         )
 
         if response.status_code >= 500:
-            raise ExternalServiceRequestError(response, cls.SERVICE_NAME)
+            cls.handle_500_error(response)
 
         return response
 
@@ -72,7 +76,7 @@ class BaseExternalServiceClient:
         )
 
         if response.status_code >= 500:
-            raise ExternalServiceRequestError(response, cls.SERVICE_NAME)
+            cls.handle_500_error(response)
 
         return response
 
@@ -84,7 +88,8 @@ class BaseExternalServiceClient:
             data=json.dumps(data),
             headers=headers,
         )
+
         if response.status_code >= 500:
-            raise ExternalServiceRequestError(response, cls.SERVICE_NAME)
+            cls.handle_500_error(response)
 
         return response

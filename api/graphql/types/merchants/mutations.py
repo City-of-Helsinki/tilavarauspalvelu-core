@@ -1,7 +1,6 @@
 from datetime import datetime
 
 import graphene
-from django.conf import settings
 from django.utils.timezone import get_default_timezone
 from graphene import relay
 from graphene_permissions.mixins import AuthMutation
@@ -11,7 +10,7 @@ from api.graphql.extensions.validation_errors import ValidationErrorCodes, Valid
 from api.graphql.types.merchants.permissions import OrderRefreshPermission
 from merchants.models import OrderStatus, PaymentOrder
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError
-from merchants.verkkokauppa.payment.requests import get_payment
+from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.choices import ReservationStateChoice
 from reservations.email_utils import send_confirmation_email
 from utils.sentry import log_exception_to_sentry
@@ -53,7 +52,7 @@ class RefreshOrderMutation(relay.ClientIDMutation, AuthMutation):
             )
 
         try:
-            payment = get_payment(remote_id, settings.VERKKOKAUPPA_NAMESPACE)
+            payment = VerkkokauppaAPIClient.get_payment(order_uuid=remote_id)
             if not payment:
                 capture_message(
                     f"Order payment check failed: payment not found ({remote_id})",

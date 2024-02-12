@@ -2,11 +2,12 @@ from unittest import mock
 from uuid import uuid4
 
 import pytest
-from assertpy import assert_that
 from django.test.testcases import TestCase
 
+from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.tasks import refund_paid_reservation_task
 from tests.factories import PaymentOrderFactory, ReservationFactory
+from tests.helpers import patch_method
 
 pytestmark = [
     pytest.mark.usefixtures("_setup_verkkokauppa_env_variables"),
@@ -21,31 +22,33 @@ class RefundPaidReservationTestCase(TestCase):
         reservation = ReservationFactory.create()
         refund_paid_reservation_task(reservation.pk)
 
-    @mock.patch("reservations.tasks.refund_order")
-    def test_updates_payment_order_on_success(self, mock_refund_order):
+    @patch_method(VerkkokauppaAPIClient.refund_order)
+    def test_updates_payment_order_on_success(self):
         reservation = ReservationFactory.create()
         order = PaymentOrderFactory.create(reservation=reservation, remote_id=uuid4())
 
         refund = mock.MagicMock()
         refund.refund_id = uuid4()
-        mock_refund_order.return_value = refund
+        VerkkokauppaAPIClient.refund_order.return_value = refund
 
         refund_paid_reservation_task(reservation.pk)
-        assert_that(mock_refund_order.called).is_true()
+
+        assert VerkkokauppaAPIClient.refund_order.called
 
         order.refresh_from_db()
-        assert_that(order.refund_id).is_equal_to(refund.refund_id)
+        assert order.refund_id == refund.refund_id
 
-    @mock.patch("reservations.tasks.refund_order")
-    def test_throws_on_refund_call_failure(self, mock_refund_order):
+    @patch_method(VerkkokauppaAPIClient.refund_order)
+    def test_throws_on_refund_call_failure(self):
         reservation = ReservationFactory.create()
         order = PaymentOrderFactory.create(reservation=reservation, remote_id=uuid4())
 
-        mock_refund_order.side_effect = Exception("Test exception")
+        VerkkokauppaAPIClient.refund_order.side_effect = Exception("Test exception")
 
         with pytest.raises(Exception) as ex:  # noqa: PT011
             refund_paid_reservation_task(reservation.pk)
-        assert_that(str(ex.value)).is_equal_to("Test exception")
+
+        assert str(ex.value) == "Test exception"
 
         order.refresh_from_db()
-        assert_that(order.refund_id).is_none()
+        assert order.refund_id is None

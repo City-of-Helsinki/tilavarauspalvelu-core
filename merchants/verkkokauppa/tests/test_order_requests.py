@@ -381,7 +381,7 @@ def test_verkkokauppa__get_order__raises_exception_on_404():
 
 
 @patch_method(VerkkokauppaAPIClient.generic, return_value=MockResponse(status_code=200, json=cancel_order_response))
-def test_verkkokauppa__cancel__order_makes_valid_request(settings):
+def test_verkkokauppa__cancel_order__makes_valid_request(settings):
     order_uuid = UUID(cancel_order_response["order"]["orderId"])
     user_uuid = cancel_order_response["order"]["user"]
 
