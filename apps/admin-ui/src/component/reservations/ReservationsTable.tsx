@@ -2,10 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import { memoize } from "lodash";
-import {
-  ReservationsReservationTypeChoices,
-  ReservationType,
-} from "common/types/gql-types";
+import { ReservationType } from "common/types/gql-types";
 import { truncate } from "@/helpers";
 import { reservationUrl } from "@/common/urls";
 import { formatDateTime } from "@/common/util";
@@ -42,18 +39,14 @@ const getColConfig = (t: TFunction): ReservationTableColumn[] => [
     key: "reservee_name",
     isSortable: true,
     transform: (reservation: ReservationType) => {
-      const staffPrefix =
-        reservation.type === ReservationsReservationTypeChoices.Staff
-          ? t("Reservations.prefixes.staff")
-          : "";
-      const prefix =
-        reservation.type === ReservationsReservationTypeChoices.Behalf
-          ? t("Reservations.prefixes.behalf")
-          : staffPrefix;
+      const reservationDisplayName = getReserveeName(
+        reservation,
+        t,
+        MAX_NAME_LENGTH
+      );
       return (
         <TableLink href={reservationUrl(reservation.pk as number)}>
-          {getReserveeName(reservation, 22, prefix) ||
-            t("RequestedReservation.noName")}
+          {reservationDisplayName || t("RequestedReservation.noName")}
         </TableLink>
       );
     },

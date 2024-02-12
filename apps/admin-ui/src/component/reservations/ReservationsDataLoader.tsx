@@ -7,8 +7,8 @@ import {
   ReservationType,
 } from "common/types/gql-types";
 import { More } from "@/component/More";
-import { LIST_PAGE_SIZE } from "../../common/const";
-import { useNotification } from "../../context/NotificationContext";
+import { LIST_PAGE_SIZE } from "@/common/const";
+import { useNotification } from "@/context/NotificationContext";
 import Loader from "../Loader";
 import { FilterArguments } from "./Filters";
 import { RESERVATIONS_QUERY } from "./queries";

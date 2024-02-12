@@ -242,20 +242,22 @@ const DialogContent = ({
   }, [start, trigger]);
 
   // force form vaildation on date change but not on first render
+  const date = watch("date");
   useEffect(() => {
     // Is touched is always false with controller
     if (getFieldState("date").isDirty) {
       trigger();
     }
-  }, [watch("date"), trigger, getFieldState]);
+  }, [date, trigger, getFieldState]);
 
   // force revalidation of end time on start time change
+  const startTime = watch("startTime");
   useEffect(() => {
     // Is touched is always false with controller
     if (getFieldState("endTime").isDirty) {
       trigger("endTime");
     }
-  }, [watch("startTime"), trigger, getFieldState]);
+  }, [startTime, trigger, getFieldState]);
 
   const [create] = useMutation<
     { createStaffReservation: ReservationStaffCreateMutationPayload },

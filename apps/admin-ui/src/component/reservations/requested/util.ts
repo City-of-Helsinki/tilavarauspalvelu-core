@@ -16,12 +16,12 @@ import {
   AgeGroupType,
   Maybe,
   ReservationsReservationReserveeTypeChoices,
-  ReservationType,
-  ReservationUnitType,
-  ReservationUnitPricingType,
-  ReservationUnitsReservationUnitPricingPricingTypeChoices,
-  ReservationUnitsReservationUnitPricingPriceUnitChoices,
   ReservationsReservationTypeChoices,
+  ReservationType,
+  ReservationUnitPricingType,
+  ReservationUnitsReservationUnitPricingPriceUnitChoices,
+  ReservationUnitsReservationUnitPricingPricingTypeChoices,
+  ReservationUnitType,
 } from "common/types/gql-types";
 import { fromApiDate } from "common/src/common/util";
 import { toMondayFirst } from "common/src/helpers";
@@ -214,9 +214,22 @@ export const getTranslationKeyForReserveeType = (
 
 export const getReserveeName = (
   reservation: ReservationType,
-  length = 50,
-  prefix = ""
-): string => truncate(prefix + reservation.reserveeName?.trim() ?? "-", length);
+  t?: TFunction,
+  length = 50
+): string => {
+  let prefix = "";
+  if (reservation.type === ReservationsReservationTypeChoices.Behalf) {
+    prefix = t ? t("Reservations.prefixes.behalf") : "";
+  }
+  if (
+    reservation.type === ReservationsReservationTypeChoices.Staff &&
+    reservation.reserveeName ===
+      `${reservation.user?.firstName} ${reservation.user?.lastName}`
+  ) {
+    prefix = t ? t("Reservations.prefixes.staff") : "";
+  }
+  return truncate(prefix + reservation.reserveeName, length);
+};
 
 export const getName = (reservation: ReservationType, t: TFunction) => {
   if (reservation.name) {
@@ -225,7 +238,7 @@ export const getName = (reservation: ReservationType, t: TFunction) => {
 
   return trim(
     `${reservation.pk}, ${
-      getReserveeName(reservation) || t("RequestedReservation.noName")
+      getReserveeName(reservation, t) || t("RequestedReservation.noName")
     }`.trim()
   );
 };

@@ -125,6 +125,10 @@ export const RESERVATION_COMMON_FRAGMENT = gql`
     order {
       status
     }
+    user {
+      firstName
+      lastName
+    }
     bufferTimeBefore
     bufferTimeAfter
   }

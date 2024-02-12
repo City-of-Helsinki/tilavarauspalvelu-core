@@ -9,6 +9,7 @@ import { DenseVerticalFlex } from "../../styles/layout";
 import { getReserveeName } from "../reservations/requested/util";
 import { CELL_BORDER } from "./const";
 import VisibleIfPermission from "../reservations/requested/VisibleIfPermission";
+import { useTranslation } from "next-i18next";
 
 const PopupContent = styled.div`
   border: ${CELL_BORDER};
@@ -35,7 +36,8 @@ const ReservationPopupContent = ({
 }: {
   reservation: ReservationType;
 }): JSX.Element => {
-  const eventName = getReserveeName(reservation, 22) || "-";
+  const { t } = useTranslation();
+  const eventName = getReserveeName(reservation, t, 22) || "-";
   return (
     <PopupContent>
       <DenseVerticalFlex>
