@@ -11,7 +11,6 @@ from sentry_sdk import capture_message
 from merchants.models import OrderStatus, PaymentOrder
 from merchants.verkkokauppa.order.exceptions import GetOrderError
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError, GetRefundStatusError
-from merchants.verkkokauppa.payment.requests import get_payment, get_refund_status
 from merchants.verkkokauppa.payment.types import PaymentStatus, RefundStatus
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.choices import ReservationStateChoice
@@ -38,7 +37,6 @@ class WebhookOrderPaidViewSet(viewsets.GenericViewSet):
 
         order_id: uuid.UUID = serializer.validated_data["orderId"]
         payment_id: str = serializer.validated_data["paymentId"]
-        namespace: str = serializer.validated_data["namespace"]
 
         payment_order: PaymentOrder | None = PaymentOrder.objects.filter(remote_id=order_id).first()
         if payment_order is None:
@@ -51,7 +49,7 @@ class WebhookOrderPaidViewSet(viewsets.GenericViewSet):
             return Response(data={"message": msg}, status=200)
 
         try:
-            payment = get_payment(order_id, namespace)
+            payment = VerkkokauppaAPIClient.get_payment(order_uuid=order_id)
         except GetPaymentError:
             msg = f"Checking payment for order '{order_id}' failed"
             capture_message(msg)
@@ -137,7 +135,6 @@ class WebhookRefundViewSet(viewsets.ViewSet):
 
         order_id: uuid.UUID = serializer.validated_data["orderId"]
         refund_id: uuid.UUID = serializer.validated_data["refundId"]
-        namespace: str = serializer.validated_data["namespace"]
 
         payment_order: PaymentOrder | None
         payment_order = PaymentOrder.objects.filter(remote_id=order_id, refund_id=refund_id).first()
@@ -151,7 +148,7 @@ class WebhookRefundViewSet(viewsets.ViewSet):
             return Response(data={"message": msg}, status=200)
 
         try:
-            refund_result = get_refund_status(order_id, namespace)
+            refund_result = VerkkokauppaAPIClient.get_refund_status(order_uuid=order_id)
         except GetRefundStatusError:
             msg = f"Checking order '{order_id}' failed"
             capture_message(msg)
