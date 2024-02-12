@@ -1,11 +1,9 @@
-import {
+import { filterNonNullable } from "common/src/helpers";
+import type {
   UnitRoleType,
-  type GeneralRoleType,
-  type ServiceSectorRolePermissionType,
-  type ServiceSectorRoleType,
-  type UserType,
-  Maybe,
-  UnitType,
+  GeneralRoleType,
+  ServiceSectorRoleType,
+  UserType,
 } from "common/types/gql-types";
 
 export enum Permission {
@@ -26,82 +24,63 @@ const hasGeneralPermission = (permissionName: string, user: UserType) =>
     x?.permissions?.find((y) => y?.permission === permissionName)
   ) != null;
 
-const hasUnitPermission = (
-  permissionName: string,
+function hasUnitPermission(
+  permissionName: Permission,
   unitPk: number,
   user: UserType
-) => {
-  const unitRoles =
-    user.unitRoles?.filter((x): x is UnitRoleType => x != null) || [];
+): boolean {
+  const unitRoles = filterNonNullable(user.unitRoles);
 
-  const unitGroups =
-    unitRoles
-      .map((x) =>
-        x.unitGroups?.reduce<Array<UnitType | undefined>>(
-          (agv, y) => y?.units?.map((z) => z ?? undefined, agv) ?? [...agv],
-          []
-        )
-      )
-      .reduce((agv, x) => [...(agv ?? []), ...(x ?? [])], [])
-      ?.map((x) => x?.pk)
-      ?.filter((x): x is number => x != null) ?? [];
+  for (const role of unitRoles) {
+    if (
+      role.permissions?.find((x) => x?.permission === permissionName) == null
+    ) {
+      continue;
+    }
 
-  const units =
-    unitRoles
-      .reduce<Maybe<UnitType>[]>((agv, x) => [...agv, ...(x.units ?? [])], [])
-      ?.map((x) => x?.pk)
-      ?.filter((x): x is number => x != null) ?? [];
+    // Check unit group permissions
+    const groupUnits = role.unitGroups?.flatMap((x) => x?.units);
+    if (groupUnits?.find((x) => x?.pk === unitPk)) {
+      return true;
+    }
 
-  const permissions =
-    unitRoles
-      .map((x) => x.permissions)
-      .reduce((agv, x) => [...(agv ?? []), ...(x ?? [])], [])
-      ?.map((x) => x?.permission)
-      ?.filter((x) => x != null) ?? [];
+    // Check unit specific permissions
+    if (role.units?.find((x) => x?.pk === unitPk)) {
+      return true;
+    }
+  }
 
-  return (
-    permissions.includes(permissionName) &&
-    (units.includes(unitPk) || unitGroups.includes(unitPk))
-  );
-};
+  return false;
+}
 
-const hasServiceSectorPermission = (
-  permissionName: string,
+function hasServiceSectorPermission(
+  permissionName: Permission,
   serviceSectorPks: number[],
   user: UserType
-) => {
-  const serviceSectorPermissions = (
-    user.serviceSectorRoles?.filter(
-      (x): x is ServiceSectorRoleType => x != null
-    ) || []
-  ).flatMap((sr) =>
-    (sr.permissions ?? [])
-      .filter((perm): perm is ServiceSectorRolePermissionType => perm != null)
-      .map((permission) => ({
-        permission: permission.permission,
-        serviceSector: sr.serviceSector?.pk,
-      }))
-  );
+): boolean {
+  const roles = filterNonNullable(user.serviceSectorRoles);
+  for (const role of roles) {
+    if (
+      role.permissions?.find((x) => x?.permission === permissionName) == null
+    ) {
+      continue;
+    }
 
-  return (
-    serviceSectorPermissions
-      .filter(
-        (up): up is { permission: string; serviceSector: number } =>
-          up.permission != null && up.serviceSector != null
-      )
-      .filter(
-        (up) =>
-          up.permission === permissionName &&
-          serviceSectorPks.includes(up.serviceSector)
-      ).length > 0
-  );
-};
+    if (
+      role.serviceSector?.pk &&
+      serviceSectorPks.includes(role.serviceSector.pk)
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
 
 /// Returns true if the user is allowed to perform operation for a specific unit or service sector
 export const hasPermission =
   (user: UserType) =>
   (
-    permissionName: string,
+    permissionName: Permission,
     unitPk?: number,
     serviceSectorPk?: number[]
   ): boolean => {
@@ -128,7 +107,10 @@ export const hasPermission =
 
 /// Returns true if the user if the user is allowed to perform what the permission is for
 /// e.g. if the user allowed to view some reservations but not all this will return true
-export const hasSomePermission = (user: UserType, permission: Permission) => {
+export function hasSomePermission(
+  user: UserType,
+  permission: Permission
+): boolean {
   if (user.isSuperuser) {
     return true;
   }
@@ -153,10 +135,10 @@ export const hasSomePermission = (user: UserType, permission: Permission) => {
     ) ?? false;
 
   return someUnitRoles || someSectorRoles || someGeneralRoles;
-};
+}
 
 /// Returns true if the user has any kind of access to the system
-export const hasAnyPermission = (user: UserType) => {
+export function hasAnyPermission(user: UserType): boolean {
   if (user.isSuperuser) {
     return true;
   }
@@ -176,4 +158,4 @@ export const hasAnyPermission = (user: UserType) => {
     user?.generalRoles?.some((role) => hasAnyPerm(role ?? undefined)) ?? false;
 
   return someUnitRoles || someSectorRoles || someGeneralRoles;
-};
+}
