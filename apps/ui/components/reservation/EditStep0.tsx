@@ -205,11 +205,14 @@ const EditStep0 = ({
         : undefined;
     const diff = maybeDiff ?? 0;
     const duration = diff >= 90 ? `(${formatDurationMinutes(diff)})` : "";
-    const shownReservation = { ...initialReservation, state: "INITIAL" } || {
-      begin: reservation.begin,
-      end: reservation.end,
-      state: "OWN",
-    };
+    const shownReservation =
+      initialReservation != null
+        ? { ...initialReservation, state: "INITIAL" }
+        : {
+            begin: reservation.begin,
+            end: reservation.end,
+            state: "OWN",
+          };
     const reservations =
       (initialReservation?.begin
         ? reservationUnit?.reservations?.filter((n) => n?.pk !== reservation.pk)
