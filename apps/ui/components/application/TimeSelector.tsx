@@ -335,6 +335,12 @@ const ResetButton = styled(Button)`
     white-space: nowrap;
     align-items: center;
   }
+  &:hover {
+    --background-color-hover-focus: var(--color-black-15);
+    --background-color-hover: var(--color-black-5);
+    --color-hover: var(--color-black-90);
+    --color-hover-focus: var(--color-hover);
+  }
 
   ${fontRegular};
 `;
