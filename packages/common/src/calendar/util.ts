@@ -18,18 +18,19 @@ import {
 import { TFunction } from "next-i18next";
 import {
   type ReservableTimeSpanType,
+  ReservationState,
   type ReservationType,
   type ReservationUnitByPkType,
+  ReservationUnitsReservationUnitReservationKindChoices,
   type ReservationUnitsReservationUnitReservationStartIntervalChoices,
-  ReservationState,
 } from "../../types/gql-types";
 import {
-  type CalendarEventBuffer,
-  type SlotProps,
   type ApplicationEvent,
+  type CalendarEventBuffer,
   type OptionType,
   type PendingReservation,
   type ReservationUnitNode,
+  type SlotProps,
 } from "../../types/common";
 import {
   convertHMSToSeconds,
@@ -593,8 +594,12 @@ export const isReservationUnitReservable = (
   if (!reservationUnit) {
     return [false, "reservationUnit is null"];
   }
-  const { reservationState, minReservationDuration, maxReservationDuration } =
-    reservationUnit;
+  const {
+    reservationState,
+    minReservationDuration,
+    maxReservationDuration,
+    reservationKind,
+  } = reservationUnit;
 
   switch (reservationState) {
     case ReservationState.Reservable:
@@ -617,6 +622,15 @@ export const isReservationUnitReservable = (
       }
       if (!minReservationDuration || !maxReservationDuration) {
         return [false, "reservationUnit has no min/max reservation duration"];
+      }
+      if (
+        reservationKind ===
+        ReservationUnitsReservationUnitReservationKindChoices.Season
+      ) {
+        return [
+          false,
+          "reservationUnit is only available for seasonal booking",
+        ];
       }
       return [true];
     }

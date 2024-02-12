@@ -132,7 +132,7 @@ const NonReservableNotification = ({
     reservationUnit.reservationKind ===
     ReservationUnitsReservationUnitReservationKindChoices.Season
   ) {
-    returnText = t("reservationUnit:notifications.season");
+    returnText = t("reservationUnit:notifications.onlyRecurring");
   } else if (isReservationStartInFuture(reservationUnit))
     returnText = futureOpeningText;
   return (
