@@ -110,7 +110,7 @@ jobs:
       #  run: poetry run python -m tilavarauspalvelu.hooks.translations_done
 
       - name: "Run pytest with coverage"
-        run: poetry run pytest --cov=. --cov-report=xml --cov-branch
+        run: poetry run pytest --cov=. --cov-report=xml --cov-branch --disable-warnings
         env:
           CACHE_LOCATION: redis://localhost:6379/0
           DATABASE_URL: postgis://tvp:tvp@localhost/tvp
