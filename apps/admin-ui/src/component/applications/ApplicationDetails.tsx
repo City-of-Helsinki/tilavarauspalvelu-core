@@ -447,7 +447,7 @@ function ApplicationDetails({
       alias: applicationRound.nameFi ?? "-",
     },
     {
-      slug: `application`,
+      slug: "",
       alias: customerName,
     },
   ];
