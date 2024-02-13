@@ -1,10 +1,10 @@
-import { getDay } from "date-fns";
+import { differenceInMinutes, getDay } from "date-fns";
 import { Button, IconCross } from "hds-react";
 import React, { ReactNode } from "react";
-import { useTranslation } from "next-i18next";
+import { type TFunction, useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { parseTimeframeLength } from "common/src/calendar/util";
 import { fontMedium } from "common/src/common/typography";
+import { formatDuration } from "common/src/common/util";
 import { formatDate } from "../../modules/util";
 
 type EventEvent = {
@@ -29,6 +29,18 @@ const wrapperHeight = "150px";
 const Wrapper = styled.div`
   pointer-events: all;
 `;
+
+function parseTimeframeLength(
+  begin: string,
+  end: string,
+  t: TFunction
+): string {
+  const beginDate = new Date(begin);
+  const endDate = new Date(end);
+  const durMinutes = differenceInMinutes(endDate, beginDate);
+  const abbreviated = true;
+  return formatDuration(durMinutes, t, abbreviated);
+}
 
 const Modal = styled.div<{
   $top: number;
@@ -135,7 +147,7 @@ const ReservationDetails = ({
     >
       {React.Children.map(children, (child) => {
         const day = getDay(new Date(event.start));
-        const timeframe = parseTimeframeLength(event.start, event.end);
+        const timeframe = parseTimeframeLength(event.start, event.end, t);
         const props =
           child != null && typeof child === "object" && "props" in child
             ? child?.props

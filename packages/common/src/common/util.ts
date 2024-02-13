@@ -10,7 +10,7 @@ import {
 } from "date-fns";
 import { fi } from "date-fns/locale";
 /* eslint-enable import/no-duplicates */
-import { capitalize, isNumber } from "lodash";
+import { capitalize } from "lodash";
 import { type TFunction, i18n } from "next-i18next";
 import { HMS } from "../../types/common";
 
@@ -65,51 +65,6 @@ export function formatDuration(
   }
 
   return p.join(" ");
-}
-
-/// @deprecated
-/// TODO this is duplicated code
-/// TODO this should take in t function and not use i18n directly (fails to load translations)
-function formatDurationString(
-  duration: string | null,
-  abbreviated = true
-): string {
-  if (!duration || isNumber(duration) || !duration?.includes(":")) {
-    return "-";
-  }
-
-  const hourKey = abbreviated ? "common:abbreviations.hour" : "common:hour";
-  const minuteKey = abbreviated
-    ? "common:abbreviations.minute"
-    : "common:minute";
-
-  const time = duration.split(":");
-  if (time.length < 3) {
-    return "-";
-  }
-
-  const hours = Number(time[0]);
-  const minutes = Number(time[1]);
-
-  return `${
-    hours
-      ? `${`${i18n?.t(hourKey, { count: hours }) || "".toLocaleLowerCase()}`} `
-      : ""
-  }${minutes ? i18n?.t(minuteKey, { count: minutes }) : ""}`.trim();
-}
-
-/// @deprecated
-/// TODO rename? or remove? we should always use a single format function that has consistent input types (seconds or minutes)
-export function formatSecondDuration(
-  duration: number,
-  abbreviated = true
-): string {
-  if (!duration || !isNumber(duration)) {
-    return "-";
-  }
-
-  const hms = secondsToHms(duration);
-  return formatDurationString(`${hms.h}:${hms.m}:${hms.s}`, abbreviated);
 }
 
 export const addYears = (date: Date, years: number): Date => {

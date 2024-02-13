@@ -1,5 +1,5 @@
 import React from "react";
-import { formatSecondDuration } from "common/src/common/util";
+import { formatDuration } from "common/src/common/util";
 import { ReservationUnitByPkType } from "common/types/gql-types";
 import ClientOnly from "common/src/ClientOnly";
 import { Trans, useTranslation } from "next-i18next";
@@ -168,12 +168,14 @@ const ReservationInfoContainer = ({
                 i18nKey="reservationUnit:reservationInfo3"
                 defaults="Varauksen keston tulee olla välillä <bold>{{minReservationDuration}}</bold> ja <bold>{{maxReservationDuration}}</bold>."
                 values={{
-                  minReservationDuration: formatSecondDuration(
-                    reservationUnit.minReservationDuration,
+                  minReservationDuration: formatDuration(
+                    reservationUnit.minReservationDuration / 60,
+                    t,
                     false
                   ),
-                  maxReservationDuration: formatSecondDuration(
-                    reservationUnit.maxReservationDuration,
+                  maxReservationDuration: formatDuration(
+                    reservationUnit.maxReservationDuration / 60,
+                    t,
                     false
                   ),
                 }}

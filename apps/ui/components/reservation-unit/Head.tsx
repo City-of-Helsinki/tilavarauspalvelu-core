@@ -4,7 +4,7 @@ import NextImage from "next/image";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { isReservationStartInFuture } from "common/src/calendar/util";
-import { formatSecondDuration } from "common/src/common/util";
+import { formatDuration } from "common/src/common/util";
 import { fontRegular, H2, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
@@ -161,15 +161,10 @@ const Head = ({
     return singleSearchUrl(omit(storedValues, "applicationRound"));
   }, [storedValues]);
 
-  const minReservationDuration = formatSecondDuration(
-    reservationUnit.minReservationDuration ?? 0,
-    true
-  );
-
-  const maxReservationDuration = formatSecondDuration(
-    reservationUnit.maxReservationDuration ?? 0,
-    true
-  );
+  const minDur = reservationUnit.minReservationDuration ?? 0;
+  const maxDur = reservationUnit.maxReservationDuration ?? 0;
+  const minReservationDuration = formatDuration(minDur / 60, t, true);
+  const maxReservationDuration = formatDuration(maxDur / 60, t, true);
 
   const pricing = getActivePricing(reservationUnit);
   const unitPrice = pricing ? getPrice({ pricing }) : undefined;

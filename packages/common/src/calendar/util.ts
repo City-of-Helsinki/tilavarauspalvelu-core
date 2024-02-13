@@ -35,7 +35,6 @@ import {
 import {
   convertHMSToSeconds,
   endOfWeek,
-  formatSecondDuration,
   parseDate,
   secondsToHms,
   startOfWeek,
@@ -662,13 +661,6 @@ export const getNormalizedReservationBeginTime = (
     new Date(reservationUnit.reservationBegins as string),
     negativeBuffer
   ).toISOString();
-};
-
-export const parseTimeframeLength = (begin: string, end: string): string => {
-  const beginDate = new Date(begin);
-  const endDate = new Date(end);
-  const diff = differenceInSeconds(endDate, beginDate);
-  return formatSecondDuration(diff);
 };
 
 export const getOpenDays = (
