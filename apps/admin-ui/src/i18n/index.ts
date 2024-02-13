@@ -26,6 +26,12 @@ i18n.addResourceBundle("fi", "common", {
   increase: "Lisää",
   decrease: "Vähennä",
   applicationName: "Tilavarauskäsittely",
+  abbreviations: {
+    hour: "{{count}} t",
+    minute: "{{count}} min",
+  },
+  hours: "Tunnit",
+  minutes: "Minuutit",
 });
 i18n.addResourceBundle("en", "common", {
   day: "Day",

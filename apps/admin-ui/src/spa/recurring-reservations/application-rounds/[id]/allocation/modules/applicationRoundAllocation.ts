@@ -9,6 +9,8 @@ import {
 import type { ApplicationEventSchedulePriority } from "common/types/common";
 import i18next from "i18next";
 import { filterNonNullable } from "common/src/helpers";
+import { formatDuration } from "common/src/common/util";
+import { type TFunction } from "next-i18next";
 
 const parseApplicationEventScheduleTime = (
   applicationEventSchedule: ApplicationEventScheduleNode
@@ -484,3 +486,20 @@ export type ApplicationEventScheduleResultStatuses = {
   acceptedSlots: string[];
   declinedSlots: string[];
 };
+
+export function createDurationString(
+  applicationEvent: ApplicationEventNode,
+  t: TFunction
+) {
+  const { minDuration, maxDuration } = applicationEvent;
+
+  const minDurString =
+    minDuration != null ? formatDuration(minDuration / 60, t) : undefined;
+  const maxDurString =
+    maxDuration != null ? formatDuration(maxDuration / 60, t) : undefined;
+  const durationString =
+    minDuration === maxDuration
+      ? minDurString
+      : `${minDurString ?? ""} - ${maxDurString ?? ""}`;
+  return durationString;
+}

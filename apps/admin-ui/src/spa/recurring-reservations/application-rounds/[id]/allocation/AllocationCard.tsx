@@ -26,6 +26,7 @@ import {
   parseApiTime,
   timeSlotKeyToScheduleTime,
   decodeTimeSlot,
+  createDurationString,
 } from "./modules/applicationRoundAllocation";
 import {
   APPROVE_APPLICATION_EVENT_SCHEDULE,
@@ -408,7 +409,7 @@ export function AllocationCard({
   const selectionDurationMins = selection.length * 30;
   const beginSeconds = applicationEvent.minDuration ?? 0;
   const endSeconds = applicationEvent.maxDuration ?? 0;
-  const selectionDurationString = formatDuration(selectionDurationMins * 60);
+  const selectionDurationString = formatDuration(selectionDurationMins, t);
   const isRequestedTimeMismatch = isOutsideOfRequestedTimes(
     matchingApplicationEventSchedule,
     selection
@@ -566,12 +567,8 @@ function TimeRequested({
   applicationEvent: ApplicationEventNode;
 }) {
   const { t } = useTranslation();
-  const { minDuration, maxDuration, eventsPerWeek } = applicationEvent;
-
-  const parsedDuration =
-    minDuration === maxDuration
-      ? formatDuration(minDuration)
-      : `${formatDuration(minDuration)} - ${formatDuration(maxDuration)}`;
+  const { eventsPerWeek } = applicationEvent;
+  const durationString = createDurationString(applicationEvent, t);
 
   const aes = filterNonNullable(applicationEvent?.applicationEventSchedules);
   const primaryTimes = getApplicationEventScheduleTimeString(aes, 300);
@@ -582,7 +579,7 @@ function TimeRequested({
       <DetailRow>
         <span>{t("Allocation.applicationsWeek")}:</span>
         <SemiBold>
-          {parsedDuration}, {eventsPerWeek}x
+          {durationString}, {eventsPerWeek}x
         </SemiBold>
       </DetailRow>
       <DetailRow>

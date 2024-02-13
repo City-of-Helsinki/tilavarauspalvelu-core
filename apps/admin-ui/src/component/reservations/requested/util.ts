@@ -23,7 +23,7 @@ import {
   ReservationUnitsReservationUnitPricingPricingTypeChoices,
   ReservationUnitType,
 } from "common/types/gql-types";
-import { fromApiDate } from "common/src/common/util";
+import { formatDuration, fromApiDate } from "common/src/common/util";
 import { toMondayFirst } from "common/src/helpers";
 import { truncate } from "@/helpers";
 import { DATE_FORMAT, formatDate, formatTime } from "@/common/util";
@@ -63,20 +63,18 @@ export const reservationDuration = (start: Date, end: Date): string => {
   return `${differenceInHours(end, start)}`;
 };
 
-const reservationDurationString = (
+function reservationDurationString(
   start: string,
   end: string,
   t: TFunction
-): string => {
+): string {
   const startDate = new Date(start);
   const endDate = new Date(end);
 
-  const h = differenceInHours(endDate, startDate);
-  const m = differenceInMinutes(endDate, startDate) - h * 60;
-  return `${t("common.hoursUnit", { count: h })} ${
-    m !== 0 ? t("common.minutesUnit", { count: m }) : ""
-  }`;
-};
+  const durMinutes = differenceInMinutes(endDate, startDate);
+  const abbreviated = true;
+  return formatDuration(durMinutes, t, abbreviated);
+}
 
 export const reservationUnitName = (
   reservationUnit: Maybe<ReservationUnitType>
@@ -243,6 +241,7 @@ export const getName = (reservation: ReservationType, t: TFunction) => {
   );
 };
 
+// TODO rename: it's the time + duration
 // recurring format: {weekday(s)} {time}, {duration} | {startDate}-{endDate} | {unit}
 // single format   : {weekday} {date} {time}, {duration} | {unit}
 export const createTagString = (reservation: ReservationType, t: TFunction) => {

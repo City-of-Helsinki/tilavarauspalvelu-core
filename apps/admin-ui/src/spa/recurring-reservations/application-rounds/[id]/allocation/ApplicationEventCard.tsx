@@ -8,11 +8,13 @@ import type {
 } from "common/types/gql-types";
 import { SemiBold, type ReservationUnitNode, fontMedium } from "common";
 import { PUBLIC_URL } from "@/common/const";
-import { formatDuration } from "@/common/util";
 import { getApplicantName } from "@/component/applications/util";
 import { ageGroup } from "@/component/reservations/requested/util";
 import { filterNonNullable } from "common/src/helpers";
-import { formatTime } from "./modules/applicationRoundAllocation";
+import {
+  createDurationString,
+  formatTime,
+} from "./modules/applicationRoundAllocation";
 
 export type AllocationApplicationEventCardType =
   | "unallocated"
@@ -152,12 +154,7 @@ export function ApplicationEventCard({
 
   const applicantName = getApplicantName(application);
   const isActive = applicationEvent === focusedApplicationEvent;
-  const parsedDuration =
-    applicationEvent.minDuration === applicationEvent.maxDuration
-      ? formatDuration(applicationEvent.minDuration)
-      : `${formatDuration(applicationEvent.minDuration)} - ${formatDuration(
-          applicationEvent.maxDuration
-        )}`;
+  const durationString = createDurationString(applicationEvent, t);
 
   const nReservationUnits =
     applicationEvent?.eventReservationUnits?.length ?? -1;
@@ -227,7 +224,7 @@ export function ApplicationEventCard({
         <div>
           {t("Allocation.applicationsWeek")}:{" "}
           <SemiBold>
-            {parsedDuration}, x{applicationEvent.eventsPerWeek}
+            {durationString}, x{applicationEvent.eventsPerWeek}
           </SemiBold>
         </div>
         <div>

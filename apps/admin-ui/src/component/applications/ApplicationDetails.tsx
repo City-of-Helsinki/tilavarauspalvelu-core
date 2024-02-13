@@ -17,13 +17,7 @@ import {
   type ApplicationNode,
   ApplicationsApplicationApplicantTypeChoices,
 } from "common/types/gql-types";
-import {
-  formatNumber,
-  formatDate,
-  parseAgeGroups,
-  formatDurationShort,
-  secondsToHms,
-} from "@/common/util";
+import { formatNumber, formatDate, parseAgeGroups } from "@/common/util";
 import { weekdays } from "@/common/const";
 import { useNotification } from "@/context/NotificationContext";
 import ScrollIntoView from "@/common/ScrollIntoView";
@@ -41,6 +35,7 @@ import StickyHeader from "../StickyHeader";
 import StatusBlock from "../StatusBlock";
 import { APPLICATION_ADMIN_QUERY } from "./queries";
 import { BirthDate } from "../BirthDate";
+import { formatDuration } from "common/src/common/util";
 
 const parseApplicationEventSchedules = (
   applicationEventSchedules: ApplicationEventScheduleNode[],
@@ -209,18 +204,17 @@ const KV = ({
   </div>
 );
 
-const formatDuration = (
-  duration: number | undefined,
+const formatApplicationDuration = (
+  durationSeconds: number | undefined,
   t: TFunction,
   type?: "min" | "max"
 ): string => {
-  if (!duration) {
+  if (!durationSeconds) {
     return "";
   }
+  const durMinutes = durationSeconds / 60;
   const translationKey = `common.${type}Amount`;
-  return `${type ? t(translationKey) : ""} ${formatDurationShort(
-    secondsToHms(duration)
-  )}`;
+  return `${type ? t(translationKey) : ""} ${formatDuration(durMinutes, t)}`;
 };
 
 const appEventDuration = (
@@ -230,10 +224,10 @@ const appEventDuration = (
 ): string => {
   let duration = "";
   if (isEqual(min, max)) {
-    duration += formatDuration(min, t);
+    duration += formatApplicationDuration(min, t);
   } else {
-    duration += formatDuration(min, t, "min");
-    duration += `, ${formatDuration(max, t, "max")}`;
+    duration += formatApplicationDuration(min, t, "min");
+    duration += `, ${formatApplicationDuration(max, t, "max")}`;
   }
   return trim(duration, ", ");
 };

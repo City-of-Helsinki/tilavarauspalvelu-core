@@ -33,7 +33,7 @@ import {
   isReservationReservable,
 } from "@/modules/reservation";
 import { getReservationUnitPrice } from "@/modules/reservationUnit";
-import { formatDurationMinutes, isTouchDevice } from "@/modules/util";
+import { formatDuration, isTouchDevice } from "@/modules/util";
 import { BlackButton, MediumButton } from "@/styles/util";
 import Legend from "../calendar/Legend";
 import ReservationCalendarControls from "../calendar/ReservationCalendarControls";
@@ -143,7 +143,7 @@ const EditStep0 = ({
           )
         : undefined;
     const diff = maybeDiff ?? 0;
-    const duration = diff >= 90 ? `(${formatDurationMinutes(diff)})` : "";
+    const duration = diff >= 90 ? `(${formatDuration(diff, t)})` : "";
     const shownReservation =
       initialReservation != null
         ? { ...initialReservation, state: "INITIAL" }

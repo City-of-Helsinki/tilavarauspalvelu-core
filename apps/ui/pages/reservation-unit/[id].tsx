@@ -67,7 +67,7 @@ import { Map } from "@/components/Map";
 import Legend from "@/components/calendar/Legend";
 import ReservationCalendarControls from "@/components/calendar/ReservationCalendarControls";
 import {
-  formatDurationMinutes,
+  formatDuration,
   getTranslation,
   isTouchDevice,
   printErrorMessages,
@@ -674,7 +674,7 @@ const ReservationUnit = ({
             new Date(initialReservation.begin)
           )
         : 0;
-    const duration = diff >= 90 ? `(${formatDurationMinutes(diff)})` : "";
+    const duration = diff >= 90 ? `(${formatDuration(diff, t)})` : "";
 
     const existingReservations = filterNonNullable(
       reservationUnit?.reservations

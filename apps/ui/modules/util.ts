@@ -30,6 +30,7 @@ import {
 } from "./const";
 import type { LocalizationLanguages } from "common/src/helpers";
 
+export { formatDuration } from "common/src/common/util";
 export { fromAPIDate, fromUIDate };
 export { getTranslation };
 
@@ -282,34 +283,6 @@ export const getReducedApplicationStatus = (
     default:
       return null;
   }
-};
-
-export const formatDurationMinutes = (
-  duration: number,
-  abbreviated = true
-): string => {
-  if (!duration) {
-    return "-";
-  }
-
-  const hour = Math.floor(duration / 60);
-  const min = Math.floor(duration % 60);
-
-  const hourKey = abbreviated ? "common:abbreviations.hour" : "common:hour";
-  const minuteKey = abbreviated
-    ? "common:abbreviations.minute"
-    : "common:minute";
-
-  const p = [];
-
-  if (hour && i18n?.t != null) {
-    p.push(i18n.t(hourKey, { count: hour }).toLocaleLowerCase());
-  }
-  if (min && i18n?.t != null) {
-    p.push(i18n.t(minuteKey, { count: min }).toLocaleLowerCase());
-  }
-
-  return p.join(" ");
 };
 
 export const getReadableList = (list: string[]): string => {

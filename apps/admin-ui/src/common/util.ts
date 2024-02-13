@@ -5,6 +5,8 @@ import { LocationType, Query } from "common/types/gql-types";
 import { DataFilterOption } from "./types";
 import { NUMBER_OF_DECIMALS } from "./const";
 
+export { formatDuration } from "common/src/common/util";
+
 export const DATE_FORMAT = "d.M.yyyy";
 export const DATE_FORMAT_SHORT = "d.M.";
 
@@ -88,30 +90,6 @@ export const parseDurationString = (time: string): HMS | undefined => {
     return undefined;
   }
   return { h, m };
-};
-
-export const formatDurationShort = (hms: HMS): string =>
-  `${hms.h ? i18next.t("common.hoursUnit", { count: hms.h }) : ""} ${
-    hms.m ? i18next.t("common.minutesUnit", { count: hms.m }) : ""
-  }`;
-
-export const formatDurationLong = (hms: HMS): string =>
-  `${hms.h ? i18next.t("common.hoursUnitLong", { count: hms.h }) : ""} ${
-    hms.m ? i18next.t("common.minutesUnitLong", { count: hms.m }) : ""
-  }`;
-
-export const formatDuration = (
-  duration: number | null | undefined,
-  unitFormat?: "long"
-): string => {
-  const hms = secondsToHms(duration);
-
-  switch (unitFormat) {
-    case "long":
-      return formatDurationLong(hms).trim();
-    default:
-      return formatDurationShort(hms).trim();
-  }
 };
 
 export const convertHMSToSeconds = (input: string): number | null => {

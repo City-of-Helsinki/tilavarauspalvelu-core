@@ -55,11 +55,7 @@ import {
 } from "@/modules/reservationUnit";
 import LoginFragment from "../LoginFragment";
 import { useDebounce } from "@/hooks/useDebounce";
-import {
-  capitalize,
-  formatDurationMinutes,
-  getPostLoginUrl,
-} from "@/modules/util";
+import { capitalize, formatDuration, getPostLoginUrl } from "@/modules/util";
 
 type Props<T> = {
   reservationUnit: ReservationUnitByPkType;
@@ -583,9 +579,7 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
     );
     const durationStr =
       end != null && begin != null
-        ? formatDurationMinutes(
-            differenceInMinutes(new Date(end), new Date(begin))
-          )
+        ? formatDuration(differenceInMinutes(new Date(end), new Date(begin)), t)
         : "";
 
     return `${dateStr}, ${durationStr}`;

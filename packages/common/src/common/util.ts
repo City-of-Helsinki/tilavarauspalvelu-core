@@ -11,7 +11,7 @@ import {
 import { fi } from "date-fns/locale";
 /* eslint-enable import/no-duplicates */
 import { capitalize, isNumber } from "lodash";
-import { i18n } from "next-i18next";
+import { type TFunction, i18n } from "next-i18next";
 import { HMS } from "../../types/common";
 
 export const parseDate = (date: string): Date => parseISO(date);
@@ -38,10 +38,42 @@ export const secondsToHms = (
   return { h, m, s };
 };
 
-export const formatDuration = (
+export function formatDuration(
+  durationMinutes: number,
+  t: TFunction,
+  abbreviated = true
+): string {
+  if (!durationMinutes) {
+    return "-";
+  }
+
+  const hour = Math.floor(durationMinutes / 60);
+  const min = Math.floor(durationMinutes % 60);
+
+  const hourKey = abbreviated ? "common:abbreviations.hour" : "common:hour";
+  const minuteKey = abbreviated
+    ? "common:abbreviations.minute"
+    : "common:minute";
+
+  const p = [];
+
+  if (hour) {
+    p.push(t(hourKey, { count: hour }).toLocaleLowerCase());
+  }
+  if (min) {
+    p.push(t(minuteKey, { count: min }).toLocaleLowerCase());
+  }
+
+  return p.join(" ");
+}
+
+/// @deprecated
+/// TODO this is duplicated code
+/// TODO this should take in t function and not use i18n directly (fails to load translations)
+function formatDurationString(
   duration: string | null,
   abbreviated = true
-): string => {
+): string {
   if (!duration || isNumber(duration) || !duration?.includes(":")) {
     return "-";
   }
@@ -64,24 +96,26 @@ export const formatDuration = (
       ? `${`${i18n?.t(hourKey, { count: hours }) || "".toLocaleLowerCase()}`} `
       : ""
   }${minutes ? i18n?.t(minuteKey, { count: minutes }) : ""}`.trim();
-};
+}
 
-export const addYears = (date: Date, years: number): Date => {
-  const newDate = new Date(date);
-  newDate.setFullYear(newDate.getFullYear() + years);
-  return newDate;
-};
-
-export const formatSecondDuration = (
+/// @deprecated
+/// TODO rename? or remove? we should always use a single format function that has consistent input types (seconds or minutes)
+export function formatSecondDuration(
   duration: number,
   abbreviated = true
-): string => {
+): string {
   if (!duration || !isNumber(duration)) {
     return "-";
   }
 
   const hms = secondsToHms(duration);
-  return formatDuration(`${hms.h}:${hms.m}:${hms.s}`, abbreviated);
+  return formatDurationString(`${hms.h}:${hms.m}:${hms.s}`, abbreviated);
+}
+
+export const addYears = (date: Date, years: number): Date => {
+  const newDate = new Date(date);
+  newDate.setFullYear(newDate.getFullYear() + years);
+  return newDate;
 };
 
 // Returns a string in specified format (default: "yyyy-MM-dd") from a Date object,

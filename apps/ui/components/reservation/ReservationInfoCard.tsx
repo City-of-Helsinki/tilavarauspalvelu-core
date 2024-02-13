@@ -16,7 +16,7 @@ import type { ReservationType } from "common/types/gql-types";
 import { getReservationUnitPrice } from "@/modules/reservationUnit";
 import {
   capitalize,
-  formatDurationMinutes,
+  formatDuration,
   getImageSource,
   getMainImage,
   getTranslation,
@@ -183,7 +183,7 @@ const ReservationInfoCard = ({
         </Subheading>
         <Value data-testid="reservation__reservation-info-card__duration">
           <Strong>
-            {capitalize(timeString)}, {formatDurationMinutes(duration)}
+            {capitalize(timeString)}, {formatDuration(duration, t)}
           </Strong>
         </Value>
         <Value data-testid="reservation__reservation-info-card__price">
