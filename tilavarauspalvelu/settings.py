@@ -16,7 +16,6 @@ from .utils.logging import getLogger
 # This can be removed when graphene_permissions is updated to import ResolveInfo from the correct package.
 graphql.ResolveInfo = graphql.GraphQLResolveInfo
 
-logger = getLogger("settings")
 
 # ----- ENV Setup --------------------------------------------------------------------------------------
 
@@ -57,7 +56,6 @@ env = environ.Env(
     EMAIL_PORT=(str, global_settings.EMAIL_PORT),
     EMAIL_USE_TLS=(bool, True),
     EMAIL_VARAAMO_EXT_LINK=(str, None),
-    ENABLE_SQL_LOGGING=(bool, False),
     GDPR_API_DELETE_SCOPE=(str, ""),
     GDPR_API_QUERY_SCOPE=(str, ""),
     HAUKI_ADMIN_UI_URL=(str, None),
@@ -141,7 +139,6 @@ ADMINS = env("ADMINS")
 APP_VERSION = env("SOURCE_BRANCH_NAME").replace("main", "") or env("SOURCE_VERSION")[:8] or "local"
 
 if DEBUG is True and env("SECRET_KEY") == "":
-    logger.warning("Running in debug mode without proper secret key. Fix if not intentional")
     SECRET_KEY = "example_secret"  # nosec
 else:
     SECRET_KEY = env("SECRET_KEY")  # NOSONAR
@@ -337,29 +334,28 @@ EMAIL_FEEDBACK_EXT_LINK = env("EMAIL_FEEDBACK_EXT_LINK")
 
 # ----- Logging ----------------------------------------------------------------------------------------
 
-APP_LOGGING_LEVEL = env("APP_LOGGING_LEVEL")
-LOGGING = DEFAULT_LOGGING
-LOGGING["handlers"]["console"] = {
-    "level": "DEBUG",
-    "class": "logging.StreamHandler",
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "filters": {},
+    "formatters": {
+        "common": {
+            "format": "{asctime} | {levelname} | {module}.{funcName}:{lineno} | {message}",
+            "datefmt": "%Y-%m-%dT%H:%M:%S%z",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "stdout": {
+            "class": "logging.StreamHandler",
+            "formatter": "common",
+        },
+    },
+    "root": {
+        "level": env("APP_LOGGING_LEVEL"),
+        "handlers": ["stdout"],
+    },
 }
-LOGGING["loggers"]["tilavaraus"] = {
-    "handlers": ["console"],
-    "level": APP_LOGGING_LEVEL,
-    "propagate": True,
-}
-
-ENABLE_SQL_LOGGING = env("ENABLE_SQL_LOGGING")
-if ENABLE_SQL_LOGGING:
-    LOGGING["loggers"].update(
-        {
-            "django.db.backends": {
-                "handlers": ["console"],
-                "level": "DEBUG",
-                "propagate": True,
-            },
-        }
-    )
 
 AUDIT_LOGGING_ENABLED = env("AUDIT_LOGGING_ENABLED")
 
