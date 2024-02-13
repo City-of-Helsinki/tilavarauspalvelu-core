@@ -28,7 +28,7 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
     def setUpTestData(cls):
         super().setUpTestData()
         AuditLogger.register(ReservationUnit)
-        cls.res_unit = ReservationUnitFactory(
+        cls.res_unit: ReservationUnit = ReservationUnitFactory(
             is_draft=True,
             name="Resunit name",
             contact_information="Sonya Blade",
@@ -171,10 +171,21 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         assert content.get("errors") is None
         assert ReservationUnitHaukiExporter.send_reservation_unit_to_hauki.call_count == 0
 
-    def test_contact_information_removal_on_archive(self):
+    def test_archiving_removes_contact_information_and_audit_logs(self):
+        # Create a log entry
+        self.res_unit.name = "Updated"
+        self.res_unit.contact_information = "Liu Kang"
+        self.res_unit.save()
+        # self.res_unit.pricings.add(ReservationUnitPricingFactory.create())
+
+        content_type_id = ContentType.objects.get(app_label="reservation_units", model="reservationunit").id
+        log_entry_count = LogEntry.objects.filter(content_type_id=content_type_id, object_id=self.res_unit.pk).count()
+        # We have more than 1 log entry for the reservation unit
+        assert log_entry_count > 1
+
         data = self.get_valid_update_data()
-        data["isArchived"] = True
         data["contactInformation"] = "Liu Kang"
+        data["isArchived"] = True
 
         response = self.query(reservation_unit_update_mutation(), input_data=data)
         assert response.status_code == 200
@@ -182,27 +193,14 @@ class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
         assert content.get("errors") is None
 
         self.res_unit.refresh_from_db()
+        # ReservationUnit is marked as both archived and draft
         assert self.res_unit.is_archived is True
+        assert self.res_unit.is_draft is True
+
+        # Contact information is removed
         assert self.res_unit.contact_information == ""
 
-    def test_audit_log_deletion_on_archive(self):
-        self.res_unit.name = "Updated"
-        self.res_unit.save()
-
-        content_type_id = ContentType.objects.get(app_label="reservation_units", model="reservationunit").id
-        log_entry_count = LogEntry.objects.filter(content_type_id=content_type_id, object_id=self.res_unit.pk).count()
-
-        assert log_entry_count > 1
-
-        data = self.get_valid_update_data()
-        data["isArchived"] = True
-        data["contactInformation"] = "Liu Kang"
-
-        response = self.query(reservation_unit_update_mutation(), input_data=data)
-        assert response.status_code == 200
-        content = json.loads(response.content)
-        assert content.get("errors") is None
-
+        # Old log entries are removed
         log_entry_count = LogEntry.objects.filter(content_type_id=content_type_id, object_id=self.res_unit.pk).count()
         assert log_entry_count == 1
 
