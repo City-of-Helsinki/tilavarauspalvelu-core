@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, time
 
 from django.utils import timezone
@@ -8,9 +9,8 @@ from opening_hours.models import OriginHaukiResource
 from opening_hours.utils.hauki_api_client import HaukiAPIClient
 from opening_hours.utils.hauki_api_types import HaukiAPIResource, HaukiAPIResourceListResponse
 from opening_hours.utils.reservable_time_span_client import ReservableTimeSpanClient
-from tilavarauspalvelu.utils.logging import getLogger
 
-logger = getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 DEFAULT_TIMEZONE = get_default_timezone()
 

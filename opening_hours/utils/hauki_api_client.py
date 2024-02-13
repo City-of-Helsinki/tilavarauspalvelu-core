@@ -1,5 +1,6 @@
 import datetime
 import json
+import logging
 from typing import NotRequired, TypedDict, Unpack
 
 from django.conf import settings
@@ -12,7 +13,6 @@ from opening_hours.utils.hauki_api_types import (
     HaukiAPIResource,
     HaukiAPIResourceListResponse,
 )
-from tilavarauspalvelu.utils import logging
 
 __all__ = [
     "HaukiAPIClient",
