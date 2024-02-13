@@ -1,5 +1,10 @@
+import logging
+import traceback
+
 from django.conf import settings
 from sentry_sdk import capture_exception
+
+logger = logging.getLogger(__name__)
 
 
 class MultipleProxyMiddleware:
@@ -37,5 +42,6 @@ class GraphQLSentryMiddleware:
         try:
             return next(root, info, **kwargs)
         except Exception as err:
+            logger.info(traceback.format_exc())
             capture_exception(err)
             return err
