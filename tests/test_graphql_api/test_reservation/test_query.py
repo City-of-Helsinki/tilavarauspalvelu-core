@@ -137,7 +137,7 @@ def test_reservation__query__all_fields(graphql):
         "reserveeId": reservation.reservee_id,
         "reserveeIsUnregisteredAssociation": reservation.reservee_is_unregistered_association,
         "reserveeLastName": reservation.reservee_last_name,
-        "reserveeName": f"{reservation.user.first_name} {reservation.user.last_name}",
+        "reserveeName": f"{reservation.reservee_first_name} {reservation.reservee_last_name}",
         "reserveeOrganisationName": reservation.reservee_organisation_name,
         "reserveePhone": reservation.reservee_phone,
         "reserveeType": reservation.reservee_type,

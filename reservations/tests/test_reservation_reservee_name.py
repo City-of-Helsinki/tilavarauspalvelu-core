@@ -1,108 +1,149 @@
+from typing import Any, NamedTuple
+
 import pytest
 
 from reservations.choices import CustomerTypeChoice, ReservationTypeChoice
 from tests.factories import RecurringReservationFactory, ReservationFactory
-
-# Applied to all tests
-pytestmark = [
-    pytest.mark.django_db,
-]
+from tests.helpers import parametrize_helper
 
 
-def test_reservation_reservee_name__type__staff():
-    reservation = ReservationFactory.create(
-        type=ReservationTypeChoice.STAFF,
-        recurring_reservation=RecurringReservationFactory.create(name="foo"),
+class Params(NamedTuple):
+    fields: dict[str, Any]
+    result: str
+
+
+@pytest.mark.parametrize(
+    **parametrize_helper(
+        {
+            "Type: BLOCKED | All names empty": Params(
+                fields={"type": ReservationTypeChoice.BLOCKED},
+                result="Closed",
+            ),
+            "Type: STAFF | All names empty": Params(
+                fields={"type": ReservationTypeChoice.STAFF},
+                result="",
+            ),
+            "Type: STAFF | Recurring Reservation": Params(
+                fields={
+                    "type": ReservationTypeChoice.STAFF,
+                    "recurring_reservation": RecurringReservationFactory.build(name="Recurring"),
+                    "name": "Reservation Name",
+                    "reservee_first_name": "First",
+                    "reservee_last_name": "Last",
+                },
+                result="Recurring",
+            ),
+            "Type: STAFF | Recurring Reservation has no name": Params(
+                fields={
+                    "type": ReservationTypeChoice.STAFF,
+                    "recurring_reservation": RecurringReservationFactory.build(name=""),
+                    "name": "Reservation Name",
+                    "reservee_first_name": "First",
+                    "reservee_last_name": "Last",
+                },
+                result="Reservation Name",
+            ),
+            "Type: STAFF | name": Params(
+                fields={
+                    "type": ReservationTypeChoice.STAFF,
+                    "name": "Reservation Name",
+                    "reservee_first_name": "First",
+                    "reservee_last_name": "Last",
+                },
+                result="Reservation Name",
+            ),
+            "Type: None | Use reservee first and last names": Params(
+                fields={
+                    "type": None,
+                    "name": "Reservation Name",
+                    "reservee_first_name": "First",
+                    "reservee_last_name": "Last",
+                },
+                result="First Last",
+            ),
+            "CustomerType: BUSINESS | reservee_organisation_name set": Params(
+                fields={
+                    "reservee_type": CustomerTypeChoice.BUSINESS,
+                    "reservee_organisation_name": "Organisation",
+                    "reservee_first_name": "First",
+                    "reservee_last_name": "Last",
+                },
+                result="Organisation",
+            ),
+            "CustomerType: NONPROFIT | reservee_organisation_name set": Params(
+                fields={
+                    "reservee_type": CustomerTypeChoice.BUSINESS,
+                    "reservee_organisation_name": "Organisation",
+                    "reservee_first_name": "First",
+                    "reservee_last_name": "Last",
+                },
+                result="Organisation",
+            ),
+            "CustomerType: BUSINESS | reservee_organisation_name not set, fallback to reservation name": Params(
+                fields={
+                    "reservee_type": CustomerTypeChoice.BUSINESS,
+                    "reservee_first_name": "First",
+                    "reservee_last_name": "Last",
+                    "name": "Fallback",
+                },
+                result="Fallback",
+            ),
+            "CustomerType: INDIVIDUAL | Use Reservee First and Last names": Params(
+                fields={
+                    "reservee_type": CustomerTypeChoice.INDIVIDUAL,
+                    "reservee_organisation_name": "Organisation",
+                    "reservee_first_name": "First",
+                    "reservee_last_name": "Last",
+                },
+                result="First Last",
+            ),
+            "CustomerType: INDIVIDUAL | Only First name": Params(
+                fields={
+                    "reservee_type": CustomerTypeChoice.INDIVIDUAL,
+                    "reservee_first_name": "First",
+                    "reservee_last_name": "",
+                },
+                result="First",
+            ),
+            "CustomerType: INDIVIDUAL | No names, fallback to Fallback to Reservation name": Params(
+                fields={
+                    "reservee_type": CustomerTypeChoice.INDIVIDUAL,
+                    "name": "Reservation Name",
+                },
+                result="Reservation Name",
+            ),
+            "CustomerType: None | Use Reservee First and Last names": Params(
+                fields={
+                    "reservee_type": None,
+                    "reservee_organisation_name": "Organisation",
+                    "reservee_first_name": "First",
+                    "reservee_last_name": "Last",
+                },
+                result="First Last",
+            ),
+            "CustomerType: None | Fallback to Reservation name": Params(
+                fields={"name": "Reservation Name"},
+                result="Reservation Name",
+            ),
+            "CustomerType: None | Fallback to User name": Params(
+                fields={
+                    "user__first_name": "User First",
+                    "user__last_name": "User Last",
+                },
+                result="User First User Last",
+            ),
+        }
     )
-    assert reservation.reservee_name == "foo"
+)
+def test__reservation__reservee_name(fields: dict[str, Any], result: str):
+    fields.setdefault("type", None)
+    fields.setdefault("reservee_type", None)
+    fields.setdefault("reservee_organisation_name", "")
+    fields.setdefault("reservee_first_name", "")
+    fields.setdefault("reservee_last_name", "")
+    fields.setdefault("name", "")
+    fields.setdefault("user__first_name", "")
+    fields.setdefault("user__last_name", "")
 
-
-def test_reservation_reservee_name__type__blocked():
-    reservation = ReservationFactory.create(type=ReservationTypeChoice.BLOCKED)
-    assert reservation.reservee_name == "Closed"
-
-
-def test_reservation_reservee_name__reservee_type__business():
-    reservation = ReservationFactory.create(
-        reservee_type=CustomerTypeChoice.BUSINESS,
-        reservee_organisation_name="Business Name",
-    )
-    assert reservation.reservee_name == "Business Name"
-
-
-def test_reservation_reservee_name__reservee_type__nonprofit():
-    reservation = ReservationFactory.create(
-        reservee_type=CustomerTypeChoice.NONPROFIT,
-        reservee_organisation_name="Nonprofit Name",
-    )
-    assert reservation.reservee_name == "Nonprofit Name"
-
-
-def test_reservation_reservee_name__reservee_type__nonprofit__no_organisation_name():
-    reservation = ReservationFactory.create(
-        reservee_type=CustomerTypeChoice.NONPROFIT, reservee_organisation_name="", name="Reservation Name"
-    )
-    assert reservation.reservee_name == "Reservation Name"
-
-
-def test_reservation_reservee_name__reservee_type__individual__full_name():
-    reservation = ReservationFactory.create(
-        reservee_type=CustomerTypeChoice.INDIVIDUAL,
-        reservee_first_name="Foo",
-        reservee_last_name="Bar",
-    )
-    assert reservation.reservee_name == "Foo Bar"
-
-
-def test_reservation_reservee_name__reservee_type__individual__only_first_name():
-    reservation = ReservationFactory.create(
-        reservee_type=CustomerTypeChoice.INDIVIDUAL,
-        reservee_first_name="Foo",
-        reservee_last_name="",
-    )
-    assert reservation.reservee_name == "Foo"
-
-
-def test_reservation_reservee_name__reservee_type__individual__only_last_name():
-    reservation = ReservationFactory.create(
-        reservee_type=CustomerTypeChoice.INDIVIDUAL,
-        reservee_first_name="",
-        reservee_last_name="Bar",
-    )
-    assert reservation.reservee_name == "Bar"
-
-
-def test_reservation_reservee_name__reservee_type__individual__no_names():
-    reservation = ReservationFactory.create(
-        reservee_type=CustomerTypeChoice.INDIVIDUAL,
-        reservee_first_name="",
-        reservee_last_name="",
-        name="Reservation Name",
-    )
-    assert reservation.reservee_name == "Reservation Name"
-
-
-def test_reservation_reservee_name__reservee_type__none():
-    reservation = ReservationFactory.create(
-        reservee_type=None,
-        name="Reservation Name",
-    )
-    assert reservation.reservee_name == "Reservation Name"
-
-
-def test_reservation_reservee_name__user_name():
-    reservation = ReservationFactory.create(
-        reservee_type=None,
-        name="",
-    )
-    assert reservation.reservee_name == reservation.user.get_full_name()
-
-
-def test_reservation_reservee_name__unnamed_reservation():
-    reservation = ReservationFactory.create(
-        reservee_type=None,
-        name="",
-        user__first_name="",
-        user__last_name="",
-    )
-    assert reservation.reservee_name == "Unnamed reservation"
+    reservation = ReservationFactory.build(**fields)
+    assert reservation.reservee_name == result
