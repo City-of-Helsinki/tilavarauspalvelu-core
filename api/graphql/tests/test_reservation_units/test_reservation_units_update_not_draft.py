@@ -21,7 +21,7 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.res_unit = ReservationUnitFactory(
+        cls.res_unit: ReservationUnit = ReservationUnitFactory(
             is_draft=False,
             name_fi="Resunit name",
             name_en="Resunit name",
@@ -409,3 +409,20 @@ class ReservationUnitUpdateNotDraftTestCase(ReservationUnitMutationsTestCaseBase
         assert updated_unit.reservation_cancelled_instructions_fi == data["reservationCancelledInstructionsFi"]
         assert updated_unit.reservation_cancelled_instructions_sv == data["reservationCancelledInstructionsSv"]
         assert updated_unit.reservation_cancelled_instructions_en == data["reservationCancelledInstructionsEn"]
+
+    def test_update_archiving_also_sets_as_draft(self):
+        self.client.force_login(self.general_admin)
+        data = self.get_valid_update_data()
+        data["isDraft"] = False  # This should be ignored
+        data["isArchived"] = True
+
+        response = self.query(reservation_unit_update_mutation(), input_data=data)
+        assert response.status_code == 200
+
+        content = json.loads(response.content)
+        assert content.get("errors") is None
+        assert content.get("data").get("updateReservationUnit").get("pk") is not None
+
+        self.res_unit.refresh_from_db()
+        assert self.res_unit.is_archived is True
+        assert self.res_unit.is_draft is True

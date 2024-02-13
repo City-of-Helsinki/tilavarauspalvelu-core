@@ -61,6 +61,11 @@ class ReservationUnitUpdateMutation(ReservationUnitMutationMixin, OldAuthSeriali
 
     permission_classes = (ReservationUnitPermission,)
 
+    class Meta:
+        model_operations = ["update"]
+        lookup_field = "pk"
+        serializer_class = ReservationUnitUpdateSerializer
+
     @classmethod
     def remove_personal_data_and_logs_on_archive(cls, input: dict):
         """
@@ -70,26 +75,25 @@ class ReservationUnitUpdateMutation(ReservationUnitMutationMixin, OldAuthSeriali
         if "is_archived" not in input:
             return
 
-        reservation_unit_pk = input["pk"]
-        reservation_unit = ReservationUnit.objects.get(pk=reservation_unit_pk)
-        old_archived_value = reservation_unit.is_archived
-        new_archived_value = input["is_archived"]
+        reservation_unit = ReservationUnit.objects.get(pk=input["pk"])
 
-        if not new_archived_value or old_archived_value == new_archived_value:
+        # Archive state is unchanged or set to false, no need to do anything.
+        if input["is_archived"] is False or reservation_unit.is_archived == input["is_archived"]:
             return
 
-        # Don't allow new contact information to be saved when reservation unit is archived
-        if "contact_information" in input:
-            del input["contact_information"]
+        # Don't allow new contact information or draft state to be saved when reservation unit is archived
+        input.pop("contact_information", None)
+        input.pop("is_draft", None)
 
-        # Reset contact information
+        # Reset contact information and mark reservation unit as draft
         reservation_unit.contact_information = ""
+        reservation_unit.is_draft = True
         reservation_unit.save()
 
         deleted_log_entries = LogEntry.objects.get_for_object(reservation_unit).delete()
 
         logger.info(
-            f"Reservation unit {reservation_unit_pk} archived. Content information "
+            f"Reservation unit {reservation_unit.pk} archived. Content information "
             f"removed and {deleted_log_entries} audit log entries deleted."
         )
 
@@ -97,8 +101,3 @@ class ReservationUnitUpdateMutation(ReservationUnitMutationMixin, OldAuthSeriali
     def mutate(cls, root, info, input):
         cls.remove_personal_data_and_logs_on_archive(input)
         return super().mutate(root, info, input)
-
-    class Meta:
-        model_operations = ["update"]
-        lookup_field = "pk"
-        serializer_class = ReservationUnitUpdateSerializer
