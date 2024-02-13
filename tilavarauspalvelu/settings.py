@@ -10,8 +10,6 @@ from django.utils.translation import gettext_lazy as _
 from helusers import defaults
 from sentry_sdk.integrations.django import DjangoIntegration
 
-from .utils.logging import getLogger
-
 # This is a temporary fix for graphene_permissions to avoid ImportError when importing ResolveInfo
 # This can be removed when graphene_permissions is updated to import ResolveInfo from the correct package.
 graphql.ResolveInfo = graphql.GraphQLResolveInfo
@@ -340,7 +338,8 @@ LOGGING = {
     "filters": {},
     "formatters": {
         "common": {
-            "format": "{asctime} | {levelname} | {module}.{funcName}:{lineno} | {message}",
+            "()": "tilavarauspalvelu.logging.TVPFormatter",
+            "format": "{asctime} | {levelname} | {dotpath}.{funcName}:{lineno} | {message}",
             "datefmt": "%Y-%m-%dT%H:%M:%S%z",
             "style": "{",
         },

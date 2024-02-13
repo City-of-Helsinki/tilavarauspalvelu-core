@@ -1,3 +1,5 @@
+import logging
+
 import graphene
 from auditlog.models import LogEntry
 from django.conf import settings
@@ -5,22 +7,17 @@ from graphene_django.rest_framework.mutation import SerializerMutation
 from graphql import GraphQLError
 
 from api.graphql.extensions.legacy_helpers import OldAuthSerializerMutation
-from api.graphql.types.reservation_units.permissions import (
-    ReservationUnitPermission,
-)
+from api.graphql.types.reservation_units.permissions import ReservationUnitPermission
 from api.graphql.types.reservation_units.serializers import (
     ReservationUnitCreateSerializer,
     ReservationUnitUpdateSerializer,
 )
-from api.graphql.types.reservation_units.types import (
-    ReservationUnitType,
-)
+from api.graphql.types.reservation_units.types import ReservationUnitType
 from opening_hours.errors import HaukiAPIError, HaukiRequestError
 from opening_hours.utils.hauki_resource_hash_updater import HaukiResourceHashUpdater
 from reservation_units.models import (
     ReservationUnit,
 )
-from tilavarauspalvelu.utils import logging
 
 logger = logging.getLogger(__name__)
 
