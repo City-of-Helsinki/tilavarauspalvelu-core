@@ -13,9 +13,10 @@ import React, {
   useCallback,
   useEffect,
   useRef,
+  useState,
 } from "react";
 import Popup from "reactjs-popup";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import {
   ReservationType,
   ReservationsReservationTypeChoices,
@@ -41,6 +42,10 @@ export type Resource = {
 
 const CELL_HEIGHT = 50;
 const TITLE_CELL_WIDTH_CH = 11;
+// Magic numbers (in px) for calendar height (margin is the difference between window height and calendar height)
+const MOBILE_CUTOFF = 1000;
+const MOBILE_MARGIN = 150;
+const DESKTOP_MARGIN = 500;
 
 const TemplateProps: CSSProperties = {
   zIndex: "var(--tilavaraus-admin-stack-calendar-buffer)",
@@ -66,7 +71,7 @@ const FlexContainer = styled.div<{ $numCols: number }>`
     min-width: calc(150px + ${({ $numCols }) => $numCols} * 35px);
   }
   min-width: calc(150px + ${({ $numCols }) => $numCols} * 40px);
-  grid-gap: 0;
+  gap: 0;
   border-bottom: ${CELL_BORDER};
 `;
 
@@ -80,16 +85,38 @@ const ResourceNameContainer = styled.div<{ $isDraft: boolean }>`
   line-height: var(--lineheight-m);
   position: sticky;
   left: 0;
-  z-index: var(--tilavaraus-admin-stack-calendar-title-cells);
+  z-index: var(--tilavaraus-admin-stack-calendar-header-names);
   background: var(--color-white);
 `;
 
-const HeadingRow = styled.div`
+const rowCommonCss = css`
   height: ${CELL_HEIGHT}px;
   display: grid;
   grid-template-columns: ${TITLE_CELL_WIDTH_CH}ch 1fr;
   border-right: 1px solid transparent;
   border-left: 2px solid transparent;
+`;
+
+// NOTE sticky times
+// Decided: the container has a fixed height and both overflows, the times are sticky and the content is scrollable.
+//
+// What doesn't work:
+// 1. Sticky doesn't work with overflow-x (so naive approach of adding CSS sticky to the times doesn't work).
+// 2. Tracking the position with JS becomes too complicated and has other issues
+//  - would have to calculate the absolute position from the whole tree
+//  - if there is layout (or size) change that doesn't affect this component directly, there is no way to know.
+// 3. Setting CSS top from scrollY with absolute position, animation lags when user scrolls.
+//
+// Other options:
+// 1. Dynamically set an absolute size for the table and use CSS sticky (no vertical scroll because the container matches the content size).
+// 2. Use absolute position for the header and set it in JS (crude) (set element position, not CSS top).
+const HeadingRow = styled.div`
+  ${rowCommonCss}
+  background: var(--color-white);
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: var(--tilavaraus-admin-stack-calendar-header-times);
 `;
 
 const Time = styled.div`
@@ -100,9 +127,8 @@ const Time = styled.div`
   font-size: var(--fontsize-body-s);
 `;
 
-const Row = styled(HeadingRow)`
-  border-right: ${CELL_BORDER};
-  border-left: 2px solid transparent;
+const Row = styled.div`
+  ${rowCommonCss}
 `;
 
 const CellContent = styled.div<{ $numCols: number }>`
@@ -160,7 +186,16 @@ const HideTimesOverTitles = styled.div`
   width: ${TITLE_CELL_WIDTH_CH}ch;
   height: ${CELL_HEIGHT}px;
   background-color: white;
-  z-index: var(--tilavaraus-admin-stack-calendar-title-cells);
+  z-index: var(--tilavaraus-admin-stack-calendar-header-names);
+`;
+
+const Container = styled.div<{ $height: number }>`
+  max-width: 100%;
+  overflow: auto auto;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+
+  height: ${({ $height }) => $height}px;
 `;
 
 const Cells = ({
@@ -391,7 +426,7 @@ const sortByDraftStatusAndTitle = (resources: Resource[]) => {
   });
 };
 
-const UnitCalendar = ({ date, resources, refetch }: Props): JSX.Element => {
+function UnitCalendar({ date, resources, refetch }: Props): JSX.Element {
   const calendarRef = useRef<HTMLDivElement>(null);
   // todo find out min and max opening hour of every reservationunit
   const [beginHour, endHour] = [0, 24];
@@ -427,7 +462,8 @@ const UnitCalendar = ({ date, resources, refetch }: Props): JSX.Element => {
       `.calendar-header > div:nth-of-type(${cellToScroll})`
     );
     if (lastElementOfHeader) {
-      lastElementOfHeader.scrollIntoView();
+      // horizontal scroll the calendar (as long as it's inside the view vertically, this doesn't scroll the page)
+      lastElementOfHeader.scrollIntoView(false);
     }
   }, [date]);
 
@@ -435,8 +471,21 @@ const UnitCalendar = ({ date, resources, refetch }: Props): JSX.Element => {
     scrollCalendar();
   }, [scrollCalendar]);
 
+  // Sticky time header requires fixed height, so track the window height and adjust the calendar height accordingly
+  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
+  useEffect(() => {
+    function updateSize() {
+      setWindowHeight(window.innerHeight);
+    }
+    window.addEventListener("resize", updateSize);
+    return () => window.removeEventListener("resize", updateSize);
+  }, []);
+
+  const margins = windowHeight < MOBILE_CUTOFF ? MOBILE_MARGIN : DESKTOP_MARGIN;
+  const containerHeight = windowHeight - margins;
+
   return (
-    <>
+    <Container $height={containerHeight}>
       <HideTimesOverTitles />
       <FlexContainer $numCols={numHours * 2} ref={calendarRef}>
         <HeadingRow>
@@ -451,7 +500,6 @@ const UnitCalendar = ({ date, resources, refetch }: Props): JSX.Element => {
             ))}
           </CellContent>
         </HeadingRow>
-
         {orderedResources.map((row) => (
           <Row key={row.url}>
             <ResourceNameContainer title={row.title} $isDraft={row.isDraft}>
@@ -475,8 +523,8 @@ const UnitCalendar = ({ date, resources, refetch }: Props): JSX.Element => {
           </Row>
         ))}
       </FlexContainer>
-    </>
+    </Container>
   );
-};
+}
 
-export default UnitCalendar;
+export { UnitCalendar };

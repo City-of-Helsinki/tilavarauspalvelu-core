@@ -5,7 +5,7 @@ import styled from "styled-components";
 import Loader from "../Loader";
 import Legend from "../reservations/requested/Legend";
 import { legend } from "./eventStyleGetter";
-import UnitCalendar from "./UnitCalendar";
+import { UnitCalendar } from "./UnitCalendar";
 import { useUnitResources } from "./hooks";
 
 type Props = {
@@ -19,11 +19,6 @@ const Legends = styled.div`
   flex-wrap: wrap;
   gap: var(--spacing-xl);
   padding: var(--spacing-m) 0;
-`;
-
-const Container = styled.div`
-  max-width: 100%;
-  overflow: auto hidden;
 `;
 
 const LegendContainer = styled.div`
@@ -53,17 +48,15 @@ const UnitReservations = ({
 
   return (
     <>
-      <Container>
-        {loading ? (
-          <Loader />
-        ) : (
-          <UnitCalendar
-            date={currentDate}
-            resources={resources}
-            refetch={refetch}
-          />
-        )}
-      </Container>
+      {loading ? (
+        <Loader />
+      ) : (
+        <UnitCalendar
+          date={currentDate}
+          resources={resources}
+          refetch={refetch}
+        />
+      )}
       <LegendContainer>
         <Legends>
           {legend.map((l) => (

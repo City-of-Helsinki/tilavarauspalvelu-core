@@ -92,6 +92,7 @@ const UnitReservationsView = (): JSX.Element => {
         <DayNavigation date={begin} onDateChange={onDateChange} />
         <div />
       </HorisontalFlexWrapper>
+      {/* TODO missing unitId is an error, not return null */}
       {unitId ? (
         <UnitReservations
           reservationUnitTypes={state.reservationUnitType.map((option) =>
