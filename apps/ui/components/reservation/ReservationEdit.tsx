@@ -76,7 +76,7 @@ const Content = styled(Container)`
 
   @media (width > ${breakpoints.m}) {
     margin-top: var(--spacing-2-xl);
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: repeat(6, 1fr);
   }
 `;
 
@@ -84,11 +84,6 @@ const Content = styled(Container)`
 const Heading = styled(H2).attrs({ as: "h1" })`
   grid-column: 1 / -1;
   margin-top: 0;
-`;
-
-const BylineWrapper = styled.div`
-  /* max-width: 390px; */
-  order: 1;
 `;
 
 const StyledStepper = styled(Stepper)`
@@ -102,21 +97,33 @@ const StyledStepper = styled(Stepper)`
 const PinkBox = styled.div`
   padding: 1px var(--spacing-m) var(--spacing-m);
   background-color: var(--color-suomenlinna-light);
+  grid-column: 1 / -1;
+  grid-row: -1;
+  @media (min-width: ${breakpoints.m}) {
+    grid-column: span 3;
+    grid-row: unset;
+  }
+  @media (min-width: ${breakpoints.l}) {
+    grid-column: -3 / span 2;
+  }
 `;
 
 const HeadingSection = styled.div`
   grid-column: 1 / -1;
   grid-row: 1;
   @media (min-width: ${breakpoints.l}) {
-    grid-column: 1 / span 2;
+    grid-column: 1 / span 4;
   }
 `;
 
 const BylineSection = styled.div`
   grid-row: 2;
+  @media (min-width: ${breakpoints.m}) {
+    grid-column: span 3;
+  }
   @media (min-width: ${breakpoints.l}) {
     grid-row: 1 / span 2;
-    grid-column-start: -1;
+    grid-column: -3 / span 2;
   }
 `;
 
@@ -125,7 +132,7 @@ const EditCalendarSection = styled.div`
   grid-row: 4 / -1;
 
   @media (min-width: ${breakpoints.l}) {
-    grid-column: 1 / span 2;
+    grid-column: 1 / span 4;
     grid-row: 2 / -1;
   }
 
@@ -152,14 +159,12 @@ const BylineContent = ({
       : reservation;
 
   return (
-    <BylineWrapper>
-      <ReservationInfoCard
-        // @ts-expect-error: TODO: fix this
-        reservation={reservationData}
-        reservationUnit={reservationUnit}
-        type="confirmed"
-      />
-    </BylineWrapper>
+    <ReservationInfoCard
+      // @ts-expect-error: TODO: fix this
+      reservation={reservationData}
+      reservationUnit={reservationUnit}
+      type="confirmed"
+    />
   );
 };
 
