@@ -333,37 +333,35 @@ class Reservation(ExportModelOperationsMixin("reservation"), SerializableMixin, 
 
     @property
     def reservee_name(self) -> str:
-        # Internal recurring reservations are created by STAFF
-        if self.type == ReservationTypeChoice.STAFF.value and self.recurring_reservation is not None:
-            return self.recurring_reservation.name
-
         # Blocking reservation
         if self.type == ReservationTypeChoice.BLOCKED.value:
             return _("Closed")
 
-        if self.reservee_type is not None:
-            # Organisation reservee
-            if (
-                self.reservee_type in [CustomerTypeChoice.BUSINESS.value, CustomerTypeChoice.NONPROFIT.value]
-                and self.reservee_organisation_name
-            ):
+        # Internal reservations created by STAFF
+        elif self.type == ReservationTypeChoice.STAFF.value:
+            if self.recurring_reservation is not None and self.recurring_reservation.name:
+                return self.recurring_reservation.name
+            if self.name:
+                return self.name
+
+        # Organisation reservee
+        is_organization = self.reservee_type in [CustomerTypeChoice.BUSINESS.value, CustomerTypeChoice.NONPROFIT.value]
+        if is_organization:
+            if self.reservee_organisation_name:
                 return self.reservee_organisation_name
-            # Individual reservee
-            elif self.reservee_type == CustomerTypeChoice.INDIVIDUAL.value and (
-                self.reservee_first_name or self.reservee_last_name
-            ):
-                return f"{self.reservee_first_name} {self.reservee_last_name}".strip()
+        # Individual reservee
+        elif individual_full_name := f"{self.reservee_first_name} {self.reservee_last_name}".strip():
+            return individual_full_name
 
         # Use reservation name when reservee name as first fallback
         if self.name:
             return self.name
 
-        # No name found yet, try the name of the User who made the reservation as second fallback
-        if self.user is not None and (user_display_name := self.user.get_display_name()):
+        # Use the name of the User who made the reservation as the last fallback
+        if self.user is not None and (user_display_name := self.user.get_display_name().strip()):
             return user_display_name
 
-        # No proper name found
-        return _("Unnamed reservation")
+        return ""
 
     def get_location_string(self):
         locations = []
