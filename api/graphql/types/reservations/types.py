@@ -216,7 +216,6 @@ class ReservationType(AuthNode, OldPrimaryKeyObjectType):
         filter_fields = {
             "state": ["exact"],
             "priority": ["exact"],
-            "begin": ["exact", "gte", "lte"],
         }
         interfaces = (graphene.relay.Node,)
         connection_class = TVPBaseConnection
