@@ -7,6 +7,7 @@ from django.contrib.postgres.search import SearchRank, SearchVector
 from django.db.models import Case, CharField, F, Q, QuerySet, Value, When
 from django.db.models.functions import Concat
 
+from api.graphql.extensions.filters import TimezoneAwareDateFilter
 from api.graphql.extensions.order_filter import CustomOrderingFilter
 from common.db import raw_prefixed_query
 from merchants.models import OrderStatus
@@ -30,8 +31,8 @@ Matches email domains like:
 
 
 class ReservationFilterSet(django_filters.FilterSet):
-    end = django_filters.DateTimeFilter(field_name="end", lookup_expr="lte")
-    begin = django_filters.DateTimeFilter(field_name="begin", lookup_expr="gte")
+    begin_date = TimezoneAwareDateFilter(field_name="end", lookup_expr="gte", use_end_of_day=False)
+    end_date = TimezoneAwareDateFilter(field_name="begin", lookup_expr="lte", use_end_of_day=True)
 
     only_with_permission = django_filters.BooleanFilter(method="get_only_with_permission")
 
@@ -115,7 +116,7 @@ class ReservationFilterSet(django_filters.FilterSet):
 
     class Meta:
         model = Reservation
-        fields = ["begin", "end"]
+        fields = []
 
     def filter_queryset(self, queryset: QuerySet) -> QuerySet:
         queryset = queryset.alias(
