@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
 from merchants.models import PaymentAccounting, PaymentMerchant, PaymentOrder
-from merchants.verkkokauppa.merchants.exceptions import GetMerchantsError
+from merchants.verkkokauppa.merchants.exceptions import GetMerchantError
 from merchants.verkkokauppa.merchants.requests import (
     create_merchant,
     get_merchant,
@@ -45,7 +45,7 @@ class PaymentMerchantForm(forms.ModelForm):
         if instance and instance.id:
             merchant_info = get_merchant(instance.id)
             if merchant_info is None:
-                raise GetMerchantsError(f"Merchant info for {instance.id!s} not found from Merchant API")
+                raise GetMerchantError(f"Merchant info for {instance.id!s} not found from Merchant API")
 
             self.fields["shop_id"].initial = merchant_info.shop_id
             self.fields["name"].initial = merchant_info.name
