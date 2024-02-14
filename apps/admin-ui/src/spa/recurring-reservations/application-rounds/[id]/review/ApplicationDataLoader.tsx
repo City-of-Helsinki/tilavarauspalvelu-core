@@ -28,7 +28,7 @@ export function ApplicationDataLoader({
   const unitFilter = searchParams.getAll("unit");
   const statusFilter = searchParams.getAll("status");
   const applicantFilter = searchParams.getAll("applicant");
-  const nameFilter = searchParams.get("name");
+  const nameFilter = searchParams.get("search");
 
   const { fetchMore, previousData, loading, data } = useQuery<
     Query,

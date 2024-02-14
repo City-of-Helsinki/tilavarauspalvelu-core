@@ -1739,6 +1739,7 @@ const translations: ITranslations = {
   // common terms used in filters (reused in multiple places)
   // TODO key prefix is questionable (it's not only filters)
   filters: {
+    // TODO move to label
     homeCity: ["Kotipaikka"],
     purpose: ["Käyttötarkoitus"],
     ageGroup: ["Ikäryhmä"],
@@ -1750,6 +1751,13 @@ const translations: ITranslations = {
       status: ["Valitse käsittelyn vaihe"],
       eventStatus: ["Valitse käsittelyn vaihe"],
       weekday: ["Valitse viikonpäivä"],
+      priority: ["Valitse aikatoive"],
+      order: ["Valitse toivejärjestys"],
+      search: ["Hae nimellä tai ID:llä"],
+      applicantType: ["Valitse asiakastyyppi"],
+      ageGroup: ["Valitse ikäryhmä"],
+      purpose: ["Valitse käyttötarkoitus"],
+      homeCity: ["Valitse kotikunta"],
     },
     label: {
       unit: ["Toimipiste"],
@@ -1758,7 +1766,18 @@ const translations: ITranslations = {
       status: ["Käsittelyn vaihe"],
       eventStatus: ["Käsittelyn vaihe"],
       weekday: ["Viikonpäivä"],
+      selectUnits: ["Valitse toimipisteet"],
+      priority: ["Aikatoive"],
+      search: ["Hae hakemusta"],
+      ageGroup: ["Ikäryhmä"],
+      purpose: ["Käyttötarkoitus"],
+      homeCity: ["Kotikunta"],
+      applicantType: ["Asiakastyyppi"],
+      order: ["Varausyksiköiden toivejärjestys"],
     },
+    // weird values that don't fit under placeholder or label (custom options in this case)
+    reservationUnitApplication: ["Tilatoive"],
+    reservationUnitApplicationOthers: ["Muut tilatoiveet"],
   },
   RequestedReservation: {
     heading: ["Varauksen tarkastelu"],
@@ -1926,29 +1945,6 @@ const translations: ITranslations = {
     countResultsPostfix: ["tuloksesta näytetty"],
     countAllResults: ["Kaikki {{ count }}  tulosta näytetty"],
     clearFiltersButton: ["Tyhjennä suodattimet"],
-    filters: {
-      placeholder: {
-        time: ["Valitse aikatoive"],
-        order: ["Valitse toivejärjestys"],
-        search: ["Hae nimellä tai ID:llä"],
-        applicantType: ["Valitse asiakastyyppi"],
-        ageGroup: ["Valitse ikäryhmä"],
-        purpose: ["Valitse käyttötarkoitus"],
-        homeCity: ["Valitse kotikunta"],
-      },
-      label: {
-        unit: ["Toimipiste"],
-        selectUnits: ["Valitse toimipisteet"],
-        schedules: ["Aikatoive"],
-        search: ["Hae hakemusta"],
-        homeCity: ["Kotikunta"],
-        selectSchedules: ["Valitse aikatoive"],
-        applicantType: ["Asiakastyyppi"],
-        reservationUnitOrder: ["Varausyksiköiden toivejärjestys"],
-      },
-      reservationUnitApplication: ["Tilatoive"],
-      reservationUnitApplicationOthers: ["Muut tilatoiveet"],
-    },
     errors: {
       accepting: {
         alreadyDeclined: ['Varaukselle "{{name}}" on jo tehty hylkäys.'],

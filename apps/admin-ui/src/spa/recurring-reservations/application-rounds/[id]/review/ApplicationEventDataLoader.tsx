@@ -35,7 +35,7 @@ export function ApplicationEventDataLoader({
   const [searchParams] = useSearchParams();
   const unitFilter = searchParams.getAll("unit");
   const applicantFilter = searchParams.getAll("applicant");
-  const nameFilter = searchParams.get("name");
+  const nameFilter = searchParams.get("search");
   const eventStatusFilter = searchParams.getAll("eventStatus");
 
   const { fetchMore, previousData, loading, data } = useQuery<

@@ -1,72 +1,19 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { AutoGrid, FullRow } from "@/styles/layout";
-import { SearchInput, Select } from "hds-react";
-import { useSearchParams } from "react-router-dom";
 import { SearchTags } from "@/component/SearchTags";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import {
   ApplicantTypeChoice,
   ApplicationEventStatusChoice,
 } from "common/types/gql-types";
-import { debounce } from "lodash";
 import { HR } from "@/component/Table";
+import { MultiSelectFilter, SearchFilter } from "@/component/QueryParamFilters";
 
 export type UnitPkName = {
   pk: number;
   nameFi: string;
 };
-
-// TODO is the T param good enough for type safety?
-// arrays of unions can be broken (ex. pushing a number to string[])
-// Discriminated Union can't be broken, but are unwieldy to use in this case
-// We want any type compatible with string | number be accepted
-// but never accept a combination of any of those types ex. [{label: "foo", value: 1}, {label: "bar", value: "baz"}]
-function MultiSelectFilter<T extends string | number>({
-  name,
-  options,
-}: {
-  name: string;
-  options: { label: string; value: T }[];
-}): JSX.Element {
-  const { t } = useTranslation();
-  const [params, setParams] = useSearchParams();
-
-  const filter = params.getAll(name);
-
-  // TODO copy paste from allocation/index.tsx
-  const setFilter = (value: string[] | null) => {
-    const vals = new URLSearchParams(params);
-    if (value == null || value.length === 0) {
-      vals.delete(name);
-    } else {
-      vals.set(name, value[0]);
-      value.forEach((v) => {
-        if (!vals.has(name, v)) {
-          vals.append(name, v);
-        }
-      });
-    }
-    setParams(vals, { replace: true });
-  };
-
-  const label = t(`filters.label.${name}`);
-  const placeholder = t(`filters.placeholder.${name}`);
-  return (
-    <Select
-      label={label}
-      multiselect
-      placeholder={placeholder}
-      // @ts-expect-error -- multiselect problems
-      options={options}
-      disabled={options.length === 0}
-      value={options.filter((v) => filter.includes(v.value.toString())) ?? null}
-      onChange={(val?: typeof options) =>
-        setFilter(val?.map((x) => x.value.toString()) ?? null)
-      }
-    />
-  );
-}
 
 type Props = {
   units: UnitPkName[];
@@ -123,19 +70,6 @@ export function Filters({
     }
   };
 
-  const [params, setParams] = useSearchParams();
-  const nameFilter = params.get("name");
-  const setNameFilter = (value: string | null) => {
-    const vals = new URLSearchParams(params);
-    if (value == null || value.length === 0) {
-      vals.delete("name");
-    } else {
-      vals.set("name", value);
-    }
-    setParams(vals, { replace: true });
-  };
-
-  // Hide the tags that don't have associated filter on the current tab
   const hideSearchTags: string[] = [
     "tab",
     "orderBy",
@@ -187,15 +121,7 @@ export function Filters({
           options={reservationUnitOptions}
         />
       )}
-      <SearchInput
-        label={t("Allocation.filters.label.search")}
-        placeholder={t("Allocation.filters.placeholder.search")}
-        onChange={debounce((str) => setNameFilter(str), 100, {
-          leading: true,
-        })}
-        onSubmit={() => {}}
-        value={nameFilter ?? ""}
-      />
+      <SearchFilter name="search" />
       <FullRow>
         <SearchTags hide={hideSearchTags} translateTag={translateTag} />
       </FullRow>

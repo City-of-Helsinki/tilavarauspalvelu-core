@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import { useQuery } from "@apollo/client";
-import { Combobox, SearchInput, Select, Tabs } from "hds-react";
+import { Select, Tabs } from "hds-react";
 import { useTranslation } from "react-i18next";
-import { debounce, uniqBy } from "lodash";
+import { uniqBy } from "lodash";
 import { useParams, useSearchParams } from "react-router-dom";
 import styled from "styled-components";
 import { H1, fontBold, fontMedium } from "common/src/common/typography";
@@ -33,6 +33,7 @@ import {
 } from "./queries";
 import { ApplicationEvents } from "./ApplicationEvents";
 import { APPLICATIONS_EVENTS_QUERY } from "../review/queries";
+import { ComboboxFilter, SearchFilter } from "@/component/QueryParamFilters";
 
 const MAX_RES_UNIT_NAME_LENGTH = 35;
 
@@ -123,7 +124,79 @@ const TabWrapper = styled.div`
   }
 `;
 
-type TimeFilterOptions = { label: string; value: 200 | 300 };
+type PriorityFilterOptions = { label: string; value: 200 | 300 };
+type PkFilterOptions = { label: string; value: number };
+
+function Filters({
+  units,
+  priorityOptions,
+  orderOptions,
+  cityOptions,
+  purposeOptions,
+  ageGroupOptions,
+}: {
+  units: UnitType[];
+  priorityOptions: PriorityFilterOptions[];
+  orderOptions: PkFilterOptions[];
+  cityOptions: PkFilterOptions[];
+  purposeOptions: PkFilterOptions[];
+  ageGroupOptions: PkFilterOptions[];
+}) {
+  const { t } = useTranslation();
+  const [searchParams, setParams] = useSearchParams();
+
+  const customerFilterOptions = Object.keys(ApplicantTypeChoice).map(
+    (value) => ({
+      label: t(`Application.applicantTypes.${value.toUpperCase()}`),
+      value: value as ApplicantTypeChoice,
+    })
+  );
+  const unitOptions = units.map((unit) => ({
+    value: unit.pk ?? 0,
+    label: unit.nameFi ?? "",
+  }));
+
+  const unitFilter = searchParams.get("unit");
+  const setUnitFilter = (value: number) => {
+    // NOTE different logic because values are not atomic and we need to set two params
+    const vals = new URLSearchParams(searchParams);
+    vals.set("unit", value.toString());
+    vals.delete("reservation-unit");
+    setParams(vals, { replace: true });
+  };
+
+  useEffect(() => {
+    if (units.length > 0 && unitFilter == null) {
+      setUnitFilter(units[0].pk ?? 0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- this is the correct list, but should be refactored
+  }, [units]);
+
+  return (
+    <>
+      {/* NOTE can't easily be refactored into reusable component because it has a side effect onChange */}
+      <Select
+        label={t("filters.label.unit")}
+        options={unitOptions}
+        disabled={unitOptions.length === 0}
+        value={unitOptions.find((v) => v.value === Number(unitFilter)) ?? null}
+        onChange={(val: { label: string; value: number }) =>
+          setUnitFilter(val.value ?? null)
+        }
+        placeholder={t("common.selectPlaceholder")}
+        clearButtonAriaLabel={t("common.clearAllSelections")}
+        selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
+      />
+      <ComboboxFilter name="priority" options={priorityOptions} />
+      <ComboboxFilter name="order" options={orderOptions} />
+      <SearchFilter name="search" />
+      <ComboboxFilter name="homeCity" options={cityOptions} />
+      <ComboboxFilter name="applicantType" options={customerFilterOptions} />
+      <ComboboxFilter name="ageGroup" options={ageGroupOptions} />
+      <ComboboxFilter name="purpose" options={purposeOptions} />
+    </>
+  );
+}
 
 function ApplicationRoundAllocation({
   applicationRoundId,
@@ -143,13 +216,6 @@ function ApplicationRoundAllocation({
 
   const { t } = useTranslation();
 
-  const customerFilterOptions = Object.keys(ApplicantTypeChoice).map(
-    (value) => ({
-      label: t(`Application.applicantTypes.${value.toUpperCase()}`),
-      value: value as ApplicantTypeChoice,
-    })
-  );
-
   const options = useOptions();
   const purposeOptions = options.purpose;
   const cityOptions = options.homeCity;
@@ -168,21 +234,6 @@ function ApplicationRoundAllocation({
     setParams(vals, { replace: true });
   };
 
-  const setUnitFilter = (value: number) => {
-    // NOTE different logic because values are not atomic and we need to set two params
-    const vals = new URLSearchParams(searchParams);
-    vals.set("unit", value.toString());
-    vals.delete("reservation-unit");
-    setParams(vals, { replace: true });
-  };
-
-  useEffect(() => {
-    if (units.length > 0 && unitFilter == null) {
-      setUnitFilter(units[0].pk ?? 0);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- this is the correct list, but should be refactored
-  }, [units]);
-
   const unitReservationUnits = reservationUnits.filter(
     (ru) => ru.unit?.pk != null && ru?.unit?.pk === Number(unitFilter)
   );
@@ -196,75 +247,17 @@ function ApplicationRoundAllocation({
     setSingleValueSearchParam("reservation-unit", value?.toString() ?? null);
   };
 
-  const nameFilter = searchParams.get("name");
-  const setNameFilter = (value: string) => {
-    const vals = new URLSearchParams(searchParams);
-    if (value === "") {
-      vals.delete("name");
-    } else {
-      vals.set("name", value);
-    }
-    setParams(vals, { replace: true });
-  };
-
-  const setMultivalueSearchParam = (param: string, value: string[] | null) => {
-    const vals = new URLSearchParams(searchParams);
-    if (value == null || value.length === 0) {
-      vals.delete(param);
-    } else {
-      vals.set(param, value[0]);
-      value.forEach((v) => {
-        if (!vals.has(param, v)) {
-          vals.append(param, v);
-        }
-      });
-    }
-    setParams(vals, { replace: true });
-  };
-
+  const nameFilter = searchParams.get("search");
   const applicantTypeFilter = searchParams.getAll("applicantType");
-  const setApplicantType = (value: ApplicantTypeChoice[] | null) => {
-    setMultivalueSearchParam(
-      "applicantType",
-      value?.map((v) => v.toString()) ?? null
-    );
-  };
-
-  const timeFilter = searchParams.getAll("time");
-  const setTimeFilter = (value: TimeFilterOptions["value"][] | null) => {
-    setMultivalueSearchParam("time", value?.map((v) => v.toString()) ?? null);
-  };
-
+  const priorityFilter = searchParams.getAll("priority");
   const orderFilter = searchParams.getAll("order");
-  const setOrderFilter = (value: number[] | null) => {
-    setMultivalueSearchParam("order", value?.map((v) => v.toString()) ?? null);
-  };
-
   const ageGroupFilter = searchParams.getAll("ageGroup");
-  const setAgeGroupFilter = (value: number[] | null) => {
-    setMultivalueSearchParam(
-      "ageGroup",
-      value?.map((v) => v.toString()) ?? null
-    );
-  };
-
-  const cityFilter = searchParams.getAll("city");
-  const setCityFilter = (value: number[] | null) => {
-    setMultivalueSearchParam("city", value?.map((v) => v.toString()) ?? null);
-  };
-
+  const cityFilter = searchParams.getAll("homeCity");
   const purposeFilter = searchParams.getAll("purpose");
-  const setPurposeFilter = (value: number[] | null) => {
-    setMultivalueSearchParam(
-      "purpose",
-      value?.map((v) => v.toString()) ?? null
-    );
-  };
 
-  // TODO sanitize all other query filters similar to this
+  // NOTE sanitize all other query filters similar to this
   // backend returns an error on invalid filter values, but user can cause them by manipulating the url
-  // TODO rename time => priority
-  const priorityFilter_ = timeFilter
+  const priorityFilterSanitized = priorityFilter
     ?.map((x) => Number(x))
     .reduce<Array<200 | 300>>((acc, x) => {
       if (x === 200 || x === 300) {
@@ -273,58 +266,59 @@ function ApplicationRoundAllocation({
       return acc;
     }, []);
 
+  // NOTE Default to 300 and 200 because there is a hidden 100 value that is not used
   const priorityFilterQuery =
-    priorityFilter_.length > 0 ? priorityFilter_ : [300, 200];
-  const { data, refetch } = useQuery<Query, QueryApplicationEventsArgs>(
-    APPLICATIONS_EVENTS_QUERY,
-    {
-      skip: !applicationRoundId,
-      // NOTE required otherwise this returns stale data when filters change
-      fetchPolicy: "cache-and-network",
-      variables: {
-        applicationRound: applicationRoundId,
-        ...(unitFilter != null ? { unit: [Number(unitFilter)] } : {}),
-        // NOTE there is an extra option of priority 100, which should never be used (old data)
-        priority: priorityFilterQuery,
-        ...(orderFilter != null &&
-        orderFilter.filter((x) => Number(x) <= 10).length > 0
-          ? {
-              preferredOrder: orderFilter
-                .map((x) => Number(x))
-                .filter((x) => x <= 10),
-            }
-          : {}),
-        includePreferredOrder10OrHigher:
-          orderFilter != null &&
-          orderFilter.filter((x) => Number(x) > 10).length > 0,
-        ...(nameFilter != null ? { textSearch: nameFilter } : {}),
-        ...(cityFilter != null
-          ? { homeCity: cityFilter.map((x) => Number(x)) }
-          : {}),
-        ...(applicantTypeFilter != null
-          ? {
-              applicantType: applicantTypeFilter.map((x) =>
-                transformApplicantType(x)
-              ),
-            }
-          : {}),
-        ...(purposeFilter != null
-          ? { purpose: purposeFilter.map((x) => Number(x)) }
-          : {}),
-        ...(ageGroupFilter != null
-          ? { ageGroup: ageGroupFilter.map((ag) => Number(ag)) }
-          : {}),
-        reservationUnit:
-          selectedReservationUnit != null
-            ? [Number(selectedReservationUnit)]
-            : [],
-        applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,
-      },
-      onError: () => {
-        notifyError(t("errors.errorFetchingData"));
-      },
-    }
+    priorityFilterSanitized.length > 0 ? priorityFilterSanitized : [300, 200];
+  const ageGroupFilterQuery = ageGroupFilter
+    .map(Number)
+    .filter(Number.isFinite);
+  const cityFilterQuery = cityFilter.map(Number).filter(Number.isFinite);
+  const purposeFilterQuery = purposeFilter.map(Number).filter(Number.isFinite);
+  const applicantTypeFilterQuery = filterNonNullable(
+    applicantTypeFilter.map((x) => transformApplicantType(x))
   );
+  const reservationUnitFilterQuery = Number.isFinite(
+    Number(selectedReservationUnit)
+  )
+    ? [Number(selectedReservationUnit)]
+    : undefined;
+  const unitFilterQuery = Number.isFinite(Number(unitFilter))
+    ? [Number(unitFilter)]
+    : undefined;
+  const preferredOrderFilterQuery = orderFilter
+    .map(Number)
+    .filter((x) => x >= 0 && x <= 10);
+  const includePreferredOrder10OrHigher =
+    orderFilter.length > 0
+      ? orderFilter.filter((x) => Number(x) > 10).length > 0
+      : undefined;
+
+  const { data, refetch, previousData } = useQuery<
+    Query,
+    QueryApplicationEventsArgs
+  >(APPLICATIONS_EVENTS_QUERY, {
+    skip: !applicationRoundId,
+    // NOTE required otherwise this returns stale data when filters change
+    fetchPolicy: "cache-and-network",
+    variables: {
+      applicationRound: applicationRoundId,
+      // TODO unit is superflous since we are filtering by reservation unit
+      unit: unitFilterQuery,
+      priority: priorityFilterQuery,
+      preferredOrder: preferredOrderFilterQuery,
+      includePreferredOrder10OrHigher,
+      textSearch: nameFilter,
+      homeCity: cityFilterQuery,
+      applicantType: applicantTypeFilterQuery,
+      purpose: purposeFilterQuery,
+      ageGroup: ageGroupFilterQuery,
+      reservationUnit: reservationUnitFilterQuery,
+      applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,
+    },
+    onError: () => {
+      notifyError(t("errors.errorFetchingData"));
+    },
+  });
 
   // TODO this can be combined with the above query (but requires casting the alias)
   const { data: allEventsData } = useQuery<Query, QueryApplicationEventsArgs>(
@@ -347,16 +341,13 @@ function ApplicationRoundAllocation({
   );
   const totalNumberOfEvents = allEvents.length;
 
+  // TODO show loading state somewhere down the line
+  const appEventsData = data ?? previousData;
   const applicationEvents = filterNonNullable(
-    data?.applicationEvents?.edges.map((e) => e?.node)
+    appEventsData?.applicationEvents?.edges.map((e) => e?.node)
   );
 
-  const unitOptions = units.map((unit) => ({
-    value: unit.pk ?? 0,
-    label: unit.nameFi ?? "",
-  }));
-
-  const timeOptions = ([300, 200] as const).map((n) => ({
+  const priorityOptions = ([300, 200] as const).map((n) => ({
     value: n,
     label: t(`ApplicationEvent.priority.${n}`),
   }));
@@ -364,18 +355,18 @@ function ApplicationRoundAllocation({
   const orderOptions = Array.from(Array(10).keys())
     .map((n) => ({
       value: n,
-      label: `${n + 1}. ${t("Allocation.filters.reservationUnitApplication")}`,
+      label: `${n + 1}. ${t("filters.reservationUnitApplication")}`,
     }))
     .concat([
       {
         value: 11,
-        label: `${t("Allocation.filters.reservationUnitApplicationOthers")}`,
+        label: `${t("filters.reservationUnitApplicationOthers")}`,
       },
     ]);
 
   const translateTag = (key: string, value: string) => {
     switch (key) {
-      case "city":
+      case "homeCity":
         return cityOptions.find((o) => String(o.value) === value)?.label ?? "";
       case "textSearch":
         return value;
@@ -389,11 +380,13 @@ function ApplicationRoundAllocation({
         return (
           ageGroupOptions.find((o) => String(o.value) === value)?.label ?? ""
         );
-      case "time":
-        return timeOptions.find((o) => String(o.value) === value)?.label ?? "";
+      case "priority":
+        return (
+          priorityOptions.find((o) => String(o.value) === value)?.label ?? ""
+        );
       case "order":
         return orderOptions.find((o) => String(o.value) === value)?.label ?? "";
-      case "name":
+      case "search":
         return value;
       default:
         return key;
@@ -435,142 +428,13 @@ function ApplicationRoundAllocation({
         showLessLabel={t("ReservationUnitsSearch.lessFilters")}
         maximumNumber={4}
       >
-        <Select
-          label={t("Allocation.filters.label.unit")}
-          options={unitOptions}
-          disabled={unitOptions.length === 0}
-          value={
-            unitOptions.find((v) => v.value === Number(unitFilter)) ?? null
-          }
-          onChange={(val: { label: string; value: number }) =>
-            setUnitFilter(val.value ?? null)
-          }
-          placeholder={t("common.selectPlaceholder")}
-          clearButtonAriaLabel={t("common.clearAllSelections")}
-          selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
-        />
-        <Combobox<typeof timeOptions>
-          label={t("Allocation.filters.label.schedules")}
-          clearable
-          multiselect
-          /* @ts-expect-error - multiselect issues */
-          options={timeOptions}
-          disabled={timeOptions.length === 0}
-          value={
-            timeOptions.filter((v) =>
-              timeFilter.includes(v.value.toString())
-            ) ?? null
-          }
-          onChange={(val?: TimeFilterOptions[]) =>
-            setTimeFilter(val?.map((x) => x.value) ?? null)
-          }
-          placeholder={t("Allocation.filters.placeholder.time")}
-          clearButtonAriaLabel={t("common.clearAllSelections")}
-          selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
-        />
-        <Combobox<typeof orderOptions>
-          label={t("Allocation.filters.label.reservationUnitOrder")}
-          clearable
-          multiselect
-          /* @ts-expect-error - multiselect issues */
-          options={orderOptions}
-          disabled={orderOptions.length === 0}
-          value={
-            orderOptions.filter((v) =>
-              orderFilter.includes(v.value.toString())
-            ) ?? null
-          }
-          onChange={(val?: typeof orderOptions) =>
-            setOrderFilter(val?.map((x) => x.value) ?? null)
-          }
-          placeholder={t("Allocation.filters.placeholder.order")}
-          clearButtonAriaLabel={t("common.clearAllSelections")}
-          selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
-        />
-        <SearchInput
-          label={t("Allocation.filters.label.search")}
-          onChange={debounce((str) => setNameFilter(str), 100, {
-            leading: true,
-          })}
-          onSubmit={() => {}}
-          value={nameFilter ?? ""}
-          placeholder={t("Allocation.filters.placeholder.search")}
-        />
-        <Combobox<typeof cityOptions>
-          label={t("Allocation.filters.label.homeCity")}
-          clearable
-          multiselect
-          /* @ts-expect-error - multiselect issues */
-          options={cityOptions}
-          disabled={cityOptions.length === 0}
-          value={
-            cityOptions.filter((v) =>
-              cityFilter.includes(v.value.toString())
-            ) ?? null
-          }
-          onChange={(val?: typeof cityOptions) =>
-            setCityFilter(val?.map((x) => x.value) ?? null)
-          }
-          placeholder={t("Allocation.filters.placeholder.homeCity")}
-          clearButtonAriaLabel={t("common.clearAllSelections")}
-          selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
-        />
-        <Combobox<typeof customerFilterOptions>
-          label={t("Allocation.filters.label.applicantType")}
-          clearable
-          multiselect
-          /* @ts-expect-error - multiselect issues */
-          options={customerFilterOptions}
-          disabled={customerFilterOptions.length === 0}
-          value={
-            customerFilterOptions.filter((v) =>
-              applicantTypeFilter.includes(v.value.toString())
-            ) ?? null
-          }
-          onChange={(val?: typeof customerFilterOptions) =>
-            setApplicantType(val?.map((x) => x.value) ?? null)
-          }
-          placeholder={t("Allocation.filters.placeholder.applicantType")}
-          clearButtonAriaLabel={t("common.clearAllSelections")}
-          selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
-        />
-        <Combobox<typeof ageGroupOptions>
-          label={t("filters.ageGroup")}
-          clearable
-          multiselect
-          /* @ts-expect-error - multiselect issues */
-          options={ageGroupOptions}
-          disabled={ageGroupOptions.length === 0}
-          value={
-            ageGroupOptions.filter((v) =>
-              ageGroupFilter.includes(v.value.toString())
-            ) ?? null
-          }
-          onChange={(val?: typeof ageGroupOptions) =>
-            setAgeGroupFilter(val?.map((x) => x.value) ?? null)
-          }
-          placeholder={t("Allocation.filters.placeholder.ageGroup")}
-          clearButtonAriaLabel={t("common.clearAllSelections")}
-          selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
-        />
-        <Combobox<typeof purposeOptions>
-          label={t("filters.purpose")}
-          clearable
-          multiselect
-          /* @ts-expect-error - multiselect issues */
-          options={purposeOptions}
-          disabled={purposeOptions.length === 0}
-          value={
-            purposeOptions.filter((v) =>
-              purposeFilter.includes(v.value.toString())
-            ) ?? null
-          }
-          onChange={(val?: typeof purposeOptions) =>
-            setPurposeFilter(val?.map((x) => x.value) ?? null)
-          }
-          placeholder={t("Allocation.filters.placeholder.purpose")}
-          clearButtonAriaLabel={t("common.clearAllSelections")}
-          selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
+        <Filters
+          units={units}
+          priorityOptions={priorityOptions}
+          orderOptions={orderOptions}
+          cityOptions={cityOptions}
+          purposeOptions={purposeOptions}
+          ageGroupOptions={ageGroupOptions}
         />
       </MoreWrapper>
       <SearchTags hide={hideSearchTags} translateTag={translateTag} />
@@ -665,7 +529,7 @@ function AllocationWrapper({
   const reservationUnits = filterNonNullable(appRound?.reservationUnits);
   const unitData = reservationUnits.map((ru) => ru?.unit);
 
-  // TODO sort by name (they are in a random order because of the nested structure)
+  // TODO name sort fails with numbers because 11 < 2
   const units = uniqBy(filterNonNullable(unitData), "pk")
     .filter((unit) =>
       hasUnitPermission(Permission.CAN_VALIDATE_APPLICATIONS, unit)

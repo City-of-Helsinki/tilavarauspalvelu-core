@@ -38,7 +38,7 @@ export function AllocatedEventDataLoader({
   const [searchParams] = useSearchParams();
   const unitFilter = searchParams.getAll("unit");
   const applicantFilter = searchParams.getAll("applicant");
-  const nameFilter = searchParams.get("name");
+  const nameFilter = searchParams.get("search");
   const appEventStatusFilter = searchParams.getAll("eventStatus");
   const weekDayFilter = searchParams.getAll("weekday");
   const reservationUnitFilter = searchParams.getAll("reservationUnit");
