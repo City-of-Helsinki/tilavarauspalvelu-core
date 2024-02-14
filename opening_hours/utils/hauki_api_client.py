@@ -1,26 +1,20 @@
 import datetime
-import json
-import logging
 from typing import NotRequired, TypedDict, Unpack
 
 from django.conf import settings
-from requests import Response, request
 
-from opening_hours.errors import HaukiAPIError, HaukiConfigurationError, HaukiRequestError
+from opening_hours.errors import HaukiAPIError, HaukiConfigurationError
 from opening_hours.utils.hauki_api_types import (
     HaukiAPIOpeningHoursResponse,
     HaukiAPIOpeningHoursResponseItem,
     HaukiAPIResource,
     HaukiAPIResourceListResponse,
 )
+from utils.external_service.base_external_service_client import BaseExternalServiceClient
 
 __all__ = [
     "HaukiAPIClient",
 ]
-
-REQUESTS_TIMEOUT = 15
-
-logger = logging.getLogger(__name__)
 
 
 class HaukiGetResourcesParams(TypedDict):
@@ -34,17 +28,17 @@ class HaukiGetResourcesParams(TypedDict):
     page_size: NotRequired[int]
 
 
-class HaukiAPIClient:
+class HaukiAPIClient(BaseExternalServiceClient):
+    SERVICE_NAME = "Hauki"
+    REQUEST_TIMEOUT_SECONDS = 30
+
     ############
     # resource #
     ############
 
     @classmethod
     def get_resources(
-        cls,
-        *,
-        hauki_resource_ids: list[int],
-        **kwargs: Unpack[HaukiGetResourcesParams],
+        cls, *, hauki_resource_ids: list[int], **kwargs: Unpack[HaukiGetResourcesParams]
     ) -> HaukiAPIResourceListResponse:
         # Prepare the URL
         url = cls._build_url("resource")
@@ -52,27 +46,38 @@ class HaukiAPIClient:
             "resource_ids": ",".join(str(id_) for id_ in hauki_resource_ids),
             **kwargs,
         }
-
         return cls.get(url=url, params=query_params)
 
     @classmethod
     def get_resource(cls, *, hauki_resource_id: str) -> HaukiAPIResource:
         url = cls._build_url(f"resource/{hauki_resource_id}")
+        response_json = cls.get(url=url)
 
-        return cls.get(url=url)
+        if not response_json.get("id"):
+            raise HaukiAPIError("Hauki API did not return a resource id.")
+
+        return response_json
 
     @classmethod
     def create_resource(cls, *, data: dict) -> HaukiAPIResource:
         url = cls._build_url("resource")
+        response_json = cls.post(url=url, data=data)
 
-        return cls.post(url=url, data=data)
+        if not response_json.get("id"):
+            raise HaukiAPIError("Hauki API did not return a resource id.")
+
+        return response_json
 
     @classmethod
     def update_resource(cls, *, data: dict) -> HaukiAPIResource:
         hauki_resource_id = data["id"]
         url = cls._build_url(f"resource/{hauki_resource_id}")
+        response_json = cls.put(url=url, data=data)
 
-        return cls.put(url=url, data=data)
+        if not response_json.get("id"):
+            raise HaukiAPIError("Hauki API did not return a resource id.")
+
+        return response_json
 
     #################
     # opening_hours #
@@ -103,95 +108,55 @@ class HaukiAPIClient:
         }
 
         # Get the data from Hauki API
-        response: HaukiAPIOpeningHoursResponse = cls.get(url=url, params=query_params)
-        if response["count"] == 0:
+        response_json: HaukiAPIOpeningHoursResponse = cls.get(url=url, params=query_params)
+        if response_json["count"] == 0:
             raise HaukiAPIError(f"Hauki API did not return any resources matching '{hauki_resource_id}'.")
-        if response["count"] > 1:
+        if response_json["count"] > 1:
             raise HaukiAPIError("Received too many results from Hauki API.")
 
-        return response["results"][0]
+        return response_json["results"][0]
 
     ##################
     # Helper methods #
     ##################
 
     @staticmethod
-    def _build_url(endpoint: str):
+    def _build_url(endpoint: str) -> str:
         if not settings.HAUKI_API_URL:
             raise HaukiConfigurationError("HAUKI_API_URL environment variable must to be configured.")
 
         hauki_api_url_base = settings.HAUKI_API_URL.removesuffix("/")
         return f"{hauki_api_url_base}/v1/{endpoint}/"
 
-    @staticmethod
-    def _hauki_response_json(response: Response):
-        """
-        Parse a response from Hauki API as json
-        Raises an appropriate error if parsing fails or response is not ok
-        """
-        try:
-            response_json = response.json()
-        except ValueError:
-            logger.exception("Could not read Hauki response as json.")
-            raise HaukiRequestError("Parsing Hauki API return data failed")
-
-        if not response.ok:
-            if "detail" in response_json:
-                logger.error(f"Hauki API returned an error: {response_json['detail']}")
-            else:
-                logger.error("Hauki API returned an error")
-            raise HaukiAPIError("Hauki API returned an error")
-
-        return response_json
-
-    ################
-    # Base methods #
-    ################
+    @classmethod
+    def get(
+        cls, *, url: str, params: dict | None = None, headers: dict | None = None
+    ) -> HaukiAPIResource | HaukiAPIResourceListResponse | HaukiAPIOpeningHoursResponse:
+        response = super().get(url=url, params=params, headers=headers)
+        return cls.response_json(response)
 
     @classmethod
-    def generic(cls, method: str, url: str, **kwargs):
-        try:
-            response = request(method, url, **kwargs, timeout=REQUESTS_TIMEOUT)
-        except Exception:
-            logger.exception("Request to Hauki API failed.")
-            raise HaukiRequestError(f"{method.upper()} request to Hauki url: {url} failed")
-
-        return cls._hauki_response_json(response)
-
-    @classmethod
-    def get(cls, url: str, params: dict | None = None):
-        return cls.generic(
-            "get",
-            url,
-            params=params,
-        )
-
-    @classmethod
-    def post(cls, url: str, data: dict):
+    def post(cls, *, url: str, data: dict | None = None, **headers) -> HaukiAPIResource:
         if not settings.HAUKI_API_KEY:
             raise HaukiConfigurationError("HAUKI_API_KEY environment variable must to be configured.")
 
-        return cls.generic(
-            "post",
-            url,
-            data=json.dumps(data),
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": f"APIToken {settings.HAUKI_API_KEY}",
-            },
-        )
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"APIToken {settings.HAUKI_API_KEY}",
+            **headers,
+        }
+        response = super().put(url=url, data=data, headers=headers)
+        return cls.response_json(response)
 
     @classmethod
-    def put(cls, url: str, data: dict):
+    def put(cls, *, url: str, data: dict | None = None, **headers) -> HaukiAPIResource:
         if not settings.HAUKI_API_KEY:
             raise HaukiConfigurationError("HAUKI_API_KEY environment variable must to be configured.")
 
-        return cls.generic(
-            "put",
-            url,
-            data=json.dumps(data),
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": f"APIToken {settings.HAUKI_API_KEY}",
-            },
-        )
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"APIToken {settings.HAUKI_API_KEY}",
+            **headers,
+        }
+        response = super().put(url=url, data=data, headers=headers)
+        return cls.response_json(response)

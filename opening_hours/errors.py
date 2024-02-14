@@ -1,21 +1,12 @@
-class HaukiError(Exception):
-    """Base class for all Hauki client errors"""
+from utils.external_service.errors import ExternalServiceError
 
 
-class HaukiRequestError(HaukiError):
-    """Request to the Hauki API failed"""
-
-
-class HaukiAPIError(HaukiError):
+class HaukiAPIError(ExternalServiceError):
     """Request succeeded but Hauki API returned an error"""
 
 
-class HaukiConfigurationError(HaukiError):
+class HaukiConfigurationError(ExternalServiceError):
     """Hauki API settings are not configured correctly"""
-
-
-class HaukiValueError(HaukiError):
-    """Generic Value error related to Hauki"""
 
 
 class ReservableTimeSpanClientError(Exception):

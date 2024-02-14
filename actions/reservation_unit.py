@@ -6,10 +6,11 @@ from typing import TYPE_CHECKING, Any
 from django.db import models
 
 from common.date_utils import time_as_timedelta
-from opening_hours.errors import HaukiAPIError, HaukiRequestError, HaukiValueError
+from opening_hours.errors import HaukiAPIError
 from opening_hours.models import OriginHaukiResource
 from opening_hours.utils.hauki_api_client import HaukiAPIClient
 from opening_hours.utils.hauki_api_types import HaukiAPIResource, HaukiTranslatedField
+from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     from reservation_units.models import ReservationUnit
@@ -43,10 +44,10 @@ class ReservationUnitHaukiExporter:
     def _convert_reservation_unit_to_hauki_resource_data(self) -> dict[str, Any]:
         parent_unit_resource_id = self._get_parent_resource_id()
         if not parent_unit_resource_id:
-            raise HaukiValueError("Parent Unit does have 'Hauki Resource' set and could not get it from Hauki API.")
+            raise HaukiAPIError("Parent Unit does have 'Hauki Resource' set and could not get it from Hauki API.")
 
         if not self.reservation_unit.unit.tprek_department_id:
-            raise HaukiValueError("Parent Unit does not have a department id.")
+            raise HaukiAPIError("Parent Unit does not have a department id.")
 
         return {
             "name": HaukiTranslatedField(
@@ -99,16 +100,13 @@ class ReservationUnitHaukiExporter:
         try:
             resource_data = HaukiAPIClient.get_resource(hauki_resource_id=unit_origin_resource_id)
             return resource_data["id"]
-        except (HaukiAPIError, HaukiRequestError, KeyError, IndexError, TypeError):
+        except (ExternalServiceError, KeyError, IndexError, TypeError):
             return None
 
     def _create_hauki_resource(self, hauki_resource_data):
         """Create a new HaukiResource in Hauki API for the ReservationUnit."""
         # New Hauki Resource, create it in Hauki API and update the reservation unit
         response_data: HaukiAPIResource = HaukiAPIClient.create_resource(data=hauki_resource_data)
-
-        if not response_data["id"]:
-            raise HaukiValueError("Hauki API did not return a resource id.")
 
         # Save the returned Hauki Resource to the database as OriginHaukiResource
         origin_hauki_resource, _ = OriginHaukiResource.objects.get_or_create(id=response_data["id"])

@@ -13,11 +13,9 @@ from api.graphql.types.reservation_units.serializers import (
     ReservationUnitUpdateSerializer,
 )
 from api.graphql.types.reservation_units.types import ReservationUnitType
-from opening_hours.errors import HaukiAPIError, HaukiRequestError
 from opening_hours.utils.hauki_resource_hash_updater import HaukiResourceHashUpdater
-from reservation_units.models import (
-    ReservationUnit,
-)
+from reservation_units.models import ReservationUnit
+from utils.external_service.errors import ExternalServiceError
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +37,7 @@ class ReservationUnitMutationMixin:
         if settings.HAUKI_EXPORTS_ENABLED:
             try:
                 reservation_unit.actions.send_reservation_unit_to_hauki()
-            except (HaukiRequestError, HaukiAPIError):
+            except ExternalServiceError:
                 raise GraphQLError("Sending reservation unit as resource to HAUKI failed.")
 
         return mutation_response
