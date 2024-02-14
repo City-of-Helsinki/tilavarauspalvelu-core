@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Button, IconAngleLeft, IconAngleRight, DateInput } from "hds-react";
 import { fromUIDate, toUIDate } from "common/src/common/util";
 import { breakpoints } from "common";
+import { toMondayFirstUnsafe } from "common/src/helpers";
 
 type Props = {
   date: string;
@@ -64,7 +65,7 @@ const DayNavigation = ({ date, onDateChange }: Props): JSX.Element => {
       >
         {" "}
       </Button>
-      <WeekDay>{`${t(`dayShort.${d.getDay()}`)} `}</WeekDay>
+      <WeekDay>{`${t(`dayShort.${toMondayFirstUnsafe(d.getDay())}`)} `}</WeekDay>
       <SimpleDatePicker
         disableConfirmation
         id="date-input"
