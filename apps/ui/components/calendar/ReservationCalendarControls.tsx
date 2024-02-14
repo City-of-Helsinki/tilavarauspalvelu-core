@@ -200,13 +200,17 @@ const Price = styled.div`
 `;
 
 const ResetButton = styled(Button).attrs({
-  variant: "supplementary",
+  variant: "secondary",
   iconLeft: <IconCross aria-hidden />,
 })<{ $isLast: boolean }>`
   --color: var(--color-black);
 
   white-space: nowrap;
   order: 1;
+
+  span {
+    ${fontRegular};
+  }
 
   svg {
     min-width: 24px;
@@ -220,7 +224,7 @@ const ResetButton = styled(Button).attrs({
   @media (min-width: ${breakpoints.xl}) {
     grid-column: unset;
 
-    svg {
+    [class*="Button-module__icon"] {
       display: none;
     }
   }
