@@ -19,6 +19,7 @@ __all__ = [
     "local_time_min",
     "local_time_max",
     "local_start_of_day",
+    "local_end_of_day",
     "utc_datetime",
     "utc_date",
     "utc_time",
@@ -154,6 +155,13 @@ def local_start_of_day(_date: datetime.date | datetime.datetime, /) -> datetime.
     if isinstance(_date, datetime.datetime):
         _date = _date.astimezone(DEFAULT_TIMEZONE).date()
     return datetime.datetime.combine(_date, datetime.time.min, tzinfo=DEFAULT_TIMEZONE)
+
+
+def local_end_of_day(_date: datetime.date | datetime.datetime, /) -> datetime.datetime:
+    """Get the end of day (23:59:59) as datetime for the given date in local timezone."""
+    if isinstance(_date, datetime.datetime):
+        _date = _date.astimezone(DEFAULT_TIMEZONE).date()
+    return datetime.datetime.combine(_date, datetime.time.max, tzinfo=DEFAULT_TIMEZONE)
 
 
 ### UTC TIME #############################################################################################
