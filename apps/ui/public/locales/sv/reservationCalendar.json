@@ -87,9 +87,6 @@
   "reservationQuotaFull_other": "Du kan inte göra nya bokningar.",
   "quickReservation": {
     "heading": "Se lediga tider och boka",
-    "date": "Dag",
-    "time": "Tid (från)",
-    "duration": "Längd (t:mm)",
     "subheading": "Lediga tider",
     "noTimes": "Inga lediga tider",
     "gotoCalendar": "Se alla lediga tider",

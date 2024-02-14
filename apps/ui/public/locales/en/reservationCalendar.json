@@ -87,9 +87,6 @@
   "reservationQuotaFull_other": "You cannot make new bookings.",
   "quickReservation": {
     "heading": "See the available times and make a booking",
-    "date": "Date",
-    "time": "Time (from)",
-    "duration": "Duration (h:mm)",
     "subheading": "Available times",
     "noTimes": "No available times",
     "gotoCalendar": "See all available times",

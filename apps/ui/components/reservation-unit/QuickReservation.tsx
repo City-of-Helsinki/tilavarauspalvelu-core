@@ -581,7 +581,7 @@ const QuickReservation = ({
       <Selects>
         <DateInput
           id="quick-reservation-date"
-          label={t("reservationCalendar:quickReservation.date")}
+          label={t("reservationCalendar:startDate")}
           initialMonth={new Date()}
           language={getLocalizationLang(i18n.language)}
           onChange={(_val, valueAsDate) => {
@@ -609,7 +609,7 @@ const QuickReservation = ({
         <StyledTimeInput
           key={`timeInput-${time}`}
           id="quick-reservation-time"
-          label={t("reservationCalendar:quickReservation.time")}
+          label={t("reservationCalendar:startTime")}
           hoursLabel={t("common:hours")}
           minutesLabel={t("common:minutes")}
           defaultValue={time}
@@ -628,7 +628,7 @@ const QuickReservation = ({
         <StyledSelect
           key={`durationSelect-${duration?.value}`}
           id="quick-reservation-duration"
-          label={t("reservationCalendar:quickReservation.duration")}
+          label={t("reservationCalendar:duration")}
           options={durationOptions}
           onChange={(val: OptionType) => setDuration(val)}
           defaultValue={duration}
