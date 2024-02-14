@@ -360,6 +360,14 @@ const eventStyleGetter = (
       style.color = "var(--color-black)";
   }
 
+  if (event?.isBlocked) {
+    style.color = "transparent";
+    style.backgroundColor = "var(--color-black-5)";
+    style.border = "1px solid var(--color-black-30)";
+    style.borderLeft = "2px solid var(--color-black-30)";
+    className = "rbc-timeslot-inactive";
+  }
+
   return {
     style,
     className,
