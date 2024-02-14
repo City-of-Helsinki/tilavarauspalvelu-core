@@ -1,10 +1,14 @@
-from unittest import mock
-
+import pytest
 from django.test import override_settings
-from django.test.testcases import TestCase
 
+from opening_hours.utils.hauki_api_client import HaukiAPIClient
 from spaces.importers.units import UnitHaukiResourceIdImporter
 from tests.factories import UnitFactory
+from tests.helpers import patch_method
+
+pytestmark = [
+    pytest.mark.django_db,
+]
 
 RET_VAL = {
     "count": 1,
@@ -32,22 +36,24 @@ RETURN_VALUES = [RET_VAL, SECOND_RET_VAL]
 
 
 @override_settings(HAUKI_API_URL="url")
-@mock.patch("spaces.importers.units.HaukiAPIClient.get", side_effect=RETURN_VALUES)
-class HaukiResourceIdImporterTestCase(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.unit = UnitFactory(tprek_id=1)
+@patch_method(HaukiAPIClient.get, side_effect=RETURN_VALUES)
+def test__hauki_resource_id_importer__from_unit_id():
+    unit = UnitFactory(tprek_id=1)
+    importer = UnitHaukiResourceIdImporter()
+    importer.import_hauki_resource_ids_for_units(unit_ids=[unit.id])
+    unit.refresh_from_db()
 
-    def test_resource_id_is_imported_from_unit_ids(self, mock):
-        importer = UnitHaukiResourceIdImporter()
-        importer.import_hauki_resource_ids_for_units(unit_ids=[self.unit.id])
-        self.unit.refresh_from_db()
-        assert self.unit.origin_hauki_resource.id == 1
-        assert mock.call_count == 2
+    assert unit.origin_hauki_resource.id == 1
+    assert HaukiAPIClient.get.call_count == 2
 
-    def test_resource_id_is_importer_from_tprek_ids(self, mock):
-        importer = UnitHaukiResourceIdImporter()
-        importer.import_hauki_resource_ids_for_units(tprek_ids=[self.unit.tprek_id])
-        self.unit.refresh_from_db()
-        assert self.unit.origin_hauki_resource.id == 1
-        assert mock.call_count == 2
+
+@override_settings(HAUKI_API_URL="url")
+@patch_method(HaukiAPIClient.get, side_effect=RETURN_VALUES)
+def test__hauki_resource_id_importer__from_tprek_id():
+    unit = UnitFactory(tprek_id=1)
+    importer = UnitHaukiResourceIdImporter()
+    importer.import_hauki_resource_ids_for_units(tprek_ids=[unit.tprek_id])
+    unit.refresh_from_db()
+
+    assert unit.origin_hauki_resource.id == 1
+    assert HaukiAPIClient.get.call_count == 2

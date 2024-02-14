@@ -74,15 +74,15 @@ def test_reservation_unit__create__send_to_hauki__succeeded(graphql, settings):
 
     response = graphql(CREATE_MUTATION, input_data=data)
 
+    assert HaukiAPIClient.get_resource.call_count == 1
+    assert HaukiAPIClient.create_resource.call_count == 1
+
     assert response.has_errors is False
 
     reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
     assert reservation_unit.is_draft is True
     assert reservation_unit.unit == unit
     assert reservation_unit.origin_hauki_resource.id == 123
-
-    assert HaukiAPIClient.get_resource.call_count == 1
-    assert HaukiAPIClient.create_resource.call_count == 1
 
 
 @patch_method(HaukiAPIClient.get_resource, return_value=HaukiAPIResource(id=123))
@@ -100,6 +100,9 @@ def test_reservation_unit__create__send_to_hauki__failed(graphql, settings):
 
     response = graphql(CREATE_MUTATION, input_data=data)
 
+    assert HaukiAPIClient.get_resource.call_count == 1
+    assert HaukiAPIClient.create_resource.call_count == 1
+
     assert response.error_message() == "Sending reservation unit as resource to HAUKI failed."
 
     # Unit is still created
@@ -107,11 +110,7 @@ def test_reservation_unit__create__send_to_hauki__failed(graphql, settings):
     assert reservation_unit is not None
     assert reservation_unit.is_draft is True
     assert reservation_unit.unit == unit
-    # It doesn't have origin hauki resource
-    assert reservation_unit.origin_hauki_resource is None
-
-    assert HaukiAPIClient.get_resource.call_count == 1
-    assert HaukiAPIClient.create_resource.call_count == 1
+    assert reservation_unit.origin_hauki_resource is None  # Unit doesn't have origin hauki resource
 
 
 def test_reservation_unit__create__empty_name(graphql):
