@@ -12,7 +12,6 @@ from merchants.verkkokauppa.exceptions import VerkkokauppaConfigurationError
 from merchants.verkkokauppa.merchants.exceptions import (
     CreateMerchantError,
     GetMerchantError,
-    GetMerchantsError,
     ParseMerchantError,
     UpdateMerchantError,
 )
@@ -70,30 +69,6 @@ def update_merchant(merchant_uuid: UUID, params: UpdateMerchantParams, post=_pos
         return Merchant.from_json(json)
     except (RequestException, JSONDecodeError, ParseMerchantError) as e:
         raise UpdateMerchantError("Merchant update failed") from e
-
-
-def get_merchants(get=_get) -> list[Merchant]:
-    try:
-        response = get(
-            url=urljoin(
-                _get_base_url(),
-                f"list/merchants/{settings.VERKKOKAUPPA_NAMESPACE}",
-            ),
-            headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
-            timeout=REQUEST_TIMEOUT_SECONDS,
-        )
-
-        json = response.json()
-        if response.status_code != 200:
-            raise GetMerchantsError(f"Fetching merchants failed: {json.get('errors')}")
-
-        result = []
-        for merchant_data in json.values():
-            result.append(Merchant.from_json(merchant_data))
-    except (RequestException, JSONDecodeError, ParseMerchantError) as e:
-        raise GetMerchantsError("Fetching merchants failed") from e
-
-    return result
 
 
 def get_merchant(merchant_uuid: UUID, get=_get) -> MerchantInfo | None:

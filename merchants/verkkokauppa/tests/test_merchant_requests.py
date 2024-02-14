@@ -1,15 +1,13 @@
 from typing import Any
-from unittest.mock import Mock
 from uuid import UUID
 
 from assertpy import assert_that
 from django.conf import settings
 from django.test.testcases import TestCase
-from requests import Timeout
 
 from merchants.verkkokauppa.constants import REQUEST_TIMEOUT_SECONDS
-from merchants.verkkokauppa.merchants.exceptions import CreateMerchantError, GetMerchantsError, UpdateMerchantError
-from merchants.verkkokauppa.merchants.requests import create_merchant, get_merchant, get_merchants, update_merchant
+from merchants.verkkokauppa.merchants.exceptions import CreateMerchantError, UpdateMerchantError
+from merchants.verkkokauppa.merchants.requests import create_merchant, get_merchant, update_merchant
 from merchants.verkkokauppa.merchants.types import CreateMerchantParams, Merchant, MerchantInfo, UpdateMerchantParams
 from merchants.verkkokauppa.tests.mocks import mock_get, mock_post
 
@@ -88,117 +86,6 @@ class MerchantRequestsBaseTestCase(TestCase):
         "merchantOrderWebhookUrl": "https://tilavaraus.dev.hel.ninja/v1/webhook/order/",
         "merchantPaymentWebhookUrl": "https://tilavaraus.dev.hel.ninja/v1/webhook/payment/",
         "merchantShopId": "test-shop-id",
-    }
-
-    get_merchants_response: dict[str, Any] = {
-        "0": {
-            "merchantId": "7107df38-5985-39c9-8c83-ffe18bff24f5",
-            "namespace": "tilanvaraus",
-            "createdAt": "2022-09-26T10:11:12.000",
-            "updatedAt": "2022-09-27T10:11:12.000",
-            "configurations": [
-                {"key": "merchantName", "value": "Test Merchant", "restricted": False},
-                {
-                    "key": "merchantStreet",
-                    "value": "Test Street 1",
-                    "restricted": False,
-                },
-                {"key": "merchantZip", "value": "00112", "restricted": False},
-                {"key": "merchantCity", "value": "Helsinki", "restricted": False},
-                {
-                    "key": "merchantEmail",
-                    "value": "foo.bar@test.mail",
-                    "restricted": False,
-                },
-                {
-                    "key": "merchantPhone",
-                    "value": "+358 50 123 4567",
-                    "restricted": False,
-                },
-                {
-                    "key": "merchantUrl",
-                    "value": "https://test.url",
-                    "restricted": False,
-                },
-                {
-                    "key": "merchantTermsOfServiceUrl",
-                    "value": "https://test.url/tos",
-                    "restricted": False,
-                },
-                {"key": "merchantBusinessId", "value": "123456-7", "restricted": False},
-                {
-                    "key": "merchantOrderWebhookUrl",
-                    "value": "https://tilavaraus.dev.hel.ninja/v1/webhook/order/",
-                    "restricted": False,
-                },
-                {
-                    "key": "merchantPaymentWebhookUrl",
-                    "value": "https://tilavaraus.dev.hel.ninja/v1/webhook/payment/",
-                    "restricted": False,
-                },
-                {
-                    "key": "merchant-shop-id",
-                    "value": "test-shop-id",
-                    "restricted": False,
-                },
-            ],
-        },
-        "1": {
-            "merchantId": "0312c2f7-3ed6-409e-84e3-ae21196e685d",
-            "namespace": "tilanvaraus",
-            "createdAt": "2022-07-26T10:11:12.000",
-            "updatedAt": "2022-07-27T10:11:12.000",
-            "configurations": [
-                {
-                    "key": "merchantName",
-                    "value": "Test Merchant 2",
-                    "restricted": False,
-                },
-                {
-                    "key": "merchantStreet",
-                    "value": "Test Street 2",
-                    "restricted": False,
-                },
-                {"key": "merchantZip", "value": "99887", "restricted": False},
-                {"key": "merchantCity", "value": "Vantaa", "restricted": False},
-                {
-                    "key": "merchantEmail",
-                    "value": "foo.bar.2@test.mail",
-                    "restricted": False,
-                },
-                {
-                    "key": "merchantPhone",
-                    "value": "+358 40 876 5432",
-                    "restricted": False,
-                },
-                {
-                    "key": "merchantUrl",
-                    "value": "https://test.url.2",
-                    "restricted": False,
-                },
-                {
-                    "key": "merchantTermsOfServiceUrl",
-                    "value": "https://test.url/tos2",
-                    "restricted": False,
-                },
-                {"key": "merchantBusinessId", "value": "765432-1", "restricted": False},
-                {
-                    "key": "merchantOrderWebhookUrl",
-                    "value": "https://tilavaraus.dev.hel.ninja/v1/webhook/order/",
-                    "restricted": False,
-                },
-                {
-                    "key": "merchantPaymentWebhookUrl",
-                    "value": "https://tilavaraus.dev.hel.ninja/v1/webhook/payment/",
-                    "restricted": False,
-                },
-                {
-                    "key": "merchantShopId",
-                    "value": "another-shop-id",
-                    "restricted": False,
-                },
-            ],
-        },
     }
 
 
@@ -300,37 +187,6 @@ class UpdateMerchantRequestTestCase(MerchantRequestsBaseTestCase):
             self.update_merchant_params,
             post,
         )
-
-
-class GetMerchantsRequestTestCase(MerchantRequestsBaseTestCase):
-    def test_get_merchants_makes_valid_request(self):
-        get = mock_get(self.get_merchants_response)
-        get_merchants(get)
-        get.assert_called_with(
-            url=(settings.VERKKOKAUPPA_MERCHANT_API_URL + "/list/merchants/" + settings.VERKKOKAUPPA_NAMESPACE),
-            headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
-            timeout=REQUEST_TIMEOUT_SECONDS,
-        )
-
-    def test_get_merchants_returns_merchants(self):
-        merchants = get_merchants(mock_get(self.get_merchants_response))
-
-        merchant_1 = Merchant.from_json(self.get_merchants_response["0"])
-        merchant_2 = Merchant.from_json(self.get_merchants_response["1"])
-        expected = [merchant_1, merchant_2]
-
-        assert_that(merchants).is_equal_to(expected)
-
-    def test_get_merchants_raises_exception_if_merchant_id_is_missing(self):
-        response = {
-            "0": self.get_merchants_response["0"].copy(),
-            "1": self.get_merchants_response["1"].copy(),
-        }
-        response["0"].pop("merchantId")
-        assert_that(get_merchants).raises(GetMerchantsError).when_called_with(mock_get(response))
-
-    def test_get_merchants_raises_exception_on_timeout(self):
-        assert_that(get_merchants).raises(GetMerchantsError).when_called_with(Mock(side_effect=Timeout()))
 
 
 class GetMerchantRequestTestCase(MerchantRequestsBaseTestCase):
