@@ -61,8 +61,8 @@ const mapFilterParams = (
             ?.map((x) => (x != null ? String(x) : null))
         : defaults.state,
     textSearch: params.textSearch || undefined,
-    begin: parseDate(params.begin) || defaults.begin,
-    end: parseDate(params.end),
+    beginDate: parseDate(params.begin) ?? defaults.beginDate,
+    endDate: parseDate(params.end),
     priceGte: params.minPrice !== "" ? params.minPrice : undefined,
     priceLte: params.maxPrice !== "" ? params.maxPrice : undefined,
     orderStatus: params.paymentStatuses
@@ -110,7 +110,7 @@ const useReservations = (
     }
   );
 
-  const reservations = (data?.reservations?.edges || [])
+  const reservations = (data?.reservations?.edges ?? [])
     .map((edge) => edge?.node)
     .filter((x): x is ReservationType => x != null);
 
@@ -147,7 +147,7 @@ const ReservationsDataLoader = ({
         sortChanged={onSortChanged}
       />
       <More
-        totalCount={totalCount || 0}
+        totalCount={totalCount ?? 0}
         count={data.length}
         fetchMore={() => fetchMore({ variables: { offset } })}
       />

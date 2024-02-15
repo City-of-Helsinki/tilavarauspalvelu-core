@@ -2109,8 +2109,8 @@ export type QueryReservationUnitsArgs = {
 export type QueryReservationsArgs = {
   after?: InputMaybe<Scalars["String"]["input"]>;
   before?: InputMaybe<Scalars["String"]["input"]>;
-  begin?: InputMaybe<Scalars["DateTime"]["input"]>;
-  end?: InputMaybe<Scalars["DateTime"]["input"]>;
+  beginDate?: InputMaybe<Scalars["Date"]["input"]>;
+  endDate?: InputMaybe<Scalars["Date"]["input"]>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   last?: InputMaybe<Scalars["Int"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;

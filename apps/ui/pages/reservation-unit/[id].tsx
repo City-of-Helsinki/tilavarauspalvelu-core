@@ -467,7 +467,7 @@ const ReservationUnit = ({
       fetchPolicy: "no-cache",
       skip: !currentUser || !reservationUnit?.pk,
       variables: {
-        begin: now.toISOString(),
+        beginDate: now.toISOString(),
         user: currentUser?.pk?.toString(),
         reservationUnit: [reservationUnit?.pk?.toString() ?? ""],
         state: allowedReservationStates,
@@ -740,11 +740,7 @@ const ReservationUnit = ({
     { input: ReservationCreateMutationInput }
   >(CREATE_RESERVATION, {
     onCompleted: (data) => {
-      if (
-        initialReservation == null ||
-        data.createReservation == null ||
-        data.createReservation.pk == null
-      ) {
+      if (initialReservation == null || data.createReservation?.pk == null) {
         return;
       }
       setPendingReservation({
@@ -861,9 +857,8 @@ const ReservationUnit = ({
   useEffect(() => {
     if (
       quickReservationSlot &&
-      initialReservation &&
-      initialReservation.begin &&
-      initialReservation.end &&
+      initialReservation?.begin &&
+      initialReservation?.end &&
       (quickReservationSlot.start.toISOString() !== initialReservation.begin ||
         quickReservationSlot.end.toISOString() !== initialReservation.end)
     ) {

@@ -269,7 +269,7 @@ const ReservationEdit = ({ id, apiBaseUrl }: Props): JSX.Element => {
       fetchPolicy: "no-cache",
       skip: !currentUser || !reservationUnit,
       variables: {
-        begin: now,
+        beginDate: now,
         user: currentUser?.pk?.toString(),
         reservationUnit: [reservationUnit?.pk?.toString() ?? ""],
         state: allowedReservationStates,

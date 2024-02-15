@@ -1596,8 +1596,8 @@ type Query {
     after: String
     first: Int
     last: Int
-    begin: DateTime
-    end: DateTime
+    beginDate: Date
+    endDate: Date
     onlyWithPermission: Boolean
 
     """

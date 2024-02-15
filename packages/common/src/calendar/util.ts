@@ -285,7 +285,10 @@ export const doReservationsCollide = (
   const { start, end } = newReservation;
   return reservations.some((reservation) =>
     areIntervalsOverlapping(
-      { start: new Date(reservation.begin), end: new Date(reservation.end) },
+      {
+        start: new Date(reservation.begin),
+        end: new Date(reservation.end),
+      },
       { start, end }
     )
   );
@@ -359,8 +362,7 @@ export const isStartTimeWithinInterval = (
     .filter((n): n is NonNullable<typeof n> => n != null)
     .filter((n) => {
       if (n.start > start) return false;
-      if (n.end < start) return false;
-      return true;
+      return n.end >= start;
     })
     .filter((n) => {
       const begin = isSameDay(n.start, start)
@@ -493,8 +495,8 @@ export const getBufferedEventTimes = (
   bufferTimeBefore?: number,
   bufferTimeAfter?: number
 ): { start: Date; end: Date } => {
-  const before = addSeconds(start, -1 * (bufferTimeBefore || 0));
-  const after = addSeconds(end, bufferTimeAfter || 0);
+  const before = addSeconds(start, -1 * (bufferTimeBefore ?? 0));
+  const after = addSeconds(end, bufferTimeAfter ?? 0);
   return { start: before, end: after };
 };
 
@@ -642,7 +644,7 @@ export const isReservationStartInFuture = (
   reservationUnit: ReservationUnitNode,
   now = new Date()
 ): boolean => {
-  const bufferDays = reservationUnit.reservationsMaxDaysBefore || 0;
+  const bufferDays = reservationUnit.reservationsMaxDaysBefore ?? 0;
   const negativeBuffer = Math.abs(bufferDays) * -1;
 
   return (
@@ -654,7 +656,7 @@ export const isReservationStartInFuture = (
 export const getNormalizedReservationBeginTime = (
   reservationUnit: ReservationUnitNode
 ): string => {
-  const bufferDays = reservationUnit.reservationsMaxDaysBefore || 0;
+  const bufferDays = reservationUnit.reservationsMaxDaysBefore ?? 0;
   const negativeBuffer = Math.abs(bufferDays) * -1;
 
   return addDays(
@@ -702,7 +704,7 @@ export const getNewReservation = ({
       start,
       end: roundToNearestMinutes(end),
       reservationStartInterval,
-    }) || roundToNearestMinutes(end);
+    }) ?? roundToNearestMinutes(end);
 
   if (normalizedEnd < minEnd) {
     normalizedEnd = minEnd;

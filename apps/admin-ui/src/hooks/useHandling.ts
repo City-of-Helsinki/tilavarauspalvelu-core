@@ -14,7 +14,7 @@ const useHandling = () => {
     {
       skip: !isAuthenticated,
       variables: {
-        begin: today.toISOString(),
+        beginDate: today.toISOString(),
       },
     }
   );

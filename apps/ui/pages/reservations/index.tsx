@@ -105,8 +105,8 @@ const Reservations = (): JSX.Element | null => {
             ],
       orderBy: tab === "upcoming" ? "begin" : "-begin",
       user: currentUser?.pk?.toString(),
-      begin: tab === "upcoming" ? today.toISOString() : undefined,
-      end: tab === "past" ? today.toISOString() : undefined,
+      beginDate: tab === "upcoming" ? today.toISOString() : undefined,
+      endDate: tab === "past" ? today.toISOString() : undefined,
     },
   });
 
