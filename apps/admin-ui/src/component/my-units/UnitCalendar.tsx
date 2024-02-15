@@ -23,14 +23,14 @@ import {
 } from "common/types/gql-types";
 import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
+import { POST_PAUSE, PRE_PAUSE } from "@/common/calendarStyling";
+import { sortByName } from "@/common/util";
+import { useModal } from "@/context/ModalContext";
 import { CELL_BORDER, CELL_BORDER_LEFT, CELL_BORDER_LEFT_ALERT } from "./const";
-import ReservationPopupContent from "./ReservationPopupContent";
+import { ReservationPopupContent } from "./ReservationPopupContent";
 import resourceEventStyleGetter from "./eventStyleGetter";
-import { POST_PAUSE, PRE_PAUSE } from "../../common/calendarStyling";
 import { getReserveeName } from "../reservations/requested/util";
-import { sortByName } from "../../common/util";
 import CreateReservationModal from "./create-reservation/CreateReservationModal";
-import { useModal } from "../../context/ModalContext";
 
 export type Resource = {
   title: string;
@@ -396,10 +396,8 @@ const Events = ({
             >
               <EventContent style={{ ...eventStyleGetter(e).style }}>
                 <p>{title}</p>
-                <Popup
-                  position={["right center", "left center"]}
-                  trigger={EventTriggerButton}
-                >
+                {/* NOTE don't set position on Popup it breaks responsiveness */}
+                <Popup trigger={EventTriggerButton}>
                   {e.event && <ReservationPopupContent reservation={e.event} />}
                 </Popup>
               </EventContent>

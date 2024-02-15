@@ -2,14 +2,18 @@ import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { ReservationType } from "common/types/gql-types";
-import { Permission } from "app/modules/permissionHelper";
-import { reservationUrl } from "../../common/urls";
-import { formatTime } from "../../common/util";
-import { DenseVerticalFlex } from "../../styles/layout";
+import { Permission } from "@/modules/permissionHelper";
+import { reservationUrl } from "@/common/urls";
+import { formatTime } from "@/common/util";
+import { truncate } from "@/helpers";
+import { DenseVerticalFlex } from "@/styles/layout";
 import { getReserveeName } from "../reservations/requested/util";
 import { CELL_BORDER } from "./const";
 import VisibleIfPermission from "../reservations/requested/VisibleIfPermission";
 import { useTranslation } from "next-i18next";
+
+const MAX_POPOVER_COMMENT_LENGTH = 140;
+const POPOVER_MAX_WIDTH = 300;
 
 const PopupContent = styled.div`
   border: ${CELL_BORDER};
@@ -17,6 +21,7 @@ const PopupContent = styled.div`
   padding: var(--spacing-xs);
   background-color: white;
   font-size: var(--fontsize-body-s);
+  max-width: ${POPOVER_MAX_WIDTH}px;
 `;
 
 const Heading = styled.div``;
@@ -29,13 +34,14 @@ const WorkingMemo = styled.div`
   background-color: var(--color-black-5);
   padding: var(--spacing-xs);
   border-radius: 4px;
+  max-width: ${POPOVER_MAX_WIDTH - 20}px;
 `;
 
-const ReservationPopupContent = ({
+export function ReservationPopupContent({
   reservation,
 }: {
   reservation: ReservationType;
-}): JSX.Element => {
+}): JSX.Element {
   const { t } = useTranslation();
   const eventName = getReserveeName(reservation, t, 22) || "-";
   return (
@@ -59,12 +65,12 @@ const ReservationPopupContent = ({
             )}
           </Reservee>
           {reservation.workingMemo && (
-            <WorkingMemo>{reservation.workingMemo}</WorkingMemo>
+            <WorkingMemo>
+              {truncate(reservation.workingMemo, MAX_POPOVER_COMMENT_LENGTH)}
+            </WorkingMemo>
           )}
         </VisibleIfPermission>
       </DenseVerticalFlex>
     </PopupContent>
   );
-};
-
-export default ReservationPopupContent;
+}
