@@ -52,6 +52,7 @@ type Props = {
   setErrorMsg: React.Dispatch<React.SetStateAction<string | null>>;
   nextStep: () => void;
   apiBaseUrl: string;
+  isLoading: boolean;
 };
 
 type WeekOptions = "day" | "week" | "month";
@@ -121,6 +122,7 @@ const EditStep0 = ({
   setErrorMsg,
   nextStep,
   apiBaseUrl,
+  isLoading,
 }: Props): JSX.Element => {
   const { t, i18n } = useTranslation();
   const router = useRouter();
@@ -489,6 +491,7 @@ const EditStep0 = ({
             }
           }}
           data-testid="reservation-edit__button--continue"
+          isLoading={isLoading}
         >
           {t("reservationCalendar:nextStep")}
         </MediumButton>

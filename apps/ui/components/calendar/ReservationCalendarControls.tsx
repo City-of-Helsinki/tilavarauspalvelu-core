@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { useTranslation } from "next-i18next";
+import { useTranslation, type TFunction } from "next-i18next";
 import styled from "styled-components";
 import {
   differenceInMinutes,
@@ -238,7 +238,7 @@ const ResetButton = styled(Button).attrs({
 
 const SelectButton = styled(Button)`
   order: 7;
-  ${truncatedText}
+  ${truncatedText};
 
   @media (min-width: ${breakpoints.m}) {
     display: none;
@@ -290,6 +290,28 @@ const StyledSelect = styled(Select<OptionType>)`
   }
 `;
 
+const TogglerLabelContent = ({
+  areControlsVisible,
+  togglerLabel,
+  t,
+  price,
+}: {
+  areControlsVisible: boolean;
+  togglerLabel: string;
+  t: TFunction;
+  price?: string;
+}) => {
+  if (areControlsVisible) return <div>&nbsp;</div>;
+  return (
+    <>
+      <TogglerDate>{togglerLabel}</TogglerDate>
+      <TogglerPrice>
+        {t("reservationUnit:price")}: {price}
+      </TogglerPrice>
+    </>
+  );
+};
+
 const ReservationCalendarControls = <T extends Record<string, unknown>>({
   reservationUnit,
   initialReservation,
@@ -310,7 +332,7 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
 }: Props<T>): JSX.Element => {
   const { t, i18n } = useTranslation();
 
-  const { begin, end } = initialReservation || {};
+  const { begin, end } = initialReservation ?? {};
   const {
     minReservationDuration,
     maxReservationDuration,
@@ -640,7 +662,8 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
                 });
               }
             }}
-            disabled={!isReservable || isReserving}
+            disabled={!isReservable}
+            isLoading={isReserving}
             data-test="reservation__button--submit"
           >
             {t("reservationCalendar:makeReservation")}
@@ -657,16 +680,12 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
         <ToggleControls>
           <TogglerLabel>
             {isReservable ? (
-              areControlsVisible ? (
-                <div>&nbsp;</div>
-              ) : (
-                <>
-                  <TogglerDate>{togglerLabel}</TogglerDate>
-                  <TogglerPrice>
-                    {t("reservationUnit:price")}: {price}
-                  </TogglerPrice>
-                </>
-              )
+              <TogglerLabelContent
+                areControlsVisible={areControlsVisible}
+                togglerLabel={togglerLabel}
+                t={t}
+                price={price}
+              />
             ) : (
               t("reservationCalendar:selectTime")
             )}

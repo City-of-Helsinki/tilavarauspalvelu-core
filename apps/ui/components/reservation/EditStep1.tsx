@@ -351,6 +351,7 @@ const EditStep1 = ({
             type="submit"
             disabled={isSubmitting}
             data-testid="reservation-edit__button--submit"
+            isLoading={isSubmitting}
           >
             {t("reservations:saveNewTime")}
           </MediumButton>

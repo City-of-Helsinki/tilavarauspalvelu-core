@@ -24,11 +24,11 @@ import {
   CANCEL_RESERVATION,
   GET_RESERVATION,
   GET_RESERVATION_CANCEL_REASONS,
-} from "../../modules/queries/reservation";
-import { JustForDesktop, JustForMobile } from "../../modules/style/layout";
-import { getSelectedOption, getTranslation } from "../../modules/util";
+} from "@/modules/queries/reservation";
+import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
+import { getSelectedOption, getTranslation } from "@/modules/util";
 import { CenterSpinner } from "../common/common";
-import { BlackButton, MediumButton, Toast } from "../../styles/util";
+import { BlackButton, MediumButton, Toast } from "@/styles/util";
 import ReservationInfoCard from "./ReservationInfoCard";
 import { Paragraph } from "./styles";
 import { signOut } from "@/hooks/auth";
@@ -338,6 +338,7 @@ const ReservationCancellation = ({ id, apiBaseUrl }: Props): JSX.Element => {
                           type="submit"
                           disabled={!watch("reason")}
                           data-testid="reservation-cancel__button--cancel"
+                          isLoading={loading}
                         >
                           {t("reservations:cancelReservation")}
                         </MediumButton>

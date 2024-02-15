@@ -397,6 +397,7 @@ const QuickReservation = ({
     minReservationDuration,
     maxReservationDuration,
     reservationStartInterval,
+    t,
   ]);
 
   // TODO this should be on a timer
@@ -696,13 +697,14 @@ const QuickReservation = ({
           componentIfAuthenticated={
             isReservationUnitReservable && (
               <MediumButton
-                disabled={!slot || isReserving}
+                disabled={!slot}
                 onClick={() => {
                   if (localReservation != null) {
                     setIsReserving(true);
                     createReservation(localReservation);
                   }
                 }}
+                isLoading={isReserving}
                 data-test="quick-reservation__button--submit"
               >
                 {t("reservationCalendar:makeReservation")}

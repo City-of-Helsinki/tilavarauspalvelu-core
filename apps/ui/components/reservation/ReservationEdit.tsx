@@ -436,6 +436,7 @@ const ReservationEdit = ({ id, apiBaseUrl }: Props): JSX.Element => {
               setErrorMsg={setErrorMsg}
               nextStep={() => setStep(1)}
               apiBaseUrl={apiBaseUrl}
+              isLoading={isLoading}
             />
           )}
           {step === 1 && (

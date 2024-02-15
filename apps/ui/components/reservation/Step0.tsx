@@ -10,11 +10,11 @@ import { Trans, useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { fontMedium, fontRegular } from "common/src/common/typography";
 import MetaFields from "common/src/reservation-form/MetaFields";
-import { MediumButton } from "../../styles/util";
+import { MediumButton } from "@/styles/util";
 import { ActionContainer } from "./styles";
 import { getTranslation } from "../../modules/util";
 import InfoDialog from "../common/InfoDialog";
-import { JustForMobile } from "../../modules/style/layout";
+import { JustForMobile } from "@/modules/style/layout";
 import {
   ErrorAnchor,
   ErrorBox,
