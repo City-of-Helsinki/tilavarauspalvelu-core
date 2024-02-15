@@ -22,13 +22,7 @@ import {
 import classNames from "classnames";
 import { IconArrowRight, IconCross } from "hds-react";
 import { useRouter } from "next/router";
-import React, {
-  CSSProperties,
-  Children,
-  useCallback,
-  useMemo,
-  useState,
-} from "react";
+import React, { Children, useCallback, useMemo, useState } from "react";
 import { useTranslation } from "next-i18next";
 import { useMedia } from "react-use";
 import styled from "styled-components";
@@ -44,6 +38,7 @@ import { BlackButton, MediumButton } from "@/styles/util";
 import Legend from "../calendar/Legend";
 import ReservationCalendarControls from "../calendar/ReservationCalendarControls";
 import { CalendarWrapper } from "../reservation-unit/ReservationUnitStyles";
+import { eventStyleGetter } from "@/components/common/calendarUtils";
 
 type Props = {
   reservation: ReservationType;
@@ -58,8 +53,6 @@ type Props = {
   nextStep: () => void;
   apiBaseUrl: string;
 };
-
-type ReservationStateWithInitial = string;
 
 type WeekOptions = "day" | "week" | "month";
 
@@ -89,60 +82,6 @@ const Actions = styled.div`
     flex-direction: row;
   }
 `;
-
-const eventStyleGetter = (
-  { event }: CalendarEvent<ReservationType>,
-  ownReservations: number[]
-): { style: React.CSSProperties; className?: string } => {
-  const draggable = true;
-  const style: CSSProperties = {
-    borderRadius: "0px",
-    opacity: "0.8",
-    color: "var(--color-white)",
-    display: "block",
-    borderColor: "transparent",
-  };
-  let className = "";
-
-  const eventPk: number | undefined =
-    event != null && "pk" in event
-      ? event?.pk ?? undefined
-      : Number(event?.id) ?? undefined;
-  const eventState = event?.state as ReservationStateWithInitial;
-  const isOwn =
-    eventPk != null &&
-    ownReservations.includes(eventPk) &&
-    eventState !== "BUFFER";
-
-  const state = isOwn ? "OWN" : eventState;
-
-  switch (state) {
-    case "INITIAL":
-      style.backgroundColor = "var(--tilavaraus-event-initial-color)";
-      style.color = "var(--color-black)";
-      style.border = "2px dashed var(--tilavaraus-event-initial-border)";
-      className = draggable ? "rbc-event-movable" : "";
-      break;
-    case "OWN":
-      style.backgroundColor = "var(--tilavaraus-event-initial-color)";
-      style.color = "var(--color-black)";
-      style.border = "2px solid var(--tilavaraus-event-initial-border)";
-      break;
-    case "BUFFER":
-      style.backgroundColor = "var(--color-black-5)";
-      className = "rbc-event-buffer";
-      break;
-    default:
-      style.backgroundColor = "var(--tilavaraus-event-reservation-color)";
-      style.border = "2px solid var(--tilavaraus-event-reservation-border)";
-      style.color = "var(--color-black)";
-  }
-
-  return {
-    style,
-    className,
-  };
-};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO type calendar props
 const EventWrapperComponent = (props: any): JSX.Element => {
