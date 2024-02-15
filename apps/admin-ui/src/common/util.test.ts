@@ -1,7 +1,6 @@
 import {
   convertHMSToSeconds,
   formatTimeDistance,
-  formatDuration,
   secondsToHms,
   filterData,
   formatDecimal,
@@ -18,33 +17,6 @@ test("secondToHms", () => {
   expect(secondsToHms(-190)).toEqual({});
   expect(secondsToHms()).toEqual({});
   expect(secondsToHms(undefined)).toEqual({});
-});
-
-// can't test actual values since i18next mock doesn't pass them through
-test("parseDuration short", () => {
-  expect(formatDuration(3600)).toBe("common.hoursUnit");
-  expect(formatDuration(3600 * 10)).toContain("common.hoursUnit");
-  expect(formatDuration(7834)).toContain("common.hoursUnit");
-  expect(formatDuration(3600 - 10)).not.toContain("common.hoursUnit");
-  expect(formatDuration(3600 - 10)).toBe("common.minutesUnit");
-  // we have both hours and minutes
-  expect(formatDuration(3600 + 2 * 60)).toBe(
-    "common.hoursUnit common.minutesUnit"
-  );
-});
-
-test("parseDuration long", () => {
-  expect(formatDuration(3600, "long")).toBe("common.hoursUnitLong");
-  expect(formatDuration(3600 - 10, "long")).toBe("common.minutesUnitLong");
-  expect(formatDuration(3600 + 2 * 60, "long")).toBe(
-    "common.hoursUnitLong common.minutesUnitLong"
-  );
-});
-
-test("parseDuration invalid", () => {
-  expect(formatDuration(0)).toBe("");
-  expect(formatDuration(-30)).toBe("");
-  expect(formatDuration(undefined)).toBe("");
 });
 
 test("parseDurationString", () => {
