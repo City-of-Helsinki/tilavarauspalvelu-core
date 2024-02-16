@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mock Verkkokauppa Checkout</title>
+</head>
+<body>
+<div>
+    <h1>Mock Verkkokauppa Checkout</h1>
+    <p>Order UUID: {{ order_uuid }}</p>
+    <p>Order Status: {{ payment_order.status }}</p>
+    <p>Reservation ID: {{ reservation.id }}</p>
+    <p>Reservation Name: {{ reservation.name }}</p>
+    <p>Reservation Reservee: {{ reservation.reservee_name }}</p>
+    <p>Reservation Price: {{ reservation.price }}€</p>
+</div>
+<div>
+    <form method='POST'>
+        <button type="submit" name="payment_success">Payment Success</button>
+    </form>
+    <br>
+    <form method='POST'>
+        <button type="submit" name="payment_cancelled">Payment Cancel</button>
+    </form>
+</div>
+</body>
+</html>

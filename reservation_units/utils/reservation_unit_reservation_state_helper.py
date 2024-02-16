@@ -1,6 +1,7 @@
 import datetime
 from dataclasses import dataclass, field
 
+from django.conf import settings
 from django.db.models import Expression, F, OuterRef, Q, Subquery
 
 from common.date_utils import local_datetime
@@ -123,15 +124,24 @@ class ReservationUnitReservationStateHelper:
         if active_price is None:
             return False
 
-        # Pricing is free
+        # If USE_MOCK_VERKKOKAUPPA_API is True there is no need to check for payment products,
+        if settings.USE_MOCK_VERKKOKAUPPA_API:
+            return True
+
+        # Pricing is FREE
         if active_price.pricing_type == PricingType.FREE:
             return True
-        # Pricing is paid and there is a payment product
+        # Pricing is PAID and there is a payment product
         else:
             return reservation_unit.payment_product is not None
 
     @classmethod
     def __has_valid_pricing_query(cls) -> Q:
+        # If USE_MOCK_VERKKOKAUPPA_API is True there is no need to check for payment products,
+        # as the products are created when a reservation is made.
+        if settings.USE_MOCK_VERKKOKAUPPA_API:
+            return Q(active_pricing_type__isnull=False)
+
         return (
             # Pricing is paid and there is a payment product
             Q(active_pricing_type=PricingType.PAID, payment_product__isnull=False)
@@ -301,12 +311,20 @@ class ReservationUnitReservationStateHelper:
             or cls.__is_scheduled_closing_period(now, reservation_unit)
         ) and (
             active_price is None
-            or (active_price.pricing_type == PricingType.PAID and reservation_unit.payment_product is None)
+            or (
+                active_price.pricing_type == PricingType.PAID
+                and reservation_unit.payment_product is None
+                and not settings.USE_MOCK_VERKKOKAUPPA_API  # Don't show as closed if using Mock Verkkokauppa API
+            )
         )
 
     @classmethod
     def __get_is_reservation_closed_query(cls) -> QueryState:
         now = local_datetime()
+
+        payment_product_query = Q(active_pricing_type=PricingType.PAID) & Q(payment_product__isnull=True)
+        if settings.USE_MOCK_VERKKOKAUPPA_API:
+            payment_product_query = Q()
 
         return QueryState(
             aliases=cls.__active_pricing_type_alias(),
@@ -316,10 +334,7 @@ class ReservationUnitReservationStateHelper:
                 | Q(reservation_ends=F("reservation_begins"))
                 | (
                     (cls.__is_reservable_period_query() | cls.__is_scheduled_closing_period_query())
-                    & (
-                        Q(active_pricing_type=None)
-                        | (Q(active_pricing_type=PricingType.PAID) & Q(payment_product__isnull=True))
-                    )
+                    & (Q(active_pricing_type=None) | payment_product_query)
                 )
             ),
         )

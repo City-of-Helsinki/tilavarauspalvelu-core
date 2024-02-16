@@ -1,19 +1,25 @@
+import uuid
 from datetime import datetime, timedelta
 from decimal import Decimal
 
 from django.conf import settings
+from django.urls import reverse
 from django.utils.timezone import get_default_timezone
 
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
+from common.date_utils import local_datetime
+from merchants.models import PaymentMerchant, PaymentProduct
 from merchants.verkkokauppa.exceptions import UnsupportedMetaKey
 from merchants.verkkokauppa.order.exceptions import CreateOrderError
 from merchants.verkkokauppa.order.requests import create_order
 from merchants.verkkokauppa.order.types import (
     CreateOrderParams,
+    Order,
     OrderCustomer,
     OrderItemMetaParams,
     OrderItemParams,
 )
+from reservation_units.utils.reservation_unit_payment_helper import ReservationUnitPaymentHelper
 from reservations.models import Reservation
 from tilavarauspalvelu.utils.date_util import localized_short_weekday
 from utils.decimal_utils import round_decimal
@@ -63,7 +69,10 @@ def get_meta_label(key: str, reservation: Reservation) -> str:
     return labels[key][preferred_language]
 
 
-def create_verkkokauppa_order(reservation: Reservation):
+def create_verkkokauppa_order(reservation: Reservation) -> Order:
+    if settings.USE_MOCK_VERKKOKAUPPA_API:
+        return create_mock_verkkokauppa_order(reservation)
+
     order_params: CreateOrderParams = _get_order_params(reservation)
 
     try:
@@ -78,15 +87,15 @@ def create_verkkokauppa_order(reservation: Reservation):
 
 
 def _get_order_params(reservation: Reservation) -> CreateOrderParams:
-    runit = reservation.reservation_unit.first()
+    reservation_unit = reservation.reservation_unit.first()
     quantity = 1  # Currently, we don't support quantities larger than 1
     price_net = round_decimal(Decimal(quantity * reservation.price_net), 2)
     price_vat = round_decimal(Decimal(quantity * reservation.price_net * (reservation.tax_percentage_value / 100)), 2)
     preferred_language = getattr(reservation, "reservee_language", "fi")
     items = [
         OrderItemParams(
-            product_id=runit.payment_product.id,
-            product_name=getattr(runit, f"name_{preferred_language}", runit.name),
+            product_id=reservation_unit.payment_product.id,
+            product_name=getattr(reservation_unit, f"name_{preferred_language}", reservation_unit.name),
             quantity=1,
             unit="pcs",
             row_price_net=price_net,
@@ -99,7 +108,7 @@ def _get_order_params(reservation: Reservation) -> CreateOrderParams:
             meta=[
                 OrderItemMetaParams(
                     key="namespaceProductId",
-                    value=runit.uuid,
+                    value=reservation_unit.uuid,
                     label=None,
                     visible_in_checkout=False,
                     ordinal="0",
@@ -141,3 +150,50 @@ def _get_order_params(reservation: Reservation) -> CreateOrderParams:
     )
 
     return order_params
+
+
+def create_mock_verkkokauppa_order(reservation: Reservation) -> Order:
+    reservation_unit = reservation.reservation_unit.first()
+
+    if reservation_unit.payment_product is None:
+        payment_merchant = ReservationUnitPaymentHelper.get_merchant(reservation_unit)
+        if payment_merchant is None:
+            payment_merchant = PaymentMerchant.objects.create(id=uuid.uuid4(), name="MOCK VERKKOKAUPPA MERCHANT")
+            reservation_unit.payment_merchant = payment_merchant
+
+        payment_product = PaymentProduct.objects.create(id=uuid.uuid4(), merchant=payment_merchant)
+        reservation_unit.payment_product = payment_product
+        reservation_unit.save()
+
+    order_uuid = uuid.uuid4()
+    quantity = 1
+    price_net = round_decimal(Decimal(quantity * reservation.price_net), 2)
+    price_vat = round_decimal(Decimal(quantity * reservation.price_net * (reservation.tax_percentage_value / 100)), 2)
+
+    # Assume that the first URL in CORS_ALLOWED_ORIGINS is the backend URL
+    base_url = settings.CORS_ALLOWED_ORIGINS[0].strip("/")
+    # Reservation URI in the django admin
+    mock_verkkokauppa_checkout_url = reverse("mock_verkkokauppa", args=[order_uuid]).strip("/")
+    admin_url = reverse("admin:reservations_reservation_change", args=[reservation.id]).strip("/")
+
+    return Order(
+        order_id=order_uuid,
+        namespace=settings.VERKKOKAUPPA_NAMESPACE,
+        user="test-user",
+        created_at=local_datetime(),
+        items=[],
+        price_net=price_net,
+        price_vat=price_vat,
+        price_total=price_net + price_vat,
+        customer=OrderCustomer(
+            first_name=reservation.user.first_name,
+            last_name=reservation.user.last_name,
+            email=reservation.user.email,
+            phone="",
+        ),
+        status="draft",
+        subscription_id=None,
+        type="order",
+        checkout_url=f"{base_url}/{mock_verkkokauppa_checkout_url}/",
+        receipt_url=f"{base_url}/{admin_url}/?",
+    )

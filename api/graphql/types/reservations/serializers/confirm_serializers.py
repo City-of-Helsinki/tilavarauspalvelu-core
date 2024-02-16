@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from api.graphql.extensions.legacy_helpers import OldChoiceCharField
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from api.graphql.types.reservations.serializers.update_serializers import (
@@ -5,6 +7,7 @@ from api.graphql.types.reservations.serializers.update_serializers import (
 )
 from merchants.models import Language, OrderStatus, PaymentOrder
 from merchants.verkkokauppa.helpers import create_verkkokauppa_order
+from merchants.verkkokauppa.order.types import Order
 from reservation_units.enums import PaymentType, PricingType
 from reservation_units.utils.reservation_unit_pricing_helper import (
     ReservationUnitPricingHelper,
@@ -61,25 +64,26 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
     def validate(self, data, prefill_from_profile=False):
         data = super().validate(data)
 
-        if self.instance.payment_order.exists():
+        if self.instance.payment_order.exists() == 1:
             raise ValidationErrorWithCode(
                 "Reservation cannot be changed anymore because it is attached to a payment order",
                 ValidationErrorCodes.CHANGES_NOT_ALLOWED,
             )
 
-        if self.instance.reservation_unit.count() > 1:
+        elif self.instance.reservation_unit.count() > 1:
             raise ValidationErrorWithCode(
                 "Reservations with multiple reservation units are not supported.",
                 ValidationErrorCodes.MULTIPLE_RESERVATION_UNITS,
             )
 
+        # If reservation requires handling, it can't be confirmed here and needs to be manually handled by the staff
         if not self.instance.requires_handling:
             payment_type = data.get("payment_type", "").upper()
             reservation_unit = self.instance.reservation_unit.first()
 
             active_price = ReservationUnitPricingHelper.get_active_price(reservation_unit)
             if active_price.pricing_type == PricingType.PAID or self.instance.price_net > 0:
-                if not reservation_unit.payment_product:
+                if not reservation_unit.payment_product and not settings.USE_MOCK_VERKKOKAUPPA_API:
                     raise ValidationErrorWithCode(
                         "Reservation unit is missing payment product",
                         ValidationErrorCodes.MISSING_PAYMENT_PRODUCT,
@@ -138,7 +142,7 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
                     reservation=self.instance,
                 )
             else:
-                payment_order = create_verkkokauppa_order(self.instance)
+                payment_order: Order = create_verkkokauppa_order(self.instance)
                 PaymentOrder.objects.create(
                     payment_type=payment_type,
                     status=OrderStatus.DRAFT,

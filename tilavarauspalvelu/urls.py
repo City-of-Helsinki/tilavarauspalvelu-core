@@ -23,6 +23,9 @@ urlpatterns = [
     path("tinymce/", include("tinymce.urls")),
 ]
 
+if settings.USE_MOCK_VERKKOKAUPPA_API:
+    urlpatterns.append(path("mock_verkkokauppa/", include("merchants.mock_verkkokauppa_api.urls")))
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
