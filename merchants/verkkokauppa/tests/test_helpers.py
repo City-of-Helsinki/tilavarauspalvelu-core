@@ -13,6 +13,10 @@ from merchants.verkkokauppa.helpers import create_verkkokauppa_order, get_format
 from reservations.choices import CustomerTypeChoice
 from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory
 
+pytestmark = [
+    pytest.mark.usefixtures("_setup_verkkokauppa_env_variables"),
+]
+
 
 @freeze_time("2022-11-05T10:00:00")
 class HelpersTestCase(TestCase):

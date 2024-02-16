@@ -4,6 +4,7 @@ from decimal import Decimal
 from unittest.mock import patch
 
 import freezegun
+import pytest
 from assertpy import assert_that
 from django.contrib.auth import get_user_model
 from django.core import mail
@@ -24,6 +25,10 @@ from tests.factories import (
     ReservationFactory,
     ReservationUnitPricingFactory,
 )
+
+pytestmark = [
+    pytest.mark.usefixtures("_setup_verkkokauppa_env_variables"),
+]
 
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")

@@ -8,6 +8,10 @@ from django.test.testcases import TestCase
 from reservations.tasks import refund_paid_reservation_task
 from tests.factories import PaymentOrderFactory, ReservationFactory
 
+pytestmark = [
+    pytest.mark.usefixtures("_setup_verkkokauppa_env_variables"),
+]
+
 
 class RefundPaidReservationTestCase(TestCase):
     def test_does_not_fail_when_reservation_is_missing(self):

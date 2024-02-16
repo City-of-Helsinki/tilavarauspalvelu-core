@@ -9,6 +9,7 @@ from tests.factories import PaymentProductFactory, ReservationUnitFactory, Reser
 
 pytestmark = [
     pytest.mark.django_db,
+    pytest.mark.usefixtures("_setup_verkkokauppa_env_variables"),
 ]
 
 
