@@ -75,6 +75,17 @@ def _setup_hauki(settings):
     settings.HAUKI_ADMIN_UI_URL = "https://test.com"
 
 
+@pytest.fixture()
+def _setup_verkkokauppa(settings):
+    settings.VERKKOKAUPPA_API_KEY = "test-api-key"
+    settings.VERKKOKAUPPA_PRODUCT_API_URL = "http://test-product:1234"
+    settings.VERKKOKAUPPA_ORDER_API_URL = "http://test-order:1234"
+    settings.VERKKOKAUPPA_PAYMENT_API_URL = "http://test-payment:1234"
+    settings.VERKKOKAUPPA_MERCHANT_API_URL = "http://test-merchant:1234"
+    settings.VERKKOKAUPPA_NAMESPACE = "tilanvaraus"
+    settings.USE_MOCK_VERKKOKAUPPA_API = False
+
+
 @pytest.hookimpl()
 def pytest_addoption(parser: pytest.Parser) -> None:
     parser.addoption("--skip-elastic", action="store_true", default=False, help="Skip tests that need Elasticsearch.")

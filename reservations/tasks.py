@@ -1,3 +1,7 @@
+import uuid
+
+from django.conf import settings
+
 from merchants.models import PaymentOrder
 from merchants.pruning import update_expired_orders
 from merchants.verkkokauppa.payment.requests import refund_order
@@ -60,6 +64,10 @@ def refund_paid_reservation_task(reservation_pk: int) -> None:
     if not payment_order:
         return
 
-    refund = refund_order(payment_order.remote_id)
-    payment_order.refund_id = refund.refund_id
-    payment_order.save()
+    if not settings.USE_MOCK_VERKKOKAUPPA_API:
+        refund = refund_order(payment_order.remote_id)
+        payment_order.refund_id = refund.refund_id
+        payment_order.save()
+    else:
+        payment_order.refund_id = uuid.uuid4()
+        payment_order.save()
