@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from unittest.mock import patch
 
 import pytest
 from assertpy import assert_that
@@ -10,8 +9,10 @@ from freezegun import freeze_time
 
 from merchants.verkkokauppa.exceptions import UnsupportedMetaKey
 from merchants.verkkokauppa.helpers import create_verkkokauppa_order, get_formatted_reservation_time, get_meta_label
+from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.choices import CustomerTypeChoice
 from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory
+from tests.helpers import patch_method
 
 pytestmark = [
     pytest.mark.usefixtures("_setup_verkkokauppa_env_variables"),
@@ -64,8 +65,8 @@ class HelpersTestCase(TestCase):
         date = get_formatted_reservation_time(self.reservation)
         assert_that(date).is_equal_to("La 5.11.2022 10:00-12:00")
 
-    @patch("merchants.verkkokauppa.helpers.create_order")
-    def test_create_verkkokauppa_order_respect_reservee_language(self, mock_create_order):
+    @patch_method(VerkkokauppaAPIClient.create_order)
+    def test_create_verkkokauppa_order_respect_reservee_language(self):
         user = get_user_model().objects.create(
             username="testuser",
             first_name="Test",
@@ -93,10 +94,10 @@ class HelpersTestCase(TestCase):
         )
 
         create_verkkokauppa_order(reservation_en)
-        assert_that(mock_create_order.call_args.args[0].items[0].product_name).is_equal_to("Name")
+        assert VerkkokauppaAPIClient.create_order.call_args.kwargs["order_params"].items[0].product_name == "Name"
 
         create_verkkokauppa_order(reservation_sv)
-        assert_that(mock_create_order.call_args.args[0].items[0].product_name).is_equal_to("Namn")
+        assert VerkkokauppaAPIClient.create_order.call_args.kwargs["order_params"].items[0].product_name == "Namn"
 
     def test_get_meta_label_returns_label_with_supported_key(self):
         period_label = get_meta_label("reservationPeriod", self.reservation)

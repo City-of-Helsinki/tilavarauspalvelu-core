@@ -41,7 +41,7 @@ from api.graphql.types.reservations.types import ReservationType
 from common.typing import GQLInfo
 from merchants.models import OrderStatus, PaymentOrder
 from merchants.verkkokauppa.order.exceptions import CancelOrderError
-from merchants.verkkokauppa.order.requests import cancel_order
+from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.choices import ReservationStateChoice
 from reservations.models import Reservation
 from utils.sentry import log_exception_to_sentry
@@ -180,7 +180,10 @@ class ReservationDeleteMutation(OldAuthDeleteMutation, ClientIDMutation):
         payment_order: PaymentOrder = reservation.payment_order.first()
         if payment_order and payment_order.remote_id and payment_order.status != OrderStatus.CANCELLED.value:
             try:
-                webshop_order = cancel_order(payment_order.remote_id, payment_order.reservation_user_uuid)
+                webshop_order = VerkkokauppaAPIClient.cancel_order(
+                    order_uuid=payment_order.remote_id,
+                    user_uuid=payment_order.reservation_user_uuid,
+                )
 
                 if webshop_order and webshop_order.status == "cancelled":
                     payment_order.status = OrderStatus.CANCELLED

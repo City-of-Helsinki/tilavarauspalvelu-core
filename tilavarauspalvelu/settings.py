@@ -5,7 +5,6 @@ import environ
 import graphql
 import sentry_sdk
 from django.conf import global_settings
-from django.utils.log import DEFAULT_LOGGING
 from django.utils.translation import gettext_lazy as _
 from helusers import defaults
 from sentry_sdk.integrations.django import DjangoIntegration
@@ -111,13 +110,13 @@ env = environ.Env(
     UPDATE_ACCOUNTING=(bool, False),
     UPDATE_PRODUCT_MAPPING=(bool, False),
     VERKKOKAUPPA_API_KEY=(str, None),
-    VERKKOKAUPPA_MERCHANT_API_URL=(str, None),
     VERKKOKAUPPA_NAMESPACE=(str, None),
     VERKKOKAUPPA_NEW_LOGIN=(bool, True),
-    VERKKOKAUPPA_ORDER_API_URL=(str, None),
     VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES=(int, 10),
-    VERKKOKAUPPA_PAYMENT_API_URL=(str, None),
-    VERKKOKAUPPA_PRODUCT_API_URL=(str, None),
+    VERKKOKAUPPA_MERCHANT_API_URL=(str, ""),
+    VERKKOKAUPPA_ORDER_API_URL=(str, ""),
+    VERKKOKAUPPA_PAYMENT_API_URL=(str, ""),
+    VERKKOKAUPPA_PRODUCT_API_URL=(str, ""),
     VERKKOKAUPPA_TIMEZONE=(str, "Europe/Helsinki"),
     USE_MOCK_VERKKOKAUPPA_API=(bool, False),
 )

@@ -10,10 +10,10 @@ from sentry_sdk import capture_message
 
 from merchants.models import OrderStatus, PaymentOrder
 from merchants.verkkokauppa.order.exceptions import GetOrderError
-from merchants.verkkokauppa.order.requests import get_order
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError, GetRefundStatusError
 from merchants.verkkokauppa.payment.requests import get_payment, get_refund_status
 from merchants.verkkokauppa.payment.types import PaymentStatus, RefundStatus
+from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.choices import ReservationStateChoice
 from reservations.email_utils import send_confirmation_email
 from reservations.models import Reservation
@@ -103,7 +103,7 @@ class WebhookOrderCancelViewSet(viewsets.ViewSet):
             return Response(data={"message": msg}, status=200)
 
         try:
-            order = get_order(order_id)
+            order = VerkkokauppaAPIClient.get_order(order_uuid=order_id)
         except GetOrderError:
             msg = f"Checking order '{order_id}' failed"
             capture_message(msg)
