@@ -11,8 +11,10 @@ from merchants.pruning import update_expired_orders
 from merchants.verkkokauppa.order.exceptions import CancelOrderError
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError
 from merchants.verkkokauppa.payment.types import PaymentStatus as WebShopPaymentStatus
+from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.choices import ReservationStateChoice
 from tests.factories import PaymentFactory, PaymentOrderFactory, ReservationFactory
+from tests.helpers import patch_method
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
@@ -65,9 +67,9 @@ class UpdateExpiredOrderTestCase(TestCase):
 
         assert mock_confirmation_email.called is True
 
-    @mock.patch("merchants.pruning.cancel_order")
     @mock.patch("merchants.pruning.get_payment")
-    def test_handle_expired_orders(self, mock_get_payment, mock_cancel_order):
+    @patch_method(VerkkokauppaAPIClient.cancel_order)
+    def test_handle_expired_orders(self, mock_get_payment):
         six_minutes_ago = datetime.now(tz=DEFAULT_TIMEZONE) - timedelta(minutes=6)
 
         mock_get_payment.return_value = PaymentFactory(
@@ -85,14 +87,14 @@ class UpdateExpiredOrderTestCase(TestCase):
         with freeze_time(datetime(2022, 11, 28, 10, 15, 0, tzinfo=DEFAULT_TIMEZONE)):
             update_expired_orders(5)
 
-        assert mock_cancel_order.called is True
+        assert VerkkokauppaAPIClient.cancel_order.called is True
 
         order.refresh_from_db()
         assert order.status == OrderStatus.EXPIRED
 
-    @mock.patch("merchants.pruning.cancel_order")
     @mock.patch("merchants.pruning.get_payment")
-    def test_handle_missing_payment(self, mock_get_payment, mock_cancel_order):
+    @patch_method(VerkkokauppaAPIClient.cancel_order)
+    def test_handle_missing_payment(self, mock_get_payment):
         mock_get_payment.return_value = None
 
         six_minutes_ago = datetime.now() - timedelta(minutes=6)
@@ -106,7 +108,7 @@ class UpdateExpiredOrderTestCase(TestCase):
         with freeze_time(datetime(2022, 11, 28, 10, 15, 0, tzinfo=DEFAULT_TIMEZONE)):
             update_expired_orders(5)
 
-        assert mock_cancel_order.called is True
+        assert VerkkokauppaAPIClient.cancel_order.called is True
 
         order.refresh_from_db()
         assert order.status == OrderStatus.EXPIRED
@@ -132,15 +134,14 @@ class UpdateExpiredOrderTestCase(TestCase):
         assert mock_log_exception_to_sentry.called is True
 
     @mock.patch("merchants.pruning.log_exception_to_sentry")
-    @mock.patch("merchants.pruning.cancel_order")
     @mock.patch("merchants.pruning.get_payment")
-    def test_cancel_error_errors_are_logged(self, mock_get_payment, mock_cancel_order, mock_capture_message):
+    @patch_method(VerkkokauppaAPIClient.cancel_order, side_effect=CancelOrderError("mock-error"))
+    def test_cancel_error_errors_are_logged(self, mock_get_payment, mock_capture_message):
         six_minutes_ago = datetime.now(tz=DEFAULT_TIMEZONE) - timedelta(minutes=6)
         mock_get_payment.return_value = PaymentFactory(
             status=WebShopPaymentStatus.CREATED.value,
             timestamp=six_minutes_ago,
         )
-        mock_cancel_order.side_effect = CancelOrderError("mock-error")
 
         order = PaymentOrderFactory.create(
             status=OrderStatus.DRAFT,
@@ -156,9 +157,9 @@ class UpdateExpiredOrderTestCase(TestCase):
         assert order.status == OrderStatus.DRAFT
         assert mock_capture_message.called is True
 
-    @mock.patch("merchants.pruning.cancel_order")
     @mock.patch("merchants.pruning.get_payment")
-    def test_give_more_time_if_user_entered_to_payment_phase(self, mock_get_payment, mock_cancel_order):
+    @patch_method(VerkkokauppaAPIClient.cancel_order)
+    def test_give_more_time_if_user_entered_to_payment_phase(self, mock_get_payment):
         four_minutes_in_the_future = datetime.now(tz=DEFAULT_TIMEZONE) + timedelta(minutes=4)
         six_minutes_ago = datetime.now(tz=DEFAULT_TIMEZONE) - timedelta(minutes=6)
 
@@ -178,7 +179,7 @@ class UpdateExpiredOrderTestCase(TestCase):
             update_expired_orders(5)
 
         assert mock_get_payment.called is True
-        assert mock_cancel_order.called is False
+        assert VerkkokauppaAPIClient.cancel_order.called is False
 
         order.refresh_from_db()
         assert order.status == OrderStatus.DRAFT

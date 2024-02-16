@@ -5,10 +5,10 @@ from django.utils.timezone import get_default_timezone
 
 from merchants.models import OrderStatus, PaymentOrder
 from merchants.verkkokauppa.order.exceptions import CancelOrderError
-from merchants.verkkokauppa.order.requests import cancel_order
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError
 from merchants.verkkokauppa.payment.requests import get_payment
 from merchants.verkkokauppa.payment.types import PaymentStatus as WebShopPaymentStatus
+from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.choices import ReservationStateChoice
 from reservations.email_utils import send_confirmation_email
 from reservations.models import Reservation
@@ -42,7 +42,7 @@ def update_expired_orders(older_than_minutes: int) -> None:
                 continue
             else:
                 order.status = OrderStatus.EXPIRED
-                cancel_order(order.remote_id, order.reservation_user_uuid)
+                VerkkokauppaAPIClient.cancel_order(order_uuid=order.remote_id, user_uuid=order.reservation_user_uuid)
 
             order.processed_at = datetime.now(tz=DEFAULT_TIMEZONE)
             order.save()

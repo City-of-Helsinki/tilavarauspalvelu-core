@@ -18,8 +18,6 @@ pytestmark = [
 
 
 def test_order_payment_webhook__success(api_client, settings):
-    settings.VERKKOKAUPPA_NAMESPACE = "tilanvaraus"
-
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
 
@@ -40,7 +38,7 @@ def test_order_payment_webhook__success(api_client, settings):
     }
     url = reverse("payment-list")
 
-    with mock_order_payment_api(order_id, payment_id, settings.VERKKOKAUPPA_NAMESPACE):
+    with mock_order_payment_api(order_id, payment_id):
         response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 200, response.data
@@ -56,8 +54,6 @@ def test_order_payment_webhook__success(api_client, settings):
 
 
 def test_order_payment_webhook__success__no_reservation(api_client, settings):
-    settings.VERKKOKAUPPA_NAMESPACE = "tilanvaraus"
-
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
 
@@ -76,7 +72,7 @@ def test_order_payment_webhook__success__no_reservation(api_client, settings):
     }
     url = reverse("payment-list")
 
-    with mock_order_payment_api(order_id, payment_id, settings.VERKKOKAUPPA_NAMESPACE):
+    with mock_order_payment_api(order_id, payment_id):
         response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 200, response.data
@@ -90,8 +86,6 @@ def test_order_payment_webhook__success__no_reservation(api_client, settings):
 
 @pytest.mark.parametrize("status", [OrderStatus.PAID, OrderStatus.PAID_MANUALLY, OrderStatus.REFUNDED])
 def test_order_payment_webhook__no_action_needed(api_client, settings, status):
-    settings.VERKKOKAUPPA_NAMESPACE = "tilanvaraus"
-
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
     PaymentOrderFactory.create(remote_id=order_id, status=status)
@@ -104,7 +98,7 @@ def test_order_payment_webhook__no_action_needed(api_client, settings, status):
     }
     url = reverse("payment-list")
 
-    with mock_order_payment_api(order_id, payment_id, settings.VERKKOKAUPPA_NAMESPACE):
+    with mock_order_payment_api(order_id, payment_id):
         response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 200, response.data
@@ -113,8 +107,6 @@ def test_order_payment_webhook__no_action_needed(api_client, settings, status):
 
 @pytest.mark.parametrize("missing_field", ["orderId", "paymentId", "namespace", "eventType"])
 def test_order_payment_webhook__missing_field(api_client, settings, missing_field):
-    settings.VERKKOKAUPPA_NAMESPACE = "tilanvaraus"
-
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
     PaymentOrderFactory.create(remote_id=order_id)
@@ -128,7 +120,7 @@ def test_order_payment_webhook__missing_field(api_client, settings, missing_fiel
     data.pop(missing_field)
     url = reverse("payment-list")
 
-    with mock_order_payment_api(order_id, payment_id, settings.VERKKOKAUPPA_NAMESPACE):
+    with mock_order_payment_api(order_id, payment_id):
         response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 400, response.data
@@ -136,8 +128,6 @@ def test_order_payment_webhook__missing_field(api_client, settings, missing_fiel
 
 
 def test_order_payment_webhook__bad_namespace(api_client, settings):
-    settings.VERKKOKAUPPA_NAMESPACE = "tilanvaraus"
-
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
     PaymentOrderFactory.create(remote_id=order_id)
@@ -150,7 +140,7 @@ def test_order_payment_webhook__bad_namespace(api_client, settings):
     }
     url = reverse("payment-list")
 
-    with mock_order_payment_api(order_id, payment_id, settings.VERKKOKAUPPA_NAMESPACE):
+    with mock_order_payment_api(order_id, payment_id):
         response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 400, response.data
@@ -158,8 +148,6 @@ def test_order_payment_webhook__bad_namespace(api_client, settings):
 
 
 def test_order_payment_webhook__bad_event_type(api_client, settings):
-    settings.VERKKOKAUPPA_NAMESPACE = "tilanvaraus"
-
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
     PaymentOrderFactory.create(remote_id=order_id)
@@ -172,7 +160,7 @@ def test_order_payment_webhook__bad_event_type(api_client, settings):
     }
     url = reverse("payment-list")
 
-    with mock_order_payment_api(order_id, payment_id, settings.VERKKOKAUPPA_NAMESPACE):
+    with mock_order_payment_api(order_id, payment_id):
         response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 400, response.data
@@ -180,8 +168,6 @@ def test_order_payment_webhook__bad_event_type(api_client, settings):
 
 
 def test_order_payment_webhook__payment_order_not_found(api_client, settings):
-    settings.VERKKOKAUPPA_NAMESPACE = "tilanvaraus"
-
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
 
@@ -193,7 +179,7 @@ def test_order_payment_webhook__payment_order_not_found(api_client, settings):
     }
     url = reverse("payment-list")
 
-    with mock_order_payment_api(order_id, payment_id, settings.VERKKOKAUPPA_NAMESPACE):
+    with mock_order_payment_api(order_id, payment_id):
         response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 404, response.data
@@ -201,8 +187,6 @@ def test_order_payment_webhook__payment_order_not_found(api_client, settings):
 
 
 def test_order_payment_webhook__payment_fetch_failed(api_client, settings):
-    settings.VERKKOKAUPPA_NAMESPACE = "tilanvaraus"
-
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
 
@@ -224,8 +208,6 @@ def test_order_payment_webhook__payment_fetch_failed(api_client, settings):
 
 
 def test_order_payment_webhook__no_payment_from_verkkokauppa(api_client, settings):
-    settings.VERKKOKAUPPA_NAMESPACE = "tilanvaraus"
-
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
 
@@ -247,8 +229,6 @@ def test_order_payment_webhook__no_payment_from_verkkokauppa(api_client, setting
 
 
 def test_order_payment_webhook__invalid_payment_status(api_client, settings):
-    settings.VERKKOKAUPPA_NAMESPACE = "tilanvaraus"
-
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
 
@@ -262,7 +242,7 @@ def test_order_payment_webhook__invalid_payment_status(api_client, settings):
     }
     url = reverse("payment-list")
 
-    with mock_order_payment_api(order_id, payment_id, settings.VERKKOKAUPPA_NAMESPACE, status="foo"):
+    with mock_order_payment_api(order_id, payment_id, status="foo"):
         response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 400, response.data

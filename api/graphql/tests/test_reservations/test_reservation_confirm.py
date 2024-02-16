@@ -15,6 +15,7 @@ from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from applications.models import City
 from email_notification.models import EmailType
 from merchants.models import OrderStatus, PaymentOrder, PaymentType
+from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservation_units.enums import PricingType
 from reservations.choices import ReservationStateChoice
 from reservations.models import AgeGroup
@@ -25,6 +26,7 @@ from tests.factories import (
     ReservationFactory,
     ReservationUnitPricingFactory,
 )
+from tests.helpers import patch_method
 
 pytestmark = [
     pytest.mark.usefixtures("_setup_verkkokauppa_env_variables"),
@@ -84,9 +86,9 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         SEND_RESERVATION_NOTIFICATION_EMAILS=True,
         EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
     )
-    @patch("merchants.verkkokauppa.helpers.create_order")
-    def test_confirm_reservation_changes_state(self, mock_create_order):
-        mock_create_order.return_value = OrderFactory.create()
+    @patch_method(VerkkokauppaAPIClient.create_order)
+    def test_confirm_reservation_changes_state(self):
+        VerkkokauppaAPIClient.create_order.return_value = OrderFactory.create()
         self.client.force_login(self.regular_joe)
 
         self.reservation_unit.payment_types.add("ON_SITE")
@@ -185,9 +187,9 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CREATED)
 
-    @patch("merchants.verkkokauppa.helpers.create_order")
-    def test_confirm_reservation_updates_confirmed_at(self, mock_create_order):
-        mock_create_order.return_value = OrderFactory.create()
+    @patch_method(VerkkokauppaAPIClient.create_order)
+    def test_confirm_reservation_updates_confirmed_at(self):
+        VerkkokauppaAPIClient.create_order.return_value = OrderFactory.create()
         self.client.force_login(self.regular_joe)
         input_data = self.get_valid_confirm_data()
         assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.CREATED)
@@ -197,9 +199,9 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
             datetime.datetime(2021, 10, 12, 12).astimezone(get_default_timezone())
         )
 
-    @patch("merchants.verkkokauppa.helpers.create_order")
-    def test_confirm_reservation_succeeds_if_reservation_already_has_required_fields(self, mock_create_order):
-        mock_create_order.return_value = OrderFactory.create()
+    @patch_method(VerkkokauppaAPIClient.create_order)
+    def test_confirm_reservation_succeeds_if_reservation_already_has_required_fields(self):
+        VerkkokauppaAPIClient.create_order.return_value = OrderFactory.create()
         self.reservation_unit.metadata_set = self._create_metadata_set()
         self.reservation_unit.save(update_fields=["metadata_set"])
         self.reservation.reservee_first_name = "John"

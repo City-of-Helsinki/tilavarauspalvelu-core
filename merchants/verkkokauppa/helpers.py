@@ -11,7 +11,6 @@ from common.date_utils import local_datetime
 from merchants.models import PaymentMerchant, PaymentProduct
 from merchants.verkkokauppa.exceptions import UnsupportedMetaKey
 from merchants.verkkokauppa.order.exceptions import CreateOrderError
-from merchants.verkkokauppa.order.requests import create_order
 from merchants.verkkokauppa.order.types import (
     CreateOrderParams,
     Order,
@@ -19,6 +18,7 @@ from merchants.verkkokauppa.order.types import (
     OrderItemMetaParams,
     OrderItemParams,
 )
+from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservation_units.utils.reservation_unit_payment_helper import ReservationUnitPaymentHelper
 from reservations.models import Reservation
 from tilavarauspalvelu.utils.date_util import localized_short_weekday
@@ -76,7 +76,7 @@ def create_verkkokauppa_order(reservation: Reservation) -> Order:
     order_params: CreateOrderParams = _get_order_params(reservation)
 
     try:
-        payment_order = create_order(order_params)
+        payment_order = VerkkokauppaAPIClient.create_order(order_params=order_params)
     except CreateOrderError as err:
         log_exception_to_sentry(err, details="Creating order in Verkkokauppa failed", reservation_id=reservation.pk)
         raise ValidationErrorWithCode(
