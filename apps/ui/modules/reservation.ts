@@ -23,14 +23,15 @@ import {
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
 import { filterNonNullable } from "common/src/helpers";
 import { getTranslation } from "./util";
+import { TFunction } from "i18next";
 
 export const getDurationOptions = (
   minReservationDuration: number | undefined,
   maxReservationDuration: number | undefined,
-  reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices
+  reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices,
+  t: TFunction
 ): OptionType[] => {
   const intervalSeconds = getIntervalMinutes(reservationStartInterval) * 60;
-
   if (!minReservationDuration || !maxReservationDuration || !intervalSeconds)
     return [];
 
@@ -44,10 +45,21 @@ export const getDurationOptions = (
     i += intervalSeconds
   ) {
     const hms = secondsToHms(i);
-    const minute = String(hms.m).padEnd(2, "0");
+    const hourString =
+      hms.h !== 0 && hms.h >= 2
+        ? t("common:abbreviations.hour", { count: hms.h })
+        : "";
+    const minuteString = () => {
+      if (hms.h < 2)
+        return t("common:abbreviations.minute", { count: hms.h * 60 + hms.m });
+      if (hms.m !== 0)
+        return t("common:abbreviations.minute", { count: hms.m });
+      return "";
+    };
+    const optionString = `${hourString} ${minuteString()}`;
     timeOptions.push({
-      label: `${hms.h}:${minute}`,
-      value: `${hms.h}:${minute}`,
+      label: optionString,
+      value: `${hms.h}:${String(hms.m).padEnd(2, "0")}`,
     });
   }
 

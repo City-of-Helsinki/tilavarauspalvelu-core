@@ -315,13 +315,15 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
     const options = getDurationOptions(
       minReservationDuration ?? 0,
       maxReservationDuration ?? 0,
-      reservationStartInterval
+      reservationStartInterval,
+      t
     );
     return [{ value: "0:00", label: "" }, ...options];
   }, [
     minReservationDuration,
     maxReservationDuration,
     reservationStartInterval,
+    t,
   ]);
 
   const [date, setDate] = useState<Date | null>(new Date());

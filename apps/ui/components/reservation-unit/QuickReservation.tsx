@@ -402,7 +402,8 @@ const QuickReservation = ({
     return getDurationOptions(
       minReservationDuration ?? undefined,
       maxReservationDuration ?? undefined,
-      reservationStartInterval
+      reservationStartInterval,
+      t
     );
   }, [
     minReservationDuration,
@@ -431,7 +432,7 @@ const QuickReservation = ({
     formatDate(nextHour.toISOString(), "HH:mm")
   );
   const [duration, setDuration] = useState<OptionType | undefined>(
-    durationOptions.find((n) => n.value === "1:00") || durationOptions[0]
+    durationOptions.find((n) => n.value === "60 min") ?? durationOptions[0]
   );
   const [slot, setSlot] = useState<string | null>(null);
   const [isReserving, setIsReserving] = useState(false);
@@ -591,7 +592,6 @@ const QuickReservation = ({
               const times = getAvailableTimesForDay({
                 day: valueAsDate,
                 duration: duration?.value?.toString() ?? "00:00",
-                time,
                 isSlotReservable,
                 reservationUnit: reservationUnit ?? undefined,
                 fromStartOfDay: true,
