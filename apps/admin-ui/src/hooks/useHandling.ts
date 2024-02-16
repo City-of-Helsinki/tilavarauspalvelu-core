@@ -3,6 +3,7 @@ import { startOfDay } from "date-fns";
 import { useQuery } from "@apollo/client";
 import { useSession } from "@/hooks/auth";
 import { Query, QueryReservationsArgs } from "common/types/gql-types";
+import { toApiDate } from "common/src/common/util";
 import { HANDLING_COUNT_QUERY } from "../common/queries";
 
 const useHandling = () => {
@@ -14,7 +15,7 @@ const useHandling = () => {
     {
       skip: !isAuthenticated,
       variables: {
-        beginDate: today.toISOString(),
+        beginDate: toApiDate(today),
       },
     }
   );

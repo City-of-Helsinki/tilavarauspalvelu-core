@@ -14,8 +14,8 @@ export const RESERVATIONS_QUERY = gql`
     $textSearch: String
     $priceGte: Decimal
     $priceLte: Decimal
-    $begin: DateTime
-    $end: DateTime
+    $beginDate: Date
+    $endDate: Date
     $reservationUnit: [ID]
     $orderStatus: [String]
   ) {
@@ -32,8 +32,8 @@ export const RESERVATIONS_QUERY = gql`
       textSearch: $textSearch
       priceLte: $priceLte
       priceGte: $priceGte
-      begin: $begin
-      end: $end
+      beginDate: $beginDate
+      endDate: $endDate
       onlyWithPermission: true
     ) {
       edges {

@@ -467,7 +467,7 @@ const ReservationUnit = ({
       fetchPolicy: "no-cache",
       skip: !currentUser || !reservationUnit?.pk,
       variables: {
-        beginDate: now.toISOString(),
+        beginDate: toApiDate(now),
         user: currentUser?.pk?.toString(),
         reservationUnit: [reservationUnit?.pk?.toString() ?? ""],
         state: allowedReservationStates,

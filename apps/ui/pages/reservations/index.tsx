@@ -22,6 +22,7 @@ import ReservationCard from "@/components/reservation/ReservationCard";
 import Head from "@/components/reservations/Head";
 import { CenterSpinner } from "@/components/common/common";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { toApiDate } from "common/src/common/util";
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { locale } = ctx;
@@ -105,8 +106,8 @@ const Reservations = (): JSX.Element | null => {
             ],
       orderBy: tab === "upcoming" ? "begin" : "-begin",
       user: currentUser?.pk?.toString(),
-      beginDate: tab === "upcoming" ? today.toISOString() : undefined,
-      endDate: tab === "past" ? today.toISOString() : undefined,
+      beginDate: tab === "upcoming" ? toApiDate(today) : undefined,
+      endDate: tab === "past" ? toApiDate(today) : undefined,
     },
   });
 

@@ -118,8 +118,8 @@ export const LIST_RESERVATIONS = gql`
     $after: String
     $first: Int
     $last: Int
-    $begin: DateTime
-    $end: DateTime
+    $beginDate: Date
+    $endDate: Date
     $state: [String]
     $user: ID!
     $reservationUnit: [ID]
@@ -130,8 +130,8 @@ export const LIST_RESERVATIONS = gql`
       after: $after
       first: $first
       last: $last
-      begin: $begin
-      end: $end
+      beginDate: $beginDate
+      endDate: $endDate
       state: $state
       user: $user
       reservationUnit: $reservationUnit

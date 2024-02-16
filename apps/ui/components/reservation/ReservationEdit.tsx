@@ -187,7 +187,7 @@ const ReservationEdit = ({ id, apiBaseUrl }: Props): JSX.Element => {
   const [showSuccessMsg, setShowSuccessMsg] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const now = useMemo(() => new Date().toISOString(), []);
+  const now = useMemo(() => new Date(), []);
   const { currentUser } = useCurrentUser();
 
   const { data } = useQuery<Query>(GET_RESERVATION, {
@@ -269,7 +269,7 @@ const ReservationEdit = ({ id, apiBaseUrl }: Props): JSX.Element => {
       fetchPolicy: "no-cache",
       skip: !currentUser || !reservationUnit,
       variables: {
-        beginDate: now,
+        beginDate: toApiDate(now),
         user: currentUser?.pk?.toString(),
         reservationUnit: [reservationUnit?.pk?.toString() ?? ""],
         state: allowedReservationStates,

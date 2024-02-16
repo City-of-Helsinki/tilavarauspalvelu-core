@@ -1,6 +1,6 @@
 import React from "react";
 import { ApolloError, useQuery } from "@apollo/client";
-import { trim, values } from "lodash";
+import { values } from "lodash";
 import {
   Query,
   QueryReservationsArgs,
@@ -13,7 +13,8 @@ import Loader from "../Loader";
 import { FilterArguments } from "./Filters";
 import { RESERVATIONS_QUERY } from "./queries";
 import ReservationsTable from "./ReservationsTable";
-import { fromUIDate } from "common/src/common/util";
+import { fromUIDate, toApiDate } from "common/src/common/util";
+import { filterNonNullable } from "common/src/helpers";
 
 export type Sort = {
   field: string;
@@ -27,18 +28,6 @@ type Props = {
   defaultFiltering: QueryReservationsArgs;
 };
 
-function parseDate(hdsDate: string): string | null {
-  if (trim(hdsDate) === "") {
-    return null;
-  }
-
-  const d = fromUIDate(hdsDate);
-  if (d && !isNaN(d.getTime())) {
-    return d.toISOString();
-  }
-  return null;
-}
-
 const mapFilterParams = (
   params: FilterArguments,
   defaultParams: QueryReservationsArgs
@@ -48,26 +37,34 @@ const mapFilterParams = (
 
   // only use defaults if search is "empty"
   const defaults = emptySearch ? defaultParams : {};
+
+  const states = filterNonNullable(
+    params.reservationState.map((ru) => ru.value?.toString())
+  );
+  const state = states.length > 0 ? states : defaults.state;
+
+  const begin = fromUIDate(params.begin);
+  const end = fromUIDate(params.end);
+  const beginDate = begin ? toApiDate(begin) : defaults.beginDate;
+  const endDate = end ? toApiDate(end) : defaults.endDate;
+
   return {
     unit: params.unit?.map((u) => u.value as string),
-    reservationUnitType: params.reservationUnitType?.map(
-      (u) => u.value as string
+    reservationUnitType: filterNonNullable(
+      params.reservationUnitType?.map((u) => u.value?.toString())
     ),
-    reservationUnit: params.reservationUnit?.map((ru) => ru.value as string),
-    state:
-      params.reservationState.length > 0
-        ? params.reservationState
-            ?.map((ru) => ru.value)
-            ?.map((x) => (x != null ? String(x) : null))
-        : defaults.state,
+    reservationUnit: filterNonNullable(
+      params.reservationUnit?.map((ru) => ru.value?.toString())
+    ),
+    state,
     textSearch: params.textSearch || undefined,
-    beginDate: parseDate(params.begin) ?? defaults.beginDate,
-    endDate: parseDate(params.end),
+    beginDate,
+    endDate,
     priceGte: params.minPrice !== "" ? params.minPrice : undefined,
     priceLte: params.maxPrice !== "" ? params.maxPrice : undefined,
-    orderStatus: params.paymentStatuses
-      ?.map((status) => status.value)
-      .map((x) => (x != null ? String(x) : null)),
+    orderStatus: filterNonNullable(
+      params.paymentStatuses?.map((status) => status.value?.toString())
+    ),
   };
 };
 
