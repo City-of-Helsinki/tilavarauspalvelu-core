@@ -26,6 +26,7 @@ import {
 } from "../reservation";
 import mockTranslations from "../../public/locales/fi/prices.json";
 import { toApiDate } from "common/src/common/util";
+import { TFunction } from "i18next";
 
 jest.mock("next-i18next", () => ({
   i18n: {
@@ -39,64 +40,66 @@ jest.mock("next-i18next", () => ({
 
 describe("getDurationOptions", () => {
   test("empty inputs", () => {
+    const mockT = ((x: string) => x) as TFunction;
     const interval90 =
       ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_90Mins;
     const interval60 =
       ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_60Mins;
-    expect(getDurationOptions(0, 5400, interval90)).toEqual([]);
-    expect(getDurationOptions(5400, 0, interval60)).toEqual([]);
-    expect(getDurationOptions(0, 0, interval90)).toEqual([]);
+    expect(getDurationOptions(0, 5400, interval90, mockT)).toEqual([]);
+    expect(getDurationOptions(5400, 0, interval60, mockT)).toEqual([]);
+    expect(getDurationOptions(0, 0, interval90, mockT)).toEqual([]);
   });
-
   test("with 15 min intervals", () => {
+    const mockT = ((x: string) => x) as TFunction;
     const interval15 =
       ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins;
-    expect(getDurationOptions(1800, 5400, interval15)).toEqual([
+    expect(getDurationOptions(1800, 5400, interval15, mockT)).toEqual([
       {
-        label: "0:30",
+        label: " common:abbreviations.minute",
         value: "0:30",
       },
       {
-        label: "0:45",
+        label: " common:abbreviations.minute",
         value: "0:45",
       },
       {
-        label: "1:00",
+        label: " common:abbreviations.minute",
         value: "1:00",
       },
       {
-        label: "1:15",
+        label: " common:abbreviations.minute",
         value: "1:15",
       },
       {
-        label: "1:30",
+        label: " common:abbreviations.minute",
         value: "1:30",
       },
     ]);
   });
 
   test("with 90 min intervals", () => {
+    const mockT = ((x: string) => x) as TFunction;
     const interval90 =
       ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_90Mins;
-    expect(getDurationOptions(1800, 30600, interval90)).toEqual([
+    expect(getDurationOptions(1800, 30600, interval90, mockT)).toEqual([
       {
-        label: "1:30",
+        label: " common:abbreviations.minute",
         value: "1:30",
       },
       {
-        label: "3:00",
+        label: "common:abbreviations.hour ",
         value: "3:00",
       },
       {
-        label: "4:30",
+        label: "common:abbreviations.hour common:abbreviations.minute",
         value: "4:30",
       },
       {
-        label: "6:00",
+        label: "common:abbreviations.hour ",
         value: "6:00",
       },
       {
-        label: "7:30",
+        label: "common:abbreviations.hour common:abbreviations.minute",
         value: "7:30",
       },
     ]);
