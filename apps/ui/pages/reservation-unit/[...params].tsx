@@ -288,15 +288,18 @@ const ReservationUnitReservationWithReservationProp = ({
           homeCity: data.updateReservation.reservation?.homeCity?.pk,
           showBillingAddress: watch("showBillingAddress"),
         };
+        // ???
         if (reservation == null) {
           return;
         }
+        const { calendarUrl } = data.updateReservation?.reservation ?? {};
+        // TODO cache updates are not a good idea, just do an old fashioned refetch
+        // especially if we router push a new url and load another page we don't even need to refetch
         // @ts-expect-error: TODO: the types for reservation are wrong (old rest types)
         setReservation({
           ...reservation,
           ...payload,
-          calendarUrl:
-            data.updateReservation?.reservation?.calendarUrl ?? undefined,
+          calendarUrl,
         });
         setStep(1);
         window.scrollTo(0, 0);
@@ -348,11 +351,13 @@ const ReservationUnitReservationWithReservationProp = ({
   });
 
   const { pk: reservationPk } = reservation || {};
-  if (!ageGroups || ageGroups.length < 1)
+  if (!ageGroups || ageGroups.length < 1) {
     // eslint-disable-next-line no-console
     console.warn("No ageGroups received!");
-  const sortedAgeGroups = ageGroups.sort((a, b) => a.minimum - b.minimum);
+  }
 
+  // TODO why isn't this on the SSR side?
+  const sortedAgeGroups = ageGroups.sort((a, b) => a.minimum - b.minimum);
   const options = useMemo(
     () => ({
       purpose: reservationPurposes.map((purpose) => ({
@@ -375,12 +380,10 @@ const ReservationUnitReservationWithReservationProp = ({
     [reservationPurposes, cities, sortedAgeGroups]
   );
 
-  const pageTitle = useMemo(() => {
-    if (step === 0) {
-      return t("reservationCalendar:heading.newReservation");
-    }
-    return t("reservationCalendar:heading.pendingReservation");
-  }, [step, t]);
+  const pageTitle =
+    step === 0
+      ? t("reservationCalendar:heading.newReservation")
+      : t("reservationCalendar:heading.pendingReservation");
 
   // TODO all this is copy pasta from EditStep1
   const supportedFields = filterNonNullable(
@@ -497,14 +500,13 @@ const ReservationUnitReservationWithReservationProp = ({
     return null;
   }
 
-  const pendingReservation = reservation;
   return (
     <StyledContainer>
       <Columns>
-        {pendingReservation != null && (
+        {reservation != null && (
           <div>
             <ReservationInfoCard
-              reservation={pendingReservation}
+              reservation={reservation}
               reservationUnit={reservationUnit}
               type="pending"
               shouldDisplayReservationUnitPrice={
@@ -527,6 +529,11 @@ const ReservationUnitReservationWithReservationProp = ({
           <FormProvider {...form}>
             <div>
               <Title>{pageTitle}</Title>
+              {/* TODO what's the logic here?
+               * in what case are there more than 2 steps?
+               * why do we not show that?
+               * TODO why isn't this shown when creating a paid version? I think there was on purpose reason for that? maybe?
+               */}
               {steps.length <= 2 && (
                 <StyledStepper
                   language={i18n.language}
@@ -564,7 +571,9 @@ const ReservationUnitReservationWithReservationProp = ({
                 reservationApplicationFields={reservationApplicationFields}
                 options={options}
                 reserveeType={reserveeType}
-                steps={steps}
+                // TODO this is correct but confusing.
+                // There used to be 5 steps for payed reservations but the stepper is hidden for them now.
+                requiresHandling={steps.length > 2}
                 setStep={setStep}
                 genericTerms={termsOfUse.genericTerms}
               />

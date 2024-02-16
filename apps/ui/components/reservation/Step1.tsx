@@ -14,7 +14,6 @@ import {
   Subheading,
   TwoColumnContainer,
 } from "common/src/reservation-form/styles";
-import { ReservationStep } from "@/modules/types";
 import { capitalize, getTranslation } from "@/modules/util";
 import { ActionContainer } from "./styles";
 import Sanitize from "../common/Sanitize";
@@ -35,7 +34,7 @@ type Props = {
   reservationApplicationFields: string[];
   options: Record<string, OptionType[]>;
   reserveeType: ReservationsReservationReserveeTypeChoices;
-  steps: ReservationStep[];
+  requiresHandling: boolean;
   setStep: React.Dispatch<React.SetStateAction<number>>;
   genericTerms: TermsOfUseType | null;
 };
@@ -85,7 +84,7 @@ const Step1 = ({
   reservationApplicationFields,
   options,
   reserveeType,
-  steps,
+  requiresHandling,
   setStep,
   genericTerms,
 }: Props): JSX.Element => {
@@ -354,7 +353,7 @@ const Step1 = ({
         >
           {t(
             `reservationCalendar:${
-              steps.length > 2 ? "nextStep" : "makeReservation"
+              requiresHandling ? "nextStep" : "makeReservation"
             }`
           )}
         </MediumButton>
