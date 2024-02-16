@@ -5,6 +5,7 @@ from unittest import mock
 from uuid import uuid4
 
 import freezegun
+import pytest
 from assertpy import assert_that
 from django.test import override_settings
 from django.utils.timezone import get_default_timezone
@@ -13,6 +14,10 @@ from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
 from merchants.models import OrderStatus
 from reservations.choices import ReservationStateChoice
 from tests.factories import PaymentOrderFactory, ReservationFactory, ReservationMetadataSetFactory
+
+pytestmark = [
+    pytest.mark.usefixtures("_setup_verkkokauppa_env_variables"),
+]
 
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")

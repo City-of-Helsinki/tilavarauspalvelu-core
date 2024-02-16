@@ -5,6 +5,7 @@ from unittest import mock
 from uuid import uuid4
 
 import freezegun
+import pytest
 from assertpy import assert_that
 from django.contrib.auth import get_user_model
 from django.core import mail
@@ -22,6 +23,10 @@ from tests.factories import (
     ReservationFactory,
     ReservationUnitCancellationRuleFactory,
 )
+
+pytestmark = [
+    pytest.mark.usefixtures("_setup_verkkokauppa_env_variables"),
+]
 
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")
