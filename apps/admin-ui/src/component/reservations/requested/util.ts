@@ -220,9 +220,10 @@ export const getReserveeName = (
     prefix = t ? t("Reservations.prefixes.behalf") : "";
   }
   if (
-    reservation.type === ReservationsReservationTypeChoices.Staff &&
+    // commented extra condition out for now, as the staff prefix was requested to be used for all staff reservations
+    reservation.type === ReservationsReservationTypeChoices.Staff /* &&
     reservation.reserveeName ===
-      `${reservation.user?.firstName} ${reservation.user?.lastName}`
+      `${reservation.user?.firstName} ${reservation.user?.lastName}` */
   ) {
     prefix = t ? t("Reservations.prefixes.staff") : "";
   }
