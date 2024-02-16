@@ -5,6 +5,7 @@ from django.test import TestCase, override_settings
 
 from merchants.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError
 from merchants.verkkokauppa.product.types import CreateOrUpdateAccountingParams, Product
+from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservation_units.tasks import (
     refresh_reservation_unit_accounting,
     refresh_reservation_unit_product_mapping,
@@ -15,11 +16,12 @@ from tests.factories import (
     ReservationUnitFactory,
     ReservationUnitPricingFactory,
 )
+from tests.helpers import patch_method
 
 product_id = uuid4()
 
 
-def mock_create_product(*args, **kwargs):
+def mock_create_product():
     return Product(
         product_id=product_id,
         namespace="tilanvaraus",
@@ -41,22 +43,21 @@ class TaskTestBase(TestCase):
 
 
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True, UPDATE_PRODUCT_MAPPING=True)
-@mock.patch("reservation_units.tasks.create_or_update_accounting")
-@mock.patch(
-    "reservation_units.tasks.create_product",
-    return_value=mock_create_product(),
-)
 class ReservationUnitProductMappingTaskTestCase(TaskTestBase):
-    def test_task_is_called_on_reservation_unit_save(self, mock_product, mock_create_or_update_accounting):
+    @patch_method(VerkkokauppaAPIClient.create_product)
+    @patch_method(VerkkokauppaAPIClient.create_or_update_accounting)
+    def test_task_is_called_on_reservation_unit_save(self):
+        VerkkokauppaAPIClient.create_product.return_value = mock_create_product()
         self.runit.payment_merchant = self.payment_merchant
         self.runit.save()
 
         self.runit.refresh_from_db()
         assert self.runit.payment_product is not None
 
-    def test_mapping_is_created_when_unit_is_paid_and_has_merchant(
-        self, mock_product, mock_create_or_update_accounting
-    ):
+    @patch_method(VerkkokauppaAPIClient.create_product)
+    @patch_method(VerkkokauppaAPIClient.create_or_update_accounting)
+    def test_mapping_is_created_when_unit_is_paid_and_has_merchant(self):
+        VerkkokauppaAPIClient.create_product.return_value = mock_create_product()
         self.runit.payment_merchant = self.payment_merchant
         self.runit.save()
 
@@ -66,7 +67,10 @@ class ReservationUnitProductMappingTaskTestCase(TaskTestBase):
         assert self.runit.payment_product is not None
         assert self.runit.payment_product.id == product_id
 
-    def test_mapping_is_not_created_if_merchant_is_missing(self, mock_product, mock_create_or_update_accounting):
+    @patch_method(VerkkokauppaAPIClient.create_product)
+    @patch_method(VerkkokauppaAPIClient.create_or_update_accounting)
+    def test_mapping_is_not_created_if_merchant_is_missing(self):
+        VerkkokauppaAPIClient.create_product.return_value = mock_create_product()
         self.runit.payment_merchant = None
         self.runit.save()
 
@@ -75,7 +79,10 @@ class ReservationUnitProductMappingTaskTestCase(TaskTestBase):
         self.runit.refresh_from_db()
         assert self.runit.payment_product is None
 
-    def test_mapping_is_not_created_if_unit_is_not_paid(self, mock_product, mock_create_or_update_accounting):
+    @patch_method(VerkkokauppaAPIClient.create_product)
+    @patch_method(VerkkokauppaAPIClient.create_or_update_accounting)
+    def test_mapping_is_not_created_if_unit_is_not_paid(self):
+        VerkkokauppaAPIClient.create_product.return_value = mock_create_product()
         self.runit.pricings.set([])
         self.runit.payment_merchant = self.payment_merchant
         self.runit.save()
@@ -87,13 +94,11 @@ class ReservationUnitProductMappingTaskTestCase(TaskTestBase):
 
 
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True, UPDATE_PRODUCT_MAPPING=True)
-@mock.patch("reservation_units.tasks.create_or_update_accounting")
-@mock.patch(
-    "reservation_units.tasks.create_product",
-    return_value=mock_create_product(),
-)
 class ReservationUnitRefreshAccountingTaskTestCase(TaskTestBase):
-    def test_accounting_task_is_called_on_reservation_unit_save(self, mock_product, mock_create_or_update_accounting):
+    @patch_method(VerkkokauppaAPIClient.create_product)
+    @patch_method(VerkkokauppaAPIClient.create_or_update_accounting)
+    def test_accounting_task_is_called_on_reservation_unit_save(self):
+        VerkkokauppaAPIClient.create_product.return_value = mock_create_product()
         self.runit.payment_merchant = self.payment_merchant
         self.runit.save()
 
@@ -110,42 +115,49 @@ class ReservationUnitRefreshAccountingTaskTestCase(TaskTestBase):
             main_ledger_account=self.accounting.main_ledger_account,
             balance_profit_center=self.accounting.balance_profit_center,
         )
-        mock_create_or_update_accounting.assert_called_with(self.runit.payment_product.id, expected_params)
+        VerkkokauppaAPIClient.create_or_update_accounting.assert_called_with(
+            product_uuid=self.runit.payment_product.id,
+            params=expected_params,
+        )
 
-    def test_accounting_task_api_not_called_when_accounting_does_not_exist(
-        self, mock_product, mock_create_or_update_accounting
-    ):
+    @patch_method(VerkkokauppaAPIClient.create_product)
+    @patch_method(VerkkokauppaAPIClient.create_or_update_accounting)
+    def test_accounting_task_api_not_called_when_accounting_does_not_exist(self):
+        VerkkokauppaAPIClient.create_product.return_value = mock_create_product()
         self.runit.payment_merchant = self.payment_merchant
         self.runit.payment_accounting = None
         self.runit.save()
 
         self.runit.refresh_from_db()
         assert self.runit.payment_product is not None
-        assert mock_create_or_update_accounting.called is False
+        assert VerkkokauppaAPIClient.create_or_update_accounting.called is False
 
-    def test_accounting_task_api_not_called_when_product_mapping_is_not_needed(
-        self, mock_product, mock_create_or_update_accounting
-    ):
+    @patch_method(VerkkokauppaAPIClient.create_product)
+    @patch_method(VerkkokauppaAPIClient.create_or_update_accounting)
+    def test_accounting_task_api_not_called_when_product_mapping_is_not_needed(self):
+        VerkkokauppaAPIClient.create_product.return_value = mock_create_product()
         self.runit.is_draft = True
         self.runit.payment_merchant = self.payment_merchant
         self.runit.save()
 
         self.runit.refresh_from_db()
         assert self.runit.payment_product is None
-        assert mock_create_or_update_accounting.called is False
+        assert VerkkokauppaAPIClient.create_or_update_accounting.called is False
 
+    @patch_method(VerkkokauppaAPIClient.create_product)
+    @patch_method(VerkkokauppaAPIClient.create_or_update_accounting)
     @mock.patch("reservation_units.tasks.capture_message")
-    def test_accounting_task_captures_warning_when_runit_does_not_exist(
-        self, mock_capture_message, mock_product, mock_create_or_update_accounting
-    ):
+    def test_accounting_task_captures_warning_when_runit_does_not_exist(self, mock_capture_message):
+        VerkkokauppaAPIClient.create_product.return_value = mock_create_product()
         refresh_reservation_unit_accounting(0)
         assert mock_capture_message.called is True
 
     @mock.patch("reservation_units.tasks.log_exception_to_sentry")
-    def test_accounting_task_captures_api_errors(
-        self, mock_log_exception_to_sentry, mock_product, mock_create_or_update_accounting
-    ):
-        mock_create_or_update_accounting.side_effect = CreateOrUpdateAccountingError("mock-error")
+    @patch_method(VerkkokauppaAPIClient.create_product)
+    @patch_method(VerkkokauppaAPIClient.create_or_update_accounting)
+    def test_accounting_task_captures_api_errors(self, mock_log_exception_to_sentry):
+        VerkkokauppaAPIClient.create_product.return_value = mock_create_product()
+        VerkkokauppaAPIClient.create_or_update_accounting.side_effect = CreateOrUpdateAccountingError("mock-error")
 
         self.runit.payment_merchant = self.payment_merchant
         self.runit.save()

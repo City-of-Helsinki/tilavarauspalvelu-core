@@ -1,4 +1,3 @@
-from unittest import mock
 from uuid import UUID, uuid4
 
 from assertpy import assert_that
@@ -6,7 +5,9 @@ from django.test import override_settings
 from django.test.testcases import TestCase
 
 from merchants.verkkokauppa.product.types import Product
+from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tests.factories import PaymentMerchantFactory, ReservationUnitFactory, ReservationUnitPricingFactory, UnitFactory
+from tests.helpers import patch_method
 
 
 def mock_create_product():
@@ -26,15 +27,13 @@ class UnitMerchantUpdateTestCase(TestCase):
         cls.unit = UnitFactory(name="Test unit", payment_merchant=cls.merchant_1)
 
     @override_settings(CELERY_TASK_ALWAYS_EAGER=True, UPDATE_PRODUCT_MAPPING=True)
-    @mock.patch(
-        "reservation_units.tasks.create_product",
-        side_effect=[
+    @patch_method(VerkkokauppaAPIClient.create_product)
+    def test_changing_merchant_updates_reservation_units_without_merchant(self):
+        VerkkokauppaAPIClient.create_product.side_effect = [
             mock_create_product(),
             mock_create_product(),
             mock_create_product(),
-        ],
-    )
-    def test_changing_merchant_updates_reservation_units_without_merchant(self, mock_product):
+        ]
         reservation_unit_1 = ReservationUnitFactory(name="I should be updated: unit set", unit=self.unit)
         pricing_1 = ReservationUnitPricingFactory(reservation_unit=reservation_unit_1)
         reservation_unit_1.pricings.set([pricing_1])
