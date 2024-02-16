@@ -9,7 +9,7 @@ import {
   isBefore,
   isValid,
 } from "date-fns";
-import { DateInput, IconAngleDown, Select, TimeInput } from "hds-react";
+import { DateInput, IconAngleDown, Select } from "hds-react";
 import { padStart } from "lodash";
 import { useTranslation } from "next-i18next";
 import { useLocalStorage } from "react-use";
@@ -74,6 +74,9 @@ const Price = styled.div`
   }
   padding-bottom: var(--spacing-m);
   height: var(--spacing-m);
+  &:empty {
+    display: none;
+  }
 `;
 
 const Selects = styled.div`
@@ -97,16 +100,6 @@ const Selects = styled.div`
     }
 
     grid-template-columns: 1fr 1fr;
-  }
-`;
-
-const StyledTimeInput = styled(TimeInput)`
-  > div > div {
-    > div {
-      margin: 0;
-      width: var(--spacing-2-xs);
-    }
-    padding: 0 var(--spacing-xs) 0 var(--spacing-xs) !important;
   }
 `;
 
@@ -275,7 +268,6 @@ function getLastPossibleReservationDate(
 type AvailableTimesProps = {
   day: Date;
   duration: string;
-  time: string;
   isSlotReservable: (start: Date, end: Date) => boolean;
   fromStartOfDay?: boolean;
   reservationUnit?: ReservationUnitByPkType;
@@ -286,17 +278,13 @@ type AvailableTimesProps = {
 function getAvailableTimesForDay({
   day,
   duration,
-  time,
   isSlotReservable,
   reservationUnit,
-  fromStartOfDay = false,
 }: AvailableTimesProps): string[] {
   if (reservationUnit == null) return [];
   const [durationHours, durationMinutes] =
     duration?.split(":").map(Number) || [];
-  const [timeHours, timeMinutesRaw] = fromStartOfDay
-    ? [0, 0]
-    : (!time ? "0:0" : time).split(":").map(Number);
+  const [timeHours, timeMinutesRaw] = [0, 0];
 
   const timeMinutes = timeMinutesRaw > 59 ? 59 : timeMinutesRaw;
   const { reservableTimeSpans: spans, reservationStartInterval: interval } =
@@ -432,7 +420,7 @@ const QuickReservation = ({
     formatDate(nextHour.toISOString(), "HH:mm")
   );
   const [duration, setDuration] = useState<OptionType | undefined>(
-    durationOptions.find((n) => n.value === "60 min") ?? durationOptions[0]
+    durationOptions.find((n) => n.value === "1:00") ?? durationOptions[0]
   );
   const [slot, setSlot] = useState<string | null>(null);
   const [isReserving, setIsReserving] = useState(false);
@@ -531,7 +519,6 @@ const QuickReservation = ({
     const availableTimesForDay = getAvailableTimesForDay({
       day: date,
       duration: duration?.value?.toString() ?? "00:00",
-      time,
       isSlotReservable,
       reservationUnit: reservationUnit ?? undefined,
     });
@@ -540,7 +527,7 @@ const QuickReservation = ({
       0,
       timeItems / itemsPerChunk
     );
-  }, [date, reservationUnit, time, duration, isSlotReservable]);
+  }, [date, reservationUnit, duration, isSlotReservable]);
 
   // NOTE useMemo has the same overhead as calling these multiple times during initial render
   // might be faster when user is interacting with the page because
@@ -551,12 +538,11 @@ const QuickReservation = ({
     () =>
       getNextAvailableTime({
         day: date,
-        time,
         duration: duration?.value?.toString() ?? "00:00",
         isSlotReservable,
         reservationUnit: reservationUnit ?? undefined,
       }),
-    [date, time, duration, isSlotReservable, reservationUnit]
+    [date, duration, isSlotReservable, reservationUnit]
   );
 
   // the available times for the selected day
@@ -564,12 +550,11 @@ const QuickReservation = ({
     () =>
       getAvailableTimesForDay({
         day: date,
-        time,
         duration: duration?.value?.toString() ?? "00:00",
         isSlotReservable,
         reservationUnit: reservationUnit ?? undefined,
       }),
-    [date, time, duration, isSlotReservable, reservationUnit]
+    [date, duration, isSlotReservable, reservationUnit]
   );
 
   const lastPossibleDate = getLastPossibleReservationDate(
@@ -605,25 +590,6 @@ const QuickReservation = ({
           value={toUIDate(date)}
           minDate={new Date()}
           maxDate={lastPossibleDate ?? undefined}
-        />
-        <StyledTimeInput
-          key={`timeInput-${time}`}
-          id="quick-reservation-time"
-          label={t("reservationCalendar:startTime")}
-          hoursLabel={t("common:hours")}
-          minutesLabel={t("common:minutes")}
-          defaultValue={time}
-          onChange={(e) => {
-            if (e.target.value.length !== 5) {
-              return;
-            }
-            const [hours, minutes] = e.target.value.split(":").map(Number);
-            const timeVal = `${
-              hours > 23 ? "00" : padStart(hours.toString(), 2, "0")
-            }:${minutes > 59 ? "00" : padStart(minutes.toString(), 2, "0")}`;
-
-            setTime(timeVal);
-          }}
         />
         <StyledSelect
           key={`durationSelect-${duration?.value}`}

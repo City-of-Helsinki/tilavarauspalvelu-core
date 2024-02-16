@@ -207,9 +207,10 @@ const ResetButton = styled(Button).attrs({
 
   && {
     border: var(--border-width) solid var(--color-black-50) !important;
-      &:hover, &:focus-within {
-          border-color: var(--color-black) !important;
-      }
+    &:hover,
+    &:focus-within {
+      border-color: var(--color-black) !important;
+    }
   }
 
   span {
