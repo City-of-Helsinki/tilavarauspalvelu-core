@@ -4,7 +4,6 @@ from uuid import UUID
 
 from django.conf import settings
 from requests import RequestException
-from requests import get as _get
 from requests import post as _post
 
 from merchants.verkkokauppa.constants import REQUEST_TIMEOUT_SECONDS
@@ -12,7 +11,6 @@ from merchants.verkkokauppa.exceptions import VerkkokauppaConfigurationError
 from merchants.verkkokauppa.product.exceptions import (
     CreateOrUpdateAccountingError,
     CreateProductError,
-    GetProductMappingError,
     ParseAccountingError,
     ParseProductError,
 )
@@ -49,24 +47,6 @@ def create_product(params: CreateProductParams, post=_post) -> Product:
         return Product.from_json(json)
     except (RequestException, JSONDecodeError, ParseProductError) as e:
         raise CreateProductError(f"Product creation failed: {e}")
-
-
-def get_product_mapping(product_id: UUID, get=_get) -> Product | None:
-    try:
-        response = get(
-            url=urljoin(_get_base_url(), f"{product_id!s}/mapping"),
-            headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
-            timeout=REQUEST_TIMEOUT_SECONDS,
-        )
-
-        json = response.json()
-        if response.status_code == 404:
-            return None
-        if response.status_code != 200:
-            raise GetProductMappingError(f"Fetching product mapping failed: {json.get('errors')}")
-        return Product.from_json(json)
-    except (RequestException, JSONDecodeError, ParseProductError) as e:
-        raise GetProductMappingError(f"Fetching product mapping failed: {e}")
 
 
 def create_or_update_accounting(product_id: UUID, params: CreateOrUpdateAccountingParams, post=_post) -> Accounting:
