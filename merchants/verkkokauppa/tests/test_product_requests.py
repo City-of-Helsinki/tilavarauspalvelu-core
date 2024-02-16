@@ -1,6 +1,5 @@
 from contextlib import suppress
 from unittest.mock import Mock
-from uuid import UUID
 
 import pytest
 from assertpy import assert_that
@@ -12,11 +11,10 @@ from merchants.verkkokauppa.constants import REQUEST_TIMEOUT_SECONDS
 from merchants.verkkokauppa.product.exceptions import (
     CreateOrUpdateAccountingError,
     CreateProductError,
-    GetProductMappingError,
 )
-from merchants.verkkokauppa.product.requests import create_or_update_accounting, create_product, get_product_mapping
+from merchants.verkkokauppa.product.requests import create_or_update_accounting, create_product
 from merchants.verkkokauppa.product.types import CreateOrUpdateAccountingParams, CreateProductParams, Product
-from merchants.verkkokauppa.tests.mocks import mock_get, mock_post
+from merchants.verkkokauppa.tests.mocks import mock_post
 
 
 class ProductRequestsTestCaseBase(TestCase):
@@ -48,15 +46,6 @@ class ProductRequestsTestCaseBase(TestCase):
             "namespace": "test-namespace",
             "namespaceEntityId": "test-namespace-entity-id",
             "merchantId": "be4154c7-9f66-4625-998b-18abac4ecae7",
-        }
-
-    @classmethod
-    def get_product_mapping_response(cls) -> dict[str, str]:
-        return {
-            "productId": "0bd382a0-d79f-44c8-b3c6-8617bf72ebd5",
-            "namespace": "test-namespace",
-            "namespaceEntityId": "test-namespace-entity-id",
-            "merchantId": "5fdb7904-1a82-4a3b-9480-cd02cce37999",
         }
 
     @classmethod
@@ -120,54 +109,6 @@ class CreateProductTestCase(ProductRequestsTestCaseBase):
         params = self.create_product_params()
         with pytest.raises(CreateProductError):
             create_product(params, Mock(side_effect=Timeout()))
-
-
-class GetProductMappingTestCase(ProductRequestsTestCaseBase):
-    product_id = UUID("0bd382a0-d79f-44c8-b3c6-8617bf72ebd5")
-
-    def test_get_product_mapping_makes_valid_request(self):
-        get = mock_get(self.get_product_mapping_response())
-        get_product_mapping(self.product_id, get)
-        get.assert_called_with(
-            url=(settings.VERKKOKAUPPA_PRODUCT_API_URL + "/0bd382a0-d79f-44c8-b3c6-8617bf72ebd5/mapping"),
-            headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
-            timeout=REQUEST_TIMEOUT_SECONDS,
-        )
-
-    def test_get_product_mapping_returns_mapping(self):
-        response = self.get_product_mapping_response()
-        get = mock_get(response)
-        mapping = get_product_mapping(self.product_id, get)
-        expected = Product.from_json(response)
-        assert_that(mapping).is_equal_to(expected)
-
-    def test_get_product_mapping_returns_none_404(self):
-        response = {
-            "errors": [
-                {
-                    "code": "product-mapping-not-found",
-                    "message": "Product mapping not found",
-                }
-            ]
-        }
-        get = mock_get(response, status_code=404)
-        mapping = get_product_mapping(self.product_id, get)
-        assert_that(mapping).is_none()
-
-    def test_get_product_mapping_raises_exception_on_server_error(self):
-        response = {"errors": [{"code": "mock-error", "message": "Error Message"}]}
-        get = mock_get(response, status_code=500)
-        with pytest.raises(GetProductMappingError) as e:
-            get_product_mapping(self.product_id, get)
-
-        assert_that(str(e.value)).contains("mock-error")
-
-    def test_get_product_mapping_raises_exception_if_field_is_missing(self):
-        response = self.get_product_mapping_response()
-        response.pop("merchantId")
-        get = mock_get(response)
-        with pytest.raises(GetProductMappingError):
-            get_product_mapping(self.product_id, get)
 
 
 class CreateOrUpdateAccountingTestCase(ProductRequestsTestCaseBase):
