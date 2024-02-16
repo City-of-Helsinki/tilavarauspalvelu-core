@@ -1,5 +1,4 @@
 import { addMinutes, addSeconds, isAfter, isValid } from "date-fns";
-import camelCase from "lodash/camelCase";
 import { secondsToHms } from "common/src/common/util";
 import { OptionType, PendingReservation } from "common/types/common";
 import {
@@ -120,12 +119,12 @@ export const getReservationApplicationMutationValues = (
   const fields = getReservationApplicationFields({
     supportedFields,
     reserveeType,
-  }).map(camelCase);
+  });
 
   const commonFields = getReservationApplicationFields({
     supportedFields,
     reserveeType: "common",
-  }).map(camelCase);
+  });
 
   [...fields, ...commonFields].forEach((field: string) => {
     const key = changes.find((c) => c.field === field)?.mutationField || field;

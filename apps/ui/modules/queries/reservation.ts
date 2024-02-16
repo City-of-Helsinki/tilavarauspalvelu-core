@@ -356,22 +356,6 @@ export const GET_RESERVATION_CANCEL_REASONS = gql`
   }
 `;
 
-export const GET_CITIES = gql`
-  query getCities {
-    cities {
-      edges {
-        node {
-          pk
-          name
-          nameFi
-          nameEn
-          nameSv
-        }
-      }
-    }
-  }
-`;
-
 export const ADJUST_RESERVATION_TIME = gql`
   mutation adjustReservationTime($input: ReservationAdjustTimeMutationInput!) {
     adjustReservationTime(input: $input) {

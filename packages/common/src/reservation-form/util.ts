@@ -5,11 +5,9 @@ import { reservationApplicationFields } from "./types";
 export const getReservationApplicationFields = ({
   supportedFields,
   reserveeType,
-  camelCaseOutput = false,
 }: {
   supportedFields: string[];
   reserveeType: ReservationsReservationReserveeTypeChoices | "common";
-  camelCaseOutput?: boolean;
 }): string[] => {
   if (!supportedFields || supportedFields?.length === 0 || !reserveeType)
     return [];
@@ -27,7 +25,7 @@ export const getReservationApplicationFields = ({
     }
   }
 
-  return camelCaseOutput ? fields.map(camelCase) : fields;
+  return fields.map(camelCase);
 };
 
 export function removeRefParam<Type>(

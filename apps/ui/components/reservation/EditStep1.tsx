@@ -25,6 +25,7 @@ import { capitalize, getTranslation } from "@/modules/util";
 import Sanitize from "../common/Sanitize";
 import { BlackButton, MediumButton } from "@/styles/util";
 import { reservationsPrefix } from "@/modules/const";
+import { filterNonNullable } from "common/src/helpers";
 
 type Props = {
   reservation: ReservationType;
@@ -110,14 +111,12 @@ const EditStep1 = ({
     useState(false);
 
   // TODO all this is copy pasta from reservation-unit/[...params].tsx
-  const supportedFields =
-    frozenReservationUnit?.metadataSet?.supportedFields?.filter(
-      (n): n is string => n != null
-    ) ?? [];
+  const supportedFields = filterNonNullable(
+    frozenReservationUnit?.metadataSet?.supportedFields
+  );
   const generalFields = getReservationApplicationFields({
     supportedFields,
     reserveeType: "common",
-    camelCaseOutput: true,
   }).filter((n) => n !== "reserveeType");
 
   const type = supportedFields.includes("reservee_type")
@@ -126,7 +125,6 @@ const EditStep1 = ({
   const reservationApplicationFields = getReservationApplicationFields({
     supportedFields,
     reserveeType: type ?? "common",
-    camelCaseOutput: true,
   });
 
   const getValue = useCallback(

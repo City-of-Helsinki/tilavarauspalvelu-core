@@ -7,15 +7,12 @@ import { useLocalStorage, useSessionStorage } from "react-use";
 import { Stepper } from "hds-react";
 import { FormProvider, useForm } from "react-hook-form";
 import type { GetServerSidePropsContext } from "next";
-import { isFinite, omit, pick } from "lodash";
+import { omit, pick } from "lodash";
 import { useTranslation } from "next-i18next";
 import { breakpoints } from "common/src/common/style";
 import { fontRegular, H2 } from "common/src/common/typography";
 import {
   Query,
-  QueryAgeGroupsArgs,
-  QueryCitiesArgs,
-  QueryReservationPurposesArgs,
   QueryReservationUnitByPkArgs,
   QueryTermsOfUseArgs,
   QueryReservationByPkArgs,
@@ -52,7 +49,6 @@ import {
 import {
   CONFIRM_RESERVATION,
   DELETE_RESERVATION,
-  GET_CITIES,
   GET_RESERVATION,
   UPDATE_RESERVATION,
 } from "@/modules/queries/reservation";
@@ -63,7 +59,6 @@ import {
   getReservationApplicationMutationValues,
   profileUserFields,
 } from "@/modules/reservation";
-import { AGE_GROUPS, RESERVATION_PURPOSES } from "@/modules/queries/params";
 import { ReservationProps } from "@/context/DataContext";
 import ReservationInfoCard from "@/components/reservation/ReservationInfoCard";
 import Step0 from "@/components/reservation/Step0";
@@ -74,23 +69,23 @@ import { PinkBox } from "@/components/reservation-unit/ReservationUnitStyles";
 import { Toast } from "@/styles/util";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { filterNonNullable } from "common/src/helpers";
+import { OPTIONS_QUERY } from "@/hooks/useOptions";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { locale, params } = ctx;
-  const reservationUnitPk = Number(params?.params?.[0]);
-  const path = params?.params?.[1];
+  const [reservationUnitPk, path, reservationPk] = params?.params ?? [];
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
-  if (isFinite(reservationUnitPk) && path === "reservation") {
+  if (Number.isFinite(Number(reservationUnitPk)) && path === "reservation") {
     const { data: reservationUnitData } = await apolloClient.query<
       Query,
       QueryReservationUnitByPkArgs
     >({
       query: RESERVATION_UNIT,
-      variables: { pk: reservationUnitPk },
+      variables: { pk: Number(reservationUnitPk) },
       fetchPolicy: "no-cache",
     });
 
@@ -109,39 +104,19 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
         ?.map((n) => n?.node)
         .find((n) => n?.pk === "booking") ?? null;
 
-    const { data: reservationPurposesData } = await apolloClient.query<
-      Query,
-      QueryReservationPurposesArgs
-    >({
-      query: RESERVATION_PURPOSES,
+    const { data: paramsData } = await apolloClient.query<Query>({
+      query: OPTIONS_QUERY,
       fetchPolicy: "no-cache",
     });
 
     const reservationPurposes = filterNonNullable(
-      reservationPurposesData.reservationPurposes?.edges?.map(
-        (edge) => edge?.node
-      )
+      paramsData.reservationPurposes?.edges?.map((e) => e?.node)
     );
-    const { data: ageGroupsData } = await apolloClient.query<
-      Query,
-      QueryAgeGroupsArgs
-    >({
-      query: AGE_GROUPS,
-      fetchPolicy: "no-cache",
-    });
     const ageGroups = filterNonNullable(
-      ageGroupsData.ageGroups?.edges?.map((edge) => edge?.node)
+      paramsData.ageGroups?.edges?.map((e) => e?.node)
     );
-
-    const { data: citiesData } = await apolloClient.query<
-      Query,
-      QueryCitiesArgs
-    >({
-      query: GET_CITIES,
-      fetchPolicy: "no-cache",
-    });
     const cities = filterNonNullable(
-      citiesData.cities?.edges?.map((edge) => edge?.node)
+      paramsData.cities?.edges?.map((e) => e?.node)
     );
 
     return {
@@ -149,6 +124,8 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
         ...commonProps,
         key: `${reservationUnitPk}${locale}`,
         reservationUnit: reservationUnitData.reservationUnitByPk ?? null,
+        // TODO check for NaN
+        reservationPk: Number(reservationPk),
         reservationPurposes,
         ageGroups,
         cities,
@@ -163,6 +140,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       ...commonProps,
       key: `${reservationUnitPk}${locale}`,
       reservationUnit: null,
+      reservationPk: null,
       reservationPurposes: [],
       ageGroups: [],
       cities: [],
@@ -231,7 +209,7 @@ const ReservationUnitReservationWithReservationProp = ({
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
-  const [reservationData, setPendingReservation] =
+  const [, setPendingReservation] =
     useSessionStorage<PendingReservation | null>("pendingReservation", null);
 
   const [storedReservation, , removeStoredReservation] =
@@ -411,7 +389,6 @@ const ReservationUnitReservationWithReservationProp = ({
   const generalFields = getReservationApplicationFields({
     supportedFields,
     reserveeType: "common",
-    camelCaseOutput: true,
   }).filter((n) => n !== "reserveeType");
 
   const type = supportedFields.includes("reservee_type")
@@ -420,7 +397,6 @@ const ReservationUnitReservationWithReservationProp = ({
   const reservationApplicationFields = getReservationApplicationFields({
     supportedFields,
     reserveeType: type,
-    camelCaseOutput: true,
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: type the form
@@ -521,7 +497,7 @@ const ReservationUnitReservationWithReservationProp = ({
     return null;
   }
 
-  const pendingReservation = reservation || reservationData;
+  const pendingReservation = reservation;
   return (
     <StyledContainer>
       <Columns>
@@ -579,23 +555,20 @@ const ReservationUnitReservationWithReservationProp = ({
                 options={options}
               />
             )}
-            {step === 1 &&
-              reservation != null &&
-              reservationUnit != null &&
-              termsOfUse?.genericTerms != null && (
-                <Step1
-                  reservation={reservation}
-                  reservationUnit={reservationUnit}
-                  handleSubmit={handleSubmit(onSubmitStep1)}
-                  generalFields={generalFields}
-                  reservationApplicationFields={reservationApplicationFields}
-                  options={options}
-                  reserveeType={reserveeType}
-                  steps={steps}
-                  setStep={setStep}
-                  genericTerms={termsOfUse.genericTerms}
-                />
-              )}
+            {step === 1 && reservation != null && reservationUnit != null && (
+              <Step1
+                reservation={reservation}
+                reservationUnit={reservationUnit}
+                handleSubmit={handleSubmit(onSubmitStep1)}
+                generalFields={generalFields}
+                reservationApplicationFields={reservationApplicationFields}
+                options={options}
+                reserveeType={reserveeType}
+                steps={steps}
+                setStep={setStep}
+                genericTerms={termsOfUse.genericTerms}
+              />
+            )}
           </FormProvider>
         </BodyContainer>
       </Columns>
@@ -620,21 +593,23 @@ const ReservationUnitReservationWithReservationProp = ({
 
 // TODO this is wrong. Use getServerSideProps and export the Page component directly without this wrapper
 const ReservationUnitReservation = (props: Props) => {
-  const [reservationData] = useSessionStorage<PendingReservation | null>(
-    "pendingReservation",
-    null
-  );
+  const { reservationPk } = props;
 
+  // TODO show an error if this fails
+  // TODO show an error if the pk is not a number
   const { data, loading } = useQuery<Query, QueryReservationByPkArgs>(
     GET_RESERVATION,
     {
-      variables: { pk: reservationData?.pk },
-      skip: !reservationData?.pk,
+      variables: { pk: reservationPk },
+      skip: !reservationPk || !Number.isInteger(reservationPk),
       onError: () => {},
     }
   );
 
-  if (loading || !data?.reservationByPk?.pk) return null;
+  // TODO errors vs loading
+  if (loading || !data?.reservationByPk?.pk) {
+    return null;
+  }
 
   const { reservationByPk } = data;
 

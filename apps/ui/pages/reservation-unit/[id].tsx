@@ -748,8 +748,10 @@ const ReservationUnit = ({
         pk: data.createReservation.pk,
         price: data.createReservation.price?.toString() ?? undefined,
       });
-      if (reservationUnit?.pk != null) {
-        router.push(`/reservation-unit/${reservationUnit?.pk}/reservation`);
+      if (reservationUnit?.pk != null && data.createReservation?.pk != null) {
+        router.push(
+          `/reservation-unit/${reservationUnit?.pk}/reservation/${data.createReservation.pk}`
+        );
       }
     },
     onError: (error) => {

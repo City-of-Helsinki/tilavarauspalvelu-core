@@ -2,7 +2,7 @@ import { getReservationApplicationFields } from "../util";
 import { ReservationsReservationReserveeTypeChoices } from "../../../types/gql-types";
 
 describe("getReservationApplicationFields", () => {
-  test("with emrty input", () => {
+  test("with empty input", () => {
     expect(
       getReservationApplicationFields({
         supportedFields: [],
@@ -37,15 +37,14 @@ describe("getReservationApplicationFields", () => {
         supportedFields: fields,
         reserveeType: ReservationsReservationReserveeTypeChoices.Business,
       })
-    ).toEqual(["reservee_organisation_name", "reservee_id"]);
+    ).toEqual(["reserveeOrganisationName", "reserveeId"]);
   });
 
-  test("with nonprofit input, camelCased", () => {
+  test("with nonprofit input", () => {
     expect(
       getReservationApplicationFields({
         supportedFields: fields,
         reserveeType: ReservationsReservationReserveeTypeChoices.Nonprofit,
-        camelCaseOutput: true,
       })
     ).toEqual(["reserveeOrganisationName", "reserveeId"]);
   });

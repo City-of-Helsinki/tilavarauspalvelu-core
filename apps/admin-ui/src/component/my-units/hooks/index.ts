@@ -15,7 +15,8 @@ import {
   ReservationsReservationTypeChoices,
 } from "common/types/gql-types";
 import { toApiDate } from "common/src/common/util";
-import { useNotification } from "../../../context/NotificationContext";
+import { filterNonNullable } from "common/src/helpers";
+import { useNotification } from "@/context/NotificationContext";
 import {
   OPTIONS_QUERY,
   UNIT_QUERY,
@@ -38,12 +39,10 @@ export const useApplicationFields = (
       : ReservationsReservationReserveeTypeChoices.Individual;
 
     return getReservationApplicationFields({
-      supportedFields:
-        reservationUnit.metadataSet?.supportedFields?.filter(
-          (x): x is string => x != null
-        ) ?? [],
+      supportedFields: filterNonNullable(
+        reservationUnit.metadataSet?.supportedFields
+      ),
       reserveeType: type,
-      camelCaseOutput: true,
     });
   }, [reservationUnit.metadataSet?.supportedFields, reserveeType]);
 };
@@ -51,12 +50,10 @@ export const useApplicationFields = (
 export const useGeneralFields = (reservationUnit: ReservationUnitType) => {
   return useMemo(() => {
     return getReservationApplicationFields({
-      supportedFields:
-        reservationUnit.metadataSet?.supportedFields?.filter(
-          (x): x is string => x != null
-        ) ?? [],
+      supportedFields: filterNonNullable(
+        reservationUnit.metadataSet?.supportedFields
+      ),
       reserveeType: "common",
-      camelCaseOutput: true,
     }).filter((n) => n !== "reserveeType");
   }, [reservationUnit.metadataSet?.supportedFields]);
 };

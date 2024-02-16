@@ -15,7 +15,9 @@ export type OptionTypes = {
   participantCountOptions: OptionType[];
 };
 
-const PARAMS = gql`
+// There is a duplicate in admin-ui but it doesn't have translations
+// export so we can use this on SSR
+export const OPTIONS_QUERY = gql`
   query Params {
     reservationUnitTypes {
       edges {
@@ -103,7 +105,7 @@ const sortAgeGroups = (ageGroups: AgeGroupType[]): AgeGroupType[] => {
 export const useOptions = () => {
   const { i18n } = useTranslation();
 
-  const { data, loading: isLoading } = useQuery<Query>(PARAMS);
+  const { data, loading: isLoading } = useQuery<Query>(OPTIONS_QUERY);
   const ageGroups = filterNonNullable(
     data?.ageGroups?.edges?.map((edge) => edge?.node)
   );
