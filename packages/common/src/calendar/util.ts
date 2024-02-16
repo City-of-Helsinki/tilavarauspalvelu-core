@@ -6,7 +6,6 @@ import {
   differenceInMinutes,
   differenceInSeconds,
   format,
-  getISODay,
   isAfter,
   isBefore,
   isSameDay,
@@ -25,7 +24,6 @@ import {
   type ReservationUnitsReservationUnitReservationStartIntervalChoices,
 } from "../../types/gql-types";
 import {
-  type ApplicationEvent,
   type CalendarEventBuffer,
   type OptionType,
   type PendingReservation,
@@ -35,7 +33,6 @@ import {
 import {
   convertHMSToSeconds,
   endOfWeek,
-  parseDate,
   secondsToHms,
   startOfWeek,
   toUIDate,
@@ -54,23 +51,6 @@ export const getWeekOption = (date: Date, t: TFunction): OptionType => {
     label: `${monthName} ${longDate(begin, t)} - ${longDate(end, t)} `,
     value: begin.getTime(),
   };
-};
-
-export const getWeekOptions = (
-  t: TFunction,
-  applicationEvent: ApplicationEvent
-): OptionType[] => {
-  const { begin, end } = applicationEvent;
-  const beginDate = parseDate(begin as string);
-  const endDate = parseDate(end as string);
-  const endSunday = addDays(endDate, getISODay(endDate));
-  let date = beginDate;
-  const options = [] as OptionType[];
-  while (isBefore(date, endSunday)) {
-    options.push(getWeekOption(date, t));
-    date = addDays(date, 7);
-  }
-  return options;
 };
 
 export const displayDate = (date: Date, t: TFunction): string => {

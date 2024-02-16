@@ -75,15 +75,6 @@ import { Toast } from "@/styles/util";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { filterNonNullable } from "common/src/helpers";
 
-/*
-type Props = {
-  reservationUnit: ReservationUnitType;
-  reservationPurposes: ReservationPurposeType[];
-  ageGroups: AgeGroupType[];
-  cities: CityNode[];
-  termsOfUse: Record<string, TermsOfUseType>;
-};
-*/
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
