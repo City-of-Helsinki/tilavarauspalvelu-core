@@ -7,14 +7,8 @@ from sentry_sdk import capture_exception, capture_message
 
 from merchants.models import PaymentProduct
 from merchants.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError
-from merchants.verkkokauppa.product.requests import (
-    create_or_update_accounting,
-    create_product,
-)
-from merchants.verkkokauppa.product.types import (
-    CreateOrUpdateAccountingParams,
-    CreateProductParams,
-)
+from merchants.verkkokauppa.product.types import CreateOrUpdateAccountingParams, CreateProductParams
+from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservation_units.pricing_updates import update_reservation_unit_pricings
 from reservation_units.utils.reservation_unit_payment_helper import ReservationUnitPaymentHelper
 from tilavarauspalvelu.celery import app
@@ -58,9 +52,10 @@ def refresh_reservation_unit_product_mapping(reservation_unit_pk) -> None:
             namespace_entity_id=reservation_unit.pk,
             merchant_id=payment_merchant.id,
         )
-        api_product = create_product(params)
+        api_product = VerkkokauppaAPIClient.create_product(params=params)
         payment_product, _ = PaymentProduct.objects.update_or_create(
-            id=api_product.product_id, defaults={"merchant": payment_merchant}
+            id=api_product.product_id,
+            defaults={"merchant": payment_merchant},
         )
 
         ReservationUnit.objects.filter(pk=reservation_unit_pk).update(payment_product=payment_product)
@@ -103,7 +98,9 @@ def refresh_reservation_unit_accounting(reservation_unit_pk) -> None:
             balance_profit_center=accounting.balance_profit_center,
         )
         try:
-            accounting = create_or_update_accounting(reservation_unit.payment_product.id, params)
+            VerkkokauppaAPIClient.create_or_update_accounting(
+                product_uuid=reservation_unit.payment_product.id, params=params
+            )
         except CreateOrUpdateAccountingError as err:
             log_exception_to_sentry(
                 err,

@@ -1,6 +1,5 @@
 import datetime
 import json
-from unittest import mock
 from uuid import UUID
 
 from django.contrib.auth import get_user_model
@@ -13,6 +12,7 @@ from api.graphql.tests.test_reservation_units.base import (
     mock_create_product,
 )
 from api.graphql.tests.test_reservation_units.conftest import reservation_unit_by_pk_query, reservation_units_query
+from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from permissions.models import (
     GeneralRoleChoice,
     GeneralRolePermission,
@@ -45,6 +45,7 @@ from tests.factories import (
     UnitFactory,
     UnitGroupFactory,
 )
+from tests.helpers import patch_method
 from users.models import PersonalInfoViewLog
 
 DEFAULT_TIMEZONE = get_default_timezone()
@@ -2052,8 +2053,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         ]
         assert PersonalInfoViewLog.objects.all().count() == 1
 
-    @mock.patch("reservation_units.tasks.create_product", return_value=mock_create_product())
-    def test_show_payment_merchant_from_reservation_unit(self, mock_product):
+    @patch_method(VerkkokauppaAPIClient.create_product)
+    def test_show_payment_merchant_from_reservation_unit(self):
+        VerkkokauppaAPIClient.create_product.return_value = mock_create_product()
         merchant = PaymentMerchantFactory.create(name="Test Merchant")
         self.client.force_login(self.general_admin)
         self.reservation_unit.payment_merchant = merchant
@@ -2072,8 +2074,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             {"node": {"nameFi": "test name fi", "paymentMerchant": {"name": "Test Merchant"}}}
         ]
 
-    @mock.patch("reservation_units.tasks.create_product", return_value=mock_create_product())
-    def test_show_payment_merchant_from_unit(self, mock_create_product):
+    @patch_method(VerkkokauppaAPIClient.create_product)
+    def test_show_payment_merchant_from_unit(self):
+        VerkkokauppaAPIClient.create_product.return_value = mock_create_product()
         self.client.force_login(self.general_admin)
         merchant = PaymentMerchantFactory.create(name="Test Merchant")
         self.unit.payment_merchant = merchant
@@ -2091,8 +2094,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
             {"node": {"nameFi": "test name fi", "paymentMerchant": {"name": "Test Merchant"}}}
         ]
 
-    @mock.patch("reservation_units.tasks.create_product", return_value=mock_create_product())
-    def test_hide_payment_merchant_without_permissions(self, mock_product):
+    @patch_method(VerkkokauppaAPIClient.create_product)
+    def test_hide_payment_merchant_without_permissions(self):
+        VerkkokauppaAPIClient.create_product.return_value = mock_create_product()
         merchant = PaymentMerchantFactory.create(name="Test Merchant")
         self.reservation_unit.payment_merchant = merchant
         self.reservation_unit.save()
@@ -2142,8 +2146,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         }
 
     @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
-    @mock.patch("reservation_units.tasks.create_product", return_value=mock_create_product())
-    def test_show_payment_product(self, mock_product):
+    @patch_method(VerkkokauppaAPIClient.create_product)
+    def test_show_payment_product(self):
+        VerkkokauppaAPIClient.create_product.return_value = mock_create_product()
         self.client.force_login(self.general_admin)
 
         merchant_pk = UUID("3828ac38-3e26-4501-8556-ba2ea3442627")
@@ -2174,8 +2179,9 @@ class ReservationUnitQueryTestCase(ReservationUnitQueryTestCaseBase):
         ]
 
     @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
-    @mock.patch("reservation_units.tasks.create_product", return_value=mock_create_product())
-    def test_hide_payment_product_without_permissions(self, mock_product):
+    @patch_method(VerkkokauppaAPIClient.create_product)
+    def test_hide_payment_product_without_permissions(self):
+        VerkkokauppaAPIClient.create_product.return_value = mock_create_product()
         merchant_pk = UUID("3828ac38-3e26-4501-8556-ba2ea3442627")
         merchant = PaymentMerchantFactory.create(pk=merchant_pk, name="Test Merchant")
 

@@ -29,6 +29,18 @@ from merchants.verkkokauppa.payment.exceptions import (
     RefundPaymentError,
 )
 from merchants.verkkokauppa.payment.types import Payment, Refund, RefundStatusResult
+from merchants.verkkokauppa.product.exceptions import (
+    CreateOrUpdateAccountingError,
+    CreateProductError,
+    ParseAccountingError,
+    ParseProductError,
+)
+from merchants.verkkokauppa.product.types import (
+    Accounting,
+    CreateOrUpdateAccountingParams,
+    CreateProductParams,
+    Product,
+)
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
 from utils.external_service.errors import ExternalServiceError
 from utils.sentry import log_exception_to_sentry
@@ -260,6 +272,58 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
 
         except (RequestException, ExternalServiceError, ParseMerchantError) as err:
             raise UpdateMerchantError(action_fail) from err
+
+    ###########
+    # Product #
+    ###########
+
+    @classmethod
+    def create_product(cls, *, params: CreateProductParams) -> Product:
+        action_fail = "Product creation failed"
+        url = f"{settings.VERKKOKAUPPA_PRODUCT_API_URL}"
+
+        try:
+            response = cls.post(
+                url=url,
+                data=params.to_json(),
+            )
+            response_json = cls.response_json(response)
+
+            if response.status_code != 201:
+                raise CreateProductError(f"{action_fail}: {response_json.get('errors')}")
+
+            return Product.from_json(response_json)
+
+        except (RequestException, ExternalServiceError, ParseProductError) as err:
+            raise CreateProductError(f"{action_fail}: {err}") from err
+
+    @classmethod
+    def create_or_update_accounting(cls, *, product_uuid: UUID, params: CreateOrUpdateAccountingParams) -> Accounting:
+        """
+        Be aware that this endpoint allows creating accounting data for products that
+        do not exist. This is intentional, since in some uses cases there is a need
+        to create accounting information before product information.
+
+        It is up to us to make sure that the product exists, as otherwise payments will fail.
+        """
+        action_fail = "Creating or updating accounting failed"
+        url = f"{settings.VERKKOKAUPPA_PRODUCT_API_URL}/{product_uuid}/accounting"
+
+        try:
+            response = cls.post(
+                url=url,
+                data=params.to_json(),
+                headers={"namespace": settings.VERKKOKAUPPA_NAMESPACE},
+            )
+            response_json = cls.response_json(response)
+
+            if response.status_code != 201:
+                raise CreateOrUpdateAccountingError(f"{action_fail}: {response_json.get('errors')}")
+
+            return Accounting.from_json(response_json)
+
+        except (RequestException, ExternalServiceError, ParseAccountingError) as err:
+            raise CreateOrUpdateAccountingError(f"{action_fail}: {err}") from err
 
     ##################
     # Helper methods #

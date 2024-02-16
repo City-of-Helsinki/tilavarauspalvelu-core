@@ -1,148 +1,153 @@
-from contextlib import suppress
-from unittest.mock import Mock
+import json
+from uuid import UUID
 
 import pytest
-from assertpy import assert_that
 from django.conf import settings
-from django.test.testcases import TestCase
 from requests import Timeout
 
-from merchants.verkkokauppa.constants import REQUEST_TIMEOUT_SECONDS
-from merchants.verkkokauppa.product.exceptions import (
-    CreateOrUpdateAccountingError,
-    CreateProductError,
+from merchants.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError, CreateProductError
+from merchants.verkkokauppa.product.types import (
+    Accounting,
+    CreateOrUpdateAccountingParams,
+    CreateProductParams,
+    Product,
 )
-from merchants.verkkokauppa.product.requests import create_or_update_accounting, create_product
-from merchants.verkkokauppa.product.types import CreateOrUpdateAccountingParams, CreateProductParams, Product
-from merchants.verkkokauppa.tests.mocks import mock_post
+from merchants.verkkokauppa.tests.mocks import MockResponse
+from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
+from tests.helpers import patch_method
+
+create_product_params = CreateProductParams(
+    namespace="test-namespace",
+    namespace_entity_id="test-namespace-entity-id",
+    merchant_id="be4154c7-9f66-4625-998b-18abac4ecae7",
+)
 
 
-class ProductRequestsTestCaseBase(TestCase):
-    @classmethod
-    def create_product_params(cls) -> CreateProductParams:
-        return CreateProductParams(
-            namespace="test-namespace",
-            namespace_entity_id="test-namespace-entity-id",
-            merchant_id="be4154c7-9f66-4625-998b-18abac4ecae7",
+create_or_update_account_params = CreateOrUpdateAccountingParams(
+    vat_code="AB",
+    internal_order="1234567890",
+    profit_center="1111111",
+    project="2222222",
+    operation_area="333333",
+    company_code="4444",
+    main_ledger_account="555555",
+    balance_profit_center="2983300",
+)
+
+
+create_product_response = {
+    "productId": "306ab20a-6b30-3ce3-95e8-fef818e6c30e",
+    "namespace": "test-namespace",
+    "namespaceEntityId": "test-namespace-entity-id",
+    "merchantId": "be4154c7-9f66-4625-998b-18abac4ecae7",
+}
+
+
+create_or_update_accounting_response = {
+    "productId": "0bd382a0-d79f-44c8-b3c6-8617bf72ebd5",
+    "vatCode": "AB",
+    "internalOrder": "1234567890",
+    "profitCenter": "1111111",
+    "project": "2222222",
+    "operationArea": "333333",
+    "companyCode": "4444",
+    "mainLedgerAccount": "555555",
+    "balanceProfitCenter": "666666",
+}
+
+
+@patch_method(VerkkokauppaAPIClient.generic)
+def test__create_product__makes_valid_request():
+    VerkkokauppaAPIClient.generic.return_value = MockResponse(status_code=201, json=create_product_response)
+
+    response = VerkkokauppaAPIClient.create_product(params=create_product_params)
+
+    VerkkokauppaAPIClient.generic.assert_called_with(
+        "post",
+        url=settings.VERKKOKAUPPA_PRODUCT_API_URL,
+        data=json.dumps(create_product_params.to_json()),
+        headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
+    )
+
+    assert response == Product.from_json(create_product_response)
+
+
+@patch_method(VerkkokauppaAPIClient.generic)
+def test__create_product__raises_exception_if_product_id_is_missing():
+    response = create_product_response.copy()
+    response.pop("productId")
+    VerkkokauppaAPIClient.generic.return_value = MockResponse(status_code=201, json=response)
+
+    with pytest.raises(CreateProductError):
+        VerkkokauppaAPIClient.create_product(params=create_product_params)
+
+
+@patch_method(VerkkokauppaAPIClient.generic)
+def test__create_product__raises_exception_if_product_id_is_invalid():
+    response = create_product_response.copy()
+    response["productId"] = "invalid-id"
+    VerkkokauppaAPIClient.generic.return_value = MockResponse(status_code=201, json=response)
+
+    with pytest.raises(CreateProductError):
+        VerkkokauppaAPIClient.create_product(params=create_product_params)
+
+
+@patch_method(VerkkokauppaAPIClient.generic)
+def test__create_product__raises_exception_if_status_code_is_not_201():
+    response = {"errors": [{"code": "mock-error", "message": "Error Message"}]}
+    VerkkokauppaAPIClient.generic.return_value = MockResponse(status_code=500, json=response)
+
+    with pytest.raises(CreateProductError):
+        VerkkokauppaAPIClient.create_product(params=create_product_params)
+
+
+@patch_method(VerkkokauppaAPIClient.generic, side_effect=Timeout())
+def test__create_product__raises_exception_on_timeout():
+    with pytest.raises(CreateProductError):
+        VerkkokauppaAPIClient.create_product(params=create_product_params)
+
+
+@patch_method(VerkkokauppaAPIClient.generic)
+def test__create_or_update__account_makes_valid_request():
+    VerkkokauppaAPIClient.generic.return_value = MockResponse(
+        status_code=201, json=create_or_update_accounting_response
+    )
+
+    response = VerkkokauppaAPIClient.create_or_update_accounting(
+        product_uuid=UUID("0bd382a0-d79f-44c8-b3c6-8617bf72ebd5"),
+        params=create_or_update_account_params,
+    )
+
+    VerkkokauppaAPIClient.generic.assert_called_with(
+        "post",
+        url=settings.VERKKOKAUPPA_PRODUCT_API_URL + "/0bd382a0-d79f-44c8-b3c6-8617bf72ebd5/accounting",
+        data=json.dumps(create_or_update_account_params.to_json()),
+        headers={
+            "api-key": settings.VERKKOKAUPPA_API_KEY,
+            "namespace": settings.VERKKOKAUPPA_NAMESPACE,
+        },
+    )
+
+    assert response == Accounting.from_json(create_or_update_accounting_response)
+
+
+@patch_method(VerkkokauppaAPIClient.generic)
+def test__create_or_update_accounting__raises_exception_if_status_code_is_not_201():
+    VerkkokauppaAPIClient.generic.return_value = MockResponse(
+        status_code=500, json={"errors": [{"code": "mock-error", "message": "Error Message"}]}
+    )
+
+    with pytest.raises(CreateOrUpdateAccountingError):
+        VerkkokauppaAPIClient.create_or_update_accounting(
+            product_uuid=UUID("0bd382a0-d79f-44c8-b3c6-8617bf72ebd5"),
+            params=create_or_update_account_params,
         )
 
-    @classmethod
-    def create_or_update_account_params(cls) -> CreateOrUpdateAccountingParams:
-        return CreateOrUpdateAccountingParams(
-            vat_code="AB",
-            internal_order="1234567890",
-            profit_center="1111111",
-            project="2222222",
-            operation_area="333333",
-            company_code="4444",
-            main_ledger_account="555555",
-            balance_profit_center="2983300",
+
+@patch_method(VerkkokauppaAPIClient.generic, side_effect=Timeout())
+def test__create_or_update_accounting__raises_exception_on_timeout():
+    with pytest.raises(CreateOrUpdateAccountingError):
+        VerkkokauppaAPIClient.create_or_update_accounting(
+            product_uuid=UUID("0bd382a0-d79f-44c8-b3c6-8617bf72ebd5"),
+            params=create_or_update_account_params,
         )
-
-    @classmethod
-    def create_product_response(cls) -> dict[str, str]:
-        return {
-            "productId": "306ab20a-6b30-3ce3-95e8-fef818e6c30e",
-            "namespace": "test-namespace",
-            "namespaceEntityId": "test-namespace-entity-id",
-            "merchantId": "be4154c7-9f66-4625-998b-18abac4ecae7",
-        }
-
-    @classmethod
-    def create_or_update_accounting_response(cls) -> dict[str, str]:
-        return {
-            "productId": "0bd382a0-d79f-44c8-b3c6-8617bf72ebd5",
-            "vatCode": "AB",
-            "internalOrder": "1234567890",
-            "profitCenter": "1111111",
-            "project": "2222222",
-            "operationArea": "333333",
-            "companyCode": "4444",
-            "mainLedgerAccount": "555555",
-        }
-
-
-class CreateProductTestCase(ProductRequestsTestCaseBase):
-    def test_create_product_makes_valid_request(self):
-        params = self.create_product_params()
-        post = mock_post(params.to_json())
-        with suppress(Exception):
-            create_product(params, post)
-        post.assert_called_with(
-            url=settings.VERKKOKAUPPA_PRODUCT_API_URL + "/",
-            json=params.to_json(),
-            headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
-            timeout=REQUEST_TIMEOUT_SECONDS,
-        )
-
-    def test_create_product_returns_product(self):
-        params = self.create_product_params()
-        response = self.create_product_response()
-        product = create_product(params, mock_post(response))
-        expected = Product.from_json(response)
-        assert_that(product).is_equal_to(expected)
-
-    def test_create_product_raises_exception_if_product_id_is_missing(self):
-        response = self.create_product_response()
-        params = self.create_product_params()
-        response.pop("productId")
-        with pytest.raises(CreateProductError):
-            create_product(params, mock_post(response))
-
-    def test_create_product_raises_exception_if_product_id_is_invalid(self):
-        response = self.create_product_response()
-        params = self.create_product_params()
-        response["productId"] = "invalid-id"
-        with pytest.raises(CreateProductError):
-            create_product(params, mock_post(response))
-
-    def test_create_product_raises_exception_if_status_code_is_not_201(self):
-        response = {"errors": [{"code": "mock-error", "message": "Error Message"}]}
-        params = self.create_product_params()
-        post = mock_post(response, status_code=500)
-        with pytest.raises(CreateProductError) as e:
-            create_product(params, post)
-
-        assert_that(str(e.value)).contains("mock-error")
-
-    def test_create_product_raises_exception_on_timeout(self):
-        params = self.create_product_params()
-        with pytest.raises(CreateProductError):
-            create_product(params, Mock(side_effect=Timeout()))
-
-
-class CreateOrUpdateAccountingTestCase(ProductRequestsTestCaseBase):
-    def test_create_or_update_account_makes_valid_request(self):
-        params = self.create_or_update_account_params()
-        post = mock_post(params.to_json())
-        with suppress(Exception):
-            create_or_update_accounting("0bd382a0-d79f-44c8-b3c6-8617bf72ebd5", params, post)
-        post.assert_called_with(
-            url=settings.VERKKOKAUPPA_PRODUCT_API_URL + "/0bd382a0-d79f-44c8-b3c6-8617bf72ebd5/accounting",
-            json=params.to_json(),
-            headers={
-                "api-key": settings.VERKKOKAUPPA_API_KEY,
-                "namespace": settings.VERKKOKAUPPA_NAMESPACE,
-            },
-            timeout=REQUEST_TIMEOUT_SECONDS,
-        )
-
-    def test_create_or_update_accounting_raises_exception_if_status_code_is_not_201(
-        self,
-    ):
-        response = {"errors": [{"code": "mock-error", "message": "Error Message"}]}
-        params = self.create_or_update_account_params()
-        post = mock_post(response, status_code=500)
-        with pytest.raises(CreateOrUpdateAccountingError) as e:
-            create_or_update_accounting("0bd382a0-d79f-44c8-b3c6-8617bf72ebd5", params, post)
-
-        assert_that(str(e.value)).contains("mock-error")
-
-    def test_create_or_update_accounting_raises_exception_on_timeout(self):
-        params = self.create_or_update_account_params()
-        with pytest.raises(CreateOrUpdateAccountingError):
-            create_or_update_accounting(
-                "0bd382a0-d79f-44c8-b3c6-8617bf72ebd5",
-                params,
-                Mock(side_effect=Timeout()),
-            )
