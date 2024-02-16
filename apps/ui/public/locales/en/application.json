@@ -72,7 +72,7 @@
     "resetTimes": "Clear calendar",
     "summary": "Summary",
     "prioritySelectLabel": "Type of booking request",
-    "reservationUnitSelectLabel": "Seasonal booking times",
+    "reservationUnitSelectLabel": "Available seasonal booking times for",
     "priorityLabels": {
       "300": "Select preferred time slots",
       "200": "Select other time slots"

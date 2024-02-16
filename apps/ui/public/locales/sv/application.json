@@ -72,7 +72,7 @@
     "resetTimes": "Töm kalendern",
     "summary": "Sammanfattning",
     "prioritySelectLabel": "Typ av tidsönskemål",
-    "reservationUnitSelectLabel": "Säsongbokningstider",
+    "reservationUnitSelectLabel": "Visa säsongbokningstider för lokalen",
     "priorityLabels": {
       "300": "Välj prioriterade tidsönskemål",
       "200": "Välj alternativa tidsönskemål"

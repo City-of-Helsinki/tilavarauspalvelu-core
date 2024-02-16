@@ -73,7 +73,7 @@
     "resetTimes": "Tyhjennä kalenteri",
     "summary": "Yhteenveto",
     "prioritySelectLabel": "Aikatoiveen tyyppi",
-    "reservationUnitSelectLabel": "Kausivarauksen ajankohdat",
+    "reservationUnitSelectLabel": "Näytä kausivarattavat ajankohdat tilalle",
     "priorityLabels": {
       "300": "Valitse ensisijaiset aikatoiveet",
       "200": "Valitse muut aikatoiveet"
