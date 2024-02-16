@@ -174,7 +174,7 @@ const Content = styled.div<{ $isAnimated: boolean }>`
   }
 
   @media (min-width: ${breakpoints.xl}) {
-    grid-template-columns: 154px 120px 100px minmax(100px, 1fr) 100px auto;
+    grid-template-columns: 154px 105px 140px minmax(100px, 1fr) 110px auto;
   }
 `;
 
@@ -188,15 +188,13 @@ const PriceWrapper = styled.div`
   }
 `;
 
-const Label = styled.div`
-  margin-bottom: var(--spacing-2-xs);
-`;
-
 const Price = styled.div`
+  display: flex;
+  align-items: center;
+  height: 58px;
   ${fontRegular};
   font-size: var(--fontsize-body-l);
-  line-height: var(--lineheight-s);
-  padding-bottom: var(--spacing-3-xs);
+  line-height: var(--lineheight-l);
 `;
 
 const ResetButton = styled(Button).attrs({
@@ -204,12 +202,19 @@ const ResetButton = styled(Button).attrs({
   iconLeft: <IconCross aria-hidden />,
 })<{ $isLast: boolean }>`
   --color: var(--color-black);
-
   white-space: nowrap;
   order: 1;
 
+  && {
+    border: var(--border-width) solid var(--color-black-50) !important;
+      &:hover, &:focus-within {
+          border-color: var(--color-black) !important;
+      }
+  }
+
   span {
     ${fontRegular};
+    padding-left: 0;
   }
 
   svg {
@@ -748,8 +753,10 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
             <PriceWrapper>
               {isReservable && (
                 <>
-                  <Label>{t("reservationUnit:price")}:</Label>
-                  <Price data-testid="reservation__price--value">{price}</Price>
+                  <label htmlFor="price">{t("reservationUnit:price")}</label>
+                  <Price id="price" data-testid="reservation__price--value">
+                    {price}
+                  </Price>
                 </>
               )}
             </PriceWrapper>
