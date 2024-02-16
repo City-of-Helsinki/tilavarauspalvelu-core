@@ -8,6 +8,7 @@ import ClientOnly from "common/src/ClientOnly";
 import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
 import { truncatedText } from "@/styles/util";
 import Link from "next/link";
+import { focusStyles } from "common/styles/cssFragments";
 
 type Props = {
   count: number;
@@ -78,11 +79,20 @@ const DeleteButton = styled(Button).attrs({
 `;
 
 const StyledLink = styled(Link)`
-  background-color: var(--color-white);
-  color: var(--color-bus);
+  background-color: transparent;
+  color: var(--color-white);
   ${truncatedText}
   display: flex;
   gap: var(--spacing-2-xs);
+  ${focusStyles}
+  padding: var(--spacing-2-xs) var(--spacing-s);
+  && {
+    --color-focus: var(--color-white);
+    --focus-outline-color: var(--color-white);
+  }
+  &:hover {
+    text-decoration: underline;
+  }
 `;
 
 const StartApplicationBar = ({
