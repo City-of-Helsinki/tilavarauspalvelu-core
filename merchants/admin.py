@@ -4,15 +4,8 @@ from django.utils.translation import gettext_lazy as _
 
 from merchants.models import PaymentAccounting, PaymentMerchant, PaymentOrder
 from merchants.verkkokauppa.merchants.exceptions import GetMerchantError
-from merchants.verkkokauppa.merchants.requests import (
-    create_merchant,
-    get_merchant,
-    update_merchant,
-)
-from merchants.verkkokauppa.merchants.types import (
-    CreateMerchantParams,
-    UpdateMerchantParams,
-)
+from merchants.verkkokauppa.merchants.types import CreateMerchantParams, UpdateMerchantParams
+from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 
 
 class PaymentMerchantForm(forms.ModelForm):
@@ -41,9 +34,9 @@ class PaymentMerchantForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        instance = kwargs.get("instance", None)
+        instance: PaymentMerchant | None = kwargs.get("instance", None)
         if instance and instance.id:
-            merchant_info = get_merchant(instance.id)
+            merchant_info = VerkkokauppaAPIClient.get_merchant(merchant_uuid=instance.id)
             if merchant_info is None:
                 raise GetMerchantError(f"Merchant info for {instance.id!s} not found from Merchant API")
 
@@ -63,7 +56,9 @@ class PaymentMerchantForm(forms.ModelForm):
             self.fields["paytrail_merchant_id"].widget.input_type = "hidden"
 
     def save(self, commit=True):
-        if self.instance:
+        instance: PaymentMerchant | None = self.instance
+
+        if instance:
             params = {
                 "name": self.cleaned_data.get("name", ""),
                 "street": self.cleaned_data.get("street", ""),
@@ -77,16 +72,16 @@ class PaymentMerchantForm(forms.ModelForm):
                 "shop_id": self.cleaned_data.get("shop_id", ""),
             }
 
-            if self.instance.id is None:
+            if instance.id is None:
                 params = CreateMerchantParams(
                     **params,
                     paytrail_merchant_id=self.cleaned_data.get("shop_id", ""),
                 )
-                created_merchant = create_merchant(params)
-                self.instance.id = created_merchant.id
+                created_merchant = VerkkokauppaAPIClient.create_merchant(params=params)
+                instance.id = created_merchant.id
             else:
                 params = UpdateMerchantParams(**params)
-                update_merchant(self.instance.id, params)
+                VerkkokauppaAPIClient.update_merchant(merchant_uuid=instance.id, params=params)
 
         return super().save(commit=commit)
 

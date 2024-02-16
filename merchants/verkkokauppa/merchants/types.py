@@ -3,7 +3,6 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from merchants.verkkokauppa.helpers import parse_datetime
 from merchants.verkkokauppa.merchants.exceptions import ParseMerchantError, ParseMerchantInfoError
 
 
@@ -58,6 +57,8 @@ class Merchant:
 
     @classmethod
     def from_json(cls, json: dict[str, Any]) -> "Merchant":
+        from merchants.verkkokauppa.helpers import parse_datetime
+
         try:
             configurations = json["configurations"]
             return Merchant(

@@ -6,6 +6,13 @@ from sentry_sdk import capture_message
 
 from merchants.verkkokauppa import constants as verkkokauppa_constants
 from merchants.verkkokauppa.exceptions import VerkkokauppaConfigurationError
+from merchants.verkkokauppa.merchants.exceptions import (
+    CreateMerchantError,
+    GetMerchantError,
+    ParseMerchantError,
+    UpdateMerchantError,
+)
+from merchants.verkkokauppa.merchants.types import CreateMerchantParams, Merchant, MerchantInfo, UpdateMerchantParams
 from merchants.verkkokauppa.order.exceptions import (
     CancelOrderError,
     CreateOrderError,
@@ -45,7 +52,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
         url = f"{settings.VERKKOKAUPPA_ORDER_API_URL}/admin/{order_uuid}"
 
         try:
-            response = cls.get(url=url)
+            response = cls.get(url=url, headers={"namespace": settings.VERKKOKAUPPA_NAMESPACE})
             response_json = cls.response_json(response)
 
             if response.status_code == 404:
@@ -113,7 +120,10 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
         url = f"{settings.VERKKOKAUPPA_PAYMENT_API_URL}/admin/{order_uuid}"
 
         try:
-            response = cls.get(url=url)
+            response = cls.get(
+                url=url,
+                headers={"namespace": settings.VERKKOKAUPPA_NAMESPACE},
+            )
             response_json = cls.response_json(response)
 
             if response.status_code == 404:
@@ -133,7 +143,10 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
         url = f"{settings.VERKKOKAUPPA_PAYMENT_API_URL}/admin/refund-payment/{order_uuid}"
 
         try:
-            response = cls.get(url=url)
+            response = cls.get(
+                url=url,
+                headers={"namespace": settings.VERKKOKAUPPA_NAMESPACE},
+            )
             response_json = cls.response_json(response)
 
             if response.status_code == 404:
@@ -182,6 +195,71 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
         except (RequestException, ExternalServiceError, ParseRefundError) as err:
             log_exception_to_sentry(err, details=action_fail, order_id=order_uuid)
             raise RefundPaymentError(f"{action_fail}: {err!s}") from err
+
+    ############
+    # Merchant #
+    ############
+
+    @classmethod
+    def get_merchant(cls, *, merchant_uuid: UUID) -> MerchantInfo | None:
+        action_fail = f"Fetching merchant {merchant_uuid} failed"
+        url = f"{settings.VERKKOKAUPPA_MERCHANT_API_URL}/{settings.VERKKOKAUPPA_NAMESPACE}/{merchant_uuid}"
+
+        try:
+            response = cls.get(url=url)
+            response_json = cls.response_json(response)
+
+            if response.status_code == 404:
+                return None
+
+            if response.status_code != 200:
+                raise GetMerchantError(f"{action_fail}: {response_json.get('errors')}")
+
+            return MerchantInfo.from_json(response_json)
+        except (RequestException, ExternalServiceError, ParseMerchantError) as err:
+            raise GetMerchantError(f"{action_fail}: {err!s}") from err
+
+    @classmethod
+    def create_merchant(cls, *, params: CreateMerchantParams) -> Merchant:
+        action_fail = "Merchant creation failed"
+        url = f"create/merchant/{settings.VERKKOKAUPPA_NAMESPACE}"
+
+        try:
+            response = cls.post(
+                url=f"{settings.VERKKOKAUPPA_MERCHANT_API_URL}/{url}",
+                data=params.to_json(),
+            )
+            response_json = cls.response_json(response)
+
+            if response.status_code != 201:
+                raise CreateMerchantError(f"{action_fail}: {response_json.get('errors')}")
+
+            return Merchant.from_json(response_json)
+
+        except (RequestException, ExternalServiceError, ParseMerchantError) as err:
+            raise CreateMerchantError(action_fail) from err
+
+    @classmethod
+    def update_merchant(cls, *, merchant_uuid: UUID, params: UpdateMerchantParams) -> Merchant:
+        action_fail = "Merchant update failed"
+        url = f"update/merchant/{settings.VERKKOKAUPPA_NAMESPACE}/{merchant_uuid}"
+
+        try:
+            response = cls.post(
+                url=f"{settings.VERKKOKAUPPA_MERCHANT_API_URL}/{url}",
+                data=params.to_json(),
+            )
+            response_json = cls.response_json(response)
+
+            if response.status_code == 404:
+                raise UpdateMerchantError(f"{action_fail}: merchant {merchant_uuid} not found")
+            if response.status_code != 200:
+                raise UpdateMerchantError(f"{action_fail}: {response_json.get('errors')}")
+
+            return Merchant.from_json(response_json)
+
+        except (RequestException, ExternalServiceError, ParseMerchantError) as err:
+            raise UpdateMerchantError(action_fail) from err
 
     ##################
     # Helper methods #
