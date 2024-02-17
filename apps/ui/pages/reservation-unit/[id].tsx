@@ -29,7 +29,7 @@ import {
   isReservationUnitReservable,
 } from "common/src/calendar/util";
 import { Container, formatters as getFormatters } from "common";
-import { useLocalStorage, useMedia, useSessionStorage } from "react-use";
+import { useLocalStorage, useMedia } from "react-use";
 import { breakpoints } from "common/src/common/style";
 import Calendar, { CalendarEvent } from "common/src/calendar/Calendar";
 import { Toolbar } from "common/src/calendar/Toolbar";
@@ -403,9 +403,6 @@ const ReservationUnit = ({
   const now = useMemo(() => new Date(), []);
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
 
-  const [, setPendingReservation] =
-    useSessionStorage<PendingReservation | null>("pendingReservation", null);
-
   const [focusDate, setFocusDate] = useState(new Date());
   const [calendarViewType, setCalendarViewType] = useState<WeekOptions>("week");
   const [initialReservation, setInitialReservation] =
@@ -731,18 +728,15 @@ const ReservationUnit = ({
     { createReservation: ReservationCreateMutationPayload },
     { input: ReservationCreateMutationInput }
   >(CREATE_RESERVATION, {
-    onCompleted: (data) => {
-      if (initialReservation == null || data.createReservation?.pk == null) {
+    onCompleted: ({ createReservation }) => {
+      const { pk } = createReservation;
+      /// ??? errors
+      if (initialReservation == null || pk == null) {
         return;
       }
-      setPendingReservation({
-        ...initialReservation,
-        pk: data.createReservation.pk,
-        price: data.createReservation.price?.toString() ?? undefined,
-      });
-      if (reservationUnit?.pk != null && data.createReservation?.pk != null) {
+      if (reservationUnit?.pk != null && pk != null) {
         router.push(
-          `/reservation-unit/${reservationUnit?.pk}/reservation/${data.createReservation.pk}`
+          `/reservation-unit/${reservationUnit.pk}/reservation/${pk}`
         );
       }
     },

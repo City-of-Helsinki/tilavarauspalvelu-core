@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useMutation, useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
-import { useLocalStorage, useSessionStorage } from "react-use";
+import { useLocalStorage } from "react-use";
 import { Stepper } from "hds-react";
 import { FormProvider, useForm } from "react-hook-form";
 import type { GetServerSidePropsContext } from "next";
@@ -30,7 +30,7 @@ import {
 import { Inputs } from "common/src/reservation-form/types";
 import { Subheading } from "common/src/reservation-form/styles";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
-import { Container, PendingReservation } from "common";
+import { Container } from "common";
 import { createApolloClient } from "@/modules/apolloClient";
 import {
   isBrowser,
@@ -194,6 +194,18 @@ const StyledStepper = styled(Stepper)<{ small: boolean }>`
   ${({ small }) => !small && "max-width: 300px;"}
 `;
 
+/// We want to get rid of the local storage
+/// but there is still code that requires it to be used.
+/// Other pages (ex. login + book) get confused if we don't clear it here.
+const useRemoveStoredReservation = () => {
+  const [storedReservation, , removeStoredReservation] =
+    useLocalStorage<ReservationProps>("reservation");
+
+  useEffect(() => {
+    if (storedReservation) removeStoredReservation();
+  }, [storedReservation, removeStoredReservation]);
+};
+
 const ReservationUnitReservationWithReservationProp = ({
   fetchedReservation,
   reservationUnit,
@@ -207,11 +219,7 @@ const ReservationUnitReservationWithReservationProp = ({
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
-  const [, setPendingReservation] =
-    useSessionStorage<PendingReservation | null>("pendingReservation", null);
-
-  const [storedReservation, , removeStoredReservation] =
-    useLocalStorage<ReservationProps>("reservation");
+  useRemoveStoredReservation();
 
   const [step, setStep] = useState(0);
   const [reservation, setReservation] = useState<ReservationType | null>(
@@ -250,21 +258,15 @@ const ReservationUnitReservationWithReservationProp = ({
     });
   }, [step, requireHandling, reservationUnit, reservation, t]);
 
-  useEffect(() => {
-    if (storedReservation) removeStoredReservation();
-  }, [storedReservation, removeStoredReservation]);
-
   const [deleteReservation] = useMutation<
     { deleteReservation: ReservationDeleteMutationPayload },
     { input: ReservationDeleteMutationInput }
   >(DELETE_RESERVATION, {
     errorPolicy: "all",
     onCompleted: () => {
-      setPendingReservation(null);
       router.push(`${reservationUnitPrefix}/${reservationUnit?.pk}`);
     },
     onError: () => {
-      setPendingReservation(null);
       router.push(`${reservationUnitPrefix}/${reservationUnit?.pk}`);
     },
   });
@@ -276,7 +278,6 @@ const ReservationUnitReservationWithReservationProp = ({
     errorPolicy: "all",
     onCompleted: (data) => {
       if (data.updateReservation?.reservation?.state === "CANCELLED") {
-        setPendingReservation(null);
         router.push(`${reservationUnitPrefix}/${reservationUnit?.pk}`);
       } else {
         const payload = {
@@ -454,8 +455,7 @@ const ReservationUnitReservationWithReservationProp = ({
         },
       },
     });
-    setPendingReservation(null);
-  }, [deleteReservation, reservationPk, setPendingReservation]);
+  }, [deleteReservation, reservationPk]);
 
   useEffect(() => {
     router.beforePopState(({ as }) => {
