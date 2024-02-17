@@ -72,6 +72,7 @@ import { filterNonNullable } from "common/src/helpers";
 import { OPTIONS_QUERY } from "@/hooks/useOptions";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { locale, params } = ctx;
@@ -137,14 +138,9 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
 
   return {
     props: {
+      // have to double up notFound inside the props to get TS types dynamically
+      notFound: true,
       ...commonProps,
-      key: `${reservationUnitPk}${locale}`,
-      reservationUnit: null,
-      reservationPk: null,
-      reservationPurposes: [],
-      ageGroups: [],
-      cities: [],
-      termsOfUse: null,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
     notFound: true,
@@ -205,7 +201,9 @@ const ReservationUnitReservationWithReservationProp = ({
   ageGroups,
   cities,
   termsOfUse,
-}: Props & { fetchedReservation: ReservationType }): JSX.Element | null => {
+}: PropsNarrowed & {
+  fetchedReservation: ReservationType;
+}): JSX.Element | null => {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
@@ -601,7 +599,7 @@ const ReservationUnitReservationWithReservationProp = ({
 };
 
 // TODO this is wrong. Use getServerSideProps and export the Page component directly without this wrapper
-const ReservationUnitReservation = (props: Props) => {
+const ReservationUnitReservation = (props: PropsNarrowed) => {
   const { reservationPk } = props;
 
   // TODO show an error if this fails

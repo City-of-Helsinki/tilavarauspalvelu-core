@@ -27,7 +27,6 @@ import {
   getTimeslots,
   isReservationStartInFuture,
   isReservationUnitReservable,
-  RoundPeriod,
 } from "common/src/calendar/util";
 import { Container, formatters as getFormatters } from "common";
 import { useLocalStorage, useMedia, useSessionStorage } from "react-use";
@@ -48,7 +47,6 @@ import {
   ReservationCreateMutationPayload,
   ReservationsReservationStateChoices,
   ReservationType,
-  ReservationUnitByPkType,
   ReservationUnitByPkTypeReservableTimeSpansArgs,
   ReservationUnitByPkTypeReservationsArgs,
   ReservationUnitsReservationUnitPricingPricingTypeChoices,
@@ -121,19 +119,8 @@ import { CenterSpinner } from "@/components/common/common";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { eventStyleGetter } from "@/components/common/calendarUtils";
 
-// TODO infered types don't cast them
-// type Props = Awaited<ReturnType<typeof getServerSideProps>>['props']
-// Problem is that the logic in getServerSideProps is too complicated
-// the tripple early return returns different types
-type Props = {
-  reservationUnit: ReservationUnitByPkType | null;
-  relatedReservationUnits: ReservationUnitType[];
-  activeApplicationRounds: RoundPeriod[];
-  termsOfUse: Record<string, TermsOfUseType>;
-  apiBaseUrl: string;
-  mapboxToken: string;
-  isPostLogin?: boolean;
-};
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
 type WeekOptions = "day" | "week" | "month";
 
@@ -184,6 +171,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       return {
         props: {
           ...commonProps,
+          notFound: true, // required for type narrowing
         },
         notFound: true,
       };
@@ -194,6 +182,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       return {
         props: {
           ...commonProps,
+          notFound: true, // required for type narrowing
         },
         notFound: true,
       };
@@ -258,6 +247,10 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
 
     if (!reservationUnitData.reservationUnitByPk?.pk) {
       return {
+        props: {
+          ...commonProps,
+          notFound: true, // required for type narrowing
+        },
         notFound: true,
       };
     }
@@ -303,8 +296,10 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       key: `${id}-${locale}`,
       ...commonProps,
       ...(await serverSideTranslations(locale ?? "fi")),
+      notFound: true, // required for type narrowing
       paramsId: id,
     },
+    notFound: true,
   };
 };
 
@@ -402,17 +397,14 @@ const ReservationUnit = ({
   isPostLogin,
   mapboxToken,
   apiBaseUrl,
-}: Props): JSX.Element | null => {
+}: PropsNarrowed): JSX.Element | null => {
   const { t, i18n } = useTranslation();
-
-  const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
-
   const router = useRouter();
+  const now = useMemo(() => new Date(), []);
+  const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
 
   const [, setPendingReservation] =
     useSessionStorage<PendingReservation | null>("pendingReservation", null);
-
-  const now = useMemo(() => new Date(), []);
 
   const [focusDate, setFocusDate] = useState(new Date());
   const [calendarViewType, setCalendarViewType] = useState<WeekOptions>("week");
@@ -1187,7 +1179,7 @@ const ReservationUnit = ({
                   />
                 )}
                 <Sanitize
-                  html={getTranslation(termsOfUse.genericTerms, "text")}
+                  html={getTranslation(termsOfUse.genericTerms ?? {}, "text")}
                 />
               </PaddedContent>
             </Accordion>
