@@ -2,7 +2,7 @@ from typing import Any
 
 from django.core.management.base import BaseCommand
 
-from applications.exporter import ApplicationDataExporter
+from applications.exporter import export_application_round_statistics_for_reservation_units
 
 
 class Command(BaseCommand):
@@ -17,7 +17,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args: Any, **options: Any) -> None:
-        application_rounds = options.get("application_round")
+        application_rounds: list[int] = options.get("application_round")
 
         for application_round in application_rounds:
-            ApplicationDataExporter.export_application_round_statistics_for_reservation_units(application_round)
+            export_application_round_statistics_for_reservation_units(application_round)

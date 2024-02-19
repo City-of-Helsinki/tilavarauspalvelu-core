@@ -12,10 +12,9 @@ from applications.typing import TimeSlot
 from common.utils import comma_sep_str
 
 if TYPE_CHECKING:
-    from applications.models import ApplicationEvent
+    from applications.models import ApplicationSection
 
 __all__ = [
-    "validate_event_reservation_unit_preferred_ordering",
     "validate_reservable_times",
 ]
 
@@ -106,18 +105,18 @@ def validate_string_time(value: str) -> datetime.time:
     raise ValidationError(_("Enter a valid time."), code="invalid")
 
 
-def validate_event_reservation_unit_preferred_ordering(
-    instance: ApplicationEvent | None,
+def validate_reservation_unit_option_preferred_ordering(
+    instance: ApplicationSection | None,
     data: list[dict[str, Any]],
 ) -> None:
-    from applications.models import EventReservationUnit
+    from applications.models import ReservationUnitOption
 
     # Fetch current ordering for existing event reservation units
     current_ordering: dict[str, int] = {}
     if instance is not None:
         current_ordering: dict[str, int] = {
-            event_unit["pk"]: event_unit["preferred_order"]
-            for event_unit in EventReservationUnit.objects.filter(application_event=instance).values(
+            option["pk"]: option["preferred_order"]
+            for option in ReservationUnitOption.objects.filter(application_section=instance).values(
                 "preferred_order", "pk"
             )
         }
@@ -137,8 +136,8 @@ def validate_event_reservation_unit_preferred_ordering(
 
         if order in tracked_ordering:
             errors.append(
-                f"Event reservation unit {pk_or_order} has duplicate 'preferred_order' "
-                f"{order} with these event reservation units: {comma_sep_str(tracked_ordering[order])}"
+                f"Reservation Unit Option {pk_or_order} has duplicate 'preferred_order' "
+                f"{order} with these Reservation Unit Options: {comma_sep_str(tracked_ordering[order])}"
             )
 
         tracked_ordering.setdefault(order, [])
@@ -152,7 +151,7 @@ def validate_event_reservation_unit_preferred_ordering(
     for index, (tracked, pks) in enumerate(sorted(tracked_ordering.items(), key=lambda x: x[0])):
         if index != tracked:
             # There should be only one pk in the list, since we raised errors early
-            errors.append(f"Event reservation unit {pks[0]} has 'preferred_order' {tracked} but should be {index}")
+            errors.append(f"Reservation Unit Option {pks[0]} has 'preferred_order' {tracked} but should be {index}")
 
     if errors:
         raise serializers.ValidationError(errors)

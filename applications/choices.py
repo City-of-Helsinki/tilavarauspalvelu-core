@@ -7,10 +7,12 @@ __all__ = [
     "ApplicantTypeChoice",
     "ApplicationEventStatusChoice",
     "ApplicationRoundStatusChoice",
+    "ApplicationSectionStatusChoice",
     "ApplicationStatusChoice",
     "OrganizationTypeChoice",
-    "PriorityChoice",
+    "Priority",
     "TargetGroupChoice",
+    "Weekday",
     "WeekdayChoice",
 ]
 
@@ -25,10 +27,19 @@ class WeekdayChoice(models.IntegerChoices):
     SUNDAY = 6, _("Sunday")
 
 
-class PriorityChoice(models.IntegerChoices):
-    LOW = 100, _("Low")
-    MEDIUM = 200, _("Medium")
-    HIGH = 300, _("High")
+class Weekday(models.TextChoices):
+    MONDAY = "MONDAY", _("Monday")
+    TUESDAY = "TUESDAY", _("Tuesday")
+    WEDNESDAY = "WEDNESDAY", _("Wednesday")
+    THURSDAY = "THURSDAY", _("Thursday")
+    FRIDAY = "FRIDAY", _("Friday")
+    SATURDAY = "SATURDAY", _("Saturday")
+    SUNDAY = "SUNDAY", _("Sunday")
+
+
+class Priority(models.TextChoices):
+    PRIMARY = "PRIMARY", _("Primary")
+    SECONDARY = "SECONDARY", _("Secondary")
 
 
 class ApplicantTypeChoice(models.TextChoices):
@@ -62,8 +73,23 @@ class ApplicationRoundStatusChoice(models.TextChoices):
         ]
 
     @DynamicClassAttribute
+    def can_remove_allocations(self) -> bool:
+        return self in [
+            ApplicationRoundStatusChoice.IN_ALLOCATION,
+        ]
+
+    @DynamicClassAttribute
+    def past_allocation(self) -> bool:
+        return self in [
+            ApplicationRoundStatusChoice.HANDLED,
+            ApplicationRoundStatusChoice.RESULTS_SENT,
+        ]
+
+    @DynamicClassAttribute
     def is_ongoing(self) -> bool:
-        return self is not ApplicationRoundStatusChoice.RESULTS_SENT
+        return self not in [
+            ApplicationRoundStatusChoice.RESULTS_SENT,
+        ]
 
 
 class ApplicationStatusChoice(models.TextChoices):
@@ -165,6 +191,42 @@ class ApplicationEventStatusChoice(models.TextChoices):
             ApplicationEventStatusChoice.APPROVED,
             ApplicationEventStatusChoice.DECLINED,
             ApplicationEventStatusChoice.UNALLOCATED,
+        ]
+
+
+class ApplicationSectionStatusChoice(models.TextChoices):
+    UNALLOCATED = "UNALLOCATED", _("Unallocated")
+    """Application sections has been created by the user, but it hasn't been allocated"""
+
+    IN_ALLOCATION = "IN_ALLOCATION", _("In Allocation")
+    """Some allocations have been made for the application section, but allocation is not finished"""
+
+    HANDLED = "HANDLED", _("Handled")
+    """Application section has been handled fully in the allocation process"""
+
+    RESERVED = "RESERVED", _("Reserved")
+    """All reservations for the application section have been created successfully"""
+
+    FAILED = "FAILED", _("Failed")
+    """Some or all reservations for the application section could not be created successfully"""
+
+    @DynamicClassAttribute
+    def can_approve(self) -> bool:
+        return self in [
+            ApplicationSectionStatusChoice.UNALLOCATED,
+            ApplicationSectionStatusChoice.IN_ALLOCATION,
+        ]
+
+    @DynamicClassAttribute
+    def can_delete(self) -> bool:
+        return self in [ApplicationSectionStatusChoice.UNALLOCATED]
+
+    @DynamicClassAttribute
+    def can_reset(self) -> bool:
+        return self in [
+            ApplicationSectionStatusChoice.UNALLOCATED,
+            ApplicationSectionStatusChoice.IN_ALLOCATION,
+            ApplicationSectionStatusChoice.HANDLED,
         ]
 
 
