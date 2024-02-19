@@ -6,7 +6,6 @@ from graphene_permissions.permissions import BasePermission
 from common.typing import GQLInfo
 from permissions.helpers import (
     can_comment_reservation,
-    can_create_reservation,
     can_create_staff_reservation,
     can_handle_reservation,
     can_manage_ability_groups,
@@ -204,7 +203,7 @@ class ReservationPermission(BasePermission):
         if pk:
             reservation = get_object_or_404(Reservation, pk=input.get("pk"))
             return can_modify_reservation(info.context.user, reservation)
-        return can_create_reservation(info.context.user)
+        return info.context.user.is_authenticated
 
     @classmethod
     def has_filter_permission(cls, info: GQLInfo) -> bool:

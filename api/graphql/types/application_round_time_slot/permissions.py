@@ -1,18 +1,9 @@
-from typing import Any
+from graphene_django_extensions.permissions import BasePermission
 
-from graphene_permissions.permissions import BasePermission
-
-from common.typing import GQLInfo
-from permissions.helpers import can_manage_units_reservation_units
+from common.typing import AnyUser
 
 
 class ApplicationRoundTimeSlotPermission(BasePermission):
     @classmethod
-    def has_permission(cls, info: GQLInfo) -> bool:
+    def has_permission(cls, user: AnyUser) -> bool:
         return True
-
-    @classmethod
-    def has_mutation_permission(cls, root: Any, info: GQLInfo, input: dict) -> bool:
-        user = info.context.user
-        unit = root.reservation_unit.unit
-        return can_manage_units_reservation_units(user, unit)

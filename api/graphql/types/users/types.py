@@ -2,9 +2,10 @@ import datetime
 
 import graphene
 from django.db.models import QuerySet
+from graphene_django_extensions import DjangoNode
 from graphene_permissions.mixins import AuthNode
 
-from api.graphql.extensions.base_types import DjangoAuthNode, TVPBaseConnection
+from api.graphql.extensions.base_types import TVPBaseConnection
 from api.graphql.extensions.legacy_helpers import OldPrimaryKeyObjectType
 from api.graphql.types.permissions.types import GeneralRoleType, ServiceSectorRoleType, UnitRoleType
 from api.graphql.types.users.permissions import ApplicantPermission, UserPermission
@@ -78,7 +79,7 @@ class UserType(AuthNode, OldPrimaryKeyObjectType):
         return is_strong_login(token)
 
 
-class ApplicantNode(DjangoAuthNode):
+class ApplicantNode(DjangoNode):
     name = graphene.String()
 
     class Meta:
@@ -89,11 +90,11 @@ class ApplicantNode(DjangoAuthNode):
             "email",
             "date_of_birth",
         ]
-        permissions_classes = (ApplicantPermission,)
+        permissions_classes = [ApplicantPermission]
 
     def resolve_name(root: User, info: GQLInfo) -> str | None:
         return root.get_full_name()
 
-    def resolve_date_of_birth(root: User, info: GQLInfo) -> str | None:
+    def resolve_date_of_birth(root: User, info: GQLInfo) -> datetime.date | None:
         save_personal_info_view_log.delay(root.pk, info.context.user.id, "User.date_of_birth")
-        return root.date_of_birth
+        return root.date_of_birth if root.date_of_birth else None

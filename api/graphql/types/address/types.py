@@ -1,9 +1,10 @@
-from api.graphql.extensions.base_types import DjangoAuthNode
+from graphene_django_extensions import DjangoNode
+
 from api.graphql.types.address.permissions import AddressPermission
 from applications.models import Address
 
 
-class AddressNode(DjangoAuthNode):
+class AddressNode(DjangoNode):
     class Meta:
         model = Address
         fields = [
@@ -12,4 +13,4 @@ class AddressNode(DjangoAuthNode):
             "post_code",
             "city",
         ]
-        permission_classes = (AddressPermission,)
+        permission_classes = [AddressPermission]

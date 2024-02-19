@@ -1,20 +1,15 @@
 from typing import Any
 
-from graphene_permissions.permissions import BasePermission
+from graphene_django_extensions.permissions import BasePermission
 
-from common.typing import GQLInfo
+from common.typing import AnyUser
 
 
 class OrganisationPermission(BasePermission):
     @classmethod
-    def has_permission(cls, info: GQLInfo) -> bool:
-        return info.context.user.is_authenticated
-
-    @classmethod
-    def has_node_permission(cls, info: GQLInfo, id: str) -> bool:
-        user = info.context.user
+    def has_permission(cls, user: AnyUser) -> bool:
         return user.is_authenticated
 
     @classmethod
-    def has_mutation_permission(cls, root: Any, info: GQLInfo, input: dict[str, Any]) -> bool:
+    def has_mutation_permission(cls, user: AnyUser, input_data: dict[str, Any]) -> bool:
         return False

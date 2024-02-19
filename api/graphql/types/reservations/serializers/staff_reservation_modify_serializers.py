@@ -31,7 +31,6 @@ class StaffReservationModifySerializer(OldPrimaryKeyUpdateSerializer, Reservatio
     buffer_time_after = DurationField(required=False, read_only=True)
 
     home_city_pk = IntegerPrimaryKeyField(queryset=City.objects.all(), source="home_city", allow_null=True)
-    priority = serializers.IntegerField(required=False)
     purpose_pk = IntegerPrimaryKeyField(queryset=ReservationPurpose.objects.all(), source="purpose", allow_null=True)
     reservee_type = OldChoiceCharField(choices=CustomerTypeChoice.choices)
     reservation_unit_pks = serializers.ListField(
@@ -73,7 +72,6 @@ class StaffReservationModifySerializer(OldPrimaryKeyUpdateSerializer, Reservatio
             "name",
             "description",
             "state",
-            "priority",
             "begin",
             "end",
             "buffer_time_before",
@@ -136,7 +134,6 @@ class StaffReservationModifySerializer(OldPrimaryKeyUpdateSerializer, Reservatio
             "String value for ReservationType's ReservationState enum. "
             f"Possible values are {', '.join(value.upper() for value in ReservationStateChoice.values)}."
         )
-        self.fields["priority"].required = False
         self.fields["buffer_time_before"].required = False
         self.fields["buffer_time_after"].required = False
         self.fields["reservation_unit_pks"].required = False

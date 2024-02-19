@@ -1,42 +1,45 @@
-from api.graphql.extensions.base_mutations import CreateAuthMutation, UpdateAuthMutation
-from api.graphql.types.application.permissions import ApplicationDeclinePermission, ApplicationPermission
+from graphene_django_extensions import CreateMutation, UpdateMutation
+
+from api.graphql.types.address.types import AddressNode
+from api.graphql.types.application.permissions import ApplicationPermission
 from api.graphql.types.application.serializers import (
     ApplicationCancelSerializer,
     ApplicationCreateSerializer,
-    ApplicationDeclineSerializer,
     ApplicationSendSerializer,
     ApplicationUpdateSerializer,
 )
-from api.graphql.types.application.types import ApplicationNode
+from api.graphql.types.application_section.types import ApplicationSectionNode
+from api.graphql.types.organization.types import OrganisationNode
+from api.graphql.types.person.types import PersonNode
+
+__all__ = [
+    "ApplicationCreateMutation",
+    "ApplicationUpdateMutation",
+    "ApplicationSendMutation",
+    "ApplicationCancelMutation",
+]
 
 
-class ApplicationCreateMutation(CreateAuthMutation):
+class ApplicationCreateMutation(CreateMutation):
     class Meta:
-        node = ApplicationNode
         serializer_class = ApplicationCreateSerializer
-        permission_classes = (ApplicationPermission,)
+        permission_classes = [ApplicationPermission]
+        nodes = [ApplicationSectionNode, AddressNode, PersonNode, OrganisationNode]
 
 
-class ApplicationUpdateMutation(UpdateAuthMutation):
+class ApplicationUpdateMutation(UpdateMutation):
     class Meta:
-        node = ApplicationNode
         serializer_class = ApplicationUpdateSerializer
-        permission_classes = (ApplicationPermission,)
+        permission_classes = [ApplicationPermission]
 
 
-class ApplicationDeclineMutation(UpdateAuthMutation):
-    class Meta:
-        serializer_class = ApplicationDeclineSerializer
-        permission_classes = (ApplicationDeclinePermission,)
-
-
-class ApplicationSendMutation(UpdateAuthMutation):
+class ApplicationSendMutation(UpdateMutation):
     class Meta:
         serializer_class = ApplicationSendSerializer
-        permission_classes = (ApplicationPermission,)
+        permission_classes = [ApplicationPermission]
 
 
-class ApplicationCancelMutation(UpdateAuthMutation):
+class ApplicationCancelMutation(UpdateMutation):
     class Meta:
         serializer_class = ApplicationCancelSerializer
-        permission_classes = (ApplicationPermission,)
+        permission_classes = [ApplicationPermission]

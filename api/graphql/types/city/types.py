@@ -1,9 +1,10 @@
-from api.graphql.extensions.base_types import DjangoAuthNode
+from graphene_django_extensions import DjangoNode
+
 from api.graphql.types.city.permissions import CityPermission
 from applications.models import City
 
 
-class CityNode(DjangoAuthNode):
+class CityNode(DjangoNode):
     class Meta:
         model = City
         fields = [
@@ -11,4 +12,4 @@ class CityNode(DjangoAuthNode):
             "name",
             "municipality_code",
         ]
-        permission_classes = (CityPermission,)
+        permission_classes = [CityPermission]

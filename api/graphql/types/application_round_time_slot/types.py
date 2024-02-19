@@ -1,18 +1,17 @@
-import graphene
+from graphene_django_extensions import DjangoNode
+from graphene_django_extensions.fields.graphql import TypedDictListField
 
-from api.graphql.extensions.base_types import DjangoAuthNode, convert_typed_dict_to_graphene_type
+from api.graphql.types.application_round_time_slot.permissions import ApplicationRoundTimeSlotPermission
 from applications.models.application_round_time_slot import ApplicationRoundTimeSlot
 from applications.typing import TimeSlot
-
-from .permissions import ApplicationRoundTimeSlotPermission
 
 __all__ = [
     "ApplicationRoundTimeSlotNode",
 ]
 
 
-class ApplicationRoundTimeSlotNode(DjangoAuthNode):
-    reservable_times = graphene.List(convert_typed_dict_to_graphene_type(TimeSlot))
+class ApplicationRoundTimeSlotNode(DjangoNode):
+    reservable_times = TypedDictListField(TimeSlot)
 
     class Meta:
         model = ApplicationRoundTimeSlot
@@ -22,4 +21,4 @@ class ApplicationRoundTimeSlotNode(DjangoAuthNode):
             "closed",
             "reservable_times",
         ]
-        permission_classes = (ApplicationRoundTimeSlotPermission,)
+        permission_classes = [ApplicationRoundTimeSlotPermission]

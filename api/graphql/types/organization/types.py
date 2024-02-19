@@ -1,9 +1,10 @@
-from api.graphql.extensions.base_types import DjangoAuthNode
+from graphene_django_extensions import DjangoNode
+
 from api.graphql.types.organization.permissions import OrganisationPermission
 from applications.models import Organisation
 
 
-class OrganisationNode(DjangoAuthNode):
+class OrganisationNode(DjangoNode):
     class Meta:
         model = Organisation
         fields = [
@@ -17,4 +18,4 @@ class OrganisationNode(DjangoAuthNode):
             "email",
             "address",
         ]
-        permission_classes = (OrganisationPermission,)
+        permission_classes = [OrganisationPermission]

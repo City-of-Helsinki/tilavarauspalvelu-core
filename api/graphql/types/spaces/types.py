@@ -1,4 +1,5 @@
 import graphene
+from graphene_django_extensions.fields import RelatedField
 from graphene_permissions.mixins import AuthNode
 
 from api.graphql.extensions.base_types import TVPBaseConnection
@@ -8,6 +9,7 @@ from api.graphql.extensions.permission_helpers import (
 )
 from api.graphql.types.resources.permissions import ResourcePermission
 from api.graphql.types.spaces.permissions import SpacePermission
+from api.graphql.types.units.types import UnitByPkType
 from common.typing import GQLInfo
 from spaces.models import Building, Location, RealEstate, ServiceSector, Space
 
@@ -21,7 +23,7 @@ class RealEstateType(OldPrimaryKeyObjectType):
 
 
 class BuildingType(OldPrimaryKeyObjectType):
-    real_estate = RealEstateType()
+    real_estate = RelatedField(RealEstateType)
 
     class Meta:
         model = Building
@@ -32,7 +34,10 @@ class BuildingType(OldPrimaryKeyObjectType):
 
 class SpaceType(AuthNode, OldPrimaryKeyObjectType):
     permission_classes = (SpacePermission,)
+    parent = RelatedField(lambda: SpaceType)
     children = graphene.List(lambda: SpaceType)
+    building = RelatedField(BuildingType)
+    unit = RelatedField(UnitByPkType)
     resources = graphene.List("api.graphql.types.resources.types.ResourceType")
     surface_area = graphene.Int
 

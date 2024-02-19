@@ -1,8 +1,9 @@
+from graphene_django_extensions import NestingModelSerializer
+
 from applications.models import Person
-from common.serializers import TranslatedModelSerializer
 
 
-class PersonSerializer(TranslatedModelSerializer):
+class PersonSerializer(NestingModelSerializer):
     class Meta:
         model = Person
         fields = [
