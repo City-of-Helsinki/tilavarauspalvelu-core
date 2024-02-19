@@ -4,6 +4,10 @@ from django.utils.translation import gettext_lazy as _
 from resources.choices import ResourceLocationType
 from spaces.models import Space
 
+__all__ = [
+    "Resource",
+]
+
 
 class Resource(models.Model):
     location_type = models.CharField(

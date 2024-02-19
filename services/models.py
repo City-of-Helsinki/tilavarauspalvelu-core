@@ -1,6 +1,10 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+__all__ = [
+    "Service",
+]
+
 
 class Service(models.Model):
     TYPE_INTRODUCTION = "introduction"

@@ -1,11 +1,21 @@
-from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from permissions.base_models import BaseRole
 from spaces.models import ServiceSector, Unit, UnitGroup
 
-User = get_user_model()
+__all__ = [
+    "GeneralRole",
+    "GeneralRoleChoice",
+    "GeneralRolePermission",
+    "ServiceSectorRole",
+    "ServiceSectorRoleChoice",
+    "ServiceSectorRolePermission",
+    "UnitRole",
+    "UnitRoleChoice",
+    "UnitRolePermission",
+]
+
 
 GENERAL_PERMISSIONS = (
     (
@@ -105,7 +115,6 @@ GENERAL_PERMISSIONS = (
         _("Can create, edit and delete banner notifications in the whole system"),
     ),
 )
-
 
 UNIT_PERMISSIONS = (
     (
@@ -348,7 +357,7 @@ class UnitRole(BaseRole):
         blank=True,
     )
     user = models.ForeignKey(
-        User,
+        "users.User",
         verbose_name=_("User"),
         related_name="unit_roles",
         on_delete=models.CASCADE,
@@ -373,7 +382,7 @@ class ServiceSectorRole(BaseRole):
     )
 
     user = models.ForeignKey(
-        User,
+        "users.User",
         verbose_name=_("User"),
         related_name="service_sector_roles",
         on_delete=models.CASCADE,
@@ -390,7 +399,7 @@ class ServiceSectorRole(BaseRole):
 class GeneralRole(BaseRole):
     role = models.ForeignKey(GeneralRoleChoice, verbose_name=_("Role"), on_delete=models.CASCADE)
     user = models.ForeignKey(
-        User,
+        "users.User",
         verbose_name=_("User"),
         related_name="general_roles",
         on_delete=models.CASCADE,

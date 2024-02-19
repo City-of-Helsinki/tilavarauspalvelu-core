@@ -15,12 +15,12 @@ def get_staff_notification_recipients(
     """
     notification_recipients: list[str] = []
     reservation_units = reservation.reservation_unit.all()
-    units = Unit.objects.filter(reservationunit__in=reservation_units)
+    units: list[int] = list(Unit.objects.filter(reservationunit__in=reservation_units).values_list("pk", flat=True))
 
     users = User.objects.filter(Q(unit_roles__isnull=False) & ~Q(reservation_notification="NONE"))
     for user in users:
         if (
-            has_unit_permission(user, units, "can_manage_reservations")
+            has_unit_permission(user, "can_manage_reservations", units)
             and __user_has_notification_setting(user, notification_settings)
             and (reservation.user is None or user.pk != reservation.user.pk)
         ):

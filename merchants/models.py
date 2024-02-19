@@ -8,6 +8,13 @@ from django.utils.translation import gettext_lazy as _
 
 from merchants.validators import is_numeric, validate_accounting_project
 
+__all__ = [
+    "PaymentMerchant",
+    "PaymentProduct",
+    "PaymentOrder",
+    "PaymentAccounting",
+]
+
 
 class PaymentMerchant(models.Model):
     """
