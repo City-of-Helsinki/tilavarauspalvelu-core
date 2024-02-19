@@ -1,10 +1,10 @@
-from graphene_permissions.permissions import AllowAuthenticated
+from graphene_django_extensions import DjangoNode
+from graphene_django_extensions.permissions import AllowAuthenticated
 
-from api.graphql.extensions.base_types import DjangoAuthNode
 from applications.models import Person
 
 
-class PersonNode(DjangoAuthNode):
+class PersonNode(DjangoNode):
     class Meta:
         model = Person
         fields = [
@@ -14,4 +14,4 @@ class PersonNode(DjangoAuthNode):
             "email",
             "phone_number",
         ]
-        permission_classes = (AllowAuthenticated,)
+        permission_classes = [AllowAuthenticated]

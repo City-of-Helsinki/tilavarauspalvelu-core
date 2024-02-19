@@ -2,6 +2,7 @@ from datetime import datetime
 from decimal import Decimal
 
 import graphene
+from graphene_django_extensions.fields import RelatedField
 from graphene_permissions.mixins import AuthNode
 from graphene_permissions.permissions import AllowAuthenticated
 from rest_framework.reverse import reverse
@@ -64,16 +65,15 @@ class RecurringReservationType(AuthNode, OldPrimaryKeyObjectType):
     permission_classes = (RecurringReservationPermission,)
 
     user = graphene.String()
-    application_event_schedule = graphene.Int()
     age_group = graphene.Field(AgeGroupType)
     ability_group = graphene.Field(AbilityGroupType)
     weekdays = graphene.List(graphene.Int)
+    reservation_unit = RelatedField("api.graphql.types.reservation_units.types.ReservationUnitByPkType")
 
     class Meta:
         model = RecurringReservation
         fields = [
             "user",
-            "application_event_schedule",
             "age_group",
             "ability_group",
             "name",
@@ -97,12 +97,6 @@ class RecurringReservationType(AuthNode, OldPrimaryKeyObjectType):
         if not root.user:
             return None
         return root.user.email
-
-    @recurring_reservation_non_public_field
-    def resolve_application_event_schedule(root: RecurringReservation, info: GQLInfo) -> int | None:
-        if not root.application_event_schedule:
-            return None
-        return root.application_event_schedule.pk
 
     def resolve_weekdays(root: RecurringReservation, info: GQLInfo) -> list[graphene.List]:
         return root.weekday_list
@@ -157,6 +151,9 @@ class ReservationType(AuthNode, OldPrimaryKeyObjectType):
     tax_percentage_value = graphene.Decimal()
     unit_price = graphene.Float()
     user = graphene.Field("api.graphql.types.users.types.UserType")
+    purpose = graphene.Field(ReservationPurposeType)
+    cancel_reason = graphene.Field(lambda: ReservationCancelReasonType)
+    deny_reason = graphene.Field(lambda: ReservationDenyReasonType)
 
     class Meta:
         model = Reservation
@@ -190,7 +187,6 @@ class ReservationType(AuthNode, OldPrimaryKeyObjectType):
             "order",
             "price",
             "price_net",
-            "priority",
             "purpose",
             "recurring_reservation",
             "reservation_units",
@@ -215,7 +211,7 @@ class ReservationType(AuthNode, OldPrimaryKeyObjectType):
         ]
         filter_fields = {
             "state": ["exact"],
-            "priority": ["exact"],
+            "begin": ["exact", "gte", "lte"],
         }
         interfaces = (graphene.relay.Node,)
         connection_class = TVPBaseConnection

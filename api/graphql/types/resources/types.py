@@ -1,16 +1,20 @@
 import graphene
+from graphene_django_extensions.fields import RelatedField
 from graphene_permissions.mixins import AuthNode
 
 from api.graphql.extensions.base_types import TVPBaseConnection
 from api.graphql.extensions.duration_field import Duration
 from api.graphql.extensions.legacy_helpers import OldPrimaryKeyObjectType, get_all_translatable_fields
 from api.graphql.types.resources.permissions import ResourcePermission
-from api.graphql.types.spaces.types import BuildingType
+from api.graphql.types.spaces.types import BuildingType, SpaceType
+from resources.choices import ResourceLocationType
 from resources.models import Resource
 
 
 class ResourceType(AuthNode, OldPrimaryKeyObjectType):
     building = graphene.List(BuildingType)
+    location_type = graphene.Field(graphene.Enum.from_enum(ResourceLocationType))
+    space = RelatedField(SpaceType)
     buffer_time_before = Duration()
     buffer_time_after = Duration()
 

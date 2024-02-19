@@ -1,9 +1,10 @@
+from graphene_django_extensions import NestingModelSerializer
+
 from api.graphql.types.address.serializers import AddressSerializer
 from applications.models import Organisation
-from common.serializers import TranslatedModelSerializer
 
 
-class OrganisationSerializer(TranslatedModelSerializer):
+class OrganisationSerializer(NestingModelSerializer):
     address = AddressSerializer(allow_null=True)
 
     class Meta:

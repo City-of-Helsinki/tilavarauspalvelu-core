@@ -38,7 +38,6 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
         child=IntegerPrimaryKeyField(queryset=ReservationUnit.objects.all()),
         source="reservation_unit",
     )
-    priority = serializers.IntegerField(required=False)
     purpose_pk = IntegerPrimaryKeyField(queryset=ReservationPurpose.objects.all(), source="purpose", allow_null=True)
     home_city_pk = IntegerPrimaryKeyField(queryset=City.objects.all(), source="home_city", allow_null=True)
     age_group_pk = IntegerPrimaryKeyField(queryset=AgeGroup.objects.all(), source="age_group", allow_null=True)
@@ -79,7 +78,6 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
             "name",
             "description",
             "state",
-            "priority",
             "begin",
             "end",
             "buffer_time_before",

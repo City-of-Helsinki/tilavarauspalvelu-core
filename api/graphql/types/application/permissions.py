@@ -1,49 +1,25 @@
-from typing import Any
+from __future__ import annotations
 
-from graphene_permissions.permissions import BasePermission
+from typing import TYPE_CHECKING, Any
 
-from applications.models import Application
-from common.typing import GQLInfo
-from permissions.helpers import can_manage_service_sectors_applications, can_modify_application, can_read_application
+from graphene_django_extensions.permissions import BasePermission
+
+from common.typing import AnyUser
+from permissions.helpers import can_modify_application, can_read_application
+
+if TYPE_CHECKING:
+    from applications.models import Application
 
 
 class ApplicationPermission(BasePermission):
     @classmethod
-    def has_permission(cls, info: GQLInfo) -> bool:
-        return info.context.user.is_authenticated
+    def has_permission(cls, user: AnyUser) -> bool:
+        return user.is_authenticated
 
     @classmethod
-    def has_node_permission(cls, info: GQLInfo, id: str) -> bool:
-        user = info.context.user
-        application = Application.objects.filter(id=id).first()
-
-        if application:
-            return user.is_authenticated and can_read_application(user, application)
-
-        return False
+    def has_node_permission(cls, instance: Application, user: AnyUser, filters: dict[str, Any]) -> bool:
+        return user.is_authenticated and can_read_application(user, instance)
 
     @classmethod
-    def has_mutation_permission(cls, root: Any, info: GQLInfo, input: dict) -> bool:
-        pk = input.get("pk")
-
-        if pk:
-            application = Application.objects.filter(id=pk).first()
-            if not application:
-                return False
-            return can_modify_application(info.context.user, application)
-
-        return cls.has_permission(info)
-
-
-class ApplicationDeclinePermission(BasePermission):
-    @classmethod
-    def has_mutation_permission(cls, root: Any, info: GQLInfo, input: dict[str, Any]) -> bool:
-        pk: int | None = input.get("pk")
-        if not pk:
-            return False
-
-        application: Application | None = Application.objects.filter(id=pk).first()
-        if not application:
-            return False
-
-        return can_manage_service_sectors_applications(info.context.user, application.application_round.service_sector)
+    def has_update_permission(cls, instance: Application, user: AnyUser, input_data: dict[str, Any]) -> bool:
+        return can_modify_application(user, instance)

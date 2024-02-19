@@ -2,49 +2,47 @@ from collections import defaultdict
 from typing import Any
 
 from django.utils import timezone
+from graphene_django_extensions import NestingModelSerializer
 from rest_framework import serializers
 from rest_framework.settings import api_settings
 
 from api.graphql.types.address.serializers import AddressSerializer
-from api.graphql.types.application_event.serializers import ApplicationEventSerializer
+from api.graphql.types.application_section.serializers import ApplicationSectionForApplicationSerializer
 from api.graphql.types.organization.serializers import OrganisationSerializer
 from api.graphql.types.person.serializers import PersonSerializer
-from applications.models import Application, ApplicationEvent
-from common.serializers import TranslatedModelSerializer
+from applications.choices import ApplicationStatusChoice
+from applications.models import Application
 from permissions.helpers import can_validate_unit_applications
 
 
-class ApplicationEventInApplicationSerializer(ApplicationEventSerializer):
-    class Meta:
-        model = ApplicationEvent
-        fields = [field for field in ApplicationEventSerializer.Meta.fields if field != "application"]
-
-
-class ApplicationCreateSerializer(TranslatedModelSerializer):
-    instance: Application
+class ApplicationCreateSerializer(NestingModelSerializer):
+    instance: None
 
     organisation = OrganisationSerializer(required=False, allow_null=True)
     contact_person = PersonSerializer(required=False, allow_null=True)
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    application_events = ApplicationEventInApplicationSerializer(required=False, many=True)
+    application_sections = ApplicationSectionForApplicationSerializer(required=False, many=True)
     billing_address = AddressSerializer(required=False, allow_null=True)
+    status = serializers.ChoiceField(choices=ApplicationStatusChoice.choices, read_only=True)
 
     class Meta:
         model = Application
         fields = [
             "pk",
             "applicant_type",
-            "organisation",
-            "application_round",
-            "contact_person",
-            "user",
-            "application_events",
-            "status",
-            "billing_address",
-            "home_city",
             "created_date",
             "last_modified_date",
+            "cancelled_date",
+            "sent_date",
             "additional_information",
+            "application_round",
+            "organisation",
+            "contact_person",
+            "user",
+            "billing_address",
+            "home_city",
+            "application_sections",
+            "status",
         ]
         extra_kwargs = {
             "home_city": {
@@ -55,73 +53,37 @@ class ApplicationCreateSerializer(TranslatedModelSerializer):
 
 
 class ApplicationUpdateSerializer(ApplicationCreateSerializer):
+    instance: Application
+
     class Meta(ApplicationCreateSerializer.Meta):
         fields = [*ApplicationCreateSerializer.Meta.fields, "working_memo"]
 
     def validate_working_memo(self, value: str) -> str:
-        if not can_validate_unit_applications(self.request_user, self.instance.units):
+        if not can_validate_unit_applications(
+            user=self.request_user,
+            units=list(self.instance.units.values_list("pk", flat=True)),
+        ):
             raise serializers.ValidationError("No permission to access working memo.")
         return value
 
 
-class ApplicationDeclineSerializer(TranslatedModelSerializer):
+class ApplicationSendSerializer(NestingModelSerializer):
     instance: Application
 
     class Meta:
         model = Application
-        fields = [
-            "pk",
-        ]
+        fields = ["pk"]
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         errors: dict[str, list[str]] = defaultdict(list)
 
-        status = self.instance.status
-        if not status.can_decline:
-            msg = f"Application in status '{status.value}' cannot be declined."
+        if not self.instance.application_sections.exists():
+            msg = "Application requires application sections before it can be sent."
             errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
-
-        if errors:
-            raise serializers.ValidationError(errors)
-
-        return data
-
-    def save(self, **kwargs: Any) -> Application:
-        self.instance.actions.decline()
-        return self.instance
-
-
-class ApplicationSendSerializer(TranslatedModelSerializer):
-    instance: Application
-
-    class Meta:
-        model = Application
-        fields = [
-            "pk",
-        ]
-
-    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
-        errors: dict[str, list[str]] = defaultdict(list)
-
-        application_events = self.instance.application_events.all()
-
-        if len(application_events) == 0:
-            msg = "Application requires application events before it can be sent."
-            errors["application_events"].append(msg)
-
-        for event in application_events:
-            for field in ApplicationEvent.required_for_review:
-                value = getattr(event, field, None)
-                if value is None:
-                    msg = (
-                        f"Field '{field}' is required for application event '{event.name}' "
-                        f"before the application can be sent."
-                    )
-                    errors["application_events"].append(msg)
 
         if self.instance.contact_person is None:
             msg = "Contact person is required for application before the it can be sent."
-            errors["contact_person"].append(msg)
+            errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
 
         status = self.instance.status
         if not status.can_send:
@@ -139,14 +101,12 @@ class ApplicationSendSerializer(TranslatedModelSerializer):
         return self.instance
 
 
-class ApplicationCancelSerializer(TranslatedModelSerializer):
+class ApplicationCancelSerializer(NestingModelSerializer):
     instance: Application
 
     class Meta:
         model = Application
-        fields = [
-            "pk",
-        ]
+        fields = ["pk"]
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         errors: dict[str, list[str]] = defaultdict(list)

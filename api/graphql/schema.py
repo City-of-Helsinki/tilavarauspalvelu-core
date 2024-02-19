@@ -7,28 +7,25 @@ from graphene_django.debug import DjangoDebug
 from rest_framework.generics import get_object_or_404
 
 from api.graphql.extensions.permission_helpers import check_resolver_permission
+from api.graphql.types.allocated_time_slot.mutations import (
+    AllocatedTimeSlotCreateMutation,
+    AllocatedTimeSlotDeleteMutation,
+)
+from api.graphql.types.allocated_time_slot.types import AllocatedTimeSlotNode
 from api.graphql.types.application.mutations import (
     ApplicationCancelMutation,
     ApplicationCreateMutation,
-    ApplicationDeclineMutation,
     ApplicationSendMutation,
     ApplicationUpdateMutation,
 )
 from api.graphql.types.application.types import ApplicationNode
-from api.graphql.types.application_event.mutations import (
-    ApplicationEventCreateMutation,
-    ApplicationEventDeclineMutation,
-    ApplicationEventDeleteMutation,
-    ApplicationEventUpdateMutation,
-)
-from api.graphql.types.application_event.types import ApplicationEventNode
-from api.graphql.types.application_event_schedule.mutations import (
-    ApplicationEventScheduleApproveMutation,
-    ApplicationEventScheduleDeclineMutation,
-    ApplicationEventScheduleResetMutation,
-)
-from api.graphql.types.application_event_schedule.types import ApplicationEventScheduleNode
 from api.graphql.types.application_round.types import ApplicationRoundNode
+from api.graphql.types.application_section.mutations import (
+    ApplicationSectionCreateMutation,
+    ApplicationSectionDeleteMutation,
+    ApplicationSectionUpdateMutation,
+)
+from api.graphql.types.application_section.types import ApplicationSectionNode
 from api.graphql.types.banner_notification.mutations import (
     BannerNotificationCreateMutation,
     BannerNotificationDeleteMutation,
@@ -161,9 +158,10 @@ from users.models import User
 
 class Query(graphene.ObjectType):
     application_rounds = ApplicationRoundNode.Connection()
+    application_round = ApplicationRoundNode.Node()
     applications = ApplicationNode.Connection()
-    application_events = ApplicationEventNode.Connection()
-    application_event_schedules = ApplicationEventScheduleNode.Connection()
+    application_sections = ApplicationSectionNode.Connection()
+    allocated_time_slots = AllocatedTimeSlotNode.Connection()
 
     reservations = ReservationsFilter(ReservationType, filterset_class=ReservationFilterSet)
     reservation_by_pk = Field(ReservationType, pk=graphene.Int())
@@ -314,18 +312,15 @@ class Query(graphene.ObjectType):
 class Mutation(graphene.ObjectType):
     create_application = ApplicationCreateMutation.Field()
     update_application = ApplicationUpdateMutation.Field()
-    decline_application = ApplicationDeclineMutation.Field()
     send_application = ApplicationSendMutation.Field()
     cancel_application = ApplicationCancelMutation.Field()
 
-    create_application_event = ApplicationEventCreateMutation.Field()
-    update_application_event = ApplicationEventUpdateMutation.Field()
-    delete_application_event = ApplicationEventDeleteMutation.Field()
-    decline_application_event = ApplicationEventDeclineMutation.Field()
+    create_application_section = ApplicationSectionCreateMutation.Field()
+    update_application_section = ApplicationSectionUpdateMutation.Field()
+    delete_application_section = ApplicationSectionDeleteMutation.Field()
 
-    approve_application_event_schedule = ApplicationEventScheduleApproveMutation.Field()
-    decline_application_event_schedule = ApplicationEventScheduleDeclineMutation.Field()
-    reset_application_event_schedule = ApplicationEventScheduleResetMutation.Field()
+    create_allocated_timeslot = AllocatedTimeSlotCreateMutation.Field()
+    delete_allocated_timeslot = AllocatedTimeSlotDeleteMutation.Field()
 
     create_recurring_reservation = RecurringReservationCreateMutation.Field()
     update_recurring_reservation = RecurringReservationUpdateMutation.Field()

@@ -26,7 +26,6 @@ class ReservationUpdateSerializer(OldPrimaryKeyUpdateSerializer, ReservationCrea
         self.fields["reservee_language"].required = False
         self.fields["name"].required = False
         self.fields["description"].required = False
-        self.fields["priority"].required = False
         self.fields["begin"].required = False
         self.fields["end"].required = False
         self.fields["buffer_time_before"].required = False

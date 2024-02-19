@@ -22,6 +22,7 @@ from api.graphql.types.qualifier.permissions import QualifierPermission
 from api.graphql.types.qualifier.types import QualifierType
 from api.graphql.types.reservation_unit_cancellation_rule.permissions import ReservationUnitCancellationRulePermission
 from api.graphql.types.reservation_unit_cancellation_rule.types import ReservationUnitCancellationRuleType
+from api.graphql.types.reservation_unit_image.types import ReservationUnitImageType
 from api.graphql.types.reservation_unit_payment_type.types import ReservationUnitPaymentTypeType
 from api.graphql.types.reservation_unit_pricing.types import ReservationUnitPricingType
 from api.graphql.types.reservation_unit_type.types import ReservationUnitTypeType
@@ -177,6 +178,7 @@ class ReservationUnitType(
     pricings = graphene.List(ReservationUnitPricingType)
 
     application_round_time_slots = DjangoListField(ApplicationRoundTimeSlotNode)
+    images = DjangoListField(ReservationUnitImageType)
 
     is_closed = graphene.Boolean()
     first_reservable_datetime = graphene.DateTime()
