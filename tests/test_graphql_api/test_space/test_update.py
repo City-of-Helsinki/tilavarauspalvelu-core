@@ -1,7 +1,7 @@
 import pytest
 
 from tests.factories import SpaceFactory
-from tests.helpers import UserType
+from tests.helpers import UserType, deprecated_field_error_messages
 
 from .helpers import UPDATE_MUTATION
 
@@ -45,7 +45,6 @@ def test_update_space__name_fi_cannot_be_empty(graphql, name):
     # then:
     # - The response has errors about nameFi field
     # - The space is not updated in the database
-    assert response.has_errors is True, response
-    assert response.field_error_messages() == ["nameFi cannot be empty."]
+    assert deprecated_field_error_messages(response) == ["nameFi cannot be empty."]
     space.refresh_from_db()
     assert space.name_fi == "foo"

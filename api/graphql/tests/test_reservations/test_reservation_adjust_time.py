@@ -48,7 +48,6 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
             end=cls.reservation_end,
             state=ReservationStateChoice.CONFIRMED,
             user=cls.regular_joe,
-            priority=100,
             unit_price=0,
             tax_percentage_value=24,
             price=0,
@@ -420,7 +419,7 @@ class ReservationAdjustTimeTestCase(ReservationTestCaseBase):
         assert_that(self.reservation.end).is_equal_to(self.reservation_end)
 
     def test_reservation_unit_in_open_application_round_fails(self):
-        ApplicationRoundFactory(
+        ApplicationRoundFactory.create_in_status_open(
             reservation_units=[self.reservation_unit],
             reservation_period_begin=self.reservation_begin.date(),
             reservation_period_end=self.reservation_begin.date(),

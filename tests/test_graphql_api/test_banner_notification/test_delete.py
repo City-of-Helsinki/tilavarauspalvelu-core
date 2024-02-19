@@ -2,6 +2,7 @@ import pytest
 
 from common.models import BannerNotification
 from tests.factories import BannerNotificationFactory, UserFactory
+from tests.helpers import deprecated_field_error_messages
 
 # Applied to all tests
 pytestmark = [
@@ -88,4 +89,4 @@ def test_user_tries_to_delete_non_existing_banner_notification(graphql):
 
     # then:
     # - The response complains about missing banner notification
-    assert response.field_error_messages("nonFieldErrors") == ["Object does not exist."]
+    assert deprecated_field_error_messages(response, "nonFieldErrors") == ["Object does not exist."]

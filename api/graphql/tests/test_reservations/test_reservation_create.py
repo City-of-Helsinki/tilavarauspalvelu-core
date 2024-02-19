@@ -9,7 +9,6 @@ from django.utils.timezone import get_default_timezone
 
 from api.graphql.extensions.validation_errors import ValidationErrorCodes
 from api.graphql.tests.test_reservations.base import ReservationTestCaseBase
-from applications.choices import PriorityChoice
 from applications.models import City
 from opening_hours.models import ReservableTimeSpan
 from reservation_units.enums import (
@@ -48,7 +47,6 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
                 createReservation(input: $input) {
                     reservation {
                         pk
-                        priority
                         calendarUrl
                     }
                     errors {
@@ -116,7 +114,6 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert reservation is not None
         assert reservation.user == self.regular_joe
         assert reservation.state == ReservationStateChoice.CREATED
-        assert reservation.priority == PriorityChoice.MEDIUM
         assert reservation.reservee_first_name == input_data["reserveeFirstName"]
         assert reservation.reservee_last_name == input_data["reserveeLastName"]
         assert reservation.reservee_phone == input_data["reserveePhone"]
@@ -151,7 +148,6 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert reservation is not None
         assert reservation.user == self.regular_joe
         assert reservation.state == ReservationStateChoice.CREATED
-        assert reservation.priority == PriorityChoice.MEDIUM
 
         assert reservation.buffer_time_after == self.reservation_unit.buffer_time_after
         assert reservation.buffer_time_before == self.reservation_unit.buffer_time_before
@@ -455,7 +451,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
         assert saved_reservation is not None
 
     def test_create_fails_when_reservation_unit_in_open_application_round_decimal(self):
-        ApplicationRoundFactory(
+        ApplicationRoundFactory.create_in_status_open(
             reservation_units=[self.reservation_unit],
             reservation_period_begin=datetime.date.today(),
             reservation_period_end=datetime.date.today() + datetime.timedelta(days=10),

@@ -1,127 +1,97 @@
+import django.apps
 import pytest
-from django.db.models import Model
+from django.db import models
 
-from applications.models import (
-    Address,
-    Application,
-    ApplicationEvent,
-    ApplicationEventSchedule,
-    ApplicationRound,
-    ApplicationRoundTimeSlot,
-    City,
-    EventReservationUnit,
-    Organisation,
-    Person,
-)
+from applications.models import ApplicationEvent, ApplicationEventSchedule, EventReservationUnit
 from common.management.commands.create_test_data import create_test_data
-from common.models import BannerNotification
+from email_notification.models import EmailTemplate
+from merchants.models import PaymentOrder
 from permissions.models import (
-    GeneralRole,
     GeneralRoleChoice,
     GeneralRolePermission,
-    ServiceSectorRole,
     ServiceSectorRoleChoice,
     ServiceSectorRolePermission,
-    UnitRole,
     UnitRoleChoice,
     UnitRolePermission,
 )
 from reservation_units.models import (
-    Equipment,
-    EquipmentCategory,
-    Purpose,
-    Qualifier,
-    ReservationUnit,
-    ReservationUnitCancellationRule,
+    Introduction,
+    Keyword,
+    KeywordCategory,
+    KeywordGroup,
+    ReservationUnitImage,
     ReservationUnitPaymentType,
-    ReservationUnitPricing,
-    ReservationUnitType,
     TaxPercentage,
 )
-from reservations.models import (
-    AgeGroup,
-    Reservation,
-    ReservationCancelReason,
-    ReservationDenyReason,
-    ReservationMetadataField,
-    ReservationMetadataSet,
-    ReservationPurpose,
-)
-from resources.models import Resource
-from services.models import Service
-from spaces.models import Location, ServiceSector, Space, Unit, UnitGroup
-from terms_of_use.models import TermsOfUse
-from users.models import User
+from reservations.models import AbilityGroup, RecurringReservation, ReservationMetadataField
+from spaces.models import Building, RealEstate
+from users.models import PersonalInfoViewLog, ProxyUserSocialAuth
 
-models: list[type[Model]] = [
-    Address,
-    AgeGroup,
-    Application,
-    ApplicationEvent,
-    ApplicationEventSchedule,
-    ApplicationRound,
-    ApplicationRoundTimeSlot,
-    BannerNotification,
-    City,
-    Equipment,
-    EquipmentCategory,
-    EventReservationUnit,
-    GeneralRole,
+apps_to_check: list[str] = [
+    "common",
+    "users",
+    "applications",
+    "email_notification",
+    "merchants",
+    "opening_hours",
+    "permissions",
+    "reservation_units",
+    "reservations",
+    "resources",
+    "services",
+    "spaces",
+    "terms_of_use",
+    "api",
+]
+
+models_that_always_contain_data: list[type[models.Model]] = [
     GeneralRoleChoice,
     GeneralRolePermission,
-    Location,
-    Organisation,
-    Person,
-    Purpose,
-    Qualifier,
-    Reservation,
-    ReservationCancelReason,
-    ReservationDenyReason,
     ReservationMetadataField,
-    ReservationMetadataSet,
-    ReservationPurpose,
-    ReservationUnit,
-    ReservationUnitCancellationRule,
     ReservationUnitPaymentType,
-    ReservationUnitPricing,
-    ReservationUnitType,
-    Resource,
-    Service,
-    ServiceSector,
-    ServiceSectorRole,
     ServiceSectorRoleChoice,
     ServiceSectorRolePermission,
-    Space,
     TaxPercentage,
-    TermsOfUse,
-    Unit,
-    UnitGroup,
-    UnitRole,
     UnitRoleChoice,
     UnitRolePermission,
-    User,
+]
+
+models_that_should_be_empty: list[type[models.Model]] = [
+    AbilityGroup,
+    ApplicationEvent,
+    ApplicationEventSchedule,
+    Building,
+    EmailTemplate,
+    EventReservationUnit,
+    Introduction,
+    Keyword,
+    KeywordCategory,
+    KeywordGroup,
+    PaymentOrder,
+    PersonalInfoViewLog,
+    ProxyUserSocialAuth,
+    RealEstate,
+    RecurringReservation,
+    ReservationUnitImage,
 ]
 
 
 @pytest.mark.django_db()
 @pytest.mark.slow()
 def test_create_test_data():
-    for model in models:
-        if model in [
-            GeneralRoleChoice,
-            GeneralRolePermission,
-            ReservationMetadataField,
-            ReservationUnitPaymentType,
-            ServiceSectorRoleChoice,
-            ServiceSectorRolePermission,
-            TaxPercentage,
-            UnitRoleChoice,
-            UnitRolePermission,
-        ]:
+    all_models = []
+    for app_config in django.apps.apps.app_configs.values():
+        if app_config.name in apps_to_check:
+            all_models.extend(app_config.get_models())
+
+    for model in all_models:
+        if model in models_that_always_contain_data:
             continue
-        assert model.objects.count() == 0, f"Model {model.__name__} is not empty"
+        assert not model.objects.exists(), f"Model {model.__name__} is not empty"
 
     create_test_data(flush=False)
 
-    for model in models:
-        assert model.objects.count() != 0, f"Model {model.__name__} is empty"
+    for model in all_models:
+        if model in models_that_should_be_empty:
+            continue
+        assert model.objects.exists(), f"Model {model.__name__} is empty"

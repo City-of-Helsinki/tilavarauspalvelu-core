@@ -25,7 +25,7 @@ def test_unauthenticated_cannot_create_application(graphql):
 
     # then:
     # - The response complains about missing permissions
-    assert response.field_error_messages() == ["No permission to mutate."]
+    assert response.error_message() == "No permission to create."
 
 
 def test_regular_user_can_create_application(graphql):

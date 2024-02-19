@@ -6,7 +6,7 @@ from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from django.utils import timezone
 
-from applications.models import Application, ApplicationEvent
+from applications.models import Application, ApplicationSection
 from merchants.models import OrderStatus
 from reservations.choices import ReservationStateChoice
 from reservations.models import Reservation
@@ -62,7 +62,7 @@ def test_query_user_data__simple(api_client, settings):
 def test_query_user_data__full(api_client, settings):
     user: User = UserFactory.create()
     application: Application = ApplicationFactory.create_in_status_in_allocation(user=user)
-    event: ApplicationEvent = application.application_events.first()
+    section: ApplicationSection = application.application_sections.first()
     reservation: Reservation = ReservationFactory.create(user=user)
 
     settings.GDPR_API_QUERY_SCOPE = "testprefix.gdprquery"
@@ -198,26 +198,18 @@ def test_query_user_data__full(api_client, settings):
                                 "value": application.additional_information,
                             },
                             {
+                                "children": [],
                                 "key": "APPLICATION_EVENTS",
+                            },
+                            {
+                                "key": "APPLICATION_SECTIONS",
                                 "children": [
                                     {
-                                        "key": "APPLICATIONEVENT",
+                                        "key": "APPLICATIONSECTION",
                                         "children": [
                                             {
                                                 "key": "NAME",
-                                                "value": event.name,
-                                            },
-                                            {
-                                                "key": "NAME_FI",
-                                                "value": event.name_fi,
-                                            },
-                                            {
-                                                "key": "NAME_EN",
-                                                "value": event.name_en,
-                                            },
-                                            {
-                                                "key": "NAME_SV",
-                                                "value": event.name_sv,
+                                                "value": section.name,
                                             },
                                         ],
                                     }

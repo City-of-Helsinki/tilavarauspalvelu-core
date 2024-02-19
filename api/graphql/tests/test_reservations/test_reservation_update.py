@@ -46,7 +46,6 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
             end=self.reservation_end,
             state=ReservationStateChoice.CREATED,
             user=self.regular_joe,
-            priority=100,
             unit_price=10,
             tax_percentage_value=24,
             price=10,
@@ -59,7 +58,6 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
                 updateReservation(input: $input) {
                     reservation {
                         pk
-                        priority
                         calendarUrl
                     }
                     errors {
@@ -73,9 +71,8 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
     def get_valid_update_data(self):
         return {
             "pk": self.reservation.pk,
-            "priority": 200,
-            "begin": (self.reservation_begin + datetime.timedelta(hours=1)).strftime("%Y%m%dT%H%M%S%zZ"),
-            "end": (self.reservation_end + datetime.timedelta(hours=1)).strftime("%Y%m%dT%H%M%S%zZ"),
+            "begin": (self.reservation_begin + datetime.timedelta(hours=1)).isoformat(),
+            "end": (self.reservation_end + datetime.timedelta(hours=1)).isoformat(),
         }
 
     def test_updating_reservation_succeed(self):
@@ -90,7 +87,6 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert reservation is not None
         assert reservation.user == self.regular_joe
         assert reservation.state == ReservationStateChoice.CREATED
-        assert reservation.priority == self.get_valid_update_data()["priority"]
         assert reservation.begin == self.reservation_begin + datetime.timedelta(hours=1)
         assert reservation.end == self.reservation_end + datetime.timedelta(hours=1)
 
@@ -173,15 +169,13 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         self.client.force_login(self.regular_joe)
         response = self.query(
             self.get_update_query(),
-            input_data={"pk": self.reservation.id, "priority": 200},
+            input_data={"pk": self.reservation.id},
         )
         content = json.loads(response.content)
 
         assert content.get("errors") is not None
         assert content.get("errors")[0]["message"] == "Reservation overlaps with reservation before due to buffer time."
         assert content.get("errors")[0]["extensions"]["error_code"] == "RESERVATION_OVERLAP"
-
-        assert self.reservation.priority == 100
 
     def test_update_fails_when_buffer_time_overlaps_reservation_after(self):
         begin = datetime.datetime.now(tz=get_default_timezone()) + datetime.timedelta(hours=2)
@@ -292,7 +286,7 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert saved_reservation.end == end
 
     def test_update_fails_when_reservation_unit_in_open_application_round_decimal(self):
-        ApplicationRoundFactory(
+        ApplicationRoundFactory.create_in_status_open(
             reservation_units=[self.reservation_unit],
             reservation_period_begin=datetime.date.today(),
             reservation_period_end=datetime.date.today() + datetime.timedelta(days=10),
@@ -568,7 +562,6 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert content.get("data").get("updateReservation").get("errors") is None
         self.reservation.refresh_from_db()
         assert self.reservation is not None
-        assert self.reservation.priority == update_data["priority"]
 
     def test_updating_reservation_with_staff_event_succeed(self):
         self.client.force_login(self.general_admin)
@@ -620,7 +613,6 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert content.get("data").get("updateReservation").get("errors") is None
         self.reservation.refresh_from_db()
         assert self.reservation is not None
-        assert self.reservation.priority == update_data["priority"]
         assert self.reservation.price == 10
         assert self.reservation.unit_price == 10
         assert self.reservation.tax_percentage_value == 24
@@ -653,7 +645,6 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert content.get("data").get("updateReservation").get("errors") is None
         self.reservation.refresh_from_db()
         assert self.reservation is not None
-        assert self.reservation.priority == update_data["priority"]
         assert self.reservation.price == 3.0
         assert self.reservation.unit_price == 3.0
         assert self.reservation.tax_percentage_value == tax_percentage.value
@@ -686,7 +677,6 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert content.get("data").get("updateReservation").get("errors") is None
         self.reservation.refresh_from_db()
         assert self.reservation is not None
-        assert self.reservation.priority == update_data["priority"]
         assert self.reservation.price == 3.0
         assert self.reservation.unit_price == 3.0
         assert self.reservation.tax_percentage_value == tax_percentage.value
@@ -749,7 +739,6 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert content.get("data").get("updateReservation").get("errors") is None
         self.reservation.refresh_from_db()
         assert self.reservation is not None
-        assert self.reservation.priority == update_data["priority"]
         assert self.reservation.price == 4.0
         assert self.reservation.unit_price == 4.0
         assert self.reservation.tax_percentage_value == tax_percentage.value
@@ -796,7 +785,6 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert content.get("data").get("updateReservation").get("errors") is None
         self.reservation.refresh_from_db()
         assert self.reservation is not None
-        assert self.reservation.priority == update_data["priority"]
         assert self.reservation.price == 6.0
         assert self.reservation.unit_price == 6.0
         assert self.reservation.tax_percentage_value == tax_percentage.value
@@ -860,7 +848,6 @@ class ReservationUpdateTestCase(ReservationTestCaseBase):
         assert reservation is not None
         assert reservation.user == self.regular_joe
         assert reservation.state == ReservationStateChoice.CREATED
-        assert reservation.priority == self.get_valid_update_data()["priority"]
         assert reservation.begin == self.reservation_begin + datetime.timedelta(hours=1)
         assert reservation.end == self.reservation_end + datetime.timedelta(hours=1)
         assert reservation.reservee_first_name != "John"

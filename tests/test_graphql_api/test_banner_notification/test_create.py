@@ -4,7 +4,7 @@ import pytest
 
 from common.choices import BannerNotificationLevel, BannerNotificationTarget
 from tests.factories import UserFactory
-from tests.helpers import parametrize_helper
+from tests.helpers import deprecated_field_error_messages, parametrize_helper
 
 # Applied to all tests
 pytestmark = [
@@ -102,9 +102,15 @@ def test_user_creates_non_draft_banner_notification_without_required_fields(grap
 
     # then:
     # - The response complains about the missing fields
-    assert response.field_error_messages("activeFrom") == ["Non-draft notifications must set 'active_from'"]
-    assert response.field_error_messages("activeUntil") == ["Non-draft notifications must set 'active_until'"]
-    assert response.field_error_messages("message") == ["Non-draft notifications must have a message."]
+    assert deprecated_field_error_messages(response, "activeFrom") == [
+        "Non-draft notifications must set 'active_from'",
+    ]
+    assert deprecated_field_error_messages(response, "activeUntil") == [
+        "Non-draft notifications must set 'active_until'"
+    ]
+    assert deprecated_field_error_messages(response, "message") == [
+        "Non-draft notifications must have a message.",
+    ]
 
 
 @pytest.mark.parametrize(

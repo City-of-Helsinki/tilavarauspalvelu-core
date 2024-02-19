@@ -2,80 +2,77 @@ import datetime
 from functools import partial
 from typing import Any
 
-from applications.choices import ApplicantTypeChoice, WeekdayChoice
+from graphene_django_extensions.testing import build_mutation, build_query
+
+from applications.choices import ApplicantTypeChoice, Priority, Weekday
 from applications.models import Application, ApplicationRound
-from common.date_utils import timedelta_to_json
 from tests.factories import (
-    AbilityGroupFactory,
     AgeGroupFactory,
     CityFactory,
     ReservationPurposeFactory,
     ReservationUnitFactory,
 )
-from tests.gql_builders import build_mutation, build_query
 
-applications_query = partial(build_query, "applications", connection=True, order_by="pk")
+applications_query = partial(build_query, "applications", connection=True, order_by="pkAsc")
 
 CREATE_MUTATION = build_mutation(
     "createApplication",
-    "ApplicationCreateMutationInput",
+    "ApplicationCreateMutation",
 )
 
 UPDATE_MUTATION = build_mutation(
     "updateApplication",
-    "ApplicationUpdateMutationInput",
+    "ApplicationUpdateMutation",
 )
 
 DECLINE_MUTATION = build_mutation(
     "declineApplication",
-    "ApplicationDeclineMutationInput",
+    "ApplicationDeclineMutation",
 )
 
 SEND_MUTATION = build_mutation(
     "sendApplication",
-    "ApplicationSendMutationInput",
+    "ApplicationSendMutation",
 )
 
 CANCEL_MUTATION = build_mutation(
     "cancelApplication",
-    "ApplicationCancelMutationInput",
+    "ApplicationCancelMutation",
 )
 
 
-def get_application_create_data(application_round: ApplicationRound, create_events: bool = False) -> dict[str, Any]:
-    events: list[dict[str, Any]] = []
+def get_application_create_data(application_round: ApplicationRound, create_sections: bool = False) -> dict[str, Any]:
+    sections: list[dict[str, Any]] = []
     home_city = CityFactory.create()
 
-    if create_events:
+    if create_sections:
         reservation_purpose = ReservationPurposeFactory.create()
-        ability_group = AbilityGroupFactory.create()
         age_group = AgeGroupFactory.create()
         reservation_unit = ReservationUnitFactory.create(
             unit__service_sectors=[application_round.service_sector],
             application_rounds=[application_round],
         )
 
-        events = [
+        sections = [
             {
-                "name": "App event name",
-                "applicationEventSchedules": [
+                "name": "Section name",
+                "numPersons": 10,
+                "reservationMinDuration": int(datetime.timedelta(hours=1).total_seconds()),
+                "reservationMaxDuration": int(datetime.timedelta(hours=2).total_seconds()),
+                "appliedReservationsPerWeek": 2,
+                "reservationsBeginDate": datetime.date(2022, 8, 1).isoformat(),
+                "reservationsEndDate": datetime.date(2023, 2, 28).isoformat(),
+                "purpose": reservation_purpose.id,
+                "ageGroup": age_group.id,
+                "suitableTimeRanges": [
                     {
-                        "day": WeekdayChoice.MONDAY.value,
-                        "begin": "10:00",
-                        "end": "16:30",
+                        "priority": Priority.PRIMARY.value,
+                        "dayOfTheWeek": Weekday.MONDAY.value,
+                        "beginTime": datetime.time(10, 0).isoformat(),
+                        "endTime": datetime.time(16, 0).isoformat(),
                     },
                 ],
-                "numPersons": 10,
-                "ageGroup": age_group.id,
-                "abilityGroup": ability_group.id,
-                "minDuration": timedelta_to_json(datetime.timedelta(hours=1)),
-                "maxDuration": timedelta_to_json(datetime.timedelta(hours=2)),
-                "eventsPerWeek": 2,
-                "biweekly": False,
-                "begin": datetime.date(2022, 8, 1).isoformat(),
-                "end": datetime.date(2023, 2, 28).isoformat(),
-                "purpose": reservation_purpose.id,
-                "eventReservationUnits": [
+                "reservationUnitOptions": [
                     {
                         "preferredOrder": 0,
                         "reservationUnit": reservation_unit.id,
@@ -102,7 +99,7 @@ def get_application_create_data(application_round: ApplicationRound, create_even
             "phoneNumber": "123-123",
         },
         "applicationRound": application_round.pk,
-        "applicationEvents": events,
+        "applicationSections": sections,
         "billingAddress": {
             "streetAddress": "Laskukatu 1c",
             "postCode": "33540",

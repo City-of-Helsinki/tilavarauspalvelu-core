@@ -35,7 +35,6 @@ class RecurringReservationFactory(GenericDjangoModelFactory[RecurringReservation
     end_time = factory.LazyAttribute(lambda r: r.end.time())
 
     user = factory.SubFactory("tests.factories.UserFactory")
-    application_event_schedule = factory.SubFactory("tests.factories.ApplicationEventScheduleFactory")
     reservation_unit = factory.SubFactory("tests.factories.ReservationUnitFactory")
     age_group = factory.SubFactory("tests.factories.AgeGroupFactory")
     ability_group = factory.SubFactory("tests.factories.AbilityGroupFactory")

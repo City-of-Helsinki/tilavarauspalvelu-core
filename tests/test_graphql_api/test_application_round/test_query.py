@@ -74,9 +74,7 @@ def test_can_query_application_rounds__all_fields(graphql):
         "sentDate": None,
         "reservationUnits": [],
         "purposes": [],
-        "serviceSector": {
-            "nameFi": application_round.service_sector.name_fi,
-        },
+        "serviceSector": {"nameFi": application_round.service_sector.name_fi},
         "status": application_round.status,
         "statusTimestamp": application_round.status_timestamp.isoformat(),
         "applicationsCount": 0,

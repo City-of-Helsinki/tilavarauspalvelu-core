@@ -1,13 +1,13 @@
 import datetime
-import itertools
 from unittest import mock
 
 import pytest
 from django.utils import timezone
 
-from applications.choices import ApplicantTypeChoice, PriorityChoice, WeekdayChoice
-from applications.exporter import ApplicationDataExporter, get_header_rows
-from applications.models import ApplicationEvent
+from applications.choices import ApplicantTypeChoice, Priority, Weekday
+from applications.exporter import ApplicationExportRow, export_application_data, get_header_rows
+from applications.models import ApplicationSection
+from common.date_utils import local_date_string, local_timedelta_string
 from tests.factories import ApplicationFactory, ApplicationRoundFactory
 from tests.helpers import parametrize_helper
 
@@ -20,138 +20,122 @@ pytestmark = [
 
 
 def test_application_export_multiple(graphql):
-    # given:
-    # - There are two application rounds in the system
     application_round = ApplicationRoundFactory.create_in_status_in_allocation()
     application_1 = ApplicationFactory.create_in_status_in_allocation(
         application_round=application_round,
         organisation__name="aaa",
-        application_events__application_event_schedules__day=WeekdayChoice.TUESDAY,
-        application_events__application_event_schedules__priority=PriorityChoice.HIGH,
-        application_events__event_reservation_units__reservation_unit__name="foo",
-        application_events__event_reservation_units__reservation_unit__unit__name="fizz",
+        application_sections__suitable_time_ranges__priority=Priority.PRIMARY,
+        application_sections__suitable_time_ranges__day_of_the_week=Weekday.TUESDAY,
+        application_sections__reservation_unit_options__reservation_unit__name="foo",
+        application_sections__reservation_unit_options__reservation_unit__unit__name="fizz",
     )
     application_2 = ApplicationFactory.create_in_status_in_allocation(
         application_round=application_round,
         organisation__name="bbb",
-        application_events__application_event_schedules__day=WeekdayChoice.FRIDAY,
-        application_events__application_event_schedules__priority=PriorityChoice.LOW,
-        application_events__event_reservation_units__reservation_unit__name="bar",
-        application_events__event_reservation_units__reservation_unit__unit__name="buzz",
+        application_sections__suitable_time_ranges__priority=Priority.SECONDARY,
+        application_sections__suitable_time_ranges__day_of_the_week=Weekday.FRIDAY,
+        application_sections__reservation_unit_options__reservation_unit__name="bar",
+        application_sections__reservation_unit_options__reservation_unit__unit__name="buzz",
     )
-    event_1: ApplicationEvent = application_1.application_events.first()
-    event_2: ApplicationEvent = application_2.application_events.first()
+    section_1: ApplicationSection = application_1.application_sections.first()
+    section_2: ApplicationSection = application_2.application_sections.first()
 
-    # when:
-    # - The exporter is run
     open_mock = mock.patch("applications.exporter.open", new=mock.mock_open())
     csv_writer_mock = mock.patch("applications.exporter.writer")
     with open_mock, csv_writer_mock as mock_file:
-        ApplicationDataExporter.export_application_data(application_round_id=application_round.id)
+        export_application_data(application_round_id=application_round.id)
 
-    # then:
-    # - The writes to the csv file are correct
     writes = get_writes(mock_file)
-    header_rows = get_header_rows(spaces_count=1)
+    header_rows = get_header_rows(max_options=1)
     assert writes[0] == header_rows[0]
     assert writes[1] == header_rows[1]
     assert writes[2] == header_rows[2]
 
-    index = itertools.count()
-    row = writes[3]
+    assert writes[3] == [
+        *list(
+            ApplicationExportRow(
+                application_id=str(application_1.id),
+                application_status=application_1.status.value,
+                applicant=application_1.organisation.name,
+                organisation_id=application_1.organisation.identifier,
+                contact_person_first_name=application_1.contact_person.first_name,
+                contact_person_last_name=application_1.contact_person.last_name,
+                contact_person_email=application_1.contact_person.email,
+                contact_person_phone=application_1.contact_person.phone_number,
+                section_id=str(section_1.id),
+                section_status=section_1.status.value,
+                section_name=section_1.name,
+                reservations_begin_date=local_date_string(section_1.reservations_begin_date),
+                reservations_end_date=local_date_string(section_1.reservations_end_date),
+                home_city_name=application_1.home_city.name,
+                purpose_name=section_1.purpose.name,
+                age_group_str=str(section_1.age_group),
+                num_persons=str(section_1.num_persons),
+                applicant_type=application_1.applicant_type,
+                applied_reservations_per_week=str(section_1.applied_reservations_per_week),
+                reservation_min_duration=local_timedelta_string(section_1.reservation_min_duration),
+                reservation_max_duration=local_timedelta_string(section_1.reservation_max_duration),
+                primary_monday="",
+                primary_tuesday="12:00-14:00",
+                primary_wednesday="",
+                primary_thursday="",
+                primary_friday="",
+                primary_saturday="",
+                primary_sunday="",
+                secondary_monday="",
+                secondary_tuesday="",
+                secondary_wednesday="",
+                secondary_thursday="",
+                secondary_friday="",
+                secondary_saturday="",
+                secondary_sunday="",
+            )
+        ),
+        "foo, fizz",  # reservation unit option
+    ]
 
-    # asserts on individual lines since it's easier to debug
-    assert row[next(index)] == application_1.id
-    assert row[next(index)] == application_1.status.value
-    assert row[next(index)] == application_1.organisation.name
-    assert row[next(index)] == application_1.organisation.identifier
-    assert row[next(index)] == application_1.contact_person.first_name
-    assert row[next(index)] == application_1.contact_person.last_name
-    assert row[next(index)] == application_1.contact_person.email
-    assert row[next(index)] == application_1.contact_person.phone_number
-    assert row[next(index)] == event_1.id
-    assert row[next(index)] == event_1.status.value
-    assert row[next(index)] == event_1.name
-    assert row[next(index)] == f"{event_1.begin.day}.{event_1.begin.month}.{event_1.begin.year}"
-    assert row[next(index)] == f"{event_1.end.day}.{event_1.end.month}.{event_1.end.year}"
-    assert row[next(index)] == application_1.home_city.name
-    assert row[next(index)] == event_1.purpose.name
-    assert row[next(index)] == str(event_1.age_group)
-    assert row[next(index)] == event_1.num_persons
-    assert row[next(index)] == application_1.applicant_type
-    assert row[next(index)] == event_1.events_per_week
-    assert row[next(index)] == "1 h"
-    assert row[next(index)] == "2 h"
-    assert row[next(index)] == "foo, fizz"
-    assert row[next(index)] == ""  # Monday, Priority: HIGH
-    assert row[next(index)] == "12:00 - 14:00"  # Tuesday, Priority: HIGH
-    assert row[next(index)] == ""  # Wednesday, Priority: HIGH
-    assert row[next(index)] == ""  # Thursday, Priority: HIGH
-    assert row[next(index)] == ""  # Friday, Priority: HIGH
-    assert row[next(index)] == ""  # Saturday, Priority: HIGH
-    assert row[next(index)] == ""  # Sunday, Priority: HIGH
-    assert row[next(index)] == ""  # Monday, Priority: MEDIUM
-    assert row[next(index)] == ""  # Tuesday, Priority: MEDIUM
-    assert row[next(index)] == ""  # Wednesday, Priority: MEDIUM
-    assert row[next(index)] == ""  # Thursday, Priority: MEDIUM
-    assert row[next(index)] == ""  # Friday, Priority: MEDIUM
-    assert row[next(index)] == ""  # Saturday, Priority: MEDIUM
-    assert row[next(index)] == ""  # Sunday, Priority: MEDIUM
-    assert row[next(index)] == ""  # Monday, Priority: LOW
-    assert row[next(index)] == ""  # Tuesday, Priority: LOW
-    assert row[next(index)] == ""  # Wednesday, Priority: LOW
-    assert row[next(index)] == ""  # Thursday, Priority: LOW
-    assert row[next(index)] == ""  # Friday, Priority: LOW
-    assert row[next(index)] == ""  # Saturday, Priority: LOW
-    assert row[next(index)] == ""  # Sunday, Priority: LOW
-
-    index = itertools.count()
-    row = writes[4]
-
-    # asserts on individual lines since it's easier to debug
-    assert row[next(index)] == application_2.id
-    assert row[next(index)] == application_2.status.value
-    assert row[next(index)] == application_2.organisation.name
-    assert row[next(index)] == application_2.organisation.identifier
-    assert row[next(index)] == application_2.contact_person.first_name
-    assert row[next(index)] == application_2.contact_person.last_name
-    assert row[next(index)] == application_2.contact_person.email
-    assert row[next(index)] == application_2.contact_person.phone_number
-    assert row[next(index)] == event_2.id
-    assert row[next(index)] == event_2.status.value
-    assert row[next(index)] == event_2.name
-    assert row[next(index)] == f"{event_2.begin.day}.{event_2.begin.month}.{event_2.begin.year}"
-    assert row[next(index)] == f"{event_2.end.day}.{event_2.end.month}.{event_2.end.year}"
-    assert row[next(index)] == application_2.home_city.name
-    assert row[next(index)] == event_2.purpose.name
-    assert row[next(index)] == str(event_2.age_group)
-    assert row[next(index)] == event_2.num_persons
-    assert row[next(index)] == application_2.applicant_type
-    assert row[next(index)] == event_2.events_per_week
-    assert row[next(index)] == "1 h"
-    assert row[next(index)] == "2 h"
-    assert row[next(index)] == "bar, buzz"
-    assert row[next(index)] == ""  # Monday, Priority: HIGH
-    assert row[next(index)] == ""  # Tuesday, Priority: HIGH
-    assert row[next(index)] == ""  # Wednesday, Priority: HIGH
-    assert row[next(index)] == ""  # Thursday, Priority: HIGH
-    assert row[next(index)] == ""  # Friday, Priority: HIGH
-    assert row[next(index)] == ""  # Saturday, Priority: HIGH
-    assert row[next(index)] == ""  # Sunday, Priority: HIGH
-    assert row[next(index)] == ""  # Monday, Priority: MEDIUM
-    assert row[next(index)] == ""  # Tuesday, Priority: MEDIUM
-    assert row[next(index)] == ""  # Wednesday, Priority: MEDIUM
-    assert row[next(index)] == ""  # Thursday, Priority: MEDIUM
-    assert row[next(index)] == ""  # Friday, Priority: MEDIUM
-    assert row[next(index)] == ""  # Saturday, Priority: MEDIUM
-    assert row[next(index)] == ""  # Sunday, Priority: MEDIUM
-    assert row[next(index)] == ""  # Monday, Priority: LOW
-    assert row[next(index)] == ""  # Tuesday, Priority: LOW
-    assert row[next(index)] == ""  # Wednesday, Priority: LOW
-    assert row[next(index)] == ""  # Thursday, Priority: LOW
-    assert row[next(index)] == "12:00 - 14:00"  # Friday, Priority: LOW
-    assert row[next(index)] == ""  # Saturday, Priority: LOW
-    assert row[next(index)] == ""  # Sunday, Priority: LOW
+    assert writes[4] == [
+        *list(
+            ApplicationExportRow(
+                application_id=str(application_2.id),
+                application_status=application_2.status.value,
+                applicant=application_2.organisation.name,
+                organisation_id=application_2.organisation.identifier,
+                contact_person_first_name=application_2.contact_person.first_name,
+                contact_person_last_name=application_2.contact_person.last_name,
+                contact_person_email=application_2.contact_person.email,
+                contact_person_phone=application_2.contact_person.phone_number,
+                section_id=str(section_2.id),
+                section_status=section_2.status.value,
+                section_name=section_2.name,
+                reservations_begin_date=local_date_string(section_2.reservations_begin_date),
+                reservations_end_date=local_date_string(section_2.reservations_end_date),
+                home_city_name=application_2.home_city.name,
+                purpose_name=section_2.purpose.name,
+                age_group_str=str(section_2.age_group),
+                num_persons=str(section_2.num_persons),
+                applicant_type=application_2.applicant_type,
+                applied_reservations_per_week=str(section_2.applied_reservations_per_week),
+                reservation_min_duration=local_timedelta_string(section_2.reservation_min_duration),
+                reservation_max_duration=local_timedelta_string(section_2.reservation_max_duration),
+                primary_monday="",
+                primary_tuesday="",
+                primary_wednesday="",
+                primary_thursday="",
+                primary_friday="",
+                primary_saturday="",
+                primary_sunday="",
+                secondary_monday="",
+                secondary_tuesday="",
+                secondary_wednesday="",
+                secondary_thursday="",
+                secondary_friday="12:00-14:00",
+                secondary_saturday="",
+                secondary_sunday="",
+            )
+        ),
+        "bar, buzz",  # reservation unit option
+    ]
 
 
 @pytest.mark.parametrize(
@@ -178,37 +162,17 @@ def test_application_export_multiple(graphql):
                     "yhteyshenkilön puh": "",
                 },
             ),
-            "Missing event begin": MissingParams(
-                missing=Missing(null=["application_events__begin"]),
-                column_value_mapping={"hakijan ilmoittaman kauden alkupäivä": ""},
-            ),
-            "Missing event end": MissingParams(
-                missing=Missing(null=["application_events__end"]),
-                column_value_mapping={"hakijan ilmoittaman kauden loppupäivä": ""},
-            ),
             "Missing home city": MissingParams(
                 missing=Missing(null=["home_city"]),
                 column_value_mapping={"kotikunta": "muu"},
             ),
             "Missing purpose": MissingParams(
-                missing=Missing(null=["application_events__purpose"]),
+                missing=Missing(null=["application_sections__purpose"]),
                 column_value_mapping={"vuoronkäyttötarkoitus": ""},
             ),
             "Missing age group": MissingParams(
-                missing=Missing(null=["application_events__age_group"]),
+                missing=Missing(null=["application_sections__age_group"]),
                 column_value_mapping={"ikäryhmä": ""},
-            ),
-            "Missing events per week": MissingParams(
-                missing=Missing(null=["application_events__events_per_week"]),
-                column_value_mapping={"vuoroja, kpl / vko": 0},
-            ),
-            "Missing event min duration": MissingParams(
-                missing=Missing(null=["application_events__min_duration"]),
-                column_value_mapping={"minimi aika": ""},
-            ),
-            "Missing event max duration": MissingParams(
-                missing=Missing(null=["application_events__max_duration"]),
-                column_value_mapping={"maksimi aika": ""},
             ),
         }
     )
@@ -231,19 +195,18 @@ def test_application_export_missing_data(graphql, column_value_mapping, missing)
         "contact_person__last_name": "last",
         "contact_person__email": "email@example.com",
         "contact_person__phone_number": "123467890",
-        "application_events__min_duration": datetime.timedelta(hours=1),
-        "application_events__max_duration": datetime.timedelta(hours=2),
-        "application_events__events_per_week": 1,
-        "application_events__begin": application_round.reservation_period_begin,
-        "application_events__end": application_round.reservation_period_end,
-        "application_events__purpose__name": "free",
-        "application_events__age_group__minimum": 1,
-        "application_events__age_group__maximum": 10,
-        "application_events__application_event_schedules__declined": False,
-        "application_events__application_event_schedules__day": WeekdayChoice.TUESDAY,
-        "application_events__application_event_schedules__priority": PriorityChoice.HIGH,
-        "application_events__event_reservation_units__reservation_unit__name": "foo",
-        "application_events__event_reservation_units__reservation_unit__unit__name": "fizz",
+        "application_sections__reservation_min_duration": datetime.timedelta(hours=1),
+        "application_sections__reservation_max_duration": datetime.timedelta(hours=2),
+        "application_sections__applied_reservations_per_week": 1,
+        "application_sections__reservations_begin_date": application_round.reservation_period_begin,
+        "application_sections__reservations_end_date": application_round.reservation_period_end,
+        "application_sections__purpose__name": "free",
+        "application_sections__age_group__minimum": 1,
+        "application_sections__age_group__maximum": 10,
+        "application_sections__suitable_time_ranges__day_of_the_week": Weekday.TUESDAY,
+        "application_sections__suitable_time_ranges__priority": Priority.PRIMARY,
+        "application_sections__reservation_unit_options__reservation_unit__name": "foo",
+        "application_sections__reservation_unit_options__reservation_unit__unit__name": "fizz",
     }
     missing.remove_from_data(data)
     ApplicationFactory.create(**data)
@@ -253,7 +216,7 @@ def test_application_export_missing_data(graphql, column_value_mapping, missing)
     open_mock = mock.patch("applications.exporter.open", new=mock.mock_open())
     csv_writer_mock = mock.patch("applications.exporter.writer")
     with open_mock, csv_writer_mock as mock_file:
-        ApplicationDataExporter.export_application_data(application_round_id=application_round.id)
+        export_application_data(application_round_id=application_round.id)
 
     # then:
     # - The writes to the csv file are correct
@@ -267,27 +230,26 @@ def test_application_export_missing_data(graphql, column_value_mapping, missing)
         assert data_row[index] == expected_value
 
 
-def test_application_export__no_event_reservation_units(graphql):
+def test_application_export__no_reservation_unit_options(graphql):
     # given:
-    # - There is a single application with no event reservation units
+    # - There is a single application with no reservation unit options
     application_round = ApplicationRoundFactory.create_in_status_in_allocation()
     application_1 = ApplicationFactory.create_in_status_in_allocation(
         application_round=application_round,
-        organisation__name="aaa",
-        application_events__application_event_schedules__day=WeekdayChoice.TUESDAY,
-        application_events__application_event_schedules__priority=PriorityChoice.HIGH,
+        application_sections__suitable_time_ranges__day_of_the_week=Weekday.MONDAY,
+        application_sections__reservation_unit_options=[],
     )
-    application_1.application_events.first()
+    application_1.application_sections.first()
 
     # when:
     # - The exporter is run
     open_mock = mock.patch("applications.exporter.open", new=mock.mock_open())
     csv_writer_mock = mock.patch("applications.exporter.writer")
     with open_mock, csv_writer_mock as mock_file:
-        ApplicationDataExporter.export_application_data(application_round_id=application_round.id)
+        export_application_data(application_round_id=application_round.id)
 
     # then:
-    # - The csv doesn't contain the event reservation unit column
+    # - The csv doesn't contain the reservation unit options column
     writes = get_writes(mock_file)
 
     header_row = writes[2]

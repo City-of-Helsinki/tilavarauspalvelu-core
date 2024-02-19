@@ -1,7 +1,7 @@
 import pytest
 
 from spaces.models import Space
-from tests.helpers import UserType
+from tests.helpers import UserType, deprecated_field_error_messages
 from tests.test_graphql_api.test_space.helpers import CREATE_MUTATION
 
 # Applied to all tests
@@ -56,6 +56,5 @@ def test_create_space__name_fi_cannot_be_empty(graphql, name):
     # then:
     # - The response has errors about nameFi field
     # - The space is not created in the database
-    assert response.has_errors is True, response
-    assert response.field_error_messages() == ["nameFi cannot be empty."]
+    assert deprecated_field_error_messages(response) == ["nameFi cannot be empty."]
     assert Space.objects.count() == 0

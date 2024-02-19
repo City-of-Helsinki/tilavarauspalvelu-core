@@ -125,7 +125,7 @@ def test_reservation__query__regular_user_cannot_see_personal_information_from_o
         reserveeId
         cancelDetails
         order { orderUuid status paymentType receiptUrl checkoutUrl reservationPk refundUuid expiresInMinutes }
-        homeCity { name }
+        homeCity { nameFi }
         reserveeType
         reserveeIsUnregisteredAssociation
         applyingForFreeOfCharge

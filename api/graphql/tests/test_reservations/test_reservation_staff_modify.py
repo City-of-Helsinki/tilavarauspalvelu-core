@@ -32,7 +32,6 @@ class ReservationStaffModifyTestCase(ReservationTestCaseBase):
             end=cls.reservation_end,
             state=ReservationStateChoice.CONFIRMED,
             user=cls.regular_joe,
-            priority=100,
             unit_price=0,
             tax_percentage_value=24,
             price=0,

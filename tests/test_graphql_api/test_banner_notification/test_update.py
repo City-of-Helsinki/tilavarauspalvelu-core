@@ -5,7 +5,7 @@ import pytest
 from common.choices import BannerNotificationLevel, BannerNotificationTarget
 from common.models import BannerNotification
 from tests.factories import BannerNotificationFactory, UserFactory
-from tests.helpers import parametrize_helper
+from tests.helpers import deprecated_field_error_messages, parametrize_helper
 
 # Applied to all tests
 pytestmark = [
@@ -132,8 +132,12 @@ def test_user_tries_to_publish_draft_banner_notification_without_setting_active_
 
     # then:
     # - The response contains errors about missing active period
-    assert response.field_error_messages("activeFrom") == ["Non-draft notifications must set 'active_from'"]
-    assert response.field_error_messages("activeUntil") == ["Non-draft notifications must set 'active_until'"]
+    assert deprecated_field_error_messages(response, "activeFrom") == [
+        "Non-draft notifications must set 'active_from'",
+    ]
+    assert deprecated_field_error_messages(response, "activeUntil") == [
+        "Non-draft notifications must set 'active_until'"
+    ]
 
 
 @pytest.mark.parametrize(
@@ -233,7 +237,7 @@ def test_user_tries_to_publish_draft_banner_notification_with_improper_active_pe
 
     # then:
     # - The response contains errors about the improper active period
-    assert response.field_errors == expected, response
+    assert response["updateBannerNotification"]["errors"] == expected, response
 
 
 def test_primary_key_is_required_for_updating(graphql):
@@ -284,4 +288,4 @@ def test_user_updates_non_existing_banner_notification(graphql):
 
     # then:
     # - The response contains an error about non-existing banner notification
-    assert response.field_error_messages("nonFieldErrors") == ["Object does not exist."]
+    assert deprecated_field_error_messages(response, "nonFieldErrors") == ["Object does not exist."]

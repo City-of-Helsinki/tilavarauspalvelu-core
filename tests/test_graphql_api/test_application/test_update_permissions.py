@@ -48,7 +48,7 @@ def test_regular_user_can_update_other_users_application(graphql):
 
     # then:
     # - The response complains about mutation permissions
-    assert response.field_error_messages() == ["No permission to mutate."]
+    assert response.error_message() == "No permission to update."
 
 
 def test_general_admin_can_update_other_users_application(graphql):
@@ -117,7 +117,7 @@ def test_service_sector_admin_for_other_sector_cannot_update_other_users_applica
 
     # then:
     # - The response complains about mutation permissions
-    assert response.field_error_messages() == ["No permission to mutate."]
+    assert response.error_message() == "No permission to update."
 
 
 def test_application_owner_cannot_update_own_application_after_application_period_over(graphql):
@@ -135,7 +135,7 @@ def test_application_owner_cannot_update_own_application_after_application_perio
 
     # then:
     # - The response contains errors
-    assert response.field_error_messages() == ["No permission to mutate."]
+    assert response.error_message() == "No permission to update."
 
 
 def test_application_user_cannot_update_own_application_working_memo(graphql):

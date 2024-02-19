@@ -7,11 +7,17 @@ import factory
 from django.utils.timezone import get_default_timezone, now
 from factory import fuzzy
 
-from applications.choices import ApplicantTypeChoice, ApplicationStatusChoice, PriorityChoice, WeekdayChoice
-from applications.models import Application, ApplicationEvent, ApplicationRound
+from applications.choices import ApplicantTypeChoice, ApplicationStatusChoice, Priority, Weekday
+from applications.models import Application, ApplicationRound, ApplicationSection
 from reservation_units.models import ReservationUnit
 
 from ._base import GenericDjangoModelFactory
+from .allocated_time_slot import AllocatedTimeSlotFactory
+from .application_round import ApplicationRoundFactory
+from .application_section import ApplicationSectionFactory
+from .reservation_unit import ReservationUnitFactory
+from .space import SpaceFactory
+from .suitable_time_range import SuitableTimeRangeFactory
 
 __all__ = [
     "ApplicationFactory",
@@ -55,10 +61,17 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
                 return cls.create_in_status_cancelled(**kwargs)
 
     @classmethod
-    def create_in_status_draft(cls, **kwargs: Any) -> Application:
-        """Create a draft application in an open application round."""
-        from .application_round import ApplicationRoundFactory
+    def create_in_status_draft_no_sections(cls, **kwargs: Any) -> Application:
+        return cls.create_in_status_draft(application_sections=[], **kwargs)
 
+    @classmethod
+    def create_in_status_draft(cls, **kwargs: Any) -> Application:
+        """
+        Create a draft application:
+        - in an open application round
+        - with a single application section
+            - with a single reservation unit option
+        """
         kwargs.setdefault("cancelled_date", None)
         kwargs.setdefault("sent_date", None)
 
@@ -66,17 +79,25 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
             sub_kwargs = cls.pop_sub_kwargs("application_round", kwargs)
             kwargs["application_round"] = ApplicationRoundFactory.create_in_status_open(**sub_kwargs)
 
-        return cls.create(**kwargs)
+        key = "application_sections"
+        application_section_kwargs = cls.pop_sub_kwargs(key, kwargs)
+
+        application = cls.create(**kwargs)
+
+        if key not in kwargs:  # allow for empty application sections
+            application_section_kwargs["application"] = application
+            ApplicationSectionFactory.create_in_status_unallocated(**application_section_kwargs)
+
+        return application
 
     @classmethod
     def create_in_status_received(cls, **kwargs: Any) -> Application:
         """
-        Create a received application with an unallocated application event
-        in an open application round.
+        Create a received application:
+        - in an open application round
+        - with a single application section
+            - with a single reservation unit option
         """
-        from .application_event import ApplicationEventFactory
-        from .application_round import ApplicationRoundFactory
-
         kwargs.setdefault("cancelled_date", None)
         kwargs.setdefault("sent_date", now())
 
@@ -84,25 +105,29 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
             sub_kwargs = cls.pop_sub_kwargs("application_round", kwargs)
             kwargs["application_round"] = ApplicationRoundFactory.create_in_status_open(**sub_kwargs)
 
-        event_key = "application_events"
-        event_kwargs = cls.pop_sub_kwargs(event_key, kwargs)
+        key = "application_sections"
+        application_section_kwargs = cls.pop_sub_kwargs(key, kwargs)
 
         application = cls.create(**kwargs)
-        if event_key not in kwargs:
-            event_kwargs["application"] = application
-            ApplicationEventFactory.create_in_status_unallocated(**event_kwargs)
+
+        if key not in kwargs:  # allow for empty application sections
+            application_section_kwargs["application"] = application
+            ApplicationSectionFactory.create_in_status_unallocated(**application_section_kwargs)
 
         return application
 
     @classmethod
+    def create_in_status_in_allocation_no_sections(cls, **kwargs: Any) -> Application:
+        return cls.create_in_status_in_allocation(application_sections=[], **kwargs)
+
+    @classmethod
     def create_in_status_in_allocation(cls, **kwargs: Any) -> Application:
         """
-        Create an application to be allocated with a single unallocated application event
-        in an application round in the allocation stage.
+        Create an application to be allocated:
+        - in an application round in allocation
+        - with a single application section
+            - with a single reservation unit option
         """
-        from .application_event import ApplicationEventFactory
-        from .application_round import ApplicationRoundFactory
-
         kwargs.setdefault("cancelled_date", None)
         kwargs.setdefault("sent_date", now())
 
@@ -110,26 +135,29 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
             sub_kwargs = cls.pop_sub_kwargs("application_round", kwargs)
             kwargs["application_round"] = ApplicationRoundFactory.create_in_status_in_allocation(**sub_kwargs)
 
-        event_key = "application_events"
-        event_kwargs = cls.pop_sub_kwargs(event_key, kwargs)
+        key = "application_sections"
+        key_kwargs = cls.pop_sub_kwargs(key, kwargs)
 
         application = cls.create(**kwargs)
-
-        if event_key not in kwargs:
-            event_kwargs["application"] = application
-            ApplicationEventFactory.create_in_status_unallocated(**event_kwargs)
+        if key not in kwargs:
+            key_kwargs["application"] = application
+            ApplicationSectionFactory.create_in_status_in_allocation(**key_kwargs)
 
         return application
 
     @classmethod
+    def create_in_status_handled_no_sections(cls, **kwargs: Any) -> Application:
+        return cls.create_in_status_handled(application_sections=[], **kwargs)
+
+    @classmethod
     def create_in_status_handled(cls, **kwargs: Any) -> Application:
         """
-        Create a handled application with a single approved application event
-        in an application round in the handled stage.
+        Create a handled application:
+        - in a handled application round
+        - with a single application section
+            - with a single reservation unit option
+                - that has been allocated
         """
-        from .application_event import ApplicationEventFactory
-        from .application_round import ApplicationRoundFactory
-
         kwargs.setdefault("cancelled_date", None)
         kwargs.setdefault("sent_date", now())
 
@@ -137,26 +165,25 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
             sub_kwargs = cls.pop_sub_kwargs("application_round", kwargs)
             kwargs["application_round"] = ApplicationRoundFactory.create_in_status_handled(**sub_kwargs)
 
-        event_key = "application_events"
-        event_kwargs = cls.pop_sub_kwargs(event_key, kwargs)
+        key = "application_sections"
+        key_kwargs = cls.pop_sub_kwargs(key, kwargs)
 
         application = cls.create(**kwargs)
-
-        if event_key not in kwargs:
-            event_kwargs["application"] = application
-            ApplicationEventFactory.create_in_status_approved(**event_kwargs)
+        if key not in kwargs:
+            key_kwargs["application"] = application
+            ApplicationSectionFactory.create_in_status_handled(**key_kwargs)
 
         return application
 
     @classmethod
     def create_in_status_result_sent(cls, **kwargs: Any) -> Application:
         """
-        Create an application, the result of which has been sent to the user,
-        with a single reserved application event in an application round in the handled stage.
+        Create an application, the result of which has been sent to the user:
+        - in a handled application round
+        - with a single application section
+            - with a single reservation unit option
+                - that has been allocated
         """
-        from .application_event import ApplicationEventFactory
-        from .application_round import ApplicationRoundFactory
-
         kwargs.setdefault("cancelled_date", None)
         kwargs.setdefault("sent_date", now())
 
@@ -164,22 +191,24 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
             round_kwargs = cls.pop_sub_kwargs("application_round", kwargs)
             kwargs["application_round"] = ApplicationRoundFactory.create_in_status_result_sent(**round_kwargs)
 
-        event_key = "application_events"
-        event_kwargs = cls.pop_sub_kwargs(event_key, kwargs)
+        key = "application_sections"
+        key_kwargs = cls.pop_sub_kwargs(key, kwargs)
 
         application = cls.create(**kwargs)
-
-        if event_key not in kwargs:
-            event_kwargs["application"] = application
-            ApplicationEventFactory.create_in_status_reserved(**event_kwargs)
+        if key not in kwargs:
+            key_kwargs["application"] = application
+            ApplicationSectionFactory.create_in_status_handled(**key_kwargs)
 
         return application
 
     @classmethod
     def create_in_status_expired(cls, **kwargs: Any) -> Application:
-        """Create an expired application in a handled application round."""
-        from .application_round import ApplicationRoundFactory
-
+        """
+        Create an expired application:
+        - in a handled application round
+        - with a single unallocated application section
+            - with a single reservation unit option
+        """
         kwargs.setdefault("cancelled_date", None)
         kwargs.setdefault("sent_date", None)
 
@@ -187,7 +216,15 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
             sub_kwargs = cls.pop_sub_kwargs("application_round", kwargs)
             kwargs["application_round"] = ApplicationRoundFactory.create_in_status_handled(**sub_kwargs)
 
-        return cls.create(**kwargs)
+        key = "application_sections"
+        key_kwargs = cls.pop_sub_kwargs(key, kwargs)
+
+        application = cls.create(**kwargs)
+        if key not in kwargs:
+            key_kwargs["application"] = application
+            ApplicationSectionFactory.create_in_status_unallocated(**key_kwargs)
+
+        return application
 
     @classmethod
     def create_in_status_cancelled(cls, **kwargs: Any) -> Application:
@@ -201,8 +238,8 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
         application_round: ApplicationRound | None = None,
         reservation_unit: ReservationUnit | None = None,
         *,
-        events_per_week: int = 2,
-        schedules_to_create: int = 2,
+        applied_reservations_per_week: int = 1,
+        times_slots_to_create: int = 2,
         min_duration_hours: int = 1,
         max_duration_hours: int = 2,
         begin_date: datetime.date | None = None,
@@ -210,19 +247,17 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
         pre_allocated: bool = False,
     ) -> Application:
         """
-        Create an application with a single application event in an application round in the allocation stage.
-        - The application round has a single reservation unit.
-        - The same reservation unit is included in the application event's event reservation units.
-        - By default, the application has 2 schedules from 10:00-14:00 (Monday & Tuesday).
-        - By default, the application event can have 2 events per week.
-        - By default, the application event has a minimum duration of 1 hour and a maximum duration of 2 hours.
-        """
-        from .application_event import ApplicationEventFactory
-        from .application_event_schedule import ApplicationEventScheduleFactory
-        from .application_round import ApplicationRoundFactory
-        from .reservation_unit import ReservationUnitFactory
-        from .space import SpaceFactory
+        Create an application:
+        - In an application round in the allocation stage.
+            - The application round has a single reservation unit.
+        - With a single application section.
+            - with a single reservation unit option
 
+        - By default, the applicant has applied for 1 reservation per week.
+        - By default, the application section has a minimum duration of 1 hour and a maximum duration of 2 hours.
+        - By default, the application has 2 suitable time ranges from 10:00-14:00 (Monday & Tuesday).
+        - If pre_allocated, there are allocated time slots equal to reservations per week.
+        """
         if reservation_unit is None:
             reservation_unit = ReservationUnitFactory.create(spaces=[SpaceFactory.create()])
 
@@ -239,52 +274,53 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
             sent_date=this_moment - timedelta(days=2),
             application_round=application_round,
         )
-        application_event = ApplicationEventFactory.create(
+        application_section = ApplicationSectionFactory.create(
             application=application,
-            event_reservation_units__reservation_unit=reservation_unit,
-            events_per_week=events_per_week,
-            min_duration=datetime.timedelta(hours=min_duration_hours),
-            max_duration=datetime.timedelta(hours=max_duration_hours),
-            begin=begin_date or this_moment.date(),
-            end=end_date or (this_moment + datetime.timedelta(days=7)).date(),
+            applied_reservations_per_week=applied_reservations_per_week,
+            reservation_min_duration=datetime.timedelta(hours=min_duration_hours),
+            reservation_max_duration=datetime.timedelta(hours=max_duration_hours),
+            reservations_begin_date=begin_date or this_moment.date(),
+            reservations_end_date=end_date or (this_moment + datetime.timedelta(days=7)).date(),
+            reservation_unit_options__reservation_unit=reservation_unit,
         )
 
-        weekdays = iter(WeekdayChoice.values)
-        schedules_to_create = min(schedules_to_create, 7)
-        while schedules_to_create > 0:
-            day = next(weekdays)
-            ApplicationEventScheduleFactory.create(
-                application_event=application_event,
-                day=day,
-                begin=datetime.time(10, 0, tzinfo=get_default_timezone()),
-                end=datetime.time(14, 0, tzinfo=get_default_timezone()),
-                priority=PriorityChoice.HIGH,
-                allocated_day=day if pre_allocated else None,
-                allocated_begin=datetime.time(10, 0, tzinfo=get_default_timezone()) if pre_allocated else None,
-                allocated_end=(
-                    datetime.time(10 + max_duration_hours, 0, tzinfo=get_default_timezone()) if pre_allocated else None
-                ),
-                allocated_reservation_unit=reservation_unit if pre_allocated else None,
+        weekdays = iter(Weekday.values)
+        times_slots_to_create = min(times_slots_to_create, 7)
+        reservation_unit_option = application_section.reservation_unit_options.first()
+
+        while times_slots_to_create > 0:
+            times_slots_to_create -= 1
+            day_of_the_week = next(weekdays)
+
+            SuitableTimeRangeFactory.create(
+                application_section=application_section,
+                priority=Priority.PRIMARY,
+                day_of_the_week=day_of_the_week,
+                begin_time=datetime.time(10, 0, tzinfo=get_default_timezone()),
+                end_time=datetime.time(14, 0, tzinfo=get_default_timezone()),
             )
-            schedules_to_create -= 1
+            if not pre_allocated:
+                continue
+
+            AllocatedTimeSlotFactory.create(
+                reservation_unit_option=reservation_unit_option,
+                day_of_the_week=day_of_the_week,
+                begin_time=datetime.time(10, 0, tzinfo=get_default_timezone()),
+                end_time=datetime.time(10 + max_duration_hours, 0, tzinfo=get_default_timezone()),
+            )
 
         return application
 
     @factory.post_generation
-    def application_events(
+    def application_sections(
         self,
         create: bool,
-        application_events: Iterable[ApplicationEvent] | None,
+        application_sections: Iterable[ApplicationSection] | None,
         **kwargs: Any,
-    ):
+    ) -> None:
         if not create:
             return
 
-        if not application_events and kwargs:
-            from .application_event import ApplicationEventFactory
-
+        if not application_sections and kwargs:
             kwargs.setdefault("application", self)
-            self.application_events.add(ApplicationEventFactory.create(**kwargs))
-
-        for event in application_events or []:
-            self.application_events.add(event)
+            ApplicationSectionFactory.create(**kwargs)

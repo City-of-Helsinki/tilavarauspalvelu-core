@@ -485,7 +485,7 @@ def valid_application_event_schedule_data():
 
 @pytest.fixture()
 def valid_event_reservation_unit_data(reservation_unit):
-    return {"priority": 22, "reservation_unit_id": reservation_unit.id}
+    return {"reservation_unit_id": reservation_unit.id}
 
 
 @pytest.fixture()

@@ -1,9 +1,8 @@
 import pytest
 
-from applications.models import EventReservationUnit
 from tests.factories import (
-    ApplicationEventFactory,
     ApplicationFactory,
+    ApplicationSectionFactory,
     ServiceSectorFactory,
     UnitFactory,
     UnitGroupFactory,
@@ -32,7 +31,7 @@ def test_anonymous_user_cannot_view_applications(graphql):
 
     # then:
     # - The response complains about permissions
-    assert response.error_message() == "You do not have permission to access this node."
+    assert response.error_message() == "No permission to access node."
 
 
 def test_regular_user_cannot_view_other_applications(graphql):
@@ -115,14 +114,13 @@ def test_service_sector_admin_cannot_view_applications_for_other_sector(graphql)
 
 def test_unit_admin_can_view_applications(graphql):
     # given:
-    # - There is an application event in an application with an event reservation unit
+    # - There is an application section in an application with an event reservation unit
     # - A unit admin for that unit is using the system
-    event = ApplicationEventFactory.create_in_status_unallocated(
-        event_reservation_units__reservation_unit__unit__name="foo",
+    section = ApplicationSectionFactory.create_in_status_unallocated(
+        reservation_unit_options__reservation_unit__unit__name="foo",
     )
-    event_reservation_unit: EventReservationUnit = event.event_reservation_units.first()
     admin = UserFactory.create_with_unit_permissions(
-        unit=event_reservation_unit.reservation_unit.unit,
+        unit=section.reservation_unit_options.first().reservation_unit.unit,
         perms=["can_validate_applications"],
     )
     graphql.force_login(admin)
@@ -135,15 +133,15 @@ def test_unit_admin_can_view_applications(graphql):
     # - The response has no errors, and contains the application
     assert response.has_errors is False, response
     assert len(response.edges) == 1
-    assert response.node(0) == {"pk": event.application.pk}
+    assert response.node(0) == {"pk": section.application.pk}
 
 
 def test_unit_admin_can_view_applications_for_other_units(graphql):
     # given:
     # - There is an application event in an application with an event reservation unit
     # - A unit admin for some other unit is using the system
-    ApplicationEventFactory.create_in_status_unallocated(
-        event_reservation_units__reservation_unit__unit__name="foo",
+    ApplicationSectionFactory.create_in_status_unallocated(
+        reservation_unit_options__reservation_unit__unit__name="foo",
     )
     admin = UserFactory.create_with_unit_permissions(
         unit=UnitFactory.create(name="bar"),
@@ -163,14 +161,13 @@ def test_unit_admin_can_view_applications_for_other_units(graphql):
 
 def test_unit_group_admin_can_view_applications(graphql):
     # given:
-    # - There is an application event in an application with an event reservation unit
+    # - There is an application section in an application with a reservation unit option
     # - A unit group admin for that unit's group is using the system
-    event = ApplicationEventFactory.create_in_status_unallocated(
-        event_reservation_units__reservation_unit__unit__unit_groups__name="foo",
+    event = ApplicationSectionFactory.create_in_status_unallocated(
+        reservation_unit_options__reservation_unit__unit__unit_groups__name="foo",
     )
-    event_reservation_unit: EventReservationUnit = event.event_reservation_units.first()
     admin = UserFactory.create_with_unit_group_permissions(
-        unit_group=event_reservation_unit.reservation_unit.unit.unit_groups.first(),
+        unit_group=event.reservation_unit_options.first().reservation_unit.unit.unit_groups.first(),
         perms=["can_validate_applications"],
     )
     graphql.force_login(admin)
@@ -188,10 +185,10 @@ def test_unit_group_admin_can_view_applications(graphql):
 
 def test_unit_group_admin_can_view_applications_for_other_unit_groups(graphql):
     # given:
-    # - There is an application event in an application with an event reservation unit
+    # - There is an application section in an application with a reservation unit option
     # - A unit group admin for some other unit group is using the system
-    ApplicationEventFactory.create_in_status_unallocated(
-        event_reservation_units__reservation_unit__unit__unit_groups__name="foo",
+    ApplicationSectionFactory.create_in_status_unallocated(
+        reservation_unit_options__reservation_unit__unit__unit_groups__name="foo",
     )
     admin = UserFactory.create_with_unit_group_permissions(
         unit_group=UnitGroupFactory.create(name="bar"),
@@ -242,7 +239,7 @@ def test_application_user_cannot_see_own_application_working_memo(graphql):
 
     # then:
     # - The response complains about permissions to working memo.
-    assert response.error_message("workingMemo") == "You do not have permission to access this field."
+    assert response.error_message("workingMemo") == "No permission to access field."
 
 
 def test_service_sector_admin_can_see_working_memo(graphql):
@@ -267,14 +264,14 @@ def test_service_sector_admin_can_see_working_memo(graphql):
 
 def test_unit_admin_can_see_working_memo(graphql):
     # given:
-    # - There is an application event in an application with an event reservation unit
+    # - There is an application section in an application with a reservation unit option
     # - A unit admin for that unit is using the system
-    event = ApplicationEventFactory.create_in_status_unallocated(
-        event_reservation_units__reservation_unit__unit__name="foo",
+    section = ApplicationSectionFactory.create_in_status_unallocated(
+        reservation_unit_options__reservation_unit__unit__name="foo",
     )
-    event_reservation_unit: EventReservationUnit = event.event_reservation_units.first()
+    option = section.reservation_unit_options.first()
     admin = UserFactory.create_with_unit_permissions(
-        unit=event_reservation_unit.reservation_unit.unit,
+        unit=option.reservation_unit.unit,
         perms=["can_validate_applications"],
     )
     graphql.force_login(admin)
