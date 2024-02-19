@@ -16,21 +16,23 @@ from django.utils.timezone import localtime
 from applications.choices import (
     ApplicantTypeChoice,
     OrganizationTypeChoice,
-    PriorityChoice,
+    Priority,
     TargetGroupChoice,
+    Weekday,
     WeekdayChoice,
 )
 from applications.models import (
     Address,
+    AllocatedTimeSlot,
     Application,
-    ApplicationEvent,
-    ApplicationEventSchedule,
     ApplicationRound,
     ApplicationRoundTimeSlot,
+    ApplicationSection,
     City,
-    EventReservationUnit,
     Organisation,
     Person,
+    ReservationUnitOption,
+    SuitableTimeRange,
 )
 from applications.typing import TimeSlotDB
 from common.choices import BannerNotificationLevel, BannerNotificationTarget
@@ -99,7 +101,6 @@ from services.models import Service
 from spaces.models import Location, ServiceSector, Space, Unit, UnitGroup
 from spaces.models.location import COORDINATE_SYSTEM_ID
 from terms_of_use.models import TermsOfUse
-from tilavarauspalvelu.utils.commons import WEEKDAYS
 from users.models import User
 
 
@@ -2010,11 +2011,7 @@ def _create_applications(
             applications.append(application)
 
     applications = Application.objects.bulk_create(applications)
-    _create_application_events(
-        applications,
-        age_groups,
-        reservation_purposes,
-    )
+    _create_application_sections(applications, age_groups, reservation_purposes)
     return applications
 
 
@@ -2143,15 +2140,15 @@ def _create_organisation(
 
 
 @with_logs(
-    text_entering="Creating application events...",
-    text_exiting="Application events created!",
+    text_entering="Creating application sections...",
+    text_exiting="Application sections created!",
 )
-def _create_application_events(
+def _create_application_sections(
     applications: list[Application],
     age_groups: list[AgeGroup],
     reservation_purposes: list[ReservationPurpose],
-) -> list[ApplicationEvent]:
-    application_events: list[ApplicationEvent] = []
+) -> list[ApplicationSection]:
+    application_sections: list[ApplicationSection] = []
 
     now = datetime.now(tz=UTC)
     huge_application_created: bool = False
@@ -2160,93 +2157,119 @@ def _create_application_events(
         #
         # Add one application in the first past application round with "a lot" of application events
         # Note this in application working memo.
-        application_event_count: int = random.randint(1, 3)
+        application_section_count: int = random.randint(1, 3)
         if not huge_application_created and application.application_round.application_period_end < now:
-            application_event_count = 30
+            application_section_count = 30
             application.working_memo = "Massive application"
             application.save(update_fields=["working_memo"])
             huge_application_created = True
 
-        for _ in range(application_event_count):
+        for _ in range(application_section_count):
             name = faker_fi.word()
             min_duration = random.randint(1, 2)
             max_duration = random.randint(min_duration, 5)
 
-            event = ApplicationEvent(
+            event = ApplicationSection(
                 name=name,
-                name_fi=name,
-                name_en=faker_en.word(),
-                name_sv=faker_sv.word(),
                 num_persons=random.randint(1, 100),
-                age_group=random.choice(age_groups),
-                min_duration=timedelta(hours=min_duration),
-                max_duration=timedelta(hours=max_duration),
-                events_per_week=weighted_choice(range(1, 8), weights=[10, 7, 4, 2, 1, 1, 1]),
-                biweekly=weighted_choice([True, False], weights=[1, 5]),
-                begin=application.application_round.reservation_period_begin,
-                end=application.application_round.reservation_period_end,
+                reservation_min_duration=timedelta(hours=min_duration),
+                reservation_max_duration=timedelta(hours=max_duration),
+                applied_reservations_per_week=weighted_choice(range(1, 8), weights=[10, 7, 4, 2, 1, 1, 1]),
+                reservations_begin_date=application.application_round.reservation_period_begin,
+                reservations_end_date=application.application_round.reservation_period_end,
                 application=application,
                 purpose=random.choice(reservation_purposes),
+                age_group=random.choice(age_groups),
             )
-            application_events.append(event)
+            application_sections.append(event)
 
-    application_events = ApplicationEvent.objects.bulk_create(application_events)
-    _create_event_reservation_units(application_events)
-    _create_application_event_schedules(application_events)
-    return application_events
+    application_sections = ApplicationSection.objects.bulk_create(application_sections)
+    _create_reservation_unit_options(application_sections)
+    _create_suitable_time_ranges(application_sections)
+    return application_sections
 
 
 @with_logs(
-    text_entering="Creating application reservation units...",
-    text_exiting="Application reservation units created!",
+    text_entering="Creating reservation unit options...",
+    text_exiting="Reservation unit options created!",
 )
-def _create_event_reservation_units(
-    application_events: list[ApplicationEvent],
-) -> list[EventReservationUnit]:
-    event_units: list[EventReservationUnit] = []
-    for application_event in application_events:
-        reservation_units = list(application_event.application.application_round.reservation_units.all())
+def _create_reservation_unit_options(
+    application_sections: list[ApplicationSection],
+) -> list[ReservationUnitOption]:
+    reservation_unit_options: list[ReservationUnitOption] = []
+    for application_section in application_sections:
+        reservation_units = list(application_section.application.application_round.reservation_units.all())
         amount = random.randint(1, min(len(reservation_units), 4))
         selected_units: list[ReservationUnit] = random.sample(reservation_units, k=amount)
 
-        for i, unit in enumerate(selected_units):
-            event_unit = EventReservationUnit(
+        for i, reservation_unit in enumerate(selected_units):
+            option = ReservationUnitOption(
                 preferred_order=i,
-                application_event=application_event,
-                reservation_unit=unit,
+                application_section=application_section,
+                reservation_unit=reservation_unit,
             )
-            event_units.append(event_unit)
+            reservation_unit_options.append(option)
 
-    return EventReservationUnit.objects.bulk_create(event_units)
+    reservation_unit_options = ReservationUnitOption.objects.bulk_create(reservation_unit_options)
+    _create_allocated_time_slots(reservation_unit_options)
+    return reservation_unit_options
 
 
 @with_logs(
-    text_entering="Creating application event schedules...",
-    text_exiting="Application event schedules created!",
+    text_entering="Creating allocated time slots...",
+    text_exiting="Allocated time slots created!",
 )
-def _create_application_event_schedules(
-    application_events: list[ApplicationEvent],
-) -> list[ApplicationEventSchedule]:
-    schedules: list[ApplicationEventSchedule] = []
-    for application_event in application_events:
-        weekdays: list[int] = [choice for choice, _ in WEEKDAYS.CHOICES]
-        amount = random.randint(1, application_event.events_per_week)
+def _create_allocated_time_slots(
+    reservation_unit_options: list[ReservationUnitOption],
+) -> list[AllocatedTimeSlot]:
+    allocations: list[AllocatedTimeSlot] = []
+    for option in reservation_unit_options:
+        weekdays: list[str] = Weekday.values.copy()
+        amount = random.randint(1, option.application_section.applied_reservations_per_week)
 
         for _ in range(amount):
             weekday = weekdays.pop(random.randint(0, len(weekdays) - 1))
             begin = random.randint(8, 20)
             end = random.randint(begin + 1, min(begin + random.randint(1, 6), 22))
 
-            schedule = ApplicationEventSchedule(
-                day=weekday,
-                begin=time(hour=begin, tzinfo=UTC),
-                end=time(hour=end, tzinfo=UTC),
-                priority=random.choice(PriorityChoice.values),
-                application_event=application_event,
+            allocation = AllocatedTimeSlot(
+                day_of_the_week=weekday,
+                begin_time=time(hour=begin, tzinfo=UTC),
+                end_time=time(hour=end, tzinfo=UTC),
+                reservation_unit_option=option,
             )
-            schedules.append(schedule)
+            allocations.append(allocation)
 
-    return ApplicationEventSchedule.objects.bulk_create(schedules)
+    return AllocatedTimeSlot.objects.bulk_create(allocations)
+
+
+@with_logs(
+    text_entering="Creating suitable time ranges...",
+    text_exiting="Suitable time ranges created!",
+)
+def _create_suitable_time_ranges(
+    application_sections: list[ApplicationSection],
+) -> list[SuitableTimeRange]:
+    suitable_time_ranges: list[SuitableTimeRange] = []
+    for application_section in application_sections:
+        weekdays: list[str] = Weekday.values.copy()
+        amount = random.randint(1, application_section.applied_reservations_per_week)
+
+        for _ in range(amount):
+            weekday = weekdays.pop(random.randint(0, len(weekdays) - 1))
+            begin = random.randint(8, 20)
+            end = random.randint(begin + 1, min(begin + random.randint(1, 6), 22))
+
+            suitable = SuitableTimeRange(
+                priority=random.choice(Priority.values),
+                day_of_the_week=weekday,
+                begin_time=time(hour=begin, tzinfo=UTC),
+                end_time=time(hour=end, tzinfo=UTC),
+                application_section=application_section,
+            )
+            suitable_time_ranges.append(suitable)
+
+    return SuitableTimeRange.objects.bulk_create(suitable_time_ranges)
 
 
 @with_logs(
