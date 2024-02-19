@@ -1,4 +1,3 @@
-from applications.choices import PriorityChoice
 from reservations.models import (
     Reservation,
     ReservationStatistic,
@@ -22,8 +21,6 @@ def create_or_update_reservation_statistics(reservation_pk: Reservation):
             "buffer_time_after": reservation.buffer_time_after,
             "reservee_language": reservation.reservee_language,
             "num_persons": reservation.num_persons,
-            "priority": reservation.priority,
-            "priority_name": PriorityChoice(reservation.priority).name,
             "home_city": reservation.home_city,
             "home_city_name": reservation.home_city.name if reservation.home_city else "",
             "home_city_municipality_code": reservation.home_city.municipality_code if reservation.home_city else "",

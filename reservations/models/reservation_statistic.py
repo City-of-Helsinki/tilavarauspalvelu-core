@@ -4,7 +4,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from applications.choices import PriorityChoice
+from applications.models.application_event_schedule import ReservationPriorityChoice
 from reservations.choices import CustomerTypeChoice
 
 __all__ = [
@@ -64,7 +64,9 @@ class ReservationStatistic(models.Model):
 
     num_persons = models.fields.PositiveIntegerField(verbose_name=_("Number of persons"), null=True, blank=True)
 
-    priority = models.IntegerField(choices=PriorityChoice.choices, default=PriorityChoice.MEDIUM)
+    priority = models.IntegerField(
+        choices=ReservationPriorityChoice.choices, default=ReservationPriorityChoice.MEDIUM, null=True, blank=True
+    )
 
     priority_name = models.CharField(max_length=255, null=False, default="", blank=True)
 

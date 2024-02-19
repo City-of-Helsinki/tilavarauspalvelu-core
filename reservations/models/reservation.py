@@ -5,7 +5,6 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
 
-from applications.choices import PriorityChoice
 from common.connectors import ReservationActionsConnector
 from reservations.choices import (
     RESERVEE_LANGUAGE_CHOICES,
@@ -140,8 +139,6 @@ class Reservation(SerializableMixin, models.Model):
         default=ReservationStateChoice.CREATED,
         db_index=True,
     )
-
-    priority = models.IntegerField(choices=PriorityChoice.choices, default=PriorityChoice.MEDIUM)
 
     user = models.ForeignKey(
         "users.User",
