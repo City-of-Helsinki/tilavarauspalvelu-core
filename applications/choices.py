@@ -121,7 +121,7 @@ class ApplicationStatusChoice(models.TextChoices):
         ]
 
     @DynamicClassAttribute
-    def can_approve(self) -> bool:
+    def can_allocate(self) -> bool:
         return self == ApplicationStatusChoice.IN_ALLOCATION
 
     @DynamicClassAttribute
@@ -211,7 +211,7 @@ class ApplicationSectionStatusChoice(models.TextChoices):
     """Some or all reservations for the application section could not be created successfully"""
 
     @DynamicClassAttribute
-    def can_approve(self) -> bool:
+    def can_allocate(self) -> bool:
         return self in [
             ApplicationSectionStatusChoice.UNALLOCATED,
             ApplicationSectionStatusChoice.IN_ALLOCATION,
