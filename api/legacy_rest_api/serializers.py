@@ -311,7 +311,6 @@ class ReservationSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "state",
-            "priority",
             "user_id",
             "begin_weekday",
             "begin",

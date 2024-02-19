@@ -66,8 +66,8 @@ class ReservationUnitReservationScheduler:
 
         for app_round in ApplicationRound.objects.filter(
             reservation_units=self.reservation_unit,
-            reservation_period_end__gte=end,
-            reservation_period_begin__lte=start,
+            reservation_period_end__gte=start,
+            reservation_period_begin__lte=end,
         ):
             if app_round.status.is_ongoing:
                 return app_round
