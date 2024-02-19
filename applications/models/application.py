@@ -141,7 +141,7 @@ class Application(SerializableMixin, models.Model):
                 then=models.Value(ApplicationStatusChoice.HANDLED.value),
             ),
             models.When(
-                # If the application round application period has ended
+                # If the application round application period has not ended
                 models.Q(application_round__application_period_end__gt=now),
                 then=models.Value(ApplicationStatusChoice.RECEIVED.value),
             ),

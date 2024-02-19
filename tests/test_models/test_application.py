@@ -40,7 +40,7 @@ def test_application__status():
     assert application.status == ApplicationStatusChoice.EXPIRED
     assert Application.objects.filter(L(status=ApplicationStatusChoice.EXPIRED)).exists()
 
-    # Application was sent, but without any sections -> application is IN_ALLOCATION
+    # Application was sent, but without any sections -> application is HANDLED
     application.sent_date = now
     application.save()
     assert application.status == ApplicationStatusChoice.HANDLED
