@@ -1,7 +1,6 @@
 import pytest
 from django.urls import reverse
 
-from reservation_units.models import ReservationUnit
 from tests.factories import PurposeFactory
 
 
@@ -120,26 +119,6 @@ def test_reservation_unit_is_draft_filter_false(user_api_client, reservation_uni
 
     assert response.status_code == 200
     assert len(response.data) == 2
-
-
-@pytest.mark.django_db()
-def test_reservation_unit_create(user, user_api_client, equipment_hammer, valid_reservation_unit_data):
-    assert ReservationUnit.objects.count() == 0
-
-    # Test without permissions
-    response = user_api_client.post(reverse("reservationunit-list"), data=valid_reservation_unit_data, format="json")
-    assert response.status_code == 403
-
-    # Test with unit manager role
-    unit_role = user.unit_roles.create(user=user, role_id="manager")
-    unit_role.unit.add(valid_reservation_unit_data["unit_id"])
-    response = user_api_client.post(reverse("reservationunit-list"), data=valid_reservation_unit_data, format="json")
-    assert response.status_code == 201
-
-    assert ReservationUnit.objects.count() == 1
-    unit = ReservationUnit.objects.all()[0]
-    assert unit.name_en == "New reservation unit"
-    assert [x.id for x in unit.equipments.all()] == [equipment_hammer.id]
 
 
 # Permission tests starts here

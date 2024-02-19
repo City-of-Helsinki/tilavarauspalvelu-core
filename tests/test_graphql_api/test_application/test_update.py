@@ -1,8 +1,8 @@
 import pytest
 
-from applications.choices import WeekdayChoice
-from applications.models import Address, ApplicationEvent, ApplicationEventSchedule, Organisation
-from tests.factories import ApplicationEventFactory, ApplicationFactory
+from applications.choices import Weekday
+from applications.models import Address, ApplicationSection, Organisation, SuitableTimeRange
+from tests.factories import ApplicationFactory
 from tests.helpers import UserType
 
 from .helpers import UPDATE_MUTATION
@@ -51,11 +51,11 @@ def test_update_application__organisation__replace(graphql):
     input_data = {
         "pk": application.id,
         "organisation": {
-            "name": "Hyper organisation",
+            "nameFi": "Hyper organisation",
             "address": {
-                "streetAddress": "Testikatu 1",
+                "streetAddressFi": "Testikatu 1",
                 "postCode": "00001",
-                "city": "Helsinki",
+                "cityFi": "Helsinki",
             },
         },
     }
@@ -118,7 +118,7 @@ def test_update_application__organisation__modify_existing(graphql):
         "pk": application.id,
         "organisation": {
             "pk": old_organisation_pk,
-            "name": "bar",
+            "nameFi": "bar",
         },
     }
     response = graphql(UPDATE_MUTATION, input_data=input_data)
@@ -183,31 +183,39 @@ def test_update_application__organisation__deleted_if_none(graphql):
     assert application.organisation is None
 
 
-def test_update_application__application_events__replace(graphql):
+def test_update_application__application_sections__replace(graphql):
     # given:
     # - There is a draft application in an open application round
     # - A superuser is using the system
-    event = ApplicationEventFactory.create_in_status_unallocated(name="foo")
-    application = event.application
-    schedule: ApplicationEventSchedule = event.application_event_schedules.first()
+    application = ApplicationFactory.create_in_status_draft(
+        application_sections__suitable_time_ranges__day_of_the_week=Weekday.MONDAY,
+    )
+    section = application.application_sections.first()
+    suitable_time_range = section.suitable_time_ranges.first()
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
-    old_event_pk = event.pk
-    old_schedule_pk = schedule.pk
+    old_section_pk = section.pk
+    old_range_pk = suitable_time_range.pk
 
     # when:
-    # - User tries to replace the application events
+    # - User tries to replace the application sections
     input_data = {
         "pk": application.pk,
-        "applicationEvents": [
+        "applicationSections": [
             {
                 "name": "foo",
-                "applicationEventSchedules": [
+                "numPersons": section.num_persons,
+                "reservationsBeginDate": section.reservations_begin_date.isoformat(),
+                "reservationsEndDate": section.reservations_end_date.isoformat(),
+                "reservationMinDuration": int(section.reservation_min_duration.total_seconds()),
+                "reservationMaxDuration": int(section.reservation_max_duration.total_seconds()),
+                "appliedReservationsPerWeek": section.applied_reservations_per_week,
+                "suitableTimeRanges": [
                     {
-                        "day": schedule.day,
-                        "begin": schedule.begin.isoformat(),
-                        "end": schedule.end.isoformat(),
-                        "priority": schedule.priority,
+                        "priority": suitable_time_range.priority,
+                        "dayOfTheWeek": suitable_time_range.day_of_the_week,
+                        "beginTime": suitable_time_range.begin_time.isoformat(),
+                        "endTime": suitable_time_range.end_time.isoformat(),
                     },
                 ],
             },
@@ -217,85 +225,91 @@ def test_update_application__application_events__replace(graphql):
 
     # then:
     # - The response contains no errors
-    # - The application event and schedule have been changed
-    # - The old event and schedule do not exist anymore
+    # - The application section and suitable time ranges have been changed
+    # - The old section and ranges do not exist anymore
     assert response.has_errors is False, response
-    application.refresh_from_db()
-    event: ApplicationEvent = application.application_events.first()
-    assert event.pk != old_event_pk
-    schedule: ApplicationEventSchedule = event.application_event_schedules.first()
-    assert schedule.pk != old_schedule_pk
-    assert ApplicationEvent.objects.filter(pk=old_event_pk).count() == 0
-    assert ApplicationEventSchedule.objects.filter(pk=old_schedule_pk).count() == 0
+
+    section = application.application_sections.first()
+    assert section.pk != old_section_pk
+
+    suitable = section.suitable_time_ranges.first()
+    assert suitable.pk != old_range_pk
+
+    assert ApplicationSection.objects.filter(pk=old_section_pk).count() == 0
+    assert SuitableTimeRange.objects.filter(pk=old_range_pk).count() == 0
 
 
-def test_update_application__application_events__use_existing(graphql):
+def test_update_application__application_sections__use_existing(graphql):
     # given:
     # - There is a draft application in an open application round
     # - A superuser is using the system
-    event = ApplicationEventFactory.create_in_status_unallocated()
-    application = event.application
-    schedule: ApplicationEventSchedule = event.application_event_schedules.first()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
-
-    old_event_pk = event.pk
-    old_schedule_pk = schedule.pk
-
-    # when:
-    # - User tries to use the same the application events and schedules
-    input_data = {
-        "pk": application.pk,
-        "applicationEvents": [
-            {
-                "pk": old_event_pk,
-                "applicationEventSchedules": [
-                    {
-                        "pk": old_schedule_pk,
-                    },
-                ],
-            },
-        ],
-    }
-    response = graphql(UPDATE_MUTATION, input_data=input_data)
-
-    # then:
-    # - The response contains no errors
-    # - The application event and schedule have not changed
-    assert response.has_errors is False, response
-    application.refresh_from_db()
-    event: ApplicationEvent = application.application_events.first()
-    assert event.pk == old_event_pk
-    schedule: ApplicationEventSchedule = event.application_event_schedules.first()
-    assert schedule.pk == old_schedule_pk
-
-
-def test_update_application__application_events__modify_existing(graphql):
-    # given:
-    # - There is a draft application in an open application round
-    # - A superuser is using the system
-    event = ApplicationEventFactory.create_in_status_unallocated(
-        name="foo",
-        application_event_schedules__day=WeekdayChoice.MONDAY,
+    application = ApplicationFactory.create_in_status_draft(
+        application_sections__suitable_time_ranges__day_of_the_week=Weekday.MONDAY,
     )
-    application = event.application
-    schedule: ApplicationEventSchedule = event.application_event_schedules.first()
+    section = application.application_sections.first()
+    suitable_time_range = section.suitable_time_ranges.first()
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
-    old_event_pk = event.pk
-    old_schedule_pk = schedule.pk
+    old_section_pk = section.pk
+    old_range_pk = suitable_time_range.pk
 
     # when:
-    # - User tries to modify existing application events and schedules
+    # - User tries to use the same the application sections and suitable time ranges
     input_data = {
         "pk": application.pk,
-        "applicationEvents": [
+        "applicationSections": [
             {
-                "pk": old_event_pk,
+                "pk": old_section_pk,
+                "suitableTimeRanges": [
+                    {
+                        "pk": old_range_pk,
+                    },
+                ],
+            },
+        ],
+    }
+    response = graphql(UPDATE_MUTATION, input_data=input_data)
+
+    # then:
+    # - The response contains no errors
+    # - The application section sand suitable time ranges have not changed
+    assert response.has_errors is False, response
+
+    section = application.application_sections.first()
+    assert section.pk == old_section_pk
+
+    suitable = section.suitable_time_ranges.first()
+    assert suitable.pk == old_range_pk
+
+
+def test_update_application__application_sections__modify_existing(graphql):
+    # given:
+    # - There is a draft application in an open application round
+    # - A superuser is using the system
+    application = ApplicationFactory.create_in_status_draft(
+        application_sections__name="foo",
+        application_sections__suitable_time_ranges__day_of_the_week=Weekday.MONDAY,
+    )
+    section = application.application_sections.first()
+    suitable_time_range = section.suitable_time_ranges.first()
+
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    old_section_pk = section.pk
+    old_range_pk = suitable_time_range.pk
+
+    # when:
+    # - User tries to modify existing application sections and suitable time ranges
+    input_data = {
+        "pk": application.pk,
+        "applicationSections": [
+            {
+                "pk": old_section_pk,
                 "name": "bar",
-                "applicationEventSchedules": [
+                "suitableTimeRanges": [
                     {
-                        "pk": old_schedule_pk,
-                        "day": WeekdayChoice.TUESDAY.value,
+                        "pk": old_range_pk,
+                        "dayOfTheWeek": Weekday.TUESDAY.value,
                     },
                 ],
             },
@@ -305,34 +319,35 @@ def test_update_application__application_events__modify_existing(graphql):
 
     # then:
     # - The response contains no errors
-    # - The application event and schedule have not changed, but the name and day are updated
+    # - The application section and suitable time ranges have not changed, but the name and day are updated
     assert response.has_errors is False, response
-    application.refresh_from_db()
-    event: ApplicationEvent = application.application_events.first()
-    assert event.pk == old_event_pk
-    assert event.name == "bar"
-    schedule: ApplicationEventSchedule = event.application_event_schedules.first()
-    assert schedule.pk == old_schedule_pk
-    assert schedule.day == WeekdayChoice.TUESDAY
+
+    section = application.application_sections.first()
+    assert section.pk == old_section_pk
+    assert section.name == "bar"
+
+    suitable = section.suitable_time_ranges.first()
+    assert suitable.pk == old_range_pk
+    assert suitable.day_of_the_week == Weekday.TUESDAY
 
 
-def test_update_application__application_events__not_deleted_if_not_given(graphql):
+def test_update_application__application_sections__not_deleted_if_not_given(graphql):
     # given:
     # - There is a draft application in an open application round
     # - A superuser is using the system
-    event = ApplicationEventFactory.create_in_status_unallocated(
-        name="foo",
-        application_event_schedules__day=WeekdayChoice.MONDAY,
+    application = ApplicationFactory.create_in_status_draft(
+        application_sections__suitable_time_ranges__day_of_the_week=Weekday.MONDAY,
     )
-    application = event.application
-    schedule: ApplicationEventSchedule = event.application_event_schedules.first()
+    section = application.application_sections.first()
+    suitable_time_range = section.suitable_time_ranges.first()
+
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
-    old_event_pk = event.pk
-    old_schedule_pk = schedule.pk
+    old_section_pk = section.pk
+    old_range_pk = suitable_time_range.pk
 
     # when:
-    # - User tries to modify without specifying application events and schedules
+    # - User tries to modify without specifying application sections and suitable time ranges
     input_data = {
         "pk": application.pk,
         "additionalInformation": "bar",
@@ -341,36 +356,36 @@ def test_update_application__application_events__not_deleted_if_not_given(graphq
 
     # then:
     # - The response contains no errors
-    # - The application event and schedule have not changed
+    # - The application sections and suitable time ranges have not changed
     assert response.has_errors is False, response
-    application.refresh_from_db()
-    event: ApplicationEvent = application.application_events.first()
-    assert event.pk == old_event_pk
-    schedule: ApplicationEventSchedule = event.application_event_schedules.first()
-    assert schedule.pk == old_schedule_pk
+
+    section = application.application_sections.first()
+    assert section.pk == old_section_pk
+
+    suitable = section.suitable_time_ranges.first()
+    assert suitable.pk == old_range_pk
 
 
 def test_update_application__organisation__deleted_if_empty(graphql):
     # given:
     # - There is a draft application in an open application round
     # - A superuser is using the system
-    event = ApplicationEventFactory.create_in_status_unallocated()
-    application = event.application
-    event.application_event_schedules.first()
+    application = ApplicationFactory.create_in_status_draft()
+    section = application.application_sections.first()
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     # when:
-    # - User tries to remove the application events and schedules
+    # - User tries to remove the application sections and suitable time ranges
     input_data = {
         "pk": application.pk,
-        "applicationEvents": [],
+        "applicationSections": [],
     }
     response = graphql(UPDATE_MUTATION, input_data=input_data)
 
     # then:
     # - The response contains no errors
-    # - The application event and schedule have been removed
+    # - The application sections and suitable time ranges have been removed
     assert response.has_errors is False, response
-    application.refresh_from_db()
-    event: ApplicationEvent = application.application_events.first()
-    assert event is None
+
+    section = application.application_sections.first()
+    assert section is None

@@ -38,7 +38,7 @@ class ReservationByPkTestCase(ReservationTestCaseBase):
         """
 
     def test_getting_reservation_by_pk(self):
-        self.client.force_login(self.regular_joe)
+        self.client.force_login(self.general_admin)
         response = self.query(self.get_query())
         content = json.loads(response.content)
         assert content.get("errors") is None

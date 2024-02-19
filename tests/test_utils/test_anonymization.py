@@ -13,8 +13,8 @@ from permissions.models import (
 )
 from tests.factories import (
     AddressFactory,
-    ApplicationEventFactory,
     ApplicationFactory,
+    ApplicationSectionFactory,
     ReservationFactory,
     ServiceSectorFactory,
     UnitFactory,
@@ -74,7 +74,7 @@ class AnonymizationTestCase(TestCase):
         )
         billing_address = AddressFactory()
         cls.application = ApplicationFactory.create(user=cls.mr_anonymous, billing_address=billing_address)
-        cls.app_event = ApplicationEventFactory.create(application=cls.application)
+        cls.app_section = ApplicationSectionFactory.create(application=cls.application)
 
     def test_user_anonymization(self):
         user_data = self.mr_anonymous.__dict__.copy()
@@ -98,13 +98,10 @@ class AnonymizationTestCase(TestCase):
 
     def test_application_anonymization(self):
         anonymize_user_applications(self.mr_anonymous)
-        self.app_event.refresh_from_db()
+        self.app_section.refresh_from_db()
 
-        # Event
-        assert_that(self.app_event.name).is_equal_to(SENSITIVE_APPLICATION)
-        assert_that(self.app_event.name_fi).is_equal_to(SENSITIVE_APPLICATION)
-        assert_that(self.app_event.name_en).is_equal_to(SENSITIVE_APPLICATION)
-        assert_that(self.app_event.name_sv).is_equal_to(SENSITIVE_APPLICATION)
+        # Section
+        assert_that(self.app_section.name).is_equal_to(SENSITIVE_APPLICATION)
 
         # Actual application
         self.application.refresh_from_db()

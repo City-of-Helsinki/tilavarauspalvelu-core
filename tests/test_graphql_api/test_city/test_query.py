@@ -14,7 +14,7 @@ pytestmark = [
 age_groups_query = partial(build_query, "cities", connection=True)
 
 
-def test_age_group__query__all_fields(graphql):
+def test_cities__query__all_fields(graphql):
     city_1 = CityFactory.create()
     city_2 = CityFactory.create()
     graphql.login_user_based_on_type(UserType.SUPERUSER)

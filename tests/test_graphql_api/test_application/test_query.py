@@ -1,7 +1,7 @@
 import pytest
 from django.test import override_settings
 
-from tests.factories import ApplicationEventFactory, ApplicationFactory
+from tests.factories import ApplicationFactory
 from tests.helpers import UserType
 from users.models import PersonalInfoViewLog
 
@@ -18,8 +18,7 @@ def test_can_query_application__all_fields(graphql):
     # - There are two applications in the system, one with events and one without
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft()
-    ApplicationFactory.create_in_status_draft()
-    event = ApplicationEventFactory.create_in_status_unallocated(application=application)
+    section = application.application_sections.first()
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     fields = """
@@ -31,16 +30,15 @@ def test_can_query_application__all_fields(graphql):
         applicationRound {
             pk
         }
-        applicant {
+        user {
             pk
         }
         contactPerson {
             pk
         }
-        applicationEvents {
+        applicationSections {
             pk
         }
-        status
         billingAddress {
             pk
         }
@@ -51,6 +49,7 @@ def test_can_query_application__all_fields(graphql):
         lastModifiedDate
         additionalInformation
         workingMemo
+        status
     """
 
     # when:
@@ -60,7 +59,7 @@ def test_can_query_application__all_fields(graphql):
 
     # then:
     # - The response contains the selected fields from both applications
-    assert len(response.edges) == 2, response
+    assert len(response.edges) == 1, response
     assert response.node(0) == {
         "pk": application.pk,
         "applicantType": application.applicant_type,
@@ -70,15 +69,15 @@ def test_can_query_application__all_fields(graphql):
         "applicationRound": {
             "pk": application.application_round.pk,
         },
-        "applicant": {
+        "user": {
             "pk": application.user.pk,
         },
         "contactPerson": {
             "pk": application.contact_person.pk,
         },
-        "applicationEvents": [
+        "applicationSections": [
             {
-                "pk": event.pk,
+                "pk": section.pk,
             },
         ],
         "status": application.status.value,
@@ -106,7 +105,7 @@ def test_accessing_applicant_date_of_birth_creates_personal_info_view_log(graphq
     # when:
     # - User tries to access the date of birth of the applicant
     fields = """
-        applicant {
+        user {
             dateOfBirth
         }
     """

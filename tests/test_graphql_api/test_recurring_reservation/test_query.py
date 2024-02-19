@@ -28,7 +28,6 @@ def test_recurring_reservations__query(graphql):
         weekdays
         created
         user
-        applicationEventSchedule
         ageGroup {
             minimum
             maximum
@@ -58,7 +57,6 @@ def test_recurring_reservations__query(graphql):
         "weekdays": [1, 2, 3, 4, 5],
         "created": recurring_reservation.created.isoformat(),
         "user": recurring_reservation.user.email,
-        "applicationEventSchedule": recurring_reservation.application_event_schedule.pk,
         "ageGroup": {
             "minimum": recurring_reservation.age_group.minimum,
             "maximum": recurring_reservation.age_group.maximum,

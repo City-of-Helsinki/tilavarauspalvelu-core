@@ -4,7 +4,6 @@ from typing import Any
 import factory
 from factory import fuzzy
 
-from applications.choices import PriorityChoice
 from reservation_units.models import ReservationUnit
 from reservations.choices import ReservationStateChoice
 from reservations.models import (
@@ -37,7 +36,6 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         )
     )
     user = factory.SubFactory("tests.factories.UserFactory")
-    priority = fuzzy.FuzzyInteger(low=PriorityChoice.LOW, high=PriorityChoice.HIGH, step=100)
     begin = fuzzy.FuzzyDateTime(
         start_dt=datetime(2021, 1, 1, tzinfo=UTC),
         end_dt=datetime(2022, 5, 31, tzinfo=UTC),

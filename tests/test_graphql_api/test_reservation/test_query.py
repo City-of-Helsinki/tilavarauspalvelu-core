@@ -56,7 +56,7 @@ def test_reservation__query__all_fields(graphql):
         freeOfChargeReason
         handledAt
         handlingDetails
-        homeCity { name }
+        homeCity { nameFi }
         isBlocked
         isHandled
         name
@@ -64,7 +64,6 @@ def test_reservation__query__all_fields(graphql):
         order { orderUuid status paymentType receiptUrl checkoutUrl reservationPk refundUuid expiresInMinutes }
         price
         priceNet
-        priority
         purpose { nameFi }
         recurringReservation { user }
         reservationUnits { nameFi }
@@ -125,7 +124,6 @@ def test_reservation__query__all_fields(graphql):
         "order": None,
         "price": float(reservation.price),
         "priceNet": "0.000000",
-        "priority": f"A_{reservation.priority}",
         "purpose": None,
         "recurringReservation": None,
         "reservationUnits": [],

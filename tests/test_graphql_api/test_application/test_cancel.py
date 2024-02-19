@@ -1,7 +1,7 @@
 import pytest
 
 from applications.choices import ApplicationStatusChoice
-from tests.factories import ApplicationEventFactory, ApplicationFactory
+from tests.factories import ApplicationFactory
 from tests.helpers import UserType
 
 from .helpers import CANCEL_MUTATION
@@ -14,10 +14,9 @@ pytestmark = [
 
 def test_cancel_application(graphql):
     # given:
-    # - There is a draft application in an open application round with a single application event
+    # - There is a draft application in an open application round with a single application section
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft()
-    ApplicationEventFactory.create(application=application)
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     # when:
@@ -47,7 +46,6 @@ def test_cancel_application__wrong_status(graphql, status):
     # - There is a draft application in a certain status
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status(status)
-    ApplicationEventFactory.create(application=application)
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     # when:

@@ -1,7 +1,7 @@
 import pytest
 
 from applications.choices import ApplicantTypeChoice
-from tests.factories import ApplicationEventFactory, ApplicationFactory
+from tests.factories import ApplicationFactory
 from tests.helpers import UserType
 
 from .helpers import applications_query
@@ -17,7 +17,6 @@ def test_application__filter__by_pk__single(graphql):
     # - There are two applications in the system
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft()
-    ApplicationFactory.create_in_status_draft()
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     # when:
@@ -150,17 +149,19 @@ def test_application__filter__by_status__multiple(graphql):
 
 def test_application__filter__by_unit__single(graphql):
     # given:
-    # - There are two applications in the system with different application event units
+    # - There are two applications in the system to different units
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft(
-        application_events__event_reservation_units__reservation_unit__unit__name="Unit 1",
+        application_sections__reservation_unit_options__reservation_unit__unit__name="Unit 1",
     )
     ApplicationFactory.create_in_status_draft(
-        application_events__event_reservation_units__reservation_unit__unit__name="Unit 2",
+        application_sections__reservation_unit_options__reservation_unit__unit__name="Unit 2",
     )
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
-    unit = application.application_events.first().event_reservation_units.first().reservation_unit.unit
+    section = application.application_sections.first()
+    option = section.reservation_unit_options.first()
+    unit = option.reservation_unit.unit
 
     # when:
     # - User tries to search for applications with a specific unit
@@ -177,15 +178,20 @@ def test_application__filter__by_unit__multiple(graphql):
     # - There are two applications in the system with different application event units
     # - A superuser is using the system
     application_1 = ApplicationFactory.create_in_status_draft(
-        application_events__event_reservation_units__reservation_unit__unit__name="Unit 1",
+        application_sections__reservation_unit_options__reservation_unit__unit__name="Unit 1",
     )
     application_2 = ApplicationFactory.create_in_status_draft(
-        application_events__event_reservation_units__reservation_unit__unit__name="Unit 2",
+        application_sections__reservation_unit_options__reservation_unit__unit__name="Unit 2",
     )
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
-    unit_1 = application_1.application_events.first().event_reservation_units.first().reservation_unit.unit
-    unit_2 = application_2.application_events.first().event_reservation_units.first().reservation_unit.unit
+    section_1 = application_1.application_sections.first()
+    option_1 = section_1.reservation_unit_options.first()
+    unit_1 = option_1.reservation_unit.unit
+
+    section_2 = application_2.application_sections.first()
+    option_2 = section_2.reservation_unit_options.first()
+    unit_2 = option_2.reservation_unit.unit
 
     # when:
     # - User tries to search for applications with a specific units
@@ -208,7 +214,7 @@ def test_application__filter__by_applicant(graphql):
 
     # when:
     # - User tries to search for applications by an applicant
-    response = graphql(applications_query(applicant=application.user.pk))
+    response = graphql(applications_query(user=application.user.pk))
 
     # then:
     # - The response contains the application with the given applicant
@@ -216,14 +222,22 @@ def test_application__filter__by_applicant(graphql):
     assert response.node(0) == {"pk": application.pk}
 
 
-def test_application__filter__by_text_search__event_name(graphql):
+def test_application__filter__by_text_search__section_name(graphql):
     # given:
     # - There are two applications with one application events each
     # - A superuser is using the system
-    application_1 = ApplicationFactory.create_in_status_draft(organisation=None, contact_person=None, user=None)
-    application_2 = ApplicationFactory.create_in_status_draft(organisation=None, contact_person=None, user=None)
-    ApplicationEventFactory.create_in_status_unallocated(application=application_1, name="foo")
-    ApplicationEventFactory.create_in_status_unallocated(application=application_2, name="bar")
+    application_1 = ApplicationFactory.create_in_status_draft(
+        organisation=None,
+        contact_person=None,
+        user=None,
+        application_sections__name="foo",
+    )
+    ApplicationFactory.create_in_status_draft(
+        organisation=None,
+        contact_person=None,
+        user=None,
+        application_sections__name="bar",
+    )
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     # when:
@@ -239,14 +253,22 @@ def test_application__filter__by_text_search__event_name(graphql):
     assert response.node(0) == {"pk": application_1.pk}
 
 
-def test_application__filter__by_text_search__event_name__prefix(graphql):
+def test_application__filter__by_text_search__section_name__prefix(graphql):
     # given:
     # - There are two applications with one application events each
     # - A superuser is using the system
-    application_1 = ApplicationFactory.create_in_status_draft(organisation=None, contact_person=None, user=None)
-    application_2 = ApplicationFactory.create_in_status_draft(organisation=None, contact_person=None, user=None)
-    ApplicationEventFactory.create_in_status_unallocated(application=application_1, name="foo")
-    ApplicationEventFactory.create_in_status_unallocated(application=application_2, name="bar")
+    application_1 = ApplicationFactory.create_in_status_draft(
+        organisation=None,
+        contact_person=None,
+        user=None,
+        application_sections__name="foo",
+    )
+    ApplicationFactory.create_in_status_draft(
+        organisation=None,
+        contact_person=None,
+        user=None,
+        application_sections__name="bar",
+    )
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     # when:
@@ -262,14 +284,22 @@ def test_application__filter__by_text_search__event_name__prefix(graphql):
     assert response.node(0) == {"pk": application_1.pk}
 
 
-def test_application__filter__by_text_search__event_name__has_quotes(graphql):
+def test_application__filter__by_text_search__section_name__has_quotes(graphql):
     # given:
     # - There are two applications with one application events each
     # - A superuser is using the system
-    application_1 = ApplicationFactory.create_in_status_draft(organisation=None, contact_person=None, user=None)
-    application_2 = ApplicationFactory.create_in_status_draft(organisation=None, contact_person=None, user=None)
-    ApplicationEventFactory.create_in_status_unallocated(application=application_1, name="Moe's Bar")
-    ApplicationEventFactory.create_in_status_unallocated(application=application_2, name="Bar")
+    application_1 = ApplicationFactory.create_in_status_draft(
+        organisation=None,
+        contact_person=None,
+        user=None,
+        application_sections__name="Moe's Bar",
+    )
+    ApplicationFactory.create_in_status_draft(
+        organisation=None,
+        contact_person=None,
+        user=None,
+        application_sections__name="Bar",
+    )
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     # when:
@@ -289,8 +319,18 @@ def test_application__filter__by_text_search__applicant__organisation_name(graph
     # given:
     # - There are two applications
     # - A superuser is using the system
-    application = ApplicationFactory.create_in_status_draft(organisation__name="foo", contact_person=None, user=None)
-    ApplicationFactory.create_in_status_draft(organisation__name="bar", contact_person=None, user=None)
+    application = ApplicationFactory.create_in_status_draft(
+        organisation__name="foo",
+        contact_person=None,
+        user=None,
+        application_sections__name="aaaa",
+    )
+    ApplicationFactory.create_in_status_draft(
+        organisation__name="bar",
+        contact_person=None,
+        user=None,
+        application_sections__name="bbbb",
+    )
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     # when:
@@ -315,12 +355,14 @@ def test_application__filter__by_text_search__applicant__contact_person_first_na
         contact_person__first_name="foo",
         contact_person__last_name="none",
         user=None,
+        application_sections__name="aaaa",
     )
     ApplicationFactory.create_in_status_draft(
         organisation=None,
         contact_person__first_name="bar",
         contact_person__last_name="none",
         user=None,
+        application_sections__name="bbbb",
     )
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
@@ -346,12 +388,14 @@ def test_application__filter__by_text_search__applicant__contact_person_last_nam
         contact_person__first_name="none",
         contact_person__last_name="foo",
         user=None,
+        application_sections__name="aaaa",
     )
     ApplicationFactory.create_in_status_draft(
         organisation=None,
         contact_person__first_name="none",
         contact_person__last_name="bar",
         user=None,
+        application_sections__name="bbbb",
     )
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
@@ -377,12 +421,14 @@ def test_application__filter__by_text_search__applicant__user_first_name(graphql
         contact_person=None,
         user__first_name="foo",
         user__last_name="none",
+        application_sections__name="aaaa",
     )
     ApplicationFactory.create_in_status_draft(
         organisation=None,
         contact_person=None,
         user__first_name="bar",
         user__last_name="none",
+        application_sections__name="bbbb",
     )
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
@@ -408,12 +454,14 @@ def test_application__filter__by_text_search__applicant__user_last_name(graphql)
         contact_person=None,
         user__first_name="none",
         user__last_name="foo",
+        application_sections__name="aaaa",
     )
     ApplicationFactory.create_in_status_draft(
         organisation=None,
         contact_person=None,
         user__first_name="none",
         user__last_name="bar",
+        application_sections__name="bbbb",
     )
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
@@ -430,19 +478,31 @@ def test_application__filter__by_text_search__applicant__user_last_name(graphql)
     assert response.node(0) == {"pk": application.pk}
 
 
-def test_application__filter__by_text_search__event_id(graphql):
+def test_application__filter__by_text_search__section_id(graphql):
     # given:
     # - There are two applications with one application events each
     # - A superuser is using the system
-    application_1 = ApplicationFactory.create_in_status_draft(organisation=None, contact_person=None, user=None)
-    application_2 = ApplicationFactory.create_in_status_draft(organisation=None, contact_person=None, user=None)
-    event_1 = ApplicationEventFactory.create_in_status_unallocated(application=application_1, name="foo")
-    ApplicationEventFactory.create_in_status_unallocated(application=application_2, name="bar")
+    application_1 = ApplicationFactory.create_in_status_draft(
+        id=1,
+        organisation=None,
+        contact_person=None,
+        user=None,
+        application_sections__id=3,
+        application_sections__name="foo",
+    )
+    ApplicationFactory.create_in_status_draft(
+        id=2,
+        organisation=None,
+        contact_person=None,
+        user=None,
+        application_sections__id=4,
+        application_sections__name="bar",
+    )
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     # when:
     # - User tries to filter applications with a text search
-    query = applications_query(text_search=f"{event_1.pk}")
+    query = applications_query(text_search=f"{application_1.application_sections.first().pk}")
     response = graphql(query)
 
     # then:
@@ -457,8 +517,18 @@ def test_application__filter__by_text_search__application_id(graphql):
     # given:
     # - There are two applications
     # - A superuser is using the system
-    application = ApplicationFactory.create_in_status_draft(organisation=None, contact_person=None, user=None)
-    ApplicationFactory.create_in_status_draft(organisation=None, contact_person=None, user=None)
+    application = ApplicationFactory.create_in_status_draft(
+        organisation=None,
+        contact_person=None,
+        user=None,
+        application_sections__name="aaaa",
+    )
+    ApplicationFactory.create_in_status_draft(
+        organisation=None,
+        contact_person=None,
+        user=None,
+        application_sections__name="bbbb",
+    )
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     # when:
@@ -478,14 +548,14 @@ def test_application__filter__by_text_search__not_found(graphql):
     # given:
     # - There is an application with an application event
     # - A superuser is using the system
-    application = ApplicationFactory.create_in_status_draft(
+    ApplicationFactory.create_in_status_draft(
         organisation__name="org",
         contact_person__first_name="fizz",
         contact_person__last_name="buzz",
         user__first_name="person",
         user__last_name="one",
+        application_sections__name="foo",
     )
-    ApplicationEventFactory.create_in_status_unallocated(application=application, name="foo")
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     # when:

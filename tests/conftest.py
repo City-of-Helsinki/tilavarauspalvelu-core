@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 import pytest
 from rest_framework.test import APIClient
 
-from tests.helpers import GraphQLClient, capture_database_queries
+from tests.helpers import GraphQLClient
 
 if TYPE_CHECKING:
     from django.core.mail import EmailMessage
@@ -14,12 +14,6 @@ if TYPE_CHECKING:
 @pytest.fixture()
 def graphql() -> GraphQLClient:
     return GraphQLClient()
-
-
-@pytest.fixture()
-def query_counter(settings):
-    settings.DEBUG = True
-    return capture_database_queries
 
 
 @pytest.fixture()

@@ -1,10 +1,10 @@
 from .ability_group import AbilityGroupFactory
 from .address import AddressFactory
 from .age_group import AgeGroupFactory
+from .allocated_time_slot import AllocatedTimeSlotFactory
 from .application import ApplicationFactory
-from .application_event import ApplicationEventFactory, EventReservationUnitFactory
-from .application_event_schedule import ApplicationEventScheduleFactory
 from .application_round import ApplicationRoundFactory
+from .application_section import ApplicationSectionFactory
 from .banner_notification import BannerNotificationFactory
 from .building import BuildingFactory
 from .city import CityFactory
@@ -35,6 +35,7 @@ from .reservation_purpose import ReservationPurposeFactory
 from .reservation_unit import ReservationUnitFactory
 from .reservation_unit_cancellation_rule import ReservationUnitCancellationRuleFactory
 from .reservation_unit_image import ReservationUnitImageFactory
+from .reservation_unit_option import ReservationUnitOptionFactory
 from .reservation_unit_payment_type import ReservationUnitPaymentTypeFactory
 from .reservation_unit_pricing import ReservationUnitPricingFactory
 from .reservation_unit_type import ReservationUnitTypeFactory
@@ -53,6 +54,7 @@ from .role import (
 from .service import ServiceFactory
 from .service_sector import ServiceSectorFactory
 from .space import SpaceFactory
+from .suitable_time_range import SuitableTimeRangeFactory
 from .tax_percentage import TaxPercentageFactory
 from .terms_of_use import TermsOfUseFactory
 from .unit import UnitFactory, UnitGroupFactory
@@ -74,17 +76,16 @@ __all__ = [
     "AbilityGroupFactory",
     "AddressFactory",
     "AgeGroupFactory",
-    "ApplicationEventFactory",
-    "ApplicationEventScheduleFactory",
+    "AllocatedTimeSlotFactory",
     "ApplicationFactory",
     "ApplicationRoundFactory",
+    "ApplicationSectionFactory",
     "BannerNotificationFactory",
     "BuildingFactory",
     "CityFactory",
     "EmailTemplateFactory",
     "EquipmentCategoryFactory",
     "EquipmentFactory",
-    "EventReservationUnitFactory",
     "GeneralRoleChoiceFactory",
     "GeneralRoleFactory",
     "GeneralRolePermissionFactory",
@@ -116,6 +117,7 @@ __all__ = [
     "ReservationUnitCancellationRuleFactory",
     "ReservationUnitFactory",
     "ReservationUnitImageFactory",
+    "ReservationUnitOptionFactory",
     "ReservationUnitPaymentTypeFactory",
     "ReservationUnitPricingFactory",
     "ReservationUnitTypeFactory",
@@ -126,6 +128,7 @@ __all__ = [
     "ServiceSectorRoleFactory",
     "ServiceSectorRolePermissionFactory",
     "SpaceFactory",
+    "SuitableTimeRangeFactory",
     "TaxPercentageFactory",
     "TermsOfUseFactory",
     "UnitFactory",

@@ -3,11 +3,11 @@ from datetime import timedelta
 from typing import Any
 
 import factory
-from django.utils.timezone import now
 from factory import fuzzy
 
 from applications.choices import ApplicationRoundStatusChoice, TargetGroupChoice
 from applications.models import ApplicationRound
+from common.date_utils import utc_start_of_day
 from reservation_units.models import Purpose, ReservationUnit
 
 from ._base import GenericDjangoModelFactory
@@ -25,7 +25,7 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
     name = fuzzy.FuzzyText()
     target_group = fuzzy.FuzzyChoice(choices=TargetGroupChoice.values)
 
-    timestamp = factory.LazyFunction(now)  # private helper (see Meta.exclude)
+    timestamp = factory.LazyFunction(utc_start_of_day)  # private helper (see Meta.exclude)
 
     application_period_begin = factory.LazyAttribute(lambda a: a.timestamp)
     application_period_end = factory.LazyAttribute(lambda a: a.application_period_begin + timedelta(weeks=4))
@@ -61,7 +61,7 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
         """Create an upcoming application round."""
         kwargs.setdefault("sent_date", None)
         kwargs.setdefault("handled_date", None)
-        kwargs.setdefault("application_period_begin", now() + timedelta(days=1))
+        kwargs.setdefault("application_period_begin", utc_start_of_day() + timedelta(days=1))
         return cls.create(**kwargs)
 
     @classmethod
@@ -69,8 +69,8 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
         """Create an open application round."""
         kwargs.setdefault("sent_date", None)
         kwargs.setdefault("handled_date", None)
-        kwargs.setdefault("application_period_begin", now() - timedelta(days=1))
-        kwargs.setdefault("application_period_end", now() + timedelta(days=1))
+        kwargs.setdefault("application_period_begin", utc_start_of_day() - timedelta(days=1))
+        kwargs.setdefault("application_period_end", utc_start_of_day() + timedelta(days=1))
         return cls.create(**kwargs)
 
     @classmethod
@@ -78,26 +78,26 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
         """Create an application round in allocation."""
         kwargs.setdefault("sent_date", None)
         kwargs.setdefault("handled_date", None)
-        kwargs.setdefault("application_period_begin", now() - timedelta(days=2))
-        kwargs.setdefault("application_period_end", now() - timedelta(days=1))
+        kwargs.setdefault("application_period_begin", utc_start_of_day() - timedelta(days=2))
+        kwargs.setdefault("application_period_end", utc_start_of_day() - timedelta(days=1))
         return cls.create(**kwargs)
 
     @classmethod
     def create_in_status_handled(cls, **kwargs: Any) -> ApplicationRound:
         """Create a handled application round."""
         kwargs.setdefault("sent_date", None)
-        kwargs.setdefault("handled_date", now())
-        kwargs.setdefault("application_period_begin", now() - timedelta(days=2))
-        kwargs.setdefault("application_period_end", now() - timedelta(days=1))
+        kwargs.setdefault("handled_date", utc_start_of_day())
+        kwargs.setdefault("application_period_begin", utc_start_of_day() - timedelta(days=2))
+        kwargs.setdefault("application_period_end", utc_start_of_day() - timedelta(days=1))
         return cls.create(**kwargs)
 
     @classmethod
     def create_in_status_result_sent(cls, **kwargs: Any) -> ApplicationRound:
         """Create an application round with results sent."""
-        kwargs.setdefault("sent_date", now())
-        kwargs.setdefault("handled_date", now())
-        kwargs.setdefault("application_period_begin", now() - timedelta(days=2))
-        kwargs.setdefault("application_period_end", now() - timedelta(days=1))
+        kwargs.setdefault("sent_date", utc_start_of_day())
+        kwargs.setdefault("handled_date", utc_start_of_day())
+        kwargs.setdefault("application_period_begin", utc_start_of_day() - timedelta(days=2))
+        kwargs.setdefault("application_period_end", utc_start_of_day() - timedelta(days=1))
         return cls.create(**kwargs)
 
     @factory.post_generation

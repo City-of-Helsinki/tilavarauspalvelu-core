@@ -1,8 +1,7 @@
 import pytest
 
 from applications.choices import ApplicationStatusChoice
-from applications.models import ApplicationEvent
-from tests.factories import ApplicationEventFactory, ApplicationFactory
+from tests.factories import ApplicationFactory
 from tests.helpers import UserType
 
 from .helpers import SEND_MUTATION
@@ -18,7 +17,6 @@ def test_send_application(graphql):
     # - There is a draft application in an open application round with a single application event
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft()
-    ApplicationEventFactory.create(application=application)
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     # when:
@@ -33,11 +31,11 @@ def test_send_application(graphql):
     assert application.sent_date is not None
 
 
-def test_send_application__no_events(graphql):
+def test_send_application__no_sections(graphql):
     # given:
-    # - There is a draft application without application events
+    # - There is a draft application without application sections
     # - A superuser is using the system
-    application = ApplicationFactory.create_in_status_draft()
+    application = ApplicationFactory.create_in_status_draft_no_sections()
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     # when:
@@ -45,32 +43,10 @@ def test_send_application__no_events(graphql):
     response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
 
     # then:
-    # - The response contains errors about missing application events
+    # - The response contains errors about missing application sections
     assert response.has_errors is True
-    assert response.field_error_messages("applicationEvents") == [
-        "Application requires application events before it can be sent.",
-    ]
-
-
-@pytest.mark.parametrize("missing_field", ApplicationEvent.required_for_review)
-def test_send_application__missing_data_in_event(graphql, missing_field):
-    # given:
-    # - There is a draft application with and application event with one missing field required for review
-    # - A superuser is using the system
-    application = ApplicationFactory.create_in_status_draft()
-    event = ApplicationEventFactory.create(application=application, **{missing_field: None})
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
-
-    # when:
-    # - The user tries to send the application
-    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
-
-    # then:
-    # - The response contains errors about missing field on the application event
-    assert response.has_errors is True
-    assert response.field_error_messages("applicationEvents") == [
-        f"Field '{missing_field}' is required for application event "
-        f"'{event.name}' before the application can be sent."
+    assert response.field_error_messages() == [
+        "Application requires application sections before it can be sent.",
     ]
 
 
@@ -79,7 +55,6 @@ def test_send_application__missing_contact_person(graphql):
     # - There is a draft application without a contact person
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft(contact_person=None)
-    ApplicationEventFactory.create(application=application)
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     # when:
@@ -89,7 +64,7 @@ def test_send_application__missing_contact_person(graphql):
     # then:
     # - The response contains errors about missing contact person
     assert response.has_errors is True
-    assert response.field_error_messages("contactPerson") == [
+    assert response.field_error_messages() == [
         "Contact person is required for application before the it can be sent.",
     ]
 
@@ -108,8 +83,7 @@ def test_send_application__wrong_status(graphql, status):
     # given:
     # - There is a draft application in a certain status
     # - A superuser is using the system
-    application = ApplicationFactory.create_in_status(status)
-    ApplicationEventFactory.create(application=application)
+    application = ApplicationFactory.create_in_status(status, application_sections__name="foo")
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     # when:

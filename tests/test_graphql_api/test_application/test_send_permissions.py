@@ -1,6 +1,6 @@
 import pytest
 
-from tests.factories import ApplicationEventFactory, ApplicationFactory, ServiceSectorFactory, UserFactory
+from tests.factories import ApplicationFactory, ServiceSectorFactory, UserFactory
 from tests.helpers import UserType
 
 from .helpers import SEND_MUTATION
@@ -13,10 +13,9 @@ pytestmark = [
 
 def test_application_user_can_send_own_application(graphql):
     # given:
-    # - There is a draft application in an open application round with a single application event
+    # - There is a draft application in an open application round with a single application section
     # - The owner of the application is using the system
     application = ApplicationFactory.create_in_status_draft()
-    ApplicationEventFactory.create(application=application)
     graphql.force_login(application.user)
 
     # when:
@@ -33,10 +32,9 @@ def test_application_user_can_send_own_application(graphql):
 
 def test_regular_user_cannot_send_other_user_application(graphql):
     # given:
-    # - There is a draft application in an open application round with a single application event
+    # - There is a draft application in an open application round with a single application section
     # - The regular user is using the system
     application = ApplicationFactory.create_in_status_draft()
-    ApplicationEventFactory.create(application=application)
     graphql.login_user_based_on_type(UserType.REGULAR)
 
     # when:
@@ -45,7 +43,7 @@ def test_regular_user_cannot_send_other_user_application(graphql):
 
     # then:
     # - The response contains errors about mutation permissions
-    assert response.field_error_messages() == ["No permission to mutate."]
+    assert response.error_message() == "No permission to update."
 
 
 def test_service_sector_admin_can_send_other_user_application(graphql):
@@ -53,7 +51,6 @@ def test_service_sector_admin_can_send_other_user_application(graphql):
     # - There is a draft application in an open application round with a single application event
     # - The owner of the application is using the system
     application = ApplicationFactory.create_in_status_draft()
-    ApplicationEventFactory.create(application=application)
     admin = UserFactory.create_with_service_sector_permissions(
         service_sector=application.application_round.service_sector,
         perms=["can_handle_applications"],
@@ -74,10 +71,9 @@ def test_service_sector_admin_can_send_other_user_application(graphql):
 
 def test_service_sector_admin_can_send_application_for_other_sector(graphql):
     # given:
-    # - There is a draft application in an open application round with a single application event
+    # - There is a draft application in an open application round with a single application section
     # - The regular user is using the system
     application = ApplicationFactory.create_in_status_draft()
-    ApplicationEventFactory.create(application=application)
     admin = UserFactory.create_with_service_sector_permissions(
         service_sector=ServiceSectorFactory.create(),
         perms=["can_handle_applications"],
@@ -90,4 +86,4 @@ def test_service_sector_admin_can_send_application_for_other_sector(graphql):
 
     # then:
     # - The response contains errors about mutation permissions
-    assert response.field_error_messages() == ["No permission to mutate."]
+    assert response.error_message() == "No permission to update."

@@ -4,10 +4,11 @@ from applications.models import (
     Address,
     Application,
     ApplicationEvent,
-    ApplicationEventSchedule,
-    EventReservationUnit,
+    ApplicationSection,
     Organisation,
     Person,
+    ReservationUnitOption,
+    SuitableTimeRange,
 )
 from tests.factories import ApplicationRoundFactory
 from tests.helpers import UserType
@@ -21,7 +22,7 @@ pytestmark = [
 ]
 
 
-def test_create_application(graphql):
+def test_application__create(graphql):
     # given:
     # - There is an open application round
     # - A superuser is using the system
@@ -29,7 +30,7 @@ def test_create_application(graphql):
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     # when:
-    # - User tries to create a new application without events
+    # - User tries to create a new application without sections
     input_data = get_application_create_data(application_round)
     response = graphql(CREATE_MUTATION, input_data=input_data)
 
@@ -49,7 +50,7 @@ def test_create_application(graphql):
     assert ApplicationEvent.objects.count() == 0
 
 
-def test_create_application_with_application_events(graphql):
+def test_application__create__with_application_sections(graphql):
     # given:
     # - There is an open application round
     # - A superuser is using the system
@@ -60,7 +61,7 @@ def test_create_application_with_application_events(graphql):
 
     # when:
     # - User tries to create a new application without events
-    input_data = get_application_create_data(application_round, create_events=True)
+    input_data = get_application_create_data(application_round, create_sections=True)
     response = graphql(CREATE_MUTATION, input_data=input_data)
 
     # then:
@@ -70,50 +71,48 @@ def test_create_application_with_application_events(graphql):
     # - An address is created for the organisation
     # - A contact person is created for the application
     # - A billing address is created for the application
-    # - An application event is created for the application
-    # - An application event schedule is created for the application event
-    # - An event reservation unit is created for the application event
+    # - An application section is created for the application
+    # - A suitable time range is created for the application section
+    # - An reservation unit option is created for the application section
     assert response.has_errors is False, response
     assert Application.objects.count() == 1
     assert Organisation.objects.count() == 1
     assert Person.objects.count() == 1  # contact person
     assert Address.objects.count() == 2  # billing and organisation addresses
-    assert ApplicationEvent.objects.count() == 1
-    assert ApplicationEventSchedule.objects.count() == 1
-    assert EventReservationUnit.objects.count() == 1
+    assert ApplicationSection.objects.count() == 1
+    assert SuitableTimeRange.objects.count() == 1
+    assert ReservationUnitOption.objects.count() == 1
 
 
-def test_create_application__sub_serializer_error(graphql):
+@pytest.mark.parametrize("field", ["city", "postCode", "streetAddress"])
+def test_application__create__sub_serializer_error(graphql, field):
     # given:
     # - There is an open application round
     # - A superuser is using the system
     application_round = ApplicationRoundFactory.create_in_status_open()
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
+    address_data = {
+        "streetAddress": "Address",
+        "city": "City",
+        "postCode": "12345",
+    }
+    address_data[field] = ""
     input_data = {
         "applicationRound": application_round.pk,
-        "billingAddress": {"city": "", "postCode": "", "streetAddress": ""},
+        "billingAddress": address_data,
     }
 
     # when:
     # - User tries to create a new application with improper address data
     response = graphql(CREATE_MUTATION, input_data=input_data)
 
-    field_empty = "Tämä kenttä ei voi olla tyhjä."
-
     # then:
     # - The response contains errors from sub serializers
     assert response.field_errors == [
         {
-            "field": "billingAddress.city",
-            "messages": [field_empty],
-        },
-        {
-            "field": "billingAddress.postCode",
-            "messages": [field_empty],
-        },
-        {
-            "field": "billingAddress.streetAddress",
-            "messages": [field_empty],
-        },
+            "code": "blank",
+            "field": f"billingAddress.{field}",
+            "message": "Tämä kenttä ei voi olla tyhjä.",
+        }
     ]
