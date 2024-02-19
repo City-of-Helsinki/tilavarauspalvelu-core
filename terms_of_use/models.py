@@ -4,6 +4,10 @@ from django.utils.translation import pgettext_lazy
 
 from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 
+__all__ = [
+    "TermsOfUse",
+]
+
 
 class TermsOfUse(models.Model):
     TERMS_TYPE_GENERIC = "generic_terms"

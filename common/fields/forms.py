@@ -7,7 +7,12 @@ from django.contrib.admin.widgets import AutocompleteSelectMultiple, FilteredSel
 from django.db import models
 from django.db.models import ManyToManyField
 from django.forms import ModelMultipleChoiceField
+from graphene_django.converter import convert_django_field
 from graphene_django.forms.converter import convert_form_field, get_form_field_description
+from graphene_django.registry import Registry
+from lookup_property.field import LookupPropertyField
+
+from common.typing import GQLInfo
 
 __all__ = [
     "IntChoiceField",
@@ -16,6 +21,7 @@ __all__ = [
     "EnumMultipleChoiceField",
     "disabled_widget",
 ]
+
 
 disabled_widget = forms.TextInput(attrs={"class": "readonly", "disabled": True, "required": False})
 
@@ -130,3 +136,24 @@ def convert_form_field_to_enum_list(field):
         description=get_form_field_description(field),
         required=field.required,
     )
+
+
+@convert_django_field.register
+def convert_lookup_field(field: LookupPropertyField, registry: Registry | None = None) -> graphene.Dynamic:
+    model = field.model
+
+    def dynamic_type():
+        _type = registry.get_type_for_model(model)
+        if not _type:
+            return None
+
+        class CustomField(graphene.Field):
+            def wrap_resolve(self, parent_resolver: Any) -> Any:
+                def custom_resolver(root: models.Model, info: GQLInfo):
+                    return field.target_property.__get__(root, type(root))
+
+                return custom_resolver
+
+        return CustomField(_type, required=not field.null)
+
+    return graphene.Dynamic(dynamic_type)

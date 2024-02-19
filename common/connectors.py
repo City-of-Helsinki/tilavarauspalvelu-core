@@ -2,8 +2,7 @@ from django.db import models
 
 __all__ = [
     "ApplicationActionsConnector",
-    "ApplicationEventActionsConnector",
-    "ApplicationEventScheduleActionsConnector",
+    "ApplicationSectionActionsConnector",
     "ApplicationRoundActionsConnector",
     "ReservationUnitActionsConnector",
     "ReservationActionsConnector",
@@ -30,20 +29,28 @@ class ApplicationActionsConnector:
         return ApplicationActions(instance)
 
 
-class ApplicationEventActionsConnector:
+class ApplicationSectionActionsConnector:
     def __get__(self, instance, _):
         _raise_if_accessed_on_class(instance)
-        from actions.application_event import ApplicationEventActions
+        from actions.application_section import ApplicationSectionActions
 
-        return ApplicationEventActions(instance)
+        return ApplicationSectionActions(instance)
 
 
-class ApplicationEventScheduleActionsConnector:
+class SuitableTimeRangeActionsConnector:
     def __get__(self, instance, _):
         _raise_if_accessed_on_class(instance)
-        from actions.application_event_schedule import ApplicationEventScheduleActions
+        from actions.suitable_time_range import SuitableTimeRangeActions
 
-        return ApplicationEventScheduleActions(instance)
+        return SuitableTimeRangeActions(instance)
+
+
+class AllocatedTimeSlotActionsConnector:
+    def __get__(self, instance, _):
+        _raise_if_accessed_on_class(instance)
+        from actions.allocated_time_slot import AllocatedTimeSlotActions
+
+        return AllocatedTimeSlotActions(instance)
 
 
 class ApplicationRoundActionsConnector:
@@ -52,6 +59,14 @@ class ApplicationRoundActionsConnector:
         from actions.application_round import ApplicationRoundActions
 
         return ApplicationRoundActions(instance)
+
+
+class ReservationUnitOptionActionsConnector:
+    def __get__(self, instance, _):
+        _raise_if_accessed_on_class(instance)
+        from actions.reservation_unit_option import ReservationUnitOptionActions
+
+        return ReservationUnitOptionActions(instance)
 
 
 class ReservationUnitActionsConnector:

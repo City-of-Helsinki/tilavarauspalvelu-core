@@ -1,6 +1,6 @@
 import datetime
 import zoneinfo
-from typing import Generic, TypeVar
+from typing import Generic, TypedDict, TypeVar
 
 from django.utils.timezone import get_default_timezone
 
@@ -20,6 +20,9 @@ __all__ = [
     "local_time_max",
     "local_start_of_day",
     "local_end_of_day",
+    "local_date_string",
+    "local_time_string",
+    "local_timedelta_string",
     "utc_datetime",
     "utc_date",
     "utc_time",
@@ -150,10 +153,12 @@ def local_time_max() -> datetime.time:
     return datetime.time.max.replace(tzinfo=DEFAULT_TIMEZONE)
 
 
-def local_start_of_day(_date: datetime.date | datetime.datetime, /) -> datetime.datetime:
-    """Get the start of day (00:00:00) as datetime for the given date in local timezone."""
+def local_start_of_day(_date: datetime.date | datetime.datetime | None = None, /) -> datetime.datetime:
+    """Get the start of day (00:00:00) as datetime for the given date (or today if not given) in local timezone."""
     if isinstance(_date, datetime.datetime):
         _date = _date.astimezone(DEFAULT_TIMEZONE).date()
+    if _date is None:
+        _date = local_date()
     return datetime.datetime.combine(_date, datetime.time.min, tzinfo=DEFAULT_TIMEZONE)
 
 
@@ -162,6 +167,33 @@ def local_end_of_day(_date: datetime.date | datetime.datetime, /) -> datetime.da
     if isinstance(_date, datetime.datetime):
         _date = _date.astimezone(DEFAULT_TIMEZONE).date()
     return datetime.datetime.combine(_date, datetime.time.max, tzinfo=DEFAULT_TIMEZONE)
+
+
+def local_date_string(_date: datetime.date, /) -> str:
+    """Format a date to a string in the finnish local format."""
+    return _date.strftime("%d.%m.%Y")
+
+
+def local_time_string(_time: datetime.time, /) -> str:
+    """Format a time to a string in the finnish local format."""
+    return _time.strftime("%H:%M")
+
+
+def local_timedelta_string(delta: datetime.timedelta, /) -> str:
+    """Format a timedelta to a string in the format, e.g., '2 h 22 min 5 s'."""
+    total_seconds = int(delta.total_seconds())
+    hours, remaining_seconds = divmod(total_seconds, 3600)
+    minutes, seconds = divmod(remaining_seconds, 60)
+
+    duration_string: str = ""
+    if hours:
+        duration_string += f"{hours} h"
+    if minutes:
+        duration_string += f" {minutes} min"
+    if seconds:
+        duration_string += f" {seconds} s"
+
+    return duration_string
 
 
 ### UTC TIME #############################################################################################
@@ -202,8 +234,12 @@ def utc_time_max() -> datetime.time:
     return datetime.time.max.replace(tzinfo=datetime.UTC)
 
 
-def utc_start_of_day(_date: datetime.date, /) -> datetime.datetime:
-    """Get the start of day (00:00:00) as datetime for the given date in UTC."""
+def utc_start_of_day(_date: datetime.date | datetime.datetime | None = None, /) -> datetime.datetime:
+    """Get the start of day (00:00:00) as datetime for the given date (of today if None) in UTC."""
+    if isinstance(_date, datetime.datetime):
+        _date = _date.astimezone(datetime.UTC).date()
+    if _date is None:
+        _date = utc_date()
     return datetime.datetime.combine(_date, datetime.time.min, tzinfo=datetime.UTC)
 
 
@@ -254,3 +290,28 @@ def time_difference(
 ) -> datetime.timedelta:
     """Difference between two datetimes/times as timedelta."""
     return time_as_timedelta(_input_1) - time_as_timedelta(_input_2)
+
+
+class TimeSlot(TypedDict):
+    begin_time: datetime.time
+    end_time: datetime.time
+
+
+def merge_time_slots(time_slots: list[TimeSlot]) -> list[TimeSlot]:
+    """
+    Merge time slots that overlap or touch each other.
+    Time slots should be in chronological order, and on the same day.
+    """
+    merged_slots = time_slots[:1]
+
+    # Go through all periods in order.
+    for period in time_slots[1:]:
+        last_period = merged_slots[-1]
+        # If time periods overlap, or are next to each other -> merge them and continue.
+        if last_period["end_time"] >= period["begin_time"]:
+            last_period["end_time"] = max(period["end_time"], last_period["end_time"])
+            continue
+
+        # Otherwise the periods are not contiguous -> append the period and continue.
+        merged_slots.append(period)
+    return merged_slots

@@ -11,6 +11,12 @@ from opening_hours.utils.time_span_element import TimeSpanElement
 DEFAULT_TIMEZONE = get_default_timezone()
 
 
+__all__ = [
+    "OriginHaukiResource",
+    "ReservableTimeSpan",
+]
+
+
 class OriginHaukiResource(models.Model):
     # Resource id in Hauki API
     id = models.IntegerField(unique=True, primary_key=True)

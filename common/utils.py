@@ -73,7 +73,7 @@ def get_field_to_related_field_mapping(model: type[models.Model]) -> dict[str, s
     }
 
 
-def get_translation_fields(model: type[models.Model], fields: list[str] | Literal["__all__"]) -> list[str]:
+def get_translation_fields(model: type[models.Model], fields: Sequence[str] | Literal["__all__"]) -> list[str]:
     translatable_fields = get_translatable_fields_for_model(model) or []
     if fields == "__all__":
         fields = translatable_fields

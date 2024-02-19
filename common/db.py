@@ -61,7 +61,7 @@ class SubqueryArray(models.Subquery):
         distinct: bool = False,
         include_nulls: bool = False,
         coalesce: bool = True,
-        coalesce_output_type: str = "integer",
+        coalesce_output_type: str = "integer",  # https://www.postgresql.org/docs/current/datatype.html#DATATYPE-TABLE
         output_field: models.Field | None = None,
         alias: str = "_array",
         **kwargs: Any,
