@@ -10,7 +10,8 @@ from django.db import migrations, models
 
 import applications.models.organization
 import common.fields.model
-from applications.choices import ApplicantTypeChoice, OrganizationTypeChoice, PriorityChoice, WeekdayChoice
+from applications.choices import ApplicantTypeChoice, OrganizationTypeChoice, WeekdayChoice
+from applications.models.application_event_schedule import ReservationPriorityChoice
 
 
 def convert_schedule_results_to_schedule(apps, schema_editor):
@@ -522,7 +523,7 @@ class Migration(migrations.Migration):
             name="priority",
             field=common.fields.model.IntChoiceField(
                 blank=True,
-                enum=PriorityChoice,
+                enum=ReservationPriorityChoice,
                 default=300,
                 validators=[
                     django.core.validators.MinValueValidator(

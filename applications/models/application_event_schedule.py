@@ -1,32 +1,24 @@
 import datetime
-import logging
-from typing import TYPE_CHECKING
 
-from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.timezone import get_default_timezone
+from django.utils.translation import gettext_lazy as _
 
-from applications.choices import PriorityChoice, WeekdayChoice
-from applications.querysets.application_event_schedule import ApplicationEventScheduleQuerySet
-from common.connectors import ApplicationEventScheduleActionsConnector
+from applications.choices import WeekdayChoice
 from common.fields.model import IntChoiceField
-from reservations.choices import ReservationStateChoice
-
-if TYPE_CHECKING:
-    from actions.application_event_schedule import EventOccurrence
-
 
 __all__ = [
     "ApplicationEventSchedule",
 ]
 
 
-DEFAULT_TIMEZONE = get_default_timezone()
-logger = logging.getLogger(__name__)
-User = get_user_model()
+# Legacy. Still used for reservation models
+class ReservationPriorityChoice(models.IntegerChoices):
+    LOW = 100, _("Low")
+    MEDIUM = 200, _("Medium")
+    HIGH = 300, _("High")
 
 
+# DEPRECATED: Use ApplicationSection and SuitableTimeRange models instead
 class ApplicationEventSchedule(models.Model):
     """Time request for an application event. Allocated times filled if request accepted in allocation."""
 
@@ -41,7 +33,11 @@ class ApplicationEventSchedule(models.Model):
     allocated_end: datetime.time | None = models.TimeField(null=True, blank=True, default=None)
 
     declined: bool = models.BooleanField(blank=True, default=False)
-    priority: int = IntChoiceField(enum=PriorityChoice, blank=True, default=PriorityChoice.HIGH.value)
+    priority: int = IntChoiceField(
+        enum=ReservationPriorityChoice,
+        blank=True,
+        default=ReservationPriorityChoice.HIGH.value,
+    )
 
     application_event = models.ForeignKey(
         "applications.ApplicationEvent",
@@ -56,9 +52,6 @@ class ApplicationEventSchedule(models.Model):
         on_delete=models.CASCADE,
         related_name="application_event_schedules",
     )
-
-    objects = ApplicationEventScheduleQuerySet.as_manager()
-    actions = ApplicationEventScheduleActionsConnector()
 
     class Meta:
         db_table = "application_event_schedule"
@@ -105,46 +98,3 @@ class ApplicationEventSchedule(models.Model):
 
     def __str__(self) -> str:
         return f"ApplicationEventSchedule {self.day} {self.begin}-{self.end}"
-
-    @property
-    def accepted(self) -> bool:
-        return (
-            not self.declined
-            and self.allocated_begin is not None
-            and self.allocated_end is not None
-            and self.allocated_day is not None
-            and self.allocated_reservation_unit is not None
-        )
-
-    @property
-    def reserved(self) -> bool:
-        return self.recurring_reservations.exists()
-
-    @property
-    def unsuccessfully_reserved(self) -> bool:
-        return self.recurring_reservations.filter(reservations__state=ReservationStateChoice.DENIED).exists()
-
-    @property
-    def desired_occurrences(self) -> "EventOccurrence":
-        return self.actions.get_event_occurrences(
-            self.day,
-            self.begin,
-            self.end,
-            self.application_event.begin,
-            self.application_event.end,
-            self.application_event.biweekly,
-        )
-
-    @property
-    def allocated_occurrences(self) -> "EventOccurrence":
-        if not self.accepted:
-            raise ValidationError("Cannot get allocated occurrences for unaccepted schedule")
-
-        return self.actions.get_event_occurrences(
-            self.allocated_day,
-            self.allocated_begin,
-            self.allocated_end,
-            self.application_event.begin,
-            self.application_event.end,
-            self.application_event.biweekly,
-        )

@@ -1,16 +1,21 @@
 from datetime import datetime
 
 from django.db import models
+from django.db.models.functions import Concat
 from django.db.models.manager import Manager
 from helsinki_gdpr.models import SerializableMixin
+from lookup_property import L, lookup_property
 
-from applications.choices import ApplicantTypeChoice, ApplicationRoundStatusChoice, ApplicationStatusChoice
+from applications.choices import (
+    ApplicantTypeChoice,
+    ApplicationRoundStatusChoice,
+    ApplicationSectionStatusChoice,
+    ApplicationStatusChoice,
+)
 from applications.querysets.application import ApplicationQuerySet
 from common.connectors import ApplicationActionsConnector
+from common.date_utils import local_datetime
 from common.fields.model import StrChoiceField
-from spaces.models import Unit
-
-from .event_reservation_unit import EventReservationUnit
 
 __all__ = [
     "Application",
@@ -22,6 +27,11 @@ class ApplicationManager(SerializableMixin.SerializableManager, Manager.from_que
 
 
 class Application(SerializableMixin, models.Model):
+    """
+    An application for an application round. Contains multiple application sections,
+    as well as information about the applicant.
+    """
+
     applicant_type: str = StrChoiceField(enum=ApplicantTypeChoice, null=True, db_index=True)
     created_date: datetime = models.DateTimeField(auto_now_add=True)
     last_modified_date: datetime = models.DateTimeField(auto_now=True)
@@ -83,6 +93,7 @@ class Application(SerializableMixin, models.Model):
     serialize_fields = (
         {"name": "additional_information"},
         {"name": "application_events"},
+        {"name": "application_sections"},
         {"name": "contact_person"},
         {"name": "organisation"},
         {"name": "billing_address"},
@@ -91,8 +102,60 @@ class Application(SerializableMixin, models.Model):
     def __str__(self) -> str:
         return f"{self.user} ({self.created_date})"
 
-    @property
-    def status(self) -> ApplicationStatusChoice:
+    @lookup_property(joins=["application_round"], skip_codegen=True)
+    def status() -> ApplicationStatusChoice:
+        now = local_datetime()
+        return models.Case(  # type: ignore[return-value]
+            models.When(
+                # If there is a cancelled date
+                models.Q(cancelled_date__isnull=False),
+                then=models.Value(ApplicationStatusChoice.CANCELLED.value),
+            ),
+            models.When(
+                # If there is no sent date in the application
+                # AND application round is upcoming or open
+                (
+                    models.Q(sent_date__isnull=True)
+                    # NOTE: Some copy-pasta from Application Round status for efficiency
+                    & models.Q(application_round__sent_date__isnull=True)
+                    & models.Q(application_round__handled_date__isnull=True)
+                    & models.Q(application_round__application_period_end__gt=now)
+                ),
+                then=models.Value(ApplicationStatusChoice.DRAFT.value),
+            ),
+            models.When(
+                # If there is no sent date in the application
+                # (and the application round has moved on according to the previous cases)
+                models.Q(sent_date__isnull=True),
+                then=models.Value(ApplicationStatusChoice.EXPIRED.value),
+            ),
+            # NOTE: Some copy-pasta from Application Round status for efficiency
+            models.When(
+                # If the application round has been marked as sent
+                models.Q(application_round__sent_date__isnull=False),
+                then=models.Value(ApplicationStatusChoice.RESULTS_SENT.value),
+            ),
+            models.When(
+                # If the application round has been marked as handled
+                models.Q(application_round__handled_date__isnull=False),
+                then=models.Value(ApplicationStatusChoice.HANDLED.value),
+            ),
+            models.When(
+                # If the application round application period has ended
+                models.Q(application_round__application_period_end__gt=now),
+                then=models.Value(ApplicationStatusChoice.RECEIVED.value),
+            ),
+            models.When(
+                # If not all sections are done allocating
+                models.Q(L(all_sections_allocated=False)),
+                then=models.Value(ApplicationStatusChoice.IN_ALLOCATION.value),
+            ),
+            default=models.Value(ApplicationStatusChoice.HANDLED.value),
+            output_field=models.CharField(),
+        )
+
+    @status.override
+    def _(self) -> ApplicationStatusChoice:
         if self.cancelled_date is not None:
             return ApplicationStatusChoice.CANCELLED
 
@@ -107,7 +170,7 @@ class Application(SerializableMixin, models.Model):
                 return ApplicationStatusChoice.RECEIVED
 
             case ApplicationRoundStatusChoice.IN_ALLOCATION:
-                if self.has_unallocated_events:
+                if not self.all_sections_allocated:
                     return ApplicationStatusChoice.IN_ALLOCATION
                 return ApplicationStatusChoice.HANDLED
 
@@ -117,14 +180,102 @@ class Application(SerializableMixin, models.Model):
             case ApplicationRoundStatusChoice.RESULTS_SENT:
                 return ApplicationStatusChoice.RESULTS_SENT
 
-    @property
-    def has_unallocated_events(self) -> bool:
-        return self.application_events.all().unallocated().exists()
+    @lookup_property(joins=["application_sections"], skip_codegen=True)
+    def all_sections_allocated() -> bool:
+        from applications.models import ApplicationSection
+
+        exists = ~models.Exists(
+            ApplicationSection.objects.alias(status=L("status")).filter(
+                application=models.OuterRef("pk"),
+                status__in=[
+                    ApplicationSectionStatusChoice.UNALLOCATED.value,
+                    ApplicationSectionStatusChoice.IN_ALLOCATION.value,
+                ],
+            )
+        )
+        return exists  # type: ignore[return-value]
+
+    @all_sections_allocated.override
+    def _(self) -> bool:
+        return (
+            not self.application_sections.alias(status=L("status"))
+            .filter(
+                status__in=[
+                    ApplicationSectionStatusChoice.UNALLOCATED.value,
+                    ApplicationSectionStatusChoice.IN_ALLOCATION.value,
+                ]
+            )
+            .exists()
+        )
+
+    @lookup_property(joins=["organisation", "contact_person", "user"], skip_codegen=True)
+    def applicant() -> str:
+        applicant = models.Case(
+            models.When(
+                models.Q(organisation__isnull=False),
+                then=models.F("organisation__name"),
+            ),
+            models.When(
+                models.Q(contact_person__isnull=False),
+                then=Concat(
+                    "contact_person__first_name",
+                    models.Value(" "),
+                    "contact_person__last_name",
+                ),
+            ),
+            models.When(
+                models.Q(user__isnull=False),
+                then=Concat(
+                    "user__first_name",
+                    models.Value(" "),
+                    "user__last_name",
+                ),
+            ),
+            default=models.Value(""),
+            output_field=models.CharField(),
+        )
+        return applicant  # type: ignore[return-value]
+
+    @applicant.override
+    def _(self) -> str:
+        if self.organisation is not None:
+            return self.organisation.name
+        elif self.contact_person is not None:
+            return f"{self.contact_person.first_name} {self.contact_person.last_name}"
+        elif self.user is not None:
+            return f"{self.user.first_name} {self.user.last_name}"
+        return ""
+
+    @lookup_property
+    def status_sort_order() -> int:
+        return models.Case(  # type: ignore[return-value]
+            models.When(models.Q(L(status=ApplicationStatusChoice.DRAFT.value)), then=models.Value(1)),
+            models.When(models.Q(L(status=ApplicationStatusChoice.CANCELLED.value)), then=models.Value(2)),
+            models.When(models.Q(L(status=ApplicationStatusChoice.EXPIRED.value)), then=models.Value(3)),
+            models.When(models.Q(L(status=ApplicationStatusChoice.RECEIVED.value)), then=models.Value(4)),
+            models.When(models.Q(L(status=ApplicationStatusChoice.IN_ALLOCATION.value)), then=models.Value(5)),
+            models.When(models.Q(L(status=ApplicationStatusChoice.HANDLED.value)), then=models.Value(6)),
+            models.When(models.Q(L(status=ApplicationStatusChoice.RESULTS_SENT.value)), then=models.Value(7)),
+            default=models.Value(8),
+            output_field=models.IntegerField(),
+        )
+
+    @lookup_property
+    def applicant_type_sort_order() -> int:
+        return models.Case(  # type: ignore[return-value]
+            models.When(models.Q(applicant_type=ApplicantTypeChoice.ASSOCIATION.value), then=models.Value(1)),
+            models.When(models.Q(applicant_type=ApplicantTypeChoice.COMMUNITY.value), then=models.Value(2)),
+            models.When(models.Q(applicant_type=ApplicantTypeChoice.INDIVIDUAL.value), then=models.Value(3)),
+            models.When(models.Q(applicant_type=ApplicantTypeChoice.COMPANY.value), then=models.Value(4)),
+            default=models.Value(5),
+            output_field=models.IntegerField(),
+        )
 
     @property
-    def units(self) -> models.QuerySet[Unit]:
-        application_event_ids = self.application_events.all().values("id")
-        reservation_unit_ids = EventReservationUnit.objects.filter(
-            application_event__in=models.Subquery(application_event_ids)
-        ).values("reservation_unit")
-        return Unit.objects.filter(reservationunit__in=models.Subquery(reservation_unit_ids))
+    def units(self):
+        from spaces.models import Unit
+
+        from .reservation_unit_option import ReservationUnitOption
+
+        ids = ReservationUnitOption.objects.filter(application_section__application=self).values("reservation_unit")
+        return Unit.objects.filter(reservationunit__in=models.Subquery(ids))
