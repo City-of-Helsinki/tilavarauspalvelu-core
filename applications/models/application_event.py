@@ -1,28 +1,15 @@
 from datetime import date, timedelta
-from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
 from django.db import models
-from django.db.models import Manager
-from django.utils.functional import classproperty
 from helsinki_gdpr.models import SerializableMixin
-
-from applications.choices import ApplicationEventStatusChoice
-from applications.querysets.application_event import ApplicationEventQuerySet
-from common.connectors import ApplicationEventActionsConnector
-
-if TYPE_CHECKING:
-    from applications.models import ApplicationEventSchedule
 
 __all__ = [
     "ApplicationEvent",
 ]
 
 
-class ApplicationEventManager(SerializableMixin.SerializableManager, Manager.from_queryset(ApplicationEventQuerySet)):
-    """Contains custom queryset methods and GDPR serialization."""
-
-
+# DEPRECATED: Use ApplicationSection model instead
 class ApplicationEvent(SerializableMixin, models.Model):
     name: str = models.CharField(max_length=100, null=False, blank=True)
     uuid: UUID = models.UUIDField(default=uuid4, null=False, editable=False, unique=True)
@@ -67,9 +54,6 @@ class ApplicationEvent(SerializableMixin, models.Model):
         related_name="application_events",
     )
 
-    objects = ApplicationEventManager()
-    actions = ApplicationEventActionsConnector()
-
     # Translated field hints
     name_fi: str | None
     name_sv: str | None
@@ -89,28 +73,3 @@ class ApplicationEvent(SerializableMixin, models.Model):
 
     def __str__(self) -> str:
         return self.name
-
-    @property
-    def status(self) -> ApplicationEventStatusChoice:
-        schedules: list["ApplicationEventSchedule"] = list(self.application_event_schedules.all())
-
-        if schedules and all(schedule.declined for schedule in schedules):
-            return ApplicationEventStatusChoice.DECLINED
-        if not schedules or all(not schedule.accepted for schedule in schedules):
-            return ApplicationEventStatusChoice.UNALLOCATED
-        if not any(schedule.reserved for schedule in schedules):
-            return ApplicationEventStatusChoice.APPROVED
-        if any(schedule.unsuccessfully_reserved for schedule in schedules):
-            return ApplicationEventStatusChoice.FAILED
-        return ApplicationEventStatusChoice.RESERVED
-
-    @classproperty
-    def required_for_review(cls) -> list[str]:
-        return [
-            "num_persons",
-            "begin",
-            "end",
-            "min_duration",
-            "events_per_week",
-            "age_group",
-        ]
