@@ -7,7 +7,7 @@ import { useLocalStorage } from "react-use";
 import { Stepper } from "hds-react";
 import { FormProvider, useForm } from "react-hook-form";
 import type { GetServerSidePropsContext } from "next";
-import { omit, pick } from "lodash";
+import { omit } from "lodash";
 import { useTranslation } from "next-i18next";
 import { breakpoints } from "common/src/common/style";
 import { fontRegular, H2 } from "common/src/common/typography";
@@ -57,7 +57,6 @@ import { getReservationUnitPrice } from "@/modules/reservationUnit";
 import {
   getCheckoutUrl,
   getReservationApplicationMutationValues,
-  profileUserFields,
 } from "@/modules/reservation";
 import { ReservationProps } from "@/context/DataContext";
 import ReservationInfoCard from "@/components/reservation/ReservationInfoCard";
@@ -222,12 +221,24 @@ const ReservationUnitReservationWithReservationProp = ({
   useRemoveStoredReservation();
 
   const [step, setStep] = useState(0);
-  const [reservation, setReservation] = useState<ReservationType | null>(
-    fetchedReservation
-  );
+  const [reservation, setReservation] =
+    useState<ReservationType>(fetchedReservation);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const defaultValues = pick(reservation || {}, profileUserFields);
+  // Get prefilled profile user fields from the reservation (backend fills them when created).
+  // NOTE Using pick makes the types way too complex; easier to just define the fields here.
+  const defaultValues = {
+    reserveeFirstName: reservation?.reserveeFirstName ?? "",
+    reserveeLastName: reservation?.reserveeLastName ?? "",
+    reserveePhone: reservation?.reserveePhone ?? "",
+    reserveeEmail: reservation?.reserveeEmail ?? "",
+    reserveeAddressStreet: reservation?.reserveeAddressStreet ?? "",
+    reserveeAddressCity: reservation?.reserveeAddressCity ?? "",
+    reserveeAddressZip: reservation?.reserveeAddressZip ?? "",
+    // TODO is this correct? it used to just pick the homeCity (but that makes no sense since it's typed as a number)
+    homeCity: reservation?.homeCity?.pk ?? 0,
+  };
+  // TODO don't use defaultValues, use values (and reset on fetch) from the form
   const form = useForm<Inputs>({ defaultValues, mode: "onBlur" });
   const { handleSubmit, watch } = form;
 
