@@ -7,16 +7,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: actions/application_event.py
-msgid "Cannot decline an event without defined schedules"
-msgstr "Ei voi perua hakemuksen osaa ilman määriteltyjä aikatauluja"
-
-#: actions/application_event.py
-#, python-brace-format
-msgid ""
-"Cannot create reservations for event based on its status: '{status.value}'"
-msgstr ""
-
 #: api/gdpr/views.py
 msgid "User has upcoming or too recent reservations."
 msgstr "Käyttäjällä on tulevia tai liian äskettäisiä varauksia."
@@ -337,15 +327,11 @@ msgid "Sunday"
 msgstr ""
 
 #: applications/choices.py
-msgid "Low"
+msgid "Primary"
 msgstr ""
 
 #: applications/choices.py
-msgid "Medium"
-msgstr ""
-
-#: applications/choices.py
-msgid "High"
+msgid "Secondary"
 msgstr ""
 
 #: applications/choices.py reservations/choices.py
@@ -385,6 +371,14 @@ msgid "Failed"
 msgstr ""
 
 #: applications/choices.py
+msgid "In Allocation"
+msgstr ""
+
+#: applications/choices.py
+msgid "Handled"
+msgstr ""
+
+#: applications/choices.py
 msgid "Internal"
 msgstr ""
 
@@ -416,8 +410,84 @@ msgstr ""
 msgid "Religious community"
 msgstr ""
 
+#: applications/models/allocated_time_slot.py
+msgid "Allocated Timeslot"
+msgstr ""
+
+#: applications/models/allocated_time_slot.py
+msgid "Allocated Timeslots"
+msgstr ""
+
+#: applications/models/allocated_time_slot.py
+#: applications/models/suitable_time_range.py
+msgid "Begin time must be before end time."
+msgstr ""
+
+#: applications/models/application_event_schedule.py
+msgid "Low"
+msgstr ""
+
+#: applications/models/application_event_schedule.py
+msgid "Medium"
+msgstr ""
+
+#: applications/models/application_event_schedule.py
+msgid "High"
+msgstr ""
+
+#: applications/models/application_section.py
+msgid "Application section"
+msgstr ""
+
+#: applications/models/application_section.py
+msgid "Application sections"
+msgstr ""
+
+#: applications/models/application_section.py
+msgid "Reservations begin date must be before reservations end date."
+msgstr ""
+
+#: applications/models/application_section.py
+msgid ""
+"Reservation min duration cannot be greater than reservation max duration."
+msgstr ""
+
+#: applications/models/application_section.py
+msgid "Can only apply from 1 to 7 reservations per week."
+msgstr ""
+
+#: applications/models/application_section.py
+msgid ""
+"Reservation min and max durations must be multiples of 30 minutes, up to a "
+"maximum of 24 hours."
+msgstr ""
+
 #: applications/models/organization.py
 msgid "is after current year"
+msgstr ""
+
+#: applications/models/reservation_unit_option.py
+msgid "Reservation Unit Option"
+msgstr ""
+
+#: applications/models/reservation_unit_option.py
+msgid "Reservation Unit Options"
+msgstr ""
+
+#: applications/models/reservation_unit_option.py
+msgid "Preferred order must be unique for each application section"
+msgstr ""
+
+#: applications/models/suitable_time_range.py
+msgid "Suitable Timerange"
+msgstr ""
+
+#: applications/models/suitable_time_range.py
+msgid "Suitable Timeranges"
+msgstr ""
+
+#: applications/models/suitable_time_range.py
+msgid "Begin and end times must be a multiples of 60 minutes."
 msgstr ""
 
 #: applications/validators.py
@@ -1739,10 +1809,6 @@ msgstr ""
 #: reservations/models/reservation.py
 msgid "Closed"
 msgstr "Suljettu"
-
-#: reservations/models/reservation.py
-msgid "Unnamed reservation"
-msgstr ""
 
 #: reservations/models/reservation_metadata.py
 msgid "Field name"
