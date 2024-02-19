@@ -94,11 +94,11 @@ class AllocatedTimeSlotCreateSerializer(NestingModelSerializer):
         section_status = section.status
         application_status = section.application.status
 
-        if not section_status.can_approve:
+        if not section_status.can_allocate:
             msg = f"Cannot allocate to application section in status: '{section_status.value}'"
             errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
 
-        if not application_status.can_approve:
+        if not application_status.can_allocate:
             msg = f"Cannot allocate to application in status: '{application_status.value}'"
             errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
 
