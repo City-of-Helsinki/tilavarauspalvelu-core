@@ -906,6 +906,20 @@ django = ">=3.2"
 tests = ["coverage"]
 
 [[package]]
+name = "django-lookup-property"
+version = "0.1.1"
+description = "Django model properties that are also lookup expressions."
+optional = false
+python-versions = ">=3.11,<4"
+files = [
+    {file = "django_lookup_property-0.1.1-py3-none-any.whl", hash = "sha256:a9f5254da6367988262a2875620d2e40ca17a9f9d1263284423028aecafcf8b8"},
+    {file = "django_lookup_property-0.1.1.tar.gz", hash = "sha256:509f134e7ed4cdc97bb03839961b944ab36aa2e5a71c675939733540e1225cb9"},
+]
+
+[package.dependencies]
+Django = ">=4.2"
+
+[[package]]
 name = "django-modeltranslation"
 version = "0.18.11"
 description = "Translates Django models using a registration approach."
@@ -969,6 +983,17 @@ redis = ">=3,<4.0.0 || >4.0.0,<4.0.1 || >4.0.1"
 
 [package.extras]
 hiredis = ["redis[hiredis] (>=3,!=4.0.0,!=4.0.1)"]
+
+[[package]]
+name = "django-settings-holder"
+version = "0.1.2"
+description = "Object that allows settings to be accessed with attributes."
+optional = false
+python-versions = ">=3.9,<4"
+files = [
+    {file = "django_settings_holder-0.1.2-py3-none-any.whl", hash = "sha256:7a65f888fc1e8427a807be72d43d5f3f242163e0a0eaf33a393592e6fff3e102"},
+    {file = "django_settings_holder-0.1.2.tar.gz", hash = "sha256:8ab0f2dabf5a1c79ec9e95e97a296808e0f2c48f6f9aa1da1b77b433ee1e2f9e"},
+]
 
 [[package]]
 name = "django-subforms"
@@ -1286,6 +1311,48 @@ text-unidecode = "*"
 dev = ["coveralls", "django-filter (>=22.1)", "djangorestframework (>=3.6.3)", "mock", "pre-commit", "pytest (>=7.3.1)", "pytest-cov", "pytest-django (>=4.5.2)", "pytest-random-order", "pytz", "ruff (==0.1.2)"]
 rest-framework = ["djangorestframework (>=3.6.3)"]
 test = ["coveralls", "django-filter (>=22.1)", "djangorestframework (>=3.6.3)", "mock", "pytest (>=7.3.1)", "pytest-cov", "pytest-django (>=4.5.2)", "pytest-random-order", "pytz"]
+
+[[package]]
+name = "graphene-django-extensions"
+version = "0.2.14"
+description = "Extensions for graphene-django"
+optional = false
+python-versions = ">=3.10,<4"
+files = [
+    {file = "graphene_django_extensions-0.2.14-py3-none-any.whl", hash = "sha256:72df6c1eeeabcf33de8d4875616513e4f80eae3d277e86d16ea2e34340492013"},
+    {file = "graphene_django_extensions-0.2.14.tar.gz", hash = "sha256:66a614a418cc1b567da9e6dfd55f3b8c320246569390a1613aab3a66034679b2"},
+]
+
+[package.dependencies]
+Django = ">=4.2"
+django-filter = ">=23.5"
+django-settings-holder = ">=0.1.2"
+djangorestframework = ">=3.14.0"
+graphene-django = ">=3.0.0"
+graphene-django-query-optimizer = ">=0.1.6"
+
+[package.extras]
+files = ["graphene-file-upload (>=1.3.0)"]
+translation = ["django-modeltranslation (>=0.18.11)"]
+
+[[package]]
+name = "graphene-django-query-optimizer"
+version = "0.3.0"
+description = "Automatically optimize SQL queries in Graphene-Django schemas."
+optional = false
+python-versions = ">=3.9,<4"
+files = [
+    {file = "graphene_django_query_optimizer-0.3.0-py3-none-any.whl", hash = "sha256:4625f54399fe170ce775d33ec4de9e86f01248b05010ec7c01b55af5b40b64cd"},
+    {file = "graphene_django_query_optimizer-0.3.0.tar.gz", hash = "sha256:d026865e22f80bd9ad07098850505e4b9ea2e7397b9945e74649751c119d21bb"},
+]
+
+[package.dependencies]
+Django = ">=4.2"
+django-settings-holder = ">=0.1.2"
+graphene-django = ">=3.0.0"
+
+[package.extras]
+filter = ["django-filter (>=21.1)"]
 
 [[package]]
 name = "graphene-file-upload"
@@ -1767,13 +1834,13 @@ et-xmlfile = "*"
 
 [[package]]
 name = "packaging"
-version = "23.2"
+version = "24.0"
 description = "Core utilities for Python packages"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "packaging-23.2-py3-none-any.whl", hash = "sha256:8c491190033a9af7e1d931d0b5dacc2ef47509b34dd0de67ed209b5203fc88c7"},
-    {file = "packaging-23.2.tar.gz", hash = "sha256:048fb0e9405036518eaaf48a55953c750c11e1a1b68e0dd1a9d62ed0c092cfc5"},
+    {file = "packaging-24.0-py3-none-any.whl", hash = "sha256:2ddfb553fdf02fb784c234c7ba6ccc288296ceabec964ad2eae3777778130bc5"},
+    {file = "packaging-24.0.tar.gz", hash = "sha256:eb82c5e3e56209074766e6885bb04b8c38a0c015d0a30036ebe7ece34c9989e9"},
 ]
 
 [[package]]
@@ -2301,13 +2368,13 @@ test = ["fixtures", "mock", "purl", "pytest", "requests-futures", "sphinx", "tes
 
 [[package]]
 name = "requests-oauthlib"
-version = "1.3.1"
+version = "1.4.0"
 description = "OAuthlib authentication support for Requests."
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 files = [
-    {file = "requests-oauthlib-1.3.1.tar.gz", hash = "sha256:75beac4a47881eeb94d5ea5d6ad31ef88856affe2332b9aafb52c6452ccf0d7a"},
-    {file = "requests_oauthlib-1.3.1-py2.py3-none-any.whl", hash = "sha256:2577c501a2fb8d05a304c09d090d6e47c306fef15809d102b327cf8364bddab5"},
+    {file = "requests-oauthlib-1.4.0.tar.gz", hash = "sha256:acee623221e4a39abcbb919312c8ff04bd44e7e417087fb4bd5e2a2f53d5e79a"},
+    {file = "requests_oauthlib-1.4.0-py2.py3-none-any.whl", hash = "sha256:7a3130d94a17520169e38db6c8d75f2c974643788465ecc2e4b36d288bf13033"},
 ]
 
 [package.dependencies]
@@ -2861,4 +2928,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.12,<3.13"
-content-hash = "7b035b5c870e0c14681499fa124b7e69ee15d0e8d84b71a9b7083ca76de8a0a6"
+content-hash = "bc743c73a6ce09f697d527e9e3c8f0fd37201144556345103615498a74cc2160"
