@@ -518,15 +518,19 @@ def test_application__filter__by_text_search__application_id(graphql):
     # - There are two applications
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft(
+        id=1,
         organisation=None,
         contact_person=None,
         user=None,
+        application_sections__id=3,
         application_sections__name="aaaa",
     )
     ApplicationFactory.create_in_status_draft(
+        id=2,
         organisation=None,
         contact_person=None,
         user=None,
+        application_sections__id=4,
         application_sections__name="bbbb",
     )
     graphql.login_user_based_on_type(UserType.SUPERUSER)
