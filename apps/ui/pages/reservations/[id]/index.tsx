@@ -19,17 +19,18 @@ import {
   ReservationsReservationReserveeTypeChoices,
   TermsOfUseTermsOfUseTermsTypeChoices,
   ReservationsReservationStateChoices,
+  QueryReservationByPkArgs,
 } from "common/types/gql-types";
 import { parseISO } from "date-fns";
 import Link from "next/link";
 import { Container } from "common";
 import { filterNonNullable } from "common/src/helpers";
 import { useSession } from "@/hooks/auth";
-import { useReservation, useOrder } from "@/hooks/reservation";
+import { useOrder } from "@/hooks/reservation";
 import { genericTermsVariant, reservationUnitPath } from "@/modules/const";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getTranslation, reservationsUrl } from "@/modules/util";
-import { BlackButton, Toast } from "@/styles/util";
+import { BlackButton } from "@/styles/util";
 import { CenterSpinner } from "@/components/common/common";
 import Sanitize from "@/components/common/Sanitize";
 import { AccordionWithState as Accordion } from "@/components/common/Accordion";
@@ -53,8 +54,10 @@ import { AddressSection } from "@/components/reservation-unit/Address";
 import ReservationInfoCard from "@/components/reservation/ReservationInfoCard";
 import { ReservationOrderStatus } from "@/components/reservation/ReservationOrderStatus";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { GET_RESERVATION } from "@/modules/queries/reservation";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { locale, params } = ctx;
@@ -76,26 +79,45 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       genericTermsData?.termsOfUse?.edges?.map((e) => e?.node)
     ).find((edge) => edge.pk === genericTermsVariant.BOOKING);
 
-    return {
-      props: {
-        ...commonProps,
-        key: `${id}-${locale}`,
-        ...(await serverSideTranslations(locale ?? "fi")),
-        overrideBackgroundColor: "var(--tilavaraus-white)",
-        termsOfUse: {
-          genericTerms: bookingTerms ?? null,
+    // NOTE errors will fallback to 404
+    const { data, error } = await apolloClient.query<
+      Query,
+      QueryReservationByPkArgs
+    >({
+      query: GET_RESERVATION,
+      fetchPolicy: "no-cache",
+      variables: { pk: id },
+    });
+
+    if (error) {
+      // eslint-disable-next-line no-console
+      console.error("Error while fetching reservation", error);
+    }
+
+    const reservation = data?.reservationByPk ?? null;
+    if (reservation != null) {
+      return {
+        props: {
+          ...commonProps,
+          key: `${id}-${locale}`,
+          ...(await serverSideTranslations(locale ?? "fi")),
+          overrideBackgroundColor: "var(--tilavaraus-white)",
+          reservation,
+          termsOfUse: {
+            genericTerms: bookingTerms ?? null,
+          },
         },
-        id,
-      },
-    };
+      };
+    }
   }
 
   return {
     notFound: true,
     props: {
+      // have to double up notFound inside the props to get TS types dynamically
+      notFound: true,
       ...commonProps,
-      termsOfUse: null,
-      id: null,
+      ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
 };
@@ -258,31 +280,32 @@ const PageContent = styled.div`
   }
 `;
 
-const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
+const Reservation = ({
+  termsOfUse,
+  reservation,
+}: PropsNarrowed): JSX.Element | null => {
   const { t, i18n } = useTranslation();
   const { isAuthenticated } = useSession();
 
-  const { reservation, loading, error } = useReservation({
-    reservationPk: id ?? 0,
-  });
+  // TODO this should be moved to SSR also
   const { order, isLoading: orderLoading } = useOrder({
-    orderUuid: reservation?.order?.orderUuid ?? "",
+    orderUuid: reservation.order?.orderUuid ?? "",
   });
 
-  const reservationUnit = reservation?.reservationUnits?.[0] ?? null;
+  const reservationUnit = reservation.reservationUnits?.[0] ?? null;
   const instructionsKey =
-    reservation?.state != null
+    reservation.state != null
       ? getReservationUnitInstructionsKey(reservation.state)
       : undefined;
 
   const shouldDisplayPricingTerms: boolean = useMemo(() => {
-    if (!reservation || !reservationUnit) {
+    if (!reservationUnit) {
       return false;
     }
 
     const reservationUnitPrice = getReservationUnitPrice({
       reservationUnit,
-      pricingDate: reservation?.begin ? new Date(reservation.begin) : undefined,
+      pricingDate: reservation.begin ? new Date(reservation.begin) : undefined,
       asInt: true,
     });
 
@@ -314,7 +337,7 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
   });
 
   const cancellationReason = useMemo(() => {
-    const reason = reservation && getReservationCancellationReason(reservation);
+    const reason = getReservationCancellationReason(reservation);
     switch (reason) {
       case "NO_CANCELLATION_RULE":
       case "REQUIRES_HANDLING":
@@ -331,29 +354,15 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
     return <div>{t("common:error.notAuthenticated")}</div>;
   }
 
-  if (error) {
-    return (
-      <Toast
-        type="error"
-        label={t("common:error")}
-        position="top-center"
-        autoClose={false}
-        displayAutoCloseProgress={false}
-      >
-        {t("common:dataError")}
-      </Toast>
-    );
-  }
+  const normalizedOrderStatus =
+    getNormalizedReservationOrderStatus(reservation);
 
-  const normalizedOrderStatus = reservation
-    ? getNormalizedReservationOrderStatus(reservation)
-    : null;
-
-  if (loading || orderLoading) {
+  if (orderLoading) {
     return <CenterSpinner />;
   }
 
-  if (!reservation || !reservationUnit) {
+  // TODO this should be moved to SSR also (and don't return null on errors)
+  if (!reservationUnit) {
     return null;
   }
 
@@ -488,8 +497,8 @@ const Reservation = ({ termsOfUse, id }: Props): JSX.Element | null => {
       </>
     );
 
-  const isReservationCancelled = reservation?.state === "CANCELLED";
-  const isBeingHandled = reservation?.state === "REQUIRES_HANDLING";
+  const isReservationCancelled = reservation.state === "CANCELLED";
+  const isBeingHandled = reservation.state === "REQUIRES_HANDLING";
 
   const isReservationCancellable =
     canUserCancelReservation(reservation) &&
