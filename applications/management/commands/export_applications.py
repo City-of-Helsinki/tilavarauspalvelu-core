@@ -2,7 +2,7 @@ from typing import Any
 
 from django.core.management.base import BaseCommand
 
-from applications.exporter import ApplicationDataExporter
+from applications.exporter import export_application_data
 
 
 class Command(BaseCommand):
@@ -20,4 +20,4 @@ class Command(BaseCommand):
         application_rounds = options.get("application_round")
 
         for application_round in application_rounds:
-            ApplicationDataExporter.export_application_data(application_round)
+            export_application_data(application_round)

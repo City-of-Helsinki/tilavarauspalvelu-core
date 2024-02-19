@@ -1,396 +1,289 @@
-import datetime
+from collections.abc import Iterator
 from csv import QUOTE_ALL, writer
-from functools import reduce
+from dataclasses import dataclass
 from pathlib import Path
 
 from django.conf import settings
-from django.db.models import Count, Max, Prefetch
-from django.utils import timezone
+from django.contrib.postgres.aggregates import StringAgg
+from django.db.models import Prefetch
+from lookup_property import L
 
-from applications.choices import ApplicationStatusChoice, PriorityChoice
-from applications.models import (
-    Application,
-    ApplicationEvent,
-    ApplicationEventSchedule,
-    EventReservationUnit,
-)
-from applications.querysets.application_event import ApplicationEventQuerySet
+from applications.choices import ApplicationStatusChoice
+from applications.models import ApplicationSection, ReservationUnitOption, SuitableTimeRange
+from common.date_utils import local_date, local_date_string, local_time_string, local_timedelta_string
+
+__all__ = [
+    "get_header_rows",
+    "export_application_data",
+    "export_application_round_statistics_for_reservation_units",
+]
 
 
-def get_header_rows(spaces_count: int) -> tuple[list[str], list[str], list[str]]:
+@dataclass
+class ApplicationExportRow:
+    application_id: str = ""
+    application_status: str = ""
+    applicant: str = ""
+    organisation_id: str = ""
+    contact_person_first_name: str = ""
+    contact_person_last_name: str = ""
+    contact_person_email: str = ""
+    contact_person_phone: str = ""
+    section_id: str = ""
+    section_status: str = ""
+    section_name: str = ""
+    reservations_begin_date: str = ""
+    reservations_end_date: str = ""
+    home_city_name: str = ""
+    purpose_name: str = ""
+    age_group_str: str = ""
+    num_persons: str = ""
+    applicant_type: str = ""
+    applied_reservations_per_week: str = ""
+    reservation_min_duration: str = ""
+    reservation_max_duration: str = ""
+
+    primary_monday: str = ""
+    primary_tuesday: str = ""
+    primary_wednesday: str = ""
+    primary_thursday: str = ""
+    primary_friday: str = ""
+    primary_saturday: str = ""
+    primary_sunday: str = ""
+    secondary_monday: str = ""
+    secondary_tuesday: str = ""
+    secondary_wednesday: str = ""
+    secondary_thursday: str = ""
+    secondary_friday: str = ""
+    secondary_saturday: str = ""
+    secondary_sunday: str = ""
+
+    def add_time_range(self, priority: str, day_of_the_week: str, time_range: SuitableTimeRange) -> None:
+        """Add suitable time range to the correct position in the row."""
+        key = f"{priority.lower()}_{day_of_the_week.lower()}"
+        current_value: str | None = getattr(self, key, None)
+        new_value = f"{local_time_string(time_range.begin_time)}-{local_time_string(time_range.end_time)}"
+        if current_value is None:
+            raise ValueError(f"Key {key} not found in {self.__class__.__name__}")
+        # If the value is already set, append the new time range to the end of the string.
+        # Time ranges should be in chronological order.
+        elif current_value:
+            setattr(self, key, f"{current_value}, {new_value}")
+        else:
+            setattr(self, key, new_value)
+
+    def __iter__(self) -> Iterator[str]:
+        """Iterate over the values of the dataclass in the order they were defined."""
+        return iter(self.__dict__.values())
+
+
+@dataclass
+class ExportRowSuitableTimeRanges:
+    def __iter__(self) -> Iterator[str]:
+        return iter(self.__dict__.values())
+
+
+def get_header_rows(max_options: int) -> tuple[list[str], list[str], list[str]]:
     return (
-        [
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "haetut ajat prioriteetilla HIGH",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "haetut ajat prioriteetilla MEDIUM",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "haetut ajat prioriteetilla LOW",
-        ],
-        [
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "KAIKKI TILAT",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "KAIKKI TILAT",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "KAIKKI TILAT",
-        ],
-        [
-            "hakemuksen numero",
-            "hakemuksen tila",
-            "hakija",
-            "y-tunnus",
-            "yhteyshenkilö etunimi",
-            "yhteyshenkilö sukunimi",
-            "sähköpostiosoite",
-            "yhteyshenkilön puh",
-            "hakemusosan numero",
-            "hakemusosan tila",
-            "varauksen nimi",
-            "hakijan ilmoittaman kauden alkupäivä",
-            "hakijan ilmoittaman kauden loppupäivä",
-            "kotikunta",
-            "vuoronkäyttötarkoitus",
-            "ikäryhmä",
-            "osallistujamäärä",
-            "hakijan tyyppi",
-            "vuoroja, kpl / vko",
-            "minimi aika",
-            "maksimi aika",
-        ]
-        + [f"tilatoive {i}" for i in range(1, spaces_count + 1)]
-        + [
-            "ma",
-            "ti",
-            "ke",
-            "to",
-            "pe",
-            "la",
-            "su",
-            "ma",
-            "ti",
-            "ke",
-            "to",
-            "pe",
-            "la",
-            "su",
-            "ma",
-            "ti",
-            "ke",
-            "to",
-            "pe",
-            "la",
-            "su",
-        ],
+        list(
+            ApplicationExportRow(
+                primary_monday="Ensisijaisesti haetut tilat",
+                secondary_monday="Toissijaisesti haetut tilat",
+            )
+        ),
+        list(
+            ApplicationExportRow(
+                primary_monday="KAIKKI TILAT",
+                secondary_monday="KAIKKI TILAT",
+            )
+        ),
+        list(
+            ApplicationExportRow(
+                application_id="hakemuksen numero",
+                application_status="hakemuksen tila",
+                applicant="hakija",
+                organisation_id="y-tunnus",
+                contact_person_first_name="yhteyshenkilö etunimi",
+                contact_person_last_name="yhteyshenkilö sukunimi",
+                contact_person_email="sähköpostiosoite",
+                contact_person_phone="yhteyshenkilön puh",
+                section_id="hakemusosan numero",
+                section_status="hakemusosan tila",
+                section_name="varauksen nimi",
+                reservations_begin_date="hakijan ilmoittaman kauden alkupäivä",
+                reservations_end_date="hakijan ilmoittaman kauden loppupäivä",
+                home_city_name="kotikunta",
+                purpose_name="vuoronkäyttötarkoitus",
+                age_group_str="ikäryhmä",
+                num_persons="osallistujamäärä",
+                applicant_type="hakijan tyyppi",
+                applied_reservations_per_week="vuoroja, kpl / vko",
+                reservation_min_duration="minimi aika",
+                reservation_max_duration="maksimi aika",
+                primary_monday="ma",
+                primary_tuesday="ti",
+                primary_wednesday="ke",
+                primary_thursday="to",
+                primary_friday="pe",
+                primary_saturday="la",
+                primary_sunday="su",
+                secondary_monday="ma",
+                secondary_tuesday="ti",
+                secondary_wednesday="ke",
+                secondary_thursday="to",
+                secondary_friday="pe",
+                secondary_saturday="la",
+                secondary_sunday="su",
+            )
+        )
+        + [f"tilatoive {i}" for i in range(1, max_options + 1)],
     )
 
 
-class ApplicationDataExporter:
-    @staticmethod
-    def get_base_queryset(application_round_id: int) -> ApplicationEventQuerySet:
-        return (
-            ApplicationEvent.objects.with_application_status()
-            .exclude(application_status__in=[ApplicationStatusChoice.DRAFT, ApplicationStatusChoice.EXPIRED])
-            .filter(
-                application__application_round=application_round_id,
-                application_event_schedules__isnull=False,
-            )
-            .order_by("pk")
+def export_application_data(application_round_id: int) -> Path | None:
+    application_sections: list[ApplicationSection] = list(
+        ApplicationSection.objects.annotate(
+            # Annotate statuses for performance
+            application_status=L("application__status"),
+            status=L("status"),
         )
-
-    @classmethod
-    def export_application_data(cls, application_round_id: int) -> Path | None:
-        now = timezone.now()
-        root = settings.BASE_DIR
-        path = root / "exports" / "application"
-        path.mkdir(parents=True, exist_ok=True)
-
-        application_events: list[ApplicationEvent] = list(
-            cls.get_base_queryset(application_round_id)
-            .select_related(
-                "application",
-                "application__organisation",
-                "application__contact_person",
-                "application__application_round",
-                "purpose",
-                "age_group",
-            )
-            .prefetch_related(
-                Prefetch(
-                    "application_event_schedules",
-                    queryset=ApplicationEventSchedule.objects.all().order_by("begin"),
-                ),
-            )
-            .order_by("application__organisation__name")
+        .filter(
+            application__application_round=application_round_id,
+            suitable_time_ranges__isnull=False,
         )
-
-        spaces_max_count = (
-            ApplicationEvent.objects.filter(application__application_round=application_round_id)
-            .annotate(spaces_count=Count("event_reservation_units"))
-            .aggregate(spaces_max_count=Max("spaces_count"))
-        ).get("spaces_max_count", 0)
-
-        if len(application_events):
-            file_name = f"application_data_round_{application_round_id}_{now.strftime('%d-%m-%Y')}.csv"
-
-            with open(path / file_name, "w", newline="") as applications_file:
-                applications_writer = writer(applications_file)
-
-                for header_row in get_header_rows(spaces_max_count):
-                    applications_writer.writerow(header_row)
-
-                for event in application_events:
-                    application: Application = event.application
-                    min_duration_string = cls._get_duration_string(event.min_duration)
-                    max_duration_string = cls._get_duration_string(event.max_duration)
-                    event_schedules_prio_high = {0: "", 1: "", 2: "", 3: "", 4: "", 5: "", 6: ""}
-                    event_schedules_prio_medium = {0: "", 1: "", 2: "", 3: "", 4: "", 5: "", 6: ""}
-                    event_schedules_prio_low = {0: "", 1: "", 2: "", 3: "", 4: "", 5: "", 6: ""}
-                    reservation_units = []
-                    contact_person_first_name = ""
-                    contact_person_last_name = ""
-                    contact_person_email = ""
-                    contact_person_phone = ""
-                    applicant = getattr(application.organisation, "name", "")
-                    organisation_id = getattr(application.organisation, "identifier", "")
-                    event_begin = f"{event.begin.day}.{event.begin.month}.{event.begin.year}" if event.begin else ""
-                    event_end = f"{event.end.day}.{event.end.month}.{event.end.year}" if event.end else ""
-
-                    if application.contact_person:
-                        contact_person_first_name = application.contact_person.first_name
-                        contact_person_last_name = application.contact_person.last_name
-                        contact_person_email = getattr(application.contact_person, "email", "")
-                        contact_person_phone = getattr(application.contact_person, "phone_number", "")
-
-                        if not applicant:
-                            applicant = f"{contact_person_first_name} {contact_person_last_name}"
-
-                    # Loop through requested schedules and update
-                    # the correct time range string depending on day integer
-                    schedule: ApplicationEventSchedule
-                    for schedule in event.application_event_schedules.all():
-                        event_schedules = None
-
-                        if schedule.priority == PriorityChoice.HIGH:
-                            event_schedules = event_schedules_prio_high
-
-                        if schedule.priority == PriorityChoice.MEDIUM:
-                            event_schedules = event_schedules_prio_medium
-
-                        if schedule.priority == PriorityChoice.LOW:
-                            event_schedules = event_schedules_prio_low
-
-                        cls._update_event_schedule_string(event_schedules, schedule)
-
-                    # Loop through event reservation units and update strings by preferred_order.
-                    event_reservation_unit: EventReservationUnit
-                    for event_reservation_unit in (
-                        event.event_reservation_units.all()
-                        .select_related("reservation_unit")
-                        .order_by("preferred_order", "pk")
-                    ):
-                        reservation_units.append(
-                            f"{event_reservation_unit.reservation_unit.name}, "
-                            f"{event_reservation_unit.reservation_unit.unit.name}"
-                        )
-
-                    # Write application event to CSV file
-                    row = [
-                        application.id,
-                        application.status.value,
-                        applicant,
-                        organisation_id,
-                        contact_person_first_name,
-                        contact_person_last_name,
-                        contact_person_email,
-                        contact_person_phone,
-                        event.id,
-                        event.status.value,
-                        event.name,
-                        event_begin,
-                        event_end,
-                        getattr(application.home_city, "name", "muu"),
-                        getattr(event.purpose, "name", ""),
-                        str(event.age_group) if event.age_group else "",
-                        getattr(event, "num_persons", ""),
-                        application.applicant_type,
-                        event.events_per_week or 0,
-                        min_duration_string,
-                        max_duration_string,
-                    ]
-                    row.extend(reservation_units)
-                    row.extend(["" for _ in range(spaces_max_count - len(reservation_units))])
-                    row.extend(
-                        [
-                            event_schedules_prio_high[0],
-                            event_schedules_prio_high[1],
-                            event_schedules_prio_high[2],
-                            event_schedules_prio_high[3],
-                            event_schedules_prio_high[4],
-                            event_schedules_prio_high[5],
-                            event_schedules_prio_high[6],
-                            event_schedules_prio_medium[0],
-                            event_schedules_prio_medium[1],
-                            event_schedules_prio_medium[2],
-                            event_schedules_prio_medium[3],
-                            event_schedules_prio_medium[4],
-                            event_schedules_prio_medium[5],
-                            event_schedules_prio_medium[6],
-                            event_schedules_prio_low[0],
-                            event_schedules_prio_low[1],
-                            event_schedules_prio_low[2],
-                            event_schedules_prio_low[3],
-                            event_schedules_prio_low[4],
-                            event_schedules_prio_low[5],
-                            event_schedules_prio_low[6],
-                        ]
-                    )
-                    applications_writer.writerow(row)
-
-                return path / file_name
+        .exclude(
+            application_status__in=[ApplicationStatusChoice.DRAFT.value, ApplicationStatusChoice.EXPIRED.value],
+        )
+        .select_related(
+            "application",
+            "application__organisation",
+            "application__contact_person",
+            "application__application_round",
+            "purpose",
+            "age_group",
+        )
+        .prefetch_related(
+            # All suitable time ranges ordered by begin time
+            Prefetch(
+                "suitable_time_ranges",
+                SuitableTimeRange.objects.all().order_by("begin_time"),
+            ),
+            # All reservation unit options ordered by preferred order
+            Prefetch(
+                "reservation_unit_options",
+                ReservationUnitOption.objects.select_related(
+                    "reservation_unit",
+                    "reservation_unit__unit",
+                ).order_by("preferred_order"),
+            ),
+        )
+        .order_by("application__organisation__name")
+    )
+    if not application_sections:
         return None
 
-    @staticmethod
-    def _get_duration_string(duration: datetime.timedelta | None) -> str:
-        if duration is None:
-            return ""
+    today = local_date()
+    root = settings.BASE_DIR
+    path = root / "exports" / "application"
+    path.mkdir(parents=True, exist_ok=True)
 
-        total_seconds = int(duration.total_seconds())
-        duration_hours, seconds = divmod(total_seconds, 3600)
-        duration_minutes = int(seconds // 60)
-        duration_string = ""
+    file_name: str = f"application_data_round_{application_round_id}_{today.isoformat()}.csv"
+    max_options: int = max(len(section.reservation_unit_options.all()) for section in application_sections)
+    options_part_template = [""] * max_options
 
-        if duration_hours:
-            duration_string += f"{duration_hours} h"
+    with open(path / file_name, "w", newline="") as applications_file:
+        applications_writer = writer(applications_file)
 
-        if duration_minutes:
-            duration_string += f" {duration_minutes} min" if duration_string else f"{duration_minutes} min"
+        # Write header rows
+        for header_row in get_header_rows(max_options):
+            applications_writer.writerow(header_row)
 
-        return duration_string
+        # Write data rows
+        for section in application_sections:
+            row = ApplicationExportRow(
+                application_id=str(section.application.id),
+                application_status=section.application_status,  # type: ignore[attr-defined]
+                section_id=str(section.id),
+                section_status=section.status,
+                section_name=section.name,
+                home_city_name="muu",
+                num_persons=str(section.num_persons),
+                applicant_type=section.application.applicant_type,
+                applied_reservations_per_week=str(section.applied_reservations_per_week),
+            )
 
-    @staticmethod
-    def _get_time_range_string(begin: str, end: str) -> str:
-        result: str = begin
+            row.reservation_min_duration = local_timedelta_string(section.reservation_min_duration)
+            row.reservation_max_duration = local_timedelta_string(section.reservation_max_duration)
+            row.reservations_begin_date = local_date_string(section.reservations_begin_date)
+            row.reservations_end_date = local_date_string(section.reservations_end_date)
 
-        if not result:
-            result = end
+            if section.application.organisation is not None:
+                row.applicant = section.application.organisation.name
+                row.organisation_id = section.application.organisation.identifier
 
-        elif result != end and end:
-            result += f" - {end}"
+            if section.application.contact_person is not None:
+                row.contact_person_first_name = section.application.contact_person.first_name
+                row.contact_person_last_name = section.application.contact_person.last_name
+                row.contact_person_email = section.application.contact_person.email
+                row.contact_person_phone = section.application.contact_person.phone_number
 
-        return result
+                if not row.applicant:
+                    row.applicant = (
+                        f"{section.application.contact_person.first_name} "
+                        f"{section.application.contact_person.last_name}"
+                    )
 
-    @classmethod
-    def _update_event_schedule_string(
-        cls,
-        event_schedules: dict[int, str],
-        new_schedule: ApplicationEventSchedule,
-    ) -> None:
-        time_range_string = cls._get_time_range_string(
-            new_schedule.begin.strftime("%H:%M"),
-            new_schedule.end.strftime("%H:%M"),
+            if section.application.home_city is not None:
+                row.home_city_name = section.application.home_city.name
+
+            if section.purpose is not None:
+                row.purpose_name = section.purpose.name
+
+            if section.age_group is not None:
+                row.age_group_str = str(section.age_group)
+
+            for time_range in section.suitable_time_ranges.all():
+                row.add_time_range(time_range.priority, time_range.day_of_the_week, time_range)
+
+            # Add reservation unit options to the end.
+            options_part: list[str] = options_part_template.copy()
+            for i, option in enumerate(section.reservation_unit_options.all()):
+                options_part[i] = f"{option.reservation_unit.name}, {option.reservation_unit.unit.name}"
+
+            applications_writer.writerow(list(row) + options_part)
+
+        return path / file_name
+
+
+def export_application_round_statistics_for_reservation_units(application_round_id: int) -> None:
+    root = settings.BASE_DIR
+    path = root / "exports"
+    path.mkdir(parents=True, exist_ok=True)
+
+    with open(path / "reservation_units.csv", "w", newline="") as export_file:
+        export_writer = writer(export_file, dialect="excel", quoting=QUOTE_ALL)
+
+        export_writer.writerow(["Application ID", "Section name", "Status", "Reservation unit names"])
+
+        data = (
+            ApplicationSection.objects.filter(application__application_round=application_round_id)
+            .exclude(
+                L(application__status__in=[ApplicationStatusChoice.DRAFT.value, ApplicationStatusChoice.EXPIRED.value])
+            )
+            .annotate(
+                status=L("status"),
+                # Concatenate all reservation unit names from the application section
+                # reservation unit options into a single string, separated by a semicolon.
+                unit_string=StringAgg(
+                    "reservation_unit_options__reservation_unit__name",
+                    delimiter="; ",
+                    default="",
+                    ordering="reservation_unit_options__preferred_order",
+                ),
+            )
+            .values_list("application__id", "name", "status", "unit_string")
+            .order_by("application__organisation__name", "application__pk")
         )
 
-        # For multiple schedules on the same day, separate them by comma
-        if event_schedules[new_schedule.day]:
-            time_range_string = f"{event_schedules[new_schedule.day]}, {time_range_string}"
-
-        event_schedules.update({new_schedule.day: time_range_string})
-
-    @classmethod
-    def export_application_round_statistics_for_reservation_units(cls, application_round: int) -> None:
-        root = settings.BASE_DIR
-        path = root / "exports"
-        path.mkdir(parents=True, exist_ok=True)
-
-        with open(path / "reservation_units.csv", "w", newline="") as export_file:
-            export_writer = writer(export_file, dialect="excel", quoting=QUOTE_ALL)
-
-            export_writer.writerow(["Application ID", "Event name", "Status", "Reservation unit names"])
-
-            for event_id, application_id, event_name, event_status in (
-                cls.get_base_queryset(application_round)
-                .with_event_status()
-                .values_list("id", "application__id", "name", "event_status")
-                .order_by("application__organisation__name", "application__id")
-            ):
-                event_reservation_unit_names = (
-                    EventReservationUnit.objects.filter(application_event__id=event_id)
-                    .order_by("priority")
-                    .values_list("reservation_unit__name", flat=True)
-                )
-
-                reservation_units_string = reduce(
-                    (
-                        lambda current_string, unit_name: (
-                            unit_name if not current_string else f"{current_string}; {unit_name}"
-                        )
-                    ),
-                    event_reservation_unit_names,
-                    "",
-                )
-
-                export_writer.writerow(
-                    [
-                        application_id,
-                        event_name,
-                        event_status,
-                        reservation_units_string,
-                    ]
-                )
+        for application_id, section_name, status, unit_string in data:
+            export_writer.writerow([application_id, section_name, status, unit_string])

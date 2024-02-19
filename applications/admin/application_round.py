@@ -5,7 +5,7 @@ from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
 from modeltranslation.admin import TranslationAdmin
 
-from applications.exporter import ApplicationDataExporter
+from applications.exporter import export_application_data
 from applications.models import ApplicationRound
 from applications.querysets.application_round import ApplicationRoundQuerySet
 from utils.sentry import SentryLogger
@@ -27,7 +27,8 @@ class ApplicationRoundAdmin(TranslationAdmin):
     def export_to_csv(self, request, queryset):
         try:
             app_round = queryset.first()
-            path = ApplicationDataExporter.export_application_data(application_round_id=app_round)
+            path = export_application_data(application_round_id=app_round)
+
         except Exception as err:
             self.message_user(
                 request,
