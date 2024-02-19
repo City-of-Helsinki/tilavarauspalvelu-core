@@ -283,7 +283,7 @@ def test_application_section__order__by_preferred_unit_name__asc(graphql, lang):
 
     # Section doesn't have reservation unit options at all
     # -> preferred_unit_name is None -> ordered last
-    event_4 = ApplicationSectionFactory.create_in_status_unallocated()
+    section_4 = ApplicationSectionFactory.create_in_status_unallocated()
 
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
@@ -299,7 +299,7 @@ def test_application_section__order__by_preferred_unit_name__asc(graphql, lang):
     assert response.node(0) == {"pk": section_2.pk}
     assert response.node(1) == {"pk": section_1.pk}
     assert response.node(2) == {"pk": section_3.pk}
-    assert response.node(3) == {"pk": event_4.pk}
+    assert response.node(3) == {"pk": section_4.pk}
 
 
 @pytest.mark.parametrize("lang", ["fi", "en", "sv"])

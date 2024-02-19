@@ -471,15 +471,15 @@ msgstr "on tämän vuoden jälkeen"
 
 #: applications/models/reservation_unit_option.py
 msgid "Reservation Unit Option"
-msgstr "Varausyksikkö vaihtoehto"
+msgstr "Varausyksikkö-vaihtoehto"
 
 #: applications/models/reservation_unit_option.py
 msgid "Reservation Unit Options"
-msgstr "Varausyksikkö vaihtoehdot"
+msgstr "Varausyksikkö-vaihtoehdot"
 
 #: applications/models/reservation_unit_option.py
 msgid "Preferred order must be unique for each application section"
-msgstr "Halutun järjestyksen tule olla uniikki jokaisella hakemuksen osalla"
+msgstr "Halutun järjestyksen tulee olla uniikki jokaisella hakemuksen osalla"
 
 #: applications/models/suitable_time_range.py
 msgid "Suitable Timerange"
