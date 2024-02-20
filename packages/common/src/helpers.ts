@@ -42,3 +42,11 @@ export const getLocalizationLang = (code: string): LocalizationLanguages => {
 };
 
 export const isBrowser = typeof window !== "undefined";
+
+export function base64encode(str: string) {
+  if (isBrowser) {
+    return window.btoa(str);
+    // TODO do we want unescape(encodeURIComponent(str)));?
+  }
+  return Buffer.from(str, "binary").toString("base64");
+}

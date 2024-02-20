@@ -2,7 +2,7 @@ import React from "react";
 import "@testing-library/jest-dom";
 import { render } from "@testing-library/react";
 import { addDays, format, nextMonday } from "date-fns";
-import { ReservationUnitsReservationUnitReservationStartIntervalChoices } from "common/types/gql-types";
+import { ReservationStartInterval } from "common/types/gql-types";
 import { toUIDate } from "common/src/common/util";
 import { generateReservations } from "./generateReservations";
 import ReservationList from "../../ReservationsList";
@@ -23,8 +23,7 @@ const twoWeeksOnceAWeek = {
   },
 };
 
-const interval15mins =
-  ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins;
+const interval15mins = ReservationStartInterval.Interval_15Mins;
 describe("generate reservations", () => {
   test("can generate reservations with valid data", () => {
     const res = generateReservations(twoWeeksOnceAWeek, interval15mins);

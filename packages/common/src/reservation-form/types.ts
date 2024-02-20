@@ -1,4 +1,4 @@
-import { type ReservationsReservationReserveeTypeChoices } from "../../types/gql-types";
+import { type ReserveeType } from "../../types/gql-types";
 
 type Billing = {
   billingFirstName: string;
@@ -31,7 +31,7 @@ type CommonInputs = {
   purpose: number;
   numPersons: number;
   ageGroup: number;
-  reserveeType: ReservationsReservationReserveeTypeChoices;
+  reserveeType: ReserveeType;
   freeOfChargeReason: string;
   applyingForFreeOfCharge: boolean;
 };

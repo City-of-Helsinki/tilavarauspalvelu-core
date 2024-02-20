@@ -5,29 +5,37 @@ import { TFunction } from "i18next";
 import { fontMedium } from "common/src/common/typography";
 import styled from "styled-components";
 import {
-  type ApplicationEventNode,
-  type ApplicationEventScheduleNode,
+  type ApplicationSectionNode,
   ApplicationRoundStatusChoice,
   type Query,
+  type AllocatedTimeSlotNode,
+  type SuitableTimeRangeNode,
+  Weekday,
+  ApplicationSectionStatusChoice,
 } from "common/types/gql-types";
 import { ShowAllContainer } from "common/src/components/";
 import type { ReservationUnitNode } from "common";
 import { ALLOCATION_CALENDAR_TIMES } from "@/common/const";
 import {
-  getApplicationEventsInsideSelection,
-  getSlotApplicationEvents,
+  type RelatedSlot,
+  constructTimeSlot,
+  convertWeekday,
+  decodeTimeSlot,
   getTimeSlotOptions,
-  isSlotAccepted,
+  transformWeekday,
 } from "./modules/applicationRoundAllocation";
-import { AllocationCard } from "./AllocationCard";
+import { AllocatedCard, AllocationCard } from "./AllocationCard";
 import { type ApolloQueryResult } from "@apollo/client";
 import { useSlotSelection } from "./hooks";
+import { filterNonNullable } from "common/src/helpers";
+import { type Day } from "common/src/conversion";
 
 type Props = {
-  applicationEvents: ApplicationEventNode[] | null;
+  applicationSections: ApplicationSectionNode[] | null;
   reservationUnit?: ReservationUnitNode;
   refetchApplicationEvents: () => Promise<ApolloQueryResult<Query>>;
   applicationRoundStatus: ApplicationRoundStatusChoice;
+  relatedAllocations: RelatedSlot[][];
 };
 
 const Wrapper = styled.div`
@@ -204,35 +212,147 @@ function TimeSelection(): JSX.Element {
   );
 }
 
+function isInsideSelection(
+  selection: { day: Day; start: number; end: number },
+  tr: {
+    dayOfTheWeek: Weekday;
+    beginTime: string;
+    endTime: string;
+  }
+): boolean {
+  const start = constructTimeSlot(selection.day, tr.beginTime);
+  const end = constructTimeSlot(selection.day, tr.endTime);
+  if (!start || !end) {
+    return false;
+  }
+  if (selection.day !== convertWeekday(tr.dayOfTheWeek)) {
+    return false;
+  }
+  if (start.hour > selection.end) {
+    return false;
+  }
+  if (end.hour <= selection.start) {
+    return false;
+  }
+  return true;
+}
+
+function getAllocatedTimeSlot(
+  section: ApplicationSectionNode,
+  selection: { day: Day; startHour: number; endHour: number }
+): AllocatedTimeSlotNode | null {
+  const { day, startHour, endHour } = selection;
+  return (
+    section.reservationUnitOptions
+      ?.flatMap((ruo) => ruo.allocatedTimeSlots ?? [])
+      .find((ts) => {
+        return isInsideSelection({ day, start: startHour, end: endHour }, ts);
+      }) ?? null
+  );
+}
+
+function getSuitableTimeSlot(
+  section: ApplicationSectionNode,
+  selection: { day: Day; startHour: number; endHour: number }
+): SuitableTimeRangeNode | null {
+  const { day, startHour, endHour } = selection;
+  return (
+    section.suitableTimeRanges?.find((tr) => {
+      return isInsideSelection({ day, start: startHour, end: endHour }, tr);
+    }) ?? null
+  );
+}
+
 export function AllocationColumn({
-  applicationEvents,
+  applicationSections,
   reservationUnit,
   refetchApplicationEvents,
   applicationRoundStatus,
+  relatedAllocations,
 }: Props): JSX.Element | null {
   const { t } = useTranslation();
   const [selection, setSelection] = useSlotSelection();
 
-  const painted = getSlotApplicationEvents(selection, applicationEvents);
-  const aeList = getApplicationEventsInsideSelection(
-    painted,
-    selection,
-    reservationUnit?.pk ?? 0
+  const slots = selection.map((s) => decodeTimeSlot(s));
+  const day = slots
+    .map((s) => s.day)
+    .filter((d): d is Day => d >= 0 && d <= 6)
+    .reduce<Day>((acc, d) => (d > acc ? d : acc), 0);
+  const startHour = slots.length > 0 ? slots[0].hour : 0;
+  const endHour = slots.length > 0 ? slots[slots.length - 1].hour : 0;
+
+  // TODO copy pasta from AllocationCalendar (the day part of this)
+  const aesForThisUnit = filterNonNullable(applicationSections);
+
+  // NOTE need to split the applicationSection into two props
+  // - the section
+  // - the selected time slot / allocation (this is used for the mutation pk)
+  // - might even want to split the mutation component into two separate props / children
+  // NOTE we show Handled for already allocated, but not for suitable that have already been allocated.
+  // TODO might be able to remove them with fulfilled?
+  const selectedInterval = { day, start: startHour, end: endHour };
+  const timeslots = aesForThisUnit
+    .filter((ae) => ae.status !== ApplicationSectionStatusChoice.Handled)
+    .filter((ae) =>
+      ae.suitableTimeRanges?.some(
+        (tr) => tr.dayOfTheWeek === transformWeekday(day)
+      )
+    )
+    .filter((ae) =>
+      ae.suitableTimeRanges?.some((tr) =>
+        isInsideSelection(selectedInterval, tr)
+      )
+    );
+  const resUnits = filterNonNullable(
+    aesForThisUnit?.flatMap((ae) => ae.reservationUnitOptions)
   );
+  const allocated = resUnits
+    .filter((a) =>
+      a.allocatedTimeSlots?.some(
+        (ts) => ts.dayOfTheWeek === transformWeekday(day)
+      )
+    )
+    .filter((ae) =>
+      ae.allocatedTimeSlots?.some((tr) =>
+        isInsideSelection(selectedInterval, tr)
+      )
+    );
 
   // check if something is already allocated and push it down to the Card components
-  const isSlotAlreadyAllocated = (slot: string): boolean =>
-    !!painted
-      .flatMap((aes) => aes.applicationEventSchedules)
-      .filter((aes): aes is ApplicationEventScheduleNode => aes != null)
-      .filter((aes) => aes.allocatedDay != null)
-      .find((aes) => isSlotAccepted(aes, slot));
-  const canAllocateSelection =
-    selection?.every((slot) => !isSlotAlreadyAllocated(slot)) ?? false;
   const hasSelection = selection != null && selection.length > 0;
   const isRoundAllocable =
     applicationRoundStatus === ApplicationRoundStatusChoice.InAllocation;
+
+  const allocatedPks = filterNonNullable(
+    allocated
+      .flatMap((ruo) =>
+        ruo.allocatedTimeSlots?.map(
+          (ts) => ts.reservationUnitOption.applicationSection
+        )
+      )
+      .map((as) => as?.pk)
+  );
+
+  const allocatedSections = aesForThisUnit.filter(
+    (as) => as.pk != null && allocatedPks.includes(as.pk)
+  );
+  const doesCollideToOtherAllocations = relatedAllocations[day].some((slot) => {
+    return (
+      slot.day === day &&
+      slot.beginTime < endHour * 60 &&
+      slot.endTime > startHour * 60
+    );
+  });
+  const canAllocateSelection =
+    allocatedSections.length === 0 && !doesCollideToOtherAllocations;
   const canAllocate = hasSelection && canAllocateSelection && isRoundAllocable;
+
+  // TODO check that the same event has not already been allocated on the same day
+  // (the backend filtering didn't seem to remove invalid events)
+  // but can't allocate twice on the same day
+  // Could also remove them from the Calendar component
+  // dunno why the backend filtering doesn't remove them
+  // Requires a bit more investigation.
 
   // TODO empty state when no selection (current is ok placeholder), don't remove from DOM
   return (
@@ -247,17 +367,35 @@ export function AllocationColumn({
       >
         <TimeSelection />
       </StyledShowAllContainer>
-      {aeList.map((applicationEvent) => (
+      {/* TODO what order should these be in? */}
+      {allocatedSections.map((as) => (
+        <AllocatedCard
+          key={as.pk}
+          applicationSection={as}
+          refetchApplicationEvents={refetchApplicationEvents}
+          // TODO define a partial function
+          allocatedTimeSlot={getAllocatedTimeSlot(as, {
+            day,
+            startHour,
+            endHour,
+          })}
+        />
+      ))}
+      {timeslots.map((as) => (
         <AllocationCard
-          key={applicationEvent.pk}
-          applicationEvent={applicationEvent}
-          reservationUnit={reservationUnit}
+          key={as.pk}
+          applicationSection={as}
+          reservationUnitOption={as.reservationUnitOptions?.find(
+            (ruo) => ruo.reservationUnit?.pk === reservationUnit?.pk
+          )}
           selection={selection ?? []}
           isAllocationEnabled={canAllocate}
           refetchApplicationEvents={refetchApplicationEvents}
+          // TODO define a partial function
+          timeSlot={getSuitableTimeSlot(as, { day, startHour, endHour })}
         />
       ))}
-      {aeList.length === 0 && (
+      {timeslots.length + allocated.length === 0 && (
         <EmptyState>{t("Allocation.noRequestedTimes")}</EmptyState>
       )}
     </Wrapper>

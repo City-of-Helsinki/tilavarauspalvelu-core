@@ -5,7 +5,7 @@ import { SearchTags } from "@/component/SearchTags";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import {
   ApplicantTypeChoice,
-  ApplicationEventStatusChoice,
+  ApplicationSectionStatusChoice,
 } from "common/types/gql-types";
 import { HR } from "@/component/Table";
 import { MultiSelectFilter, SearchFilter } from "@/component/QueryParamFilters";
@@ -64,7 +64,7 @@ export function Filters({
           reservationUnits.find((u) => u.pk === Number(value))?.nameFi ?? "-"
         );
       case "eventStatus":
-        return t(`ApplicationEvent.statuses.${value}`);
+        return t(`ApplicationSectionStatusChoice.${value}`);
       default:
         return value;
     }
@@ -90,16 +90,17 @@ export function Filters({
 
   // event status is shared on two tabs, but allocated only has two options
   const eventStatusArrayLong = Object.values(
-    ApplicationEventStatusChoice
-  ).filter((x) => x !== ApplicationEventStatusChoice.Failed);
+    ApplicationSectionStatusChoice
+  ).filter((x) => x !== ApplicationSectionStatusChoice.Failed);
+  // TODO what are the actual statuses?
   const eventStatusArrayShort = [
-    ApplicationEventStatusChoice.Approved,
-    ApplicationEventStatusChoice.Declined,
+    ApplicationSectionStatusChoice.Handled,
+    ApplicationSectionStatusChoice.Reserved,
   ];
   const eventStatusOptions = (
     statusOption === "eventShort" ? eventStatusArrayShort : eventStatusArrayLong
   ).map((status) => ({
-    label: t(`ApplicationEvent.statuses.${status}`),
+    label: t(`ApplicationSectionStatusChoice.${status}`),
     value: status,
   }));
 

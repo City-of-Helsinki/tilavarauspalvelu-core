@@ -19,7 +19,7 @@ import {
   ReservationRefundMutationInput,
   ReservationType,
   ReservationTypeConnection,
-  ReservationsReservationStateChoices,
+  State,
 } from "common/types/gql-types";
 import { useModal } from "@/context/ModalContext";
 import { DENY_RESERVATION, REFUND_RESERVATION } from "./queries";
@@ -168,9 +168,7 @@ const DialogContent = ({
                 if (cpy?.node && state) {
                   // State === ReservationsReservationStateChoices: are the exact same enum
                   // but Typescript complains about them so use zod just in case.
-                  const val = z
-                    .nativeEnum(ReservationsReservationStateChoices)
-                    .parse(state.valueOf());
+                  const val = z.nativeEnum(State).parse(state.valueOf());
                   cpy.node.state = val;
                 }
                 return {

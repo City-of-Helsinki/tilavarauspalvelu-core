@@ -6,7 +6,7 @@ import styled from "styled-components";
 import type { OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
 import { CheckboxWrapper } from "common/src/reservation-form/components";
-import { Applicant_Type } from "common/types/gql-types";
+import { ApplicantTypeChoice } from "common/types/gql-types";
 import { applicationErrorText } from "@/modules/util";
 import { TwoColumnContainer, FormSubHeading } from "../common/common";
 import { EmailInput } from "./EmailInput";
@@ -36,7 +36,7 @@ const OrganisationForm = ({ homeCityOptions }: Props): JSX.Element | null => {
   } = useFormContext<ApplicationFormPage3Values>();
 
   const applicantType = watch("applicantType");
-  const hasRegistration = applicantType === Applicant_Type.Association;
+  const hasRegistration = applicantType === ApplicantTypeChoice.Association;
   const hasBillingAddress = watch("hasBillingAddress");
 
   useEffect(() => {
@@ -104,9 +104,9 @@ const OrganisationForm = ({ homeCityOptions }: Props): JSX.Element | null => {
           checked={!hasRegistration}
           onClick={() => {
             if (!hasRegistration) {
-              setValue("applicantType", Applicant_Type.Association);
+              setValue("applicantType", ApplicantTypeChoice.Association);
             } else {
-              setValue("applicantType", Applicant_Type.Community);
+              setValue("applicantType", ApplicantTypeChoice.Community);
             }
           }}
         />

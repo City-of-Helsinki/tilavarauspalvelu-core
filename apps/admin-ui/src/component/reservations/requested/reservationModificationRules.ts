@@ -1,4 +1,4 @@
-import { ReservationsReservationStateChoices } from "common/types/gql-types";
+import { State } from "common/types/gql-types";
 import { addHours, isToday } from "date-fns";
 
 /* Rules
@@ -10,38 +10,21 @@ import { addHours, isToday } from "date-fns";
  * Allowed to change state (except deny unconfirmed) only till it's ended.
  * Allowed to modify the reservation after ending as long as it's the same date or within one hour.
  */
-export const isPossibleToApprove = (
-  state: ReservationsReservationStateChoices,
-  end: Date
-): boolean =>
-  state === ReservationsReservationStateChoices.RequiresHandling &&
-  end > new Date();
+export const isPossibleToApprove = (state: State, end: Date): boolean =>
+  state === State.RequiresHandling && end > new Date();
 
-export const isPossibleToDeny = (
-  state: ReservationsReservationStateChoices,
-  end: Date
-): boolean => {
-  if (state === ReservationsReservationStateChoices.RequiresHandling) {
+export const isPossibleToDeny = (state: State, end: Date): boolean => {
+  if (state === State.RequiresHandling) {
     return true;
   }
-  return (
-    state === ReservationsReservationStateChoices.Confirmed && end > new Date()
-  );
+  return state === State.Confirmed && end > new Date();
 };
 
-export const isPossibleToReturn = (
-  state: ReservationsReservationStateChoices,
-  end: Date
-): boolean =>
-  (state === ReservationsReservationStateChoices.Denied ||
-    state === ReservationsReservationStateChoices.Confirmed) &&
-  end > new Date();
+export const isPossibleToReturn = (state: State, end: Date): boolean =>
+  (state === State.Denied || state === State.Confirmed) && end > new Date();
 
-export const isPossibleToEdit = (
-  state: ReservationsReservationStateChoices,
-  end: Date
-): boolean => {
-  if (state !== ReservationsReservationStateChoices.Confirmed) {
+export const isPossibleToEdit = (state: State, end: Date): boolean => {
+  if (state !== State.Confirmed) {
     return false;
   }
   const now = new Date();

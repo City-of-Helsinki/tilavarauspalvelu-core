@@ -5,7 +5,7 @@ import { MemoryRouter, Route, Routes, generatePath } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 // @ts-expect-error -- FIXME
 import * as router from "react-router";
-import { ReservationsReservationReserveeTypeChoices } from "common/types/gql-types";
+import { ReserveeType } from "common/types/gql-types";
 import NotificationContextMock, {
   notifySuccess,
 } from "app/__mocks__/NotificationContextMock";
@@ -20,7 +20,7 @@ import { SINGLE_RESERVATION_QUERY } from "./requested/hooks/queries";
 
 const extendedReservation = {
   ...mockReservation,
-  reserveeType: ReservationsReservationReserveeTypeChoices.Business,
+  reserveeType: ReserveeType.Business,
   numPersons: 10,
   // NORMAL, BLOCKED, STAFF, BEHALF
   type: "BEHALF",

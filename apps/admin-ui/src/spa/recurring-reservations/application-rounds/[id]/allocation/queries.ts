@@ -4,26 +4,19 @@ import { gql } from "@apollo/client";
  * only needs to be done once when landing on the page
  * filtered queries only include the reservation-units that match the filters
  */
-export const ALLOCATION_UNFILTERED_QUERY = gql`
-  query Applications(
-    $applicationRound: Int!
-    $status: [ApplicationStatusChoice]!
-  ) {
-    applications(applicationRound: $applicationRound, status: $status) {
-      edges {
-        node {
-          applicationRound {
-            nameFi
-            status
-            reservationUnits {
-              pk
-              nameFi
-              unit {
-                pk
-                nameFi
-              }
-            }
-          }
+export const APPLICATION_ROUND_FILTER_OPTIONS = gql`
+  query ApplicationRound($id: ID!) {
+    applicationRound(id: $id) {
+      nameFi
+      status
+      reservationPeriodBegin
+      reservationPeriodEnd
+      reservationUnits {
+        pk
+        nameFi
+        unit {
+          pk
+          nameFi
         }
       }
     }
@@ -38,7 +31,7 @@ export const ALL_EVENTS_PER_UNIT_QUERY = gql`
     $unit: [Int]!
     $reservationUnit: [Int]!
   ) {
-    applicationEvents(
+    applicationSections(
       applicationRound: $applicationRound
       reservationUnit: $reservationUnit
       unit: $unit
@@ -46,7 +39,7 @@ export const ALL_EVENTS_PER_UNIT_QUERY = gql`
     ) {
       edges {
         node {
-          eventReservationUnits {
+          reservationUnitOptions {
             reservationUnit {
               pk
               nameFi
@@ -54,46 +47,27 @@ export const ALL_EVENTS_PER_UNIT_QUERY = gql`
           }
         }
       }
+      totalCount
     }
   }
 `;
 
-export const DECLINE_APPLICATION_EVENT_SCHEDULE = gql`
-  mutation ($input: ApplicationEventScheduleDeclineMutationInput!) {
-    declineApplicationEventSchedule(input: $input) {
+export const CREATE_ALLOCATED_TIME_SLOT = gql`
+  mutation ($input: AllocatedTimeSlotCreateMutationInput!) {
+    createAllocatedTimeslot(input: $input) {
+      beginTime
+      dayOfTheWeek
+      endTime
       pk
-      errors {
-        field
-        messages
-      }
+      reservationUnitOption
     }
   }
 `;
 
-export const APPROVE_APPLICATION_EVENT_SCHEDULE = gql`
-  mutation ($input: ApplicationEventScheduleApproveMutationInput!) {
-    approveApplicationEventSchedule(input: $input) {
-      pk
-      allocatedReservationUnit
-      allocatedDay
-      allocatedBegin
-      allocatedEnd
-      errors {
-        field
-        messages
-      }
-    }
-  }
-`;
-
-export const RESET_APPLICATION_EVENT_SCHEDULE = gql`
-  mutation ($input: ApplicationEventScheduleResetMutationInput!) {
-    resetApplicationEventSchedule(input: $input) {
-      pk
-      errors {
-        field
-        messages
-      }
+export const DELETE_ALLOCATED_TIME_SLOT = gql`
+  mutation ($input: AllocatedTimeSlotDeleteMutationInput!) {
+    deleteAllocatedTimeslot(input: $input) {
+      deleted
     }
   }
 `;

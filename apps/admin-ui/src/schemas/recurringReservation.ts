@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ReservationUnitsReservationUnitReservationStartIntervalChoices } from "common/types/gql-types";
+import { ReservationStartInterval } from "common/types/gql-types";
 import { fromUIDate } from "common/src/common/util";
 import {
   ReservationTypeSchema,
@@ -66,9 +66,7 @@ const convertToDate = (date?: string): Date | null =>
 const dateIsBefore = (date: Date | null, other: Date | null) =>
   date && other && date.getTime() < other.getTime();
 
-export const timeSelectionSchema = (
-  interval: ReservationUnitsReservationUnitReservationStartIntervalChoices
-) =>
+export const timeSelectionSchema = (interval: ReservationStartInterval) =>
   timeSelectionSchemaBase
     .partial()
     .superRefine((val, ctx) =>

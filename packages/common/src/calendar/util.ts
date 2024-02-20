@@ -20,8 +20,8 @@ import {
   ReservationState,
   type ReservationType,
   type ReservationUnitByPkType,
-  ReservationUnitsReservationUnitReservationKindChoices,
-  type ReservationUnitsReservationUnitReservationStartIntervalChoices,
+  ReservationKind,
+  type ReservationStartInterval,
 } from "../../types/gql-types";
 import {
   type CalendarEventBuffer,
@@ -154,7 +154,7 @@ const doesSlotCollideWithApplicationRounds = (
 };
 
 export const getIntervalMinutes = (
-  reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices
+  reservationStartInterval: ReservationStartInterval
 ): number => {
   switch (reservationStartInterval) {
     case "INTERVAL_15_MINS":
@@ -185,7 +185,7 @@ export const getIntervalMinutes = (
 export const generateSlots = (
   start: Date,
   end: Date,
-  reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices
+  reservationStartInterval: ReservationStartInterval
 ): Date[] => {
   if (!start || !end || !reservationStartInterval) return [];
 
@@ -240,7 +240,7 @@ export const isRangeReservable = ({
   reservationBegins?: Date;
   reservationEnds?: Date;
   activeApplicationRounds: RoundPeriod[];
-  reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices;
+  reservationStartInterval: ReservationStartInterval;
 }): boolean => {
   const slots = generateSlots(range[0], range[1], reservationStartInterval);
 
@@ -289,7 +289,7 @@ export const doReservationsCollide = (
 export const getDayIntervals = (
   startTime: string,
   endTime: string,
-  interval: ReservationUnitsReservationUnitReservationStartIntervalChoices
+  interval: ReservationStartInterval
 ): string[] => {
   // normalize end time to allow comparison
   const normalizedEndTime = endTime === "00:00" ? "23:59" : endTime;
@@ -353,7 +353,7 @@ export const getDayIntervals = (
 export const isStartTimeWithinInterval = (
   start: Date,
   reservableTimeSpans: ReservableTimeSpanType[],
-  interval?: ReservationUnitsReservationUnitReservationStartIntervalChoices
+  interval?: ReservationStartInterval
 ): boolean => {
   if (reservableTimeSpans.length < 1) return false;
   if (!interval) return true;
@@ -415,7 +415,7 @@ export const getMinReservation = ({
   minReservationDuration = 0,
 }: {
   begin: Date;
-  reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices;
+  reservationStartInterval: ReservationStartInterval;
   minReservationDuration?: number;
 }): { begin: Date; end: Date } => {
   const minDurationMinutes = minReservationDuration / 60;
@@ -433,7 +433,7 @@ export const getValidEndingTime = ({
 }: {
   start: Date;
   end: Date;
-  reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices;
+  reservationStartInterval: ReservationStartInterval;
 }): Date | null => {
   if (!start || !end || !reservationStartInterval) return null;
 
@@ -634,10 +634,7 @@ export const isReservationUnitReservable = (
       if (!minReservationDuration || !maxReservationDuration) {
         return [false, "reservationUnit has no min/max reservation duration"];
       }
-      if (
-        reservationKind ===
-        ReservationUnitsReservationUnitReservationKindChoices.Season
-      ) {
+      if (reservationKind === ReservationKind.Season) {
         return [
           false,
           "reservationUnit is only available for seasonal booking",

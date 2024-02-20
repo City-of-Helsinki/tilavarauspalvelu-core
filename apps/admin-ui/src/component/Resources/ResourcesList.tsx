@@ -7,7 +7,7 @@ import styled from "styled-components";
 import { useDebounce } from "react-use";
 import { useQuery, ApolloError } from "@apollo/client";
 import { H1, Strong } from "common/src/common/typography";
-import { Query, ResourceType } from "common/types/gql-types";
+import type { Query, ResourceType } from "common/types/gql-types";
 import { DataFilterConfig } from "../../common/types";
 import Loader from "../Loader";
 import DataTable, { CellConfig } from "../DataTable";
@@ -18,6 +18,7 @@ import { useNotification } from "../../context/NotificationContext";
 import { resourceUrl } from "../../common/urls";
 import { Container } from "../../styles/layout";
 import SearchContainer from "../SearchContainer";
+import { filterNonNullable } from "common/src/helpers";
 
 const StyledInput = styled(TextInput).attrs({
   style: {
@@ -81,8 +82,8 @@ const getFilterConfig = (
   const buildings = uniq(
     resources.map((resource) => resource?.space?.unit?.nameFi || "")
   ).filter((n) => n);
-  const types = uniq(resources.map((resource) => resource.locationType)).filter(
-    (n) => n
+  const types = uniq(
+    filterNonNullable(resources.map((resource) => resource.locationType))
   );
 
   return [
@@ -98,13 +99,11 @@ const getFilterConfig = (
     },
     {
       title: t("Resources.headings.resourceType"),
-      filters:
-        types &&
-        types.map((type: string) => ({
-          title: type,
-          key: "locationType",
-          value: type || "",
-        })),
+      filters: types.map((type: string) => ({
+        title: type,
+        key: "locationType",
+        value: type || "",
+      })),
     },
   ];
 };

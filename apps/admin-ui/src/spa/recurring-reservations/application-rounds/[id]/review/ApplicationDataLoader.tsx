@@ -36,20 +36,22 @@ export function ApplicationDataLoader({
   >(APPLICATIONS_QUERY, {
     skip: !applicationRoundPk,
     variables: {
-      unit: unitFilter.map(Number).filter(Number.isFinite),
       applicationRound: applicationRoundPk,
-      offset: 0,
-      first: LIST_PAGE_SIZE,
+      unit: unitFilter.map(Number).filter(Number.isFinite),
       status: transformApplicationStatuses(statusFilter),
       applicantType: transformApplicantType(applicantFilter),
       textSearch: nameFilter,
-      orderBy,
+      // TODO
+      // orderBy,
     },
     onError: (err: ApolloError) => {
       notifyError(err.message);
     },
+    fetchPolicy: "no-cache",
+    /*
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
+    */
   });
 
   const dataToUse = data ?? previousData;

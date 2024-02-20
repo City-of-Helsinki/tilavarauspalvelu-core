@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { ReservationsReservationStateChoices } from "common/types/gql-types";
+import { State } from "common/types/gql-types";
 import { SortedSelect } from "@/component/SortedSelect";
 import { OptionType } from "@/common/types";
 
@@ -12,9 +12,7 @@ type Props = {
 const ReservationStateFilter = ({ onChange, value }: Props): JSX.Element => {
   const { t } = useTranslation();
 
-  const opts: OptionType[] = Object.values(
-    ReservationsReservationStateChoices
-  ).map((s) => ({
+  const opts: OptionType[] = Object.values(State).map((s) => ({
     value: s,
     label: t(`RequestedReservation.state.${s}`),
   }));

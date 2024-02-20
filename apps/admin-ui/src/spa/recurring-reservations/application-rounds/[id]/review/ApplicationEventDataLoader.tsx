@@ -1,9 +1,9 @@
 import React from "react";
 import { ApolloError, useQuery } from "@apollo/client";
 import { useSearchParams } from "react-router-dom";
-import {
-  type Query,
-  type QueryApplicationEventsArgs,
+import type {
+  Query,
+  QueryApplicationSectionsArgs,
 } from "common/types/gql-types";
 import { useTranslation } from "next-i18next";
 import { filterNonNullable } from "common/src/helpers";
@@ -19,13 +19,14 @@ import { APPLICATIONS_EVENTS_QUERY } from "./queries";
 import { ApplicationEventsTable, SORT_KEYS } from "./ApplicationEventsTable";
 import {
   transformApplicantType,
-  transformApplicationEventStatus,
+  transformApplicationSectionStatus,
 } from "./utils";
 
 type Props = {
   applicationRoundPk: number;
 };
 
+// TODO rename the component (section)
 export function ApplicationEventDataLoader({
   applicationRoundPk,
 }: Props): JSX.Element {
@@ -38,21 +39,22 @@ export function ApplicationEventDataLoader({
   const nameFilter = searchParams.get("search");
   const eventStatusFilter = searchParams.getAll("eventStatus");
 
+  // TODO rename the query (section)
   const { fetchMore, previousData, loading, data } = useQuery<
     Query,
-    QueryApplicationEventsArgs
+    QueryApplicationSectionsArgs
   >(APPLICATIONS_EVENTS_QUERY, {
     skip: !applicationRoundPk,
     variables: {
-      offset: 0,
-      first: LIST_PAGE_SIZE,
       unit: unitFilter.map(Number).filter(Number.isFinite),
       applicationRound: applicationRoundPk,
       applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,
-      status: transformApplicationEventStatus(eventStatusFilter),
+      // TODO does this use any of the other filters? or are they null because of backend limitations?
+      status: transformApplicationSectionStatus(eventStatusFilter),
       applicantType: transformApplicantType(applicantFilter),
       textSearch: nameFilter,
-      orderBy,
+      // FIXME orderBy has changed a lot (typesafety with enums)
+      // orderBy,
     },
     onError: (err: ApolloError) => {
       notifyError(err.message);
@@ -69,9 +71,9 @@ export function ApplicationEventDataLoader({
   }
 
   const applicationEvents = filterNonNullable(
-    dataToUse?.applicationEvents?.edges.map((edge) => edge?.node)
+    dataToUse?.applicationSections?.edges.map((edge) => edge?.node)
   );
-  const totalCount = dataToUse?.applicationEvents?.totalCount ?? 0;
+  const totalCount = dataToUse?.applicationSections?.totalCount ?? 0;
 
   return (
     <>
@@ -92,7 +94,7 @@ export function ApplicationEventDataLoader({
         fetchMore={() =>
           fetchMore({
             variables: {
-              offset: data?.applicationEvents?.edges.length,
+              offset: data?.applicationSections?.edges.length,
             },
           })
         }

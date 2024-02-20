@@ -17,10 +17,7 @@ import React, {
 } from "react";
 import Popup from "reactjs-popup";
 import styled, { css } from "styled-components";
-import {
-  ReservationType,
-  ReservationsReservationTypeChoices,
-} from "common/types/gql-types";
+import { ReservationType, Type } from "common/types/gql-types";
 import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import { POST_PAUSE, PRE_PAUSE } from "@/common/calendarStyling";
@@ -312,7 +309,7 @@ const getEventTitle = ({
   reservation: CalendarEvent<ReservationType>;
   t: TFunction;
 }) => {
-  if (event?.type === ReservationsReservationTypeChoices.Blocked) {
+  if (event?.type === Type.Blocked) {
     return t("MyUnits.Calendar.legend.closed");
   }
 

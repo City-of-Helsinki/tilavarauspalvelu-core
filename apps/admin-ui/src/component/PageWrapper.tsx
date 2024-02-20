@@ -2,12 +2,11 @@ import React, { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import * as Sentry from "@sentry/nextjs";
 import styled from "styled-components";
-
 import ClientOnly from "common/src/ClientOnly";
 import Error5xx from "app/common/Error5xx";
 import usePermission from "app/hooks/usePermission";
 import { BannerNotificationsList } from "common/src/components";
-import { CommonBannerNotificationTargetChoices } from "common/types/gql-types";
+import { BannerNotificationTarget } from "common/types/gql-types";
 import ScrollToTop from "../common/ScrollToTop";
 import GlobalElements from "./GlobalElements";
 import Navigation from "./Navigation";
@@ -57,7 +56,7 @@ export default function PageWrapper({
             <Content>
               {hasAccess && (
                 <BannerNotificationsList
-                  target={CommonBannerNotificationTargetChoices.Staff}
+                  target={BannerNotificationTarget.Staff}
                 />
               )}
               {user ? children : <MainLander apiBaseUrl={apiBaseUrl} />}

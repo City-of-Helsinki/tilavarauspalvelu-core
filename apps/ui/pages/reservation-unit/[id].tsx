@@ -38,6 +38,7 @@ import { PendingReservation } from "common/types/common";
 import {
   ApplicationRoundStatusChoice,
   ApplicationRoundTimeSlotNode,
+  PricingType,
   Query,
   QueryReservationsArgs,
   QueryReservationUnitByPkArgs,
@@ -45,14 +46,13 @@ import {
   QueryTermsOfUseArgs,
   ReservationCreateMutationInput,
   ReservationCreateMutationPayload,
-  ReservationsReservationStateChoices,
   ReservationType,
   ReservationUnitByPkTypeReservableTimeSpansArgs,
   ReservationUnitByPkTypeReservationsArgs,
-  ReservationUnitsReservationUnitPricingPricingTypeChoices,
   ReservationUnitType,
-  TermsOfUseTermsOfUseTermsTypeChoices,
+  State,
   TermsOfUseType,
+  TermsType,
 } from "common/types/gql-types";
 import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
 import Head from "../../components/reservation-unit/Head";
@@ -123,11 +123,11 @@ type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
 type WeekOptions = "day" | "week" | "month";
 
-const allowedReservationStates: ReservationsReservationStateChoices[] = [
-  ReservationsReservationStateChoices.Created,
-  ReservationsReservationStateChoices.Confirmed,
-  ReservationsReservationStateChoices.RequiresHandling,
-  ReservationsReservationStateChoices.WaitingForPayment,
+const allowedReservationStates: State[] = [
+  State.Created,
+  State.Confirmed,
+  State.RequiresHandling,
+  State.WaitingForPayment,
 ];
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
@@ -194,7 +194,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       query: TERMS_OF_USE,
       fetchPolicy: "no-cache",
       variables: {
-        termsType: TermsOfUseTermsOfUseTermsTypeChoices.GenericTerms,
+        termsType: TermsType.GenericTerms,
       },
     });
     const bookingTerms: TermsOfUseType | null =
@@ -1076,13 +1076,15 @@ const ReservationUnit = ({
                         }}
                         components={{ bold: <strong /> }}
                       />
-                      {futurePricing.pricingType ===
-                        ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid &&
-                        parseFloat(futurePricing.taxPercentage?.value) > 0 && (
+                      {futurePricing.pricingType === PricingType.Paid &&
+                        parseFloat(futurePricing.taxPercentage?.value ?? "") >
+                          0 && (
                           <strong>
                             {t("reservationUnit:futurePriceNoticeTax", {
                               tax: formatters.strippedDecimal.format(
-                                parseFloat(futurePricing.taxPercentage.value)
+                                parseFloat(
+                                  futurePricing.taxPercentage?.value ?? ""
+                                )
                               ),
                             })}
                           </strong>

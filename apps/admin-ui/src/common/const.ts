@@ -33,6 +33,16 @@ export const NUMBER_OF_DECIMALS = 6;
 
 export const RECURRING_AUTOMATIC_REFETCH_LIMIT = 2000;
 
+/// Poll updates to application sections on the allocation page (in milliseconds), 0 to disable.
+/// Why use this? if there are multiple users working on the same allocation, they will see updates.
+/// If you are testing, you can use multiple tabs / browsers to see the updates.
+/// Reason to disable (especially in production): the allocations queries are heavy and may cause performance issues.
+/// TODO if this is left enabled it should be moved to env (so we can disable without recompiling).
+/// TODO there is some funny stuff with it if it's low (like 1000) it can go into an endless update loop
+/// so if this is going to be used in production need to add custom logic to backoff updates if they are taking too long
+/// or better yet, use subscriptions (i.e. drive updates from the backend).
+export const ALLOCATION_POLL_INTERVAL = 10000;
+
 // This is a backend (or library) limit based on testing
 export const GQL_MAX_RESULTS_PER_QUERY = 100;
 

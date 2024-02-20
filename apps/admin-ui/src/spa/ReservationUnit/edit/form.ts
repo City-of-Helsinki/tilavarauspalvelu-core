@@ -6,17 +6,17 @@ import {
   toApiDate,
 } from "common/src/common/util";
 import {
-  ReservationUnitsReservationUnitReservationStartIntervalChoices,
-  ReservationUnitsReservationUnitAuthenticationChoices,
+  ReservationStartInterval,
+  Authentication,
   type ReservationUnitByPkType,
-  ReservationUnitsReservationUnitPricingPricingTypeChoices,
-  ReservationUnitsReservationUnitReservationKindChoices,
-  ReservationUnitsReservationUnitPricingStatusChoices,
-  ReservationUnitsReservationUnitPricingPriceUnitChoices,
+  PricingType,
+  ReservationKind,
+  Status,
+  PriceUnit,
   type ReservationUnitPricingType,
   type ReservationUnitUpdateMutationInput,
   type ReservationUnitCreateMutationInput,
-  ReservationUnitsReservationUnitImageImageTypeChoices,
+  ImageType,
   type ReservationUnitImageType,
 } from "common/types/gql-types";
 import { addDays, format } from "date-fns";
@@ -39,13 +39,9 @@ export const PricingFormSchema = z.object({
   lowestPriceNet: z.number(),
   highestPrice: z.number(),
   highestPriceNet: z.number(),
-  pricingType: z.nativeEnum(
-    ReservationUnitsReservationUnitPricingPricingTypeChoices
-  ),
-  priceUnit: z
-    .nativeEnum(ReservationUnitsReservationUnitPricingPriceUnitChoices)
-    .nullable(),
-  status: z.nativeEnum(ReservationUnitsReservationUnitPricingStatusChoices),
+  pricingType: z.nativeEnum(PricingType),
+  priceUnit: z.nativeEnum(PriceUnit).nullable(),
+  status: z.nativeEnum(Status),
   // NOTE this has to be a string because of HDS date input in ui format: "d.M.yyyy"
   begins: z.string(),
 });
@@ -57,9 +53,7 @@ const refinePricing = (
   ctx: z.RefinementCtx,
   path: string
 ) => {
-  if (
-    data.status === ReservationUnitsReservationUnitPricingStatusChoices.Future
-  ) {
+  if (data.status === Status.Future) {
     if (data.begins === "") {
       ctx.addIssue({
         message: "Required",
@@ -84,10 +78,7 @@ const refinePricing = (
     }
   }
 
-  if (
-    data.pricingType ===
-    ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid
-  ) {
+  if (data.pricingType === PricingType.Paid) {
     const lowestPrice = Number(data.lowestPrice);
     const highestPrice = Number(data.highestPrice);
     const lowestPriceNet = Number(data.lowestPriceNet);
@@ -141,12 +132,8 @@ const ImageFormSchema = z.object({
   pk: z.number().optional(),
   mediumUrl: z.string().optional(),
   imageUrl: z.string().optional(),
-  imageType: z
-    .nativeEnum(ReservationUnitsReservationUnitImageImageTypeChoices)
-    .optional(),
-  originalImageType: z
-    .nativeEnum(ReservationUnitsReservationUnitImageImageTypeChoices)
-    .optional(),
+  imageType: z.nativeEnum(ImageType).optional(),
+  originalImageType: z.nativeEnum(ImageType).optional(),
   bytes: z.instanceof(File).optional(),
   deleted: z.boolean().optional(),
 });
@@ -359,9 +346,7 @@ function validateDateTimeInterval({
 
 export const ReservationUnitEditSchema = z
   .object({
-    authentication: z.nativeEnum(
-      ReservationUnitsReservationUnitAuthenticationChoices
-    ),
+    authentication: z.nativeEnum(Authentication),
     // TODO these are optional (0 is bit different than not set)
     // because if they are set (non undefined) we should show the active checkbox
     bufferTimeAfter: z.number(),
@@ -388,16 +373,12 @@ export const ReservationUnitEditSchema = z
     reservationEndsTime: z.string(),
     requireIntroduction: z.boolean(),
     requireReservationHandling: z.boolean(),
-    reservationStartInterval: z.nativeEnum(
-      ReservationUnitsReservationUnitReservationStartIntervalChoices
-    ),
+    reservationStartInterval: z.nativeEnum(ReservationStartInterval),
     unitPk: z.number().min(1),
     canApplyFreeOfCharge: z.boolean(),
     reservationsMinDaysBefore: z.number(),
     reservationsMaxDaysBefore: z.number(),
-    reservationKind: z.nativeEnum(
-      ReservationUnitsReservationUnitReservationKindChoices
-    ),
+    reservationKind: z.nativeEnum(ReservationKind),
     contactInformation: z.string(),
     reservationPendingInstructionsFi: z.string(),
     reservationPendingInstructionsEn: z.string(),
@@ -458,10 +439,7 @@ export const ReservationUnitEditSchema = z
     }
 
     // Drafts also require seasonal times validation
-    if (
-      v.reservationKind !==
-      ReservationUnitsReservationUnitReservationKindChoices.Direct
-    ) {
+    if (v.reservationKind !== ReservationKind.Direct) {
       validateSeasonalTimes(v.seasons, ctx);
     }
 
@@ -469,10 +447,7 @@ export const ReservationUnitEditSchema = z
       return;
     }
 
-    if (
-      v.reservationKind !==
-      ReservationUnitsReservationUnitReservationKindChoices.Season
-    ) {
+    if (v.reservationKind !== ReservationKind.Season) {
       if (v.minReservationDuration == null) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -631,9 +606,7 @@ export const ReservationUnitEditSchema = z
 
     // refine pricing only if not draft and the pricing is enabled
     const enabledPricings = v.pricings.filter(
-      (p) =>
-        v.hasFuturePricing ||
-        p.status === ReservationUnitsReservationUnitPricingStatusChoices.Active
+      (p) => v.hasFuturePricing || p.status === Status.Active
     );
     enabledPricings.forEach((p, i) => {
       refinePricing(p, ctx, `pricings.${i}`);
@@ -641,9 +614,7 @@ export const ReservationUnitEditSchema = z
 
     // TODO if it includes futurePricing check that the futurePrice date is in the future (is today ok?)
     const hasPaidPricing = enabledPricings.some(
-      (p) =>
-        p.pricingType ===
-        ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid
+      (p) => p.pricingType === PricingType.Paid
     );
     if (hasPaidPricing && v.paymentTypes.length === 0) {
       ctx.addIssue({
@@ -674,16 +645,13 @@ const convertMaybeDecimal = (value?: unknown) => {
 };
 
 const convertPricing = (p?: ReservationUnitPricingType): PricingFormValues => {
-  const convertBegins = (
-    begins?: string,
-    status?: ReservationUnitsReservationUnitPricingStatusChoices
-  ) => {
+  const convertBegins = (begins?: string, status?: Status) => {
     const d = begins != null && begins !== "" ? fromApiDate(begins) : undefined;
     const today = new Date();
     if (d != null) {
       return toUIDate(d);
     }
-    if (status === ReservationUnitsReservationUnitPricingStatusChoices.Future) {
+    if (status === Status.Future) {
       return toUIDate(addDays(today, 1));
     }
     return toUIDate(today);
@@ -699,12 +667,9 @@ const convertPricing = (p?: ReservationUnitPricingType): PricingFormValues => {
     lowestPriceNet: convertMaybeDecimal(p?.lowestPriceNet) ?? 0,
     highestPrice: convertMaybeDecimal(p?.highestPrice) ?? 0,
     highestPriceNet: convertMaybeDecimal(p?.highestPriceNet) ?? 0,
-    pricingType:
-      p?.pricingType ??
-      ReservationUnitsReservationUnitPricingPricingTypeChoices.Free,
+    pricingType: p?.pricingType ?? PricingType.Free,
     priceUnit: p?.priceUnit ?? null,
-    status:
-      p?.status ?? ReservationUnitsReservationUnitPricingStatusChoices.Active,
+    status: p?.status ?? Status.Active,
     begins: convertBegins(p?.begins, p?.status),
   };
 };
@@ -716,16 +681,16 @@ const convertPricingList = (
   pricings: ReservationUnitPricingType[]
 ): PricingFormValues[] => {
   const isActive = (p?: ReservationUnitPricingType) =>
-    p?.status === ReservationUnitsReservationUnitPricingStatusChoices.Active;
+    p?.status === Status.Active;
   const isFuture = (p?: ReservationUnitPricingType) =>
-    p?.status === ReservationUnitsReservationUnitPricingStatusChoices.Future;
+    p?.status === Status.Future;
 
   const active = pricings.find(isActive);
   // NOTE using casting here because we only need the status to be set for the next step
   const future =
     pricings.find(isFuture) ??
     ({
-      status: ReservationUnitsReservationUnitPricingStatusChoices.Future,
+      status: Status.Future,
     } as ReservationUnitPricingType);
 
   // allow undefined's here so we create two default values always
@@ -825,14 +790,12 @@ export const convertReservationUnit = (
     requireReservationHandling: data?.requireReservationHandling ?? false,
     reservationStartInterval:
       data?.reservationStartInterval ??
-      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins,
+      ReservationStartInterval.Interval_15Mins,
     unitPk: data?.unit?.pk ?? 0,
     canApplyFreeOfCharge: data?.canApplyFreeOfCharge ?? false,
     reservationsMinDaysBefore: data?.reservationsMinDaysBefore ?? 0,
     reservationsMaxDaysBefore: data?.reservationsMaxDaysBefore ?? 0,
-    reservationKind:
-      data?.reservationKind ??
-      ReservationUnitsReservationUnitReservationKindChoices.DirectAndSeason,
+    reservationKind: data?.reservationKind ?? ReservationKind.DirectAndSeason,
     contactInformation: data?.contactInformation ?? "",
     reservationPendingInstructionsFi:
       data?.reservationPendingInstructionsFi ?? "",
@@ -867,9 +830,7 @@ export const convertReservationUnit = (
     purposePks: filterNonNullable(data?.purposes?.map((p) => p?.pk)),
     qualifierPks: filterNonNullable(data?.qualifiers?.map((q) => q?.pk)),
     surfaceArea: data?.surfaceArea ?? 0,
-    authentication:
-      data?.authentication ??
-      ReservationUnitsReservationUnitAuthenticationChoices.Weak,
+    authentication: data?.authentication ?? Authentication.Weak,
     reservationUnitTypePk: data?.reservationUnitType?.pk ?? null,
     metadataSetPk: data?.metadataSet?.pk ?? null,
     paymentTermsPk: data?.paymentTerms?.pk ?? null,
@@ -887,10 +848,7 @@ export const convertReservationUnit = (
     ),
     hasFuturePricing:
       data?.pricings?.some(
-        (p) =>
-          p?.status != null &&
-          p?.status ===
-            ReservationUnitsReservationUnitPricingStatusChoices.Future
+        (p) => p?.status != null && p?.status === Status.Future
       ) ?? false,
     hasScheduledPublish:
       data?.publishBegins != null || data?.publishEnds != null,
@@ -946,8 +904,7 @@ export function transformReservationUnit(
   } = values;
 
   const shouldSavePricing = (p: PricingFormValues) =>
-    hasFuturePricing ||
-    p.status === ReservationUnitsReservationUnitPricingStatusChoices.Active;
+    hasFuturePricing || p.status === Status.Active;
 
   const isReservableTime = (t?: SeasonalFormType["reservableTimes"][0]) =>
     t && t.begin && t.end;

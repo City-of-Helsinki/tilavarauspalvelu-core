@@ -5,7 +5,7 @@ import { memoize, orderBy, trim, uniqBy } from "lodash";
 import { IconLinkExternal } from "hds-react";
 import { differenceInWeeks } from "date-fns";
 import { fromApiDate } from "common/src/common/util";
-import type { ApplicationEventNode } from "common/types/gql-types";
+import type { ApplicationSectionNode } from "common/types/gql-types";
 import { formatters as getFormatters } from "common";
 import { PUBLIC_URL } from "@/common/const";
 import { truncate } from "@/helpers";
@@ -13,7 +13,7 @@ import { applicationDetailsUrl } from "@/common/urls";
 import { getApplicantName } from "@/component/applications/util";
 import { formatNumber } from "@/common/util";
 import { CustomTable, ExternalTableLink } from "@/component/Table";
-import { ApplicationEventStatusCell } from "./StatusCell";
+import { ApplicationSectionStatusCell } from "./StatusCell";
 
 const formatters = getFormatters("fi");
 
@@ -23,7 +23,7 @@ const applicantTruncateLen = 20;
 type Props = {
   sort: string | null;
   sortChanged: (field: string) => void;
-  applicationEvents: ApplicationEventNode[];
+  applicationEvents: ApplicationSectionNode[];
   isLoading?: boolean;
 };
 
@@ -42,9 +42,9 @@ type ApplicationEventView = {
 };
 
 const appEventMapper = (
-  appEvent: ApplicationEventNode
+  appEvent: ApplicationSectionNode
 ): ApplicationEventView => {
-  const resUnits = appEvent.eventReservationUnits?.flatMap((eru) => ({
+  const resUnits = appEvent.reservationUnitOptions?.flatMap((eru) => ({
     ...eru?.reservationUnit?.unit,
     priority: eru?.preferredOrder ?? 0,
   }));
@@ -60,17 +60,21 @@ const appEventMapper = (
 
   const applicantName = getApplicantName(appEvent.application);
 
-  const begin = appEvent.begin ? fromApiDate(appEvent.begin) : undefined;
-  const end = appEvent.end ? fromApiDate(appEvent.end) : undefined;
+  const begin = appEvent.reservationsBeginDate
+    ? fromApiDate(appEvent.reservationsBeginDate)
+    : undefined;
+  const end = appEvent.reservationsEndDate
+    ? fromApiDate(appEvent.reservationsEndDate)
+    : undefined;
 
-  const biW = appEvent.biweekly;
-  const evtPerW = appEvent.eventsPerWeek ?? 0;
+  const biW = false; // appEvent.biweekly;
+  const evtPerW = appEvent.appliedReservationsPerWeek ?? 0;
   const turns =
     begin && end
       ? (differenceInWeeks(end, begin) / (biW ? 2 : 1)) * evtPerW
       : 0;
 
-  const minDuration = appEvent.minDuration ?? 0;
+  const minDuration = appEvent.reservationMinDuration ?? 0;
   const totalHours = (turns * minDuration) / 3600;
 
   return {
@@ -85,7 +89,7 @@ const appEventMapper = (
       )} t`,
       " / "
     ),
-    statusView: <ApplicationEventStatusCell status={status} />,
+    statusView: <ApplicationSectionStatusCell status={status} />,
   };
 };
 

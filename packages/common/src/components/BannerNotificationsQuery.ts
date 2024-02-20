@@ -61,9 +61,7 @@ export const BANNER_NOTIFICATIONS_ADMIN_LIST = gql`
 // query alias breaks typescript typing (refactor later if possible).
 export const BANNER_NOTIFICATIONS_LIST = gql`
   ${BANNER_NOTIFICATION_COMMON}
-  query BannerNotificationsList(
-    $target: CommonBannerNotificationTargetChoices!
-  ) {
+  query BannerNotificationsList($target: BannerNotificationTarget!) {
     bannerNotifications(isVisible: true, target: $target) {
       edges {
         node {

@@ -19,6 +19,7 @@ interface ITranslations {
 }
 
 const translations: ITranslations = {
+  // @deprecated (use dayShort and dayLong)
   calendar: {
     monday: ["Maanantai"],
     tuesday: ["Tiistai"],
@@ -541,6 +542,18 @@ const translations: ITranslations = {
       time: ["Vuoro"],
     },
   },
+  ApplicationSectionStatusChoice: {
+    FAILED: ["Epäonnistunut"],
+    HANDLED: ["Käsitelty"],
+    IN_ALLOCATION: ["Käsittelyssä"],
+    RESERVED: ["Varattu"],
+    UNALLOCATED: ["Ei jaettu"],
+  },
+  TimeSlotStatusCell: {
+    declined: ["Hylätty"],
+    approved: ["Hyväksytty"],
+  },
+  // TODO ApplicationEvent has been renamed to ApplicationSection, rename these keys
   ApplicationEvent: {
     name: ["Vakiovuoron nimi"],
     emptyFilterPageName: ["haettua vuoroa"],
@@ -584,21 +597,6 @@ const translations: ITranslations = {
   Recommendation: {
     // TODO this is used in SelectionActionBar.tsx
     actionMassActionSubmit: ["Massakäsittele valitut"],
-    // TODO these are used in ApplicationEventStatusBlock.tsx
-    statuses: {
-      approved: ["Päätös tehty"],
-      created: ["Käsittelemättä"],
-      validated: ["Ehdotus hyväksytty"],
-      declined: ["Ehdotus hylätty"],
-      ignored: ["Tilakielto asetettu"],
-    },
-    // TODO these are used in ApplicantApplicationStatusBlock.tsx
-    applicantStatuses: {
-      handling: ["Käsittely kesken"],
-      validated: ["Odottaa esihenkilöhyväksyntää"],
-      approved: ["Päätös tehty"],
-      sent: ["Päätös lähetetty"],
-    },
   },
   Reservation: {
     headings: {
@@ -1946,14 +1944,16 @@ const translations: ITranslations = {
     rejectSlot: ["Hylkää vuoro"],
     acceptSlot: ["Jaa {{duration}} vuoro"],
     acceptingSlot: ["Jaetaan vuoroa..."],
-    acceptingSuccess: ['Vuoroa varaukselle "{{applicationEvent}}" jaetaan.'],
-    resetSuccess: ["Vuoro poistettu"],
+    acceptingSuccess: ['Vuoroa varaukselle "{{name}}" jaetaan.'],
+    resetSuccess: ['Vuoro "{{name}}" poistettu'],
     countResultsPostfix: ["tuloksesta näytetty"],
     countAllResults: ["Kaikki {{ count }}  tulosta näytetty"],
     clearFiltersButton: ["Tyhjennä suodattimet"],
     errors: {
       accepting: {
         alreadyDeclined: ['Varaukselle "{{name}}" on jo tehty hylkäys.'],
+        // TODO this should only happen if the it's already allocated for that day
+        // there should be no blocks to allocate for another day (unless it's completely fullfilled?)
         alreadyAllocated: ['Varaukselle "{{name}}" on jo jaettu vuoro.'],
         alreadyHandled: ['Varaus "{{name}}" on jo kokonaan jaettu.'],
         title: ["Vuoron jakaminen epäonnistui"],
@@ -1963,10 +1963,14 @@ const translations: ITranslations = {
         receivedCantAllocate: [
           "Hakukierrokselle ei voi jakaa vuoroja, koska se on vielä avoinna.",
         ],
+        alreadyAllocatedWithSpaceHierrarchy: [
+          'Vuoroa "{{name}}" ei voi jakaa, koska se on jo jaettu toiselle varausyksikölle.',
+        ],
       },
       remove: {
         title: ["Vuoron poistaminen epäonnistui"],
         generic: ['Vuoron poistaminen varaukselta "{{name}}" epäonnistui.'],
+        alreadyDeleted: ['Vuoro varaukselle "{{name}}" on jo poistettu.'],
       },
       noPermission: ["Sinulla ei ole riittäviä oikeuksia jakaa vuoroa."],
       allocatedDurationIsIncorrect: [

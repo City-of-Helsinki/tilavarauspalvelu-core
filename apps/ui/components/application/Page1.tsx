@@ -31,9 +31,7 @@ const Page1 = ({ applicationRound, onNext }: Props): JSX.Element | null => {
   );
   const { data: unitData } = useQuery<Query>(SEARCH_FORM_PARAMS_UNIT);
   const units =
-    unitData?.units?.edges
-      ?.map((e) => e?.node)
-      .filter((node): node is NonNullable<typeof node> => node != null)
+    filterNonNullable(unitData?.units?.edges?.map((e) => e?.node))
       .filter((u) => unitsInApplicationRound.includes(u.pk))
       .map((u) => ({
         pk: u.pk ?? 0,
@@ -50,69 +48,74 @@ const Page1 = ({ applicationRound, onNext }: Props): JSX.Element | null => {
   const { reservationUnits: selectedReservationUnits } =
     useReservationUnitsList();
 
-  const applicationEvents = watch("applicationEvents");
+  const applicationSections = watch("applicationSections");
 
   const isAccordionOpen = (formKey: string) => {
-    const index = applicationEvents?.findIndex((ae) => ae?.formKey === formKey);
+    const index = applicationSections?.findIndex(
+      (ae) => ae?.formKey === formKey
+    );
     if (index == null) {
       return false;
     }
-    return watch(`applicationEvents.${index}.accordionOpen`);
+    return watch(`applicationSections.${index}.accordionOpen`);
   };
 
   const handleToggleAccordion = (formKey: string) => {
-    const index = applicationEvents?.findIndex((ae) => ae?.formKey === formKey);
+    const index = applicationSections?.findIndex(
+      (ae) => ae?.formKey === formKey
+    );
     if (index == null) {
       return;
     }
-    const val = watch(`applicationEvents.${index}.accordionOpen`);
-    setValue(`applicationEvents.${index}.accordionOpen`, !val);
+    const val = watch(`applicationSections.${index}.accordionOpen`);
+    setValue(`applicationSections.${index}.accordionOpen`, !val);
   };
 
   const handleDeleteEvent = (formKey: string) => {
-    const index = applicationEvents?.findIndex((ae) => ae?.formKey === formKey);
+    const index = applicationSections?.findIndex(
+      (ae) => ae?.formKey === formKey
+    );
     if (index == null) {
       return;
     }
-    unregister(`applicationEvents.${index}`);
+    unregister(`applicationSections.${index}`);
   };
 
   const handleAddNewApplicationEvent = () => {
-    const nextIndex = applicationEvents?.length ?? 0;
+    const nextIndex = applicationSections?.length ?? 0;
     // TODO check if we have to register all the sub fields in application event
     // seems so, we could also just register the pk here and register the rest in the form where they are used
-    register(`applicationEvents.${nextIndex}.pk`);
-    register(`applicationEvents.${nextIndex}.name`);
-    register(`applicationEvents.${nextIndex}.numPersons`);
-    register(`applicationEvents.${nextIndex}.ageGroup`);
-    register(`applicationEvents.${nextIndex}.abilityGroup`);
-    register(`applicationEvents.${nextIndex}.purpose`);
-    register(`applicationEvents.${nextIndex}.minDuration`);
-    register(`applicationEvents.${nextIndex}.maxDuration`);
-    register(`applicationEvents.${nextIndex}.eventsPerWeek`);
-    register(`applicationEvents.${nextIndex}.biweekly`);
-    register(`applicationEvents.${nextIndex}.begin`);
-    register(`applicationEvents.${nextIndex}.end`);
-    register(`applicationEvents.${nextIndex}.applicationEventSchedules`);
-    register(`applicationEvents.${nextIndex}.reservationUnits`);
+    register(`applicationSections.${nextIndex}.pk`);
+    register(`applicationSections.${nextIndex}.name`);
+    register(`applicationSections.${nextIndex}.numPersons`);
+    register(`applicationSections.${nextIndex}.ageGroup`);
+    // register(`applicationSections.${nextIndex}.abilityGroup`);
+    register(`applicationSections.${nextIndex}.purpose`);
+    register(`applicationSections.${nextIndex}.minDuration`);
+    register(`applicationSections.${nextIndex}.maxDuration`);
+    // register(`applicationSections.${nextIndex}.eventsPerWeek`);
+    // register(`applicationSections.${nextIndex}.biweekly`);
+    register(`applicationSections.${nextIndex}.begin`);
+    register(`applicationSections.${nextIndex}.end`);
+    // register(`applicationSections.${nextIndex}.applicationEventSchedules`);
+    register(`applicationSections.${nextIndex}.reservationUnits`);
     setValue(
-      `applicationEvents.${nextIndex}.reservationUnits`,
+      `applicationSections.${nextIndex}.reservationUnits`,
       filterNonNullable(selectedReservationUnits.map((ru) => ru.pk)).filter(
         (pk) => unitsInApplicationRound.includes(pk)
       )
     );
-    setValue(`applicationEvents.${nextIndex}.applicationEventSchedules`, []);
-    setValue(`applicationEvents.${nextIndex}.pk`, undefined);
-    setValue(`applicationEvents.${nextIndex}.name`, "");
-    setValue(`applicationEvents.${nextIndex}.eventsPerWeek`, 1);
-    setValue(`applicationEvents.${nextIndex}.biweekly`, false);
-    setValue(`applicationEvents.${nextIndex}.accordionOpen`, true);
-    setValue(`applicationEvents.${nextIndex}.formKey`, `NEW-${nextIndex}`);
+    // setValue(`applicationSections.${nextIndex}.applicationEventSchedules`, []);
+    setValue(`applicationSections.${nextIndex}.pk`, undefined);
+    setValue(`applicationSections.${nextIndex}.name`, "");
+    // setValue(`applicationSections.${nextIndex}.eventsPerWeek`, 1);
+    // setValue(`applicationSections.${nextIndex}.biweekly`, false);
+    setValue(`applicationSections.${nextIndex}.accordionOpen`, true);
+    setValue(`applicationSections.${nextIndex}.formKey`, `NEW-${nextIndex}`);
   };
 
-  const formAes = watch("applicationEvents");
-
-  const submitDisabled = formAes == null || formAes.length === 0;
+  const submitDisabled =
+    applicationSections == null || applicationSections.length === 0;
 
   const onSubmit = (data: ApplicationFormValues) => {
     onNext(data);
@@ -122,7 +125,7 @@ const Page1 = ({ applicationRound, onNext }: Props): JSX.Element | null => {
     <form noValidate onSubmit={handleSubmit(onSubmit)}>
       {/* NOTE can't filter this because we have undefined values in the array so the index would break
        * we could use findIndex with the formKey though */}
-      {applicationEvents?.map((event, index) =>
+      {applicationSections?.map((event, index) =>
         event != null ? (
           <ApplicationEvent
             key={event.formKey}

@@ -67,13 +67,7 @@ const Preview = (props: Props): JSX.Element => {
       return;
     }
 
-    const { pk, errors: mutErrors } = data?.sendApplication ?? {};
-    if (mutErrors) {
-      // eslint-disable-next-line no-console
-      console.error("error sending application", mutErrors);
-      // TODO show error
-      return;
-    }
+    const { pk } = data?.sendApplication ?? {};
 
     const prefix = `/application/${pk}`;
     const target = `${prefix}/sent`;

@@ -1,6 +1,6 @@
 import { toMondayFirst } from "common/src/helpers";
 import { fromUIDateUnsafe } from "common/src/common/util";
-import { ReservationUnitsReservationUnitReservationStartIntervalChoices } from "common/types/gql-types";
+import { ReservationStartInterval } from "common/types/gql-types";
 import { timeSelectionSchema } from "app/schemas";
 
 // NOTE Custom UTC date code because taking only the date part of Date results
@@ -26,7 +26,7 @@ const dayOfWeek: (t: number) => WeekDay = (time: number) =>
 // Returning the zod validation result also for error handling
 const generateReservations = (
   props: unknown,
-  interval: ReservationUnitsReservationUnitReservationStartIntervalChoices
+  interval: ReservationStartInterval
 ) => {
   const vals = timeSelectionSchema(interval).safeParse(props);
 

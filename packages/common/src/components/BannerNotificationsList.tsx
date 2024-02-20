@@ -11,14 +11,14 @@ import {
   type BannerNotificationNode,
   type Query,
   type QueryBannerNotificationsArgs,
-  type CommonBannerNotificationTargetChoices,
   type BannerNotificationNodeConnection,
   type Maybe,
+  BannerNotificationTarget,
 } from "../../types/gql-types";
 import { BANNER_NOTIFICATIONS_LIST } from "./BannerNotificationsQuery";
 
 type BannerNotificationListProps = {
-  target: CommonBannerNotificationTargetChoices;
+  target: BannerNotificationTarget;
   displayAmount?: number;
   centered?: boolean;
 };

@@ -2,16 +2,15 @@ import { get as mockGet } from "lodash";
 import { addDays, addHours, addMinutes, startOfToday } from "date-fns";
 import {
   PaymentOrderType,
-  ReservationsReservationReserveeTypeChoices,
-  ReservationsReservationStateChoices,
+  State,
   ReservationType,
   ReservationUnitByPkType,
-  ReservationUnitsReservationUnitReservationStartIntervalChoices,
-  ReservationUnitsReservationUnitAuthenticationChoices,
-  ReservationUnitsReservationUnitReservationKindChoices,
+  ReservationStartInterval,
+  Authentication,
+  ReservationKind,
   ReservationUnitCancellationRuleType,
   ReservationUnitType,
-  ReservationsReservationPriorityChoices,
+  ReserveeType,
 } from "common/types/gql-types";
 import {
   CanReservationBeChangedProps,
@@ -41,18 +40,15 @@ jest.mock("next-i18next", () => ({
 describe("getDurationOptions", () => {
   test("empty inputs", () => {
     const mockT = ((x: string) => x) as TFunction;
-    const interval90 =
-      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_90Mins;
-    const interval60 =
-      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_60Mins;
+    const interval90 = ReservationStartInterval.Interval_90Mins;
+    const interval60 = ReservationStartInterval.Interval_60Mins;
     expect(getDurationOptions(0, 5400, interval90, mockT)).toEqual([]);
     expect(getDurationOptions(5400, 0, interval60, mockT)).toEqual([]);
     expect(getDurationOptions(0, 0, interval90, mockT)).toEqual([]);
   });
   test("with 15 min intervals", () => {
     const mockT = ((x: string) => x) as TFunction;
-    const interval15 =
-      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins;
+    const interval15 = ReservationStartInterval.Interval_15Mins;
     expect(getDurationOptions(1800, 5400, interval15, mockT)).toEqual([
       {
         label: " common:abbreviations.minute",
@@ -79,8 +75,7 @@ describe("getDurationOptions", () => {
 
   test("with 90 min intervals", () => {
     const mockT = ((x: string) => x) as TFunction;
-    const interval90 =
-      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_90Mins;
+    const interval90 = ReservationStartInterval.Interval_90Mins;
     expect(getDurationOptions(1800, 30600, interval90, mockT)).toEqual([
       {
         label: " common:abbreviations.minute",
@@ -107,7 +102,7 @@ describe("getDurationOptions", () => {
 });
 
 const reservationUnit: ReservationUnitByPkType = {
-  authentication: ReservationUnitsReservationUnitAuthenticationChoices.Weak,
+  authentication: Authentication.Weak,
   canApplyFreeOfCharge: false,
   contactInformation: "",
   id: "123f4w90",
@@ -116,9 +111,8 @@ const reservationUnit: ReservationUnitByPkType = {
   isArchived: false,
   isDraft: false,
   requireIntroduction: false,
-  reservationKind: ReservationUnitsReservationUnitReservationKindChoices.Direct,
-  reservationStartInterval:
-    ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins,
+  reservationKind: ReservationKind.Direct,
+  reservationStartInterval: ReservationStartInterval.Interval_15Mins,
   reservationBegins: addDays(new Date(), -1).toISOString(),
   reservationEnds: undefined, // addDays(new Date(), 200).toISOString(),
   reservableTimeSpans: Array.from(Array(100)).map((_val, index) => {
@@ -139,13 +133,12 @@ const reservationUnit: ReservationUnitByPkType = {
 
 const reservation: ReservationType = {
   id: "123f4w90",
-  state: ReservationsReservationStateChoices.Confirmed,
+  state: State.Confirmed,
   price: 0,
   begin: addHours(startOfToday(), 34).toISOString(),
   end: addHours(startOfToday(), 35).toISOString(),
   reservationUnits: [reservationUnit as ReservationUnitType],
   handlingDetails: "",
-  priority: ReservationsReservationPriorityChoices.A_300,
 };
 
 describe("canUserCancelReservation", () => {
@@ -171,7 +164,7 @@ describe("canUserCancelReservation", () => {
     const res: ReservationType = {
       ...reservation,
       begin: addMinutes(new Date(), 10).toISOString(),
-      state: ReservationsReservationStateChoices.Confirmed,
+      state: State.Confirmed,
       reservationUnits: [
         {
           ...reservationUnit,
@@ -187,7 +180,7 @@ describe("canUserCancelReservation", () => {
   test("that does not need handling", () => {
     const reservation_ = {
       begin: new Date().toISOString(),
-      state: ReservationsReservationStateChoices.Confirmed,
+      state: State.Confirmed,
       reservationUnits: [
         {
           cancellationRule: {
@@ -202,7 +195,7 @@ describe("canUserCancelReservation", () => {
   test("with non-confirmed state", () => {
     const reservation_ = {
       begin: new Date().toISOString(),
-      state: ReservationsReservationStateChoices.RequiresHandling,
+      state: State.RequiresHandling,
       reservationUnits: [
         {
           cancellationRule: {
@@ -217,7 +210,7 @@ describe("canUserCancelReservation", () => {
   test("with 0 secs of buffer time", () => {
     const reservation_ = {
       begin: new Date().toISOString(),
-      state: ReservationsReservationStateChoices.Confirmed,
+      state: State.Confirmed,
       reservationUnits: [
         {
           cancellationRule: {
@@ -257,13 +250,9 @@ describe("canUserCancelReservation", () => {
 describe("getReservationApplcationMutationValues", () => {
   test("with empty input", () => {
     expect(
-      getReservationApplicationMutationValues(
-        {},
-        [],
-        ReservationsReservationReserveeTypeChoices.Individual
-      )
+      getReservationApplicationMutationValues({}, [], ReserveeType.Individual)
     ).toEqual({
-      reserveeType: ReservationsReservationReserveeTypeChoices.Individual,
+      reserveeType: ReserveeType.Individual,
     });
   });
 
@@ -277,12 +266,12 @@ describe("getReservationApplcationMutationValues", () => {
       getReservationApplicationMutationValues(
         payload,
         ["name", "reservee_id", "reservee_first_name"],
-        ReservationsReservationReserveeTypeChoices.Individual
+        ReserveeType.Individual
       )
     ).toEqual({
       name: "Nimi",
       reserveeFirstName: "Etunimi",
-      reserveeType: ReservationsReservationReserveeTypeChoices.Individual,
+      reserveeType: ReserveeType.Individual,
     });
   });
 });
@@ -504,7 +493,7 @@ describe("canReservationBeChanged", () => {
       canReservationTimeBeChanged({
         reservation: {
           ...reservation,
-          state: ReservationsReservationStateChoices.Created,
+          state: State.Created,
         },
       })
     ).toStrictEqual([false, "RESERVATION_MODIFICATION_NOT_ALLOWED"]);

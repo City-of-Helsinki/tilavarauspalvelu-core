@@ -3,11 +3,11 @@ import styled, { css } from "styled-components";
 import { IconCheckCircleFill, IconCrossCircleFill } from "hds-react";
 import { useTranslation } from "react-i18next";
 import {
-  ApplicationEventStatusChoice,
+  ApplicationSectionStatusChoice,
   ApplicationStatusChoice,
 } from "common/types/gql-types";
 import {
-  getApplicationEventStatusColor,
+  getApplicationSectiontatusColor,
   getApplicationStatusColor,
 } from "@/component//applications/util";
 
@@ -29,11 +29,11 @@ const StatusDot = styled.div<{
 `;
 
 const ApplicationEventStatusDot = styled.div<{
-  status: ApplicationEventStatusChoice;
+  status: ApplicationSectionStatusChoice;
 }>`
   ${dotCss}
   background-color: ${({ status }) =>
-    getApplicationEventStatusColor(status, "s")};
+    getApplicationSectiontatusColor(status, "s")};
 `;
 
 const Wrapper = styled.div`
@@ -75,15 +75,19 @@ function ApplicationStatusIcon({
   return <StatusDot aria-hidden status={status} />;
 }
 
-function ApplicationEventStatusIcon({
+// FIXME this needs to use fullfilled / rejected not the status (they are not added to the backend yet)
+function ApplicationSectionStatusIcon({
   status,
 }: {
-  status?: ApplicationEventStatusChoice;
+  status?: ApplicationSectionStatusChoice;
 }): JSX.Element | null {
   if (status == null) {
     return null;
   }
-  if (status === ApplicationEventStatusChoice.Approved) {
+
+  // TODO what are the states? declined / approved now?
+  // @ts-ignore -- TODO fix
+  if (status === ApplicationSectionStatusChoice.Approved) {
     return (
       <IconCheckCircleFill
         aria-hidden
@@ -91,7 +95,8 @@ function ApplicationEventStatusIcon({
       />
     );
   }
-  if (status === ApplicationEventStatusChoice.Declined) {
+  // @ts-ignore -- TODO fix
+  if (status === ApplicationSectionStatusChoice.Declined) {
     return (
       <IconCrossCircleFill
         aria-hidden
@@ -116,16 +121,33 @@ export function ApplicationStatusCell({
   );
 }
 
-export function ApplicationEventStatusCell({
+export function ApplicationSectionStatusCell({
   status,
 }: {
-  status?: ApplicationEventStatusChoice;
+  status?: ApplicationSectionStatusChoice;
 }): JSX.Element {
-  const text = `ApplicationEvent.statuses.${status}`;
+  const text = `ApplicationSectionStatusChoice.${status}`;
   return (
     <StatusCell
       text={text}
-      icon={<ApplicationEventStatusIcon status={status} />}
+      icon={<ApplicationSectionStatusIcon status={status} />}
     />
   );
+}
+
+export function TimeSlotStatusCell({
+  status,
+}: {
+  status: "declined" | "approved";
+}): JSX.Element {
+  const text = `TimeSlotStatusCell.${status}`;
+  // TODO refactor the Status Dot not to require an enum status (pass the colour / custom status as a prop)
+  const icon =
+    status === "approved" ? (
+      <StatusDot aria-hidden status={ApplicationStatusChoice.Handled} />
+    ) : (
+      <StatusDot aria-hidden status={ApplicationStatusChoice.InAllocation} />
+    );
+
+  return <StatusCell text={text} icon={icon} />;
 }

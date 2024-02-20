@@ -1,8 +1,5 @@
 /// Plain js / ts helper functions
-import {
-  ReservationsReservationTypeChoices,
-  ReservationType,
-} from "common/types/gql-types";
+import { ReservationType, Type } from "common/types/gql-types";
 
 import { addSeconds } from "date-fns";
 
@@ -12,7 +9,7 @@ export type CollisionInterval = {
   start: Date;
   end: Date;
   buffers: { before: number; after: number };
-  type?: ReservationsReservationTypeChoices;
+  type?: Type;
 };
 
 /// @brief Check if two intervals collide
@@ -35,7 +32,7 @@ export const doesIntervalCollide = (
 /// @desc Special handling for Blocked reservations since they don't collide with buffers.
 export const reservationToInterval = (
   x: ReservationType,
-  comparisonReservationType: ReservationsReservationTypeChoices
+  comparisonReservationType: Type
 ): CollisionInterval | undefined => {
   if (!x || !x.begin || !x.end) {
     return undefined;
@@ -45,16 +42,14 @@ export const reservationToInterval = (
     end: new Date(x.end),
     buffers: {
       before:
-        comparisonReservationType !==
-          ReservationsReservationTypeChoices.Blocked &&
-        x.type !== ReservationsReservationTypeChoices.Blocked &&
+        comparisonReservationType !== Type.Blocked &&
+        x.type !== Type.Blocked &&
         x.bufferTimeBefore
           ? x.bufferTimeBefore
           : 0,
       after:
-        comparisonReservationType !==
-          ReservationsReservationTypeChoices.Blocked &&
-        x.type !== ReservationsReservationTypeChoices.Blocked &&
+        comparisonReservationType !== Type.Blocked &&
+        x.type !== Type.Blocked &&
         x.bufferTimeAfter
           ? x.bufferTimeAfter
           : 0,

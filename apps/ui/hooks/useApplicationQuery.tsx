@@ -1,20 +1,23 @@
 import { useQuery } from "@apollo/client";
-import type { Query, QueryApplicationsArgs } from "common/types/gql-types";
+import type { Query, QueryApplicationArgs } from "common/types/gql-types";
 import { APPLICATION_QUERY } from "common/src/queries/application";
+import { base64encode } from "common/src/helpers";
 
 export const useApplicationQuery = (pk?: number) => {
-  const { data, error, loading } = useQuery<Query, QueryApplicationsArgs>(
+  const typename = "ApplicationNode";
+  const id = base64encode(`${typename}:${pk}`);
+  const { data, error, loading } = useQuery<Query, QueryApplicationArgs>(
     APPLICATION_QUERY,
     {
       variables: {
-        pk: [pk ?? 0],
+        id,
       },
       skip: !pk,
     }
   );
 
   return {
-    application: data?.applications?.edges[0]?.node,
+    application: data?.application ?? null,
     error,
     isLoading: loading,
   };

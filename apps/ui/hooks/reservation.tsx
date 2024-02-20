@@ -11,7 +11,7 @@ import {
   ReservationDeleteMutationInput,
   ReservationDeleteMutationPayload,
   ReservationType,
-  ReservationsReservationStateChoices,
+  State,
   UserType,
 } from "common/types/gql-types";
 import {
@@ -133,7 +133,7 @@ export function useReservation({ reservationPk }: UseReservationProps): {
 
 type UseReservationsProps = {
   currentUser?: UserType;
-  states?: ReservationsReservationStateChoices[];
+  states?: State[];
   orderBy?: string;
 };
 

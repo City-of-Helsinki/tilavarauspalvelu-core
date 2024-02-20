@@ -16,7 +16,7 @@ import {
   type Mutation,
   type ApplicationNode,
   type MutationCancelApplicationArgs,
-  ApplicationsApplicationApplicantTypeChoices,
+  ApplicantTypeChoice,
 } from "common/types/gql-types";
 import {
   isActive,
@@ -138,10 +138,7 @@ type Props = {
 };
 
 const getApplicant = (application: ApplicationNode, t: TFunction): string => {
-  if (
-    application.applicantType ===
-    ApplicationsApplicationApplicantTypeChoices.Individual
-  ) {
+  if (application.applicantType === ApplicantTypeChoice.Individual) {
     return t("applicationCard:person");
   }
   if (application.organisation) {

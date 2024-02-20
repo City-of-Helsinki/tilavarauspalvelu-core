@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { fromUIDate } from "common/src/common/util";
-import { ReservationUnitsReservationUnitReservationStartIntervalChoices } from "common/types/gql-types";
+import { ReservationStartInterval } from "common/types/gql-types";
 import { intervalToNumber } from "./utils";
 import { checkTimeStringFormat, checkValidFutureDate } from "./schemaCommon";
 import { constructApiDate } from "@/helpers";
@@ -75,9 +75,7 @@ export const checkReservationInterval = (
   }
 };
 
-const ReservationFormSchemaRefined = (
-  interval: ReservationUnitsReservationUnitReservationStartIntervalChoices
-) =>
+const ReservationFormSchemaRefined = (interval: ReservationStartInterval) =>
   ReservationFormSchema.partial()
     .superRefine((val, ctx) => {
       if (val.date) {
@@ -121,7 +119,7 @@ const ReservationFormSchemaRefined = (
 
 // NOTE duplicated schema because schemas need to be refined after merge (only times in this case)
 export const TimeChangeFormSchemaRefined = (
-  interval: ReservationUnitsReservationUnitReservationStartIntervalChoices
+  interval: ReservationStartInterval
 ) =>
   TimeFormSchema.partial()
     .superRefine((val, ctx) => {

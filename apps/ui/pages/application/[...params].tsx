@@ -19,7 +19,7 @@ import {
   ApplicationFormSchema,
   type ApplicationFormValues,
   transformApplication,
-  convertApplicationToForm,
+  convertApplication,
 } from "@/components/application/Form";
 import useReservationUnitsList from "@/hooks/useReservationUnitList";
 import { useApplicationUpdate } from "@/hooks/useApplicationUpdate";
@@ -28,6 +28,7 @@ import { useApplicationQuery } from "@/hooks/useApplicationQuery";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { locale } = ctx;
@@ -38,11 +39,23 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const [id, slug] = params ?? [];
   const pk = Number.isNaN(Number(id)) ? null : Number(id);
 
+  if (pk == null) {
+    return {
+      props: {
+        ...getCommonServerSideProps(),
+        notFound: true,
+        slug,
+        ...(await serverSideTranslations(locale ?? "fi")),
+      },
+      notFound: true,
+    };
+  }
+
   return {
     props: {
       ...getCommonServerSideProps(),
       key: locale,
-      id: pk,
+      pk,
       slug,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
@@ -92,10 +105,7 @@ const ApplicationRootPage = ({
 
   const form = useForm<ApplicationFormValues>({
     mode: "onChange",
-    defaultValues: convertApplicationToForm(
-      application,
-      selectedReservationUnits
-    ),
+    defaultValues: convertApplication(application, selectedReservationUnits),
     resolver: zodResolver(ApplicationFormSchema),
   });
 
@@ -111,7 +121,7 @@ const ApplicationRootPage = ({
       const resUnits = selectedReservationUnits.filter(
         (ru) => ru?.pk != null && unitsInApplicationRound.includes(ru.pk)
       );
-      reset(convertApplicationToForm(application, resUnits));
+      reset(convertApplication(application, resUnits));
     }
   }, [
     application,
@@ -153,12 +163,15 @@ const ApplicationRootPage = ({
   );
 };
 
-const ApplicationPageWithQuery = ({ id, slug }: Props): JSX.Element | null => {
+const ApplicationPageWithQuery = ({
+  pk,
+  slug,
+}: PropsNarrowed): JSX.Element | null => {
   const router = useRouter();
   const { t } = useTranslation();
 
   const { application, error, isLoading } = useApplicationQuery(
-    id ?? undefined
+    pk ?? undefined
   );
 
   if (error != null) {
@@ -174,7 +187,7 @@ const ApplicationPageWithQuery = ({ id, slug }: Props): JSX.Element | null => {
 
   const applicationRound = application?.applicationRound ?? undefined;
 
-  if (id == null) {
+  if (pk == null) {
     return <Error statusCode={404} />;
   }
   if (isLoading) {

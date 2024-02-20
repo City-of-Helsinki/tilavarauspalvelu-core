@@ -13,12 +13,12 @@ import {
   type Query,
   type QueryReservationsArgs,
   type QueryReservationUnitByPkArgs,
-  ReservationsReservationStateChoices,
-  ReservationsReservationTypeChoices,
+  State,
   type ReservationType,
   type ReservationUnitByPkType,
   type ReservationUnitByPkTypeReservableTimeSpansArgs,
   type ReservationUnitByPkTypeReservationsArgs,
+  Type,
 } from "common/types/gql-types";
 import { pick } from "lodash";
 import { useRouter } from "next/router";
@@ -57,11 +57,11 @@ type Props = {
   logout?: () => void;
 };
 
-const allowedReservationStates: ReservationsReservationStateChoices[] = [
-  ReservationsReservationStateChoices.Created,
-  ReservationsReservationStateChoices.Confirmed,
-  ReservationsReservationStateChoices.RequiresHandling,
-  ReservationsReservationStateChoices.WaitingForPayment,
+const allowedReservationStates: State[] = [
+  State.Created,
+  State.Confirmed,
+  State.RequiresHandling,
+  State.WaitingForPayment,
 ];
 
 /* TODO margins should be in page layout component, not custom for every page */
@@ -272,7 +272,7 @@ const ReservationEdit = ({ id, apiBaseUrl }: Props): JSX.Element => {
     const reservations = filterNonNullable(
       userReservationsData?.reservations?.edges?.map((e) => e?.node)
     )
-      .filter((n) => n.type === ReservationsReservationTypeChoices.Normal)
+      .filter((n) => n.type === Type.Normal)
       .filter((n) => allowedReservationStates.includes(n.state));
     setUserReservations(reservations);
   }, [userReservationsData]);

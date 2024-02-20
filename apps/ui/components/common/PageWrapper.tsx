@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { BannerNotificationsList } from "common/src/components";
-import { CommonBannerNotificationTargetChoices } from "common/types/gql-types";
+import { BannerNotificationTarget } from "common/types/gql-types";
 import Footer from "./Footer";
 import { Navigation } from "./Navigation/Navigation";
 import Title from "./Title";
@@ -32,7 +32,7 @@ function PageWrapper({
       <Navigation apiBaseUrl={apiBaseUrl} profileLink={profileLink} />
       <BannerNotificationsList
         centered
-        target={CommonBannerNotificationTargetChoices.User}
+        target={BannerNotificationTarget.User}
       />
       <UnpaidReservationNotification />
       <Main

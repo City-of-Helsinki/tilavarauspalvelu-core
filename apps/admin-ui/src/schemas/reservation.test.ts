@@ -1,4 +1,4 @@
-import { ReservationUnitsReservationUnitReservationStartIntervalChoices } from "common/types/gql-types";
+import { ReservationStartInterval } from "common/types/gql-types";
 import { addDays, addHours, format, setMinutes, subDays } from "date-fns";
 import { ReservationFormSchema } from "./reservation";
 
@@ -24,7 +24,7 @@ describe("with schema", () => {
     };
 
     const res = ReservationFormSchema(
-      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
+      ReservationStartInterval.Interval_15Mins
     ).safeParse(reservation);
     expect(res.success).toBeTruthy();
   });
@@ -42,7 +42,7 @@ describe("with schema", () => {
     };
 
     const res = ReservationFormSchema(
-      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
+      ReservationStartInterval.Interval_15Mins
     ).safeParse(reservation);
     expect(res.success).toBeFalsy();
     if (!res.success) {
@@ -68,7 +68,7 @@ describe("with schema", () => {
     };
 
     const res = ReservationFormSchema(
-      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_30Mins
+      ReservationStartInterval.Interval_30Mins
     ).safeParse(reservation);
     expect(res.success).toBeTruthy();
   });
@@ -87,7 +87,7 @@ describe("with schema", () => {
     };
 
     const res = ReservationFormSchema(
-      ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_30Mins
+      ReservationStartInterval.Interval_30Mins
     ).safeParse(reservation);
     expect(res.success).toBeFalsy();
     if (!res.success) {

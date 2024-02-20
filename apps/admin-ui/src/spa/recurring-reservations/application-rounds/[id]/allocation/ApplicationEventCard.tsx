@@ -3,8 +3,8 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled, { css } from "styled-components";
 import type {
-  ApplicationEventNode,
-  ApplicationEventScheduleNode,
+  AllocatedTimeSlotNode,
+  ApplicationSectionNode,
 } from "common/types/gql-types";
 import { SemiBold, type ReservationUnitNode, fontMedium } from "common";
 import { PUBLIC_URL } from "@/common/const";
@@ -12,25 +12,26 @@ import { getApplicantName } from "@/component/applications/util";
 import { ageGroup } from "@/component/reservations/requested/util";
 import { filterNonNullable } from "common/src/helpers";
 import {
+  convertWeekday,
   createDurationString,
   formatTime,
 } from "./modules/applicationRoundAllocation";
 
-export type AllocationApplicationEventCardType =
+export type AllocationApplicationSectionCardType =
   | "unallocated"
   | "allocated"
   | "partial"
   | "declined";
 
 type Props = {
-  applicationEvent: ApplicationEventNode;
-  focusedApplicationEvent?: ApplicationEventNode;
-  setFocusedApplicationEvent: (val?: ApplicationEventNode) => void;
-  reservationUnit?: ReservationUnitNode;
-  type: AllocationApplicationEventCardType;
+  applicationSection: ApplicationSectionNode;
+  focusedApplicationSection?: ApplicationSectionNode;
+  setFocusedApplicationSection: (val?: ApplicationSectionNode) => void;
+  reservationUnit: ReservationUnitNode;
+  type: AllocationApplicationSectionCardType;
 };
 
-const borderCss = css<{ $type: AllocationApplicationEventCardType }>`
+const borderCss = css<{ $type: AllocationApplicationSectionCardType }>`
   border: 1px solid var(--color-black-10);
   border-left: ${({ $type }) => {
     switch ($type) {
@@ -46,7 +47,7 @@ const borderCss = css<{ $type: AllocationApplicationEventCardType }>`
   }};
 `;
 
-const Card = styled.button<{ $type: AllocationApplicationEventCardType }>`
+const Card = styled.button<{ $type: AllocationApplicationSectionCardType }>`
   position: relative;
   display: flex;
   flex-direction: column;
@@ -123,14 +124,14 @@ const StyledLink = styled(Link)`
   }
 `;
 
-// TODO type is bad, it get's prop drilled and it should be gotten from applicationEvent instead
+// TODO type is bad, it get's prop drilled and it should be gotten from applicationSection instead
 // if not it shold be renamed to status? "declined" | "allocated" | "unallocated" | "partiallyAllocated"
 // or variation since it's used only for styling
 // TODO rename, this is the Listing Card / Info Card, that doesn't have any functionality
-export function ApplicationEventCard({
-  applicationEvent,
-  focusedApplicationEvent,
-  setFocusedApplicationEvent,
+export function ApplicationSectionCard({
+  applicationSection,
+  focusedApplicationSection,
+  setFocusedApplicationSection,
   reservationUnit,
   type,
 }: Props): JSX.Element | null {
@@ -138,49 +139,46 @@ export function ApplicationEventCard({
 
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const application = applicationEvent.application ?? null;
+  const application = applicationSection.application ?? null;
 
   // TODO can we pass through without application?
   if (application?.pk == null) {
     // eslint-disable-next-line no-console
-    console.warn("ApplicationEventCard: application is missing");
+    console.warn("ApplicationSectionCard: application is missing");
     return null;
   }
-  if (!applicationEvent) {
+  if (!applicationSection) {
     // eslint-disable-next-line no-console
-    console.warn("ApplicationEventCard: applicationEvent is missing");
+    console.warn("ApplicationSectionCard: applicationSection is missing");
     return null;
   }
 
   const applicantName = getApplicantName(application);
-  const isActive = applicationEvent === focusedApplicationEvent;
-  const durationString = createDurationString(applicationEvent, t);
+  const isActive = applicationSection === focusedApplicationSection;
+  const durationString = createDurationString(applicationSection, t);
 
   const nReservationUnits =
-    applicationEvent?.eventReservationUnits?.length ?? -1;
+    applicationSection?.reservationUnitOptions?.length ?? -1;
   const n =
-    applicationEvent?.eventReservationUnits?.findIndex(
+    applicationSection?.reservationUnitOptions?.findIndex(
       (ru) => ru?.reservationUnit?.pk === reservationUnit?.pk
     ) ?? -1;
 
   const toggleSelection = () => {
     if (isActive) {
-      setFocusedApplicationEvent();
+      setFocusedApplicationSection();
     } else {
-      setFocusedApplicationEvent(applicationEvent);
+      setFocusedApplicationSection(applicationSection);
     }
   };
 
-  const schedules = filterNonNullable(
-    applicationEvent.applicationEventSchedules
-  );
   return (
     <Card $type={type}>
       <TitleWrapper>
         {/* TODO Radio button can't be controlled, the typical hds problem, so if we use query params to make it active it doesn't work */}
         <StyledRadioButton
-          id={`applicationEvent-${applicationEvent.pk}`}
-          label={applicationEvent.name}
+          id={`applicationSection-${applicationSection.pk}`}
+          label={applicationSection.name}
           checked={isActive}
           onClick={() => toggleSelection()}
           $topPadding
@@ -190,41 +188,39 @@ export function ApplicationEventCard({
         </ToggleButton>
       </TitleWrapper>
       <Applicant>
-        {applicationEvent.pk}, {applicantName}
+        {applicationSection.pk}, {applicantName}
       </Applicant>
       <Details $hidden={!isExpanded}>
-        {schedules.filter((x) => x.allocatedDay != null).length > 0 && (
-          <SchedulesList
-            schedules={schedules}
-            reservationUnitPk={reservationUnit?.pk ?? 0}
-            eventsPerWeek={applicationEvent.eventsPerWeek ?? 0}
-          />
-        )}
+        <SchedulesList
+          section={applicationSection}
+          currentReservationUnit={reservationUnit}
+          eventsPerWeek={applicationSection.appliedReservationsPerWeek ?? 0}
+        />
         <StyledLink
           // TODO use an url constructor
-          href={`${PUBLIC_URL}/application/${application.pk}/details#${applicationEvent.pk}`}
+          href={`${PUBLIC_URL}/application/${application.pk}/details#${applicationSection.pk}`}
           external
           openInNewTab
           openInExternalDomainAriaLabel={t("common.openToNewTab")}
         >
           {t("Allocation.openApplication")}{" "}
           <b>
-            {applicationEvent.application.pk}-{applicationEvent.pk}
+            {applicationSection.application.pk}-{applicationSection.pk}
           </b>
         </StyledLink>
         <div>
           {t("Allocation.ageGroup")}:{" "}
           <SemiBold>
             {t("common.agesSuffix", {
-              range: ageGroup(applicationEvent.ageGroup),
+              range: ageGroup(applicationSection.ageGroup),
             })}
-            , {applicationEvent.numPersons} {t("common.peopleSuffixShort")}
+            , {applicationSection.numPersons} {t("common.peopleSuffixShort")}
           </SemiBold>
         </div>
         <div>
           {t("Allocation.applicationsWeek")}:{" "}
           <SemiBold>
-            {durationString}, x{applicationEvent.eventsPerWeek}
+            {durationString}, x{applicationSection.appliedReservationsPerWeek}
           </SemiBold>
         </div>
         <div>
@@ -252,28 +248,46 @@ const SelectionListCount = styled.div`
 `;
 
 function SchedulesList({
-  schedules,
-  reservationUnitPk,
+  section,
+  currentReservationUnit,
   eventsPerWeek,
 }: {
-  schedules: ApplicationEventScheduleNode[];
-  reservationUnitPk: number;
+  currentReservationUnit: ReservationUnitNode;
+  section: ApplicationSectionNode;
   eventsPerWeek: number;
 }): JSX.Element {
   const { t } = useTranslation();
 
-  const allocatedSchedules = schedules
-    .filter((schedule) => schedule.allocatedDay != null)
-    .sort((a, b) => (a.allocatedDay ?? 0) - (b.allocatedDay ?? 0));
+  // TODO not pretty or clear
+  // NOTE we want only the allocated slots here, but we need the information about which reservation unit it's allocated to
+  // this information is not available in the allocated time slot (it could be, but because it causes extra query complexity, it's not).
+  const resUnitOpts = section.reservationUnitOptions?.filter(
+    (ruo) => ruo.allocatedTimeSlots != null && ruo.allocatedTimeSlots.length > 0
+  );
+  const allocatedSchedules = filterNonNullable(
+    resUnitOpts?.flatMap((ruo) => {
+      if (ruo.allocatedTimeSlots == null) {
+        return null;
+      }
+      return [
+        ...ruo.allocatedTimeSlots.map((ats) => ({
+          ...ats,
+          reservationUnitOption: ruo,
+        })),
+      ];
+    })
+  ).sort(
+    (a, b) => convertWeekday(a.dayOfTheWeek) - convertWeekday(b.dayOfTheWeek)
+  );
 
   const nToAllocate = eventsPerWeek - allocatedSchedules.length;
   return (
     <SelectionListContainer>
-      {allocatedSchedules.map((schedule) => (
+      {allocatedSchedules.map((ats) => (
         <ScheduleSection
-          key={schedule.pk}
-          schedule={schedule}
-          reservationUnitPk={reservationUnitPk}
+          key={ats.pk}
+          allocatedTimeSlot={ats}
+          currentReservationUnit={currentReservationUnit}
         />
       ))}
       {nToAllocate > 0 && (
@@ -294,38 +308,38 @@ const ScheduleCard = styled.div`
   text-align: left;
 `;
 
+// TODO these are only for allocated schedules => rename
 function ScheduleSection({
-  schedule,
-  reservationUnitPk,
+  allocatedTimeSlot,
+  currentReservationUnit,
 }: {
-  schedule: ApplicationEventScheduleNode;
-  reservationUnitPk: number;
+  allocatedTimeSlot: AllocatedTimeSlotNode;
+  currentReservationUnit: ReservationUnitNode;
 }): JSX.Element {
   const { t } = useTranslation();
 
-  const isAllocated = schedule.allocatedDay != null;
-  const day = isAllocated ? schedule.allocatedDay : schedule.day;
-  const begin =
-    (isAllocated ? schedule.allocatedBegin : schedule.begin) ?? undefined;
-  const end = (isAllocated ? schedule.allocatedEnd : schedule.end) ?? undefined;
-  const reservationUnit = schedule.allocatedReservationUnit ?? null;
+  const day = convertWeekday(allocatedTimeSlot.dayOfTheWeek);
+  const begin = allocatedTimeSlot.beginTime;
+  const end = allocatedTimeSlot.endTime;
+  const allocatedReservationUnit =
+    allocatedTimeSlot.reservationUnitOption?.reservationUnit;
 
-  const isAllocatedInDifferentReservationUnit =
-    schedule.allocatedReservationUnit != null &&
-    schedule.allocatedReservationUnit.pk !== reservationUnitPk;
+  const isInDifferentUnit =
+    allocatedReservationUnit != null &&
+    allocatedReservationUnit.pk !== currentReservationUnit.pk;
 
   return (
-    <ScheduleCard key={schedule.pk}>
-      {/* TODO functionality for selecting the schedule vs. an applicationEvent */}
+    <ScheduleCard key={allocatedTimeSlot.pk}>
+      {/* TODO functionality for selecting the schedule vs. an applicationSection */}
       <StyledRadioButton
-        id={`applicationEventSchedule-${schedule.pk}`}
-        disabled={isAllocatedInDifferentReservationUnit}
+        id={`applicationSectionSchedule-${allocatedTimeSlot.pk}`}
+        disabled={isInDifferentUnit}
       />
       <div>
         <SemiBold>
           {t(`dayShort.${day}`)} {formatTime(begin)}-{formatTime(end)}
         </SemiBold>
-        {isAllocated ? <div>{reservationUnit?.nameFi ?? "-"}</div> : null}
+        <div>{allocatedReservationUnit?.nameFi ?? "-"}</div>
       </div>
     </ScheduleCard>
   );

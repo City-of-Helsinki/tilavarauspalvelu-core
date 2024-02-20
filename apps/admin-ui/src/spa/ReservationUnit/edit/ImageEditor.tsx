@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { Button, FileInput } from "hds-react";
-import { ReservationUnitsReservationUnitImageImageTypeChoices } from "common/types/gql-types";
+import { ImageType } from "common/types/gql-types";
 import { AutoGrid } from "@/styles/layout";
 import { type ImageFormType } from "./form";
 
@@ -85,9 +85,7 @@ function ReservationUnitImage({
   deleteImage: (pk: number) => void;
   image: ImageFormType;
 }) {
-  const isMain =
-    image.imageType ===
-    ReservationUnitsReservationUnitImageImageTypeChoices.Main;
+  const isMain = image.imageType === ImageType.Main;
   const { t } = useTranslation();
   return (
     <div>
@@ -125,10 +123,7 @@ export function ImageEditor({ images, setImages }: Props): JSX.Element {
   const { t } = useTranslation();
 
   const addImage = (files: File[]) => {
-    const imageType =
-      images.length === 0
-        ? ReservationUnitsReservationUnitImageImageTypeChoices.Main
-        : ReservationUnitsReservationUnitImageImageTypeChoices.Other;
+    const imageType = images.length === 0 ? ImageType.Main : ImageType.Other;
 
     const newImage: ImageFormType = {
       pk: fakePk,
@@ -156,10 +151,7 @@ export function ImageEditor({ images, setImages }: Props): JSX.Element {
     setImages(
       images.map((image) => ({
         ...image,
-        imageType:
-          pk === image.pk
-            ? ReservationUnitsReservationUnitImageImageTypeChoices.Main
-            : ReservationUnitsReservationUnitImageImageTypeChoices.Other,
+        imageType: pk === image.pk ? ImageType.Main : ImageType.Other,
       }))
     );
   };

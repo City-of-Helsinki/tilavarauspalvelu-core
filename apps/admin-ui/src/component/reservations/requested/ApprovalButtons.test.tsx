@@ -1,10 +1,7 @@
 import React from "react";
 import { render } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
-import {
-  type ReservationType,
-  ReservationsReservationStateChoices,
-} from "common/types/gql-types";
+import { type ReservationType, State } from "common/types/gql-types";
 import { addDays, addMinutes } from "date-fns";
 import ApprovalButtons from "./ApprovalButtons";
 
@@ -25,7 +22,7 @@ const wrappedRender = (reservation: ReservationType) => {
 describe("State change rules", () => {
   test("Return and Deny are enabled for future Confirmed events", async () => {
     const res = {
-      state: ReservationsReservationStateChoices.Confirmed,
+      state: State.Confirmed,
       end: addDays(new Date(), 2).toISOString(),
       recurringReservation: undefined,
     } as ReservationType;
@@ -44,7 +41,7 @@ describe("State change rules", () => {
 
   test("Approve and deny are enabled for future RequiresHandling", async () => {
     const res = {
-      state: ReservationsReservationStateChoices.RequiresHandling,
+      state: State.RequiresHandling,
       end: addDays(new Date(), 2).toISOString(),
       recurringReservation: undefined,
     } as ReservationType;
@@ -61,7 +58,7 @@ describe("State change rules", () => {
 
   test("Only Return to Handling is enabled if Denied", async () => {
     const res = {
-      state: ReservationsReservationStateChoices.Denied,
+      state: State.Denied,
       end: addDays(new Date(), 2).toISOString(),
       recurringReservation: undefined,
     } as ReservationType;
@@ -78,7 +75,7 @@ describe("State change rules", () => {
 
   test("Past Confirmed all buttons are disabled", async () => {
     const res = {
-      state: ReservationsReservationStateChoices.Confirmed,
+      state: State.Confirmed,
       end: addDays(new Date(), -2).toISOString(),
       recurringReservation: undefined,
     } as ReservationType;
@@ -88,7 +85,7 @@ describe("State change rules", () => {
 
   test("Past Denied all buttons are disabled", async () => {
     const res = {
-      state: ReservationsReservationStateChoices.Denied,
+      state: State.Denied,
       end: addDays(new Date(), -2).toISOString(),
       recurringReservation: undefined,
     } as ReservationType;
@@ -98,7 +95,7 @@ describe("State change rules", () => {
 
   test("Past RequiresHandling can be Denied", async () => {
     const res = {
-      state: ReservationsReservationStateChoices.RequiresHandling,
+      state: State.RequiresHandling,
       end: addDays(new Date(), -2).toISOString(),
       recurringReservation: undefined,
     } as ReservationType;
@@ -115,7 +112,7 @@ describe("State change rules", () => {
 describe("Editing allowed", () => {
   test("Editing is allowed for future Confirmed events", async () => {
     const res = {
-      state: ReservationsReservationStateChoices.Confirmed,
+      state: State.Confirmed,
       end: addDays(new Date(), 2).toISOString(),
       recurringReservation: undefined,
     } as ReservationType;
@@ -129,7 +126,7 @@ describe("Editing allowed", () => {
 
   test("No editing if the event isn't Confirmed", async () => {
     const res = {
-      state: ReservationsReservationStateChoices.RequiresHandling,
+      state: State.RequiresHandling,
       end: addDays(new Date(), 2).toISOString(),
       recurringReservation: undefined,
     } as ReservationType;
@@ -139,32 +136,32 @@ describe("Editing allowed", () => {
 
     const view2 = wrappedRender({
       ...res,
-      state: ReservationsReservationStateChoices.Denied,
+      state: State.Denied,
     });
     expect(view2.queryAllByRole("link")).toHaveLength(0);
 
     const view3 = wrappedRender({
       ...res,
-      state: ReservationsReservationStateChoices.Cancelled,
+      state: State.Cancelled,
     });
     expect(view3.queryAllByRole("link")).toHaveLength(0);
 
     const view4 = wrappedRender({
       ...res,
-      state: ReservationsReservationStateChoices.WaitingForPayment,
+      state: State.WaitingForPayment,
     });
     expect(view4.queryAllByRole("link")).toHaveLength(0);
 
     const view5 = wrappedRender({
       ...res,
-      state: ReservationsReservationStateChoices.Created,
+      state: State.Created,
     });
     expect(view5.queryAllByRole("link")).toHaveLength(0);
   });
 
   test("Past Confirmed has a one hour edit window", async () => {
     const res = {
-      state: ReservationsReservationStateChoices.Confirmed,
+      state: State.Confirmed,
       end: addMinutes(new Date(), -45).toISOString(),
       recurringReservation: undefined,
     } as ReservationType;

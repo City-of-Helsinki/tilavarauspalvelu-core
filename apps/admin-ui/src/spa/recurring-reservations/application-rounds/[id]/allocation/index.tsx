@@ -9,30 +9,39 @@ import { H1, fontBold, fontMedium } from "common/src/common/typography";
 import { ShowAllContainer } from "common/src/components";
 import {
   type Query,
-  type QueryApplicationEventsArgs,
+  type QueryApplicationSectionsArgs,
   type UnitType,
-  type QueryApplicationsArgs,
   ApplicantTypeChoice,
   ApplicationRoundStatusChoice,
+  Priority,
+  type QueryApplicationRoundArgs,
+  type QueryAffectingAllocatedTimeSlotsArgs,
+  type ApplicationRoundNode,
 } from "common/types/gql-types";
 import { type ReservationUnitNode, breakpoints } from "common";
-import { filterNonNullable } from "common/src/helpers";
+import { base64encode, filterNonNullable } from "common/src/helpers";
 import { SearchTags } from "@/component/SearchTags";
 import Loader from "@/component/Loader";
 import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import { useOptions } from "@/component/my-units/hooks";
 import { Container as BaseContainer, autoGridCss } from "@/styles/layout";
 import { useNotification } from "@/context/NotificationContext";
-import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
+import {
+  ALLOCATION_POLL_INTERVAL,
+  VALID_ALLOCATION_APPLICATION_STATUSES,
+} from "@/common/const";
 import usePermission from "@/hooks/usePermission";
 import { Permission } from "@/modules/permissionHelper";
 import { truncate } from "@/helpers";
 import {
   ALL_EVENTS_PER_UNIT_QUERY,
-  ALLOCATION_UNFILTERED_QUERY,
+  APPLICATION_ROUND_FILTER_OPTIONS,
 } from "./queries";
-import { ApplicationEvents } from "./ApplicationEvents";
-import { APPLICATIONS_EVENTS_QUERY } from "../review/queries";
+import { AllocationPageContent } from "./ApplicationEvents";
+import {
+  AFFECTING_ALLOCATED_TIME_SLOTS_QUERY,
+  APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY,
+} from "../review/queries";
 import { ComboboxFilter, SearchFilter } from "@/component/QueryParamFilters";
 
 const MAX_RES_UNIT_NAME_LENGTH = 35;
@@ -199,12 +208,16 @@ function Filters({
 }
 
 function ApplicationRoundAllocation({
+  applicationRound,
   applicationRoundId,
   units,
   reservationUnits,
   roundName,
   applicationRoundStatus,
 }: {
+  // TODO don't like the undefined, but I hate spinners
+  applicationRound?: ApplicationRoundNode;
+  // TODO refactor the others to use the RoundNode
   applicationRoundId: number;
   units: UnitType[];
   reservationUnits: ReservationUnitNode[];
@@ -259,16 +272,17 @@ function ApplicationRoundAllocation({
   // backend returns an error on invalid filter values, but user can cause them by manipulating the url
   const priorityFilterSanitized = priorityFilter
     ?.map((x) => Number(x))
-    .reduce<Array<200 | 300>>((acc, x) => {
-      if (x === 200 || x === 300) {
-        return [...acc, x];
+    .reduce<Array<Priority.Secondary | Priority.Primary>>((acc, x) => {
+      if (x === 200) {
+        return [...acc, Priority.Secondary];
+      } else if (x === 300) {
+        return [...acc, Priority.Primary];
       }
       return acc;
     }, []);
 
-  // NOTE Default to 300 and 200 because there is a hidden 100 value that is not used
   const priorityFilterQuery =
-    priorityFilterSanitized.length > 0 ? priorityFilterSanitized : [300, 200];
+    priorityFilterSanitized.length > 0 ? priorityFilterSanitized : null;
   const ageGroupFilterQuery = ageGroupFilter
     .map(Number)
     .filter(Number.isFinite);
@@ -280,30 +294,32 @@ function ApplicationRoundAllocation({
   const reservationUnitFilterQuery = Number.isFinite(
     Number(selectedReservationUnit)
   )
-    ? [Number(selectedReservationUnit)]
-    : undefined;
-  const unitFilterQuery = Number.isFinite(Number(unitFilter))
-    ? [Number(unitFilter)]
-    : undefined;
+    ? Number(selectedReservationUnit)
+    : null;
   const preferredOrderFilterQuery = orderFilter
     .map(Number)
     .filter((x) => x >= 0 && x <= 10);
   const includePreferredOrder10OrHigher =
     orderFilter.length > 0
       ? orderFilter.filter((x) => Number(x) > 10).length > 0
-      : undefined;
+      : null;
 
   const { data, refetch, previousData } = useQuery<
     Query,
-    QueryApplicationEventsArgs
-  >(APPLICATIONS_EVENTS_QUERY, {
-    skip: !applicationRoundId,
+    // NOTE specialised variation of the query so the params don't match the generate types
+    Omit<QueryApplicationSectionsArgs, "reservationUnit"> & {
+      reservationUnit: number;
+    }
+  >(APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY, {
+    // On purpose skip if the reservation unit is not selected (it is required)
+    skip: !applicationRoundId || reservationUnitFilterQuery == null,
+    pollInterval: ALLOCATION_POLL_INTERVAL,
     // NOTE required otherwise this returns stale data when filters change
     fetchPolicy: "cache-and-network",
     variables: {
       applicationRound: applicationRoundId,
       // TODO unit is superflous since we are filtering by reservation unit
-      unit: unitFilterQuery,
+      // unit: unitFilterQuery,
       priority: priorityFilterQuery,
       preferredOrder: preferredOrderFilterQuery,
       includePreferredOrder10OrHigher,
@@ -312,16 +328,57 @@ function ApplicationRoundAllocation({
       applicantType: applicantTypeFilterQuery,
       purpose: purposeFilterQuery,
       ageGroup: ageGroupFilterQuery,
-      reservationUnit: reservationUnitFilterQuery,
+      reservationUnit: reservationUnitFilterQuery ?? 0,
+      // TODO should we split this query into two?
+      // we need both the HANDLED and IN_ALLOCATION statuses
+      // but they function differently in the frontend
+      // one for already handled and one for not handled
+      // applicationStatus: [ApplicationStatusChoice.InAllocation],
       applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,
+      // TODO
+      // status: [ApplicationSectionStatusChoice.InAllocation],
     },
     onError: () => {
       notifyError(t("errors.errorFetchingData"));
     },
   });
 
+  if (
+    reservationUnitFilterQuery == null ||
+    applicationRound?.reservationPeriodBegin == null ||
+    applicationRound.reservationPeriodEnd == null
+  ) {
+    // eslint-disable-next-line no-console -- TODO use logger
+    console.warn(
+      "Skipping allocation query because reservation unit or reservation period is not set"
+    );
+  }
+  const {
+    data: affectingAllocationsData,
+    refetch: refetchAffectedAllocations,
+  } = useQuery<Query, QueryAffectingAllocatedTimeSlotsArgs>(
+    AFFECTING_ALLOCATED_TIME_SLOTS_QUERY,
+    {
+      // TODO skip is super bad here (it needs to be an error)
+      pollInterval: ALLOCATION_POLL_INTERVAL,
+      skip:
+        !reservationUnitFilterQuery ||
+        applicationRound?.reservationPeriodBegin == null ||
+        applicationRound.reservationPeriodEnd == null,
+      variables: {
+        reservationUnit: reservationUnitFilterQuery ?? 0,
+        beginDate: applicationRound?.reservationPeriodBegin ?? "",
+        endDate: applicationRound?.reservationPeriodEnd ?? "",
+      },
+    }
+  );
+  const affectingAllocations = filterNonNullable(
+    affectingAllocationsData?.affectingAllocatedTimeSlots
+  );
+
+  // NOTE get the count of all application sections for the selected reservation unit
   // TODO this can be combined with the above query (but requires casting the alias)
-  const { data: allEventsData } = useQuery<Query, QueryApplicationEventsArgs>(
+  const { data: allEventsData } = useQuery<Query, QueryApplicationSectionsArgs>(
     ALL_EVENTS_PER_UNIT_QUERY,
     {
       skip: !applicationRoundId || !selectedReservationUnit || !unitFilter,
@@ -336,15 +393,23 @@ function ApplicationRoundAllocation({
       fetchPolicy: "no-cache",
     }
   );
+  // TODO if there are no warnings from testing we can remove fetching all events and just use the totalCount
+  // default to zero because filter returns empty array if no data
+  const totalCount = allEventsData?.applicationSections?.totalCount ?? 0;
   const allEvents = filterNonNullable(
-    allEventsData?.applicationEvents?.edges.map((e) => e?.node)
+    allEventsData?.applicationSections?.edges.map((e) => e?.node)
   );
-  const totalNumberOfEvents = allEvents.length;
+  // TODO totalCount is fine, but we need to query the things we want to count otherwise it's off by a mile.
+  if (allEvents.length !== totalCount) {
+    // eslint-disable-next-line no-console -- TODO use logger
+    console.warn("Total count of application sections does not match");
+  }
+  const totalNumberOfEvents = totalCount; // allEvents.length;
 
   // TODO show loading state somewhere down the line
   const appEventsData = data ?? previousData;
-  const applicationEvents = filterNonNullable(
-    appEventsData?.applicationEvents?.edges.map((e) => e?.node)
+  const applicationSections = filterNonNullable(
+    appEventsData?.applicationSections?.edges.map((e) => e?.node)
   );
 
   const priorityOptions = ([300, 200] as const).map((n) => ({
@@ -461,12 +526,12 @@ function ApplicationRoundAllocation({
         </Tabs>
       </TabWrapper>
       <NumberOfResultsContainer>
-        {applicationEvents.length === totalNumberOfEvents ? (
+        {applicationSections.length === totalNumberOfEvents ? (
           t("Allocation.countAllResults", { count: totalNumberOfEvents })
         ) : (
           <>
             <NumberOfResults>
-              {applicationEvents.length} / {totalNumberOfEvents}
+              {applicationSections.length} / {totalNumberOfEvents}
             </NumberOfResults>
             {t("Allocation.countResultsPostfix")}
             <button type="button" onClick={handleResetFilters}>
@@ -475,14 +540,19 @@ function ApplicationRoundAllocation({
           </>
         )}
       </NumberOfResultsContainer>
-      <ApplicationEvents
-        applicationEvents={applicationEvents}
+      <AllocationPageContent
+        applicationSections={applicationSections}
         reservationUnit={
           unitReservationUnits.find(
             (x) => x.pk != null && x.pk.toString() === selectedReservationUnit
           ) || unitReservationUnits[0]
         }
-        refetchApplicationEvents={refetch}
+        relatedAllocations={affectingAllocations}
+        // TODO don't like awaiting the first one, we can run both queries simultaneously (but the return type doesn't match)
+        refetchApplicationEvents={async () => {
+          await refetchAffectedAllocations();
+          return refetch();
+        }}
         applicationRoundStatus={applicationRoundStatus}
       />
     </Container>
@@ -491,17 +561,19 @@ function ApplicationRoundAllocation({
 
 // Do a single full query to get filter / page data
 function AllocationWrapper({
+  // TODO rename to Pk
   applicationRoundId,
 }: {
   applicationRoundId: number;
 }): JSX.Element {
-  const { loading, error, data } = useQuery<Query, QueryApplicationsArgs>(
-    ALLOCATION_UNFILTERED_QUERY,
+  const typename = "ApplicationRoundNode";
+  const id = base64encode(`${typename}:${applicationRoundId}`);
+  const { loading, error, data } = useQuery<Query, QueryApplicationRoundArgs>(
+    APPLICATION_ROUND_FILTER_OPTIONS,
     {
       skip: !applicationRoundId,
       variables: {
-        applicationRound: applicationRoundId ?? 0,
-        status: VALID_ALLOCATION_APPLICATION_STATUSES,
+        id,
       },
     }
   );
@@ -521,11 +593,7 @@ function AllocationWrapper({
     return <p>{t("errors.errorFetchingData")}</p>;
   }
 
-  const applications = filterNonNullable(
-    data?.applications?.edges?.map((edge) => edge?.node)
-  );
-
-  const appRound = applications?.[0]?.applicationRound ?? undefined;
+  const appRound = data?.applicationRound;
   const reservationUnits = filterNonNullable(appRound?.reservationUnits);
   const unitData = reservationUnits.map((ru) => ru?.unit);
 
@@ -536,15 +604,17 @@ function AllocationWrapper({
     )
     .sort((a, b) => a?.nameFi?.localeCompare(b?.nameFi ?? "") ?? 0);
 
-  const roundName = applications?.[0]?.applicationRound?.nameFi ?? "";
+  const roundName = appRound?.nameFi ?? "-";
 
   const resUnits = uniqBy(filterNonNullable(reservationUnits), "pk").sort(
     (a, b) => a?.nameFi?.localeCompare(b?.nameFi ?? "") ?? 0
   );
+
   return (
     <>
       <BreadcrumbWrapper backLink=".." />
       <ApplicationRoundAllocation
+        applicationRound={appRound ?? undefined}
         applicationRoundId={applicationRoundId}
         units={units}
         reservationUnits={resUnits}

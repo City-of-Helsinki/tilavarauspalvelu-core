@@ -14,13 +14,13 @@ import {
 } from "common/src/calendar/util";
 import {
   type EquipmentType,
-  ReservationsReservationStateChoices,
   type ReservationUnitPricingType,
-  ReservationUnitsReservationUnitPricingPricingTypeChoices,
-  ReservationUnitsReservationUnitPricingStatusChoices,
   ReservationUnitState,
   type UnitType,
   type ReservationUnitByPkType,
+  State,
+  PricingType,
+  Status,
 } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { capitalize, getTranslation } from "./util";
@@ -137,17 +137,17 @@ export const getUnitName = (
 };
 
 export const getReservationUnitInstructionsKey = (
-  state: ReservationsReservationStateChoices
+  state: State
 ): string | null => {
   switch (state) {
-    case ReservationsReservationStateChoices.Created:
-    case ReservationsReservationStateChoices.RequiresHandling:
+    case State.Created:
+    case State.RequiresHandling:
       return "reservationPendingInstructions";
-    case ReservationsReservationStateChoices.Cancelled:
+    case State.Cancelled:
       return "reservationCancelledInstructions";
-    case ReservationsReservationStateChoices.Confirmed:
+    case State.Confirmed:
       return "reservationConfirmedInstructions";
-    case ReservationsReservationStateChoices.Denied:
+    case State.Denied:
     default:
       return null;
   }
@@ -185,11 +185,7 @@ export const getFuturePricing = (
   const now = toUIDate(new Date(), "yyyy-MM-dd");
 
   const futurePricings = pricings
-    .filter(
-      (pricing) =>
-        pricing?.status ===
-        ReservationUnitsReservationUnitPricingStatusChoices.Future
-    )
+    .filter((pricing) => pricing?.status === Status.Future)
     .filter((x): x is NonNullable<typeof x> => x != null)
     .filter((futurePricing) => futurePricing.begins > now)
     .filter((futurePricing) => {
@@ -307,12 +303,8 @@ export const isReservationUnitPaidInFuture = (
   return pricings
     .filter(
       (pricing) =>
-        [
-          ReservationUnitsReservationUnitPricingStatusChoices.Active,
-          ReservationUnitsReservationUnitPricingStatusChoices.Future,
-        ].includes(pricing.status) &&
-        pricing.pricingType ===
-          ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid
+        [Status.Active, Status.Future].includes(pricing.status) &&
+        pricing.pricingType === PricingType.Paid
     )
     .map((pricing) => getPrice({ pricing, asInt: true }))
     .some((n) => n !== "0");

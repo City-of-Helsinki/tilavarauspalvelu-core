@@ -4,17 +4,17 @@ import React, { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
-import { TFunction } from "i18next";
+import type { TFunction } from "i18next";
 import { add, startOfISOWeek } from "date-fns";
 import { breakpoints } from "common/src/common/style";
 import {
-  Maybe,
-  Query,
-  QueryReservationByPkArgs,
-  ReservationType,
-  ReservationsReservationReserveeTypeChoices,
-  ReservationUnitsReservationUnitPricingPricingTypeChoices,
-  ReservationsReservationStateChoices,
+  type Maybe,
+  type Query,
+  type QueryReservationByPkArgs,
+  type ReservationType,
+  ReserveeType,
+  PricingType,
+  State,
 } from "common/types/gql-types";
 import { Permission } from "@/modules/permissionHelper";
 import { useNotification } from "@/context/NotificationContext";
@@ -214,14 +214,14 @@ const ReservationSummary = ({
     : undefined;
 
   const cancelReasonString =
-    reservation.state === ReservationsReservationStateChoices.Cancelled
+    reservation.state === State.Cancelled
       ? {
           l: "RequestedReservation.cancelReason",
           v: reservation?.cancelReason?.reasonFi || "-",
         }
       : undefined;
   const rejectionReasonString =
-    reservation.state === ReservationsReservationStateChoices.Denied
+    reservation.state === State.Denied
       ? {
           l: "RequestedReservation.denyReason",
           v: reservation?.denyReason?.reasonFi || "-",
@@ -294,9 +294,7 @@ const TimeBlock = ({
   );
 
   const nextReservation = reservations.find(
-    (x) =>
-      x.state === ReservationsReservationStateChoices.Confirmed &&
-      new Date(x.begin) > new Date()
+    (x) => x.state === State.Confirmed && new Date(x.begin) > new Date()
   );
 
   const shownReservation =
@@ -379,8 +377,7 @@ const RequestedReservation = ({
     : undefined;
 
   const isNonFree =
-    pricing?.pricingType ===
-      ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid &&
+    pricing?.pricingType === PricingType.Paid &&
     parseFloat(pricing.highestPrice) >= 0;
 
   const reservationTagline = createTagString(reservation, t);
@@ -484,15 +481,11 @@ const RequestedReservation = ({
               <ApplicationData
                 label={t("RequestedReservation.reserveeType")}
                 data={translateType(reservation, t)}
-                wide={
-                  reservation.reserveeType ===
-                  ReservationsReservationReserveeTypeChoices.Individual
-                }
+                wide={reservation.reserveeType === ReserveeType.Individual}
               />
               <ApplicationData
                 label={t(
-                  reservation.reserveeType ===
-                    ReservationsReservationReserveeTypeChoices.Business
+                  reservation.reserveeType === ReserveeType.Business
                     ? "RequestedReservation.reserveeBusinessName"
                     : "RequestedReservation.reserveeOrganisationName"
                 )}

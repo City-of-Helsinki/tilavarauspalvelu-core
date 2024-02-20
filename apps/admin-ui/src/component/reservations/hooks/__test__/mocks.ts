@@ -1,12 +1,11 @@
 import { GraphQLError } from "graphql";
 import { addDays, addHours, set } from "date-fns";
 import {
-  ReservationType,
-  ReservationUnitsReservationUnitAuthenticationChoices,
-  ReservationUnitsReservationUnitReservationKindChoices,
-  ReservationUnitsReservationUnitReservationStartIntervalChoices,
-  ReservationsReservationPriorityChoices,
-  ReservationsReservationStateChoices,
+  type ReservationType,
+  Authentication,
+  ReservationKind,
+  ReservationStartInterval,
+  State,
 } from "common/types/gql-types";
 import {
   UPDATE_STAFF_RECURRING_RESERVATION,
@@ -67,7 +66,7 @@ const getValidInterval = (daysToAdd: number) => {
 const createRecurringEdges = (
   startingPk: number,
   recurringPk: number,
-  state: ReservationsReservationStateChoices = ReservationsReservationStateChoices.Confirmed
+  state: State = State.Confirmed
 ) => [
   {
     node: {
@@ -105,10 +104,7 @@ const correctRecurringReservationQueryResult = (
         pk: recurringPk,
         count: 100,
         offset: 0,
-        state: [
-          ReservationsReservationStateChoices.Confirmed,
-          ReservationsReservationStateChoices.Denied,
-        ],
+        state: [State.Confirmed, State.Denied],
       },
     },
     result: {
@@ -117,9 +113,7 @@ const correctRecurringReservationQueryResult = (
           edges: createRecurringEdges(
             startingPk,
             recurringPk,
-            options?.allDenied
-              ? ReservationsReservationStateChoices.Denied
-              : ReservationsReservationStateChoices.Confirmed
+            options?.allDenied ? State.Denied : State.Confirmed
           ),
           totalCount: 2,
         },
@@ -266,8 +260,7 @@ export const mockReservation: ReservationType = {
   begin: "2024-01-01T10:00:00+00:00",
   end: "2024-01-01T14:00:00+00:00",
   id: "be4fa7a2-05b7-11ee-be56-0242ac120002",
-  priority: ReservationsReservationPriorityChoices.A_200,
-  state: ReservationsReservationStateChoices.Confirmed,
+  state: State.Confirmed,
   workingMemo: "empty",
   handlingDetails: "",
 };
@@ -291,14 +284,12 @@ export const mockRecurringReservation: ReservationType = {
       canApplyFreeOfCharge: false,
       reservationBlockWholeDay: false,
       maxPersons: 10,
-      authentication: ReservationUnitsReservationUnitAuthenticationChoices.Weak,
+      authentication: Authentication.Weak,
       allowReservationsWithoutOpeningHours: true,
       requireReservationHandling: false,
       requireIntroduction: false,
-      reservationKind:
-        ReservationUnitsReservationUnitReservationKindChoices.DirectAndSeason,
-      reservationStartInterval:
-        ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins,
+      reservationKind: ReservationKind.DirectAndSeason,
+      reservationStartInterval: ReservationStartInterval.Interval_15Mins,
       uuid: "be4fa7a2-05b7-11ee-be56-0242ac120004",
     },
   },

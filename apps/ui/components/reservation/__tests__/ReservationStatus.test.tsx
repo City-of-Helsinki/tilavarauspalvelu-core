@@ -1,6 +1,6 @@
 import * as React from "react";
 import { get as mockGet } from "lodash";
-import { ReservationsReservationStateChoices } from "common/types/gql-types";
+import { State } from "common/types/gql-types";
 import { render, screen } from "../../../test/testUtils";
 import { ReservationStatus, type Props } from "../ReservationStatus";
 import mockTranslations from "../../../public/locales/fi/reservations.json";
@@ -27,7 +27,7 @@ jest.mock("next-i18next", () => ({
 }));
 
 const defaultProps: Props = {
-  state: "" as ReservationsReservationStateChoices,
+  state: "" as State,
 };
 
 const renderComponent = (props?: Partial<Props>) =>
@@ -35,33 +35,33 @@ const renderComponent = (props?: Partial<Props>) =>
 
 [
   {
-    status: ReservationsReservationStateChoices.Cancelled,
+    status: State.Cancelled,
     label: "Peruttu",
   },
   {
-    status: ReservationsReservationStateChoices.Confirmed,
+    status: State.Confirmed,
     label: "Hyväksytty",
   },
   {
-    status: ReservationsReservationStateChoices.Denied,
+    status: State.Denied,
     label: "Hylätty",
   },
   {
-    status: ReservationsReservationStateChoices.Created,
+    status: State.Created,
     label: "Luonnos",
   },
   {
-    status: ReservationsReservationStateChoices.RequiresHandling,
+    status: State.RequiresHandling,
     label: "Käsiteltävänä",
   },
   {
-    status: ReservationsReservationStateChoices.WaitingForPayment,
+    status: State.WaitingForPayment,
     label: "Odottaa maksua",
   },
 ].forEach((state) => {
   test(`should render ${state.status}`, () => {
     renderComponent({
-      state: state.status as ReservationsReservationStateChoices,
+      state: state.status,
     });
 
     expect(screen.getByText(state.label)).toHaveAttribute("title", state.label);

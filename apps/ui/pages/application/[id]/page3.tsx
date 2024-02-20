@@ -1,10 +1,9 @@
 import React, { useEffect } from "react";
 import styled from "styled-components";
 import {
-  Applicant_Type,
+  ApplicantTypeChoice,
   ApplicationNode,
   ApplicationUpdateMutationInput,
-  ApplicationsApplicationApplicantTypeChoices,
 } from "common/types/gql-types";
 import { useTranslation } from "next-i18next";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
@@ -23,7 +22,6 @@ import {
   convertAddress,
   convertOrganisation,
   convertPerson,
-  convertApplicantType,
   ApplicationFormPage3Values,
   PersonFormValues,
   AddressFormValues,
@@ -89,13 +87,12 @@ const convertApplicationToForm = (
 ): ApplicationFormPage3Values => {
   return {
     pk: app?.pk ?? 0,
-    applicantType: convertApplicantType(app?.applicantType),
+    applicantType: app?.applicantType ?? ApplicantTypeChoice.Individual,
     organisation: convertOrganisation(app?.organisation),
     contactPerson: convertPerson(app?.contactPerson),
     billingAddress: convertAddress(app?.billingAddress),
     hasBillingAddress:
-      app?.applicantType !==
-        ApplicationsApplicationApplicantTypeChoices.Individual &&
+      app?.applicantType !== ApplicantTypeChoice.Individual &&
       app?.billingAddress?.streetAddress != null,
     additionalInformation: app?.additionalInformation ?? "",
     homeCity: app?.homeCity?.pk ?? undefined,
@@ -106,7 +103,7 @@ const transformApplication = (
   values: ApplicationFormPage3Values
 ): ApplicationUpdateMutationInput => {
   const shouldSaveBillingAddress =
-    values.applicantType === Applicant_Type.Individual ||
+    values.applicantType === ApplicantTypeChoice.Individual ||
     values.hasBillingAddress;
   return {
     pk: values.pk,
@@ -118,7 +115,7 @@ const transformApplication = (
       ? { contactPerson: transformPerson(values.contactPerson) }
       : {}),
     ...(values.organisation != null &&
-    values.applicantType !== Applicant_Type.Individual
+    values.applicantType !== ApplicantTypeChoice.Individual
       ? { organisation: transformOrganisation(values.organisation) }
       : {}),
     ...(values.additionalInformation != null
@@ -139,12 +136,12 @@ const Page3 = (): JSX.Element | null => {
   const type = watch("applicantType");
 
   switch (type) {
-    case Applicant_Type.Individual:
+    case ApplicantTypeChoice.Individual:
       return <IndividualForm />;
-    case Applicant_Type.Community:
-    case Applicant_Type.Association:
+    case ApplicantTypeChoice.Community:
+    case ApplicantTypeChoice.Association:
       return <OrganisationForm homeCityOptions={cityOptions} />;
-    case Applicant_Type.Company:
+    case ApplicantTypeChoice.Company:
       return <CompanyForm />;
     default:
       return null;

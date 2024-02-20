@@ -8,8 +8,8 @@ import { formatDuration } from "common/src/common/util";
 import { fontRegular, H2, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
-  ReservationUnitByPkType,
-  ReservationUnitsReservationUnitReservationKindChoices,
+  type ReservationUnitByPkType,
+  ReservationKind,
 } from "common/types/gql-types";
 import { omit } from "lodash";
 import { useLocalStorage } from "react-use";
@@ -128,10 +128,7 @@ const NonReservableNotification = ({
       ? formatDate(reservationUnit.reservationBegins, "H.mm")
       : "",
   });
-  if (
-    reservationUnit.reservationKind ===
-    ReservationUnitsReservationUnitReservationKindChoices.Season
-  ) {
+  if (reservationUnit.reservationKind === ReservationKind.Season) {
     returnText = t("reservationUnit:notifications.onlyRecurring");
   } else if (isReservationStartInFuture(reservationUnit))
     returnText = futureOpeningText;
@@ -265,7 +262,7 @@ const Head = ({
               )}
             </div>
             <Images
-              images={orderImages(reservationUnit.images)}
+              images={orderImages(reservationUnit.images ?? [])}
               contextName={reservationUnitName}
             />
           </RightContainer>

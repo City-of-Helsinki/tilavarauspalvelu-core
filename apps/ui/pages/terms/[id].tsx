@@ -6,7 +6,7 @@ import { useTranslation } from "next-i18next";
 import {
   type QueryTermsOfUseArgs,
   type Query,
-  TermsOfUseTermsOfUseTermsTypeChoices,
+  TermsType,
 } from "common/types/gql-types";
 import { H2 } from "common/src/common/typography";
 import { Container } from "common";
@@ -33,7 +33,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   >({
     query: TERMS_OF_USE,
     variables: {
-      termsType: TermsOfUseTermsOfUseTermsTypeChoices.GenericTerms,
+      termsType: TermsType.GenericTerms,
     },
   });
   const genericTerms = genericTermsData.termsOfUse?.edges

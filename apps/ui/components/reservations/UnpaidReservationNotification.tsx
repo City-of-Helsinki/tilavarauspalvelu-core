@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
-import { ReservationsReservationStateChoices } from "common/types/gql-types";
+import { State } from "common/types/gql-types";
 import NotificationWrapper from "common/src/components/NotificationWrapper";
 import { useCurrentUser } from "@/hooks/user";
 import { BlackButton, Toast } from "@/styles/util";
@@ -45,7 +45,7 @@ const ReservationNotification = () => {
   const { currentUser } = useCurrentUser();
   const { reservations } = useReservations({
     currentUser,
-    states: [ReservationsReservationStateChoices.WaitingForPayment],
+    states: [State.WaitingForPayment],
     orderBy: "-pk",
   });
 

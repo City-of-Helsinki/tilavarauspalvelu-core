@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  ReservationsReservationTypeChoices,
-  ReservationUnitsReservationUnitReservationStartIntervalChoices,
+  Type,
+  ReservationStartInterval,
   type ReservationUnitType,
 } from "common/types/gql-types";
 import { camelCase, get } from "lodash";
@@ -182,23 +182,22 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
 
   const interval =
     reservationUnit?.reservationStartInterval ===
-    ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
-      ? ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
-      : ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_30Mins;
+    ReservationStartInterval.Interval_15Mins
+      ? ReservationStartInterval.Interval_15Mins
+      : ReservationStartInterval.Interval_30Mins;
   const newReservations = useMultipleReservation({
     form,
     reservationUnit,
     interval,
   });
 
-  const reservationType =
-    watch("type") ?? ReservationsReservationTypeChoices.Blocked;
+  const reservationType = watch("type") ?? Type.Blocked;
   const checkedReservations = useFilteredReservationList({
     items: newReservations.reservations,
     reservationUnitPk: reservationUnit?.pk ?? undefined,
     begin: fromUIDate(getValues("startingDate")) ?? new Date(),
     end: fromUIDate(getValues("endingDate")) ?? new Date(),
-    reservationType: reservationType as ReservationsReservationTypeChoices,
+    reservationType: reservationType as Type,
   });
 
   const navigate = useNavigate();

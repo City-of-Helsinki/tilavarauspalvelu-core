@@ -3,11 +3,11 @@ import { secondsToHms } from "common/src/common/util";
 import { OptionType, PendingReservation } from "common/types/common";
 import {
   PaymentOrderType,
-  ReservationsReservationReserveeTypeChoices,
-  ReservationsReservationStateChoices,
+  ReserveeType,
+  State,
   ReservationType,
   ReservationUnitByPkType,
-  ReservationUnitsReservationUnitReservationStartIntervalChoices,
+  ReservationStartInterval,
 } from "common/types/gql-types";
 import {
   type RoundPeriod,
@@ -27,7 +27,7 @@ import { TFunction } from "i18next";
 export const getDurationOptions = (
   minReservationDuration: number | undefined,
   maxReservationDuration: number | undefined,
-  reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices,
+  reservationStartInterval: ReservationStartInterval,
   t: TFunction
 ): OptionType[] => {
   const intervalSeconds = getIntervalMinutes(reservationStartInterval) * 60;
@@ -94,8 +94,7 @@ export const canUserCancelReservation = (
   skipTimeCheck = false
 ): boolean => {
   const reservationUnit = reservation.reservationUnits?.[0];
-  if (reservation.state !== ReservationsReservationStateChoices.Confirmed)
-    return false;
+  if (reservation.state !== State.Confirmed) return false;
   if (!reservationUnit?.cancellationRule) return false;
   if (reservationUnit?.cancellationRule?.needsHandling) return false;
   if (!skipTimeCheck && isReservationWithinCancellationPeriod(reservation))
@@ -107,7 +106,7 @@ export const canUserCancelReservation = (
 export const getReservationApplicationMutationValues = (
   payload: Record<string, string | number | boolean>,
   supportedFields: string[],
-  reserveeType: ReservationsReservationReserveeTypeChoices
+  reserveeType: ReserveeType
 ): Record<string, string | number | boolean> => {
   const result: typeof payload = { reserveeType };
   const intValues = ["numPersons"];
@@ -182,8 +181,16 @@ export const getNormalizedReservationOrderStatus = (
     return null;
   }
 
-  const shouldShowOrderStatus = (state: ReservationsReservationStateChoices) =>
-    !["CREATED", "WAITING_FOR_PAYMENT", "REQUIRES_HANDLING"].includes(state);
+  const shouldShowOrderStatus = (state: State) => {
+    if (
+      state === State.Created ||
+      state === State.WaitingForPayment ||
+      state === State.RequiresHandling
+    ) {
+      return false;
+    }
+    return true;
+  };
 
   if (shouldShowOrderStatus(reservation.state)) {
     return reservation.order?.status ?? null;

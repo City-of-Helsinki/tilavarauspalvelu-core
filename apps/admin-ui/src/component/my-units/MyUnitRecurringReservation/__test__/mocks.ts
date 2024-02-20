@@ -1,9 +1,9 @@
 import { getYear, nextMonday, set } from "date-fns";
 import {
+  Authentication,
+  ReservationKind,
+  ReservationStartInterval,
   ReservationUnitType,
-  ReservationUnitsReservationUnitAuthenticationChoices,
-  ReservationUnitsReservationUnitReservationKindChoices,
-  ReservationUnitsReservationUnitReservationStartIntervalChoices,
 } from "common/types/gql-types";
 import { RESERVATION_UNIT_QUERY } from "../../hooks/queries";
 import { CREATE_STAFF_RESERVATION } from "../../create-reservation/queries";
@@ -13,10 +13,9 @@ import {
 } from "../queries";
 
 const unitCommon = {
-  reservationStartInterval:
-    ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins,
+  reservationStartInterval: ReservationStartInterval.Interval_15Mins,
   allowReservationsWithoutOpeningHours: true,
-  authentication: ReservationUnitsReservationUnitAuthenticationChoices.Weak,
+  authentication: Authentication.Weak,
   canApplyFreeOfCharge: false,
   reservationBlockWholeDay: false,
   bufferTimeBefore: null,
@@ -26,7 +25,7 @@ const unitCommon = {
   isDraft: false,
   requireIntroduction: false,
   requireReservationHandling: false,
-  reservationKind: ReservationUnitsReservationUnitReservationKindChoices.Direct,
+  reservationKind: ReservationKind.Direct,
   uuid: "",
   id: "",
   contactInformation: "",

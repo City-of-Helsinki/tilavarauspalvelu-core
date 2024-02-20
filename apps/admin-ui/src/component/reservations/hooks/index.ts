@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useNotification } from "app/context/NotificationContext";
 import { useMutation } from "@apollo/client";
 import {
-  ReservationsReservationStateChoices,
+  State,
   type RecurringReservationUpdateMutationInput,
   type RecurringReservationUpdateMutationPayload,
   type ReservationStaffModifyMutationInput,
@@ -69,9 +69,7 @@ export const useStaffReservationMutation = ({
       // NOTE frontend filtering because of cache issues
       const pksToUpdate = reservations
         .filter((x) => new Date(x.begin) >= new Date())
-        .filter(
-          (x) => x.state === ReservationsReservationStateChoices.Confirmed
-        )
+        .filter((x) => x.state === State.Confirmed)
         .map((x) => x.pk)
         .filter((x): x is number => x != null);
 

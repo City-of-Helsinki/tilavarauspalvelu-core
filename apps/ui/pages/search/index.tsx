@@ -14,11 +14,12 @@ import { H2 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
   ApplicationRoundStatusChoice,
-  Query,
-  QueryApplicationRoundsArgs,
-  QueryReservationUnitsArgs,
-  ReservationUnitsReservationUnitReservationKindChoices,
+  type Query,
+  type QueryApplicationRoundsArgs,
+  type QueryReservationUnitsArgs,
+  ReservationKind,
   ReservationUnitType,
+  ApplicationRoundOrderingChoices,
 } from "common/types/gql-types";
 import { Container } from "common";
 import { filterNonNullable } from "common/src/helpers";
@@ -48,7 +49,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     fetchPolicy: "no-cache",
     query: APPLICATION_ROUNDS,
     variables: {
-      orderBy: "pk",
+      orderBy: [ApplicationRoundOrderingChoices.PkAsc],
     },
   });
   const applicationRounds = filterNonNullable(
@@ -144,8 +145,7 @@ const processVariables = (values: Record<string, string>, language: string) => {
     orderBy: values.order === "desc" ? `-${sortCriteria}` : sortCriteria,
     isDraft: false,
     isVisible: true,
-    reservationKind:
-      ReservationUnitsReservationUnitReservationKindChoices.Season,
+    reservationKind: ReservationKind.Season,
   };
 };
 

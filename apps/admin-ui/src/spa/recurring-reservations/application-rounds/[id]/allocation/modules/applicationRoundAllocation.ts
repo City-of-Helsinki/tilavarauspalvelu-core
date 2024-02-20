@@ -1,24 +1,25 @@
 import { padStart, sortBy } from "lodash";
 import {
-  type ApplicationEventScheduleNode,
-  type ApplicationEventNode,
-  ApplicationsApplicationApplicantTypeChoices,
+  type SuitableTimeRangeNode,
+  type ApplicationSectionNode,
+  ApplicantTypeChoice,
   type ApplicationNode,
-  ApplicationEventStatusChoice,
+  Priority,
+  type AllocatedTimeSlotNode,
 } from "common/types/gql-types";
-import type { ApplicationEventSchedulePriority } from "common/types/common";
 import i18next from "i18next";
 import { filterNonNullable } from "common/src/helpers";
 import { formatDuration } from "common/src/common/util";
 import { type TFunction } from "next-i18next";
+import { convertWeekday } from "common/src/conversion";
 
-const parseApplicationEventScheduleTime = (
-  applicationEventSchedule: ApplicationEventScheduleNode
-): string => {
-  const weekday = i18next.t(`dayShort.${applicationEventSchedule?.day}`);
-  return `${weekday} ${Number(
-    applicationEventSchedule.begin.substring(0, 2)
-  )}-${Number(applicationEventSchedule.end.substring(0, 2))}`;
+export { convertWeekday };
+export { transformWeekday } from "common/src/conversion";
+
+export type RelatedSlot = {
+  day: number;
+  beginTime: number;
+  endTime: number;
 };
 
 export type Cell = {
@@ -28,10 +29,11 @@ export type Cell = {
   key: string;
 };
 
-export const applicationEventSchedulesToCells = (
+// TODO why is there a similar function in ui?
+export function applicationEventSchedulesToCells(
   firstSlotStart: number,
   lastSlotStart: number
-): Cell[][] => {
+): Cell[][] {
   const cells = [] as Cell[][];
 
   // TODO don't string encode
@@ -54,84 +56,20 @@ export const applicationEventSchedulesToCells = (
   }
 
   return cells;
-};
-
-/// Pick allocated or requested time slot
-/// @param aes Application event schedule
-/// @returns null if no time slot is found (invalid data)
-/// TODO should define a data structure for time slots (TimeSlot doesn't work here)
-/// there is too much incosistency in these utility functions
-export function pickTimeSlot(aes: ApplicationEventScheduleNode) {
-  if (aes.allocatedDay && aes.allocatedBegin && aes.allocatedEnd) {
-    return {
-      day: aes.allocatedDay,
-      begin: aes.allocatedBegin,
-      end: aes.allocatedEnd,
-    };
-  }
-  if (aes.allocatedDay || aes.allocatedBegin || aes.allocatedEnd) {
-    // eslint-disable-next-line no-console
-    console.error("Invalid time slot", aes);
-    return null;
-  }
-  if (aes.day && aes.begin && aes.end) {
-    return {
-      day: aes.day,
-      begin: aes.begin,
-      end: aes.end,
-    };
-  }
-  return null;
 }
-
-/// Q: do we want to show the maximum of the two? or only the exact allocated if it's allocated?
-/// TODO replace this function (don't use string encoding)
-export const getApplicationEventScheduleTimes = (
-  aes: ApplicationEventScheduleNode
-): { begin: string; end: string } | null => {
-  const { day, begin, end } = pickTimeSlot(aes) ?? {};
-  if (!day || !begin || !end) {
-    return null;
-  }
-  return {
-    begin: `${day}-${Number(begin.substring(0, 2))}-${begin.substring(3, 5)}`,
-    end: `${day}-${Number(end.substring(0, 2))}-${end.substring(3, 5)}`,
-  };
-};
 
 export const timeSlotKeyToTime = (slot: string): number => {
   const [, hour, minute] = slot.split("-").map(Number);
   return new Date().setHours(hour, minute);
 };
 
-export const doSomeSlotsFitApplicationEventSchedule = (
-  applicationEventSchedule: ApplicationEventScheduleNode,
-  slots: string[]
-): boolean => {
-  const { begin, end } =
-    getApplicationEventScheduleTimes(applicationEventSchedule) ?? {};
-  if (!begin || !end) {
-    return false;
-  }
-
-  return slots.some((slot) => {
-    const [slotDay, slotHour, slotMinute] = slot.split("-").map(Number);
-    const [beginDay, beginHour, beginMinute] = begin.split("-").map(Number);
-    const [, endHour, endMinute] = end.split("-").map(Number);
-    const slotTime = new Date().setHours(slotHour, slotMinute);
-    const beginTime = new Date().setHours(beginHour, beginMinute);
-    const endTime = new Date().setHours(endHour, endMinute);
-    return slotDay === beginDay && beginTime <= slotTime && endTime > slotTime;
-  });
-};
-
-export const getTimeSlotOptions = (
+export function getTimeSlotOptions(
   day: string,
   startHours: number,
   startMinutes: number,
   endHours: number,
   endOptions?: boolean
-): Array<{ label: string; value: string }> => {
+): Array<{ label: string; value: string }> {
   const timeSlots = [];
   for (let i = startHours; i <= endHours; i += 1) {
     if (endOptions) {
@@ -158,50 +96,7 @@ export const getTimeSlotOptions = (
   if (startMinutes === 30) timeSlots.shift();
 
   return timeSlots;
-};
-
-type TimeSlotInput = {
-  day: number;
-  begin: string;
-  end: string;
-};
-
-export const getTimeSlots = (
-  applicationEventSchedules: TimeSlotInput[]
-): string[] => {
-  return applicationEventSchedules?.reduce<string[]>((acc, cur) => {
-    const { day } = cur;
-    const [startHours, startMinutes] = cur.begin.split(":").map(Number);
-    const [endHours, endMinutes] = cur.end.split(":").map(Number);
-    if (startHours > endHours) {
-      return acc;
-    }
-    if (startHours === endHours && startMinutes >= endMinutes) {
-      return acc;
-    }
-    if (Number.isNaN(startHours) || Number.isNaN(endHours)) {
-      return acc;
-    }
-    // No NaN check for minutes because of equality checks
-
-    const timeSlots: string[] = [];
-    for (let i = startHours; i <= endHours; i += 1) {
-      timeSlots.push(`${day}-${i}-00`);
-      timeSlots.push(`${day}-${i}-30`);
-    }
-
-    if (startMinutes === 30) timeSlots.shift();
-    if (endMinutes === 0) {
-      timeSlots.pop();
-      timeSlots.pop();
-    }
-    if (endMinutes === 30) {
-      timeSlots.pop();
-    }
-
-    return [...acc, ...timeSlots];
-  }, []);
-};
+}
 
 export type TimeSlot = { day: number; hour: number };
 
@@ -216,16 +111,6 @@ export function encodeTimeSlot(day: number, hour: number): string {
   return `${day}-${h < 10 ? `0${h}` : h}-${m < 10 ? `0${m}` : m}`;
 }
 
-function getAllocatedTime(
-  aes: ApplicationEventScheduleNode
-): TimeSlot[] | null {
-  const { allocatedDay, allocatedBegin, allocatedEnd } = aes;
-  if (!allocatedDay || !allocatedBegin || !allocatedEnd) {
-    return null;
-  }
-  return constructTimeRange(allocatedDay, allocatedBegin, allocatedEnd);
-}
-
 export function constructTimeSlot(day: number, begin: string): TimeSlot | null {
   const time = parseApiTime(begin);
   if (time == null) {
@@ -234,7 +119,9 @@ export function constructTimeSlot(day: number, begin: string): TimeSlot | null {
   return { day, hour: time };
 }
 
-// returns time in hours from a python time string: "HH:MM:SS"
+/// Convert python time string to hours
+/// @return time in hours
+/// @param from a python time string: "HH:MM:SS"
 export function parseApiTime(time: string): number | null {
   const t = time.split(":").map((n) => parseInt(n, 10));
   if (t.length < 2) {
@@ -249,54 +136,6 @@ export function parseApiTime(time: string): number | null {
     return null;
   }
   return h1 + m1 / 60;
-}
-
-export function constructTimeRange(
-  day: number,
-  begin: string,
-  end: string
-): TimeSlot[] | null {
-  const endTime = parseApiTime(end);
-  const beginTime = parseApiTime(begin);
-  if (endTime == null || beginTime == null) {
-    return null;
-  }
-  if (beginTime >= endTime) {
-    // eslint-disable-next-line no-console
-    console.warn("Invalid time range", begin, end);
-    return null;
-  }
-  return [
-    { day, hour: beginTime },
-    { day, hour: endTime },
-  ];
-}
-
-// TODO copy paste because we have strings here, and Cells in AllocationCalendar
-export function isSlotAccepted(
-  aes: ApplicationEventScheduleNode,
-  slot: string
-): boolean {
-  const timeRange = getAllocatedTime(aes);
-  if (timeRange == null) {
-    // eslint-disable-next-line no-console
-    console.warn("Invalid application event", aes);
-    return false;
-  }
-  if (timeRange.length < 2) {
-    // eslint-disable-next-line no-console
-    console.warn("Invalid application event", aes);
-    return false;
-  }
-  const s = decodeTimeSlot(slot);
-  if (timeRange[0].day !== s.day) {
-    // eslint-disable-next-line no-console
-    console.warn("Invalid time slot string", slot);
-    return false;
-  }
-  const beginTime = timeRange[0].hour;
-  const endTime = timeRange[1].hour;
-  return s.hour >= beginTime && s.hour < endTime;
 }
 
 export const getTimeSeries = (
@@ -318,133 +157,30 @@ export const getTimeSeries = (
   return timeSlots;
 };
 
-export const getApplicantName = (
+export function getApplicantName(
   application: ApplicationNode | undefined
-): string => {
-  return application?.applicantType ===
-    ApplicationsApplicationApplicantTypeChoices.Individual
+): string {
+  return application?.applicantType === ApplicantTypeChoice.Individual
     ? `${application?.contactPerson?.firstName} ${application?.contactPerson?.lastName}`.trim()
-    : application?.applicant?.name || "";
-};
-
-export function getSlotApplicationEvents(
-  slots: string[] | null,
-  aes: ApplicationEventNode[] | null
-): ApplicationEventNode[] {
-  if (!slots) {
-    return [];
-  }
-
-  return filterNonNullable(aes).filter((ae) =>
-    ae?.applicationEventSchedules?.some((schedule) =>
-      doSomeSlotsFitApplicationEventSchedule(schedule, slots)
-    )
-  );
+    : application?.user?.name || "";
 }
 
-export function getApplicationEventsInsideSelection(
-  aes: ApplicationEventNode[],
-  selection: string[] | null,
-  reservationUnitPk: number
-): ApplicationEventNode[] {
-  if (!selection || !aes || selection.length < 1) {
-    return [];
-  }
-
-  const selectionDecoded = selection.map(decodeTimeSlot);
-  const isInRange = (slot: TimeSlot, range: TimeSlot[] | null) => {
-    if (!range) {
-      return false;
-    }
-    if (range.length < 2) {
-      return false;
-    }
-    if (slot.day !== range[0].day) {
-      return false;
-    }
-    if (slot.hour < range[0].hour) {
-      return false;
-    }
-    if (slot.hour >= range[1].hour) {
-      return false;
-    }
-    return true;
-  };
-
-  const day = selectionDecoded[0].day;
-  const filtered = aes
-    .filter((ae) => {
-      // this makes it impossible to revert decline
-      return ae.status !== ApplicationEventStatusChoice.Declined;
-    })
-    .filter((ae) => {
-      const times =
-        ae.applicationEventSchedules
-          ?.filter((s) => s.day === day)
-          .map(pickTimeSlot)
-          .filter((t): t is NonNullable<typeof t> => t != null)
-          .map(({ begin, end }) => constructTimeRange(day, begin, end)) ?? [];
-      return times.some(
-        (slot) => slot && selectionDecoded.some((item) => isInRange(item, slot))
-      );
-    })
-    .filter((ae) => {
-      const isAllocatedForToday =
-        ae.applicationEventSchedules?.some((s) => s.allocatedDay) ?? false;
-      const nAllocated =
-        ae.applicationEventSchedules?.filter((s) => s.allocatedDay === day)
-          .length ?? 0;
-      const nRequested = ae.eventsPerWeek ?? 0;
-      // if it's allocated already for today compare selection to allocation time, not requested time
-      // ex. requested 10 - 16, but allocated for 10 - 12, only show it if selection includes a slot between 10 - 12
-      if (isAllocatedForToday) {
-        const aesToday = ae.applicationEventSchedules?.filter(
-          (s) => s.allocatedDay === day
-        );
-        if (aesToday != null && aesToday?.length > 0) {
-          const fa = aesToday.map((s) => {
-            const timeRange = getAllocatedTime(s);
-            if (!timeRange) {
-              return false;
-            }
-            return selectionDecoded
-              .map((x) => isInRange(x, timeRange))
-              .some((b) => b);
-          });
-          return fa.some((b) => b);
-        }
-        return nAllocated < nRequested;
-      }
-      return true;
-    })
-    // remove all events that are allocated but not in this reservation unit
-    .map((ae) => ({
-      ...ae,
-      applicationEventSchedules:
-        ae.applicationEventSchedules?.filter(
-          (s) =>
-            s.allocatedReservationUnit == null ||
-            s.allocatedReservationUnit.pk === reservationUnitPk
-        ) ?? [],
-    }))
-    .sort((a, b) => {
-      // if there is already allocated they are always shown first
-      // TODO sorted by their allocation start time
-      if (a.applicationEventSchedules?.some((s) => s.allocatedDay === day)) {
-        return -1;
-      }
-      if (b.applicationEventSchedules?.some((s) => s.allocatedDay === day)) {
-        return 1;
-      }
-      return a.name.localeCompare(b.name);
-    });
-
-  return filtered;
+// TODO is this parse? or format? it looks like a format
+function parseApplicationEventScheduleTime(
+  range: SuitableTimeRangeNode
+): string {
+  // TODO convert the day of the week
+  const day = convertWeekday(range.dayOfTheWeek);
+  const weekday = i18next.t(`dayShort.${day}`);
+  // TODO don't use substring to convert times (wrap it in a function)
+  return `${weekday} ${Number(
+    range.beginTime.substring(0, 2)
+  )}-${Number(range.endTime.substring(0, 2))}`;
 }
 
 export const getApplicationEventScheduleTimeString = (
-  aes: ApplicationEventScheduleNode[],
-  priority: ApplicationEventSchedulePriority
+  aes: SuitableTimeRangeNode[],
+  priority: Priority
 ): string => {
   const schedules = sortBy(
     aes?.filter((s) => s?.priority === priority),
@@ -488,10 +224,11 @@ export type ApplicationEventScheduleResultStatuses = {
 };
 
 export function createDurationString(
-  applicationEvent: ApplicationEventNode,
+  section: ApplicationSectionNode,
   t: TFunction
 ) {
-  const { minDuration, maxDuration } = applicationEvent;
+  const minDuration = section.reservationMinDuration;
+  const maxDuration = section.reservationMaxDuration;
 
   const minDurString =
     minDuration != null ? formatDuration(minDuration / 60, t) : undefined;
@@ -502,4 +239,38 @@ export function createDurationString(
       ? minDurString
       : `${minDurString ?? ""} - ${maxDurString ?? ""}`;
   return durationString;
+}
+
+export function getRelatedTimeSlots(
+  allocations: AllocatedTimeSlotNode[]
+): RelatedSlot[][] {
+  const relatedSpacesTimeSlots = allocations;
+
+  // split the data to days
+  // sort every array by start time
+  // run reduce to get contiguous time slots (and remove extras)
+  // we should end up with 7 arrays (one for each day), each having a list of time slots (beginTime, endTime)
+  // then we can use that data to draw the calendar
+  const dayArray = Array.from(Array(7)).map(() => []);
+  const relatedSpacesTimeSlotsByDay = relatedSpacesTimeSlots.reduce<
+    RelatedSlot[][]
+  >((acc, ts) => {
+    const day = convertWeekday(ts.dayOfTheWeek);
+    const begin = parseApiTime(ts.beginTime);
+    const end = parseApiTime(ts.endTime);
+    if (begin == null || end == null) {
+      return acc;
+    }
+    acc[day].push({
+      day,
+      beginTime: begin * 60,
+      endTime: end * 60,
+    });
+    return acc;
+  }, dayArray);
+
+  // TODO sort by beginTime
+  // TODO reduce the array to contiguous time slots
+
+  return relatedSpacesTimeSlotsByDay;
 }

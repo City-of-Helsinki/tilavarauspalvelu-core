@@ -2,10 +2,7 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { Button, IconCross, Select } from "hds-react";
-import type {
-  ApplicationEventSchedulePriority,
-  OptionType,
-} from "common/types/common";
+import type { ApplicationEventSchedulePriority } from "common/types/common";
 import { fontBold, fontRegular } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { fromMondayFirstUnsafe } from "common/src/helpers";
@@ -31,7 +28,7 @@ type Props = {
     ApplicationEventScheduleFormType[],
     ApplicationEventScheduleFormType[],
   ];
-  reservationUnitOptions: OptionType[];
+  reservationUnitOptions: { label: string; value: number }[];
   reservationUnitPk: number;
   setReservationUnitPk: (pk: number) => void;
 };
@@ -202,7 +199,7 @@ const OptionWrapper = styled.div`
   }
 `;
 
-const StyledSelect = styled(Select<OptionType>)`
+const StyledSelect = styled(Select<{ label: string; value: number }>)`
   label {
     ${fontBold};
   }
@@ -289,13 +286,13 @@ const LegendBox = styled.div<{ type: string }>`
   `}
   ${(props) =>
     props.type === "within-opening-hours" &&
-    ` 
+    `
     background-color: var(--color-white);
     border: 1px solid var(--color-black-50);
    `}
   ${(props) =>
     props.type === "outside-opening-hours" &&
-    ` 
+    `
     background-color: var(--color-black-10);
     border: 1px solid var(--color-black-50);
    `}
@@ -345,7 +342,14 @@ const ResetButton = styled(Button)`
   ${fontRegular};
 `;
 
-const TimeSelector = ({
+/// TODO what is the responsibility of this component?
+/// Why does it take a bucket full of props?
+/// Why is it used in only two different places?
+/// TODO why does it require some Cell functions in the props? what are these?
+/// TODO why is the summaryData type so weird?
+/// TODO why is the summaryData coupled with the Selector? instead of passing JSX child element or a JSX component?
+/// TODO why does summaryData include priority but is split by priority also? one of these is redundant
+export function TimeSelector({
   cells,
   updateCells,
   copyCells,
@@ -355,7 +359,7 @@ const TimeSelector = ({
   reservationUnitOptions,
   reservationUnitPk,
   setReservationUnitPk,
-}: Props): JSX.Element | null => {
+}: Props): JSX.Element | null {
   const { t } = useTranslation();
   const [priority, setPriority] =
     useState<ApplicationEventSchedulePriority>(300);
@@ -382,7 +386,7 @@ const TimeSelector = ({
       label: t("application:Page2.legend.selected-2"),
     },
   ];
-  const priorityOptions: OptionType[] = [300, 200].map((n) => ({
+  const priorityOptions = [300, 200].map((n) => ({
     label: t(`application:Page2.priorityLabels.${n}`),
     value: n,
   }));
@@ -416,8 +420,8 @@ const TimeSelector = ({
           options={priorityOptions}
           value={priorityOptions.find((n) => n.value === priority) ?? null}
           defaultValue={priorityOptions[0]}
-          onChange={(val: OptionType) =>
-            setPriority(val.value as ApplicationEventSchedulePriority)
+          onChange={(val: (typeof priorityOptions)[0]) =>
+            setPriority(val.value)
           }
         />
         <StyledSelect
@@ -429,8 +433,8 @@ const TimeSelector = ({
             null
           }
           defaultValue={reservationUnitOptions[0]}
-          onChange={(val: OptionType) =>
-            setReservationUnitPk(val.value as number)
+          onChange={(val: (typeof reservationUnitOptions)[0]) =>
+            setReservationUnitPk(val.value)
           }
         />
       </OptionWrapper>
@@ -490,6 +494,4 @@ const TimeSelector = ({
       )}
     </>
   );
-};
-
-export { TimeSelector };
+}

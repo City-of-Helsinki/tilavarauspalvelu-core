@@ -1,22 +1,23 @@
 import { filterNonNullable } from "common/src/helpers";
 import {
-  Applicant_Type,
-  type ApplicationEventNode,
+  ApplicantTypeChoice,
+  type ApplicationSectionNode,
   type AddressNode,
   type PersonNode,
   type OrganisationNode,
-  ApplicationsApplicationApplicantTypeChoices,
-  type UpdateEventReservationUnitSerializerInput,
-  type UpdateApplicationEventScheduleInEventSerializerInput,
   type ApplicationNode,
   type ApplicationUpdateMutationInput,
+  type ApplicationCreateMutationInput,
+  type SuitableTimeRangeNode,
+  Weekday,
+  Priority,
+  type ApplicationSectionUpdateMutationInput,
+  type ApplicationSectionForApplicationSerializerInput,
+  ApplicationSectionCreateMutationInput,
 } from "common/types/gql-types";
 import { type Maybe } from "graphql/jsutils/Maybe";
 import { z } from "zod";
-import type {
-  ApplicationEventSchedulePriority,
-  ReservationUnitNode,
-} from "common";
+import type { ReservationUnitNode } from "common";
 import { toApiDate } from "common/src/common/util";
 import { apiDateToUIDate, fromUIDate } from "@/modules/util";
 
@@ -49,18 +50,28 @@ function lessThanMaybeDate(a?: string | null, b?: string | null): boolean {
   return aDate < bDate;
 }
 
-const ApplicationEventFormValueSchema = z
+const SuitableTimeRangeFormTypeSchema = z.object({
+  pk: z.number().optional(),
+  priority: z.nativeEnum(Priority),
+  // TODO validate Time input string
+  beginTime: z.string(),
+  endTime: z.string(),
+  dayOfTheWeek: z.nativeEnum(Weekday),
+});
+export type SuitableTimeRangeFormValues = z.infer<
+  typeof SuitableTimeRangeFormTypeSchema
+>;
+
+const ApplicationSectionFormValueSchema = z
   .object({
     pk: z.number().optional(),
     name: z.string().min(1, { message: "Required" }),
     numPersons: z.number().min(1),
     ageGroup: z.number().refine((s) => s, { path: [""], message: "Required" }),
-    abilityGroup: z.number().optional(),
     purpose: z.number().refine((s) => s, { path: [""], message: "Required" }),
     minDuration: z.number().min(1, { message: "Required" }),
     maxDuration: z.number().min(1, { message: "Required" }),
-    eventsPerWeek: z.number().min(1),
-    biweekly: z.boolean(),
+    appliedReservationsPerWeek: z.number().min(1),
     begin: z
       .string()
       .optional()
@@ -69,7 +80,8 @@ const ApplicationEventFormValueSchema = z
       .string()
       .optional()
       .refine((s) => s, { path: [""], message: "Required" }),
-    applicationEventSchedules: z.array(ApplicationEventScheduleFormTypeSchema),
+    suitableTimeRanges: z.array(SuitableTimeRangeFormTypeSchema),
+    // TODO do we want to keep the pk of the options? so we can update them when the order changes and not recreate the whole list on save?
     reservationUnits: z.array(z.number()).min(1, { message: "Required" }),
     // extra page prop, not saved to backend
     accordionOpen: z.boolean(),
@@ -85,54 +97,64 @@ const ApplicationEventFormValueSchema = z
     message: "End date must be after begin date",
   });
 
-export type ApplicationEventFormValue = z.infer<
-  typeof ApplicationEventFormValueSchema
+export type ApplicationSectionFormValue = z.infer<
+  typeof ApplicationSectionFormValueSchema
 >;
 
-export const transformApplicationEventToForm = (
-  applicationEvent: ApplicationEventNode
-): ApplicationEventFormValue => ({
-  pk: applicationEvent.pk ?? undefined,
-  formKey: applicationEvent.pk ? `event-${applicationEvent.pk}` : "event-NEW",
-  name: applicationEvent.name,
-  numPersons: applicationEvent.numPersons ?? 0,
-  ageGroup: applicationEvent.ageGroup?.pk ?? 0,
-  // TODO not present in the form?
-  abilityGroup: applicationEvent.abilityGroup?.pk ?? undefined,
-  purpose: applicationEvent.purpose?.pk ?? 0,
-  minDuration: applicationEvent.minDuration ?? 0,
-  maxDuration: applicationEvent.maxDuration ?? 0,
-  eventsPerWeek: applicationEvent.eventsPerWeek ?? 0,
-  biweekly: applicationEvent.biweekly ?? false,
-  reservationUnits: filterNonNullable(applicationEvent.eventReservationUnits)
-    .sort((a, b) =>
-      a.preferredOrder && b.preferredOrder
-        ? a.preferredOrder - b.preferredOrder
-        : 0
+export function transformApplicationSectionToForm(
+  section: ApplicationSectionNode
+): ApplicationSectionFormValue {
+  return {
+    pk: section.pk ?? undefined,
+    formKey: section.pk ? `event-${section.pk}` : "event-NEW",
+    name: section.name,
+    numPersons: section.numPersons ?? 0,
+    ageGroup: section.ageGroup?.pk ?? 0,
+    purpose: section.purpose?.pk ?? 0,
+    minDuration: section.reservationMinDuration ?? 0,
+    maxDuration: section.reservationMaxDuration ?? 0,
+    appliedReservationsPerWeek: section.appliedReservationsPerWeek ?? 0,
+    reservationUnits: filterNonNullable(
+      section.reservationUnitOptions?.map(
+        ({ reservationUnit, preferredOrder }) => ({
+          pk: reservationUnit?.pk,
+          preferredOrder,
+        })
+      )
     )
-    .map((eru) => eru.reservationUnit?.pk ?? 0)
-    .filter((pk) => pk > 0),
-  // schedules are only used for page2 form
-  applicationEventSchedules: filterNonNullable(
-    applicationEvent.applicationEventSchedules
-  ).map((aes) => ({
-    pk: aes.pk ?? undefined,
-    day: aes.day ?? 0,
-    begin: aes.begin ?? "",
-    end: aes.end ?? "",
-    priority: aes.priority ?? 50,
-  })),
-  // TODO remove the format hacks
-  begin:
-    applicationEvent.begin != null && applicationEvent.begin.includes("-")
-      ? apiDateToUIDate(applicationEvent.begin)
-      : applicationEvent?.begin ?? undefined,
-  end:
-    applicationEvent.end != null && applicationEvent.end.includes("-")
-      ? apiDateToUIDate(applicationEvent.end)
-      : applicationEvent.end ?? undefined,
-  accordionOpen: false,
-});
+      .sort((a, b) =>
+        a.preferredOrder && b.preferredOrder
+          ? a.preferredOrder - b.preferredOrder
+          : 0
+      )
+      .map((eru) => eru.pk ?? 0)
+      .filter((pk) => pk > 0),
+    suitableTimeRanges: filterNonNullable(section.suitableTimeRanges).map(
+      (timeRanges) => convertTimeRange(timeRanges)
+    ),
+    begin: convertDate(section.reservationsBeginDate),
+    end: convertDate(section.reservationsEndDate),
+    accordionOpen: false,
+  };
+}
+
+function convertTimeRange(
+  timeRange: SuitableTimeRangeNode
+): SuitableTimeRangeFormValues {
+  return {
+    pk: timeRange.pk ?? undefined,
+    // TODO pk should be sent if updating (otherwise it always creates new)
+    beginTime: timeRange.beginTime ?? "",
+    dayOfTheWeek: timeRange.dayOfTheWeek ?? 0,
+    endTime: timeRange.endTime ?? "",
+    priority: timeRange.priority ?? 50,
+  };
+}
+
+function convertDate(date: string | null | undefined): string | undefined {
+  // TODO is there a case where this could be DD.MM.YYYY? do we want to ignore invalide dates or raise a problem?
+  return date != null && date.includes("-") ? apiDateToUIDate(date) : undefined;
+}
 
 export const AddressFormValueSchema = z.object({
   pk: z.number().optional(),
@@ -191,36 +213,17 @@ export const convertOrganisation = (
   address: convertAddress(o?.address),
 });
 
-// There is an issue with the type of the data returned by the query (double enums with same values)
-export const convertApplicantType = (
-  type: Maybe<ApplicationsApplicationApplicantTypeChoices> | undefined
-): Applicant_Type => {
-  switch (type) {
-    case ApplicationsApplicationApplicantTypeChoices.Individual:
-      return Applicant_Type.Individual;
-    case ApplicationsApplicationApplicantTypeChoices.Company:
-      return Applicant_Type.Company;
-    case ApplicationsApplicationApplicantTypeChoices.Association:
-      return Applicant_Type.Association;
-    case ApplicationsApplicationApplicantTypeChoices.Community:
-      return Applicant_Type.Community;
-    default:
-      return Applicant_Type.Individual;
-  }
-};
-
 const ApplicantTypeSchema = z.enum([
-  Applicant_Type.Individual,
-  Applicant_Type.Company,
-  Applicant_Type.Association,
-  Applicant_Type.Community,
+  ApplicantTypeChoice.Individual,
+  ApplicantTypeChoice.Company,
+  ApplicantTypeChoice.Association,
+  ApplicantTypeChoice.Community,
 ]);
 export const ApplicationFormSchema = z.object({
   pk: z.number(),
   applicantType: ApplicantTypeSchema,
-  // TODO remove id (also does this need to be sent?)
-  applicationEvents: z
-    .array(ApplicationEventFormValueSchema.optional())
+  applicationSections: z
+    .array(ApplicationSectionFormValueSchema.optional())
     .optional(),
 });
 
@@ -257,96 +260,134 @@ function transformDateString(date?: string | null): string | null {
   return null;
 }
 
-type ApplicationEventScheduleFormValues = Omit<
-  NonNullable<
-    NonNullable<ApplicationFormValues["applicationEvents"]>[0]
-  >["applicationEventSchedules"][0],
-  "priority"
-> & {
-  priority: ApplicationEventSchedulePriority;
-};
-
-const transformApplicationEventSchedule = (
-  aes: ApplicationEventScheduleFormValues
-): UpdateApplicationEventScheduleInEventSerializerInput => {
-  return {
-    day: aes.day,
-    // Time format (HH:MM)
-    begin: aes.begin,
-    end: aes.end,
-    priority: aes.priority,
-  };
-};
-
+// On purpose not return typed create / update compatible objects
 const transformEventReservationUnit = (
   pk: number,
   priority: number
-): UpdateEventReservationUnitSerializerInput => ({
+) => ({
   preferredOrder: priority,
   reservationUnit: pk,
 });
 
-const transformApplicationEvent = (
-  ae: NonNullable<NonNullable<ApplicationFormValues["applicationEvents"]>[0]>
-) => {
+function transformSuitableTimeRange(timeRange: SuitableTimeRangeFormValues) {
   return {
-    ...(transformDateString(ae.begin) != null
-      ? { begin: transformDateString(ae.begin) }
-      : {}),
-    ...(transformDateString(ae.end) != null
-      ? { end: transformDateString(ae.end) }
-      : {}),
-    pk: ae.pk,
+    ...(timeRange.pk != null ? { pk: timeRange.pk } : {}),
+    beginTime: timeRange.beginTime ?? "",
+    endTime: timeRange.endTime ?? "",
+    priority: timeRange.priority ?? 50,
+    dayOfTheWeek: timeRange.dayOfTheWeek,
+  };
+}
+
+function transformApplicationSectionCreate(
+  ae: ApplicationSectionFormValue
+): ApplicationSectionForApplicationSerializerInput {
+  // TODO these should never be empty or invalid (backend forbids)
+  const begin = transformDateString(ae.begin) ?? "";
+  const end = transformDateString(ae.end) ?? "";
+  return {
+    ...(ae.pk != null ? { pk: ae.pk } : {}),
+    reservationsBeginDate: begin,
+    reservationsEndDate: end,
+    ...(ae.pk != null ? { pk: ae.pk } : {}),
     name: ae.name,
     numPersons: ae.numPersons ?? 0,
-    // these (pks) can never be zero or null in the current version
-    // even if there are no abilityGroups in the database...
-    // so for now default them to 1 and have another look after the backend change is merged
-    ...(ae.abilityGroup != null ? { abilityGroup: ae.abilityGroup } : {}),
-    ...(ae.ageGroup != null ? { ageGroup: ae.ageGroup } : {}),
-    ...(ae.purpose != null ? { purpose: ae.purpose } : {}),
-    // min / max duration is a weird string format in the API
-    minDuration: String(ae.minDuration ?? 0), // "3600" == 1h
-    maxDuration: String(ae.maxDuration ?? 0), // "7200" == 2h
-    // API Date format (YYYY-MM-DD)
-    // not mandatory in the input but what is the default value?
-    ...(transformDateString(ae.begin) != null
-      ? { begin: transformDateString(ae.begin) }
-      : {}),
-    ...(transformDateString(ae.end) != null
-      ? { end: transformDateString(ae.end) }
-      : {}),
-    biweekly: ae.biweekly,
-    eventsPerWeek: ae.eventsPerWeek,
-    applicationEventSchedules: ae.applicationEventSchedules
-      ?.filter(
-        (aes): aes is ApplicationEventScheduleFormValues => aes.priority != null
-      )
-      .map((aes) => transformApplicationEventSchedule(aes)),
-    eventReservationUnits: ae.reservationUnits?.map((eruPk, eruIndex) =>
-      transformEventReservationUnit(eruPk, eruIndex)
+    ageGroup: ae.ageGroup,
+    purpose: ae.purpose,
+    reservationMinDuration: ae.minDuration ?? 0, // "3600" == 1h
+    reservationMaxDuration: ae.maxDuration ?? 0, // "7200" == 2h
+    appliedReservationsPerWeek: ae.appliedReservationsPerWeek,
+    suitableTimeRanges: ae.suitableTimeRanges.map(
+      transformSuitableTimeRange
+    ),
+    reservationUnitOptions: ae.reservationUnits.map((ruo, ruoIndex) =>
+      transformEventReservationUnit(ruo, ruoIndex)
     ),
   };
-};
+}
+
+// TODO type the output
+// create or update mutation
+function transformApplicationSection(
+  ae: ApplicationSectionFormValue,
+  application: number
+):
+  | ApplicationSectionUpdateMutationInput
+  | ApplicationSectionCreateMutationInput {
+  const begin = transformDateString(ae.begin);
+  const end = transformDateString(ae.end);
+
+  const commonData = {
+    ...(begin != null ? { reservationsBeginDate: begin } : {}),
+    ...(end != null ? { reservationsEndDate: end } : {}),
+    name: ae.name,
+    numPersons: ae.numPersons ?? 0,
+    ageGroup: ae.ageGroup,
+    purpose: ae.purpose,
+    reservationMinDuration: ae.minDuration ?? 0, // "3600" == 1h
+    reservationMaxDuration: ae.maxDuration ?? 0, // "7200" == 2h
+    appliedReservationsPerWeek: ae.appliedReservationsPerWeek,
+    suitableTimeRanges: ae.suitableTimeRanges.map(transformSuitableTimeRange),
+    reservationUnitOptions: ae.reservationUnits.map((ruo, ruoIndex) =>
+      transformEventReservationUnit(ruo, ruoIndex)
+    ),
+  }
+  if (ae.pk != null) {
+    const data: ApplicationSectionUpdateMutationInput = {
+      ...commonData,
+      pk: ae.pk,
+    }
+    return data
+  }
+  // TODO throw is bad (null return is preferable)
+  // this should be a validation error (it's incorrect date string)
+  if (begin == null || end == null) {
+    throw new Error("begin or end cannot be null")
+  }
+  const data: ApplicationSectionCreateMutationInput = {
+    ...commonData,
+    application,
+    reservationsBeginDate: begin,
+    reservationsEndDate: end,
+  };
+
+  return data;
+}
+
+export function transformApplicationCreate(
+  values: ApplicationFormValues,
+  applicationRoundPk: number
+): ApplicationCreateMutationInput {
+  const appEvents = filterNonNullable(values.applicationSections);
+  return {
+    applicationRound: applicationRoundPk,
+    pk: values.pk,
+    applicantType: values.applicantType,
+    applicationSections: appEvents.map((ae) =>
+      transformApplicationSectionCreate(ae)
+    ),
+  };
+}
 
 // For pages 1 and 2
 export const transformApplication = (
-  values: ApplicationFormValues
+  values: ApplicationFormValues,
+  application: number
 ): ApplicationUpdateMutationInput => {
-  const appEvents = filterNonNullable(values.applicationEvents);
+  const appEvents = filterNonNullable(values.applicationSections);
   return {
     pk: values.pk,
     applicantType: values.applicantType,
-    applicationEvents: appEvents.map((ae) => transformApplicationEvent(ae)),
+    applicationSections: appEvents.map((ae) => transformApplicationSection(ae, application)),
   };
 };
 
-export const convertApplicationToForm = (
+export function convertApplication(
   app: Maybe<ApplicationNode> | undefined,
   reservationUnits: ReservationUnitNode[]
-): ApplicationFormValues => {
-  const formAes = filterNonNullable(app?.applicationEvents).map((ae) =>
-    transformApplicationEventToForm(ae)
+): ApplicationFormValues {
+  const formAes = filterNonNullable(app?.applicationSections).map((ae) =>
+    transformApplicationSectionToForm(ae)
   );
   // TODO do we need to set default values?
   const defaultAes: (typeof formAes)[0] = {
@@ -354,25 +395,21 @@ export const convertApplicationToForm = (
     name: "",
     formKey: "event-NEW",
     numPersons: 0,
-    abilityGroup: undefined,
     ageGroup: 0,
     purpose: 0,
     minDuration: 0,
     maxDuration: 0,
     begin: undefined,
     end: undefined,
-    biweekly: false,
-    eventsPerWeek: 1,
-    applicationEventSchedules: [],
-    reservationUnits: reservationUnits
-      .map((ru) => ru.pk)
-      .filter((pk): pk is number => pk != null),
+    appliedReservationsPerWeek: 1,
+    suitableTimeRanges: [],
+    reservationUnits: filterNonNullable(reservationUnits.map((ru) => ru.pk)),
     accordionOpen: true,
   };
   return {
     pk: app?.pk ?? 0,
-    applicantType: convertApplicantType(app?.applicantType),
-    applicationEvents: formAes.length > 0 ? formAes : [defaultAes],
+    applicantType: app?.applicantType ?? ApplicantTypeChoice.Individual,
+    applicationSections: formAes.length > 0 ? formAes : [defaultAes],
   };
-};
+}
 /* eslint-disabled @typescript-eslint/explicit-function-return-type */

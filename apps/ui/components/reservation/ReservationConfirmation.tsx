@@ -12,9 +12,9 @@ import styled from "styled-components";
 import { fontRegular, H2 } from "common/src/common/typography";
 import {
   PaymentOrderType,
-  ReservationsReservationStateChoices,
   ReservationType,
   ReservationUnitType,
+  State,
 } from "common/types/gql-types";
 import { Subheading } from "common/src/reservation-form/styles";
 import { breakpoints } from "common/src/common/style";
@@ -111,8 +111,7 @@ const ReservationConfirmation = ({
   const router = useRouter();
 
   const instructionsKey = getReservationUnitInstructionsKey(reservation?.state);
-  const requiresHandling =
-    reservation.state === ReservationsReservationStateChoices.RequiresHandling;
+  const requiresHandling = reservation.state === State.RequiresHandling;
   const heading = t(
     `reservationUnit:${
       requiresHandling ? "reservationInHandling" : "reservationSuccessful"
@@ -140,7 +139,7 @@ const ReservationConfirmation = ({
           {" "}
         </Trans>
       </Paragraph>
-      {reservation.state === ReservationsReservationStateChoices.Confirmed && (
+      {reservation.state === State.Confirmed && (
         <ActionContainer1 style={{ marginBottom: "var(--spacing-2-xl)" }}>
           <BlackButton
             data-testid="reservation__confirmation--button__calendar-url"

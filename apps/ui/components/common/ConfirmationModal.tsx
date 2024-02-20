@@ -10,6 +10,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { MediumButton } from "../../styles/util";
+import { isBrowser } from "common/src/helpers";
 
 type Props = {
   okLabel?: string;
@@ -92,6 +93,10 @@ const ConfirmationModal = forwardRef(
       }
     }, [type]);
 
+    // FIXME this is a hack to avoid SSR issues
+    if (!isBrowser) {
+      return null;
+    }
     const root = document.getElementById("modal-root");
     if (!root) {
       return null;

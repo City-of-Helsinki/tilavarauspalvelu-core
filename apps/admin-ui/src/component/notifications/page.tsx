@@ -18,15 +18,14 @@ import {
 import {
   BannerNotificationState,
   type BannerNotificationNode,
-  Level,
-  Target,
+  BannerNotificationLevel,
+  BannerNotificationTarget,
   type Mutation,
   type Query,
   type QueryBannerNotificationArgs,
   type MutationUpdateBannerNotificationArgs,
   type MutationCreateBannerNotificationArgs,
   type MutationDeleteBannerNotificationArgs,
-  type ErrorType,
   type BannerNotificationNodeConnection,
 } from "common/types/gql-types";
 import { BANNER_NOTIFICATIONS_ADMIN } from "common/src/components/BannerNotificationsQuery";
@@ -62,9 +61,6 @@ const BANNER_NOTIFICATIONS_CREATE = gql`
   mutation ($input: BannerNotificationCreateMutationInput!) {
     createBannerNotification(input: $input) {
       pk
-      errors {
-        messages
-      }
     }
   }
 `;
@@ -73,42 +69,37 @@ const BANNER_NOTIFICATIONS_UPDATE = gql`
   mutation ($input: BannerNotificationUpdateMutationInput!) {
     updateBannerNotification(input: $input) {
       pk
-      errors {
-        messages
-      }
     }
   }
 `;
 const BANNER_NOTIFICATIONS_DELETE = gql`
   mutation ($input: BannerNotificationDeleteMutationInput!) {
     deleteBannerNotification(input: $input) {
-      errors {
-        messages
-      }
+      deleted
     }
   }
 `;
 
 // helpers so we get typechecking without casting
-const convertLevel = (level: "EXCEPTION" | "NORMAL" | "WARNING"): Level => {
+const convertLevel = (level: "EXCEPTION" | "NORMAL" | "WARNING"): BannerNotificationLevel => {
   switch (level) {
     case "EXCEPTION":
-      return Level.Exception;
+      return BannerNotificationLevel.Exception;
     case "NORMAL":
-      return Level.Normal;
+      return BannerNotificationLevel.Normal;
     case "WARNING":
-      return Level.Warning;
+      return BannerNotificationLevel.Warning;
   }
 };
 
-const convertTarget = (target: "ALL" | "STAFF" | "USER"): Target => {
+const convertTarget = (target: "ALL" | "STAFF" | "USER"): BannerNotificationTarget => {
   switch (target) {
     case "ALL":
-      return Target.All;
+      return BannerNotificationTarget.All;
     case "STAFF":
-      return Target.Staff;
+      return BannerNotificationTarget.Staff;
     case "USER":
-      return Target.User;
+      return BannerNotificationTarget.User;
   }
 };
 
@@ -404,7 +395,7 @@ const NotificationForm = ({
     };
     const mutationFn = data.pk === 0 ? createMutation : updateMutation;
     try {
-      const res = await mutationFn({
+      await mutationFn({
         variables: {
           input,
         },
@@ -414,6 +405,8 @@ const NotificationForm = ({
           handleError(e.graphQLErrors.map((err) => err.message));
         },
       });
+      // FIXME remove mutation errors (they are inside the GQL error)
+      /*
       const mutationData =
         data.pk === 0
           ? res?.data?.createBannerNotification
@@ -427,6 +420,7 @@ const NotificationForm = ({
           )
         );
       } else {
+      */
         notifySuccess(
           t("form.saveSuccessToast", {
             name: data.name,
@@ -434,7 +428,6 @@ const NotificationForm = ({
           })
         );
         navigate("..");
-      }
     } catch (e) {
       // TODO what is the format of these errors?
       // eslint-disable-next-line no-console
@@ -695,12 +688,14 @@ const useRemoveNotification = ({
           // @ts-expect-error; TODO: typecheck broke after updating Apollo or Typescript
           bannerNotifications(existing: BannerNotificationNodeConnection) {
             const res = newData?.deleteBannerNotification;
+            /*
             if (res?.errors) {
               return existing;
             }
+            */
 
             const pkToDelete = notification?.pk;
-            if (!pkToDelete) {
+            if (!pkToDelete || !res?.deleted) {
               return existing;
             }
             return existing.edges.filter(
@@ -715,17 +710,25 @@ const useRemoveNotification = ({
   const navigate = useNavigate();
 
   const removeNotification = async () => {
-    const res = await removeMutation({
-      variables: {
-        input: {
-          pk: String(notification?.pk ?? 0),
+    try {
+      const res = await removeMutation({
+        variables: {
+          input: {
+            pk: String(notification?.pk ?? 0),
+          },
         },
-      },
-    });
-    if (res.errors) {
-      handleError(res.errors.map((e) => e.message));
+      });
+      if (res.errors) {
+        handleError(res.errors.map((e) => e.message));
+        return;
+      }
+    } catch(e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
+      handleError(["gql threw an error"]);
       return;
     }
+    /*
     if (res.data?.deleteBannerNotification?.errors) {
       const errs = res.data.deleteBannerNotification.errors
         .filter((e): e is ErrorType => e != null)
@@ -733,6 +736,7 @@ const useRemoveNotification = ({
       handleError(errs);
       return;
     }
+    */
     notifySuccess(t("Notifications.success.removed"));
     navigate("..");
   };

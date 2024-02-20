@@ -1,5 +1,5 @@
 import { camelCase, get, uniq } from "lodash";
-import { ReservationsReservationReserveeTypeChoices } from "../../types/gql-types";
+import { ReserveeType } from "../../types/gql-types";
 import { reservationApplicationFields } from "./types";
 
 export const getReservationApplicationFields = ({
@@ -7,7 +7,7 @@ export const getReservationApplicationFields = ({
   reserveeType,
 }: {
   supportedFields: string[];
-  reserveeType: ReservationsReservationReserveeTypeChoices | "common";
+  reserveeType: ReserveeType | "common";
 }): string[] => {
   if (!supportedFields || supportedFields?.length === 0 || !reserveeType)
     return [];

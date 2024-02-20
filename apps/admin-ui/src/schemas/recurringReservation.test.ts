@@ -1,6 +1,6 @@
 import { addDays, format } from "date-fns";
 
-import { ReservationUnitsReservationUnitReservationStartIntervalChoices } from "common/types/gql-types";
+import { ReservationStartInterval } from "common/types/gql-types";
 import { timeSelectionSchema } from "./recurringReservation";
 
 const DATE_FORMAT = "dd.MM.yyyy";
@@ -24,8 +24,7 @@ const reservation = {
   seriesName: "name",
 };
 
-const interval =
-  ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins;
+const interval = ReservationStartInterval.Interval_15Mins;
 
 // Tests timeSelectionSchema instead of the form schema because of refinements
 

@@ -8,10 +8,7 @@ import {
   RadioButton,
   Select,
 } from "hds-react";
-import {
-  ReservationUnitsReservationUnitPricingPriceUnitChoices,
-  ReservationUnitsReservationUnitPricingPricingTypeChoices,
-} from "common/types/gql-types";
+import { PriceUnit, PricingType } from "common/types/gql-types";
 import { Controller, UseFormReturn } from "react-hook-form";
 import { addDays } from "date-fns";
 import { AutoGrid } from "@/styles/layout";
@@ -51,9 +48,7 @@ function PaidPricingPart({
   const { control, setValue, formState, register, watch } = form;
   const { errors } = formState;
 
-  const unitPriceOptions = Object.values(
-    ReservationUnitsReservationUnitPricingPriceUnitChoices
-  ).map((choice) => ({
+  const unitPriceOptions = Object.values(PriceUnit).map((choice) => ({
     value: choice,
     label: t(`priceUnit.${choice}`),
   }));
@@ -93,10 +88,9 @@ function PaidPricingPart({
             style={{ gridColumnStart: "1" }}
             required
             options={unitPriceOptions}
-            onChange={(v: {
-              value: ReservationUnitsReservationUnitPricingPriceUnitChoices;
-              label: string;
-            }) => onChange(v.value)}
+            onChange={(v: { value: PriceUnit; label: string }) =>
+              onChange(v.value)
+            }
             value={
               unitPriceOptions.find((option) => option.value === value) ?? null
             }
@@ -290,7 +284,7 @@ function PaidPricingPart({
   );
 }
 
-export function PricingType({
+export function PricingTypeView({
   index,
   form,
   taxPercentageOptions,
@@ -302,10 +296,7 @@ export function PricingType({
 
   const pricing = watch(`pricings.${index}`);
 
-  const priceOptions = [
-    ReservationUnitsReservationUnitPricingPricingTypeChoices.Free,
-    ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid,
-  ] as const;
+  const priceOptions = [PricingType.Free, PricingType.Paid] as const;
 
   return (
     <AutoGrid>
@@ -353,7 +344,7 @@ export function PricingType({
           <span>{getTranslatedError(t, errors.pricings.message)}</span>
         </Error>
       )}
-      {pricing?.pricingType === "PAID" && (
+      {pricing?.pricingType === PricingType.Paid && (
         <PaidPricingPart
           form={form}
           index={index}

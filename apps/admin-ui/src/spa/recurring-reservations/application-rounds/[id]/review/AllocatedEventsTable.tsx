@@ -3,16 +3,14 @@ import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import { memoize } from "lodash";
 import { IconLinkExternal } from "hds-react";
-import {
-  ApplicationEventStatusChoice,
-  type ApplicationEventScheduleNode,
-} from "common/types/gql-types";
+import type { AllocatedTimeSlotNode } from "common/types/gql-types";
 import { PUBLIC_URL } from "@/common/const";
 import { truncate } from "@/helpers";
 import { applicationDetailsUrl } from "@/common/urls";
 import { CustomTable, ExternalTableLink } from "@/component/Table";
-import { getApplicantName } from "app/component/applications/util";
-import { ApplicationEventStatusCell } from "./StatusCell";
+import { getApplicantName } from "@/component/applications/util";
+import { TimeSlotStatusCell } from "./StatusCell";
+import { convertWeekday } from "../allocation/modules/applicationRoundAllocation";
 
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
@@ -20,7 +18,7 @@ const applicantTruncateLen = 20;
 type Props = {
   sort: string | null;
   sortChanged: (field: string) => void;
-  schedules: ApplicationEventScheduleNode[];
+  schedules: AllocatedTimeSlotNode[];
   isLoading?: boolean;
 };
 
@@ -35,41 +33,41 @@ type ApplicationScheduleView = {
   statusView: JSX.Element;
 };
 
-function aesMapper(
+function timeSlotMapper(
   t: TFunction,
-  aes: ApplicationEventScheduleNode
+  slot: AllocatedTimeSlotNode
 ): ApplicationScheduleView {
-  const allocatedReservationUnitName =
-    aes.allocatedReservationUnit?.nameFi ?? "-";
-  const allocatedUnit = aes.allocatedReservationUnit?.unit?.nameFi ?? "-";
+  const allocatedReservationUnit = slot.reservationUnitOption?.reservationUnit;
+  const allocatedReservationUnitName = allocatedReservationUnit?.nameFi ?? "-";
+  const allocatedUnit = allocatedReservationUnit?.unit?.nameFi ?? "-";
 
-  const ae = aes.applicationEvent;
-  const application = ae?.application;
+  const application =
+    slot.reservationUnitOption.applicationSection?.application;
   const applicantName = getApplicantName(application);
 
-  const { allocatedDay: day, allocatedBegin: begin, allocatedEnd: end } = aes;
+  // TODO should this check the state directly?
+  const isAllocated = !slot.reservationUnitOption.rejected;
+  const isDeclined = slot.reservationUnitOption.rejected;
 
-  const isAllocated = aes.allocatedBegin && aes.allocatedEnd;
-  const isDeclined = aes.declined;
-  const status = isDeclined
-    ? ApplicationEventStatusChoice.Declined
-    : isAllocated
-      ? ApplicationEventStatusChoice.Approved
-      : undefined;
-
+  const day = slot?.dayOfTheWeek ? convertWeekday(slot?.dayOfTheWeek) : 0;
+  const begin = slot?.beginTime ?? "";
+  const end = slot?.endTime ?? "";
   const timeString = isAllocated
-    ? `${t(`dayShort.${day}`)} ${begin?.slice(0, 5)} - ${end?.slice(0, 5)}`
+    ? `${t(`dayShort.${day}`)} ${begin.slice(0, 5)} - ${end.slice(0, 5)}`
     : "-";
+  const name = slot.reservationUnitOption.applicationSection.name ?? "-";
 
   return {
-    applicationPk: application?.pk ?? 0,
-    pk: aes.applicationEvent.pk ?? 0,
+    applicationPk: application.pk ?? 0,
+    pk: slot.reservationUnitOption.applicationSection.pk ?? 0,
     applicantName,
     allocatedReservationUnitName,
     unitName: allocatedUnit,
     time: timeString,
-    name: ae.name ?? "-",
-    statusView: <ApplicationEventStatusCell status={status} />,
+    name,
+    statusView: (
+      <TimeSlotStatusCell status={isDeclined ? "declined" : "approved"} />
+    ),
   };
 }
 
@@ -160,7 +158,7 @@ export function AllocatedEventsTable({
 }: Props): JSX.Element {
   const { t } = useTranslation();
 
-  const views = schedules.map((aes) => aesMapper(t, aes));
+  const views = schedules.map((aes) => timeSlotMapper(t, aes));
 
   const cols = memoize(() => getColConfig(t))();
 
@@ -174,6 +172,7 @@ export function AllocatedEventsTable({
   return (
     <CustomTable
       setSort={onSortChanged}
+      // FIXME this creates duplicate keys because section pk is not unique (same section can be allocated / declined multiple times)
       indexKey="pk"
       isLoading={isLoading}
       rows={views}

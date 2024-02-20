@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { ReservationsReservationTypeChoices } from "common/types/gql-types";
+import { Type } from "common/types/gql-types";
 
 export const CREATE_RESERVATION = gql`
   mutation createReservation($input: ReservationCreateMutationInput!) {
@@ -136,7 +136,7 @@ export const LIST_RESERVATIONS = gql`
       user: $user
       reservationUnit: $reservationUnit
       orderBy: $orderBy
-      reservationType: "${ReservationsReservationTypeChoices.Normal.toLowerCase()}"
+      reservationType: "${Type.Normal.toLowerCase()}"
     ) {
       edges {
         node {

@@ -154,7 +154,6 @@ export const RESERVATIONUNIT_RESERVATIONS_FRAGMENT = gql`
       pk
       name
       type
-      priority
       begin
       end
       state

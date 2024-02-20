@@ -107,8 +107,8 @@ const getColConfig = (t: TFunction) =>
 export const SORT_KEYS = COLS.filter((c) => c.isSortable).map((c) => c.key);
 
 const appMapper = (app: ApplicationNode, t: TFunction): ApplicationView => {
-  const applicationEvents = (app.applicationEvents || [])
-    .flatMap((ae) => ae?.eventReservationUnits)
+  const applicationEvents = (app.applicationSections || [])
+    .flatMap((ae) => ae?.reservationUnitOptions)
     .flatMap((eru) => ({
       ...eru?.reservationUnit?.unit,
       priority: eru?.preferredOrder ?? 0,
@@ -117,8 +117,8 @@ const appMapper = (app: ApplicationNode, t: TFunction): ApplicationView => {
     (u) => ({ pk: u.pk ?? 0, name: u.nameFi ?? "-" })
   );
 
-  const name = app.applicationEvents?.find(() => true)?.name || "-";
-  const firstEvent = app.applicationEvents?.find(() => true);
+  const name = app.applicationSections?.find(() => true)?.name || "-";
+  const firstEvent = app.applicationSections?.find(() => true);
   const eventPk = firstEvent?.pk ?? 0;
 
   const status = app.status ?? undefined;

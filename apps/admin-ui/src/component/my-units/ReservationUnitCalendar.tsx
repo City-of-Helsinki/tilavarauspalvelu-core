@@ -7,11 +7,11 @@ import { addDays, endOfISOWeek, startOfISOWeek } from "date-fns";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import {
-  Query,
-  ReservationType,
-  ReservationUnitByPkTypeReservationsArgs,
-  QueryReservationUnitByPkArgs,
-  ReservationsReservationTypeChoices,
+  type Query,
+  type ReservationType,
+  type ReservationUnitByPkTypeReservationsArgs,
+  type QueryReservationUnitByPkArgs,
+  Type,
 } from "common/types/gql-types";
 import { Permission } from "app/modules/permissionHelper";
 import usePermission from "app/hooks/usePermission";
@@ -119,7 +119,7 @@ const ReservationUnitCalendar = ({
       setEvents(
         reservations.map((reservation) => {
           const title =
-            reservation.type !== ReservationsReservationTypeChoices.Blocked
+            reservation.type !== Type.Blocked
               ? constructEventTitle(reservation, reservationUnitPk)
               : t("MyUnits.Calendar.legend.closed");
           return {
@@ -155,7 +155,7 @@ const ReservationUnitCalendar = ({
     ? getEventBuffers(
         events
           .map((e) => e.event)
-          .filter((e) => e?.type !== ReservationsReservationTypeChoices.Blocked)
+          .filter((e) => e?.type !== Type.Blocked)
           .filter((e): e is ReservationType => e != null)
       )
     : [];

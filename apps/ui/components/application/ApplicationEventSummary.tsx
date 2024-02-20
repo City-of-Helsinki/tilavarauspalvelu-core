@@ -6,10 +6,10 @@ import styled from "styled-components";
 import { H5 } from "common/src/common/typography";
 import { fromUIDate } from "common/src/common/util";
 import IconWithText from "../common/IconWithText";
-import { ApplicationEventFormValue } from "./Form";
+import { ApplicationSectionFormValue } from "./Form";
 
 type Props = {
-  applicationEvent?: ApplicationEventFormValue;
+  applicationSection?: ApplicationSectionFormValue;
   name: string;
 };
 
@@ -70,26 +70,34 @@ function displayDuration(duration: number, t: TFunction) {
   }`;
 }
 
-const ApplicationEventSummary = ({
-  applicationEvent,
+export function ApplicationEventSummary({
+  applicationSection,
   name,
-}: Props): JSX.Element | null => {
+}: Props): JSX.Element | null {
   const { t } = useTranslation();
 
-  if (!applicationEvent) {
+  if (!applicationSection) {
     return null;
   }
 
   const {
     begin,
     end,
-    biweekly,
-    eventsPerWeek,
+    // biweekly,
+    appliedReservationsPerWeek,
     minDuration,
     maxDuration,
     numPersons,
-  } = applicationEvent;
-  const hours = numHours(begin, end, biweekly, eventsPerWeek, minDuration / 60);
+  } = applicationSection;
+
+  const biweekly = false;
+  const hours = numHours(
+    begin,
+    end,
+    biweekly,
+    appliedReservationsPerWeek,
+    minDuration / 60
+  );
 
   if (!begin || !end || !minDuration) {
     return null;
@@ -123,15 +131,15 @@ const ApplicationEventSummary = ({
               minDuration === maxDuration ? "minDuration" : "durations"
             }`,
             {
-              minDuration: displayDuration(applicationEvent.minDuration, t),
-              maxDuration: displayDuration(applicationEvent.maxDuration, t),
+              minDuration: displayDuration(applicationSection.minDuration, t),
+              maxDuration: displayDuration(applicationSection.maxDuration, t),
             }
           )}
         />
         <CustomIconWithText
           icon={<IconCalendar aria-hidden />}
           text={t("applicationEventSummary:eventsPerWeek", {
-            count: eventsPerWeek,
+            count: appliedReservationsPerWeek,
           })}
         />
         {biweekly ? (
@@ -143,5 +151,4 @@ const ApplicationEventSummary = ({
       </Box>
     </>
   );
-};
-export { ApplicationEventSummary };
+}

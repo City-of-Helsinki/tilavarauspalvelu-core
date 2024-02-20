@@ -1,26 +1,26 @@
 import {
   ApplicantTypeChoice,
-  ApplicationEventStatusChoice,
   ApplicationStatusChoice,
+  ApplicationSectionStatusChoice,
 } from "common/types/gql-types";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 
-export function transformApplicationEventStatus(
+export function transformApplicationSectionStatus(
   status: string[]
-): ApplicationEventStatusChoice[] {
+): ApplicationSectionStatusChoice[] {
   return status
     .map((s) => {
       switch (s) {
-        case ApplicationEventStatusChoice.Approved:
-          return ApplicationEventStatusChoice.Approved;
-        case ApplicationEventStatusChoice.Unallocated:
-          return ApplicationEventStatusChoice.Unallocated;
-        case ApplicationEventStatusChoice.Declined:
-          return ApplicationEventStatusChoice.Declined;
-        case ApplicationEventStatusChoice.Failed:
-          return ApplicationEventStatusChoice.Failed;
-        case ApplicationEventStatusChoice.Reserved:
-          return ApplicationEventStatusChoice.Reserved;
+        case ApplicationSectionStatusChoice.Handled:
+          return ApplicationSectionStatusChoice.Handled;
+        case ApplicationSectionStatusChoice.Unallocated:
+          return ApplicationSectionStatusChoice.Unallocated;
+        case ApplicationSectionStatusChoice.InAllocation:
+          return ApplicationSectionStatusChoice.InAllocation;
+        case ApplicationSectionStatusChoice.Failed:
+          return ApplicationSectionStatusChoice.Failed;
+        case ApplicationSectionStatusChoice.Reserved:
+          return ApplicationSectionStatusChoice.Reserved;
         default:
           return undefined;
       }

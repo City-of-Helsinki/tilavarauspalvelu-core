@@ -20,12 +20,12 @@ import {
   ReservationConfirmMutationPayload,
   ReservationDeleteMutationInput,
   ReservationDeleteMutationPayload,
-  ReservationsReservationReserveeTypeChoices,
   ReservationType,
   ReservationUpdateMutationInput,
   ReservationUpdateMutationPayload,
-  TermsOfUseTermsOfUseTermsTypeChoices,
-  ReservationsReservationStateChoices,
+  ReserveeType,
+  TermsType,
+  State,
 } from "common/types/gql-types";
 import { Inputs } from "common/src/reservation-form/types";
 import { Subheading } from "common/src/reservation-form/styles";
@@ -96,7 +96,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       query: TERMS_OF_USE,
       fetchPolicy: "no-cache",
       variables: {
-        termsType: TermsOfUseTermsOfUseTermsTypeChoices.GenericTerms,
+        termsType: TermsType.GenericTerms,
       },
     });
     const genericTerms =
@@ -336,10 +336,7 @@ const ReservationUnitReservationWithReservationProp = ({
         setErrorMsg(t("errors:general_error"));
         return;
       }
-      if (
-        state === ReservationsReservationStateChoices.Confirmed ||
-        state === ReservationsReservationStateChoices.RequiresHandling
-      ) {
+      if (state === State.Confirmed || state === State.RequiresHandling) {
         router.push(`${reservationsUrl}${pk}/confirmation`);
       } else if (steps?.length > 2) {
         const order = data.confirmReservation?.order;
@@ -410,7 +407,7 @@ const ReservationUnitReservationWithReservationProp = ({
 
   const type = supportedFields.includes("reservee_type")
     ? reserveeType
-    : ReservationsReservationReserveeTypeChoices.Individual;
+    : ReserveeType.Individual;
   const reservationApplicationFields = getReservationApplicationFields({
     supportedFields,
     reserveeType: type,
@@ -438,7 +435,7 @@ const ReservationUnitReservationWithReservationProp = ({
       supportedFields,
       supportedFields.includes("reservee_type")
         ? reserveeType
-        : ReservationsReservationReserveeTypeChoices.Individual
+        : ReserveeType.Individual
     );
 
     return updateReservation({

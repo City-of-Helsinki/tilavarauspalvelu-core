@@ -16,8 +16,8 @@ import ClientOnly from "common/src/ClientOnly";
 import {
   type Query,
   type QueryReservationUnitsArgs,
-  ReservationUnitsReservationUnitReservationKindChoices,
   type ReservationUnitType,
+  ReservationKind,
 } from "common/types/gql-types";
 import { Container } from "common";
 import { filterNonNullable } from "common/src/helpers";
@@ -151,8 +151,7 @@ const processVariables = (values: Record<string, string>, language: string) => {
     orderBy: values.order === "desc" ? `-${sortCriteria}` : sortCriteria,
     isDraft: false,
     isVisible: true,
-    reservationKind:
-      ReservationUnitsReservationUnitReservationKindChoices.Direct,
+    reservationKind: ReservationKind.Direct,
   };
 };
 

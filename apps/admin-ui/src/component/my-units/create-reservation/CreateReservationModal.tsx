@@ -7,8 +7,8 @@ import {
   type ReservationStaffCreateMutationInput,
   type ReservationStaffCreateMutationPayload,
   type ReservationUnitType,
-  ReservationsReservationTypeChoices,
-  ReservationUnitsReservationUnitReservationStartIntervalChoices,
+  Type,
+  ReservationStartInterval,
 } from "common/types/gql-types";
 import styled from "styled-components";
 import { camelCase, get } from "lodash";
@@ -122,8 +122,7 @@ const useCheckFormCollisions = ({
       before: bufferBeforeSeconds,
       after: bufferAfterSeconds,
     },
-    reservationType: (type ??
-      ReservationsReservationTypeChoices.Blocked) as ReservationsReservationTypeChoices,
+    reservationType: (type ?? Type.Blocked) as Type,
   });
 
   return { hasCollisions };
@@ -203,9 +202,9 @@ const DialogContent = ({
   const { t, i18n } = useTranslation();
   const interval =
     reservationUnit.reservationStartInterval ===
-    ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
-      ? ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
-      : ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_30Mins;
+    ReservationStartInterval.Interval_15Mins
+      ? ReservationStartInterval.Interval_15Mins
+      : ReservationStartInterval.Interval_30Mins;
   const form = useForm<FormValueType>({
     resolver: zodResolver(ReservationFormSchema(interval)),
     // TODO onBlur or onChange? onChange is anoying because it highlights even untouched fields

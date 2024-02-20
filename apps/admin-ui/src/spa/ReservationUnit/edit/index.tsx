@@ -28,15 +28,15 @@ import {
   type QueryReservationUnitByPkArgs,
   type QueryUnitByPkArgs,
   type Mutation,
-  ReservationUnitsReservationUnitReservationStartIntervalChoices,
+  ReservationStartInterval,
   type ReservationUnitImageCreateMutationInput,
-  ReservationUnitsReservationUnitAuthenticationChoices,
+  Authentication,
   type UnitByPkType,
   type ReservationState,
   type ReservationUnitState,
-  TermsOfUseTermsOfUseTermsTypeChoices,
+  TermsType,
   type ReservationUnitByPkType,
-  ReservationUnitsReservationUnitPricingStatusChoices,
+  Status,
   type SpaceType,
   type ReservationUnitTypeType,
   type QualifierType,
@@ -81,7 +81,7 @@ import { ArchiveDialog } from "./ArchiveDialog";
 import { ReservationStateTag, ReservationUnitStateTag } from "./tags";
 import { ActivationGroup } from "./ActivationGroup";
 import { ImageEditor } from "./ImageEditor";
-import { PricingType } from "./PricingType";
+import { PricingTypeView } from "./PricingType";
 import { GenericDialog } from "./GenericDialog";
 import {
   type ReservationUnitEditFormValues,
@@ -327,7 +327,7 @@ const durationOptions = bufferTimeOptions.concat(
 // Terms PK is not a number but any valid string
 const makeTermsOptions = (
   parameters: Query | undefined,
-  termsType: TermsOfUseTermsOfUseTermsTypeChoices
+  termsType: TermsType
 ) => {
   return filterNonNullable(parameters?.termsOfUse?.edges.map((e) => e?.node))
     .filter((tou) => termsType === tou?.termsType)
@@ -828,15 +828,13 @@ function ReservationUnitSettings({
   const { errors } = formState;
 
   const reservationStartIntervalOptions = Object.values(
-    ReservationUnitsReservationUnitReservationStartIntervalChoices
+    ReservationStartInterval
   ).map((choice) => ({
     value: choice,
     label: t(`reservationStartInterval.${choice}`),
   }));
 
-  const authenticationOptions = Object.values(
-    ReservationUnitsReservationUnitAuthenticationChoices
-  ).map((choice) => ({
+  const authenticationOptions = Object.values(Authentication).map((choice) => ({
     value: choice,
     label: t(`authentication.${choice}`),
   }));
@@ -1063,7 +1061,7 @@ function ReservationUnitSettings({
                 ) ?? null
               }
               onChange={(val: {
-                value: ReservationUnitsReservationUnitReservationStartIntervalChoices;
+                value: ReservationStartInterval;
                 label: string;
               }) => onChange(val.value)}
               error={getTranslatedError(
@@ -1251,10 +1249,9 @@ function ReservationUnitSettings({
               value={
                 authenticationOptions.find((o) => o.value === value) ?? null
               }
-              onChange={(val: {
-                value: ReservationUnitsReservationUnitAuthenticationChoices;
-                label: string;
-              }) => onChange(val.value)}
+              onChange={(val: { value: Authentication; label: string }) =>
+                onChange(val.value)
+              }
               label={t("ReservationUnitEditor.authenticationLabel")}
               tooltipText={t("ReservationUnitEditor.tooltip.authentication")}
             />
@@ -1319,12 +1316,8 @@ function PricingSection({
   const isPaid =
     watch("pricings")
       .filter((p) => p?.pricingType === "PAID")
-      .filter(
-        (p) =>
-          p.status ===
-            ReservationUnitsReservationUnitPricingStatusChoices.Active ||
-          isFuturePriceVisible
-      ).length > 0;
+      .filter((p) => p.status === Status.Active || isFuturePriceVisible)
+      .length > 0;
 
   const hasErrors = errors.pricings != null || errors.paymentTypes != null;
   return (
@@ -1335,8 +1328,7 @@ function PricingSection({
       <VerticalFlex>
         {watch("pricings").map(
           (pricing, index) =>
-            pricing?.status ===
-              ReservationUnitsReservationUnitPricingStatusChoices.Active && (
+            pricing?.status === Status.Active && (
               <FieldGroup
                 // eslint-disable-next-line react/no-array-index-key -- TODO refactor to use pk / fake pks
                 key={index}
@@ -1344,7 +1336,7 @@ function PricingSection({
                 heading={`${t("ReservationUnitEditor.label.pricingType")} *`}
                 tooltip={t("ReservationUnitEditor.tooltip.pricingType")}
               >
-                <PricingType
+                <PricingTypeView
                   // TODO form index is bad, use pk or form key
                   index={index}
                   form={form}
@@ -1368,8 +1360,7 @@ function PricingSection({
         {watch("hasFuturePricing") &&
           watch("pricings").map(
             (pricing, index) =>
-              pricing.status ===
-                ReservationUnitsReservationUnitPricingStatusChoices.Future && (
+              pricing.status === Status.Future && (
                 <FieldGroup
                   // eslint-disable-next-line react/no-array-index-key -- TODO refactor to use pk / fake pks
                   key={index}
@@ -1377,7 +1368,7 @@ function PricingSection({
                   heading={`${t("ReservationUnitEditor.label.pricingType")} *`}
                   tooltip={t("ReservationUnitEditor.tooltip.pricingType")}
                 >
-                  <PricingType
+                  <PricingTypeView
                     // TODO form index is bad, use pk or form key
                     index={index}
                     form={form}
@@ -1972,11 +1963,11 @@ const ReservationUnitEditor = ({
 
   const paymentTermsOptions = makeTermsOptions(
     parametersData,
-    TermsOfUseTermsOfUseTermsTypeChoices.PaymentTerms
+    TermsType.PaymentTerms
   );
   const pricingTermsOptions = makeTermsOptions(
     parametersData,
-    TermsOfUseTermsOfUseTermsTypeChoices.PricingTerms
+    TermsType.PricingTerms
   );
   const taxPercentageOptions = filterNonNullable(
     parametersData?.taxPercentages?.edges.map((e) => e?.node)
@@ -1986,11 +1977,11 @@ const ReservationUnitEditor = ({
   }));
   const serviceSpecificTermsOptions = makeTermsOptions(
     parametersData,
-    TermsOfUseTermsOfUseTermsTypeChoices.ServiceTerms
+    TermsType.ServiceTerms
   );
   const cancellationTermsOptions = makeTermsOptions(
     parametersData,
-    TermsOfUseTermsOfUseTermsTypeChoices.CancellationTerms
+    TermsType.CancellationTerms
   );
 
   const unit = unitResourcesData?.unitByPk ?? undefined;

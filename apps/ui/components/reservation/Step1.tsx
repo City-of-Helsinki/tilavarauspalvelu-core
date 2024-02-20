@@ -5,8 +5,8 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { IconArrowLeft, IconArrowRight } from "hds-react";
 import {
-  ReservationsReservationReserveeTypeChoices,
   ReservationType,
+  ReserveeType,
   TermsOfUseType,
 } from "common/types/gql-types";
 import TermsBox from "common/src/termsbox/TermsBox";
@@ -34,7 +34,7 @@ type Props = {
   generalFields: string[];
   reservationApplicationFields: string[];
   options: Record<string, OptionType[]>;
-  reserveeType: ReservationsReservationReserveeTypeChoices;
+  reserveeType: ReserveeType;
   requiresHandling: boolean;
   setStep: React.Dispatch<React.SetStateAction<number>>;
   genericTerms: TermsOfUseType | null;

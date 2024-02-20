@@ -1,24 +1,22 @@
 import React from "react";
 import { ApolloError, useQuery } from "@apollo/client";
 import {
-  ApplicationEventStatusChoice,
   type Query,
-  type QueryApplicationEventSchedulesArgs,
+  type QueryAllocatedTimeSlotsArgs,
+  ApplicationSectionStatusChoice,
 } from "common/types/gql-types";
 import { useTranslation } from "next-i18next";
 import { filterNonNullable } from "common/src/helpers";
 import { LIST_PAGE_SIZE } from "@/common/const";
 import { useNotification } from "@/context/NotificationContext";
-import { APPLICATIONS_EVENTS_SCHEDULE_QUERY } from "./queries";
+import { ALLOCATED_TIME_SLOTS_QUERY } from "./queries";
 import Loader from "@/component/Loader";
 import { More } from "@/component/More";
 import { useSort } from "@/hooks/useSort";
-import {
-  transformApplicantType,
-  transformApplicationEventStatus,
-} from "./utils";
+import { transformApplicantType } from "./utils";
 import { useSearchParams } from "react-router-dom";
 import { AllocatedEventsTable, SORT_KEYS } from "./AllocatedEventsTable";
+import { transformWeekday, type Day } from "common/src/conversion";
 
 export type Sort = {
   field: string;
@@ -29,6 +27,7 @@ type Props = {
   applicationRoundPk: number;
 };
 
+// TODO rename the component TimeSlotDataLoader
 export function AllocatedEventDataLoader({
   applicationRoundPk,
 }: Props): JSX.Element {
@@ -39,42 +38,58 @@ export function AllocatedEventDataLoader({
   const unitFilter = searchParams.getAll("unit");
   const applicantFilter = searchParams.getAll("applicant");
   const nameFilter = searchParams.get("search");
-  const appEventStatusFilter = searchParams.getAll("eventStatus");
   const weekDayFilter = searchParams.getAll("weekday");
   const reservationUnitFilter = searchParams.getAll("reservationUnit");
 
-  const aesFilter = transformApplicationEventStatus(appEventStatusFilter);
+  // FIXME rewrite this for ApplicationSection
+  // it doesn't have Approved / Declined statuses (it's based on fullfilled / rejected?)
+  // or allocatedTimeSlots declined?
+  // FIXME rewrite the query key rangeStatus?
+  /* TODO
+  const appEventStatusFilter = searchParams.getAll("eventStatus");
+  const aesFilter = transformApplicationSectionStatus(appEventStatusFilter);
   // accepted and declined are mutually exclusive
   const onlyAccepted =
     aesFilter.length === 1 &&
     aesFilter[0] === ApplicationEventStatusChoice.Approved;
   const onlyDeclined =
     aesFilter.length === 1 &&
-    aesFilter[0] === ApplicationEventStatusChoice.Declined;
+    aesFilter[0] === ApplicationSe.Declined;
+  */
 
   const { fetchMore, previousData, loading, data } = useQuery<
     Query,
-    QueryApplicationEventSchedulesArgs
-  >(APPLICATIONS_EVENTS_SCHEDULE_QUERY, {
+    QueryAllocatedTimeSlotsArgs
+  >(ALLOCATED_TIME_SLOTS_QUERY, {
     skip: !applicationRoundPk,
     variables: {
       allocatedUnit: unitFilter.map(Number).filter(Number.isFinite),
       applicationRound: applicationRoundPk,
       applicantType: transformApplicantType(applicantFilter),
-      allocatedDay: weekDayFilter
+      applicationSectionStatus: [
+        ApplicationSectionStatusChoice.Handled,
+        ApplicationSectionStatusChoice.InAllocation,
+      ],
+      // applicationSectionStatus: appEventStatusFilter
+      dayOfTheWeek: weekDayFilter
         .map(Number)
         .filter(Number.isFinite)
-        .filter((n) => n >= 0 && n <= 6),
+        .filter((n): n is Day => n >= 0 && n <= 6)
+        .map(transformWeekday),
+      /*
+      allocatedDay: weekDayFilter
+      unallocated: false,
+      */
       allocatedReservationUnit: reservationUnitFilter
         .map(Number)
         .filter(Number.isFinite),
-      unallocated: false,
-      accepted: onlyAccepted ? true : undefined,
-      declined: onlyDeclined ? true : undefined,
+      // accepted: onlyAccepted ? true : undefined,
+      // declined: onlyDeclined ? true : undefined,
       textSearch: nameFilter,
       offset: 0,
       first: LIST_PAGE_SIZE,
-      orderBy,
+      // TODO
+      // orderBy,
     },
     onError: (err: ApolloError) => {
       notifyError(err.message);
@@ -90,9 +105,9 @@ export function AllocatedEventDataLoader({
     return <Loader />;
   }
 
-  const totalCount = dataToUse?.applicationEventSchedules?.totalCount ?? 0;
+  const totalCount = dataToUse?.allocatedTimeSlots?.totalCount ?? 0;
   const aes = filterNonNullable(
-    dataToUse?.applicationEventSchedules?.edges.map((edge) => edge?.node)
+    dataToUse?.allocatedTimeSlots?.edges.map((edge) => edge?.node)
   );
 
   return (
@@ -114,7 +129,7 @@ export function AllocatedEventDataLoader({
         fetchMore={() =>
           fetchMore({
             variables: {
-              offset: data?.applicationEventSchedules?.edges.length ?? 0,
+              offset: data?.allocatedTimeSlots?.edges.length ?? 0,
             },
           })
         }

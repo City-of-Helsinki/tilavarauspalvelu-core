@@ -6,6 +6,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { H2, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
+  ApplicationRoundOrderingChoices,
   ApplicationRoundStatusChoice,
   type Query,
   type QueryApplicationRoundsArgs,
@@ -31,7 +32,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     query: APPLICATION_ROUNDS,
     fetchPolicy: "no-cache",
     variables: {
-      orderBy: "pk",
+      orderBy: [ApplicationRoundOrderingChoices.PkAsc],
     },
   });
   const applicationRounds = filterNonNullable(

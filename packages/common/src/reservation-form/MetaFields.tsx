@@ -16,7 +16,7 @@ import { Controller, useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import {
   type ReservationMetadataSetType,
-  ReservationsReservationReserveeTypeChoices,
+  ReserveeType,
 } from "../../types/gql-types";
 import ReservationFormField from "./ReservationFormField";
 import { Inputs, Reservation } from "./types";
@@ -83,15 +83,15 @@ const ReservationApplicationFieldsContainer = styled(TwoColumnContainer)`
 
 const reserveeOptions = [
   {
-    id: ReservationsReservationReserveeTypeChoices.Individual,
+    id: ReserveeType.Individual,
     icon: <IconUser aria-hidden />,
   },
   {
-    id: ReservationsReservationReserveeTypeChoices.Nonprofit,
+    id: ReserveeType.Nonprofit,
     icon: <IconGroup aria-hidden />,
   },
   {
-    id: ReservationsReservationReserveeTypeChoices.Business,
+    id: ReserveeType.Business,
     icon: <IconPremises width="24" height="24" aria-hidden />,
   },
 ];
@@ -101,27 +101,23 @@ const SubheadingByType = ({
   index,
   field,
 }: {
-  reserveeType: ReservationsReservationReserveeTypeChoices;
+  reserveeType: ReserveeType;
   index: number;
   field: string;
 }) => {
   const { t } = useTranslation();
 
   const headingForNonProfit =
-    reserveeType === ReservationsReservationReserveeTypeChoices.Nonprofit &&
-    index === 0;
+    reserveeType === ReserveeType.Nonprofit && index === 0;
 
   const headingForNonProfitContactInfo =
-    reserveeType === ReservationsReservationReserveeTypeChoices.Nonprofit &&
-    field === "reserveeFirstName";
+    reserveeType === ReserveeType.Nonprofit && field === "reserveeFirstName";
 
   const headingForCompanyInfo =
-    reserveeType === ReservationsReservationReserveeTypeChoices.Business &&
-    index === 0;
+    reserveeType === ReserveeType.Business && index === 0;
 
   const headingForContactInfo =
-    reserveeType === ReservationsReservationReserveeTypeChoices.Business &&
-    field === "reserveeFirstName";
+    reserveeType === ReserveeType.Business && field === "reserveeFirstName";
 
   return headingForNonProfit ? (
     <GroupHeading style={{ marginTop: 0 }}>
@@ -153,7 +149,7 @@ const ReservationFormFields = ({
   data,
 }: CommonProps & {
   fields: Field[];
-  headingKey?: ReservationsReservationReserveeTypeChoices | "COMMON";
+  headingKey?: ReserveeType | "COMMON";
   hasSubheading?: boolean;
   metadata?: ReservationMetadataSetType;
   params?: { numPersons: { min?: number; max?: number } };

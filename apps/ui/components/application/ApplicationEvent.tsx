@@ -140,16 +140,16 @@ const ApplicationEventInner = ({
     unitOptions,
   } = optionTypes;
 
-  const applicationPeriodBegin = watch(`applicationEvents.${index}.begin`);
-  const applicationPeriodEnd = watch(`applicationEvents.${index}.end`);
-  const numPersons = watch(`applicationEvents.${index}.numPersons`);
+  const applicationPeriodBegin = watch(`applicationSections.${index}.begin`);
+  const applicationPeriodEnd = watch(`applicationSections.${index}.end`);
+  const numPersons = watch(`applicationSections.${index}.numPersons`);
   const modalRef = useRef<ModalRef>();
 
   const selectDefaultPeriod = (): void => {
     const begin = periodStartDate ? apiDateToUIDate(periodStartDate) : "";
     const end = periodEndDate ? apiDateToUIDate(periodEndDate) : "";
-    setValue(`applicationEvents.${index}.begin`, begin);
-    setValue(`applicationEvents.${index}.end`, end);
+    setValue(`applicationSections.${index}.begin`, begin);
+    setValue(`applicationSections.${index}.end`, end);
   };
 
   const selectionIsDefaultPeriod =
@@ -164,15 +164,16 @@ const ApplicationEventInner = ({
     | "purpose"
     | "ageGroup"
     | "numPersons"
-    | "abilityGroup"
+    // | "abilityGroup"
     | "minDuration"
     | "maxDuration"
     | "name"
-    | "eventsPerWeek"
-    | "applicationEventSchedules"
+    // | "eventsPerWeek"
+    // | "applicationEventSchedules"
+    // TODO requested times is missing
     | "reservationUnits";
   const getTranslatedError = (field: FieldName): string => {
-    const error = errors.applicationEvents?.[index]?.[field];
+    const error = errors.applicationSections?.[index]?.[field];
     if (error?.message != null) {
       return t(`application:validation.${error.message}`);
     }
@@ -187,22 +188,22 @@ const ApplicationEventInner = ({
       <TwoColumnContainer>
         <div>
           <TextInput
-            {...register(`applicationEvents.${index}.name`, {
+            {...register(`applicationSections.${index}.name`, {
               required: true,
               maxLength: 255,
             })}
             label={t("application:Page1.name")}
-            id={`applicationEvents.${index}.name`}
+            id={`applicationSections.${index}.name`}
             required
-            invalid={errors.applicationEvents?.[index]?.name != null}
+            invalid={errors.applicationSections?.[index]?.name != null}
             errorText={getTranslatedError("name")}
           />
         </div>
         <div>
           <NumberInput
-            id={`applicationEvents.${index}.numPersons`}
+            id={`applicationSections.${index}.numPersons`}
             required
-            {...register(`applicationEvents.${index}.numPersons`, {
+            {...register(`applicationSections.${index}.numPersons`, {
               validate: {
                 required: (val) => Boolean(val),
                 numPersonsMin: (val) => Number(val) > 0,
@@ -215,14 +216,14 @@ const ApplicationEventInner = ({
             minusStepButtonAriaLabel={t("common:subtract")}
             plusStepButtonAriaLabel={t("common:add")}
             step={1}
-            invalid={errors.applicationEvents?.[index]?.numPersons != null}
+            invalid={errors.applicationSections?.[index]?.numPersons != null}
             errorText={getTranslatedError("numPersons")}
           />
         </div>
         <Controller
           control={control}
           rules={{ required: true }}
-          name={`applicationEvents.${index}.ageGroup`}
+          name={`applicationSections.${index}.ageGroup`}
           render={({ field }) => (
             <Select<OptionType>
               value={
@@ -232,7 +233,7 @@ const ApplicationEventInner = ({
               required
               label={t("application:Page1.ageGroup")}
               options={ageGroupOptions}
-              invalid={errors.applicationEvents?.[index]?.ageGroup != null}
+              invalid={errors.applicationSections?.[index]?.ageGroup != null}
               error={getTranslatedError("ageGroup")}
             />
           )}
@@ -240,7 +241,7 @@ const ApplicationEventInner = ({
         <Controller
           control={control}
           rules={{ required: true }}
-          name={`applicationEvents.${index}.purpose`}
+          name={`applicationSections.${index}.purpose`}
           render={({ field }) => (
             <Select<OptionType>
               label={t("application:Page1.purpose")}
@@ -250,7 +251,7 @@ const ApplicationEventInner = ({
               onChange={(v: OptionType) => field.onChange(v.value)}
               required
               options={purposeOptions}
-              invalid={errors.applicationEvents?.[index]?.purpose != null}
+              invalid={errors.applicationSections?.[index]?.purpose != null}
               error={getTranslatedError("purpose")}
             />
           )}
@@ -273,15 +274,15 @@ const ApplicationEventInner = ({
       </SubHeadLine>
       <CheckboxWrapper>
         <Checkbox
-          id={`applicationEvents.${index}.defaultPeriod`}
+          id={`applicationSections.${index}.defaultPeriod`}
           checked={selectionIsDefaultPeriod}
           label={`${t("application:Page1.defaultPeriodPrefix")} ${formatDate(
             applicationRound.reservationPeriodBegin
           )} - ${formatDate(applicationRound.reservationPeriodEnd)}`}
           onChange={() => {
             clearErrors([
-              `applicationEvents.${index}.begin`,
-              `applicationEvents.${index}.end`,
+              `applicationSections.${index}.begin`,
+              `applicationSections.${index}.end`,
             ]);
             selectDefaultPeriod();
           }}
@@ -292,54 +293,54 @@ const ApplicationEventInner = ({
         <DateInput
           // disableConfirmation: is not accessible
           language={getLocalizationLang(i18n.language)}
-          {...register(`applicationEvents.${index}.begin`)}
+          {...register(`applicationSections.${index}.begin`)}
           onChange={(v) => {
             clearErrors([
-              `applicationEvents.${index}.begin`,
-              `applicationEvents.${index}.end`,
+              `applicationSections.${index}.begin`,
+              `applicationSections.${index}.end`,
             ]);
-            setValue(`applicationEvents.${index}.begin`, v);
+            setValue(`applicationSections.${index}.begin`, v);
             trigger([
-              `applicationEvents.${index}.begin`,
-              `applicationEvents.${index}.end`,
+              `applicationSections.${index}.begin`,
+              `applicationSections.${index}.end`,
             ]);
           }}
           label={t("application:Page1.periodStartDate")}
-          id={`applicationEvents.${index}.begin`}
-          value={getValues(`applicationEvents.${index}.begin`)}
+          id={`applicationSections.${index}.begin`}
+          value={getValues(`applicationSections.${index}.begin`)}
           required
           minDate={new Date(applicationRound.reservationPeriodBegin)}
           maxDate={new Date(applicationRound.reservationPeriodEnd)}
-          invalid={errors?.applicationEvents?.[index]?.begin != null}
+          invalid={errors?.applicationSections?.[index]?.begin != null}
           errorText={getTranslatedError("begin")}
         />
         <DateInput
-          {...register(`applicationEvents.${index}.end`)}
+          {...register(`applicationSections.${index}.end`)}
           // disableConfirmation: is not accessible
           language={getLocalizationLang(i18n.language)}
           onChange={(v) => {
             clearErrors([
-              `applicationEvents.${index}.begin`,
-              `applicationEvents.${index}.end`,
+              `applicationSections.${index}.begin`,
+              `applicationSections.${index}.end`,
             ]);
-            setValue(`applicationEvents.${index}.end`, v);
+            setValue(`applicationSections.${index}.end`, v);
             trigger([
-              `applicationEvents.${index}.begin`,
-              `applicationEvents.${index}.end`,
+              `applicationSections.${index}.begin`,
+              `applicationSections.${index}.end`,
             ]);
           }}
-          value={getValues(`applicationEvents.${index}.end`)}
+          value={getValues(`applicationSections.${index}.end`)}
           label={t("application:Page1.periodEndDate")}
-          id={`applicationEvents.${index}.end`}
+          id={`applicationSections.${index}.end`}
           required
           minDate={new Date(applicationRound.reservationPeriodBegin)}
           maxDate={new Date(applicationRound.reservationPeriodEnd)}
-          invalid={errors.applicationEvents?.[index]?.end != null}
+          invalid={errors.applicationSections?.[index]?.end != null}
           errorText={getTranslatedError("end")}
         />
         <Controller
           control={control}
-          name={`applicationEvents.${index}.minDuration`}
+          name={`applicationSections.${index}.minDuration`}
           rules={{ required: true }}
           render={({ field }) => (
             <Select
@@ -356,14 +357,14 @@ const ApplicationEventInner = ({
               onChange={(selection: OptionType): void => {
                 field.onChange(selection.value);
               }}
-              invalid={errors.applicationEvents?.[index]?.minDuration != null}
+              invalid={errors.applicationSections?.[index]?.minDuration != null}
               error={getTranslatedError("minDuration")}
             />
           )}
         />
         <Controller
           control={control}
-          name={`applicationEvents.${index}.maxDuration`}
+          name={`applicationSections.${index}.maxDuration`}
           rules={{ required: true }}
           render={({ field }) => (
             <Select
@@ -380,15 +381,16 @@ const ApplicationEventInner = ({
               onChange={(selection: OptionType): void => {
                 field.onChange(selection.value);
               }}
-              invalid={errors.applicationEvents?.[index]?.maxDuration != null}
+              invalid={errors.applicationSections?.[index]?.maxDuration != null}
               error={getTranslatedError("maxDuration")}
             />
           )}
         />
+        {/* TODO
         <NumberInput
-          id={`applicationEvents.${index}.eventsPerWeek`}
+          id={`applicationSections.${index}.eventsPerWeek`}
           required
-          {...register(`applicationEvents.${index}.eventsPerWeek`, {
+          {...register(`applicationSections.${index}.eventsPerWeek`, {
             valueAsNumber: true,
           })}
           label={t("application:Page1.eventsPerWeek")}
@@ -397,28 +399,31 @@ const ApplicationEventInner = ({
           minusStepButtonAriaLabel={t("common:subtract")}
           plusStepButtonAriaLabel={t("common:add")}
           step={1}
-          invalid={errors.applicationEvents?.[index]?.eventsPerWeek != null}
+          invalid={errors.applicationSections?.[index]?.eventsPerWeek != null}
           errorText={getTranslatedError("eventsPerWeek")}
         />
+        */}
+        {/* TODO
         <Controller
           control={control}
-          name={`applicationEvents.${index}.biweekly`}
+          name={`applicationSections.${index}.biweekly`}
           render={({ field }) => {
             return (
               <input type="hidden" id={field.name} name={field.name} value="" />
             );
           }}
         />
+        */}
       </PeriodContainer>
       <ApplicationEventSummary
-        applicationEvent={getValues(`applicationEvents.${index}`)}
-        name={watch(`applicationEvents.${index}.name`) ?? ""}
+        applicationSection={getValues(`applicationSections.${index}`)}
+        name={watch(`applicationSections.${index}.name`) ?? ""}
       />
       <ActionContainer>
         <Button
           type="button"
           variant="secondary"
-          id={`applicationEvents[${index}].delete`}
+          id={`applicationSections[${index}].delete`}
           onClick={() => {
             modalRef?.current?.open();
           }}
@@ -451,14 +456,14 @@ const ApplicationEvent = (props: Props): JSX.Element => {
     formState: { errors },
   } = form;
 
-  const eventName = watch(`applicationEvents.${index}.name`);
-  watch(`applicationEvents.${index}.eventsPerWeek`);
-  watch(`applicationEvents.${index}.biweekly`);
+  const eventName = watch(`applicationSections.${index}.name`);
+  // watch(`applicationSections.${index}.eventsPerWeek`);
+  // watch(`applicationSections.${index}.biweekly`);
 
   const shouldRenderInner = isVisible;
 
   // TODO requires us to use the accordion from admin-ui instead (or add force open)
-  const hasErrors = errors.applicationEvents?.[index] != null;
+  const hasErrors = errors.applicationSections?.[index] != null;
 
   return (
     <Wrapper>

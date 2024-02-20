@@ -1,7 +1,7 @@
 import {
   Query,
   QueryReservationUnitByPkArgs,
-  ReservationsReservationTypeChoices,
+  Type,
   ReservationType,
 } from "common/types/gql-types";
 import { useQuery } from "@apollo/client";
@@ -26,7 +26,7 @@ const useCheckCollisions = ({
     before: number;
     after: number;
   };
-  reservationType: ReservationsReservationTypeChoices;
+  reservationType: Type;
 }) => {
   const { notifyError } = useNotification();
 
@@ -56,9 +56,7 @@ const useCheckCollisions = ({
           .filter((x) => {
             if (x == null) return false;
             const buff =
-              x.type === ReservationsReservationTypeChoices.Blocked
-                ? { before: 0, after: 0 }
-                : buffers;
+              x.type === Type.Blocked ? { before: 0, after: 0 } : buffers;
             return doesIntervalCollide({ start, end, buffers: buff }, x);
           })
       : [];

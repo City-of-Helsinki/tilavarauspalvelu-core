@@ -2,10 +2,10 @@ import { useQuery } from "@apollo/client";
 import {
   Query,
   QueryTermsOfUseArgs,
-  ReservationsReservationReserveeTypeChoices,
   ReservationType,
   ReservationUnitByPkType,
-  TermsOfUseTermsOfUseTermsTypeChoices,
+  ReserveeType,
+  TermsType,
 } from "common/types/gql-types";
 import { IconArrowLeft, IconCross, LoadingSpinner } from "hds-react";
 import { get } from "lodash";
@@ -88,7 +88,7 @@ const EditStep1 = ({
 
   useQuery<Query, QueryTermsOfUseArgs>(TERMS_OF_USE, {
     variables: {
-      termsType: TermsOfUseTermsOfUseTermsTypeChoices.GenericTerms,
+      termsType: TermsType.GenericTerms,
     },
     onCompleted: (data) => {
       const result =
@@ -121,7 +121,7 @@ const EditStep1 = ({
 
   const type = supportedFields.includes("reservee_type")
     ? reservation.reserveeType
-    : ReservationsReservationReserveeTypeChoices.Individual;
+    : ReserveeType.Individual;
   const reservationApplicationFields = getReservationApplicationFields({
     supportedFields,
     reserveeType: type ?? "common",

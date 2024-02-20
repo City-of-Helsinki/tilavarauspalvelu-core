@@ -16,10 +16,10 @@ import { breakpoints } from "common/src/common/style";
 import {
   type Query,
   type QueryTermsOfUseArgs,
-  ReservationsReservationReserveeTypeChoices,
-  TermsOfUseTermsOfUseTermsTypeChoices,
-  ReservationsReservationStateChoices,
-  QueryReservationByPkArgs,
+  type QueryReservationByPkArgs,
+  ReserveeType,
+  TermsType,
+  State,
 } from "common/types/gql-types";
 import { parseISO } from "date-fns";
 import Link from "next/link";
@@ -72,7 +72,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     >({
       query: TERMS_OF_USE,
       variables: {
-        termsType: TermsOfUseTermsOfUseTermsTypeChoices.GenericTerms,
+        termsType: TermsType.GenericTerms,
       },
     });
     const bookingTerms = filterNonNullable(
@@ -416,10 +416,8 @@ const Reservation = ({
   );
 
   const reserveeInfo =
-    ReservationsReservationReserveeTypeChoices.Business ===
-      reservation.reserveeType ||
-    ReservationsReservationReserveeTypeChoices.Nonprofit ===
-      reservation.reserveeType ? (
+    ReserveeType.Business === reservation.reserveeType ||
+    ReserveeType.Nonprofit === reservation.reserveeType ? (
       <>
         {supportedFields.includes("reserveeOrganisationName") && (
           <ParagraphAlt>
@@ -508,8 +506,7 @@ const Reservation = ({
   const checkoutUrl = getCheckoutUrl(order, i18n.language);
 
   const hasCheckoutUrl = !!checkoutUrl;
-  const isWaitingForPayment =
-    reservation.state === ReservationsReservationStateChoices.WaitingForPayment;
+  const isWaitingForPayment = reservation.state === State.WaitingForPayment;
 
   const routes = [
     {
@@ -560,8 +557,7 @@ const Reservation = ({
               type="complete"
             />
             <SecondaryActions>
-              {reservation.state ===
-                ReservationsReservationStateChoices.Confirmed && (
+              {reservation.state === State.Confirmed && (
                 <BlackButton
                   variant="secondary"
                   iconRight={<IconCalendar aria-hidden />}

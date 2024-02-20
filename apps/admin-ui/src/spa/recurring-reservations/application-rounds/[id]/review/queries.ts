@@ -1,50 +1,34 @@
 import { gql } from "@apollo/client";
-
-const APPLICANT_NAME_FRAGMENT = gql`
-  fragment ApplicationNameFragment on ApplicationNode {
-    applicantType
-    contactPerson {
-      lastName
-      firstName
-    }
-    organisation {
-      name
-      organisationType
-    }
-  }
-`;
+import {
+  APPLICANT_NAME_FRAGMENT,
+  APPLICATION_SECTION_FRAGMENT,
+} from "common/src/queries/application";
 
 export const APPLICATIONS_QUERY = gql`
   ${APPLICANT_NAME_FRAGMENT}
   query getApplications(
-    $offset: Int
-    $first: Int
     $applicationRound: Int!
     $unit: [Int]
     $applicantType: [ApplicantTypeChoice]
     $status: [ApplicationStatusChoice]!
     $textSearch: String
-    $orderBy: String
   ) {
     applications(
-      first: $first
-      offset: $offset
       applicationRound: $applicationRound
       unit: $unit
       applicantType: $applicantType
       status: $status
       textSearch: $textSearch
-      orderBy: $orderBy
     ) {
       edges {
         node {
           pk
           status
           ...ApplicationNameFragment
-          applicationEvents {
+          applicationSections {
             name
             pk
-            eventReservationUnits {
+            reservationUnitOptions {
               preferredOrder
               reservationUnit {
                 unit {
@@ -57,37 +41,37 @@ export const APPLICATIONS_QUERY = gql`
         }
       }
       totalCount
-      pageInfo {
-        endCursor
-        hasNextPage
-      }
     }
   }
 `;
 
+// TODO change the type $orderBy: String
+// TODO the fragment includes reservationUnit.applicationRoundTimeSlots which is not needed for allocation
+// it's used on ui to show the time slots for the reservation unit
+// and the fragment is shared
+// also it includes nameEn, nameSv for reservationUnit, unit, purpose
+// TODO see if we can use a different primary query for the listing page?
+// TODO rename (there is no Events anymore)
+// TODO see if we can remove some of the fields (like reservationUnitOptions)
+// NOTE this can't be cached (probably) because of the duplicate versions
 export const APPLICATIONS_EVENTS_QUERY = gql`
-  ${APPLICANT_NAME_FRAGMENT}
-  query getApplicationEvents(
-    $offset: Int
-    $first: Int
+  ${APPLICATION_SECTION_FRAGMENT}
+  query getApplicationSections(
     $applicationRound: Int!
     $applicationStatus: [ApplicationStatusChoice]!
-    $status: [ApplicationEventStatusChoice]
+    $status: [ApplicationSectionStatusChoice]
     $unit: [Int]
     $applicantType: [ApplicantTypeChoice]
     $preferredOrder: [Int]
     $textSearch: String
-    $priority: [Int]
+    $priority: [Priority]
     $purpose: [Int]
     $reservationUnit: [Int]
     $ageGroup: [Int]
     $homeCity: [Int]
     $includePreferredOrder10OrHigher: Boolean
-    $orderBy: String
   ) {
-    applicationEvents(
-      first: $first
-      offset: $offset
+    applicationSections(
       applicationRound: $applicationRound
       applicationStatus: $applicationStatus
       status: $status
@@ -101,130 +85,155 @@ export const APPLICATIONS_EVENTS_QUERY = gql`
       ageGroup: $ageGroup
       homeCity: $homeCity
       includePreferredOrder10OrHigher: $includePreferredOrder10OrHigher
-      orderBy: $orderBy
     ) {
       edges {
         node {
-          pk
-          name
-          status
-          begin
-          end
-          biweekly
-          eventsPerWeek
-          minDuration
-          maxDuration
-          ageGroup {
-            minimum
-            maximum
-          }
-          numPersons
-          applicationEventSchedules(priority: $priority) {
-            pk
-            priority
-            day
-            begin
-            end
-            allocatedReservationUnit {
+          ...ApplicationSectionFragment
+          allocations
+          reservationUnitOptions {
+            allocatedTimeSlots {
               pk
-              nameFi
-            }
-            allocatedDay
-            allocatedBegin
-            allocatedEnd
-            declined
-          }
-          application {
-            pk
-            status
-            applicant {
-              name
-            }
-            ...ApplicationNameFragment
-          }
-          eventReservationUnits {
-            preferredOrder
-            reservationUnit {
-              unit {
-                pk
-                nameFi
+              dayOfTheWeek
+              beginTime
+              endTime
+              reservationUnitOption {
+                applicationSection {
+                  pk
+                }
               }
-              pk
-              nameFi
             }
           }
         }
       }
       totalCount
-      pageInfo {
-        endCursor
-        hasNextPage
-      }
     }
   }
 `;
 
-export const APPLICATIONS_EVENTS_SCHEDULE_QUERY = gql`
-  ${APPLICANT_NAME_FRAGMENT}
-  query getApplicationEventsSchedule(
-    $offset: Int
-    $first: Int
+// NOTE have to design a separate query for allocation page (a bit different data than the listing page)
+// primarily we need to define reservationUnit parameter as a singular pk instead of array (because of the related allocated time slots)
+export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
+  ${APPLICATION_SECTION_FRAGMENT}
+  query getApplicationSections(
     $applicationRound: Int!
-    $allocatedUnit: [Int]
+    $applicationStatus: [ApplicationStatusChoice]!
+    $status: [ApplicationSectionStatusChoice]
     $applicantType: [ApplicantTypeChoice]
-    $applicationEventStatus: [ApplicationEventStatusChoice]
-    $allocatedReservationUnit: [Int]
-    $allocatedDay: [Int]
-    $accepted: Boolean
-    $declined: Boolean
-    $unallocated: Boolean
+    $preferredOrder: [Int]
     $textSearch: String
-    $orderBy: String
+    $priority: [Priority]
+    $purpose: [Int]
+    $reservationUnit: Int
+    $ageGroup: [Int]
+    $homeCity: [Int]
+    $includePreferredOrder10OrHigher: Boolean
   ) {
-    applicationEventSchedules(
-      first: $first
-      offset: $offset
+    applicationSections(
       applicationRound: $applicationRound
-      allocatedUnit: $allocatedUnit
+      applicationStatus: $applicationStatus
+      status: $status
       applicantType: $applicantType
-      applicationEventStatus: $applicationEventStatus
-      allocatedReservationUnit: $allocatedReservationUnit
-      allocatedDay: $allocatedDay
-      accepted: $accepted
-      declined: $declined
-      unallocated: $unallocated
+      preferredOrder: $preferredOrder
       textSearch: $textSearch
-      orderBy: $orderBy
+      priority: $priority
+      purpose: $purpose
+      reservationUnit: [$reservationUnit]
+      ageGroup: $ageGroup
+      homeCity: $homeCity
+      includePreferredOrder10OrHigher: $includePreferredOrder10OrHigher
     ) {
       edges {
         node {
-          pk
-          declined
-          allocatedDay
-          allocatedBegin
-          allocatedEnd
-          allocatedReservationUnit {
-            nameFi
-            unit {
-              nameFi
+          ...ApplicationSectionFragment
+          allocations
+          reservationUnitOptions {
+            allocatedTimeSlots {
               pk
-            }
-          }
-          applicationEvent {
-            name
-            pk
-            application {
-              pk
-              ...ApplicationNameFragment
+              dayOfTheWeek
+              beginTime
+              endTime
+              reservationUnitOption {
+                applicationSection {
+                  pk
+                }
+              }
             }
           }
         }
       }
       totalCount
-      pageInfo {
-        endCursor
-        hasNextPage
+    }
+  }
+`;
+
+export const AFFECTING_ALLOCATED_TIME_SLOTS_QUERY = gql`
+  query getAffectingAllocations(
+    $reservationUnit: Int!
+    $beginDate: Date!
+    $endDate: Date!
+  ) {
+    affectingAllocatedTimeSlots(
+      reservationUnit: $reservationUnit
+      beginDate: $beginDate
+      endDate: $endDate
+    ) {
+      beginTime
+      dayOfTheWeek
+      endTime
+    }
+  }
+`;
+
+export const ALLOCATED_TIME_SLOTS_QUERY = gql`
+  ${APPLICANT_NAME_FRAGMENT}
+  query getAllocatedTimeSlots(
+    $applicationRound: Int!
+    $allocatedUnit: [Int]
+    $applicantType: [ApplicantTypeChoice]
+    $applicationSectionStatus: [ApplicationSectionStatusChoice]
+    $allocatedReservationUnit: [Int]
+    $textSearch: String
+  ) {
+    allocatedTimeSlots(
+      applicationRound: $applicationRound
+      allocatedUnit: $allocatedUnit
+      applicantType: $applicantType
+      applicationSectionStatus: $applicationSectionStatus
+      allocatedReservationUnit: $allocatedReservationUnit
+      textSearch: $textSearch
+    ) {
+      edges {
+        node {
+          pk
+          dayOfTheWeek
+          endTime
+          beginTime
+          reservationUnitOption {
+            rejected
+            locked
+            preferredOrder
+            applicationSection {
+              pk
+              name
+              reservationsEndDate
+              reservationsBeginDate
+              reservationMinDuration
+              reservationMaxDuration
+              application {
+                pk
+                ...ApplicationNameFragment
+              }
+            }
+            reservationUnit {
+              nameFi
+              unit {
+                nameFi
+              }
+            }
+          }
+        }
       }
+      totalCount
     }
   }
 `;

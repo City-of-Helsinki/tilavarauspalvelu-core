@@ -13,9 +13,6 @@ import { GraphQLError } from "graphql/error/GraphQLError";
 import type {
   ReservationTypeConnection,
   BannerNotificationNodeConnection,
-  ApplicationNodeConnection,
-  ApplicationEventNodeConnection,
-  ApplicationEventScheduleNodeConnection,
 } from "common/types/gql-types";
 import { buildGraphQLUrl } from "common/src/urlBuilder";
 import { env } from "@/env.mjs";
@@ -96,6 +93,7 @@ function createClient(apiBaseUrl: string) {
               return merged;
             },
           },
+          /* TODO
           applicationEventSchedules: {
             keyArgs: [
               "applicationRound",
@@ -185,6 +183,7 @@ function createClient(apiBaseUrl: string) {
               };
             },
           },
+          */
           reservations: {
             // Separate caches for all query params
             // causes a full refetch when anything changes which is bad (e.g. sorting)

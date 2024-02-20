@@ -6,13 +6,15 @@ import type {
 } from "common/types/gql-types";
 import { UPDATE_APPLICATION_MUTATION } from "@/modules/queries/application";
 
-export const useApplicationUpdate = () => {
+export function useApplicationUpdate() {
   const [mutate, { error, loading: isLoading }] = useMutation<
     Mutation,
     MutationUpdateApplicationArgs
   >(UPDATE_APPLICATION_MUTATION);
 
-  const update = async (input: ApplicationUpdateMutationInput) => {
+  const update = async (
+    input: ApplicationUpdateMutationInput
+  ): Promise<number> => {
     try {
       const response = await mutate({
         variables: {
@@ -20,19 +22,14 @@ export const useApplicationUpdate = () => {
         },
       });
       const { data, errors } = response;
-      const { errors: mutErrors, pk } = data?.updateApplication ?? {};
+      const { pk } = data?.updateApplication ?? {};
       if (errors != null) {
         // eslint-disable-next-line no-console
         console.error("Error saving application: ", errors);
         return 0;
       }
-      if (mutErrors != null) {
-        // eslint-disable-next-line no-console
-        console.error("Mutation error saving application: ", errors);
-        return 0;
-      }
       // TODO do a refetch here instead of cache modification (after moving to fetch hook)
-      return pk;
+      return pk ?? 0;
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error("Error thrown while saving application: ", e);
@@ -41,4 +38,4 @@ export const useApplicationUpdate = () => {
   };
 
   return [update, { error, isLoading }] as const;
-};
+}

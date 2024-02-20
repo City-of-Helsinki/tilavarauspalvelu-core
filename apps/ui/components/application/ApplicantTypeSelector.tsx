@@ -3,7 +3,7 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { fontRegular } from "common/src/common/typography";
-import { Applicant_Type } from "common/types/gql-types";
+import { ApplicantTypeChoice } from "common/types/gql-types";
 import { useController, useFormContext } from "react-hook-form";
 import { ApplicationFormPage3Values } from "./Form";
 
@@ -26,14 +26,15 @@ export const ApplicantTypeSelector = (): JSX.Element => {
     control,
   });
   // Community and association are the same except for corporate id
-  const choices = Object.values(Applicant_Type).filter(
-    (id) => id !== Applicant_Type.Community
+  const choices = Object.values(ApplicantTypeChoice).filter(
+    (id) => id !== ApplicantTypeChoice.Community
   );
 
   const selection = choices.find(
     (id) =>
       id === value ||
-      (id === Applicant_Type.Association && value === Applicant_Type.Community)
+      (id === ApplicantTypeChoice.Association &&
+        value === ApplicantTypeChoice.Community)
   );
 
   return (

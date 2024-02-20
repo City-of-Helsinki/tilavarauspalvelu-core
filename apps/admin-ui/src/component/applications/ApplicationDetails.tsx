@@ -3,22 +3,23 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { Card, Table, IconCheck, IconEnvelope } from "hds-react";
-import { isEqual, trim, orderBy } from "lodash";
+import { isEqual, trim } from "lodash";
 import { useQuery } from "@apollo/client";
 import { TFunction } from "i18next";
 import { H2, H4, H5, Strong } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import { filterNonNullable } from "common/src/helpers";
+import { base64encode, filterNonNullable } from "common/src/helpers";
 import {
   type Query,
   ApplicationStatusChoice,
-  type ApplicationEventScheduleNode,
-  type ApplicationEventNode,
+  type ApplicationSectionNode,
   type ApplicationNode,
-  ApplicationsApplicationApplicantTypeChoices,
+  ApplicantTypeChoice,
+  type SuitableTimeRangeNode,
+  Priority,
+  type QueryApplicationArgs,
 } from "common/types/gql-types";
 import { formatNumber, formatDate, parseAgeGroups } from "@/common/util";
-import { weekdays } from "@/common/const";
 import { useNotification } from "@/context/NotificationContext";
 import ScrollIntoView from "@/common/ScrollIntoView";
 import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
@@ -36,20 +37,23 @@ import StatusBlock from "../StatusBlock";
 import { APPLICATION_ADMIN_QUERY } from "./queries";
 import { BirthDate } from "../BirthDate";
 import { formatDuration } from "common/src/common/util";
+import { convertWeekday, type Day } from "common/src/conversion";
 
-const parseApplicationEventSchedules = (
-  applicationEventSchedules: ApplicationEventScheduleNode[],
-  index: number,
-  priority: 100 | 200 | 300
-): string => {
-  const schedules = applicationEventSchedules
-    .filter((s) => s.day === index)
+const weekdays = [0, 1, 2, 3, 4, 5, 6] as const;
+
+function printSuitableTimes(
+  timeRanges: SuitableTimeRangeNode[],
+  day: Day,
+  priority: Priority
+): string {
+  const schedules = timeRanges
+    .filter((s) => convertWeekday(s.dayOfTheWeek) === day)
     .filter((s) => s.priority === priority);
 
   return schedules
-    .map((s) => `${s.begin.substring(0, 2)}-${s.end.substring(0, 2)}`)
+    .map((s) => `${s.beginTime.substring(0, 2)}-${s.endTime.substring(0, 2)}`)
     .join(", ");
-};
+}
 
 const StyledStatusBlock = styled(StatusBlock)`
   margin: 0;
@@ -233,82 +237,82 @@ const appEventDuration = (
 };
 
 function SchedulesContent({
-  applicationEvent,
+  as,
   priority,
 }: {
-  applicationEvent: ApplicationEventNode;
-  priority: 200 | 300;
+  as: ApplicationSectionNode;
+  priority: Priority;
 }): JSX.Element {
   const { t } = useTranslation();
-  const schedules = filterNonNullable(
-    applicationEvent.applicationEventSchedules
-  );
+  const schedules = filterNonNullable(as.suitableTimeRanges);
   const title =
-    priority === 300
+    priority === Priority.Primary
       ? t("ApplicationEvent.primarySchedules")
       : t("ApplicationEvent.secondarySchedules");
+  const calendar = weekdays.map((day) => {
+    const schedulesTxt = printSuitableTimes(schedules, day, priority);
+    return { day, schedulesTxt };
+  });
+
   return (
     <div>
       <StyledH5>{title}</StyledH5>
-      {weekdays.map((day, index) => {
-        const schedulesTxt = parseApplicationEventSchedules(
-          schedules,
-          index,
-          priority
-        );
-        return (
-          <EventSchedule key={day}>
-            <Strong>{t(`calendar.${day}`)}</Strong>
-            {schedulesTxt ? `: ${schedulesTxt}` : ""}
-          </EventSchedule>
-        );
-      })}
+      {calendar.map(({ day, schedulesTxt }) => (
+        <EventSchedule key={day}>
+          <Strong>{t(`dayLong.${day}`)}</Strong>
+          {schedulesTxt ? `: ${schedulesTxt}` : ""}
+        </EventSchedule>
+      ))}
     </div>
   );
 }
 
 function ApplicationEventDetails({
-  applicationEvent,
+  section,
   application,
 }: {
-  applicationEvent: ApplicationEventNode;
+  section: ApplicationSectionNode;
   application: ApplicationNode;
 }): JSX.Element {
   const { t } = useTranslation();
 
-  const duration = appEventDuration(
-    applicationEvent?.minDuration ?? undefined,
-    applicationEvent?.maxDuration ?? undefined,
-    t
-  );
-  const hash = applicationEvent?.pk?.toString() ?? "";
+  const minDuration = section?.reservationMinDuration ?? undefined;
+  const maxDuration = section?.reservationMaxDuration ?? undefined;
+  const duration = appEventDuration(minDuration, maxDuration, t);
+  const hash = section?.pk?.toString() ?? "";
+  const heading = `${application.pk}-${section.pk} ${section.name}`;
+
+  // TODO use a function for this
+  const dates =
+    section.reservationsBeginDate != null && section.reservationsEndDate
+      ? `${formatDate(section.reservationsBeginDate)} - ${formatDate(
+          section.reservationsEndDate
+        )}`
+      : "No dates";
 
   return (
-    <ScrollIntoView key={applicationEvent.pk} hash={hash}>
-      <StyledAccordion
-        heading={`${application.pk}-${applicationEvent.pk} ${applicationEvent.name}`}
-        initiallyOpen
-      >
+    <ScrollIntoView key={section.pk} hash={hash}>
+      <StyledAccordion heading={heading} initiallyOpen>
         <EventProps>
-          {applicationEvent.ageGroup && (
+          {section.ageGroup && (
             <ValueBox
               label={t("ApplicationEvent.ageGroup")}
               value={parseAgeGroups({
-                minimum: applicationEvent.ageGroup.minimum,
-                maximum: applicationEvent.ageGroup.maximum ?? undefined,
+                minimum: section.ageGroup.minimum,
+                maximum: section.ageGroup.maximum ?? undefined,
               })}
             />
           )}
           <ValueBox
             label={t("ApplicationEvent.groupSize")}
             value={`${formatNumber(
-              applicationEvent.numPersons,
+              section.numPersons,
               t("common.membersSuffix")
             )}`}
           />
           <ValueBox
             label={t("ApplicationEvent.purpose")}
-            value={applicationEvent.purpose?.nameFi ?? undefined}
+            value={section.purpose?.nameFi ?? undefined}
           />
           <ValueBox
             label={t("ApplicationEvent.eventDuration")}
@@ -316,22 +320,14 @@ function ApplicationEventDetails({
           />
           <ValueBox
             label={t("ApplicationEvent.eventsPerWeek")}
-            value={`${applicationEvent.eventsPerWeek}`}
+            value={`${section.appliedReservationsPerWeek}`}
           />
-          <ValueBox
-            label={t("ApplicationEvent.dates")}
-            value={
-              applicationEvent.begin != null && applicationEvent.end
-                ? `${formatDate(applicationEvent.begin)} - ${formatDate(
-                    applicationEvent.end
-                  )}`
-                : "No dates"
-            }
-          />
+          <ValueBox label={t("ApplicationEvent.dates")} value={dates} />
         </EventProps>
         <H4>{t("ApplicationEvent.requestedReservationUnits")}</H4>
         <StyledTable
-          rows={filterNonNullable(applicationEvent?.eventReservationUnits).map(
+          // TODO why is this mixed into the JSX
+          rows={filterNonNullable(section?.reservationUnitOptions).map(
             (ru, index) => ({
               index: index + 1,
               pk: ru?.pk,
@@ -348,7 +344,7 @@ function ApplicationEventDetails({
         />
         <H4>{t("ApplicationEvent.requestedTimes")}</H4>
         <EventSchedules>
-          <TimeSelector applicationEvent={applicationEvent} />
+          <TimeSelector applicationSection={section} />
           <Card
             border
             theme={{
@@ -358,14 +354,8 @@ function ApplicationEventDetails({
             }}
           >
             <SchedulesCardContainer>
-              <SchedulesContent
-                applicationEvent={applicationEvent}
-                priority={300}
-              />
-              <SchedulesContent
-                applicationEvent={applicationEvent}
-                priority={200}
-              />
+              <SchedulesContent as={section} priority={Priority.Primary} />
+              <SchedulesContent as={section} priority={Priority.Secondary} />
             </SchedulesCardContainer>
           </Card>
         </EventSchedules>
@@ -383,18 +373,21 @@ function ApplicationDetails({
   const { t } = useTranslation();
   const { notifyError } = useNotification();
 
+  const typename = "ApplicationNode";
+  const id = base64encode(`${typename}:${applicationPk}`);
   const {
     data,
     loading: isLoading,
     refetch,
-  } = useQuery<Query>(APPLICATION_ADMIN_QUERY, {
+  } = useQuery<Query, QueryApplicationArgs>(APPLICATION_ADMIN_QUERY, {
     skip: applicationPk === 0,
-    variables: { pk: [applicationPk] },
+    variables: { id },
     onError: () => {
       notifyError(t("errors.errorFetchingApplication"));
     },
   });
-  const application = data?.applications?.edges[0]?.node ?? undefined;
+
+  const application = data?.application ?? undefined;
   const applicationRound = application?.applicationRound ?? undefined;
 
   if (isLoading) {
@@ -411,17 +404,23 @@ function ApplicationDetails({
   const customerName = application != null ? getApplicantName(application) : "";
   // TODO where is this defined in the application form?
   const homeCity = application?.homeCity?.nameFi ?? "-";
+  // ???? why
+  /*
   const applicationEvents = filterNonNullable(
-    application?.applicationEvents
+    application?.applicationSections
   ).map((ae) => ({
     ...ae,
-    eventReservationUnits: orderBy(ae.eventReservationUnits, "priority", "asc"),
+    eventReservationUnits: orderBy(ae.reservationUnitOptions, "priority", "asc"),
     applicationEventSchedules: orderBy(
       ae.applicationEventSchedules,
       "begin",
       "asc"
     ),
   }));
+  */
+  const applicationSections = filterNonNullable(
+    application?.applicationSections
+  );
 
   if (application == null || applicationRound == null) {
     return null;
@@ -504,18 +503,18 @@ function ApplicationDetails({
             initialValue={application.workingMemo}
           />
         </HDSAccordion>
-        {applicationEvents.map((applicationEvent) => (
+        {applicationSections.map((section) => (
           <ApplicationEventDetails
-            applicationEvent={applicationEvent}
+            section={section}
             application={application}
-            key={applicationEvent.pk}
+            key={section.pk}
           />
         ))}
         <H4>{t("Application.customerBasicInfo")}</H4>
         <EventProps>
           <ValueBox
             label={t("Application.authenticatedUser")}
-            value={application.applicant?.email}
+            value={application.user?.email}
           />
           <ValueBox
             label={t("Application.applicantType")}
@@ -546,7 +545,7 @@ function ApplicationDetails({
           />
           <ValueBox
             label={t("Application.headings.userBirthDate")}
-            value={<BirthDate userPk={application.applicant?.pk ?? 0} />}
+            value={<BirthDate userPk={application.user?.pk ?? 0} />}
           />
         </EventProps>
         <H4>{t("Application.contactPersonInformation")}</H4>
@@ -590,8 +589,7 @@ function ApplicationDetails({
         {hasBillingAddress ? (
           <>
             <H4>
-              {application.applicantType ===
-              ApplicationsApplicationApplicantTypeChoices.Individual
+              {application.applicantType === ApplicantTypeChoice.Individual
                 ? t("Application.contactInformation")
                 : t("common.billingAddress")}
             </H4>

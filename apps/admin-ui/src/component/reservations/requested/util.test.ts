@@ -4,9 +4,9 @@ import {
   RecurringReservationType,
   ReservationType,
   ReservationUnitPricingType,
-  ReservationUnitsReservationUnitPricingPriceUnitChoices,
-  ReservationUnitsReservationUnitPricingPricingTypeChoices,
-  ReservationUnitsReservationUnitPricingStatusChoices,
+  PriceUnit,
+  PricingType,
+  Status,
   ReservationUnitType,
 } from "common/types/gql-types";
 import {
@@ -17,9 +17,9 @@ import {
 
 const PRICING_FREE: ReservationUnitPricingType = {
   begins: "2021-01-01",
-  pricingType: ReservationUnitsReservationUnitPricingPricingTypeChoices.Free,
+  pricingType: PricingType.Free,
   pk: 1,
-  priceUnit: ReservationUnitsReservationUnitPricingPriceUnitChoices.PerHour,
+  priceUnit: PriceUnit.PerHour,
   lowestPrice: 120,
   lowestPriceNet: 120 / 1.24,
   highestPrice: 120,
@@ -28,13 +28,13 @@ const PRICING_FREE: ReservationUnitPricingType = {
     id: "1",
     value: 24,
   },
-  status: ReservationUnitsReservationUnitPricingStatusChoices.Active,
+  status: Status.Active,
 };
 const PRICING_PAID = {
   ...PRICING_FREE,
   begins: "2022-01-01",
-  pricingType: ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid,
-  status: ReservationUnitsReservationUnitPricingStatusChoices.Future,
+  pricingType: PricingType.Paid,
+  status: Status.Future,
 };
 
 describe("pricingDetails", () => {
@@ -47,10 +47,8 @@ describe("pricingDetails", () => {
           pricings: [
             {
               ...PRICING_PAID,
-              priceUnit:
-                ReservationUnitsReservationUnitPricingPriceUnitChoices.Fixed,
-              status:
-                ReservationUnitsReservationUnitPricingStatusChoices.Active,
+              priceUnit: PriceUnit.Fixed,
+              status: Status.Active,
             },
           ],
         } as ReservationUnitType,
@@ -70,8 +68,7 @@ describe("pricingDetails", () => {
           pricings: [
             {
               ...PRICING_FREE,
-              pricingType:
-                ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid,
+              pricingType: PricingType.Paid,
             },
           ],
         } as ReservationUnitType,
@@ -96,12 +93,12 @@ describe("getReservatinUnitPricing", () => {
     expect(
       getReservatinUnitPricing(reservationUnit, "2021-02-01T00:00:01Z")
         ?.pricingType
-    ).toBe(ReservationUnitsReservationUnitPricingPricingTypeChoices.Free);
+    ).toBe(PricingType.Free);
 
     expect(
       getReservatinUnitPricing(reservationUnit, "2022-02-01T00:00:01Z")
         ?.pricingType
-    ).toBe(ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid);
+    ).toBe(PricingType.Paid);
   });
 });
 

@@ -48,11 +48,40 @@ export const APPLICATION_ROUNDS_PERIODS = gql`
 
 export const APPLICATION_ROUNDS = gql`
   ${APPLICATION_ROUND_FRAGMENT}
-  query ApplicationRounds($orderBy: String) {
+  query ApplicationRounds($orderBy: [ApplicationRoundOrderingChoices]) {
     applicationRounds(orderBy: $orderBy) {
       edges {
         node {
           ...ApplicationRoundFields
+        }
+      }
+    }
+  }
+`;
+
+// TODO image should be a fragment
+/* FIXME images breaks backend query optimization (overriden locally) */
+export const APPLICATION_ROUND_BY_ID = gql`
+  ${APPLICATION_ROUND_FRAGMENT}
+  query ApplicationRound($id: ID!) {
+    applicationRound(id: $id) {
+      ...ApplicationRoundFields
+      reservationUnits {
+        pk
+        nameFi
+        nameEn
+        nameSv
+        images {
+          imageType
+          smallUrl
+          mediumUrl
+          imageUrl
+        }
+        unit {
+          pk
+          nameFi
+          nameEn
+          nameSv
         }
       }
     }

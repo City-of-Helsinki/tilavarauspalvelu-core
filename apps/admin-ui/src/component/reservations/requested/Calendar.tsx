@@ -3,10 +3,7 @@ import CommonCalendar from "common/src/calendar/Calendar";
 import { Toolbar } from "common/src/calendar/Toolbar";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import {
-  ReservationsReservationTypeChoices,
-  type ReservationType,
-} from "common/types/gql-types";
+import { Type, type ReservationType } from "common/types/gql-types";
 import { useModal } from "app/context/ModalContext";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
 import Legend from "./Legend";
@@ -91,9 +88,7 @@ const Calendar = ({
 
   const eventBuffers = events
     ? getEventBuffers(
-        events
-          .map((e) => e.event)
-          .filter((e) => e?.type !== ReservationsReservationTypeChoices.Blocked)
+        events.map((e) => e.event).filter((e) => e?.type !== Type.Blocked)
       )
     : [];
 

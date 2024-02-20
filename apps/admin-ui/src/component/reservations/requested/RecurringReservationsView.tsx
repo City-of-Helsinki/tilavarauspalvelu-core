@@ -2,10 +2,7 @@ import React from "react";
 import { H6 } from "common/src/common/typography";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
-import {
-  ReservationsReservationStateChoices,
-  type ReservationType,
-} from "common/types/gql-types";
+import { State, type ReservationType } from "common/types/gql-types";
 import { useRecurringReservations } from "./hooks";
 import { RECURRING_AUTOMATIC_REFETCH_LIMIT } from "../../../common/const";
 import ReservationList from "../../ReservationsList";
@@ -80,7 +77,7 @@ const RecurringReservationsView = ({
     const startDate = new Date(x.begin);
     const now = new Date();
 
-    if (x.state !== ReservationsReservationStateChoices.Denied) {
+    if (x.state !== State.Denied) {
       if (startDate > now && onChange) {
         buttons.push(
           <ReservationListButton

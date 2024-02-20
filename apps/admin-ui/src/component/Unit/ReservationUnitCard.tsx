@@ -10,10 +10,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { H2 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import {
-  ReservationUnitsReservationUnitImageImageTypeChoices,
-  ReservationUnitType,
-} from "common/types/gql-types";
+import { ImageType, ReservationUnitType } from "common/types/gql-types";
 import { BasicLink } from "../../styles/util";
 import IconDraft from "../../images/icon_draft.svg";
 
@@ -110,11 +107,8 @@ const ReservationUnitCard = ({
   const { t } = useTranslation();
 
   const image =
-    reservationUnit.images?.find(
-      (i) =>
-        i?.imageType ===
-        ReservationUnitsReservationUnitImageImageTypeChoices.Main
-    ) || reservationUnit.images?.find(() => true);
+    reservationUnit.images?.find((i) => i?.imageType === ImageType.Main) ||
+    reservationUnit.images?.find(() => true);
 
   const hasPurposes = (reservationUnit?.purposes?.length || 0) > 0;
 

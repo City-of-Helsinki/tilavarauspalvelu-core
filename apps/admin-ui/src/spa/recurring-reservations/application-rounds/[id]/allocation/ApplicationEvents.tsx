@@ -3,22 +3,25 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useSearchParams } from "react-router-dom";
 import { H4, fontMedium } from "common/src/common/typography";
-import type {
-  ApplicationEventNode,
-  ApplicationEventScheduleNode,
-  ApplicationRoundStatusChoice,
-  Query,
+import {
+  type ApplicationSectionNode,
+  type ApplicationRoundStatusChoice,
+  type Query,
+  ApplicationSectionStatusChoice,
+  AllocatedTimeSlotNode,
 } from "common/types/gql-types";
 import { ReservationUnitNode, breakpoints } from "common";
 import { Accordion } from "@/component/Accordion";
 import { AllocationCalendar } from "./AllocationCalendar";
 import { AllocationColumn } from "./AllocationColumn";
 import {
-  type AllocationApplicationEventCardType,
-  ApplicationEventCard,
+  type AllocationApplicationSectionCardType,
+  ApplicationSectionCard,
 } from "./ApplicationEventCard";
 import { useFocusApplicationEvent } from "./hooks";
 import { ApolloQueryResult } from "@apollo/client";
+import { filterNonNullable } from "common/src/helpers";
+import { getRelatedTimeSlots } from "./modules/applicationRoundAllocation";
 
 // TODO max-width for the grid columns (315px, 480px, 332px)
 // TODO not perfect (aligment issues with the last columns and grid end),
@@ -78,29 +81,29 @@ const EventGroupListWrapper = styled.div`
 /// @deprecated - this is awful we need to remove applications from here
 /// the new query returns only application events (they do include their own application if needed)
 const EventGroupList = ({
-  applicationEvents,
-  focusedApplicationEvent,
-  setFocusedApplicationEvent,
+  applicationSections,
+  focusedApplicationSection,
+  setFocusedApplicationSection,
   reservationUnit,
   type,
 }: {
-  applicationEvents: ApplicationEventNode[];
-  focusedApplicationEvent?: ApplicationEventNode;
-  setFocusedApplicationEvent: (applicationEvent?: ApplicationEventNode) => void;
-  reservationUnit?: ReservationUnitNode;
-  type: AllocationApplicationEventCardType;
+  applicationSections: ApplicationSectionNode[];
+  focusedApplicationSection?: ApplicationSectionNode;
+  setFocusedApplicationSection: (section?: ApplicationSectionNode) => void;
+  reservationUnit: ReservationUnitNode;
+  type: AllocationApplicationSectionCardType;
 }): JSX.Element => {
-  if (applicationEvents.length < 1) {
+  if (applicationSections.length < 1) {
     return <div>-</div>;
   }
   return (
     <EventGroupListWrapper>
-      {applicationEvents.map((applicationEvent) => (
-        <ApplicationEventCard
-          key={`${applicationEvent.pk}-${reservationUnit?.pk}`}
-          applicationEvent={applicationEvent}
-          focusedApplicationEvent={focusedApplicationEvent}
-          setFocusedApplicationEvent={setFocusedApplicationEvent}
+      {applicationSections.map((ae) => (
+        <ApplicationSectionCard
+          key={`${ae.pk}-${reservationUnit?.pk}`}
+          applicationSection={ae}
+          focusedApplicationSection={focusedApplicationSection}
+          setFocusedApplicationSection={setFocusedApplicationSection}
           reservationUnit={reservationUnit}
           type={type}
         />
@@ -109,33 +112,44 @@ const EventGroupList = ({
   );
 };
 
-const isAllocated = (aes: ApplicationEventScheduleNode) =>
-  aes.allocatedBegin != null;
-const isDeclined = (aes: ApplicationEventScheduleNode) => aes.declined;
-const isNotAllocated = (aes: ApplicationEventScheduleNode) =>
-  aes.allocatedBegin == null && !aes.declined;
+/// TODO are these specific to the ReservationUnit? yes
+/// then we can just check this one, not the whole map
+/*
+function isAllocated(aes: ReservationUnitOptionNode) {
+  return aes.allocatedTimeSlots != null && aes.allocatedTimeSlots.length > 0;
+}
+function isDeclined(aes: ReservationUnitOptionNode) {
+  return aes.rejected;
+}
+// TODO what is the purpose of this function?
+function isNotAllocated(aes: ReservationUnitOptionNode) {
+  return isAllocated(aes) === false && isDeclined(aes) === false;
+}
+*/
 
 // TODO combine this with the AllocationColumn Props type (it's more or less just passing it through)
 type ApplicationEventsProps = {
-  applicationEvents: ApplicationEventNode[] | null;
-  reservationUnit?: ReservationUnitNode;
+  applicationSections: ApplicationSectionNode[] | null;
+  reservationUnit: ReservationUnitNode;
   refetchApplicationEvents: () => Promise<ApolloQueryResult<Query>>;
   applicationRoundStatus: ApplicationRoundStatusChoice;
+  relatedAllocations: AllocatedTimeSlotNode[];
 };
 
 /// TODO rename to something more descriptive
-export function ApplicationEvents({
-  applicationEvents,
+export function AllocationPageContent({
+  applicationSections,
   reservationUnit,
   refetchApplicationEvents,
   applicationRoundStatus,
+  relatedAllocations,
 }: ApplicationEventsProps): JSX.Element {
   const [params] = useSearchParams();
-  // TODO could also pass the applicationEvents to the hook and let it handle the filtering
+  // TODO could also pass the applicationSections to the hook and let it handle the filtering
   // and validating that the focused application event is in the list of application events
   // could also add a reset toggle to the hook, and remove the effect from here
   const [focused, setFocusedApplicationEvent] = useFocusApplicationEvent();
-  const focusedApplicationEvent = applicationEvents?.find(
+  const focusedApplicationEvent = applicationSections?.find(
     (ae) => ae.pk === focused
   );
 
@@ -144,7 +158,7 @@ export function ApplicationEvents({
   useEffect(() => {
     const selectedAeasPk = params.get("aes");
     if (selectedAeasPk) {
-      const selectedAeas = applicationEvents?.find(
+      const selectedAeas = applicationSections?.find(
         (ae) => ae.pk === Number(selectedAeasPk)
       );
       setFocusedApplicationEvent(selectedAeas);
@@ -167,72 +181,98 @@ export function ApplicationEvents({
   );
   */
 
+  const relatedSpacesTimeSlotsByDayReduced =
+    getRelatedTimeSlots(relatedAllocations);
+
   // TODO should use mobile menu layout if the screen is small (this page probably requires  >= 1200px)
   return (
     <Content>
       <ApplicationEventColumn
-        applicationEvents={applicationEvents}
+        applicationSections={applicationSections}
         reservationUnit={reservationUnit}
       />
       <AllocationCalendar
-        applicationEvents={applicationEvents}
+        applicationSections={applicationSections}
         focusedApplicationEvent={focusedApplicationEvent}
-        reservationUnitPk={reservationUnit?.pk ?? 0}
+        relatedAllocations={relatedSpacesTimeSlotsByDayReduced}
       />
       <AllocationColumn
-        applicationEvents={applicationEvents}
+        applicationSections={applicationSections}
         reservationUnit={reservationUnit}
         refetchApplicationEvents={refetchApplicationEvents}
         applicationRoundStatus={applicationRoundStatus}
+        relatedAllocations={relatedSpacesTimeSlotsByDayReduced}
       />
     </Content>
   );
 }
 
 function ApplicationEventColumn({
-  applicationEvents,
+  applicationSections,
   reservationUnit,
   // TODO separate these types (use a union of two types or use Pick to define a new type)
-}: Omit<
+}: Pick<
   ApplicationEventsProps,
-  "refetchApplicationEvents" | "applicationRoundStatus"
+  "applicationSections" | "reservationUnit"
 >): JSX.Element {
   const { t } = useTranslation();
   const [focused, setFocusedApplicationEvent] = useFocusApplicationEvent();
-  const focusedApplicationEvent = applicationEvents?.find(
+  const focusedApplicationEvent = applicationSections?.find(
     (ae) => ae.pk === focused
   );
 
-  const allocated =
-    applicationEvents
+  // TODO should use fullfilled
+  const isAllocated = (as: ApplicationSectionNode) =>
+    as.allocations != null && as.allocations > 0;
+  const allocated = filterNonNullable(
+    applicationSections?.filter(
+      (as) => as.status === ApplicationSectionStatusChoice.Handled
+    )
+  );
+  // (applicationSections ?? []).filter((as) => isAllocated(as));
+  /* FIXME
       ?.filter((applicationEvent) =>
         applicationEvent?.applicationEventSchedules?.every(isAllocated)
       )
       .sort((a, b) => a.name.localeCompare(b.name)) ?? [];
+  */
 
-  const partiallyAllocated =
-    applicationEvents
+  // TODO
+  const partiallyAllocated = filterNonNullable(
+    applicationSections?.filter(
+      (as) =>
+        as.status !== ApplicationSectionStatusChoice.Handled && isAllocated(as)
+    )
+  );
+  /* FIXME
       ?.filter(
         (applicationEvent) =>
           applicationEvent?.applicationEventSchedules?.some(isAllocated) &&
           applicationEvent?.applicationEventSchedules?.some(isNotAllocated)
       )
       .sort((a, b) => a.name.localeCompare(b.name)) ?? [];
+  */
 
-  const declined =
-    applicationEvents
+  const isRejected = (as: ApplicationSectionNode) =>
+    as.reservationUnitOptions?.map((ruo) => ruo.rejected).some(Boolean);
+  const declined = (applicationSections ?? []).filter((as) => isRejected(as));
+  /* FIXME
       ?.filter((ae) => ae?.applicationEventSchedules?.every(isDeclined))
       .sort((a, b) => a.name.localeCompare(b.name)) ?? [];
+  */
 
   // take certain states and omit colliding application events
-  const unallocatedApplicationEvents =
-    applicationEvents
+  const unallocatedApplicationEvents = (applicationSections ?? []).filter(
+    (as) => !isAllocated(as)
+  );
+  /* FIXME
       ?.filter((applicationEvent) =>
         applicationEvent?.applicationEventSchedules?.every(isNotAllocated)
       )
       .sort((a, b) => a.name.localeCompare(b.name)) ?? [];
+  */
 
-  const handleSelectApplicationEvent = (aes?: ApplicationEventNode) => {
+  const handleSelectApplicationEvent = (aes?: ApplicationSectionNode) => {
     setFocusedApplicationEvent(aes);
   };
 
@@ -247,9 +287,9 @@ function ApplicationEventColumn({
         >
           <p>{t("Allocation.selectApplicant")}</p>
           <EventGroupList
-            applicationEvents={unallocatedApplicationEvents}
-            focusedApplicationEvent={focusedApplicationEvent}
-            setFocusedApplicationEvent={handleSelectApplicationEvent}
+            applicationSections={unallocatedApplicationEvents}
+            focusedApplicationSection={focusedApplicationEvent}
+            setFocusedApplicationSection={handleSelectApplicationEvent}
             reservationUnit={reservationUnit}
             type="unallocated"
           />
@@ -264,9 +304,9 @@ function ApplicationEventColumn({
           initiallyOpen
         >
           <EventGroupList
-            applicationEvents={partiallyAllocated}
-            focusedApplicationEvent={focusedApplicationEvent}
-            setFocusedApplicationEvent={handleSelectApplicationEvent}
+            applicationSections={partiallyAllocated}
+            focusedApplicationSection={focusedApplicationEvent}
+            setFocusedApplicationSection={handleSelectApplicationEvent}
             reservationUnit={reservationUnit}
             type="partial"
           />
@@ -278,9 +318,9 @@ function ApplicationEventColumn({
           initiallyOpen
         >
           <EventGroupList
-            applicationEvents={allocated}
-            focusedApplicationEvent={focusedApplicationEvent}
-            setFocusedApplicationEvent={handleSelectApplicationEvent}
+            applicationSections={allocated}
+            focusedApplicationSection={focusedApplicationEvent}
+            setFocusedApplicationSection={handleSelectApplicationEvent}
             reservationUnit={reservationUnit}
             type="allocated"
           />
@@ -292,9 +332,9 @@ function ApplicationEventColumn({
           initiallyOpen
         >
           <EventGroupList
-            applicationEvents={declined}
-            focusedApplicationEvent={focusedApplicationEvent}
-            setFocusedApplicationEvent={handleSelectApplicationEvent}
+            applicationSections={declined}
+            focusedApplicationSection={focusedApplicationEvent}
+            setFocusedApplicationSection={handleSelectApplicationEvent}
             reservationUnit={reservationUnit}
             type="declined"
           />

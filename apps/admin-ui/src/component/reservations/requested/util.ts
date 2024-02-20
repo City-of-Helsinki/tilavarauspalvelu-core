@@ -15,13 +15,13 @@ import {
 import {
   AgeGroupType,
   Maybe,
-  ReservationsReservationReserveeTypeChoices,
-  ReservationsReservationTypeChoices,
+  ReserveeType,
   ReservationType,
   ReservationUnitPricingType,
-  ReservationUnitsReservationUnitPricingPriceUnitChoices,
-  ReservationUnitsReservationUnitPricingPricingTypeChoices,
+  PriceUnit,
+  PricingType,
   ReservationUnitType,
+  Type,
 } from "common/types/gql-types";
 import { formatDuration, fromApiDate } from "common/src/common/util";
 import { toMondayFirst } from "common/src/helpers";
@@ -143,16 +143,14 @@ export const getReservationPriceDetails = (
   const volume = getUnRoundedReservationVolume(durationMinutes, priceUnit);
 
   const maxPrice =
-    pricing.pricingType ===
-    ReservationUnitsReservationUnitPricingPricingTypeChoices.Paid
+    pricing.pricingType === PricingType.Paid
       ? parseFloat(pricing.highestPrice)
       : 0;
   const formatters = getFormatters("fi");
 
-  const taxP = parseFloat(pricing.taxPercentage?.value);
+  const taxP = parseFloat(pricing.taxPercentage?.value ?? "");
   const taxPercentage = Number.isNaN(taxP) ? 0 : taxP;
-  return priceUnit ===
-    ReservationUnitsReservationUnitPricingPriceUnitChoices.Fixed
+  return priceUnit === PriceUnit.Fixed
     ? getReservationPrice(maxPrice, t("RequestedReservation.noPrice"))
     : t("RequestedReservation.ApproveDialog.priceBreakdown", {
         volume: formatters.strippedDecimal.format(volume),
@@ -173,14 +171,14 @@ export const ageGroup = (
 ): string | null => (group ? `${group.minimum}-${group.maximum || ""}` : null);
 
 const reserveeTypeToTranslationKey = (
-  reserveeType: ReservationsReservationReserveeTypeChoices,
+  reserveeType: ReserveeType,
   isUnregisteredAssociation: boolean
 ) => {
   switch (reserveeType) {
-    case ReservationsReservationReserveeTypeChoices.Business:
-    case ReservationsReservationReserveeTypeChoices.Individual:
+    case ReserveeType.Business:
+    case ReserveeType.Individual:
       return `ReserveeType.${reserveeType}`;
-    case ReservationsReservationReserveeTypeChoices.Nonprofit:
+    case ReserveeType.Nonprofit:
       return `ReserveeType.${reserveeType}.${
         isUnregisteredAssociation ? "UNREGISTERED" : "REGISTERED"
       }`;
@@ -190,14 +188,14 @@ const reserveeTypeToTranslationKey = (
 };
 
 export const getTranslationKeyForReserveeType = (
-  reservationType?: ReservationsReservationTypeChoices,
-  reserveeType?: ReservationsReservationReserveeTypeChoices,
+  reservationType?: Type,
+  reserveeType?: ReserveeType,
   isUnregisteredAssociation?: boolean
 ): string[] => {
   if (!reservationType) {
     return ["errors.missingReservationType"];
   }
-  if (reservationType === ReservationsReservationTypeChoices.Blocked) {
+  if (reservationType === Type.Blocked) {
     return ["ReservationType.BLOCKED"];
   }
 
@@ -216,12 +214,12 @@ export const getReserveeName = (
   length = 50
 ): string => {
   let prefix = "";
-  if (reservation.type === ReservationsReservationTypeChoices.Behalf) {
+  if (reservation.type === Type.Behalf) {
     prefix = t ? t("Reservations.prefixes.behalf") : "";
   }
   if (
     // commented extra condition out for now, as the staff prefix was requested to be used for all staff reservations
-    reservation.type === ReservationsReservationTypeChoices.Staff /* &&
+    reservation.type === Type.Staff /* &&
     reservation.reserveeName ===
       `${reservation.user?.firstName} ${reservation.user?.lastName}` */
   ) {

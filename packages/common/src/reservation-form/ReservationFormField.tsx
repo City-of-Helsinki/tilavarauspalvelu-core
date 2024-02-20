@@ -10,7 +10,7 @@ import {
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { fontMedium, fontRegular, Strongish } from "../common/typography";
-import { ReservationsReservationReserveeTypeChoices } from "../../types/gql-types";
+import { ReserveeType } from "../../types/gql-types";
 import { Inputs, Reservation } from "./types";
 import { CheckboxWrapper } from "./components";
 import { OptionType } from "../../types/common";
@@ -19,7 +19,7 @@ import { removeRefParam } from "./util";
 type Props = {
   field: keyof Inputs;
   options: Record<string, OptionType[]>;
-  translationKey?: ReservationsReservationReserveeTypeChoices | "COMMON";
+  translationKey?: ReserveeType | "COMMON";
   reservation: Reservation;
   required: boolean;
   params?: Record<string, Record<string, string | number>>;

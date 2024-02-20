@@ -9,8 +9,8 @@ import {
   MutationStaffAdjustReservationTimeArgs,
   ReservationType,
   ReservationTypeConnection,
-  ReservationUnitsReservationUnitReservationStartIntervalChoices,
-  ReservationsReservationTypeChoices,
+  ReservationStartInterval,
+  Type,
 } from "common/types/gql-types";
 import { FormProvider, useForm } from "react-hook-form";
 import { format } from "date-fns";
@@ -178,9 +178,9 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
   // not doing it right now because of open question and because of breaking enum name change.
   const interval =
     reservationUnit?.reservationStartInterval ===
-    ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
-      ? ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
-      : ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_30Mins;
+    ReservationStartInterval.Interval_15Mins
+      ? ReservationStartInterval.Interval_15Mins
+      : ReservationStartInterval.Interval_30Mins;
 
   const form = useForm<FormValueType>({
     resolver: zodResolver(TimeChangeFormSchemaRefined(interval)),
@@ -243,18 +243,15 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
     end: newEndTime,
     buffers: {
       before:
-        reservation.type !== ReservationsReservationTypeChoices.Blocked &&
-        reservation.bufferTimeBefore
+        reservation.type !== Type.Blocked && reservation.bufferTimeBefore
           ? reservation.bufferTimeBefore
           : 0,
       after:
-        reservation.type !== ReservationsReservationTypeChoices.Blocked &&
-        reservation.bufferTimeAfter
+        reservation.type !== Type.Blocked && reservation.bufferTimeAfter
           ? reservation.bufferTimeAfter
           : 0,
     },
-    reservationType:
-      reservation.type ?? ReservationsReservationTypeChoices.Staff,
+    reservationType: reservation.type ?? Type.Staff,
   });
 
   // NOTE 0 => buffer disabled for this reservation, undefined => no buffers selected

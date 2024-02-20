@@ -2,12 +2,12 @@ import { useState } from "react";
 import {
   type Query,
   type ReservationType,
-  ReservationsReservationStateChoices,
+  State,
   type QueryReservationUnitByPkArgs,
   type ReservationDenyReasonType,
   type QueryReservationDenyReasonsArgs,
   type QueryReservationByPkArgs,
-  ReservationsReservationTypeChoices,
+  Type,
 } from "common/types/gql-types";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@apollo/client";
@@ -25,13 +25,10 @@ import { GQL_MAX_RESULTS_PER_QUERY } from "../../../../common/const";
 export { default as useCheckCollisions } from "./useCheckCollisions";
 
 const getEventName = (
-  eventType?: ReservationsReservationTypeChoices,
+  eventType?: Type,
   title?: string,
   blockedName?: string
-) =>
-  eventType === ReservationsReservationTypeChoices.Blocked
-    ? blockedName
-    : title?.trim();
+) => (eventType === Type.Blocked ? blockedName : title?.trim());
 
 const getReservationTitle = (r: ReservationType) => r.reserveeName ?? "";
 
@@ -52,8 +49,8 @@ const convertReservationToCalendarEvent = (
 // TODO This would be better if we combined two GQL queries, one for the reservation itself
 // and other that includes the states (now we are fetching a lot of things we don't need)
 const shouldBeShownInTheCalendar = (r: ReservationType, ownPk?: number) =>
-  r.state === ReservationsReservationStateChoices.Confirmed ||
-  r.state === ReservationsReservationStateChoices.RequiresHandling ||
+  r.state === State.Confirmed ||
+  r.state === State.RequiresHandling ||
   r.pk === ownPk;
 
 /// NOTE only fetches 100 reservations => use pageInfo and fetchMore
@@ -103,7 +100,7 @@ type CustomQueryParams = {
   pk: number;
   count: number;
   offset: number;
-  state: ReservationsReservationStateChoices[];
+  state: State[];
   begin?: Date;
   end?: Date;
 };
@@ -136,10 +133,7 @@ export const useRecurringReservations = (
         pk: recurringPk ?? 0,
         offset: 0,
         count: Math.min(limit, defaultOptions.limit),
-        state: [
-          ReservationsReservationStateChoices.Confirmed,
-          ReservationsReservationStateChoices.Denied,
-        ],
+        state: [State.Confirmed, State.Denied],
       },
       // do automatic fetching and let the cache manage merging
       onCompleted: (d: Query) => {
@@ -240,7 +234,7 @@ export const useReservationEditData = (id?: string) => {
   // into it will break the reservation queries elsewhere.
   const possibleReservations = recurringReservations
     .filter((x) => new Date(x.begin) > new Date())
-    .filter((x) => x.state === ReservationsReservationStateChoices.Confirmed);
+    .filter((x) => x.state === State.Confirmed);
 
   const { data: nextRecurrance, loading: nextReservationLoading } = useQuery<
     Query,

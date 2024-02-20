@@ -4,7 +4,7 @@ import {
   QueryTermsOfUseArgs,
   TermsOfUseType,
   Query,
-  TermsOfUseTermsOfUseTermsTypeChoices,
+  TermsType,
   ReservationUnitType,
 } from "common/types/gql-types";
 import { gql, useQuery } from "@apollo/client";
@@ -36,7 +36,7 @@ const TOSElement = ({ title, text }: { title: string; text: string }) => (
 );
 
 const TERMS_OF_USE = gql`
-  query TermsOfUse($termsType: TermsOfUseTermsOfUseTermsTypeChoices) {
+  query TermsOfUse($termsType: TermsType) {
     termsOfUse(termsType: $termsType) {
       edges {
         node {
@@ -57,7 +57,7 @@ const TERMS_OF_USE = gql`
 const useGenericTerms = () => {
   const { data } = useQuery<Query, QueryTermsOfUseArgs>(TERMS_OF_USE, {
     variables: {
-      termsType: TermsOfUseTermsOfUseTermsTypeChoices.GenericTerms,
+      termsType: TermsType.GenericTerms,
     },
   });
 

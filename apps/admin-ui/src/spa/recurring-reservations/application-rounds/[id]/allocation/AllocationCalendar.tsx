@@ -5,8 +5,10 @@ import styled, { css } from "styled-components";
 import { fontMedium } from "common/src/common/typography";
 import { filterNonNullable } from "common/src/helpers";
 import {
-  ApplicationEventNode,
-  ApplicationEventScheduleNode,
+  type ApplicationSectionNode,
+  type ReservationUnitOptionNode,
+  Weekday,
+  ApplicationSectionStatusChoice,
 } from "common/types/gql-types";
 import { ALLOCATION_CALENDAR_TIMES } from "@/common/const";
 import {
@@ -14,19 +16,19 @@ import {
   getTimeSeries,
   timeSlotKeyToTime,
   type Cell,
+  transformWeekday,
+  parseApiTime,
   encodeTimeSlot,
-  TimeSlot,
-  constructTimeRange,
-  pickTimeSlot,
+  type RelatedSlot,
 } from "./modules/applicationRoundAllocation";
-import { uniqBy } from "lodash";
 import { breakpoints } from "common";
 import { useSlotSelection } from "./hooks";
+import { type Day } from "common/src/conversion";
 
 type Props = {
-  applicationEvents: ApplicationEventNode[] | null;
-  focusedApplicationEvent?: ApplicationEventNode;
-  reservationUnitPk: number;
+  applicationSections: ApplicationSectionNode[] | null;
+  focusedApplicationEvent?: ApplicationSectionNode;
+  relatedAllocations: RelatedSlot[][];
 };
 
 // grid:s have some weird scaling rules, the easiest way to make the center scale reasonably is with media queries
@@ -46,8 +48,6 @@ const Wrapper = styled.div`
   }
 `;
 
-const DayWrapper = styled.div``;
-
 const DayLabel = styled.div`
   display: flex;
   justify-content: center;
@@ -59,6 +59,7 @@ const Slot = styled.div<{
   $eventCount?: number;
   $isAccepted?: boolean;
   $isDeclined?: boolean;
+  $isRelated?: boolean;
 }>`
   ${fontMedium};
   font-size: var(--fontsize-body-m);
@@ -71,10 +72,16 @@ const Slot = styled.div<{
   background-color: var(--color-black-10);
   margin-bottom: 4px;
   cursor: pointer;
-  ${({ $eventCount, $isAccepted, $isDeclined }) => {
+  ${({ $eventCount, $isAccepted, $isDeclined, $isRelated }) => {
     if ($isAccepted) {
       return css`
         background-color: var(--color-success);
+        color: var(--color-white);
+      `;
+    }
+    if ($isRelated) {
+      return css`
+        background-color: var(--color-black-70);
         color: var(--color-white);
       `;
     }
@@ -181,58 +188,22 @@ const isSlotLast = (selection: string[], slot: string): boolean => {
     : !selection.includes(`${day}-${hour + 1}-00`);
 };
 
-/// Is application event schedule on a cell (time slot)
-/// Assumes that the day is already checked
-/// TODO reuse this?
-function isInRange(aes: ApplicationEventScheduleNode, cell: Cell) {
-  const time = cell.hour * 60 + cell.minute;
-  const { day, begin, end } = pickTimeSlot(aes) ?? {};
-  if (!day || !begin || !end) {
-    return false;
-  }
-  const b = begin.split(":").map((n) => parseInt(n, 10));
-  const e = end.split(":").map((n) => parseInt(n, 10));
-  if (b.length < 2 || e.length < 2) {
-    return false;
-  }
-  const beginTime = b[0] * 60 + b[1];
-  const endTime = e[0] * 60 + e[1];
-  return time >= beginTime && time < endTime;
-}
-
-/// Check if the applciation event schedule is allocated on a specific day and time
-/// @param aes the application event schedule
-/// @param cell on a day (time slot)
-/// @param day we are interested in
-function isSlotAccepted(
-  aes: ApplicationEventScheduleNode,
-  cell: Cell,
-  day: 0 | 1 | 2 | 3 | 4 | 5 | 6
-) {
-  const { allocatedDay, allocatedBegin, allocatedEnd } = aes;
-  if (allocatedDay == null || allocatedBegin == null || allocatedEnd == null) {
-    return false;
-  }
-  if (allocatedDay !== day) {
-    return false;
-  }
-  const time = cell.hour * 60 + cell.minute;
-  const begin = allocatedBegin.split(":").map((n) => parseInt(n, 10));
-  const end = allocatedEnd.split(":").map((n) => parseInt(n, 10));
-  if (begin.length < 2 || end.length < 2) {
-    return false;
-  }
-  const beginTime = begin[0] * 60 + begin[1];
-  const endTime = end[0] * 60 + end[1];
-  return time >= beginTime && time < endTime;
-}
-
 const weekdays = [0, 1, 2, 3, 4, 5, 6] as const;
 
+/* TODO full rethink on this
+ *
+ * - we have data that is already divided based on the ReservationUnitOptionNode right?
+ *   so only pass that here
+ * - no checks if the reservation unit matches are done here
+ * - suitable vs. allocated time ranges?
+ */
+// TODO need to query all the allocated even in the filtered query
+// suitable times should be filtered but allocated not
+// so neeed to pass both separately to this component
 export function AllocationCalendar({
-  applicationEvents,
+  applicationSections,
   focusedApplicationEvent,
-  reservationUnitPk,
+  relatedAllocations,
 }: Props): JSX.Element {
   const [selection, setSelection] = useSlotSelection();
   const [isSelecting, setIsSelecting] = useState(false);
@@ -247,9 +218,10 @@ export function AllocationCalendar({
     setIsSelecting(false);
   };
 
+  const aesForThisUnit = filterNonNullable(applicationSections);
   return (
     <Wrapper>
-      <DayWrapper>
+      <div>
         <DayLabel />
         {cells[0].map((cell) => {
           const key = `${cell.hour}-${cell.minute}`;
@@ -261,25 +233,113 @@ export function AllocationCalendar({
             <HourLabel key={key} />
           );
         })}
-      </DayWrapper>
+      </div>
       {weekdays.map((day) => {
         // Only show allocated that match the unit and day
-        const aes = filterNonNullable(
-          applicationEvents?.flatMap((ae) => ae.applicationEventSchedules)
-        )
+        const timeslots = filterNonNullable(
+          aesForThisUnit
+            .filter(
+              (ae) => ae.status !== ApplicationSectionStatusChoice.Handled
+            )
+            .filter((ae) =>
+              ae.suitableTimeRanges?.some(
+                (tr) => tr.dayOfTheWeek === transformWeekday(day)
+              )
+            )
+        );
+
+        const resUnits = filterNonNullable(
+          aesForThisUnit?.flatMap((ae) => ae.reservationUnitOptions)
+        );
+        // TODO wrap this into a function? we need the same for focused
+        // TODO do we have to do it like this? or should we split the data (similar to Column / Cards)?
+        // reason why it's needed is because we need per day time slot data but all of the section data (the section includes all the days)
+        const allocated = resUnits
           .filter((a) =>
-            a.allocatedDay != null ? a.allocatedDay === day : a.day === day
+            a.allocatedTimeSlots?.some(
+              (ts) => ts.dayOfTheWeek === transformWeekday(day)
+            )
           )
-          .filter(
-            (a) =>
-              a.allocatedReservationUnit == null ||
-              a.allocatedReservationUnit.pk === reservationUnitPk
-          );
-        const uAes = uniqBy(aes, "pk");
+          .map((a) => {
+            return {
+              ...a,
+              allocatedTimeSlots: a.allocatedTimeSlots?.filter(
+                (ts) => ts.dayOfTheWeek === transformWeekday(day)
+              ),
+            };
+          });
+
+        // this should transform it into
+        // so focused: Array<{ beginTime, endTime, allocated: boolean }>
+        // then use a separate map to transform it into the cells (we want to remove the cell type completely)
+        const focusedTimeSlots = filterNonNullable(
+          focusedApplicationEvent?.suitableTimeRanges?.filter(
+            (tr) => tr.dayOfTheWeek === transformWeekday(day)
+          )
+        );
+        const focusedAllocatedTimeSlots = filterNonNullable(
+          focusedApplicationEvent?.reservationUnitOptions?.filter((a) =>
+            a.allocatedTimeSlots?.some(
+              (ts) => ts.dayOfTheWeek === transformWeekday(day)
+            )
+          )
+        ).map((a) => {
+          return {
+            ...a,
+            allocatedTimeSlots: a.allocatedTimeSlots?.filter(
+              (ts) => ts.dayOfTheWeek === transformWeekday(day)
+            ),
+          };
+        });
+
+        // TODO move to a free function
+        // Assume that this is already filtered by the day
+        // TODO Not a good name it should match the Cell type (which isn't great either)
+        type Slot = {
+          day: Day;
+          cell: string;
+          allocated: boolean;
+          minutes: number;
+        };
+        const addTimeSlotToArray = (
+          arr: Slot[],
+          slot: { beginTime: string; endTime: string },
+          allocated: boolean
+        ) => {
+          const { beginTime, endTime } = slot;
+          const begin = parseApiTime(beginTime);
+          const end = parseApiTime(endTime);
+          if (!begin || !end) {
+            return;
+          }
+          const beginMinutes = begin * 60;
+          const endMinutes = end * 60;
+          for (let i = beginMinutes; i < endMinutes; i += 30) {
+            const cell = i / 60;
+            const key = encodeTimeSlot(day, cell);
+            arr.push({ day, cell: key, allocated, minutes: i });
+          }
+        };
+
+        const focusedSlots: Slot[] = [];
+        for (const ts of focusedTimeSlots) {
+          addTimeSlotToArray(focusedSlots, ts, false);
+        }
+
+        for (const a of focusedAllocatedTimeSlots) {
+          if (!a.allocatedTimeSlots) {
+            continue;
+          }
+          for (const ts of a.allocatedTimeSlots) {
+            addTimeSlotToArray(focusedSlots, ts, true);
+          }
+        }
+
         return (
-          <Day
+          <CalendarDay
             key={`day-${day}`}
-            aesForDay={uAes}
+            allocated={allocated}
+            suitable={timeslots}
             day={day}
             cells={cells}
             isSelecting={isSelecting}
@@ -290,8 +350,8 @@ export function AllocationCalendar({
               setIsSelecting(true);
               setSelection([key]);
             }}
-            reservationUnitPk={reservationUnitPk}
-            focusedApplicationEvent={focusedApplicationEvent}
+            relatedTimeSpans={relatedAllocations[day] ?? []}
+            focusedSlots={focusedSlots}
           />
         );
       })}
@@ -299,41 +359,35 @@ export function AllocationCalendar({
   );
 }
 
-function toTimeSlots(aes: ApplicationEventScheduleNode[]): TimeSlot[][] {
-  const allocated = aes
-    .filter(
-      (a) =>
-        a.allocatedDay != null &&
-        a.allocatedBegin != null &&
-        a.allocatedEnd != null
-    )
-    .map((a) => {
-      if (
-        a.allocatedDay == null ||
-        a.allocatedBegin == null ||
-        a.allocatedEnd == null
-      ) {
-        return null;
-      }
-      return {
-        day: a.allocatedDay,
-        begin: a.allocatedBegin,
-        end: a.allocatedEnd,
-      };
-    })
-    .filter((a): a is NonNullable<typeof a> => a != null);
-  if (allocated.length > 0) {
-    return filterNonNullable(
-      allocated.map((a) => constructTimeRange(a.day, a.begin, a.end))
-    );
+function checkCell(
+  day: Day,
+  cell: Cell,
+  weekday: Weekday,
+  beginTime: string,
+  endTime: string
+) {
+  if (weekday !== transformWeekday(day)) {
+    return false;
   }
-  return filterNonNullable(
-    aes.map((a) => constructTimeRange(a.day, a.begin, a.end))
-  );
+  const begin = parseApiTime(beginTime);
+  const end = parseApiTime(endTime);
+  if (!begin || !end) {
+    return false;
+  }
+  const cellTime = cell.hour * 60 + cell.minute;
+  const beginMinutes = begin * 60;
+  const endMinutes = end * 60;
+  return cellTime >= beginMinutes && cellTime < endMinutes;
 }
 
-function Day({
-  aesForDay,
+// TODO filter this before passing it to the component
+// so it should be Cell[] not Cell[][]
+// the allocated / suitable should be filtered by day
+// focused should be filtered by day
+// remove day if possible (key's might require it)
+function CalendarDay({
+  allocated,
+  suitable,
   day,
   cells,
   isSelecting,
@@ -341,10 +395,11 @@ function Day({
   setSelection,
   onFinishSelection,
   onStartSelection,
-  reservationUnitPk,
-  focusedApplicationEvent,
+  focusedSlots,
+  relatedTimeSpans,
 }: {
-  aesForDay: ApplicationEventScheduleNode[];
+  allocated: ReservationUnitOptionNode[];
+  suitable: ApplicationSectionNode[];
   day: 0 | 1 | 2 | 3 | 4 | 5 | 6;
   cells: Cell[][];
   isSelecting: boolean;
@@ -352,36 +407,15 @@ function Day({
   setSelection: (selection: string[]) => void;
   onFinishSelection: () => void;
   onStartSelection: (key: string) => void;
-  reservationUnitPk: number;
-  focusedApplicationEvent?: ApplicationEventNode;
+  focusedSlots: Array<{
+    day: Day;
+    cell: string;
+    allocated: boolean;
+    minutes: number;
+  }>;
+  relatedTimeSpans: RelatedSlot[];
 }): JSX.Element {
   const { t } = useTranslation();
-
-  // TODO rename this, it's only the focused application event schedules
-  const aesEvt = filterNonNullable(
-    focusedApplicationEvent?.applicationEventSchedules
-  ).filter(
-    (a) =>
-      a.allocatedReservationUnit == null ||
-      a.allocatedReservationUnit.pk === reservationUnitPk
-  );
-
-  // TODO refactor this (don't string convert)
-  // What we want:
-  // - if it's allocated return the allocated range
-  // - if it's not allocated return all the requested ranges
-  const activeSlots = toTimeSlots(aesEvt)
-    .reduce<{ day: number; hour: number }[]>((acc, val) => {
-      const s = [];
-      for (let i = val[0].hour; i < val[1].hour; i++) {
-        s.push({ day: val[0].day, hour: i });
-        s.push({ day: val[0].day, hour: i + 0.5 });
-      }
-      return [...acc, ...s];
-    }, [])
-    .map((x) => encodeTimeSlot(x.day, x.hour));
-
-  const isActiveAllocated = aesEvt.some((a) => a.allocatedDay === day);
 
   const handleMouseEnter = (cell: (typeof cells)[0][0]) => {
     if (isSelecting && selection.length > 0) {
@@ -398,16 +432,51 @@ function Day({
     }
   };
 
+  const isInRange = (ae: ApplicationSectionNode, cell: Cell) => {
+    return (
+      ae.suitableTimeRanges?.some((tr) => {
+        const { dayOfTheWeek, beginTime, endTime } = tr;
+        return checkCell(day, cell, dayOfTheWeek, beginTime, endTime);
+      }) ?? false
+    );
+  };
+
+  const isAllocated = (ae: ReservationUnitOptionNode, cell: Cell) => {
+    return ae.allocatedTimeSlots
+      ?.map((ts) => {
+        const { beginTime, endTime, dayOfTheWeek } = ts;
+        return checkCell(day, cell, dayOfTheWeek, beginTime, endTime);
+      })
+      .some((x) => x);
+  };
+
+  const focused = focusedSlots.filter((x) => x.day === day);
   return (
-    <DayWrapper key={`day-${day}`}>
+    <div key={`day-${day}`}>
       <DayLabel>{t(`dayShort.${day}`)}</DayLabel>
       {cells[day].map((cell) => {
-        const foundAes = aesForDay.filter((aes) => isInRange(aes, cell));
-        const isSlotDeclined =
-          foundAes.filter((aes) => aes.declined).length > 0;
-        const isAccepted =
-          foundAes.filter((aes) => isSlotAccepted(aes, cell, day)).length > 0;
+        const foundAes = suitable.filter((aes) => isInRange(aes, cell));
+        const isSlotDeclined = false;
+        const isAccepted = allocated.some((aes) => isAllocated(aes, cell));
         const slotEventCount = foundAes.length;
+        const focusedSlot = focused.find(
+          (x) => x.minutes === cell.hour * 60 + cell.minute
+        );
+        const isFocused = focusedSlot != null;
+        // TODO these don't look nice and don't work if the array is not presorted
+        const isFocusedFirst =
+          focused.length > 0 &&
+          focused[0].minutes === cell.hour * 60 + cell.minute;
+        const isFocusedLast =
+          focused.length > 0 &&
+          focused[focused.length - 1].minutes === cell.hour * 60 + cell.minute;
+        const isInsideRelatedTimeSpan =
+          relatedTimeSpans?.some((ts) => {
+            return (
+              ts.beginTime <= cell.hour * 60 + cell.minute &&
+              ts.endTime > cell.hour * 60 + cell.minute
+            );
+          }) ?? false;
         return (
           <Slot
             key={cell.key}
@@ -417,8 +486,9 @@ function Day({
             $eventCount={slotEventCount}
             $isAccepted={isAccepted}
             $isDeclined={isSlotDeclined}
+            $isRelated={isInsideRelatedTimeSpan}
           >
-            {isAccepted ? (
+            {isAccepted || isInsideRelatedTimeSpan ? (
               <IconCheck />
             ) : isSlotDeclined ? (
               <IconCross />
@@ -432,16 +502,16 @@ function Day({
                 $isLast={isSlotLast(selection, cell.key)}
               />
             )}
-            {activeSlots?.includes(cell.key) && (
+            {isFocused && (
               <Active
-                $isAllocated={isActiveAllocated}
-                $isFirst={isSlotFirst(activeSlots, cell.key)}
-                $isLast={isSlotLast(activeSlots, cell.key)}
+                $isAllocated={focusedSlot.allocated}
+                $isFirst={isFocusedFirst}
+                $isLast={isFocusedLast}
               />
             )}
           </Slot>
         );
       })}
-    </DayWrapper>
+    </div>
   );
 }

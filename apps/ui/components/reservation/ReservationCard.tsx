@@ -6,10 +6,7 @@ import styled from "styled-components";
 import { getReservationPrice } from "common";
 import { trim } from "lodash";
 import { breakpoints } from "common/src/common/style";
-import {
-  ReservationsReservationStateChoices,
-  ReservationType,
-} from "common/types/gql-types";
+import { ReservationType, State } from "common/types/gql-types";
 import {
   capitalize,
   getImageSource,
@@ -190,7 +187,7 @@ const ReservationCard = ({ reservation, type }: PropsT): JSX.Element => {
   );
 
   const price =
-    reservation.state === ReservationsReservationStateChoices.RequiresHandling
+    reservation.state === State.RequiresHandling
       ? getReservationUnitPrice({
           reservationUnit,
           pricingDate: new Date(reservation.begin),
@@ -214,7 +211,7 @@ const ReservationCard = ({ reservation, type }: PropsT): JSX.Element => {
     orderStatus,
     statusType = "desktop",
   }: {
-    state: ReservationsReservationStateChoices;
+    state: State;
     orderStatus: string | null;
     statusType: "desktop" | "mobile";
   }) => (

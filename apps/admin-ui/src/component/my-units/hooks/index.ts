@@ -10,10 +10,7 @@ import type {
   ReservationUnitByPkTypeReservationsArgs,
   ReservationUnitType,
 } from "common/types/gql-types";
-import {
-  ReservationsReservationReserveeTypeChoices,
-  ReservationsReservationTypeChoices,
-} from "common/types/gql-types";
+import { ReserveeType, Type } from "common/types/gql-types";
 import { toApiDate } from "common/src/common/util";
 import { filterNonNullable } from "common/src/helpers";
 import { useNotification } from "@/context/NotificationContext";
@@ -26,17 +23,16 @@ import {
 
 export const useApplicationFields = (
   reservationUnit: ReservationUnitType,
-  reserveeType?: ReservationsReservationReserveeTypeChoices
+  reserveeType?: ReserveeType
 ) => {
   return useMemo(() => {
-    const reserveeTypeString =
-      reserveeType || ReservationsReservationReserveeTypeChoices.Individual;
+    const reserveeTypeString = reserveeType || ReserveeType.Individual;
 
     const type = reservationUnit.metadataSet?.supportedFields?.includes(
       "reservee_type"
     )
       ? reserveeTypeString
-      : ReservationsReservationReserveeTypeChoices.Individual;
+      : ReserveeType.Individual;
 
     return getReservationApplicationFields({
       supportedFields: filterNonNullable(
@@ -160,7 +156,7 @@ export const useUnitResources = (
           .map((y) => ({
             event: {
               ...y,
-              ...(y.type !== ReservationsReservationTypeChoices.Blocked
+              ...(y.type !== Type.Blocked
                 ? {
                     bufferTimeBefore:
                       y.bufferTimeBefore ?? x.bufferTimeBefore ?? 0,

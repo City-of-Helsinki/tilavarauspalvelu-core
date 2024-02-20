@@ -336,7 +336,6 @@ export const OPENING_HOURS = gql`
         pk
         state
         isBlocked
-        priority
         begin
         end
         numPersons

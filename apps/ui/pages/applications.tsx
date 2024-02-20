@@ -87,7 +87,7 @@ const ApplicationsPage = (): JSX.Element | null => {
     fetchPolicy: "no-cache",
     skip: !user?.pk,
     variables: {
-      applicant: user?.pk,
+      user: user?.pk,
       status: [
         ApplicationStatusChoice.Draft,
         ApplicationStatusChoice.ResultsSent,

@@ -1,31 +1,30 @@
-import { ReservationUnitsReservationUnitPricingPriceUnitChoices } from "../types/gql-types";
+import { PriceUnit } from "../types/gql-types";
 import formatters from "./number-formatters";
 
-export const getPriceUnitMinutes = (
-  unit: ReservationUnitsReservationUnitPricingPriceUnitChoices
-): number => {
+export const getPriceUnitMinutes = (unit: PriceUnit): number => {
   switch (unit) {
+    case PriceUnit.Per_15Mins:
     case "PER_15_MINS":
       return 15;
+    case PriceUnit.Per_30Mins:
     case "PER_30_MINS":
       return 30;
+    case PriceUnit.PerHour:
     case "PER_HOUR":
       return 60;
-    case "PER_HALF_DAY":
-    case "PER_DAY":
-    case "PER_WEEK":
+    case PriceUnit.PerHalfDay:
+    case PriceUnit.PerDay:
+    case PriceUnit.PerWeek:
     default:
       return 1;
   }
 };
 
-export const getPriceFractionMinutes = (
-  unit: ReservationUnitsReservationUnitPricingPriceUnitChoices
-): number => {
+export const getPriceFractionMinutes = (unit: PriceUnit): number => {
   switch (unit) {
-    case "PER_15_MINS":
-    case "PER_30_MINS":
-    case "PER_HOUR":
+    case PriceUnit.Per_15Mins:
+    case PriceUnit.Per_30Mins:
+    case PriceUnit.PerHour:
       return 15;
     default:
       return 1;
@@ -34,7 +33,7 @@ export const getPriceFractionMinutes = (
 
 export const getUnRoundedReservationVolume = (
   minutes: number,
-  unit: ReservationUnitsReservationUnitPricingPriceUnitChoices
+  unit: PriceUnit
 ): number => {
   const wholeMinutes = getPriceUnitMinutes(unit);
 
@@ -61,7 +60,7 @@ export const getUnRoundedReservationVolume = (
 
 export const getReservationVolume = (
   minutes: number,
-  unit: ReservationUnitsReservationUnitPricingPriceUnitChoices
+  unit: PriceUnit
 ): number => {
   if (!minutes) {
     return 1;

@@ -67,7 +67,7 @@ const ReservationUnitList = ({
     return !error;
   };
 
-  const fieldName = `applicationEvents.${index}.reservationUnits` as const;
+  const fieldName = `applicationSections.${index}.reservationUnits` as const;
 
   const reservationUnits = watch(fieldName);
   const setReservationUnits = (units: number[]) => {
@@ -77,15 +77,16 @@ const ReservationUnitList = ({
   const availableReservationUnits = filterNonNullable(
     applicationRound.reservationUnits
   );
-  const currentReservationUnits =
-    reservationUnits
-      .map((pk) => availableReservationUnits.find((ru) => ru.pk === pk))
-      .filter((n): n is ReservationUnitType => n != null) ?? [];
+  const currentReservationUnits = filterNonNullable(
+    reservationUnits.map((pk) =>
+      availableReservationUnits.find((ru) => ru.pk === pk)
+    )
+  );
 
   useEffect(() => {
     const valid = isValid(currentReservationUnits);
     if (valid) {
-      clearErrors([`applicationEvents.${index}.reservationUnits`]);
+      clearErrors([`applicationSections.${index}.reservationUnits`]);
     } else {
       setError(fieldName, { message: "reservationUnitTooSmall" });
     }

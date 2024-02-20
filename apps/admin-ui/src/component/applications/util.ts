@@ -1,23 +1,22 @@
 import {
   type ApplicationNode,
-  ApplicationEventStatusChoice,
+  ApplicationSectionStatusChoice,
   ApplicationStatusChoice,
-  ApplicationsApplicationApplicantTypeChoices,
+  ApplicantTypeChoice,
 } from "common/types/gql-types";
 
 export const getApplicantName = (app: ApplicationNode): string => {
-  return app.applicantType ===
-    ApplicationsApplicationApplicantTypeChoices.Individual
+  return app.applicantType === ApplicantTypeChoice.Individual
     ? `${app.contactPerson?.firstName || "-"} ${
         app.contactPerson?.lastName || "-"
       }`
     : app.organisation?.name || "-";
 };
 
-export const getApplicationStatusColor = (
+export function getApplicationStatusColor(
   status: ApplicationStatusChoice,
   size: "s" | "l"
-): string => {
+): string {
   switch (status) {
     case ApplicationStatusChoice.Handled:
       return "var(--color-info)";
@@ -38,20 +37,20 @@ export const getApplicationStatusColor = (
           return "var(--color-error-dark)";
       }
   }
-};
+}
 
-export const getApplicationEventStatusColor = (
-  status: ApplicationEventStatusChoice,
+export function getApplicationSectiontatusColor(
+  status: ApplicationSectionStatusChoice,
   size: "s" | "l"
-): string => {
+): string {
   switch (status) {
-    case ApplicationEventStatusChoice.Reserved:
-    case ApplicationEventStatusChoice.Unallocated:
+    case ApplicationSectionStatusChoice.Reserved:
+    case ApplicationSectionStatusChoice.Unallocated:
       return "var(--color-alert-dark)";
-    case ApplicationEventStatusChoice.Approved:
+    case ApplicationSectionStatusChoice.Handled:
       return "var(--color-success)";
-    case ApplicationEventStatusChoice.Failed:
-    case ApplicationEventStatusChoice.Declined:
+    case ApplicationSectionStatusChoice.Failed:
+    case ApplicationSectionStatusChoice.InAllocation:
     default:
       switch (size) {
         case "s":
@@ -61,4 +60,4 @@ export const getApplicationEventStatusColor = (
           return "var(--color-error-dark)";
       }
   }
-};
+}

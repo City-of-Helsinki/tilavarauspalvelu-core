@@ -3,64 +3,61 @@ import styled, { css } from "styled-components";
 import { useTranslation } from "react-i18next";
 import { breakpoints } from "common/src/common/style";
 import {
-  ApplicationEventNode,
-  ApplicationEventScheduleNode,
+  type ApplicationSectionNode,
+  type SuitableTimeRangeNode,
+  Priority,
 } from "common/types/gql-types";
-import { weekdays } from "@/common/const";
+// FIXME move the convert function to more common utils
+import { convertWeekday } from "app/spa/recurring-reservations/application-rounds/[id]/allocation/modules/applicationRoundAllocation";
+import { filterNonNullable } from "common/src/helpers";
 
 type Cell = {
   hour: number;
   label: string;
-  priority: 100 | 200 | 300;
+  priority: Priority | null;
   key: string;
 };
-const cellLabel = (row: number): string => {
-  return `${row} - ${row + 1}`;
-};
 
-export const applicationEventSchedulesToCells = (
-  applicationEventSchedules: ApplicationEventScheduleNode[]
-): Cell[][] => {
+const weekdays = [0, 1, 2, 3, 4, 5, 6] as const;
+
+function cellLabel(row: number): string {
+  return `${row} - ${row + 1}`;
+}
+
+function timeRangeToCell(timeRanges: SuitableTimeRangeNode[]): Cell[][] {
   const firstSlotStart = 7;
   const lastSlotStart = 23;
 
-  const cells = [] as Cell[][];
+  const cells: Cell[][] = [];
 
-  for (let j = 0; j < 7; j += 1) {
-    const day = [];
+  for (const j of weekdays) {
+    const day: Cell[] = [];
     for (let i = firstSlotStart; i <= lastSlotStart; i += 1) {
       day.push({
         key: `${i}-${j}`,
         hour: i,
         label: cellLabel(i),
-      } as Cell);
+        priority: null,
+      });
     }
     cells.push(day);
   }
 
-  applicationEventSchedules.forEach((applicationEventSchedule) => {
-    const { day } = applicationEventSchedule;
-    if (day == null) return;
-    const hourBegin =
-      Number(applicationEventSchedule.begin.substring(0, 2)) - firstSlotStart;
+  for (const timeRange of timeRanges) {
+    const { dayOfTheWeek, beginTime, endTime, priority } = timeRange;
+    // TODO conversion functions from API time to frontend format
+    const hourBegin = Number(beginTime.substring(0, 2)) - firstSlotStart;
+    const hourEnd = (Number(endTime.substring(0, 2)) || 24) - firstSlotStart;
 
-    const hourEnd =
-      (Number(applicationEventSchedule.end.substring(0, 2)) || 24) -
-      firstSlotStart;
-
+    const day = convertWeekday(dayOfTheWeek);
     for (let h = hourBegin; h < hourEnd; h += 1) {
       const cell = cells[day][h];
-      const { priority } = applicationEventSchedule;
-      if (priority === 200 || priority === 300) {
-        cell.priority = priority;
-      } else {
-        cell.priority = 100;
-      }
+      cell.priority = priority;
     }
-  });
+  }
 
   return cells;
-};
+}
 
 const arrowUp = css`
   content: "";
@@ -90,7 +87,7 @@ const CalendarHead = styled.div`
 `;
 
 const TimeSelectionButton = styled.div<{
-  $priority?: 100 | 200 | 300;
+  $priority: Priority | null;
   $firstRow: boolean;
 }>`
   /* stylelint-disable csstools/value-no-unknown-custom-properties */
@@ -106,7 +103,7 @@ const TimeSelectionButton = styled.div<{
   border-top: ${({ $firstRow }) =>
     $firstRow ? "1px solid var(--border-color)" : "none"};
   ${({ $priority }) =>
-    $priority === 300
+    $priority === Priority.Primary
       ? `
     &:after {
       ${arrowUp}
@@ -118,7 +115,7 @@ const TimeSelectionButton = styled.div<{
     color: var(--color-white);
     border-bottom-color: var(--color-black-60);
   `
-      : $priority === 200
+      : $priority === Priority.Secondary
         ? `
     &:after {
       ${arrowDown}
@@ -248,14 +245,14 @@ const Wrapper = styled.div`
 `;
 
 type TimeSelectorProps = {
-  applicationEvent: ApplicationEventNode;
+  applicationSection: ApplicationSectionNode;
 };
-const TimeSelector = ({ applicationEvent }: TimeSelectorProps): JSX.Element => {
-  const schedules =
-    applicationEvent.applicationEventSchedules?.filter(
-      (x): x is NonNullable<typeof x> => x != null
-    ) ?? [];
-  const cells = applicationEventSchedulesToCells(schedules);
+
+export function TimeSelector({
+  applicationSection,
+}: TimeSelectorProps): JSX.Element {
+  const schedules = filterNonNullable(applicationSection.suitableTimeRanges);
+  const cells = timeRangeToCell(schedules);
   const { t } = useTranslation();
 
   const cellTypes = [
@@ -272,10 +269,9 @@ const TimeSelector = ({ applicationEvent }: TimeSelectorProps): JSX.Element => {
     <Wrapper>
       <CalendarContainer>
         {weekdays.map((c, i) => (
-          <Day key={`day-${c}`} head={t(`calendar.${c}`)} cells={cells[i]} />
+          <Day key={`day-${c}`} head={t(`dayLong.${c}`)} cells={cells[i]} />
         ))}
       </CalendarContainer>
-
       <LegendContainer>
         <div>
           {cellTypes.map((cell) => (
@@ -288,6 +284,4 @@ const TimeSelector = ({ applicationEvent }: TimeSelectorProps): JSX.Element => {
       </LegendContainer>
     </Wrapper>
   );
-};
-
-export { TimeSelector };
+}

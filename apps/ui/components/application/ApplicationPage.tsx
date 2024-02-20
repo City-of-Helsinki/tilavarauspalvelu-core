@@ -4,16 +4,16 @@ import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { Container } from "common";
 import {
-  ApplicationNode,
+  ApplicantTypeChoice,
+  type ApplicationNode,
   ApplicationStatusChoice,
-  ApplicationsApplicationApplicantTypeChoices,
 } from "common/types/gql-types";
 import { useRouter } from "next/router";
 import Head from "./Head";
 import Stepper, { StepperProps } from "./Stepper";
 
 type ApplicationPageProps = {
-  application: ApplicationNode;
+  application: ApplicationNode | null;
   translationKeyPrefix: string;
   overrideText?: string;
   isDirty?: boolean;
@@ -58,8 +58,7 @@ const calculateCompletedStep = (values: ApplicationNode): 0 | 1 | 2 | 3 | 4 => {
   // 3 if the user information is filled
   if (
     (values.billingAddress?.streetAddress &&
-      values.applicantType ===
-        ApplicationsApplicationApplicantTypeChoices.Individual) ||
+      values.applicantType === ApplicantTypeChoice.Individual) ||
     values.contactPerson != null
   ) {
     return 3;
@@ -67,22 +66,20 @@ const calculateCompletedStep = (values: ApplicationNode): 0 | 1 | 2 | 3 | 4 => {
 
   // 2 only if application events have time schedules
   if (
-    values.applicationEvents?.length &&
-    values.applicationEvents?.find(
-      (x) => x?.applicationEventSchedules?.length
-    ) != null
+    values.applicationSections?.length &&
+    values.applicationSections?.find((x) => x?.suitableTimeRanges) != null
   ) {
     return 2;
   }
 
   // First page is valid
   if (
-    values.applicationEvents?.[0]?.eventReservationUnits?.length &&
-    values.applicationEvents?.[0]?.begin &&
-    values.applicationEvents?.[0]?.end &&
-    values.applicationEvents?.[0]?.name &&
-    values.applicationEvents?.[0]?.numPersons &&
-    values.applicationEvents?.[0]?.purpose
+    values.applicationSections?.[0]?.reservationUnitOptions?.length &&
+    values.applicationSections?.[0]?.reservationsBeginDate &&
+    values.applicationSections?.[0]?.reservationsEndDate &&
+    values.applicationSections?.[0]?.name &&
+    values.applicationSections?.[0]?.numPersons &&
+    values.applicationSections?.[0]?.purpose
   ) {
     return 1;
   }
@@ -106,8 +103,8 @@ const ApplicationPageWrapper = ({
     pages.filter((x) => router.asPath.match(`/${x}`)).length === 0;
   const steps: StepperProps = {
     steps: pages.map((x, i) => ({ slug: x, step: i })),
-    completedStep: calculateCompletedStep(application),
-    basePath: `/application/${application.pk ?? 0}`,
+    completedStep: application ? calculateCompletedStep(application) : 0,
+    basePath: `/application/${application?.pk ?? 0}`,
     isFormDirty: isDirty ?? false,
   };
 

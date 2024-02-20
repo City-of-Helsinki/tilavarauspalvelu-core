@@ -14,10 +14,7 @@ import type {
   ReservationStaffCreateMutationInput,
   ReservationStaffCreateMutationPayload,
 } from "common/types/gql-types";
-import {
-  ReservationsReservationTypeChoices,
-  ReservationUnitsReservationUnitReservationStartIntervalChoices,
-} from "common/types/gql-types";
+import { Type, ReservationStartInterval } from "common/types/gql-types";
 import type { UseFormReturn } from "react-hook-form";
 import type { RecurringReservationForm } from "app/schemas";
 import {
@@ -48,11 +45,11 @@ import { flattenMetadata } from "../create-reservation/utils";
 export const useMultipleReservation = ({
   form,
   reservationUnit,
-  interval = ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins,
+  interval = ReservationStartInterval.Interval_15Mins,
 }: {
   form: UseFormReturn<RecurringReservationForm>;
   reservationUnit?: ReservationUnitType;
-  interval?: ReservationUnitsReservationUnitReservationStartIntervalChoices;
+  interval?: ReservationStartInterval;
 }) => {
   const { watch } = form;
 
@@ -123,7 +120,7 @@ const useReservationsInInterval = ({
   begin: Date;
   end: Date;
   reservationUnitPk?: number;
-  reservationType: ReservationsReservationTypeChoices;
+  reservationType: Type;
 }) => {
   const { notifyError } = useNotification();
 
@@ -162,7 +159,7 @@ const useReservationsInInterval = ({
 
 const listItemToInterval = (
   item: NewReservationListItem,
-  type: ReservationsReservationTypeChoices
+  type: Type
 ): CollisionInterval | undefined => {
   const start = convertToDate(item.date, item.startTime);
   const end = convertToDate(item.date, item.endTime);
@@ -171,14 +168,8 @@ const listItemToInterval = (
       start,
       end,
       buffers: {
-        before:
-          type !== ReservationsReservationTypeChoices.Blocked
-            ? item.buffers?.before ?? 0
-            : 0,
-        after:
-          type !== ReservationsReservationTypeChoices.Blocked
-            ? item.buffers?.after ?? 0
-            : 0,
+        before: type !== Type.Blocked ? item.buffers?.before ?? 0 : 0,
+        after: type !== Type.Blocked ? item.buffers?.after ?? 0 : 0,
       },
       type,
     };
@@ -197,7 +188,7 @@ export const useFilteredReservationList = ({
   reservationUnitPk?: number;
   begin: Date;
   end: Date;
-  reservationType: ReservationsReservationTypeChoices;
+  reservationType: Type;
 }) => {
   const { reservations, refetch } = useReservationsInInterval({
     reservationUnitPk,
@@ -214,7 +205,7 @@ export const useFilteredReservationList = ({
       reservationToMake: NewReservationListItem,
       interval: CollisionInterval
     ) => {
-      const type = interval.type ?? ReservationsReservationTypeChoices.Blocked;
+      const type = interval.type ?? Type.Blocked;
       const interval2 = listItemToInterval(reservationToMake, type);
       if (interval2 && interval) {
         return doesIntervalCollide(interval2, interval);

@@ -11,7 +11,7 @@ import { breakpoints } from "common/src/common/style";
 import {
   type Query,
   type QueryReservationsArgs,
-  ReservationsReservationStateChoices,
+  State,
 } from "common/types/gql-types";
 import { Container } from "common";
 import { filterNonNullable } from "common/src/helpers";
@@ -98,12 +98,12 @@ const Reservations = (): JSX.Element | null => {
     variables: {
       state:
         tab === "cancelled"
-          ? [ReservationsReservationStateChoices.Cancelled]
+          ? [State.Cancelled]
           : [
-              ReservationsReservationStateChoices.Confirmed,
-              ReservationsReservationStateChoices.RequiresHandling,
-              ReservationsReservationStateChoices.WaitingForPayment,
-              ReservationsReservationStateChoices.Denied,
+              State.Confirmed,
+              State.RequiresHandling,
+              State.WaitingForPayment,
+              State.Denied,
             ],
       orderBy: tab === "upcoming" ? "begin" : "-begin",
       user: currentUser?.pk?.toString(),

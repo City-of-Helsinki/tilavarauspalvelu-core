@@ -22,23 +22,20 @@ type AddressNode implements Node {
 
   """The ID of the object"""
   id: ID!
-
-  """May contain more than one error for same field."""
-  errors: [ErrorType]
   pk: Int
 }
 
 input AddressSerializerInput {
-  city: String!
-  cityEn: String
-  cityFi: String
-  citySv: String
   pk: Int
-  postCode: String!
   streetAddress: String!
-  streetAddressEn: String
   streetAddressFi: String
+  streetAddressEn: String
   streetAddressSv: String
+  postCode: String!
+  city: String!
+  cityFi: String
+  cityEn: String
+  citySv: String
 }
 
 type AgeGroupType implements Node {
@@ -67,19 +64,96 @@ type AgeGroupTypeEdge {
   cursor: String!
 }
 
-"""An enumeration."""
-enum applicant_type {
-  """Individual"""
-  INDIVIDUAL
+input AllocatedTimeSlotCreateMutationInput {
+  pk: Int
+  dayOfTheWeek: Weekday!
+  beginTime: Time!
+  endTime: Time!
+  reservationUnitOption: Int!
+  force: Boolean
+  clientMutationId: String
+}
 
-  """Association"""
-  ASSOCIATION
+type AllocatedTimeSlotCreateMutationPayload {
+  pk: Int
+  dayOfTheWeek: Weekday
+  beginTime: Time
+  endTime: Time
+  reservationUnitOption: Int
+  clientMutationId: String
+}
 
-  """Community"""
-  COMMUNITY
+input AllocatedTimeSlotDeleteMutationInput {
+  pk: ID!
+  clientMutationId: String
+}
 
-  """Company"""
-  COMPANY
+type AllocatedTimeSlotDeleteMutationPayload {
+  deleted: Boolean
+  clientMutationId: String
+}
+
+type AllocatedTimeSlotNode implements Node {
+  dayOfTheWeek: Weekday!
+  beginTime: Time!
+  endTime: Time!
+  reservationUnitOption: ReservationUnitOptionNode!
+
+  """The ID of the object"""
+  id: ID!
+  pk: Int
+}
+
+type AllocatedTimeSlotNodeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [AllocatedTimeSlotNodeEdge]!
+  totalCount: Int
+}
+
+"""A Relay edge containing a `AllocatedTimeSlotNode` and its cursor."""
+type AllocatedTimeSlotNodeEdge {
+  """The item at the end of the edge"""
+  node: AllocatedTimeSlotNode
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+"""Ordering fields for the 'AllocatedTimeSlot' model."""
+enum AllocatedTimeSlotOrderingChoices {
+  pkAsc
+  pkDesc
+  applicationSectionPkAsc
+  applicationSectionPkDesc
+  applicationPkAsc
+  applicationPkDesc
+  applicationSectionNameAsc
+  applicationSectionNameDesc
+  allocatedUnitNameFiAsc
+  allocatedUnitNameFiDesc
+  allocatedUnitNameEnAsc
+  allocatedUnitNameEnDesc
+  allocatedUnitNameSvAsc
+  allocatedUnitNameSvDesc
+  allocatedReservationUnitNameFiAsc
+  allocatedReservationUnitNameFiDesc
+  allocatedReservationUnitNameEnAsc
+  allocatedReservationUnitNameEnDesc
+  allocatedReservationUnitNameSvAsc
+  allocatedReservationUnitNameSvDesc
+  allocatedTimeOfWeekAsc
+  allocatedTimeOfWeekDesc
+  applicantAsc
+  applicantDesc
+  dayOfTheWeekAsc
+  dayOfTheWeekDesc
+  applicationStatusAsc
+  applicationStatusDesc
+  applicationSectionStatusAsc
+  applicationSectionStatusDesc
 }
 
 type ApplicantNode implements Node {
@@ -88,9 +162,6 @@ type ApplicantNode implements Node {
 
   """The ID of the object"""
   id: ID!
-
-  """May contain more than one error for same field."""
-  errors: [ErrorType]
   name: String
   pk: Int
 }
@@ -110,375 +181,82 @@ input ApplicationCancelMutationInput {
 
 type ApplicationCancelMutationPayload {
   pk: Int
-
-  """May contain more than one error for same field."""
-  errors: [ErrorType]
   clientMutationId: String
 }
 
 input ApplicationCreateMutationInput {
-  additionalInformation: String
-  applicantType: applicant_type
-  applicationEvents: [ApplicationEventInApplicationSerializerInput]
-  applicationRound: Int!
-  billingAddress: AddressSerializerInput
-  contactPerson: PersonSerializerInput
-  homeCity: Int
-  organisation: OrganisationSerializerInput
   pk: Int
+  applicantType: ApplicantTypeChoice
+  cancelledDate: DateTime
+  sentDate: DateTime
+  additionalInformation: String
+  applicationRound: Int!
+  organisation: OrganisationSerializerInput
+  contactPerson: PersonSerializerInput
+  billingAddress: AddressSerializerInput
+  homeCity: Int
+  applicationSections: [ApplicationSectionForApplicationSerializerInput]
   clientMutationId: String
 }
 
 type ApplicationCreateMutationPayload {
-  additionalInformation: String
-  applicantType: applicant_type
-  applicationEvents: [ApplicationEventNode]
-  applicationRound: Int
-  billingAddress: AddressNode
-  contactPerson: PersonNode
+  pk: Int
+  applicantType: ApplicantTypeChoice
   createdDate: DateTime
-  homeCity: Int
   lastModifiedDate: DateTime
+  cancelledDate: DateTime
+  sentDate: DateTime
+  additionalInformation: String
+  applicationRound: Int
   organisation: OrganisationNode
-  pk: Int
-  status: String
-
-  """May contain more than one error for same field."""
-  errors: [ErrorType]
-  clientMutationId: String
-}
-
-input ApplicationDeclineMutationInput {
-  pk: Int!
-  clientMutationId: String
-}
-
-type ApplicationDeclineMutationPayload {
-  pk: Int
-
-  """May contain more than one error for same field."""
-  errors: [ErrorType]
-  clientMutationId: String
-}
-
-input ApplicationEventCreateMutationInput {
-  abilityGroup: Int
-  ageGroup: Int
-  application: Int!
-  applicationEventSchedules: [ApplicationEventScheduleInEventSerializerInput]!
-  begin: Date
-  biweekly: Boolean
-  end: Date
-  eventReservationUnits: [EventReservationUnitSerializerInput]!
-  eventsPerWeek: Int
-  maxDuration: String
-  minDuration: String
-  name: String
-  nameEn: String
-  nameFi: String
-  nameSv: String
-  numPersons: Int
-  pk: Int
-  purpose: Int
-  clientMutationId: String
-}
-
-type ApplicationEventCreateMutationPayload {
-  abilityGroup: Int
-  ageGroup: Int
-  application: Int
-  applicationEventSchedules: [ApplicationEventScheduleNode]
-  begin: Date
-  biweekly: Boolean
-  end: Date
-  eventReservationUnits: [EventReservationUnitNode]
-  eventsPerWeek: Int
-  maxDuration: String
-  minDuration: String
-  name: String
-  nameEn: String
-  nameFi: String
-  nameSv: String
-  numPersons: Int
-  pk: Int
-  purpose: Int
-
-  """May contain more than one error for same field."""
-  errors: [ErrorType]
-  clientMutationId: String
-}
-
-input ApplicationEventDeclineMutationInput {
-  pk: Int!
-  clientMutationId: String
-}
-
-type ApplicationEventDeclineMutationPayload {
-  pk: Int
-
-  """May contain more than one error for same field."""
-  errors: [ErrorType]
-  clientMutationId: String
-}
-
-input ApplicationEventDeleteMutationInput {
-  pk: ID!
-  clientMutationId: String
-}
-
-type ApplicationEventDeleteMutationPayload {
-  """May contain more than one error for same field."""
-  errors: [ErrorType]
-
-  """Whether the object was deleted successfully."""
-  deleted: Boolean
-
-  """Number of rows deleted."""
-  rowCount: Int
-  clientMutationId: String
-}
-
-input ApplicationEventInApplicationSerializerInput {
-  abilityGroup: Int
-  ageGroup: Int
-  applicationEventSchedules: [ApplicationEventScheduleInEventSerializerInput]!
-  begin: Date
-  biweekly: Boolean
-  end: Date
-  eventReservationUnits: [EventReservationUnitSerializerInput]!
-  eventsPerWeek: Int
-  maxDuration: String
-  minDuration: String
-  name: String
-  nameEn: String
-  nameFi: String
-  nameSv: String
-  numPersons: Int
-  pk: Int
-  purpose: Int
-}
-
-type ApplicationEventNode implements Node {
-  name: String!
-  nameFi: String
-  nameEn: String
-  nameSv: String
-  uuid: UUID!
-  numPersons: Int
-  minDuration: Duration
-  maxDuration: Duration
-  begin: Date
-  end: Date
-  eventsPerWeek: Int
-  biweekly: Boolean!
-  flagged: Boolean!
-  application: ApplicationNode!
-  ageGroup: AgeGroupType
-  abilityGroup: AbilityGroupType
-  purpose: ReservationPurposeType
-  eventReservationUnits(preferredOrder: Int): [EventReservationUnitNode!]
-  applicationEventSchedules(priority: [Int]): [ApplicationEventScheduleNode!]
-
-  """The ID of the object"""
-  id: ID!
-
-  """May contain more than one error for same field."""
-  errors: [ErrorType]
-  status: ApplicationEventStatusChoice
-  relatedApplicationEvents: [ApplicationEventNode]
-  pk: Int
-}
-
-type ApplicationEventNodeConnection {
-  """Pagination data for this connection."""
-  pageInfo: PageInfo!
-
-  """Contains the nodes in this connection."""
-  edges: [ApplicationEventNodeEdge]!
-  totalCount: Int
-}
-
-"""A Relay edge containing a `ApplicationEventNode` and its cursor."""
-type ApplicationEventNodeEdge {
-  """The item at the end of the edge"""
-  node: ApplicationEventNode
-
-  """A cursor for use in pagination"""
-  cursor: String!
-}
-
-input ApplicationEventScheduleApproveMutationInput {
-  allocatedBegin: Time!
-  allocatedDay: Int!
-  allocatedEnd: Time!
-  allocatedReservationUnit: Int!
-  force: Boolean
-  pk: Int!
-  clientMutationId: String
-}
-
-type ApplicationEventScheduleApproveMutationPayload {
-  allocatedBegin: Time
-  allocatedDay: Int
-  allocatedEnd: Time
-  allocatedReservationUnit: Int
-  pk: Int
-
-  """May contain more than one error for same field."""
-  errors: [ErrorType]
-  clientMutationId: String
-}
-
-input ApplicationEventScheduleDeclineMutationInput {
-  pk: Int!
-  clientMutationId: String
-}
-
-type ApplicationEventScheduleDeclineMutationPayload {
-  pk: Int
-
-  """May contain more than one error for same field."""
-  errors: [ErrorType]
-  clientMutationId: String
-}
-
-input ApplicationEventScheduleInEventSerializerInput {
-  begin: Time!
-  day: Int!
-  end: Time!
-  pk: Int
-  priority: Int
-}
-
-type ApplicationEventScheduleNode implements Node {
-  day: Int!
-  begin: TimeString!
-  end: TimeString!
-  allocatedDay: Int
-  allocatedBegin: TimeString
-  allocatedEnd: TimeString
-  declined: Boolean!
-  priority: Int!
-  applicationEvent: ApplicationEventNode!
-  allocatedReservationUnit: ReservationUnitType
-
-  """The ID of the object"""
-  id: ID!
-
-  """May contain more than one error for same field."""
-  errors: [ErrorType]
-  pk: Int
-}
-
-type ApplicationEventScheduleNodeConnection {
-  """Pagination data for this connection."""
-  pageInfo: PageInfo!
-
-  """Contains the nodes in this connection."""
-  edges: [ApplicationEventScheduleNodeEdge]!
-  totalCount: Int
-}
-
-"""
-A Relay edge containing a `ApplicationEventScheduleNode` and its cursor.
-"""
-type ApplicationEventScheduleNodeEdge {
-  """The item at the end of the edge"""
-  node: ApplicationEventScheduleNode
-
-  """A cursor for use in pagination"""
-  cursor: String!
-}
-
-input ApplicationEventScheduleResetMutationInput {
-  pk: Int!
-  clientMutationId: String
-}
-
-type ApplicationEventScheduleResetMutationPayload {
-  pk: Int
-
-  """May contain more than one error for same field."""
-  errors: [ErrorType]
-  clientMutationId: String
-}
-
-"""An enumeration."""
-enum ApplicationEventStatusChoice {
-  UNALLOCATED
-  APPROVED
-  DECLINED
-  RESERVED
-  FAILED
-}
-
-input ApplicationEventUpdateMutationInput {
-  abilityGroup: Int
-  ageGroup: Int
-  application: Int
-  applicationEventSchedules: [UpdateApplicationEventScheduleInEventSerializerInput]
-  begin: Date
-  biweekly: Boolean
-  end: Date
-  eventReservationUnits: [UpdateEventReservationUnitSerializerInput]
-  eventsPerWeek: Int
-  maxDuration: String
-  minDuration: String
-  name: String
-  nameEn: String
-  nameFi: String
-  nameSv: String
-  numPersons: Int
-  pk: Int!
-  purpose: Int
-  clientMutationId: String
-}
-
-type ApplicationEventUpdateMutationPayload {
-  abilityGroup: Int
-  ageGroup: Int
-  application: Int
-  applicationEventSchedules: [ApplicationEventScheduleNode]
-  begin: Date
-  biweekly: Boolean
-  end: Date
-  eventReservationUnits: [EventReservationUnitNode]
-  eventsPerWeek: Int
-  maxDuration: String
-  minDuration: String
-  name: String
-  nameEn: String
-  nameFi: String
-  nameSv: String
-  numPersons: Int
-  pk: Int
-  purpose: Int
-
-  """May contain more than one error for same field."""
-  errors: [ErrorType]
+  contactPerson: PersonNode
+  billingAddress: AddressNode
+  homeCity: Int
+  applicationSections: [ApplicationSectionNode]
+  status: Status
   clientMutationId: String
 }
 
 type ApplicationNode implements Node {
-  applicantType: ApplicationsApplicationApplicantTypeChoices
+  applicantType: ApplicantTypeChoice
   createdDate: DateTime!
   lastModifiedDate: DateTime!
+  cancelledDate: DateTime
+  sentDate: DateTime
   additionalInformation: String
   workingMemo: String!
   applicationRound: ApplicationRoundNode!
   organisation: OrganisationNode
   contactPerson: PersonNode
+  user: ApplicantNode
   billingAddress: AddressNode
   homeCity: CityNode
-  applicationEvents: [ApplicationEventNode!]
+  applicationSections(
+    pk: [Int]
+    name: String
+    user: Int
+    application: Int
+    applicationRound: Int
+    reservationUnit: [Int]
+    unit: [Int]
+    applicantType: [ApplicantTypeChoice]
+    status: [ApplicationSectionStatusChoice]
+    applicationStatus: [ApplicationStatusChoice]
+    priority: [Priority]
+    preferredOrder: [Int]
+    includePreferredOrder10OrHigher: Boolean
+    homeCity: [Int]
+    ageGroup: [Int]
+    purpose: [Int]
+    textSearch: String
+
+    """Järjestä"""
+    orderBy: [ApplicationSectionOrderingChoices]
+  ): [ApplicationSectionNode!]
 
   """The ID of the object"""
   id: ID!
-
-  """May contain more than one error for same field."""
-  errors: [ErrorType]
   status: ApplicationStatusChoice
-  applicant: ApplicantNode
   pk: Int
 }
 
@@ -500,12 +278,30 @@ type ApplicationNodeEdge {
   cursor: String!
 }
 
+"""Ordering fields for the 'Application' model."""
+enum ApplicationOrderingChoices {
+  pkAsc
+  pkDesc
+  applicantAsc
+  applicantDesc
+  applicantTypeAsc
+  applicantTypeDesc
+  preferredUnitNameFiAsc
+  preferredUnitNameFiDesc
+  preferredUnitNameEnAsc
+  preferredUnitNameEnDesc
+  preferredUnitNameSvAsc
+  preferredUnitNameSvDesc
+  statusAsc
+  statusDesc
+}
+
 type ApplicationRoundNode implements Node {
   name: String!
   nameFi: String
   nameEn: String
   nameSv: String
-  targetGroup: ApplicationsApplicationRoundTargetGroupChoices!
+  targetGroup: TargetGroup!
   criteria: String!
   criteriaFi: String
   criteriaEn: String
@@ -524,9 +320,6 @@ type ApplicationRoundNode implements Node {
 
   """The ID of the object"""
   id: ID!
-
-  """May contain more than one error for same field."""
-  errors: [ErrorType]
   status: ApplicationRoundStatusChoice
   statusTimestamp: DateTime
   applicationsCount: Int
@@ -552,6 +345,12 @@ type ApplicationRoundNodeEdge {
   cursor: String!
 }
 
+"""Ordering fields for the 'ApplicationRound' model."""
+enum ApplicationRoundOrderingChoices {
+  pkAsc
+  pkDesc
+}
+
 """An enumeration."""
 enum ApplicationRoundStatusChoice {
   UPCOMING
@@ -568,9 +367,6 @@ type ApplicationRoundTimeSlotNode implements Node {
 
   """The ID of the object"""
   id: ID!
-
-  """May contain more than one error for same field."""
-  errors: [ErrorType]
   pk: Int
 }
 
@@ -580,31 +376,181 @@ input ApplicationRoundTimeSlotSerializerInput {
   reservableTimes: [TimeSlotSerializerInput]
 }
 
-"""An enumeration."""
-enum ApplicationsApplicationApplicantTypeChoices {
-  """Individual"""
-  INDIVIDUAL
+input ApplicationSectionCreateMutationInput {
+  pk: Int
+  name: String!
+  numPersons: Int!
+  reservationsBeginDate: Date!
+  reservationsEndDate: Date!
+  reservationMinDuration: Duration!
+  reservationMaxDuration: Duration!
+  appliedReservationsPerWeek: Int!
+  application: Int!
+  purpose: Int
+  ageGroup: Int
+  reservationUnitOptions: [ReservationUnitOptionApplicantSerializerInput]!
+  suitableTimeRanges: [SuitableTimeRangeSerializerInput]!
+  clientMutationId: String
+}
 
-  """Association"""
-  ASSOCIATION
+type ApplicationSectionCreateMutationPayload {
+  pk: Int
+  name: String
+  numPersons: Int
+  reservationsBeginDate: Date
+  reservationsEndDate: Date
+  reservationMinDuration: Duration
+  reservationMaxDuration: Duration
+  appliedReservationsPerWeek: Int
+  application: Int
+  purpose: Int
+  ageGroup: Int
+  reservationUnitOptions: [ReservationUnitOptionNode]
+  suitableTimeRanges: [SuitableTimeRangeNode]
+  clientMutationId: String
+}
 
-  """Community"""
-  COMMUNITY
+input ApplicationSectionDeleteMutationInput {
+  pk: ID!
+  clientMutationId: String
+}
 
-  """Company"""
-  COMPANY
+type ApplicationSectionDeleteMutationPayload {
+  deleted: Boolean
+  clientMutationId: String
+}
+
+input ApplicationSectionForApplicationSerializerInput {
+  pk: Int
+  name: String!
+  numPersons: Int!
+  reservationsBeginDate: Date!
+  reservationsEndDate: Date!
+  reservationMinDuration: Duration!
+  reservationMaxDuration: Duration!
+  appliedReservationsPerWeek: Int!
+  purpose: Int
+  ageGroup: Int
+  reservationUnitOptions: [ReservationUnitOptionApplicantSerializerInput]!
+  suitableTimeRanges: [SuitableTimeRangeSerializerInput]!
+}
+
+type ApplicationSectionNode implements Node {
+  name: String!
+  numPersons: Int!
+  reservationsBeginDate: Date!
+  reservationsEndDate: Date!
+  reservationMinDuration: Duration!
+  reservationMaxDuration: Duration!
+  appliedReservationsPerWeek: Int!
+  application: ApplicationNode!
+  purpose: ReservationPurposeType
+  ageGroup: AgeGroupType
+  reservationUnitOptions(
+    pk: [Int]
+    preferredOrder: Int
+    reservationUnit: [Int]
+
+    """Järjestä"""
+    orderBy: [ReservationUnitOptionOrderingChoices]
+  ): [ReservationUnitOptionNode!]
+  suitableTimeRanges(
+    pk: [Int]
+    priority: [Priority]
+    fulfilled: Boolean
+
+    """Järjestä"""
+    orderBy: [SuitableTimeRangeOrderingChoices]
+  ): [SuitableTimeRangeNode!]
+
+  """The ID of the object"""
+  id: ID!
+  status: ApplicationSectionStatusChoice
+  allocations: Int
+  pk: Int
+}
+
+type ApplicationSectionNodeConnection {
+  """Pagination data for this connection."""
+  pageInfo: PageInfo!
+
+  """Contains the nodes in this connection."""
+  edges: [ApplicationSectionNodeEdge]!
+  totalCount: Int
+}
+
+"""A Relay edge containing a `ApplicationSectionNode` and its cursor."""
+type ApplicationSectionNodeEdge {
+  """The item at the end of the edge"""
+  node: ApplicationSectionNode
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+"""Ordering fields for the 'ApplicationSection' model."""
+enum ApplicationSectionOrderingChoices {
+  pkAsc
+  pkDesc
+  applicationPkAsc
+  applicationPkDesc
+  applicantAsc
+  applicantDesc
+  nameAsc
+  nameDesc
+  statusAsc
+  statusDesc
+  applicationStatusAsc
+  applicationStatusDesc
+  preferredUnitNameFiAsc
+  preferredUnitNameFiDesc
+  preferredUnitNameEnAsc
+  preferredUnitNameEnDesc
+  preferredUnitNameSvAsc
+  preferredUnitNameSvDesc
 }
 
 """An enumeration."""
-enum ApplicationsApplicationRoundTargetGroupChoices {
-  """Internal"""
-  INTERNAL
+enum ApplicationSectionStatusChoice {
+  UNALLOCATED
+  IN_ALLOCATION
+  HANDLED
+  RESERVED
+  FAILED
+}
 
-  """Public"""
-  PUBLIC
+input ApplicationSectionUpdateMutationInput {
+  pk: Int!
+  name: String
+  numPersons: Int
+  reservationsBeginDate: Date
+  reservationsEndDate: Date
+  reservationMinDuration: Duration
+  reservationMaxDuration: Duration
+  appliedReservationsPerWeek: Int
+  application: Int
+  purpose: Int
+  ageGroup: Int
+  reservationUnitOptions: [UpdateReservationUnitOptionApplicantSerializerInput]
+  suitableTimeRanges: [UpdateSuitableTimeRangeSerializerInput]
+  clientMutationId: String
+}
 
-  """Kaikki"""
-  ALL
+type ApplicationSectionUpdateMutationPayload {
+  pk: Int
+  name: String
+  numPersons: Int
+  reservationsBeginDate: Date
+  reservationsEndDate: Date
+  reservationMinDuration: Duration
+  reservationMaxDuration: Duration
+  appliedReservationsPerWeek: Int
+  application: Int
+  purpose: Int
+  ageGroup: Int
+  reservationUnitOptions: [ReservationUnitOptionNode]
+  suitableTimeRanges: [SuitableTimeRangeNode]
+  clientMutationId: String
 }
 
 input ApplicationSendMutationInput {
@@ -614,31 +560,7 @@ input ApplicationSendMutationInput {
 
 type ApplicationSendMutationPayload {
   pk: Int
-
-  """May contain more than one error for same field."""
-  errors: [ErrorType]
   clientMutationId: String
-}
-
-"""An enumeration."""
-enum ApplicationsOrganisationOrganisationTypeChoices {
-  """Company"""
-  COMPANY
-
-  """Registered association"""
-  REGISTERED_ASSOCIATION
-
-  """Public association"""
-  PUBLIC_ASSOCIATION
-
-  """Unregistered association"""
-  UNREGISTERED_ASSOCIATION
-
-  """Municipality consortium"""
-  MUNICIPALITY_CONSORTIUM
-
-  """Religious community"""
-  RELIGIOUS_COMMUNITY
 }
 
 """An enumeration."""
@@ -653,69 +575,76 @@ enum ApplicationStatusChoice {
 }
 
 input ApplicationUpdateMutationInput {
-  additionalInformation: String
-  applicantType: applicant_type
-  applicationEvents: [UpdateApplicationEventInApplicationSerializerInput]
-  applicationRound: Int
-  billingAddress: UpdateAddressSerializerInput
-  contactPerson: UpdatePersonSerializerInput
-  homeCity: Int
-  organisation: UpdateOrganisationSerializerInput
   pk: Int!
+  applicantType: ApplicantTypeChoice
+  cancelledDate: DateTime
+  sentDate: DateTime
+  additionalInformation: String
+  applicationRound: Int
+  organisation: UpdateOrganisationSerializerInput
+  contactPerson: UpdatePersonSerializerInput
+  billingAddress: UpdateAddressSerializerInput
+  homeCity: Int
+  applicationSections: [UpdateApplicationSectionForApplicationSerializerInput]
   workingMemo: String
   clientMutationId: String
 }
 
 type ApplicationUpdateMutationPayload {
-  additionalInformation: String
-  applicantType: applicant_type
-  applicationEvents: [ApplicationEventNode]
-  applicationRound: Int
-  billingAddress: AddressNode
-  contactPerson: PersonNode
-  createdDate: DateTime
-  homeCity: Int
-  lastModifiedDate: DateTime
-  organisation: OrganisationNode
   pk: Int
-  status: String
+  applicantType: ApplicantTypeChoice
+  createdDate: DateTime
+  lastModifiedDate: DateTime
+  cancelledDate: DateTime
+  sentDate: DateTime
+  additionalInformation: String
+  applicationRound: Int
+  organisation: OrganisationNode
+  contactPerson: PersonNode
+  billingAddress: AddressNode
+  homeCity: Int
+  applicationSections: [ApplicationSectionNode]
+  status: Status
   workingMemo: String
-
-  """May contain more than one error for same field."""
-  errors: [ErrorType]
   clientMutationId: String
 }
 
+"""An enumeration."""
+enum Authentication {
+  """Heikko"""
+  WEAK
+
+  """Vahva"""
+  STRONG
+}
+
 input BannerNotificationCreateMutationInput {
+  pk: Int
+  name: String!
+  message: String
+  messageFi: String
+  messageEn: String
+  messageSv: String
+  draft: Boolean
+  level: BannerNotificationLevel!
+  target: BannerNotificationTarget!
   activeFrom: DateTime
   activeUntil: DateTime
-  draft: Boolean
-  level: level!
-  message: String
-  messageEn: String
-  messageFi: String
-  messageSv: String
-  name: String!
-  pk: Int
-  target: target!
   clientMutationId: String
 }
 
 type BannerNotificationCreateMutationPayload {
+  pk: Int
+  name: String
+  message: String
+  messageFi: String
+  messageEn: String
+  messageSv: String
+  draft: Boolean
+  level: BannerNotificationLevel
+  target: BannerNotificationTarget
   activeFrom: DateTime
   activeUntil: DateTime
-  draft: Boolean
-  level: level
-  message: String
-  messageEn: String
-  messageFi: String
-  messageSv: String
-  name: String
-  pk: Int
-  target: target
-
-  """May contain more than one error for same field."""
-  errors: [ErrorType]
   clientMutationId: String
 }
 
@@ -725,15 +654,20 @@ input BannerNotificationDeleteMutationInput {
 }
 
 type BannerNotificationDeleteMutationPayload {
-  """May contain more than one error for same field."""
-  errors: [ErrorType]
-
-  """Whether the object was deleted successfully."""
   deleted: Boolean
-
-  """Number of rows deleted."""
-  rowCount: Int
   clientMutationId: String
+}
+
+"""An enumeration."""
+enum BannerNotificationLevel {
+  """Poikkeus"""
+  EXCEPTION
+
+  """Varoitus"""
+  WARNING
+
+  """Normaali"""
+  NORMAL
 }
 
 type BannerNotificationNode implements Node {
@@ -743,8 +677,8 @@ type BannerNotificationNode implements Node {
   messageEn: String
   messageSv: String
   draft: Boolean!
-  level: CommonBannerNotificationLevelChoices!
-  target: CommonBannerNotificationTargetChoices!
+  level: BannerNotificationLevel!
+  target: BannerNotificationTarget!
   activeFrom: DateTime
   activeUntil: DateTime
 
@@ -782,36 +716,45 @@ enum BannerNotificationState {
   ACTIVE
 }
 
+"""An enumeration."""
+enum BannerNotificationTarget {
+  """Kaikki"""
+  ALL
+
+  """Henkilökunta"""
+  STAFF
+
+  """Käyttäjä"""
+  USER
+}
+
 input BannerNotificationUpdateMutationInput {
+  pk: Int!
+  name: String
+  message: String
+  messageFi: String
+  messageEn: String
+  messageSv: String
+  draft: Boolean
+  level: BannerNotificationLevel
+  target: BannerNotificationTarget
   activeFrom: DateTime
   activeUntil: DateTime
-  draft: Boolean
-  level: level
-  message: String
-  messageEn: String
-  messageFi: String
-  messageSv: String
-  name: String
-  pk: Int!
-  target: target
   clientMutationId: String
 }
 
 type BannerNotificationUpdateMutationPayload {
+  pk: Int
+  name: String
+  message: String
+  messageFi: String
+  messageEn: String
+  messageSv: String
+  draft: Boolean
+  level: BannerNotificationLevel
+  target: BannerNotificationTarget
   activeFrom: DateTime
   activeUntil: DateTime
-  draft: Boolean
-  level: level
-  message: String
-  messageEn: String
-  messageFi: String
-  messageSv: String
-  name: String
-  pk: Int
-  target: target
-
-  """May contain more than one error for same field."""
-  errors: [ErrorType]
   clientMutationId: String
 }
 
@@ -836,9 +779,6 @@ type CityNode implements Node {
 
   """The ID of the object"""
   id: ID!
-
-  """May contain more than one error for same field."""
-  errors: [ErrorType]
   pk: Int
 }
 
@@ -860,30 +800,6 @@ type CityNodeEdge {
   cursor: String!
 }
 
-"""An enumeration."""
-enum CommonBannerNotificationLevelChoices {
-  """Exception"""
-  EXCEPTION
-
-  """Warning"""
-  WARNING
-
-  """Normal"""
-  NORMAL
-}
-
-"""An enumeration."""
-enum CommonBannerNotificationTargetChoices {
-  """Kaikki"""
-  ALL
-
-  """Staff"""
-  STAFF
-
-  """Käyttäjä"""
-  USER
-}
-
 """
 The `Date` scalar type represents a Date
 value as specified by
@@ -900,6 +816,72 @@ scalar DateTime
 
 """The `Decimal` scalar type represents a python Decimal."""
 scalar Decimal
+
+"""Debugging information for the current query."""
+type DjangoDebug {
+  """Executed SQL queries for this API query."""
+  sql: [DjangoDebugSQL]
+
+  """Raise exceptions for this API query."""
+  exceptions: [DjangoDebugException]
+}
+
+"""Represents a single exception raised."""
+type DjangoDebugException {
+  """The class of the exception"""
+  excType: String!
+
+  """The message of the exception"""
+  message: String!
+
+  """The stack trace"""
+  stack: String!
+}
+
+"""Represents a single database query made to a Django managed DB."""
+type DjangoDebugSQL {
+  """The type of database being used (e.g. postrgesql, mysql, sqlite)."""
+  vendor: String!
+
+  """The Django database alias (e.g. 'default')."""
+  alias: String!
+
+  """The actual SQL sent to this database."""
+  sql: String
+
+  """Duration of this database query in seconds."""
+  duration: Float!
+
+  """The raw SQL of this query, without params."""
+  rawSql: String!
+
+  """JSON encoded database query parameters."""
+  params: String!
+
+  """Start time of this database query."""
+  startTime: Float!
+
+  """Stop time of this database query."""
+  stopTime: Float!
+
+  """Whether this database query took more than 10 seconds."""
+  isSlow: Boolean!
+
+  """Whether this database query was a SELECT."""
+  isSelect: Boolean!
+
+  """Postgres transaction ID if available."""
+  transId: String
+
+  """Postgres transaction status if available."""
+  transStatus: String
+
+  """Postgres isolation level if available."""
+  isoLevel: String
+
+  """Postgres connection encoding if available."""
+  encoding: String
+}
 
 """
 The `Duration` scalar type represents a duration value as an integer in seconds.
@@ -1073,24 +1055,6 @@ type ErrorType {
   messages: [String!]!
 }
 
-type EventReservationUnitNode implements Node {
-  preferredOrder: Int!
-  reservationUnit: ReservationUnitByPkType!
-
-  """The ID of the object"""
-  id: ID!
-
-  """May contain more than one error for same field."""
-  errors: [ErrorType]
-  pk: Int
-}
-
-input EventReservationUnitSerializerInput {
-  pk: Int
-  preferredOrder: Int!
-  reservationUnit: Int!
-}
-
 type GeneralRolePermissionType {
   permission: String
 }
@@ -1102,6 +1066,21 @@ type GeneralRoleType implements Node {
   id: ID!
   pk: Int
   permissions: [GeneralRolePermissionType]
+}
+
+"""An enumeration."""
+enum ImageType {
+  """Pääkuva"""
+  MAIN
+
+  """Pohjapiirros"""
+  GROUND_PLAN
+
+  """Kartta"""
+  MAP
+
+  """Muu"""
+  OTHER
 }
 
 type KeywordCategoryType implements Node {
@@ -1190,18 +1169,6 @@ type KeywordTypeEdge {
   cursor: String!
 }
 
-"""An enumeration."""
-enum level {
-  """Exception"""
-  EXCEPTION
-
-  """Warning"""
-  WARNING
-
-  """Normal"""
-  NORMAL
-}
-
 type LocationType implements Node {
   addressStreetFi: String
   addressStreetEn: String
@@ -1221,16 +1188,14 @@ type LocationType implements Node {
 type Mutation {
   createApplication(input: ApplicationCreateMutationInput!): ApplicationCreateMutationPayload
   updateApplication(input: ApplicationUpdateMutationInput!): ApplicationUpdateMutationPayload
-  declineApplication(input: ApplicationDeclineMutationInput!): ApplicationDeclineMutationPayload
   sendApplication(input: ApplicationSendMutationInput!): ApplicationSendMutationPayload
   cancelApplication(input: ApplicationCancelMutationInput!): ApplicationCancelMutationPayload
-  createApplicationEvent(input: ApplicationEventCreateMutationInput!): ApplicationEventCreateMutationPayload
-  updateApplicationEvent(input: ApplicationEventUpdateMutationInput!): ApplicationEventUpdateMutationPayload
-  deleteApplicationEvent(input: ApplicationEventDeleteMutationInput!): ApplicationEventDeleteMutationPayload
-  declineApplicationEvent(input: ApplicationEventDeclineMutationInput!): ApplicationEventDeclineMutationPayload
-  approveApplicationEventSchedule(input: ApplicationEventScheduleApproveMutationInput!): ApplicationEventScheduleApproveMutationPayload
-  declineApplicationEventSchedule(input: ApplicationEventScheduleDeclineMutationInput!): ApplicationEventScheduleDeclineMutationPayload
-  resetApplicationEventSchedule(input: ApplicationEventScheduleResetMutationInput!): ApplicationEventScheduleResetMutationPayload
+  createApplicationSection(input: ApplicationSectionCreateMutationInput!): ApplicationSectionCreateMutationPayload
+  updateApplicationSection(input: ApplicationSectionUpdateMutationInput!): ApplicationSectionUpdateMutationPayload
+  deleteApplicationSection(input: ApplicationSectionDeleteMutationInput!): ApplicationSectionDeleteMutationPayload
+  createAllocatedTimeslot(input: AllocatedTimeSlotCreateMutationInput!): AllocatedTimeSlotCreateMutationPayload
+  deleteAllocatedTimeslot(input: AllocatedTimeSlotDeleteMutationInput!): AllocatedTimeSlotDeleteMutationPayload
+  updateReservationUnitOption(input: ReservationUnitOptionUpdateMutationInput!): ReservationUnitOptionUpdateMutationPayload
   createRecurringReservation(input: RecurringReservationCreateMutationInput!): RecurringReservationCreateMutationPayload
   updateRecurringReservation(input: RecurringReservationUpdateMutationInput!): RecurringReservationUpdateMutationPayload
   createReservation(input: ReservationCreateMutationInput!): ReservationCreateMutationPayload
@@ -1280,27 +1245,6 @@ interface Node {
   id: ID!
 }
 
-"""An enumeration."""
-enum organisation_type {
-  """Company"""
-  COMPANY
-
-  """Registered association"""
-  REGISTERED_ASSOCIATION
-
-  """Public association"""
-  PUBLIC_ASSOCIATION
-
-  """Unregistered association"""
-  UNREGISTERED_ASSOCIATION
-
-  """Municipality consortium"""
-  MUNICIPALITY_CONSORTIUM
-
-  """Religious community"""
-  RELIGIOUS_COMMUNITY
-}
-
 type OrganisationNode implements Node {
   name: String!
   nameFi: String
@@ -1314,33 +1258,51 @@ type OrganisationNode implements Node {
   coreBusinessFi: String
   coreBusinessEn: String
   coreBusinessSv: String
-  organisationType: ApplicationsOrganisationOrganisationTypeChoices!
+  organisationType: OrganizationTypeChoice!
   address: AddressNode
 
   """The ID of the object"""
   id: ID!
-
-  """May contain more than one error for same field."""
-  errors: [ErrorType]
   pk: Int
 }
 
 input OrganisationSerializerInput {
-  activeMembers: Int
-  address: AddressSerializerInput!
-  coreBusiness: String
-  coreBusinessEn: String
-  coreBusinessFi: String
-  coreBusinessSv: String
-  email: String
-  identifier: String
-  name: String!
-  nameEn: String
-  nameFi: String
-  nameSv: String
-  organisationType: organisation_type
   pk: Int
+  name: String!
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  identifier: String
   yearEstablished: Int
+  address: AddressSerializerInput!
+  activeMembers: Int
+  coreBusiness: String
+  coreBusinessFi: String
+  coreBusinessEn: String
+  coreBusinessSv: String
+  organisationType: OrganizationTypeChoice
+  email: String
+}
+
+"""An enumeration."""
+enum OrganizationTypeChoice {
+  """Yritys"""
+  COMPANY
+
+  """Rekisteröity yhdistys"""
+  REGISTERED_ASSOCIATION
+
+  """Julkinen yhdistys"""
+  PUBLIC_ASSOCIATION
+
+  """Rekisteröimätön yhdistys"""
+  UNREGISTERED_ASSOCIATION
+
+  """Kuntakonsortio"""
+  MUNICIPALITY_CONSORTIUM
+
+  """Uskonnollinen yhteisö"""
+  RELIGIOUS_COMMUNITY
 }
 
 """
@@ -1399,18 +1361,54 @@ type PersonNode implements Node {
 
   """The ID of the object"""
   id: ID!
-
-  """May contain more than one error for same field."""
-  errors: [ErrorType]
   pk: Int
 }
 
 input PersonSerializerInput {
-  email: String
+  pk: Int
   firstName: String!
   lastName: String!
+  email: String
   phoneNumber: String
-  pk: Int
+}
+
+"""An enumeration."""
+enum PriceUnit {
+  """per 15 minuuttia"""
+  PER_15_MINS
+
+  """per 30 minuuttia"""
+  PER_30_MINS
+
+  """per tunti"""
+  PER_HOUR
+
+  """per puolipäivää"""
+  PER_HALF_DAY
+
+  """per päivä"""
+  PER_DAY
+
+  """per viikko"""
+  PER_WEEK
+
+  """kiinteä"""
+  FIXED
+}
+
+"""An enumeration."""
+enum PricingType {
+  """Paid"""
+  PAID
+
+  """Free"""
+  FREE
+}
+
+"""An enumeration."""
+enum Priority {
+  PRIMARY
+  SECONDARY
 }
 
 input PurposeCreateMutationInput {
@@ -1436,7 +1434,7 @@ type PurposeType implements Node {
   nameEn: String
   nameSv: String
 
-  """Order number to be used in api sorting."""
+  """Järjestysnumero, jota käytetään rajapinnan järjestämisessä."""
   rank: Int
 
   """The ID of the object"""
@@ -1514,51 +1512,59 @@ type QualifierTypeEdge {
 
 type Query {
   applicationRounds(
-    offset: Int
-    before: String
-    after: String
     first: Int
     last: Int
-    name_Istartswith: String
+    offset: Int
+    after: String
+    before: String
     pk: [Int]
+    name: String
 
-    """Järjestys"""
-    orderBy: String
+    """Järjestä"""
+    orderBy: [ApplicationRoundOrderingChoices]
   ): ApplicationRoundNodeConnection
+  applicationRound(
+    """The ID of the object"""
+    id: ID!
+  ): ApplicationRoundNode
   applications(
-    offset: Int
-    before: String
-    after: String
     first: Int
     last: Int
+    offset: Int
+    after: String
+    before: String
     pk: [Int]
     applicationRound: Int
+    user: Int
     applicantType: [ApplicantTypeChoice]
     status: [ApplicationStatusChoice]
     unit: [Int]
-    applicant: Int
     textSearch: String
 
-    """Järjestys"""
-    orderBy: String
+    """Järjestä"""
+    orderBy: [ApplicationOrderingChoices]
   ): ApplicationNodeConnection
-  applicationEvents(
-    offset: Int
-    before: String
-    after: String
+  application(
+    """The ID of the object"""
+    id: ID!
+  ): ApplicationNode
+  applicationSections(
     first: Int
     last: Int
-    name_Istartswith: String
-    application: ID
+    offset: Int
+    after: String
+    before: String
     pk: [Int]
+    name: String
     user: Int
+    application: Int
     applicationRound: Int
     reservationUnit: [Int]
     unit: [Int]
     applicantType: [ApplicantTypeChoice]
-    status: [ApplicationEventStatusChoice]
+    status: [ApplicationSectionStatusChoice]
     applicationStatus: [ApplicationStatusChoice]
-    priority: [Int]
+    priority: [Priority]
     preferredOrder: [Int]
     includePreferredOrder10OrHigher: Boolean
     homeCity: [Int]
@@ -1566,30 +1572,33 @@ type Query {
     purpose: [Int]
     textSearch: String
 
-    """Järjestys"""
-    orderBy: String
-  ): ApplicationEventNodeConnection
-  applicationEventSchedules(
-    offset: Int
-    before: String
-    after: String
+    """Järjestä"""
+    orderBy: [ApplicationSectionOrderingChoices]
+  ): ApplicationSectionNodeConnection
+  allocatedTimeSlots(
     first: Int
     last: Int
+    offset: Int
+    after: String
+    before: String
     pk: [Int]
+    dayOfTheWeek: [Weekday]
     applicationRound: Int
-    applicationEventStatus: [ApplicationEventStatusChoice]
+    applicationSectionStatus: [ApplicationSectionStatusChoice]
     applicantType: [ApplicantTypeChoice]
     allocatedUnit: [Int]
     allocatedReservationUnit: [Int]
-    allocatedDay: [Int]
-    accepted: Boolean
-    declined: Boolean
-    unallocated: Boolean
     textSearch: String
 
-    """Järjestys"""
-    orderBy: String
-  ): ApplicationEventScheduleNodeConnection
+    """Järjestä"""
+    orderBy: [AllocatedTimeSlotOrderingChoices]
+  ): AllocatedTimeSlotNodeConnection
+
+  """
+  Return all allocations that affect allocations for given reservation unit
+  (through space hierarchy or common resource) during the given time period.
+  """
+  affectingAllocatedTimeSlots(reservationUnit: Int!, beginDate: Date!, endDate: Date!): [AllocatedTimeSlotNode!]
   reservations(
     offset: Int
     before: String
@@ -1599,6 +1608,7 @@ type Query {
     beginDate: Date
     endDate: Date
     onlyWithPermission: Boolean
+    onlyWithHandlingPermission: Boolean
 
     """
     PaymentOrder's statuses; DRAFT, EXPIRED, CANCELLED, PAID, PAID_MANUALLY, REFUNDED
@@ -1619,7 +1629,7 @@ type Query {
     user: ID
     textSearch: String
 
-    """Järjestys"""
+    """Järjestä"""
     orderBy: String
   ): ReservationTypeConnection
   reservationByPk(pk: Int): ReservationType
@@ -1643,7 +1653,7 @@ type Query {
     reservationUnit: [ID]
     reservationUnitType: [ID]
 
-    """Järjestys"""
+    """Järjestä"""
     orderBy: String
   ): RecurringReservationTypeConnection
   reservationCancelReasons(offset: Int, before: String, after: String, first: Int, last: Int, reason: String): ReservationCancelReasonTypeConnection
@@ -1689,7 +1699,7 @@ type Query {
     reservableMinimumDurationMinutes: Decimal
     showOnlyReservable: Boolean
 
-    """Järjestys"""
+    """Järjestä"""
     orderBy: String
   ): ReservationUnitTypeConnection
   reservationUnit(
@@ -1706,7 +1716,7 @@ type Query {
     first: Int
     last: Int
 
-    """Järjestys"""
+    """Järjestä"""
     orderBy: String
   ): ReservationUnitTypeTypeConnection
   resources(offset: Int, before: String, after: String, first: Int, last: Int, onlyWithPermission: Boolean): ResourceTypeConnection
@@ -1725,7 +1735,7 @@ type Query {
     rankGte: Decimal
     rankLte: Decimal
 
-    """Järjestys"""
+    """Järjestä"""
     orderBy: String
   ): EquipmentTypeConnection
   equipment(
@@ -1747,7 +1757,7 @@ type Query {
     last: Int
     onlyWithPermission: Boolean
 
-    """Järjestys"""
+    """Järjestä"""
     orderBy: String
   ): SpaceTypeConnection
   space(
@@ -1771,7 +1781,7 @@ type Query {
     publishedReservationUnits: Boolean
     ownReservations: Boolean
 
-    """Järjestys"""
+    """Järjestä"""
     orderBy: String
   ): UnitTypeConnection
   unit(
@@ -1791,15 +1801,15 @@ type Query {
     first: Int
     last: Int
 
-    """Järjestys"""
+    """Järjestä"""
     orderBy: String
   ): PurposeTypeConnection
   qualifiers(offset: Int, before: String, after: String, first: Int, last: Int, nameFi: String, nameEn: String, nameSv: String): QualifierTypeConnection
   reservationPurposes(offset: Int, before: String, after: String, first: Int, last: Int, nameFi: String, nameEn: String, nameSv: String): ReservationPurposeTypeConnection
-  termsOfUse(offset: Int, before: String, after: String, first: Int, last: Int, termsType: TermsOfUseTermsOfUseTermsTypeChoices): TermsOfUseTypeConnection
+  termsOfUse(offset: Int, before: String, after: String, first: Int, last: Int, termsType: TermsType): TermsOfUseTypeConnection
   taxPercentages(offset: Int, before: String, after: String, first: Int, last: Int, value: Decimal): TaxPercentageTypeConnection
   ageGroups(offset: Int, before: String, after: String, first: Int, last: Int): AgeGroupTypeConnection
-  cities(offset: Int, before: String, after: String, first: Int, last: Int): CityNodeConnection
+  cities(first: Int, last: Int, offset: Int, after: String, before: String): CityNodeConnection
   metadataSets(offset: Int, before: String, after: String, first: Int, last: Int): ReservationMetadataSetTypeConnection
   order(orderUuid: String): PaymentOrderType
   bannerNotification(
@@ -1813,13 +1823,14 @@ type Query {
     first: Int
     last: Int
     name: String
-    target: CommonBannerNotificationTargetChoices
+    target: BannerNotificationTarget
     isActive: Boolean
     isVisible: Boolean
 
-    """Järjestys"""
+    """Järjestä"""
     orderBy: String
   ): BannerNotificationNodeConnection
+  _debug: DjangoDebug
 }
 
 type RealEstateType implements Node {
@@ -1898,8 +1909,7 @@ type RecurringReservationType implements Node {
   beginTime: TimeString
   endDate: Date
   endTime: TimeString
-  applicationEventSchedule: Int
-  reservationUnit: ReservationUnitByPkType!
+  reservationUnit: ReservationUnitByPkType
   recurrenceInDays: Int
   weekdays: [Int]
   ageGroup: AgeGroupType
@@ -2006,7 +2016,7 @@ input ReservationAdjustTimeMutationInput {
   pk: Int!
   begin: DateTime!
   end: DateTime!
-  state: state
+  state: State
   clientMutationId: String
 }
 
@@ -2014,7 +2024,7 @@ type ReservationAdjustTimeMutationPayload {
   pk: Int
   begin: DateTime
   end: DateTime
-  state: state
+  state: State
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -2033,7 +2043,7 @@ input ReservationApproveMutationInput {
 
 type ReservationApproveMutationPayload {
   pk: Int
-  state: state
+  state: State
 
   """Additional information for approval."""
   handlingDetails: String
@@ -2067,7 +2077,7 @@ type ReservationCancellationMutationPayload {
 
   """Additional information for the cancellation."""
   cancelDetails: String
-  state: state
+  state: State
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -2149,7 +2159,6 @@ type ReservationConfirmMutationPayload {
   CREATED, CANCELLED, REQUIRES_HANDLING, WAITING_FOR_PAYMENT, CONFIRMED, DENIED.
   """
   state: String
-  priority: Int
   begin: DateTime
   end: DateTime
   bufferTimeBefore: Int
@@ -2211,7 +2220,6 @@ input ReservationCreateMutationInput {
   numPersons: Int
   name: String
   description: String
-  priority: Int
   begin: DateTime!
   end: DateTime!
   bufferTimeBefore: Int
@@ -2253,7 +2261,6 @@ type ReservationCreateMutationPayload {
   name: String
   description: String
   state: String
-  priority: Int
   begin: DateTime
   end: DateTime
   bufferTimeBefore: Int
@@ -2310,7 +2317,7 @@ input ReservationDenyMutationInput {
 
 type ReservationDenyMutationPayload {
   pk: Int
-  state: state
+  state: State
 
   """Additional information for denying."""
   handlingDetails: String
@@ -2352,6 +2359,18 @@ type ReservationDenyReasonTypeEdge {
 
   """A cursor for use in pagination"""
   cursor: String!
+}
+
+"""An enumeration."""
+enum ReservationKind {
+  """Direct"""
+  DIRECT
+
+  """Season"""
+  SEASON
+
+  """Direct And Season"""
+  DIRECT_AND_SEASON
 }
 
 type ReservationMetadataSetType implements Node {
@@ -2428,78 +2447,18 @@ input ReservationRequiresHandlingMutationInput {
 
 type ReservationRequiresHandlingMutationPayload {
   pk: Int
-  state: state
+  state: State
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
   clientMutationId: String
 }
 
-"""An enumeration."""
-enum ReservationsReservationPriorityChoices {
-  """Low"""
-  A_100
-
-  """Medium"""
-  A_200
-
-  """High"""
-  A_300
-}
-
-"""An enumeration."""
-enum ReservationsReservationReserveeTypeChoices {
-  """Business"""
-  BUSINESS
-
-  """Nonprofit"""
-  NONPROFIT
-
-  """Individual"""
-  INDIVIDUAL
-}
-
-"""An enumeration."""
-enum ReservationsReservationStateChoices {
-  """Luotu"""
-  CREATED
-
-  """Cancelled"""
-  CANCELLED
-
-  """Requires handling"""
-  REQUIRES_HANDLING
-
-  """Waiting for payment"""
-  WAITING_FOR_PAYMENT
-
-  """Confirmed"""
-  CONFIRMED
-
-  """Denied"""
-  DENIED
-}
-
-"""An enumeration."""
-enum ReservationsReservationTypeChoices {
-  """Normal"""
-  NORMAL
-
-  """Blocked"""
-  BLOCKED
-
-  """Staff"""
-  STAFF
-
-  """Behalf"""
-  BEHALF
-}
-
 input ReservationStaffAdjustTimeMutationInput {
   pk: Int!
   begin: DateTime!
   end: DateTime!
-  state: state
+  state: State
 
   """
   Can be a number of seconds or timespan in format HH:MM:SS. Null/undefined
@@ -2519,7 +2478,7 @@ type ReservationStaffAdjustTimeMutationPayload {
   pk: Int
   begin: DateTime
   end: DateTime
-  state: state
+  state: State
 
   """
   Can be a number of seconds or timespan in format HH:MM:SS. Null/undefined
@@ -2624,7 +2583,7 @@ type ReservationStaffCreateMutationPayload {
   numPersons: Int
   name: String
   description: String
-  state: state
+  state: State
   begin: DateTime
   end: DateTime
 
@@ -2696,9 +2655,6 @@ input ReservationStaffModifyMutationInput {
   CREATED, CANCELLED, REQUIRES_HANDLING, WAITING_FOR_PAYMENT, CONFIRMED, DENIED.
   """
   state: String
-  priority: Int
-  bufferTimeBefore: Int
-  bufferTimeAfter: Int
   reservationUnitPks: [Int]
   purposePk: Int
   type: String
@@ -2741,7 +2697,6 @@ type ReservationStaffModifyMutationPayload {
   CREATED, CANCELLED, REQUIRES_HANDLING, WAITING_FOR_PAYMENT, CONFIRMED, DENIED.
   """
   state: String
-  priority: Int
   begin: DateTime
   end: DateTime
   bufferTimeBefore: Int
@@ -2774,6 +2729,39 @@ type ReservationStaffModifyMutationPayload {
 }
 
 """An enumeration."""
+enum ReservationStartInterval {
+  """15 minuuttia"""
+  INTERVAL_15_MINS
+
+  """30 minuuttia"""
+  INTERVAL_30_MINS
+
+  """60 minuuttia"""
+  INTERVAL_60_MINS
+
+  """90 minuuttia"""
+  INTERVAL_90_MINS
+
+  """2 tuntia"""
+  INTERVAL_120_MINS
+
+  """3 tuntia"""
+  INTERVAL_180_MINS
+
+  """4 tuntia"""
+  INTERVAL_240_MINS
+
+  """5 tuntia"""
+  INTERVAL_300_MINS
+
+  """6 tuntia"""
+  INTERVAL_360_MINS
+
+  """7 tuntia"""
+  INTERVAL_420_MINS
+}
+
+"""An enumeration."""
 enum ReservationState {
   SCHEDULED_RESERVATION
   SCHEDULED_PERIOD
@@ -2784,7 +2772,7 @@ enum ReservationState {
 
 type ReservationType implements Node {
   """Type of reservee"""
-  reserveeType: ReservationsReservationReserveeTypeChoices
+  reserveeType: ReserveeType
   reserveeFirstName: String
   reserveeLastName: String
   reserveeOrganisationName: String
@@ -2810,8 +2798,7 @@ type ReservationType implements Node {
   freeOfChargeReason: String
   name: String
   description: String
-  state: ReservationsReservationStateChoices!
-  priority: ReservationsReservationPriorityChoices!
+  state: State!
   user: UserType
   begin: DateTime!
   end: DateTime!
@@ -2837,7 +2824,7 @@ type ReservationType implements Node {
   workingMemo: String
 
   """Type of reservation"""
-  type: ReservationsReservationTypeChoices
+  type: Type
 
   """The ID of the object"""
   id: ID!
@@ -2917,47 +2904,49 @@ type ReservationUnitByPkType implements Node {
   interval_90_mins, interval_120_mins, interval_180_mins, interval_240_mins,
   interval_300_mins, interval_360_mins, interval_420_mins.
   """
-  reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices!
+  reservationStartInterval: ReservationStartInterval!
   reservationsMinDaysBefore: Int
   reservationsMaxDaysBefore: Int
 
   """
-  Time when making reservations become possible for this reservation unit.
+  Aika, jolloin varauksien tekeminen tulee mahdolliseksi tälle varausyksikölle.
   """
   reservationBegins: DateTime
 
   """
-  Time when making reservations become not possible for this reservation unit
+  Aika, jolloin varauksien tekeminen ei ole enää mahdollista tälle varausyksikölle
   """
   reservationEnds: DateTime
 
-  """Time after this reservation unit should be publicly visible in UI."""
+  """
+  Aika, jonka jälkeen tämä varausyksikkö tulee julkisesti näkyville käyttöliittymässä.
+  """
   publishBegins: DateTime
 
-  """Time after this reservation unit should not be publicly visible in UI."""
+  """
+  Aika, jonka jälkeen tämä varausyksikkö ei enää ole julkisesti näkyvillä käyttöliittymässä.
+  """
   publishEnds: DateTime
   metadataSet: ReservationMetadataSetType
   maxReservationsPerUser: Int
 
   """
-  Does reservations of this reservation unit need to be handled before they're confirmed.
+  Vaativatko tämän varausyksikön varaukset käsittelyn ennen kuin ne voidaan vahvistaa.
   """
   requireReservationHandling: Boolean!
 
-  """Authentication required for reserving this reservation unit."""
-  authentication: ReservationUnitsReservationUnitAuthenticationChoices!
+  """Tunnistautumisen taso joka vaaditaan tämän varausyksikön varaamiseen."""
+  authentication: Authentication!
 
-  """Order number to be use in api sorting."""
+  """Järjestysnumero, jota käytetään rajapinnan järjestämisessä."""
   rank: Int
 
   """What kind of reservations are to be booked with this reservation unit."""
-  reservationKind: ReservationUnitsReservationUnitReservationKindChoices!
+  reservationKind: ReservationKind!
   paymentTypes: [ReservationUnitPaymentTypeType]
   reservationBlockWholeDay: Boolean!
 
-  """
-  Can reservations to this reservation unit be able to apply free of charge.
-  """
+  """Voivatko tämän varausyksikön varaukset olla alennuskelpoisia."""
   canApplyFreeOfCharge: Boolean!
 
   """
@@ -2968,7 +2957,7 @@ type ReservationUnitByPkType implements Node {
   """Is reservation unit archived."""
   isArchived: Boolean!
   applicationRounds(active: Boolean): [ApplicationRoundNode]
-  images: [ReservationUnitImageType!]!
+  images: [ReservationUnitImageType!]
 
   """The ID of the object"""
   id: ID!
@@ -2999,7 +2988,7 @@ type ReservationUnitCancellationRuleType implements Node {
   """
   Seconds before reservations related to this cancellation rule can be cancelled without handling.
   """
-  canBeCancelledTimeBefore: Float
+  canBeCancelledTimeBefore: Duration
   needsHandling: Boolean!
 
   """The ID of the object"""
@@ -3067,25 +3056,29 @@ input ReservationUnitCreateMutationInput {
   reservationStartInterval: String
 
   """
-  Time when making reservations become possible for this reservation unit.
+  Aika, jolloin varauksien tekeminen tulee mahdolliseksi tälle varausyksikölle.
   """
   reservationBegins: DateTime
 
   """
-  Time when making reservations become not possible for this reservation unit
+  Aika, jolloin varauksien tekeminen ei ole enää mahdollista tälle varausyksikölle
   """
   reservationEnds: DateTime
 
-  """Time after this reservation unit should be publicly visible in UI."""
+  """
+  Aika, jonka jälkeen tämä varausyksikkö tulee julkisesti näkyville käyttöliittymässä.
+  """
   publishBegins: DateTime
 
-  """Time after this reservation unit should not be publicly visible in UI."""
+  """
+  Aika, jonka jälkeen tämä varausyksikkö ei enää ole julkisesti näkyvillä käyttöliittymässä.
+  """
   publishEnds: DateTime
   metadataSetPk: Int
   maxReservationsPerUser: Int
 
   """
-  Does reservations of this reservation unit need to be handled before they're confirmed.
+  Vaativatko tämän varausyksikön varaukset käsittelyn ennen kuin ne voidaan vahvistaa.
   """
   requireReservationHandling: Boolean
 
@@ -3101,9 +3094,7 @@ input ReservationUnitCreateMutationInput {
   reservationKind: String
   reservationBlockWholeDay: Boolean
 
-  """
-  Can reservations to this reservation unit be able to apply free of charge.
-  """
+  """Voivatko tämän varausyksikön varaukset olla alennuskelpoisia."""
   canApplyFreeOfCharge: Boolean
   reservationsMaxDaysBefore: Int
   reservationsMinDaysBefore: Int
@@ -3118,24 +3109,24 @@ input ReservationUnitCreateMutationInput {
   paymentTypes: [String]
   pricings: [ReservationUnitPricingCreateSerializerInput]
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotSerializerInput]
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   clientMutationId: String
 }
 
@@ -3196,24 +3187,28 @@ type ReservationUnitCreateMutationPayload {
   reservationStartInterval: String
 
   """
-  Time when making reservations become possible for this reservation unit.
+  Aika, jolloin varauksien tekeminen tulee mahdolliseksi tälle varausyksikölle.
   """
   reservationBegins: DateTime
 
   """
-  Time when making reservations become not possible for this reservation unit
+  Aika, jolloin varauksien tekeminen ei ole enää mahdollista tälle varausyksikölle
   """
   reservationEnds: DateTime
 
-  """Time after this reservation unit should be publicly visible in UI."""
+  """
+  Aika, jonka jälkeen tämä varausyksikkö tulee julkisesti näkyville käyttöliittymässä.
+  """
   publishBegins: DateTime
 
-  """Time after this reservation unit should not be publicly visible in UI."""
+  """
+  Aika, jonka jälkeen tämä varausyksikkö ei enää ole julkisesti näkyvillä käyttöliittymässä.
+  """
   publishEnds: DateTime
   maxReservationsPerUser: Int
 
   """
-  Does reservations of this reservation unit need to be handled before they're confirmed.
+  Vaativatko tämän varausyksikön varaukset käsittelyn ennen kuin ne voidaan vahvistaa.
   """
   requireReservationHandling: Boolean
 
@@ -3229,9 +3224,7 @@ type ReservationUnitCreateMutationPayload {
   reservationKind: String
   reservationBlockWholeDay: Boolean
 
-  """
-  Can reservations to this reservation unit be able to apply free of charge.
-  """
+  """Voivatko tämän varausyksikön varaukset olla alennuskelpoisia."""
   canApplyFreeOfCharge: Boolean
   reservationsMaxDaysBefore: Int
   reservationsMinDaysBefore: Int
@@ -3246,24 +3239,24 @@ type ReservationUnitCreateMutationPayload {
   paymentTypes: [String]
   pricings: [ReservationUnitPricingType]
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotNode]
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -3313,7 +3306,7 @@ type ReservationUnitImageDeleteMutationPayload {
 }
 
 type ReservationUnitImageType {
-  imageType: ReservationUnitsReservationUnitImageImageTypeChoices!
+  imageType: ImageType!
   largeUrl: String
   mediumUrl: String
   smallUrl: String
@@ -3346,8 +3339,58 @@ type ReservationUnitImageUpdateMutationPayload {
   clientMutationId: String
 }
 
+input ReservationUnitOptionApplicantSerializerInput {
+  pk: Int
+  preferredOrder: Int!
+  reservationUnit: Int!
+}
+
+type ReservationUnitOptionNode implements Node {
+  preferredOrder: Int!
+  rejected: Boolean!
+  locked: Boolean!
+  applicationSection: ApplicationSectionNode!
+  reservationUnit: ReservationUnitByPkType
+  allocatedTimeSlots(
+    pk: [Int]
+    dayOfTheWeek: [Weekday]
+    applicationRound: Int
+    applicationSectionStatus: [ApplicationSectionStatusChoice]
+    applicantType: [ApplicantTypeChoice]
+    allocatedUnit: [Int]
+    allocatedReservationUnit: [Int]
+    textSearch: String
+
+    """Järjestä"""
+    orderBy: [AllocatedTimeSlotOrderingChoices]
+  ): [AllocatedTimeSlotNode!]
+
+  """The ID of the object"""
+  id: ID!
+  pk: Int
+}
+
+"""Ordering fields for the 'ReservationUnitOption' model."""
+enum ReservationUnitOptionOrderingChoices {
+  pkAsc
+  pkDesc
+}
+
+input ReservationUnitOptionUpdateMutationInput {
+  pk: Int!
+  rejected: Boolean
+  locked: Boolean
+  clientMutationId: String
+}
+
+type ReservationUnitOptionUpdateMutationPayload {
+  pk: Int
+  rejected: Boolean
+  locked: Boolean
+  clientMutationId: String
+}
+
 type ReservationUnitPaymentTypeType implements Node {
-  """Available values: ONLINE, INVOICE, ON_SITE"""
   code: String
 
   """The ID of the object"""
@@ -3383,22 +3426,20 @@ type ReservationUnitPricingType {
   begins: Date!
 
   """What kind of pricing types are available with this reservation unit."""
-  pricingType: ReservationUnitsReservationUnitPricingPricingTypeChoices
+  pricingType: PricingType
 
   """Unit of the price"""
-  priceUnit: ReservationUnitsReservationUnitPricingPriceUnitChoices!
+  priceUnit: PriceUnit!
 
   """Minimum price of the reservation unit including VAT"""
   lowestPrice: Decimal!
 
   """Maximum price of the reservation unit including VAT"""
   highestPrice: Decimal!
-
-  """The percentage of tax included in the price"""
-  taxPercentage: TaxPercentageType!
+  taxPercentage: TaxPercentageType
 
   """Status of the pricing"""
-  status: ReservationUnitsReservationUnitPricingStatusChoices!
+  status: Status!
   pk: Int
   lowestPriceNet: Decimal
   highestPriceNet: Decimal
@@ -3427,120 +3468,6 @@ input ReservationUnitPricingUpdateSerializerInput {
 
   """Pricing status. Possible values are PAST, ACTIVE, FUTURE."""
   status: String!
-}
-
-"""An enumeration."""
-enum ReservationUnitsReservationUnitAuthenticationChoices {
-  """Weak"""
-  WEAK
-
-  """Strong"""
-  STRONG
-}
-
-"""An enumeration."""
-enum ReservationUnitsReservationUnitImageImageTypeChoices {
-  """Main image"""
-  MAIN
-
-  """Ground plan"""
-  GROUND_PLAN
-
-  """Map"""
-  MAP
-
-  """Other"""
-  OTHER
-}
-
-"""An enumeration."""
-enum ReservationUnitsReservationUnitPricingPriceUnitChoices {
-  """per 15 minutes"""
-  PER_15_MINS
-
-  """per 30 minutes"""
-  PER_30_MINS
-
-  """per hour"""
-  PER_HOUR
-
-  """per half a day"""
-  PER_HALF_DAY
-
-  """per day"""
-  PER_DAY
-
-  """per week"""
-  PER_WEEK
-
-  """fixed"""
-  FIXED
-}
-
-"""An enumeration."""
-enum ReservationUnitsReservationUnitPricingPricingTypeChoices {
-  """Paid"""
-  PAID
-
-  """Free"""
-  FREE
-}
-
-"""An enumeration."""
-enum ReservationUnitsReservationUnitPricingStatusChoices {
-  """past"""
-  PAST
-
-  """voimassa"""
-  ACTIVE
-
-  """future"""
-  FUTURE
-}
-
-"""An enumeration."""
-enum ReservationUnitsReservationUnitReservationKindChoices {
-  """Direct"""
-  DIRECT
-
-  """Season"""
-  SEASON
-
-  """Direct And Season"""
-  DIRECT_AND_SEASON
-}
-
-"""An enumeration."""
-enum ReservationUnitsReservationUnitReservationStartIntervalChoices {
-  """15 minutes"""
-  INTERVAL_15_MINS
-
-  """30 minutes"""
-  INTERVAL_30_MINS
-
-  """60 minutes"""
-  INTERVAL_60_MINS
-
-  """90 minutes"""
-  INTERVAL_90_MINS
-
-  """2 hours"""
-  INTERVAL_120_MINS
-
-  """3 hours"""
-  INTERVAL_180_MINS
-
-  """4 hours"""
-  INTERVAL_240_MINS
-
-  """5 hours"""
-  INTERVAL_300_MINS
-
-  """6 hours"""
-  INTERVAL_360_MINS
-
-  """7 hours"""
-  INTERVAL_420_MINS
 }
 
 """An enumeration."""
@@ -3603,47 +3530,49 @@ type ReservationUnitType implements Node {
   interval_90_mins, interval_120_mins, interval_180_mins, interval_240_mins,
   interval_300_mins, interval_360_mins, interval_420_mins.
   """
-  reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices!
+  reservationStartInterval: ReservationStartInterval!
   reservationsMinDaysBefore: Int
   reservationsMaxDaysBefore: Int
 
   """
-  Time when making reservations become possible for this reservation unit.
+  Aika, jolloin varauksien tekeminen tulee mahdolliseksi tälle varausyksikölle.
   """
   reservationBegins: DateTime
 
   """
-  Time when making reservations become not possible for this reservation unit
+  Aika, jolloin varauksien tekeminen ei ole enää mahdollista tälle varausyksikölle
   """
   reservationEnds: DateTime
 
-  """Time after this reservation unit should be publicly visible in UI."""
+  """
+  Aika, jonka jälkeen tämä varausyksikkö tulee julkisesti näkyville käyttöliittymässä.
+  """
   publishBegins: DateTime
 
-  """Time after this reservation unit should not be publicly visible in UI."""
+  """
+  Aika, jonka jälkeen tämä varausyksikkö ei enää ole julkisesti näkyvillä käyttöliittymässä.
+  """
   publishEnds: DateTime
   metadataSet: ReservationMetadataSetType
   maxReservationsPerUser: Int
 
   """
-  Does reservations of this reservation unit need to be handled before they're confirmed.
+  Vaativatko tämän varausyksikön varaukset käsittelyn ennen kuin ne voidaan vahvistaa.
   """
   requireReservationHandling: Boolean!
 
-  """Authentication required for reserving this reservation unit."""
-  authentication: ReservationUnitsReservationUnitAuthenticationChoices!
+  """Tunnistautumisen taso joka vaaditaan tämän varausyksikön varaamiseen."""
+  authentication: Authentication!
 
-  """Order number to be use in api sorting."""
+  """Järjestysnumero, jota käytetään rajapinnan järjestämisessä."""
   rank: Int
 
   """What kind of reservations are to be booked with this reservation unit."""
-  reservationKind: ReservationUnitsReservationUnitReservationKindChoices!
+  reservationKind: ReservationKind!
   paymentTypes: [ReservationUnitPaymentTypeType]
   reservationBlockWholeDay: Boolean!
 
-  """
-  Can reservations to this reservation unit be able to apply free of charge.
-  """
+  """Voivatko tämän varausyksikön varaukset olla alennuskelpoisia."""
   canApplyFreeOfCharge: Boolean!
 
   """
@@ -3657,7 +3586,7 @@ type ReservationUnitType implements Node {
   paymentProduct: PaymentProductType
   applicationRounds(active: Boolean): [ApplicationRoundNode]
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotNode!]
-  images: [ReservationUnitImageType!]!
+  images: [ReservationUnitImageType!]
   pricings: [ReservationUnitPricingType]
 
   """The ID of the object"""
@@ -3697,7 +3626,7 @@ type ReservationUnitTypeType implements Node {
   nameEn: String
   nameSv: String
 
-  """Order number to be used in api sorting."""
+  """Järjestysnumero, jota käytetään rajapinnan järjestämisessä."""
   rank: Int
 
   """The ID of the object"""
@@ -3765,25 +3694,29 @@ input ReservationUnitUpdateMutationInput {
   reservationStartInterval: String
 
   """
-  Time when making reservations become possible for this reservation unit.
+  Aika, jolloin varauksien tekeminen tulee mahdolliseksi tälle varausyksikölle.
   """
   reservationBegins: DateTime
 
   """
-  Time when making reservations become not possible for this reservation unit
+  Aika, jolloin varauksien tekeminen ei ole enää mahdollista tälle varausyksikölle
   """
   reservationEnds: DateTime
 
-  """Time after this reservation unit should be publicly visible in UI."""
+  """
+  Aika, jonka jälkeen tämä varausyksikkö tulee julkisesti näkyville käyttöliittymässä.
+  """
   publishBegins: DateTime
 
-  """Time after this reservation unit should not be publicly visible in UI."""
+  """
+  Aika, jonka jälkeen tämä varausyksikkö ei enää ole julkisesti näkyvillä käyttöliittymässä.
+  """
   publishEnds: DateTime
   metadataSetPk: Int
   maxReservationsPerUser: Int
 
   """
-  Does reservations of this reservation unit need to be handled before they're confirmed.
+  Vaativatko tämän varausyksikön varaukset käsittelyn ennen kuin ne voidaan vahvistaa.
   """
   requireReservationHandling: Boolean
 
@@ -3799,9 +3732,7 @@ input ReservationUnitUpdateMutationInput {
   reservationKind: String
   reservationBlockWholeDay: Boolean
 
-  """
-  Can reservations to this reservation unit be able to apply free of charge.
-  """
+  """Voivatko tämän varausyksikön varaukset olla alennuskelpoisia."""
   canApplyFreeOfCharge: Boolean
   reservationsMaxDaysBefore: Int
   reservationsMinDaysBefore: Int
@@ -3816,24 +3747,24 @@ input ReservationUnitUpdateMutationInput {
   paymentTypes: [String]
   pricings: [ReservationUnitPricingUpdateSerializerInput]!
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotSerializerInput]
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   clientMutationId: String
 }
 
@@ -3894,24 +3825,28 @@ type ReservationUnitUpdateMutationPayload {
   reservationStartInterval: String
 
   """
-  Time when making reservations become possible for this reservation unit.
+  Aika, jolloin varauksien tekeminen tulee mahdolliseksi tälle varausyksikölle.
   """
   reservationBegins: DateTime
 
   """
-  Time when making reservations become not possible for this reservation unit
+  Aika, jolloin varauksien tekeminen ei ole enää mahdollista tälle varausyksikölle
   """
   reservationEnds: DateTime
 
-  """Time after this reservation unit should be publicly visible in UI."""
+  """
+  Aika, jonka jälkeen tämä varausyksikkö tulee julkisesti näkyville käyttöliittymässä.
+  """
   publishBegins: DateTime
 
-  """Time after this reservation unit should not be publicly visible in UI."""
+  """
+  Aika, jonka jälkeen tämä varausyksikkö ei enää ole julkisesti näkyvillä käyttöliittymässä.
+  """
   publishEnds: DateTime
   maxReservationsPerUser: Int
 
   """
-  Does reservations of this reservation unit need to be handled before they're confirmed.
+  Vaativatko tämän varausyksikön varaukset käsittelyn ennen kuin ne voidaan vahvistaa.
   """
   requireReservationHandling: Boolean
 
@@ -3927,9 +3862,7 @@ type ReservationUnitUpdateMutationPayload {
   reservationKind: String
   reservationBlockWholeDay: Boolean
 
-  """
-  Can reservations to this reservation unit be able to apply free of charge.
-  """
+  """Voivatko tämän varausyksikön varaukset olla alennuskelpoisia."""
   canApplyFreeOfCharge: Boolean
   reservationsMaxDaysBefore: Int
   reservationsMinDaysBefore: Int
@@ -3943,24 +3876,24 @@ type ReservationUnitUpdateMutationPayload {
   pricingTerms: String
   paymentTypes: [String]
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotNode]
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  reservationPendingInstructionsFi: String
-  reservationPendingInstructionsEn: String
-  reservationPendingInstructionsSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -4004,7 +3937,6 @@ input ReservationUpdateMutationInput {
   CREATED, CANCELLED, REQUIRES_HANDLING, WAITING_FOR_PAYMENT, CONFIRMED, DENIED.
   """
   state: String
-  priority: Int
   begin: DateTime
   end: DateTime
   bufferTimeBefore: Int
@@ -4051,7 +3983,6 @@ type ReservationUpdateMutationPayload {
   CREATED, CANCELLED, REQUIRES_HANDLING, WAITING_FOR_PAYMENT, CONFIRMED, DENIED.
   """
   state: String
-  priority: Int
   begin: DateTime
   end: DateTime
   bufferTimeBefore: Int
@@ -4103,6 +4034,18 @@ type ReservationWorkingMemoMutationPayload {
   """May contain more than one error for same field."""
   errors: [ErrorType]
   clientMutationId: String
+}
+
+"""An enumeration."""
+enum ReserveeType {
+  """Yritys"""
+  BUSINESS
+
+  """Yhdistys"""
+  NONPROFIT
+
+  """Yksittäinen"""
+  INDIVIDUAL
 }
 
 input ResourceCreateMutationInput {
@@ -4168,16 +4111,13 @@ type ResourceDeleteMutationPayload {
 }
 
 """An enumeration."""
-enum ResourcesResourceLocationTypeChoices {
-  """Fixed"""
+enum ResourceLocationType {
   FIXED
-
-  """Movable"""
   MOVABLE
 }
 
 type ResourceType implements Node {
-  locationType: ResourcesResourceLocationTypeChoices!
+  locationType: ResourceLocationType
   nameFi: String
   nameEn: String
   nameSv: String
@@ -4310,23 +4250,11 @@ type ServiceSectorTypeEdge {
   cursor: String!
 }
 
-"""An enumeration."""
-enum ServicesServiceServiceTypeChoices {
-  """Introduction"""
-  INTRODUCTION
-
-  """Catering"""
-  CATERING
-
-  """Configuration"""
-  CONFIGURATION
-}
-
 type ServiceType implements Node {
   nameFi: String
   nameEn: String
   nameSv: String
-  serviceType: ServicesServiceServiceTypeChoices!
+  serviceType: ServiceType!
   bufferTimeBefore: Duration
   bufferTimeAfter: Duration
 
@@ -4449,36 +4377,75 @@ type SpaceUpdateMutationPayload {
 }
 
 """An enumeration."""
-enum state {
+enum State {
   """Luotu"""
   CREATED
 
-  """Cancelled"""
+  """Peruttu"""
   CANCELLED
 
-  """Requires handling"""
+  """Vaatiiko käsittelyn"""
   REQUIRES_HANDLING
 
-  """Waiting for payment"""
+  """Odottaa maksua"""
   WAITING_FOR_PAYMENT
 
-  """Confirmed"""
+  """Vahvistettu"""
   CONFIRMED
 
-  """Denied"""
+  """Hylätty"""
   DENIED
 }
 
 """An enumeration."""
-enum target {
+enum Status {
+  """mennyt"""
+  PAST
+
+  """aktiivinen"""
+  ACTIVE
+
+  """tuleva"""
+  FUTURE
+}
+
+type SuitableTimeRangeNode implements Node {
+  priority: Priority!
+  dayOfTheWeek: Weekday!
+  beginTime: Time!
+  endTime: Time!
+  applicationSection: ApplicationSectionNode!
+
+  """The ID of the object"""
+  id: ID!
+  fulfilled: Boolean
+  pk: Int
+}
+
+"""Ordering fields for the 'SuitableTimeRange' model."""
+enum SuitableTimeRangeOrderingChoices {
+  pkAsc
+  pkDesc
+}
+
+input SuitableTimeRangeSerializerInput {
+  pk: Int
+  priority: Priority!
+  dayOfTheWeek: Weekday!
+  beginTime: Time!
+  endTime: Time!
+}
+
+"""An enumeration."""
+enum TargetGroup {
+  """Sisäinen"""
+  INTERNAL
+
+  """Julkinen"""
+  PUBLIC
+
   """Kaikki"""
   ALL
-
-  """Staff"""
-  STAFF
-
-  """Käyttäjä"""
-  USER
 }
 
 type TaxPercentageType implements Node {
@@ -4508,27 +4475,6 @@ type TaxPercentageTypeEdge {
   cursor: String!
 }
 
-"""An enumeration."""
-enum TermsOfUseTermsOfUseTermsTypeChoices {
-  """Generic terms"""
-  GENERIC_TERMS
-
-  """Payment terms"""
-  PAYMENT_TERMS
-
-  """Cancellation terms"""
-  CANCELLATION_TERMS
-
-  """Recurring reservation terms"""
-  RECURRING_TERMS
-
-  """Service-specific terms"""
-  SERVICE_TERMS
-
-  """Pricing terms"""
-  PRICING_TERMS
-}
-
 type TermsOfUseType implements Node {
   nameFi: String
   nameEn: String
@@ -4536,7 +4482,7 @@ type TermsOfUseType implements Node {
   textFi: String
   textEn: String
   textSv: String
-  termsType: TermsOfUseTermsOfUseTermsTypeChoices!
+  termsType: TermsType!
 
   """The ID of the object"""
   id: ID!
@@ -4561,11 +4507,28 @@ type TermsOfUseTypeEdge {
   cursor: String!
 }
 
-"""
-The `Time` scalar type represents a Time value as
-specified by
-[iso8601](https://en.wikipedia.org/wiki/ISO_8601).
-"""
+"""An enumeration."""
+enum TermsType {
+  """Yleiset ehdot"""
+  GENERIC_TERMS
+
+  """Maksuehdot"""
+  PAYMENT_TERMS
+
+  """Peruutusehdot"""
+  CANCELLATION_TERMS
+
+  """Toistuvan varauksen ehdot"""
+  RECURRING_TERMS
+
+  """Palvelualuekohtaiset ehdot"""
+  SERVICE_TERMS
+
+  """Hinnoitteluehdot"""
+  PRICING_TERMS
+}
+
+"""Time scalar that can parse time-strings from database."""
 scalar Time
 
 input TimeSlotSerializerInput {
@@ -4580,6 +4543,21 @@ type TimeSlotType {
 
 """Time scalar that can parse time-strings from database."""
 scalar TimeString
+
+"""An enumeration."""
+enum Type {
+  """Normaali"""
+  NORMAL
+
+  """Estetty"""
+  BLOCKED
+
+  """Henkilökunta"""
+  STAFF
+
+  """Puolesta"""
+  BEHALF
+}
 
 type UnitByPkType implements Node {
   tprekId: String
@@ -4679,15 +4657,15 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
   clientMutationId: String
 }
 
@@ -4697,15 +4675,15 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -4714,76 +4692,71 @@ type UnitUpdateMutationPayload {
 }
 
 input UpdateAddressSerializerInput {
-  city: String
-  cityEn: String
-  cityFi: String
-  citySv: String
   pk: Int
-  postCode: String
   streetAddress: String
-  streetAddressEn: String
   streetAddressFi: String
+  streetAddressEn: String
   streetAddressSv: String
+  postCode: String
+  city: String
+  cityFi: String
+  cityEn: String
+  citySv: String
 }
 
-input UpdateApplicationEventInApplicationSerializerInput {
-  abilityGroup: Int
-  ageGroup: Int
-  applicationEventSchedules: [UpdateApplicationEventScheduleInEventSerializerInput]
-  begin: Date
-  biweekly: Boolean
-  end: Date
-  eventReservationUnits: [UpdateEventReservationUnitSerializerInput]
-  eventsPerWeek: Int
-  maxDuration: String
-  minDuration: String
+input UpdateApplicationSectionForApplicationSerializerInput {
+  pk: Int
   name: String
-  nameEn: String
-  nameFi: String
-  nameSv: String
   numPersons: Int
-  pk: Int
+  reservationsBeginDate: Date
+  reservationsEndDate: Date
+  reservationMinDuration: Duration
+  reservationMaxDuration: Duration
+  appliedReservationsPerWeek: Int
   purpose: Int
+  ageGroup: Int
+  reservationUnitOptions: [UpdateReservationUnitOptionApplicantSerializerInput]
+  suitableTimeRanges: [UpdateSuitableTimeRangeSerializerInput]
 }
 
-input UpdateApplicationEventScheduleInEventSerializerInput {
-  begin: Time
-  day: Int
-  end: Time
+input UpdateOrganisationSerializerInput {
   pk: Int
-  priority: Int
+  name: String
+  nameFi: String
+  nameEn: String
+  nameSv: String
+  identifier: String
+  yearEstablished: Int
+  address: UpdateAddressSerializerInput
+  activeMembers: Int
+  coreBusiness: String
+  coreBusinessFi: String
+  coreBusinessEn: String
+  coreBusinessSv: String
+  organisationType: OrganizationTypeChoice
+  email: String
 }
 
-input UpdateEventReservationUnitSerializerInput {
+input UpdatePersonSerializerInput {
+  pk: Int
+  firstName: String
+  lastName: String
+  email: String
+  phoneNumber: String
+}
+
+input UpdateReservationUnitOptionApplicantSerializerInput {
   pk: Int
   preferredOrder: Int
   reservationUnit: Int
 }
 
-input UpdateOrganisationSerializerInput {
-  activeMembers: Int
-  address: UpdateAddressSerializerInput
-  coreBusiness: String
-  coreBusinessEn: String
-  coreBusinessFi: String
-  coreBusinessSv: String
-  email: String
-  identifier: String
-  name: String
-  nameEn: String
-  nameFi: String
-  nameSv: String
-  organisationType: organisation_type
+input UpdateSuitableTimeRangeSerializerInput {
   pk: Int
-  yearEstablished: Int
-}
-
-input UpdatePersonSerializerInput {
-  email: String
-  firstName: String
-  lastName: String
-  phoneNumber: String
-  pk: Int
+  priority: Priority
+  dayOfTheWeek: Weekday
+  beginTime: Time
+  endTime: Time
 }
 
 """
@@ -4848,4 +4821,15 @@ Leverages the internal Python implementation of UUID (uuid.UUID) to provide nati
 in fields, resolvers and input.
 """
 scalar UUID
+
+"""An enumeration."""
+enum Weekday {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
 

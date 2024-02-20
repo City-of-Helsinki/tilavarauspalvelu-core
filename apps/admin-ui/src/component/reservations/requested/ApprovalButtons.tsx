@@ -1,8 +1,5 @@
 import React from "react";
-import {
-  ReservationType,
-  ReservationsReservationStateChoices,
-} from "common/types/gql-types";
+import { ReservationType, State } from "common/types/gql-types";
 import { useTranslation } from "react-i18next";
 import { addHours, isToday } from "date-fns";
 import { Button } from "hds-react";
@@ -21,38 +18,21 @@ import { useModal } from "../../../context/ModalContext";
  * Allowed to change state (except deny unconfirmed) only till it's ended.
  * Allowed to modify the reservation after ending as long as it's the same date or within one hour.
  */
-const isPossibleToApprove = (
-  state: ReservationsReservationStateChoices,
-  end: Date
-): boolean =>
-  state === ReservationsReservationStateChoices.RequiresHandling &&
-  end > new Date();
+const isPossibleToApprove = (state: State, end: Date): boolean =>
+  state === State.RequiresHandling && end > new Date();
 
-const isPossibleToDeny = (
-  state: ReservationsReservationStateChoices,
-  end: Date
-): boolean => {
-  if (state === ReservationsReservationStateChoices.RequiresHandling) {
+const isPossibleToDeny = (state: State, end: Date): boolean => {
+  if (state === State.RequiresHandling) {
     return true;
   }
-  return (
-    state === ReservationsReservationStateChoices.Confirmed && end > new Date()
-  );
+  return state === State.Confirmed && end > new Date();
 };
 
-const isPossibleToReturn = (
-  state: ReservationsReservationStateChoices,
-  end: Date
-): boolean =>
-  (state === ReservationsReservationStateChoices.Denied ||
-    state === ReservationsReservationStateChoices.Confirmed) &&
-  end > new Date();
+const isPossibleToReturn = (state: State, end: Date): boolean =>
+  (state === State.Denied || state === State.Confirmed) && end > new Date();
 
-const isPossibleToEdit = (
-  state: ReservationsReservationStateChoices,
-  end: Date
-): boolean => {
-  if (state !== ReservationsReservationStateChoices.Confirmed) {
+const isPossibleToEdit = (state: State, end: Date): boolean => {
+  if (state !== State.Confirmed) {
     return false;
   }
   const now = new Date();
@@ -67,7 +47,7 @@ const ApprovalButtons = ({
   handleAccept,
   disableNonEssentialButtons,
 }: {
-  state: ReservationsReservationStateChoices;
+  state: State;
   isFree: boolean;
   reservation: ReservationType;
   handleClose: () => void;
