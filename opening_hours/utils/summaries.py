@@ -20,7 +20,7 @@ def get_resources_total_hours_per_resource(
                 .truncated_start_and_end_datetimes_for_period(start=period_start_date, end=period_end_date)
                 .annotate(duration=F("truncated_end_datetime") - F("truncated_start_datetime"))
                 .values("duration"),
-                sum_field="duration",
+                aggregate_field="duration",
                 output_field=DurationField(),
             ),
             timedelta(),

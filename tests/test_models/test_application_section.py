@@ -3,7 +3,7 @@ import datetime
 import pytest
 from lookup_property import L
 
-from applications.choices import ApplicationSectionStatusChoice
+from applications.choices import ApplicationSectionStatusChoice, Weekday
 from applications.models import ApplicationSection
 from tests.factories import AllocatedTimeSlotFactory, ApplicationRoundFactory, ReservationUnitOptionFactory
 from tests.factories.application_section import ApplicationSectionFactory
@@ -74,20 +74,38 @@ def test_application_section__status():
 
 
 def test_application_section__allocations():
-    section = ApplicationSectionFactory.create()
-    option = ReservationUnitOptionFactory.create(application_section=section)
+    section_1 = ApplicationSectionFactory.create()
+    option_1 = ReservationUnitOptionFactory.create(application_section=section_1, reservation_unit__name="foo 0")
 
     # Sanity check
     assert ApplicationSection.objects.count() == 1
 
     # Application section has 0 allocations
-    assert section.allocations == 0
+    assert section_1.allocations == 0
     assert ApplicationSection.objects.filter(L(allocations=0)).exists()
 
     # Application section has 1 allocation
-    AllocatedTimeSlotFactory.create(reservation_unit_option=option)
-    assert section.allocations == 1
+    AllocatedTimeSlotFactory.create(reservation_unit_option=option_1)
+    assert section_1.allocations == 1
     assert ApplicationSection.objects.filter(L(allocations=1)).exists()
+
+    option_2 = ReservationUnitOptionFactory.create(application_section=section_1, reservation_unit__name="foo 1")
+    option_3 = ReservationUnitOptionFactory.create(application_section=section_1, reservation_unit__name="foo 2")
+
+    AllocatedTimeSlotFactory.create(reservation_unit_option=option_2, day_of_the_week=Weekday.MONDAY)
+    AllocatedTimeSlotFactory.create(reservation_unit_option=option_2, day_of_the_week=Weekday.TUESDAY)
+    AllocatedTimeSlotFactory.create(reservation_unit_option=option_2, day_of_the_week=Weekday.WEDNESDAY)
+    AllocatedTimeSlotFactory.create(reservation_unit_option=option_3, day_of_the_week=Weekday.MONDAY)
+    AllocatedTimeSlotFactory.create(reservation_unit_option=option_3, day_of_the_week=Weekday.TUESDAY)
+
+    section = (
+        ApplicationSection.objects.annotate(allocations=L("allocations"))
+        .filter(reservation_unit_options__reservation_unit__name__startswith="foo")
+        .order_by("pk")
+        .first()
+    )
+
+    assert section.allocations == 6
 
 
 def test_application_section__usable_reservation_unit_options():
