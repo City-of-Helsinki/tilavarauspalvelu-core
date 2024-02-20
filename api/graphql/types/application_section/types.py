@@ -53,9 +53,10 @@ class ApplicationSectionNode(DjangoNode):
     def filter_queryset(cls, queryset: models.QuerySet, info: GQLInfo) -> models.QuerySet:
         field_info = get_fields_from_info(info)
         selections = get_nested(field_info, "applicationSections", "edges", "node", default=[])
-        if "status" in selections:
+        selections_with_typenames = get_nested(field_info, "applicationSections", 0, "edges", 0, "node", 0, default=[])
+        if "status" in selections or "status" in selections_with_typenames:
             queryset = queryset.annotate(status=L("status"))
-        if "allocations" in selections:
+        if "allocations" in selections or "allocations" in selections_with_typenames:
             queryset = queryset.annotate(allocations=L("allocations"))
 
         units = get_units_where_can_view_applications(info.context.user)
