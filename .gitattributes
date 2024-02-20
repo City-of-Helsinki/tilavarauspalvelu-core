@@ -23,6 +23,7 @@
 *.toml      text diff=toml eol=lf
 *.yml       text diff=yaml eol=lf
 *.yaml      text diff=yaml eol=lf
+*.po        text diff=po eol=lf
 
 # Archives
 # ============
