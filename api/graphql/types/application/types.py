@@ -58,7 +58,8 @@ class ApplicationNode(DjangoNode):
     def filter_queryset(cls, queryset: models.QuerySet, info: GQLInfo) -> models.QuerySet:
         field_info = get_fields_from_info(info)
         selections = get_nested(field_info, "applications", "edges", "node", default=[])
-        if "status" in selections:
+        selections_with_typenames = get_nested(field_info, "applications", 0, "edges", 0, "node", 0, default=[])
+        if "status" in selections or "status" in selections_with_typenames:
             queryset = queryset.annotate(status=L("status"))
 
         units = get_units_where_can_view_applications(info.context.user)
