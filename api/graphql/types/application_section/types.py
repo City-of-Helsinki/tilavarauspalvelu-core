@@ -7,7 +7,6 @@ from graphene_django_extensions.fields import RelatedField
 from graphene_django_extensions.utils import get_fields_from_info, get_nested
 from lookup_property import L
 
-from api.graphql.extensions.duration_field import Duration
 from api.graphql.types.application_section.filtersets import ApplicationSectionFilterSet
 from api.graphql.types.application_section.permissions import ApplicationSectionPermission
 from api.graphql.types.reservation_unit_option.types import ReservationUnitOptionNode
@@ -20,9 +19,7 @@ from permissions.helpers import get_service_sectors_where_can_view_applications,
 
 class ApplicationSectionNode(DjangoNode):
     status = graphene.Field(graphene.Enum.from_enum(ApplicationSectionStatusChoice))
-
-    min_duration = Duration()
-    max_duration = Duration()
+    allocations = graphene.Field(graphene.Int)
 
     related_application_sections = graphene.List(lambda: ApplicationSectionNode)
     reservation_unit_options = ReservationUnitOptionNode.ListField()
@@ -41,6 +38,7 @@ class ApplicationSectionNode(DjangoNode):
             "reservation_min_duration",
             "reservation_max_duration",
             "applied_reservations_per_week",
+            "allocations",
             "age_group",
             "purpose",
             "application",
@@ -57,6 +55,8 @@ class ApplicationSectionNode(DjangoNode):
         selections = get_nested(field_info, "applicationSections", "edges", "node", default=[])
         if "status" in selections:
             queryset = queryset.annotate(status=L("status"))
+        if "allocations" in selections:
+            queryset = queryset.annotate(allocations=L("allocations"))
 
         units = get_units_where_can_view_applications(info.context.user)
         service_sectors = get_service_sectors_where_can_view_applications(info.context.user)

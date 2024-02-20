@@ -15,6 +15,7 @@ from applications.choices import ApplicationSectionStatusChoice, Weekday
 from applications.querysets.application_section import ApplicationSectionQuerySet
 from common.connectors import ApplicationSectionActionsConnector
 from common.date_utils import local_datetime
+from common.db import SubqueryCount
 
 if TYPE_CHECKING:
     from applications.models import Application
@@ -61,6 +62,9 @@ class ApplicationSection(SerializableMixin, models.Model):
         on_delete=models.CASCADE,
         related_name="application_sections",
     )
+    # TODO: These should be required, but nullable since the
+    # purposes and age groups might get deleted, and the application
+    # section should still remain in the database
     purpose: ReservationPurpose | None = models.ForeignKey(
         "reservations.ReservationPurpose",
         null=True,
@@ -158,7 +162,7 @@ class ApplicationSection(SerializableMixin, models.Model):
 
     @status.override
     def _(self) -> ApplicationSectionStatusChoice:
-        if self.application.application_round.application_period_end >= local_datetime():
+        if self.application.application_round.application_period_end > local_datetime():
             return ApplicationSectionStatusChoice.UNALLOCATED
 
         reservation_unit_options = list(
@@ -181,10 +185,18 @@ class ApplicationSection(SerializableMixin, models.Model):
 
         return ApplicationSectionStatusChoice.IN_ALLOCATION
 
-    @lookup_property(joins=["reservation_unit_options"], skip_codegen=True)
+    @lookup_property(skip_codegen=True)
     def allocations() -> int:
+        from .allocated_time_slot import AllocatedTimeSlot
+
         allocations = Coalesce(
-            models.Count("reservation_unit_options__allocated_time_slots"),
+            SubqueryCount(
+                queryset=(
+                    AllocatedTimeSlot.objects.filter(
+                        reservation_unit_option__application_section=models.OuterRef("id")
+                    ).values("id")
+                )
+            ),
             models.Value(0),
         )
         return allocations  # type: ignore[return-value]
@@ -200,17 +212,12 @@ class ApplicationSection(SerializableMixin, models.Model):
             ).values_list("num_of_allocations", flat=True)
         )
 
-    @lookup_property(joins=["reservation_unit_options"], skip_codegen=True)
+    @lookup_property(skip_codegen=True)
     def usable_reservation_unit_options() -> int:
+        from .reservation_unit_option import ReservationUnitOption
+
         usable_reservation_unit_options = Coalesce(
-            models.Count(
-                "reservation_unit_options",
-                # Only include reservation units that are not rejected or locked
-                filter=(
-                    models.Q(reservation_unit_options__rejected=False)
-                    & models.Q(reservation_unit_options__locked=False)
-                ),
-            ),
+            SubqueryCount(queryset=ReservationUnitOption.objects.filter(rejected=False, locked=False).values("id")),
             models.Value(0),
         )
         return usable_reservation_unit_options  # type: ignore[return-value]
