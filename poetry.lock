@@ -1314,13 +1314,13 @@ test = ["coveralls", "django-filter (>=22.1)", "djangorestframework (>=3.6.3)", 
 
 [[package]]
 name = "graphene-django-extensions"
-version = "0.2.14"
+version = "0.2.16"
 description = "Extensions for graphene-django"
 optional = false
 python-versions = ">=3.10,<4"
 files = [
-    {file = "graphene_django_extensions-0.2.14-py3-none-any.whl", hash = "sha256:72df6c1eeeabcf33de8d4875616513e4f80eae3d277e86d16ea2e34340492013"},
-    {file = "graphene_django_extensions-0.2.14.tar.gz", hash = "sha256:66a614a418cc1b567da9e6dfd55f3b8c320246569390a1613aab3a66034679b2"},
+    {file = "graphene_django_extensions-0.2.16-py3-none-any.whl", hash = "sha256:4d1615bebdedf691cba2a5b12585ee9f67412476d9fdca730f9ef3ecfefbd64c"},
+    {file = "graphene_django_extensions-0.2.16.tar.gz", hash = "sha256:91605bd69caff4b9a19857b60cc680cf06a4c8776848bbecbbc7a696cf2cbc1e"},
 ]
 
 [package.dependencies]
@@ -1329,7 +1329,7 @@ django-filter = ">=23.5"
 django-settings-holder = ">=0.1.2"
 djangorestframework = ">=3.14.0"
 graphene-django = ">=3.0.0"
-graphene-django-query-optimizer = ">=0.1.6"
+graphene-django-query-optimizer = ">=0.1.7"
 
 [package.extras]
 files = ["graphene-file-upload (>=1.3.0)"]
@@ -2928,4 +2928,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.12,<3.13"
-content-hash = "bc743c73a6ce09f697d527e9e3c8f0fd37201144556345103615498a74cc2160"
+content-hash = "db4c549ec7ee88a5187e6200ab61dfc9a3ed81e8a54b36252746d40b97c3e9f4"
