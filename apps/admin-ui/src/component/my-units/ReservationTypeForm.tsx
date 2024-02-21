@@ -1,7 +1,10 @@
 import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
-import { RadioButton, SelectionGroup, TextArea } from "hds-react";
-import type { ReservationUnitType } from "common/types/gql-types";
+import { Notification, RadioButton, SelectionGroup, TextArea } from "hds-react";
+import {
+  ReservationUnitsReservationUnitAuthenticationChoices,
+  ReservationUnitType,
+} from "common/types/gql-types";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { type ReservationFormType, ReservationTypes } from "app/schemas";
@@ -105,6 +108,18 @@ const ReservationTypeForm = ({
       )}
       {type !== undefined && type !== "BLOCKED" && (
         <>
+          {type === "BEHALF" &&
+            reservationUnit.authentication ===
+              ReservationUnitsReservationUnitAuthenticationChoices.Strong && (
+              <Element $wide>
+                <Notification
+                  label={t("reservationApplication:strongAuthentication.label")}
+                  type="info"
+                >
+                  {t("reservationApplication:strongAuthentication.info")}
+                </Notification>
+              </Element>
+            )}
           {!disableBufferToggle && (
             <BufferToggles
               before={reservationUnit.bufferTimeBefore ?? 0}

@@ -66,6 +66,7 @@ export const RESERVATION_UNIT_FRAGMENT = gql`
     bufferTimeBefore
     bufferTimeAfter
     reservationStartInterval
+    authentication
     unit {
       pk
       nameFi

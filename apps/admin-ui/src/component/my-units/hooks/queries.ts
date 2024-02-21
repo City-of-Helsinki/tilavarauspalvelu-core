@@ -84,6 +84,7 @@ export const RESERVATION_UNITS_BY_UNIT = gql`
           bufferTimeBefore
           bufferTimeAfter
           isDraft
+          authentication
           ...ReservationUnitReservations
         }
       }
