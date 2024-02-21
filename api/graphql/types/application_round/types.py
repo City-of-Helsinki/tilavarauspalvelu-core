@@ -1,7 +1,10 @@
 import graphene
+from django.db import models
 from graphene_django import DjangoListField
 from graphene_django_extensions import DjangoNode
 from graphene_django_extensions.fields import RelatedField
+from graphene_django_extensions.utils import get_fields_from_info, get_nested
+from lookup_property import L
 
 from api.graphql.types.application_round.filtersets import ApplicationRoundFilterSet
 from api.graphql.types.application_round.permissions import ApplicationRoundPermission
@@ -49,6 +52,20 @@ class ApplicationRoundNode(DjangoNode):
         ]
         filterset_class = ApplicationRoundFilterSet
         permission_classes = [ApplicationRoundPermission]
+
+    @classmethod
+    def filter_queryset(cls, queryset: models.QuerySet, info: GQLInfo) -> models.QuerySet:
+        return cls.optimize_computed_properties(queryset, info)
+
+    @classmethod
+    def optimize_computed_properties(cls, queryset: models.QuerySet, info: GQLInfo):
+        field_info = get_fields_from_info(info)
+        selections = get_nested(field_info, 0, "applicationRound", 0, "edges", 0, "node", 0, default=[])
+
+        if "status" in selections:
+            queryset = queryset.annotate(status=L("status"))
+
+        return queryset
 
     def resolve_applications_count(root: ApplicationRound, info: GQLInfo) -> int:
         return root.applications.all().reached_allocation().count()

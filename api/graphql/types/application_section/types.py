@@ -51,13 +51,7 @@ class ApplicationSectionNode(DjangoNode):
 
     @classmethod
     def filter_queryset(cls, queryset: models.QuerySet, info: GQLInfo) -> models.QuerySet:
-        field_info = get_fields_from_info(info)
-        selections = get_nested(field_info, "applicationSections", "edges", "node", default=[])
-        selections_with_typenames = get_nested(field_info, "applicationSections", 0, "edges", 0, "node", 0, default=[])
-        if "status" in selections or "status" in selections_with_typenames:
-            queryset = queryset.annotate(status=L("status"))
-        if "allocations" in selections or "allocations" in selections_with_typenames:
-            queryset = queryset.annotate(allocations=L("allocations"))
+        queryset = cls.optimize_computed_properties(queryset, info)
 
         units = get_units_where_can_view_applications(info.context.user)
         service_sectors = get_service_sectors_where_can_view_applications(info.context.user)
@@ -67,6 +61,18 @@ class ApplicationSectionNode(DjangoNode):
             | models.Q(reservation_unit_options__reservation_unit__unit__in=units)
             | models.Q(application__user=info.context.user)
         ).distinct()
+
+    @classmethod
+    def optimize_computed_properties(cls, queryset: models.QuerySet, info: GQLInfo):
+        field_info = get_fields_from_info(info)
+        selections = get_nested(field_info, 0, "applicationSections", 0, "edges", 0, "node", 0, default=[])
+
+        if "status" in selections:
+            queryset = queryset.annotate(status=L("status"))
+        if "allocations" in selections:
+            queryset = queryset.annotate(allocations=L("allocations"))
+
+        return queryset
 
     def resolve_related_application_sections(root: ApplicationSection, info: GQLInfo, **kwargs: Any) -> models.QuerySet:
         return root.actions.application_sections_affecting_allocations()
