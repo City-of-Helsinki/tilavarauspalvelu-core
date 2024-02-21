@@ -23,6 +23,7 @@ __all__ = [
     "ProxyUserSocialAuth",
     "ReservationNotification",
     "User",
+    "get_user",
 ]
 
 
@@ -255,6 +256,110 @@ class ProfileUser(SerializableMixin, User):
         return self
 
 
+def get_user(pk: int) -> User | None:
+    """
+    This method is called by python-social-auth and to fetch the user object during HTTP requests.
+    Any optimization for fetching the user should be done here.
+    """
+    from permissions.models import GeneralRolePermission, ServiceSectorRolePermission, UnitRolePermission
+
+    try:
+        # Annotate permissions to the user object, since they are used so often.
+        return User.objects.annotate(
+            # General Permissions in form: ["<permission>", ...]
+            _general_permissions=SubqueryArray(
+                queryset=(
+                    GeneralRolePermission.objects.filter(
+                        role__generalrole__user__pk=pk,
+                    ).values("permission")
+                ),
+                agg_field="permission",
+                distinct=True,
+                output_field=models.CharField(),
+                coalesce_output_type="varchar",
+            ),
+            # Unit Permissions in form: ["<id>,<id>:<permission>", ...]
+            _unit_permissions=SubqueryArray(
+                queryset=(
+                    UnitRolePermission.objects.filter(
+                        role__unitrole__user__pk=pk,
+                        role__unitrole__unit__isnull=False,
+                    )
+                    .alias(
+                        units=StringAgg(
+                            Cast("role__unitrole__unit", output_field=models.CharField()),
+                            delimiter=",",
+                        ),
+                    )
+                    .annotate(
+                        unit_to_permission=Concat(
+                            models.F("units"),
+                            models.Value(":"),
+                            models.F("permission"),
+                            output_field=models.CharField(),
+                        ),
+                    )
+                    .values("unit_to_permission")
+                ),
+                agg_field="unit_to_permission",
+                distinct=True,
+                output_field=models.CharField(),
+                coalesce_output_type="varchar",
+            ),
+            # Unit Group Permissions in form: ["<id>,<id>:<permission>", ...]
+            _unit_group_permissions=SubqueryArray(
+                queryset=(
+                    UnitRolePermission.objects.filter(
+                        role__unitrole__user__pk=pk,
+                        role__unitrole__unit_group__isnull=False,
+                    )
+                    .alias(
+                        unit_groups=StringAgg(
+                            Cast("role__unitrole__unit_group", output_field=models.CharField()),
+                            delimiter=",",
+                        ),
+                    )
+                    .annotate(
+                        unit_group_to_permission=Concat(
+                            models.F("unit_groups"),
+                            models.Value(":"),
+                            models.F("permission"),
+                            output_field=models.CharField(),
+                        ),
+                    )
+                    .values("unit_group_to_permission")
+                ),
+                agg_field="unit_group_to_permission",
+                distinct=True,
+                output_field=models.CharField(),
+                coalesce_output_type="varchar",
+            ),
+            # Service Sector Permissions in form: ["<id>:<permission>", ...]
+            _service_sector_permissions=SubqueryArray(
+                queryset=(
+                    ServiceSectorRolePermission.objects.filter(
+                        role__servicesectorrole__user__pk=pk,
+                    )
+                    .annotate(
+                        sector_to_permission=Concat(
+                            models.F("role__servicesectorrole__service_sector"),
+                            models.Value(":"),
+                            models.F("permission"),
+                            output_field=models.CharField(),
+                        ),
+                    )
+                    .values("sector_to_permission")
+                ),
+                agg_field="sector_to_permission",
+                distinct=True,
+                output_field=models.CharField(),
+                coalesce_output_type="varchar",
+            ),
+        ).get(pk=pk)
+    except User.DoesNotExist:
+        return None
+
+
 class ProxyUserSocialAuth(UserSocialAuth):
     """Overriden accessing get_user for optimizing request user fetching."""
 
@@ -263,107 +368,7 @@ class ProxyUserSocialAuth(UserSocialAuth):
 
     @classmethod
     def get_user(cls, pk: Any = None, **kwargs: Any) -> User | None:
-        """
-        This method is called by python-social-auth to fetch the user object during HTTP requests.
-        Any optimization for fetching the user should be done here.
-        """
-        from permissions.models import GeneralRolePermission, ServiceSectorRolePermission, UnitRolePermission
-
-        try:
-            # Annotate permissions to the user object, since they are used so often.
-            return User.objects.annotate(
-                # General Permissions in form: ["<permission>", ...]
-                _general_permissions=SubqueryArray(
-                    queryset=(
-                        GeneralRolePermission.objects.filter(
-                            role__generalrole__user__pk=pk,
-                        ).values("permission")
-                    ),
-                    agg_field="permission",
-                    distinct=True,
-                    output_field=models.CharField(),
-                    coalesce_output_type="varchar",
-                ),
-                # Unit Permissions in form: ["<id>,<id>:<permission>", ...]
-                _unit_permissions=SubqueryArray(
-                    queryset=(
-                        UnitRolePermission.objects.filter(
-                            role__unitrole__user__pk=pk,
-                            role__unitrole__unit__isnull=False,
-                        )
-                        .alias(
-                            units=StringAgg(
-                                Cast("role__unitrole__unit", output_field=models.CharField()),
-                                delimiter=",",
-                            ),
-                        )
-                        .annotate(
-                            unit_to_permission=Concat(
-                                models.F("units"),
-                                models.Value(":"),
-                                models.F("permission"),
-                                output_field=models.CharField(),
-                            ),
-                        )
-                        .values("unit_to_permission")
-                    ),
-                    agg_field="unit_to_permission",
-                    distinct=True,
-                    output_field=models.CharField(),
-                    coalesce_output_type="varchar",
-                ),
-                # Unit Group Permissions in form: ["<id>,<id>:<permission>", ...]
-                _unit_group_permissions=SubqueryArray(
-                    queryset=(
-                        UnitRolePermission.objects.filter(
-                            role__unitrole__user__pk=pk,
-                            role__unitrole__unit_group__isnull=False,
-                        )
-                        .alias(
-                            unit_groups=StringAgg(
-                                Cast("role__unitrole__unit_group", output_field=models.CharField()),
-                                delimiter=",",
-                            ),
-                        )
-                        .annotate(
-                            unit_group_to_permission=Concat(
-                                models.F("unit_groups"),
-                                models.Value(":"),
-                                models.F("permission"),
-                                output_field=models.CharField(),
-                            ),
-                        )
-                        .values("unit_group_to_permission")
-                    ),
-                    agg_field="unit_group_to_permission",
-                    distinct=True,
-                    output_field=models.CharField(),
-                    coalesce_output_type="varchar",
-                ),
-                # Service Sector Permissions in form: ["<id>:<permission>", ...]
-                _service_sector_permissions=SubqueryArray(
-                    queryset=(
-                        ServiceSectorRolePermission.objects.filter(
-                            role__servicesectorrole__user__pk=pk,
-                        )
-                        .annotate(
-                            sector_to_permission=Concat(
-                                models.F("role__servicesectorrole__service_sector"),
-                                models.Value(":"),
-                                models.F("permission"),
-                                output_field=models.CharField(),
-                            ),
-                        )
-                        .values("sector_to_permission")
-                    ),
-                    agg_field="sector_to_permission",
-                    distinct=True,
-                    output_field=models.CharField(),
-                    coalesce_output_type="varchar",
-                ),
-            ).get(pk=pk)
-        except User.DoesNotExist:
-            return None
+        return get_user(pk) if pk is not None else None
 
 
 class ProxyDjangoStorage(DjangoStorage):

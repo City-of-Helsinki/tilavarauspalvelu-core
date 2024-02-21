@@ -371,7 +371,7 @@ USE_TZ = True
 
 AUTHENTICATION_BACKENDS = [
     "helusers.tunnistamo_oidc.TunnistamoOIDCAuth",
-    "django.contrib.auth.backends.ModelBackend",
+    "tilavarauspalvelu.auth.ProxyModelBackend",
 ]
 
 LOGIN_REDIRECT_URL = "/admin/"
