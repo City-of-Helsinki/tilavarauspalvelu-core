@@ -56,11 +56,7 @@ class ApplicationNode(DjangoNode):
 
     @classmethod
     def filter_queryset(cls, queryset: models.QuerySet, info: GQLInfo) -> models.QuerySet:
-        field_info = get_fields_from_info(info)
-        selections = get_nested(field_info, "applications", "edges", "node", default=[])
-        selections_with_typenames = get_nested(field_info, "applications", 0, "edges", 0, "node", 0, default=[])
-        if "status" in selections or "status" in selections_with_typenames:
-            queryset = queryset.annotate(status=L("status"))
+        queryset = cls.optimize_computed_properties(queryset, info)
 
         units = get_units_where_can_view_applications(info.context.user)
         service_sectors = get_service_sectors_where_can_view_applications(info.context.user)
@@ -70,3 +66,13 @@ class ApplicationNode(DjangoNode):
             | models.Q(application_sections__reservation_unit_options__reservation_unit__unit__in=units)
             | models.Q(user=info.context.user)
         ).distinct()
+
+    @classmethod
+    def optimize_computed_properties(cls, queryset: models.QuerySet, info: GQLInfo):
+        field_info = get_fields_from_info(info)
+        selections = get_nested(field_info, 0, "applications", 0, "edges", 0, "node", 0, default=[])
+
+        if "status" in selections:
+            queryset = queryset.annotate(status=L("status"))
+
+        return queryset
