@@ -104,7 +104,6 @@ class Application(SerializableMixin, models.Model):
 
     @lookup_property(joins=["application_round"], skip_codegen=True)
     def status() -> ApplicationStatusChoice:
-        now = local_datetime()
         return models.Case(  # type: ignore[return-value]
             models.When(
                 # If there is a cancelled date
@@ -119,7 +118,7 @@ class Application(SerializableMixin, models.Model):
                     # NOTE: Some copy-pasta from Application Round status for efficiency
                     & models.Q(application_round__sent_date__isnull=True)
                     & models.Q(application_round__handled_date__isnull=True)
-                    & models.Q(application_round__application_period_end__gt=now)
+                    & models.Q(application_round__application_period_end__gt=local_datetime())
                 ),
                 then=models.Value(ApplicationStatusChoice.DRAFT.value),
             ),
@@ -142,7 +141,7 @@ class Application(SerializableMixin, models.Model):
             ),
             models.When(
                 # If the application round application period has not ended
-                models.Q(application_round__application_period_end__gt=now),
+                models.Q(application_round__application_period_end__gt=local_datetime()),
                 then=models.Value(ApplicationStatusChoice.RECEIVED.value),
             ),
             models.When(

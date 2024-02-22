@@ -80,7 +80,6 @@ class ApplicationRound(models.Model):
 
     @lookup_property(skip_codegen=True)
     def status() -> ApplicationRoundStatusChoice:
-        now = local_datetime()
         return models.Case(  # type: ignore[return-value]
             models.When(
                 models.Q(sent_date__isnull=False),
@@ -91,11 +90,11 @@ class ApplicationRound(models.Model):
                 then=models.Value(ApplicationRoundStatusChoice.HANDLED.value),
             ),
             models.When(
-                models.Q(application_period_begin__gt=now),
+                models.Q(application_period_begin__gt=local_datetime()),
                 then=models.Value(ApplicationRoundStatusChoice.UPCOMING.value),
             ),
             models.When(
-                models.Q(application_period_end__gt=now),
+                models.Q(application_period_end__gt=local_datetime()),
                 then=models.Value(ApplicationRoundStatusChoice.OPEN.value),
             ),
             default=models.Value(ApplicationRoundStatusChoice.IN_ALLOCATION.value),

@@ -61,7 +61,7 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
         """Create an upcoming application round."""
         kwargs.setdefault("sent_date", None)
         kwargs.setdefault("handled_date", None)
-        kwargs.setdefault("application_period_begin", utc_start_of_day() + timedelta(days=1))
+        kwargs.setdefault("application_period_begin", utc_start_of_day() + timedelta(days=2))
         return cls.create(**kwargs)
 
     @classmethod
@@ -69,8 +69,8 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
         """Create an open application round."""
         kwargs.setdefault("sent_date", None)
         kwargs.setdefault("handled_date", None)
-        kwargs.setdefault("application_period_begin", utc_start_of_day() - timedelta(days=1))
-        kwargs.setdefault("application_period_end", utc_start_of_day() + timedelta(days=1))
+        kwargs.setdefault("application_period_begin", utc_start_of_day() - timedelta(days=2))
+        kwargs.setdefault("application_period_end", utc_start_of_day() + timedelta(days=2))
         return cls.create(**kwargs)
 
     @classmethod
@@ -79,7 +79,7 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
         kwargs.setdefault("sent_date", None)
         kwargs.setdefault("handled_date", None)
         kwargs.setdefault("application_period_begin", utc_start_of_day() - timedelta(days=2))
-        kwargs.setdefault("application_period_end", utc_start_of_day() - timedelta(days=1))
+        kwargs.setdefault("application_period_end", utc_start_of_day() - timedelta(days=2))
         return cls.create(**kwargs)
 
     @classmethod
@@ -88,7 +88,7 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
         kwargs.setdefault("sent_date", None)
         kwargs.setdefault("handled_date", utc_start_of_day())
         kwargs.setdefault("application_period_begin", utc_start_of_day() - timedelta(days=2))
-        kwargs.setdefault("application_period_end", utc_start_of_day() - timedelta(days=1))
+        kwargs.setdefault("application_period_end", utc_start_of_day() - timedelta(days=2))
         return cls.create(**kwargs)
 
     @classmethod
@@ -97,7 +97,7 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
         kwargs.setdefault("sent_date", utc_start_of_day())
         kwargs.setdefault("handled_date", utc_start_of_day())
         kwargs.setdefault("application_period_begin", utc_start_of_day() - timedelta(days=2))
-        kwargs.setdefault("application_period_end", utc_start_of_day() - timedelta(days=1))
+        kwargs.setdefault("application_period_end", utc_start_of_day() - timedelta(days=2))
         return cls.create(**kwargs)
 
     @factory.post_generation

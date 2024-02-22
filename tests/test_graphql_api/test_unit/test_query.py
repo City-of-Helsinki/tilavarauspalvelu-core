@@ -121,7 +121,9 @@ def test_units__filter__by_published_reservation_units(graphql):
     ReservationUnitFactory.create(publish_begins=publish_date + datetime.timedelta(days=30), unit=unit_3)
 
     graphql.login_user_based_on_type(UserType.SUPERUSER)
-    response = graphql(units_query(published_reservation_units=True))
+
+    query = build_query("units", connection=True, published_reservation_units=True, order_by="name_fi")
+    response = graphql(query)
 
     assert response.has_errors is False
 
