@@ -4,8 +4,8 @@ import graphene
 from django.db import models
 from graphene_django_extensions import DjangoNode
 from graphene_django_extensions.fields import RelatedField
-from graphene_django_extensions.utils import get_fields_from_info, get_nested
 from lookup_property import L
+from query_optimizer.optimizer import required_annotations
 
 from api.graphql.types.application_section.filtersets import ApplicationSectionFilterSet
 from api.graphql.types.application_section.permissions import ApplicationSectionPermission
@@ -51,8 +51,6 @@ class ApplicationSectionNode(DjangoNode):
 
     @classmethod
     def filter_queryset(cls, queryset: models.QuerySet, info: GQLInfo) -> models.QuerySet:
-        queryset = cls.optimize_computed_properties(queryset, info)
-
         units = get_units_where_can_view_applications(info.context.user)
         service_sectors = get_service_sectors_where_can_view_applications(info.context.user)
 
@@ -62,17 +60,13 @@ class ApplicationSectionNode(DjangoNode):
             | models.Q(application__user=info.context.user)
         ).distinct()
 
-    @classmethod
-    def optimize_computed_properties(cls, queryset: models.QuerySet, info: GQLInfo):
-        field_info = get_fields_from_info(info)
-        selections = get_nested(field_info, 0, "applicationSections", 0, "edges", 0, "node", 0, default=[])
+    @required_annotations(status=L("status"))
+    def resolve_status(root: ApplicationSection, info: GQLInfo) -> ApplicationSectionStatusChoice:
+        return root.status
 
-        if "status" in selections:
-            queryset = queryset.annotate(status=L("status"))
-        if "allocations" in selections:
-            queryset = queryset.annotate(allocations=L("allocations"))
-
-        return queryset
+    @required_annotations(allocations=L("allocations"))
+    def resolve_allocations(root: ApplicationSection, info: GQLInfo) -> int:
+        return root.allocations
 
     def resolve_related_application_sections(root: ApplicationSection, info: GQLInfo, **kwargs: Any) -> models.QuerySet:
         return root.actions.application_sections_affecting_allocations()
