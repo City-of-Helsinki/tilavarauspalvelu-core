@@ -275,13 +275,13 @@ const SearchForm = ({
   );
   const durationMinuteOptions = () => {
     const durations: OptionType[] = [];
-    let minute = 15; // no zero duration option, as all available reservations have a positive/non-zero duration
+    let minute = 30; // no zero duration option, as all available reservations have a positive/non-zero duration
     while (minute <= 90) {
       durations.push({
         label: t("common:minute_other", { count: minute }),
         value: minute,
       });
-      minute += 15;
+      minute += 30;
     }
     return durations;
   };
