@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 from django.db import models
+from lookup_property import L
 
 from applications.choices import Weekday
 from common.date_utils import TimeSlot, merge_time_slots
@@ -33,3 +34,6 @@ class SuitableTimeRangeQuerySet(models.QuerySet):
         # If the given time slot fits fully in any of the existing merged time ranges,
         # it can be allocated. Otherwise, it cannot be allocated.
         return any(begin_time >= slot["begin_time"] and end_time <= slot["end_time"] for slot in merged)
+
+    def fulfilled(self, value: bool) -> Self:
+        return self.filter(L(fulfilled=value))

@@ -1121,3 +1121,54 @@ def test_application_section__filter__reservation_unit_options__preferred_order(
     assert len(response.edges) == 2, response
     assert response.node(0) == {"pk": section_1.pk, "reservationUnitOptions": [{"preferredOrder": 0}]}
     assert response.node(1) == {"pk": section_2.pk, "reservationUnitOptions": []}
+
+
+def test_application_section__filter__suitable_time_ranges__by_fulfilled(graphql):
+    # given:
+    # - There is an application section with an allocated time slot on Monday,
+    #   and two suitable time ranges for Monday and Tuesday.
+    # - A superuser is using the system
+    section = ApplicationSectionFactory.create_in_status_unallocated(
+        reservation_unit_options__allocated_time_slots__day_of_the_week=Weekday.MONDAY,
+    )
+    time_range_1 = SuitableTimeRangeFactory.create(application_section=section, day_of_the_week=Weekday.MONDAY)
+    time_range_2 = SuitableTimeRangeFactory.create(application_section=section, day_of_the_week=Weekday.TUESDAY)
+    graphql.login_with_superuser()
+
+    fields = """
+        pk
+        suitableTimeRanges {
+            pk
+            dayOfTheWeek
+        }
+    """
+
+    # when:
+    # - User tries to filter only to fulfilled suitable time ranges
+    query = sections_query(fields=fields, suitable_time_ranges__fulfilled=True)
+    response = graphql(query)
+
+    # then:
+    # - The response contains only the suitable time ranges that are fulfilled
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {
+        "pk": section.pk,
+        "suitableTimeRanges": [
+            {"pk": time_range_1.pk, "dayOfTheWeek": Weekday.MONDAY.value},
+        ],
+    }
+
+    # when:
+    # - User tries to filter only to unfulfilled suitable time ranges
+    query = sections_query(fields=fields, suitable_time_ranges__fulfilled=False)
+    response = graphql(query)
+
+    # then:
+    # - The response contains only the suitable time ranges that are not fulfilled
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {
+        "pk": section.pk,
+        "suitableTimeRanges": [
+            {"pk": time_range_2.pk, "dayOfTheWeek": Weekday.TUESDAY.value},
+        ],
+    }

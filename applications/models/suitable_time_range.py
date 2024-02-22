@@ -5,8 +5,9 @@ from typing import TYPE_CHECKING
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from lookup_property import L, lookup_property
 
-from applications.choices import Priority, Weekday
+from applications.choices import ApplicationSectionStatusChoice, Priority, Weekday
 from applications.querysets.suitable_time_range import SuitableTimeRangeQuerySet
 from common.connectors import SuitableTimeRangeActionsConnector
 from common.fields.model import StrChoiceField
@@ -57,3 +58,41 @@ class SuitableTimeRange(models.Model):
 
     def __str__(self) -> str:
         return f"{self.day_of_the_week} {self.begin_time.isoformat()}-{self.end_time.isoformat()}"
+
+    @lookup_property(joins=["application_section"], skip_codegen=True)
+    def fulfilled() -> bool:
+        from .allocated_time_slot import AllocatedTimeSlot
+
+        fulfilled = models.Case(
+            models.When(
+                ~models.Q(
+                    L(
+                        application_section__status__in=[
+                            ApplicationSectionStatusChoice.UNALLOCATED,
+                            ApplicationSectionStatusChoice.IN_ALLOCATION,
+                        ]
+                    )
+                ),
+                then=models.Value(True),
+            ),
+            default=models.Exists(
+                AllocatedTimeSlot.objects.filter(
+                    day_of_the_week=models.OuterRef("day_of_the_week"),
+                    reservation_unit_option__application_section=models.OuterRef("application_section"),
+                )
+            ),
+            output_field=models.BooleanField(),
+        )
+        return fulfilled  # type: ignore[return-value]
+
+    @fulfilled.override
+    def _(self) -> bool:
+        if not self.application_section.status.can_allocate:
+            return True
+
+        from .allocated_time_slot import AllocatedTimeSlot
+
+        return AllocatedTimeSlot.objects.filter(
+            day_of_the_week=self.day_of_the_week,
+            reservation_unit_option__application_section=self.application_section,
+        ).exists()

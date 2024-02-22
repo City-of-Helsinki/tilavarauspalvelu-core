@@ -1,11 +1,13 @@
 from django.db import models
 
 __all__ = [
+    "AllocatedTimeSlotActionsConnector",
     "ApplicationActionsConnector",
-    "ApplicationSectionActionsConnector",
     "ApplicationRoundActionsConnector",
-    "ReservationUnitActionsConnector",
+    "ApplicationSectionActionsConnector",
     "ReservationActionsConnector",
+    "ReservationUnitActionsConnector",
+    "SuitableTimeRangeActionsConnector",
 ]
 
 
