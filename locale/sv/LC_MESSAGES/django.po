@@ -450,8 +450,7 @@ msgstr "Varausten alkupäivän täytyy olla ennen niiden loppupäivää."
 #: applications/models/application_section.py
 msgid ""
 "Reservation min duration cannot be greater than reservation max duration."
-msgstr ""
-"Varauten minimikesto ei voi olla niiden maksimikestoa suurempi."
+msgstr "Varauten minimikesto ei voi olla niiden maksimikestoa suurempi."
 
 #: applications/models/application_section.py
 msgid "Can only apply from 1 to 7 reservations per week."
@@ -462,8 +461,8 @@ msgid ""
 "Reservation min and max durations must be multiples of 30 minutes, up to a "
 "maximum of 24 hours."
 msgstr ""
-"Varausten minimi ja maksimikestojen täytyy olla jaollinen 30 minuutilla, "
-"ja alle 24 tuntia."
+"Varausten minimi ja maksimikestojen täytyy olla jaollinen 30 minuutilla, ja "
+"alle 24 tuntia."
 
 #: applications/models/organization.py
 msgid "is after current year"

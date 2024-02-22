@@ -14,8 +14,8 @@ def test_can_query_application_rounds__all_fields(graphql):
     # given:
     # - There are two application rounds
     # - A superuser is using the system
-    application_round = ApplicationRoundFactory.create()
-    ApplicationRoundFactory.create()
+    application_round = ApplicationRoundFactory.create_in_status_open()
+    ApplicationRoundFactory.create_in_status_open()
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     fields = """
