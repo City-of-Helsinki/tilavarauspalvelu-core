@@ -23,6 +23,7 @@ import Head from "@/components/reservations/Head";
 import { CenterSpinner } from "@/components/common/common";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { toApiDate } from "common/src/common/util";
+import { addDays } from "date-fns";
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { locale } = ctx;
@@ -106,8 +107,9 @@ const Reservations = (): JSX.Element | null => {
             ],
       orderBy: tab === "upcoming" ? "begin" : "-begin",
       user: currentUser?.pk?.toString(),
+      // NOTE today's reservations are always shown in upcoming (even when they are in the past)
       beginDate: tab === "upcoming" ? toApiDate(today) : undefined,
-      endDate: tab === "past" ? toApiDate(today) : undefined,
+      endDate: tab === "past" ? toApiDate(addDays(today, -1)) : undefined,
     },
   });
 
