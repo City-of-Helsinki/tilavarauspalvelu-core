@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 from django.db import models
 from django.db.models import Manager
-from django.db.models.functions import Coalesce
+from django.db.models.functions import Coalesce, Now
 from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
 from lookup_property import L, lookup_property
@@ -140,7 +140,7 @@ class ApplicationSection(SerializableMixin, models.Model):
         status = models.Case(
             models.When(
                 # The application round has not yet moved to the allocation stage
-                models.Q(application__application_round__application_period_end__gte=local_datetime()),
+                models.Q(application__application_round__application_period_end__gte=Now()),
                 then=models.Value(ApplicationSectionStatusChoice.UNALLOCATED.value),
             ),
             models.When(

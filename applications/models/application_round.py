@@ -2,6 +2,7 @@ import logging
 from datetime import date, datetime
 
 from django.db import models
+from django.db.models.functions import Now
 from lookup_property import lookup_property
 
 from applications.choices import ApplicationRoundStatusChoice, TargetGroupChoice
@@ -90,11 +91,11 @@ class ApplicationRound(models.Model):
                 then=models.Value(ApplicationRoundStatusChoice.HANDLED.value),
             ),
             models.When(
-                models.Q(application_period_begin__gt=local_datetime()),
+                models.Q(application_period_begin__gt=Now()),
                 then=models.Value(ApplicationRoundStatusChoice.UPCOMING.value),
             ),
             models.When(
-                models.Q(application_period_end__gt=local_datetime()),
+                models.Q(application_period_end__gt=Now()),
                 then=models.Value(ApplicationRoundStatusChoice.OPEN.value),
             ),
             default=models.Value(ApplicationRoundStatusChoice.IN_ALLOCATION.value),
