@@ -350,6 +350,7 @@ const Step1 = ({
           type="submit"
           iconRight={<IconArrowRight aria-hidden />}
           data-test="reservation__button--update"
+          isLoading={isSubmitted}
         >
           {t(
             `reservationCalendar:${

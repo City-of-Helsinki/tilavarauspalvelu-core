@@ -22,6 +22,8 @@ export const ActionContainer = styled.div`
   @media (min-width: ${breakpoints.s}) {
     & > button:first-of-type {
       order: 1;
+      {/* set min-width so the buttons retains their placements even when isLoading is triggered */}
+      min-width: 130px;
     }
 
     display: flex;
