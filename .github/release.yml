@@ -1,0 +1,20 @@
+
+changelog:
+  categories:
+    - title: Features
+      labels:
+        - "*"
+      exclude:
+        labels:
+          - bug
+          - maintenance
+          - dependencies
+    - title: Fixes
+      labels:
+        - bug
+    - title: Maintenance
+      labels:
+        - maintenance
+    - title: Automated
+      labels:
+        - dependencies
