@@ -1,8 +1,8 @@
 import graphene
 from django.db import models
 from graphene_django_extensions import DjangoNode
-from graphene_django_extensions.utils import get_fields_from_info, get_nested
 from lookup_property import L
+from query_optimizer.optimizer import required_annotations
 
 from api.graphql.types.application.filtersets import ApplicationFilterSet
 from api.graphql.types.application.permissions import ApplicationPermission
@@ -56,8 +56,6 @@ class ApplicationNode(DjangoNode):
 
     @classmethod
     def filter_queryset(cls, queryset: models.QuerySet, info: GQLInfo) -> models.QuerySet:
-        queryset = cls.optimize_computed_properties(queryset, info)
-
         units = get_units_where_can_view_applications(info.context.user)
         service_sectors = get_service_sectors_where_can_view_applications(info.context.user)
 
@@ -67,12 +65,6 @@ class ApplicationNode(DjangoNode):
             | models.Q(user=info.context.user)
         ).distinct()
 
-    @classmethod
-    def optimize_computed_properties(cls, queryset: models.QuerySet, info: GQLInfo):
-        field_info = get_fields_from_info(info)
-        selections = get_nested(field_info, 0, "applications", 0, "edges", 0, "node", 0, default=[])
-
-        if "status" in selections:
-            queryset = queryset.annotate(status=L("status"))
-
-        return queryset
+    @required_annotations(status=L("status"))
+    def resolve_status(root: Application, info: GQLInfo) -> ApplicationStatusChoice:
+        return root.status
