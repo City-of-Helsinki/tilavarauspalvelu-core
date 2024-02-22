@@ -53,6 +53,7 @@ def test_application_section__query__all_fields(graphql):
             dayOfTheWeek
             beginTime
             endTime
+            fulfilled
         }
         status
     """
@@ -97,6 +98,7 @@ def test_application_section__query__all_fields(graphql):
                 "dayOfTheWeek": suitable_time_range.day_of_the_week,
                 "beginTime": suitable_time_range.begin_time.isoformat(),
                 "endTime": suitable_time_range.end_time.isoformat(),
+                "fulfilled": suitable_time_range.fulfilled,
             },
         ],
         "status": section.status.value,
