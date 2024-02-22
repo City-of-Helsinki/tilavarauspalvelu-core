@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from django.db import models
-from django.db.models.functions import Concat
+from django.db.models.functions import Concat, Now
 from django.db.models.manager import Manager
 from helsinki_gdpr.models import SerializableMixin
 from lookup_property import L, lookup_property
@@ -14,7 +14,6 @@ from applications.choices import (
 )
 from applications.querysets.application import ApplicationQuerySet
 from common.connectors import ApplicationActionsConnector
-from common.date_utils import local_datetime
 from common.fields.model import StrChoiceField
 
 __all__ = [
@@ -118,7 +117,7 @@ class Application(SerializableMixin, models.Model):
                     # NOTE: Some copy-pasta from Application Round status for efficiency
                     & models.Q(application_round__sent_date__isnull=True)
                     & models.Q(application_round__handled_date__isnull=True)
-                    & models.Q(application_round__application_period_end__gt=local_datetime())
+                    & models.Q(application_round__application_period_end__gt=Now())
                 ),
                 then=models.Value(ApplicationStatusChoice.DRAFT.value),
             ),
@@ -141,7 +140,7 @@ class Application(SerializableMixin, models.Model):
             ),
             models.When(
                 # If the application round application period has not ended
-                models.Q(application_round__application_period_end__gt=local_datetime()),
+                models.Q(application_round__application_period_end__gt=Now()),
                 then=models.Value(ApplicationStatusChoice.RECEIVED.value),
             ),
             models.When(
