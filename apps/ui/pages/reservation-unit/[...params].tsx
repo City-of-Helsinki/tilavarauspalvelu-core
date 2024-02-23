@@ -14,7 +14,6 @@ import { fontRegular, H2 } from "common/src/common/typography";
 import {
   Query,
   QueryReservationUnitByPkArgs,
-  QueryTermsOfUseArgs,
   QueryReservationByPkArgs,
   ReservationConfirmMutationInput,
   ReservationConfirmMutationPayload,
@@ -24,7 +23,6 @@ import {
   ReservationUpdateMutationInput,
   ReservationUpdateMutationPayload,
   ReserveeType,
-  TermsType,
   State,
 } from "common/types/gql-types";
 import { Inputs } from "common/src/reservation-form/types";
@@ -42,10 +40,7 @@ import {
   printErrorMessages,
   reservationsUrl,
 } from "@/modules/util";
-import {
-  RESERVATION_UNIT,
-  TERMS_OF_USE,
-} from "@/modules/queries/reservationUnit";
+import { RESERVATION_UNIT } from "@/modules/queries/reservationUnit";
 import {
   CONFIRM_RESERVATION,
   DELETE_RESERVATION,
@@ -66,7 +61,10 @@ import { ReservationStep } from "@/modules/types";
 import { JustForDesktop } from "@/modules/style/layout";
 import { PinkBox } from "@/components/reservation-unit/ReservationUnitStyles";
 import { Toast } from "@/styles/util";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
+import {
+  getCommonServerSideProps,
+  getGenericTerms,
+} from "@/modules/serverUtils";
 import { filterNonNullable } from "common/src/helpers";
 import { OPTIONS_QUERY } from "@/hooks/useOptions";
 
@@ -89,20 +87,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       fetchPolicy: "no-cache",
     });
 
-    const { data: genericTermsData } = await apolloClient.query<
-      Query,
-      QueryTermsOfUseArgs
-    >({
-      query: TERMS_OF_USE,
-      fetchPolicy: "no-cache",
-      variables: {
-        termsType: TermsType.GenericTerms,
-      },
-    });
-    const genericTerms =
-      genericTermsData.termsOfUse?.edges
-        ?.map((n) => n?.node)
-        .find((n) => n?.pk === "booking") ?? null;
+    const genericTerms = await getGenericTerms(apolloClient);
 
     const { data: paramsData } = await apolloClient.query<Query>({
       query: OPTIONS_QUERY,

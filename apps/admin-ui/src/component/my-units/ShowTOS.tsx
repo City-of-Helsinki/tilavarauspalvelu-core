@@ -1,14 +1,8 @@
 import React from "react";
 import styled from "styled-components";
-import {
-  QueryTermsOfUseArgs,
-  TermsOfUseType,
-  Query,
-  TermsType,
-  ReservationUnitType,
-} from "common/types/gql-types";
-import { gql, useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
+import { type ReservationUnitType } from "common/types/gql-types";
+import { useGenericTerms } from "common/src/hooks/useGenericTerms";
 
 // NOTE This is partial duplicate from ui/application/Preview.tsx
 // see if we can combine them (and other Terms later with parameters)
@@ -34,40 +28,6 @@ const TOSElement = ({ title, text }: { title: string; text: string }) => (
     <p>{text}</p>
   </Terms>
 );
-
-const TERMS_OF_USE = gql`
-  query TermsOfUse($termsType: TermsType) {
-    termsOfUse(termsType: $termsType) {
-      edges {
-        node {
-          pk
-          nameFi
-          nameEn
-          nameSv
-          textFi
-          textEn
-          textSv
-          termsType
-        }
-      }
-    }
-  }
-`;
-
-const useGenericTerms = () => {
-  const { data } = useQuery<Query, QueryTermsOfUseArgs>(TERMS_OF_USE, {
-    variables: {
-      termsType: TermsType.GenericTerms,
-    },
-  });
-
-  const genericTerms = data?.termsOfUse?.edges
-    ?.map((n) => n?.node)
-    ?.filter((n): n is TermsOfUseType => n != null)
-    .find((n) => n.pk != null && ["booking"].includes(n.pk));
-
-  return genericTerms;
-};
 
 const ShowTOS = ({
   reservationUnit,

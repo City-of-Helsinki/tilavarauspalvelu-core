@@ -1,11 +1,7 @@
-import { useQuery } from "@apollo/client";
 import {
-  Query,
-  QueryTermsOfUseArgs,
-  ReservationType,
-  ReservationUnitByPkType,
+  type ReservationType,
+  type ReservationUnitByPkType,
   ReserveeType,
-  TermsType,
 } from "common/types/gql-types";
 import { IconArrowLeft, IconCross, LoadingSpinner } from "hds-react";
 import { get } from "lodash";
@@ -20,12 +16,12 @@ import React, { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import TermsBox from "common/src/termsbox/TermsBox";
-import { TERMS_OF_USE } from "@/modules/queries/reservationUnit";
 import { capitalize, getTranslation } from "@/modules/util";
 import Sanitize from "../common/Sanitize";
 import { BlackButton, MediumButton } from "@/styles/util";
 import { reservationsPrefix } from "@/modules/const";
 import { filterNonNullable } from "common/src/helpers";
+import { useGenericTerms } from "common/src/hooks/useGenericTerms";
 
 type Props = {
   reservation: ReservationType;
@@ -84,20 +80,9 @@ const EditStep1 = ({
   const { t } = useTranslation();
   const router = useRouter();
 
-  const [hasTermsOfUse, setHasTermsOfUse] = useState<boolean>();
-
-  useQuery<Query, QueryTermsOfUseArgs>(TERMS_OF_USE, {
-    variables: {
-      termsType: TermsType.GenericTerms,
-    },
-    onCompleted: (data) => {
-      const result =
-        data.termsOfUse?.edges
-          .map((n) => n?.node)
-          .find((n) => n?.pk === "booking") || undefined;
-      setHasTermsOfUse(Boolean(result));
-    },
-  });
+  // TODO should use SSR for this
+  const genericTerms = useGenericTerms();
+  const hasTermsOfUse = genericTerms != null;
 
   const frozenReservationUnit = useMemo(() => {
     return (

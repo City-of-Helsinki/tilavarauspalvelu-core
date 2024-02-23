@@ -5,32 +5,34 @@ import { useMutation } from "@apollo/client";
 import type {
   Mutation,
   MutationSendApplicationArgs,
-  QueryTermsOfUseArgs,
-  Query,
 } from "common/types/gql-types";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Error from "next/error";
-import { filterNonNullable } from "common/src/helpers";
 import { SEND_APPLICATION_MUTATION } from "@/modules/queries/application";
 import { MediumButton } from "@/styles/util";
 import { ButtonContainer, CenterSpinner } from "@/components/common/common";
 import { ViewInner } from "@/components/application/ViewInner";
-import { TERMS_OF_USE } from "@/modules/queries/reservationUnit";
 import { createApolloClient } from "@/modules/apolloClient";
 import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
 import { useApplicationQuery } from "@/hooks/useApplicationQuery";
 import { ErrorToast } from "@/components/common/ErrorToast";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
+import {
+  getCommonServerSideProps,
+  getGenericTerms,
+} from "@/modules/serverUtils";
+
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
 // User has to accept the terms of service then on submit we change the application status
 // This uses separate Send mutation (not update) so no onNext like the other pages
 // we could also remove the FormContext here
-const Preview = (props: Props): JSX.Element => {
-  const { id, tos } = props;
+function Preview(props: PropsNarrowed): JSX.Element {
+  const { pk, tos } = props;
 
   const { application, error, isLoading } = useApplicationQuery(
-    id ?? undefined
+    pk ?? undefined
   );
 
   const [acceptTermsOfUse, setAcceptTermsOfUse] = useState(false);
@@ -48,7 +50,7 @@ const Preview = (props: Props): JSX.Element => {
     if (!acceptTermsOfUse) {
       return;
     }
-    if (!id) {
+    if (!pk) {
       // eslint-disable-next-line no-console
       console.error("no pk in values");
       return;
@@ -56,7 +58,7 @@ const Preview = (props: Props): JSX.Element => {
     const { data, errors } = await send({
       variables: {
         input: {
-          pk: id,
+          pk,
         },
       },
     });
@@ -78,7 +80,7 @@ const Preview = (props: Props): JSX.Element => {
     // TODO error
   };
 
-  if (id == null) {
+  if (pk == null) {
     return <Error statusCode={404} />;
   }
   if (error) {
@@ -126,25 +128,14 @@ const Preview = (props: Props): JSX.Element => {
       </form>
     </ApplicationPageWrapper>
   );
-};
+}
 
-type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
-
-export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale } = ctx;
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
-  const { data: tosData } = await apolloClient.query<
-    Query,
-    QueryTermsOfUseArgs
-  >({
-    query: TERMS_OF_USE,
-  });
-
-  const tos = filterNonNullable(
-    tosData?.termsOfUse?.edges?.map((e) => e?.node)
-  ).filter((n) => n?.pk === "KUVAnupa" || n?.pk === "booking");
+  const tos = await getGenericTerms(apolloClient);
 
   // TODO should fetch on SSR but we need authentication for it
   const { query } = ctx;
@@ -152,15 +143,25 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const pkstring = Array.isArray(id) ? id[0] : id;
   const pk = Number.isNaN(Number(pkstring)) ? null : Number(pkstring);
 
+  if (pk == null) {
+    return {
+      props: {
+        notFound: true,
+        ...commonProps,
+      },
+      notFound: true,
+    };
+  }
+
   return {
     props: {
       ...commonProps,
       key: locale,
-      id: pk,
+      pk,
       tos,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
-};
+}
 
 export default Preview;

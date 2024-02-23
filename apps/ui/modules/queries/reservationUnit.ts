@@ -1,6 +1,8 @@
 import { gql } from "@apollo/client";
 import { IMAGE_FRAGMENT } from "common/src/queries/fragments";
 
+export { TERMS_OF_USE } from "common/src/queries/terms";
+
 export const RESERVATION_UNIT = gql`
   ${IMAGE_FRAGMENT}
   query ReservationUnit($pk: Int!) {
@@ -337,25 +339,6 @@ export const OPENING_HOURS = gql`
         calendarUrl
         bufferTimeBefore
         bufferTimeAfter
-      }
-    }
-  }
-`;
-
-export const TERMS_OF_USE = gql`
-  query TermsOfUse($termsType: TermsOfUseTermsOfUseTermsTypeChoices) {
-    termsOfUse(termsType: $termsType) {
-      edges {
-        node {
-          pk
-          nameFi
-          nameEn
-          nameSv
-          textFi
-          textEn
-          textSv
-          termsType
-        }
       }
     }
   }

@@ -16,14 +16,15 @@ export const ViewInner = ({
   setAcceptTermsOfUse,
 }: {
   application: ApplicationNode;
-  tos: TermsOfUseType[];
+  tos: TermsOfUseType | null;
   acceptTermsOfUse?: boolean;
   setAcceptTermsOfUse?: (value: boolean) => void;
 }): JSX.Element => {
   const { t } = useTranslation();
 
-  const tos1 = tos.find((n) => n.pk === "booking");
-  const tos2 = tos.find((n) => n.pk === "KUVAnupa");
+  // FIXME why is KUVAnupa hardcoded here? and why it's only needed for the application
+  // TODO do we need two different terms of use here? or do we need to select the correct one in the query?
+  // const tos2 = tos.find((n) => n.pk === "KUVAnupa");
 
   return (
     <>
@@ -37,11 +38,11 @@ export const ViewInner = ({
       </Accordion>
       <ApplicationEventList application={application} />
       <FormSubHeading>{t("reservationUnit:termsOfUse")}</FormSubHeading>
-      {tos1 && <Terms tabIndex={0}>{getTranslation(tos1, "text")}</Terms>}
+      {tos && <Terms tabIndex={0}>{getTranslation(tos, "text")}</Terms>}
       <FormSubHeading>
         {t("application:preview.reservationUnitTerms")}
       </FormSubHeading>
-      {tos2 && <Terms tabIndex={0}>{getTranslation(tos2, "text")}</Terms>}
+      {/* tos2 && <Terms tabIndex={0}>{getTranslation(tos2, "text")}</Terms>*/}
       {acceptTermsOfUse != null && setAcceptTermsOfUse != null && (
         <CheckboxContainer>
           <Checkbox

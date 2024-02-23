@@ -2,19 +2,19 @@ import React from "react";
 import Error from "next/error";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
-import type { Query, QueryTermsOfUseArgs } from "common/types/gql-types";
 import { getTranslation } from "common/src/common/util";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { filterNonNullable } from "common/src/helpers";
 import { BlackButton } from "@/styles/util";
 import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
 import { createApolloClient } from "@/modules/apolloClient";
-import { TERMS_OF_USE } from "@/modules/queries/reservationUnit";
 import { ViewInner } from "@/components/application/ViewInner";
 import { ButtonContainer, CenterSpinner } from "@/components/common/common";
 import { useApplicationQuery } from "@/hooks/useApplicationQuery";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
+import {
+  getCommonServerSideProps,
+  getGenericTerms,
+} from "@/modules/serverUtils";
 
 const View = ({ id, tos }: Props): JSX.Element => {
   const { t } = useTranslation();
@@ -66,16 +66,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
-  const { data: tosData } = await apolloClient.query<
-    Query,
-    QueryTermsOfUseArgs
-  >({
-    query: TERMS_OF_USE,
-  });
-
-  const tos = filterNonNullable(
-    tosData?.termsOfUse?.edges?.map((e) => e?.node)
-  ).filter((n) => n?.pk === "KUVAnupa" || n?.pk === "booking");
+  const tos = await getGenericTerms(apolloClient);
 
   // TODO should fetch on SSR but we need authentication for it
   const { query } = ctx;

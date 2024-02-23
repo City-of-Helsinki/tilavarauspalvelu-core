@@ -43,7 +43,6 @@ import {
   QueryReservationsArgs,
   QueryReservationUnitByPkArgs,
   QueryReservationUnitsArgs,
-  QueryTermsOfUseArgs,
   ReservationCreateMutationInput,
   ReservationCreateMutationPayload,
   ReservationType,
@@ -51,8 +50,6 @@ import {
   ReservationUnitByPkTypeReservationsArgs,
   ReservationUnitType,
   State,
-  TermsOfUseType,
-  TermsType,
 } from "common/types/gql-types";
 import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
 import Head from "../../components/reservation-unit/Head";
@@ -74,7 +71,6 @@ import {
   OPENING_HOURS,
   RELATED_RESERVATION_UNITS,
   RESERVATION_UNIT,
-  TERMS_OF_USE,
 } from "@/modules/queries/reservationUnit";
 import { ReservationProps } from "@/context/DataContext";
 import {
@@ -112,10 +108,12 @@ import QuickReservation, {
 } from "@/components/reservation-unit/QuickReservation";
 import ReservationInfoContainer from "@/components/reservation-unit/ReservationInfoContainer";
 import { useCurrentUser } from "@/hooks/user";
-import { genericTermsVariant } from "@/modules/const";
 import { APPLICATION_ROUNDS_PERIODS } from "@/modules/queries/applicationRound";
 import { CenterSpinner } from "@/components/common/common";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
+import {
+  getCommonServerSideProps,
+  getGenericTerms,
+} from "@/modules/serverUtils";
 import { eventStyleGetter } from "@/components/common/calendarUtils";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
@@ -187,21 +185,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       };
     }
 
-    const { data: genericTermsData } = await apolloClient.query<
-      Query,
-      QueryTermsOfUseArgs
-    >({
-      query: TERMS_OF_USE,
-      fetchPolicy: "no-cache",
-      variables: {
-        termsType: TermsType.GenericTerms,
-      },
-    });
-    const bookingTerms: TermsOfUseType | null =
-      genericTermsData.termsOfUse?.edges
-        ?.map((e) => e?.node)
-        .filter((n): n is NonNullable<typeof n> => n != null)
-        .find((edge) => edge.pk === genericTermsVariant.BOOKING) ?? null;
+    const bookingTerms = await getGenericTerms(apolloClient);
 
     const startDate = today;
     const endDate = addYears(today, 2);

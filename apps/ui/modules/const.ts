@@ -4,6 +4,7 @@ import { MapboxStyle } from "react-map-gl";
 
 export { isBrowser } from "common/src/helpers";
 export { getSignInUrl, getSignOutUrl } from "common/src/urlBuilder";
+export { genericTermsVariant } from "common/src/const";
 
 export const reservationUnitPrefix = "/reservation-unit";
 export const searchPrefix = "/search";
@@ -145,10 +146,3 @@ if (!isBrowser && !env.SKIP_ENV_VALIDATION) {
   }
 }
 */
-
-export const genericTermsVariant = {
-  BOOKING: "booking",
-  SERVICE: "service",
-  PRIVACY: "privacy",
-  ACCESSIBILITY: "accessibility",
-};

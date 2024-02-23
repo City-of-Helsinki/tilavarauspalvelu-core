@@ -15,19 +15,16 @@ import { H2, H4, fontRegular } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
   type Query,
-  type QueryTermsOfUseArgs,
   type QueryReservationByPkArgs,
   ReserveeType,
-  TermsType,
   State,
 } from "common/types/gql-types";
 import { parseISO } from "date-fns";
 import Link from "next/link";
 import { Container } from "common";
-import { filterNonNullable } from "common/src/helpers";
 import { useSession } from "@/hooks/auth";
 import { useOrder } from "@/hooks/reservation";
-import { genericTermsVariant, reservationUnitPath } from "@/modules/const";
+import { reservationUnitPath } from "@/modules/const";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getTranslation, reservationsUrl } from "@/modules/util";
 import { BlackButton } from "@/styles/util";
@@ -42,7 +39,6 @@ import {
   getReservationCancellationReason,
   getReservationValue,
 } from "@/modules/reservation";
-import { TERMS_OF_USE } from "@/modules/queries/reservationUnit";
 import {
   getReservationUnitInstructionsKey,
   getReservationUnitName,
@@ -53,7 +49,10 @@ import { ReservationStatus } from "@/components/reservation/ReservationStatus";
 import { AddressSection } from "@/components/reservation-unit/Address";
 import ReservationInfoCard from "@/components/reservation/ReservationInfoCard";
 import { ReservationOrderStatus } from "@/components/reservation/ReservationOrderStatus";
-import { getCommonServerSideProps } from "@/modules/serverUtils";
+import {
+  getCommonServerSideProps,
+  getGenericTerms,
+} from "@/modules/serverUtils";
 import { GET_RESERVATION } from "@/modules/queries/reservation";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
@@ -66,18 +65,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
   if (isFinite(id)) {
-    const { data: genericTermsData } = await apolloClient.query<
-      Query,
-      QueryTermsOfUseArgs
-    >({
-      query: TERMS_OF_USE,
-      variables: {
-        termsType: TermsType.GenericTerms,
-      },
-    });
-    const bookingTerms = filterNonNullable(
-      genericTermsData?.termsOfUse?.edges?.map((e) => e?.node)
-    ).find((edge) => edge.pk === genericTermsVariant.BOOKING);
+    const bookingTerms = await getGenericTerms(apolloClient);
 
     // NOTE errors will fallback to 404
     const { data, error } = await apolloClient.query<
