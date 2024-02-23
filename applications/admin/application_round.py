@@ -20,8 +20,13 @@ __all__ = [
 @admin.register(ApplicationRound)
 class ApplicationRoundAdmin(TranslationAdmin):
     form = ApplicationRoundAdminForm
+    list_display = ["_name"]
     actions = ["export_to_csv", "reset_application_rounds"]
     autocomplete_fields = ["reservation_units"]
+
+    @admin.display(description=_("Application Round"), ordering="name")
+    def _name(self, obj: ApplicationRound) -> str:
+        return str(obj)
 
     @admin.action(description="Export application events in the selected application round to CSV")
     def export_to_csv(self, request, queryset):

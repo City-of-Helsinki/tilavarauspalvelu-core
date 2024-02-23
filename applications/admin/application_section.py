@@ -5,6 +5,13 @@ from lookup_property import L
 
 from applications.models import ApplicationSection, ReservationUnitOption, SuitableTimeRange
 
+from .filters.application_section import (
+    AgeGroupFilter,
+    ApplicationRoundStatusFilter,
+    ApplicationSectionStatusFilter,
+    ApplicationStatusFilter,
+    ReservationPurposeFilter,
+)
 from .forms.application_section import ApplicationSectionAdminForm
 from .forms.reservation_unit_option import ReservationUnitOptionInlineAdminForm
 from .forms.suitable_time_range import SuitableTimeRangeInlineAdminForm
@@ -38,13 +45,13 @@ class ApplicationSectionAdmin(admin.ModelAdmin):
     list_display = [
         "name",
         "application",
-        "reservations_begin_date",
-        "reservations_end_date",
     ]
     list_filter = [
-        "applied_reservations_per_week",
-        "age_group",
-        "purpose",
+        ApplicationSectionStatusFilter,
+        ApplicationStatusFilter,
+        ApplicationRoundStatusFilter,
+        AgeGroupFilter,
+        ReservationPurposeFilter,
     ]
     search_fields = [
         "name",

@@ -41,8 +41,8 @@ class SuitableTimeRange(models.Model):
     class Meta:
         db_table = "suitable_time_range"
         base_manager_name = "objects"
-        verbose_name = _("Suitable Timerange")
-        verbose_name_plural = _("Suitable Timeranges")
+        verbose_name = _("Suitable Time Range")
+        verbose_name_plural = _("Suitable Time Ranges")
         constraints = [
             models.CheckConstraint(
                 check=models.Q(begin_time__lt=models.F("end_time")),
@@ -96,3 +96,17 @@ class SuitableTimeRange(models.Model):
             day_of_the_week=self.day_of_the_week,
             reservation_unit_option__application_section=self.application_section,
         ).exists()
+
+    @lookup_property
+    def day_of_the_week_number() -> int:
+        return models.Case(  # type: ignore[return-value]
+            models.When(day_of_the_week=Weekday.MONDAY.value, then=models.Value(1)),
+            models.When(day_of_the_week=Weekday.TUESDAY.value, then=models.Value(2)),
+            models.When(day_of_the_week=Weekday.WEDNESDAY.value, then=models.Value(3)),
+            models.When(day_of_the_week=Weekday.THURSDAY.value, then=models.Value(4)),
+            models.When(day_of_the_week=Weekday.FRIDAY.value, then=models.Value(5)),
+            models.When(day_of_the_week=Weekday.SATURDAY.value, then=models.Value(6)),
+            models.When(day_of_the_week=Weekday.SUNDAY.value, then=models.Value(7)),
+            default=models.Value(8),
+            output_field=models.IntegerField(),
+        )

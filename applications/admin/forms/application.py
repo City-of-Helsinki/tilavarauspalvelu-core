@@ -16,6 +16,7 @@ class ApplicationAdminForm(forms.ModelForm):
         widget=disabled_widget,
         required=False,
         disabled=True,
+        label=_("Status"),
         help_text=(
             f"{ApplicationStatusChoice.DRAFT.value}: "
             f"Application started but not ready. "
@@ -32,7 +33,6 @@ class ApplicationAdminForm(forms.ModelForm):
             f"{ApplicationStatusChoice.CANCELLED.value}: "
             f"Application cancelled by user. "
         ),
-        label=_("Status"),
     )
 
     def __init__(self, *args, **kwargs):

@@ -3,6 +3,7 @@ from datetime import datetime
 from django.db import models
 from django.db.models.functions import Concat, Now
 from django.db.models.manager import Manager
+from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
 from lookup_property import L, lookup_property
 
@@ -87,6 +88,8 @@ class Application(SerializableMixin, models.Model):
     class Meta:
         db_table = "application"
         base_manager_name = "objects"
+        verbose_name = _("Application")
+        verbose_name_plural = _("Applications")
 
     # For GDPR API
     serialize_fields = (

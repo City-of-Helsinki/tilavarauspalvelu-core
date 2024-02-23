@@ -19,6 +19,7 @@
 .PHONY: services-local-stop
 .PHONY: stop
 .PHONY: translations
+.PHONT: translate
 
 # Trick to allow passing commands to make
 # Use quotes (" ") if command contains flags (-h / --help)
@@ -51,6 +52,7 @@ define helptext
   services-local-status              Check status of services running locally with 'systemctl'.
   stop                               Stop running containers.
   translations                       Fetch all translation strings under ./locale/.
+  translate                          Compile translation strings.
 
 endef
 
@@ -132,5 +134,12 @@ translations:
 	@echo ""
 	@echo Making translations...
 	@python manage.py maketranslations -l fi -l sv --no-obsolete --omit-header --add-location file
+	@echo ""
+	@echo Done!
+
+translate:
+	@echo ""
+	@echo Compiling translations...
+	@python manage.py compilemessages
 	@echo ""
 	@echo Done!

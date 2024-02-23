@@ -32,6 +32,17 @@ msgstr ""
 "Valinta \"%(choice)s\" ei ole sallittu. Mahdolliset valinnat ovat: "
 "%(allowed_choices)s."
 
+#: applications/admin/allocated_time_slot.py
+#: applications/models/allocated_time_slot.py
+msgid "Allocated Time Slot"
+msgstr "Jaettu vuoro"
+
+#: applications/admin/allocated_time_slot.py
+#: applications/admin/forms/application_section.py
+#: applications/models/application.py
+msgid "Application"
+msgstr "Hakemus"
+
 #: applications/admin/application.py applications/admin/application_round.py
 msgid "Are you sure?"
 msgstr "Oletko varma?"
@@ -39,6 +50,49 @@ msgstr "Oletko varma?"
 #: applications/admin/application.py applications/admin/application_round.py
 msgid "Are you sure you want reset allocations?"
 msgstr "Oletko varma, että haluat resetoida allokoinnit?"
+
+#: applications/admin/application_round.py
+#: applications/admin/filters/allocated_time_slot.py
+#: applications/admin/filters/application.py
+#: applications/models/application_round.py
+msgid "Application Round"
+msgstr "Kausivarauskierros"
+
+#: applications/admin/filters/allocated_time_slot.py
+#: applications/admin/filters/application.py
+#: applications/admin/filters/application_section.py
+msgid "Application round status"
+msgstr "Kausivarauskierroksen status"
+
+#: applications/admin/filters/allocated_time_slot.py
+#: applications/admin/filters/application.py
+#: applications/admin/filters/application_section.py
+msgid "Application status"
+msgstr "Hakemuksen status"
+
+#: applications/admin/filters/allocated_time_slot.py
+#: applications/admin/filters/application_section.py
+msgid "Application section status"
+msgstr "Hakemuksen osan status"
+
+#: applications/admin/filters/allocated_time_slot.py
+#: applications/admin/forms/allocated_time_slot.py
+#: applications/admin/forms/suitable_time_range.py
+msgid "Day of the week"
+msgstr "Viikonpäivä"
+
+#: applications/admin/filters/application_section.py
+#: applications/admin/forms/application_section.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py
+msgid "Age group"
+msgstr "Ikäryhmä"
+
+#: applications/admin/filters/application_section.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py
+msgid "Reservation purpose"
+msgstr "Varaustarkoitukset"
 
 #: applications/admin/forms/address.py merchants/admin.py
 msgid "Street address"
@@ -53,28 +107,26 @@ msgid "City name"
 msgstr "Kaupungin nimi"
 
 #: applications/admin/forms/allocated_time_slot.py
+msgid "Reservation unit option"
+msgstr "Varausyksikkö-vaihtoehto"
+
+#: applications/admin/forms/allocated_time_slot.py
 msgid "Reservation unit option for to this allocation."
 msgstr "Varausyksikkövaihtoehto tälle allokoinnille."
 
 #: applications/admin/forms/allocated_time_slot.py
-msgid "Day of the week"
-msgstr "Viikonpäivä"
-
-#: applications/admin/forms/allocated_time_slot.py
+#: applications/admin/forms/suitable_time_range.py
 #: reservations/models/reservation.py
 #: reservations/models/reservation_statistic.py
 msgid "Begin time"
 msgstr "Aloitusaika"
 
 #: applications/admin/forms/allocated_time_slot.py
+#: applications/admin/forms/suitable_time_range.py
 #: reservations/models/reservation.py
 #: reservations/models/reservation_statistic.py
 msgid "End time"
 msgstr "Lopetusaika"
-
-#: applications/admin/forms/allocated_time_slot.py
-msgid "Reservation unit option"
-msgstr "Varausyksikkö-vaihtoehto"
 
 #: applications/admin/forms/allocated_time_slot.py
 msgid "Allocated day of the week."
@@ -103,7 +155,7 @@ msgstr "hakijan tyyppi"
 msgid "Application round"
 msgstr "Kausivarauskierros"
 
-#: applications/admin/forms/application.py
+#: applications/admin/forms/application.py applications/models/organization.py
 msgid "Organisation"
 msgstr "Organisaatio"
 
@@ -313,10 +365,6 @@ msgid "Application this section is in."
 msgstr "Hakemus jolle tämä osa kuuluu."
 
 #: applications/admin/forms/application_section.py
-msgid "Application"
-msgstr "Hakemus"
-
-#: applications/admin/forms/application_section.py
 #: reservations/models/reservation.py
 #: reservations/models/reservation_statistic.py
 msgid "Number of persons"
@@ -343,12 +391,6 @@ msgid "Applied reservations per week"
 msgstr "Haetut toistokerrat"
 
 #: applications/admin/forms/application_section.py
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
-msgid "Age group"
-msgstr "Ikäryhmä"
-
-#: applications/admin/forms/application_section.py
 msgid "Purpose"
 msgstr "Käyttötarkoitus"
 
@@ -367,7 +409,7 @@ msgstr "Minimikesto allokoitaville vuoroille."
 
 #: applications/admin/forms/application_section.py
 msgid "Maximum duration that should be allocated for this section."
-msgstr "Maksimikesto allokoitavilel vuoroille."
+msgstr "Maksimikesto allokoitaville vuoroille."
 
 #: applications/admin/forms/application_section.py
 msgid "First date on which reservations for this section are created."
@@ -388,6 +430,14 @@ msgstr "Hakemuksen osan ikäryhmä."
 #: applications/admin/forms/application_section.py
 msgid "Purpose for this section."
 msgstr "Hakemuksen osan käyttötarkoitus."
+
+#: applications/admin/forms/application_section.py
+msgid "Suitable days of the week"
+msgstr "Sopivat viikonpäivät"
+
+#: applications/admin/forms/application_section.py
+msgid "Suitable days of the week for this section."
+msgstr "Hakemusen osalle sopivat viikonpäivät."
 
 #: applications/admin/forms/city.py
 msgid "Municipality"
@@ -425,7 +475,7 @@ msgstr "Ydin liiketoiminta-alue"
 msgid "Organisation type"
 msgstr "Organisaation tyyppi"
 
-#: applications/admin/forms/organization.py
+#: applications/admin/forms/organization.py applications/models/address.py
 msgid "Address"
 msgstr "Osoite"
 
@@ -490,8 +540,27 @@ msgid "Person's phone number."
 msgstr "Henkilön puhelinnumero"
 
 #: applications/admin/forms/reservation_unit_option.py
+#: reservation_units/models/introduction.py
+#: reservation_units/models/reservation_unit_pricing.py
+#: reservations/models/reservation.py
+msgid "Reservation unit"
+msgstr "Varausyksikkö"
+
+#: applications/admin/forms/reservation_unit_option.py
 msgid "Reservation unit for to this option."
 msgstr "Varausyksikkö tälle vaihtoehdolle."
+
+#: applications/admin/forms/reservation_unit_option.py
+msgid "Preferred order"
+msgstr "Suosittu järjestys"
+
+#: applications/admin/forms/reservation_unit_option.py
+msgid "Rejected"
+msgstr "Hylätty"
+
+#: applications/admin/forms/reservation_unit_option.py
+msgid "Locked"
+msgstr "Lukittu"
 
 #: applications/admin/forms/reservation_unit_option.py
 msgid "Preferred order of the reservation unit option."
@@ -507,12 +576,20 @@ msgid "Locked reservation unit options can no longer receive allocations."
 msgstr "Lukitut varausyksikkövaihtoehdot eivät voi enää saada allokaatioita."
 
 #: applications/admin/forms/suitable_time_range.py
+msgid "Fulfilled"
+msgstr "Täyttynyt"
+
+#: applications/admin/forms/suitable_time_range.py
 msgid ""
 "Has this suitable time range been fulfilled based on existing allocations "
 "and reservation unit options being locked or rejected."
 msgstr ""
 "Onko tämä sopiva aikaväli täyttynyt olemassa olevien allokaatioiden ja "
 "varausyksikkövaihtoehtojen hylkäysten tai lukitusten myötä."
+
+#: applications/admin/forms/suitable_time_range.py
+msgid "Priority"
+msgstr "Prioriteetti"
 
 #: applications/admin/forms/suitable_time_range.py
 msgid "Priority of the time range."
@@ -529,6 +606,10 @@ msgstr "Pyydetty aloitusaika allokaatioille."
 #: applications/admin/forms/suitable_time_range.py
 msgid "Requested end time for allocations."
 msgstr "Pyydetty lopetusaika allokaatioille."
+
+#: applications/apps.py
+msgid "Seasonal Booking"
+msgstr "Kausivaraus"
 
 #: applications/choices.py tilavarauspalvelu/utils/commons.py
 msgid "Monday"
@@ -583,16 +664,49 @@ msgid "Company"
 msgstr "Yritys"
 
 #: applications/choices.py
+msgid "Upcoming"
+msgstr "Tulossa"
+
+#: applications/choices.py
+msgid "Open"
+msgstr "Auki"
+
+#: applications/choices.py
+msgid "In allocation"
+msgstr "Allokoinnissa"
+
+#: applications/choices.py
+msgid "Handled"
+msgstr "Allokoitu"
+
+#: applications/choices.py
+msgid "Results sent"
+msgstr "Tulokset lähetetty"
+
+#: applications/choices.py common/choices/banner_notification.py
+#: merchants/models.py
+msgid "Draft"
+msgstr "Luonnos"
+
+#: applications/choices.py
+msgid "Received"
+msgstr "Vastaanotettu"
+
+#: applications/choices.py merchants/models.py
+msgid "Expired"
+msgstr "Vanhentunut"
+
+#: applications/choices.py merchants/models.py reservations/choices.py
+msgid "Cancelled"
+msgstr "Peruttu"
+
+#: applications/choices.py
 msgid "Unallocated"
 msgstr "Ei allokoidut"
 
 #: applications/choices.py
-msgid "Approved"
-msgstr "Hyväksytty"
-
-#: applications/choices.py
-msgid "Declined"
-msgstr "Hylätty"
+msgid "In Allocation"
+msgstr "Allokoinnissa"
 
 #: applications/choices.py
 msgid "Reserved"
@@ -601,14 +715,6 @@ msgstr "Varattu"
 #: applications/choices.py
 msgid "Failed"
 msgstr "Epäonnistunut"
-
-#: applications/choices.py
-msgid "In Allocation"
-msgstr "Allokoinnissa"
-
-#: applications/choices.py
-msgid "Handled"
-msgstr "Allokoitu"
 
 #: applications/choices.py
 msgid "Internal"
@@ -642,18 +748,22 @@ msgstr "Kuntakonsortio"
 msgid "Religious community"
 msgstr "Uskonnollinen yhteisö"
 
-#: applications/models/allocated_time_slot.py
-msgid "Allocated Timeslot"
-msgstr "Allokoitu "
+#: applications/models/address.py
+msgid "Addresses"
+msgstr "Osoitteet"
 
 #: applications/models/allocated_time_slot.py
-msgid "Allocated Timeslots"
-msgstr "Jaetut vuorot "
+msgid "Allocated Time Slots"
+msgstr "Jaetut vuorot"
 
 #: applications/models/allocated_time_slot.py
 #: applications/models/suitable_time_range.py
 msgid "Begin time must be before end time."
 msgstr "Aloitusaika tulee ennen lopetusaikaa."
+
+#: applications/models/application.py
+msgid "Applications"
+msgstr "Hakemukset"
 
 #: applications/models/application_event_schedule.py
 msgid "Low"
@@ -666,6 +776,18 @@ msgstr "Keskitaso"
 #: applications/models/application_event_schedule.py
 msgid "High"
 msgstr "Korkea"
+
+#: applications/models/application_round.py
+msgid "Application Rounds"
+msgstr "Kausivarauskierrokset"
+
+#: applications/models/application_round_time_slot.py
+msgid "Application Round Time Slot"
+msgstr "Kausivararattava aika"
+
+#: applications/models/application_round_time_slot.py
+msgid "Application Round Time Slots"
+msgstr "Kausivararattavat ajat"
 
 #: applications/models/application_section.py
 msgid "Application section"
@@ -697,9 +819,29 @@ msgstr ""
 "Varauksen minimi- ja maksimikeston tulee olla 30 minuutin monikertoja, "
 "jakorkeintaan 24 tuntia."
 
+#: applications/models/city.py merchants/admin.py
+msgid "City"
+msgstr "Kaupunki"
+
+#: applications/models/city.py
+msgid "Cities"
+msgstr "Kaupungit"
+
 #: applications/models/organization.py
 msgid "is after current year"
 msgstr "on nykyvuoden jälkeen"
+
+#: applications/models/organization.py
+msgid "Organisations"
+msgstr "Organisaatiot"
+
+#: applications/models/person.py
+msgid "Person"
+msgstr "Henkilö"
+
+#: applications/models/person.py
+msgid "Persons"
+msgstr "Henkilöt"
 
 #: applications/models/reservation_unit_option.py
 msgid "Reservation Unit Option"
@@ -714,11 +856,11 @@ msgid "Preferred order must be unique for each application section"
 msgstr "Suosittu järjestys tulee olla uniikki jokaiselle hakemuksen osalle"
 
 #: applications/models/suitable_time_range.py
-msgid "Suitable Timerange"
+msgid "Suitable Time Range"
 msgstr "Sopiva aikaväli"
 
 #: applications/models/suitable_time_range.py
-msgid "Suitable Timeranges"
+msgid "Suitable Time Ranges"
 msgstr "Sopivat aikavälit"
 
 #: applications/models/suitable_time_range.py
@@ -791,10 +933,6 @@ msgstr "Henkilökunta"
 #: reservation_units/models/introduction.py reservations/models/reservation.py
 msgid "User"
 msgstr "Käyttäjä"
-
-#: common/choices/banner_notification.py merchants/models.py
-msgid "Draft"
-msgstr "Luonnos"
 
 #: common/choices/banner_notification.py
 msgid "Scheduled"
@@ -878,10 +1016,6 @@ msgid "ZIP code"
 msgstr "Postinumero"
 
 #: merchants/admin.py
-msgid "City"
-msgstr "Kaupunki"
-
-#: merchants/admin.py
 msgid "Email address"
 msgstr "Sähköpostiosoite"
 
@@ -928,14 +1062,6 @@ msgstr "Verkossa"
 #: merchants/models.py
 msgid "Invoice"
 msgstr "Lasku"
-
-#: merchants/models.py
-msgid "Expired"
-msgstr "Vanhentunut"
-
-#: merchants/models.py reservations/choices.py
-msgid "Cancelled"
-msgstr "Peruttu"
 
 #: merchants/models.py
 msgid "Paid"
@@ -1516,12 +1642,6 @@ msgid "Category"
 msgstr "Kategoria"
 
 #: reservation_units/models/introduction.py
-#: reservation_units/models/reservation_unit_pricing.py
-#: reservations/models/reservation.py
-msgid "Reservation unit"
-msgstr "Varausyksikkö"
-
-#: reservation_units/models/introduction.py
 msgid "Completed at"
 msgstr "Valmistunut"
 
@@ -1955,11 +2075,6 @@ msgstr "Tauko varauksen jälkeen"
 #: reservations/models/reservation.py
 msgid "Recurring reservation"
 msgstr "Toistuva varaus"
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
-msgid "Reservation purpose"
-msgstr "Varaustarkoitukset"
 
 #: reservations/models/reservation.py
 #: reservations/models/reservation_statistic.py

@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
 
 __all__ = [
@@ -22,6 +23,8 @@ class Address(SerializableMixin, models.Model):
     class Meta:
         db_table = "address"
         base_manager_name = "objects"
+        verbose_name = _("Address")
+        verbose_name_plural = _("Addresses")
 
     # For GDPR API
     serialize_fields = (

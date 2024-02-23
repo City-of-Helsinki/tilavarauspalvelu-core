@@ -8,14 +8,15 @@ from common.fields.forms import disabled_widget
 
 __all__ = [
     "ApplicationSectionAdminForm",
+    "ApplicationSectionInlineAdminForm",
 ]
 
 
 class ApplicationSectionAdminForm(forms.ModelForm):
     application = forms.ModelChoiceField(
         Application.objects.select_related("user"),
-        help_text=_("Application this section is in."),
         label=_("Application"),
+        help_text=_("Application this section is in."),
     )
 
     status = EnumChoiceField(
@@ -23,6 +24,7 @@ class ApplicationSectionAdminForm(forms.ModelForm):
         widget=disabled_widget,
         required=False,
         disabled=True,
+        label=_("Status"),
         help_text=(
             f"{ApplicationSectionStatusChoice.UNALLOCATED.value}: "
             f"Section has been created, but application round is still open. "
@@ -36,7 +38,6 @@ class ApplicationSectionAdminForm(forms.ModelForm):
             f"{ApplicationSectionStatusChoice.RESERVED.value}: "
             f"All allocations have successful reservations. "
         ),
-        label=_("Status"),
     )
 
     def __init__(self, *args, **kwargs):
@@ -63,6 +64,7 @@ class ApplicationSectionAdminForm(forms.ModelForm):
         ]
         labels = {
             "name": _("Name"),
+            "status": _("Status"),
             "num_persons": _("Number of persons"),
             "reservation_min_duration": _("Reservation minimum duration"),
             "reservation_max_duration": _("Reservation maximum duration"),
@@ -82,4 +84,40 @@ class ApplicationSectionAdminForm(forms.ModelForm):
             "applied_reservations_per_week": _("How many reservation the applicant has applied for per week."),
             "age_group": _("Age group for this section."),
             "purpose": _("Purpose for this section."),
+        }
+
+
+class ApplicationSectionInlineAdminForm(forms.ModelForm):
+    status = EnumChoiceField(enum=ApplicationSectionStatusChoice, required=False, disabled=True)
+    suitable_days_of_the_week = forms.CharField()
+
+    def __init__(self, *args, **kwargs):
+        instance: ApplicationSection | None = kwargs.get("instance", None)
+        if instance:
+            kwargs.setdefault("initial", {})
+            kwargs["initial"]["status"] = instance.status
+        super().__init__(*args, **kwargs)
+
+    class Meta:
+        model = ApplicationSection
+        fields = [
+            "status",
+            "reservation_min_duration",
+            "reservation_max_duration",
+            "applied_reservations_per_week",
+            "suitable_days_of_the_week",
+        ]
+        labels = {
+            "status": _("Status"),
+            "suitable_days_of_the_week": _("Suitable days of the week"),
+            "reservation_min_duration": _("Reservation minimum duration"),
+            "reservation_max_duration": _("Reservation maximum duration"),
+            "applied_reservations_per_week": _("Applied reservations per week"),
+        }
+        help_texts = {
+            "status": _("Status"),
+            "suitable_days_of_the_week": _("Suitable days of the week for this section."),
+            "reservation_min_duration": _("Minimum duration that should be allocated for this section."),
+            "reservation_max_duration": _("Maximum duration that should be allocated for this section."),
+            "applied_reservations_per_week": _("How many reservation the applicant has applied for per week."),
         }

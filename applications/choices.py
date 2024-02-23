@@ -5,7 +5,6 @@ from django.utils.translation import gettext_lazy as _
 
 __all__ = [
     "ApplicantTypeChoice",
-    "ApplicationEventStatusChoice",
     "ApplicationRoundStatusChoice",
     "ApplicationSectionStatusChoice",
     "ApplicationStatusChoice",
@@ -50,19 +49,19 @@ class ApplicantTypeChoice(models.TextChoices):
 
 
 class ApplicationRoundStatusChoice(models.TextChoices):
-    UPCOMING = "UPCOMING"
+    UPCOMING = "UPCOMING", _("Upcoming")
     """Applications cannot yet be made in the round"""
 
-    OPEN = "OPEN"
+    OPEN = "OPEN", _("Open")
     """Applications can be made in the round"""
 
-    IN_ALLOCATION = "IN_ALLOCATION"
+    IN_ALLOCATION = "IN_ALLOCATION", _("In allocation")
     """Applications in the round are being allocated"""
 
-    HANDLED = "HANDLED"
+    HANDLED = "HANDLED", _("Handled")
     """All application have been allocated"""
 
-    RESULTS_SENT = "SENT"
+    RESULTS_SENT = "SENT", _("Results sent")
     """All application results have been sent to users"""
 
     @DynamicClassAttribute
@@ -93,25 +92,25 @@ class ApplicationRoundStatusChoice(models.TextChoices):
 
 
 class ApplicationStatusChoice(models.TextChoices):
-    DRAFT = "DRAFT"
+    DRAFT = "DRAFT", _("Draft")
     """Application started but not ready"""
 
-    RECEIVED = "RECEIVED"
+    RECEIVED = "RECEIVED", _("Received")
     """Application sent by user"""
 
-    IN_ALLOCATION = "IN_ALLOCATION"
+    IN_ALLOCATION = "IN_ALLOCATION", _("In allocation")
     """Application's events are being allocated"""
 
-    HANDLED = "HANDLED"
+    HANDLED = "HANDLED", _("Handled")
     """Application's events have all been allocated"""
 
-    RESULTS_SENT = "RESULT_SENT"
+    RESULTS_SENT = "RESULT_SENT", _("Results sent")
     """Application's results have been sent to user"""
 
-    EXPIRED = "EXPIRED"
+    EXPIRED = "EXPIRED", _("Expired")
     """Application not completed before application round ended"""
 
-    CANCELLED = "CANCELLED"
+    CANCELLED = "CANCELLED", _("Cancelled")
     """Application cancelled by user"""
 
     @DynamicClassAttribute
@@ -151,46 +150,6 @@ class ApplicationStatusChoice(models.TextChoices):
         return self in [
             ApplicationStatusChoice.IN_ALLOCATION,
             ApplicationStatusChoice.HANDLED,
-        ]
-
-
-class ApplicationEventStatusChoice(models.TextChoices):
-    UNALLOCATED = "UNALLOCATED", _("Unallocated")
-    """Application event has been created by the user, but not yet allocated"""
-
-    APPROVED = "APPROVED", _("Approved")
-    """Application event has been approved in the allocation process"""
-
-    DECLINED = "DECLINED", _("Declined")
-    """Application event has been declined in the allocation process"""
-
-    RESERVED = "RESERVED", _("Reserved")
-    """All reservations for the application event have been created successfully"""
-
-    FAILED = "FAILED", _("Failed")
-    """Some or all reservations for the application event could not be created successfully"""
-
-    @DynamicClassAttribute
-    def can_decline(self) -> bool:
-        return self in [
-            ApplicationEventStatusChoice.APPROVED,
-            ApplicationEventStatusChoice.FAILED,
-            ApplicationEventStatusChoice.UNALLOCATED,
-        ]
-
-    @DynamicClassAttribute
-    def can_approve(self) -> bool:
-        return self in [
-            ApplicationEventStatusChoice.APPROVED,
-            ApplicationEventStatusChoice.UNALLOCATED,
-        ]
-
-    @DynamicClassAttribute
-    def can_reset(self) -> bool:
-        return self in [
-            ApplicationEventStatusChoice.APPROVED,
-            ApplicationEventStatusChoice.DECLINED,
-            ApplicationEventStatusChoice.UNALLOCATED,
         ]
 
 

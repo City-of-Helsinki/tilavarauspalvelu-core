@@ -11,8 +11,9 @@ __all__ = [
 class AllocatedTimeSlotAdminForm(forms.ModelForm):
     reservation_unit_option = forms.ModelChoiceField(
         ReservationUnitOption.objects.select_related("application_section", "reservation_unit__unit"),
-        help_text=_("Reservation unit option for to this allocation."),
         blank=False,
+        label=_("Reservation unit option"),
+        help_text=_("Reservation unit option for to this allocation."),
     )
 
     class Meta:

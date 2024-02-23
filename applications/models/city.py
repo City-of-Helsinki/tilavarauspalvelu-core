@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 __all__ = [
     "City",
@@ -17,6 +18,8 @@ class City(models.Model):
     class Meta:
         db_table = "city"
         base_manager_name = "objects"
+        verbose_name = _("City")
+        verbose_name_plural = _("Cities")
 
     def __str__(self) -> str:
         return self.name

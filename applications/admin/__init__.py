@@ -4,14 +4,16 @@ from .application import ApplicationAdmin
 from .application_round import ApplicationRoundAdmin
 from .application_section import ApplicationSectionAdmin
 from .city import CityAdmin
+from .organization import OrganisationAdmin
 from .person import PersonAdmin
 
 __all__ = [
     "AddressAdmin",
-    "ApplicationAdmin",
-    "ApplicationSectionAdmin",
-    "ApplicationRoundAdmin",
-    "CityAdmin",
-    "PersonAdmin",
     "AllocatedTimeSlotAdmin",
+    "ApplicationAdmin",
+    "ApplicationRoundAdmin",
+    "ApplicationSectionAdmin",
+    "CityAdmin",
+    "OrganisationAdmin",
+    "PersonAdmin",
 ]

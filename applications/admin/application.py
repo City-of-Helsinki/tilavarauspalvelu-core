@@ -7,14 +7,40 @@ from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L
 
+from applications.admin.filters.application import (
+    ApplicationRoundFilter,
+    ApplicationRoundStatusFilter,
+    ApplicationStatusFilter,
+)
 from applications.admin.forms.application import ApplicationAdminForm
-from applications.models import Application
+from applications.admin.forms.application_section import ApplicationSectionInlineAdminForm
+from applications.models import Application, ApplicationSection
+from applications.querysets.application import ApplicationQuerySet
+from common.utils import comma_sep_str
 
 __all__ = [
     "ApplicationAdmin",
 ]
 
-from applications.querysets.application import ApplicationQuerySet
+
+class ApplicationSectionInline(admin.TabularInline):
+    model = ApplicationSection
+    form = ApplicationSectionInlineAdminForm
+    extra = 0
+    show_change_link = True
+    can_delete = False
+
+    def get_queryset(self, request: WSGIRequest) -> QuerySet:
+        return super().get_queryset(request).annotate(status=L("status")).prefetch_related("suitable_time_ranges")
+
+    def has_change_permission(self, request: WSGIRequest, obj: ApplicationSection | None = None) -> bool:
+        return False
+
+    def has_add_permission(self, request: WSGIRequest, obj: ApplicationSection | None = None) -> bool:
+        return False
+
+    def suitable_days_of_the_week(self, obj: ApplicationSection) -> str:
+        return comma_sep_str([str(item.label) for item in obj.suitable_days_of_the_week])
 
 
 @admin.register(Application)
@@ -27,8 +53,9 @@ class ApplicationAdmin(admin.ModelAdmin):
         "last_modified_date",
     ]
     list_filter = [
-        "application_round",
-        "application_round__reservation_units__name",
+        ApplicationStatusFilter,
+        ApplicationRoundStatusFilter,
+        ApplicationRoundFilter,
     ]
     search_fields = [
         "user__first_name",
@@ -36,6 +63,7 @@ class ApplicationAdmin(admin.ModelAdmin):
         "application_round__reservation_units__name",
     ]
     actions = ["reset_applications"]
+    inlines = [ApplicationSectionInline]
 
     def get_queryset(self, request: WSGIRequest) -> QuerySet:
         return (
