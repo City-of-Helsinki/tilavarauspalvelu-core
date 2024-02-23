@@ -12,7 +12,9 @@ pytestmark = [
 
 
 def test_suitable_time_range__fulfilled():
-    application_section = ApplicationSectionFactory.create_in_status_unallocated()
+    application_section = ApplicationSectionFactory.create_in_status_unallocated(
+        applied_reservations_per_week=2,
+    )
     time_range = SuitableTimeRangeFactory.create(
         application_section=application_section,
         day_of_the_week=Weekday.MONDAY,
@@ -29,7 +31,9 @@ def test_suitable_time_range__fulfilled():
     assert SuitableTimeRange.objects.filter(L(fulfilled=True)).exists()
 
     # Section is in allocation, but has no allocations -> time range is not fulfilled
-    time_range.application_section = ApplicationSectionFactory.create_in_status_in_allocation()
+    time_range.application_section = ApplicationSectionFactory.create_in_status_in_allocation(
+        applied_reservations_per_week=2,
+    )
     time_range.save()
     assert time_range.fulfilled is False
     assert SuitableTimeRange.objects.filter(L(fulfilled=False)).exists()

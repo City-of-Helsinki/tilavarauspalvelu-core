@@ -50,8 +50,105 @@ msgstr ""
 msgid "City name"
 msgstr ""
 
+#: applications/admin/forms/allocated_time_slot.py
+#, fuzzy
+#| msgid "Reservation Unit Options"
+msgid "Reservation unit option for to this allocation."
+msgstr "Varausyksikkö-vaihtoehdot"
+
+#: applications/admin/forms/allocated_time_slot.py
+msgid "Day of the week"
+msgstr ""
+
+#: applications/admin/forms/allocated_time_slot.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py
+msgid "Begin time"
+msgstr ""
+
+#: applications/admin/forms/allocated_time_slot.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py
+msgid "End time"
+msgstr ""
+
+#: applications/admin/forms/allocated_time_slot.py
+#, fuzzy
+#| msgid "Reservation Unit Option"
+msgid "Reservation unit option"
+msgstr "Varausyksikkö-vaihtoehto"
+
+#: applications/admin/forms/allocated_time_slot.py
+msgid "Allocated day of the week."
+msgstr ""
+
+#: applications/admin/forms/allocated_time_slot.py
+#, fuzzy
+#| msgid "Allocated Timeslot"
+msgid "Allocated begin time."
+msgstr "Jaettu vuoro"
+
+#: applications/admin/forms/allocated_time_slot.py
+#, fuzzy
+#| msgid "Allocated Timeslot"
+msgid "Allocated end time."
+msgstr "Jaettu vuoro"
+
+#: applications/admin/forms/application.py
+#: applications/admin/forms/application_round.py
+#: applications/admin/forms/application_section.py
+#: reservation_units/models/reservation_unit_pricing.py
+msgid "Status"
+msgstr ""
+
+#: applications/admin/forms/application.py
+#, fuzzy
+#| msgid "Application section"
+msgid "Applicant type"
+msgstr "Hakemuksen osa"
+
+#: applications/admin/forms/application.py
+#, fuzzy
+#| msgid "Application section"
+msgid "Application round"
+msgstr "Hakemuksen osa"
+
+#: applications/admin/forms/application.py
+msgid "Organisation"
+msgstr ""
+
+#: applications/admin/forms/application.py
+msgid "Contact person"
+msgstr ""
+
 #: applications/admin/forms/application.py
 msgid "Applicant"
+msgstr ""
+
+#: applications/admin/forms/application.py
+msgid "Billing address"
+msgstr ""
+
+#: applications/admin/forms/application.py reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py
+msgid "Home city"
+msgstr ""
+
+#: applications/admin/forms/application.py
+msgid "Additional information"
+msgstr ""
+
+#: applications/admin/forms/application.py reservations/models/reservation.py
+msgid "Working memo"
+msgstr ""
+
+#: applications/admin/forms/application.py
+#: applications/admin/forms/application_round.py
+msgid "Sent date"
+msgstr ""
+
+#: applications/admin/forms/application.py
+msgid "Cancelled date"
 msgstr ""
 
 #: applications/admin/forms/application.py
@@ -98,93 +195,75 @@ msgstr ""
 msgid "Date when the application was cancelled."
 msgstr ""
 
-#: applications/admin/forms/application_event.py
-msgid "Name that describes this event."
+#: applications/admin/forms/application_round.py
+#: applications/admin/forms/application_section.py
+#: applications/admin/forms/city.py applications/admin/forms/organization.py
+#: reservation_units/models/equipment.py reservation_units/models/keyword.py
+#: reservation_units/models/reservation_unit.py
+#: reservation_units/models/reservation_unit_type.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_metadata.py
+#: reservations/models/reservation_statistic.py resources/models.py
+#: services/models.py terms_of_use/models.py
+msgid "Name"
 msgstr ""
 
-#: applications/admin/forms/application_event.py
-msgid "Number of persons that are excepted to attend this event."
+#: applications/admin/forms/application_round.py
+msgid "Target group"
 msgstr ""
 
-#: applications/admin/forms/application_event.py
-msgid "Minimum duration of reservations allocated for this event."
+#: applications/admin/forms/application_round.py
+#, fuzzy
+#| msgid "Reservation Unit Options"
+msgid "Reservation units"
+msgstr "Varausyksikkö-vaihtoehdot"
+
+#: applications/admin/forms/application_round.py
+msgid "Application period begin date and time"
 msgstr ""
 
-#: applications/admin/forms/application_event.py
-msgid "Maximum duration of reservations allocated for this event."
+#: applications/admin/forms/application_round.py
+msgid "Application period end date and time"
 msgstr ""
 
-#: applications/admin/forms/application_event.py
-msgid "First date on which reservations for this event are created."
+#: applications/admin/forms/application_round.py
+#, fuzzy
+#| msgid "Reservation Unit Option"
+msgid "Reservation period begin date"
+msgstr "Varausyksikkö-vaihtoehto"
+
+#: applications/admin/forms/application_round.py
+#, fuzzy
+#| msgid "Reservation Unit Option"
+msgid "Reservation period end date"
+msgstr "Varausyksikkö-vaihtoehto"
+
+#: applications/admin/forms/application_round.py
+msgid "Public display begin date and time"
 msgstr ""
 
-#: applications/admin/forms/application_event.py
-msgid "Last date on which reservations for this event are created."
+#: applications/admin/forms/application_round.py
+msgid "Public display end date and time"
 msgstr ""
 
-#: applications/admin/forms/application_event.py
-msgid "Number of reservations created per week (every other week if biweekly)."
+#: applications/admin/forms/application_round.py
+msgid "Handled date"
 msgstr ""
 
-#: applications/admin/forms/application_event.py
-msgid "Whether reservations are created every other week."
+#: applications/admin/forms/application_round.py
+#: reservation_units/models/reservation_unit.py
+msgid "Purposes"
 msgstr ""
 
-#: applications/admin/forms/application_event.py
-msgid "Whether this event is flagged for manual review."
+#: applications/admin/forms/application_round.py permissions/models.py
+msgid "Service sector"
 msgstr ""
 
-#: applications/admin/forms/application_event.py
-msgid "Application this event is in."
-msgstr ""
-
-#: applications/admin/forms/application_event.py
-msgid "Age group for this event."
-msgstr ""
-
-#: applications/admin/forms/application_event.py
-msgid "Ability group for this event."
-msgstr ""
-
-#: applications/admin/forms/application_event.py
-msgid "Purpose for this event."
-msgstr ""
-
-#: applications/admin/forms/application_event.py
-msgid "Priority of event."
-msgstr ""
-
-#: applications/admin/forms/application_event.py
-msgid "Requested day of the week."
-msgstr ""
-
-#: applications/admin/forms/application_event.py
-msgid "Requested start time of event."
-msgstr ""
-
-#: applications/admin/forms/application_event.py
-msgid "Requested end time of event."
-msgstr ""
-
-#: applications/admin/forms/application_event.py
-msgid "Has this event been declined or not."
-msgstr ""
-
-#: applications/admin/forms/application_event.py
-msgid "Allocated day of event."
-msgstr ""
-
-#: applications/admin/forms/application_event.py
-msgid "Allocated start time of event."
-msgstr ""
-
-#: applications/admin/forms/application_event.py
-msgid "Allocated end time of event."
-msgstr ""
-
-#: applications/admin/forms/application_event.py
-msgid "Allocated reservation unit."
-msgstr ""
+#: applications/admin/forms/application_round.py
+#, fuzzy
+#| msgid "Application section"
+msgid "Application criteria"
+msgstr "Hakemuksen osa"
 
 #: applications/admin/forms/application_round.py
 msgid "Name that describes the application round."
@@ -242,12 +321,138 @@ msgstr ""
 msgid "Application criteria for the application round."
 msgstr ""
 
+#: applications/admin/forms/application_section.py
+#, fuzzy
+#| msgid "Application sections"
+msgid "Application this section is in."
+msgstr "Hakemuksen osat"
+
+#: applications/admin/forms/application_section.py
+#, fuzzy
+#| msgid "Application section"
+msgid "Application"
+msgstr "Hakemuksen osa"
+
+#: applications/admin/forms/application_section.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py
+msgid "Number of persons"
+msgstr ""
+
+#: applications/admin/forms/application_section.py
+#, fuzzy
+#| msgid "Reservation Unit Option"
+msgid "Reservation minimum duration"
+msgstr "Varausyksikkö-vaihtoehto"
+
+#: applications/admin/forms/application_section.py
+#, fuzzy
+#| msgid "Reservation Unit Option"
+msgid "Reservation maximum duration"
+msgstr "Varausyksikkö-vaihtoehto"
+
+#: applications/admin/forms/application_section.py
+#, fuzzy
+#| msgid "Reservation Unit Option"
+msgid "Reservations begin date"
+msgstr "Varausyksikkö-vaihtoehto"
+
+#: applications/admin/forms/application_section.py
+#, fuzzy
+#| msgid "Reservation Unit Option"
+msgid "Reservations end date"
+msgstr "Varausyksikkö-vaihtoehto"
+
+#: applications/admin/forms/application_section.py
+#, fuzzy
+#| msgid "Can only apply from 1 to 7 reservations per week."
+msgid "Applied reservations per week"
+msgstr "Voi hakea vain yhdestä seitsemään varausta viikossa."
+
+#: applications/admin/forms/application_section.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py
+msgid "Age group"
+msgstr ""
+
+#: applications/admin/forms/application_section.py
+msgid "Purpose"
+msgstr ""
+
+#: applications/admin/forms/application_section.py
+msgid "Name that describes this section."
+msgstr ""
+
+#: applications/admin/forms/application_section.py
+msgid "Number of persons that are excepted to attend this section."
+msgstr ""
+
+#: applications/admin/forms/application_section.py
+msgid "Minimum duration that should be allocated for this section."
+msgstr ""
+
+#: applications/admin/forms/application_section.py
+msgid "Maximum duration that should be allocated for this section."
+msgstr ""
+
+#: applications/admin/forms/application_section.py
+msgid "First date on which reservations for this section are created."
+msgstr ""
+
+#: applications/admin/forms/application_section.py
+msgid "Last date on which reservations for this section are created."
+msgstr ""
+
+#: applications/admin/forms/application_section.py
+msgid "How many reservation the applicant has applied for per week."
+msgstr ""
+
+#: applications/admin/forms/application_section.py
+msgid "Age group for this section."
+msgstr ""
+
+#: applications/admin/forms/application_section.py
+msgid "Purpose for this section."
+msgstr ""
+
+#: applications/admin/forms/city.py
+msgid "Municipality"
+msgstr ""
+
 #: applications/admin/forms/city.py
 msgid "Name of the city."
 msgstr ""
 
 #: applications/admin/forms/city.py
 msgid "Municipality code for the city."
+msgstr ""
+
+#: applications/admin/forms/organization.py applications/admin/forms/person.py
+msgid "Email"
+msgstr ""
+
+#: applications/admin/forms/organization.py merchants/models.py
+msgid "Company code"
+msgstr ""
+
+#: applications/admin/forms/organization.py
+msgid "Year established"
+msgstr ""
+
+#: applications/admin/forms/organization.py
+msgid "Active members"
+msgstr ""
+
+#: applications/admin/forms/organization.py
+msgid "Core business area"
+msgstr ""
+
+#: applications/admin/forms/organization.py
+msgid "Organisation type"
+msgstr ""
+
+#: applications/admin/forms/organization.py
+msgid "Address"
 msgstr ""
 
 #: applications/admin/forms/organization.py
@@ -259,7 +464,7 @@ msgid "Email address of the organisation."
 msgstr ""
 
 #: applications/admin/forms/organization.py
-msgid "Organization company code."
+msgid "Organisation company code."
 msgstr ""
 
 #: applications/admin/forms/organization.py
@@ -283,6 +488,18 @@ msgid "Organisation address."
 msgstr ""
 
 #: applications/admin/forms/person.py
+msgid "First name"
+msgstr ""
+
+#: applications/admin/forms/person.py
+msgid "Last name"
+msgstr ""
+
+#: applications/admin/forms/person.py merchants/admin.py
+msgid "Phone number"
+msgstr ""
+
+#: applications/admin/forms/person.py
 msgid "Person's first name."
 msgstr ""
 
@@ -297,6 +514,48 @@ msgstr ""
 #: applications/admin/forms/person.py
 msgid "Person's phone number."
 msgstr ""
+
+#: applications/admin/forms/reservation_unit_option.py
+#, fuzzy
+#| msgid "Reservation Unit Option"
+msgid "Reservation unit for to this option."
+msgstr "Varausyksikkö-vaihtoehto"
+
+#: applications/admin/forms/reservation_unit_option.py
+msgid "Preferred order of the reservation unit option."
+msgstr ""
+
+#: applications/admin/forms/reservation_unit_option.py
+msgid "Rejected reservation unit options can never receive allocations."
+msgstr ""
+
+#: applications/admin/forms/reservation_unit_option.py
+msgid "Locked reservation unit options can no longer receive allocations."
+msgstr ""
+
+#: applications/admin/forms/suitable_time_range.py
+msgid ""
+"Has this suitable time range been fulfilled based on existing allocations "
+"and reservation unit options being locked or rejected."
+msgstr ""
+
+#: applications/admin/forms/suitable_time_range.py
+msgid "Priority of the time range."
+msgstr ""
+
+#: applications/admin/forms/suitable_time_range.py
+msgid "Requested day of the week."
+msgstr ""
+
+#: applications/admin/forms/suitable_time_range.py
+msgid "Requested start time for allocations."
+msgstr ""
+
+#: applications/admin/forms/suitable_time_range.py
+#, fuzzy
+#| msgid "Reservation Unit Options"
+msgid "Requested end time for allocations."
+msgstr "Varausyksikkö-vaihtoehdot"
 
 #: applications/choices.py tilavarauspalvelu/utils/commons.py
 msgid "Monday"
@@ -641,10 +900,6 @@ msgid "Email address"
 msgstr ""
 
 #: merchants/admin.py
-msgid "Phone number"
-msgstr ""
-
-#: merchants/admin.py
 msgid "URL"
 msgstr ""
 
@@ -807,10 +1062,6 @@ msgstr ""
 
 #: merchants/models.py
 msgid "Accounting name"
-msgstr ""
-
-#: merchants/models.py
-msgid "Company code"
 msgstr ""
 
 #: merchants/models.py
@@ -1182,10 +1433,6 @@ msgstr ""
 msgid "Unit"
 msgstr ""
 
-#: permissions/models.py
-msgid "Service sector"
-msgstr ""
-
 #: reservation_units/admin/forms/reservation_unit.py
 msgid "Which weekday this timeslot concerns."
 msgstr ""
@@ -1254,16 +1501,6 @@ msgstr ""
 msgid "future"
 msgstr ""
 
-#: reservation_units/models/equipment.py reservation_units/models/keyword.py
-#: reservation_units/models/reservation_unit.py
-#: reservation_units/models/reservation_unit_type.py
-#: reservations/models/reservation.py
-#: reservations/models/reservation_metadata.py
-#: reservations/models/reservation_statistic.py resources/models.py
-#: services/models.py terms_of_use/models.py
-msgid "Name"
-msgstr ""
-
 #: reservation_units/models/equipment.py reservation_units/models/purpose.py
 #: reservation_units/models/reservation_unit.py
 #: reservation_units/models/reservation_unit_type.py
@@ -1321,10 +1558,6 @@ msgstr ""
 
 #: reservation_units/models/reservation_unit.py
 msgid "Services"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Purposes"
 msgstr ""
 
 #: reservation_units/models/reservation_unit.py
@@ -1573,10 +1806,6 @@ msgstr ""
 msgid "Tax percentage"
 msgstr ""
 
-#: reservation_units/models/reservation_unit_pricing.py
-msgid "Status"
-msgstr ""
-
 #: reservations/admin.py
 msgid "Required fields must be a subset of supported fields"
 msgstr ""
@@ -1689,16 +1918,6 @@ msgstr ""
 
 #: reservations/models/reservation.py
 #: reservations/models/reservation_statistic.py
-msgid "Home city"
-msgstr ""
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
-msgid "Age group"
-msgstr ""
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
 msgid "Reservee is applying for a free-of-charge reservation"
 msgstr ""
 
@@ -1709,16 +1928,6 @@ msgstr ""
 #: reservations/models/reservation.py
 #: reservations/models/reservation_statistic.py
 msgid "State"
-msgstr ""
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
-msgid "Begin time"
-msgstr ""
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
-msgid "End time"
 msgstr ""
 
 #: reservations/models/reservation.py
@@ -1735,11 +1944,6 @@ msgstr ""
 
 #: reservations/models/reservation.py
 msgid "Recurring reservation"
-msgstr ""
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
-msgid "Number of persons"
 msgstr ""
 
 #: reservations/models/reservation.py
@@ -1802,10 +2006,6 @@ msgstr ""
 
 #: reservations/models/reservation.py
 msgid "Handling details for this reservation"
-msgstr ""
-
-#: reservations/models/reservation.py
-msgid "Working memo"
 msgstr ""
 
 #: reservations/models/reservation.py
