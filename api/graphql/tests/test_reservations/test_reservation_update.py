@@ -35,6 +35,7 @@ DEFAULT_TIMEZONE = get_default_timezone()
 
 
 @freezegun.freeze_time("2021-10-12T12:00:00Z")
+@override_settings(LOCALE_PATHS=[])
 class ReservationUpdateTestCase(ReservationTestCaseBase):
     def setUp(self):
         super().setUp()

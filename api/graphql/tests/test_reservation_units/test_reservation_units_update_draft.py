@@ -22,7 +22,7 @@ from tests.helpers import patch_method
 from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 
 
-@override_settings(AUDIT_LOGGING_ENABLED=True)
+@override_settings(AUDIT_LOGGING_ENABLED=True, LOCALE_PATHS=[])
 class ReservationUnitUpdateDraftTestCase(ReservationUnitMutationsTestCaseBase):
     @classmethod
     def setUpTestData(cls):

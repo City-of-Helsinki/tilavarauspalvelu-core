@@ -59,6 +59,11 @@ def _disable_hauki_export(settings):
     settings.HAUKI_EXPORTS_ENABLED = None
 
 
+@pytest.fixture(autouse=True)
+def _disable_translations(settings):
+    settings.LOCALE_PATHS = []
+
+
 @pytest.fixture()
 def _setup_hauki(settings):
     settings.HAUKI_API_URL = "url"
