@@ -3,17 +3,17 @@ from datetime import datetime
 from types import NoneType
 from typing import Any
 
+from graphene_django_extensions import NestingModelSerializer
 from rest_framework import serializers
 
 from common.models import BannerNotification
-from common.serializers import TranslatedModelSerializer
 
 __all__ = [
     "BannerNotificationSerializer",
 ]
 
 
-class BannerNotificationSerializer(TranslatedModelSerializer):
+class BannerNotificationSerializer(NestingModelSerializer):
     class Meta:
         model = BannerNotification
         fields = [

@@ -3,8 +3,11 @@ from typing import Any, NamedTuple
 import pytest
 
 from common.choices import BannerNotificationLevel, BannerNotificationTarget
+from common.models import BannerNotification
 from tests.factories import UserFactory
-from tests.helpers import deprecated_field_error_messages, parametrize_helper
+from tests.helpers import parametrize_helper
+
+from .helpers import CREATE_MUTATION
 
 # Applied to all tests
 pytestmark = [
@@ -23,20 +26,6 @@ class InvalidActiveParams(NamedTuple):
     expected: Any
 
 
-MUTATION_QUERY = """
-    mutation ($input: BannerNotificationCreateMutationInput!) {
-      createBannerNotification(input: $input) {
-        name
-        message
-        errors {
-          field
-          messages
-        }
-      }
-    }
-    """
-
-
 def test_user_creates_draft_banner_notification(graphql):
     # given:
     # - Notification manager is using the system
@@ -46,7 +35,7 @@ def test_user_creates_draft_banner_notification(graphql):
     # when:
     # - User tries to create a new draft banner notification
     response = graphql(
-        MUTATION_QUERY,
+        CREATE_MUTATION,
         input_data={
             "name": "foo",
             "message": "bar",
@@ -56,12 +45,10 @@ def test_user_creates_draft_banner_notification(graphql):
     )
 
     # then:
-    # - The response contains the created notification
-    assert response.first_query_object == {
-        "name": "foo",
-        "message": "bar",
-        "errors": None,
-    }, response
+    # - The response has no errors
+    # - The banner notification was created
+    assert response.has_errors is False, response.errors
+    assert BannerNotification.objects.filter(pk=response.first_query_object["pk"]).exists()
 
 
 def test_user_creates_draft_banner_notification_without_required_fields(graphql):
@@ -72,7 +59,7 @@ def test_user_creates_draft_banner_notification_without_required_fields(graphql)
 
     # when:
     # - User tries to create a new banner notification with the given invalid data
-    response = graphql(MUTATION_QUERY, input_data={})
+    response = graphql(CREATE_MUTATION, input_data={})
 
     # then:
     # - The response complains about the improper input
@@ -91,7 +78,7 @@ def test_user_creates_non_draft_banner_notification_without_required_fields(grap
     # when:
     # - User tries to create a new banner notification with the given invalid data
     response = graphql(
-        MUTATION_QUERY,
+        CREATE_MUTATION,
         input_data={
             "name": "foo",
             "target": BannerNotificationTarget.ALL.value,
@@ -102,13 +89,11 @@ def test_user_creates_non_draft_banner_notification_without_required_fields(grap
 
     # then:
     # - The response complains about the missing fields
-    assert deprecated_field_error_messages(response, "activeFrom") == [
+    assert response.field_error_messages("activeFrom") == [
         "Non-draft notifications must set 'active_from'",
     ]
-    assert deprecated_field_error_messages(response, "activeUntil") == [
-        "Non-draft notifications must set 'active_until'"
-    ]
-    assert deprecated_field_error_messages(response, "message") == [
+    assert response.field_error_messages("activeUntil") == ["Non-draft notifications must set 'active_until'"]
+    assert response.field_error_messages("message") == [
         "Non-draft notifications must have a message.",
     ]
 
@@ -121,11 +106,10 @@ def test_user_creates_non_draft_banner_notification_without_required_fields(grap
                 active_until="2022-01-01T00:00:00",
                 expected=[
                     {
+                        "code": "invalid",
                         "field": "activeFrom",
-                        "messages": [
-                            "'active_from' must be before 'active_until'.",
-                        ],
-                    },
+                        "message": "'active_from' must be before 'active_until'.",
+                    }
                 ],
             ),
             "Must set 'active_until' if 'active_from' is set.": InvalidActiveParams(
@@ -133,16 +117,14 @@ def test_user_creates_non_draft_banner_notification_without_required_fields(grap
                 active_until=None,
                 expected=[
                     {
+                        "code": "invalid",
                         "field": "activeUntil",
-                        "messages": [
-                            "Both 'active_from' and 'active_until' must be either set or null.",
-                        ],
+                        "message": "Both 'active_from' and 'active_until' must be either set or null.",
                     },
                     {
+                        "code": "invalid",
                         "field": "activeFrom",
-                        "messages": [
-                            "Both 'active_from' and 'active_until' must be either set or null.",
-                        ],
+                        "message": "Both 'active_from' and 'active_until' must be either set or null.",
                     },
                 ],
             ),
@@ -151,16 +133,14 @@ def test_user_creates_non_draft_banner_notification_without_required_fields(grap
                 active_until="2022-01-01T00:00:00",
                 expected=[
                     {
+                        "code": "invalid",
                         "field": "activeUntil",
-                        "messages": [
-                            "Both 'active_from' and 'active_until' must be either set or null.",
-                        ],
+                        "message": "Both 'active_from' and 'active_until' must be either set or null.",
                     },
                     {
+                        "code": "invalid",
                         "field": "activeFrom",
-                        "messages": [
-                            "Both 'active_from' and 'active_until' must be either set or null.",
-                        ],
+                        "message": "Both 'active_from' and 'active_until' must be either set or null.",
                     },
                 ],
             ),
@@ -169,10 +149,9 @@ def test_user_creates_non_draft_banner_notification_without_required_fields(grap
                 active_until="2022-01-02T00:00:00",
                 expected=[
                     {
+                        "code": "invalid",
                         "field": "activeFrom",
-                        "messages": [
-                            "'active_from' must be before 'active_until'.",
-                        ],
+                        "message": "'active_from' must be before 'active_until'.",
                     },
                 ],
             ),
@@ -188,7 +167,7 @@ def test_user_creates_banner_notification_where_active_range_is_invalid(graphql,
     # when:
     # - User tries to create a new banner notification with the given invalid data
     response = graphql(
-        MUTATION_QUERY,
+        CREATE_MUTATION,
         input_data={
             "name": "foo",
             "target": BannerNotificationTarget.ALL.value,
@@ -200,9 +179,6 @@ def test_user_creates_banner_notification_where_active_range_is_invalid(graphql,
     )
 
     # then:
-    # - The response complains about the 'active'-fields being invali
-    assert response.first_query_object == {
-        "errors": expected,
-        "message": None,
-        "name": None,
-    }, response
+    # - The response has no errors
+    # - The banner notification was created
+    assert response.field_errors == expected
