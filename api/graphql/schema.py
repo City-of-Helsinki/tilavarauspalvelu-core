@@ -160,6 +160,7 @@ class Query(graphene.ObjectType):
     application_rounds = ApplicationRoundNode.Connection()
     application_round = ApplicationRoundNode.Node()
     applications = ApplicationNode.Connection()
+    application = ApplicationNode.Node()
     application_sections = ApplicationSectionNode.Connection()
     allocated_time_slots = AllocatedTimeSlotNode.Connection()
 
