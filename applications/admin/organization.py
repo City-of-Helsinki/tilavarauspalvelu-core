@@ -12,4 +12,4 @@ __all__ = [
 
 @admin.register(Organisation)
 class OrganisationAdmin(TranslationAdmin):
-    model = OrganisationAdminForm
+    form = OrganisationAdminForm

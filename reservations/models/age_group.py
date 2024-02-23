@@ -14,4 +14,6 @@ class AgeGroup(models.Model):
         base_manager_name = "objects"
 
     def __str__(self) -> str:
+        if self.maximum is None:
+            return f"{self.minimum}+"
         return f"{self.minimum} - {self.maximum}"

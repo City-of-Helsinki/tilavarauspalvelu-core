@@ -11,4 +11,4 @@ __all__ = [
 
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
-    model = PersonAdminForm
+    form = PersonAdminForm

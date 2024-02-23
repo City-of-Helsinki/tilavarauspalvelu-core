@@ -17,6 +17,7 @@ class ApplicationRoundAdminForm(forms.ModelForm):
         widget=disabled_widget,
         required=False,
         disabled=True,
+        label=_("Status"),
         help_text=(
             f"{ApplicationRoundStatusChoice.UPCOMING.value}: "
             f"Applications cannot yet be made in the round. "
@@ -29,7 +30,6 @@ class ApplicationRoundAdminForm(forms.ModelForm):
             f"{ApplicationRoundStatusChoice.RESULTS_SENT.value}: "
             f"All application results have been sent to users. "
         ),
-        label=_("Status"),
     )
 
     def __init__(self, *args, **kwargs):

@@ -5,7 +5,7 @@ from datetime import date, timedelta
 from typing import TYPE_CHECKING
 
 from django.db import models
-from django.db.models import Manager
+from django.db.models import Manager, OrderBy
 from django.db.models.functions import Coalesce, Now
 from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
@@ -132,7 +132,11 @@ class ApplicationSection(SerializableMixin, models.Model):
 
     @property
     def suitable_days_of_the_week(self) -> list[Weekday]:
-        suitable = set(self.suitable_time_ranges.values_list("day_of_the_week", flat=True))
+        suitable = (
+            self.suitable_time_ranges.distinct()
+            .order_by(OrderBy(L("day_of_the_week_number")))
+            .values_list("day_of_the_week", flat=True)
+        )
         return [Weekday(day) for day in suitable]
 
     @lookup_property(joins=["reservation_unit_options", "application"], skip_codegen=True)

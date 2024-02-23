@@ -6,6 +6,7 @@ __all__ = [
 ]
 
 
+# DEPRECATED: Use ReservationUnitOption model instead
 class EventReservationUnit(models.Model):
     preferred_order = models.PositiveIntegerField()
 

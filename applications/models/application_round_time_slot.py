@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING
 
 from django.contrib.postgres.fields import ArrayField, HStoreField
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from applications.choices import WeekdayChoice
 from applications.typing import TimeSlotDB
@@ -31,6 +32,8 @@ class ApplicationRoundTimeSlot(models.Model):
     class Meta:
         db_table = "application_round_time_slot"
         base_manager_name = "objects"
+        verbose_name = _("Application Round Time Slot")
+        verbose_name_plural = _("Application Round Time Slots")
         ordering = ["reservation_unit", "weekday"]
         constraints = [
             models.UniqueConstraint(

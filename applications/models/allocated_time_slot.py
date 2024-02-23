@@ -46,8 +46,8 @@ class AllocatedTimeSlot(models.Model):
     class Meta:
         db_table = "allocated_time_slot"
         base_manager_name = "objects"
-        verbose_name = _("Allocated Timeslot")
-        verbose_name_plural = _("Allocated Timeslots")
+        verbose_name = _("Allocated Time Slot")
+        verbose_name_plural = _("Allocated Time Slots")
         constraints = [
             models.CheckConstraint(
                 check=models.Q(begin_time__lt=models.F("end_time")),
@@ -57,7 +57,10 @@ class AllocatedTimeSlot(models.Model):
         ]
 
     def __str__(self) -> str:
-        return f"Allocated timeslot {self.day_of_the_week} {self.begin_time.isoformat()}-{self.end_time.isoformat()}"
+        return (
+            f"{Weekday(self.day_of_the_week).label} "
+            f"{self.begin_time.isoformat(timespec="minutes")}-{self.end_time.isoformat(timespec="minutes")}"
+        )
 
     @lookup_property
     def allocated_time_of_week() -> str:

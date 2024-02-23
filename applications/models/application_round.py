@@ -3,6 +3,7 @@ from datetime import date, datetime
 
 from django.db import models
 from django.db.models.functions import Now
+from django.utils.translation import gettext_lazy as _
 from lookup_property import lookup_property
 
 from applications.choices import ApplicationRoundStatusChoice, TargetGroupChoice
@@ -75,6 +76,8 @@ class ApplicationRound(models.Model):
     class Meta:
         db_table = "application_round"
         base_manager_name = "objects"
+        verbose_name = _("Application Round")
+        verbose_name_plural = _("Application Rounds")
 
     def __str__(self) -> str:
         return f"{self.name} ({self.reservation_period_begin} - {self.reservation_period_end})"

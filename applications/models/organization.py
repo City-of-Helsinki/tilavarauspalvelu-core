@@ -58,6 +58,8 @@ class Organisation(SerializableMixin, models.Model):
     class Meta:
         db_table = "organisation"
         base_manager_name = "objects"
+        verbose_name = _("Organisation")
+        verbose_name_plural = _("Organisations")
 
     # For GDPR API
     serialize_fields = (
