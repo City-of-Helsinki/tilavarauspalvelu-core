@@ -1,3 +1,4 @@
+import datetime
 from typing import Any, NamedTuple
 
 import pytest
@@ -5,7 +6,9 @@ import pytest
 from common.choices import BannerNotificationLevel, BannerNotificationTarget
 from common.models import BannerNotification
 from tests.factories import BannerNotificationFactory, UserFactory
-from tests.helpers import deprecated_field_error_messages, parametrize_helper
+from tests.helpers import parametrize_helper
+
+from .helpers import UPDATE_MUTATION
 
 # Applied to all tests
 pytestmark = [
@@ -17,19 +20,6 @@ class InvalidActiveParams(NamedTuple):
     active_from: str | None
     active_until: str | None
     expected: Any
-
-
-MUTATION_QUERY = """
-    mutation ($input: BannerNotificationUpdateMutationInput!) {
-      updateBannerNotification(input: $input) {
-        %s
-        errors {
-          field
-          messages
-        }
-      }
-    }
-    """
 
 
 def test_user_updates_draft_banner_notification(graphql):
@@ -48,7 +38,7 @@ def test_user_updates_draft_banner_notification(graphql):
     # when:
     # - User tries to modify the banner notification
     response = graphql(
-        MUTATION_QUERY % ("pk name message target level draft",),
+        UPDATE_MUTATION,
         input_data={
             "pk": notification.pk,
             "name": "1",
@@ -59,16 +49,15 @@ def test_user_updates_draft_banner_notification(graphql):
     )
 
     # then:
-    # - The response contains the modified notification
-    assert response.first_query_object == {
-        "pk": notification.pk,
-        "name": "1",
-        "message": "2",
-        "target": BannerNotificationTarget.ALL.value,
-        "level": BannerNotificationLevel.NORMAL.value,
-        "draft": True,
-        "errors": None,
-    }
+    # - The response has no errors
+    # - The banner notification has been updated
+    assert response.has_errors is False
+
+    notification.refresh_from_db()
+    assert notification.name == "1"
+    assert notification.message == "2"
+    assert notification.target == BannerNotificationTarget.ALL.value
+    assert notification.level == BannerNotificationLevel.NORMAL.value
 
 
 def test_user_publishes_draft_banner_notification(graphql):
@@ -84,27 +73,30 @@ def test_user_publishes_draft_banner_notification(graphql):
     user = UserFactory.create_with_general_permissions(perms=["can_manage_notifications"])
     graphql.force_login(user)
 
+    active_from = datetime.datetime(2020, 1, 1, tzinfo=datetime.UTC)
+    active_until = datetime.datetime(2020, 1, 2, tzinfo=datetime.UTC)
+
     # when:
     # - User tries to 'publish' the banner notification
     response = graphql(
-        MUTATION_QUERY % ("pk draft activeFrom activeUntil",),
+        UPDATE_MUTATION,
         input_data={
             "pk": notification.pk,
             "draft": False,
-            "activeFrom": "2020-01-01T00:00:00+00:00",
-            "activeUntil": "2020-01-02T00:00:00+00:00",
+            "activeFrom": active_from.isoformat(),
+            "activeUntil": active_until.isoformat(),
         },
     )
 
     # then:
-    # - The response contains the 'published' notification
-    assert response.first_query_object == {
-        "pk": notification.pk,
-        "draft": False,
-        "activeFrom": "2020-01-01T02:00:00+02:00",
-        "activeUntil": "2020-01-02T02:00:00+02:00",
-        "errors": None,
-    }
+    # - The response has no errors
+    # - The banner notification has been updated
+    assert response.has_errors is False
+
+    notification.refresh_from_db()
+    assert notification.draft is False
+    assert notification.active_from == active_from
+    assert notification.active_until == active_until
 
 
 def test_user_tries_to_publish_draft_banner_notification_without_setting_active_period(graphql):
@@ -123,7 +115,7 @@ def test_user_tries_to_publish_draft_banner_notification_without_setting_active_
     # when:
     # - User tries to 'publish' the banner notification
     response = graphql(
-        MUTATION_QUERY % ("pk draft",),
+        UPDATE_MUTATION,
         input_data={
             "pk": notification.pk,
             "draft": False,
@@ -132,11 +124,17 @@ def test_user_tries_to_publish_draft_banner_notification_without_setting_active_
 
     # then:
     # - The response contains errors about missing active period
-    assert deprecated_field_error_messages(response, "activeFrom") == [
-        "Non-draft notifications must set 'active_from'",
-    ]
-    assert deprecated_field_error_messages(response, "activeUntil") == [
-        "Non-draft notifications must set 'active_until'"
+    assert response.field_errors == [
+        {
+            "code": "invalid",
+            "field": "activeFrom",
+            "message": "Non-draft notifications must set 'active_from'",
+        },
+        {
+            "code": "invalid",
+            "field": "activeUntil",
+            "message": "Non-draft notifications must set 'active_until'",
+        },
     ]
 
 
@@ -148,10 +146,9 @@ def test_user_tries_to_publish_draft_banner_notification_without_setting_active_
                 active_until="2022-01-01T00:00:00",
                 expected=[
                     {
+                        "code": "invalid",
                         "field": "activeFrom",
-                        "messages": [
-                            "'active_from' must be before 'active_until'.",
-                        ],
+                        "message": "'active_from' must be before 'active_until'.",
                     },
                 ],
             ),
@@ -160,17 +157,19 @@ def test_user_tries_to_publish_draft_banner_notification_without_setting_active_
                 active_until=None,
                 expected=[
                     {
+                        "code": "invalid",
                         "field": "activeUntil",
-                        "messages": [
-                            "Both 'active_from' and 'active_until' must be either set or null.",
-                            "Non-draft notifications must set 'active_until'",
-                        ],
+                        "message": "Both 'active_from' and 'active_until' must be either set or null.",
                     },
                     {
+                        "code": "invalid",
+                        "field": "activeUntil",
+                        "message": "Non-draft notifications must set 'active_until'",
+                    },
+                    {
+                        "code": "invalid",
                         "field": "activeFrom",
-                        "messages": [
-                            "Both 'active_from' and 'active_until' must be either set or null.",
-                        ],
+                        "message": "Both 'active_from' and 'active_until' must be either set or null.",
                     },
                 ],
             ),
@@ -179,17 +178,19 @@ def test_user_tries_to_publish_draft_banner_notification_without_setting_active_
                 active_until="2022-01-01T00:00:00",
                 expected=[
                     {
+                        "code": "invalid",
                         "field": "activeUntil",
-                        "messages": [
-                            "Both 'active_from' and 'active_until' must be either set or null.",
-                        ],
+                        "message": "Both 'active_from' and 'active_until' must be either set or null.",
                     },
                     {
+                        "code": "invalid",
                         "field": "activeFrom",
-                        "messages": [
-                            "Both 'active_from' and 'active_until' must be either set or null.",
-                            "Non-draft notifications must set 'active_from'",
-                        ],
+                        "message": "Both 'active_from' and 'active_until' must be either set or null.",
+                    },
+                    {
+                        "code": "invalid",
+                        "field": "activeFrom",
+                        "message": "Non-draft notifications must set 'active_from'",
                     },
                 ],
             ),
@@ -198,10 +199,9 @@ def test_user_tries_to_publish_draft_banner_notification_without_setting_active_
                 active_until="2022-01-01T00:00:00",
                 expected=[
                     {
+                        "code": "invalid",
                         "field": "activeFrom",
-                        "messages": [
-                            "'active_from' must be before 'active_until'.",
-                        ],
+                        "message": "'active_from' must be before 'active_until'.",
                     },
                 ],
             ),
@@ -226,7 +226,7 @@ def test_user_tries_to_publish_draft_banner_notification_with_improper_active_pe
     # when:
     # - User tries to modify the banner notification
     response = graphql(
-        MUTATION_QUERY % ("pk draft activeFrom activeUntil",),
+        UPDATE_MUTATION,
         input_data={
             "pk": notification.pk,
             "draft": False,
@@ -237,7 +237,7 @@ def test_user_tries_to_publish_draft_banner_notification_with_improper_active_pe
 
     # then:
     # - The response contains errors about the improper active period
-    assert response["updateBannerNotification"]["errors"] == expected, response
+    assert response.field_errors == expected, response
 
 
 def test_primary_key_is_required_for_updating(graphql):
@@ -255,7 +255,7 @@ def test_primary_key_is_required_for_updating(graphql):
 
     # when:
     # - User tries to modify the banner notification
-    response = graphql(MUTATION_QUERY % ("pk",), input_data={})
+    response = graphql(UPDATE_MUTATION, input_data={})
 
     # then:
     # - The response complains about the improper input
@@ -276,7 +276,7 @@ def test_user_updates_non_existing_banner_notification(graphql):
     # when:
     # - User tries to modify a non-existing banner notification
     response = graphql(
-        MUTATION_QUERY % ("pk",),
+        UPDATE_MUTATION,
         input_data={
             "pk": 1,
             "name": "1",
@@ -288,4 +288,4 @@ def test_user_updates_non_existing_banner_notification(graphql):
 
     # then:
     # - The response contains an error about non-existing banner notification
-    assert deprecated_field_error_messages(response, "nonFieldErrors") == ["Object does not exist."]
+    assert response.error_message() == "`BannerNotification` object matching query `{'pk': 1}` does not exist."

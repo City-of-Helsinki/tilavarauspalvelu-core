@@ -1,5 +1,6 @@
-from api.graphql.extensions.base_mutations import CreateAuthMutation, DeleteAuthMutation, UpdateAuthMutation
-from api.graphql.types.banner_notification.permissions import BannerNotificationPermission
+from graphene_django_extensions import CreateMutation, DeleteMutation, UpdateMutation
+
+from api.graphql.types.banner_notification.permissions import BannerNotificationPermissionNew
 from api.graphql.types.banner_notification.serializers import BannerNotificationSerializer
 from common.models import BannerNotification
 
@@ -10,19 +11,19 @@ __all__ = [
 ]
 
 
-class BannerNotificationCreateMutation(CreateAuthMutation):
+class BannerNotificationCreateMutation(CreateMutation):
     class Meta:
         serializer_class = BannerNotificationSerializer
-        permission_classes = (BannerNotificationPermission,)
+        permission_classes = [BannerNotificationPermissionNew]
 
 
-class BannerNotificationUpdateMutation(UpdateAuthMutation):
+class BannerNotificationUpdateMutation(UpdateMutation):
     class Meta:
         serializer_class = BannerNotificationSerializer
-        permission_classes = (BannerNotificationPermission,)
+        permission_classes = [BannerNotificationPermissionNew]
 
 
-class BannerNotificationDeleteMutation(DeleteAuthMutation):
+class BannerNotificationDeleteMutation(DeleteMutation):
     class Meta:
         model = BannerNotification
-        permission_classes = (BannerNotificationPermission,)
+        permission_classes = [BannerNotificationPermissionNew]
