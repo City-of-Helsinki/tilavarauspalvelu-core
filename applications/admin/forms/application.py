@@ -22,9 +22,9 @@ class ApplicationAdminForm(forms.ModelForm):
             f"{ApplicationStatusChoice.RECEIVED.value}: "
             f"Application sent by user. "
             f"{ApplicationStatusChoice.IN_ALLOCATION.value}: "
-            f"Application's events are being allocated. "
+            f"Application's sections are being allocated. "
             f"{ApplicationStatusChoice.HANDLED.value}: "
-            f"Application's events have all been allocated. "
+            f"Application's sections have all been allocated. "
             f"{ApplicationStatusChoice.RESULTS_SENT.value}: "
             f"Application's results have been sent to user. "
             f"{ApplicationStatusChoice.EXPIRED.value}: "
@@ -32,11 +32,12 @@ class ApplicationAdminForm(forms.ModelForm):
             f"{ApplicationStatusChoice.CANCELLED.value}: "
             f"Application cancelled by user. "
         ),
+        label=_("Status"),
     )
 
     def __init__(self, *args, **kwargs):
-        instance = kwargs.get("instance", None)
-        if instance:
+        instance: Application | None = kwargs.get("instance", None)
+        if instance is not None:
             kwargs.setdefault("initial", {})
             kwargs["initial"]["status"] = instance.status
         super().__init__(*args, **kwargs)
@@ -58,7 +59,17 @@ class ApplicationAdminForm(forms.ModelForm):
             "cancelled_date",
         ]
         labels = {
+            "applicant_type": _("Applicant type"),
+            "application_round": _("Application round"),
+            "organisation": _("Organisation"),
+            "contact_person": _("Contact person"),
             "user": _("Applicant"),
+            "billing_address": _("Billing address"),
+            "home_city": _("Home city"),
+            "additional_information": _("Additional information"),
+            "working_memo": _("Working memo"),
+            "sent_date": _("Sent date"),
+            "cancelled_date": _("Cancelled date"),
         }
         help_texts = {
             "applicant_type": _("Applicant type."),

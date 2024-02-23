@@ -1,8 +1,11 @@
 from django.contrib import admin, messages
 from django.contrib.admin import helpers
+from django.core.handlers.wsgi import WSGIRequest
+from django.db.models import QuerySet
 from django.http import HttpRequest
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
+from lookup_property import L
 
 from applications.admin.forms.application import ApplicationAdminForm
 from applications.models import Application
@@ -33,6 +36,21 @@ class ApplicationAdmin(admin.ModelAdmin):
         "application_round__reservation_units__name",
     ]
     actions = ["reset_applications"]
+
+    def get_queryset(self, request: WSGIRequest) -> QuerySet:
+        return (
+            super()
+            .get_queryset(request)
+            .annotate(status=L("status"))
+            .select_related(
+                "application_round",
+                "organisation",
+                "contact_person",
+                "user",
+                "home_city",
+                "billing_address",
+            )
+        )
 
     @admin.action(description="Reset application allocations")
     def reset_applications(self, request: HttpRequest, queryset: ApplicationQuerySet) -> TemplateResponse | None:

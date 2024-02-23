@@ -15,6 +15,10 @@ class CityAdminForm(forms.ModelForm):
             "name",
             "municipality_code",
         ]
+        labels = {
+            "name": _("Name"),
+            "municipality_code": _("Municipality"),
+        }
         help_texts = {
             "name": _("Name of the city."),
             "municipality_code": _("Municipality code for the city."),
