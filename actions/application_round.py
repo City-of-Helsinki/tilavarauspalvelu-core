@@ -8,16 +8,19 @@ class ApplicationRoundActions:
     def __init__(self, application_round: "ApplicationRound") -> None:
         self.application_round = application_round
 
-    def reset_application_round_allocation(self):
-        """Reset application round applications to a state before any allocations were made."""
-        from applications.models import ApplicationEventSchedule
+    def reset_application_round_allocation(self) -> None:
+        """
+        Remove application round allocations, and unlock locked reservation unit options.
+        Rejected options stay rejected.
+        """
+        from applications.models import AllocatedTimeSlot, ReservationUnitOption
 
-        ApplicationEventSchedule.objects.filter(
-            application_event__application__application_round=self.application_round,
+        ReservationUnitOption.objects.filter(
+            application_section__application__application_round=self.application_round,
         ).update(
-            allocated_day=None,
-            allocated_begin=None,
-            allocated_end=None,
-            allocated_reservation_unit=None,
-            declined=False,
+            locked=False,
         )
+
+        AllocatedTimeSlot.objects.filter(
+            reservation_unit_option__application_section__application__application_round=self.application_round,
+        ).delete()

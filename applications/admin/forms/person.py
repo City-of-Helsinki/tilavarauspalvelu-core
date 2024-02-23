@@ -17,6 +17,12 @@ class PersonAdminForm(forms.ModelForm):
             "email",
             "phone_number",
         ]
+        labels = {
+            "first_name": _("First name"),
+            "last_name": _("Last name"),
+            "email": _("Email"),
+            "phone_number": _("Phone number"),
+        }
         help_texts = {
             "first_name": _("Person's first name."),
             "last_name": _("Person's last name."),

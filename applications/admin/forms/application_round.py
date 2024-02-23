@@ -29,10 +29,11 @@ class ApplicationRoundAdminForm(forms.ModelForm):
             f"{ApplicationRoundStatusChoice.RESULTS_SENT.value}: "
             f"All application results have been sent to users. "
         ),
+        label=_("Status"),
     )
 
     def __init__(self, *args, **kwargs):
-        instance = kwargs.get("instance", None)
+        instance: ApplicationRound | None = kwargs.get("instance", None)
         if instance:
             kwargs.setdefault("initial", {})
             kwargs["initial"]["status"] = instance.status
@@ -59,6 +60,22 @@ class ApplicationRoundAdminForm(forms.ModelForm):
         ]
         widgets = {
             "criteria": TinyMCE(),
+        }
+        labels = {
+            "name": _("Name"),
+            "target_group": _("Target group"),
+            "reservation_units": _("Reservation units"),
+            "application_period_begin": _("Application period begin date and time"),
+            "application_period_end": _("Application period end date and time"),
+            "reservation_period_begin": _("Reservation period begin date"),
+            "reservation_period_end": _("Reservation period end date"),
+            "public_display_begin": _("Public display begin date and time"),
+            "public_display_end": _("Public display end date and time"),
+            "handled_date": _("Handled date"),
+            "sent_date": _("Sent date"),
+            "purposes": _("Purposes"),
+            "service_sector": _("Service sector"),
+            "criteria": _("Application criteria"),
         }
         help_texts = {
             "name": _("Name that describes the application round."),

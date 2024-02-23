@@ -12,6 +12,11 @@ class AddressAdminForm(forms.ModelForm):
             "post_code",
             "city",
         ]
+        labels = {
+            "street_address": _("Street address"),
+            "post_code": _("Post code"),
+            "city": _("City name"),
+        }
         help_texts = {
             "street_address": _("Street address"),
             "post_code": _("Post code"),

@@ -21,10 +21,20 @@ class OrganisationAdminForm(forms.ModelForm):
             "organisation_type",
             "address",
         ]
+        labels = {
+            "name": _("Name"),
+            "email": _("Email"),
+            "identifier": _("Company code"),
+            "year_established": _("Year established"),
+            "active_members": _("Active members"),
+            "core_business": _("Core business area"),
+            "organisation_type": _("Organisation type"),
+            "address": _("Address"),
+        }
         help_texts = {
             "name": _("Name of the organisation."),
             "email": _("Email address of the organisation."),
-            "identifier": _("Organization company code."),
+            "identifier": _("Organisation company code."),
             "year_established": _("Year the organisation was established."),
             "active_members": _("Number of active members in the organisation."),
             "core_business": _("Organisation core business area."),
