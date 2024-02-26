@@ -1,14 +1,5 @@
-from typing import Any
-
 from django.conf import settings
 from rest_framework import serializers
-from sentry_sdk import capture_message, push_scope
-
-
-def sentry_webhook_error(errors: dict[str, Any]) -> None:
-    with push_scope() as scope:
-        scope.set_extra("message", errors)
-        capture_message("Invalid webhook")
 
 
 class WebhookPaymentSerializer(serializers.Serializer):

@@ -153,7 +153,7 @@ def test_order_cancel_webhook__payment_order_not_found(api_client, settings):
     response = api_client.post(reverse("order-list"), data=data, format="json")
 
     assert response.status_code == 404, response.data
-    assert response.data == {"message": f"Payment order {order_id=!s} not found"}
+    assert response.data == {"message": f"Payment order '{order_id}' not found"}
 
 
 @patch_method(VerkkokauppaAPIClient.get_order)

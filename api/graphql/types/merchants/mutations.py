@@ -4,7 +4,6 @@ import graphene
 from django.utils.timezone import get_default_timezone
 from graphene import relay
 from graphene_permissions.mixins import AuthMutation
-from sentry_sdk import capture_message
 
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from api.graphql.types.merchants.permissions import OrderRefreshPermission
@@ -54,8 +53,9 @@ class RefreshOrderMutation(relay.ClientIDMutation, AuthMutation):
         try:
             payment = VerkkokauppaAPIClient.get_payment(order_uuid=remote_id)
             if not payment:
-                capture_message(
-                    f"Order payment check failed: payment not found ({remote_id})",
+                SentryLogger.log_message(
+                    message="Verkkokauppa: Order payment check failed",
+                    details=f"Order payment check failed: payment not found ({remote_id}).",
                     level="warning",
                 )
                 raise ValidationErrorWithCode("Unable to check order payment", ValidationErrorCodes.NOT_FOUND)

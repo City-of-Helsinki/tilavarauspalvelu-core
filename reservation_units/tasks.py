@@ -3,7 +3,6 @@ from logging import getLogger
 
 from django.conf import settings
 from easy_thumbnails.exceptions import InvalidImageFormatError
-from sentry_sdk import capture_message
 
 from merchants.models import PaymentProduct
 from merchants.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError
@@ -38,8 +37,9 @@ def refresh_reservation_unit_product_mapping(reservation_unit_pk) -> None:
 
     reservation_unit = ReservationUnit.objects.filter(pk=reservation_unit_pk).first()
     if reservation_unit is None:
-        capture_message(
-            f"Unable to refresh reservation unit product mapping. Reservation unit not found: {reservation_unit_pk}",
+        SentryLogger.log_message(
+            message=f"Unable to refresh reservation unit ({reservation_unit_pk}) product mapping.",
+            details=f"Reservation unit ({reservation_unit_pk}) not found.",
             level="warning",
         )
         return
@@ -78,8 +78,9 @@ def refresh_reservation_unit_accounting(reservation_unit_pk) -> None:
 
     reservation_unit = ReservationUnit.objects.filter(pk=reservation_unit_pk).first()
     if reservation_unit is None:
-        capture_message(
-            f"Unable to refresh reservation unit accounting data. Reservation unit not found: {reservation_unit_pk}",
+        SentryLogger.log_message(
+            message=f"Unable to refresh reservation unit ({reservation_unit_pk}) accounting data.",
+            details=f"Reservation unit ({reservation_unit_pk}) not found.",
             level="warning",
         )
         return

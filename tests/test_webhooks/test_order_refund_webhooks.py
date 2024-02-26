@@ -82,7 +82,7 @@ def test_order_refund_webhook__no_action_needed(api_client, settings, status):
     response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 200, response.data
-    assert response.data == {"message": "Order is already in a state where no updates are needed"}
+    assert response.data == {"message": f"Order '{order_id}' is already in a state where no updates are needed"}
 
 
 @pytest.mark.parametrize("missing_field", ["orderId", "refundId", "refundPaymentId", "namespace", "eventType"])

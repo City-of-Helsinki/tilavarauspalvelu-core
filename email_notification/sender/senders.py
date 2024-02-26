@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
-from sentry_sdk import capture_message
 
 from email_notification.email_tester import EmailTestForm
 from email_notification.models import EmailTemplate, EmailType
@@ -9,6 +8,7 @@ from email_notification.sender.email_notification_builder import (
     ReservationEmailNotificationBuilder,
 )
 from reservations.models import Reservation
+from utils.sentry import SentryLogger
 
 
 class SendReservationEmailNotificationException(Exception):
@@ -32,7 +32,7 @@ def send_reservation_email_notification(
 
     mail_template = EmailTemplate.objects.filter(type=email_type).first()
     if not mail_template:
-        capture_message(
+        SentryLogger.log_message(
             f"Tried to send '{email_type}' notification but no template was defined",
             level="error",
         )

@@ -2,7 +2,6 @@ from uuid import UUID
 
 from django.conf import settings
 from requests import RequestException, Response
-from sentry_sdk import capture_message
 
 from merchants.verkkokauppa import constants as verkkokauppa_constants
 from merchants.verkkokauppa.exceptions import VerkkokauppaConfigurationError
@@ -186,9 +185,9 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             response_json = cls.response_json(response)
 
             if response.status_code > 200:
-                capture_message(
-                    f"Call to Payment Experience API refund endpoint failed with status {response.status_code}. "
-                    f"Response body: {response.text}",
+                SentryLogger.log_message(
+                    message=f"Call to Payment Experience API refund endpoint failed with status {response.status_code}",
+                    details=f"Response body: {response.text}",
                     level="error",
                 )
                 raise RefundPaymentError(f"{action_fail}: problem with upstream service")
@@ -197,10 +196,9 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             if refund_count == 1:
                 return Refund.from_json(response_json["refunds"][0])
             else:
-                capture_message(
-                    "Call to Payment Experience API refund endpoint failed. "
-                    f"Response contains {refund_count} refunds instead of one. "
-                    f"Response body: {response.text}",
+                SentryLogger.log_message(
+                    message="Call to Payment Experience API refund endpoint failed, too many refunds in response.",
+                    details=f"Response contains {refund_count} refunds instead of one. Response body: {response.text}",
                     level="error",
                 )
                 raise RefundPaymentError(f"Refund response refund count expected to be 1 but was {refund_count}")
