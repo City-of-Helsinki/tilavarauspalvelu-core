@@ -350,7 +350,9 @@ const Step1 = ({
         <MediumButton
           variant="primary"
           type="submit"
-          iconRight={<IconArrowRight aria-hidden />}
+          iconRight={
+            requiresHandling ? <IconArrowRight aria-hidden /> : undefined
+          }
           data-test="reservation__button--update"
           isLoading={isSubmitting}
           disabled={!areTermsSpaceAccepted || !areServiceSpecificTermsAccepted}
