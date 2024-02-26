@@ -3,7 +3,6 @@ import datetime
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from django_prometheus.models import ExportModelOperationsMixin
 from helsinki_gdpr.models import SerializableMixin
 
 from applications.choices import PriorityChoice
@@ -22,7 +21,7 @@ __all__ = [
 ]
 
 
-class Reservation(ExportModelOperationsMixin("reservation"), SerializableMixin, models.Model):
+class Reservation(SerializableMixin, models.Model):
     reservee_type = models.CharField(
         max_length=50,
         choices=CustomerTypeChoice.choices,

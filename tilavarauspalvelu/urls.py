@@ -21,7 +21,6 @@ urlpatterns = [
     path("helauth/", include("api.helauth.urls")),
     path("gdpr/v1/", include("api.gdpr.urls")),
     path("tinymce/", include("tinymce.urls")),
-    path("", include("django_prometheus.urls")),
 ]
 
 if settings.DEBUG:

@@ -7,7 +7,7 @@ from requests import RequestException
 from requests import get as _get
 from requests import post as _post
 
-from merchants.verkkokauppa.constants import METRIC_SERVICE_NAME, REQUEST_TIMEOUT_SECONDS
+from merchants.verkkokauppa.constants import REQUEST_TIMEOUT_SECONDS
 from merchants.verkkokauppa.exceptions import VerkkokauppaConfigurationError
 from merchants.verkkokauppa.product.exceptions import (
     CreateOrUpdateAccountingError,
@@ -22,7 +22,6 @@ from merchants.verkkokauppa.product.types import (
     CreateProductParams,
     Product,
 )
-from utils.metrics import ExternalServiceMetric
 
 
 def _get_base_url():
@@ -37,14 +36,12 @@ def _get_base_url():
 
 def create_product(params: CreateProductParams, post=_post) -> Product:
     try:
-        with ExternalServiceMetric(METRIC_SERVICE_NAME, "POST", "/product") as metric:
-            response = post(
-                url=_get_base_url(),
-                json=params.to_json(),
-                headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
-                timeout=REQUEST_TIMEOUT_SECONDS,
-            )
-            metric.response_status = response.status_code
+        response = post(
+            url=_get_base_url(),
+            json=params.to_json(),
+            headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
+            timeout=REQUEST_TIMEOUT_SECONDS,
+        )
 
         json = response.json()
         if response.status_code != 201:
@@ -56,13 +53,11 @@ def create_product(params: CreateProductParams, post=_post) -> Product:
 
 def get_product_mapping(product_id: UUID, get=_get) -> Product | None:
     try:
-        with ExternalServiceMetric(METRIC_SERVICE_NAME, "GET", "/product/{product_id}/mapping") as metric:
-            response = get(
-                url=urljoin(_get_base_url(), f"{product_id!s}/mapping"),
-                headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
-                timeout=REQUEST_TIMEOUT_SECONDS,
-            )
-            metric.response_status = response.status_code
+        response = get(
+            url=urljoin(_get_base_url(), f"{product_id!s}/mapping"),
+            headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
+            timeout=REQUEST_TIMEOUT_SECONDS,
+        )
 
         json = response.json()
         if response.status_code == 404:
@@ -84,17 +79,15 @@ def create_or_update_accounting(product_id: UUID, params: CreateOrUpdateAccounti
     Otherwise payments will fail.
     """
     try:
-        with ExternalServiceMetric(METRIC_SERVICE_NAME, "POST", "/product/{product_id}/accounting") as metric:
-            response = post(
-                url=urljoin(_get_base_url(), f"{product_id}/accounting"),
-                json=params.to_json(),
-                headers={
-                    "api-key": settings.VERKKOKAUPPA_API_KEY,
-                    "namespace": settings.VERKKOKAUPPA_NAMESPACE,
-                },
-                timeout=REQUEST_TIMEOUT_SECONDS,
-            )
-            metric.response_status = response.status_code
+        response = post(
+            url=urljoin(_get_base_url(), f"{product_id}/accounting"),
+            json=params.to_json(),
+            headers={
+                "api-key": settings.VERKKOKAUPPA_API_KEY,
+                "namespace": settings.VERKKOKAUPPA_NAMESPACE,
+            },
+            timeout=REQUEST_TIMEOUT_SECONDS,
+        )
 
         json = response.json()
         if response.status_code == 201:
