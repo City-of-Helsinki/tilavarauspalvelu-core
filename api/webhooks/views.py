@@ -6,7 +6,6 @@ from django.utils.timezone import get_default_timezone
 from rest_framework import viewsets
 from rest_framework.request import Request
 from rest_framework.response import Response
-from sentry_sdk import capture_message
 
 from merchants.models import OrderStatus, PaymentOrder
 from merchants.verkkokauppa.order.exceptions import GetOrderError
@@ -16,13 +15,13 @@ from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.choices import ReservationStateChoice
 from reservations.email_utils import send_confirmation_email
 from reservations.models import Reservation
+from utils.sentry import SentryLogger
 
 from .permissions import WebhookPermission
 from .serializers import (
     WebhookOrderCancelSerializer,
     WebhookPaymentSerializer,
     WebhookRefundSerializer,
-    sentry_webhook_error,
 )
 
 
@@ -32,7 +31,7 @@ class WebhookOrderPaidViewSet(viewsets.GenericViewSet):
     def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         serializer = WebhookPaymentSerializer(data=request.data)
         if not serializer.is_valid():
-            sentry_webhook_error(serializer.errors)
+            SentryLogger.log_message("Verkkokauppa: Invalid webhook", details=serializer.errors)
             return Response(data=serializer.errors, status=400)
 
         order_id: uuid.UUID = serializer.validated_data["orderId"]
@@ -40,8 +39,8 @@ class WebhookOrderPaidViewSet(viewsets.GenericViewSet):
 
         payment_order: PaymentOrder | None = PaymentOrder.objects.filter(remote_id=order_id).first()
         if payment_order is None:
-            msg = f"Payment order {order_id=!s} not found"
-            capture_message(msg)
+            msg = f"Payment order '{order_id}' not found"
+            SentryLogger.log_message(f"Verkkokauppa: {msg}", details=serializer.validated_data)
             return Response(data={"message": msg}, status=404)
 
         if payment_order.status not in [OrderStatus.DRAFT, OrderStatus.EXPIRED, OrderStatus.CANCELLED]:
@@ -52,17 +51,17 @@ class WebhookOrderPaidViewSet(viewsets.GenericViewSet):
             payment = VerkkokauppaAPIClient.get_payment(order_uuid=order_id)
         except GetPaymentError:
             msg = f"Checking payment for order '{order_id}' failed"
-            capture_message(msg)
+            SentryLogger.log_message(f"Verkkokauppa: {msg}", details=serializer.validated_data)
             return Response(data={"message": msg}, status=500)
 
         if payment is None:
             msg = f"Payment '{order_id}' not found from verkkokauppa"
-            capture_message(msg)
+            SentryLogger.log_message(f"Verkkokauppa: {msg}", details=serializer.validated_data)
             return Response(data={"message": msg}, status=404)
 
         if payment.status != PaymentStatus.PAID_ONLINE.value:
             msg = f"Invalid payment status: '{payment.status}'"
-            capture_message(msg)
+            SentryLogger.log_message(f"Verkkokauppa: {msg}", details=serializer.validated_data)
             return Response(data={"message": msg}, status=400)
 
         payment_order.status = OrderStatus.PAID
@@ -85,15 +84,15 @@ class WebhookOrderCancelViewSet(viewsets.ViewSet):
     def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         serializer = WebhookOrderCancelSerializer(data=request.data)
         if not serializer.is_valid():
-            sentry_webhook_error(serializer.errors)
+            SentryLogger.log_message("Verkkokauppa: Invalid webhook", details=serializer.errors)
             return Response(data=serializer.errors, status=400)
 
         order_id: uuid.UUID = serializer.validated_data["orderId"]
 
         payment_order: PaymentOrder | None = PaymentOrder.objects.filter(remote_id=order_id).first()
         if payment_order is None:
-            msg = f"Payment order {order_id=!s} not found"
-            capture_message(msg)
+            msg = f"Payment order '{order_id}' not found"
+            SentryLogger.log_message(f"Verkkokauppa: {msg}", details=serializer.validated_data)
             return Response(data={"message": msg}, status=404)
 
         if payment_order.status not in [OrderStatus.DRAFT]:
@@ -104,17 +103,17 @@ class WebhookOrderCancelViewSet(viewsets.ViewSet):
             order = VerkkokauppaAPIClient.get_order(order_uuid=order_id)
         except GetOrderError:
             msg = f"Checking order '{order_id}' failed"
-            capture_message(msg)
+            SentryLogger.log_message(f"Verkkokauppa: {msg}", details=serializer.validated_data)
             return Response(data={"message": msg}, status=500)
 
         if order is None:
             msg = f"Order '{order_id}' not found from verkkokauppa"
-            capture_message(msg)
+            SentryLogger.log_message(f"Verkkokauppa: {msg}", details=serializer.validated_data)
             return Response(data={"message": msg}, status=404)
 
         if order.status != "cancelled":
             msg = f"Invalid order status: '{order.status}'"
-            capture_message(msg)
+            SentryLogger.log_message(f"Verkkokauppa: {msg}", details=serializer.validated_data)
             return Response(data={"message": msg}, status=400)
 
         payment_order.status = OrderStatus.CANCELLED
@@ -130,7 +129,7 @@ class WebhookRefundViewSet(viewsets.ViewSet):
     def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         serializer = WebhookRefundSerializer(data=request.data)
         if not serializer.is_valid():
-            sentry_webhook_error(serializer.errors)
+            SentryLogger.log_message("Verkkokauppa: Invalid webhook", details=serializer.errors)
             return Response(data=serializer.errors, status=400)
 
         order_id: uuid.UUID = serializer.validated_data["orderId"]
@@ -140,28 +139,28 @@ class WebhookRefundViewSet(viewsets.ViewSet):
         payment_order = PaymentOrder.objects.filter(remote_id=order_id, refund_id=refund_id).first()
         if payment_order is None:
             msg = f"Payment order {order_id=!s} & {refund_id=!s} not found"
-            capture_message(msg)
+            SentryLogger.log_message(f"Verkkokauppa: {msg}", details=serializer.validated_data)
             return Response(data={"message": msg}, status=404)
 
         if payment_order.status not in [OrderStatus.PAID]:
-            msg = "Order is already in a state where no updates are needed"
+            msg = f"Order '{order_id}' is already in a state where no updates are needed"
             return Response(data={"message": msg}, status=200)
 
         try:
             refund_result = VerkkokauppaAPIClient.get_refund_status(order_uuid=order_id)
         except GetRefundStatusError:
             msg = f"Checking order '{order_id}' failed"
-            capture_message(msg)
+            SentryLogger.log_message(f"Verkkokauppa: {msg}", details=serializer.validated_data)
             return Response(data={"message": msg}, status=500)
 
         if refund_result is None:
             msg = f"Refund for order '{order_id}' not found from verkkokauppa"
-            capture_message(msg)
+            SentryLogger.log_message(f"Verkkokauppa: {msg}", details=serializer.validated_data)
             return Response(data={"message": msg}, status=404)
 
         if refund_result.status != RefundStatus.PAID_ONLINE.value:
             msg = f"Invalid refund status: '{refund_result.status}'"
-            capture_message(msg)
+            SentryLogger.log_message(f"Verkkokauppa: {msg}", details=serializer.validated_data)
             return Response(data={"message": msg}, status=400)
 
         payment_order.status = OrderStatus.REFUNDED

@@ -1,6 +1,5 @@
 from copy import deepcopy
 from typing import Any
-from unittest import mock
 from urllib.parse import urljoin
 from uuid import UUID
 
@@ -162,9 +161,9 @@ def test__refund_order__returns_refund():
     assert refund == expected
 
 
+@patch_method(SentryLogger.log_message)
 @patch_method(VerkkokauppaAPIClient.generic, return_value=MockResponse(status_code=500, json={}))
-@mock.patch("utils.external_service.errors.capture_message")
-def test__refund_order__raises_exception_on_non_200_status_code(mock_capture_message):
+def test__refund_order__raises_exception_on_non_200_status_code():
     order_uuid = UUID(refund_response["refunds"][0]["orderId"])
 
     with pytest.raises(RefundPaymentError) as err:
@@ -172,12 +171,12 @@ def test__refund_order__raises_exception_on_non_200_status_code(mock_capture_mes
 
     msg = "Payment refund failed: GET request to VERKKOKAUPPA (http://example.com) failed with status 500."
     assert str(err.value) == msg
-    assert mock_capture_message.called is True
+    assert SentryLogger.log_message.called is True
 
 
+@patch_method(SentryLogger.log_message)
 @patch_method(VerkkokauppaAPIClient.generic)
-@mock.patch("merchants.verkkokauppa.verkkokauppa_api_client.capture_message")
-def test__refund_order__raises_exception_on_multi_refund_response(mock_capture_message):
+def test__refund_order__raises_exception_on_multi_refund_response():
     order_uuid = UUID(refund_response["refunds"][0]["orderId"])
 
     response = deepcopy(refund_response)
@@ -189,7 +188,7 @@ def test__refund_order__raises_exception_on_multi_refund_response(mock_capture_m
         VerkkokauppaAPIClient.refund_order(order_uuid=order_uuid)
 
     assert str(err.value) == "Refund response refund count expected to be 1 but was 2"
-    assert mock_capture_message.called is True
+    assert SentryLogger.log_message.called is True
 
 
 @patch_method(VerkkokauppaAPIClient.generic)

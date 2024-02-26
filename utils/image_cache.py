@@ -2,7 +2,8 @@ from urllib.parse import urljoin
 
 from django.conf import settings
 from requests import request
-from sentry_sdk import capture_message
+
+from utils.sentry import SentryLogger
 
 
 class ImageCacheConfigurationError(Exception):
@@ -13,10 +14,10 @@ def purge(path: str) -> None:
     if not settings.IMAGE_CACHE_ENABLED:
         return
 
-    if not settings.IMAGE_CACHE_VARNISH_HOST or not settings.IMAGE_CACHE_PURGE_KEY:
-        raise ImageCacheConfigurationError(
-            "IMAGE_CACHE_VARNISH_HOST or IMAGE_CACHE_PURGE_KEY setting is not configured"
-        )
+    if not settings.IMAGE_CACHE_VARNISH_HOST:
+        raise ImageCacheConfigurationError("IMAGE_CACHE_VARNISH_HOST setting is not configured")
+    if not settings.IMAGE_CACHE_PURGE_KEY:
+        raise ImageCacheConfigurationError("IMAGE_CACHE_PURGE_KEY setting is not configured")
 
     full_url = urljoin(settings.IMAGE_CACHE_VARNISH_HOST, path)
 
@@ -30,7 +31,9 @@ def purge(path: str) -> None:
     )
 
     if response.status_code != 200:
-        capture_message(
-            f"Purging an image cache failed with status code {response.status_code}. Check image cache configuration.",
+        SentryLogger.log_message(
+            message="Purging an image cache failed",
+            details=f"Purging an image cache failed with status code {response.status_code}. "
+            f"Check image cache configuration.",
             level="error",
         )

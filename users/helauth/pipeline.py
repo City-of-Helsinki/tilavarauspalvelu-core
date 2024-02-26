@@ -6,7 +6,6 @@ import requests
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
 from helusers.tunnistamo_oidc import TunnistamoOIDCAuth
-from sentry_sdk import capture_message
 from social_django.models import DjangoStorage, UserSocialAuth
 from social_django.strategy import DjangoStrategy
 
@@ -94,7 +93,7 @@ def fetch_additional_info_for_user_from_helsinki_profile(
 
 def update_user_from_profile(user: User, token: str | None) -> None:
     if token is None:
-        capture_message(f"Could not fetch JWT from Tunnistamo for user {user.pk!r}")
+        SentryLogger.log_message(f"Helsinki-profiili: Could not fetch JWT from Tunnistamo for user {user.pk!r}")
         return
 
     query = """
@@ -116,12 +115,12 @@ def update_user_from_profile(user: User, token: str | None) -> None:
     data = response.json()
     if "errors" in data:
         msg = data["errors"][0]["message"]
-        capture_message(msg)
+        SentryLogger.log_message(msg)
         return
 
     profile_id: str | None = get_nested(data, "data", "myProfile", "id")
     if profile_id is None:
-        capture_message(f"Profile ID not found for user {user.pk!r}")
+        SentryLogger.log_message(f"Helsinki-profiili: Profile ID not found for user {user.pk!r}")
         return
 
     user.profile_id = profile_id
@@ -134,13 +133,15 @@ def update_user_from_profile(user: User, token: str | None) -> None:
         "nationalIdentificationNumber",
     )
     if id_number is None:
-        capture_message(f"ID number not found for user {user.pk!r}")
+        SentryLogger.log_message(f"Helsinki-profiili: ID number not found for user {user.pk!r}")
         user.save()
         return
 
     date_of_birth = id_number_to_date(id_number)
     if date_of_birth is None:
-        capture_message(f"ID number received from profile was not of correct format for user {user.pk!r}")
+        SentryLogger.log_message(
+            f"Helsinki-profiili: ID number received from profile was not of correct format for user {user.pk!r}"
+        )
         user.save()
         return
 

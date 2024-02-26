@@ -1,5 +1,6 @@
 from requests import Response
-from sentry_sdk import capture_message
+
+from utils.sentry import SentryLogger
 
 
 class ExternalServiceError(Exception):
@@ -16,7 +17,11 @@ class ExternalServiceRequestError(ExternalServiceError):
         )
 
         # Log the response body to Sentry
-        capture_message(f"{error_message} Response body: {response.text}", level="error")
+        SentryLogger.log_message(
+            f"{service_name.capitalize()}: {error_message}",
+            details=f"Response body: {response.text}",
+            level="error",
+        )
 
         super().__init__(error_message)
 

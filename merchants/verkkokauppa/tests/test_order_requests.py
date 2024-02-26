@@ -2,7 +2,6 @@ import json
 from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any
-from unittest import mock
 from urllib.parse import urljoin
 from uuid import UUID
 
@@ -20,6 +19,7 @@ from merchants.verkkokauppa.order.types import (
 from merchants.verkkokauppa.tests.mocks import MockResponse
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tests.helpers import patch_method
+from utils.sentry import SentryLogger
 
 create_order_params: CreateOrderParams = CreateOrderParams(
     namespace="test-namespace",
@@ -409,9 +409,9 @@ def test_verkkokauppa__cancel_order__returns_none_if_order_is_not_found():
     assert order is None
 
 
+@patch_method(SentryLogger.log_message)
 @patch_method(VerkkokauppaAPIClient.generic, return_value=MockResponse(status_code=500, json={}, method="post"))
-@mock.patch("utils.external_service.errors.capture_message")
-def test_verkkokauppa__cancel_order__raises_exception_on_500_status(mock_capture_message):
+def test_verkkokauppa__cancel_order__raises_exception_on_500_status():
     order_uuid = UUID(cancel_order_response["order"]["orderId"])
     user_uuid = cancel_order_response["order"]["user"]
 
@@ -420,4 +420,4 @@ def test_verkkokauppa__cancel_order__raises_exception_on_500_status(mock_capture
 
     err_msg = "Order cancellation failed: POST request to VERKKOKAUPPA (http://example.com) failed with status 500."
     assert str(ex.value) == err_msg
-    assert mock_capture_message.call_count == 1
+    assert SentryLogger.log_message.call_count == 1

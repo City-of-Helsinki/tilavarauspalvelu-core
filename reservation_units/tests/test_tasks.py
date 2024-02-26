@@ -1,4 +1,3 @@
-from unittest import mock
 from uuid import uuid4
 
 from django.test import TestCase, override_settings
@@ -145,13 +144,13 @@ class ReservationUnitRefreshAccountingTaskTestCase(TaskTestBase):
         assert self.runit.payment_product is None
         assert VerkkokauppaAPIClient.create_or_update_accounting.called is False
 
+    @patch_method(SentryLogger.log_message)
     @patch_method(VerkkokauppaAPIClient.create_product)
     @patch_method(VerkkokauppaAPIClient.create_or_update_accounting)
-    @mock.patch("reservation_units.tasks.capture_message")
-    def test_accounting_task_captures_warning_when_runit_does_not_exist(self, mock_capture_message):
+    def test_accounting_task_captures_warning_when_runit_does_not_exist(self):
         VerkkokauppaAPIClient.create_product.return_value = mock_create_product()
         refresh_reservation_unit_accounting(0)
-        assert mock_capture_message.called is True
+        assert SentryLogger.log_message.called is True
 
     @patch_method(SentryLogger.log_exception)
     @patch_method(VerkkokauppaAPIClient.create_product)

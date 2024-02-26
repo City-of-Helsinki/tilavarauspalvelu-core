@@ -5,8 +5,9 @@ from unittest.mock import patch
 import pytest
 
 from tests.factories import UserFactory
-from tests.helpers import ResponseMock, parametrize_helper
+from tests.helpers import ResponseMock, parametrize_helper, patch_method
 from users.helauth.pipeline import id_number_to_date, update_user_from_profile
+from utils.sentry import SentryLogger
 
 
 class ErrorParams(NamedTuple):
@@ -48,13 +49,14 @@ def test_update_user_from_profile():
 
 
 @pytest.mark.django_db()
+@patch_method(SentryLogger.log_message)
 @pytest.mark.parametrize(
     **parametrize_helper(
         {
             "JWT fetch failed": ErrorParams(
                 token=None,
                 profile_response={},
-                error_message="Could not fetch JWT from Tunnistamo for user",
+                error_message="Helsinki-profiili: Could not fetch JWT from Tunnistamo for user",
             ),
             "Missing Profile ID": ErrorParams(
                 token="x",
@@ -65,7 +67,7 @@ def test_update_user_from_profile():
                         },
                     },
                 },
-                error_message="Profile ID not found for user",
+                error_message="Helsinki-profiili: Profile ID not found for user",
             ),
             "Missing ID number": ErrorParams(
                 token="x",
@@ -79,7 +81,7 @@ def test_update_user_from_profile():
                         },
                     },
                 },
-                error_message="ID number not found for user",
+                error_message="Helsinki-profiili: ID number not found for user",
             ),
             "Missing verifiedPersonalInformation": ErrorParams(
                 token="x",
@@ -91,7 +93,7 @@ def test_update_user_from_profile():
                         },
                     },
                 },
-                error_message="ID number not found for user",
+                error_message="Helsinki-profiili: ID number not found for user",
             ),
             "Invalid ID number": ErrorParams(
                 token="x",
@@ -105,7 +107,7 @@ def test_update_user_from_profile():
                         },
                     },
                 },
-                error_message="ID number received from profile was not of correct format for user",
+                error_message="Helsinki-profiili: ID number received from profile was not of correct format for user",
             ),
             "Unexpected Errors": ErrorParams(
                 token="x",
@@ -134,15 +136,12 @@ def test_update_user_from_profile_logs_to_sentry_if_unsuccessful(token, profile_
     # when:
     # - This user's info is updated from profile
     response = ResponseMock(json_data=profile_response)
-    mock_requests = patch("users.helauth.pipeline.requests.get", return_value=response)
-    mock_capture_message = patch("users.helauth.pipeline.capture_message")
-    with mock_requests, mock_capture_message as mock:
+    mock_requests_get = patch("users.helauth.pipeline.requests.get", return_value=response)
+    with mock_requests_get:
         update_user_from_profile(user, token=token)
 
-    # then:
-    # - The user's profile id and date of birth are updated
-    assert mock.call_count == 1
-    log_message = str(mock.mock_calls[0][1][0])
+    assert SentryLogger.log_message.call_count == 1
+    log_message = SentryLogger.log_message.mock_calls[0][1][0]
     assert log_message.startswith(error_message), log_message
 
 
