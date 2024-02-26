@@ -1,4 +1,5 @@
 from graphene_django_extensions import NestingModelSerializer
+from rest_framework.exceptions import ValidationError
 
 from applications.models import ReservationUnitOption
 
@@ -14,6 +15,8 @@ class ReservationUnitOptionApplicantSerializer(NestingModelSerializer):
 
 
 class ReservationUnitOptionHandlerSerializer(NestingModelSerializer):
+    instance: ReservationUnitOption
+
     class Meta:
         model = ReservationUnitOption
         fields = [
@@ -21,3 +24,9 @@ class ReservationUnitOptionHandlerSerializer(NestingModelSerializer):
             "rejected",
             "locked",
         ]
+
+    def validate_rejected(self, value: bool) -> bool:
+        if value and self.instance.allocated_time_slots.exists():
+            msg = "Cannot reject a reservation unit option with allocations"
+            raise ValidationError(msg)
+        return value
