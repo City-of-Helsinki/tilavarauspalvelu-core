@@ -7,7 +7,6 @@ from typing import Any
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django_prometheus.models import ExportModelOperationsMixin
 from elasticsearch_django.models import SearchDocumentManagerMixin, SearchDocumentMixin
 
 from common.connectors import ReservationUnitActionsConnector
@@ -26,7 +25,7 @@ class ReservationUnitManager(SearchDocumentManagerMixin.from_queryset(Reservatio
         return self.get_queryset()
 
 
-class ReservationUnit(SearchDocumentMixin, ExportModelOperationsMixin("reservation_unit"), models.Model):
+class ReservationUnit(SearchDocumentMixin, models.Model):
     sku = models.CharField(verbose_name=_("SKU"), max_length=255, blank=True, default="")
     name = models.CharField(verbose_name=_("Name"), max_length=255)
     description = models.TextField(verbose_name=_("Description"), blank=True, default="")

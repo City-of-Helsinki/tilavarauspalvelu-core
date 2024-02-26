@@ -41,7 +41,6 @@ env = environ.Env(
     CONN_MAX_AGE=(int, 0),
     CORS_ALLOWED_ORIGINS=(list, []),
     CSRF_TRUSTED_ORIGINS=(list, []),
-    DATABASE_ENGINE=(str, ""),
     DATABASE_URL=(str, "sqlite:../db.sqlite3"),
     DEBUG=(bool, False),
     DEFAULT_FROM_EMAIL=(str, global_settings.DEFAULT_FROM_EMAIL),
@@ -182,7 +181,6 @@ INSTALLED_APPS = [
     "django_celery_results",
     "django_extensions",
     "django_filters",
-    "django_prometheus",
     "drf_spectacular",
     "easy_thumbnails",
     "elasticsearch_django",
@@ -214,8 +212,6 @@ INSTALLED_APPS = [
 # ----- Middleware -------------------------------------------------------------------------------------
 
 MIDDLEWARE = [
-    # Make sure PrometheusBeforeMiddleware is the first one
-    "django_prometheus.middleware.PrometheusBeforeMiddleware",
     "tilavarauspalvelu.middleware.MultipleProxyMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
@@ -229,18 +225,12 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "auditlog.middleware.AuditlogMiddleware",
     "social_django.middleware.SocialAuthExceptionMiddleware",
-    # Make sure PrometheusAfterMiddleware is the last one
-    "django_prometheus.middleware.PrometheusAfterMiddleware",
 ]
 
 # ----- Database ---------------------------------------------------------------------------------------
 
 DATABASES = {"default": env.db()}
 DATABASES["default"]["CONN_MAX_AGE"] = env("CONN_MAX_AGE")
-
-# Database engine can be overridden for Prometheus monitoring
-if env("DATABASE_ENGINE"):
-    DATABASES["default"]["ENGINE"] = env("DATABASE_ENGINE")
 
 # ----- Templates --------------------------------------------------------------------------------------
 

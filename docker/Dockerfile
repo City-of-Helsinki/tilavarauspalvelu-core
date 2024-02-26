@@ -36,9 +36,6 @@ RUN echo "Install common dependencies" \
     && chmod g+rw /broker \
     && chmod g+rw /broker/queue \
     && chmod g+rw /broker/processed \
-    && echo "Create directory for django-prometheus metrics" \
-    && mkdir -p /metrics \
-    && chmod g+rw /metrics \
     && echo "Done"
 
 

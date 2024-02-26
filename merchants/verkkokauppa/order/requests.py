@@ -8,11 +8,10 @@ from requests import get as _get
 from requests import post as _post
 from sentry_sdk import capture_message
 
-from merchants.verkkokauppa.constants import METRIC_SERVICE_NAME, REQUEST_TIMEOUT_SECONDS
+from merchants.verkkokauppa.constants import REQUEST_TIMEOUT_SECONDS
 from merchants.verkkokauppa.exceptions import VerkkokauppaConfigurationError
 from merchants.verkkokauppa.order.exceptions import CancelOrderError, CreateOrderError, GetOrderError, ParseOrderError
 from merchants.verkkokauppa.order.types import CreateOrderParams, Order
-from utils.metrics import ExternalServiceMetric
 from utils.sentry import log_exception_to_sentry
 
 
@@ -28,14 +27,12 @@ def _get_base_url():
 
 def create_order(params: CreateOrderParams, post=_post) -> Order:
     try:
-        with ExternalServiceMetric(METRIC_SERVICE_NAME, "POST", "/order") as metric:
-            response = post(
-                url=_get_base_url(),
-                json=params.to_json(),
-                headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
-                timeout=REQUEST_TIMEOUT_SECONDS,
-            )
-            metric.response_status = response.status_code
+        response = post(
+            url=_get_base_url(),
+            json=params.to_json(),
+            headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
+            timeout=REQUEST_TIMEOUT_SECONDS,
+        )
 
         if response.status_code >= 500:
             capture_message(
@@ -56,16 +53,14 @@ def create_order(params: CreateOrderParams, post=_post) -> Order:
 
 def get_order(order_id: UUID, get=_get) -> Order:
     try:
-        with ExternalServiceMetric(METRIC_SERVICE_NAME, "GET", "/order/admin/{order_id}") as metric:
-            response = get(
-                url=urljoin(_get_base_url(), f"admin/{order_id}"),
-                headers={
-                    "api-key": settings.VERKKOKAUPPA_API_KEY,
-                    "namespace": settings.VERKKOKAUPPA_NAMESPACE,
-                },
-                timeout=REQUEST_TIMEOUT_SECONDS,
-            )
-            metric.response_status = response.status_code
+        response = get(
+            url=urljoin(_get_base_url(), f"admin/{order_id}"),
+            headers={
+                "api-key": settings.VERKKOKAUPPA_API_KEY,
+                "namespace": settings.VERKKOKAUPPA_NAMESPACE,
+            },
+            timeout=REQUEST_TIMEOUT_SECONDS,
+        )
 
         json = response.json()
         if response.status_code == 404:
@@ -80,16 +75,14 @@ def get_order(order_id: UUID, get=_get) -> Order:
 
 def cancel_order(order_id: UUID, user_uuid: UUID, post=_post) -> Order | None:
     try:
-        with ExternalServiceMetric(METRIC_SERVICE_NAME, "POST", "/order/{order_id}/cancel") as metric:
-            response = post(
-                url=urljoin(_get_base_url(), f"{order_id!s}/cancel"),
-                headers={
-                    "api-key": settings.VERKKOKAUPPA_API_KEY,
-                    "user": str(user_uuid),
-                },
-                timeout=REQUEST_TIMEOUT_SECONDS,
-            )
-            metric.response_status = response.status_code
+        response = post(
+            url=urljoin(_get_base_url(), f"{order_id!s}/cancel"),
+            headers={
+                "api-key": settings.VERKKOKAUPPA_API_KEY,
+                "user": str(user_uuid),
+            },
+            timeout=REQUEST_TIMEOUT_SECONDS,
+        )
 
         if response.status_code >= 500:
             capture_message(
