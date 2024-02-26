@@ -1,4 +1,5 @@
 import datetime
+from typing import Any
 
 from django.utils.timezone import get_default_timezone
 from rest_framework import serializers
@@ -26,8 +27,8 @@ class StaffReservationModifySerializer(OldPrimaryKeyUpdateSerializer, Reservatio
 
     age_group_pk = IntegerPrimaryKeyField(queryset=AgeGroup.objects.all(), source="age_group", allow_null=True)
 
-    buffer_time_before = DurationField(required=False)
-    buffer_time_after = DurationField(required=False)
+    buffer_time_before = DurationField(required=False, read_only=True)
+    buffer_time_after = DurationField(required=False, read_only=True)
 
     home_city_pk = IntegerPrimaryKeyField(queryset=City.objects.all(), source="home_city", allow_null=True)
     priority = serializers.IntegerField(required=False)
@@ -101,6 +102,8 @@ class StaffReservationModifySerializer(OldPrimaryKeyUpdateSerializer, Reservatio
         self.fields["non_subsidised_price_net"].read_only = True
         self.fields["begin"].read_only = True
         self.fields["end"].read_only = True
+        self.fields["buffer_time_before"].read_only = True
+        self.fields["buffer_time_after"].read_only = True
 
         self.fields["reservee_type"].required = False
         self.fields["reservee_first_name"].required = False
@@ -138,7 +141,7 @@ class StaffReservationModifySerializer(OldPrimaryKeyUpdateSerializer, Reservatio
         self.fields["buffer_time_after"].required = False
         self.fields["reservation_unit_pks"].required = False
 
-    def validate(self, data):
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         data = super().validate(data)
 
         if self.instance.state != ReservationStateChoice.CONFIRMED.value:
@@ -147,52 +150,26 @@ class StaffReservationModifySerializer(OldPrimaryKeyUpdateSerializer, Reservatio
                 ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED,
             )
 
-        begin = data.get("begin", self.instance.begin).astimezone(DEFAULT_TIMEZONE)
-        end = data.get("end", self.instance.end).astimezone(DEFAULT_TIMEZONE)
-
-        new_buffer_before: datetime.timedelta | None = data.get("buffer_time_before", None)
-        new_buffer_after: datetime.timedelta | None = data.get("buffer_time_after", None)
-
-        reservation_unit: ReservationUnit
-        for reservation_unit in self.instance.reservation_unit.all():
-            # Can't set buffers for whole day reservations
-            if reservation_unit.reservation_block_whole_day:
-                data["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(begin)
-                data["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(end)
-
-            reservation_type = data.get("type", getattr(self.instance, "type", None))
-            self.check_reservation_overlap(reservation_unit, begin, end)
-            self.check_buffer_times(
-                reservation_unit,
-                begin,
-                end,
-                reservation_type=reservation_type,
-                new_buffer_before=new_buffer_before,
-                new_buffer_after=new_buffer_after,
-            )
-            self.check_reservation_intervals_for_staff_reservation(reservation_unit, begin)
-
         self.check_time_passed()
-
         if data.get("type"):
             self.check_type(data.get("type"))
 
         return data
 
-    def check_type(self, type):
-        if self.instance.type == ReservationTypeChoice.NORMAL.value and type != ReservationTypeChoice.NORMAL.value:
+    def check_type(self, type_: str) -> None:
+        if self.instance.type == ReservationTypeChoice.NORMAL.value and type_ != ReservationTypeChoice.NORMAL.value:
             raise ValidationErrorWithCode(
-                f"Reservation type cannot be changed from NORMAL to {type.upper()}.",
+                f"Reservation type cannot be changed from NORMAL to {type_.upper()}.",
                 ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED,
             )
 
-        if type == ReservationTypeChoice.NORMAL.value and self.instance.type != ReservationTypeChoice.NORMAL.value:
+        if type_ == ReservationTypeChoice.NORMAL.value and self.instance.type != ReservationTypeChoice.NORMAL.value:
             raise ValidationErrorWithCode(
                 f"Reservation type cannot be changed to NORMAl from state {self.instance.type.upper()}.",
                 ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED,
             )
 
-    def check_time_passed(self):
+    def check_time_passed(self) -> None:
         now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
 
         if now.hour <= 1:
