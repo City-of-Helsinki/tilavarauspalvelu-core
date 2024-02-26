@@ -413,9 +413,9 @@ const ReservationUnitReservationWithReservationProp = ({
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: type the form
-  const onSubmitStep0 = (payload: any): void => {
+  const onSubmitStep0 = (payload: any): Promise<void> => {
     if (supportedFields.includes("reservee_type") && !reserveeType) {
-      return;
+      return Promise.resolve();
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: type the form
@@ -437,7 +437,7 @@ const ReservationUnitReservationWithReservationProp = ({
         : ReservationsReservationReserveeTypeChoices.Individual
     );
 
-    updateReservation({
+    return updateReservation({
       variables: {
         input: {
           pk: reservationPk ?? 0,
@@ -445,16 +445,20 @@ const ReservationUnitReservationWithReservationProp = ({
           reserveeLanguage: i18n.language,
         },
       },
+    }).then(() => {
+      return Promise.resolve();
     });
   };
 
-  const onSubmitStep1 = () => {
-    confirmReservation({
+  const onSubmitStep1 = (): Promise<void> => {
+    return confirmReservation({
       variables: {
         input: {
           pk: reservationPk ?? 0,
         },
       },
+    }).then(() => {
+      return Promise.resolve();
     });
   };
 

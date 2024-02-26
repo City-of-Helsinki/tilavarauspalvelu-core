@@ -25,6 +25,7 @@ import {
   ErrorList,
   PinkBox,
 } from "../reservation-unit/ReservationUnitStyles";
+import { useFormContext } from "react-hook-form";
 
 type Props = {
   reservation: ReservationType;
@@ -89,8 +90,10 @@ const Step1 = ({
   genericTerms,
 }: Props): JSX.Element => {
   const { t } = useTranslation();
+  const {
+    formState: { isSubmitting, isSubmitted },
+  } = useFormContext();
 
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const [areTermsSpaceAccepted, setAreTermsSpaceAccepted] = useState(false);
   const [areServiceSpecificTermsAccepted, setAreServiceSpecificTermsAccepted] =
     useState(false);
@@ -136,7 +139,6 @@ const Step1 = ({
     <Form
       onSubmit={(e) => {
         e.preventDefault();
-        setIsSubmitted(true);
         if (areTermsSpaceAccepted && areServiceSpecificTermsAccepted) {
           handleSubmit();
         }
@@ -350,7 +352,8 @@ const Step1 = ({
           type="submit"
           iconRight={<IconArrowRight aria-hidden />}
           data-test="reservation__button--update"
-          isLoading={isSubmitted}
+          isLoading={isSubmitting}
+          disabled={!areTermsSpaceAccepted || !areServiceSpecificTermsAccepted}
         >
           {t(
             `reservationCalendar:${

@@ -78,7 +78,7 @@ const Step0 = ({
 
   const {
     watch,
-    formState: { errors, isSubmitted },
+    formState: { errors, isSubmitted, isSubmitting, isValid },
   } = useFormContext();
 
   const errorKeys =
@@ -193,9 +193,10 @@ const Step0 = ({
         <MediumButton
           variant="primary"
           type="submit"
+          disabled={!isValid || !reserveeType}
           iconRight={<IconArrowRight aria-hidden />}
           data-test="reservation__button--update"
-          isLoading={isSubmitted}
+          isLoading={isSubmitting}
         >
           {t("reservationCalendar:nextStep")}
         </MediumButton>
