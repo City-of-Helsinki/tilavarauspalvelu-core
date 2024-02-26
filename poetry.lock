@@ -1314,13 +1314,13 @@ test = ["coveralls", "django-filter (>=22.1)", "djangorestframework (>=3.6.3)", 
 
 [[package]]
 name = "graphene-django-extensions"
-version = "0.2.18"
+version = "0.2.19"
 description = "Extensions for graphene-django"
 optional = false
 python-versions = ">=3.10,<4"
 files = [
-    {file = "graphene_django_extensions-0.2.18-py3-none-any.whl", hash = "sha256:ddb3d14cb70fc510d4ffdb0ba13283f4951909084e096252ccbe7951f0b2894e"},
-    {file = "graphene_django_extensions-0.2.18.tar.gz", hash = "sha256:c0f7cf5a97b81b66d052fd73bd1c18f22c16592ba0d95160acd0be06dea291fa"},
+    {file = "graphene_django_extensions-0.2.19-py3-none-any.whl", hash = "sha256:aab54735593f8bb9cbed9361e6d8247821f2a674e810d67ae33454352f41dd5d"},
+    {file = "graphene_django_extensions-0.2.19.tar.gz", hash = "sha256:0eaec25778527ac89cfc1a43b1f3f98ba3f2b0e04590640df58df88af8a1c626"},
 ]
 
 [package.dependencies]
@@ -2928,4 +2928,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.12,<3.13"
-content-hash = "13446b3fa0842691e8cd022e0c6ea99aa53ecd1a055b229cd6866e7c5a205c2e"
+content-hash = "b101fa21c454453040c8f512bb654858efb95d94c3e66e131af4eac5df662f27"

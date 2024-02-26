@@ -55,7 +55,7 @@ whitenoise = "6.6.0"
 django-subforms = "0.3.0"
 python-dateutil = "2.9.0.post0"
 django-lookup-property = "0.1.1"
-graphene-django-extensions = "0.2.18"
+graphene-django-extensions = "0.2.19"
 
 [tool.poetry.dependencies.uWSGI]
 version = "2.0.23"
