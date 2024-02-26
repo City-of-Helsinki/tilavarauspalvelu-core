@@ -35,6 +35,11 @@ _UNIT_PERMISSIONS = {perm[0] for perm in UNIT_PERMISSIONS}
 
 __all__ = [
     "UserFactory",
+    "UserSocialAuthFactory",
+    "add_general_permissions",
+    "add_unit_permissions",
+    "add_unit_group_permissions",
+    "add_service_sector_permissions",
 ]
 
 
@@ -224,3 +229,38 @@ def get_id_token(
             get_random_string(100),
         ]
     )
+
+
+def add_general_permissions(user: User, perms: list[str], code: str = "admin") -> None:
+    choice = GeneralRoleChoiceFactory.create(code=code)
+    GeneralRoleFactory.create(role=choice, user=user)
+    for perm in perms:
+        GeneralRolePermissionFactory.create(role=choice, permission=perm)
+
+
+def add_unit_permissions(user: User, unit: Unit, perms: list[str], code: str = "admin") -> None:
+    choice = UnitRoleChoiceFactory.create(code=code)
+    role = UnitRoleFactory.create(role=choice, user=user)
+    role.unit.add(unit)
+    for perm in perms:
+        UnitRolePermissionFactory.create(role=choice, permission=perm)
+
+
+def add_unit_group_permissions(user: User, unit_group: UnitGroup, perms: list[str], code: str = "admin") -> None:
+    choice = UnitRoleChoiceFactory.create(code=code)
+    role = UnitRoleFactory.create(role=choice, user=user)
+    role.unit_group.add(unit_group)
+    for perm in perms:
+        UnitRolePermissionFactory.create(role=choice, permission=perm)
+
+
+def add_service_sector_permissions(
+    user: User,
+    service_sector: ServiceSector,
+    perms: list[str],
+    code: str = "admin",
+) -> None:
+    choice = ServiceSectorRoleChoiceFactory.create(code=code)
+    ServiceSectorRoleFactory.create(role=choice, user=user, service_sector=service_sector)
+    for perm in perms:
+        ServiceSectorRolePermissionFactory.create(role=choice, permission=perm)
