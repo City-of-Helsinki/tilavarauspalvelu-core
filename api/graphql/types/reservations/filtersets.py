@@ -11,6 +11,7 @@ from api.graphql.extensions.filters import TimezoneAwareDateFilter
 from api.graphql.extensions.order_filter import CustomOrderingFilter
 from common.db import raw_prefixed_query
 from merchants.models import OrderStatus
+from permissions.getters import get_service_sectors_with_permission, get_units_with_permission
 from permissions.helpers import (
     get_service_sectors_where_can_view_reservations,
     get_units_where_can_view_reservations,
@@ -35,6 +36,7 @@ class ReservationFilterSet(django_filters.FilterSet):
     end_date = TimezoneAwareDateFilter(field_name="begin", lookup_expr="lte", use_end_of_day=True)
 
     only_with_permission = django_filters.BooleanFilter(method="get_only_with_permission")
+    only_with_handling_permission = django_filters.BooleanFilter(method="get_only_with_handling_permission")
 
     order_status = django_filters.MultipleChoiceFilter(
         field_name="payment_order__status",
@@ -144,11 +146,11 @@ class ReservationFilterSet(django_filters.FilterSet):
 
         return super().filter_queryset(queryset)
 
-    def get_only_with_permission(root: Reservation, qs: QuerySet, name: str, value: bool) -> QuerySet:
+    def get_only_with_permission(self, qs: QuerySet, name: str, value: bool) -> QuerySet:
         if not value:
             return qs
 
-        user = root.request.user
+        user = self.request.user
         viewable_units = get_units_where_can_view_reservations(user)
         viewable_service_sectors = get_service_sectors_where_can_view_reservations(user)
         if user.is_anonymous:
@@ -159,19 +161,35 @@ class ReservationFilterSet(django_filters.FilterSet):
             | Q(user=user)
         ).distinct()
 
-    def get_requested(root: Reservation, qs: QuerySet, name, value: str) -> QuerySet:
+    def get_only_with_handling_permission(self, qs: QuerySet, name: str, value: bool) -> QuerySet:
+        if not value:
+            return qs
+
+        user = self.request.user
+        if user.is_anonymous:
+            return qs.none()
+
+        units = get_units_with_permission(user, permission="can_manage_reservations")
+        sectors = get_service_sectors_with_permission(user, permission="can_manage_reservations")
+        return qs.filter(
+            Q(user=user)  #
+            | Q(reservation_unit__unit__in=units)
+            | Q(reservation_unit__unit__service_sectors__in=sectors)
+        ).distinct()
+
+    def get_requested(self, qs: QuerySet, name, value: str) -> QuerySet:
         query = Q(state=ReservationStateChoice.REQUIRES_HANDLING) | Q(handled_at__isnull=False)
         if value:
             return qs.filter(query)
         return qs.exclude(query)
 
-    def get_reservation_unit(root: Reservation, qs, property, value):
+    def get_reservation_unit(self, qs, property, value):
         if not value:
             return qs
 
         return qs.filter(reservation_unit__in=value)
 
-    def get_reservation_unit_name(root: Reservation, qs: QuerySet, name: str, value: str) -> QuerySet:
+    def get_reservation_unit_name(self, qs: QuerySet, name: str, value: str) -> QuerySet:
         language = name[-2:]
         words = value.split(",")
         queries = []
@@ -187,12 +205,12 @@ class ReservationFilterSet(django_filters.FilterSet):
         query = reduce(operator.or_, (query for query in queries))
         return qs.filter(query).distinct()
 
-    def get_reservation_unit_type(root: Reservation, qs: QuerySet, name: str, value: list[str]) -> QuerySet:
+    def get_reservation_unit_type(self, qs: QuerySet, name: str, value: list[str]) -> QuerySet:
         if not value:
             return qs
         return qs.filter(reservation_unit__reservation_unit_type__in=value)
 
-    def get_text_search(root: Reservation, qs: QuerySet, name: str, value: str) -> QuerySet:
+    def get_text_search(self, qs: QuerySet, name: str, value: str) -> QuerySet:
         value = value.strip()
         if not value:
             return qs
@@ -228,7 +246,7 @@ class ReservationFilterSet(django_filters.FilterSet):
 
         return qs
 
-    def get_unit(root: Reservation, qs: QuerySet, name: str, value: list[int]) -> QuerySet:
+    def get_unit(self, qs: QuerySet, name: str, value: list[int]) -> QuerySet:
         if not value:
             return qs
 

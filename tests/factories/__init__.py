@@ -56,9 +56,21 @@ from .space import SpaceFactory
 from .tax_percentage import TaxPercentageFactory
 from .terms_of_use import TermsOfUseFactory
 from .unit import UnitFactory, UnitGroupFactory
-from .user import UserFactory, UserSocialAuthFactory
+from .user import (
+    UserFactory,
+    UserSocialAuthFactory,
+    add_general_permissions,
+    add_service_sector_permissions,
+    add_unit_group_permissions,
+    add_unit_permissions,
+)
 
 __all__ = [
+    "UserSocialAuthFactory",
+    "add_general_permissions",
+    "add_unit_permissions",
+    "add_unit_group_permissions",
+    "add_service_sector_permissions",
     "AbilityGroupFactory",
     "AddressFactory",
     "AgeGroupFactory",
