@@ -23,7 +23,7 @@ from reservation_units.utils.reservation_unit_payment_helper import ReservationU
 from reservations.models import Reservation
 from tilavarauspalvelu.utils.date_util import localized_short_weekday
 from utils.decimal_utils import round_decimal
-from utils.sentry import log_exception_to_sentry
+from utils.sentry import SentryLogger
 
 
 def parse_datetime(string: str | None) -> datetime | None:
@@ -78,7 +78,7 @@ def create_verkkokauppa_order(reservation: Reservation) -> Order:
     try:
         payment_order = VerkkokauppaAPIClient.create_order(order_params=order_params)
     except CreateOrderError as err:
-        log_exception_to_sentry(err, details="Creating order in Verkkokauppa failed", reservation_id=reservation.pk)
+        SentryLogger.log_exception(err, details="Creating order in Verkkokauppa failed", reservation_id=reservation.pk)
         raise ValidationErrorWithCode(
             "Upstream service call failed. Unable to confirm the reservation.",
             ValidationErrorCodes.UPSTREAM_CALL_FAILED,

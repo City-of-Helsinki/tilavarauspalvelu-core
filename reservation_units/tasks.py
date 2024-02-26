@@ -3,7 +3,7 @@ from logging import getLogger
 
 from django.conf import settings
 from easy_thumbnails.exceptions import InvalidImageFormatError
-from sentry_sdk import capture_exception, capture_message
+from sentry_sdk import capture_message
 
 from merchants.models import PaymentProduct
 from merchants.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError
@@ -13,7 +13,7 @@ from reservation_units.pricing_updates import update_reservation_unit_pricings
 from reservation_units.utils.reservation_unit_payment_helper import ReservationUnitPaymentHelper
 from tilavarauspalvelu.celery import app
 from utils.image_cache import purge
-from utils.sentry import log_exception_to_sentry
+from utils.sentry import SentryLogger
 
 logger = getLogger(__name__)
 
@@ -102,7 +102,7 @@ def refresh_reservation_unit_accounting(reservation_unit_pk) -> None:
                 product_uuid=reservation_unit.payment_product.id, params=params
             )
         except CreateOrUpdateAccountingError as err:
-            log_exception_to_sentry(
+            SentryLogger.log_exception(
                 err,
                 details="Unable to refresh reservation unit accounting data",
                 reservation_unit_id=reservation_unit_pk,
@@ -126,7 +126,7 @@ def update_urls(pk: int | None = None):
             image.save(update_urls=False)
 
         except InvalidImageFormatError as err:
-            capture_exception(err)
+            SentryLogger.log_exception(err, details="Unable to update image urls", reservation_unit_image_id=image.pk)
 
 
 @app.task(name="purge_image_cache")

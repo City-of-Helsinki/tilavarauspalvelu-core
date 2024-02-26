@@ -13,7 +13,7 @@ from merchants.verkkokauppa.payment.exceptions import GetPaymentError
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.choices import ReservationStateChoice
 from reservations.email_utils import send_confirmation_email
-from utils.sentry import log_exception_to_sentry
+from utils.sentry import SentryLogger
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
@@ -60,7 +60,7 @@ class RefreshOrderMutation(relay.ClientIDMutation, AuthMutation):
                 )
                 raise ValidationErrorWithCode("Unable to check order payment", ValidationErrorCodes.NOT_FOUND)
         except GetPaymentError as err:
-            log_exception_to_sentry(err, details="Order payment check failed", remote_id=remote_id)
+            SentryLogger.log_exception(err, details="Order payment check failed", remote_id=remote_id)
             raise ValidationErrorWithCode(
                 "Unable to check order payment: problem with external service",
                 ValidationErrorCodes.EXTERNAL_SERVICE_ERROR,

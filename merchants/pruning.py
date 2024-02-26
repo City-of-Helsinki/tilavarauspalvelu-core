@@ -10,7 +10,7 @@ from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.choices import ReservationStateChoice
 from reservations.email_utils import send_confirmation_email
 from reservations.models import Reservation
-from utils.sentry import log_exception_to_sentry
+from utils.sentry import SentryLogger
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
@@ -53,6 +53,6 @@ def update_expired_orders(older_than_minutes: int) -> None:
                 send_confirmation_email(reservation)
 
         except GetPaymentError as err:
-            log_exception_to_sentry(err, details="Fetching order payment failed.", remote_id=order.remote_id)
+            SentryLogger.log_exception(err, details="Fetching order payment failed.", remote_id=order.remote_id)
         except CancelOrderError as err:
-            log_exception_to_sentry(err, details="Canceling order failed.", remote_id=order.remote_id)
+            SentryLogger.log_exception(err, details="Canceling order failed.", remote_id=order.remote_id)

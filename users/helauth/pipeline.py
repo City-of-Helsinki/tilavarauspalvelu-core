@@ -6,7 +6,7 @@ import requests
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
 from helusers.tunnistamo_oidc import TunnistamoOIDCAuth
-from sentry_sdk import capture_exception, capture_message
+from sentry_sdk import capture_message
 from social_django.models import DjangoStorage, UserSocialAuth
 from social_django.strategy import DjangoStrategy
 
@@ -19,6 +19,8 @@ __all__ = [
     "id_number_to_date",
     "update_user_from_profile",
 ]
+
+from utils.sentry import SentryLogger
 
 
 class UserDetails(TypedDict):
@@ -84,8 +86,8 @@ def fetch_additional_info_for_user_from_helsinki_profile(
         token = get_profile_token(request.session)
         try:
             update_user_from_profile(user, token)
-        except Exception as error:
-            capture_exception(error)
+        except Exception as err:
+            SentryLogger.log_exception(err, "Helsinki-profiili: Failed to update user from profile")
 
     return {"user": user}
 
