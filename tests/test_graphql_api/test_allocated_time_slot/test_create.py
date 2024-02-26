@@ -5,9 +5,11 @@ from django.utils.timezone import get_default_timezone
 
 from applications.choices import ApplicationSectionStatusChoice, ApplicationStatusChoice, Weekday
 from tests.factories import (
+    AllocatedTimeSlotFactory,
     ApplicationFactory,
     ApplicationRoundFactory,
     ReservationUnitFactory,
+    ReservationUnitOptionFactory,
     SpaceFactory,
     SuitableTimeRangeFactory,
 )
@@ -140,10 +142,7 @@ def test_allocated_time_slot__create__application_not_in_allocation_anymore(grap
 
     # then:
     # - The response complains about the application being in the wrong status
-    assert response.field_error_messages() == [
-        "Cannot allocate to application section in status: 'HANDLED'",
-        "Cannot allocate to application in status: 'HANDLED'",
-    ]
+    assert response.field_error_messages() == ["Cannot allocate to application section in status: 'HANDLED'"]
 
 
 @pytest.mark.parametrize("force", [True, False])
@@ -167,7 +166,7 @@ def test_allocated_time_slot__create__approve_duration_longer_than_section_maxim
     # - If force=True -> The allocation is successful
     assert response.has_errors is (not force)
     if not force:
-        assert response.field_error_messages("endTime") == [
+        assert response.field_error_messages() == [
             "Allocation duration too long. Maximum allowed is 02:00:00 while given duration is 02:30:00."
         ]
 
@@ -193,7 +192,7 @@ def test_allocated_time_slot__create__approve_duration_shorter_than_section_mini
     # - If force=True -> The allocation is successful
     assert response.has_errors is (not force)
     if not force:
-        assert response.field_error_messages("endTime") == [
+        assert response.field_error_messages() == [
             "Allocation duration too short. Minimum allowed is 01:00:00 while given duration is 00:30:00."
         ]
 
@@ -219,7 +218,9 @@ def test_allocated_time_slot__create__approve_duration_not_multiple_of_30_minute
     # - If force=True -> The allocation is successful
     assert response.has_errors is (not force)
     if not force:
-        assert response.field_error_messages("endTime") == ["Allocation duration must be a multiple of 30 minutes."]
+        assert response.field_error_messages() == [
+            "Allocation duration must be a multiple of 30 minutes.",
+        ]
 
 
 @pytest.mark.parametrize("force", [True, False])
@@ -246,9 +247,10 @@ def test_allocated_time_slot__create__approve_more_than_events_per_week(graphql,
     # then:
     # - The response complains about too many allocations already exising
     assert sorted(response.field_error_messages()) == [
-        "Cannot allocate to application in status: 'HANDLED'",
+        # There is a separate check for the number of allocations per week
+        # but since the application section status is tied to the number of allocations,
+        # this message is what is given first.
         "Cannot allocate to application section in status: 'HANDLED'",
-        "Cannot make more allocations for this application section. Maximum allowed is 1.",
     ]
 
 
@@ -335,8 +337,8 @@ def test_allocated_time_slot__create__approved_time_falls_on_two_separated_wishe
     #   and it falls on two of the applicants the wished periods, but not consecutively.
     input_data = allocation_create_data(
         option,
-        begin_time=datetime.time(13, 0),
-        end_time=datetime.time(16, 0),
+        begin_time=datetime.time(13, 30),
+        end_time=datetime.time(15, 30),
     )
     response = graphql(CREATE_ALLOCATION, input_data=input_data)
 
@@ -354,6 +356,7 @@ def test_allocated_time_slot__create__reservation_unit_rejected(graphql, force):
     # - A superuser is using the system
     application = ApplicationFactory.create_application_ready_for_allocation()
     section = application.application_sections.first()
+    ReservationUnitOptionFactory.create(application_section=section)
     option = section.reservation_unit_options.first()
     option.rejected = True
     option.save()
@@ -368,7 +371,7 @@ def test_allocated_time_slot__create__reservation_unit_rejected(graphql, force):
 
     # then:
     # - The response complains about the reservation unit not being included.
-    assert response.field_error_messages("reservationUnitOption") == [
+    assert response.field_error_messages() == [
         "This reservation unit option has been rejected.",
     ]
 
@@ -380,6 +383,7 @@ def test_allocated_time_slot__create__reservation_unit_locked(graphql, force):
     # - A superuser is using the system
     application = ApplicationFactory.create_application_ready_for_allocation()
     section = application.application_sections.first()
+    ReservationUnitOptionFactory.create(application_section=section)
     option = section.reservation_unit_options.first()
     option.locked = True
     option.save()
@@ -394,7 +398,7 @@ def test_allocated_time_slot__create__reservation_unit_locked(graphql, force):
 
     # then:
     # - The response complains about the reservation unit not being included.
-    assert response.field_error_messages("reservationUnitOption") == [
+    assert response.field_error_messages() == [
         "This reservation unit option has been locked.",
     ]
 
@@ -404,11 +408,17 @@ def test_allocated_time_slot__create__two_allocations_for_same_day(graphql, forc
     # given:
     # - There is an allocatable reservation unit option
     # - A superuser is using the system
-    application = ApplicationFactory.create_application_ready_for_allocation(
-        applied_reservations_per_week=2, pre_allocated=True
-    )
+    application = ApplicationFactory.create_application_ready_for_allocation(applied_reservations_per_week=2)
     section = application.application_sections.first()
     option = section.reservation_unit_options.first()
+
+    AllocatedTimeSlotFactory.create(
+        reservation_unit_option=option,
+        day_of_the_week=Weekday.MONDAY,
+        begin_time=datetime.time(10, 0, tzinfo=get_default_timezone()),
+        end_time=datetime.time(12, 0, tzinfo=get_default_timezone()),
+    )
+
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     # when:
@@ -416,6 +426,7 @@ def test_allocated_time_slot__create__two_allocations_for_same_day(graphql, forc
     #   but allocation is on the same day as another allocation for the same section.
     input_data = allocation_create_data(
         option,
+        day_of_the_week=Weekday.MONDAY,
         begin_time=datetime.time(12, 0),
         end_time=datetime.time(14, 0),
         force=force,
@@ -424,7 +435,7 @@ def test_allocated_time_slot__create__two_allocations_for_same_day(graphql, forc
 
     # then:
     # - The response complains about the allocations being on the same day of the week
-    assert response.field_error_messages("dayOfTheWeek") == [
+    assert response.field_error_messages() == [
         "Cannot make multiple allocations on the same day of the week for one application section."
     ]
 

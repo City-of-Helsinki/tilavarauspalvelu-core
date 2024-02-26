@@ -1,11 +1,11 @@
 import datetime
-from collections import defaultdict
 from typing import Any
 
 from graphene_django_extensions import NestingModelSerializer
 from rest_framework import serializers
-from rest_framework.settings import api_settings
+from rest_framework.exceptions import ValidationError
 
+from api.graphql.extensions import error_codes
 from applications.choices import Weekday
 from applications.models import AllocatedTimeSlot, ApplicationSection, ReservationUnitOption, SuitableTimeRange
 from common.date_utils import time_difference, timedelta_to_json
@@ -30,18 +30,19 @@ class AllocatedTimeSlotCreateSerializer(NestingModelSerializer):
         ]
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
-        errors: dict[str, list[str]] = defaultdict(list)
         force: bool = data.pop("force", False)
 
         section: ApplicationSection = data["reservation_unit_option"].application_section
 
-        self.validate_statuses(
-            section=section,
-            errors=errors,
-        )
+        # TODO: "not found for pk" errors should return with code
+        self.validate_statuses(section=section)
+        self.validate_slots_per_week(section=section)
         self.validate_reservation_unit_option_available(
             option=data["reservation_unit_option"],
-            errors=errors,
+        )
+        self.validate_no_allocations_on_the_same_day(
+            section=section,
+            day_of_the_week=data["day_of_the_week"],
         )
         self.validate_overlapping_allocations(
             section=section,
@@ -49,16 +50,6 @@ class AllocatedTimeSlotCreateSerializer(NestingModelSerializer):
             begin_time=data["begin_time"],
             end_time=data["end_time"],
             option=data["reservation_unit_option"],
-            errors=errors,
-        )
-        self.validate_no_allocations_on_the_same_day(
-            section=section,
-            day_of_the_week=data["day_of_the_week"],
-            errors=errors,
-        )
-        self.validate_slots_per_week(
-            section=section,
-            errors=errors,
         )
 
         if not force:
@@ -66,63 +57,50 @@ class AllocatedTimeSlotCreateSerializer(NestingModelSerializer):
                 section=section,
                 begin_time=data["begin_time"],
                 end_time=data["end_time"],
-                errors=errors,
             )
             self.validate_day_of_the_week_is_suitable(
                 section=section,
                 day_of_the_week=data["day_of_the_week"],
-                errors=errors,
             )
             self.validate_within_suitable_time_range(
                 section=section,
                 day_of_the_week=data["day_of_the_week"],
                 begin_time=data["begin_time"],
                 end_time=data["end_time"],
-                errors=errors,
             )
-
-        if errors:
-            raise serializers.ValidationError(errors)
 
         return data
 
-    def validate_statuses(
-        self,
-        section: ApplicationSection,
-        errors: dict[str, list[str]],
-    ) -> None:
+    @staticmethod
+    def validate_statuses(section: ApplicationSection) -> None:
         section_status = section.status
         application_status = section.application.status
 
         if not section_status.can_allocate:
             msg = f"Cannot allocate to application section in status: '{section_status.value}'"
-            errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+            raise ValidationError(msg, code=error_codes.ALLOCATION_SECTION_STATUS_NOT_ALLOWED)
 
         if not application_status.can_allocate:
             msg = f"Cannot allocate to application in status: '{application_status.value}'"
-            errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+            raise ValidationError(msg, code=error_codes.ALLOCATION_APPLICATION_STATUS_NOT_ALLOWED)
 
-    def validate_reservation_unit_option_available(
-        self,
-        option: ReservationUnitOption,
-        errors: dict[str, list[str]],
-    ) -> None:
+    @staticmethod
+    def validate_reservation_unit_option_available(option: ReservationUnitOption) -> None:
         if option.rejected:
             msg = "This reservation unit option has been rejected."
-            errors["reservation_unit_option"].append(msg)
+            raise ValidationError(msg, code=error_codes.ALLOCATION_OPTION_REJECTED)
 
         if option.locked:
             msg = "This reservation unit option has been locked."
-            errors["reservation_unit_option"].append(msg)
+            raise ValidationError(msg, code=error_codes.ALLOCATION_OPTION_LOCKED)
 
+    @staticmethod
     def validate_overlapping_allocations(
-        self,
         section: ApplicationSection,
         day_of_the_week: Weekday,
         begin_time: datetime.time,
         end_time: datetime.time,
         option: ReservationUnitOption,
-        errors: dict[str, list[str]],
     ) -> None:
         has_overlapping_allocations = AllocatedTimeSlot.objects.has_overlapping_allocations(
             reservation_unit_option=option,
@@ -138,14 +116,10 @@ class AllocatedTimeSlotCreateSerializer(NestingModelSerializer):
                 "Given time slot has already been allocated for another application section "
                 "with a related reservation unit or resource."
             )
-            errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+            raise ValidationError(msg, code=error_codes.ALLOCATION_OVERLAPPING_ALLOCATIONS)
 
-    def validate_no_allocations_on_the_same_day(
-        self,
-        section: ApplicationSection,
-        day_of_the_week: Weekday,
-        errors: dict[str, list[str]],
-    ) -> None:
+    @staticmethod
+    def validate_no_allocations_on_the_same_day(section: ApplicationSection, day_of_the_week: Weekday) -> None:
         allocation_for_day_already_exist = AllocatedTimeSlot.objects.filter(
             reservation_unit_option__application_section=section,
             day_of_the_week=day_of_the_week,
@@ -153,30 +127,24 @@ class AllocatedTimeSlotCreateSerializer(NestingModelSerializer):
 
         if allocation_for_day_already_exist:
             msg = "Cannot make multiple allocations on the same day of the week for one application section."
-            errors["day_of_the_week"].append(msg)
+            raise ValidationError(msg, code=error_codes.ALLOCATION_NO_ALLOCATIONS_ON_THE_SAME_DAY)
 
-    def validate_slots_per_week(
-        self,
-        section: ApplicationSection,
-        errors: dict[str, list[str]],
-    ) -> None:
-        allocations = AllocatedTimeSlot.objects.filter(
-            reservation_unit_option__application_section=section,
-        ).count()
+    @staticmethod
+    def validate_slots_per_week(section: ApplicationSection) -> None:
+        allocations = AllocatedTimeSlot.objects.filter(reservation_unit_option__application_section=section).count()
 
         if allocations >= section.applied_reservations_per_week:
             msg = (
                 f"Cannot make more allocations for this application section. "
                 f"Maximum allowed is {section.applied_reservations_per_week}."
             )
-            errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+            raise ValidationError(msg, code=error_codes.ALLOCATION_APPLIED_RESERVATIONS_PER_WEEK_EXCEEDED)
 
+    @staticmethod
     def validate_duration(
-        self,
         section: ApplicationSection,
         begin_time: datetime.time,
         end_time: datetime.time,
-        errors: dict[str, list[str]],
     ) -> None:
         duration = time_difference(end_time, begin_time)
 
@@ -188,7 +156,7 @@ class AllocatedTimeSlotCreateSerializer(NestingModelSerializer):
                 f"Minimum allowed is {min_allowed} "
                 f"while given duration is {given_duration}."
             )
-            errors["end_time"].append(msg)
+            raise ValidationError(msg, code=error_codes.ALLOCATION_DURATION_TOO_SHORT)
 
         if duration > section.reservation_max_duration:
             max_allowed = timedelta_to_json(section.reservation_max_duration)
@@ -198,32 +166,27 @@ class AllocatedTimeSlotCreateSerializer(NestingModelSerializer):
                 f"Maximum allowed is {max_allowed} "
                 f"while given duration is {given_duration}."
             )
-            errors["end_time"].append(msg)
+            raise ValidationError(msg, code=error_codes.ALLOCATION_DURATION_TOO_LONG)
 
         if duration.total_seconds() % 1800 != 0:
             msg = "Allocation duration must be a multiple of 30 minutes."
-            errors["end_time"].append(msg)
+            raise ValidationError(msg, code=error_codes.ALLOCATION_DURATION_NOT_A_MULTIPLE_OF_30_MINUTES)
 
-    def validate_day_of_the_week_is_suitable(
-        self,
-        section: ApplicationSection,
-        day_of_the_week: Weekday,
-        errors: dict[str, list[str]],
-    ) -> None:
+    @staticmethod
+    def validate_day_of_the_week_is_suitable(section: ApplicationSection, day_of_the_week: Weekday) -> None:
         if day_of_the_week not in section.suitable_days_of_the_week:
             msg = (
                 "Cannot allocate for this day of the week. "
                 "Applicant has not indicated it suitable for this application section."
             )
-            errors["day_of_the_week"].append(msg)
+            raise ValidationError(msg, code=error_codes.ALLOCATION_DAY_OF_THE_WEEK_NOT_SUITABLE)
 
+    @staticmethod
     def validate_within_suitable_time_range(
-        self,
         section: ApplicationSection,
         day_of_the_week: Weekday,
         begin_time: datetime.time,
         end_time: datetime.time,
-        errors: dict[str, list[str]],
     ) -> None:
         fits_in_time_range = SuitableTimeRange.objects.fits_in_time_range(
             application_section=section,
@@ -234,4 +197,4 @@ class AllocatedTimeSlotCreateSerializer(NestingModelSerializer):
 
         if not fits_in_time_range:
             msg = "Given time slot does not fit within applicants suitable time ranges."
-            errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+            raise ValidationError(msg, code=error_codes.ALLOCATION_NOT_IN_SUITABLE_TIME_RANGES)
