@@ -72,6 +72,7 @@ from api.graphql.types.reservation_unit_image.mutations import (
     ReservationUnitImageDeleteMutation,
     ReservationUnitImageUpdateMutation,
 )
+from api.graphql.types.reservation_unit_option.mutations import ReservationUnitOptionUpdateMutation
 from api.graphql.types.reservation_unit_type.field import ReservationUnitTypesFilter
 from api.graphql.types.reservation_unit_type.types import ReservationUnitTypeType
 from api.graphql.types.reservation_units.fields import ReservationUnitsFilter
@@ -322,6 +323,8 @@ class Mutation(graphene.ObjectType):
 
     create_allocated_timeslot = AllocatedTimeSlotCreateMutation.Field()
     delete_allocated_timeslot = AllocatedTimeSlotDeleteMutation.Field()
+
+    update_reservation_unit_option = ReservationUnitOptionUpdateMutation.Field()
 
     create_recurring_reservation = RecurringReservationCreateMutation.Field()
     update_recurring_reservation = RecurringReservationUpdateMutation.Field()
