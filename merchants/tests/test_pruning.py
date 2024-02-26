@@ -15,6 +15,7 @@ from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.choices import ReservationStateChoice
 from tests.factories import PaymentFactory, PaymentOrderFactory, ReservationFactory
 from tests.helpers import patch_method
+from utils.sentry import SentryLogger
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
@@ -113,9 +114,9 @@ class UpdateExpiredOrderTestCase(TestCase):
         order.refresh_from_db()
         assert order.status == OrderStatus.EXPIRED
 
-    @mock.patch("merchants.pruning.log_exception_to_sentry")
+    @patch_method(SentryLogger.log_exception)
     @patch_method(VerkkokauppaAPIClient.get_payment)
-    def test_get_payment_errors_are_logged(self, mock_log_exception_to_sentry):
+    def test_get_payment_errors_are_logged(self):
         VerkkokauppaAPIClient.get_payment.side_effect = GetPaymentError("mock-error")
 
         six_minutes_ago = datetime.now() - timedelta(minutes=6)
@@ -131,12 +132,12 @@ class UpdateExpiredOrderTestCase(TestCase):
 
         order.refresh_from_db()
         assert order.status == OrderStatus.DRAFT
-        assert mock_log_exception_to_sentry.called is True
+        assert SentryLogger.log_exception.called is True
 
-    @mock.patch("merchants.pruning.log_exception_to_sentry")
+    @patch_method(SentryLogger.log_exception)
     @patch_method(VerkkokauppaAPIClient.get_payment)
     @patch_method(VerkkokauppaAPIClient.cancel_order, side_effect=CancelOrderError("mock-error"))
-    def test_cancel_error_errors_are_logged(self, mock_capture_message):
+    def test_cancel_error_errors_are_logged(self):
         six_minutes_ago = datetime.now(tz=DEFAULT_TIMEZONE) - timedelta(minutes=6)
         VerkkokauppaAPIClient.get_payment.return_value = PaymentFactory(
             status=WebShopPaymentStatus.CREATED.value,
@@ -155,7 +156,7 @@ class UpdateExpiredOrderTestCase(TestCase):
 
         order.refresh_from_db()
         assert order.status == OrderStatus.DRAFT
-        assert mock_capture_message.called is True
+        assert SentryLogger.log_exception.called is True
 
     @patch_method(VerkkokauppaAPIClient.get_payment)
     @patch_method(VerkkokauppaAPIClient.cancel_order)

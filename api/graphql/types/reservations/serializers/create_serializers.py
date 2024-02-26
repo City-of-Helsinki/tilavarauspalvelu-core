@@ -4,7 +4,6 @@ from django.conf import settings
 from django.utils.timezone import get_default_timezone
 from graphql import GraphQLError
 from rest_framework import serializers
-from sentry_sdk import capture_exception as log_exception_to_sentry
 
 from api.graphql.extensions.duration_field import DurationField
 from api.graphql.extensions.legacy_helpers import OldChoiceCharField, OldPrimaryKeySerializer
@@ -28,6 +27,7 @@ from reservations.choices import (
 from reservations.models import AgeGroup, Reservation, ReservationPurpose
 from users.helauth.utils import get_id_token, is_ad_login
 from users.utils.open_city_profile.basic_info_resolver import ProfileReadError, ProfileUserInfoReader
+from utils.sentry import SentryLogger
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
@@ -242,9 +242,9 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
                 data["reservee_address_city"] = address.get("city")
 
         except ProfileReadError as prof_err:
-            log_exception_to_sentry(prof_err)
+            SentryLogger.log_exception(prof_err, details="Error reading profile data", user=user, data=data)
         except Exception as ex:
-            log_exception_to_sentry(ex)
+            SentryLogger.log_exception(ex, details="Unexpected error reading profile data", user=user, data=data)
 
         return data
 

@@ -44,7 +44,7 @@ from merchants.verkkokauppa.order.exceptions import CancelOrderError
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.choices import ReservationStateChoice
 from reservations.models import Reservation
-from utils.sentry import log_exception_to_sentry
+from utils.sentry import SentryLogger
 
 
 class ReservationCreateMutation(OldAuthSerializerMutation, SerializerMutation):
@@ -189,7 +189,7 @@ class ReservationDeleteMutation(OldAuthDeleteMutation, ClientIDMutation):
                     payment_order.status = OrderStatus.CANCELLED
                     payment_order.save()
             except CancelOrderError as err:
-                log_exception_to_sentry(err, details="Order cancellation failed", remote_id=payment_order.remote_id)
+                SentryLogger.log_exception(err, details="Order cancellation failed", remote_id=payment_order.remote_id)
                 payment_order.status = OrderStatus.CANCELLED
                 payment_order.save()
 

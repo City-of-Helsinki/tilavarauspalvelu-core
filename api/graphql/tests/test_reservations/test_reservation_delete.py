@@ -1,6 +1,5 @@
 import datetime
 import json
-from unittest import mock
 from uuid import uuid4
 
 from django.contrib.auth import get_user_model
@@ -14,6 +13,7 @@ from reservations.choices import ReservationStateChoice
 from reservations.models import Reservation
 from tests.factories import OrderFactory, PaymentOrderFactory, ReservationFactory
 from tests.helpers import patch_method
+from utils.sentry import SentryLogger
 
 
 class ReservationDeleteTestCase(ReservationTestCaseBase):
@@ -153,9 +153,9 @@ class ReservationDeleteTestCase(ReservationTestCaseBase):
         payment_order.refresh_from_db()
         assert payment_order.status == OrderStatus.DRAFT
 
-    @mock.patch("api.graphql.types.reservations.mutations.log_exception_to_sentry")
+    @patch_method(SentryLogger.log_exception)
     @patch_method(VerkkokauppaAPIClient.cancel_order)
-    def test_log_error_on_cancel_order_failure_but_mark_order_cancelled(self, mock_log_exception_to_sentry):
+    def test_log_error_on_cancel_order_failure_but_mark_order_cancelled(self):
         VerkkokauppaAPIClient.cancel_order.side_effect = CancelOrderError("mock-error")
 
         self.reservation.state = ReservationStateChoice.WAITING_FOR_PAYMENT
@@ -177,7 +177,7 @@ class ReservationDeleteTestCase(ReservationTestCaseBase):
         assert payment_order.status == OrderStatus.CANCELLED
 
         assert VerkkokauppaAPIClient.cancel_order.called is True
-        assert mock_log_exception_to_sentry.called is True
+        assert SentryLogger.log_exception.called is True
 
     def test_cannot_delete_when_status_not_created_nor_waiting_for_payment(self):
         self.client.force_login(self.general_admin)

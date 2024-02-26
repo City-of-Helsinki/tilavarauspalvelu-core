@@ -17,6 +17,7 @@ from tests.factories import (
     ReservationUnitPricingFactory,
 )
 from tests.helpers import patch_method
+from utils.sentry import SentryLogger
 
 product_id = uuid4()
 
@@ -152,10 +153,10 @@ class ReservationUnitRefreshAccountingTaskTestCase(TaskTestBase):
         refresh_reservation_unit_accounting(0)
         assert mock_capture_message.called is True
 
-    @mock.patch("reservation_units.tasks.log_exception_to_sentry")
+    @patch_method(SentryLogger.log_exception)
     @patch_method(VerkkokauppaAPIClient.create_product)
     @patch_method(VerkkokauppaAPIClient.create_or_update_accounting)
-    def test_accounting_task_captures_api_errors(self, mock_log_exception_to_sentry):
+    def test_accounting_task_captures_api_errors(self):
         VerkkokauppaAPIClient.create_product.return_value = mock_create_product()
         VerkkokauppaAPIClient.create_or_update_accounting.side_effect = CreateOrUpdateAccountingError("mock-error")
 
@@ -163,4 +164,4 @@ class ReservationUnitRefreshAccountingTaskTestCase(TaskTestBase):
         self.runit.save()
 
         refresh_reservation_unit_accounting(self.runit.pk)
-        assert mock_log_exception_to_sentry.called is True
+        assert SentryLogger.log_exception.called is True

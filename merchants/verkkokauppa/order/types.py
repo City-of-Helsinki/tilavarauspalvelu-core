@@ -7,7 +7,7 @@ from uuid import UUID
 from django.conf import settings
 
 from merchants.verkkokauppa.order.exceptions import ParseOrderError
-from utils.sentry import log_exception_to_sentry
+from utils.sentry import SentryLogger
 
 
 @dataclass(frozen=True)
@@ -166,7 +166,7 @@ class Order:
                 type=json["type"],
             )
         except (KeyError, ValueError) as err:
-            log_exception_to_sentry(err, details="Parsing order failed", json=json)
+            SentryLogger.log_exception(err, details="Parsing order failed", json=json)
             raise ParseOrderError(f"Could not parse order: {err!s}") from err
 
 

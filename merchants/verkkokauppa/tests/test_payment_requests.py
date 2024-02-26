@@ -13,6 +13,7 @@ from merchants.verkkokauppa.payment.types import Payment, Refund, RefundStatusRe
 from merchants.verkkokauppa.tests.mocks import MockResponse
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tests.helpers import patch_method
+from utils.sentry import SentryLogger
 
 get_payment_response: dict[str, Any] = {
     "paymentId": "08c2d282-eb98-3271-a3fc-81fe200f129b_at_20211115-122645",
@@ -192,8 +193,8 @@ def test__refund_order__raises_exception_on_multi_refund_response(mock_capture_m
 
 
 @patch_method(VerkkokauppaAPIClient.generic)
-@mock.patch("merchants.verkkokauppa.payment.types.log_exception_to_sentry")
-def test__refund_order__raises_exception_on_invalid_response(mock_log_exception_to_sentry):
+@patch_method(SentryLogger.log_exception)
+def test__refund_order__raises_exception_on_invalid_response():
     order_uuid = UUID(refund_response["refunds"][0]["orderId"])
 
     response = deepcopy(refund_response)
@@ -205,4 +206,4 @@ def test__refund_order__raises_exception_on_invalid_response(mock_log_exception_
 
     assert str(err.value) == "Payment refund failed: Could not parse refund: badly formed hexadecimal UUID string"
 
-    assert mock_log_exception_to_sentry.called is True
+    assert SentryLogger.log_exception.called is True

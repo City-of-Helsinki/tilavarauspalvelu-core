@@ -43,11 +43,12 @@ from merchants.verkkokauppa.product.types import (
 )
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
 from utils.external_service.errors import ExternalServiceError
-from utils.sentry import log_exception_to_sentry
 
 __all__ = [
     "VerkkokauppaAPIClient",
 ]
+
+from utils.sentry import SentryLogger
 
 
 class VerkkokauppaAPIClient(BaseExternalServiceClient):
@@ -75,7 +76,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             return Order.from_json(response_json)
 
         except (RequestException, ExternalServiceError, ParseOrderError) as err:
-            log_exception_to_sentry(err, details=f"{action_fail}.", order_id=order_uuid)
+            SentryLogger.log_exception(err, details=f"{action_fail}.", order_id=order_uuid)
             raise GetOrderError(f"{action_fail}: {err!s}") from err
 
     @classmethod
@@ -96,7 +97,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             return Order.from_json(response_json)
 
         except (RequestException, ExternalServiceError, ParseOrderError) as err:
-            log_exception_to_sentry(err, details=f"{action_fail}.", order_params=order_params)
+            SentryLogger.log_exception(err, details=f"{action_fail}.", order_params=order_params)
             raise CreateOrderError(f"{action_fail}: {err!s}") from err
 
     @classmethod
@@ -119,7 +120,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             return Order.from_json(response_json["order"])
 
         except (RequestException, ExternalServiceError, ParseOrderError) as err:
-            log_exception_to_sentry(err, details=f"{action_fail}.", order_id=order_uuid)
+            SentryLogger.log_exception(err, details=f"{action_fail}.", order_id=order_uuid)
             raise CancelOrderError(f"{action_fail}: {err!s}") from err
 
     ###########
@@ -205,7 +206,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
                 raise RefundPaymentError(f"Refund response refund count expected to be 1 but was {refund_count}")
 
         except (RequestException, ExternalServiceError, ParseRefundError) as err:
-            log_exception_to_sentry(err, details=action_fail, order_id=order_uuid)
+            SentryLogger.log_exception(err, details=action_fail, order_id=order_uuid)
             raise RefundPaymentError(f"{action_fail}: {err!s}") from err
 
     ############

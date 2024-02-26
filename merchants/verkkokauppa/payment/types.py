@@ -8,7 +8,7 @@ from uuid import UUID
 from django.conf import settings
 
 from merchants.verkkokauppa.payment.exceptions import ParsePaymentError, ParseRefundError, ParseRefundStatusError
-from utils.sentry import log_exception_to_sentry
+from utils.sentry import SentryLogger
 
 
 class PaymentStatus(Enum):
@@ -69,7 +69,7 @@ class Payment:
                 payment_method_label=json["paymentMethodLabel"],
             )
         except (KeyError, ValueError) as err:
-            log_exception_to_sentry(err, details="Parsing refund failed", json=json)
+            SentryLogger.log_exception(err, details="Parsing refund failed", json=json)
             raise ParsePaymentError(f"Could not parse payment: {err!s}") from err
 
     @classmethod
@@ -110,7 +110,7 @@ class Refund:
                 refund_reason=json.get("refundReason"),
             )
         except (KeyError, ValueError) as err:
-            log_exception_to_sentry(err, details="Parsing refund failed", json=json)
+            SentryLogger.log_exception(err, details="Parsing refund failed", json=json)
             raise ParseRefundError(f"Could not parse refund: {err!s}") from err
 
 
@@ -137,5 +137,5 @@ class RefundStatusResult:
                 created_at=parse_datetime(json["createdAt"]),
             )
         except (KeyError, ValueError) as err:
-            log_exception_to_sentry(err, details="Parsing refund status failed", json=json)
+            SentryLogger.log_exception(err, details="Parsing refund status failed", json=json)
             raise ParseRefundStatusError(f"Could not parse refund status: {err!s}") from err

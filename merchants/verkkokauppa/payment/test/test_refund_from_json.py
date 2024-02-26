@@ -1,5 +1,4 @@
 from datetime import datetime
-from unittest import mock
 from uuid import UUID
 
 import pytest
@@ -8,6 +7,8 @@ from django.test import TestCase
 
 from merchants.verkkokauppa.payment.exceptions import ParseRefundError
 from merchants.verkkokauppa.payment.types import Refund
+from tests.helpers import patch_method
+from utils.sentry import SentryLogger
 
 refund_json = {
     "refundId": "b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6",
@@ -63,12 +64,12 @@ class RefundFromJsonTestCase(TestCase):
         assert refund.customer_phone is None
         assert refund.refund_reason is None
 
-    @mock.patch("merchants.verkkokauppa.payment.types.log_exception_to_sentry")
-    def test_parsing_fails(self, mock_log_exception_to_sentry):
+    @patch_method(SentryLogger.log_exception)
+    def test_parsing_fails(self):
         data = refund_json.copy()
         data["refundId"] = "not-a-uuid"
         with pytest.raises(ParseRefundError) as ex:
             Refund.from_json(data)
 
         assert str(ex.value) == "Could not parse refund: badly formed hexadecimal UUID string"
-        assert mock_log_exception_to_sentry.called is True
+        assert SentryLogger.log_exception.called is True

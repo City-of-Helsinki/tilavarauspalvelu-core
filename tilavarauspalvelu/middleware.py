@@ -2,7 +2,8 @@ import logging
 import traceback
 
 from django.conf import settings
-from sentry_sdk import capture_exception
+
+from utils.sentry import SentryLogger
 
 logger = logging.getLogger(__name__)
 
@@ -43,5 +44,5 @@ class GraphQLSentryMiddleware:
             return next(root, info, **kwargs)
         except Exception as err:
             logger.info(traceback.format_exc())
-            capture_exception(err)
+            SentryLogger.log_exception(err, "Error in GraphQL query")
             return err
