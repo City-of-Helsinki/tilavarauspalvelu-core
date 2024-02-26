@@ -2,7 +2,7 @@ import datetime
 from collections.abc import Callable
 from functools import partial
 from itertools import chain
-from typing import Any, TypedDict
+from typing import Any
 
 import graphene
 from django import forms
@@ -10,7 +10,6 @@ from django.db import models
 from django.db.models import Model
 from graphene import Connection, Field, relay
 from graphene.types.resolver import attr_resolver
-from graphene.types.unmountedtype import UnmountedType
 from graphene_django import DjangoConnectionField, DjangoListField, DjangoObjectType
 from graphene_django.converter import convert_django_field, get_django_field_description
 from graphene_django.filter import DjangoFilterConnectionField
@@ -25,7 +24,6 @@ from common.utils import get_translation_fields
 
 __all__ = [
     "DjangoAuthNode",
-    "TypedDictField",
 ]
 
 
@@ -41,6 +39,7 @@ class TVPBaseConnection(Connection):
         return self.length  # type: ignore
 
 
+# DEPRECATED: Use graphene_django_extensions.DjangoNode instead
 class DjangoAuthNode(DjangoObjectType):
     """
     Custom base class for all GraphQL-types that are backed by a Django model.
@@ -161,14 +160,6 @@ class DjangoAuthNode(DjangoObjectType):
         return all(perm.has_node_permission(info, id) for perm in cls._meta.permission_classes)
 
 
-class TypedDictField(graphene.Field):
-    """Field that converts a TypedDict to a graphene ObjectType."""
-
-    def __init__(self, typed_dict: type[TypedDict], *arg: Any, **kwargs: Any) -> None:
-        type_ = convert_typed_dict_to_graphene_type(typed_dict)
-        super().__init__(type_, *arg, **kwargs)
-
-
 _CONVERSION_TABLE: dict[type, type[models.Field]] = {
     int: models.IntegerField,
     str: models.CharField,
@@ -181,18 +172,6 @@ _CONVERSION_TABLE: dict[type, type[models.Field]] = {
     bytes: models.BinaryField,
     datetime.time: models.TimeField,
 }
-
-
-def convert_typed_dict_to_graphene_type(typed_dict: type[TypedDict]) -> type[graphene.ObjectType]:
-    graphene_types: dict[str, UnmountedType] = {}
-    for field_name, type_ in typed_dict.__annotations__.items():
-        model_field = _CONVERSION_TABLE.get(type_)
-        if model_field is None:
-            raise ValueError(f"Cannot convert field {field_name} of type {type_} to model field.")
-        graphene_type = convert_django_field(model_field())
-        graphene_types[field_name] = graphene_type
-
-    return type(f"{typed_dict.__name__}Type", (graphene.ObjectType,), graphene_types)  # type: ignore
 
 
 class TimeString(graphene.Time):
