@@ -9,9 +9,9 @@ from requests import Timeout
 
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError, RefundPaymentError
 from merchants.verkkokauppa.payment.types import Payment, Refund, RefundStatusResult
-from merchants.verkkokauppa.tests.mocks import MockResponse
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tests.helpers import patch_method
+from tests.mocks import MockResponse
 from utils.sentry import SentryLogger
 
 get_payment_response: dict[str, Any] = {

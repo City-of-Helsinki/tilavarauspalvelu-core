@@ -7,9 +7,9 @@ from django.conf import settings
 
 from merchants.verkkokauppa.merchants.exceptions import CreateMerchantError, UpdateMerchantError
 from merchants.verkkokauppa.merchants.types import CreateMerchantParams, Merchant, MerchantInfo, UpdateMerchantParams
-from merchants.verkkokauppa.tests.mocks import MockResponse
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tests.helpers import patch_method
+from tests.mocks import MockResponse
 
 create_merchant_params: CreateMerchantParams = CreateMerchantParams(
     name="Test Merchant",
