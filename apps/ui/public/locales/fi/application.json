@@ -103,7 +103,7 @@
     "firstName": "Etunimi",
     "homeCity": "Kotipaikka",
     "lastName": "Sukunimi",
-    "phoneNumber": "Puhelinumero",
+    "phoneNumber": "Puhelinnumero",
     "email": "Hakemukselle liitettävä sähköpostiosoite",
     "emailNotification": "Kaikki hakemukseen liittyvät viestit lähetetään alla olevaan sähköpostiin",
     "subHeading": {
@@ -162,7 +162,7 @@
     "lastName": "Yhteyshenkilön sukunimi",
     "applicantTypeLabel": "Hakijan tyyppi",
     "email": "Sähköpostiosoite",
-    "phoneNumber": "Puhelinumero",
+    "phoneNumber": "Puhelinnumero",
     "additionalInformation": "Lisätietoja varauksen käyttötarkoituksesta",
     "organisation": {
       "name": "Hakijan nimi",
