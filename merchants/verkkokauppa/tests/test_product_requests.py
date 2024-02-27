@@ -12,9 +12,9 @@ from merchants.verkkokauppa.product.types import (
     CreateProductParams,
     Product,
 )
-from merchants.verkkokauppa.tests.mocks import MockResponse
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tests.helpers import patch_method
+from tests.mocks import MockResponse
 
 create_product_params = CreateProductParams(
     namespace="test-namespace",

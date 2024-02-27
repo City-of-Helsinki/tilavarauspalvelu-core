@@ -16,9 +16,9 @@ from merchants.verkkokauppa.order.types import (
     OrderItemMetaParams,
     OrderItemParams,
 )
-from merchants.verkkokauppa.tests.mocks import MockResponse
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tests.helpers import patch_method
+from tests.mocks import MockResponse
 from utils.sentry import SentryLogger
 
 create_order_params: CreateOrderParams = CreateOrderParams(
