@@ -263,160 +263,180 @@ const ReservationFormField = ({
     message: "email",
   };
 
-  return isSelectField ? (
-    <Controller
-      name={field}
-      control={control}
-      key={field}
-      rules={{ required }}
-      render={({ field: formField }) => (
-        <StyledSelect
+  if (isSelectField)
+    return (
+      <Controller
+        name={field}
+        control={control}
+        key={field}
+        rules={{ required }}
+        render={({ field: formField }) => (
+          <StyledSelect
+            label={label}
+            id={field}
+            options={options[field]}
+            {...removeRefParam(formField)}
+            value={
+              typeof formField.value === "object"
+                ? formField.value
+                : options[field].find((n) => n.value === defaultValue) || null
+            }
+            error={errorText}
+            required={required}
+            invalid={!!error}
+            $isWide={isWideRow}
+          />
+        )}
+      />
+    );
+  if (isNumField)
+    return (
+      <NumberInput
+        label={`${label}`}
+        id={field}
+        {...register(field, {
+          valueAsNumber: true,
+          required,
+          min: minValue,
+          max: maxValue,
+        })}
+        key={field}
+        errorText={errorText}
+        invalid={!!error}
+        required={required}
+        step={1}
+        minusStepButtonAriaLabel={t("common:decrease") || "Decrease"}
+        plusStepButtonAriaLabel={t("common:increase") || "Increase"}
+        min={minValue}
+        max={maxValue}
+        onChange={(e) => {
+          trigger(field);
+          register(field).onChange(e);
+        }}
+      />
+    );
+  if (isTextArea)
+    return (
+      <StyledTextArea
+        label={label}
+        id={field}
+        {...register(field, {
+          required,
+          ...(isEmailField && {
+            pattern: emailPattern,
+          }),
+        })}
+        key={field}
+        defaultValue={defaultValue?.toString() ?? ""}
+        errorText={errorText}
+        invalid={!!error}
+        required={required}
+        $isWide={isWideRow}
+        $hidden={
+          field.includes("billing") && watch("showBillingAddress") !== true
+        }
+        $break={isBreakingColumn}
+        $height="119px"
+      />
+    );
+
+  switch (field) {
+    case "applyingForFreeOfCharge":
+      return (
+        <StyledCheckboxWrapper
+          key={field}
+          $isWide={isWideRow}
+          $break={isBreakingColumn}
+        >
+          <Subheading>
+            {t("reservationApplication:label.subHeadings.subvention")}
+          </Subheading>{" "}
+          <ControlledCheckbox {...checkParams} />
+          {data.termsForDiscount && (
+            <div style={{ marginTop: "0.5rem" }}>{data.termsForDiscount}</div>
+          )}
+        </StyledCheckboxWrapper>
+      );
+    case "reserveeIsUnregisteredAssociation":
+      return (
+        <StyledCheckboxWrapper key={field} $break={isBreakingColumn}>
+          <ControlledCheckbox
+            {...checkParams}
+            defaultChecked={watch("reserveeIsUnregisteredAssociation")}
+          />
+        </StyledCheckboxWrapper>
+      );
+    case "showBillingAddress":
+      return (
+        <StyledCheckboxWrapper key={field} $break={isBreakingColumn}>
+          <ControlledCheckbox {...checkParams} />
+        </StyledCheckboxWrapper>
+      );
+    case "freeOfChargeReason":
+      return (
+        <StyledTextArea
           label={label}
           id={field}
-          options={options[field]}
-          {...removeRefParam(formField)}
-          value={
-            typeof formField.value === "object"
-              ? formField.value
-              : options[field].find((n) => n.value === defaultValue) || null
-          }
-          error={errorText}
-          required={required}
+          key={field}
+          {...register(field, { required: isFreeOfChargeReasonRequired })}
+          defaultValue={defaultValue?.toString() ?? ""}
+          errorText={errorText}
           invalid={!!error}
-          $isWide={isWideRow}
+          required={isFreeOfChargeReasonRequired}
+          $hidden={!watch("applyingForFreeOfCharge")}
+          $isWide
+          $height="92px"
         />
-      )}
-    />
-  ) : field === "applyingForFreeOfCharge" ? (
-    <StyledCheckboxWrapper
-      key={field}
-      $isWide={isWideRow}
-      $break={isBreakingColumn}
-    >
-      <Subheading>
-        {t("reservationApplication:label.subHeadings.subvention")}
-      </Subheading>{" "}
-      <ControlledCheckbox {...checkParams} />
-      {data.termsForDiscount && (
-        <div style={{ marginTop: "0.5rem" }}>{data.termsForDiscount}</div>
-      )}
-    </StyledCheckboxWrapper>
-  ) : field === "reserveeIsUnregisteredAssociation" ? (
-    <StyledCheckboxWrapper key={field} $break={isBreakingColumn}>
-      <ControlledCheckbox
-        {...checkParams}
-        defaultChecked={watch("reserveeIsUnregisteredAssociation")}
-      />
-    </StyledCheckboxWrapper>
-  ) : field === "showBillingAddress" ? (
-    <StyledCheckboxWrapper key={field} $break={isBreakingColumn}>
-      <ControlledCheckbox {...checkParams} />
-    </StyledCheckboxWrapper>
-  ) : field === "freeOfChargeReason" ? (
-    <StyledTextArea
-      label={label}
-      id={field}
-      key={field}
-      {...register(field, { required: isFreeOfChargeReasonRequired })}
-      defaultValue={defaultValue?.toString() ?? ""}
-      errorText={errorText}
-      invalid={!!error}
-      required={isFreeOfChargeReasonRequired}
-      $hidden={!watch("applyingForFreeOfCharge")}
-      $isWide
-      $height="92px"
-    />
-  ) : isNumField ? (
-    <NumberInput
-      label={`${label}`}
-      id={field}
-      {...register(field, {
-        valueAsNumber: true,
-        required,
-        min: minValue,
-        max: maxValue,
-      })}
-      key={field}
-      errorText={errorText}
-      invalid={!!error}
-      required={required}
-      step={1}
-      minusStepButtonAriaLabel={t("common:decrease") || "Decrease"}
-      plusStepButtonAriaLabel={t("common:increase") || "Increase"}
-      min={minValue}
-      max={maxValue}
-      onChange={(e) => {
-        trigger(field);
-        register(field).onChange(e);
-      }}
-    />
-  ) : isTextArea ? (
-    <StyledTextArea
-      label={label}
-      id={field}
-      {...register(field, {
-        required,
-        ...(isEmailField && {
-          pattern: emailPattern,
-        }),
-      })}
-      key={field}
-      defaultValue={defaultValue?.toString() ?? ""}
-      errorText={errorText}
-      invalid={!!error}
-      required={required}
-      $isWide={isWideRow}
-      $hidden={
-        field.includes("billing") && watch("showBillingAddress") !== true
-      }
-      $break={isBreakingColumn}
-      $height="119px"
-    />
-  ) : field === "reserveeId" ? (
-    <StyledTextInput
-      label={label}
-      id={field}
-      {...register(field, {
-        required: isReserveeIdRequired,
-        minLength: 3,
-      })}
-      key={field}
-      type="text"
-      defaultValue={typeof defaultValue === "string" ? defaultValue : ""}
-      errorText={errorText}
-      invalid={!!error}
-      required={required}
-      $isWide={isWideRow}
-      $hidden={
-        watch("reserveeIsUnregisteredAssociation") === undefined
-          ? get(reservation, "reserveeIsUnregisteredAssociation") === true
-          : watch("reserveeIsUnregisteredAssociation") === true
-      }
-      $break={isBreakingColumn}
-    />
-  ) : (
-    <StyledTextInput
-      label={label}
-      id={field}
-      {...register(field, {
-        required,
-        ...(isEmailField && {
-          pattern: emailPattern,
-        }),
-      })}
-      key={field}
-      type="text"
-      errorText={errorText}
-      defaultValue={defaultValue ? String(defaultValue) : undefined}
-      invalid={!!error}
-      required={required}
-      $isWide={isWideRow}
-      $hidden={
-        field.includes("billing") && watch("showBillingAddress") !== true
-      }
-      $break={isBreakingColumn}
-    />
-  );
+      );
+    case "reserveeId":
+      return (
+        <StyledTextInput
+          label={label}
+          id={field}
+          {...register(field, {
+            required: isReserveeIdRequired,
+            minLength: 3,
+          })}
+          key={field}
+          type="text"
+          defaultValue={typeof defaultValue === "string" ? defaultValue : ""}
+          errorText={errorText}
+          invalid={!!error}
+          required={required}
+          $isWide={isWideRow}
+          $hidden={
+            watch("reserveeIsUnregisteredAssociation") === undefined
+              ? get(reservation, "reserveeIsUnregisteredAssociation") === true
+              : watch("reserveeIsUnregisteredAssociation") === true
+          }
+          $break={isBreakingColumn}
+        />
+      );
+    default:
+      return (
+        <StyledTextInput
+          label={label}
+          id={field}
+          {...register(field, {
+            required,
+            ...(isEmailField && {
+              pattern: emailPattern,
+            }),
+          })}
+          key={field}
+          type="text"
+          errorText={errorText}
+          defaultValue={defaultValue ? String(defaultValue) : undefined}
+          invalid={!!error}
+          required={required}
+          $isWide={isWideRow}
+          $hidden={
+            field.includes("billing") && watch("showBillingAddress") !== true
+          }
+          $break={isBreakingColumn}
+        />
+      );
+  }
 };
 
 export default ReservationFormField;

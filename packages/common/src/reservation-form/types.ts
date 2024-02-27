@@ -61,8 +61,6 @@ export type Reservation = {
   Partial<Reservee> &
   Partial<CommonInputs>;
 
-export type ReserveeType = "individual" | "nonprofit" | "business";
-
 const fieldsCommon = [
   "reservee_first_name",
   "reservee_last_name",
