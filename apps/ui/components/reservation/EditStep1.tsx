@@ -352,6 +352,7 @@ const EditStep1 = ({
             disabled={isSubmitting}
             data-testid="reservation-edit__button--submit"
             isLoading={isSubmitting}
+            loadingText={t("reservations:saveNewTimeLoading")}
           >
             {t("reservations:saveNewTime")}
           </MediumButton>

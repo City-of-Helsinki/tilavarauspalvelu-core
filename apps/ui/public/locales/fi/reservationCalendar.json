@@ -20,6 +20,7 @@
   "showView": "Näytä {{view}}näkymä",
   "initialReservation": "Alustava varaus",
   "makeReservation": "Varaa",
+  "makeReservationLoading": "Varataan",
   "reserverInfo": "Varaajan tiedot",
   "reservationInfo": "Varauksen tiedot",
   "notification": {
@@ -69,6 +70,7 @@
     "step3": "Varaus tehty"
   },
   "nextStep": "Jatka",
+  "nextStepLoading": "Jatketaan",
   "reservationSummary": "Varauksen yhteenveto",
   "errors": {
     "bufferCollision": "Varaus on liian lähellä edellistä tai seuraavaa varausta. Muuta varauksen ajankohtaa.",

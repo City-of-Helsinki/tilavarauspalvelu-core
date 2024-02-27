@@ -20,6 +20,7 @@
   "showView": "Visa {{view}}vy",
   "initialReservation": "Preliminär bokning",
   "makeReservation": "Boka",
+  "makeReservationLoading": "Bokar",
   "reserverInfo": "Uppgifter om bokaren",
   "reservationInfo": "Uppgifter om bokningen",
   "notification": {
@@ -71,6 +72,7 @@
     "step3": "Bokningen har gjorts"
   },
   "nextStep": "Fortsätt",
+  "nextStepLoading": "Fortsätter",
   "reservationSummary": "Sammanfattning av bokningen",
   "errors": {
     "bufferCollision": "Bokningen är för nära föregående eller nästa bokning. Ändra bokningens tidpunkt.",

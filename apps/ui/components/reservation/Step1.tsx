@@ -91,9 +91,9 @@ const Step1 = ({
 }: Props): JSX.Element => {
   const { t } = useTranslation();
   const {
-    formState: { isSubmitting, isSubmitted },
+    formState: { isSubmitting },
   } = useFormContext();
-
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [areTermsSpaceAccepted, setAreTermsSpaceAccepted] = useState(false);
   const [areServiceSpecificTermsAccepted, setAreServiceSpecificTermsAccepted] =
     useState(false);
@@ -139,6 +139,7 @@ const Step1 = ({
     <Form
       onSubmit={(e) => {
         e.preventDefault();
+        setIsSubmitted(true);
         if (areTermsSpaceAccepted && areServiceSpecificTermsAccepted) {
           handleSubmit();
         }
@@ -355,6 +356,9 @@ const Step1 = ({
           }
           data-test="reservation__button--update"
           isLoading={isSubmitting}
+          loadingText={t(
+            `reservationCalendar:${requiresHandling ? "nextStep" : "makeReservation"}Loading`
+          )}
           disabled={!areTermsSpaceAccepted || !areServiceSpecificTermsAccepted}
         >
           {t(

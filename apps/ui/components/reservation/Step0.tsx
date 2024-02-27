@@ -198,6 +198,7 @@ const Step0 = ({
           iconRight={<IconArrowRight aria-hidden />}
           data-test="reservation__button--update"
           isLoading={isSubmitting}
+          loadingText={t("reservationCalendar:nextStepLoading")}
         >
           {t("reservationCalendar:nextStep")}
         </MediumButton>

@@ -705,6 +705,7 @@ const QuickReservation = ({
                   }
                 }}
                 isLoading={isReserving}
+                loadingText={t("reservationCalendar:makeReservationLoading")}
                 data-test="quick-reservation__button--submit"
               >
                 {t("reservationCalendar:makeReservation")}

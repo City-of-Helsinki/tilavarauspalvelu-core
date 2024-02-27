@@ -664,6 +664,7 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
             }}
             disabled={!isReservable}
             isLoading={isReserving}
+            loadingText={t("reservationCalendar:makeReservationLoading")}
             data-test="reservation__button--submit"
           >
             {t("reservationCalendar:makeReservation")}

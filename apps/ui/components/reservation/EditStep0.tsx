@@ -492,6 +492,7 @@ const EditStep0 = ({
           }}
           data-testid="reservation-edit__button--continue"
           isLoading={isLoading}
+          loadingText={t("reservationCalendar:nextStepLoading")}
         >
           {t("reservationCalendar:nextStep")}
         </MediumButton>

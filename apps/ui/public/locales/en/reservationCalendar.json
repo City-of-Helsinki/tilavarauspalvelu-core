@@ -20,6 +20,7 @@
   "showView": "Show {{view}} view",
   "initialReservation": "Preliminary booking",
   "makeReservation": "Book",
+  "makeReservationLoading": "Booking",
   "reserverInfo": "Booker’s information",
   "reservationInfo": "Booking details",
   "notification": {
@@ -71,6 +72,7 @@
     "step3": "Booking ready"
   },
   "nextStep": "Continue",
+  "nextStepLoading": "Continuing",
   "reservationSummary": "Booking summary",
   "errors": {
     "bufferCollision": "The booking is too close to the previous or next booking. Please change the booking time.",
