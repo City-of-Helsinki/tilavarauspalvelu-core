@@ -90,12 +90,9 @@ const Step0 = ({
   const includesReserveeType =
     reservationUnit?.metadataSet?.supportedFields?.includes("reservee_type");
   const reserveeType = watch("reserveeType");
+  const homeCity = watch("homeCity");
 
-  if (
-    includesReserveeType &&
-    isSubmitted &&
-    !reserveeType
-  )
+  if (includesReserveeType && isSubmitted && !reserveeType)
     errorKeys.push("reserveeType");
 
   return (
@@ -158,11 +155,10 @@ const Step0 = ({
           <div>{t("forms:heading.errorsSubtitle")}</div>
           <ErrorList>
             {errorKeys.map((key: string) => {
-              const isGeneralField =
-                generalFields.includes(key) || key === "reserveeType";
-              const fieldType = isGeneralField
-                ? "common"
-                : reserveeType?.toLocaleLowerCase() || "individual";
+              const fieldType =
+                generalFields.includes(key) || key === "reserveeType"
+                  ? "common"
+                  : reserveeType?.toLocaleLowerCase() || "individual";
               return (
                 <li key={key}>
                   <ErrorAnchor
@@ -195,7 +191,10 @@ const Step0 = ({
         <MediumButton
           variant="primary"
           type="submit"
-          disabled={!isValid || (includesReserveeType && !reserveeType)}
+          disabled={
+            !isValid ||
+            (includesReserveeType && (!reserveeType || homeCity === 0))
+          }
           iconRight={<IconArrowRight aria-hidden />}
           data-test="reservation__button--update"
           isLoading={isSubmitting}
