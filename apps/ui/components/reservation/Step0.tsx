@@ -87,10 +87,12 @@ const Step0 = ({
       return fields.indexOf(a) - fields.indexOf(b);
     }) || [];
 
+  const includesReserveeType =
+    reservationUnit?.metadataSet?.supportedFields?.includes("reservee_type");
   const reserveeType = watch("reserveeType");
 
   if (
-    reservationUnit?.metadataSet?.supportedFields?.includes("reservee_type") &&
+    includesReserveeType &&
     isSubmitted &&
     !reserveeType
   )
@@ -193,7 +195,7 @@ const Step0 = ({
         <MediumButton
           variant="primary"
           type="submit"
-          disabled={!isValid || !reserveeType}
+          disabled={!isValid || (includesReserveeType && !reserveeType)}
           iconRight={<IconArrowRight aria-hidden />}
           data-test="reservation__button--update"
           isLoading={isSubmitting}
