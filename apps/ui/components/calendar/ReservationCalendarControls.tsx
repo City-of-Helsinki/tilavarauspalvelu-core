@@ -422,10 +422,12 @@ const ReservationCalendarControls = <T extends Record<string, unknown>>({
       const [durationHours, durationMinutes] = String(duration.value).split(
         ":"
       );
-      startDate.setHours(Number(hours), Number(minutes));
+      startDate.setHours(Number(hours), Number(minutes), 0, 0);
       endDate.setHours(
         Number(hours) + Number(durationHours),
-        Number(minutes) + Number(durationMinutes)
+        Number(minutes) + Number(durationMinutes),
+        0,
+        0
       );
 
       if (isSlotReservable(startDate, endDate)) {
