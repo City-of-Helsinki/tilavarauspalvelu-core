@@ -3,7 +3,7 @@ from graphene_django import DjangoListField
 from graphene_django_extensions import DjangoNode
 from graphene_django_extensions.fields import RelatedField
 from lookup_property import L
-from query_optimizer.optimizer import required_annotations
+from query_optimizer import required_annotations
 
 from api.graphql.types.application_round.filtersets import ApplicationRoundFilterSet
 from api.graphql.types.application_round.permissions import ApplicationRoundPermission

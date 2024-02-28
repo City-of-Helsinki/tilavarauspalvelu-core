@@ -2,7 +2,7 @@ import graphene
 from django.db import models
 from graphene_django_extensions import DjangoNode
 from lookup_property import L
-from query_optimizer.optimizer import required_annotations
+from query_optimizer import required_annotations
 
 from api.graphql.types.application.filtersets import ApplicationFilterSet
 from api.graphql.types.application.permissions import ApplicationPermission
