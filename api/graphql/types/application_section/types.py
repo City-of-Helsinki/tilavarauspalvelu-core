@@ -5,7 +5,7 @@ from django.db import models
 from graphene_django_extensions import DjangoNode
 from graphene_django_extensions.fields import RelatedField
 from lookup_property import L
-from query_optimizer.optimizer import required_annotations
+from query_optimizer import required_annotations
 
 from api.graphql.types.application_section.filtersets import ApplicationSectionFilterSet
 from api.graphql.types.application_section.permissions import ApplicationSectionPermission
