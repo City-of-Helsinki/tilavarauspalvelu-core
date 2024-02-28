@@ -1,8 +1,7 @@
 import datetime
-from typing import NotRequired, TypedDict, Unpack
+from typing import Any, NotRequired, TypedDict, Unpack
 
 from django.conf import settings
-from requests import Response
 
 from opening_hours.errors import HaukiAPIError, HaukiConfigurationError
 from opening_hours.utils.hauki_api_types import (
@@ -141,26 +140,12 @@ class HaukiAPIClient(BaseExternalServiceClient):
         return f"{hauki_api_url_base}/v1/{endpoint}/"
 
     @classmethod
-    def get(cls, *, url: str, params: dict | None = None, headers: dict | None = None) -> Response:
-        return super().get(url=url, params=params, headers=headers)
-
-    @classmethod
-    def post(cls, *, url: str, data: dict | None = None, **headers) -> Response:
+    def _get_mutate_headers(cls, headers: dict[str, Any] | None) -> dict[str, Any]:
+        """Add the API key to POST and PUT request headers."""
         if not settings.HAUKI_API_KEY:
             raise HaukiConfigurationError("HAUKI_API_KEY environment variable must to be configured.")
 
-        headers = {
+        return {
             "Content-Type": "application/json",
             "Authorization": f"APIToken {settings.HAUKI_API_KEY}",
-            **headers,
         }
-        return super().post(url=url, data=data, headers=headers)
-
-    @classmethod
-    def put(cls, *, url: str, data: dict | None = None, **headers) -> Response:
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"APIToken {settings.HAUKI_API_KEY}",
-            **headers,
-        }
-        return super().put(url=url, data=data, headers=headers)

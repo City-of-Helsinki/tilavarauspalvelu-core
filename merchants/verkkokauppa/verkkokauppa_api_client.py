@@ -1,3 +1,4 @@
+from typing import Any
 from uuid import UUID
 
 from django.conf import settings
@@ -12,12 +13,7 @@ from merchants.verkkokauppa.merchants.exceptions import (
     UpdateMerchantError,
 )
 from merchants.verkkokauppa.merchants.types import CreateMerchantParams, Merchant, MerchantInfo, UpdateMerchantParams
-from merchants.verkkokauppa.order.exceptions import (
-    CancelOrderError,
-    CreateOrderError,
-    GetOrderError,
-    ParseOrderError,
-)
+from merchants.verkkokauppa.order.exceptions import CancelOrderError, CreateOrderError, GetOrderError, ParseOrderError
 from merchants.verkkokauppa.order.types import CreateOrderParams, Order
 from merchants.verkkokauppa.payment.exceptions import (
     GetPaymentError,
@@ -42,12 +38,11 @@ from merchants.verkkokauppa.product.types import (
 )
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
 from utils.external_service.errors import ExternalServiceError
+from utils.sentry import SentryLogger
 
 __all__ = [
     "VerkkokauppaAPIClient",
 ]
-
-from utils.sentry import SentryLogger
 
 
 class VerkkokauppaAPIClient(BaseExternalServiceClient):
@@ -341,6 +336,16 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             raise VerkkokauppaConfigurationError
 
     @classmethod
+    def _get_headers(cls, headers: dict[str, Any] | None) -> dict[str, Any]:
+        """Add the API key to all request headers."""
+        cls._validate_env_variables()
+
+        return {
+            "api-key": settings.VERKKOKAUPPA_API_KEY,
+            **(headers or {}),  # Allow adding extra headers
+        }
+
+    @classmethod
     def handle_500_error(cls, response: Response) -> None:
         """
         API documentation says that these error codes should are associated with status 404, but in reality the API
@@ -358,29 +363,3 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
                 return
 
         raise super().handle_500_error(response)
-
-    ################
-    # Base methods #
-    ################
-
-    @classmethod
-    def get(cls, *, url: str, params: dict | None = None, headers=None) -> Response:
-        cls._validate_env_variables()
-
-        headers = {
-            "api-key": settings.VERKKOKAUPPA_API_KEY,
-            **(headers if headers else {}),
-        }
-
-        return super().get(url=url, params=params, headers=headers)
-
-    @classmethod
-    def post(cls, *, url: str, data: dict | None = None, headers=None) -> Response:
-        cls._validate_env_variables()
-
-        headers = {
-            "api-key": settings.VERKKOKAUPPA_API_KEY,
-            **(headers if headers else {}),
-        }
-
-        return super().post(url=url, data=data, headers=headers)
