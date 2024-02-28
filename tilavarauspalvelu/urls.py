@@ -12,6 +12,10 @@ from api.webhooks.urls import webhook_router
 real_autocomplete_view = admin.site.autocomplete_view
 admin.site.autocomplete_view = lambda request, extra_context: real_autocomplete_view(request)
 
+# Mock the catch-all view to be able to include `extra_context` for other pages
+real_catch_all_view = admin.site.catch_all_view
+admin.site.catch_all_view = lambda request, url, extra_context: real_catch_all_view(request, url)
+
 urlpatterns = [
     path("graphql/", csrf_exempt(FileUploadGraphQLView.as_view(graphiql=settings.DEBUG))),  # NOSONAR
     path("admin/", admin.site.urls, {"extra_context": {"version": settings.APP_VERSION}}),
