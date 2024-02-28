@@ -747,7 +747,7 @@ const ReservationUnit = ({
   });
 
   const createReservation = useCallback(
-    (res: ReservationProps): void => {
+    async (res: ReservationProps): Promise<void> => {
       setErrorMsg(null);
       setIsReserving(true);
       const { begin, end } = res;
@@ -765,11 +765,12 @@ const ReservationUnit = ({
         end,
       });
 
-      addReservation({
+      await addReservation({
         variables: {
           input,
         },
       });
+      setIsReserving(false);
     },
     [addReservation, reservationUnit?.pk, setInitialReservation]
   );
