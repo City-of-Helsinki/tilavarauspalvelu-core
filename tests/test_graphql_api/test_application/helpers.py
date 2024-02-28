@@ -60,8 +60,8 @@ def get_application_create_data(application_round: ApplicationRound, create_sect
                 "reservationMinDuration": int(datetime.timedelta(hours=1).total_seconds()),
                 "reservationMaxDuration": int(datetime.timedelta(hours=2).total_seconds()),
                 "appliedReservationsPerWeek": 2,
-                "reservationsBeginDate": datetime.date(2022, 8, 1).isoformat(),
-                "reservationsEndDate": datetime.date(2023, 2, 28).isoformat(),
+                "reservationsBeginDate": application_round.reservation_period_begin.isoformat(),
+                "reservationsEndDate": application_round.reservation_period_end.isoformat(),
                 "purpose": reservation_purpose.id,
                 "ageGroup": age_group.id,
                 "suitableTimeRanges": [

@@ -140,7 +140,7 @@ def test_application_section__update__two_reservation_unit_options_with_same_pre
 
     # then:
     # - The response contains errors about duplicate preferred order
-    assert response.field_error_messages("reservationUnitOptions") == [
+    assert response.field_error_messages() == [
         f"Reservation Unit Option {option_2.pk} has duplicate 'preferred_order' 0 "
         f"with these Reservation Unit Options: {option_1.pk}",
     ], response
@@ -173,6 +173,50 @@ def test_application_section__update__preferred_order_must_be_consecutive(graphq
 
     # then:
     # - The response contains errors about preferred order not being consecutive
-    assert response.field_error_messages("reservationUnitOptions") == [
+    assert response.field_error_messages() == [
         f"Reservation Unit Option {event_unit_2.pk} has 'preferred_order' 2 but should be 1"
     ], response
+
+
+def test_application_section__update__reservations_begin_date_not_in_round_reservable_period(graphql):
+    # given:
+    # - There is an unallocated application section in a draft application in an open application round
+    # - A superuser is using the system
+    application_section = ApplicationSectionFactory.create_in_status_unallocated()
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    # when:
+    # - User tries to update the application section
+    #   with a reservations begin date outside the application round
+    data = get_application_section_update_data(application_section=application_section)
+    new_date = application_section.application.application_round.reservation_period_begin - datetime.timedelta(days=1)
+    data["reservationsBeginDate"] = new_date.isoformat()
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    # then:
+    # - The response contains errors about reservations begin date
+    assert response.field_error_messages() == [
+        "Reservations begin date cannot be before the application round's reservation period begin date.",
+    ]
+
+
+def test_application_section__update__reservations_end_date_not_in_round_reservable_period(graphql):
+    # given:
+    # - There is an unallocated application section in a draft application in an open application round
+    # - A superuser is using the system
+    application_section = ApplicationSectionFactory.create_in_status_unallocated()
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    # when:
+    # - User tries to update the application section
+    #   with a reservations end date outside the application round
+    data = get_application_section_update_data(application_section=application_section)
+    new_date = application_section.application.application_round.reservation_period_end + datetime.timedelta(days=1)
+    data["reservationsEndDate"] = new_date.isoformat()
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    # then:
+    # - The response contains errors about reservations end date
+    assert response.field_error_messages() == [
+        "Reservations end date cannot be after the application round's reservation period end date.",
+    ]

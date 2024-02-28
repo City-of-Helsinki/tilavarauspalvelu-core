@@ -14,7 +14,7 @@ pytestmark = [
 ]
 
 
-def test_create_application_section(graphql):
+def test_application_section__create(graphql):
     # given:
     # - There is draft application in an open application round
     # - The owner of the application is using the system
@@ -55,7 +55,7 @@ def test_create_application_section(graphql):
     assert section.status == ApplicationSectionStatusChoice.UNALLOCATED
 
 
-def test_create_application_section__smaller_max_duration_than_min_duration(graphql):
+def test_application_section__create__smaller_max_duration_than_min_duration(graphql):
     # given:
     # - There is draft application in an open application round
     # - The owner of the application is using the system
@@ -75,7 +75,7 @@ def test_create_application_section__smaller_max_duration_than_min_duration(grap
     ]
 
 
-def test_create_application_section__duration_not_multiple_of_30(graphql):
+def test_application_section__create__duration_not_multiple_of_30(graphql):
     # given:
     # - There is draft application in an open application round
     # - The owner of the application is using the system
@@ -95,7 +95,7 @@ def test_create_application_section__duration_not_multiple_of_30(graphql):
     ]
 
 
-def test_create_application_section__two_reservation_unit_options_with_same_preferred_order(graphql):
+def test_application_section__create__two_reservation_unit_options_with_same_preferred_order(graphql):
     # given:
     # - There is draft application in an open application round
     # - The owner of the application is using the system
@@ -120,6 +120,50 @@ def test_create_application_section__two_reservation_unit_options_with_same_pref
     # then:
     # - The response contains errors about violating unique constraint
     assert response.has_errors is True, response
-    assert response.field_error_messages("reservationUnitOptions") == [
+    assert response.field_error_messages() == [
         "Reservation Unit Option #2 has duplicate 'preferred_order' 0 with these Reservation Unit Options: #1"
+    ]
+
+
+def test_application_section__create__reservations_begin_date_not_in_round_reservable_period(graphql):
+    # given:
+    # - There is draft application in an open application round
+    # - The owner of the application is using the system
+    application = ApplicationFactory.create_in_status_draft()
+    graphql.force_login(application.user)
+
+    # when:
+    # - User tries to create a new application section
+    #   with a reservations begin date outside the application round
+    data = get_application_section_create_data(application=application)
+    new_date = application.application_round.reservation_period_begin - datetime.timedelta(days=1)
+    data["reservationsBeginDate"] = new_date.isoformat()
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    # then:
+    # - The response contains an error about the reservations begin date
+    assert response.field_error_messages() == [
+        "Reservations begin date cannot be before the application round's reservation period begin date.",
+    ]
+
+
+def test_application_section__create__reservations_end_date_not_in_round_reservable_period(graphql):
+    # given:
+    # - There is draft application in an open application round
+    # - The owner of the application is using the system
+    application = ApplicationFactory.create_in_status_draft()
+    graphql.force_login(application.user)
+
+    # when:
+    # - User tries to create a new application section
+    #   with a reservations end date outside the application round
+    data = get_application_section_create_data(application=application)
+    new_date = application.application_round.reservation_period_end + datetime.timedelta(days=1)
+    data["reservationsEndDate"] = new_date.isoformat()
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    # then:
+    # - The response contains an error about the reservations begin date
+    assert response.field_error_messages() == [
+        "Reservations end date cannot be after the application round's reservation period end date.",
     ]
