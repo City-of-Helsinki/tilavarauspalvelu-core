@@ -179,7 +179,7 @@ class UnitHaukiResourceIdImporter:
 
         logger.info(f"Importing units {units} resource ids from Hauki...")
 
-        response = HaukiAPIClient.get_resources(
+        response: HaukiAPIResourceListResponse = HaukiAPIClient.get_resources(
             hauki_resource_ids=[],
             data_source="tprek",
             origin_id_exists=True,
@@ -190,9 +190,9 @@ class UnitHaukiResourceIdImporter:
         # Keep fetching results until there are no more pages.
         next_url = response.get("next", None)
         while next_url:
-            response: HaukiAPIResourceListResponse = HaukiAPIClient.get(url=next_url)
-            self.read_response(response)
-            next_url = response.get("next", None)
+            response_json: HaukiAPIResourceListResponse = HaukiAPIClient.response_json(HaukiAPIClient.get(url=next_url))
+            self.read_response(response_json)
+            next_url = response_json.get("next", None)
 
         resource_ids_updated = []
         for unit in units:
