@@ -6,11 +6,9 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils.timezone import get_default_timezone
 
-from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from common.date_utils import local_datetime
 from merchants.models import PaymentMerchant, PaymentProduct
 from merchants.verkkokauppa.exceptions import UnsupportedMetaKey
-from merchants.verkkokauppa.order.exceptions import CreateOrderError
 from merchants.verkkokauppa.order.types import (
     CreateOrderParams,
     Order,
@@ -18,12 +16,10 @@ from merchants.verkkokauppa.order.types import (
     OrderItemMetaParams,
     OrderItemParams,
 )
-from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservation_units.utils.reservation_unit_payment_helper import ReservationUnitPaymentHelper
 from reservations.models import Reservation
 from tilavarauspalvelu.utils.date_util import localized_short_weekday
 from utils.decimal_utils import round_decimal
-from utils.sentry import SentryLogger
 
 
 def parse_datetime(string: str | None) -> datetime | None:
@@ -69,24 +65,7 @@ def get_meta_label(key: str, reservation: Reservation) -> str:
     return labels[key][preferred_language]
 
 
-def create_verkkokauppa_order(reservation: Reservation) -> Order:
-    if settings.USE_MOCK_VERKKOKAUPPA_API:
-        return create_mock_verkkokauppa_order(reservation)
-
-    order_params: CreateOrderParams = _get_order_params(reservation)
-
-    try:
-        payment_order = VerkkokauppaAPIClient.create_order(order_params=order_params)
-    except CreateOrderError as err:
-        SentryLogger.log_exception(err, details="Creating order in Verkkokauppa failed", reservation_id=reservation.pk)
-        raise ValidationErrorWithCode(
-            "Upstream service call failed. Unable to confirm the reservation.",
-            ValidationErrorCodes.UPSTREAM_CALL_FAILED,
-        ) from err
-    return payment_order
-
-
-def _get_order_params(reservation: Reservation) -> CreateOrderParams:
+def get_verkkokauppa_order_params(reservation: Reservation) -> CreateOrderParams:
     reservation_unit = reservation.reservation_unit.first()
     quantity = 1  # Currently, we don't support quantities larger than 1
     price_net = round_decimal(Decimal(quantity * reservation.price_net), 2)

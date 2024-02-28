@@ -8,7 +8,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 
 from merchants.verkkokauppa.exceptions import UnsupportedMetaKey
-from merchants.verkkokauppa.helpers import create_verkkokauppa_order, get_formatted_reservation_time, get_meta_label
+from merchants.verkkokauppa.helpers import get_formatted_reservation_time, get_meta_label, get_verkkokauppa_order_params
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.choices import CustomerTypeChoice
 from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory
@@ -66,7 +66,7 @@ class HelpersTestCase(TestCase):
         assert_that(date).is_equal_to("La 5.11.2022 10:00-12:00")
 
     @patch_method(VerkkokauppaAPIClient.create_order)
-    def test_create_verkkokauppa_order_respect_reservee_language(self):
+    def test_get_verkkokauppa_order_params_respect_reservee_language(self):
         user = get_user_model().objects.create(
             username="testuser",
             first_name="Test",
@@ -93,11 +93,11 @@ class HelpersTestCase(TestCase):
             reservee_language="sv",
         )
 
-        create_verkkokauppa_order(reservation_en)
-        assert VerkkokauppaAPIClient.create_order.call_args.kwargs["order_params"].items[0].product_name == "Name"
+        order_params = get_verkkokauppa_order_params(reservation_en)
+        assert order_params.items[0].product_name == "Name"
 
-        create_verkkokauppa_order(reservation_sv)
-        assert VerkkokauppaAPIClient.create_order.call_args.kwargs["order_params"].items[0].product_name == "Namn"
+        order_params = get_verkkokauppa_order_params(reservation_sv)
+        assert order_params.items[0].product_name == "Namn"
 
     def test_get_meta_label_returns_label_with_supported_key(self):
         period_label = get_meta_label("reservationPeriod", self.reservation)

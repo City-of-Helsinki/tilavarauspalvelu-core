@@ -1,7 +1,6 @@
 import datetime
 import json
 from decimal import Decimal
-from unittest.mock import patch
 
 import freezegun
 import pytest
@@ -229,8 +228,8 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         assert content.get("errors")[0]["extensions"]["error_code"] == "REQUIRED_FIELD_MISSING"
         assert content.get("errors")[0]["extensions"]["field"] == "ageGroup"
 
-    @patch("api.graphql.types.reservations.serializers.confirm_serializers.create_verkkokauppa_order")
-    def test_confirm_reservation_does_not_create_order_when_handling_is_required(self, mock_create_vk_order):
+    @patch_method(VerkkokauppaAPIClient.create_order)
+    def test_confirm_reservation_does_not_create_order_when_handling_is_required(self):
         self.reservation_unit.require_reservation_handling = True
         self.reservation_unit.save()
 
@@ -246,10 +245,10 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         assert_that(confirm_data.get("state")).is_not_equal_to(ReservationStateChoice.CONFIRMED.upper())
 
         assert_that(PaymentOrder.objects.all().count()).is_equal_to(0)
-        assert_that(mock_create_vk_order.called).is_false()
+        assert VerkkokauppaAPIClient.create_order.called is False
 
-    @patch("api.graphql.types.reservations.serializers.confirm_serializers.create_verkkokauppa_order")
-    def test_confirm_reservation_creates_local_order_when_payment_type_is_on_site(self, mock_create_vk_order):
+    @patch_method(VerkkokauppaAPIClient.create_order)
+    def test_confirm_reservation_creates_local_order_when_payment_type_is_on_site(self):
         self.client.force_login(self.regular_joe)
 
         self.reservation_unit.payment_types.add(PaymentType.ON_SITE)
@@ -268,7 +267,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
 
         local_order = PaymentOrder.objects.first()
 
-        assert_that(mock_create_vk_order.called).is_false()
+        assert VerkkokauppaAPIClient.create_order.called is False
         assert_that(local_order).is_not_none()
         assert_that(local_order.payment_type).is_equal_to(PaymentType.ON_SITE)
         assert_that(local_order.status).is_equal_to(OrderStatus.PAID_MANUALLY)
@@ -278,10 +277,10 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         assert_that(local_order.language).is_equal_to(self.reservation.reservee_language)
         assert_that(local_order.reservation).is_equal_to(self.reservation)
 
-    @patch("api.graphql.types.reservations.serializers.confirm_serializers.create_verkkokauppa_order")
-    def test_confirm_reservation_calls_api_when_payment_type_is_not_on_site(self, mock_create_vk_order):
+    @patch_method(VerkkokauppaAPIClient.create_order)
+    def test_confirm_reservation_calls_api_when_payment_type_is_not_on_site(self):
         mock_vk_order = OrderFactory()
-        mock_create_vk_order.return_value = mock_vk_order
+        VerkkokauppaAPIClient.create_order.return_value = mock_vk_order
 
         self.client.force_login(self.regular_joe)
 
@@ -299,7 +298,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         assert_that(confirm_data.get("errors")).is_none()
         assert_that(confirm_data.get("state")).is_equal_to(ReservationStateChoice.WAITING_FOR_PAYMENT.upper())
 
-        assert_that(mock_create_vk_order.called).is_true()
+        assert VerkkokauppaAPIClient.create_order.called is True
         local_order = PaymentOrder.objects.first()
         assert_that(local_order).is_not_none()
         assert_that(local_order.remote_id).is_equal_to(mock_vk_order.order_id)
@@ -309,10 +308,8 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         self.reservation.refresh_from_db()
         assert_that(self.reservation.state).is_equal_to(ReservationStateChoice.WAITING_FOR_PAYMENT)
 
-    @patch("api.graphql.types.reservations.serializers.confirm_serializers.create_verkkokauppa_order")
-    def test_confirm_reservation_does_not_save_when_api_call_fails(self, mock_create_vk_order):
-        mock_create_vk_order.side_effect = Exception("Test exception")
-
+    @patch_method(VerkkokauppaAPIClient.create_order, side_effect=Exception("Test exception"))
+    def test_confirm_reservation_does_not_save_when_api_call_fails(self):
         self.client.force_login(self.regular_joe)
 
         self.reservation_unit.payment_types.add(PaymentType.INVOICE)
@@ -325,7 +322,7 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         content = json.loads(response.content)
         assert_that(content.get("errors")[0]["message"]).is_equal_to("Test exception")
 
-        assert_that(mock_create_vk_order.called).is_true()
+        assert VerkkokauppaAPIClient.create_order.called is True
 
         local_order = PaymentOrder.objects.first()
         assert_that(local_order).is_none()
@@ -382,9 +379,9 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         local_order = PaymentOrder.objects.first()
         assert_that(local_order.payment_type).is_equal_to(PaymentType.ON_SITE)
 
-    @patch("api.graphql.types.reservations.serializers.confirm_serializers.create_verkkokauppa_order")
-    def test_confirm_reservation_without_payment_type_use_invoice(self, mock_create_vk_order):
-        mock_create_vk_order.return_value = OrderFactory()
+    @patch_method(VerkkokauppaAPIClient.create_order)
+    def test_confirm_reservation_without_payment_type_use_invoice(self):
+        VerkkokauppaAPIClient.create_order.return_value = OrderFactory()
         self.client.force_login(self.regular_joe)
 
         self.reservation_unit.payment_types.add(PaymentType.ON_SITE, PaymentType.INVOICE)
@@ -398,9 +395,9 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         local_order = PaymentOrder.objects.first()
         assert_that(local_order.payment_type).is_equal_to(PaymentType.INVOICE)
 
-    @patch("api.graphql.types.reservations.serializers.confirm_serializers.create_verkkokauppa_order")
-    def test_confirm_reservation_without_payment_type_use_online(self, mock_create_vk_order):
-        mock_create_vk_order.return_value = OrderFactory()
+    @patch_method(VerkkokauppaAPIClient.create_order)
+    def test_confirm_reservation_without_payment_type_use_online(self):
+        VerkkokauppaAPIClient.create_order.return_value = OrderFactory()
         self.client.force_login(self.regular_joe)
 
         self.reservation_unit.payment_types.add(PaymentType.ON_SITE, PaymentType.INVOICE, PaymentType.ONLINE)
@@ -443,10 +440,10 @@ class ReservationConfirmTestCase(ReservationTestCaseBase):
         local_order = PaymentOrder.objects.first()
         assert_that(local_order).is_none()
 
-    @patch("api.graphql.types.reservations.serializers.confirm_serializers.create_verkkokauppa_order")
-    def test_confirm_reservation_return_order_data(self, mock_create_vk_order):
+    @patch_method(VerkkokauppaAPIClient.create_order)
+    def test_confirm_reservation_return_order_data(self):
         mock_order = OrderFactory()
-        mock_create_vk_order.return_value = mock_order
+        VerkkokauppaAPIClient.create_order.return_value = mock_order
 
         self.client.force_login(self.regular_joe)
 

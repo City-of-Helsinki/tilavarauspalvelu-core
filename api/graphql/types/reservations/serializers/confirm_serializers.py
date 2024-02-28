@@ -6,15 +6,22 @@ from api.graphql.types.reservations.serializers.update_serializers import (
     ReservationUpdateSerializer,
 )
 from merchants.models import Language, OrderStatus, PaymentOrder
-from merchants.verkkokauppa.helpers import create_verkkokauppa_order
-from merchants.verkkokauppa.order.types import Order
+from merchants.verkkokauppa.helpers import (
+    create_mock_verkkokauppa_order,
+    get_verkkokauppa_order_params,
+)
+from merchants.verkkokauppa.order.exceptions import CreateOrderError
+from merchants.verkkokauppa.order.types import CreateOrderParams, Order
+from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservation_units.enums import PaymentType, PricingType
 from reservation_units.utils.reservation_unit_pricing_helper import (
     ReservationUnitPricingHelper,
 )
 from reservations.choices import ReservationStateChoice
 from reservations.email_utils import send_confirmation_email
+from reservations.models import Reservation
 from utils.decimal_utils import round_decimal
+from utils.sentry import SentryLogger
 
 
 class ReservationConfirmSerializer(ReservationUpdateSerializer):
@@ -114,7 +121,7 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
 
         return validated_data
 
-    def save(self, **kwargs):
+    def save(self, **kwargs) -> Reservation:
         self.fields.pop("payment_type")
         state = self.validated_data["state"]
 
@@ -142,7 +149,23 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
                     reservation=self.instance,
                 )
             else:
-                payment_order: Order = create_verkkokauppa_order(self.instance)
+                verkkokauppa_order: Order
+                if settings.USE_MOCK_VERKKOKAUPPA_API:
+                    verkkokauppa_order = create_mock_verkkokauppa_order(self.instance)
+                else:
+                    order_params: CreateOrderParams = get_verkkokauppa_order_params(self.instance)
+
+                    try:
+                        verkkokauppa_order = VerkkokauppaAPIClient.create_order(order_params=order_params)
+                    except CreateOrderError as err:
+                        SentryLogger.log_exception(
+                            err, details="Creating order in Verkkokauppa failed", reservation_id=self.instance.pk
+                        )
+                        raise ValidationErrorWithCode(
+                            "Upstream service call failed. Unable to confirm the reservation.",
+                            ValidationErrorCodes.UPSTREAM_CALL_FAILED,
+                        ) from err
+
                 PaymentOrder.objects.create(
                     payment_type=payment_type,
                     status=OrderStatus.DRAFT,
@@ -152,9 +175,9 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
                     price_total=price_total,
                     reservation=self.instance,
                     reservation_user_uuid=self.instance.user.uuid,
-                    remote_id=payment_order.order_id,
-                    checkout_url=payment_order.checkout_url,
-                    receipt_url=payment_order.receipt_url,
+                    remote_id=verkkokauppa_order.order_id,
+                    checkout_url=verkkokauppa_order.checkout_url,
+                    receipt_url=verkkokauppa_order.receipt_url,
                 )
 
         instance = super().save(**kwargs)

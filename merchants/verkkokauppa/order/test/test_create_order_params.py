@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.utils.timezone import get_default_timezone
 
-from merchants.verkkokauppa.helpers import _get_order_params
+from merchants.verkkokauppa.helpers import get_verkkokauppa_order_params
 from reservations.choices import CustomerTypeChoice
 from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory
 
@@ -38,7 +38,7 @@ class CreateOrderParamsToJsonTestCase(TestCase):
             reservee_phone="+358 50 123 4567",
             reservee_language="fi",
         )
-        order_params = _get_order_params(reservation)
+        order_params = get_verkkokauppa_order_params(reservation)
 
         json = order_params.to_json()
 
@@ -108,7 +108,7 @@ class CreateOrderParamsToJsonTestCase(TestCase):
             reservee_phone="+358 50 123 4567",
             reservee_language="en",
         )
-        order_params = _get_order_params(reservation)
+        order_params = get_verkkokauppa_order_params(reservation)
         json = order_params.to_json()
 
         assert_that(json["items"][0]["meta"]).is_length(3)
