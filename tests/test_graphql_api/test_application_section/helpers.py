@@ -41,8 +41,8 @@ def get_application_section_create_data(application: Application) -> dict[str, A
         "reservationMinDuration": int(datetime.timedelta(hours=1).total_seconds()),
         "reservationMaxDuration": int(datetime.timedelta(hours=2).total_seconds()),
         "appliedReservationsPerWeek": 2,
-        "reservationsBeginDate": datetime.date(2022, 8, 1).isoformat(),
-        "reservationsEndDate": datetime.date(2023, 2, 28).isoformat(),
+        "reservationsBeginDate": application.application_round.reservation_period_begin.isoformat(),
+        "reservationsEndDate": application.application_round.reservation_period_end.isoformat(),
         "purpose": reservation_purpose.id,
         "ageGroup": age_group.id,
         "suitableTimeRanges": [
@@ -77,8 +77,8 @@ def get_application_section_update_data(application_section: ApplicationSection)
         "reservationMinDuration": int(datetime.timedelta(hours=1).total_seconds()),
         "reservationMaxDuration": int(datetime.timedelta(hours=2).total_seconds()),
         "appliedReservationsPerWeek": 2,
-        "reservationsBeginDate": datetime.date(2022, 8, 1).isoformat(),
-        "reservationsEndDate": datetime.date(2023, 2, 28).isoformat(),
+        "reservationsBeginDate": application_section.application.application_round.reservation_period_begin.isoformat(),
+        "reservationsEndDate": application_section.application.application_round.reservation_period_end.isoformat(),
         "purpose": application_section.purpose.pk,
         "ageGroup": application_section.age_group.pk,
         "suitableTimeRanges": [
