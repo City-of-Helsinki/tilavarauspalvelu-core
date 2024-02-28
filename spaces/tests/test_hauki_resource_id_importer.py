@@ -5,12 +5,13 @@ from opening_hours.utils.hauki_api_client import HaukiAPIClient
 from spaces.importers.units import UnitHaukiResourceIdImporter
 from tests.factories import UnitFactory
 from tests.helpers import patch_method
+from tests.mocks import MockResponse
 
 pytestmark = [
     pytest.mark.django_db,
 ]
 
-RET_VAL = {
+FIRST_RET_VAL = {
     "count": 1,
     "next": "NotNone",
     "previous": None,
@@ -32,11 +33,16 @@ SECOND_RET_VAL = {
         }
     ],
 }
-RETURN_VALUES = [RET_VAL, SECOND_RET_VAL]
 
 
 @override_settings(HAUKI_API_URL="url")
-@patch_method(HaukiAPIClient.get, side_effect=RETURN_VALUES)
+@patch_method(
+    HaukiAPIClient.get,
+    side_effect=[
+        MockResponse(status_code=200, json=FIRST_RET_VAL),
+        MockResponse(status_code=200, json=SECOND_RET_VAL),
+    ],
+)
 def test__hauki_resource_id_importer__from_unit_id():
     unit = UnitFactory(tprek_id=1)
     importer = UnitHaukiResourceIdImporter()
@@ -48,7 +54,13 @@ def test__hauki_resource_id_importer__from_unit_id():
 
 
 @override_settings(HAUKI_API_URL="url")
-@patch_method(HaukiAPIClient.get, side_effect=RETURN_VALUES)
+@patch_method(
+    HaukiAPIClient.get,
+    side_effect=[
+        MockResponse(status_code=200, json=FIRST_RET_VAL),
+        MockResponse(status_code=200, json=SECOND_RET_VAL),
+    ],
+)
 def test__hauki_resource_id_importer__from_tprek_id():
     unit = UnitFactory(tprek_id=1)
     importer = UnitHaukiResourceIdImporter()

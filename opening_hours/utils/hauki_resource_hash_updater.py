@@ -57,17 +57,19 @@ class HaukiResourceHashUpdater:
 
     def _fetch_hauki_resources(self):
         """Fetch resources from Hauki API based on the given resource ids."""
-        response = HaukiAPIClient.get_resources(hauki_resource_ids=self.hauki_resource_ids)
+        response_json = HaukiAPIClient.get_resources(hauki_resource_ids=self.hauki_resource_ids)
 
-        self.fetched_hauki_resources: list[HaukiAPIResource] = response["results"]
+        self.fetched_hauki_resources: list[HaukiAPIResource] = response_json["results"]
 
         # In case of multiple pages, keep fetching resources until there are no more pages
         resource_page_counter = 1
-        while response.get("next", None):
+        while response_json.get("next", None):
             resource_page_counter += 1
             logger.info(f"Fetching from Hauki. Page number: {resource_page_counter}")
-            response: HaukiAPIResourceListResponse = HaukiAPIClient.get(url=response["next"])
-            self.fetched_hauki_resources.extend(response["results"])
+            response_json: HaukiAPIResourceListResponse = HaukiAPIClient.response_json(
+                HaukiAPIClient.get(url=response_json["next"])
+            )
+            self.fetched_hauki_resources.extend(response_json["results"])
 
         logger.info(f"Fetched {len(self.fetched_hauki_resources)} hauki resources in total.")
 

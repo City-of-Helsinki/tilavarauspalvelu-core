@@ -10,6 +10,7 @@ from opening_hours.utils.hauki_resource_hash_updater import HaukiResourceHashUpd
 from opening_hours.utils.reservable_time_span_client import NEVER_ANY_OPENING_HOURS_HASH, ReservableTimeSpanClient
 from tests.factories.opening_hours import OriginHaukiResourceFactory, ReservableTimeSpanFactory
 from tests.helpers import patch_method
+from tests.mocks import MockResponse
 
 # Applied to all tests
 pytestmark = [
@@ -58,15 +59,18 @@ def test__HaukiResourceHashUpdater__fetch_hauki_resources__single_page(reservati
     assert updater.fetched_hauki_resources == ["foo"]
 
 
-# First request uses `get_resources`, Later requests use `get`
-@patch_method(HaukiAPIClient.get_resources, return_value={"results": ["foo"], "next": "page2"})
-@patch_method(HaukiAPIClient.get, return_value={"results": ["bar"], "next": None})
+@patch_method(
+    HaukiAPIClient.get,
+    side_effect=[
+        MockResponse(status_code=200, json={"results": ["foo"], "next": "page2"}),
+        MockResponse(status_code=200, json={"results": ["bar"], "next": None}),
+    ],
+)
 def test__HaukiResourceHashUpdater__fetch_hauki_resources__multiple_pages(reservation_unit):
     updater = HaukiResourceHashUpdater()
     updater._fetch_hauki_resources()
 
-    assert HaukiAPIClient.get_resources.call_count == 1
-    assert HaukiAPIClient.get.call_count == 1
+    assert HaukiAPIClient.get.call_count == 2
     assert updater.fetched_hauki_resources == ["foo", "bar"]
 
 
