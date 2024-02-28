@@ -1,6 +1,5 @@
 import json
-from json import JSONDecodeError
-from typing import Literal
+from typing import Any, Literal
 
 from requests import Response, request
 
@@ -19,8 +18,38 @@ class BaseExternalServiceClient:
     ##################
 
     @staticmethod
-    def _build_url(endpoint: str) -> str:
+    def _validate_env_variables() -> None:
+        """
+        Validate that all required environment variables are set.
+        Override this method to add custom validations.
+        """
         raise NotImplementedError
+
+    @staticmethod
+    def _build_url(endpoint: str) -> str:
+        """
+        Build the URL for the request.
+        Override this method to add custom URL building.
+        """
+        raise NotImplementedError
+
+    @classmethod
+    def _get_headers(cls, headers: dict[str, Any] | None) -> dict[str, Any]:
+        """
+        Get headers for all requests.
+        Override this method to add custom headers.
+        """
+        return headers or {}
+
+    @classmethod
+    def _get_mutate_headers(cls, headers: dict[str, Any] | None) -> dict[str, Any]:
+        """
+        Get headers for mutate requests.
+        Override this method to add custom headers.
+
+        This helper method is provided to allow different headers for different POST, PUT requests.
+        """
+        return cls._get_headers(headers)
 
     @classmethod
     def response_json(cls, response: Response) -> dict:
@@ -30,7 +59,7 @@ class BaseExternalServiceClient:
         """
         try:
             response_json = response.json()
-        except (ValueError, JSONDecodeError):
+        except (ValueError, json.JSONDecodeError):
             raise ExternalServiceParseJSONError(f"Parsing {cls.SERVICE_NAME} return data failed.")
 
         return response_json
@@ -44,22 +73,12 @@ class BaseExternalServiceClient:
     ################
 
     @classmethod
-    def generic(
-        cls,
-        method: Literal["get", "post", "put"],
-        url: str,
-        **kwargs,
-    ) -> Response:
+    def generic(cls, method: Literal["get", "post", "put"], url: str, **kwargs) -> Response:
         return request(method, url, **kwargs, timeout=REQUEST_TIMEOUT_SECONDS)
 
     @classmethod
-    def get(cls, *, url: str, params: dict | None = None, headers=None) -> Response:
-        response = cls.generic(
-            "get",
-            url=url,
-            params=params,
-            headers=headers,
-        )
+    def get(cls, *, url: str, params: dict[str, Any] | None = None, headers: dict[str, Any] | None = None) -> Response:
+        response = cls.generic("get", url=url, params=params, headers=cls._get_headers(headers))
 
         if response.status_code >= 500:
             cls.handle_500_error(response)
@@ -67,13 +86,8 @@ class BaseExternalServiceClient:
         return response
 
     @classmethod
-    def post(cls, *, url: str, data: dict | None = None, headers=None) -> Response:
-        response = cls.generic(
-            "post",
-            url=url,
-            data=json.dumps(data),
-            headers=headers,
-        )
+    def post(cls, *, url: str, data: dict[str, Any] | None = None, headers: dict[str, Any] | None = None) -> Response:
+        response = cls.generic("post", url=url, data=json.dumps(data), headers=cls._get_mutate_headers(headers))
 
         if response.status_code >= 500:
             cls.handle_500_error(response)
@@ -81,13 +95,8 @@ class BaseExternalServiceClient:
         return response
 
     @classmethod
-    def put(cls, *, url: str, data: dict | None = None, headers=None) -> Response:
-        response = cls.generic(
-            "put",
-            url=url,
-            data=json.dumps(data),
-            headers=headers,
-        )
+    def put(cls, *, url: str, data: dict[str, Any] | None = None, headers: dict[str, Any] | None = None) -> Response:
+        response = cls.generic("put", url=url, data=json.dumps(data), headers=cls._get_mutate_headers(headers))
 
         if response.status_code >= 500:
             cls.handle_500_error(response)
