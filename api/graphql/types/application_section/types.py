@@ -77,6 +77,6 @@ class ApplicationSectionNode(DjangoNode):
     ) -> models.QuerySet:
         """Return all allocations that affect this"""
         # Note: Querying this field still causes 1 additional query for each application section.
-        # Currently, there is no way to optimize it, since it's a custom relation which requires
+        # Currently, there is no way to optimize it, since it's an "indirect" relation which requires
         # an input field (i.e. can't use `@required_annotations`).
         return root.actions.affecting_allocations(reservation_unit=reservation_unit)
