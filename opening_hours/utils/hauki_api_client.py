@@ -67,7 +67,7 @@ class HaukiAPIClient(BaseExternalServiceClient):
     def create_resource(cls, *, data: dict) -> HaukiAPIResource:
         url = cls._build_url("resource")
 
-        response = cls.post(url=url, data=data)
+        response = cls.post(url=url, json=data)
         response_json: HaukiAPIResource = cls.response_json(response)
 
         if not response_json.get("id"):
@@ -80,7 +80,7 @@ class HaukiAPIClient(BaseExternalServiceClient):
         hauki_resource_id = data["id"]
         url = cls._build_url(f"resource/{hauki_resource_id}")
 
-        response = cls.put(url=url, data=data)
+        response = cls.put(url=url, json=data)
         response_json: HaukiAPIResource = cls.response_json(response)
 
         if not response_json.get("id"):
@@ -145,7 +145,4 @@ class HaukiAPIClient(BaseExternalServiceClient):
         if not settings.HAUKI_API_KEY:
             raise HaukiConfigurationError("HAUKI_API_KEY environment variable must to be configured.")
 
-        return {
-            "Content-Type": "application/json",
-            "Authorization": f"APIToken {settings.HAUKI_API_KEY}",
-        }
+        return {"Authorization": f"APIToken {settings.HAUKI_API_KEY}"}

@@ -84,7 +84,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
         try:
             response = cls.post(
                 url=url,
-                data=order_params.to_json(),
+                json=order_params.to_json(),
             )
             response_json = cls.response_json(response)
 
@@ -236,7 +236,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
         try:
             response = cls.post(
                 url=url,
-                data=params.to_json(),
+                json=params.to_json(),
             )
             response_json = cls.response_json(response)
 
@@ -259,7 +259,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
         try:
             response = cls.post(
                 url=url,
-                data=params.to_json(),
+                json=params.to_json(),
             )
             response_json = cls.response_json(response)
 
@@ -285,7 +285,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
         try:
             response = cls.post(
                 url=url,
-                data=params.to_json(),
+                json=params.to_json(),
             )
             response_json = cls.response_json(response)
 
@@ -312,7 +312,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
         try:
             response = cls.post(
                 url=url,
-                data=params.to_json(),
+                json=params.to_json(),
                 headers={"namespace": settings.VERKKOKAUPPA_NAMESPACE},
             )
             response_json = cls.response_json(response)

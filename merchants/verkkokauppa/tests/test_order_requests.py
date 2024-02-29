@@ -1,4 +1,3 @@
-import json
 from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any
@@ -270,7 +269,7 @@ def test_verkkokauppa__create_order__makes_valid_request(settings):
     VerkkokauppaAPIClient.generic.assert_called_with(
         "post",
         url=settings.VERKKOKAUPPA_ORDER_API_URL + "/",
-        data=json.dumps(create_order_params.to_json()),
+        json=create_order_params.to_json(),
         headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
     )
 
@@ -390,7 +389,7 @@ def test_verkkokauppa__cancel_order__makes_valid_request(settings):
     VerkkokauppaAPIClient.generic.assert_called_with(
         "post",
         url=urljoin(settings.VERKKOKAUPPA_ORDER_API_URL, f"{order_uuid}/cancel"),
-        data="null",
+        json=None,
         headers={
             "api-key": settings.VERKKOKAUPPA_API_KEY,
             "user": user_uuid,
