@@ -84,47 +84,47 @@ fix = true
 line-length = 120
 target-version = "py312"
 extend-exclude = [
-    "migrations",
-    "venv",
-    "build",
     "api/examples.py",
-    "tilavarauspalvelu/settings.py",
+    "build",
     "local_settings.py",
+    "migrations",
+    "tilavarauspalvelu/settings.py",
+    "venv",
 ]
 lint.select = [
-    "F",        # pyflakes
-    "E",        # pycodestyle errors
-    "W",        # pycodestyle warnings
-    "I",        # isort
-    "UP",       # pyupgrade
-    "PL",       # pylint
-    "TRY",      # tryceratops
-    "ISC",      # flake8-implicit-str-concat
-    "S",        # flake8-bandit
-    "C4",       # flake8-comprehensions
     "B",        # flake8-bugbear
-    "T20",      # flake8-print
-    "TID",      # flake8-tidy-imports
-    "PT",       # flake8-pytest-style
-    "RSE",      # flake8-raise
-    "SIM",      # flake8-simplify
-    "DJ",       # flake8-django
-    "LOG",      # flake8-logging
-    "PIE",      # flake8-pie
-    "RUF",      # ruff-specific rules
-    "RET502",   # flake8-return: Do not implicitly return None in function able to return non-None value
-    "RET503",   # flake8-return: Missing explicit return at the end of function able to return non-None value
+    "C4",       # flake8-comprehensions
     "D200",     # pydocstyle: One-line docstring should fit on one line
     "D201",     # pydocstyle: No blank lines allowed before function docstring (found {num_lines})
     "D202",     # pydocstyle: No blank lines allowed after function docstring (found {num_lines})
     "D209",     # pydocstyle: Multi-line docstring closing quotes should be on a separate line
     "D213",     # pydocstyle: Multi-line docstring summary should start at the second line
+    "DJ",       # flake8-django
+    "E",        # pycodestyle errors
+    "F",        # pyflakes
+    "I",        # isort
+    "ISC",      # flake8-implicit-str-concat
+    "LOG",      # flake8-logging
+    "PIE",      # flake8-pie
+    "PL",       # pylint
+    "PT",       # flake8-pytest-style
+    "RET502",   # flake8-return: Do not implicitly return None in function able to return non-None value
+    "RET503",   # flake8-return: Missing explicit return at the end of function able to return non-None value
+    "RSE",      # flake8-raise
+    "RUF",      # ruff-specific rules
+    "S",        # flake8-bandit
+    "SIM",      # flake8-simplify
+    "T20",      # flake8-print
+    "TID",      # flake8-tidy-imports
+    "TRY",      # tryceratops
+    "UP",       # pyupgrade
+    "W",        # pycodestyle warnings
 ]
 lint.ignore = [
-    "S101",     # assert is fine
     "B904",     # bare raise is fine
     "B905",     # zip without strict
     "DJ001",    # Allow `null=True` in text-based fields TODO: Remove this ignore once the issues are fixed.
+    "S101",     # assert is fine
     #
     # Conflicting with ruff-format
     #
@@ -137,19 +137,19 @@ lint.ignore = [
     "E117",     # over-indented
     "ISC001",   # single-line-implicit-string-concatenation
     "ISC002",   # multi-line-implicit-string-concatenation
-    "Q000",     # bad-quotes-inline-string
-    "Q001",     # bad-quotes-multiline-string
-    "Q002",     # bad-quotes-docstring
-    "Q003",     # avoidable-escaped-quote
-    "W191",     # tab-indentation
-    "RUF012",   # mutable-class-default
     "PLR0911",  # too-many-return-statements
     "PLR0912",  # too-many-branches
     "PLR0913",  # too-many-arguments
     "PLR0915",  # too-many-statements
     "PLR2004",  # magic-value-comparison
     "PLW2901",  # redefined-loop-name
+    "Q000",     # bad-quotes-inline-string
+    "Q001",     # bad-quotes-multiline-string
+    "Q002",     # bad-quotes-docstring
+    "Q003",     # avoidable-escaped-quote
+    "RUF012",   # mutable-class-default
     "TRY003",   # raise-vanilla-args
+    "W191",     # tab-indentation
 ]
 
 [tool.ruff.lint.extend-per-file-ignores]
