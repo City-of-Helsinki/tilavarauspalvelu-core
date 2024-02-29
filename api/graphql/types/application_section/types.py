@@ -1,5 +1,3 @@
-from typing import Any
-
 import graphene
 from django.db import models
 from graphene_django_extensions import DjangoNode
@@ -21,11 +19,15 @@ class ApplicationSectionNode(DjangoNode):
     status = graphene.Field(graphene.Enum.from_enum(ApplicationSectionStatusChoice))
     allocations = graphene.Field(graphene.Int)
 
-    related_application_sections = graphene.List(lambda: ApplicationSectionNode)
     reservation_unit_options = ReservationUnitOptionNode.ListField()
     suitable_time_ranges = SuitableTimeRangeNode.ListField()
     purpose = RelatedField("api.graphql.types.reservations.types.ReservationPurposeType")
     age_group = RelatedField("api.graphql.types.reservations.types.AgeGroupType")
+
+    affecting_allocated_time_slots = graphene.List(
+        "api.graphql.types.allocated_time_slot.types.AllocatedTimeSlotNode",
+        reservation_unit=graphene.Int(),
+    )
 
     class Meta:
         model = ApplicationSection
@@ -68,5 +70,13 @@ class ApplicationSectionNode(DjangoNode):
     def resolve_allocations(root: ApplicationSection, info: GQLInfo) -> int:
         return root.allocations
 
-    def resolve_related_application_sections(root: ApplicationSection, info: GQLInfo, **kwargs: Any) -> models.QuerySet:
-        return root.actions.application_sections_affecting_allocations()
+    def resolve_affecting_allocated_time_slots(
+        root: ApplicationSection,
+        info: GQLInfo,
+        reservation_unit: int,
+    ) -> models.QuerySet:
+        """Return all allocations that affect this"""
+        # Note: Querying this field still causes 1 additional query for each application section.
+        # Currently, there is no way to optimize it, since it's a custom relation which requires
+        # an input field (i.e. can't use `@required_annotations`).
+        return root.actions.affecting_allocations(reservation_unit=reservation_unit)

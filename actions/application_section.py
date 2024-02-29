@@ -8,29 +8,23 @@ from common.db import ArrayUnnest
 
 if TYPE_CHECKING:
     from applications.models import ApplicationSection
-    from applications.querysets.application_section import ApplicationSectionQuerySet
+    from applications.querysets.allocated_time_slot import AllocatedTimeSlotQuerySet
 
 
 class ApplicationSectionActions:
     def __init__(self, application_section: ApplicationSection) -> None:
         self.application_section = application_section
 
-    def application_sections_affecting_allocations(self) -> ApplicationSectionQuerySet:
-        from applications.models import ApplicationSection
+    def affecting_allocations(self, reservation_unit: int) -> AllocatedTimeSlotQuerySet:
+        from applications.models import AllocatedTimeSlot
         from reservation_units.models import ReservationUnit
 
         return (
-            ApplicationSection.objects.distinct()
+            AllocatedTimeSlot.objects.distinct()
             .alias(
                 _affecting_ids=models.Subquery(
                     queryset=(
-                        ReservationUnit.objects.alias(
-                            # All reservation units that are possible for this section
-                            _reservation_unit_ids=models.Subquery(
-                                self.application_section.reservation_unit_options.values("reservation_unit__id"),
-                            ),
-                        )
-                        .filter(id__in=models.F("_reservation_unit_ids"))
+                        ReservationUnit.objects.filter(id=reservation_unit)
                         .with_reservation_unit_ids_affecting_reservations()
                         .annotate(_found_ids=ArrayUnnest("reservation_units_affecting_reservations"))
                         .values("_found_ids")
@@ -38,15 +32,16 @@ class ApplicationSectionActions:
                 )
             )
             .filter(
-                # Don't include this event.
-                ~models.Q(id=self.application_section.id),
-                # Application section has allocations.
-                reservation_unit_options__isnull=False,
-                reservation_unit_options__allocated_time_slots__isnull=False,
-                # Allocated to any reservation unit affecting this section's allocations.
-                reservation_unit_options__reservation_unit__id__in=models.F("_affecting_ids"),
-                # Allocation period overlaps with this section's period.
-                reservations_begin_date__lte=self.application_section.reservations_end_date,
-                reservations_end_date__gte=self.application_section.reservations_begin_date,
+                # Don't include this section's allocations
+                ~models.Q(reservation_unit_option__application_section=self.application_section.id),
+                # Allocated to any reservation unit affecting this allocation's reservation unit
+                reservation_unit_option__reservation_unit__id__in=models.F("_affecting_ids"),
+                # Allocation period overlaps with this section's period
+                reservation_unit_option__application_section__reservations_begin_date__lte=(
+                    self.application_section.reservations_end_date
+                ),
+                reservation_unit_option__application_section__reservations_end_date__gte=(
+                    self.application_section.reservations_begin_date
+                ),
             )
         )
