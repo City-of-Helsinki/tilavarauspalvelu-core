@@ -448,6 +448,11 @@ by their respective language codes as field keys:
 }
 ```
 
+### Ruff Language Server
+
+TODO: Add instructions for setting up Ruff Language Server.
+
+
 ---
 
 [__version__]: https://github.com/City-of-Helsinki/tilavarauspalvelu-core/blob/main/tilavarauspalvelu/__init__.py#L9

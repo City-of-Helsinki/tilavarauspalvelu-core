@@ -76,7 +76,9 @@ django-graphiql-debug-toolbar = "0.2.0"
 polib = "1.2.0"
 
 [tool.poetry.group.lint.dependencies]
-pre-commit = "3.6.2"
+pre-commit = "3.6.2"  # TODO: Check versions
+ruff-lsp = "0.0.52"  # TODO: Check versions
+polib = "1.2.0"  # TODO: Check versions
 
 [tool.ruff]
 fix = true
@@ -118,9 +120,36 @@ lint.select = [
     "TRY",      # tryceratops
     "UP",       # pyupgrade
     "W",        # pycodestyle warnings
+
+    # "A" ?
+    # "COM" ?
+    # "DTZ" ?
+    # "EM" ?
+    # "FA" ?
+    # "ICN" # REQUIRES CONFIGURATION
+    # "G" ?
+    # "INP"
+    # "PYI" ?
+    # "Q" ?
+    # "RSE" ?
+    # "RET" ?
+    # "SLF" ?
+    # TID: lint.flake8-tidy-imports.banned-api
+    # TID: lint.flake8-tidy-imports.banned-module-level-imports
+    # TID: lint.flake8-tidy-imports.ban-relative-imports
+    # "TCH" ?
+    # "INT" ?
+    # "ARG" ?
+    # "PTH" ?
+    # "ERA" ?
+    # "FLY" ?
+    # "PERF" ?
+
 ]
+
+# TODO: Remove as many ignores as possible
 lint.ignore = [
-    "B904",     # bare raise is fine
+    #"B904",     # bare raise is fine
     "B905",     # zip without strict
     "DJ001",    # Allow `null=True` in text-based fields TODO: Remove this ignore once the issues are fixed.
     "S101",     # assert is fine
@@ -150,6 +179,32 @@ lint.ignore = [
     "TRY003",   # raise-vanilla-args
     "W191",     # tab-indentation
 ]
+#[tool.ruff.lint.flake8-import-conventions]
+#banned-from = [
+#    # Python standard libraries
+#    "base64",
+#    "csv",
+#    "datetime",
+#    "hashlib",
+#    "hmac",
+#    "json",
+#    "logging",
+#    "math",
+#    "os",
+#    "pickle",
+#    "random",
+#    "re",
+#    "shutil",
+#    "subprocess",
+#    "sys",
+#    "tempfile",
+#    "time",
+#    "uuid",
+#    "xml",
+#    "yaml",
+#    # Project-specific
+#    "error_codes",
+#]
 
 [tool.ruff.lint.extend-per-file-ignores]
 "common/management/commands/create_test_data.py" = [
@@ -167,9 +222,32 @@ lint.ignore = [
 
 [tool.ruff.lint.isort]
 combine-as-imports = false
+#split-on-trailing-comma = false  # TODO: Run linter
 known-third-party = [
     "django",
 ]
+known-first-party = [
+    "actions",
+    "api",
+    "applications",
+    "common",
+    "elastic_django",
+    "email_notification",
+    "merchants",
+    "opening_hours",
+    "permissions",
+    "reservation_units",
+    "reservations",
+    "resources",
+    "services",
+    "spaces",
+    "terms_of_use",
+    "tests",
+    "tilavarauspalvelu",
+    "users",
+    "utils",
+]
+
 
 [tool.ruff.lint.mccabe]
 max-complexity = 10
