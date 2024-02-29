@@ -64,7 +64,7 @@ def test__create_product__makes_valid_request():
 
     VerkkokauppaAPIClient.generic.assert_called_with(
         "post",
-        url=settings.VERKKOKAUPPA_PRODUCT_API_URL,
+        url=settings.VERKKOKAUPPA_PRODUCT_API_URL + "/",
         data=json.dumps(create_product_params.to_json()),
         headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
     )
