@@ -34,7 +34,6 @@ class AllocatedTimeSlotCreateSerializer(NestingModelSerializer):
 
         section: ApplicationSection = data["reservation_unit_option"].application_section
 
-        # TODO: "not found for pk" errors should return with code
         self.validate_statuses(section=section)
         self.validate_slots_per_week(section=section)
         self.validate_reservation_unit_option_available(
