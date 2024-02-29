@@ -150,7 +150,7 @@ def create_mock_verkkokauppa_order(reservation: Reservation) -> Order:
     price_vat = round_decimal(Decimal(quantity * reservation.price_net * (reservation.tax_percentage_value / 100)), 2)
 
     # Assume that the first URL in CORS_ALLOWED_ORIGINS is the backend URL
-    base_url = settings.CORS_ALLOWED_ORIGINS[0].strip("/")
+    base_url = settings.MOCK_VERKKOKAUPPA_BACKEND_URL.strip("/")
     # Reservation URI in the django admin
     mock_verkkokauppa_checkout_url = reverse("mock_verkkokauppa", args=[order_uuid]).strip("/")
     admin_url = reverse("admin:reservations_reservation_change", args=[reservation.id]).strip("/")

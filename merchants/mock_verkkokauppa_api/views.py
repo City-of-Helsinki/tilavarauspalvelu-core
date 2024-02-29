@@ -49,8 +49,7 @@ class MockVerkkokauppaView(TemplateView):
 
     def post(self, request: WSGIRequest, *args, **kwargs) -> HttpResponseRedirect | HttpResponse:
         payment_order = self.get_payment_order(order_uuid=kwargs.get("order_uuid"))
-        # Assume that the second URL in CORS_ALLOWED_ORIGINS is the Frontend UI URL
-        frontend_url = settings.CORS_ALLOWED_ORIGINS[1].strip("/")
+        frontend_url = settings.MOCK_VERKKOKAUPPA_FRONTEND_URL.strip("/")
 
         if "payment_success" in request.POST:
             self.handle_payment_success(payment_order=payment_order)

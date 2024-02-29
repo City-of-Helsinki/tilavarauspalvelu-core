@@ -23,7 +23,7 @@ urlpatterns = [
     path("tinymce/", include("tinymce.urls")),
 ]
 
-if settings.USE_MOCK_VERKKOKAUPPA_API:
+if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
     urlpatterns.append(path("mock_verkkokauppa/", include("merchants.mock_verkkokauppa_api.urls")))
 
 if settings.DEBUG:
