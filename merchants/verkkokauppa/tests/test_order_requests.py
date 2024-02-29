@@ -269,7 +269,7 @@ def test_verkkokauppa__create_order__makes_valid_request(settings):
 
     VerkkokauppaAPIClient.generic.assert_called_with(
         "post",
-        url=settings.VERKKOKAUPPA_ORDER_API_URL,
+        url=settings.VERKKOKAUPPA_ORDER_API_URL + "/",
         data=json.dumps(create_order_params.to_json()),
         headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
     )

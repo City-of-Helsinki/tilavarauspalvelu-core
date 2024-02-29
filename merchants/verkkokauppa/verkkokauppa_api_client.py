@@ -59,7 +59,10 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
         url = f"{settings.VERKKOKAUPPA_ORDER_API_URL}/admin/{order_uuid}"
 
         try:
-            response = cls.get(url=url, headers={"namespace": settings.VERKKOKAUPPA_NAMESPACE})
+            response = cls.get(
+                url=url,
+                headers={"namespace": settings.VERKKOKAUPPA_NAMESPACE},
+            )
             response_json = cls.response_json(response)
 
             if response.status_code == 404:
@@ -76,7 +79,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
     @classmethod
     def create_order(cls, *, order_params: CreateOrderParams) -> Order:
         action_fail = "Order creation failed"
-        url = settings.VERKKOKAUPPA_ORDER_API_URL
+        url = f"{settings.VERKKOKAUPPA_ORDER_API_URL}/"
 
         try:
             response = cls.post(
@@ -228,11 +231,11 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
     @classmethod
     def create_merchant(cls, *, params: CreateMerchantParams) -> Merchant:
         action_fail = "Merchant creation failed"
-        url = f"create/merchant/{settings.VERKKOKAUPPA_NAMESPACE}"
+        url = f"{settings.VERKKOKAUPPA_MERCHANT_API_URL}/create/merchant/{settings.VERKKOKAUPPA_NAMESPACE}"
 
         try:
             response = cls.post(
-                url=f"{settings.VERKKOKAUPPA_MERCHANT_API_URL}/{url}",
+                url=url,
                 data=params.to_json(),
             )
             response_json = cls.response_json(response)
@@ -248,11 +251,14 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
     @classmethod
     def update_merchant(cls, *, merchant_uuid: UUID, params: UpdateMerchantParams) -> Merchant:
         action_fail = "Merchant update failed"
-        url = f"update/merchant/{settings.VERKKOKAUPPA_NAMESPACE}/{merchant_uuid}"
+        url = (
+            f"{settings.VERKKOKAUPPA_MERCHANT_API_URL}/"
+            f"update/merchant/{settings.VERKKOKAUPPA_NAMESPACE}/{merchant_uuid}"
+        )
 
         try:
             response = cls.post(
-                url=f"{settings.VERKKOKAUPPA_MERCHANT_API_URL}/{url}",
+                url=url,
                 data=params.to_json(),
             )
             response_json = cls.response_json(response)
@@ -274,7 +280,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
     @classmethod
     def create_product(cls, *, params: CreateProductParams) -> Product:
         action_fail = "Product creation failed"
-        url = f"{settings.VERKKOKAUPPA_PRODUCT_API_URL}"
+        url = f"{settings.VERKKOKAUPPA_PRODUCT_API_URL}/"
 
         try:
             response = cls.post(
