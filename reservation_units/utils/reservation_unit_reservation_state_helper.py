@@ -124,8 +124,8 @@ class ReservationUnitReservationStateHelper:
         if active_price is None:
             return False
 
-        # If USE_MOCK_VERKKOKAUPPA_API is True there is no need to check for payment products,
-        if settings.USE_MOCK_VERKKOKAUPPA_API:
+        # If MOCK_VERKKOKAUPPA_API_ENABLED is True there is no need to check for payment products,
+        if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
             return True
 
         # Pricing is FREE
@@ -137,9 +137,9 @@ class ReservationUnitReservationStateHelper:
 
     @classmethod
     def __has_valid_pricing_query(cls) -> Q:
-        # If USE_MOCK_VERKKOKAUPPA_API is True there is no need to check for payment products,
+        # If MOCK_VERKKOKAUPPA_API_ENABLED is True there is no need to check for payment products,
         # as the products are created when a reservation is made.
-        if settings.USE_MOCK_VERKKOKAUPPA_API:
+        if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
             return Q(active_pricing_type__isnull=False)
 
         return (
@@ -314,7 +314,7 @@ class ReservationUnitReservationStateHelper:
             or (
                 active_price.pricing_type == PricingType.PAID
                 and reservation_unit.payment_product is None
-                and not settings.USE_MOCK_VERKKOKAUPPA_API  # Don't show as closed if using Mock Verkkokauppa API
+                and not settings.MOCK_VERKKOKAUPPA_API_ENABLED  # Don't show as closed if using Mock Verkkokauppa API
             )
         )
 
@@ -323,7 +323,7 @@ class ReservationUnitReservationStateHelper:
         now = local_datetime()
 
         payment_product_query = Q(active_pricing_type=PricingType.PAID) & Q(payment_product__isnull=True)
-        if settings.USE_MOCK_VERKKOKAUPPA_API:
+        if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
             payment_product_query = Q()
 
         return QueryState(

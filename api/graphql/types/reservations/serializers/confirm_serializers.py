@@ -90,7 +90,7 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
 
             active_price = ReservationUnitPricingHelper.get_active_price(reservation_unit)
             if active_price.pricing_type == PricingType.PAID or self.instance.price_net > 0:
-                if not reservation_unit.payment_product and not settings.USE_MOCK_VERKKOKAUPPA_API:
+                if not reservation_unit.payment_product and not settings.MOCK_VERKKOKAUPPA_API_ENABLED:
                     raise ValidationErrorWithCode(
                         "Reservation unit is missing payment product",
                         ValidationErrorCodes.MISSING_PAYMENT_PRODUCT,
@@ -150,7 +150,7 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
                 )
             else:
                 verkkokauppa_order: Order
-                if settings.USE_MOCK_VERKKOKAUPPA_API:
+                if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
                     verkkokauppa_order = create_mock_verkkokauppa_order(self.instance)
                 else:
                     order_params: CreateOrderParams = get_verkkokauppa_order_params(self.instance)
