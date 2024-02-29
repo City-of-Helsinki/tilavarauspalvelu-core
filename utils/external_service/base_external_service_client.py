@@ -86,8 +86,8 @@ class BaseExternalServiceClient:
         return response
 
     @classmethod
-    def post(cls, *, url: str, data: dict[str, Any] | None = None, headers: dict[str, Any] | None = None) -> Response:
-        response = cls.generic("post", url=url, data=json.dumps(data), headers=cls._get_mutate_headers(headers))
+    def post(cls, *, url: str, json: dict[str, Any] | None = None, headers: dict[str, Any] | None = None) -> Response:
+        response = cls.generic("post", url=url, json=json, headers=cls._get_mutate_headers(headers))
 
         if response.status_code >= 500:
             cls.handle_500_error(response)
@@ -95,8 +95,8 @@ class BaseExternalServiceClient:
         return response
 
     @classmethod
-    def put(cls, *, url: str, data: dict[str, Any] | None = None, headers: dict[str, Any] | None = None) -> Response:
-        response = cls.generic("put", url=url, data=json.dumps(data), headers=cls._get_mutate_headers(headers))
+    def put(cls, *, url: str, json: dict[str, Any] | None = None, headers: dict[str, Any] | None = None) -> Response:
+        response = cls.generic("put", url=url, json=json, headers=cls._get_mutate_headers(headers))
 
         if response.status_code >= 500:
             cls.handle_500_error(response)

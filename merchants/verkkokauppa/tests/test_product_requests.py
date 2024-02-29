@@ -1,4 +1,3 @@
-import json
 from uuid import UUID
 
 import pytest
@@ -65,7 +64,7 @@ def test__create_product__makes_valid_request():
     VerkkokauppaAPIClient.generic.assert_called_with(
         "post",
         url=settings.VERKKOKAUPPA_PRODUCT_API_URL + "/",
-        data=json.dumps(create_product_params.to_json()),
+        json=create_product_params.to_json(),
         headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
     )
 
@@ -121,7 +120,7 @@ def test__create_or_update__account_makes_valid_request():
     VerkkokauppaAPIClient.generic.assert_called_with(
         "post",
         url=settings.VERKKOKAUPPA_PRODUCT_API_URL + "/0bd382a0-d79f-44c8-b3c6-8617bf72ebd5/accounting",
-        data=json.dumps(create_or_update_account_params.to_json()),
+        json=create_or_update_account_params.to_json(),
         headers={
             "api-key": settings.VERKKOKAUPPA_API_KEY,
             "namespace": settings.VERKKOKAUPPA_NAMESPACE,

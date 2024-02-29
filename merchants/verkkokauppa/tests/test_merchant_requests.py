@@ -1,4 +1,3 @@
-import json
 from typing import Any
 from uuid import UUID
 
@@ -95,7 +94,7 @@ def test__create_merchant__makes_valid_request_returns_merchant():
     VerkkokauppaAPIClient.generic.assert_called_with(
         "post",
         url=(settings.VERKKOKAUPPA_MERCHANT_API_URL + "/create/merchant/" + settings.VERKKOKAUPPA_NAMESPACE),
-        data=json.dumps(create_merchant_params.to_json()),
+        json=create_merchant_params.to_json(),
         headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
     )
 
@@ -147,7 +146,7 @@ def test__update_merchant__makes_valid_request_returns_merchant():
             + settings.VERKKOKAUPPA_NAMESPACE
             + "/7107df38-5985-39c9-8c83-ffe18bff24f5"
         ),
-        data=json.dumps(update_merchant_params.to_json()),
+        json=update_merchant_params.to_json(),
         headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
     )
 
