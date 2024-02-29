@@ -87,13 +87,18 @@ const Step0 = ({
       return fields.indexOf(a) - fields.indexOf(b);
     }) || [];
 
-  const includesReserveeType =
-    reservationUnit?.metadataSet?.supportedFields?.includes("reservee_type");
+  const { supportedFields } = reservationUnit.metadataSet ?? {};
+  const includesReserveeType = supportedFields?.includes("reservee_type");
   const reserveeType = watch("reserveeType");
   const homeCity = watch("homeCity");
+  const includesHomeCity = supportedFields?.includes("home_city");
 
   if (includesReserveeType && isSubmitted && !reserveeType)
     errorKeys.push("reserveeType");
+
+  const isHomeCityValid = !includesHomeCity || Boolean(homeCity);
+  const isReserveeTypeValid = !includesReserveeType || Boolean(reserveeType);
+  const submitDisabled = !isValid || !isReserveeTypeValid || !isHomeCityValid;
 
   return (
     <Form
@@ -191,10 +196,7 @@ const Step0 = ({
         <MediumButton
           variant="primary"
           type="submit"
-          disabled={
-            !isValid ||
-            (includesReserveeType && (!reserveeType || homeCity === 0))
-          }
+          disabled={submitDisabled}
           iconRight={<IconArrowRight aria-hidden />}
           data-test="reservation__button--update"
           isLoading={isSubmitting}

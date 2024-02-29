@@ -236,9 +236,13 @@ const ReservationUnitReservationWithReservationProp = ({
     reserveeAddressCity: reservation?.reserveeAddressCity ?? "",
     reserveeAddressZip: reservation?.reserveeAddressZip ?? "",
     // TODO is this correct? it used to just pick the homeCity (but that makes no sense since it's typed as a number)
-    homeCity: reservation?.homeCity?.pk ?? 0,
+    // no it's not correct, the types and MetaFields are based on a number but the front sets it as { label: string, value: number }
+    // requires typing the useFormContext properly and refactoring all setters.
+    homeCity: reservation?.homeCity?.pk ?? undefined,
   };
-  // TODO don't use defaultValues, use values (and reset on fetch) from the form
+  // TODO is defaultValues correct? it's prefilled from the profile data and we are not refetching at any point.
+  // If we would refetch values would be more correct with reset hook.
+  // Also if this is ever initialised without the data it will not prefill the form.
   const form = useForm<Inputs>({ defaultValues, mode: "onBlur" });
   const { handleSubmit, watch } = form;
 
