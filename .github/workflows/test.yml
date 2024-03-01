@@ -106,8 +106,8 @@ jobs:
       - name: "Test for migration issues"
         run: poetry run python manage.py makemigrations --check --no-color --no-input --dry-run
 
-      #- name: "Test for missing translation"
-      #  run: poetry run python -m tilavarauspalvelu.hooks.translations_done
+      - name: "Test for missing translation"
+        run: poetry run python -m tilavarauspalvelu.hooks.translations_done
 
       - name: "Run pytest with coverage"
         run: poetry run pytest --cov=. --cov-report=xml --cov-branch --disable-warnings
