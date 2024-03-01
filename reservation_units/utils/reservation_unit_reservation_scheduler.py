@@ -1,8 +1,9 @@
-from datetime import date, datetime, time, timedelta
+from datetime import date, datetime, timedelta
 
 from django.db.models import QuerySet
 from django.utils.timezone import get_default_timezone
 
+from common.date_utils import local_start_of_day
 from opening_hours.models import ReservableTimeSpan
 from reservation_units.models import ReservationUnit
 
@@ -88,7 +89,7 @@ class ReservationUnitReservationScheduler:
         )
 
         possible_start_times = set()
-        start_time = datetime.combine(selected_date, time.min, tzinfo=DEFAULT_TIMEZONE)
+        start_time = local_start_of_day(selected_date)
         interval_timedelta = timedelta(minutes=interval_minutes)
 
         for time_span in reservable_time_spans:
