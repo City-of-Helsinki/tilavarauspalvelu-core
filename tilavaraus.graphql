@@ -1522,7 +1522,7 @@ type Query {
     name_Istartswith: String
     pk: [Int]
 
-    """Järjestä"""
+    """Järjestys"""
     orderBy: String
   ): ApplicationRoundNodeConnection
   applications(
@@ -1539,7 +1539,7 @@ type Query {
     applicant: Int
     textSearch: String
 
-    """Järjestä"""
+    """Järjestys"""
     orderBy: String
   ): ApplicationNodeConnection
   applicationEvents(
@@ -1566,7 +1566,7 @@ type Query {
     purpose: [Int]
     textSearch: String
 
-    """Järjestä"""
+    """Järjestys"""
     orderBy: String
   ): ApplicationEventNodeConnection
   applicationEventSchedules(
@@ -1587,7 +1587,7 @@ type Query {
     unallocated: Boolean
     textSearch: String
 
-    """Järjestä"""
+    """Järjestys"""
     orderBy: String
   ): ApplicationEventScheduleNodeConnection
   reservations(
@@ -1619,7 +1619,7 @@ type Query {
     user: ID
     textSearch: String
 
-    """Järjestä"""
+    """Järjestys"""
     orderBy: String
   ): ReservationTypeConnection
   reservationByPk(pk: Int): ReservationType
@@ -1643,7 +1643,7 @@ type Query {
     reservationUnit: [ID]
     reservationUnitType: [ID]
 
-    """Järjestä"""
+    """Järjestys"""
     orderBy: String
   ): RecurringReservationTypeConnection
   reservationCancelReasons(offset: Int, before: String, after: String, first: Int, last: Int, reason: String): ReservationCancelReasonTypeConnection
@@ -1689,7 +1689,7 @@ type Query {
     reservableMinimumDurationMinutes: Decimal
     showOnlyReservable: Boolean
 
-    """Järjestä"""
+    """Järjestys"""
     orderBy: String
   ): ReservationUnitTypeConnection
   reservationUnit(
@@ -1706,7 +1706,7 @@ type Query {
     first: Int
     last: Int
 
-    """Järjestä"""
+    """Järjestys"""
     orderBy: String
   ): ReservationUnitTypeTypeConnection
   resources(offset: Int, before: String, after: String, first: Int, last: Int, onlyWithPermission: Boolean): ResourceTypeConnection
@@ -1725,7 +1725,7 @@ type Query {
     rankGte: Decimal
     rankLte: Decimal
 
-    """Järjestä"""
+    """Järjestys"""
     orderBy: String
   ): EquipmentTypeConnection
   equipment(
@@ -1747,7 +1747,7 @@ type Query {
     last: Int
     onlyWithPermission: Boolean
 
-    """Järjestä"""
+    """Järjestys"""
     orderBy: String
   ): SpaceTypeConnection
   space(
@@ -1771,7 +1771,7 @@ type Query {
     publishedReservationUnits: Boolean
     ownReservations: Boolean
 
-    """Järjestä"""
+    """Järjestys"""
     orderBy: String
   ): UnitTypeConnection
   unit(
@@ -1791,7 +1791,7 @@ type Query {
     first: Int
     last: Int
 
-    """Järjestä"""
+    """Järjestys"""
     orderBy: String
   ): PurposeTypeConnection
   qualifiers(offset: Int, before: String, after: String, first: Int, last: Int, nameFi: String, nameEn: String, nameSv: String): QualifierTypeConnection
@@ -1817,7 +1817,7 @@ type Query {
     isActive: Boolean
     isVisible: Boolean
 
-    """Järjestä"""
+    """Järjestys"""
     orderBy: String
   ): BannerNotificationNodeConnection
 }
@@ -2914,7 +2914,8 @@ type ReservationUnitByPkType implements Node {
   Determines the interval for the start time of the reservation. For example an
   interval of 15 minutes means a reservation can begin at minutes 15, 30, 60, or
   90. Possible values are interval_15_mins, interval_30_mins, interval_60_mins,
-  interval_90_mins.
+  interval_90_mins, interval_120_mins, interval_180_mins, interval_240_mins,
+  interval_300_mins, interval_360_mins, interval_420_mins.
   """
   reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices!
   reservationsMinDaysBefore: Int
@@ -3059,7 +3060,9 @@ input ReservationUnitCreateMutationInput {
   Determines the interval for the start time of the reservation. For example an
   interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or
   45. Possible values are INTERVAL_15_MINUTES, INTERVAL_30_MINUTES,
-  INTERVAL_60_MINUTES, INTERVAL_90_MINUTES.
+  INTERVAL_60_MINUTES, INTERVAL_90_MINUTES, INTERVAL_120_MINUTES,
+  INTERVAL_180_MINUTES, INTERVAL_240_MINUTES, INTERVAL_300_MINUTES,
+  INTERVAL_360_MINUTES, INTERVAL_420_MINUTES.
   """
   reservationStartInterval: String
 
@@ -3115,24 +3118,24 @@ input ReservationUnitCreateMutationInput {
   paymentTypes: [String]
   pricings: [ReservationUnitPricingCreateSerializerInput]
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotSerializerInput]
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
   clientMutationId: String
 }
 
@@ -3186,7 +3189,9 @@ type ReservationUnitCreateMutationPayload {
   Determines the interval for the start time of the reservation. For example an
   interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or
   45. Possible values are INTERVAL_15_MINUTES, INTERVAL_30_MINUTES,
-  INTERVAL_60_MINUTES, INTERVAL_90_MINUTES.
+  INTERVAL_60_MINUTES, INTERVAL_90_MINUTES, INTERVAL_120_MINUTES,
+  INTERVAL_180_MINUTES, INTERVAL_240_MINUTES, INTERVAL_300_MINUTES,
+  INTERVAL_360_MINUTES, INTERVAL_420_MINUTES.
   """
   reservationStartInterval: String
 
@@ -3241,24 +3246,24 @@ type ReservationUnitCreateMutationPayload {
   paymentTypes: [String]
   pricings: [ReservationUnitPricingType]
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotNode]
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -3518,6 +3523,24 @@ enum ReservationUnitsReservationUnitReservationStartIntervalChoices {
 
   """90 minutes"""
   INTERVAL_90_MINS
+
+  """2 hours"""
+  INTERVAL_120_MINS
+
+  """3 hours"""
+  INTERVAL_180_MINS
+
+  """4 hours"""
+  INTERVAL_240_MINS
+
+  """5 hours"""
+  INTERVAL_300_MINS
+
+  """6 hours"""
+  INTERVAL_360_MINS
+
+  """7 hours"""
+  INTERVAL_420_MINS
 }
 
 """An enumeration."""
@@ -3577,7 +3600,8 @@ type ReservationUnitType implements Node {
   Determines the interval for the start time of the reservation. For example an
   interval of 15 minutes means a reservation can begin at minutes 15, 30, 60, or
   90. Possible values are interval_15_mins, interval_30_mins, interval_60_mins,
-  interval_90_mins.
+  interval_90_mins, interval_120_mins, interval_180_mins, interval_240_mins,
+  interval_300_mins, interval_360_mins, interval_420_mins.
   """
   reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices!
   reservationsMinDaysBefore: Int
@@ -3734,7 +3758,9 @@ input ReservationUnitUpdateMutationInput {
   Determines the interval for the start time of the reservation. For example an
   interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or
   45. Possible values are INTERVAL_15_MINUTES, INTERVAL_30_MINUTES,
-  INTERVAL_60_MINUTES, INTERVAL_90_MINUTES.
+  INTERVAL_60_MINUTES, INTERVAL_90_MINUTES, INTERVAL_120_MINUTES,
+  INTERVAL_180_MINUTES, INTERVAL_240_MINUTES, INTERVAL_300_MINUTES,
+  INTERVAL_360_MINUTES, INTERVAL_420_MINUTES.
   """
   reservationStartInterval: String
 
@@ -3790,24 +3816,24 @@ input ReservationUnitUpdateMutationInput {
   paymentTypes: [String]
   pricings: [ReservationUnitPricingUpdateSerializerInput]!
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotSerializerInput]
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
   clientMutationId: String
 }
 
@@ -3861,7 +3887,9 @@ type ReservationUnitUpdateMutationPayload {
   Determines the interval for the start time of the reservation. For example an
   interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or
   45. Possible values are INTERVAL_15_MINUTES, INTERVAL_30_MINUTES,
-  INTERVAL_60_MINUTES, INTERVAL_90_MINUTES.
+  INTERVAL_60_MINUTES, INTERVAL_90_MINUTES, INTERVAL_120_MINUTES,
+  INTERVAL_180_MINUTES, INTERVAL_240_MINUTES, INTERVAL_300_MINUTES,
+  INTERVAL_360_MINUTES, INTERVAL_420_MINUTES.
   """
   reservationStartInterval: String
 
@@ -3915,24 +3943,24 @@ type ReservationUnitUpdateMutationPayload {
   pricingTerms: String
   paymentTypes: [String]
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotNode]
+  descriptionFi: String
+  descriptionEn: String
+  descriptionSv: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsSv: String
+  termsOfUseFi: String
+  termsOfUseEn: String
+  termsOfUseSv: String
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsEn: String
   reservationPendingInstructionsSv: String
   reservationCancelledInstructionsFi: String
   reservationCancelledInstructionsEn: String
   reservationCancelledInstructionsSv: String
-  termsOfUseFi: String
-  termsOfUseEn: String
-  termsOfUseSv: String
-  descriptionFi: String
-  descriptionEn: String
-  descriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
-  reservationConfirmedInstructionsFi: String
-  reservationConfirmedInstructionsEn: String
-  reservationConfirmedInstructionsSv: String
 
   """May contain more than one error for same field."""
   errors: [ErrorType]
@@ -4651,12 +4679,12 @@ input UnitUpdateMutationInput {
   webPage: String
   email: String
   phone: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String
@@ -4669,12 +4697,12 @@ type UnitUpdateMutationPayload {
   webPage: String
   email: String
   phone: String
-  shortDescriptionFi: String
-  shortDescriptionEn: String
-  shortDescriptionSv: String
   descriptionFi: String
   descriptionEn: String
   descriptionSv: String
+  shortDescriptionFi: String
+  shortDescriptionEn: String
+  shortDescriptionSv: String
   nameFi: String
   nameEn: String
   nameSv: String

@@ -165,6 +165,18 @@ export const getIntervalMinutes = (
       return 60;
     case "INTERVAL_90_MINS":
       return 90;
+    case "INTERVAL_120_MINS":
+      return 120;
+    case "INTERVAL_180_MINS":
+      return 180;
+    case "INTERVAL_240_MINS":
+      return 240;
+    case "INTERVAL_300_MINS":
+      return 300;
+    case "INTERVAL_360_MINS":
+      return 360;
+    case "INTERVAL_420_MINS":
+      return 420;
     default:
       return 0;
   }
@@ -299,6 +311,24 @@ export const getDayIntervals = (
       break;
     case "INTERVAL_90_MINS":
       intervalSeconds = 90 * 60;
+      break;
+    case "INTERVAL_120_MINS":
+      intervalSeconds = 120 * 60;
+      break;
+    case "INTERVAL_180_MINS":
+      intervalSeconds = 180 * 60;
+      break;
+    case "INTERVAL_240_MINS":
+      intervalSeconds = 240 * 60;
+      break;
+    case "INTERVAL_300_MINS":
+      intervalSeconds = 300 * 60;
+      break;
+    case "INTERVAL_360_MINS":
+      intervalSeconds = 360 * 60;
+      break;
+    case "INTERVAL_420_MINS":
+      intervalSeconds = 420 * 60;
       break;
     default:
   }

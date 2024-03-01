@@ -1626,6 +1626,12 @@ const translations: ITranslations = {
     INTERVAL_30_MINS: ["30 min välein"],
     INTERVAL_60_MINS: ["1 tunnin välein"],
     INTERVAL_90_MINS: ["1,5 tunnin välein"],
+    INTERVAL_120_MINS: ["2 tunnin välein"],
+    INTERVAL_180_MINS: ["3 tunnin välein"],
+    INTERVAL_240_MINS: ["4 tunnin välein"],
+    INTERVAL_300_MINS: ["5 tunnin välein"],
+    INTERVAL_360_MINS: ["6 tunnin välein"],
+    INTERVAL_420_MINS: ["7 tunnin välein"],
   },
   ReservationStateFilter: {
     label: ["Käsittelytila"],
