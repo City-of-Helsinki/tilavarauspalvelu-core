@@ -1,6 +1,7 @@
 import pytest
+from graphene_django_extensions.testing import build_query
 
-from tests.factories import AllocatedTimeSlotFactory
+from tests.factories import AllocatedTimeSlotFactory, ReservationUnitFactory, SpaceFactory
 from tests.helpers import UserType
 
 from .helpers import allocations_query
@@ -57,4 +58,41 @@ def test_allocated_time_slot__query__all_fields(graphql):
                 "nameFi": allocation.reservation_unit_option.reservation_unit.name,
             },
         },
+    }
+
+
+def test_affecting_allocated_time_slots__query(graphql):
+    # given:
+    # - There is a timeslot in the system
+    space = SpaceFactory.create()
+    reservation_unit = ReservationUnitFactory.create(spaces=[space])
+    allocation = AllocatedTimeSlotFactory.create(reservation_unit_option__reservation_unit=reservation_unit)
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    fields = """
+        pk
+        dayOfTheWeek
+        beginTime
+        endTime
+    """
+
+    # when:
+    # - User tries to query timeslots that affect the given reservation unit
+    query = build_query(
+        "affectingAllocatedTimeSlots",
+        fields=fields,
+        reservation_unit=allocation.reservation_unit_option.reservation_unit.pk,
+        begin_date=allocation.reservation_unit_option.application_section.reservations_begin_date.isoformat(),
+        end_date=allocation.reservation_unit_option.application_section.reservations_end_date.isoformat(),
+    )
+    response = graphql(query)
+
+    # then:
+    # - The response contains the allocations that affect the given reservation unit
+    assert len(response.first_query_object) == 1
+    assert response.first_query_object[0] == {
+        "pk": allocation.pk,
+        "dayOfTheWeek": allocation.day_of_the_week,
+        "beginTime": allocation.begin_time.isoformat(),
+        "endTime": allocation.end_time.isoformat(),
     }

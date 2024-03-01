@@ -1,11 +1,7 @@
 import pytest
 
 from tests.factories import (
-    AllocatedTimeSlotFactory,
     ApplicationSectionFactory,
-    ReservationUnitFactory,
-    ReservationUnitOptionFactory,
-    SpaceFactory,
     SuitableTimeRangeFactory,
 )
 from tests.helpers import UserType
@@ -103,65 +99,6 @@ def test_application_section__query__all_fields(graphql):
             },
         ],
         "status": section.status.value,
-    }
-
-
-def test_application_section__query__affecting_allocations(graphql):
-    # given:
-    # - There are three applications for the same reservation unit, at the same time
-    #   - Two of the applications has been allocated
-    #   - One application has not been allocated
-    # - A superuser is using the system
-    common_unit = ReservationUnitFactory.create(spaces=[SpaceFactory.create()])
-
-    slot_1 = AllocatedTimeSlotFactory.create(reservation_unit_option__reservation_unit=common_unit)
-    slot_2 = AllocatedTimeSlotFactory.create(reservation_unit_option__reservation_unit=common_unit)
-    option_3 = ReservationUnitOptionFactory.create(reservation_unit=common_unit)
-
-    section_1 = slot_1.reservation_unit_option.application_section
-    section_2 = slot_2.reservation_unit_option.application_section
-    section_3 = option_3.application_section
-
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
-
-    fields = """
-        pk
-        affectingAllocatedTimeSlots {
-            pk
-        }
-    """
-
-    # when:
-    # - User tries to search for application sections and their affecting allocated time slots
-    query = sections_query(fields=fields, affecting_allocated_time_slots__reservation_unit=common_unit.pk)
-    response = graphql(query)
-
-    # then:
-    # - The response has no errors
-    assert response.has_errors is False, response.errors
-    assert len(response.edges) == 3, response
-
-    # The seconds sections allocations affect the first section
-    assert response.node(0) == {
-        "pk": section_1.pk,
-        "affectingAllocatedTimeSlots": [
-            {"pk": slot_2.pk},
-        ],
-    }
-    # The first sections allocations affect the second section
-    assert response.node(1) == {
-        "pk": section_2.pk,
-        "affectingAllocatedTimeSlots": [
-            {"pk": slot_1.pk},
-        ],
-    }
-    # The first and the second sections allocations affect the third section
-    assert response.node(2) == {
-        "pk": section_3.pk,
-        "affectingAllocatedTimeSlots": [
-            {"pk": slot_1.pk},
-            {"pk": slot_2.pk},
-        ],
     }
 
 

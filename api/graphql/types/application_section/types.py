@@ -24,11 +24,6 @@ class ApplicationSectionNode(DjangoNode):
     purpose = RelatedField("api.graphql.types.reservations.types.ReservationPurposeType")
     age_group = RelatedField("api.graphql.types.reservations.types.AgeGroupType")
 
-    affecting_allocated_time_slots = graphene.List(
-        "api.graphql.types.allocated_time_slot.types.AllocatedTimeSlotNode",
-        reservation_unit=graphene.Int(),
-    )
-
     class Meta:
         model = ApplicationSection
         fields = [
@@ -69,14 +64,3 @@ class ApplicationSectionNode(DjangoNode):
     @required_annotations(allocations=L("allocations"))
     def resolve_allocations(root: ApplicationSection, info: GQLInfo) -> int:
         return root.allocations
-
-    def resolve_affecting_allocated_time_slots(
-        root: ApplicationSection,
-        info: GQLInfo,
-        reservation_unit: int,
-    ) -> models.QuerySet:
-        """Return all allocations that affect this"""
-        # Note: Querying this field still causes 1 additional query for each application section.
-        # Currently, there is no way to optimize it, since it's an "indirect" relation which requires
-        # an input field (i.e. can't use `@required_annotations`).
-        return root.actions.affecting_allocations(reservation_unit=reservation_unit)
