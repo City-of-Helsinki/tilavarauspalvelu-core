@@ -3213,7 +3213,8 @@ export type ReservationUnitByPkType = Node & {
    * Determines the interval for the start time of the reservation. For example an
    * interval of 15 minutes means a reservation can begin at minutes 15, 30, 60, or
    * 90. Possible values are interval_15_mins, interval_30_mins, interval_60_mins,
-   * interval_90_mins.
+   * interval_90_mins, interval_120_mins, interval_180_mins, interval_240_mins,
+   * interval_300_mins, interval_360_mins, interval_420_mins.
    */
   reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices;
   reservationState?: Maybe<ReservationState>;
@@ -3356,7 +3357,9 @@ export type ReservationUnitCreateMutationInput = {
    * Determines the interval for the start time of the reservation. For example an
    * interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or
    * 45. Possible values are INTERVAL_15_MINUTES, INTERVAL_30_MINUTES,
-   * INTERVAL_60_MINUTES, INTERVAL_90_MINUTES.
+   * INTERVAL_60_MINUTES, INTERVAL_90_MINUTES, INTERVAL_120_MINUTES,
+   * INTERVAL_180_MINUTES, INTERVAL_240_MINUTES, INTERVAL_300_MINUTES,
+   * INTERVAL_360_MINUTES, INTERVAL_420_MINUTES.
    */
   reservationStartInterval?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitTypePk?: InputMaybe<Scalars["Int"]["input"]>;
@@ -3446,7 +3449,9 @@ export type ReservationUnitCreateMutationPayload = {
    * Determines the interval for the start time of the reservation. For example an
    * interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or
    * 45. Possible values are INTERVAL_15_MINUTES, INTERVAL_30_MINUTES,
-   * INTERVAL_60_MINUTES, INTERVAL_90_MINUTES.
+   * INTERVAL_60_MINUTES, INTERVAL_90_MINUTES, INTERVAL_120_MINUTES,
+   * INTERVAL_180_MINUTES, INTERVAL_240_MINUTES, INTERVAL_300_MINUTES,
+   * INTERVAL_360_MINUTES, INTERVAL_420_MINUTES.
    */
   reservationStartInterval?: Maybe<Scalars["String"]["output"]>;
   reservationUnit?: Maybe<ReservationUnitType>;
@@ -3686,7 +3691,8 @@ export type ReservationUnitType = Node & {
    * Determines the interval for the start time of the reservation. For example an
    * interval of 15 minutes means a reservation can begin at minutes 15, 30, 60, or
    * 90. Possible values are interval_15_mins, interval_30_mins, interval_60_mins,
-   * interval_90_mins.
+   * interval_90_mins, interval_120_mins, interval_180_mins, interval_240_mins,
+   * interval_300_mins, interval_360_mins, interval_420_mins.
    */
   reservationStartInterval: ReservationUnitsReservationUnitReservationStartIntervalChoices;
   reservationState?: Maybe<ReservationState>;
@@ -3840,7 +3846,9 @@ export type ReservationUnitUpdateMutationInput = {
    * Determines the interval for the start time of the reservation. For example an
    * interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or
    * 45. Possible values are INTERVAL_15_MINUTES, INTERVAL_30_MINUTES,
-   * INTERVAL_60_MINUTES, INTERVAL_90_MINUTES.
+   * INTERVAL_60_MINUTES, INTERVAL_90_MINUTES, INTERVAL_120_MINUTES,
+   * INTERVAL_180_MINUTES, INTERVAL_240_MINUTES, INTERVAL_300_MINUTES,
+   * INTERVAL_360_MINUTES, INTERVAL_420_MINUTES.
    */
   reservationStartInterval?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitTypePk?: InputMaybe<Scalars["Int"]["input"]>;
@@ -3929,7 +3937,9 @@ export type ReservationUnitUpdateMutationPayload = {
    * Determines the interval for the start time of the reservation. For example an
    * interval of 15 minutes means a reservation can begin at minutes 0, 15, 30, or
    * 45. Possible values are INTERVAL_15_MINUTES, INTERVAL_30_MINUTES,
-   * INTERVAL_60_MINUTES, INTERVAL_90_MINUTES.
+   * INTERVAL_60_MINUTES, INTERVAL_90_MINUTES, INTERVAL_120_MINUTES,
+   * INTERVAL_180_MINUTES, INTERVAL_240_MINUTES, INTERVAL_300_MINUTES,
+   * INTERVAL_360_MINUTES, INTERVAL_420_MINUTES.
    */
   reservationStartInterval?: Maybe<Scalars["String"]["output"]>;
   reservationUnit?: Maybe<ReservationUnitType>;
@@ -4029,6 +4039,18 @@ export enum ReservationUnitsReservationUnitReservationStartIntervalChoices {
   Interval_60Mins = "INTERVAL_60_MINS",
   /** 90 minutes */
   Interval_90Mins = "INTERVAL_90_MINS",
+  /** 2 hours */
+  Interval_120Mins = "INTERVAL_120_MINS",
+  /** 3 hours */
+  Interval_180Mins = "INTERVAL_180_MINS",
+  /** 4 hours */
+  Interval_240Mins = "INTERVAL_240_MINS",
+  /** 5 hours */
+  Interval_300Mins = "INTERVAL_300_MINS",
+  /** 6 hours */
+  Interval_360Mins = "INTERVAL_360_MINS",
+  /** 7 hours */
+  Interval_420Mins = "INTERVAL_420_MINS",
 }
 
 export type ReservationUpdateMutationInput = {
