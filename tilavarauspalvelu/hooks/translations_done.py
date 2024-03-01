@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Literal
 
+import django
 import polib
 from django.core.management import call_command
 
@@ -30,21 +31,22 @@ def working_directory(directory: Path):
 
 
 def main() -> int:
+    django.setup()
     path_fi = BASE_PATH / "locale" / "fi" / "LC_MESSAGES" / "django.po"
-    path_sv = BASE_PATH / "locale" / "sv" / "LC_MESSAGES" / "django.po"
+    # path_sv = BASE_PATH / "locale" / "sv" / "LC_MESSAGES" / "django.po"
 
     missing: dict[str, MissingTranslations] = defaultdict(MissingTranslations)
 
     contents_before_fi = polib.pofile(str(path_fi))
-    contents_before_sv = polib.pofile(str(path_sv))
+    # contents_before_sv = polib.pofile(str(path_sv))
 
     with working_directory(BASE_PATH):
         call_command(
             "maketranslations",
             "-l",
             "fi",
-            "-l",
-            "sv",
+            # "-l",
+            # "sv",
             "--no-obsolete",
             "--omit-header",
             "--add-location",
@@ -53,7 +55,7 @@ def main() -> int:
 
     items: list[tuple[LangType, str, polib.POFile]] = [
         ("fi", str(path_fi), contents_before_fi),
-        ("sv", str(path_sv), contents_before_sv),
+        # ("sv", str(path_sv), contents_before_sv),
     ]
 
     for lang, path, contents_before in items:

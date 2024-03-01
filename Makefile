@@ -18,6 +18,7 @@
 .PHONY: services-local-status
 .PHONY: services-local-stop
 .PHONY: stop
+.PHONY: check-translations
 .PHONY: translations
 .PHONT: translate
 
@@ -51,6 +52,7 @@ define helptext
   services-local-stop                Stop required services locally with 'systemctl'.
   services-local-status              Check status of services running locally with 'systemctl'.
   stop                               Stop running containers.
+  check-translations                 Check if translations are up to date.
   translations                       Fetch all translation strings under ./locale/.
   translate                          Compile translation strings.
 
@@ -129,6 +131,9 @@ services-local-status:
 
 stop:
 	@docker compose stop
+
+check-translations:
+	@echo python -m tilavarauspalvelu.hooks.translations_done
 
 translations:
 	@echo ""
