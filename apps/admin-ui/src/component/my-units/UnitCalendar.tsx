@@ -438,24 +438,33 @@ function UnitCalendar({ date, resources, refetch }: Props): JSX.Element {
   const scrollCalendar = useCallback(() => {
     const ref = calendarRef.current;
 
-    if (!ref) return;
+    if (!ref) {
+      return;
+    }
 
-    // NOTE on mobile only for today move the scroll position to this hour
-    // TODO improve the calculations (less magic numbers), add desktop version (sidebars, margins)
-    const LAST_HOUR = 17;
-    const FIRST_HOUR = 9;
-    const HOUR_CELL_WIDTH = 82;
-    const PAGE_MARGIN = 30;
+    // TODO improve the calculations (less magic numbers)
+    const FIRST_HOUR = 7;
+    const HOUR_CELL_WIDTH = 73;
+    // 768px is the mobile breakpoint (there is some funk in it at 768px vs 769px)
     const TITLE_CELL_WIDTH = 105;
-    const calendarSectionSize =
-      window.innerWidth - PAGE_MARGIN - TITLE_CELL_WIDTH;
+    const MOBILE_BREAKPOINT = 768;
+    const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
+    // 48px on both sides on desktop, 16px on mobile
+    const CONTAINER_MARGIN = isMobile ? 16 * 2 : 48 * 2;
+    const SIDE_MENU_WIDTH = isMobile ? 0 : 300;
+    const MAX_CALENDAR_WIDTH = 1200 - 48 * 2;
+    const possibleCalendarWidth =
+      window.innerWidth -
+      (SIDE_MENU_WIDTH + CONTAINER_MARGIN + TITLE_CELL_WIDTH);
+    const calendarSectionSize = Math.min(
+      possibleCalendarWidth,
+      MAX_CALENDAR_WIDTH
+    );
     const nCells = Math.round(calendarSectionSize / HOUR_CELL_WIDTH);
     const now = new Date();
-    const mobileCell = isToday(date)
-      ? now.getHours() + nCells
-      : FIRST_HOUR + nCells;
-    const isMobile = window.innerWidth < 768;
-    const cellToScroll = isMobile ? mobileCell : LAST_HOUR;
+    const cellToScroll = isToday(date)
+      ? Math.min(now.getHours() + nCells, 24)
+      : Math.min(FIRST_HOUR + nCells, 24);
     const lastElementOfHeader = ref.querySelector(
       `.calendar-header > div:nth-of-type(${cellToScroll})`
     );
