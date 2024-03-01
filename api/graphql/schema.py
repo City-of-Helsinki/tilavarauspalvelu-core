@@ -1,9 +1,12 @@
+import datetime
 from typing import Any
 
 import graphene
 from django.conf import settings
+from django.db import models
 from graphene import Field, relay
 from graphene_django.debug import DjangoDebug
+from query_optimizer import DjangoListField
 from rest_framework.generics import get_object_or_404
 
 from api.graphql.extensions.permission_helpers import check_resolver_permission
@@ -146,6 +149,7 @@ from api.graphql.types.units.types import UnitByPkType, UnitType
 from api.graphql.types.users.mutations import UserUpdateMutation
 from api.graphql.types.users.permissions import UserPermission
 from api.graphql.types.users.types import UserType
+from applications.models import AllocatedTimeSlot
 from common.models import BannerNotification
 from common.typing import GQLInfo
 from merchants.models import PaymentOrder
@@ -164,6 +168,18 @@ class Query(graphene.ObjectType):
     application = ApplicationNode.Node()
     application_sections = ApplicationSectionNode.Connection()
     allocated_time_slots = AllocatedTimeSlotNode.Connection()
+
+    affecting_allocated_time_slots = DjangoListField(
+        AllocatedTimeSlotNode,
+        reservation_unit=graphene.NonNull(graphene.Int),
+        begin_date=graphene.NonNull(graphene.Date),
+        end_date=graphene.NonNull(graphene.Date),
+        description=(
+            "Return all allocations that affect allocations for given reservation unit "
+            "(through space hierarchy or common resource) during the given time period."
+        ),
+        no_filters=True,
+    )
 
     reservations = ReservationsFilter(ReservationType, filterset_class=ReservationFilterSet)
     reservation_by_pk = Field(ReservationType, pk=graphene.Int())
@@ -309,6 +325,15 @@ class Query(graphene.ObjectType):
         if kwargs.get("is_visible", False):
             return BannerNotification.objects.visible(info.context.user)
         return BannerNotification.objects.none()
+
+    def resolve_affecting_allocated_time_slots(
+        root: None,
+        info: GQLInfo,
+        reservation_unit: int,
+        begin_date: datetime.date,
+        end_date: datetime.date,
+    ) -> models.QuerySet:
+        return AllocatedTimeSlot.objects.affecting_allocations(reservation_unit, begin_date, end_date)
 
 
 class Mutation(graphene.ObjectType):
