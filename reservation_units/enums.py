@@ -39,6 +39,12 @@ class ReservationStartInterval(TextChoices):
     INTERVAL_30_MINUTES = "interval_30_mins", _("30 minutes")
     INTERVAL_60_MINUTES = "interval_60_mins", _("60 minutes")
     INTERVAL_90_MINUTES = "interval_90_mins", _("90 minutes")
+    INTERVAL_120_MINUTES = "interval_120_mins", _("2 hours")
+    INTERVAL_180_MINUTES = "interval_180_mins", _("3 hours")
+    INTERVAL_240_MINUTES = "interval_240_mins", _("4 hours")
+    INTERVAL_300_MINUTES = "interval_300_mins", _("5 hours")
+    INTERVAL_360_MINUTES = "interval_360_mins", _("6 hours")
+    INTERVAL_420_MINUTES = "interval_420_mins", _("7 hours")
 
     @property
     def as_number(self) -> int:

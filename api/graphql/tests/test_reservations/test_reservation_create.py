@@ -19,6 +19,7 @@ from reservation_units.enums import (
     ReservationKind,
     ReservationStartInterval,
 )
+from reservation_units.models import ReservationUnit
 from reservations.choices import ReservationStateChoice, ReservationTypeChoice
 from reservations.models import AgeGroup, Reservation
 from tests.factories import (
@@ -39,7 +40,7 @@ def get_profile_data():
     return {"data": {"myProfile": {"firstName": "John", "lastName": "Doe"}}}
 
 
-@freezegun.freeze_time("2021-10-12T12:00:00Z")
+@freezegun.freeze_time(datetime.datetime(2021, 10, 12, 12, 0, tzinfo=DEFAULT_TIMEZONE))
 class ReservationCreateTestCase(ReservationTestCaseBase):
     def get_create_query(self):
         return """
@@ -93,7 +94,7 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
 
     def setUp(self):
         super().setUp()
-        self.reservation_unit = ReservationUnitFactory(
+        self.reservation_unit: ReservationUnit = ReservationUnitFactory(
             spaces=[self.space],
             name="resunit",
             reservation_start_interval=ReservationStartInterval.INTERVAL_15_MINUTES.value,
@@ -499,14 +500,19 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
 
     def test_create_succeeds_when_start_time_matches_reservation_start_interval(self):
         self.client.force_login(self.regular_joe)
-        intervals = list(ReservationStartInterval.values)
-        for interval, interval_minutes in zip(intervals, [15, 30, 60, 90]):
+
+        interval: ReservationStartInterval
+        for interval in ReservationStartInterval:
+            interval_minutes = interval.as_number
             input_data = self.get_valid_input_data()
             self.reservation_unit.reservation_start_interval = interval
             self.reservation_unit.save(update_fields=["reservation_start_interval"])
-            begin = datetime.datetime.now() + datetime.timedelta(minutes=interval_minutes)
-            input_data["begin"] = begin.strftime("%Y%m%dT%H%M%SZ")
-            input_data["end"] = (begin + datetime.timedelta(minutes=interval_minutes)).strftime("%Y%m%dT%H%M%SZ")
+
+            begin = self.reservation_unit.origin_hauki_resource.reservable_time_spans.first().start_datetime
+            begin += datetime.timedelta(minutes=interval_minutes)
+            input_data["begin"] = begin.isoformat()
+            input_data["end"] = (begin + datetime.timedelta(minutes=interval_minutes)).isoformat()
+
             response = self.query(self.get_create_query(), input_data=input_data)
             content = json.loads(response.content)
             assert content.get("errors") is None
@@ -516,12 +522,16 @@ class ReservationCreateTestCase(ReservationTestCaseBase):
 
     def test_create_fails_when_start_time_does_not_match_reservation_start_interval(self):
         self.client.force_login(self.regular_joe)
-        intervals = list(ReservationStartInterval.values)
-        for interval, interval_minutes in zip(intervals, [15, 30, 60, 90]):
+
+        interval: ReservationStartInterval
+        for interval in ReservationStartInterval:
+            interval_minutes = interval.as_number
             input_data = self.get_valid_input_data()
             self.reservation_unit.reservation_start_interval = interval
             self.reservation_unit.save(update_fields=["reservation_start_interval"])
-            begin = datetime.datetime.now() + datetime.timedelta(minutes=interval_minutes + 1)
+
+            begin = self.reservation_unit.origin_hauki_resource.reservable_time_spans.first().start_datetime
+            begin += datetime.timedelta(minutes=interval_minutes + 1)
             end = begin + datetime.timedelta(minutes=interval_minutes)
             input_data["begin"] = begin.strftime("%Y%m%dT%H%M%SZ")
             input_data["end"] = end.strftime("%Y%m%dT%H%M%SZ")
