@@ -1,13 +1,15 @@
 from django.contrib import admin, messages
 from django.contrib.admin import helpers
-from django.http import FileResponse, HttpRequest
+from django.core.handlers.wsgi import WSGIRequest
+from django.db.models import QuerySet
+from django.http import FileResponse
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
+from lookup_property import L
 from modeltranslation.admin import TranslationAdmin
 
 from applications.exporter import export_application_data
 from applications.models import ApplicationRound
-from applications.querysets.application_round import ApplicationRoundQuerySet
 from utils.sentry import SentryLogger
 
 from .forms.application_round import ApplicationRoundAdminForm
@@ -20,15 +22,30 @@ __all__ = [
 @admin.register(ApplicationRound)
 class ApplicationRoundAdmin(TranslationAdmin):
     form = ApplicationRoundAdminForm
-    list_display = ["_name"]
-    actions = ["export_to_csv", "reset_application_rounds"]
-    autocomplete_fields = ["reservation_units"]
+    list_display = [
+        "_name",
+    ]
+    actions = [
+        "export_to_csv",
+        "reset_application_rounds",
+    ]
+    autocomplete_fields = [
+        "reservation_units",
+    ]
+
+    def get_queryset(self, request: WSGIRequest) -> QuerySet:
+        return (
+            super()  #
+            .get_queryset(request)
+            .annotate(status=L("status"))
+            .select_related("service_sector")
+        )
 
     @admin.display(description=_("Application Round"), ordering="name")
     def _name(self, obj: ApplicationRound) -> str:
         return str(obj)
 
-    @admin.action(description="Export application events in the selected application round to CSV")
+    @admin.action(description=_("Export application sections in the selected application round to CSV"))
     def export_to_csv(self, request, queryset):
         try:
             app_round = queryset.first()
@@ -53,12 +70,8 @@ class ApplicationRoundAdmin(TranslationAdmin):
                 level=messages.INFO,
             )
 
-    @admin.action(description="Reset application round allocations")
-    def reset_application_rounds(
-        self,
-        request: HttpRequest,
-        queryset: ApplicationRoundQuerySet,
-    ) -> TemplateResponse | None:
+    @admin.action(description=_("Reset application round allocations"))
+    def reset_application_rounds(self, request: WSGIRequest, queryset: QuerySet) -> TemplateResponse | None:
         # Coming from confirmation page, perform the action
         if request.POST.get("post"):
             application_round: ApplicationRound

@@ -47,7 +47,7 @@ class ApplicationSectionInline(admin.TabularInline):
 class ApplicationAdmin(admin.ModelAdmin):
     form = ApplicationAdminForm
     list_display = [
-        "__str__",
+        "_name",
         "application_round",
         "created_date",
         "last_modified_date",
@@ -62,8 +62,12 @@ class ApplicationAdmin(admin.ModelAdmin):
         "user__last_name",
         "application_round__reservation_units__name",
     ]
-    actions = ["reset_applications"]
-    inlines = [ApplicationSectionInline]
+    actions = [
+        "reset_applications",
+    ]
+    inlines = [
+        ApplicationSectionInline,
+    ]
 
     def get_queryset(self, request: WSGIRequest) -> QuerySet:
         return (
@@ -80,7 +84,11 @@ class ApplicationAdmin(admin.ModelAdmin):
             )
         )
 
-    @admin.action(description="Reset application allocations")
+    @admin.display(description=_("Application"), ordering="user__last_name")
+    def _name(self, obj: Application) -> str:
+        return str(obj)
+
+    @admin.action(description=_("Reset application allocations"))
     def reset_applications(self, request: HttpRequest, queryset: ApplicationQuerySet) -> TemplateResponse | None:
         # Coming from confirmation page, perform the action
         if request.POST.get("post"):

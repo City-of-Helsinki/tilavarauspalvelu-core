@@ -1,14 +1,18 @@
+from typing import Any
+
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from tinymce.widgets import TinyMCE
 
 from applications.choices import ApplicationRoundStatusChoice
 from applications.models import ApplicationRound
-from common.fields.forms import EnumChoiceField, disabled_widget
+from common.fields.forms import EnumChoiceField, ModelMultipleChoiceFilteredField, disabled_widget
 
 __all__ = [
     "ApplicationRoundAdminForm",
 ]
+
+from reservation_units.models import Purpose, ReservationUnit
 
 
 class ApplicationRoundAdminForm(forms.ModelForm):
@@ -18,25 +22,41 @@ class ApplicationRoundAdminForm(forms.ModelForm):
         required=False,
         disabled=True,
         label=_("Status"),
-        help_text=(
-            f"{ApplicationRoundStatusChoice.UPCOMING.value}: "
-            f"Applications cannot yet be made in the round. "
-            f"{ApplicationRoundStatusChoice.OPEN.value}: "
-            f"Applications can be made in the round. "
-            f"{ApplicationRoundStatusChoice.IN_ALLOCATION.value}: "
-            f"Applications in the round are being allocated. "
-            f"{ApplicationRoundStatusChoice.HANDLED.value}: "
-            f"All application have been allocated. "
-            f"{ApplicationRoundStatusChoice.RESULTS_SENT.value}: "
-            f"All application results have been sent to users. "
-        ),
+        help_text=_(
+            "%(upcoming)s: Applications cannot yet be made in the round. <br>"
+            "%(open)s: Applications can be made in the round. <br>"
+            "%(in_allocation)s: Applications in the round are being allocated. <br>"
+            "%(handled)s: All application have been allocated. <br>"
+            "%(results_sent)s: All application results have been sent to users. <br>"
+        )
+        % {
+            "upcoming": ApplicationRoundStatusChoice.UPCOMING.label,
+            "open": ApplicationRoundStatusChoice.OPEN.label,
+            "in_allocation": ApplicationRoundStatusChoice.IN_ALLOCATION.label,
+            "handled": ApplicationRoundStatusChoice.HANDLED.label,
+            "results_sent": ApplicationRoundStatusChoice.RESULTS_SENT.label,
+        },
     )
 
-    def __init__(self, *args, **kwargs):
+    reservation_units = ModelMultipleChoiceFilteredField(
+        queryset=ReservationUnit.objects.select_related("unit").all(),
+        is_stacked=False,
+        label=_("Reservation units"),
+        help_text=_("Reservation units that can be applied for in this application round."),
+    )
+
+    purposes = ModelMultipleChoiceFilteredField(
+        queryset=Purpose.objects.all(),
+        is_stacked=False,
+        label=_("Purposes"),
+        help_text=_("Purposes that are allowed in this application period."),
+    )
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         instance: ApplicationRound | None = kwargs.get("instance", None)
         if instance:
             kwargs.setdefault("initial", {})
-            kwargs["initial"]["status"] = instance.status
+            kwargs["initial"]["status"] = ApplicationRoundStatusChoice(instance.status).label
         super().__init__(*args, **kwargs)
 
     class Meta:
@@ -63,6 +83,9 @@ class ApplicationRoundAdminForm(forms.ModelForm):
         }
         labels = {
             "name": _("Name"),
+            "name_fi": _("Name (Finnish)"),
+            "name_en": _("Name (English)"),
+            "name_sv": _("Name (Swedish)"),
             "target_group": _("Target group"),
             "reservation_units": _("Reservation units"),
             "application_period_begin": _("Application period begin date and time"),
@@ -76,9 +99,15 @@ class ApplicationRoundAdminForm(forms.ModelForm):
             "purposes": _("Purposes"),
             "service_sector": _("Service sector"),
             "criteria": _("Application criteria"),
+            "criteria_fi": _("Application criteria (Finnish)"),
+            "criteria_en": _("Application criteria (English)"),
+            "criteria_sv": _("Application criteria (Swedish)"),
         }
         help_texts = {
             "name": _("Name that describes the application round."),
+            "name_fi": _("Name that describes the application round in Finnish."),
+            "name_en": _("Name that describes the application round in English."),
+            "name_sv": _("Name that describes the application round in Swedish."),
             "target_group": _("Target group of the application round."),
             "reservation_units": _("Reservation units that can be applied for in this application round."),
             "application_period_begin": _("Start date and time of the period when application can be sent."),
@@ -92,4 +121,7 @@ class ApplicationRoundAdminForm(forms.ModelForm):
             "purposes": _("Purposes that are allowed in this application period."),
             "service_sector": _("Service sector for the application round."),
             "criteria": _("Application criteria for the application round."),
+            "criteria_fi": _("Application criteria for the application round in Finnish."),
+            "criteria_en": _("Application criteria for the application round in English."),
+            "criteria_sv": _("Application criteria for the application round in Swedish."),
         }

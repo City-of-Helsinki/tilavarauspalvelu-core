@@ -37,11 +37,15 @@ msgstr ""
 msgid "Allocated Time Slot"
 msgstr "Jaettu vuoro"
 
-#: applications/admin/allocated_time_slot.py
+#: applications/admin/allocated_time_slot.py applications/admin/application.py
 #: applications/admin/forms/application_section.py
 #: applications/models/application.py
 msgid "Application"
 msgstr "Hakemus"
+
+#: applications/admin/application.py
+msgid "Reset application allocations"
+msgstr "Resetoi hakemuksen allokoinnit"
 
 #: applications/admin/application.py applications/admin/application_round.py
 msgid "Are you sure?"
@@ -57,6 +61,14 @@ msgstr "Oletko varma, että haluat resetoida allokoinnit?"
 #: applications/models/application_round.py
 msgid "Application Round"
 msgstr "Kausivarauskierros"
+
+#: applications/admin/application_round.py
+msgid "Export application sections in the selected application round to CSV"
+msgstr "Vie valitun kausivarauskierroksen hakemuksen osat CSV-tiedostoon"
+
+#: applications/admin/application_round.py
+msgid "Reset application round allocations"
+msgstr "Resetoi kausivarauskierroksen allokoinnit"
 
 #: applications/admin/filters/allocated_time_slot.py
 #: applications/admin/filters/application.py
@@ -146,6 +158,22 @@ msgstr "Allokoitu lopetusaika"
 #: reservation_units/models/reservation_unit_pricing.py
 msgid "Status"
 msgstr "Status"
+
+#: applications/admin/forms/application.py
+#, python-format
+msgid ""
+"%(draft)s: Application started but not ready. <br>%(received)s: Application "
+"sent by user. <br>%(in_allocation)s: Application's sections are being "
+"allocated. <br>%(handled)s: Application's sections have all been allocated. "
+"<br>%(results_sent)s: Application's results have been sent to user. "
+"<br>%(expired)s: Application not completed before application round ended. "
+"<br>%(cancelled)s: Application cancelled by user. <br>"
+msgstr ""
+"%(draft)s: Hakemus aloitettu. <br>%(received)s: Hakemus lähetetty. "
+"%(in_allocation)s: Hakemus siirtynyt käsittelyyn. <br>%(handled)s: Hakemus "
+"käsitelty. <br>%(results_sent)s: Käsittelyn tuloksesta ilmoitettu hakijalle. "
+"<br>%(expired)s: Hakemusta ei lähetetty ennen hakuajan loppumista. "
+"<br>%(cancelled)s: Hakemus peruttu hakijan toimesta. "
 
 #: applications/admin/forms/application.py
 msgid "Applicant type"
@@ -238,6 +266,37 @@ msgid "Date when the application was cancelled."
 msgstr "Päivämäärä, jolloin hakemus peruttiin."
 
 #: applications/admin/forms/application_round.py
+#, python-format
+msgid ""
+"%(upcoming)s: Applications cannot yet be made in the round. <br>%(open)s: "
+"Applications can be made in the round. <br>%(in_allocation)s: Applications "
+"in the round are being allocated. <br>%(handled)s: All application have been "
+"allocated. <br>%(results_sent)s: All application results have been sent to "
+"users. <br>"
+msgstr ""
+"%(upcoming)s: Hakemuksia ei voi vielä tehdä. <br>%(open)s: Hakemuksia voi "
+"tehdä. <br>%(in_allocation)s: Hakemuksiin jaetaan vuoroja. <br>%(handled)s: "
+"Kierros on käsitelty. <br>%(results_sent)s: Tulokset on lähetetty "
+"hakijoille. <br>"
+
+#: applications/admin/forms/application_round.py
+msgid "Reservation units"
+msgstr "Varausyksiköt"
+
+#: applications/admin/forms/application_round.py
+msgid "Reservation units that can be applied for in this application round."
+msgstr "Varausyksiköt, joihin kausivarauskierroksella voi hakea"
+
+#: applications/admin/forms/application_round.py
+#: reservation_units/models/reservation_unit.py
+msgid "Purposes"
+msgstr "Käyttötarkoitukset"
+
+#: applications/admin/forms/application_round.py
+msgid "Purposes that are allowed in this application period."
+msgstr "Kausivarauskierroksella mahdolliset käyttötarkoitukset."
+
+#: applications/admin/forms/application_round.py
 #: applications/admin/forms/application_section.py
 #: applications/admin/forms/city.py applications/admin/forms/organization.py
 #: reservation_units/models/equipment.py reservation_units/models/keyword.py
@@ -251,12 +310,20 @@ msgid "Name"
 msgstr "Nimi"
 
 #: applications/admin/forms/application_round.py
-msgid "Target group"
-msgstr "Kohderyhmä"
+msgid "Name (Finnish)"
+msgstr "Nimi (suomeksi)"
 
 #: applications/admin/forms/application_round.py
-msgid "Reservation units"
-msgstr "Varausyksiköt"
+msgid "Name (English)"
+msgstr "Nimi (englanniksi)"
+
+#: applications/admin/forms/application_round.py
+msgid "Name (Swedish)"
+msgstr "Nimi (ruotsiksi)"
+
+#: applications/admin/forms/application_round.py
+msgid "Target group"
+msgstr "Kohderyhmä"
 
 #: applications/admin/forms/application_round.py
 msgid "Application period begin date and time"
@@ -286,11 +353,6 @@ msgstr "Julkisen näkyvyyden loppumispäivä ja -aika"
 msgid "Handled date"
 msgstr "Käsittelypäivä"
 
-#: applications/admin/forms/application_round.py
-#: reservation_units/models/reservation_unit.py
-msgid "Purposes"
-msgstr "Käyttötarkoitukset"
-
 #: applications/admin/forms/application_round.py permissions/models.py
 msgid "Service sector"
 msgstr "Palvelualue"
@@ -300,16 +362,36 @@ msgid "Application criteria"
 msgstr "Hakukriteerit"
 
 #: applications/admin/forms/application_round.py
+msgid "Application criteria (Finnish)"
+msgstr "Hakukriteerit (suomeksi)"
+
+#: applications/admin/forms/application_round.py
+msgid "Application criteria (English)"
+msgstr "Hakukriteerit (englanniksi)"
+
+#: applications/admin/forms/application_round.py
+msgid "Application criteria (Swedish)"
+msgstr "Hakukriteerit (ruotsiksi)"
+
+#: applications/admin/forms/application_round.py
 msgid "Name that describes the application round."
 msgstr "Kausivarauskierrosta kuvaava nimi"
 
 #: applications/admin/forms/application_round.py
-msgid "Target group of the application round."
-msgstr "Kausivarauskierroksen kohderyhmä"
+msgid "Name that describes the application round in Finnish."
+msgstr "Kausivarauskierrosta kuvaava nimi suomeksi"
 
 #: applications/admin/forms/application_round.py
-msgid "Reservation units that can be applied for in this application round."
-msgstr "Varausyksiköt, joihin kausivarauskierroksella voi hakea"
+msgid "Name that describes the application round in English."
+msgstr "Kausivarauskierrosta kuvaava nimi englanniksi"
+
+#: applications/admin/forms/application_round.py
+msgid "Name that describes the application round in Swedish."
+msgstr "Kausivarauskierrosta kuvaava nimi ruotsiksi"
+
+#: applications/admin/forms/application_round.py
+msgid "Target group of the application round."
+msgstr "Kausivarauskierroksen kohderyhmä"
 
 #: applications/admin/forms/application_round.py
 msgid "Start date and time of the period when application can be sent."
@@ -349,10 +431,6 @@ msgstr ""
 "Päivämäärä, jolloin kausivarauskierroksen hakemukset lähetettiin hakijoille."
 
 #: applications/admin/forms/application_round.py
-msgid "Purposes that are allowed in this application period."
-msgstr "Kausivarauskierroksella mahdolliset käyttötarkoitukset."
-
-#: applications/admin/forms/application_round.py
 msgid "Service sector for the application round."
 msgstr "Kausivarauskierroksen palvelualue."
 
@@ -360,9 +438,40 @@ msgstr "Kausivarauskierroksen palvelualue."
 msgid "Application criteria for the application round."
 msgstr "Kausivarauskierroksen hakukriteerit."
 
+#: applications/admin/forms/application_round.py
+msgid "Application criteria for the application round in Finnish."
+msgstr "Kausivarauskierroksen hakukriteerit suomeksi."
+
+#: applications/admin/forms/application_round.py
+msgid "Application criteria for the application round in English."
+msgstr "Kausivarauskierroksen hakukriteerit englanniksi."
+
+#: applications/admin/forms/application_round.py
+msgid "Application criteria for the application round in Swedish."
+msgstr "Kausivarauskierroksen hakukriteerit ruotsiksi."
+
 #: applications/admin/forms/application_section.py
 msgid "Application this section is in."
 msgstr "Hakemus jolle tämä osa kuuluu."
+
+#: applications/admin/forms/application_section.py
+#, python-format
+msgid ""
+"%(unallocated)s: Section has been created, but application round is still "
+"open. <br>%(in_allocation)s: Application round has closed, but the section "
+"is not fully allocated. <br>%(handled)s: Application round is no longer in "
+"allocation, section's applied reservations <br>per week has been fulfilled, "
+"or all reservation unit options rejected or locked. <br>%(failed)s: At least "
+"one reservation was not possible for some allocation. <br>%(reserved)s: All "
+"allocations have successful reservations. <br>"
+msgstr ""
+"%(unallocated)s: Hakemuksen osa luotu, mutta kausivarauskierroksen hakuaika "
+"on vielä auki. <br>%(in_allocation)s: Hakuaika on sulkeutunut, mutta osaa ei "
+"ole vielä kokonaan käsitelty. <br>%(handled)s: Kausivarauskierros on "
+"käsitelty, tai osan toistokerrat on täytetty, tai kaikki varausyksikkö-"
+"vaihtoehdot on hylätty tai lukittu. <br>%(failed)s: Ainakin yhtä varausta ei "
+"ollut mahdollista luoda jollekin vuorolle. <br>%(reserved)s: Kaikki "
+"varaukset jaetuille vuoroille on luotu. <br>"
 
 #: applications/admin/forms/application_section.py
 #: reservations/models/reservation.py
@@ -672,7 +781,7 @@ msgid "Open"
 msgstr "Auki"
 
 #: applications/choices.py
-msgid "In allocation"
+msgid "In Allocation"
 msgstr "Allokoinnissa"
 
 #: applications/choices.py
@@ -680,7 +789,7 @@ msgid "Handled"
 msgstr "Allokoitu"
 
 #: applications/choices.py
-msgid "Results sent"
+msgid "Results Sent"
 msgstr "Tulokset lähetetty"
 
 #: applications/choices.py common/choices/banner_notification.py
@@ -694,7 +803,7 @@ msgstr "Vastaanotettu"
 
 #: applications/choices.py merchants/models.py
 msgid "Expired"
-msgstr "Vanhentunut"
+msgstr "Rauennut"
 
 #: applications/choices.py merchants/models.py reservations/choices.py
 msgid "Cancelled"
@@ -702,11 +811,7 @@ msgstr "Peruttu"
 
 #: applications/choices.py
 msgid "Unallocated"
-msgstr "Ei allokoidut"
-
-#: applications/choices.py
-msgid "In Allocation"
-msgstr "Allokoinnissa"
+msgstr "Allokoimaton"
 
 #: applications/choices.py
 msgid "Reserved"
