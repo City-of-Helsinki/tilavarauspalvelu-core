@@ -25,26 +25,28 @@ class ApplicationSectionAdminForm(forms.ModelForm):
         required=False,
         disabled=True,
         label=_("Status"),
-        help_text=(
-            f"{ApplicationSectionStatusChoice.UNALLOCATED.value}: "
-            f"Section has been created, but application round is still open. "
-            f"{ApplicationSectionStatusChoice.IN_ALLOCATION.value}: "
-            f"Application round has closed, but the section is not fully allocated. "
-            f"{ApplicationSectionStatusChoice.HANDLED.value}: "
-            f"Application round is no longer in allocation, section's applied reservations"
-            f"per week have been fulfilled, or all reservation unit options rejected or locked. "
-            f"{ApplicationSectionStatusChoice.FAILED.value}: "
-            f"At least one reservation was not possible for some allocation. "
-            f"{ApplicationSectionStatusChoice.RESERVED.value}: "
-            f"All allocations have successful reservations. "
-        ),
+        help_text=_(
+            "%(unallocated)s: Section has been created, but application round is still open. <br>"
+            "%(in_allocation)s: Application round has closed, but the section is not fully allocated. <br>"
+            "%(handled)s: Application round is no longer in allocation, section's applied reservations <br>"
+            "per week has been fulfilled, or all reservation unit options rejected or locked. <br>"
+            "%(failed)s: At least one reservation was not possible for some allocation. <br>"
+            "%(reserved)s: All allocations have successful reservations. <br>"
+        )
+        % {
+            "unallocated": ApplicationSectionStatusChoice.UNALLOCATED.label,
+            "in_allocation": ApplicationSectionStatusChoice.IN_ALLOCATION.label,
+            "handled": ApplicationSectionStatusChoice.HANDLED.label,
+            "failed": ApplicationSectionStatusChoice.FAILED.label,
+            "reserved": ApplicationSectionStatusChoice.RESERVED.label,
+        },
     )
 
     def __init__(self, *args, **kwargs):
         instance: ApplicationSection | None = kwargs.get("instance", None)
         if instance:
             kwargs.setdefault("initial", {})
-            kwargs["initial"]["status"] = instance.status
+            kwargs["initial"]["status"] = ApplicationSectionStatusChoice(instance.status).label
         super().__init__(*args, **kwargs)
 
     class Meta:

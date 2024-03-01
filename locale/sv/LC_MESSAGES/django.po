@@ -37,12 +37,18 @@ msgstr ""
 msgid "Allocated Time Slot"
 msgstr "Jaettu vuoro"
 
-#: applications/admin/allocated_time_slot.py
+#: applications/admin/allocated_time_slot.py applications/admin/application.py
 #: applications/admin/forms/application_section.py
 #: applications/models/application.py
 #, fuzzy
 #| msgid "Application section"
 msgid "Application"
+msgstr "Hakemuksen osa"
+
+#: applications/admin/application.py
+#, fuzzy
+#| msgid "Application section"
+msgid "Reset application allocations"
 msgstr "Hakemuksen osa"
 
 #: applications/admin/application.py applications/admin/application_round.py
@@ -60,6 +66,18 @@ msgstr ""
 #, fuzzy
 #| msgid "Application section"
 msgid "Application Round"
+msgstr "Hakemuksen osa"
+
+#: applications/admin/application_round.py
+#, fuzzy
+#| msgid "Application sections"
+msgid "Export application sections in the selected application round to CSV"
+msgstr "Hakemuksen osat"
+
+#: applications/admin/application_round.py
+#, fuzzy
+#| msgid "Application section"
+msgid "Reset application round allocations"
 msgstr "Hakemuksen osa"
 
 #: applications/admin/filters/allocated_time_slot.py
@@ -166,6 +184,17 @@ msgid "Status"
 msgstr ""
 
 #: applications/admin/forms/application.py
+#, python-format
+msgid ""
+"%(draft)s: Application started but not ready. <br>%(received)s: Application "
+"sent by user. <br>%(in_allocation)s: Application's sections are being "
+"allocated. <br>%(handled)s: Application's sections have all been allocated. "
+"<br>%(results_sent)s: Application's results have been sent to user. "
+"<br>%(expired)s: Application not completed before application round ended. "
+"<br>%(cancelled)s: Application cancelled by user. <br>"
+msgstr ""
+
+#: applications/admin/forms/application.py
 #, fuzzy
 #| msgid "Application section"
 msgid "Applicant type"
@@ -260,6 +289,35 @@ msgid "Date when the application was cancelled."
 msgstr ""
 
 #: applications/admin/forms/application_round.py
+#, python-format
+msgid ""
+"%(upcoming)s: Applications cannot yet be made in the round. <br>%(open)s: "
+"Applications can be made in the round. <br>%(in_allocation)s: Applications "
+"in the round are being allocated. <br>%(handled)s: All application have been "
+"allocated. <br>%(results_sent)s: All application results have been sent to "
+"users. <br>"
+msgstr ""
+
+#: applications/admin/forms/application_round.py
+#, fuzzy
+#| msgid "Reservation Unit Options"
+msgid "Reservation units"
+msgstr "Varausyksikkö-vaihtoehdot"
+
+#: applications/admin/forms/application_round.py
+msgid "Reservation units that can be applied for in this application round."
+msgstr ""
+
+#: applications/admin/forms/application_round.py
+#: reservation_units/models/reservation_unit.py
+msgid "Purposes"
+msgstr ""
+
+#: applications/admin/forms/application_round.py
+msgid "Purposes that are allowed in this application period."
+msgstr ""
+
+#: applications/admin/forms/application_round.py
 #: applications/admin/forms/application_section.py
 #: applications/admin/forms/city.py applications/admin/forms/organization.py
 #: reservation_units/models/equipment.py reservation_units/models/keyword.py
@@ -273,14 +331,20 @@ msgid "Name"
 msgstr ""
 
 #: applications/admin/forms/application_round.py
-msgid "Target group"
+msgid "Name (Finnish)"
 msgstr ""
 
 #: applications/admin/forms/application_round.py
-#, fuzzy
-#| msgid "Reservation Unit Options"
-msgid "Reservation units"
-msgstr "Varausyksikkö-vaihtoehdot"
+msgid "Name (English)"
+msgstr ""
+
+#: applications/admin/forms/application_round.py
+msgid "Name (Swedish)"
+msgstr ""
+
+#: applications/admin/forms/application_round.py
+msgid "Target group"
+msgstr ""
 
 #: applications/admin/forms/application_round.py
 msgid "Application period begin date and time"
@@ -314,11 +378,6 @@ msgstr ""
 msgid "Handled date"
 msgstr ""
 
-#: applications/admin/forms/application_round.py
-#: reservation_units/models/reservation_unit.py
-msgid "Purposes"
-msgstr ""
-
 #: applications/admin/forms/application_round.py permissions/models.py
 msgid "Service sector"
 msgstr ""
@@ -330,15 +389,41 @@ msgid "Application criteria"
 msgstr "Hakemuksen osa"
 
 #: applications/admin/forms/application_round.py
+#, fuzzy
+#| msgid "Application section"
+msgid "Application criteria (Finnish)"
+msgstr "Hakemuksen osa"
+
+#: applications/admin/forms/application_round.py
+#, fuzzy
+#| msgid "Application section"
+msgid "Application criteria (English)"
+msgstr "Hakemuksen osa"
+
+#: applications/admin/forms/application_round.py
+#, fuzzy
+#| msgid "Application section"
+msgid "Application criteria (Swedish)"
+msgstr "Hakemuksen osa"
+
+#: applications/admin/forms/application_round.py
 msgid "Name that describes the application round."
 msgstr ""
 
 #: applications/admin/forms/application_round.py
-msgid "Target group of the application round."
+msgid "Name that describes the application round in Finnish."
 msgstr ""
 
 #: applications/admin/forms/application_round.py
-msgid "Reservation units that can be applied for in this application round."
+msgid "Name that describes the application round in English."
+msgstr ""
+
+#: applications/admin/forms/application_round.py
+msgid "Name that describes the application round in Swedish."
+msgstr ""
+
+#: applications/admin/forms/application_round.py
+msgid "Target group of the application round."
 msgstr ""
 
 #: applications/admin/forms/application_round.py
@@ -374,10 +459,6 @@ msgid "When the application round applications were sent to applicants."
 msgstr ""
 
 #: applications/admin/forms/application_round.py
-msgid "Purposes that are allowed in this application period."
-msgstr ""
-
-#: applications/admin/forms/application_round.py
 msgid "Service sector for the application round."
 msgstr ""
 
@@ -385,11 +466,37 @@ msgstr ""
 msgid "Application criteria for the application round."
 msgstr ""
 
+#: applications/admin/forms/application_round.py
+#, fuzzy
+#| msgid "Application sections"
+msgid "Application criteria for the application round in Finnish."
+msgstr "Hakemuksen osat"
+
+#: applications/admin/forms/application_round.py
+msgid "Application criteria for the application round in English."
+msgstr ""
+
+#: applications/admin/forms/application_round.py
+msgid "Application criteria for the application round in Swedish."
+msgstr ""
+
 #: applications/admin/forms/application_section.py
 #, fuzzy
 #| msgid "Application sections"
 msgid "Application this section is in."
 msgstr "Hakemuksen osat"
+
+#: applications/admin/forms/application_section.py
+#, python-format
+msgid ""
+"%(unallocated)s: Section has been created, but application round is still "
+"open. <br>%(in_allocation)s: Application round has closed, but the section "
+"is not fully allocated. <br>%(handled)s: Application round is no longer in "
+"allocation, section's applied reservations <br>per week has been fulfilled, "
+"or all reservation unit options rejected or locked. <br>%(failed)s: At least "
+"one reservation was not possible for some allocation. <br>%(reserved)s: All "
+"allocations have successful reservations. <br>"
+msgstr ""
 
 #: applications/admin/forms/application_section.py
 #: reservations/models/reservation.py
@@ -709,7 +816,7 @@ msgid "Open"
 msgstr ""
 
 #: applications/choices.py
-msgid "In allocation"
+msgid "In Allocation"
 msgstr ""
 
 #: applications/choices.py
@@ -717,7 +824,7 @@ msgid "Handled"
 msgstr ""
 
 #: applications/choices.py
-msgid "Results sent"
+msgid "Results Sent"
 msgstr ""
 
 #: applications/choices.py common/choices/banner_notification.py
@@ -739,10 +846,6 @@ msgstr ""
 
 #: applications/choices.py
 msgid "Unallocated"
-msgstr ""
-
-#: applications/choices.py
-msgid "In Allocation"
 msgstr ""
 
 #: applications/choices.py

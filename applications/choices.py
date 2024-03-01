@@ -55,13 +55,13 @@ class ApplicationRoundStatusChoice(models.TextChoices):
     OPEN = "OPEN", _("Open")
     """Applications can be made in the round"""
 
-    IN_ALLOCATION = "IN_ALLOCATION", _("In allocation")
+    IN_ALLOCATION = "IN_ALLOCATION", _("In Allocation")
     """Applications in the round are being allocated"""
 
     HANDLED = "HANDLED", _("Handled")
     """All application have been allocated"""
 
-    RESULTS_SENT = "SENT", _("Results sent")
+    RESULTS_SENT = "SENT", _("Results Sent")
     """All application results have been sent to users"""
 
     @DynamicClassAttribute
@@ -98,13 +98,13 @@ class ApplicationStatusChoice(models.TextChoices):
     RECEIVED = "RECEIVED", _("Received")
     """Application sent by user"""
 
-    IN_ALLOCATION = "IN_ALLOCATION", _("In allocation")
+    IN_ALLOCATION = "IN_ALLOCATION", _("In Allocation")
     """Application's events are being allocated"""
 
     HANDLED = "HANDLED", _("Handled")
     """Application's events have all been allocated"""
 
-    RESULTS_SENT = "RESULT_SENT", _("Results sent")
+    RESULTS_SENT = "RESULT_SENT", _("Results Sent")
     """Application's results have been sent to user"""
 
     EXPIRED = "EXPIRED", _("Expired")

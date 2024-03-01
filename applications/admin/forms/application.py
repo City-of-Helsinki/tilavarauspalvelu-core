@@ -17,29 +17,31 @@ class ApplicationAdminForm(forms.ModelForm):
         required=False,
         disabled=True,
         label=_("Status"),
-        help_text=(
-            f"{ApplicationStatusChoice.DRAFT.value}: "
-            f"Application started but not ready. "
-            f"{ApplicationStatusChoice.RECEIVED.value}: "
-            f"Application sent by user. "
-            f"{ApplicationStatusChoice.IN_ALLOCATION.value}: "
-            f"Application's sections are being allocated. "
-            f"{ApplicationStatusChoice.HANDLED.value}: "
-            f"Application's sections have all been allocated. "
-            f"{ApplicationStatusChoice.RESULTS_SENT.value}: "
-            f"Application's results have been sent to user. "
-            f"{ApplicationStatusChoice.EXPIRED.value}: "
-            f"Application not completed before application round ended. "
-            f"{ApplicationStatusChoice.CANCELLED.value}: "
-            f"Application cancelled by user. "
-        ),
+        help_text=_(
+            "%(draft)s: Application started but not ready. <br>"
+            "%(received)s: Application sent by user. <br>"
+            "%(in_allocation)s: Application's sections are being allocated. <br>"
+            "%(handled)s: Application's sections have all been allocated. <br>"
+            "%(results_sent)s: Application's results have been sent to user. <br>"
+            "%(expired)s: Application not completed before application round ended. <br>"
+            "%(cancelled)s: Application cancelled by user. <br>"
+        )
+        % {
+            "draft": ApplicationStatusChoice.DRAFT.label,
+            "received": ApplicationStatusChoice.RECEIVED.label,
+            "in_allocation": ApplicationStatusChoice.IN_ALLOCATION.label,
+            "handled": ApplicationStatusChoice.HANDLED.label,
+            "results_sent": ApplicationStatusChoice.RESULTS_SENT.label,
+            "expired": ApplicationStatusChoice.EXPIRED.label,
+            "cancelled": ApplicationStatusChoice.CANCELLED.label,
+        },
     )
 
     def __init__(self, *args, **kwargs):
         instance: Application | None = kwargs.get("instance", None)
         if instance is not None:
             kwargs.setdefault("initial", {})
-            kwargs["initial"]["status"] = instance.status
+            kwargs["initial"]["status"] = ApplicationStatusChoice(instance.status).label
         super().__init__(*args, **kwargs)
 
     class Meta:

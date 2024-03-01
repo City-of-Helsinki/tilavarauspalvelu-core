@@ -9,12 +9,12 @@ from lookup_property import lookup_property
 from applications.choices import ApplicationRoundStatusChoice, TargetGroupChoice
 from applications.querysets.application_round import ApplicationRoundQuerySet
 from common.connectors import ApplicationRoundActionsConnector
+from common.date_utils import local_datetime
 
 __all__ = [
     "ApplicationRound",
 ]
 
-from common.date_utils import local_datetime
 
 logger = logging.getLogger(__name__)
 
