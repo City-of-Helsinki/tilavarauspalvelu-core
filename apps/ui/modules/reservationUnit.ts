@@ -4,9 +4,9 @@ import {
   getReservationVolume,
 } from "common";
 import { flatten, trim, uniq } from "lodash";
-import { addDays, format, isAfter, isBefore, isSameDay, set } from "date-fns";
+import { format, isAfter, isBefore, isSameDay, set } from "date-fns";
 import { i18n } from "next-i18next";
-import { toApiDate, toUIDate } from "common/src/common/util";
+import { toUIDate } from "common/src/common/util";
 import {
   type RoundPeriod,
   getDayIntervals,
@@ -299,73 +299,6 @@ export const getReservationUnitPrice = (
   return pricing
     ? getPrice({ pricing, minutes, trailingZeros, asInt })
     : undefined;
-};
-
-// Create multiple mock opening times for reservation unit
-// if pk is even, return one 4 year span (tests the case of 24 / 7 open)
-// if pk is odd, return 100 days from 12:00 to 20:00
-// assuming that the backend will add TZ info to the dates
-// NOTE this is not a good solution but Hauki doesn't work locally so have to leave it
-// proper solution would be to mock it on the backend or a mock service so this code is never in production
-export const createMockOpeningTimes = (pk: number) => {
-  // Two short intervals per day
-  if (pk % 7 === 0) {
-    return Array.from(Array(100))
-      .map((_, index) => {
-        const start = toApiDate(addDays(new Date(), index));
-        return [
-          {
-            startDatetime: `${start}T09:00:00+02:00`,
-            endDatetime: `${start}T11:00:00+02:00`,
-          },
-          {
-            startDatetime: `${start}T12:00:00+02:00`,
-            endDatetime: `${start}T20:00:00+02:00`,
-          },
-        ];
-      })
-      .flat();
-  }
-  // A weird case where the end time < start time (different days)
-  if (pk % 5 === 0) {
-    const start = toApiDate(addDays(new Date(), -4));
-    const end = toApiDate(addDays(new Date(), 4));
-    return [
-      {
-        startDatetime: `${start}T23:00:00+02:00`,
-        endDatetime: `${end}T01:00:00+02:00`,
-      },
-    ];
-  }
-
-  // all day x 100 days (technical limitation for the 23:59)
-  if (pk % 3 === 0) {
-    return Array.from(Array(100)).map((_, index) => {
-      const start = toApiDate(addDays(new Date(), index));
-      return {
-        startDatetime: `${start}T00:00:00+02:00`,
-        endDatetime: `${start}T23:59:00+02:00`,
-      };
-    });
-  }
-
-  // 24 / 7 for 4 years, single interval
-  if (pk % 2 === 0) {
-    return [
-      {
-        startDatetime: "2023-01-01T04:00:00+02:00",
-        endDatetime: "2027-12-31T20:00:00+02:00",
-      },
-    ];
-  }
-  // reasonable default case for 100 days
-  return Array.from(Array(100)).map((_, index) => {
-    const start = toApiDate(addDays(new Date(), index));
-    return {
-      startDatetime: `${start}T12:00:00+02:00`,
-      endDatetime: `${start}T20:00:00+02:00`,
-    };
-  });
 };
 
 export const isReservationUnitPaidInFuture = (

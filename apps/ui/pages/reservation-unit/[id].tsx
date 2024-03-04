@@ -82,7 +82,6 @@ import {
   LIST_RESERVATIONS,
 } from "@/modules/queries/reservation";
 import {
-  createMockOpeningTimes,
   getFuturePricing,
   getPrice,
   isReservationUnitPaidInFuture,
@@ -255,21 +254,17 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       };
     }
 
-    const allowReservationsWithoutOpeningHours =
-      reservationUnitData?.reservationUnitByPk
-        ?.allowReservationsWithoutOpeningHours;
-
     const timespans = filterNonNullable(
       additionalData.reservationUnitByPk?.reservableTimeSpans
     );
-    const reservableTimeSpans = !allowReservationsWithoutOpeningHours
-      ? [
-          ...timespans,
-          ...(reservationUnitData.reservationUnitByPk?.reservableTimeSpans ??
-            []),
-        ]
-      : createMockOpeningTimes(id);
+    const moreTimespans = filterNonNullable(
+      reservationUnitData.reservationUnitByPk?.reservableTimeSpans
+    );
+    const reservableTimeSpans = [...timespans, ...moreTimespans];
 
+    const reservations = filterNonNullable(
+      additionalData?.reservationUnitByPk?.reservations
+    );
     return {
       props: {
         key: `${id}-${locale}`,
@@ -278,10 +273,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
         reservationUnit: {
           ...reservationUnitData?.reservationUnitByPk,
           reservableTimeSpans,
-          reservations:
-            additionalData?.reservationUnitByPk?.reservations?.filter(
-              (n) => n
-            ) || [],
+          reservations,
         },
         relatedReservationUnits,
         activeApplicationRounds,

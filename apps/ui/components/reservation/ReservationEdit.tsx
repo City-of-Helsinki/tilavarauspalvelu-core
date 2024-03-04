@@ -45,7 +45,6 @@ import {
   OPENING_HOURS,
   RESERVATION_UNIT,
 } from "@/modules/queries/reservationUnit";
-import { createMockOpeningTimes } from "@/modules/reservationUnit";
 import EditStep0 from "./EditStep0";
 import EditStep1 from "./EditStep1";
 import { reservationsPrefix } from "@/modules/const";
@@ -241,21 +240,13 @@ const ReservationEdit = ({ id, apiBaseUrl }: Props): JSX.Element => {
       return;
     }
 
-    const { allowReservationsWithoutOpeningHours } =
-      reservationUnitData?.reservationUnitByPk ?? {};
-
     const timespans = filterNonNullable(
       reservationUnitData?.reservationUnitByPk?.reservableTimeSpans
     );
     const moreTimespans = filterNonNullable(
       additionalData?.reservationUnitByPk?.reservableTimeSpans
     ).filter((n) => n?.startDatetime != null && n?.endDatetime != null);
-    const reservableTimeSpans = [
-      ...timespans,
-      ...(allowReservationsWithoutOpeningHours
-        ? createMockOpeningTimes(id)
-        : moreTimespans),
-    ];
+    const reservableTimeSpans = [...timespans, ...moreTimespans];
     setReservationUnit({
       ...reservationUnitData?.reservationUnitByPk,
       reservableTimeSpans,
