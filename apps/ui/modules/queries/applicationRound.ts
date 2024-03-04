@@ -37,6 +37,9 @@ export const APPLICATION_ROUNDS_PERIODS = gql`
           reservationPeriodEnd
           applicationPeriodBegin
           status
+          reservationUnits {
+            pk
+          }
         }
       }
     }
