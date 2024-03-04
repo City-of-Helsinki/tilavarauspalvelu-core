@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+import { IMAGE_FRAGMENT } from "./fragments";
 
 export const APPLICANT_NAME_FRAGMENT = gql`
   fragment ApplicationNameFragment on ApplicationNode {
@@ -120,6 +121,7 @@ const APPLICATION_SECTION_UI_FRAGMENT = gql`
 // other uncommon fields ?
 export const APPLICATION_FRAGMENT = gql`
   ${APPLICATION_SECTION_UI_FRAGMENT}
+  ${IMAGE_FRAGMENT}
   fragment ApplicationCommon on ApplicationNode {
     pk
     status
@@ -147,8 +149,7 @@ export const APPLICATION_FRAGMENT = gql`
         minPersons
         maxPersons
         images {
-          imageType
-          mediumUrl
+          ...ImageFragment
         }
         unit {
           pk

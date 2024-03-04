@@ -106,14 +106,14 @@ const Button = styled(MediumButton)`
   }
 `;
 
-const ApplicationEventInner = ({
+function ApplicationEventInner({
   index,
   applicationRound,
   optionTypes,
   del,
 }: Omit<Props, "onToggleAccordion" | "onDeleteEvent"> & {
   del: () => void;
-}): JSX.Element => {
+}): JSX.Element {
   const { t, i18n } = useTranslation();
   const form = useFormContext<ApplicationFormValues>();
   const {
@@ -443,9 +443,9 @@ const ApplicationEventInner = ({
       </ActionContainer>
     </>
   );
-};
+}
 
-const ApplicationEvent = (props: Props): JSX.Element => {
+export function ApplicationEvent(props: Props): JSX.Element {
   const { index, isVisible, onDeleteEvent, onToggleAccordion } = props;
 
   const { t } = useTranslation();
@@ -480,6 +480,4 @@ const ApplicationEvent = (props: Props): JSX.Element => {
       </Accordion>
     </Wrapper>
   );
-};
-
-export { ApplicationEvent };
+}

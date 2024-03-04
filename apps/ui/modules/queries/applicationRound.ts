@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+import { IMAGE_FRAGMENT } from "common/src/queries/fragments";
 
 export const APPLICATION_ROUND_FRAGMENT = gql`
   fragment ApplicationRoundFields on ApplicationRoundNode {
@@ -63,6 +64,7 @@ export const APPLICATION_ROUNDS = gql`
 /* FIXME images breaks backend query optimization (overriden locally) */
 export const APPLICATION_ROUND_BY_ID = gql`
   ${APPLICATION_ROUND_FRAGMENT}
+  ${IMAGE_FRAGMENT}
   query ApplicationRound($id: ID!) {
     applicationRound(id: $id) {
       ...ApplicationRoundFields
@@ -72,10 +74,7 @@ export const APPLICATION_ROUND_BY_ID = gql`
         nameEn
         nameSv
         images {
-          imageType
-          smallUrl
-          mediumUrl
-          imageUrl
+          ...ImageFragment
         }
         unit {
           pk

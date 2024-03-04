@@ -1,6 +1,8 @@
 import { gql } from "@apollo/client";
+import { IMAGE_FRAGMENT } from "common/src/queries/fragments";
 
 export const RESERVATION_UNIT = gql`
+  ${IMAGE_FRAGMENT}
   query ReservationUnit($pk: Int!) {
     reservationUnitByPk(pk: $pk) {
       id
@@ -12,11 +14,7 @@ export const RESERVATION_UNIT = gql`
       isDraft
       isDraft
       images {
-        imageUrl
-        largeUrl
-        mediumUrl
-        smallUrl
-        imageType
+        ...ImageFragment
       }
       applicationRoundTimeSlots {
         closed
@@ -148,6 +146,7 @@ export const RESERVATION_UNIT = gql`
 `;
 
 export const RESERVATION_UNITS = gql`
+  ${IMAGE_FRAGMENT}
   query SearchReservationUnits(
     $textSearch: String
     $pk: [Int]
@@ -229,10 +228,7 @@ export const RESERVATION_UNITS = gql`
           }
           maxPersons
           images {
-            imageType
-            smallUrl
-            mediumUrl
-            imageUrl
+            ...ImageFragment
           }
           pricings {
             begins
@@ -257,6 +253,7 @@ export const RESERVATION_UNITS = gql`
 `;
 
 export const RELATED_RESERVATION_UNITS = gql`
+  ${IMAGE_FRAGMENT}
   query RelatedReservationUnits(
     $unit: [Int]!
     $isDraft: Boolean
@@ -271,9 +268,7 @@ export const RELATED_RESERVATION_UNITS = gql`
           nameEn
           nameSv
           images {
-            mediumUrl
-            smallUrl
-            imageType
+            ...ImageFragment
           }
           unit {
             pk

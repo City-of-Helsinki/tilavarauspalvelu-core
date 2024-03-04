@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+import { IMAGE_FRAGMENT } from "common/src/queries/fragments";
 import { Type } from "common/types/gql-types";
 
 export const CREATE_RESERVATION = gql`
@@ -113,6 +114,7 @@ export const CONFIRM_RESERVATION = gql`
 // even though the ReservationsReservationTypeChoices says they are uppercase
 // NOTE bang user ID so this doesn't get abused (don't use it without a user)
 export const LIST_RESERVATIONS = gql`
+  ${IMAGE_FRAGMENT}
   query listReservations(
     $before: String
     $after: String
@@ -172,9 +174,7 @@ export const LIST_RESERVATIONS = gql`
               needsHandling
             }
             images {
-              imageType
-              imageUrl
-              mediumUrl
+              ...ImageFragment
             }
             pricings {
               begins
@@ -195,6 +195,7 @@ export const LIST_RESERVATIONS = gql`
 `;
 
 export const GET_RESERVATION = gql`
+  ${IMAGE_FRAGMENT}
   query reservationByPk($pk: Int!) {
     reservationByPk(pk: $pk) {
       pk
@@ -293,11 +294,7 @@ export const GET_RESERVATION = gql`
           requiredFields
         }
         images {
-          imageUrl
-          largeUrl
-          mediumUrl
-          smallUrl
-          imageType
+          ...ImageFragment
         }
         pricings {
           begins

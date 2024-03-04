@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+import { IMAGE_FRAGMENT } from "common/src/queries/fragments";
 
 export const SPACES_QUERY = gql`
   query getSpaces {
@@ -33,7 +34,6 @@ export const RESOURCES_QUERY = gql`
           pk
           nameFi
           locationType
-
           space {
             unit {
               nameFi
@@ -61,7 +61,6 @@ export const RESERVATION_UNITS_QUERY = gql`
             pk
             nameFi
           }
-
           reservationUnitType {
             nameFi
           }
@@ -82,6 +81,7 @@ export const DELETE_SPACE = gql`
 `;
 
 export const UNIT_QUERY = gql`
+  ${IMAGE_FRAGMENT}
   query unit($pk: Int) {
     unitByPk(pk: $pk) {
       pk
@@ -104,8 +104,7 @@ export const UNIT_QUERY = gql`
           nameFi
         }
         images {
-          imageType
-          mediumUrl
+          ...ImageFragment
         }
       }
       spaces {

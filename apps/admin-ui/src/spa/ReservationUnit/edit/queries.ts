@@ -1,6 +1,8 @@
 import { gql } from "@apollo/client";
+import { IMAGE_FRAGMENT } from "common/src/queries/fragments";
 
 export const RESERVATIONUNIT_QUERY = gql`
+  ${IMAGE_FRAGMENT}
   query reservationUnit($pk: Int) {
     reservationUnitByPk(pk: $pk) {
       pk
@@ -8,8 +10,7 @@ export const RESERVATIONUNIT_QUERY = gql`
       reservationState
       images {
         pk
-        mediumUrl
-        imageType
+        ...ImageFragment
       }
       haukiUrl {
         url
