@@ -1692,6 +1692,30 @@ msgid "90 minutes"
 msgstr "90 minuuttia"
 
 #: reservation_units/enums.py
+msgid "2 hours"
+msgstr "2 tuntia"
+
+#: reservation_units/enums.py
+msgid "3 hours"
+msgstr "3 tuntia"
+
+#: reservation_units/enums.py
+msgid "4 hours"
+msgstr "4 tuntia"
+
+#: reservation_units/enums.py
+msgid "5 hours"
+msgstr "5 tuntia"
+
+#: reservation_units/enums.py
+msgid "6 hours"
+msgstr "6 tuntia"
+
+#: reservation_units/enums.py
+msgid "7 hours"
+msgstr "7 tuntia"
+
+#: reservation_units/enums.py
 msgid "per 15 minutes"
 msgstr "per 15 minuuttia"
 
