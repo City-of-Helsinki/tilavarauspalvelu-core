@@ -12,11 +12,6 @@ from tests.helpers import parametrize_helper
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
-DATES = (
-    datetime.datetime(2023, 1, 1, 10, 0, 0, tzinfo=DEFAULT_TIMEZONE),
-    datetime.datetime(2023, 1, 2, 12, 0, 0, tzinfo=DEFAULT_TIMEZONE),
-)
-
 
 class TimeSpanElementParams(NamedTuple):
     time_element_changes: dict[str, Any]

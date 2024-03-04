@@ -137,12 +137,16 @@ def find_first_reservable_time_span_for_reservation_unit(
                 continue
 
             # Reservation is inside the Before-buffer, shorten the reservable time span from the start
-            # ┌──────────────────────────┬─────────────────────────────────────┐
-            # │ ----oooooo ->     ----oo │ Reservation starts in Before-buffer │
-            # │ xxxx       -> xxxx       │                                     │
+            # ┌────────────────────────────────────────────────────────────────┐
+            # │ █ = Reservation                                                │
+            # │ ▁ = Reservable Time Span                                       │
+            # │ ▄ = Reservable Time Span Buffer                                │
+            # ├──────────────────────────┬─────────────────────────────────────┤
+            # │ ▄▄▄▄▁▁▁▁▁▁ ->     ▄▄▄▄▁▁ │ Reservation starts in Before-buffer │
+            # │ ████       -> ████       │                                     │
             # ├──────────────────────────┼─────────────────────────────────────┤
-            # │     --oooo ->       --oo │ Reservation ends in Before-buffer   │
-            # │   xxxx     ->   xxxx     │                                     │
+            # │     ▄▄▁▁▁▁ ->       ▄▄▁▁ │ Reservation ends in Before-buffer   │
+            # │   ████     ->   ████     │                                     │
             # └──────────────────────────┴─────────────────────────────────────┘
             elif (
                 reservable_time_span.buffered_start_datetime
@@ -154,11 +158,11 @@ def find_first_reservable_time_span_for_reservation_unit(
 
             # Reservation is inside the After-buffer, shorten the reservable time span from the end
             # ┌──────────────────────────┬─────────────────────────────────────┐
-            # │ oooo----   -> oo----     │ Reservation starts in After-buffer  │
-            # │       xxxx ->       xxxx │                                     │
+            # │ ▁▁▁▁▄▄▄▄   -> ▁▁▄▄▄▄     │ Reservation starts in After-buffer  │
+            # │       ████ ->       ████ │                                     │
             # ├──────────────────────────┼─────────────────────────────────────┤
-            # │ oooooo---- -> oo----     │ Reservation ends in After-buffer    │
-            # │       xxxx ->       xxxx │                                     │
+            # │ ▁▁▁▁▁▁▄▄▄▄ -> ▁▁▄▄▄▄     │ Reservation ends in After-buffer    │
+            # │       ████ ->       ████ │                                     │
             # └──────────────────────────┴─────────────────────────────────────┘
             elif (
                 reservable_time_span.end_datetime
