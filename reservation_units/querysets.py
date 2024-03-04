@@ -31,7 +31,7 @@ type ReservationUnitPK = int
 
 
 class ReservationUnitQuerySet(SearchResultsQuerySet):
-    def scheduled_for_publishing(self):
+    def scheduled_for_publishing(self) -> Self:
         now = local_datetime()
         return self.filter(
             Q(is_archived=False, is_draft=False)
@@ -301,7 +301,7 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
             ),
         )
 
-    def with_affecting_spaces_alias(self):
+    def with_affecting_spaces_alias(self) -> Self:
         return self.alias(
             spaces_affecting_reservations=models.Subquery(
                 queryset=(
@@ -313,7 +313,7 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
             ),
         )
 
-    def with_affecting_resources_alias(self):
+    def with_affecting_resources_alias(self) -> Self:
         return self.alias(
             resources_affecting_reservations=models.Subquery(
                 queryset=Resource.objects.filter(reservation_units__id=models.OuterRef("id")).values("id"),

@@ -292,22 +292,31 @@ class TimeSpanElement:
         For a reservation to be valid, its start time must be at an interval that is valid for the ReservationUnit.
         e.g. When ReservationUnit.reservation_start_interval is 30 minutes,
         a reservation must start at 00:00, 00:30, 01:00, 01:30 from the start of the time span.
+
+        FIXME: This function only works when the interval is <= 60 minutes.
+         When the interval is > 60 minutes, the function MAY not always work as intended.
         """
-        # If a buffer was added to the reservable time span, but the reservation units buffer is
-        # longer, we need to move the start time forward to account for the difference.
+        # If a buffer was added to the reservable time span, but the reservation units buffer is longer,
+        # we need to move the start time forward to account for the difference.
         if self.buffer_time_before < reservation_unit.buffer_time_before:
             self.start_datetime += reservation_unit.buffer_time_before - self.buffer_time_before
             self.buffer_time_before = reservation_unit.buffer_time_before
 
-        interval = ReservationStartInterval(reservation_unit.reservation_start_interval).as_number
+        interval: int = ReservationStartInterval(reservation_unit.reservation_start_interval).as_number
 
+        # Round the start time to the next valid minute, if the start time contains seconds or microseconds.
         if self.start_datetime.microsecond > 0 or self.start_datetime.second > 0:
             self.start_datetime = self.start_datetime.replace(second=0, microsecond=0) + datetime.timedelta(minutes=1)
 
-        overflow_minutes = ceil((time_as_timedelta(self.start_datetime).total_seconds() / 60) % interval)
+        # Convert the start time to minutes. e.g. time(10, 15) -> 615, time(14, 30) -> 870
+        timedelta_minutes = time_as_timedelta(self.start_datetime).total_seconds() / 60
+        # Number of minutes past the last valid interval. e.g. interval=30, 615 % 30 = 15, 870 % 30 = 0
+        overflow_minutes = ceil(timedelta_minutes % interval)
         if overflow_minutes == 0:
             return
 
+        # Move the start time to the next valid interval by adding the difference between interval and overflow minutes
+        # to the start time. e.g. interval=30, overflow_minutes=15, 30 - 15 = 15, start_time += 15 minutes
         delta_to_next_interval = datetime.timedelta(minutes=interval - overflow_minutes)
         self.start_datetime += delta_to_next_interval
 

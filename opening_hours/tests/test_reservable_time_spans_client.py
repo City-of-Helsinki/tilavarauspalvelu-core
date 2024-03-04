@@ -31,8 +31,8 @@ pytestmark = [
 ]
 
 
-def _get_date(*, day: int = 1, hour: int = 0, tzinfo: zoneinfo.ZoneInfo | None = None):
-    return datetime.datetime(2023, 1, day, hour, 0, 0, tzinfo=tzinfo or DEFAULT_TIMEZONE)
+def _get_date(*, day: int = 1, hour: int = 0, minute: int = 0, tzinfo: zoneinfo.ZoneInfo | None = None):
+    return datetime.datetime(2023, 1, day, hour, minute, 0, tzinfo=tzinfo or DEFAULT_TIMEZONE)
 
 
 def _get_resource_opening_hours() -> HaukiAPIOpeningHoursResponseItem:

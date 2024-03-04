@@ -183,16 +183,19 @@ def merge_overlapping_time_span_elements(time_span_elements: list[TimeSpanElemen
 
         # If the selected_list contains a time span that overlaps with the current time span, combine them.
         # The only time span that can overlap with the current time span is the last time span in the list.
-        # ┌────────────────────────┬─────────────────────────────────────────────┐
-        # │  xxxx     ->  xxxxxxx  │ Overlapping                                 │
-        # │    xxxxx  ->           │ The last time span is extended              │
-        # ├────────────────────────┼─────────────────────────────────────────────┤
-        # │  xxxx     ->  xxxxxxx  │ Current ends at the same time last ends     │
-        # │      xxx  ->           │ The last time span is extended              │
-        # ├────────────────────────┼─────────────────────────────────────────────┤
-        # │  xxxxxxx  ->  xxxxxxx  │ Time span is fully inside the last one      │
-        # │    xxx    ->           │                                             │
-        # └────────────────────────┴─────────────────────────────────────────────┘
+        # ┌───────────────────────────────────────────────────────────────────┐
+        # │ █ = Closed Time Span                                              │
+        # │ ▁ = Reservable Time Span                                          │
+        # ├────────────────────────┬──────────────────────────────────────────┤
+        # │  ████     ->  ███████  │ Overlapping                              │
+        # │    █████  ->           │ The last time span is extended           │
+        # ├────────────────────────┼──────────────────────────────────────────┤
+        # │  ████     ->  ███████  │ Current ends at the same time last ends  │
+        # │      ███  ->           │ The last time span is extended           │
+        # ├────────────────────────┼──────────────────────────────────────────┤
+        # │  ███████  ->  ███████  │ Time span is fully inside the last one   │
+        # │    ███    ->           │                                          │
+        # └────────────────────────┴──────────────────────────────────────────┘
         last_time_span = merged_time_span_elements[-1]
         # Last time span can maybe be extended
         if last_time_span.end_datetime >= current_time_span.start_datetime:
@@ -205,8 +208,8 @@ def merge_overlapping_time_span_elements(time_span_elements: list[TimeSpanElemen
 
         # No overlapping time spans, add the current time span to the list.
         # ┌────────────────────────┬─────────────────────────────────────┐
-        # │  xxxx     ->  xxxx     │ Not overlapping                     │
-        # │       xx  ->       xx  │ Current time span is added to list  │
+        # │  ████     ->  ████     │ Not overlapping                     │
+        # │       ██  ->       ██  │ Current time span is added to list  │
         # └────────────────────────┴─────────────────────────────────────┘
         merged_time_span_elements.append(current_time_span)
 
@@ -244,13 +247,16 @@ def override_reservable_with_closed_time_spans(
                 continue
 
             # Closed time span is fully inside the reservable time span, split the reservable time span
-            # ┌────────────────────┬───────────────────────────────────────────────┐
-            # │ ooooooo -> oo   oo │ Closed time span inside reservable time span. │
-            # │   xxx   ->   xxx   │ Reservable time span is split in two          │
+            # ┌────────────────────────────────────────────────────────────────────┐
+            # │ █ = Closed Time Span                                               │
+            # │ ▁ = Reservable Time Span                                           │
+            # ├────────────────────┬───────────────────────────────────────────────┤
+            # │ ▁▁▁▁▁▁▁ -> ▁▁   ▁▁ │ Closed time span inside reservable time span. │
+            # │   ███   ->   ███   │ Reservable time span is split in two          │
             # ├────────────────────┼───────────────────────────────────────────────┤
-            # │ ooooooo -> o  o  o │ Multiple closed time spans overlap            │
-            # │  xx     ->  xx     │ reservable time span is split in three.       │
-            # │     xx  ->     xx  │ (in different loops)                          │
+            # │ ▁▁▁▁▁▁▁ -> ▁  ▁  ▁ │ Multiple closed time spans overlap            │
+            # │  ██     ->  ██     │ reservable time span is split in three.       │
+            # │     ██  ->     ██  │ (in different loops)                          │
             # └────────────────────┴───────────────────────────────────────────────┘
             elif closed_time_span.fully_inside_of(reservable_time_span):
                 new_reservable_time_span = copy(reservable_time_span)
@@ -262,14 +268,14 @@ def override_reservable_with_closed_time_spans(
             # Reservable time span starts inside the closed time span.
             # Shorten the reservable time span from the beginning
             # ┌──────────────────────────┬───────────────────────────────────┐
-            # │     oooo   ->       oo   │                                   │
-            # │   xxxx     ->   xxxx     │ Reservable time span is shortened │
+            # │     ▁▁▁▁   ->       ▁▁   │                                   │
+            # │   ████     ->   ████     │ Reservable time span is shortened │
             # ├──────────────────────────┼───────────────────────────────────┤
-            # │     oooo   ->     oooo   │ Not overlapping (or start == end) │
-            # │ xxxx       -> xxxx       │ Untouched                         │
+            # │     ▁▁▁▁   ->     ▁▁▁▁   │ Not overlapping (or start == end) │
+            # │ ████       -> ████       │ Untouched                         │
             # ├──────────────────────────┼───────────────────────────────────┤
-            # │     oooo   ->     oooo   │ Overlapping from the beginning    │
-            # │       xxxx ->       xxxx │ Handled later in the next step    │
+            # │     ▁▁▁▁   ->     ▁▁▁▁   │ Overlapping from the beginning    │
+            # │       ████ ->       ████ │ Handled later in the next step    │
             # └──────────────────────────┴───────────────────────────────────┘
             elif reservable_time_span.starts_inside_of(closed_time_span):
                 reservable_time_span.start_datetime = closed_time_span.buffered_end_datetime
@@ -277,14 +283,14 @@ def override_reservable_with_closed_time_spans(
             # Reservable time span ends inside the closed time span.
             # Shorten the reservable time span from the end
             # ┌──────────────────────────┬───────────────────────────────────┐
-            # │   oooo     ->   oo       │                                   │
-            # │     xxxx   ->     xxxx   │ Reservable time span is shortened │
+            # │   ▁▁▁▁     ->   ▁▁       │                                   │
+            # │     ████   ->     ████   │ Reservable time span is shortened │
             # ├──────────────────────────┼───────────────────────────────────┤
-            # │   oooo     ->   oooo     │ Not overlapping (or end == start) │
-            # │       xxxx ->       xxxx │ Untouched                         │
+            # │   ▁▁▁▁     ->   ▁▁▁▁     │ Not overlapping (or end == start) │
+            # │       ████ ->       ████ │ Untouched                         │
             # ├──────────────────────────┼───────────────────────────────────┤
-            # │   oooo     ->   oooo     │ Overlapping from the beginning    │
-            # │ xxxx       -> xxxx       │ Already handled in last step      │
+            # │   ▁▁▁▁     ->   ▁▁▁▁     │ Overlapping from the beginning    │
+            # │ ████       -> ████       │ Already handled in last step      │
             # └──────────────────────────┴───────────────────────────────────┘
             elif reservable_time_span.ends_inside_of(closed_time_span):
                 reservable_time_span.end_datetime = closed_time_span.buffered_start_datetime
