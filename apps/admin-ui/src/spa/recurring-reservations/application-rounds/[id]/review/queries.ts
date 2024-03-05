@@ -12,6 +12,7 @@ export const APPLICATIONS_QUERY = gql`
     $applicantType: [ApplicantTypeChoice]
     $status: [ApplicationStatusChoice]!
     $textSearch: String
+    $orderBy: [ApplicationOrderingChoices]
     $first: Int
     $offset: Int
   ) {
@@ -21,6 +22,7 @@ export const APPLICATIONS_QUERY = gql`
       applicantType: $applicantType
       status: $status
       textSearch: $textSearch
+      orderBy: $orderBy
       first: $first
       offset: $offset
     ) {
@@ -74,6 +76,7 @@ export const APPLICATIONS_EVENTS_QUERY = gql`
     $ageGroup: [Int]
     $homeCity: [Int]
     $includePreferredOrder10OrHigher: Boolean
+    $orderBy: [ApplicationSectionOrderingChoices]
     $first: Int
     $offset: Int
   ) {
@@ -91,6 +94,7 @@ export const APPLICATIONS_EVENTS_QUERY = gql`
       ageGroup: $ageGroup
       homeCity: $homeCity
       includePreferredOrder10OrHigher: $includePreferredOrder10OrHigher
+      orderBy: $orderBy
       first: $first
       offset: $offset
     ) {
@@ -202,6 +206,7 @@ export const ALLOCATED_TIME_SLOTS_QUERY = gql`
     $allocatedReservationUnit: [Int]
     $dayOfTheWeek: [Weekday]
     $textSearch: String
+    $orderBy: [AllocatedTimeSlotOrderingChoices]
     $first: Int
     $offset: Int
   ) {
@@ -213,6 +218,7 @@ export const ALLOCATED_TIME_SLOTS_QUERY = gql`
       allocatedReservationUnit: $allocatedReservationUnit
       dayOfTheWeek: $dayOfTheWeek
       textSearch: $textSearch
+      orderBy: $orderBy
       first: $first
       offset: $offset
     ) {

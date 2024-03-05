@@ -1,9 +1,10 @@
 import React from "react";
 import { ApolloError, useQuery } from "@apollo/client";
 import { useSearchParams } from "react-router-dom";
-import type {
-  Query,
-  QueryApplicationSectionsArgs,
+import {
+  ApplicationSectionOrderingChoices,
+  type Query,
+  type QueryApplicationSectionsArgs,
 } from "common/types/gql-types";
 import { useTranslation } from "next-i18next";
 import { filterNonNullable } from "common/src/helpers";
@@ -54,8 +55,7 @@ export function ApplicationEventDataLoader({
       status: transformApplicationSectionStatus(eventStatusFilter),
       applicantType: transformApplicantType(applicantFilter),
       textSearch: nameFilter,
-      // FIXME orderBy has changed a lot (typesafety with enums)
-      // orderBy,
+      orderBy: transformOrderBy(orderBy),
     },
     onError: (err: ApolloError) => {
       notifyError(err.message);
@@ -102,4 +102,45 @@ export function ApplicationEventDataLoader({
       />
     </>
   );
+}
+
+function transformOrderBy(
+  orderBy: string | null
+): ApplicationSectionOrderingChoices[] {
+  if (orderBy == null) {
+    return [];
+  }
+  const desc = orderBy.startsWith("-");
+  const rest = desc ? orderBy.slice(1) : orderBy;
+  switch (rest) {
+    case "nameFi":
+      return desc
+        ? [ApplicationSectionOrderingChoices.NameDesc]
+        : [ApplicationSectionOrderingChoices.NameAsc];
+    case "preferredUnitNameFi":
+      return desc
+        ? [ApplicationSectionOrderingChoices.PreferredUnitNameFiDesc]
+        : [ApplicationSectionOrderingChoices.PreferredUnitNameFiAsc];
+    case "status":
+      return desc
+        ? [ApplicationSectionOrderingChoices.StatusDesc]
+        : [ApplicationSectionOrderingChoices.StatusAsc];
+    case "applicant":
+      return desc
+        ? [ApplicationSectionOrderingChoices.ApplicantDesc]
+        : [ApplicationSectionOrderingChoices.ApplicantAsc];
+    case "application_id,pk":
+    case "application_id,-pk":
+      return desc
+        ? [
+            ApplicationSectionOrderingChoices.ApplicationPkDesc,
+            ApplicationSectionOrderingChoices.PkDesc,
+          ]
+        : [
+            ApplicationSectionOrderingChoices.ApplicationPkAsc,
+            ApplicationSectionOrderingChoices.PkAsc,
+          ];
+    default:
+      return [];
+  }
 }

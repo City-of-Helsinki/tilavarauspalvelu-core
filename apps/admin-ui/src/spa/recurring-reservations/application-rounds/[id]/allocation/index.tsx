@@ -402,7 +402,9 @@ function ApplicationRoundAllocation({
   // TODO totalCount is fine, but we need to query the things we want to count otherwise it's off by a mile.
   if (allEvents.length !== totalCount && totalCount < 100) {
     // eslint-disable-next-line no-console -- TODO use logger
-    console.warn(`Total count of application sections "${totalCount}" does not match array length "${allEvents.length}"`);
+    console.warn(
+      `Total count of application sections "${totalCount}" does not match array length "${allEvents.length}"`
+    );
   }
   const totalNumberOfEvents = totalCount; // allEvents.length;
 

@@ -4,6 +4,7 @@ import {
   type Query,
   type QueryAllocatedTimeSlotsArgs,
   ApplicationSectionStatusChoice,
+  AllocatedTimeSlotOrderingChoices,
 } from "common/types/gql-types";
 import { useTranslation } from "next-i18next";
 import { filterNonNullable } from "common/src/helpers";
@@ -85,8 +86,7 @@ export function AllocatedEventDataLoader({
       // todo allocation status?
       textSearch: nameFilter,
       first: LIST_PAGE_SIZE,
-      // TODO
-      // orderBy,
+      orderBy: transformOrderBy(orderBy),
     },
     onError: (err: ApolloError) => {
       notifyError(err.message);
@@ -133,4 +133,49 @@ export function AllocatedEventDataLoader({
       />
     </>
   );
+}
+
+function transformOrderBy(
+  orderBy: string | null
+): AllocatedTimeSlotOrderingChoices[] {
+  if (orderBy == null) {
+    return [];
+  }
+  const desc = orderBy.startsWith("-");
+  const rest = desc ? orderBy.slice(1) : orderBy;
+  switch (rest) {
+    case "allocated_reservation_unit_name_fi":
+      return desc
+        ? [AllocatedTimeSlotOrderingChoices.AllocatedReservationUnitNameFiDesc]
+        : [AllocatedTimeSlotOrderingChoices.AllocatedReservationUnitNameFiAsc];
+    case "allocated_unit_name_fi":
+      return desc
+        ? [AllocatedTimeSlotOrderingChoices.AllocatedUnitNameFiDesc]
+        : [AllocatedTimeSlotOrderingChoices.AllocatedUnitNameFiAsc];
+    case "application_event_name_fi":
+      return desc
+        ? [AllocatedTimeSlotOrderingChoices.ApplicationSectionNameDesc]
+        : [AllocatedTimeSlotOrderingChoices.ApplicationSectionNameAsc];
+    case "applicant":
+      return desc
+        ? [AllocatedTimeSlotOrderingChoices.ApplicantDesc]
+        : [AllocatedTimeSlotOrderingChoices.ApplicantAsc];
+    case "application_id,application_event_id":
+    case "application_id,-application_event_id":
+      return desc
+        ? [
+            AllocatedTimeSlotOrderingChoices.ApplicationPkDesc,
+            AllocatedTimeSlotOrderingChoices.ApplicationSectionPkDesc,
+          ]
+        : [
+            AllocatedTimeSlotOrderingChoices.ApplicationPkAsc,
+            AllocatedTimeSlotOrderingChoices.ApplicationSectionPkAsc,
+          ];
+    case "allocated_time_of_week":
+      return desc
+        ? [AllocatedTimeSlotOrderingChoices.DayOfTheWeekDesc]
+        : [AllocatedTimeSlotOrderingChoices.DayOfTheWeekAsc];
+    default:
+      return [];
+  }
 }

@@ -2,7 +2,11 @@ import React from "react";
 import { ApolloError, useQuery } from "@apollo/client";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "next-i18next";
-import { type Query, type QueryApplicationsArgs } from "common/types/gql-types";
+import {
+  ApplicationOrderingChoices,
+  type Query,
+  type QueryApplicationsArgs,
+} from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { LIST_PAGE_SIZE } from "@/common/const";
 import { useNotification } from "@/context/NotificationContext";
@@ -42,8 +46,7 @@ export function ApplicationDataLoader({
       status: transformApplicationStatuses(statusFilter),
       applicantType: transformApplicantType(applicantFilter),
       textSearch: nameFilter,
-      // TODO
-      // orderBy,
+      orderBy: transformOrderBy(orderBy),
     },
     onError: (err: ApolloError) => {
       notifyError(err.message);
@@ -88,4 +91,38 @@ export function ApplicationDataLoader({
       />
     </>
   );
+}
+
+function transformOrderBy(
+  orderBy: string | null
+): ApplicationOrderingChoices[] {
+  if (orderBy == null) {
+    return [];
+  }
+  const desc = orderBy.startsWith("-");
+  const rest = desc ? orderBy.slice(1) : orderBy;
+  switch (rest) {
+    case "applicantType":
+      return desc
+        ? [ApplicationOrderingChoices.ApplicantTypeDesc]
+        : [ApplicationOrderingChoices.ApplicantTypeAsc];
+    case "applicant":
+      return desc
+        ? [ApplicationOrderingChoices.ApplicantDesc]
+        : [ApplicationOrderingChoices.ApplicantAsc];
+    case "pk":
+      return desc
+        ? [ApplicationOrderingChoices.PkDesc]
+        : [ApplicationOrderingChoices.PkAsc];
+    case "preferredUnitNameFi":
+      return desc
+        ? [ApplicationOrderingChoices.PreferredUnitNameFiDesc]
+        : [ApplicationOrderingChoices.PreferredUnitNameFiAsc];
+    case "application_status":
+      return desc
+        ? [ApplicationOrderingChoices.StatusDesc]
+        : [ApplicationOrderingChoices.StatusAsc];
+    default:
+      return [];
+  }
 }

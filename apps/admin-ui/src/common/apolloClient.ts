@@ -158,12 +158,12 @@ function createClient(apiBaseUrl: string) {
           },
           applications: {
             keyArgs: [
-              "orderBy",
               "applicationRound",
               "unit",
               "status",
               "applicantType",
               "textSearch",
+              "orderBy",
             ],
             read(existing: ApplicationNodeConnection) {
               return existing;
