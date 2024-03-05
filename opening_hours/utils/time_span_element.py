@@ -1,16 +1,11 @@
 import datetime
 import zoneinfo
 from dataclasses import dataclass, field
-from math import ceil
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
-from common.date_utils import DEFAULT_TIMEZONE, combine, local_start_of_day, time_as_timedelta
+from common.date_utils import DEFAULT_TIMEZONE, combine, local_start_of_day
 from opening_hours.enums import HaukiResourceState
 from opening_hours.utils.hauki_api_types import HaukiAPIOpeningHoursResponseTime
-from reservation_units.enums import ReservationStartInterval
-
-if TYPE_CHECKING:
-    from reservation_units.models import ReservationUnit
 
 
 @dataclass(order=True, frozen=False)
@@ -158,6 +153,11 @@ class TimeSpanElement:
             return self.duration_minutes
         return self.duration_minutes + (self.buffer_time_after.total_seconds() / 60)
 
+    def round_start_time_to_next_minute(self) -> None:
+        """Round the start time to the next valid minute, if the start time contains seconds or microseconds."""
+        if self.start_datetime.microsecond > 0 or self.start_datetime.second > 0:
+            self.start_datetime = self.start_datetime.replace(second=0, microsecond=0) + datetime.timedelta(minutes=1)
+
     def overlaps_with(self, other: "TimeSpanElement") -> bool:
         """
         Does this time spans overlap with the other time span?
@@ -245,80 +245,6 @@ class TimeSpanElement:
              │            │  ═══ # No
         """
         return other.buffered_start_datetime < self.end_datetime <= other.buffered_end_datetime
-
-    def can_fit_reservation_for_reservation_unit(
-        self,
-        reservation_unit: "ReservationUnit",
-        minimum_duration_minutes: int,
-    ) -> bool:
-        """Can a reservation from given ReservationUnit fit inside this TimeSpanElement?"""
-        if reservation_unit.min_reservation_duration:
-            minimum_duration_minutes = max(
-                reservation_unit.min_reservation_duration.total_seconds() / 60,
-                minimum_duration_minutes,
-            )
-
-        # If this time span's duration is less than the minimum duration, it obviously can't fit.
-        if self.duration_minutes < minimum_duration_minutes:
-            return False
-
-        # Validate duration with front buffers
-        buffer_front_minutes = 0
-        if reservation_unit.buffer_time_before:
-            buffer_front_minutes = reservation_unit.buffer_time_before.total_seconds() / 60
-            if self.front_buffered_duration_minutes < (buffer_front_minutes + minimum_duration_minutes):
-                return False
-
-        # Validate duration with back buffers
-        buffer_back_minutes = 0
-        if reservation_unit.buffer_time_after:
-            buffer_back_minutes = reservation_unit.buffer_time_after.total_seconds() / 60
-            if self.back_buffered_duration_minutes < (minimum_duration_minutes + buffer_back_minutes):
-                return False
-
-        # Validate duration with front and back buffers
-        # We need to validate front, back and total duration separately because the buffers
-        # can be different lengths in the front and back.
-        if self.buffered_duration_minutes < (buffer_front_minutes + minimum_duration_minutes + buffer_back_minutes):
-            return False
-
-        return True
-
-    def move_to_next_valid_start_time(self, reservation_unit: "ReservationUnit") -> None:
-        """
-        Move reservable time span start time to the next valid start time based on the
-        given reservation unit's settings and filter time start.
-
-        For a reservation to be valid, its start time must be at an interval that is valid for the ReservationUnit.
-        e.g. When ReservationUnit.reservation_start_interval is 30 minutes,
-        a reservation must start at 00:00, 00:30, 01:00, 01:30 from the start of the time span.
-
-        FIXME: This function only works when the interval is <= 60 minutes.
-         When the interval is > 60 minutes, the function MAY not always work as intended.
-        """
-        # If a buffer was added to the reservable time span, but the reservation units buffer is longer,
-        # we need to move the start time forward to account for the difference.
-        if self.buffer_time_before < reservation_unit.buffer_time_before:
-            self.start_datetime += reservation_unit.buffer_time_before - self.buffer_time_before
-            self.buffer_time_before = reservation_unit.buffer_time_before
-
-        interval: int = ReservationStartInterval(reservation_unit.reservation_start_interval).as_number
-
-        # Round the start time to the next valid minute, if the start time contains seconds or microseconds.
-        if self.start_datetime.microsecond > 0 or self.start_datetime.second > 0:
-            self.start_datetime = self.start_datetime.replace(second=0, microsecond=0) + datetime.timedelta(minutes=1)
-
-        # Convert the start time to minutes. e.g. time(10, 15) -> 615, time(14, 30) -> 870
-        timedelta_minutes = time_as_timedelta(self.start_datetime).total_seconds() / 60
-        # Number of minutes past the last valid interval. e.g. interval=30, 615 % 30 = 15, 870 % 30 = 0
-        overflow_minutes = ceil(timedelta_minutes % interval)
-        if overflow_minutes == 0:
-            return
-
-        # Move the start time to the next valid interval by adding the difference between interval and overflow minutes
-        # to the start time. e.g. interval=30, overflow_minutes=15, 30 - 15 = 15, start_time += 15 minutes
-        delta_to_next_interval = datetime.timedelta(minutes=interval - overflow_minutes)
-        self.start_datetime += delta_to_next_interval
 
     def generate_closed_time_spans_outside_filter(
         self,
