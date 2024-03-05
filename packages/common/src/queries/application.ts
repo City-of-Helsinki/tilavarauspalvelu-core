@@ -18,6 +18,8 @@ const APPLICATION_FRAGMENT = gql`
     applicationRound {
       pk
       nameFi
+      nameSv
+      nameEn
       serviceSector {
         pk
         nameFi
