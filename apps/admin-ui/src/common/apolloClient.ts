@@ -11,6 +11,9 @@ import { onError } from "@apollo/client/link/error";
 import { uniqBy } from "lodash";
 import { GraphQLError } from "graphql/error/GraphQLError";
 import type {
+  ApplicationNodeConnection,
+  ApplicationSectionNodeConnection,
+  AllocatedTimeSlotNodeConnection,
   ReservationTypeConnection,
   BannerNotificationNodeConnection,
 } from "common/types/gql-types";
@@ -93,27 +96,23 @@ function createClient(apiBaseUrl: string) {
               return merged;
             },
           },
-          /* TODO
-          applicationEventSchedules: {
+          allocatedTimeSlots: {
             keyArgs: [
               "applicationRound",
               "allocatedUnit",
               "applicantType",
-              "applicationEventStatus",
+              "applicationSectionStatus",
               "allocatedReservationUnit",
-              "allocatedDay",
-              "accepted",
-              "declined",
-              "unallocated",
+              "dayOfTheWeek",
               "textSearch",
               "orderBy",
             ],
-            read(existing: ApplicationEventScheduleNodeConnection) {
+            read(existing: AllocatedTimeSlotNodeConnection) {
               return existing;
             },
             merge(
-              existing: ApplicationEventScheduleNodeConnection,
-              incoming: ApplicationEventScheduleNodeConnection
+              existing: AllocatedTimeSlotNodeConnection,
+              incoming: AllocatedTimeSlotNodeConnection
             ) {
               return {
                 ...incoming,
@@ -124,30 +123,29 @@ function createClient(apiBaseUrl: string) {
               };
             },
           },
-          applicationEvents: {
+          applicationSections: {
             keyArgs: [
-              "unit",
               "applicationRound",
               "applicationStatus",
               "status",
+              "unit",
               "applicantType",
-              "textSearch",
-              "orderBy",
               "preferredOrder",
+              "textSearch",
               "priority",
               "purpose",
               "reservationUnit",
-              "applicantType",
               "ageGroup",
               "homeCity",
               "includePreferredOrder10OrHigher",
+              "orderBy",
             ],
-            read(existing: ApplicationEventNodeConnection) {
+            read(existing: ApplicationSectionNodeConnection) {
               return existing;
             },
             merge(
-              existing: ApplicationEventNodeConnection,
-              incoming: ApplicationEventNodeConnection
+              existing: ApplicationSectionNodeConnection,
+              incoming: ApplicationSectionNodeConnection
             ) {
               return {
                 ...incoming,
@@ -183,7 +181,6 @@ function createClient(apiBaseUrl: string) {
               };
             },
           },
-          */
           reservations: {
             // Separate caches for all query params
             // causes a full refetch when anything changes which is bad (e.g. sorting)

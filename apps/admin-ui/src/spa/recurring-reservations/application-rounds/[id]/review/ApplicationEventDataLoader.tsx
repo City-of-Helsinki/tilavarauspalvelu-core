@@ -46,6 +46,7 @@ export function ApplicationEventDataLoader({
   >(APPLICATIONS_EVENTS_QUERY, {
     skip: !applicationRoundPk,
     variables: {
+      first: LIST_PAGE_SIZE,
       unit: unitFilter.map(Number).filter(Number.isFinite),
       applicationRound: applicationRoundPk,
       applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,

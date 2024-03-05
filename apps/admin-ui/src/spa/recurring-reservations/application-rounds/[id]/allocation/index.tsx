@@ -400,9 +400,9 @@ function ApplicationRoundAllocation({
     allEventsData?.applicationSections?.edges.map((e) => e?.node)
   );
   // TODO totalCount is fine, but we need to query the things we want to count otherwise it's off by a mile.
-  if (allEvents.length !== totalCount) {
+  if (allEvents.length !== totalCount && totalCount < 100) {
     // eslint-disable-next-line no-console -- TODO use logger
-    console.warn("Total count of application sections does not match");
+    console.warn(`Total count of application sections "${totalCount}" does not match array length "${allEvents.length}"`);
   }
   const totalNumberOfEvents = totalCount; // allEvents.length;
 

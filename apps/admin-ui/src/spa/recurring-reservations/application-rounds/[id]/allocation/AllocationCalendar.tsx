@@ -54,7 +54,7 @@ const DayLabel = styled.div`
   height: var(--spacing-l);
 `;
 
-const Slot = styled.div<{
+const CalendarSlot = styled.div<{
   $selected?: boolean;
   $eventCount?: number;
   $isAccepted?: boolean;
@@ -160,7 +160,7 @@ const Active = styled.div<{
     `}
 `;
 
-const HourLabel = styled(Slot)<{ $hour?: boolean }>`
+const HourLabel = styled(CalendarSlot)<{ $hour?: boolean }>`
   border-top: 1px solid transparent;
   ${({ $hour }) => $hour && "border-color: var(--color-black-20);"}
   width: var(--fontsize-heading-l);
@@ -189,6 +189,35 @@ const isSlotLast = (selection: string[], slot: string): boolean => {
 };
 
 const weekdays = [0, 1, 2, 3, 4, 5, 6] as const;
+
+// Assume that this is already filtered by the day
+// TODO Not a good name it should match the Cell type (which isn't great either)
+type Slot = {
+  day: Day;
+  cell: string;
+  allocated: boolean;
+  minutes: number;
+};
+function addTimeSlotToArray(
+  arr: Slot[],
+  slot: { beginTime: string; endTime: string },
+  day: Day,
+  allocated: boolean
+) {
+  const { beginTime, endTime } = slot;
+  const begin = parseApiTime(beginTime);
+  const end = parseApiTime(endTime);
+  if (!begin || !end) {
+    return;
+  }
+  const beginMinutes = begin * 60;
+  const endMinutes = end * 60;
+  for (let i = beginMinutes; i < endMinutes; i += 30) {
+    const cell = i / 60;
+    const key = encodeTimeSlot(day, cell);
+    arr.push({ day, cell: key, allocated, minutes: i });
+  }
+}
 
 /* TODO full rethink on this
  *
@@ -292,38 +321,9 @@ export function AllocationCalendar({
           };
         });
 
-        // TODO move to a free function
-        // Assume that this is already filtered by the day
-        // TODO Not a good name it should match the Cell type (which isn't great either)
-        type Slot = {
-          day: Day;
-          cell: string;
-          allocated: boolean;
-          minutes: number;
-        };
-        const addTimeSlotToArray = (
-          arr: Slot[],
-          slot: { beginTime: string; endTime: string },
-          allocated: boolean
-        ) => {
-          const { beginTime, endTime } = slot;
-          const begin = parseApiTime(beginTime);
-          const end = parseApiTime(endTime);
-          if (!begin || !end) {
-            return;
-          }
-          const beginMinutes = begin * 60;
-          const endMinutes = end * 60;
-          for (let i = beginMinutes; i < endMinutes; i += 30) {
-            const cell = i / 60;
-            const key = encodeTimeSlot(day, cell);
-            arr.push({ day, cell: key, allocated, minutes: i });
-          }
-        };
-
         const focusedSlots: Slot[] = [];
         for (const ts of focusedTimeSlots) {
-          addTimeSlotToArray(focusedSlots, ts, false);
+          addTimeSlotToArray(focusedSlots, ts, day, false);
         }
 
         for (const a of focusedAllocatedTimeSlots) {
@@ -331,7 +331,7 @@ export function AllocationCalendar({
             continue;
           }
           for (const ts of a.allocatedTimeSlots) {
-            addTimeSlotToArray(focusedSlots, ts, true);
+            addTimeSlotToArray(focusedSlots, ts, day, true);
           }
         }
 
@@ -478,7 +478,7 @@ function CalendarDay({
             );
           }) ?? false;
         return (
-          <Slot
+          <CalendarSlot
             key={cell.key}
             onMouseDown={() => onStartSelection(cell.key)}
             onMouseUp={onFinishSelection}
@@ -509,7 +509,7 @@ function CalendarDay({
                 $isLast={isFocusedLast}
               />
             )}
-          </Slot>
+          </CalendarSlot>
         );
       })}
     </div>

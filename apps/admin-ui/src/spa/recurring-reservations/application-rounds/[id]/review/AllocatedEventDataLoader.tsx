@@ -57,6 +57,7 @@ export function AllocatedEventDataLoader({
     aesFilter[0] === ApplicationSe.Declined;
   */
 
+  // TODO Käsittelyn vaihe filter doesn't work atm
   const { fetchMore, previousData, loading, data } = useQuery<
     Query,
     QueryAllocatedTimeSlotsArgs
@@ -76,17 +77,13 @@ export function AllocatedEventDataLoader({
         .filter(Number.isFinite)
         .filter((n): n is Day => n >= 0 && n <= 6)
         .map(transformWeekday),
-      /*
-      allocatedDay: weekDayFilter
-      unallocated: false,
-      */
       allocatedReservationUnit: reservationUnitFilter
         .map(Number)
         .filter(Number.isFinite),
       // accepted: onlyAccepted ? true : undefined,
       // declined: onlyDeclined ? true : undefined,
+      // todo allocation status?
       textSearch: nameFilter,
-      offset: 0,
       first: LIST_PAGE_SIZE,
       // TODO
       // orderBy,

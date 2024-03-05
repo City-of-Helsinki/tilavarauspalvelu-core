@@ -36,6 +36,7 @@ export function ApplicationDataLoader({
   >(APPLICATIONS_QUERY, {
     skip: !applicationRoundPk,
     variables: {
+      first: LIST_PAGE_SIZE,
       applicationRound: applicationRoundPk,
       unit: unitFilter.map(Number).filter(Number.isFinite),
       status: transformApplicationStatuses(statusFilter),
@@ -47,11 +48,8 @@ export function ApplicationDataLoader({
     onError: (err: ApolloError) => {
       notifyError(err.message);
     },
-    fetchPolicy: "no-cache",
-    /*
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
-    */
   });
 
   const dataToUse = data ?? previousData;

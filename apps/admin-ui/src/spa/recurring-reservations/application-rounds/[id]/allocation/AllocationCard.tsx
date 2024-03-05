@@ -465,26 +465,28 @@ export function AllocationCard({
     } catch (e) {
       if (e instanceof ApolloError) {
         const gqlerrors = e.graphQLErrors;
-        const mutError = gqlerrors.find((err) => "code" in err.extensions && err.extensions.code === "MUTATION_VALIDATION_ERROR");
+        const mutError = gqlerrors.find(
+          (err) =>
+            "code" in err.extensions &&
+            err.extensions.code === "MUTATION_VALIDATION_ERROR"
+        );
         if (mutError) {
           const err = mutError;
-            if (
-              "errors" in err.extensions &&
-              Array.isArray(err.extensions.errors)
-            ) {
-              // TODO type check the error
-              // TODO check the number of errors (should be 1)
-              const errMsg = getTranslatedMutationError(
-                err.extensions.errors[0]
-              );
+          if (
+            "errors" in err.extensions &&
+            Array.isArray(err.extensions.errors)
+          ) {
+            // TODO type check the error
+            // TODO check the number of errors (should be 1)
+            const errMsg = getTranslatedMutationError(err.extensions.errors[0]);
 
-              const { name } = applicationSection;
-              if (errMsg != null) {
-                const title = "Allocation.errors.accepting.title";
-                notifyError(t(errMsg, { name }), t(title));
-                return;
-              }
+            const { name } = applicationSection;
+            if (errMsg != null) {
+              const title = "Allocation.errors.accepting.title";
+              notifyError(t(errMsg, { name }), t(title));
+              return;
             }
+          }
         }
       } else {
         // eslint-disable-next-line no-console

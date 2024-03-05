@@ -1,6 +1,6 @@
 import React, { type ReactNode } from "react";
 import styled, { css } from "styled-components";
-import { IconCheckCircleFill, IconCrossCircleFill } from "hds-react";
+import { IconCheckCircleFill } from "hds-react";
 import { useTranslation } from "react-i18next";
 import {
   ApplicationSectionStatusChoice,
@@ -86,8 +86,7 @@ function ApplicationSectionStatusIcon({
   }
 
   // TODO what are the states? declined / approved now?
-  // @ts-ignore -- TODO fix
-  if (status === ApplicationSectionStatusChoice.Approved) {
+  if (status === ApplicationSectionStatusChoice.Handled) {
     return (
       <IconCheckCircleFill
         aria-hidden
@@ -95,8 +94,9 @@ function ApplicationSectionStatusIcon({
       />
     );
   }
-  // @ts-ignore -- TODO fix
-  if (status === ApplicationSectionStatusChoice.Declined) {
+  // FIXME this is wrong, it should not be InAllocation it should be declined (but there is no such status)
+  /*
+  if (status === ApplicationSectionStatusChoice.InAllocation) {
     return (
       <IconCrossCircleFill
         aria-hidden
@@ -104,6 +104,7 @@ function ApplicationSectionStatusIcon({
       />
     );
   }
+  */
   return <ApplicationEventStatusDot aria-hidden status={status} />;
 }
 

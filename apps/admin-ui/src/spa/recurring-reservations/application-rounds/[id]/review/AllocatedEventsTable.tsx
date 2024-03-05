@@ -23,6 +23,7 @@ type Props = {
 };
 
 type ApplicationScheduleView = {
+  key: string;
   applicationPk?: number;
   pk?: number;
   applicantName?: string;
@@ -57,8 +58,10 @@ function timeSlotMapper(
     : "-";
   const name = slot.reservationUnitOption.applicationSection.name ?? "-";
 
+  const applicationPk = application.pk ?? 0;
   return {
-    applicationPk: application.pk ?? 0,
+    key: `${applicationPk}-${slot.pk}`,
+    applicationPk,
     pk: slot.reservationUnitOption.applicationSection.pk ?? 0,
     applicantName,
     allocatedReservationUnitName,
@@ -172,8 +175,7 @@ export function AllocatedEventsTable({
   return (
     <CustomTable
       setSort={onSortChanged}
-      // FIXME this creates duplicate keys because section pk is not unique (same section can be allocated / declined multiple times)
-      indexKey="pk"
+      indexKey="key"
       isLoading={isLoading}
       rows={views}
       cols={cols}

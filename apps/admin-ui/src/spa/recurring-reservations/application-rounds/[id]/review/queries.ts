@@ -12,6 +12,8 @@ export const APPLICATIONS_QUERY = gql`
     $applicantType: [ApplicantTypeChoice]
     $status: [ApplicationStatusChoice]!
     $textSearch: String
+    $first: Int
+    $offset: Int
   ) {
     applications(
       applicationRound: $applicationRound
@@ -19,6 +21,8 @@ export const APPLICATIONS_QUERY = gql`
       applicantType: $applicantType
       status: $status
       textSearch: $textSearch
+      first: $first
+      offset: $offset
     ) {
       edges {
         node {
@@ -70,6 +74,8 @@ export const APPLICATIONS_EVENTS_QUERY = gql`
     $ageGroup: [Int]
     $homeCity: [Int]
     $includePreferredOrder10OrHigher: Boolean
+    $first: Int
+    $offset: Int
   ) {
     applicationSections(
       applicationRound: $applicationRound
@@ -85,6 +91,8 @@ export const APPLICATIONS_EVENTS_QUERY = gql`
       ageGroup: $ageGroup
       homeCity: $homeCity
       includePreferredOrder10OrHigher: $includePreferredOrder10OrHigher
+      first: $first
+      offset: $offset
     ) {
       edges {
         node {
@@ -192,7 +200,10 @@ export const ALLOCATED_TIME_SLOTS_QUERY = gql`
     $applicantType: [ApplicantTypeChoice]
     $applicationSectionStatus: [ApplicationSectionStatusChoice]
     $allocatedReservationUnit: [Int]
+    $dayOfTheWeek: [Weekday]
     $textSearch: String
+    $first: Int
+    $offset: Int
   ) {
     allocatedTimeSlots(
       applicationRound: $applicationRound
@@ -200,7 +211,10 @@ export const ALLOCATED_TIME_SLOTS_QUERY = gql`
       applicantType: $applicantType
       applicationSectionStatus: $applicationSectionStatus
       allocatedReservationUnit: $allocatedReservationUnit
+      dayOfTheWeek: $dayOfTheWeek
       textSearch: $textSearch
+      first: $first
+      offset: $offset
     ) {
       edges {
         node {
