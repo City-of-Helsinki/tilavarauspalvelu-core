@@ -16,7 +16,6 @@ from common.date_utils import (
     local_datetime_max,
     local_datetime_min,
     local_start_of_day,
-    time_as_timedelta,
 )
 from opening_hours.models import ReservableTimeSpan
 from opening_hours.utils.reservable_time_span_client import override_reservable_with_closed_time_spans
@@ -617,26 +616,24 @@ class ReservableTimeSpanFirstReservableTimeHelper:
           - ReservationUnit.reservation_start_interval is 90 minutes.
           - ReservableTimeSpan.start_datetime is 11:15.
           - A new reservation must start at 11:15, 12:45, 14:15, 15:45 etc.
-
-        FIXME: This function only works properly when the interval is <= 60 minutes.
-         When the interval is > 60 minutes, the function MAY not always work as intended.
         """
         reservation_unit = self.parent.reservation_unit
-        interval: int = ReservationStartInterval(reservation_unit.reservation_start_interval).as_number
+        interval_minutes = ReservationStartInterval(reservation_unit.reservation_start_interval).as_number
 
         time_span.round_start_time_to_next_minute()
 
-        # Convert the start time to minutes. e.g. time(10, 15) -> 615, time(14, 30) -> 870
-        timedelta_minutes = time_as_timedelta(time_span.start_datetime).total_seconds() / 60
-        # Number of minutes past the last valid interval. e.g. interval=30, 615 % 30 = 15, 870 % 30 = 0
-        overflow_minutes = ceil(timedelta_minutes % interval)
-        if overflow_minutes == 0:
+        difference: timedelta = time_span.start_datetime - self.reservable_time_span.start_datetime
+        difference_minutes = difference.total_seconds() / 60
+
+        minutes_past_interval = ceil(difference_minutes % interval_minutes)
+        if minutes_past_interval == 0:
             return
 
-        # Move the start time to the next valid interval by adding the difference between interval and overflow minutes
-        # to the start time. e.g. interval=30, overflow_minutes=15, 30 - 15 = 15, start_time += 15 minutes
-        delta_to_next_interval = timedelta(minutes=interval - overflow_minutes)
-        time_span.start_datetime += delta_to_next_interval
+        # Move the start time to the next valid interval by adding the difference between
+        # interval_minutes and minutes_past_interval to the start time.
+        # e.g. interval=30, overflow_minutes=15, start_time += (30-15 = 15) minutes
+        minutes_to_next_interval = timedelta(minutes=interval_minutes - minutes_past_interval)
+        time_span.start_datetime += minutes_to_next_interval
 
     def _can_reservation_fit_inside_time_span(self, time_span: TimeSpanElement) -> bool:
         """
