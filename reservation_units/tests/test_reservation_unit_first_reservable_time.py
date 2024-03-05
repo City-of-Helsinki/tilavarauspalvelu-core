@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from typing import NamedTuple
 
 import pytest
@@ -7,13 +7,17 @@ from django.utils.timezone import get_default_timezone
 
 from opening_hours.utils.time_span_element import TimeSpanElement
 from reservation_units.enums import ReservationStartInterval
-from reservation_units.utils.first_reservable_time import find_first_reservable_time_span_for_reservation_unit
-from tests.factories import (
-    ReservationUnitFactory,
+from reservation_units.models import ReservationUnit
+from reservation_units.utils.first_reservable_time import (
+    FirstReservableTimeHelper,
+    ReservableTimeSpanFirstReservableTimeHelper,
+    ReservationUnitFirstReservableTimeHelper,
 )
+from tests.factories import OriginHaukiResourceFactory, ReservableTimeSpanFactory, ReservationUnitFactory
 from tests.helpers import parametrize_helper
 
 DEFAULT_TIMEZONE = get_default_timezone()
+
 
 # Applied to all tests
 pytestmark = [
@@ -183,7 +187,14 @@ def test__find_first_reservable_time_span_for_reservation_unit__different_buffer
     Reservations exist at 01-02 and 04-05.
     Reservable time spans are at 02-04 and 05-09 (Reservation buffers may shorten these).
     """
+    origin_hauki_resource = OriginHaukiResourceFactory(
+        id="999",
+        opening_hours_hash="test_hash",
+        latest_fetched_date=date(2024, 12, 31),
+    )
+
     reservation_unit = ReservationUnitFactory(
+        origin_hauki_resource=origin_hauki_resource,
         buffer_time_before=buffer_time_before,
         buffer_time_after=buffer_time_after,
         reservation_start_interval=ReservationStartInterval.INTERVAL_30_MINUTES.value,
@@ -202,7 +213,13 @@ def test__find_first_reservable_time_span_for_reservation_unit__different_buffer
         ),
     ]
 
-    reservations = [
+    original_reservable_time_span = ReservableTimeSpanFactory(
+        resource=origin_hauki_resource,
+        start_datetime=reservable_time_spans[0].start_datetime,
+        end_datetime=reservable_time_spans[1].end_datetime,
+    )
+
+    reservation_time_spans = [
         TimeSpanElement(
             start_datetime=_time(hour=1),
             end_datetime=_time(hour=2),
@@ -219,11 +236,15 @@ def test__find_first_reservable_time_span_for_reservation_unit__different_buffer
         ),
     ]
 
-    result = find_first_reservable_time_span_for_reservation_unit(
-        reservation_unit=reservation_unit,
+    helper = FirstReservableTimeHelper(ReservationUnit.objects.none(), minimum_duration_minutes=30)
+    reservation_unit_helper = ReservationUnitFirstReservableTimeHelper(helper, reservation_unit)
+    reservable_time_span_helper = ReservableTimeSpanFirstReservableTimeHelper(
+        reservation_unit_helper,
+        original_reservable_time_span,
+    )
+    result = reservable_time_span_helper._find_first_reservable_time_span(
         normalised_reservable_time_spans=reservable_time_spans,
-        reservations=reservations,
-        minimum_duration_minutes=30,
+        reservation_time_spans=reservation_time_spans,
     )
 
     assert result == first_reservable_time
@@ -238,31 +259,32 @@ def test__find_first_reservable_time_span_for_reservation_unit__buffer_goes_thro
     # │ 0   1   2   3   4   5   6   7   8   9   10   │
     # │ ░░░░░░░░▁▁▁▁░░░░████░░░░▁▁▁▁░░░░▁▁▁▁░░░░░░░░ │
     # │                         ────────══────────   │
+
+    origin_hauki_resource = OriginHaukiResourceFactory(
+        id="999",
+        opening_hours_hash="test_hash",
+        latest_fetched_date=date(2024, 12, 31),
+    )
     reservation_unit = ReservationUnitFactory(
+        origin_hauki_resource=origin_hauki_resource,
         buffer_time_before=timedelta(minutes=120),
         buffer_time_after=timedelta(minutes=120),
         reservation_start_interval=ReservationStartInterval.INTERVAL_30_MINUTES.value,
     )
 
+    original_reservable_time_span = ReservableTimeSpanFactory(
+        resource=origin_hauki_resource,
+        start_datetime=_time(hour=2),
+        end_datetime=_time(hour=9),
+    )
+
     reservable_time_spans = [
-        TimeSpanElement(
-            start_datetime=_time(hour=2),
-            end_datetime=_time(hour=3),
-            is_reservable=True,
-        ),
-        TimeSpanElement(
-            start_datetime=_time(hour=6),
-            end_datetime=_time(hour=7),
-            is_reservable=True,
-        ),
-        TimeSpanElement(
-            start_datetime=_time(hour=8),
-            end_datetime=_time(hour=9),
-            is_reservable=True,
-        ),
+        TimeSpanElement(start_datetime=_time(hour=2), end_datetime=_time(hour=3), is_reservable=True),
+        TimeSpanElement(start_datetime=_time(hour=6), end_datetime=_time(hour=7), is_reservable=True),
+        TimeSpanElement(start_datetime=_time(hour=8), end_datetime=_time(hour=9), is_reservable=True),
     ]
 
-    reservations = [
+    reservation_time_spans = [
         TimeSpanElement(
             start_datetime=_time(hour=4),
             end_datetime=_time(hour=5),
@@ -270,11 +292,15 @@ def test__find_first_reservable_time_span_for_reservation_unit__buffer_goes_thro
         ),
     ]
 
-    result = find_first_reservable_time_span_for_reservation_unit(
-        reservation_unit=reservation_unit,
+    helper = FirstReservableTimeHelper(ReservationUnit.objects.none(), minimum_duration_minutes=30)
+    reservation_unit_helper = ReservationUnitFirstReservableTimeHelper(helper, reservation_unit)
+    reservable_time_span_helper = ReservableTimeSpanFirstReservableTimeHelper(
+        reservation_unit_helper,
+        original_reservable_time_span,
+    )
+    result = reservable_time_span_helper._find_first_reservable_time_span(
         normalised_reservable_time_spans=reservable_time_spans,
-        reservations=reservations,
-        minimum_duration_minutes=30,
+        reservation_time_spans=reservation_time_spans,
     )
 
     assert result == _time(hour=8)
