@@ -149,28 +149,12 @@ export function AllocatedCard({
     console.warn("MANDATORY: No allocated time slot");
   }
 
+  const [refresh, isRefreshLoading] = useRefreshApplications(refetchApplicationEvents);
+
   const [resetApplicationEvent, { loading: isResetLoading }] = useMutation<
     Mutation,
     MutationDeleteAllocatedTimeslotArgs
   >(DELETE_ALLOCATED_TIME_SLOT);
-
-  const [isRefetchLoading, setIsRefetchLoading] = React.useState(false);
-  const [, setSelection] = useSlotSelection();
-
-  // TODO copy pasta (make it into a hook)
-  // TODO this should disable sibling cards allocation while this is loading
-  // atm one can try to allocate multiple cards at the same time and all except the first will fail
-  const refresh = () => {
-    // NOTE this is slow so use a loading state to show the user that something is happening
-    // TODO this takes 3s to complete (on my local machine, so more in the cloud),
-    // should update the cache in the mutation instead (or do a single id query instead of refetching all)
-    setIsRefetchLoading(true);
-    refetchApplicationEvents().then(() => {
-      setIsRefetchLoading(false);
-      // Close all the cards (requires removing the selection)
-      setSelection([]);
-    });
-  };
 
   const handleRemoveAllocation = async () => {
     if (allocatedTimeSlot?.pk == null) {
@@ -258,13 +242,13 @@ export function AllocatedCard({
     console.warn("TODO: implement");
   };
 
-  // FIXME
-  const allocationBegin = 0; /*section?.allocatedBegin
-    ? parseApiTime(section?.allocatedBegin) ?? 0
-    : 0;*/
-  const allocationEnd = 0; /*section?.allocatedEnd
-    ? parseApiTime(section?.allocatedEnd ?? "") ?? 0
-    : 0; */
+  const allocationBegin = allocatedTimeSlot?.beginTime != null
+    ? parseApiTime(allocatedTimeSlot.beginTime) ?? 0
+    : 0;
+
+  const allocationEnd = allocatedTimeSlot?.endTime
+    ? parseApiTime(allocatedTimeSlot.endTime) ?? 0
+    : 0;
 
   const beginSeconds = applicationSection.reservationMinDuration ?? 0;
   const endSeconds = applicationSection.reservationMaxDuration ?? 0;
@@ -273,13 +257,15 @@ export function AllocatedCard({
     allocatedDurationMins < beginSeconds / 60 ||
     allocatedDurationMins > endSeconds / 60;
   const isMutationLoading = isResetLoading;
-  const isLoading = isMutationLoading || isRefetchLoading;
+  const isLoading = isMutationLoading || isRefreshLoading;
 
+  // FIXME
   const isAllocatedTimeMismatch = false; // isOutsideOfAllocatedTimes(section);
   const isTimeMismatch = isAllocatedTimeMismatch;
   const applicantName = applicationSection.application
     ? getApplicantName(applicationSection.application)
     : "-";
+
   return (
     <Wrapper>
       <ApplicationEventName>{applicationSection.name}</ApplicationEventName>
@@ -381,54 +367,38 @@ function isOutsideOfRequestedTimes(
   }
 }
 
-/// Right hand side single card
-/// Contains the single applicationScheduleEvent and its actions (accept / decline etc.)
-/// TODO either time slot or allocated time slot should be mandatory
-export function AllocationCard({
+type AcceptSlotMutationProps =
+  Pick<Props, "selection" | "applicationSection" | "reservationUnitOption"> & {
+    timeRange: SuitableTimeRangeNode | null,
+    refresh: () => void
+  }
+
+// TODO make into more generic
+// MutationF
+// MutationParams
+type RetVal = [
+  // TODO add the results to the promise
+  () => Promise<void>, //FetchResult<TData>>,
+  {
+    isLoading: boolean
+  }
+]
+
+function useAcceptSlotMutation({
+  selection,
+  timeRange,
   applicationSection,
   reservationUnitOption,
-  selection,
-  isAllocationEnabled,
-  refetchApplicationEvents,
-  timeSlot,
-}: Omit<Props, "allocatedTimeSlot">): JSX.Element {
+  // TODO await instead of calling a callback (alternatively chain a callback to the handle function but it's already red)
+  refresh,
+}: AcceptSlotMutationProps): RetVal {
   const { notifySuccess, notifyError } = useNotification();
   const { t } = useTranslation();
 
-  // TODO should cause a type error if both are null
-  if (timeSlot == null) {
-    // eslint-disable-next-line no-console
-    console.warn("MANDATORY: No time slot or allocated time slot");
-  }
-
-  // TODO reservationUnit should not be null (requires refactoring the parent component a bit)
-  if (reservationUnitOption?.pk == null) {
-    // eslint-disable-next-line no-console
-    console.warn("Invalid reservation unit option: missing pk");
-  }
-
-  const [acceptApplicationEvent, { loading: isAcceptLoading }] = useMutation<
+  const [acceptApplicationEvent, { loading: isLoading }] = useMutation<
     Mutation,
     MutationCreateAllocatedTimeslotArgs
   >(CREATE_ALLOCATED_TIME_SLOT);
-  const [isRefetchLoading, setIsRefetchLoading] = React.useState(false);
-  const [, setSelection] = useSlotSelection();
-
-  const timeRange = timeSlot;
-
-  // TODO this should disable sibling cards allocation while this is loading
-  // atm one can try to allocate multiple cards at the same time and all except the first will fail
-  const refresh = () => {
-    // NOTE this is slow so use a loading state to show the user that something is happening
-    // TODO this takes 3s to complete (on my local machine, so more in the cloud),
-    // should update the cache in the mutation instead (or do a single id query instead of refetching all)
-    setIsRefetchLoading(true);
-    refetchApplicationEvents().then(() => {
-      setIsRefetchLoading(false);
-      // Close all the cards (requires removing the selection)
-      setSelection([]);
-    });
-  };
 
   const handleAcceptSlot = async () => {
     if (selection.length === 0) {
@@ -523,6 +493,68 @@ export function AllocationCard({
     refresh();
   };
 
+  return [handleAcceptSlot, { isLoading }]
+}
+
+// side effects that should happen when a modification is made
+function useRefreshApplications(
+  fetchCallback: () => Promise<ApolloQueryResult<Query>>
+): [
+  () => Promise<void>,
+  boolean,
+] {
+  const [, setSelection] = useSlotSelection();
+  const [isRefetchLoading, setIsRefetchLoading] = React.useState(false);
+  // TODO this should disable sibling cards allocation while this is loading
+  // atm one can try to allocate multiple cards at the same time and all except the first will fail
+  const refresh = async () => {
+    // NOTE this is slow so use a loading state to show the user that something is happening
+    // TODO this takes 3s to complete (on my local machine, so more in the cloud),
+    // should update the cache in the mutation instead (or do a single id query instead of refetching all)
+    setIsRefetchLoading(true);
+    await fetchCallback()
+    setIsRefetchLoading(false);
+    // Close all the cards (requires removing the selection)
+    setSelection([]);
+  };
+
+  return [refresh, isRefetchLoading];
+}
+
+/// Right hand side single card
+/// Contains the single applicationScheduleEvent and its actions (accept / decline etc.)
+/// TODO either time slot or allocated time slot should be mandatory
+export function AllocationCard({
+  applicationSection,
+  reservationUnitOption,
+  selection,
+  isAllocationEnabled,
+  refetchApplicationEvents,
+  timeSlot,
+}: Omit<Props, "allocatedTimeSlot">): JSX.Element {
+  const { t } = useTranslation();
+
+  // TODO should cause a type error if both are null
+  if (timeSlot == null) {
+    // eslint-disable-next-line no-console
+    console.warn("MANDATORY: No time slot or allocated time slot");
+  }
+
+  // TODO reservationUnit should not be null (requires refactoring the parent component a bit)
+  if (reservationUnitOption?.pk == null) {
+    // eslint-disable-next-line no-console
+    console.warn("Invalid reservation unit option: missing pk");
+  }
+
+  const [refresh, isRefreshLoading] = useRefreshApplications(refetchApplicationEvents);
+
+  const [handleAcceptSlot, { isLoading: isAcceptLoading }] = useAcceptSlotMutation({
+    selection,
+    timeRange: timeSlot,
+    applicationSection,
+    reservationUnitOption,
+    refresh,
+  });
   const applicantName = applicationSection.application
     ? getApplicantName(applicationSection.application)
     : "-";
@@ -547,14 +579,14 @@ export function AllocationCard({
   const lastSelected = selection[selection.length-1]
   const selectionBegin = decodeTimeSlot(firstSelected)
   const selectionEnd = decodeTimeSlot(lastSelected)
-  const isTimeMismatch = isOutsideOfRequestedTimes(timeRange, selectionBegin.hour, selectionEnd.hour + 0.5);
+  const isTimeMismatch = isOutsideOfRequestedTimes(timeSlot, selectionBegin.hour, selectionEnd.hour + 0.5);
 
   // Duration checks
   const isTooShort = selectionDurationMins < beginSeconds / 60;
   const isTooLong = selectionDurationMins > endSeconds / 60;
   const durationIsInvalid = isTooShort || isTooLong;
   const isMutationLoading = isAcceptLoading;
-  const isLoading = isMutationLoading || isRefetchLoading;
+  const isLoading = isMutationLoading || isRefreshLoading;
 
   return (
     <Wrapper>
