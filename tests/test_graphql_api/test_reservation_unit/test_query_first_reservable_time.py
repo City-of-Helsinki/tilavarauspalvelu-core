@@ -784,8 +784,8 @@ def test__query_reservation_unit__first_reservable_time__reservation_unit_settin
                 reservation_unit_settings=ReservationUnitOverrides(
                     reservation_start_interval=ReservationStartInterval.INTERVAL_90_MINUTES.value,
                 ),
-                filters=ReservableFilters(time_start=time(hour=13, minute=31)),
-                result=ReservableNode(first_reservable_datetime=_datetime(day=20, hour=18)),
+                filters=ReservableFilters(time_start=time(hour=13, minute=1)),
+                result=ReservableNode(first_reservable_datetime=_datetime(day=20, hour=17)),
             ),
         }
     )
@@ -1930,6 +1930,75 @@ def test__query_reservation_unit__first_reservable_time__round_current_time_to_t
     assert response.node(0) == {
         "isClosed": False,
         "firstReservableDatetime": _datetime(hour=10, minute=15).isoformat(),
+    }
+
+
+########################################################################################################################
+
+
+@freezegun.freeze_time(NOW)
+def test__query_reservation_unit__first_reservable_time__extra_long_interval(graphql, reservation_unit):
+    """
+    Make sure that:
+    - The correct first reservable time is returned even with a long interval
+    - When the reservable time span is split in two, the intervals for the reservable time is correctly calculated from
+      the beginning of the original ReservableTimeSpan, not from the new split time span or beginning of the day.
+
+    ┌────────────────────────────────────────────────────┐
+    │ █ = Reservation                                    │
+    │ ░ = Not reservable                                 │
+    │ ▁ = Reservable                                     │
+    │ ═ = Valid reservation times due to interval        │
+    ├────────────────────────────────────────────────────┤
+    │ reservation_unit                                   │
+    │   0   2   4   6   8   10  12  14  16  18  20  22   │
+    │ 1 ░░░░░░░░░░░░░░░░░░▁▁▁▁▁▁▁▁██████▁▁▁▁▁▁░░░░░░░░░░ │
+    │                     ══  ══  ══  ══  ══             │
+    └────────────────────────────────────────────────────┘
+    """
+    reservation_unit.min_reservation_duration = timedelta(minutes=60)
+    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_120_MINUTES.value
+    reservation_unit.save()
+
+    # 2024-01-01 9:00 - 19:00 (8h)
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(hour=9),
+        end_datetime=_datetime(hour=19),
+    )
+
+    # 2024-01-01 13:00 - 16:00 (3h)
+    ReservationFactory.create_for_reservation_unit(
+        reservation_unit=reservation_unit,
+        begin=_datetime(hour=13),
+        end=_datetime(hour=16),
+    )
+
+    # Query without any filters.
+    # The first reservable time should be the beginning of the Reservable Time Span
+    response = graphql(reservation_units_reservable_query())
+    assert response.has_errors is False, response
+    assert response.node(0) == {
+        "isClosed": False,
+        "firstReservableDatetime": _datetime(hour=9).isoformat(),
+    }
+
+    # Query one minute after beginning of the Reservable Time Span
+    # The next interval is at 11:00.
+    response = graphql(reservation_units_reservable_query(reservable_time_start="09:01"))
+    assert response.has_errors is False, response
+    assert response.node(0) == {
+        "isClosed": False,
+        "firstReservableDatetime": _datetime(hour=11).isoformat(),
+    }
+
+    # Query one minute after the last interval
+    # Next interval are at 13:00 and 15:00, but the reservation ends at 16:00, so the next valid time is at 17:00
+    response = graphql(reservation_units_reservable_query(reservable_time_start="11:01"))
+    assert response.has_errors is False, response
+    assert response.node(0) == {
+        "isClosed": False,
+        "firstReservableDatetime": _datetime(hour=17).isoformat(),
     }
 
 
