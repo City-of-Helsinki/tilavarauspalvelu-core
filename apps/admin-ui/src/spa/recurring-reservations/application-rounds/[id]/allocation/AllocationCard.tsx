@@ -29,6 +29,7 @@ import {
   parseApiTime,
   timeSlotKeyToScheduleTime,
   createDurationString,
+  decodeTimeSlot,
 } from "./modules/applicationRoundAllocation";
 import {
   CREATE_ALLOCATED_TIME_SLOT,
@@ -362,6 +363,24 @@ function getTranslatedMutationError(err: ERROR_EXTENSION) {
   }
 }
 
+function isOutsideOfRequestedTimes(
+  time: SuitableTimeRangeNode | null,
+  begin: number,
+  end: number
+) {
+  if (time?.beginTime == null || time.endTime == null) {
+    return true;
+  }
+  const beginTime = parseApiTime(time.beginTime);
+  const endTime = parseApiTime(time.endTime);
+  if (beginTime == null || endTime == null) {
+    return true;
+  }
+  if (begin < beginTime || end > endTime) {
+    return true;
+  }
+}
+
 /// Right hand side single card
 /// Contains the single applicationScheduleEvent and its actions (accept / decline etc.)
 /// TODO either time slot or allocated time slot should be mandatory
@@ -519,14 +538,16 @@ export function AllocationCard({
 
   // Time interval checks
   const selectionDurationMins = selection.length * 30;
+  // TODO rename the begin and end it's duration not time
   const beginSeconds = applicationSection.reservationMinDuration ?? 0;
   const endSeconds = applicationSection.reservationMaxDuration ?? 0;
   const selectionDurationString = formatDuration(selectionDurationMins, t);
-  const isRequestedTimeMismatch = false; /*isOutsideOfRequestedTimes(
-    section,
-    selection
-  );*/
-  const isTimeMismatch = isRequestedTimeMismatch;
+  // TODO this should be cleaner, only pass things we need here
+  const firstSelected = selection[0]
+  const lastSelected = selection[selection.length-1]
+  const selectionBegin = decodeTimeSlot(firstSelected)
+  const selectionEnd = decodeTimeSlot(lastSelected)
+  const isTimeMismatch = isOutsideOfRequestedTimes(timeRange, selectionBegin.hour, selectionEnd.hour + 0.5);
 
   // Duration checks
   const isTooShort = selectionDurationMins < beginSeconds / 60;
