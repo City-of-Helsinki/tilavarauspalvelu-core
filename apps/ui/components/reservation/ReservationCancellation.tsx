@@ -9,12 +9,11 @@ import { OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
 import NotificationBox from "common/src/common/NotificationBox";
 import { fontMedium, H2 } from "common/src/common/typography";
-import {
+import type {
   Query,
   QueryReservationCancelReasonsArgs,
   ReservationCancellationMutationInput,
   ReservationCancellationMutationPayload,
-  ReservationType,
 } from "common/types/gql-types";
 import { Container as CommonContainer } from "common";
 import { IconButton, ShowAllContainer } from "common/src/components";
@@ -165,37 +164,30 @@ const ReservationCancellation = ({ id, apiBaseUrl }: Props): JSX.Element => {
 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [formState, setFormState] = useState<"unsent" | "sent">("unsent");
-  const [reservation, setReservation] = useState<ReservationType>();
-  const [reasons, setReasons] = useState<OptionType[]>([]);
 
-  useQuery(GET_RESERVATION, {
+  const { data: reservationData } = useQuery(GET_RESERVATION, {
     fetchPolicy: "no-cache",
+    skip: !id,
     variables: {
       pk: id,
     },
-    onCompleted: (data) => {
-      setReservation(data.reservationByPk);
-    },
   });
 
-  useQuery<Query, QueryReservationCancelReasonsArgs>(
-    GET_RESERVATION_CANCEL_REASONS,
-    {
-      fetchPolicy: "cache-first",
-      onCompleted: (data) => {
-        const nodes = filterNonNullable(
-          data.reservationCancelReasons?.edges.map((edge) => edge?.node)
-        );
-        if (nodes.length > 0)
-          setReasons(
-            nodes.map((node) => ({
-              label: getTranslation(node, "reason"),
-              value: node?.pk != null ? node?.pk : "",
-            }))
-          );
-      },
-    }
-  );
+  const reservation = reservationData?.reservationByPk ?? null;
+
+  const { data: cancelReasonsData } = useQuery<
+    Query,
+    QueryReservationCancelReasonsArgs
+  >(GET_RESERVATION_CANCEL_REASONS, {
+    fetchPolicy: "cache-first",
+  });
+
+  const reasons: { label: string; value: number }[] = filterNonNullable(
+    cancelReasonsData?.reservationCancelReasons?.edges.map((edge) => edge?.node)
+  ).map((node) => ({
+    label: getTranslation(node, "reason"),
+    value: node?.pk != null ? node?.pk : 0,
+  }));
 
   const [cancelReservation, { data, loading, error }] = useMutation<
     { cancelReservation: ReservationCancellationMutationPayload },
