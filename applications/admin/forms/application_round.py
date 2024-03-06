@@ -6,18 +6,18 @@ from tinymce.widgets import TinyMCE
 
 from applications.choices import ApplicationRoundStatusChoice
 from applications.models import ApplicationRound
-from common.fields.forms import EnumChoiceField, ModelMultipleChoiceFilteredField, disabled_widget
+from common.fields.forms import ModelMultipleChoiceFilteredField, disabled_widget
 
 __all__ = [
     "ApplicationRoundAdminForm",
 ]
 
-from reservation_units.models import Purpose, ReservationUnit
+from reservation_units.models import ReservationUnit
+from reservations.models import ReservationPurpose
 
 
 class ApplicationRoundAdminForm(forms.ModelForm):
-    status = EnumChoiceField(
-        enum=ApplicationRoundStatusChoice,
+    status = forms.CharField(
         widget=disabled_widget,
         required=False,
         disabled=True,
@@ -46,7 +46,7 @@ class ApplicationRoundAdminForm(forms.ModelForm):
     )
 
     purposes = ModelMultipleChoiceFilteredField(
-        queryset=Purpose.objects.all(),
+        queryset=ReservationPurpose.objects.all(),
         is_stacked=False,
         label=_("Purposes"),
         help_text=_("Purposes that are allowed in this application period."),

@@ -19,8 +19,7 @@ class ApplicationSectionAdminForm(forms.ModelForm):
         help_text=_("Application this section is in."),
     )
 
-    status = EnumChoiceField(
-        enum=ApplicationSectionStatusChoice,
+    status = forms.CharField(
         widget=disabled_widget,
         required=False,
         disabled=True,
