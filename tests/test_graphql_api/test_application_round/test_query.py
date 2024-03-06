@@ -43,6 +43,9 @@ def test_can_query_application_rounds__all_fields(graphql):
         serviceSector {
             nameFi
         }
+        termsOfUse {
+            nameFi
+        }
         status
         statusTimestamp
         applicationsCount
@@ -75,6 +78,7 @@ def test_can_query_application_rounds__all_fields(graphql):
         "reservationUnits": [],
         "purposes": [],
         "serviceSector": {"nameFi": application_round.service_sector.name_fi},
+        "termsOfUse": {"nameFi": application_round.terms_of_use.name_fi},
         "status": application_round.status,
         "statusTimestamp": application_round.status_timestamp.isoformat(),
         "applicationsCount": 0,

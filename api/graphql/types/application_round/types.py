@@ -32,6 +32,7 @@ class ApplicationRoundNode(DjangoNode):
             "pk",
             "name",
             "target_group",
+            "terms_of_use",
             "criteria",
             "application_period_begin",
             "application_period_end",
