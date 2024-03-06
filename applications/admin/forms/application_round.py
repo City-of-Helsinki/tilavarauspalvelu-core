@@ -2,18 +2,19 @@ from typing import Any
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import pgettext_lazy
 from tinymce.widgets import TinyMCE
 
 from applications.choices import ApplicationRoundStatusChoice
 from applications.models import ApplicationRound
 from common.fields.forms import ModelMultipleChoiceFilteredField, disabled_widget
+from reservation_units.models import ReservationUnit
+from reservations.models import ReservationPurpose
+from terms_of_use.models import TermsOfUse
 
 __all__ = [
     "ApplicationRoundAdminForm",
 ]
-
-from reservation_units.models import ReservationUnit
-from reservations.models import ReservationPurpose
 
 
 class ApplicationRoundAdminForm(forms.ModelForm):
@@ -52,6 +53,12 @@ class ApplicationRoundAdminForm(forms.ModelForm):
         help_text=_("Purposes that are allowed in this application period."),
     )
 
+    terms_of_use = forms.ModelChoiceField(
+        queryset=TermsOfUse.objects.filter(terms_type=TermsOfUse.TERMS_TYPE_RECURRING).all(),
+        label=pgettext_lazy("ApplicationRound", "Terms of use"),
+        help_text=_("Terms of use for the application round."),
+    )
+
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         instance: ApplicationRound | None = kwargs.get("instance", None)
         if instance:
@@ -76,6 +83,7 @@ class ApplicationRoundAdminForm(forms.ModelForm):
             "sent_date",
             "purposes",
             "service_sector",
+            "terms_of_use",
             "criteria",
         ]
         widgets = {
@@ -98,6 +106,7 @@ class ApplicationRoundAdminForm(forms.ModelForm):
             "sent_date": _("Sent date"),
             "purposes": _("Purposes"),
             "service_sector": _("Service sector"),
+            "terms_of_use": pgettext_lazy("ApplicationRound", "Terms of use"),
             "criteria": _("Application criteria"),
             "criteria_fi": _("Application criteria (Finnish)"),
             "criteria_en": _("Application criteria (English)"),
@@ -120,6 +129,7 @@ class ApplicationRoundAdminForm(forms.ModelForm):
             "sent_date": _("When the application round applications were sent to applicants."),
             "purposes": _("Purposes that are allowed in this application period."),
             "service_sector": _("Service sector for the application round."),
+            "terms_of_use": _("Terms of use for the application round."),
             "criteria": _("Application criteria for the application round."),
             "criteria_fi": _("Application criteria for the application round in Finnish."),
             "criteria_en": _("Application criteria for the application round in English."),

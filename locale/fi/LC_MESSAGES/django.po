@@ -297,6 +297,15 @@ msgid "Purposes that are allowed in this application period."
 msgstr "Kausivarauskierroksella mahdolliset käyttötarkoitukset."
 
 #: applications/admin/forms/application_round.py
+msgctxt "ApplicationRound"
+msgid "Terms of use"
+msgstr "Sopimusehdot"
+
+#: applications/admin/forms/application_round.py
+msgid "Terms of use for the application round."
+msgstr "Kausivarauskierroksen sopimusehdot."
+
+#: applications/admin/forms/application_round.py
 #: applications/admin/forms/application_section.py
 #: applications/admin/forms/city.py applications/admin/forms/organization.py
 #: reservation_units/models/equipment.py reservation_units/models/keyword.py
@@ -455,6 +464,7 @@ msgid "Application this section is in."
 msgstr "Hakemus jolle tämä osa kuuluu."
 
 #: applications/admin/forms/application_section.py
+#, python-format
 msgid ""
 "%(unallocated)s: Section has been created, but application round is still "
 "open. <br>%(in_allocation)s: Application round has closed, but the section "
