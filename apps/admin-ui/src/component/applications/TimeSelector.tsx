@@ -9,6 +9,7 @@ import {
 } from "common/types/gql-types";
 import { convertWeekday } from "common/src/conversion";
 import { filterNonNullable } from "common/src/helpers";
+import { WEEKDAYS } from "common/src/const";
 
 type Cell = {
   hour: number;
@@ -16,8 +17,6 @@ type Cell = {
   priority: Priority | null;
   key: string;
 };
-
-const weekdays = [0, 1, 2, 3, 4, 5, 6] as const;
 
 function cellLabel(row: number): string {
   return `${row} - ${row + 1}`;
@@ -29,11 +28,11 @@ function timeRangeToCell(timeRanges: SuitableTimeRangeNode[]): Cell[][] {
 
   const cells: Cell[][] = [];
 
-  for (const j of weekdays) {
+  for (const j of WEEKDAYS) {
     const day: Cell[] = [];
     for (let i = firstSlotStart; i <= lastSlotStart; i += 1) {
       day.push({
-        key: `${i}-${j}`,
+        key: `${j}-${i}`,
         hour: i,
         label: cellLabel(i),
         priority: null,
@@ -267,8 +266,8 @@ export function TimeSelector({
   return (
     <Wrapper>
       <CalendarContainer>
-        {weekdays.map((c, i) => (
-          <Day key={`day-${c}`} head={t(`dayLong.${c}`)} cells={cells[i]} />
+        {WEEKDAYS.map((d) => (
+          <Day key={`day-${d}`} head={t(`dayLong.${d}`)} cells={cells[d]} />
         ))}
       </CalendarContainer>
       <LegendContainer>

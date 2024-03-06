@@ -11,17 +11,6 @@ export const defaultLanguage = "fi";
 // Changing it without changing the backend will break all form submits.
 export const languages = ["fi", "sv", "en"];
 
-// @deprecated TODO this should be removed use numbers or translations instead
-export const weekdays = [
-  "monday",
-  "tuesday",
-  "wednesday",
-  "thursday",
-  "friday",
-  "saturday",
-  "sunday",
-];
-
 export const PUBLIC_URL = env.NEXT_PUBLIC_BASE_URL ?? "";
 
 export const LIST_PAGE_SIZE = 50;

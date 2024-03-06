@@ -13,6 +13,7 @@ import {
 import { breakpoints } from "common";
 import { type Day } from "common/src/conversion";
 import { transformWeekday } from "common/src/conversion";
+import { WEEKDAYS } from "common/src/const";
 import { ALLOCATION_CALENDAR_TIMES } from "@/common/const";
 import {
   applicationEventSchedulesToCells,
@@ -188,8 +189,6 @@ const isSlotLast = (selection: string[], slot: string): boolean => {
     : !selection.includes(`${day}-${hour + 1}-00`);
 };
 
-const weekdays = [0, 1, 2, 3, 4, 5, 6] as const;
-
 // Assume that this is already filtered by the day
 // TODO Not a good name it should match the Cell type (which isn't great either)
 type Slot = {
@@ -253,7 +252,7 @@ export function AllocationCalendar({
           );
         })}
       </div>
-      {weekdays.map((day) => {
+      {WEEKDAYS.map((day) => {
         // Only show allocated that match the unit and day
         const timeslots = filterNonNullable(
           aesForThisUnit

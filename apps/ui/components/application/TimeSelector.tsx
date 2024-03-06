@@ -6,7 +6,7 @@ import type { ApplicationEventSchedulePriority } from "common/types/common";
 import { fontBold, fontRegular } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { fromMondayFirstUnsafe } from "common/src/helpers";
-import { weekdays } from "@/modules/const";
+import { WEEKDAYS } from "common/src/const";
 import { arrowDown, arrowUp, MediumButton } from "@/styles/util";
 import { TimePreview } from "./TimePreview";
 import { type ApplicationEventScheduleFormType } from "./Form";
@@ -446,16 +446,16 @@ export function TimeSelector({
         aria-labelledby={`timeSelector-${index}`}
         role="listbox"
       >
-        {weekdays.map((c, i) => (
+        {WEEKDAYS.map((day) => (
           <Day
             paintState={paintState}
             setPaintState={setPaintState}
             painting={painting}
             setPainting={setPainting}
-            key={`day-${c}`}
-            head={t(`common:weekDayLong.${fromMondayFirstUnsafe(i)}`)}
-            labelHead={t(`common:weekDay.${fromMondayFirstUnsafe(i)}`)}
-            cells={cells[i]}
+            key={`day-${day}`}
+            head={t(`common:weekDayLong.${fromMondayFirstUnsafe(day)}`)}
+            labelHead={t(`common:weekDay.${fromMondayFirstUnsafe(day)}`)}
+            cells={cells[day]}
             setCellValue={setCellValue}
             priority={priority}
           />

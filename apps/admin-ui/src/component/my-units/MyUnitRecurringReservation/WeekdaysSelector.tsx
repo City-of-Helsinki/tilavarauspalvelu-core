@@ -5,6 +5,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
+import { WEEKDAYS } from "common/src/const";
 
 const Wrapper = styled.div`
   display: flex;
@@ -73,8 +74,6 @@ const WarningIcon = () => (
   </svg>
 );
 
-const weekdays = [0, 1, 2, 3, 4, 5, 6];
-
 type Props = {
   label: string;
   value?: number[];
@@ -83,13 +82,13 @@ type Props = {
   errorText?: string;
 };
 
-const WeekdaysSelector = ({
+export function WeekdaysSelector({
   label,
   value = [],
   disabled = false,
   onChange,
   errorText,
-}: Props) => {
+}: Props) {
   const { t } = useTranslation();
   const [selectedDays, setSelectedDays] = useState<number[]>(value);
 
@@ -112,7 +111,7 @@ const WeekdaysSelector = ({
     <div>
       <Label>{label}</Label>
       <Wrapper>
-        {weekdays.map((weekday) => (
+        {WEEKDAYS.map((weekday) => (
           <Day
             key={`weekday-${weekday}`}
             disabled={disabled}
@@ -132,6 +131,4 @@ const WeekdaysSelector = ({
       )}
     </div>
   );
-};
-
-export { WeekdaysSelector };
+}

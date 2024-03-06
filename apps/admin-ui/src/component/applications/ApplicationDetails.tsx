@@ -21,6 +21,7 @@ import {
 } from "common/types/gql-types";
 import { formatDuration } from "common/src/common/util";
 import { convertWeekday, type Day } from "common/src/conversion";
+import { WEEKDAYS } from "common/src/const";
 import { formatNumber, formatDate, parseAgeGroups } from "@/common/util";
 import { useNotification } from "@/context/NotificationContext";
 import ScrollIntoView from "@/common/ScrollIntoView";
@@ -38,8 +39,6 @@ import { ValueBox } from "./ValueBox";
 import { getApplicantName, getApplicationStatusColor } from "./util";
 import { TimeSelector } from "./TimeSelector";
 import { APPLICATION_ADMIN_QUERY } from "./queries";
-
-const weekdays = [0, 1, 2, 3, 4, 5, 6] as const;
 
 function printSuitableTimes(
   timeRanges: SuitableTimeRangeNode[],
@@ -268,7 +267,7 @@ function SchedulesContent({
     priority === Priority.Primary
       ? t("ApplicationEvent.primarySchedules")
       : t("ApplicationEvent.secondarySchedules");
-  const calendar = weekdays.map((day) => {
+  const calendar = WEEKDAYS.map((day) => {
     const schedulesTxt = printSuitableTimes(schedules, day, priority);
     return { day, schedulesTxt };
   });

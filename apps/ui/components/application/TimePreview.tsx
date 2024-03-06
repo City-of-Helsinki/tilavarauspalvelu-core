@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { fontBold, H4 } from "common/src/common/typography";
 import { fromMondayFirstUnsafe } from "common/src/helpers";
-import { weekdays } from "../../modules/const";
+import { WEEKDAYS } from "common/src/const";
 import { ApplicationEventScheduleFormType } from "./Form";
 
 type Props = {
@@ -22,17 +22,17 @@ const Label = styled.div`
   padding-right: 4px;
 `;
 
-const Weekdays = ({
+function Weekdays({
   schedules,
 }: {
   schedules: ApplicationEventScheduleFormType[];
-}) => {
+}) {
   const { t } = useTranslation();
   return (
     <>
-      {weekdays.map((day, index) => {
+      {WEEKDAYS.map((day) => {
         const value = schedules
-          .filter((s) => s.day === index)
+          .filter((s) => s.day === day)
           .map(
             (cur) =>
               `${Number(cur.begin.substring(0, 2))}-${Number(
@@ -43,7 +43,7 @@ const Weekdays = ({
         return (
           <WeekWrapper key={day}>
             <Label>
-              {t(`common:weekDayLong.${fromMondayFirstUnsafe(index)}`)}
+              {t(`common:weekDayLong.${fromMondayFirstUnsafe(day)}`)}
               {value && ":"}
             </Label>
             <div>{value}</div>
@@ -52,7 +52,7 @@ const Weekdays = ({
       })}
     </>
   );
-};
+}
 
 const Wrapper = styled.div`
   border: 2px solid var(--color-black);
