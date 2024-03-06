@@ -90,3 +90,7 @@ class AllocatedTimeSlotFilterSet(ModelFilterSet):
     @staticmethod
     def order_by_applicant(qs: AllocatedTimeSlotQuerySet, desc: bool) -> models.QuerySet:
         return qs.order_by_applicant(desc=desc)
+
+    @staticmethod
+    def order_by_day_of_the_week(qs: AllocatedTimeSlotQuerySet, desc: bool) -> models.QuerySet:
+        return qs.order_by_day_of_the_week(desc=desc)
