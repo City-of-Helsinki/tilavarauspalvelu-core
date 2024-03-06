@@ -10,7 +10,7 @@ from applications.choices import ApplicationRoundStatusChoice
 from common.date_utils import DEFAULT_TIMEZONE
 from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import ReservationUnit
-from reservations.choices import ReservationStateChoice
+from reservations.choices import ReservationStateChoice, ReservationTypeChoice
 from tests.factories import (
     ApplicationRoundFactory,
     OriginHaukiResourceFactory,
@@ -1999,6 +1999,82 @@ def test__query_reservation_unit__first_reservable_time__extra_long_interval(gra
     assert response.node(0) == {
         "isClosed": False,
         "firstReservableDatetime": _datetime(hour=17).isoformat(),
+    }
+
+
+########################################################################################################################
+
+
+@freezegun.freeze_time(NOW)
+def test__query_reservation_unit__first_reservable_time__blocked_type_reservation_can_overlap_with_buffer(
+    graphql, reservation_unit
+):
+    """
+    Make sure that:
+    - Buffers from new reservations can overlap with the BLOCKED-Type Reservation
+    - BLOCKED-Type Reservation buffers are ignored even if they are set
+    - BLOCKED-Type Reservations still block new reservations that overlap with them
+
+    ┌────────────────────────────────────────────────────┐
+    │ █ = BLOCKED-Type Reservation                       │
+    │ ░ = Not reservable                                 │
+    │ ▁ = Reservable                                     │
+    │ ═ = First reservable time                          │
+    │ ─ = Reservation Unit Buffer                        │
+    ├────────────────────────────────────────────────────┤
+    │ reservation_unit                                   │
+    │   0   2   4   6   8   10  12  14  16  18  20  22   │
+    │ 1 ░░░░░░░░░░░░░░░░░░░░▁▁▁▁████▁▁▁▁░░░░░░░░░░░░░░░░ │
+    │                     ──══──                         │
+    │                       ──══──                       │
+    │                             ──══──                 │
+    └────────────────────────────────────────────────────┘
+    """
+    reservation_unit.min_reservation_duration = timedelta(minutes=60)
+    reservation_unit.buffer_time_before = timedelta(minutes=60)
+    reservation_unit.buffer_time_after = timedelta(minutes=60)
+    reservation_unit.save()
+
+    # 2024-01-01 10:00 - 16:00 (6h)
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(hour=10),
+        end_datetime=_datetime(hour=16),
+    )
+
+    # 2024-01-01 12:00 - 14:00 (2h)
+    ReservationFactory.create(
+        reservation_unit=[reservation_unit],
+        begin=_datetime(hour=12),
+        end=_datetime(hour=14),
+        buffer_time_before=timedelta(minutes=300),  # This buffer should be completely ignored
+        buffer_time_after=timedelta(minutes=300),  # This buffer should be completely ignored
+        type=ReservationTypeChoice.BLOCKED,
+        state=ReservationStateChoice.CONFIRMED,
+    )
+
+    # Buffer does not overlap with BLOCKED reservation at all
+    response = graphql(reservation_units_reservable_query(reservable_time_start=time(hour=10).isoformat()))
+    assert response.has_errors is False, response
+    assert response.node(0) == {
+        "isClosed": False,
+        "firstReservableDatetime": _datetime(hour=10).isoformat(),
+    }
+
+    # Buffer overlaps with BLOCKED reservation from the end, which should be allowed
+    response = graphql(reservation_units_reservable_query(reservable_time_start=time(hour=11).isoformat()))
+    assert response.has_errors is False, response
+    assert response.node(0) == {
+        "isClosed": False,
+        "firstReservableDatetime": _datetime(hour=11).isoformat(),
+    }
+
+    # Buffer overlaps with BLOCKED reservation from the start, which should be allowed
+    response = graphql(reservation_units_reservable_query(reservable_time_start=time(hour=12).isoformat()))
+    assert response.has_errors is False, response
+    assert response.node(0) == {
+        "isClosed": False,
+        "firstReservableDatetime": _datetime(hour=14).isoformat(),
     }
 
 

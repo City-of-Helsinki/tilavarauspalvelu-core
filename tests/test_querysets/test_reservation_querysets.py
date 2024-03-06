@@ -5,7 +5,7 @@ from django.utils.timezone import get_current_timezone
 
 from opening_hours.utils.time_span_element import TimeSpanElement
 from reservation_units.models import ReservationUnit
-from reservations.choices import ReservationStateChoice
+from reservations.choices import ReservationStateChoice, ReservationTypeChoice
 from reservations.models import Reservation
 from tests.factories import (
     ReservationFactory,
@@ -44,6 +44,7 @@ def _create_test_reservations_for_all_reservation_units() -> None:
             reservation_unit=[reservation_unit],
             user=None,
             state=ReservationStateChoice.CREATED,
+            type=ReservationTypeChoice.NORMAL,
         )
 
 
@@ -92,7 +93,7 @@ def test__get_affecting_reservations__only_resources():
 
     _create_test_reservations_for_all_reservation_units()
 
-    all_closed_time_spans = Reservation.objects.get_affecting_reservations_as_closed_time_spans(
+    all_closed_time_spans, _ = Reservation.objects.get_affecting_reservations_as_closed_time_spans(
         reservation_unit_queryset=ReservationUnit.objects.all(),
         start_date=_datetime(month=1).date(),
         end_date=_datetime(month=12).date(),
@@ -135,7 +136,7 @@ def test__get_affecting_reservations__only_spaces():
 
     _create_test_reservations_for_all_reservation_units()
 
-    all_closed_time_spans = Reservation.objects.get_affecting_reservations_as_closed_time_spans(
+    all_closed_time_spans, _ = Reservation.objects.get_affecting_reservations_as_closed_time_spans(
         reservation_unit_queryset=ReservationUnit.objects.all(),
         start_date=_datetime(month=1).date(),
         end_date=_datetime(month=12).date(),
@@ -247,7 +248,7 @@ def test__get_affecting_reservations__resources_and_spaces():
 
     _create_test_reservations_for_all_reservation_units()
 
-    all_closed_time_spans = Reservation.objects.get_affecting_reservations_as_closed_time_spans(
+    all_closed_time_spans, _ = Reservation.objects.get_affecting_reservations_as_closed_time_spans(
         reservation_unit_queryset=ReservationUnit.objects.all(),
         start_date=_datetime(month=1).date(),
         end_date=_datetime(month=12).date(),
