@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 from applications.choices import ApplicationStatusChoice
 from applications.models import Application
-from common.fields.forms import EnumChoiceField, disabled_widget
+from common.fields.forms import disabled_widget
 
 __all__ = [
     "ApplicationAdminForm",
@@ -11,8 +11,7 @@ __all__ = [
 
 
 class ApplicationAdminForm(forms.ModelForm):
-    status = EnumChoiceField(
-        enum=ApplicationStatusChoice,
+    status = forms.CharField(
         widget=disabled_widget,
         required=False,
         disabled=True,
