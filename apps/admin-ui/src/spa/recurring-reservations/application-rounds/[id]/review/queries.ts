@@ -1,11 +1,13 @@
 import { gql } from "@apollo/client";
 import {
   APPLICANT_NAME_FRAGMENT,
+  APPLICATION_DURATION_FRAGMENT,
   APPLICATION_SECTION_FRAGMENT,
 } from "common/src/queries/application";
 
 export const APPLICATIONS_QUERY = gql`
   ${APPLICANT_NAME_FRAGMENT}
+  ${APPLICATION_DURATION_FRAGMENT}
   query getApplications(
     $applicationRound: Int!
     $unit: [Int]
@@ -34,6 +36,7 @@ export const APPLICATIONS_QUERY = gql`
           applicationSections {
             name
             pk
+            ...ApplicationDurationFragment
             reservationUnitOptions {
               preferredOrder
               reservationUnit {

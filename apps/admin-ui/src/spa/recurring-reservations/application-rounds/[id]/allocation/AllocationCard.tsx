@@ -18,6 +18,7 @@ import {
 } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { NotificationInline } from "common/src/components/NotificationInline";
+import { convertWeekday } from "common/src/conversion";
 import { SemiBold } from "common";
 import { getApplicantName } from "@/component/applications/util";
 import { formatDuration } from "@/common/util";
@@ -36,7 +37,6 @@ import {
   DELETE_ALLOCATED_TIME_SLOT,
 } from "./queries";
 import { useSlotSelection } from "./hooks";
-import { convertWeekday } from "common/src/conversion";
 
 type Props = {
   applicationSection: ApplicationSectionNode;

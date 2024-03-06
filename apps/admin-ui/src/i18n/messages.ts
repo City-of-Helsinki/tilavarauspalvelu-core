@@ -699,6 +699,9 @@ const translations: ITranslations = {
         generic: ["Ilmoituksen tallennus epäonnistui"],
         alreadyExists: ["Ilmoitus on jo olemassa"],
         missingMessage: ["Ilmoituksen viesti puuttuu"],
+        // TODO this is based on the ERROR_CODES which are common to all mutations,
+        // we could pass the object type as a variable so we can reuse the same error message.
+        NOT_FOUND: ["Ilmoitusta ei löytynyt"],
         noMutationPermission: ["Ei oikeutta muokata ilmoitusta"],
       },
       deleteFailed: {

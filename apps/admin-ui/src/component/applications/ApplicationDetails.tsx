@@ -19,6 +19,8 @@ import {
   Priority,
   type QueryApplicationArgs,
 } from "common/types/gql-types";
+import { formatDuration } from "common/src/common/util";
+import { convertWeekday, type Day } from "common/src/conversion";
 import { formatNumber, formatDate, parseAgeGroups } from "@/common/util";
 import { useNotification } from "@/context/NotificationContext";
 import ScrollIntoView from "@/common/ScrollIntoView";
@@ -28,16 +30,14 @@ import { Accordion as HDSAccordion } from "@/common/hds-fork/Accordion";
 import Loader from "@/component/Loader";
 import { ApplicationWorkingMemo } from "@/component/WorkingMemo";
 import ShowWhenTargetInvisible from "@/component/ShowWhenTargetInvisible";
+import StickyHeader from "@/component/StickyHeader";
+import StatusBlock from "@/component/StatusBlock";
+import { BirthDate } from "@/component/BirthDate";
 import { Container } from "@/styles/layout";
 import { ValueBox } from "./ValueBox";
 import { getApplicantName, getApplicationStatusColor } from "./util";
 import { TimeSelector } from "./TimeSelector";
-import StickyHeader from "../StickyHeader";
-import StatusBlock from "../StatusBlock";
 import { APPLICATION_ADMIN_QUERY } from "./queries";
-import { BirthDate } from "../BirthDate";
-import { formatDuration } from "common/src/common/util";
-import { convertWeekday, type Day } from "common/src/conversion";
 
 const weekdays = [0, 1, 2, 3, 4, 5, 6] as const;
 
@@ -57,8 +57,32 @@ function printSuitableTimes(
 
 const StyledStatusBlock = styled(StatusBlock)`
   margin: 0;
-  margin-top: var(--spacing-l);
 `;
+
+function getApplicationStatusIcon(status: ApplicationStatusChoice): {
+  icon: ReactNode | null;
+  style: React.CSSProperties;
+} {
+  switch (status) {
+    case ApplicationStatusChoice.Handled:
+      return {
+        icon: (
+          <IconCheck aria-hidden style={{ color: "var(--color-success)" }} />
+        ),
+        style: { fontSize: "var(--fontsize-heading-xs)" },
+      };
+    case ApplicationStatusChoice.ResultsSent:
+      return {
+        icon: <IconEnvelope aria-hidden />,
+        style: { fontSize: "var(--fontsize-heading-xs)" },
+      };
+    default:
+      return {
+        icon: null,
+        style: {},
+      };
+  }
+}
 
 function ApplicationStatusBlock({
   status,
@@ -69,39 +93,25 @@ function ApplicationStatusBlock({
 }): JSX.Element {
   const { t } = useTranslation();
 
-  let icon: ReactNode | null;
-  let style: React.CSSProperties = {};
-  switch (status) {
-    case ApplicationStatusChoice.Handled:
-      icon = (
-        <IconCheck aria-hidden style={{ color: "var(--color-success)" }} />
-      );
-      style = { fontSize: "var(--fontsize-heading-xs)" };
-      break;
-    case ApplicationStatusChoice.ResultsSent:
-      icon = <IconEnvelope aria-hidden />;
-      style = { fontSize: "var(--fontsize-heading-xs)" };
-      break;
-    default:
-  }
-
+  const { icon, style } = getApplicationStatusIcon(status);
   return (
-    <div>
-      <StyledStatusBlock
-        statusStr={t(`Application.statuses.${status}`)}
-        color={getApplicationStatusColor(status, "l")}
-        icon={icon}
-        className={className}
-        style={style}
-      />
-    </div>
+    <StyledStatusBlock
+      statusStr={t(`Application.statuses.${status}`)}
+      color={getApplicationStatusColor(status, "l")}
+      icon={icon}
+      className={className}
+      style={style}
+    />
   );
 }
 
 const CardContentContainer = styled.div`
   display: grid;
   gap: var(--spacing-m);
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
+  @media (min-width: ${breakpoints.m}) {
+    grid-template-columns: 1fr 1fr;
+  }
 `;
 
 const EventProps = styled.div`
@@ -191,6 +201,15 @@ const StyledH5 = styled(H5)`
   margin-bottom: var(--spacing-2-xs);
 `;
 
+// TODO this is duplicated in other pages (H1 + status tag)
+// TODO should not use margin-top almost ever. The container (reused in all layouts) should have the correct padding.
+// spacing between elements should be either gap if possible or margin-bottom if not.
+const HeadingContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--spacing-s);
+`;
+
 const KV = ({
   k,
   v,
@@ -267,7 +286,7 @@ function SchedulesContent({
   );
 }
 
-function ApplicationEventDetails({
+function ApplicationSectionDetails({
   section,
   application,
 }: {
@@ -289,6 +308,15 @@ function ApplicationEventDetails({
           section.reservationsEndDate
         )}`
       : "No dates";
+
+  const rows = filterNonNullable(section?.reservationUnitOptions).map(
+    (ru, index) => ({
+      index: index + 1,
+      pk: ru?.pk,
+      unit: ru?.reservationUnit?.unit?.nameFi,
+      name: ru?.reservationUnit?.nameFi,
+    })
+  );
 
   return (
     <ScrollIntoView key={section.pk} hash={hash}>
@@ -326,15 +354,7 @@ function ApplicationEventDetails({
         </EventProps>
         <H4>{t("ApplicationEvent.requestedReservationUnits")}</H4>
         <StyledTable
-          // TODO why is this mixed into the JSX
-          rows={filterNonNullable(section?.reservationUnitOptions).map(
-            (ru, index) => ({
-              index: index + 1,
-              pk: ru?.pk,
-              unit: ru?.reservationUnit?.unit?.nameFi,
-              name: ru?.reservationUnit?.nameFi,
-            })
-          )}
+          rows={rows}
           cols={[
             { headerName: "a", key: "index" },
             { headerName: "b", key: "unit" },
@@ -404,20 +424,11 @@ function ApplicationDetails({
   const customerName = application != null ? getApplicantName(application) : "";
   // TODO where is this defined in the application form?
   const homeCity = application?.homeCity?.nameFi ?? "-";
-  // ???? why
-  /*
-  const applicationEvents = filterNonNullable(
-    application?.applicationSections
-  ).map((ae) => ({
-    ...ae,
-    eventReservationUnits: orderBy(ae.reservationUnitOptions, "priority", "asc"),
-    applicationEventSchedules: orderBy(
-      ae.applicationEventSchedules,
-      "begin",
-      "asc"
-    ),
-  }));
-  */
+
+  // TODO (test these and either change the query to do the sorting or sort on the client)
+  // sort reservationUnitOptions by priority
+  // sort applicationSections by "begin" date (test case would be to have the second section begin before the first)
+
   const applicationSections = filterNonNullable(
     application?.applicationSections
   );
@@ -454,13 +465,15 @@ function ApplicationDetails({
           tagline={`${t("Application.id")}: ${application.pk}`}
         />
       </ShowWhenTargetInvisible>
-      <Container style={{ marginBottom: "6rem" }}>
-        {application.status != null && (
-          <ApplicationStatusBlock status={application.status} />
-        )}
-        <H2 ref={ref} data-testid="application-details__heading--main">
-          {customerName}
-        </H2>
+      <Container>
+        <HeadingContainer>
+          <H2 ref={ref} style={{ margin: "0" }}>
+            {customerName}
+          </H2>
+          {application.status != null && (
+            <ApplicationStatusBlock status={application.status} />
+          )}
+        </HeadingContainer>
         <PreCard>
           {t("Application.applicationReceivedTime")}{" "}
           {formatDate(application.lastModifiedDate, "d.M.yyyy HH:mm")}
@@ -504,7 +517,7 @@ function ApplicationDetails({
           />
         </HDSAccordion>
         {applicationSections.map((section) => (
-          <ApplicationEventDetails
+          <ApplicationSectionDetails
             section={section}
             application={application}
             key={section.pk}

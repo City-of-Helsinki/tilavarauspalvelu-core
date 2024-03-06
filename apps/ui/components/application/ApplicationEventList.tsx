@@ -9,12 +9,12 @@ import {
   Priority,
 } from "common/types/gql-types";
 import { getTranslation } from "common/src/common/util";
+import { convertWeekday } from "common/src/conversion";
 import { TimePreview } from "./TimePreview";
 import { StyledLabelValue, TimePreviewContainer } from "./styled";
 import { TwoColumnContainer, FormSubHeading } from "../common/common";
 import { AccordionWithState as Accordion } from "../common/Accordion";
 import { UnitList } from "./UnitList";
-import { convertWeekday } from "common/src/conversion";
 
 const filterPrimary = (n: SuitableTimeRangeNode) =>
   n.priority === Priority.Primary;

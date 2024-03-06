@@ -173,8 +173,8 @@ function transformOrderBy(
           ];
     case "allocated_time_of_week":
       return desc
-        ? [AllocatedTimeSlotOrderingChoices.DayOfTheWeekDesc]
-        : [AllocatedTimeSlotOrderingChoices.DayOfTheWeekAsc];
+        ? [AllocatedTimeSlotOrderingChoices.AllocatedTimeOfWeekDesc]
+        : [AllocatedTimeSlotOrderingChoices.AllocatedTimeOfWeekAsc];
     default:
       return [];
   }

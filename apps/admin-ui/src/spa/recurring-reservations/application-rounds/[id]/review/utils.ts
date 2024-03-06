@@ -1,9 +1,14 @@
+import { differenceInWeeks } from "date-fns";
+import { fromApiDate } from "common/src/common/util";
+import { formatters as getFormatters } from "common";
 import {
   ApplicantTypeChoice,
   ApplicationStatusChoice,
   ApplicationSectionStatusChoice,
+  ApplicationSectionNode,
 } from "common/types/gql-types";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
+import { formatNumber } from "@/common/util";
 
 export function transformApplicationSectionStatus(
   status: string[]
@@ -71,4 +76,34 @@ export function transformApplicantType(
       }
     })
     .filter((at): at is NonNullable<typeof at> => at != null);
+}
+
+const formatters = getFormatters("fi");
+
+export function calculateAppliedReservationTime(ae: ApplicationSectionNode): {
+  count: number;
+  hours: number;
+} {
+  const begin = ae.reservationsBeginDate
+    ? fromApiDate(ae.reservationsBeginDate)
+    : undefined;
+  const end = ae.reservationsEndDate
+    ? fromApiDate(ae.reservationsEndDate)
+    : undefined;
+  const evtPerW = ae.appliedReservationsPerWeek ?? 0;
+  const turns = begin && end ? differenceInWeeks(end, begin) * evtPerW : 0;
+
+  const minDuration = ae.reservationMinDuration ?? 0;
+  const totalHours = (turns * minDuration) / 3600;
+  return { count: turns, hours: totalHours };
+}
+
+export function formatAppliedReservationTime(time: {
+  count: number;
+  hours: number;
+}): string {
+  const { count, hours } = time;
+  // TODO is there a case where there is an extra / in the string? (there used to be trim by / here)
+  // TODO the hours short format should use a tr key
+  return `${formatNumber(count, "")} / ${formatters.oneDecimal.format(hours)} t`;
 }

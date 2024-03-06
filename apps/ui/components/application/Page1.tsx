@@ -93,15 +93,12 @@ export function Page1({ applicationRound, onNext }: Props): JSX.Element | null {
     register(`applicationSections.${nextIndex}.purpose`);
     register(`applicationSections.${nextIndex}.minDuration`);
     register(`applicationSections.${nextIndex}.maxDuration`);
-    // register(`applicationSections.${nextIndex}.eventsPerWeek`);
-    // setValue(`applicationSections.${nextIndex}.eventsPerWeek`, 1);
+    register(`applicationSections.${nextIndex}.appliedReservationsPerWeek`);
     register(`applicationSections.${nextIndex}.begin`);
     register(`applicationSections.${nextIndex}.end`);
     register(`applicationSections.${nextIndex}.reservationUnits`, {
       value: filterNonNullable(selectedReservationUnits.map((ru) => ru.pk)),
     });
-    // register(`applicationSections.${nextIndex}.applicationEventSchedules`);
-    // setValue(`applicationSections.${nextIndex}.applicationEventSchedules`, []);
     register(`applicationSections.${nextIndex}.accordionOpen`, { value: true });
     register(`applicationSections.${nextIndex}.formKey`);
     // NOTE need a single setValue to trigger the form to rerender

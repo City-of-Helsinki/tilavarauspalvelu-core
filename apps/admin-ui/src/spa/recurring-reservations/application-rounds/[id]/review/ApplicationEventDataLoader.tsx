@@ -71,7 +71,7 @@ export function ApplicationEventDataLoader({
     return <Loader />;
   }
 
-  const applicationEvents = filterNonNullable(
+  const applicationSections = filterNonNullable(
     dataToUse?.applicationSections?.edges.map((edge) => edge?.node)
   );
   const totalCount = dataToUse?.applicationSections?.totalCount ?? 0;
@@ -84,14 +84,14 @@ export function ApplicationEventDataLoader({
         </b>
       </span>
       <ApplicationEventsTable
-        applicationEvents={applicationEvents}
+        applicationSections={applicationSections}
         sort={orderBy}
         sortChanged={handleSortChanged}
         isLoading={loading}
       />
       <More
         totalCount={totalCount}
-        count={applicationEvents.length}
+        count={applicationSections.length}
         fetchMore={() =>
           fetchMore({
             variables: {

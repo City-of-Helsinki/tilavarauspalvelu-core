@@ -1,7 +1,7 @@
 import React, { type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import { useParams, useNavigate } from "react-router-dom";
-import { useQuery, useMutation, gql } from "@apollo/client";
+import { useQuery, useMutation, gql, ApolloError } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { z } from "zod";
@@ -81,9 +81,9 @@ const BANNER_NOTIFICATIONS_DELETE = gql`
 `;
 
 // helpers so we get typechecking without casting
-const convertLevel = (
+function convertLevel(
   level: "EXCEPTION" | "NORMAL" | "WARNING"
-): BannerNotificationLevel => {
+): BannerNotificationLevel {
   switch (level) {
     case "EXCEPTION":
       return BannerNotificationLevel.Exception;
@@ -92,11 +92,11 @@ const convertLevel = (
     case "WARNING":
       return BannerNotificationLevel.Warning;
   }
-};
+}
 
-const convertTarget = (
+function convertTarget(
   target: "ALL" | "STAFF" | "USER"
-): BannerNotificationTarget => {
+): BannerNotificationTarget {
   switch (target) {
     case "ALL":
       return BannerNotificationTarget.All;
@@ -105,7 +105,7 @@ const convertTarget = (
     case "USER":
       return BannerNotificationTarget.User;
   }
-};
+}
 
 const StyledTag = styled(Tag)`
   justify-content: center;
@@ -343,6 +343,7 @@ const NotificationForm = ({
 
   const { notifyError, notifySuccess } = useNotification();
 
+  // TODO rewrite this for the new error codes
   const handleError = (errorMsgs: string[]) => {
     // TODO improved filtering here
     const alreadyExists = errorMsgs.find(
@@ -403,28 +404,7 @@ const NotificationForm = ({
         variables: {
           input,
         },
-        onError: (e) => {
-          // eslint-disable-next-line no-console
-          console.error("error", e);
-          handleError(e.graphQLErrors.map((err) => err.message));
-        },
       });
-      // FIXME remove mutation errors (they are inside the GQL error)
-      /*
-      const mutationData =
-        data.pk === 0
-          ? res?.data?.createBannerNotification
-          : res?.data?.updateBannerNotification;
-      const mutationErrors = mutationData?.errors;
-      if (mutationErrors && mutationErrors.length > 0) {
-        // TODO error translations and logic
-        handleError(
-          mutationErrors.map(
-            (err) => err?.messages?.join(", ") ?? "unknown error"
-          )
-        );
-      } else {
-      */
       notifySuccess(
         t("form.saveSuccessToast", {
           name: data.name,
@@ -434,8 +414,20 @@ const NotificationForm = ({
       navigate("..");
     } catch (e) {
       // TODO what is the format of these errors?
+      if (e instanceof ApolloError) {
+        const gqlerrors = e.graphQLErrors;
+        for (const err of gqlerrors) {
+          if ("code" in err.extensions) {
+            const { code } = err.extensions;
+            if (code === "NOT_FOUND") {
+              notifyError(t("error.submit.NOT_FOUND"));
+              return;
+            }
+          }
+        }
+      }
       // eslint-disable-next-line no-console
-      console.error("error", e);
+      console.error("unkown error thrown:", e);
       // TODO this is not necessary gql error, for example notifySuccess can throw on null
       handleError(["gql threw an error"]);
     }
@@ -692,12 +684,6 @@ const useRemoveNotification = ({
           // @ts-expect-error; TODO: typecheck broke after updating Apollo or Typescript
           bannerNotifications(existing: BannerNotificationNodeConnection) {
             const res = newData?.deleteBannerNotification;
-            /*
-            if (res?.errors) {
-              return existing;
-            }
-            */
-
             const pkToDelete = notification?.pk;
             if (!pkToDelete || !res?.deleted) {
               return existing;
@@ -726,23 +712,14 @@ const useRemoveNotification = ({
         handleError(res.errors.map((e) => e.message));
         return;
       }
+
+      notifySuccess(t("Notifications.success.removed"));
+      navigate("..");
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
       handleError(["gql threw an error"]);
-      return;
     }
-    /*
-    if (res.data?.deleteBannerNotification?.errors) {
-      const errs = res.data.deleteBannerNotification.errors
-        .filter((e): e is ErrorType => e != null)
-        .map((e) => e?.messages.join(", ") ?? "unknown error");
-      handleError(errs);
-      return;
-    }
-    */
-    notifySuccess(t("Notifications.success.removed"));
-    navigate("..");
   };
 
   return removeNotification;

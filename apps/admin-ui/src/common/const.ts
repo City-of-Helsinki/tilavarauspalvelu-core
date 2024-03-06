@@ -38,9 +38,8 @@ export const RECURRING_AUTOMATIC_REFETCH_LIMIT = 2000;
 /// If you are testing, you can use multiple tabs / browsers to see the updates.
 /// Reason to disable (especially in production): the allocations queries are heavy and may cause performance issues.
 /// TODO if this is left enabled it should be moved to env (so we can disable without recompiling).
-/// TODO there is some funny stuff with it if it's low (like 1000) it can go into an endless update loop
-/// so if this is going to be used in production need to add custom logic to backoff updates if they are taking too long
-/// or better yet, use subscriptions (i.e. drive updates from the backend).
+/// NOTE seems to work fine without backoff logic (the next query is run after the previous one is finished)
+/// better solution would be to use subscriptions (i.e. drive updates from the backend).
 export const ALLOCATION_POLL_INTERVAL = 10000;
 
 // This is a backend (or library) limit based on testing

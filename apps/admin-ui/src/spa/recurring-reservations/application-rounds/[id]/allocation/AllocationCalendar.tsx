@@ -10,20 +10,20 @@ import {
   Weekday,
   ApplicationSectionStatusChoice,
 } from "common/types/gql-types";
+import { breakpoints } from "common";
+import { type Day } from "common/src/conversion";
+import { transformWeekday } from "common/src/conversion";
 import { ALLOCATION_CALENDAR_TIMES } from "@/common/const";
 import {
   applicationEventSchedulesToCells,
   getTimeSeries,
   timeSlotKeyToTime,
   type Cell,
-  transformWeekday,
   parseApiTime,
   encodeTimeSlot,
   type RelatedSlot,
 } from "./modules/applicationRoundAllocation";
-import { breakpoints } from "common";
 import { useSlotSelection } from "./hooks";
-import { type Day } from "common/src/conversion";
 
 type Props = {
   applicationSections: ApplicationSectionNode[] | null;
@@ -219,16 +219,6 @@ function addTimeSlotToArray(
   }
 }
 
-/* TODO full rethink on this
- *
- * - we have data that is already divided based on the ReservationUnitOptionNode right?
- *   so only pass that here
- * - no checks if the reservation unit matches are done here
- * - suitable vs. allocated time ranges?
- */
-// TODO need to query all the allocated even in the filtered query
-// suitable times should be filtered but allocated not
-// so neeed to pass both separately to this component
 export function AllocationCalendar({
   applicationSections,
   focusedApplicationEvent,
@@ -380,6 +370,24 @@ function checkCell(
   return cellTime >= beginMinutes && cellTime < endMinutes;
 }
 
+function isInRange(ae: ApplicationSectionNode, cell: Cell, day: Day) {
+  return (
+    ae.suitableTimeRanges?.some((tr) => {
+      const { dayOfTheWeek, beginTime, endTime } = tr;
+      return checkCell(day, cell, dayOfTheWeek, beginTime, endTime);
+    }) ?? false
+  );
+}
+
+function isAllocated(ae: ReservationUnitOptionNode, cell: Cell, day: Day) {
+  return ae.allocatedTimeSlots
+    ?.map((ts) => {
+      const { beginTime, endTime, dayOfTheWeek } = ts;
+      return checkCell(day, cell, dayOfTheWeek, beginTime, endTime);
+    })
+    .some((x) => x);
+}
+
 // TODO filter this before passing it to the component
 // so it should be Cell[] not Cell[][]
 // the allocated / suitable should be filtered by day
@@ -432,32 +440,14 @@ function CalendarDay({
     }
   };
 
-  const isInRange = (ae: ApplicationSectionNode, cell: Cell) => {
-    return (
-      ae.suitableTimeRanges?.some((tr) => {
-        const { dayOfTheWeek, beginTime, endTime } = tr;
-        return checkCell(day, cell, dayOfTheWeek, beginTime, endTime);
-      }) ?? false
-    );
-  };
-
-  const isAllocated = (ae: ReservationUnitOptionNode, cell: Cell) => {
-    return ae.allocatedTimeSlots
-      ?.map((ts) => {
-        const { beginTime, endTime, dayOfTheWeek } = ts;
-        return checkCell(day, cell, dayOfTheWeek, beginTime, endTime);
-      })
-      .some((x) => x);
-  };
-
   const focused = focusedSlots.filter((x) => x.day === day);
   return (
     <div key={`day-${day}`}>
       <DayLabel>{t(`dayShort.${day}`)}</DayLabel>
       {cells[day].map((cell) => {
-        const foundAes = suitable.filter((aes) => isInRange(aes, cell));
+        const foundAes = suitable.filter((aes) => isInRange(aes, cell, day));
         const isSlotDeclined = false;
-        const isAccepted = allocated.some((aes) => isAllocated(aes, cell));
+        const isAccepted = allocated.some((aes) => isAllocated(aes, cell, day));
         const slotEventCount = foundAes.length;
         const focusedSlot = focused.find(
           (x) => x.minutes === cell.hour * 60 + cell.minute

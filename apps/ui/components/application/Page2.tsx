@@ -7,11 +7,6 @@ import { useFormContext } from "react-hook-form";
 import type { ApplicationEventSchedulePriority } from "common/types/common";
 import { Priority, type ApplicationNode } from "common/types/gql-types";
 import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
-import { MediumButton } from "@/styles/util";
-import { getReadableList } from "@/modules/util";
-import { AccordionWithState as Accordion } from "../common/Accordion";
-import { TimeSelector } from "./TimeSelector";
-import { ButtonContainer } from "../common/common";
 import type {
   ApplicationSectionFormValue,
   ApplicationEventScheduleFormType,
@@ -24,6 +19,11 @@ import {
   transformWeekday,
   type Day,
 } from "common/src/conversion";
+import { MediumButton } from "@/styles/util";
+import { getReadableList } from "@/modules/util";
+import { AccordionWithState as Accordion } from "../common/Accordion";
+import { TimeSelector } from "./TimeSelector";
+import { ButtonContainer } from "../common/common";
 
 type Props = {
   application: ApplicationNode;

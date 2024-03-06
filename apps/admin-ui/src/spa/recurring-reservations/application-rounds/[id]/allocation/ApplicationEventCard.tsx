@@ -11,8 +11,8 @@ import { PUBLIC_URL } from "@/common/const";
 import { getApplicantName } from "@/component/applications/util";
 import { ageGroup } from "@/component/reservations/requested/util";
 import { filterNonNullable } from "common/src/helpers";
+import { convertWeekday } from "common/src/conversion";
 import {
-  convertWeekday,
   createDurationString,
   formatTime,
 } from "./modules/applicationRoundAllocation";
@@ -258,9 +258,8 @@ function SchedulesList({
 }): JSX.Element {
   const { t } = useTranslation();
 
-  // TODO not pretty or clear
   // NOTE we want only the allocated slots here, but we need the information about which reservation unit it's allocated to
-  // this information is not available in the allocated time slot (it could be, but because it causes extra query complexity, it's not).
+  // this information is not available in the allocated time slot (it could be, but it causes extra query complexity and dublicates fields).
   const resUnitOpts = section.reservationUnitOptions?.filter(
     (ruo) => ruo.allocatedTimeSlots != null && ruo.allocatedTimeSlots.length > 0
   );
@@ -284,7 +283,7 @@ function SchedulesList({
   return (
     <SelectionListContainer>
       {allocatedSchedules.map((ats) => (
-        <ScheduleSection
+        <AllocatedScheduleSection
           key={ats.pk}
           allocatedTimeSlot={ats}
           currentReservationUnit={currentReservationUnit}
@@ -308,8 +307,7 @@ const ScheduleCard = styled.div`
   text-align: left;
 `;
 
-// TODO these are only for allocated schedules => rename
-function ScheduleSection({
+function AllocatedScheduleSection({
   allocatedTimeSlot,
   currentReservationUnit,
 }: {

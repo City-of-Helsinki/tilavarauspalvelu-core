@@ -7,8 +7,7 @@ import {
   type SuitableTimeRangeNode,
   Priority,
 } from "common/types/gql-types";
-// FIXME move the convert function to more common utils
-import { convertWeekday } from "app/spa/recurring-reservations/application-rounds/[id]/allocation/modules/applicationRoundAllocation";
+import { convertWeekday } from "common/src/conversion";
 import { filterNonNullable } from "common/src/helpers";
 
 type Cell = {

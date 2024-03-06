@@ -5,13 +5,13 @@ import {
   ApplicantTypeChoice,
 } from "common/types/gql-types";
 
-export const getApplicantName = (app: ApplicationNode): string => {
-  return app.applicantType === ApplicantTypeChoice.Individual
-    ? `${app.contactPerson?.firstName || "-"} ${
-        app.contactPerson?.lastName || "-"
-      }`
-    : app.organisation?.name || "-";
-};
+export function getApplicantName(app: ApplicationNode): string {
+  if (app.applicantType === ApplicantTypeChoice.Individual) {
+    const { firstName, lastName } = app.contactPerson || {};
+    return `${firstName || "-"} ${lastName || "-"}`;
+  }
+  return app.organisation?.name || "-";
+}
 
 export function getApplicationStatusColor(
   status: ApplicationStatusChoice,
@@ -40,24 +40,17 @@ export function getApplicationStatusColor(
 }
 
 export function getApplicationSectiontatusColor(
-  status: ApplicationSectionStatusChoice,
-  size: "s" | "l"
+  status: ApplicationSectionStatusChoice
 ): string {
   switch (status) {
     case ApplicationSectionStatusChoice.Reserved:
     case ApplicationSectionStatusChoice.Unallocated:
+    case ApplicationSectionStatusChoice.InAllocation:
       return "var(--color-alert-dark)";
     case ApplicationSectionStatusChoice.Handled:
       return "var(--color-success)";
     case ApplicationSectionStatusChoice.Failed:
-    case ApplicationSectionStatusChoice.InAllocation:
     default:
-      switch (size) {
-        case "s":
-          return "var(--color-error)";
-        case "l":
-        default:
-          return "var(--color-error-dark)";
-      }
+      return "var(--color-error)";
   }
 }

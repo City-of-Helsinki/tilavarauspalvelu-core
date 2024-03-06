@@ -2,8 +2,8 @@ import React, { useEffect } from "react";
 import styled from "styled-components";
 import {
   ApplicantTypeChoice,
-  ApplicationNode,
-  ApplicationUpdateMutationInput,
+  type ApplicationNode,
+  type ApplicationUpdateMutationInput,
 } from "common/types/gql-types";
 import { useTranslation } from "next-i18next";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
@@ -22,10 +22,10 @@ import {
   convertAddress,
   convertOrganisation,
   convertPerson,
-  ApplicationFormPage3Values,
-  PersonFormValues,
-  AddressFormValues,
-  OrganisationFormValues,
+  type ApplicationFormPage3Values,
+  type PersonFormValues,
+  type AddressFormValues,
+  type OrganisationFormValues,
 } from "@/components/application/Form";
 import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
 import { useApplicationQuery } from "@/hooks/useApplicationQuery";
@@ -40,16 +40,16 @@ const Form = styled.form`
 `;
 
 // Filter out any empty strings from the object (otherwise the mutation fails)
-const transformPerson = (person?: PersonFormValues) => {
+function transformPerson(person?: PersonFormValues) {
   return {
     firstName: person?.firstName || undefined,
     lastName: person?.lastName || undefined,
     email: person?.email || undefined,
     phoneNumber: person?.phoneNumber || undefined,
   };
-};
+}
 
-const isAddressValid = (address?: AddressFormValues) => {
+function isAddressValid(address?: AddressFormValues) {
   const { streetAddress, postCode, city } = address || {};
   return (
     streetAddress != null &&
@@ -59,19 +59,20 @@ const isAddressValid = (address?: AddressFormValues) => {
     city != null &&
     city !== ""
   );
-};
+}
 
-const transformAddress = (address?: AddressFormValues) => {
+function transformAddress(address?: AddressFormValues) {
   return {
     pk: address?.pk || undefined,
     streetAddress: address?.streetAddress || undefined,
     postCode: address?.postCode || undefined,
     city: address?.city || undefined,
   };
-};
+}
+
 // Filter out any empty strings from the object (otherwise the mutation fails)
 // remove the identifier if it's empty (otherwise the mutation fails)
-const transformOrganisation = (org?: OrganisationFormValues) => {
+function transformOrganisation(org?: OrganisationFormValues) {
   return {
     name: org?.name || undefined,
     identifier: org?.identifier || undefined,
@@ -80,11 +81,11 @@ const transformOrganisation = (org?: OrganisationFormValues) => {
       : undefined,
     coreBusiness: org?.coreBusiness || undefined,
   };
-};
+}
 
-const convertApplicationToForm = (
+function convertApplicationToForm(
   app?: Maybe<ApplicationNode>
-): ApplicationFormPage3Values => {
+): ApplicationFormPage3Values {
   return {
     pk: app?.pk ?? 0,
     applicantType: app?.applicantType ?? ApplicantTypeChoice.Individual,
@@ -97,11 +98,11 @@ const convertApplicationToForm = (
     additionalInformation: app?.additionalInformation ?? "",
     homeCity: app?.homeCity?.pk ?? undefined,
   };
-};
+}
 
-const transformApplication = (
+function transformApplication(
   values: ApplicationFormPage3Values
-): ApplicationUpdateMutationInput => {
+): ApplicationUpdateMutationInput {
   const shouldSaveBillingAddress =
     values.applicantType === ApplicantTypeChoice.Individual ||
     values.hasBillingAddress;
@@ -125,9 +126,9 @@ const transformApplication = (
       ? { homeCity: values.homeCity }
       : {}),
   };
-};
+}
 
-const Page3 = (): JSX.Element | null => {
+function Page3(): JSX.Element | null {
   const { options } = useOptions();
   const { cityOptions } = options;
 
@@ -146,9 +147,9 @@ const Page3 = (): JSX.Element | null => {
     default:
       return null;
   }
-};
+}
 
-const Page3Wrapped = (props: Props): JSX.Element | null => {
+function Page3Wrapped(props: Props): JSX.Element | null {
   const { id } = props;
   const router = useRouter();
   const {
@@ -252,11 +253,11 @@ const Page3Wrapped = (props: Props): JSX.Element | null => {
       </ApplicationPageWrapper>
     </FormProvider>
   );
-};
+}
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
-export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale } = ctx;
 
   // TODO should fetch on SSR but we need authentication for it
@@ -272,6 +273,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
-};
+}
 
 export default Page3Wrapped;

@@ -1,21 +1,19 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
-import { memoize, orderBy, trim, uniqBy } from "lodash";
+import { memoize, orderBy, uniqBy } from "lodash";
 import { IconLinkExternal } from "hds-react";
-import { differenceInWeeks } from "date-fns";
-import { fromApiDate } from "common/src/common/util";
 import type { ApplicationSectionNode } from "common/types/gql-types";
-import { formatters as getFormatters } from "common";
 import { PUBLIC_URL } from "@/common/const";
 import { truncate } from "@/helpers";
 import { applicationDetailsUrl } from "@/common/urls";
 import { getApplicantName } from "@/component/applications/util";
-import { formatNumber } from "@/common/util";
 import { CustomTable, ExternalTableLink } from "@/component/Table";
 import { ApplicationSectionStatusCell } from "./StatusCell";
-
-const formatters = getFormatters("fi");
+import {
+  calculateAppliedReservationTime,
+  formatAppliedReservationTime,
+} from "./utils";
 
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
@@ -23,7 +21,7 @@ const applicantTruncateLen = 20;
 type Props = {
   sort: string | null;
   sortChanged: (field: string) => void;
-  applicationEvents: ApplicationSectionNode[];
+  applicationSections: ApplicationSectionNode[];
   isLoading?: boolean;
 };
 
@@ -41,9 +39,10 @@ type ApplicationEventView = {
   applicationCount: string;
 };
 
-const appEventMapper = (
+function appEventMapper(
   appEvent: ApplicationSectionNode
-): ApplicationEventView => {
+): ApplicationEventView {
+  // TODO why is this modified?
   const resUnits = appEvent.reservationUnitOptions?.flatMap((eru) => ({
     ...eru?.reservationUnit?.unit,
     priority: eru?.preferredOrder ?? 0,
@@ -57,25 +56,9 @@ const appEventMapper = (
 
   const status = appEvent.status ?? undefined;
   const name = appEvent.name || "-";
-
   const applicantName = getApplicantName(appEvent.application);
-
-  const begin = appEvent.reservationsBeginDate
-    ? fromApiDate(appEvent.reservationsBeginDate)
-    : undefined;
-  const end = appEvent.reservationsEndDate
-    ? fromApiDate(appEvent.reservationsEndDate)
-    : undefined;
-
-  const biW = false; // appEvent.biweekly;
-  const evtPerW = appEvent.appliedReservationsPerWeek ?? 0;
-  const turns =
-    begin && end
-      ? (differenceInWeeks(end, begin) / (biW ? 2 : 1)) * evtPerW
-      : 0;
-
-  const minDuration = appEvent.reservationMinDuration ?? 0;
-  const totalHours = (turns * minDuration) / 3600;
+  const time = calculateAppliedReservationTime(appEvent);
+  const applicationCount = formatAppliedReservationTime(time);
 
   return {
     applicationPk: appEvent.application.pk ?? undefined,
@@ -83,15 +66,10 @@ const appEventMapper = (
     applicantName,
     units,
     nameFi: name,
-    applicationCount: trim(
-      `${formatNumber(turns, "")} / ${formatters.oneDecimal.format(
-        totalHours
-      )} t`,
-      " / "
-    ),
+    applicationCount,
     statusView: <ApplicationSectionStatusCell status={status} />,
   };
-};
+}
 
 const MAX_NAME_LENGTH = 30;
 
@@ -171,12 +149,12 @@ export const SORT_KEYS = COLS.filter((c) => c.isSortable).map((c) => c.key);
 export function ApplicationEventsTable({
   sort,
   sortChanged: onSortChanged,
-  applicationEvents,
+  applicationSections,
   isLoading,
 }: Props): JSX.Element {
   const { t } = useTranslation();
 
-  const views = applicationEvents.map((ae) => appEventMapper(ae));
+  const views = applicationSections.map((ae) => appEventMapper(ae));
 
   const cols = memoize(() => getColConfig(t))();
 

@@ -7,12 +7,17 @@ import type {
   ApplicationNode,
   ApplicationStatusChoice,
 } from "common/types/gql-types";
+import { filterNonNullable } from "common/src/helpers";
 import { PUBLIC_URL } from "@/common/const";
 import { applicationDetailsUrl } from "@/common/urls";
 import { truncate } from "@/helpers";
 import { getApplicantName } from "@/component/applications/util";
 import { CustomTable, ExternalTableLink } from "@/component/Table";
 import { ApplicationStatusCell } from "./StatusCell";
+import {
+  calculateAppliedReservationTime,
+  formatAppliedReservationTime,
+} from "./utils";
 
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
@@ -106,7 +111,7 @@ const getColConfig = (t: TFunction) =>
   }));
 export const SORT_KEYS = COLS.filter((c) => c.isSortable).map((c) => c.key);
 
-const appMapper = (app: ApplicationNode, t: TFunction): ApplicationView => {
+function appMapper(app: ApplicationNode, t: TFunction): ApplicationView {
   const applicationEvents = (app.applicationSections || [])
     .flatMap((ae) => ae?.reservationUnitOptions)
     .flatMap((eru) => ({
@@ -120,27 +125,38 @@ const appMapper = (app: ApplicationNode, t: TFunction): ApplicationView => {
   const name = app.applicationSections?.find(() => true)?.name || "-";
   const firstEvent = app.applicationSections?.find(() => true);
   const eventPk = firstEvent?.pk ?? 0;
-
   const status = app.status ?? undefined;
-
   const applicantName = getApplicantName(app);
+  const applicantType =
+    app.applicantType != null
+      ? t(`Application.applicantTypes.${app.applicantType}`)
+      : "-";
+
+  const time = filterNonNullable(
+    app.applicationSections?.map((ae) => calculateAppliedReservationTime(ae))
+  ).reduce<{ count: number; hours: number }>(
+    (acc, { count, hours }) => ({
+      count: acc.count + count,
+      hours: acc.hours + hours,
+    }),
+    { count: 0, hours: 0 }
+  );
+  const applicationCount = formatAppliedReservationTime(time);
 
   return {
     key: `${app.pk}-${eventPk || "-"} `,
     pk: app.pk ?? 0,
     eventPk,
     applicantName,
-    applicantType: app.applicantType
-      ? t(`Application.applicantTypes.${app.applicantType}`)
-      : "",
+    applicantType,
     units,
     name,
     status,
     statusView: <ApplicationStatusCell status={status} />,
     statusType: app.status ?? undefined,
-    applicationCount: "NA",
+    applicationCount,
   };
-};
+}
 
 type ApplicationsTableProps = {
   sort: string | null;

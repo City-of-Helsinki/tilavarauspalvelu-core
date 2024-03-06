@@ -4,10 +4,14 @@ import { uniqBy } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Link, useSearchParams } from "react-router-dom";
+import { type Maybe } from "graphql/jsutils/Maybe";
 import { H2 } from "common/src/common/typography";
+import { filterNonNullable } from "common/src/helpers";
 import {
   type ApplicationRoundNode,
   ApplicationRoundStatusChoice,
+  type ReservationUnitType,
+  type UnitType,
 } from "common/types/gql-types";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { Container } from "@/styles/layout";
@@ -17,10 +21,9 @@ import { ApplicationDataLoader } from "./ApplicationDataLoader";
 import { Filters } from "./Filters";
 import { ApplicationEventDataLoader } from "./ApplicationEventDataLoader";
 import { AllocatedEventDataLoader } from "./AllocatedEventDataLoader";
-import { filterNonNullable } from "common/src/helpers";
 
 const Header = styled.div`
-  margin-top: var(--spacing-l);
+  margin-top: var(--spacing-s);
 `;
 
 const SpaceBetweenContainer = styled.div`
@@ -39,6 +42,32 @@ const TabContent = styled.div`
   margin-top: var(--spacing-s);
   line-height: 1;
 `;
+
+const StyledH2 = styled(H2)`
+  margin-top: 1.5rem;
+`;
+
+function getUnitOptions(resUnits: ReservationUnitType[]) {
+  const opts = resUnits.map((x) => x?.unit).map((x) => unitToOption(x));
+  return filterNonNullable(opts);
+}
+
+// TODO these to toOption functions are identical, can they be combined (bit of type magic)?
+function unitToOption(unit: Maybe<UnitType>) {
+  if (unit?.pk == null || unit.nameFi == null) {
+    return null;
+  }
+  const { nameFi, pk } = unit;
+  return { nameFi, pk };
+}
+
+function resUnitsToOption(resUnit: Maybe<ReservationUnitType>) {
+  if (resUnit?.pk == null || resUnit.nameFi == null) {
+    return null;
+  }
+  const { nameFi, pk } = resUnit;
+  return { nameFi, pk };
+}
 
 type ReviewProps = {
   applicationRound: ApplicationRoundNode;
@@ -59,15 +88,8 @@ export function Review({ applicationRound }: ReviewProps): JSX.Element | null {
   const resUnits = filterNonNullable(
     applicationRound?.reservationUnits?.flatMap((x) => x)
   );
-  const ds = filterNonNullable(
-    resUnits
-      .map((x) => x?.unit)
-      .map((x) =>
-        x?.pk != null && x.nameFi != null
-          ? { pk: x.pk, nameFi: x.nameFi }
-          : null
-      )
-  );
+
+  const ds = getUnitOptions(resUnits);
   const unitPks = uniqBy(ds, (unit) => unit.pk).sort((a, b) =>
     a.nameFi.localeCompare(b.nameFi)
   );
@@ -81,14 +103,7 @@ export function Review({ applicationRound }: ReviewProps): JSX.Element | null {
     selectedTab === "events" ? 1 : selectedTab === "allocated" ? 2 : 0;
 
   const reseevationUnitOptions = filterNonNullable(
-    resUnits.map((x) =>
-      x.pk != null && x.nameFi != null
-        ? {
-            nameFi: x.nameFi,
-            pk: x.pk,
-          }
-        : null
-    )
+    resUnits.map((x) => resUnitsToOption(x))
   );
 
   return (
@@ -100,7 +115,7 @@ export function Review({ applicationRound }: ReviewProps): JSX.Element | null {
           )}
           <Link to="criteria">{t("ApplicationRound.roundCriteria")}</Link>
         </SpaceBetweenContainer>
-        <H2>{applicationRound.nameFi}</H2>
+        <StyledH2>{applicationRound.nameFi}</StyledH2>
         <TimeframeStatus
           applicationPeriodBegin={applicationRound.applicationPeriodBegin}
           applicationPeriodEnd={applicationRound.applicationPeriodEnd}

@@ -28,12 +28,11 @@ const StatusDot = styled.div<{
   background-color: ${({ status }) => getApplicationStatusColor(status, "s")};
 `;
 
-const ApplicationEventStatusDot = styled.div<{
+const ApplicationSectionStatusDot = styled.div<{
   status: ApplicationSectionStatusChoice;
 }>`
   ${dotCss}
-  background-color: ${({ status }) =>
-    getApplicationSectiontatusColor(status, "s")};
+  background-color: ${({ status }) => getApplicationSectiontatusColor(status)};
 `;
 
 const Wrapper = styled.div`
@@ -105,7 +104,7 @@ function ApplicationSectionStatusIcon({
     );
   }
   */
-  return <ApplicationEventStatusDot aria-hidden status={status} />;
+  return <ApplicationSectionStatusDot aria-hidden status={status} />;
 }
 
 // Define separate components to make the refactoring easier

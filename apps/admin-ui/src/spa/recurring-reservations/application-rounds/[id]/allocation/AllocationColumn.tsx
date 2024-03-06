@@ -1,8 +1,9 @@
-import { IconCross, Select } from "hds-react";
 import React, { useCallback } from "react";
+import { IconCross, Select } from "hds-react";
 import { useTranslation } from "react-i18next";
-import { TFunction } from "i18next";
+import { type TFunction } from "i18next";
 import { fontMedium } from "common/src/common/typography";
+import { type ApolloQueryResult } from "@apollo/client";
 import styled from "styled-components";
 import {
   type ApplicationSectionNode,
@@ -15,20 +16,21 @@ import {
 } from "common/types/gql-types";
 import { ShowAllContainer } from "common/src/components/";
 import type { ReservationUnitNode } from "common";
+import {
+  convertWeekday,
+  transformWeekday,
+  type Day,
+} from "common/src/conversion";
+import { filterNonNullable } from "common/src/helpers";
 import { ALLOCATION_CALENDAR_TIMES } from "@/common/const";
 import {
   type RelatedSlot,
   constructTimeSlot,
-  convertWeekday,
   decodeTimeSlot,
   getTimeSlotOptions,
-  transformWeekday,
 } from "./modules/applicationRoundAllocation";
 import { AllocatedCard, AllocationCard } from "./AllocationCard";
-import { type ApolloQueryResult } from "@apollo/client";
 import { useSlotSelection } from "./hooks";
-import { filterNonNullable } from "common/src/helpers";
-import { type Day } from "common/src/conversion";
 
 type Props = {
   applicationSections: ApplicationSectionNode[] | null;
@@ -282,7 +284,7 @@ export function AllocationColumn({
   const endHour = slots.length > 0 ? slots[slots.length - 1].hour : 0;
 
   // TODO copy pasta from AllocationCalendar (the day part of this)
-  const aesForThisUnit = filterNonNullable(applicationSections);
+  const aes = applicationSections ?? [];
 
   // NOTE need to split the applicationSection into two props
   // - the section
@@ -291,7 +293,7 @@ export function AllocationColumn({
   // NOTE we show Handled for already allocated, but not for suitable that have already been allocated.
   // TODO might be able to remove them with fulfilled?
   const selectedInterval = { day, start: startHour, end: endHour };
-  const timeslots = aesForThisUnit
+  const timeslots = aes
     .filter((ae) => ae.status !== ApplicationSectionStatusChoice.Handled)
     .filter((ae) =>
       ae.suitableTimeRanges?.some(
@@ -304,7 +306,7 @@ export function AllocationColumn({
       )
     );
   const resUnits = filterNonNullable(
-    aesForThisUnit?.flatMap((ae) => ae.reservationUnitOptions)
+    aes?.flatMap((ae) => ae.reservationUnitOptions)
   );
   const allocated = resUnits
     .filter((a) =>
@@ -333,7 +335,7 @@ export function AllocationColumn({
       .map((as) => as?.pk)
   );
 
-  const allocatedSections = aesForThisUnit.filter(
+  const allocatedSections = aes.filter(
     (as) => as.pk != null && allocatedPks.includes(as.pk)
   );
   const doesCollideToOtherAllocations = relatedAllocations[day].some((slot) => {
@@ -347,12 +349,14 @@ export function AllocationColumn({
     allocatedSections.length === 0 && !doesCollideToOtherAllocations;
   const canAllocate = hasSelection && canAllocateSelection && isRoundAllocable;
 
-  // TODO check that the same event has not already been allocated on the same day
-  // (the backend filtering didn't seem to remove invalid events)
-  // but can't allocate twice on the same day
-  // Could also remove them from the Calendar component
-  // dunno why the backend filtering doesn't remove them
-  // Requires a bit more investigation.
+  const suitableTimeSlot = (
+    as: ApplicationSectionNode
+  ): SuitableTimeRangeNode | null =>
+    getSuitableTimeSlot(as, { day, startHour, endHour });
+  const allocatedTimeSlot = (
+    as: ApplicationSectionNode
+  ): AllocatedTimeSlotNode | null =>
+    getAllocatedTimeSlot(as, { day, startHour, endHour });
 
   // TODO empty state when no selection (current is ok placeholder), don't remove from DOM
   return (
@@ -367,18 +371,12 @@ export function AllocationColumn({
       >
         <TimeSelection />
       </StyledShowAllContainer>
-      {/* TODO what order should these be in? */}
       {allocatedSections.map((as) => (
         <AllocatedCard
           key={as.pk}
           applicationSection={as}
           refetchApplicationEvents={refetchApplicationEvents}
-          // TODO define a partial function
-          allocatedTimeSlot={getAllocatedTimeSlot(as, {
-            day,
-            startHour,
-            endHour,
-          })}
+          allocatedTimeSlot={allocatedTimeSlot(as)}
         />
       ))}
       {timeslots.map((as) => (
@@ -391,8 +389,7 @@ export function AllocationColumn({
           selection={selection ?? []}
           isAllocationEnabled={canAllocate}
           refetchApplicationEvents={refetchApplicationEvents}
-          // TODO define a partial function
-          timeSlot={getSuitableTimeSlot(as, { day, startHour, endHour })}
+          timeSlot={suitableTimeSlot(as)}
         />
       ))}
       {timeslots.length + allocated.length === 0 && (

@@ -4,13 +4,13 @@ import { TFunction } from "i18next";
 import { memoize } from "lodash";
 import { IconLinkExternal } from "hds-react";
 import type { AllocatedTimeSlotNode } from "common/types/gql-types";
+import { convertWeekday } from "common/src/conversion";
 import { PUBLIC_URL } from "@/common/const";
 import { truncate } from "@/helpers";
 import { applicationDetailsUrl } from "@/common/urls";
 import { CustomTable, ExternalTableLink } from "@/component/Table";
 import { getApplicantName } from "@/component/applications/util";
 import { TimeSlotStatusCell } from "./StatusCell";
-import { convertWeekday } from "../allocation/modules/applicationRoundAllocation";
 
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;

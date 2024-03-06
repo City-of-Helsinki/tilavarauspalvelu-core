@@ -67,11 +67,15 @@ const Preview = (props: Props): JSX.Element => {
       return;
     }
 
-    const { pk } = data?.sendApplication ?? {};
+    const { pk: resPk } = data?.sendApplication ?? {};
 
-    const prefix = `/application/${pk}`;
-    const target = `${prefix}/sent`;
-    router.push(target);
+    if (resPk != null) {
+      // TODO use an urlbuilder
+      const prefix = `/application/${resPk}`;
+      const target = `${prefix}/sent`;
+      router.push(target);
+    }
+    // TODO error
   };
 
   if (id == null) {
@@ -90,6 +94,9 @@ const Preview = (props: Props): JSX.Element => {
     return <Error statusCode={404} />;
   }
 
+  // TODO use an urlbuilder
+  const handleBack = () => router.push(`/application/${application.pk}/page3`);
+
   return (
     <ApplicationPageWrapper
       translationKeyPrefix="application:preview"
@@ -104,10 +111,7 @@ const Preview = (props: Props): JSX.Element => {
           setAcceptTermsOfUse={setAcceptTermsOfUse}
         />
         <ButtonContainer>
-          <MediumButton
-            variant="secondary"
-            onClick={() => router.push(`/application/${application.pk}/page3`)}
-          >
+          <MediumButton variant="secondary" onClick={handleBack}>
             {t("common:prev")}
           </MediumButton>
           <MediumButton

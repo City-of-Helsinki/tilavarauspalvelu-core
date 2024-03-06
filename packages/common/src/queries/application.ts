@@ -14,16 +14,23 @@ export const APPLICANT_NAME_FRAGMENT = gql`
   }
 `;
 
-const APPLICATION_SECTION_COMMON_FRAGMENT = gql`
-  ${APPLICANT_NAME_FRAGMENT}
-  fragment ApplicationSectionCommonFragment on ApplicationSectionNode {
-    pk
-    name
-    status
+export const APPLICATION_DURATION_FRAGMENT = gql`
+  fragment ApplicationDurationFragment on ApplicationSectionNode {
     reservationsEndDate
     reservationsBeginDate
     appliedReservationsPerWeek
     reservationMinDuration
+  }
+`;
+
+const APPLICATION_SECTION_COMMON_FRAGMENT = gql`
+  ${APPLICANT_NAME_FRAGMENT}
+  ${APPLICATION_DURATION_FRAGMENT}
+  fragment ApplicationSectionCommonFragment on ApplicationSectionNode {
+    pk
+    name
+    status
+    ...ApplicationDurationFragment
     reservationMaxDuration
     ageGroup {
       pk

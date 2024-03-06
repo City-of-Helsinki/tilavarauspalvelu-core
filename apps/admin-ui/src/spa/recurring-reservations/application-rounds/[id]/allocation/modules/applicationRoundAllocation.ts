@@ -8,13 +8,10 @@ import {
   type AllocatedTimeSlotNode,
 } from "common/types/gql-types";
 import i18next from "i18next";
+import { type TFunction } from "next-i18next";
 import { filterNonNullable } from "common/src/helpers";
 import { formatDuration } from "common/src/common/util";
-import { type TFunction } from "next-i18next";
 import { convertWeekday } from "common/src/conversion";
-
-export { convertWeekday };
-export { transformWeekday } from "common/src/conversion";
 
 export type RelatedSlot = {
   day: number;
