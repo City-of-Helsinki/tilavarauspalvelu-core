@@ -389,6 +389,7 @@ export type ApplicationRoundNode = Node & {
   status?: Maybe<ApplicationRoundStatusChoice>;
   statusTimestamp?: Maybe<Scalars["DateTime"]["output"]>;
   targetGroup: TargetGroup;
+  termsOfUse?: Maybe<TermsOfUseType>;
 };
 
 export type ApplicationRoundNodeConnection = {

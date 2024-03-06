@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import { IMAGE_FRAGMENT } from "./fragments";
+import { TERMS_OF_USE_FRAGMENT } from "./terms";
 
 export const APPLICANT_NAME_FRAGMENT = gql`
   fragment ApplicationNameFragment on ApplicationNode {
@@ -207,9 +208,15 @@ export const APPLICATION_FRAGMENT = gql`
 
 export const APPLICATION_QUERY = gql`
   ${APPLICATION_FRAGMENT}
+  ${TERMS_OF_USE_FRAGMENT}
   query getApplication($id: ID!) {
     application(id: $id) {
       ...ApplicationCommon
+      applicationRound {
+        termsOfUse {
+          ...TermsOfUseFragment
+        }
+      }
     }
   }
 `;

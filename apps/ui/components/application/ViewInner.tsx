@@ -9,7 +9,7 @@ import { CheckboxContainer, StyledNotification, Terms } from "./styled";
 import { AccordionWithState as Accordion } from "../common/Accordion";
 import { ApplicationEventList } from "./ApplicationEventList";
 
-export const ViewInner = ({
+export function ViewInner({
   application,
   tos,
   acceptTermsOfUse,
@@ -19,12 +19,10 @@ export const ViewInner = ({
   tos: TermsOfUseType | null;
   acceptTermsOfUse?: boolean;
   setAcceptTermsOfUse?: (value: boolean) => void;
-}): JSX.Element => {
+}): JSX.Element {
   const { t } = useTranslation();
 
-  // FIXME why is KUVAnupa hardcoded here? and why it's only needed for the application
-  // TODO do we need two different terms of use here? or do we need to select the correct one in the query?
-  // const tos2 = tos.find((n) => n.pk === "KUVAnupa");
+  const tos2 = application.applicationRound?.termsOfUse;
 
   return (
     <>
@@ -42,7 +40,7 @@ export const ViewInner = ({
       <FormSubHeading>
         {t("application:preview.reservationUnitTerms")}
       </FormSubHeading>
-      {/* tos2 && <Terms tabIndex={0}>{getTranslation(tos2, "text")}</Terms>*/}
+      {tos2 && <Terms tabIndex={0}>{getTranslation(tos2, "text")}</Terms>}
       {acceptTermsOfUse != null && setAcceptTermsOfUse != null && (
         <CheckboxContainer>
           <Checkbox
@@ -61,4 +59,4 @@ export const ViewInner = ({
       </StyledNotification>
     </>
   );
-};
+}
