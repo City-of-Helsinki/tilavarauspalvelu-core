@@ -23,20 +23,21 @@ type Props = {
   onNext: (formValues: ApplicationFormValues) => void;
 };
 
-const Page1 = ({ applicationRound, onNext }: Props): JSX.Element | null => {
+export function Page1({ applicationRound, onNext }: Props): JSX.Element | null {
   const { t } = useTranslation();
 
-  const unitsInApplicationRound = uniq(
-    applicationRound.reservationUnits?.flatMap((resUnit) => resUnit?.unit?.pk)
+  const resUnitsInApplicationRound = applicationRound.reservationUnits;
+  const resUnitPks = resUnitsInApplicationRound?.map(
+    (resUnit) => resUnit?.unit?.pk
   );
+  const unitsInApplicationRound = filterNonNullable(uniq(resUnitPks));
   const { data: unitData } = useQuery<Query>(SEARCH_FORM_PARAMS_UNIT);
-  const units =
-    filterNonNullable(unitData?.units?.edges?.map((e) => e?.node))
-      .filter((u) => unitsInApplicationRound.includes(u.pk))
-      .map((u) => ({
-        pk: u.pk ?? 0,
-        name: getTranslation(u, "name"),
-      })) ?? [];
+  const units = filterNonNullable(unitData?.units?.edges?.map((e) => e?.node))
+    .filter((u) => u.pk != null && unitsInApplicationRound.includes(u.pk))
+    .map((u) => ({
+      pk: u.pk ?? 0,
+      name: getTranslation(u, "name"),
+    }));
 
   const unitOptions = mapOptions(units);
 
@@ -85,32 +86,25 @@ const Page1 = ({ applicationRound, onNext }: Props): JSX.Element | null => {
     const nextIndex = applicationSections?.length ?? 0;
     // TODO check if we have to register all the sub fields in application event
     // seems so, we could also just register the pk here and register the rest in the form where they are used
-    register(`applicationSections.${nextIndex}.pk`);
-    register(`applicationSections.${nextIndex}.name`);
+    register(`applicationSections.${nextIndex}.pk`, { value: undefined });
+    register(`applicationSections.${nextIndex}.name`, { value: "" });
     register(`applicationSections.${nextIndex}.numPersons`);
     register(`applicationSections.${nextIndex}.ageGroup`);
-    // register(`applicationSections.${nextIndex}.abilityGroup`);
     register(`applicationSections.${nextIndex}.purpose`);
     register(`applicationSections.${nextIndex}.minDuration`);
     register(`applicationSections.${nextIndex}.maxDuration`);
     // register(`applicationSections.${nextIndex}.eventsPerWeek`);
-    // register(`applicationSections.${nextIndex}.biweekly`);
+    // setValue(`applicationSections.${nextIndex}.eventsPerWeek`, 1);
     register(`applicationSections.${nextIndex}.begin`);
     register(`applicationSections.${nextIndex}.end`);
+    register(`applicationSections.${nextIndex}.reservationUnits`, {
+      value: filterNonNullable(selectedReservationUnits.map((ru) => ru.pk)),
+    });
     // register(`applicationSections.${nextIndex}.applicationEventSchedules`);
-    register(`applicationSections.${nextIndex}.reservationUnits`);
-    setValue(
-      `applicationSections.${nextIndex}.reservationUnits`,
-      filterNonNullable(selectedReservationUnits.map((ru) => ru.pk)).filter(
-        (pk) => unitsInApplicationRound.includes(pk)
-      )
-    );
     // setValue(`applicationSections.${nextIndex}.applicationEventSchedules`, []);
-    setValue(`applicationSections.${nextIndex}.pk`, undefined);
-    setValue(`applicationSections.${nextIndex}.name`, "");
-    // setValue(`applicationSections.${nextIndex}.eventsPerWeek`, 1);
-    // setValue(`applicationSections.${nextIndex}.biweekly`, false);
-    setValue(`applicationSections.${nextIndex}.accordionOpen`, true);
+    register(`applicationSections.${nextIndex}.accordionOpen`, { value: true });
+    register(`applicationSections.${nextIndex}.formKey`);
+    // NOTE need a single setValue to trigger the form to rerender
     setValue(`applicationSections.${nextIndex}.formKey`, `NEW-${nextIndex}`);
   };
 
@@ -164,6 +158,6 @@ const Page1 = ({ applicationRound, onNext }: Props): JSX.Element | null => {
       </ButtonContainer>
     </form>
   );
-};
+}
 
 export default Page1;

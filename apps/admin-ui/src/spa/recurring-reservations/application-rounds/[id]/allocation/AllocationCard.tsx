@@ -149,7 +149,9 @@ export function AllocatedCard({
     console.warn("MANDATORY: No allocated time slot");
   }
 
-  const [refresh, isRefreshLoading] = useRefreshApplications(refetchApplicationEvents);
+  const [refresh, isRefreshLoading] = useRefreshApplications(
+    refetchApplicationEvents
+  );
 
   const [resetApplicationEvent, { loading: isResetLoading }] = useMutation<
     Mutation,
@@ -242,9 +244,10 @@ export function AllocatedCard({
     console.warn("TODO: implement");
   };
 
-  const allocationBegin = allocatedTimeSlot?.beginTime != null
-    ? parseApiTime(allocatedTimeSlot.beginTime) ?? 0
-    : 0;
+  const allocationBegin =
+    allocatedTimeSlot?.beginTime != null
+      ? parseApiTime(allocatedTimeSlot.beginTime) ?? 0
+      : 0;
 
   const allocationEnd = allocatedTimeSlot?.endTime
     ? parseApiTime(allocatedTimeSlot.endTime) ?? 0
@@ -367,11 +370,13 @@ function isOutsideOfRequestedTimes(
   }
 }
 
-type AcceptSlotMutationProps =
-  Pick<Props, "selection" | "applicationSection" | "reservationUnitOption"> & {
-    timeRange: SuitableTimeRangeNode | null,
-    refresh: () => void
-  }
+type AcceptSlotMutationProps = Pick<
+  Props,
+  "selection" | "applicationSection" | "reservationUnitOption"
+> & {
+  timeRange: SuitableTimeRangeNode | null;
+  refresh: () => void;
+};
 
 // TODO make into more generic
 // MutationF
@@ -380,9 +385,9 @@ type RetVal = [
   // TODO add the results to the promise
   () => Promise<void>, //FetchResult<TData>>,
   {
-    isLoading: boolean
-  }
-]
+    isLoading: boolean;
+  },
+];
 
 function useAcceptSlotMutation({
   selection,
@@ -493,16 +498,13 @@ function useAcceptSlotMutation({
     refresh();
   };
 
-  return [handleAcceptSlot, { isLoading }]
+  return [handleAcceptSlot, { isLoading }];
 }
 
 // side effects that should happen when a modification is made
 function useRefreshApplications(
   fetchCallback: () => Promise<ApolloQueryResult<Query>>
-): [
-  () => Promise<void>,
-  boolean,
-] {
+): [() => Promise<void>, boolean] {
   const [, setSelection] = useSlotSelection();
   const [isRefetchLoading, setIsRefetchLoading] = React.useState(false);
   // TODO this should disable sibling cards allocation while this is loading
@@ -512,7 +514,7 @@ function useRefreshApplications(
     // TODO this takes 3s to complete (on my local machine, so more in the cloud),
     // should update the cache in the mutation instead (or do a single id query instead of refetching all)
     setIsRefetchLoading(true);
-    await fetchCallback()
+    await fetchCallback();
     setIsRefetchLoading(false);
     // Close all the cards (requires removing the selection)
     setSelection([]);
@@ -546,15 +548,18 @@ export function AllocationCard({
     console.warn("Invalid reservation unit option: missing pk");
   }
 
-  const [refresh, isRefreshLoading] = useRefreshApplications(refetchApplicationEvents);
+  const [refresh, isRefreshLoading] = useRefreshApplications(
+    refetchApplicationEvents
+  );
 
-  const [handleAcceptSlot, { isLoading: isAcceptLoading }] = useAcceptSlotMutation({
-    selection,
-    timeRange: timeSlot,
-    applicationSection,
-    reservationUnitOption,
-    refresh,
-  });
+  const [handleAcceptSlot, { isLoading: isAcceptLoading }] =
+    useAcceptSlotMutation({
+      selection,
+      timeRange: timeSlot,
+      applicationSection,
+      reservationUnitOption,
+      refresh,
+    });
   const applicantName = applicationSection.application
     ? getApplicantName(applicationSection.application)
     : "-";
@@ -575,11 +580,15 @@ export function AllocationCard({
   const endSeconds = applicationSection.reservationMaxDuration ?? 0;
   const selectionDurationString = formatDuration(selectionDurationMins, t);
   // TODO this should be cleaner, only pass things we need here
-  const firstSelected = selection[0]
-  const lastSelected = selection[selection.length-1]
-  const selectionBegin = decodeTimeSlot(firstSelected)
-  const selectionEnd = decodeTimeSlot(lastSelected)
-  const isTimeMismatch = isOutsideOfRequestedTimes(timeSlot, selectionBegin.hour, selectionEnd.hour + 0.5);
+  const firstSelected = selection[0];
+  const lastSelected = selection[selection.length - 1];
+  const selectionBegin = decodeTimeSlot(firstSelected);
+  const selectionEnd = decodeTimeSlot(lastSelected);
+  const isTimeMismatch = isOutsideOfRequestedTimes(
+    timeSlot,
+    selectionBegin.hour,
+    selectionEnd.hour + 0.5
+  );
 
   // Duration checks
   const isTooShort = selectionDurationMins < beginSeconds / 60;

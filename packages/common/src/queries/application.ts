@@ -51,13 +51,6 @@ export const APPLICATION_SECTION_FRAGMENT = gql`
   ${APPLICATION_SECTION_COMMON_FRAGMENT}
   fragment ApplicationSectionFragment on ApplicationSectionNode {
     ...ApplicationSectionCommonFragment
-    suitableTimeRanges(fulfilled: false) {
-      beginTime
-      endTime
-      dayOfTheWeek
-      priority
-      fulfilled
-    }
     purpose {
       pk
       nameFi

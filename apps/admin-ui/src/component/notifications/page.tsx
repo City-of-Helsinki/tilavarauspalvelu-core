@@ -81,7 +81,9 @@ const BANNER_NOTIFICATIONS_DELETE = gql`
 `;
 
 // helpers so we get typechecking without casting
-const convertLevel = (level: "EXCEPTION" | "NORMAL" | "WARNING"): BannerNotificationLevel => {
+const convertLevel = (
+  level: "EXCEPTION" | "NORMAL" | "WARNING"
+): BannerNotificationLevel => {
   switch (level) {
     case "EXCEPTION":
       return BannerNotificationLevel.Exception;
@@ -92,7 +94,9 @@ const convertLevel = (level: "EXCEPTION" | "NORMAL" | "WARNING"): BannerNotifica
   }
 };
 
-const convertTarget = (target: "ALL" | "STAFF" | "USER"): BannerNotificationTarget => {
+const convertTarget = (
+  target: "ALL" | "STAFF" | "USER"
+): BannerNotificationTarget => {
   switch (target) {
     case "ALL":
       return BannerNotificationTarget.All;
@@ -421,13 +425,13 @@ const NotificationForm = ({
         );
       } else {
       */
-        notifySuccess(
-          t("form.saveSuccessToast", {
-            name: data.name,
-            state: data.pk === 0 ? t("form.created") : t("form.updated"),
-          })
-        );
-        navigate("..");
+      notifySuccess(
+        t("form.saveSuccessToast", {
+          name: data.name,
+          state: data.pk === 0 ? t("form.created") : t("form.updated"),
+        })
+      );
+      navigate("..");
     } catch (e) {
       // TODO what is the format of these errors?
       // eslint-disable-next-line no-console
@@ -722,7 +726,7 @@ const useRemoveNotification = ({
         handleError(res.errors.map((e) => e.message));
         return;
       }
-    } catch(e) {
+    } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
       handleError(["gql threw an error"]);

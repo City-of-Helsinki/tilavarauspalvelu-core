@@ -11,7 +11,7 @@ import type {
   ApplicationRoundNode,
 } from "common/types/gql-types";
 import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
-import Page1 from "@/components/application/Page1";
+import { Page1 } from "@/components/application/Page1";
 import Page2 from "@/components/application/Page2";
 import { CenterSpinner } from "@/components/common/common";
 import { getTranslation } from "@/modules/util";
@@ -30,7 +30,7 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
-export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale } = ctx;
 
   // TODO should fetch on SSR but we need authentication for it
@@ -60,9 +60,9 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
-};
+}
 
-const ApplicationRootPage = ({
+function ApplicationRootPage({
   application,
   applicationRound,
   pageId,
@@ -70,7 +70,7 @@ const ApplicationRootPage = ({
   application: ApplicationNode;
   applicationRound: ApplicationRoundNode;
   pageId: string;
-}): JSX.Element | null => {
+}): JSX.Element | null {
   const router = useRouter();
 
   const [update, { error }] = useApplicationUpdate();
@@ -161,12 +161,12 @@ const ApplicationRootPage = ({
       )}
     </FormProvider>
   );
-};
+}
 
-const ApplicationPageWithQuery = ({
+function ApplicationPageWithQuery({
   pk,
   slug,
-}: PropsNarrowed): JSX.Element | null => {
+}: PropsNarrowed): JSX.Element | null {
   const router = useRouter();
   const { t } = useTranslation();
 
@@ -204,6 +204,6 @@ const ApplicationPageWithQuery = ({
       applicationRound={applicationRound}
     />
   );
-};
+}
 
 export default ApplicationPageWithQuery;

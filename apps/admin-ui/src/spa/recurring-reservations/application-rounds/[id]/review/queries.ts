@@ -158,6 +158,13 @@ export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
         node {
           ...ApplicationSectionFragment
           allocations
+          suitableTimeRanges(fulfilled: false) {
+            beginTime
+            endTime
+            dayOfTheWeek
+            priority
+            fulfilled
+          }
           reservationUnitOptions {
             allocatedTimeSlots {
               pk

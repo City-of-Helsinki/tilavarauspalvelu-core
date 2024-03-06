@@ -261,10 +261,7 @@ function transformDateString(date?: string | null): string | null {
 }
 
 // On purpose not return typed create / update compatible objects
-const transformEventReservationUnit = (
-  pk: number,
-  priority: number
-) => ({
+const transformEventReservationUnit = (pk: number, priority: number) => ({
   preferredOrder: priority,
   reservationUnit: pk,
 });
@@ -297,9 +294,7 @@ function transformApplicationSectionCreate(
     reservationMinDuration: ae.minDuration ?? 0, // "3600" == 1h
     reservationMaxDuration: ae.maxDuration ?? 0, // "7200" == 2h
     appliedReservationsPerWeek: ae.appliedReservationsPerWeek,
-    suitableTimeRanges: ae.suitableTimeRanges.map(
-      transformSuitableTimeRange
-    ),
+    suitableTimeRanges: ae.suitableTimeRanges.map(transformSuitableTimeRange),
     reservationUnitOptions: ae.reservationUnits.map((ruo, ruoIndex) =>
       transformEventReservationUnit(ruo, ruoIndex)
     ),
@@ -331,18 +326,18 @@ function transformApplicationSection(
     reservationUnitOptions: ae.reservationUnits.map((ruo, ruoIndex) =>
       transformEventReservationUnit(ruo, ruoIndex)
     ),
-  }
+  };
   if (ae.pk != null) {
     const data: ApplicationSectionUpdateMutationInput = {
       ...commonData,
       pk: ae.pk,
-    }
-    return data
+    };
+    return data;
   }
   // TODO throw is bad (null return is preferable)
   // this should be a validation error (it's incorrect date string)
   if (begin == null || end == null) {
-    throw new Error("begin or end cannot be null")
+    throw new Error("begin or end cannot be null");
   }
   const data: ApplicationSectionCreateMutationInput = {
     ...commonData,
@@ -371,14 +366,15 @@ export function transformApplicationCreate(
 
 // For pages 1 and 2
 export const transformApplication = (
-  values: ApplicationFormValues,
-  application: number
+  values: ApplicationFormValues
 ): ApplicationUpdateMutationInput => {
   const appEvents = filterNonNullable(values.applicationSections);
   return {
     pk: values.pk,
     applicantType: values.applicantType,
-    applicationSections: appEvents.map((ae) => transformApplicationSection(ae, application)),
+    applicationSections: appEvents.map((ae) =>
+      transformApplicationSection(ae, values.pk)
+    ),
   };
 };
 
