@@ -85,8 +85,8 @@ class FirstReservableTimeHelper:
     │                  │ reservation_start_interval   │
     │                  │ reservations_min_days_before │
     │                  │ reservations_max_days_before │
-    │                  │ buffer_time_before           │ (when comparing with Reservations)
-    │                  │ buffer_time_after            │ (when comparing with Reservations)
+    │                  │ buffer_time_before           │ (when comparing with non-blocking Reservations)
+    │                  │ buffer_time_after            │ (when comparing with non-blocking Reservations)
     ├──────────────────┼──────────────────────────────┤
     │ Reservation      │ begin                        │ (from ReservationUnits with common hierarchy)
     │                  │ end                          │
@@ -108,6 +108,8 @@ class FirstReservableTimeHelper:
     reservation_units_with_prefetched_related_objects: Iterable[ReservationUnit]
     # Contains a set of closed time spans for each ReservationUnit generated from their relevant Reservations
     reservation_closed_time_spans_map: dict[ReservationUnitPK, set[TimeSpanElement]]
+    # Contains a set of closed time spans for each ReservationUnit generated from their relevant BLOCKING Reservations
+    blocking_reservation_closed_time_spans_map: dict[ReservationUnitPK, set[TimeSpanElement]]
 
     # Contains a list of the first reservable time for each ReservationUnit.
     first_reservable_times: dict[ReservationUnitPK, datetime]
@@ -183,12 +185,14 @@ class FirstReservableTimeHelper:
 
         self.reservation_unit_queryset = reservation_unit_queryset
         self.reservation_units_with_prefetched_related_objects = self._get_reservation_unit_queryset_with_prefetches()
-        self.reservation_closed_time_spans_map = Reservation.objects.get_affecting_reservations_as_closed_time_spans(
+
+        reservations, blocking_reservations = Reservation.objects.get_affecting_reservations_as_closed_time_spans(
             reservation_unit_queryset=reservation_unit_queryset.exclude(origin_hauki_resource__isnull=True),
             start_date=filter_date_start,
             end_date=filter_date_end,
         )
-
+        self.reservation_closed_time_spans_map = reservations
+        self.blocking_reservation_closed_time_spans_map = blocking_reservations
         ##################################
         # Initialise important variables #
         ##################################
@@ -310,6 +314,11 @@ class ReservationUnitFirstReservableTimeHelper:
     # [x] Can overlap with buffers
     soft_closed_time_spans: list[TimeSpanElement]
 
+    # BLOCKED-type Reservation Closed Time Spans
+    # [ ] Affects closed status
+    # [X] Can overlap with buffers
+    blocking_reservation_closed_time_spans: list[TimeSpanElement]
+
     # Reservation Closed Time Spans
     # [ ] Affects closed status
     # [ ] Can overlap with buffers
@@ -325,9 +334,11 @@ class ReservationUnitFirstReservableTimeHelper:
         self.hard_closed_time_spans += parent.shared_hard_closed_time_spans
 
         self.reservation_closed_time_spans = self._get_reservation_closed_time_spans()
+        self.blocking_reservation_closed_time_spans = self._get_blocking_reservation_closed_time_spans()
 
         self.soft_closed_time_spans = self._get_soft_closed_time_spans()
         self.soft_closed_time_spans += self.reservation_closed_time_spans
+        self.soft_closed_time_spans += self.blocking_reservation_closed_time_spans
 
         # Check if the ReservationUnits Maximum Reservation Duration is at least as long as the minimum duration.
         # Note that wes till need to check if the ReservationUnit is considered Open, so we can't return early here.
@@ -442,6 +453,10 @@ class ReservationUnitFirstReservableTimeHelper:
     def _get_reservation_closed_time_spans(self) -> list[TimeSpanElement]:
         """Get a list of closed time spans from Reservations of the ReservationUnit"""
         return list(self.parent.reservation_closed_time_spans_map.get(self.reservation_unit.pk, set()))
+
+    def _get_blocking_reservation_closed_time_spans(self) -> list[TimeSpanElement]:
+        """Get a list of closed time spans from Reservations of the ReservationUnit"""
+        return list(self.parent.blocking_reservation_closed_time_spans_map.get(self.reservation_unit.pk, set()))
 
 
 class ReservableTimeSpanFirstReservableTimeHelper:

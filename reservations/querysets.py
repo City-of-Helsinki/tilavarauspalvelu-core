@@ -13,7 +13,7 @@ from merchants.models import OrderStatus
 from opening_hours.utils.time_span_element import TimeSpanElement
 from reservation_units.models import ReservationUnit
 from reservation_units.querysets import ReservationUnitQuerySet
-from reservations.choices import ReservationStateChoice
+from reservations.choices import ReservationStateChoice, ReservationTypeChoice
 
 ReservationUnitPK = Annotated[int, "ReservationUnit PK"]
 SpacePK = Annotated[int, "Space PK"]
@@ -34,18 +34,22 @@ class ReservationUnitInfo:
 
 @dataclass
 class ReservationInfo:
+    is_blocking_reservation: bool
     time_span: TimeSpanElement
     reservation_unit_id: ReservationUnitPK
     space_ids: set[SpacePK]
     resource_ids: set[ResourcePK]
 
     def __init__(self, reservation_values: dict[str, Any]):
+        # BLOCKED-type reservations should be treated differently than normal reservations.
+        # They are not reservable, they don't have a buffer time, and other reservation buffer times can overlap them.
+        self.is_blocking_reservation = reservation_values["type"] == ReservationTypeChoice.BLOCKED.value
         self.time_span = TimeSpanElement(
             start_datetime=reservation_values["begin"],
             end_datetime=reservation_values["end"],
             is_reservable=False,
-            buffer_time_before=reservation_values["buffer_time_before"],
-            buffer_time_after=reservation_values["buffer_time_after"],
+            buffer_time_before=reservation_values["buffer_time_before"] if not self.is_blocking_reservation else None,
+            buffer_time_after=reservation_values["buffer_time_after"] if not self.is_blocking_reservation else None,
         )
         self.reservation_unit_id = reservation_values["reservation_unit__id"]
         self.space_ids = set(reservation_values["space_ids"])
@@ -58,7 +62,16 @@ class ReservationQuerySet(QuerySet):
         reservation_unit_queryset: ReservationUnitQuerySet,
         start_date: date,
         end_date: date,
-    ) -> dict[ReservationUnitPK, set[TimeSpanElement]]:
+    ) -> tuple[dict[ReservationUnitPK, set[TimeSpanElement]], dict[ReservationUnitPK, set[TimeSpanElement]]]:
+        """
+        Get all reservations that affect the given reservation units and period as closed time spans.
+
+        Returns a tuple of two dictionaries:
+        - Reservations, that affect the reservation units, as closed time spans.
+        - BLOCKED-type reservations, that affect the reservation units, as closed time spans.
+        The difference between the two is that BLOCKED reservations are treated differently than normal reservations.
+        (They are not reservable, they don't have a buffer time, and other reservation buffer times can overlap them.)
+        """
         from spaces.models import Space
 
         reservation_unit_queryset = (
@@ -102,17 +115,27 @@ class ReservationQuerySet(QuerySet):
                 "reservation_unit__id",
                 "space_ids",
                 "resource_ids",
+                "type",
             )
         )
         reservation_infos = [ReservationInfo(item) for item in reservation_queryset]
 
-        closed_time_spans: dict[ReservationUnitPK, set[TimeSpanElement]] = {}
+        reservation_time_spans: dict[ReservationUnitPK, set[TimeSpanElement]] = {}
+        blocked_time_spans: dict[ReservationUnitPK, set[TimeSpanElement]] = {}
+
+        def _use_reservation_time_span(reservation_unit_id: ReservationUnitPK, reservation_info: ReservationInfo):
+            """Add the reservation time span to the correct dictionary."""
+            if reservation_info.is_blocking_reservation:
+                blocked_time_spans.setdefault(reservation_unit_id, set())
+                blocked_time_spans[reservation_unit_id].add(reservation_info.time_span)
+            else:
+                reservation_time_spans.setdefault(reservation_unit_id, set())
+                reservation_time_spans[reservation_unit_id].add(reservation_info.time_span)
 
         for reservation_info in reservation_infos:
             # Still add this reservation for the reservation unit if it doesn't have any spaces or resources.
             if not reservation_info.space_ids and not reservation_info.resource_ids:
-                closed_time_spans.setdefault(reservation_info.reservation_unit_id, set())
-                closed_time_spans[reservation_info.reservation_unit_id].add(reservation_info.time_span)
+                _use_reservation_time_span(reservation_info.reservation_unit_id, reservation_info)
                 continue
 
             # Spaces
@@ -128,16 +151,14 @@ class ReservationQuerySet(QuerySet):
                     # If any space from the family is a direct space on the reservation unit,
                     # add a timespan from the reservation to the reservation unit, but only once.
                     if reservation_unit_info.space_ids.intersection(family):
-                        closed_time_spans.setdefault(reservation_unit_info.pk, set())
-                        closed_time_spans[reservation_unit_info.pk].add(reservation_info.time_span)
+                        _use_reservation_time_span(reservation_unit_info.pk, reservation_info)
 
             # Resources
             for reservation_unit_info in reservation_unit_infos:
                 if reservation_unit_info.resource_ids.intersection(reservation_info.resource_ids):
-                    closed_time_spans.setdefault(reservation_unit_info.pk, set())
-                    closed_time_spans[reservation_unit_info.pk].add(reservation_info.time_span)
+                    _use_reservation_time_span(reservation_unit_info.pk, reservation_info)
 
-        return closed_time_spans
+        return reservation_time_spans, blocked_time_spans
 
     def with_buffered_begin_and_end(self: Self) -> Self:
         """Annotate the queryset with buffered begin and end times."""
