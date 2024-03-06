@@ -18,7 +18,7 @@ export type Props = {
   accepted?: boolean;
   setAccepted?: (accepted: boolean) => void;
   errorText?: string;
-};
+} & React.HTMLAttributes<HTMLDivElement>;
 
 const Wrapper = styled.div`
   --background-color: var(--color-silver-light);

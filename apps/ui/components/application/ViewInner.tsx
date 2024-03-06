@@ -4,10 +4,11 @@ import { useTranslation } from "next-i18next";
 import type { ApplicationNode, TermsOfUseType } from "common/types/gql-types";
 import { getTranslation } from "@/modules/util";
 import { ApplicantInfoPreview } from "./ApplicantInfoPreview";
-import { FormSubHeading } from "../common/common";
-import { CheckboxContainer, StyledNotification, Terms } from "./styled";
+import { CheckboxContainer, StyledNotification } from "./styled";
 import { AccordionWithState as Accordion } from "../common/Accordion";
 import { ApplicationEventList } from "./ApplicationEventList";
+import TermsBox from "common/src/termsbox/TermsBox";
+import Sanitize from "../common/Sanitize";
 
 export function ViewInner({
   application,
@@ -35,12 +36,22 @@ export function ViewInner({
         <ApplicantInfoPreview application={application} />
       </Accordion>
       <ApplicationEventList application={application} />
-      <FormSubHeading>{t("reservationUnit:termsOfUse")}</FormSubHeading>
-      {tos && <Terms tabIndex={0}>{getTranslation(tos, "text")}</Terms>}
-      <FormSubHeading>
-        {t("application:preview.reservationUnitTerms")}
-      </FormSubHeading>
-      {tos2 && <Terms tabIndex={0}>{getTranslation(tos2, "text")}</Terms>}
+      {tos && (
+        <TermsBox
+          id="preview.acceptTermsOfUse"
+          heading={t("reservationUnit:termsOfUse")}
+          body={<Sanitize html={getTranslation(tos, "text")} />}
+        />
+      )}
+      {tos2 && (
+        <TermsBox
+          id="preview.acceptServiceSpecificTerms"
+          heading={t("application:preview.reservationUnitTerms")}
+          body={<Sanitize html={getTranslation(tos2, "text")} />}
+          /* TODO TermsBox has accepted and checkbox we could use but for now leaving the single
+           * page specfici checkbox to accept all terms */
+        />
+      )}
       {acceptTermsOfUse != null && setAcceptTermsOfUse != null && (
         <CheckboxContainer>
           <Checkbox

@@ -1,6 +1,5 @@
 import styled from "styled-components";
 import { Notification } from "hds-react";
-import { breakpoints } from "common/src/common/style";
 import LabelValue from "../common/LabelValue";
 
 export const TimePreviewContainer = styled.div`
@@ -24,24 +23,6 @@ export const StyledNotification = styled(Notification)`
   svg {
     position: relative;
     top: -2px;
-  }
-`;
-
-export const Terms = styled.div`
-  margin-top: var(--spacing-s);
-  width: (--container-width-m);
-  white-space: break-spaces;
-  height: 20em;
-  overflow-y: scroll;
-  background-color: var(--color-white);
-  padding: var(--spacing-s);
-  border: 1px solid var(--color-black-90);
-
-  @media (max-width: ${breakpoints.m}) {
-    height: auto;
-    background-color: transparent;
-    padding: 0;
-    overflow-y: none;
   }
 `;
 
