@@ -110,6 +110,26 @@ def test_application_section__order__by_name__asc(graphql):
     assert response.node(1) == {"pk": section_2.pk}
 
 
+def test_application_section__order__by_name__asc__case_insensitive(graphql):
+    # given:
+    # - There are two application sections
+    # - A superuser is using the system
+    section_1 = ApplicationSectionFactory.create_in_status_unallocated(name="B")
+    section_2 = ApplicationSectionFactory.create_in_status_unallocated(name="a")
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    # when:
+    # - User tries to order application sections by name, ascending
+    query = sections_query(order_by="nameAsc")
+    response = graphql(query)
+
+    # then:
+    # - The response contains the application section in the correct order
+    assert len(response.edges) == 2, response
+    assert response.node(0) == {"pk": section_2.pk}
+    assert response.node(1) == {"pk": section_1.pk}
+
+
 def test_application_section__order__by_name__desc(graphql):
     # given:
     # - There are two application sections

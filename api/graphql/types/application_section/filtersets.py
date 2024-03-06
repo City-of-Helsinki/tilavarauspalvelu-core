@@ -4,6 +4,7 @@ import django_filters
 from django.contrib.postgres.search import SearchVector
 from django.db import models
 from django.db.models import QuerySet
+from django.db.models.functions import Lower
 from graphene_django_extensions.filters import (
     EnumMultipleChoiceFilter,
     IntChoiceFilter,
@@ -87,6 +88,10 @@ class ApplicationSectionFilterSet(ModelFilterSet):
         vector = SearchVector("application__id", "id", "name", "applicant")
         query = raw_prefixed_query(value)
         return qs.alias(applicant=L("application__applicant")).annotate(search=vector).filter(search=query)
+
+    @staticmethod
+    def order_by_name(qs: ApplicationSectionQuerySet, desc: bool) -> QuerySet:
+        return qs.alias(name_lower=Lower("name")).order_by(models.OrderBy(models.F("name_lower"), descending=desc))
 
     @staticmethod
     def order_by_status(qs: ApplicationSectionQuerySet, desc: bool) -> QuerySet:
