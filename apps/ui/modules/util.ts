@@ -136,10 +136,10 @@ export const mapOptions = (
 export const getSelectedOption = (
   selectedId: number | string | null,
   options: OptionType[]
-): OptionType | undefined => {
+): OptionType | null => {
   const selected = String(selectedId);
   const option = options.find((o) => String(o.value) === selected);
-  return option;
+  return option ?? null;
 };
 
 export const getComboboxValues = (
