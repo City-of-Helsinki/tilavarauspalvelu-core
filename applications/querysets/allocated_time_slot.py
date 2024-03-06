@@ -50,6 +50,11 @@ class AllocatedTimeSlotQuerySet(models.QuerySet):
         order = L("reservation_unit_option__application_section__application__applicant")
         return self.alias(applicant=order).order_by(models.OrderBy(models.F("applicant"), descending=desc))
 
+    def order_by_day_of_the_week(self, *, desc: bool = False) -> Self:
+        return self.alias(day_of_the_week_number=L("day_of_the_week_number")).order_by(
+            models.OrderBy(models.F("day_of_the_week_number"), descending=desc)
+        )
+
     def has_overlapping_allocations(
         self,
         reservation_unit_option: ReservationUnitOption,

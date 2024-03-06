@@ -14,6 +14,11 @@ if TYPE_CHECKING:
 
 
 class SuitableTimeRangeQuerySet(models.QuerySet):
+    def order_by_day_of_the_week(self, *, desc: bool = False) -> Self:
+        return self.alias(day_of_the_week_number=L("day_of_the_week_number")).order_by(
+            models.OrderBy(models.F("day_of_the_week_number"), descending=desc)
+        )
+
     def fits_in_time_range(
         self,
         application_section: ApplicationSection,
