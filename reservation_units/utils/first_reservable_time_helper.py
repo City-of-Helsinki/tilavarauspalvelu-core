@@ -11,12 +11,7 @@ from django.db.models import QuerySet, When
 
 from applications.choices import ApplicationRoundStatusChoice
 from applications.models import ApplicationRound
-from common.date_utils import (
-    local_datetime,
-    local_datetime_max,
-    local_datetime_min,
-    local_start_of_day,
-)
+from common.date_utils import local_datetime, local_datetime_max, local_datetime_min, local_start_of_day
 from opening_hours.models import ReservableTimeSpan
 from opening_hours.utils.reservable_time_span_client import override_reservable_with_closed_time_spans
 from opening_hours.utils.time_span_element import TimeSpanElement

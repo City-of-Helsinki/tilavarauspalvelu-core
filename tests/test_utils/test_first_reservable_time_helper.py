@@ -8,7 +8,7 @@ from django.utils.timezone import get_default_timezone
 from opening_hours.utils.time_span_element import TimeSpanElement
 from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import ReservationUnit
-from reservation_units.utils.first_reservable_time import (
+from reservation_units.utils.first_reservable_time_helper import (
     FirstReservableTimeHelper,
     ReservableTimeSpanFirstReservableTimeHelper,
     ReservationUnitFirstReservableTimeHelper,
