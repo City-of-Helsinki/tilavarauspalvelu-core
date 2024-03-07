@@ -172,9 +172,15 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
   const startDateTime = new Date(reservation.begin);
   const endDateTime = new Date(reservation.end);
 
+  const reservationUnit = reservation.reservationUnits?.find(() => true);
+
+  // TODO this matches the CreateReservationModal logic (should use a common function that is documented)
+  // not doing it right now because of open question and because of breaking enum name change.
   const interval =
-    reservation.reservationUnits?.find(() => true)?.reservationStartInterval ??
-    ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins;
+    reservationUnit?.reservationStartInterval ===
+    ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
+      ? ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_15Mins
+      : ReservationUnitsReservationUnitReservationStartIntervalChoices.Interval_30Mins;
 
   const form = useForm<FormValueType>({
     resolver: zodResolver(TimeChangeFormSchemaRefined(interval)),
@@ -217,8 +223,6 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
       },
     });
   };
-
-  const reservationUnit = reservation.reservationUnits?.find(() => true);
 
   const formDate = watch("date");
   const formEndTime = watch("endTime");
