@@ -366,8 +366,8 @@ class ReservationSchedulingMixin:
     ) -> None:
         interval_minutes = ReservationStartInterval(reservation_unit.reservation_start_interval).as_number
 
-        # Staff reservations ignore 60 and 90 minute intervals
-        if interval_minutes in (60, 90):
+        # Staff reservations ignore start intervals longer than 30 minutes
+        if interval_minutes != 15:
             interval_minutes = 30
 
         interval_timedelta = datetime.timedelta(minutes=interval_minutes)
