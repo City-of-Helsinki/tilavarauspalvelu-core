@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, NamedTuple
 
 from django.db import models
 from django.db.models import QuerySet, When
+from lookup_property import L
 
 from applications.choices import ApplicationRoundStatusChoice
 from applications.models import ApplicationRound
@@ -254,12 +255,10 @@ class FirstReservableTimeHelper:
             ),
             models.Prefetch(
                 "application_rounds",
-                ApplicationRound.objects.with_round_status()
-                .filter(
+                ApplicationRound.objects.filter(
                     reservation_period_begin__lte=self.filter_date_end,
                     reservation_period_end__gte=self.filter_date_start,
-                )
-                .exclude(round_status=ApplicationRoundStatusChoice.RESULTS_SENT),
+                ).exclude(L(status=ApplicationRoundStatusChoice.RESULTS_SENT.value)),
             ),
         )
 
