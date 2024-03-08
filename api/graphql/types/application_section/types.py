@@ -45,6 +45,7 @@ class ApplicationSectionNode(DjangoNode):
         ]
         filterset_class = ApplicationSectionFilterSet
         permission_classes = [ApplicationSectionPermission]
+        max_complexity = 14
 
     @classmethod
     def filter_queryset(cls, queryset: models.QuerySet, info: GQLInfo) -> models.QuerySet:
