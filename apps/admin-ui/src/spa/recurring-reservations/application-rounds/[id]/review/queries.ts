@@ -1,13 +1,13 @@
 import { gql } from "@apollo/client";
 import {
   APPLICANT_NAME_FRAGMENT,
-  APPLICATION_DURATION_FRAGMENT,
-  APPLICATION_SECTION_FRAGMENT,
+  APPLICATION_SECTION_DURATION_FRAGMENT,
+  APPLICATION_SECTION_ADMIN_FRAGMENT,
 } from "common/src/queries/application";
 
 export const APPLICATIONS_QUERY = gql`
   ${APPLICANT_NAME_FRAGMENT}
-  ${APPLICATION_DURATION_FRAGMENT}
+  ${APPLICATION_SECTION_DURATION_FRAGMENT}
   query getApplications(
     $applicationRound: Int!
     $unit: [Int]
@@ -36,7 +36,7 @@ export const APPLICATIONS_QUERY = gql`
           applicationSections {
             name
             pk
-            ...ApplicationDurationFragment
+            ...ApplicationSectionDurationFragment
             reservationUnitOptions {
               preferredOrder
               reservationUnit {
@@ -54,17 +54,12 @@ export const APPLICATIONS_QUERY = gql`
   }
 `;
 
-// TODO change the type $orderBy: String
-// TODO the fragment includes reservationUnit.applicationRoundTimeSlots which is not needed for allocation
-// it's used on ui to show the time slots for the reservation unit
-// and the fragment is shared
-// also it includes nameEn, nameSv for reservationUnit, unit, purpose
-// TODO see if we can use a different primary query for the listing page?
-// TODO rename (there is no Events anymore)
-// TODO see if we can remove some of the fields (like reservationUnitOptions)
-// NOTE this can't be cached (probably) because of the duplicate versions
+/// NOTE Requires higher backend optimizer complexity limit (14 works, lower doesn't)
+/// NOTE might have some cache issues (because it collides with the other sections query)
+/// TODO rename (there is no Events anymore)
+/// TODO see if we can remove some of the fields (like reservationUnitOptions)
 export const APPLICATIONS_EVENTS_QUERY = gql`
-  ${APPLICATION_SECTION_FRAGMENT}
+  ${APPLICATION_SECTION_ADMIN_FRAGMENT}
   query getApplicationSections(
     $applicationRound: Int!
     $applicationStatus: [ApplicationStatusChoice]!
@@ -125,10 +120,11 @@ export const APPLICATIONS_EVENTS_QUERY = gql`
   }
 `;
 
-// NOTE have to design a separate query for allocation page (a bit different data than the listing page)
-// primarily we need to define reservationUnit parameter as a singular pk instead of array (because of the related allocated time slots)
+/// NOTE have to design a separate query for allocation page (a bit different data than the listing page)
+/// primarily we need to define reservationUnit parameter as a singular pk instead of array (because of the related allocated time slots)
+/// NOTE Requires higher backend optimizer complexity limit (14 works, lower doesn't)
 export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
-  ${APPLICATION_SECTION_FRAGMENT}
+  ${APPLICATION_SECTION_ADMIN_FRAGMENT}
   query getApplicationSections(
     $applicationRound: Int!
     $applicationStatus: [ApplicationStatusChoice]!

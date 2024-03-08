@@ -16,8 +16,8 @@ export const APPLICANT_NAME_FRAGMENT = gql`
   }
 `;
 
-export const APPLICATION_DURATION_FRAGMENT = gql`
-  fragment ApplicationDurationFragment on ApplicationSectionNode {
+export const APPLICATION_SECTION_DURATION_FRAGMENT = gql`
+  fragment ApplicationSectionDurationFragment on ApplicationSectionNode {
     reservationsEndDate
     reservationsBeginDate
     appliedReservationsPerWeek
@@ -26,13 +26,12 @@ export const APPLICATION_DURATION_FRAGMENT = gql`
 `;
 
 const APPLICATION_SECTION_COMMON_FRAGMENT = gql`
-  ${APPLICANT_NAME_FRAGMENT}
-  ${APPLICATION_DURATION_FRAGMENT}
+  ${APPLICATION_SECTION_DURATION_FRAGMENT}
   fragment ApplicationSectionCommonFragment on ApplicationSectionNode {
     pk
     name
     status
-    ...ApplicationDurationFragment
+    ...ApplicationSectionDurationFragment
     reservationMaxDuration
     ageGroup {
       pk
@@ -40,11 +39,6 @@ const APPLICATION_SECTION_COMMON_FRAGMENT = gql`
       maximum
     }
     numPersons
-    application {
-      pk
-      status
-      ...ApplicationNameFragment
-    }
     reservationUnitOptions {
       pk
       preferredOrder
@@ -52,17 +46,21 @@ const APPLICATION_SECTION_COMMON_FRAGMENT = gql`
   }
 `;
 
-// TODO on admin side we need to filter out the suitableTimeRanges with fulfilled
-// TODO on admin side we don't need nameEn, nameSv for reservationUnit, unit, purpose
-// TODO rename this to admin fragment
-// TODO filter out unrelated reservationUnitOptions (we are always interested in a single reservationUnit)
-export const APPLICATION_SECTION_FRAGMENT = gql`
+// NOTE this is for allocation only (it includes the application name)
+// for regular application queries we don't need to query the name through the application relation
+export const APPLICATION_SECTION_ADMIN_FRAGMENT = gql`
+  ${APPLICANT_NAME_FRAGMENT}
   ${APPLICATION_SECTION_COMMON_FRAGMENT}
   fragment ApplicationSectionFragment on ApplicationSectionNode {
     ...ApplicationSectionCommonFragment
     purpose {
       pk
       nameFi
+    }
+    application {
+      pk
+      status
+      ...ApplicationNameFragment
     }
     reservationUnitOptions {
       reservationUnit {
@@ -206,6 +204,7 @@ export const APPLICATION_FRAGMENT = gql`
   }
 `;
 
+/// NOTE Requires higher backend optimizer complexity limit (22 works, lower doesn't)
 export const APPLICATION_QUERY = gql`
   ${APPLICATION_FRAGMENT}
   ${TERMS_OF_USE_FRAGMENT}
