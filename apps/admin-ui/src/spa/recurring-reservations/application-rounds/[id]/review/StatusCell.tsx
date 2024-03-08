@@ -74,7 +74,6 @@ function ApplicationStatusIcon({
   return <StatusDot aria-hidden status={status} />;
 }
 
-// FIXME this needs to use fullfilled / rejected not the status (they are not added to the backend yet)
 function ApplicationSectionStatusIcon({
   status,
 }: {
@@ -93,17 +92,7 @@ function ApplicationSectionStatusIcon({
       />
     );
   }
-  // FIXME this is wrong, it should not be InAllocation it should be declined (but there is no such status)
-  /*
-  if (status === ApplicationSectionStatusChoice.InAllocation) {
-    return (
-      <IconCrossCircleFill
-        aria-hidden
-        style={{ color: "var(--color-error)" }}
-      />
-    );
-  }
-  */
+
   return <ApplicationSectionStatusDot aria-hidden status={status} />;
 }
 

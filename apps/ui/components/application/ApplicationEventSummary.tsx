@@ -1,5 +1,5 @@
 import { differenceInWeeks } from "date-fns";
-import { IconArrowRedo, IconCalendar, IconClock, IconGroup } from "hds-react";
+import { IconCalendar, IconClock, IconGroup } from "hds-react";
 import React from "react";
 import { Trans, useTranslation, TFunction } from "next-i18next";
 import styled from "styled-components";
@@ -39,7 +39,6 @@ const Box = styled.div`
 const numHours = (
   startDate: string | undefined,
   endDate: string | undefined,
-  biweekly: boolean,
   eventsPerWeek: number,
   minDurationMinutes: number
 ) => {
@@ -51,7 +50,7 @@ const numHours = (
   if (!sd || !ed) {
     return 0;
   }
-  const numWeeks = differenceInWeeks(ed, sd) / (biweekly ? 2 : 1);
+  const numWeeks = differenceInWeeks(ed, sd);
 
   const hours = (numWeeks * eventsPerWeek * minDurationMinutes) / 60;
   return hours;
@@ -83,18 +82,15 @@ export function ApplicationEventSummary({
   const {
     begin,
     end,
-    // biweekly,
     appliedReservationsPerWeek,
     minDuration,
     maxDuration,
     numPersons,
   } = applicationSection;
 
-  const biweekly = false;
   const hours = numHours(
     begin,
     end,
-    biweekly,
     appliedReservationsPerWeek,
     minDuration / 60
   );
@@ -142,12 +138,6 @@ export function ApplicationEventSummary({
             count: appliedReservationsPerWeek,
           })}
         />
-        {biweekly ? (
-          <CustomIconWithText
-            icon={<IconArrowRedo aria-hidden />}
-            text={<strong>{t("application:Page1.biweekly")}</strong>}
-          />
-        ) : null}
       </Box>
     </>
   );

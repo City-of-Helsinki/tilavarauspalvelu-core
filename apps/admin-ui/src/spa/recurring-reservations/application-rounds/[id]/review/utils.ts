@@ -103,7 +103,5 @@ export function formatAppliedReservationTime(time: {
   hours: number;
 }): string {
   const { count, hours } = time;
-  // TODO is there a case where there is an extra / in the string? (there used to be trim by / here)
-  // TODO the hours short format should use a tr key
   return `${formatNumber(count, "")} / ${formatters.oneDecimal.format(hours)} t`;
 }

@@ -14,7 +14,6 @@ export const RESERVATION_UNIT = gql`
       nameEn
       nameSv
       isDraft
-      isDraft
       images {
         ...ImageFragment
       }

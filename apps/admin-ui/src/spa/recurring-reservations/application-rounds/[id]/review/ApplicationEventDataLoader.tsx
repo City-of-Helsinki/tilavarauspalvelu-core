@@ -51,7 +51,6 @@ export function ApplicationEventDataLoader({
       unit: unitFilter.map(Number).filter(Number.isFinite),
       applicationRound: applicationRoundPk,
       applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,
-      // TODO does this use any of the other filters? or are they null because of backend limitations?
       status: transformApplicationSectionStatus(eventStatusFilter),
       applicantType: transformApplicantType(applicantFilter),
       textSearch: nameFilter,

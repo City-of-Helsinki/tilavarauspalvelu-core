@@ -104,6 +104,7 @@ const ApplicationPageWrapper = ({
   const steps: StepperProps = {
     steps: pages.map((x, i) => ({ slug: x, step: i })),
     completedStep: application ? calculateCompletedStep(application) : 0,
+    // TODO use an urlbuilder
     basePath: `/application/${application?.pk ?? 0}`,
     isFormDirty: isDirty ?? false,
   };

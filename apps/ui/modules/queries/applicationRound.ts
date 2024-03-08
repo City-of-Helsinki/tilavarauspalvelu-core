@@ -60,8 +60,6 @@ export const APPLICATION_ROUNDS = gql`
   }
 `;
 
-// TODO image should be a fragment
-/* FIXME images breaks backend query optimization (overriden locally) */
 export const APPLICATION_ROUND_BY_ID = gql`
   ${APPLICATION_ROUND_FRAGMENT}
   ${IMAGE_FRAGMENT}
