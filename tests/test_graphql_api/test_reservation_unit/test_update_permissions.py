@@ -4,13 +4,24 @@ from applications.choices import WeekdayChoice
 from tests.factories import ReservationUnitFactory
 from tests.helpers import UserType
 
-from .helpers import UPDATE_MUTATION
+from .helpers import UPDATE_MUTATION, get_draft_update_input_data
 
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
     pytest.mark.usefixtures("_disable_hauki_export"),
 ]
+
+
+def test_reservation_unit__update__regular_user(graphql):
+    graphql.login_user_based_on_type(UserType.REGULAR)
+
+    reservation_unit = ReservationUnitFactory.create(is_draft=True)
+    data = get_draft_update_input_data(reservation_unit)
+
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    assert response.error_message() == "No permission to mutate"
 
 
 @pytest.mark.parametrize(
