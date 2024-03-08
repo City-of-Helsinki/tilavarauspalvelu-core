@@ -1,5 +1,28 @@
-import { ApplicationSectionNode } from "common/types/gql-types";
+import {
+  ApolloError,
+  type ApolloQueryResult,
+  useMutation,
+} from "@apollo/client";
+import { useTranslation } from "react-i18next";
+import {
+  type ApplicationSectionNode,
+  type Query,
+  type ReservationUnitOptionNode,
+  type SuitableTimeRangeNode,
+  type Mutation,
+  type MutationDeleteAllocatedTimeslotArgs,
+  type MutationCreateAllocatedTimeslotArgs,
+  type AllocatedTimeSlotCreateMutationInput,
+  type AllocatedTimeSlotNode,
+} from "common/types/gql-types";
+import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { useNotification } from "@/context/NotificationContext";
+import { timeSlotKeyToScheduleTime } from "./modules/applicationRoundAllocation";
+import {
+  CREATE_ALLOCATED_TIME_SLOT,
+  DELETE_ALLOCATED_TIME_SLOT,
+} from "./queries";
 
 export function useFocusApplicationEvent(): [
   number | undefined,
@@ -95,4 +118,291 @@ export function useSlotSelection(): [string[], (slots: string[]) => void] {
   const selection = getSelection();
 
   return [selection, setSelectedSlots];
+}
+
+// side effects that should happen when a modification is made
+export function useRefreshApplications(
+  fetchCallback: () => Promise<ApolloQueryResult<Query>>
+): [() => Promise<void>, boolean] {
+  const [, setSelection] = useSlotSelection();
+  const [isRefetchLoading, setIsRefetchLoading] = useState(false);
+  // TODO this should disable sibling cards allocation while this is loading
+  // atm one can try to allocate multiple cards at the same time and all except the first will fail
+  const refresh = async () => {
+    // NOTE this is slow so use a loading state to show the user that something is happening
+    // TODO this takes 3s to complete (on my local machine, so more in the cloud),
+    // should update the cache in the mutation instead (or do a single id query instead of refetching all)
+    setIsRefetchLoading(true);
+    await fetchCallback();
+    setIsRefetchLoading(false);
+    // Close all the cards (requires removing the selection)
+    setSelection([]);
+  };
+
+  return [refresh, isRefetchLoading];
+}
+
+type AcceptSlotMutationProps = {
+  applicationSection: ApplicationSectionNode;
+  reservationUnitOption?: ReservationUnitOptionNode;
+  selection: string[];
+  timeRange: SuitableTimeRangeNode | null;
+  refresh: () => void;
+};
+
+// TODO make into more generic
+// MutationF
+// MutationParams
+type HookReturnValue = [
+  // TODO add the results to the promise
+  () => Promise<void>, //FetchResult<TData>>,
+  {
+    isLoading: boolean;
+  },
+];
+
+// Return the translation key for a mutation error
+// these are new errors using the backend code system, so don't work most of the mutations.
+type ERROR_EXTENSION = { message: string; code: string; field: string };
+function getTranslatedMutationError(err: ERROR_EXTENSION) {
+  // TODO remove the message variation
+  // "Given time slot has already been allocated for another application section with a related reservation unit or resource."
+  const ALREADY_ALLOCATED_WITH_SPACE_HIERARCHY_CODE =
+    "ALLOCATION_OVERLAPPING_ALLOCATIONS";
+  // TODO migrate to error codes
+  const ALREADY_ALLOCATED_FOR_THAT_DAY =
+    "Cannot make multiple allocations on the same day of the week for one application section.";
+  const STATUS_CANCELLED =
+    "Cannot allocate to application in status: 'CANCELLED'";
+  const STATUS_HANDLED =
+    "Cannot allocate to application section in status: 'HANDLED'";
+  const MAX_ALLOCATIONS =
+    "Cannot make more allocations for this application section."; // Maximum allowed is 1."
+  if (err.code === ALREADY_ALLOCATED_WITH_SPACE_HIERARCHY_CODE) {
+    return "Allocation.errors.accepting.alreadyAllocatedWithSpaceHierrarchy";
+  }
+  if (err.message === STATUS_CANCELLED) {
+    return "Allocation.errors.accepting.statusCancelled";
+  }
+  if (err.message === STATUS_HANDLED) {
+    return "Allocation.errors.accepting.statusHandled";
+  }
+  if (err.message.includes(MAX_ALLOCATIONS)) {
+    return "Allocation.errors.accepting.maxAllocations";
+  }
+  if (err.message.includes(ALREADY_ALLOCATED_FOR_THAT_DAY)) {
+    return "Allocation.errors.accepting.alreadyAllocated";
+  }
+}
+
+export function useAcceptSlotMutation({
+  selection,
+  timeRange,
+  applicationSection,
+  reservationUnitOption,
+  // TODO await instead of calling a callback (alternatively chain a callback to the handle function but it's already red)
+  refresh,
+}: AcceptSlotMutationProps): HookReturnValue {
+  const { notifySuccess, notifyError } = useNotification();
+  const { t } = useTranslation();
+
+  const [acceptApplicationEvent, { loading: isLoading }] = useMutation<
+    Mutation,
+    MutationCreateAllocatedTimeslotArgs
+  >(CREATE_ALLOCATED_TIME_SLOT);
+
+  const handleAcceptSlot = async () => {
+    if (selection.length === 0) {
+      // eslint-disable-next-line no-console
+      console.error("Invalid selection");
+    }
+    if (timeRange == null) {
+      // eslint-disable-next-line no-console
+      console.error("Invalid timeRange for section: ", applicationSection);
+    }
+    if (selection.length === 0 || timeRange == null) {
+      notifyError(t("Allocation.errors.accepting.generic"));
+      return;
+    }
+    // TODO is this correct time format?
+    // why isn't it going through and API format function?
+    const allocatedBegin = timeSlotKeyToScheduleTime(selection[0]);
+    const allocatedEnd = timeSlotKeyToScheduleTime(
+      selection[selection.length - 1],
+      true
+    );
+    if (reservationUnitOption?.pk == null) {
+      notifyError(t("Allocation.errors.accepting.generic"));
+      return;
+    }
+
+    // NOTE the pk is an update pk that matches AllocatedTimeSlot (not the applicationSection)
+    // The reservationUnitOption is ReservationUnitOptionNode.pk not ReservationUnit.pk
+    // This creates an allocated time slot for the given reservationUnitOption and time range
+    // that changes the status of the applicationSection and maybe the whole application
+    // TODO check the inputs
+    const input: AllocatedTimeSlotCreateMutationInput = {
+      reservationUnitOption: reservationUnitOption?.pk,
+      dayOfTheWeek: timeRange.dayOfTheWeek,
+      beginTime: allocatedBegin,
+      endTime: allocatedEnd,
+      // Disable backend checks
+      force: true,
+    };
+
+    try {
+      const { errors } = await acceptApplicationEvent({
+        variables: {
+          input,
+        },
+      });
+      // NOTE there should be no errors here (the new api throws them as exceptions)
+      if (errors) {
+        const { name } = applicationSection;
+        notifyError(t("Allocation.errors.accepting.generic", { name }));
+        return;
+      }
+    } catch (e) {
+      if (e instanceof ApolloError) {
+        const gqlerrors = e.graphQLErrors;
+        const mutError = gqlerrors.find(
+          (err) =>
+            "code" in err.extensions &&
+            err.extensions.code === "MUTATION_VALIDATION_ERROR"
+        );
+        if (mutError) {
+          const err = mutError;
+          if (
+            "errors" in err.extensions &&
+            Array.isArray(err.extensions.errors)
+          ) {
+            // TODO type check the error
+            // TODO check the number of errors (should be 1)
+            const errMsg = getTranslatedMutationError(err.extensions.errors[0]);
+
+            const { name } = applicationSection;
+            if (errMsg != null) {
+              const title = "Allocation.errors.accepting.title";
+              notifyError(t(errMsg, { name }), t(title));
+              return;
+            }
+          }
+        }
+      } else {
+        // eslint-disable-next-line no-console
+        console.warn("Not a graphql error: ", e);
+      }
+      notifyError(
+        t("Allocation.errors.accepting.generic"),
+        t("Allocation.errors.accepting.title")
+      );
+      return;
+    }
+    const { name } = applicationSection;
+    const msg = t("Allocation.acceptingSuccess", { name });
+    notifySuccess(msg);
+    refresh();
+  };
+
+  return [handleAcceptSlot, { isLoading }];
+}
+
+export function useRemoveAllocation({
+  allocatedTimeSlot,
+  applicationSection,
+  refresh,
+}: {
+  allocatedTimeSlot: AllocatedTimeSlotNode | null;
+  applicationSection: ApplicationSectionNode;
+  refresh: () => void;
+}): HookReturnValue {
+  const { notifySuccess, notifyError } = useNotification();
+  const { t } = useTranslation();
+
+  const [resetApplicationEvent, { loading: isLoading }] = useMutation<
+    Mutation,
+    MutationDeleteAllocatedTimeslotArgs
+  >(DELETE_ALLOCATED_TIME_SLOT);
+
+  const handleRemoveAllocation = async () => {
+    if (allocatedTimeSlot?.pk == null) {
+      // eslint-disable-next-line no-console
+      console.error(
+        "Invalid allocated time slot for section: ",
+        applicationSection
+      );
+      return;
+    }
+
+    const allocatedPk = allocatedTimeSlot.pk;
+    // TODO both of these should be handled before we are in a callback
+    // they should never happen
+    // if the card is not allocated this callback should not be called (and they should be zero)
+    // if this card is allocated, it should have a single allocation (to this particular time slot)
+    // one applicationSection can't be allocated multiple times in a single day (so even if we have multiple time slots,
+    // they are all on the same day) and also a card matches a single time slot / range
+    if (allocatedPk === 0) {
+      const { name } = applicationSection;
+      notifyError(
+        t("Allocation.errors.remove.noAllocations", { name }),
+        t("Allocation.errors.remove.title")
+      );
+      return;
+    }
+    try {
+      const { data, errors } = await resetApplicationEvent({
+        variables: {
+          input: {
+            pk: String(allocatedPk),
+          },
+        },
+      });
+      // TODO these should not happen (they should still go through the same process and get logged and maybe displayed)
+      // they are typed the same as other GraphQL errors so we can make a free function / hook for both
+      if (errors) {
+        // eslint-disable-next-line no-console
+        console.warn("Removing allocation failed with data errors: ", errors);
+        notifyError(
+          t("Allocation.errors.remove.generic", {
+            name: applicationSection.name,
+          }),
+          t("Allocation.errors.remove.title")
+        );
+        return;
+      }
+      const { deleteAllocatedTimeslot: res } = data || {};
+      if (res?.deleted) {
+        const { name } = applicationSection;
+        const msg = t("Allocation.resetSuccess", { name });
+        notifySuccess(msg);
+        refresh();
+      }
+    } catch (e) {
+      if (e instanceof ApolloError) {
+        const gqlerrors = e.graphQLErrors;
+        for (const err of gqlerrors) {
+          if ("code" in err.extensions) {
+            const { code } = err.extensions;
+            if (code === "NOT_FOUND") {
+              const { name } = applicationSection;
+              notifyError(
+                t("Allocation.errors.remove.alreadyDeleted", {
+                  name,
+                }),
+                t("Allocation.errors.remove.title")
+              );
+              return;
+            }
+          }
+        }
+      }
+      notifyError(
+        t("Allocation.errors.remove.generic", {
+          name: applicationSection.name,
+        }),
+        t("Allocation.errors.remove.title")
+      );
+    }
+  };
+  return [handleRemoveAllocation, { isLoading }];
 }
