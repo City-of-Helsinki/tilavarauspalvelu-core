@@ -1,12 +1,16 @@
 import datetime
 
 import pytest
-from django.utils.timezone import get_default_timezone
 
-from reservation_units.enums import PricingType, ReservationState
-from tests.factories import EquipmentFactory, PaymentProductFactory, ReservationUnitFactory
+from common.date_utils import local_datetime
+from reservation_units.enums import ReservationState, ReservationUnitState
+from tests.factories import EquipmentFactory, ReservationUnitFactory
 
-from .helpers import reservation_units_query
+from .helpers import (
+    create_reservation_units_for_reservation_state_filtering,
+    create_reservation_units_for_reservation_unit_state_filtering,
+    reservation_units_query,
+)
 
 # Applied to all tests
 pytestmark = [
@@ -75,164 +79,224 @@ def test_reservation_unit__filter__by_equipment__multiple__none_match(graphql):
     assert len(response.edges) == 0, response
 
 
-def create_test_reservation_units():
-    now = datetime.datetime.now(tz=get_default_timezone())
-
-    ReservationUnitFactory.create(
-        name="I'm scheduled for reservation!",
-        reservation_begins=(now + datetime.timedelta(hours=1)),
-    )
-    ReservationUnitFactory.create(
-        name="Yey! I'm reservable!",
-        payment_product=PaymentProductFactory.create(),
-        pricings__pricing_type=PricingType.PAID,
-    )
-    ReservationUnitFactory.create(
-        name="I'm also reservable since I'm free!",
-        pricings__pricing_type=PricingType.FREE,
-    )
-    ReservationUnitFactory.create(
-        name="I am scheduled period",
-        reservation_begins=(now + datetime.timedelta(days=1)),
-        reservation_ends=(now + datetime.timedelta(days=2)),
-    )
-    ReservationUnitFactory.create(
-        name="I am scheduled closing",
-        pricings__pricing_type=PricingType.FREE,
-        reservation_begins=(now - datetime.timedelta(days=1)),
-        reservation_ends=(now + datetime.timedelta(days=1)),
-    )
-    ReservationUnitFactory.create(
-        name="My reservations are closed",
-        reservation_begins=(now - datetime.timedelta(days=2)),
-        reservation_ends=(now - datetime.timedelta(days=1)),
-    )
-    ReservationUnitFactory.create(
-        name="Oh no, I'm not reservable due to missing pricing!",
-    )
-    ReservationUnitFactory.create(
-        name="Oh no, I'm not reservable due to missing payment product!",
-        pricings__pricing_type=PricingType.PAID,
-    )
+# Reservation state
 
 
-def test_reservation_unit__filter__by_reservable(graphql):
-    create_test_reservation_units()
-    query = reservation_units_query(
-        fields="nameFi reservationState",
-        order_by="name_fi",
-        reservation_state=ReservationState.RESERVABLE.value,
-    )
+def test_reservation_unit__filter__by_reservation_state__reservable(graphql):
+    graphql.login_with_superuser()
+
+    reservation_units = create_reservation_units_for_reservation_state_filtering()
+
+    query = reservation_units_query(reservation_state=ReservationState.RESERVABLE.value)
     response = graphql(query)
 
     assert response.has_errors is False, response
     assert len(response.edges) == 2, response
-    assert response.node(0) == {
-        "nameFi": "I'm also reservable since I'm free!",
-        "reservationState": "RESERVABLE",
-    }, response
-    assert response.node(1) == {
-        "nameFi": "Yey! I'm reservable!",
-        "reservationState": "RESERVABLE",
-    }, response
+    assert response.node(0) == {"pk": reservation_units.reservable_paid.pk}
+    assert response.node(1) == {"pk": reservation_units.reservable_free.pk}
 
 
-def test_reservation_unit__filter__by_scheduled_reservation(graphql):
-    create_test_reservation_units()
-    query = reservation_units_query(
-        fields="nameFi reservationState",
-        order_by="name_fi",
-        reservation_state=ReservationState.SCHEDULED_RESERVATION.value,
-    )
+def test_reservation_unit__filter__by_reservation_state__scheduled_reservation(graphql):
+    graphql.login_with_superuser()
+
+    reservation_units = create_reservation_units_for_reservation_state_filtering()
+
+    query = reservation_units_query(reservation_state=ReservationState.SCHEDULED_RESERVATION.value)
     response = graphql(query)
 
     assert response.has_errors is False, response
     assert len(response.edges) == 1, response
-    assert response.node(0) == {
-        "nameFi": "I'm scheduled for reservation!",
-        "reservationState": "SCHEDULED_RESERVATION",
-    }, response
+    assert response.node(0) == {"pk": reservation_units.scheduled_reservation.pk}
 
 
-def test_reservation_unit__filter__by_scheduled_period(graphql):
-    create_test_reservation_units()
-    query = reservation_units_query(
-        fields="nameFi reservationState",
-        order_by="name_fi",
-        reservation_state=[ReservationState.SCHEDULED_PERIOD.value],
-    )
+def test_reservation_unit__filter__by_reservation_state__scheduled_period(graphql):
+    graphql.login_with_superuser()
+
+    reservation_units = create_reservation_units_for_reservation_state_filtering()
+
+    query = reservation_units_query(reservation_state=ReservationState.SCHEDULED_PERIOD.value)
     response = graphql(query)
 
     assert response.has_errors is False, response
     assert len(response.edges) == 1, response
-    assert response.node(0) == {
-        "nameFi": "I am scheduled period",
-        "reservationState": "SCHEDULED_PERIOD",
-    }, response
+    assert response.node(0) == {"pk": reservation_units.scheduled_period.pk}
 
 
-def test_reservation_unit__filter__by_scheduled_closing(graphql):
-    create_test_reservation_units()
-    query = reservation_units_query(
-        fields="nameFi reservationState",
-        order_by="name_fi",
-        reservation_state=[ReservationState.SCHEDULED_CLOSING.value],
-    )
+def test_reservation_unit__filter__by_reservation_state__scheduled_closing(graphql):
+    graphql.login_with_superuser()
+
+    reservation_units = create_reservation_units_for_reservation_state_filtering()
+
+    query = reservation_units_query(reservation_state=ReservationState.SCHEDULED_CLOSING.value)
     response = graphql(query)
 
     assert response.has_errors is False, response
     assert len(response.edges) == 1, response
-    assert response.node(0) == {
-        "nameFi": "I am scheduled closing",
-        "reservationState": "SCHEDULED_CLOSING",
-    }, response
+    assert response.node(0) == {"pk": reservation_units.scheduled_closing.pk}
 
 
-def test_reservation_unit__filter__by_reservation_closed(graphql):
-    create_test_reservation_units()
-    query = reservation_units_query(
-        fields="nameFi reservationState",
-        order_by="name_fi",
-        reservation_state=[ReservationState.RESERVATION_CLOSED.value],
-    )
+def test_reservation_unit__filter__by_reservation_state__reservation_closed(graphql):
+    graphql.login_with_superuser()
+
+    reservation_units = create_reservation_units_for_reservation_state_filtering()
+
+    query = reservation_units_query(reservation_state=ReservationState.RESERVATION_CLOSED.value)
     response = graphql(query)
 
     assert response.has_errors is False, response
     assert len(response.edges) == 3, response
-    assert response.node(0) == {
-        "nameFi": "My reservations are closed",
-        "reservationState": "RESERVATION_CLOSED",
-    }, response
-    assert response.node(1) == {
-        "nameFi": "Oh no, I'm not reservable due to missing payment product!",
-        "reservationState": "RESERVATION_CLOSED",
-    }, response
-    assert response.node(2) == {
-        "nameFi": "Oh no, I'm not reservable due to missing pricing!",
-        "reservationState": "RESERVATION_CLOSED",
-    }, response
+    assert response.node(0) == {"pk": reservation_units.closed.pk}
+    assert response.node(1) == {"pk": reservation_units.missing_pricing.pk}
+    assert response.node(2) == {"pk": reservation_units.missing_payment_product.pk}
 
 
-def test_reservation_unit__filter__by_reservable_and_scheduled_for_reservation(graphql):
-    create_test_reservation_units()
+def test_reservation_unit__filter__by_reservation_state__multiple(graphql):
+    graphql.login_with_superuser()
+
+    reservation_units = create_reservation_units_for_reservation_state_filtering()
+
     query = reservation_units_query(
-        fields="nameFi reservationState",
-        order_by="name_fi",
         reservation_state=[ReservationState.SCHEDULED_RESERVATION.value, ReservationState.RESERVABLE.value],
     )
     response = graphql(query)
 
     assert response.has_errors is False, response
     assert len(response.edges) == 3, response
-    assert response.node(0) == {
-        "nameFi": "I'm also reservable since I'm free!",
-        "reservationState": "RESERVABLE",
-    }, response
-    assert response.node(1) == {
-        "nameFi": "I'm scheduled for reservation!",
-        "reservationState": "SCHEDULED_RESERVATION",
-    }, response
-    assert response.node(2) == {
-        "nameFi": "Yey! I'm reservable!",
-        "reservationState": "RESERVABLE",
-    }, response
+    assert response.node(0) == {"pk": reservation_units.scheduled_reservation.pk}
+    assert response.node(1) == {"pk": reservation_units.reservable_paid.pk}
+    assert response.node(2) == {"pk": reservation_units.reservable_free.pk}
+
+
+# Reservation unit state
+
+
+def test_reservation_unit__filter__by_reservation_unit_state__archived(graphql):
+    graphql.login_with_superuser()
+
+    create_reservation_units_for_reservation_unit_state_filtering()
+
+    query = reservation_units_query(state=ReservationUnitState.ARCHIVED.value)
+    response = graphql(query)
+
+    # Archived reservation units are always hidden
+    assert response.has_errors is False
+    assert len(response.edges) == 0
+
+
+def test_reservation_unit__filter__by_reservation_unit_state__draft(graphql):
+    graphql.login_with_superuser()
+
+    reservation_units = create_reservation_units_for_reservation_unit_state_filtering()
+
+    query = reservation_units_query(state=ReservationUnitState.DRAFT.value)
+    response = graphql(query)
+
+    assert response.has_errors is False
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": reservation_units.draft.pk}
+
+
+def test_reservation_unit__filter__by_reservation_unit_state__scheduled_publishing(graphql):
+    graphql.login_with_superuser()
+
+    reservation_units = create_reservation_units_for_reservation_unit_state_filtering()
+
+    query = reservation_units_query(state=ReservationUnitState.SCHEDULED_PUBLISHING.value)
+    response = graphql(query)
+
+    assert response.has_errors is False
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": reservation_units.scheduled_publishing.pk}
+
+
+def test_reservation_unit__filter__by_reservation_unit_state__published(graphql):
+    graphql.login_with_superuser()
+
+    reservation_units = create_reservation_units_for_reservation_unit_state_filtering()
+
+    query = reservation_units_query(state=ReservationUnitState.PUBLISHED.value)
+    response = graphql(query)
+
+    assert response.has_errors is False
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": reservation_units.published.pk}
+
+
+def test_reservation_unit__filter__by_reservation_unit_state__scheduled_period(graphql):
+    graphql.login_with_superuser()
+
+    reservation_units = create_reservation_units_for_reservation_unit_state_filtering()
+
+    query = reservation_units_query(state=ReservationUnitState.SCHEDULED_PERIOD.value)
+    response = graphql(query)
+
+    assert response.has_errors is False
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": reservation_units.scheduled_period.pk}
+
+
+def test_reservation_unit__filter__by_reservation_unit_state__scheduled_hiding(graphql):
+    graphql.login_with_superuser()
+
+    reservation_units = create_reservation_units_for_reservation_unit_state_filtering()
+
+    query = reservation_units_query(state=ReservationUnitState.SCHEDULED_HIDING.value)
+    response = graphql(query)
+
+    assert response.has_errors is False
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": reservation_units.scheduled_hiding.pk}
+
+
+def test_reservation_unit__filter__by_reservation_unit_state__hidden(graphql):
+    graphql.login_with_superuser()
+
+    reservation_units = create_reservation_units_for_reservation_unit_state_filtering()
+
+    query = reservation_units_query(state=ReservationUnitState.HIDDEN.value)
+    response = graphql(query)
+
+    assert response.has_errors is False
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": reservation_units.hidden.pk}
+
+
+def test_reservation_unit__filter__by_reservation_unit_state__multiple(graphql):
+    graphql.login_with_superuser()
+
+    reservation_units = create_reservation_units_for_reservation_unit_state_filtering()
+
+    query = reservation_units_query(
+        state=[
+            ReservationUnitState.DRAFT.value,
+            ReservationUnitState.SCHEDULED_PUBLISHING.value,
+        ],
+    )
+    response = graphql(query)
+
+    assert response.has_errors is False
+    assert len(response.edges) == 2
+    assert response.node(0) == {"pk": reservation_units.draft.pk}
+    assert response.node(1) == {"pk": reservation_units.scheduled_publishing.pk}
+
+
+def test_reservation_unit__filter__by_reservation_unit_state__scheduled_publishing__when_begin_after_end(graphql):
+    graphql.login_with_superuser()
+
+    reservation_units = create_reservation_units_for_reservation_unit_state_filtering()
+
+    now = local_datetime()
+    reservation_unit = ReservationUnitFactory.create(
+        is_archived=False,
+        is_draft=False,
+        publish_begins=(now + datetime.timedelta(days=2)),
+        publish_ends=(now + datetime.timedelta(days=1)),
+    )
+
+    query = reservation_units_query(state=ReservationUnitState.SCHEDULED_PUBLISHING.value)
+    response = graphql(query)
+
+    assert response.has_errors is False
+    assert len(response.edges) == 2
+    assert response.node(0) == {"pk": reservation_units.scheduled_publishing.pk}
+    assert response.node(1) == {"pk": reservation_unit.pk}
