@@ -403,6 +403,9 @@ const ReservationFormField = ({
           errorText={errorText}
           invalid={!!error}
           required={required}
+          maxLength={
+            255 /* TODO: Might want to remove this once proper validation works */
+          }
           $isWide={isWideRow}
           $hidden={
             watch("reserveeIsUnregisteredAssociation") === undefined
@@ -429,6 +432,9 @@ const ReservationFormField = ({
           defaultValue={defaultValue ? String(defaultValue) : undefined}
           invalid={!!error}
           required={required}
+          maxLength={
+            255 /* TODO: Might want to remove this once proper validation works */
+          }
           $isWide={isWideRow}
           $hidden={
             field.includes("billing") && watch("showBillingAddress") !== true
