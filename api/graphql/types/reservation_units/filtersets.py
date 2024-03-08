@@ -78,6 +78,7 @@ class ReservationUnitFilterSet(BaseModelFilterSet, ReservationUnitQueryBuilderMi
 
     order_by = django_filters.OrderingFilter(
         fields=(
+            "pk",
             "name_fi",
             "name_en",
             "name_sv",
