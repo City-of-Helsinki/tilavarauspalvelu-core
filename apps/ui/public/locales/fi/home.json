@@ -5,8 +5,8 @@
     "searchPlaceholder": "Hae tiloja tai laitetta"
   },
   "infoRecurring": {
-    "heading": "Kausivarauksen tekeminen",
-    "text": "Hae Helsingin kaupungin tiloja säännölliseen käyttöön. Voit tutustua tiloihin etukäteen ennen hakuaikaa."
+    "heading": "Kausivaraus",
+    "text": "Hae Helsingin kaupungin tiloja säännölliseen, viikoittaiseen käyttöön tulevalle kaudelle. Tutustu hakuaikoihin ja täytä hakemus."
   },
   "browseRecurringReservationsButton": "Tutustu hakuaikoihin",
   "footer": {
