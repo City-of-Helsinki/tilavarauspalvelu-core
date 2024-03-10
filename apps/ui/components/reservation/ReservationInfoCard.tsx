@@ -148,7 +148,7 @@ const ReservationInfoCard = ({
           reservationUnit,
           pricingDate: new Date(begin),
           minutes: 0,
-          asInt: true,
+          asNumeral: true,
         }) !== "0"
       : Number(reservation?.price) > 0;
 

@@ -256,7 +256,7 @@ const EditStep0 = ({
       const price = getReservationUnitPrice({
         reservationUnit,
         pricingDate: start,
-        asInt: true,
+        asNumeral: true,
       });
       return price === "0";
     },
@@ -471,7 +471,7 @@ const EditStep0 = ({
                   ? new Date(initialReservation.begin)
                   : undefined,
                 minutes: 0,
-                asInt: true,
+                asNumeral: true,
               }),
             };
             const [isNewReservationValid, validationError] =

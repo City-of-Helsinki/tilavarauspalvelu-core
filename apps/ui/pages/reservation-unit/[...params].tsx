@@ -251,7 +251,7 @@ const ReservationUnitReservationWithReservationProp = ({
       pricingDate: reservation?.begin
         ? new Date(reservation?.begin)
         : undefined,
-      asInt: true,
+      asNumeral: true,
     });
 
     const stepLength = price === "0" || requireHandling ? 2 : 5;

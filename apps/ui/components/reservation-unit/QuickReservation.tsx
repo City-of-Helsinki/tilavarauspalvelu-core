@@ -444,7 +444,7 @@ const QuickReservation = ({
         pricingDate: date,
         minutes: length,
         trailingZeros: true,
-        asInt,
+        asNumeral: asInt,
       });
     },
     [duration?.value, reservationUnit, date]

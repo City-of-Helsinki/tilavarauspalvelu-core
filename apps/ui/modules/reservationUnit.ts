@@ -21,6 +21,7 @@ import {
   State,
   PricingType,
   Status,
+  PriceUnit,
 } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { capitalize, getTranslation } from "./util";
@@ -223,46 +224,47 @@ export const getFuturePricing = (
     : futurePricings[0];
 };
 
+function formatPrice(
+  price: number,
+  trailingZeros: boolean,
+  toCurrency?: boolean
+) {
+  const currencyFormatter = trailingZeros ? "currencyWithDecimals" : "currency";
+  const floatFormatter = trailingZeros ? "twoDecimal" : "strippedDecimal";
+  const formatters = getFormatters("fi");
+  const formatter = formatters[toCurrency ? currencyFormatter : floatFormatter];
+  return parseFloat(price.toString()) ? formatter.format(price) : 0;
+}
+
 export type GetPriceType = {
   pricing: ReservationUnitPricingType;
   minutes?: number; // additional minutes for total price calculation
   trailingZeros?: boolean;
-  asInt?: boolean;
+  asNumeral?: boolean; // return a string of numbers ("0" instead of e.g. "free" when the price is 0)
 };
 
-// TODO refactor: this is over complex and does weird things
-// asInt and trailingZeros should be split to separate functions
-// bad: combining the actual price calculation and formatting
 export const getPrice = (props: GetPriceType): string => {
-  const { pricing, minutes, trailingZeros = false, asInt = false } = props;
+  const { pricing, minutes, trailingZeros = false, asNumeral = false } = props;
 
-  const currencyFormatter = trailingZeros ? "currencyWithDecimals" : "currency";
-  const floatFormatter = trailingZeros ? "twoDecimal" : "strippedDecimal";
+  if (
+    pricing.pricingType === PricingType.Free ||
+    (pricing.pricingType === PricingType.Paid &&
+      parseFloat(pricing.highestPrice) === 0)
+  )
+    return asNumeral ? i18n?.t("prices:priceFree") ?? "0" : "0";
 
-  const formatters = getFormatters("fi");
-
-  const lowestPrice = parseFloat(pricing.lowestPrice);
-  const highestPrice = parseFloat(pricing.highestPrice);
-  if (pricing.pricingType === "PAID" && highestPrice > 0) {
-    const volume = getReservationVolume(minutes ?? 0, pricing.priceUnit);
-    const unitStr =
-      pricing.priceUnit === "FIXED" || minutes
-        ? ""
-        : i18n?.t(`prices:priceUnits.${pricing.priceUnit}`);
-    const fLowestPrice = parseFloat(pricing.lowestPrice?.toString())
-      ? formatters[floatFormatter].format(lowestPrice * volume)
-      : 0;
-    const fHighestPrice = formatters[currencyFormatter].format(
-      highestPrice * volume
-    );
-    const price =
-      lowestPrice === highestPrice
-        ? formatters[currencyFormatter].format(lowestPrice * volume)
-        : `${fLowestPrice} - ${fHighestPrice}`;
-    return trim(`${price} / ${unitStr}`, " / ");
-  }
-
-  return asInt ? "0" : i18n?.t("prices:priceFree") ?? "0";
+  const volume = getReservationVolume(minutes ?? 0, pricing.priceUnit);
+  const highestPrice = parseFloat(pricing.highestPrice) * volume;
+  const lowestPrice = parseFloat(pricing.lowestPrice) * volume;
+  const priceString =
+    lowestPrice === highestPrice
+      ? formatPrice(lowestPrice, trailingZeros, true)
+      : `${formatPrice(lowestPrice, trailingZeros)} - ${formatPrice(highestPrice, trailingZeros, true)}`;
+  const unitString =
+    pricing.priceUnit === PriceUnit.Fixed || minutes
+      ? ""
+      : i18n?.t(`prices:priceUnits.${pricing.priceUnit}`);
+  return trim(`${priceString} / ${unitString}`, " / ");
 };
 
 export type GetReservationUnitPriceProps = {
@@ -270,7 +272,7 @@ export type GetReservationUnitPriceProps = {
   pricingDate?: Date;
   minutes?: number;
   trailingZeros?: boolean;
-  asInt?: boolean;
+  asNumeral?: boolean;
 };
 
 export const getReservationUnitPrice = (
@@ -281,7 +283,7 @@ export const getReservationUnitPrice = (
     pricingDate,
     minutes,
     trailingZeros = false,
-    asInt = false,
+    asNumeral = false,
   } = props;
 
   if (!ru) {
@@ -293,7 +295,12 @@ export const getReservationUnitPrice = (
     : getActivePricing(ru);
 
   return pricing
-    ? getPrice({ pricing, minutes, trailingZeros, asInt })
+    ? getPrice({
+        pricing,
+        minutes,
+        trailingZeros,
+        asNumeral,
+      })
     : undefined;
 };
 
@@ -306,7 +313,7 @@ export const isReservationUnitPaidInFuture = (
         [Status.Active, Status.Future].includes(pricing.status) &&
         pricing.pricingType === PricingType.Paid
     )
-    .map((pricing) => getPrice({ pricing, asInt: true }))
+    .map((pricing) => getPrice({ pricing, asNumeral: true }))
     .some((n) => n !== "0");
 };
 
@@ -319,8 +326,7 @@ export function isInTimeSpan(
 ) {
   const { startDatetime, endDatetime } = timeSpan ?? {};
 
-  if (!startDatetime) return false;
-  if (!endDatetime) return false;
+  if (!startDatetime || !endDatetime) return false;
   const startDate = new Date(startDatetime);
   const endDate = new Date(endDatetime);
   // either we have per day open time, or we have a span of multiple days
