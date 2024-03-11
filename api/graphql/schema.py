@@ -88,7 +88,6 @@ from api.graphql.types.reservation_units.filtersets import (
 from api.graphql.types.reservation_units.mutations import ReservationUnitCreateMutation, ReservationUnitUpdateMutation
 from api.graphql.types.reservation_units.permissions import ReservationUnitPermission
 from api.graphql.types.reservation_units.types import (
-    ReservationUnitByPkType,
     ReservationUnitHaukiUrlType,
     ReservationUnitType,
 )
@@ -192,9 +191,8 @@ class Query(graphene.ObjectType):
 
     reservation_deny_reasons = ReservationDenyReasonFilter(ReservationDenyReasonType)
 
-    reservation_units = ReservationUnitsFilter(ReservationUnitType, filterset_class=ReservationUnitFilterSet)
     reservation_unit = relay.Node.Field(ReservationUnitType)
-    reservation_unit_by_pk = Field(ReservationUnitByPkType, pk=graphene.Int())
+    reservation_units = ReservationUnitsFilter(ReservationUnitType, filterset_class=ReservationUnitFilterSet)
     reservation_unit_cancellation_rules = ReservationUnitCancellationRulesFilter(ReservationUnitCancellationRuleType)
     reservation_unit_hauki_url = Field(
         ReservationUnitHaukiUrlType,
