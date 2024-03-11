@@ -133,7 +133,7 @@ stop:
 	@docker compose stop
 
 check-translations:
-	@echo python -m tilavarauspalvelu.hooks.translations_done
+	@python -m tilavarauspalvelu.hooks.translations_done
 
 translations:
 	@echo ""
