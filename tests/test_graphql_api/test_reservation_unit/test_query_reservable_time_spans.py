@@ -4,6 +4,7 @@ from zoneinfo import ZoneInfo
 
 import pytest
 from django.utils.timezone import get_default_timezone
+from graphql_relay import to_global_id
 
 from reservation_units.models import ReservationUnit
 from tests.factories import (
@@ -39,63 +40,69 @@ def _get_date(*, day: int = 1, hour: int = 0, tzinfo: ZoneInfo | None = None):
 
 reservation_unit_time_spans_query = partial(
     build_query,
-    "reservationUnitByPk",
-    fields='reservableTimeSpans(startDate:"2023-05-01" endDate:"2024-01-01"){startDatetime endDatetime}',
+    "reservationUnit",
+    fields="reservableTimeSpans { startDatetime endDatetime }",
 )
 
 
-def test__gql__reservation_unit__reservable_time_spans__no_origin_hauki_resource(graphql, reservation_unit):
+def test_reservation_unit__reservable_time_spans__no_origin_hauki_resource(graphql, reservation_unit):
     reservation_unit.origin_hauki_resource = None
     reservation_unit.save()
 
-    response = graphql(reservation_unit_time_spans_query(pk=reservation_unit.id))
+    global_id = to_global_id("ReservationUnitType", reservation_unit.pk)
+    query = reservation_unit_time_spans_query(
+        id=global_id,
+        reservable_time_spans__start_date="2023-05-01",
+        reservable_time_spans__end_date="2024-01-01",
+    )
+    response = graphql(query)
 
     assert not response.has_errors
-    assert response.data == {
-        "reservationUnitByPk": {
-            "reservableTimeSpans": None,
-        }
+    assert response.first_query_object == {
+        "reservableTimeSpans": None,
     }
 
 
-def test__gql__reservation_unit__reservable_time_spans__no_start_date(graphql, reservation_unit):
-    response = graphql(
-        reservation_unit_time_spans_query(
-            pk=reservation_unit.id,
-            fields='reservableTimeSpans(endDate:"2024-01-01"){startDatetime endDatetime}',
-        )
+def test_reservation_unit__reservable_time_spans__no_start_date(graphql, reservation_unit):
+    global_id = to_global_id("ReservationUnitType", reservation_unit.pk)
+    query = reservation_unit_time_spans_query(
+        id=global_id,
+        reservable_time_spans__end_date="2024-01-01",
     )
+    response = graphql(query)
 
     assert response.has_errors
     message = "Field 'reservableTimeSpans' argument 'startDate' of type 'Date!' is required, but it was not provided."
-    assert response.errors[0].get("message") == message
+    assert response.error_message() == message
 
 
-def test__gql__reservation_unit__reservable_time_spans__no_end_date(graphql, reservation_unit):
-    response = graphql(
-        reservation_unit_time_spans_query(
-            pk=reservation_unit.id,
-            fields='reservableTimeSpans(startDate:"2023-05-01"){startDatetime endDatetime}',
-        )
+def test_reservation_unit__reservable_time_spans__no_end_date(graphql, reservation_unit):
+    global_id = to_global_id("ReservationUnitType", reservation_unit.pk)
+    query = reservation_unit_time_spans_query(
+        id=global_id,
+        reservable_time_spans__start_date="2023-05-01",
     )
+    response = graphql(query)
 
     assert response.has_errors
     message = "Field 'reservableTimeSpans' argument 'endDate' of type 'Date!' is required, but it was not provided."
-    assert response.errors[0].get("message") == message
+    assert response.error_message() == message
 
 
-def test__gql__reservation_unit__reservable_time_spans__no_results(graphql, reservation_unit):
-    response = graphql(reservation_unit_time_spans_query(pk=reservation_unit.id))
+def test_reservation_unit__reservable_time_spans__no_results(graphql, reservation_unit):
+    global_id = to_global_id("ReservationUnitType", reservation_unit.pk)
+    query = reservation_unit_time_spans_query(
+        id=global_id,
+        reservable_time_spans__start_date="2023-05-01",
+        reservable_time_spans__end_date="2024-01-01",
+    )
+    response = graphql(query)
 
     assert not response.has_errors
-    assert response.data == {
-        "reservationUnitByPk": {
-            "reservableTimeSpans": [],
-        }
-    }
+    assert response.first_query_object == {"reservableTimeSpans": []}
 
 
-def test__gql__reservation_unit__reservable_time_spans__multiple_days(graphql, reservation_unit):
+def test_reservation_unit__reservable_time_spans__multiple_days(graphql, reservation_unit):
     ReservableTimeSpanFactory(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_get_date(day=1, hour=0),
@@ -112,10 +119,16 @@ def test__gql__reservation_unit__reservable_time_spans__multiple_days(graphql, r
         end_datetime=_get_date(day=4, hour=0),
     )
 
-    response = graphql(reservation_unit_time_spans_query(pk=reservation_unit.id))
+    global_id = to_global_id("ReservationUnitType", reservation_unit.pk)
+    query = reservation_unit_time_spans_query(
+        id=global_id,
+        reservable_time_spans__start_date="2023-05-01",
+        reservable_time_spans__end_date="2024-01-01",
+    )
+    response = graphql(query)
 
     assert not response.has_errors
-    assert response.data["reservationUnitByPk"]["reservableTimeSpans"] == [
+    assert response.first_query_object["reservableTimeSpans"] == [
         {
             "startDatetime": f"2023-05-01T00:00:00+{UTCOFFSET}",
             "endDatetime": f"2023-05-01T12:00:00+{UTCOFFSET}",
@@ -131,7 +144,7 @@ def test__gql__reservation_unit__reservable_time_spans__multiple_days(graphql, r
     ]
 
 
-def test__gql__reservation_unit__reservable_time_spans__multiple_spans_in_same_day(graphql, reservation_unit):
+def test_reservation_unit__reservable_time_spans__multiple_spans_in_same_day(graphql, reservation_unit):
     ReservableTimeSpanFactory(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_get_date(day=1, hour=10),
@@ -153,10 +166,16 @@ def test__gql__reservation_unit__reservable_time_spans__multiple_spans_in_same_d
         end_datetime=_get_date(day=2, hour=20),
     )
 
-    response = graphql(reservation_unit_time_spans_query(pk=reservation_unit.id))
+    global_id = to_global_id("ReservationUnitType", reservation_unit.pk)
+    query = reservation_unit_time_spans_query(
+        id=global_id,
+        reservable_time_spans__start_date="2023-05-01",
+        reservable_time_spans__end_date="2024-01-01",
+    )
+    response = graphql(query)
 
     assert not response.has_errors
-    assert response.data["reservationUnitByPk"]["reservableTimeSpans"] == [
+    assert response.first_query_object["reservableTimeSpans"] == [
         {
             "startDatetime": f"2023-05-01T10:00:00+{UTCOFFSET}",
             "endDatetime": f"2023-05-01T20:00:00+{UTCOFFSET}",
@@ -176,17 +195,23 @@ def test__gql__reservation_unit__reservable_time_spans__multiple_spans_in_same_d
     ]
 
 
-def test__gql__reservation_unit__reservable_time_spans__full_day(graphql, reservation_unit):
+def test_reservation_unit__reservable_time_spans__full_day(graphql, reservation_unit):
     ReservableTimeSpanFactory(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_get_date(day=4, hour=0),
         end_datetime=_get_date(day=5, hour=0),
     )
 
-    response = graphql(reservation_unit_time_spans_query(pk=reservation_unit.id))
+    global_id = to_global_id("ReservationUnitType", reservation_unit.pk)
+    query = reservation_unit_time_spans_query(
+        id=global_id,
+        reservable_time_spans__start_date="2023-05-01",
+        reservable_time_spans__end_date="2024-01-01",
+    )
+    response = graphql(query)
 
     assert not response.has_errors
-    assert response.data["reservationUnitByPk"]["reservableTimeSpans"] == [
+    assert response.first_query_object["reservableTimeSpans"] == [
         {
             "startDatetime": f"2023-05-04T00:00:00+{UTCOFFSET}",
             "endDatetime": f"2023-05-05T00:00:00+{UTCOFFSET}",
@@ -194,17 +219,23 @@ def test__gql__reservation_unit__reservable_time_spans__full_day(graphql, reserv
     ]
 
 
-def test__gql__reservation_unit__reservable_time_spans__multiple_days_long_time_span(graphql, reservation_unit):
+def test_reservation_unit__reservable_time_spans__multiple_days_long_time_span(graphql, reservation_unit):
     ReservableTimeSpanFactory(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_get_date(day=10, hour=12),
         end_datetime=_get_date(day=12, hour=12),
     )
 
-    response = graphql(reservation_unit_time_spans_query(pk=reservation_unit.id))
+    global_id = to_global_id("ReservationUnitType", reservation_unit.pk)
+    query = reservation_unit_time_spans_query(
+        id=global_id,
+        reservable_time_spans__start_date="2023-05-01",
+        reservable_time_spans__end_date="2024-01-01",
+    )
+    response = graphql(query)
 
     assert not response.has_errors
-    assert response.data["reservationUnitByPk"]["reservableTimeSpans"] == [
+    assert response.first_query_object["reservableTimeSpans"] == [
         {
             "startDatetime": f"2023-05-10T12:00:00+{UTCOFFSET}",
             "endDatetime": f"2023-05-12T12:00:00+{UTCOFFSET}",
@@ -212,7 +243,7 @@ def test__gql__reservation_unit__reservable_time_spans__multiple_days_long_time_
     ]
 
 
-def test__gql__reservation_unit__reservable_time_spans__all_timezones_are_in_default_tz(graphql, reservation_unit):
+def test_reservation_unit__reservable_time_spans__all_timezones_are_in_default_tz(graphql, reservation_unit):
     rts1 = ReservableTimeSpanFactory(
         resource=reservation_unit.origin_hauki_resource,
         start_datetime=_get_date(day=1, hour=10, tzinfo=ZoneInfo("Europe/Helsinki")),
@@ -229,10 +260,16 @@ def test__gql__reservation_unit__reservable_time_spans__all_timezones_are_in_def
         end_datetime=_get_date(day=3, hour=20, tzinfo=ZoneInfo("Asia/Shanghai")),
     )
 
-    response = graphql(reservation_unit_time_spans_query(pk=reservation_unit.id))
+    global_id = to_global_id("ReservationUnitType", reservation_unit.pk)
+    query = reservation_unit_time_spans_query(
+        id=global_id,
+        reservable_time_spans__start_date="2023-05-01",
+        reservable_time_spans__end_date="2024-01-01",
+    )
+    response = graphql(query)
 
     assert not response.has_errors
-    assert response.data["reservationUnitByPk"]["reservableTimeSpans"] == [
+    assert response.first_query_object["reservableTimeSpans"] == [
         {
             "startDatetime": rts1.start_datetime.astimezone(DEFAULT_TIMEZONE).isoformat(),
             "endDatetime": rts1.end_datetime.astimezone(DEFAULT_TIMEZONE).isoformat(),
