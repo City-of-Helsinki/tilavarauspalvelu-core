@@ -365,7 +365,6 @@ LANGUAGES = (("fi", _("Finnish")), ("en", _("English")), ("sv", _("Swedish")))
 LOCALE_PATHS = [BASE_DIR / "locale"]
 TIME_ZONE = "Europe/Helsinki"
 USE_I18N = True
-USE_L10N = True
 USE_TZ = True
 
 # ----- Authentication settings ------------------------------------------------------------------------
