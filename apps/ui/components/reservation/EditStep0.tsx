@@ -424,7 +424,7 @@ const EditStep0 = ({
             reservationUnit={normalizedReservationUnit}
             initialReservation={initialReservation}
             setInitialReservation={setInitialReservation}
-            isSlotReservable={(startDate, endDate) =>
+            isSlotReservable={(startDate: Date, endDate: Date) =>
               isSlotReservable(startDate, endDate)
             }
             setCalendarFocusDate={setFocusDate}

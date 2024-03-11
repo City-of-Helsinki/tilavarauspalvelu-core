@@ -14,9 +14,11 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import {
   addHours,
+  addMinutes,
   addSeconds,
   addYears,
   differenceInMinutes,
+  isToday,
   startOfDay,
 } from "date-fns";
 import { toApiDate, toUIDate } from "common/src/common/util";
@@ -58,16 +60,19 @@ import {
   getLocalizationLang,
 } from "common/src/helpers";
 import Head from "../../components/reservation-unit/Head";
-import { AddressSection } from "../../components/reservation-unit/Address";
+import { AddressSection } from "@/components/reservation-unit/Address";
 import Sanitize from "../../components/common/Sanitize";
 import RelatedUnits from "../../components/reservation-unit/RelatedUnits";
 import { AccordionWithState as Accordion } from "../../components/common/Accordion";
 import { createApolloClient } from "@/modules/apolloClient";
 import { Map } from "@/components/Map";
 import Legend from "@/components/calendar/Legend";
-import ReservationCalendarControls from "@/components/calendar/ReservationCalendarControls";
+import ReservationCalendarControls, {
+  FocusTimeSlot,
+} from "@/components/calendar/ReservationCalendarControls";
 import {
   formatDuration,
+  getSelectedOption,
   getTranslation,
   isTouchDevice,
   printErrorMessages,
@@ -77,20 +82,24 @@ import {
   RELATED_RESERVATION_UNITS,
   RESERVATION_UNIT_QUERY,
 } from "@/modules/queries/reservationUnit";
-import { ReservationProps } from "@/context/DataContext";
 import {
   CREATE_RESERVATION,
   LIST_RESERVATIONS,
 } from "@/modules/queries/reservation";
 import {
   getFuturePricing,
+  getPossibleTimesForDay,
   getPrice,
+  getTimeString,
   isReservationUnitPaidInFuture,
   isReservationUnitPublished,
 } from "@/modules/reservationUnit";
 import EquipmentList from "../../components/reservation-unit/EquipmentList";
 import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
-import { isReservationReservable } from "@/modules/reservation";
+import {
+  getDurationOptions,
+  isReservationReservable,
+} from "@/modules/reservation";
 import SubventionSuffix from "../../components/reservation/SubventionSuffix";
 import InfoDialog from "../../components/common/InfoDialog";
 import {
@@ -108,9 +117,7 @@ import {
   Wrapper,
 } from "@/components/reservation-unit/ReservationUnitStyles";
 import { Toast } from "@/components/common/Toast";
-import QuickReservation, {
-  type QuickReservationSlotProps,
-} from "@/components/reservation-unit/QuickReservation";
+import QuickReservation from "@/components/reservation-unit/QuickReservation";
 import ReservationInfoContainer from "@/components/reservation-unit/ReservationInfoContainer";
 import { useCurrentUser } from "@/hooks/user";
 import { APPLICATION_ROUNDS_PERIODS } from "@/modules/queries/applicationRound";
@@ -120,6 +127,13 @@ import {
   getGenericTerms,
 } from "@/modules/serverUtils";
 import { eventStyleGetter } from "@/components/common/calendarUtils";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { getNextAvailableTime } from "@/components/reservation-unit/utils";
+import {
+  PendingReservationFormSchema,
+  PendingReservationFormType,
+} from "@/components/reservation-unit/schema";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -384,48 +398,161 @@ const ReservationUnit = ({
   const now = useMemo(() => new Date(), []);
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
 
-  const [focusDate, setFocusDate] = useState(new Date());
   const [calendarViewType, setCalendarViewType] = useState<WeekOptions>("week");
-  const [initialReservation, setInitialReservation] =
-    useState<PendingReservation | null>(null);
   const [isReserving, setIsReserving] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [shouldUnselect, setShouldUnselect] = useState(0);
-  const [storedReservation, , removeStoredReservation] =
-    useLocalStorage<PendingReservation>("reservation");
 
   const calendarRef = useRef<HTMLDivElement>(null);
-  const openPricingTermsRef = useRef<HTMLAnchorElement>(null);
+
   const hash = router.asPath.split("#")[1];
 
-  const isClientATouchDevice = isTouchDevice();
+  const isSlotReservable = useCallback(
+    (start: Date, end: Date, skipLengthCheck = false): boolean => {
+      return (
+        reservationUnit != null &&
+        isReservationReservable({
+          reservationUnit,
+          activeApplicationRounds,
+          start,
+          end,
+          skipLengthCheck,
+        })
+      );
+    },
+    [activeApplicationRounds, reservationUnit]
+  );
+  const reservableTimeSpans = useMemo(
+    () => filterNonNullable(reservationUnit?.reservableTimeSpans),
+    [reservationUnit?.reservableTimeSpans]
+  );
+  const todaysTimeSpans = reservableTimeSpans.filter(
+    (span) => span.startDatetime && isToday(new Date(span.startDatetime))
+  );
 
-  useEffect(() => {
-    const scrollToCalendar = () => {
-      if (calendarRef?.current?.parentElement?.offsetTop != null) {
-        window.scroll({
-          top: calendarRef.current.parentElement.offsetTop - 20,
-          behavior: "smooth",
-        });
-      }
-    };
-
-    if (
-      storedReservation?.reservationUnitPk === reservationUnit?.pk &&
-      storedReservation?.begin &&
-      storedReservation?.end
-    ) {
-      setFocusDate(new Date(storedReservation.begin));
-      scrollToCalendar();
-      setInitialReservation(storedReservation);
-      removeStoredReservation();
-    } else if (hash === "calendar" && initialReservation) {
-      scrollToCalendar();
+  // TODO: plug in query parameters
+  const initialFieldValues = {
+    date: new Date(todaysTimeSpans[0]?.startDatetime ?? "").toISOString(),
+    duration: reservationUnit.minReservationDuration
+      ? reservationUnit.minReservationDuration / 60
+      : 0,
+    time: getTimeString(new Date(todaysTimeSpans[0]?.startDatetime ?? "")),
+  };
+  const reservationForm = useForm<PendingReservationFormType>({
+    defaultValues: initialFieldValues,
+    mode: "onChange",
+    resolver: zodResolver(PendingReservationFormSchema),
+  });
+  const { watch, setValue } = reservationForm;
+  const durationValue =
+    watch("duration") ?? reservationUnit.minReservationDuration ?? 0;
+  const focusDate = new Date(watch("date") ?? "");
+  const timeValue = watch("time") ?? getTimeString();
+  const submitReservation = (_data: PendingReservationFormType) => {
+    if (focusSlot.start && focusSlot.end && reservationUnit.pk)
+      setErrorMsg(null);
+    setIsReserving(true);
+    const { start: begin, end } = focusSlot;
+    if (reservationUnit?.pk == null || begin == null || end == null) {
+      return;
     }
-
+    const input: ReservationCreateMutationInput = {
+      begin: begin.toISOString(),
+      end: end.toISOString(),
+      reservationUnitPks: [reservationUnit.pk],
+    };
+    createReservation(input);
+  };
+  const durationOptions = useMemo(() => {
+    const {
+      minReservationDuration,
+      maxReservationDuration,
+      reservationStartInterval,
+    } = reservationUnit || {};
+    if (
+      minReservationDuration == null ||
+      maxReservationDuration == null ||
+      reservationStartInterval == null
+    ) {
+      return [];
+    }
+    return getDurationOptions(
+      minReservationDuration ?? undefined,
+      maxReservationDuration ?? undefined,
+      reservationStartInterval ?? 0,
+      t
+    );
+  }, [reservationUnit, t]);
+  const availableTimesForDay = useMemo(() => {
+    return getPossibleTimesForDay(
+      reservableTimeSpans,
+      reservationUnit?.reservationStartInterval,
+      focusDate
+    ).filter((span) => {
+      const [slotH, slotM] = span.split(":").map(Number);
+      const slotDate = new Date(focusDate);
+      slotDate.setHours(slotH, slotM, 0, 0);
+      return (
+        slotDate >= now &&
+        isSlotReservable(slotDate, addMinutes(slotDate, durationValue))
+      );
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialReservation]);
+  }, [
+    reservableTimeSpans,
+    reservationUnit?.reservationStartInterval,
+    now,
+    durationValue,
+    isSlotReservable,
+  ]);
+
+  const startingTimeOptions = useMemo(() => {
+    return getPossibleTimesForDay(
+      reservableTimeSpans,
+      reservationUnit?.reservationStartInterval,
+      focusDate
+    )
+      .filter((span) => {
+        const [slotH, slotM] = span.split(":").map(Number);
+        const slotDate = new Date(focusDate);
+        slotDate.setHours(slotH, slotM, 0, 0);
+        return (
+          slotDate >= now &&
+          isSlotReservable(slotDate, addMinutes(slotDate, durationValue))
+        );
+      })
+      .map((span) => ({
+        label: span,
+        value: span,
+      }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    reservableTimeSpans,
+    reservationUnit?.reservationStartInterval,
+    now,
+    durationValue,
+    isSlotReservable,
+  ]);
+
+  const selectedDuration = useMemo(
+    () =>
+      getSelectedOption(durationValue, durationOptions) ?? durationOptions[0],
+    [durationValue, durationOptions]
+  );
+
+  const focusSlot: FocusTimeSlot = useMemo(() => {
+    const start = focusDate;
+    const [hours, minutes] = timeValue.split(":").map(Number);
+    start.setHours(hours, minutes, 0, 0);
+    const end = addMinutes(start, durationValue);
+    return {
+      start,
+      end,
+      isReservable: isSlotReservable(start, end),
+      durationMinutes: durationValue,
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [durationValue, isSlotReservable, timeValue]);
 
   const { currentUser } = useCurrentUser();
 
@@ -447,10 +574,6 @@ const ReservationUnit = ({
 
   const userReservations = filterNonNullable(
     userReservationsData?.reservations?.edges?.map((e) => e?.node)
-  );
-  const reservableTimeSpans = useMemo(
-    () => filterNonNullable(reservationUnit?.reservableTimeSpans),
-    [reservationUnit?.reservableTimeSpans]
   );
 
   const slotPropGetter = useMemo(() => {
@@ -485,22 +608,6 @@ const ReservationUnit = ({
     );
   }, [reservationUnit?.maxReservationsPerUser, userReservations]);
 
-  const isSlotReservable = useCallback(
-    (start: Date, end: Date, skipLengthCheck = false): boolean => {
-      return (
-        reservationUnit != null &&
-        isReservationReservable({
-          reservationUnit,
-          activeApplicationRounds,
-          start,
-          end,
-          skipLengthCheck,
-        })
-      );
-    },
-    [activeApplicationRounds, reservationUnit]
-  );
-
   const shouldDisplayApplicationRoundTimeSlots =
     !!activeApplicationRounds?.length;
 
@@ -519,11 +626,11 @@ const ReservationUnit = ({
 
   const [shouldCalendarControlsBeVisible, setShouldCalendarControlsBeVisible] =
     useState(false);
-
+  const isClientATouchDevice = isTouchDevice();
   const handleCalendarEventChange = useCallback(
     (
       { start, end }: CalendarEvent<ReservationType>,
-      skipLengthCheck = false
+      skipLengthCheck = true
     ): boolean => {
       if (!reservationUnit) {
         return false;
@@ -538,7 +645,14 @@ const ReservationUnit = ({
       }
 
       setIsReserving(false);
-      setInitialReservation(newReservation);
+      setValue("date", newReservation.begin);
+      setValue(
+        "duration",
+        differenceInMinutes(
+          new Date(newReservation.begin),
+          new Date(newReservation.end)
+        )
+      );
 
       if (isClientATouchDevice) {
         setShouldCalendarControlsBeVisible(true);
@@ -551,6 +665,7 @@ const ReservationUnit = ({
       isReservationQuotaReached,
       isSlotReservable,
       reservationUnit,
+      setValue,
     ]
   );
 
@@ -559,11 +674,11 @@ const ReservationUnit = ({
     ({ start, end, action }: any, skipLengthCheck = false): boolean => {
       const isTouchClick = action === "select" && isClientATouchDevice;
 
-      if (action === "select" && !isClientATouchDevice) {
-        return false;
-      }
-
-      if (isReservationQuotaReached) {
+      if (
+        (action === "select" && !isClientATouchDevice) ||
+        isReservationQuotaReached ||
+        !reservationUnit
+      ) {
         return false;
       }
 
@@ -576,9 +691,6 @@ const ReservationUnit = ({
             )
           : new Date(end);
 
-      if (!reservationUnit) {
-        return false;
-      }
       const newReservation = getNewReservation({
         start,
         end: normalizedEnd,
@@ -591,8 +703,15 @@ const ReservationUnit = ({
         return false;
       }
 
-      setIsReserving(false);
-      setInitialReservation(newReservation);
+      setIsReserving(false); // why?
+      setValue("date", new Date(newReservation.begin).toISOString());
+      setValue(
+        "duration",
+        differenceInMinutes(
+          new Date(newReservation.begin),
+          new Date(newReservation.end)
+        )
+      );
 
       return true;
     },
@@ -601,7 +720,7 @@ const ReservationUnit = ({
       isReservationQuotaReached,
       isSlotReservable,
       reservationUnit,
-      setInitialReservation,
+      setValue,
     ]
   );
 
@@ -609,45 +728,21 @@ const ReservationUnit = ({
     setCalendarViewType(isMobile ? "day" : "week");
   }, [isMobile]);
 
-  useEffect(() => {
-    const start = storedReservation?.begin
-      ? new Date(storedReservation.begin)
-      : null;
-    const end = storedReservation?.end ? new Date(storedReservation.end) : null;
-
-    if (start && end) {
-      handleCalendarEventChange(
-        { start, end } as CalendarEvent<ReservationType>,
-        true
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [storedReservation?.begin, storedReservation?.end]);
-
-  const shouldDisplayBottomWrapper = useMemo(
-    () => relatedReservationUnits?.length > 0,
-    [relatedReservationUnits?.length]
-  );
-
   const calendarEvents: CalendarEvent<ReservationType>[] = useMemo(() => {
     const diff =
-      initialReservation != null
-        ? differenceInMinutes(
-            new Date(initialReservation.end),
-            new Date(initialReservation.begin)
-          )
-        : 0;
-    const duration = diff >= 90 ? `(${formatDuration(diff, t)})` : "";
+      focusSlot?.durationMinutes != null ? focusSlot.durationMinutes : 0;
+    const calendarDuration = diff >= 90 ? `(${formatDuration(diff, t)})` : "";
 
     const existingReservations = filterNonNullable(
       reservationUnit?.reservations
     );
     return [
       ...existingReservations,
-      ...(initialReservation != null
+      ...(focusSlot != null
         ? [
             {
-              ...initialReservation,
+              begin: focusSlot.start,
+              end: focusSlot.end,
               state: "INITIAL",
             },
           ]
@@ -655,15 +750,16 @@ const ReservationUnit = ({
     ]
       .filter((n): n is NonNullable<typeof n> => n != null)
       .map((n) => {
-        const suffix = n.state === "INITIAL" ? duration : "";
+        const suffix = n.state === "INITIAL" ? calendarDuration : "";
+        const { begin: start, end } = n;
         const event: CalendarEvent<ReservationType> = {
           title: `${
             n.state === "CANCELLED"
               ? `${t("reservationCalendar:prefixForCancelled")}: `
               : suffix
           }`,
-          start: n.begin != null ? new Date(n.begin) : new Date(),
-          end: n.end != null ? new Date(n.end) : new Date(),
+          start: new Date(start ?? ""),
+          end: new Date(end ?? ""),
           allDay: false,
           // TODO refactor and remove modifying the state
           event: n as ReservationType,
@@ -671,7 +767,7 @@ const ReservationUnit = ({
 
         return event;
       });
-  }, [reservationUnit, t, initialReservation]);
+  }, [reservationUnit, t, focusSlot]);
 
   const eventBuffers = useMemo(() => {
     const bufferTimeBefore =
@@ -689,15 +785,16 @@ const ReservationUnit = ({
         .flatMap((e) => e.event)
         .filter((n): n is NonNullable<typeof n> => n != null),
       {
-        begin: initialReservation?.begin,
-        end: initialReservation?.end,
+        begin: focusSlot?.start.toISOString(),
+        end: focusSlot?.end.toISOString(),
         state: "INITIAL",
         bufferTimeBefore,
         bufferTimeAfter,
       } as PendingReservation,
     ]);
-  }, [calendarEvents, initialReservation, reservationUnit]);
+  }, [calendarEvents, focusSlot, reservationUnit]);
 
+  // TODO: Refactor to try/catch
   const [addReservation] = useMutation<
     { createReservation: ReservationCreateMutationPayload },
     { input: ReservationCreateMutationInput }
@@ -705,7 +802,7 @@ const ReservationUnit = ({
     onCompleted: ({ createReservation }) => {
       const { pk } = createReservation;
       /// ??? errors
-      if (initialReservation == null || pk == null) {
+      if (focusSlot == null || pk == null) {
         return;
       }
       if (reservationUnit?.pk != null && pk != null) {
@@ -719,26 +816,8 @@ const ReservationUnit = ({
       setErrorMsg(msg || t("errors:general_error"));
     },
   });
-
   const createReservation = useCallback(
-    async (res: ReservationProps): Promise<void> => {
-      setErrorMsg(null);
-      setIsReserving(true);
-      const { begin, end } = res;
-      if (reservationUnit?.pk == null || begin == null || end == null) {
-        return;
-      }
-      const input: ReservationCreateMutationInput = {
-        begin,
-        end,
-        reservationUnitPks: [reservationUnit.pk],
-      };
-
-      setInitialReservation({
-        begin,
-        end,
-      });
-
+    async (input: ReservationCreateMutationInput): Promise<void> => {
       await addReservation({
         variables: {
           input,
@@ -746,36 +825,29 @@ const ReservationUnit = ({
       });
       setIsReserving(false);
     },
-    [addReservation, reservationUnit?.pk, setInitialReservation]
+    [addReservation, reservationUnit.pk]
   );
 
+  // store reservation unit overall reservability to use in JSX and pass to some child elements
   const [reservationUnitIsReservable, reason] =
     isReservationUnitReservable(reservationUnit);
   if (!reservationUnitIsReservable) {
     // eslint-disable-next-line no-console
     console.warn("not reservable because: ", reason);
   }
-
-  const termsOfUseContent = reservationUnit
-    ? getTranslation(reservationUnit, "termsOfUse")
-    : undefined;
-  const paymentTermsContent = reservationUnit?.paymentTerms
-    ? getTranslation(reservationUnit.paymentTerms, "text")
-    : undefined;
-  const cancellationTermsContent = reservationUnit?.cancellationTerms
-    ? getTranslation(reservationUnit.cancellationTerms, "text")
-    : undefined;
-  const pricingTermsContent = reservationUnit?.pricingTerms
-    ? getTranslation(reservationUnit.pricingTerms, "text")
-    : undefined;
-  const serviceSpecificTermsContent = reservationUnit?.serviceSpecificTerms
-    ? getTranslation(reservationUnit.serviceSpecificTerms, "text")
-    : undefined;
-
-  const [quickReservationSlot, setQuickReservationSlot] =
-    useState<QuickReservationSlotProps | null>(null);
-
-  const [cookiehubBannerHeight, setCookiehubBannerHeight] = useState<number>(0);
+  const [storedReservation, setStoredReservation, _removeStoredReservation] =
+    useLocalStorage<PendingReservation>("reservation");
+  const storeReservationForLogin = () => {
+    if (reservationUnit.pk != null && focusSlot != null) {
+      const { start, end } = focusSlot ?? {};
+      setStoredReservation({
+        begin: start.toISOString(),
+        end: end.toISOString(),
+        price: undefined,
+        reservationUnitPk: reservationUnit.pk ?? 0,
+      });
+    }
+  };
 
   // If returning from login, continue on to reservation details
   useEffect(() => {
@@ -800,52 +872,44 @@ const ReservationUnit = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onScroll = () => {
-    const banner: HTMLElement | null = window.document.querySelector(
-      ".ch2 .ch2-dialog.ch2-visible"
+  // IRRELEVANT STUFF (FOR ME/NOW)
+  /*
+useEffect(() => {
+  const start = storedReservation?.begin
+    ? new Date(storedReservation.begin)
+    : null;
+  const end = storedReservation?.end ? new Date(storedReservation.end) : null;
+
+  if (start && end) {
+    handleCalendarEventChange(
+      { start, end } as CalendarEvent<ReservationType>,
+      true
     );
-    const height: number = banner?.offsetHeight ?? 0;
-    setCookiehubBannerHeight(height);
-  };
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [storedReservation?.begin, storedReservation?.end]);
+*/
+  const shouldDisplayBottomWrapper = useMemo(
+    () => relatedReservationUnits?.length > 0,
+    [relatedReservationUnits?.length]
+  );
+  const termsOfUseContent = reservationUnit
+    ? getTranslation(reservationUnit, "termsOfUse")
+    : undefined;
+  const paymentTermsContent = reservationUnit?.paymentTerms
+    ? getTranslation(reservationUnit.paymentTerms, "text")
+    : undefined;
+  const cancellationTermsContent = reservationUnit?.cancellationTerms
+    ? getTranslation(reservationUnit.cancellationTerms, "text")
+    : undefined;
+  const pricingTermsContent = reservationUnit?.pricingTerms
+    ? getTranslation(reservationUnit.pricingTerms, "text")
+    : undefined;
+  const serviceSpecificTermsContent = reservationUnit?.serviceSpecificTerms
+    ? getTranslation(reservationUnit.serviceSpecificTerms, "text")
+    : undefined;
 
-  // Update the calendar to reflect a selected quick reservation slot
-  useEffect(() => {
-    if (quickReservationSlot == null) return;
-    handleCalendarEventChange({
-      start: quickReservationSlot.start,
-      end: quickReservationSlot.end,
-    });
-  }, [handleCalendarEventChange, quickReservationSlot]);
-
-  // Update quickReservation widget to reflect a changed calendar time, thus unselecting any quick reservation slot
-  useEffect(() => {
-    if (
-      quickReservationSlot &&
-      initialReservation?.begin &&
-      initialReservation?.end &&
-      (quickReservationSlot.start.toISOString() !== initialReservation.begin ||
-        quickReservationSlot.end.toISOString() !== initialReservation.end)
-    ) {
-      setShouldUnselect((prev) => prev + 1);
-    }
-    // If user resets the calendar/unselects a slot, unselect the quick reservation slot
-    if (quickReservationSlot && !initialReservation) {
-      setShouldUnselect((prev) => prev + 1);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialReservation, setShouldUnselect, setQuickReservationSlot]);
-
-  useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if ((window as any).cookiehub) {
-      window.addEventListener("scroll", onScroll, { passive: true });
-    }
-
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-    };
-  }, []);
-
+  const [cookiehubBannerHeight, setCookiehubBannerHeight] = useState<number>(0);
   const futurePricing =
     reservationUnit != null
       ? getFuturePricing(reservationUnit, activeApplicationRounds)
@@ -855,54 +919,102 @@ const ReservationUnit = ({
   const dayStartTime = addHours(startOfDay(currentDate), 6);
   const equipment = filterNonNullable(reservationUnit?.equipment);
 
+  // MYSTIC STUFF
+  const onScroll = () => {
+    const banner: HTMLElement | null = window.document.querySelector(
+      ".ch2 .ch2-dialog.ch2-visible"
+    );
+    const height: number = banner?.offsetHeight ?? 0;
+    setCookiehubBannerHeight(height);
+  };
+
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((window as any).cookiehub) {
+      window.addEventListener("scroll", onScroll, { passive: true });
+    }
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+
+  // This seems to be meant to scroll to the calendar if there's an initial reservation, and
+  // ALSO if there's a stored reservation, set the focusDate to it, and
+  // ALSO if there's a stored reservation, set it as the new initial reservation, and
+  // ALSO remove the stored reservation if there is one. phew.
+  useEffect(() => {
+    const scrollToCalendar = () => {
+      if (calendarRef?.current?.parentElement?.offsetTop != null) {
+        window.scroll({
+          top: calendarRef.current.parentElement.offsetTop - 20,
+          behavior: "smooth",
+        });
+      }
+    };
+    /*
+    // TODO: we shouldn't be setting values based on stored reservation here
+    if (
+      storedReservation?.reservationUnitPk === reservationUnit?.pk &&
+      storedReservation?.begin &&
+      storedReservation?.end
+    ) {
+      setFocusDate(new Date(storedReservation.begin));
+      scrollToCalendar();
+      setInitialReservation(storedReservation);
+      removeStoredReservation();
+    } else */
+    if (hash === "calendar" && focusSlot) {
+      scrollToCalendar();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusSlot]);
+
+  // TODO: Should this be an _early_ return?
   if (reservationUnit == null) {
     return <CenterSpinner />;
   }
-
+  const subventionSuffix = reservationUnit?.canApplyFreeOfCharge ? (
+    <SubventionSuffix
+      placement="reservation-unit-head"
+      setIsDialogOpen={setIsDialogOpen}
+    />
+  ) : undefined;
+  const nextAvailableTime = getNextAvailableTime({
+    day: focusDate,
+    slots: availableTimesForDay,
+    duration: durationValue,
+    isSlotReservable,
+    reservationUnit,
+  });
+  const quickReservationProps = {
+    reservationUnitIsReservable,
+    reservationUnit,
+    calendarRef,
+    subventionSuffix,
+    apiBaseUrl,
+    reservationForm,
+    durationOptions,
+    startingTimeOptions,
+    nextAvailableTime,
+    focusSlot,
+    selectedDuration,
+    storeReservationForLogin,
+    isReserving,
+    submitReservation,
+  };
   return (
     <Wrapper>
       <Head
         reservationUnit={reservationUnit}
         reservationUnitIsReservable={reservationUnitIsReservable}
-        subventionSuffix={
-          reservationUnit?.canApplyFreeOfCharge ? (
-            <SubventionSuffix
-              placement="reservation-unit-head"
-              ref={openPricingTermsRef}
-              setIsDialogOpen={setIsDialogOpen}
-            />
-          ) : undefined
-        }
+        subventionSuffix={subventionSuffix}
       />
       <Container>
         <Columns>
           <div>
             {!isReservationStartInFuture(reservationUnit) &&
               reservationUnitIsReservable && (
-                <QuickReservation
-                  isSlotReservable={isSlotReservable}
-                  isReservationUnitReservable={!isReservationQuotaReached}
-                  createReservation={createReservation}
-                  reservationUnit={reservationUnit}
-                  calendarRef={calendarRef}
-                  setErrorMsg={setErrorMsg}
-                  subventionSuffix={
-                    reservationUnit?.canApplyFreeOfCharge
-                      ? () => (
-                          <SubventionSuffix
-                            placement="quick-reservation"
-                            ref={openPricingTermsRef}
-                            setIsDialogOpen={setIsDialogOpen}
-                          />
-                        )
-                      : undefined
-                  }
-                  shouldUnselect={shouldUnselect}
-                  quickReservationSlot={quickReservationSlot}
-                  setQuickReservationSlot={setQuickReservationSlot}
-                  setInitialReservation={setInitialReservation}
-                  apiBaseUrl={apiBaseUrl}
-                />
+                <QuickReservation {...quickReservationProps} />
               )}
             <JustForDesktop customBreakpoint={breakpoints.l}>
               <AddressSection reservationUnit={reservationUnit} />
@@ -956,8 +1068,10 @@ const ReservationUnit = ({
                 <div aria-hidden ref={calendarRef}>
                   <Calendar<ReservationType>
                     events={[...calendarEvents, ...eventBuffers]}
-                    begin={currentDate}
-                    onNavigate={(d: Date) => setFocusDate(d)}
+                    begin={focusDate}
+                    onNavigate={(d: Date) =>
+                      reservationForm.setValue("date", d.toISOString())
+                    }
                     eventStyleGetter={(event) =>
                       eventStyleGetter(
                         event,
@@ -1011,15 +1125,7 @@ const ReservationUnit = ({
                     >
                       <ReservationCalendarControls
                         reservationUnit={reservationUnit}
-                        initialReservation={initialReservation}
-                        setInitialReservation={setInitialReservation}
-                        isSlotReservable={isSlotReservable}
                         isReserving={isReserving}
-                        setCalendarFocusDate={setFocusDate}
-                        activeApplicationRounds={activeApplicationRounds}
-                        createReservation={(res) => createReservation(res)}
-                        setErrorMsg={setErrorMsg}
-                        handleEventChange={handleCalendarEventChange}
                         mode="create"
                         shouldCalendarControlsBeVisible={
                           shouldCalendarControlsBeVisible
@@ -1029,6 +1135,13 @@ const ReservationUnit = ({
                         }
                         apiBaseUrl={apiBaseUrl}
                         isAnimated={isMobile}
+                        reservationForm={reservationForm}
+                        durationOptions={durationOptions}
+                        availableTimesForDay={availableTimesForDay}
+                        focusSlot={focusSlot}
+                        storeReservationForLogin={storeReservationForLogin}
+                        startingTimeOptions={startingTimeOptions}
+                        submitReservation={submitReservation}
                       />
                     </CalendarFooter>
                   )}

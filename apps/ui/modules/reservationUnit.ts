@@ -4,7 +4,7 @@ import {
   getReservationVolume,
 } from "common";
 import { flatten, trim, uniq } from "lodash";
-import { format, isAfter, isBefore, isSameDay, set } from "date-fns";
+import { isAfter, isBefore, isSameDay, set } from "date-fns";
 import { i18n } from "next-i18next";
 import { toUIDate } from "common/src/common/util";
 import {
@@ -25,6 +25,10 @@ import {
 } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { capitalize, getTranslation } from "./util";
+
+export const getTimeString = (date = new Date()) => {
+  return `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+};
 
 export const isReservationUnitPublished = (
   reservationUnit?: ReservationUnitNode
@@ -350,27 +354,23 @@ export function getPossibleTimesForDay(
     .filter((x) => isInTimeSpan(date, x))
     .forEach((rts) => {
       if (!rts?.startDatetime || !rts?.endDatetime) return;
-      const begin = isSameDay(new Date(rts.startDatetime), date)
-        ? new Date(rts.startDatetime)
+      const startDate = new Date(rts.startDatetime);
+      const endDate = new Date(rts.endDatetime);
+      const begin = isSameDay(startDate, date)
+        ? startDate
         : set(date, { hours: 0, minutes: 0 });
-      const end = isSameDay(new Date(rts.endDatetime), date)
-        ? new Date(rts.endDatetime)
+      const end = isSameDay(endDate, date)
+        ? endDate
         : set(date, { hours: 23, minutes: 59 });
       // TODO I hate this function, don't use strings for durations
       // wasteful because we do date -> string -> object -> number -> string
       // the numbers are what we compare but all the scaffolding to mess with memory alloc
       const intervals = getDayIntervals(
-        format(begin, "HH:mm"),
-        format(end, "HH:mm"),
+        getTimeString(begin),
+        getTimeString(end),
         reservationStartInterval
-      );
-
-      // TODO why is this needed?
-      const times: string[] = intervals.map((val) => {
-        const [startHours, startMinutes] = val.split(":");
-        return `${startHours}:${startMinutes}`;
-      });
-      allTimes.push(...times);
+      ).map((i) => i.substring(0, 5));
+      allTimes.push(...intervals);
     });
   return allTimes;
 }

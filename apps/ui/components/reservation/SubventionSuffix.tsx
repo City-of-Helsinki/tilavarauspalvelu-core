@@ -4,8 +4,8 @@ import styled from "styled-components";
 
 type Props = {
   placement: "reservation-unit-head" | "quick-reservation";
-  ref: RefObject<HTMLAnchorElement>;
   setIsDialogOpen: (value: boolean) => void;
+  ref?: RefObject<HTMLAnchorElement>;
 };
 
 const Anchor = styled.a`
@@ -16,7 +16,6 @@ const Anchor = styled.a`
 
 const SubventionSuffix = ({
   placement,
-  ref,
   setIsDialogOpen,
 }: Props): JSX.Element => {
   const { t } = useTranslation();
@@ -26,7 +25,6 @@ const SubventionSuffix = ({
       {", "}
       <Anchor
         href="#"
-        ref={ref}
         style={{}}
         onClick={(e) => {
           e.preventDefault();
