@@ -4,8 +4,11 @@ from admin_extra_buttons.api import ExtraButtonsMixin, button
 from django.contrib import admin
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.forms import ModelForm, ValidationError
+from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.template.response import TemplateResponse
+from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 from email_notification.email_tester import EmailTestForm, ReservationUnitSelectForm
 from email_notification.models import EmailTemplate, EmailType
@@ -67,20 +70,24 @@ class EmailTemplateAdminForm(ModelForm):
 
     def get_validated_field(self, field):
         data = self.cleaned_data[field]
+
         if data is None:
             if field in self.required_fields:
                 raise ValidationError(f"Field {field} is required.")
-            return data
-        try:
-            EmailTemplateValidator().validate_string(data, context_dict=self.test_context)
-        except EmailTemplateValidationError as e:
-            raise ValidationError(e.message) from e
+        else:
+            try:
+                EmailTemplateValidator().validate_string(data, context_dict=self.test_context)
+            except EmailTemplateValidationError as e:
+                raise ValidationError(e.message) from e
+
         return data
 
     def validate_uploaded_html_file(self, language: str):
         file = self.cleaned_data[f"html_content_{language}"]
+
         if file and isinstance(file, InMemoryUploadedFile):
             EmailTemplateValidator().validate_html_file(file, context_dict=self.test_context)
+
         return file
 
     def clean_subject(self):
@@ -127,24 +134,21 @@ class EmailTemplateAdmin(ExtraButtonsMixin, admin.ModelAdmin):
     exclude = ["html_content"]
 
     @button(label="Email Template Testing")
-    def template_tester(self, request, extra_context=None):
-        context = self.admin_site.each_context(request)
-
+    def template_tester(self, request, extra_context=None) -> TemplateResponse | HttpResponseRedirect:
         if request.method == "POST":
             form = EmailTestForm(request.POST)
-
             if form.is_valid():
                 template = EmailTemplate.objects.filter(pk=request.POST["template"]).first()
                 send_test_emails(template, form)
-                return redirect("/admin/email_notification/emailtemplate/template_tester/")
+                self.message_user(request, _("Test Email '%s' successfully sent.") % template.name)
 
-            context["form"] = form
-            context["runit_form"] = ReservationUnitSelectForm()
-            return TemplateResponse(request, "email_tester.html", context=context)
+                template_admin_url = reverse("admin:email_notification_emailtemplate_change", args=[template.id])
+                return redirect(f"{template_admin_url}template_tester/")
+        else:
+            initial_values = get_initial_values(request)
+            form = EmailTestForm(initial=initial_values)
 
-        initial_values = get_initial_values(request)
-        form = EmailTestForm(initial=initial_values)
-
+        context = self.admin_site.each_context(request)
         context["form"] = form
         context["runit_form"] = ReservationUnitSelectForm()
 
