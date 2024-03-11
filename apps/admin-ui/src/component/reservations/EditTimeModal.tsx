@@ -286,7 +286,7 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
   return (
     <Dialog.Content>
       <StyledForm onSubmit={handleSubmit(onSubmit)} noValidate>
-        {reservation.recurringReservation ? (
+        {reservation.recurringReservation && (
           <TimeInfoBox>
             {t("Reservation.EditTime.recurringInfoLabel")}:{" "}
             <Bold>
@@ -304,7 +304,7 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
               })}
             </Bold>
           </TimeInfoBox>
-        ) : null}
+        )}
         <TimeInfoBox>
           {t("Reservation.EditTime.originalTime")}: <Bold>{originalTime}</Bold>
         </TimeInfoBox>

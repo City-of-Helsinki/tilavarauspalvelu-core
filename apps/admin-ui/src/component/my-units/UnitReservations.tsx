@@ -7,8 +7,10 @@ import Legend from "../reservations/requested/Legend";
 import { legend } from "./eventStyleGetter";
 import { UnitCalendar } from "./UnitCalendar";
 import { useUnitResources } from "./hooks";
+import { fromUIDate, isValidDate } from "common/src/common/util";
 
 type Props = {
+  // date in ui string format
   begin: string;
   unitPk: string;
   reservationUnitTypes: number[];
@@ -36,26 +38,31 @@ const UnitReservations = ({
   unitPk,
   reservationUnitTypes,
 }: Props): JSX.Element => {
-  const currentDate = new Date(begin);
+  const currentDate = fromUIDate(begin);
+
+  // TODO if the date is invalid show it to the user and disable the calendar
+  if (currentDate == null || Number.isNaN(currentDate.getTime())) {
+    // eslint-disable-next-line no-console
+    console.warn("UnitReservations: Invalid date", begin);
+  }
 
   const { t } = useTranslation();
 
   const { loading, resources, refetch } = useUnitResources(
-    currentDate,
+    currentDate ?? new Date(),
     unitPk,
     reservationUnitTypes
   );
+
+  const date =
+    currentDate && isValidDate(currentDate) ? currentDate : new Date();
 
   return (
     <>
       {loading ? (
         <Loader />
       ) : (
-        <UnitCalendar
-          date={currentDate}
-          resources={resources}
-          refetch={refetch}
-        />
+        <UnitCalendar date={date} resources={resources} refetch={refetch} />
       )}
       <LegendContainer>
         <Legends>

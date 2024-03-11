@@ -8,8 +8,9 @@ import { breakpoints } from "common";
 import { toMondayFirstUnsafe } from "common/src/helpers";
 
 type Props = {
+  // both in ui string format
   date: string;
-  onDateChange: ({ date }: { date: Date }) => void;
+  onDateChange: (date: string) => void;
 };
 
 const Wrapper = styled.div`
@@ -48,11 +49,17 @@ const SimpleDatePicker = styled(DateInput)`
 `;
 
 const DayNavigation = ({ date, onDateChange }: Props): JSX.Element => {
-  const d = new Date(date);
+  const d = fromUIDate(date);
   const { t } = useTranslation();
 
-  const onPreviousDay = () => onDateChange({ date: subDays(d, 1) });
-  const onNextDay = () => onDateChange({ date: addDays(d, 1) });
+  const onPreviousDay = () => {
+    if (!d) return;
+    onDateChange(toUIDate(subDays(d, 1)));
+  };
+  const onNextDay = () => {
+    if (!d) return;
+    onDateChange(toUIDate(addDays(d, 1)));
+  };
 
   return (
     <Wrapper>
@@ -65,16 +72,14 @@ const DayNavigation = ({ date, onDateChange }: Props): JSX.Element => {
       >
         {" "}
       </Button>
-      <WeekDay>{`${t(`dayShort.${toMondayFirstUnsafe(d.getDay())}`)} `}</WeekDay>
+      <WeekDay>{`${t(`dayShort.${toMondayFirstUnsafe(d?.getDay() ?? 0)}`)} `}</WeekDay>
       <SimpleDatePicker
         disableConfirmation
         id="date-input"
-        initialMonth={d}
+        initialMonth={d ?? new Date()}
         language="fi"
         required
-        onChange={(value) =>
-          onDateChange({ date: fromUIDate(value) ?? new Date() })
-        }
+        onChange={(value) => onDateChange(value)}
         value={toUIDate(d)}
       />
       <Button

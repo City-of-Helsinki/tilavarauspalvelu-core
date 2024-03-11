@@ -1,5 +1,5 @@
-import { toUIDate } from "common/src/common/util";
-import { formatISO, parse, startOfDay } from "date-fns";
+import { fromUIDate, isValidDate, toUIDate } from "common/src/common/util";
+import { startOfDay } from "date-fns";
 import { Button } from "hds-react";
 import React, { useReducer, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -29,12 +29,15 @@ type Params = {
 const UnitReservationsView = (): JSX.Element => {
   const { hash } = useLocation();
   const [queryParams] = useSearchParams();
-  const initialDate = queryParams.get("date")
-    ? parse(queryParams.get("date") || "", "d.M.yyyy", new Date())
-    : new Date();
-  const today = formatISO(startOfDay(initialDate));
 
-  const [begin, setBegin] = useState(today);
+  // date in UI string format
+  const queryParamsDate = queryParams.get("date");
+  const date = queryParamsDate != null ? fromUIDate(queryParamsDate) : null;
+  const initialDate =
+    queryParamsDate != null && date && isValidDate(date)
+      ? queryParamsDate
+      : toUIDate(startOfDay(new Date())) ?? "";
+  const [begin, setBegin] = useState<string>(initialDate);
   const { unitId } = useParams<Params>();
   const { t } = useTranslation();
   const history = useNavigate();
@@ -46,13 +49,20 @@ const UnitReservationsView = (): JSX.Element => {
     initialEmptyState
   );
 
-  const onDateChange = ({ date }: { date: Date }) => {
-    setBegin(formatISO(date));
+  const onDateChange = (dateString: string) => {
+    setBegin(dateString);
 
-    history({
-      hash,
-      search: `?date=${toUIDate(date)}`,
-    });
+    // TODO should use setQueryParams for consistency
+    // TODO there should not be state duplication either query params or useState, not both
+    // TODO this should not be validated, it should be validated on use
+    // because modifying the query string will will crash the frontend
+    const newDate = fromUIDate(dateString);
+    if (newDate && isValidDate(newDate)) {
+      history({
+        hash,
+        search: `?date=${dateString}`,
+      });
+    }
   };
 
   const tags = toTags(
@@ -84,7 +94,7 @@ const UnitReservationsView = (): JSX.Element => {
           theme="black"
           size="small"
           onClick={() => {
-            onDateChange({ date: new Date() });
+            onDateChange(toUIDate(startOfDay(new Date())));
           }}
         >
           {t("common.today")}
