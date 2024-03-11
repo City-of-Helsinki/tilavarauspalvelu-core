@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import uuid
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 from django.db import models
@@ -10,10 +10,25 @@ from django.utils.translation import gettext_lazy as _
 from elasticsearch_django.models import SearchDocumentManagerMixin, SearchDocumentMixin
 
 from common.connectors import ReservationUnitActionsConnector
-from reservation_units.enums import ReservationKind, ReservationStartInterval, ReservationState, ReservationUnitState
+from reservation_units.enums import (
+    AuthenticationType,
+    ReservationKind,
+    ReservationStartInterval,
+    ReservationState,
+    ReservationUnitState,
+)
 from reservation_units.querysets import ReservationUnitQuerySet
 from reservation_units.tasks import refresh_reservation_unit_product_mapping
 from tilavarauspalvelu.utils.auditlog_util import AuditLogger
+
+if TYPE_CHECKING:
+    from merchants.models import PaymentAccounting, PaymentMerchant, PaymentProduct
+    from opening_hours.models import OriginHaukiResource
+    from reservation_units.models import ReservationUnitCancellationRule, ReservationUnitType
+    from reservations.models import ReservationMetadataSet
+    from spaces.models import Unit
+    from terms_of_use.models import TermsOfUse
+
 
 __all__ = [
     "ReservationUnit",
@@ -26,342 +41,200 @@ class ReservationUnitManager(SearchDocumentManagerMixin.from_queryset(Reservatio
 
 
 class ReservationUnit(SearchDocumentMixin, models.Model):
-    sku = models.CharField(verbose_name=_("SKU"), max_length=255, blank=True, default="")
-    name = models.CharField(verbose_name=_("Name"), max_length=255)
-    description = models.TextField(verbose_name=_("Description"), blank=True, default="")
-    spaces = models.ManyToManyField(
-        "spaces.Space",
-        verbose_name=_("Spaces"),
-        related_name="reservation_units",
-        blank=True,
+    # IDs
+
+    sku: str = models.CharField(max_length=255, blank=True, default="")
+    uuid: uuid.UUID = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    rank: int | None = models.PositiveIntegerField(null=True, blank=True)
+
+    # Strings
+
+    name: str = models.CharField(max_length=255)
+    description: str = models.TextField(blank=True, default="")
+    contact_information: str = models.TextField(blank=True, default="")
+    terms_of_use: str | None = models.TextField(null=True, blank=True, max_length=2000)
+    reservation_pending_instructions: str = models.TextField(blank=True, default="")
+    reservation_confirmed_instructions: str = models.TextField(blank=True, default="")
+    reservation_cancelled_instructions: str = models.TextField(blank=True, default="")
+
+    # Integers
+
+    surface_area: int | None = models.IntegerField(null=True, blank=True)
+    min_persons: int | None = models.fields.PositiveIntegerField(null=True, blank=True)
+    max_persons: int | None = models.fields.PositiveIntegerField(null=True, blank=True)
+    max_reservations_per_user: int | None = models.PositiveIntegerField(null=True, blank=True)
+    # In calculations this is interpreted as the beginning of the calculated day.
+    # e.g. current_date = 2023-10-10
+    # min_days_before = 1, earliest reservation that can be made is 2023-10-11 00:00
+    # min_days_before = 2, earliest reservation that can be made is 2023-10-12 00:00
+    reservations_min_days_before: int | None = models.PositiveIntegerField(null=True, blank=True)
+    # The latest reservation that can be made is calculated as now + max_days_before. No time interpretation made.
+    reservations_max_days_before: int | None = models.PositiveIntegerField(null=True, blank=True)
+
+    # Datetime
+
+    reservation_begins: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
+    reservation_ends: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
+    publish_begins: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
+    publish_ends: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
+    min_reservation_duration: datetime.timedelta | None = models.DurationField(null=True, blank=True)
+    max_reservation_duration: datetime.timedelta | None = models.DurationField(null=True, blank=True)
+    buffer_time_before: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
+    buffer_time_after: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
+
+    # Booleans
+
+    is_draft: bool = models.BooleanField(default=False, blank=True, db_index=True)
+    is_archived: bool = models.BooleanField(default=False, db_index=True)
+    require_introduction: bool = models.BooleanField(default=False)
+    require_reservation_handling: bool = models.BooleanField(default=False, blank=True)
+    reservation_block_whole_day: bool = models.BooleanField(default=False, blank=True)
+    can_apply_free_of_charge: bool = models.BooleanField(default=False, blank=True)
+    allow_reservations_without_opening_hours: bool = models.BooleanField(default=False)
+
+    # Enums
+
+    authentication: str = models.CharField(
+        max_length=20,
+        choices=AuthenticationType.choices,
+        default=AuthenticationType.WEAK.value,
+    )
+    reservation_start_interval: str = models.CharField(
+        max_length=20,
+        choices=ReservationStartInterval.choices,
+        default=ReservationStartInterval.INTERVAL_15_MINUTES.value,
+    )
+    reservation_kind: str = models.CharField(
+        max_length=20,
+        choices=ReservationKind.choices,
+        default=ReservationKind.DIRECT_AND_SEASON.value,
     )
 
-    keyword_groups = models.ManyToManyField(
-        "reservation_units.KeywordGroup",
-        verbose_name=_("Keyword groups"),
-        related_name="reservation_units",
-        blank=True,
-    )
+    # Many-to-One related
 
-    resources = models.ManyToManyField(
-        "resources.Resource",
-        verbose_name=_("Resources"),
-        related_name="reservation_units",
-        blank=True,
-    )
-    services = models.ManyToManyField(
-        "services.Service",
-        verbose_name=_("Services"),
-        related_name="reservation_units",
-        blank=True,
-    )
-    purposes = models.ManyToManyField(
-        "Purpose",
-        verbose_name=_("Purposes"),
-        related_name="reservation_units",
-        blank=True,
-    )
-
-    qualifiers = models.ManyToManyField(
-        "Qualifier",
-        verbose_name=_("Qualifiers"),
-        related_name="reservation_units",
-        blank=True,
-    )
-
-    reservation_unit_type = models.ForeignKey(
-        "reservation_units.ReservationUnitType",
-        verbose_name=_("Type"),
-        related_name="reservation_units",
-        blank=True,
-        null=True,
-        on_delete=models.SET_NULL,
-    )
-    require_introduction = models.BooleanField(verbose_name=_("Require introduction"), default=False)
-    equipments = models.ManyToManyField(
-        "reservation_units.Equipment",
-        verbose_name=_("Equipments"),
-        blank=True,
-    )
-    terms_of_use = models.TextField(
-        verbose_name=_("Terms of use"),
-        blank=True,
-        max_length=2000,
-        null=True,
-    )
-    payment_terms = models.ForeignKey(
-        "terms_of_use.TermsOfUse",
-        related_name="payment_terms_reservation_unit",
-        verbose_name=_("Payment terms"),
-        blank=True,
-        null=True,
-        on_delete=models.SET_NULL,
-    )
-    cancellation_terms = models.ForeignKey(
-        "terms_of_use.TermsOfUse",
-        related_name="cancellation_terms_reservation_unit",
-        verbose_name=_("Cancellation terms"),
-        blank=True,
-        null=True,
-        on_delete=models.SET_NULL,
-    )
-    service_specific_terms = models.ForeignKey(
-        "terms_of_use.TermsOfUse",
-        related_name="service_specific_terms_reservation_unit",
-        verbose_name=_("Service-specific terms"),
-        blank=True,
-        null=True,
-        on_delete=models.SET_NULL,
-    )
-    pricing_terms = models.ForeignKey(
-        "terms_of_use.TermsOfUse",
-        related_name="pricing_terms_reservation_unit",
-        verbose_name=_("Pricing terms"),
-        blank=True,
-        null=True,
-        on_delete=models.SET_NULL,
-    )
-    reservation_pending_instructions = models.TextField(
-        verbose_name=_("Additional instructions for pending reservation"),
-        blank=True,
-        default="",
-    )
-
-    reservation_confirmed_instructions = models.TextField(
-        verbose_name=_("Additional instructions for confirmed reservation"),
-        blank=True,
-        default="",
-    )
-
-    reservation_cancelled_instructions = models.TextField(
-        verbose_name=_("Additional instructions for cancelled reservations"),
-        blank=True,
-        default="",
-    )
-
-    unit = models.ForeignKey(
+    unit: Unit | None = models.ForeignKey(
         "spaces.Unit",
-        verbose_name=_("Unit"),
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
     )
-    contact_information = models.TextField(
-        verbose_name=_("Contact information"),
-        blank=True,
-        default="",
-    )
-    max_reservation_duration = models.DurationField(
-        verbose_name=_("Maximum reservation duration"), blank=True, null=True
-    )
-    min_reservation_duration = models.DurationField(
-        verbose_name=_("Minimum reservation duration"), blank=True, null=True
-    )
-
-    uuid = models.UUIDField(default=uuid.uuid4, null=False, editable=False, unique=True)
-
-    is_draft = models.BooleanField(
-        default=False,
-        verbose_name=_("Is this in draft state"),
-        blank=True,
-        db_index=True,
-    )
-
-    max_persons = models.fields.PositiveIntegerField(verbose_name=_("Maximum number of persons"), null=True, blank=True)
-
-    min_persons = models.fields.PositiveIntegerField(verbose_name=_("Minimum number of persons"), null=True, blank=True)
-
-    surface_area = models.IntegerField(
-        verbose_name=_("Surface area"),
-        blank=True,
-        null=True,
-    )
-
-    buffer_time_before: datetime.timedelta = models.DurationField(
-        verbose_name=_("Buffer time before reservation"),
-        default=datetime.timedelta(),
-        blank=True,
-    )
-
-    buffer_time_after: datetime.timedelta = models.DurationField(
-        verbose_name=_("Buffer time after reservation"),
-        default=datetime.timedelta(),
-        blank=True,
-    )
-
-    origin_hauki_resource = models.ForeignKey(
+    origin_hauki_resource: OriginHaukiResource | None = models.ForeignKey(
         "opening_hours.OriginHaukiResource",
         related_name="reservation_units",
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
     )
-
-    cancellation_rule = models.ForeignKey(
+    reservation_unit_type: ReservationUnitType | None = models.ForeignKey(
+        "reservation_units.ReservationUnitType",
+        related_name="reservation_units",
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+    cancellation_rule: ReservationUnitCancellationRule | None = models.ForeignKey(
         "reservation_units.ReservationUnitCancellationRule",
         blank=True,
         null=True,
         on_delete=models.PROTECT,
     )
-
-    reservation_start_interval: str = models.CharField(
-        max_length=20,
-        verbose_name=_("Reservation start interval"),
-        choices=ReservationStartInterval.choices,
-        default=ReservationStartInterval.INTERVAL_15_MINUTES.value,
-        help_text=(
-            "Determines the interval for the start time of the reservation. "
-            "For example an interval of 15 minutes means a reservation can "
-            "begin at minutes 15, 30, 60, or 90. Possible values are "
-            f"{', '.join(values for values in ReservationStartInterval.values)}."
-        ),
-    )
-
-    # In calculations this is interpreted as the beginning of the calculated day.
-    # e.g. current_date = 2023-10-10
-    # min_days_before = 1, earliest reservation that can be made is 2023-10-11 00:00
-    # min_days_before = 2, earliest reservation that can be made is 2023-10-12 00:00
-    reservations_min_days_before = models.PositiveIntegerField(
-        verbose_name=_("Minimum days before reservations can be made"),
-        null=True,
-        blank=True,
-    )
-
-    # The latest reservation that can be made is calculated as now + max_days_before. No time interpretation made.
-    reservations_max_days_before = models.PositiveIntegerField(
-        verbose_name=_("Maximum number of days before reservations can be made"),
-        null=True,
-        blank=True,
-    )
-
-    reservation_begins = models.DateTimeField(
-        null=True,
-        blank=True,
-        help_text=_("Time when making reservations become possible for this reservation unit."),
-    )
-    reservation_ends = models.DateTimeField(
-        null=True,
-        blank=True,
-        help_text=_("Time when making reservations become not possible for this reservation unit"),
-    )
-    publish_begins = models.DateTimeField(
-        null=True,
-        blank=True,
-        help_text=_("Time after this reservation unit should be publicly visible in UI."),
-    )
-    publish_ends = models.DateTimeField(
-        null=True,
-        blank=True,
-        help_text=_("Time after this reservation unit should not be publicly visible in UI."),
-    )
-    metadata_set = models.ForeignKey(
+    metadata_set: ReservationMetadataSet | None = models.ForeignKey(
         "reservations.ReservationMetadataSet",
-        verbose_name=_("Reservation metadata set"),
         related_name="reservation_units",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        help_text=_(
-            "Reservation metadata set that defines the set of supported "
-            "and required form fields for this reservation unit."
-        ),
     )
-    max_reservations_per_user = models.PositiveIntegerField(
-        verbose_name=_("Maximum number of active reservations per user"),
-        null=True,
-        blank=True,
-    )
-
-    require_reservation_handling = models.BooleanField(
-        verbose_name=_("Does the reservations of this require a handling"),
-        default=False,
-        blank=True,
-        help_text=_("Does reservations of this reservation unit need to be handled before they're confirmed."),
-    )
-
-    AUTHENTICATION_TYPES = (("weak", _("Weak")), ("strong", _("Strong")))
-    authentication = models.CharField(
-        blank=False,
-        verbose_name=_("Authentication"),
-        max_length=20,
-        choices=AUTHENTICATION_TYPES,
-        default="weak",
-        help_text=_("Authentication required for reserving this reservation unit."),
-    )
-
-    rank = models.PositiveIntegerField(
+    cancellation_terms: TermsOfUse | None = models.ForeignKey(
+        "terms_of_use.TermsOfUse",
+        related_name="cancellation_terms_reservation_unit",
         blank=True,
         null=True,
-        verbose_name=_("Order number"),
-        help_text=_("Order number to be use in api sorting."),
+        on_delete=models.SET_NULL,
     )
-
-    reservation_kind = models.CharField(
-        max_length=20,
-        verbose_name=_("Reservation kind "),
-        choices=ReservationKind.choices,
-        default=ReservationKind.DIRECT_AND_SEASON,
-        help_text="What kind of reservations are to be booked with this reservation unit.",
-    )
-
-    payment_types = models.ManyToManyField("reservation_units.ReservationUnitPaymentType", blank=True)
-
-    reservation_block_whole_day = models.BooleanField(blank=True, default=False)
-
-    can_apply_free_of_charge = models.BooleanField(
-        blank=True,
-        default=False,
-        verbose_name=_("Can apply free of charge"),
-        help_text=_("Can reservations to this reservation unit be able to apply free of charge."),
-    )
-
-    allow_reservations_without_opening_hours = models.BooleanField(
-        verbose_name=_("Allow reservations without opening hours"),
-        default=False,
-        help_text="Is it possible to reserve this reservation unit when opening hours are not defined.",
-        blank=False,
-    )
-
-    is_archived = models.BooleanField(
-        verbose_name=_("Is reservation unit archived"),
-        default=False,
-        help_text="Is reservation unit archived.",
-        blank=False,
-        db_index=True,
-    )
-
-    payment_merchant = models.ForeignKey(
-        "merchants.PaymentMerchant",
-        verbose_name=_("Payment merchant"),
-        related_name="reservation_units",
-        on_delete=models.PROTECT,
+    service_specific_terms: TermsOfUse | None = models.ForeignKey(
+        "terms_of_use.TermsOfUse",
+        related_name="service_specific_terms_reservation_unit",
         blank=True,
         null=True,
-        help_text="Merchant used for payments",
+        on_delete=models.SET_NULL,
     )
-
-    payment_product = models.ForeignKey(
+    pricing_terms: TermsOfUse | None = models.ForeignKey(
+        "terms_of_use.TermsOfUse",
+        related_name="pricing_terms_reservation_unit",
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+    payment_terms: TermsOfUse | None = models.ForeignKey(
+        "terms_of_use.TermsOfUse",
+        related_name="payment_terms_reservation_unit",
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+    payment_product: PaymentProduct | None = models.ForeignKey(
         "merchants.PaymentProduct",
-        verbose_name=_("Payment product"),
         related_name="reservation_units",
         on_delete=models.PROTECT,
         null=True,
         blank=True,
-        help_text="Product used for payments",
     )
-
-    payment_accounting = models.ForeignKey(
+    payment_merchant: PaymentMerchant | None = models.ForeignKey(
+        "merchants.PaymentMerchant",
+        related_name="reservation_units",
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+    )
+    payment_accounting: PaymentAccounting | None = models.ForeignKey(
         "merchants.PaymentAccounting",
-        verbose_name=_("Payment accounting"),
         related_name="reservation_units",
         on_delete=models.PROTECT,
         null=True,
         blank=True,
-        help_text="Payment accounting information",
     )
 
-    objects = ReservationUnitManager()
-    actions = ReservationUnitActionsConnector()
+    # Many-to-Many related
+
+    spaces = models.ManyToManyField(
+        "spaces.Space",
+        related_name="reservation_units",
+        blank=True,
+    )
+    resources = models.ManyToManyField(
+        "resources.Resource",
+        related_name="reservation_units",
+        blank=True,
+    )
+    purposes = models.ManyToManyField(
+        "reservation_units.Purpose",
+        related_name="reservation_units",
+        blank=True,
+    )
+    equipments = models.ManyToManyField(
+        "reservation_units.Equipment",
+        blank=True,
+    )
+    services = models.ManyToManyField(
+        "services.Service",
+        related_name="reservation_units",
+        blank=True,
+    )
+    payment_types = models.ManyToManyField(
+        "reservation_units.ReservationUnitPaymentType",
+        blank=True,
+    )
+    qualifiers = models.ManyToManyField(  # Deprecated
+        "reservation_units.Qualifier",
+        related_name="reservation_units",
+        blank=True,
+    )
+    keyword_groups = models.ManyToManyField(  # Deprecated
+        "reservation_units.KeywordGroup",
+        related_name="reservation_units",
+        blank=True,
+    )
 
     # Translated field hints
     name_fi: str | None
@@ -383,9 +256,14 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
     reservation_cancelled_instructions_sv: str | None
     reservation_cancelled_instructions_en: str | None
 
+    objects = ReservationUnitManager()
+    actions = ReservationUnitActionsConnector()
+
     class Meta:
         db_table = "reservation_unit"
         base_manager_name = "objects"
+        verbose_name = _("Reservation Unit")
+        verbose_name_plural = _("Reservation Units")
         ordering = ["rank", "id"]
 
     def __str__(self) -> str:
