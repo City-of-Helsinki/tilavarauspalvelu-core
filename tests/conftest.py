@@ -30,6 +30,15 @@ def _toggle_elasticsearch(request, settings):
 
 
 @pytest.fixture()
+def _celery_synchronous(settings):
+    """
+    Run celery tasks synchronously for the duration of the test.
+    Use with '@pytest.mark.usefixtures' decorator.
+    """
+    settings.CELERY_TASK_ALWAYS_EAGER = True
+
+
+@pytest.fixture()
 def _disable_reservation_email_sending(settings):
     """
     Disable sending emails for the duration of the test.
