@@ -2,6 +2,7 @@ import pytest
 from auditlog.models import LogEntry
 from django.contrib.contenttypes.models import ContentType
 
+from reservation_units.enums import AuthenticationType
 from reservation_units.models import ReservationUnit
 from terms_of_use.models import TermsOfUse
 from tests.factories import (
@@ -123,16 +124,13 @@ def test_reservation_unit__update__authentication(graphql):
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
-    data = get_draft_update_input_data(
-        reservation_unit,
-        authentication=ReservationUnit.AUTHENTICATION_TYPES[1][0],
-    )
+    data = get_draft_update_input_data(reservation_unit, authentication=AuthenticationType.STRONG)
 
     response = graphql(UPDATE_MUTATION, input_data=data)
     assert response.has_errors is False, response
 
     reservation_unit.refresh_from_db()
-    assert reservation_unit.authentication == ReservationUnit.AUTHENTICATION_TYPES[1][0]
+    assert reservation_unit.authentication == AuthenticationType.STRONG.value
 
 
 def test_reservation_unit__update__errors_with_invalid_authentication(graphql):
@@ -177,9 +175,10 @@ def test_reservation_unit__update__archiving_removes_contact_information_and_aud
     # one for the creation and one for the contact information update
     content_type = ContentType.objects.get_for_model(ReservationUnit)
     log_entries = LogEntry.objects.filter(content_type_id=content_type.pk, object_id=reservation_unit.pk).order_by("pk")
-    assert log_entries.count() == 2
+
     assert log_entries[0].action == LogEntry.Action.CREATE
     assert log_entries[1].changes == '{"contact_information": ["foo", "bar"]}'
+    assert log_entries.count() == 2
 
     # Update the reservation unit to be archived
     data = get_draft_update_input_data(reservation_unit, isArchived=True)
