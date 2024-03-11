@@ -394,6 +394,20 @@ def test_get_reservations_ext_link(language: Literal["fi", "en", "sv"], settings
 
 
 @pytest.mark.parametrize("language", ["fi", "en", "sv"])
+def test_get_application_ext_link(language: Literal["fi", "en", "sv"], settings):
+    settings.EMAIL_VARAAMO_EXT_LINK = link = "https://varaamo.hel.fi"
+
+    email_template = get_email_template()
+    reservation_unit = ReservationUnitFactory.create()
+    reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
+
+    builder = get_email_builder(email_template, reservation, language=language)
+
+    lang_part = f"/{language}" if language != "fi" else ""
+    assert builder._get_my_applications_ext_link() == f"{link}{lang_part}/applications"
+
+
+@pytest.mark.parametrize("language", ["fi", "en", "sv"])
 def test_get_varaamo_ext_link(language: Literal["fi", "en", "sv"], settings):
     settings.EMAIL_VARAAMO_EXT_LINK = link = "https://varaamo.hel.fi"
 

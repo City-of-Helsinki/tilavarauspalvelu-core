@@ -312,6 +312,7 @@ EMAIL_TEMPLATE_CONTEXT_VARIABLES = [
     "current_year",
     "varaamo_ext_link",
     "my_reservations_ext_link",
+    "my_applications_ext_link",
     "feedback_ext_link",
 ]
 EMAIL_TEMPLATE_SUPPORTED_EXPRESSIONS = ["if", "elif", "else", "endif"]
