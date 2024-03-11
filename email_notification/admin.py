@@ -1,3 +1,4 @@
+import contextlib
 from typing import Any
 
 from admin_extra_buttons.api import ExtraButtonsMixin, button
@@ -22,34 +23,32 @@ from reservation_units.models import ReservationUnit
 from spaces.models import Location
 
 
-def get_initial_values(request) -> dict[str, Any]:
+def _get_template_tester_form_initial_values(request) -> dict[str, Any]:
     recipient = request.user.email if request.user else ""
     initial_values = {"recipient": recipient}
+
+    with contextlib.suppress(AttributeError):
+        # Select the template that user navigated from
+        initial_values["template"] = request.resolver_match.kwargs.get("extra_context")
 
     reservation_unit_pk = request.GET.get("reservation_unit", None)
     if not reservation_unit_pk:
         return initial_values
 
-    runit = ReservationUnit.objects.filter(pk=int(reservation_unit_pk)).first()
-    if not runit:
+    reservation_unit: ReservationUnit = ReservationUnit.objects.filter(pk=int(reservation_unit_pk)).first()
+    if not reservation_unit:
         return initial_values
 
-    initial_values["reservation_unit_name"] = runit.name
+    initial_values["reservation_unit_name"] = reservation_unit.name
+    initial_values["unit_name"] = getattr(reservation_unit.unit, "name", "")
 
-    for lang in ["fi", "sv", "en"]:
-        initial_values[f"confirmed_instructions_{lang}"] = getattr(
-            runit, f"reservation_confirmed_instructions_{lang}", ""
-        )
-        initial_values[f"pending_instructions_{lang}"] = getattr(runit, f"reservation_pending_instructions_{lang}", "")
-        initial_values[f"cancelled_instructions_{lang}"] = getattr(
-            runit, f"reservation_cancelled_instructions_{lang}", ""
-        )
-
-    initial_values["unit_name"] = getattr(runit.unit, "name", "")
-
-    location: Location | None = getattr(runit.unit, "location", None)
+    location: Location | None = getattr(reservation_unit.unit, "location", None)
     if location is not None:
         initial_values["unit_location"] = str(location)
+
+    for lang in ["fi", "sv", "en"]:
+        for field in ["confirmed_instructions", "pending_instructions", "cancelled_instructions"]:
+            initial_values[f"{field}_{lang}"] = getattr(reservation_unit, f"reservation_{field}_{lang}", "")
 
     return initial_values
 
@@ -145,7 +144,7 @@ class EmailTemplateAdmin(ExtraButtonsMixin, admin.ModelAdmin):
                 template_admin_url = reverse("admin:email_notification_emailtemplate_change", args=[template.id])
                 return redirect(f"{template_admin_url}template_tester/")
         else:
-            initial_values = get_initial_values(request)
+            initial_values = _get_template_tester_form_initial_values(request)
             form = EmailTestForm(initial=initial_values)
 
         context = self.admin_site.each_context(request)
