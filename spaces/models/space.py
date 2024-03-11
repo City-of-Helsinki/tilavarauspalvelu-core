@@ -54,6 +54,11 @@ class Space(MPTTModel):
 
     objects = SpaceManager()
 
+    # Translated field hints
+    name_fi: str | None
+    name_sv: str | None
+    name_en: str | None
+
     class Meta:
         db_table = "space"
         base_manager_name = "objects"

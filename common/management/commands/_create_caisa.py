@@ -4,6 +4,7 @@ from common.management.commands._utils import SetName, with_logs
 from merchants.models import PaymentAccounting, PaymentMerchant, PaymentProduct
 from opening_hours.models import OriginHaukiResource
 from reservation_units.enums import (
+    AuthenticationType,
     PriceUnit,
     PricingStatus,
     PricingType,
@@ -1505,7 +1506,7 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]):
             "reservations_max_days_before": 90,
             "max_reservations_per_user": 2,
             "require_reservation_handling": True,
-            "authentication": ReservationUnit.AUTHENTICATION_TYPES[0][0],
+            "authentication": AuthenticationType.WEAK,
             "reservation_kind": ReservationKind.DIRECT_AND_SEASON,
             "can_apply_free_of_charge": False,
             "allow_reservations_without_opening_hours": False,
