@@ -376,7 +376,7 @@ AUTHENTICATION_BACKENDS = [
 
 LOGIN_REDIRECT_URL = "/admin/"
 LOGOUT_REDIRECT_URL = "/admin/"
-SESSION_SERIALIZER = "tilavarauspalvelu.utils.serializers.PickleSerializer"
+SESSION_SERIALIZER = "helusers.sessions.TunnistamoOIDCSerializer"
 
 # See 'oidc_auth/settings.py'
 OIDC_AUTH = {
