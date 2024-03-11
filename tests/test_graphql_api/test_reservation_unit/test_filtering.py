@@ -1,10 +1,21 @@
 import datetime
 
 import pytest
+from django.utils.timezone import get_default_timezone
 
 from common.date_utils import local_datetime
-from reservation_units.enums import ReservationState, ReservationUnitState
-from tests.factories import EquipmentFactory, ReservationUnitFactory
+from reservation_units.enums import ReservationKind, ReservationState, ReservationUnitState
+from reservations.choices import ReservationStateChoice
+from tests.factories import (
+    ApplicationRoundFactory,
+    EquipmentFactory,
+    KeywordGroupFactory,
+    ReservationFactory,
+    ReservationUnitFactory,
+    ReservationUnitTypeFactory,
+    UnitFactory,
+    UserFactory,
+)
 
 from .helpers import (
     create_reservation_units_for_reservation_state_filtering,
@@ -17,6 +28,32 @@ pytestmark = [
     pytest.mark.django_db,
     pytest.mark.usefixtures("_setup_verkkokauppa_env_variables"),
 ]
+
+
+def test_reservation_unit__filter__by_pk(graphql):
+    reservation_unit = ReservationUnitFactory.create()
+    ReservationUnitFactory.create()
+
+    query = reservation_units_query(pk=reservation_unit.pk)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": reservation_unit.pk}
+
+
+def test_reservation_unit__filter__by_pk__multiple(graphql):
+    reservation_unit_1 = ReservationUnitFactory.create()
+    reservation_unit_2 = ReservationUnitFactory.create()
+    ReservationUnitFactory.create()
+
+    query = reservation_units_query(pk=[reservation_unit_1.pk, reservation_unit_2.pk])
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 2
+    assert response.node(0) == {"pk": reservation_unit_1.pk}
+    assert response.node(1) == {"pk": reservation_unit_2.pk}
 
 
 def test_reservation_unit__filter__by_equipment(graphql):
@@ -77,6 +114,611 @@ def test_reservation_unit__filter__by_equipment__multiple__none_match(graphql):
     # - The response does not contain any reservation units
     assert response.has_errors is False, response
     assert len(response.edges) == 0, response
+
+
+def test_reservation_unit__filtering__by_unit(graphql):
+    reservation_unit = ReservationUnitFactory.create(unit=UnitFactory.create())
+    ReservationUnitFactory.create(unit=UnitFactory.create())
+
+    query = reservation_units_query(unit=reservation_unit.unit.pk)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": reservation_unit.pk}
+
+
+def test_reservation_unit__filter__by_unit__multiple(graphql):
+    reservation_unit_1 = ReservationUnitFactory.create(unit=UnitFactory.create())
+    reservation_unit_2 = ReservationUnitFactory.create(unit=UnitFactory.create())
+    ReservationUnitFactory.create(unit=UnitFactory.create())
+
+    query = reservation_units_query(unit=[reservation_unit_1.unit.pk, reservation_unit_2.unit.pk])
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 2
+    assert response.node(0) == {"pk": reservation_unit_1.pk}
+    assert response.node(1) == {"pk": reservation_unit_2.pk}
+
+
+def test_reservation_unit__filter__by_application_round__multiple(graphql):
+    reservation_unit_1 = ReservationUnitFactory.create()
+    reservation_unit_2 = ReservationUnitFactory.create()
+    reservation_unit_3 = ReservationUnitFactory.create()
+
+    application_round_1 = ApplicationRoundFactory.create(reservation_units=[reservation_unit_1])
+    application_round_2 = ApplicationRoundFactory.create(reservation_units=[reservation_unit_2])
+    ApplicationRoundFactory.create(reservation_units=[reservation_unit_3])
+
+    query = reservation_units_query(applicationRound=[application_round_1.pk, application_round_2.pk])
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 2
+    assert response.node(0) == {"pk": reservation_unit_1.pk}
+    assert response.node(1) == {"pk": reservation_unit_2.pk}
+
+
+def test_reservation_unit__filter__by_reservation_unit_type(graphql):
+    reservation_unit = ReservationUnitFactory.create()
+    ReservationUnitFactory.create()
+
+    query = reservation_units_query(reservationUnitType=reservation_unit.reservation_unit_type.pk)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": reservation_unit.pk}
+
+
+def test_reservation_unit__filter__by_reservation_unit_type__multiple(graphql):
+    reservation_unit_1 = ReservationUnitFactory.create()
+    reservation_unit_2 = ReservationUnitFactory.create()
+    ReservationUnitFactory.create()
+
+    query = reservation_units_query(
+        reservationUnitType=[
+            reservation_unit_1.reservation_unit_type.pk,
+            reservation_unit_2.reservation_unit_type.pk,
+        ]
+    )
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 2
+    assert response.node(0) == {"pk": reservation_unit_1.pk}
+    assert response.node(1) == {"pk": reservation_unit_2.pk}
+
+
+def test_reservation_unit__filter__by_purpose(graphql):
+    reservation_unit = ReservationUnitFactory.create(purposes__name="foo")
+    ReservationUnitFactory.create(purposes__name="bar")
+
+    query = reservation_units_query(purposes=reservation_unit.purposes.first().pk)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": reservation_unit.pk}
+
+
+def test_reservation_unit__filter__by_multiple_purposes(graphql):
+    reservation_unit_1 = ReservationUnitFactory.create(purposes__name="foo")
+    reservation_unit_2 = ReservationUnitFactory.create(purposes__name="bar")
+    ReservationUnitFactory.create(purposes__name="baz")
+
+    query = reservation_units_query(
+        purposes=[
+            reservation_unit_1.purposes.first().pk,
+            reservation_unit_2.purposes.first().pk,
+        ]
+    )
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 2
+    assert response.node(0) == {"pk": reservation_unit_1.pk}
+    assert response.node(1) == {"pk": reservation_unit_2.pk}
+
+
+def test_reservation_unit__filter__by_qualifier(graphql):
+    reservation_unit = ReservationUnitFactory.create(qualifiers__name="foo")
+    ReservationUnitFactory.create(qualifiers__name="bar")
+
+    query = reservation_units_query(qualifiers=reservation_unit.qualifiers.first().pk)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": reservation_unit.pk}
+
+
+def test_reservation_unit__filter__by_qualifiers__multiple(graphql):
+    reservation_unit_1 = ReservationUnitFactory.create(qualifiers__name="foo")
+    reservation_unit_2 = ReservationUnitFactory.create(qualifiers__name="bar")
+    ReservationUnitFactory.create(qualifiers__name="baz")
+
+    query = reservation_units_query(
+        qualifiers=[
+            reservation_unit_1.qualifiers.first().pk,
+            reservation_unit_2.qualifiers.first().pk,
+        ]
+    )
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 2
+    assert response.node(0) == {"pk": reservation_unit_1.pk}
+    assert response.node(1) == {"pk": reservation_unit_2.pk}
+
+
+def test_reservation_unit__filter__by_max_persons_gte(graphql):
+    reservation_unit_1 = ReservationUnitFactory.create(max_persons=None)
+    reservation_unit_2 = ReservationUnitFactory.create(max_persons=201)
+    reservation_unit_3 = ReservationUnitFactory.create(max_persons=200)
+    ReservationUnitFactory.create(max_persons=199)
+
+    query = reservation_units_query(maxPersonsGte=200)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 3
+    assert response.node(0) == {"pk": reservation_unit_1.pk}
+    assert response.node(1) == {"pk": reservation_unit_2.pk}
+    assert response.node(2) == {"pk": reservation_unit_3.pk}
+
+
+def test_reservation_unit__filter__by_max_persons_lte(graphql):
+    reservation_unit_1 = ReservationUnitFactory.create(max_persons=None)
+    ReservationUnitFactory.create(max_persons=201)
+    reservation_unit_2 = ReservationUnitFactory.create(max_persons=200)
+    reservation_unit_3 = ReservationUnitFactory.create(max_persons=199)
+
+    query = reservation_units_query(maxPersonsLte=200)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 3
+    assert response.node(0) == {"pk": reservation_unit_1.pk}
+    assert response.node(1) == {"pk": reservation_unit_2.pk}
+    assert response.node(2) == {"pk": reservation_unit_3.pk}
+
+
+def test_reservation_unit__filter__by_min_persons_gte(graphql):
+    reservation_unit_1 = ReservationUnitFactory.create(min_persons=None)
+    reservation_unit_2 = ReservationUnitFactory.create(min_persons=201)
+    reservation_unit_3 = ReservationUnitFactory.create(min_persons=200)
+    ReservationUnitFactory.create(min_persons=199)
+
+    query = reservation_units_query(minPersonsGte=200)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 3
+    assert response.node(0) == {"pk": reservation_unit_1.pk}
+    assert response.node(1) == {"pk": reservation_unit_2.pk}
+    assert response.node(2) == {"pk": reservation_unit_3.pk}
+
+
+def test_reservation_unit__filter__by_min_persons_lte(graphql):
+    reservation_unit_1 = ReservationUnitFactory.create(min_persons=None)
+    ReservationUnitFactory.create(min_persons=201)
+    reservation_unit_2 = ReservationUnitFactory.create(min_persons=200)
+    reservation_unit_3 = ReservationUnitFactory.create(min_persons=199)
+
+    query = reservation_units_query(minPersonsLte=200)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 3
+    assert response.node(0) == {"pk": reservation_unit_1.pk}
+    assert response.node(1) == {"pk": reservation_unit_2.pk}
+    assert response.node(2) == {"pk": reservation_unit_3.pk}
+
+
+def test_reservation_unit__filter__by_keyword_group(graphql):
+    keyword_group_1 = KeywordGroupFactory.create()
+    keyword_group_2 = KeywordGroupFactory.create()
+    reservation_unit = ReservationUnitFactory.create(keyword_groups=[keyword_group_1])
+    ReservationUnitFactory.create(keyword_groups=[keyword_group_2])
+
+    query = reservation_units_query(keywordGroups=keyword_group_1.pk)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": reservation_unit.pk}
+
+
+def test_reservation_unit__filter__by_multiple_keyword_groups(graphql):
+    keyword_group_1 = KeywordGroupFactory.create()
+    keyword_group_2 = KeywordGroupFactory.create()
+    keyword_group_3 = KeywordGroupFactory.create()
+    reservation_unit_1 = ReservationUnitFactory.create(keyword_groups=[keyword_group_1])
+    reservation_unit_2 = ReservationUnitFactory.create(keyword_groups=[keyword_group_2])
+    ReservationUnitFactory.create(keyword_groups=[keyword_group_3])
+
+    query = reservation_units_query(keywordGroups=[keyword_group_1.pk, keyword_group_2.pk])
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 2
+    assert response.node(0) == {"pk": reservation_unit_1.pk}
+    assert response.node(1) == {"pk": reservation_unit_2.pk}
+
+
+def test_reservation_unit__filter__by_name_fi(graphql):
+    reservation_unit = ReservationUnitFactory.create(name_fi="foo")
+    ReservationUnitFactory.create(name_fi="bar")
+
+    query = reservation_units_query(nameFi="foo")
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": reservation_unit.pk}
+
+
+def test_reservation_unit__filter__by_surface_area(graphql):
+    ReservationUnitFactory.create(surface_area=121)
+    reservation_unit_1 = ReservationUnitFactory.create(surface_area=120)
+    reservation_unit_2 = ReservationUnitFactory.create(surface_area=90)
+    reservation_unit_3 = ReservationUnitFactory.create(surface_area=60)
+    ReservationUnitFactory.create(surface_area=59)
+
+    query = reservation_units_query(surfaceAreaGte=60, surfaceAreaLte=120)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 3
+    assert response.node(0) == {"pk": reservation_unit_1.pk}
+    assert response.node(1) == {"pk": reservation_unit_2.pk}
+    assert response.node(2) == {"pk": reservation_unit_3.pk}
+
+
+def test_reservation_unit__filter__by_rank(graphql):
+    ReservationUnitFactory.create(rank=1)
+    reservation_unit_1 = ReservationUnitFactory.create(rank=2)
+    reservation_unit_2 = ReservationUnitFactory.create(rank=3)
+    reservation_unit_3 = ReservationUnitFactory.create(rank=4)
+    ReservationUnitFactory.create(rank=5)
+
+    query = reservation_units_query(rankGte=2, rankLte=4)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 3
+    assert response.node(0) == {"pk": reservation_unit_1.pk}
+    assert response.node(1) == {"pk": reservation_unit_2.pk}
+    assert response.node(2) == {"pk": reservation_unit_3.pk}
+
+
+def test_reservation_unit__filter__by_reservation_unit_type_rank(graphql):
+    type_1 = ReservationUnitTypeFactory(rank=1)
+    type_2 = ReservationUnitTypeFactory(rank=2)
+    type_3 = ReservationUnitTypeFactory(rank=3)
+    type_4 = ReservationUnitTypeFactory(rank=4)
+    type_5 = ReservationUnitTypeFactory(rank=5)
+
+    ReservationUnitFactory.create(reservation_unit_type=type_1)
+    reservation_unit_1 = ReservationUnitFactory.create(reservation_unit_type=type_2)
+    reservation_unit_2 = ReservationUnitFactory.create(reservation_unit_type=type_3)
+    reservation_unit_3 = ReservationUnitFactory.create(reservation_unit_type=type_4)
+    ReservationUnitFactory.create(reservation_unit_type=type_5)
+
+    query = reservation_units_query(typeRankGte=2, typeRankLte=4)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 3
+    assert response.node(0) == {"pk": reservation_unit_1.pk}
+    assert response.node(1) == {"pk": reservation_unit_2.pk}
+    assert response.node(2) == {"pk": reservation_unit_3.pk}
+
+
+def test_reservation_unit__filter__reservations__by_timestamps(graphql):
+    reservation_unit = ReservationUnitFactory.create()
+
+    tz = get_default_timezone()
+
+    ReservationFactory.create(
+        reservation_unit=[reservation_unit],
+        begin=datetime.datetime(2023, 1, 1, 15, 0, 0, tzinfo=tz),
+        end=datetime.datetime(2023, 1, 1, 16, 0, 0, tzinfo=tz),
+    )
+    reservation_1 = ReservationFactory.create(
+        reservation_unit=[reservation_unit],
+        begin=datetime.datetime(2023, 1, 2, 0, 0, 0, tzinfo=tz),
+        end=datetime.datetime(2023, 1, 2, 1, 0, 0, tzinfo=tz),
+    )
+    reservation_2 = ReservationFactory.create(
+        reservation_unit=[reservation_unit],
+        begin=datetime.datetime(2023, 1, 3, 23, 00, 00, tzinfo=tz),
+        end=datetime.datetime(2023, 1, 3, 23, 59, 59, tzinfo=tz),
+    )
+    ReservationFactory.create(
+        reservation_unit=[reservation_unit],
+        begin=datetime.datetime(2023, 1, 4, 0, 0, 0, tzinfo=tz),
+        end=datetime.datetime(2023, 1, 4, 1, 0, 0, tzinfo=tz),
+    )
+
+    graphql.login_with_superuser()
+
+    fields = "reservations { pk }"
+    query = reservation_units_query(
+        fields=fields,
+        reservations__from="2023-01-02",
+        reservations__to="2023-01-03",
+    )
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 1
+    assert response.node(0) == {
+        "reservations": [
+            {"pk": reservation_1.pk},
+            {"pk": reservation_2.pk},
+        ],
+    }
+
+
+def test_reservation_unit__filter__reservations__by_reservation_state(graphql):
+    reservation_unit = ReservationUnitFactory.create()
+
+    reservation = ReservationFactory.create(
+        reservation_unit=[reservation_unit],
+        state=ReservationStateChoice.CREATED,
+    )
+    ReservationFactory.create(
+        reservation_unit=[reservation_unit],
+        state=ReservationStateChoice.CANCELLED,
+    )
+
+    graphql.login_with_superuser()
+
+    fields = "reservations { pk }"
+    query = reservation_units_query(
+        fields=fields,
+        reservations__state=ReservationStateChoice.CREATED.value,
+    )
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 1
+    assert response.node(0) == {
+        "reservations": [
+            {"pk": reservation.pk},
+        ],
+    }
+
+
+def test_reservation_unit__filter__reservations__by_reservation_state__multiple(graphql):
+    reservation_unit = ReservationUnitFactory.create()
+
+    reservation_1 = ReservationFactory.create(
+        reservation_unit=[reservation_unit],
+        state=ReservationStateChoice.CREATED,
+    )
+    reservation_2 = ReservationFactory.create(
+        reservation_unit=[reservation_unit],
+        state=ReservationStateChoice.CANCELLED,
+    )
+    ReservationFactory.create(
+        reservation_unit=[reservation_unit],
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+    )
+
+    graphql.login_with_superuser()
+
+    fields = "reservations { pk }"
+    query = reservation_units_query(
+        fields=fields,
+        reservations__state=[
+            ReservationStateChoice.CREATED.value,
+            ReservationStateChoice.CANCELLED.value,
+        ],
+    )
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 1
+
+    # Check like this to avoid ordering issues
+    assert response.node(0) in [
+        {
+            "reservations": [
+                {"pk": reservation_1.pk},
+                {"pk": reservation_2.pk},
+            ],
+        },
+        {
+            "reservations": [
+                {"pk": reservation_2.pk},
+                {"pk": reservation_1.pk},
+            ],
+        },
+    ]
+
+
+def test_reservation_unit__filter__application_rounds__by_active(graphql):
+    reservation_unit = ReservationUnitFactory.create()
+
+    application_round = ApplicationRoundFactory.create_in_status_open(reservation_units=[reservation_unit])
+    ApplicationRoundFactory.create_in_status_in_allocation(reservation_units=[reservation_unit])
+
+    query = reservation_units_query(
+        fields="applicationRounds { pk }",
+        application_rounds__active=True,
+    )
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 1
+    assert response.node(0) == {
+        "applicationRounds": [
+            {"pk": application_round.pk},
+        ],
+    }
+
+
+def test_reservation_unit__filter__by_is_draft(graphql):
+    reservation_unit = ReservationUnitFactory.create(is_draft=True)
+    ReservationUnitFactory.create(is_draft=False)
+
+    query = reservation_units_query(is_draft=True)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": reservation_unit.pk}
+
+
+def test_reservation_unit__filter__by_is_visible(graphql):
+    now = local_datetime()
+
+    # No publish times -> VISIBLE
+    reservation_unit_1 = ReservationUnitFactory.create(
+        publish_begins=None,
+        publish_ends=None,
+    )
+
+    # Publish begins before today -> VISIBLE
+    reservation_unit_2 = ReservationUnitFactory.create(
+        publish_begins=now - datetime.timedelta(days=5),
+        publish_ends=now + datetime.timedelta(days=10),
+    )
+
+    # Publish begins after today -> NOT VISIBLE
+    reservation_unit_3 = ReservationUnitFactory.create(
+        publish_begins=now + datetime.timedelta(days=5),
+        publish_ends=now + datetime.timedelta(days=10),
+    )
+
+    # Publish begins before today, ends null -> VISIBLE
+    reservation_unit_4 = ReservationUnitFactory.create(
+        publish_begins=now - datetime.timedelta(days=5),
+        publish_ends=None,
+    )
+
+    # Publish begins null, ends after today -> VISIBLE
+    reservation_unit_5 = ReservationUnitFactory.create(
+        publish_begins=None,
+        publish_ends=now + datetime.timedelta(days=5),
+    )
+
+    # Publish begins null, ends before today -> NOT VISIBLE
+    reservation_unit_6 = ReservationUnitFactory.create(
+        publish_begins=None,
+        publish_ends=now - datetime.timedelta(days=1),
+    )
+
+    # Archived -> NEVER SHOWN
+    ReservationUnitFactory.create(
+        publish_begins=now - datetime.timedelta(days=5),
+        publish_ends=now + datetime.timedelta(days=10),
+        is_archived=True,
+    )
+
+    query = reservation_units_query(isVisible=True)
+    response = graphql(query)
+
+    assert len(response.edges) == 4
+    assert response.node(0) == {"pk": reservation_unit_1.pk}
+    assert response.node(1) == {"pk": reservation_unit_2.pk}
+    assert response.node(2) == {"pk": reservation_unit_4.pk}
+    assert response.node(3) == {"pk": reservation_unit_5.pk}
+
+    query = reservation_units_query(isVisible=False)
+    response = graphql(query)
+
+    assert len(response.edges) == 2
+    assert response.node(0) == {"pk": reservation_unit_3.pk}
+    assert response.node(1) == {"pk": reservation_unit_6.pk}
+
+
+@pytest.mark.parametrize(
+    ("kind", "units"),
+    [
+        (ReservationKind.DIRECT.value, [1, 3]),
+        (ReservationKind.SEASON.value, [2, 3]),
+        (ReservationKind.DIRECT_AND_SEASON.value, [3]),
+    ],
+    ids=[
+        ReservationKind.DIRECT.value,
+        ReservationKind.SEASON.value,
+        ReservationKind.DIRECT_AND_SEASON.value,
+    ],
+)
+def test_reservation_unit__filter__by_reservation_kind(graphql, kind, units):
+    reservation_units = {
+        1: ReservationUnitFactory.create(reservation_kind=ReservationKind.DIRECT),
+        2: ReservationUnitFactory.create(reservation_kind=ReservationKind.SEASON),
+        3: ReservationUnitFactory.create(reservation_kind=ReservationKind.DIRECT_AND_SEASON),
+    }
+
+    query = reservation_units_query(reservationKind=kind)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == len(units)
+
+    for i, unit in enumerate(units):
+        assert response.node(i) == {"pk": reservation_units[unit].pk}
+
+
+def test_reservation_unit__filter__only_with_permission__general_admin(graphql):
+    reservation_unit_1 = ReservationUnitFactory.create()
+    reservation_unit_2 = ReservationUnitFactory.create()
+
+    user = UserFactory.create_with_general_permissions(
+        perms=["can_manage_reservations"],
+    )
+    graphql.force_login(user)
+
+    query = reservation_units_query(onlyWithPermission=True)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 2
+    assert response.node(0) == {"pk": reservation_unit_1.pk}
+    assert response.node(1) == {"pk": reservation_unit_2.pk}
+
+
+def test_reservation_unit__filter__only_with_permission__unit_admin(graphql):
+    reservation_unit = ReservationUnitFactory.create()
+    ReservationUnitFactory.create()
+
+    user = UserFactory.create_with_unit_permissions(
+        unit=reservation_unit.unit,
+        perms=["can_manage_reservations"],
+    )
+    graphql.force_login(user)
+
+    query = reservation_units_query(onlyWithPermission=True)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": reservation_unit.pk}
+
+
+def test_reservation_unit__filter__only_with_permission__service_sector_admin(graphql):
+    reservation_unit = ReservationUnitFactory.create(unit__service_sectors__name="foo")
+    ReservationUnitFactory.create(unit__service_sectors__name="bar")
+
+    user = UserFactory.create_with_service_sector_permissions(
+        service_sector=reservation_unit.unit.service_sectors.first(),
+        perms=["can_manage_reservations"],
+    )
+    graphql.force_login(user)
+
+    query = reservation_units_query(onlyWithPermission=True)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": reservation_unit.pk}
 
 
 # Reservation state

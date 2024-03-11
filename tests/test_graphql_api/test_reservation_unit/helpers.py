@@ -28,22 +28,14 @@ __all__ = [
     "get_draft_update_input_data",
     "get_non_draft_update_input_data",
     "get_pricing_data",
-    "reservation_unit_by_pk_query",
+    "reservation_unit_query",
     "reservation_units_query",
-    "TIMESLOTS_QUERY",
     "UPDATE_MUTATION",
 ]
 
 
-TIMESLOTS_QUERY = build_query(
-    "reservationUnits",
-    connection=True,
-    fields="applicationRoundTimeSlots { weekday closed reservableTimes { begin end } }",
-)
-
+reservation_unit_query = partial(build_query, "reservationUnit")
 reservation_units_query = partial(build_query, "reservationUnits", connection=True, order_by="pk")
-
-reservation_unit_by_pk_query = partial(build_query, "reservationUnitByPk")
 
 CREATE_MUTATION = build_mutation(
     "createReservationUnit",
