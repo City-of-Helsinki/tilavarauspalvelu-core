@@ -203,6 +203,14 @@ class ReservationEmailNotificationBuilder:
 
         return urljoin(url_base, "reservations")
 
+    def _get_my_applications_ext_link(self):
+        url_base = settings.EMAIL_VARAAMO_EXT_LINK
+
+        if self.language.lower() != "fi":
+            url_base = urljoin(url_base, self.language) + "/"
+
+        return urljoin(url_base, "applications")
+
     def _get_feedback_ext_link(self):
         params = urlencode(
             {
