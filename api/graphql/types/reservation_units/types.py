@@ -48,8 +48,6 @@ from spaces.models import Space
 from tilavarauspalvelu.utils.date_util import end_of_day, start_of_day
 from utils.query_performance import QueryPerformanceOptimizerMixin
 
-DEFAULT_TIMEZONE = get_default_timezone()
-
 
 class ReservationUnitHaukiUrlType(AuthNode, DjangoObjectType):
     url = graphene.String()
@@ -99,49 +97,18 @@ class ReservationUnitHaukiUrlType(AuthNode, DjangoObjectType):
         return None
 
 
-class ReservationUnitWithReservationsMixin:
-    reservations = graphene.List(
-        ReservationType,
-        from_=graphene.Date(name="from"),
-        to=graphene.Date(),
-        state=graphene.List(graphene.String),
-        include_with_same_components=graphene.Boolean(),
-    )
+class ReservableTimeSpanType(graphene.ObjectType):
+    start_datetime = graphene.DateTime()
+    end_datetime = graphene.DateTime()
 
-    def resolve_reservations(
-        self: ReservationUnit,
-        info: GQLInfo,
-        from_: datetime.date | None = None,
-        to: datetime.date | None = None,
-        state: list[str] | None = None,
-        include_with_same_components: bool | None = None,
-    ) -> QuerySet:
-        from_ = start_of_day(from_)
-        to = end_of_day(to)
+    def resolve_start_datetime(self: "ReservableTimeSpanType", info: GQLInfo):
+        return self.start_datetime
 
-        if include_with_same_components:
-            reservations = Reservation.objects.with_same_components(self, from_, to)
-        else:
-            reservations = self.reservation_set.all()
-
-            if from_ is not None:
-                reservations = reservations.filter(begin__gte=from_)
-            if to is not None:
-                reservations = reservations.filter(end__lte=to)
-
-        if state is not None:
-            states = [s.lower() for s in state]
-            reservations = reservations.filter(state__in=states)
-
-        return reservations.order_by("begin")
+    def resolve_end_datetime(self: "ReservableTimeSpanType", info: GQLInfo):
+        return self.end_datetime
 
 
-class ReservationUnitType(
-    QueryPerformanceOptimizerMixin,
-    AuthNode,
-    OldPrimaryKeyObjectType,
-    ReservationUnitWithReservationsMixin,
-):
+class ReservationUnitType(QueryPerformanceOptimizerMixin, AuthNode, OldPrimaryKeyObjectType):
     spaces = graphene.List(SpaceType)
     resources = graphene.List(ResourceType)
     services = graphene.List(ServiceType)
@@ -183,60 +150,88 @@ class ReservationUnitType(
     is_closed = graphene.Boolean()
     first_reservable_datetime = graphene.DateTime()
 
+    hauki_url = graphene.Field(ReservationUnitHaukiUrlType)
+    reservable_time_spans = graphene.List(
+        ReservableTimeSpanType,
+        start_date=graphene.Date(required=True),
+        end_date=graphene.Date(required=True),
+    )
+
+    reservations = graphene.List(
+        ReservationType,
+        from_=graphene.Date(name="from"),
+        to=graphene.Date(),
+        state=graphene.List(graphene.String),
+        include_with_same_components=graphene.Boolean(),
+    )
+
     class Meta:
         model = ReservationUnit
         fields = [
-            "spaces",
-            "resources",
-            "services",
-            "require_introduction",
-            "purposes",
-            "qualifiers",
-            "images",
-            "location",
-            "max_persons",
-            "min_persons",
-            "reservation_unit_type",
-            "equipment",
+            "pk",
             "uuid",
+            "rank",
             "contact_information",
-            "max_reservation_duration",
-            "min_reservation_duration",
-            "is_draft",
+            #
             "surface_area",
-            "buffer_time_before",
-            "buffer_time_after",
-            "reservations",
-            "application_rounds",
-            "cancellation_rule",
-            "payment_terms",
-            "cancellation_terms",
-            "service_specific_terms",
-            "pricing_terms",
-            "pricings",
-            "reservation_start_interval",
+            "min_persons",
+            "max_persons",
+            "max_reservations_per_user",
+            "reservations_min_days_before",
+            "reservations_max_days_before",
+            #
             "reservation_begins",
             "reservation_ends",
             "publish_begins",
             "publish_ends",
-            "metadata_set",
-            "max_reservations_per_user",
+            "min_reservation_duration",
+            "max_reservation_duration",
+            "buffer_time_before",
+            "buffer_time_after",
+            #
+            "is_draft",
+            "is_archived",
+            "require_introduction",
             "require_reservation_handling",
-            "authentication",
-            "rank",
-            "reservation_kind",
-            "payment_types",
             "reservation_block_whole_day",
             "can_apply_free_of_charge",
-            "reservations_max_days_before",
-            "reservations_min_days_before",
             "allow_reservations_without_opening_hours",
-            "is_archived",
+            #
+            "authentication",
+            "reservation_start_interval",
+            "reservation_kind",
             "state",
             "reservation_state",
-            "payment_merchant",
+            #
+            "unit",
+            "reservation_unit_type",
+            "cancellation_rule",
+            "metadata_set",
+            "cancellation_terms",
+            "service_specific_terms",
+            "pricing_terms",
+            "payment_terms",
             "payment_product",
+            "payment_merchant",
+            "location",
+            #
+            "spaces",
+            "resources",
+            "purposes",
+            "equipment",
+            "services",
+            "payment_types",
+            "qualifiers",
+            #
+            "application_rounds",
+            "pricings",
+            "reservations",
+            "images",
+            #
             "application_round_time_slots",
+            #
+            "hauki_url",
+            "reservable_time_spans",
             "is_closed",
             "first_reservable_datetime",
             *get_all_translatable_fields(model),
@@ -405,83 +400,6 @@ class ReservationUnitType(
 
         raise GraphQLError("Unexpected error: 'first_reservable_datetime' should have been calculated but wasn't.")
 
-
-class ReservableTimeSpanType(graphene.ObjectType):
-    start_datetime = graphene.DateTime()
-    end_datetime = graphene.DateTime()
-
-    def resolve_start_datetime(self: "ReservableTimeSpanType", info: GQLInfo):
-        return self.start_datetime
-
-    def resolve_end_datetime(self: "ReservableTimeSpanType", info: GQLInfo):
-        return self.end_datetime
-
-
-class ReservationUnitByPkType(ReservationUnitType, ReservationUnitWithReservationsMixin):
-    hauki_url = graphene.Field(ReservationUnitHaukiUrlType)
-    reservable_time_spans = graphene.List(
-        ReservableTimeSpanType,
-        start_date=graphene.Date(required=True),
-        end_date=graphene.Date(required=True),
-    )
-
-    class Meta:
-        model = ReservationUnit
-        fields = [
-            "pk",
-            "spaces",
-            "resources",
-            "services",
-            "require_introduction",
-            "purposes",
-            "images",
-            "location",
-            "max_persons",
-            "min_persons",
-            "reservation_unit_type",
-            "equipment",
-            "uuid",
-            "contact_information",
-            "max_reservation_duration",
-            "min_reservation_duration",
-            "is_draft",
-            "surface_area",
-            "buffer_time_before",
-            "buffer_time_after",
-            "reservations",
-            "application_rounds",
-            "cancellation_rule",
-            "payment_terms",
-            "cancellation_terms",
-            "service_specific_terms",
-            "pricing_terms",
-            "reservation_start_interval",
-            "reservation_begins",
-            "reservation_ends",
-            "publish_begins",
-            "publish_ends",
-            "metadata_set",
-            "max_reservations_per_user",
-            "require_reservation_handling",
-            "authentication",
-            "rank",
-            "reservation_kind",
-            "payment_types",
-            "reservation_block_whole_day",
-            "can_apply_free_of_charge",
-            "reservations_max_days_before",
-            "reservations_min_days_before",
-            "allow_reservations_without_opening_hours",
-            "is_archived",
-            "state",
-            "hauki_url",
-            "reservable_time_spans",
-            *get_all_translatable_fields(model),
-        ]
-
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
-
     def resolve_hauki_url(root: ReservationUnit, info: GQLInfo):
         return root
 
@@ -501,8 +419,35 @@ class ReservationUnitByPkType(ReservationUnitType, ReservationUnitWithReservatio
         )
         return [
             ReservableTimeSpanType(
-                start_datetime=time_span.start_datetime.astimezone(DEFAULT_TIMEZONE),
-                end_datetime=time_span.end_datetime.astimezone(DEFAULT_TIMEZONE),
+                start_datetime=time_span.start_datetime.astimezone(get_default_timezone()),
+                end_datetime=time_span.end_datetime.astimezone(get_default_timezone()),
             )
             for time_span in time_span_qs
         ]
+
+    def resolve_reservations(
+        self: ReservationUnit,
+        info: GQLInfo,
+        from_: datetime.date | None = None,
+        to: datetime.date | None = None,
+        state: list[str] | None = None,
+        include_with_same_components: bool | None = None,
+    ) -> QuerySet:
+        from_ = start_of_day(from_)
+        to = end_of_day(to)
+
+        if include_with_same_components:
+            reservations = Reservation.objects.with_same_components(self, from_, to)
+        else:
+            reservations = self.reservation_set.all()
+
+            if from_ is not None:
+                reservations = reservations.filter(begin__gte=from_)
+            if to is not None:
+                reservations = reservations.filter(end__lte=to)
+
+        if state is not None:
+            states = [s.lower() for s in state]
+            reservations = reservations.filter(state__in=states)
+
+        return reservations.order_by("begin")
