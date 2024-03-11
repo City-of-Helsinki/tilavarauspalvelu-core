@@ -148,6 +148,7 @@ class EmailTemplateAdmin(ExtraButtonsMixin, admin.ModelAdmin):
             form = EmailTestForm(initial=initial_values)
 
         context = self.admin_site.each_context(request)
+        context["opts"] = self.model._meta
         context["form"] = form
         context["runit_form"] = ReservationUnitSelectForm()
 
