@@ -137,10 +137,9 @@ ADMINS = env("ADMINS")
 # Either the release tag or git short hash (or "local" if running locally)
 APP_VERSION = env("SOURCE_BRANCH_NAME").replace("main", "") or env("SOURCE_VERSION")[:8] or "local"
 
-if DEBUG is True and env("SECRET_KEY") == "":
-    SECRET_KEY = "example_secret"  # nosec
-else:
-    SECRET_KEY = env("SECRET_KEY")  # NOSONAR
+SECRET_KEY = env("SECRET_KEY")  # NOSONAR
+if DEBUG is True and not SECRET_KEY:
+    SECRET_KEY = "example_secret"  # nosec # noqa: S105
 
 # ----- CORS and CSRF settings -------------------------------------------------------------------------
 
@@ -289,6 +288,10 @@ EMAIL_PORT = env("EMAIL_PORT")
 EMAIL_USE_TLS = env("EMAIL_USE_TLS")
 EMAIL_MAX_RECIPIENTS = env("EMAIL_MAX_RECIPIENTS")
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
+
+if DEBUG is True and EMAIL_HOST is None:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
 EMAIL_TEMPLATE_CONTEXT_VARIABLES = [
     "reservee_name",
     "name",
@@ -402,7 +405,8 @@ SOCIAL_AUTH_TUNNISTAMO_SECRET = env("TUNNISTAMO_ADMIN_SECRET")
 SOCIAL_AUTH_TUNNISTAMO_SCOPE = [env("OPEN_CITY_PROFILE_SCOPE")]
 SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT = env("TUNNISTAMO_ADMIN_OIDC_ENDPOINT")
 SOCIAL_AUTH_TUNNISTAMO_ALLOWED_REDIRECT_HOSTS = env("TUNNISTAMO_ALLOWED_REDIRECT_HOSTS")
-SOCIAL_AUTH_TUNNISTAMO_PIPELINE = defaults.SOCIAL_AUTH_PIPELINE + (
+SOCIAL_AUTH_TUNNISTAMO_PIPELINE = (
+    *defaults.SOCIAL_AUTH_PIPELINE,
     "users.helauth.pipeline.fetch_additional_info_for_user_from_helsinki_profile",
 )
 
@@ -593,4 +597,4 @@ local_settings_path = BASE_DIR / "local_settings.py"
 if local_settings_path.exists():
     with open(local_settings_path) as fp:
         code = compile(fp.read(), local_settings_path, "exec")
-    exec(code, globals(), locals())  # nosec
+    exec(code, globals(), locals())  # nosec # noqa: S102 RUF100
