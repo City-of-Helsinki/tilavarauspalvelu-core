@@ -12,7 +12,7 @@ import {
 } from "common/types/gql-types";
 import styled from "styled-components";
 import { camelCase, get } from "lodash";
-import { format, isValid as isDateValid } from "date-fns";
+import { format } from "date-fns";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ErrorBoundary } from "react-error-boundary";
 import {
@@ -21,13 +21,11 @@ import {
   type ReservationFormMeta,
 } from "app/schemas";
 import { breakpoints } from "common/src/common/style";
-import { fromUIDate } from "common/src/common/util";
-import { setTimeOnDate } from "app/component/reservations/utils";
-import { useCheckCollisions } from "app/component/reservations/requested/hooks";
-import { dateTime } from "app/helpers";
+import { useCheckCollisions } from "@/component/reservations/requested/hooks";
+import Loader from "@/component/Loader";
+import { dateTime, parseDateTimeSafe } from "@/helpers";
 import { useModal } from "@/context/ModalContext";
 import { CREATE_STAFF_RESERVATION } from "./queries";
-import Loader from "../../Loader";
 import { useNotification } from "@/context/NotificationContext";
 import { flattenMetadata } from "./utils";
 import { useReservationUnitQuery } from "../hooks";
@@ -106,18 +104,13 @@ const useCheckFormCollisions = ({
       ? reservationUnit.bufferTimeAfter
       : 0;
 
-  const d = fromUIDate(formDate);
+  const start = parseDateTimeSafe(formDate, formStartTime);
+  const end = parseDateTimeSafe(formDate, formEndTime);
   const { hasCollisions } = useCheckCollisions({
     reservationPk: undefined,
     reservationUnitPk: reservationUnit?.pk ?? 0,
-    start:
-      d && isDateValid(d) && formStartTime
-        ? setTimeOnDate(d, formStartTime)
-        : undefined,
-    end:
-      d && isDateValid(d) && formEndTime
-        ? setTimeOnDate(d, formEndTime)
-        : undefined,
+    start,
+    end,
     buffers: {
       before: bufferBeforeSeconds,
       after: bufferAfterSeconds,

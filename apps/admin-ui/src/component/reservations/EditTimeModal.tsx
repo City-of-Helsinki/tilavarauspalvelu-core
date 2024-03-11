@@ -17,18 +17,18 @@ import { format } from "date-fns";
 import { ErrorBoundary } from "react-error-boundary";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@apollo/client";
-import { fromUIDate, toUIDate } from "common/src/common/util";
+import { toUIDate } from "common/src/common/util";
 import { useNotification } from "app/context/NotificationContext";
 import { useModal } from "app/context/ModalContext";
 import { TimeChangeFormSchemaRefined, TimeFormSchema } from "app/schemas";
 import { CHANGE_RESERVATION_TIME } from "./queries";
-import { setTimeOnDate } from "./utils";
 import ControlledTimeInput from "../my-units/components/ControlledTimeInput";
 import { reservationDateTime, reservationDuration } from "./requested/util";
 import ControlledDateInput from "../my-units/components/ControlledDateInput";
 import { BufferToggles } from "../my-units/BufferToggles";
 import { useCheckCollisions } from "./requested/hooks";
 import { filterNonNullable } from "common/src/helpers";
+import { parseDateTimeSafe } from "@/helpers";
 
 const StyledForm = styled.form`
   margin-top: var(--spacing-m);
@@ -228,19 +228,13 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
   const formEndTime = watch("endTime");
   const formStartTime = watch("startTime");
 
-  const newStartTime = setTimeOnDate(
-    fromUIDate(formDate) ?? new Date(),
-    formStartTime
-  );
-  const newEndTime = setTimeOnDate(
-    fromUIDate(formDate) ?? new Date(),
-    formEndTime
-  );
+  const start = parseDateTimeSafe(formDate, formStartTime);
+  const end = parseDateTimeSafe(formDate, formEndTime);
   const { hasCollisions, isLoading } = useCheckCollisions({
     reservationPk: reservation.pk ?? 0,
     reservationUnitPk: reservationUnit?.pk ?? 0,
-    start: newStartTime,
-    end: newEndTime,
+    start,
+    end,
     buffers: {
       before:
         reservation.type !== Type.Blocked && reservation.bufferTimeBefore
@@ -261,16 +255,10 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
     (reservation.bufferTimeAfter || reservationUnit?.bufferTimeAfter) ?? 0;
 
   const onSubmit = (values: FormValueType) => {
-    if (values.date && values.startTime && values.endTime) {
-      const start = setTimeOnDate(
-        fromUIDate(values.date) ?? new Date(),
-        values.startTime
-      );
-      const end = setTimeOnDate(
-        fromUIDate(values.date) ?? new Date(),
-        values.endTime
-      );
-      changeTime(start, end, {
+    const newStart = parseDateTimeSafe(formDate, formStartTime);
+    const newEnd = parseDateTimeSafe(formDate, formEndTime);
+    if (newStart && newEnd) {
+      changeTime(newStart, newEnd, {
         before: values.bufferTimeBefore ? bufferBefore : 0,
         after: values.bufferTimeAfter ? bufferAfter : 0,
       });
@@ -280,11 +268,14 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
   const translateError = (errorMsg?: string) =>
     errorMsg ? t(`reservationForm:errors.${errorMsg}`) : "";
 
-  const newTime = `${reservationDateTime(
-    newStartTime,
-    newEndTime,
-    t
-  )}, ${reservationDuration(newStartTime, newEndTime)} t`;
+  const newTimeString =
+    start && end
+      ? `${reservationDateTime(
+          start,
+          end,
+          t
+        )}, ${reservationDuration(start, end)} t`
+      : "";
 
   const originalTime = `${reservationDateTime(
     startDateTime,
@@ -292,32 +283,28 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
     t
   )}, ${reservationDuration(startDateTime, endDateTime)} t`;
 
-  const recurringReservationInfo = reservation.recurringReservation ? (
-    <TimeInfoBox>
-      {t("Reservation.EditTime.recurringInfoLabel")}:{" "}
-      <Bold>
-        {recurringReservationInfoText({
-          weekdays: filterNonNullable(
-            reservation.recurringReservation.weekdays
-          ),
-          // begin: reservation.recurringReservation.beginDate ?? undefined,
-          begin: ((x) => (x != null ? new Date(x) : undefined))(
-            reservation.recurringReservation.beginDate
-          ),
-          // end: reservation.recurringReservation.endDate ?? undefined,
-          end: ((x) => (x != null ? new Date(x) : undefined))(
-            reservation.recurringReservation.endDate
-          ),
-          t,
-        })}
-      </Bold>
-    </TimeInfoBox>
-  ) : null;
-
   return (
     <Dialog.Content>
       <StyledForm onSubmit={handleSubmit(onSubmit)} noValidate>
-        {recurringReservationInfo}
+        {reservation.recurringReservation ? (
+          <TimeInfoBox>
+            {t("Reservation.EditTime.recurringInfoLabel")}:{" "}
+            <Bold>
+              {recurringReservationInfoText({
+                weekdays: filterNonNullable(
+                  reservation.recurringReservation.weekdays
+                ),
+                begin: ((x) => (x != null ? new Date(x) : undefined))(
+                  reservation.recurringReservation.beginDate
+                ),
+                end: ((x) => (x != null ? new Date(x) : undefined))(
+                  reservation.recurringReservation.endDate
+                ),
+                t,
+              })}
+            </Bold>
+          </TimeInfoBox>
+        ) : null}
         <TimeInfoBox>
           {t("Reservation.EditTime.originalTime")}: <Bold>{originalTime}</Bold>
         </TimeInfoBox>
@@ -342,7 +329,7 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
           <BufferToggles before={bufferBefore} after={bufferAfter} />
         </FormProvider>
         <TimeInfoBox $isDisabled={!isDirty || !isValid}>
-          {t("Reservation.EditTime.newTime")}: <Bold>{newTime}</Bold>
+          {t("Reservation.EditTime.newTime")}: <Bold>{newTimeString}</Bold>
         </TimeInfoBox>
         {hasCollisions && (
           <Notification
