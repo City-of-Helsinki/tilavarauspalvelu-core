@@ -110,7 +110,7 @@ const ApplicationRoundsRouter = () => (
     <Route index element={<AllApplicationRounds />} />
     <Route path=":applicationRoundId/criteria" element={<Criteria />} />
     <Route
-      path=":applicationRoundId/allocation"
+      path=":applicationRoundPk/allocation"
       element={<ApplicationRoundAllocation />}
     />
     <Route path=":applicationRoundId" element={<ApplicationRound />} />

@@ -92,11 +92,10 @@ export function Filters({
   const eventStatusArrayLong = Object.values(
     ApplicationSectionStatusChoice
   ).filter((x) => x !== ApplicationSectionStatusChoice.Failed);
-  // TODO what are the actual statuses?
-  const eventStatusArrayShort = [
-    ApplicationSectionStatusChoice.Handled,
-    ApplicationSectionStatusChoice.Reserved,
-  ];
+  // TODO these are "declined" / "approved" but the decline functionality is not implemented
+  // so disabling the filter for now (there is no backend filter for it nor can it be tested)
+  const eventStatusArrayShort: string[] = [];
+
   const eventStatusOptions = (
     statusOption === "eventShort" ? eventStatusArrayShort : eventStatusArrayLong
   ).map((status) => ({

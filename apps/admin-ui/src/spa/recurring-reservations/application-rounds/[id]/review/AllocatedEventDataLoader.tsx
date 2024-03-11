@@ -42,23 +42,12 @@ export function AllocatedEventDataLoader({
   const weekDayFilter = searchParams.getAll("weekday");
   const reservationUnitFilter = searchParams.getAll("reservationUnit");
 
-  // FIXME rewrite this for ApplicationSection
-  // it doesn't have Approved / Declined statuses (it's based on fullfilled / rejected?)
-  // or allocatedTimeSlots declined?
-  // FIXME rewrite the query key rangeStatus?
-  /* TODO
+  /* TODO this is "declined" / "approved" filter but there is no decline functionality
+   * so disabled
   const appEventStatusFilter = searchParams.getAll("eventStatus");
   const aesFilter = transformApplicationSectionStatus(appEventStatusFilter);
-  // accepted and declined are mutually exclusive
-  const onlyAccepted =
-    aesFilter.length === 1 &&
-    aesFilter[0] === ApplicationEventStatusChoice.Approved;
-  const onlyDeclined =
-    aesFilter.length === 1 &&
-    aesFilter[0] === ApplicationSe.Declined;
   */
 
-  // TODO Käsittelyn vaihe filter doesn't work atm
   const { fetchMore, previousData, loading, data } = useQuery<
     Query,
     QueryAllocatedTimeSlotsArgs
@@ -81,9 +70,6 @@ export function AllocatedEventDataLoader({
       allocatedReservationUnit: reservationUnitFilter
         .map(Number)
         .filter(Number.isFinite),
-      // accepted: onlyAccepted ? true : undefined,
-      // declined: onlyDeclined ? true : undefined,
-      // todo allocation status?
       textSearch: nameFilter,
       first: LIST_PAGE_SIZE,
       orderBy: transformOrderBy(orderBy),

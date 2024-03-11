@@ -7,13 +7,11 @@ import {
   type OrganisationNode,
   type ApplicationNode,
   type ApplicationUpdateMutationInput,
-  type ApplicationCreateMutationInput,
   type SuitableTimeRangeNode,
   Weekday,
   Priority,
   type ApplicationSectionUpdateMutationInput,
-  type ApplicationSectionForApplicationSerializerInput,
-  ApplicationSectionCreateMutationInput,
+  type ApplicationSectionCreateMutationInput,
 } from "common/types/gql-types";
 import { type Maybe } from "graphql/jsutils/Maybe";
 import { z } from "zod";
@@ -275,34 +273,7 @@ function transformSuitableTimeRange(timeRange: SuitableTimeRangeFormValues) {
     dayOfTheWeek: timeRange.dayOfTheWeek,
   };
 }
-
-function transformApplicationSectionCreate(
-  ae: ApplicationSectionFormValue
-): ApplicationSectionForApplicationSerializerInput {
-  // TODO these should never be empty or invalid (backend forbids)
-  const begin = transformDateString(ae.begin) ?? "";
-  const end = transformDateString(ae.end) ?? "";
-  return {
-    ...(ae.pk != null ? { pk: ae.pk } : {}),
-    reservationsBeginDate: begin,
-    reservationsEndDate: end,
-    ...(ae.pk != null ? { pk: ae.pk } : {}),
-    name: ae.name,
-    numPersons: ae.numPersons ?? 0,
-    ageGroup: ae.ageGroup,
-    purpose: ae.purpose,
-    reservationMinDuration: ae.minDuration ?? 0, // "3600" == 1h
-    reservationMaxDuration: ae.maxDuration ?? 0, // "7200" == 2h
-    appliedReservationsPerWeek: ae.appliedReservationsPerWeek,
-    suitableTimeRanges: ae.suitableTimeRanges.map(transformSuitableTimeRange),
-    reservationUnitOptions: ae.reservationUnits.map((ruo, ruoIndex) =>
-      transformEventReservationUnit(ruo, ruoIndex)
-    ),
-  };
-}
-
-// TODO type the output
-// create or update mutation
+// create and update mutation are somewhat different so bit logic to handle both
 function transformApplicationSection(
   ae: ApplicationSectionFormValue,
   application: number
@@ -347,21 +318,6 @@ function transformApplicationSection(
   };
 
   return data;
-}
-
-export function transformApplicationCreate(
-  values: ApplicationFormValues,
-  applicationRoundPk: number
-): ApplicationCreateMutationInput {
-  const appEvents = filterNonNullable(values.applicationSections);
-  return {
-    applicationRound: applicationRoundPk,
-    pk: values.pk,
-    applicantType: values.applicantType,
-    applicationSections: appEvents.map((ae) =>
-      transformApplicationSectionCreate(ae)
-    ),
-  };
 }
 
 // For pages 1 and 2

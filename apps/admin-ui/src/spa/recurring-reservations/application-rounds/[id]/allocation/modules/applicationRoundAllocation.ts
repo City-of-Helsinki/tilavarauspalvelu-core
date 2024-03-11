@@ -163,9 +163,7 @@ export function getApplicantName(
 }
 
 // TODO is this parse? or format? it looks like a format
-function parseApplicationEventScheduleTime(
-  range: SuitableTimeRangeNode
-): string {
+function formatTimeRange(range: SuitableTimeRangeNode): string {
   // TODO convert the day of the week
   const day = convertWeekday(range.dayOfTheWeek);
   const weekday = i18next.t(`dayShort.${day}`);
@@ -175,19 +173,19 @@ function parseApplicationEventScheduleTime(
   )}-${Number(range.endTime.substring(0, 2))}`;
 }
 
-export const getApplicationEventScheduleTimeString = (
+export function formatTimeRangeList(
   aes: SuitableTimeRangeNode[],
   priority: Priority
-): string => {
+): string {
   const schedules = sortBy(
     aes?.filter((s) => s?.priority === priority),
     ["day", "begin"]
   );
 
   return filterNonNullable(schedules)
-    .map((schedule) => parseApplicationEventScheduleTime(schedule))
+    .map((schedule) => formatTimeRange(schedule))
     .join(", ");
-};
+}
 
 export const timeSlotKeyToScheduleTime = (
   slot: string,

@@ -29,7 +29,7 @@ import {
   decodeTimeSlot,
   getTimeSlotOptions,
 } from "./modules/applicationRoundAllocation";
-import { AllocatedCard, AllocationCard } from "./AllocationCard";
+import { AllocatedCard, SuitableTimeCard } from "./AllocationCard";
 import { useSlotSelection } from "./hooks";
 
 type Props = {
@@ -289,9 +289,7 @@ export function AllocationColumn({
   // NOTE need to split the applicationSection into two props
   // - the section
   // - the selected time slot / allocation (this is used for the mutation pk)
-  // - might even want to split the mutation component into two separate props / children
   // NOTE we show Handled for already allocated, but not for suitable that have already been allocated.
-  // TODO might be able to remove them with fulfilled?
   const selectedInterval = { day, start: startHour, end: endHour };
   const timeslots = aes
     .filter((ae) => ae.status !== ApplicationSectionStatusChoice.Handled)
@@ -325,6 +323,7 @@ export function AllocationColumn({
   const isRoundAllocable =
     applicationRoundStatus === ApplicationRoundStatusChoice.InAllocation;
 
+  // NOTE have to reverse search for the pk, as the reservationUnitOption doesn't include any other fields than pk
   const allocatedPks = filterNonNullable(
     allocated
       .flatMap((ruo) =>
@@ -334,10 +333,10 @@ export function AllocationColumn({
       )
       .map((as) => as?.pk)
   );
-
   const allocatedSections = aes.filter(
     (as) => as.pk != null && allocatedPks.includes(as.pk)
   );
+
   const doesCollideToOtherAllocations = relatedAllocations[day].some((slot) => {
     return (
       slot.day === day &&
@@ -380,12 +379,14 @@ export function AllocationColumn({
         />
       ))}
       {timeslots.map((as) => (
-        <AllocationCard
+        <SuitableTimeCard
           key={as.pk}
           applicationSection={as}
-          reservationUnitOption={as.reservationUnitOptions?.find(
-            (ruo) => ruo.reservationUnit?.pk === reservationUnit?.pk
-          )}
+          reservationUnitOptionPk={
+            as.reservationUnitOptions?.find(
+              (ruo) => ruo.reservationUnit?.pk === reservationUnit?.pk
+            )?.pk ?? 0
+          }
           selection={selection ?? []}
           isAllocationEnabled={canAllocate}
           refetchApplicationEvents={refetchApplicationEvents}

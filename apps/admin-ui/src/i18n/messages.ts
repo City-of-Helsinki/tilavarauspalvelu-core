@@ -544,7 +544,7 @@ const translations: ITranslations = {
   },
   ApplicationSectionStatusChoice: {
     FAILED: ["Epäonnistunut"],
-    HANDLED: ["Käsitelty"],
+    HANDLED: ["Hyväksytty"],
     IN_ALLOCATION: ["Käsittelyssä"],
     RESERVED: ["Varattu"],
     UNALLOCATED: ["Ei jaettu"],
@@ -1958,7 +1958,11 @@ const translations: ITranslations = {
         // TODO this should only happen if the it's already allocated for that day
         // there should be no blocks to allocate for another day (unless it's completely fullfilled?)
         alreadyAllocated: ['Varaukselle "{{name}}" on jo jaettu vuoro.'],
-        alreadyHandled: ['Varaus "{{name}}" on jo kokonaan jaettu.'],
+        statusHandled: ['Varaus "{{name}}" on jo kokonaan jaettu.'],
+        maxAllocations: [
+          'Varaukselle "{{name}}" on jo jaettu maksimi määrä vuoroja.',
+        ],
+        statusCancelled: ['Varaus "{{name}}" on peruutettu.'],
         title: ["Vuoron jakaminen epäonnistui"],
         generic: [
           "Varmista, että hakukierros on käsittelyssä ja että valittu ajankohta on vapaana.",

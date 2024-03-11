@@ -164,13 +164,10 @@ function ApplicationEventInner({
     | "purpose"
     | "ageGroup"
     | "numPersons"
-    // | "abilityGroup"
     | "minDuration"
     | "maxDuration"
     | "name"
-    // | "eventsPerWeek"
-    // | "applicationEventSchedules"
-    // TODO requested times is missing
+    | "appliedReservationsPerWeek"
     | "reservationUnits";
   const getTranslatedError = (field: FieldName): string => {
     const error = errors.applicationSections?.[index]?.[field];
@@ -386,34 +383,27 @@ function ApplicationEventInner({
             />
           )}
         />
-        {/* TODO
         <NumberInput
-          id={`applicationSections.${index}.eventsPerWeek`}
+          id={`applicationSections.${index}.appliedReservationsPerWeek`}
           required
-          {...register(`applicationSections.${index}.eventsPerWeek`, {
-            valueAsNumber: true,
-          })}
+          {...register(
+            `applicationSections.${index}.appliedReservationsPerWeek`,
+            {
+              valueAsNumber: true,
+            }
+          )}
           label={t("application:Page1.eventsPerWeek")}
           min={1}
           max={undefined}
           minusStepButtonAriaLabel={t("common:subtract")}
           plusStepButtonAriaLabel={t("common:add")}
           step={1}
-          invalid={errors.applicationSections?.[index]?.eventsPerWeek != null}
-          errorText={getTranslatedError("eventsPerWeek")}
+          invalid={
+            errors.applicationSections?.[index]?.appliedReservationsPerWeek !=
+            null
+          }
+          errorText={getTranslatedError("appliedReservationsPerWeek")}
         />
-        */}
-        {/* TODO
-        <Controller
-          control={control}
-          name={`applicationSections.${index}.biweekly`}
-          render={({ field }) => {
-            return (
-              <input type="hidden" id={field.name} name={field.name} value="" />
-            );
-          }}
-        />
-        */}
       </PeriodContainer>
       <ApplicationEventSummary
         applicationSection={getValues(`applicationSections.${index}`)}
@@ -457,8 +447,7 @@ export function ApplicationEvent(props: Props): JSX.Element {
   } = form;
 
   const eventName = watch(`applicationSections.${index}.name`);
-  // watch(`applicationSections.${index}.eventsPerWeek`);
-  // watch(`applicationSections.${index}.biweekly`);
+  watch(`applicationSections.${index}.appliedReservationsPerWeek`);
 
   const shouldRenderInner = isVisible;
 

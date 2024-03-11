@@ -1,6 +1,6 @@
 import React, { type ReactNode } from "react";
 import styled, { css } from "styled-components";
-import { IconCheckCircleFill } from "hds-react";
+import { IconCheckCircleFill, IconCrossCircleFill } from "hds-react";
 import { useTranslation } from "react-i18next";
 import {
   ApplicationSectionStatusChoice,
@@ -130,12 +130,17 @@ export function TimeSlotStatusCell({
   status: "declined" | "approved";
 }): JSX.Element {
   const text = `TimeSlotStatusCell.${status}`;
-  // TODO refactor the Status Dot not to require an enum status (pass the colour / custom status as a prop)
   const icon =
     status === "approved" ? (
-      <StatusDot aria-hidden status={ApplicationStatusChoice.Handled} />
+      <IconCheckCircleFill
+        aria-hidden
+        style={{ color: "var(--color-success)" }}
+      />
     ) : (
-      <StatusDot aria-hidden status={ApplicationStatusChoice.InAllocation} />
+      <IconCrossCircleFill
+        aria-hidden
+        style={{ color: "var(--color-danger)" }}
+      />
     );
 
   return <StatusCell text={text} icon={icon} />;

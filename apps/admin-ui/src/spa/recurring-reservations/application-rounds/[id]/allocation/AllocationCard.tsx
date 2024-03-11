@@ -10,7 +10,6 @@ import {
   Priority,
   type SuitableTimeRangeNode,
   type AllocatedTimeSlotNode,
-  type ReservationUnitOptionNode,
 } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { NotificationInline } from "common/src/components/NotificationInline";
@@ -21,7 +20,7 @@ import { formatDuration } from "@/common/util";
 import { Accordion } from "@/component/Accordion";
 import {
   formatTime,
-  getApplicationEventScheduleTimeString,
+  formatTimeRangeList,
   parseApiTime,
   createDurationString,
   decodeTimeSlot,
@@ -34,12 +33,13 @@ import {
 
 type Props = {
   applicationSection: ApplicationSectionNode;
-  reservationUnitOption?: ReservationUnitOptionNode;
+  reservationUnitOptionPk: number;
   selection: string[];
   isAllocationEnabled: boolean;
   // TODO better solution would be to have a query key (similar to tanstack/react-query) and invalidate the key
   // so we don't have to prop drill the refetch
   refetchApplicationEvents: () => Promise<ApolloQueryResult<Query>>;
+  // TODO these should be mandatory (but requires refactoring the parent component a bit)
   timeSlot: SuitableTimeRangeNode | null;
   allocatedTimeSlot: AllocatedTimeSlotNode | null;
 };
@@ -124,15 +124,13 @@ const DetailContainer = styled.div`
 /// The mutations they use are completely different.
 /// - yes the error handling is common
 /// - yes we should move them to hooks, but still it's two different hooks
-///
-/// TODO rename these two (so they aren't so similar)
 export function AllocatedCard({
   applicationSection,
   refetchApplicationEvents,
   allocatedTimeSlot,
 }: Omit<
   Props,
-  "timeSlot" | "selection" | "isAllocationEnabled" | "reservationUnitOption"
+  "timeSlot" | "selection" | "isAllocationEnabled" | "reservationUnitOptionPk"
 >): JSX.Element {
   const { t } = useTranslation();
 
@@ -167,21 +165,19 @@ export function AllocatedCard({
     ? parseApiTime(allocatedTimeSlot.endTime) ?? 0
     : 0;
 
-  const beginSeconds = applicationSection.reservationMinDuration ?? 0;
-  const endSeconds = applicationSection.reservationMaxDuration ?? 0;
+  const minDurationSeconds = applicationSection.reservationMinDuration ?? 0;
+  const maxDurationSeconds = applicationSection.reservationMaxDuration ?? 0;
   const allocatedDurationMins = (allocationEnd - allocationBegin) * 60;
   const durationIsInvalid =
-    allocatedDurationMins < beginSeconds / 60 ||
-    allocatedDurationMins > endSeconds / 60;
-  const isMutationLoading = isResetLoading;
-  const isLoading = isMutationLoading || isRefreshLoading;
+    allocatedDurationMins < minDurationSeconds / 60 ||
+    allocatedDurationMins > maxDurationSeconds / 60;
+  // TODO should compare the allocated to the suitable time ranges, not to selection
+  const isTimeMismatch = false;
 
-  // FIXME
-  const isAllocatedTimeMismatch = false; // isOutsideOfAllocatedTimes(section);
-  const isTimeMismatch = isAllocatedTimeMismatch;
   const applicantName = applicationSection.application
     ? getApplicantName(applicationSection.application)
     : "-";
+  const isLoading = isResetLoading || isRefreshLoading;
 
   return (
     <Wrapper>
@@ -233,9 +229,9 @@ export function AllocatedCard({
 }
 
 function isOutsideOfRequestedTimes(
-  time: SuitableTimeRangeNode | null,
-  begin: number,
-  end: number
+  time: SuitableTimeRangeNode | AllocatedTimeSlotNode | null,
+  beginHours: number,
+  endHours: number
 ) {
   if (time?.beginTime == null || time.endTime == null) {
     return true;
@@ -245,17 +241,16 @@ function isOutsideOfRequestedTimes(
   if (beginTime == null || endTime == null) {
     return true;
   }
-  if (begin < beginTime || end > endTime) {
+  if (beginHours < beginTime || endHours > endTime) {
     return true;
   }
 }
 
 /// Right hand side single card
 /// Contains the single applicationScheduleEvent and its actions (accept / decline etc.)
-/// TODO either time slot or allocated time slot should be mandatory
-export function AllocationCard({
+export function SuitableTimeCard({
   applicationSection,
-  reservationUnitOption,
+  reservationUnitOptionPk,
   selection,
   isAllocationEnabled,
   refetchApplicationEvents,
@@ -269,8 +264,7 @@ export function AllocationCard({
     console.warn("MANDATORY: No time slot or allocated time slot");
   }
 
-  // TODO reservationUnit should not be null (requires refactoring the parent component a bit)
-  if (reservationUnitOption?.pk == null) {
+  if (reservationUnitOptionPk === 0) {
     // eslint-disable-next-line no-console
     console.warn("Invalid reservation unit option: missing pk");
   }
@@ -284,43 +278,36 @@ export function AllocationCard({
       selection,
       timeRange: timeSlot,
       applicationSection,
-      reservationUnitOption,
+      reservationUnitOptionPk,
       refresh,
     });
   const applicantName = applicationSection.application
     ? getApplicantName(applicationSection.application)
     : "-";
 
-  // TODO this is hackish
-  // the allocated have custom fields in the GQL query and suitableTimeRanges is not quried for them
-  // problem if we refactor the query or use the pk to do a frontend search
-  // const isAllocated = applicationSection.suitableTimeRanges == null;
-  // section?.allocatedReservationUnit != null;
-  // TODO need to check if it's allocated here or elsewhere, don't allow changes if it's elsewhere (just show it or not?)
-  const isReservable = isAllocationEnabled;
-  const isDisabled = !reservationUnitOption?.pk || !isReservable;
+  const isDisabled = !reservationUnitOptionPk || !isAllocationEnabled;
 
   // Time interval checks
   const selectionDurationMins = selection.length * 30;
-  // TODO rename the begin and end it's duration not time
-  const beginSeconds = applicationSection.reservationMinDuration ?? 0;
-  const endSeconds = applicationSection.reservationMaxDuration ?? 0;
+  const minDurationSeconds = applicationSection.reservationMinDuration ?? 0;
+  const maxDurationSeconds = applicationSection.reservationMaxDuration ?? 0;
   const selectionDurationString = formatDuration(selectionDurationMins, t);
   // TODO this should be cleaner, only pass things we need here
   const firstSelected = selection[0];
   const lastSelected = selection[selection.length - 1];
   const selectionBegin = decodeTimeSlot(firstSelected);
   const selectionEnd = decodeTimeSlot(lastSelected);
+  // Duration checks
+  const isTooShort = selectionDurationMins < minDurationSeconds / 60;
+  const isTooLong = selectionDurationMins > maxDurationSeconds / 60;
+  const durationIsInvalid = isTooShort || isTooLong;
+
   const isTimeMismatch = isOutsideOfRequestedTimes(
     timeSlot,
     selectionBegin.hour,
     selectionEnd.hour + 0.5
   );
 
-  // Duration checks
-  const isTooShort = selectionDurationMins < beginSeconds / 60;
-  const isTooLong = selectionDurationMins > endSeconds / 60;
-  const durationIsInvalid = isTooShort || isTooLong;
   const isMutationLoading = isAcceptLoading;
   const isLoading = isMutationLoading || isRefreshLoading;
 
@@ -422,14 +409,8 @@ function TimeRequested({
   const durationString = createDurationString(applicationSection, t);
 
   const aes = filterNonNullable(applicationSection?.suitableTimeRanges);
-  const primaryTimes = getApplicationEventScheduleTimeString(
-    aes,
-    Priority.Primary
-  );
-  const secondaryTimes = getApplicationEventScheduleTimeString(
-    aes,
-    Priority.Secondary
-  );
+  const primaryTimes = formatTimeRangeList(aes, Priority.Primary);
+  const secondaryTimes = formatTimeRangeList(aes, Priority.Secondary);
 
   return (
     <div>

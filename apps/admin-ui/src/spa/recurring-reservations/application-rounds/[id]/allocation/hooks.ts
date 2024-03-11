@@ -7,7 +7,6 @@ import { useTranslation } from "react-i18next";
 import {
   type ApplicationSectionNode,
   type Query,
-  type ReservationUnitOptionNode,
   type SuitableTimeRangeNode,
   type Mutation,
   type MutationDeleteAllocatedTimeslotArgs,
@@ -123,20 +122,19 @@ export function useSlotSelection(): [string[], (slots: string[]) => void] {
 // side effects that should happen when a modification is made
 export function useRefreshApplications(
   fetchCallback: () => Promise<ApolloQueryResult<Query>>
-): [() => Promise<void>, boolean] {
+): [(clearSelection?: boolean) => Promise<void>, boolean] {
   const [, setSelection] = useSlotSelection();
   const [isRefetchLoading, setIsRefetchLoading] = useState(false);
   // TODO this should disable sibling cards allocation while this is loading
   // atm one can try to allocate multiple cards at the same time and all except the first will fail
-  const refresh = async () => {
-    // NOTE this is slow so use a loading state to show the user that something is happening
-    // TODO this takes 3s to complete (on my local machine, so more in the cloud),
-    // should update the cache in the mutation instead (or do a single id query instead of refetching all)
+  const refresh = async (clearSelection = true) => {
     setIsRefetchLoading(true);
     await fetchCallback();
     setIsRefetchLoading(false);
     // Close all the cards (requires removing the selection)
-    setSelection([]);
+    if (clearSelection) {
+      setSelection([]);
+    }
   };
 
   return [refresh, isRefetchLoading];
@@ -144,10 +142,10 @@ export function useRefreshApplications(
 
 type AcceptSlotMutationProps = {
   applicationSection: ApplicationSectionNode;
-  reservationUnitOption?: ReservationUnitOptionNode;
+  reservationUnitOptionPk: number;
   selection: string[];
   timeRange: SuitableTimeRangeNode | null;
-  refresh: () => void;
+  refresh: (clearSelection?: boolean) => void;
 };
 
 // TODO make into more generic
@@ -199,7 +197,7 @@ export function useAcceptSlotMutation({
   selection,
   timeRange,
   applicationSection,
-  reservationUnitOption,
+  reservationUnitOptionPk,
   // TODO await instead of calling a callback (alternatively chain a callback to the handle function but it's already red)
   refresh,
 }: AcceptSlotMutationProps): HookReturnValue {
@@ -210,6 +208,11 @@ export function useAcceptSlotMutation({
     Mutation,
     MutationCreateAllocatedTimeslotArgs
   >(CREATE_ALLOCATED_TIME_SLOT);
+
+  if (!reservationUnitOptionPk) {
+    // eslint-disable-next-line no-console
+    console.error("Invalid reservationUnitOptionPk: ", reservationUnitOptionPk);
+  }
 
   const handleAcceptSlot = async () => {
     if (selection.length === 0) {
@@ -224,25 +227,20 @@ export function useAcceptSlotMutation({
       notifyError(t("Allocation.errors.accepting.generic"));
       return;
     }
-    // TODO is this correct time format?
-    // why isn't it going through and API format function?
     const allocatedBegin = timeSlotKeyToScheduleTime(selection[0]);
     const allocatedEnd = timeSlotKeyToScheduleTime(
       selection[selection.length - 1],
       true
     );
-    if (reservationUnitOption?.pk == null) {
+    if (!reservationUnitOptionPk) {
       notifyError(t("Allocation.errors.accepting.generic"));
       return;
     }
 
     // NOTE the pk is an update pk that matches AllocatedTimeSlot (not the applicationSection)
-    // The reservationUnitOption is ReservationUnitOptionNode.pk not ReservationUnit.pk
-    // This creates an allocated time slot for the given reservationUnitOption and time range
-    // that changes the status of the applicationSection and maybe the whole application
     // TODO check the inputs
     const input: AllocatedTimeSlotCreateMutationInput = {
-      reservationUnitOption: reservationUnitOption?.pk,
+      reservationUnitOption: reservationUnitOptionPk,
       dayOfTheWeek: timeRange.dayOfTheWeek,
       beginTime: allocatedBegin,
       endTime: allocatedEnd,
@@ -262,6 +260,10 @@ export function useAcceptSlotMutation({
         notifyError(t("Allocation.errors.accepting.generic", { name }));
         return;
       }
+      const { name } = applicationSection;
+      const msg = t("Allocation.acceptingSuccess", { name });
+      notifySuccess(msg);
+      refresh();
     } catch (e) {
       if (e instanceof ApolloError) {
         const gqlerrors = e.graphQLErrors;
@@ -284,6 +286,7 @@ export function useAcceptSlotMutation({
             if (errMsg != null) {
               const title = "Allocation.errors.accepting.title";
               notifyError(t(errMsg, { name }), t(title));
+              refresh(false);
               return;
             }
           }
@@ -296,12 +299,7 @@ export function useAcceptSlotMutation({
         t("Allocation.errors.accepting.generic"),
         t("Allocation.errors.accepting.title")
       );
-      return;
     }
-    const { name } = applicationSection;
-    const msg = t("Allocation.acceptingSuccess", { name });
-    notifySuccess(msg);
-    refresh();
   };
 
   return [handleAcceptSlot, { isLoading }];
@@ -314,7 +312,7 @@ export function useRemoveAllocation({
 }: {
   allocatedTimeSlot: AllocatedTimeSlotNode | null;
   applicationSection: ApplicationSectionNode;
-  refresh: () => void;
+  refresh: (clearSelection?: boolean) => void;
 }): HookReturnValue {
   const { notifySuccess, notifyError } = useNotification();
   const { t } = useTranslation();
@@ -325,6 +323,7 @@ export function useRemoveAllocation({
   >(DELETE_ALLOCATED_TIME_SLOT);
 
   const handleRemoveAllocation = async () => {
+    // TODO both of these error cases should be handled before we are in this event handler
     if (allocatedTimeSlot?.pk == null) {
       // eslint-disable-next-line no-console
       console.error(
@@ -333,14 +332,7 @@ export function useRemoveAllocation({
       );
       return;
     }
-
     const allocatedPk = allocatedTimeSlot.pk;
-    // TODO both of these should be handled before we are in a callback
-    // they should never happen
-    // if the card is not allocated this callback should not be called (and they should be zero)
-    // if this card is allocated, it should have a single allocation (to this particular time slot)
-    // one applicationSection can't be allocated multiple times in a single day (so even if we have multiple time slots,
-    // they are all on the same day) and also a card matches a single time slot / range
     if (allocatedPk === 0) {
       const { name } = applicationSection;
       notifyError(
@@ -391,6 +383,7 @@ export function useRemoveAllocation({
                 }),
                 t("Allocation.errors.remove.title")
               );
+              refresh(false);
               return;
             }
           }

@@ -126,14 +126,6 @@ type Cell = {
   key: string;
 };
 
-// TODO why declined? why are we using id here (it's normally gql id)
-/*
-type ApplicationEventScheduleType = Pick<
-  ApplicationSectionNode,
-  "id" | "begin" | "end" | "priority" | "day" | "declined"
->;
-*/
-
 // TODO improve the typing
 type ApplicationEventScheduleType = {
   day: Day;

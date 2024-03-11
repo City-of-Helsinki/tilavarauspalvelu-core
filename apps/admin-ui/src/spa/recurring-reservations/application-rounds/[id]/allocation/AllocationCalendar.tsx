@@ -414,12 +414,7 @@ function CalendarDay({
   setSelection: (selection: string[]) => void;
   onFinishSelection: () => void;
   onStartSelection: (key: string) => void;
-  focusedSlots: Array<{
-    day: Day;
-    cell: string;
-    allocated: boolean;
-    minutes: number;
-  }>;
+  focusedSlots: Slot[];
   relatedTimeSpans: RelatedSlot[];
 }): JSX.Element {
   const { t } = useTranslation();

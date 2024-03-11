@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useQuery } from "@apollo/client";
+import { type ApolloQueryResult, useQuery } from "@apollo/client";
 import { Select, Tabs } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { uniqBy } from "lodash";
@@ -47,7 +47,7 @@ import { ComboboxFilter, SearchFilter } from "@/component/QueryParamFilters";
 const MAX_RES_UNIT_NAME_LENGTH = 35;
 
 type IParams = {
-  applicationRoundId: string;
+  applicationRoundPk: string;
 };
 
 /* TODO is the gap everywhere 24px? i.e. can we remove the override */
@@ -209,7 +209,7 @@ function Filters({
 
 function ApplicationRoundAllocation({
   applicationRound,
-  applicationRoundId,
+  applicationRoundPk,
   units,
   reservationUnits,
   roundName,
@@ -218,7 +218,7 @@ function ApplicationRoundAllocation({
   // TODO don't like the undefined, but I hate spinners
   applicationRound?: ApplicationRoundNode;
   // TODO refactor the others to use the RoundNode
-  applicationRoundId: number;
+  applicationRoundPk: number;
   units: UnitType[];
   reservationUnits: ReservationUnitNode[];
   // TODO do we want to prop drill these? or include it in every application event?
@@ -312,14 +312,12 @@ function ApplicationRoundAllocation({
     }
   >(APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY, {
     // On purpose skip if the reservation unit is not selected (it is required)
-    skip: !applicationRoundId || reservationUnitFilterQuery == null,
+    skip: !applicationRoundPk || reservationUnitFilterQuery == null,
     pollInterval: ALLOCATION_POLL_INTERVAL,
     // NOTE required otherwise this returns stale data when filters change
     fetchPolicy: "cache-and-network",
     variables: {
-      applicationRound: applicationRoundId,
-      // TODO unit is superflous since we are filtering by reservation unit
-      // unit: unitFilterQuery,
+      applicationRound: applicationRoundPk,
       priority: priorityFilterQuery,
       preferredOrder: preferredOrderFilterQuery,
       includePreferredOrder10OrHigher,
@@ -329,14 +327,7 @@ function ApplicationRoundAllocation({
       purpose: purposeFilterQuery,
       ageGroup: ageGroupFilterQuery,
       reservationUnit: reservationUnitFilterQuery ?? 0,
-      // TODO should we split this query into two?
-      // we need both the HANDLED and IN_ALLOCATION statuses
-      // but they function differently in the frontend
-      // one for already handled and one for not handled
-      // applicationStatus: [ApplicationStatusChoice.InAllocation],
       applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,
-      // TODO
-      // status: [ApplicationSectionStatusChoice.InAllocation],
     },
     onError: () => {
       notifyError(t("errors.errorFetchingData"));
@@ -359,7 +350,6 @@ function ApplicationRoundAllocation({
   } = useQuery<Query, QueryAffectingAllocatedTimeSlotsArgs>(
     AFFECTING_ALLOCATED_TIME_SLOTS_QUERY,
     {
-      // TODO skip is super bad here (it needs to be an error)
       pollInterval: ALLOCATION_POLL_INTERVAL,
       skip:
         !reservationUnitFilterQuery ||
@@ -381,9 +371,9 @@ function ApplicationRoundAllocation({
   const { data: allEventsData } = useQuery<Query, QueryApplicationSectionsArgs>(
     ALL_EVENTS_PER_UNIT_QUERY,
     {
-      skip: !applicationRoundId || !selectedReservationUnit || !unitFilter,
+      skip: !applicationRoundPk || !selectedReservationUnit || !unitFilter,
       variables: {
-        applicationRound: applicationRoundId,
+        applicationRound: applicationRoundPk,
         // cast constructor is ok because of the skip
         reservationUnit: [Number(selectedReservationUnit)],
         unit: [Number(unitFilter)],
@@ -393,20 +383,20 @@ function ApplicationRoundAllocation({
       fetchPolicy: "no-cache",
     }
   );
-  // TODO if there are no warnings from testing we can remove fetching all events and just use the totalCount
+
+  // NOTE totalCount is fine, but we need to query the things we want to count otherwise it's off by a mile.
   // default to zero because filter returns empty array if no data
   const totalCount = allEventsData?.applicationSections?.totalCount ?? 0;
   const allEvents = filterNonNullable(
     allEventsData?.applicationSections?.edges.map((e) => e?.node)
   );
-  // TODO totalCount is fine, but we need to query the things we want to count otherwise it's off by a mile.
   if (allEvents.length !== totalCount && totalCount < 100) {
     // eslint-disable-next-line no-console -- TODO use logger
     console.warn(
       `Total count of application sections "${totalCount}" does not match array length "${allEvents.length}"`
     );
   }
-  const totalNumberOfEvents = totalCount; // allEvents.length;
+  const totalNumberOfEvents = totalCount;
 
   // TODO show loading state somewhere down the line
   const appEventsData = data ?? previousData;
@@ -475,6 +465,28 @@ function ApplicationRoundAllocation({
       new URLSearchParams()
     );
     setParams(newParams, { replace: true });
+  };
+
+  const handleRefetchApplicationEvents = async () => {
+    const res = await Promise.allSettled([
+      refetch(),
+      refetchAffectedAllocations(),
+    ]);
+    const success = res.filter(
+      (r): r is PromiseFulfilledResult<ApolloQueryResult<Query>> =>
+        r.status === "fulfilled"
+    );
+    const error = res.filter(
+      (r): r is PromiseRejectedResult => r.status === "rejected"
+    );
+    if (error.length > 0) {
+      notifyError(t("errors.errorFetchingData"));
+    }
+    if (success.length > 0) {
+      const retval = success[0];
+      return retval.value;
+    }
+    return refetch();
   };
 
   // NOTE findIndex returns -1 if not found
@@ -550,11 +562,8 @@ function ApplicationRoundAllocation({
           ) || unitReservationUnits[0]
         }
         relatedAllocations={affectingAllocations}
-        // TODO don't like awaiting the first one, we can run both queries simultaneously (but the return type doesn't match)
-        refetchApplicationEvents={async () => {
-          await refetchAffectedAllocations();
-          return refetch();
-        }}
+        // TODO overly complicated but doesn't properly handle single failures
+        refetchApplicationEvents={handleRefetchApplicationEvents}
         applicationRoundStatus={applicationRoundStatus}
       />
     </Container>
@@ -564,16 +573,16 @@ function ApplicationRoundAllocation({
 // Do a single full query to get filter / page data
 function AllocationWrapper({
   // TODO rename to Pk
-  applicationRoundId,
+  applicationRoundPk,
 }: {
-  applicationRoundId: number;
+  applicationRoundPk: number;
 }): JSX.Element {
   const typename = "ApplicationRoundNode";
-  const id = base64encode(`${typename}:${applicationRoundId}`);
+  const id = base64encode(`${typename}:${applicationRoundPk}`);
   const { loading, error, data } = useQuery<Query, QueryApplicationRoundArgs>(
     APPLICATION_ROUND_FILTER_OPTIONS,
     {
-      skip: !applicationRoundId,
+      skip: !applicationRoundPk,
       variables: {
         id,
       },
@@ -617,7 +626,7 @@ function AllocationWrapper({
       <BreadcrumbWrapper backLink=".." />
       <ApplicationRoundAllocation
         applicationRound={appRound ?? undefined}
-        applicationRoundId={applicationRoundId}
+        applicationRoundPk={applicationRoundPk}
         units={units}
         reservationUnits={resUnits}
         roundName={roundName}
@@ -630,13 +639,13 @@ function AllocationWrapper({
 }
 
 function ApplicationRoundAllocationRouted(): JSX.Element {
-  const { applicationRoundId } = useParams<IParams>();
+  const { applicationRoundPk } = useParams<IParams>();
   const { t } = useTranslation();
 
-  if (!applicationRoundId || Number.isNaN(Number(applicationRoundId))) {
+  if (!applicationRoundPk || Number.isNaN(Number(applicationRoundPk))) {
     return <div>{t("errors.router.invalidApplicationRoundNumber")}</div>;
   }
-  return <AllocationWrapper applicationRoundId={Number(applicationRoundId)} />;
+  return <AllocationWrapper applicationRoundPk={Number(applicationRoundPk)} />;
 }
 
 export default ApplicationRoundAllocationRouted;
