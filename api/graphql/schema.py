@@ -181,6 +181,7 @@ class Query(graphene.ObjectType):
     )
 
     reservations = ReservationsFilter(ReservationType, filterset_class=ReservationFilterSet)
+    reservation = relay.Node.Field(ReservationType)
     reservation_by_pk = Field(ReservationType, pk=graphene.Int())
 
     recurring_reservations = RecurringReservationsFilter(
