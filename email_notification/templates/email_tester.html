@@ -1,5 +1,14 @@
 {% extends "admin/base_site.html" %}
-Fooo
+{% load i18n admin_urls %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+    &rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+    &rsaquo; {% translate 'Email Template Testing' %}
+</div>
+{% endblock %}
 
 {% block content %}
 <h1 id="site-name">Email Template Testing</h1>
