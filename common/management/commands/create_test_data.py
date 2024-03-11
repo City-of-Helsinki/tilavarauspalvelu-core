@@ -67,6 +67,7 @@ from permissions.models import (
     UnitRolePermission,
 )
 from reservation_units.enums import (
+    AuthenticationType,
     PriceUnit,
     PricingStatus,
     PricingType,
@@ -1412,10 +1413,7 @@ def _create_reservation_units(
 
         reservation_unit = ReservationUnit(
             allow_reservations_without_opening_hours=True,
-            authentication=weighted_choice(
-                ReservationUnit.AUTHENTICATION_TYPES,
-                weights=[2, 1],
-            )[0],
+            authentication=weighted_choice(AuthenticationType.values, weights=[2, 1]),
             can_apply_free_of_charge=can_apply_free_of_charge,
             cancellation_rule=next(cancellation_rules_loop),
             cancellation_terms=terms_of_use[TermsOfUse.TERMS_TYPE_CANCELLATION],

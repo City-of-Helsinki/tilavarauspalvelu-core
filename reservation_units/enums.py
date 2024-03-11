@@ -5,6 +5,7 @@ from django.db.models import TextChoices
 from django.utils.translation import gettext_lazy as _
 
 __all__ = [
+    "AuthenticationType",
     "PaymentType",
     "PriceUnit",
     "PricingStatus",
@@ -82,3 +83,8 @@ class PricingStatus(models.TextChoices):
     PRICING_STATUS_PAST = "past", _("past")
     PRICING_STATUS_ACTIVE = "active", _("active")
     PRICING_STATUS_FUTURE = "future", _("future")
+
+
+class AuthenticationType(models.TextChoices):
+    WEAK = "weak", _("Weak")
+    STRONG = "strong", _("Strong")
