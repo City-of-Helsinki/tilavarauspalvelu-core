@@ -1,5 +1,5 @@
 {% extends "admin/login.html" %}
-{% load static %}
+{% load static i18n %}
 
 {% block content %}
 {% if helsinki_provider_installed %}
@@ -22,9 +22,10 @@
 {{ block.super }}
 
 {% if request.user and request.user.is_authenticated and helsinki_logout_url %}
-<a href="{{ helsinki_logout_url }}">
-    <button style="margin-left: 9em; width: auto;" class="button grp-button grp-default" type="button">Kirjaudu ulos</button>
-</a>
+<form id="logout-form" method="post" action="{{ helsinki_logout_url }}">
+{% csrf_token %}
+    <button type="submit">{% translate 'Log out' %}</button>
+</form>
 {% endif %}
 
 {% if grappelli_installed %}
