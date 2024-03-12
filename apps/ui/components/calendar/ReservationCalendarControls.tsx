@@ -317,9 +317,9 @@ const ReservationCalendarControls = ({
   const formDate = watch("date");
   const formDuration = watch("duration");
   const date = new Date(formDate ?? "");
-  const duration = Number.isNaN(Number(formDuration))
-    ? reservationUnit.minReservationDuration ?? 0
-    : Number(formDuration);
+  const duration = !Number.isNaN(Number(formDuration))
+    ? Number(formDuration)
+    : reservationUnit.minReservationDuration ?? 0;
   const time = watch("time") ?? getTimeString();
   const selectedDuration: OptionType = getSelectedOption(
     duration,

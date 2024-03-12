@@ -21,7 +21,12 @@ import {
   isToday,
   startOfDay,
 } from "date-fns";
-import { toApiDate, toUIDate } from "common/src/common/util";
+import {
+  fromUIDate,
+  isValidDate,
+  toApiDate,
+  toUIDate,
+} from "common/src/common/util";
 import {
   getEventBuffers,
   getNewReservation,
@@ -266,6 +271,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       reservationUnitData.reservationUnit?.reservableTimeSpans
     );
     const reservableTimeSpans = [...timespans, ...moreTimespans];
+    const { date, time, duration } = query;
     const reservations = filterNonNullable(
       additionalData?.reservationUnit?.reservations
     );
@@ -283,6 +289,11 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
         activeApplicationRounds,
         termsOfUse: { genericTerms: bookingTerms },
         isPostLogin: query?.isPostLogin === "true",
+        searchDuration: Number.isNaN(Number(duration))
+          ? null
+          : Number(duration),
+        searchDate: `${date}` ?? null,
+        searchTime: `${time}` ?? null,
       },
     };
   }
@@ -392,6 +403,9 @@ const ReservationUnit = ({
   termsOfUse,
   isPostLogin,
   apiBaseUrl,
+  searchDuration,
+  searchDate,
+  searchTime,
 }: PropsNarrowed): JSX.Element | null => {
   const { t, i18n } = useTranslation();
   const router = useRouter();
@@ -429,14 +443,21 @@ const ReservationUnit = ({
   const todaysTimeSpans = reservableTimeSpans.filter(
     (span) => span.startDatetime && isToday(new Date(span.startDatetime))
   );
-
+  const searchUIDate = fromUIDate(searchDate);
   // TODO: plug in query parameters
   const initialFieldValues = {
-    date: new Date(todaysTimeSpans[0]?.startDatetime ?? "").toISOString(),
-    duration: reservationUnit.minReservationDuration
-      ? reservationUnit.minReservationDuration / 60
-      : 0,
-    time: getTimeString(new Date(todaysTimeSpans[0]?.startDatetime ?? "")),
+    date:
+      searchUIDate && isValidDate(searchUIDate)
+        ? searchDate
+        : toUIDate(new Date(todaysTimeSpans[0]?.startDatetime ?? "")),
+    duration:
+      searchDuration ??
+      (reservationUnit.minReservationDuration
+        ? reservationUnit.minReservationDuration / 60
+        : 0),
+    time:
+      searchTime ??
+      getTimeString(new Date(todaysTimeSpans[0]?.startDatetime ?? "")),
   };
   const reservationForm = useForm<PendingReservationFormType>({
     defaultValues: initialFieldValues,
@@ -445,8 +466,14 @@ const ReservationUnit = ({
   });
   const { watch, setValue } = reservationForm;
   const durationValue =
-    watch("duration") ?? reservationUnit.minReservationDuration ?? 0;
-  const focusDate = new Date(watch("date") ?? "");
+    watch("duration") ??
+    (reservationUnit.minReservationDuration
+      ? reservationUnit.minReservationDuration / 60
+      : 0);
+  const formDate = watch("date");
+  const formUIDate = fromUIDate(formDate ?? "");
+  const focusDate = new Date(formUIDate != null ? formUIDate : new Date());
+
   const timeValue = watch("time") ?? getTimeString();
   const submitReservation = (_data: PendingReservationFormType) => {
     if (focusSlot.start && focusSlot.end && reservationUnit.pk)
@@ -463,6 +490,19 @@ const ReservationUnit = ({
     };
     createReservation(input);
   };
+  const focusSlot: FocusTimeSlot = useMemo(() => {
+    const start = new Date(focusDate);
+    const [hours, minutes] = timeValue.split(":").map(Number);
+    start.setHours(hours, minutes, 0, 0);
+    const end = addMinutes(start, durationValue);
+    return {
+      start,
+      end,
+      isReservable: isSlotReservable(start, end),
+      durationMinutes: durationValue,
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [durationValue, isSlotReservable, timeValue]);
   const durationOptions = useMemo(() => {
     const {
       minReservationDuration,
@@ -539,20 +579,6 @@ const ReservationUnit = ({
       getSelectedOption(durationValue, durationOptions) ?? durationOptions[0],
     [durationValue, durationOptions]
   );
-
-  const focusSlot: FocusTimeSlot = useMemo(() => {
-    const start = focusDate;
-    const [hours, minutes] = timeValue.split(":").map(Number);
-    start.setHours(hours, minutes, 0, 0);
-    const end = addMinutes(start, durationValue);
-    return {
-      start,
-      end,
-      isReservable: isSlotReservable(start, end),
-      durationMinutes: durationValue,
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [durationValue, isSlotReservable, timeValue]);
 
   const { currentUser } = useCurrentUser();
 
@@ -704,7 +730,7 @@ const ReservationUnit = ({
       }
 
       setIsReserving(false); // why?
-      setValue("date", new Date(newReservation.begin).toISOString());
+      setValue("date", toUIDate(new Date(newReservation.begin)));
       setValue(
         "duration",
         differenceInMinutes(
@@ -785,8 +811,8 @@ const ReservationUnit = ({
         .flatMap((e) => e.event)
         .filter((n): n is NonNullable<typeof n> => n != null),
       {
-        begin: focusSlot?.start.toISOString(),
-        end: focusSlot?.end.toISOString(),
+        begin: toUIDate(focusSlot?.start),
+        end: toUIDate(focusSlot?.end),
         state: "INITIAL",
         bufferTimeBefore,
         bufferTimeAfter,
@@ -825,7 +851,7 @@ const ReservationUnit = ({
       });
       setIsReserving(false);
     },
-    [addReservation, reservationUnit.pk]
+    [addReservation]
   );
 
   // store reservation unit overall reservability to use in JSX and pass to some child elements
@@ -841,8 +867,8 @@ const ReservationUnit = ({
     if (reservationUnit.pk != null && focusSlot != null) {
       const { start, end } = focusSlot ?? {};
       setStoredReservation({
-        begin: start.toISOString(),
-        end: end.toISOString(),
+        begin: toUIDate(start),
+        end: toUIDate(end),
         price: undefined,
         reservationUnitPk: reservationUnit.pk ?? 0,
       });
