@@ -21,6 +21,12 @@ __all__ = [
 
 
 class GenericDjangoModelFactory(DjangoModelFactory, Generic[TModel]):
+    """
+    DjangoModelFactory that adds return type annotations for the
+    `build`, `create`, `build_batch`, and `create_batch` methods,
+    as well as some convenience methods for creating custom builder-methods.
+    """
+
     @classmethod
     def build(cls: type[Generic[TModel]], **kwargs: Any) -> TModel:
         return super().build(**kwargs)
@@ -51,6 +57,8 @@ class GenericDjangoModelFactory(DjangoModelFactory, Generic[TModel]):
 
 
 class GenericFactory(Factory, Generic[T]):
+    """Same as `GenericDjangoModelFactory`, but for regular factories."""
+
     @classmethod
     def build(cls: Generic[T], **kwargs: Any) -> T:
         return super().build(**kwargs)
@@ -70,9 +78,9 @@ class GenericFactory(Factory, Generic[T]):
 
 class NullableSubFactory(SubFactory, Generic[TModel]):
     """
-    A SubFactory where te default value can be None.
+    A SubFactory where the default value can be None.
     If arguments are passed, i.e. `model__argument=value`,
-    the default None setting will be ignored.
+    the `null` setting will be ignored.
     """
 
     def __init__(self, factory: str | Factory, *, null: bool = False, **kwargs: Any) -> None:
@@ -104,15 +112,25 @@ class ManyFactory(PostGeneration, Generic[TModel]):
         raise NotImplementedError
 
     def manager(self, instance: Model) -> Any:
-        # to-one fields:
-        # - django.db.models.fields.related_descriptors.create_reverse_many_to_one_manager -> RelatedManager
-        # to-many fields:
-        # - django.db.models.fields.related_descriptors.create_forward_many_to_many_manager -> ManyRelatedManager
+        """
+        Find the related manager for the instance based on the field name it was defined with on the factory.
+
+        Note that due to how Django handles related fields, the manager type is created dynamically at runtime.
+
+        For one-to-many fields:
+        - django.db.models.fields.related_descriptors.create_reverse_many_to_one_manager -> RelatedManager
+        For many-to-many fields:
+        - django.db.models.fields.related_descriptors.create_forward_many_to_many_manager -> ManyRelatedManager
+        """
         return getattr(instance, self.field_name)
 
 
 class ManyToManyFactory(ManyFactory[TModel]):
-    """Factory for many-to-many related fields."""
+    """
+    Factory for forward/reverse many-to-many related fields.
+    By default, either creates a single related object from extra kwargs passed to it
+    (i.e., `related__field=value`) or adds the given list of related models to the current instance.
+    """
 
     def generate(self, instance: Model, create: bool, models: Iterable[TModel] | None, **kwargs: Any) -> None:
         if not models and kwargs:
@@ -125,7 +143,11 @@ class ManyToManyFactory(ManyFactory[TModel]):
 
 
 class OneToManyFactory(ManyFactory[TModel]):
-    """Factory for one-to-many related fields."""
+    """
+    Factory for reverse one-to-many related fields.
+    By default, creates a single related object from extra kwargs passed to it
+    (i.e., `related__field=value`), linking the current instance to the related object.
+    """
 
     def generate(self, instance: Model, create: bool, models: Iterable[TModel] | None, **kwargs: Any) -> None:
         if not models and kwargs:
