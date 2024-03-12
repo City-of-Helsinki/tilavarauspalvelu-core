@@ -44,7 +44,8 @@
   "peerDependencies": {
     "@apollo/client": "^3.8.10",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "typescript-cookie": "^1.0.6"
   },
   "devDependencies": {
     "@apollo/client": "^3.8.10",
@@ -71,6 +72,7 @@
     "stylelint-config-standard": "^36.0.0",
     "stylelint-config-styled-components": "^0.1.1",
     "ts-jest": "^29.1.2",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "typescript-cookie": "^1.0.6"
   }
 }

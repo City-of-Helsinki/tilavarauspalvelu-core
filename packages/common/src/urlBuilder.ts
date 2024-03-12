@@ -45,5 +45,5 @@ export function getSignInUrl(
 /// @return url for logging out with redirect url to /logout
 export function getSignOutUrl(apiBaseUrl: string): string {
   const authUrl = buildAuthUrl(apiBaseUrl);
-  return `${authUrl}logout`;
+  return `${authUrl}logout/`;
 }

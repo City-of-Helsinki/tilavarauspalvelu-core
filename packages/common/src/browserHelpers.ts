@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { isBrowser } from "./helpers";
 import { getSignOutUrl, getSignInUrl } from "./urlBuilder";
+import { getCookie } from "typescript-cookie";
 
 // TODO add wrapper a that blocks importing on nodejs
 
@@ -31,5 +32,24 @@ export function signOut(apiBaseUrl: string) {
   if (!isBrowser) {
     throw new Error("signIn can only be called in the browser");
   }
-  window.location.href = getSignOutUrl(apiBaseUrl);
+  const logoutUrl = getSignOutUrl(apiBaseUrl);
+  const csrfToken = getCookie("csrftoken");
+  if (!csrfToken) {
+    throw new Error("csrf token not found");
+  }
+
+  // NOTE dynamically create a form and submit it so this function can be used anywhere
+  // can't use fetch because the logout goes through redirects after Django logout
+  const form = document.createElement("form");
+  form.method = "POST";
+  form.action = logoutUrl;
+  form.style.display = "none";
+  const csrfTokenInput = document.createElement("input");
+  csrfTokenInput.type = "hidden";
+  csrfTokenInput.name = "csrfmiddlewaretoken";
+  csrfTokenInput.value = csrfToken;
+  form.appendChild(csrfTokenInput);
+  document.body.appendChild(form);
+  form.submit();
+  document.body.removeChild(form);
 }

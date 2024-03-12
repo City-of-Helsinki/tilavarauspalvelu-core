@@ -545,6 +545,9 @@ importers:
       typescript:
         specifier: ^5.2.2
         version: 5.2.2
+      typescript-cookie:
+        specifier: ^1.0.6
+        version: 1.0.6
 
   packages/eslint-config-custom:
     devDependencies:
@@ -16820,7 +16823,6 @@ packages:
   /typescript-cookie@1.0.6:
     resolution: {integrity: sha512-s+BZr7/9BUG6Kg7jGGcOY/4XJcP+iZRFdF3q4FPTfRSP83ivLWF94OcH8PrzGmnS8Ab9qP7ENu/ikLwNFsIafA==}
     engines: {node: '>=14'}
-    dev: false
 
   /typescript@5.2.2:
     resolution: {integrity: sha512-mI4WrpHsbCIcwT9cF4FZvr80QUeKvsUsUvKDoR+X/7XHQH98xYD8YHZg7ANtz2GtZt/CBq2QJ0thkGJMHfqc1w==}
