@@ -168,11 +168,16 @@ class ReservationUnitType(QueryPerformanceOptimizerMixin, AuthNode, OldPrimaryKe
     class Meta:
         model = ReservationUnit
         fields = [
+            #
+            # IDs
             "pk",
             "uuid",
             "rank",
+            #
+            # Strings (translatable string from `get_all_translatable_fields` below)
             "contact_information",
             #
+            # Integers
             "surface_area",
             "min_persons",
             "max_persons",
@@ -180,6 +185,7 @@ class ReservationUnitType(QueryPerformanceOptimizerMixin, AuthNode, OldPrimaryKe
             "reservations_min_days_before",
             "reservations_max_days_before",
             #
+            # Datetime
             "reservation_begins",
             "reservation_ends",
             "publish_begins",
@@ -189,6 +195,7 @@ class ReservationUnitType(QueryPerformanceOptimizerMixin, AuthNode, OldPrimaryKe
             "buffer_time_before",
             "buffer_time_after",
             #
+            # Booleans
             "is_draft",
             "is_archived",
             "require_introduction",
@@ -197,12 +204,14 @@ class ReservationUnitType(QueryPerformanceOptimizerMixin, AuthNode, OldPrimaryKe
             "can_apply_free_of_charge",
             "allow_reservations_without_opening_hours",
             #
+            # Enums
             "authentication",
             "reservation_start_interval",
             "reservation_kind",
             "state",
             "reservation_state",
             #
+            # Forward many-to-one related
             "unit",
             "reservation_unit_type",
             "cancellation_rule",
@@ -215,6 +224,7 @@ class ReservationUnitType(QueryPerformanceOptimizerMixin, AuthNode, OldPrimaryKe
             "payment_merchant",
             "location",
             #
+            # Forward many-to-many related
             "spaces",
             "resources",
             "purposes",
@@ -223,13 +233,16 @@ class ReservationUnitType(QueryPerformanceOptimizerMixin, AuthNode, OldPrimaryKe
             "payment_types",
             "qualifiers",
             #
+            # Reverse many-to-many related
             "application_rounds",
             "pricings",
             "reservations",
-            "images",
             #
+            # Reverse one-to-many related
+            "images",
             "application_round_time_slots",
             #
+            # "Special" fields
             "hauki_url",
             "reservable_time_spans",
             "is_closed",
