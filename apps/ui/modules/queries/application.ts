@@ -1,12 +1,17 @@
 import { gql } from "@apollo/client";
 import { APPLICATION_ROUND_FRAGMENT } from "./applicationRound";
 import { APPLICANT_NAME_FRAGMENT } from "common/src/queries/application";
+import { ApplicationOrderingChoices } from "common/types/gql-types";
 
+// TODO this doesn't have pagination so the orderBy is for development purposes only
+// in production the order isn't specified and pagination is not needed
+// (there is never even close to 100 applications for single user)
+// but in development we need to be able to see the latest applications.
 export const APPLICATIONS = gql`
   ${APPLICATION_ROUND_FRAGMENT}
   ${APPLICANT_NAME_FRAGMENT}
   query Applications($user: Int!, $status: [ApplicationStatusChoice]!) {
-    applications(user: $user, status: $status) {
+    applications(user: $user, status: $status, orderBy:  ${ApplicationOrderingChoices.PkDesc}) {
       edges {
         node {
           pk

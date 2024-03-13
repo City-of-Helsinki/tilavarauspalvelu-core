@@ -10,8 +10,7 @@ import {
   type SuitableTimeRangeNode,
   Weekday,
   Priority,
-  type ApplicationSectionUpdateMutationInput,
-  type ApplicationSectionCreateMutationInput,
+  type UpdateApplicationSectionForApplicationSerializerInput,
 } from "common/types/gql-types";
 import { type Maybe } from "graphql/jsutils/Maybe";
 import { z } from "zod";
@@ -60,6 +59,7 @@ export type SuitableTimeRangeFormValues = z.infer<
   typeof SuitableTimeRangeFormTypeSchema
 >;
 
+// TODO this should be splitted into separate schemas for each page
 const ApplicationSectionFormValueSchema = z
   .object({
     pk: z.number().optional(),
@@ -78,7 +78,8 @@ const ApplicationSectionFormValueSchema = z
       .string()
       .optional()
       .refine((s) => s, { path: [""], message: "Required" }),
-    suitableTimeRanges: z.array(SuitableTimeRangeFormTypeSchema),
+    // optional because it's not present on the first page
+    suitableTimeRanges: z.array(SuitableTimeRangeFormTypeSchema).optional(),
     // TODO do we want to keep the pk of the options? so we can update them when the order changes and not recreate the whole list on save?
     reservationUnits: z.array(z.number()).min(1, { message: "Required" }),
     // extra page prop, not saved to backend
@@ -273,17 +274,16 @@ function transformSuitableTimeRange(timeRange: SuitableTimeRangeFormValues) {
     dayOfTheWeek: timeRange.dayOfTheWeek,
   };
 }
-// create and update mutation are somewhat different so bit logic to handle both
+
+// NOTE this works only for subsections of an application mutation
+// if needed without an application mutation needs to use a different SerializerInput
 function transformApplicationSection(
-  ae: ApplicationSectionFormValue,
-  application: number
-):
-  | ApplicationSectionUpdateMutationInput
-  | ApplicationSectionCreateMutationInput {
+  ae: ApplicationSectionFormValue
+): UpdateApplicationSectionForApplicationSerializerInput {
   const begin = transformDateString(ae.begin);
   const end = transformDateString(ae.end);
 
-  const commonData = {
+  const commonData: UpdateApplicationSectionForApplicationSerializerInput = {
     ...(begin != null ? { reservationsBeginDate: begin } : {}),
     ...(end != null ? { reservationsEndDate: end } : {}),
     name: ae.name,
@@ -293,31 +293,19 @@ function transformApplicationSection(
     reservationMinDuration: ae.minDuration ?? 0, // "3600" == 1h
     reservationMaxDuration: ae.maxDuration ?? 0, // "7200" == 2h
     appliedReservationsPerWeek: ae.appliedReservationsPerWeek,
-    suitableTimeRanges: ae.suitableTimeRanges.map(transformSuitableTimeRange),
+    suitableTimeRanges: ae.suitableTimeRanges?.map(transformSuitableTimeRange),
     reservationUnitOptions: ae.reservationUnits.map((ruo, ruoIndex) =>
       transformEventReservationUnit(ruo, ruoIndex)
     ),
   };
   if (ae.pk != null) {
-    const data: ApplicationSectionUpdateMutationInput = {
+    return {
       ...commonData,
       pk: ae.pk,
     };
-    return data;
   }
-  // TODO throw is bad (null return is preferable)
-  // this should be a validation error (it's incorrect date string)
-  if (begin == null || end == null) {
-    throw new Error("begin or end cannot be null");
-  }
-  const data: ApplicationSectionCreateMutationInput = {
-    ...commonData,
-    application,
-    reservationsBeginDate: begin,
-    reservationsEndDate: end,
-  };
 
-  return data;
+  return commonData;
 }
 
 // For pages 1 and 2
@@ -328,9 +316,7 @@ export const transformApplication = (
   return {
     pk: values.pk,
     applicantType: values.applicantType,
-    applicationSections: appEvents.map((ae) =>
-      transformApplicationSection(ae, values.pk)
-    ),
+    applicationSections: appEvents.map((ae) => transformApplicationSection(ae)),
   };
 };
 

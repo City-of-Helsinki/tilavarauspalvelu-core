@@ -251,14 +251,16 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
   const convertToSchedule = (
     b: (typeof applicationSections)[0]
   ): ApplicationEventScheduleFormType[] => {
-    return b.suitableTimeRanges.map((range) => {
-      return {
-        day: range ? convertWeekday(range.dayOfTheWeek) : 0,
-        begin: range?.beginTime ?? "",
-        end: range?.endTime ?? "",
-        priority: range?.priority === Priority.Primary ? 300 : 200,
-      };
-    });
+    return (
+      b.suitableTimeRanges?.map((range) => {
+        return {
+          day: range ? convertWeekday(range.dayOfTheWeek) : 0,
+          begin: range?.beginTime ?? "",
+          end: range?.endTime ?? "",
+          priority: range?.priority === Priority.Primary ? 300 : 200,
+        };
+      }) ?? []
+    );
   };
   const selectorData = applicationSections.map((ae) =>
     applicationEventSchedulesToCells(convertToSchedule(ae), openingHours)
