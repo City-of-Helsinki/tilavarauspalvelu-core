@@ -2417,7 +2417,7 @@ msgstr ""
 msgid "Change password"
 msgstr ""
 
-#: templates/admin/base.html
+#: templates/admin/base.html templates/admin/hel_login.html
 msgid "Log out"
 msgstr ""
 

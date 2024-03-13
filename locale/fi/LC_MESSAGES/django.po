@@ -45,7 +45,7 @@ msgstr "Hakemus"
 
 #: applications/admin/application.py
 msgid "Reset application allocations"
-msgstr "Resetoi hakemuksen allokoinnit"
+msgstr "Nollaa hakemuksen allokoinnit"
 
 #: applications/admin/application.py applications/admin/application_round.py
 msgid "Are you sure?"
@@ -53,7 +53,7 @@ msgstr "Oletko varma?"
 
 #: applications/admin/application.py applications/admin/application_round.py
 msgid "Are you sure you want reset allocations?"
-msgstr "Oletko varma, että haluat resetoida allokoinnit?"
+msgstr "Oletko varma, että haluat nollata allokoinnit?"
 
 #: applications/admin/application_round.py
 #: applications/admin/filters/allocated_time_slot.py
@@ -531,7 +531,7 @@ msgstr "Maksimikesto allokoitaville vuoroille."
 
 #: applications/admin/forms/application_section.py
 msgid "First date on which reservations for this section are created."
-msgstr "Ensimmäinen päivä jolle varaukset tehdään allokoitien perusteella."
+msgstr "Ensimmäinen päivä jolle varaukset tehdään allokointien perusteella."
 
 #: applications/admin/forms/application_section.py
 msgid "Last date on which reservations for this section are created."
@@ -555,7 +555,7 @@ msgstr "Sopivat viikonpäivät"
 
 #: applications/admin/forms/application_section.py
 msgid "Suitable days of the week for this section."
-msgstr "Hakemusen osalle sopivat viikonpäivät."
+msgstr "Hakemuksen osalle sopivat viikonpäivät."
 
 #: applications/admin/forms/city.py
 msgid "Municipality"
@@ -579,7 +579,7 @@ msgstr "Y-tunnus"
 
 #: applications/admin/forms/organization.py
 msgid "Year established"
-msgstr "Perustemisvuosi"
+msgstr "Perustamisvuosi"
 
 #: applications/admin/forms/organization.py
 msgid "Active members"
@@ -587,7 +587,7 @@ msgstr "Aktiivisia jäseniä"
 
 #: applications/admin/forms/organization.py
 msgid "Core business area"
-msgstr "Ydin liiketoiminta-alue"
+msgstr "Ydinliiketoiminta-alue"
 
 #: applications/admin/forms/organization.py
 msgid "Organisation type"
@@ -1003,7 +1003,7 @@ msgstr "Ilmoituksen taso."
 
 #: common/admin/forms/banner_notification.py
 msgid "Target user interface of the notification."
-msgstr "Ilmoituksen kohde käyttöliittymä."
+msgstr "Ilmoituksen kohdistettu käyttöliittymä."
 
 #: common/admin/forms/banner_notification.py
 msgid ""
@@ -1050,7 +1050,7 @@ msgstr "Käyttäjä"
 
 #: common/choices/banner_notification.py
 msgid "Scheduled"
-msgstr "Ajoitettu"
+msgstr "Ajastettu"
 
 #: common/choices/banner_notification.py
 msgid "Active"
@@ -1111,11 +1111,11 @@ msgstr ""
 
 #: merchants/admin.py
 msgid "Paytrail merchant ID"
-msgstr "Paytrail kauppiastunnus"
+msgstr "Paytrail-kauppiastunnus"
 
 #: merchants/admin.py
 msgid "The Paytrail Merchant ID should be a six-digit number."
-msgstr "Paytrail kauppiastunnuksen tulisi olla kuusinumeroinen."
+msgstr "Paytrail-kauppiastunnuksen tulisi olla kuusinumeroinen."
 
 #: merchants/admin.py
 msgid "Shop ID"
@@ -1211,7 +1211,7 @@ msgstr "Ulkoinen tilaustunniste"
 
 #: merchants/models.py
 msgid "eCommerce order ID"
-msgstr "eCommerce tilaustunniste"
+msgstr "eCommerce-tilaustunniste"
 
 #: merchants/models.py
 msgid "Payment ID"
@@ -1219,7 +1219,7 @@ msgstr "Maksutunniste"
 
 #: merchants/models.py
 msgid "eCommerce payment ID"
-msgstr "eCommerce maksutunniste"
+msgstr "eCommerce-maksutunniste"
 
 #: merchants/models.py
 msgid "Refund ID"
@@ -1272,7 +1272,7 @@ msgstr "Kassan URL"
 
 #: merchants/models.py
 msgid "Receipt URL"
-msgstr "Kuittauksen URL"
+msgstr "Kuitin URL"
 
 #: merchants/models.py
 msgid "Must be greater than 0.01"
@@ -1335,7 +1335,7 @@ msgstr ""
 
 #: opening_hours/admin.py
 msgid "ID of the resource in Hauki."
-msgstr "Resurssin tunniste Haukista."
+msgstr "Resurssin tunniste Aukiolosovelluksesta."
 
 #: opening_hours/admin.py
 msgid ""
@@ -1350,8 +1350,8 @@ msgid ""
 "All opening hours have been fetched from Hauki up until this date. Opening "
 "hours are fetched until the last day of the month two years from now."
 msgstr ""
-"Kaikki aukioloajat on haettu Haukista tähän päivämäärään asti. Aukioloajat "
-"haetaan kaksi vuotta eteenpäin."
+"Kaikki aukioloajat on haettu Aukiolosovelluksesta tähän päivämäärään asti. "
+"Aukioloajat haetaan kaksi vuotta eteenpäin."
 
 #: opening_hours/admin.py
 msgid "Reservable Time Spans updated."
@@ -1828,7 +1828,7 @@ msgstr "Tyyppi"
 
 #: reservation_units/models/reservation_unit.py
 msgid "Require introduction"
-msgstr "Vaatii perehdytys"
+msgstr "Vaatii perehdytyksen"
 
 #: reservation_units/models/reservation_unit.py
 msgid "Equipments"
@@ -2076,7 +2076,7 @@ msgstr "Veroprosentti"
 
 #: reservations/admin.py
 msgid "Required fields must be a subset of supported fields"
-msgstr "Vaaditut kentät täytyy olla tuettujen kenttien alijoukko"
+msgstr "Vaadittujen kenttien täytyy olla tuettujen kenttien alijoukko"
 
 #: reservations/choices.py
 msgid "Business"
@@ -2162,32 +2162,32 @@ msgstr "Laskuttajan etunimi"
 
 #: reservations/models/reservation.py
 msgid "Billing last name"
-msgstr "Lasuttajan sukunimi"
+msgstr "Laskuttajan sukunimi"
 
 #: reservations/models/reservation.py
 msgid "Billing phone"
-msgstr "Lasuttajan puhelinnumero"
+msgstr "Laskuttajan puhelinnumero"
 
 #: reservations/models/reservation.py
 msgid "Billing email"
-msgstr "Lasuttajan sähköposti"
+msgstr "Laskuttajan sähköposti"
 
 #: reservations/models/reservation.py
 msgid "Billing address street"
-msgstr "Lasuttajan katuosoite"
+msgstr "Laskuttajan katuosoite"
 
 #: reservations/models/reservation.py
 msgid "Billing address city"
-msgstr "Lasuttajan kaupunki"
+msgstr "Laskuttajan kaupunki"
 
 #: reservations/models/reservation.py
 msgid "Billing address zip code"
-msgstr "Lasuttajan postinumero"
+msgstr "Laskuttajan postinumero"
 
 #: reservations/models/reservation.py
 #: reservations/models/reservation_statistic.py
 msgid "Reservee is applying for a free-of-charge reservation"
-msgstr "Lasuttaja hakee alennuskelpoisuutta"
+msgstr "Varaaja hakee alennuskelpoisuutta"
 
 #: reservations/models/reservation.py
 msgid "Reason for applying for a free-of-charge reservation"
@@ -2269,7 +2269,7 @@ msgstr "Syy hylkäämiselle"
 
 #: reservations/models/reservation.py
 msgid "Handling details for this reservation"
-msgstr "Käsittelytiedot tälle varaukselle"
+msgstr "Käsittelymuistio tälle varaukselle"
 
 #: reservations/models/reservation.py
 msgid "Closed"
@@ -2281,11 +2281,11 @@ msgstr "Kentän nimi"
 
 #: reservations/models/reservation_metadata.py
 msgid "Reservation metadata field"
-msgstr "Varauslomakekenttä"
+msgstr "Varauslomakkeen kenttä"
 
 #: reservations/models/reservation_metadata.py
 msgid "Reservation metadata fields"
-msgstr "Varauslomakekentät"
+msgstr "Varauslomakkeen kentät"
 
 #: reservations/models/reservation_metadata.py
 msgid "Supported fields"
@@ -2297,7 +2297,7 @@ msgstr "Vaaditut kentät"
 
 #: reservations/models/reservation_metadata.py
 msgid "Reservation metadata sets"
-msgstr "Varauslomakekenttä setit"
+msgstr "Varauslomakkeen kenttäkokonaisuus"
 
 #: reservations/models/reservation_statistic.py
 msgid "Statistics updated at"
@@ -2333,7 +2333,7 @@ msgstr "Hylkäämisen syyteksti"
 
 #: reservations/models/reservation_statistic.py
 msgid "TPREK id"
-msgstr "TPREK id"
+msgstr "Toimipisterekisterin tunniste"
 
 #: resources/choices.py
 msgid "Fixed"
@@ -2361,31 +2361,31 @@ msgstr "Palvelun tyyppi"
 
 #: spaces/admin.py
 msgid "Selected units for this unit group."
-msgstr "Valitut yksiköt tälle yksikköryhmälle."
+msgstr "Valitut toimipisteet tälle toimipisteryhmälle."
 
 #: spaces/admin.py
 msgid "Previously selected number of units for this unit group."
-msgstr "Aiemmin valittu yksiköiden määrä tälle yksikköryhmälle."
+msgstr "Aiemmin valittu toimipisteiden määrä tälle toimipisteryhmälle."
 
 #: spaces/admin.py
 msgid "Name of the unit group in Finnish."
-msgstr "Yksikköryhmän nimi suomeksi."
+msgstr "Toimipisteryhmän nimi suomeksi."
 
 #: spaces/admin.py
 msgid "Name of the unit group in English."
-msgstr "Yksikköryhmän nimi englanniksi."
+msgstr "Toimipisteryhmän nimi englanniksi."
 
 #: spaces/admin.py
 msgid "Name of the unit group in Swedish."
-msgstr "Yksikköryhmän nimi ruotsiksi."
+msgstr "Toimipisteryhmän nimi ruotsiksi."
 
 #: spaces/admin.py
 msgid "Selected units for this service sector."
-msgstr "Valitut yksiköt tälle palvelualueelle."
+msgstr "Valitut toimipisteet tälle palvelualueelle."
 
 #: spaces/admin.py
 msgid "Previously selected number of units for this service sector."
-msgstr "Aiemmin valittu yksiköiden määrä tälle palvelualueelle."
+msgstr "Aiemmin valittu toimipisteiden määrä tälle palvelualueelle."
 
 #: spaces/admin.py
 msgid "Name of the service sector in Finnish."
@@ -2403,7 +2403,7 @@ msgstr "Palvelualueen nimi ruotsiksi."
 msgid "Change password"
 msgstr "Vaihda salasana"
 
-#: templates/admin/base.html
+#: templates/admin/base.html templates/admin/hel_login.html
 msgid "Log out"
 msgstr "Kirjaudu ulos"
 
