@@ -19,13 +19,37 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
+      # use daily till we are happy with the config and up to date with the deps
       interval: "daily"
     pull-request-branch-name:
       separator: "-"
+    ignore:
+      # turbo requires config changes
+      - dependency-name: "turbo"
+      # version 6 has new TS types that OOM during build
+      # also major bump that would break the app even if it did build
+      - dependency-name: "styled-components"
+        update-types: ["version-update:semver-major"]
+      # have to manually update HDS
+      - dependency-name: "hds-*"
+        update-types: ["version-update:semver-major"]
+    # NOTE can't do a single group for all it will fail to update
+    # either just accept multiple PRs or do fine grained groups manually
     groups:
-      npm-dependencies:
+      nextjs:
         patterns:
-          - "*"
+          - "next"
+          - "next-*"
+          - "@next/*"
+        exclude-patterns:
+          - "next-i18next"
+      i18n:
+        patterns:
+          - "i18next-*"
+      linter:
+        patterns:
+          - "eslint*"
+          - "prettier*"
 
   # Update Docker dependencies
   - package-ecosystem: "docker"
