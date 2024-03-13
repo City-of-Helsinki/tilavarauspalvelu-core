@@ -68,7 +68,7 @@ msgstr "Vie valitun kausivarauskierroksen hakemuksen osat CSV-tiedostoon"
 
 #: applications/admin/application_round.py
 msgid "Reset application round allocations"
-msgstr "Resetoi kausivarauskierroksen allokoinnit"
+msgstr "Nollaa kausivarauskierroksen allokoinnit"
 
 #: applications/admin/filters/allocated_time_slot.py
 #: applications/admin/filters/application.py
@@ -112,11 +112,11 @@ msgstr "Katuosoite"
 
 #: applications/admin/forms/address.py
 msgid "Post code"
-msgstr "Postikoodi"
+msgstr "Postinumero"
 
 #: applications/admin/forms/address.py
 msgid "City name"
-msgstr "Kaupungin nimi"
+msgstr "Postitoimipaikka"
 
 #: applications/admin/forms/allocated_time_slot.py
 msgid "Reservation unit option"
@@ -177,7 +177,7 @@ msgstr ""
 
 #: applications/admin/forms/application.py
 msgid "Applicant type"
-msgstr "hakijan tyyppi"
+msgstr "Hakijan tyyppi"
 
 #: applications/admin/forms/application.py
 msgid "Application round"
@@ -210,12 +210,12 @@ msgstr "Lisätiedot"
 
 #: applications/admin/forms/application.py reservations/models/reservation.py
 msgid "Working memo"
-msgstr "Muistio"
+msgstr "Käsittelymuistio"
 
 #: applications/admin/forms/application.py
 #: applications/admin/forms/application_round.py
 msgid "Sent date"
-msgstr "Lähetyspäivä"
+msgstr "Lähetyspäivä ja -aika"
 
 #: applications/admin/forms/application.py
 msgid "Cancelled date"
@@ -247,7 +247,7 @@ msgstr "Hakemuksen laskutusosoite"
 
 #: applications/admin/forms/application.py
 msgid "Home city for the application."
-msgstr "Hakemuksen kotikaupunki"
+msgstr "Hakemuksen kotipaikka"
 
 #: applications/admin/forms/application.py
 msgid "Additional information for the application."
@@ -360,7 +360,7 @@ msgstr "Julkisen näkyvyyden loppumispäivä ja -aika"
 
 #: applications/admin/forms/application_round.py
 msgid "Handled date"
-msgstr "Käsittelypäivä"
+msgstr "Käsittelyn valmistumispäivä ja -aika"
 
 #: applications/admin/forms/application_round.py permissions/models.py
 msgid "Service sector"
@@ -412,7 +412,7 @@ msgstr "Loppu päivämäärä ja -aika, johon asti hakemuksia voi lähettää."
 
 #: applications/admin/forms/application_round.py
 msgid "Start date of the period to which the reservations will be made."
-msgstr "Alkupäivämärä, josta eteenpäin varaukset tullaan tekemään."
+msgstr "Alkupäivämäärä, josta eteenpäin varaukset tullaan tekemään."
 
 #: applications/admin/forms/application_round.py
 msgid "End date of the period to which the reservations will be made."
@@ -437,7 +437,8 @@ msgstr "Päivämäärä, jolloin kausivarauskierros käsiteltiin loppuun."
 #: applications/admin/forms/application_round.py
 msgid "When the application round applications were sent to applicants."
 msgstr ""
-"Päivämäärä, jolloin kausivarauskierroksen hakemukset lähetettiin hakijoille."
+"Päivämäärä, jolloin kausivarauskierroksen hakemusten päätökset lähetettiin "
+"hakijoille."
 
 #: applications/admin/forms/application_round.py
 msgid "Service sector for the application round."
@@ -519,7 +520,7 @@ msgstr "Nimi joka kuvaa tätä hakeuksen osaa."
 #: applications/admin/forms/application_section.py
 msgid "Number of persons that are excepted to attend this section."
 msgstr ""
-"Kuinka monta henkilöä odotetaan osallistuvan hakemuksen osan varauksiin."
+"Kuinka monen henkilön odotetaan osallistuvan hakemuksen osan varauksiin."
 
 #: applications/admin/forms/application_section.py
 msgid "Minimum duration that should be allocated for this section."
@@ -539,7 +540,7 @@ msgstr "Viimeinen päivä jolle varaukset tehdään allokointien perusteella."
 
 #: applications/admin/forms/application_section.py
 msgid "How many reservation the applicant has applied for per week."
-msgstr "Kuinka monta toistokertaa hakia on toivonut per viikko."
+msgstr "Kuinka monta toistokertaa hakija on toivonut per viikko."
 
 #: applications/admin/forms/application_section.py
 msgid "Age group for this section."
@@ -563,11 +564,11 @@ msgstr "Kunta"
 
 #: applications/admin/forms/city.py
 msgid "Name of the city."
-msgstr "Kaupungin nimi"
+msgstr "Kunnan nimi"
 
 #: applications/admin/forms/city.py
 msgid "Municipality code for the city."
-msgstr "Kaupungin kuntakoodi"
+msgstr "Kuntanumero"
 
 #: applications/admin/forms/organization.py applications/admin/forms/person.py
 msgid "Email"
@@ -787,19 +788,19 @@ msgstr "Tulossa"
 
 #: applications/choices.py
 msgid "Open"
-msgstr "Auki"
+msgstr "Haku avoinna"
 
 #: applications/choices.py
 msgid "In Allocation"
-msgstr "Allokoinnissa"
+msgstr "Käsittelyssä"
 
 #: applications/choices.py
 msgid "Handled"
-msgstr "Allokoitu"
+msgstr "Käsitelty"
 
 #: applications/choices.py
 msgid "Results Sent"
-msgstr "Tulokset lähetetty"
+msgstr "Päätökset lähetetty"
 
 #: applications/choices.py common/choices/banner_notification.py
 #: merchants/models.py
@@ -820,7 +821,7 @@ msgstr "Peruttu"
 
 #: applications/choices.py
 msgid "Unallocated"
-msgstr "Allokoimaton"
+msgstr "Vastaanotettu"
 
 #: applications/choices.py
 msgid "Reserved"
@@ -828,7 +829,7 @@ msgstr "Varattu"
 
 #: applications/choices.py
 msgid "Failed"
-msgstr "Epäonnistunut"
+msgstr "Varaus epäonnistunut"
 
 #: applications/choices.py
 msgid "Internal"
@@ -1135,7 +1136,7 @@ msgstr "Sähköpostiosoite"
 
 #: merchants/admin.py
 msgid "URL"
-msgstr "URL"
+msgstr "Verkko-osoite"
 
 #: merchants/admin.py
 msgid "Terms of service URL"
@@ -1163,7 +1164,7 @@ msgstr "Arvo tulee tuotekokemusrajapinnasta"
 
 #: merchants/models.py reservation_units/models/reservation_unit.py
 msgid "Payment merchant"
-msgstr "Maksunvälittäjä"
+msgstr "Kauppias"
 
 #: merchants/models.py
 msgid "On site"
@@ -1223,11 +1224,11 @@ msgstr "eCommerce-maksutunniste"
 
 #: merchants/models.py
 msgid "Refund ID"
-msgstr "Palautustunniste"
+msgstr "Maksun palautuksen tunniste"
 
 #: merchants/models.py
 msgid "Available only when order has been refunded"
-msgstr "Saatavilla vain, kun tilaus on palautettu"
+msgstr "Saatavilla vain, kun maksu on palautettu"
 
 #: merchants/models.py
 msgid "Payment type"
@@ -1380,12 +1381,12 @@ msgstr "Itsepalvelu"
 #: opening_hours/enums.py
 msgctxt "HaukiResourceState"
 msgid "With key"
-msgstr "Avainkäyttö"
+msgstr "Avaimella"
 
 #: opening_hours/enums.py
 msgctxt "HaukiResourceState"
 msgid "With reservation"
-msgstr "Varauskäyttö"
+msgstr "Varauksella"
 
 #: opening_hours/enums.py
 msgctxt "HaukiResourceState"
@@ -1395,7 +1396,7 @@ msgstr "Auki ja varattavissa"
 #: opening_hours/enums.py
 msgctxt "HaukiResourceState"
 msgid "With key and reservation"
-msgstr "Avain- ja varauskäyttö"
+msgstr "Avaimella ja varauksella"
 
 #: opening_hours/enums.py
 msgctxt "HaukiResourceState"
@@ -1415,12 +1416,12 @@ msgstr "Sään salliessa"
 #: opening_hours/enums.py
 msgctxt "HaukiResourceState"
 msgid "Not in use"
-msgstr "Ei käytössä"
+msgstr "Ei vuoroa käytössä"
 
 #: opening_hours/enums.py
 msgctxt "HaukiResourceState"
 msgid "Maintenance"
-msgstr "Huolto"
+msgstr "Siivoustauko/huoltotauko"
 
 #: opening_hours/models.py
 msgid "`start_datetime` must be before `end_datetime`."
@@ -1750,7 +1751,7 @@ msgstr "per viikko"
 
 #: reservation_units/enums.py
 msgid "fixed"
-msgstr "kiinteä"
+msgstr "per kerta"
 
 #: reservation_units/enums.py
 msgid "past"
@@ -1856,7 +1857,7 @@ msgstr "Hinnoitteluehdot"
 
 #: reservation_units/models/reservation_unit.py
 msgid "Additional instructions for pending reservation"
-msgstr "Lisätietoja keskeneräiselle varaukselle"
+msgstr "Lisätietoja käsittelyn vaativalle varaukselle"
 
 #: reservation_units/models/reservation_unit.py
 msgid "Additional instructions for confirmed reservation"
@@ -2015,7 +2016,7 @@ msgstr "Maksutuote"
 
 #: reservation_units/models/reservation_unit.py
 msgid "Payment accounting"
-msgstr "Maksukirjanpito"
+msgstr "Kirjanpidon tiliöintitieto"
 
 #: reservation_units/models/reservation_unit_cancellation_rule.py
 msgid "Name for the rule"
@@ -2059,7 +2060,7 @@ msgstr "Hinnoittelutyyppi"
 
 #: reservation_units/models/reservation_unit_pricing.py
 msgid "Price unit"
-msgstr "Hintayksikkö"
+msgstr "Hinnan yksikkö"
 
 #: reservation_units/models/reservation_unit_pricing.py
 msgid "Lowest price"
@@ -2067,7 +2068,7 @@ msgstr "Alin hinta"
 
 #: reservation_units/models/reservation_unit_pricing.py
 msgid "Highest price"
-msgstr "Korkein hinta"
+msgstr "Ylin hinta"
 
 #: reservation_units/models/reservation_unit_pricing.py
 #: reservation_units/models/tax_percentage.py
@@ -2158,31 +2159,31 @@ msgstr "Varaajan kieli"
 
 #: reservations/models/reservation.py
 msgid "Billing first name"
-msgstr "Laskuttajan etunimi"
+msgstr "Varauksen maksajan etunimi"
 
 #: reservations/models/reservation.py
 msgid "Billing last name"
-msgstr "Laskuttajan sukunimi"
+msgstr "Varauksen maksajan sukunimi"
 
 #: reservations/models/reservation.py
 msgid "Billing phone"
-msgstr "Laskuttajan puhelinnumero"
+msgstr "Varauksen maksajan puhelinnumero"
 
 #: reservations/models/reservation.py
 msgid "Billing email"
-msgstr "Laskuttajan sähköposti"
+msgstr "Varauksen maksajan sähköposti"
 
 #: reservations/models/reservation.py
 msgid "Billing address street"
-msgstr "Laskuttajan katuosoite"
+msgstr "Varauksen maksajan katuosoite"
 
 #: reservations/models/reservation.py
 msgid "Billing address city"
-msgstr "Laskuttajan kaupunki"
+msgstr "Varauksen maksajan postitoimipaikka"
 
 #: reservations/models/reservation.py
 msgid "Billing address zip code"
-msgstr "Laskuttajan postinumero"
+msgstr "Varauksen maksajan postinumero"
 
 #: reservations/models/reservation.py
 #: reservations/models/reservation_statistic.py
@@ -2305,11 +2306,11 @@ msgstr "Tilastot päivitetty"
 
 #: reservations/models/reservation_statistic.py
 msgid "Home city name"
-msgstr "Kotikaupungin nimi"
+msgstr "Kotikunnan nimi"
 
 #: reservations/models/reservation_statistic.py
 msgid "Home city municipality code"
-msgstr "Kotikaupungin kunnan koodi"
+msgstr "Kotikunnan kuntanumero"
 
 #: reservations/models/reservation_statistic.py
 msgid "Is the reservation done through application process."
@@ -2325,11 +2326,11 @@ msgstr "Varauksen kesto minuutteina"
 
 #: reservations/models/reservation_statistic.py
 msgid "The reason text of the cancel reason"
-msgstr "Perumisen syyteksti"
+msgstr "Perumisen syyn kuvaus"
 
 #: reservations/models/reservation_statistic.py
 msgid "The reason text of the deny reason"
-msgstr "Hylkäämisen syyteksti"
+msgstr "Hylkäämisen syyn kuvaus"
 
 #: reservations/models/reservation_statistic.py
 msgid "TPREK id"
