@@ -1337,13 +1337,13 @@ translation = ["django-modeltranslation (>=0.18.11)"]
 
 [[package]]
 name = "graphene-django-query-optimizer"
-version = "0.3.0"
+version = "0.3.1"
 description = "Automatically optimize SQL queries in Graphene-Django schemas."
 optional = false
 python-versions = ">=3.9,<4"
 files = [
-    {file = "graphene_django_query_optimizer-0.3.0-py3-none-any.whl", hash = "sha256:4625f54399fe170ce775d33ec4de9e86f01248b05010ec7c01b55af5b40b64cd"},
-    {file = "graphene_django_query_optimizer-0.3.0.tar.gz", hash = "sha256:d026865e22f80bd9ad07098850505e4b9ea2e7397b9945e74649751c119d21bb"},
+    {file = "graphene_django_query_optimizer-0.3.1-py3-none-any.whl", hash = "sha256:1cf3f98077c9fde277dec6eaf2774a49a091a443e2ccb0d695f3c8ecc4555b5a"},
+    {file = "graphene_django_query_optimizer-0.3.1.tar.gz", hash = "sha256:5013b356d4442458939690ca2e951ff251a058ee44b8e966ff20dde4f2c377c3"},
 ]
 
 [package.dependencies]
