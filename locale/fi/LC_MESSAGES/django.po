@@ -288,7 +288,7 @@ msgid "Reservation units that can be applied for in this application round."
 msgstr "Varausyksiköt, joihin kausivarauskierroksella voi hakea"
 
 #: applications/admin/forms/application_round.py
-#: reservation_units/models/reservation_unit.py
+#: reservation_units/admin/forms/reservation_unit.py
 msgid "Purposes"
 msgstr "Käyttötarkoitukset"
 
@@ -308,8 +308,8 @@ msgstr "Kausivarauskierroksen sopimusehdot."
 #: applications/admin/forms/application_round.py
 #: applications/admin/forms/application_section.py
 #: applications/admin/forms/city.py applications/admin/forms/organization.py
+#: reservation_units/admin/forms/reservation_unit.py
 #: reservation_units/models/equipment.py reservation_units/models/keyword.py
-#: reservation_units/models/reservation_unit.py
 #: reservation_units/models/reservation_unit_type.py
 #: reservations/models/reservation.py
 #: reservations/models/reservation_metadata.py
@@ -319,14 +319,17 @@ msgid "Name"
 msgstr "Nimi"
 
 #: applications/admin/forms/application_round.py
+#: reservation_units/admin/forms/reservation_unit.py
 msgid "Name (Finnish)"
 msgstr "Nimi (suomeksi)"
 
 #: applications/admin/forms/application_round.py
+#: reservation_units/admin/forms/reservation_unit.py
 msgid "Name (English)"
 msgstr "Nimi (englanniksi)"
 
 #: applications/admin/forms/application_round.py
+#: reservation_units/admin/forms/reservation_unit.py
 msgid "Name (Swedish)"
 msgstr "Nimi (ruotsiksi)"
 
@@ -1162,7 +1165,7 @@ msgstr "Tuotteen nimi"
 msgid "Value comes from the Product Experience API"
 msgstr "Arvo tulee tuotekokemusrajapinnasta"
 
-#: merchants/models.py reservation_units/models/reservation_unit.py
+#: merchants/models.py reservation_units/admin/forms/reservation_unit.py
 msgid "Payment merchant"
 msgstr "Kauppias"
 
@@ -1669,21 +1672,482 @@ msgstr "Oikeus"
 msgid "Unit group"
 msgstr "Yksikköryhmä"
 
-#: permissions/models.py reservation_units/models/reservation_unit.py
+#: permissions/models.py reservation_units/admin/forms/reservation_unit.py
 msgid "Unit"
 msgstr "Yksikkö"
 
-#: reservation_units/admin/forms/reservation_unit.py
+#: reservation_units/admin/forms/application_round_time_slot.py
 msgid "Which weekday this timeslot concerns."
 msgstr "Mitä viikonpäivää tämä aikaikkuna koskee"
 
-#: reservation_units/admin/forms/reservation_unit.py
+#: reservation_units/admin/forms/application_round_time_slot.py
 msgid "Timeslots when the reservation unit is reservable"
 msgstr "Aikaikkunat, jolloin varausyksikkö on varattavissa"
 
-#: reservation_units/admin/forms/reservation_unit.py
+#: reservation_units/admin/forms/application_round_time_slot.py
 msgid "Is the reservation unit closed on this weekday?"
 msgstr "Onko varausyksikkö suljettu tänä viikonpäivänä?"
+
+#: reservation_units/admin/forms/reservation_unit.py terms_of_use/models.py
+msgid "Pricing terms"
+msgstr "Hinnoitteluehdot"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Pricing terms for the reservation unit."
+msgstr "Varausyksikön hinnoitteluehdot."
+
+#: reservation_units/admin/forms/reservation_unit.py terms_of_use/models.py
+msgid "Payment terms"
+msgstr "Maksuehdot"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Payment terms for the reservation unit."
+msgstr "Varausyksikön maksuehdot."
+
+#: reservation_units/admin/forms/reservation_unit.py terms_of_use/models.py
+msgid "Cancellation terms"
+msgstr "Peruutusehdot"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Cancellation terms for the reservation unit."
+msgstr "Varausyksikön peruutusehdot."
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Service specific terms"
+msgstr "Palvelualuekohtaiset ehdot"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Service specific terms for the reservation unit."
+msgstr "Varausyksikön palvelualuekohtaiset ehdot."
+
+#: reservation_units/admin/forms/reservation_unit.py
+#: reservations/models/reservation.py
+msgid "SKU"
+msgstr "SKU"
+
+#: reservation_units/admin/forms/reservation_unit.py
+#: reservations/models/reservation.py
+msgid "Description"
+msgstr "Kuvaus"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Description (Finnish)"
+msgstr "Kuvaus (Suomeksi)"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Description (English)"
+msgstr "Kuvaus (Englanniksi)"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Description (Swedish)"
+msgstr "Kuvaus (Ruotsiksi)"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Spaces"
+msgstr "Tilat"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Keyword groups"
+msgstr "Avainsanan ryhmät"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Resources"
+msgstr "Resurssit"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Services"
+msgstr "Palvelut"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Qualifiers"
+msgstr "Tarkenteet"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Reservation unit type"
+msgstr "Varausyksikön tyyppi"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Require introduction"
+msgstr "Vaatii perehdytyksen"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Equipments"
+msgstr "Varusteet"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Terms of use"
+msgstr "Käyttöehdot"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Terms of use (Finnish)"
+msgstr "Käyttöehdot (Suomeksi)"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Terms of use (English)"
+msgstr "Käyttöehdot (Englanniksi)"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Terms of use (Swedish)"
+msgstr "Käyttöehdot (Ruotsiksi)"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Reservation pending instructions"
+msgstr "Käsittelyn vaativan varauksen lisätiedot"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Reservation pending instructions (Finnish)"
+msgstr "Käsittelyn vaativan varauksen lisätiedot (Suomeksi)"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Reservation pending instructions (English)"
+msgstr "Käsittelyn vaativan varauksen lisätiedot (Englanniksi)"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Reservation pending instructions (Swedish)"
+msgstr "Käsittelyn vaativan varauksen lisätiedot (Ruotsiksi)"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Reservation confirmed instructions"
+msgstr "Vahvistetun varauksen lisätiedot"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Reservation confirmed instructions (Finnish)"
+msgstr "Vahvistetun varauksen lisätiedot (Suomeksi)"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Reservation confirmed instructions (English)"
+msgstr "Vahvistetun varauksen lisätiedot (Englanniksi)"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Reservation confirmed instructions (Swedish)"
+msgstr "Vahvistetun varauksen lisätiedot (Ruotsiksi)"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Reservation cancelled instructions"
+msgstr "Peruuutuneen varauksen lisätiedot"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Reservation cancelled instructions (Finnish)"
+msgstr "Peruuutuneen varauksen lisätiedot (Suomeksi)"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Reservation cancelled instructions (English)"
+msgstr "Peruuutuneen varauksen lisätiedot (Englanniksi)"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Reservation cancelled instructions (Swedish)"
+msgstr "Peruuutuneen varauksen lisätiedot (Ruotsiksi)"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Contact information"
+msgstr "Yhteystiedot"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Max reservation duration"
+msgstr "Varauksen maksimikesto"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Min reservation duration"
+msgstr "Varauksen minimikesto"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Is draft"
+msgstr "Luonnos"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Max persons"
+msgstr "Henkilöiden enimmäismäärä"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Min persons"
+msgstr "Henkilöiden vähimmäismäärä"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Surface area"
+msgstr "Pinta-ala"
+
+#: reservation_units/admin/forms/reservation_unit.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py resources/models.py
+#: services/models.py
+msgid "Buffer time before"
+msgstr "Tauko ennen varausta"
+
+#: reservation_units/admin/forms/reservation_unit.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py resources/models.py
+#: services/models.py
+msgid "Buffer time after"
+msgstr "Tauko varauksen jälkeen"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Origin hauki resource"
+msgstr "Aukiolosovelluksen resurssi"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Cancellation rule"
+msgstr "Peruutusehdot"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Reservation start interval"
+msgstr "Varauksen aloitusväli"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Reservations max days before"
+msgstr "Enin määrä päiviä ennen varauksen alkua"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Reservations min days before"
+msgstr "Vähin määrä päiviä ennen varauksen alkua"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Reservation begins"
+msgstr "Varausten alkamispäivä"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Reservation ends"
+msgstr "Varausten loppumispäivä"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Publish begins"
+msgstr "Julkaisu alkaa"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Publish ends"
+msgstr "Julkaisu päättyy"
+
+#: reservation_units/admin/forms/reservation_unit.py
+#: reservations/models/reservation_metadata.py
+msgid "Reservation metadata set"
+msgstr "Varausmetadatasetti"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Max reservations per user"
+msgstr "Maksimi varauksia per käyttäjä"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Does the reservations of this require a handling"
+msgstr "Vaativatko tämän varausyksikön varaukset käsittelyn"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Authentication"
+msgstr "Tunnistautumisen taso"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Reservation kind"
+msgstr "Varauksen tyyppi"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Payment types"
+msgstr "Maksutyyppi"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Reservation block whole day"
+msgstr "Varaukset sulkevat koko päivän"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Can apply free of charge"
+msgstr "Alennuskelpoinen"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Allow reservations without opening hours"
+msgstr "Salli varaukset ilman aukioloaikoja"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Is archived"
+msgstr "Arkistoitu"
+
+#: reservation_units/admin/forms/reservation_unit.py
+#: reservation_units/models/equipment.py reservation_units/models/purpose.py
+#: reservation_units/models/reservation_unit_type.py
+msgid "Order number"
+msgstr "Järjestysnumero"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Payment accounting"
+msgstr "Kirjanpidon tiliöintitieto"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "UUID"
+msgstr "UUID"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Payment product"
+msgstr "Maksutuote"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Keyword gruops"
+msgstr "Avainsanan ryhmä"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Additional instructions for pending reservation"
+msgstr "Lisätietoja käsittelyn vaativalle varaukselle"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Additional instructions for pending reservation (Finnish)"
+msgstr "Lisätietoja käsittelyn vaativalle varaukselle (Suomeksi)"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Additional instructions for pending reservation (English)"
+msgstr "Lisätietoja käsittelyn vaativalle varaukselle (Englanniksi)"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Additional instructions for pending reservation (Swedish)"
+msgstr "Lisätietoja käsittelyn vaativalle varaukselle (Ruotsiksi)"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Additional instructions for confirmed reservation"
+msgstr "Lisätietoja vahvistetulle varaukselle"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Additional instructions for confirmed reservation (Finnish)"
+msgstr "Lisätietoja vahvistetulle varaukselle (Suomeksi)"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Additional instructions for confirmed reservation (English)"
+msgstr "Lisätietoja vahvistetulle varaukselle (Englanniksi)"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Additional instructions for confirmed reservation (Swedish)"
+msgstr "Lisätietoja vahvistetulle varaukselle (Ruotsiksi)"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Additional instructions for cancelled reservation"
+msgstr "Lisätietoja peruutetuille varaukselle"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Additional instructions for cancelled reservations (Finnish)"
+msgstr "Lisätietoja peruutetuille varaukselle (Suomeksi)"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Additional instructions for cancelled reservations (English)"
+msgstr "Lisätietoja peruutetuille varaukselle (Englanniksi)"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Additional instructions for cancelled reservations (Swedish)"
+msgstr "Lisätietoja peruutetuille varaukselle (Ruotsiksi)"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Is this in draft state"
+msgstr "Onko tämä varausyksikkö luonnos-tilassa"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Maximum number of persons"
+msgstr "Henkilöiden maksimimäärä"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Minimum number of persons"
+msgstr "Henkilöiden minimimäärä"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Buffer time before reservation"
+msgstr "Tauko ennen varausta"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Buffer time after reservation"
+msgstr "Tauko varauksen jälkeen"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid ""
+"Determines the interval for the start time of the reservation. For example "
+"an interval of 15 minutes means a reservation can begin at minutes 15, 30, "
+"60, or 90."
+msgstr ""
+"Määrittää aloitusintervallint alkavalle varaukselle. Jos intervalli on esim. "
+"15 minuuttia, varaus voi alkaa minuuteilla 15, 30, 60 tai 90."
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Minimum days before reservations can be made"
+msgstr "Minimi määrä päiviä ennen kuin varauksia voidaan tehdä"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Maximum number of days before reservations can be made"
+msgstr "Maksimi määrä päiviä ennen kuin varauksia voidaan tehdä"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid ""
+"Time when making reservations become possible for this reservation unit."
+msgstr ""
+"Aika, jolloin varauksien tekeminen tulee mahdolliseksi tälle varausyksikölle."
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid ""
+"Time when making reservations become not possible for this reservation unit"
+msgstr ""
+"Aika, jolloin varauksien tekeminen ei ole enää mahdollista tälle "
+"varausyksikölle"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Time after this reservation unit should be publicly visible in UI."
+msgstr ""
+"Aika, jonka jälkeen tämä varausyksikkö tulee julkisesti näkyville "
+"käyttöliittymässä."
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Time after this reservation unit should not be publicly visible in UI."
+msgstr ""
+"Aika, jonka jälkeen tämä varausyksikkö ei enää ole julkisesti näkyvillä "
+"käyttöliittymässä."
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid ""
+"Reservation metadata set that defines the set of supported and required form "
+"fields for this reservation unit."
+msgstr ""
+"Varausmetadatasetti, joka määrittelee tuetut ja vaaditut lomakkeen kentät "
+"tälle varausyksikölle."
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Maximum number of active reservations per user"
+msgstr "Maksimi määrä aktiivisia varauksia per käyttäjä"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid ""
+"Does reservations of this reservation unit need to be handled before they're "
+"confirmed."
+msgstr ""
+"Vaativatko tämän varausyksikön varaukset käsittelyn ennen kuin ne voidaan "
+"vahvistaa."
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Authentication required for reserving this reservation unit."
+msgstr "Tunnistautumisen taso joka vaaditaan tämän varausyksikön varaamiseen."
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "What kind of reservations are to be booked with this reservation unit."
+msgstr "Minkä tyyppisiä varauksia voidaan tehdä tämän varausyksikön kautta."
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid ""
+"Can reservations to this reservation unit be able to apply free of charge."
+msgstr "Voivatko tämän varausyksikön varaukset olla alennuskelpoisia."
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid ""
+"Is it possible to reserve this reservation unit when opening hours are not "
+"defined."
+msgstr ""
+"Onko tämä varausyksikkö varattavissa, kun aukioloaikoja ei ole saatavilla."
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Is reservation unit archived."
+msgstr "Onko varausyksikkö arkistoitu."
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Order number to be use in api sorting."
+msgstr "Järjestysnumero, jota käytetään rajapinnan järjestämisessä."
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Merchant used for payments"
+msgstr "Kauppias, jota käytetään maksuihin"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Payment accounting information"
+msgstr "Maksujen kirjanpidon tiliöintitiedot"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Product used for payments"
+msgstr "Tuote, jota käytetään maksuihin"
 
 #: reservation_units/enums.py
 msgid "15 minutes"
@@ -1765,11 +2229,13 @@ msgstr "aktiivinen"
 msgid "future"
 msgstr "tuleva"
 
-#: reservation_units/models/equipment.py reservation_units/models/purpose.py
-#: reservation_units/models/reservation_unit.py
-#: reservation_units/models/reservation_unit_type.py
-msgid "Order number"
-msgstr "Järjestysnumero"
+#: reservation_units/enums.py
+msgid "Weak"
+msgstr "Heikko"
+
+#: reservation_units/enums.py
+msgid "Strong"
+msgstr "Vahva"
 
 #: reservation_units/models/equipment.py reservation_units/models/purpose.py
 #: reservation_units/models/reservation_unit_type.py
@@ -1793,230 +2259,12 @@ msgid "Keyword group"
 msgstr "Avainsanan ryhmä"
 
 #: reservation_units/models/reservation_unit.py
-#: reservations/models/reservation.py
-msgid "SKU"
-msgstr "SKU"
+msgid "Reservation Unit"
+msgstr "Varausyksikkö"
 
 #: reservation_units/models/reservation_unit.py
-#: reservations/models/reservation.py
-msgid "Description"
-msgstr "Kuvaus"
-
-#: reservation_units/models/reservation_unit.py
-msgid "Spaces"
-msgstr "Tilat"
-
-#: reservation_units/models/reservation_unit.py
-msgid "Keyword groups"
-msgstr "Avainsanaryhmät"
-
-#: reservation_units/models/reservation_unit.py
-msgid "Resources"
-msgstr "Resurssit"
-
-#: reservation_units/models/reservation_unit.py
-msgid "Services"
-msgstr "Palvelut"
-
-#: reservation_units/models/reservation_unit.py
-msgid "Qualifiers"
-msgstr "Tarkenteet"
-
-#: reservation_units/models/reservation_unit.py
-#: reservation_units/models/reservation_unit_image.py
-msgid "Type"
-msgstr "Tyyppi"
-
-#: reservation_units/models/reservation_unit.py
-msgid "Require introduction"
-msgstr "Vaatii perehdytyksen"
-
-#: reservation_units/models/reservation_unit.py
-msgid "Equipments"
-msgstr "Varusteet"
-
-#: reservation_units/models/reservation_unit.py
-msgid "Terms of use"
-msgstr "Käyttöehdot"
-
-#: reservation_units/models/reservation_unit.py terms_of_use/models.py
-msgid "Payment terms"
-msgstr "Maksuehdot"
-
-#: reservation_units/models/reservation_unit.py terms_of_use/models.py
-msgid "Cancellation terms"
-msgstr "Peruutusehdot"
-
-#: reservation_units/models/reservation_unit.py terms_of_use/models.py
-msgid "Service-specific terms"
-msgstr "Palvelualuekohtaiset ehdot"
-
-#: reservation_units/models/reservation_unit.py terms_of_use/models.py
-msgid "Pricing terms"
-msgstr "Hinnoitteluehdot"
-
-#: reservation_units/models/reservation_unit.py
-msgid "Additional instructions for pending reservation"
-msgstr "Lisätietoja käsittelyn vaativalle varaukselle"
-
-#: reservation_units/models/reservation_unit.py
-msgid "Additional instructions for confirmed reservation"
-msgstr "Lisätietoja vahvistetulle varaukselle"
-
-#: reservation_units/models/reservation_unit.py
-msgid "Additional instructions for cancelled reservations"
-msgstr "Lisätietoja perutuille varauksille"
-
-#: reservation_units/models/reservation_unit.py
-msgid "Contact information"
-msgstr "Yhteystiedot"
-
-#: reservation_units/models/reservation_unit.py
-msgid "Maximum reservation duration"
-msgstr "Varauksen maksimikesto"
-
-#: reservation_units/models/reservation_unit.py
-msgid "Minimum reservation duration"
-msgstr "Varauksen minimikesto"
-
-#: reservation_units/models/reservation_unit.py
-msgid "Is this in draft state"
-msgstr "Onko tämä luonnos-tilassa"
-
-#: reservation_units/models/reservation_unit.py
-msgid "Maximum number of persons"
-msgstr "Henkilöiden maksimimäärä"
-
-#: reservation_units/models/reservation_unit.py
-msgid "Minimum number of persons"
-msgstr "Henkilöiden minimimäärä"
-
-#: reservation_units/models/reservation_unit.py
-msgid "Surface area"
-msgstr "Pinta-ala"
-
-#: reservation_units/models/reservation_unit.py
-msgid "Buffer time before reservation"
-msgstr "Tauko ennen varausta"
-
-#: reservation_units/models/reservation_unit.py
-msgid "Buffer time after reservation"
-msgstr "Tauko varauksen jälkeen"
-
-#: reservation_units/models/reservation_unit.py
-msgid "Reservation start interval"
-msgstr "Varauksen aloitusväli"
-
-#: reservation_units/models/reservation_unit.py
-msgid "Minimum days before reservations can be made"
-msgstr "Minimi määrä päiviä ennen kuin varauksia voidaan tehdä"
-
-#: reservation_units/models/reservation_unit.py
-msgid "Maximum number of days before reservations can be made"
-msgstr "Maksimi määrä päiviä ennen kuin varauksia voidaan tehdä"
-
-#: reservation_units/models/reservation_unit.py
-msgid ""
-"Time when making reservations become possible for this reservation unit."
-msgstr ""
-"Aika, jolloin varauksien tekeminen tulee mahdolliseksi tälle varausyksikölle."
-
-#: reservation_units/models/reservation_unit.py
-msgid ""
-"Time when making reservations become not possible for this reservation unit"
-msgstr ""
-"Aika, jolloin varauksien tekeminen ei ole enää mahdollista tälle "
-"varausyksikölle"
-
-#: reservation_units/models/reservation_unit.py
-msgid "Time after this reservation unit should be publicly visible in UI."
-msgstr ""
-"Aika, jonka jälkeen tämä varausyksikkö tulee julkisesti näkyville "
-"käyttöliittymässä."
-
-#: reservation_units/models/reservation_unit.py
-msgid "Time after this reservation unit should not be publicly visible in UI."
-msgstr ""
-"Aika, jonka jälkeen tämä varausyksikkö ei enää ole julkisesti näkyvillä "
-"käyttöliittymässä."
-
-#: reservation_units/models/reservation_unit.py
-#: reservations/models/reservation_metadata.py
-msgid "Reservation metadata set"
-msgstr "Varausmetadatasetti"
-
-#: reservation_units/models/reservation_unit.py
-msgid ""
-"Reservation metadata set that defines the set of supported and required form "
-"fields for this reservation unit."
-msgstr ""
-"Varausmetadatasetti, joka määrittelee tuetut ja vaaditut lomakkeen kentät "
-"tälle varausyksikölle."
-
-#: reservation_units/models/reservation_unit.py
-msgid "Maximum number of active reservations per user"
-msgstr "Maksimi määrä aktiivisia varauksia per käyttäjä"
-
-#: reservation_units/models/reservation_unit.py
-msgid "Does the reservations of this require a handling"
-msgstr "Vaativatko tämän varausyksikön varaukset käsittelyn"
-
-#: reservation_units/models/reservation_unit.py
-msgid ""
-"Does reservations of this reservation unit need to be handled before they're "
-"confirmed."
-msgstr ""
-"Vaativatko tämän varausyksikön varaukset käsittelyn ennen kuin ne voidaan "
-"vahvistaa."
-
-#: reservation_units/models/reservation_unit.py
-msgid "Weak"
-msgstr "Heikko"
-
-#: reservation_units/models/reservation_unit.py
-msgid "Strong"
-msgstr "Vahva"
-
-#: reservation_units/models/reservation_unit.py
-msgid "Authentication"
-msgstr "Tunnistautumisen taso"
-
-#: reservation_units/models/reservation_unit.py
-msgid "Authentication required for reserving this reservation unit."
-msgstr "Tunnistautumisen taso joka vaaditaan tämän varausyksikön varaamiseen."
-
-#: reservation_units/models/reservation_unit.py
-msgid "Order number to be use in api sorting."
-msgstr "Järjestysnumero, jota käytetään rajapinnan järjestämisessä."
-
-#: reservation_units/models/reservation_unit.py
-msgid "Reservation kind "
-msgstr "Varauksen tyyppi"
-
-#: reservation_units/models/reservation_unit.py
-msgid "Can apply free of charge"
-msgstr "Alennuskelpoinen"
-
-#: reservation_units/models/reservation_unit.py
-msgid ""
-"Can reservations to this reservation unit be able to apply free of charge."
-msgstr "Voivatko tämän varausyksikön varaukset olla alennuskelpoisia."
-
-#: reservation_units/models/reservation_unit.py
-msgid "Allow reservations without opening hours"
-msgstr "Salli varaukset ilman aukioloaikoja"
-
-#: reservation_units/models/reservation_unit.py
-msgid "Is reservation unit archived"
-msgstr "Onko varausyksikkö arkistoitu"
-
-#: reservation_units/models/reservation_unit.py
-msgid "Payment product"
-msgstr "Maksutuote"
-
-#: reservation_units/models/reservation_unit.py
-msgid "Payment accounting"
-msgstr "Kirjanpidon tiliöintitieto"
+msgid "Reservation Units"
+msgstr "Varausyksiköt"
 
 #: reservation_units/models/reservation_unit_cancellation_rule.py
 msgid "Name for the rule"
@@ -2045,6 +2293,10 @@ msgstr "Kartta"
 #: reservation_units/models/reservation_unit_image.py
 msgid "Other"
 msgstr "Muu"
+
+#: reservation_units/models/reservation_unit_image.py
+msgid "Type"
+msgstr "Tyyppi"
 
 #: reservation_units/models/reservation_unit_image.py
 msgid "Reservation unit image"
@@ -2198,18 +2450,6 @@ msgstr "Syy alennuskelpoisuuden hakemiselle"
 #: reservations/models/reservation_statistic.py
 msgid "State"
 msgstr "Tila"
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py resources/models.py
-#: services/models.py
-msgid "Buffer time before"
-msgstr "Tauko ennen varausta"
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py resources/models.py
-#: services/models.py
-msgid "Buffer time after"
-msgstr "Tauko varauksen jälkeen"
 
 #: reservations/models/reservation.py
 msgid "Recurring reservation"
@@ -2431,6 +2671,10 @@ msgstr "Yleiset ehdot"
 #: terms_of_use/models.py
 msgid "Recurring reservation terms"
 msgstr "Toistuvan varauksen ehdot"
+
+#: terms_of_use/models.py
+msgid "Service-specific terms"
+msgstr "Palvelualuekohtaiset ehdot"
 
 #: terms_of_use/models.py
 msgid "Text"

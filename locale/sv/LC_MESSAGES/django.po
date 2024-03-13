@@ -309,7 +309,7 @@ msgid "Reservation units that can be applied for in this application round."
 msgstr ""
 
 #: applications/admin/forms/application_round.py
-#: reservation_units/models/reservation_unit.py
+#: reservation_units/admin/forms/reservation_unit.py
 msgid "Purposes"
 msgstr ""
 
@@ -331,8 +331,8 @@ msgstr "Hakemuksen osat"
 #: applications/admin/forms/application_round.py
 #: applications/admin/forms/application_section.py
 #: applications/admin/forms/city.py applications/admin/forms/organization.py
+#: reservation_units/admin/forms/reservation_unit.py
 #: reservation_units/models/equipment.py reservation_units/models/keyword.py
-#: reservation_units/models/reservation_unit.py
 #: reservation_units/models/reservation_unit_type.py
 #: reservations/models/reservation.py
 #: reservations/models/reservation_metadata.py
@@ -342,14 +342,17 @@ msgid "Name"
 msgstr ""
 
 #: applications/admin/forms/application_round.py
+#: reservation_units/admin/forms/reservation_unit.py
 msgid "Name (Finnish)"
 msgstr ""
 
 #: applications/admin/forms/application_round.py
+#: reservation_units/admin/forms/reservation_unit.py
 msgid "Name (English)"
 msgstr ""
 
 #: applications/admin/forms/application_round.py
+#: reservation_units/admin/forms/reservation_unit.py
 msgid "Name (Swedish)"
 msgstr ""
 
@@ -1203,7 +1206,7 @@ msgstr ""
 msgid "Value comes from the Product Experience API"
 msgstr ""
 
-#: merchants/models.py reservation_units/models/reservation_unit.py
+#: merchants/models.py reservation_units/admin/forms/reservation_unit.py
 msgid "Payment merchant"
 msgstr ""
 
@@ -1697,20 +1700,507 @@ msgstr ""
 msgid "Unit group"
 msgstr ""
 
-#: permissions/models.py reservation_units/models/reservation_unit.py
+#: permissions/models.py reservation_units/admin/forms/reservation_unit.py
 msgid "Unit"
 msgstr ""
 
-#: reservation_units/admin/forms/reservation_unit.py
+#: reservation_units/admin/forms/application_round_time_slot.py
 msgid "Which weekday this timeslot concerns."
 msgstr ""
 
-#: reservation_units/admin/forms/reservation_unit.py
+#: reservation_units/admin/forms/application_round_time_slot.py
 msgid "Timeslots when the reservation unit is reservable"
 msgstr ""
 
-#: reservation_units/admin/forms/reservation_unit.py
+#: reservation_units/admin/forms/application_round_time_slot.py
 msgid "Is the reservation unit closed on this weekday?"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py terms_of_use/models.py
+msgid "Pricing terms"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+#, fuzzy
+#| msgid "Reservations begin date must be before reservations end date."
+msgid "Pricing terms for the reservation unit."
+msgstr "Varausten alkupäivän täytyy olla ennen niiden loppupäivää."
+
+#: reservation_units/admin/forms/reservation_unit.py terms_of_use/models.py
+msgid "Payment terms"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Payment terms for the reservation unit."
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py terms_of_use/models.py
+msgid "Cancellation terms"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+#, fuzzy
+#| msgid "Reservations begin date must be before reservations end date."
+msgid "Cancellation terms for the reservation unit."
+msgstr "Varausten alkupäivän täytyy olla ennen niiden loppupäivää."
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Service specific terms"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+#, fuzzy
+#| msgid "Reservations begin date must be before reservations end date."
+msgid "Service specific terms for the reservation unit."
+msgstr "Varausten alkupäivän täytyy olla ennen niiden loppupäivää."
+
+#: reservation_units/admin/forms/reservation_unit.py
+#: reservations/models/reservation.py
+msgid "SKU"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+#: reservations/models/reservation.py
+msgid "Description"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Description (Finnish)"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Description (English)"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Description (Swedish)"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Spaces"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Keyword groups"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Resources"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Services"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Qualifiers"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+#, fuzzy
+#| msgid "Reservation Unit Options"
+msgid "Reservation unit type"
+msgstr "Varausyksikkö-vaihtoehdot"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Require introduction"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Equipments"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Terms of use"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Terms of use (Finnish)"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Terms of use (English)"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Terms of use (Swedish)"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+#, fuzzy
+#| msgid "Reservation Unit Options"
+msgid "Reservation pending instructions"
+msgstr "Varausyksikkö-vaihtoehdot"
+
+#: reservation_units/admin/forms/reservation_unit.py
+#, fuzzy
+#| msgid "Reservation Unit Options"
+msgid "Reservation pending instructions (Finnish)"
+msgstr "Varausyksikkö-vaihtoehdot"
+
+#: reservation_units/admin/forms/reservation_unit.py
+#, fuzzy
+#| msgid "Reservation Unit Options"
+msgid "Reservation pending instructions (English)"
+msgstr "Varausyksikkö-vaihtoehdot"
+
+#: reservation_units/admin/forms/reservation_unit.py
+#, fuzzy
+#| msgid "Reservation Unit Options"
+msgid "Reservation pending instructions (Swedish)"
+msgstr "Varausyksikkö-vaihtoehdot"
+
+#: reservation_units/admin/forms/reservation_unit.py
+#, fuzzy
+#| msgid "Reservation Unit Options"
+msgid "Reservation confirmed instructions"
+msgstr "Varausyksikkö-vaihtoehdot"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Reservation confirmed instructions (Finnish)"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Reservation confirmed instructions (English)"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Reservation confirmed instructions (Swedish)"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+#, fuzzy
+#| msgid "Reservation Unit Options"
+msgid "Reservation cancelled instructions"
+msgstr "Varausyksikkö-vaihtoehdot"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Reservation cancelled instructions (Finnish)"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Reservation cancelled instructions (English)"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Reservation cancelled instructions (Swedish)"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Contact information"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+#, fuzzy
+#| msgid "Reservation Unit Option"
+msgid "Max reservation duration"
+msgstr "Varausyksikkö-vaihtoehto"
+
+#: reservation_units/admin/forms/reservation_unit.py
+#, fuzzy
+#| msgid "Reservation Unit Option"
+msgid "Min reservation duration"
+msgstr "Varausyksikkö-vaihtoehto"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Is draft"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Max persons"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Min persons"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Surface area"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py resources/models.py
+#: services/models.py
+msgid "Buffer time before"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+#: reservations/models/reservation.py
+#: reservations/models/reservation_statistic.py resources/models.py
+#: services/models.py
+msgid "Buffer time after"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Origin hauki resource"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Cancellation rule"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Reservation start interval"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+#, fuzzy
+#| msgid "Reservation Unit Option"
+msgid "Reservations max days before"
+msgstr "Varausyksikkö-vaihtoehto"
+
+#: reservation_units/admin/forms/reservation_unit.py
+#, fuzzy
+#| msgid "Reservation Unit Option"
+msgid "Reservations min days before"
+msgstr "Varausyksikkö-vaihtoehto"
+
+#: reservation_units/admin/forms/reservation_unit.py
+#, fuzzy
+#| msgid "Reservation Unit Option"
+msgid "Reservation begins"
+msgstr "Varausyksikkö-vaihtoehto"
+
+#: reservation_units/admin/forms/reservation_unit.py
+#, fuzzy
+#| msgid "Reservation Unit Options"
+msgid "Reservation ends"
+msgstr "Varausyksikkö-vaihtoehdot"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Publish begins"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Publish ends"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+#: reservations/models/reservation_metadata.py
+msgid "Reservation metadata set"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+#, fuzzy
+#| msgid "Can only apply from 1 to 7 reservations per week."
+msgid "Max reservations per user"
+msgstr "Voi hakea vain yhdestä seitsemään varausta viikossa."
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Does the reservations of this require a handling"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Authentication"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+#, fuzzy
+#| msgid "Reservation Unit Options"
+msgid "Reservation kind"
+msgstr "Varausyksikkö-vaihtoehdot"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Payment types"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+#, fuzzy
+#| msgid "Reservation Unit Option"
+msgid "Reservation block whole day"
+msgstr "Varausyksikkö-vaihtoehto"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Can apply free of charge"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Allow reservations without opening hours"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Is archived"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+#: reservation_units/models/equipment.py reservation_units/models/purpose.py
+#: reservation_units/models/reservation_unit_type.py
+msgid "Order number"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Payment accounting"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "UUID"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Payment product"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Keyword gruops"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Additional instructions for pending reservation"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Additional instructions for pending reservation (Finnish)"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Additional instructions for pending reservation (English)"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Additional instructions for pending reservation (Swedish)"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Additional instructions for confirmed reservation"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Additional instructions for confirmed reservation (Finnish)"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Additional instructions for confirmed reservation (English)"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Additional instructions for confirmed reservation (Swedish)"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Additional instructions for cancelled reservation"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Additional instructions for cancelled reservations (Finnish)"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Additional instructions for cancelled reservations (English)"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Additional instructions for cancelled reservations (Swedish)"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Is this in draft state"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Maximum number of persons"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Minimum number of persons"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Buffer time before reservation"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Buffer time after reservation"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid ""
+"Determines the interval for the start time of the reservation. For example "
+"an interval of 15 minutes means a reservation can begin at minutes 15, 30, "
+"60, or 90."
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Minimum days before reservations can be made"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Maximum number of days before reservations can be made"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid ""
+"Time when making reservations become possible for this reservation unit."
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid ""
+"Time when making reservations become not possible for this reservation unit"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Time after this reservation unit should be publicly visible in UI."
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Time after this reservation unit should not be publicly visible in UI."
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid ""
+"Reservation metadata set that defines the set of supported and required form "
+"fields for this reservation unit."
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Maximum number of active reservations per user"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid ""
+"Does reservations of this reservation unit need to be handled before they're "
+"confirmed."
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Authentication required for reserving this reservation unit."
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "What kind of reservations are to be booked with this reservation unit."
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid ""
+"Can reservations to this reservation unit be able to apply free of charge."
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid ""
+"Is it possible to reserve this reservation unit when opening hours are not "
+"defined."
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+#, fuzzy
+#| msgid "Reservation Unit Option"
+msgid "Is reservation unit archived."
+msgstr "Varausyksikkö-vaihtoehto"
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Order number to be use in api sorting."
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Merchant used for payments"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Payment accounting information"
+msgstr ""
+
+#: reservation_units/admin/forms/reservation_unit.py
+msgid "Product used for payments"
 msgstr ""
 
 #: reservation_units/enums.py
@@ -1793,10 +2283,12 @@ msgstr ""
 msgid "future"
 msgstr ""
 
-#: reservation_units/models/equipment.py reservation_units/models/purpose.py
-#: reservation_units/models/reservation_unit.py
-#: reservation_units/models/reservation_unit_type.py
-msgid "Order number"
+#: reservation_units/enums.py
+msgid "Weak"
+msgstr ""
+
+#: reservation_units/enums.py
+msgid "Strong"
 msgstr ""
 
 #: reservation_units/models/equipment.py reservation_units/models/purpose.py
@@ -1821,219 +2313,16 @@ msgid "Keyword group"
 msgstr ""
 
 #: reservation_units/models/reservation_unit.py
-#: reservations/models/reservation.py
-msgid "SKU"
-msgstr ""
+#, fuzzy
+#| msgid "Reservation Unit Options"
+msgid "Reservation Unit"
+msgstr "Varausyksikkö-vaihtoehdot"
 
 #: reservation_units/models/reservation_unit.py
-#: reservations/models/reservation.py
-msgid "Description"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Spaces"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Keyword groups"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Resources"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Services"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Qualifiers"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-#: reservation_units/models/reservation_unit_image.py
-msgid "Type"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Require introduction"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Equipments"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Terms of use"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py terms_of_use/models.py
-msgid "Payment terms"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py terms_of_use/models.py
-msgid "Cancellation terms"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py terms_of_use/models.py
-msgid "Service-specific terms"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py terms_of_use/models.py
-msgid "Pricing terms"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Additional instructions for pending reservation"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Additional instructions for confirmed reservation"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Additional instructions for cancelled reservations"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Contact information"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Maximum reservation duration"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Minimum reservation duration"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Is this in draft state"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Maximum number of persons"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Minimum number of persons"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Surface area"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Buffer time before reservation"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Buffer time after reservation"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Reservation start interval"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Minimum days before reservations can be made"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Maximum number of days before reservations can be made"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid ""
-"Time when making reservations become possible for this reservation unit."
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid ""
-"Time when making reservations become not possible for this reservation unit"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Time after this reservation unit should be publicly visible in UI."
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Time after this reservation unit should not be publicly visible in UI."
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-#: reservations/models/reservation_metadata.py
-msgid "Reservation metadata set"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid ""
-"Reservation metadata set that defines the set of supported and required form "
-"fields for this reservation unit."
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Maximum number of active reservations per user"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Does the reservations of this require a handling"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid ""
-"Does reservations of this reservation unit need to be handled before they're "
-"confirmed."
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Weak"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Strong"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Authentication"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Authentication required for reserving this reservation unit."
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Order number to be use in api sorting."
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Reservation kind "
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Can apply free of charge"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid ""
-"Can reservations to this reservation unit be able to apply free of charge."
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Allow reservations without opening hours"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Is reservation unit archived"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Payment product"
-msgstr ""
-
-#: reservation_units/models/reservation_unit.py
-msgid "Payment accounting"
-msgstr ""
+#, fuzzy
+#| msgid "Reservation Unit Options"
+msgid "Reservation Units"
+msgstr "Varausyksikkö-vaihtoehdot"
 
 #: reservation_units/models/reservation_unit_cancellation_rule.py
 msgid "Name for the rule"
@@ -2061,6 +2350,10 @@ msgstr ""
 
 #: reservation_units/models/reservation_unit_image.py
 msgid "Other"
+msgstr ""
+
+#: reservation_units/models/reservation_unit_image.py
+msgid "Type"
 msgstr ""
 
 #: reservation_units/models/reservation_unit_image.py
@@ -2214,18 +2507,6 @@ msgstr ""
 #: reservations/models/reservation.py
 #: reservations/models/reservation_statistic.py
 msgid "State"
-msgstr ""
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py resources/models.py
-#: services/models.py
-msgid "Buffer time before"
-msgstr ""
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py resources/models.py
-#: services/models.py
-msgid "Buffer time after"
 msgstr ""
 
 #: reservations/models/reservation.py
@@ -2447,6 +2728,10 @@ msgstr ""
 
 #: terms_of_use/models.py
 msgid "Recurring reservation terms"
+msgstr ""
+
+#: terms_of_use/models.py
+msgid "Service-specific terms"
 msgstr ""
 
 #: terms_of_use/models.py
