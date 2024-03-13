@@ -8,7 +8,8 @@ from reservation_units.enums import ReservationKind
 from reservation_units.models import ReservationUnit, ReservationUnitImage, ReservationUnitPricing
 from reservation_units.utils.export_data import ReservationUnitExporter
 
-from .forms.reservation_unit import ApplicationRoundTimeSlotForm, ReservationUnitAdminForm
+from .forms.application_round_time_slot import ApplicationRoundTimeSlotForm
+from .forms.reservation_unit import ReservationUnitAdminForm
 
 
 class ReservationUnitImageInline(admin.TabularInline):
@@ -39,6 +40,14 @@ class ReservationUnitAdmin(SortableAdminMixin, admin.ModelAdmin):
         ApplicationRoundTimeSlotInline,
     ]
     list_filter = ["is_archived", "is_draft"]
+    filter_horizontal = [
+        "spaces",
+        "purposes",
+        "resources",
+        "services",
+        "equipments",
+        "keyword_groups",
+    ]
     readonly_fields = [
         "uuid",
         "payment_product",
