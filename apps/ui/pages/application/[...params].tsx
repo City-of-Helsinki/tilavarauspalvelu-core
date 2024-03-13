@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import React from "react";
+import { ApolloError } from "@apollo/client";
 import Error from "next/error";
 import { FormProvider, useForm } from "react-hook-form";
 import { useRouter } from "next/router";
@@ -26,6 +27,57 @@ import { useApplicationUpdate } from "@/hooks/useApplicationUpdate";
 import { ErrorToast } from "@/components/common/ErrorToast";
 import { useApplicationQuery } from "@/hooks/useApplicationQuery";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
+
+// TODO move this to a shared file
+// and combine all the separate error handling functions to one
+function getErrorMessages(error: unknown): string {
+  if (error == null) {
+    return "";
+  }
+  if (error instanceof ApolloError) {
+    const { graphQLErrors, networkError } = error;
+    if (networkError != null) {
+      if ("result" in networkError) {
+        if (typeof networkError.result === "string") {
+          return networkError.result;
+        }
+        if ("errors" in networkError.result) {
+          // TODO match to known error messages
+          // fallback to return unkown backend validation error (different from other unknown errors)
+          const { errors } = networkError.result;
+          const VALIDATION_ERROR = "Variable '$input'";
+          const isValidationError =
+            errors.find((e: unknown) => {
+              if (typeof e !== "object" || e == null) {
+                return false;
+              }
+              if ("message" in e && typeof e.message === "string") {
+                return e.message.startsWith(VALIDATION_ERROR);
+              }
+              return false;
+            }) != null;
+          if (isValidationError) {
+            return "Validation error";
+          }
+          return "Unknown network error";
+        }
+      }
+      return networkError.message;
+    }
+    if (graphQLErrors.length > 0) {
+      return "Unknown GQL error";
+    }
+  }
+  if (typeof error === "string") {
+    return error;
+  }
+  if (typeof error === "object" && "message" in error) {
+    if (typeof error.message === "string") {
+      return error.message;
+    }
+  }
+  return "Unknown error";
+}
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -110,32 +162,25 @@ function ApplicationRootPage({
   });
 
   const {
-    reset,
     formState: { isDirty },
   } = form;
 
-  useEffect(() => {
-    if (application != null) {
-      const unitsInApplicationRound =
-        applicationRound?.reservationUnits?.map((ru) => ru.pk) ?? [];
-      const resUnits = selectedReservationUnits.filter(
-        (ru) => ru?.pk != null && unitsInApplicationRound.includes(ru.pk)
-      );
-      reset(convertApplication(application, resUnits));
-    }
-  }, [
-    application,
-    applicationRound?.reservationUnits,
-    reset,
-    selectedReservationUnits,
-  ]);
+  /* TODO removing form reset on page load for now
+   * the defaultValues should be enough and seems to work when loading an existing application
+   * this page is not saved + refreshed but goes to second page after save.
+   * The problem using reset is that it resets the form with development quick refresh,
+   * so not a big problem, but if there is no need to use it, it's better to avoid it.
+   */
 
   const applicationRoundName =
     applicationRound != null ? getTranslation(applicationRound, "name") : "-";
 
+  // TODO the error message needs to be translated
+  const errorMessage = getErrorMessages(error);
+
   return (
     <FormProvider {...form}>
-      {error && <ErrorToast error="ApolloError" />}
+      {errorMessage !== "" && <ErrorToast error={errorMessage} />}
       {pageId === "page1" ? (
         <ApplicationPageWrapper
           overrideText={applicationRoundName}
