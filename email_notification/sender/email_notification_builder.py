@@ -14,8 +14,8 @@ from jinja2.sandbox import SandboxedEnvironment
 
 from email_notification.exceptions import (
     EmailBuilderConfigError,
+    EmailNotificationBuilderError,
     EmailTemplateValidationError,
-    ReservationEmailNotificationBuilderException,
 )
 from email_notification.models import EmailTemplate
 from email_notification.sender.email_notification_context import EmailNotificationContext
@@ -114,7 +114,7 @@ class ReservationEmailNotificationBuilder:
         context: EmailNotificationContext | None = None,
     ):
         if reservation and context:
-            raise ReservationEmailNotificationBuilderException(
+            raise EmailNotificationBuilderError(
                 "Reservation and context cannot be used at the same time. Provide only one of them."
             )
         self.reservation = reservation
