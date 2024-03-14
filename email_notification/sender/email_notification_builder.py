@@ -52,7 +52,7 @@ class EmailTemplateValidator:
 
         for tag in variable_tags:
             if tag not in settings.EMAIL_TEMPLATE_CONTEXT_VARIABLES:
-                raise EmailTemplateValidationError(f"Tag {tag} not supported")
+                raise EmailTemplateValidationError(f"Tag '{tag}' is not supported")
 
     @staticmethod
     def _validate_illegals(string: str) -> None:
@@ -62,7 +62,7 @@ class EmailTemplateValidator:
         expressions = re.findall(expression_lookup, string)
         for expression in expressions:
             if expression not in settings.EMAIL_TEMPLATE_SUPPORTED_EXPRESSIONS:
-                raise EmailTemplateValidationError("Illegal tags found: tag was '%s'" % expression)
+                raise EmailTemplateValidationError(f"Illegal tags found: tag was {expression}")
 
     @staticmethod
     def _validate_in_sandbox(string: str, context: dict, env: SandboxedEnvironment) -> None:
@@ -108,9 +108,9 @@ class ReservationEmailNotificationBuilder:
 
     def __init__(
         self,
-        reservation: Reservation,
+        reservation: Reservation | None,
         template: EmailTemplate,
-        language=None,
+        language: str | None = None,
         context: EmailNotificationContext | None = None,
     ):
         if reservation and context:

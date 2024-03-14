@@ -1,83 +1,88 @@
 import pytest
-from assertpy import assert_that
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase
 
 from email_notification.exceptions import EmailNotificationBuilderError, EmailTemplateValidationError
+from email_notification.models import EmailTemplate
 from email_notification.sender.email_notification_builder import (
     EmailNotificationContext,
     ReservationEmailNotificationBuilder,
 )
-from tests.factories import EmailTemplateFactory, ReservationFactory, ReservationUnitFactory, UnitFactory
+from reservations.models import Reservation
+from tests.factories import EmailTemplateFactory, ReservationFactory
+
+pytestmark = [
+    pytest.mark.django_db,
+]
+
+mock_data = EmailNotificationContext.with_mock_data()
 
 
-class EmailNotificationBuilderTestCase(TestCase):
-    def setUp(self) -> None:
-        self.unit = UnitFactory(name="Test unit")
-        self.reservation_unit = ReservationUnitFactory(name="Test reservation unit", unit=self.unit)
-        self.reservation = ReservationFactory(name="Test reservation", reservation_unit=[self.reservation_unit])
+@pytest.fixture()
+def email_template() -> EmailTemplate:
+    html_file_fi = SimpleUploadedFile(name="mock_file_fi.html", content=b"HTML content FI")
+    html_file_en = SimpleUploadedFile(name="mock_file_en.html", content=b"HTML content EN")
+    html_file_sv = SimpleUploadedFile(name="mock_file_sv.html", content=b"HTML content SV")
 
-    def test_constructor_raises_error_on_invalid_text_content(self):
-        template = EmailTemplateFactory(name="Test template", content_fi="Text content FI {{invalid_tag}}")
-        with pytest.raises(EmailTemplateValidationError) as err:
-            ReservationEmailNotificationBuilder(self.reservation, template, "fi")
-        assert_that(err.value.message).is_equal_to("Tag invalid_tag not supported")
+    return EmailTemplateFactory.build(
+        name="Test template",
+        content_fi="Text content FI",
+        content_en="Text content EN",
+        content_sv="Text content SV",
+        html_content_fi=html_file_fi,
+        html_content_en=html_file_en,
+        html_content_sv=html_file_sv,
+    )
 
-    def test_constructor_raises_error_on_invalid_html_content(self):
-        html_file = SimpleUploadedFile(name="mock_file.html", content=b"HTML content FI {{invalid_tag}}")
-        template = EmailTemplateFactory(
-            name="Test template",
-            content_fi="Text content FI",
-            html_content_fi=html_file,
-        )
-        with pytest.raises(EmailTemplateValidationError) as err:
-            ReservationEmailNotificationBuilder(self.reservation, template, "fi")
-        assert_that(err.value.message).is_equal_to("Tag invalid_tag not supported")
 
-    def test_constructor_raises_error_when_reservation_and_context_are_given(self):
-        template = EmailTemplateFactory(name="Test template", content_fi="Text content FI {{invalid_tag}}")
-        context = EmailNotificationContext.from_reservation(self.reservation)
-        with pytest.raises(EmailNotificationBuilderError) as err:
-            ReservationEmailNotificationBuilder(self.reservation, template, "fi", context=context)
-        assert_that(str(err.value)).is_equal_to(
-            "Reservation and context cannot be used at the same time. Provide only one of them."
-        )
+@pytest.fixture()
+def reservation() -> Reservation:
+    return ReservationFactory.create(
+        name="Test reservation",
+        reservation_unit__name="Test reservation unit",
+        reservation_unit__unit__name="Test unit",
+    )
 
-    def test_get_content_with_html_file(self):
-        html_file_fi = SimpleUploadedFile(name="mock_file_fi.html", content=b"HTML content FI")
-        html_file_en = SimpleUploadedFile(name="mock_file_en.html", content=b"HTML content EN")
-        html_file_sv = SimpleUploadedFile(name="mock_file_sv.html", content=b"HTML content SV")
 
-        template = EmailTemplateFactory(
-            name="Test template",
-            content_fi="Text content FI",
-            content_en="Text content EN",
-            content_sv="Text content SV",
-            html_content_fi=html_file_fi,
-            html_content_en=html_file_en,
-            html_content_sv=html_file_sv,
-        )
+def test_constructor_raises_error_on_invalid_text_content(email_template, reservation):
+    email_template.content_fi = "Text content FI {{invalid_tag}}"
 
-        builder_fi = ReservationEmailNotificationBuilder(self.reservation, template, "fi")
-        builder_en = ReservationEmailNotificationBuilder(self.reservation, template, "en")
-        builder_sv = ReservationEmailNotificationBuilder(self.reservation, template, "sv")
+    msg = "Tag 'invalid_tag' is not supported"
+    with pytest.raises(EmailTemplateValidationError, match=msg):
+        ReservationEmailNotificationBuilder(reservation=reservation, template=email_template, language="fi")
 
-        assert_that(builder_fi.get_html_content()).is_equal_to("HTML content FI")
-        assert_that(builder_en.get_html_content()).is_equal_to("HTML content EN")
-        assert_that(builder_sv.get_html_content()).is_equal_to("HTML content SV")
 
-    def test_get_content_with_text_content(self):
-        template = EmailTemplateFactory(
-            name="Test template",
-            content_fi="Text content FI",
-            content_en="Text content EN",
-            content_sv="Text content SV",
+def test_constructor_raises_error_on_invalid_html_content(email_template, reservation):
+    email_template.html_content_fi = SimpleUploadedFile(name="mock_file_fi.html", content=b"HTML FI {{invalid_tag}}")
+
+    msg = "Tag 'invalid_tag' is not supported"
+    with pytest.raises(EmailTemplateValidationError, match=msg):
+        ReservationEmailNotificationBuilder(reservation=reservation, template=email_template, language="fi")
+
+
+def test_constructor_raises_error_when_reservation_and_context_are_given(email_template, reservation):
+    context = EmailNotificationContext.from_reservation(reservation)
+    msg = "Reservation and context cannot be used at the same time. Provide only one of them."
+    with pytest.raises(EmailNotificationBuilderError, match=msg):
+        ReservationEmailNotificationBuilder(
+            reservation=reservation, template=email_template, language="fi", context=context
         )
 
-        builder_fi = ReservationEmailNotificationBuilder(self.reservation, template, "fi")
-        builder_en = ReservationEmailNotificationBuilder(self.reservation, template, "en")
-        builder_sv = ReservationEmailNotificationBuilder(self.reservation, template, "sv")
 
-        assert_that(builder_fi.get_content()).is_equal_to("Text content FI")
-        assert_that(builder_en.get_content()).is_equal_to("Text content EN")
-        assert_that(builder_sv.get_content()).is_equal_to("Text content SV")
+def test_get_content_with_html_file(email_template, reservation):
+    builder_fi = ReservationEmailNotificationBuilder(reservation, email_template, "fi")
+    builder_en = ReservationEmailNotificationBuilder(reservation, email_template, "en")
+    builder_sv = ReservationEmailNotificationBuilder(reservation, email_template, "sv")
+
+    assert builder_fi.get_html_content() == "HTML content FI"
+    assert builder_en.get_html_content() == "HTML content EN"
+    assert builder_sv.get_html_content() == "HTML content SV"
+
+
+def test_get_content_with_text_content(email_template, reservation):
+    builder_fi = ReservationEmailNotificationBuilder(reservation, email_template, "fi")
+    builder_en = ReservationEmailNotificationBuilder(reservation, email_template, "en")
+    builder_sv = ReservationEmailNotificationBuilder(reservation, email_template, "sv")
+
+    assert builder_fi.get_content() == "Text content FI"
+    assert builder_en.get_content() == "Text content EN"
+    assert builder_sv.get_content() == "Text content SV"
