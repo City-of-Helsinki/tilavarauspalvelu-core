@@ -9,7 +9,7 @@ from email_notification.sender.email_notification_validator import EmailTemplate
 
 
 @override_settings(EMAIL_HTML_MAX_FILE_SIZE=150000)
-def test_raises_validation_error_on_invalid_file_extension():
+def test_email_validator__raises__validation_error_on_invalid_file_extension():
     mock_field_file = mock.MagicMock()
     mock_field_file.name = "/tmp/mock_template.jpg"
     mock_field_file.size = settings.EMAIL_HTML_MAX_FILE_SIZE
@@ -20,7 +20,7 @@ def test_raises_validation_error_on_invalid_file_extension():
 
 
 @override_settings(EMAIL_HTML_MAX_FILE_SIZE=150000)
-def test_raises_validation_error_on_zero_size_file():
+def test_email_validator__raises__validation_error_on_zero_size_file():
     mock_field_file = mock.MagicMock()
     mock_field_file.name = "/tmp/mock_template.html"
     mock_field_file.size = 0
@@ -31,7 +31,7 @@ def test_raises_validation_error_on_zero_size_file():
 
 
 @override_settings(EMAIL_HTML_MAX_FILE_SIZE=150000)
-def test_raises_validation_error_on_big_file():
+def test_email_validator__raises__validation_error_on_big_file():
     mock_field_file = mock.MagicMock()
     mock_field_file.name = "/tmp/mock_template.html"
     mock_field_file.size = settings.EMAIL_HTML_MAX_FILE_SIZE + 1
@@ -42,7 +42,7 @@ def test_raises_validation_error_on_big_file():
 
 
 @override_settings(EMAIL_HTML_MAX_FILE_SIZE=150000)
-def test_raises_validation_error_on_unsupported_tag():
+def test_email_validator__raises__validation_error_on_unsupported_tag():
     mock_file = mock.MagicMock()
     mock_file.read.return_value = b"<html>{{invalid_tag}}</html>"
 
@@ -57,7 +57,22 @@ def test_raises_validation_error_on_unsupported_tag():
 
 
 @override_settings(EMAIL_HTML_MAX_FILE_SIZE=150000)
-def valid_file_raises_no_exceptions():
+def test_email_validator__raises__validation_error_on_illegal_tag():
+    mock_file = mock.MagicMock()
+    mock_file.read.return_value = b"<html>{% invalid_tag %}</html>"
+
+    mock_field_file = mock.MagicMock()
+    mock_field_file.name = "/tmp/mock_template.html"
+    mock_field_file.size = settings.EMAIL_HTML_MAX_FILE_SIZE
+    mock_field_file.open.return_value = mock_file
+
+    msg = "Illegal tags found: tag was 'invalid_tag'"
+    with pytest.raises(ValidationError, match=msg):
+        EmailTemplateValidator().validate_html_file(mock_field_file)
+
+
+@override_settings(EMAIL_HTML_MAX_FILE_SIZE=150000)
+def valid_email_validator__file_raises_no_exceptions():
     mock_file = mock.MagicMock()
     mock_file.read.return_value = b"<html></html>"
 

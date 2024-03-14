@@ -16,8 +16,9 @@ from email_notification.admin.email_tester import (
 )
 from email_notification.exceptions import EmailTemplateValidationError
 from email_notification.models import EmailTemplate, EmailType
-from email_notification.sender.email_notification_builder import EmailNotificationContext, EmailTemplateValidator
+from email_notification.sender.email_notification_builder import EmailNotificationContext
 from email_notification.sender.email_notification_sender import EmailNotificationSender
+from email_notification.sender.email_notification_validator import EmailTemplateValidator
 
 
 class EmailTemplateAdminForm(ModelForm):
