@@ -20,6 +20,7 @@ import {
 } from "@/modules/reservationUnit";
 import { reservationUnitPrefix } from "@/modules/const";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
+import { useSearchParams } from "next/navigation";
 
 interface PropsT {
   reservationUnit: ReservationUnitType;
@@ -221,11 +222,21 @@ const StatusTag = (ru: {
 
 const ReservationUnitCard = ({ reservationUnit }: PropsT): JSX.Element => {
   const { t } = useTranslation();
+  const params = useSearchParams();
+  const date = params.get("startDate");
+  const time = params.get("timeBegin");
+  const duration = params.get("duration");
 
   const name = getReservationUnitName(reservationUnit);
 
-  const link = `${reservationUnitPrefix}/${reservationUnit.pk}`;
-
+  const linkURL = new URL(
+    `${reservationUnitPrefix}/${reservationUnit.pk}`,
+    document.baseURI
+  );
+  if (duration != null) linkURL.searchParams.set("duration", duration);
+  if (date != null) linkURL.searchParams.set("date", date);
+  if (time != null) linkURL.searchParams.set("time", time);
+  const link = linkURL.toString();
   const unitName = getUnitName(reservationUnit.unit ?? undefined);
 
   const pricing = getActivePricing(reservationUnit);
