@@ -192,8 +192,15 @@ Environment configurations for each environment are defined in the [Azure Pipeli
 To run all tests with verbose output, you can simply run `pytest`.
 To ignore third-party warnings, you can run `pytest -W default`.
 
-Not that some unit tests may take longer to run.
-If you want to ignore the slow tests, run `SKIP_LONG_RUNNING=1 pytest -W default`.
+Note that some tests may take longer to run or require Elasticsearch to be running.
+To skip slow tests, add the flag `--skip-slow` or to skip tests requiring Elasticsearch, add the flag `--skip-elastic`.
+
+You can also, use `pytest-xdist` plugin to run tests in parallel.
+For example, to run the tests with 8 parallel processes, use the following command: `pytest -n 8`.
+Note, that some tests might be flaky when run in parallel.
+
+In order to save time, you can also reuse the test database between test runs.
+This can be done by adding the `--reuse-db` and/or `--no-migrations` flag to the test command.
 
 If you'd like the unittests not to mess up your development environment use
 a `local_settings.py` file (at root level) to make own search index for test database.
