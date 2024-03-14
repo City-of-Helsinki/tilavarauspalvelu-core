@@ -1,8 +1,8 @@
-class SendReservationEmailNotificationException(Exception):
+class SendEmailNotificationError(Exception):
     pass
 
 
-class ReservationEmailNotificationBuilderException(Exception):
+class EmailNotificationBuilderError(Exception):
     pass
 
 
@@ -11,6 +11,6 @@ class EmailBuilderConfigError(Exception):
 
 
 class EmailTemplateValidationError(Exception):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         if len(args) > 0:
             self.message = args[0]

@@ -1,7 +1,7 @@
 from django.conf import settings
 
 from email_notification.models import EmailType
-from email_notification.sender.senders import send_reservation_email_notification
+from email_notification.sender.email_notification_sender import EmailNotificationSender
 from permissions.helpers import has_unit_permission
 from reservations.models import Reservation
 from spaces.models import Unit
@@ -10,13 +10,15 @@ from users.models import ReservationNotification, User
 
 
 @app.task(name="send_reservation_email")
-def send_reservation_email_task(reservation_id: int, email_type: EmailType):
+def send_reservation_email_task(reservation_id: int, email_type: EmailType) -> None:
     if not settings.SEND_RESERVATION_NOTIFICATION_EMAILS:
         return
     reservation = Reservation.objects.filter(id=reservation_id).first()
     if not reservation:
         return
-    send_reservation_email_notification(email_type, reservation, None)
+
+    email_notification_sender = EmailNotificationSender(email_type=email_type, recipients=None)
+    email_notification_sender.send_reservation_email_notification(reservation=reservation)
 
 
 @app.task(name="send_staff_reservation_email")
@@ -24,7 +26,7 @@ def send_staff_reservation_email_task(
     reservation_id: int,
     email_type: EmailType,
     notification_settings: list[ReservationNotification],
-):
+) -> None:
     if not settings.SEND_RESERVATION_NOTIFICATION_EMAILS:
         return
     reservation = Reservation.objects.filter(id=reservation_id).first()
@@ -32,7 +34,11 @@ def send_staff_reservation_email_task(
         return
 
     recipients = _get_staff_notification_recipients(reservation, notification_settings)
-    send_reservation_email_notification(email_type, reservation, recipients)
+    if not recipients:
+        return
+
+    email_notification_sender = EmailNotificationSender(email_type=email_type, recipients=recipients)
+    email_notification_sender.send_reservation_email_notification(reservation=reservation)
 
 
 def _get_staff_notification_recipients(

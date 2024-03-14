@@ -9,9 +9,7 @@ from django.utils.timezone import get_default_timezone
 
 from email_notification.exceptions import EmailBuilderConfigError, EmailTemplateValidationError
 from email_notification.models import EmailTemplate, EmailType
-from email_notification.sender.email_notification_builder import (
-    ReservationEmailNotificationBuilder,
-)
+from email_notification.sender.email_notification_builder import ReservationEmailNotificationBuilder
 from reservations.choices import CustomerTypeChoice
 from reservations.models import Reservation
 from tests.factories import (

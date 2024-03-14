@@ -3,7 +3,7 @@ from assertpy import assert_that
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 
-from email_notification.exceptions import EmailTemplateValidationError, ReservationEmailNotificationBuilderException
+from email_notification.exceptions import EmailNotificationBuilderError, EmailTemplateValidationError
 from email_notification.sender.email_notification_builder import (
     EmailNotificationContext,
     ReservationEmailNotificationBuilder,
@@ -37,7 +37,7 @@ class EmailNotificationBuilderTestCase(TestCase):
     def test_constructor_raises_error_when_reservation_and_context_are_given(self):
         template = EmailTemplateFactory(name="Test template", content_fi="Text content FI {{invalid_tag}}")
         context = EmailNotificationContext.from_reservation(self.reservation)
-        with pytest.raises(ReservationEmailNotificationBuilderException) as err:
+        with pytest.raises(EmailNotificationBuilderError) as err:
             ReservationEmailNotificationBuilder(self.reservation, template, "fi", context=context)
         assert_that(str(err.value)).is_equal_to(
             "Reservation and context cannot be used at the same time. Provide only one of them."

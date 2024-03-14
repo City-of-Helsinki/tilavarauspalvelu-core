@@ -17,7 +17,7 @@ from email_notification.admin.email_tester import (
 from email_notification.exceptions import EmailTemplateValidationError
 from email_notification.models import EmailTemplate, EmailType
 from email_notification.sender.email_notification_builder import EmailNotificationContext, EmailTemplateValidator
-from email_notification.sender.senders import send_test_emails
+from email_notification.sender.email_notification_sender import EmailNotificationSender
 
 
 class EmailTemplateAdminForm(ModelForm):
@@ -96,7 +96,10 @@ class EmailTemplateAdmin(ExtraButtonsMixin, admin.ModelAdmin):
             form = EmailTemplateTesterForm(request.POST)
             if form.is_valid():
                 template = EmailTemplate.objects.filter(pk=request.POST["template"]).first()
-                send_test_emails(template, form)
+
+                email_notification_sender = EmailNotificationSender(email_type=template.type, recipients=None)
+                email_notification_sender.send_test_emails(form=form)
+
                 self.message_user(request, _("Test Email '%s' successfully sent.") % template.name)
 
                 template_admin_url = reverse("admin:email_notification_emailtemplate_change", args=[template.id])
