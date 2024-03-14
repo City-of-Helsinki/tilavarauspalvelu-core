@@ -307,7 +307,7 @@ const QuickReservation = ({
             <StyledCarousel
               hideCenterControls
               wrapAround={false}
-              key={`${focusDate}-${time}-${selectedDuration?.value}`}
+              slideIndex={activeChunk}
             >
               {timeChunks.map((chunk: string[], index: number) => (
                 <SlotGroup key={chunk[0]}>

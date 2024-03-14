@@ -14,6 +14,7 @@ type Props = {
   wrapAround?: boolean;
   hideCenterControls?: boolean;
   controlAriaLabel?: string;
+  slideIndex?: number;
 };
 
 const Button = styled(MediumButton).attrs({
