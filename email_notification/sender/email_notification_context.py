@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 from decimal import Decimal
 from typing import Literal
@@ -6,7 +8,7 @@ from django.conf import settings
 from django.utils.timezone import get_default_timezone
 
 from common.utils import get_attr_by_language
-from email_notification.email_tester import EmailTestForm
+from email_notification.admin.email_tester import EmailTemplateTesterForm
 from reservations.choices import CustomerTypeChoice
 from reservations.models import Reservation
 from spaces.models import Location
@@ -56,7 +58,7 @@ class EmailNotificationContext:
         return all_instructions
 
     @staticmethod
-    def with_mock_data() -> "EmailNotificationContext":
+    def with_mock_data() -> EmailNotificationContext:
         """Initialize context with mock data"""
         context = EmailNotificationContext()
         context.reservee_name = "Email Test"
@@ -99,7 +101,7 @@ class EmailNotificationContext:
         return context
 
     @staticmethod
-    def from_reservation(reservation: Reservation) -> "EmailNotificationContext":
+    def from_reservation(reservation: Reservation) -> EmailNotificationContext:
         """Build context from reservation"""
         context = EmailNotificationContext()
 
@@ -164,7 +166,7 @@ class EmailNotificationContext:
         return context
 
     @staticmethod
-    def from_form(form: EmailTestForm) -> "EmailNotificationContext":
+    def from_form(form: EmailTemplateTesterForm) -> EmailNotificationContext:
         context = EmailNotificationContext()
         context.reservee_name = form.cleaned_data["reservee_name"]
         context.begin_datetime = form.cleaned_data["begin_datetime"]

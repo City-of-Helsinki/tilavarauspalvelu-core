@@ -76,7 +76,7 @@ class EmailTemplate(models.Model):
         db_table = "email_template"
         base_manager_name = "objects"
 
-    def __str__(self):
+    def __str__(self) -> str:
         choices = dict(EmailType.choices)
-        label = choices.get(self.type)
+        label = choices.get(self.type) or self.type
         return f"{label}: {self.name}"

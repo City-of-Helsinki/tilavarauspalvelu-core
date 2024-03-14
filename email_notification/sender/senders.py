@@ -1,7 +1,8 @@
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 
-from email_notification.email_tester import EmailTestForm
+from email_notification.admin.email_tester import EmailTemplateTesterForm
+from email_notification.exceptions import SendReservationEmailNotificationException
 from email_notification.models import EmailTemplate, EmailType
 from email_notification.sender.email_notification_builder import (
     EmailNotificationContext,
@@ -9,10 +10,6 @@ from email_notification.sender.email_notification_builder import (
 )
 from reservations.models import Reservation
 from utils.sentry import SentryLogger
-
-
-class SendReservationEmailNotificationException(Exception):
-    pass
 
 
 def send_reservation_email_notification(
@@ -36,7 +33,8 @@ def send_reservation_email_notification(
             f"Tried to send '{email_type}' notification but no template was defined",
             level="error",
         )
-    language = reservation.reservee_language if reservation else context.reservee_language
+
+    language: str = reservation.reservee_language if reservation else context.reservee_language
     message_builder = ReservationEmailNotificationBuilder(
         reservation, mail_template, language=language, context=context
     )
@@ -64,7 +62,7 @@ def send_reservation_email_notification(
     email.send(fail_silently=False)
 
 
-def send_test_emails(template: EmailTemplate, form: EmailTestForm):
+def send_test_emails(template: EmailTemplate, form: EmailTemplateTesterForm):
     context = EmailNotificationContext.from_form(form)
     for language in ["fi", "sv", "en"]:
         context.reservee_language = language

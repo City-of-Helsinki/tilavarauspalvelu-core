@@ -1,6 +1,6 @@
 import pytest
 
-from email_notification.sender.helpers import get_staff_notification_recipients
+from email_notification.tasks import _get_staff_notification_recipients
 from tests.factories import ReservationFactory, ReservationUnitFactory, UserFactory
 from users.models import ReservationNotification
 
@@ -27,7 +27,7 @@ def test_get_staff_get_notification_recipients__all_and_handling_required():
 
     reservation = ReservationFactory.create(reservation_unit=[reservation_unit_1, reservation_unit_2])
 
-    result = get_staff_notification_recipients(
+    result = _get_staff_notification_recipients(
         reservation,
         [
             ReservationNotification.ALL,
@@ -55,7 +55,7 @@ def test_get_staff_get_notification_recipients__only_handling_required():
 
     reservation = ReservationFactory.create(reservation_unit=[reservation_unit_1, reservation_unit_2])
 
-    result = get_staff_notification_recipients(
+    result = _get_staff_notification_recipients(
         reservation,
         [
             ReservationNotification.ONLY_HANDLING_REQUIRED,
@@ -85,7 +85,7 @@ def test_get_staff_get_notification_recipients__dont_include_reservation_recipie
         user=unit_admin_2,
     )
 
-    result = get_staff_notification_recipients(
+    result = _get_staff_notification_recipients(
         reservation,
         [
             ReservationNotification.ONLY_HANDLING_REQUIRED,

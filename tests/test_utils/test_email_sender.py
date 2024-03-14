@@ -4,10 +4,10 @@ from decimal import Decimal
 
 import pytest
 
-from email_notification.email_tester import EmailTestForm
+from email_notification.admin.email_tester import EmailTemplateTesterForm
+from email_notification.exceptions import SendReservationEmailNotificationException
 from email_notification.models import EmailTemplate, EmailType
 from email_notification.sender.senders import (
-    SendReservationEmailNotificationException,
     send_reservation_email_notification,
     send_test_emails,
 )
@@ -144,7 +144,7 @@ def test_send_email__test_emails(outbox):
         subject_sv="sv",
         content_sv="sv",
     )
-    form = EmailTestForm()
+    form = EmailTemplateTesterForm()
     form.cleaned_data = {
         "recipient": "test@example.com",
         "reservee_name": "Test Name",

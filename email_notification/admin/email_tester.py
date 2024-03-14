@@ -1,13 +1,47 @@
+import contextlib
 from datetime import datetime
 from decimal import Decimal
+from typing import Any
 
 from django import forms
 
 from email_notification.models import EmailTemplate
 from reservation_units.models import ReservationUnit
+from spaces.models import Location
 
 
-class ReservationUnitSelectForm(forms.Form):
+def get_email_template_tester_form_initial_values(request) -> dict[str, Any]:
+    recipient = request.user.email if request.user else ""
+    initial_values = {"recipient": recipient}
+
+    with contextlib.suppress(AttributeError):
+        # Select the template that user navigated from
+        initial_values["template"] = request.resolver_match.kwargs.get("extra_context")
+
+    reservation_unit_pk = request.GET.get("reservation_unit", None)
+    if not reservation_unit_pk:
+        return initial_values
+
+    reservation_unit: ReservationUnit = ReservationUnit.objects.filter(pk=int(reservation_unit_pk)).first()
+    if not reservation_unit:
+        return initial_values
+
+    initial_values["reservation_unit_name"] = reservation_unit.name
+    initial_values["unit_name"] = getattr(reservation_unit.unit, "name", "")
+
+    location: Location | None = getattr(reservation_unit.unit, "location", None)
+    if location is not None:
+        initial_values["unit_location"] = str(location)
+
+    # Set initial instructions values for all languages
+    for lang in ["fi", "sv", "en"]:
+        for field in ["confirmed_instructions", "pending_instructions", "cancelled_instructions"]:
+            initial_values[f"{field}_{lang}"] = getattr(reservation_unit, f"reservation_{field}_{lang}", "")
+
+    return initial_values
+
+
+class EmailTemplateTesterReservationUnitSelectForm(forms.Form):
     reservation_unit = forms.ChoiceField()
 
     def __init__(self, *args, **kwargs) -> None:
@@ -19,7 +53,7 @@ class ReservationUnitSelectForm(forms.Form):
         self.fields["reservation_unit"].choices = runit_choices
 
 
-class EmailTestForm(forms.Form):
+class EmailTemplateTesterForm(forms.Form):
     recipient = forms.CharField(initial="", max_length=256, widget=forms.TextInput(attrs={"size": 50}))
     template = forms.ChoiceField()  # Choices are defined in __init__
     begin_datetime = forms.SplitDateTimeField(
