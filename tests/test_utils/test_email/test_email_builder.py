@@ -454,7 +454,7 @@ def test_validate_fails_on_init_when_unsupported_tag():
     reservation_unit = ReservationUnitFactory.create()
     reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
 
-    msg = "Tag foo not supported"
+    msg = "Tag 'foo' is not supported"
     with pytest.raises(EmailTemplateValidationError, match=re.escape(msg)):
         ReservationEmailNotificationBuilder(reservation, email_template)
 
