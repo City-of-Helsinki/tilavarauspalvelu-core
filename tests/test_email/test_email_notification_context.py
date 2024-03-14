@@ -58,7 +58,7 @@ def reservation() -> Reservation:
     )
 
 
-def test_with_mock_data():
+def test_email_context__with_mock_data():
     context = EmailNotificationContext.with_mock_data()
 
     assert context.reservee_name == "Email Test"
@@ -102,7 +102,7 @@ def test_with_mock_data():
     assert (len(context.__dict__.keys())) == 17
 
 
-def test_from_reservation(reservation):
+def test_email_context__from_reservation(reservation):
     context = EmailNotificationContext.from_reservation(reservation)
     reservation_unit: ReservationUnit = reservation.reservation_unit.first()
 
@@ -141,7 +141,7 @@ def test_from_reservation(reservation):
     assert context.cancel_reason["en"] == reservation.cancel_reason.reason_fi
 
 
-def test_from_reservation_organisation_name(reservation):
+def test_email_context__from_reservation__organisation_name(reservation):
     reservation.reservee_type = CustomerTypeChoice.BUSINESS
     reservation.reservee_organisation_name = "Business"
     reservation.save()
@@ -150,13 +150,13 @@ def test_from_reservation_organisation_name(reservation):
     assert context.reservee_name == reservation.reservee_organisation_name
 
 
-def test_from_reservation_no_location(reservation):
+def test_email_context__from_reservation__no_location(reservation):
     Location.objects.all().delete()
     context = EmailNotificationContext.from_reservation(reservation)
     assert context.unit_location == ""
 
 
-def test_from_reservation_unit_name_is_reservee_langauge(reservation):
+def test_email_context__from_reservation_unit__name_is_reservee_langauge(reservation):
     reservation.reservee_language = "sv"
     reservation.save()
 
@@ -164,7 +164,7 @@ def test_from_reservation_unit_name_is_reservee_langauge(reservation):
     assert context.unit_name == reservation.reservation_unit.first().unit.name_sv
 
 
-def test_from_reservation_unit_name_uses_reservation_user_preferred_language(reservation):
+def test_email_context__from_reservation_unit__name_uses_reservation_user_preferred_language(reservation):
     user = get_user_model().objects.create(
         username="test",
         first_name="test",
@@ -179,7 +179,7 @@ def test_from_reservation_unit_name_uses_reservation_user_preferred_language(res
     assert context.unit_name == reservation.reservation_unit.first().unit.name_sv
 
 
-def test_from_reservation_reservation_unit_name_is_reservee_langauge(reservation):
+def test_email_context__from_reservation__reservation_unit_name_is_reservee_langauge(reservation):
     reservation.reservee_language = "sv"
     reservation.save()
 
@@ -187,7 +187,7 @@ def test_from_reservation_reservation_unit_name_is_reservee_langauge(reservation
     assert context.reservation_unit_name == reservation.reservation_unit.first().name_sv
 
 
-def test_from_reservation_reservation_unit_name_uses_reservation_user_preferred_language(reservation):
+def test_email_context__from_reservation__reservation_unit_name_uses_reservation_user_preferred_language(reservation):
     user = get_user_model().objects.create(
         username="test",
         first_name="test",
