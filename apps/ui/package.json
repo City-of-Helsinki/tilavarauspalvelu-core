@@ -30,7 +30,7 @@
     "hds-core": "^2.17.1",
     "hds-design-tokens": "^2.17.0",
     "hds-react": "^2.17.0",
-    "i18next": "^23.8.2",
+    "i18next": "^23.10.1",
     "lodash": "^4.17.21",
     "mapbox-gl": "^3.0.1",
     "next": "14.1.3",
