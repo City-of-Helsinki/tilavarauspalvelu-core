@@ -359,8 +359,8 @@ importers:
         specifier: ^4.4.10
         version: 4.4.10
       '@types/sanitize-html':
-        specifier: ^2.9.5
-        version: 2.9.5
+        specifier: ^2.11.0
+        version: 2.11.0
       '@types/styled-components':
         specifier: ^5.1.29
         version: 5.1.29
@@ -6902,8 +6902,8 @@ packages:
       '@types/scheduler': 0.16.3
       csstype: 3.1.2
 
-  /@types/sanitize-html@2.9.5:
-    resolution: {integrity: sha512-2Sr1vd8Dw+ypsg/oDDfZ57OMSG2Befs+l2CMyCC5bVSK3CpE7lTB2aNlbbWzazgVA+Qqfuholwom6x/mWd1qmw==}
+  /@types/sanitize-html@2.11.0:
+    resolution: {integrity: sha512-7oxPGNQHXLHE48r/r/qjn7q0hlrs3kL7oZnGj0Wf/h9tj/6ibFyRkNbsDxaBBZ4XUZ0Dx5LGCyDJ04ytSofacQ==}
     dependencies:
       htmlparser2: 8.0.2
     dev: true
