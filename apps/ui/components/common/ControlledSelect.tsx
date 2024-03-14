@@ -3,14 +3,15 @@ import { Select } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { Controller, useForm } from "react-hook-form";
 import { OptionType } from "common/types/common";
-import { getSelectedOption } from "../../modules/util";
+import { getSelectedOption } from "@/modules/util";
 
 type Props = {
   name: string;
   label: string;
   control: ReturnType<typeof useForm>["control"];
-  required: boolean;
   options: OptionType[];
+  required?: boolean;
+  disabled?: boolean;
   error?: string;
   validate?: { [key: string]: (val: string) => boolean };
 };
@@ -41,7 +42,7 @@ const ControlledSelect = ({
             placeholder={t("common:select")}
             options={options}
             label={label}
-            required={required}
+            required={required ?? false}
             onChange={(selection: OptionType): void => {
               field.onChange(selection.value);
             }}

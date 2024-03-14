@@ -1,10 +1,9 @@
 import React, { useCallback, useMemo } from "react";
 import type { OptionType } from "common/types/common";
-import { DateInput, IconAngleDown, Select } from "hds-react";
+import { IconAngleDown } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { chunkArray, toUIDate } from "common/src/common/util";
-import { getLocalizationLang } from "common/src/helpers";
+import { chunkArray } from "common/src/common/util";
 import { fontBold, fontMedium, H4 } from "common/src/common/typography";
 import type { ReservationUnitType } from "common/types/gql-types";
 import { breakpoints } from "common";
@@ -12,15 +11,16 @@ import {
   getReservationUnitPrice,
   getTimeString,
 } from "@/modules/reservationUnit";
-import { getPostLoginUrl, getSelectedOption } from "@/modules/util";
+import { getPostLoginUrl } from "@/modules/util";
 import { MediumButton } from "@/styles/util";
 import Carousel from "../Carousel";
 import LoginFragment from "../LoginFragment";
 import { getLastPossibleReservationDate } from "@/components/reservation-unit/utils";
-import { isValid } from "date-fns";
 import type { FocusTimeSlot } from "@/components/calendar/ReservationCalendarControls";
 import type { SubmitHandler, UseFormReturn } from "react-hook-form";
 import { PendingReservationFormType } from "@/components/reservation-unit/schema";
+import ControlledDateInput from "@/components/common/ControlledDateInput";
+import ControlledSelect from "@/components/common/ControlledSelect";
 
 export type TimeRange = {
   start: Date;
@@ -159,7 +159,7 @@ const SlotButton = styled.button`
   user-select: none;
 `;
 
-const StyledSelect = styled(Select<OptionType>)`
+const StyledSelect = styled(ControlledSelect)`
   li[role="option"] {
     white-space: nowrap;
   }
@@ -214,7 +214,7 @@ const QuickReservation = ({
   storeReservationForLogin,
   submitReservation,
 }: Props): JSX.Element | null => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { setValue, watch, handleSubmit } = reservationForm;
   const formDate = watch("date");
   const dateValue = useMemo(() => new Date(formDate ?? ""), [formDate]);
@@ -224,8 +224,6 @@ const QuickReservation = ({
   );
   const duration =
     watch("duration") ?? reservationUnit?.minReservationDuration ?? 0;
-  const selectedDuration = getSelectedOption(duration, durationOptions);
-  const time = watch("time") ?? getTimeString();
 
   const getPrice = useCallback(
     (asNumeral = false) => {
@@ -252,6 +250,16 @@ const QuickReservation = ({
       itemsPerChunk
     ).slice(0, timeItems / itemsPerChunk);
   }, [startingTimeOptions]);
+  let activeChunk = 0;
+  for (let i = 0; i < timeChunks.length; i++) {
+    if (
+      timeChunks[i].some((item) => {
+        return item === watch("time");
+      })
+    ) {
+      activeChunk = i;
+    }
+  }
 
   const lastPossibleDate = getLastPossibleReservationDate(
     reservationUnit ?? undefined
@@ -265,33 +273,24 @@ const QuickReservation = ({
     >
       <Heading>{t("reservationCalendar:quickReservation.heading")}</Heading>
       <Selects>
-        <DateInput
+        <ControlledDateInput
           id="quick-reservation-date"
+          name="date"
+          control={reservationForm.control}
           label={t("reservationCalendar:startDate")}
-          initialMonth={new Date()}
-          language={getLocalizationLang(i18n.language)}
-          onChange={(_val, valueAsDate) => {
-            if (isValid(valueAsDate) && valueAsDate.getFullYear() > 1970) {
-              setValue("date", valueAsDate.toString());
-            }
-          }}
-          value={toUIDate(focusDate)}
+          initialMonth={dateValue ?? new Date()}
           minDate={new Date()}
           maxDate={lastPossibleDate ?? undefined}
         />
         <StyledSelect
-          key={`durationSelect-${selectedDuration?.value}`}
-          id="quick-reservation-duration"
+          name="duration"
+          control={reservationForm.control}
           label={t("reservationCalendar:duration")}
           options={durationOptions}
-          onChange={(val: OptionType) =>
-            setValue("duration", Number(val.value))
-          }
-          defaultValue={selectedDuration}
         />
       </Selects>
       <Price data-testid="quick-reservation-price">
-        {time && (
+        {focusSlot?.isReservable && (
           <>
             {t("reservationUnit:price")}: <PriceValue>{getPrice()}</PriceValue>
             {getPrice(true) !== "0" && subventionSuffix}
@@ -313,10 +312,11 @@ const QuickReservation = ({
               {timeChunks.map((chunk: string[], index: number) => (
                 <SlotGroup key={chunk[0]}>
                   {chunk.map((value: string) => (
-                    <Slot $active={time === value} key={value}>
+                    <Slot $active={watch("time") === value} key={value}>
                       <SlotButton
                         data-testid="quick-reservation-slot"
                         onClick={() => setValue("time", value)}
+                        type="button"
                       >
                         {value}
                       </SlotButton>

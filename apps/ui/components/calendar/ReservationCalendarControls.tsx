@@ -1,15 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation, type TFunction } from "next-i18next";
 import styled from "styled-components";
-import { isValid, parseISO, startOfDay } from "date-fns";
-import {
-  Button,
-  DateInput,
-  IconAngleDown,
-  IconAngleUp,
-  IconCross,
-  Select,
-} from "hds-react";
+import { Button, IconAngleDown, IconAngleUp, IconCross } from "hds-react";
 import { maxBy, trim } from "lodash";
 import { toUIDate } from "common/src/common/util";
 import { Transition } from "react-transition-group";
@@ -21,22 +13,18 @@ import {
 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { ReservationUnitType } from "common/types/gql-types";
-import { getLocalizationLang } from "common/src/helpers";
 import { MediumButton, truncatedText } from "@/styles/util";
 import {
   getReservationUnitPrice,
   getTimeString,
 } from "@/modules/reservationUnit";
 import LoginFragment from "../LoginFragment";
-import {
-  capitalize,
-  formatDuration,
-  getPostLoginUrl,
-  getSelectedOption,
-} from "@/modules/util";
+import { capitalize, getPostLoginUrl, getSelectedOption } from "@/modules/util";
 import type { SubmitHandler, UseFormReturn } from "react-hook-form";
 import type { TimeRange } from "@/components/reservation-unit/QuickReservation";
 import { PendingReservationFormType } from "@/components/reservation-unit/schema";
+import ControlledDateInput from "@/components/common/ControlledDateInput";
+import ControlledSelect from "@/components/common/ControlledSelect";
 
 export type FocusTimeSlot = TimeRange & {
   isReservable: boolean;
@@ -159,7 +147,7 @@ const Content = styled.div<{ $isAnimated: boolean }>`
   }
 
   @media (min-width: ${breakpoints.xl}) {
-    grid-template-columns: 154px 105px 140px minmax(100px, 1fr) 110px auto;
+    grid-template-columns: 154px 120px 140px minmax(100px, 1fr) 110px auto;
   }
 `;
 
@@ -253,7 +241,7 @@ const SubmitButton = styled(MediumButton)`
   }
 `;
 
-const StyledSelect = styled(Select<OptionType>)`
+const StyledSelect = styled(ControlledSelect)`
   & > div:nth-of-type(2) {
     line-height: var(--lineheight-l);
   }
@@ -311,21 +299,31 @@ const ReservationCalendarControls = ({
   startingTimeOptions,
   submitReservation,
 }: Props): JSX.Element => {
-  const { t, i18n } = useTranslation();
-  const { setValue, watch, handleSubmit } = reservationForm;
+  const { t } = useTranslation();
+  const { watch, handleSubmit } = reservationForm;
   const { start, end } = focusSlot ?? {};
   const formDate = watch("date");
   const formDuration = watch("duration");
   const date = new Date(formDate ?? "");
+  const dateValue = useMemo(() => new Date(formDate ?? ""), [formDate]);
+  const focusDate = useMemo(
+    () => focusSlot?.start ?? dateValue,
+    [focusSlot, dateValue]
+  );
   const duration = !Number.isNaN(Number(formDuration))
     ? Number(formDuration)
     : reservationUnit.minReservationDuration ?? 0;
-  const time = watch("time") ?? getTimeString();
+  const time = watch("time") ?? getTimeString(focusDate);
   const selectedDuration: OptionType = getSelectedOption(
     duration,
     durationOptions
   ) as OptionType;
-  const selectedTime = getSelectedOption(time.toString(), startingTimeOptions);
+  // if there's a query parameter value for time it can be unreservable and thus not in the list of startingTimeOptions.
+  // so we construct the selected time as an option, which is then shown as the selected option even if not "valid".
+  const selectedTime = getSelectedOption(
+    time.toString(),
+    startingTimeOptions
+  ) ?? { value: time, label: time };
   const [areControlsVisible, setAreControlsVisible] = useState(false);
 
   useEffect(() => {
@@ -335,19 +333,19 @@ const ReservationCalendarControls = ({
   }, [setShouldCalendarControlsBeVisible, shouldCalendarControlsBeVisible]);
 
   const startDate = t("common:dateWithWeekday", {
-    date: start && parseISO(start.toISOString()),
+    date: start && toUIDate(start),
   });
 
   const startTime = t("common:timeInForm", {
-    date: start && parseISO(start.toISOString()),
+    date: start && getTimeString(start),
   });
 
   const endDate = t("common:dateWithWeekday", {
-    date: end && parseISO(end.toISOString()),
+    date: end && toUIDate(end),
   });
 
   const endTime = t("common:timeInForm", {
-    date: end && parseISO(end.toISOString()),
+    date: end && getTimeString(end),
   });
 
   const togglerLabel = (() => {
@@ -357,7 +355,7 @@ const ReservationCalendarControls = ({
       }${endTime}`,
       "-"
     );
-    const durationStr = duration != null ? formatDuration(duration, t) : "";
+    const durationStr = duration != null ? selectedDuration.label : "";
 
     return `${dateStr}, ${durationStr}`;
   })();
@@ -449,21 +447,11 @@ const ReservationCalendarControls = ({
         >
           {(state) => (
             <Content className={state} $isAnimated={isAnimated}>
-              <DateInput
-                onChange={(val, valueAsDate) => {
-                  if (
-                    val &&
-                    isValid(valueAsDate) &&
-                    valueAsDate > startOfDay(new Date())
-                  ) {
-                    setValue("date", valueAsDate.toISOString());
-                  }
-                }}
-                value={date != null ? toUIDate(date) : ""}
-                id="reservation__input--date"
-                initialMonth={new Date()}
+              <ControlledDateInput
+                name="date"
+                control={reservationForm.control}
                 label={t("reservationCalendar:startDate")}
-                language={getLocalizationLang(i18n.language)}
+                initialMonth={dateValue ?? new Date()}
                 minDate={new Date()}
                 maxDate={
                   lastOpeningDate?.endDatetime
@@ -472,26 +460,18 @@ const ReservationCalendarControls = ({
                 }
               />
               <StyledSelect
-                id="reservation__input--start-time"
-                key={`startTimeSelect-${selectedTime?.value}`}
+                name="time"
                 label={t("reservationCalendar:startTime")}
-                onChange={(val: OptionType) => {
-                  setValue("time", val.value?.toString());
-                }}
+                control={reservationForm.control}
                 options={startingTimeOptions}
-                defaultValue={selectedTime}
-                disabled={!(startingTimeOptions?.length >= 1)}
+                disabled={!(startingTimeOptions?.length >= 1) && !time}
               />
               <div data-testid="reservation__input--duration">
                 <StyledSelect
-                  key={`durationSelect-${selectedDuration?.value}`}
-                  id="reservation__input--duration"
+                  name="duration"
+                  control={reservationForm.control}
                   label={t("reservationCalendar:duration")}
-                  onChange={(val: OptionType) =>
-                    setValue("duration", Number(val.value))
-                  }
                   options={durationOptions}
-                  defaultValue={selectedDuration}
                 />
               </div>
               <PriceWrapper>
