@@ -3,11 +3,10 @@ from assertpy import assert_that
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 
+from email_notification.exceptions import EmailTemplateValidationError, ReservationEmailNotificationBuilderException
 from email_notification.sender.email_notification_builder import (
     EmailNotificationContext,
-    EmailTemplateValidationError,
     ReservationEmailNotificationBuilder,
-    ReservationEmailNotificationBuilderException,
 )
 from tests.factories import EmailTemplateFactory, ReservationFactory, ReservationUnitFactory, UnitFactory
 
