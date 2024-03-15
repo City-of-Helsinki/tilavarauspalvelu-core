@@ -5,6 +5,13 @@
   "500": {
     "body": "Jotain meni pieleen"
   },
+  "applicationMutation": {
+    "Validation error": "Virheellinen rajapintakutsu",
+    "Form validation error": "Virheellinen lomake",
+    "Unknown network error": "Tuntematon verkkovirhe",
+    "Unknown GQL error": "Tuntematon GraphQL-virhe",
+    "Unknown error": "Tuntematon virhe"
+  },
   "general_error": "Tapahtui määrittämätön virhe.",
   "CHANGES_NOT_ALLOWED": "Muutoksia ei sallita.",
   "RESERVATION_UNIT_NOT_RESERVABLE": "Kohde ei ole varattavissa.",

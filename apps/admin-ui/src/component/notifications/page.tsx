@@ -42,7 +42,7 @@ import {
   checkValidFutureDate,
   checkTimeStringFormat,
   checkLengthWithoutHtml,
-} from "app/schemas";
+} from "common/src/schemas/schemaCommon";
 import {
   valueForDateInput,
   valueForTimeInput,

@@ -4,7 +4,7 @@
 
 import { ReserveeType } from "common/types/gql-types";
 import { z } from "zod";
-import { OptionSchema } from "./schemaCommon";
+import { OptionSchema } from "common/src/schemas/schemaCommon";
 
 export const reservationTypeSchema = z.enum(["STAFF", "BEHALF", "BLOCKED"]);
 

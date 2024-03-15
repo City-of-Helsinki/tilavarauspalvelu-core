@@ -10,7 +10,7 @@ import {
   checkDateNotInPast,
   checkTimeStringFormat,
   OptionSchema,
-} from "./schemaCommon";
+} from "common/src/schemas/schemaCommon";
 import { intervalToNumber } from "./utils";
 
 // TODO handle metadata (variable form fields) instead of using .passthrough

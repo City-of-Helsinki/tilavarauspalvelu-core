@@ -15,5 +15,6 @@ module.exports = {
     typeof window === "undefined"
       ? require("node:path").resolve("./public/locales")
       : "/public/locales",
+  // TODO this doesn't work, it is supposed to enable fast refresh for json translations
   reloadOnPrerender: process.env.NODE_ENV === "development",
 };

@@ -5,6 +5,13 @@
   "500": {
     "body": "Något oväntat hände"
   },
+  "applicationMutation": {
+    "Validation error": "Ett fel uppstod i API-anropet",
+    "Form validation error": "Formuläret innehåller fel",
+    "Unknown network error": "Okänt nätverksfel",
+    "Unknown GQL error": "Okänt GQL-fel",
+    "Unknown error": "Okänt fel"
+  },
   "general_error": "Odefinierat fel.",
   "CHANGES_NOT_ALLOWED": "Du kan inte göra ändringar.",
   "RESERVATION_UNIT_NOT_RESERVABLE": "Objektet går inte att boka.",

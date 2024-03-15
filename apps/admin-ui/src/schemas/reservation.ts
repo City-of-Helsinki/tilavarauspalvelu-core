@@ -2,7 +2,10 @@ import { z } from "zod";
 import { fromUIDate } from "common/src/common/util";
 import { ReservationStartInterval } from "common/types/gql-types";
 import { intervalToNumber } from "./utils";
-import { checkTimeStringFormat, checkValidFutureDate } from "./schemaCommon";
+import {
+  checkTimeStringFormat,
+  checkValidFutureDate,
+} from "common/src/schemas/schemaCommon";
 import { constructApiDate } from "@/helpers";
 
 export const ReservationTypes = [

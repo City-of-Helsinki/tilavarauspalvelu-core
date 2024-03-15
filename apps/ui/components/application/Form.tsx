@@ -17,6 +17,7 @@ import { z } from "zod";
 import type { ReservationUnitNode } from "common";
 import { toApiDate } from "common/src/common/util";
 import { apiDateToUIDate, fromUIDate } from "@/modules/util";
+import { lessThanMaybeDate } from "common/src/schemas/schemaCommon";
 
 // NOTE the zod schemas have a lot of undefineds because the form is split into four pages
 // so you can't trust some of the zod validation (e.g. mandatory fields)
@@ -35,18 +36,6 @@ export type ApplicationEventScheduleFormType = z.infer<
   typeof ApplicationEventScheduleFormTypeSchema
 >;
 
-function lessThanMaybeDate(a?: string | null, b?: string | null): boolean {
-  if (a == null || b == null) {
-    return false;
-  }
-  const aDate = fromUIDate(a);
-  const bDate = fromUIDate(b);
-  if (aDate == null || bDate == null) {
-    return false;
-  }
-  return aDate < bDate;
-}
-
 const SuitableTimeRangeFormTypeSchema = z.object({
   pk: z.number().optional(),
   priority: z.nativeEnum(Priority),
@@ -59,7 +48,6 @@ export type SuitableTimeRangeFormValues = z.infer<
   typeof SuitableTimeRangeFormTypeSchema
 >;
 
-// TODO this should be splitted into separate schemas for each page
 const ApplicationSectionFormValueSchema = z
   .object({
     pk: z.number().optional(),
@@ -70,6 +58,8 @@ const ApplicationSectionFormValueSchema = z
     minDuration: z.number().min(1, { message: "Required" }),
     maxDuration: z.number().min(1, { message: "Required" }),
     appliedReservationsPerWeek: z.number().min(1),
+    // TODO validate these to be valid dates
+    // TODO validate these to be inside the application round begin and end dates
     begin: z
       .string()
       .optional()
@@ -79,6 +69,7 @@ const ApplicationSectionFormValueSchema = z
       .optional()
       .refine((s) => s, { path: [""], message: "Required" }),
     // optional because it's not present on the first page
+    // TODO do we check this on Page2? not undefined and length > 0?)
     suitableTimeRanges: z.array(SuitableTimeRangeFormTypeSchema).optional(),
     // TODO do we want to keep the pk of the options? so we can update them when the order changes and not recreate the whole list on save?
     reservationUnits: z.array(z.number()).min(1, { message: "Required" }),
@@ -95,6 +86,7 @@ const ApplicationSectionFormValueSchema = z
     path: ["end"],
     message: "End date must be after begin date",
   });
+// TODO pass the application round begin and end dates to the form and validate the begin and end dates to be inside the application round begin and end dates
 
 export type ApplicationSectionFormValue = z.infer<
   typeof ApplicationSectionFormValueSchema

@@ -5,6 +5,13 @@
   "500": {
     "body": "Something unexpected happened"
   },
+  "applicationMutation": {
+    "Validation error": "Error in the API call",
+    "Form validation error": "Form validation error",
+    "Unknown network error": "Unknown network error",
+    "Unknown GQL error": "Unknown GraphQL error",
+    "Unknown error": "Unknown error occurred."
+  },
   "general_error": "Undefined error.",
   "CHANGES_NOT_ALLOWED": "You cannot make changes to the booking.",
   "RESERVATION_UNIT_NOT_RESERVABLE": "The item cannot be booked.",

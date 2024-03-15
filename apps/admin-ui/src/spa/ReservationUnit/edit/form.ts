@@ -22,7 +22,10 @@ import {
 import { addDays, format } from "date-fns";
 import { z } from "zod";
 import { TFunction } from "i18next";
-import { checkLengthWithoutHtml, checkTimeStringFormat } from "@/schemas";
+import {
+  checkLengthWithoutHtml,
+  checkTimeStringFormat,
+} from "common/src/schemas/schemaCommon";
 import { constructApiDate } from "@/helpers";
 
 export const PaymentTypes = ["ONLINE", "INVOICE", "ON_SITE"] as const;

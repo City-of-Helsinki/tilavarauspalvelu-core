@@ -45,6 +45,7 @@ function getErrorMessages(error: unknown): string {
           // TODO match to known error messages
           // fallback to return unkown backend validation error (different from other unknown errors)
           const { errors } = networkError.result;
+          // TODO separate validation errors: this is invalid MutationInput (probably a bug)
           const VALIDATION_ERROR = "Variable '$input'";
           const isValidationError =
             errors.find((e: unknown) => {
@@ -65,6 +66,23 @@ function getErrorMessages(error: unknown): string {
       return networkError.message;
     }
     if (graphQLErrors.length > 0) {
+      // TODO separate validation errors: this is invalid form values (user error)
+      const MUTATION_ERROR_CODE = "MUTATION_VALIDATION_ERROR";
+      const isMutationError =
+        graphQLErrors.find((e) => {
+          if (e.extensions == null) {
+            return false;
+          }
+          return e.extensions.code === MUTATION_ERROR_CODE;
+        }) != null;
+      // Possible mutations errors (there are others too)
+      // 1. message: "Voi hakea vain 1-7 varausta viikossa."
+      //  - code: "invalid"
+      // 2. message: "Reservations begin date cannot be before the application round's reservation period begin date."
+      //  - code: ""
+      if (isMutationError) {
+        return "Form validation error";
+      }
       return "Unknown GQL error";
     }
   }
@@ -165,6 +183,8 @@ function ApplicationRootPage({
     formState: { isDirty },
   } = form;
 
+  const { t } = useTranslation();
+
   /* TODO removing form reset on page load for now
    * the defaultValues should be enough and seems to work when loading an existing application
    * this page is not saved + refreshed but goes to second page after save.
@@ -175,12 +195,13 @@ function ApplicationRootPage({
   const applicationRoundName =
     applicationRound != null ? getTranslation(applicationRound, "name") : "-";
 
-  // TODO the error message needs to be translated
   const errorMessage = getErrorMessages(error);
+  const errorTranslated =
+    errorMessage !== "" ? t(`errors:applicationMutation.${errorMessage}`) : "";
 
   return (
     <FormProvider {...form}>
-      {errorMessage !== "" && <ErrorToast error={errorMessage} />}
+      {errorTranslated !== "" && <ErrorToast error={errorTranslated} />}
       {pageId === "page1" ? (
         <ApplicationPageWrapper
           overrideText={applicationRoundName}
