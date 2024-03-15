@@ -17,7 +17,7 @@ from api.graphql.extensions.permission_helpers import (
     reservation_staff_field,
 )
 from api.graphql.types.merchants.types import PaymentOrderType
-from api.graphql.types.reservation_units.permissions import ReservationUnitPermission
+from api.graphql.types.reservation_unit.permissions import ReservationUnitPermission
 from api.graphql.types.reservations.permissions import (
     AbilityGroupPermission,
     AgeGroupPermission,
@@ -68,7 +68,7 @@ class RecurringReservationType(AuthNode, OldPrimaryKeyObjectType):
     age_group = graphene.Field(AgeGroupType)
     ability_group = graphene.Field(AbilityGroupType)
     weekdays = graphene.List(graphene.Int)
-    reservation_unit = RelatedField("api.graphql.types.reservation_units.types.ReservationUnitType")
+    reservation_unit = RelatedField("api.graphql.types.reservation_unit.types.ReservationUnitNode")
 
     class Meta:
         model = RecurringReservation
@@ -135,7 +135,7 @@ class ReservationType(AuthNode, OldPrimaryKeyObjectType):
     order = graphene.Field(PaymentOrderType)
     price = graphene.Float()
     price_net = graphene.Decimal()
-    reservation_units = graphene.List("api.graphql.types.reservation_units.types.ReservationUnitType")
+    reservation_units = graphene.List("api.graphql.types.reservation_unit.types.ReservationUnitNode")
     recurring_reservation = graphene.Field(RecurringReservationType)
     reservee_first_name = graphene.String()
     reservee_last_name = graphene.String()

@@ -11,7 +11,7 @@ from api.graphql.types.permissions.permissions import (
     ServiceSectorRolePermission,
     UnitRolePermission,
 )
-from api.graphql.types.spaces.types import ServiceSectorType
+from api.graphql.types.service_sector.types import ServiceSectorType
 from api.graphql.types.units.types import UnitGroupType, UnitType
 from common.typing import GQLInfo
 from permissions.helpers import can_view_users

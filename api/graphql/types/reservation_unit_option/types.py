@@ -8,7 +8,7 @@ from applications.models import ReservationUnitOption
 
 
 class ReservationUnitOptionNode(DjangoNode):
-    reservation_unit = RelatedField("api.graphql.types.reservation_units.types.ReservationUnitType")
+    reservation_unit = RelatedField("api.graphql.types.reservation_unit.types.ReservationUnitNode")
 
     allocated_time_slots = AllocatedTimeSlotNode.ListField()
 

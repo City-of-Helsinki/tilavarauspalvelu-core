@@ -4,7 +4,7 @@ from graphene_permissions.mixins import AuthNode
 from api.graphql.extensions.base_types import TVPBaseConnection
 from api.graphql.extensions.legacy_helpers import OldPrimaryKeyObjectType, get_all_translatable_fields
 from api.graphql.extensions.permission_helpers import check_resolver_permission
-from api.graphql.types.reservation_units.permissions import ReservationUnitPermission
+from api.graphql.types.reservation_unit.permissions import ReservationUnitPermission
 from api.graphql.types.spaces.permissions import SpacePermission
 from api.graphql.types.units.permissions import UnitPermission
 from common.typing import GQLInfo
@@ -16,10 +16,10 @@ class UnitType(AuthNode, OldPrimaryKeyObjectType):
     permission_classes = (UnitPermission,)
 
     # avoid circulars and use path.
-    reservation_units = graphene.List("api.graphql.types.reservation_units.types.ReservationUnitType")
+    reservation_units = graphene.List("api.graphql.types.reservation_unit.types.ReservationUnitNode")
     spaces = graphene.List("api.graphql.types.spaces.types.SpaceType")
-    location = graphene.Field("api.graphql.types.spaces.types.LocationType")
-    service_sectors = graphene.List("api.graphql.types.spaces.types.ServiceSectorType")
+    location = graphene.Field("api.graphql.types.location.types.LocationType")
+    service_sectors = graphene.List("api.graphql.types.service_sector.types.ServiceSectorType")
     payment_merchant = graphene.Field("api.graphql.types.merchants.types.PaymentMerchantType")
 
     class Meta:

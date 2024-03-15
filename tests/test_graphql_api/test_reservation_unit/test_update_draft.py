@@ -43,7 +43,7 @@ def test_reservation_unit__update__metadata_set(graphql):
 
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
     metadata_set = ReservationMetadataSetFactory.create()
-    data = get_draft_update_input_data(reservation_unit, metadataSetPk=metadata_set.pk)
+    data = get_draft_update_input_data(reservation_unit, metadataSet=metadata_set.pk)
 
     response = graphql(UPDATE_MUTATION, input_data=data)
     assert response.has_errors is False, response
@@ -56,7 +56,7 @@ def test_reservation_unit__update__metadata_set__null(graphql):
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
-    data = get_draft_update_input_data(reservation_unit, metadataSetPk=None)
+    data = get_draft_update_input_data(reservation_unit, metadataSet=None)
 
     response = graphql(UPDATE_MUTATION, input_data=data)
     assert response.has_errors is False, response
@@ -74,9 +74,9 @@ def test_reservation_unit__update__terms_of_use(graphql):
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
     data = get_draft_update_input_data(
         reservation_unit,
-        paymentTermsPk=payment_terms.pk,
-        cancellationTermsPk=cancellation_terms.pk,
-        serviceSpecificTermsPk=service_specific_terms.pk,
+        paymentTerms=payment_terms.pk,
+        cancellationTerms=cancellation_terms.pk,
+        serviceSpecificTerms=service_specific_terms.pk,
     )
 
     response = graphql(UPDATE_MUTATION, input_data=data)
@@ -124,7 +124,7 @@ def test_reservation_unit__update__authentication(graphql):
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
-    data = get_draft_update_input_data(reservation_unit, authentication=AuthenticationType.STRONG)
+    data = get_draft_update_input_data(reservation_unit, authentication=AuthenticationType.STRONG.value.upper())
 
     response = graphql(UPDATE_MUTATION, input_data=data)
     assert response.has_errors is False, response
@@ -141,7 +141,7 @@ def test_reservation_unit__update__errors_with_invalid_authentication(graphql):
 
     response = graphql(UPDATE_MUTATION, input_data=data)
 
-    assert response.error_message() == 'Choice "invalid" is not allowed. Allowed choices are: WEAK, STRONG.'
+    assert response.error_message().startswith("Variable '$input' got invalid value 'invalid'")
 
     reservation_unit.refresh_from_db()
     assert reservation_unit.authentication != "invalid"
@@ -151,11 +151,12 @@ def test_reservation_unit__update__errors_with_empty_name(graphql):
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
-    data = get_draft_update_input_data(reservation_unit, nameFi="")
+    data = get_draft_update_input_data(reservation_unit, name="")
 
     response = graphql(UPDATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "nameFi is required for draft reservation units."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("name") == ["Tämä kenttä ei voi olla tyhjä."]
 
     reservation_unit.refresh_from_db()
     assert reservation_unit.name_fi != ""
@@ -197,5 +198,4 @@ def test_reservation_unit__update__archiving_removes_contact_information_and_aud
 
     # Old log entries are removed
     log_entries = LogEntry.objects.filter(content_type_id=content_type.pk, object_id=reservation_unit.pk)
-    assert log_entries.count() == 1
-    assert log_entries[0].changes == '{"is_archived": ["False", "True"]}'
+    assert log_entries.count() == 0

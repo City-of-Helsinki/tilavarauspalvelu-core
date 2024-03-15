@@ -5,8 +5,9 @@ from graphene_permissions.mixins import AuthNode
 from api.graphql.extensions.base_types import TVPBaseConnection
 from api.graphql.extensions.duration_field import Duration
 from api.graphql.extensions.legacy_helpers import OldPrimaryKeyObjectType, get_all_translatable_fields
+from api.graphql.types.building.types import BuildingType
 from api.graphql.types.resources.permissions import ResourcePermission
-from api.graphql.types.spaces.types import BuildingType, SpaceType
+from api.graphql.types.spaces.types import SpaceType
 from resources.choices import ResourceLocationType
 from resources.models import Resource
 
