@@ -88,7 +88,7 @@ class ApplicationSection(SerializableMixin, models.Model):
         verbose_name_plural = _("Application sections")
         constraints = [
             models.CheckConstraint(
-                check=models.Q(reservations_begin_date__lt=models.F("reservations_end_date")),
+                check=models.Q(reservations_begin_date__lte=models.F("reservations_end_date")),
                 name="begin_date_before_end_date",
                 violation_error_message=_("Reservations begin date must be before reservations end date."),
             ),
