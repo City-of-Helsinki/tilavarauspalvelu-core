@@ -242,7 +242,7 @@ def test_reservation_unit__query__sensitive_information__general_admin(graphql):
     assert PersonalInfoViewLog.objects.count() == 1
 
 
-def test_reservation_unit__query__payment_merchant__hide_without_permissions(graphql):
+def test_reservation_unit__query__payment_merchant__without_permissions(graphql):
     merchant = PaymentMerchantFactory.create()
     ReservationUnitFactory.create(payment_merchant=merchant)
 
@@ -250,25 +250,16 @@ def test_reservation_unit__query__payment_merchant__hide_without_permissions(gra
     query = reservation_units_query(fields="paymentMerchant { name }")
     response = graphql(query)
 
-    assert response.has_errors is False, response.errors
-    assert len(response.edges) == 1
-    assert response.node(0) == {"paymentMerchant": None}
+    assert response.error_message("paymentMerchant") == "No permission to access field."
 
 
-def test_reservation_unit__query__payment_product__hide_without_permissions(graphql):
+def test_reservation_unit__query__payment_product__without_permissions(graphql):
     merchant = PaymentMerchantFactory.create()
     product = PaymentProductFactory.create(merchant=merchant)
     ReservationUnitFactory.create(payment_merchant=merchant, payment_product=product)
 
-    graphql.login_with_superuser()
+    graphql.login_with_regular_user()
     query = reservation_units_query(fields="paymentProduct { pk merchantPk }")
     response = graphql(query)
 
-    assert response.has_errors is False, response.errors
-    assert len(response.edges) == 1
-    assert response.node(0) == {
-        "paymentProduct": {
-            "pk": str(product.id),
-            "merchantPk": str(merchant.id),
-        },
-    }
+    assert response.error_message("paymentProduct") == "No permission to access field."

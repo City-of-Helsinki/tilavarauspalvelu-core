@@ -1,17 +1,12 @@
 import graphene
-from graphene_django_extensions.fields import RelatedField
-from graphene_permissions.mixins import AuthNode
+from graphene_django_extensions import DjangoNode
 
-from api.graphql.extensions.legacy_helpers import OldPrimaryKeyObjectType
-from api.graphql.types.tax_percentage.types import TaxPercentageType
 from reservation_units.models import ReservationUnitPricing
 
 
-class ReservationUnitPricingType(AuthNode, OldPrimaryKeyObjectType):
+class ReservationUnitPricingNode(DjangoNode):
     lowest_price_net = graphene.Decimal()
     highest_price_net = graphene.Decimal()
-
-    tax_percentage = RelatedField(TaxPercentageType)
 
     class Meta:
         model = ReservationUnitPricing

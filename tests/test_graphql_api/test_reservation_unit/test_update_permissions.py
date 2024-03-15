@@ -21,7 +21,7 @@ def test_reservation_unit__update__regular_user(graphql):
 
     response = graphql(UPDATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "No permission to mutate"
+    assert response.error_message() == "No permission to update."
 
 
 @pytest.mark.parametrize(
@@ -61,4 +61,4 @@ def test_anonymous_user_cannot_update_reservation_unit_with_timeslots(graphql, u
     # - The response contains errors about missing permissions
     assert response.has_errors is expected_errors, response
     if expected_errors:
-        assert response.error_message() == "No permission to mutate"
+        assert response.error_message() == "No permission to update."
