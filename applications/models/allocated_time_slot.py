@@ -50,7 +50,13 @@ class AllocatedTimeSlot(models.Model):
         verbose_name_plural = _("Allocated Time Slots")
         constraints = [
             models.CheckConstraint(
-                check=models.Q(begin_time__lt=models.F("end_time")),
+                check=(
+                    models.Q(begin_time__lt=models.F("end_time"))  # begin before end
+                    | (
+                        models.Q(end_time__hour=0)  # end at midnight, but start not
+                        & ~models.Q(begin_time__hour=0)
+                    )
+                ),
                 name="begin_time_before_end_time_allocated",
                 violation_error_message=_("Begin time must be before end time."),
             ),
