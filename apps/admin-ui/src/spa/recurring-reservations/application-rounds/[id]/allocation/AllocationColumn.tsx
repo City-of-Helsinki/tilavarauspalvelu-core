@@ -227,6 +227,11 @@ function isInsideSelection(
   if (!start || !end) {
     return false;
   }
+  // NOTE 00:00 could be either 24:00 or 00:00
+  // but we use number comparison so for end we need 24 and start 0
+  if (end?.hour === 0) {
+    end.hour = 24;
+  }
   if (selection.day !== convertWeekday(tr.dayOfTheWeek)) {
     return false;
   }

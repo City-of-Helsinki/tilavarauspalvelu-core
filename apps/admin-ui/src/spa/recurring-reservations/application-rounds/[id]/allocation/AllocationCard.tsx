@@ -228,6 +228,7 @@ export function AllocatedCard({
   );
 }
 
+// TODO this seems very similar to the AllocationCard and Column filter functions
 function isOutsideOfRequestedTimes(
   time: SuitableTimeRangeNode | AllocatedTimeSlotNode | null,
   beginHours: number,
@@ -241,7 +242,7 @@ function isOutsideOfRequestedTimes(
   if (beginTime == null || endTime == null) {
     return true;
   }
-  if (beginHours < beginTime || endHours > endTime) {
+  if (beginHours < beginTime || endHours > (endTime === 0 ? 24 : endTime)) {
     return true;
   }
 }
@@ -359,7 +360,7 @@ function getDurationFromApiTimeInHours(begin: string, end: string) {
   if (bh == null || eh == null) {
     return undefined;
   }
-  return eh - bh;
+  return (eh === 0 ? 24 : eh) - bh;
 }
 
 function AllocatedDetails({

@@ -348,41 +348,44 @@ export function AllocationCalendar({
   );
 }
 
+// TODO combine with isInsideSelection in AllocationColumn
 function checkCell(
   day: Day,
   cell: Cell,
-  weekday: Weekday,
-  beginTime: string,
-  endTime: string
+  ts: {
+    dayOfTheWeek: Weekday;
+    beginTime: string;
+    endTime: string;
+  }
 ) {
-  if (weekday !== transformWeekday(day)) {
+  const { beginTime, endTime, dayOfTheWeek } = ts;
+  if (dayOfTheWeek !== transformWeekday(day)) {
     return false;
   }
+  // NOTE if the end time is 00:00 swap it to 24:00 (24h)
   const begin = parseApiTime(beginTime);
   const end = parseApiTime(endTime);
-  if (!begin || !end) {
+  if (begin == null || end == null) {
     return false;
   }
   const cellTime = cell.hour * 60 + cell.minute;
   const beginMinutes = begin * 60;
-  const endMinutes = end * 60;
+  const endMinutes = (end === 0 ? 24 : end) * 60;
   return cellTime >= beginMinutes && cellTime < endMinutes;
 }
 
 function isInRange(ae: ApplicationSectionNode, cell: Cell, day: Day) {
   return (
     ae.suitableTimeRanges?.some((tr) => {
-      const { dayOfTheWeek, beginTime, endTime } = tr;
-      return checkCell(day, cell, dayOfTheWeek, beginTime, endTime);
+      return checkCell(day, cell, tr);
     }) ?? false
   );
 }
 
 function isAllocated(ae: ReservationUnitOptionNode, cell: Cell, day: Day) {
   return ae.allocatedTimeSlots
-    ?.map((ts) => {
-      const { beginTime, endTime, dayOfTheWeek } = ts;
-      return checkCell(day, cell, dayOfTheWeek, beginTime, endTime);
+    ?.map((tr) => {
+      return checkCell(day, cell, tr);
     })
     .some((x) => x);
 }
