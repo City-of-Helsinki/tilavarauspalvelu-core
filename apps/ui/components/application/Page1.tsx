@@ -96,6 +96,9 @@ export function Page1({ applicationRound, onNext }: Props): JSX.Element | null {
     register(`applicationSections.${nextIndex}.appliedReservationsPerWeek`);
     register(`applicationSections.${nextIndex}.begin`);
     register(`applicationSections.${nextIndex}.end`);
+    // FIXME this needs to be filtered by currently selected application round
+    // question is though if we should filter it here or in the hook?
+    // as in provide optional applicationRound parameter to the hook
     register(`applicationSections.${nextIndex}.reservationUnits`, {
       value: filterNonNullable(selectedReservationUnits.map((ru) => ru.pk)),
     });

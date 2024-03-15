@@ -17,10 +17,10 @@ import Page2 from "@/components/application/Page2";
 import { CenterSpinner } from "@/components/common/common";
 import { getTranslation } from "@/modules/util";
 import {
-  ApplicationFormSchema,
   type ApplicationFormValues,
   transformApplication,
   convertApplication,
+  ApplicationFormSchemaRefined,
 } from "@/components/application/Form";
 import useReservationUnitsList from "@/hooks/useReservationUnitList";
 import { useApplicationUpdate } from "@/hooks/useApplicationUpdate";
@@ -173,10 +173,12 @@ function ApplicationRootPage({
   const { reservationUnits: selectedReservationUnits } =
     useReservationUnitsList();
 
+  const begin = new Date(applicationRound.reservationPeriodBegin);
+  const end = new Date(applicationRound.reservationPeriodEnd);
   const form = useForm<ApplicationFormValues>({
     mode: "onChange",
     defaultValues: convertApplication(application, selectedReservationUnits),
-    resolver: zodResolver(ApplicationFormSchema),
+    resolver: zodResolver(ApplicationFormSchemaRefined({ begin, end })),
   });
 
   const {

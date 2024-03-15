@@ -25,8 +25,14 @@
     "End date must be after begin date": "Slutdatum måste vara efter startdatum",
     "Expected number, received nan": "Felaktigt nummer",
     "Number must be greater than or equal to 1": "Numret måste vara större än eller lika med 1",
+    "Number must be less than or equal to 7": "Numret måste vara mindre än eller lika med 7",
     "Maximum duration must be greater than minimum duration": "Maximala varaktigheten måste vara större än den minsta varaktigheten",
-    "reservationUnitTooSmall": "Lokalen är för liten för gruppens användning"
+    "reservationUnitTooSmall": "Lokalen är för liten för gruppens användning",
+    "begin date must be after application round begin date": "Startdatum måste vara efter ansökningsperiodens startdatum",
+    "begin date must be before application round end date": "Startdatum måste vara före ansökningsperiodens slutdatum",
+    "end date must be before application round end date": "Slutdatum måste vara före ansökningsperiodens slutdatum",
+    "end date must be after application round begin date": "Slutdatum måste vara efter ansökningsperiodens startdatum",
+    "Invalid date": "Ogiltigt datum"
   },
   "Intro": {
     "startNewApplication": "Fyll i ansökan",

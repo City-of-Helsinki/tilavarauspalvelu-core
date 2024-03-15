@@ -44,12 +44,11 @@ export function checkDateWithinThreeYears(
   }
 }
 
-// TODO doesn't check for valid days or months i.e. 2024-02-31 and 2024-13-41 are valid
-export function checkValidDate(
+export function checkValidDateOnly(
   date: Date | null,
   ctx: z.RefinementCtx,
   path: string
-): void {
+) {
   if (!date) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -63,6 +62,16 @@ export function checkValidDate(
       message: "Invalid date",
     });
   }
+}
+
+// TODO doesn't check for valid days or months i.e. 2024-02-31 and 2024-13-41 are valid (?) it seems to work
+// TODO this should not do two things, it should only check if the date is valid, but requires refactoring the users
+export function checkValidDate(
+  date: Date | null,
+  ctx: z.RefinementCtx,
+  path: string
+): void {
+  checkValidDateOnly(date, ctx, path);
   checkDateWithinThreeYears(date, ctx, path);
 }
 

@@ -25,8 +25,14 @@
     "End date must be after begin date": "Päättymispäivän pitää olla aloituspäivän jälkeen",
     "Expected number, received nan": "Pitää olla numero",
     "Number must be greater than or equal to 1": "Pitää olla vähintään 1",
+    "Number must be less than or equal to 7": "Pitää olla enintään 7",
     "Maximum duration must be greater than minimum duration": "Enimmäiskeston pitää olla suurempi kuin vähimmäiskesto",
-    "reservationUnitTooSmall": "Tila on liian pieni ryhmän käyttöön"
+    "reservationUnitTooSmall": "Tila on liian pieni ryhmän käyttöön",
+    "begin date must be after application round begin date": "Aloituspäivän pitää olla hakukierroksen alkamispäivän jälkeen",
+    "begin date must be before application round end date": "Aloituspäivän pitää olla ennen hakukierroksen päättymispäivän",
+    "end date must be before application round end date": "Päättymispäivän pitää olla ennen hakukierroksen päättymispäivän",
+    "end date must be after application round begin date": "Päättymispäivän pitää olla hakukierroksen alkamispäivän jälkeen",
+    "Invalid date": "Virheellinen päivämäärä"
   },
   "Intro": {
     "startNewApplication": "Täytä hakemus",

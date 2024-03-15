@@ -1,3 +1,4 @@
+import { startOfDay } from "date-fns";
 import { filterNonNullable } from "common/src/helpers";
 import {
   ApplicantTypeChoice,
@@ -17,7 +18,10 @@ import { z } from "zod";
 import type { ReservationUnitNode } from "common";
 import { toApiDate } from "common/src/common/util";
 import { apiDateToUIDate, fromUIDate } from "@/modules/util";
-import { lessThanMaybeDate } from "common/src/schemas/schemaCommon";
+import {
+  checkValidDateOnly,
+  lessThanMaybeDate,
+} from "common/src/schemas/schemaCommon";
 
 // NOTE the zod schemas have a lot of undefineds because the form is split into four pages
 // so you can't trust some of the zod validation (e.g. mandatory fields)
@@ -57,9 +61,7 @@ const ApplicationSectionFormValueSchema = z
     purpose: z.number().refine((s) => s, { path: [""], message: "Required" }),
     minDuration: z.number().min(1, { message: "Required" }),
     maxDuration: z.number().min(1, { message: "Required" }),
-    appliedReservationsPerWeek: z.number().min(1),
-    // TODO validate these to be valid dates
-    // TODO validate these to be inside the application round begin and end dates
+    appliedReservationsPerWeek: z.number().min(1).max(7),
     begin: z
       .string()
       .optional()
@@ -82,11 +84,16 @@ const ApplicationSectionFormValueSchema = z
     path: ["maxDuration"],
     message: "Maximum duration must be greater than minimum duration",
   })
+  .superRefine((val, ctx) => {
+    checkValidDateOnly(fromUIDate(val.begin ?? ""), ctx, `begin`);
+  })
+  .superRefine((val, ctx) => {
+    checkValidDateOnly(fromUIDate(val.end ?? ""), ctx, `end`);
+  })
   .refine((s) => lessThanMaybeDate(s.begin, s.end), {
     path: ["end"],
     message: "End date must be after begin date",
   });
-// TODO pass the application round begin and end dates to the form and validate the begin and end dates to be inside the application round begin and end dates
 
 export type ApplicationSectionFormValue = z.infer<
   typeof ApplicationSectionFormValueSchema
@@ -218,6 +225,93 @@ export const ApplicationFormSchema = z.object({
     .optional(),
 });
 
+function checkDateRange(props: {
+  date: Date;
+  pathRoot: string;
+  part: "begin" | "end";
+  range: { begin: Date; end: Date };
+  ctx: z.RefinementCtx;
+}) {
+  const { date, pathRoot, part, range, ctx } = props;
+
+  const path = `${pathRoot}.${part}`;
+  if (startOfDay(date).getTime() < startOfDay(range.begin).getTime()) {
+    const message = `${part} date must be after application round begin date`;
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: [path],
+      message,
+    });
+  }
+  if (startOfDay(date).getTime() > startOfDay(range.end).getTime()) {
+    const message = `${part} date must be before application round end date`;
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: [path],
+      message,
+    });
+  }
+}
+
+/// check that the given time is inside a DateRange
+/// Assumes that date validity has already been checked (adds a range error if the date is invalid)
+/// but that's implementation specific and could change in the future (depending on the fromUIDate implementation)
+function checkApplicationRoundDates(
+  round: {
+    begin: Date;
+    end: Date;
+  },
+  val: ApplicationSectionFormValue,
+  pathRoot: string,
+  ctx: z.RefinementCtx
+) {
+  const { begin, end } = val;
+  if (begin == null || end == null) {
+    return;
+  }
+  const b = fromUIDate(begin);
+  const e = fromUIDate(end);
+
+  if (b != null) {
+    checkDateRange({
+      date: b,
+      pathRoot,
+      part: "begin",
+      range: { begin: round.begin, end: round.end },
+      ctx,
+    });
+  }
+
+  if (e != null) {
+    checkDateRange({
+      date: e,
+      pathRoot,
+      part: "end",
+      range: { begin: round.begin, end: round.end },
+      ctx,
+    });
+  }
+}
+
+export function ApplicationFormSchemaRefined(round: {
+  begin: Date;
+  end: Date;
+}) {
+  return ApplicationFormSchema.superRefine((val, ctx) => {
+    if (val.applicationSections == null) {
+      return;
+    }
+    for (let i = 0; i < val.applicationSections.length; i++) {
+      const section = val.applicationSections[i];
+      if (section == null) {
+        continue;
+      }
+      const pathRoot = `applicationSections.${i}`;
+      checkApplicationRoundDates(round, section, pathRoot, ctx);
+    }
+  });
+}
+
 // TODO refine the form (different applicant types require different fields)
 // if applicantType === Organisation | Company => organisation.identifier is required
 // if hasBillingAddress | applicantType === Individual => billingAddress is required
@@ -286,6 +380,7 @@ function transformApplicationSection(
     reservationMaxDuration: ae.maxDuration ?? 0, // "7200" == 2h
     appliedReservationsPerWeek: ae.appliedReservationsPerWeek,
     suitableTimeRanges: ae.suitableTimeRanges?.map(transformSuitableTimeRange),
+    // TODO should validate that the units are on the application round
     reservationUnitOptions: ae.reservationUnits.map((ruo, ruoIndex) =>
       transformEventReservationUnit(ruo, ruoIndex)
     ),
