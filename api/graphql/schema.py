@@ -10,87 +10,17 @@ from query_optimizer import DjangoListField
 from rest_framework.generics import get_object_or_404
 
 from api.graphql.extensions.permission_helpers import check_resolver_permission
-from api.graphql.types.allocated_time_slot.mutations import (
-    AllocatedTimeSlotCreateMutation,
-    AllocatedTimeSlotDeleteMutation,
-)
-from api.graphql.types.allocated_time_slot.types import AllocatedTimeSlotNode
-from api.graphql.types.application.mutations import (
-    ApplicationCancelMutation,
-    ApplicationCreateMutation,
-    ApplicationSendMutation,
-    ApplicationUpdateMutation,
-)
-from api.graphql.types.application.types import ApplicationNode
-from api.graphql.types.application_round.types import ApplicationRoundNode
-from api.graphql.types.application_section.mutations import (
-    ApplicationSectionCreateMutation,
-    ApplicationSectionDeleteMutation,
-    ApplicationSectionUpdateMutation,
-)
-from api.graphql.types.application_section.types import ApplicationSectionNode
-from api.graphql.types.banner_notification.mutations import (
-    BannerNotificationCreateMutation,
-    BannerNotificationDeleteMutation,
-    BannerNotificationUpdateMutation,
-)
-from api.graphql.types.banner_notification.types import BannerNotificationNode
-from api.graphql.types.city.types import CityNode
 from api.graphql.types.equipment.field import EquipmentFilter
-from api.graphql.types.equipment.mutations import (
-    EquipmentCreateMutation,
-    EquipmentDeleteMutation,
-    EquipmentUpdateMutation,
-)
 from api.graphql.types.equipment.permissions import EquipmentPermission
-from api.graphql.types.equipment.types import EquipmentType
 from api.graphql.types.equipment_category.field import EquipmentCategoryFilter
-from api.graphql.types.equipment_category.mutations import (
-    EquipmentCategoryCreateMutation,
-    EquipmentCategoryDeleteMutation,
-    EquipmentCategoryUpdateMutation,
-)
 from api.graphql.types.equipment_category.permissions import EquipmentCategoryPermission
-from api.graphql.types.equipment_category.types import EquipmentCategoryType
 from api.graphql.types.keyword.field import KeywordFilter
-from api.graphql.types.keyword.types import KeywordCategoryType, KeywordGroupType, KeywordType
-from api.graphql.types.merchants.mutations import RefreshOrderMutation
 from api.graphql.types.merchants.permissions import PaymentOrderPermission
-from api.graphql.types.merchants.types import PaymentOrderType
 from api.graphql.types.purpose.field import PurposeFilter
-from api.graphql.types.purpose.mutations import PurposeCreateMutation, PurposeUpdateMutation
-from api.graphql.types.purpose.types import PurposeType
 from api.graphql.types.qualifier.field import QualifierFilter
-from api.graphql.types.qualifier.types import QualifierType
 from api.graphql.types.recurring_reservation.fields import RecurringReservationsFilter
 from api.graphql.types.recurring_reservation.filtersets import RecurringReservationFilterSet
-from api.graphql.types.recurring_reservation.mutations import (
-    RecurringReservationCreateMutation,
-    RecurringReservationUpdateMutation,
-)
 from api.graphql.types.reservation_unit_cancellation_rule.field import ReservationUnitCancellationRulesFilter
-from api.graphql.types.reservation_unit_cancellation_rule.types import ReservationUnitCancellationRuleType
-from api.graphql.types.reservation_unit_image.mutations import (
-    ReservationUnitImageCreateMutation,
-    ReservationUnitImageDeleteMutation,
-    ReservationUnitImageUpdateMutation,
-)
-from api.graphql.types.reservation_unit_option.mutations import ReservationUnitOptionUpdateMutation
-from api.graphql.types.reservation_unit_type.field import ReservationUnitTypesFilter
-from api.graphql.types.reservation_unit_type.types import ReservationUnitTypeType
-from api.graphql.types.reservation_units.fields import ReservationUnitsFilter
-from api.graphql.types.reservation_units.filtersets import (
-    EquipmentFilterSet,
-    PurposeFilterSet,
-    ReservationUnitFilterSet,
-    ReservationUnitTypeFilterSet,
-)
-from api.graphql.types.reservation_units.mutations import ReservationUnitCreateMutation, ReservationUnitUpdateMutation
-from api.graphql.types.reservation_units.permissions import ReservationUnitPermission
-from api.graphql.types.reservation_units.types import (
-    ReservationUnitHaukiUrlType,
-    ReservationUnitType,
-)
 from api.graphql.types.reservations.fields import (
     AgeGroupFilter,
     ReservationCancelReasonFilter,
@@ -100,7 +30,93 @@ from api.graphql.types.reservations.fields import (
     ReservationsFilter,
 )
 from api.graphql.types.reservations.filtersets import ReservationFilterSet
-from api.graphql.types.reservations.mutations import (
+from api.graphql.types.reservations.permissions import ReservationPermission
+from api.graphql.types.resources.fields import ResourcesFilter
+from api.graphql.types.resources.filtersets import ResourceFilterSet
+from api.graphql.types.resources.permissions import ResourcePermission
+from api.graphql.types.spaces.fields import ServiceSectorFilter, SpacesFilter
+from api.graphql.types.spaces.filtersets import SpaceFilterSet
+from api.graphql.types.spaces.permissions import SpacePermission
+from api.graphql.types.tax_percentage.field import TaxPercentageFilter
+from api.graphql.types.terms_of_use.fields import TermsOfUseFilter
+from api.graphql.types.units.fields import UnitsFilter
+from api.graphql.types.units.filtersets import UnitsFilterSet
+from api.graphql.types.units.permissions import UnitPermission
+from api.graphql.types.users.permissions import UserPermission
+from applications.models import AllocatedTimeSlot
+from common.models import BannerNotification
+from common.typing import GQLInfo
+from merchants.models import PaymentOrder
+from permissions.helpers import can_handle_reservation, can_manage_banner_notifications
+from reservation_units.models import Equipment, EquipmentCategory
+from reservations.models import Reservation
+from resources.models import Resource
+from spaces.models import Space, Unit
+from users.models import User
+
+from .types.equipment.filtersets import EquipmentFilterSet
+from .types.purpose.filtersets import PurposeFilterSet
+
+# NOTE: Queries __need__ to be imported before mutations, see mutations.py!
+from .queries import (  # isort:skip
+    AgeGroupType,
+    AllocatedTimeSlotNode,
+    ApplicationNode,
+    ApplicationRoundNode,
+    ApplicationSectionNode,
+    BannerNotificationNode,
+    CityNode,
+    EquipmentCategoryType,
+    EquipmentType,
+    KeywordCategoryType,
+    KeywordGroupType,
+    KeywordType,
+    PaymentOrderType,
+    PurposeType,
+    QualifierType,
+    RecurringReservationType,
+    ReservationCancelReasonType,
+    ReservationDenyReasonType,
+    ReservationMetadataSetType,
+    ReservationPurposeType,
+    ReservationType,
+    ReservationUnitCancellationRuleType,
+    ReservationUnitNode,
+    ReservationUnitTypeNode,
+    ResourceType,
+    SpaceType,
+    TaxPercentageNode,
+    TermsOfUseType,
+    UnitByPkType,
+    UnitType,
+    UserType,
+)
+from .types.service_sector.types import ServiceSectorType
+
+from .mutations import (  # isort:skip
+    AllocatedTimeSlotCreateMutation,
+    AllocatedTimeSlotDeleteMutation,
+    ApplicationCancelMutation,
+    ApplicationCreateMutation,
+    ApplicationSectionCreateMutation,
+    ApplicationSectionDeleteMutation,
+    ApplicationSectionUpdateMutation,
+    ApplicationSendMutation,
+    ApplicationUpdateMutation,
+    BannerNotificationCreateMutation,
+    BannerNotificationDeleteMutation,
+    BannerNotificationUpdateMutation,
+    EquipmentCategoryCreateMutation,
+    EquipmentCategoryDeleteMutation,
+    EquipmentCategoryUpdateMutation,
+    EquipmentCreateMutation,
+    EquipmentDeleteMutation,
+    EquipmentUpdateMutation,
+    PurposeCreateMutation,
+    PurposeUpdateMutation,
+    RecurringReservationCreateMutation,
+    RecurringReservationUpdateMutation,
+    RefreshOrderMutation,
     ReservationAdjustTimeMutation,
     ReservationApproveMutation,
     ReservationCancellationMutation,
@@ -113,51 +129,23 @@ from api.graphql.types.reservations.mutations import (
     ReservationStaffAdjustTimeMutation,
     ReservationStaffCreateMutation,
     ReservationStaffModifyMutation,
+    ReservationUnitCreateMutation,
+    ReservationUnitImageCreateMutation,
+    ReservationUnitImageDeleteMutation,
+    ReservationUnitImageUpdateMutation,
+    ReservationUnitOptionUpdateMutation,
+    ReservationUnitUpdateMutation,
     ReservationUpdateMutation,
     ReservationWorkingMemoMutation,
+    ResourceCreateMutation,
+    ResourceDeleteMutation,
+    ResourceUpdateMutation,
+    SpaceCreateMutation,
+    SpaceDeleteMutation,
+    SpaceUpdateMutation,
+    UnitUpdateMutation,
+    UserUpdateMutation,
 )
-from api.graphql.types.reservations.permissions import ReservationPermission
-from api.graphql.types.reservations.types import (
-    AgeGroupType,
-    RecurringReservationType,
-    ReservationCancelReasonType,
-    ReservationDenyReasonType,
-    ReservationMetadataSetType,
-    ReservationPurposeType,
-    ReservationType,
-)
-from api.graphql.types.resources.fields import ResourcesFilter
-from api.graphql.types.resources.filtersets import ResourceFilterSet
-from api.graphql.types.resources.mutations import ResourceCreateMutation, ResourceDeleteMutation, ResourceUpdateMutation
-from api.graphql.types.resources.permissions import ResourcePermission
-from api.graphql.types.resources.types import ResourceType
-from api.graphql.types.spaces.fields import ServiceSectorFilter, SpacesFilter
-from api.graphql.types.spaces.filtersets import SpaceFilterSet
-from api.graphql.types.spaces.mutations import SpaceCreateMutation, SpaceDeleteMutation, SpaceUpdateMutation
-from api.graphql.types.spaces.permissions import SpacePermission
-from api.graphql.types.spaces.types import ServiceSectorType, SpaceType
-from api.graphql.types.tax_percentage.field import TaxPercentageFilter
-from api.graphql.types.tax_percentage.types import TaxPercentageType
-from api.graphql.types.terms_of_use.fields import TermsOfUseFilter
-from api.graphql.types.terms_of_use.types import TermsOfUseType
-from api.graphql.types.units.fields import UnitsFilter
-from api.graphql.types.units.filtersets import UnitsFilterSet
-from api.graphql.types.units.mutations import UnitUpdateMutation
-from api.graphql.types.units.permissions import UnitPermission
-from api.graphql.types.units.types import UnitByPkType, UnitType
-from api.graphql.types.users.mutations import UserUpdateMutation
-from api.graphql.types.users.permissions import UserPermission
-from api.graphql.types.users.types import UserType
-from applications.models import AllocatedTimeSlot
-from common.models import BannerNotification
-from common.typing import GQLInfo
-from merchants.models import PaymentOrder
-from permissions.helpers import can_handle_reservation, can_manage_banner_notifications
-from reservation_units.models import Equipment, EquipmentCategory, ReservationUnit
-from reservations.models import Reservation
-from resources.models import Resource
-from spaces.models import Space, Unit
-from users.models import User
 
 
 class Query(graphene.ObjectType):
@@ -192,18 +180,11 @@ class Query(graphene.ObjectType):
 
     reservation_deny_reasons = ReservationDenyReasonFilter(ReservationDenyReasonType)
 
-    reservation_unit = relay.Node.Field(ReservationUnitType)
-    reservation_units = ReservationUnitsFilter(ReservationUnitType, filterset_class=ReservationUnitFilterSet)
-    reservation_unit_cancellation_rules = ReservationUnitCancellationRulesFilter(ReservationUnitCancellationRuleType)
-    reservation_unit_hauki_url = Field(
-        ReservationUnitHaukiUrlType,
-        pk=graphene.Int(),
-        reservation_units=graphene.List(graphene.Int),
-    )
+    reservation_unit = ReservationUnitNode.Node()
+    reservation_units = ReservationUnitNode.Connection()
+    reservation_unit_types = ReservationUnitTypeNode.Connection()
 
-    reservation_unit_types = ReservationUnitTypesFilter(
-        ReservationUnitTypeType, filterset_class=ReservationUnitTypeFilterSet
-    )
+    reservation_unit_cancellation_rules = ReservationUnitCancellationRulesFilter(ReservationUnitCancellationRuleType)
 
     resources = ResourcesFilter(ResourceType, filterset_class=ResourceFilterSet)
     resource = relay.Node.Field(ResourceType)
@@ -238,7 +219,7 @@ class Query(graphene.ObjectType):
     reservation_purposes = ReservationPurposeFilter(ReservationPurposeType)
 
     terms_of_use = TermsOfUseFilter(TermsOfUseType)
-    tax_percentages = TaxPercentageFilter(TaxPercentageType)
+    tax_percentages = TaxPercentageFilter(TaxPercentageNode)
     age_groups = AgeGroupFilter(AgeGroupType)
     cities = CityNode.Connection()
     metadata_sets = ReservationMetadataSetFilter(ReservationMetadataSetType)
@@ -263,23 +244,6 @@ class Query(graphene.ObjectType):
     def resolve_reservation_by_pk(self: None, info: GQLInfo, **kwargs: Any):
         pk = kwargs.get("pk")
         return get_object_or_404(Reservation, pk=pk)
-
-    @check_resolver_permission(ReservationUnitPermission)
-    def resolve_reservation_unit_by_pk(self: None, info: GQLInfo, **kwargs: Any):
-        pk = kwargs.get("pk")
-        return get_object_or_404(ReservationUnit, pk=pk)
-
-    def resolve_reservation_unit_hauki_url(self: None, info: GQLInfo, **kwargs: Any):
-        pk = kwargs.get("pk")
-
-        reservation_unit = get_object_or_404(ReservationUnit, pk=pk)
-
-        res_units_to_include = kwargs.get("reservation_units")
-        url_type = ReservationUnitHaukiUrlType(
-            instance=reservation_unit, include_reservation_units=res_units_to_include
-        )
-
-        return url_type
 
     @check_resolver_permission(ResourcePermission)
     def resolve_resource_by_pk(self: None, info: GQLInfo, **kwargs: Any):

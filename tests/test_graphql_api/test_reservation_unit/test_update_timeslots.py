@@ -178,7 +178,14 @@ def test_update_reservation_unit_with_timeslots__begin_before_end(graphql):
     # then:
     # - The response contains no errors about end time being before begin time
     assert response.has_errors is True, response
-    assert response.error_message() == "Timeslot 1 begin time must be before end time."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("applicationRoundTimeSlots") == [
+        {
+            "reservableTimes": [
+                "Timeslot 1 begin time must be before end time.",
+            ],
+        }
+    ]
 
 
 def test_update_reservation_unit_with_timeslots__overlapping_reservable_times(graphql):
@@ -210,9 +217,14 @@ def test_update_reservation_unit_with_timeslots__overlapping_reservable_times(gr
     # then:
     # - The response contains no errors about overlapping reservable times
     assert response.has_errors is True, response
-    assert response.error_message() == (
-        "Timeslot 1 (10:00:00 - 12:00:00) overlaps with timeslot 2 (11:00:00 - 15:00:00)."
-    )
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("applicationRoundTimeSlots") == [
+        {
+            "reservableTimes": [
+                "Timeslot 1 (10:00:00 - 12:00:00) overlaps with timeslot 2 (11:00:00 - 15:00:00).",
+            ],
+        }
+    ]
 
 
 def test_update_reservation_unit_with_timeslots__two_for_same_day(graphql):
@@ -247,7 +259,10 @@ def test_update_reservation_unit_with_timeslots__two_for_same_day(graphql):
     # then:
     # - The response contains no errors about multiple timeslots for the same day
     assert response.has_errors is True, response
-    assert response.error_message() == "Got multiple timeslots for Monday."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("applicationRoundTimeSlots") == [
+        "Got multiple timeslots for Monday.",
+    ]
 
 
 def test_update_reservation_unit_with_timeslots__open_has_no_reservable_times(graphql):
@@ -276,7 +291,10 @@ def test_update_reservation_unit_with_timeslots__open_has_no_reservable_times(gr
     # then:
     # - The response contains no errors about no reservable times
     assert response.has_errors is True, response
-    assert response.error_message() == "Open timeslots must have reservable times."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("applicationRoundTimeSlots") == [
+        "Open timeslots must have reservable times.",
+    ]
 
 
 def test_update_reservation_unit_with_timeslots__closed_has_reservable_times(graphql):
@@ -308,7 +326,10 @@ def test_update_reservation_unit_with_timeslots__closed_has_reservable_times(gra
     # then:
     # - The response contains no errors about closed timeslot having reservable times
     assert response.has_errors is True, response
-    assert response.error_message() == "Closed timeslots cannot have reservable times."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("applicationRoundTimeSlots") == [
+        "Closed timeslots cannot have reservable times.",
+    ]
 
 
 def test_reservation_unit__update__reservation_block_whole_day(graphql):

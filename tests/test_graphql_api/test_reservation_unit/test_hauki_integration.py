@@ -91,17 +91,11 @@ def test_reservation_unit__query__hauki_url__regular_user(graphql):
         uuid="3774af34-9916-40f2-acc7-68db5a627710",
     )
 
-    fields = "haukiUrl { url }"
-    global_id = to_global_id("ReservationUnitType", reservation_unit.pk)
-    query = reservation_unit_query(fields=fields, id=global_id)
+    global_id = to_global_id("ReservationUnitNode", reservation_unit.pk)
+    query = reservation_unit_query(fields="haukiUrl", id=global_id)
     response = graphql(query)
 
-    assert response.has_errors is False, response.errors
-    assert response.first_query_object == {
-        "haukiUrl": {
-            "url": None,
-        },
-    }
+    assert response.error_message("haukiUrl") == "No permission to access field."
 
 
 @freezegun.freeze_time("2023-01-01T12:00:00+02:00")
@@ -114,9 +108,8 @@ def test_reservation_unit__query__hauki_url__superuser(graphql, settings):
         uuid="3774af34-9916-40f2-acc7-68db5a627710",
     )
 
-    fields = "haukiUrl { url }"
-    global_id = to_global_id("ReservationUnitType", reservation_unit.pk)
-    query = reservation_unit_query(fields=fields, id=global_id)
+    global_id = to_global_id("ReservationUnitNode", reservation_unit.pk)
+    query = reservation_unit_query(fields="haukiUrl", id=global_id)
     response = graphql(query)
 
     assert response.has_errors is False, response.errors
@@ -137,8 +130,4 @@ def test_reservation_unit__query__hauki_url__superuser(graphql, settings):
         safe="/&?=",
     )
 
-    assert response.first_query_object == {
-        "haukiUrl": {
-            "url": url,
-        },
-    }
+    assert response.first_query_object == {"haukiUrl": url}

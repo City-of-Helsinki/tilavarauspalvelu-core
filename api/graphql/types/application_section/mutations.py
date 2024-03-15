@@ -3,7 +3,6 @@ from rest_framework.exceptions import ValidationError
 
 from api.graphql.types.application_section.permissions import ApplicationSectionPermission
 from api.graphql.types.application_section.serializers import ApplicationSectionSerializer
-from api.graphql.types.application_section.types import ApplicationSectionNode
 from applications.models import ApplicationSection
 from common.typing import AnyUser
 
@@ -16,14 +15,12 @@ __all__ = [
 
 class ApplicationSectionCreateMutation(CreateMutation):
     class Meta:
-        node = ApplicationSectionNode
         serializer_class = ApplicationSectionSerializer
         permission_classes = [ApplicationSectionPermission]
 
 
 class ApplicationSectionUpdateMutation(UpdateMutation):
     class Meta:
-        node = ApplicationSectionNode
         serializer_class = ApplicationSectionSerializer
         permission_classes = [ApplicationSectionPermission]
 

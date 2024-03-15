@@ -78,7 +78,7 @@ def test_reservation_unit__update__cancellation_rule(graphql):
 
     reservation_unit = ReservationUnitFactory.create(is_draft=False)
     rule = ReservationUnitCancellationRuleFactory.create()
-    data = get_non_draft_update_input_data(reservation_unit, cancellationRulePk=rule.pk)
+    data = get_non_draft_update_input_data(reservation_unit, cancellationRule=rule.pk)
 
     response = graphql(UPDATE_MUTATION, input_data=data)
     assert response.has_errors is False, response
@@ -94,7 +94,7 @@ def test_reservation_unit__update__cancellation_rule__to_null(graphql):
         is_draft=False,
         cancellation_rule=ReservationUnitCancellationRuleFactory.create(),
     )
-    data = get_non_draft_update_input_data(reservation_unit, cancellationRulePk=None)
+    data = get_non_draft_update_input_data(reservation_unit, cancellationRule=None)
 
     response = graphql(UPDATE_MUTATION, input_data=data)
     assert response.has_errors is False, response
@@ -111,7 +111,7 @@ def test_reservation_unit__update__reservation_start_interval_invalid(graphql):
 
     response = graphql(UPDATE_MUTATION, input_data=data)
 
-    assert response.error_message().startswith('Choice "invalid" is not allowed. Allowed choices are:')
+    assert response.error_message().startswith("Variable '$input' got invalid value 'invalid'")
 
     reservation_unit.refresh_from_db()
     assert reservation_unit.reservation_start_interval != "invalid"
@@ -125,10 +125,10 @@ def test_reservation_unit__update__empty_name_translation(graphql):
 
     response = graphql(UPDATE_MUTATION, input_data=data)
 
-    assert (
-        response.error_message()
-        == "Not draft state reservation units must have a translations. Missing translation for nameEn."
-    )
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Not draft state reservation units must have a translations. Missing translation for nameEn.",
+    ]
 
 
 def test_reservation_unit__update__empty_description_translation(graphql):
@@ -139,34 +139,36 @@ def test_reservation_unit__update__empty_description_translation(graphql):
 
     response = graphql(UPDATE_MUTATION, input_data=data)
 
-    assert (
-        response.error_message()
-        == "Not draft state reservation units must have a translations. Missing translation for descriptionEn."
-    )
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Not draft state reservation units must have a translations. Missing translation for descriptionEn."
+    ]
 
 
 def test_reservation_unit__update__empty_spaces_and_resources(graphql):
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=False)
-    data = get_non_draft_update_input_data(reservation_unit, spacePks=[], resourcePks=[])
+    data = get_non_draft_update_input_data(reservation_unit, spaces=[], resources=[])
 
     response = graphql(UPDATE_MUTATION, input_data=data)
 
-    assert (
-        response.error_message() == "Not draft state reservation unit must have one or more space or resource defined"
-    )
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Not draft state reservation unit must have one or more space or resource defined"
+    ]
 
 
 def test_reservation_unit__update__empty_type(graphql):
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create(is_draft=False)
-    data = get_non_draft_update_input_data(reservation_unit, reservationUnitTypePk=None)
+    data = get_non_draft_update_input_data(reservation_unit, reservationUnitType=None)
 
     response = graphql(UPDATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "Not draft reservation unit must have a reservation unit type."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Not draft reservation unit must have a reservation unit type."]
 
 
 def test_reservation_unit__update__reservation_start_interval(graphql):
@@ -174,8 +176,7 @@ def test_reservation_unit__update__reservation_start_interval(graphql):
 
     reservation_unit = ReservationUnitFactory.create(is_draft=False)
     data = get_non_draft_update_input_data(
-        reservation_unit,
-        reservationStartInterval=ReservationStartInterval.INTERVAL_60_MINUTES.value,
+        reservation_unit, reservationStartInterval=ReservationStartInterval.INTERVAL_60_MINUTES.value.upper()
     )
 
     response = graphql(UPDATE_MUTATION, input_data=data)
@@ -193,7 +194,8 @@ def test_reservation_unit__update__min_persons_over_max_persons_errors(graphql):
 
     response = graphql(UPDATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "minPersons can't be more than maxPersons"
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["minPersons can't be more than maxPersons"]
 
 
 def test_reservation_unit__update__min_persons(graphql):
@@ -214,7 +216,7 @@ def test_reservation_unit__update__pricing_terms(graphql):
 
     reservation_unit = ReservationUnitFactory.create(is_draft=False)
     pricing_terms = TermsOfUseFactory.create(terms_type=TermsOfUse.TERMS_TYPE_PRICING)
-    data = get_non_draft_update_input_data(reservation_unit, pricingTermsPk=pricing_terms.pk)
+    data = get_non_draft_update_input_data(reservation_unit, pricingTerms=pricing_terms.pk)
 
     response = graphql(UPDATE_MUTATION, input_data=data)
     assert response.has_errors is False, response

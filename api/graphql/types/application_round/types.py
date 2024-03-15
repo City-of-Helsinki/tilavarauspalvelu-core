@@ -7,9 +7,9 @@ from query_optimizer import required_annotations
 
 from api.graphql.types.application_round.filtersets import ApplicationRoundFilterSet
 from api.graphql.types.application_round.permissions import ApplicationRoundPermission
-from api.graphql.types.reservation_units.types import ReservationUnitType
+from api.graphql.types.reservation_unit.types import ReservationUnitNode
 from api.graphql.types.reservations.types import ReservationPurposeType
-from api.graphql.types.spaces.types import ServiceSectorType
+from api.graphql.types.service_sector.types import ServiceSectorType
 from applications.choices import ApplicationRoundStatusChoice
 from applications.models import ApplicationRound
 from common.typing import GQLInfo
@@ -17,7 +17,7 @@ from common.typing import GQLInfo
 
 class ApplicationRoundNode(DjangoNode):
     purposes = DjangoListField(ReservationPurposeType)
-    reservation_units = DjangoListField(ReservationUnitType)
+    reservation_units = DjangoListField(ReservationUnitNode)
     service_sector = RelatedField(ServiceSectorType)
 
     status = graphene.Field(graphene.Enum.from_enum(ApplicationRoundStatusChoice))

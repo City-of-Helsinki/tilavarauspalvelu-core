@@ -1,15 +1,22 @@
-import graphene
+from graphene_django_extensions import DjangoNode
 
-from api.graphql.extensions.base_types import TVPBaseConnection
-from api.graphql.extensions.legacy_helpers import OldPrimaryKeyObjectType, get_all_translatable_fields
-from reservation_units.models import ReservationUnitType as ReservationUnitTypeModel
+from reservation_units.models import ReservationUnitType
+
+from .filtersets import ReservationUnitTypeFilterSet
+from .permissions import ReservationUnitTypePermission
+
+__all__ = [
+    "ReservationUnitTypeNode",
+]
 
 
-class ReservationUnitTypeType(OldPrimaryKeyObjectType):
+class ReservationUnitTypeNode(DjangoNode):
     class Meta:
-        model = ReservationUnitTypeModel
-        fields = ["pk", "rank", *get_all_translatable_fields(model)]
-        filter_fields = get_all_translatable_fields(model)
-
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
+        model = ReservationUnitType
+        fields = [
+            "pk",
+            "name",
+            "rank",
+        ]
+        filterset_class = ReservationUnitTypeFilterSet
+        permission_classes = [ReservationUnitTypePermission]

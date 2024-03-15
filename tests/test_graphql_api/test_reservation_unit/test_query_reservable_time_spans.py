@@ -49,7 +49,7 @@ def test_reservation_unit__reservable_time_spans__no_origin_hauki_resource(graph
     reservation_unit.origin_hauki_resource = None
     reservation_unit.save()
 
-    global_id = to_global_id("ReservationUnitType", reservation_unit.pk)
+    global_id = to_global_id("ReservationUnitNode", reservation_unit.pk)
     query = reservation_unit_time_spans_query(
         id=global_id,
         reservable_time_spans__start_date="2023-05-01",
@@ -64,7 +64,7 @@ def test_reservation_unit__reservable_time_spans__no_origin_hauki_resource(graph
 
 
 def test_reservation_unit__reservable_time_spans__no_start_date(graphql, reservation_unit):
-    global_id = to_global_id("ReservationUnitType", reservation_unit.pk)
+    global_id = to_global_id("ReservationUnitNode", reservation_unit.pk)
     query = reservation_unit_time_spans_query(
         id=global_id,
         reservable_time_spans__end_date="2024-01-01",
@@ -77,7 +77,7 @@ def test_reservation_unit__reservable_time_spans__no_start_date(graphql, reserva
 
 
 def test_reservation_unit__reservable_time_spans__no_end_date(graphql, reservation_unit):
-    global_id = to_global_id("ReservationUnitType", reservation_unit.pk)
+    global_id = to_global_id("ReservationUnitNode", reservation_unit.pk)
     query = reservation_unit_time_spans_query(
         id=global_id,
         reservable_time_spans__start_date="2023-05-01",
@@ -90,7 +90,7 @@ def test_reservation_unit__reservable_time_spans__no_end_date(graphql, reservati
 
 
 def test_reservation_unit__reservable_time_spans__no_results(graphql, reservation_unit):
-    global_id = to_global_id("ReservationUnitType", reservation_unit.pk)
+    global_id = to_global_id("ReservationUnitNode", reservation_unit.pk)
     query = reservation_unit_time_spans_query(
         id=global_id,
         reservable_time_spans__start_date="2023-05-01",
@@ -119,7 +119,7 @@ def test_reservation_unit__reservable_time_spans__multiple_days(graphql, reserva
         end_datetime=_get_date(day=4, hour=0),
     )
 
-    global_id = to_global_id("ReservationUnitType", reservation_unit.pk)
+    global_id = to_global_id("ReservationUnitNode", reservation_unit.pk)
     query = reservation_unit_time_spans_query(
         id=global_id,
         reservable_time_spans__start_date="2023-05-01",
@@ -166,7 +166,7 @@ def test_reservation_unit__reservable_time_spans__multiple_spans_in_same_day(gra
         end_datetime=_get_date(day=2, hour=20),
     )
 
-    global_id = to_global_id("ReservationUnitType", reservation_unit.pk)
+    global_id = to_global_id("ReservationUnitNode", reservation_unit.pk)
     query = reservation_unit_time_spans_query(
         id=global_id,
         reservable_time_spans__start_date="2023-05-01",
@@ -202,7 +202,7 @@ def test_reservation_unit__reservable_time_spans__full_day(graphql, reservation_
         end_datetime=_get_date(day=5, hour=0),
     )
 
-    global_id = to_global_id("ReservationUnitType", reservation_unit.pk)
+    global_id = to_global_id("ReservationUnitNode", reservation_unit.pk)
     query = reservation_unit_time_spans_query(
         id=global_id,
         reservable_time_spans__start_date="2023-05-01",
@@ -226,7 +226,7 @@ def test_reservation_unit__reservable_time_spans__multiple_days_long_time_span(g
         end_datetime=_get_date(day=12, hour=12),
     )
 
-    global_id = to_global_id("ReservationUnitType", reservation_unit.pk)
+    global_id = to_global_id("ReservationUnitNode", reservation_unit.pk)
     query = reservation_unit_time_spans_query(
         id=global_id,
         reservable_time_spans__start_date="2023-05-01",
@@ -260,7 +260,7 @@ def test_reservation_unit__reservable_time_spans__all_timezones_are_in_default_t
         end_datetime=_get_date(day=3, hour=20, tzinfo=ZoneInfo("Asia/Shanghai")),
     )
 
-    global_id = to_global_id("ReservationUnitType", reservation_unit.pk)
+    global_id = to_global_id("ReservationUnitNode", reservation_unit.pk)
     query = reservation_unit_time_spans_query(
         id=global_id,
         reservable_time_spans__start_date="2023-05-01",
