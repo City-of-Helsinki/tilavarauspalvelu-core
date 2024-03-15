@@ -1,18 +1,19 @@
-import graphene
+from graphene_django_extensions import DjangoNode
 
-from api.graphql.extensions.base_types import TVPBaseConnection
-from api.graphql.extensions.duration_field import Duration
-from api.graphql.extensions.legacy_helpers import OldPrimaryKeyObjectType, get_all_translatable_fields
 from services.models import Service
 
+__all__ = [
+    "ServiceNode",
+]
 
-class ServiceType(OldPrimaryKeyObjectType):
-    buffer_time_before = Duration()
-    buffer_time_after = Duration()
 
+class ServiceNode(DjangoNode):
     class Meta:
         model = Service
-        fields = ["pk", "service_type", "buffer_time_before", "buffer_time_after", *get_all_translatable_fields(model)]
-
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
+        fields = [
+            "pk",
+            "name",
+            "service_type",
+            "buffer_time_before",
+            "buffer_time_after",
+        ]

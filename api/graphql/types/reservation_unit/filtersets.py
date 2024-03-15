@@ -6,20 +6,25 @@ from typing import Any
 
 import django_filters
 from django.db.models import Expression, F, Q, QuerySet
-from django.utils import timezone
 from elasticsearch_django.models import SearchQuery
+from graphene_django_extensions import ModelFilterSet
 
-from common.filtersets import BaseModelFilterSet, IntMultipleChoiceFilter
-from elastic_django.reservation_units.query_builder import ReservationUnitQueryBuilderMixin
+from common.date_utils import local_datetime
+from common.filtersets import IntMultipleChoiceFilter
+from elastic_django.reservation_units.query_builder import build_elastic_query_str
 from reservation_units.enums import ReservationKind, ReservationState, ReservationUnitState
-from reservation_units.models import Equipment, ReservationUnit
+from reservation_units.models import ReservationUnit
 from reservation_units.querysets import ReservationUnitQuerySet
 from reservation_units.utils.reservation_unit_reservation_state_helper import ReservationUnitReservationStateHelper
 from reservation_units.utils.reservation_unit_state_helper import ReservationUnitStateHelper
 from spaces.models import Unit
 
+__all__ = [
+    "ReservationUnitFilterSet",
+]
 
-class ReservationUnitFilterSet(BaseModelFilterSet, ReservationUnitQueryBuilderMixin):
+
+class ReservationUnitFilterSet(ModelFilterSet):
     pk = IntMultipleChoiceFilter()
     unit = IntMultipleChoiceFilter()
     reservation_unit_type = IntMultipleChoiceFilter()
@@ -58,7 +63,6 @@ class ReservationUnitFilterSet(BaseModelFilterSet, ReservationUnitQueryBuilderMi
 
     state = django_filters.MultipleChoiceFilter(
         method="get_state",
-        # Must use upper case characters for value to comply with GraphQL Enum
         choices=tuple((state.value, state.value) for state in ReservationUnitState),
     )
 
@@ -75,9 +79,22 @@ class ReservationUnitFilterSet(BaseModelFilterSet, ReservationUnitQueryBuilderMi
     reservable_time_end = django_filters.TimeFilter(method="get_filter_reservable")
     reservable_minimum_duration_minutes = django_filters.NumberFilter(method="get_filter_reservable")
     show_only_reservable = django_filters.BooleanFilter(method="get_filter_reservable")
+    calculate_first_reservable_time = django_filters.BooleanFilter(method="get_filter_reservable")
 
-    order_by = django_filters.OrderingFilter(
-        fields=(
+    class Meta:
+        model = ReservationUnit
+        fields = {
+            "name_fi": ["exact", "icontains", "istartswith"],
+            "name_sv": ["exact", "icontains", "istartswith"],
+            "name_en": ["exact", "icontains", "istartswith"],
+            "description_fi": ["exact", "icontains"],
+            "description_sv": ["exact", "icontains"],
+            "description_en": ["exact", "icontains"],
+        }
+        combination_methods = [
+            "get_filter_reservable",
+        ]
+        order_by = [
             "pk",
             "name_fi",
             "name_en",
@@ -92,66 +109,65 @@ class ReservationUnitFilterSet(BaseModelFilterSet, ReservationUnitQueryBuilderMi
             "surface_area",
             "rank",
             ("reservation_unit_type__rank", "type_rank"),
-        )
-    )
-
-    class Meta:
-        model = ReservationUnit
-        fields = []  # Must be defined but is not needed
-        combination_methods = [
-            "get_filter_reservable",
         ]
 
-    def get_text_search(self, qs, property, value: str):
-        query_str = self.build_elastic_query_str(value)
+    @staticmethod
+    def get_text_search(qs: ReservationUnitQuerySet, name: str, value: str) -> QuerySet:
+        query_str = build_elastic_query_str(value)
         sq = SearchQuery.do_search("reservation_units", {"query_string": {"query": query_str}})
         return qs.from_search_results(sq)
 
-    def get_max_persons_gte(self, qs, property, value):
-        filters = Q(max_persons__gte=value) | Q(max_persons__isnull=True)
-        return qs.filter(filters)
+    @staticmethod
+    def get_max_persons_gte(qs: ReservationUnitQuerySet, name: str, value: int) -> QuerySet:
+        return qs.filter(Q(max_persons__gte=value) | Q(max_persons__isnull=True))
 
-    def get_max_persons_lte(self, qs, property, value):
-        filters = Q(max_persons__lte=value) | Q(max_persons__isnull=True)
-        return qs.filter(filters)
+    @staticmethod
+    def get_max_persons_lte(qs: ReservationUnitQuerySet, name: str, value: int) -> QuerySet:
+        return qs.filter(Q(max_persons__lte=value) | Q(max_persons__isnull=True))
 
-    def get_min_persons_gte(self, qs, property, value):
-        filters = Q(min_persons__gte=value) | Q(min_persons__isnull=True)
-        return qs.filter(filters)
+    @staticmethod
+    def get_min_persons_gte(qs: ReservationUnitQuerySet, name: str, value: int) -> QuerySet:
+        return qs.filter(Q(min_persons__gte=value) | Q(min_persons__isnull=True))
 
-    def get_min_persons_lte(self, qs, property, value):
-        filters = Q(min_persons__lte=value) | Q(min_persons__isnull=True)
-        return qs.filter(filters)
+    @staticmethod
+    def get_min_persons_lte(qs: ReservationUnitQuerySet, name: str, value: int) -> QuerySet:
+        return qs.filter(Q(min_persons__lte=value) | Q(min_persons__isnull=True))
 
-    def get_is_visible(self, qs, property, value):
-        now = timezone.now()
+    @staticmethod
+    def get_is_visible(qs: ReservationUnitQuerySet, name: str, value: bool) -> QuerySet:
+        now = local_datetime()
+
         qs = qs.filter(is_draft=False, is_archived=False)
-        published = (Q(publish_begins__lte=now) | Q(publish_begins__isnull=True)) & (
-            Q(publish_ends__gt=now)
-            | Q(publish_ends__isnull=True)
-            | Q(
-                publish_ends__lt=F("publish_begins")
-            )  # When end is before begin and begin is now or before it is considered as (re)published.
+        published = (  #
+            (  #
+                Q(publish_begins__lte=now) | Q(publish_begins__isnull=True)
+            )
+            & (  #
+                Q(publish_ends__gt=now) | Q(publish_ends__isnull=True) | Q(publish_ends__lt=F("publish_begins"))
+            )
         )
 
         if value:
             return qs.filter(published)
         return qs.exclude(published)
 
-    def get_reservation_kind(self, qs, property, value):
-        if property.upper() == ReservationKind.DIRECT_AND_SEASON:
+    @staticmethod
+    def get_reservation_kind(qs: ReservationUnitQuerySet, name: str, value: str) -> QuerySet:
+        if name.upper() == ReservationKind.DIRECT_AND_SEASON:
             return qs.filter(reservation_kind__isnull=False)
 
         return qs.filter(reservation_kind__icontains=value)
 
-    def get_state(self, qs, property, value: list[str]):
+    @staticmethod
+    def get_state(qs: ReservationUnitQuerySet, name: str, value: list[str]):
         queries = []
         for state in value:
             queries.append(ReservationUnitStateHelper.get_state_query(state))
         query = reduce(operator.or_, (query for query in queries))
         return qs.filter(query).distinct()
 
-    def get_reservation_state(self, qs, property, value: list[str]):
+    @staticmethod
+    def get_reservation_state(qs: ReservationUnitQuerySet, name: str, value: list[str]) -> QuerySet:
         query: Q = Q()
         aliases: dict[str, Expression | F] = {}
         for state in value:
@@ -160,7 +176,7 @@ class ReservationUnitFilterSet(BaseModelFilterSet, ReservationUnitQueryBuilderMi
             aliases |= query_state.aliases
         return qs.alias(**aliases).filter(query).distinct()
 
-    def get_only_with_permission(self, qs, property, value):
+    def get_only_with_permission(self, qs: ReservationUnitQuerySet, name: str, value: bool) -> QuerySet:
         """Returns reservation units where the user has any kind of permissions in its unit"""
         if not value:
             return qs
@@ -182,12 +198,8 @@ class ReservationUnitFilterSet(BaseModelFilterSet, ReservationUnitQueryBuilderMi
             )
         ).distinct()
 
-    def get_filter_reservable(
-        self,
-        qs: ReservationUnitQuerySet,
-        name: str,
-        value: dict[str, Any],
-    ) -> QuerySet[ReservationUnit]:
+    @staticmethod
+    def get_filter_reservable(qs: ReservationUnitQuerySet, name: str, value: dict[str, Any]) -> QuerySet:
         """
         Filter reservation units by their reservability.
 
@@ -196,6 +208,13 @@ class ReservationUnitFilterSet(BaseModelFilterSet, ReservationUnitQueryBuilderMi
         If 'show_only_reservable' is True, then only reservation units, which are reservable with the given filters
         are returned. Otherwise, all reservation units are returned.
         """
+        # Since the calculation of `first_reservable_datetime` is quite heavy, allow skipping it if not needed.
+        # Note that if the calculation is skipped, querying `first_reservable_datetime` or `is_closed`
+        # fill raise an error.
+        calculate_first_reservable_time: bool = value.get("calculate_first_reservable_time", False)
+        if not calculate_first_reservable_time:
+            return qs
+
         date_start: date | None = value["reservable_date_start"]
         date_end: date | None = value["reservable_date_end"]
         time_start: time | None = value["reservable_time_start"]
@@ -218,34 +237,3 @@ class ReservationUnitFilterSet(BaseModelFilterSet, ReservationUnitQueryBuilderMi
             return qs
 
         return qs.exclude(first_reservable_datetime=None)
-
-
-class EquipmentFilterSet(django_filters.FilterSet):
-    rank_gte = django_filters.NumberFilter(field_name="category__rank", lookup_expr="gte")
-    rank_lte = django_filters.NumberFilter(field_name="category__rank", lookup_expr="lte")
-
-    order_by = django_filters.OrderingFilter(
-        fields=("name", ("category__rank", "category_rank")),
-    )
-
-    class Meta:
-        model = Equipment
-        fields = ["name"]
-
-
-class PurposeFilterSet(django_filters.FilterSet):
-    order_by = django_filters.OrderingFilter(
-        fields=("rank", "name_fi", "name_en", "name_sv"),
-    )
-
-    def filter_queryset(self, queryset):
-        return super().filter_queryset(queryset.order_by("rank"))
-
-
-class ReservationUnitTypeFilterSet(django_filters.FilterSet):
-    order_by = django_filters.OrderingFilter(
-        fields=("rank", "name_fi", "name_en", "name_sv"),
-    )
-
-    def filter_queryset(self, queryset):
-        return super().filter_queryset(queryset.order_by("rank"))

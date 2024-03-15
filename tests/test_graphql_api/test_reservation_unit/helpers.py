@@ -2,8 +2,17 @@ import datetime
 from functools import partial
 from typing import Any, NamedTuple
 
+from graphene_django_extensions.testing import build_mutation, build_query
+
 from common.date_utils import local_datetime
-from reservation_units.enums import PriceUnit, PricingStatus, PricingType, ReservationKind, ReservationStartInterval
+from reservation_units.enums import (
+    AuthenticationType,
+    PriceUnit,
+    PricingStatus,
+    PricingType,
+    ReservationKind,
+    ReservationStartInterval,
+)
 from reservation_units.models import ReservationUnit
 from tests.factories import (
     PaymentProductFactory,
@@ -17,7 +26,6 @@ from tests.factories import (
     TaxPercentageFactory,
     UnitFactory,
 )
-from tests.gql_builders import build_mutation, build_query
 
 __all__ = [
     "CREATE_MUTATION",
@@ -35,16 +43,16 @@ __all__ = [
 
 
 reservation_unit_query = partial(build_query, "reservationUnit")
-reservation_units_query = partial(build_query, "reservationUnits", connection=True, order_by="pk")
+reservation_units_query = partial(build_query, "reservationUnits", connection=True, order_by="pkAsc")
 
 CREATE_MUTATION = build_mutation(
     "createReservationUnit",
-    "ReservationUnitCreateMutationInput",
+    "ReservationUnitCreateMutation",
 )
 
 UPDATE_MUTATION = build_mutation(
     "updateReservationUnit",
-    "ReservationUnitUpdateMutationInput",
+    "ReservationUnitUpdateMutation",
 )
 
 
@@ -60,46 +68,48 @@ def get_create_non_draft_input_data() -> dict[str, Any]:
 
     return {
         "isDraft": False,
+        "name": "Name",
         "nameFi": "Name FI",
         "nameEn": "Name EN",
         "nameSv": "Name SV",
+        "description": "desc",
         "descriptionFi": "desc FI",
         "descriptionEn": "desc EN",
         "descriptionSv": "desc SV",
         "contactInformation": "contact info",
-        "spacePks": [space.id],
-        "resourcePks": [resource.id],
-        "servicePks": [service.id],
-        "unitPk": unit.id,
-        "reservationUnitTypePk": reservation_unit_type.id,
+        "spaces": [space.id],
+        "resources": [resource.id],
+        "services": [service.id],
+        "unit": unit.id,
+        "reservationUnitType": reservation_unit_type.id,
         "surfaceArea": 100,
         "minPersons": 1,
         "maxPersons": 10,
         "bufferTimeBefore": 3600,
         "bufferTimeAfter": 3600,
-        "cancellationRulePk": rule.pk,
+        "cancellationRule": rule.pk,
         "reservationStartInterval": ReservationStartInterval.INTERVAL_60_MINUTES.value.upper(),
         "publishBegins": "2021-05-03T00:00:00+00:00",
         "publishEnds": "2021-05-03T00:00:00+00:00",
         "reservationBegins": "2021-05-03T00:00:00+00:00",
         "reservationEnds": "2021-05-03T00:00:00+00:00",
-        "metadataSetPk": metadata_set.pk,
+        "metadataSet": metadata_set.pk,
         "maxReservationsPerUser": 2,
         "requireReservationHandling": True,
-        "authentication": "STRONG",
+        "authentication": AuthenticationType.STRONG.value.upper(),
         "canApplyFreeOfCharge": True,
         "reservationsMinDaysBefore": 1,
         "reservationsMaxDaysBefore": 360,
-        "reservationKind": ReservationKind.DIRECT,
+        "reservationKind": ReservationKind.DIRECT.value.upper(),
         "pricings": [
             {
                 "begins": datetime.date.today().strftime("%Y-%m-%d"),
-                "pricingType": PricingType.PAID,
-                "priceUnit": PriceUnit.PRICE_UNIT_PER_15_MINS,
-                "lowestPrice": 10.5,
-                "highestPrice": 18.8,
-                "taxPercentagePk": tax_percentage.id,
-                "status": PricingStatus.PRICING_STATUS_ACTIVE,
+                "pricingType": PricingType.PAID.value.upper(),
+                "priceUnit": PriceUnit.PRICE_UNIT_PER_15_MINS.value.upper(),
+                "lowestPrice": "10.5",
+                "highestPrice": "18.8",
+                "taxPercentage": tax_percentage.id,
+                "status": PricingStatus.PRICING_STATUS_ACTIVE.value.upper(),
             }
         ],
     }
@@ -114,17 +124,19 @@ def get_create_draft_input_data(**overrides: Any) -> dict[str, Any]:
 
     return {
         "isDraft": True,
+        "name": "Name",
         "nameFi": "Name FI",
         "nameEn": "Name EN",
         "nameSv": "Name SV",
+        "description": "desc",
         "descriptionFi": "desc FI",
         "descriptionEn": "desc EN",
         "descriptionSv": "desc SV",
-        "spacePks": [space.id],
-        "resourcePks": [resource.id],
-        "servicePks": [service.id],
-        "unitPk": unit.id,
-        "reservationUnitTypePk": reservation_unit_type.id,
+        "spaces": [space.id],
+        "resources": [resource.id],
+        "services": [service.id],
+        "unit": unit.id,
+        "reservationUnitType": reservation_unit_type.id,
         **overrides,
     }
 
@@ -132,23 +144,28 @@ def get_create_draft_input_data(**overrides: Any) -> dict[str, Any]:
 def get_pricing_data(**overrides: Any) -> dict[str, Any]:
     return {
         "begins": "2022-09-11",
-        "pricingType": PricingType.PAID.value,
-        "priceUnit": PriceUnit.PRICE_UNIT_PER_15_MINS.value,
-        "lowestPrice": 18.2,
-        "highestPrice": 21.5,
-        "taxPercentagePk": 2,
-        "status": PricingStatus.PRICING_STATUS_ACTIVE.value,
+        "pricingType": PricingType.PAID.value.upper(),
+        "priceUnit": PriceUnit.PRICE_UNIT_PER_15_MINS.value.upper(),
+        "lowestPrice": "18.2",
+        "highestPrice": "21.5",
+        "taxPercentage": 2,
+        "status": PricingStatus.PRICING_STATUS_ACTIVE.value.upper(),
         **overrides,
     }
 
 
 def get_draft_update_input_data(reservation_unit: ReservationUnit, **overrides) -> dict[str, Any]:
-    return {"pk": reservation_unit.pk, "pricings": [], **overrides}
+    return {
+        "pk": reservation_unit.pk,
+        "name": "name",
+        **overrides,
+    }
 
 
 def get_non_draft_update_input_data(reservation_unit: ReservationUnit, **overrides):
     return {
         "pk": reservation_unit.pk,
+        "name": "name",
         "nameFi": "name",
         "nameEn": "name",
         "nameSv": "name",

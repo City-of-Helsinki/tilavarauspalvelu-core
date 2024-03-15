@@ -51,11 +51,12 @@ def test_reservation_unit__create__allow_only_one_active_pricing(graphql):
 def test_reservation_unit__create__allow_only_one_future_pricing(graphql):
     graphql.login_with_superuser()
     future_pricing_date = (datetime.date.today() + datetime.timedelta(days=2)).isoformat()
+
     data = get_create_draft_input_data(
         pricings=[
             get_pricing_data(),
-            get_pricing_data(begins=future_pricing_date, status=PricingStatus.PRICING_STATUS_FUTURE.value),
-            get_pricing_data(begins=future_pricing_date, status=PricingStatus.PRICING_STATUS_FUTURE.value),
+            get_pricing_data(begins=future_pricing_date, status=PricingStatus.PRICING_STATUS_FUTURE.value.upper()),
+            get_pricing_data(begins=future_pricing_date, status=PricingStatus.PRICING_STATUS_FUTURE.value.upper()),
         ],
     )
 
@@ -70,7 +71,7 @@ def test_reservation_unit__create__mutating_past_pricings_is_not_allowed(graphql
     data = get_create_draft_input_data(
         pricings=[
             get_pricing_data(),
-            get_pricing_data(begins="2022-01-01", status=PricingStatus.PRICING_STATUS_PAST),
+            get_pricing_data(begins="2022-01-01", status=PricingStatus.PRICING_STATUS_PAST.value.upper()),
         ],
     )
 
@@ -101,7 +102,7 @@ def test_reservation_unit__create__future_pricing_must_be_in_the_future(graphql)
 
     data = get_create_draft_input_data(
         pricings=[
-            get_pricing_data(begins=pricing_date, status=PricingStatus.PRICING_STATUS_FUTURE.value),
+            get_pricing_data(begins=pricing_date, status=PricingStatus.PRICING_STATUS_FUTURE.value.upper()),
         ],
     )
     response = graphql(CREATE_MUTATION, input_data=data)
@@ -117,8 +118,8 @@ def test_reservation_unit__create__free_pricing_doesnt_require_price_information
         pricings=[
             {
                 "begins": datetime.date.today().strftime("%Y-%m-%d"),
-                "pricingType": PricingType.FREE.value,
-                "status": PricingStatus.PRICING_STATUS_ACTIVE.value,
+                "pricingType": PricingType.FREE.value.upper(),
+                "status": PricingStatus.PRICING_STATUS_ACTIVE.value.upper(),
             }
         ],
     )
@@ -156,7 +157,7 @@ def test_reservation_unit__update__active_pricing_can_be_created_on_update(graph
     data["pk"] = reservation_unit.pk
     data["isDraft"] = False
     data["pricings"] = [
-        get_pricing_data(begins="2022-09-16", lowestPrice=20.2, highestPrice=31.5),
+        get_pricing_data(begins="2022-09-16", lowestPrice="20.2", highestPrice="31.5"),
     ]
 
     response = graphql(UPDATE_MUTATION, input_data=data)
@@ -188,7 +189,7 @@ def test_reservation_unit__update__future_pricing_can_be_created_on_update(graph
     data["pk"] = reservation_unit.pk
     data["pricings"][0]["pk"] = reservation_unit.pricings.first().pk
     data["pricings"].append(
-        get_pricing_data(begins=future_pricing_date, status=PricingStatus.PRICING_STATUS_FUTURE.value),
+        get_pricing_data(begins=future_pricing_date, status=PricingStatus.PRICING_STATUS_FUTURE.value.upper()),
     )
 
     response = graphql(UPDATE_MUTATION, input_data=data)
@@ -231,7 +232,7 @@ def test_reservation_unit__update__add_another_future_pricing(graphql):
     future_pricing_date = (datetime.date.today() + datetime.timedelta(days=2)).isoformat()
     data = get_create_draft_input_data(
         pricings=[
-            get_pricing_data(begins=future_pricing_date, status=PricingStatus.PRICING_STATUS_FUTURE.value),
+            get_pricing_data(begins=future_pricing_date, status=PricingStatus.PRICING_STATUS_FUTURE.value.upper()),
         ],
     )
     response = graphql(CREATE_MUTATION, input_data=data)
@@ -244,7 +245,7 @@ def test_reservation_unit__update__add_another_future_pricing(graphql):
 
     data["pk"] = reservation_unit.pk
     data["pricings"] = [
-        get_pricing_data(begins=future_pricing_date, status=PricingStatus.PRICING_STATUS_FUTURE.value),
+        get_pricing_data(begins=future_pricing_date, status=PricingStatus.PRICING_STATUS_FUTURE.value.upper()),
     ]
 
     response = graphql(UPDATE_MUTATION, input_data=data)
@@ -262,7 +263,7 @@ def test_reservation_unit__update__remove_pricings(graphql):
     data = get_create_draft_input_data(
         pricings=[
             get_pricing_data(),
-            get_pricing_data(begins=future_pricing_date, status=PricingStatus.PRICING_STATUS_FUTURE.value),
+            get_pricing_data(begins=future_pricing_date, status=PricingStatus.PRICING_STATUS_FUTURE.value.upper()),
         ],
     )
     response = graphql(CREATE_MUTATION, input_data=data)
