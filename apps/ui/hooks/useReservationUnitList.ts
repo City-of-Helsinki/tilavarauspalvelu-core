@@ -1,7 +1,8 @@
 import { useSessionStorage } from "react-use";
 import type { ReservationUnitNode } from "common";
+import type { ApplicationRoundNode } from "common/types/gql-types";
+import { filterNonNullable } from "common/src/helpers";
 
-// export type ReservationUnitUnion = ReservationUnitType | ReservationUnitByPkType
 export type ReservationUnitList = {
   reservationUnits: ReservationUnitNode[];
   selectReservationUnit: (ru: ReservationUnitNode) => void;
@@ -10,7 +11,12 @@ export type ReservationUnitList = {
   clearSelections: () => void;
 };
 
-const useReservationUnitsList = (): ReservationUnitList => {
+/// @param round filter the reservation units by the application round
+/// Problem with this is that the current system is not based on around requiring an application round
+/// but the actual use case is, so have to do filtering case by case.
+const useReservationUnitsList = (
+  round?: ApplicationRoundNode
+): ReservationUnitList => {
   const [reservationUnits, setReservationUnits] = useSessionStorage<
     ReservationUnitNode[]
   >("reservationUnitList", []);
@@ -39,12 +45,24 @@ const useReservationUnitsList = (): ReservationUnitList => {
       ? reservationUnits.some((ru) => ru.pk === reservationUnit.pk)
       : false;
 
+  const getReservationUnits = () => {
+    if (round) {
+      const roundRuPks = filterNonNullable(
+        round.reservationUnits?.map((ru) => ru.pk)
+      );
+      return reservationUnits.filter(
+        (ru) => ru.pk != null && roundRuPks.find((x) => x === ru.pk) != null
+      );
+    }
+    return reservationUnits;
+  };
+
   return {
     selectReservationUnit,
     containsReservationUnit,
     clearSelections,
     removeReservationUnit,
-    reservationUnits: reservationUnits || [],
+    reservationUnits: getReservationUnits(),
   };
 };
 

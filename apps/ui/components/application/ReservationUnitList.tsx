@@ -74,6 +74,8 @@ const ReservationUnitList = ({
     setValue(fieldName, units);
   };
 
+  // TODO these could be prefiltered on the Page level similar to the addition of a new application section
+  // but requires a bit different mechanic because forms are separate from the selected resservation units hook that uses session storage
   const availableReservationUnits = filterNonNullable(
     applicationRound.reservationUnits
   );
