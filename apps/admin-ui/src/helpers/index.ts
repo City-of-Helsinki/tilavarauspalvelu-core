@@ -1,7 +1,8 @@
 /// Plain js / ts helper functions
 import { ReservationType, Type } from "common/types/gql-types";
-
 import { addSeconds } from "date-fns";
+
+export { truncate } from "common/src/helpers";
 
 export * from "./date";
 
@@ -57,6 +58,3 @@ export const reservationToInterval = (
     type: x.type ?? undefined,
   };
 };
-
-export const truncate = (val: string, maxLen: number): string =>
-  val.length > maxLen ? `${val.substring(0, maxLen - 1)}…` : val;

@@ -6,7 +6,11 @@ import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
 import type { ApplicationEventSchedulePriority } from "common/types/common";
 import { Priority, type ApplicationNode } from "common/types/gql-types";
-import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
+import {
+  filterNonNullable,
+  getLocalizationLang,
+  truncate,
+} from "common/src/helpers";
 import type {
   ApplicationSectionFormValue,
   ApplicationEventScheduleFormType,
@@ -42,6 +46,9 @@ type DailyOpeningHours =
       reservableTimes?: OpeningHourPeriod[] | null;
     }[]
   | null;
+
+// Mobile layout breaks if the select options are too long
+const MAX_SELECT_OPTION_LENGTH = 28;
 
 const StyledNotification = styled(Notification)`
   margin-top: var(--spacing-m);
@@ -252,10 +259,15 @@ const Page2 = ({ application, onNext }: Props): JSX.Element => {
   const resUnits = filterNonNullable(
     resUnitOptions.map((n) => n?.reservationUnit)
   );
-  const reservationUnitOptions = resUnits.map((n) => ({
-    value: n?.pk ?? 0,
-    label: getTranslationSafe(n, "name", getLocalizationLang(i18n.language)),
-  }));
+  const reservationUnitOptions = resUnits
+    .map((n) => ({
+      value: n?.pk ?? 0,
+      label: getTranslationSafe(n, "name", getLocalizationLang(i18n.language)),
+    }))
+    .map(({ value, label }) => ({
+      value,
+      label: truncate(label, MAX_SELECT_OPTION_LENGTH),
+    }));
   // TODO why is this done like this?
   const openingHours = filterNonNullable(
     resUnits.find((n) => n.pk === reservationUnitPk)?.applicationRoundTimeSlots

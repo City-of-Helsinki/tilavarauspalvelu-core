@@ -20,6 +20,8 @@ const WeekWrapper = styled.div`
 const Label = styled.div`
   ${fontBold};
   padding-right: 4px;
+  max-width: 10ch;
+  width: 100%;
 `;
 
 function Weekdays({

@@ -50,3 +50,6 @@ export function base64encode(str: string) {
   }
   return Buffer.from(str, "binary").toString("base64");
 }
+
+export const truncate = (val: string, maxLen: number): string =>
+  val.length > maxLen ? `${val.substring(0, maxLen - 1)}…` : val;
