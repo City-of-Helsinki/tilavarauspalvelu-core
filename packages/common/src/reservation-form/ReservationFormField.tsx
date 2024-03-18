@@ -120,6 +120,11 @@ const ControlledCheckbox = (props: {
   />
 );
 
+/* NOTE: backend returns validation errors if text fields are too long
+ * remove maxlength after adding proper schema validation
+ */
+const MAX_TEXT_LENGTH = 255;
+
 const ReservationFormField = ({
   field,
   options,
@@ -331,6 +336,7 @@ const ReservationFormField = ({
         errorText={errorText}
         invalid={!!error}
         required={required}
+        maxLength={MAX_TEXT_LENGTH}
         $isWide={isWideRow}
         $hidden={
           field.includes("billing") && watch("showBillingAddress") !== true
@@ -383,6 +389,7 @@ const ReservationFormField = ({
           errorText={errorText}
           invalid={!!error}
           required={isFreeOfChargeReasonRequired}
+          maxLength={MAX_TEXT_LENGTH}
           $hidden={!watch("applyingForFreeOfCharge")}
           $isWide
           $height="92px"
@@ -403,9 +410,7 @@ const ReservationFormField = ({
           errorText={errorText}
           invalid={!!error}
           required={required}
-          maxLength={
-            255 /* TODO: Might want to remove this once proper validation works */
-          }
+          maxLength={MAX_TEXT_LENGTH}
           $isWide={isWideRow}
           $hidden={
             watch("reserveeIsUnregisteredAssociation") === undefined
@@ -432,9 +437,7 @@ const ReservationFormField = ({
           defaultValue={defaultValue ? String(defaultValue) : undefined}
           invalid={!!error}
           required={required}
-          maxLength={
-            255 /* TODO: Might want to remove this once proper validation works */
-          }
+          maxLength={MAX_TEXT_LENGTH}
           $isWide={isWideRow}
           $hidden={
             field.includes("billing") && watch("showBillingAddress") !== true
