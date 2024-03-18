@@ -51,7 +51,11 @@ import {
   ReservationUnitType,
   State,
 } from "common/types/gql-types";
-import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
+import {
+  filterNonNullable,
+  fromMondayFirstUnsafe,
+  getLocalizationLang,
+} from "common/src/helpers";
 import Head from "../../components/reservation-unit/Head";
 import { AddressSection } from "../../components/reservation-unit/Address";
 import Sanitize from "../../components/common/Sanitize";
@@ -334,7 +338,7 @@ const ApplicationRoundScheduleDay = ({
     <StyledApplicationRoundScheduleDay>
       {/* eslint-disable react/no-unknown-property */}
       <span test-dataid="application-round-time-slot__weekday">
-        {t(`common:weekDayLong.${weekday}`)}
+        {t(`common:weekDayLong.${fromMondayFirstUnsafe(weekday)}`)}
       </span>{" "}
       {closed ? (
         <span test-dataid="application-round-time-slot__value">-</span>
@@ -499,14 +503,7 @@ const ReservationUnit = ({
   const shouldDisplayApplicationRoundTimeSlots =
     !!activeApplicationRounds?.length;
 
-  // TODO: should this be sorted here?
-  const applicationRoundTimeSlots = (
-    reservationUnit?.applicationRoundTimeSlots ?? []
-  ).sort((a, b) => a.weekday - b.weekday);
-  const orderedApplicationRoundTimeSlots =
-    applicationRoundTimeSlots[0]?.weekday === 0
-      ? [...applicationRoundTimeSlots.slice(1), applicationRoundTimeSlots[0]]
-      : applicationRoundTimeSlots;
+  const { applicationRoundTimeSlots } = reservationUnit;
 
   const shouldDisplayPricingTerms = useMemo(() => {
     const pricings = filterNonNullable(reservationUnit?.pricings);
@@ -1084,7 +1081,7 @@ const ReservationUnit = ({
               <Accordion heading={t("reservationUnit:recurringHeading")}>
                 <PaddedContent>
                   <p>{t("reservationUnit:recurringBody")}</p>
-                  {orderedApplicationRoundTimeSlots.map((day) => (
+                  {applicationRoundTimeSlots?.map((day) => (
                     <ApplicationRoundScheduleDay key={day.weekday} {...day} />
                   ))}
                 </PaddedContent>
