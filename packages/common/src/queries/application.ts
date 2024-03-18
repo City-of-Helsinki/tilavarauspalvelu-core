@@ -104,6 +104,7 @@ const APPLICATION_SECTION_UI_FRAGMENT = gql`
           nameSv
         }
         applicationRoundTimeSlots {
+          weekday
           reservableTimes {
             begin
             end

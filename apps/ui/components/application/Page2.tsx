@@ -37,6 +37,7 @@ type OpeningHourPeriod = {
 
 type DailyOpeningHours =
   | {
+      weekday: number;
       closed: boolean;
       reservableTimes?: OpeningHourPeriod[] | null;
     }[]
@@ -46,16 +47,33 @@ const StyledNotification = styled(Notification)`
   margin-top: var(--spacing-m);
 `;
 
-const cellLabel = (row: number): string => {
+function cellLabel(row: number): string {
   return `${row} - ${row + 1}`;
-};
+}
 
-const getListOfApplicationEventTitles = (
+function getListOfApplicationEventTitles(
   applicationSections: ApplicationSectionFormValue[],
   ids: number[]
-): string => {
+): string {
   return getReadableList(ids.map((id) => `"${applicationSections[id].name}"`));
-};
+}
+
+function getOpeningHours(
+  day: number,
+  openingHours?: DailyOpeningHours
+): OpeningHourPeriod[] | null {
+  if (!openingHours) {
+    return null;
+  }
+  const dayOpeningHours = openingHours.find((oh) => oh.weekday === day);
+  if (!dayOpeningHours) {
+    return null;
+  }
+  if (dayOpeningHours.closed) {
+    return null;
+  }
+  return dayOpeningHours.reservableTimes ?? null;
+}
 
 function applicationEventSchedulesToCells(
   schedule: ApplicationEventScheduleFormType[],
@@ -68,8 +86,9 @@ function applicationEventSchedulesToCells(
 
   for (let j = 0; j < 7; j += 1) {
     const day = [];
+    const openingHoursForADay = getOpeningHours(j, openingHours);
     const dayOpeningHours =
-      openingHours?.[j]?.reservableTimes?.map((t) => {
+      openingHoursForADay?.map((t) => {
         return {
           begin: t && +t.begin.split(":")[0],
           end: t && +t.end.split(":")[0] === 0 ? 24 : t && +t.end.split(":")[0],
