@@ -66,8 +66,8 @@ importers:
         specifier: ^2.17.1
         version: 2.17.1
       hds-react:
-        specifier: ^2.17.0
-        version: 2.17.0(@react-three/fiber@8.15.19)(eslint@8.57.0)(konva@9.3.6)(postcss@8.4.36)(react-dom@18.2.0)(react-konva@16.8.6)(react-native@0.73.6)(react-zdog@1.2.2)(react@18.2.0)(three@0.162.0)(typescript@5.2.2)(zdog@1.1.3)
+        specifier: ^2.17.1
+        version: 2.17.1(@react-three/fiber@8.15.19)(eslint@8.57.0)(konva@9.3.6)(postcss@8.4.36)(react-dom@18.2.0)(react-konva@16.8.6)(react-native@0.73.6)(react-zdog@1.2.2)(react@18.2.0)(three@0.162.0)(typescript@5.2.2)(zdog@1.1.3)
       i18next:
         specifier: ^23.10.1
         version: 23.10.1
@@ -250,8 +250,8 @@ importers:
         specifier: ^2.17.1
         version: 2.17.1
       hds-react:
-        specifier: ^2.17.0
-        version: 2.17.0(@react-three/fiber@8.15.19)(eslint@8.57.0)(konva@9.3.6)(postcss@8.4.36)(react-dom@18.2.0)(react-konva@16.8.6)(react-native@0.73.6)(react-zdog@1.2.2)(react@18.2.0)(three@0.162.0)(typescript@5.2.2)(zdog@1.1.3)
+        specifier: ^2.17.1
+        version: 2.17.1(@react-three/fiber@8.15.19)(eslint@8.57.0)(konva@9.3.6)(postcss@8.4.36)(react-dom@18.2.0)(react-konva@16.8.6)(react-native@0.73.6)(react-zdog@1.2.2)(react@18.2.0)(three@0.162.0)(typescript@5.2.2)(zdog@1.1.3)
       i18next:
         specifier: ^23.10.1
         version: 23.10.1
@@ -419,8 +419,8 @@ importers:
         specifier: workspace:*
         version: link:../eslint-config-custom
       hds-react:
-        specifier: ^2.17.0
-        version: 2.17.0(@react-three/fiber@8.15.19)(eslint@8.57.0)(konva@9.3.6)(postcss@8.4.36)(react-dom@18.2.0)(react-konva@16.8.6)(react-native@0.73.6)(react-zdog@1.2.2)(react@18.2.0)(three@0.162.0)(typescript@5.2.2)(zdog@1.1.3)
+        specifier: ^2.17.1
+        version: 2.17.1(@react-three/fiber@8.15.19)(eslint@8.57.0)(konva@9.3.6)(postcss@8.4.36)(react-dom@18.2.0)(react-konva@16.8.6)(react-native@0.73.6)(react-zdog@1.2.2)(react@18.2.0)(three@0.162.0)(typescript@5.2.2)(zdog@1.1.3)
       i18next:
         specifier: ^23.10.1
         version: 23.10.1
@@ -10484,10 +10484,6 @@ packages:
       function-bind: 1.1.2
     dev: true
 
-  /hds-core@2.17.0:
-    resolution: {integrity: sha512-OKYAU3bGsogDXAuJ40WMaGDxNfSXPp4zvgIrHM/O/f2lenQTqVjdL2zJTMcIFufXevwxdiY1bmJ1qXyksMmtBw==}
-    dev: false
-
   /hds-core@2.17.1:
     resolution: {integrity: sha512-Ii9hHyrGofstuy58qMg+lTqwhj/jjaIOwJsieeFJ36C6Ewv6qdvkEP3wvaGW/38hIycoWosCTLMCSqQ5XRvF5A==}
     dev: false
@@ -10496,8 +10492,8 @@ packages:
     resolution: {integrity: sha512-EM87DUAgAVQ2ahourNyyfOSCzYHyCxNkYhJPftSe1W2CS2vHXrskWgP4PWPbGIZbYvIZeEFuHA3TqobCXmy1aw==}
     dev: false
 
-  /hds-react@2.17.0(@react-three/fiber@8.15.19)(eslint@8.57.0)(konva@9.3.6)(postcss@8.4.36)(react-dom@18.2.0)(react-konva@16.8.6)(react-native@0.73.6)(react-zdog@1.2.2)(react@18.2.0)(three@0.162.0)(typescript@5.2.2)(zdog@1.1.3):
-    resolution: {integrity: sha512-nfN6sCCGGkZpv9++9qf0X3Dn+grTI5hPNXFGbFWCrV0dlTYBrDEzV2P3rsJiT6uYs5Yl0kqGBbr+uxQWw3s3wg==}
+  /hds-react@2.17.1(@react-three/fiber@8.15.19)(eslint@8.57.0)(konva@9.3.6)(postcss@8.4.36)(react-dom@18.2.0)(react-konva@16.8.6)(react-native@0.73.6)(react-zdog@1.2.2)(react@18.2.0)(three@0.162.0)(typescript@5.2.2)(zdog@1.1.3):
+    resolution: {integrity: sha512-Gcqr2NtVs8Vh35fZArGFwzQ2wvsjhX64q+ijHeFzdozYLZzQ47f6YD8NlpG2qnZvfMsZdUqKdMcg1+/jmHgQ5A==}
     peerDependencies:
       postcss: ^8.4.21
       react: ^16.8.0 || ^17
@@ -10515,18 +10511,9 @@ packages:
       crc-32: 1.2.0
       date-fns: 2.16.1
       downshift: 6.0.6(react@18.2.0)
-      hds-core: 2.17.0
+      hds-core: 2.17.1
       kashe: 1.0.4
-      lodash.get: 4.4.2
-      lodash.isequal: 4.5.0
-      lodash.isfunction: 3.0.9
-      lodash.isobject: 3.0.2
-      lodash.isundefined: 3.0.1
-      lodash.pick: 4.4.0
-      lodash.pickby: 4.6.0
-      lodash.throttle: 4.1.1
-      lodash.uniqueid: 4.0.1
-      lodash.xor: 4.5.0
+      lodash: 4.17.21
       memoize-one: 5.2.1
       postcss: 8.4.36
       react: 18.2.0
@@ -12175,40 +12162,12 @@ packages:
   /lodash.debounce@4.0.8:
     resolution: {integrity: sha512-FT1yDzDYEoYWhnSGnpE/4Kj1fLZkDFyqRb7fNt6FdYOSxlUWAtp42Eh6Wb0rGIv/m9Bgo7x4GhQbm5Ys4SG5ow==}
 
-  /lodash.get@4.4.2:
-    resolution: {integrity: sha512-z+Uw/vLuy6gQe8cfaFWD7p0wVv8fJl3mbzXh33RS+0oW2wvUqiRXiQ69gLWSLpgB5/6sU+r6BlQR0MBILadqTQ==}
-    dev: false
-
-  /lodash.isequal@4.5.0:
-    resolution: {integrity: sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ==}
-    dev: false
-
-  /lodash.isfunction@3.0.9:
-    resolution: {integrity: sha512-AirXNj15uRIMMPihnkInB4i3NHeb4iBtNg9WRWuK2o31S+ePwwNmDPaTL3o7dTJ+VXNZim7rFs4rxN4YU1oUJw==}
-    dev: false
-
-  /lodash.isobject@3.0.2:
-    resolution: {integrity: sha512-3/Qptq2vr7WeJbB4KHUSKlq8Pl7ASXi3UG6CMbBm8WRtXi8+GHm7mKaU3urfpSEzWe2wCIChs6/sdocUsTKJiA==}
-    dev: false
-
-  /lodash.isundefined@3.0.1:
-    resolution: {integrity: sha512-MXB1is3s899/cD8jheYYE2V9qTHwKvt+npCwpD+1Sxm3Q3cECXCiYHjeHWXNwr6Q0SOBPrYUDxendrO6goVTEA==}
-    dev: false
-
   /lodash.memoize@4.1.2:
     resolution: {integrity: sha512-t7j+NzmgnQzTAYXcsHYLgimltOV1MXHtlOWf6GjL9Kj8GK5FInw5JotxvbOs+IvV1/Dzo04/fCGfLVs7aXb4Ag==}
     dev: true
 
   /lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
-
-  /lodash.pick@4.4.0:
-    resolution: {integrity: sha512-hXt6Ul/5yWjfklSGvLQl8vM//l3FtyHZeuelpzK6mm99pNvN9yTDruNZPEJZD1oWrqo+izBmB7oUfWgcCX7s4Q==}
-    dev: false
-
-  /lodash.pickby@4.6.0:
-    resolution: {integrity: sha512-AZV+GsS/6ckvPOVQPXSiFFacKvKB4kOQu6ynt9wz0F3LO4R9Ij4K1ddYsIytDpSgLz88JHd9P+oaLeej5/Sl7Q==}
-    dev: false
 
   /lodash.sortby@4.7.0:
     resolution: {integrity: sha512-HDWXG8isMntAyRF5vZ7xKuEvOhT4AhlRt/3czTSjvGUxjYCBVRQY48ViDHyfYz9VIoBkW4TMGQNapx+l3RUwdA==}
@@ -12221,14 +12180,6 @@ packages:
   /lodash.truncate@4.4.2:
     resolution: {integrity: sha512-jttmRe7bRse52OsWIMDLaXxWqRAmtIUccAQ3garviCqJjafXOfNMO0yMfNpdD6zbGaTU0P5Nz7e7gAT6cKmJRw==}
     dev: true
-
-  /lodash.uniqueid@4.0.1:
-    resolution: {integrity: sha512-GQQWaIeGlL6DIIr06kj1j6sSmBxyNMwI8kaX9aKpHR/XsMTiaXDVPNPAkiboOTK9OJpTJF/dXT3xYoFQnj386Q==}
-    dev: false
-
-  /lodash.xor@4.5.0:
-    resolution: {integrity: sha512-sVN2zimthq7aZ5sPGXnSz32rZPuqcparVW50chJQe+mzTYV+IsxSsl/2gnkWWE2Of7K3myBQBqtLKOUEHJKRsQ==}
-    dev: false
 
   /lodash@4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
