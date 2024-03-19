@@ -292,33 +292,6 @@ DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
 if DEBUG is True and EMAIL_HOST is None:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-EMAIL_TEMPLATE_CONTEXT_VARIABLES = [
-    "reservee_name",
-    "name",
-    "begin_date",
-    "begin_time",
-    "end_date",
-    "end_time",
-    "reservation_number",
-    "unit_name",
-    "unit_location",
-    "reservation_unit",
-    "price",
-    "non_subsidised_price",
-    "subsidised_price",
-    "tax_percentage",
-    "confirmed_instructions",
-    "pending_instructions",
-    "cancelled_instructions",
-    "deny_reason",
-    "cancel_reason",
-    "current_year",
-    "varaamo_ext_link",
-    "my_reservations_ext_link",
-    "my_applications_ext_link",
-    "feedback_ext_link",
-]
-EMAIL_TEMPLATE_SUPPORTED_EXPRESSIONS = ["if", "elif", "else", "endif"]
 
 SEND_RESERVATION_NOTIFICATION_EMAILS = env("SEND_RESERVATION_NOTIFICATION_EMAILS")
 EMAIL_HTML_MAX_FILE_SIZE = env("EMAIL_HTML_MAX_FILE_SIZE")

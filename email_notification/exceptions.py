@@ -2,11 +2,7 @@ class SendEmailNotificationError(Exception):
     pass
 
 
-class EmailNotificationBuilderError(Exception):
-    pass
-
-
-class EmailBuilderConfigError(Exception):
+class EmailBuilderConfigurationError(Exception):
     pass
 
 
