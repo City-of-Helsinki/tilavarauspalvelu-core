@@ -33,6 +33,8 @@ updates:
       # have to manually update HDS
       - dependency-name: "hds-*"
         update-types: ["version-update:semver-major"]
+      # breaks time selecting using drag and drop (at least 1.8.6 -> 1.11.2)
+      - dependency-name: "react-big-calendar"
     # NOTE can't do a single group for all it will fail to update
     # either just accept multiple PRs or do fine grained groups manually
     groups:
@@ -46,6 +48,10 @@ updates:
       i18n:
         patterns:
           - "i18next-*"
+          - "react-i18next"
+      hds:
+        patterns:
+          - "hds-*"
       linter:
         patterns:
           - "eslint*"
