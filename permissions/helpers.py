@@ -152,7 +152,7 @@ def can_view_reservation(user: AnyUser, reservation: Reservation, needs_staff_pe
         return False
     if user.is_superuser:
         return True
-    if reservation.user == user and (True if needs_staff_permissions else user.has_staff_permissions):
+    if reservation.user == user and (user.has_staff_permissions if needs_staff_permissions else True):
         return True
     if has_general_permission(user, permission):
         return True
