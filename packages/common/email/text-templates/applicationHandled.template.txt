@@ -1,0 +1,11 @@
+${salutation}
+
+${applicationHandled} ${ownApplicationPage}: {{my_applications_ext_link}}
+
+${thankYouForUsing}
+${withRegards}
+${serviceName}
+
+${automaticMessage} ${sendUs} ${feedbackOnService}: {{feedback_ext_link}}
+
+${reserveCityResourcesAt} {{varaamo_ext_link}}

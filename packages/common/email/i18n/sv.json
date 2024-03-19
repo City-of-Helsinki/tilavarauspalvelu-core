@@ -55,5 +55,16 @@
     "oClock": "kl.",
     "vatIncluded": "inkl. moms",
     "paymentDue": "Förfallodatum",
-    "payReservation": "Betala bokningen"
+    "payReservation": "Betala bokningen",
+
+    "subjectApplicationReceived": "subjectApplicationReceived SV",
+    "subjectApplicationInHandling": "subjectApplicationInHandling SV",
+    "subjectApplicationHandled": "subjectApplicationHandled SV",
+    "applicationReceived": "applicationReceived SV",
+    "applicationInHandling": "applicationInHandling SV",
+    "applicationHandled": "applicationHandled SV",
+    "manageApplication": "manageApplication SV",
+    "viewApplication": "viewApplication SV",
+    "ownApplicationPage": "ownApplicationPage SV",
+    "untilApplicationPeriodEnd": "untilApplicationPeriodEnd SV"
 }

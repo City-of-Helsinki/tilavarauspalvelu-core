@@ -55,5 +55,16 @@
     "oClock": "at",
     "vatIncluded": "incl. VAT",
     "paymentDue": "Due date",
-    "payReservation": "Pay the booking"
+    "payReservation": "Pay the booking",
+
+    "subjectApplicationReceived": "subjectApplicationReceived EN",
+    "subjectApplicationInHandling": "subjectApplicationInHandling EN",
+    "subjectApplicationHandled": "subjectApplicationHandled EN",
+    "applicationReceived": "applicationReceived EN",
+    "applicationInHandling": "applicationInHandling EN",
+    "applicationHandled": "applicationHandled EN",
+    "manageApplication": "manageApplication EN",
+    "viewApplication": "viewApplication EN",
+    "ownApplicationPage": "ownApplicationPage EN",
+    "untilApplicationPeriodEnd": "untilApplicationPeriodEnd EN"
 }

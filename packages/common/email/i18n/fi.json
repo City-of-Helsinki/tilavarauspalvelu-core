@@ -55,5 +55,16 @@
     "oClock": "klo",
     "vatIncluded": "sis. alv",
     "paymentDue": "Eräpäivä",
-    "payReservation": "Maksa varaus"
+    "payReservation": "Maksa varaus",
+
+    "subjectApplicationReceived": "Hakemuksesi on vastaanotettu",
+    "subjectApplicationInHandling": "Hakemuksesi on käsiteltävänä",
+    "subjectApplicationHandled": "Hakemuksesi on käsitelty",
+    "applicationReceived": "Kiitos hakemuksestasi.",
+    "applicationInHandling": "Hakuaika on päättynyt. Ilmoitamme käsittelyn tuloksesta, kun hakemuksesi on käsitelty.",
+    "applicationHandled": "Näet tiedon käsittelyn tuloksesta",
+    "manageApplication": "Voit muuttaa tai täydentää hakemustasi",
+    "viewApplication": "Voit tarkastella lähettämääsi hakemusta",
+    "ownApplicationPage": "Omat hakemukset -sivulla",
+    "untilApplicationPeriodEnd": "hakuajan päättymiseen asti"
 }
