@@ -82,7 +82,7 @@ importers:
         version: 14.1.3(@babel/core@7.24.1)(react-dom@18.2.0)(react@18.2.0)(sass@1.69.7)
       next-i18next:
         specifier: ^15.2.0
-        version: 15.2.0(i18next@23.10.1)(next@14.1.3)(react-i18next@14.0.5)(react@18.2.0)
+        version: 15.2.0(i18next@23.10.1)(next@14.1.3)(react-i18next@14.1.0)(react@18.2.0)
       query-string:
         specifier: 8.1.0
         version: 8.1.0
@@ -99,8 +99,8 @@ importers:
         specifier: ^7.51.1
         version: 7.51.1(react@18.2.0)
       react-i18next:
-        specifier: ^14.0.5
-        version: 14.0.5(i18next@23.10.1)(react-dom@18.2.0)(react-native@0.73.6)(react@18.2.0)
+        specifier: ^14.1.0
+        version: 14.1.0(i18next@23.10.1)(react-dom@18.2.0)(react-native@0.73.6)(react@18.2.0)
       react-quill:
         specifier: 2.0.0
         version: 2.0.0(react-dom@18.2.0)(react@18.2.0)
@@ -269,7 +269,7 @@ importers:
         version: 2.2.1
       next-i18next:
         specifier: ^15.2.0
-        version: 15.2.0(i18next@23.10.1)(next@14.1.3)(react-i18next@14.0.5)(react@18.2.0)
+        version: 15.2.0(i18next@23.10.1)(next@14.1.3)(react-i18next@14.1.0)(react@18.2.0)
       next-transpile-modules:
         specifier: ^10.0.1
         version: 10.0.1
@@ -289,8 +289,8 @@ importers:
         specifier: ^7.51.1
         version: 7.51.1(react@18.2.0)
       react-i18next:
-        specifier: ^14.0.5
-        version: 14.0.5(i18next@23.10.1)(react-dom@18.2.0)(react-native@0.73.6)(react@18.2.0)
+        specifier: ^14.1.0
+        version: 14.1.0(i18next@23.10.1)(react-dom@18.2.0)(react-native@0.73.6)(react@18.2.0)
       react-map-gl:
         specifier: ^7.1.7
         version: 7.1.7(mapbox-gl@3.2.0)(react-dom@18.2.0)(react@18.2.0)
@@ -435,7 +435,7 @@ importers:
         version: 14.1.3(@babel/core@7.24.1)(react-dom@18.2.0)(react@18.2.0)(sass@1.69.7)
       next-i18next:
         specifier: ^15.2.0
-        version: 15.2.0(i18next@23.10.1)(next@14.1.3)(react-i18next@14.0.5)(react@18.2.0)
+        version: 15.2.0(i18next@23.10.1)(next@14.1.3)(react-i18next@14.1.0)(react@18.2.0)
       react:
         specifier: ^18.2.0
         version: 18.2.0
@@ -449,8 +449,8 @@ importers:
         specifier: ^7.51.1
         version: 7.51.1(react@18.2.0)
       react-i18next:
-        specifier: ^14.0.5
-        version: 14.0.5(i18next@23.10.1)(react-dom@18.2.0)(react-native@0.73.6)(react@18.2.0)
+        specifier: ^14.1.0
+        version: 14.1.0(i18next@23.10.1)(react-dom@18.2.0)(react-native@0.73.6)(react@18.2.0)
       react-use:
         specifier: ^17.4.2
         version: 17.4.2(react-dom@18.2.0)(react@18.2.0)
@@ -3296,13 +3296,6 @@ packages:
       regenerator-runtime: 0.14.1
     dev: false
 
-  /@babel/runtime@7.23.9:
-    resolution: {integrity: sha512-0CX6F+BI2s9dkUqr08KFrAIZgNFj75rdBU/DjCyYLIaV/quFjkk6T+EJ2LkZHyZTbEV4L5p97mNkUsHl2wLFAw==}
-    engines: {node: '>=6.9.0'}
-    dependencies:
-      regenerator-runtime: 0.14.1
-    dev: false
-
   /@babel/runtime@7.24.0:
     resolution: {integrity: sha512-Chk32uHMg6TnQdvw2e9IlqPpFX/6NLuK0Ys2PqLb7/gL5uFn9mXvK715FGLlOLQrcO4qIkNHkvPGktzzXexsFw==}
     engines: {node: '>=6.9.0'}
@@ -4862,7 +4855,7 @@ packages:
   /@math.gl/web-mercator@3.6.3:
     resolution: {integrity: sha512-UVrkSOs02YLehKaehrxhAejYMurehIHPfFQvPFZmdJHglHOU4V2cCUApTVEwOksvCp161ypEqVp+9H6mGhTTcw==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       gl-matrix: 3.4.3
     dev: false
 
@@ -5149,7 +5142,7 @@ packages:
     peerDependencies:
       react: ^16.8.0
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       '@react-aria/interactions': 3.17.0(react@18.2.0)
       '@react-aria/utils': 3.19.0(react@18.2.0)
       clsx: 1.2.1
@@ -6080,7 +6073,7 @@ packages:
     engines: {node: '>=14'}
     dependencies:
       '@babel/code-frame': 7.23.5
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       '@types/aria-query': 5.0.4
       aria-query: 5.1.3
       chalk: 4.1.2
@@ -8869,7 +8862,7 @@ packages:
   /dom-helpers@5.2.1:
     resolution: {integrity: sha512-nRCa7CK3VTrM2NmGkIy4cbK7IZlgBE/PYMn55rrXefr5xXDP0LdtfPnblFDoVdcAfslJ7or6iqAUnx0CCGIWQA==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       csstype: 3.1.3
     dev: false
 
@@ -8955,7 +8948,7 @@ packages:
     peerDependencies:
       react: '>=16.8.0'
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       compute-scroll-into-view: 1.0.20
       prop-types: 15.8.1
       react: 18.2.0
@@ -9465,7 +9458,7 @@ packages:
     peerDependencies:
       eslint: ^3 || ^4 || ^5 || ^6 || ^7 || ^8
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       aria-query: 5.3.0
       array-includes: 3.1.7
       array.prototype.flatmap: 1.3.2
@@ -12753,7 +12746,7 @@ packages:
   /mjml-accordion@4.14.1:
     resolution: {integrity: sha512-dpNXyjnhYwhM75JSjD4wFUa9JgHm86M2pa0CoTzdv1zOQz67ilc4BoK5mc2S0gOjJpjBShM5eOJuCyVIuAPC6w==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       lodash: 4.17.21
       mjml-core: 4.14.1
     transitivePeerDependencies:
@@ -12763,7 +12756,7 @@ packages:
   /mjml-body@4.14.1:
     resolution: {integrity: sha512-YpXcK3o2o1U+fhI8f60xahrhXuHmav6BZez9vIN3ZEJOxPFSr+qgr1cT2iyFz50L5+ZsLIVj2ZY+ALQjdsg8ig==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       lodash: 4.17.21
       mjml-core: 4.14.1
     transitivePeerDependencies:
@@ -12773,7 +12766,7 @@ packages:
   /mjml-button@4.14.1:
     resolution: {integrity: sha512-V1Tl1vQ3lXYvvqHJHvGcc8URr7V1l/ZOsv7iLV4QRrh7kjKBXaRS7uUJtz6/PzEbNsGQCiNtXrODqcijLWlgaw==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       lodash: 4.17.21
       mjml-core: 4.14.1
     transitivePeerDependencies:
@@ -12783,7 +12776,7 @@ packages:
   /mjml-carousel@4.14.1:
     resolution: {integrity: sha512-Ku3MUWPk/TwHxVgKEUtzspy/ePaWtN/3z6/qvNik0KIn0ZUIZ4zvR2JtaVL5nd30LHSmUaNj30XMPkCjYiKkFA==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       lodash: 4.17.21
       mjml-core: 4.14.1
     transitivePeerDependencies:
@@ -12794,7 +12787,7 @@ packages:
     resolution: {integrity: sha512-Gy6MnSygFXs0U1qOXTHqBg2vZX2VL/fAacgQzD4MHq4OuybWaTNSzXRwxBXYCxT3IJB874n2Q0Mxp+Xka+tnZg==}
     hasBin: true
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       chokidar: 3.5.3
       glob: 7.2.3
       html-minifier: 4.0.0
@@ -12812,7 +12805,7 @@ packages:
   /mjml-column@4.14.1:
     resolution: {integrity: sha512-iixVCIX1YJtpQuwG2WbDr7FqofQrlTtGQ4+YAZXGiLThs0En3xNIJFQX9xJ8sgLEGGltyooHiNICBRlzSp9fDg==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       lodash: 4.17.21
       mjml-core: 4.14.1
     transitivePeerDependencies:
@@ -12822,7 +12815,7 @@ packages:
   /mjml-core@4.14.1:
     resolution: {integrity: sha512-di88rSfX+8r4r+cEqlQCO7CRM4mYZrfe2wSCu2je38i+ujjkLpF72cgLnjBlSG5aOUCZgYvlsZ85stqIz9LQfA==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       cheerio: 1.0.0-rc.12
       detect-node: 2.0.4
       html-minifier: 4.0.0
@@ -12839,7 +12832,7 @@ packages:
   /mjml-divider@4.14.1:
     resolution: {integrity: sha512-agqWY0aW2xaMiUOhYKDvcAAfOLalpbbtjKZAl1vWmNkURaoK4L7MgDilKHSJDFUlHGm2ZOArTrq8i6K0iyThBQ==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       lodash: 4.17.21
       mjml-core: 4.14.1
     transitivePeerDependencies:
@@ -12849,7 +12842,7 @@ packages:
   /mjml-group@4.14.1:
     resolution: {integrity: sha512-dJt5batgEJ7wxlxzqOfHOI94ABX+8DZBvAlHuddYO4CsLFHYv6XRIArLAMMnAKU76r6p3X8JxYeOjKZXdv49kg==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       lodash: 4.17.21
       mjml-core: 4.14.1
     transitivePeerDependencies:
@@ -12859,7 +12852,7 @@ packages:
   /mjml-head-attributes@4.14.1:
     resolution: {integrity: sha512-XdUNOp2csK28kBDSistInOyzWNwmu5HDNr4y1Z7vSQ1PfkmiuS6jWG7jHUjdoMhs27e6Leuyyc6a8gWSpqSWrg==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       lodash: 4.17.21
       mjml-core: 4.14.1
     transitivePeerDependencies:
@@ -12869,7 +12862,7 @@ packages:
   /mjml-head-breakpoint@4.14.1:
     resolution: {integrity: sha512-Qw9l/W/I5Z9p7I4ShgnEpAL9if4472ejcznbBnp+4Gq+sZoPa7iYoEPsa9UCGutlaCh3N3tIi2qKhl9qD8DFxA==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       lodash: 4.17.21
       mjml-core: 4.14.1
     transitivePeerDependencies:
@@ -12879,7 +12872,7 @@ packages:
   /mjml-head-font@4.14.1:
     resolution: {integrity: sha512-oBYm1gaOdEMjE5BoZouRRD4lCNZ1jcpz92NR/F7xDyMaKCGN6T/+r4S5dq1gOLm9zWqClRHaECdFJNEmrDpZqA==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       lodash: 4.17.21
       mjml-core: 4.14.1
     transitivePeerDependencies:
@@ -12889,7 +12882,7 @@ packages:
   /mjml-head-html-attributes@4.14.1:
     resolution: {integrity: sha512-vlJsJc1Sm4Ml2XvLmp01zsdmWmzm6+jNCO7X3eYi9ngEh8LjMCLIQOncnOgjqm9uGpQu2EgUhwvYFZP2luJOVg==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       lodash: 4.17.21
       mjml-core: 4.14.1
     transitivePeerDependencies:
@@ -12899,7 +12892,7 @@ packages:
   /mjml-head-preview@4.14.1:
     resolution: {integrity: sha512-89gQtt3fhl2dkYpHLF5HDQXz/RLpzecU6wmAIT7Dz6etjLGE1dgq2Ay6Bu/OeHjDcT1gbM131zvBwuXw8OydNw==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       lodash: 4.17.21
       mjml-core: 4.14.1
     transitivePeerDependencies:
@@ -12909,7 +12902,7 @@ packages:
   /mjml-head-style@4.14.1:
     resolution: {integrity: sha512-XryOuf32EDuUCBT2k99C1+H87IOM919oY6IqxKFJCDkmsbywKIum7ibhweJdcxiYGONKTC6xjuibGD3fQTTYNQ==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       lodash: 4.17.21
       mjml-core: 4.14.1
     transitivePeerDependencies:
@@ -12919,7 +12912,7 @@ packages:
   /mjml-head-title@4.14.1:
     resolution: {integrity: sha512-aIfpmlQdf1eJZSSrFodmlC4g5GudBti2eMyG42M7/3NeLM6anEWoe+UkF/6OG4Zy0tCQ40BDJ5iBZlMsjQICzw==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       lodash: 4.17.21
       mjml-core: 4.14.1
     transitivePeerDependencies:
@@ -12929,7 +12922,7 @@ packages:
   /mjml-head@4.14.1:
     resolution: {integrity: sha512-KoCbtSeTAhx05Ugn9TB2UYt5sQinSCb7RGRer5iPQ3CrXj8hT5B5Svn6qvf/GACPkWl4auExHQh+XgLB+r3OEA==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       lodash: 4.17.21
       mjml-core: 4.14.1
     transitivePeerDependencies:
@@ -12939,7 +12932,7 @@ packages:
   /mjml-hero@4.14.1:
     resolution: {integrity: sha512-TQJ3yfjrKYGkdEWjHLHhL99u/meKFYgnfJvlo9xeBvRjSM696jIjdqaPHaunfw4CP6d2OpCIMuacgOsvqQMWOA==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       lodash: 4.17.21
       mjml-core: 4.14.1
     transitivePeerDependencies:
@@ -12949,7 +12942,7 @@ packages:
   /mjml-image@4.14.1:
     resolution: {integrity: sha512-jfKLPHXuFq83okwlNM1Um/AEWeVDgs2JXIOsWp2TtvXosnRvGGMzA5stKLYdy1x6UfKF4c1ovpMS162aYGp+xQ==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       lodash: 4.17.21
       mjml-core: 4.14.1
     transitivePeerDependencies:
@@ -12960,7 +12953,7 @@ packages:
     resolution: {integrity: sha512-d+9HKQOhZi3ZFAaFSDdjzJX9eDQGjMf3BArLWNm2okC4ZgfJSpOc77kgCyFV8ugvwc8fFegPnSV60Jl4xtvK2A==}
     hasBin: true
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       js-beautify: 1.14.9
       lodash: 4.17.21
       mjml-core: 4.14.1
@@ -12973,7 +12966,7 @@ packages:
   /mjml-navbar@4.14.1:
     resolution: {integrity: sha512-rNy1Kw8CR3WQ+M55PFBAUDz2VEOjz+sk06OFnsnmNjoMVCjo1EV7OFLDAkmxAwqkC8h4zQWEOFY0MBqqoAg7+A==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       lodash: 4.17.21
       mjml-core: 4.14.1
     transitivePeerDependencies:
@@ -12983,7 +12976,7 @@ packages:
   /mjml-parser-xml@4.14.1:
     resolution: {integrity: sha512-9WQVeukbXfq9DUcZ8wOsHC6BTdhaVwTAJDYMIQglXLwKwN7I4pTCguDDHy5d0kbbzK5OCVxCdZe+bfVI6XANOQ==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       detect-node: 2.0.4
       htmlparser2: 8.0.2
       lodash: 4.17.21
@@ -12992,7 +12985,7 @@ packages:
   /mjml-preset-core@4.14.1:
     resolution: {integrity: sha512-uUCqK9Z9d39rwB/+JDV2KWSZGB46W7rPQpc9Xnw1DRP7wD7qAfJwK6AZFCwfTgWdSxw0PwquVNcrUS9yBa9uhw==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       mjml-accordion: 4.14.1
       mjml-body: 4.14.1
       mjml-button: 4.14.1
@@ -13025,7 +13018,7 @@ packages:
   /mjml-raw@4.14.1:
     resolution: {integrity: sha512-9+4wzoXnCtfV6QPmjfJkZ50hxFB4Z8QZnl2Ac0D1Cn3dUF46UkmO5NLMu7UDIlm5DdFyycZrMOwvZS4wv9ksPw==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       lodash: 4.17.21
       mjml-core: 4.14.1
     transitivePeerDependencies:
@@ -13035,7 +13028,7 @@ packages:
   /mjml-section@4.14.1:
     resolution: {integrity: sha512-Ik5pTUhpT3DOfB3hEmAWp8rZ0ilWtIivnL8XdUJRfgYE9D+MCRn+reIO+DAoJHxiQoI6gyeKkIP4B9OrQ7cHQw==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       lodash: 4.17.21
       mjml-core: 4.14.1
     transitivePeerDependencies:
@@ -13045,7 +13038,7 @@ packages:
   /mjml-social@4.14.1:
     resolution: {integrity: sha512-G44aOZXgZHukirjkeQWTTV36UywtE2YvSwWGNfo/8d+k5JdJJhCIrlwaahyKEAyH63G1B0Zt8b2lEWx0jigYUw==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       lodash: 4.17.21
       mjml-core: 4.14.1
     transitivePeerDependencies:
@@ -13055,7 +13048,7 @@ packages:
   /mjml-spacer@4.14.1:
     resolution: {integrity: sha512-5SfQCXTd3JBgRH1pUy6NVZ0lXBiRqFJPVHBdtC3OFvUS3q1w16eaAXlIUWMKTfy8CKhQrCiE6m65kc662ZpYxA==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       lodash: 4.17.21
       mjml-core: 4.14.1
     transitivePeerDependencies:
@@ -13065,7 +13058,7 @@ packages:
   /mjml-table@4.14.1:
     resolution: {integrity: sha512-aVBdX3WpyKVGh/PZNn2KgRem+PQhWlvnD00DKxDejRBsBSKYSwZ0t3EfFvZOoJ9DzfHsN0dHuwd6Z18Ps44NFQ==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       lodash: 4.17.21
       mjml-core: 4.14.1
     transitivePeerDependencies:
@@ -13075,7 +13068,7 @@ packages:
   /mjml-text@4.14.1:
     resolution: {integrity: sha512-yZuvf5z6qUxEo5CqOhCUltJlR6oySKVcQNHwoV5sneMaKdmBiaU4VDnlYFera9gMD9o3KBHIX6kUg7EHnCwBRQ==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       lodash: 4.17.21
       mjml-core: 4.14.1
     transitivePeerDependencies:
@@ -13085,13 +13078,13 @@ packages:
   /mjml-validator@4.13.0:
     resolution: {integrity: sha512-uURYfyQYtHJ6Qz/1A7/+E9ezfcoISoLZhYK3olsxKRViwaA2Mm8gy/J3yggZXnsUXWUns7Qymycm5LglLEIiQg==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
     dev: false
 
   /mjml-wrapper@4.14.1:
     resolution: {integrity: sha512-aA5Xlq6d0hZ5LY+RvSaBqmVcLkvPvdhyAv3vQf3G41Gfhel4oIPmkLnVpHselWhV14A0KwIOIAKVxHtSAxyOTQ==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       lodash: 4.17.21
       mjml-core: 4.14.1
       mjml-section: 4.14.1
@@ -13244,7 +13237,7 @@ packages:
     resolution: {integrity: sha512-OjJ+fV15FXO2uQXQagLD4C0abYErBjyjE0I0FHpOEIB8upw0hg1ldFP6cqHTJBH1cZqy96OeR3u1dJ+Ez2D4Bg==}
     dev: false
 
-  /next-i18next@15.2.0(i18next@23.10.1)(next@14.1.3)(react-i18next@14.0.5)(react@18.2.0):
+  /next-i18next@15.2.0(i18next@23.10.1)(next@14.1.3)(react-i18next@14.1.0)(react@18.2.0):
     resolution: {integrity: sha512-Rl5yZ4oGffsB0AjRykZ5PzNQ2M6am54MaMayldGmH/UKZisrIxk2SKEPJvaHhKlWe1qgdNi2FkodwK8sEjfEmg==}
     engines: {node: '>=14'}
     peerDependencies:
@@ -13261,7 +13254,7 @@ packages:
       i18next-fs-backend: 2.3.1
       next: 14.1.3(@babel/core@7.24.1)(react-dom@18.2.0)(react@18.2.0)(sass@1.69.7)
       react: 18.2.0
-      react-i18next: 14.0.5(i18next@23.10.1)(react-dom@18.2.0)(react-native@0.73.6)(react@18.2.0)
+      react-i18next: 14.1.0(i18next@23.10.1)(react-dom@18.2.0)(react-native@0.73.6)(react@18.2.0)
     dev: false
 
   /next-transpile-modules@10.0.1:
@@ -14220,8 +14213,8 @@ packages:
       react: 18.2.0
     dev: false
 
-  /react-i18next@14.0.5(i18next@23.10.1)(react-dom@18.2.0)(react-native@0.73.6)(react@18.2.0):
-    resolution: {integrity: sha512-5+bQSeEtgJrMBABBL5lO7jPdSNAbeAZ+MlFWDw//7FnVacuVu3l9EeWFzBQvZsKy+cihkbThWOAThEdH8YjGEw==}
+  /react-i18next@14.1.0(i18next@23.10.1)(react-dom@18.2.0)(react-native@0.73.6)(react@18.2.0):
+    resolution: {integrity: sha512-3KwX6LHpbvGQ+sBEntjV4sYW3Zovjjl3fpoHbUwSgFHf0uRBcbeCBLR5al6ikncI5+W0EFb71QXZmfop+J6NrQ==}
     peerDependencies:
       i18next: '>= 23.2.3'
       react: '>= 16.8.0'
@@ -14233,7 +14226,7 @@ packages:
       react-native:
         optional: true
     dependencies:
-      '@babel/runtime': 7.23.9
+      '@babel/runtime': 7.24.1
       html-parse-stringify: 3.0.1
       i18next: 23.10.1
       react: 18.2.0
@@ -14353,7 +14346,7 @@ packages:
       react: '>=16.3.0'
       react-dom: '>=16.3.0'
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       '@popperjs/core': 2.11.8
       '@restart/hooks': 0.4.15(react@18.2.0)
       '@types/warning': 3.0.3
@@ -14675,7 +14668,7 @@ packages:
   /regenerator-transform@0.15.2:
     resolution: {integrity: sha512-hfMp2BoF0qOk3uc5V20ALGDS2ddjQaLrdl7xrGXvAIow7qeWRM2VA2HuCHkUKk9slq3VwEwLNK3DFBqDfPGYtg==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
 
   /regexp-tree@0.1.27:
     resolution: {integrity: sha512-iETxpjK6YoRWJG5o6hXLwvjYAoW+FEZn9os0PD/b6AP6xQwsa/Y7lCVgIixBbUPMfhu+i2LtdeAqVTgGlQarfA==}
@@ -14915,7 +14908,7 @@ packages:
   /rtl-css-js@1.16.1:
     resolution: {integrity: sha512-lRQgou1mu19e+Ya0LsTvKrVJ5TYUbqCVPAiImX3UfLTenarvPUl1QFdvu5Z3PYmHT9RCcwIfbjRQBntExyj3Zg==}
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
     dev: false
 
   /run-applescript@5.0.0:
@@ -16372,7 +16365,7 @@ packages:
     peerDependencies:
       react: '>=15.0.0'
     dependencies:
-      '@babel/runtime': 7.24.0
+      '@babel/runtime': 7.24.1
       '@types/react': 18.0.27
       invariant: 2.2.4
       react: 18.2.0
