@@ -4,7 +4,9 @@ from decimal import Decimal
 from typing import Any
 
 from django import forms
+from django.core.exceptions import ValidationError
 
+from email_notification.helpers.email_builder_reservation import ReservationEmailBuilder
 from email_notification.models import EmailTemplate
 from reservation_units.models import ReservationUnit
 from spaces.models import Location
@@ -69,10 +71,7 @@ class EmailTemplateTesterForm(forms.Form):
     reservation_name = forms.CharField(initial="TESTIVARAUS")
     reservation_unit_name = forms.CharField(initial="VARAUSYKSIKKÖ")
     unit_name = forms.CharField(initial="TOIMIPISTE")
-    unit_location = forms.CharField(
-        initial="Testikatu 99999 Korvatunturi",
-        widget=forms.TextInput(attrs={"size": 50}),
-    )
+    unit_location = forms.CharField(initial="Testikatu 99999 Korvatunturi", widget=forms.TextInput(attrs={"size": 50}))
     price = forms.DecimalField(decimal_places=2, initial=Decimal("12.30"), widget=forms.NumberInput())
     non_subsidised_price = forms.DecimalField(decimal_places=2, initial=Decimal("15.00"), widget=forms.NumberInput())
     subsidised_price = forms.DecimalField(decimal_places=2, initial=Decimal("5.00"), widget=forms.NumberInput)
@@ -93,11 +92,17 @@ class EmailTemplateTesterForm(forms.Form):
     cancel_reason_sv = forms.CharField(initial="[orsak]", widget=forms.Textarea)
     cancel_reason_en = forms.CharField(initial="[reason]", widget=forms.Textarea)
 
+    def clean_template(self) -> None:
+        template = EmailTemplate.objects.get(pk=self.cleaned_data["template"])
+
+        # TODO: Add support for APPLICATION-type email templates
+        if template.type not in ReservationEmailBuilder.email_template_types:
+            raise ValidationError("Only RESERVATION email template testing is supported.")
+
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
-        # Templates are fetched here because calling EmailTemplate.objects.all() in the field
-        # initialization somehow wrecks translation support. I didn't have time figure out
-        # the root cause, but setting the choices here solves the issue
+        # Templates are fetched here because calling EmailTemplate.objects.all() in the field initialization breaks
+        # translation support, due to the choices being defined on module import.
         template_choices = [(template.pk, template.name) for template in EmailTemplate.objects.all()]
         self.fields["template"].choices = template_choices

@@ -1,5 +1,9 @@
+from typing import Literal
+
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+
+type LanguageType = Literal["fi", "en", "sv"]
 
 
 class LANGUAGES:

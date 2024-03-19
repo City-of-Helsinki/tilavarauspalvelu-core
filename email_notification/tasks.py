@@ -1,7 +1,7 @@
 from django.conf import settings
 
+from email_notification.helpers.email_sender import EmailNotificationSender
 from email_notification.models import EmailType
-from email_notification.sender.email_notification_sender import EmailNotificationSender
 from permissions.helpers import has_unit_permission
 from reservations.models import Reservation
 from spaces.models import Unit
@@ -18,7 +18,7 @@ def send_reservation_email_task(reservation_id: int, email_type: EmailType) -> N
         return
 
     email_notification_sender = EmailNotificationSender(email_type=email_type, recipients=None)
-    email_notification_sender.send_reservation_email_notification(reservation=reservation)
+    email_notification_sender.send_reservation_email(reservation=reservation)
 
 
 @app.task(name="send_staff_reservation_email")
@@ -33,15 +33,15 @@ def send_staff_reservation_email_task(
     if not reservation:
         return
 
-    recipients = _get_staff_notification_recipients(reservation, notification_settings)
+    recipients = _get_reservation_staff_notification_recipients(reservation, notification_settings)
     if not recipients:
         return
 
     email_notification_sender = EmailNotificationSender(email_type=email_type, recipients=recipients)
-    email_notification_sender.send_reservation_email_notification(reservation=reservation)
+    email_notification_sender.send_reservation_email(reservation=reservation)
 
 
-def _get_staff_notification_recipients(
+def _get_reservation_staff_notification_recipients(
     reservation: Reservation,
     notification_settings: list[ReservationNotification],
 ) -> list[str]:

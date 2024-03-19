@@ -1,24 +1,23 @@
 import datetime
 import urllib.parse
+from decimal import Decimal
 
 import freezegun
 import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-from email_notification.exceptions import EmailNotificationBuilderError, EmailTemplateValidationError
-from email_notification.models import EmailTemplate
-from email_notification.sender.email_notification_builder import (
-    EmailNotificationContext,
-    ReservationEmailNotificationBuilder,
+from email_notification.exceptions import EmailTemplateValidationError
+from email_notification.helpers.email_builder_reservation import (
+    ReservationEmailBuilder,
+    ReservationEmailContext,
 )
+from email_notification.models import EmailTemplate, EmailType
 from reservations.models import Reservation
 from tests.factories import EmailTemplateFactory, ReservationFactory, ReservationUnitFactory
 
 pytestmark = [
     pytest.mark.django_db,
 ]
-
-mock_data = EmailNotificationContext.with_mock_data()
 
 
 @pytest.fixture()
@@ -28,6 +27,7 @@ def email_template() -> EmailTemplate:
     html_file_sv = SimpleUploadedFile(name="mock_file_sv.html", content=b"HTML content SV")
 
     return EmailTemplateFactory.build(
+        type=EmailType.RESERVATION_CONFIRMED,
         name="Test template",
         content_fi="Text content FI",
         content_en="Text content EN",
@@ -49,34 +49,31 @@ def reservation() -> Reservation:
 def test_email_builder__raises__on_invalid_tag_in_text_content(email_template, reservation):
     email_template.content_fi = "Text content FI {{invalid_tag}}"
 
+    context = ReservationEmailContext.from_reservation(reservation)
+
     msg = "Tag 'invalid_tag' is not supported"
     with pytest.raises(EmailTemplateValidationError, match=msg):
-        ReservationEmailNotificationBuilder(reservation=reservation, template=email_template, language="fi")
+        ReservationEmailBuilder(template=email_template, context=context)
 
 
 def test_email_builder__raises__on_invalid_tag_in_html_content(email_template, reservation):
     email_template.html_content_fi = SimpleUploadedFile(name="mock_file_fi.html", content=b"HTML FI {{invalid_tag}}")
 
+    context = ReservationEmailContext.from_reservation(reservation)
+
     msg = "Tag 'invalid_tag' is not supported"
     with pytest.raises(EmailTemplateValidationError, match=msg):
-        ReservationEmailNotificationBuilder(reservation=reservation, template=email_template, language="fi")
+        ReservationEmailBuilder(template=email_template, context=context)
 
 
 def test_email_builder__raises__on_illegal_tag_in_text_content(email_template, reservation):
     email_template.content = "I contain an illegal {% foo %} tag"
 
+    context = ReservationEmailContext.from_reservation(reservation)
+
     msg = "Illegal tags found: tag was 'foo'"
     with pytest.raises(EmailTemplateValidationError, match=msg):
-        ReservationEmailNotificationBuilder(reservation, email_template)
-
-
-def test_email_builder__raises__when_both_reservation_and_context_are_given(email_template, reservation):
-    context = EmailNotificationContext.from_reservation(reservation)
-    msg = "Reservation and context cannot be used at the same time. Provide only one of them."
-    with pytest.raises(EmailNotificationBuilderError, match=msg):
-        ReservationEmailNotificationBuilder(
-            reservation=reservation, template=email_template, language="fi", context=context
-        )
+        ReservationEmailBuilder(template=email_template, context=context)
 
 
 # Get Subject
@@ -85,7 +82,8 @@ def test_email_builder__raises__when_both_reservation_and_context_are_given(emai
 def test_email_builder__get_subject(email_template, reservation):
     email_template.subject = "Hello {{ reservee_name }}"
 
-    builder = ReservationEmailNotificationBuilder(reservation, email_template)
+    context = ReservationEmailContext.from_reservation(reservation)
+    builder = ReservationEmailBuilder(template=email_template, context=context)
 
     assert builder.get_subject() == f"Hello {reservation.reservee_first_name} {reservation.reservee_last_name}"
 
@@ -93,27 +91,16 @@ def test_email_builder__get_subject(email_template, reservation):
 # Get HTML Content
 
 
-def test_email_builder__get_content__with_html_file(email_template, reservation):
-    builder_fi = ReservationEmailNotificationBuilder(reservation, email_template, "fi")
-    builder_en = ReservationEmailNotificationBuilder(reservation, email_template, "en")
-    builder_sv = ReservationEmailNotificationBuilder(reservation, email_template, "sv")
+@pytest.mark.parametrize("language", ["fi", "en", "sv"])
+def test_email_builder__get_content__with_html_file(language, email_template, reservation):
+    reservation.reservee_language = language
+    context = ReservationEmailContext.from_reservation(reservation)
+    builder = ReservationEmailBuilder(template=email_template, context=context)
 
-    assert builder_fi.get_html_content() == "HTML content FI"
-    assert builder_en.get_html_content() == "HTML content EN"
-    assert builder_sv.get_html_content() == "HTML content SV"
-
-
-# Get Content
+    assert builder.get_html_content() == f"HTML content {language.upper()}"
 
 
-def test_email_builder__get_content__with_text_content(email_template, reservation):
-    builder_fi = ReservationEmailNotificationBuilder(reservation, email_template, "fi")
-    builder_en = ReservationEmailNotificationBuilder(reservation, email_template, "en")
-    builder_sv = ReservationEmailNotificationBuilder(reservation, email_template, "sv")
-
-    assert builder_fi.get_content() == "Text content FI"
-    assert builder_en.get_content() == "Text content EN"
-    assert builder_sv.get_content() == "Text content SV"
+# Get Text Content
 
 
 @freezegun.freeze_time("2021-01-01T12:00:00+02:00")
@@ -125,7 +112,7 @@ def test_email_builder__get_content(settings, email_template):
         name="foo",
         begin=datetime.datetime(2022, 2, 9, 10, 0),
         end=datetime.datetime(2022, 2, 9, 12, 0),
-        price=52,
+        price=Decimal("52"),
         non_subsidised_price=0,
     )
 
@@ -145,7 +132,7 @@ def test_email_builder__get_content(settings, email_template):
         link to feedback {{ feedback_ext_link }}
     """
 
-    builder = ReservationEmailNotificationBuilder(reservation, email_template)
+    builder = ReservationEmailBuilder.from_reservation(template=email_template, reservation=reservation)
 
     compiled_content = f"""
         Should contain foo and 9.2.2022 and 10:00 and 9.2.2022
@@ -166,16 +153,18 @@ def test_email_builder__get_content(settings, email_template):
     assert builder.get_content() == compiled_content
 
 
-def test_email_builder__get_content__padding_in_templates(email_template, reservation):
+def test_email_builder__get_content__variable_tag_padding(email_template, reservation):
     email_template.content = "I have {{ reservation_number }} padding"
 
-    builder = ReservationEmailNotificationBuilder(reservation, email_template)
+    builder = ReservationEmailBuilder.from_reservation(template=email_template, reservation=reservation)
 
     assert builder.get_content() == f"I have {reservation.id} padding"
 
+
+def test_email_builder__get_content__variable_tag_no_padding(email_template, reservation):
     email_template.content = "I don't have {{reservation_number}} padding"
 
-    builder = ReservationEmailNotificationBuilder(reservation, email_template)
+    builder = ReservationEmailBuilder.from_reservation(template=email_template, reservation=reservation)
 
     assert builder.get_content() == f"I don't have {reservation.id} padding"
 
@@ -192,7 +181,7 @@ def test_email_builder__get_content__if_else_elif_expressions_supported(email_te
         This is else
     """
 
-    builder = ReservationEmailNotificationBuilder(reservation, email_template)
+    builder = ReservationEmailBuilder.from_reservation(template=email_template, reservation=reservation)
 
     assert builder.get_content() == compiled_content
 
@@ -210,7 +199,7 @@ def test_email_builder__get_content__for_loop_not_supported(email_template, rese
 
     msg = "Illegal tags found: tag was 'for'"
     with pytest.raises(EmailTemplateValidationError, match=msg):
-        ReservationEmailNotificationBuilder(reservation, email_template)
+        ReservationEmailBuilder.from_reservation(template=email_template, reservation=reservation)
 
 
 def test_email_builder__get_content__currency_filter_comma_separator(email_template, reservation):
@@ -218,7 +207,7 @@ def test_email_builder__get_content__currency_filter_comma_separator(email_templ
     email_template.content = "{{price | currency}}"
     compiled_content = "52,00"
 
-    builder = ReservationEmailNotificationBuilder(reservation, email_template)
+    builder = ReservationEmailBuilder.from_reservation(template=email_template, reservation=reservation)
 
     assert builder.get_content() == compiled_content
 
@@ -228,7 +217,7 @@ def test_email_builder__get_content__currency_filter_thousand_separator_is_space
     email_template.content = "{{price | currency}}"
     compiled_content = "10 000,00"
 
-    builder = ReservationEmailNotificationBuilder(reservation, email_template)
+    builder = ReservationEmailBuilder.from_reservation(template=email_template, reservation=reservation)
 
     assert builder.get_content() == compiled_content
 
@@ -248,7 +237,7 @@ def test_email_builder__subsidised_price(email_template, reservation):
     )
     compiled_content = "Varauksen hinta: 52,00 € (sis. alv 10%)"
 
-    builder = ReservationEmailNotificationBuilder(reservation, email_template)
+    builder = ReservationEmailBuilder.from_reservation(template=email_template, reservation=reservation)
 
     assert builder.get_content() == compiled_content
 
@@ -269,7 +258,7 @@ def test_email_builder__get_content__subsidised_price_from_price_calc(email_temp
     )
     compiled_content = "Varauksen hinta: 0,00 - 52,00 € (sis. alv 10%)"
 
-    builder = ReservationEmailNotificationBuilder(reservation, email_template)
+    builder = ReservationEmailBuilder.from_reservation(template=email_template, reservation=reservation)
 
     assert builder.get_content() == compiled_content
 
@@ -293,7 +282,7 @@ def test_email_builder__get_content__confirmed_instructions_renders(email_templa
         system.
     """
 
-    builder = ReservationEmailNotificationBuilder(reservation, email_template)
+    builder = ReservationEmailBuilder.from_reservation(template=email_template, reservation=reservation)
 
     assert builder.get_content() == compiled_content
 
@@ -317,7 +306,7 @@ def test_email_builder__get_content__pending_instructions_renders(email_template
         system.
     """
 
-    builder = ReservationEmailNotificationBuilder(reservation, email_template)
+    builder = ReservationEmailBuilder.from_reservation(template=email_template, reservation=reservation)
 
     assert builder.get_content() == compiled_content
 
@@ -341,6 +330,6 @@ def test_email_builder__get_content__cancel_instructions_renders(email_template)
         system.
     """
 
-    builder = ReservationEmailNotificationBuilder(reservation, email_template)
+    builder = ReservationEmailBuilder.from_reservation(template=email_template, reservation=reservation)
 
     assert builder.get_content() == compiled_content

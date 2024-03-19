@@ -15,50 +15,73 @@ from email_notification.admin.email_tester import (
     get_email_template_tester_form_initial_values,
 )
 from email_notification.exceptions import EmailTemplateValidationError
+from email_notification.helpers.email_builder_application import (
+    ApplicationEmailBuilder,
+    ApplicationEmailContext,
+)
+from email_notification.helpers.email_builder_reservation import (
+    ReservationEmailBuilder,
+    ReservationEmailContext,
+)
+from email_notification.helpers.email_sender import EmailNotificationSender
+from email_notification.helpers.email_validator import EmailTemplateValidator
 from email_notification.models import EmailTemplate, EmailType
-from email_notification.sender.email_notification_builder import EmailNotificationContext
-from email_notification.sender.email_notification_sender import EmailNotificationSender
-from email_notification.sender.email_notification_validator import EmailTemplateValidator
+from tilavarauspalvelu.utils.commons import LanguageType
 
 
 class EmailTemplateAdminForm(ModelForm):
-    required_fields = ["content_fi", "subject_fi"]
-
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
+        # The Finnish 'content' and 'subject' are always required
+        self.fields["content_fi"].required = True
+        self.fields["subject_fi"].required = True
+
+        # Set up the available 'type' choices
+        # Remove existing types from the choices, so that the same type cannot be added twice
         existing_types = EmailTemplate.objects.values_list("type", flat=True)
         if self.instance and self.instance.type:
             existing_types = existing_types.exclude(type=self.instance.type)
-
         available_types = [(value, label) for value, label in EmailType.choices if value not in existing_types]
-        self.fields["type"].choices = list(available_types)
-        self.test_context = EmailNotificationContext.with_mock_data().__dict__
+        self.fields["type"].choices = available_types
+
+    def _get_validator(self) -> EmailTemplateValidator:
+        email_template_type = self.cleaned_data["type"]
+
+        # Reservation
+        if email_template_type in ReservationEmailBuilder.email_template_types:
+            mock_context = ReservationEmailContext.from_mock_data()
+        # Application
+        elif email_template_type in ApplicationEmailBuilder.email_template_types:
+            mock_context = ApplicationEmailContext.from_mock_data()
+        else:
+            raise EmailTemplateValidationError(f"Email template type '{email_template_type}' is not supported.")
+
+        return EmailTemplateValidator(context=mock_context)
 
     def _get_validated_field(self, field) -> str | None:
         data: str | None = self.cleaned_data[field]
-
         if not data:
-            if field in self.required_fields:
-                raise ValidationError(f"Field {field} is required.")
             return data
 
         try:
-            EmailTemplateValidator().validate_string(data, context_dict=self.test_context)
+            validator = self._get_validator()
+            validator.validate_string(data)
         except EmailTemplateValidationError as e:
             raise ValidationError(e.message) from e
         return data
 
-    def _get_validated_html_file(self, language: str) -> InMemoryUploadedFile | FieldFile | None:
+    def _get_validated_html_file(self, language: LanguageType) -> InMemoryUploadedFile | FieldFile | None:
         file: InMemoryUploadedFile | FieldFile | None = self.cleaned_data[f"html_content_{language}"]
 
         if file and isinstance(file, InMemoryUploadedFile):
-            EmailTemplateValidator().validate_html_file(file, context_dict=self.test_context)
+            validator = self._get_validator()
+            validator.validate_html_file(file)
 
         return file
 
-    def clean_subject(self) -> str | None:
-        return self._get_validated_field("subject")
+    def clean_subject_fi(self) -> str | None:
+        return self._get_validated_field("subject_fi")
 
     def clean_subject_en(self) -> str | None:
         return self._get_validated_field("subject_en")
@@ -66,8 +89,8 @@ class EmailTemplateAdminForm(ModelForm):
     def clean_subject_sv(self) -> str | None:
         return self._get_validated_field("subject_sv")
 
-    def clean_content(self) -> str | None:
-        return self._get_validated_field("content")
+    def clean_content_fi(self) -> str | None:
+        return self._get_validated_field("content_fi")
 
     def clean_content_en(self) -> str | None:
         return self._get_validated_field("content_en")
@@ -89,7 +112,7 @@ class EmailTemplateAdminForm(ModelForm):
 class EmailTemplateAdmin(ExtraButtonsMixin, admin.ModelAdmin):
     model = EmailTemplate
     form = EmailTemplateAdminForm
-    exclude = ["html_content"]
+    exclude = ["subject", "content", "html_content"]  # These are not used directly, only the translated fields are used
 
     @button(label="Email Template Testing")
     def template_tester(self, request, extra_context=None) -> TemplateResponse | HttpResponseRedirect:
@@ -99,7 +122,7 @@ class EmailTemplateAdmin(ExtraButtonsMixin, admin.ModelAdmin):
                 template = EmailTemplate.objects.filter(pk=request.POST["template"]).first()
 
                 email_notification_sender = EmailNotificationSender(email_type=template.type, recipients=None)
-                email_notification_sender.send_test_emails(form=form)
+                email_notification_sender.send_test_reservation_email(form=form)
 
                 self.message_user(request, _("Test Email '%s' successfully sent.") % template.name)
 
