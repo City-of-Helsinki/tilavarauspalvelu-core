@@ -6,8 +6,8 @@ import pytest
 
 from email_notification.admin.email_tester import EmailTemplateTesterForm
 from email_notification.exceptions import SendEmailNotificationError
+from email_notification.helpers.email_sender import EmailNotificationSender
 from email_notification.models import EmailTemplate, EmailType
-from email_notification.sender.email_notification_sender import EmailNotificationSender
 from reservations.models import Reservation
 from tests.factories import EmailTemplateFactory, ReservationFactory
 
@@ -44,7 +44,7 @@ def test_email_sender__reservation__success__reservee_email(outbox, email_templa
         email_type=email_template.type,
         recipients=None,
     )
-    email_notification_sender.send_reservation_email_notification(reservation=reservation)
+    email_notification_sender.send_reservation_email(reservation=reservation)
 
     assert len(outbox) == 1
     assert outbox[0].subject == email_template.subject
@@ -63,7 +63,7 @@ def test_email_sender__reservation__success__reservation_user_email(outbox, emai
         email_type=email_template.type,
         recipients=None,
     )
-    email_notification_sender.send_reservation_email_notification(reservation=reservation)
+    email_notification_sender.send_reservation_email(reservation=reservation)
 
     assert len(outbox) == 1
     assert outbox[0].subject == email_template.subject
@@ -83,7 +83,7 @@ def test_email_sender__reservation__success__reservee_and_user_email(outbox, ema
         email_type=email_template.type,
         recipients=None,
     )
-    email_notification_sender.send_reservation_email_notification(reservation=reservation)
+    email_notification_sender.send_reservation_email(reservation=reservation)
 
     assert len(outbox) == 1
     assert outbox[0].subject == email_template.subject
@@ -104,7 +104,7 @@ def test_email_sender__reservation__with_multiple_recipients__success(outbox, em
         email_type=email_template.type,
         recipients=recipients,
     )
-    email_notification_sender.send_reservation_email_notification(reservation=reservation)
+    email_notification_sender.send_reservation_email(reservation=reservation)
 
     assert len(outbox) == 1
     assert outbox[0].subject == email_template.subject
@@ -115,41 +115,33 @@ def test_email_sender__reservation__with_multiple_recipients__success(outbox, em
 def test_email_sender__reservation__with_multiple_recipients__too_many_recipients(outbox, settings, email_template):
     settings.EMAIL_MAX_RECIPIENTS = 3
 
-    reservation: Reservation = ReservationFactory.create(reservation_unit__unit__name="foo")
-
     recipients = [
         "liu.kang@earthrealm.com",
         "sonya.blade@earthrealm.com",
         "shao.kahn@outworld.com",
         "mileena@outworld.com",
     ]
-    email_notification_sender = EmailNotificationSender(
-        email_type=email_template.type,
-        recipients=recipients,
-    )
 
     msg = re.escape(
-        f"Refusing to notify more than '{settings.EMAIL_MAX_RECIPIENTS}' users. "
-        f"Email type: '{email_template.type}' "
-        f"Reservation: '{reservation.pk}'"
+        f"Refusing to notify more than '{settings.EMAIL_MAX_RECIPIENTS}' users. " f"Email type: '{email_template.type}'"
     )
     with pytest.raises(SendEmailNotificationError, match=msg):
-        email_notification_sender.send_reservation_email_notification(reservation=reservation)
+        EmailNotificationSender(email_type=email_template.type, recipients=recipients)
 
 
-@pytest.mark.parametrize("lang", ["fi", "en", "sv"])
-def test_email_sender__reservation__reservation_language_is_used(outbox, lang, email_template):
-    reservation: Reservation = ReservationFactory.create(reservation_unit__unit__name="foo", reservee_language=lang)
+@pytest.mark.parametrize("language", ["fi", "en", "sv"])
+def test_email_sender__reservation__reservation_language_is_used(outbox, language, email_template):
+    reservation: Reservation = ReservationFactory.create(reservation_unit__unit__name="foo", reservee_language=language)
 
     email_notification_sender = EmailNotificationSender(
         email_type=email_template.type,
         recipients=None,
     )
-    email_notification_sender.send_reservation_email_notification(reservation=reservation)
+    email_notification_sender.send_reservation_email(reservation=reservation)
 
     assert len(outbox) == 1
-    assert outbox[0].subject == getattr(email_template, f"subject_{lang}", None)
-    assert outbox[0].body == getattr(email_template, f"content_{lang}", None)
+    assert outbox[0].subject == getattr(email_template, f"subject_{language}", None)
+    assert outbox[0].body == getattr(email_template, f"content_{language}", None)
     assert outbox[0].bcc == [reservation.user.email]
 
 
@@ -187,7 +179,7 @@ def test_email_sender__test_emails(outbox, email_template):
     }
 
     email_notification_sender = EmailNotificationSender(email_type=email_template.type, recipients=None)
-    email_notification_sender.send_test_emails(form=form)
+    email_notification_sender.send_test_reservation_email(form=form)
 
     assert len(outbox) == 3
     assert outbox[0].subject == "fi"
