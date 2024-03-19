@@ -27,10 +27,10 @@ body {
 
 #__next {
   min-height: 100vh;
-  height: 100%;
   position: relative;
   display: flex;
   flex-direction: column;
+  overflow-y: hidden;
 }
 
 // utils
