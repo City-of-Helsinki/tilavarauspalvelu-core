@@ -2,8 +2,17 @@ import datetime
 
 import pytest
 
-from reservations.choices import ReservationTypeChoice
-from tests.factories import ReservationFactory, ReservationUnitFactory, UnitFactory, UserFactory
+from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
+from tests.factories import (
+    AgeGroupFactory,
+    CityFactory,
+    PaymentOrderFactory,
+    ReservationFactory,
+    ReservationPurposeFactory,
+    ReservationUnitFactory,
+    UnitFactory,
+    UserFactory,
+)
 from tests.helpers import UserType
 
 from .helpers import reservations_query
@@ -246,3 +255,127 @@ def test_reservation__query__fields_requiring_staff_permissions__regular_user(gr
         "handlingDetails": "",
         "handledAt": None,
     }
+
+
+def test_reservation__query__reservation_owner_can_see_personal_information_from_own_reservation(graphql):
+    reservation = ReservationFactory.create(
+        age_group=AgeGroupFactory.create(),
+        applying_for_free_of_charge=True,
+        billing_address_city="billing city",
+        billing_address_street="billing street",
+        billing_address_zip="billing zip",
+        billing_email="billing email",
+        billing_first_name="billing first",
+        billing_last_name="billing last",
+        billing_phone="billing phone",
+        cancel_details="cancel details",
+        description="desc",
+        free_of_charge_reason="reason",
+        home_city=CityFactory.create(),
+        name="foo",
+        num_persons=1,
+        price=123,
+        price_net=100,
+        purpose=ReservationPurposeFactory.create(),
+        reservee_address_city="city",
+        reservee_address_street="street",
+        reservee_address_zip="123",
+        reservee_email="foo@email.com",
+        reservee_first_name="John",
+        reservee_id="reservee id",
+        reservee_is_unregistered_association=True,
+        reservee_last_name="Doe",
+        reservee_organisation_name="org",
+        reservee_phone="123",
+        reservee_type=CustomerTypeChoice.BUSINESS,
+        state=ReservationStateChoice.CREATED,
+        tax_percentage_value=24,
+        type=ReservationTypeChoice.STAFF,
+        unit_price=100,
+        user=UserFactory.create(),
+    )
+
+    PaymentOrderFactory.create(reservation=reservation)
+
+    graphql.force_login(reservation.user)
+
+    fields = """
+        pk
+        ageGroup { minimum, maximum }
+        applyingForFreeOfCharge
+        billingAddressCity
+        billingAddressStreet
+        billingAddressZip
+        billingEmail
+        billingFirstName
+        billingLastName
+        billingPhone
+        cancelDetails
+        description
+        freeOfChargeReason
+        homeCity { nameFi }
+        isHandled
+        name
+        numPersons
+        order { orderUuid status paymentType receiptUrl checkoutUrl reservationPk refundUuid expiresInMinutes }
+        price
+        priceNet
+        purpose { nameFi }
+        reserveeAddressCity
+        reserveeAddressStreet
+        reserveeAddressZip
+        reserveeEmail
+        reserveeFirstName
+        reserveeId
+        reserveeIsUnregisteredAssociation
+        reserveeLastName
+        reserveeName
+        reserveeOrganisationName
+        reserveePhone
+        reserveeType
+        taxPercentageValue
+        unitPrice
+        user { email }
+    """
+
+    query = reservations_query(fields=fields)
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1
+    assert response.node(0)["pk"] == reservation.pk
+    assert response.node(0)["ageGroup"] is not None, "field not found"
+    assert response.node(0)["applyingForFreeOfCharge"] is not None, "field not found"
+    assert response.node(0)["billingAddressCity"] is not None, "field not found"
+    assert response.node(0)["billingAddressStreet"] is not None, "field not found"
+    assert response.node(0)["billingAddressZip"] is not None, "field not found"
+    assert response.node(0)["billingEmail"] is not None, "field not found"
+    assert response.node(0)["billingFirstName"] is not None, "field not found"
+    assert response.node(0)["billingLastName"] is not None, "field not found"
+    assert response.node(0)["billingPhone"] is not None, "field not found"
+    assert response.node(0)["cancelDetails"] is not None, "field not found"
+    assert response.node(0)["description"] is not None, "field not found"
+    assert response.node(0)["freeOfChargeReason"] is not None, "field not found"
+    assert response.node(0)["homeCity"] is not None, "field not found"
+    assert response.node(0)["isHandled"] is not None, "field not found"
+    assert response.node(0)["name"] is not None, "field not found"
+    assert response.node(0)["numPersons"] is not None, "field not found"
+    assert response.node(0)["order"] is not None, "field not found"
+    assert response.node(0)["price"] is not None, "field not found"
+    assert response.node(0)["priceNet"] is not None, "field not found"
+    assert response.node(0)["purpose"] is not None, "field not found"
+    assert response.node(0)["reserveeAddressCity"] is not None, "field not found"
+    assert response.node(0)["reserveeAddressStreet"] is not None, "field not found"
+    assert response.node(0)["reserveeAddressZip"] is not None, "field not found"
+    assert response.node(0)["reserveeEmail"] is not None, "field not found"
+    assert response.node(0)["reserveeFirstName"] is not None, "field not found"
+    assert response.node(0)["reserveeId"] is not None, "field not found"
+    assert response.node(0)["reserveeIsUnregisteredAssociation"] is not None, "field not found"
+    assert response.node(0)["reserveeLastName"] is not None, "field not found"
+    assert response.node(0)["reserveeName"] is not None, "field not found"
+    assert response.node(0)["reserveeOrganisationName"] is not None, "field not found"
+    assert response.node(0)["reserveePhone"] is not None, "field not found"
+    assert response.node(0)["reserveeType"] is not None, "field not found"
+    assert response.node(0)["taxPercentageValue"] is not None, "field not found"
+    assert response.node(0)["unitPrice"] is not None, "field not found"
+    assert response.node(0)["user"] is not None, "field not found"
