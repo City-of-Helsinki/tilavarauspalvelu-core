@@ -18,8 +18,7 @@ import {
   getReservationUnitPrice,
   getTimeString,
 } from "@/modules/reservationUnit";
-import LoginFragment from "../LoginFragment";
-import { capitalize, getPostLoginUrl, getSelectedOption } from "@/modules/util";
+import { capitalize, getSelectedOption } from "@/modules/util";
 import type { SubmitHandler, UseFormReturn } from "react-hook-form";
 import type { TimeRange } from "@/components/reservation-unit/QuickReservation";
 import { PendingReservationFormType } from "@/components/reservation-unit/schema";
@@ -33,11 +32,9 @@ export type FocusTimeSlot = TimeRange & {
 
 type Props = {
   reservationUnit: ReservationUnitType;
-  isReserving: boolean;
   mode: string;
   shouldCalendarControlsBeVisible?: boolean;
   setShouldCalendarControlsBeVisible?: (value: boolean) => void;
-  apiBaseUrl: string;
   isAnimated?: boolean;
   reservationForm: UseFormReturn<{
     duration?: number;
@@ -45,11 +42,10 @@ type Props = {
     time?: string;
   }>;
   durationOptions: OptionType[];
-  availableTimesForDay: string[];
   startingTimeOptions: OptionType[];
   focusSlot: FocusTimeSlot;
-  storeReservationForLogin: () => void;
   submitReservation: SubmitHandler<PendingReservationFormType>;
+  LoginAndSubmit?: JSX.Element;
 };
 
 const Wrapper = styled.div`
@@ -227,21 +223,7 @@ const SubmitButtonWrapper = styled.div`
   order: 3;
 `;
 
-const SubmitButton = styled(MediumButton)`
-  white-space: nowrap;
-
-  > span {
-    margin: 0 !important;
-    padding-right: var(--spacing-3-xs);
-    padding-left: var(--spacing-3-xs);
-  }
-
-  @media (min-width: ${breakpoints.m}) {
-    order: unset;
-  }
-`;
-
-const StyledSelect = styled(ControlledSelect)`
+const StyledControlledSelect = styled(ControlledSelect)`
   & > div:nth-of-type(2) {
     line-height: var(--lineheight-l);
   }
@@ -290,14 +272,13 @@ const ReservationCalendarControls = ({
   mode,
   shouldCalendarControlsBeVisible,
   setShouldCalendarControlsBeVisible,
-  apiBaseUrl,
   isAnimated = false,
   reservationForm,
   durationOptions,
   focusSlot,
-  storeReservationForLogin,
   startingTimeOptions,
   submitReservation,
+  LoginAndSubmit,
 }: Props): JSX.Element => {
   const { t } = useTranslation();
   const { watch, handleSubmit } = reservationForm;
@@ -314,16 +295,6 @@ const ReservationCalendarControls = ({
     ? Number(formDuration)
     : reservationUnit.minReservationDuration ?? 0;
   const time = watch("time") ?? getTimeString(focusDate);
-  const selectedDuration: OptionType = getSelectedOption(
-    duration,
-    durationOptions
-  ) as OptionType;
-  // if there's a query parameter value for time it can be unreservable and thus not in the list of startingTimeOptions.
-  // so we construct the selected time as an option, which is then shown as the selected option even if not "valid".
-  const selectedTime = getSelectedOption(
-    time.toString(),
-    startingTimeOptions
-  ) ?? { value: time, label: time };
   const [areControlsVisible, setAreControlsVisible] = useState(false);
 
   useEffect(() => {
@@ -355,7 +326,10 @@ const ReservationCalendarControls = ({
       }${endTime}`,
       "-"
     );
-    const durationStr = duration != null ? selectedDuration.label : "";
+    const durationStr =
+      duration != null
+        ? getSelectedOption(duration, durationOptions)?.label
+        : "";
 
     return `${dateStr}, ${durationStr}`;
   })();
@@ -374,29 +348,6 @@ const ReservationCalendarControls = ({
     reservationUnit.reservableTimeSpans,
     (n) => n?.endDatetime
   );
-
-  const submitButton =
-    mode === "create" ? (
-      <SubmitButtonWrapper>
-        <LoginFragment
-          isActionDisabled={!focusSlot.isReservable}
-          apiBaseUrl={apiBaseUrl}
-          actionCallback={() => storeReservationForLogin()}
-          componentIfAuthenticated={
-            <SubmitButton
-              type="submit"
-              disabled={!focusSlot.isReservable}
-              isLoading={reservationForm.formState.isSubmitting}
-              loadingText={t("reservationCalendar:makeReservationLoading")}
-              data-test="reservation__button--submit"
-            >
-              {t("reservationCalendar:makeReservation")}
-            </SubmitButton>
-          }
-          returnUrl={getPostLoginUrl()}
-        />
-      </SubmitButtonWrapper>
-    ) : null;
 
   return (
     <Wrapper data-testid="reservation-unit__reservation-controls--wrapper">
@@ -437,7 +388,7 @@ const ReservationCalendarControls = ({
           </ToggleControls>
         </TogglerTop>
         <TogglerBottom>
-          {focusSlot.isReservable && !areControlsVisible && submitButton}
+          {focusSlot.isReservable && !areControlsVisible && LoginAndSubmit}
         </TogglerBottom>
         <Transition
           mountOnEnter
@@ -459,7 +410,7 @@ const ReservationCalendarControls = ({
                     : new Date()
                 }
               />
-              <StyledSelect
+              <StyledControlledSelect
                 name="time"
                 label={t("reservationCalendar:startTime")}
                 control={reservationForm.control}
@@ -467,7 +418,7 @@ const ReservationCalendarControls = ({
                 disabled={!(startingTimeOptions?.length >= 1) && !time}
               />
               <div data-testid="reservation__input--duration">
-                <StyledSelect
+                <StyledControlledSelect
                   name="duration"
                   control={reservationForm.control}
                   label={t("reservationCalendar:duration")}
@@ -486,7 +437,7 @@ const ReservationCalendarControls = ({
               </PriceWrapper>
               <ResetButton
                 onClick={() => reservationForm.reset()}
-                disabled={!selectedTime}
+                disabled={!focusSlot}
                 $isLast={mode === "edit"}
               >
                 {t("searchForm:resetForm")}
@@ -494,13 +445,15 @@ const ReservationCalendarControls = ({
               {mode === "edit" && (
                 <SelectButton
                   onClick={() => setAreControlsVisible(false)}
-                  disabled={!selectedTime}
+                  disabled={!focusSlot.isReservable}
                   data-testid="reservation__button--select-time"
                 >
                   {t("reservationCalendar:selectTime")}
                 </SelectButton>
               )}
-              {mode === "create" && submitButton}
+              {mode === "create" && (
+                <SubmitButtonWrapper>{LoginAndSubmit}</SubmitButtonWrapper>
+              )}
             </Content>
           )}
         </Transition>

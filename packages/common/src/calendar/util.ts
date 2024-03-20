@@ -716,7 +716,7 @@ export const getNewReservation = ({
   }
 
   return {
-    begin: start?.toISOString(),
-    end: normalizedEnd?.toISOString(),
+    begin: start.toISOString(),
+    end: normalizedEnd.toISOString(),
   };
 };

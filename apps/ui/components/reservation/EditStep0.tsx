@@ -134,7 +134,6 @@ const EditStep0 = ({
   activeApplicationRounds,
   setErrorMsg,
   nextStep,
-  apiBaseUrl,
   isLoading,
 }: Props): JSX.Element => {
   const { t, i18n } = useTranslation();
@@ -250,28 +249,6 @@ const EditStep0 = ({
     () => filterNonNullable(reservationUnit?.reservableTimeSpans),
     [reservationUnit?.reservableTimeSpans]
   );
-  const availableTimesForDay = useMemo(() => {
-    return getPossibleTimesForDay(
-      reservableTimeSpans,
-      reservationUnit?.reservationStartInterval,
-      focusDate
-    ).filter((span) => {
-      const [slotH, slotM] = span.split(":").map(Number);
-      const slotDate = new Date(focusDate);
-      slotDate.setHours(slotH, slotM, 0, 0);
-      return (
-        slotDate >= now &&
-        isSlotReservable(slotDate, addMinutes(slotDate, durationValue))
-      );
-    });
-  }, [
-    focusDate,
-    reservableTimeSpans,
-    reservationUnit?.reservationStartInterval,
-    now,
-    durationValue,
-    isSlotReservable,
-  ]);
   const startingTimeOptions = useMemo(() => {
     return getPossibleTimesForDay(
       reservableTimeSpans,
@@ -561,19 +538,15 @@ const EditStep0 = ({
         <CalendarFooter>
           <ReservationCalendarControls
             reservationUnit={reservationUnit}
-            isReserving={isLoading}
             mode="edit"
             shouldCalendarControlsBeVisible={shouldCalendarControlsBeVisible}
             setShouldCalendarControlsBeVisible={
               setShouldCalendarControlsBeVisible
             }
-            apiBaseUrl={apiBaseUrl}
             isAnimated={isMobile}
             reservationForm={reservationForm}
             durationOptions={durationOptions}
-            availableTimesForDay={availableTimesForDay}
             focusSlot={focusSlot}
-            storeReservationForLogin={() => {}}
             startingTimeOptions={startingTimeOptions}
             submitReservation={submitReservation}
           />

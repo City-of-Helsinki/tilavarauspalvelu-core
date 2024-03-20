@@ -3,7 +3,7 @@ import type { OptionType } from "common/types/common";
 import { IconAngleDown } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { chunkArray } from "common/src/common/util";
+import { chunkArray, toUIDate } from "common/src/common/util";
 import { fontBold, fontMedium, H4 } from "common/src/common/typography";
 import type { ReservationUnitType } from "common/types/gql-types";
 import { breakpoints } from "common";
@@ -11,10 +11,7 @@ import {
   getReservationUnitPrice,
   getTimeString,
 } from "@/modules/reservationUnit";
-import { getPostLoginUrl } from "@/modules/util";
-import { MediumButton } from "@/styles/util";
 import Carousel from "../Carousel";
-import LoginFragment from "../LoginFragment";
 import { getLastPossibleReservationDate } from "@/components/reservation-unit/utils";
 import type { FocusTimeSlot } from "@/components/calendar/ReservationCalendarControls";
 import type { SubmitHandler, UseFormReturn } from "react-hook-form";
@@ -28,11 +25,14 @@ export type TimeRange = {
 };
 
 type Props = {
+<<<<<<< HEAD
   reservationUnitIsReservable: boolean;
   reservationUnit: ReservationUnitType | null;
+=======
+  reservationUnit: ReservationUnitByPkType | null;
+>>>>>>> 7534f72d (fix: calendar use, move LoginFragment to reservation unit page)
   calendarRef: React.RefObject<HTMLDivElement>;
   subventionSuffix: JSX.Element | undefined;
-  apiBaseUrl: string;
   reservationForm: UseFormReturn<{
     duration?: number;
     date?: string;
@@ -42,8 +42,8 @@ type Props = {
   startingTimeOptions: OptionType[];
   focusSlot: FocusTimeSlot | null;
   nextAvailableTime: Date | null;
-  storeReservationForLogin: () => void;
   submitReservation: SubmitHandler<PendingReservationFormType>;
+  LoginAndSubmit: JSX.Element;
 };
 
 const timeItems = 24;
@@ -107,21 +107,6 @@ const Times = styled.div`
 `;
 
 const Slots = styled.div``;
-
-const StyledCarousel = styled(Carousel)`
-  .slider-control-centerleft,
-  .slider-control-centerright {
-    top: 36px !important;
-  }
-
-  .slider-list {
-    &:focus-visible {
-      outline: none;
-    }
-
-    cursor: default !important;
-  }
-`;
 
 const SlotGroup = styled.ul`
   list-style: none;
@@ -201,44 +186,38 @@ const ActionWrapper = styled.div`
 `;
 
 const QuickReservation = ({
-  reservationUnitIsReservable,
   reservationUnit,
   subventionSuffix,
   calendarRef,
-  apiBaseUrl,
   reservationForm,
   focusSlot,
   durationOptions,
   startingTimeOptions,
   nextAvailableTime,
-  storeReservationForLogin,
   submitReservation,
+  LoginAndSubmit,
 }: Props): JSX.Element | null => {
   const { t } = useTranslation();
   const { setValue, watch, handleSubmit } = reservationForm;
   const formDate = watch("date");
   const dateValue = useMemo(() => new Date(formDate ?? ""), [formDate]);
-  const focusDate = useMemo(
-    () => focusSlot?.start ?? dateValue,
-    [focusSlot, dateValue]
-  );
   const duration =
     watch("duration") ?? reservationUnit?.minReservationDuration ?? 0;
 
   const getPrice = useCallback(
     (asNumeral = false) => {
-      if (reservationUnit == null || focusDate == null || duration == null) {
+      if (reservationUnit == null || dateValue == null || duration == null) {
         return null;
       }
       return getReservationUnitPrice({
         reservationUnit,
-        pricingDate: focusDate,
+        pricingDate: dateValue,
         minutes: duration,
         trailingZeros: true,
         asNumeral,
       });
     },
-    [duration, reservationUnit, focusDate]
+    [duration, reservationUnit, dateValue]
   );
 
   // A map of all available times for the day, chunked into groups of 8
@@ -281,6 +260,7 @@ const QuickReservation = ({
           initialMonth={dateValue ?? new Date()}
           minDate={new Date()}
           maxDate={lastPossibleDate ?? undefined}
+          disableConfirmation={false}
         />
         <StyledSelect
           name="duration"
@@ -304,7 +284,7 @@ const QuickReservation = ({
       <Times>
         {startingTimeOptions.length > 0 ? (
           <Slots>
-            <StyledCarousel
+            <Carousel
               hideCenterControls
               wrapAround={false}
               slideIndex={activeChunk}
@@ -343,12 +323,12 @@ const QuickReservation = ({
                     )}
                 </SlotGroup>
               ))}
-            </StyledCarousel>
+            </Carousel>
           </Slots>
         ) : (
           <NoTimes>
             <span>{t("reservationCalendar:quickReservation.noTimes")}</span>
-            {nextAvailableTime && (
+            {nextAvailableTime != null && (
               <span>
                 {/* eslint-disable-next-line jsx-a11y/anchor-is-valid -- FIXME */}
                 <a
@@ -360,7 +340,7 @@ const QuickReservation = ({
                       // console.log(nextAvailableTime);
                       const nextTime = getTimeString(nextAvailableTime);
                       nextAvailableTime.setHours(0, 0, 0, 0);
-                      setValue("date", nextAvailableTime.toISOString());
+                      setValue("date", toUIDate(nextAvailableTime));
                       setValue("time", nextTime);
                     }
                   }}
@@ -372,27 +352,7 @@ const QuickReservation = ({
           </NoTimes>
         )}
       </Times>
-      <ActionWrapper>
-        <LoginFragment
-          isActionDisabled={!focusSlot?.isReservable}
-          apiBaseUrl={apiBaseUrl}
-          actionCallback={() => storeReservationForLogin()}
-          componentIfAuthenticated={
-            reservationUnitIsReservable && (
-              <MediumButton
-                disabled={!focusSlot?.isReservable}
-                type="submit"
-                isLoading={reservationForm.formState.isSubmitting}
-                loadingText={t("reservationCalendar:makeReservationLoading")}
-                data-test="quick-reservation__button--submit"
-              >
-                {t("reservationCalendar:makeReservation")}
-              </MediumButton>
-            )
-          }
-          returnUrl={getPostLoginUrl()}
-        />
-      </ActionWrapper>
+      <ActionWrapper>{LoginAndSubmit}</ActionWrapper>
     </Wrapper>
   );
 };
