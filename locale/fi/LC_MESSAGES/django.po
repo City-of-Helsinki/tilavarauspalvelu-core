@@ -905,11 +905,11 @@ msgid "Application Round Time Slots"
 msgstr "Kausivararattavat ajat"
 
 #: applications/models/application_section.py
-msgid "Application section"
+msgid "Application Section"
 msgstr "Hakemuksen osa"
 
 #: applications/models/application_section.py
-msgid "Application sections"
+msgid "Application Sections"
 msgstr "Hakemuksen osat"
 
 #: applications/models/application_section.py

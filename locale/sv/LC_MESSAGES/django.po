@@ -951,11 +951,15 @@ msgid "Application Round Time Slots"
 msgstr "Hakemuksen osa"
 
 #: applications/models/application_section.py
-msgid "Application section"
+#, fuzzy
+#| msgid "Application section"
+msgid "Application Section"
 msgstr "Hakemuksen osa"
 
 #: applications/models/application_section.py
-msgid "Application sections"
+#, fuzzy
+#| msgid "Application sections"
+msgid "Application Sections"
 msgstr "Hakemuksen osat"
 
 #: applications/models/application_section.py
