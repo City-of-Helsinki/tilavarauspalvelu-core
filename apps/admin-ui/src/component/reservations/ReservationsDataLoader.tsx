@@ -1,11 +1,7 @@
 import React from "react";
 import { ApolloError, useQuery } from "@apollo/client";
 import { values } from "lodash";
-import {
-  Query,
-  QueryReservationsArgs,
-  ReservationType,
-} from "common/types/gql-types";
+import { Query, QueryReservationsArgs } from "common/types/gql-types";
 import { More } from "@/component/More";
 import { LIST_PAGE_SIZE } from "@/common/const";
 import { useNotification } from "@/context/NotificationContext";
@@ -90,26 +86,27 @@ const useReservations = (
     sortString = "state";
   }
 
-  const { fetchMore, loading, data } = useQuery<Query, QueryReservationsArgs>(
-    RESERVATIONS_QUERY,
-    {
-      fetchPolicy: "cache-and-network",
-      nextFetchPolicy: "cache-first",
-      errorPolicy: "all",
-      variables: {
-        orderBy: sortString,
-        first: LIST_PAGE_SIZE,
-        ...mapFilterParams(filters, defaultFiltering),
-      },
-      onError: (err: ApolloError) => {
-        notifyError(err.message);
-      },
-    }
-  );
+  const { fetchMore, loading, data, previousData } = useQuery<
+    Query,
+    QueryReservationsArgs
+  >(RESERVATIONS_QUERY, {
+    fetchPolicy: "cache-and-network",
+    nextFetchPolicy: "cache-first",
+    errorPolicy: "all",
+    variables: {
+      orderBy: sortString,
+      first: LIST_PAGE_SIZE,
+      ...mapFilterParams(filters, defaultFiltering),
+    },
+    onError: (err: ApolloError) => {
+      notifyError(err.message);
+    },
+  });
 
-  const reservations = (data?.reservations?.edges ?? [])
-    .map((edge) => edge?.node)
-    .filter((x): x is ReservationType => x != null);
+  const currData = data ?? previousData;
+  const reservations = filterNonNullable(
+    currData?.reservations?.edges.map((edge) => edge?.node)
+  );
 
   return {
     fetchMore,
@@ -142,6 +139,7 @@ const ReservationsDataLoader = ({
         reservations={data}
         sort={sort}
         sortChanged={onSortChanged}
+        isLoading={loading}
       />
       <More
         totalCount={totalCount ?? 0}

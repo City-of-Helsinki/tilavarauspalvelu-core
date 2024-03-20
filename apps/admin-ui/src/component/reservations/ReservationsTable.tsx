@@ -24,6 +24,7 @@ type ReservationTableColumn = {
 type Props = {
   sort?: Sort;
   sortChanged: (field: string) => void;
+  isLoading: boolean;
   reservations: ReservationType[];
 };
 
@@ -98,6 +99,7 @@ const getColConfig = (t: TFunction): ReservationTableColumn[] => [
 const ReservationsTable = ({
   sort,
   sortChanged: onSortChanged,
+  isLoading,
   reservations,
 }: Props): JSX.Element => {
   const { t } = useTranslation();
@@ -115,6 +117,7 @@ const ReservationsTable = ({
       indexKey="pk"
       rows={reservations}
       cols={cols}
+      isLoading={isLoading}
       initialSortingColumnKey={sort === undefined ? undefined : sort.field}
       initialSortingOrder={
         sort === undefined ? undefined : (sort.asc && "asc") || "desc"
