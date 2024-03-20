@@ -111,7 +111,10 @@ const MaxPersonsContainer = styled.div`
 const DeleteButton = styled(MediumButton)`
   white-space: nowrap;
   margin: var(--spacing-s) var(--spacing-s) var(--spacing-s) 0;
-  place-self: flex-end;
+  place-self: flex-start;
+  @media (min-width: ${breakpoints.m}) {
+    place-self: flex-end;
+  }
 `;
 
 const ArrowContainer = styled.div`
