@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import type { GetServerSidePropsContext } from "next";
-import queryString from "query-string";
+import queryString, { ParsedQuery } from "query-string";
 import { useLocalStorage } from "react-use";
 import { Notification } from "hds-react";
 import { useRouter } from "next/router";
@@ -149,14 +149,45 @@ const processVariables = (values: Record<string, string>, language: string) => {
   };
 };
 
+function convertParamsToValues(params: ParsedQuery<string>) {
+  const parsed = params;
+  if (!parsed.sort) parsed.sort = "name";
+  if (!parsed.order) parsed.order = "asc";
+
+  const newValues = Object.keys(parsed).reduce<Record<string, string>>(
+    (p, key) => {
+      if (parsed[key]) {
+        return { ...p, [key]: parsed[key]?.toString() } as Record<
+          string,
+          string
+        >;
+      }
+      return p;
+    },
+    {}
+  );
+
+  return newValues;
+}
+
 const Search = ({ applicationRounds }: Props): JSX.Element => {
+  const searchParams = isBrowser ? window.location.search : "";
+  const parsedParams = queryString.parse(searchParams);
+  const [values, setValues] = useState<Record<string, string>>(
+    convertParamsToValues(parsedParams)
+  );
+
+  const selectedApplicationRound = applicationRounds.find(
+    (ar) => ar.pk === Number(values.applicationRound)
+  );
   const {
     reservationUnits: selectedReservationUnits,
     selectReservationUnit,
     removeReservationUnit,
     containsReservationUnit,
     clearSelections,
-  } = useReservationUnitsList();
+    // Hide other application rounds' reservation units
+  } = useReservationUnitsList(selectedApplicationRound);
 
   const { t, i18n } = useTranslation();
 
@@ -178,7 +209,6 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
     [t]
   );
 
-  const [values, setValues] = useState({} as Record<string, string>);
   const setStoredValues = useLocalStorage("reservationUnit-search", null)[1];
 
   const { data, fetchMore, loading, error, networkStatus } = useQuery<
@@ -191,35 +221,19 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
     notifyOnNetworkStatusChange: true,
   });
 
-  const searchParams = isBrowser ? window.location.search : "";
-  const parsedParams = queryString.parse(searchParams);
-
-  const reservationUnits: ReservationUnitType[] =
-    data?.reservationUnits?.edges
-      ?.map((e) => e?.node)
-      .filter((n): n is NonNullable<typeof n> => n != null) ?? [];
+  const reservationUnits: ReservationUnitType[] = filterNonNullable(
+    data?.reservationUnits?.edges?.map((e) => e?.node)
+  );
   const totalCount = data?.reservationUnits?.totalCount;
 
   const pageInfo = data?.reservationUnits?.pageInfo;
 
+  // TODO useEffect is not the way to manage state
+  // functionality that is added here needs to be added to the onSearch function as well
+  // and neither communicates with the Tags at all
   useEffect(() => {
     if (parsedParams) {
-      const parsed = parsedParams;
-      if (!parsed.sort) parsed.sort = "name";
-      if (!parsed.order) parsed.order = "asc";
-
-      const newValues = Object.keys(parsed).reduce<Record<string, string>>(
-        (p, key) => {
-          if (parsed[key]) {
-            return { ...p, [key]: parsed[key]?.toString() } as Record<
-              string,
-              string
-            >;
-          }
-          return p;
-        },
-        {}
-      );
+      const newValues = convertParamsToValues(parsedParams);
 
       if (!isEqual(values, newValues)) {
         setValues(newValues);
