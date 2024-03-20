@@ -31,10 +31,13 @@ type Props = {
 
 const MainContainer = styled.div`
   margin-top: var(--spacing-l);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-l);
 `;
 
 const ButtonContainer = styled.div`
-  margin-top: var(--spacing-layout-m);
+  margin-top: var(--spacing-s);
 `;
 
 const Notification = styled(HDSNotification)`
@@ -53,7 +56,8 @@ const ReservationUnitList = ({
   const [showModal, setShowModal] = useState(false);
 
   const form = useFormContext<ApplicationFormValues>();
-  const { clearErrors, setError, watch, setValue } = form;
+  const { clearErrors, setError, watch, setValue, formState } = form;
+  const { errors } = formState;
 
   const isValid = (units: ReservationUnitType[]) => {
     const error = units
@@ -134,8 +138,21 @@ const ReservationUnitList = ({
     setReservationUnits(move(reservationUnits, from, to));
   };
 
+  // Only checking for the required error here, other errors are handled in the ReservationUnitCard
+  const unitErros = errors.applicationSections?.[index]?.reservationUnits;
+  const hasNoUnitsError = unitErros != null && unitErros.message === "Required";
+
   return (
     <MainContainer>
+      {hasNoUnitsError && (
+        <Notification
+          type="error"
+          label={t("application:error.noReservationUnits")}
+          size="small"
+        >
+          {t("application:error.noReservationUnits")}
+        </Notification>
+      )}
       <Notification
         size="small"
         label={t("reservationUnitList:infoReservationUnits")}

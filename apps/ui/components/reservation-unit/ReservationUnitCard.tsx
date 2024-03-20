@@ -30,12 +30,11 @@ type Props = {
   invalid: boolean;
 };
 
-const NameCardContainer = styled.div`
-  margin-top: var(--spacing-l);
-`;
+const NameCardContainer = styled.div``;
 
 const PreCardLabel = styled(H6).attrs({ as: "h3" })`
   margin-bottom: 0;
+  margin-top: 0;
 `;
 
 const CardButtonContainer = styled.div`

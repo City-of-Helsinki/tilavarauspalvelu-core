@@ -171,7 +171,7 @@ function ApplicationRootPage({
     };
 
   const { reservationUnits: selectedReservationUnits } =
-    useReservationUnitsList();
+    useReservationUnitsList(applicationRound);
 
   const begin = new Date(applicationRound.reservationPeriodBegin);
   const end = new Date(applicationRound.reservationPeriodEnd);
