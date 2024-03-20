@@ -238,8 +238,16 @@ const ReservationFormField = ({
         return t("forms:minLength");
       case "maxLength":
         return t("forms:maxLength");
+      // duplicated email errror messages because they can be added by zod schema or register pattern validators
+      case "invalid_string":
+        if (error.message === "Invalid email") {
+          return t("forms:invalidEmail");
+        }
+        break;
       case "pattern":
-        if (error.message === "email") return t("forms:invalidEmail");
+        if (error.message === "email") {
+          return t("forms:invalidEmail");
+        }
         break;
       case "required":
       default:

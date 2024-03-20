@@ -70,6 +70,8 @@ i18n.addResourceBundle("fi", "forms", {
     select: "Valitse",
     approve: "Hyväksy",
   },
+  // duplicated in reservationForm.json (translation system is borked and cant be shared)
+  invalidEmail: "Sähköpostin tulee olla oikeassa muodossa (sisältäen @-merkin)",
 });
 
 export default i18n;

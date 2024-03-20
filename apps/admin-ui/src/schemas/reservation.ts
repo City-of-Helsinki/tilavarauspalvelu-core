@@ -31,6 +31,10 @@ const ReservationFormSchema = z
   .object({
     comments: z.string().optional(),
     type: ReservationTypeSchema,
+    // backend doesn't accept bad emails (empty is fine)
+    reserveeEmail: z
+      .union([z.string().email(), z.string().length(0)])
+      .optional(),
   })
   .merge(TimeFormSchema)
   // passthrough since this is combined to the metafields
