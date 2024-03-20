@@ -57,7 +57,7 @@ class ApplicationRound(models.Model):
     service_sector = models.ForeignKey(
         "spaces.ServiceSector",
         null=True,
-        blank=False,
+        blank=True,
         on_delete=models.SET_NULL,
         related_name="application_rounds",
     )
