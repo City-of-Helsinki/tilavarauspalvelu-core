@@ -54,6 +54,8 @@ def comma_sep_str(values: Sequence[str]) -> str:
     >>> comma_sep_str(["foo", "bar", "baz"])
     "foo, bar & baz"
     """
+    if len(values) == 0:
+        return ""
     if len(values) == 1:
         return str(values[0])
     return ", ".join(values[:-1]) + f" & {values[-1]}"
