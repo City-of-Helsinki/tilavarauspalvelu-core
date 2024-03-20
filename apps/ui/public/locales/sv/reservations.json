@@ -107,5 +107,6 @@
   "confirmationError": {
     "heading": "Väntar på betalning",
     "body": "Din betalning kunde inte bekräftas. Vänligen kontrollera efter en stund statusen för bokningen från Dina bokningar sidan. Om bokningen misslyckades, vänligen upprepa bokningsprocessen. Vår kundtjänst hjälper dig vid behov."
-  }
+  },
+  "confirmNavigation": "Om du vill lämna sidan, kommer din bokning att avbokas automatiskt."
 }

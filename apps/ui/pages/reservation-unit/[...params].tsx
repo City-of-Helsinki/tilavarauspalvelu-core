@@ -30,11 +30,7 @@ import { Subheading } from "common/src/reservation-form/styles";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
 import { Container } from "common";
 import { createApolloClient } from "@/modules/apolloClient";
-import {
-  isBrowser,
-  reservationUnitPath,
-  reservationUnitPrefix,
-} from "@/modules/const";
+import { isBrowser, reservationUnitPrefix } from "@/modules/const";
 import {
   getTranslation,
   printErrorMessages,
@@ -67,6 +63,7 @@ import {
 } from "@/modules/serverUtils";
 import { filterNonNullable } from "common/src/helpers";
 import { OPTIONS_QUERY } from "@/hooks/useOptions";
+import { useConfirmNavigation } from "@/hooks/useConfirmNavigation";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -190,6 +187,16 @@ const useRemoveStoredReservation = () => {
   }, [storedReservation, removeStoredReservation]);
 };
 
+// NOTE back / forward buttons (browser) do NOT work properly
+// router.beforePopState could be used to handle them but it's super hackish
+// the correct solution is to create separate pages (files) for each step (then next-router does this for free)
+// Known issues with using beforePopState:
+// - using back button changes the url but if the confirmation is cancelled the page is not changed
+//   so it will break at least refresh (but next links still work like the url was correct)
+// - it interfares with the confirmNavigation (incorrect url changes will break it)
+// - using back multiple times breaks the confirmation hook (bypassing it or blocking the navigation while deleting the reservation)
+// - requires complex logic to handle the steps and keep the url in sync with what's on the page
+// - forward / backward navigation work differently
 const ReservationUnitReservationWithReservationProp = ({
   fetchedReservation,
   reservationUnit,
@@ -263,12 +270,36 @@ const ReservationUnitReservationWithReservationProp = ({
     { input: ReservationDeleteMutationInput }
   >(DELETE_RESERVATION, {
     errorPolicy: "all",
-    onCompleted: () => {
-      router.push(`${reservationUnitPrefix}/${reservationUnit?.pk}`);
-    },
     onError: () => {
       router.push(`${reservationUnitPrefix}/${reservationUnit?.pk}`);
     },
+  });
+
+  const confirmMessage = t("reservations:confirmNavigation");
+  // NOTE this is the only place where reservation is deleted, don't add a second place or it gets called repeatedly
+  const onNavigationConfirmed = useCallback(() => {
+    deleteReservation({
+      variables: {
+        input: {
+          pk: reservation?.pk ?? 0,
+        },
+      },
+    });
+  }, [deleteReservation, reservation?.pk]);
+
+  // whitelist to allow language change and confirmation
+  const whitelist = [
+    RegExp(`.*/reservations/${reservation?.pk}/confirmation`),
+    RegExp(
+      `.*/reservation-unit/${reservationUnit?.pk}/reservation/${reservation?.pk}`
+    ),
+  ];
+  // only block nextjs navigation (we should not have any <a> links and we don't want to block refresh)
+  useConfirmNavigation({
+    confirm: true,
+    confirmMessage,
+    onNavigationConfirmed,
+    whitelist,
   });
 
   const [updateReservation] = useMutation<
@@ -321,6 +352,7 @@ const ReservationUnitReservationWithReservationProp = ({
         setErrorMsg(t("errors:general_error"));
         return;
       }
+
       if (state === State.Confirmed || state === State.RequiresHandling) {
         router.push(`${reservationsUrl}${pk}/confirmation`);
       } else if (steps?.length > 2) {
@@ -448,31 +480,10 @@ const ReservationUnitReservationWithReservationProp = ({
     });
   };
 
+  // NOTE: only navigate away from the page if the reservation is cancelled the confirmation hook handles delete
   const cancelReservation = useCallback(async () => {
-    await deleteReservation({
-      variables: {
-        input: {
-          pk: reservationPk ?? 0,
-        },
-      },
-    });
-  }, [deleteReservation, reservationPk]);
-
-  useEffect(() => {
-    router.beforePopState(({ as }) => {
-      if (
-        reservationUnit?.pk != null &&
-        as === reservationUnitPath(reservationUnit.pk)
-      ) {
-        cancelReservation();
-      }
-      return true;
-    });
-
-    return () => {
-      router.beforePopState(() => true);
-    };
-  }, [router, reservationUnit?.pk, cancelReservation]);
+    router.push(`${reservationUnitPrefix}/${reservationUnit?.pk}`);
+  }, [reservationUnitPrefix, reservationPk]);
 
   const shouldDisplayReservationUnitPrice = useMemo(() => {
     switch (step) {

@@ -109,5 +109,6 @@
   "confirmationError": {
     "heading": "Awaiting for payment",
     "body": "Your payment could not be confirmed. Please check the status of your booking in a moment from Your bookings -page. If the booking was unsuccessful, please repeat the booking process. Our customer service will provide assistance if necessary."
-  }
+  },
+  "confirmNavigation": "If you wish to leave this page, your booking will be cancelled automatically."
 }

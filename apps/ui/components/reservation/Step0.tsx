@@ -206,10 +206,9 @@ const Step0 = ({
         </MediumButton>
         <MediumButton
           variant="secondary"
+          type="button"
           iconLeft={<IconArrowLeft aria-hidden />}
-          onClick={() => {
-            cancelReservation();
-          }}
+          onClick={cancelReservation}
           data-test="reservation__button--cancel"
         >
           {t("common:cancel")}

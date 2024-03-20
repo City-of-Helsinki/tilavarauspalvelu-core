@@ -297,6 +297,8 @@ export const printErrorMessages = (error: ApolloError): string => {
 
   const { graphQLErrors: errors } = error;
 
+  // TODO add this case "No Reservation matches the given query."
+  // at least happens when mutating a reservation that doesn't exist
   return errors
     .reduce((acc, cur) => {
       const code = cur?.extensions?.error_code

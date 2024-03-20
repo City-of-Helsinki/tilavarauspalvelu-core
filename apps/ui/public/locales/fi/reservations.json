@@ -109,5 +109,6 @@
   "confirmationError": {
     "heading": "Maksu odottaa vahvistusta",
     "body": "Maksuasi ei voitu vielä vahvistaa. Tarkista varauksen tila hetken kuluttua Omat varaukset -sivulta. Jos varaus ei onnistunut, ole hyvä ja tee uusi varaus. Asiakaspalvelumme auttaa tarvittaessa."
-  }
+  },
+  "confirmNavigation": "Jos haluat poistua tältä sivulta, niin varauksesi peruuntuu automaattisesti"
 }
