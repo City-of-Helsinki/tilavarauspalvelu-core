@@ -1,10 +1,10 @@
 import datetime
 import uuid
-from unittest.mock import patch
 
 import freezegun
 import pytest
 
+from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from merchants.models import OrderStatus
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError
 from merchants.verkkokauppa.payment.types import PaymentStatus
@@ -131,6 +131,7 @@ def test_refresh_order__cancelled_status_causes_cancellation(graphql):
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
+@patch_method(ReservationEmailNotificationSender.send_confirmation_email)
 @freezegun.freeze_time("2022-01-01T12:00:00Z")
 def test_refresh_order__paid_online_status_causes_paid_marking_and_no_notification(graphql):
     graphql.login_user_based_on_type(UserType.SUPERUSER)
@@ -140,11 +141,10 @@ def test_refresh_order__paid_online_status_causes_paid_marking_and_no_notificati
     VerkkokauppaAPIClient.get_payment.return_value = payment
 
     data = {"orderUuid": str(order.remote_id)}
-    with patch("api.graphql.types.merchants.mutations.send_confirmation_email") as mock:
-        response = graphql(REFRESH_MUTATION, input_data=data)
+    response = graphql(REFRESH_MUTATION, input_data=data)
 
     assert VerkkokauppaAPIClient.get_payment.call_count == 1
-    assert mock.call_count == 0
+    assert ReservationEmailNotificationSender.send_confirmation_email.call_count == 0
 
     assert response.has_errors is False
     assert response.first_query_object == {
@@ -158,6 +158,7 @@ def test_refresh_order__paid_online_status_causes_paid_marking_and_no_notificati
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
+@patch_method(ReservationEmailNotificationSender.send_confirmation_email)
 def test_refresh_order__paid_online_status_sends_notification_if_reservation_waiting_for_payment(graphql):
     graphql.login_user_based_on_type(UserType.SUPERUSER)
     order = get_order()
@@ -169,11 +170,10 @@ def test_refresh_order__paid_online_status_sends_notification_if_reservation_wai
     VerkkokauppaAPIClient.get_payment.return_value = payment
 
     data = {"orderUuid": str(order.remote_id)}
-    with patch("api.graphql.types.merchants.mutations.send_confirmation_email") as mock:
-        response = graphql(REFRESH_MUTATION, input_data=data)
+    response = graphql(REFRESH_MUTATION, input_data=data)
 
     assert VerkkokauppaAPIClient.get_payment.call_count == 1
-    assert mock.call_count == 1
+    assert ReservationEmailNotificationSender.send_confirmation_email.call_count == 1
 
     assert response.has_errors is False
     assert response.first_query_object == {
@@ -198,7 +198,6 @@ def test_refresh_order__payment_endpoint_error(graphql):
     response = graphql(REFRESH_MUTATION, input_data=data)
 
     assert VerkkokauppaAPIClient.get_payment.call_count == 1
-
     assert response.error_message() == "Unable to check order payment: problem with external service"
 
     order.refresh_from_db()

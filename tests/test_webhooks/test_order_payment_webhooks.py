@@ -3,13 +3,14 @@ import uuid
 import pytest
 from django.urls import reverse
 
+from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from merchants.models import OrderStatus
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.choices import ReservationStateChoice
 from tests.factories import PaymentOrderFactory, ReservationFactory
 from tests.helpers import patch_method
-from tests.test_webhooks.helpers import get_mock_order_payment_api, mock_send_confirmation_email
+from tests.test_webhooks.helpers import get_mock_order_payment_api
 
 # Applied to all tests
 pytestmark = [
@@ -19,6 +20,7 @@ pytestmark = [
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
+@patch_method(ReservationEmailNotificationSender.send_confirmation_email)
 def test_order_payment_webhook__success(api_client, settings):
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
@@ -42,8 +44,7 @@ def test_order_payment_webhook__success(api_client, settings):
 
     VerkkokauppaAPIClient.get_payment.return_value = get_mock_order_payment_api(order_id, payment_id)
 
-    with mock_send_confirmation_email():
-        response = api_client.post(url, data=data, format="json")
+    response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 200, response.data
     assert response.data == {"message": "Order payment completed successfully"}
@@ -58,6 +59,7 @@ def test_order_payment_webhook__success(api_client, settings):
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
+@patch_method(ReservationEmailNotificationSender.send_confirmation_email)
 def test_order_payment_webhook__success__no_reservation(api_client, settings):
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
@@ -79,8 +81,7 @@ def test_order_payment_webhook__success__no_reservation(api_client, settings):
 
     VerkkokauppaAPIClient.get_payment.return_value = get_mock_order_payment_api(order_id, payment_id)
 
-    with mock_send_confirmation_email():
-        response = api_client.post(url, data=data, format="json")
+    response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 200, response.data
     assert response.data == {"message": "Order payment completed successfully"}
@@ -92,6 +93,7 @@ def test_order_payment_webhook__success__no_reservation(api_client, settings):
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
+@patch_method(ReservationEmailNotificationSender.send_confirmation_email)
 @pytest.mark.parametrize("status", [OrderStatus.PAID, OrderStatus.PAID_MANUALLY, OrderStatus.REFUNDED])
 def test_order_payment_webhook__no_action_needed(api_client, settings, status):
     order_id = uuid.uuid4()
@@ -108,14 +110,14 @@ def test_order_payment_webhook__no_action_needed(api_client, settings, status):
 
     VerkkokauppaAPIClient.get_payment.return_value = get_mock_order_payment_api(order_id, payment_id)
 
-    with mock_send_confirmation_email():
-        response = api_client.post(url, data=data, format="json")
+    response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 200, response.data
     assert response.data == {"message": "Order is already in a state where no updates are needed"}
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
+@patch_method(ReservationEmailNotificationSender.send_confirmation_email)
 @pytest.mark.parametrize("missing_field", ["orderId", "paymentId", "namespace", "eventType"])
 def test_order_payment_webhook__missing_field(api_client, settings, missing_field):
     order_id = uuid.uuid4()
@@ -133,14 +135,14 @@ def test_order_payment_webhook__missing_field(api_client, settings, missing_fiel
 
     VerkkokauppaAPIClient.get_payment.return_value = get_mock_order_payment_api(order_id, payment_id)
 
-    with mock_send_confirmation_email():
-        response = api_client.post(url, data=data, format="json")
+    response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 400, response.data
     assert response.data == {missing_field: ["Tämä kenttä vaaditaan."]}
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
+@patch_method(ReservationEmailNotificationSender.send_confirmation_email)
 def test_order_payment_webhook__bad_namespace(api_client, settings):
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
@@ -156,14 +158,14 @@ def test_order_payment_webhook__bad_namespace(api_client, settings):
 
     VerkkokauppaAPIClient.get_payment.return_value = get_mock_order_payment_api(order_id, payment_id)
 
-    with mock_send_confirmation_email():
-        response = api_client.post(url, data=data, format="json")
+    response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 400, response.data
     assert response.data == {"namespace": ["Invalid namespace: 'foo'"]}
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
+@patch_method(ReservationEmailNotificationSender.send_confirmation_email)
 def test_order_payment_webhook__bad_event_type(api_client, settings):
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
@@ -179,14 +181,14 @@ def test_order_payment_webhook__bad_event_type(api_client, settings):
 
     VerkkokauppaAPIClient.get_payment.return_value = get_mock_order_payment_api(order_id, payment_id)
 
-    with mock_send_confirmation_email():
-        response = api_client.post(url, data=data, format="json")
+    response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 400, response.data
     assert response.data == {"eventType": ["Unsupported event type: 'foo'"]}
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
+@patch_method(ReservationEmailNotificationSender.send_confirmation_email)
 def test_order_payment_webhook__payment_order_not_found(api_client, settings):
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
@@ -201,8 +203,7 @@ def test_order_payment_webhook__payment_order_not_found(api_client, settings):
 
     VerkkokauppaAPIClient.get_payment.return_value = get_mock_order_payment_api(order_id, payment_id)
 
-    with mock_send_confirmation_email():
-        response = api_client.post(url, data=data, format="json")
+    response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 404, response.data
     assert response.data == {"message": f"Payment order '{order_id}' not found"}
@@ -253,6 +254,7 @@ def test_order_payment_webhook__no_payment_from_verkkokauppa(api_client, setting
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment)
+@patch_method(ReservationEmailNotificationSender.send_confirmation_email)
 def test_order_payment_webhook__invalid_payment_status(api_client, settings):
     order_id = uuid.uuid4()
     payment_id = uuid.uuid4()
@@ -269,8 +271,7 @@ def test_order_payment_webhook__invalid_payment_status(api_client, settings):
 
     VerkkokauppaAPIClient.get_payment.return_value = get_mock_order_payment_api(order_id, payment_id, status="foo")
 
-    with mock_send_confirmation_email():
-        response = api_client.post(url, data=data, format="json")
+    response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 400, response.data
     assert response.data == {"message": "Invalid payment status: 'foo'"}

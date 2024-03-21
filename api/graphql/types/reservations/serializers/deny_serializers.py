@@ -1,19 +1,12 @@
-import datetime
-
-from django.utils.timezone import get_default_timezone
 from rest_framework import serializers
 
 from api.graphql.extensions.legacy_helpers import OldPrimaryKeySerializer
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
+from common.date_utils import local_datetime
 from common.fields.serializer import IntegerPrimaryKeyField
+from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from reservations.choices import ReservationStateChoice, ReservationTypeChoice
-from reservations.email_utils import send_deny_email
-from reservations.models import (
-    Reservation,
-    ReservationDenyReason,
-)
-
-DEFAULT_TIMEZONE = get_default_timezone()
+from reservations.models import Reservation, ReservationDenyReason
 
 
 class ReservationDenySerializer(OldPrimaryKeySerializer):
@@ -49,7 +42,7 @@ class ReservationDenySerializer(OldPrimaryKeySerializer):
     def validated_data(self):
         validated_data = super().validated_data
         validated_data["state"] = ReservationStateChoice.DENIED.value
-        validated_data["handled_at"] = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
+        validated_data["handled_at"] = local_datetime()
 
         return validated_data
 
@@ -71,7 +64,7 @@ class ReservationDenySerializer(OldPrimaryKeySerializer):
         return data
 
     def check_reservation_has_not_ended(self):
-        now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
+        now = local_datetime()
 
         if self.instance.end < now:
             raise ValidationErrorWithCode(
@@ -81,10 +74,10 @@ class ReservationDenySerializer(OldPrimaryKeySerializer):
 
     def save(self, **kwargs):
         instance = super().save(**kwargs)
-        now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
+        now = local_datetime()
 
         # Send the notification email only for normal reservations which has not ended.
         if instance.type == ReservationTypeChoice.NORMAL and instance.end > now:
-            send_deny_email(instance)
+            ReservationEmailNotificationSender.send_deny_email(reservation=instance)
 
         return instance

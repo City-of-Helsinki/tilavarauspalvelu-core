@@ -1,16 +1,12 @@
-import datetime
-
-from django.utils.timezone import get_default_timezone
 from rest_framework import serializers
 
 from api.graphql.extensions.decimal_field import DecimalField
 from api.graphql.extensions.legacy_helpers import OldPrimaryKeySerializer
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
+from common.date_utils import local_datetime
+from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from reservations.choices import ReservationStateChoice
-from reservations.email_utils import send_approve_email
 from reservations.models import Reservation
-
-DEFAULT_TIMEZONE = get_default_timezone()
 
 
 class ReservationApproveSerializer(OldPrimaryKeySerializer):
@@ -38,7 +34,7 @@ class ReservationApproveSerializer(OldPrimaryKeySerializer):
     def validated_data(self):
         validated_data = super().validated_data
         validated_data["state"] = ReservationStateChoice.CONFIRMED.value
-        validated_data["handled_at"] = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
+        validated_data["handled_at"] = local_datetime()
 
         return validated_data
 
@@ -56,5 +52,5 @@ class ReservationApproveSerializer(OldPrimaryKeySerializer):
 
     def save(self, **kwargs):
         instance = super().save(**kwargs)
-        send_approve_email(instance)
+        ReservationEmailNotificationSender.send_approve_email(reservation=instance)
         return instance

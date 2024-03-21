@@ -1,28 +1,23 @@
 import uuid
-from datetime import datetime
 from typing import Any
 
-from django.utils.timezone import get_default_timezone
 from rest_framework import viewsets
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from common.date_utils import local_datetime
+from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from merchants.models import OrderStatus, PaymentOrder
 from merchants.verkkokauppa.order.exceptions import GetOrderError
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError, GetRefundStatusError
 from merchants.verkkokauppa.payment.types import PaymentStatus, RefundStatus
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.choices import ReservationStateChoice
-from reservations.email_utils import send_confirmation_email
 from reservations.models import Reservation
 from utils.sentry import SentryLogger
 
 from .permissions import WebhookPermission
-from .serializers import (
-    WebhookOrderCancelSerializer,
-    WebhookPaymentSerializer,
-    WebhookRefundSerializer,
-)
+from .serializers import WebhookOrderCancelSerializer, WebhookPaymentSerializer, WebhookRefundSerializer
 
 
 class WebhookOrderPaidViewSet(viewsets.GenericViewSet):
@@ -66,14 +61,14 @@ class WebhookOrderPaidViewSet(viewsets.GenericViewSet):
 
         payment_order.status = OrderStatus.PAID
         payment_order.payment_id = payment_id
-        payment_order.processed_at = datetime.now().astimezone(get_default_timezone())
+        payment_order.processed_at = local_datetime()
         payment_order.save()
 
         reservation: Reservation | None = payment_order.reservation
         if reservation is not None and reservation.state == ReservationStateChoice.WAITING_FOR_PAYMENT:
             reservation.state = ReservationStateChoice.CONFIRMED
             reservation.save()
-            send_confirmation_email(reservation)
+            ReservationEmailNotificationSender.send_confirmation_email(reservation=reservation)
 
         return Response(data={"message": "Order payment completed successfully"}, status=200)
 
@@ -117,7 +112,7 @@ class WebhookOrderCancelViewSet(viewsets.ViewSet):
             return Response(data={"message": msg}, status=400)
 
         payment_order.status = OrderStatus.CANCELLED
-        payment_order.processed_at = datetime.now().astimezone(get_default_timezone())
+        payment_order.processed_at = local_datetime()
         payment_order.save()
 
         return Response(data={"message": "Order cancellation completed successfully"}, status=200)
@@ -164,7 +159,7 @@ class WebhookRefundViewSet(viewsets.ViewSet):
             return Response(data={"message": msg}, status=400)
 
         payment_order.status = OrderStatus.REFUNDED
-        payment_order.processed_at = datetime.now().astimezone(get_default_timezone())
+        payment_order.processed_at = local_datetime()
         payment_order.save()
 
         return Response(data={"message": "Order refund completed successfully"}, status=200)
