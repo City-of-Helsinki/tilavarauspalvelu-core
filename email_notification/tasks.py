@@ -1,5 +1,6 @@
 from django.conf import settings
 
+from applications.models import Application
 from email_notification.helpers.email_sender import EmailNotificationSender
 from email_notification.models import EmailType
 from permissions.helpers import has_unit_permission
@@ -7,6 +8,10 @@ from reservations.models import Reservation
 from spaces.models import Unit
 from tilavarauspalvelu.celery import app
 from users.models import ReservationNotification, User
+
+###############
+# Reservation #
+###############
 
 
 @app.task(name="send_reservation_email")
@@ -73,3 +78,20 @@ def _get_reservation_staff_notification_recipients(
 
     # Remove possible duplicates
     return list(set(notification_recipients))
+
+
+###############
+# Application #
+###############
+
+
+@app.task(name="send_application_email")
+def send_application_email_task(application_id: int, email_type: EmailType) -> None:
+    if not settings.SEND_RESERVATION_NOTIFICATION_EMAILS:
+        return
+    application = Application.objects.filter(id=application_id).first()
+    if not application:
+        return
+
+    email_notification_sender = EmailNotificationSender(email_type=email_type, recipients=None)
+    email_notification_sender.send_application_email(application=application)

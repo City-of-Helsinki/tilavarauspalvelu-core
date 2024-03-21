@@ -12,6 +12,7 @@ from api.graphql.types.organization.serializers import OrganisationSerializer
 from api.graphql.types.person.serializers import PersonSerializer
 from applications.choices import ApplicationStatusChoice
 from applications.models import Application
+from email_notification.helpers.application_email_notification_sender import ApplicationEmailNotificationSender
 from permissions.helpers import can_validate_unit_applications
 
 
@@ -98,6 +99,7 @@ class ApplicationSendSerializer(NestingModelSerializer):
     def save(self, **kwargs: Any) -> Application:
         self.instance.sent_date = timezone.now()
         self.instance.save()
+        ApplicationEmailNotificationSender.send_received_email(application=self.instance)
         return self.instance
 
 
