@@ -1,11 +1,11 @@
 from datetime import datetime, timedelta
-from unittest import mock
 from uuid import uuid4
 
 from django.test import TestCase
 from django.utils.timezone import get_default_timezone
 from freezegun import freeze_time
 
+from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from merchants.models import OrderStatus
 from merchants.pruning import update_expired_orders
 from merchants.verkkokauppa.order.exceptions import CancelOrderError
@@ -44,9 +44,9 @@ class UpdateExpiredOrderTestCase(TestCase):
         order.refresh_from_db()
         assert order.status == OrderStatus.CANCELLED
 
-    @mock.patch("merchants.pruning.send_confirmation_email")
+    @patch_method(ReservationEmailNotificationSender.send_confirmation_email)
     @patch_method(VerkkokauppaAPIClient.get_payment)
-    def test_handle_paid_orders(self, mock_confirmation_email):
+    def test_handle_paid_orders(self):
         VerkkokauppaAPIClient.get_payment.return_value = PaymentFactory(status=WebShopPaymentStatus.PAID_ONLINE.value)
 
         six_minutes_ago = datetime.now() - timedelta(minutes=6)
@@ -66,7 +66,7 @@ class UpdateExpiredOrderTestCase(TestCase):
         self.reservation.refresh_from_db()
         assert self.reservation.state == ReservationStateChoice.CONFIRMED
 
-        assert mock_confirmation_email.called is True
+        assert ReservationEmailNotificationSender.send_confirmation_email.called is True
 
     @patch_method(VerkkokauppaAPIClient.get_payment)
     @patch_method(VerkkokauppaAPIClient.cancel_order)

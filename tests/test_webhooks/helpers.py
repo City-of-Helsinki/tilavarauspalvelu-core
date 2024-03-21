@@ -1,19 +1,11 @@
 import uuid
-from contextlib import contextmanager
 from datetime import datetime
 from decimal import Decimal
-from unittest import mock
 from uuid import uuid4
 
 from django.utils.timezone import get_default_timezone
 
 from merchants.verkkokauppa.payment.types import Payment, PaymentStatus, RefundStatus, RefundStatusResult
-
-
-@contextmanager
-def mock_send_confirmation_email():
-    with mock.patch("api.webhooks.views.send_confirmation_email"):
-        yield
 
 
 def get_mock_order_payment_api(remote_id: uuid.UUID, payment_id: uuid.UUID, status: str = "") -> Payment:

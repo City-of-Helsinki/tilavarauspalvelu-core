@@ -7,11 +7,11 @@ from graphene_permissions.mixins import AuthMutation
 
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from api.graphql.types.merchants.permissions import OrderRefreshPermission
+from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from merchants.models import OrderStatus, PaymentOrder
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.choices import ReservationStateChoice
-from reservations.email_utils import send_confirmation_email
 from utils.sentry import SentryLogger
 
 DEFAULT_TIMEZONE = get_default_timezone()
@@ -80,7 +80,7 @@ class RefreshOrderMutation(relay.ClientIDMutation, AuthMutation):
             if payment_order.reservation.state == ReservationStateChoice.WAITING_FOR_PAYMENT:
                 payment_order.reservation.state = ReservationStateChoice.CONFIRMED
                 payment_order.reservation.save()
-                send_confirmation_email(payment_order.reservation)
+                ReservationEmailNotificationSender.send_confirmation_email(reservation=payment_order.reservation)
 
         return RefreshOrderMutation(
             order_uuid=payment_order.remote_id,

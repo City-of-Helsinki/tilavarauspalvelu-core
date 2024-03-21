@@ -1,18 +1,14 @@
-import datetime
-
-from django.utils.timezone import get_default_timezone
 from rest_framework import serializers
 
 from api.graphql.extensions.legacy_helpers import OldPrimaryKeyUpdateSerializer
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
+from common.date_utils import local_datetime
 from common.fields.serializer import IntegerPrimaryKeyField
+from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from merchants.models import OrderStatus, PaymentOrder
 from reservations.choices import ReservationStateChoice
-from reservations.email_utils import send_cancellation_email
 from reservations.models import Reservation, ReservationCancelReason
 from reservations.tasks import refund_paid_reservation_task
-
-DEFAULT_TIMEZONE = get_default_timezone()
 
 
 class ReservationCancellationSerializer(OldPrimaryKeyUpdateSerializer):
@@ -54,7 +50,7 @@ class ReservationCancellationSerializer(OldPrimaryKeyUpdateSerializer):
                 ValidationErrorCodes.CANCELLATION_NOT_ALLOWED,
             )
 
-        now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
+        now = local_datetime()
         if self.instance.begin < now:
             ValidationErrorWithCode(
                 "Reservation cannot be cancelled when begin time is in past.",
@@ -92,5 +88,5 @@ class ReservationCancellationSerializer(OldPrimaryKeyUpdateSerializer):
         if payment_is_refundable and self.instance.price_net > 0:
             refund_paid_reservation_task.delay(self.instance.pk)
 
-        send_cancellation_email(instance)
+        ReservationEmailNotificationSender.send_cancellation_email(reservation=instance)
         return instance
