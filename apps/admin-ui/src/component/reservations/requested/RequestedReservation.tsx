@@ -80,6 +80,24 @@ const ApplicationProp = ({
     </div>
   ) : null;
 
+// Need to set max-width otherwise word-break doesn't work, different max-width because of the side menu.
+const KVPair = styled.div<{ $wide?: boolean }>`
+  font-weight: 400;
+  max-width: calc(50vw - 32px);
+  grid-column: ${({ $wide }) => ($wide ? "1 / span 2" : "auto")};
+  @media (width > ${breakpoints.m}) {
+    max-width: calc(50vw - 100px);
+  }
+`;
+const Label = styled.div`
+  padding-bottom: var(--spacing-xs);
+  color: var(--color-black-70);
+`;
+const Value = styled.div`
+  font-size: var(--fontsize-body-l);
+  word-wrap: break-word;
+`;
+
 const ApplicationData = ({
   label,
   data,
@@ -89,17 +107,10 @@ const ApplicationData = ({
   data?: Maybe<string> | number | JSX.Element;
   wide?: boolean;
 }) => (
-  <div style={{ fontWeight: "400", gridColumn: wide ? "1 / span 2" : "auto" }}>
-    <div
-      style={{
-        paddingBottom: "var(--spacing-xs)",
-        color: "var(--color-black-70)",
-      }}
-    >
-      <span>{label}</span>
-    </div>
-    <span style={{ fontSize: "var(--fontsize-body-l)" }}>{data}</span>
-  </div>
+  <KVPair $wide={wide}>
+    <Label>{label}</Label>
+    <Value>{data}</Value>
+  </KVPair>
 );
 
 const ButtonsWithPermChecks = ({
@@ -520,7 +531,6 @@ const RequestedReservation = ({
               />
             </ApplicationDatas>
           </Accordion>
-
           {isNonFree && (
             <Accordion heading={t("RequestedReservation.pricingDetails")}>
               <ApplicationDatas>
