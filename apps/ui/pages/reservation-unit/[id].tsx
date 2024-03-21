@@ -38,14 +38,15 @@ import {
 import { Container, formatters as getFormatters } from "common";
 import { useLocalStorage, useMedia } from "react-use";
 import { breakpoints } from "common/src/common/style";
-import Calendar, { CalendarEvent } from "common/src/calendar/Calendar";
+import Calendar, { type CalendarEvent } from "common/src/calendar/Calendar";
 import { Toolbar } from "common/src/calendar/Toolbar";
 import classNames from "classnames";
-import { PendingReservation } from "common/types/common";
+import { type PendingReservation } from "common/types/common";
 import {
   ApplicationRoundStatusChoice,
-  ApplicationRoundTimeSlotNode,
+  type ApplicationRoundTimeSlotNode,
   PricingType,
+<<<<<<< HEAD
   Query,
   QueryReservationsArgs,
   QueryReservationUnitArgs,
@@ -54,6 +55,18 @@ import {
   ReservationCreateMutationPayload,
   ReservationType,
   ReservationUnitType,
+=======
+  type Query,
+  type QueryReservationsArgs,
+  type QueryReservationUnitByPkArgs,
+  type QueryReservationUnitsArgs,
+  type ReservationCreateMutationInput,
+  type ReservationCreateMutationPayload,
+  type ReservationType,
+  type ReservationUnitByPkTypeReservableTimeSpansArgs,
+  type ReservationUnitByPkTypeReservationsArgs,
+  type ReservationUnitType,
+>>>>>>> 986c8b2e (fix: show next available time)
   State,
   ReservationUnitTypeReservableTimeSpansArgs,
   ReservationUnitTypeReservationsArgs,
@@ -73,7 +86,7 @@ import { createApolloClient } from "@/modules/apolloClient";
 import { Map } from "@/components/Map";
 import Legend from "@/components/calendar/Legend";
 import ReservationCalendarControls, {
-  FocusTimeSlot,
+  type FocusTimeSlot,
 } from "@/components/calendar/ReservationCalendarControls";
 import {
   formatDuration,
@@ -540,28 +553,6 @@ const ReservationUnit = ({
       t
     );
   }, [reservationUnit, t]);
-  const availableTimesForDay = useMemo(() => {
-    return getPossibleTimesForDay(
-      reservableTimeSpans,
-      reservationUnit?.reservationStartInterval,
-      focusDate
-    ).filter((span) => {
-      const [slotH, slotM] = span.split(":").map(Number);
-      const slotDate = new Date(focusDate);
-      slotDate.setHours(slotH, slotM, 0, 0);
-      return (
-        slotDate >= now &&
-        isSlotReservable(slotDate, addMinutes(slotDate, durationValue))
-      );
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    reservableTimeSpans,
-    reservationUnit?.reservationStartInterval,
-    now,
-    durationValue,
-    isSlotReservable,
-  ]);
 
   const startingTimeOptions = useMemo(() => {
     return getPossibleTimesForDay(
@@ -701,8 +692,9 @@ const ReservationUnit = ({
       isReservationQuotaReached,
       isSlotReservable,
       reservationUnit,
-      setValue,
       durationValue,
+      focusDate,
+      timeValue,
     ]
   );
 
@@ -989,7 +981,7 @@ const ReservationUnit = ({
   ) : undefined;
   const nextAvailableTime = getNextAvailableTime({
     day: focusDate,
-    slots: availableTimesForDay,
+    slots: reservableTimeSpans,
     duration: durationValue,
     isSlotReservable,
     reservationUnit,

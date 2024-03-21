@@ -308,7 +308,7 @@ const ReservationCalendarControls = ({
   });
 
   const startTime = t("common:timeInForm", {
-    date: start && getTimeString(start),
+    date: time,
   });
 
   const endDate = t("common:dateWithWeekday", {

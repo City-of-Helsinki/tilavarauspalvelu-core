@@ -1,6 +1,9 @@
 import { filterNonNullable } from "common/src/helpers";
 import { addDays, addMinutes, isAfter, isBefore } from "date-fns";
-import { ReservationUnitByPkType } from "common/types/gql-types";
+import {
+  ReservableTimeSpanType,
+  ReservationUnitByPkType,
+} from "common/types/gql-types";
 import {
   getPossibleTimesForDay,
   isInTimeSpan,
@@ -70,7 +73,7 @@ type AvailableTimesProps = {
   isSlotReservable: (start: Date, end: Date) => boolean;
   fromStartOfDay?: boolean;
   reservationUnit?: ReservationUnitByPkType;
-  slots?: string[];
+  slots?: ReservableTimeSpanType[];
 };
 
 // Returns an array of available times for the given duration and day
@@ -119,7 +122,6 @@ const getNextAvailableTime = (props: AvailableTimesProps): Date | null => {
   const possibleEndDay = getLastPossibleReservationDate(reservationUnit);
   const endDay = possibleEndDay ? addDays(possibleEndDay, 1) : undefined;
   const minDay = dayMax([today, day]) ?? today;
-
   // Find the first possible day
   const interval = filterNonNullable(reservableTimeSpans).find((x) =>
     isInTimeSpan(minDay, x)
@@ -130,8 +132,8 @@ const getNextAvailableTime = (props: AvailableTimesProps): Date | null => {
   if (endDay && endDay < new Date(interval.endDatetime) && endDay < minDay) {
     return null;
   }
-
   const startDay = dayMax([new Date(interval.startDatetime), minDay]) ?? minDay;
+
   const daysToGenerate = reservationsMaxDaysBefore ?? 180;
   const days = Array.from({ length: daysToGenerate }, (_, i) =>
     addDays(startDay, i)
@@ -141,17 +143,23 @@ const getNextAvailableTime = (props: AvailableTimesProps): Date | null => {
   for (const singleDay of days) {
     const availableTimesForDay =
       slots ??
-      getAvailableTimesForDay({
+      (getAvailableTimesForDay({
         ...props,
         day: singleDay,
         fromStartOfDay: true,
         reservationUnit,
-      });
-    if (availableTimesForDay.length > 0) {
-      const [hours, minutes] = availableTimesForDay[0]
-        .toString()
-        .split(":")
-        .map(Number);
+      }) as ReservableTimeSpanType[]);
+    if (
+      availableTimesForDay.length > 0 &&
+      !!availableTimesForDay[0].startDatetime
+    ) {
+      const [hours, minutes] = availableTimesForDay[0].startDatetime
+        ? availableTimesForDay[0].startDatetime
+            .toString()
+            .split("T")[1]
+            .split(":")
+            .map(Number)
+        : [0, 0];
       singleDay.setHours(hours, minutes, 0, 0);
       return singleDay;
     }
