@@ -5,9 +5,9 @@ from django.utils.timezone import get_default_timezone
 from api.graphql.extensions.legacy_helpers import OldPrimaryKeyUpdateSerializer
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from api.graphql.types.reservations.serializers.mixins import ReservationSchedulingMixin
+from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from reservation_units.models import ReservationUnit
 from reservations.choices import ReservationStateChoice, ReservationTypeChoice
-from reservations.email_utils import send_reservation_modified_email
 from reservations.models import Reservation
 
 DEFAULT_TIMEZONE = get_default_timezone()
@@ -42,7 +42,7 @@ class StaffReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reserv
 
         now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
         if instance.type == ReservationTypeChoice.NORMAL and instance.end > now:
-            send_reservation_modified_email(instance)
+            ReservationEmailNotificationSender.send_reservation_modified_email(reservation=instance)
 
         return instance
 

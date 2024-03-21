@@ -2,23 +2,16 @@ from django.conf import settings
 
 from api.graphql.extensions.legacy_helpers import OldChoiceCharField
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
-from api.graphql.types.reservations.serializers.update_serializers import (
-    ReservationUpdateSerializer,
-)
+from api.graphql.types.reservations.serializers.update_serializers import ReservationUpdateSerializer
+from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from merchants.models import Language, OrderStatus, PaymentOrder
-from merchants.verkkokauppa.helpers import (
-    create_mock_verkkokauppa_order,
-    get_verkkokauppa_order_params,
-)
+from merchants.verkkokauppa.helpers import create_mock_verkkokauppa_order, get_verkkokauppa_order_params
 from merchants.verkkokauppa.order.exceptions import CreateOrderError
 from merchants.verkkokauppa.order.types import CreateOrderParams, Order
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservation_units.enums import PaymentType, PricingType
-from reservation_units.utils.reservation_unit_pricing_helper import (
-    ReservationUnitPricingHelper,
-)
+from reservation_units.utils.reservation_unit_pricing_helper import ReservationUnitPricingHelper
 from reservations.choices import ReservationStateChoice
-from reservations.email_utils import send_confirmation_email
 from reservations.models import Reservation
 from utils.decimal_utils import round_decimal
 from utils.sentry import SentryLogger
@@ -181,5 +174,5 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
                 )
 
         instance = super().save(**kwargs)
-        send_confirmation_email(instance)
+        ReservationEmailNotificationSender.send_confirmation_email(reservation=instance)
         return instance
