@@ -129,7 +129,7 @@ const ReservationsDataLoader = ({
     sort
   );
 
-  if (loading && !data) {
+  if (loading && data.length === 0) {
     return <Loader />;
   }
 
