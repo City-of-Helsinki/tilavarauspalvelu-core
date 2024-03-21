@@ -1,8 +1,9 @@
 import pytest
 
 from applications.choices import ApplicationStatusChoice
+from email_notification.helpers.application_email_notification_sender import ApplicationEmailNotificationSender
 from tests.factories import ApplicationFactory
-from tests.helpers import UserType
+from tests.helpers import UserType, patch_method
 
 from .helpers import SEND_MUTATION
 
@@ -12,6 +13,7 @@ pytestmark = [
 ]
 
 
+@patch_method(ApplicationEmailNotificationSender.send_received_email)
 def test_send_application(graphql):
     # given:
     # - There is a draft application in an open application round with a single application event
@@ -29,6 +31,8 @@ def test_send_application(graphql):
     assert response.has_errors is False, response
     application.refresh_from_db()
     assert application.sent_date is not None
+
+    assert ApplicationEmailNotificationSender.send_received_email.called is True
 
 
 def test_send_application__no_sections(graphql):
