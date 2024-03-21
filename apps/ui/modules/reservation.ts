@@ -1,5 +1,5 @@
 import { addMinutes, addSeconds, isAfter, isValid } from "date-fns";
-import type { OptionType, PendingReservation } from "common/types/common";
+import type { PendingReservation } from "common/types/common";
 import {
   PaymentOrderType,
   ReserveeType,
@@ -28,12 +28,12 @@ export const getDurationOptions = (
   maxReservationDuration: number | undefined,
   reservationStartInterval: ReservationStartInterval,
   t: TFunction
-): OptionType[] => {
+): { label: string; value: number }[] => {
   const intervalSeconds = getIntervalMinutes(reservationStartInterval) * 60;
   if (!minReservationDuration || !maxReservationDuration || !intervalSeconds)
     return [];
 
-  const durationOptions: OptionType[] = [];
+  const durationOptions: { label: string; value: number }[] = [];
   const intervalMinutes = getIntervalMinutes(reservationStartInterval);
   if (!minReservationDuration || !maxReservationDuration || !intervalMinutes)
     return durationOptions;

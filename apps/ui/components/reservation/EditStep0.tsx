@@ -138,7 +138,6 @@ const EditStep0 = ({
 }: Props): JSX.Element => {
   const { t, i18n } = useTranslation();
   const router = useRouter();
-  const now = useMemo(() => new Date(), []);
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
   const [calendarViewType, setCalendarViewType] = useState<WeekOptions>("week");
 
@@ -253,28 +252,17 @@ const EditStep0 = ({
     return getPossibleTimesForDay(
       reservableTimeSpans,
       reservationUnit?.reservationStartInterval,
-      focusDate
-    )
-      .filter((span) => {
-        const [slotH, slotM] = span.split(":").map(Number);
-        const slotDate = new Date(focusDate);
-        slotDate.setHours(slotH, slotM, 0, 0);
-        return (
-          slotDate >= now &&
-          isSlotReservable(slotDate, addMinutes(slotDate, durationValue))
-        );
-      })
-      .map((span) => ({
-        label: span,
-        value: span,
-      }));
+      focusDate,
+      reservationUnit,
+      activeApplicationRounds,
+      durationValue
+    );
   }, [
-    focusDate,
     reservableTimeSpans,
-    reservationUnit?.reservationStartInterval,
-    now,
+    focusDate,
+    reservationUnit,
+    activeApplicationRounds,
     durationValue,
-    isSlotReservable,
   ]);
   const calendarEvents: CalendarEvent<ReservationType>[] = useMemo(() => {
     const diff = focusSlot?.durationMinutes ?? 0;

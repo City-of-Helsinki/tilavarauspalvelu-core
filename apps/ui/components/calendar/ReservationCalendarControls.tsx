@@ -42,7 +42,7 @@ type Props = {
     time?: string;
   }>;
   durationOptions: OptionType[];
-  startingTimeOptions: OptionType[];
+  startingTimeOptions: string[];
   focusSlot: FocusTimeSlot;
   submitReservation: SubmitHandler<PendingReservationFormType>;
   LoginAndSubmit?: JSX.Element;

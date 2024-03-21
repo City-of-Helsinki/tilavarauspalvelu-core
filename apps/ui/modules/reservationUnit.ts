@@ -2,9 +2,10 @@ import {
   type ReservationUnitNode,
   formatters as getFormatters,
   getReservationVolume,
+  OptionType,
 } from "common";
 import { flatten, trim, uniq } from "lodash";
-import { isAfter, isBefore, isSameDay, set } from "date-fns";
+import { addMinutes, isAfter, isBefore, isSameDay, set } from "date-fns";
 import { i18n } from "next-i18next";
 import { toUIDate } from "common/src/common/util";
 import {
@@ -25,6 +26,7 @@ import {
 } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { capitalize, getTranslation } from "./util";
+import { isReservationReservable } from "@/modules/reservation";
 
 export const getTimeString = (date = new Date()) => {
   return `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
@@ -347,7 +349,10 @@ export function isInTimeSpan(
 export function getPossibleTimesForDay(
   reservableTimeSpans: ReservationUnitType["reservableTimeSpans"],
   reservationStartInterval: ReservationUnitType["reservationStartInterval"],
-  date: Date
+  date: Date,
+  reservationUnit: ReservationUnitType,
+  activeApplicationRounds: RoundPeriod[],
+  durationValue: number
 ): string[] {
   const allTimes: string[] = [];
   filterNonNullable(reservableTimeSpans)
@@ -372,5 +377,20 @@ export function getPossibleTimesForDay(
       ).map((i) => i.substring(0, 5));
       allTimes.push(...intervals);
     });
-  return allTimes;
+  return allTimes
+    .filter((span) => {
+      const [slotH, slotM] = span.split(":").map(Number);
+      const slotDate = new Date(date);
+      slotDate.setHours(slotH, slotM, 0, 0);
+      return (
+        slotDate >= new Date() &&
+        isReservationReservable({
+          reservationUnit,
+          activeApplicationRounds,
+          start: slotDate,
+          end: addMinutes(slotDate, durationValue),
+          skipLengthCheck: false,
+        })
+      );
+    });
 }

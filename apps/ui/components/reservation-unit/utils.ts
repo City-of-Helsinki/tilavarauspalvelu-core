@@ -8,6 +8,8 @@ import {
   getPossibleTimesForDay,
   isInTimeSpan,
 } from "@/modules/reservationUnit";
+import { isReservationReservable } from "@/modules/reservation";
+import { RoundPeriod } from "common/src/calendar/util";
 
 function pickMaybeDay(
   a: Date | undefined,
@@ -68,39 +70,51 @@ const getLastPossibleReservationDate = (
 };
 
 type AvailableTimesProps = {
-  day: Date;
+  start: Date;
   duration: number;
-  isSlotReservable: (start: Date, end: Date) => boolean;
+  reservationUnit: ReservationUnitByPkType;
+  slots: ReservableTimeSpanType[];
+  activeApplicationRounds: RoundPeriod[];
   fromStartOfDay?: boolean;
-  reservationUnit?: ReservationUnitByPkType;
-  slots?: ReservableTimeSpanType[];
 };
 
 // Returns an array of available times for the given duration and day
 // TODO this is really slow (especially if called from a loop)
 const getAvailableTimesForDay = ({
-  day,
+  start,
   duration,
-  isSlotReservable,
   reservationUnit,
+  activeApplicationRounds,
 }: AvailableTimesProps): string[] => {
-  if (reservationUnit == null) return [];
+  if (!reservationUnit || !activeApplicationRounds) return [];
   const [timeHours, timeMinutesRaw] = [0, 0];
 
   const timeMinutes = timeMinutesRaw > 59 ? 59 : timeMinutesRaw;
   const { reservableTimeSpans: spans, reservationStartInterval: interval } =
     reservationUnit;
-  return getPossibleTimesForDay(spans, interval, day)
+  return getPossibleTimesForDay(
+    spans,
+    interval,
+    start,
+    reservationUnit,
+    activeApplicationRounds,
+    duration
+  )
     .map((n) => {
-      const [slotHours, slotMinutes] = n.split(":").map(Number);
-      const start = new Date(day);
-      start.setHours(slotHours, slotMinutes, 0, 0);
-      const end = addMinutes(start, duration ?? 0);
-      const startTime = new Date(day);
+      const [slotHours, slotMinutes] = n.label.split(":").map(Number);
+      const startDate = new Date(start);
+      startDate.setHours(slotHours, slotMinutes, 0, 0);
+      const endDate = addMinutes(startDate, duration ?? 0);
+      const startTime = new Date(start);
       startTime.setHours(timeHours, timeMinutes, 0, 0);
-
-      return isSlotReservable(start, end) && !isBefore(start, startTime)
-        ? n
+      return isReservationReservable({
+        reservationUnit,
+        activeApplicationRounds,
+        start: startDate,
+        end: endDate,
+        skipLengthCheck: false,
+      }) && !isBefore(startDate, startTime)
+        ? n.label
         : null;
     })
     .filter((n): n is NonNullable<typeof n> => n != null);
@@ -108,7 +122,7 @@ const getAvailableTimesForDay = ({
 
 // Returns the next available time, after the given time (Date object)
 const getNextAvailableTime = (props: AvailableTimesProps): Date | null => {
-  const { day, reservationUnit, slots } = props;
+  const { start, reservationUnit, slots, activeApplicationRounds } = props;
   if (reservationUnit == null) {
     return null;
   }
@@ -121,7 +135,7 @@ const getNextAvailableTime = (props: AvailableTimesProps): Date | null => {
   const today = addDays(new Date(), reservationsMinDaysBefore ?? 0);
   const possibleEndDay = getLastPossibleReservationDate(reservationUnit);
   const endDay = possibleEndDay ? addDays(possibleEndDay, 1) : undefined;
-  const minDay = dayMax([today, day]) ?? today;
+  const minDay = dayMax([today, start]) ?? today;
   // Find the first possible day
   const interval = filterNonNullable(reservableTimeSpans).find((x) =>
     isInTimeSpan(minDay, x)
@@ -145,9 +159,10 @@ const getNextAvailableTime = (props: AvailableTimesProps): Date | null => {
       slots ??
       (getAvailableTimesForDay({
         ...props,
-        day: singleDay,
+        start: singleDay,
         fromStartOfDay: true,
         reservationUnit,
+        activeApplicationRounds,
       }) as ReservableTimeSpanType[]);
     if (
       availableTimesForDay.length > 0 &&
@@ -168,4 +183,26 @@ const getNextAvailableTime = (props: AvailableTimesProps): Date | null => {
   return null;
 };
 
-export { dayMax, getNextAvailableTime, getLastPossibleReservationDate };
+const isSlotReservable = (
+  start: Date,
+  end: Date,
+  reservationUnit: ReservationUnitByPkType,
+  activeApplicationRounds?: RoundPeriod[],
+  skipLengthCheck = false
+): boolean => {
+  if (!reservationUnit || !activeApplicationRounds) return false;
+  return isReservationReservable({
+    reservationUnit,
+    activeApplicationRounds,
+    start,
+    end,
+    skipLengthCheck,
+  });
+};
+
+export {
+  dayMax,
+  getNextAvailableTime,
+  getLastPossibleReservationDate,
+  isSlotReservable,
+};

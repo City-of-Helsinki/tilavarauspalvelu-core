@@ -22,7 +22,6 @@ export type TimeRange = {
 };
 
 type Props = {
-  reservationUnitIsReservable: boolean;
   reservationUnit: ReservationUnitType | null;
   calendarRef: React.RefObject<HTMLDivElement>;
   subventionSuffix: JSX.Element | undefined;
@@ -32,7 +31,7 @@ type Props = {
     time?: string;
   }>;
   durationOptions: OptionType[];
-  startingTimeOptions: OptionType[];
+  startingTimeOptions: string[];
   focusSlot: FocusTimeSlot | null;
   nextAvailableTime: Date | null;
   submitReservation: SubmitHandler<PendingReservationFormType>;
@@ -221,7 +220,7 @@ const QuickReservation = ({
     const itemsPerChunk = 8;
 
     return chunkArray(
-      startingTimeOptions.map((opt) => (opt.value ? opt.value.toString() : "")),
+      startingTimeOptions.map((opt) => (opt ? opt.toString() : "")),
       itemsPerChunk
     ).slice(0, timeItems / itemsPerChunk);
   }, [startingTimeOptions]);
