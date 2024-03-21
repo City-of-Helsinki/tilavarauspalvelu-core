@@ -344,7 +344,7 @@ const ReservationFormField = ({
         errorText={errorText}
         invalid={!!error}
         required={required}
-        maxLength={MAX_TEXT_LENGTH}
+        maxLength={MAX_TEXT_LENGTH - (isEmailField ? 1 : 0)}
         $isWide={isWideRow}
         $hidden={
           field.includes("billing") && watch("showBillingAddress") !== true
@@ -445,7 +445,8 @@ const ReservationFormField = ({
           defaultValue={defaultValue ? String(defaultValue) : undefined}
           invalid={!!error}
           required={required}
-          maxLength={MAX_TEXT_LENGTH}
+          // email field is special and has one less character than the rest
+          maxLength={MAX_TEXT_LENGTH - (isEmailField ? 1 : 0)}
           $isWide={isWideRow}
           $hidden={
             field.includes("billing") && watch("showBillingAddress") !== true
