@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import re
+from dataclasses import asdict
 from typing import TYPE_CHECKING
 
 from django.conf import settings
@@ -73,7 +74,7 @@ class EmailTemplateValidator:
     def render_string(self, string: str) -> str:
         """Render the given string with the given context in a safe, sandboxed environment."""
         try:
-            return self.env.from_string(string).render(self.context.__dict__)
+            return self.env.from_string(string).render(asdict(self.context))
         except TemplateError as e:
             raise EmailTemplateValidationError(e) from e
 

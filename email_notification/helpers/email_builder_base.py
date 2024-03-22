@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from typing import Any
 from urllib.parse import urlencode, urljoin
 
@@ -30,7 +30,7 @@ class BaseEmailContext:
 
     @property
     def fields(self) -> list[str]:
-        return list(self.__dict__.keys())
+        return list(asdict(self).keys())
 
     # Builders
     @classmethod
