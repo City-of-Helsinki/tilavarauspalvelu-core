@@ -37,10 +37,11 @@ export const ButtonCss = css<ButtonStyleProps>`
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
   min-width: 80px;
   line-height: 1;
   text-align: center;
-  height: 44px;
+  min-height: 44px;
   &:hover,
   &:focus-visible {
     transition-property: background-color, border-color, color;
@@ -50,6 +51,7 @@ export const ButtonCss = css<ButtonStyleProps>`
   &:hover {
     background-color: var(--background-color-hover);
     color: var(--color-hover);
+    cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
   }
   &:focus-visible {
     background-color: var(--background-color-focus, transparent);

@@ -1,7 +1,6 @@
 import React, { useRef } from "react";
 import { useTranslation, type TFunction } from "next-i18next";
 import styled from "styled-components";
-import { useRouter } from "next/router";
 import {
   Card as HdsCard,
   IconArrowRight,
@@ -24,8 +23,11 @@ import { applicationUrl, getReducedApplicationStatus } from "@/modules/util";
 import { BlackButton } from "@/styles/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { CANCEL_APPLICATION_MUTATION } from "@/modules/queries/application";
-import ConfirmationModal, { ModalRef } from "../common/ConfirmationModal";
-import { CenterSpinner } from "../common/common";
+import ConfirmationModal, {
+  ModalRef,
+} from "@/components/common/ConfirmationModal";
+import { CenterSpinner } from "@/components/common/common";
+import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 
 const Card = styled(HdsCard)`
   border-width: 0;
@@ -65,22 +67,29 @@ const Buttons = styled.div`
   flex-direction: column;
   gap: var(--spacing-xs);
 
-  @media (min-width: ${breakpoints.s}) {
+  > * {
+    flex-grow: 1;
+    text-wrap: nowrap;
+  }
+
+  @media (width > ${breakpoints.s}) {
     flex-direction: row;
     gap: var(--spacing-s);
   }
 
-  @media (min-width: ${breakpoints.m}) {
+  @media (width > ${breakpoints.m}) {
     flex-direction: column;
     align-items: flex-end;
     justify-content: flex-end;
 
-    > button {
+    /* swapping flex-direction makes grow resize buttons vertically */
+    > * {
+      flex-grow: 0;
       width: 100%;
     }
   }
 
-  @media (min-width: ${breakpoints.l}) {
+  @media (width > ${breakpoints.l}) {
     flex-direction: row;
   }
 `;
@@ -169,7 +178,6 @@ function isEditable(
 
 function ApplicationCard({ application, actionCallback }: Props): JSX.Element {
   const { t } = useTranslation();
-  const router = useRouter();
   const modal = useRef<ModalRef>();
 
   const [mutation, { loading: isLoading }] = useMutation<
@@ -235,6 +243,7 @@ function ApplicationCard({ application, actionCallback }: Props): JSX.Element {
           <StyledButton
             aria-label={t("applicationCard:cancel")}
             onClick={() => {
+              // TODO modal.open scrolls the page to the top
               modal?.current?.open();
             }}
             disabled={!editable}
@@ -243,27 +252,30 @@ function ApplicationCard({ application, actionCallback }: Props): JSX.Element {
             {t("applicationCard:cancel")}
           </StyledButton>
         )}
-        <StyledButton
-          disabled={!editable}
-          onClick={() => {
-            if (application.pk != null) {
-              router.push(`${applicationUrl(application.pk)}/page1`);
-            }
-          }}
-          iconRight={<IconPen aria-hidden />}
+        <ButtonLikeLink
+          disabled={!editable || application.pk == null}
+          href={
+            editable && application.pk != null
+              ? `${applicationUrl(application.pk ?? 0)}/page1`
+              : ""
+          }
+          fontSize="small"
         >
           {t("applicationCard:edit")}
-        </StyledButton>
-        <StyledButton
-          onClick={() => {
-            if (application.pk != null) {
-              router.push(`${applicationUrl(application.pk)}/view`);
-            }
-          }}
-          iconRight={<IconArrowRight aria-hidden />}
+          <IconPen aria-hidden />
+        </ButtonLikeLink>
+        <ButtonLikeLink
+          href={
+            application.pk != null
+              ? `${applicationUrl(application.pk ?? 0)}/view`
+              : ""
+          }
+          disabled={application.pk == null}
+          fontSize="small"
         >
           {t("applicationCard:view")}
-        </StyledButton>
+          <IconArrowRight aria-hidden />
+        </ButtonLikeLink>
       </Buttons>
       <ConfirmationModal
         id="application-card-modal"
