@@ -16,7 +16,57 @@ updates:
         patterns:
           - "*"
 
+  # Manual updates for npm dependencies that break the app or types.
+  # Why? because we want separate limits of open PRs for those that require manual intervention.
+  # https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file#open-pull-requests-limit
+  # description of the workaround: https://github.com/dependabot/dependabot-core/issues/1778#issuecomment-1814577069
   - package-ecosystem: "npm"
+    schedule:
+      # use daily till we are happy with the config and up to date with the deps
+      interval: "daily"
+    directory: "/"
+    pull-request-branch-name:
+      separator: "-"
+    labels:
+      - "dependencies"
+      - "javascript"
+      - "manual"
+    allow:
+      # major updates that break the app
+      - dependency-name: "react"
+      - dependency-name: "react-dom"
+      - dependency-name: "styled-components"
+      - dependency-name: "hds-*"
+      - dependency-name: "date-fns"
+      # all versions break
+      - dependency-name: "turbo"
+      - dependency-name: "@types/node"
+      - dependency-name: "@types/react"
+      - dependency-name: "react-big-calendar"
+    ignore:
+      - dependency-name: "react"
+        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
+      - dependency-name: "styled-components"
+        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
+      - dependency-name: "hds-*"
+        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
+      - dependency-name: "date-fns"
+        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
+    groups:
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+      hds:
+        patterns:
+          - "hds-*"
+
+  # npm dependencies that pass without manual intervention
+  - package-ecosystem: "npm"
+    # required for double configuration of the same package ecosystem
+    target-branch: "main"
     directory: "/"
     schedule:
       # use daily till we are happy with the config and up to date with the deps
@@ -26,6 +76,14 @@ updates:
     ignore:
       # turbo requires config changes
       - dependency-name: "turbo"
+      # types break requiring manual updates
+      - dependency-name: "@types/node"
+      - dependency-name: "@types/react"
+      # major update of React requires a manual review (even if it would pass all checks)
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
       # version 6 has new TS types that OOM during build
       # also major bump that would break the app even if it did build
       - dependency-name: "styled-components"
@@ -35,6 +93,9 @@ updates:
         update-types: ["version-update:semver-major"]
       # breaks time selecting using drag and drop (at least 1.8.6 -> 1.11.2)
       - dependency-name: "react-big-calendar"
+      # fails typescript lint
+      - dependency-name: "date-fns"
+        update-types: ["version-update:semver-major"]
     # NOTE can't do a single group for all it will fail to update
     # either just accept multiple PRs or do fine grained groups manually
     groups:
