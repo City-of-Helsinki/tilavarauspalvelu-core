@@ -17,12 +17,10 @@ import {
   type ApplicationNode,
   type MutationCancelApplicationArgs,
   ApplicantTypeChoice,
+  ApplicationStatusChoice,
+  Maybe,
 } from "common/types/gql-types";
-import {
-  isActive,
-  applicationUrl,
-  getReducedApplicationStatus,
-} from "@/modules/util";
+import { applicationUrl, getReducedApplicationStatus } from "@/modules/util";
 import { BlackButton } from "@/styles/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { CANCEL_APPLICATION_MUTATION } from "@/modules/queries/application";
@@ -131,13 +129,14 @@ const StyledButton = styled(BlackButton).attrs({
     width: 100%;
   }
 `;
+
 type Props = {
   application: ApplicationNode;
   // TODO refactor the action callback (it's not a good idea in general, but especially error callback)
   actionCallback: (string: "error" | "cancel") => Promise<void>;
 };
 
-const getApplicant = (application: ApplicationNode, t: TFunction): string => {
+function getApplicant(application: ApplicationNode, t: TFunction): string {
   if (application.applicantType === ApplicantTypeChoice.Individual) {
     return t("applicationCard:person");
   }
@@ -154,12 +153,21 @@ const getApplicant = (application: ApplicationNode, t: TFunction): string => {
   }
 
   return "";
-};
+}
 
-const ApplicationCard = ({
-  application,
-  actionCallback,
-}: Props): JSX.Element | null => {
+function isEditable(
+  status: Maybe<ApplicationStatusChoice> | undefined
+): boolean {
+  if (status === ApplicationStatusChoice.Draft) {
+    return true;
+  }
+  if (status === ApplicationStatusChoice.Received) {
+    return true;
+  }
+  return false;
+}
+
+function ApplicationCard({ application, actionCallback }: Props): JSX.Element {
   const { t } = useTranslation();
   const router = useRouter();
   const modal = useRef<ModalRef>();
@@ -186,14 +194,12 @@ const ApplicationCard = ({
   };
 
   const { applicationRound } = application;
-  const editable = isActive(
-    applicationRound.applicationPeriodBegin,
-    applicationRound.applicationPeriodEnd
-  );
 
   const reducedApplicationStatus = getReducedApplicationStatus(
     application.status ?? undefined
   );
+
+  const editable = isEditable(application.status);
 
   const style =
     reducedApplicationStatus === "draft"
@@ -238,7 +244,6 @@ const ApplicationCard = ({
           </StyledButton>
         )}
         <StyledButton
-          aria-label={t("applicationCard:edit")}
           disabled={!editable}
           onClick={() => {
             if (application.pk != null) {
@@ -250,7 +255,6 @@ const ApplicationCard = ({
           {t("applicationCard:edit")}
         </StyledButton>
         <StyledButton
-          aria-label={t("applicationCard:view")}
           onClick={() => {
             if (application.pk != null) {
               router.push(`${applicationUrl(application.pk)}/view`);
@@ -271,6 +275,6 @@ const ApplicationCard = ({
       />
     </Card>
   );
-};
+}
 
 export default ApplicationCard;

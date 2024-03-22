@@ -1,4 +1,4 @@
-import { isAfter, parseISO, isBefore } from "date-fns";
+import { parseISO } from "date-fns";
 import { i18n, TFunction } from "next-i18next";
 import queryString from "query-string";
 import { trim } from "lodash";
@@ -33,15 +33,6 @@ import type { LocalizationLanguages } from "common/src/helpers";
 export { formatDuration } from "common/src/common/util";
 export { fromAPIDate, fromUIDate };
 export { getTranslation };
-
-// TODO don't use parseISO unless the function specifies that it only accepts dates as ISO strings
-export const isActive = (startDate: string, endDate: string): boolean => {
-  const now = new Date().getTime();
-  return (
-    isAfter(now, parseISO(startDate).getTime()) &&
-    isBefore(now, parseISO(endDate).getTime())
-  );
-};
 
 // TODO why? where is this used? why not use toUIDate(new Date(string))
 // TODO why return "-" instead of null or ""?
