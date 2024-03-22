@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 from urllib.parse import urljoin
 
 from django.conf import settings
@@ -9,6 +10,9 @@ from applications.models import Application
 from email_notification.helpers.email_builder_base import BaseEmailBuilder, BaseEmailContext
 from email_notification.models import EmailTemplate, EmailType
 from tilavarauspalvelu.utils.commons import LanguageType
+
+if TYPE_CHECKING:
+    from email_notification.admin.email_tester import EmailTemplateTesterForm
 
 
 @dataclass
@@ -22,6 +26,15 @@ class ApplicationEmailContext(BaseEmailContext):
         if not language:
             language = settings.LANGUAGE_CODE
 
+        return ApplicationEmailContext(
+            # Links
+            my_applications_ext_link=cls._get_my_applications_ext_link(language),
+            # Common
+            **cls._get_common_kwargs(language),
+        )
+
+    @classmethod
+    def from_form(cls, form: EmailTemplateTesterForm, language: LanguageType) -> ApplicationEmailContext:
         return ApplicationEmailContext(
             # Links
             my_applications_ext_link=cls._get_my_applications_ext_link(language),
@@ -66,4 +79,13 @@ class ApplicationEmailBuilder(BaseEmailBuilder):
         return ApplicationEmailBuilder(
             template=template,
             context=ApplicationEmailContext.from_application(application),
+        )
+
+    @classmethod
+    def from_form(
+        cls, *, template: EmailTemplate, form: EmailTemplateTesterForm, language: LanguageType
+    ) -> ApplicationEmailBuilder:
+        return ApplicationEmailBuilder(
+            template=template,
+            context=ApplicationEmailContext.from_form(form, language),
         )

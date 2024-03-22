@@ -1,7 +1,7 @@
 import pytest
 from django.test import RequestFactory
 
-from email_notification.admin.email_tester import get_email_template_tester_form_initial_values
+from email_notification.admin.email_tester import _get_email_template_tester_form_initial_values
 from tests.factories import LocationFactory, ReservationUnitFactory, UnitFactory, UserFactory
 
 pytestmark = [
@@ -35,7 +35,7 @@ def test_email_template__get_initial_values_collects_all_data():
     request = RequestFactory().get("/", {"recipient": "test@example.com", "reservation_unit": reservation_unit.pk})
     request.user = user
 
-    initial_values = get_email_template_tester_form_initial_values(request)
+    initial_values = _get_email_template_tester_form_initial_values(request)
 
     assert initial_values == {
         "recipient": user.email,
@@ -74,7 +74,7 @@ def test_email_template__get_initial_values__no_location():
     request = RequestFactory().get("/", {"recipient": "test@example.com", "reservation_unit": reservation_unit.pk})
     request.user = user
 
-    initial_values = get_email_template_tester_form_initial_values(request)
+    initial_values = _get_email_template_tester_form_initial_values(request)
 
     assert "unit_location" not in initial_values
 
@@ -104,7 +104,7 @@ def test_email_template__get_initial_values__no_unit():
     request = RequestFactory().get("/", {"recipient": "test@example.com", "reservation_unit": reservation_unit.pk})
     request.user = user
 
-    initial_values = get_email_template_tester_form_initial_values(request)
+    initial_values = _get_email_template_tester_form_initial_values(request)
 
     assert initial_values["unit_name"] == ""
 
@@ -122,6 +122,6 @@ def test_email_template__get_initial_values__no_reservation_unit():
     request = RequestFactory().get("/", {"recipient": "test@example.com", "reservation_unit": 0})
     request.user = user
 
-    initial_values = get_email_template_tester_form_initial_values(request)
+    initial_values = _get_email_template_tester_form_initial_values(request)
 
     assert initial_values == {"recipient": user.email}
