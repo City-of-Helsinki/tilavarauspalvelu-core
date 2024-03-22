@@ -1,17 +1,21 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 
 from applications.models import Application
-from email_notification.admin.email_tester import EmailTemplateTesterForm
 from email_notification.exceptions import SendEmailNotificationError
 from email_notification.helpers.email_builder_application import ApplicationEmailBuilder
 from email_notification.helpers.email_builder_base import BaseEmailBuilder
-from email_notification.helpers.email_builder_reservation import (
-    ReservationEmailBuilder,
-)
+from email_notification.helpers.email_builder_reservation import ReservationEmailBuilder
 from email_notification.models import EmailTemplate, EmailType
 from reservations.models import Reservation
 from tilavarauspalvelu.utils.commons import LanguageType
+
+if TYPE_CHECKING:
+    from email_notification.admin.email_tester import EmailTemplateTesterForm
 
 
 class EmailNotificationSender:
@@ -87,6 +91,18 @@ class EmailNotificationSender:
         )
 
         self._send_email(message_builder)
+
+    def send_test_application_email(self, *, form: EmailTemplateTesterForm):
+        self.recipients = [form.cleaned_data["recipient"]]
+
+        language: LanguageType
+        for language in ["fi", "sv", "en"]:
+            message_builder = ApplicationEmailBuilder.from_form(
+                template=self.email_template,
+                form=form,
+                language=language,
+            )
+            self._send_email(message_builder)
 
     def _send_email(self, message_builder: BaseEmailBuilder) -> None:
         subject = message_builder.get_subject()

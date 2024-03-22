@@ -1,18 +1,26 @@
+from __future__ import annotations
+
 import contextlib
 from datetime import datetime
 from decimal import Decimal
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from django import forms
-from django.core.exceptions import ValidationError
+from django.http import HttpResponseRedirect
+from django.template.response import TemplateResponse
+from django.utils.translation import gettext_lazy as _
 
 from email_notification.helpers.email_builder_reservation import ReservationEmailBuilder
+from email_notification.helpers.email_sender import EmailNotificationSender
 from email_notification.models import EmailTemplate
 from reservation_units.models import ReservationUnit
 from spaces.models import Location
 
+if TYPE_CHECKING:
+    from email_notification.admin import EmailTemplateAdmin
 
-def get_email_template_tester_form_initial_values(request) -> dict[str, Any]:
+
+def _get_email_template_tester_form_initial_values(request) -> dict[str, Any]:
     recipient = request.user.email if request.user else ""
     initial_values = {"recipient": recipient}
 
@@ -24,6 +32,7 @@ def get_email_template_tester_form_initial_values(request) -> dict[str, Any]:
     if not reservation_unit_pk:
         return initial_values
 
+    # If reservation_unit was passed as a GET query parameter, set the initial values from it to the form
     reservation_unit: ReservationUnit = ReservationUnit.objects.filter(pk=int(reservation_unit_pk)).first()
     if not reservation_unit:
         return initial_values
@@ -43,6 +52,7 @@ def get_email_template_tester_form_initial_values(request) -> dict[str, Any]:
     return initial_values
 
 
+# TODO: Add a similar form for EmailTemplate to select a different form for Application and Reservation
 class EmailTemplateTesterReservationUnitSelectForm(forms.Form):
     reservation_unit = forms.ChoiceField()
 
@@ -92,13 +102,6 @@ class EmailTemplateTesterForm(forms.Form):
     cancel_reason_sv = forms.CharField(initial="[orsak]", widget=forms.Textarea)
     cancel_reason_en = forms.CharField(initial="[reason]", widget=forms.Textarea)
 
-    def clean_template(self) -> None:
-        template = EmailTemplate.objects.get(pk=self.cleaned_data["template"])
-
-        # TODO: Add support for APPLICATION-type email templates
-        if template.type not in ReservationEmailBuilder.email_template_types:
-            raise ValidationError("Only RESERVATION email template testing is supported.")
-
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
@@ -106,3 +109,31 @@ class EmailTemplateTesterForm(forms.Form):
         # translation support, due to the choices being defined on module import.
         template_choices = [(template.pk, template.name) for template in EmailTemplate.objects.all()]
         self.fields["template"].choices = template_choices
+
+
+def email_template_tester_admin_view(
+    email_template_admin: EmailTemplateAdmin,
+    request,
+) -> TemplateResponse | HttpResponseRedirect:
+    if request.method == "POST":
+        form = EmailTemplateTesterForm(request.POST)
+        if form.is_valid():
+            template = EmailTemplate.objects.filter(pk=request.POST["template"]).first()
+
+            email_notification_sender = EmailNotificationSender(email_type=template.type, recipients=None)
+            if template.type in ReservationEmailBuilder.email_template_types:
+                email_notification_sender.send_test_reservation_email(form=form)
+            else:
+                email_notification_sender.send_test_application_email(form=form)
+
+            email_template_admin.message_user(request, _("Test Email '%s' successfully sent.") % template.name)
+    else:
+        initial_values = _get_email_template_tester_form_initial_values(request)
+        form = EmailTemplateTesterForm(initial=initial_values)
+
+    context = email_template_admin.admin_site.each_context(request)
+    context["opts"] = email_template_admin.model._meta
+    context["form"] = form
+    context["reservation_unit_form"] = EmailTemplateTesterReservationUnitSelectForm()
+
+    return TemplateResponse(request, "email_tester.html", context=context)
