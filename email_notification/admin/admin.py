@@ -8,6 +8,7 @@ from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from modeltranslation.admin import TranslationAdmin
 
 from email_notification.admin.email_tester import (
     EmailTemplateTesterForm,
@@ -32,10 +33,6 @@ from tilavarauspalvelu.utils.commons import LanguageType
 class EmailTemplateAdminForm(ModelForm):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-
-        # The Finnish 'content' and 'subject' are always required
-        self.fields["content_fi"].required = True
-        self.fields["subject_fi"].required = True
 
         # Set up the available 'type' choices
         # Remove existing types from the choices, so that the same type cannot be added twice
@@ -109,10 +106,9 @@ class EmailTemplateAdminForm(ModelForm):
 
 
 @admin.register(EmailTemplate)
-class EmailTemplateAdmin(ExtraButtonsMixin, admin.ModelAdmin):
+class EmailTemplateAdmin(ExtraButtonsMixin, TranslationAdmin):
     model = EmailTemplate
     form = EmailTemplateAdminForm
-    exclude = ["subject", "content", "html_content"]  # These are not used directly, only the translated fields are used
 
     @button(label="Email Template Testing")
     def template_tester(self, request, extra_context=None) -> TemplateResponse | HttpResponseRedirect:
