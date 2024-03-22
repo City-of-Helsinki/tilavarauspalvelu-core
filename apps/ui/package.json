@@ -46,7 +46,7 @@
     "react-transition-group": "^4.4.5",
     "react-use": "^17.4.2",
     "sanitize-html": "^2.13.0",
-    "sass": "^1.69.7",
+    "sass": "^1.72.0",
     "styled-components": "5.3.11",
     "tsconfig": "workspace:*",
     "typescript-cookie": "^1.0.6",
