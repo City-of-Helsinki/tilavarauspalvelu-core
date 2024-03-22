@@ -1122,6 +1122,11 @@ msgid ""
 "are set, 'active_until' must be after 'active_from'."
 msgstr ""
 
+#: email_notification/admin/email_tester.py
+#, python-format
+msgid "Test Email '%s' successfully sent."
+msgstr ""
+
 #: email_notification/models.py
 msgid "Email type"
 msgstr ""
@@ -1152,6 +1157,15 @@ msgstr ""
 msgid ""
 "Email body content as HTML. Use curly brackets to indicate data specific "
 "fields e.g {{reservee_name}}."
+msgstr ""
+
+#: email_notification/templates/email_tester.html
+#: templates/admin/reset_allocation_confirmation.html
+msgid "Home"
+msgstr ""
+
+#: email_notification/templates/email_tester.html
+msgid "Email Template Testing"
 msgstr ""
 
 #: merchants/admin.py
@@ -2704,10 +2718,6 @@ msgstr ""
 
 #: templates/admin/base.html templates/admin/hel_login.html
 msgid "Log out"
-msgstr ""
-
-#: templates/admin/reset_allocation_confirmation.html
-msgid "Home"
 msgstr ""
 
 #: templates/admin/reset_allocation_confirmation.html
