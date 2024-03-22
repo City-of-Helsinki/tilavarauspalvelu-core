@@ -22,6 +22,7 @@ import {
   REFRESH_ORDER,
 } from "../modules/queries/reservation";
 import { filterNonNullable } from "common/src/helpers";
+import { toApiDate } from "common/src/common/util";
 
 type UseOrderProps = {
   orderUuid?: string;
@@ -137,7 +138,8 @@ type UseReservationsProps = {
   orderBy?: string;
 };
 
-export const useReservations = ({
+// Only used by InProgressReservationNotification
+export function useReservations({
   currentUser,
   states,
   orderBy,
@@ -145,7 +147,7 @@ export const useReservations = ({
   reservations: ReservationType[];
   error?: ApolloError;
   loading: boolean;
-} => {
+} {
   const { data, error, loading } = useQuery<Query, QueryReservationsArgs>(
     LIST_RESERVATIONS,
     {
@@ -154,6 +156,7 @@ export const useReservations = ({
         ...(states != null && states?.length > 0 && { state: states }),
         ...(orderBy && { orderBy }),
         user: currentUser?.pk?.toString(),
+        beginDate: toApiDate(new Date()),
       },
       fetchPolicy: "no-cache",
     }
@@ -168,4 +171,4 @@ export const useReservations = ({
     error,
     loading,
   };
-};
+}

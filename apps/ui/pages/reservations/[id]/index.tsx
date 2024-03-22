@@ -268,6 +268,8 @@ const PageContent = styled.div`
   }
 `;
 
+// TODO add a state check => if state is Created redirect to the reservation funnel
+// if state is Cancelled, Denied, WaitingForPayment what then?
 const Reservation = ({
   termsOfUse,
   reservation,

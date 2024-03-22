@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
-import { State } from "common/types/gql-types";
+import { ReservationType, State } from "common/types/gql-types";
 import NotificationWrapper from "common/src/components/NotificationWrapper";
 import { useCurrentUser } from "@/hooks/user";
 import { BlackButton, Toast } from "@/styles/util";
@@ -13,6 +13,8 @@ import {
   useDeleteReservation,
 } from "@/hooks/reservation";
 import { getCheckoutUrl } from "@/modules/reservation";
+import { filterNonNullable } from "common/src/helpers";
+import { reservationUnitPrefix } from "@/modules/const";
 
 const NotificationContent = styled.div`
   display: flex;
@@ -38,22 +40,101 @@ const NotificationButtons = styled.div`
   }
 `;
 
-const ReservationNotification = () => {
-  const { t, i18n } = useTranslation();
-  const router = useRouter();
+function ReservationNotification({
+  onDelete,
+  onNext,
+  reservation,
+  disabled,
+  isLoading,
+}: {
+  onDelete: () => void;
+  onNext: () => void;
+  reservation: ReservationType;
+  disabled?: boolean;
+  isLoading?: boolean;
+}) {
+  const { t } = useTranslation(["notification, common"]);
 
+  const title =
+    reservation.state === State.Created
+      ? t("notification:createdReservation.title")
+      : t("notification:waitingForPayment.title");
+  const text =
+    reservation.state === State.Created
+      ? t("notification:createdReservation.body")
+      : t("notification:waitingForPayment.body");
+  const submitButtonText =
+    reservation.state === State.Created
+      ? t("notification:createdReservation.continueReservation")
+      : t("notification:waitingForPayment.payReservation");
+  return (
+    <NotificationWrapper
+      type="alert"
+      dismissible
+      centered
+      label={title}
+      closeButtonLabelText={t("common:close")}
+      data-testid="unpaid-reservation-notification__title"
+    >
+      <NotificationContent>
+        <BodyText>{text}</BodyText>
+        <NotificationButtons>
+          <BlackButton
+            variant="secondary"
+            size="small"
+            onClick={onDelete}
+            disabled={disabled}
+            isLoading={isLoading}
+            data-testid="reservation-notification__button--delete"
+          >
+            {t("notification:waitingForPayment.cancelReservation")}
+          </BlackButton>
+          <BlackButton
+            variant="secondary"
+            size="small"
+            disabled={disabled}
+            onClick={onNext}
+            data-testid="reservation-notification__button--checkout"
+          >
+            {submitButtonText}
+          </BlackButton>
+        </NotificationButtons>
+      </NotificationContent>
+    </NotificationWrapper>
+  );
+}
+
+export function InProgressReservationNotification() {
+  const { t, i18n } = useTranslation();
   const { currentUser } = useCurrentUser();
   const { reservations } = useReservations({
     currentUser,
-    states: [State.WaitingForPayment],
+    states: [State.WaitingForPayment, State.Created],
     orderBy: "-pk",
   });
 
-  const reservation = reservations?.[0];
+  // Hide on some routes
+  // We want to filter these two routes for
+  // WaitingForPayment: when cancelling and success
+  // Created: user is already in the funnel (no need to redirect him to the funnel page)
+  const hidePaymentNotificationRoutes = ["/reservation/cancel", "/success"];
+  const hideCreatedNotificationRoutes = ["/reservation-unit/[...params]"];
 
-  const { order } = useOrder({
-    orderUuid: reservation?.order?.orderUuid ?? undefined,
-  });
+  const router = useRouter();
+
+  const shouldHidePaymentNotification = hidePaymentNotificationRoutes.some(
+    (route) => router.pathname.startsWith(route)
+  );
+  const shouldHideCreatedNotification = hideCreatedNotificationRoutes.some(
+    (route) => router.pathname.startsWith(route)
+  );
+
+  const unpaidReservation = reservations
+    .filter(() => !shouldHidePaymentNotification)
+    .find((r) => r.state === State.WaitingForPayment);
+  const createdReservation = reservations
+    .filter(() => !shouldHideCreatedNotification)
+    .find((r) => r.state === State.Created);
 
   const {
     mutation: deleteReservation,
@@ -62,6 +143,9 @@ const ReservationNotification = () => {
     isLoading: isDeleteLoading,
   } = useDeleteReservation();
 
+  const { order } = useOrder({
+    orderUuid: unpaidReservation?.order?.orderUuid ?? undefined,
+  });
   const checkoutUrl = getCheckoutUrl(order, i18n.language);
 
   if (deleted) {
@@ -75,6 +159,61 @@ const ReservationNotification = () => {
       />
     );
   }
+
+  // NOTE don't need to invalidate the cache on reservations list page because Created is not shown on it.
+  // how about WaitingForPayment?
+  // it would still be proper to invalidate the cache so if there is such a page, it would show the correct data.
+  const handleDelete = async (reservation?: ReservationType) => {
+    // If we are on the page for the reservation we are deleting, we should redirect to the front page.
+    // The funnel page: reservation-unit/:pk/reservation/:pk should not show this notification at all.
+
+    let shouldRedirect = false;
+    // we match both the base name (reservations) and the specific reservation pk
+    // NOTE we could remove this if the Created reservation would always redirect to the funnel page instead of reservation/:pk page
+    const isReservationPage = router.pathname.includes("/reservations/");
+    if (isReservationPage) {
+      const { id } = router.query;
+      if (
+        id != null &&
+        typeof id === "string" &&
+        Number(id) === reservation?.pk
+      ) {
+        shouldRedirect = true;
+      }
+    }
+
+    if (reservation?.pk) {
+      await deleteReservation({
+        variables: {
+          input: {
+            pk: reservation.pk,
+          },
+        },
+      });
+      if (shouldRedirect) {
+        router.push("/");
+      } else {
+        // reload is necessary otherwise canceling on reservation-unit page will not remove the restriction
+        // of making a new reservation (also fixes any other cached data)
+        router.reload();
+      }
+    }
+  };
+
+  // TODO should pass the reservation here and remove the useOrder hook
+  const handleCheckout = () => {
+    if (checkoutUrl) {
+      router.push(checkoutUrl);
+    }
+  };
+
+  const handleContinue = (reservation?: ReservationType) => {
+    // TODO add an url builder for this
+    // - reuse the url builder in [...params].tsx
+    const reservationUnit = reservation?.reservationUnits?.find(() => true);
+    const url = `${reservationUnitPrefix}/${reservationUnit?.pk}/reservation/${reservation?.pk}`;
+    router.push(url);
+  };
 
   if (deleteError) {
     return (
@@ -90,63 +229,32 @@ const ReservationNotification = () => {
     );
   }
 
-  if (!checkoutUrl) {
-    return null;
-  }
+  // We want to only show the most recent reservation one of each type
+  const list = filterNonNullable([unpaidReservation, createdReservation]);
+
   return (
-    <NotificationWrapper
-      type="alert"
-      dismissible
-      centered
-      label={t("notification:waitingForPayment.title")}
-      closeButtonLabelText={t("common:close")}
-      data-testid="unpaid-reservation-notification__title"
-    >
-      <NotificationContent>
-        <BodyText>{t("notification:waitingForPayment.body")}</BodyText>
-        <NotificationButtons>
-          <BlackButton
-            variant="secondary"
-            size="small"
-            onClick={() => {
-              if (reservation?.pk) {
-                deleteReservation({
-                  variables: {
-                    input: {
-                      pk: reservation.pk,
-                    },
-                  },
-                });
-              }
-            }}
-            disabled={isDeleteLoading || !reservation?.pk}
-            data-testid="reservation-notification__button--delete"
-          >
-            {t("notification:waitingForPayment.cancelReservation")}
-          </BlackButton>
-          <BlackButton
-            variant="secondary"
-            size="small"
-            onClick={() => router.push(checkoutUrl)}
-            data-testid="reservation-notification__button--checkout"
-          >
-            {t("notification:waitingForPayment.payReservation")}
-          </BlackButton>
-        </NotificationButtons>
-      </NotificationContent>
-    </NotificationWrapper>
+    <>
+      {list.map((x) =>
+        x.state === State.Created ? (
+          <ReservationNotification
+            key={x.pk}
+            onDelete={() => handleDelete(x)}
+            onNext={() => handleContinue(x)}
+            // disabled={!createdReservation?.pk}
+            isLoading={isDeleteLoading}
+            reservation={x}
+          />
+        ) : (
+          <ReservationNotification
+            key={x.pk}
+            onDelete={() => handleDelete(x)}
+            onNext={handleCheckout}
+            disabled={!checkoutUrl}
+            isLoading={isDeleteLoading}
+            reservation={x}
+          />
+        )
+      )}
+    </>
   );
-};
-
-const UnpaidReservationNotification = () => {
-  const router = useRouter();
-  const restrictedRoutes = ["/reservation/cancel", "/success"];
-
-  if (restrictedRoutes.some((route) => router.pathname.startsWith(route))) {
-    return null;
-  }
-
-  return <ReservationNotification />;
-};
-
-export default UnpaidReservationNotification;
+}

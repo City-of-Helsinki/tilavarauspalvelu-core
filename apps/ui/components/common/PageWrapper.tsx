@@ -5,7 +5,7 @@ import { BannerNotificationTarget } from "common/types/gql-types";
 import Footer from "./Footer";
 import { Navigation } from "./Navigation/Navigation";
 import Title from "./Title";
-import UnpaidReservationNotification from "../reservations/UnpaidReservationNotification";
+import { InProgressReservationNotification } from "@/components/reservations/UnpaidReservationNotification";
 
 interface Props {
   children: React.ReactNode;
@@ -34,7 +34,7 @@ function PageWrapper({
         centered
         target={BannerNotificationTarget.User}
       />
-      <UnpaidReservationNotification />
+      <InProgressReservationNotification />
       <Main
         $bgColor={overrideBackgroundColor}
         id="main"

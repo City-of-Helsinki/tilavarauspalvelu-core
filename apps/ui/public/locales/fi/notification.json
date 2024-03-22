@@ -5,5 +5,10 @@
     "cancelReservation": "Peru varaus",
     "payReservation": "Maksa varaus",
     "reservationCancelledTitle": "Varauksesi on peruttu!"
+  },
+  "createdReservation": {
+    "title": "Varauksesi on keskeneräinen",
+    "body": "Varauksesi peruuntuu automaattisesti, jos et viimestele sitä 20 minuutin kuluessa.",
+    "continueReservation": "Jatka varaamista"
   }
 }

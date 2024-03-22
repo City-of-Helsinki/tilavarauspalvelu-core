@@ -5,5 +5,10 @@
     "cancelReservation": "Avboka bokningen",
     "payReservation": "Betala",
     "reservationCancelledTitle": "Din bokning har avbokats!"
+  },
+  "createdReservation": {
+    "title": "Din bokning är inte klar",
+    "body": "Din bokning är inte klar. Vänligen slutför bokningen inom 20 minuter.",
+    "continueReservation": "Fortsätt bokningen"
   }
 }
