@@ -5,13 +5,12 @@
   "cancelled": "Your application has been cancelled.",
   "edit": "Edit",
   "cancel": "Cancel",
-  "view": "",
+  "view": "View",
   "status": {
     "draft": "Draft",
     "processing": "In process",
     "sent": "Processed"
   },
-
   "reservations": "Bookings",
   "saved": "Last saved: {{date, d.M.yyyy ',' H:mm}}",
   "person": "Application created: as a private person",
