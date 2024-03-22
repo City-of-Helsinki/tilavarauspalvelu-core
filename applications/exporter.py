@@ -1,6 +1,6 @@
 from collections.abc import Iterator
 from csv import QUOTE_ALL, writer
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from django.conf import settings
@@ -74,13 +74,13 @@ class ApplicationExportRow:
 
     def __iter__(self) -> Iterator[str]:
         """Iterate over the values of the dataclass in the order they were defined."""
-        return iter(self.__dict__.values())
+        return iter(asdict(self).values())
 
 
 @dataclass
 class ExportRowSuitableTimeRanges:
     def __iter__(self) -> Iterator[str]:
-        return iter(self.__dict__.values())
+        return iter(asdict(self).values())
 
 
 def get_header_rows(max_options: int) -> tuple[list[str], list[str], list[str]]:
