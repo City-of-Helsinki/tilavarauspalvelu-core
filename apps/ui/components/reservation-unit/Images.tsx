@@ -62,6 +62,7 @@ const ModalContent = styled.div`
 
   @media (max-width: ${breakpoints.s}) {
     margin: 0.5em;
+    margin-top: var(--spacing-layout-m);
   }
 `;
 
@@ -73,10 +74,10 @@ const ThumbnailButton = styled.button`
 `;
 
 const ModalImages = styled.div`
-  margin-top: var(--spacing-layout-s);
   display: flex;
   max-width: 100%;
   overflow-x: auto;
+  margin-top: var(--spacing-2-xs);
 
   button {
     margin-right: 1em;
@@ -102,7 +103,11 @@ export function Images({ images, contextName }: Props): JSX.Element {
 
   return (
     <>
-      <StyledCarousel>
+      <StyledCarousel
+        controlAriaLabel={t("common:imgAltForSpace", {
+          name: contextName,
+        })}
+      >
         {images?.map((image, index) => (
           <CarouselImage
             key={image.imageUrl}
@@ -126,6 +131,7 @@ export function Images({ images, contextName }: Props): JSX.Element {
         }}
         show={showModal}
         closeButtonKey="common:close"
+        showControlButtons={false}
       >
         <ModalContent>
           {currentImage ? (

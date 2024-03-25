@@ -3,8 +3,9 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
-import { isBrowser } from "../../modules/const";
-import { MediumButton } from "../../styles/util";
+import { isBrowser } from "common/src/helpers";
+import { MediumButton } from "@/styles/util";
+import { IconCross } from "hds-react";
 
 type Props = {
   handleOk?: () => void;
@@ -13,6 +14,7 @@ type Props = {
   children: React.ReactNode;
   closeButtonKey?: string;
   okButtonKey?: string;
+  showControlButtons?: boolean;
 };
 
 const Overlay = styled.div`
@@ -23,7 +25,7 @@ const Overlay = styled.div`
 `;
 
 const ModalElement = styled.div`
-  padding: var(--spacing-layout-xs);
+  padding: var(--spacing-layout-2-xs);
   background: var(--color-white);
   max-width: 100%;
   position: fixed;
@@ -35,6 +37,22 @@ const ModalElement = styled.div`
   flex-direction: column;
   max-height: 90%;
   overflow-y: auto;
+
+  {/* The top close button */}
+  > button {
+    position: absolute;
+    top: var(--spacing-layout-xs);
+    right: var(--spacing-layout-xs);
+    border: 0;
+    span {
+      display: flex;
+      align-items: center;
+    }
+    @media (max-width: ${breakpoints.s}) {
+      top: 0;
+      right: 0;
+    }
+  }
 
   @media (max-width: ${breakpoints.s}) {
     height: 100%;
@@ -51,7 +69,6 @@ const ButtonContainer = styled.div`
   display: grid;
   gap: var(--spacing-layout-s);
   grid-template-columns: 1fr 1fr;
-  padding-top: var(--spacing-layout-s);
 
   > button {
     width: fit-content;
@@ -76,6 +93,7 @@ const Modal = ({
   children,
   closeButtonKey = "common:close",
   okButtonKey = "common:ok",
+  showControlButtons = true,
 }: Props): JSX.Element | null => {
   const { t } = useTranslation();
 
@@ -97,24 +115,35 @@ const Modal = ({
   }
 
   return (
-    <>
-      <Overlay role="none" onClick={handleClose} onKeyDown={handleClose} />
+    <Overlay role="none" onKeyDown={(e) => e.key === "Escape" && handleClose()}>
       <FocusTrap>
         <ModalElement>
-          <MainContainer>{children}</MainContainer>
-          <ButtonContainer>
-            {handleOk ? (
-              <MediumButton variant="primary" onClick={handleOk}>
-                {t(okButtonKey)}
-              </MediumButton>
-            ) : null}
-            <MediumButton variant="secondary" onClick={handleClose}>
-              {t(closeButtonKey)}
+          {!showControlButtons && (
+            <MediumButton
+              variant="secondary"
+              size="small"
+              onClick={handleClose}
+            >
+              {t("common:close")}
+              <IconCross />
             </MediumButton>
-          </ButtonContainer>
+          )}
+          <MainContainer>{children}</MainContainer>
+          {showControlButtons && (
+            <ButtonContainer>
+              {handleOk ? (
+                <MediumButton variant="primary" onClick={handleOk}>
+                  {t(okButtonKey)}
+                </MediumButton>
+              ) : null}
+              <MediumButton variant="secondary" onClick={handleClose}>
+                {t(closeButtonKey)}
+              </MediumButton>
+            </ButtonContainer>
+          )}
         </ModalElement>
       </FocusTrap>
-    </>
+    </Overlay>
   );
 };
 

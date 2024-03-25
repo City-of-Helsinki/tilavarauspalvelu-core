@@ -4,7 +4,7 @@ import { IconAngleLeft, IconAngleRight } from "hds-react";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { useTranslation } from "next-i18next";
-import { MediumButton } from "../styles/util";
+import { MediumButton } from "@/styles/util";
 
 type Props = {
   children: React.ReactNode[];
@@ -13,6 +13,7 @@ type Props = {
   cellSpacing?: number;
   wrapAround?: boolean;
   hideCenterControls?: boolean;
+  controlAriaLabel?: string;
 };
 
 const Button = styled(MediumButton).attrs({
@@ -84,6 +85,40 @@ const StyledCarousel = styled(NukaCarousel)<{
   }
 `;
 
+const CustomBottomControls = styled.div`
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  ul {
+    position: relative;
+    top: -10px;
+    display: flex;
+    margin: 0;
+    padding: 0 var(--spacing-3-xs);
+    list-style-type: none;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: var(--spacing-xs);
+
+    li {
+      button {
+        cursor: pointer;
+        background: transparent;
+        border: none;
+        fill: white;
+        opacity: 0.7;
+        &:hover {
+          opacity: 1;
+        }
+      }
+      &.active button {
+        fill: var(--color-bus);
+      }
+    }
+  }
+`;
+
 const Carousel = ({
   children,
   slidesToShow = 1,
@@ -91,6 +126,7 @@ const Carousel = ({
   cellSpacing = 1,
   wrapAround = true,
   hideCenterControls = false,
+  controlAriaLabel = "",
   ...rest
 }: Props): JSX.Element => {
   const { t } = useTranslation();
@@ -120,6 +156,28 @@ const Carousel = ({
         >
           <IconAngleRight />
         </ButtonComponent>
+      )}
+      renderBottomCenterControls={({ slideCount, currentSlide, goToSlide }) => (
+        <CustomBottomControls>
+          <ul>
+            {[...Array(slideCount)].map((key, idx) => (
+              <li
+                key={key}
+                className={currentSlide === idx ? "active" : undefined}
+              >
+                <button
+                  type="button"
+                  aria-label={`${controlAriaLabel} #${idx + 1}`}
+                  onClick={() => goToSlide(idx)}
+                >
+                  <svg width="12" height="12">
+                    <circle cx="5" cy="5" r="5" />
+                  </svg>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </CustomBottomControls>
       )}
       wrapAround={wrapAround}
       slidesToShow={slidesToShow}
