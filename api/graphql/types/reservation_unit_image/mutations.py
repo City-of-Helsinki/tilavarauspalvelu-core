@@ -1,53 +1,32 @@
-import graphene
-from graphene import ClientIDMutation
-from graphene_django.rest_framework.mutation import SerializerMutation
-from graphene_file_upload.scalars import Upload
-from rest_framework.generics import get_object_or_404
+from graphene_django_extensions import CreateMutation, DeleteMutation, UpdateMutation
 
-from api.graphql.extensions.legacy_helpers import OldAuthDeleteMutation, OldAuthSerializerMutation
 from api.graphql.types.reservation_unit_image.permissions import ReservationUnitImagePermission
 from api.graphql.types.reservation_unit_image.serializers import (
     ReservationUnitImageCreateSerializer,
     ReservationUnitImageUpdateSerializer,
 )
-from api.graphql.types.reservation_unit_image.types import ReservationUnitImageType
-from common.typing import GQLInfo
 from reservation_units.models import ReservationUnitImage
 
+__all__ = [
+    "ReservationUnitImageCreateMutation",
+    "ReservationUnitImageUpdateMutation",
+    "ReservationUnitImageDeleteMutation",
+]
 
-class ReservationUnitImageCreateMutation(OldAuthSerializerMutation, SerializerMutation):
-    reservation_unit_image = graphene.Field(ReservationUnitImageType)
 
-    class Input:
-        image = Upload()
-
-    permission_classes = (ReservationUnitImagePermission,)
-
+class ReservationUnitImageCreateMutation(CreateMutation):
     class Meta:
-        model_operations = ["create"]
         serializer_class = ReservationUnitImageCreateSerializer
-
-    def resolve_reservation_unit_image(root: ReservationUnitImage, info: GQLInfo):
-        if root.pk:
-            return get_object_or_404(ReservationUnitImage, pk=root.pk)
-        return None
+        permission_classes = [ReservationUnitImagePermission]
 
 
-class ReservationUnitImageUpdateMutation(OldAuthSerializerMutation, SerializerMutation):
-    reservation_unit_image = graphene.Field(ReservationUnitImageType)
-
-    permission_classes = (ReservationUnitImagePermission,)
-
+class ReservationUnitImageUpdateMutation(UpdateMutation):
     class Meta:
-        model_operations = ["update"]
-        lookup_field = "pk"
         serializer_class = ReservationUnitImageUpdateSerializer
+        permission_classes = [ReservationUnitImagePermission]
 
 
-class ReservationUnitImageDeleteMutation(OldAuthDeleteMutation, ClientIDMutation):
-    permission_classes = (ReservationUnitImagePermission,)
-    model = ReservationUnitImage
-
-    @classmethod
-    def validate(cls, root, info, **input):
-        return None
+class ReservationUnitImageDeleteMutation(DeleteMutation):
+    class Meta:
+        model = ReservationUnitImage
+        permission_classes = [ReservationUnitImagePermission]

@@ -1,51 +1,24 @@
-from rest_framework import serializers
+from typing import Any
 
-from api.graphql.extensions.legacy_helpers import (
-    OldChoiceIntegerField,
-    OldPrimaryKeySerializer,
-    OldPrimaryKeyUpdateSerializer,
-)
-from api.graphql.extensions.validating_list_field import ValidatingListField
+from graphene_django_extensions import NestingModelSerializer
+
+from api.graphql.extensions.fields import OldChoiceIntegerField, ValidatingListField
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
-from common.fields.serializer import IntegerPrimaryKeyField
-from reservation_units.models import ReservationUnit
-from reservations.models import AbilityGroup, AgeGroup, RecurringReservation
+from reservations.models import RecurringReservation
 from tilavarauspalvelu.utils.commons import WEEKDAYS
 
+__all__ = [
+    "RecurringReservationSerializer",
+]
 
-class RecurringReservationCreateSerializer(OldPrimaryKeySerializer):
-    reservation_unit_pk = IntegerPrimaryKeyField(
-        queryset=ReservationUnit.objects.all(),
-        source="reservation_unit",
-        allow_null=False,
-    )
-    age_group_pk = IntegerPrimaryKeyField(
-        queryset=AgeGroup.objects.all(),
-        source="age_group",
-        allow_null=True,
-        required=False,
-    )
-    ability_group_pk = IntegerPrimaryKeyField(
-        queryset=AbilityGroup.objects.all(),
-        source="ability_group",
-        allow_null=True,
-        required=False,
-    )
 
+class RecurringReservationSerializer(NestingModelSerializer):
+    # TODO: Refactor this away
     weekdays = ValidatingListField(
         child=OldChoiceIntegerField(choices=WEEKDAYS.CHOICES, allow_null=False),
         allow_empty=False,
-        required=True,
-        help_text="List of weekdays which days the reservations occurs",
+        required=False,
     )
-
-    name = serializers.CharField(required=False, default="")
-    description = serializers.CharField(required=False, default="", allow_blank=True)
-    begin_time = serializers.TimeField(required=True, help_text="Time when reservations begins.")
-    end_time = serializers.TimeField(required=True, help_text="Time when reservations ends.")
-    begin_date = serializers.DateField(required=True, help_text="Date when first reservation begins.")
-    end_date = serializers.DateField(required=True, help_text="Date when last reservation begins.")
-    recurrence_in_days = serializers.IntegerField(required=True)
 
     class Meta:
         model = RecurringReservation
@@ -54,9 +27,9 @@ class RecurringReservationCreateSerializer(OldPrimaryKeySerializer):
             "user",
             "name",
             "description",
-            "reservation_unit_pk",
-            "age_group_pk",
-            "ability_group_pk",
+            "reservation_unit",
+            "age_group",
+            "ability_group",
             "recurrence_in_days",
             "weekdays",
             "begin_time",
@@ -64,17 +37,17 @@ class RecurringReservationCreateSerializer(OldPrimaryKeySerializer):
             "begin_date",
             "end_date",
         ]
+        extra_kwargs = {
+            "user": {
+                "read_only": False,
+            },
+        }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
+        begin_time = data.get("begin_time", getattr(self.instance, "begin_time", None))
+        end_time = data.get("end_time", getattr(self.instance, "end_time", None))
 
-        self.fields["user"].readonly = True
-
-    def validate(self, data):
-        begin = data.get("begin_time", getattr(self.instance, "begin_time", None))
-        end = data.get("end_time", getattr(self.instance, "end_time", None))
-
-        if end < begin:
+        if end_time < begin_time:
             raise ValidationErrorWithCode(
                 "Begin time cannot be after end time.",
                 ValidationErrorCodes.RESERVATION_BEGIN_AFTER_END,
@@ -97,7 +70,7 @@ class RecurringReservationCreateSerializer(OldPrimaryKeySerializer):
 
         return data
 
-    def validate_weekdays(self, weekdays):
+    def validate_weekdays(self, weekdays: list[str] | None) -> str:
         days = []
         weekdays = weekdays or getattr(self.instance, "weekdays", [])
         for weekday in weekdays:
@@ -107,29 +80,10 @@ class RecurringReservationCreateSerializer(OldPrimaryKeySerializer):
 
         return ",".join(days)
 
-    def validate_recurrence_in_days(self, recurrence_in_days):
+    def validate_recurrence_in_days(self, recurrence_in_days: int) -> int:
         if recurrence_in_days == 0 or recurrence_in_days % 7 != 0:
             raise ValidationErrorWithCode(
                 "Interval value not allowed, allowed values are 7,14,28 etc. divisible by seven.",
                 ValidationErrorCodes.INVALID_RECURRENCE_IN_DAY,
             )
-
         return recurrence_in_days
-
-
-class RecurringReservationUpdateSerializer(OldPrimaryKeyUpdateSerializer, RecurringReservationCreateSerializer):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.fields["user"].readonly = True
-        self.fields["name"].required = False
-        self.fields["description"].required = False
-        self.fields["recurrence_in_days"].required = False
-        self.fields["begin_time"].required = False
-        self.fields["end_time"].required = False
-        self.fields["begin_date"].required = False
-        self.fields["end_date"].required = False
-        self.fields["weekdays"].required = False
-        self.fields["ability_group_pk"].required = False
-        self.fields["age_group_pk"].required = False
-        self.fields.pop("reservation_unit_pk")

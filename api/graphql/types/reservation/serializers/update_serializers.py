@@ -3,9 +3,9 @@ import datetime
 from django.utils.timezone import get_default_timezone
 from graphene.utils.str_converters import to_camel_case
 
-from api.graphql.extensions.legacy_helpers import OldPrimaryKeyUpdateSerializer
+from api.graphql.extensions.serializers import OldPrimaryKeyUpdateSerializer
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
-from api.graphql.types.reservations.serializers.create_serializers import ReservationCreateSerializer
+from api.graphql.types.reservation.serializers.create_serializers import ReservationCreateSerializer
 from reservations.choices import CustomerTypeChoice, ReservationStateChoice
 
 DEFAULT_TIMEZONE = get_default_timezone()
@@ -43,7 +43,7 @@ class ReservationUpdateSerializer(OldPrimaryKeyUpdateSerializer, ReservationCrea
         new_state = data.get("state", self.instance.state)
         if new_state not in [ReservationStateChoice.CANCELLED.value, ReservationStateChoice.CREATED.value]:
             raise ValidationErrorWithCode(
-                f"Setting the reservation state to {new_state} is not allowed.",
+                f"Setting the reservation state to '{getattr(new_state, 'value', new_state)}' is not allowed.",
                 ValidationErrorCodes.STATE_CHANGE_NOT_ALLOWED,
             )
 
@@ -95,7 +95,7 @@ class ReservationUpdateSerializer(OldPrimaryKeyUpdateSerializer, ReservationCrea
             existing_value = getattr(self.instance, internal_field_name, None)
 
             # If the reservee_is_unregistered_association is True it's not mandatory to give reservee_id
-            # even if in metadataset says so.
+            # even if in metadata set says so.
             unregistered_field_name = "reservee_is_unregistered_association"
             if internal_field_name == "reservee_id" and data.get(
                 unregistered_field_name,

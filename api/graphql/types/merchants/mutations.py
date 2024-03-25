@@ -1,12 +1,13 @@
-from datetime import datetime
+from typing import Any, NamedTuple
+from uuid import UUID
 
-import graphene
-from django.utils.timezone import get_default_timezone
-from graphene import relay
-from graphene_permissions.mixins import AuthMutation
+from graphene_django_extensions.bases import DjangoMutation
 
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from api.graphql.types.merchants.permissions import OrderRefreshPermission
+from api.graphql.types.merchants.serializers import RefreshOrderInputSerializer, RefreshOrderOutputSerializer
+from common.date_utils import local_datetime
+from common.typing import GQLInfo
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from merchants.models import OrderStatus, PaymentOrder
 from merchants.verkkokauppa.payment.exceptions import GetPaymentError
@@ -14,37 +15,29 @@ from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.choices import ReservationStateChoice
 from utils.sentry import SentryLogger
 
-DEFAULT_TIMEZONE = get_default_timezone()
+
+class RefreshOrderMutationOutput(NamedTuple):
+    order_uuid: UUID
+    status: str
+    reservation_pk: int
 
 
-class RefreshOrderMutation(relay.ClientIDMutation, AuthMutation):
-    permission_classes = (OrderRefreshPermission,)
-
-    class Input:
-        order_uuid = graphene.UUID(required=True)
-
-    order_uuid = graphene.UUID()
-    status = graphene.String()
-    reservation_pk = graphene.Int()
+class RefreshOrderMutation(DjangoMutation):
+    class Meta:
+        serializer_class = RefreshOrderInputSerializer
+        output_serializer_class = RefreshOrderOutputSerializer
+        permission_classes = [OrderRefreshPermission]
 
     @classmethod
-    def mutate_and_get_payload(cls, root, info, **input):
-        if not cls.has_permission(root, info, input):
-            raise ValidationErrorWithCode("No permission to refresh the order", ValidationErrorCodes.NO_PERMISSION)
+    def custom_mutation(cls, info: GQLInfo, input_data: dict[str, Any]) -> RefreshOrderMutationOutput:
+        remote_id: UUID = input_data["order_uuid"]
 
-        needs_update_statuses = [
-            OrderStatus.DRAFT,
-            OrderStatus.EXPIRED,
-            OrderStatus.CANCELLED,
-        ]
-
-        remote_id = input.get("order_uuid")
-        payment_order = PaymentOrder.objects.filter(remote_id=remote_id).first()
+        payment_order: PaymentOrder | None = PaymentOrder.objects.filter(remote_id=remote_id).first()
         if not payment_order:
             raise ValidationErrorWithCode("Order not found", ValidationErrorCodes.NOT_FOUND)
 
-        if payment_order.status not in needs_update_statuses:
-            return RefreshOrderMutation(
+        if payment_order.status not in OrderStatus.needs_update_statuses():
+            return RefreshOrderMutationOutput(
                 order_uuid=payment_order.remote_id,
                 status=payment_order.status,
                 reservation_pk=payment_order.reservation.pk,
@@ -58,16 +51,16 @@ class RefreshOrderMutation(relay.ClientIDMutation, AuthMutation):
                     details=f"Order payment check failed: payment not found ({remote_id}).",
                     level="warning",
                 )
-                raise ValidationErrorWithCode("Unable to check order payment", ValidationErrorCodes.NOT_FOUND)
-        except GetPaymentError as err:
-            SentryLogger.log_exception(err, details="Order payment check failed", remote_id=remote_id)
-            raise ValidationErrorWithCode(
-                "Unable to check order payment: problem with external service",
-                ValidationErrorCodes.EXTERNAL_SERVICE_ERROR,
-            ) from err
+                msg = "Unable to check order payment"
+                raise ValidationErrorWithCode(msg, ValidationErrorCodes.NOT_FOUND)
+
+        except GetPaymentError as error:
+            SentryLogger.log_exception(error, details="Order payment check failed", remote_id=remote_id)
+            msg = "Unable to check order payment: problem with external service"
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.EXTERNAL_SERVICE_ERROR) from error
 
         payment_order.payment_id = payment.payment_id
-        payment_order.processed_at = datetime.now().astimezone(DEFAULT_TIMEZONE)
+        payment_order.processed_at = local_datetime()
 
         if payment.status == "payment_cancelled" and payment_order.status is not OrderStatus.CANCELLED:
             payment_order.status = OrderStatus.CANCELLED
@@ -82,7 +75,7 @@ class RefreshOrderMutation(relay.ClientIDMutation, AuthMutation):
                 payment_order.reservation.save()
                 ReservationEmailNotificationSender.send_confirmation_email(reservation=payment_order.reservation)
 
-        return RefreshOrderMutation(
+        return RefreshOrderMutationOutput(
             order_uuid=payment_order.remote_id,
             status=payment_order.status,
             reservation_pk=payment_order.reservation.pk,

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
-from api.graphql.extensions.decimal_field import DecimalField
-from api.graphql.extensions.legacy_helpers import OldPrimaryKeySerializer
+from api.graphql.extensions.fields import DecimalField
+from api.graphql.extensions.serializers import OldPrimaryKeySerializer
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from common.date_utils import local_datetime
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender

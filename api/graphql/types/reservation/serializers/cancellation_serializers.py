@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from api.graphql.extensions.legacy_helpers import OldPrimaryKeyUpdateSerializer
+from api.graphql.extensions.serializers import OldPrimaryKeyUpdateSerializer
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from common.date_utils import local_datetime
 from common.fields.serializer import IntegerPrimaryKeyField

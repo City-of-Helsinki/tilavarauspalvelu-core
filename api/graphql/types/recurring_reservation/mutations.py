@@ -1,41 +1,23 @@
-import graphene
-from graphene_django.rest_framework.mutation import SerializerMutation
+from graphene_django_extensions import CreateMutation, UpdateMutation
 
-from api.graphql.extensions.legacy_helpers import OldAuthSerializerMutation
+from api.graphql.types.recurring_reservation.permissions import RecurringReservationPermission
 from api.graphql.types.recurring_reservation.serializers import (
-    RecurringReservationCreateSerializer,
-    RecurringReservationUpdateSerializer,
+    RecurringReservationSerializer,
 )
-from api.graphql.types.reservations.permissions import RecurringReservationPermission
-from api.graphql.types.reservations.types import RecurringReservationType
-from common.typing import GQLInfo
-from reservations.models import RecurringReservation
+
+__all__ = [
+    "RecurringReservationCreateMutation",
+    "RecurringReservationUpdateMutation",
+]
 
 
-class RecurringReservationCreateMutation(OldAuthSerializerMutation, SerializerMutation):
-    recurring_reservation = graphene.Field(RecurringReservationType)
-
-    permission_classes = (RecurringReservationPermission,)
-
+class RecurringReservationCreateMutation(CreateMutation):
     class Meta:
-        model_operations = ["create"]
-        serializer_class = RecurringReservationCreateSerializer
-
-    def resolve_recurring_reservation(self: "RecurringReservationCreateMutation", info: GQLInfo):
-        recurring_reservation = RecurringReservation.objects.filter(pk=self.pk).first()
-        return recurring_reservation
+        serializer_class = RecurringReservationSerializer
+        permission_classes = [RecurringReservationPermission]
 
 
-class RecurringReservationUpdateMutation(OldAuthSerializerMutation, SerializerMutation):
-    recurring_reservation = graphene.Field(RecurringReservationType)
-
-    permission_classes = (RecurringReservationPermission,)
-
+class RecurringReservationUpdateMutation(UpdateMutation):
     class Meta:
-        model_operations = ["update"]
-        lookup_field = "pk"
-        serializer_class = RecurringReservationUpdateSerializer
-
-    def resolve_recurring_reservation(self: "RecurringReservationUpdateMutation", info: GQLInfo):
-        recurring_reservation = RecurringReservation.objects.filter(pk=self.pk).first()
-        return recurring_reservation
+        serializer_class = RecurringReservationSerializer
+        permission_classes = [RecurringReservationPermission]

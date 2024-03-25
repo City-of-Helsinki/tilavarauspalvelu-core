@@ -9,7 +9,7 @@ from rest_framework.exceptions import ValidationError
 
 from api.graphql.extensions import error_codes
 from api.graphql.types.application_round_time_slot.serializers import ApplicationRoundTimeSlotSerializer
-from api.graphql.types.reservation_unit_image.serializers import ReservationUnitImageSerializer
+from api.graphql.types.reservation_unit_image.serializers import ReservationUnitImageFieldSerializer
 from api.graphql.types.reservation_unit_pricing.serializers import ReservationUnitPricingSerializer
 from applications.choices import WeekdayChoice
 from opening_hours.utils.hauki_resource_hash_updater import HaukiResourceHashUpdater
@@ -26,7 +26,7 @@ __all__ = [
 class ReservationUnitSerializer(NestingModelSerializer):
     instance: ReservationUnit | None
 
-    images = ReservationUnitImageSerializer(many=True, required=False)
+    images = ReservationUnitImageFieldSerializer(many=True, required=False)
     pricings = ReservationUnitPricingSerializer(many=True, required=False)
     application_round_time_slots = ApplicationRoundTimeSlotSerializer(many=True, required=False)
 

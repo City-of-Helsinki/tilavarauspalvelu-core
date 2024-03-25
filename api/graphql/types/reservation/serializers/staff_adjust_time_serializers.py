@@ -4,7 +4,7 @@ from django.utils.timezone import get_default_timezone
 
 from api.graphql.extensions.legacy_helpers import OldPrimaryKeyUpdateSerializer
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
-from api.graphql.types.reservations.serializers.mixins import ReservationSchedulingMixin
+from api.graphql.types.reservation.serializers.mixins import ReservationSchedulingMixin
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from reservation_units.models import ReservationUnit
 from reservations.choices import ReservationStateChoice, ReservationTypeChoice

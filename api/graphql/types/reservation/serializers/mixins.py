@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.utils.timezone import get_default_timezone
 
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
-from api.graphql.types.reservations.types import ReservationType
+from api.graphql.types.reservation.types import ReservationNode
 from reservation_units.enums import PriceUnit, PricingType, ReservationStartInterval, ReservationUnitState
 from reservation_units.models import ReservationUnit, ReservationUnitPricing
 from reservation_units.utils.reservation_unit_pricing_helper import ReservationUnitPricingHelper
@@ -18,6 +18,8 @@ from reservations.models import Reservation
 
 
 class PriceCalculationResult:
+    instance: Reservation
+
     reservation_price: Decimal = Decimal("0")
     unit_price: Decimal = Decimal("0")
     tax_percentage_value: Decimal = Decimal("0")
@@ -57,6 +59,8 @@ class PriceCalculationResult:
 
 class ReservationPriceMixin:
     """Validation methods for pricing related operations"""
+
+    instance: Reservation
 
     def requires_price_calculation(self, data: dict[str, Any]) -> bool:
         # If pk is not given, this is a create request -> price is always calculated
@@ -191,7 +195,7 @@ class ReservationSchedulingMixin:
         state = reservation_unit.state
         if state in (ReservationUnitState.DRAFT, ReservationUnitState.ARCHIVED):
             raise ValidationErrorWithCode(
-                f"Reservation unit is not reservable due to status is {state}.",
+                f"Reservation unit is not reservable due to its status: '{state.value}'.",
                 ValidationErrorCodes.RESERVATION_UNIT_NOT_RESERVABLE,
             )
 
@@ -262,7 +266,7 @@ class ReservationSchedulingMixin:
         reservation_unit: ReservationUnit,
         begin: datetime.datetime,
         end: datetime.datetime,
-        reservation_type: ReservationType | None = None,
+        reservation_type: ReservationNode | None = None,
         new_buffer_before: datetime.timedelta | None = None,
         new_buffer_after: datetime.timedelta | None = None,
     ) -> None:

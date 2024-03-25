@@ -5,10 +5,10 @@ from django.utils.timezone import get_default_timezone
 from graphql import GraphQLError
 from rest_framework import serializers
 
-from api.graphql.extensions.duration_field import DurationField
-from api.graphql.extensions.legacy_helpers import OldChoiceCharField, OldPrimaryKeySerializer
+from api.graphql.extensions.fields import DurationField, OldChoiceCharField
+from api.graphql.extensions.serializers import OldPrimaryKeySerializer
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
-from api.graphql.types.reservations.serializers.mixins import (
+from api.graphql.types.reservation.serializers.mixins import (
     ReservationPriceMixin,
     ReservationSchedulingMixin,
 )
@@ -272,8 +272,7 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
     def check_reservation_kind(self, reservation_unit):
         if reservation_unit.reservation_kind == ReservationKind.SEASON:
             raise ValidationErrorWithCode(
-                "Reservation cannot be done to this reservation unit from the api "
-                "since its reservation kind is SEASON.",
+                "Reservation unit is only available or seasonal booking.",
                 ValidationErrorCodes.RESERVATION_UNIT_TYPE_IS_SEASON,
             )
 
