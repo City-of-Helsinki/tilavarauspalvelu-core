@@ -2,7 +2,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
-from graphene_file_upload.django import FileUploadGraphQLView
+from graphene_django_extensions import FileUploadGraphQLView
 
 from api.legacy_rest_api.urls import legacy_outer
 from api.webhooks.urls import webhook_router
