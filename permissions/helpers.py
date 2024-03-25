@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections.abc import Iterable
 from typing import TYPE_CHECKING
 
 from django.db import models
@@ -448,7 +447,7 @@ def can_refresh_order(user: AnyUser, payment_order: PaymentOrder | None) -> bool
     return user.uuid == payment_order.reservation_user_uuid
 
 
-def can_create_staff_reservation(user: AnyUser, reservation_unit: Iterable[ReservationUnit]):
+def can_create_staff_reservation(user: AnyUser, units: list[int]) -> bool:
     from spaces.models import ServiceSector
 
     permission = "can_create_staff_reservations"
@@ -460,7 +459,6 @@ def can_create_staff_reservation(user: AnyUser, reservation_unit: Iterable[Reser
     if has_general_permission(user, permission):
         return True
 
-    units: list[int] = [r.unit_id for r in reservation_unit]
     if has_unit_permission(user, permission, units):
         return True
 

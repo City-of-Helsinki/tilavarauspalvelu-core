@@ -3,10 +3,9 @@ from django.utils.timezone import localtime
 from drf_extra_fields.relations import PresentablePrimaryKeyRelatedField
 from rest_framework import serializers
 
-from api.graphql.types.resources.serializers import ResourceSerializer
-from api.graphql.types.units.serializers import UnitSerializer
 from reservation_units.models import Equipment, Purpose, ReservationUnit, ReservationUnitImage, ReservationUnitType
 from reservations.models import AgeGroup, RecurringReservation, Reservation
+from resources.models import Resource
 from services.models import Service
 from spaces.models import Building, Location, Space, Unit
 
@@ -179,6 +178,60 @@ class ReservationUnitTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReservationUnitType
         fields = ["id", "name"]
+
+
+class UnitSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Unit
+        fields = [
+            "id",
+            "tprek_id",
+            "name",
+            "description",
+            "short_description",
+            "web_page",
+            "email",
+            "phone",
+        ]
+        extra_kwargs = {
+            "name": {
+                "help_text": "Name of the unit.",
+            },
+        }
+
+
+class ResourceSerializer(OldTranslatedModelSerializer):
+    space_id = serializers.PrimaryKeyRelatedField(
+        queryset=Space.objects.all(),
+        source="space",
+        help_text="Id of related space for this resource.",
+    )
+
+    class Meta:
+        model = Resource
+        fields = [
+            "id",
+            "location_type",
+            "name",
+            "space_id",
+            "buffer_time_before",
+            "buffer_time_after",
+        ]
+        extra_kwargs = {
+            "name": {
+                "help_text": "State of the reservation. Default is 'created'.",
+            },
+            "location_type": {
+                "help_text": "Priority of this reservation. Higher priority reservations replaces lower ones.",
+            },
+            "buffer_time_before": {
+                "help_text": "Buffer time while reservation unit is unreservable after the reservation. "
+                "Dynamically calculated from spaces and resources.",
+            },
+            "buffer_time_after": {
+                "help_text": "Begin date and time of the reservation.",
+            },
+        }
 
 
 class ReservationUnitSerializer(OldTranslatedModelSerializer):
