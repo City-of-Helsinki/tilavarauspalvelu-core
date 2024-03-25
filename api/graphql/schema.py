@@ -4,94 +4,53 @@ from typing import Any
 import graphene
 from django.conf import settings
 from django.db import models
-from graphene import Field, relay
+from graphene import Field
 from graphene_django.debug import DjangoDebug
 from query_optimizer import DjangoListField
 from rest_framework.generics import get_object_or_404
 
-from api.graphql.extensions.permission_helpers import check_resolver_permission
-from api.graphql.types.equipment.field import EquipmentFilter
-from api.graphql.types.equipment.permissions import EquipmentPermission
-from api.graphql.types.equipment_category.field import EquipmentCategoryFilter
-from api.graphql.types.equipment_category.permissions import EquipmentCategoryPermission
-from api.graphql.types.keyword.field import KeywordFilter
-from api.graphql.types.merchants.permissions import PaymentOrderPermission
-from api.graphql.types.purpose.field import PurposeFilter
-from api.graphql.types.qualifier.field import QualifierFilter
-from api.graphql.types.recurring_reservation.fields import RecurringReservationsFilter
-from api.graphql.types.recurring_reservation.filtersets import RecurringReservationFilterSet
-from api.graphql.types.reservation_unit_cancellation_rule.field import ReservationUnitCancellationRulesFilter
-from api.graphql.types.reservations.fields import (
-    AgeGroupFilter,
-    ReservationCancelReasonFilter,
-    ReservationDenyReasonFilter,
-    ReservationMetadataSetFilter,
-    ReservationPurposeFilter,
-    ReservationsFilter,
-)
-from api.graphql.types.reservations.filtersets import ReservationFilterSet
-from api.graphql.types.reservations.permissions import ReservationPermission
-from api.graphql.types.resources.fields import ResourcesFilter
-from api.graphql.types.resources.filtersets import ResourceFilterSet
-from api.graphql.types.resources.permissions import ResourcePermission
-from api.graphql.types.spaces.fields import ServiceSectorFilter, SpacesFilter
-from api.graphql.types.spaces.filtersets import SpaceFilterSet
-from api.graphql.types.spaces.permissions import SpacePermission
-from api.graphql.types.tax_percentage.field import TaxPercentageFilter
-from api.graphql.types.terms_of_use.fields import TermsOfUseFilter
-from api.graphql.types.units.fields import UnitsFilter
-from api.graphql.types.units.filtersets import UnitsFilterSet
-from api.graphql.types.units.permissions import UnitPermission
-from api.graphql.types.users.permissions import UserPermission
 from applications.models import AllocatedTimeSlot
 from common.models import BannerNotification
 from common.typing import GQLInfo
 from merchants.models import PaymentOrder
-from permissions.helpers import can_handle_reservation, can_manage_banner_notifications
-from reservation_units.models import Equipment, EquipmentCategory
-from reservations.models import Reservation
-from resources.models import Resource
-from spaces.models import Space, Unit
+from permissions.helpers import can_manage_banner_notifications
 from users.models import User
-
-from .types.equipment.filtersets import EquipmentFilterSet
-from .types.purpose.filtersets import PurposeFilterSet
 
 # NOTE: Queries __need__ to be imported before mutations, see mutations.py!
 from .queries import (  # isort:skip
-    AgeGroupType,
     AllocatedTimeSlotNode,
     ApplicationNode,
     ApplicationRoundNode,
     ApplicationSectionNode,
     BannerNotificationNode,
     CityNode,
-    EquipmentCategoryType,
-    EquipmentType,
-    KeywordCategoryType,
-    KeywordGroupType,
-    KeywordType,
-    PaymentOrderType,
-    PurposeType,
-    QualifierType,
-    RecurringReservationType,
-    ReservationCancelReasonType,
-    ReservationDenyReasonType,
-    ReservationMetadataSetType,
-    ReservationPurposeType,
-    ReservationType,
-    ReservationUnitCancellationRuleType,
+    EquipmentCategoryNode,
+    EquipmentNode,
+    KeywordCategoryNode,
+    KeywordGroupNode,
+    KeywordNode,
+    PaymentOrderNode,
+    PurposeNode,
+    QualifierNode,
+    ReservationNode,
+    ReservationUnitCancellationRuleNode,
     ReservationUnitNode,
     ReservationUnitTypeNode,
-    ResourceType,
-    SpaceType,
+    ResourceNode,
+    SpaceNode,
     TaxPercentageNode,
-    TermsOfUseType,
-    UnitByPkType,
-    UnitType,
-    UserType,
+    TermsOfUseNode,
+    UnitNode,
+    UserNode,
+    AgeGroupNode,
+    RecurringReservationNode,
+    ReservationCancelReasonNode,
+    ReservationDenyReasonNode,
+    ReservationMetadataSetNode,
+    ReservationPurposeNode,
+    ServiceSectorNode,
 )
-from .types.service_sector.types import ServiceSectorType
+from .types.merchants.permissions import PaymentOrderPermission
 
 from .mutations import (  # isort:skip
     AllocatedTimeSlotCreateMutation,
@@ -149,13 +108,14 @@ from .mutations import (  # isort:skip
 
 
 class Query(graphene.ObjectType):
-    application_rounds = ApplicationRoundNode.Connection()
+    #
+    # Seasonal booking
     application_round = ApplicationRoundNode.Node()
-    applications = ApplicationNode.Connection()
+    application_rounds = ApplicationRoundNode.Connection()
     application = ApplicationNode.Node()
+    applications = ApplicationNode.Connection()
     application_sections = ApplicationSectionNode.Connection()
     allocated_time_slots = AllocatedTimeSlotNode.Connection()
-
     affecting_allocated_time_slots = DjangoListField(
         AllocatedTimeSlotNode,
         reservation_unit=graphene.NonNull(graphene.Int),
@@ -167,117 +127,64 @@ class Query(graphene.ObjectType):
         ),
         no_filters=True,
     )
-
-    reservations = ReservationsFilter(ReservationType, filterset_class=ReservationFilterSet)
-    reservation = relay.Node.Field(ReservationType)
-    reservation_by_pk = Field(ReservationType, pk=graphene.Int())
-
-    recurring_reservations = RecurringReservationsFilter(
-        RecurringReservationType, filterset_class=RecurringReservationFilterSet
-    )
-
-    reservation_cancel_reasons = ReservationCancelReasonFilter(ReservationCancelReasonType)
-
-    reservation_deny_reasons = ReservationDenyReasonFilter(ReservationDenyReasonType)
-
+    #
+    # Reservable entities
+    unit = UnitNode.Node()
+    units = UnitNode.Connection()
+    resource = ResourceNode.Node()
+    resources = ResourceNode.Connection()
+    space = SpaceNode.Node()
+    spaces = SpaceNode.Connection()
+    equipment = EquipmentNode.Node()
+    equipments = EquipmentNode.Connection()
+    equipment_category = EquipmentCategoryNode.Node()
+    equipment_categories = EquipmentCategoryNode.Connection()
+    #
+    # Reservation units
     reservation_unit = ReservationUnitNode.Node()
     reservation_units = ReservationUnitNode.Connection()
     reservation_unit_types = ReservationUnitTypeNode.Connection()
-
-    reservation_unit_cancellation_rules = ReservationUnitCancellationRulesFilter(ReservationUnitCancellationRuleType)
-
-    resources = ResourcesFilter(ResourceType, filterset_class=ResourceFilterSet)
-    resource = relay.Node.Field(ResourceType)
-    resource_by_pk = Field(ResourceType, pk=graphene.Int())
-
-    equipments = EquipmentFilter(EquipmentType, filterset_class=EquipmentFilterSet)
-    equipment = relay.Node.Field(EquipmentType)
-    equipment_by_pk = Field(EquipmentType, pk=graphene.Int())
-
-    equipment_categories = EquipmentCategoryFilter(EquipmentCategoryType)
-    equipment_category = relay.Node.Field(EquipmentCategoryType)
-    equipment_category_by_pk = Field(EquipmentCategoryType, pk=graphene.Int())
-
-    spaces = SpacesFilter(SpaceType, filterset_class=SpaceFilterSet)
-    space = relay.Node.Field(SpaceType)
-    space_by_pk = Field(SpaceType, pk=graphene.Int())
-    service_sectors = ServiceSectorFilter(ServiceSectorType)
-
-    units = UnitsFilter(UnitType, filterset_class=UnitsFilterSet)
-    unit = relay.Node.Field(UnitType)
-    unit_by_pk = Field(UnitByPkType, pk=graphene.Int())
-
-    current_user = Field(UserType)
-    user = Field(UserType, pk=graphene.Int())
-
-    keyword_categories = KeywordFilter(KeywordCategoryType)
-    keyword_groups = KeywordFilter(KeywordGroupType)
-    keywords = KeywordFilter(KeywordType)
-
-    purposes = PurposeFilter(PurposeType, filterset_class=PurposeFilterSet)
-    qualifiers = QualifierFilter(QualifierType)
-    reservation_purposes = ReservationPurposeFilter(ReservationPurposeType)
-
-    terms_of_use = TermsOfUseFilter(TermsOfUseType)
-    tax_percentages = TaxPercentageFilter(TaxPercentageNode)
-    age_groups = AgeGroupFilter(AgeGroupType)
+    reservation_unit_cancellation_rules = ReservationUnitCancellationRuleNode.Connection()
+    tax_percentages = TaxPercentageNode.Connection()
+    metadata_sets = ReservationMetadataSetNode.Connection()
+    purposes = PurposeNode.Connection()
+    qualifiers = QualifierNode.Connection()
+    keyword_categories = KeywordCategoryNode.Connection()
+    keyword_groups = KeywordGroupNode.Connection()
+    keywords = KeywordNode.Connection()
+    #
+    # Reservations
+    reservation = ReservationNode.Node()
+    reservations = ReservationNode.Connection()
+    recurring_reservations = RecurringReservationNode.Connection()
+    reservation_cancel_reasons = ReservationCancelReasonNode.Connection()
+    reservation_deny_reasons = ReservationDenyReasonNode.Connection()
+    reservation_purposes = ReservationPurposeNode.Connection()
+    age_groups = AgeGroupNode.Connection()
     cities = CityNode.Connection()
-    metadata_sets = ReservationMetadataSetFilter(ReservationMetadataSetType)
-
-    order = Field(PaymentOrderType, order_uuid=graphene.String())
-
+    order = Field(PaymentOrderNode, order_uuid=graphene.String(required=True))
+    #
+    # User
+    user = UserNode.Node()
+    current_user = UserNode.Field()
+    #
+    # Misc.
+    terms_of_use = TermsOfUseNode.Connection()
     banner_notification = BannerNotificationNode.Node()
     banner_notifications = BannerNotificationNode.Connection()
-
+    service_sectors = ServiceSectorNode.Connection()
+    #
+    # Debug
     if "graphiql_debug_toolbar" in settings.INSTALLED_APPS:
         debug = Field(DjangoDebug, name="_debug")
 
-    def resolve_current_user(self: None, info: GQLInfo, **kwargs: Any):
+    def resolve_current_user(root: None, info: GQLInfo, **kwargs: Any):
         return get_object_or_404(User, pk=info.context.user.pk)
 
-    @check_resolver_permission(UserPermission, raise_permission_error=True)
-    def resolve_user(self: None, info: GQLInfo, **kwargs: Any):
-        pk = kwargs.get("pk")
-        return get_object_or_404(User, pk=pk)
-
-    @check_resolver_permission(ReservationPermission)
-    def resolve_reservation_by_pk(self: None, info: GQLInfo, **kwargs: Any):
-        pk = kwargs.get("pk")
-        return get_object_or_404(Reservation, pk=pk)
-
-    @check_resolver_permission(ResourcePermission)
-    def resolve_resource_by_pk(self: None, info: GQLInfo, **kwargs: Any):
-        pk = kwargs.get("pk")
-        return get_object_or_404(Resource, pk=pk)
-
-    @check_resolver_permission(UnitPermission)
-    def resolve_unit_by_pk(self: None, info: GQLInfo, **kwargs: Any):
-        pk = kwargs.get("pk")
-        return get_object_or_404(Unit, pk=pk)
-
-    @check_resolver_permission(SpacePermission)
-    def resolve_space_by_pk(self: None, info: GQLInfo, **kwargs: Any):
-        pk = kwargs.get("pk")
-        return get_object_or_404(Space, pk=pk)
-
-    @check_resolver_permission(EquipmentPermission)
-    def resolve_equipment_by_pk(self: None, info: GQLInfo, **kwargs: Any):
-        pk = kwargs.get("pk")
-        return get_object_or_404(Equipment, pk=pk)
-
-    @check_resolver_permission(EquipmentCategoryPermission)
-    def resolve_equipment_category_by_pk(self: None, info: GQLInfo, **kwargs: Any):
-        pk = kwargs.get("pk")
-        return get_object_or_404(EquipmentCategory, pk=pk)
-
-    @check_resolver_permission(PaymentOrderPermission)
-    def resolve_order(self: None, info: GQLInfo, **kwargs: Any):
-        remote_id = kwargs.get("order_uuid")
+    def resolve_order(root: None, info: GQLInfo, **kwargs: Any):
+        remote_id: str = kwargs["order_uuid"]
         order = get_object_or_404(PaymentOrder, remote_id=remote_id)
-        if (
-            can_handle_reservation(info.context.user, order.reservation)
-            or order.reservation.user_id == info.context.user.id
-        ):
+        if PaymentOrderPermission.has_node_permission(order, info.context.user, {}):
             return order
         return None
 
@@ -300,23 +207,44 @@ class Query(graphene.ObjectType):
 
 
 class Mutation(graphene.ObjectType):
+    #
+    # Seasonal booking
     create_application = ApplicationCreateMutation.Field()
     update_application = ApplicationUpdateMutation.Field()
     send_application = ApplicationSendMutation.Field()
     cancel_application = ApplicationCancelMutation.Field()
-
     create_application_section = ApplicationSectionCreateMutation.Field()
     update_application_section = ApplicationSectionUpdateMutation.Field()
     delete_application_section = ApplicationSectionDeleteMutation.Field()
-
     create_allocated_timeslot = AllocatedTimeSlotCreateMutation.Field()
     delete_allocated_timeslot = AllocatedTimeSlotDeleteMutation.Field()
-
     update_reservation_unit_option = ReservationUnitOptionUpdateMutation.Field()
-
-    create_recurring_reservation = RecurringReservationCreateMutation.Field()
-    update_recurring_reservation = RecurringReservationUpdateMutation.Field()
-
+    #
+    # Reservable entities
+    update_unit = UnitUpdateMutation.Field()
+    create_resource = ResourceCreateMutation.Field()
+    update_resource = ResourceUpdateMutation.Field()
+    delete_resource = ResourceDeleteMutation.Field()
+    create_space = SpaceCreateMutation.Field()
+    update_space = SpaceUpdateMutation.Field()
+    delete_space = SpaceDeleteMutation.Field()
+    create_equipment = EquipmentCreateMutation.Field()
+    update_equipment = EquipmentUpdateMutation.Field()
+    delete_equipment = EquipmentDeleteMutation.Field()
+    create_equipment_category = EquipmentCategoryCreateMutation.Field()
+    update_equipment_category = EquipmentCategoryUpdateMutation.Field()
+    delete_equipment_category = EquipmentCategoryDeleteMutation.Field()
+    #
+    # Reservation unit
+    create_reservation_unit = ReservationUnitCreateMutation.Field()
+    update_reservation_unit = ReservationUnitUpdateMutation.Field()
+    create_reservation_unit_image = ReservationUnitImageCreateMutation.Field()
+    update_reservation_unit_image = ReservationUnitImageUpdateMutation.Field()
+    delete_reservation_unit_image = ReservationUnitImageDeleteMutation.Field()
+    create_purpose = PurposeCreateMutation.Field()
+    update_purpose = PurposeUpdateMutation.Field()
+    #
+    # Reservations
     create_reservation = ReservationCreateMutation.Field()
     create_staff_reservation = ReservationStaffCreateMutation.Field()
     update_reservation = ReservationUpdateMutation.Field()
@@ -331,39 +259,14 @@ class Mutation(graphene.ObjectType):
     adjust_reservation_time = ReservationAdjustTimeMutation.Field()
     staff_adjust_reservation_time = ReservationStaffAdjustTimeMutation.Field()
     staff_reservation_modify = ReservationStaffModifyMutation.Field()
-
-    create_reservation_unit = ReservationUnitCreateMutation.Field()
-    update_reservation_unit = ReservationUnitUpdateMutation.Field()
-
-    create_reservation_unit_image = ReservationUnitImageCreateMutation.Field()
-    update_reservation_unit_image = ReservationUnitImageUpdateMutation.Field()
-    delete_reservation_unit_image = ReservationUnitImageDeleteMutation.Field()
-
-    create_purpose = PurposeCreateMutation.Field()
-    update_purpose = PurposeUpdateMutation.Field()
-
-    create_equipment = EquipmentCreateMutation.Field()
-    update_equipment = EquipmentUpdateMutation.Field()
-    delete_equipment = EquipmentDeleteMutation.Field()
-
-    create_equipment_category = EquipmentCategoryCreateMutation.Field()
-    update_equipment_category = EquipmentCategoryUpdateMutation.Field()
-    delete_equipment_category = EquipmentCategoryDeleteMutation.Field()
-
-    create_space = SpaceCreateMutation.Field()
-    update_space = SpaceUpdateMutation.Field()
-    delete_space = SpaceDeleteMutation.Field()
-
-    create_resource = ResourceCreateMutation.Field()
-    update_resource = ResourceUpdateMutation.Field()
-    delete_resource = ResourceDeleteMutation.Field()
-
-    update_unit = UnitUpdateMutation.Field()
-
-    update_user = UserUpdateMutation.Field()
-
+    create_recurring_reservation = RecurringReservationCreateMutation.Field()
+    update_recurring_reservation = RecurringReservationUpdateMutation.Field()
     refresh_order = RefreshOrderMutation.Field()
-
+    #
+    # User
+    update_user = UserUpdateMutation.Field()
+    #
+    # Misc.
     create_banner_notification = BannerNotificationCreateMutation.Field()
     update_banner_notification = BannerNotificationUpdateMutation.Field()
     delete_banner_notification = BannerNotificationDeleteMutation.Field()
