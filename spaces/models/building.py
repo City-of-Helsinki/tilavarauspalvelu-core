@@ -23,6 +23,11 @@ class Building(models.Model):
         blank=True,
     )
 
+    # Translated field hints
+    name_fi: str | None
+    name_en: str | None
+    name_sv: str | None
+
     class Meta:
         db_table = "building"
         base_manager_name = "objects"

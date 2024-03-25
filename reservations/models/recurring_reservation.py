@@ -69,12 +69,18 @@ class RecurringReservation(models.Model):
     class Meta:
         db_table = "recurring_reservation"
         base_manager_name = "objects"
+        ordering = [
+            "begin_date",
+            "begin_time",
+            "reservation_unit",
+        ]
 
     def __str__(self) -> str:
         return f"{self.name}"
 
     @property
-    def denied_reservations(self):
+    def denied_reservations(self):  # DEPRECATED
+        """Used in `api.legacy_rest_api.serializers.RecurringReservationSerializer`"""
         # Avoid a query to the database if we have fetched list already
         if "reservations" in self._prefetched_objects_cache:
             return [
@@ -84,9 +90,3 @@ class RecurringReservation(models.Model):
             ]
 
         return self.reservations.filter(state=ReservationStateChoice.DENIED)
-
-    @property
-    def weekday_list(self):
-        if self.weekdays:
-            return [int(i) for i in self.weekdays.split(",")]
-        return []

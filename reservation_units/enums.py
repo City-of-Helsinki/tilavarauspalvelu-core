@@ -88,3 +88,10 @@ class PricingStatus(models.TextChoices):
 class AuthenticationType(models.TextChoices):
     WEAK = "weak", _("Weak")
     STRONG = "strong", _("Strong")
+
+
+class ReservationUnitImageType(models.TextChoices):
+    MAIN = "main", _("Main image")
+    GROUND_PLAN = "ground_plan", _("Ground plan")
+    MAP = "map", _("Map")
+    OTHER = "other", _("Other")
