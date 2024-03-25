@@ -7,12 +7,12 @@ from django.db.models import QuerySet, Sum
 from django.utils.timezone import get_default_timezone
 from graphene_django_extensions import DjangoNode
 from graphql import GraphQLError
-from query_optimizer import required_annotations
+from query_optimizer import AnnotatedField
 
-from api.graphql.types.location.types import LocationType
+from api.graphql.types.location.types import LocationNode
+from api.graphql.types.reservation.types import ReservationNode
 from api.graphql.types.reservation_unit.filtersets import ReservationUnitFilterSet
 from api.graphql.types.reservation_unit.permissions import ReservationUnitPermission
-from api.graphql.types.reservations.types import ReservationType
 from common.date_utils import local_end_of_day, local_start_of_day
 from common.typing import GQLInfo
 from merchants.models import PaymentMerchant
@@ -42,7 +42,7 @@ class ReservationUnitNode(DjangoNode):
     state = graphene.Field(graphene.Enum.from_enum(ReservationUnitState))
     reservation_state = graphene.Field(graphene.Enum.from_enum(ReservationState))
 
-    location = graphene.Field(LocationType)
+    location = graphene.Field(LocationNode)
 
     is_closed = graphene.Boolean()
     first_reservable_datetime = graphene.DateTime()
@@ -56,12 +56,14 @@ class ReservationUnitNode(DjangoNode):
     )
 
     reservations = graphene.List(
-        ReservationType,
+        ReservationNode,
         from_=graphene.Date(name="from"),
         to=graphene.Date(),
         state=graphene.List(graphene.String),
         include_with_same_components=graphene.Boolean(),
     )
+
+    calculated_surface_area = AnnotatedField(graphene.Int, expression=Sum("surface_area"))
 
     class Meta:
         model = ReservationUnit
@@ -83,6 +85,7 @@ class ReservationUnitNode(DjangoNode):
             #
             # Integers
             "surface_area",
+            "calculated_surface_area",
             "min_persons",
             "max_persons",
             "max_reservations_per_user",
@@ -182,12 +185,6 @@ class ReservationUnitNode(DjangoNode):
 
     def resolve_location(root: ReservationUnit, info: GQLInfo) -> Location:
         return root.actions.get_location()
-
-    @required_annotations(calculated_surface_area=Sum("surface_area"))
-    def resolve_surface_area(root: ReservationUnit, info: GQLInfo) -> int | None:
-        if root.surface_area is not None:
-            return root.surface_area
-        return getattr(root, "calculated_surface_area", None)
 
     def resolve_payment_merchant(root: ReservationUnit, info: GQLInfo) -> PaymentMerchant | None:
         if root.payment_merchant is not None:

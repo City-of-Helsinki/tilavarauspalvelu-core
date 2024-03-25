@@ -1,18 +1,20 @@
-import graphene
-from graphene_permissions.mixins import AuthNode
+from graphene_django_extensions import DjangoNode
 
-from api.graphql.extensions.base_types import TVPBaseConnection
-from api.graphql.extensions.legacy_helpers import OldPrimaryKeyObjectType, get_all_translatable_fields
+from api.graphql.types.qualifier.filtersets import QualifierFilterSet
 from api.graphql.types.qualifier.permissions import QualifierPermission
 from reservation_units.models import Qualifier
 
+__all__ = [
+    "QualifierNode",
+]
 
-class QualifierType(AuthNode, OldPrimaryKeyObjectType):
-    permission_classes = (QualifierPermission,)
 
+class QualifierNode(DjangoNode):
     class Meta:
         model = Qualifier
-        fields = ["pk", *get_all_translatable_fields(model)]
-        filter_fields = ["name_fi", "name_en", "name_sv"]
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
+        fields = [
+            "pk",
+            "name",
+        ]
+        filterset_class = QualifierFilterSet
+        permission_classes = [QualifierPermission]

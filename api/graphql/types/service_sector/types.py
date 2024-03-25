@@ -1,14 +1,19 @@
-import graphene
+from graphene_django_extensions import DjangoNode
 
-from api.graphql.extensions.base_types import TVPBaseConnection
-from api.graphql.extensions.legacy_helpers import OldPrimaryKeyObjectType, get_all_translatable_fields
 from spaces.models import ServiceSector
 
+from .permissions import ServiceSectorPermission
 
-class ServiceSectorType(OldPrimaryKeyObjectType):
+__all__ = [
+    "ServiceSectorNode",
+]
+
+
+class ServiceSectorNode(DjangoNode):
     class Meta:
         model = ServiceSector
-        fields = ["id", *get_all_translatable_fields(model)]
-        filter_fields = []
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
+        fields = [
+            "pk",
+            "name",
+        ]
+        permission_classes = [ServiceSectorPermission]

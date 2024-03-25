@@ -1,16 +1,15 @@
-import graphene
-from graphene_permissions.mixins import AuthNode
+from graphene_django_extensions import DjangoNode
 
-from api.graphql.extensions.base_types import TVPBaseConnection
-from api.graphql.extensions.legacy_helpers import OldPrimaryKeyObjectType
 from reservation_units.models import ReservationUnitPaymentType
 
+__all__ = [
+    "ReservationUnitPaymentTypeNode",
+]
 
-class ReservationUnitPaymentTypeType(AuthNode, OldPrimaryKeyObjectType):
-    code = graphene.Field(graphene.String)
 
+class ReservationUnitPaymentTypeNode(DjangoNode):
     class Meta:
         model = ReservationUnitPaymentType
-        fields = ["code"]
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
+        fields = [
+            "code",
+        ]

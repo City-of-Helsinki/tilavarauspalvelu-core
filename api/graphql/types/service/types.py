@@ -2,6 +2,8 @@ from graphene_django_extensions import DjangoNode
 
 from services.models import Service
 
+from .permissions import ServicePermission
+
 __all__ = [
     "ServiceNode",
 ]
@@ -17,3 +19,4 @@ class ServiceNode(DjangoNode):
             "buffer_time_before",
             "buffer_time_after",
         ]
+        permission_classes = [ServicePermission]
