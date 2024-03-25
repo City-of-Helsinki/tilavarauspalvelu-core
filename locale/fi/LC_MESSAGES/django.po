@@ -19,11 +19,11 @@ msgstr "Käyttäjällä on käsittelemätön hakemus."
 msgid "User has open payments."
 msgstr "Käyttäjällä on avoimia maksuja."
 
-#: api/graphql/extensions/duration_field.py
+#: api/graphql/extensions/fields.py
 msgid "A valid integer is required."
 msgstr "Syötä oikea kokonaisluku."
 
-#: api/graphql/extensions/legacy_helpers.py
+#: api/graphql/extensions/fields.py
 #, python-format
 msgid ""
 "Choice \"%(choice)s\" is not allowed. Allowed choices are: "
@@ -1551,6 +1551,23 @@ msgstr ""
 "Saa luoda, muokata ja poistaa järjestelmäilmoituksia koko järjestelmässä"
 
 #: permissions/models.py
+#: reservation_units/models/reservation_unit_payment_type.py
+msgid "Code"
+msgstr "Koodi"
+
+#: permissions/models.py
+msgid "Verbose name"
+msgstr "Näyttönimi"
+
+#: permissions/models.py
+msgid "Role"
+msgstr "Rooli"
+
+#: permissions/models.py
+msgid "Permission"
+msgstr "Oikeus"
+
+#: permissions/models.py
 msgid "Can modify roles for the unit"
 msgstr "Saa muokata yksikön rooleja"
 
@@ -1565,10 +1582,6 @@ msgstr "Saa luoda, muokata ja perua varauksia yksikössä"
 #: permissions/models.py
 msgid "Can view details of all reservations in the unit"
 msgstr "Saa tarkastella kaikkien varauksien tietoja yksikössä"
-
-#: permissions/models.py
-msgid "Can allocate applications"
-msgstr "Saa allokoida kausivaraushakemuksia"
 
 #: permissions/models.py
 msgid "Can validate applications in the unit"
@@ -1601,6 +1614,14 @@ msgstr "Saa luoda henkilökunnan varauksia yksikössä"
 #: permissions/models.py
 msgid "Can comment reservations in the unit"
 msgstr "Saa kommentoida varauksia yksikössä"
+
+#: permissions/models.py
+msgid "Unit group"
+msgstr "Yksikköryhmä"
+
+#: permissions/models.py reservation_units/admin/forms/reservation_unit.py
+msgid "Unit"
+msgstr "Yksikkö"
 
 #: permissions/models.py
 msgid "Can modify roles for the service sector"
@@ -1657,31 +1678,6 @@ msgstr "Saa kommentoida varauksia palvelualueella"
 #: permissions/models.py
 msgid "Can edit unit information in the service sector"
 msgstr "Saa muokata yksiköiden tietoja palvelualueella"
-
-#: permissions/models.py
-#: reservation_units/models/reservation_unit_payment_type.py
-msgid "Code"
-msgstr "Koodi"
-
-#: permissions/models.py
-msgid "Verbose name"
-msgstr "Näyttönimi"
-
-#: permissions/models.py
-msgid "Role"
-msgstr "Rooli"
-
-#: permissions/models.py
-msgid "Permission"
-msgstr "Oikeus"
-
-#: permissions/models.py
-msgid "Unit group"
-msgstr "Yksikköryhmä"
-
-#: permissions/models.py reservation_units/admin/forms/reservation_unit.py
-msgid "Unit"
-msgstr "Yksikkö"
 
 #: reservation_units/admin/forms/application_round_time_slot.py
 msgid "Which weekday this timeslot concerns."
@@ -2388,7 +2384,7 @@ msgstr "Alennuksen haun syy"
 
 #: reservations/admin.py
 msgid "Reservee ID"
-msgstr "Varaajan tunniste"
+msgstr "Varaajan y-tunnus"
 
 #: reservations/admin.py
 msgid "Reservee first name"
@@ -2512,11 +2508,11 @@ msgstr "Muistio henkilökunnalle"
 
 #: reservations/admin.py
 msgid "Reservation begin date and time"
-msgstr "Varauksen alkamispäivä"
+msgstr "Varauksen alkamishetki"
 
 #: reservations/admin.py
 msgid "Reservation end date and time"
-msgstr "Varauksen loppumispäivä"
+msgstr "Varauksen loppumishetki"
 
 #: reservations/admin.py
 msgid "When this reservation was handled"
@@ -2564,7 +2560,7 @@ msgstr "Syy alennuskelpoisuuden hakemiselle"
 
 #: reservations/admin.py
 msgid "Reservee's business or association identity code"
-msgstr "Varaaja yrityksen tai yhdistyksen tunnus"
+msgstr "Varaaja yrityksen tai yhdistyksen y-tunnus"
 
 #: reservations/admin.py
 msgid "Reservee's first name"
@@ -2619,8 +2615,8 @@ msgid "Purpose of the reservation"
 msgstr "Varauksen käyttötarkoitus"
 
 #: reservations/admin.py
-msgid "Home city of the group or association"
-msgstr "Yhdistyksen tai ryhmän kotikunta"
+msgid "Reservee's home city"
+msgstr "Varaajan kotikunta"
 
 #: reservations/admin.py
 msgid "Age group of the group or association"

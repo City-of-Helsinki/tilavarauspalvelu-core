@@ -197,7 +197,7 @@ class ReservationAdminForm(forms.ModelForm):
             "deny_reason": _("Reason for denying the reservation"),
             "cancel_reason": _("Reason for cancelling the reservation"),
             "purpose": _("Purpose of the reservation"),
-            "home_city": _("Home city of the group or association"),
+            "home_city": _("Reservee's home city"),
             "age_group": _("Age group of the group or association"),
         }
 
