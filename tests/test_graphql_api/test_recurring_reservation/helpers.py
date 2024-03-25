@@ -2,20 +2,14 @@ import datetime
 from functools import partial
 from typing import Any
 
+from graphene_django_extensions.testing import build_mutation, build_query
+
 from reservation_units.models import ReservationUnit
-from tests.gql_builders import build_mutation, build_query
 
-recurring_reservations_query = partial(build_query, "recurringReservations", connection=True, order_by="name")
+recurring_reservations_query = partial(build_query, "recurringReservations", connection=True, order_by="nameAsc")
 
-CREATE_MUTATION = build_mutation(
-    "createRecurringReservation",
-    "RecurringReservationCreateMutationInput",
-)
-
-UPDATE_MUTATION = build_mutation(
-    "updateRecurringReservation",
-    "RecurringReservationUpdateMutationInput",
-)
+CREATE_MUTATION = build_mutation("createRecurringReservation", "RecurringReservationCreateMutation")
+UPDATE_MUTATION = build_mutation("updateRecurringReservation", "RecurringReservationUpdateMutation")
 
 
 def get_minimal_create_date(reservation_unit: ReservationUnit) -> dict[str, Any]:
@@ -26,5 +20,5 @@ def get_minimal_create_date(reservation_unit: ReservationUnit) -> dict[str, Any]
         "beginTime": datetime.time(10, 0, 0).isoformat(),
         "endTime": datetime.time(12, 0, 0).isoformat(),
         "recurrenceInDays": 7,
-        "reservationUnitPk": reservation_unit.pk,
+        "reservationUnit": reservation_unit.pk,
     }

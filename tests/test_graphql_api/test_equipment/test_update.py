@@ -14,7 +14,7 @@ pytestmark = [
 def test_equipment__update(graphql):
     equipment = EquipmentFactory.create(name="foo")
 
-    data = {"pk": equipment.pk, "nameFi": "bar", "categoryPk": equipment.category.pk}
+    data = {"pk": equipment.pk, "nameFi": "bar", "category": equipment.category.pk}
 
     graphql.login_user_based_on_type(UserType.SUPERUSER)
     response = graphql(UPDATE_MUTATION, input_data=data)

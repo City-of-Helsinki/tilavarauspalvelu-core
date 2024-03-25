@@ -4,10 +4,10 @@ from typing import NamedTuple
 import pytest
 from django.utils import timezone
 from freezegun import freeze_time
+from graphene_django_extensions.testing import parametrize_helper
 
 from common.choices import BannerNotificationLevel, BannerNotificationTarget
 from tests.factories import BannerNotificationFactory, UserFactory
-from tests.helpers import parametrize_helper
 
 # Applied to all tests
 pytestmark = [
@@ -24,7 +24,7 @@ class OrderingParams(NamedTuple):
     **parametrize_helper(
         {
             "Ascending order": OrderingParams(
-                order_by="state",
+                order_by="stateAsc",
                 expected=[
                     {"node": {"message": "2", "state": "ACTIVE"}},
                     {"node": {"message": "3", "state": "SCHEDULED"}},
@@ -33,7 +33,7 @@ class OrderingParams(NamedTuple):
                 ],
             ),
             "Descending order": OrderingParams(
-                order_by="-state",
+                order_by="stateDesc",
                 expected=[
                     {"node": {"message": "4", "state": "DRAFT"}},
                     {"node": {"message": "1", "state": "DRAFT"}},
@@ -73,7 +73,7 @@ def test_sort_banner_notifications_by_state(graphql, order_by, expected):
     response = graphql(
         f"""
         query {{
-          bannerNotifications(orderBy: "{order_by}") {{
+          bannerNotifications(orderBy: {order_by}) {{
             edges {{
               node {{
                 message
@@ -94,14 +94,14 @@ def test_sort_banner_notifications_by_state(graphql, order_by, expected):
     **parametrize_helper(
         {
             "Ascending order": OrderingParams(
-                order_by="name",
+                order_by="nameAsc",
                 expected=[
                     {"node": {"message": "2", "name": "bar"}},
                     {"node": {"message": "1", "name": "foo"}},
                 ],
             ),
             "Descending order": OrderingParams(
-                order_by="-name",
+                order_by="nameDesc",
                 expected=[
                     {"node": {"message": "1", "name": "foo"}},
                     {"node": {"message": "2", "name": "bar"}},
@@ -132,7 +132,7 @@ def test_sort_banner_notifications_by_name(graphql, order_by, expected):
     response = graphql(
         f"""
         query {{
-          bannerNotifications(orderBy: "{order_by}") {{
+          bannerNotifications(orderBy: {order_by}) {{
             edges {{
               node {{
                 message
@@ -153,7 +153,7 @@ def test_sort_banner_notifications_by_name(graphql, order_by, expected):
     **parametrize_helper(
         {
             "Ascending order": OrderingParams(
-                order_by="starts",
+                order_by="startsAsc",
                 expected=[
                     {"node": {"message": "2", "activeFrom": "2023-01-30T00:00:00+00:00"}},
                     {"node": {"message": "1", "activeFrom": "2023-01-31T00:00:00+00:00"}},
@@ -161,7 +161,7 @@ def test_sort_banner_notifications_by_name(graphql, order_by, expected):
                 ],
             ),
             "Descending order": OrderingParams(
-                order_by="-starts",
+                order_by="startsDesc",
                 expected=[
                     {"node": {"message": "3", "activeFrom": None}},
                     {"node": {"message": "1", "activeFrom": "2023-01-31T00:00:00+00:00"}},
@@ -200,7 +200,7 @@ def test_sort_banner_notifications_by_start_date(graphql, order_by, expected):
     response = graphql(
         f"""
         query {{
-          bannerNotifications(orderBy: "{order_by}") {{
+          bannerNotifications(orderBy: {order_by}) {{
             edges {{
               node {{
                 message
@@ -221,7 +221,7 @@ def test_sort_banner_notifications_by_start_date(graphql, order_by, expected):
     **parametrize_helper(
         {
             "Ascending order": OrderingParams(
-                order_by="ends",
+                order_by="endsAsc",
                 expected=[
                     {"node": {"message": "1", "activeUntil": "2023-02-02T00:00:00+00:00"}},
                     {"node": {"message": "2", "activeUntil": "2023-02-03T00:00:00+00:00"}},
@@ -229,7 +229,7 @@ def test_sort_banner_notifications_by_start_date(graphql, order_by, expected):
                 ],
             ),
             "Descending order": OrderingParams(
-                order_by="-ends",
+                order_by="endsDesc",
                 expected=[
                     {"node": {"message": "3", "activeUntil": None}},
                     {"node": {"message": "2", "activeUntil": "2023-02-03T00:00:00+00:00"}},
@@ -268,7 +268,7 @@ def test_sort_banner_notifications_by_end_date(graphql, order_by, expected):
     response = graphql(
         f"""
         query {{
-          bannerNotifications(orderBy: "{order_by}") {{
+          bannerNotifications(orderBy: {order_by}) {{
             edges {{
               node {{
                 message
@@ -289,7 +289,7 @@ def test_sort_banner_notifications_by_end_date(graphql, order_by, expected):
     **parametrize_helper(
         {
             "Ascending order": OrderingParams(
-                order_by="target",
+                order_by="targetAsc",
                 expected=[
                     {"node": {"message": "1", "target": "ALL"}},
                     {"node": {"message": "2", "target": "USER"}},
@@ -297,7 +297,7 @@ def test_sort_banner_notifications_by_end_date(graphql, order_by, expected):
                 ],
             ),
             "Descending order": OrderingParams(
-                order_by="-target",
+                order_by="targetDesc",
                 expected=[
                     {"node": {"message": "3", "target": "STAFF"}},
                     {"node": {"message": "2", "target": "USER"}},
@@ -331,7 +331,7 @@ def test_sort_banner_notifications_by_target(graphql, order_by, expected):
     response = graphql(
         f"""
         query {{
-          bannerNotifications(orderBy: "{order_by}") {{
+          bannerNotifications(orderBy: {order_by}) {{
             edges {{
               node {{
                 message
@@ -352,7 +352,7 @@ def test_sort_banner_notifications_by_target(graphql, order_by, expected):
     **parametrize_helper(
         {
             "Ascending order": OrderingParams(
-                order_by="level",
+                order_by="levelAsc",
                 expected=[
                     {"node": {"message": "3", "level": "EXCEPTION"}},
                     {"node": {"message": "2", "level": "WARNING"}},
@@ -360,7 +360,7 @@ def test_sort_banner_notifications_by_target(graphql, order_by, expected):
                 ],
             ),
             "Descending order": OrderingParams(
-                order_by="-level",
+                order_by="levelDesc",
                 expected=[
                     {"node": {"message": "1", "level": "NORMAL"}},
                     {"node": {"message": "2", "level": "WARNING"}},
@@ -394,7 +394,7 @@ def test_sort_banner_notifications_by_level(graphql, order_by, expected):
     response = graphql(
         f"""
         query {{
-          bannerNotifications(orderBy: "{order_by}") {{
+          bannerNotifications(orderBy: {order_by}) {{
             edges {{
               node {{
                 message

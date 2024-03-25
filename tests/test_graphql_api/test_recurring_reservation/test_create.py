@@ -23,8 +23,8 @@ def test_recurring_reservations__create__full_data(graphql):
     data = get_minimal_create_date(reservation_unit)
     data["name"] = "foo"
     data["description"] = "bar"
-    data["abilityGroupPk"] = ability_group.pk
-    data["ageGroupPk"] = age_group.pk
+    data["abilityGroup"] = ability_group.pk
+    data["ageGroup"] = age_group.pk
 
     response = graphql(CREATE_MUTATION, input_data=data)
 
@@ -80,9 +80,7 @@ def test_recurring_reservations__create__end_date_before_begin_date(graphql):
         "beginTime",
         "endTime",
         "endDate",
-        "reservationUnitPk",
-        "recurrenceInDays",
-        "weekdays",
+        "reservationUnit",
     ],
 )
 def test_recurring_reservations__create__missing_required_fields(graphql, field):

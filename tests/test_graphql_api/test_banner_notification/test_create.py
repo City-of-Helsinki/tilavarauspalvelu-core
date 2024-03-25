@@ -1,11 +1,11 @@
 from typing import Any, NamedTuple
 
 import pytest
+from graphene_django_extensions.testing import parametrize_helper
 
 from common.choices import BannerNotificationLevel, BannerNotificationTarget
 from common.models import BannerNotification
 from tests.factories import UserFactory
-from tests.helpers import parametrize_helper
 
 from .helpers import CREATE_MUTATION
 
@@ -59,14 +59,16 @@ def test_user_creates_draft_banner_notification_without_required_fields(graphql)
 
     # when:
     # - User tries to create a new banner notification with the given invalid data
-    response = graphql(CREATE_MUTATION, input_data={})
+    response = graphql(
+        CREATE_MUTATION,
+        input_data={
+            "name": "foo",
+        },
+    )
 
     # then:
     # - The response complains about the improper input
-    assert (
-        response.error_message()
-        == "Variable '$input' of required type 'BannerNotificationCreateMutationInput!' was not provided."
-    )
+    assert response.error_message().startswith("Variable '$input'")
 
 
 def test_user_creates_non_draft_banner_notification_without_required_fields(graphql):

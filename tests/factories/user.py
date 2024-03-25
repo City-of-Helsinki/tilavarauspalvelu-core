@@ -10,7 +10,7 @@ from django.conf import settings
 from django.utils.crypto import get_random_string
 from social_django.models import UserSocialAuth
 
-from permissions.models import GENERAL_PERMISSIONS, SERVICE_SECTOR_PERMISSIONS, UNIT_PERMISSIONS
+from permissions.models import GeneralPermissionChoices, ServiceSectorPermissionsChoices, UnitPermissionChoices
 from spaces.models import ServiceSector, Unit, UnitGroup
 from users.helauth.utils import IDToken
 from users.models import User
@@ -27,11 +27,6 @@ from .role import (
     UnitRoleFactory,
     UnitRolePermissionFactory,
 )
-
-_GENERAL_PERMISSIONS = {perm[0] for perm in GENERAL_PERMISSIONS}
-_SERVICE_SECTOR_PERMISSIONS = {perm[0] for perm in SERVICE_SECTOR_PERMISSIONS}
-_UNIT_PERMISSIONS = {perm[0] for perm in UNIT_PERMISSIONS}
-
 
 __all__ = [
     "UserFactory",
@@ -72,7 +67,7 @@ class UserFactory(GenericDjangoModelFactory[User]):
         code: str = "admin",
         **kwargs: Any,
     ) -> User:
-        diff = set(perms).difference(_GENERAL_PERMISSIONS)
+        diff = set(perms).difference(GeneralPermissionChoices.values)
         if diff:
             raise RuntimeError(f"Invalid perms: {diff}")
 
@@ -94,7 +89,7 @@ class UserFactory(GenericDjangoModelFactory[User]):
         code: str = "admin",
         **kwargs: Any,
     ) -> User:
-        diff = set(perms).difference(_SERVICE_SECTOR_PERMISSIONS)
+        diff = set(perms).difference(ServiceSectorPermissionsChoices.values)
         if diff:
             raise RuntimeError(f"Invalid perms: {diff}")
 
@@ -116,7 +111,7 @@ class UserFactory(GenericDjangoModelFactory[User]):
         code: str = "admin",
         **kwargs: Any,
     ) -> User:
-        diff = set(perms).difference(_UNIT_PERMISSIONS)
+        diff = set(perms).difference(UnitPermissionChoices.values)
         if diff:
             raise RuntimeError(f"Invalid perms: {diff}")
 
@@ -139,7 +134,7 @@ class UserFactory(GenericDjangoModelFactory[User]):
         code: str = "admin",
         **kwargs: Any,
     ) -> User:
-        diff = set(perms).difference(_UNIT_PERMISSIONS)
+        diff = set(perms).difference(UnitPermissionChoices.values)
         if diff:
             raise RuntimeError(f"Invalid perms: {diff}")
 

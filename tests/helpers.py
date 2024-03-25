@@ -1,30 +1,21 @@
 from collections.abc import Callable
 from enum import Enum, auto
 from functools import wraps
-from typing import Any, NamedTuple, ParamSpec, TypedDict, TypeVar
+from typing import Any, NamedTuple, ParamSpec, TypeVar
 from unittest import mock
 
-import pytest
 from django.contrib.auth import get_user_model
 from graphene_django_extensions.testing import GraphQLClient as BaseGraphQLClient
 
 __all__ = [
     "GraphQLClient",
-    "parametrize_helper",
     "ResponseMock",
     "UserType",
 ]
 
-from graphene_django_extensions.testing.client import GQLResponse
-
 TNamedTuple = TypeVar("TNamedTuple", bound=NamedTuple)
 
 User = get_user_model()
-
-
-class FieldError(TypedDict):
-    field: str
-    messages: list[str]
 
 
 class UserType(Enum):
@@ -33,32 +24,6 @@ class UserType(Enum):
     STAFF = auto()
     SUPERUSER = auto()
     NOTIFICATION_MANAGER = auto()
-
-
-def deprecated_field_error_messages(response: GQLResponse, field: str = "nonFieldErrors") -> list[str]:
-    # Support for old-style error messages in the GraphQL "data" layer:
-    # {
-    #    "data": {
-    #        "errors": ...  <-- Here
-    #    },
-    #    "errors": ...,  <-- Not here
-    # }
-    try:
-        data = response.first_query_object["errors"]
-    except (KeyError, TypeError):
-        pytest.fail(f"Field errors not found in response content: {response.json}")
-
-    for error in data or []:
-        if error.get("field") == field:
-            try:
-                return error["messages"]
-            except (KeyError, TypeError):
-                pytest.fail(f"Error message for field {field!r} not found in error: {error}")
-    raise pytest.fail(f"Error for field {field!r} not found in response content: {response.json}")
-
-
-def assert_query_count(self, count: int) -> None:
-    assert len(self.queries) == count, self.query_log
 
 
 class GraphQLClient(BaseGraphQLClient):
@@ -86,26 +51,6 @@ class GraphQLClient(BaseGraphQLClient):
             self.force_login(user)
 
         return user
-
-
-class ParametrizeArgs(TypedDict):
-    argnames: list[str]
-    argvalues: list[TNamedTuple]
-    ids: list[str]
-
-
-def parametrize_helper(__tests: dict[str, TNamedTuple], /) -> ParametrizeArgs:
-    """Construct parametrize input while setting test IDs."""
-    assert __tests, "I need some tests, please!"
-    values = list(__tests.values())
-    try:
-        return ParametrizeArgs(
-            argnames=list(values[0].__class__.__annotations__),
-            argvalues=values,
-            ids=list(__tests),
-        )
-    except Exception as error:
-        raise RuntimeError("Improper configuration. Did you use a NamedTuple for TNamedTuple?") from error
 
 
 class ResponseMock:

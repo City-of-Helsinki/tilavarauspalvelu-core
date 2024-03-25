@@ -4,6 +4,7 @@ from typing import NamedTuple
 
 import pytest
 from django.utils.timezone import get_default_timezone
+from graphene_django_extensions.testing import parametrize_helper
 
 from opening_hours.utils.time_span_element import TimeSpanElement
 from reservation_units.enums import ReservationStartInterval
@@ -14,7 +15,6 @@ from reservation_units.utils.first_reservable_time_helper import (
     ReservationUnitFirstReservableTimeHelper,
 )
 from tests.factories import OriginHaukiResourceFactory, ReservableTimeSpanFactory, ReservationUnitFactory
-from tests.helpers import parametrize_helper
 
 DEFAULT_TIMEZONE = get_default_timezone()
 

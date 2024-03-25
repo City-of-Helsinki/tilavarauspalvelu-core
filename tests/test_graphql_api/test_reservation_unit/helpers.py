@@ -45,15 +45,8 @@ __all__ = [
 reservation_unit_query = partial(build_query, "reservationUnit")
 reservation_units_query = partial(build_query, "reservationUnits", connection=True, order_by="pkAsc")
 
-CREATE_MUTATION = build_mutation(
-    "createReservationUnit",
-    "ReservationUnitCreateMutation",
-)
-
-UPDATE_MUTATION = build_mutation(
-    "updateReservationUnit",
-    "ReservationUnitUpdateMutation",
-)
+CREATE_MUTATION = build_mutation("createReservationUnit", "ReservationUnitCreateMutation")
+UPDATE_MUTATION = build_mutation("updateReservationUnit", "ReservationUnitUpdateMutation")
 
 
 def get_create_non_draft_input_data() -> dict[str, Any]:

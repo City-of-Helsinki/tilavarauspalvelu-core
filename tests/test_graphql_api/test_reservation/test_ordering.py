@@ -26,7 +26,7 @@ def test_reservation__order__by_reservation_unit_name__asc(graphql, lang):
     reservation_3 = ReservationFactory.create(reservation_unit=[res_unit_c])
 
     graphql.login_user_based_on_type(UserType.SUPERUSER)
-    query = reservations_query(order_by=f"reservation_unit_name_{lang}")
+    query = reservations_query(order_by=f"reservationUnitName{lang.capitalize()}Asc")
     response = graphql(query)
 
     assert response.has_errors is False, response
@@ -47,7 +47,7 @@ def test_reservation__order__by_reservation_unit_name__desc(graphql, lang):
     reservation_3 = ReservationFactory.create(reservation_unit=[res_unit_c])
 
     graphql.login_user_based_on_type(UserType.SUPERUSER)
-    query = reservations_query(order_by=f"-reservation_unit_name_{lang}")
+    query = reservations_query(order_by=f"reservationUnitName{lang.capitalize()}Desc")
     response = graphql(query)
 
     assert response.has_errors is False, response
@@ -72,7 +72,7 @@ def test_reservation__order__by_reservee_name__asc(graphql):
     )
 
     graphql.login_user_based_on_type(UserType.SUPERUSER)
-    query = reservations_query(order_by="reservee_name")
+    query = reservations_query(order_by="reserveeNameAsc")
     response = graphql(query)
 
     assert response.has_errors is False, response
@@ -97,7 +97,7 @@ def test_reservation__order__by_reservee_name__desc(graphql):
     )
 
     graphql.login_user_based_on_type(UserType.SUPERUSER)
-    query = reservations_query(order_by="-reservee_name")
+    query = reservations_query(order_by="reserveeNameDesc")
     response = graphql(query)
 
     assert response.has_errors is False, response
@@ -118,7 +118,7 @@ def test_reservation__order__by_unit_name__asc(graphql, lang):
     reservation_3 = ReservationFactory.create(reservation_unit=[res_unit_c])
 
     graphql.login_user_based_on_type(UserType.SUPERUSER)
-    query = reservations_query(order_by=f"unit_name_{lang}")
+    query = reservations_query(order_by=f"unitName{lang.capitalize()}Asc")
     response = graphql(query)
 
     assert response.has_errors is False, response
@@ -139,7 +139,7 @@ def test_reservation__order__by_unit_name__desc(graphql, lang):
     reservation_3 = ReservationFactory.create(reservation_unit=[res_unit_c])
 
     graphql.login_user_based_on_type(UserType.SUPERUSER)
-    query = reservations_query(order_by=f"-unit_name_{lang}")
+    query = reservations_query(order_by=f"unitName{lang.capitalize()}Desc")
     response = graphql(query)
 
     assert response.has_errors is False, response
@@ -156,7 +156,7 @@ def test_reservation__order__by_created_at(graphql):
     reservation_3 = ReservationFactory.create(created_at=now + datetime.timedelta(hours=-1))
 
     graphql.login_user_based_on_type(UserType.SUPERUSER)
-    query = reservations_query(order_by="created_at")
+    query = reservations_query(order_by="createdAtAsc")
     response = graphql(query)
 
     assert response.has_errors is False, response
@@ -186,7 +186,7 @@ def test_reservation__order__by_order_status(graphql):
     PaymentOrderFactory.create(status=OrderStatus.REFUNDED, reservation=reservation_6)
 
     graphql.login_user_based_on_type(UserType.SUPERUSER)
-    query = reservations_query(order_by="order_status")
+    query = reservations_query(order_by="orderStatusAsc")
     response = graphql(query)
 
     assert response.has_errors is False, response

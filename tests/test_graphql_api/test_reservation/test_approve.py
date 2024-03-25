@@ -1,0 +1,203 @@
+import pytest
+
+from email_notification.models import EmailType
+from reservations.choices import ReservationStateChoice
+from tests.factories import EmailTemplateFactory, ReservationFactory, ReservationUnitFactory, UserFactory
+from users.models import ReservationNotification
+
+from .helpers import APPROVE_MUTATION, get_approve_data
+
+pytestmark = [
+    pytest.mark.django_db,
+    pytest.mark.usefixtures("_celery_synchronous"),
+]
+
+
+def test_reservation__approve__superuser_can_approve(graphql, outbox, settings):
+    settings.SEND_RESERVATION_NOTIFICATION_EMAILS = True
+
+    reservation_unit = ReservationUnitFactory.create()
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_unit=[reservation_unit],
+    )
+
+    # A unit admin that will receive a notification about new reservations
+    UserFactory.create_with_unit_permissions(
+        unit=reservation_unit.unit,
+        perms=["can_manage_reservations"],
+        reservation_notification=ReservationNotification.ALL,
+    )
+
+    EmailTemplateFactory.create(
+        type=EmailType.RESERVATION_HANDLED_AND_CONFIRMED,
+        subject="approved",
+    )
+    EmailTemplateFactory.create(
+        type=EmailType.STAFF_NOTIFICATION_RESERVATION_MADE,
+        subject="staff reservation made",
+    )
+
+    graphql.login_with_superuser()
+    data = get_approve_data(reservation)
+    response = graphql(APPROVE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.CONFIRMED
+    assert reservation.handled_at is not None
+
+    assert len(outbox) == 2
+    assert outbox[0].subject == "approved"
+    assert outbox[1].subject == "staff reservation made"
+
+
+def test_reservation__approve__regular_user_cannot_approve(graphql):
+    reservation_unit = ReservationUnitFactory.create()
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_unit=[reservation_unit],
+    )
+
+    graphql.login_with_regular_user()
+    input_data = get_approve_data(reservation)
+    response = graphql(APPROVE_MUTATION, input_data=input_data)
+
+    assert response.error_message() == "No permission to update."
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
+
+
+def test_reservation__approve__cant_approve_if_status_not_requires_handling(graphql):
+    reservation_unit = ReservationUnitFactory.create()
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.CREATED,
+        reservation_unit=[reservation_unit],
+    )
+
+    graphql.login_with_superuser()
+    data = get_approve_data(reservation)
+    response = graphql(APPROVE_MUTATION, input_data=data)
+
+    assert response.error_message() == "Only reservations with state as REQUIRES_HANDLING can be approved."
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.CREATED
+
+
+def test_reservation__approve__approving_fails_when_price_missing(graphql):
+    reservation_unit = ReservationUnitFactory.create()
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_unit=[reservation_unit],
+    )
+
+    graphql.login_with_superuser()
+    input_data = get_approve_data(reservation)
+    input_data.pop("price")
+    response = graphql(APPROVE_MUTATION, input_data=input_data)
+
+    assert response.has_errors is True
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
+
+
+def test_reservation__approve__fails_when_price_net_missing(graphql):
+    reservation_unit = ReservationUnitFactory.create()
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_unit=[reservation_unit],
+    )
+
+    graphql.login_with_superuser()
+    input_data = get_approve_data(reservation)
+    input_data.pop("priceNet")
+    response = graphql(APPROVE_MUTATION, input_data=input_data)
+
+    assert response.has_errors is True
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
+
+
+def test_reservation__approve__fails_when_handling_details_missing(graphql):
+    reservation_unit = ReservationUnitFactory.create()
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_unit=[reservation_unit],
+    )
+
+    graphql.login_with_superuser()
+    input_data = get_approve_data(reservation)
+    input_data.pop("handlingDetails")
+    response = graphql(APPROVE_MUTATION, input_data=input_data)
+
+    assert response.has_errors is True
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
+
+
+def test_reservation__approve__succeeds_with_empty_handling_details(graphql):
+    reservation_unit = ReservationUnitFactory.create()
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_unit=[reservation_unit],
+    )
+
+    graphql.login_with_superuser()
+    data = get_approve_data(reservation)
+    data["handlingDetails"] = ""
+    response = graphql(APPROVE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.CONFIRMED
+
+
+def test_reservation__approve__unit_reserver_can_approve_own_reservation(graphql):
+    reservation_unit = ReservationUnitFactory.create()
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_unit=[reservation_unit],
+        user=UserFactory.create_with_unit_permissions(
+            unit=reservation_unit.unit,
+            perms=["can_create_staff_reservations"],
+            code="foo",
+        ),
+    )
+
+    graphql.force_login(reservation.user)
+
+    input_data = get_approve_data(reservation)
+    response = graphql(APPROVE_MUTATION, input_data=input_data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.CONFIRMED
+
+
+def test_reservation__approve__unit_reserver_cant_approve_other_reservation(graphql):
+    reservation_unit = ReservationUnitFactory.create()
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.REQUIRES_HANDLING,
+        reservation_unit=[reservation_unit],
+    )
+
+    admin = UserFactory.create_with_unit_permissions(
+        unit=reservation_unit.unit,
+        perms=["can_create_staff_reservations"],
+        code="foo",
+    )
+
+    graphql.force_login(admin)
+
+    input_data = get_approve_data(reservation)
+    response = graphql(APPROVE_MUTATION, input_data=input_data)
+
+    assert response.error_message() == "No permission to update."

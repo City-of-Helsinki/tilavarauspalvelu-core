@@ -5,15 +5,15 @@ import factory
 from factory import fuzzy
 
 from permissions.models import (
-    GENERAL_PERMISSIONS,
-    SERVICE_SECTOR_PERMISSIONS,
-    UNIT_PERMISSIONS,
+    GeneralPermissionChoices,
     GeneralRole,
     GeneralRoleChoice,
     GeneralRolePermission,
+    ServiceSectorPermissionsChoices,
     ServiceSectorRole,
     ServiceSectorRoleChoice,
     ServiceSectorRolePermission,
+    UnitPermissionChoices,
     UnitRole,
     UnitRoleChoice,
     UnitRolePermission,
@@ -59,7 +59,7 @@ class GeneralRolePermissionFactory(GenericDjangoModelFactory[GeneralRolePermissi
         django_get_or_create = ["role", "permission"]
 
     role = factory.SubFactory("tests.factories.GeneralRoleChoiceFactory")
-    permission = fuzzy.FuzzyChoice([perm[0] for perm in GENERAL_PERMISSIONS])
+    permission = fuzzy.FuzzyChoice(GeneralPermissionChoices.values)
 
 
 class ServiceSectorRoleChoiceFactory(GenericDjangoModelFactory[ServiceSectorRoleChoice]):
@@ -87,7 +87,7 @@ class ServiceSectorRolePermissionFactory(GenericDjangoModelFactory[ServiceSector
         django_get_or_create = ["role", "permission"]
 
     role = factory.SubFactory("tests.factories.ServiceSectorRoleChoiceFactory")
-    permission = fuzzy.FuzzyChoice([perm[0] for perm in SERVICE_SECTOR_PERMISSIONS])
+    permission = fuzzy.FuzzyChoice(ServiceSectorPermissionsChoices.values)
 
 
 class UnitRoleChoiceFactory(GenericDjangoModelFactory[UnitRoleChoice]):
@@ -140,4 +140,4 @@ class UnitRolePermissionFactory(GenericDjangoModelFactory[UnitRolePermission]):
         django_get_or_create = ["role", "permission"]
 
     role = factory.SubFactory("tests.factories.UnitRoleChoiceFactory")
-    permission = fuzzy.FuzzyChoice([perm[0] for perm in UNIT_PERMISSIONS])
+    permission = fuzzy.FuzzyChoice(UnitPermissionChoices.values)
