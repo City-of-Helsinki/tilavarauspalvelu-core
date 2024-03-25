@@ -1,40 +1,56 @@
-import datetime
-
 import django_filters
 from django.db.models import Count, Q
-from django.utils.timezone import get_default_timezone
+from graphene_django_extensions import ModelFilterSet
+from graphene_django_extensions.filters import IntMultipleChoiceFilter
 
-from api.graphql.types.units.types import Unit
+from api.graphql.types.unit.types import Unit
+from common.date_utils import local_datetime
+
+__all__ = [
+    "UnitFilterSet",
+]
 
 
-class UnitsFilterSet(django_filters.FilterSet):
-    pk = django_filters.ModelMultipleChoiceFilter(field_name="pk", method="filter_by_pk", queryset=Unit.objects.all())
+class UnitFilterSet(ModelFilterSet):
+    pk = IntMultipleChoiceFilter()
 
     name_fi = django_filters.CharFilter(field_name="name_fi", lookup_expr="istartswith")
     name_en = django_filters.CharFilter(field_name="name_en", lookup_expr="istartswith")
     name_sv = django_filters.CharFilter(field_name="name_sv", lookup_expr="istartswith")
+
     service_sector = django_filters.NumberFilter(field_name="service_sectors__pk")
 
     only_with_permission = django_filters.BooleanFilter(method="get_only_with_permission")
-
     published_reservation_units = django_filters.BooleanFilter(method="get_published_reservation_units")
-
     own_reservations = django_filters.BooleanFilter(method="get_own_reservations")
 
-    order_by = django_filters.OrderingFilter(fields=("name_fi", "name_en", "name_sv", "rank", "reservation_count"))
+    class Meta:
+        model = Unit
+        fields = {
+            "name_fi": ["exact", "icontains", "istartswith"],
+            "name_sv": ["exact", "icontains", "istartswith"],
+            "name_en": ["exact", "icontains", "istartswith"],
+        }
+        order_by = [
+            "name_fi",
+            "name_en",
+            "name_sv",
+            "rank",
+            "reservation_count",
+        ]
 
     def filter_queryset(self, queryset):
         queryset = queryset.annotate(reservation_count=Count("reservationunit__reservation"))
 
         return super().filter_queryset(queryset)
 
-    def filter_by_pk(self, qs, property, value):
+    def filter_by_pk(self, qs, name, value):
         if value:
             return qs.filter(id__in=[model.id for model in value])
 
         return qs
 
-    def get_only_with_permission(self, qs, property, value):
+    def get_only_with_permission(self, qs, name, value):
         """Returns units where the user has any kind of permissions"""
         if not value:
             return qs
@@ -56,8 +72,8 @@ class UnitsFilterSet(django_filters.FilterSet):
             )
         ).distinct()
 
-    def get_published_reservation_units(self, qs, property, value):
-        now = datetime.datetime.now(tz=get_default_timezone())
+    def get_published_reservation_units(self, qs, name, value):
+        now = local_datetime()
 
         if value:
             query = (
@@ -84,7 +100,7 @@ class UnitsFilterSet(django_filters.FilterSet):
 
         return qs.filter(query)
 
-    def get_own_reservations(self, qs, property, value):
+    def get_own_reservations(self, qs, name, value):
         user = self.request.user
 
         if user.is_anonymous:

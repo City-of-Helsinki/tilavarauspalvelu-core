@@ -1,10 +1,10 @@
 import django_filters
 from django.db import models
 from graphene_django_extensions import ModelFilterSet
+from graphene_django_extensions.filters import IntMultipleChoiceFilter
 
 from applications.models import ApplicationRound
 from common.date_utils import local_datetime
-from common.filtersets import IntMultipleChoiceFilter
 
 
 class ApplicationRoundFilterSet(ModelFilterSet):

@@ -1,18 +1,18 @@
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import IntMultipleChoiceFilter
 
-from reservation_units.models import TaxPercentage
+from reservations.models import ReservationDenyReason
 
 __all__ = [
-    "TaxPercentageFilterSet",
+    "ReservationDenyReasonFilterSet",
 ]
 
 
-class TaxPercentageFilterSet(ModelFilterSet):
+class ReservationDenyReasonFilterSet(ModelFilterSet):
     pk = IntMultipleChoiceFilter()
 
     class Meta:
-        model = TaxPercentage
+        model = ReservationDenyReason
         fields = [
-            "value",
+            "reason",
         ]

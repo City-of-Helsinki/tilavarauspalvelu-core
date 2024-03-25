@@ -1,25 +1,19 @@
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import IntMultipleChoiceFilter
 
-from reservation_units.models import Purpose
+from reservations.models import ReservationPurpose
 
 __all__ = [
-    "PurposeFilterSet",
+    "ReservationPurposeFilterSet",
 ]
 
 
-class PurposeFilterSet(ModelFilterSet):
+class ReservationPurposeFilterSet(ModelFilterSet):
     pk = IntMultipleChoiceFilter()
 
     class Meta:
-        model = Purpose
+        model = ReservationPurpose
         fields = [
-            "name_fi",
-            "name_en",
-            "name_sv",
-        ]
-        order_by = [
-            "rank",
             "name_fi",
             "name_en",
             "name_sv",
