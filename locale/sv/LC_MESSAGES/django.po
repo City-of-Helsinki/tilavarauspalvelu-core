@@ -110,14 +110,12 @@ msgid "Day of the week"
 msgstr ""
 
 #: applications/admin/filters/application_section.py
-#: applications/admin/forms/application_section.py
-#: reservations/models/reservation.py
+#: applications/admin/forms/application_section.py reservations/admin.py
 #: reservations/models/reservation_statistic.py
 msgid "Age group"
 msgstr ""
 
-#: applications/admin/filters/application_section.py
-#: reservations/models/reservation.py
+#: applications/admin/filters/application_section.py reservations/admin.py
 #: reservations/models/reservation_statistic.py
 msgid "Reservation purpose"
 msgstr ""
@@ -147,15 +145,13 @@ msgid "Reservation unit option for to this allocation."
 msgstr "Varausyksikkö-vaihtoehdot"
 
 #: applications/admin/forms/allocated_time_slot.py
-#: applications/admin/forms/suitable_time_range.py
-#: reservations/models/reservation.py
+#: applications/admin/forms/suitable_time_range.py reservations/admin.py
 #: reservations/models/reservation_statistic.py
 msgid "Begin time"
 msgstr ""
 
 #: applications/admin/forms/allocated_time_slot.py
-#: applications/admin/forms/suitable_time_range.py
-#: reservations/models/reservation.py
+#: applications/admin/forms/suitable_time_range.py reservations/admin.py
 #: reservations/models/reservation_statistic.py
 msgid "End time"
 msgstr ""
@@ -222,7 +218,7 @@ msgstr ""
 msgid "Billing address"
 msgstr ""
 
-#: applications/admin/forms/application.py reservations/models/reservation.py
+#: applications/admin/forms/application.py reservations/admin.py
 #: reservations/models/reservation_statistic.py
 msgid "Home city"
 msgstr ""
@@ -231,7 +227,7 @@ msgstr ""
 msgid "Additional information"
 msgstr ""
 
-#: applications/admin/forms/application.py reservations/models/reservation.py
+#: applications/admin/forms/application.py reservations/admin.py
 msgid "Working memo"
 msgstr ""
 
@@ -333,8 +329,7 @@ msgstr "Hakemuksen osat"
 #: applications/admin/forms/city.py applications/admin/forms/organization.py
 #: reservation_units/admin/forms/reservation_unit.py
 #: reservation_units/models/equipment.py reservation_units/models/keyword.py
-#: reservation_units/models/reservation_unit_type.py
-#: reservations/models/reservation.py
+#: reservation_units/models/reservation_unit_type.py reservations/admin.py
 #: reservations/models/reservation_metadata.py
 #: reservations/models/reservation_statistic.py resources/models.py
 #: services/models.py terms_of_use/models.py
@@ -512,8 +507,7 @@ msgid ""
 "allocations have successful reservations. <br>"
 msgstr ""
 
-#: applications/admin/forms/application_section.py
-#: reservations/models/reservation.py
+#: applications/admin/forms/application_section.py reservations/admin.py
 #: reservations/models/reservation_statistic.py
 msgid "Number of persons"
 msgstr ""
@@ -699,7 +693,6 @@ msgstr ""
 #: applications/admin/forms/reservation_unit_option.py
 #: reservation_units/models/introduction.py
 #: reservation_units/models/reservation_unit_pricing.py
-#: reservations/models/reservation.py
 msgid "Reservation unit"
 msgstr ""
 
@@ -1095,7 +1088,7 @@ msgid "Staff"
 msgstr ""
 
 #: common/choices/banner_notification.py permissions/models.py
-#: reservation_units/models/introduction.py reservations/models/reservation.py
+#: reservation_units/models/introduction.py reservations/admin.py
 msgid "User"
 msgstr ""
 
@@ -1308,7 +1301,7 @@ msgstr ""
 msgid "Total amount"
 msgstr ""
 
-#: merchants/models.py reservations/models/reservation.py
+#: merchants/models.py reservations/admin.py
 #: reservations/models/reservation_statistic.py
 msgid "Created at"
 msgstr ""
@@ -1768,13 +1761,11 @@ msgstr ""
 msgid "Service specific terms for the reservation unit."
 msgstr "Varausten alkupäivän täytyy olla ennen niiden loppupäivää."
 
-#: reservation_units/admin/forms/reservation_unit.py
-#: reservations/models/reservation.py
+#: reservation_units/admin/forms/reservation_unit.py reservations/admin.py
 msgid "SKU"
 msgstr ""
 
-#: reservation_units/admin/forms/reservation_unit.py
-#: reservations/models/reservation.py
+#: reservation_units/admin/forms/reservation_unit.py reservations/admin.py
 msgid "Description"
 msgstr ""
 
@@ -1932,15 +1923,13 @@ msgstr ""
 msgid "Surface area"
 msgstr ""
 
-#: reservation_units/admin/forms/reservation_unit.py
-#: reservations/models/reservation.py
+#: reservation_units/admin/forms/reservation_unit.py reservations/admin.py
 #: reservations/models/reservation_statistic.py resources/models.py
 #: services/models.py
 msgid "Buffer time before"
 msgstr ""
 
-#: reservation_units/admin/forms/reservation_unit.py
-#: reservations/models/reservation.py
+#: reservation_units/admin/forms/reservation_unit.py reservations/admin.py
 #: reservations/models/reservation_statistic.py resources/models.py
 #: services/models.py
 msgid "Buffer time after"
@@ -2119,11 +2108,11 @@ msgstr ""
 msgid "Minimum number of persons"
 msgstr ""
 
-#: reservation_units/admin/forms/reservation_unit.py
+#: reservation_units/admin/forms/reservation_unit.py reservations/admin.py
 msgid "Buffer time before reservation"
 msgstr ""
 
-#: reservation_units/admin/forms/reservation_unit.py
+#: reservation_units/admin/forms/reservation_unit.py reservations/admin.py
 msgid "Buffer time after reservation"
 msgstr ""
 
@@ -2305,6 +2294,22 @@ msgstr ""
 msgid "Strong"
 msgstr ""
 
+#: reservation_units/enums.py
+msgid "Main image"
+msgstr ""
+
+#: reservation_units/enums.py
+msgid "Ground plan"
+msgstr ""
+
+#: reservation_units/enums.py
+msgid "Map"
+msgstr ""
+
+#: reservation_units/enums.py
+msgid "Other"
+msgstr ""
+
 #: reservation_units/models/equipment.py reservation_units/models/purpose.py
 #: reservation_units/models/reservation_unit_type.py
 msgid "Order number to be used in api sorting."
@@ -2351,22 +2356,6 @@ msgid "Will the cancellation need manual staff handling"
 msgstr ""
 
 #: reservation_units/models/reservation_unit_image.py
-msgid "Main image"
-msgstr ""
-
-#: reservation_units/models/reservation_unit_image.py
-msgid "Ground plan"
-msgstr ""
-
-#: reservation_units/models/reservation_unit_image.py
-msgid "Map"
-msgstr ""
-
-#: reservation_units/models/reservation_unit_image.py
-msgid "Other"
-msgstr ""
-
-#: reservation_units/models/reservation_unit_image.py
 msgid "Type"
 msgstr ""
 
@@ -2397,6 +2386,320 @@ msgstr ""
 #: reservation_units/models/reservation_unit_pricing.py
 #: reservation_units/models/tax_percentage.py
 msgid "Tax percentage"
+msgstr ""
+
+#: reservations/admin.py reservations/models/reservation_statistic.py
+msgid "State"
+msgstr ""
+
+#: reservations/admin.py
+#, fuzzy
+#| msgid "Reservation Unit Options"
+msgid "Reservation type"
+msgstr "Varausyksikkö-vaihtoehdot"
+
+#: reservations/admin.py
+msgid "Cancel details"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Handling details"
+msgstr ""
+
+#: reservations/admin.py reservations/models/reservation_statistic.py
+msgid "Handled at"
+msgstr ""
+
+#: reservations/admin.py reservations/models/reservation_statistic.py
+msgid "Confirmed at"
+msgstr ""
+
+#: reservations/admin.py reservations/models/reservation_statistic.py
+msgid "Price"
+msgstr ""
+
+#: reservations/admin.py reservations/models/reservation_statistic.py
+msgid "Price net"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Non-subsidised price"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Non-subsidised net price"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Unit price"
+msgstr ""
+
+#: reservations/admin.py reservations/models/reservation_statistic.py
+msgid "Tax percentage value"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Applying free of charge"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Free of charge reason"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Reservee ID"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Reservee first name"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Reservee last name"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Reservee email"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Reservee phone"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Reservee organisation name"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Reservee address street"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Reservee address city"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Reservee address zip code"
+msgstr ""
+
+#: reservations/admin.py reservations/models/reservation_statistic.py
+msgid "Reservee is an unregistered association"
+msgstr ""
+
+#: reservations/admin.py reservations/models/reservation_statistic.py
+msgid "Preferred language of reservee"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Type of reservee"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Billing first name"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Billing last name"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Billing email"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Billing phone"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Billing address street"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Billing address city"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Billing address zip code"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Recurring reservation"
+msgstr ""
+
+#: reservations/admin.py reservations/models/reservation_statistic.py
+msgid "Reason for deny"
+msgstr ""
+
+#: reservations/admin.py reservations/models/reservation_statistic.py
+msgid "Reason for cancellation"
+msgstr ""
+
+#: reservations/admin.py
+msgid "SKU for this particular reservation"
+msgstr ""
+
+#: reservations/admin.py
+#, fuzzy
+#| msgid "Reservations begin date must be before reservations end date."
+msgid "Name of the reservation"
+msgstr "Varausten alkupäivän täytyy olla ennen niiden loppupäivää."
+
+#: reservations/admin.py
+#, fuzzy
+#| msgid "Reservations begin date must be before reservations end date."
+msgid "Description of the reservation"
+msgstr "Varausten alkupäivän täytyy olla ennen niiden loppupäivää."
+
+#: reservations/admin.py
+msgid "Number of persons in the reservation"
+msgstr ""
+
+#: reservations/admin.py
+#, fuzzy
+#| msgid "Reservations begin date must be before reservations end date."
+msgid "State of the reservation"
+msgstr "Varausten alkupäivän täytyy olla ennen niiden loppupäivää."
+
+#: reservations/admin.py
+msgid "Type of reservation"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Details for this reservation's cancellation"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Additional details for denying or approving the reservation"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Working memo for staff users"
+msgstr ""
+
+#: reservations/admin.py
+#, fuzzy
+#| msgid "Reservation Unit Option"
+msgid "Reservation begin date and time"
+msgstr "Varausyksikkö-vaihtoehto"
+
+#: reservations/admin.py
+#, fuzzy
+#| msgid "Reservation Unit Option"
+msgid "Reservation end date and time"
+msgstr "Varausyksikkö-vaihtoehto"
+
+#: reservations/admin.py
+msgid "When this reservation was handled"
+msgstr ""
+
+#: reservations/admin.py
+msgid "When this reservation was confirmed"
+msgstr ""
+
+#: reservations/admin.py
+msgid "When this reservation was created"
+msgstr ""
+
+#: reservations/admin.py
+msgid "The price of this particular reservation including VAT"
+msgstr ""
+
+#: reservations/admin.py
+msgid "The price of this particular reservation excluding VAT"
+msgstr ""
+
+#: reservations/admin.py
+msgid "The non subsidised price of this reservation including VAT"
+msgstr ""
+
+#: reservations/admin.py
+msgid "The non subsidised price of this reservation excluding VAT"
+msgstr ""
+
+#: reservations/admin.py
+msgid "The unit price of this particular reservation"
+msgstr ""
+
+#: reservations/admin.py
+msgid "The value of the tax percentage for this particular reservation"
+msgstr ""
+
+#: reservations/admin.py reservations/models/reservation_statistic.py
+msgid "Reservee is applying for a free-of-charge reservation"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Reason for applying for a free-of-charge reservation"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Reservee's business or association identity code"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Reservee's first name"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Reservee's last name"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Reservee's email address"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Reservee's phone number"
+msgstr ""
+
+#: reservations/admin.py
+#, fuzzy
+#| msgid "Reservation Unit Option"
+msgid "Reservee's organisation name"
+msgstr "Varausyksikkö-vaihtoehto"
+
+#: reservations/admin.py
+msgid "Reservee's street address"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Reservee's city"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Reservee's zip code"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Reservee's preferred language"
+msgstr ""
+
+#: reservations/admin.py
+msgid "User who made the reservation"
+msgstr ""
+
+#: reservations/admin.py
+#, fuzzy
+#| msgid "Reservations begin date must be before reservations end date."
+msgid "Reason for denying the reservation"
+msgstr "Varausten alkupäivän täytyy olla ennen niiden loppupäivää."
+
+#: reservations/admin.py
+msgid "Reason for cancelling the reservation"
+msgstr ""
+
+#: reservations/admin.py
+#, fuzzy
+#| msgid "Reservations begin date must be before reservations end date."
+msgid "Purpose of the reservation"
+msgstr "Varausten alkupäivän täytyy olla ennen niiden loppupäivää."
+
+#: reservations/admin.py
+msgid "Home city of the group or association"
+msgstr ""
+
+#: reservations/admin.py
+msgid "Age group of the group or association"
 msgstr ""
 
 #: reservations/admin.py
@@ -2433,155 +2736,6 @@ msgstr ""
 
 #: reservations/choices.py
 msgid "Behalf"
-msgstr ""
-
-#: reservations/models/reservation.py
-msgid "Reservee first name"
-msgstr ""
-
-#: reservations/models/reservation.py
-msgid "Reservee last name"
-msgstr ""
-
-#: reservations/models/reservation.py
-msgid "Reservee organisation name"
-msgstr ""
-
-#: reservations/models/reservation.py
-msgid "Reservee phone"
-msgstr ""
-
-#: reservations/models/reservation.py
-msgid "Reservee email"
-msgstr ""
-
-#: reservations/models/reservation.py
-msgid "Reservee ID"
-msgstr ""
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
-msgid "Reservee is an unregistered association"
-msgstr ""
-
-#: reservations/models/reservation.py
-msgid "Reservee address street"
-msgstr ""
-
-#: reservations/models/reservation.py
-msgid "Reservee address city"
-msgstr ""
-
-#: reservations/models/reservation.py
-msgid "Reservee address zip code"
-msgstr ""
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
-msgid "Preferred language of reservee"
-msgstr ""
-
-#: reservations/models/reservation.py
-msgid "Billing first name"
-msgstr ""
-
-#: reservations/models/reservation.py
-msgid "Billing last name"
-msgstr ""
-
-#: reservations/models/reservation.py
-msgid "Billing phone"
-msgstr ""
-
-#: reservations/models/reservation.py
-msgid "Billing email"
-msgstr ""
-
-#: reservations/models/reservation.py
-msgid "Billing address street"
-msgstr ""
-
-#: reservations/models/reservation.py
-msgid "Billing address city"
-msgstr ""
-
-#: reservations/models/reservation.py
-msgid "Billing address zip code"
-msgstr ""
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
-msgid "Reservee is applying for a free-of-charge reservation"
-msgstr ""
-
-#: reservations/models/reservation.py
-msgid "Reason for applying for a free-of-charge reservation"
-msgstr ""
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
-msgid "State"
-msgstr ""
-
-#: reservations/models/reservation.py
-msgid "Recurring reservation"
-msgstr ""
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
-msgid "Reason for cancellation"
-msgstr ""
-
-#: reservations/models/reservation.py
-msgid "Details for this reservation's cancellation"
-msgstr ""
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
-msgid "Confirmed at"
-msgstr ""
-
-#: reservations/models/reservation.py
-msgid "Unit price"
-msgstr ""
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
-msgid "Tax percentage value"
-msgstr ""
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
-msgid "Price"
-msgstr ""
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
-msgid "Price net"
-msgstr ""
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
-msgid "Non subsidised price"
-msgstr ""
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
-msgid "Non subsidised net price"
-msgstr ""
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
-msgid "Handled at"
-msgstr ""
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
-msgid "Reason for deny"
-msgstr ""
-
-#: reservations/models/reservation.py
-msgid "Handling details for this reservation"
 msgstr ""
 
 #: reservations/models/reservation.py
@@ -2642,6 +2796,14 @@ msgstr ""
 
 #: reservations/models/reservation_statistic.py
 msgid "The reason text of the deny reason"
+msgstr ""
+
+#: reservations/models/reservation_statistic.py
+msgid "Non subsidised price"
+msgstr ""
+
+#: reservations/models/reservation_statistic.py
+msgid "Non subsidised net price"
 msgstr ""
 
 #: reservations/models/reservation_statistic.py
