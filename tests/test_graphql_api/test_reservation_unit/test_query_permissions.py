@@ -143,7 +143,7 @@ def test_reservation_unit__query__sensitive_information__regular_user(graphql):
                 "denyReason": None,
                 "description": None,
                 "freeOfChargeReason": None,
-                "handlingDetails": "",
+                "handlingDetails": None,
                 "reserveeAddressCity": None,
                 "reserveeAddressStreet": None,
                 "reserveeAddressZip": None,
@@ -259,7 +259,7 @@ def test_reservation_unit__query__payment_product__without_permissions(graphql):
     ReservationUnitFactory.create(payment_merchant=merchant, payment_product=product)
 
     graphql.login_with_regular_user()
-    query = reservation_units_query(fields="paymentProduct { pk merchantPk }")
+    query = reservation_units_query(fields="paymentProduct { pk merchant { pk } }")
     response = graphql(query)
 
     assert response.error_message("paymentProduct") == "No permission to access field."

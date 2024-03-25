@@ -4,9 +4,9 @@ from functools import partial
 import freezegun
 import pytest
 from django.utils.timezone import get_default_timezone
+from graphene_django_extensions.testing import build_query
 
 from tests.factories import ReservationFactory, ReservationUnitFactory, ServiceSectorFactory, UnitFactory, UserFactory
-from tests.gql_builders import build_query
 from tests.helpers import UserType
 
 # Applied to all tests
@@ -14,7 +14,7 @@ pytestmark = [
     pytest.mark.django_db,
 ]
 
-units_query = partial(build_query, "units", connection=True, order_by="nameFi")
+units_query = partial(build_query, "units", connection=True, order_by="nameFiAsc")
 
 
 def test_units__query(graphql):
@@ -122,7 +122,7 @@ def test_units__filter__by_published_reservation_units(graphql):
 
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
-    query = build_query("units", connection=True, published_reservation_units=True, order_by="name_fi")
+    query = build_query("units", connection=True, published_reservation_units=True, order_by="nameFiAsc")
     response = graphql(query)
 
     assert response.has_errors is False
@@ -176,7 +176,7 @@ def test_units__order_by__name_fi(graphql):
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     # Ascending
-    response = graphql(units_query(order_by="nameFi"))
+    response = graphql(units_query(order_by="nameFiAsc"))
 
     assert response.has_errors is False
     assert len(response.edges) == 3
@@ -185,7 +185,7 @@ def test_units__order_by__name_fi(graphql):
     assert response.node(2) == {"pk": unit_3.pk}
 
     # Descending
-    response = graphql(units_query(order_by="-nameFi"))
+    response = graphql(units_query(order_by="nameFiDesc"))
 
     assert response.has_errors is False
     assert len(response.edges) == 3
@@ -214,7 +214,7 @@ def test_units__order__by_own_reservations_count(graphql):
     ReservationFactory.create(reservation_unit=[res_unit_4], user=user_2)
 
     graphql.force_login(user_1)
-    response = graphql(units_query(own_reservations=True, order_by="-reservationCount"))
+    response = graphql(units_query(own_reservations=True, order_by="reservationCountDesc"))
 
     assert response.has_errors is False
 

@@ -3,9 +3,10 @@ from typing import Any, NamedTuple
 from unittest.mock import patch
 
 import pytest
+from graphene_django_extensions.testing import parametrize_helper
 
 from tests.factories import UserFactory
-from tests.helpers import ResponseMock, parametrize_helper, patch_method
+from tests.helpers import ResponseMock, patch_method
 from users.helauth.pipeline import id_number_to_date, update_user_from_profile
 from utils.sentry import SentryLogger
 

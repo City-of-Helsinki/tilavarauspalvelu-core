@@ -1,17 +1,17 @@
-from tests.gql_builders import build_mutation
+from graphene_django_extensions.testing import build_mutation
 
 CREATE_MUTATION = build_mutation(
     "createReservationUnitImage",
-    "ReservationUnitImageCreateMutationInput",
+    "ReservationUnitImageCreateMutation",
 )
 
 UPDATE_MUTATION = build_mutation(
     "updateReservationUnitImage",
-    "ReservationUnitImageUpdateMutationInput",
+    "ReservationUnitImageUpdateMutation",
 )
 
 DELETE_MUTATION = build_mutation(
     "deleteReservationUnitImage",
-    "ReservationUnitImageDeleteMutationInput",
-    selections="deleted errors",
+    "ReservationUnitImageDeleteMutation",
+    fields="deleted",
 )

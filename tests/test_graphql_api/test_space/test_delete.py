@@ -60,5 +60,6 @@ def test_space_not_deleted_because_in_active_application_round(graphql, status):
     # then:
     # - Response contains no errors
     # - The space is still in the database
-    assert response.error_message() == "Space occurs in active application round."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Space occurs in active application round."]
     assert Space.objects.filter(pk=pk).exists() is True

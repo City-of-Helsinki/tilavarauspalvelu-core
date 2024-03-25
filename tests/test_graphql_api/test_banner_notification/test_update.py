@@ -2,11 +2,11 @@ import datetime
 from typing import Any, NamedTuple
 
 import pytest
+from graphene_django_extensions.testing import parametrize_helper
 
 from common.choices import BannerNotificationLevel, BannerNotificationTarget
 from common.models import BannerNotification
 from tests.factories import BannerNotificationFactory, UserFactory
-from tests.helpers import parametrize_helper
 
 from .helpers import UPDATE_MUTATION
 
@@ -259,10 +259,7 @@ def test_primary_key_is_required_for_updating(graphql):
 
     # then:
     # - The response complains about the improper input
-    assert (
-        response.error_message()
-        == "Variable '$input' of required type 'BannerNotificationUpdateMutationInput!' was not provided."
-    )
+    assert response.error_message().startswith("Variable '$input'")
 
 
 def test_user_updates_non_existing_banner_notification(graphql):

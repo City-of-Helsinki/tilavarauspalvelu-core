@@ -1,9 +1,9 @@
 from typing import Any, NamedTuple
 
 import pytest
+from graphene_django_extensions.testing import parametrize_helper
 
 from common.utils import get_nested
-from tests.helpers import parametrize_helper
 
 Sentinel = object()
 

@@ -3,13 +3,13 @@ from unittest import mock
 
 import pytest
 from django.utils import timezone
+from graphene_django_extensions.testing import parametrize_helper
 
 from applications.choices import ApplicantTypeChoice, Priority, Weekday
 from applications.exporter import ApplicationExportRow, export_application_data, get_header_rows
 from applications.models import ApplicationSection
 from common.date_utils import local_date_string, local_timedelta_string
 from tests.factories import ApplicationFactory, ApplicationRoundFactory
-from tests.helpers import parametrize_helper
 
 from .helpers import Missing, MissingParams, get_writes
 

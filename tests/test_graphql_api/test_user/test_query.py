@@ -2,9 +2,10 @@ import datetime
 
 import freezegun
 import pytest
+from graphene_django_extensions.testing import build_query
+from graphql_relay import to_global_id
 
 from tests.factories import UserFactory
-from tests.gql_builders import build_query
 from users.models import PersonalInfoViewLog
 
 # Applied to all tests
@@ -27,7 +28,9 @@ def test_user__query(graphql):
         isSuperuser
         reservationNotification
     """
-    query = build_query("user", fields=fields, pk=user.pk)
+
+    global_id = to_global_id("UserNode", user.pk)
+    query = build_query("user", fields=fields, id=global_id)
     response = graphql(query)
 
     assert response.has_errors is False
@@ -39,20 +42,16 @@ def test_user__query(graphql):
         "lastName": user.last_name,
         "email": user.email,
         "isSuperuser": user.is_superuser,
-        "reservationNotification": user.reservation_notification,
+        "reservationNotification": user.reservation_notification.value,
     }
 
 
 def test_user__query__regular_user_has_no_reservation_notification(graphql):
     user = UserFactory.create()
-    admin = UserFactory.create_with_general_permissions(perms=["can_view_users"])
-    graphql.force_login(admin)
+    graphql.force_login(user)
 
-    fields = """
-        pk
-        reservationNotification
-    """
-    query = build_query("user", fields=fields, pk=user.pk)
+    global_id = to_global_id("UserNode", user.pk)
+    query = build_query("user", fields="pk reservationNotification", id=global_id)
     response = graphql(query)
 
     assert response.has_errors is False
@@ -71,7 +70,8 @@ def test_user__query__date_of_birth_read_is_logged(graphql, settings):
     admin = UserFactory.create_with_general_permissions(perms=["can_view_users"])
     graphql.force_login(admin)
 
-    query = build_query("user", fields="pk dateOfBirth", pk=user.pk)
+    global_id = to_global_id("UserNode", user.pk)
+    query = build_query("user", fields="pk dateOfBirth", id=global_id)
     response = graphql(query)
 
     assert response.has_errors is False
