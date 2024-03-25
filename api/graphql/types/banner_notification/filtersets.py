@@ -1,30 +1,31 @@
 import django_filters
+from graphene_django_extensions import ModelFilterSet
 
-from api.graphql.extensions.order_filter import CustomOrderingFilter
 from common.models import BannerNotification
 from common.querysets.banner_notification import BannerNotificationQuerySet
 
+__all__ = [
+    "BannerNotificationFilterSet",
+]
 
-class BannerNotificationFilterSet(django_filters.FilterSet):
+
+class BannerNotificationFilterSet(ModelFilterSet):
     is_active = django_filters.BooleanFilter(method="filter_active")
     is_visible = django_filters.BooleanFilter(method="filter_visible")
 
-    order_by = CustomOrderingFilter(
-        fields=[
+    class Meta:
+        model = BannerNotification
+        fields = [
+            "name",
+            "target",
+        ]
+        order_by = [
             "pk",
             "name",
             ("active_from", "starts"),
             ("active_until", "ends"),
             "level",
             "state",
-            "target",
-        ],
-    )
-
-    class Meta:
-        model = BannerNotification
-        fields = [
-            "name",
             "target",
         ]
 

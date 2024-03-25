@@ -6,9 +6,9 @@ import django_filters
 from django.contrib.postgres.search import SearchRank, SearchVector
 from django.db.models import Case, CharField, F, Q, QuerySet, Value, When
 from django.db.models.functions import Concat
+from graphene_django_extensions import ModelFilterSet
 
 from api.graphql.extensions.filters import TimezoneAwareDateFilter
-from api.graphql.extensions.order_filter import CustomOrderingFilter
 from common.db import raw_prefixed_query
 from merchants.models import OrderStatus
 from permissions.getters import get_service_sectors_with_permission, get_units_with_permission
@@ -31,7 +31,7 @@ Matches email domains like:
 """
 
 
-class ReservationFilterSet(django_filters.FilterSet):
+class ReservationFilterSet(ModelFilterSet):
     begin_date = TimezoneAwareDateFilter(field_name="end", lookup_expr="gte", use_end_of_day=False)
     end_date = TimezoneAwareDateFilter(field_name="begin", lookup_expr="lte", use_end_of_day=True)
 
@@ -91,20 +91,23 @@ class ReservationFilterSet(django_filters.FilterSet):
     )
 
     unit = django_filters.ModelMultipleChoiceFilter(method="get_unit", queryset=Unit.objects.all())
-
     user = django_filters.ModelChoiceFilter(field_name="user", queryset=User.objects.all())
-
     text_search = django_filters.CharFilter(method="get_text_search")
 
-    order_by = CustomOrderingFilter(
-        fields=(
-            "created_at",
-            "state",
+    class Meta:
+        model = Reservation
+        fields = {
+            "state": ["exact"],
+            "begin": ["exact", "gte", "lte"],
+        }
+        order_by = [
+            "pk",
+            "name",
             "begin",
             "end",
-            "name",
+            "created_at",
+            "state",
             "price",
-            "pk",
             ("reservation_unit__name_fi", "reservation_unit_name_fi"),
             ("reservation_unit__name_en", "reservation_unit_name_en"),
             ("reservation_unit__name_sv", "reservation_unit_name_sv"),
@@ -113,12 +116,7 @@ class ReservationFilterSet(django_filters.FilterSet):
             ("reservation_unit__unit__name_sv", "unit_name_sv"),
             "reservee_name",
             ("payment_order__status", "order_status"),
-        )
-    )
-
-    class Meta:
-        model = Reservation
-        fields = []
+        ]
 
     def filter_queryset(self, queryset: QuerySet) -> QuerySet:
         queryset = queryset.alias(
