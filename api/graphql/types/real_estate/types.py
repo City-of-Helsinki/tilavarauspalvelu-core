@@ -1,13 +1,17 @@
-import graphene
+from graphene_django_extensions import DjangoNode
 
-from api.graphql.extensions.base_types import TVPBaseConnection
-from api.graphql.extensions.legacy_helpers import OldPrimaryKeyObjectType, get_all_translatable_fields
 from spaces.models import RealEstate
 
+__all__ = [
+    "RealEstateNode",
+]
 
-class RealEstateType(OldPrimaryKeyObjectType):
+
+class RealEstateNode(DjangoNode):
     class Meta:
         model = RealEstate
-        fields = ["pk", "surface_area", *get_all_translatable_fields(model)]
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
+        fields = [
+            "pk",
+            "name",
+            "surface_area",
+        ]

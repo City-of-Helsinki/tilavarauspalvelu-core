@@ -1,45 +1,47 @@
-import graphene
-from django.db.models import QuerySet
-from graphene_permissions.mixins import AuthNode
+from graphene_django_extensions import DjangoNode
 
-from api.graphql.extensions.base_types import TVPBaseConnection
-from api.graphql.extensions.legacy_helpers import OldPrimaryKeyObjectType, get_all_translatable_fields
-from common.typing import GQLInfo
 from reservation_units.models import Keyword, KeywordCategory, KeywordGroup
 
+from .filtersets import KeywordCategoryFilterSet, KeywordFilterSet, KeywordGroupFilterSet
+from .permissions import KeywordCategoryPermission, KeywordGroupPermission, KeywordPermission
 
-class KeywordType(AuthNode, OldPrimaryKeyObjectType):
+__all__ = [
+    "KeywordNode",
+    "KeywordGroupNode",
+    "KeywordCategoryNode",
+]
+
+
+class KeywordNode(DjangoNode):
     class Meta:
         model = Keyword
-        fields = ["pk", *get_all_translatable_fields(model)]
-        filter_fields = ["name_fi", "name_sv", "name_en"]
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
+        fields = [
+            "pk",
+            "name",
+        ]
+        filterset_class = KeywordFilterSet
+        permission_classes = [KeywordPermission]
 
 
-class KeywordGroupType(AuthNode, OldPrimaryKeyObjectType):
-    keywords = graphene.List(KeywordType)
-
+class KeywordGroupNode(DjangoNode):
     class Meta:
         model = KeywordGroup
-        fields = ["pk", *get_all_translatable_fields(model)]
-        filter_fields = ["name_fi", "name_sv", "name_en"]
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
+        fields = [
+            "pk",
+            "name",
+            "keywords",
+        ]
+        filterset_class = KeywordGroupFilterSet
+        permission_classes = [KeywordGroupPermission]
 
-    def resolve_keywords(root: KeywordGroup, info: GQLInfo) -> QuerySet[Keyword]:
-        return root.keywords.all()
 
-
-class KeywordCategoryType(AuthNode, OldPrimaryKeyObjectType):
-    keyword_groups = graphene.List(KeywordGroupType)
-
+class KeywordCategoryNode(DjangoNode):
     class Meta:
         model = KeywordCategory
-        fields = ["pk", *get_all_translatable_fields(model)]
-        filter_fields = ["name_fi", "name_sv", "name_en"]
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
-
-    def resolve_keyword_groups(root: KeywordCategory, info: GQLInfo) -> QuerySet[KeywordGroup]:
-        return root.keyword_groups.all()
+        fields = [
+            "pk",
+            "name",
+            "keyword_groups",
+        ]
+        filterset_class = KeywordCategoryFilterSet
+        permission_classes = [KeywordCategoryPermission]

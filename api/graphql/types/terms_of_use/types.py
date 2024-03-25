@@ -1,20 +1,26 @@
 import graphene
-from graphene_permissions.mixins import AuthNode
+from graphene_django_extensions import DjangoNode
 
-from api.graphql.extensions.base_types import TVPBaseConnection
-from api.graphql.extensions.legacy_helpers import OldPrimaryKeyObjectType, get_all_translatable_fields
-from api.graphql.types.terms_of_use.permissions import TermsOfUsePermission
 from terms_of_use.models import TermsOfUse
 
+from .filtersets import TermsOfUseFilterSet
+from .permissions import TermsOfUsePermission
 
-class TermsOfUseType(AuthNode, OldPrimaryKeyObjectType):
+__all__ = [
+    "TermsOfUseNode",
+]
+
+
+class TermsOfUseNode(DjangoNode):
     pk = graphene.String()
-
-    permission_classes = (TermsOfUsePermission,)
 
     class Meta:
         model = TermsOfUse
-        fields = ["pk", "terms_type", *get_all_translatable_fields(model)]
-        filter_fields = ["terms_type"]
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
+        fields = [
+            "pk",
+            "name",
+            "text",
+            "terms_type",
+        ]
+        filterset_class = TermsOfUseFilterSet
+        permission_classes = [TermsOfUsePermission]

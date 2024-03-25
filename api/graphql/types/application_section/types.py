@@ -1,14 +1,11 @@
 import graphene
 from django.db import models
 from graphene_django_extensions import DjangoNode
-from graphene_django_extensions.fields import RelatedField
 from lookup_property import L
-from query_optimizer import required_annotations
+from query_optimizer import AnnotatedField
 
 from api.graphql.types.application_section.filtersets import ApplicationSectionFilterSet
 from api.graphql.types.application_section.permissions import ApplicationSectionPermission
-from api.graphql.types.reservation_unit_option.types import ReservationUnitOptionNode
-from api.graphql.types.suitable_time_range.types import SuitableTimeRangeNode
 from applications.choices import ApplicationSectionStatusChoice
 from applications.models import ApplicationSection
 from common.typing import GQLInfo
@@ -16,13 +13,8 @@ from permissions.helpers import get_service_sectors_where_can_view_applications,
 
 
 class ApplicationSectionNode(DjangoNode):
-    status = graphene.Field(graphene.Enum.from_enum(ApplicationSectionStatusChoice))
-    allocations = graphene.Field(graphene.Int)
-
-    reservation_unit_options = ReservationUnitOptionNode.ListField()
-    suitable_time_ranges = SuitableTimeRangeNode.ListField()
-    purpose = RelatedField("api.graphql.types.reservations.types.ReservationPurposeType")
-    age_group = RelatedField("api.graphql.types.reservations.types.AgeGroupType")
+    status = AnnotatedField(graphene.Enum.from_enum(ApplicationSectionStatusChoice), expression=L("status"))
+    allocations = AnnotatedField(graphene.Int, expression=L("allocations"))
 
     class Meta:
         model = ApplicationSection
@@ -57,11 +49,3 @@ class ApplicationSectionNode(DjangoNode):
             | models.Q(reservation_unit_options__reservation_unit__unit__in=units)
             | models.Q(application__user=info.context.user)
         ).distinct()
-
-    @required_annotations(status=L("status"))
-    def resolve_status(root: ApplicationSection, info: GQLInfo) -> ApplicationSectionStatusChoice:
-        return root.status
-
-    @required_annotations(allocations=L("allocations"))
-    def resolve_allocations(root: ApplicationSection, info: GQLInfo) -> int:
-        return root.allocations
