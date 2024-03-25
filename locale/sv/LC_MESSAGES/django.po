@@ -19,11 +19,11 @@ msgstr ""
 msgid "User has open payments."
 msgstr ""
 
-#: api/graphql/extensions/duration_field.py
+#: api/graphql/extensions/fields.py
 msgid "A valid integer is required."
 msgstr ""
 
-#: api/graphql/extensions/legacy_helpers.py
+#: api/graphql/extensions/fields.py
 #, python-format
 msgid ""
 "Choice \"%(choice)s\" is not allowed. Allowed choices are: "
@@ -1579,6 +1579,23 @@ msgid "Can create, edit and delete banner notifications in the whole system"
 msgstr ""
 
 #: permissions/models.py
+#: reservation_units/models/reservation_unit_payment_type.py
+msgid "Code"
+msgstr ""
+
+#: permissions/models.py
+msgid "Verbose name"
+msgstr ""
+
+#: permissions/models.py
+msgid "Role"
+msgstr ""
+
+#: permissions/models.py
+msgid "Permission"
+msgstr ""
+
+#: permissions/models.py
 msgid "Can modify roles for the unit"
 msgstr ""
 
@@ -1592,10 +1609,6 @@ msgstr ""
 
 #: permissions/models.py
 msgid "Can view details of all reservations in the unit"
-msgstr ""
-
-#: permissions/models.py
-msgid "Can allocate applications"
 msgstr ""
 
 #: permissions/models.py
@@ -1628,6 +1641,14 @@ msgstr ""
 
 #: permissions/models.py
 msgid "Can comment reservations in the unit"
+msgstr ""
+
+#: permissions/models.py
+msgid "Unit group"
+msgstr ""
+
+#: permissions/models.py reservation_units/admin/forms/reservation_unit.py
+msgid "Unit"
 msgstr ""
 
 #: permissions/models.py
@@ -1684,31 +1705,6 @@ msgstr ""
 
 #: permissions/models.py
 msgid "Can edit unit information in the service sector"
-msgstr ""
-
-#: permissions/models.py
-#: reservation_units/models/reservation_unit_payment_type.py
-msgid "Code"
-msgstr ""
-
-#: permissions/models.py
-msgid "Verbose name"
-msgstr ""
-
-#: permissions/models.py
-msgid "Role"
-msgstr ""
-
-#: permissions/models.py
-msgid "Permission"
-msgstr ""
-
-#: permissions/models.py
-msgid "Unit group"
-msgstr ""
-
-#: permissions/models.py reservation_units/admin/forms/reservation_unit.py
-msgid "Unit"
 msgstr ""
 
 #: reservation_units/admin/forms/application_round_time_slot.py
@@ -2695,7 +2691,7 @@ msgid "Purpose of the reservation"
 msgstr "Varausten alkupäivän täytyy olla ennen niiden loppupäivää."
 
 #: reservations/admin.py
-msgid "Home city of the group or association"
+msgid "Reservee's home city"
 msgstr ""
 
 #: reservations/admin.py
