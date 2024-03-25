@@ -1,4 +1,4 @@
-from api.graphql.extensions.legacy_helpers import OldPrimaryKeySerializer
+from api.graphql.extensions.serializers import OldPrimaryKeySerializer
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from reservations.choices import ReservationStateChoice

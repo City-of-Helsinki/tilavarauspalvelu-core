@@ -3,9 +3,10 @@ import datetime
 from django.utils.timezone import get_default_timezone
 from rest_framework import serializers
 
-from api.graphql.extensions.legacy_helpers import OldChoiceCharField, OldPrimaryKeySerializer
+from api.graphql.extensions.fields import OldChoiceCharField
+from api.graphql.extensions.serializers import OldPrimaryKeySerializer
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
-from api.graphql.types.reservations.serializers.mixins import ReservationSchedulingMixin
+from api.graphql.types.reservation.serializers.mixins import ReservationSchedulingMixin
 from applications.models import City
 from common.fields.serializer import IntegerPrimaryKeyField
 from reservation_units.models import ReservationUnit

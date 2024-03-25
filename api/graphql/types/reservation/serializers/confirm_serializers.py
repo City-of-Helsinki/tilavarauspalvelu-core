@@ -2,7 +2,7 @@ from django.conf import settings
 
 from api.graphql.extensions.legacy_helpers import OldChoiceCharField
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
-from api.graphql.types.reservations.serializers.update_serializers import ReservationUpdateSerializer
+from api.graphql.types.reservation.serializers.update_serializers import ReservationUpdateSerializer
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from merchants.models import Language, OrderStatus, PaymentOrder
 from merchants.verkkokauppa.helpers import create_mock_verkkokauppa_order, get_verkkokauppa_order_params
@@ -18,6 +18,8 @@ from utils.sentry import SentryLogger
 
 
 class ReservationConfirmSerializer(ReservationUpdateSerializer):
+    instance: Reservation
+
     payment_type = OldChoiceCharField(
         choices=PaymentType.choices,
         required=False,
