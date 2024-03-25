@@ -252,7 +252,7 @@ def test_reservation__query__fields_requiring_staff_permissions__regular_user(gr
         "staffEvent": None,
         "type": None,
         "workingMemo": None,
-        "handlingDetails": "",
+        "handlingDetails": None,
         "handledAt": None,
     }
 

@@ -11,9 +11,9 @@ pytestmark = [
 
 
 def test_equipment_category__create__regular_user_cannot_create(graphql):
-    data = {"nameFi": "foo"}
+    data = {"name": "foo"}
 
     graphql.login_user_based_on_type(UserType.REGULAR)
     response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "No permission to mutate"
+    assert response.error_message() == "No permission to create."

@@ -49,10 +49,7 @@ def test_primary_key_is_required_for_deleting(graphql):
 
     # then:
     # - The response complains about the improper input
-    assert (
-        response.error_message()
-        == "Variable '$input' of required type 'BannerNotificationDeleteMutationInput!' was not provided."
-    )
+    assert response.error_message().startswith("Variable '$input'")
 
 
 def test_user_tries_to_delete_non_existing_banner_notification(graphql):

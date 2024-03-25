@@ -6,7 +6,7 @@ from graphql_relay import to_global_id
 
 from applications.choices import WeekdayChoice
 from common.date_utils import local_datetime
-from reservation_units.enums import ReservationUnitState
+from reservation_units.enums import PricingType, ReservationUnitState
 from reservations.choices import ReservationStateChoice
 from reservations.models import Reservation
 from terms_of_use.models import TermsOfUse
@@ -23,7 +23,6 @@ from tests.factories import (
     ReservationUnitCancellationRuleFactory,
     ReservationUnitFactory,
     ReservationUnitPaymentTypeFactory,
-    ReservationUnitPricingFactory,
     ResourceFactory,
     ServiceFactory,
     SpaceFactory,
@@ -282,7 +281,6 @@ def test_reservation_unit__query__all_to_one_relations(graphql):
 
     fields = """
         pk
-
         unit {
             nameFi
         }
@@ -332,7 +330,6 @@ def test_reservation_unit__query__all_to_one_relations(graphql):
     assert len(response.edges) == 1
     assert response.node(0) == {
         "pk": reservation_unit.pk,
-        #
         "unit": {
             "nameFi": reservation_unit.unit.name_fi,
         },
@@ -368,11 +365,8 @@ def test_reservation_unit__query__all_to_one_relations(graphql):
 
 @pytest.mark.usefixtures("_celery_synchronous")  # for updating image urls when creating images for reservation unit
 def test_reservation_unit__query__all_one_to_many_relations(graphql):
-    graphql.login_with_superuser()
-
     fields = """
         pk
-
         pricings {
             begins
             taxPercentage {
@@ -388,10 +382,11 @@ def test_reservation_unit__query__all_one_to_many_relations(graphql):
     """
 
     reservation_unit = ReservationUnitFactory.create(
-        pricings=[ReservationUnitPricingFactory.create()],
+        pricings__pricing_type=PricingType.PAID,
         images__large_url="https://example.com",
         application_round_time_slots__closed=False,
     )
+    graphql.login_with_superuser()
     query = reservation_units_query(fields=fields)
     response = graphql(query)
 
@@ -399,7 +394,6 @@ def test_reservation_unit__query__all_one_to_many_relations(graphql):
     assert len(response.edges) == 1
     assert response.node(0) == {
         "pk": reservation_unit.pk,
-        #
         "pricings": [
             {
                 "begins": reservation_unit.pricings.first().begins.isoformat(),
@@ -805,7 +799,7 @@ def test_reservation_unit__query__payment_product(graphql):
     ReservationUnitFactory.create(payment_merchant=merchant, payment_product=product)
 
     graphql.login_with_superuser()
-    query = reservation_units_query(fields="paymentProduct { pk merchantPk }")
+    query = reservation_units_query(fields="paymentProduct { pk merchant { pk } }")
     response = graphql(query)
 
     assert response.has_errors is False, response.errors
@@ -813,6 +807,8 @@ def test_reservation_unit__query__payment_product(graphql):
     assert response.node(0) == {
         "paymentProduct": {
             "pk": str(product.id),
-            "merchantPk": str(merchant.id),
+            "merchant": {
+                "pk": str(merchant.id),
+            },
         },
     }

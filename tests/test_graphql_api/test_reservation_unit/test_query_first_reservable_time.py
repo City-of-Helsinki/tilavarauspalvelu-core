@@ -5,6 +5,7 @@ from typing import NamedTuple
 
 import freezegun
 import pytest
+from graphene_django_extensions.testing import parametrize_helper
 
 from applications.choices import ApplicationRoundStatusChoice
 from common.date_utils import DEFAULT_TIMEZONE
@@ -20,7 +21,6 @@ from tests.factories import (
     ResourceFactory,
     SpaceFactory,
 )
-from tests.helpers import parametrize_helper
 
 from .helpers import reservation_units_query
 

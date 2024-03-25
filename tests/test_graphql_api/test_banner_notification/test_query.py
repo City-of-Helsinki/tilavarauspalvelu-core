@@ -1,12 +1,12 @@
 from typing import Any, NamedTuple
 
 import pytest
+from graphene_django_extensions.testing import parametrize_helper
 from graphql_relay import to_global_id
 
 from api.graphql.types.banner_notification.types import BannerNotificationNode
 from common.choices import BannerNotificationTarget
 from tests.factories import BannerNotificationFactory, UserFactory
-from tests.helpers import parametrize_helper
 
 # Applied to all tests
 pytestmark = [
@@ -186,7 +186,7 @@ def test_filter_banner_notifications_by_is_visible(graphql, value, expected):
     response = graphql(
         """
         query BannerNotifications($isVisible: Boolean!) {
-            bannerNotifications(isVisible: $isVisible, orderBy: "pk") {
+            bannerNotifications(isVisible: $isVisible, orderBy: pkAsc) {
                 edges {
                     node {
                         name

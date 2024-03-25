@@ -49,7 +49,7 @@ def test_purpose__order__by_rank(graphql):
 
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
-    query = purposes_query(order_by="-rank")
+    query = purposes_query(order_by="rankDesc")
     response = graphql(query)
 
     assert response.has_errors is False

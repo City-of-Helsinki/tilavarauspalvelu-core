@@ -1,7 +1,7 @@
 import pytest
+from graphene_django_extensions.testing import build_query
 
 from tests.factories import ReservationMetadataFieldFactory, ReservationMetadataSetFactory
-from tests.gql_builders import build_query
 from tests.helpers import UserType
 
 # Applied to all tests
@@ -22,7 +22,8 @@ def test_metadata_sets__query(graphql):
     )
 
     graphql.login_user_based_on_type(UserType.SUPERUSER)
-    query = build_query("metadataSets", fields="name supportedFields requiredFields", connection=True)
+    fields = "name supportedFields { fieldName } requiredFields { fieldName }"
+    query = build_query("metadataSets", fields=fields, connection=True)
     response = graphql(query)
 
     assert response.has_errors is False
@@ -30,6 +31,23 @@ def test_metadata_sets__query(graphql):
 
     assert response.node() == {
         "name": field_set.name,
-        "requiredFields": ["reservee_first_name", "reservee_last_name"],
-        "supportedFields": ["reservee_first_name", "reservee_last_name", "reservee_phone"],
+        "requiredFields": [
+            {
+                "fieldName": "reservee_first_name",
+            },
+            {
+                "fieldName": "reservee_last_name",
+            },
+        ],
+        "supportedFields": [
+            {
+                "fieldName": "reservee_first_name",
+            },
+            {
+                "fieldName": "reservee_last_name",
+            },
+            {
+                "fieldName": "reservee_phone",
+            },
+        ],
     }

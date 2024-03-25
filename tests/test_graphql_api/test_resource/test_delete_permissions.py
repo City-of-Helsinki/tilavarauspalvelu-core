@@ -17,4 +17,4 @@ def test_resource__delete__regular_user(graphql):
 
     response = graphql(DELETE_MUTATION, input_data={"pk": resource.pk})
 
-    assert response.error_message() == "No permissions to perform delete."
+    assert response.error_message() == "No permission to delete."

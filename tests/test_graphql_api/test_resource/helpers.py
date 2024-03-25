@@ -1,17 +1,11 @@
 from functools import partial
 
-from tests.gql_builders import build_mutation, build_query
+from graphene_django_extensions.testing import build_mutation, build_query
 
+resource_query = partial(build_query, "resource")
 resources_query = partial(build_query, "resources", connection=True)
-resource_by_pk_query = partial(build_query, "resourceByPk")
 
 
-CREATE_MUTATION = build_mutation(
-    "createResource",
-    "ResourceCreateMutationInput",
-)
-UPDATE_MUTATION = build_mutation(
-    "updateResource",
-    "ResourceUpdateMutationInput",
-)
-DELETE_MUTATION = build_mutation("deleteResource", "ResourceDeleteMutationInput", selections="deleted errors")
+CREATE_MUTATION = build_mutation("createResource", "ResourceCreateMutation")
+UPDATE_MUTATION = build_mutation("updateResource", "ResourceUpdateMutation")
+DELETE_MUTATION = build_mutation("deleteResource", "ResourceDeleteMutation", fields="deleted")

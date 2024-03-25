@@ -22,7 +22,7 @@ def test_recurring_reservations__create__regular_user(graphql):
     data = get_minimal_create_date(reservation_unit)
     response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "No permission to mutate"
+    assert response.error_message() == "No permission to create."
 
 
 def test_recurring_reservations__create__general_admin(graphql):
@@ -71,7 +71,7 @@ def test_recurring_reservations__create__service_sector_admin(graphql):
         "beginTime": datetime.time(10, 0, 0).isoformat(),
         "endTime": datetime.time(12, 0, 0).isoformat(),
         "recurrenceInDays": 7,
-        "reservationUnitPk": reservation_unit.pk,
+        "reservationUnit": reservation_unit.pk,
     }
     response = graphql(CREATE_MUTATION, input_data=data)
 

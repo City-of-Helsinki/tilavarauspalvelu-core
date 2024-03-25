@@ -3,8 +3,9 @@ import datetime
 import freezegun
 import pytest
 from django.test import override_settings
+from graphql_relay import to_global_id
 
-from reservations.choices import ReservationTypeChoice
+from reservations.choices import CustomerTypeChoice, ReservationTypeChoice
 from reservations.models import Reservation
 from tests.factories import (
     PaymentOrderFactory,
@@ -18,7 +19,7 @@ from tests.factories import (
 from tests.helpers import UserType
 from users.models import PersonalInfoViewLog
 
-from .helpers import reservations_query
+from .helpers import reservation_query, reservations_query
 
 # Applied to all tests
 pytestmark = [
@@ -65,7 +66,7 @@ def test_reservation__query__all_fields(graphql):
         price
         priceNet
         purpose { nameFi }
-        recurringReservation { user }
+        recurringReservation { user { email } }
         reservationUnits { nameFi }
         reserveeAddressCity
         reserveeAddressStreet
@@ -122,8 +123,8 @@ def test_reservation__query__all_fields(graphql):
         "name": reservation.name,
         "numPersons": reservation.num_persons,
         "order": None,
-        "price": float(reservation.price),
-        "priceNet": "0.000000",
+        "price": f"{reservation.price:.2f}",
+        "priceNet": f"{reservation.price_net:.6f}",
         "purpose": None,
         "recurringReservation": None,
         "reservationUnits": [],
@@ -140,13 +141,78 @@ def test_reservation__query__all_fields(graphql):
         "reserveePhone": reservation.reservee_phone,
         "reserveeType": reservation.reservee_type,
         "staffEvent": False,
-        "state": reservation.state.value.upper(),
-        "taxPercentageValue": "0.00",
-        "type": reservation.type.value.upper(),
-        "unitPrice": float(reservation.unit_price),
+        "state": reservation.state.upper(),
+        "taxPercentageValue": f"{reservation.tax_percentage_value:.2f}",
+        "type": reservation.type,
+        "unitPrice": f"{reservation.unit_price:.2f}",
         "user": {"email": reservation.user.email},
         "workingMemo": reservation.working_memo,
     }
+
+
+def test_reservation__query__single(graphql):
+    reservation = ReservationFactory.create()
+
+    graphql.login_with_superuser()
+    global_id = to_global_id("ReservationNode", reservation.pk)
+    query = reservation_query(id=global_id)
+
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert response.first_query_object["pk"] == reservation.pk
+
+
+def test_reservation__query__reservee_name_for_individual_reservee(graphql):
+    reservation = ReservationFactory.create(
+        reservee_type=CustomerTypeChoice.INDIVIDUAL,
+        reservee_first_name="First",
+        reservee_last_name="Last",
+    )
+
+    graphql.login_with_superuser()
+    global_id = to_global_id("ReservationNode", reservation.pk)
+    query = reservation_query(id=global_id, fields="pk reserveeName")
+
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert response.first_query_object["pk"] == reservation.pk
+    assert response.first_query_object["reserveeName"] == "First Last"
+
+
+def test_reservation__query__reservee_name_for_business_reservee(graphql):
+    reservation = ReservationFactory.create(
+        reservee_type=CustomerTypeChoice.BUSINESS,
+        reservee_organisation_name="Business Oy",
+    )
+
+    graphql.login_with_superuser()
+    global_id = to_global_id("ReservationNode", reservation.pk)
+    query = reservation_query(id=global_id, fields="pk reserveeName")
+
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert response.first_query_object["pk"] == reservation.pk
+    assert response.first_query_object["reserveeName"] == "Business Oy"
+
+
+def test_reservation__query__reservee_name_for_nonprofit_reservee(graphql):
+    reservation = ReservationFactory(
+        reservee_type=CustomerTypeChoice.NONPROFIT,
+        reservee_organisation_name="Nonprofit Ry",
+    )
+
+    graphql.login_with_superuser()
+    global_id = to_global_id("ReservationNode", reservation.pk)
+    query = reservation_query(id=global_id, fields="pk reserveeName")
+
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert response.first_query_object["pk"] == reservation.pk
+    assert response.first_query_object["reserveeName"] == "Nonprofit Ry"
 
 
 def test_reservation__query__reservee_date_of_birth_is_not_shown_to_regular_user(graphql, settings):
@@ -162,8 +228,7 @@ def test_reservation__query__reservee_date_of_birth_is_not_shown_to_regular_user
     assert len(response.edges) == 1
     assert response.node(0) == {"pk": reservation.pk, "user": None}
 
-    view_log: PersonalInfoViewLog | None = PersonalInfoViewLog.objects.first()
-    assert view_log is None
+    assert PersonalInfoViewLog.objects.first() is None
 
 
 def test_reservation__query__reservee_date_of_birth_is_show_but_logged__general_admin(graphql, settings):
@@ -335,7 +400,7 @@ def test_reservation__query__order__all_fields(graphql):
 
     graphql.login_user_based_on_type(UserType.SUPERUSER)
     query = reservations_query(
-        fields="order {orderUuid status paymentType receiptUrl checkoutUrl reservationPk refundUuid expiresInMinutes}"
+        fields="order { orderUuid status paymentType receiptUrl checkoutUrl reservationPk refundUuid expiresInMinutes }"
     )
     response = graphql(query)
 

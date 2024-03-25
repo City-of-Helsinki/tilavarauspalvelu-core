@@ -2,10 +2,10 @@ from typing import NamedTuple
 
 import pytest
 from elasticsearch_django.settings import get_client
+from graphene_django_extensions.testing import parametrize_helper
 
 from reservation_units.models import ReservationUnit
 from tests.factories import ReservationUnitFactory, SpaceFactory
-from tests.helpers import parametrize_helper
 
 from .helpers import reservation_units_query
 

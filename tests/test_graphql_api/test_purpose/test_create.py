@@ -12,12 +12,12 @@ pytestmark = [
 
 
 def test_purpose__create(graphql):
-    data = {"nameFi": "foo"}
+    data = {"name": "foo"}
 
     graphql.login_user_based_on_type(UserType.SUPERUSER)
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is False
 
-    purpose = Purpose.objects.get(pk=response.first_query_object["purpose"]["pk"])
+    purpose = Purpose.objects.get(pk=response.first_query_object["pk"])
     assert purpose.name_fi == "foo"

@@ -1,6 +1,7 @@
 import factory
 from factory import fuzzy
 
+from resources.choices import ResourceLocationType
 from resources.models import Resource
 
 from ._base import GenericDjangoModelFactory
@@ -16,4 +17,4 @@ class ResourceFactory(GenericDjangoModelFactory[Resource]):
 
     name = fuzzy.FuzzyText()
     space = factory.SubFactory("tests.factories.SpaceFactory")
-    location_type = "fixed"
+    location_type = ResourceLocationType.FIXED.value

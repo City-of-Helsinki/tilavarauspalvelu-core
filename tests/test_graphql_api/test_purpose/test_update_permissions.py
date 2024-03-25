@@ -13,9 +13,9 @@ pytestmark = [
 
 def test_purpose__update__regular_user(graphql):
     purpose = PurposeFactory.create(name="foo")
-    data = {"pk": purpose.pk, "nameFi": "bar"}
+    data = {"pk": purpose.pk, "name": "bar"}
 
     graphql.login_user_based_on_type(UserType.REGULAR)
     response = graphql(UPDATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "No permission to mutate"
+    assert response.error_message() == "No permission to update."

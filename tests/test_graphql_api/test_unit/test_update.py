@@ -1,7 +1,7 @@
 import pytest
+from graphene_django_extensions.testing import build_mutation
 
 from tests.factories import UnitFactory
-from tests.gql_builders import build_mutation
 from tests.helpers import UserType
 
 # Applied to all tests
@@ -10,10 +10,7 @@ pytestmark = [
 ]
 
 
-UPDATE_MUTATION = build_mutation(
-    "updateUnit",
-    "UnitUpdateMutationInput",
-)
+UPDATE_MUTATION = build_mutation("updateUnit", "UnitUpdateMutation")
 
 
 def test_units__query(graphql):

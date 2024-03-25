@@ -1,7 +1,7 @@
 import pytest
+from graphene_django_extensions.testing import build_mutation
 
 from tests.factories import UnitFactory
-from tests.gql_builders import build_mutation
 from tests.helpers import UserType
 
 # Applied to all tests
@@ -10,17 +10,14 @@ pytestmark = [
 ]
 
 
-UPDATE_MUTATION = build_mutation(
-    "updateUnit",
-    "UnitUpdateMutationInput",
-)
+UPDATE_MUTATION = build_mutation("updateUnit", "UnitUpdateMutation")
 
 
-def test_units__query(graphql):
+def test_units__update__regular_user(graphql):
     unit = UnitFactory.create()
     graphql.login_user_based_on_type(UserType.REGULAR)
 
     data = {"pk": unit.pk, "descriptionFi": "foo"}
     response = graphql(UPDATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "No permission to mutate"
+    assert response.error_message() == "No permission to update."

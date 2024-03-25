@@ -1,9 +1,11 @@
 import datetime
 import uuid
+from typing import Any
 
 import factory
 from factory import fuzzy
 
+from common.date_utils import local_start_of_day
 from reservation_units.enums import AuthenticationType, ReservationKind, ReservationStartInterval
 from reservation_units.models import (
     ReservationUnit,
@@ -92,9 +94,32 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
 
     # Reverse many-to-many
     application_rounds = ManyToManyFactory("tests.factories.ApplicationRoundFactory")
-    pricings = ManyToManyFactory("tests.factories.ReservationUnitPricingFactory")
     reservation_set = ManyToManyFactory("tests.factories.ReservationFactory")
 
     # Reverse one-to-many
     images = OneToManyFactory("tests.factories.ReservationUnitImageFactory")
+    pricings = OneToManyFactory("tests.factories.ReservationUnitPricingFactory")
     application_round_time_slots = OneToManyFactory("tests.factories.ApplicationRoundTimeSlotFactory")
+
+    @classmethod
+    def create_reservable_now(cls, **kwargs: Any) -> ReservationUnit:
+        """Create a reservation unit that is reservable for yesterday, the current day, and the next day."""
+        from .opening_hours import ReservableTimeSpanFactory
+        from .space import SpaceFactory
+
+        start_of_today = local_start_of_day()
+
+        space = SpaceFactory.create()
+
+        kwargs.setdefault("origin_hauki_resource__id", "987")
+        kwargs.setdefault("spaces", [space])
+        kwargs.setdefault("unit", space.unit)
+        reservation_unit = cls.create(**kwargs)
+
+        ReservableTimeSpanFactory.create(
+            resource=reservation_unit.origin_hauki_resource,
+            start_datetime=start_of_today - datetime.timedelta(days=1),
+            end_datetime=start_of_today + datetime.timedelta(days=2),
+        )
+
+        return reservation_unit

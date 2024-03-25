@@ -1,5 +1,8 @@
+from factory import fuzzy
+
 from reservations.models import ReservationCancelReason
-from tests.factories._base import GenericDjangoModelFactory
+
+from ._base import GenericDjangoModelFactory, OneToManyFactory
 
 __all__ = [
     "ReservationCancelReasonFactory",
@@ -9,3 +12,7 @@ __all__ = [
 class ReservationCancelReasonFactory(GenericDjangoModelFactory[ReservationCancelReason]):
     class Meta:
         model = ReservationCancelReason
+
+    reason = fuzzy.FuzzyText()
+
+    reservations = OneToManyFactory("tests.factories.reservation.ReservationFactory")
