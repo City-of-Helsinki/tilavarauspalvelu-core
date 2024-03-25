@@ -1,89 +1,159 @@
-from typing import Any
-
 import graphene
-from graphene_permissions.mixins import AuthNode
-from rest_framework.exceptions import PermissionDenied
+from graphene_django_extensions import DjangoNode
+from query_optimizer import DjangoListField
 
-from api.graphql.extensions.base_types import TVPBaseConnection
-from api.graphql.extensions.legacy_helpers import OldPrimaryKeyObjectType
-from api.graphql.types.permissions.permissions import (
-    GeneralRolePermission,
-    ServiceSectorRolePermission,
-    UnitRolePermission,
-)
-from api.graphql.types.service_sector.types import ServiceSectorType
-from api.graphql.types.units.types import UnitGroupType, UnitType
 from common.typing import GQLInfo
 from permissions.helpers import can_view_users
-from permissions.models import GeneralRole, ServiceSectorRole, UnitRole
-from permissions.models import GeneralRolePermission as GeneralRolePermissionModel
-from permissions.models import ServiceSectorRolePermission as ServiceSectorRolePermissionModel
-from permissions.models import UnitRolePermission as UnitRolePermissionModel
+from permissions.models import (
+    GeneralPermissionChoices,
+    GeneralRole,
+    GeneralRoleChoice,
+    GeneralRolePermission,
+    ServiceSectorPermissionsChoices,
+    ServiceSectorRole,
+    ServiceSectorRoleChoice,
+    ServiceSectorRolePermission,
+    UnitPermissionChoices,
+    UnitRole,
+    UnitRoleChoice,
+    UnitRolePermission,
+)
+
+from .permissions import (
+    GeneralRolePermissionPermission,
+    ServiceSectorRolePermissionPermission,
+    UnitRolePermissionPermission,
+)
+
+__all__ = [
+    "GeneralRoleChoiceNode",
+    "GeneralRolePermissionNode",
+    "GeneralRoleNode",
+    "ServiceSectorRoleChoiceNode",
+    "ServiceSectorRolePermissionNode",
+    "ServiceSectorRoleNode",
+    "UnitRoleChoiceNode",
+    "UnitRolePermissionNode",
+    "UnitRoleNode",
+]
 
 
-class RoleType(graphene.ObjectType):
-    code = graphene.String()
-    verbose_name = graphene.String()
-    verbose_name_fi = graphene.String()
-    verbose_name_sv = graphene.String()
-    verbose_name_en = graphene.String()
+# General
 
 
-class IncludePermissionsMixin:
-    def resolve_permissions(root: Any, info: GQLInfo):
-        if info.context.user == root.user or can_view_users(info.context.user):
-            return root.role.permissions.all()
-
-        raise PermissionDenied("No permission to view permissions.")
-
-
-class GeneralRolePermissionType(graphene.ObjectType):
-    permission = graphene.String()
+class GeneralRoleChoiceNode(DjangoNode):
+    permissions = DjangoListField(lambda: GeneralRolePermissionNode)
 
     class Meta:
-        model = GeneralRolePermissionModel
-        fields = ["permission"]
+        model = GeneralRoleChoice
+        fields = [
+            "code",
+            "verbose_name",
+            "permissions",
+        ]
 
 
-class ServiceSectorRolePermissionType(graphene.ObjectType):
-    permission = graphene.String()
-
-    class Meta:
-        model = ServiceSectorRolePermissionModel
-        fields = ["permission"]
-
-
-class UnitRolePermissionType(graphene.ObjectType):
-    permission = graphene.String()
+class GeneralRolePermissionNode(DjangoNode):
+    permission = graphene.Field(graphene.Enum.from_enum(GeneralPermissionChoices))
 
     class Meta:
-        model = UnitRolePermissionModel
-        fields = ["permission"]
+        model = GeneralRolePermission
+        fields = [
+            "pk",
+            "permission",
+        ]
+
+    def resolve_permission(root: GeneralRolePermission, info: GQLInfo) -> str:
+        return root.permission.upper()
 
 
-class GeneralRoleType(AuthNode, OldPrimaryKeyObjectType, IncludePermissionsMixin):
-    permission_classes = (GeneralRolePermission,)
-
-    role = graphene.Field(RoleType)
-    permissions = graphene.List(GeneralRolePermissionType)
-
+class GeneralRoleNode(DjangoNode):
     class Meta:
         model = GeneralRole
         fields = [
             "pk",
             "role",
         ]
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
+        restricted_fields = {
+            "role": lambda user, role: user == role.user or can_view_users(user),
+        }
+        permission_classes = [GeneralRolePermissionPermission]
 
 
-class ServiceSectorRoleType(AuthNode, OldPrimaryKeyObjectType, IncludePermissionsMixin):
-    permission_classes = (ServiceSectorRolePermission,)
+# Unit
 
-    role = graphene.Field(RoleType)
-    service_sector = graphene.Field(ServiceSectorType)
-    permissions = graphene.List(ServiceSectorRolePermissionType)
 
+class UnitRoleChoiceNode(DjangoNode):
+    permissions = DjangoListField(lambda: UnitRolePermissionNode)
+
+    class Meta:
+        model = UnitRoleChoice
+        fields = [
+            "code",
+            "verbose_name",
+            "permissions",
+        ]
+
+
+class UnitRolePermissionNode(DjangoNode):
+    permission = graphene.Field(graphene.Enum.from_enum(UnitPermissionChoices))
+
+    class Meta:
+        model = UnitRolePermission
+        fields = [
+            "pk",
+            "permission",
+        ]
+
+    def resolve_permission(root: GeneralRolePermission, info: GQLInfo) -> str:
+        return root.permission.upper()
+
+
+class UnitRoleNode(DjangoNode):
+    class Meta:
+        model = UnitRole
+        fields = [
+            "pk",
+            "role",
+            "unit",
+            "unit_group",
+        ]
+        restricted_fields = {
+            "role": lambda user, role: user == role.user or can_view_users(user),
+        }
+        permission_classes = [UnitRolePermissionPermission]
+
+
+# Service Sector
+
+
+class ServiceSectorRoleChoiceNode(DjangoNode):
+    permissions = DjangoListField(lambda: ServiceSectorRolePermissionNode)
+
+    class Meta:
+        model = ServiceSectorRoleChoice
+        fields = [
+            "code",
+            "verbose_name",
+            "permissions",
+        ]
+
+
+class ServiceSectorRolePermissionNode(DjangoNode):
+    permission = graphene.Field(graphene.Enum.from_enum(ServiceSectorPermissionsChoices))
+
+    class Meta:
+        model = ServiceSectorRolePermission
+        fields = [
+            "pk",
+            "permission",
+        ]
+
+    def resolve_permission(root: GeneralRolePermission, info: GQLInfo) -> str:
+        return root.permission.upper()
+
+
+class ServiceSectorRoleNode(DjangoNode):
     class Meta:
         model = ServiceSectorRole
         fields = [
@@ -91,26 +161,7 @@ class ServiceSectorRoleType(AuthNode, OldPrimaryKeyObjectType, IncludePermission
             "role",
             "service_sector",
         ]
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
-
-
-class UnitRoleType(AuthNode, OldPrimaryKeyObjectType, IncludePermissionsMixin):
-    permission_classes = (UnitRolePermission,)
-
-    role = graphene.Field(RoleType)
-    units = graphene.List(UnitType)
-    unit_groups = graphene.List(UnitGroupType)
-    permissions = graphene.List(UnitRolePermissionType)
-
-    class Meta:
-        model = UnitRole
-        fields = ["pk", "role", "units", "unit_groups"]
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
-
-    def resolve_units(root: UnitRole, info: GQLInfo):
-        return root.unit.all()
-
-    def resolve_unit_groups(root: UnitRole, info: GQLInfo):
-        return root.unit_group.all()
+        restricted_fields = {
+            "role": lambda user, role: user == role.user or can_view_users(user),
+        }
+        permission_classes = [ServiceSectorRolePermissionPermission]

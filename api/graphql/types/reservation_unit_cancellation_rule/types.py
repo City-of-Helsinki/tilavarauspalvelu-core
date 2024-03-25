@@ -1,23 +1,22 @@
-import graphene
-from graphene_permissions.mixins import AuthNode
+from graphene_django_extensions import DjangoNode
 
-from api.graphql.extensions.base_types import TVPBaseConnection
-from api.graphql.extensions.legacy_helpers import OldPrimaryKeyObjectType, get_all_translatable_fields
+from api.graphql.types.reservation_unit_cancellation_rule.filtersets import ReservationUnitCancellationRuleFilterSet
 from api.graphql.types.reservation_unit_cancellation_rule.permissions import ReservationUnitCancellationRulePermission
 from reservation_units.models import ReservationUnitCancellationRule
 
+__all__ = [
+    "ReservationUnitCancellationRuleNode",
+]
 
-class ReservationUnitCancellationRuleType(AuthNode, OldPrimaryKeyObjectType):
-    permission_classes = (ReservationUnitCancellationRulePermission,)
 
+class ReservationUnitCancellationRuleNode(DjangoNode):
     class Meta:
         model = ReservationUnitCancellationRule
         fields = [
             "pk",
+            "name",
             "can_be_cancelled_time_before",
             "needs_handling",
-            *get_all_translatable_fields(model),
         ]
-        filter_fields = ["name"]
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
+        filterset_class = ReservationUnitCancellationRuleFilterSet
+        permission_classes = [ReservationUnitCancellationRulePermission]
