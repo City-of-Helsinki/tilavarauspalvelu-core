@@ -2,12 +2,11 @@ import graphene
 from django.db import models
 from graphene_django_extensions import DjangoNode
 from lookup_property import L
-from query_optimizer import required_annotations
+from query_optimizer import AnnotatedField
 
 from api.graphql.types.application.filtersets import ApplicationFilterSet
 from api.graphql.types.application.permissions import ApplicationPermission
 from api.graphql.types.application_section.types import ApplicationSectionNode
-from api.graphql.types.users.types import ApplicantNode
 from applications.choices import ApplicationStatusChoice
 from applications.models import Application
 from common.typing import GQLInfo
@@ -23,9 +22,8 @@ __all__ = [
 
 
 class ApplicationNode(DjangoNode):
-    status = graphene.Field(graphene.Enum.from_enum(ApplicationStatusChoice))
+    status = AnnotatedField(graphene.Enum.from_enum(ApplicationStatusChoice), expression=L("status"))
 
-    user = ApplicantNode.RelatedField()
     application_sections = ApplicationSectionNode.ListField()
 
     class Meta:
@@ -65,7 +63,3 @@ class ApplicationNode(DjangoNode):
             | models.Q(application_sections__reservation_unit_options__reservation_unit__unit__in=units)
             | models.Q(user=info.context.user)
         ).distinct()
-
-    @required_annotations(status=L("status"))
-    def resolve_status(root: Application, info: GQLInfo) -> ApplicationStatusChoice:
-        return root.status

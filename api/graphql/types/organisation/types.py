@@ -1,6 +1,6 @@
 from graphene_django_extensions import DjangoNode
 
-from api.graphql.types.organization.permissions import OrganisationPermission
+from api.graphql.types.organisation.permissions import OrganisationPermission
 from applications.models import Organisation
 
 
