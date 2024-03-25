@@ -1355,42 +1355,6 @@ graphene-django = ">=3.0.0"
 filter = ["django-filter (>=21.1)"]
 
 [[package]]
-name = "graphene-file-upload"
-version = "1.3.0"
-description = "Lib for adding file upload functionality to GraphQL mutations in Graphene Django and Flask-Graphql"
-optional = false
-python-versions = "*"
-files = [
-    {file = "graphene_file_upload-1.3.0-py3-none-any.whl", hash = "sha256:5afe50f409f50e3d198fd92c883d98d868e6c6aaadf5df3a3f4d88ecad90ed97"},
-    {file = "graphene_file_upload-1.3.0.tar.gz", hash = "sha256:6898480b0556826472c80971032917c01968ade5800d84054008fe598795b063"},
-]
-
-[package.dependencies]
-six = ">=1.11.0"
-
-[package.extras]
-all = ["Flask (>=1.0.2)", "Flask-Graphql (>=2.0.0)", "graphene (>=2.1.2)", "graphene-django (>=2.0.0)"]
-django = ["graphene-django (>=2.0.0)"]
-flask = ["Flask (>=1.0.2)", "Flask-Graphql (>=2.0.0)", "graphene (>=2.1.2)"]
-tests = ["coverage", "pytest", "pytest-cov", "pytest-django"]
-
-[[package]]
-name = "graphene-permissions"
-version = "1.1.4"
-description = "Simple graphene-django permission system."
-optional = false
-python-versions = ">=3.5"
-files = [
-    {file = "graphene-permissions-1.1.4.tar.gz", hash = "sha256:8a201e352ee8b559ce069093a4485dbf0aba38cbb82042ebd521368a8310ab86"},
-    {file = "graphene_permissions-1.1.4-py3-none-any.whl", hash = "sha256:1b55d2dc45c9a708fd642ca1e8890075a733807a1c634d5696dbfe71eb4a7446"},
-]
-
-[package.dependencies]
-django-filter = "*"
-graphene = "*"
-graphene-django = "*"
-
-[[package]]
 name = "graphql-core"
 version = "3.2.3"
 description = "GraphQL implementation for Python, a port of GraphQL.js, the JavaScript reference implementation for GraphQL."
@@ -2928,4 +2892,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.12,<3.13"
-content-hash = "e117af22e518c24dcf390d040d5fffeaab622fbaf9f389e23cb62a8e3e068fba"
+content-hash = "7e7ba7e6a18ebfce3770bc6894f80b4bed7c459526df82eb139ebbbeee0bad4c"
