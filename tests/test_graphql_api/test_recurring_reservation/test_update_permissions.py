@@ -19,13 +19,15 @@ def test_recurring_reservations__update__regular_user(graphql):
 
     response = graphql(UPDATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "No permission to mutate"
+    assert response.error_message() == "No permission to update."
 
 
 def test_recurring_reservations__update__general_admin(graphql):
     recurring_reservation = RecurringReservationFactory.create(name="foo")
 
-    admin = UserFactory.create_with_general_permissions(perms=["can_manage_reservations"])
+    admin = UserFactory.create_with_general_permissions(
+        perms=["can_create_staff_reservations"],
+    )
     graphql.force_login(admin)
 
     data = {"pk": recurring_reservation.pk, "name": "bar"}
@@ -43,7 +45,7 @@ def test_recurring_reservations__update__unit_admin(graphql):
 
     admin = UserFactory.create_with_unit_permissions(
         unit=recurring_reservation.reservation_unit.unit,
-        perms=["can_manage_reservations"],
+        perms=["can_create_staff_reservations"],
     )
     graphql.force_login(admin)
 
@@ -63,7 +65,7 @@ def test_recurring_reservations__update__service_sector_admin(graphql):
 
     admin = UserFactory.create_with_service_sector_permissions(
         service_sector=sector,
-        perms=["can_manage_reservations"],
+        perms=["can_create_staff_reservations"],
     )
     graphql.force_login(admin)
 

@@ -1,7 +1,7 @@
 import pytest
+from graphene_django_extensions.testing import build_mutation
 
 from tests.factories import UserFactory
-from tests.gql_builders import build_mutation
 from tests.helpers import UserType
 
 # Applied to all tests
@@ -10,10 +10,7 @@ pytestmark = [
 ]
 
 
-UPDATE_MUTATION = build_mutation(
-    "updateUser",
-    "UserUpdateMutationInput",
-)
+UPDATE_MUTATION = build_mutation("updateUser", "UserUpdateMutation")
 
 
 def test_user__update__anonymous_user(graphql):
@@ -23,7 +20,7 @@ def test_user__update__anonymous_user(graphql):
     data = {"pk": user.pk, "reservationNotification": "NONE"}
     response = graphql(UPDATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "No permission to mutate"
+    assert response.error_message() == "No permission to update."
 
 
 def test_user__update__cannot_update_other_user(graphql):
@@ -33,7 +30,7 @@ def test_user__update__cannot_update_other_user(graphql):
     data = {"pk": user.pk, "reservationNotification": "NONE"}
     response = graphql(UPDATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "No permission to mutate"
+    assert response.error_message() == "No permission to update."
 
 
 def test_user__update__regular_user(graphql):
@@ -42,7 +39,7 @@ def test_user__update__regular_user(graphql):
     data = {"pk": user.pk, "reservationNotification": "NONE"}
     response = graphql(UPDATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "No permission to mutate"
+    assert response.error_message() == "No permission to update."
 
 
 def test_user__update__staff_user(graphql):

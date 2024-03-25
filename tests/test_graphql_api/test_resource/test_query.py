@@ -1,11 +1,12 @@
 import datetime
 
 import pytest
+from graphql_relay import to_global_id
 
 from tests.factories import ResourceFactory
 from tests.helpers import UserType
 
-from .helpers import resource_by_pk_query, resources_query
+from .helpers import resource_query, resources_query
 
 # Applied to all tests
 pytestmark = [
@@ -51,7 +52,7 @@ def test_resources__query__all_fields(graphql):
     }
 
 
-def test_resource_by_pk__buffer_times(graphql):
+def test_resource__buffer_times(graphql):
     resource = ResourceFactory.create(
         buffer_time_before=datetime.timedelta(minutes=15),
         buffer_time_after=datetime.timedelta(minutes=30),
@@ -65,7 +66,8 @@ def test_resource_by_pk__buffer_times(graphql):
         bufferTimeAfter
     """
 
-    query = resource_by_pk_query(fields=fields, pk=resource.pk)
+    global_id = to_global_id("ResourceNode", resource.pk)
+    query = resource_query(fields=fields, id=global_id)
     response = graphql(query)
 
     assert response.has_errors is False
@@ -77,10 +79,11 @@ def test_resource_by_pk__buffer_times(graphql):
     }
 
 
-def test_resource_by_pk__not_found(graphql):
+def test_resource__not_found(graphql):
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
-    query = resource_by_pk_query(pk=1)
+    global_id = to_global_id("ResourceNode", -1)
+    query = resource_query(id=global_id)
     response = graphql(query)
 
-    assert response.error_message() == "No Resource matches the given query."
+    assert response.first_query_object is None

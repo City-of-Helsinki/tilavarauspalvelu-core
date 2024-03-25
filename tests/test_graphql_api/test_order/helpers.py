@@ -1,9 +1,10 @@
 import uuid
 from functools import partial
 
+from graphene_django_extensions.testing import build_mutation, build_query
+
 from merchants.models import PaymentOrder
 from tests.factories import PaymentOrderFactory, ReservationFactory, ReservationUnitFactory
-from tests.gql_builders import build_mutation, build_query
 from users.models import User
 
 order_query = partial(
@@ -22,11 +23,7 @@ order_query = partial(
 )
 
 
-REFRESH_MUTATION = build_mutation(
-    "refreshOrder",
-    "RefreshOrderMutationInput",
-    selections="orderUuid status",
-)
+REFRESH_MUTATION = build_mutation("refreshOrder", "RefreshOrderMutation", fields="orderUuid status")
 
 
 def get_order(*, user: User | None = None) -> PaymentOrder:

@@ -17,8 +17,8 @@ def test_resource__update__regular_user(graphql):
 
     data = {
         "pk": resource.pk,
-        "nameFi": "a",
+        "name": "a",
     }
     response = graphql(UPDATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "No permission to mutate"
+    assert response.error_message() == "No permission to update."

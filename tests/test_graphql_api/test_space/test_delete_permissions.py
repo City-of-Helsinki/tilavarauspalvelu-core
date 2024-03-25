@@ -24,7 +24,7 @@ def test_regular_user_cannot_delete_space(graphql):
 
     # then:
     # - Response complains about mutation permissions
-    assert response.error_message() == "No permissions to perform delete."
+    assert response.error_message() == "No permission to delete."
 
 
 def test_unit_admin_can_delete_space(graphql):
@@ -59,7 +59,7 @@ def test_unit_admin_can_delete_space_if_not_for_spaces_unit(graphql):
 
     # then:
     # - Response complains about mutation permissions
-    assert response.error_message() == "No permissions to perform delete."
+    assert response.error_message() == "No permission to delete."
 
 
 def test_service_sector_admin_can_delete_space(graphql):
@@ -101,7 +101,7 @@ def test_service_sector_admin_for_other_sector_cannot_delete_space(graphql):
 
     # then:
     # - Response complains about mutation permissions
-    assert response.error_message() == "No permissions to perform delete."
+    assert response.error_message() == "No permission to delete."
 
 
 def test_general_admin_can_delete_space(graphql):

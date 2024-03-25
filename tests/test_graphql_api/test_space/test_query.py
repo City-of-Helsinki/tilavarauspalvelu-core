@@ -29,9 +29,6 @@ def test_query_spaces__all_fields(graphql):
         parent {
             pk
         }
-        building {
-            pk
-        }
         unit {
             pk
         }
@@ -60,9 +57,6 @@ def test_query_spaces__all_fields(graphql):
         "maxPersons": space.max_persons,
         "code": space.code,
         "parent": None,
-        "building": {
-            "pk": space.building.pk,
-        },
         "unit": {
             "pk": space.unit.pk,
         },

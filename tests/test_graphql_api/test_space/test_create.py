@@ -1,8 +1,9 @@
 import pytest
 
 from spaces.models import Space
-from tests.helpers import UserType, deprecated_field_error_messages
-from tests.test_graphql_api.test_space.helpers import CREATE_MUTATION
+from tests.helpers import UserType
+
+from .helpers import CREATE_MUTATION
 
 # Applied to all tests
 pytestmark = [
@@ -17,7 +18,7 @@ def test_create_space(graphql):
 
     # when:
     # - User tries to create a space
-    response = graphql(CREATE_MUTATION, input_data={"nameFi": "foo"})
+    response = graphql(CREATE_MUTATION, input_data={"name": "foo"})
 
     # then:
     # - The response has no errors
@@ -26,7 +27,7 @@ def test_create_space(graphql):
     assert Space.objects.count() == 1
 
 
-def test_create_space__name_fi_is_required(graphql):
+def test_create_space__name_is_required(graphql):
     # given:
     # - A superuser is using the system
     graphql.login_user_based_on_type(UserType.SUPERUSER)
@@ -36,25 +37,25 @@ def test_create_space__name_fi_is_required(graphql):
     response = graphql(CREATE_MUTATION, input_data={"nameSv": "foo"})
 
     # then:
-    # - The response has errors about nameFi field
+    # - The response has errors about name field
     # - The space is not created in the database
-    assert response.has_errors is True, response
-    assert "nameFi" in response.error_message()
+    assert response.error_message().startswith("Variable '$input'")
     assert Space.objects.count() == 0
 
 
-@pytest.mark.parametrize("name", ["", " "])
-def test_create_space__name_fi_cannot_be_empty(graphql, name):
+@pytest.mark.parametrize("value", ["", " "])
+def test_create_space__name_cannot_be_empty(graphql, value):
     # given:
     # - A superuser is using the system
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     # when:
     # - User tries to create a space
-    response = graphql(CREATE_MUTATION, input_data={"nameFi": name})
+    response = graphql(CREATE_MUTATION, input_data={"name": value})
 
     # then:
     # - The response has errors about nameFi field
     # - The space is not created in the database
-    assert deprecated_field_error_messages(response) == ["nameFi cannot be empty."]
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("name") == ["Tämä kenttä ei voi olla tyhjä."]
     assert Space.objects.count() == 0
