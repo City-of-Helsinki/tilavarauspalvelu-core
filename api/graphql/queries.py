@@ -5,7 +5,9 @@ Note that the type should be imported here even if it's not imported to schema.p
 simply so that it's registered before any mutations.
 """
 
+from .types.ability_group.types import AbilityGroupNode
 from .types.address.types import AddressNode
+from .types.age_group.types import AgeGroupNode
 from .types.allocated_time_slot.types import AllocatedTimeSlotNode
 from .types.application.types import ApplicationNode
 from .types.application_round.types import ApplicationRoundNode
@@ -13,103 +15,105 @@ from .types.application_round_time_slot.types import ApplicationRoundTimeSlotNod
 from .types.application_section.types import ApplicationSectionNode
 from .types.banner_notification.types import BannerNotificationNode
 from .types.city.types import CityNode
-from .types.equipment.types import EquipmentType
-from .types.equipment_category.types import EquipmentCategoryType
-from .types.keyword.types import KeywordCategoryType, KeywordGroupType, KeywordType
-from .types.location.types import LocationType
-from .types.merchants.types import PaymentMerchantType, PaymentOrderType, PaymentProductType
-from .types.organization.types import OrganisationNode
+from .types.equipment.types import EquipmentNode
+from .types.equipment_category.types import EquipmentCategoryNode
+from .types.keyword.types import KeywordCategoryNode, KeywordGroupNode, KeywordNode
+from .types.location.types import LocationNode
+from .types.merchants.types import PaymentMerchantNode, PaymentOrderNode, PaymentProductNode
+from .types.organisation.types import OrganisationNode
 from .types.permissions.types import (
-    GeneralRolePermissionType,
-    GeneralRoleType,
-    RoleType,
-    ServiceSectorRolePermissionType,
-    ServiceSectorRoleType,
-    UnitRolePermissionType,
-    UnitRoleType,
+    GeneralRoleChoiceNode,
+    GeneralRoleNode,
+    GeneralRolePermissionNode,
+    ServiceSectorRoleChoiceNode,
+    ServiceSectorRoleNode,
+    ServiceSectorRolePermissionNode,
+    UnitRoleChoiceNode,
+    UnitRoleNode,
+    UnitRolePermissionNode,
 )
 from .types.person.types import PersonNode
-from .types.purpose.types import PurposeType
-from .types.qualifier.types import QualifierType
+from .types.purpose.types import PurposeNode
+from .types.qualifier.types import QualifierNode
+from .types.recurring_reservation.types import RecurringReservationNode
+from .types.reservation.types import ReservationNode
+from .types.reservation_cancel_reason.types import ReservationCancelReasonNode
+from .types.reservation_deny_reason.types import ReservationDenyReasonNode
+from .types.reservation_metadata.types import ReservationMetadataFieldNode, ReservationMetadataSetNode
+from .types.reservation_purpose.types import ReservationPurposeNode
 from .types.reservation_unit.types import ReservationUnitNode
-from .types.reservation_unit_cancellation_rule.types import ReservationUnitCancellationRuleType
-from .types.reservation_unit_image.types import ReservationUnitImageType
+from .types.reservation_unit_cancellation_rule.types import ReservationUnitCancellationRuleNode
+from .types.reservation_unit_image.types import ReservationUnitImageNode
 from .types.reservation_unit_option.types import ReservationUnitOptionNode
-from .types.reservation_unit_payment_type.types import ReservationUnitPaymentTypeType
+from .types.reservation_unit_payment_type.types import ReservationUnitPaymentTypeNode
 from .types.reservation_unit_pricing.types import ReservationUnitPricingNode
 from .types.reservation_unit_type.types import ReservationUnitTypeNode
-from .types.reservations.types import (
-    AgeGroupType,
-    RecurringReservationType,
-    ReservationCancelReasonType,
-    ReservationDenyReasonType,
-    ReservationMetadataSetType,
-    ReservationPurposeType,
-    ReservationType,
-)
-from .types.resources.types import ResourceType
-from .types.service_sector.types import ServiceSectorType
-from .types.services.types import ServiceNode
-from .types.spaces.types import SpaceType
+from .types.resource.types import ResourceNode
+from .types.service.types import ServiceNode
+from .types.service_sector.types import ServiceSectorNode
+from .types.space.types import SpaceNode
 from .types.suitable_time_range.types import SuitableTimeRangeNode
 from .types.tax_percentage.types import TaxPercentageNode
-from .types.terms_of_use.types import TermsOfUseType
-from .types.units.types import UnitByPkType, UnitGroupType, UnitType
-from .types.users.types import ApplicantNode, UserType
+from .types.terms_of_use.types import TermsOfUseNode
+from .types.unit.types import UnitNode
+from .types.unit_group.types import UnitGroupNode
+from .types.user.types import UserNode
 
 __all__ = [
+    "AbilityGroupNode",
     "AddressNode",
-    "AgeGroupType",
+    "AgeGroupNode",
     "AllocatedTimeSlotNode",
-    "ApplicantNode",
     "ApplicationNode",
     "ApplicationRoundNode",
     "ApplicationRoundTimeSlotNode",
     "ApplicationSectionNode",
     "BannerNotificationNode",
     "CityNode",
-    "EquipmentCategoryType",
-    "EquipmentType",
-    "GeneralRolePermissionType",
-    "GeneralRoleType",
-    "KeywordCategoryType",
-    "KeywordGroupType",
-    "KeywordType",
-    "LocationType",
+    "EquipmentCategoryNode",
+    "EquipmentNode",
+    "GeneralRoleChoiceNode",
+    "GeneralRoleNode",
+    "GeneralRolePermissionNode",
+    "KeywordCategoryNode",
+    "KeywordGroupNode",
+    "KeywordNode",
+    "LocationNode",
     "OrganisationNode",
-    "PaymentMerchantType",
-    "PaymentOrderType",
-    "PaymentProductType",
+    "PaymentMerchantNode",
+    "PaymentOrderNode",
+    "PaymentProductNode",
     "PersonNode",
-    "PurposeType",
-    "QualifierType",
-    "RecurringReservationType",
-    "ReservationCancelReasonType",
-    "ReservationDenyReasonType",
-    "ReservationMetadataSetType",
-    "ReservationPurposeType",
-    "ReservationType",
-    "ReservationUnitCancellationRuleType",
-    "ReservationUnitImageType",
+    "PurposeNode",
+    "QualifierNode",
+    "RecurringReservationNode",
+    "ReservationCancelReasonNode",
+    "ReservationDenyReasonNode",
+    "ReservationMetadataFieldNode",
+    "ReservationMetadataSetNode",
+    "ReservationNode",
+    "ReservationPurposeNode",
+    "ReservationUnitCancellationRuleNode",
+    "ReservationUnitImageNode",
     "ReservationUnitNode",
     "ReservationUnitOptionNode",
-    "ReservationUnitPaymentTypeType",
+    "ReservationUnitPaymentTypeNode",
     "ReservationUnitPricingNode",
     "ReservationUnitTypeNode",
-    "ResourceType",
-    "RoleType",
+    "ResourceNode",
     "ServiceNode",
-    "ServiceSectorRolePermissionType",
-    "ServiceSectorRoleType",
-    "ServiceSectorType",
-    "SpaceType",
+    "ServiceSectorNode",
+    "ServiceSectorRoleChoiceNode",
+    "ServiceSectorRoleNode",
+    "ServiceSectorRolePermissionNode",
+    "SpaceNode",
     "SuitableTimeRangeNode",
     "TaxPercentageNode",
-    "TermsOfUseType",
-    "UnitByPkType",
-    "UnitGroupType",
-    "UnitRolePermissionType",
-    "UnitRoleType",
-    "UnitType",
-    "UserType",
+    "TermsOfUseNode",
+    "UnitGroupNode",
+    "UnitNode",
+    "UnitRoleChoiceNode",
+    "UnitRoleNode",
+    "UnitRolePermissionNode",
+    "UserNode",
 ]
