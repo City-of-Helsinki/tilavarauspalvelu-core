@@ -8,9 +8,9 @@ import django_filters
 from django.db.models import Expression, F, Q, QuerySet
 from elasticsearch_django.models import SearchQuery
 from graphene_django_extensions import ModelFilterSet
+from graphene_django_extensions.filters import IntMultipleChoiceFilter
 
 from common.date_utils import local_datetime
-from common.filtersets import IntMultipleChoiceFilter
 from elastic_django.reservation_units.query_builder import build_elastic_query_str
 from reservation_units.enums import ReservationKind, ReservationState, ReservationUnitState
 from reservation_units.models import ReservationUnit

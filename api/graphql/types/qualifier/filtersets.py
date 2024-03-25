@@ -1,18 +1,20 @@
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import IntMultipleChoiceFilter
 
-from reservation_units.models import TaxPercentage
+from reservation_units.models import Qualifier
 
 __all__ = [
-    "TaxPercentageFilterSet",
+    "QualifierFilterSet",
 ]
 
 
-class TaxPercentageFilterSet(ModelFilterSet):
+class QualifierFilterSet(ModelFilterSet):
     pk = IntMultipleChoiceFilter()
 
     class Meta:
-        model = TaxPercentage
+        model = Qualifier
         fields = [
-            "value",
+            "name_fi",
+            "name_en",
+            "name_sv",
         ]
