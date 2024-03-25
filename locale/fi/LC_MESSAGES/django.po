@@ -94,14 +94,12 @@ msgid "Day of the week"
 msgstr "Viikonpäivä"
 
 #: applications/admin/filters/application_section.py
-#: applications/admin/forms/application_section.py
-#: reservations/models/reservation.py
+#: applications/admin/forms/application_section.py reservations/admin.py
 #: reservations/models/reservation_statistic.py
 msgid "Age group"
 msgstr "Ikäryhmä"
 
-#: applications/admin/filters/application_section.py
-#: reservations/models/reservation.py
+#: applications/admin/filters/application_section.py reservations/admin.py
 #: reservations/models/reservation_statistic.py
 msgid "Reservation purpose"
 msgstr "Varaustarkoitukset"
@@ -127,15 +125,13 @@ msgid "Reservation unit option for to this allocation."
 msgstr "Varausyksikkövaihtoehto tälle allokoinnille."
 
 #: applications/admin/forms/allocated_time_slot.py
-#: applications/admin/forms/suitable_time_range.py
-#: reservations/models/reservation.py
+#: applications/admin/forms/suitable_time_range.py reservations/admin.py
 #: reservations/models/reservation_statistic.py
 msgid "Begin time"
 msgstr "Aloitusaika"
 
 #: applications/admin/forms/allocated_time_slot.py
-#: applications/admin/forms/suitable_time_range.py
-#: reservations/models/reservation.py
+#: applications/admin/forms/suitable_time_range.py reservations/admin.py
 #: reservations/models/reservation_statistic.py
 msgid "End time"
 msgstr "Lopetusaika"
@@ -199,7 +195,7 @@ msgstr "Hakija"
 msgid "Billing address"
 msgstr "Laskutusosoite"
 
-#: applications/admin/forms/application.py reservations/models/reservation.py
+#: applications/admin/forms/application.py reservations/admin.py
 #: reservations/models/reservation_statistic.py
 msgid "Home city"
 msgstr "Kotikunta"
@@ -208,7 +204,7 @@ msgstr "Kotikunta"
 msgid "Additional information"
 msgstr "Lisätiedot"
 
-#: applications/admin/forms/application.py reservations/models/reservation.py
+#: applications/admin/forms/application.py reservations/admin.py
 msgid "Working memo"
 msgstr "Käsittelymuistio"
 
@@ -310,8 +306,7 @@ msgstr "Kausivarauskierroksen sopimusehdot."
 #: applications/admin/forms/city.py applications/admin/forms/organization.py
 #: reservation_units/admin/forms/reservation_unit.py
 #: reservation_units/models/equipment.py reservation_units/models/keyword.py
-#: reservation_units/models/reservation_unit_type.py
-#: reservations/models/reservation.py
+#: reservation_units/models/reservation_unit_type.py reservations/admin.py
 #: reservations/models/reservation_metadata.py
 #: reservations/models/reservation_statistic.py resources/models.py
 #: services/models.py terms_of_use/models.py
@@ -486,8 +481,7 @@ msgstr ""
 "ollut mahdollista luoda jollekin vuorolle. <br>%(reserved)s: Kaikki "
 "varaukset jaetuille vuoroille on luotu. <br>"
 
-#: applications/admin/forms/application_section.py
-#: reservations/models/reservation.py
+#: applications/admin/forms/application_section.py reservations/admin.py
 #: reservations/models/reservation_statistic.py
 msgid "Number of persons"
 msgstr "Henkilömäärä"
@@ -664,7 +658,6 @@ msgstr "Henkilön puhelinnumero"
 #: applications/admin/forms/reservation_unit_option.py
 #: reservation_units/models/introduction.py
 #: reservation_units/models/reservation_unit_pricing.py
-#: reservations/models/reservation.py
 msgid "Reservation unit"
 msgstr "Varausyksikkö"
 
@@ -1048,7 +1041,7 @@ msgid "Staff"
 msgstr "Henkilökunta"
 
 #: common/choices/banner_notification.py permissions/models.py
-#: reservation_units/models/introduction.py reservations/models/reservation.py
+#: reservation_units/models/introduction.py reservations/admin.py
 msgid "User"
 msgstr "Käyttäjä"
 
@@ -1267,7 +1260,7 @@ msgstr "ALV-määrä"
 msgid "Total amount"
 msgstr "Kokonaismäärä"
 
-#: merchants/models.py reservations/models/reservation.py
+#: merchants/models.py reservations/admin.py
 #: reservations/models/reservation_statistic.py
 msgid "Created at"
 msgstr "Luotu"
@@ -1734,13 +1727,11 @@ msgstr "Palvelualuekohtaiset ehdot"
 msgid "Service specific terms for the reservation unit."
 msgstr "Varausyksikön palvelualuekohtaiset ehdot."
 
-#: reservation_units/admin/forms/reservation_unit.py
-#: reservations/models/reservation.py
+#: reservation_units/admin/forms/reservation_unit.py reservations/admin.py
 msgid "SKU"
 msgstr "SKU"
 
-#: reservation_units/admin/forms/reservation_unit.py
-#: reservations/models/reservation.py
+#: reservation_units/admin/forms/reservation_unit.py reservations/admin.py
 msgid "Description"
 msgstr "Kuvaus"
 
@@ -1880,15 +1871,13 @@ msgstr "Henkilöiden vähimmäismäärä"
 msgid "Surface area"
 msgstr "Pinta-ala"
 
-#: reservation_units/admin/forms/reservation_unit.py
-#: reservations/models/reservation.py
+#: reservation_units/admin/forms/reservation_unit.py reservations/admin.py
 #: reservations/models/reservation_statistic.py resources/models.py
 #: services/models.py
 msgid "Buffer time before"
 msgstr "Tauko ennen varausta"
 
-#: reservation_units/admin/forms/reservation_unit.py
-#: reservations/models/reservation.py
+#: reservation_units/admin/forms/reservation_unit.py reservations/admin.py
 #: reservations/models/reservation_statistic.py resources/models.py
 #: services/models.py
 msgid "Buffer time after"
@@ -2053,11 +2042,11 @@ msgstr "Henkilöiden maksimimäärä"
 msgid "Minimum number of persons"
 msgstr "Henkilöiden minimimäärä"
 
-#: reservation_units/admin/forms/reservation_unit.py
+#: reservation_units/admin/forms/reservation_unit.py reservations/admin.py
 msgid "Buffer time before reservation"
 msgstr "Tauko ennen varausta"
 
-#: reservation_units/admin/forms/reservation_unit.py
+#: reservation_units/admin/forms/reservation_unit.py reservations/admin.py
 msgid "Buffer time after reservation"
 msgstr "Tauko varauksen jälkeen"
 
@@ -2251,6 +2240,22 @@ msgstr "Heikko"
 msgid "Strong"
 msgstr "Vahva"
 
+#: reservation_units/enums.py
+msgid "Main image"
+msgstr "Pääkuva"
+
+#: reservation_units/enums.py
+msgid "Ground plan"
+msgstr "Pohjapiirros"
+
+#: reservation_units/enums.py
+msgid "Map"
+msgstr "Kartta"
+
+#: reservation_units/enums.py
+msgid "Other"
+msgstr "Muu"
+
 #: reservation_units/models/equipment.py reservation_units/models/purpose.py
 #: reservation_units/models/reservation_unit_type.py
 msgid "Order number to be used in api sorting."
@@ -2293,22 +2298,6 @@ msgid "Will the cancellation need manual staff handling"
 msgstr "Tarvitseeko peruminen manuaalisen käsittelyn"
 
 #: reservation_units/models/reservation_unit_image.py
-msgid "Main image"
-msgstr "Pääkuva"
-
-#: reservation_units/models/reservation_unit_image.py
-msgid "Ground plan"
-msgstr "Pohjapiirros"
-
-#: reservation_units/models/reservation_unit_image.py
-msgid "Map"
-msgstr "Kartta"
-
-#: reservation_units/models/reservation_unit_image.py
-msgid "Other"
-msgstr "Muu"
-
-#: reservation_units/models/reservation_unit_image.py
 msgid "Type"
 msgstr "Tyyppi"
 
@@ -2340,6 +2329,302 @@ msgstr "Ylin hinta"
 #: reservation_units/models/tax_percentage.py
 msgid "Tax percentage"
 msgstr "Veroprosentti"
+
+#: reservations/admin.py reservations/models/reservation_statistic.py
+msgid "State"
+msgstr "Tila"
+
+#: reservations/admin.py
+msgid "Reservation type"
+msgstr "Varauksen tyyppi"
+
+#: reservations/admin.py
+msgid "Cancel details"
+msgstr "Perumistiedot"
+
+#: reservations/admin.py
+msgid "Handling details"
+msgstr "Käsittelytiedot"
+
+#: reservations/admin.py reservations/models/reservation_statistic.py
+msgid "Handled at"
+msgstr "Käsitelty"
+
+#: reservations/admin.py reservations/models/reservation_statistic.py
+msgid "Confirmed at"
+msgstr "Vahvistettu"
+
+#: reservations/admin.py reservations/models/reservation_statistic.py
+msgid "Price"
+msgstr "Hinta"
+
+#: reservations/admin.py reservations/models/reservation_statistic.py
+msgid "Price net"
+msgstr "Nettohinta"
+
+#: reservations/admin.py
+msgid "Non-subsidised price"
+msgstr "Subventoimaton hinta"
+
+#: reservations/admin.py
+msgid "Non-subsidised net price"
+msgstr "Subventoimaton nettohinta"
+
+#: reservations/admin.py
+msgid "Unit price"
+msgstr "Yksikköhinta"
+
+#: reservations/admin.py reservations/models/reservation_statistic.py
+msgid "Tax percentage value"
+msgstr "Veroprosentti"
+
+#: reservations/admin.py
+msgid "Applying free of charge"
+msgstr "Hakee alennusta"
+
+#: reservations/admin.py
+msgid "Free of charge reason"
+msgstr "Alennuksen haun syy"
+
+#: reservations/admin.py
+msgid "Reservee ID"
+msgstr "Varaajan tunniste"
+
+#: reservations/admin.py
+msgid "Reservee first name"
+msgstr "Varaajan etunimi"
+
+#: reservations/admin.py
+msgid "Reservee last name"
+msgstr "Varaajan sukunimi"
+
+#: reservations/admin.py
+msgid "Reservee email"
+msgstr "Varaajan sähköposti"
+
+#: reservations/admin.py
+msgid "Reservee phone"
+msgstr "Varaajan puhelinnumero"
+
+#: reservations/admin.py
+msgid "Reservee organisation name"
+msgstr "Varaajan organisaation nimi"
+
+#: reservations/admin.py
+msgid "Reservee address street"
+msgstr "Varaajan katuosoite"
+
+#: reservations/admin.py
+msgid "Reservee address city"
+msgstr "Varaajan kaupunki"
+
+#: reservations/admin.py
+msgid "Reservee address zip code"
+msgstr "Varaajan postinumero"
+
+#: reservations/admin.py reservations/models/reservation_statistic.py
+msgid "Reservee is an unregistered association"
+msgstr "Varaaja on rekisteröimätön yhdistys"
+
+#: reservations/admin.py reservations/models/reservation_statistic.py
+msgid "Preferred language of reservee"
+msgstr "Varaajan kieli"
+
+#: reservations/admin.py
+msgid "Type of reservee"
+msgstr "Varaajan tyyppi"
+
+#: reservations/admin.py
+msgid "Billing first name"
+msgstr "Varauksen maksajan etunimi"
+
+#: reservations/admin.py
+msgid "Billing last name"
+msgstr "Varauksen maksajan sukunimi"
+
+#: reservations/admin.py
+msgid "Billing email"
+msgstr "Varauksen maksajan sähköposti"
+
+#: reservations/admin.py
+msgid "Billing phone"
+msgstr "Varauksen maksajan puhelinnumero"
+
+#: reservations/admin.py
+msgid "Billing address street"
+msgstr "Varauksen maksajan katuosoite"
+
+#: reservations/admin.py
+msgid "Billing address city"
+msgstr "Varauksen maksajan postitoimipaikka"
+
+#: reservations/admin.py
+msgid "Billing address zip code"
+msgstr "Varauksen maksajan postinumero"
+
+#: reservations/admin.py
+msgid "Recurring reservation"
+msgstr "Toistuva varaus"
+
+#: reservations/admin.py reservations/models/reservation_statistic.py
+msgid "Reason for deny"
+msgstr "Syy hylkäämiselle"
+
+#: reservations/admin.py reservations/models/reservation_statistic.py
+msgid "Reason for cancellation"
+msgstr "Syy perumiselle"
+
+#: reservations/admin.py
+msgid "SKU for this particular reservation"
+msgstr "Tämän varauksen SKU"
+
+#: reservations/admin.py
+msgid "Name of the reservation"
+msgstr "Varauksen nimi"
+
+#: reservations/admin.py
+msgid "Description of the reservation"
+msgstr "Varauksen kuvaus"
+
+#: reservations/admin.py
+msgid "Number of persons in the reservation"
+msgstr "Henkilöiden määrä varauksessa"
+
+#: reservations/admin.py
+msgid "State of the reservation"
+msgstr "Varauksen tila"
+
+#: reservations/admin.py
+msgid "Type of reservation"
+msgstr "Varauksen tyyppi"
+
+#: reservations/admin.py
+msgid "Details for this reservation's cancellation"
+msgstr "Lisätiedot varauksen perumiselle"
+
+#: reservations/admin.py
+msgid "Additional details for denying or approving the reservation"
+msgstr "Lisätietoja varauksen hylkäämiseen tai hyväksymiseen"
+
+#: reservations/admin.py
+msgid "Working memo for staff users"
+msgstr "Muistio henkilökunnalle"
+
+#: reservations/admin.py
+msgid "Reservation begin date and time"
+msgstr "Varauksen alkamispäivä"
+
+#: reservations/admin.py
+msgid "Reservation end date and time"
+msgstr "Varauksen loppumispäivä"
+
+#: reservations/admin.py
+msgid "When this reservation was handled"
+msgstr "Milloin tämä varaus käsiteltiin"
+
+#: reservations/admin.py
+msgid "When this reservation was confirmed"
+msgstr "Milloin tämä varaus vahvistettiin"
+
+#: reservations/admin.py
+msgid "When this reservation was created"
+msgstr "Milloin tämä varaus luotiin"
+
+#: reservations/admin.py
+msgid "The price of this particular reservation including VAT"
+msgstr "Varauksen hinta ALV:n kanssa"
+
+#: reservations/admin.py
+msgid "The price of this particular reservation excluding VAT"
+msgstr "Varauksen hinta ilman ALV:ta"
+
+#: reservations/admin.py
+msgid "The non subsidised price of this reservation including VAT"
+msgstr "Subventoimaton hinta ALV:n kanssa"
+
+#: reservations/admin.py
+msgid "The non subsidised price of this reservation excluding VAT"
+msgstr "Subventoimaton hinta ilman ALV:ta"
+
+#: reservations/admin.py
+msgid "The unit price of this particular reservation"
+msgstr "Varauksen yksikköhinta"
+
+#: reservations/admin.py
+msgid "The value of the tax percentage for this particular reservation"
+msgstr "ALV:n prosenttiosuus tässä varauksessa"
+
+#: reservations/admin.py reservations/models/reservation_statistic.py
+msgid "Reservee is applying for a free-of-charge reservation"
+msgstr "Varaaja hakee alennuskelpoisuutta"
+
+#: reservations/admin.py
+msgid "Reason for applying for a free-of-charge reservation"
+msgstr "Syy alennuskelpoisuuden hakemiselle"
+
+#: reservations/admin.py
+msgid "Reservee's business or association identity code"
+msgstr "Varaaja yrityksen tai yhdistyksen tunnus"
+
+#: reservations/admin.py
+msgid "Reservee's first name"
+msgstr "Varaajan etunimi"
+
+#: reservations/admin.py
+msgid "Reservee's last name"
+msgstr "Varaajan sukunimi"
+
+#: reservations/admin.py
+msgid "Reservee's email address"
+msgstr "Varaajan sähköpostiosoite"
+
+#: reservations/admin.py
+msgid "Reservee's phone number"
+msgstr "Varaajan puhelinnumero"
+
+#: reservations/admin.py
+msgid "Reservee's organisation name"
+msgstr "Varaajan organisaation nimi"
+
+#: reservations/admin.py
+msgid "Reservee's street address"
+msgstr "Varaajan katuosoite"
+
+#: reservations/admin.py
+msgid "Reservee's city"
+msgstr "Varaajan kaupunki"
+
+#: reservations/admin.py
+msgid "Reservee's zip code"
+msgstr "Varaajan postinumero"
+
+#: reservations/admin.py
+msgid "Reservee's preferred language"
+msgstr "Varaajan suosima kieli"
+
+#: reservations/admin.py
+msgid "User who made the reservation"
+msgstr "Varauksen tehnyt käyttäjä"
+
+#: reservations/admin.py
+msgid "Reason for denying the reservation"
+msgstr "Syy varauksen hylkäämiselle"
+
+#: reservations/admin.py
+msgid "Reason for cancelling the reservation"
+msgstr "Syy varauksen perumiselle"
+
+#: reservations/admin.py
+msgid "Purpose of the reservation"
+msgstr "Varauksen käyttötarkoitus"
+
+#: reservations/admin.py
+msgid "Home city of the group or association"
+msgstr "Yhdistyksen tai ryhmän kotikunta"
+
+#: reservations/admin.py
+msgid "Age group of the group or association"
+msgstr "Ikäryhmä tälle ryhmälle tai yhdistykselle"
 
 #: reservations/admin.py
 msgid "Required fields must be a subset of supported fields"
@@ -2376,155 +2661,6 @@ msgstr "Estetty"
 #: reservations/choices.py
 msgid "Behalf"
 msgstr "Puolesta"
-
-#: reservations/models/reservation.py
-msgid "Reservee first name"
-msgstr "Varaajan etunimi"
-
-#: reservations/models/reservation.py
-msgid "Reservee last name"
-msgstr "Varaajan sukunimi"
-
-#: reservations/models/reservation.py
-msgid "Reservee organisation name"
-msgstr "Varaajan organisaation nimi"
-
-#: reservations/models/reservation.py
-msgid "Reservee phone"
-msgstr "Varaajan puhelinnumero"
-
-#: reservations/models/reservation.py
-msgid "Reservee email"
-msgstr "Varaajan sähköposti"
-
-#: reservations/models/reservation.py
-msgid "Reservee ID"
-msgstr "Varaajan tunniste"
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
-msgid "Reservee is an unregistered association"
-msgstr "Varaaja on rekisteröimätön yhdistys"
-
-#: reservations/models/reservation.py
-msgid "Reservee address street"
-msgstr "Varaajan katuosoite"
-
-#: reservations/models/reservation.py
-msgid "Reservee address city"
-msgstr "Varaajan kaupunki"
-
-#: reservations/models/reservation.py
-msgid "Reservee address zip code"
-msgstr "Varaajan postinumero"
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
-msgid "Preferred language of reservee"
-msgstr "Varaajan kieli"
-
-#: reservations/models/reservation.py
-msgid "Billing first name"
-msgstr "Varauksen maksajan etunimi"
-
-#: reservations/models/reservation.py
-msgid "Billing last name"
-msgstr "Varauksen maksajan sukunimi"
-
-#: reservations/models/reservation.py
-msgid "Billing phone"
-msgstr "Varauksen maksajan puhelinnumero"
-
-#: reservations/models/reservation.py
-msgid "Billing email"
-msgstr "Varauksen maksajan sähköposti"
-
-#: reservations/models/reservation.py
-msgid "Billing address street"
-msgstr "Varauksen maksajan katuosoite"
-
-#: reservations/models/reservation.py
-msgid "Billing address city"
-msgstr "Varauksen maksajan postitoimipaikka"
-
-#: reservations/models/reservation.py
-msgid "Billing address zip code"
-msgstr "Varauksen maksajan postinumero"
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
-msgid "Reservee is applying for a free-of-charge reservation"
-msgstr "Varaaja hakee alennuskelpoisuutta"
-
-#: reservations/models/reservation.py
-msgid "Reason for applying for a free-of-charge reservation"
-msgstr "Syy alennuskelpoisuuden hakemiselle"
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
-msgid "State"
-msgstr "Tila"
-
-#: reservations/models/reservation.py
-msgid "Recurring reservation"
-msgstr "Toistuva varaus"
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
-msgid "Reason for cancellation"
-msgstr "Syy perumiselle"
-
-#: reservations/models/reservation.py
-msgid "Details for this reservation's cancellation"
-msgstr "Lisätiedot varauksen perumiselle"
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
-msgid "Confirmed at"
-msgstr "Vahvistettu"
-
-#: reservations/models/reservation.py
-msgid "Unit price"
-msgstr "Yksikköhinta"
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
-msgid "Tax percentage value"
-msgstr "Veroprosentti"
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
-msgid "Price"
-msgstr "Hinta"
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
-msgid "Price net"
-msgstr "Nettohinta"
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
-msgid "Non subsidised price"
-msgstr "Subventoimaton hinta"
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
-msgid "Non subsidised net price"
-msgstr "Subventoimaton nettohinta"
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
-msgid "Handled at"
-msgstr "Käsitelty"
-
-#: reservations/models/reservation.py
-#: reservations/models/reservation_statistic.py
-msgid "Reason for deny"
-msgstr "Syy hylkäämiselle"
-
-#: reservations/models/reservation.py
-msgid "Handling details for this reservation"
-msgstr "Käsittelymuistio tälle varaukselle"
 
 #: reservations/models/reservation.py
 msgid "Closed"
@@ -2585,6 +2721,14 @@ msgstr "Perumisen syyn kuvaus"
 #: reservations/models/reservation_statistic.py
 msgid "The reason text of the deny reason"
 msgstr "Hylkäämisen syyn kuvaus"
+
+#: reservations/models/reservation_statistic.py
+msgid "Non subsidised price"
+msgstr "Subventoimaton hinta"
+
+#: reservations/models/reservation_statistic.py
+msgid "Non subsidised net price"
+msgstr "Subventoimaton nettohinta"
 
 #: reservations/models/reservation_statistic.py
 msgid "TPREK id"
