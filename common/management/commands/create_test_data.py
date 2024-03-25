@@ -53,15 +53,15 @@ from common.management.commands._utils import (
 from common.models import BannerNotification
 from opening_hours.models import OriginHaukiResource, ReservableTimeSpan
 from permissions.models import (
-    GENERAL_PERMISSIONS,
-    SERVICE_SECTOR_PERMISSIONS,
-    UNIT_PERMISSIONS,
+    GeneralPermissionChoices,
     GeneralRole,
     GeneralRoleChoice,
     GeneralRolePermission,
+    ServiceSectorPermissionsChoices,
     ServiceSectorRole,
     ServiceSectorRoleChoice,
     ServiceSectorRolePermission,
+    UnitPermissionChoices,
     UnitRole,
     UnitRoleChoice,
     UnitRolePermission,
@@ -433,25 +433,25 @@ def _create_roles_and_permissions() -> Roles:
             "general",
             GeneralRoleChoice,
             GeneralRolePermission,
-            GENERAL_PERMISSIONS,
+            GeneralPermissionChoices.values,
         ),
         (
             "unit",
             UnitRoleChoice,
             UnitRolePermission,
-            UNIT_PERMISSIONS,
+            UnitPermissionChoices.values,
         ),
         (
             "service_sector",
             ServiceSectorRoleChoice,
             ServiceSectorRolePermission,
-            SERVICE_SECTOR_PERMISSIONS,
+            ServiceSectorPermissionsChoices.values,
         ),
     ]
     role_kind: Literal["general", "unit", "service_sector"]
     role_choice: type[RoleChoice]
     permission: type[RolePermission]
-    choices: tuple[tuple[str, Any], ...]
+    choices: tuple[str, ...]
 
     for role_kind, role_choice, permission, choices in permission_types:
         role_choices: list[RoleChoice] = []
@@ -464,7 +464,7 @@ def _create_roles_and_permissions() -> Roles:
             )
             role_choices.append(new_role)
 
-            for name, _ in choices:
+            for name in choices:
                 role_permissions.append(
                     permission(
                         role=new_role,
