@@ -47,14 +47,7 @@ from api.graphql.types.recurring_reservation.mutations import (
     RecurringReservationCreateMutation,
     RecurringReservationUpdateMutation,
 )
-from api.graphql.types.reservation_unit.mutations import ReservationUnitCreateMutation, ReservationUnitUpdateMutation
-from api.graphql.types.reservation_unit_image.mutations import (
-    ReservationUnitImageCreateMutation,
-    ReservationUnitImageDeleteMutation,
-    ReservationUnitImageUpdateMutation,
-)
-from api.graphql.types.reservation_unit_option.mutations import ReservationUnitOptionUpdateMutation
-from api.graphql.types.reservations.mutations import (
+from api.graphql.types.reservation.mutations import (
     ReservationAdjustTimeMutation,
     ReservationApproveMutation,
     ReservationCancellationMutation,
@@ -70,10 +63,17 @@ from api.graphql.types.reservations.mutations import (
     ReservationUpdateMutation,
     ReservationWorkingMemoMutation,
 )
-from api.graphql.types.resources.mutations import ResourceCreateMutation, ResourceDeleteMutation, ResourceUpdateMutation
-from api.graphql.types.spaces.mutations import SpaceCreateMutation, SpaceDeleteMutation, SpaceUpdateMutation
-from api.graphql.types.units.mutations import UnitUpdateMutation
-from api.graphql.types.users.mutations import UserUpdateMutation
+from api.graphql.types.reservation_unit.mutations import ReservationUnitCreateMutation, ReservationUnitUpdateMutation
+from api.graphql.types.reservation_unit_image.mutations import (
+    ReservationUnitImageCreateMutation,
+    ReservationUnitImageDeleteMutation,
+    ReservationUnitImageUpdateMutation,
+)
+from api.graphql.types.reservation_unit_option.mutations import ReservationUnitOptionUpdateMutation
+from api.graphql.types.resource.mutations import ResourceCreateMutation, ResourceDeleteMutation, ResourceUpdateMutation
+from api.graphql.types.space.mutations import SpaceCreateMutation, SpaceDeleteMutation, SpaceUpdateMutation
+from api.graphql.types.unit.mutations import UnitUpdateMutation
+from api.graphql.types.user.mutations import UserUpdateMutation
 
 __all__ = [
     "AllocatedTimeSlotCreateMutation",
