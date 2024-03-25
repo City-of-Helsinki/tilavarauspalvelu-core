@@ -1,4 +1,4 @@
-from api.graphql.extensions.legacy_helpers import OldPrimaryKeySerializer
+from api.graphql.extensions.serializers import OldPrimaryKeySerializer
 from reservations.models import Reservation
 
 
