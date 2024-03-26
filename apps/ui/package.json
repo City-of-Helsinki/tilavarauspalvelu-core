@@ -44,7 +44,7 @@
     "react-i18next": "^14.1.0",
     "react-map-gl": "^7.1.7",
     "react-transition-group": "^4.4.5",
-    "react-use": "^17.4.2",
+    "react-use": "^17.5.0",
     "sanitize-html": "^2.13.0",
     "sass": "^1.72.0",
     "styled-components": "5.3.11",
