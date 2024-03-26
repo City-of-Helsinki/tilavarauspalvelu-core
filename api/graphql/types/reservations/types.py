@@ -68,7 +68,7 @@ class RecurringReservationType(AuthNode, OldPrimaryKeyObjectType):
     age_group = graphene.Field(AgeGroupType)
     ability_group = graphene.Field(AbilityGroupType)
     weekdays = graphene.List(graphene.Int)
-    reservation_unit = RelatedField("api.graphql.types.reservation_units.types.ReservationUnitByPkType")
+    reservation_unit = RelatedField("api.graphql.types.reservation_units.types.ReservationUnitType")
 
     class Meta:
         model = RecurringReservation

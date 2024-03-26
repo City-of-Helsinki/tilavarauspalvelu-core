@@ -80,6 +80,12 @@ def create_child_for_reservation_unit(reservation_unit: ReservationUnit) -> Rese
     child_space = SpaceFactory.create(parent=parent_space)
 
     return ReservationUnitFactory.create(
+        reservation_begins=None,
+        reservation_ends=None,
+        reservations_min_days_before=None,
+        reservations_max_days_before=None,
+        min_reservation_duration=None,
+        max_reservation_duration=None,
         buffer_time_before=timedelta(),
         buffer_time_after=timedelta(),
         reservation_start_interval=ReservationStartInterval.INTERVAL_30_MINUTES.value,

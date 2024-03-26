@@ -4,6 +4,7 @@ from .age_group import AgeGroupFactory
 from .allocated_time_slot import AllocatedTimeSlotFactory
 from .application import ApplicationFactory
 from .application_round import ApplicationRoundFactory
+from .application_round_time_slot import ApplicationRoundTimeSlotFactory
 from .application_section import ApplicationSectionFactory
 from .banner_notification import BannerNotificationFactory
 from .building import BuildingFactory
@@ -68,17 +69,17 @@ from .user import (
 )
 
 __all__ = [
-    "UserSocialAuthFactory",
-    "add_general_permissions",
-    "add_unit_permissions",
-    "add_unit_group_permissions",
-    "add_service_sector_permissions",
     "AbilityGroupFactory",
+    "add_general_permissions",
+    "add_service_sector_permissions",
+    "add_unit_group_permissions",
+    "add_unit_permissions",
     "AddressFactory",
     "AgeGroupFactory",
     "AllocatedTimeSlotFactory",
     "ApplicationFactory",
     "ApplicationRoundFactory",
+    "ApplicationRoundTimeSlotFactory",
     "ApplicationSectionFactory",
     "BannerNotificationFactory",
     "BuildingFactory",

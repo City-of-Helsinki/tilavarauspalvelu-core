@@ -53,7 +53,7 @@ class PaymentMerchantFactory(GenericDjangoModelFactory[PaymentMerchant]):
     class Meta:
         model = PaymentMerchant
 
-    id = uuid4()
+    id = factory.LazyFunction(uuid4)
     name = fuzzy.FuzzyText()
 
 
@@ -61,7 +61,7 @@ class PaymentProductFactory(GenericDjangoModelFactory[PaymentProduct]):
     class Meta:
         model = PaymentProduct
 
-    id = uuid4()
+    id = factory.LazyFunction(uuid4)
     merchant = factory.SubFactory("tests.factories.PaymentMerchantFactory")
 
     @factory.post_generation

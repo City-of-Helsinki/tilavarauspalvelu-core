@@ -23,6 +23,7 @@ from applications.choices import WeekdayChoice
 from applications.models import ApplicationRoundTimeSlot
 from common.fields.serializer import IntegerPrimaryKeyField
 from reservation_units.enums import (
+    AuthenticationType,
     PricingStatus,
     ReservationKind,
     ReservationStartInterval,
@@ -147,10 +148,10 @@ class ReservationUnitCreateSerializer(ReservationUnitSerializer, OldPrimaryKeySe
     )
     authentication = OldChoiceCharField(
         required=False,
-        choices=ReservationUnit.AUTHENTICATION_TYPES,
+        choices=AuthenticationType.choices,
         help_text=(
             "Authentication required for reserving this reservation unit. Possible values are "
-            f"{', '.join(value[0].upper() for value in ReservationUnit.AUTHENTICATION_TYPES)}."
+            f"{', '.join(value.upper() for value in AuthenticationType.values)}."
         ),
     )
 
