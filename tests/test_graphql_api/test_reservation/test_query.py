@@ -67,7 +67,7 @@ def test_reservation__query__all_fields(graphql):
         priceNet
         purpose { nameFi }
         recurringReservation { user { email } }
-        reservationUnits { nameFi }
+        reservationUnit { nameFi }
         reserveeAddressCity
         reserveeAddressStreet
         reserveeAddressZip
@@ -127,7 +127,7 @@ def test_reservation__query__all_fields(graphql):
         "priceNet": f"{reservation.price_net:.6f}",
         "purpose": None,
         "recurringReservation": None,
-        "reservationUnits": [],
+        "reservationUnit": [],
         "reserveeAddressCity": reservation.reservee_address_city,
         "reserveeAddressStreet": reservation.reservee_address_street,
         "reserveeAddressZip": reservation.reservee_address_zip,
