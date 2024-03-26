@@ -1,13 +1,14 @@
-import type { OptionType, ReservationUnitNode } from "common/types/common";
+import type { OptionType } from "common/types/common";
 import { get } from "lodash";
 import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { IconArrowLeft, IconArrowRight } from "hds-react";
 import {
-  ReservationType,
-  ReserveeType,
-  TermsOfUseType,
+  CustomerTypeChoice,
+  type ReservationUnitNode,
+  type ReservationNode,
+  type TermsOfUseNode,
 } from "common/types/gql-types";
 import TermsBox from "common/src/termsbox/TermsBox";
 import {
@@ -28,16 +29,16 @@ import {
 import { useFormContext } from "react-hook-form";
 
 type Props = {
-  reservation: ReservationType;
+  reservation: ReservationNode;
   reservationUnit: ReservationUnitNode;
   handleSubmit: () => void;
   generalFields: string[];
   reservationApplicationFields: string[];
   options: Record<string, OptionType[]>;
-  reserveeType: ReserveeType;
+  reserveeType: CustomerTypeChoice;
   requiresHandling: boolean;
   setStep: React.Dispatch<React.SetStateAction<number>>;
-  genericTerms: TermsOfUseType | null;
+  genericTerms: TermsOfUseNode | null;
 };
 
 const Form = styled.form`

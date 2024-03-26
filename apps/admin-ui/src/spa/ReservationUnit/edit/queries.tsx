@@ -13,9 +13,7 @@ export const RESERVATIONUNIT_QUERY = gql`
         pk
         ...ImageFragment
       }
-      haukiUrl {
-        url
-      }
+      haukiUrl
       cancellationRule {
         pk
       }
@@ -24,7 +22,6 @@ export const RESERVATIONUNIT_QUERY = gql`
       nameSv
       nameEn
       isDraft
-      isArchived
       authentication
       spaces {
         pk
@@ -69,7 +66,7 @@ export const RESERVATIONUNIT_QUERY = gql`
       canApplyFreeOfCharge
       reservationsMinDaysBefore
       reservationsMaxDaysBefore
-      equipment {
+      equipments {
         pk
         nameFi
       }
@@ -134,10 +131,6 @@ export const UPDATE_RESERVATION_UNIT = gql`
   mutation updateReservationUnit($input: ReservationUnitUpdateMutationInput!) {
     updateReservationUnit(input: $input) {
       pk
-      errors {
-        field
-        messages
-      }
     }
   }
 `;
@@ -146,10 +139,6 @@ export const CREATE_RESERVATION_UNIT = gql`
   mutation createReservationUnit($input: ReservationUnitCreateMutationInput!) {
     createReservationUnit(input: $input) {
       pk
-      errors {
-        field
-        messages
-      }
     }
   }
 `;
@@ -173,10 +162,6 @@ export const CREATE_IMAGE = gql`
         imageType
         mediumUrl
       }
-      errors {
-        field
-        messages
-      }
     }
   }
 `;
@@ -184,7 +169,6 @@ export const CREATE_IMAGE = gql`
 export const DELETE_IMAGE = gql`
   mutation deleteImage($pk: Int!) {
     deleteReservationUnitImage(input: { pk: $pk }) {
-      errors
       deleted
     }
   }
@@ -193,10 +177,7 @@ export const DELETE_IMAGE = gql`
 export const UPDATE_IMAGE_TYPE = gql`
   mutation updateImage($pk: Int!, $imageType: String!) {
     updateReservationUnitImage(input: { pk: $pk, imageType: $imageType }) {
-      errors {
-        messages
-        field
-      }
+      pk
     }
   }
 `;

@@ -10,8 +10,8 @@ import { filterNonNullable } from "common/src/helpers";
 import {
   type ApplicationRoundNode,
   ApplicationRoundStatusChoice,
-  type ReservationUnitType,
-  type UnitType,
+  type ReservationUnitNode,
+  type UnitNode,
 } from "common/types/gql-types";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { Container } from "@/styles/layout";
@@ -47,13 +47,13 @@ const StyledH2 = styled(H2)`
   margin-top: 1.5rem;
 `;
 
-function getUnitOptions(resUnits: ReservationUnitType[]) {
+function getUnitOptions(resUnits: ReservationUnitNode[]) {
   const opts = resUnits.map((x) => x?.unit).map((x) => unitToOption(x));
   return filterNonNullable(opts);
 }
 
 // TODO these to toOption functions are identical, can they be combined (bit of type magic)?
-function unitToOption(unit: Maybe<UnitType>) {
+function unitToOption(unit: Maybe<UnitNode>) {
   if (unit?.pk == null || unit.nameFi == null) {
     return null;
   }
@@ -61,7 +61,7 @@ function unitToOption(unit: Maybe<UnitType>) {
   return { nameFi, pk };
 }
 
-function resUnitsToOption(resUnit: Maybe<ReservationUnitType>) {
+function resUnitsToOption(resUnit: Maybe<ReservationUnitNode>) {
   if (resUnit?.pk == null || resUnit.nameFi == null) {
     return null;
   }

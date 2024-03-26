@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { ReservationUnitType } from "common/types/gql-types";
+import { type ReservationUnitNode } from "common/types/gql-types";
 import { GenericDialog } from "./GenericDialog";
 
 export function ArchiveDialog({
@@ -8,7 +8,7 @@ export function ArchiveDialog({
   onClose,
   onAccept,
 }: {
-  reservationUnit: ReservationUnitType;
+  reservationUnit: ReservationUnitNode;
   onClose: () => void;
   onAccept: () => void;
 }): JSX.Element {

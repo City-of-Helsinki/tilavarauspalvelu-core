@@ -1,7 +1,7 @@
 import {
-  ServiceSectorRoleType,
-  UnitRoleType,
-  UserType,
+  ServiceSectorRoleNode,
+  UnitRoleNode,
+  UserNode,
 } from "common/types/gql-types";
 import { hasPermission } from "./permissionHelper";
 
@@ -22,7 +22,7 @@ const serviceSectorRole = {
     id: "1",
   },
 };
-const unitRole: UnitRoleType = {
+const unitRole: UnitRoleNode = {
   id: "0",
   permissions: [{ permission: "fooPermission" }],
   units: [
@@ -36,7 +36,7 @@ const unitRole: UnitRoleType = {
   ],
 };
 
-const serviceSectorRoles: ServiceSectorRoleType[] = [
+const serviceSectorRoles: ServiceSectorRoleNode[] = [
   {
     id: "5",
     permissions: [{ permission: "fooPermission" }],
@@ -81,7 +81,7 @@ test("hasPermission returns true when named serviceSector permission is set", ()
 });
 
 test("hasPermission returns false when named serviceSector permission is set", () => {
-  const user: UserType = {
+  const user: UserNode = {
     ...userCommon,
     serviceSectorRoles: [serviceSectorRole],
   };

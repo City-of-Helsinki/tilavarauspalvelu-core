@@ -14,7 +14,7 @@ import type {
   ApplicationNodeConnection,
   ApplicationSectionNodeConnection,
   AllocatedTimeSlotNodeConnection,
-  ReservationTypeConnection,
+  ReservationNodeConnection,
   BannerNotificationNodeConnection,
 } from "common/types/gql-types";
 import { buildGraphQLUrl } from "common/src/urlBuilder";
@@ -202,12 +202,12 @@ function createClient(apiBaseUrl: string) {
               "priceLte",
               "orderStatus",
             ],
-            read(existing: ReservationTypeConnection) {
+            read(existing: ReservationNodeConnection) {
               return existing;
             },
             merge(
-              existing: ReservationTypeConnection,
-              incoming: ReservationTypeConnection
+              existing: ReservationNodeConnection,
+              incoming: ReservationNodeConnection
             ) {
               // TODO this should be optimized using both spread and uniqBy creates a lot of copies
               return {

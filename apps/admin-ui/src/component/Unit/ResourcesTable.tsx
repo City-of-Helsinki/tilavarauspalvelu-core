@@ -7,8 +7,8 @@ import { useNavigate } from "react-router-dom";
 import {
   ResourceDeleteMutationInput,
   ResourceDeleteMutationPayload,
-  ResourceType,
-  UnitByPkType,
+  ResourceNode,
+  UnitNode,
 } from "common/types/gql-types";
 import DataTable, { CellConfig } from "../DataTable";
 import PopupMenu from "./PopupMenu";
@@ -17,26 +17,22 @@ import { DELETE_RESOURCE } from "../../common/queries";
 import { resourceUrl } from "../../common/urls";
 
 interface IProps {
-  resources: ResourceType[] | undefined;
-  unit: UnitByPkType;
+  resources: ResourceNode[] | undefined;
+  unit: UnitNode;
   hasSpaces: boolean;
   onDelete: (text?: string) => void;
   onDataError: (error: string) => void;
 }
-
-const Wrapper = styled.div``;
 
 const Name = styled.div`
   font-size: var(--fontsize-body-l);
   font-family: var(--tilavaraus-admin-font-bold);
 `;
 
-const ResourceTypeContainer = styled.div`
+const ResourceNodeContainer = styled.div`
   display: flex;
   align-items: center;
 `;
-
-const ResourceTypeName = styled.span``;
 
 const ResourcesTable = ({
   resources,
@@ -53,7 +49,7 @@ const ResourcesTable = ({
   const deleteResource = (
     pk: number
   ): Promise<FetchResult<{ deleteSpace: ResourceDeleteMutationPayload }>> =>
-    deleteResourceMutation({ variables: { input: { pk } } });
+    deleteResourceMutation({ variables: { input: { pk: String(pk) } } });
 
   const { t } = useTranslation();
 
@@ -65,22 +61,22 @@ const ResourcesTable = ({
       {
         title: "ResourceTable.headings.name",
         key: `nameFi`,
-        transform: ({ nameFi }: ResourceType) => (
+        transform: ({ nameFi }: ResourceNode) => (
           <Name>{trim(nameFi as string)}</Name>
         ),
       },
       {
         title: "ResourceTable.headings.unitName",
         key: "space.unit.nameFi",
-        transform: ({ space }: ResourceType) =>
+        transform: ({ space }: ResourceNode) =>
           space?.unit?.nameFi || t("ResourceTable.noSpace"),
       },
       {
         title: "",
         key: "type",
-        transform: ({ nameFi, pk, locationType }: ResourceType) => (
-          <ResourceTypeContainer>
-            <ResourceTypeName>{locationType}</ResourceTypeName>
+        transform: ({ nameFi, pk, locationType }: ResourceNode) => (
+          <ResourceNodeContainer>
+            <span>{locationType}</span>
             <PopupMenu
               items={[
                 {
@@ -114,7 +110,7 @@ const ResourcesTable = ({
                 },
               ]}
             />
-          </ResourceTypeContainer>
+          </ResourceNodeContainer>
         ),
         disableSorting: true,
       },
@@ -122,11 +118,11 @@ const ResourcesTable = ({
     index: "pk",
     sorting: "nameFi",
     order: "asc",
-    rowLink: ({ pk }: ResourceType) => resourceUrl(Number(pk), Number(unit.pk)),
+    rowLink: ({ pk }: ResourceNode) => resourceUrl(Number(pk), Number(unit.pk)),
   } as CellConfig;
 
   return (
-    <Wrapper>
+    <div>
       <DataTable
         groups={[{ id: 1, data: resources }]}
         hasGrouping={false}
@@ -140,7 +136,7 @@ const ResourcesTable = ({
         noResultsKey={hasSpaces ? "Unit.noResources" : "Unit.noResourcesSpaces"}
       />
       <ConfirmationDialog open={false} id="confirmation-dialog" ref={modal} />
-    </Wrapper>
+    </div>
   );
 };
 

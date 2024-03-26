@@ -1,13 +1,13 @@
 import React from "react";
-import { ReservationType, State } from "common/types/gql-types";
+import { type ReservationNode, State } from "common/types/gql-types";
 import { useTranslation } from "react-i18next";
 import { addHours, isToday } from "date-fns";
 import { Button } from "hds-react";
-import { ButtonLikeLink } from "app/component/ButtonLikeLink";
+import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import DenyDialog from "./DenyDialog";
 import ApproveDialog from "./ApproveDialog";
 import ReturnToRequiredHandlingDialog from "./ReturnToRequiresHandlingDialog";
-import { useModal } from "../../../context/ModalContext";
+import { useModal } from "@/context/ModalContext";
 
 /* Rules
  * Approve only if REQUIRES_HANDLING
@@ -49,7 +49,7 @@ const ApprovalButtons = ({
 }: {
   state: State;
   isFree: boolean;
-  reservation: ReservationType;
+  reservation: ReservationNode;
   handleClose: () => void;
   handleAccept: () => void;
   disableNonEssentialButtons?: boolean;

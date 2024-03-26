@@ -6,12 +6,12 @@ import { useMutation } from "@apollo/client";
 import {
   type ReservationStaffCreateMutationInput,
   type ReservationStaffCreateMutationPayload,
-  type ReservationUnitType,
-  Type,
+  type ReservationUnitNode,
   ReservationStartInterval,
+  ReservationTypeChoice,
 } from "common/types/gql-types";
 import styled from "styled-components";
-import { camelCase, get } from "lodash";
+import { get } from "lodash";
 import { format } from "date-fns";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ErrorBoundary } from "react-error-boundary";
@@ -19,7 +19,7 @@ import {
   ReservationFormSchema,
   type ReservationFormType,
   type ReservationFormMeta,
-} from "app/schemas";
+} from "@/schemas";
 import { breakpoints } from "common/src/common/style";
 import { useCheckCollisions } from "@/component/reservations/requested/hooks";
 import Loader from "@/component/Loader";
@@ -32,6 +32,7 @@ import { useReservationUnitQuery } from "../hooks";
 import ReservationTypeForm from "../ReservationTypeForm";
 import ControlledTimeInput from "../components/ControlledTimeInput";
 import ControlledDateInput from "../components/ControlledDateInput";
+import { filterNonNullable } from "common/src/helpers";
 
 // NOTE HDS forces buttons over each other on mobile, we want them side-by-side
 const ActionButtons = styled(Dialog.ActionButtons)`
@@ -84,7 +85,7 @@ const useCheckFormCollisions = ({
   reservationUnit,
 }: {
   form: UseFormReturn<FormValueType>;
-  reservationUnit: ReservationUnitType;
+  reservationUnit: ReservationUnitNode;
 }) => {
   const { watch } = form;
 
@@ -115,7 +116,8 @@ const useCheckFormCollisions = ({
       before: bufferBeforeSeconds,
       after: bufferAfterSeconds,
     },
-    reservationType: (type ?? Type.Blocked) as Type,
+    reservationType: (type ??
+      ReservationTypeChoice.Blocked) as ReservationTypeChoice,
   });
 
   return { hasCollisions };
@@ -126,7 +128,7 @@ const CollisionWarning = ({
   reservationUnit,
 }: {
   form: UseFormReturn<FormValueType>;
-  reservationUnit: ReservationUnitType;
+  reservationUnit: ReservationUnitNode;
 }) => {
   const { t } = useTranslation();
   const { hasCollisions } = useCheckFormCollisions({ form, reservationUnit });
@@ -149,7 +151,7 @@ const ActionContainer = ({
   onSubmit,
 }: {
   form: UseFormReturn<FormValueType>;
-  reservationUnit: ReservationUnitType;
+  reservationUnit: ReservationUnitNode;
   onCancel: () => void;
   onSubmit: (values: FormValueType) => void;
 }) => {
@@ -189,7 +191,7 @@ const DialogContent = ({
   start,
 }: {
   onClose: () => void;
-  reservationUnit: ReservationUnitType;
+  reservationUnit: ReservationUnitNode;
   start: Date;
 }) => {
   const { t, i18n } = useTranslation();
@@ -272,10 +274,9 @@ const DialogContent = ({
         throw new Error("Missing reservation unit");
       }
 
-      const metadataSetFields =
+      const metadataSetFields = filterNonNullable(
         reservationUnit.metadataSet?.supportedFields
-          ?.filter((x): x is string => x != null)
-          .map(camelCase) ?? [];
+      );
 
       const flattenedMetadataSetValues = flattenMetadata(
         values,
@@ -302,24 +303,16 @@ const DialogContent = ({
         reserveeType: values.reserveeType,
       };
 
-      const { data: createResponse } = await createStaffReservation(input);
+      await createStaffReservation(input);
 
-      const firstError = (
-        createResponse?.createStaffReservation?.errors || []
-      ).find(() => true);
-
-      if (firstError) {
-        const error = get(firstError, "messages[0]");
-        errorHandler(error);
-      } else {
-        notifySuccess(
-          t("ReservationDialog.saveSuccess", {
-            reservationUnit: reservationUnit.nameFi,
-          })
-        );
-        onClose();
-      }
+      notifySuccess(
+        t("ReservationDialog.saveSuccess", {
+          reservationUnit: reservationUnit.nameFi,
+        })
+      );
+      onClose();
     } catch (e) {
+      console.error("exception thrown: ", e);
       errorHandler(get(e, "message"));
     }
   };
@@ -364,7 +357,7 @@ const DialogContent = ({
   );
 };
 
-const CreateReservationModal = ({
+function CreateReservationModal({
   reservationUnitId,
   start,
   onClose,
@@ -372,7 +365,7 @@ const CreateReservationModal = ({
   reservationUnitId: number;
   start: Date;
   onClose: () => void;
-}): JSX.Element => {
+}): JSX.Element {
   const { isOpen } = useModal();
   const { t } = useTranslation();
 
@@ -410,5 +403,6 @@ const CreateReservationModal = ({
       )}
     </FixedDialog>
   );
-};
+}
+
 export default CreateReservationModal;

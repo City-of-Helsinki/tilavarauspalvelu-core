@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { type ReservationUnitType } from "common/types/gql-types";
+import { type ReservationUnitNode } from "common/types/gql-types";
 import { useGenericTerms } from "common/src/hooks/useGenericTerms";
 
 // NOTE This is partial duplicate from ui/application/Preview.tsx
@@ -32,7 +32,7 @@ const TOSElement = ({ title, text }: { title: string; text: string }) => (
 const ShowTOS = ({
   reservationUnit,
 }: {
-  reservationUnit: ReservationUnitType;
+  reservationUnit: ReservationUnitNode;
 }) => {
   const { t } = useTranslation();
 

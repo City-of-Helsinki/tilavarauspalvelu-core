@@ -1,8 +1,4 @@
-import {
-  type ReservationUnitNode,
-  formatters as getFormatters,
-  getReservationVolume,
-} from "common";
+import { formatters as getFormatters, getReservationVolume } from "common";
 import { flatten, trim, uniq } from "lodash";
 import { addMinutes, isAfter, isBefore, isSameDay, set } from "date-fns";
 import { i18n } from "next-i18next";
@@ -13,15 +9,15 @@ import {
   isSlotWithinReservationTime,
 } from "common/src/calendar/util";
 import {
-  type EquipmentType,
-  type ReservationUnitPricingType,
+  type EquipmentNode,
   ReservationUnitState,
-  type UnitType,
-  type ReservationUnitType,
+  type UnitNode,
+  type ReservationUnitNode,
   State,
   PricingType,
-  Status,
   PriceUnit,
+  Status,
+  ReservationUnitPricingNode,
 } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { capitalize, getTranslation } from "./util";
@@ -62,7 +58,7 @@ const equipmentCategoryOrder = [
 ];
 
 export const getEquipmentCategories = (
-  equipment: EquipmentType[]
+  equipment: EquipmentNode[]
 ): string[] => {
   if (!equipment || equipment.length === 0) {
     return [];
@@ -83,16 +79,16 @@ export const getEquipmentCategories = (
   return uniq(categories);
 };
 
-export const getEquipmentList = (equipment: EquipmentType[]): string[] => {
+export const getEquipmentList = (equipment: EquipmentNode[]): string[] => {
   if (!equipment || equipment.length === 0) {
     return [];
   }
 
   const categories = getEquipmentCategories(equipment);
 
-  const sortedEquipment: EquipmentType[] = flatten(
+  const sortedEquipment: EquipmentNode[] = flatten(
     categories.map((category) => {
-      const eq: EquipmentType[] = [...equipment].filter(
+      const eq: EquipmentNode[] = [...equipment].filter(
         (n) =>
           n.category?.nameFi === category ||
           (category === "Muu" &&
@@ -128,7 +124,7 @@ export const getReservationUnitName = (
 };
 
 export const getUnitName = (
-  unit?: UnitType,
+  unit?: UnitNode,
   language: string = i18n?.language ?? "fi"
 ): string | undefined => {
   if (unit == null) {
@@ -170,7 +166,7 @@ export const getDurationRange = (
 
 export const getActivePricing = (
   reservationUnit: ReservationUnitNode
-): ReservationUnitPricingType | undefined => {
+): ReservationUnitPricingNode | undefined => {
   const { pricings } = reservationUnit;
 
   if (!pricings || pricings.length === 0) {
@@ -184,7 +180,7 @@ export const getFuturePricing = (
   reservationUnit: ReservationUnitNode,
   applicationRounds: RoundPeriod[] = [],
   reservationDate?: Date
-): ReservationUnitPricingType | undefined => {
+): ReservationUnitPricingNode | undefined => {
   const { pricings, reservationBegins, reservationEnds } = reservationUnit;
 
   if (!pricings || pricings.length === 0) {
@@ -245,7 +241,7 @@ function formatPrice(
 }
 
 export type GetPriceType = {
-  pricing: ReservationUnitPricingType;
+  pricing: ReservationUnitPricingNode;
   minutes?: number; // additional minutes for total price calculation
   trailingZeros?: boolean;
   asNumeral?: boolean; // return a string of numbers ("0" instead of e.g. "free" when the price is 0)
@@ -299,7 +295,7 @@ export const getReservationUnitPrice = (
     return undefined;
   }
 
-  const pricing: ReservationUnitPricingType | undefined = pricingDate
+  const pricing: ReservationUnitPricingNode | undefined = pricingDate
     ? getFuturePricing(ru, [], pricingDate) || getActivePricing(ru)
     : getActivePricing(ru);
 
@@ -314,7 +310,7 @@ export const getReservationUnitPrice = (
 };
 
 export const isReservationUnitPaidInFuture = (
-  pricings: ReservationUnitPricingType[]
+  pricings: ReservationUnitPricingNode[]
 ): boolean => {
   return pricings
     .filter(
@@ -331,7 +327,7 @@ export const isReservationUnitPaidInFuture = (
 /// TODO should rewrite this to work on dates since we want to do that conversion first anyway
 export function isInTimeSpan(
   date: Date,
-  timeSpan: NonNullable<ReservationUnitType["reservableTimeSpans"]>[0]
+  timeSpan: NonNullable<ReservationUnitNode["reservableTimeSpans"]>[0]
 ) {
   const { startDatetime, endDatetime } = timeSpan ?? {};
 
@@ -350,10 +346,10 @@ export function isInTimeSpan(
 // available for reservation on the given date
 // TODO should rewrite the timespans to be NonNullable and dates (and do the conversion early, not on each component render)
 export function getPossibleTimesForDay(
-  reservableTimeSpans: ReservationUnitType["reservableTimeSpans"],
-  reservationStartInterval: ReservationUnitType["reservationStartInterval"],
+  reservableTimeSpans: ReservationUnitNode["reservableTimeSpans"],
+  reservationStartInterval: ReservationUnitNode["reservationStartInterval"],
   date: Date,
-  reservationUnit: ReservationUnitType,
+  reservationUnit: ReservationUnitNode,
   activeApplicationRounds: RoundPeriod[],
   durationValue: number
 ): { label: string; value: string }[] {

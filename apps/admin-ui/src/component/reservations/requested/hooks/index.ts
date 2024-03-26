@@ -1,40 +1,41 @@
 import { useState } from "react";
 import {
   type Query,
-  type ReservationType,
+  type ReservationNode,
   State,
-  type ReservationDenyReasonType,
   type QueryReservationDenyReasonsArgs,
-  Type,
   type QueryReservationUnitArgs,
   type QueryReservationArgs,
+  type QueryRecurringReservationArgs,
+  type ReservationUnitNodeReservationSetArgs,
+  ReservationTypeChoice,
 } from "common/types/gql-types";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@apollo/client";
-import { toApiDateUnsafe } from "common/src/common/util";
+import { toApiDate } from "common/src/common/util";
 import {
   RECURRING_RESERVATION_QUERY,
   RESERVATIONS_BY_RESERVATIONUNIT,
   SINGLE_RESERVATION_QUERY,
 } from "./queries";
-import { useNotification } from "../../../../context/NotificationContext";
+import { useNotification } from "@/context/NotificationContext";
 import { RESERVATION_DENY_REASONS } from "../queries";
-import { OptionType } from "../../../../common/types";
-import { GQL_MAX_RESULTS_PER_QUERY } from "../../../../common/const";
-import { base64encode } from "common/src/helpers";
+import { OptionType } from "@/common/types";
+import { base64encode, filterNonNullable } from "common/src/helpers";
 
 export { default as useCheckCollisions } from "./useCheckCollisions";
 
 const getEventName = (
-  eventType?: Type,
+  eventType?: ReservationTypeChoice,
   title?: string,
   blockedName?: string
-) => (eventType === Type.Blocked ? blockedName : title?.trim());
+) =>
+  eventType === ReservationTypeChoice.Blocked ? blockedName : title?.trim();
 
-const getReservationTitle = (r: ReservationType) => r.reserveeName ?? "";
+const getReservationTitle = (r: ReservationNode) => r.reserveeName ?? "";
 
 const convertReservationToCalendarEvent = (
-  r: ReservationType,
+  r: ReservationNode,
   blockedName: string
 ) => ({
   title: getEventName(r.type ?? undefined, getReservationTitle(r), blockedName),
@@ -49,7 +50,7 @@ const convertReservationToCalendarEvent = (
 
 // TODO This would be better if we combined two GQL queries, one for the reservation itself
 // and other that includes the states (now we are fetching a lot of things we don't need)
-const shouldBeShownInTheCalendar = (r: ReservationType, ownPk?: number) =>
+const shouldBeShownInTheCalendar = (r: ReservationNode, ownPk?: number) =>
   r.state === State.Confirmed ||
   r.state === State.RequiresHandling ||
   r.pk === ownPk;
@@ -58,23 +59,33 @@ const shouldBeShownInTheCalendar = (r: ReservationType, ownPk?: number) =>
 export const useReservationData = (
   begin: Date,
   end: Date,
-  reservationUnitPk: string,
+  reservationUnitPk?: number,
   reservationPk?: number
 ) => {
   const { notifyError } = useNotification();
   const { t } = useTranslation();
 
-  const typename = "ReservationUnitType";
+  const today = new Date();
+
+  const typename = "ReservationUnitNode";
   const id = base64encode(`${typename}:${reservationUnitPk}`);
   const { data, ...rest } = useQuery<
     Query,
-    QueryReservationUnitArgs & { from: string; to: string }
+    QueryReservationUnitArgs & ReservationUnitNodeReservationSetArgs
   >(RESERVATIONS_BY_RESERVATIONUNIT, {
     fetchPolicy: "no-cache",
+    skip: !reservationUnitPk,
     variables: {
       id,
-      from: toApiDateUnsafe(begin, "yyyy-MM-dd"),
-      to: toApiDateUnsafe(end, "yyyy-MM-dd"),
+      beginDate: toApiDate(begin ?? today) ?? "",
+      endDate: toApiDate(end ?? today) ?? "",
+      // NOTE we need denied to show the past reservations
+      state: [
+        State.Confirmed,
+        State.RequiresHandling,
+        State.Denied,
+        State.WaitingForPayment,
+      ],
     },
     onError: () => {
       notifyError("Varauksia ei voitu hakea");
@@ -84,28 +95,11 @@ export const useReservationData = (
   const blockedName = t("ReservationUnits.reservationState.RESERVATION_CLOSED");
 
   const events =
-    data?.reservationUnit?.reservations
-      ?.filter((r): r is ReservationType => r != null)
-      ?.filter((r) => shouldBeShownInTheCalendar(r, reservationPk))
-      ?.map((r) => convertReservationToCalendarEvent(r, blockedName)) ?? [];
+    filterNonNullable(data?.reservationUnit?.reservationSet)
+      .filter((r) => shouldBeShownInTheCalendar(r, reservationPk))
+      .map((r) => convertReservationToCalendarEvent(r, blockedName)) ?? [];
 
   return { ...rest, events };
-};
-
-type OptionsType = {
-  limit: number;
-};
-const defaultOptions = {
-  limit: GQL_MAX_RESULTS_PER_QUERY,
-};
-
-type CustomQueryParams = {
-  pk: number;
-  count: number;
-  offset: number;
-  state: State[];
-  begin?: Date;
-  end?: Date;
 };
 
 /// @param recurringPk fetch reservations related to this pk
@@ -117,63 +111,34 @@ type CustomQueryParams = {
 /// use cache invalidation in the mutation instead
 /// The two solutions are either to queryInvalidate / refetch if you REALLY REALLY must do it (it's super slow)
 /// or use the update callback in the mutation to update the cache manually with cache.modify
-export const useRecurringReservations = (
-  recurringPk?: number,
-  options?: Partial<OptionsType>
-) => {
+export function useRecurringReservations(recurringPk?: number) {
   const { notifyError } = useNotification();
   const { t } = useTranslation();
 
-  const { limit } = { ...defaultOptions, ...options };
-  const { data, loading, fetchMore } = useQuery<Query, CustomQueryParams>(
+  const id = base64encode(`RecurringReservationNode:${recurringPk}`);
+  const { data, loading } = useQuery<Query, QueryRecurringReservationArgs>(
     RECURRING_RESERVATION_QUERY,
     {
       skip: !recurringPk,
       fetchPolicy: "cache-and-network",
       nextFetchPolicy: "cache-first",
       errorPolicy: "all",
-      variables: {
-        pk: recurringPk ?? 0,
-        offset: 0,
-        count: Math.min(limit, defaultOptions.limit),
-        state: [State.Confirmed, State.Denied],
-      },
-      // do automatic fetching and let the cache manage merging
-      onCompleted: (d: Query) => {
-        const allCount = d?.reservations?.totalCount ?? 0;
-        const edgeCount = d?.reservations?.edges.length ?? 0;
-
-        if (
-          limit > defaultOptions.limit && // user wanted over fetching
-          edgeCount > 0 && // don't fetch if last fetch had no data
-          edgeCount < allCount // backend has more data available
-        ) {
-          fetchMore({ variables: { offset: edgeCount } });
-        }
-      },
+      variables: { id },
       onError: () => {
         notifyError(t("errors.errorFetchingData"));
       },
     }
   );
 
-  const reservations =
-    data?.reservations?.edges
-      ?.map((x) => x?.node)
-      .filter((x): x is ReservationType => x != null) ?? [];
-
-  const edgeCount = data?.reservations?.edges?.length ?? 0;
-  const totalCount = data?.reservations?.totalCount ?? 0;
-  const hasDataToLoad = edgeCount < totalCount;
+  const { recurringReservation } = data ?? {};
+  const reservations = filterNonNullable(recurringReservation?.reservations);
 
   return {
-    loading: loading || hasDataToLoad,
+    loading,
     reservations,
-    fetchMore,
-    pageInfo: data?.reservations?.pageInfo,
-    totalCount: data?.reservations?.totalCount,
+    recurringReservation,
   };
-};
+}
 
 // TODO this has the same useState being local problems as useRecurringReservations
 // used to have but it's not obvious because we don't mutate / refetch this.
@@ -186,18 +151,18 @@ export const useDenyReasonOptions = () => {
   const { loading } = useQuery<Query, QueryReservationDenyReasonsArgs>(
     RESERVATION_DENY_REASONS,
     {
+      // TODO remove state
       onCompleted: ({ reservationDenyReasons }) => {
         if (reservationDenyReasons) {
           setDenyReasonOptions(
-            reservationDenyReasons.edges
-              .map((x) => x?.node)
-              .filter((x): x is ReservationDenyReasonType => x != null)
-              .map(
-                (dr): OptionType => ({
-                  value: dr?.pk ?? 0,
-                  label: dr?.reasonFi ?? "",
-                })
-              )
+            filterNonNullable(
+              reservationDenyReasons.edges.map((x) => x?.node)
+            ).map(
+              (dr): OptionType => ({
+                value: dr?.pk ?? 0,
+                label: dr?.reasonFi ?? "",
+              })
+            )
           );
         }
       },
@@ -216,7 +181,7 @@ export const useDenyReasonOptions = () => {
 /// If we don't get the next valid reservation for edits: the mutations work,
 /// but the UI is not updated to show the changes (since it's looking at a past instance).
 export const useReservationEditData = (pk?: string) => {
-  const typename = "ReservationType";
+  const typename = "ReservationNode";
   const id = base64encode(`${typename}:${pk}`);
   const { data, loading, refetch } = useQuery<Query, QueryReservationArgs>(
     SINGLE_RESERVATION_QUERY,
@@ -256,7 +221,7 @@ export const useReservationEditData = (pk?: string) => {
     ? nextRecurrance?.reservation
     : data?.reservation;
   const reservationUnit =
-    data?.reservation?.reservationUnits?.find((x) => x != null) ?? undefined;
+    data?.reservation?.reservationUnit?.find((x) => x != null) ?? undefined;
 
   return {
     reservation: reservation ?? undefined,

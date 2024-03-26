@@ -1,28 +1,27 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useMutation, useQuery } from "@apollo/client";
+import { FetchResult, useMutation, useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
 import { useLocalStorage } from "react-use";
 import { Stepper } from "hds-react";
 import { FormProvider, useForm } from "react-hook-form";
 import type { GetServerSidePropsContext } from "next";
-import { omit } from "lodash";
 import { useTranslation } from "next-i18next";
 import { breakpoints } from "common/src/common/style";
 import { fontRegular, H2 } from "common/src/common/typography";
 import {
-  Query,
-  QueryReservationArgs,
-  QueryReservationUnitArgs,
-  ReservationConfirmMutationInput,
-  ReservationConfirmMutationPayload,
-  ReservationDeleteMutationInput,
-  ReservationDeleteMutationPayload,
-  ReservationType,
-  ReservationUpdateMutationInput,
-  ReservationUpdateMutationPayload,
-  ReserveeType,
+  type Query,
+  type QueryReservationArgs,
+  type QueryReservationUnitArgs,
+  type ReservationConfirmMutationInput,
+  type ReservationConfirmMutationPayload,
+  type ReservationDeleteMutationInput,
+  type ReservationDeleteMutationPayload,
+  type ReservationNode,
+  type ReservationUpdateMutationInput,
+  type ReservationUpdateMutationPayload,
+  CustomerTypeChoice,
   State,
 } from "common/types/gql-types";
 import { Inputs } from "common/src/reservation-form/types";
@@ -31,11 +30,7 @@ import { getReservationApplicationFields } from "common/src/reservation-form/uti
 import { Container } from "common";
 import { createApolloClient } from "@/modules/apolloClient";
 import { isBrowser, reservationUnitPrefix } from "@/modules/const";
-import {
-  getTranslation,
-  printErrorMessages,
-  reservationsUrl,
-} from "@/modules/util";
+import { getTranslation, reservationsUrl } from "@/modules/util";
 import { RESERVATION_UNIT_QUERY } from "@/modules/queries/reservationUnit";
 import {
   CONFIRM_RESERVATION,
@@ -63,7 +58,13 @@ import {
 } from "@/modules/serverUtils";
 import { OPTIONS_QUERY } from "@/hooks/useOptions";
 import { useConfirmNavigation } from "@/hooks/useConfirmNavigation";
-import { base64encode, filterNonNullable } from "common/src/helpers";
+import {
+  base64encode,
+  containsField,
+  filterNonNullable,
+} from "common/src/helpers";
+import Error from "next/error";
+import { CenterSpinner } from "@/components/common/common";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -75,7 +76,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
   if (Number.isFinite(Number(reservationUnitPk)) && path === "reservation") {
-    const typename = "ReservationUnitType";
+    const typename = "ReservationUnitNode";
     const id = base64encode(`${typename}:${reservationUnitPk}`);
     const { data: reservationUnitData } = await apolloClient.query<
       Query,
@@ -198,24 +199,26 @@ const useRemoveStoredReservation = () => {
 // - using back multiple times breaks the confirmation hook (bypassing it or blocking the navigation while deleting the reservation)
 // - requires complex logic to handle the steps and keep the url in sync with what's on the page
 // - forward / backward navigation work differently
-const ReservationUnitReservationWithReservationProp = ({
-  fetchedReservation,
+// FIXME form validation isn't working correctly now.
+// TODO should split the steps here now (it's causing more headaches than it's worth)
+function ReservationUnitReservationWithReservationProp({
+  reservation,
   reservationUnit,
   reservationPurposes,
   ageGroups,
   cities,
   termsOfUse,
+  refetch,
 }: PropsNarrowed & {
-  fetchedReservation: ReservationType;
-}): JSX.Element | null => {
+  reservation: ReservationNode;
+  refetch: () => Promise<FetchResult<Query>>;
+}): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
   useRemoveStoredReservation();
 
   const [step, setStep] = useState(0);
-  const [reservation, setReservation] =
-    useState<ReservationType>(fetchedReservation);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // Get prefilled profile user fields from the reservation (backend fills them when created).
@@ -282,7 +285,7 @@ const ReservationUnitReservationWithReservationProp = ({
     deleteReservation({
       variables: {
         input: {
-          pk: reservation?.pk ?? 0,
+          pk: reservation?.pk?.toString() ?? "",
         },
       },
     });
@@ -308,37 +311,14 @@ const ReservationUnitReservationWithReservationProp = ({
     { input: ReservationUpdateMutationInput }
   >(UPDATE_RESERVATION, {
     errorPolicy: "all",
-    onCompleted: (data) => {
-      if (data.updateReservation?.reservation?.state === "CANCELLED") {
+    onCompleted: async (data) => {
+      if (data.updateReservation?.state === "CANCELLED") {
         router.push(`${reservationUnitPrefix}/${reservationUnit?.pk}`);
       } else {
-        const payload = {
-          ...omit(data.updateReservation.reservation, "__typename"),
-          purpose: data.updateReservation.reservation?.purpose?.pk,
-          ageGroup: data.updateReservation.reservation?.ageGroup?.pk,
-          homeCity: data.updateReservation.reservation?.homeCity?.pk,
-          showBillingAddress: watch("showBillingAddress"),
-        };
-        // ???
-        if (reservation == null) {
-          return;
-        }
-        const { calendarUrl } = data.updateReservation?.reservation ?? {};
-        // TODO cache updates are not a good idea, just do an old fashioned refetch
-        // especially if we router push a new url and load another page we don't even need to refetch
-        // @ts-expect-error: TODO: the types for reservation are wrong (old rest types)
-        setReservation({
-          ...reservation,
-          ...payload,
-          calendarUrl,
-        });
+        await refetch();
         setStep(1);
         window.scrollTo(0, 0);
       }
-    },
-    onError: (error) => {
-      const msg = printErrorMessages(error);
-      setErrorMsg(msg);
     },
   });
 
@@ -357,8 +337,8 @@ const ReservationUnitReservationWithReservationProp = ({
       if (state === State.Confirmed || state === State.RequiresHandling) {
         router.push(`${reservationsUrl}${pk}/confirmation`);
       } else if (steps?.length > 2) {
-        const order = data.confirmReservation?.order;
-        const checkoutUrl = getCheckoutUrl(order ?? undefined, i18n.language);
+        const { order } = data.confirmReservation ?? {};
+        const checkoutUrl = getCheckoutUrl(order, i18n.language);
 
         if (checkoutUrl) {
           router.push(checkoutUrl);
@@ -372,10 +352,6 @@ const ReservationUnitReservationWithReservationProp = ({
         console.warn("Confirm reservation mutation returning something odd");
         setErrorMsg(t("errors:general_error"));
       }
-    },
-    onError: (error) => {
-      const msg = printErrorMessages(error);
-      setErrorMsg(msg);
     },
   });
 
@@ -423,18 +399,22 @@ const ReservationUnitReservationWithReservationProp = ({
     reserveeType: "common",
   }).filter((n) => n !== "reserveeType");
 
-  const type = supportedFields.includes("reservee_type")
+  const type = containsField(supportedFields, "reservee_type")
     ? reserveeType
-    : ReserveeType.Individual;
+    : CustomerTypeChoice.Individual;
   const reservationApplicationFields = getReservationApplicationFields({
     supportedFields,
     reserveeType: type,
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: type the form
-  const onSubmitStep0 = (payload: any): Promise<void> => {
-    if (supportedFields.includes("reservee_type") && !reserveeType) {
-      return Promise.resolve();
+  const onSubmitStep0 = async (payload: any): Promise<void> => {
+    const hasReserveeTypeField = containsField(
+      supportedFields,
+      "reservee_type"
+    );
+    if (hasReserveeTypeField && !reserveeType) {
+      return Promise.reject();
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: type the form
@@ -451,34 +431,36 @@ const ReservationUnitReservationWithReservationProp = ({
     const input = getReservationApplicationMutationValues(
       normalizedPayload,
       supportedFields,
-      supportedFields.includes("reservee_type")
-        ? reserveeType
-        : ReserveeType.Individual
+      hasReserveeTypeField ? reserveeType : CustomerTypeChoice.Individual
     );
 
-    return updateReservation({
-      variables: {
-        input: {
-          pk: reservationPk ?? 0,
-          ...input,
-          reserveeLanguage: i18n.language,
+    try {
+      await updateReservation({
+        variables: {
+          input: {
+            pk: reservationPk ?? 0,
+            ...input,
+            reserveeLanguage: i18n.language,
+          },
         },
-      },
-    }).then(() => {
-      return Promise.resolve();
-    });
+      });
+    } catch (e) {
+      setErrorMsg(t("errors:general_error"));
+    }
   };
 
-  const onSubmitStep1 = (): Promise<void> => {
-    return confirmReservation({
-      variables: {
-        input: {
-          pk: reservationPk ?? 0,
+  const onSubmitStep1 = async (): Promise<void> => {
+    try {
+      await confirmReservation({
+        variables: {
+          input: {
+            pk: reservationPk ?? 0,
+          },
         },
-      },
-    }).then(() => {
-      return Promise.resolve();
-    });
+      });
+    } catch (e) {
+      setErrorMsg(t("errors:general_error"));
+    }
   };
 
   // NOTE: only navigate away from the page if the reservation is cancelled the confirmation hook handles delete
@@ -514,28 +496,26 @@ const ReservationUnitReservationWithReservationProp = ({
   return (
     <StyledContainer>
       <Columns>
-        {reservation != null && (
-          <div>
-            <ReservationInfoCard
-              reservation={reservation}
-              reservationUnit={reservationUnit}
-              type="pending"
-              shouldDisplayReservationUnitPrice={
-                shouldDisplayReservationUnitPrice
-              }
-            />
-            {termsOfUseContent && (
-              <JustForDesktop>
-                <PinkBox>
-                  <Subheading>
-                    {t("reservations:reservationInfoBoxHeading")}
-                  </Subheading>
-                  <Sanitize html={termsOfUseContent} />
-                </PinkBox>
-              </JustForDesktop>
-            )}
-          </div>
-        )}
+        <div>
+          <ReservationInfoCard
+            reservation={reservation}
+            reservationUnit={reservationUnit}
+            type="pending"
+            shouldDisplayReservationUnitPrice={
+              shouldDisplayReservationUnitPrice
+            }
+          />
+          {termsOfUseContent && (
+            <JustForDesktop>
+              <PinkBox>
+                <Subheading>
+                  {t("reservations:reservationInfoBoxHeading")}
+                </Subheading>
+                <Sanitize html={termsOfUseContent} />
+              </PinkBox>
+            </JustForDesktop>
+          )}
+        </div>
         <BodyContainer>
           <FormProvider {...form}>
             <div>
@@ -609,39 +589,51 @@ const ReservationUnitReservationWithReservationProp = ({
       )}
     </StyledContainer>
   );
-};
+}
 
 // TODO this is wrong. Use getServerSideProps and export the Page component directly without this wrapper
-const ReservationUnitReservation = (props: PropsNarrowed) => {
+function ReservationUnitReservation(props: PropsNarrowed) {
   const { reservationPk } = props;
 
   // TODO show an error if this fails
   // TODO show an error if the pk is not a number
   // TODO find a typesafe way to do this
-  const typename = "ReservationType";
+  const typename = "ReservationNode";
   const id = base64encode(`${typename}:${reservationPk}`);
-  const { data, loading } = useQuery<Query, QueryReservationArgs>(
-    GET_RESERVATION,
-    {
-      variables: { id },
-      skip: !reservationPk,
-      onError: () => {},
-    }
-  );
+  const { data, loading, error, refetch } = useQuery<
+    Query,
+    QueryReservationArgs
+  >(GET_RESERVATION, {
+    variables: { id },
+    skip: !reservationPk,
+  });
+
+  if (error != null) {
+    return <Error statusCode={500} />;
+  }
 
   // TODO errors vs loading
-  if (loading || !data?.reservation?.pk) {
-    return null;
+  if (loading) {
+    return <CenterSpinner />;
+  }
+  if (data == null || data.reservation == null) {
+    return <Error statusCode={400} />;
   }
 
   const { reservation } = data;
 
+  // it should be Created only here otherwise it's a client error (should redirect to /reservation/:pk page)
+  if (reservation.state !== State.Created) {
+    return <Error statusCode={400} />;
+  }
+
   return (
     <ReservationUnitReservationWithReservationProp
       {...props}
-      fetchedReservation={reservation}
+      reservation={reservation}
+      refetch={refetch}
     />
   );
-};
+}
 
 export default ReservationUnitReservation;

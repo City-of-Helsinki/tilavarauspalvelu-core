@@ -12,6 +12,7 @@ import {
   type Query,
   type QueryReservationsArgs,
   State,
+  ReservationOrderingChoices,
 } from "common/types/gql-types";
 import { Container } from "common";
 import { filterNonNullable } from "common/src/helpers";
@@ -105,7 +106,10 @@ const Reservations = (): JSX.Element | null => {
               State.WaitingForPayment,
               State.Denied,
             ],
-      orderBy: tab === "upcoming" ? "begin" : "-begin",
+      orderBy:
+        tab === "upcoming"
+          ? [ReservationOrderingChoices.BeginAsc]
+          : [ReservationOrderingChoices.BeginDesc],
       user: currentUser?.pk?.toString(),
       // NOTE today's reservations are always shown in upcoming (even when they are in the past)
       beginDate: tab === "upcoming" ? toApiDate(today) : undefined,

@@ -51,7 +51,7 @@ const translations: ITranslations = {
     WEAK: ["Heikko tunnistautuminen"],
     STRONG: ["Vahva tunnistautuminen"],
   },
-  ReserveeType: {
+  CustomerTypeChoice: {
     INDIVIDUAL: ["yksityishenkilö"],
     BUSINESS: ["yritys"],
     NONPROFIT: {

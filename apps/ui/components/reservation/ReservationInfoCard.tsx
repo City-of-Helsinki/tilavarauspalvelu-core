@@ -8,11 +8,13 @@ import {
   getReservationPrice,
   formatters as getFormatters,
   type PendingReservation,
-  type ReservationUnitNode,
 } from "common";
 import { breakpoints } from "common/src/common/style";
 import { H4, Strong } from "common/src/common/typography";
-import type { ReservationType } from "common/types/gql-types";
+import type {
+  ReservationUnitNode,
+  ReservationNode,
+} from "common/types/gql-types";
 import { getReservationUnitPrice } from "@/modules/reservationUnit";
 import {
   capitalize,
@@ -26,7 +28,7 @@ import { reservationUnitPath } from "@/modules/const";
 type Type = "pending" | "confirmed" | "complete";
 
 type Props = {
-  reservation: ReservationType | PendingReservation;
+  reservation: ReservationNode | PendingReservation;
   reservationUnit: ReservationUnitNode | null;
   type: Type;
   shouldDisplayReservationUnitPrice?: boolean;
@@ -136,7 +138,7 @@ const ReservationInfoCard = ({
           trailingZeros: true,
         })
       : getReservationPrice(
-          Number(reservation?.price),
+          reservation?.price,
           t("prices:priceFree"),
           i18n.language,
           true
@@ -156,6 +158,10 @@ const ReservationInfoCard = ({
   const img = getMainImage(reservationUnit);
   const imgSrc = getImageSource(img, "medium");
 
+  const link = reservationUnit.pk
+    ? reservationUnitPath(reservationUnit.pk)
+    : "";
+
   return (
     <Wrapper $type={type}>
       <MainImage src={imgSrc} alt={name} />
@@ -163,7 +169,7 @@ const ReservationInfoCard = ({
         <Heading>
           <StyledLink
             data-testid="reservation__reservation-info-card__reservationUnit"
-            href={reservationUnitPath(Number(reservationUnit.pk))}
+            href={link}
           >
             {name}
           </StyledLink>
@@ -172,7 +178,7 @@ const ReservationInfoCard = ({
           <Subheading>
             {t("reservations:reservationNumber")}:{" "}
             <span data-testid="reservation__reservation-info-card__reservationNumber">
-              {reservation.pk}
+              {reservation.pk ?? "-"}
             </span>
           </Subheading>
         )}

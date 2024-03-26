@@ -4,10 +4,10 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { H1 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import { ReservationType } from "common/types/gql-types";
+import type { ReservationNode } from "common/types/gql-types";
 import { getName } from "./util";
-import { HorisontalFlex } from "../../../styles/layout";
-import { formatDateTime } from "../../../common/util";
+import { HorisontalFlex } from "@/styles/layout";
+import { formatDateTime } from "@/common/util";
 
 const Dot = styled.div`
   display: inline-block;
@@ -55,7 +55,7 @@ const DateTime = styled.div`
 `;
 
 type Props = {
-  reservation: ReservationType;
+  reservation: ReservationNode;
   tagline: string;
   overrideTitle?: string;
 };

@@ -1,21 +1,18 @@
 import React, { memo, useReducer, useState } from "react";
 import { Button, Notification } from "hds-react";
 import { isEqual, omitBy, pick } from "lodash";
-
-import { FetchResult, useMutation, useQuery } from "@apollo/client";
+import { type FetchResult, useMutation, useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Joi from "joi";
 import { H1 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import {
+import type {
   Query,
-  QuerySpaceByPkArgs,
-  SpaceType,
+  SpaceNode,
   SpaceUpdateMutationInput,
   SpaceUpdateMutationPayload,
-  UnitType,
 } from "common/types/gql-types";
 import { StyledNotification } from "@/styles/util";
 import { schema } from "./util";
@@ -46,7 +43,7 @@ type Action =
       validationErrors: Joi.ValidationResult | null;
     }
   | { type: "clearError" }
-  | { type: "dataLoaded"; space: SpaceType }
+  | { type: "dataLoaded"; space: SpaceNode }
   | { type: "dataLoadError"; message: string }
   // eslint-disable-next-line
   | { type: "set"; value: any };
@@ -56,10 +53,10 @@ type State = {
   unitPk?: number;
   notification: null | NotificationType;
   loading: boolean;
-  space: SpaceType | null;
+  space: SpaceNode | null;
   spaceEdit: SpaceUpdateMutationInput | null;
-  parent?: SpaceType;
-  unitSpaces?: SpaceType[];
+  parent?: SpaceNode;
+  unitSpaces?: SpaceNode[];
   hasChanges: boolean;
   error: null | {
     message: string;
@@ -232,6 +229,7 @@ const SpaceEditor = ({ space, unit }: Props): JSX.Element | null => {
   ): Promise<FetchResult<{ updateSpace: SpaceUpdateMutationPayload }>> =>
     updateSpaceMutation({ variables: { input } });
 
+  // FIXME relay query
   const { refetch } = useQuery<Query, QuerySpaceByPkArgs>(SPACE_QUERY, {
     variables: { pk: space },
     onCompleted: ({ spaceByPk }) => {
@@ -313,7 +311,7 @@ const SpaceEditor = ({ space, unit }: Props): JSX.Element | null => {
     <Wrapper>
       <Head
         title={state.space.parent?.nameFi || t("SpaceEditor.noParent")}
-        unit={state.space.unit as UnitType}
+        unit={state.space.unit}
         maxPersons={state.spaceEdit?.maxPersons || undefined}
         surfaceArea={state.spaceEdit?.surfaceArea || undefined}
       />

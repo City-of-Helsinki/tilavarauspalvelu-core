@@ -2,14 +2,14 @@ import React from "react";
 import { type ApolloError, useQuery } from "@apollo/client";
 import type { Query, QueryReservationUnitsArgs } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
+import { LARGE_LIST_PAGE_SIZE } from "@/common/const";
+import { combineResults } from "@/common/util";
+import { useNotification } from "@/context/NotificationContext";
+import Loader from "@/component/Loader";
+import { More } from "@/component/More";
+import ReservationUnitsTable from "./ReservationUnitsTable";
 import { SEARCH_RESERVATION_UNITS_QUERY } from "./queries";
 import { FilterArguments } from "./Filters";
-import { useNotification } from "../../context/NotificationContext";
-import Loader from "../Loader";
-import ReservationUnitsTable from "./ReservationUnitsTable";
-import { More } from "@/component/More";
-import { LARGE_LIST_PAGE_SIZE } from "../../common/const";
-import { combineResults } from "../../common/util";
 
 export type Sort = {
   field: string;
@@ -66,7 +66,8 @@ const ReservationUnitsDataReader = ({
     QueryReservationUnitsArgs
   >(SEARCH_RESERVATION_UNITS_QUERY, {
     variables: {
-      orderBy: sortString,
+      // FIXME
+      // orderBy: sortString,
       first: LARGE_LIST_PAGE_SIZE,
       ...mapFilterParams(filters),
     },
@@ -93,7 +94,7 @@ const ReservationUnitsDataReader = ({
       />
       <More
         key={reservationUnits.length}
-        totalCount={data?.reservationUnits?.totalCount || 0}
+        totalCount={data?.reservationUnits?.totalCount ?? 0}
         count={reservationUnits.length}
         fetchMore={() =>
           fetchMore({

@@ -11,15 +11,12 @@ import {
   fromApiDate as fromAPIDate,
   fromUIDate,
 } from "common/src/common/util";
-import type {
-  OptionType,
-  ReducedApplicationStatus,
-  ReservationUnitNode,
-} from "common/types/common";
+import type { OptionType, ReducedApplicationStatus } from "common/types/common";
 import {
-  type ReservationUnitImageType,
+  type ReservationUnitImageNode,
+  type ReservationUnitNode,
   ApplicationStatusChoice,
-  type AgeGroupType,
+  type AgeGroupNode,
 } from "common/types/gql-types";
 import {
   searchPrefix,
@@ -84,7 +81,7 @@ type ParameterType =
   | { pk: number; name: string };
 
 export const getLabel = (
-  parameter: ParameterType | AgeGroupType,
+  parameter: ParameterType | AgeGroupNode,
   lang: LocalizationLanguages = "fi"
 ): string => {
   if ("minimum" in parameter) {
@@ -110,7 +107,7 @@ export const getLabel = (
 
 /// @deprecated - OptionType is dangerous, union types break type safety in comparisons
 export const mapOptions = (
-  src: ParameterType[] | AgeGroupType[],
+  src: ParameterType[] | AgeGroupNode[],
   emptyOptionLabel?: string,
   lang: LocalizationLanguages = "fi"
 ): OptionType[] => {
@@ -199,7 +196,7 @@ const imagePriority = ["main", "map", "ground_plan", "other"].map((n) =>
 
 export const getMainImage = (
   ru?: ReservationUnitNode
-): ReservationUnitImageType | null => {
+): ReservationUnitImageNode | null => {
   if (!ru || !ru.images || ru.images.length === 0) {
     return null;
   }
@@ -213,8 +210,8 @@ export const getMainImage = (
 };
 
 export const orderImages = (
-  images: ReservationUnitImageType[]
-): ReservationUnitImageType[] => {
+  images: ReservationUnitImageNode[]
+): ReservationUnitImageNode[] => {
   if (!images || images.length === 0) {
     return [];
   }
@@ -332,7 +329,7 @@ export const getPostLoginUrl = () => {
 /// On development we don't have image cache so we return the full image url
 /// If image is null or undefined returns a static pixel
 export function getImageSource(
-  image: ReservationUnitImageType | null,
+  image: ReservationUnitImageNode | null,
   size: "small" | "large" | "medium" | "full" = "medium"
 ): string {
   if (!image) {
@@ -342,7 +339,7 @@ export function getImageSource(
 }
 
 function getImageSourceWithoutDefault(
-  image: ReservationUnitImageType,
+  image: ReservationUnitImageNode,
   size: "small" | "large" | "medium" | "full"
 ): string | null {
   switch (size) {

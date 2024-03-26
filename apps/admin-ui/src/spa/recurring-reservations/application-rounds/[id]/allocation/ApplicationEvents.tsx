@@ -8,9 +8,10 @@ import {
   type ApplicationRoundStatusChoice,
   type Query,
   ApplicationSectionStatusChoice,
-  AllocatedTimeSlotNode,
+  type AllocatedTimeSlotNode,
+  type ReservationUnitNode,
 } from "common/types/gql-types";
-import { ReservationUnitNode, breakpoints } from "common";
+import { breakpoints } from "common";
 import { Accordion } from "@/component/Accordion";
 import { AllocationCalendar } from "./AllocationCalendar";
 import { AllocationColumn } from "./AllocationColumn";

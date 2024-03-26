@@ -5,6 +5,7 @@ import { useTranslation } from "next-i18next";
 import type { Query, QueryUserArgs } from "common/types/gql-types";
 import { formatDate } from "@/common/util";
 import { HorisontalFlex } from "@/styles/layout";
+import { base64encode } from "common/src/helpers";
 
 type Props = {
   userPk: number;
@@ -13,8 +14,8 @@ type Props = {
 // NOTE separate query because all requests for dateOfBirth are logged
 // so don't make them automatically or inside other queries
 const DATE_OF_BIRTH_QUERY = gql`
-  query getDateOfBirth($pk: Int!) {
-    user(pk: $pk) {
+  query getDateOfBirth($id: ID!) {
+    user(id: $id) {
       pk
       dateOfBirth
     }
@@ -36,13 +37,15 @@ const Button = styled.button`
 export function BirthDate({ userPk }: Props): JSX.Element {
   const [visible, setVisible] = useState(false);
 
+  const typename = "UserNode";
+  const id = base64encode(`${typename}:${userPk}`);
   const {
     data,
     loading: isLoading,
     error,
   } = useQuery<Query, QueryUserArgs>(DATE_OF_BIRTH_QUERY, {
     variables: {
-      pk: userPk,
+      id,
     },
     fetchPolicy: "network-only",
     skip: !userPk || !visible,

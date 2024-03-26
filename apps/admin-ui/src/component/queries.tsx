@@ -7,10 +7,6 @@ export const UPDATE_RESERVATION_WORKING_MEMO = gql`
     ) {
       pk
       workingMemo
-      errors {
-        field
-        messages
-      }
     }
   }
 `;

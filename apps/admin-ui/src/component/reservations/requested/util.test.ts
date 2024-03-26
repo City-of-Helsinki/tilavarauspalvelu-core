@@ -1,13 +1,13 @@
 import { get } from "lodash";
-import { TFunction } from "i18next";
+import type { TFunction } from "i18next";
 import {
-  RecurringReservationType,
-  ReservationType,
-  ReservationUnitPricingType,
+  type RecurringReservationNode,
+  type ReservationNode,
+  type ReservationUnitPricingNode,
   PriceUnit,
-  PricingType,
+  type PricingType,
   Status,
-  ReservationUnitType,
+  type ReservationUnitNode,
 } from "common/types/gql-types";
 import {
   createTagString,
@@ -15,7 +15,7 @@ import {
   getReservationPriceDetails,
 } from "./util";
 
-const PRICING_FREE: ReservationUnitPricingType = {
+const PRICING_FREE: ReservationUnitPricingNode = {
   begins: "2021-01-01",
   pricingType: PricingType.Free,
   pk: 1,
@@ -51,9 +51,9 @@ describe("pricingDetails", () => {
               status: Status.Active,
             },
           ],
-        } as ReservationUnitType,
+        } as ReservationUnitNode,
       ],
-    } as ReservationType;
+    } as ReservationNode;
 
     const t1 = ((_s: unknown, a: string) => get(a, "price") ?? "") as TFunction;
     expect(getReservationPriceDetails(r, t1)).toEqual("120 €");
@@ -71,9 +71,9 @@ describe("pricingDetails", () => {
               pricingType: PricingType.Paid,
             },
           ],
-        } as ReservationUnitType,
+        } as ReservationUnitNode,
       ],
-    } as ReservationType;
+    } as ReservationNode;
 
     const t1 = ((_s: unknown, a: string) => get(a, "price") ?? "") as TFunction;
     const t2 = ((_s: unknown, a: string) =>
@@ -88,7 +88,7 @@ describe("getReservatinUnitPricing", () => {
   test("returns correct pricing based on reservation date", () => {
     const reservationUnit = {
       pricings: [PRICING_FREE, PRICING_PAID],
-    } as ReservationUnitType;
+    } as ReservationUnitNode;
 
     expect(
       getReservatinUnitPricing(reservationUnit, "2021-02-01T00:00:01Z")
@@ -111,13 +111,13 @@ describe("createTag", () => {
         beginDate: "2023-04-01T09:00:00Z",
         endDate: "2023-07-01T09:00:00Z",
         weekdays: [0, 1, 3],
-      } as RecurringReservationType,
+      } as RecurringReservationNode,
       reservationUnits: [
         {
           nameFi: "Foobar",
-        } as ReservationUnitType,
+        } as ReservationUnitNode,
       ],
-    } as ReservationType;
+    } as ReservationNode;
 
     const mockT = ((x: string) => x) as TFunction;
     const tag = createTagString(res, mockT);
@@ -136,9 +136,9 @@ describe("createTag", () => {
       reservationUnits: [
         {
           nameFi: "Foobar",
-        } as ReservationUnitType,
+        } as ReservationUnitNode,
       ],
-    } as ReservationType;
+    } as ReservationNode;
 
     const mockT = ((x: string) => x) as TFunction;
     const tag = createTagString(res, mockT);

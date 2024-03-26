@@ -1,10 +1,11 @@
 import { gql } from "@apollo/client";
-import { Type } from "common/types/gql-types";
+import { ReservationTypeChoice } from "common/types/gql-types";
 import {
   RESERVEE_NAME_FRAGMENT,
-  RESERVEE_BILLING_FRAGMENT,
   IMAGE_FRAGMENT,
   PRICING_FRAGMENT,
+  TERMS_OF_USE_TEXT_FRAGMENT,
+  LOCATION_FRAGMENT_I18N,
 } from "common/src/queries/fragments";
 import {
   RESERVATION_UNIT_FRAGMENT,
@@ -16,47 +17,15 @@ export const CREATE_RESERVATION = gql`
     createReservation(input: $input) {
       pk
       price
-      errors {
-        field
-        messages
-      }
     }
   }
 `;
 
+// TODO is this still correct?
 export const UPDATE_RESERVATION = gql`
-  ${RESERVEE_NAME_FRAGMENT}
-  ${RESERVEE_BILLING_FRAGMENT}
   mutation updateReservation($input: ReservationUpdateMutationInput!) {
     updateReservation(input: $input) {
-      reservation {
-        pk
-        calendarUrl
-        state
-        user {
-          email
-        }
-        name
-        description
-        purpose {
-          pk
-        }
-        numPersons
-        ageGroup {
-          pk
-        }
-        ...ReserveeNameFields
-        ...ReserveeBillingFields
-        homeCity {
-          pk
-        }
-        applyingForFreeOfCharge
-        freeOfChargeReason
-      }
-      errors {
-        field
-        messages
-      }
+      pk
     }
   }
 `;
@@ -65,7 +34,6 @@ export const DELETE_RESERVATION = gql`
   mutation DeleteReservation($input: ReservationDeleteMutationInput!) {
     deleteReservation(input: $input) {
       deleted
-      errors
     }
   }
 `;
@@ -74,14 +42,6 @@ export const CANCEL_RESERVATION = gql`
   mutation CancelReservation($input: ReservationCancellationMutationInput!) {
     cancelReservation(input: $input) {
       pk
-      cancelReasonPk
-      cancelDetails
-      state
-      clientMutationId
-      errors {
-        field
-        messages
-      }
     }
   }
 `;
@@ -92,21 +52,14 @@ export const CONFIRM_RESERVATION = gql`
       pk
       state
       order {
-        id
-        pk
         checkoutUrl
-        receiptUrl
-      }
-      errors {
-        field
-        messages
       }
     }
   }
 `;
 
 const CANCELLATION_RULE_FRAGMENT = gql`
-  fragment CancellationRuleFields on ReservationUnitType {
+  fragment CancellationRuleFields on ReservationUnitNode {
     cancellationRule {
       canBeCancelledTimeBefore
       needsHandling
@@ -124,29 +77,21 @@ export const LIST_RESERVATIONS = gql`
   ${UNIT_NAME_FRAGMENT_I18N}
   ${CANCELLATION_RULE_FRAGMENT}
   query Reservations(
-    $before: String
-    $after: String
-    $first: Int
-    $last: Int
     $beginDate: Date
     $endDate: Date
     $state: [String]
     $user: ID!
     $reservationUnit: [ID]
-    $orderBy: String
+    $orderBy: [ReservationOrderingChoices]
   ) {
     reservations(
-      before: $before
-      after: $after
-      first: $first
-      last: $last
       beginDate: $beginDate
       endDate: $endDate
       state: $state
       user: $user
       reservationUnit: $reservationUnit
       orderBy: $orderBy
-      reservationType: "${Type.Normal.toLowerCase()}"
+      reservationType: "${ReservationTypeChoice.Normal.toLowerCase()}"
     ) {
       edges {
         node {
@@ -162,7 +107,7 @@ export const LIST_RESERVATIONS = gql`
             orderUuid
           }
           isBlocked
-          reservationUnits {
+          reservationUnit {
             pk
             nameFi
             nameEn
@@ -184,11 +129,17 @@ export const LIST_RESERVATIONS = gql`
   }
 `;
 
+// TODO do we need all the fields from ReservationUnitNode? ex. pricing (since we should be using the Reservations own pricing anyway)
+// TODO can we split this into smaller queries? per case?
+// making a reservation, showing a reservation, editing a reservation, cancelling a reservation
 export const GET_RESERVATION = gql`
   ${IMAGE_FRAGMENT}
   ${RESERVATION_UNIT_FRAGMENT}
   ${CANCELLATION_RULE_FRAGMENT}
   ${RESERVEE_NAME_FRAGMENT}
+  ${TERMS_OF_USE_TEXT_FRAGMENT}
+  ${LOCATION_FRAGMENT_I18N}
+  ${PRICING_FRAGMENT}
   query Reservation($id: ID!) {
     reservation(id: $id) {
       pk
@@ -212,7 +163,7 @@ export const GET_RESERVATION = gql`
         orderUuid
         status
       }
-      reservationUnits {
+      reservationUnit {
         pk
         nameFi
         nameEn
@@ -230,24 +181,16 @@ export const GET_RESERVATION = gql`
         termsOfUseEn
         termsOfUseSv
         serviceSpecificTerms {
-          textFi
-          textEn
-          textSv
+          ...TermsOfUseTextFields
         }
         cancellationTerms {
-          textFi
-          textEn
-          textSv
+          ...TermsOfUseTextFields
         }
         paymentTerms {
-          textFi
-          textEn
-          textSv
+          ...TermsOfUseTextFields
         }
         pricingTerms {
-          textFi
-          textEn
-          textSv
+          ...TermsOfUseTextFields
         }
         unit {
           pk
@@ -258,13 +201,7 @@ export const GET_RESERVATION = gql`
           location {
             latitude
             longitude
-            addressStreetFi
-            addressStreetEn
-            addressStreetSv
-            addressZip
-            addressCityFi
-            addressCityEn
-            addressCitySv
+            ...LocationFieldsI18n
           }
         }
         cancellationRule {
@@ -281,25 +218,10 @@ export const GET_RESERVATION = gql`
           ...ImageFragment
         }
         pricings {
-          begins
-          priceUnit
-          pricingType
-          lowestPrice
-          highestPrice
-          taxPercentage {
-            value
-          }
-          status
+          ...PricingFields
         }
         minPersons
         maxPersons
-        metadataSet {
-          id
-          name
-          pk
-          supportedFields
-          requiredFields
-        }
         ...ReservationUnitFields
         ...CancellationRuleFields
       }
@@ -348,10 +270,6 @@ export const ADJUST_RESERVATION_TIME = gql`
       state
       begin
       end
-      errors {
-        field
-        messages
-      }
     }
   }
 `;

@@ -1,12 +1,11 @@
 import React from "react";
-import { RecurringReservationType, State } from "common/types/gql-types";
+import { type RecurringReservationNode, State } from "common/types/gql-types";
 import { useTranslation } from "react-i18next";
 import { Button } from "hds-react";
 import { ButtonLikeLink } from "app/component/ButtonLikeLink";
 import DenyDialog from "./DenyDialog";
-import { useModal } from "../../../context/ModalContext";
+import { useModal } from "@/context/ModalContext";
 import { useRecurringReservations } from "./hooks";
-import { RECURRING_AUTOMATIC_REFETCH_LIMIT } from "../../../common/const";
 
 // NOTE some copy paste from ApprovalButtons
 const ApprovalButtonsRecurring = ({
@@ -15,7 +14,7 @@ const ApprovalButtonsRecurring = ({
   handleAccept,
   disableNonEssentialButtons,
 }: {
-  recurringReservation: RecurringReservationType;
+  recurringReservation: RecurringReservationNode;
   handleClose: () => void;
   handleAccept: () => void;
   disableNonEssentialButtons?: boolean;
@@ -23,10 +22,9 @@ const ApprovalButtonsRecurring = ({
   const { setModalContent } = useModal();
   const { t } = useTranslation();
 
-  const { loading, reservations, fetchMore, totalCount } =
-    useRecurringReservations(recurringReservation.pk ?? undefined, {
-      limit: RECURRING_AUTOMATIC_REFETCH_LIMIT,
-    });
+  const { loading, reservations } = useRecurringReservations(
+    recurringReservation.pk ?? undefined
+  );
 
   const handleDeleteSuccess = () => {
     handleAccept();
@@ -60,20 +58,6 @@ const ApprovalButtonsRecurring = ({
     variant: "secondary",
     disabled: false,
   } as const;
-
-  // Don't allow delete all unless we have loaded all
-  if (totalCount && reservations.length < totalCount) {
-    return (
-      <Button
-        {...btnCommon}
-        onClick={() =>
-          fetchMore({ variables: { offset: reservations.length } })
-        }
-      >
-        {t("common.showMore")}
-      </Button>
-    );
-  }
 
   if (reservationsPossibleToDelete.length === 0) {
     return null;

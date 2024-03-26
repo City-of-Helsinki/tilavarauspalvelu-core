@@ -2,11 +2,10 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  type ReservationType,
-  type ReservationUnitType,
+import type {
+  ReservationNode,
+  ReservationUnitNode,
 } from "common/types/gql-types";
-import camelCase from "lodash/camelCase";
 import { Button, TextInput } from "hds-react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
@@ -16,16 +15,17 @@ import {
   ReservationTypeSchema,
   type ReservationChangeFormType,
   ReservationChangeFormSchema,
-} from "app/schemas";
+} from "@/schemas";
 import { useNotification } from "../../context/NotificationContext";
 import { flattenMetadata } from "../my-units/create-reservation/utils";
-import ReservationTypeForm from "../my-units/ReservationTypeForm";
+import ReservationNodeForm from "../my-units/ReservationTypeForm";
 import Loader from "../Loader";
 import { HR } from "@/component/Table";
 import { useOptions } from "../my-units/hooks";
 import EditPageWrapper from "./EditPageWrapper";
 import { useReservationEditData } from "./requested/hooks";
 import { useStaffReservationMutation } from "./hooks";
+import { filterNonNullable } from "common/src/helpers";
 
 type FormValueType = ReservationChangeFormType & ReservationFormMeta;
 
@@ -42,7 +42,7 @@ const ButtonContainer = styled.div`
   border-top-width: 2px;
 `;
 
-const noSeparateBillingDefined = (reservation: ReservationType): boolean =>
+const noSeparateBillingDefined = (reservation: ReservationNode): boolean =>
   !reservation.billingAddressCity &&
   !reservation.billingAddressStreet &&
   !reservation.billingAddressZip &&
@@ -70,8 +70,8 @@ const EditReservation = ({
   onSuccess,
 }: {
   onCancel: () => void;
-  reservation: ReservationType;
-  reservationUnit: ReservationUnitType;
+  reservation: ReservationNode;
+  reservationUnit: ReservationUnitNode;
   options: PossibleOptions;
   onSuccess: () => void;
 }) => {
@@ -147,10 +147,9 @@ const EditReservation = ({
       return;
     }
 
-    const metadataSetFields =
+    const metadataSetFields = filterNonNullable(
       reservationUnit.metadataSet?.supportedFields
-        ?.filter((x): x is string => x != null)
-        .map(camelCase) ?? [];
+    );
 
     const flattenedMetadataSetValues = flattenMetadata(
       values,
@@ -181,7 +180,7 @@ const EditReservation = ({
   return (
     <FormProvider {...form}>
       <Form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <ReservationTypeForm
+        <ReservationNodeForm
           reservationUnit={reservationUnit}
           disableBufferToggle
         >
@@ -196,7 +195,7 @@ const EditReservation = ({
               errorText={translateError(errors.seriesName?.message)}
             />
           )}
-        </ReservationTypeForm>
+        </ReservationNodeForm>
         <HR />
         <ButtonContainer>
           <Button

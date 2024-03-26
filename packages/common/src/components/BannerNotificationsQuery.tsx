@@ -41,7 +41,7 @@ export const BANNER_NOTIFICATIONS_ADMIN_LIST = gql`
   query BannerNotificationsAdminList(
     $first: Int
     $offset: Int
-    $orderBy: String
+    $orderBy: [BannerNotificationOrderingChoices]
   ) {
     bannerNotifications(first: $first, offset: $offset, orderBy: $orderBy) {
       edges {

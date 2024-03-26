@@ -3,19 +3,19 @@ import { uniq, uniqBy } from "lodash";
 import React, { useMemo, useState } from "react";
 import i18next from "i18next";
 import { useTranslation } from "react-i18next";
-import { ReservationUnitType } from "common/types/gql-types";
-import { DataFilterConfig, DataFilterOption } from "../../common/types";
+import type { ReservationUnitNode } from "common/types/gql-types";
+import type { DataFilterConfig, DataFilterOption } from "../../common/types";
 import { filterData } from "../../common/util";
 import FilterContainer, { FilterBtn } from "../FilterContainer";
 import FilterControls from "../FilterControls";
 import ReservationUnitCard from "./ReservationUnitCard";
 
 interface IProps {
-  reservationUnits: ReservationUnitType[];
+  reservationUnits: ReservationUnitNode[];
   unitId: number;
 }
 
-const getFilterConfig = (units: ReservationUnitType[]): DataFilterConfig[] => {
+const getFilterConfig = (units: ReservationUnitNode[]): DataFilterConfig[] => {
   const types = uniq(units.map((unit) => unit.reservationUnitType)).filter(
     Boolean
   );

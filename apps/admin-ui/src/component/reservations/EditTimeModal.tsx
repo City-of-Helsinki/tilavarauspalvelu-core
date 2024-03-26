@@ -3,14 +3,14 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Button, Dialog, Notification } from "hds-react";
 import { z } from "zod";
-import { TFunction } from "i18next";
+import { type TFunction } from "i18next";
 import {
-  Mutation,
-  MutationStaffAdjustReservationTimeArgs,
-  ReservationType,
-  ReservationTypeConnection,
+  type Mutation,
+  type MutationStaffAdjustReservationTimeArgs,
+  type ReservationNode,
+  type ReservationNodeConnection,
   ReservationStartInterval,
-  Type,
+  ReservationTypeChoice,
 } from "common/types/gql-types";
 import { FormProvider, useForm } from "react-hook-form";
 import { format } from "date-fns";
@@ -38,7 +38,7 @@ const StyledForm = styled.form`
 `;
 
 type Props = {
-  reservation: ReservationType;
+  reservation: ReservationNode;
   onAccept: () => void;
   onClose: () => void;
 };
@@ -118,7 +118,7 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
         fields: {
           // find the pk => slice the array => replace the state variable in the slice
           // @ts-expect-error: TODO: typechecks broke with ts or apollo-client upgrade
-          reservations(existing: ReservationTypeConnection) {
+          reservations(existing: ReservationNodeConnection) {
             const queryRes = data?.staffAdjustReservationTime;
             if (queryRes?.errors) {
               // eslint-disable-next-line no-console
@@ -237,15 +237,17 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
     end,
     buffers: {
       before:
-        reservation.type !== Type.Blocked && reservation.bufferTimeBefore
+        reservation.type !== ReservationTypeChoice.Blocked &&
+        reservation.bufferTimeBefore
           ? reservation.bufferTimeBefore
           : 0,
       after:
-        reservation.type !== Type.Blocked && reservation.bufferTimeAfter
+        reservation.type !== ReservationTypeChoice.Blocked &&
+        reservation.bufferTimeAfter
           ? reservation.bufferTimeAfter
           : 0,
     },
-    reservationType: reservation.type ?? Type.Staff,
+    reservationType: reservation.type ?? ReservationTypeChoice.Staff,
   });
 
   // NOTE 0 => buffer disabled for this reservation, undefined => no buffers selected

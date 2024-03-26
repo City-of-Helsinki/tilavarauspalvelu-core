@@ -1,7 +1,7 @@
 import { format, parseISO } from "date-fns";
 import i18next from "i18next";
 import { groupBy, set, get, trim } from "lodash";
-import { LocationType, Query } from "common/types/gql-types";
+import type { LocationNode, Query } from "common/types/gql-types";
 import { DataFilterOption } from "./types";
 import { NUMBER_OF_DECIMALS } from "./const";
 
@@ -188,7 +188,7 @@ export const parseAgeGroups = (ageGroups: IAgeGroups): string => {
   })}`;
 };
 
-export const parseAddress = (location: LocationType): string => {
+export const parseAddress = (location: LocationNode): string => {
   return trim(
     `${location.addressStreetFi ?? ""}, ${location.addressZip} ${
       location.addressCityFi ?? ""

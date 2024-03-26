@@ -6,7 +6,7 @@ import styled from "styled-components";
 import { getReservationPrice } from "common";
 import { trim } from "lodash";
 import { breakpoints } from "common/src/common/style";
-import { ReservationType, State } from "common/types/gql-types";
+import { ReservationNode, State } from "common/types/gql-types";
 import {
   capitalize,
   getImageSource,
@@ -32,7 +32,7 @@ import { ButtonLikeLink } from "../common/ButtonLikeLink";
 type CardType = "upcoming" | "past" | "cancelled";
 
 interface PropsT {
-  reservation: ReservationType;
+  reservation: ReservationNode;
   type?: CardType;
 }
 
@@ -152,8 +152,8 @@ const Image = styled.img`
 const ReservationCard = ({ reservation, type }: PropsT): JSX.Element => {
   const { t, i18n } = useTranslation();
 
-  const reservationUnit = reservation.reservationUnits?.[0] ?? undefined;
-  const link = `/reservations/${reservation.pk}`;
+  const reservationUnit = reservation.reservationUnit?.[0] ?? undefined;
+  const link = reservation.pk ? `/reservations/${reservation.pk}` : "";
 
   const timeStripContent = useMemo(() => {
     const beginDate = t("common:dateWithWeekday", {

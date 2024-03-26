@@ -172,7 +172,7 @@ const ReservationCancellation = ({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [formState, setFormState] = useState<"unsent" | "sent">("unsent");
 
-  const typename = "ReservationType";
+  const typename = "ReservationNode";
   const id = base64encode(`${typename}:${pk}`);
   const { data: reservationData, loading } = useQuery<
     Query,
@@ -199,32 +199,29 @@ const ReservationCancellation = ({
     value: node?.pk != null ? node?.pk : "",
   }));
 
-  const [cancelReservation, { data, loading: isMutationLoading, error }] =
-    useMutation<
-      { cancelReservation: ReservationCancellationMutationPayload },
-      { input: ReservationCancellationMutationInput }
-    >(CANCEL_RESERVATION);
+  const [cancelReservation] = useMutation<
+    { cancelReservation: ReservationCancellationMutationPayload },
+    { input: ReservationCancellationMutationInput }
+  >(CANCEL_RESERVATION, {
+    onError: () => {
+      setErrorMsg(t("reservations:reservationCancellationFailed"));
+    },
+    onCompleted: () => {
+      setFormState("sent");
+      // TODO Why?
+      window.scrollTo(0, 0);
+    },
+  });
 
   const { register, handleSubmit, getValues, setValue, watch, control } =
     useForm();
-
-  useEffect(() => {
-    if (!isMutationLoading) {
-      if (error || Number(data?.cancelReservation?.errors?.length) > 0) {
-        setErrorMsg(t("reservations:reservationCancellationFailed"));
-      } else if (data) {
-        setFormState("sent");
-        window.scrollTo(0, 0);
-      }
-    }
-  }, [data, isMutationLoading, error, t]);
 
   useEffect(() => {
     register("reason", { required: true });
     register("description");
   }, [register]);
 
-  const reservationUnit = reservation?.reservationUnits?.[0] ?? null;
+  const reservationUnit = reservation?.reservationUnit?.[0] ?? null;
 
   const bylineContent = useMemo(() => {
     return (
@@ -247,12 +244,15 @@ const ReservationCancellation = ({
     : undefined;
 
   const onSubmit = (formData: { reason?: number; description?: string }) => {
+    if (!reservation.pk || !formData.reason) {
+      return;
+    }
     const { reason, description } = formData;
     cancelReservation({
       variables: {
         input: {
-          pk: Number(reservation.pk),
-          cancelReasonPk: Number(reason),
+          pk: reservation.pk,
+          cancelReasonPk: reason,
           cancelDetails: description,
         },
       },

@@ -4,8 +4,8 @@ import { FetchResult, useMutation } from "@apollo/client";
 import {
   SpaceCreateMutationInput,
   SpaceCreateMutationPayload,
-  SpaceType,
-  UnitByPkType,
+  SpaceNode,
+  UnitNode,
 } from "common/types/gql-types";
 import { CREATE_SPACE } from "../queries";
 import {
@@ -17,8 +17,8 @@ import Page1 from "./Page1";
 import Page2 from "./Page2";
 
 type Props = {
-  unit: UnitByPkType;
-  parentSpace?: SpaceType;
+  unit: UnitNode;
+  parentSpace?: SpaceNode;
   closeModal: () => void;
   onSave: () => void;
   onDataError: (message: string) => void;
@@ -88,7 +88,7 @@ const reducer = (state: State, action: Action): State => {
     case "delete": {
       return {
         ...state,
-        spaces: state.spaces.filter((s, i) => action.index !== i),
+        spaces: state.spaces.filter((_s, i) => action.index !== i),
       };
     }
     case "setValidationErrors": {

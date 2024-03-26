@@ -7,7 +7,7 @@ import {
   type RecurringReservationUpdateMutationPayload,
   type ReservationStaffModifyMutationInput,
   type ReservationStaffModifyMutationPayload,
-  type ReservationType,
+  type ReservationNode,
   type ReservationWorkingMemoMutationInput,
 } from "common/types/gql-types";
 import { useRecurringReservations } from "../requested/hooks";
@@ -21,7 +21,7 @@ export const useStaffReservationMutation = ({
   reservation,
   onSuccess,
 }: {
-  reservation: ReservationType;
+  reservation: ReservationNode;
   onSuccess: () => void;
 }) => {
   const { t } = useTranslation();

@@ -13,13 +13,13 @@ import {
   type Query,
   type QueryReservationsArgs,
   State,
-  Type,
-  type ReservationType,
-  type ReservationUnitType,
-  type ReservationUnitTypeReservableTimeSpansArgs,
-  type ReservationUnitTypeReservationsArgs,
+  type ReservationNode,
+  type ReservationUnitNode,
   type QueryReservationUnitArgs,
   type QueryReservationArgs,
+  ReservationTypeChoice,
+  type ReservationUnitNodeReservableTimeSpansArgs,
+  type ReservationUnitNodeReservationSetArgs,
 } from "common/types/gql-types";
 import { useRouter } from "next/router";
 import { LoadingSpinner, Stepper } from "hds-react";
@@ -169,8 +169,8 @@ function BylineContent({
   form,
   step,
 }: {
-  reservation: ReservationType;
-  reservationUnit: ReservationUnitType;
+  reservation: ReservationNode;
+  reservationUnit: ReservationUnitNode;
   form: UseFormReturn<PendingReservationFormType>;
   step: number;
 }) {
@@ -192,7 +192,7 @@ function BylineContent({
 }
 
 function convertReservationEdit(
-  reservation?: ReservationType
+  reservation?: ReservationNode
 ): PendingReservationFormType {
   const originalBegin = new Date(reservation?.begin ?? "");
   const originalEnd = new Date(reservation?.end ?? "");
@@ -208,13 +208,13 @@ const ReservationEdit = ({ id: resPk, apiBaseUrl }: Props): JSX.Element => {
   const router = useRouter();
 
   const [reservationUnit, setReservationUnit] =
-    useState<ReservationUnitType | null>(null);
+    useState<ReservationUnitNode | null>(null);
   const [activeApplicationRounds, setActiveApplicationRounds] = useState<
     ApplicationRoundNode[]
   >([]);
   const [step, setStep] = useState(0);
 
-  const [userReservations, setUserReservations] = useState<ReservationType[]>(
+  const [userReservations, setUserReservations] = useState<ReservationNode[]>(
     []
   );
   const [showSuccessMsg, setShowSuccessMsg] = useState<boolean>(false);
@@ -223,7 +223,7 @@ const ReservationEdit = ({ id: resPk, apiBaseUrl }: Props): JSX.Element => {
   const now = useMemo(() => new Date(), []);
   const { currentUser } = useCurrentUser();
 
-  const resTypename = "ReservationType";
+  const resTypename = "ReservationNode";
   const resId = resPk ? base64encode(`${resTypename}:${resPk}`) : undefined;
   // TODO why are we doing two separate queries? the linked reservationUnit should be part of the reservation query
   const { data } = useQuery<Query, QueryReservationArgs>(GET_RESERVATION, {
@@ -235,8 +235,8 @@ const ReservationEdit = ({ id: resPk, apiBaseUrl }: Props): JSX.Element => {
   });
   const reservation = data?.reservation ?? undefined;
 
-  const typename = "ReservationUnitType";
-  const pk = reservation?.reservationUnits?.[0]?.pk;
+  const typename = "ReservationUnitNode";
+  const pk = reservation?.reservationUnit?.[0]?.pk;
   const id = pk ? base64encode(`${typename}:${pk}`) : undefined;
   const { data: reservationUnitData } = useQuery<
     Query,
@@ -253,8 +253,8 @@ const ReservationEdit = ({ id: resPk, apiBaseUrl }: Props): JSX.Element => {
   const [fetchAdditionalData, { data: additionalData }] = useLazyQuery<
     Query,
     QueryReservationUnitArgs &
-      ReservationUnitTypeReservableTimeSpansArgs &
-      ReservationUnitTypeReservationsArgs
+      ReservationUnitNodeReservableTimeSpansArgs &
+      ReservationUnitNodeReservationSetArgs
   >(OPENING_HOURS, {
     fetchPolicy: "no-cache",
   });
@@ -264,7 +264,7 @@ const ReservationEdit = ({ id: resPk, apiBaseUrl }: Props): JSX.Element => {
     // TODO why is this necessary? why require a second client side query after the page has loaded?
     if (reservationUnitData?.reservationUnit) {
       // TODO this could be changed to fetch the id from the reservationUnitData (instead of pk and constructing it)
-      const typenameUnit = "ReservationUnitType";
+      const typenameUnit = "ReservationUnitNode";
       const { pk: resUnitPk } = reservationUnitData.reservationUnit;
       const idUnit = resUnitPk
         ? base64encode(`${typenameUnit}:${resUnitPk}`)
@@ -272,12 +272,9 @@ const ReservationEdit = ({ id: resPk, apiBaseUrl }: Props): JSX.Element => {
       fetchAdditionalData({
         variables: {
           id: idUnit,
-          startDate: String(toApiDate(new Date(now))),
-          endDate: String(toApiDate(addYears(new Date(), 1))),
-          from: toApiDate(new Date(now)),
-          to: toApiDate(addYears(new Date(), 1)),
+          startDate: toApiDate(new Date(now)) ?? "",
+          endDate: toApiDate(addYears(new Date(), 1)) ?? "",
           state: allowedReservationStates,
-          includeWithSameComponents: true,
         },
       });
     }
@@ -296,10 +293,13 @@ const ReservationEdit = ({ id: resPk, apiBaseUrl }: Props): JSX.Element => {
       additionalData?.reservationUnit?.reservableTimeSpans
     ).filter((n) => n?.startDatetime != null && n?.endDatetime != null);
     const reservableTimeSpans = [...timespans, ...moreTimespans];
+    const reservations = filterNonNullable(
+      additionalData?.reservationUnit?.reservationSet
+    );
     setReservationUnit({
       ...reservationUnitData?.reservationUnit,
       reservableTimeSpans,
-      reservations: additionalData?.reservationUnit?.reservations,
+      reservationSet: reservations,
     });
   }, [additionalData, reservationUnitData?.reservationUnit, id]);
 
@@ -321,7 +321,7 @@ const ReservationEdit = ({ id: resPk, apiBaseUrl }: Props): JSX.Element => {
     const reservations = filterNonNullable(
       userReservationsData?.reservations?.edges?.map((e) => e?.node)
     )
-      .filter((n) => n.type === Type.Normal)
+      .filter((n) => n.type === ReservationTypeChoice.Normal)
       .filter((n) => allowedReservationStates.includes(n.state));
     setUserReservations(reservations);
   }, [userReservationsData]);
@@ -361,6 +361,12 @@ const ReservationEdit = ({ id: resPk, apiBaseUrl }: Props): JSX.Element => {
   const adjustReservationTime = (
     input: MutationAdjustReservationTimeArgs["input"]
   ): Promise<FetchResult<Mutation>> => {
+    if (!input.pk) {
+      throw new Error("No reservation pk provided");
+    }
+    if (!input.begin || !input.end) {
+      throw new Error("No begin or end time provided");
+    }
     // NOTE backend throws errors in some cases if we accidentally send seconds or milliseconds that are not 0
     const { begin, end, ...rest } = input;
     const beginDate = new Date(begin);

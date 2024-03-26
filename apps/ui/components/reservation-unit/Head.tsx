@@ -7,7 +7,10 @@ import { isReservationStartInFuture } from "common/src/calendar/util";
 import { formatDuration } from "common/src/common/util";
 import { fontRegular, H2, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import { ReservationKind, ReservationUnitType } from "common/types/gql-types";
+import {
+  ReservationKind,
+  type ReservationUnitNode,
+} from "common/types/gql-types";
 import { omit } from "lodash";
 import { useLocalStorage } from "react-use";
 import { Container } from "common";
@@ -28,7 +31,7 @@ import {
 import BreadcrumbWrapper from "../common/BreadcrumbWrapper";
 
 interface PropsType {
-  reservationUnit: ReservationUnitType;
+  reservationUnit: ReservationUnitNode;
   reservationUnitIsReservable?: boolean;
   subventionSuffix?: JSX.Element;
 }
@@ -113,7 +116,7 @@ const UnitName = styled(H3).attrs({ as: "h2" })`
 const NonReservableNotification = ({
   reservationUnit,
 }: {
-  reservationUnit: ReservationUnitType;
+  reservationUnit: ReservationUnitNode;
 }) => {
   const { t } = useTranslation();
   let returnText = t("reservationUnit:notifications.notReservable");

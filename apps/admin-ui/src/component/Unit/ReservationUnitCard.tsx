@@ -10,12 +10,12 @@ import {
 import { useTranslation } from "react-i18next";
 import { H2 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import { ImageType, ReservationUnitType } from "common/types/gql-types";
+import { ImageType, type ReservationUnitNode } from "common/types/gql-types";
 import { BasicLink } from "../../styles/util";
 import IconDraft from "../../images/icon_draft.svg";
 
 interface IProps {
-  reservationUnit: ReservationUnitType;
+  reservationUnit: ReservationUnitNode;
   unitId: number;
 }
 

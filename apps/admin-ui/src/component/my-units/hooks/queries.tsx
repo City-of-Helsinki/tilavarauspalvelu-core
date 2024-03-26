@@ -36,25 +36,19 @@ export const OPTIONS_QUERY = gql`
   }
 `;
 
-// NOTE old pk: ID type
-// TODO this is a single query, replace with a relay
 export const UNIT_VIEW_QUERY = gql`
   ${LOCATION_FRAGMENT}
   ${UNIT_NAME_FRAGMENT}
-  query UnitView($pk: [ID]) {
-    units(pk: $pk, onlyWithPermission: true) {
-      edges {
-        node {
-          ...UnitNameFields
-          location {
-            ...LocationFields
-          }
-          reservationUnits {
-            pk
-            spaces {
-              pk
-            }
-          }
+  query UnitView($id: ID!) {
+    unit(id: $id) {
+      ...UnitNameFields
+      location {
+        ...LocationFields
+      }
+      reservationunitSet {
+        pk
+        spaces {
+          pk
         }
       }
     }
@@ -64,28 +58,26 @@ export const UNIT_VIEW_QUERY = gql`
 export const RESERVATION_UNITS_BY_UNIT = gql`
   ${RESERVATIONUNIT_RESERVATIONS_FRAGMENT}
   query reservationUnitsByUnit(
-    $unit: [Int]
-    $from: Date
-    $to: Date
-    $includeWithSameComponents: Boolean
+    $id: ID!
+    $state: [String]
+    $beginDate: Date
+    $endDate: Date
   ) {
-    reservationUnits(unit: $unit, orderBy: "nameFi") {
-      edges {
-        node {
+    unit(id: $id) {
+      reservationunitSet {
+        pk
+        nameFi
+        spaces {
           pk
-          nameFi
-          spaces {
-            pk
-          }
-          reservationUnitType {
-            pk
-          }
-          bufferTimeBefore
-          bufferTimeAfter
-          isDraft
-          authentication
-          ...ReservationUnitReservations
         }
+        reservationUnitType {
+          pk
+        }
+        bufferTimeBefore
+        bufferTimeAfter
+        isDraft
+        authentication
+        ...ReservationUnitReservations
       }
     }
   }
@@ -93,13 +85,9 @@ export const RESERVATION_UNITS_BY_UNIT = gql`
 
 export const RESERVATION_UNIT_QUERY = gql`
   ${RESERVATION_UNIT_FRAGMENT}
-  query reservationUnits($pk: [Int]) {
-    reservationUnits(onlyWithPermission: true, pk: $pk) {
-      edges {
-        node {
-          ...ReservationUnit
-        }
-      }
+  query reservationUnits($id: ID!) {
+    reservationUnit(id: $id) {
+      ...ReservationUnit
     }
   }
 `;

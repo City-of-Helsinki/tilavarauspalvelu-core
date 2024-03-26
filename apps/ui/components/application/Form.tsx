@@ -12,10 +12,10 @@ import {
   Weekday,
   Priority,
   type UpdateApplicationSectionForApplicationSerializerInput,
+  type ReservationUnitNode,
 } from "common/types/gql-types";
 import { type Maybe } from "graphql/jsutils/Maybe";
 import { z } from "zod";
-import type { ReservationUnitNode } from "common";
 import { toApiDate } from "common/src/common/util";
 import { apiDateToUIDate, fromUIDate } from "@/modules/util";
 import {

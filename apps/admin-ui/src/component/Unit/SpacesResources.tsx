@@ -4,14 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import { useQuery } from "@apollo/client";
-import {
-  Query,
-  QueryUnitByPkArgs,
-  ResourceType,
-  SpaceType,
-  UnitByPkType,
-  UnitType,
-} from "common/types/gql-types";
+import type { Query, QueryUnitArgs, UnitNode } from "common/types/gql-types";
 import { StyledNotification } from "@/styles/util";
 import {
   ContentContainer,
@@ -25,7 +18,8 @@ import SubPageHead from "./SubPageHead";
 import Modal, { useModal as useHDSModal } from "../HDSModal";
 import NewSpaceModal from "../Spaces/space-editor/new-space-modal/NewSpaceModal";
 import NewResourceModal from "../Resources/resource-editor/NewResourceModal";
-import { UNIT_QUERY } from "../../common/queries";
+import { UNIT_QUERY } from "@/common/queries";
+import { base64encode } from "common/src/helpers";
 
 interface IProps {
   [key: string]: string;
@@ -45,13 +39,13 @@ type Action =
     }
   | { type: "clearNotification" }
   | { type: "clearError" }
-  | { type: "unitLoaded"; unit: UnitByPkType }
+  | { type: "unitLoaded"; unit: UnitNode }
   | { type: "dataLoadError"; message: string };
 
 type State = {
   notification: null | NotificationType;
   loading: boolean;
-  unit: UnitByPkType | null;
+  unit: UnitNode | null;
   error: null | {
     message: string;
   };
@@ -125,10 +119,10 @@ const SpacesResources = (): JSX.Element | null => {
   const newSpacesButtonRef = React.createRef<HTMLButtonElement>();
   const newResourceButtonRef = React.createRef<HTMLButtonElement>();
 
-  const { refetch, data } = useQuery<Query, QueryUnitByPkArgs>(UNIT_QUERY, {
-    variables: { pk: unitPk },
+  const id = base64encode(`UnitNode:${unitPk}`);
+  const { refetch, data } = useQuery<Query, QueryUnitArgs>(UNIT_QUERY, {
+    variables: { id },
     fetchPolicy: "network-only",
-
     onError: () => {
       dispatch({
         type: "dataLoadError",
@@ -138,8 +132,8 @@ const SpacesResources = (): JSX.Element | null => {
   });
 
   useEffect(() => {
-    if (data?.unitByPk) {
-      dispatch({ type: "unitLoaded", unit: data.unitByPk });
+    if (data?.unit) {
+      dispatch({ type: "unitLoaded", unit: data.unit });
     }
   }, [data]);
 
@@ -205,9 +199,7 @@ const SpacesResources = (): JSX.Element | null => {
     return null;
   }
 
-  const resources = state.unit.spaces?.flatMap(
-    (s) => s?.resources
-  ) as ResourceType[];
+  const resources = state.unit.spaces?.flatMap((s) => s?.resourceSet);
 
   const onSaveSpace = () => {
     dispatchNotification(
@@ -290,7 +282,7 @@ const SpacesResources = (): JSX.Element | null => {
         </TableHead>
       </WideContainer>
       <SpacesTable
-        spaces={state.unit.spaces as SpaceType[]}
+        spaces={state.unit.spaces}
         unit={state.unit}
         onSave={onSaveSpace}
         onDelete={onDeleteSpace}
@@ -303,18 +295,20 @@ const SpacesResources = (): JSX.Element | null => {
             disabled={state.unit?.spaces?.length === 0}
             iconLeft={<IconPlusCircleFill />}
             variant="supplementary"
-            onClick={() =>
-              openWithContent(
-                <NewResourceModal
-                  spacePk={0}
-                  unit={state.unit as UnitType}
-                  closeModal={() => {
-                    closeNewResourceModal();
-                  }}
-                  onSave={onSaveResource}
-                />
-              )
-            }
+            onClick={() => {
+              if (state.unit) {
+                openWithContent(
+                  <NewResourceModal
+                    spacePk={0}
+                    unit={state.unit}
+                    closeModal={() => {
+                      closeNewResourceModal();
+                    }}
+                    onSave={onSaveResource}
+                  />
+                );
+              }
+            }}
           >
             {t("Unit.addResource")}
           </ActionButton>

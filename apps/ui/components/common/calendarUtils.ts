@@ -1,11 +1,11 @@
 import { CalendarEvent } from "common/src/calendar/Calendar";
-import { ReservationType } from "common/types/gql-types";
+import { ReservationNode } from "common/types/gql-types";
 import React from "react";
 
 type ReservationStateWithInitial = string;
 
 const eventStyleGetter = (
-  { event }: CalendarEvent<ReservationType>,
+  { event }: CalendarEvent<ReservationNode>,
   ownReservations: number[],
   draggable = true
 ): { style: React.CSSProperties; className?: string } => {

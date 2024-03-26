@@ -1,13 +1,13 @@
-import React, { useState, ChangeEvent } from "react";
+import React, { useState, type ChangeEvent } from "react";
 import { IconArrowRight, TextInput, IconSearch } from "hds-react";
-import { TFunction } from "i18next";
+import { type TFunction } from "i18next";
 import { uniq } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useDebounce } from "react-use";
-import { useQuery, ApolloError } from "@apollo/client";
+import { useQuery, type ApolloError } from "@apollo/client";
 import { H1, Strong } from "common/src/common/typography";
-import type { Query, ResourceType } from "common/types/gql-types";
+import type { Query, ResourceNode } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { DataFilterConfig } from "@/common/types";
 import Loader from "@/component/Loader";
@@ -39,7 +39,7 @@ const getCellConfig = (t: TFunction): CellConfig => {
       {
         title: t("Resources.headings.name"),
         key: "nameFi",
-        transform: ({ nameFi }: ResourceType) => <Strong>{nameFi}</Strong>,
+        transform: ({ nameFi }: ResourceNode) => <Strong>{nameFi}</Strong>,
       },
       {
         title: t("Resources.headings.unit"),
@@ -53,7 +53,7 @@ const getCellConfig = (t: TFunction): CellConfig => {
       {
         title: t("Resources.headings.resourceType"),
         key: "resourceType",
-        transform: ({ locationType }: ResourceType) => (
+        transform: ({ locationType }: ResourceNode) => (
           <div
             style={{
               display: "flex",
@@ -70,13 +70,13 @@ const getCellConfig = (t: TFunction): CellConfig => {
     index: "pk",
     sorting: "name",
     order: "asc",
-    rowLink: ({ space, pk }: ResourceType) =>
+    rowLink: ({ space, pk }: ResourceNode) =>
       resourceUrl(Number(pk), Number(space?.unit?.pk)),
   };
 };
 
 const getFilterConfig = (
-  resources: ResourceType[],
+  resources: ResourceNode[],
   t: TFunction
 ): DataFilterConfig[] => {
   const buildings = uniq(
@@ -112,7 +112,7 @@ const ResourcesList = (): JSX.Element => {
   const { notifyError } = useNotification();
   const { t } = useTranslation();
 
-  const [resources, setResources] = useState<ResourceType[]>([]);
+  const [resources, setResources] = useState<ResourceNode[]>([]);
   const [filterConfig, setFilterConfig] = useState<DataFilterConfig[] | null>(
     null
   );
@@ -130,8 +130,8 @@ const ResourcesList = (): JSX.Element => {
 
   useQuery<Query>(RESOURCES_QUERY, {
     onCompleted: (data) => {
-      const result = data?.resources?.edges?.map(
-        (r) => r?.node as ResourceType
+      const result = filterNonNullable(
+        data?.resources?.edges?.map((r) => r?.node)
       );
       if (result) {
         setResources(result);
@@ -151,9 +151,10 @@ const ResourcesList = (): JSX.Element => {
   }
 
   const filteredResources = searchTerm
-    ? resources.filter((resource: ResourceType) => {
+    ? resources.filter((resource: ResourceNode) => {
         const searchTerms = searchTerm.toLowerCase().split(" ");
         const { nameFi, space, locationType } = resource;
+        // FIXME
         const buildingName = space?.building?.nameFi;
         const localizedName = nameFi || "???";
 

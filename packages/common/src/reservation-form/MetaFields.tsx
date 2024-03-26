@@ -11,20 +11,21 @@
 import { IconGroup, IconUser } from "hds-react";
 import React, { Fragment } from "react";
 import styled from "styled-components";
-import camelCase from "lodash/camelCase";
 import { Controller, useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import {
-  type ReservationMetadataSetType,
-  ReserveeType,
+  type ReservationMetadataSetNode,
+  CustomerTypeChoice,
+  type ReservationUnitNode,
 } from "../../types/gql-types";
 import ReservationFormField from "./ReservationFormField";
 import { Inputs, Reservation } from "./types";
 import RadioButtonWithImage from "./RadioButtonWithImage";
 import { fontMedium, fontRegular } from "../common/typography";
-import type { OptionType, ReservationUnitNode } from "../../types/common";
+import type { OptionType } from "../../types/common";
 import { GroupHeading, Subheading, TwoColumnContainer } from "./styles";
 import IconPremises from "../icons/IconPremises";
+import { filterNonNullable } from "../helpers";
 
 type CommonProps = {
   options: Record<string, OptionType[]>;
@@ -60,7 +61,7 @@ const Container = styled.div`
   }
 `;
 
-const ReserveeTypeContainer = styled.div`
+const CustomerTypeChoiceContainer = styled.div`
   display: flex;
   margin-bottom: var(--spacing-3-xl);
   width: 100%;
@@ -83,15 +84,15 @@ const ReservationApplicationFieldsContainer = styled(TwoColumnContainer)`
 
 const reserveeOptions = [
   {
-    id: ReserveeType.Individual,
+    id: CustomerTypeChoice.Individual,
     icon: <IconUser aria-hidden />,
   },
   {
-    id: ReserveeType.Nonprofit,
+    id: CustomerTypeChoice.Nonprofit,
     icon: <IconGroup aria-hidden />,
   },
   {
-    id: ReserveeType.Business,
+    id: CustomerTypeChoice.Business,
     icon: <IconPremises width="24" height="24" aria-hidden />,
   },
 ];
@@ -101,23 +102,25 @@ const SubheadingByType = ({
   index,
   field,
 }: {
-  reserveeType: ReserveeType;
+  reserveeType: CustomerTypeChoice;
   index: number;
   field: string;
 }) => {
   const { t } = useTranslation();
 
   const headingForNonProfit =
-    reserveeType === ReserveeType.Nonprofit && index === 0;
+    reserveeType === CustomerTypeChoice.Nonprofit && index === 0;
 
   const headingForNonProfitContactInfo =
-    reserveeType === ReserveeType.Nonprofit && field === "reserveeFirstName";
+    reserveeType === CustomerTypeChoice.Nonprofit &&
+    field === "reserveeFirstName";
 
   const headingForCompanyInfo =
-    reserveeType === ReserveeType.Business && index === 0;
+    reserveeType === CustomerTypeChoice.Business && index === 0;
 
   const headingForContactInfo =
-    reserveeType === ReserveeType.Business && field === "reserveeFirstName";
+    reserveeType === CustomerTypeChoice.Business &&
+    field === "reserveeFirstName";
 
   return headingForNonProfit ? (
     <GroupHeading style={{ marginTop: 0 }}>
@@ -149,19 +152,18 @@ const ReservationFormFields = ({
   data,
 }: CommonProps & {
   fields: Field[];
-  headingKey?: ReserveeType | "COMMON";
+  headingKey?: CustomerTypeChoice | "COMMON";
   hasSubheading?: boolean;
-  metadata?: ReservationMetadataSetType;
+  metadata?: ReservationMetadataSetNode;
   params?: { numPersons: { min?: number; max?: number } };
 }) => {
   const { getValues } = useFormContext<Reservation>();
 
+  const requiredFields = filterNonNullable(metadata?.requiredFields);
+  // TODO do we need to do string conversion here? camelCase?
   const fieldsExtended = fields.map((field) => ({
     field,
-    required: (metadata?.requiredFields || [])
-      .filter((x): x is string => x != null)
-      .map(camelCase)
-      .includes(field),
+    required: requiredFields.find((x) => x.fieldName === field) != null,
   }));
 
   // TODO the subheading logic is weird / inefficient
@@ -252,11 +254,11 @@ export const ReservationMetaFields = ({
   );
 };
 
-const ReserveeTypeSelector = () => {
+const CustomerTypeChoiceSelector = () => {
   const { t } = useTranslation();
 
   return (
-    <ReserveeTypeContainer data-testid="reservation__checkbox--reservee-type">
+    <CustomerTypeChoiceContainer data-testid="reservation__checkbox--reservee-type">
       <Controller
         name="reserveeType"
         render={({ field: { value, onChange } }) => (
@@ -276,7 +278,7 @@ const ReserveeTypeSelector = () => {
           </>
         )}
       />
-    </ReserveeTypeContainer>
+    </CustomerTypeChoiceContainer>
   );
 };
 
@@ -298,8 +300,9 @@ export const ReserverMetaFields = ({
   const { t } = useTranslation();
 
   const isTypeSelectable =
-    reservationUnit?.metadataSet?.supportedFields?.includes("reservee_type") ??
-    false;
+    reservationUnit?.metadataSet?.supportedFields?.find(
+      (x) => x.fieldName === "reservee_type"
+    ) ?? false;
 
   const reserveeType = watch("reserveeType");
 
@@ -316,7 +319,7 @@ export const ReserverMetaFields = ({
           <p id="reserveeType-label">
             {t("reservationApplication:reserveeTypePrefix")}
           </p>
-          <ReserveeTypeSelector />
+          <CustomerTypeChoiceSelector />
         </>
       )}
       <ReservationApplicationFieldsContainer>

@@ -1,10 +1,13 @@
 import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { Notification, RadioButton, SelectionGroup, TextArea } from "hds-react";
-import { Authentication, ReservationUnitType } from "common/types/gql-types";
+import {
+  Authentication,
+  type ReservationUnitNode,
+} from "common/types/gql-types";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { type ReservationFormType, ReservationTypes } from "app/schemas";
+import { type ReservationFormType, ReservationTypes } from "@/schemas";
 import { ShowAllContainer } from "common/src/components/";
 import {
   ReservationMetadataSetForm,
@@ -29,7 +32,7 @@ const StyledShowAllContainer = styled(ShowAllContainer)`
 const TypeSelect = ({
   reservationUnit,
 }: {
-  reservationUnit: ReservationUnitType;
+  reservationUnit: ReservationUnitNode;
 }) => {
   const {
     watch,
@@ -81,7 +84,7 @@ const ReservationTypeForm = ({
   children,
   disableBufferToggle,
 }: {
-  reservationUnit: ReservationUnitType;
+  reservationUnit: ReservationUnitNode;
   children?: React.ReactNode;
   disableBufferToggle?: boolean;
 }) => {

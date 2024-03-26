@@ -4,15 +4,12 @@ import styled from "styled-components";
 import { Button, LoadingSpinner } from "hds-react";
 import { breakpoints } from "common/src/common/style";
 import { PageInfo } from "common/types/gql-types";
-import { CenterSpinner } from "./common";
 
 export type Props = {
-  id: string;
   items: JSX.Element[];
   fetchMore: (arg: string) => void;
   pageInfo?: PageInfo;
   totalCount?: number;
-  loading: boolean;
   loadingMore: boolean;
   sortingComponent?: React.ReactNode;
   showHitCount?: boolean;
@@ -68,26 +65,22 @@ const PaginationButton = styled(Button)`
   }
 `;
 
-const ListWithPagination = ({
-  id,
+function Content({
   items,
-  fetchMore,
-  loading,
   loadingMore,
-  pageInfo,
   totalCount,
-  sortingComponent,
-  showHitCount = true,
-  className,
-}: Props): JSX.Element => {
+  fetchMore,
+  showMore,
+}: {
+  items: JSX.Element[];
+  loadingMore: boolean;
+  fetchMore: () => void;
+  totalCount?: number;
+  showMore?: boolean;
+}) {
   const { t } = useTranslation();
 
-  const endCursor = pageInfo?.endCursor ?? undefined;
-  const shouldShowPaginationButton =
-    endCursor != null && pageInfo?.hasNextPage && items?.length > 0;
-
-  // TODO this is awful don't define components inside render functions
-  const content = items ? (
+  return (
     <>
       <ListContainer data-testid="list-with-pagination__list--container">
         {items.map((item) => item)}
@@ -98,7 +91,7 @@ const ListWithPagination = ({
         ) : (
           <>
             <HitCountSummary data-testid="list-with-pagination__pagination--summary">
-              {shouldShowPaginationButton
+              {showMore
                 ? t("searchResultList:paginationSummary", {
                     count: items?.length,
                     totalCount,
@@ -107,9 +100,9 @@ const ListWithPagination = ({
                     count: items.length,
                   })}
             </HitCountSummary>
-            {shouldShowPaginationButton && (
+            {showMore && (
               <PaginationButton
-                onClick={() => fetchMore(endCursor)}
+                onClick={fetchMore}
                 variant="secondary"
                 data-test-id="list-with-pagination__button--paginate"
               >
@@ -120,35 +113,51 @@ const ListWithPagination = ({
         )}
       </Paginator>
     </>
-  ) : null;
+  );
+}
+
+function ListWithPagination({
+  items,
+  fetchMore,
+  loadingMore,
+  pageInfo,
+  totalCount,
+  sortingComponent,
+  showHitCount = true,
+  className,
+}: Props): JSX.Element {
+  const { t } = useTranslation();
+
+  const endCursor = pageInfo?.endCursor ?? undefined;
+  const showMore =
+    endCursor != null && pageInfo?.hasNextPage && items?.length > 0;
 
   return (
-    <div className={className} id={id}>
-      {loading && !loadingMore ? (
-        <CenterSpinner
-          style={{
-            margin: "var(--spacing-xl) auto var(--spacing-layout-2-xl)",
-          }}
+    <div className={className}>
+      <TopWrapper data-testid="list-with-pagination__hit-count">
+        {items?.length > 0 ? (
+          <HitCount>
+            {showHitCount
+              ? t("searchResultList:count", { count: totalCount })
+              : ""}
+          </HitCount>
+        ) : (
+          <NoResults>{t("searchResultList:noResults")}</NoResults>
+        )}
+        {sortingComponent && sortingComponent}
+      </TopWrapper>
+      {items.length > 0 && (
+        <Content
+          items={items}
+          // TODO should not be called with empty string
+          fetchMore={() => fetchMore(endCursor ?? "")}
+          loadingMore={loadingMore}
+          totalCount={totalCount}
+          showMore={showMore}
         />
-      ) : (
-        <>
-          <TopWrapper data-testid="list-with-pagination__hit-count">
-            {items?.length > 0 ? (
-              <HitCount>
-                {showHitCount
-                  ? t("searchResultList:count", { count: totalCount })
-                  : ""}
-              </HitCount>
-            ) : (
-              <NoResults>{t("searchResultList:noResults")}</NoResults>
-            )}
-            {sortingComponent && sortingComponent}
-          </TopWrapper>
-          {items?.length > 0 && content}
-        </>
       )}
     </div>
   );
-};
+}
 
 export default ListWithPagination;

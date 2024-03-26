@@ -2,10 +2,12 @@ import React from "react";
 import { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
-import type {
-  Query,
-  QueryPurposesArgs,
-  QueryUnitsArgs,
+import {
+  PurposeOrderingChoices,
+  UnitOrderingChoices,
+  type Query,
+  type QueryPurposesArgs,
+  type QueryUnitsArgs,
 } from "common/types/gql-types";
 import { Container } from "common";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
@@ -47,7 +49,8 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     query: RESERVATION_UNIT_PURPOSES,
     fetchPolicy: "no-cache",
     variables: {
-      orderBy: "rank",
+      orderBy: [PurposeOrderingChoices.RankAsc],
+      // "rank",
     },
   });
   const purposes = filterNonNullable(
@@ -59,7 +62,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     fetchPolicy: "no-cache",
     variables: {
       publishedReservationUnits: true,
-      orderBy: "rank",
+      orderBy: [UnitOrderingChoices.RankAsc],
     },
   });
   const units = filterNonNullable(

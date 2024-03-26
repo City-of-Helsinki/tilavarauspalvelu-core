@@ -4,11 +4,11 @@ import { IconAngleDown, IconAngleUp } from "hds-react";
 import { get } from "lodash";
 import { useNavigate } from "react-router-dom";
 import { breakpoints } from "common/src/common/style";
-import { SpaceType } from "common/types/gql-types";
+import { SpaceNode } from "common/types/gql-types";
 import { CellConfig, Row, Column, Cell } from "../DataTable";
 
 interface IProps {
-  group: { data: SpaceType[] };
+  group: { data: SpaceNode[] };
   hasGrouping: boolean;
   cols: number;
   index: number;
@@ -103,11 +103,11 @@ td:first-of-type {
 
 const PREFIX_DEPTH_WIDTH_PX = 20;
 
-const depth = (space: SpaceType): number =>
+const depth = (space: SpaceNode): number =>
   space.parent ? 1 + depth(space.parent) : 0;
 
 const renderColumn = (
-  row: SpaceType,
+  row: SpaceNode,
   cellConfig: CellConfig,
   colIndex: number,
   prefixWidth: number,
@@ -147,7 +147,7 @@ function SpaceTreeDataTableGroup({
   }
   const groupChildren = (
     group.data.length > 1 ? group.data.slice(1) : group.data
-  ).map((row: SpaceType): JSX.Element => {
+  ).map((row: SpaceNode): JSX.Element => {
     const rowKey = get(row, cellConfig.index);
 
     const prefixWidth = PREFIX_DEPTH_WIDTH_PX * depth(row);
@@ -166,7 +166,7 @@ function SpaceTreeDataTableGroup({
         $disabled={false}
         $columnCount={cellConfig.cols.length}
       >
-        {cellConfig.cols.map((col, index) =>
+        {cellConfig.cols.map((_col, index) =>
           renderColumn(
             row,
             cellConfig,

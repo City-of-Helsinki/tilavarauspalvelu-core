@@ -8,7 +8,7 @@ import { IMAGE_FRAGMENT, PRICING_FRAGMENT } from "common/src/queries/fragments";
 export { TERMS_OF_USE_QUERY as TERMS_OF_USE } from "common/src/queries/queries";
 
 const RESERVATION_UNIT_TYPE_FRAGMENT = gql`
-  fragment ReservationUnitTypeFields on ReservationUnitTypeType {
+  fragment ReservationUnitTypeFields on ReservationUnitTypeNode {
     pk
     nameFi
     nameEn
@@ -57,7 +57,7 @@ export const RESERVATION_UNIT_QUERY = gql`
       reservationsMinDaysBefore
       reservationsMaxDaysBefore
       requireReservationHandling
-      equipment {
+      equipments {
         pk
         nameFi
         nameEn
@@ -74,6 +74,7 @@ export const RESERVATION_UNIT_QUERY = gql`
 `;
 
 // TODO why is ids remapped to pk here? that breaks all queries that use it
+// TODO why isDraft and isVisible are options here?
 export const RESERVATION_UNITS = gql`
   ${PRICING_FRAGMENT}
   ${IMAGE_FRAGMENT}
@@ -91,14 +92,14 @@ export const RESERVATION_UNITS = gql`
     $equipments: [Int]
     $reservableDateStart: Date
     $reservableDateEnd: Date
-    $reservableTimeStart: TimeString
-    $reservableTimeEnd: TimeString
+    $reservableTimeStart: Time
+    $reservableTimeEnd: Time
     $reservableMinimumDurationMinutes: Decimal
     $showOnlyReservable: Boolean
     $first: Int
     $before: String
     $after: String
-    $orderBy: String
+    $orderBy: [ReservationUnitOrderingChoices]
     $isDraft: Boolean
     $isVisible: Boolean
     $reservationKind: String
@@ -128,6 +129,7 @@ export const RESERVATION_UNITS = gql`
       isDraft: $isDraft
       isVisible: $isVisible
       reservationKind: $reservationKind
+      calculateFirstReservableTime: true
     ) {
       edges {
         node {
@@ -208,22 +210,14 @@ export const OPENING_HOURS = gql`
     $id: ID!
     $startDate: Date!
     $endDate: Date!
-    $from: Date
-    $to: Date
     $state: [String]
-    $includeWithSameComponents: Boolean
   ) {
     reservationUnit(id: $id) {
       reservableTimeSpans(startDate: $startDate, endDate: $endDate) {
         startDatetime
         endDatetime
       }
-      reservations(
-        state: $state
-        from: $from
-        to: $to
-        includeWithSameComponents: $includeWithSameComponents
-      ) {
+      reservationSet(state: $state, beginDate: $startDate, endDate: $endDate) {
         pk
         state
         isBlocked

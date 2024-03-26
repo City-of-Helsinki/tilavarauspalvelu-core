@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { debounce } from "lodash";
 import { useTranslation } from "react-i18next";
 import { H1 } from "common/src/common/typography";
-import { Container } from "../../styles/layout";
+import { Container } from "@/styles/layout";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import { Sort } from "../Unit/UnitsTable";
 import Filters, { FilterArguments, emptyFilterState } from "../Unit/Filters";

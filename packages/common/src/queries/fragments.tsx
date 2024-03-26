@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
 export const RESERVEE_NAME_FRAGMENT = gql`
-  fragment ReserveeNameFields on ReservationType {
+  fragment ReserveeNameFields on ReservationNode {
     reserveeFirstName
     reserveeLastName
     reserveeEmail
@@ -12,7 +12,7 @@ export const RESERVEE_NAME_FRAGMENT = gql`
 `;
 
 export const RESERVEE_BILLING_FRAGMENT = gql`
-  fragment ReserveeBillingFields on ReservationType {
+  fragment ReserveeBillingFields on ReservationNode {
     reserveeId
     reserveeIsUnregisteredAssociation
     reserveeAddressStreet
@@ -29,7 +29,7 @@ export const RESERVEE_BILLING_FRAGMENT = gql`
 `;
 
 export const TERMS_OF_USE_NAME_FRAGMENT = gql`
-  fragment TermsOfUseNameFields on TermsOfUseType {
+  fragment TermsOfUseNameFields on TermsOfUseNode {
     nameFi
     nameEn
     nameSv
@@ -37,7 +37,7 @@ export const TERMS_OF_USE_NAME_FRAGMENT = gql`
 `;
 
 export const TERMS_OF_USE_TEXT_FRAGMENT = gql`
-  fragment TermsOfUseTextFields on TermsOfUseType {
+  fragment TermsOfUseTextFields on TermsOfUseNode {
     textFi
     textEn
     textSv
@@ -47,7 +47,7 @@ export const TERMS_OF_USE_TEXT_FRAGMENT = gql`
 export const TERMS_OF_USE_FRAGMENT = gql`
   ${TERMS_OF_USE_NAME_FRAGMENT}
   ${TERMS_OF_USE_TEXT_FRAGMENT}
-  fragment TermsOfUseFields on TermsOfUseType {
+  fragment TermsOfUseFields on TermsOfUseNode {
     pk
     ...TermsOfUseNameFields
     ...TermsOfUseTextFields
@@ -56,7 +56,7 @@ export const TERMS_OF_USE_FRAGMENT = gql`
 `;
 
 export const PRICING_FRAGMENT = gql`
-  fragment PricingFields on ReservationUnitPricingType {
+  fragment PricingFields on ReservationUnitPricingNode {
     begins
     priceUnit
     pricingType
@@ -71,7 +71,7 @@ export const PRICING_FRAGMENT = gql`
 
 // TODO could split it into MEDIUM, LARGE, SMALL fragments (the imageUrl is required for all)
 export const IMAGE_FRAGMENT = gql`
-  fragment ImageFragment on ReservationUnitImageType {
+  fragment ImageFragment on ReservationUnitImageNode {
     imageUrl
     largeUrl
     mediumUrl
@@ -81,7 +81,7 @@ export const IMAGE_FRAGMENT = gql`
 `;
 
 export const LOCATION_FRAGMENT = gql`
-  fragment LocationFields on LocationType {
+  fragment LocationFields on LocationNode {
     addressStreetFi
     addressZip
     addressCityFi
@@ -90,7 +90,7 @@ export const LOCATION_FRAGMENT = gql`
 
 export const LOCATION_FRAGMENT_I18N = gql`
   ${LOCATION_FRAGMENT}
-  fragment LocationFieldsI18n on LocationType {
+  fragment LocationFieldsI18n on LocationNode {
     ...LocationFields
     addressStreetEn
     addressStreetSv

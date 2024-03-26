@@ -3,7 +3,11 @@ import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
-import { ReservationType, State } from "common/types/gql-types";
+import {
+  type ReservationNode,
+  State,
+  ReservationOrderingChoices,
+} from "common/types/gql-types";
 import NotificationWrapper from "common/src/components/NotificationWrapper";
 import { useCurrentUser } from "@/hooks/user";
 import { BlackButton, Toast } from "@/styles/util";
@@ -49,7 +53,7 @@ function ReservationNotification({
 }: {
   onDelete: () => void;
   onNext: () => void;
-  reservation: ReservationType;
+  reservation: ReservationNode;
   disabled?: boolean;
   isLoading?: boolean;
 }) {
@@ -110,7 +114,7 @@ export function InProgressReservationNotification() {
   const { reservations } = useReservations({
     currentUser,
     states: [State.WaitingForPayment, State.Created],
-    orderBy: "-pk",
+    orderBy: ReservationOrderingChoices.PkDesc,
   });
 
   // Hide on some routes
@@ -163,7 +167,7 @@ export function InProgressReservationNotification() {
   // NOTE don't need to invalidate the cache on reservations list page because Created is not shown on it.
   // how about WaitingForPayment?
   // it would still be proper to invalidate the cache so if there is such a page, it would show the correct data.
-  const handleDelete = async (reservation?: ReservationType) => {
+  const handleDelete = async (reservation?: ReservationNode) => {
     // If we are on the page for the reservation we are deleting, we should redirect to the front page.
     // The funnel page: reservation-unit/:pk/reservation/:pk should not show this notification at all.
 
@@ -186,7 +190,7 @@ export function InProgressReservationNotification() {
       await deleteReservation({
         variables: {
           input: {
-            pk: reservation.pk,
+            pk: reservation.pk.toString(),
           },
         },
       });
@@ -207,10 +211,10 @@ export function InProgressReservationNotification() {
     }
   };
 
-  const handleContinue = (reservation?: ReservationType) => {
+  const handleContinue = (reservation?: ReservationNode) => {
     // TODO add an url builder for this
     // - reuse the url builder in [...params].tsx
-    const reservationUnit = reservation?.reservationUnits?.find(() => true);
+    const reservationUnit = reservation?.reservationUnit?.find(() => true);
     const url = `${reservationUnitPrefix}/${reservationUnit?.pk}/reservation/${reservation?.pk}`;
     router.push(url);
   };

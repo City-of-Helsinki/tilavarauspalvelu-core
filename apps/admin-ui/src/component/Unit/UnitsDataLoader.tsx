@@ -25,10 +25,6 @@ type Props = {
 
 const mapFilterParams = (params: FilterArguments) => ({
   nameFi: params.nameFi,
-  serviceSector:
-    params.serviceSector?.value != null
-      ? String(params.serviceSector?.value)
-      : undefined,
 });
 
 const updateQuery = (
@@ -59,8 +55,8 @@ const UnitsDataLoader = ({
     UNITS_QUERY,
     {
       variables: {
-        orderBy: sortString,
-        offset: 0,
+        // FIXME the new sort enums
+        // orderBy: sortString,
         first: LARGE_LIST_PAGE_SIZE,
         ...mapFilterParams(filters),
       },
@@ -71,6 +67,7 @@ const UnitsDataLoader = ({
     }
   );
 
+  // TODO use previous data
   if (loading && !data) {
     return <Loader />;
   }
@@ -89,12 +86,12 @@ const UnitsDataLoader = ({
       />
       <More
         key={units.length}
-        totalCount={data?.units?.totalCount || 0}
+        totalCount={data?.units?.totalCount ?? 0}
         count={units.length}
         fetchMore={() =>
           fetchMore({
             variables: {
-              offset: data?.units?.edges.length || 0,
+              offset: data?.units?.edges.length,
             },
             updateQuery,
           })

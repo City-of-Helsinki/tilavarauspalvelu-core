@@ -1,4 +1,4 @@
-import { PriceUnit } from "../types/gql-types";
+import { Maybe, PriceUnit } from "../types/gql-types";
 import formatters from "./number-formatters";
 
 export const getPriceUnitMinutes = (unit: PriceUnit): number => {
@@ -58,26 +58,27 @@ export const getUnRoundedReservationVolume = (
   return wholeUnits + slots / totalFractions;
 };
 
-export const getReservationVolume = (
-  minutes: number,
-  unit: PriceUnit
-): number => {
+export function getReservationVolume(minutes: number, unit: PriceUnit): number {
   if (!minutes) {
     return 1;
   }
 
   return getUnRoundedReservationVolume(minutes, unit);
-};
+}
 
-export const getReservationPrice = (
-  price: number | undefined,
+export function getReservationPrice(
+  price: Maybe<string> | undefined,
   defaultText: string,
   language = "fi",
   trailingZeros = false
-): string => {
-  if (price === undefined || price === 0) {
+): string {
+  if (price == null) {
+    return defaultText;
+  }
+  const p = Number(price);
+  if (Number.isNaN(p) || p === 0) {
     return defaultText;
   }
   const formatter = trailingZeros ? "currencyWithDecimals" : "currency";
-  return formatters(language)[formatter].format(price);
-};
+  return formatters(language)[formatter].format(p);
+}

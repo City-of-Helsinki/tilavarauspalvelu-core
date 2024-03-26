@@ -3,10 +3,9 @@ import { useTranslation } from "next-i18next";
 import { NetworkStatus, useQuery } from "@apollo/client";
 import type { GetServerSidePropsContext } from "next";
 import styled from "styled-components";
-import queryString, { type ParsedQuery } from "query-string";
 import { useRouter } from "next/router";
 import { Notification } from "hds-react";
-import { useLocalStorage, useMedia } from "react-use";
+import { useMedia } from "react-use";
 import { isEqual, omit, pick } from "lodash";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { breakpoints } from "common/src/common/style";
@@ -16,7 +15,6 @@ import ClientOnly from "common/src/ClientOnly";
 import {
   type Query,
   type QueryReservationUnitsArgs,
-  type ReservationUnitType,
   ReservationKind,
 } from "common/types/gql-types";
 import { Container } from "common";
@@ -32,6 +30,7 @@ import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
 import { toApiDate } from "common/src/common/util";
 import { startOfDay } from "date-fns";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { createApolloClient } from "@/modules/apolloClient";
 
 const pagingLimit = 36;
 
@@ -67,22 +66,35 @@ const StyledSorting = styled(Sorting)`
   }
 `;
 
-export const getServerSideProps = async ({
-  locale,
-  query,
-}: GetServerSidePropsContext) => {
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+  const { locale, query } = ctx;
+  const commonProps = getCommonServerSideProps();
+  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
+  // TODO type this properly
+  const values = query as Record<string, string>;
+  const { data } = await apolloClient.query<Query, QueryReservationUnitsArgs>({
+    query: RESERVATION_UNITS,
+    fetchPolicy: "no-cache",
+    variables: processVariables(values, locale ?? "fi"),
+    // TODO limit the count?
+  });
+
   return {
     props: {
       ...getCommonServerSideProps(),
       key: JSON.stringify({ ...query, locale }),
       overrideBackgroundColor: "var(--tilavaraus-gray)",
       ...(await serverSideTranslations(locale ?? "fi")),
+      data,
     },
   };
-};
+}
 
-const processVariables = (values: Record<string, string>, language: string) => {
-  const sortCriteria = ["name", "unitName"].includes(values.sort)
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+
+// TODO type this properly and combine with the one in search.tsx
+function processVariables(values: Record<string, string>, language: string) {
+  const _sortCriteria = ["name", "unitName"].includes(values.sort)
     ? `${values.sort}${capitalize(language)}`
     : values.sort;
 
@@ -116,16 +128,25 @@ const processVariables = (values: Record<string, string>, language: string) => {
       maxPersons: parseInt(values.maxPersons, 10),
     }),
     ...replaceIfExists(values.purposes, {
-      purposes: values.purposes?.split(",").map(Number),
+      purposes: values.purposes
+        ?.split(",")
+        .map(Number)
+        .filter(Number.isInteger),
     }),
     ...replaceIfExists(values.unit, {
-      unit: values.unit?.split(",").map(Number),
+      unit: values.unit?.split(",").map(Number).filter(Number.isInteger),
     }),
     ...replaceIfExists(values.reservationUnitType, {
-      reservationUnitType: values.reservationUnitType?.split(",").map(Number),
+      reservationUnitType: values.reservationUnitType
+        ?.split(",")
+        .map(Number)
+        .filter(Number.isInteger),
     }),
     ...replaceIfExists(values.equipments, {
-      equipments: values.equipments?.split(",").map(Number),
+      equipments: values.equipments
+        ?.split(",")
+        .map(Number)
+        .filter(Number.isInteger),
     }),
     ...replaceIfExists(values.startDate, {
       reservableDateStart:
@@ -148,14 +169,14 @@ const processVariables = (values: Record<string, string>, language: string) => {
       showOnlyReservable: true,
     }),
     first: pagingLimit,
-    orderBy: values.order === "desc" ? `-${sortCriteria}` : sortCriteria,
+    // orderBy: values.order === "desc" ? `-${sortCriteria}` : sortCriteria,
     isDraft: false,
     isVisible: true,
     reservationKind: ReservationKind.Direct,
   };
-};
+}
 
-const SearchSingle = (): JSX.Element => {
+function SearchSingle({ data: initData }: Props): JSX.Element {
   const { t, i18n } = useTranslation();
 
   const sortingOptions = [
@@ -176,42 +197,37 @@ const SearchSingle = (): JSX.Element => {
   const [searchValues, setSearchValues] = useState(
     {} as Record<string, string>
   );
-  const setStoredValues = useLocalStorage<ParsedQuery<string>>(
-    "reservationUnit-search",
-    {}
-  )[1];
 
-  const { data, fetchMore, loading, error, networkStatus } = useQuery<
+  const { data, fetchMore, error, networkStatus } = useQuery<
     Query,
     QueryReservationUnitsArgs
   >(RESERVATION_UNITS, {
+    // FIXME orderBy change
     variables: processVariables(searchValues, i18n.language),
     fetchPolicy: "network-only",
-    skip: Object.keys(searchValues).length === 0,
+    // Why?
+    // skip: Object.keys(searchValues).length === 0,
     notifyOnNetworkStatusChange: true,
     onError: (error1) =>
       // eslint-disable-next-line no-console
       console.warn(error1, processVariables(searchValues, i18n.language)),
   });
 
-  const reservationUnits: ReservationUnitType[] = filterNonNullable(
-    data?.reservationUnits?.edges?.map((e) => e?.node)
+  // TODO should really hydrate the ApolloClient from SSR
+  const currData = data ?? initData;
+  const reservationUnits = filterNonNullable(
+    currData?.reservationUnits?.edges?.map((e) => e?.node)
   );
-  const totalCount = data?.reservationUnits?.totalCount;
-
-  const pageInfo = data?.reservationUnits?.pageInfo;
+  const totalCount = currData?.reservationUnits?.totalCount;
+  const pageInfo = currData?.reservationUnits?.pageInfo;
 
   const content = useRef<HTMLElement>(null);
   const router = useRouter();
 
-  const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
-
-  const searchParams = isBrowser ? window.location.search : "";
-  const parsedParams = queryString.parse(searchParams);
-
+  // TODO why???
   useEffect(() => {
-    if (parsedParams) {
-      const parsed = parsedParams;
+    if (router.query) {
+      const parsed = router.query;
       if (!parsed.sort) parsed.sort = "name";
       if (!parsed.order) parsed.order = "asc";
 
@@ -231,20 +247,17 @@ const SearchSingle = (): JSX.Element => {
         setSearchValues(newValues);
       }
     }
-  }, [parsedParams, searchValues, i18n.language]);
+  }, [router.query, searchValues, i18n.language]);
 
-  // If search params change, update stored values
-  useEffect(() => {
-    const params = queryString.parse(searchParams);
-    setStoredValues(params);
-  }, [setStoredValues, searchParams]);
-
+  // TODO this is hackish, but the purpose is to scroll to the list (esp on mobile)
+  // if the search options were selected on the front page already (and the search is automatic).
+  const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
   useEffect(() => {
     if (
       window.location.hash === "#content" &&
       isBrowser &&
       isMobile &&
-      data?.reservationUnits != null &&
+      currData?.reservationUnits != null &&
       content?.current?.offsetTop != null
     ) {
       window.scroll({
@@ -253,16 +266,13 @@ const SearchSingle = (): JSX.Element => {
         behavior: "smooth",
       });
     }
-  }, [content?.current?.offsetTop, data?.reservationUnits, isMobile]);
+  }, [content?.current?.offsetTop, currData?.reservationUnits, isMobile]);
 
   const loadingMore = networkStatus === NetworkStatus.fetchMore;
 
   // TODO type this properly
   const onSearch = async (criteria: Record<string, string>) => {
-    const sortingCriteria = pick(queryString.parse(searchParams), [
-      "sort",
-      "order",
-    ]);
+    const sortingCriteria = pick(router.query, ["sort", "order"]);
     router.replace(singleSearchUrl({ ...criteria, ...sortingCriteria }));
   };
 
@@ -280,10 +290,8 @@ const SearchSingle = (): JSX.Element => {
       newValues = omit(searchValues, key);
     }
 
-    const sortingCriteria = pick(queryString.parse(searchParams), [
-      "sort",
-      "order",
-    ]);
+    const sortingCriteria = pick(router.query, ["sort", "order"]);
+
     router.replace(
       // TODO: fix this
       singleSearchUrl({
@@ -322,11 +330,9 @@ const SearchSingle = (): JSX.Element => {
         <ClientOnly>
           <BottomWrapper>
             <ListWithPagination
-              id="searchResultList"
               items={filterNonNullable(reservationUnits).map((ru) => (
                 <ReservationUnitCard reservationUnit={ru} key={ru.id} />
               ))}
-              loading={loading}
               loadingMore={loadingMore}
               pageInfo={pageInfo}
               totalCount={totalCount ?? undefined}
@@ -366,6 +372,6 @@ const SearchSingle = (): JSX.Element => {
       </section>
     </Wrapper>
   );
-};
+}
 
 export default SearchSingle;

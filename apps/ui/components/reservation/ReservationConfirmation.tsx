@@ -11,9 +11,9 @@ import Link from "next/link";
 import styled from "styled-components";
 import { fontRegular, H2 } from "common/src/common/typography";
 import {
-  PaymentOrderType,
-  ReservationType,
-  ReservationUnitType,
+  type PaymentOrderNode,
+  type ReservationNode,
+  type ReservationUnitNode,
   State,
 } from "common/types/gql-types";
 import { Subheading } from "common/src/reservation-form/styles";
@@ -27,10 +27,10 @@ import { reservationUnitPath } from "../../modules/const";
 import { signOut } from "@/hooks/auth";
 
 type Props = {
-  reservation: ReservationType;
-  reservationUnit: ReservationUnitType;
+  reservation: ReservationNode;
+  reservationUnit: ReservationUnitNode;
   apiBaseUrl: string;
-  order?: PaymentOrderType;
+  order?: PaymentOrderNode;
 };
 
 const Wrapper = styled.div`

@@ -5,16 +5,19 @@ import get from "lodash/get";
 import type {
   Query,
   QueryReservationUnitArgs,
-  QueryUnitsArgs,
-  ReservationUnitTypeReservationsArgs,
-  ReservationUnitType,
-  ErrorType,
+  ReservationUnitNode,
   RecurringReservationCreateMutationInput,
   RecurringReservationCreateMutationPayload,
   ReservationStaffCreateMutationInput,
   ReservationStaffCreateMutationPayload,
+  QueryUnitArgs,
+  ReservationUnitNodeReservationSetArgs,
+  Maybe,
 } from "common/types/gql-types";
-import { Type, ReservationStartInterval } from "common/types/gql-types";
+import {
+  ReservationTypeChoice,
+  ReservationStartInterval,
+} from "common/types/gql-types";
 import type { UseFormReturn } from "react-hook-form";
 import type { RecurringReservationForm } from "app/schemas";
 import {
@@ -28,9 +31,9 @@ import {
   doesIntervalCollide,
   reservationToInterval,
   dateTime,
-} from "app/helpers";
+} from "@/helpers";
 import { generateReservations } from "./generateReservations";
-import { useNotification } from "../../../context/NotificationContext";
+import { useNotification } from "@/context/NotificationContext";
 import { RECURRING_RESERVATION_UNIT_QUERY } from "../queries";
 import {
   GET_RESERVATIONS_IN_INTERVAL,
@@ -41,7 +44,8 @@ import { convertToDate } from "./utils";
 import { CREATE_STAFF_RESERVATION } from "../create-reservation/queries";
 import { ReservationMade } from "./RecurringReservationDone";
 import { flattenMetadata } from "../create-reservation/utils";
-import { base64encode } from "common/src/helpers";
+import { base64encode, filterNonNullable } from "common/src/helpers";
+import { RELATED_RESERVATION_STATES } from "common/src/const";
 
 export const useMultipleReservation = ({
   form,
@@ -49,7 +53,7 @@ export const useMultipleReservation = ({
   interval = ReservationStartInterval.Interval_15Mins,
 }: {
   form: UseFormReturn<RecurringReservationForm>;
-  reservationUnit?: ReservationUnitType;
+  reservationUnit?: Maybe<ReservationUnitNode>;
   interval?: ReservationStartInterval;
 }) => {
   const { watch } = form;
@@ -87,30 +91,25 @@ export const useMultipleReservation = ({
   };
 };
 
-// NOTE pks are integers even though the query uses strings
-export const useRecurringReservationsUnits = (unitId: number) => {
+export function useRecurringReservationsUnits(unitId: number) {
   const { notifyError } = useNotification();
 
-  const { loading, data } = useQuery<Query, QueryUnitsArgs>(
+  const id = base64encode(`UnitNode:${unitId}`);
+  const { loading, data } = useQuery<Query, QueryUnitArgs>(
     RECURRING_RESERVATION_UNIT_QUERY,
     {
-      variables: {
-        pk: [String(unitId)],
-        offset: 0,
-      },
+      variables: { id },
       onError: (err) => {
         notifyError(err.message);
       },
     }
   );
 
-  const unit = data?.units?.edges[0];
-  const reservationUnits = unit?.node?.reservationUnits?.filter(
-    (item): item is ReservationUnitType => !!item
-  );
+  const { unit } = data ?? {};
+  const reservationUnits = filterNonNullable(unit?.reservationunitSet);
 
   return { loading, reservationUnits };
-};
+}
 
 const useReservationsInInterval = ({
   begin,
@@ -121,7 +120,7 @@ const useReservationsInInterval = ({
   begin: Date;
   end: Date;
   reservationUnitPk?: number;
-  reservationType: Type;
+  reservationType: ReservationTypeChoice;
 }) => {
   const { notifyError } = useNotification();
 
@@ -129,13 +128,13 @@ const useReservationsInInterval = ({
   // NOTE backend error, it returns all till 00:00 not 23:59
   const apiEnd = toApiDate(addDays(end, 1));
 
-  const typename = "ReservationUnitType";
+  const typename = "ReservationUnitNode";
   const id = base64encode(`${typename}:${reservationUnitPk}`);
   // NOTE unlike array fetches this fetches a single element with an included array
   // so it doesn't have the 100 limitation of array fetch nor does it have pagination
   const { loading, data, refetch } = useQuery<
     Query,
-    QueryReservationUnitArgs & ReservationUnitTypeReservationsArgs
+    QueryReservationUnitArgs & ReservationUnitNodeReservationSetArgs
   >(GET_RESERVATIONS_IN_INTERVAL, {
     skip:
       !reservationUnitPk ||
@@ -144,8 +143,9 @@ const useReservationsInInterval = ({
       !apiEnd,
     variables: {
       id,
-      from: apiStart,
-      to: apiEnd,
+      state: RELATED_RESERVATION_STATES,
+      beginDate: apiStart,
+      endDate: apiEnd,
     },
     fetchPolicy: "no-cache",
     onError: (err) => {
@@ -153,8 +153,8 @@ const useReservationsInInterval = ({
     },
   });
 
-  const reservations = (data?.reservationUnit?.reservations ?? [])
-    .map((x) => (x ? reservationToInterval(x, reservationType) : undefined))
+  const reservations = filterNonNullable(data?.reservationUnit?.reservationSet)
+    .map((x) => reservationToInterval(x, reservationType))
     .filter((x): x is CollisionInterval => x != null);
 
   return { reservations, loading, refetch };
@@ -162,7 +162,7 @@ const useReservationsInInterval = ({
 
 const listItemToInterval = (
   item: NewReservationListItem,
-  type: Type
+  type: ReservationTypeChoice
 ): CollisionInterval | undefined => {
   const start = convertToDate(item.date, item.startTime);
   const end = convertToDate(item.date, item.endTime);
@@ -171,8 +171,12 @@ const listItemToInterval = (
       start,
       end,
       buffers: {
-        before: type !== Type.Blocked ? item.buffers?.before ?? 0 : 0,
-        after: type !== Type.Blocked ? item.buffers?.after ?? 0 : 0,
+        before:
+          type !== ReservationTypeChoice.Blocked
+            ? item.buffers?.before ?? 0
+            : 0,
+        after:
+          type !== ReservationTypeChoice.Blocked ? item.buffers?.after ?? 0 : 0,
       },
       type,
     };
@@ -191,7 +195,7 @@ export const useFilteredReservationList = ({
   reservationUnitPk?: number;
   begin: Date;
   end: Date;
-  reservationType: Type;
+  reservationType: ReservationTypeChoice;
 }) => {
   const { reservations, refetch } = useReservationsInInterval({
     reservationUnitPk,
@@ -208,7 +212,7 @@ export const useFilteredReservationList = ({
       reservationToMake: NewReservationListItem,
       interval: CollisionInterval
     ) => {
-      const type = interval.type ?? Type.Blocked;
+      const type = interval.type ?? ReservationTypeChoice.Blocked;
       const interval2 = listItemToInterval(reservationToMake, type);
       if (interval2 && interval) {
         return doesIntervalCollide(interval2, interval);
@@ -252,7 +256,7 @@ export const useCreateRecurringReservation = () => {
 
   const { t } = useTranslation();
   const { notifyError } = useNotification();
-  const handleError = (error: ErrorType | undefined) => {
+  const handleError = (error: unknown) => {
     const errorMessage = get(error, "messages[0]");
     notifyError(t("ReservationDialog.saveFailed", { errorMessage }));
   };
@@ -308,18 +312,6 @@ export const useCreateRecurringReservation = () => {
 
       const { createStaffReservation: response } = staffData;
 
-      // TODO When does the graphql send errors as data? oposed to exceptions
-      if (response.errors != null) {
-        const errors =
-          response.errors
-            .filter((y): y is ErrorType => y != null)
-            ?.find(() => true)?.messages ?? [];
-        return {
-          ...common,
-          reservationPk: undefined,
-          error: errors.length > 0 ? errors[0] : "unknownError",
-        };
-      }
       return {
         ...common,
         reservationPk: response.pk ?? undefined,
@@ -340,10 +332,12 @@ export const useCreateRecurringReservation = () => {
   const mutate = async (
     data: RecurringReservationForm,
     reservationsToMake: NewReservationListItem[],
+    // TODO why is this named unitPk?
     unitPk: number,
     metaFields: string[],
     buffers: { before?: number; after?: number }
   ): Promise<[number | undefined, ReservationMade[]]> => {
+    // TODO this is not correct
     const metadataSetFields = metaFields;
 
     const flattenedMetadataSetValues = flattenMetadata(data, metadataSetFields);
@@ -351,7 +345,7 @@ export const useCreateRecurringReservation = () => {
     const name = data.type === "BLOCKED" ? "BLOCKED" : data.seriesName ?? "";
 
     const input: RecurringReservationCreateMutationInput = {
-      reservationUnitPk: unitPk,
+      reservationUnit: unitPk,
       beginDate: toApiDateUnsafe(fromUIDateUnsafe(data.startingDate)),
       beginTime: data.startTime,
       endDate: toApiDateUnsafe(fromUIDateUnsafe(data.endingDate)),
@@ -360,25 +354,12 @@ export const useCreateRecurringReservation = () => {
       recurrenceInDays: data.repeatPattern.value === "weekly" ? 7 : 14,
       name,
       description: data.comments,
-
-      // TODO missing fields
-      // abilityGroupPk?: InputMaybe<Scalars["Int"]>;
-      // ageGroupPk?: InputMaybe<Scalars["Int"]>;
-      // clientMutationId?: InputMaybe<Scalars["String"]>;
-      // user?: InputMaybe<Scalars["String"]>;
     };
 
     const { data: createResponse } = await createRecurringReservation(input);
 
-    if (
-      createResponse?.createRecurringReservation == null ||
-      createResponse?.createRecurringReservation.errors != null
-    ) {
-      const firstError = (
-        createResponse?.createRecurringReservation?.errors || []
-      ).find(() => true);
-
-      handleError(firstError ?? undefined);
+    if (createResponse?.createRecurringReservation == null) {
+      handleError(undefined);
       return [undefined, []];
     }
     const staffInput = {

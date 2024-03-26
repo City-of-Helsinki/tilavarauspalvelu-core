@@ -6,7 +6,7 @@ import { useMedia } from "react-use";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { H3 } from "common/src/common/typography";
-import { PurposeType } from "common/types/gql-types";
+import type { PurposeNode } from "common/types/gql-types";
 import { ShowAllContainer } from "common/src/components";
 import { singleSearchPrefix } from "../../modules/const";
 import { getTranslation } from "../../modules/util";
@@ -15,7 +15,7 @@ import { anchorStyles, focusStyles } from "common/styles/cssFragments";
 import { pixel } from "@/styles/util";
 
 type Props = {
-  purposes: PurposeType[];
+  purposes: PurposeNode[];
 };
 
 const mobileBreakpoint = "450px";
@@ -100,7 +100,7 @@ const Purposes = ({ purposes }: Props): JSX.Element => {
 
   const itemLimit = useMemo(() => (isMobile ? 4 : 8), [isMobile]);
 
-  const getImg = (item: PurposeType) => {
+  const getImg = (item: PurposeNode) => {
     return item.smallUrl || item.imageUrl || pixel;
   };
 

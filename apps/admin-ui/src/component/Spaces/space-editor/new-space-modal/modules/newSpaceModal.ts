@@ -1,10 +1,10 @@
 import { Button, IconTrash, Tag } from "hds-react";
 import Joi from "joi";
 import styled from "styled-components";
-import {
+import type {
   SpaceCreateMutationInput,
-  SpaceType,
-  UnitByPkType,
+  SpaceNode,
+  UnitNode,
 } from "common/types/gql-types";
 
 export const Title = styled.div`
@@ -91,7 +91,7 @@ export type State = {
   spaces: SpaceMutationInputWithKey<SpaceCreateMutationInput>[];
   page: number;
   unitPk: number;
-  unitSpaces?: SpaceType[];
+  unitSpaces?: SpaceNode[];
   validationErrors: (Joi.ValidationResult | null)[];
 };
 
@@ -100,7 +100,7 @@ export type Action =
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   | { type: "set"; index: number; value: any }
   | { type: "setParent"; parentPk: number | null; parentName: string | null }
-  | { type: "setUnit"; unit: UnitByPkType }
+  | { type: "setUnit"; unit: UnitNode }
   | {
       type: "setValidationErrors";
       validationErrors: (Joi.ValidationResult | null)[];

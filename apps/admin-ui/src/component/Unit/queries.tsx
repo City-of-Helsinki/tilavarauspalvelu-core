@@ -4,15 +4,13 @@ export const UNITS_QUERY = gql`
   query Units(
     $first: Int
     $offset: Int
-    $orderBy: String
-    $serviceSector: Decimal
+    $orderBy: [UnitOrderingChoices]
     $nameFi: String
   ) {
     units(
       first: $first
       offset: $offset
       orderBy: $orderBy
-      serviceSector: $serviceSector
       nameFi: $nameFi
       onlyWithPermission: true
     ) {
@@ -23,7 +21,7 @@ export const UNITS_QUERY = gql`
           serviceSectors {
             nameFi
           }
-          reservationUnits {
+          reservationunitSet {
             pk
           }
         }

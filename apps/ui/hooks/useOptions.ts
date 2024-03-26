@@ -1,7 +1,7 @@
 import { useQuery, gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
 import type { OptionType } from "common/types/common";
-import type { Query, AgeGroupType, Maybe } from "common/types/gql-types";
+import type { Query, AgeGroupNode, Maybe } from "common/types/gql-types";
 import { participantCountOptions } from "@/modules/const";
 import { mapOptions } from "@/modules/util";
 import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
@@ -90,7 +90,7 @@ const maybeOption = ({
   };
 };
 
-const sortAgeGroups = (ageGroups: AgeGroupType[]): AgeGroupType[] => {
+const sortAgeGroups = (ageGroups: AgeGroupNode[]): AgeGroupNode[] => {
   return ageGroups.sort((a, b) => {
     const order = ["1-99"];
     const strA = `${a.minimum || ""}-${a.maximum || ""}`;
@@ -118,17 +118,12 @@ export const useOptions = () => {
   const purposes = filterNonNullable(
     data?.reservationPurposes?.edges?.map((edge) => edge?.node)
   );
-  /* TODO this is missing from GraphQL schema?
-  const abilityGroups = data?.abilityGroups?.edges?.map((edge) => edge?.node)
-    .filter((node): node is NonNullable<typeof node> => node !== null) ?? [];
-  */
 
   const params = {
     ageGroups,
     cities,
     reservationUnitTypes,
     purposes,
-    // abilityGroups,
   };
   const options: OptionTypes = {
     ageGroupOptions: mapOptions(
@@ -136,14 +131,8 @@ export const useOptions = () => {
       undefined,
       getLocalizationLang(i18n.language)
     ),
+    // TODO remove abilityGroups
     abilityGroupOptions: [],
-    /* TODO
-        abilityGroups: mapOptions(
-          abilityGroups,
-          undefined,
-          i18n.language
-        ),
-      */
     cityOptions: mapOptions(
       filterNonNullable(cities.map((city) => maybeOption(city))),
       undefined,

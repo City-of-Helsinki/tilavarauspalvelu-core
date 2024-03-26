@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useMutation } from "@apollo/client";
-import { GraphQLError } from "graphql";
 import { z } from "zod";
 import {
   Button,
@@ -12,13 +11,13 @@ import {
   TextArea,
 } from "hds-react";
 import {
-  Mutation,
-  MutationDenyReservationArgs,
-  MutationRefundReservationArgs,
-  ReservationDenyMutationInput,
-  ReservationRefundMutationInput,
-  ReservationType,
-  ReservationTypeConnection,
+  type Mutation,
+  type MutationDenyReservationArgs,
+  type MutationRefundReservationArgs,
+  type ReservationDenyMutationInput,
+  type ReservationRefundMutationInput,
+  type ReservationNode,
+  type ReservationNodeConnection,
   State,
 } from "common/types/gql-types";
 import { useModal } from "@/context/ModalContext";
@@ -29,6 +28,7 @@ import { Select } from "@/component/Select";
 import { VerticalFlex } from "@/styles/layout";
 import { CustomDialogHeader } from "@/component/CustomDialogHeader";
 import { useDenyReasonOptions } from "./hooks";
+import { filterNonNullable } from "common/src/helpers";
 
 const ActionButtons = styled(Dialog.ActionButtons)`
   justify-content: end;
@@ -45,24 +45,34 @@ type ReturnAllowedState =
   | "free"
   | "already-refunded";
 
-const convertToReturnState: (
-  reservations: ReservationType[]
-) => ReturnAllowedState = (reservations) => {
-  const isPriceReturnable = (x: {
-    price: number;
-    orderStatus: string | null;
-    orderUuid: string | null;
-    refundUuid: string | null;
-  }) =>
-    x.price &&
+function isPriceReturnable(x: {
+  price: number;
+  orderStatus: string | null;
+  orderUuid: string | null;
+  refundUuid: string | null;
+}): boolean {
+  return (
     x.price > 0 &&
     x.orderStatus === "PAID" &&
     x.orderUuid != null &&
-    x.refundUuid == null;
+    x.refundUuid == null
+  );
+}
 
+function findPrice(reservations: ReservationNode[]): number {
+  const fp = reservations
+    .map((x) => x.price)
+    .map(Number)
+    .find((x) => x > 0);
+  return fp ?? 0;
+}
+
+function convertToReturnState(
+  reservations: ReservationNode[]
+): ReturnAllowedState {
   const payed = reservations
     .map(({ price, order }) => ({
-      price: price ?? 0,
+      price: price ? Number(price) : 0,
       orderStatus: order?.status ?? null,
       orderUuid: order?.orderUuid ?? null,
       refundUuid: order?.refundUuid ?? null,
@@ -78,7 +88,7 @@ const convertToReturnState: (
     return "free";
   }
   return "not-decided";
-};
+}
 
 const ReturnMoney = ({
   state,
@@ -129,7 +139,7 @@ const DialogContent = ({
   onClose,
   onReject,
 }: {
-  reservations: ReservationType[];
+  reservations: ReservationNode[];
   onClose: () => void;
   onReject: () => void;
 }) => {
@@ -147,15 +157,9 @@ const DialogContent = ({
         fields: {
           // find the pk => slice the array => replace the state variable in the slice
           // @ts-expect-error; TODO: typecheck broke after updating Apollo or Typescript
-          reservations(existing: ReservationTypeConnection) {
+          reservations(existing: ReservationNodeConnection) {
             const queryRes = data?.denyReservation;
-            if (queryRes?.errors) {
-              // eslint-disable-next-line no-console
-              console.error(
-                "NOT updating cache: mutation failed with: ",
-                queryRes?.errors
-              );
-            } else if (!queryRes?.errors && !queryRes?.pk) {
+            if (queryRes?.pk == null || queryRes?.state == null) {
               // eslint-disable-next-line no-console
               console.error(
                 "NOT updating cache: mutation success but PK missing"
@@ -242,9 +246,7 @@ const DialogContent = ({
 
       const res = await Promise.all(denyPromises);
 
-      const errors = res
-        .map((x) => x.errors)
-        .filter((x): x is GraphQLError[] => x != null);
+      const errors = filterNonNullable(res.map((x) => x.errors));
 
       if (errors.length !== 0) {
         // eslint-disable-next-line no-console
@@ -302,7 +304,7 @@ const DialogContent = ({
           <ReturnMoney
             state={returnState}
             onChange={setReturnState}
-            price={reservations.find((x) => x.price && x.price > 0)?.price ?? 0}
+            price={findPrice(reservations)}
           />
         </VerticalFlex>
       </Dialog.Content>
@@ -333,7 +335,7 @@ const DenyDialog = ({
   onReject,
   title,
 }: {
-  reservations: ReservationType[];
+  reservations: ReservationNode[];
   onClose: () => void;
   onReject: () => void;
   title?: string;

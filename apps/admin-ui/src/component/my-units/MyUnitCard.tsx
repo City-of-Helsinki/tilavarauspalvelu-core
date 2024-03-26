@@ -2,12 +2,12 @@ import { H2 } from "common/src/common/typography";
 import { IconArrowRight } from "hds-react";
 import React from "react";
 import styled from "styled-components";
-import { UnitType } from "common/types/gql-types";
+import type { UnitNode } from "common/types/gql-types";
 import { myUnitUrl } from "../../common/urls";
 import { BasicLink } from "../../styles/util";
 
 type Props = {
-  unit: UnitType;
+  unit: UnitNode;
 };
 
 const Wrapper = styled.div`
@@ -37,5 +37,3 @@ const MyUnitCard = ({ unit }: Props): JSX.Element => {
     </BasicLink>
   );
 };
-
-export default MyUnitCard;

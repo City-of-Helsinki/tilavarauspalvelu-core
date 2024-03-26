@@ -19,9 +19,9 @@ import {
 } from "../util";
 import {
   ReservableTimeSpanType,
-  ReservationType,
+  ReservationNode,
   ReservationStartInterval,
-  ReservationUnitType,
+  ReservationUnitNode,
   Authentication,
   ReservationKind,
   ReservationState,
@@ -222,7 +222,7 @@ test("doReservationsCollide", () => {
       begin: "2021-10-31T09:30:00+00:00",
       end: "2021-10-31T10:30:00+00:00",
     },
-  ] as ReservationType[];
+  ] as ReservationNode[];
 
   expect(
     doReservationsCollide(
@@ -521,7 +521,7 @@ describe("doesBuffer(s)Collide", () => {
       bufferTimeBefore: 3600,
       bufferTimeAfter: 3600,
     },
-  ] as ReservationType[];
+  ] as ReservationNode[];
 
   test("detects collisions", () => {
     expect(
@@ -638,7 +638,7 @@ describe("getEventBuffers", () => {
         bufferTimeBefore: null,
         bufferTimeAfter: 9000,
       },
-    ] as ReservationType[];
+    ] as ReservationNode[];
 
     expect(getEventBuffers([])).toEqual([]);
     expect(getEventBuffers(events)).toEqual([
@@ -672,7 +672,7 @@ describe("getEventBuffers", () => {
 
 describe("isReservationUnitReservable", () => {
   const date = new Date().toISOString().split("T")[0];
-  const reservationUnit: ReservationUnitType = {
+  const reservationUnit: ReservationUnitNode = {
     id: "1234",
     allowReservationsWithoutOpeningHours: false,
     authentication: Authentication.Strong,
@@ -692,7 +692,7 @@ describe("isReservationUnitReservable", () => {
         endDatetime: `${date}T20:00:00+00:00`,
       },
     ],
-  } as unknown as ReservationUnitType;
+  } as unknown as ReservationUnitNode;
 
   test("returns true for a unit that is reservable", () => {
     const [res1] = isReservationUnitReservable({
@@ -834,7 +834,7 @@ describe("isReservationStartInFuture", () => {
     expect(
       isReservationStartInFuture({
         reservationBegins: addMinutes(new Date(), 10),
-      } as unknown as ReservationUnitType)
+      } as unknown as ReservationUnitNode)
     ).toBe(true);
   });
 
@@ -842,17 +842,17 @@ describe("isReservationStartInFuture", () => {
     expect(
       isReservationStartInFuture({
         reservationBegins: addMinutes(new Date(), -10),
-      } as unknown as ReservationUnitType)
+      } as unknown as ReservationUnitNode)
     ).toBe(false);
 
     expect(
       isReservationStartInFuture({
         reservationBegins: new Date(),
-      } as unknown as ReservationUnitType)
+      } as unknown as ReservationUnitNode)
     ).toBe(false);
 
     expect(
-      isReservationStartInFuture({} as unknown as ReservationUnitType)
+      isReservationStartInFuture({} as unknown as ReservationUnitNode)
     ).toBe(false);
   });
 
@@ -861,14 +861,14 @@ describe("isReservationStartInFuture", () => {
       isReservationStartInFuture({
         reservationBegins: addDays(new Date(), 10),
         reservationsMaxDaysBefore: 9,
-      } as unknown as ReservationUnitType)
+      } as unknown as ReservationUnitNode)
     ).toBe(true);
 
     expect(
       isReservationStartInFuture({
         reservationBegins: addDays(new Date(), 10),
         reservationsMaxDaysBefore: 10,
-      } as unknown as ReservationUnitType)
+      } as unknown as ReservationUnitNode)
     ).toBe(false);
   });
 });
@@ -952,14 +952,14 @@ describe("getNormalizedReservationBeginTime", () => {
     expect(
       getNormalizedReservationBeginTime({
         reservationBegins: "2019-09-22T12:00:00+00:00",
-      } as ReservationUnitType)
+      } as ReservationUnitNode)
     ).toEqual("2019-09-22T12:00:00.000Z");
 
     expect(
       getNormalizedReservationBeginTime({
         reservationBegins: "2019-09-22T12:00:00+00:00",
         reservationsMaxDaysBefore: 10,
-      } as ReservationUnitType)
+      } as ReservationUnitNode)
     ).toEqual("2019-09-12T12:00:00.000Z");
   });
 });
@@ -985,7 +985,7 @@ describe("getOpenDays", () => {
       },
     ] as ReservableTimeSpanType[];
 
-    expect(getOpenDays({ reservableTimeSpans } as ReservationUnitType)).toEqual(
+    expect(getOpenDays({ reservableTimeSpans } as ReservationUnitNode)).toEqual(
       [
         new Date("2022-08-10T00:00:00.000Z"),
         new Date("2022-08-12T00:00:00.000Z"),

@@ -7,7 +7,7 @@ import Link from "next/link";
 import styled from "styled-components";
 import { useMedia } from "react-use";
 import { breakpoints } from "common/src/common/style";
-import { ReservationUnitType } from "common/types/gql-types";
+import type { ReservationUnitNode } from "common/types/gql-types";
 import { reservationUnitPath } from "../../modules/const";
 import {
   getImageSource,
@@ -25,7 +25,7 @@ import {
 import { SupplementaryButton, truncatedText } from "../../styles/util";
 
 type PropsType = {
-  units: ReservationUnitType[];
+  units: ReservationUnitNode[];
 };
 
 const Wrapper = styled.div`

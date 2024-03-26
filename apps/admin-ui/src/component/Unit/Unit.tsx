@@ -1,17 +1,12 @@
 import { useQuery } from "@apollo/client";
 import { Button, IconPlusCircleFill, Notification } from "hds-react";
-import React, { useState } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { H1, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import {
-  Query,
-  QueryUnitByPkArgs,
-  ReservationUnitType,
-  UnitByPkType,
-} from "common/types/gql-types";
+import type { Query, QueryUnitArgs } from "common/types/gql-types";
 import { UNIT_QUERY } from "@/common/queries";
 import { parseAddress } from "@/common/util";
 import { useNotification } from "@/context/NotificationContext";
@@ -21,6 +16,8 @@ import Loader from "../Loader";
 import ReservationUnitList from "./ReservationUnitList";
 import ExternalLink from "./ExternalLink";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
+import { base64encode, filterNonNullable } from "common/src/helpers";
+import Error404 from "@/common/Error404";
 
 interface IProps {
   [key: string]: string;
@@ -112,44 +109,39 @@ const ReservationUnits = styled.div`
   padding: var(--spacing-m);
 `;
 
-const Unit = (): JSX.Element | null => {
+function Unit(): JSX.Element {
   const { notifyError } = useNotification();
-  const [isLoading, setIsLoading] = useState(true);
-  const [unit, setUnit] = useState<UnitByPkType>();
-  const [hasSpacesResources, setSpacesResources] = useState(true);
 
   const { t } = useTranslation();
   const unitPk = Number(useParams<IProps>().unitPk);
   const history = useNavigate();
 
-  useQuery<Query, QueryUnitByPkArgs>(UNIT_QUERY, {
-    variables: { pk: unitPk },
-    fetchPolicy: "network-only",
-    onCompleted: ({ unitByPk }) => {
-      if (unitByPk) {
-        setUnit(unitByPk);
-        setSpacesResources(Boolean(unitByPk?.spaces?.length));
-      }
-      setIsLoading(false);
-    },
-    onError: () => {
-      notifyError(t("errors.errorFetchingData"));
-      setIsLoading(false);
-    },
-  });
+  const typename = "UnitNode";
+  const id = base64encode(`${typename}:${unitPk}`);
+  const { data, loading: isLoading } = useQuery<Query, QueryUnitArgs>(
+    UNIT_QUERY,
+    {
+      variables: { id },
+      fetchPolicy: "network-only",
+      onError: () => {
+        notifyError(t("errors.errorFetchingData"));
+      },
+    }
+  );
+
+  const { unit } = data ?? {};
+  const hasSpacesResources = Boolean(unit?.spaces?.length);
 
   if (isLoading) {
     return <Loader />;
   }
 
+  // TODO separate invalid route and no unit found errors
   if (!unit) {
-    return null;
+    return <Error404 />;
   }
 
-  const reservationUnits =
-    unit?.reservationUnits
-      ?.filter((x): x is ReservationUnitType => x != null)
-      .filter((x) => !x.isArchived) ?? [];
+  const reservationUnits = filterNonNullable(unit.reservationunitSet);
 
   const route = [
     {
@@ -240,6 +232,6 @@ const Unit = (): JSX.Element | null => {
       </Container>
     </>
   );
-};
+}
 
 export default Unit;

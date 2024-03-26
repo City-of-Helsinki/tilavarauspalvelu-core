@@ -1,10 +1,10 @@
 import React from "react";
 import styled from "styled-components";
-import { SpaceType } from "common/types/gql-types";
+import type { SpaceNode } from "common/types/gql-types";
 
 type Props = {
-  space: SpaceType;
-  unitSpaces?: SpaceType[];
+  space: SpaceNode;
+  unitSpaces?: SpaceNode[];
 };
 
 const Tree = styled.div`
@@ -14,9 +14,9 @@ const Tree = styled.div`
 `;
 
 const getParents = (
-  root?: SpaceType,
-  spaces?: SpaceType[],
-  hierarchy: SpaceType[] = []
+  root?: SpaceNode,
+  spaces?: SpaceNode[],
+  hierarchy: SpaceNode[] = []
 ) => {
   if (root) {
     hierarchy.push(root);

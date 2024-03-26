@@ -5,7 +5,11 @@ import { type TFunction } from "i18next";
 import styled from "styled-components";
 import { Button } from "hds-react";
 import { BANNER_NOTIFICATIONS_ADMIN_LIST } from "common/src/components/BannerNotificationsQuery";
-import type { Query, BannerNotificationNode } from "common/types/gql-types";
+import type {
+  Query,
+  BannerNotificationNode,
+  QueryBannerNotificationsArgs,
+} from "common/types/gql-types";
 import { H1 } from "common/src/common/typography";
 import { Container } from "app/styles/layout";
 import BreadcrumbWrapper from "app/component/BreadcrumbWrapper";
@@ -14,6 +18,7 @@ import { ButtonLikeLink } from "app/component/ButtonLikeLink";
 import { valueForDateInput, valueForTimeInput } from "app/helpers";
 import { GQL_MAX_RESULTS_PER_QUERY } from "app/common/const";
 import { CustomTable, TableLink } from "@/component/Table";
+import { filterNonNullable } from "common/src/helpers";
 
 const notificationUrl = (pk: number) => `/messaging/notifications/${pk}`;
 
@@ -144,7 +149,7 @@ const HeaderContainer = styled.div`
 `;
 
 /// @brief this is the listing page for all notifications.
-const Page = () => {
+function Page() {
   // TODO the default sort should be ["state", "-ends"] but the frontend sort doesn't support multiple options
   // so either leave it with just state or do some custom magic for the initial sort
   const [sortKey, setSortKey] = useState<Sort>({
@@ -156,18 +161,21 @@ const Page = () => {
     data,
     loading: isLoading,
     fetchMore,
-  } = useQuery<Query>(BANNER_NOTIFICATIONS_ADMIN_LIST, {
-    variables: {
-      first: GQL_MAX_RESULTS_PER_QUERY,
-      offset: 0,
-      orderBy: `${sortKey.order === "desc" ? "-" : ""}${sortKey.field}`,
-    },
-  });
+  } = useQuery<Query, QueryBannerNotificationsArgs>(
+    BANNER_NOTIFICATIONS_ADMIN_LIST,
+    {
+      variables: {
+        first: GQL_MAX_RESULTS_PER_QUERY,
+        // offset: 0,
+        // FIXME orderby using enum
+        // orderBy: `${sortKey.order === "desc" ? "-" : ""}${sortKey.field}`,
+      },
+    }
+  );
 
-  const notifications =
-    data?.bannerNotifications?.edges
-      .map((edge) => edge?.node)
-      .filter((n): n is BannerNotificationNode => n != null) ?? [];
+  const notifications = filterNonNullable(
+    data?.bannerNotifications?.edges?.map((edge) => edge?.node)
+  );
   const totalCount = data?.bannerNotifications?.totalCount ?? 0;
 
   const { t } = useTranslation();
@@ -220,16 +228,18 @@ const Page = () => {
       )}
     </>
   );
-};
+}
 
 // We don't have proper layouts yet, so just separate the container stuff here
-const PageWrapped = () => (
-  <>
-    <BreadcrumbWrapper route={["messaging", "notifications"]} />
-    <Container>
-      <Page />
-    </Container>
-  </>
-);
+function PageWrapped() {
+  return (
+    <>
+      <BreadcrumbWrapper route={["messaging", "notifications"]} />
+      <Container>
+        <Page />
+      </Container>
+    </>
+  );
+}
 
 export default PageWrapped;

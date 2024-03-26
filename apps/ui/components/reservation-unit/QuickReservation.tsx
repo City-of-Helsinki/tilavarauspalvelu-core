@@ -5,7 +5,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { chunkArray, fromUIDate, toUIDate } from "common/src/common/util";
 import { fontBold, fontMedium, H4 } from "common/src/common/typography";
-import type { ReservationUnitType } from "common/types/gql-types";
+import type { ReservationUnitNode } from "common/types/gql-types";
 import { breakpoints } from "common";
 import { getReservationUnitPrice } from "@/modules/reservationUnit";
 import Carousel from "../Carousel";
@@ -23,7 +23,7 @@ export type TimeRange = {
 };
 
 type Props = {
-  reservationUnit: ReservationUnitType | null;
+  reservationUnit: ReservationUnitNode | null;
   subventionSuffix: JSX.Element | undefined;
   reservationForm: UseFormReturn<{
     duration?: number;

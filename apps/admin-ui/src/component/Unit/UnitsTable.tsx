@@ -1,8 +1,8 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { memoize } from "lodash";
-import { UnitType } from "common/types/gql-types";
-import { TFunction } from "i18next";
+import type { UnitNode } from "common/types/gql-types";
+import type { TFunction } from "i18next";
 import { truncate } from "@/helpers";
 import { myUnitUrl, unitUrl } from "@/common/urls";
 import { CustomTable, TableLink } from "@/component/Table";
@@ -15,7 +15,7 @@ export type Sort = {
 type Props = {
   sort?: Sort;
   sortChanged: (field: string) => void;
-  units: UnitType[];
+  units: UnitNode[];
   isMyUnits?: boolean;
 };
 
@@ -25,7 +25,7 @@ const getColConfig = (t: TFunction, isMyUnits?: boolean) => [
   {
     headerName: t("Units.headings.name"),
     key: "nameFi",
-    transform: ({ nameFi, pk }: UnitType) => (
+    transform: ({ nameFi, pk }: UnitNode) => (
       <TableLink href={isMyUnits ? myUnitUrl(pk ?? 0) : unitUrl(pk ?? 0)}>
         {truncate(nameFi ?? "-", MAX_NAME_LENGTH)}
       </TableLink>
@@ -37,7 +37,7 @@ const getColConfig = (t: TFunction, isMyUnits?: boolean) => [
     headerName: t("Units.headings.serviceSector"),
     key: "serviceSector",
     isSortable: false,
-    transform: (unit: UnitType) =>
+    transform: (unit: UnitNode) =>
       (unit?.serviceSectors || [])
         .map((serviceSector) => serviceSector?.nameFi)
         .join(","),
@@ -47,7 +47,9 @@ const getColConfig = (t: TFunction, isMyUnits?: boolean) => [
     headerName: t("Units.headings.reservationUnitCount"),
     key: "typeFi",
     isSortable: false,
-    transform: (unit: UnitType) => <> {unit?.reservationUnits?.length || 0} </>,
+    transform: (unit: UnitNode) => (
+      <> {unit?.reservationunitSet?.length ?? 0} </>
+    ),
     width: "25%",
   },
 ];

@@ -3,10 +3,10 @@ import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { OptionType } from "common/types/common";
-import {
+import type { OptionType } from "common/types/common";
+import type {
   ApplicationRoundNode,
-  ReservationUnitType,
+  ReservationUnitNode,
 } from "common/types/gql-types";
 import { IconButton } from "common/src/components";
 import { filterNonNullable } from "common/src/helpers";
@@ -59,7 +59,7 @@ const ReservationUnitList = ({
   const { clearErrors, setError, watch, setValue, formState } = form;
   const { errors } = formState;
 
-  const isValid = (units: ReservationUnitType[]) => {
+  const isValid = (units: ReservationUnitNode[]) => {
     const error = units
       .map(
         (resUnit) =>
@@ -99,7 +99,7 @@ const ReservationUnitList = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reservationUnits, minSize]);
 
-  const handleAdd = (ru: ReservationUnitType) => {
+  const handleAdd = (ru: ReservationUnitNode) => {
     if (ru.pk == null) {
       return;
     }
@@ -114,13 +114,13 @@ const ReservationUnitList = ({
     return copy;
   };
 
-  const remove = (reservationUnit: ReservationUnitType) => {
+  const remove = (reservationUnit: ReservationUnitNode) => {
     setReservationUnits([
       ...reservationUnits.filter((pk) => pk !== reservationUnit.pk),
     ]);
   };
 
-  const moveUp = (reservationUnit: ReservationUnitType) => {
+  const moveUp = (reservationUnit: ReservationUnitNode) => {
     if (reservationUnit.pk == null) {
       return;
     }
@@ -129,7 +129,7 @@ const ReservationUnitList = ({
     setReservationUnits(move(reservationUnits, from, to));
   };
 
-  const moveDown = (reservationUnit: ReservationUnitType) => {
+  const moveDown = (reservationUnit: ReservationUnitNode) => {
     if (reservationUnit.pk == null) {
       return;
     }

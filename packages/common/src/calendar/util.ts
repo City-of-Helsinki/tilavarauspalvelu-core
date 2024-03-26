@@ -18,8 +18,8 @@ import { TFunction } from "next-i18next";
 import {
   type ReservableTimeSpanType,
   ReservationState,
-  type ReservationType,
-  type ReservationUnitType,
+  type ReservationNode,
+  type ReservationUnitNode,
   ReservationKind,
   type ReservationStartInterval,
 } from "../../types/gql-types";
@@ -27,7 +27,6 @@ import {
   type CalendarEventBuffer,
   type OptionType,
   type PendingReservation,
-  type ReservationUnitNode,
   type SlotProps,
 } from "../../types/common";
 import {
@@ -272,7 +271,7 @@ export const isRangeReservable = ({
 
 export const doReservationsCollide = (
   newReservation: { start: Date; end: Date },
-  reservations: ReservationType[] = []
+  reservations: ReservationNode[] = []
 ): boolean => {
   const { start, end } = newReservation;
   return reservations.some((reservation) =>
@@ -511,7 +510,7 @@ export const getBufferedEventTimes = (
 };
 
 export const doesBufferCollide = (
-  reservation: ReservationType,
+  reservation: ReservationNode,
   newReservation: {
     start: Date;
     end: Date;
@@ -563,7 +562,7 @@ export const doBuffersCollide = (
     bufferTimeBefore?: number;
     bufferTimeAfter?: number;
   },
-  reservations: ReservationType[] = []
+  reservations: ReservationNode[] = []
 ): boolean => {
   return reservations.some((reservation) =>
     doesBufferCollide(reservation, newReservation)
@@ -571,7 +570,7 @@ export const doBuffersCollide = (
 };
 
 export const getEventBuffers = (
-  events: (PendingReservation | ReservationType)[]
+  events: (PendingReservation | ReservationNode)[]
 ): CalendarEventBuffer[] => {
   const buffers: CalendarEventBuffer[] = [];
   events.forEach((event) => {
@@ -600,7 +599,7 @@ export const getEventBuffers = (
 };
 
 export const isReservationUnitReservable = (
-  reservationUnit?: ReservationUnitType | null
+  reservationUnit?: ReservationUnitNode | null
 ): [false, string] | [true] => {
   if (!reservationUnit) {
     return [false, "reservationUnit is null"];
@@ -672,7 +671,7 @@ export const getNormalizedReservationBeginTime = (
   ).toISOString();
 };
 
-export const getOpenDays = (reservationUnit: ReservationUnitType): Date[] => {
+export const getOpenDays = (reservationUnit: ReservationUnitNode): Date[] => {
   const { reservableTimeSpans } = reservationUnit;
 
   const openDays: Date[] = [];

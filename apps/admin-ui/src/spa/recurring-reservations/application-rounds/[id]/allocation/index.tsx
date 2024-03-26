@@ -10,15 +10,16 @@ import { ShowAllContainer } from "common/src/components";
 import {
   type Query,
   type QueryApplicationSectionsArgs,
-  type UnitType,
+  type UnitNode,
   ApplicantTypeChoice,
   ApplicationRoundStatusChoice,
   Priority,
   type QueryApplicationRoundArgs,
   type QueryAffectingAllocatedTimeSlotsArgs,
   type ApplicationRoundNode,
+  type ReservationUnitNode,
 } from "common/types/gql-types";
-import { type ReservationUnitNode, breakpoints } from "common";
+import { breakpoints } from "common";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { SearchTags } from "@/component/SearchTags";
 import Loader from "@/component/Loader";
@@ -144,7 +145,7 @@ function Filters({
   purposeOptions,
   ageGroupOptions,
 }: {
-  units: UnitType[];
+  units: UnitNode[];
   priorityOptions: PriorityFilterOptions[];
   orderOptions: PkFilterOptions[];
   cityOptions: PkFilterOptions[];
@@ -219,7 +220,7 @@ function ApplicationRoundAllocation({
   applicationRound?: ApplicationRoundNode;
   // TODO refactor the others to use the RoundNode
   applicationRoundPk: number;
-  units: UnitType[];
+  units: UnitNode[];
   reservationUnits: ReservationUnitNode[];
   // TODO do we want to prop drill these? or include it in every application event?
   roundName: string;

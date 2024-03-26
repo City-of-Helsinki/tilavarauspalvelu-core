@@ -10,7 +10,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { fontBold, H6 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import { ReservationUnitType } from "common/types/gql-types";
+import type { ReservationUnitNode } from "common/types/gql-types";
 import {
   getImageSource,
   getMainImage,
@@ -21,12 +21,12 @@ import { getReservationUnitName } from "../../modules/reservationUnit";
 
 type Props = {
   order: number;
-  reservationUnit: ReservationUnitType;
-  onDelete: (reservationUnit: ReservationUnitType) => void;
+  reservationUnit: ReservationUnitNode;
+  onDelete: (reservationUnit: ReservationUnitNode) => void;
   first: boolean;
   last: boolean;
-  onMoveUp: (reservationUnit: ReservationUnitType) => void;
-  onMoveDown: (reservationUnit: ReservationUnitType) => void;
+  onMoveUp: (reservationUnit: ReservationUnitNode) => void;
+  onMoveDown: (reservationUnit: ReservationUnitNode) => void;
   invalid: boolean;
 };
 

@@ -9,7 +9,7 @@ import {
 export const RESERVATION_META_FRAGMENT = gql`
   ${RESERVEE_NAME_FRAGMENT}
   ${RESERVEE_BILLING_FRAGMENT}
-  fragment ReservationMetaFields on ReservationType {
+  fragment ReservationMetaFields on ReservationNode {
     ageGroup {
       minimum
       maximum
@@ -35,7 +35,7 @@ export const RESERVATION_META_FRAGMENT = gql`
 
 export const RESERVATION_UNIT_PRICING_FRAGMENT = gql`
   ${PRICING_FRAGMENT}
-  fragment ReservationUnitPricing on ReservationUnitType {
+  fragment ReservationUnitPricing on ReservationUnitNode {
     pricings {
       ...PricingFields
     }
@@ -44,7 +44,7 @@ export const RESERVATION_UNIT_PRICING_FRAGMENT = gql`
 
 export const RESERVATION_UNIT_FRAGMENT = gql`
   ${UNIT_NAME_FRAGMENT}
-  fragment ReservationUnit on ReservationUnitType {
+  fragment ReservationUnit on ReservationUnitNode {
     pk
     nameFi
     maxPersons
@@ -57,8 +57,12 @@ export const RESERVATION_UNIT_FRAGMENT = gql`
     }
     metadataSet {
       name
-      supportedFields
-      requiredFields
+      supportedFields {
+        fieldName
+      }
+      requiredFields {
+        fieldName
+      }
     }
     cancellationTerms {
       textFi
@@ -81,7 +85,7 @@ export const RESERVATION_UNIT_FRAGMENT = gql`
 `;
 
 export const RESERVATION_RECURRING_FRAGMENT = gql`
-  fragment ReservationRecurring on ReservationType {
+  fragment ReservationRecurring on ReservationNode {
     recurringReservation {
       pk
       beginDate
@@ -94,7 +98,7 @@ export const RESERVATION_RECURRING_FRAGMENT = gql`
 `;
 
 export const RESERVATION_COMMON_FRAGMENT = gql`
-  fragment ReservationCommon on ReservationType {
+  fragment ReservationCommon on ReservationNode {
     pk
     begin
     end
@@ -120,25 +124,16 @@ export const RESERVATION_COMMON_FRAGMENT = gql`
 // TODO do we still need the user here?
 // TODO what is the reservation name vs. reserveeName?
 // TODO why do we need the pk of the unit and serviceSector
+// TODO replace this with affectingReservations Query (not a fragment)
 export const RESERVATIONUNIT_RESERVATIONS_FRAGMENT = gql`
   ${RESERVATION_COMMON_FRAGMENT}
-  fragment ReservationUnitReservations on ReservationUnitType {
-    reservations(
-      from: $from
-      to: $to
-      includeWithSameComponents: $includeWithSameComponents
-      state: [
-        "CREATED"
-        "CONFIRMED"
-        "REQUIRES_HANDLING"
-        "WAITING_FOR_PAYMENT"
-      ]
-    ) {
+  fragment ReservationUnitReservations on ReservationUnitNode {
+    reservationSet(state: $state, beginDate: $beginDate, endDate: $endDate) {
       ...ReservationCommon
       name
       numPersons
       calendarUrl
-      reservationUnits {
+      reservationUnit {
         pk
         nameFi
         bufferTimeBefore

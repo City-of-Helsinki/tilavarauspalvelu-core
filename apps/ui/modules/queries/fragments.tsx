@@ -11,7 +11,7 @@ import {
 
 export const UNIT_NAME_FRAGMENT_I18N = gql`
   ${LOCATION_FRAGMENT_I18N}
-  fragment UnitNameFieldsI18N on UnitType {
+  fragment UnitNameFieldsI18N on UnitNode {
     pk
     nameFi
     nameEn
@@ -24,7 +24,7 @@ export const UNIT_NAME_FRAGMENT_I18N = gql`
 
 export const UNIT_FRAGMENT = gql`
   ${UNIT_NAME_FRAGMENT_I18N}
-  fragment UnitFields on UnitType {
+  fragment UnitFields on UnitNode {
     ...UnitNameFieldsI18N
     id
     tprekId
@@ -43,7 +43,7 @@ export const RESERVATION_UNIT_FRAGMENT = gql`
   ${TERMS_OF_USE_TEXT_FRAGMENT}
   ${TERMS_OF_USE_NAME_FRAGMENT}
   ${PRICING_FRAGMENT}
-  fragment ReservationUnitFields on ReservationUnitType {
+  fragment ReservationUnitFields on ReservationUnitNode {
     unit {
       ...UnitFields
     }
@@ -93,8 +93,12 @@ export const RESERVATION_UNIT_FRAGMENT = gql`
       id
       name
       pk
-      supportedFields
-      requiredFields
+      supportedFields {
+        fieldName
+      }
+      requiredFields {
+        fieldName
+      }
     }
     minPersons
     maxPersons

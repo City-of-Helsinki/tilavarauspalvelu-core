@@ -1,4 +1,4 @@
-import type { Maybe } from "../types/gql-types";
+import type { Maybe, ReservationMetadataFieldNode } from "../types/gql-types";
 
 export function filterNonNullable<T>(
   arr: Maybe<Maybe<T>[]> | undefined
@@ -51,5 +51,32 @@ export function base64encode(str: string) {
   return Buffer.from(str, "binary").toString("base64");
 }
 
-export const truncate = (val: string, maxLen: number): string =>
-  val.length > maxLen ? `${val.substring(0, maxLen - 1)}…` : val;
+export function truncate(val: string, maxLen: number): string {
+  return val.length > maxLen ? `${val.substring(0, maxLen - 1)}…` : val;
+}
+
+/// Transitional helper when moving from string fields
+/// TODO should be enums or string literals instead of arbitary strings
+/// TODO are the backend fields in camelCase or snake_case?
+export function containsField(
+  formFields: ReservationMetadataFieldNode[],
+  fieldName: string
+): boolean {
+  if (!formFields || formFields?.length === 0 || !fieldName) {
+    return false;
+  }
+  if (formFields.find((x) => x.fieldName === fieldName)) {
+    return true;
+  }
+  return false;
+}
+
+/// TODO are the backend fields in camelCase or snake_case?
+export function containsNameField(
+  formFields: ReservationMetadataFieldNode[]
+): boolean {
+  return (
+    containsField(formFields, "reserveeFirstName") ||
+    containsField(formFields, "reserveeLastName")
+  );
+}

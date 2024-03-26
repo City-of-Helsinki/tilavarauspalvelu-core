@@ -2,7 +2,7 @@ import React from "react";
 import { MockedProvider } from "@apollo/client/testing";
 import { act, render, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { ReservationType } from "common/types/gql-types";
+import type { ReservationNode } from "common/types/gql-types";
 import NotificationContextMock, {
   notifyError,
   notifySuccess,
@@ -20,7 +20,7 @@ const TestComponent = ({
   onSuccess,
   seriesName,
 }: {
-  reservation: ReservationType;
+  reservation: ReservationNode;
   onSuccess: () => void;
   seriesName?: string;
 }) => {
@@ -131,7 +131,7 @@ describe("edit mutation hook recurring reservation", () => {
     recurringPk: number,
     onSuccess: () => void
   ) => {
-    const reservation: ReservationType = {
+    const reservation: ReservationNode = {
       ...mockRecurringReservation,
       pk,
       recurringReservation: {

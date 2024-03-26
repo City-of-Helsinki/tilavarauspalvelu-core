@@ -1,8 +1,3 @@
-import type { ReservationUnitType } from "./gql-types";
-
-/// @deprecated
-/// can be safely removed after all users have moved to gql-types
-export type ReservationUnitNode = ReservationUnitType;
 export type CalendarBufferEvent = {
   state: "BUFFER";
 };

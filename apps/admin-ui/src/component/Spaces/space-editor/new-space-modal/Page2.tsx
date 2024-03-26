@@ -12,7 +12,7 @@ import { FetchResult } from "@apollo/client";
 import {
   SpaceCreateMutationInput,
   SpaceCreateMutationPayload,
-  UnitByPkType,
+  UnitNode,
 } from "common/types/gql-types";
 import { CustomDialogHeader } from "../../../CustomDialogHeader";
 import {
@@ -68,7 +68,7 @@ const SpaceEditor = ({
 
 type Props = {
   editorState: State;
-  unit: UnitByPkType;
+  unit: UnitNode;
   dispatch: React.Dispatch<Action>;
   closeModal: () => void;
   createSpace: (

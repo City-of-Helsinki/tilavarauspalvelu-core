@@ -51,11 +51,10 @@ import {
   type QueryReservationUnitsArgs,
   type ReservationCreateMutationInput,
   type ReservationCreateMutationPayload,
-  type ReservationType,
-  type ReservationUnitType,
-  State,
-  type ReservationUnitTypeReservableTimeSpansArgs,
-  type ReservationUnitTypeReservationsArgs,
+  type ReservationNode,
+  type ReservationUnitNodeReservableTimeSpansArgs,
+  type ReservationUnitNode,
+  type ReservationUnitNodeReservationSetArgs,
 } from "common/types/gql-types";
 import {
   base64encode,
@@ -142,28 +141,21 @@ import {
 } from "@/components/reservation-unit/schema";
 import { MediumButton } from "@/styles/util";
 import LoginFragment from "@/components/LoginFragment";
+import { RELATED_RESERVATION_STATES } from "common/src/const";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
 type WeekOptions = "day" | "week" | "month";
 
-const allowedReservationStates: State[] = [
-  State.Created,
-  State.Confirmed,
-  State.RequiresHandling,
-  State.WaitingForPayment,
-];
-
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { params, query, locale } = ctx;
   const pk = Number(params?.id);
   const uuid = query.ru;
-  const today = new Date();
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
-  let relatedReservationUnits: ReservationUnitType[] = [];
+  let relatedReservationUnits: ReservationUnitNode[] = [];
 
   // TODO does this return only possible rounds or do we need to do frontend filtering on them?
   const { data } = await apolloClient.query<Query>({
@@ -176,7 +168,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     .filter((n) => n?.reservationUnits?.find((x) => x?.pk === pk));
 
   if (pk) {
-    const typename = "ReservationUnitType";
+    const typename = "ReservationUnitNode";
     const id = base64encode(`${typename}:${pk}`);
     const { data: reservationUnitData } = await apolloClient.query<
       Query,
@@ -215,25 +207,23 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
 
     const bookingTerms = await getGenericTerms(apolloClient);
 
+    const today = new Date();
     const startDate = today;
     const endDate = addYears(today, 2);
     // TODO remove
     const { data: additionalData } = await apolloClient.query<
       Query,
       QueryReservationUnitArgs &
-        ReservationUnitTypeReservableTimeSpansArgs &
-        ReservationUnitTypeReservationsArgs
+        ReservationUnitNodeReservableTimeSpansArgs &
+        ReservationUnitNodeReservationSetArgs
     >({
       query: OPENING_HOURS,
       fetchPolicy: "no-cache",
       variables: {
         id,
-        startDate: String(toApiDate(startDate)),
-        endDate: String(toApiDate(endDate)),
-        from: toApiDate(startDate),
-        to: toApiDate(endDate),
-        state: allowedReservationStates,
-        includeWithSameComponents: true,
+        startDate: toApiDate(startDate) ?? "",
+        endDate: toApiDate(endDate) ?? "",
+        state: RELATED_RESERVATION_STATES,
       },
     });
 
@@ -281,7 +271,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       ? null
       : Number(queryParams.get("duration"));
     const reservations = filterNonNullable(
-      additionalData?.reservationUnit?.reservations
+      additionalData?.reservationUnit?.reservationSet
     );
     return {
       props: {
@@ -328,7 +318,7 @@ const EventWrapperComponent = ({
   event,
   ...props
 }: {
-  event: CalendarEvent<ReservationType>;
+  event: CalendarEvent<ReservationNode>;
 }) => {
   let isSmall = false;
   let isMedium = false;
@@ -596,7 +586,7 @@ const ReservationUnit = ({
         beginDate: toApiDate(now),
         user: currentUser?.pk?.toString(),
         reservationUnit: [reservationUnit?.pk?.toString() ?? ""],
-        state: allowedReservationStates,
+        state: RELATED_RESERVATION_STATES,
       },
     }
   );
@@ -657,7 +647,7 @@ const ReservationUnit = ({
     useState(false);
 
   const handleCalendarEventChange = useCallback(
-    ({ start, end }: CalendarEvent<ReservationType>): boolean => {
+    ({ start, end }: CalendarEvent<ReservationNode>): boolean => {
       if (!reservationUnit) {
         return false;
       }
@@ -763,7 +753,7 @@ const ReservationUnit = ({
     setCalendarViewType(isMobile ? "day" : "week");
   }, [isMobile]);
 
-  const calendarEvents: CalendarEvent<ReservationType>[] = useMemo(() => {
+  const calendarEvents: CalendarEvent<ReservationNode>[] = useMemo(() => {
     const diff =
       focusSlot?.durationMinutes != null ? focusSlot.durationMinutes : 0;
     const calendarDuration = diff >= 90 ? `(${formatDuration(diff, t)})` : "";
@@ -792,9 +782,9 @@ const ReservationUnit = ({
     ]
       .filter((n): n is NonNullable<typeof n> => n != null)
       .map((n) => {
-        const suffix = n.state === "INITIAL" ? calendarDuration : "";
         const { begin: start, end } = n;
-        const event: CalendarEvent<ReservationType> = {
+        const suffix = n.state === "INITIAL" ? calendarDuration : "";
+        const event: CalendarEvent<ReservationNode> = {
           title: `${
             n.state === "CANCELLED"
               ? `${t("reservationCalendar:prefixForCancelled")}: `
@@ -804,7 +794,7 @@ const ReservationUnit = ({
           end: new Date(end ?? ""),
           allDay: false,
           // TODO refactor and remove modifying the state
-          event: n as ReservationType,
+          event: n as ReservationNode,
         };
 
         return event;
@@ -930,7 +920,7 @@ const ReservationUnit = ({
       handleCalendarEventChange({
         start,
         end,
-      } as CalendarEvent<ReservationType>);
+      } as CalendarEvent<ReservationNode>);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storedReservation?.begin, storedReservation?.end]);
@@ -963,7 +953,7 @@ const ReservationUnit = ({
   const formatters = getFormatters(i18n.language);
   const currentDate = focusDate ?? now;
   const dayStartTime = addHours(startOfDay(currentDate), 6);
-  const equipment = filterNonNullable(reservationUnit?.equipment);
+  const equipment = filterNonNullable(reservationUnit?.equipments);
 
   const onScroll = () => {
     const banner: HTMLElement | null = window.document.querySelector(
@@ -1115,7 +1105,7 @@ const ReservationUnit = ({
                     </StyledNotification>
                   )}
                 <div aria-hidden ref={calendarRef}>
-                  <Calendar<ReservationType>
+                  <Calendar<ReservationNode>
                     events={[...calendarEvents, ...eventBuffers]}
                     begin={focusDate}
                     onNavigate={(d: Date) =>
@@ -1135,7 +1125,7 @@ const ReservationUnit = ({
                         setCalendarViewType(n);
                       }
                     }}
-                    onSelecting={(event: CalendarEvent<ReservationType>) =>
+                    onSelecting={(event: CalendarEvent<ReservationNode>) =>
                       handleCalendarEventChange(event)
                     }
                     min={dayStartTime}

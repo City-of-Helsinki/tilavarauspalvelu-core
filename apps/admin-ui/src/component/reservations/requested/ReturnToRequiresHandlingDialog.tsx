@@ -2,10 +2,10 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { useMutation } from "@apollo/client";
 import { Button, Dialog, IconInfoCircle } from "hds-react";
-import {
+import type {
   Mutation,
   ReservationRequiresHandlingMutationInput,
-  ReservationType,
+  ReservationNode,
 } from "common/types/gql-types";
 import { useModal } from "../../../context/ModalContext";
 import { REQUIRE_HANDLING_RESERVATION } from "./queries";
@@ -16,7 +16,7 @@ const DialogContent = ({
   onClose,
   onAccept,
 }: {
-  reservation: ReservationType;
+  reservation: ReservationNode;
   onClose: () => void;
   onAccept: () => void;
 }) => {
@@ -79,7 +79,7 @@ const ReturnToRequiredHandlingDialog = ({
   onClose,
   onAccept,
 }: {
-  reservation: ReservationType;
+  reservation: ReservationNode;
 
   onClose: () => void;
   onAccept: () => void;

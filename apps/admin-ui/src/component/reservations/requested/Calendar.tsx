@@ -3,7 +3,10 @@ import CommonCalendar from "common/src/calendar/Calendar";
 import { Toolbar } from "common/src/calendar/Toolbar";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { Type, type ReservationType } from "common/types/gql-types";
+import {
+  type ReservationNode,
+  ReservationTypeChoice,
+} from "common/types/gql-types";
 import { useModal } from "app/context/ModalContext";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
 import Legend from "./Legend";
@@ -12,12 +15,12 @@ import { isPossibleToEdit } from "./reservationModificationRules";
 import { getEventBuffers } from "common/src/calendar/util";
 
 type Props = {
-  reservation: ReservationType;
+  reservation: ReservationNode;
   refetch?: (focusDate?: Date) => void;
-  selected?: ReservationType;
+  selected?: ReservationNode;
   focusDate: Date;
   events: Array<{
-    event: ReservationType;
+    event: ReservationNode;
     title?: string;
     start: Date;
     end: Date;
@@ -88,13 +91,15 @@ const Calendar = ({
 
   const eventBuffers = events
     ? getEventBuffers(
-        events.map((e) => e.event).filter((e) => e?.type !== Type.Blocked)
+        events
+          .map((e) => e.event)
+          .filter((e) => e?.type !== ReservationTypeChoice.Blocked)
       )
     : [];
 
   return (
     <Container>
-      <CommonCalendar<ReservationType>
+      <CommonCalendar<ReservationNode>
         events={[...events, ...eventBuffers]}
         toolbarComponent={(props) => (
           <Toolbar {...props}>

@@ -1,18 +1,20 @@
 import { useState } from "react";
-import { ApolloError, useMutation, useQuery } from "@apollo/client";
+import { type ApolloError, useMutation, useQuery } from "@apollo/client";
 import {
-  PaymentOrderType,
-  Query,
-  QueryOrderArgs,
-  QueryReservationArgs,
-  QueryReservationsArgs,
-  RefreshOrderMutationInput,
-  RefreshOrderMutationPayload,
-  ReservationDeleteMutationInput,
-  ReservationDeleteMutationPayload,
-  ReservationType,
+  type PaymentOrderNode,
+  type Query,
+  type QueryOrderArgs,
+  type QueryReservationArgs,
+  type QueryReservationsArgs,
+  type RefreshOrderMutationInput,
+  type RefreshOrderMutationPayload,
+  type ReservationDeleteMutationInput,
+  type ReservationDeleteMutationPayload,
+  type ReservationNode,
   State,
-  UserType,
+  type UserNode,
+  OrderStatus,
+  ReservationOrderingChoices,
 } from "common/types/gql-types";
 import {
   DELETE_RESERVATION,
@@ -31,14 +33,14 @@ type UseOrderProps = {
 export const useOrder = ({
   orderUuid,
 }: UseOrderProps): {
-  order?: PaymentOrderType;
+  order?: PaymentOrderNode;
   isError: boolean;
   refreshError?: ApolloError;
   isLoading: boolean;
   refresh: () => void;
   called: boolean;
 } => {
-  const [data, setData] = useState<PaymentOrderType | undefined>(undefined);
+  const [data, setData] = useState<PaymentOrderNode | undefined>(undefined);
   const [called, setCalled] = useState(false);
 
   const { error, loading: orderLoading } = useQuery<Query, QueryOrderArgs>(
@@ -46,7 +48,7 @@ export const useOrder = ({
     {
       fetchPolicy: "no-cache",
       skip: !orderUuid,
-      variables: { orderUuid },
+      variables: { orderUuid: orderUuid ?? "" },
       onCompleted: (res) => {
         setCalled(true);
         setData(res?.order ?? undefined);
@@ -65,9 +67,10 @@ export const useOrder = ({
       fetchPolicy: "no-cache",
       variables: { input: { orderUuid: orderUuid ?? "" } },
       onCompleted: (res) => {
-        const newData =
-          data != null
-            ? { ...data, status: res.refreshOrder.status }
+        // TODO type safe coerse status: string to OrderStatus
+        const newData: PaymentOrderNode | undefined =
+          data != null && res.refreshOrder != null
+            ? { ...data, status: res.refreshOrder.status as OrderStatus }
             : undefined;
         setData(newData);
       },
@@ -110,12 +113,12 @@ export function useDeleteReservation() {
 }
 
 export function useReservation({ reservationPk }: UseReservationProps): {
-  reservation?: ReservationType;
+  reservation?: ReservationNode;
   error?: ApolloError;
   loading: boolean;
 } {
   // TODO typesafe way to get typename
-  const typename = "ReservationType";
+  const typename = "ReservationNode";
   const id = base64encode(`${typename}:${reservationPk}`);
   const { data, error, loading } = useQuery<Query, QueryReservationArgs>(
     GET_RESERVATION,
@@ -136,9 +139,9 @@ export function useReservation({ reservationPk }: UseReservationProps): {
 }
 
 type UseReservationsProps = {
-  currentUser?: UserType;
+  currentUser?: UserNode;
   states?: State[];
-  orderBy?: string;
+  orderBy?: ReservationOrderingChoices;
 };
 
 // Only used by InProgressReservationNotification
@@ -147,7 +150,7 @@ export function useReservations({
   states,
   orderBy,
 }: UseReservationsProps): {
-  reservations: ReservationType[];
+  reservations: ReservationNode[];
   error?: ApolloError;
   loading: boolean;
 } {
@@ -157,7 +160,8 @@ export function useReservations({
       skip: !currentUser?.pk,
       variables: {
         ...(states != null && states?.length > 0 && { state: states }),
-        ...(orderBy && { orderBy }),
+        // TODO should we just pass an array here?
+        ...(orderBy && { orderBy: [orderBy] }),
         user: currentUser?.pk?.toString(),
         beginDate: toApiDate(new Date()),
       },

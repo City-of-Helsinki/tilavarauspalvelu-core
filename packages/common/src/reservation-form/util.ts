@@ -1,20 +1,26 @@
 import { camelCase, get, uniq } from "lodash";
-import { ReserveeType } from "../../types/gql-types";
+import {
+  CustomerTypeChoice,
+  ReservationMetadataFieldNode,
+} from "../../types/gql-types";
 import { reservationApplicationFields } from "./types";
+import { containsField } from "../helpers";
 
-export const getReservationApplicationFields = ({
+export function getReservationApplicationFields({
   supportedFields,
   reserveeType,
 }: {
-  supportedFields: string[];
-  reserveeType: ReserveeType | "common";
-}): string[] => {
-  if (!supportedFields || supportedFields?.length === 0 || !reserveeType)
+  supportedFields: ReservationMetadataFieldNode[];
+  reserveeType: CustomerTypeChoice | "common";
+}): string[] {
+  if (!supportedFields || supportedFields?.length === 0 || !reserveeType) {
     return [];
+  }
 
+  // TODO this is weird, why?
   const fields = uniq<string>(
     get(reservationApplicationFields, reserveeType.toLocaleLowerCase()).filter(
-      (field: string) => supportedFields.includes(field)
+      (field: string) => containsField(supportedFields, field)
     )
   );
 
@@ -26,7 +32,7 @@ export const getReservationApplicationFields = ({
   }
 
   return fields.map(camelCase);
-};
+}
 
 export function removeRefParam<Type>(
   params: Type & { ref: unknown }

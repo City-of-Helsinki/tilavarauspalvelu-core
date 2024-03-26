@@ -12,12 +12,12 @@ import {
   ReservationKind,
   Status,
   PriceUnit,
-  type ReservationUnitPricingType,
+  type ReservationUnitPricingNode,
   type ReservationUnitUpdateMutationInput,
   type ReservationUnitCreateMutationInput,
   ImageType,
-  type ReservationUnitImageType,
-  type ReservationUnitType,
+  type ReservationUnitImageNode,
+  type ReservationUnitNode,
 } from "common/types/gql-types";
 import { addDays, format } from "date-fns";
 import { z } from "zod";
@@ -647,7 +647,7 @@ const convertMaybeDecimal = (value?: unknown) => {
   return Number(value);
 };
 
-const convertPricing = (p?: ReservationUnitPricingType): PricingFormValues => {
+const convertPricing = (p?: ReservationUnitPricingNode): PricingFormValues => {
   const convertBegins = (begins?: string, status?: Status) => {
     const d = begins != null && begins !== "" ? fromApiDate(begins) : undefined;
     const today = new Date();
@@ -681,11 +681,11 @@ const convertPricing = (p?: ReservationUnitPricingType): PricingFormValues => {
 // Always return one active pricing and one future pricing
 // the boolean toggle in the form decides if the future one is shown or saved
 const convertPricingList = (
-  pricings: ReservationUnitPricingType[]
+  pricings: ReservationUnitPricingNode[]
 ): PricingFormValues[] => {
-  const isActive = (p?: ReservationUnitPricingType) =>
+  const isActive = (p?: ReservationUnitPricingNode) =>
     p?.status === Status.Active;
-  const isFuture = (p?: ReservationUnitPricingType) =>
+  const isFuture = (p?: ReservationUnitPricingNode) =>
     p?.status === Status.Future;
 
   const active = pricings.find(isActive);
@@ -694,13 +694,13 @@ const convertPricingList = (
     pricings.find(isFuture) ??
     ({
       status: Status.Future,
-    } as ReservationUnitPricingType);
+    } as ReservationUnitPricingNode);
 
   // allow undefined's here so we create two default values always
   return [active, future].map(convertPricing);
 };
 
-const convertImage = (image?: ReservationUnitImageType): ImageFormType => {
+const convertImage = (image?: ReservationUnitImageNode): ImageFormType => {
   return {
     pk: image?.pk ?? 0,
     imageUrl: image?.imageUrl ?? undefined,
@@ -727,7 +727,7 @@ const convertTime = (t?: string) => {
 // Always return all 7 days
 // Always return at least one reservableTime
 function convertSeasonalList(
-  data: NonNullable<ReservationUnitType["applicationRoundTimeSlots"]>
+  data: NonNullable<ReservationUnitNode["applicationRoundTimeSlots"]>
 ): ReservationUnitEditFormValues["seasons"] {
   const days = [0, 1, 2, 3, 4, 5, 6];
   return days.map((d) => {
@@ -747,7 +747,7 @@ function convertSeasonalList(
 }
 
 export const convertReservationUnit = (
-  data?: ReservationUnitType
+  data?: ReservationUnitNode
 ): ReservationUnitEditFormValues => {
   return {
     reservationBlockWholeDay:
@@ -829,7 +829,7 @@ export const convertReservationUnit = (
     termsOfUseSv: data?.termsOfUseSv ?? "",
     spacePks: filterNonNullable(data?.spaces?.map((s) => s?.pk)),
     resourcePks: filterNonNullable(data?.resources?.map((r) => r?.pk)),
-    equipmentPks: filterNonNullable(data?.equipment?.map((e) => e?.pk)),
+    equipmentPks: filterNonNullable(data?.equipments?.map((e) => e?.pk)),
     purposePks: filterNonNullable(data?.purposes?.map((p) => p?.pk)),
     qualifierPks: filterNonNullable(data?.qualifiers?.map((q) => q?.pk)),
     surfaceArea: data?.surfaceArea ?? 0,

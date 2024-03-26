@@ -2,12 +2,12 @@ import React, { useMemo } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
-import { EquipmentType } from "common/types/gql-types";
+import { EquipmentNode } from "common/types/gql-types";
 import { ShowAllContainer } from "common/src/components";
 import { getEquipmentList } from "../../modules/reservationUnit";
 
 type Props = {
-  equipment: EquipmentType[];
+  equipment: EquipmentNode[];
   itemsToShow?: number;
 };
 

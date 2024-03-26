@@ -4,7 +4,7 @@ export const SEARCH_FORM_PARAMS_UNIT = gql`
   query SearchFormParamsUnit(
     $publishedReservationUnits: Boolean
     $ownReservations: Boolean
-    $orderBy: String
+    $orderBy: [UnitOrderingChoices]
   ) {
     units(
       publishedReservationUnits: $publishedReservationUnits
@@ -24,7 +24,7 @@ export const SEARCH_FORM_PARAMS_UNIT = gql`
 `;
 
 export const RESERVATION_UNIT_PURPOSES = gql`
-  query ReservationUnitPurposes($orderBy: String) {
+  query ReservationUnitPurposes($orderBy: [PurposeOrderingChoices]) {
     purposes(orderBy: $orderBy) {
       edges {
         node {

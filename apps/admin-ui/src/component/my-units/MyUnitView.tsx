@@ -51,7 +51,7 @@ const ReservationTabPanel = styled(UnitCalendarTabPanel)`
   }
 `;
 
-const MyUnitView = () => {
+function MyUnitView() {
   const { unitId } = useParams<Params>();
   const { t } = useTranslation();
 
@@ -66,12 +66,16 @@ const MyUnitView = () => {
     },
   ];
 
-  const { loading, data: unitData } = useUnitQuery(unitId);
+  const { loading, data } = useUnitQuery(unitId);
 
-  const unit = unitData?.units?.edges.find(() => true)?.node ?? undefined;
+  const { unit } = data ?? {};
 
-  if (loading || !unit || !unitId) {
+  if (loading) {
     return <Loader />;
+  }
+  // TODO improve the error reporting (404)
+  if (!unit || !unitId) {
+    return <div>{t("MyUnits.Calendar.error.unitNotFound")}</div>;
   }
 
   const recurringReservationUrl = `${myUnitUrl(
@@ -124,6 +128,6 @@ const MyUnitView = () => {
       </ContainerHack>
     </>
   );
-};
+}
 
 export default MyUnitView;

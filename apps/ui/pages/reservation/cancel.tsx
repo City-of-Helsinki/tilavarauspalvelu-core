@@ -56,7 +56,7 @@ const Cancel = ({ apiBaseUrl }: Props): JSX.Element => {
     const { reservationPk } = order || {};
     if (reservationPk) {
       deleteReservation({
-        variables: { input: { pk: parseInt(reservationPk, 10) } },
+        variables: { input: { pk: reservationPk } },
       });
     }
   }, [deleteReservation, order]);

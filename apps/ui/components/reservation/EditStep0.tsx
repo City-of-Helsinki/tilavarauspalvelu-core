@@ -7,10 +7,10 @@ import {
 } from "common/src/calendar/util";
 import { breakpoints } from "common/src/common/style";
 import type { PendingReservation } from "common/types/common";
-import {
+import type {
   ApplicationRoundNode,
-  ReservationType,
-  ReservationUnitType,
+  ReservationNode,
+  ReservationUnitNode,
 } from "common/types/gql-types";
 import { addMinutes, addSeconds, differenceInMinutes } from "date-fns";
 import classNames from "classnames";
@@ -45,9 +45,9 @@ import { type PendingReservationFormType } from "@/components/reservation-unit/s
 import { fromUIDate, isValidDate, toUIDate } from "common/src/common/util";
 
 type Props = {
-  reservation: ReservationType;
-  reservationUnit: ReservationUnitType;
-  userReservations: ReservationType[];
+  reservation: ReservationNode;
+  reservationUnit: ReservationUnitNode;
+  userReservations: ReservationNode[];
   reservationForm: UseFormReturn<PendingReservationFormType>;
   activeApplicationRounds: ApplicationRoundNode[];
   setErrorMsg: React.Dispatch<React.SetStateAction<string | null>>;
@@ -117,15 +117,15 @@ any): JSX.Element => {
 /// The check functions use the reservationUnit instead of a list of other reservations
 /// so have to do some questionable edits.
 function getWithoutThisReservation(
-  reservationUnit: ReservationUnitType,
-  reservation: ReservationType
-): ReservationUnitType {
+  reservationUnit: ReservationUnitNode,
+  reservation: ReservationNode
+): ReservationUnitNode {
   const otherReservations = filterNonNullable(
-    reservationUnit?.reservations?.filter((n) => n?.pk !== reservation.pk)
+    reservationUnit?.reservationSet?.filter((n) => n?.pk !== reservation.pk)
   );
   return {
     ...reservationUnit,
-    reservations: otherReservations,
+    reservationSet: otherReservations,
   };
 }
 
@@ -233,7 +233,7 @@ const EditStep0 = ({
   );
   const isReservable = isSlotAvailable(focusSlot.start, focusSlot.end);
 
-  const calendarEvents: CalendarEvent<ReservationType>[] = useMemo(() => {
+  const calendarEvents: CalendarEvent<ReservationNode>[] = useMemo(() => {
     const diff = focusSlot.durationMinutes ?? 0;
     const dur = diff >= 90 ? `(${formatDuration(diff, t)})` : "";
     // TODO show different style if the reservation has not been modified
@@ -243,7 +243,7 @@ const EditStep0 = ({
       state: "INITIAL",
     };
     const resUnit = getWithoutThisReservation(reservationUnit, reservation);
-    const otherReservations = filterNonNullable(resUnit.reservations);
+    const otherReservations = filterNonNullable(resUnit.reservationSet);
     return [...otherReservations, currentReservation].map((n) => {
       const suffix = n.state === "INITIAL" ? dur : "";
       const event = {
@@ -258,7 +258,7 @@ const EditStep0 = ({
         event: n,
       };
 
-      return event as CalendarEvent<ReservationType>;
+      return event as CalendarEvent<ReservationNode>;
     });
   }, [reservationUnit, t, focusSlot, reservation]);
 
@@ -288,7 +288,7 @@ const EditStep0 = ({
         : reservationBufferTimeAfter;
 
     return getEventBuffers([
-      ...(calendarEvents.flatMap((e) => e.event) as ReservationType[]),
+      ...(calendarEvents.flatMap((e) => e.event) as ReservationNode[]),
       {
         begin: focusSlot.start.toISOString(),
         end: focusSlot.end.toISOString(),
@@ -378,7 +378,7 @@ const EditStep0 = ({
 
   const handleCalendarEventChange = useCallback(
     (
-      { start, end }: CalendarEvent<ReservationType>,
+      { start, end }: CalendarEvent<ReservationNode>,
       skipLengthCheck = false
     ): boolean => {
       if (!isSlotAvailable(start, end, skipLengthCheck)) {
@@ -454,7 +454,7 @@ const EditStep0 = ({
     <>
       <CalendarWrapper>
         <div aria-hidden>
-          <Calendar<ReservationType>
+          <Calendar<ReservationNode>
             events={events}
             begin={focusDate}
             // TODO should not set the reservation date, but a separate focus date

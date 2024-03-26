@@ -1,7 +1,7 @@
 import {
-  type ReservationType,
-  type ReservationUnitType,
-  ReserveeType,
+  type ReservationNode,
+  type ReservationUnitNode,
+  CustomerTypeChoice,
 } from "common/types/gql-types";
 import { IconArrowLeft, IconCross, LoadingSpinner } from "hds-react";
 import { get } from "lodash";
@@ -24,8 +24,8 @@ import { filterNonNullable } from "common/src/helpers";
 import { useGenericTerms } from "common/src/hooks/useGenericTerms";
 
 type Props = {
-  reservation: ReservationType;
-  reservationUnit: ReservationUnitType;
+  reservation: ReservationNode;
+  reservationUnit: ReservationUnitNode;
   setErrorMsg: React.Dispatch<React.SetStateAction<string | null>>;
   setStep: React.Dispatch<React.SetStateAction<number>>;
   handleSubmit: () => void;
@@ -86,7 +86,7 @@ const EditStep1 = ({
 
   const frozenReservationUnit = useMemo(() => {
     return (
-      reservation.reservationUnits?.find((n) => n?.pk === reservationUnit.pk) ??
+      reservation.reservationUnit?.find((n) => n?.pk === reservationUnit.pk) ??
       undefined
     );
   }, [reservation, reservationUnit]);
@@ -104,9 +104,10 @@ const EditStep1 = ({
     reserveeType: "common",
   }).filter((n) => n !== "reserveeType");
 
-  const type = supportedFields.includes("reservee_type")
-    ? reservation.reserveeType
-    : ReserveeType.Individual;
+  const type =
+    supportedFields.find((x) => x.fieldName === "reservee_type") != null
+      ? reservation.reserveeType
+      : CustomerTypeChoice.Individual;
   const reservationApplicationFields = getReservationApplicationFields({
     supportedFields,
     reserveeType: type ?? "common",

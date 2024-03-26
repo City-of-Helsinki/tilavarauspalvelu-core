@@ -6,10 +6,6 @@ export const CREATE_STAFF_RESERVATION = gql`
   ) {
     createStaffReservation(input: $input) {
       pk
-      errors {
-        field
-        messages
-      }
     }
   }
 `;

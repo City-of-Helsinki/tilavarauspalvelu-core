@@ -49,13 +49,6 @@ function WorkingMemo({
       ) {
         throw new Error("No data returned");
       }
-      const { updateReservationWorkingMemo } = data;
-      if (updateReservationWorkingMemo != null) {
-        const { errors: errs } = updateReservationWorkingMemo;
-        if (errs != null) {
-          throw new Error(errs[0]?.messages.find((m) => m != null));
-        }
-      }
       notifySuccess(t("RequestedReservation.savedWorkingMemo"));
       onSuccess();
     } catch (ex) {

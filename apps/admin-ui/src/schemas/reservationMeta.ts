@@ -2,7 +2,7 @@
 // TODO move to common after they are tested in use with
 // CreateReservationModal / RecurringReservation / EditReservation
 
-import { ReserveeType } from "common/types/gql-types";
+import { CustomerTypeChoice } from "common/types/gql-types";
 import { z } from "zod";
 import { OptionSchema } from "common/src/schemas/schemaCommon";
 
@@ -39,9 +39,9 @@ export const ReservationFormMetaSchema = z.object({
   // TODO test what happens if the user submits a form with a null value?
   reserveeType: z
     .enum([
-      ReserveeType.Individual,
-      ReserveeType.Nonprofit,
-      ReserveeType.Business,
+      CustomerTypeChoice.Individual,
+      CustomerTypeChoice.Nonprofit,
+      CustomerTypeChoice.Business,
     ])
     .nullable(),
 });

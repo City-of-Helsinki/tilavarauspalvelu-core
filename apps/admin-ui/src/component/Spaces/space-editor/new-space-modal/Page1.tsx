@@ -7,7 +7,7 @@ import {
   NumberInput,
 } from "hds-react";
 import { useTranslation } from "react-i18next";
-import { UnitByPkType } from "common/types/gql-types";
+import { type UnitNode } from "common/types/gql-types";
 import { CustomDialogHeader } from "../../../CustomDialogHeader";
 import ParentSelector from "../ParentSelector";
 import {
@@ -32,7 +32,7 @@ const Page1 = ({
   hasFixedParent,
 }: {
   editorState: State;
-  unit: UnitByPkType;
+  unit: UnitNode;
   dispatch: React.Dispatch<Action>;
   closeModal: () => void;
   hasFixedParent: boolean;

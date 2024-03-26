@@ -10,11 +10,11 @@ import { breakpoints } from "common/src/common/style";
 import {
   type Maybe,
   type Query,
-  type ReservationType,
-  ReserveeType,
+  type QueryReservationArgs,
+  type ReservationNode,
+  CustomerTypeChoice,
   PricingType,
   State,
-  type QueryReservationArgs,
 } from "common/types/gql-types";
 import { Permission } from "@/modules/permissionHelper";
 import { useNotification } from "@/context/NotificationContext";
@@ -32,7 +32,7 @@ import {
   createTagString,
   getName,
   getReservatinUnitPricing,
-  getTranslationKeyForReserveeType,
+  getTranslationKeyForCustomerTypeChoice,
   reservationPrice,
 } from "./util";
 import Calendar from "./Calendar";
@@ -120,7 +120,7 @@ const ButtonsWithPermChecks = ({
   onReservationUpdated,
   disableNonEssentialButtons,
 }: {
-  reservation: ReservationType;
+  reservation: ReservationNode;
   isFree: boolean;
   // Hack to deal with reservation query not being cached so we need to refetch
   onReservationUpdated: () => void;
@@ -164,8 +164,8 @@ const ButtonsWithPermChecks = ({
   );
 };
 
-const translateType = (res: ReservationType, t: TFunction) => {
-  const [part1, part2] = getTranslationKeyForReserveeType(
+const translateType = (res: ReservationNode, t: TFunction) => {
+  const [part1, part2] = getTranslationKeyForCustomerTypeChoice(
     res.type ?? undefined,
     res.reserveeType ?? undefined,
     res.reserveeIsUnregisteredAssociation ?? false
@@ -177,7 +177,7 @@ const ReservationSummary = ({
   reservation,
   isFree,
 }: {
-  reservation: ReservationType;
+  reservation: ReservationNode;
   isFree: boolean;
 }) => {
   const { t } = useTranslation();
@@ -287,10 +287,10 @@ const TimeBlock = ({
   reservation,
   onReservationUpdated,
 }: {
-  reservation: ReservationType;
+  reservation: ReservationNode;
   onReservationUpdated: () => void;
 }) => {
-  const [selected, setSelected] = useState<ReservationType | undefined>(
+  const [selected, setSelected] = useState<ReservationNode | undefined>(
     undefined
   );
 
@@ -324,7 +324,7 @@ const TimeBlock = ({
   const { events: eventsAll, refetch: calendarRefetch } = useReservationData(
     startOfISOWeek(focusDate),
     add(startOfISOWeek(focusDate), { days: 7 }),
-    String(reservation?.reservationUnits?.[0]?.pk),
+    reservation?.reservationUnit?.[0]?.pk ?? undefined,
     reservation?.pk ?? undefined
   );
 
@@ -374,16 +374,16 @@ const RequestedReservation = ({
   reservation,
   refetch,
 }: {
-  reservation: ReservationType;
+  reservation: ReservationNode;
   refetch: () => void;
 }): JSX.Element | null => {
   const { t } = useTranslation();
 
   const ref = useRef<HTMLHeadingElement>(null);
 
-  const pricing = reservation?.reservationUnits?.[0]
+  const pricing = reservation?.reservationUnit?.[0]
     ? getReservatinUnitPricing(
-        reservation?.reservationUnits?.[0],
+        reservation?.reservationUnit?.[0],
         reservation.begin
       )
     : undefined;
@@ -493,11 +493,13 @@ const RequestedReservation = ({
               <ApplicationData
                 label={t("RequestedReservation.reserveeType")}
                 data={translateType(reservation, t)}
-                wide={reservation.reserveeType === ReserveeType.Individual}
+                wide={
+                  reservation.reserveeType === CustomerTypeChoice.Individual
+                }
               />
               <ApplicationData
                 label={t(
-                  reservation.reserveeType === ReserveeType.Business
+                  reservation.reserveeType === CustomerTypeChoice.Business
                     ? "RequestedReservation.reserveeBusinessName"
                     : "RequestedReservation.reserveeOrganisationName"
                 )}
@@ -609,20 +611,18 @@ const RequestedReservation = ({
   );
 };
 
-const PermissionWrappedReservation = () => {
+function PermissionWrappedReservation() {
   const { id: pk } = useParams() as { id: string };
   const { t } = useTranslation();
   const { notifyError } = useNotification();
-  const typename = "ReservationType";
+  const typename = "ReservationNode";
   const id = base64encode(`${typename}:${pk}`);
   const { data, loading, refetch } = useQuery<Query, QueryReservationArgs>(
     SINGLE_RESERVATION_QUERY,
     {
       skip: !pk || Number.isNaN(Number(pk)),
       fetchPolicy: "no-cache",
-      variables: {
-        id,
-      },
+      variables: { id },
       onError: () => {
         notifyError(t("errors.errorFetchingData"));
       },
@@ -652,6 +652,6 @@ const PermissionWrappedReservation = () => {
       <RequestedReservation reservation={reservation} refetch={refetch} />
     </VisibleIfPermission>
   );
-};
+}
 
 export default PermissionWrappedReservation;

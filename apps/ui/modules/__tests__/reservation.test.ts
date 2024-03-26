@@ -1,15 +1,15 @@
 import { get as mockGet } from "lodash";
 import { addDays, addHours, addMinutes, startOfToday } from "date-fns";
 import {
-  PaymentOrderType,
+  PaymentOrderNode,
   State,
-  ReservationType,
+  ReservationNode,
   ReservationStartInterval,
   Authentication,
   ReservationKind,
-  ReservationUnitCancellationRuleType,
-  ReservationUnitType,
-  ReserveeType,
+  ReservationUnitCancellationRuleNode,
+  ReservationUnitNode,
+  CustomerTypeChoice,
 } from "common/types/gql-types";
 import {
   CanReservationBeChangedProps,
@@ -100,7 +100,7 @@ describe("getDurationOptions", () => {
   });
 });
 
-const reservationUnit: ReservationUnitType = {
+const reservationUnit: ReservationUnitNode = {
   authentication: Authentication.Weak,
   canApplyFreeOfCharge: false,
   contactInformation: "",
@@ -130,19 +130,19 @@ const reservationUnit: ReservationUnitType = {
   reservationBlockWholeDay: false,
 };
 
-const reservation: ReservationType = {
+const reservation: ReservationNode = {
   id: "123f4w90",
   state: State.Confirmed,
   price: 0,
   begin: addHours(startOfToday(), 34).toISOString(),
   end: addHours(startOfToday(), 35).toISOString(),
-  reservationUnits: [reservationUnit as ReservationUnitType],
+  reservationUnits: [reservationUnit as ReservationUnitNode],
   handlingDetails: "",
 };
 
 describe("canUserCancelReservation", () => {
   test("that needs handling", () => {
-    const res: ReservationType = {
+    const res: ReservationNode = {
       ...reservation,
       begin: new Date().toISOString(),
       end: addHours(new Date(), 1).toISOString(),
@@ -152,15 +152,15 @@ describe("canUserCancelReservation", () => {
           ...reservationUnit,
           cancellationRule: {
             needsHandling: true,
-          } as ReservationUnitCancellationRuleType,
-        } as ReservationUnitType,
+          } as ReservationUnitCancellationRuleNode,
+        } as ReservationUnitNode,
       ],
     };
     expect(canUserCancelReservation(res)).toBe(false);
   });
 
   test("that does not need handling", () => {
-    const res: ReservationType = {
+    const res: ReservationNode = {
       ...reservation,
       begin: addMinutes(new Date(), 10).toISOString(),
       state: State.Confirmed,
@@ -169,8 +169,8 @@ describe("canUserCancelReservation", () => {
           ...reservationUnit,
           cancellationRule: {
             needsHandling: false,
-          } as ReservationUnitCancellationRuleType,
-        } as ReservationUnitType,
+          } as ReservationUnitCancellationRuleNode,
+        } as ReservationUnitNode,
       ],
     };
     expect(canUserCancelReservation(res)).toBe(true);
@@ -187,7 +187,7 @@ describe("canUserCancelReservation", () => {
           },
         },
       ],
-    } as ReservationType;
+    } as ReservationNode;
     expect(canUserCancelReservation(reservation_)).toBe(true);
   });
 
@@ -202,7 +202,7 @@ describe("canUserCancelReservation", () => {
           },
         },
       ],
-    } as ReservationType;
+    } as ReservationNode;
     expect(canUserCancelReservation(reservation_)).toBe(false);
   });
 
@@ -218,7 +218,7 @@ describe("canUserCancelReservation", () => {
           },
         },
       ],
-    } as ReservationType;
+    } as ReservationNode;
     expect(canUserCancelReservation(reservation_)).toBe(true);
   });
 
@@ -233,7 +233,7 @@ describe("canUserCancelReservation", () => {
           },
         },
       ],
-    } as ReservationType;
+    } as ReservationNode;
     expect(canUserCancelReservation(reservation_)).toBe(false);
   });
 
@@ -241,7 +241,7 @@ describe("canUserCancelReservation", () => {
     const reservation_ = {
       begin: new Date().toISOString(),
       reservationUnits: [{}],
-    } as ReservationType;
+    } as ReservationNode;
     expect(canUserCancelReservation(reservation_)).toBe(false);
   });
 });
@@ -249,9 +249,13 @@ describe("canUserCancelReservation", () => {
 describe("getReservationApplcationMutationValues", () => {
   test("with empty input", () => {
     expect(
-      getReservationApplicationMutationValues({}, [], ReserveeType.Individual)
+      getReservationApplicationMutationValues(
+        {},
+        [],
+        CustomerTypeChoice.Individual
+      )
     ).toEqual({
-      reserveeType: ReserveeType.Individual,
+      reserveeType: CustomerTypeChoice.Individual,
     });
   });
 
@@ -265,12 +269,12 @@ describe("getReservationApplcationMutationValues", () => {
       getReservationApplicationMutationValues(
         payload,
         ["name", "reservee_id", "reservee_first_name"],
-        ReserveeType.Individual
+        CustomerTypeChoice.Individual
       )
     ).toEqual({
       name: "Nimi",
       reserveeFirstName: "Etunimi",
-      reserveeType: ReserveeType.Individual,
+      reserveeType: CustomerTypeChoice.Individual,
     });
   });
 });
@@ -280,29 +284,29 @@ describe("isReservationInThePast", () => {
     expect(
       isReservationInThePast({
         begin: new Date(),
-      } as unknown as ReservationType)
+      } as unknown as ReservationNode)
     ).toBe(true);
 
     expect(
       isReservationInThePast({
         begin: addMinutes(new Date(), 10),
-      } as unknown as ReservationType)
+      } as unknown as ReservationNode)
     ).toBe(false);
 
     expect(
       isReservationInThePast({
         begin: addMinutes(new Date(), -10),
-      } as unknown as ReservationType)
+      } as unknown as ReservationNode)
     ).toBe(true);
   });
 
   test("with invalid data", () => {
-    expect(isReservationInThePast({} as ReservationType)).toBe(false);
+    expect(isReservationInThePast({} as ReservationNode)).toBe(false);
   });
 });
 
 describe("getReservationCancellationReason", () => {
-  const reservation2: ReservationType = {
+  const reservation2: ReservationNode = {
     ...reservation,
     begin: addMinutes(new Date(), 60).toISOString(),
     reservationUnits: [
@@ -312,8 +316,8 @@ describe("getReservationCancellationReason", () => {
           id: "fr8ejifod",
           canBeCancelledTimeBefore: 10,
           needsHandling: false,
-        } as ReservationUnitCancellationRuleType,
-      } as ReservationUnitType,
+        } as ReservationUnitCancellationRuleNode,
+      } as ReservationUnitNode,
     ],
   };
 
@@ -327,10 +331,10 @@ describe("getReservationCancellationReason", () => {
   });
 
   test("with no cancellation rule", () => {
-    const resUnit: ReservationUnitType = {
+    const resUnit: ReservationUnitNode = {
       ...reservationUnit,
       cancellationRule: null,
-    } as ReservationUnitType;
+    } as ReservationUnitNode;
 
     expect(
       getReservationCancellationReason({
@@ -341,13 +345,13 @@ describe("getReservationCancellationReason", () => {
   });
 
   test("with required handling", () => {
-    const resUnit: ReservationUnitType = {
+    const resUnit: ReservationUnitNode = {
       ...reservationUnit,
       cancellationRule: {
         ...reservationUnit.cancellationRule,
         needsHandling: true,
-      } as ReservationUnitCancellationRuleType,
-    } as ReservationUnitType;
+      } as ReservationUnitCancellationRuleNode,
+    } as ReservationUnitNode;
     expect(
       getReservationCancellationReason({
         ...reservation,
@@ -360,7 +364,7 @@ describe("getReservationCancellationReason", () => {
     expect(
       getReservationCancellationReason({
         ...reservation,
-      } as ReservationType)
+      } as ReservationNode)
     ).toBe(null);
   });
 
@@ -371,8 +375,8 @@ describe("getReservationCancellationReason", () => {
       cancellationRule: {
         ...reservationUnit.cancellationRule,
         canBeCancelledTimeBefore: 3600,
-      } as ReservationUnitCancellationRuleType,
-    } as ReservationUnitType;
+      } as ReservationUnitCancellationRuleNode,
+    } as ReservationUnitNode;
 
     expect(
       getReservationCancellationReason({
@@ -386,13 +390,13 @@ describe("getReservationCancellationReason", () => {
   });
 
   test("can't cancel if the reservation is too close to the start time", () => {
-    const resUnit: ReservationUnitType = {
+    const resUnit: ReservationUnitNode = {
       ...reservationUnit,
       cancellationRule: {
         ...reservationUnit.cancellationRule,
         canBeCancelledTimeBefore: 24 * 60 * 60, // 24 hours
-      } as ReservationUnitCancellationRuleType,
-    } as ReservationUnitType;
+      } as ReservationUnitCancellationRuleNode,
+    } as ReservationUnitNode;
 
     expect(
       getReservationCancellationReason({
@@ -412,8 +416,8 @@ describe("getNormalizedReservationOrderStatus", () => {
         state: "CANCELLED",
         order: {
           status: "DRAFT",
-        } as PaymentOrderType,
-      } as ReservationType)
+        } as PaymentOrderNode,
+      } as ReservationNode)
     ).toBe("DRAFT");
 
     expect(
@@ -421,8 +425,8 @@ describe("getNormalizedReservationOrderStatus", () => {
         state: "CANCELLED",
         order: {
           status: "PAID",
-        } as PaymentOrderType,
-      } as ReservationType)
+        } as PaymentOrderNode,
+      } as ReservationNode)
     ).toBe("PAID");
 
     expect(
@@ -430,8 +434,8 @@ describe("getNormalizedReservationOrderStatus", () => {
         state: "CONFIRMED",
         order: {
           status: "PAID_MANUALLY",
-        } as PaymentOrderType,
-      } as ReservationType)
+        } as PaymentOrderNode,
+      } as ReservationNode)
     ).toBe("PAID_MANUALLY");
 
     expect(
@@ -439,13 +443,13 @@ describe("getNormalizedReservationOrderStatus", () => {
         state: "DENIED",
         order: {
           status: "SOMETHING_ELSE",
-        } as PaymentOrderType,
-      } as ReservationType)
+        } as PaymentOrderNode,
+      } as ReservationNode)
     ).toBe("SOMETHING_ELSE");
   });
 
   test("return null", () => {
-    expect(getNormalizedReservationOrderStatus({} as ReservationType)).toBe(
+    expect(getNormalizedReservationOrderStatus({} as ReservationNode)).toBe(
       null
     );
 
@@ -454,8 +458,8 @@ describe("getNormalizedReservationOrderStatus", () => {
         state: "CREATED",
         order: {
           status: "DRAFT",
-        } as PaymentOrderType,
-      } as ReservationType)
+        } as PaymentOrderNode,
+      } as ReservationNode)
     ).toBe(null);
 
     expect(
@@ -463,8 +467,8 @@ describe("getNormalizedReservationOrderStatus", () => {
         state: "WAITING_FOR_PAYMENT",
         order: {
           status: "DRAFT",
-        } as PaymentOrderType,
-      } as ReservationType)
+        } as PaymentOrderNode,
+      } as ReservationNode)
     ).toBe(null);
 
     expect(
@@ -472,8 +476,8 @@ describe("getNormalizedReservationOrderStatus", () => {
         state: "REQUIRES_HANDLING",
         order: {
           status: "DRAFT",
-        } as PaymentOrderType,
-      } as ReservationType)
+        } as PaymentOrderNode,
+      } as ReservationNode)
     ).toBe(null);
   });
 });
@@ -730,7 +734,7 @@ describe("canReservationBeChanged", () => {
 });
 
 describe("getCheckoutUrl", () => {
-  const order: PaymentOrderType = {
+  const order: PaymentOrderNode = {
     id: "order-id",
     checkoutUrl: "https://checkout.url/path?user=1111-2222-3333-4444",
   };

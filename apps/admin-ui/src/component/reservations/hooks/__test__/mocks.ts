@@ -1,7 +1,7 @@
 import { GraphQLError } from "graphql";
 import { addDays, addHours, set } from "date-fns";
 import {
-  type ReservationType,
+  type ReservationNode,
   Authentication,
   ReservationKind,
   ReservationStartInterval,
@@ -74,9 +74,9 @@ const createRecurringEdges = (
       begin: getValidInterval(0)[0],
       end: getValidInterval(0)[1],
       pk: startingPk,
-      id: base64encode(`ReservationType:${startingPk}`),
+      id: base64encode(`ReservationNode:${startingPk}`),
       recurringReservation: {
-        id: base64encode(`RecurringReservationType:${recurringPk}`),
+        id: base64encode(`RecurringReservationNode:${recurringPk}`),
         pk: recurringPk,
       },
       state,
@@ -87,9 +87,9 @@ const createRecurringEdges = (
       begin: getValidInterval(7)[0],
       end: getValidInterval(7)[1],
       pk: startingPk + 1,
-      id: base64encode(`ReservationType:${startingPk + 1}`),
+      id: base64encode(`ReservationNode:${startingPk + 1}`),
       recurringReservation: {
-        id: base64encode(`RecurringReservationType:${recurringPk}`),
+        id: base64encode(`RecurringReservationNode:${recurringPk}`),
         pk: recurringPk,
       },
       state,
@@ -112,7 +112,6 @@ const correctRecurringReservationQueryResult = (
       variables: {
         pk: recurringPk,
         count: 100,
-        offset: 0,
         state: [State.Confirmed, State.Denied],
       },
     },
@@ -264,29 +263,29 @@ export const mocks = [
   ...correctRecurringReservationQueryResult(51, 4, { shouldFailAll: true }),
 ];
 
-export const mockReservation: ReservationType = {
+export const mockReservation: ReservationNode = {
   pk: 1,
   begin: "2024-01-01T10:00:00+00:00",
   end: "2024-01-01T14:00:00+00:00",
   state: State.Confirmed,
-  id: base64encode("ReservationType:1"),
+  id: base64encode("ReservationNode:1"),
   workingMemo: "empty",
   handlingDetails: "",
 };
 
-export const mockRecurringReservation: ReservationType = {
+export const mockRecurringReservation: ReservationNode = {
   ...mockReservation,
   pk: 21,
-  id: base64encode("ReservationType:21"),
+  id: base64encode("ReservationNode:21"),
   recurringReservation: {
     pk: 1,
-    id: base64encode("RecurringReservationType:1"),
+    id: base64encode("RecurringReservationNode:1"),
     name: "recurring",
     description: "",
     created: "2021-09-01T10:00:00+00:00",
     reservationUnit: {
       pk: 1,
-      id: base64encode("ReservationUnitType:1"),
+      id: base64encode("ReservationUnitNode:1"),
       images: [],
       isArchived: false,
       isDraft: false,

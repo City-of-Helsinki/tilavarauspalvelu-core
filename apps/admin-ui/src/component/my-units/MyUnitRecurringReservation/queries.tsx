@@ -6,29 +6,19 @@ export const CREATE_RECURRING_RESERVATION = gql`
   ) {
     createRecurringReservation(input: $input) {
       pk
-      errors {
-        field
-        messages
-      }
     }
   }
 `;
 
 export const GET_RESERVATIONS_IN_INTERVAL = gql`
-  query ReservationTimesInReservationUnit($id: ID!, $from: Date, $to: Date) {
+  query ReservationTimesInReservationUnit(
+    $id: ID!
+    $beginDate: Date
+    $endDate: Date
+    $state: [String]
+  ) {
     reservationUnit(id: $id) {
-      reservations(
-        from: $from
-        to: $to
-        includeWithSameComponents: true
-        state: [
-          "CONFIRMED"
-          "CREATED"
-          "REQUIRES_HANDLING"
-          "WAITING_FOR_PAYMENT"
-          "CONFIRMED"
-        ]
-      ) {
+      reservationSet(beginDate: $beginDate, endDate: $endDate, state: $state) {
         begin
         end
         bufferTimeBefore

@@ -1,13 +1,13 @@
 import React, { useState, ChangeEvent } from "react";
 import { IconArrowRight, IconGroup, TextInput, IconSearch } from "hds-react";
-import { TFunction } from "i18next";
+import { type TFunction } from "i18next";
 import { uniq } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { H1, Strong } from "common/src/common/typography";
 import { useDebounce } from "react-use";
-import { useQuery, ApolloError } from "@apollo/client";
-import { Query, SpaceType } from "common/types/gql-types";
+import { useQuery, type ApolloError } from "@apollo/client";
+import type { Query, SpaceNode } from "common/types/gql-types";
 import { DataFilterConfig } from "../../common/types";
 import Loader from "../Loader";
 import DataTable, { CellConfig } from "../DataTable";
@@ -38,7 +38,7 @@ const getCellConfig = (t: TFunction): CellConfig => {
       {
         title: t("Spaces.headings.name"),
         key: "nameFi",
-        transform: ({ nameFi }: SpaceType) => <Strong>{nameFi}</Strong>,
+        transform: ({ nameFi }: SpaceNode) => <Strong>{nameFi}</Strong>,
       },
       {
         title: t("Spaces.headings.unit"),
@@ -51,7 +51,7 @@ const getCellConfig = (t: TFunction): CellConfig => {
       {
         title: t("Spaces.headings.volume"),
         key: "maxPersons",
-        transform: ({ maxPersons }: SpaceType) => (
+        transform: ({ maxPersons }: SpaceNode) => (
           <div
             style={{
               display: "flex",
@@ -67,7 +67,7 @@ const getCellConfig = (t: TFunction): CellConfig => {
       {
         title: t("Spaces.headings.size"),
         key: "surfaceArea",
-        transform: ({ surfaceArea }: SpaceType) => (
+        transform: ({ surfaceArea }: SpaceNode) => (
           <div
             style={{
               display: "flex",
@@ -87,17 +87,17 @@ const getCellConfig = (t: TFunction): CellConfig => {
     index: "pk",
     sorting: "name",
     order: "asc",
-    rowLink: ({ pk, unit }: SpaceType) =>
+    rowLink: ({ pk, unit }: SpaceNode) =>
       spaceUrl(Number(pk), Number(unit?.pk)),
   };
 };
 
 const getFilterConfig = (
-  spaces: SpaceType[],
+  spaces: SpaceNode[],
   t: TFunction
 ): DataFilterConfig[] => {
   const units = uniq(
-    spaces.map((space: SpaceType) => space?.unit?.nameFi || "")
+    spaces.map((space: SpaceNode) => space?.unit?.nameFi || "")
   ).filter((n) => n);
 
   return [
@@ -117,7 +117,7 @@ const getFilterConfig = (
 const SpacesList = (): JSX.Element => {
   const { notifyError } = useNotification();
   const { t } = useTranslation();
-  const [spaces, setSpaces] = useState<SpaceType[]>([]);
+  const [spaces, setSpaces] = useState<SpaceNode[]>([]);
   const [filterConfig, setFilterConfig] = useState<DataFilterConfig[] | null>(
     null
   );
@@ -135,7 +135,7 @@ const SpacesList = (): JSX.Element => {
 
   useQuery<Query>(SPACES_QUERY, {
     onCompleted: (data) => {
-      const result = data?.spaces?.edges?.map((s) => s?.node as SpaceType);
+      const result = data?.spaces?.edges?.map((s) => s?.node as SpaceNode);
       if (result) {
         setSpaces(result);
         setCellConfig(getCellConfig(t));
@@ -154,7 +154,7 @@ const SpacesList = (): JSX.Element => {
   }
 
   const filteredSpaces = searchTerm
-    ? spaces.filter((space: SpaceType) => {
+    ? spaces.filter((space: SpaceNode) => {
         const searchTerms = searchTerm.toLowerCase().split(" ");
         const { nameFi, unit } = space;
         const unitName = unit?.nameFi?.toLowerCase();

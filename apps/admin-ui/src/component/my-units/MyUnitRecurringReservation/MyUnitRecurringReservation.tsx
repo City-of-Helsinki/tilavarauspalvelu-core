@@ -31,7 +31,9 @@ const MyUnitRecurringReservation = ({ unitId }: { unitId: number }) => {
 
   const { loading, reservationUnits } = useRecurringReservationsUnits(unitId);
 
-  if (loading) return <Loader />;
+  if (loading) {
+    return <Loader />;
+  }
 
   return (
     <>
@@ -55,7 +57,7 @@ const MyUnitRecurringReservationRouteWrapper = () => {
   const { t } = useTranslation();
   const { unitId } = useParams<Params>();
 
-  if (unitId === undefined || Number.isNaN(parseInt(unitId, 10))) {
+  if (unitId == null || Number.isNaN(Number(unitId))) {
     return (
       <>
         <BackLinkHeader />
@@ -65,7 +67,7 @@ const MyUnitRecurringReservationRouteWrapper = () => {
       </>
     );
   }
-  return <MyUnitRecurringReservation unitId={parseInt(unitId, 10)} />;
+  return <MyUnitRecurringReservation unitId={Number(unitId)} />;
 };
 
 export default MyUnitRecurringReservationRouteWrapper;

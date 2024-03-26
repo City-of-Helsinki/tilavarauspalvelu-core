@@ -1,16 +1,16 @@
 import Joi from "joi";
-import { SpaceType } from "common/types/gql-types";
+import type { SpaceNode } from "common/types/gql-types";
 
 const recurse = (
-  parent: SpaceType,
-  spaces: SpaceType[],
+  parent: SpaceNode,
+  spaces: SpaceNode[],
   depth: number,
   paddingChar: string
-): SpaceType[] => {
+): SpaceNode[] => {
   const newParent = {
     ...parent,
     nameFi: "".padStart(depth, paddingChar) + parent.nameFi,
-  } as SpaceType;
+  } as SpaceNode;
 
   const children = spaces.filter((e) => e.parent?.pk === parent.pk);
 
@@ -24,9 +24,9 @@ const recurse = (
 };
 
 export const spacesAsHierarchy = (
-  spaces: SpaceType[],
+  spaces: SpaceNode[],
   paddingChar: string
-): SpaceType[] => {
+): SpaceNode[] => {
   const roots = spaces.filter((e) => e.parent == null);
   return roots.flatMap((rootSpace) =>
     recurse(rootSpace, spaces, 0, paddingChar)

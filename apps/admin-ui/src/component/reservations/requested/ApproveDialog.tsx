@@ -11,15 +11,15 @@ import {
   NumberInput,
   TextArea,
 } from "hds-react";
-import {
+import type {
   Mutation,
   ReservationApproveMutationInput,
-  ReservationType,
+  ReservationNode,
 } from "common/types/gql-types";
-import { useModal } from "../../../context/ModalContext";
+import { useModal } from "@/context/ModalContext";
 import { APPROVE_RESERVATION } from "./queries";
-import { useNotification } from "../../../context/NotificationContext";
-import { VerticalFlex } from "../../../styles/layout";
+import { useNotification } from "@/context/NotificationContext";
+import { VerticalFlex } from "@/styles/layout";
 import { getReservationPriceDetails } from "./util";
 
 const Label = styled.p`
@@ -49,7 +49,7 @@ const DialogContent = ({
   onClose,
   onAccept,
 }: {
-  reservation: ReservationType;
+  reservation: ReservationNode;
   isFree: boolean;
   onClose: () => void;
   onAccept: () => void;
@@ -86,7 +86,7 @@ const DialogContent = ({
 
   const [price, setPrice] = useState(reservation.price ?? 0);
   const [handlingDetails, setHandlingDetails] = useState<string>(
-    reservation.handlingDetails
+    reservation.handlingDetails ?? ""
   );
   const hasPrice = reservation.price != null && reservation.price > 0;
   const priceIsValid = !hasPrice || !Number.isNaN(price);
@@ -202,7 +202,7 @@ const ApproveDialog = ({
   onClose,
   onAccept,
 }: {
-  reservation: ReservationType;
+  reservation: ReservationNode;
   isFree: boolean;
   onClose: () => void;
   onAccept: () => void;
@@ -227,7 +227,6 @@ const ApproveDialog = ({
               : t("RequestedReservation.ApproveDialog.title")
           }
         />
-
         <DialogContent
           isFree={isFree}
           reservation={reservation}
@@ -238,4 +237,5 @@ const ApproveDialog = ({
     </Dialog>
   );
 };
+
 export default ApproveDialog;

@@ -4,14 +4,14 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
-import { UnitType } from "common/types/gql-types";
+import type { UnitNode } from "common/types/gql-types";
 import { parseAddress } from "../../../common/util";
 import { ContentContainer, IngressContainer } from "../../../styles/layout";
 import LinkPrev from "../../LinkPrev";
 
 interface IProps {
   title: string;
-  unit: UnitType;
+  unit: UnitNode;
   maxPersons?: number;
   surfaceArea?: number;
 }

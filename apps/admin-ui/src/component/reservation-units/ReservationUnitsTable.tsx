@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
-import { ReservationUnitType } from "common/types/gql-types";
+import { ReservationUnitNode } from "common/types/gql-types";
 import { truncate } from "@/helpers";
 import { reservationUnitUrl } from "@/common/urls";
 import { CustomTable, TableLink } from "@/component/Table";
@@ -14,7 +14,7 @@ export type Sort = {
 type Props = {
   sort?: Sort;
   sortChanged: (field: string) => void;
-  reservationUnits: ReservationUnitType[];
+  reservationUnits: ReservationUnitNode[];
 };
 
 const MAX_NAME_LENGTH = 22;
@@ -22,7 +22,7 @@ const getColConfig = (t: TFunction) => [
   {
     headerName: t("ReservationUnits.headings.name"),
     key: "nameFi",
-    transform: ({ nameFi, pk, unit }: ReservationUnitType) => (
+    transform: ({ nameFi, pk, unit }: ReservationUnitNode) => (
       <TableLink href={reservationUnitUrl(pk ?? 0, unit?.pk ?? 0)}>
         {truncate(nameFi ?? "-", MAX_NAME_LENGTH)}
       </TableLink>
@@ -33,13 +33,13 @@ const getColConfig = (t: TFunction) => [
     headerName: t("ReservationUnits.headings.unitName"),
     key: "unitNameFi",
     isSortable: true,
-    transform: (resUnit: ReservationUnitType) => resUnit.unit?.nameFi ?? "-",
+    transform: (resUnit: ReservationUnitNode) => resUnit.unit?.nameFi ?? "-",
   },
   {
     headerName: t("ReservationUnits.headings.reservationUnitType"),
     key: "typeFi",
     isSortable: true,
-    transform: ({ reservationUnitType }: ReservationUnitType) => (
+    transform: ({ reservationUnitType }: ReservationUnitNode) => (
       <span>{reservationUnitType?.nameFi ?? "-"}</span>
     ),
   },
@@ -47,7 +47,7 @@ const getColConfig = (t: TFunction) => [
     headerName: t("ReservationUnits.headings.maxPersons"),
     key: "maxPersons",
     isSortable: true,
-    transform: ({ maxPersons }: ReservationUnitType) => (
+    transform: ({ maxPersons }: ReservationUnitNode) => (
       <span>{maxPersons || "-"}</span>
     ),
   },
@@ -55,7 +55,7 @@ const getColConfig = (t: TFunction) => [
     headerName: t("ReservationUnits.headings.surfaceArea"),
     key: "surfaceArea",
     isSortable: true,
-    transform: ({ surfaceArea }: ReservationUnitType) =>
+    transform: ({ surfaceArea }: ReservationUnitNode) =>
       surfaceArea != null ? (
         <span>
           {Number(surfaceArea).toLocaleString("fi") || "-"}
@@ -68,13 +68,13 @@ const getColConfig = (t: TFunction) => [
   {
     headerName: t("ReservationUnits.headings.state"),
     key: "state",
-    transform: ({ state }: ReservationUnitType) =>
+    transform: ({ state }: ReservationUnitNode) =>
       t(`ReservationUnits.state.${state}`),
   },
   {
     headerName: t("ReservationUnits.headings.reservationState"),
     key: "reservationState",
-    transform: ({ reservationState }: ReservationUnitType) =>
+    transform: ({ reservationState }: ReservationUnitNode) =>
       t(`ReservationUnits.reservationState.${reservationState}`),
   },
 ];

@@ -5,7 +5,7 @@ import {
   getDay,
   isSameDay,
 } from "date-fns";
-import { TFunction } from "i18next";
+import type { TFunction } from "i18next";
 import { trim } from "lodash";
 import {
   formatters as getFormatters,
@@ -13,15 +13,15 @@ import {
   getUnRoundedReservationVolume,
 } from "common";
 import {
-  AgeGroupType,
-  Maybe,
-  ReserveeType,
-  ReservationType,
-  ReservationUnitPricingType,
+  type AgeGroupNode,
+  type Maybe,
+  CustomerTypeChoice,
+  type ReservationNode,
+  type ReservationUnitPricingNode,
   PriceUnit,
   PricingType,
-  ReservationUnitType,
-  Type,
+  type ReservationUnitNode,
+  ReservationTypeChoice,
 } from "common/types/gql-types";
 import { formatDuration, fromApiDate } from "common/src/common/util";
 import { toMondayFirst } from "common/src/helpers";
@@ -77,18 +77,18 @@ function reservationDurationString(
 }
 
 export const reservationUnitName = (
-  reservationUnit: Maybe<ReservationUnitType>
+  reservationUnit: Maybe<ReservationUnitNode>
 ): string =>
   reservationUnit
     ? `${reservationUnit.nameFi}, ${reservationUnit.unit?.nameFi || ""}`
     : "-";
 
 export const reservationPrice = (
-  reservation: ReservationType,
+  reservation: ReservationNode,
   t: TFunction
 ): string => {
   return getReservationPrice(
-    reservation.price as number,
+    reservation.price,
     t("RequestedReservation.noPrice"),
     "fi",
     true
@@ -97,10 +97,10 @@ export const reservationPrice = (
 
 /** returns reservation unit pricing at given date */
 export const getReservatinUnitPricing = (
-  reservationUnit: ReservationUnitType,
+  reservationUnit: Maybe<ReservationUnitNode> | undefined,
   datetime: string
-): ReservationUnitPricingType | null => {
-  if (!reservationUnit.pricings || reservationUnit.pricings.length === 0) {
+): ReservationUnitPricingNode | null => {
+  if (!reservationUnit?.pricings || reservationUnit.pricings.length === 0) {
     return null;
   }
 
@@ -114,7 +114,7 @@ export const getReservatinUnitPricing = (
   );
 
   return (
-    (reservationUnit.pricings || []) as ReservationUnitPricingType[]
+    (reservationUnit.pricings || []) as ReservationUnitPricingNode[]
   ).reduce((prev, current) => {
     if ((fromApiDate(current?.begins) ?? 0) < reservationDate) {
       return current;
@@ -124,7 +124,7 @@ export const getReservatinUnitPricing = (
 };
 
 export const getReservationPriceDetails = (
-  reservation: ReservationType,
+  reservation: ReservationNode,
   t: TFunction
 ): string => {
   const durationMinutes = differenceInMinutes(
@@ -133,7 +133,7 @@ export const getReservationPriceDetails = (
   );
 
   const pricing = getReservatinUnitPricing(
-    reservation.reservationUnits?.[0] as ReservationUnitType,
+    reservation.reservationUnit?.[0],
     reservation.begin
   );
 
@@ -143,9 +143,7 @@ export const getReservationPriceDetails = (
   const volume = getUnRoundedReservationVolume(durationMinutes, priceUnit);
 
   const maxPrice =
-    pricing.pricingType === PricingType.Paid
-      ? parseFloat(pricing.highestPrice)
-      : 0;
+    pricing.pricingType === PricingType.Paid ? pricing.highestPrice : "0";
   const formatters = getFormatters("fi");
 
   const taxP = parseFloat(pricing.taxPercentage?.value ?? "");
@@ -159,7 +157,7 @@ export const getReservationPriceDetails = (
         unit: t(`RequestedReservation.ApproveDialog.priceUnit.${priceUnit}`),
         unitPrice: getReservationPrice(maxPrice, ""),
         price: getReservationPrice(
-          volume * maxPrice,
+          String(volume * parseFloat(maxPrice)),
           t("RequestedReservation.noPrice"),
           "fi"
         ),
@@ -167,19 +165,19 @@ export const getReservationPriceDetails = (
 };
 
 export const ageGroup = (
-  group: Maybe<AgeGroupType> | undefined
+  group: Maybe<AgeGroupNode> | undefined
 ): string | null => (group ? `${group.minimum}-${group.maximum || ""}` : null);
 
 const reserveeTypeToTranslationKey = (
-  reserveeType: ReserveeType,
+  reserveeType: CustomerTypeChoice,
   isUnregisteredAssociation: boolean
 ) => {
   switch (reserveeType) {
-    case ReserveeType.Business:
-    case ReserveeType.Individual:
-      return `ReserveeType.${reserveeType}`;
-    case ReserveeType.Nonprofit:
-      return `ReserveeType.${reserveeType}.${
+    case CustomerTypeChoice.Business:
+    case CustomerTypeChoice.Individual:
+      return `CustomerTypeChoice.${reserveeType}`;
+    case CustomerTypeChoice.Nonprofit:
+      return `CustomerTypeChoice.${reserveeType}.${
         isUnregisteredAssociation ? "UNREGISTERED" : "REGISTERED"
       }`;
     default:
@@ -187,15 +185,15 @@ const reserveeTypeToTranslationKey = (
   }
 };
 
-export const getTranslationKeyForReserveeType = (
-  reservationType?: Type,
-  reserveeType?: ReserveeType,
+export const getTranslationKeyForCustomerTypeChoice = (
+  reservationType?: ReservationTypeChoice,
+  reserveeType?: CustomerTypeChoice,
   isUnregisteredAssociation?: boolean
 ): string[] => {
   if (!reservationType) {
-    return ["errors.missingReservationType"];
+    return ["errors.missingReservationNode"];
   }
-  if (reservationType === Type.Blocked) {
+  if (reservationType === ReservationTypeChoice.Blocked) {
     return ["ReservationType.BLOCKED"];
   }
 
@@ -209,17 +207,17 @@ export const getTranslationKeyForReserveeType = (
 };
 
 export const getReserveeName = (
-  reservation: ReservationType,
+  reservation: ReservationNode,
   t?: TFunction,
   length = 50
 ): string => {
   let prefix = "";
-  if (reservation.type === Type.Behalf) {
+  if (reservation.type === ReservationTypeChoice.Behalf) {
     prefix = t ? t("Reservations.prefixes.behalf") : "";
   }
   if (
     // commented extra condition out for now, as the staff prefix was requested to be used for all staff reservations
-    reservation.type === Type.Staff /* &&
+    reservation.type === ReservationTypeChoice.Staff /* &&
     reservation.reserveeName ===
       `${reservation.user?.firstName} ${reservation.user?.lastName}` */
   ) {
@@ -228,7 +226,7 @@ export const getReserveeName = (
   return truncate(prefix + reservation.reserveeName, length);
 };
 
-export const getName = (reservation: ReservationType, t: TFunction) => {
+export const getName = (reservation: ReservationNode, t: TFunction) => {
   if (reservation.name) {
     return trim(`${reservation.pk}, ${reservation.name}`);
   }
@@ -243,7 +241,7 @@ export const getName = (reservation: ReservationType, t: TFunction) => {
 // TODO rename: it's the time + duration
 // recurring format: {weekday(s)} {time}, {duration} | {startDate}-{endDate} | {unit}
 // single format   : {weekday} {date} {time}, {duration} | {unit}
-export const createTagString = (reservation: ReservationType, t: TFunction) => {
+export const createTagString = (reservation: ReservationNode, t: TFunction) => {
   const createRecurringTag = (begin?: string, end?: string) =>
     begin && end ? `${formatDate(begin)}-${formatDate(end)}` : "";
 
@@ -252,7 +250,7 @@ export const createTagString = (reservation: ReservationType, t: TFunction) => {
     reservation.recurringReservation?.endDate ?? undefined
   );
 
-  const unitTag = reservation?.reservationUnits
+  const unitTag = reservation?.reservationUnit
     ?.map(reservationUnitName)
     .join(", ");
 

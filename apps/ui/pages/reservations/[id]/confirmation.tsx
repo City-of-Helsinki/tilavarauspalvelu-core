@@ -47,7 +47,7 @@ function Confirmation({ apiBaseUrl }: Props) {
   // TODO check that the pk parameter is valid in getServerSideProps and return 404 if it's not
   // TODO this could be moved to getServerSideProps
   // TODO why is there no user check here? are regular users allowed to access a reservation of another user?
-  const typename = "ReservationType";
+  const typename = "ReservationNode";
   const id = base64encode(`${typename}:${pk}`);
   const {
     data,
@@ -60,7 +60,7 @@ function Confirmation({ apiBaseUrl }: Props) {
   });
 
   const { reservation } = data ?? {};
-  const reservationUnit = reservation?.reservationUnits?.[0] ?? undefined;
+  const reservationUnit = reservation?.reservationUnit?.[0] ?? undefined;
 
   if (isLoading) {
     return <CenterSpinner />;

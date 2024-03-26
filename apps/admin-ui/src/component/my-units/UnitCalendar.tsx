@@ -17,9 +17,12 @@ import React, {
 } from "react";
 import Popup from "reactjs-popup";
 import styled, { css } from "styled-components";
-import { ReservationType, Type } from "common/types/gql-types";
+import {
+  type ReservationNode,
+  ReservationTypeChoice,
+} from "common/types/gql-types";
 import { useTranslation } from "react-i18next";
-import { TFunction } from "i18next";
+import type { TFunction } from "i18next";
 import { POST_PAUSE, PRE_PAUSE } from "@/common/calendarStyling";
 import { sortByName } from "@/common/util";
 import { useModal } from "@/context/ModalContext";
@@ -34,7 +37,7 @@ export type Resource = {
   pk: number;
   url: string;
   isDraft: boolean;
-  events: CalendarEvent<ReservationType>[];
+  events: CalendarEvent<ReservationNode>[];
 };
 
 const CELL_HEIGHT = 50;
@@ -50,7 +53,7 @@ const TemplateProps: CSSProperties = {
   position: "absolute",
 };
 
-type EventStyleGetter = ({ event }: CalendarEvent<ReservationType>) => {
+type EventStyleGetter = ({ event }: CalendarEvent<ReservationNode>) => {
   style: React.CSSProperties;
   className?: string;
 };
@@ -244,7 +247,7 @@ const PreBuffer = ({
   left,
   style,
 }: {
-  event: CalendarEvent<ReservationType>;
+  event: CalendarEvent<ReservationNode>;
   hourPercent: number;
   left: string;
   style?: CSSProperties;
@@ -276,7 +279,7 @@ const PostBuffer = ({
   right,
   style,
 }: {
-  event: CalendarEvent<ReservationType>;
+  event: CalendarEvent<ReservationNode>;
   hourPercent: number;
   right: string;
   style?: CSSProperties;
@@ -302,21 +305,21 @@ const PostBuffer = ({
   return null;
 };
 
-const getEventTitle = ({
+function getEventTitle({
   reservation: { title, event },
   t,
 }: {
-  reservation: CalendarEvent<ReservationType>;
+  reservation: CalendarEvent<ReservationNode>;
   t: TFunction;
-}) => {
-  if (event?.type === Type.Blocked) {
+}) {
+  if (event?.type === ReservationTypeChoice.Blocked) {
     return t("MyUnits.Calendar.legend.closed");
   }
 
-  return event && event?.pk !== event?.reservationUnits?.[0]?.pk
+  return event && event?.pk !== event?.reservationUnit?.[0]?.pk
     ? getReserveeName(event)
     : title;
-};
+}
 
 const EventTriggerButton = () => (
   <button
@@ -345,7 +348,7 @@ const Events = ({
   numHours,
 }: {
   firstHour: number;
-  events: CalendarEvent<ReservationType>[];
+  events: CalendarEvent<ReservationNode>[];
   eventStyleGetter: EventStyleGetter;
   numHours: number;
 }) => {

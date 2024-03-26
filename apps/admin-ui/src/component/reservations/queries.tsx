@@ -7,7 +7,7 @@ export const RESERVATIONS_QUERY = gql`
     $after: String
     $unit: [ID]
     $reservationUnitType: [ID]
-    $orderBy: String
+    $orderBy: [ReservationOrderingChoices]
     $offset: Int
     $first: Int
     $state: [String]
@@ -39,7 +39,7 @@ export const RESERVATIONS_QUERY = gql`
       edges {
         node {
           ...ReservationCommon
-          reservationUnits {
+          reservationUnit {
             nameFi
             unit {
               nameFi

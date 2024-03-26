@@ -94,7 +94,8 @@ const useReservations = (
     nextFetchPolicy: "cache-first",
     errorPolicy: "all",
     variables: {
-      orderBy: sortString,
+      // FIXME
+      // orderBy: sortString,
       first: LIST_PAGE_SIZE,
       ...mapFilterParams(filters, defaultFiltering),
     },

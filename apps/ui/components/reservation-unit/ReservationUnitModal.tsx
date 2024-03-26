@@ -17,10 +17,11 @@ import { OptionType } from "common/types/common";
 import { fontMedium } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
-  ApplicationRoundNode,
-  Query,
-  QueryReservationUnitsArgs,
-  ReservationUnitType,
+  type ApplicationRoundNode,
+  type Query,
+  type QueryReservationUnitsArgs,
+  type ReservationUnitNode,
+  ReservationUnitOrderingChoices,
 } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { reservationUnitPath } from "@/modules/const";
@@ -138,10 +139,10 @@ const ReservationUnitCard = ({
   handleRemove,
   isSelected,
 }: {
-  reservationUnit: ReservationUnitType;
+  reservationUnit: ReservationUnitNode;
   isSelected: boolean;
-  handleAdd: (ru: ReservationUnitType) => void;
-  handleRemove: (ru: ReservationUnitType) => void;
+  handleAdd: (ru: ReservationUnitNode) => void;
+  handleRemove: (ru: ReservationUnitNode) => void;
 }) => {
   const { t } = useTranslation();
 
@@ -295,9 +296,9 @@ const ReservationUnitModal = ({
   options,
 }: {
   applicationRound: ApplicationRoundNode;
-  handleAdd: (ru: ReservationUnitType) => void;
-  handleRemove: (ru: ReservationUnitType) => void;
-  currentReservationUnits: ReservationUnitType[];
+  handleAdd: (ru: ReservationUnitNode) => void;
+  handleRemove: (ru: ReservationUnitNode) => void;
+  currentReservationUnits: ReservationUnitNode[];
   options: OptionsType;
 }): JSX.Element => {
   const [searchTerm, setSearchTerm] = useState<string | undefined>(undefined);
@@ -334,7 +335,7 @@ const ReservationUnitModal = ({
             ? [Number(reservationUnitType?.value)]
             : [],
         unit: unit?.value != null ? [Number(unit?.value)] : [],
-        orderBy: "nameFi",
+        orderBy: [ReservationUnitOrderingChoices.NameFiAsc],
         isDraft: false,
         isVisible: true,
       },

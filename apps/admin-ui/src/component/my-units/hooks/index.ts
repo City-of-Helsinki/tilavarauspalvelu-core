@@ -4,15 +4,17 @@ import { getReservationApplicationFields } from "common/src/reservation-form/uti
 import { useQuery } from "@apollo/client";
 import type {
   Query,
-  QueryReservationUnitsArgs,
-  QueryUnitsArgs,
-  ReservationType,
-  ReservationUnitTypeReservationsArgs,
-  ReservationUnitType,
+  ReservationUnitNode,
+  QueryUnitArgs,
+  QueryReservationUnitArgs,
+  ReservationUnitNodeReservationSetArgs,
 } from "common/types/gql-types";
-import { ReserveeType, Type } from "common/types/gql-types";
+import {
+  CustomerTypeChoice,
+  ReservationTypeChoice,
+} from "common/types/gql-types";
 import { toApiDate } from "common/src/common/util";
-import { filterNonNullable } from "common/src/helpers";
+import { base64encode, filterNonNullable } from "common/src/helpers";
 import { useNotification } from "@/context/NotificationContext";
 import {
   OPTIONS_QUERY,
@@ -20,35 +22,38 @@ import {
   RESERVATION_UNITS_BY_UNIT,
   RESERVATION_UNIT_QUERY,
 } from "./queries";
+import { RELATED_RESERVATION_STATES } from "common/src/const";
 
 export const useApplicationFields = (
-  reservationUnit: ReservationUnitType,
-  reserveeType?: ReserveeType
+  reservationUnit: ReservationUnitNode,
+  reserveeType?: CustomerTypeChoice
 ) => {
   return useMemo(() => {
-    const reserveeTypeString = reserveeType || ReserveeType.Individual;
+    const reserveeTypeString = reserveeType || CustomerTypeChoice.Individual;
 
-    const type = reservationUnit.metadataSet?.supportedFields?.includes(
-      "reservee_type"
+    const supportedFields = filterNonNullable(
+      reservationUnit.metadataSet?.supportedFields
+    );
+    const type = reservationUnit.metadataSet?.supportedFields?.find(
+      (n) => n.fieldName === "reservee_type"
     )
       ? reserveeTypeString
-      : ReserveeType.Individual;
+      : CustomerTypeChoice.Individual;
 
     return getReservationApplicationFields({
-      supportedFields: filterNonNullable(
-        reservationUnit.metadataSet?.supportedFields
-      ),
+      supportedFields,
       reserveeType: type,
     });
   }, [reservationUnit.metadataSet?.supportedFields, reserveeType]);
 };
 
-export const useGeneralFields = (reservationUnit: ReservationUnitType) => {
+export const useGeneralFields = (reservationUnit: ReservationUnitNode) => {
   return useMemo(() => {
+    const supportedFields = filterNonNullable(
+      reservationUnit.metadataSet?.supportedFields
+    );
     return getReservationApplicationFields({
-      supportedFields: filterNonNullable(
-        reservationUnit.metadataSet?.supportedFields
-      ),
+      supportedFields,
       reserveeType: "common",
     }).filter((n) => n !== "reserveeType");
   }, [reservationUnit.metadataSet?.supportedFields]);
@@ -84,61 +89,64 @@ export const useOptions = () => {
 };
 
 // TODO this should be combined with the code in CreateReservationModal (duplicated for now)
-export const useReservationUnitQuery = (unitPk?: number) => {
-  const { data, loading } = useQuery<Query, QueryReservationUnitsArgs>(
+export function useReservationUnitQuery(pk?: number) {
+  const typename = "ReservationUnitNode";
+  const id = base64encode(`${typename}:${pk}`);
+  const { data, loading } = useQuery<Query, QueryReservationUnitArgs>(
     RESERVATION_UNIT_QUERY,
     {
-      variables: { pk: [unitPk ?? 0] },
-      skip: unitPk === undefined,
+      variables: { id },
+      skip: pk == null || pk === 0,
     }
   );
 
-  const reservationUnit =
-    data?.reservationUnits?.edges.find((ru) => ru)?.node ?? undefined;
+  const { reservationUnit } = data ?? {};
 
   return { reservationUnit, loading };
-};
+}
 
-export const useUnitQuery = (pk?: number | string) => {
+export function useUnitQuery(pk?: number | string) {
   const { notifyError } = useNotification();
 
-  const res = useQuery<Query, QueryUnitsArgs>(UNIT_VIEW_QUERY, {
+  const typename = "UnitNode";
+  const id = base64encode(`${typename}:${pk}`);
+  const res = useQuery<Query, QueryUnitArgs>(UNIT_VIEW_QUERY, {
     skip: pk == null,
+    variables: { id },
     onError: (err) => {
       notifyError(err.message);
     },
-    variables: { pk: [pk ? String(pk) : ""], offset: 0 },
   });
 
   return res;
-};
+}
 
-export const useUnitResources = (
+export function useUnitResources(
   begin: Date,
   unitPk: string,
   reservationUnitTypes?: number[]
-) => {
+) {
   const { notifyError } = useNotification();
 
+  const id = base64encode(`UnitNode:${unitPk}`);
   const { data, ...rest } = useQuery<
     Query,
-    QueryReservationUnitsArgs & ReservationUnitTypeReservationsArgs
+    QueryReservationUnitArgs & ReservationUnitNodeReservationSetArgs
   >(RESERVATION_UNITS_BY_UNIT, {
     skip: unitPk === "" || Number.isNaN(Number(unitPk)) || Number(unitPk) === 0,
     variables: {
-      unit: [Number(unitPk)],
-      from: toApiDate(begin),
-      to: toApiDate(begin),
-      includeWithSameComponents: true,
+      id,
+      beginDate: toApiDate(begin),
+      // TODO should this be +1 day? or is it already inclusive? seems to be inclusive
+      endDate: toApiDate(begin),
+      state: RELATED_RESERVATION_STATES,
     },
     onError: () => {
       notifyError("Varauksia ei voitu hakea");
     },
   });
 
-  const resources = (data?.reservationUnits?.edges || [])
-    .map((e) => e?.node)
-    .filter((x): x is ReservationUnitType => x != null)
+  const resources = filterNonNullable(data?.unit?.reservationunitSet)
     .filter(
       (x) =>
         !reservationUnitTypes?.length ||
@@ -151,25 +159,22 @@ export const useUnitResources = (
       isDraft: x.isDraft,
       pk: x.pk ?? 0,
       events:
-        x.reservations
-          ?.filter((y): y is ReservationType => y != null)
-          .map((y) => ({
-            event: {
-              ...y,
-              ...(y.type !== Type.Blocked
-                ? {
-                    bufferTimeBefore:
-                      y.bufferTimeBefore ?? x.bufferTimeBefore ?? 0,
-                    bufferTimeAfter:
-                      y.bufferTimeAfter ?? x.bufferTimeAfter ?? 0,
-                  }
-                : {}),
-            },
-            title: y.name ?? "",
-            start: new Date(y.begin),
-            end: new Date(y.end),
-          })) ?? [],
+        filterNonNullable(x.reservationSet).map((y) => ({
+          event: {
+            ...y,
+            ...(y.type !== ReservationTypeChoice.Blocked
+              ? {
+                  bufferTimeBefore:
+                    y.bufferTimeBefore ?? x.bufferTimeBefore ?? 0,
+                  bufferTimeAfter: y.bufferTimeAfter ?? x.bufferTimeAfter ?? 0,
+                }
+              : {}),
+          },
+          title: y.name ?? "",
+          start: new Date(y.begin),
+          end: new Date(y.end),
+        })) ?? [],
     }));
 
   return { ...rest, resources };
-};
+}

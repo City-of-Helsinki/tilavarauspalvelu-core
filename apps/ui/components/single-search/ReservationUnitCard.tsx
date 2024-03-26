@@ -6,7 +6,7 @@ import NextImage from "next/image";
 import styled from "styled-components";
 import { H5 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import { ReservationUnitType } from "common/types/gql-types";
+import type { ReservationUnitNode } from "common/types/gql-types";
 import { format, isToday, isTomorrow } from "date-fns";
 import { toUIDate } from "common/src/common/util";
 import { getImageSource, getMainImage, getTranslation } from "@/modules/util";
@@ -23,7 +23,7 @@ import { ButtonLikeLink } from "../common/ButtonLikeLink";
 import { useSearchParams } from "next/navigation";
 
 interface PropsT {
-  reservationUnit: ReservationUnitType;
+  reservationUnit: ReservationUnitNode;
 }
 
 const Container = styled.div`

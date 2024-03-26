@@ -2,7 +2,7 @@ import React from "react";
 import type { TFunction } from "i18next";
 import { useTranslation } from "next-i18next";
 import {
-  type AgeGroupType,
+  type AgeGroupNode,
   type ApplicationNode,
   type Maybe,
   type SuitableTimeRangeNode,
@@ -45,7 +45,7 @@ const formatDurationSeconds = (seconds: number, t: TFunction): string => {
   )}`;
 };
 
-const ageGroupToString = (ag: Maybe<AgeGroupType> | undefined): string => {
+const ageGroupToString = (ag: Maybe<AgeGroupNode> | undefined): string => {
   if (!ag) {
     return "";
   }

@@ -20,8 +20,6 @@ export const ALLOCATION_CALENDAR_TIMES = [7, 23];
 
 export const NUMBER_OF_DECIMALS = 6;
 
-export const RECURRING_AUTOMATIC_REFETCH_LIMIT = 2000;
-
 /// Poll updates to application sections on the allocation page (in milliseconds), 0 to disable.
 /// Why use this? if there are multiple users working on the same allocation, they will see updates.
 /// If you are testing, you can use multiple tabs / browsers to see the updates.

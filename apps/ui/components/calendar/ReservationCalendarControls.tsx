@@ -12,7 +12,7 @@ import {
   fontRegular,
 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import { ReservationUnitType } from "common/types/gql-types";
+import { ReservationUnitNode } from "common/types/gql-types";
 import { truncatedText } from "@/styles/util";
 import {
   getReservationUnitPrice,
@@ -31,7 +31,7 @@ export type FocusTimeSlot = TimeRange & {
 };
 
 type Props = {
-  reservationUnit: ReservationUnitType;
+  reservationUnit: ReservationUnitNode;
   mode: string;
   shouldCalendarControlsBeVisible?: boolean;
   setShouldCalendarControlsBeVisible?: (value: boolean) => void;

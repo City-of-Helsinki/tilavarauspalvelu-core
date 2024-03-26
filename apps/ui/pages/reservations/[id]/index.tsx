@@ -3,7 +3,7 @@ import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
 import router from "next/router";
-import { camelCase, capitalize, isFinite, trim } from "lodash";
+import { capitalize, isFinite, trim } from "lodash";
 import {
   IconArrowRight,
   IconCalendar,
@@ -16,10 +16,9 @@ import { breakpoints } from "common/src/common/style";
 import {
   type Query,
   type QueryReservationArgs,
-  ReserveeType,
+  CustomerTypeChoice,
   State,
 } from "common/types/gql-types";
-import { parseISO } from "date-fns";
 import Link from "next/link";
 import { Container } from "common";
 import { useSession } from "@/hooks/auth";
@@ -54,12 +53,18 @@ import {
   getGenericTerms,
 } from "@/modules/serverUtils";
 import { GET_RESERVATION } from "@/modules/queries/reservation";
-import { base64encode } from "common/src/helpers";
+import {
+  base64encode,
+  containsField,
+  containsNameField,
+  filterNonNullable,
+} from "common/src/helpers";
+import { fromApiDate } from "common/src/common/util";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
-export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, params } = ctx;
   const pk = Number(params?.id);
   const commonProps = getCommonServerSideProps();
@@ -69,7 +74,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     const bookingTerms = await getGenericTerms(apolloClient);
 
     // NOTE errors will fallback to 404
-    const id = base64encode(`ReservationType:${pk}`);
+    const id = base64encode(`ReservationNode:${pk}`);
     const { data, error } = await apolloClient.query<
       Query,
       QueryReservationArgs
@@ -110,7 +115,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
-};
+}
 
 // TODO this has margin issues on mobile, there is zero margin on top because some element (breadcrumbs?) is removed on mobile
 const Heading = styled(H2).attrs({ as: "h1" })`
@@ -272,10 +277,10 @@ const PageContent = styled.div`
 
 // TODO add a state check => if state is Created redirect to the reservation funnel
 // if state is Cancelled, Denied, WaitingForPayment what then?
-const Reservation = ({
+function Reservation({
   termsOfUse,
   reservation,
-}: PropsNarrowed): JSX.Element | null => {
+}: PropsNarrowed): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const { isAuthenticated } = useSession();
 
@@ -284,7 +289,7 @@ const Reservation = ({
     orderUuid: reservation.order?.orderUuid ?? "",
   });
 
-  const reservationUnit = reservation.reservationUnits?.[0] ?? null;
+  const reservationUnit = reservation.reservationUnit?.[0] ?? null;
   const instructionsKey =
     reservation.state != null
       ? getReservationUnitInstructionsKey(reservation.state)
@@ -360,21 +365,12 @@ const Reservation = ({
 
   const { begin, end } = reservation;
 
-  const beginDate = t("common:dateWithWeekday", {
-    date: begin && parseISO(begin),
-  });
-
+  const beginDate = t("common:dateWithWeekday", { date: fromApiDate(begin) });
   const beginTime = t("common:timeWithPrefixInForm", {
-    date: begin && parseISO(begin),
+    date: fromApiDate(begin),
   });
-
-  const endDate = t("common:dateWithWeekday", {
-    date: end && parseISO(end),
-  });
-
-  const endTime = t("common:timeInForm", {
-    date: end && parseISO(end),
-  });
+  const endDate = t("common:dateWithWeekday", { date: fromApiDate(end) });
+  const endTime = t("common:timeInForm", { date: fromApiDate(end) });
 
   const timeString = capitalize(
     trim(
@@ -385,10 +381,9 @@ const Reservation = ({
     )
   );
 
-  const supportedFields =
+  const supportedFields = filterNonNullable(
     reservationUnit.metadataSet?.supportedFields
-      ?.filter((n): n is string => n != null)
-      .map(camelCase) ?? [];
+  );
 
   const reservationInfo = [
     "purpose",
@@ -397,7 +392,7 @@ const Reservation = ({
     "description",
   ].map(
     (field) =>
-      supportedFields.includes(field) && (
+      containsField(supportedFields, field) && (
         <ParagraphAlt key={field}>
           {t(`reservationApplication:label.common.${field}`)}:{" "}
           <span data-testid={`reservation__${field}`}>
@@ -408,10 +403,10 @@ const Reservation = ({
   );
 
   const reserveeInfo =
-    ReserveeType.Business === reservation.reserveeType ||
-    ReserveeType.Nonprofit === reservation.reserveeType ? (
+    CustomerTypeChoice.Business === reservation.reserveeType ||
+    CustomerTypeChoice.Nonprofit === reservation.reserveeType ? (
       <>
-        {supportedFields.includes("reserveeOrganisationName") && (
+        {containsField(supportedFields, "reserveeOrganisationName") && (
           <ParagraphAlt>
             {t("reservations:organisationName")}:{" "}
             <span data-testid="reservation__reservee-organisation-name">
@@ -419,7 +414,7 @@ const Reservation = ({
             </span>
           </ParagraphAlt>
         )}
-        {supportedFields.includes("reserveeId") && (
+        {containsField(supportedFields, "reserveeId") && (
           <ParagraphAlt>
             {t("reservations:reserveeId")}:
             <span data-testid="reservation__reservee-id">
@@ -427,8 +422,7 @@ const Reservation = ({
             </span>
           </ParagraphAlt>
         )}
-        {(supportedFields.includes("reserveeFirstName") ||
-          supportedFields.includes("reserveeLastName")) && (
+        {containsNameField(supportedFields) && (
           <ParagraphAlt>
             {t("reservations:contactName")}:{" "}
             <span data-testid="reservation__reservee-name">
@@ -438,7 +432,7 @@ const Reservation = ({
             </span>
           </ParagraphAlt>
         )}
-        {supportedFields.includes("reserveePhone") && (
+        {containsField(supportedFields, "reserveePhone") && (
           <ParagraphAlt>
             {t("reservations:contactPhone")}:
             <span data-testid="reservation__reservee-phone">
@@ -446,7 +440,7 @@ const Reservation = ({
             </span>
           </ParagraphAlt>
         )}
-        {supportedFields.includes("reserveeEmail") && (
+        {containsField(supportedFields, "reserveeEmail") && (
           <ParagraphAlt>
             {t("reservations:contactEmail")}:
             <span data-testid="reservation__reservee-email">
@@ -457,8 +451,7 @@ const Reservation = ({
       </>
     ) : (
       <>
-        {(supportedFields.includes("reserveeFirstName") ||
-          supportedFields.includes("reserveeLastName")) && (
+        {containsNameField(supportedFields) && (
           <ParagraphAlt>
             {t("common:name")}:{" "}
             <span data-testid="reservation__reservee-name">
@@ -468,7 +461,7 @@ const Reservation = ({
             </span>
           </ParagraphAlt>
         )}
-        {supportedFields.includes("reserveePhone") && (
+        {containsField(supportedFields, "reserveePhone") && (
           <ParagraphAlt>
             {t("common:phone")}:
             <span data-testid="reservation__reservee-phone">
@@ -476,7 +469,7 @@ const Reservation = ({
             </span>
           </ParagraphAlt>
         )}
-        {supportedFields.includes("reserveeEmail") && (
+        {containsField(supportedFields, "reserveeEmail") && (
           <ParagraphAlt>
             {t("common:email")}:
             <span data-testid="reservation__reservee-email">
@@ -724,6 +717,6 @@ const Reservation = ({
       </Container>
     </>
   );
-};
+}
 
 export default Reservation;

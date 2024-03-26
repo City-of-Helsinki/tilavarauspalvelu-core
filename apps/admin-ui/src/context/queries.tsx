@@ -15,18 +15,20 @@ export const CURRENT_USER = gql`
           code
           verboseNameFi
         }
-        units {
+        unit {
           pk
           nameFi
         }
-        unitGroups {
+        unitGroup {
           units {
             pk
             nameFi
           }
         }
-        permissions {
-          permission
+        role {
+          permissions {
+            permission
+          }
         }
       }
       serviceSectorRoles {
@@ -35,8 +37,10 @@ export const CURRENT_USER = gql`
           pk
           nameFi
         }
-        permissions {
-          permission
+        role {
+          permissions {
+            permission
+          }
         }
       }
       generalRoles {
@@ -45,8 +49,10 @@ export const CURRENT_USER = gql`
           code
           verboseNameFi
         }
-        permissions {
-          permission
+        role {
+          permissions {
+            permission
+          }
         }
       }
     }

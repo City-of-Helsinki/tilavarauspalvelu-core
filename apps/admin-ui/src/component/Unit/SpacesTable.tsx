@@ -5,11 +5,11 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { FetchResult, useMutation } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
-import {
+import type {
   SpaceDeleteMutationInput,
   SpaceDeleteMutationPayload,
-  SpaceType,
-  UnitByPkType,
+  SpaceNode,
+  UnitNode,
 } from "common/types/gql-types";
 import { DELETE_SPACE } from "../../common/queries";
 import DataTable, { CellConfig } from "../DataTable";
@@ -21,8 +21,8 @@ import SpaceTreeDataTableGroup from "./SpaceTreeDataTableGroup";
 import { useNotification } from "../../context/NotificationContext";
 
 interface IProps {
-  spaces: SpaceType[];
-  unit: UnitByPkType;
+  spaces: SpaceNode[];
+  unit: UnitNode;
   onSave: () => void;
   onDelete: () => void;
   onDataError: (error: string) => void;
@@ -49,7 +49,7 @@ const MaxPersons = styled.div`
   display: flex;
 `;
 
-const buildTrees = (spaces: SpaceType[]): SpaceType[] => {
+const buildTrees = (spaces: SpaceNode[]): SpaceNode[] => {
   const editedSpaces = spaces.map(clone);
   editedSpaces.forEach((s) => {
     const parent = editedSpaces.find((ps) => ps.pk === s.parent?.pk);
@@ -61,12 +61,12 @@ const buildTrees = (spaces: SpaceType[]): SpaceType[] => {
   return editedSpaces;
 };
 
-const collectSubTree = (space: SpaceType): SpaceType[] => {
-  const children = (space.children as SpaceType[]) || [];
+const collectSubTree = (space: SpaceNode): SpaceNode[] => {
+  const children = (space.children as SpaceNode[]) || [];
   return [space].concat(children.flatMap((c) => collectSubTree(c)));
 };
 
-const spacesAsGroups = (spaces: SpaceType[]) => {
+const spacesAsGroups = (spaces: SpaceNode[]) => {
   const reconciled = buildTrees(spaces);
   const roots = reconciled.filter((e) => e.parent == null);
 
@@ -76,14 +76,14 @@ const spacesAsGroups = (spaces: SpaceType[]) => {
   }));
 };
 
-const countSubSpaces = (space: SpaceType): number =>
+const countSubSpaces = (space: SpaceNode): number =>
   (space.children || []).reduce(
     (p, c) => p + 1 + (c ? countSubSpaces(c) : 0),
     0
   );
 
 const renderGroup = (
-  group: { data: SpaceType[] },
+  group: { data: SpaceNode[] },
   hasGrouping: boolean,
   cellConfig: CellConfig,
   groupIndex: number,
@@ -116,7 +116,7 @@ const renderGroup = (
   </SpaceTreeDataTableGroup>
 );
 
-const UnitHeadingName = (space: SpaceType) => (
+const UnitHeadingName = (space: SpaceNode) => (
   <Name>{trim(space.nameFi as string)}</Name>
 );
 
@@ -145,7 +145,7 @@ const SpacesTable = ({
   const deleteSpace = (
     pk: number
   ): Promise<FetchResult<{ deleteSpace: SpaceDeleteMutationPayload }>> =>
-    deleteSpaceMutation({ variables: { input: { pk } } });
+    deleteSpaceMutation({ variables: { input: { pk: String(pk) } } });
 
   const modal = useRef<ModalRef>();
 
@@ -162,7 +162,7 @@ const SpacesTable = ({
       {
         title: "Unit.headings.code",
         key: "code",
-        transform: ({ code }: SpaceType) => trim(code),
+        transform: ({ code }: SpaceNode) => trim(code),
         disableSorting: true,
       },
       {
@@ -177,14 +177,14 @@ const SpacesTable = ({
       {
         title: "Unit.headings.surfaceArea",
         key: "surfaceArea",
-        transform: ({ surfaceArea }: SpaceType) =>
+        transform: ({ surfaceArea }: SpaceNode) =>
           surfaceArea ? `${surfaceArea}m²` : "",
         disableSorting: true,
       },
       {
         title: "Unit.headings.maxPersons",
         key: "maxPersons",
-        transform: (space: SpaceType) => {
+        transform: (space: SpaceNode) => {
           return (
             <MaxPersons>
               {space.maxPersons ? (
@@ -263,7 +263,7 @@ const SpacesTable = ({
     ],
     order: "asc",
     index: "pk",
-    rowLink: ({ pk }: SpaceType) => `/unit/${unit.pk}/space/edit/${pk}`,
+    rowLink: ({ pk }: SpaceNode) => `/unit/${unit.pk}/space/edit/${pk}`,
   } as CellConfig;
 
   const ref = useRef(null);

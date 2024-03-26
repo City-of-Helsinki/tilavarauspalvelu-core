@@ -6,16 +6,17 @@ import { useMutation } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import { upperFirst } from "lodash";
 import {
+  LocationType,
   Mutation,
   ResourceCreateMutationInput,
-  UnitType,
+  UnitNode,
 } from "common/types/gql-types";
-import { parseAddress } from "../../../common/util";
-import { CustomDialogHeader } from "../../CustomDialogHeader";
-import { languages } from "../../../common/const";
+import { parseAddress } from "@/common/util";
+import { CustomDialogHeader } from "@/component/CustomDialogHeader";
+import { languages } from "@/common/const";
 import { CREATE_RESOURCE } from "./queries";
-import ParentSelector from "../../Spaces/space-editor/ParentSelector";
-import { useNotification } from "../../../context/NotificationContext";
+import ParentSelector from "@/component/Spaces/space-editor/ParentSelector";
+import { useNotification } from "@/context/NotificationContext";
 import {
   Buttons,
   Editor,
@@ -24,13 +25,13 @@ import {
   SaveButton,
   schema,
 } from "./modules/resourceEditor";
-import FormErrorSummary from "../../../common/FormErrorSummary";
+import FormErrorSummary from "@/common/FormErrorSummary";
 
 // eslint-disable-next-line
 type EditorProp = any;
 
 interface IProps {
-  unit: UnitType;
+  unit: UnitNode;
   spacePk: number;
   closeModal: () => void;
   onSave: () => void;
@@ -114,17 +115,13 @@ const NewResourceModal = ({
 
   const create = async (res: ResourceCreateMutationInput) => {
     try {
-      const { data } = await createResource({
+      await createResource({
         ...res,
-        locationType: "fixed",
+        locationType: LocationType.Fixed,
       });
 
-      if (data?.createResource?.errors == null) {
-        onSave();
-        closeModal();
-      } else {
-        notifyError(t("ResourceModal.saveError"));
-      }
+      onSave();
+      closeModal();
     } catch (error) {
       notifyError(t("ResourceModal.saveError"));
     }
@@ -175,7 +172,7 @@ const NewResourceModal = ({
                 label={t("ResourceModal.selectSpace")}
                 onChange={(parent) => setValue("spacePk", parent)}
                 unitPk={unit.pk ?? 0}
-                value={state.resource.spacePk ?? null}
+                value={state.resource.space ?? null}
                 placeholder={t("ResourceModal.selectSpace")}
                 noParentless
                 errorText={getValidationError("spacePk")}

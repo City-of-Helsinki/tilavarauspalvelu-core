@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { ReservationType } from "common/types/gql-types";
+import { ReservationNode } from "common/types/gql-types";
 import styled from "styled-components";
 import LinkPrev from "../LinkPrev";
 import { Container } from "../../styles/layout";
@@ -18,7 +18,7 @@ const EditPageWrapper = ({
 }: {
   children: React.ReactNode;
   title: string;
-  reservation?: ReservationType;
+  reservation?: ReservationNode;
 }) => {
   const { t } = useTranslation();
   const tagline = reservation ? createTagString(reservation, t) : "";

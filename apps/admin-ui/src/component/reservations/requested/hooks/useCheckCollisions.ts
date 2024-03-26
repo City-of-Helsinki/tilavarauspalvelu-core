@@ -1,17 +1,19 @@
 import {
-  Query,
-  Type,
-  QueryReservationUnitArgs,
-  ReservationType,
+  type Query,
+  type QueryReservationUnitArgs,
+  type ReservationNode,
+  ReservationTypeChoice,
+  ReservationUnitNodeReservationSetArgs,
 } from "common/types/gql-types";
 import { useQuery } from "@apollo/client";
-import { format } from "date-fns";
-import { useNotification } from "app/context/NotificationContext";
-import { doesIntervalCollide, reservationToInterval } from "app/helpers";
+import { useNotification } from "@/context/NotificationContext";
+import { doesIntervalCollide, reservationToInterval } from "@/helpers";
 import { RESERVATIONS_BY_RESERVATIONUNIT } from "./queries";
-import { base64encode } from "common/src/helpers";
+import { base64encode, filterNonNullable } from "common/src/helpers";
+import { toApiDate } from "common/src/common/util";
+import { RELATED_RESERVATION_STATES } from "common/src/const";
 
-const useCheckCollisions = ({
+function useCheckCollisions({
   reservationPk,
   reservationUnitPk,
   start,
@@ -27,44 +29,49 @@ const useCheckCollisions = ({
     before: number;
     after: number;
   };
-  reservationType: Type;
-}) => {
+  reservationType: ReservationTypeChoice;
+}) {
   const { notifyError } = useNotification();
 
-  const typename = "ReservationUnitType";
+  const today = new Date();
+
+  const typename = "ReservationUnitNode";
   const id = base64encode(`${typename}:${reservationUnitPk}`);
   const { data, loading } = useQuery<
     Query,
-    QueryReservationUnitArgs & { from: string; to: string }
+    QueryReservationUnitArgs & ReservationUnitNodeReservationSetArgs
   >(RESERVATIONS_BY_RESERVATIONUNIT, {
     fetchPolicy: "no-cache",
     skip: !reservationUnitPk || !start || !end,
     variables: {
       id,
-      from: format(start ?? new Date(), "yyyy-MM-dd"),
-      to: format(end ?? new Date(), "yyyy-MM-dd"),
+      beginDate: toApiDate(start ?? today) ?? "",
+      endDate: toApiDate(end ?? today) ?? "",
+      state: RELATED_RESERVATION_STATES,
     },
     onError: () => {
       notifyError("Varauksia ei voitu hakea");
     },
   });
 
-  const reservations = data?.reservationUnit?.reservations ?? [];
+  const reservations = filterNonNullable(data?.reservationUnit?.reservationSet);
   const collisions =
     end && start
       ? reservations
           .filter((x) => x?.pk !== reservationPk)
-          .filter((x): x is ReservationType => x != null)
+          .filter((x): x is ReservationNode => x != null)
           .map((x) => reservationToInterval(x, reservationType))
           .filter((x) => {
             if (x == null) return false;
             const buff =
-              x.type === Type.Blocked ? { before: 0, after: 0 } : buffers;
+              x.type === ReservationTypeChoice.Blocked
+                ? { before: 0, after: 0 }
+                : buffers;
             return doesIntervalCollide({ start, end, buffers: buff }, x);
           })
       : [];
 
   return { isLoading: loading, hasCollisions: collisions.length > 0 };
-};
+}
 
 export default useCheckCollisions;

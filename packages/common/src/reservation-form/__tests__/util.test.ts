@@ -1,12 +1,12 @@
 import { getReservationApplicationFields } from "../util";
-import { ReservationsReservationReserveeTypeChoices } from "../../../types/gql-types";
+import { CustomerTypeChoice } from "../../../types/gql-types";
 
 describe("getReservationApplicationFields", () => {
   test("with empty input", () => {
     expect(
       getReservationApplicationFields({
         supportedFields: [],
-        reserveeType: ReservationsReservationReserveeTypeChoices.Individual,
+        reserveeType: CustomerTypeChoice.Individual,
       })
     ).toEqual([]);
   });
@@ -17,7 +17,7 @@ describe("getReservationApplicationFields", () => {
     expect(
       getReservationApplicationFields({
         supportedFields: fields,
-        reserveeType: ReservationsReservationReserveeTypeChoices.Individual,
+        reserveeType: CustomerTypeChoice.Individual,
       })
     ).toEqual([]);
   });
@@ -35,7 +35,7 @@ describe("getReservationApplicationFields", () => {
     expect(
       getReservationApplicationFields({
         supportedFields: fields,
-        reserveeType: ReservationsReservationReserveeTypeChoices.Business,
+        reserveeType: CustomerTypeChoice.Business,
       })
     ).toEqual(["reserveeOrganisationName", "reserveeId"]);
   });
@@ -44,7 +44,7 @@ describe("getReservationApplicationFields", () => {
     expect(
       getReservationApplicationFields({
         supportedFields: fields,
-        reserveeType: ReservationsReservationReserveeTypeChoices.Nonprofit,
+        reserveeType: CustomerTypeChoice.Nonprofit,
       })
     ).toEqual(["reserveeOrganisationName", "reserveeId"]);
   });

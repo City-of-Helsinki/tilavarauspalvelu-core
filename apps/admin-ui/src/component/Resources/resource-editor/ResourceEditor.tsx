@@ -6,22 +6,26 @@ import { useTranslation } from "react-i18next";
 import { get, pick, upperFirst } from "lodash";
 import { useNavigate } from "react-router-dom";
 import {
-  Mutation,
-  Query,
-  QueryUnitByPkArgs,
-  ResourceUpdateMutationInput,
-  SpaceType,
-  UnitByPkType,
-  ResourceType,
+  type Mutation,
+  type Query,
+  type ResourceUpdateMutationInput,
+  type SpaceNode,
+  type ResourceNode,
+  type UnitNode,
+  type QueryUnitArgs,
+  type QueryResourceArgs,
+  LocationType,
 } from "common/types/gql-types";
-import { UNIT_WITH_SPACES_AND_RESOURCES } from "../../../common/queries";
-import { languages } from "../../../common/const";
-import Loader from "../../Loader";
-import { ContentContainer, IngressContainer } from "../../../styles/layout";
-import SubPageHead from "../../Unit/SubPageHead";
+import { base64encode } from "common/src/helpers";
+import { UNIT_WITH_SPACES_AND_RESOURCES } from "@/common/queries";
+import { languages } from "@/common/const";
+import Loader from "@/component/Loader";
+import { ContentContainer, IngressContainer } from "@/styles/layout";
+import SubPageHead from "@/component/Unit/SubPageHead";
+import { useNotification } from "@/context/NotificationContext";
+import ParentSelector from "@/component/Spaces/space-editor/ParentSelector";
+import FormErrorSummary from "@/common/FormErrorSummary";
 import { RESOURCE_QUERY, UPDATE_RESOURCE } from "./queries";
-import { useNotification } from "../../../context/NotificationContext";
-import ParentSelector from "../../Spaces/space-editor/ParentSelector";
 import {
   Buttons,
   Editor,
@@ -31,13 +35,11 @@ import {
   schema,
 } from "./modules/resourceEditor";
 
-import FormErrorSummary from "../../../common/FormErrorSummary";
-
 type State = {
   resourceEdit: ResourceUpdateMutationInput;
-  resource: ResourceType | null;
-  spaces: SpaceType[];
-  unit: UnitByPkType;
+  resource: ResourceNode | null;
+  spaces: SpaceNode[];
+  unit: UnitNode;
   loading: boolean;
   validationErrors: Joi.ValidationResult | null;
   hasChanges: boolean;
@@ -51,8 +53,8 @@ type Action =
       type: "setValidationErrors";
       validationErrors: Joi.ValidationResult | null;
     }
-  | { type: "unitLoaded"; unit: UnitByPkType }
-  | { type: "resourceLoaded"; resource: ResourceType }
+  | { type: "unitLoaded"; unit: UnitNode }
+  | { type: "resourceLoaded"; resource: ResourceNode }
   | { type: "set"; value: EditorProp };
 
 const initialState = {
@@ -109,7 +111,7 @@ const reducer = (state: State, action: Action): State => {
             "nameEn",
             "spacePk",
           ]) as ResourceUpdateMutationInput),
-          spacePk: resource.space?.pk,
+          space: resource.space?.pk,
         },
         resource,
         hasChanges: false,
@@ -138,11 +140,12 @@ const ResourceEditor = ({ resourcePk, unitPk }: Props) => {
   const setValue = (name: string, value: EditorProp) =>
     dispatch({ type: "set", value: { [name]: value } });
 
-  useQuery<Query, QueryUnitByPkArgs>(UNIT_WITH_SPACES_AND_RESOURCES, {
-    variables: { pk: Number(unitPk) },
-    onCompleted: ({ unitByPk }) => {
-      if (unitByPk) {
-        dispatch({ type: "unitLoaded", unit: unitByPk });
+  useQuery<Query, QueryUnitArgs>(UNIT_WITH_SPACES_AND_RESOURCES, {
+    variables: { id: base64encode(`UnitNode:${unitPk}`) },
+    skip: !unitPk || Number.isNaN(unitPk),
+    onCompleted: ({ unit }) => {
+      if (unit) {
+        dispatch({ type: "unitLoaded", unit });
       } else {
         notifyError(t("ResourceEditor.saveFailed"));
       }
@@ -152,11 +155,12 @@ const ResourceEditor = ({ resourcePk, unitPk }: Props) => {
     },
   });
 
-  useQuery<Query, QueryUnitByPkArgs>(RESOURCE_QUERY, {
-    variables: { pk: Number(resourcePk) },
-    onCompleted: ({ resourceByPk }) => {
-      if (resourceByPk) {
-        dispatch({ type: "resourceLoaded", resource: resourceByPk });
+  useQuery<Query, QueryResourceArgs>(RESOURCE_QUERY, {
+    variables: { id: base64encode(`ResourceNode:${resourcePk}`) },
+    skip: !resourcePk || Number.isNaN(resourcePk),
+    onCompleted: ({ resource }) => {
+      if (resource) {
+        dispatch({ type: "resourceLoaded", resource });
       } else {
         t("errors.errorFetchingData");
       }
@@ -173,19 +177,15 @@ const ResourceEditor = ({ resourcePk, unitPk }: Props) => {
 
   const update = async (res: ResourceUpdateMutationInput) => {
     try {
-      const { data } = await updateResource({
+      await updateResource({
         ...res,
-        locationType: "fixed",
+        locationType: LocationType.Fixed,
       });
 
-      if (data?.updateResource?.errors == null) {
-        notifySuccess(
-          t("ResourceEditor.resourceUpdatedNotification"),
-          t("ResourceEditor.resourceUpdated")
-        );
-      } else {
-        notifyError(t("ResourceModal.saveError"));
-      }
+      notifySuccess(
+        t("ResourceEditor.resourceUpdatedNotification"),
+        t("ResourceEditor.resourceUpdated")
+      );
     } catch (error) {
       notifyError(t("ResourceModal.saveError"));
     }
@@ -218,7 +218,7 @@ const ResourceEditor = ({ resourcePk, unitPk }: Props) => {
               label={t("ResourceModal.selectSpace")}
               onChange={(parent) => setValue("spacePk", parent)}
               unitPk={unitPk}
-              value={state.resourceEdit.spacePk ?? null}
+              value={state.resourceEdit.space ?? null}
               noParentless
             />
             {languages.map((lang) => {

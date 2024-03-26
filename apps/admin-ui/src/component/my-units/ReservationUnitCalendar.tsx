@@ -8,10 +8,10 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import {
   type Query,
-  type ReservationType,
-  Type,
-  ReservationUnitTypeReservationsArgs,
-  QueryReservationUnitArgs,
+  type ReservationNode,
+  ReservationTypeChoice,
+  type QueryReservationUnitArgs,
+  type ReservationUnitNodeReservationSetArgs,
 } from "common/types/gql-types";
 import { Permission } from "app/modules/permissionHelper";
 import usePermission from "app/hooks/usePermission";
@@ -24,6 +24,7 @@ import eventStyleGetter, { legend } from "./eventStyleGetter";
 import { PUBLIC_URL } from "../../common/const";
 import { getReserveeName } from "../reservations/requested/util";
 import { base64encode, filterNonNullable } from "common/src/helpers";
+import { RELATED_RESERVATION_STATES } from "common/src/const";
 
 type Props = {
   begin: string;
@@ -48,9 +49,9 @@ const getEventTitle = ({
   reservation,
 }: {
   reservationUnitPk: number;
-  reservation: ReservationType;
+  reservation: ReservationNode;
 }) => {
-  const reservationUnit = reservation.reservationUnits?.[0];
+  const reservationUnit = reservation.reservationUnit?.[0];
   const isOtherReservationUnit = reservationUnitPk !== reservationUnit?.pk;
 
   const reserveeName = getReserveeName(reservation);
@@ -63,7 +64,7 @@ const getEventTitle = ({
   return [reserveeName, ""];
 };
 
-const constructEventTitle = (res: ReservationType, resUnitPk: number) => {
+const constructEventTitle = (res: ReservationNode, resUnitPk: number) => {
   const [reservee, unit] = getEventTitle({
     reservationUnitPk: resUnitPk,
     reservation: res,
@@ -86,28 +87,28 @@ const ReservationUnitCalendar = ({
     "RESERVATION_UNIT_DRAFT",
   ];
 
-  const typename = "ReservationUnitType";
+  const typename = "ReservationUnitNode";
   const id = base64encode(`${typename}:${reservationUnitPk}`);
   const { data } = useQuery<
     Query,
-    QueryReservationUnitArgs & ReservationUnitTypeReservationsArgs
+    QueryReservationUnitArgs & ReservationUnitNodeReservationSetArgs
   >(RESERVATIONS_BY_RESERVATIONUNITS, {
     fetchPolicy: "network-only",
     skip: reservationUnitPk === 0,
     variables: {
       id,
-      from: toApiDate(startOfISOWeek(new Date(begin))),
-      to: toApiDate(addDays(endOfISOWeek(new Date(begin)), 1)),
-      includeWithSameComponents: true,
+      state: RELATED_RESERVATION_STATES,
+      beginDate: toApiDate(startOfISOWeek(new Date(begin))) ?? "",
+      endDate: toApiDate(addDays(endOfISOWeek(new Date(begin)), 1)) ?? "",
     },
     onError: () => {
       notifyError(t("errors.errorFetchingData"));
     },
   });
 
-  const reservations = filterNonNullable(data?.reservationUnit?.reservations);
+  const reservations = filterNonNullable(data?.reservationUnit?.reservationSet);
   const events = reservations.map((reservation) => {
-    const isBlocked = reservation.type === Type.Blocked;
+    const isBlocked = reservation.type === ReservationTypeChoice.Blocked;
     const title = !isBlocked
       ? constructEventTitle(reservation, reservationUnitPk)
       : t("MyUnits.Calendar.legend.closed");
@@ -122,7 +123,7 @@ const ReservationUnitCalendar = ({
   const { hasPermission } = usePermission();
 
   const evts = filterNonNullable(events.map((e) => e.event)).filter(
-    (e) => e.type !== Type.Blocked
+    (e) => e.type !== ReservationTypeChoice.Blocked
   );
   const eventBuffers = getEventBuffers(evts);
 

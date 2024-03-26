@@ -5,8 +5,9 @@ import styled, { css } from "styled-components";
 import type {
   AllocatedTimeSlotNode,
   ApplicationSectionNode,
+  ReservationUnitNode,
 } from "common/types/gql-types";
-import { SemiBold, type ReservationUnitNode, fontMedium } from "common";
+import { SemiBold, fontMedium } from "common";
 import { PUBLIC_URL } from "@/common/const";
 import { getApplicantName } from "@/component/applications/util";
 import { ageGroup } from "@/component/reservations/requested/util";

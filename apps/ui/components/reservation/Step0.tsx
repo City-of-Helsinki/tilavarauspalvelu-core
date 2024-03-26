@@ -2,7 +2,7 @@
  *  First part of the Reservation process form
  *  This component needs to be wrapped inside a Form context
  */
-import type { OptionType, ReservationUnitNode } from "common/types/common";
+import type { OptionType } from "common/types/common";
 import { IconArrowLeft, IconArrowRight } from "hds-react";
 import { useFormContext } from "react-hook-form";
 import React from "react";
@@ -23,6 +23,7 @@ import {
   Subheading,
 } from "../reservation-unit/ReservationUnitStyles";
 import Sanitize from "../common/Sanitize";
+import { ReservationUnitNode } from "common/types/gql-types";
 
 type Props = {
   reservationUnit: ReservationUnitNode;
@@ -88,10 +89,12 @@ const Step0 = ({
     }) || [];
 
   const { supportedFields } = reservationUnit.metadataSet ?? {};
-  const includesReserveeType = supportedFields?.includes("reservee_type");
+  const includesReserveeType =
+    supportedFields?.find((x) => x.fieldName === "reservee_type") != null;
   const reserveeType = watch("reserveeType");
   const homeCity = watch("homeCity");
-  const includesHomeCity = supportedFields?.includes("home_city");
+  const includesHomeCity =
+    supportedFields?.find((x) => x.fieldName === "home_city") != null;
 
   if (includesReserveeType && isSubmitted && !reserveeType)
     errorKeys.push("reserveeType");

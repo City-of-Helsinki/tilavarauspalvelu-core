@@ -1,15 +1,16 @@
 import { useQuery } from "@apollo/client";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import {
+import type {
   Query,
   QueryReservationUnitTypesArgs,
-  ReservationUnitTypeType,
+  ReservationUnitTypeNode,
 } from "common/types/gql-types";
 import { OptionType } from "@/common/types";
 import { GQL_MAX_RESULTS_PER_QUERY } from "@/common/const";
 import { SortedSelect } from "@/component/SortedSelect";
 import { RESERVATION_UNIT_TYPES_QUERY } from "./queries";
+import { filterNonNullable } from "common/src/helpers";
 
 type Props = {
   onChange: (reservationUnitType: OptionType[]) => void;
@@ -23,7 +24,7 @@ const ReservationUnitTypeFilter = ({
   style,
 }: Props): JSX.Element => {
   const { t } = useTranslation();
-  const [resUnitTypes, setResUnitTypes] = useState<ReservationUnitTypeType[]>(
+  const [resUnitTypes, setResUnitTypes] = useState<ReservationUnitTypeNode[]>(
     []
   );
 
@@ -31,7 +32,7 @@ const ReservationUnitTypeFilter = ({
     RESERVATION_UNIT_TYPES_QUERY,
     {
       variables: {
-        offset: resUnitTypes.length,
+        offset: resUnitTypes.length !== 0 ? resUnitTypes.length : undefined,
         first: GQL_MAX_RESULTS_PER_QUERY,
       },
       onCompleted: (data) => {
@@ -41,10 +42,7 @@ const ReservationUnitTypeFilter = ({
           qd?.totalCount &&
           qd?.edges.length > 0
         ) {
-          const ds =
-            qd.edges
-              .map((x) => x?.node)
-              .filter((x): x is ReservationUnitTypeType => x != null) ?? [];
+          const ds = filterNonNullable(qd.edges.map((x) => x?.node));
           setResUnitTypes([...resUnitTypes, ...ds]);
         }
       },

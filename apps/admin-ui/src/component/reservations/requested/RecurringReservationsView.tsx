@@ -2,13 +2,12 @@ import React from "react";
 import { H6 } from "common/src/common/typography";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
-import { State, type ReservationType } from "common/types/gql-types";
+import { State, type ReservationNode } from "common/types/gql-types";
 import { useRecurringReservations } from "./hooks";
-import { RECURRING_AUTOMATIC_REFETCH_LIMIT } from "../../../common/const";
 import ReservationList from "../../ReservationsList";
 import ReservationListButton from "../../ReservationListButton";
 import DenyDialog from "./DenyDialog";
-import { useModal } from "../../../context/ModalContext";
+import { useModal } from "@/context/ModalContext";
 import EditTimeModal from "../EditTimeModal";
 
 const RecurringReservationsView = ({
@@ -18,17 +17,14 @@ const RecurringReservationsView = ({
   onReservationUpdated,
 }: {
   recurringPk: number;
-  onSelect?: (selected: ReservationType) => void;
+  onSelect?: (selected: ReservationNode) => void;
   onChange?: () => void;
   onReservationUpdated?: () => void;
 }) => {
   const { t } = useTranslation();
   const { setModalContent } = useModal();
 
-  const { loading, reservations, fetchMore, totalCount } =
-    useRecurringReservations(recurringPk, {
-      limit: RECURRING_AUTOMATIC_REFETCH_LIMIT,
-    });
+  const { loading, reservations } = useRecurringReservations(recurringPk);
 
   if (loading) {
     return <div>Loading</div>;
@@ -41,7 +37,7 @@ const RecurringReservationsView = ({
     }
   };
 
-  const handleChange = (res: ReservationType) => {
+  const handleChange = (res: ReservationNode) => {
     setModalContent(
       <EditTimeModal
         reservation={res}
@@ -56,7 +52,7 @@ const RecurringReservationsView = ({
     setModalContent(null);
   };
 
-  const handleRemove = (res: ReservationType) => {
+  const handleRemove = (res: ReservationNode) => {
     setModalContent(
       <DenyDialog
         reservations={[res]}
@@ -119,18 +115,10 @@ const RecurringReservationsView = ({
     };
   });
 
-  const handleLoadMore = () => {
-    fetchMore({ variables: { offset: reservations.length } });
-  };
-
-  const hasMore = reservations.length < (totalCount ?? 0);
-
   return (
     <ReservationList
       header={<H6 as="h3">{t("RecurringReservationsView.Heading")}</H6>}
       items={forDisplay}
-      onLoadMore={handleLoadMore}
-      hasMore={hasMore}
     />
   );
 };

@@ -76,16 +76,15 @@ export const UNIT_QUERY = gql`
   ${RESERVATION_UNIT_COMMON_FRAGMENT}
   ${IMAGE_FRAGMENT}
   ${LOCATION_FRAGMENT}
-  query Unit($pk: Int) {
-    unitByPk(pk: $pk) {
+  query Unit($id: ID!) {
+    unit(id: $id) {
       pk
       nameFi
       tprekId
       shortDescriptionFi
-      reservationUnits {
+      reservationunitSet {
         ...ReservationUnitCommonFields
         isDraft
-        isArchived
         purposes {
           pk
           nameFi
@@ -109,13 +108,13 @@ export const UNIT_QUERY = gql`
 export const UNIT_WITH_SPACES_AND_RESOURCES = gql`
   ${SPACE_COMMON_FRAGMENT}
   ${LOCATION_FRAGMENT}
-  query UnitWithSpacesAndResources($pk: Int) {
-    unitByPk(pk: $pk) {
+  query UnitWithSpacesAndResources($id: ID!) {
+    unit(id: $id) {
       pk
       nameFi
       spaces {
         ...SpaceCommonFields
-        resources {
+        resourceSet {
           pk
           nameFi
         }
@@ -152,6 +151,11 @@ export const HANDLING_COUNT_QUERY = gql`
     }
 
     units(onlyWithPermission: true) {
+      edges {
+        node {
+          pk
+        }
+      }
       totalCount
     }
   }

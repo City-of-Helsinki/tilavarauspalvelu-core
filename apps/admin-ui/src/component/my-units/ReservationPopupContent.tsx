@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { ReservationType } from "common/types/gql-types";
+import { ReservationNode } from "common/types/gql-types";
 import { Permission } from "@/modules/permissionHelper";
 import { reservationUrl } from "@/common/urls";
 import { formatTime } from "@/common/util";
@@ -40,7 +40,7 @@ const WorkingMemo = styled.div`
 export function ReservationPopupContent({
   reservation,
 }: {
-  reservation: ReservationType;
+  reservation: ReservationNode;
 }): JSX.Element {
   const { t } = useTranslation();
   const eventName = getReserveeName(reservation, t, 22) || "-";
@@ -49,7 +49,7 @@ export function ReservationPopupContent({
       <DenseVerticalFlex>
         <Heading>
           {formatTime(reservation.begin)} - {formatTime(reservation.end)} /{" "}
-          {reservation.reservationUnits?.[0]?.nameFi}
+          {reservation.reservationUnit?.[0]?.nameFi}
         </Heading>
         <VisibleIfPermission
           reservation={reservation}

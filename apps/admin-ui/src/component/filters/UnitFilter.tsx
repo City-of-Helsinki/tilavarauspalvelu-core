@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { gql, useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
-import { Query, UnitType } from "common/types/gql-types";
-import { OptionType } from "@/common/types";
+import type { Query, UnitNode } from "common/types/gql-types";
+import type { OptionType } from "@/common/types";
 import { SortedSelect } from "@/component/SortedSelect";
 import { GQL_MAX_RESULTS_PER_QUERY } from "@/common/const";
+import { filterNonNullable } from "common/src/helpers";
 
 const UNITS_QUERY = gql`
   query UnitsFilter($offset: Int, $count: Int) {
@@ -27,7 +28,7 @@ type Props = {
 
 const UnitFilter = ({ onChange, value }: Props): JSX.Element => {
   const { t } = useTranslation();
-  const [units, setUnits] = useState<UnitType[]>([]);
+  const [units, setUnits] = useState<UnitNode[]>([]);
 
   // Copy-paste from ReservationUnitFilter (same issues etc.)
   const { loading } = useQuery<Query>(UNITS_QUERY, {
@@ -35,10 +36,7 @@ const UnitFilter = ({ onChange, value }: Props): JSX.Element => {
     onCompleted: (data) => {
       const qd = data?.units;
       if (qd?.edges.length != null && qd?.totalCount && qd?.edges.length > 0) {
-        const ds =
-          data.units?.edges
-            .map((x) => x?.node)
-            .filter((e): e is UnitType => e != null) ?? [];
+        const ds = filterNonNullable(qd?.edges.map((x) => x?.node));
         setUnits([...units, ...ds]);
       }
     },

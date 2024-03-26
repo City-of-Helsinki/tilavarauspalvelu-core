@@ -5,10 +5,6 @@ export const APPROVE_RESERVATION = gql`
     approveReservation(input: $input) {
       pk
       state
-      errors {
-        field
-        messages
-      }
     }
   }
 `;
@@ -18,10 +14,6 @@ export const DENY_RESERVATION = gql`
     denyReservation(input: $input) {
       pk
       state
-      errors {
-        field
-        messages
-      }
     }
   }
 `;
@@ -29,10 +21,8 @@ export const DENY_RESERVATION = gql`
 export const REFUND_RESERVATION = gql`
   mutation refundReservation($input: ReservationRefundMutationInput!) {
     refundReservation(input: $input) {
-      errors {
-        field
-        messages
-      }
+      pk
+      state
     }
   }
 `;
@@ -42,10 +32,6 @@ export const REQUIRE_HANDLING_RESERVATION = gql`
     requireHandlingForReservation(input: $input) {
       pk
       state
-      errors {
-        field
-        messages
-      }
     }
   }
 `;

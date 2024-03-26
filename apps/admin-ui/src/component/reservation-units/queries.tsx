@@ -10,7 +10,7 @@ export const SEARCH_RESERVATION_UNITS_QUERY = gql`
     $surfaceAreaLte: Decimal
     $unit: [Int]
     $reservationUnitType: [Int]
-    $orderBy: String
+    $orderBy: [ReservationUnitOrderingChoices]
     $offset: Int
     $first: Int
     $state: [String]

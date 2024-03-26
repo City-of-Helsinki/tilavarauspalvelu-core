@@ -2,12 +2,16 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { H4 } from "common/src/common/typography";
-import type { LocationType, Maybe, UnitType } from "common/types/gql-types";
+import type {
+  LocationNode,
+  Maybe,
+  UnitNode,
+  ReservationUnitNode,
+} from "common/types/gql-types";
 import { IconLinkExternal } from "hds-react";
 import { IconButton } from "common/src/components";
-import type { ReservationUnitNode } from "common";
-import { getTranslation } from "../../modules/util";
 import { mapUrlPrefix } from "@/modules/const";
+import { getTranslation } from "@/modules/util";
 
 type Props = {
   reservationUnit: ReservationUnitNode;
@@ -45,7 +49,7 @@ type UrlReturn = string;
 
 function createHslUrl(
   locale: string,
-  location?: Maybe<LocationType>
+  location?: Maybe<LocationNode>
 ): UrlReturn {
   if (!location) {
     return "";
@@ -65,7 +69,7 @@ function createHslUrl(
 
 function createGoogleUrl(
   locale: string,
-  location?: Maybe<LocationType>
+  location?: Maybe<LocationNode>
 ): UrlReturn {
   if (!location) {
     return "";
@@ -83,7 +87,7 @@ function createGoogleUrl(
   return `https://www.google.com/maps/dir/?api=1&hl=${locale}&destination=${destination}`;
 }
 
-function createMapUrl(locale: string, unit?: Maybe<UnitType>): string {
+function createMapUrl(locale: string, unit?: Maybe<UnitNode>): string {
   if (!unit?.tprekId) {
     return "";
   }
@@ -93,7 +97,7 @@ function createMapUrl(locale: string, unit?: Maybe<UnitType>): string {
 
 function createAccessibilityUrl(
   locale: string,
-  unit?: Maybe<UnitType>
+  unit?: Maybe<UnitNode>
 ): UrlReturn {
   if (!unit?.tprekId) {
     return "";

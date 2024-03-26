@@ -13,9 +13,9 @@ import {
   type SuitableTimeRangeNode,
   Weekday,
   ApplicationSectionStatusChoice,
+  type ReservationUnitNode,
 } from "common/types/gql-types";
 import { ShowAllContainer } from "common/src/components/";
-import type { ReservationUnitNode } from "common";
 import {
   convertWeekday,
   transformWeekday,

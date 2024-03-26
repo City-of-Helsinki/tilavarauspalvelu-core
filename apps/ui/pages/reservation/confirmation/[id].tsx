@@ -60,8 +60,7 @@ const Columns = styled.div`
 const ReservationSuccess = ({ reservationPk, apiBaseUrl }: Props) => {
   const { t } = useTranslation();
 
-  const typename = "ReservationType";
-  const id = base64encode(`${typename}:${reservationPk}`);
+  const id = base64encode(`ReservationNode:${reservationPk}`);
   const {
     data,
     loading: isReservationLoading,
@@ -105,7 +104,7 @@ const ReservationSuccess = ({ reservationPk, apiBaseUrl }: Props) => {
     );
   }
 
-  const reservationUnit = reservation?.reservationUnits?.[0] ?? null;
+  const reservationUnit = reservation?.reservationUnit?.[0] ?? null;
 
   return (
     <StyledContainer size="s">

@@ -1,11 +1,11 @@
 import React from "react";
 import { render } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
-import { type ReservationType, State } from "common/types/gql-types";
+import { type ReservationNode, State } from "common/types/gql-types";
 import { addDays, addMinutes } from "date-fns";
 import ApprovalButtons from "./ApprovalButtons";
 
-const wrappedRender = (reservation: ReservationType) => {
+const wrappedRender = (reservation: ReservationNode) => {
   return render(
     <BrowserRouter>
       <ApprovalButtons
@@ -25,7 +25,7 @@ describe("State change rules", () => {
       state: State.Confirmed,
       end: addDays(new Date(), 2).toISOString(),
       recurringReservation: undefined,
-    } as ReservationType;
+    } as ReservationNode;
 
     const view = wrappedRender(res);
 
@@ -44,7 +44,7 @@ describe("State change rules", () => {
       state: State.RequiresHandling,
       end: addDays(new Date(), 2).toISOString(),
       recurringReservation: undefined,
-    } as ReservationType;
+    } as ReservationNode;
 
     const view = wrappedRender(res);
 
@@ -61,7 +61,7 @@ describe("State change rules", () => {
       state: State.Denied,
       end: addDays(new Date(), 2).toISOString(),
       recurringReservation: undefined,
-    } as ReservationType;
+    } as ReservationNode;
 
     const view = wrappedRender(res);
 
@@ -78,7 +78,7 @@ describe("State change rules", () => {
       state: State.Confirmed,
       end: addDays(new Date(), -2).toISOString(),
       recurringReservation: undefined,
-    } as ReservationType;
+    } as ReservationNode;
     const view = wrappedRender(res);
     expect(view.queryAllByRole("button")).toHaveLength(0);
   });
@@ -88,7 +88,7 @@ describe("State change rules", () => {
       state: State.Denied,
       end: addDays(new Date(), -2).toISOString(),
       recurringReservation: undefined,
-    } as ReservationType;
+    } as ReservationNode;
     const view = wrappedRender(res);
     expect(view.queryAllByRole("button")).toHaveLength(0);
   });
@@ -98,7 +98,7 @@ describe("State change rules", () => {
       state: State.RequiresHandling,
       end: addDays(new Date(), -2).toISOString(),
       recurringReservation: undefined,
-    } as ReservationType;
+    } as ReservationNode;
 
     const view = wrappedRender(res);
 
@@ -115,7 +115,7 @@ describe("Editing allowed", () => {
       state: State.Confirmed,
       end: addDays(new Date(), 2).toISOString(),
       recurringReservation: undefined,
-    } as ReservationType;
+    } as ReservationNode;
 
     const view = wrappedRender(res);
 
@@ -129,7 +129,7 @@ describe("Editing allowed", () => {
       state: State.RequiresHandling,
       end: addDays(new Date(), 2).toISOString(),
       recurringReservation: undefined,
-    } as ReservationType;
+    } as ReservationNode;
 
     const view = wrappedRender(res);
     expect(view.queryAllByRole("link")).toHaveLength(0);
@@ -164,7 +164,7 @@ describe("Editing allowed", () => {
       state: State.Confirmed,
       end: addMinutes(new Date(), -45).toISOString(),
       recurringReservation: undefined,
-    } as ReservationType;
+    } as ReservationNode;
     const view = wrappedRender(res);
     expect(
       view.getByRole("link", { name: "ApprovalButtons.edit" })

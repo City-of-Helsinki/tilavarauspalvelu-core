@@ -2,14 +2,14 @@ import { cloneDeep, get as mockGet } from "lodash";
 import { addDays } from "date-fns";
 import { toUIDate } from "common/src/common/util";
 import {
-  EquipmentType,
+  type EquipmentNode,
   State,
-  ReservationUnitPricingType,
+  type ReservationUnitPricingNode,
   PriceUnit,
   PricingType,
   ReservationUnitState,
-  ReservationUnitType,
-  UnitType,
+  type ReservationUnitNode,
+  type UnitNode,
   Status,
 } from "common/types/gql-types";
 import {
@@ -44,7 +44,7 @@ describe("getPrice", () => {
       highestPrice: 50.5,
       priceUnit: "PER_15_MINS",
       pricingType: "PAID",
-    } as unknown as ReservationUnitPricingType;
+    } as unknown as ReservationUnitPricingNode;
 
     expect(getPrice({ pricing })).toBe("10 - 50,5 € / 15 min");
   });
@@ -55,7 +55,7 @@ describe("getPrice", () => {
       highestPrice: 50.5,
       priceUnit: "PER_15_MINS",
       pricingType: "PAID",
-    } as unknown as ReservationUnitPricingType;
+    } as unknown as ReservationUnitPricingNode;
 
     expect(getPrice({ pricing })).toBe("0 - 50,5 € / 15 min");
   });
@@ -66,7 +66,7 @@ describe("getPrice", () => {
       highestPrice: 60.5,
       priceUnit: "PER_HOUR",
       pricingType: "PAID",
-    } as unknown as ReservationUnitPricingType;
+    } as unknown as ReservationUnitPricingNode;
 
     expect(getPrice({ pricing, minutes: 60 })).toBe("0 - 60,5 €");
   });
@@ -77,7 +77,7 @@ describe("getPrice", () => {
       highestPrice: "60.5",
       priceUnit: "PER_HOUR",
       pricingType: "PAID",
-    } as unknown as ReservationUnitPricingType;
+    } as unknown as ReservationUnitPricingNode;
 
     expect(getPrice({ pricing, minutes: 61 })).toBe("0 - 75,63 €");
   });
@@ -88,7 +88,7 @@ describe("getPrice", () => {
       highestPrice: "100",
       priceUnit: "PER_HOUR",
       pricingType: "PAID",
-    } as unknown as ReservationUnitPricingType;
+    } as unknown as ReservationUnitPricingNode;
 
     expect(getPrice({ pricing, minutes: 61 })).toBe("0 - 125 €");
   });
@@ -99,7 +99,7 @@ describe("getPrice", () => {
       highestPrice: "100",
       priceUnit: "PER_HOUR",
       pricingType: "PAID",
-    } as unknown as ReservationUnitPricingType;
+    } as unknown as ReservationUnitPricingNode;
 
     expect(getPrice({ pricing, minutes: 90 })).toBe("0 - 150 €");
   });
@@ -110,7 +110,7 @@ describe("getPrice", () => {
       highestPrice: "100",
       priceUnit: "PER_HOUR",
       pricingType: "PAID",
-    } as unknown as ReservationUnitPricingType;
+    } as unknown as ReservationUnitPricingNode;
 
     expect(getPrice({ pricing, minutes: 91 })).toBe("0 - 175 €");
   });
@@ -121,7 +121,7 @@ describe("getPrice", () => {
       highestPrice: "30",
       priceUnit: "PER_15_MINS",
       pricingType: "PAID",
-    } as unknown as ReservationUnitPricingType;
+    } as unknown as ReservationUnitPricingNode;
 
     expect(getPrice({ pricing, minutes: 60 })).toBe("0 - 120 €");
   });
@@ -132,7 +132,7 @@ describe("getPrice", () => {
       highestPrice: "30",
       priceUnit: "PER_30_MINS",
       pricingType: "PAID",
-    } as unknown as ReservationUnitPricingType;
+    } as unknown as ReservationUnitPricingNode;
 
     expect(getPrice({ pricing, minutes: 60 })).toBe("0 - 60 €");
   });
@@ -143,7 +143,7 @@ describe("getPrice", () => {
       highestPrice: "30",
       priceUnit: "PER_30_MINS",
       pricingType: "PAID",
-    } as unknown as ReservationUnitPricingType;
+    } as unknown as ReservationUnitPricingNode;
 
     expect(getPrice({ pricing, minutes: 61 })).toBe("0 - 75 €");
   });
@@ -154,7 +154,7 @@ describe("getPrice", () => {
       highestPrice: "100",
       priceUnit: "PER_HALF_DAY",
       pricingType: "PAID",
-    } as unknown as ReservationUnitPricingType;
+    } as unknown as ReservationUnitPricingNode;
 
     expect(getPrice({ pricing, minutes: 61 })).toBe("10 - 100 €");
   });
@@ -165,7 +165,7 @@ describe("getPrice", () => {
       highestPrice: "100",
       priceUnit: "PER_DAY",
       pricingType: "PAID",
-    } as unknown as ReservationUnitPricingType;
+    } as unknown as ReservationUnitPricingNode;
 
     expect(getPrice({ pricing, minutes: 1234 })).toBe("10 - 100 €");
   });
@@ -176,7 +176,7 @@ describe("getPrice", () => {
       highestPrice: "100",
       priceUnit: "PER_WEEK",
       pricingType: "PAID",
-    } as unknown as ReservationUnitPricingType;
+    } as unknown as ReservationUnitPricingNode;
 
     expect(getPrice({ pricing, minutes: 1234 })).toBe("10 - 100 €");
   });
@@ -187,7 +187,7 @@ describe("getPrice", () => {
       highestPrice: 50,
       priceUnit: "FIXED",
       pricingType: "PAID",
-    } as unknown as ReservationUnitPricingType;
+    } as unknown as ReservationUnitPricingNode;
 
     expect(getPrice({ pricing })).toBe("50 €");
   });
@@ -198,7 +198,7 @@ describe("getPrice", () => {
       highestPrice: 50,
       priceUnit: "FIXED",
       pricingType: "PAID",
-    } as unknown as ReservationUnitPricingType;
+    } as unknown as ReservationUnitPricingNode;
 
     expect(getPrice({ pricing, trailingZeros: true })).toBe("50,00 €");
   });
@@ -211,7 +211,7 @@ describe("getPrice", () => {
       highestPrice: "0",
       priceUnit: "PER_HOUR",
       pricingType: "PAID",
-    } as ReservationUnitPricingType;
+    } as ReservationUnitPricingNode;
 
     expect(getPrice({ pricing })).toBe("Maksuton");
   });
@@ -223,7 +223,7 @@ describe("getPrice", () => {
       priceUnit: "PER_15_MINS",
       pricingType: "PAID",
       status: "ACTIVE",
-    } as ReservationUnitPricingType;
+    } as ReservationUnitPricingNode;
 
     expect(getPrice({ pricing, minutes: 180 })).toBe("0 - 606 €");
   });
@@ -235,7 +235,7 @@ describe("getPrice", () => {
       priceUnit: "PER_15_MINS",
       pricingType: "PAID",
       status: "ACTIVE",
-    } as ReservationUnitPricingType;
+    } as ReservationUnitPricingNode;
 
     expect(getPrice({ pricing, minutes: 180, trailingZeros: true })).toBe(
       "0 - 606,00 €"
@@ -245,20 +245,20 @@ describe("getPrice", () => {
 
 describe("isReservationUnitPublished", () => {
   test("without state", () => {
-    expect(isReservationUnitPublished({} as ReservationUnitType)).toBe(false);
+    expect(isReservationUnitPublished({} as ReservationUnitNode)).toBe(false);
   });
 
   test("with valid states", () => {
     expect(
       isReservationUnitPublished({
         state: ReservationUnitState.Published,
-      } as unknown as ReservationUnitType)
+      } as unknown as ReservationUnitNode)
     ).toBe(true);
 
     expect(
       isReservationUnitPublished({
         state: ReservationUnitState.ScheduledHiding,
-      } as unknown as ReservationUnitType)
+      } as unknown as ReservationUnitNode)
     ).toBe(true);
   });
 
@@ -266,60 +266,66 @@ describe("isReservationUnitPublished", () => {
     expect(
       isReservationUnitPublished({
         state: ReservationUnitState.Archived,
-      } as unknown as ReservationUnitType)
+      } as unknown as ReservationUnitNode)
     ).toBe(false);
 
     expect(
       isReservationUnitPublished({
         state: ReservationUnitState.Draft,
-      } as unknown as ReservationUnitType)
+      } as unknown as ReservationUnitNode)
     ).toBe(false);
 
     expect(
       isReservationUnitPublished({
         state: ReservationUnitState.Hidden,
-      } as unknown as ReservationUnitType)
+      } as unknown as ReservationUnitNode)
     ).toBe(false);
 
     expect(
       isReservationUnitPublished({
         state: ReservationUnitState.ScheduledPeriod,
-      } as unknown as ReservationUnitType)
+      } as unknown as ReservationUnitNode)
     ).toBe(false);
 
     expect(
       isReservationUnitPublished({
         state: ReservationUnitState.ScheduledPublishing,
-      } as unknown as ReservationUnitType)
+      } as unknown as ReservationUnitNode)
     ).toBe(false);
   });
 });
 
 describe("getEquipmentCategories", () => {
   test("with equipment out of predefined order", () => {
-    const equipment: EquipmentType[] = [
+    const equipment: EquipmentNode[] = [
       {
         id: "1",
         nameFi: "Item A",
+        name: "Item A",
         category: {
           id: "1",
           nameFi: "Category A",
+          name: "Category A",
         },
       },
       {
         id: "2",
         nameFi: "Item B",
+        name: "Item B",
         category: {
           id: "2",
           nameFi: "Category B",
+          name: "Category B",
         },
       },
       {
         id: "3",
         nameFi: "Item C",
+        name: "Item C",
         category: {
           id: "3",
           nameFi: "Category C",
+          name: "Category C",
         },
       },
     ];
@@ -328,53 +334,65 @@ describe("getEquipmentCategories", () => {
   });
 
   test("with equipment in predefined order", () => {
-    const equipment: EquipmentType[] = [
+    const equipment: EquipmentNode[] = [
       {
         id: "1",
         nameFi: "Item A",
+        name: "Item A",
         category: {
           id: "1",
           nameFi: "Liittimet",
+          name: "Liittimet",
         },
       },
       {
         id: "2",
         nameFi: "Item B",
+        name: "Item B",
         category: {
           id: "2",
           nameFi: "Keittiö",
+          name: "Keittiö",
         },
       },
       {
         id: "3",
         nameFi: "Item C",
+        name: "Item C",
         category: {
           id: "3",
           nameFi: "Foobar",
+          name: "Foobar",
         },
       },
       {
         id: "4",
         nameFi: "Item D",
+        name: "Item D",
         category: {
           id: "4",
           nameFi: "Pelikonsoli",
+          name: "Pelikonsoli",
         },
       },
       {
         id: "5",
         nameFi: "Item ABC 2",
+        name: "Item ABC 2",
         category: {
           id: "2",
           nameFi: "Keittiö",
+          name: "Keittiö",
         },
       },
       {
         id: "6",
         nameFi: "Item ABC 1",
+        name: "Item ABC 1",
         category: {
           id: "2",
           nameFi: "Keittiö",
+          name: "Keittiö",
         },
       },
     ];
@@ -394,29 +412,35 @@ describe("getEquipmentCategories", () => {
 
 describe("getEquipmentList", () => {
   test("with equipment out of predefined order", () => {
-    const equipment: EquipmentType[] = [
+    const equipment: EquipmentNode[] = [
       {
         id: "1",
         nameFi: "Item A",
+        name: "Item A",
         category: {
           id: "1",
           nameFi: "Category A",
+          name: "Category A",
         },
       },
       {
         id: "2",
         nameFi: "Item B",
+        name: "Item B",
         category: {
           id: "2",
           nameFi: "Category B",
+          name: "Category B",
         },
       },
       {
         id: "3",
         nameFi: "Item C",
+        name: "Item C",
         category: {
           id: "3",
           nameFi: "Category C",
+          name: "Category C",
         },
       },
     ];
@@ -429,29 +453,35 @@ describe("getEquipmentList", () => {
   });
 
   test("with equipment out of predefined order", () => {
-    const equipment: EquipmentType[] = [
+    const equipment: EquipmentNode[] = [
       {
         id: "1",
         nameFi: "Item A",
+        name: "Item A",
         category: {
           id: "1",
           nameFi: "Category C",
+          name: "Category C",
         },
       },
       {
         id: "2",
         nameFi: "Item B",
+        name: "Item B",
         category: {
           id: "2",
           nameFi: "Category B",
+          name: "Category B",
         },
       },
       {
         id: "3",
         nameFi: "Item C",
+        name: "Item C",
         category: {
           id: "3",
           nameFi: "Category A",
+          name: "Category A",
         },
       },
     ];
@@ -464,61 +494,75 @@ describe("getEquipmentList", () => {
   });
 
   test("with equipment in predefined order", () => {
-    const equipment: EquipmentType[] = [
+    const equipment: EquipmentNode[] = [
       {
         id: "1",
         nameFi: "Item A",
+        name: "Item A",
         category: {
           id: "1",
           nameFi: "Liittimet",
+          name: "Liittimet",
         },
       },
       {
         id: "2",
         nameFi: "Item B",
+        name: "Item B",
         category: {
           id: "2",
           nameFi: "Keittiö",
+          name: "Keittiö",
         },
       },
       {
         id: "3",
         nameFi: "Item C 2",
+        name: "Item C 2",
         category: {
           id: "3",
           nameFi: "Foobar",
+          name: "Foobar",
         },
       },
       {
         id: "4",
         nameFi: "Item D",
+        name: "Item D",
         category: {
           id: "4",
           nameFi: "Pelikonsoli",
+          name: "Pelikonsoli",
         },
       },
       {
         id: "5",
         nameFi: "Item ABC 2",
+        name: "Item ABC 2",
         category: {
           id: "2",
           nameFi: "Keittiö",
+          name: "Keittiö",
         },
       },
       {
         id: "6",
         nameFi: "Item ABC 1",
+        name: "Item ABC 1",
         category: {
           id: "2",
           nameFi: "Keittiö",
+          name: "Keittiö",
         },
       },
       {
         id: "6",
         nameFi: "Item C 1",
+        name: "Item C 1",
         category: {
           id: "2",
           nameFi: "Barfoo",
+          name: "Barfoo",
         },
       },
     ];
@@ -545,7 +589,7 @@ describe("getReservationUnitName", () => {
       nameFi: "Unit 1 FI",
       nameEn: "Unit 1 EN",
       nameSv: "Unit 1 SV",
-    } as ReservationUnitType;
+    } as ReservationUnitNode;
 
     expect(getReservationUnitName(reservationUnit)).toEqual("Unit 1 FI");
   });
@@ -555,7 +599,7 @@ describe("getReservationUnitName", () => {
       nameFi: "Unit 1 FI",
       nameEn: "Unit 1 EN",
       nameSv: "Unit 1 SV",
-    } as ReservationUnitType;
+    } as ReservationUnitNode;
 
     expect(getReservationUnitName(reservationUnit, "sv")).toEqual("Unit 1 SV");
   });
@@ -565,7 +609,7 @@ describe("getReservationUnitName", () => {
       nameFi: "Unit 1 FI",
       nameEn: "",
       nameSv: "",
-    } as ReservationUnitType;
+    } as ReservationUnitNode;
 
     expect(getReservationUnitName(reservationUnit, "sv")).toEqual("Unit 1 FI");
   });
@@ -573,7 +617,7 @@ describe("getReservationUnitName", () => {
   it("should return the name of the unit in the default language", () => {
     const reservationUnit = {
       nameFi: "Unit 1 FI",
-    } as ReservationUnitType;
+    } as ReservationUnitNode;
 
     expect(getReservationUnitName(reservationUnit, "sv")).toEqual("Unit 1 FI");
   });
@@ -583,7 +627,7 @@ describe("getReservationUnitName", () => {
       nameFi: "Unit 1 FI",
       nameEn: null,
       nameSv: null,
-    } as ReservationUnitType;
+    } as ReservationUnitNode;
 
     expect(getReservationUnitName(reservationUnit, "sv")).toEqual("Unit 1 FI");
   });
@@ -595,7 +639,7 @@ describe("getUnitName", () => {
       nameFi: "Unit 1 FI",
       nameEn: "Unit 1 EN",
       nameSv: "Unit 1 SV",
-    } as UnitType;
+    } as UnitNode;
 
     expect(getUnitName(unit)).toEqual("Unit 1 FI");
   });
@@ -605,7 +649,7 @@ describe("getUnitName", () => {
       nameFi: "Unit 1 FI",
       nameEn: "Unit 1 EN",
       nameSv: "Unit 1 SV",
-    } as UnitType;
+    } as UnitNode;
 
     expect(getUnitName(unit, "sv")).toEqual("Unit 1 SV");
   });
@@ -615,7 +659,7 @@ describe("getUnitName", () => {
       nameFi: "Unit 1 FI",
       nameEn: "",
       nameSv: "",
-    } as UnitType;
+    } as UnitNode;
 
     expect(getUnitName(unit, "sv")).toEqual("Unit 1 FI");
   });
@@ -623,7 +667,7 @@ describe("getUnitName", () => {
   it("should return the name of the unit in the default language", () => {
     const unit = {
       nameFi: "Unit 1 FI",
-    } as UnitType;
+    } as UnitNode;
 
     expect(getUnitName(unit, "sv")).toEqual("Unit 1 FI");
   });
@@ -633,7 +677,7 @@ describe("getUnitName", () => {
       nameFi: "Unit 1 FI",
       nameEn: null,
       nameSv: null,
-    } as UnitType;
+    } as UnitNode;
 
     expect(getUnitName(unit, "sv")).toEqual("Unit 1 FI");
   });
@@ -667,7 +711,7 @@ describe("getReservationUnitInstructionsKey", () => {
 });
 
 describe("getFuturePricing", () => {
-  const reservationUnit: ReservationUnitType = {
+  const reservationUnit: ReservationUnitNode = {
     id: "testing",
     pricings: [
       {
@@ -713,7 +757,7 @@ describe("getFuturePricing", () => {
         status: Status.Future,
       },
     ],
-  } as unknown as ReservationUnitType;
+  } as unknown as ReservationUnitNode;
 
   it("should sort items correctly", () => {
     const data = cloneDeep(reservationUnit);
@@ -747,7 +791,7 @@ describe("getFuturePricing", () => {
     data.pricings[2]!.status = Status.Past;
     expect(getFuturePricing(data)).toBeUndefined();
 
-    expect(getFuturePricing({} as ReservationUnitType)).toBeUndefined();
+    expect(getFuturePricing({} as ReservationUnitNode)).toBeUndefined();
   });
 
   it("with reservation begin time", () => {
@@ -840,7 +884,7 @@ describe("getFuturePricing", () => {
 });
 
 describe("getReservationUnitPrice", () => {
-  const reservationUnit: ReservationUnitType = {
+  const reservationUnit: ReservationUnitNode = {
     id: "testing",
     pricings: [
       {
@@ -904,7 +948,7 @@ describe("getReservationUnitPrice", () => {
         status: Status.Active,
       },
     ],
-  } as unknown as ReservationUnitType;
+  } as unknown as ReservationUnitNode;
 
   it("returns future data based on date lookup", () => {
     const data = cloneDeep(reservationUnit);
@@ -945,7 +989,7 @@ describe("isReservationUnitPaidInFuture", () => {
         highestPriceNet: "10",
         status: Status.Active,
       },
-    ] as ReservationUnitPricingType[];
+    ] as ReservationUnitPricingNode[];
 
     expect(isReservationUnitPaidInFuture(pricings)).toBe(true);
   });
@@ -968,7 +1012,7 @@ describe("isReservationUnitPaidInFuture", () => {
         highestPriceNet: "10",
         status: Status.Active,
       },
-    ] as ReservationUnitPricingType[];
+    ] as ReservationUnitPricingNode[];
 
     expect(isReservationUnitPaidInFuture(pricings)).toBe(true);
   });
@@ -991,7 +1035,7 @@ describe("isReservationUnitPaidInFuture", () => {
         highestPriceNet: "0",
         status: Status.Active,
       },
-    ] as ReservationUnitPricingType[];
+    ] as ReservationUnitPricingNode[];
 
     expect(isReservationUnitPaidInFuture(pricings)).toBe(true);
   });
@@ -1014,7 +1058,7 @@ describe("isReservationUnitPaidInFuture", () => {
         highestPriceNet: "0",
         status: Status.Active,
       },
-    ] as ReservationUnitPricingType[];
+    ] as ReservationUnitPricingNode[];
 
     expect(isReservationUnitPaidInFuture(pricings)).toBe(false);
   });
@@ -1037,7 +1081,7 @@ describe("isReservationUnitPaidInFuture", () => {
         highestPriceNet: "20",
         status: Status.Active,
       },
-    ] as ReservationUnitPricingType[];
+    ] as ReservationUnitPricingNode[];
 
     expect(isReservationUnitPaidInFuture(pricings)).toBe(false);
   });

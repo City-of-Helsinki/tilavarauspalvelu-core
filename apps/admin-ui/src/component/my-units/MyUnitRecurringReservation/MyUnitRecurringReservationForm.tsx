@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  Type,
   ReservationStartInterval,
-  type ReservationUnitType,
+  ReservationTypeChoice,
+  type ReservationUnitNode,
 } from "common/types/gql-types";
 import { camelCase, get } from "lodash";
 import { Controller, FormProvider, useForm } from "react-hook-form";
@@ -34,6 +34,7 @@ import ReservationTypeForm from "../ReservationTypeForm";
 import ControlledTimeInput from "../components/ControlledTimeInput";
 import ReservationListButton from "../../ReservationListButton";
 import ControlledDateInput from "../components/ControlledDateInput";
+import { filterNonNullable } from "common/src/helpers";
 
 const Label = styled.p<{ $bold?: boolean }>`
   font-family: var(--fontsize-body-m);
@@ -121,7 +122,7 @@ const ReservationListEditor = ({
 };
 
 type Props = {
-  reservationUnits: ReservationUnitType[];
+  reservationUnits: ReservationUnitNode[];
 };
 
 const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
@@ -191,13 +192,13 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
     interval,
   });
 
-  const reservationType = watch("type") ?? Type.Blocked;
+  const reservationType = watch("type") ?? ReservationTypeChoice.Blocked;
   const checkedReservations = useFilteredReservationList({
     items: newReservations.reservations,
     reservationUnitPk: reservationUnit?.pk ?? undefined,
     begin: fromUIDate(getValues("startingDate")) ?? new Date(),
     end: fromUIDate(getValues("endingDate")) ?? new Date(),
-    reservationType: reservationType as Type,
+    reservationType: reservationType as ReservationTypeChoice,
   });
 
   const navigate = useNavigate();
@@ -228,10 +229,9 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
     }
 
     try {
-      const metaFields =
+      const metaFields = filterNonNullable(
         reservationUnit?.metadataSet?.supportedFields
-          ?.filter((x): x is string => x != null)
-          .map(camelCase) ?? [];
+      ).map(camelCase);
 
       const buffers = {
         before:

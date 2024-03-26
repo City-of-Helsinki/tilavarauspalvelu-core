@@ -5,14 +5,14 @@ import { IconArrowRight } from "hds-react";
 import { breakpoints } from "common/src/common/style";
 import Link from "next/link";
 import { fontMedium, H3 } from "common/src/common/typography";
-import { UnitType } from "common/types/gql-types";
+import type { UnitNode } from "common/types/gql-types";
 import { IconButton } from "common/src/components";
 import { singleSearchPrefix } from "../../modules/const";
 import { getTranslation } from "../../modules/util";
 import { anchorStyles, focusStyles } from "common/styles/cssFragments";
 
 type Props = {
-  units: UnitType[];
+  units: UnitNode[];
 };
 
 const itemLimit = 8;

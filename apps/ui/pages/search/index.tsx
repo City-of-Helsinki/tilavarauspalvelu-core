@@ -18,7 +18,6 @@ import {
   type QueryApplicationRoundsArgs,
   type QueryReservationUnitsArgs,
   ReservationKind,
-  ReservationUnitType,
   ApplicationRoundOrderingChoices,
 } from "common/types/gql-types";
 import { Container } from "common";
@@ -109,7 +108,7 @@ const StyledSorting = styled(Sorting)`
 `;
 
 const processVariables = (values: Record<string, string>, language: string) => {
-  const sortCriteria = ["name", "unitName"].includes(values.sort)
+  const _sortCriteria = ["name", "unitName"].includes(values.sort)
     ? `${values.sort}${capitalize(language)}`
     : values.sort;
   return {
@@ -130,19 +129,26 @@ const processVariables = (values: Record<string, string>, language: string) => {
       maxPersons: parseInt(values.maxPersons, 10),
     }),
     ...(values.purposes && {
-      purposes: values.purposes.split(",").map(Number),
+      purposes: values.purposes.split(",").map(Number).filter(Number.isInteger),
     }),
     ...(values.unit && {
-      unit: values.unit.split(",").map(Number),
+      unit: values.unit.split(",").map(Number).filter(Number.isInteger),
     }),
     ...(values.reservationUnitType && {
-      reservationUnitType: values.reservationUnitType.split(",").map(Number),
+      reservationUnitType: values.reservationUnitType
+        .split(",")
+        .map(Number)
+        .filter(Number.isInteger),
     }),
     ...(values.applicationRound && {
-      applicationRound: values.applicationRound.split(",").map(Number),
+      applicationRound: values.applicationRound
+        .split(",")
+        .map(Number)
+        .filter(Number.isInteger),
     }),
     first: pagingLimit,
-    orderBy: values.order === "desc" ? `-${sortCriteria}` : sortCriteria,
+    // FIXME orderBy needs to be an enum now
+    // orderBy: values.order === "desc" ? `-${sortCriteria}` : sortCriteria,
     isDraft: false,
     isVisible: true,
     reservationKind: ReservationKind.Season,
@@ -217,16 +223,17 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
   >(RESERVATION_UNITS, {
     variables: processVariables(values, i18n.language),
     fetchPolicy: "network-only",
+    // Why?
     skip: Object.keys(values).length === 0,
     notifyOnNetworkStatusChange: true,
   });
 
-  const reservationUnits: ReservationUnitType[] = filterNonNullable(
+  const reservationUnits = filterNonNullable(
     data?.reservationUnits?.edges?.map((e) => e?.node)
   );
   const totalCount = data?.reservationUnits?.totalCount;
-
   const pageInfo = data?.reservationUnits?.pageInfo;
+  const loadingMore = networkStatus === NetworkStatus.fetchMore;
 
   // TODO useEffect is not the way to manage state
   // functionality that is added here needs to be added to the onSearch function as well
@@ -246,11 +253,6 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
     // @ts-expect-error: TODO: fix this (first though figure out why we are saving queryparams to localstorage)
     setStoredValues(params);
   }, [setStoredValues, searchParams]);
-
-  const loadingMore = useMemo(
-    () => networkStatus === NetworkStatus.fetchMore,
-    [networkStatus]
-  );
 
   const history = useRouter();
 

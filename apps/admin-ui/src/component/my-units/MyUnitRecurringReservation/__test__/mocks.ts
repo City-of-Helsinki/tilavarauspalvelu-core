@@ -3,7 +3,7 @@ import {
   Authentication,
   ReservationKind,
   ReservationStartInterval,
-  ReservationUnitType,
+  type ReservationUnitNode,
 } from "common/types/gql-types";
 import { RESERVATION_UNIT_QUERY } from "../../hooks/queries";
 import { CREATE_STAFF_RESERVATION } from "../../create-reservation/queries";
@@ -20,7 +20,7 @@ const unitCommon = {
   reservationBlockWholeDay: false,
   bufferTimeBefore: null,
   bufferTimeAfter: null,
-  __typename: "ReservationUnitType",
+  __typename: "ReservationUnitNode",
   isArchived: false,
   isDraft: false,
   requireIntroduction: false,
@@ -31,7 +31,7 @@ const unitCommon = {
   contactInformation: "",
 } as const;
 
-export const units: ReservationUnitType[] = [
+export const units: ReservationUnitNode[] = [
   {
     ...unitCommon,
     pk: 1,
@@ -118,11 +118,11 @@ const unitResponse = [
           "num_persons",
           "purpose",
         ],
-        __typename: "ReservationMetadataSetType",
+        __typename: "ReservationMetadataSetNode",
       },
-      __typename: "ReservationUnitType",
+      __typename: "ReservationUnitNode",
     },
-    __typename: "ReservationUnitTypeEdge",
+    __typename: "ReservationUnitNodeEdge",
   },
 ];
 
@@ -178,7 +178,7 @@ const reservationsByUnitResponse = mondayMorningReservations
   .map((x) => ({
     begin: x.begin.toUTCString(),
     end: x.end.toUTCString(),
-    __typename: "ReservationType",
+    __typename: "ReservationNode",
   }));
 
 export const mocks = [

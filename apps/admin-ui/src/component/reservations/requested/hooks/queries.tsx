@@ -9,19 +9,14 @@ import {
 } from "../../fragments";
 
 export const RESERVATIONS_BY_RESERVATIONUNIT = gql`
-  query reservationUnit($id: ID!, $from: Date, $to: Date) {
+  query reservationUnit(
+    $id: ID!
+    $beginDate: Date
+    $endDate: Date
+    $state: [String]
+  ) {
     reservationUnit(id: $id) {
-      reservations(
-        from: $from
-        to: $to
-        state: [
-          "DENIED"
-          "CONFIRMED"
-          "REQUIRES_HANDLING"
-          "WAITING_FOR_PAYMENT"
-        ]
-        includeWithSameComponents: true
-      ) {
+      reservationSet(state: $state, beginDate: $beginDate, endDate: $endDate) {
         user {
           email
         }
@@ -44,7 +39,7 @@ export const RESERVATIONS_BY_RESERVATIONUNIT = gql`
 
 // Possible optmisation: this fragment is only required for some queries.
 const SPECIALISED_SINGLE_RESERVATION_FRAGMENT = gql`
-  fragment ReservationSpecialisation on ReservationType {
+  fragment ReservationSpecialisation on ReservationNode {
     calendarUrl
     price
     taxPercentageValue
@@ -82,7 +77,7 @@ export const SINGLE_RESERVATION_QUERY = gql`
       ...ReservationCommon
       ...ReservationRecurring
       ...ReservationSpecialisation
-      reservationUnits {
+      reservationUnit {
         ...ReservationUnit
         ...ReservationUnitPricing
       }
@@ -91,35 +86,21 @@ export const SINGLE_RESERVATION_QUERY = gql`
   }
 `;
 
+// TODO do we need orderBy? orderBy: "begin" (for reservations)
+// TODO do we need $state: [String]?
 export const RECURRING_RESERVATION_QUERY = gql`
-  query recurringReservation(
-    $pk: ID!
-    $offset: Int
-    $count: Int
-    $state: [String]
-  ) {
-    reservations(
-      offset: $offset
-      recurringReservation: $pk
-      state: $state
-      first: $count
-      orderBy: "begin"
-    ) {
-      edges {
-        node {
-          pk
-          begin
-          end
-          state
-          recurringReservation {
-            pk
-            weekdays
-            beginDate
-            endDate
-          }
-        }
+  query recurringReservation($id: ID!) {
+    recurringReservation(id: $id) {
+      pk
+      weekdays
+      beginDate
+      endDate
+      reservations {
+        pk
+        begin
+        end
+        state
       }
-      totalCount
     }
   }
 `;

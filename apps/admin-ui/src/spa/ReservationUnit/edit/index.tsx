@@ -26,24 +26,25 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   type Query,
   type QueryReservationUnitArgs,
-  type QueryUnitByPkArgs,
+  type QueryUnitArgs,
   type Mutation,
   ReservationStartInterval,
   type ReservationUnitImageCreateMutationInput,
   Authentication,
-  type UnitByPkType,
+  type UnitNode,
   type ReservationState,
   type ReservationUnitState,
   TermsType,
   Status,
-  type ReservationUnitType,
-  type SpaceType,
-  type ReservationUnitTypeType,
-  type QualifierType,
-  type PurposeType,
-  type EquipmentType,
+  type ReservationUnitNode,
+  type SpaceNode,
+  type ReservationUnitTypeNode,
+  type EquipmentNode,
   type MutationCreateReservationUnitArgs,
   type MutationUpdateReservationUnitArgs,
+  type PurposeNode,
+  type QualifierNode,
+  ImageType,
 } from "common/types/gql-types";
 import { DateTimeInput } from "common/src/components/form/DateTimeInput";
 import { base64encode, filterNonNullable } from "common/src/helpers";
@@ -433,7 +434,7 @@ function DisplayUnit({
   reservationState,
 }: {
   heading: string;
-  unit?: UnitByPkType;
+  unit?: UnitNode;
   unitState?: ReservationUnitState;
   reservationState?: ReservationState;
 }): JSX.Element {
@@ -472,14 +473,7 @@ const useImageMutations = () => {
       const deletePromises = images
         .filter((image) => image.deleted)
         .map((image) => delImage({ variables: { pk: image.pk } }));
-      const res = await Promise.all(deletePromises);
-      const hasErrors =
-        res
-          .map((single) => single?.data?.createReservationUnitImage?.errors)
-          .filter((e) => e != null).length > 0;
-      if (hasErrors) {
-        return false;
-      }
+      await Promise.all(deletePromises);
     } catch (e) {
       return false;
     }
@@ -492,20 +486,13 @@ const useImageMutations = () => {
           createImage({
             variables: {
               image: image.bytes,
-              reservationUnitPk: resUnitPk,
-              imageType: image.imageType ?? "",
+              reservationUnit: resUnitPk,
+              imageType: image.imageType ?? ImageType.Other,
             },
           })
         );
 
-      const res = await Promise.all(addPromises);
-      const hasErrors =
-        res
-          .map((single) => single?.data?.createReservationUnitImage?.errors)
-          .filter((e) => e != null).length > 0;
-      if (hasErrors) {
-        return false;
-      }
+      await Promise.all(addPromises);
     } catch (e) {
       return false;
     }
@@ -525,14 +512,7 @@ const useImageMutations = () => {
           });
         });
 
-      const res = await Promise.all(changeTypePromises);
-      const hasErrors =
-        res
-          .map((single) => single?.data?.createReservationUnitImage?.errors)
-          .filter((e) => e != null).length > 0;
-      if (hasErrors) {
-        return false;
-      }
+      await Promise.all(changeTypePromises);
     } catch (e) {
       return false;
     }
@@ -571,13 +551,13 @@ const getTranslatedTooltipTex = (t: TFunction, fieldName: string) => {
 };
 
 // default is 20 if no spaces selected
-const getMaxPersons = (spaceList: NonNullable<SpaceType>[]) => {
+const getMaxPersons = (spaceList: NonNullable<SpaceNode>[]) => {
   const persons =
     spaceList.map((s) => s.maxPersons ?? 0).reduce((a, x) => a + x, 0) || 20;
   return Math.floor(persons);
 };
 // default is 1 if no spaces selected
-const getMinSurfaceArea = (spaceList: NonNullable<SpaceType>[]) => {
+const getMinSurfaceArea = (spaceList: NonNullable<SpaceNode>[]) => {
   const area =
     spaceList.map((s) => s.surfaceArea ?? 0).reduce((a, x) => a + x, 0) || 1;
   return Math.floor(area);
@@ -649,7 +629,7 @@ function BasicSection({
   spaces,
 }: {
   form: UseFormReturn<ReservationUnitEditFormValues>;
-  spaces: SpaceType[];
+  spaces: SpaceNode[];
 }) {
   const { t } = useTranslation();
   const { control, formState, register, watch, setValue } = form;
@@ -660,7 +640,7 @@ function BasicSection({
     value: Number(s?.pk),
   }));
   const resourceOptions = filterNonNullable(
-    spaces.flatMap((s) => s?.resources)
+    spaces.flatMap((s) => s?.resourceSet)
   ).map((r) => ({ label: String(r?.nameFi), value: Number(r?.pk) }));
 
   const spacePks = watch("spacePks");
@@ -1608,7 +1588,7 @@ function OpeningHoursSection({
   previewUrlPrefix,
 }: {
   // TODO can we simplify this by passing the hauki url only?
-  reservationUnit: ReservationUnitType | undefined;
+  reservationUnit: ReservationUnitNode | undefined;
   previewUrlPrefix: string;
 }) {
   const { t } = useTranslation();
@@ -1620,14 +1600,14 @@ function OpeningHoursSection({
   // TODO refactor this to inner wrapper (so we don't have a ternary in the middle)
   return (
     <Accordion heading={t("ReservationUnitEditor.openingHours")}>
-      {reservationUnit?.haukiUrl?.url ? (
+      {reservationUnit?.haukiUrl ? (
         <AutoGrid>
           <p style={{ gridColumn: "1 / -1" }}>
             {t("ReservationUnitEditor.openingHoursHelperTextHasLink")}
           </p>
           <ButtonLikeLink
-            disabled={!reservationUnit?.haukiUrl?.url}
-            to={reservationUnit?.haukiUrl?.url ?? ""}
+            disabled={!reservationUnit?.haukiUrl}
+            to={reservationUnit?.haukiUrl ?? ""}
             target="_blank"
             fontSize="small"
             rel="noopener noreferrer"
@@ -1661,10 +1641,10 @@ function DescriptionSection({
   reservationUnitTypes,
 }: {
   form: UseFormReturn<ReservationUnitEditFormValues>;
-  equipments: EquipmentType[];
-  purposes: PurposeType[];
-  qualifiers: QualifierType[];
-  reservationUnitTypes: ReservationUnitTypeType[];
+  equipments: EquipmentNode[];
+  purposes: PurposeNode[];
+  qualifiers: QualifierNode[];
+  reservationUnitTypes: ReservationUnitTypeNode[];
 }) {
   const { t } = useTranslation();
   const { control, formState } = form;
@@ -1899,7 +1879,7 @@ const ReservationUnitEditor = ({
   refetch,
   previewUrlPrefix,
 }: {
-  reservationUnit?: ReservationUnitType;
+  reservationUnit?: ReservationUnitNode;
   unitPk: string;
   form: UseFormReturn<ReservationUnitEditFormValues>;
   refetch: () => void;
@@ -1921,11 +1901,12 @@ const ReservationUnitEditor = ({
     MutationCreateReservationUnitArgs
   >(CREATE_RESERVATION_UNIT);
 
-  const { data: unitResourcesData } = useQuery<Query, QueryUnitByPkArgs>(
+  const id = base64encode(`UnitNode:${unitPk}`);
+  const { data: unitResourcesData } = useQuery<Query, QueryUnitArgs>(
     UNIT_WITH_SPACES_AND_RESOURCES,
     {
       skip: !unitPk,
-      variables: { pk: Number(unitPk) },
+      variables: { id },
       onError: (e) => {
         // eslint-disable-next-line no-console
         console.error(e);
@@ -1972,7 +1953,7 @@ const ReservationUnitEditor = ({
     TermsType.CancellationTerms
   );
 
-  const unit = unitResourcesData?.unitByPk ?? undefined;
+  const { unit } = unitResourcesData ?? {};
   const spaces = filterNonNullable(unit?.spaces);
   const equipments = filterNonNullable(
     parametersData?.equipments?.edges?.map((e) => e?.node)
@@ -2012,17 +1993,6 @@ const ReservationUnitEditor = ({
       if (mutationErrors != null) {
         notifyError(
           t("ReservationUnitEditor.saveFailed", { error: mutationErrors })
-        );
-        return undefined;
-      }
-
-      const dataErrors =
-        data?.updateReservationUnit?.errors ??
-        data?.createReservationUnit?.errors;
-
-      if (dataErrors) {
-        notifyError(
-          t("ReservationUnitEditor.saveFailed", { error: dataErrors })
         );
         return undefined;
       }
@@ -2144,7 +2114,7 @@ const ReservationUnitEditor = ({
           heading={
             reservationUnit?.nameFi ?? t("ReservationUnitEditor.defaultHeading")
           }
-          unit={unit}
+          unit={unit ?? undefined}
           reservationState={reservationUnit?.reservationState ?? undefined}
           unitState={reservationUnit?.state ?? undefined}
         />
@@ -2254,7 +2224,7 @@ function EditorWrapper({ previewUrlPrefix }: { previewUrlPrefix: string }) {
   const { reservationUnitPk, unitPk } = useParams<IRouterProps>();
   const { t } = useTranslation();
 
-  const typename = "ReservationUnitType";
+  const typename = "ReservationUnitNode";
   const id = base64encode(`${typename}:${reservationUnitPk}`);
   const {
     data: reservationUnitData,

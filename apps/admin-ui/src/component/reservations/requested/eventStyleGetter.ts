@@ -1,5 +1,9 @@
 import { CalendarEvent } from "common/src/calendar/Calendar";
-import { State, Type, ReservationType } from "common/types/gql-types";
+import {
+  State,
+  type ReservationNode,
+  ReservationTypeChoice,
+} from "common/types/gql-types";
 import {
   COMMON_LEGEND,
   CONFIRMED,
@@ -37,12 +41,12 @@ export const legend = [
 // TODO combine with the eventStyleGetter in my-units/eventStyleGetter.ts
 const eventStyleGetter =
   (
-    currentReservation?: ReservationType,
-    selectedReservation?: ReservationType
+    currentReservation?: ReservationNode,
+    selectedReservation?: ReservationNode
   ) =>
   ({
     event,
-  }: CalendarEvent<ReservationType>): {
+  }: CalendarEvent<ReservationNode>): {
     style: React.CSSProperties;
     className?: string;
   } => {
@@ -54,8 +58,8 @@ const eventStyleGetter =
     const isConfirmed = event?.state === State.Confirmed;
     const isWaitingForPayment = event?.state === State.WaitingForPayment;
 
-    const isClosed = event?.type === Type.Blocked;
-    const isStaff = event?.type === Type.Staff;
+    const isClosed = event?.type === ReservationTypeChoice.Blocked;
+    const isStaff = event?.type === ReservationTypeChoice.Staff;
     // @ts-expect-error: TODO: we are dynamically overriding an enum upstream
     const isBuffer = event?.state === "BUFFER";
 

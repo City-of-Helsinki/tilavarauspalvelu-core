@@ -1,12 +1,14 @@
 import { addMinutes, addSeconds, isAfter, isValid } from "date-fns";
 import type { PendingReservation } from "common/types/common";
 import {
-  PaymentOrderType,
-  ReserveeType,
+  type PaymentOrderNode,
   State,
-  ReservationType,
-  ReservationUnitType,
+  type ReservationNode,
+  type ReservationUnitNode,
   ReservationStartInterval,
+  CustomerTypeChoice,
+  type ReservationMetadataFieldNode,
+  type Maybe,
 } from "common/types/gql-types";
 import {
   type RoundPeriod,
@@ -71,7 +73,7 @@ export const getDurationOptions = (
 };
 
 export const isReservationInThePast = (
-  reservation: ReservationType
+  reservation: ReservationNode
 ): boolean => {
   if (!reservation?.begin) {
     return false;
@@ -82,9 +84,9 @@ export const isReservationInThePast = (
 };
 
 export const isReservationWithinCancellationPeriod = (
-  reservation: ReservationType
+  reservation: ReservationNode
 ): boolean => {
-  const reservationUnit = reservation.reservationUnits?.[0];
+  const reservationUnit = reservation.reservationUnit?.[0];
   const begin = new Date(reservation.begin);
 
   const minutesBeforeCancel =
@@ -95,10 +97,10 @@ export const isReservationWithinCancellationPeriod = (
 };
 
 export const canUserCancelReservation = (
-  reservation: ReservationType,
+  reservation: ReservationNode,
   skipTimeCheck = false
 ): boolean => {
-  const reservationUnit = reservation.reservationUnits?.[0];
+  const reservationUnit = reservation.reservationUnit?.[0];
   if (reservation.state !== State.Confirmed) return false;
   if (!reservationUnit?.cancellationRule) return false;
   if (reservationUnit?.cancellationRule?.needsHandling) return false;
@@ -110,8 +112,8 @@ export const canUserCancelReservation = (
 
 export const getReservationApplicationMutationValues = (
   payload: Record<string, string | number | boolean>,
-  supportedFields: string[],
-  reserveeType: ReserveeType
+  supportedFields: ReservationMetadataFieldNode[],
+  reserveeType: CustomerTypeChoice
 ): Record<string, string | number | boolean> => {
   const result: typeof payload = { reserveeType };
   const intValues = ["numPersons"];
@@ -149,9 +151,9 @@ export type ReservationCancellationReason =
   | "BUFFER";
 
 export const getReservationCancellationReason = (
-  reservation: ReservationType
+  reservation: ReservationNode
 ): ReservationCancellationReason | null => {
-  const reservationUnit = reservation.reservationUnits?.[0];
+  const reservationUnit = reservation.reservationUnit?.[0];
 
   if (!reservationUnit) {
     return "NO_CANCELLATION_RULE";
@@ -180,7 +182,7 @@ export const getReservationCancellationReason = (
 };
 
 export const getNormalizedReservationOrderStatus = (
-  reservation: ReservationType
+  reservation: ReservationNode
 ): string | null => {
   if (!reservation) {
     return null;
@@ -211,7 +213,7 @@ export const isReservationReservable = ({
   end,
   skipLengthCheck = false,
 }: {
-  reservationUnit: ReservationUnitType | null;
+  reservationUnit: ReservationUnitNode | null;
   activeApplicationRounds: RoundPeriod[];
   start: Date;
   end: Date;
@@ -224,7 +226,7 @@ export const isReservationReservable = ({
   const normalizedEnd = addMinutes(end, -1);
 
   const {
-    reservations,
+    reservationSet,
     bufferTimeBefore,
     bufferTimeAfter,
     reservableTimeSpans: reservableTimes,
@@ -241,7 +243,7 @@ export const isReservationReservable = ({
     return false;
   }
 
-  const reservationsArr = filterNonNullable(reservations);
+  const reservationsArr = filterNonNullable(reservationSet);
   if (
     doBuffersCollide(
       {
@@ -296,17 +298,17 @@ export const isReservationReservable = ({
   return true;
 };
 
-export const isReservationConfirmed = (reservation: ReservationType): boolean =>
+export const isReservationConfirmed = (reservation: ReservationNode): boolean =>
   reservation.state === "CONFIRMED";
 
 export const isReservationFreeOfCharge = (
-  reservation: ReservationType | PendingReservation
+  reservation: ReservationNode | PendingReservation
 ): boolean => parseInt(String(reservation.price), 10) === 0;
 
 export type CanReservationBeChangedProps = {
-  reservation?: ReservationType;
-  newReservation?: ReservationType | PendingReservation;
-  reservationUnit?: ReservationUnitType;
+  reservation?: ReservationNode;
+  newReservation?: ReservationNode | PendingReservation;
+  reservationUnit?: ReservationUnitNode;
   activeApplicationRounds?: RoundPeriod[];
 };
 
@@ -375,7 +377,7 @@ export const canReservationTimeBeChanged = ({
 };
 
 export const getReservationValue = (
-  reservation: ReservationType,
+  reservation: ReservationNode,
   key: string
 ): string | number | null => {
   switch (key) {
@@ -400,7 +402,7 @@ export const getReservationValue = (
     }
     default: {
       if (key in reservation) {
-        const val = reservation[key as keyof ReservationType];
+        const val = reservation[key as keyof ReservationNode];
         if (typeof val === "string" || typeof val === "number") {
           return val;
         }
@@ -410,10 +412,10 @@ export const getReservationValue = (
   }
 };
 
-export const getCheckoutUrl = (
-  order?: PaymentOrderType,
+export function getCheckoutUrl(
+  order?: Maybe<PaymentOrderNode>,
   lang = "fi"
-): string | undefined => {
+): string | undefined {
   const { checkoutUrl } = order ?? {};
 
   if (!checkoutUrl) {
@@ -430,4 +432,4 @@ export const getCheckoutUrl = (
     console.error(e);
   }
   return undefined;
-};
+}

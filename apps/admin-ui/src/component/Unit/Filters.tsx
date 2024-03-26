@@ -1,21 +1,11 @@
 import React, { useEffect, useReducer } from "react";
-import styled from "styled-components";
 import { TextInput } from "hds-react";
 import { useTranslation } from "react-i18next";
-import { OptionType } from "@/common/types";
-import { Grid, Span4 as DefaultSpan4 } from "@/styles/layout";
-import ServiceSectorFilter from "../filters/ServiceSectorFilter";
+import { AutoGrid } from "@/styles/layout";
 import Tags, { getReducer, toTags } from "../lists/Tags";
-
-const Span4 = styled(DefaultSpan4)`
-  label {
-    white-space: nowrap;
-  }
-`;
 
 export type FilterArguments = {
   nameFi?: string;
-  serviceSector?: OptionType;
 };
 
 export const emptyFilterState = {};
@@ -39,33 +29,22 @@ const Filters = ({ onSearch }: Props): JSX.Element => {
 
   return (
     <>
-      <Grid>
-        <Span4>
-          <TextInput
-            id="nameFi"
-            label={t("Units.filters.nameLabel")}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                onSearch(state);
-              }
-            }}
-            onChange={(e) =>
-              dispatch({ type: "set", value: { nameFi: e.target.value } })
+      <AutoGrid>
+        <TextInput
+          id="nameFi"
+          label={t("Units.filters.nameLabel")}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              onSearch(state);
             }
-            placeholder={t("common.search")}
-            value={state.nameFi || ""}
-          />
-        </Span4>
-        <Span4>
-          <ServiceSectorFilter
-            onChange={(e) =>
-              dispatch({ type: "set", value: { serviceSector: e } })
-            }
-            value={state.serviceSector}
-          />
-        </Span4>
-      </Grid>
-
+          }}
+          onChange={(e) =>
+            dispatch({ type: "set", value: { nameFi: e.target.value } })
+          }
+          placeholder={t("common.search")}
+          value={state.nameFi ?? ""}
+        />
+      </AutoGrid>
       <Tags tags={tags} t={t} dispatch={dispatch} />
     </>
   );

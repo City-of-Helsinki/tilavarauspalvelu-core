@@ -1,51 +1,56 @@
 import { filterNonNullable } from "common/src/helpers";
-import type {
-  UnitRoleType,
-  GeneralRoleType,
-  ServiceSectorRoleType,
-  UserType,
+import {
+  type UnitRoleNode,
+  type GeneralRoleNode,
+  type ServiceSectorRoleNode,
+  type UserNode,
+  GeneralPermissionChoices,
 } from "common/types/gql-types";
 
+// TODO reuse the backend enums
+// TODO add a safe conversion from Unit -> General permission
 export enum Permission {
-  CAN_COMMENT_RESERVATIONS = "can_comment_reservations",
-  CAN_CREATE_STAFF_RESERVATIONS = "can_create_staff_reservations",
-  CAN_MANAGE_RESERVATIONS = "can_manage_reservations",
-  CAN_VIEW_RESERVATIONS = "can_view_reservations",
-  CAN_MANAGE_RESERVATION_UNITS = "can_manage_reservation_units",
-  CAN_MANAGE_SPACES = "can_manage_spaces",
-  CAN_MANAGE_RESOURCES = "can_manage_resources",
-  CAN_MANAGE_UNITS = "can_manage_units",
-  CAN_VALIDATE_APPLICATIONS = "can_validate_applications",
-  CAN_MANAGE_BANNER_NOTIFICATIONS = "can_manage_notifications",
+  CAN_COMMENT_RESERVATIONS = GeneralPermissionChoices.CanCommentReservations,
+  CAN_CREATE_STAFF_RESERVATIONS = GeneralPermissionChoices.CanCreateStaffReservations,
+  CAN_MANAGE_RESERVATIONS = GeneralPermissionChoices.CanManageReservations,
+  CAN_VIEW_RESERVATIONS = GeneralPermissionChoices.CanViewReservations,
+  CAN_MANAGE_RESERVATION_UNITS = GeneralPermissionChoices.CanManageReservationUnits,
+  CAN_MANAGE_SPACES = GeneralPermissionChoices.CanManageSpaces,
+  CAN_MANAGE_RESOURCES = GeneralPermissionChoices.CanManageResources,
+  CAN_MANAGE_UNITS = GeneralPermissionChoices.CanManageUnits,
+  CAN_VALIDATE_APPLICATIONS = GeneralPermissionChoices.CanValidateApplications,
+  CAN_MANAGE_BANNER_NOTIFICATIONS = GeneralPermissionChoices.CanManageNotifications,
 }
 
-const hasGeneralPermission = (permissionName: string, user: UserType) =>
+const hasGeneralPermission = (permissionName: string, user: UserNode) =>
   user.generalRoles?.find((x) =>
-    x?.permissions?.find((y) => y?.permission === permissionName)
+    x?.role.permissions?.find((y) => y?.permission === permissionName)
   ) != null;
 
 function hasUnitPermission(
   permissionName: Permission,
   unitPk: number,
-  user: UserType
+  user: UserNode
 ): boolean {
   const unitRoles = filterNonNullable(user.unitRoles);
 
   for (const role of unitRoles) {
-    if (
-      role.permissions?.find((x) => x?.permission === permissionName) == null
-    ) {
+    const perms = filterNonNullable(
+      role.role.permissions?.flatMap((x) => x.permission)
+    );
+    // TODO safe conversion from Unit -> General permission
+    if (perms.find((x) => x.toString() === permissionName) == null) {
       continue;
     }
 
     // Check unit group permissions
-    const groupUnits = role.unitGroups?.flatMap((x) => x?.units);
+    const groupUnits = role.unitGroup?.flatMap((x) => x?.units);
     if (groupUnits?.find((x) => x?.pk === unitPk)) {
       return true;
     }
 
     // Check unit specific permissions
-    if (role.units?.find((x) => x?.pk === unitPk)) {
+    if (role.unit?.find((x) => x?.pk === unitPk)) {
       return true;
     }
   }
@@ -56,13 +61,14 @@ function hasUnitPermission(
 function hasServiceSectorPermission(
   permissionName: Permission,
   serviceSectorPks: number[],
-  user: UserType
+  user: UserNode
 ): boolean {
   const roles = filterNonNullable(user.serviceSectorRoles);
   for (const role of roles) {
-    if (
-      role.permissions?.find((x) => x?.permission === permissionName) == null
-    ) {
+    const perms = filterNonNullable(
+      role.role.permissions?.flatMap((x) => x.permission)
+    );
+    if (perms.find((x) => x.toString() === permissionName) == null) {
       continue;
     }
 
@@ -78,7 +84,7 @@ function hasServiceSectorPermission(
 
 /// Returns true if the user is allowed to perform operation for a specific unit or service sector
 export const hasPermission =
-  (user: UserType) =>
+  (user: UserNode) =>
   (
     permissionName: Permission,
     unitPk?: number,
@@ -108,7 +114,7 @@ export const hasPermission =
 /// Returns true if the user if the user is allowed to perform what the permission is for
 /// e.g. if the user allowed to view some reservations but not all this will return true
 export function hasSomePermission(
-  user: UserType,
+  user: UserNode,
   permission: Permission
 ): boolean {
   if (user.isSuperuser) {
@@ -116,9 +122,12 @@ export function hasSomePermission(
   }
 
   const hasPerm = (
-    role: UnitRoleType | ServiceSectorRoleType | GeneralRoleType | undefined,
+    role: UnitRoleNode | ServiceSectorRoleNode | GeneralRoleNode | undefined,
     perm: Permission
-  ) => role?.permissions?.some((p) => p?.permission === perm);
+  ) =>
+    role?.role.permissions?.some(
+      (p) => p?.permission != null && p.permission.toString() === perm
+    );
 
   const someUnitRoles =
     user?.unitRoles?.some((role) => hasPerm(role ?? undefined, permission)) ??
@@ -138,14 +147,14 @@ export function hasSomePermission(
 }
 
 /// Returns true if the user has any kind of access to the system
-export function hasAnyPermission(user: UserType): boolean {
+export function hasAnyPermission(user: UserNode): boolean {
   if (user.isSuperuser) {
     return true;
   }
 
   const hasAnyPerm = (
-    role?: UnitRoleType | ServiceSectorRoleType | GeneralRoleType
-  ) => role?.permissions?.some((p) => p?.permission != null) ?? false;
+    role?: UnitRoleNode | ServiceSectorRoleNode | GeneralRoleNode
+  ) => role?.role.permissions?.some((p) => p?.permission != null) ?? false;
 
   const someUnitRoles =
     user?.unitRoles?.some((role) => hasAnyPerm(role ?? undefined)) ?? false;

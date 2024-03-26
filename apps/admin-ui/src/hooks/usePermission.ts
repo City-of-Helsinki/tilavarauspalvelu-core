@@ -1,20 +1,21 @@
 import { useSession } from "app/hooks/auth";
-import {
-  UnitType,
-  type ReservationType,
-  type UserType,
+import type {
+  UnitNode,
+  ReservationNode,
+  UserNode,
 } from "common/types/gql-types";
 import {
   hasPermission as baseHasPermission,
   hasSomePermission as baseHasSomePermission,
   hasAnyPermission as baseHasAnyPermission,
   Permission,
-} from "app/modules/permissionHelper";
+} from "@/modules/permissionHelper";
+import { filterNonNullable } from "common/src/helpers";
 
 const hasUnitPermission = (
-  user: UserType | undefined,
+  user: UserNode | undefined,
   permissionName: Permission,
-  unit: UnitType | undefined
+  unit: UnitNode | undefined
 ): boolean => {
   if (user == null || unit?.pk == null) {
     return false;
@@ -35,8 +36,8 @@ const hasUnitPermission = (
 };
 
 const hasPermission = (
-  user: UserType | undefined,
-  reservation: ReservationType,
+  user: UserNode | undefined,
+  reservation: ReservationNode,
   permissionName: Permission,
   includeOwn = true
 ) => {
@@ -44,12 +45,12 @@ const hasPermission = (
     return false;
   }
 
-  const serviceSectorPks =
-    reservation?.reservationUnits?.[0]?.unit?.serviceSectors
-      ?.map((x) => x?.pk)
-      ?.filter((x): x is number => x != null) ?? [];
+  const { unit } = reservation?.reservationUnit?.[0] ?? {};
+  const serviceSectorPks = filterNonNullable(
+    unit?.serviceSectors?.map((x) => x?.pk)
+  );
 
-  const unitPk = reservation?.reservationUnits?.[0]?.unit?.pk ?? undefined;
+  const unitPk = unit?.pk ?? undefined;
 
   const permissionCheck = baseHasPermission(user);
   const permission = permissionCheck(permissionName, unitPk, serviceSectorPks);
@@ -85,13 +86,13 @@ const usePermission = () => {
   return {
     user,
     hasPermission: (
-      reservation: ReservationType,
+      reservation: ReservationNode,
       permissionName: Permission,
       includeOwn = true
     ) => hasPermission(user, reservation, permissionName, includeOwn),
     hasSomePermission,
     hasAnyPermission,
-    hasUnitPermission: (permission: Permission, unit: UnitType) =>
+    hasUnitPermission: (permission: Permission, unit: UnitNode) =>
       hasUnitPermission(user, permission, unit),
   };
 };
@@ -116,7 +117,7 @@ const usePermissionSuspended = () => {
   return {
     user,
     hasPermission: (
-      reservation: ReservationType,
+      reservation: ReservationNode,
       permissionName: Permission,
       includeOwn = true
     ) => hasPermission(user, reservation, permissionName, includeOwn),
