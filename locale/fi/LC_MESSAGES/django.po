@@ -1077,6 +1077,11 @@ msgstr ""
 "'active_from' ja 'active_until' täytyy olla joko tyhjiä tai asetettuja. Jos "
 "molemmat on asetettu, 'active_until' täytyy olla 'active_from' jälkeen."
 
+#: email_notification/admin/email_tester.py
+#, python-format
+msgid "Test Email '%s' successfully sent."
+msgstr "Testisähköposti '%s' lähetetty onnistuneesti."
+
 #: email_notification/models.py
 msgid "Email type"
 msgstr "Sähköpostin tyyppi"
@@ -1112,6 +1117,15 @@ msgid ""
 msgstr ""
 "Sähköpostin sisältö HTML-muodossa. Käytä aaltosulkeita osoittamaan dataan "
 "liittyviä kenttiä, esim {{reservee_name}}."
+
+#: email_notification/templates/email_tester.html
+#: templates/admin/reset_allocation_confirmation.html
+msgid "Home"
+msgstr "Koti"
+
+#: email_notification/templates/email_tester.html
+msgid "Email Template Testing"
+msgstr "Email-pohjan testaus"
 
 #: merchants/admin.py
 msgid "Paytrail merchant ID"
@@ -2647,10 +2661,6 @@ msgstr "Vaihda salasana"
 #: templates/admin/base.html templates/admin/hel_login.html
 msgid "Log out"
 msgstr "Kirjaudu ulos"
-
-#: templates/admin/reset_allocation_confirmation.html
-msgid "Home"
-msgstr "Koti"
 
 #: templates/admin/reset_allocation_confirmation.html
 msgid "Reset allocations"

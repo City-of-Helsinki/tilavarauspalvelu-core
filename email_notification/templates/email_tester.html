@@ -1,21 +1,27 @@
 {% extends "admin/base_site.html" %}
-Fooo
+{% load i18n admin_urls %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+    &rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+    &rsaquo; {% translate 'Email Template Testing' %}
+</div>
+{% endblock %}
 
 {% block content %}
 <h1 id="site-name">Email Template Testing</h1>
 
 <div style="display: flex; flex-direction: row-reverse; flex-wrap: wrap; justify-content: flex-end; gap: 40px 10px">
-
     <form method="get" novalidate>
         <table>
-            {{ runit_form.as_table }}
+            {{ reservation_unit_form.as_table }}
             <tr>
                 <td></td>
                 <td><button>Fill form with Reservation Unit data</button></td>
             </tr>
         </table>
-
-
     </form>
 
     <form method="post" novalidate>
@@ -23,9 +29,7 @@ Fooo
         <table>
         {{ form.as_table }}
         </table>
-
         <button>Send Test Emails</button>
     </form>
-
 </div>
 {% endblock %}

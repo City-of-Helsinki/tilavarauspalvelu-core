@@ -4,13 +4,10 @@ from decimal import Decimal
 
 import pytest
 
-from email_notification.email_tester import EmailTestForm
+from email_notification.admin.email_tester import EmailTemplateTesterForm
+from email_notification.exceptions import SendEmailNotificationError
+from email_notification.helpers.email_sender import EmailNotificationSender
 from email_notification.models import EmailTemplate, EmailType
-from email_notification.sender.senders import (
-    SendReservationEmailNotificationException,
-    send_reservation_email_notification,
-    send_test_emails,
-)
 from reservations.models import Reservation
 from tests.factories import EmailTemplateFactory, ReservationFactory
 
@@ -20,15 +17,34 @@ pytestmark = [
 ]
 
 
-def test_send_email__success__reservee_email(outbox):
-    email_template: EmailTemplate = EmailTemplateFactory.create(type=EmailType.RESERVATION_CONFIRMED)
+@pytest.fixture()
+def email_template() -> EmailTemplate:
+    return EmailTemplateFactory.create(
+        type=EmailType.RESERVATION_CONFIRMED,
+        subject="foo",
+        content="bar",
+        subject_fi="fi",
+        content_fi="fi",
+        subject_en="en",
+        content_en="en",
+        subject_sv="sv",
+        content_sv="sv",
+    )
+
+
+def test_email_sender__reservation__success__reservee_email(outbox, email_template):
+    """Test that the email is sent to the reservee email address."""
     reservation: Reservation = ReservationFactory.create(
         reservee_email="example@email.com",
         user=None,
         reservation_unit__unit__name="foo",
     )
 
-    send_reservation_email_notification(email_template.type, reservation)
+    email_notification_sender = EmailNotificationSender(
+        email_type=email_template.type,
+        recipients=None,
+    )
+    email_notification_sender.send_reservation_email(reservation=reservation)
 
     assert len(outbox) == 1
     assert outbox[0].subject == email_template.subject
@@ -36,14 +52,18 @@ def test_send_email__success__reservee_email(outbox):
     assert outbox[0].bcc == [reservation.reservee_email]
 
 
-def test_send_email__success__reservation_user_email(outbox):
-    email_template: EmailTemplate = EmailTemplateFactory.create(type=EmailType.RESERVATION_CONFIRMED)
+def test_email_sender__reservation__success__reservation_user_email(outbox, email_template):
+    """Test that the email is sent to the reservation user email address."""
     reservation: Reservation = ReservationFactory.create(
         user__email="example@email.com",
         reservation_unit__unit__name="foo",
     )
 
-    send_reservation_email_notification(email_template.type, reservation)
+    email_notification_sender = EmailNotificationSender(
+        email_type=email_template.type,
+        recipients=None,
+    )
+    email_notification_sender.send_reservation_email(reservation=reservation)
 
     assert len(outbox) == 1
     assert outbox[0].subject == email_template.subject
@@ -51,15 +71,19 @@ def test_send_email__success__reservation_user_email(outbox):
     assert outbox[0].bcc == [reservation.user.email]
 
 
-def test_send_email__success__reservee_and_user_email(outbox):
-    email_template: EmailTemplate = EmailTemplateFactory.create(type=EmailType.RESERVATION_CONFIRMED)
+def test_email_sender__reservation__success__reservee_and_user_email(outbox, email_template):
+    """Test that the email is sent to both the reservee and the reservation user email addresses."""
     reservation: Reservation = ReservationFactory.create(
         reservee_email="example1@email.com",
         user__email="example2@email.com",
         reservation_unit__unit__name="foo",
     )
 
-    send_reservation_email_notification(email_template.type, reservation)
+    email_notification_sender = EmailNotificationSender(
+        email_type=email_template.type,
+        recipients=None,
+    )
+    email_notification_sender.send_reservation_email(reservation=reservation)
 
     assert len(outbox) == 1
     assert outbox[0].subject == email_template.subject
@@ -67,11 +91,8 @@ def test_send_email__success__reservee_and_user_email(outbox):
     assert sorted(outbox[0].bcc) == [reservation.reservee_email, reservation.user.email]
 
 
-def test_send_email__with_multiple_recipients__success(outbox):
-    email_template: EmailTemplate = EmailTemplateFactory.create(type=EmailType.RESERVATION_CONFIRMED)
-    reservation: Reservation = ReservationFactory.create(
-        reservation_unit__unit__name="foo",
-    )
+def test_email_sender__reservation__with_multiple_recipients__success(outbox, email_template):
+    reservation: Reservation = ReservationFactory.create(reservation_unit__unit__name="foo")
 
     recipients = [
         "liu.kang@earthrealm.com",
@@ -79,7 +100,11 @@ def test_send_email__with_multiple_recipients__success(outbox):
         "shao.kahn@outworld.com",
         "mileena@outworld.com",
     ]
-    send_reservation_email_notification(EmailType.RESERVATION_CONFIRMED, reservation, recipients)
+    email_notification_sender = EmailNotificationSender(
+        email_type=email_template.type,
+        recipients=recipients,
+    )
+    email_notification_sender.send_reservation_email(reservation=reservation)
 
     assert len(outbox) == 1
     assert outbox[0].subject == email_template.subject
@@ -87,11 +112,8 @@ def test_send_email__with_multiple_recipients__success(outbox):
     assert outbox[0].bcc == recipients
 
 
-def test_send_email__with_multiple_recipients__too_many_recipients(outbox, settings):
+def test_email_sender__reservation__with_multiple_recipients__too_many_recipients(outbox, settings, email_template):
     settings.EMAIL_MAX_RECIPIENTS = 3
-
-    email_template: EmailTemplate = EmailTemplateFactory.create(type=EmailType.RESERVATION_CONFIRMED)
-    reservation: Reservation = ReservationFactory.create(reservation_unit__unit__name="foo")
 
     recipients = [
         "liu.kang@earthrealm.com",
@@ -101,50 +123,30 @@ def test_send_email__with_multiple_recipients__too_many_recipients(outbox, setti
     ]
 
     msg = re.escape(
-        f"Refusing to notify more than {settings.EMAIL_MAX_RECIPIENTS} users. "
-        f"Email type: {email_template.type}. "
-        f"Reservation: {reservation.pk}"
+        f"Refusing to notify more than '{settings.EMAIL_MAX_RECIPIENTS}' users. " f"Email type: '{email_template.type}'"
     )
-    with pytest.raises(SendReservationEmailNotificationException, match=msg):
-        send_reservation_email_notification(EmailType.RESERVATION_CONFIRMED, reservation, recipients)
+    with pytest.raises(SendEmailNotificationError, match=msg):
+        EmailNotificationSender(email_type=email_template.type, recipients=recipients)
 
 
-@pytest.mark.parametrize("lang", ["fi", "en", "sv"])
-def test_send_email__reservation_language_is_used(outbox, lang):
-    email_template: EmailTemplate = EmailTemplateFactory.create(
-        type=EmailType.RESERVATION_CONFIRMED,
-        subject="foo",
-        content="bar",
-        subject_fi="fi",
-        content_fi="fi",
-        subject_en="en",
-        content_en="en",
-        subject_sv="sv",
-        content_sv="sv",
+@pytest.mark.parametrize("language", ["fi", "en", "sv"])
+def test_email_sender__reservation__reservation_language_is_used(outbox, language, email_template):
+    reservation: Reservation = ReservationFactory.create(reservation_unit__unit__name="foo", reservee_language=language)
+
+    email_notification_sender = EmailNotificationSender(
+        email_type=email_template.type,
+        recipients=None,
     )
-    reservation: Reservation = ReservationFactory.create(reservation_unit__unit__name="foo", reservee_language=lang)
-
-    send_reservation_email_notification(EmailType.RESERVATION_CONFIRMED, reservation)
+    email_notification_sender.send_reservation_email(reservation=reservation)
 
     assert len(outbox) == 1
-    assert outbox[0].subject == getattr(email_template, f"subject_{lang}", None)
-    assert outbox[0].body == getattr(email_template, f"content_{lang}", None)
+    assert outbox[0].subject == getattr(email_template, f"subject_{language}", None)
+    assert outbox[0].body == getattr(email_template, f"content_{language}", None)
     assert outbox[0].bcc == [reservation.user.email]
 
 
-def test_send_email__test_emails(outbox):
-    email_template: EmailTemplate = EmailTemplateFactory.create(
-        type=EmailType.RESERVATION_CONFIRMED,
-        subject="foo",
-        content="bar",
-        subject_fi="fi",
-        content_fi="fi",
-        subject_en="en",
-        content_en="en",
-        subject_sv="sv",
-        content_sv="sv",
-    )
-    form = EmailTestForm()
+def test_email_sender__test_emails(outbox, email_template):
+    form = EmailTemplateTesterForm()
     form.cleaned_data = {
         "recipient": "test@example.com",
         "reservee_name": "Test Name",
@@ -176,7 +178,8 @@ def test_send_email__test_emails(outbox):
         "cancel_reason_sv": "Cancel reason SV",
     }
 
-    send_test_emails(email_template, form)
+    email_notification_sender = EmailNotificationSender(email_type=email_template.type, recipients=None)
+    email_notification_sender.send_test_reservation_email(form=form)
 
     assert len(outbox) == 3
     assert outbox[0].subject == "fi"
