@@ -54,6 +54,7 @@ env = environ.Env(
     EMAIL_VARAAMO_EXT_LINK=(str, None),
     GDPR_API_DELETE_SCOPE=(str, ""),
     GDPR_API_QUERY_SCOPE=(str, ""),
+    GRAPHQL_CODEGEN_ENABLED=(bool, False),
     HAUKI_ADMIN_UI_URL=(str, None),
     HAUKI_API_KEY=(str, None),
     HAUKI_API_URL=(str, None),
@@ -73,6 +74,9 @@ env = environ.Env(
     MAIL_MAILGUN_KEY=(str, ""),
     MEDIA_ROOT=(root, root("media")),
     MEDIA_URL=(str, "/media/"),
+    MOCK_VERKKOKAUPPA_API_ENABLED=(bool, False),
+    MOCK_VERKKOKAUPPA_BACKEND_URL=(str, ""),
+    MOCK_VERKKOKAUPPA_FRONTEND_URL=(str, ""),
     MULTI_PROXY_HEADERS=(bool, False),
     OIDC_LEEWAY=(int, 3600),
     OPEN_CITY_PROFILE_GRAPHQL_API=(str, "https://profile-api.test.hel.ninja/graphql/"),
@@ -110,17 +114,14 @@ env = environ.Env(
     UPDATE_ACCOUNTING=(bool, False),
     UPDATE_PRODUCT_MAPPING=(bool, False),
     VERKKOKAUPPA_API_KEY=(str, None),
+    VERKKOKAUPPA_MERCHANT_API_URL=(str, ""),
     VERKKOKAUPPA_NAMESPACE=(str, None),
     VERKKOKAUPPA_NEW_LOGIN=(bool, True),
-    VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES=(int, 10),
-    VERKKOKAUPPA_MERCHANT_API_URL=(str, ""),
     VERKKOKAUPPA_ORDER_API_URL=(str, ""),
+    VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES=(int, 10),
     VERKKOKAUPPA_PAYMENT_API_URL=(str, ""),
     VERKKOKAUPPA_PRODUCT_API_URL=(str, ""),
     VERKKOKAUPPA_TIMEZONE=(str, "Europe/Helsinki"),
-    MOCK_VERKKOKAUPPA_API_ENABLED=(bool, False),
-    MOCK_VERKKOKAUPPA_FRONTEND_URL=(str, ""),
-    MOCK_VERKKOKAUPPA_BACKEND_URL=(str, ""),
 )
 environ.Env.read_env(BASE_DIR / ".env")
 
@@ -563,6 +564,9 @@ PRIMARY_MUNICIPALITY_NAME = env("PRIMARY_MUNICIPALITY_NAME")
 SECONDARY_MUNICIPALITY_NAME = env("SECONDARY_MUNICIPALITY_NAME")
 
 TPREK_UNIT_URL = env("TPREK_UNIT_URL")
+
+# Turns off csrf protection for the graphql view for frontend codegen
+GRAPHQL_CODEGEN_ENABLED = env("GRAPHQL_CODEGEN_ENABLED")
 
 # ----- Local settings ---------------------------------------------------------------------------------
 
