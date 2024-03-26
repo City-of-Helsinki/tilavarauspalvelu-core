@@ -1,5 +1,4 @@
 import graphene
-from django.db import models
 from graphene_django_extensions import DjangoNode
 from query_optimizer import DjangoListField
 from rest_framework.reverse import reverse
@@ -40,7 +39,9 @@ class ReservationNode(DjangoNode):
     staff_event = graphene.Boolean(deprecation_reason="Please refer to type.")
     calendar_url = graphene.String()
 
-    reservation_units = DjangoListField("api.graphql.types.reservation_unit.types.ReservationUnitNode")
+    # Needs to be singular since the many-to-many field is also singular,
+    # and otherwise the optimizer cannot optimize this properly.
+    reservation_unit = DjangoListField("api.graphql.types.reservation_unit.types.ReservationUnitNode")
 
     #
     # These fields are defined "unnecessarily" since they can be null due to permission checks.
@@ -134,7 +135,7 @@ class ReservationNode(DjangoNode):
             "billing_address_city",
             "billing_address_zip",
             #
-            "reservation_units",
+            "reservation_unit",
             "user",
             "recurring_reservation",
             "deny_reason",
@@ -224,6 +225,3 @@ class ReservationNode(DjangoNode):
         calendar_url = reverse("reservation_calendar-detail", kwargs={"pk": root.pk})
         signature = hmac_signature(f"reservation-{root.pk}")
         return f"{scheme}://{host}{calendar_url}?hash={signature}"
-
-    def resolve_reservation_units(root: Reservation, info: GQLInfo) -> models.QuerySet:
-        return root.reservation_unit.all()

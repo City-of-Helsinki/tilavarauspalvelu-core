@@ -7,8 +7,6 @@ from graphql_relay import to_global_id
 from applications.choices import WeekdayChoice
 from common.date_utils import local_datetime
 from reservation_units.enums import PricingType, ReservationUnitState
-from reservations.choices import ReservationStateChoice
-from reservations.models import Reservation
 from terms_of_use.models import TermsOfUse
 from tests.factories import (
     ApplicationRoundFactory,
@@ -86,53 +84,6 @@ def test_reservation_unit__single__query__reservation_blocks_whole_day(graphql):
     assert response.has_errors is False
     assert response.first_query_object == {
         "reservationBlockWholeDay": reservation_unit.reservation_block_whole_day,
-    }
-
-
-def test_reservation_unit__single__filter__reservations__by_timestamps(graphql):
-    graphql.login_with_superuser()
-
-    reservation_unit = ReservationUnitFactory.create()
-
-    tz = get_default_timezone()
-
-    ReservationFactory.create(
-        reservation_unit=[reservation_unit],
-        begin=datetime.datetime(2023, 1, 1, 15, 0, 0, tzinfo=tz),
-        end=datetime.datetime(2023, 1, 1, 16, 0, 0, tzinfo=tz),
-    )
-    reservation_1 = ReservationFactory.create(
-        reservation_unit=[reservation_unit],
-        begin=datetime.datetime(2023, 1, 2, 0, 0, 0, tzinfo=tz),
-        end=datetime.datetime(2023, 1, 2, 1, 0, 0, tzinfo=tz),
-    )
-    reservation_2 = ReservationFactory.create(
-        reservation_unit=[reservation_unit],
-        begin=datetime.datetime(2023, 1, 3, 23, 00, 00, tzinfo=tz),
-        end=datetime.datetime(2023, 1, 3, 23, 59, 59, tzinfo=tz),
-    )
-    ReservationFactory.create(
-        reservation_unit=[reservation_unit],
-        begin=datetime.datetime(2023, 1, 4, 0, 0, 0, tzinfo=tz),
-        end=datetime.datetime(2023, 1, 4, 1, 0, 0, tzinfo=tz),
-    )
-
-    fields = "reservations { pk }"
-    global_id = to_global_id("ReservationUnitNode", reservation_unit.pk)
-    query = reservation_unit_query(
-        fields=fields,
-        id=global_id,
-        reservations__from="2023-01-02",
-        reservations__to="2023-01-03",
-    )
-    response = graphql(query)
-
-    assert response.has_errors is False, response.errors
-    assert response.first_query_object == {
-        "reservations": [
-            {"pk": reservation_1.pk},
-            {"pk": reservation_2.pk},
-        ],
     }
 
 
@@ -446,7 +397,7 @@ def test_reservation_unit__query__all_many_to_many_relations(graphql):
         applicationRounds {
             nameFi
         }
-        reservations {
+        reservationSet {
             begin
         }
     """
@@ -513,7 +464,7 @@ def test_reservation_unit__query__all_many_to_many_relations(graphql):
                 "nameFi": reservation_unit.application_rounds.first().name_fi,
             },
         ],
-        "reservations": [
+        "reservationSet": [
             {
                 "begin": reservation_unit.reservation_set.first().begin.isoformat(),
             },
@@ -631,79 +582,6 @@ def test_reservation_unit__query__reservation_blocks_whole_day(graphql):
     assert response.node(0) == {
         "pk": reservation_unit.pk,
         "reservationBlockWholeDay": reservation_unit.reservation_block_whole_day,
-    }
-
-
-def test_reservation_unit__query__include_reservations_with_same_components(graphql):
-    space_1 = SpaceFactory.create()
-    space_2 = SpaceFactory.create()
-    reservation_unit_1 = ReservationUnitFactory.create(spaces=[space_1, space_2])
-    reservation_unit_2 = ReservationUnitFactory.create(spaces=[space_2])
-
-    reservation_1: Reservation = ReservationFactory.create(
-        name="foo",
-        begin=datetime.datetime(2024, 1, 1, hour=12, tzinfo=datetime.UTC),
-        end=datetime.datetime(2024, 1, 1, hour=14, tzinfo=datetime.UTC),
-        reservation_unit=[reservation_unit_1],
-        state=ReservationStateChoice.CONFIRMED,
-    )
-    reservation_2: Reservation = ReservationFactory.create(
-        name="bar",
-        begin=datetime.datetime(2024, 1, 2, hour=13, tzinfo=datetime.UTC),
-        end=datetime.datetime(2024, 1, 2, hour=15, tzinfo=datetime.UTC),
-        reservation_unit=[reservation_unit_2],
-        state=ReservationStateChoice.CONFIRMED,
-    )
-
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
-    fields = """
-        pk
-        reservations {
-            name
-            begin
-            end
-        }
-    """
-    query = reservation_units_query(
-        fields=fields,
-        reservations__from=datetime.datetime(2024, 1, 1).date().isoformat(),
-        reservations__to=datetime.datetime(2024, 1, 2).date().isoformat(),
-        reservations__include_with_same_components=True,
-    )
-
-    response = graphql(query)
-
-    assert response.has_errors is False, response
-    assert len(response.edges) == 2
-    assert response.node(0) == {
-        "pk": reservation_unit_1.pk,
-        "reservations": [
-            {
-                "name": "foo",
-                "begin": reservation_1.begin.isoformat(),
-                "end": reservation_1.end.isoformat(),
-            },
-            {
-                "name": "bar",
-                "begin": reservation_2.begin.isoformat(),
-                "end": reservation_2.end.isoformat(),
-            },
-        ],
-    }
-    assert response.node(1) == {
-        "pk": reservation_unit_2.pk,
-        "reservations": [
-            {
-                "name": "foo",
-                "begin": reservation_1.begin.isoformat(),
-                "end": reservation_1.end.isoformat(),
-            },
-            {
-                "name": "bar",
-                "begin": reservation_2.begin.isoformat(),
-                "end": reservation_2.end.isoformat(),
-            },
-        ],
     }
 
 

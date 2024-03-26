@@ -1,4 +1,5 @@
 import datetime
+from collections.abc import Collection
 from typing import Any
 
 import graphene
@@ -14,6 +15,7 @@ from common.models import BannerNotification
 from common.typing import GQLInfo
 from merchants.models import PaymentOrder
 from permissions.helpers import can_manage_banner_notifications
+from reservations.models import Reservation
 from users.models import User
 
 # NOTE: Queries __need__ to be imported before mutations, see mutations.py!
@@ -156,6 +158,22 @@ class Query(graphene.ObjectType):
     # Reservations
     reservation = ReservationNode.Node()
     reservations = ReservationNode.Connection()
+    affecting_reservations = DjangoListField(
+        ReservationNode,
+        description=(
+            "Find all reservations that affect other reservations through the space hierarchy or a common resource."
+        ),
+        for_units=graphene.List(
+            graphene.Int,
+            default_value=(),
+            description="Reservations should contain at least one reservation unit that belongs to any of these units.",
+        ),
+        for_reservation_units=graphene.List(
+            graphene.Int,
+            default_value=(),
+            description="Reservations should contain at least one these reservation units.",
+        ),
+    )
     recurring_reservations = RecurringReservationNode.Connection()
     reservation_cancel_reasons = ReservationCancelReasonNode.Connection()
     reservation_deny_reasons = ReservationDenyReasonNode.Connection()
@@ -204,6 +222,15 @@ class Query(graphene.ObjectType):
         end_date: datetime.date,
     ) -> models.QuerySet:
         return AllocatedTimeSlot.objects.affecting_allocations(reservation_unit, begin_date, end_date)
+
+    def resolve_affecting_reservations(
+        root: None,
+        info: GQLInfo,
+        for_units: Collection[int],
+        for_reservation_units: Collection[int],
+        **kwargs: Any,
+    ) -> models.QuerySet:
+        return Reservation.objects.affecting_reservations(for_units, for_reservation_units)
 
 
 class Mutation(graphene.ObjectType):

@@ -1,16 +1,13 @@
 import datetime
 
 import pytest
-from django.utils.timezone import get_default_timezone
 
 from common.date_utils import local_datetime
 from reservation_units.enums import ReservationKind, ReservationState, ReservationUnitState
-from reservations.choices import ReservationStateChoice
 from tests.factories import (
     ApplicationRoundFactory,
     EquipmentFactory,
     KeywordGroupFactory,
-    ReservationFactory,
     ReservationUnitFactory,
     ReservationUnitTypeFactory,
     UnitFactory,
@@ -415,130 +412,6 @@ def test_reservation_unit__filter__by_reservation_unit_type_rank(graphql):
     assert response.node(0) == {"pk": reservation_unit_1.pk}
     assert response.node(1) == {"pk": reservation_unit_2.pk}
     assert response.node(2) == {"pk": reservation_unit_3.pk}
-
-
-def test_reservation_unit__filter__reservations__by_timestamps(graphql):
-    reservation_unit = ReservationUnitFactory.create()
-
-    tz = get_default_timezone()
-
-    ReservationFactory.create(
-        reservation_unit=[reservation_unit],
-        begin=datetime.datetime(2023, 1, 1, 15, 0, 0, tzinfo=tz),
-        end=datetime.datetime(2023, 1, 1, 16, 0, 0, tzinfo=tz),
-    )
-    reservation_1 = ReservationFactory.create(
-        reservation_unit=[reservation_unit],
-        begin=datetime.datetime(2023, 1, 2, 0, 0, 0, tzinfo=tz),
-        end=datetime.datetime(2023, 1, 2, 1, 0, 0, tzinfo=tz),
-    )
-    reservation_2 = ReservationFactory.create(
-        reservation_unit=[reservation_unit],
-        begin=datetime.datetime(2023, 1, 3, 23, 00, 00, tzinfo=tz),
-        end=datetime.datetime(2023, 1, 3, 23, 59, 59, tzinfo=tz),
-    )
-    ReservationFactory.create(
-        reservation_unit=[reservation_unit],
-        begin=datetime.datetime(2023, 1, 4, 0, 0, 0, tzinfo=tz),
-        end=datetime.datetime(2023, 1, 4, 1, 0, 0, tzinfo=tz),
-    )
-
-    graphql.login_with_superuser()
-
-    fields = "reservations { pk }"
-    query = reservation_units_query(
-        fields=fields,
-        reservations__from="2023-01-02",
-        reservations__to="2023-01-03",
-    )
-    response = graphql(query)
-
-    assert response.has_errors is False, response.errors
-    assert len(response.edges) == 1
-    assert response.node(0) == {
-        "reservations": [
-            {"pk": reservation_1.pk},
-            {"pk": reservation_2.pk},
-        ],
-    }
-
-
-def test_reservation_unit__filter__reservations__by_reservation_state(graphql):
-    reservation_unit = ReservationUnitFactory.create()
-
-    reservation = ReservationFactory.create(
-        reservation_unit=[reservation_unit],
-        state=ReservationStateChoice.CREATED,
-    )
-    ReservationFactory.create(
-        reservation_unit=[reservation_unit],
-        state=ReservationStateChoice.CANCELLED,
-    )
-
-    graphql.login_with_superuser()
-
-    fields = "reservations { pk }"
-    query = reservation_units_query(
-        fields=fields,
-        reservations__state=ReservationStateChoice.CREATED.value,
-    )
-    response = graphql(query)
-
-    assert response.has_errors is False, response.errors
-    assert len(response.edges) == 1
-    assert response.node(0) == {
-        "reservations": [
-            {"pk": reservation.pk},
-        ],
-    }
-
-
-def test_reservation_unit__filter__reservations__by_reservation_state__multiple(graphql):
-    reservation_unit = ReservationUnitFactory.create()
-
-    reservation_1 = ReservationFactory.create(
-        reservation_unit=[reservation_unit],
-        state=ReservationStateChoice.CREATED,
-    )
-    reservation_2 = ReservationFactory.create(
-        reservation_unit=[reservation_unit],
-        state=ReservationStateChoice.CANCELLED,
-    )
-    ReservationFactory.create(
-        reservation_unit=[reservation_unit],
-        state=ReservationStateChoice.REQUIRES_HANDLING,
-    )
-
-    graphql.login_with_superuser()
-
-    fields = "reservations { pk }"
-    query = reservation_units_query(
-        fields=fields,
-        reservations__state=[
-            ReservationStateChoice.CREATED.value,
-            ReservationStateChoice.CANCELLED.value,
-        ],
-    )
-    response = graphql(query)
-
-    assert response.has_errors is False, response.errors
-    assert len(response.edges) == 1
-
-    # Check like this to avoid ordering issues
-    assert response.node(0) in [
-        {
-            "reservations": [
-                {"pk": reservation_1.pk},
-                {"pk": reservation_2.pk},
-            ],
-        },
-        {
-            "reservations": [
-                {"pk": reservation_2.pk},
-                {"pk": reservation_1.pk},
-            ],
-        },
-    ]
 
 
 def test_reservation_unit__filter__application_rounds__by_active(graphql):

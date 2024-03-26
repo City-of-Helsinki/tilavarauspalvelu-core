@@ -3,24 +3,22 @@ from typing import NamedTuple
 
 import graphene
 from django.db import models
-from django.db.models import QuerySet, Sum
+from django.db.models import Sum
 from django.utils.timezone import get_default_timezone
 from graphene_django_extensions import DjangoNode
 from graphql import GraphQLError
-from query_optimizer import AnnotatedField
+from query_optimizer import AnnotatedField, DjangoListField
 
 from api.graphql.types.location.types import LocationNode
 from api.graphql.types.reservation.types import ReservationNode
 from api.graphql.types.reservation_unit.filtersets import ReservationUnitFilterSet
 from api.graphql.types.reservation_unit.permissions import ReservationUnitPermission
-from common.date_utils import local_end_of_day, local_start_of_day
 from common.typing import GQLInfo
 from merchants.models import PaymentMerchant
 from opening_hours.utils.hauki_link_generator import generate_hauki_link
 from permissions.helpers import can_manage_units, can_modify_reservation_unit
 from reservation_units.enums import ReservationState, ReservationUnitState
 from reservation_units.models import ReservationUnit
-from reservations.models import Reservation
 from spaces.models import Location
 
 __all__ = [
@@ -55,13 +53,7 @@ class ReservationUnitNode(DjangoNode):
         end_date=graphene.Date(required=True),
     )
 
-    reservations = graphene.List(
-        ReservationNode,
-        from_=graphene.Date(name="from"),
-        to=graphene.Date(),
-        state=graphene.List(graphene.String),
-        include_with_same_components=graphene.Boolean(),
-    )
+    reservation_set = DjangoListField(ReservationNode)
 
     calculated_surface_area = AnnotatedField(graphene.Int, expression=Sum("surface_area"))
 
@@ -142,7 +134,7 @@ class ReservationUnitNode(DjangoNode):
             #
             # Reverse many-to-many related
             "application_rounds",
-            "reservations",
+            "reservation_set",
             #
             # Reverse one-to-many related
             "images",
@@ -165,7 +157,7 @@ class ReservationUnitNode(DjangoNode):
         permission_classes = [ReservationUnitPermission]
 
     @classmethod
-    def get_queryset(cls, queryset: models.QuerySet, info: GQLInfo) -> models.QuerySet:
+    def filter_queryset(cls, queryset: models.QuerySet, info: GQLInfo) -> models.QuerySet:
         # Always hide archived reservation units
         return queryset.filter(is_archived=False)
 
@@ -214,32 +206,3 @@ class ReservationUnitNode(DjangoNode):
                 start_date, end_date
             )
         ]
-
-    def resolve_reservations(
-        self: ReservationUnit,
-        info: GQLInfo,
-        from_: datetime.date | None = None,
-        to: datetime.date | None = None,
-        state: list[str] | None = None,
-        include_with_same_components: bool | None = None,
-    ) -> QuerySet:
-        if from_ is not None:
-            from_ = local_start_of_day(from_)
-        if to is not None:
-            to = local_end_of_day(to)
-
-        if include_with_same_components:
-            reservations = Reservation.objects.with_same_components(self, from_, to)
-        else:
-            reservations = self.reservation_set.all()
-
-            if from_ is not None:
-                reservations = reservations.filter(begin__gte=from_)
-            if to is not None:
-                reservations = reservations.filter(end__lte=to)
-
-        if state is not None:
-            states = [s.lower() for s in state]
-            reservations = reservations.filter(state__in=states)
-
-        return reservations.order_by("begin")
