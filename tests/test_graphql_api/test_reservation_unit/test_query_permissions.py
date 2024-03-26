@@ -54,7 +54,7 @@ def test_reservation_unit__query__permissions_by_user_type(graphql, user_type, e
 
 
 SENSITIVE_FIELDS = """
-    reservations {
+    reservationSet {
         user {
             email
             dateOfBirth
@@ -129,7 +129,7 @@ def test_reservation_unit__query__sensitive_information__regular_user(graphql):
     assert response.has_errors is False, response.errors
     assert len(response.edges) == 1
     assert response.node(0) == {
-        "reservations": [
+        "reservationSet": [
             {
                 "billingAddressCity": None,
                 "billingAddressStreet": None,
@@ -202,7 +202,7 @@ def test_reservation_unit__query__sensitive_information__general_admin(graphql):
     assert response.has_errors is False, response.errors
     assert len(response.edges) == 1
     assert response.node(0) == {
-        "reservations": [
+        "reservationSet": [
             {
                 "billingAddressCity": "Billing City",
                 "billingAddressStreet": "Billing Street",

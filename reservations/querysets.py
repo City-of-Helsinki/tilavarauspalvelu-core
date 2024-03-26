@@ -1,9 +1,9 @@
+import datetime
 from dataclasses import dataclass
-from datetime import date, datetime, timedelta
 from typing import Annotated, Any, Self
 
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models import F, Manager, Q, QuerySet, Sum
+from django.db.models import F, Manager, Q, QuerySet, Subquery, Sum
 from helsinki_gdpr.models import SerializableMixin
 
 from applications.models import ApplicationRound
@@ -60,8 +60,8 @@ class ReservationQuerySet(QuerySet):
     def get_affecting_reservations_as_closed_time_spans(
         self,
         reservation_unit_queryset: ReservationUnitQuerySet,
-        start_date: date,
-        end_date: date,
+        start_date: datetime.date,
+        end_date: datetime.date,
     ) -> tuple[dict[ReservationUnitPK, set[TimeSpanElement]], dict[ReservationUnitPK, set[TimeSpanElement]]]:
         """
         Get all reservations that affect the given reservation units and period as closed time spans.
@@ -167,7 +167,7 @@ class ReservationQuerySet(QuerySet):
             buffered_end=F("end") + F("buffer_time_after"),
         )
 
-    def filter_buffered_reservations_period(self: Self, start_date: date, end_date: date) -> Self:
+    def filter_buffered_reservations_period(self: Self, start_date: datetime.date, end_date: datetime.date) -> Self:
         """Filter reservations that are on the given period."""
         return (
             self.with_buffered_begin_and_end()
@@ -179,12 +179,12 @@ class ReservationQuerySet(QuerySet):
             .order_by("buffered_begin")
         )
 
-    def total_duration(self: Self) -> timedelta:
+    def total_duration(self: Self) -> datetime.timedelta:
         return (
             self.annotate(duration=F("end") - F("begin"))
             .aggregate(total_duration=Sum("duration"))
             .get("total_duration")
-        ) or timedelta()
+        ) or datetime.timedelta()
 
     def total_seconds(self: Self) -> int:
         return int(self.total_duration().total_seconds())
@@ -195,7 +195,7 @@ class ReservationQuerySet(QuerySet):
             app_round.reservation_period_end,
         )
 
-    def within_period(self: Self, period_start: date, period_end: date) -> Self:
+    def within_period(self: Self, period_start: datetime.date, period_end: datetime.date) -> Self:
         return self.filter(
             begin__gte=period_start,
             end__lte=period_end,
@@ -217,29 +217,35 @@ class ReservationQuerySet(QuerySet):
     def inactive(self: Self, older_than_minutes: int) -> Self:
         return self.filter(
             state=ReservationStateChoice.CREATED,
-            created_at__lte=local_datetime() - timedelta(minutes=older_than_minutes),
+            created_at__lte=local_datetime() - datetime.timedelta(minutes=older_than_minutes),
         )
-
-    def with_same_components(
-        self: Self,
-        reservation_unit: ReservationUnit,
-        begin: datetime | None,
-        end: datetime | None,
-    ) -> Self:
-        if begin and end:
-            return self.filter(
-                reservation_unit__in=reservation_unit.actions.reservation_units_with_common_hierarchy,
-                end__lte=end,
-                begin__gte=begin,
-            ).exclude(state__in=[ReservationStateChoice.CANCELLED, ReservationStateChoice.DENIED])
-        return self.none()
 
     def with_inactive_payments(self: Self, older_than_minutes: int) -> Self:
         return self.filter(
             state=ReservationStateChoice.WAITING_FOR_PAYMENT,
             payment_order__remote_id__isnull=False,
             payment_order__status__in=[OrderStatus.EXPIRED, OrderStatus.CANCELLED],
-            payment_order__created_at__lte=local_datetime() - timedelta(minutes=older_than_minutes),
+            payment_order__created_at__lte=local_datetime() - datetime.timedelta(minutes=older_than_minutes),
+        )
+
+    def affecting_reservations(self: Self, units: list[int], reservation_units: list[int]) -> Self:
+        """Filter reservations that affect other reservations in the given units and/or reservation units."""
+        qs = ReservationUnit.objects.all()
+        if units:
+            qs = qs.filter(unit__in=units)
+        if reservation_units:
+            qs = qs.filter(pk__in=reservation_units)
+
+        return self.filter(
+            reservation_unit__in=Subquery(
+                queryset=qs.reservation_units_with_common_hierarchy().values_list("pk", flat=True),
+            ),
+        ).exclude(
+            # Cancelled or denied reservations never affect any reservations
+            state__in=[
+                ReservationStateChoice.CANCELLED,
+                ReservationStateChoice.DENIED,
+            ]
         )
 
 
