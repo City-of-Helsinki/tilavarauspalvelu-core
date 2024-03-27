@@ -17,7 +17,6 @@ __all__ = [
 class SpaceNode(DjangoNode):
     parent = RelatedField(lambda: SpaceNode)
     children = DjangoListField(lambda: SpaceNode)
-    resources = DjangoListField("api.graphql.types.resource.types.ResourceNode")
 
     class Meta:
         model = Space
@@ -30,7 +29,7 @@ class SpaceNode(DjangoNode):
             "parent",
             "building",
             "unit",
-            "resources",
+            "resource_set",
             "children",
         ]
         filterset_class = SpaceFilterSet
@@ -38,6 +37,3 @@ class SpaceNode(DjangoNode):
 
     def resolve_children(root: Space, info: GQLInfo) -> models.QuerySet:
         return Space.objects.filter(parent=root)
-
-    def resolve_resources(root: Space, info: GQLInfo) -> models.QuerySet:
-        return root.resource_set.all()
