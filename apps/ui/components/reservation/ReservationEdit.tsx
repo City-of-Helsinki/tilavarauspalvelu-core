@@ -1,49 +1,33 @@
-import {
-  FetchResult,
-  useLazyQuery,
-  useMutation,
-  useQuery,
-} from "@apollo/client";
+import { FetchResult, useMutation, useQuery } from "@apollo/client";
 import { breakpoints } from "common/src/common/style";
 import { H2 } from "common/src/common/typography";
 import {
-  type ApplicationRoundNode,
   type Mutation,
   type MutationAdjustReservationTimeArgs,
   type Query,
   type QueryReservationsArgs,
-  State,
   type ReservationNode,
   type ReservationUnitNode,
-  type QueryReservationUnitArgs,
-  type QueryReservationArgs,
   ReservationTypeChoice,
-  type ReservationUnitNodeReservableTimeSpansArgs,
-  type ReservationUnitNodeReservationSetArgs,
 } from "common/types/gql-types";
 import { useRouter } from "next/router";
-import { LoadingSpinner, Stepper } from "hds-react";
-import { addYears, differenceInMinutes, set } from "date-fns";
+import { Stepper } from "hds-react";
+import { differenceInMinutes, set } from "date-fns";
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { fromUIDate, toApiDate, toUIDate } from "common/src/common/util";
 import { Subheading } from "common/src/reservation-form/styles";
 import { Container } from "common";
-import { base64encode, filterNonNullable } from "common/src/helpers";
+import { filterNonNullable } from "common/src/helpers";
 import { useCurrentUser } from "@/hooks/user";
 import {
   ADJUST_RESERVATION_TIME,
-  GET_RESERVATION,
   LIST_RESERVATIONS,
 } from "@/modules/queries/reservation";
 import { getTranslation } from "../../modules/util";
 import Sanitize from "../common/Sanitize";
 import ReservationInfoCard from "./ReservationInfoCard";
-import {
-  OPENING_HOURS,
-  RESERVATION_UNIT_QUERY,
-} from "@/modules/queries/reservationUnit";
 import EditStep0 from "./EditStep0";
 import EditStep1 from "./EditStep1";
 import { reservationsPrefix } from "@/modules/const";
@@ -56,19 +40,14 @@ import {
 } from "../reservation-unit/schema";
 import { getTimeString } from "@/modules/reservationUnit";
 import { UseFormReturn, useForm } from "react-hook-form";
+import { RELATED_RESERVATION_STATES } from "common/src/const";
 
 type Props = {
-  id: number;
+  reservation: ReservationNode;
+  reservationUnit: ReservationUnitNode;
   apiBaseUrl: string;
   logout?: () => void;
 };
-
-const allowedReservationStates: State[] = [
-  State.Created,
-  State.Confirmed,
-  State.RequiresHandling,
-  State.WaitingForPayment,
-];
 
 /* TODO margins should be in page layout component, not custom for every page */
 const Content = styled(Container)`
@@ -190,7 +169,6 @@ function BylineContent({
     />
   );
 }
-
 function convertReservationEdit(
   reservation?: ReservationNode
 ): PendingReservationFormType {
@@ -203,105 +181,21 @@ function convertReservationEdit(
   };
 }
 
-const ReservationEdit = ({ id: resPk, apiBaseUrl }: Props): JSX.Element => {
+export function ReservationEdit({
+  reservation,
+  reservationUnit,
+  apiBaseUrl,
+}: Props): JSX.Element {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
-  const [reservationUnit, setReservationUnit] =
-    useState<ReservationUnitNode | null>(null);
-  const [activeApplicationRounds, setActiveApplicationRounds] = useState<
-    ApplicationRoundNode[]
-  >([]);
   const [step, setStep] = useState(0);
 
-  const [userReservations, setUserReservations] = useState<ReservationNode[]>(
-    []
-  );
   const [showSuccessMsg, setShowSuccessMsg] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const now = useMemo(() => new Date(), []);
   const { currentUser } = useCurrentUser();
-
-  const resTypename = "ReservationNode";
-  const resId = resPk ? base64encode(`${resTypename}:${resPk}`) : undefined;
-  // TODO why are we doing two separate queries? the linked reservationUnit should be part of the reservation query
-  const { data } = useQuery<Query, QueryReservationArgs>(GET_RESERVATION, {
-    fetchPolicy: "no-cache",
-    skip: resId == null,
-    variables: {
-      id: resId ?? "",
-    },
-  });
-  const reservation = data?.reservation ?? undefined;
-
-  const typename = "ReservationUnitNode";
-  const pk = reservation?.reservationUnit?.[0]?.pk;
-  const id = pk ? base64encode(`${typename}:${pk}`) : undefined;
-  const { data: reservationUnitData } = useQuery<
-    Query,
-    QueryReservationUnitArgs
-  >(RESERVATION_UNIT_QUERY, {
-    fetchPolicy: "no-cache",
-    skip: id == null,
-    variables: {
-      id: id ?? "",
-    },
-  });
-
-  // TODO why is this needed? why isn't it part of the reservationUnit query?
-  const [fetchAdditionalData, { data: additionalData }] = useLazyQuery<
-    Query,
-    QueryReservationUnitArgs &
-      ReservationUnitNodeReservableTimeSpansArgs &
-      ReservationUnitNodeReservationSetArgs
-  >(OPENING_HOURS, {
-    fetchPolicy: "no-cache",
-  });
-
-  // TODO remove this and combine it to the original query
-  useEffect(() => {
-    // TODO why is this necessary? why require a second client side query after the page has loaded?
-    if (reservationUnitData?.reservationUnit) {
-      // TODO this could be changed to fetch the id from the reservationUnitData (instead of pk and constructing it)
-      const typenameUnit = "ReservationUnitNode";
-      const { pk: resUnitPk } = reservationUnitData.reservationUnit;
-      const idUnit = resUnitPk
-        ? base64encode(`${typenameUnit}:${resUnitPk}`)
-        : "";
-      fetchAdditionalData({
-        variables: {
-          id: idUnit,
-          startDate: toApiDate(new Date(now)) ?? "",
-          endDate: toApiDate(addYears(new Date(), 1)) ?? "",
-          state: allowedReservationStates,
-        },
-      });
-    }
-  }, [reservationUnitData, fetchAdditionalData, now]);
-
-  // TODO can we remove this?
-  useEffect(() => {
-    if (reservationUnitData?.reservationUnit == null) {
-      return;
-    }
-
-    const timespans = filterNonNullable(
-      reservationUnitData?.reservationUnit?.reservableTimeSpans
-    );
-    const moreTimespans = filterNonNullable(
-      additionalData?.reservationUnit?.reservableTimeSpans
-    ).filter((n) => n?.startDatetime != null && n?.endDatetime != null);
-    const reservableTimeSpans = [...timespans, ...moreTimespans];
-    const reservations = filterNonNullable(
-      additionalData?.reservationUnit?.reservationSet
-    );
-    setReservationUnit({
-      ...reservationUnitData?.reservationUnit,
-      reservableTimeSpans,
-      reservationSet: reservations,
-    });
-  }, [additionalData, reservationUnitData?.reservationUnit, id]);
 
   const { data: userReservationsData } = useQuery<Query, QueryReservationsArgs>(
     LIST_RESERVATIONS,
@@ -312,50 +206,40 @@ const ReservationEdit = ({ id: resPk, apiBaseUrl }: Props): JSX.Element => {
         beginDate: toApiDate(now),
         user: currentUser?.pk?.toString(),
         reservationUnit: [reservationUnit?.pk?.toString() ?? ""],
-        state: allowedReservationStates,
+        state: RELATED_RESERVATION_STATES,
       },
     }
   );
 
-  useEffect(() => {
-    const reservations = filterNonNullable(
-      userReservationsData?.reservations?.edges?.map((e) => e?.node)
-    )
-      .filter((n) => n.type === ReservationTypeChoice.Normal)
-      .filter((n) => allowedReservationStates.includes(n.state));
-    setUserReservations(reservations);
-  }, [userReservationsData]);
+  const userReservations = filterNonNullable(
+    userReservationsData?.reservations?.edges?.map((e) => e?.node)
+  )
+    .filter((n) => n.type === ReservationTypeChoice.Normal)
+    .filter((n) => RELATED_RESERVATION_STATES.includes(n.state));
 
   // TODO this should be redundant, use the reservationUnit.applicationRounds instead
+  // TODO this is bad, we can get the application rounds from the reservationUnit
   const { data: applicationRoundsData } = useQuery<Query>(APPLICATION_ROUNDS, {
     fetchPolicy: "no-cache",
   });
-
-  useEffect(() => {
-    // TODO this is bad, we can get the application rounds from the reservationUnit
-    if (applicationRoundsData && reservationUnit) {
-      const appRounds = filterNonNullable(
-        applicationRoundsData?.applicationRounds?.edges?.map((e) => e?.node)
-      ).filter((ar) =>
-        ar.reservationUnits?.map((n) => n?.pk).includes(reservationUnit.pk)
-      );
-      setActiveApplicationRounds(appRounds);
-    }
-  }, [applicationRoundsData, reservationUnit]);
-
-  const [
-    adjustReservationTimeMutation,
-    {
-      data: adjustReservationTimeData,
-      error: adjustReservationTimeError,
-      loading: adjustReservationTimeLoading,
-    },
-  ] = useMutation<Mutation, MutationAdjustReservationTimeArgs>(
-    ADJUST_RESERVATION_TIME,
-    {
-      errorPolicy: "all",
-    }
+  const activeApplicationRounds = filterNonNullable(
+    applicationRoundsData?.applicationRounds?.edges?.map((e) => e?.node)
+  ).filter((ar) =>
+    ar.reservationUnits?.map((n) => n?.pk).includes(reservationUnit.pk)
   );
+
+  const [adjustReservationTimeMutation, { loading: isLoading }] = useMutation<
+    Mutation,
+    MutationAdjustReservationTimeArgs
+  >(ADJUST_RESERVATION_TIME, {
+    errorPolicy: "all",
+    onError: (e) => {
+      setErrorMsg(e.message);
+    },
+    onCompleted: () => {
+      setShowSuccessMsg(true);
+    },
+  });
 
   // TODO should rework this so we don't pass a string here (use Dates till we do the mutation)
   const adjustReservationTime = (
@@ -386,14 +270,6 @@ const ReservationEdit = ({ id: resPk, apiBaseUrl }: Props): JSX.Element => {
     });
   };
 
-  useEffect(() => {
-    if (adjustReservationTimeError) {
-      setErrorMsg(adjustReservationTimeError.message);
-    } else if (adjustReservationTimeData) {
-      setShowSuccessMsg(true);
-    }
-  }, [adjustReservationTimeData, adjustReservationTimeError]);
-
   const steps = useMemo(() => {
     return [
       {
@@ -417,15 +293,6 @@ const ReservationEdit = ({ id: resPk, apiBaseUrl }: Props): JSX.Element => {
   useEffect(() => {
     reset(convertReservationEdit(reservation));
   }, [reservation, reset]);
-
-  const isLoading = !reservation || !reservationUnit || !additionalData;
-  if (isLoading) {
-    return (
-      <Content>
-        <LoadingSpinner style={{ margin: "var(--spacing-layout-xl) auto" }} />
-      </Content>
-    );
-  }
 
   // TODO refactor to use form submit instead of getValues
   const handleSubmit = () => {
@@ -491,7 +358,7 @@ const ReservationEdit = ({ id: resPk, apiBaseUrl }: Props): JSX.Element => {
               setErrorMsg={setErrorMsg}
               nextStep={() => setStep(1)}
               apiBaseUrl={apiBaseUrl}
-              isLoading={isLoading}
+              isLoading={false}
             />
           )}
           {step === 1 && (
@@ -501,7 +368,7 @@ const ReservationEdit = ({ id: resPk, apiBaseUrl }: Props): JSX.Element => {
               setErrorMsg={setErrorMsg}
               setStep={setStep}
               handleSubmit={handleSubmit}
-              isSubmitting={adjustReservationTimeLoading}
+              isSubmitting={isLoading}
             />
           )}
         </EditCalendarSection>
@@ -537,6 +404,4 @@ const ReservationEdit = ({ id: resPk, apiBaseUrl }: Props): JSX.Element => {
       )}
     </>
   );
-};
-
-export default ReservationEdit;
+}

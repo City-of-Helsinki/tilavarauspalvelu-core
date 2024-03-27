@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import router from "next/router";
 import { Controller, useForm } from "react-hook-form";
 import { IconArrowRight, IconCross, IconSignout, Select } from "hds-react";
@@ -10,21 +10,15 @@ import { breakpoints } from "common/src/common/style";
 import NotificationBox from "common/src/common/NotificationBox";
 import { fontMedium, H2 } from "common/src/common/typography";
 import type {
-  Query,
-  QueryReservationArgs,
-  QueryReservationCancelReasonsArgs,
+  ReservationCancelReasonNode,
   ReservationCancellationMutationInput,
   ReservationCancellationMutationPayload,
+  ReservationNode,
 } from "common/types/gql-types";
 import { Container as CommonContainer } from "common";
 import { IconButton, ShowAllContainer } from "common/src/components";
-import { base64encode, filterNonNullable } from "common/src/helpers";
 import Sanitize from "../common/Sanitize";
-import {
-  CANCEL_RESERVATION,
-  GET_RESERVATION,
-  GET_RESERVATION_CANCEL_REASONS,
-} from "@/modules/queries/reservation";
+import { CANCEL_RESERVATION } from "@/modules/queries/reservation";
 import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
 import { getSelectedOption, getTranslation } from "@/modules/util";
 import { CenterSpinner } from "../common/common";
@@ -34,8 +28,9 @@ import { Paragraph } from "./styles";
 import { signOut } from "@/hooks/auth";
 
 type Props = {
-  id: number;
   apiBaseUrl: string;
+  reasons: ReservationCancelReasonNode[];
+  reservation: ReservationNode;
 };
 
 const Spinner = styled(CenterSpinner)`
@@ -131,13 +126,13 @@ const ReturnLinkContainer = styled.div`
   align-items: flex-start;
 `;
 
-const ReturnLinkList = ({
+function ReturnLinkList({
   apiBaseUrl,
   style,
 }: {
   apiBaseUrl: string;
   style?: React.CSSProperties;
-}): JSX.Element => {
+}): JSX.Element {
   const { t } = useTranslation();
   return (
     <ReturnLinkContainer style={style}>
@@ -158,48 +153,22 @@ const ReturnLinkList = ({
       />
     </ReturnLinkContainer>
   );
-};
+}
 
 // TODO there is also pages/reservation/cancel.tsx (what is that?)
-// TODO this should be in pages/reservation/[id]/cancel.tsx
-// TODO the prop should be pk not id
-const ReservationCancellation = ({
-  id: pk,
-  apiBaseUrl,
-}: Props): JSX.Element => {
+function ReservationCancellation(props: Props): JSX.Element {
   const { t } = useTranslation();
+  const { apiBaseUrl } = props;
 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [formState, setFormState] = useState<"unsent" | "sent">("unsent");
 
-  const typename = "ReservationNode";
-  const id = base64encode(`${typename}:${pk}`);
-  const { data: reservationData, loading } = useQuery<
-    Query,
-    QueryReservationArgs
-  >(GET_RESERVATION, {
-    fetchPolicy: "no-cache",
-    variables: {
-      id,
-    },
-  });
-  const { reservation } = reservationData || {};
-
-  const { data: cancelReasonsData } = useQuery<
-    Query,
-    QueryReservationCancelReasonsArgs
-  >(GET_RESERVATION_CANCEL_REASONS, {
-    fetchPolicy: "cache-first",
-  });
-
-  const reasons = filterNonNullable(
-    cancelReasonsData?.reservationCancelReasons?.edges.map((edge) => edge?.node)
-  ).map((node) => ({
+  const reasons = props.reasons.map((node) => ({
     label: getTranslation(node, "reason"),
     value: node?.pk != null ? node?.pk : "",
   }));
 
-  const [cancelReservation] = useMutation<
+  const [cancelReservation, { loading }] = useMutation<
     { cancelReservation: ReservationCancellationMutationPayload },
     { input: ReservationCancellationMutationInput }
   >(CANCEL_RESERVATION, {
@@ -221,6 +190,7 @@ const ReservationCancellation = ({
     register("description");
   }, [register]);
 
+  const { reservation } = props;
   const reservationUnit = reservation?.reservationUnit?.[0] ?? null;
 
   const bylineContent = useMemo(() => {
@@ -384,6 +354,6 @@ const ReservationCancellation = ({
       )}
     </Wrapper>
   );
-};
+}
 
 export default ReservationCancellation;
