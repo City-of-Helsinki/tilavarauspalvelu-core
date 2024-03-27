@@ -174,6 +174,7 @@ class Query(graphene.ObjectType):
             description="Reservations should contain at least one these reservation units.",
         ),
     )
+    recurring_reservation = RecurringReservationNode.Node()
     recurring_reservations = RecurringReservationNode.Connection()
     reservation_cancel_reasons = ReservationCancelReasonNode.Connection()
     reservation_deny_reasons = ReservationDenyReasonNode.Connection()
