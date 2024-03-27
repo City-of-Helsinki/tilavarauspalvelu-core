@@ -35,7 +35,7 @@ def test_units__query(graphql):
         webPage
         email
         phone
-        reservationUnits {
+        reservationunitSet {
             nameFi
         }
         spaces {
@@ -72,7 +72,7 @@ def test_units__query(graphql):
         "phone": unit.phone,
         "location": None,
         "paymentMerchant": None,
-        "reservationUnits": [],
+        "reservationunitSet": [],
         "serviceSectors": [],
         "spaces": [],
     }
