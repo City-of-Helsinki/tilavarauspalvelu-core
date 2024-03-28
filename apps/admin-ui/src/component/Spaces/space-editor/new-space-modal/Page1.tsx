@@ -1,47 +1,41 @@
 import React from "react";
-import {
-  Button,
-  Dialog,
-  IconArrowRight,
-  IconCheck,
-  NumberInput,
-} from "hds-react";
+import { Button, Dialog, IconArrowRight, IconCheck } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { type UnitNode } from "common/types/gql-types";
-import { CustomDialogHeader } from "../../../CustomDialogHeader";
-import ParentSelector from "../ParentSelector";
+import { parseAddress } from "@/common/util";
+import { CustomDialogHeader } from "@/component/CustomDialogHeader";
+import { ParentSelector } from "../ParentSelector";
 import {
-  Action,
   ActionButtons,
   Address,
   Name,
   NextButton,
   Parent,
   RoundTag,
-  State,
   Title,
   UnitInfo,
 } from "./modules/newSpaceModal";
-import { parseAddress } from "../../../../common/util";
+import { Controller, UseFormReturn } from "react-hook-form";
+import { SpaceUpdateForm } from "../SpaceForm";
 
-const Page1 = ({
-  editorState,
+export function Page1({
   unit,
-  dispatch,
   closeModal,
   hasFixedParent,
+  form,
+  onNextPage,
 }: {
-  editorState: State;
   unit: UnitNode;
-  dispatch: React.Dispatch<Action>;
   closeModal: () => void;
   hasFixedParent: boolean;
-}): JSX.Element => {
+  form: UseFormReturn<SpaceUpdateForm>;
+  onNextPage: () => void;
+}): JSX.Element {
   const { t } = useTranslation();
+  const { control, watch } = form;
 
-  const nextEnabled =
-    editorState.numSpaces > 0 && editorState.parentPk !== undefined;
-
+  // FIXME needs to do a lookup if parent pk is set to find the name
+  const parentName = watch("parent") ?? null;
   return (
     <>
       <CustomDialogHeader
@@ -62,15 +56,14 @@ const Page1 = ({
           <IconCheck />
           <div>
             <Name>{unit.nameFi}</Name>
-            <Parent>
-              {editorState.parentPk ? editorState.parentName : null}
-            </Parent>
+            <Parent>{parentName}</Parent>
           </div>
           {unit.location ? (
             <Address>{parseAddress(unit.location)}</Address>
           ) : null}
         </UnitInfo>
         {!hasFixedParent ? <Title>{t("SpaceModal.page1.title")}</Title> : null}
+        {/*
         <NumberInput
           style={{ maxWidth: "15em" }}
           value={editorState.numSpaces}
@@ -91,22 +84,21 @@ const Page1 = ({
           max={10}
           required
         />
+        */}
+        {/* TODO should be inside a Controller */}
         {!hasFixedParent ? (
-          <>
-            <br />
-            <ParentSelector
-              label={t("SpaceModal.page1.parentLabel")}
-              unitPk={unit.pk ?? 0}
-              value={editorState.parentPk}
-              onChange={(parentPk, parentName) =>
-                dispatch({
-                  type: "setParent",
-                  parentPk,
-                  parentName: parentName || null,
-                })
-              }
-            />
-          </>
+          <Controller
+            control={control}
+            name="parent"
+            render={({ field: { onChange, value } }) => (
+              <ParentSelector
+                label={t("SpaceModal.page1.parentLabel")}
+                unitPk={unit.pk ?? 0}
+                value={value}
+                onChange={(parentPk) => onChange(parentPk)}
+              />
+            )}
+          />
         ) : null}
       </Dialog.Content>
       <ActionButtons>
@@ -114,16 +106,13 @@ const Page1 = ({
           {t("SpaceModal.page1.buttonCancel")}
         </Button>
         <NextButton
-          disabled={!nextEnabled}
           iconRight={<IconArrowRight />}
           variant="supplementary"
-          onClick={() => dispatch({ type: "nextPage" })}
+          onClick={onNextPage}
         >
           {t("SpaceModal.page1.buttonNext")}
         </NextButton>
       </ActionButtons>
     </>
   );
-};
-
-export default Page1;
+}

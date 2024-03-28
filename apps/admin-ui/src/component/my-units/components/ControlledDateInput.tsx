@@ -17,7 +17,7 @@ interface ControllerProps<T extends FieldValues> extends UseControllerProps<T> {
 }
 
 // NOTE string version because Date breaks keyboard input
-const ControlledDateInput = <T extends FieldValues>({
+function ControlledDateInput<T extends FieldValues>({
   control,
   name,
   error,
@@ -25,7 +25,7 @@ const ControlledDateInput = <T extends FieldValues>({
   disabled,
   id,
   label,
-}: ControllerProps<T>) => {
+}: ControllerProps<T>) {
   const {
     field: { value, onChange },
   } = useController({ control, name, rules: { required } });
@@ -46,6 +46,6 @@ const ControlledDateInput = <T extends FieldValues>({
       disabled={disabled}
     />
   );
-};
+}
 
 export default ControlledDateInput;

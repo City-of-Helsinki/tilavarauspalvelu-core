@@ -1,17 +1,19 @@
 import { breakpoints } from "common/src/common/style";
 import { Button } from "hds-react";
-import Joi from "joi";
 import styled from "styled-components";
+import { z } from "zod";
 
-export const schema = Joi.object({
-  spacePk: Joi.number().required(),
-  pk: Joi.number().optional(),
-  nameFi: Joi.string().required().max(80),
-  nameSv: Joi.string().optional().allow("").allow(null).max(80),
-  nameEn: Joi.string().optional().allow("").allow(null).max(80),
-}).options({
-  abortEarly: false,
+export const ResourceUpdateSchema = z.object({
+  nameFi: z.string().max(80).min(1),
+  // TODO check that empty is valid
+  nameSv: z.string().max(80).nullish(),
+  nameEn: z.string().max(80).nullish(),
+  // optional because of TS, update requires it, create can't have it
+  pk: z.number().min(1).optional(),
+  space: z.number().min(1),
 });
+
+export type ResourceUpdateForm = z.infer<typeof ResourceUpdateSchema>;
 
 export const Buttons = styled.div`
   display: flex;

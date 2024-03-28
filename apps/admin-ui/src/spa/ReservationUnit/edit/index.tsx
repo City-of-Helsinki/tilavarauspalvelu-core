@@ -7,7 +7,6 @@ import {
   IconArrowLeft,
   IconLinkExternal,
   Notification,
-  NumberInput,
   RadioButton,
   Select,
   SelectionGroup,
@@ -67,7 +66,7 @@ import {
 import Loader from "@/component/Loader";
 import { useNotification } from "@/context/NotificationContext";
 import { useModal } from "@/context/ModalContext";
-import { parseAddress } from "@/common/util";
+import { parseAddress, getTranslatedError } from "@/common/util";
 import Error404 from "@/common/Error404";
 import { Accordion } from "@/component/Accordion";
 import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
@@ -80,6 +79,7 @@ import {
   UPDATE_IMAGE_TYPE,
   UPDATE_RESERVATION_UNIT,
 } from "./queries";
+import { ControlledNumberInput } from "common/src/components/form/ControlledNumberInput";
 import { ArchiveDialog } from "./ArchiveDialog";
 import { ReservationStateTag, ReservationUnitStateTag } from "./tags";
 import { ActivationGroup } from "./ActivationGroup";
@@ -92,7 +92,6 @@ import {
   convertReservationUnit,
   transformReservationUnit,
   type ImageFormType,
-  getTranslatedError,
 } from "./form";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { reservationUnitsUrl } from "@/common/urls";
@@ -573,14 +572,12 @@ const getMinSurfaceArea = (spaceList: NonNullable<SpaceNode>[]) => {
   return Math.floor(area);
 };
 
-// Wrapper around NumberInput so it sends nulls instead of NaNs
-// set some page specific defaults for translations
 function CustomNumberInput({
   name,
-  min,
-  max,
-  required,
   form,
+  max,
+  min,
+  required,
 }: {
   name:
     | "maxPersons"
@@ -594,42 +591,28 @@ function CustomNumberInput({
   required?: boolean;
 }) {
   const { t } = useTranslation();
+
   const { formState, control } = form;
   const { errors } = formState;
+
   const errMsg = errors[name]?.message;
+  const tErrMsg = getTranslatedError(t, errMsg);
 
   const label = t(`ReservationUnitEditor.label.${name}`);
   const tooltipText = t(`ReservationUnitEditor.tooltip.${name}`);
   const helperText = t(`ReservationUnitEditor.${name}HelperText`);
 
-  // NOTE controller is needed otherwise the values default to 0 instead of null
   return (
-    <Controller
-      name={name}
+    <ControlledNumberInput
       control={control}
-      render={({ field: { value, onChange } }) => (
-        <NumberInput
-          value={value ?? ""}
-          onChange={(e) =>
-            onChange(
-              e.target.value === "" ? null : parseInt(e.target.value, 10)
-            )
-          }
-          required={required}
-          id={name}
-          label={label}
-          minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
-          plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
-          step={1}
-          type="number"
-          min={min}
-          max={max}
-          helperText={helperText}
-          errorText={getTranslatedError(t, errMsg)}
-          invalid={errMsg != null}
-          tooltipText={tooltipText}
-        />
-      )}
+      name={name}
+      min={min}
+      max={max}
+      required={required}
+      label={label}
+      tooltipText={tooltipText}
+      helperText={helperText}
+      errorText={tErrMsg}
     />
   );
 }

@@ -1,3 +1,5 @@
+import { type Maybe } from "common/types/gql-types";
+
 export const prefixes = {
   recurringReservations: "/recurring-reservations",
   reservations: "/reservations",
@@ -31,11 +33,33 @@ export const reservationUnitUrl = (
   unitId: number
 ): string => `/unit/${unitId}/reservationUnit/edit/${reservationUnitId}`;
 
-export const spaceUrl = (spaceId: number, unitId: number): string =>
-  `/unit/${unitId}/space/edit/${spaceId}`;
+// @deprecated
+export const spaceUrl = (spacePk: number, unitPk: number): string =>
+  getSpaceUrl(spacePk, unitPk);
 
-export const resourceUrl = (resourceId: number, unitId: number): string =>
-  `/unit/${unitId}/resource/edit/${resourceId}`;
+export function getSpaceUrl(
+  spacePk: Maybe<number> | undefined,
+  unitPk: Maybe<number> | undefined
+): string {
+  if (spacePk == null || unitPk == null) {
+    return "";
+  }
+  return `/unit/${unitPk}/space/edit/${spacePk}`;
+}
+
+// @deprecated
+export const resourceUrl = (resourcePk: number, unitPk: number): string =>
+  getResourceUrl(resourcePk, unitPk);
+
+export function getResourceUrl(
+  resourcePk: Maybe<number> | undefined,
+  unitPk: Maybe<number> | undefined
+): string {
+  if (resourcePk == null || unitPk == null) {
+    return "";
+  }
+  return `/unit/${unitPk}/resource/edit/${resourcePk}`;
+}
 
 export const unitUrl = (unitId: number): string => `/unit/${unitId}`;
 

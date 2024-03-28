@@ -1,69 +1,64 @@
 import React from "react";
 import { ErrorSummary } from "hds-react";
-import Joi from "joi";
-import i18next from "i18next";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { get } from "lodash";
+import type { FieldErrors, FieldValues } from "react-hook-form";
 
-type Props = {
-  validationErrors: Joi.ValidationResult | null;
-  linkToError?: boolean;
-  useDerivedIdsFor?: string[];
-  fieldNamePrefix: string;
-};
-
-const getErrorContext = (
-  context: Joi.Context | undefined,
-  fieldNamePrefix: string
-) => {
-  return typeof get(context, "limit") === "object"
-    ? {
-        ...context,
-        limit: i18next.t(`${fieldNamePrefix}${get(context, "limit.key")}`),
-      }
-    : { ...context };
+type Props<T extends FieldValues> = {
+  fieldNamePrefix?: string;
+  errors: FieldErrors<T>;
 };
 
 const Wrapper = styled.div`
   margin: var(--spacing-m) 0;
 `;
 
-const FormErrorSummary = ({
-  validationErrors,
-  linkToError = true,
-  fieldNamePrefix = "",
-  useDerivedIdsFor = [],
-}: Props): JSX.Element | null => {
-  const { t } = useTranslation();
-
-  if (!validationErrors || !validationErrors.error) {
+function cleanUpFieldName(fieldName?: string): string | null {
+  if (!fieldName) {
     return null;
   }
+  if (fieldName.endsWith(".")) {
+    return fieldName.slice(0, -1);
+  }
+  return fieldName;
+}
+
+export function FormErrorSummary<T extends FieldValues>({
+  errors,
+  fieldNamePrefix,
+}: Props<T>): JSX.Element | null {
+  const { t } = useTranslation();
+
+  const keys: string[] = [];
+  for (const err in errors) {
+    keys.push(err);
+  }
+
+  if (Object.keys(errors).length === 0) {
+    return null;
+  }
+
+  const cleanPrefix = cleanUpFieldName(fieldNamePrefix);
+
+  // TODO use a common translation key for these
+  const prefix =
+    cleanPrefix != null ? `${cleanPrefix}.` : "Notifications.form.errors.";
 
   return (
     <Wrapper>
       <ErrorSummary label={t("FormErrorSummary.label")} autofocus>
         <ul>
-          {validationErrors.error?.details.map((error, index) => {
+          {Object.values(errors).map((err, index: number) => {
             const label = t(`FormErrorSummary.errorLabel`, {
               index: index + 1,
             });
-            const id = useDerivedIdsFor.includes(String(error.path))
-              ? `${error.path}-toggle-button`
-              : error.path;
-            const errorContext = getErrorContext(
-              error.context,
-              fieldNamePrefix
-            );
+            // TODO undefined should be filtered out
+            const fieldName = t(`${prefix}${err?.message}`);
             return (
-              <li key={String(error.path)}>
-                {linkToError ? <a href={`#${id}`}>{label}</a> : label}
+              <li key={keys[index]}>
+                <span>{label}</span>
                 {": "}
-                {t(`validation.${error.type}`, {
-                  ...errorContext,
-                  fieldName: t(`${fieldNamePrefix}${errorContext?.key}`),
-                })}
+                {t(`${fieldName}`)}
               </li>
             );
           })}
@@ -71,23 +66,4 @@ const FormErrorSummary = ({
       </ErrorSummary>
     </Wrapper>
   );
-};
-
-export const validationErrorResolver =
-  (validationErrors: Joi.ValidationResult | null, labelPrefix = "") =>
-  (name: string): string | undefined => {
-    const error = validationErrors?.error?.details.find(
-      (errorDetail) =>
-        errorDetail.path.find((path) => path === name) ||
-        name === errorDetail.path.join(",")
-    );
-    if (!error) {
-      return undefined;
-    }
-
-    return i18next.t(`validation.${error.type}`, {
-      ...getErrorContext(error.context, labelPrefix),
-    });
-  };
-
-export default FormErrorSummary;
+}

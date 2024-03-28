@@ -1,30 +1,19 @@
-import React, { useState, type ChangeEvent } from "react";
-import { IconArrowRight, TextInput, IconSearch } from "hds-react";
+import React from "react";
 import { type TFunction } from "i18next";
-import { uniq } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { useDebounce } from "react-use";
 import { useQuery, type ApolloError } from "@apollo/client";
 import { H1, Strong } from "common/src/common/typography";
 import type { Query, ResourceNode } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
-import { DataFilterConfig } from "@/common/types";
 import Loader from "@/component/Loader";
-import DataTable, { CellConfig } from "@/component/DataTable";
-import ClearButton from "@/component/ClearButton";
 import { RESOURCES_QUERY } from "@/common/queries";
 import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import { useNotification } from "@/context/NotificationContext";
-import { resourceUrl } from "@/common/urls";
 import { Container } from "@/styles/layout";
-import SearchContainer from "@/component/SearchContainer";
-
-const StyledInput = styled(TextInput).attrs({
-  style: {
-    "--border-width": "0",
-  } as React.CSSProperties,
-})``;
+import { CustomTable } from "../Table";
+import { Link } from "react-router-dom";
+import { getResourceUrl } from "@/common/urls";
 
 const ResourceCount = styled.div`
   font-family: var(--tilavaraus-admin-font-bold);
@@ -33,140 +22,73 @@ const ResourceCount = styled.div`
   margin-bottom: var(--spacing-m);
 `;
 
-const getCellConfig = (t: TFunction): CellConfig => {
-  return {
-    cols: [
-      {
-        title: t("Resources.headings.name"),
-        key: "nameFi",
-        transform: ({ nameFi }: ResourceNode) => <Strong>{nameFi}</Strong>,
-      },
-      {
-        title: t("Resources.headings.unit"),
-        key: "space.unit.nameFi",
-      },
-      {
-        title: t("Resources.headings.district"),
-        key: "space.unit.district.nameFi",
-        transform: () => "???",
-      },
-      {
-        title: t("Resources.headings.resourceType"),
-        key: "resourceType",
-        transform: ({ locationType }: ResourceNode) => (
-          <div
-            style={{
-              display: "flex",
-              alignContent: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <span>{locationType || "?"}</span>
-            <IconArrowRight />
-          </div>
-        ),
-      },
-    ],
-    index: "pk",
-    sorting: "name",
-    order: "asc",
-    rowLink: ({ space, pk }: ResourceNode) =>
-      resourceUrl(Number(pk), Number(space?.unit?.pk)),
-  };
+type ResourcesTableColumn = {
+  headerName: string;
+  key: string;
+  isSortable: boolean;
+  transform?: (space: ResourceNode) => JSX.Element | string;
 };
 
-const getFilterConfig = (
-  resources: ResourceNode[],
-  t: TFunction
-): DataFilterConfig[] => {
-  const buildings = uniq(
-    resources.map((resource) => resource?.space?.unit?.nameFi || "")
-  ).filter((n) => n);
-  const types = uniq(
-    filterNonNullable(resources.map((resource) => resource.locationType))
-  );
-
+function getColConfig(t: TFunction): ResourcesTableColumn[] {
   return [
     {
-      title: t("Resources.headings.unit"),
-      filters:
-        buildings &&
-        buildings.map((building: string) => ({
-          title: building,
-          key: "space.unit.nameFi",
-          value: building || "",
-        })),
+      headerName: t("Resources.headings.name"),
+      isSortable: false,
+      key: "nameFi",
+      transform: (res: ResourceNode) => {
+        const { pk, space, nameFi } = res;
+        const link = getResourceUrl(pk, space?.unit?.pk);
+        const name = nameFi != null && nameFi.length > 0 ? nameFi : "-";
+        return (
+          <Link to={link}>
+            <Strong>{name}</Strong>
+          </Link>
+        );
+      },
     },
     {
-      title: t("Resources.headings.resourceType"),
-      filters: types.map((type: string) => ({
-        title: type,
-        key: "locationType",
-        value: type || "",
-      })),
+      headerName: t("Resources.headings.unit"),
+      isSortable: false,
+      key: "space.unit.nameFi",
+    },
+    {
+      headerName: t("Resources.headings.district"),
+      isSortable: false,
+      key: "space.unit.district.nameFi",
+      transform: () => "???",
+    },
+    {
+      headerName: t("Resources.headings.resourceType"),
+      isSortable: false,
+      key: "resourceType",
+      transform: ({ locationType }: ResourceNode) => (
+        // TODO translate
+        <span>{locationType || "?"}</span>
+      ),
     },
   ];
-};
+}
 
-const ResourcesList = (): JSX.Element => {
+function ResourcesList(): JSX.Element {
   const { notifyError } = useNotification();
   const { t } = useTranslation();
 
-  const [resources, setResources] = useState<ResourceNode[]>([]);
-  const [filterConfig, setFilterConfig] = useState<DataFilterConfig[] | null>(
-    null
-  );
-  const [cellConfig, setCellConfig] = useState<CellConfig | null>(null);
-  const [searchTerm, setSearchTerm] = useState<string | null>(null);
-  const [searchValue, setSearchValue] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [, cancelTypeahead] = useDebounce(
-    () => {
-      setSearchTerm(searchValue);
-    },
-    300,
-    [searchValue]
-  );
-
-  useQuery<Query>(RESOURCES_QUERY, {
-    onCompleted: (data) => {
-      const result = filterNonNullable(
-        data?.resources?.edges?.map((r) => r?.node)
-      );
-      if (result) {
-        setResources(result);
-        setCellConfig(getCellConfig(t));
-        setFilterConfig(getFilterConfig(result, t));
-      }
-      setIsLoading(false);
-    },
+  const { data, loading: isLoading } = useQuery<Query>(RESOURCES_QUERY, {
     onError: (err: ApolloError) => {
       notifyError(err.message);
-      setIsLoading(false);
     },
   });
 
-  if (isLoading || !resources || !filterConfig || !cellConfig) {
+  const resources = filterNonNullable(
+    data?.resources?.edges?.map((r) => r?.node)
+  );
+  const rows = resources;
+  const cols = getColConfig(t);
+  // TODO filtering and sorting missing
+
+  if (isLoading) {
     return <Loader />;
   }
-
-  const filteredResources = searchTerm
-    ? resources.filter((resource: ResourceNode) => {
-        const searchTerms = searchTerm.toLowerCase().split(" ");
-        const { nameFi, space, locationType } = resource;
-        // FIXME
-        const buildingName = space?.building?.nameFi;
-        const localizedName = nameFi || "???";
-
-        return searchTerms.every((term: string) => {
-          return (
-            localizedName.toLowerCase().includes(term) ||
-            String(buildingName).toLowerCase().includes(term) ||
-            String(locationType).toLowerCase().includes(term)
-          );
-        });
-      })
-    : resources;
 
   return (
     <>
@@ -175,40 +97,14 @@ const ResourcesList = (): JSX.Element => {
         <div>
           <H1 $legacy>{t("Resources.resourceListHeading")}</H1>
           <p>{t("Resources.resourceListDescription")}</p>
-          <SearchContainer>
-            <IconSearch className="searchIcon" />
-            <StyledInput
-              id="resourcesSearch"
-              placeholder={t("Resources.searchPlaceholder")}
-              onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                cancelTypeahead();
-                setSearchValue(event.target.value);
-              }}
-              value={searchValue || ""}
-            />
-            {searchValue && (
-              <ClearButton
-                onClick={() => {
-                  setSearchTerm(null);
-                  setSearchValue(null);
-                }}
-              />
-            )}
-          </SearchContainer>
           <ResourceCount>
             {resources.length} {t("common.volumeUnit")}
           </ResourceCount>
         </div>
-        <DataTable
-          groups={[{ id: 1, data: filteredResources }]}
-          hasGrouping={false}
-          config={{ filtering: true, rowFilters: true }}
-          cellConfig={cellConfig}
-          filterConfig={filterConfig}
-        />
+        <CustomTable indexKey="pk" rows={rows} cols={cols} />
       </Container>
     </>
   );
-};
+}
 
 export default ResourcesList;

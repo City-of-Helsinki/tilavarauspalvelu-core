@@ -1,165 +1,34 @@
-import React, { memo, useReducer, useState } from "react";
+import React, { useEffect } from "react";
 import { Button, Notification } from "hds-react";
-import { isEqual, omitBy, pick } from "lodash";
-import { type FetchResult, useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import Joi from "joi";
 import { H1 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import type {
+  Mutation,
+  MutationUpdateSpaceArgs,
   Query,
-  SpaceNode,
+  QuerySpaceArgs,
   SpaceUpdateMutationInput,
-  SpaceUpdateMutationPayload,
 } from "common/types/gql-types";
-import { StyledNotification } from "@/styles/util";
-import { schema } from "./util";
-import { useNotification } from "../../../context/NotificationContext";
+import { useNotification } from "@/context/NotificationContext";
+import Loader from "@/component/Loader";
+import { ContentContainer } from "@/styles/layout";
+import { FormErrorSummary } from "@/common/FormErrorSummary";
 import { SPACE_QUERY, UPDATE_SPACE } from "./queries";
-import Loader from "../../Loader";
 import Head from "./Head";
-import { ContentContainer, IngressContainer } from "../../../styles/layout";
-import FormErrorSummary from "../../../common/FormErrorSummary";
-import SpaceHierarchy from "./SpaceHierarchy";
-import ParentSelector from "./ParentSelector";
-import SpaceForm from "./SpaceForm";
-
-type NotificationType = {
-  title: string;
-  text: string;
-  type: "success" | "error";
-};
-
-type Action =
-  | {
-      type: "setNotification";
-      notification: NotificationType;
-    }
-  | { type: "clearNotification" }
-  | {
-      type: "setValidationErrors";
-      validationErrors: Joi.ValidationResult | null;
-    }
-  | { type: "clearError" }
-  | { type: "dataLoaded"; space: SpaceNode }
-  | { type: "dataLoadError"; message: string }
-  // eslint-disable-next-line
-  | { type: "set"; value: any };
-
-type State = {
-  spacePk?: number;
-  unitPk?: number;
-  notification: null | NotificationType;
-  loading: boolean;
-  space: SpaceNode | null;
-  spaceEdit: SpaceUpdateMutationInput | null;
-  parent?: SpaceNode;
-  unitSpaces?: SpaceNode[];
-  hasChanges: boolean;
-  error: null | {
-    message: string;
-  };
-  validationErrors: Joi.ValidationResult | null;
-};
-
-const getInitialState = (spacePk: number, unitPk: number): State => ({
-  spacePk,
-  unitPk,
-  loading: true,
-  notification: null,
-  space: null,
-  spaceEdit: null,
-  error: null,
-  hasChanges: false,
-  validationErrors: null,
-});
-
-const modified = (d: State) => ({ ...d, hasChanges: true });
-
-const withLoadingState = (state: State): State => {
-  return {
-    ...state,
-    loading: state.space == null,
-  };
-};
-
-const reducer = (state: State, action: Action): State => {
-  switch (action.type) {
-    case "clearNotification": {
-      return { ...state, notification: null };
-    }
-    case "setNotification": {
-      return { ...state, notification: { ...action.notification } };
-    }
-    case "dataLoaded": {
-      const { space } = action;
-      return withLoadingState({
-        ...state,
-        space: {
-          ...space,
-        },
-        spaceEdit: {
-          ...pick(
-            {
-              ...space,
-              pk: space.pk,
-              maxPersons: Math.ceil(space.maxPersons || 0),
-              surfaceArea: Math.ceil(space.surfaceArea || 0),
-            },
-            [
-              "pk",
-              "nameFi",
-              "nameSv",
-              "nameEn",
-              "surfaceArea",
-              "maxPersons",
-              "code",
-            ]
-          ),
-          parentPk: space.parent ? space.parent?.pk : null,
-          unitPk: space.unit ? space.unit.pk : undefined,
-        } as SpaceUpdateMutationInput,
-        hasChanges: false,
-        validationErrors: null,
-      });
-    }
-    case "dataLoadError": {
-      return {
-        ...state,
-        loading: false,
-        hasChanges: false,
-        error: { message: action.message },
-      };
-    }
-    case "clearError": {
-      return {
-        ...state,
-        error: null,
-      };
-    }
-
-    case "set": {
-      return modified({
-        ...state,
-        spaceEdit: { ...state.spaceEdit, ...action.value },
-      });
-    }
-
-    case "setValidationErrors": {
-      return {
-        ...state,
-        validationErrors: action.validationErrors,
-      };
-    }
-
-    default:
-      return state;
-  }
-};
-
-const Wrapper = styled.div``;
+import { SpaceHierarchy } from "./SpaceHierarchy";
+import { ParentSelector } from "./ParentSelector";
+import {
+  type SpaceUpdateForm,
+  SpaceForm,
+  SpaceUpdateSchema,
+} from "./SpaceForm";
+import { base64encode } from "common/src/helpers";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const EditorContainer = styled.div`
   margin: 0;
@@ -201,186 +70,158 @@ type Props = {
   unit: number;
 };
 
-const SpaceEditor = ({ space, unit }: Props): JSX.Element | null => {
-  const [saving, setSaving] = useState(false);
+function SpaceEditor({ space, unit }: Props): JSX.Element {
   const history = useNavigate();
 
   const { notifyError, notifySuccess } = useNotification();
 
-  const [state, dispatch] = useReducer(reducer, getInitialState(space, unit));
   const { t } = useTranslation();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const setValue = (value: any) => {
-    dispatch({ type: "set", value });
-  };
-
-  const displayError = (text: string) => {
-    dispatch({ type: "dataLoadError", message: text });
-  };
-
-  const [updateSpaceMutation] = useMutation<
-    { updateSpace: SpaceUpdateMutationPayload },
-    { input: SpaceUpdateMutationInput }
+  const [updateSpaceMutation, { loading: isMutationLoading }] = useMutation<
+    Mutation,
+    MutationUpdateSpaceArgs
   >(UPDATE_SPACE);
 
-  const updateSpace = (
-    input: SpaceUpdateMutationInput
-  ): Promise<FetchResult<{ updateSpace: SpaceUpdateMutationPayload }>> =>
+  const updateSpace = (input: SpaceUpdateMutationInput) =>
     updateSpaceMutation({ variables: { input } });
 
-  // FIXME relay query
-  const { refetch } = useQuery<Query, QuerySpaceByPkArgs>(SPACE_QUERY, {
-    variables: { pk: space },
-    onCompleted: ({ spaceByPk }) => {
-      if (spaceByPk) {
-        dispatch({ type: "dataLoaded", space: spaceByPk });
-      }
-    },
+  const {
+    data,
+    refetch,
+    loading: isQueryLoading,
+    error,
+  } = useQuery<Query, QuerySpaceArgs>(SPACE_QUERY, {
+    variables: { id: base64encode(`SpaceNode:${space}`) },
     onError: (e) => {
-      displayError(t("errors.errorFetchingData", { error: e }));
+      notifyError(t("errors.errorFetchingData", { error: e }));
     },
   });
 
-  const onSave = async () => {
-    setSaving(true);
-    try {
-      const data = await updateSpace({
-        ...(omitBy(
-          state.spaceEdit,
-          (v) => v === ""
-        ) as SpaceUpdateMutationInput),
-        surfaceArea: Math.ceil(state.spaceEdit?.surfaceArea ?? 0),
-      });
-      if (data?.data?.updateSpace.errors == null) {
-        notifySuccess(
-          t("SpaceEditor.spaceUpdatedNotification"),
-          t("SpaceEditor.spaceUpdated")
-        );
-        refetch();
-      } else {
-        notifyError(t("SpaceEditor.saveFailed"));
-      }
-    } catch {
-      notifyError(t("SpaceEditor.saveFailed"));
-    }
-    setSaving(false);
-  };
+  const form = useForm<SpaceUpdateForm>({
+    resolver: zodResolver(SpaceUpdateSchema),
+    mode: "onChange",
+  });
+  const { control, handleSubmit, reset, formState, watch } = form;
+  const { errors, isDirty } = formState;
 
-  if (state.loading) {
+  useEffect(() => {
+    if (data?.space != null) {
+      const { space: s } = data;
+      reset({
+        nameFi: s.nameFi ?? "",
+        nameSv: s.nameSv ?? "",
+        nameEn: s.nameEn ?? "",
+        surfaceArea: s.surfaceArea ?? undefined,
+        maxPersons: s.maxPersons ?? undefined,
+        unit,
+        pk: s.pk ?? 0,
+        parent: s.parent?.pk ?? null,
+        code: s.code,
+      });
+    }
+  }, [data, reset, unit]);
+
+  const isLoading = isMutationLoading || isQueryLoading;
+
+  if (isLoading) {
     return <Loader />;
   }
 
-  if (state.error && !state.space) {
+  if (error != null) {
     return (
-      <Wrapper>
+      <div>
         <Notification
           type="error"
           label={t("errors.functionFailedTitle")}
           position="top-center"
           autoClose={false}
           dismissible
-          onClose={() => dispatch({ type: "clearError" })}
           closeButtonLabelText={t("common.close")}
           displayAutoCloseProgress={false}
         >
-          {t(state.error.message)}
+          {t(error.message)}
         </Notification>
-      </Wrapper>
+      </div>
     );
   }
 
-  if (state.space == null) {
-    return null;
-  }
-
-  const getValidationError = (name: string): string | undefined => {
-    const error = state.validationErrors?.error?.details.find((errorDetail) =>
-      errorDetail.path.find((path) => path === name)
-    );
-
-    if (!error) {
-      return undefined;
+  const onSubmit = async (values: SpaceUpdateForm) => {
+    try {
+      const { surfaceArea, pk, ...rest } = values;
+      if (pk == null || pk === 0) {
+        notifyError(t("SpaceEditor.saveFailed"));
+        return;
+      }
+      await updateSpace({
+        ...rest,
+        pk,
+        surfaceArea: Math.ceil(surfaceArea ?? 0),
+      });
+      notifySuccess(
+        t("SpaceEditor.spaceUpdatedNotification"),
+        t("SpaceEditor.spaceUpdated")
+      );
+      refetch();
+    } catch (e) {
+      notifyError(t("SpaceEditor.saveFailed"));
     }
-
-    // @ts-expect-error: TODO: Joi should be deprecated so ignore this for now
-    return t(`validation.${error.type}`, { ...error.context });
   };
 
   return (
-    <Wrapper>
+    <form noValidate onSubmit={handleSubmit(onSubmit)}>
       <Head
-        title={state.space.parent?.nameFi || t("SpaceEditor.noParent")}
-        unit={state.space.unit}
-        maxPersons={state.spaceEdit?.maxPersons || undefined}
-        surfaceArea={state.spaceEdit?.surfaceArea || undefined}
+        title={data?.space?.parent?.nameFi || t("SpaceEditor.noParent")}
+        unit={data?.space?.unit}
+        maxPersons={watch("maxPersons") || undefined}
+        surfaceArea={watch("surfaceArea") || undefined}
       />
-      <IngressContainer>
-        {state.notification ? (
-          <StyledNotification
-            type={state.notification.type}
-            label={t(state.notification.title)}
-            dismissible
-            closeButtonLabelText={`${t("common.close")}`}
-            onClose={() => dispatch({ type: "clearNotification" })}
-          >
-            {t(state.notification.text)}
-          </StyledNotification>
-        ) : null}
-      </IngressContainer>
       <ContentContainer>
         <EditorContainer>
           <H1 $legacy>{t("SpaceEditor.details")}</H1>
           <Editor>
-            <FormErrorSummary
-              fieldNamePrefix="SpaceEditor.label."
-              validationErrors={state.validationErrors}
-            />
-
+            <FormErrorSummary errors={errors} />
             <Section>
               <SubHeading>{t("SpaceEditor.hierarchy")}</SubHeading>
-              <SpaceHierarchy
-                space={state.space}
-                unitSpaces={state.unitSpaces}
-              />
-              <ParentSelector
-                helperText={t("SpaceModal.page1.parentHelperText")}
-                label={t("SpaceModal.page1.parentLabel")}
-                onChange={(parentPk) => setValue({ parentPk })}
-                value={state.spaceEdit?.parentPk ?? null}
-                placeholder={t("SpaceModal.page1.parentPlaceholder")}
-                unitPk={unit}
+              {data?.space && (
+                <SpaceHierarchy
+                  space={data?.space}
+                  unitSpaces={data?.unit?.spaces}
+                />
+              )}
+              <Controller
+                control={control}
+                name="parent"
+                render={({ field: { onChange, value } }) => (
+                  <ParentSelector
+                    helperText={t("SpaceModal.page1.parentHelperText")}
+                    label={t("SpaceModal.page1.parentLabel")}
+                    // FIXME this should remove this space from the list
+                    onChange={(parentPk) => onChange(parentPk)}
+                    value={value}
+                    placeholder={t("SpaceModal.page1.parentPlaceholder")}
+                    unitPk={unit}
+                  />
+                )}
               />
             </Section>
             <Section>
               <SubHeading>{t("SpaceEditor.other")}</SubHeading>
-              <SpaceForm
-                data={state.spaceEdit}
-                setValue={setValue}
-                getValidationError={getValidationError}
-              />
+              <SpaceForm form={form} />
             </Section>
             <Buttons>
               <Button
-                disabled={!state.hasChanges}
                 variant="secondary"
+                type="button"
                 onClick={() => history(-1)}
+                // TODO check loading state on mutations
               >
                 {t("SpaceEditor.cancel")}
               </Button>
               <SaveButton
-                disabled={!state.hasChanges}
-                onClick={(e) => {
-                  e.preventDefault();
-                  const validationErrors = schema.validate(state.spaceEdit);
-                  if (validationErrors.error) {
-                    dispatch({ type: "setValidationErrors", validationErrors });
-                  } else {
-                    onSave();
-                  }
-                }}
-                isLoading={saving}
-                loadingText={t("saving")}
+                disabled={!isDirty}
+                type="submit"
+                isLoading={isLoading}
+                // loadingText={t("saving")}
               >
                 {t("SpaceEditor.save")}
               </SaveButton>
@@ -388,26 +229,8 @@ const SpaceEditor = ({ space, unit }: Props): JSX.Element | null => {
           </Editor>
         </EditorContainer>
       </ContentContainer>
-      {state.error ? (
-        <Wrapper>
-          <Notification
-            type="error"
-            label={t("errors.functionFailedTitle")}
-            position="top-center"
-            autoClose={false}
-            dismissible
-            onClose={() => dispatch({ type: "clearError" })}
-            closeButtonLabelText={t("common.close")}
-            displayAutoCloseProgress={false}
-          >
-            {t(state.error?.message)}
-          </Notification>
-        </Wrapper>
-      ) : null}
-    </Wrapper>
+    </form>
   );
-};
+}
 
-export default memo(SpaceEditor, (prevProps, nextProps) => {
-  return isEqual(prevProps, nextProps);
-});
+export default SpaceEditor;

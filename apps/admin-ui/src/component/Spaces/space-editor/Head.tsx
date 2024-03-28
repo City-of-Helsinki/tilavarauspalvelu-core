@@ -4,14 +4,14 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
-import type { UnitNode } from "common/types/gql-types";
-import { parseAddress } from "../../../common/util";
-import { ContentContainer, IngressContainer } from "../../../styles/layout";
-import LinkPrev from "../../LinkPrev";
+import type { Maybe, UnitNode } from "common/types/gql-types";
+import { parseAddress } from "@/common/util";
+import { ContentContainer, IngressContainer } from "@/styles/layout";
+import LinkPrev from "@/component/LinkPrev";
 
 interface IProps {
   title: string;
-  unit: UnitNode;
+  unit?: Maybe<UnitNode>;
   maxPersons?: number;
   surfaceArea?: number;
 }
@@ -57,18 +57,16 @@ const Prop = styled.div<{ $disabled: boolean }>`
   ${({ $disabled }) => $disabled && "opacity: 0.4;"}
 `;
 
-const Head = ({
-  title,
-  unit,
-  surfaceArea,
-  maxPersons,
-}: IProps): JSX.Element => {
+function Head({ title, unit, surfaceArea, maxPersons }: IProps): JSX.Element {
   const { t } = useTranslation();
+
+  // TODO use urlBuilder
+  const unitUrl = `/unit/${unit?.pk}`;
 
   return (
     <Wrapper>
       <ContentContainer>
-        <LinkPrev route={`/unit/${unit?.pk}`} />
+        <LinkPrev route={unitUrl} />
       </ContentContainer>
       <IngressContainer>
         <Ingress>
@@ -83,7 +81,7 @@ const Head = ({
               <Prop $disabled={!unit}>
                 <IconLocation />{" "}
                 {unit ? (
-                  <Link to={`/unit/${unit?.pk}`}>{unit?.nameFi}</Link>
+                  <Link to={unitUrl}>{unit?.nameFi}</Link>
                 ) : (
                   t("SpaceEditor.noUnit")
                 )}
@@ -104,6 +102,6 @@ const Head = ({
       </IngressContainer>
     </Wrapper>
   );
-};
+}
 
 export default Head;

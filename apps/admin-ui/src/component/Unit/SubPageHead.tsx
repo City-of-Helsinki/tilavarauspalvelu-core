@@ -47,9 +47,7 @@ const SubPageHead = ({ title, unit, link, state }: IProps): JSX.Element => {
 
   return (
     <Wrapper>
-      <ContentContainer>
-        <LinkPrev route={link || `/unit/${unit.pk}`} />
-      </ContentContainer>
+      <LinkPrev route={link || `/unit/${unit.pk}`} />
       <ContentContainer>
         <Container>
           <TitleRow>

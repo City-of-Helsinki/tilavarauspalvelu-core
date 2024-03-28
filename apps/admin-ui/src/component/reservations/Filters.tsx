@@ -162,7 +162,8 @@ const Filters = ({ onSearch, initialFiltering }: Props): JSX.Element => {
             onChange={(reservationUnit) =>
               dispatch({ type: "set", value: { reservationUnit } })
             }
-            value={state.reservationUnit}
+            // FIXME should not coerce types (it's correct now, but not after 6 months)
+            value={state.reservationUnit as { value: number; label: string }[]}
           />
         </div>
         <div>

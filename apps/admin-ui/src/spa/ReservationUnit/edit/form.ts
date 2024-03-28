@@ -19,7 +19,6 @@ import {
 } from "common/types/gql-types";
 import { addDays, format } from "date-fns";
 import { z } from "zod";
-import { TFunction } from "i18next";
 import {
   checkLengthWithoutHtml,
   checkTimeStringFormat,
@@ -982,12 +981,4 @@ export function transformReservationUnit(
       })),
     applicationRoundTimeSlots,
   };
-}
-
-export function getTranslatedError(t: TFunction, error: string | undefined) {
-  if (error == null) {
-    return undefined;
-  }
-  // TODO use a common translation key for these
-  return t(`Notifications.form.errors.${error}`);
 }

@@ -4,6 +4,7 @@ import { groupBy, set, get, trim } from "lodash";
 import type { LocationNode, Query } from "common/types/gql-types";
 import { DataFilterOption } from "./types";
 import { NUMBER_OF_DECIMALS } from "./const";
+import type { TFunction } from "next-i18next";
 
 export { formatDuration } from "common/src/common/util";
 
@@ -236,3 +237,14 @@ export const combineResults = (
 
 export const sortByName = (a?: string, b?: string): number =>
   a && b ? a.toLowerCase().localeCompare(b.toLowerCase()) : !a ? 1 : -1;
+
+export function getTranslatedError(
+  t: TFunction,
+  error: string | undefined
+): string | undefined {
+  if (error == null) {
+    return undefined;
+  }
+  // TODO use a common translation key for these
+  return t(`Notifications.form.errors.${error}`);
+}

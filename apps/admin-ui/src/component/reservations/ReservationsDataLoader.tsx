@@ -8,7 +8,7 @@ import { useNotification } from "@/context/NotificationContext";
 import Loader from "../Loader";
 import { FilterArguments } from "./Filters";
 import { RESERVATIONS_QUERY } from "./queries";
-import ReservationsTable from "./ReservationsTable";
+import { ReservationsTable } from "./ReservationsTable";
 import { fromUIDate, toApiDate } from "common/src/common/util";
 import { filterNonNullable } from "common/src/helpers";
 
@@ -24,10 +24,10 @@ type Props = {
   defaultFiltering: QueryReservationsArgs;
 };
 
-const mapFilterParams = (
+function mapFilterParams(
   params: FilterArguments,
   defaultParams: QueryReservationsArgs
-): QueryReservationsArgs => {
+): QueryReservationsArgs {
   const emptySearch =
     values(params).filter((v) => !(v === "" || v.length === 0)).length === 0;
 
@@ -45,7 +45,7 @@ const mapFilterParams = (
   const endDate = end ? toApiDate(end) : defaults.endDate;
 
   return {
-    unit: params.unit?.map((u) => u.value as string),
+    unit: filterNonNullable(params.unit?.map((u) => u.value?.toString())),
     reservationUnitType: filterNonNullable(
       params.reservationUnitType?.map((u) => u.value?.toString())
     ),
@@ -62,13 +62,13 @@ const mapFilterParams = (
       params.paymentStatuses?.map((status) => status.value?.toString())
     ),
   };
-};
+}
 
-const useReservations = (
+function useReservations(
   filters: FilterArguments,
   defaultFiltering: QueryReservationsArgs,
   _sort?: Sort
-) => {
+) {
   const { notifyError } = useNotification();
 
   /*
@@ -118,14 +118,14 @@ const useReservations = (
     totalCount: data?.reservations?.totalCount,
     offset: data?.reservations?.edges?.length,
   };
-};
+}
 
-const ReservationsDataLoader = ({
+export function ReservationsDataLoader({
   filters,
   sort,
   sortChanged: onSortChanged,
   defaultFiltering,
-}: Props): JSX.Element => {
+}: Props): JSX.Element {
   const { fetchMore, loading, data, totalCount, offset } = useReservations(
     filters,
     defaultFiltering,
@@ -151,6 +151,4 @@ const ReservationsDataLoader = ({
       />
     </>
   );
-};
-
-export default ReservationsDataLoader;
+}

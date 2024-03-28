@@ -1,34 +1,31 @@
 import React, { useRef } from "react";
 import { IconGroup } from "hds-react";
-import { clone, set, trim } from "lodash";
+import { trim } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { FetchResult, useMutation } from "@apollo/client";
-import { useNavigate } from "react-router-dom";
+import { type ApolloQueryResult, useMutation } from "@apollo/client";
+import { useNavigate, Link } from "react-router-dom";
 import type {
+  Maybe,
   SpaceDeleteMutationInput,
   SpaceDeleteMutationPayload,
   SpaceNode,
   UnitNode,
+  Query,
 } from "common/types/gql-types";
-import { DELETE_SPACE } from "../../common/queries";
-import DataTable, { CellConfig } from "../DataTable";
+import { DELETE_SPACE } from "@/common/queries";
 import PopupMenu from "./PopupMenu";
 import Modal, { useModal as useHDSModal } from "../HDSModal";
-import NewSpaceModal from "../Spaces/space-editor/new-space-modal/NewSpaceModal";
+import { NewSpaceModal } from "../Spaces/space-editor/new-space-modal/NewSpaceModal";
 import ConfirmationDialog, { ModalRef } from "../ConfirmationDialog";
-import SpaceTreeDataTableGroup from "./SpaceTreeDataTableGroup";
-import { useNotification } from "../../context/NotificationContext";
+import { useNotification } from "@/context/NotificationContext";
+import { CustomTable } from "../Table";
+import { getSpaceUrl } from "@/common/urls";
 
 interface IProps {
-  spaces: SpaceNode[];
   unit: UnitNode;
-  onSave: () => void;
-  onDelete: () => void;
-  onDataError: (error: string) => void;
+  refetch: () => Promise<ApolloQueryResult<Query>>;
 }
-
-const Wrapper = styled.div``;
 
 const Name = styled.div`
   font-size: var(--fontsize-body-l);
@@ -49,84 +46,21 @@ const MaxPersons = styled.div`
   display: flex;
 `;
 
-const buildTrees = (spaces: SpaceNode[]): SpaceNode[] => {
-  const editedSpaces = spaces.map(clone);
-  editedSpaces.forEach((s) => {
-    const parent = editedSpaces.find((ps) => ps.pk === s.parent?.pk);
-    if (parent) {
-      set(s, "parent", parent);
-      set(parent, "children", (parent.children || []).concat(s));
-    }
-  });
-  return editedSpaces;
-};
-
-const collectSubTree = (space: SpaceNode): SpaceNode[] => {
-  const children = (space.children as SpaceNode[]) || [];
-  return [space].concat(children.flatMap((c) => collectSubTree(c)));
-};
-
-const spacesAsGroups = (spaces: SpaceNode[]) => {
-  const reconciled = buildTrees(spaces);
-  const roots = reconciled.filter((e) => e.parent == null);
-
-  return roots.map((sp) => ({
-    id: sp.pk ?? 0,
-    data: collectSubTree(sp),
-  }));
-};
-
-const countSubSpaces = (space: SpaceNode): number =>
-  (space.children || []).reduce(
+function countSubSpaces(space: SpaceNode): number {
+  return (space.children || []).reduce(
     (p, c) => p + 1 + (c ? countSubSpaces(c) : 0),
     0
   );
+}
 
-const renderGroup = (
-  group: { data: SpaceNode[] },
-  hasGrouping: boolean,
-  cellConfig: CellConfig,
-  groupIndex: number,
-  groupVisibility: boolean[],
-  setGroupVisibility: React.Dispatch<React.SetStateAction<boolean[]>>,
-  isSelectionActive: boolean,
-  groupRows: number[],
-  selectedRows: number[],
-  updateSelection: (
-    selection: number[],
-    method?: "add" | "remove" | undefined
-  ) => void,
-  children: React.ReactChild
-): JSX.Element => (
-  <SpaceTreeDataTableGroup
-    cellConfig={cellConfig}
-    group={group}
-    hasGrouping={hasGrouping}
-    key={group.data[0].pk || "group"}
-    cols={cellConfig.cols.length}
-    index={groupIndex}
-    isVisible={groupVisibility[groupIndex]}
-    toggleGroupVisibility={(): void => {
-      const tempGroupVisibility = [...groupVisibility];
-      tempGroupVisibility[groupIndex] = !tempGroupVisibility[groupIndex];
-      setGroupVisibility(tempGroupVisibility);
-    }}
-  >
-    {children}
-  </SpaceTreeDataTableGroup>
-);
+type SpacesTableColumn = {
+  headerName: string;
+  key: string;
+  isSortable: boolean;
+  transform?: (space: SpaceNode) => JSX.Element | string;
+};
 
-const UnitHeadingName = (space: SpaceNode) => (
-  <Name>{trim(space.nameFi as string)}</Name>
-);
-
-const SpacesTable = ({
-  spaces,
-  unit,
-  onSave,
-  onDelete,
-  onDataError,
-}: IProps): JSX.Element => {
+export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
   const { t } = useTranslation();
   const {
     open: isOpen,
@@ -142,147 +76,167 @@ const SpacesTable = ({
 
   const { notifyError } = useNotification();
 
-  const deleteSpace = (
-    pk: number
-  ): Promise<FetchResult<{ deleteSpace: SpaceDeleteMutationPayload }>> =>
-    deleteSpaceMutation({ variables: { input: { pk: String(pk) } } });
+  async function deleteSpace(pk: Maybe<number> | undefined) {
+    if (pk == null || pk === 0) {
+      return;
+    }
+    try {
+      const res = await deleteSpaceMutation({
+        variables: { input: { pk: String(pk) } },
+      });
+      if (res.data?.deleteSpace.deleted) {
+        refetch();
+      } else {
+        // TODO missing translation
+        notifyError("SpaceTable.removeFailed");
+      }
+    } catch (e) {
+      /* TODO handle this error
+       "extensions": {
+        "code": "MUTATION_VALIDATION_ERROR",
+        "errors": [{
+          "field": "nonFieldErrors",
+          "message": "Space occurs in active application round.",
+          "code": "invalid"
+        }]
+        }
+      */
+      notifyError("SpaceTable.removeFailed");
+    }
+  }
 
   const modal = useRef<ModalRef>();
 
   const history = useNavigate();
 
-  const cellConfig = {
-    cols: [
-      {
-        title: "Unit.headings.name",
-        key: "nameFi",
-        transform: UnitHeadingName,
-        disableSorting: true,
+  function handleRemoveSpace(space: SpaceNode) {
+    if (space && space.resourceSet && space?.resourceSet.length > 0) {
+      notifyError(
+        t("SpaceTable.removeConflictMessage"),
+        t("SpaceTable.removeConflictTitle")
+      );
+      return;
+    }
+    modal.current?.open({
+      id: "confirmation-modal",
+      open: true,
+      heading: t("SpaceTable.removeConfirmationTitle", {
+        name: space.nameFi,
+      }),
+      content: t("SpaceTable.removeConfirmationMessage"),
+      acceptLabel: t("SpaceTable.removeConfirmationAccept"),
+      cancelLabel: t("SpaceTable.removeConfirmationCancel"),
+      onAccept: () => {
+        deleteSpace(space.pk);
       },
-      {
-        title: "Unit.headings.code",
-        key: "code",
-        transform: ({ code }: SpaceNode) => trim(code),
-        disableSorting: true,
+    });
+  }
+
+  function handeAddSubSpace(space: SpaceNode) {
+    openWithContent(
+      <NewSpaceModal
+        parentSpace={space}
+        unit={unit}
+        closeModal={closeModal}
+        refetch={refetch}
+      />
+    );
+  }
+
+  function handleEditSpace(space: SpaceNode) {
+    const link = getSpaceUrl(space.pk, unit.pk);
+    if (link === "") {
+      return;
+    }
+    history(link);
+  }
+
+  // TODO translation keys are wonky, yeah it's under a unit page but the table should be reusable
+  const cols: SpacesTableColumn[] = [
+    {
+      headerName: t("Unit.headings.name"),
+      key: "nameFi",
+      transform: (space: SpaceNode) => {
+        const { pk, nameFi } = space;
+        const link = getSpaceUrl(pk, unit.pk);
+        // TODO should use truncate instead so it doesn't overflow
+        const name = nameFi != null && nameFi.length > 0 ? nameFi : "-";
+        return (
+          <Link to={link}>
+            <Name>{trim(name)}</Name>
+          </Link>
+        );
       },
-      {
-        title: "Unit.headings.numSubSpaces",
-        key: "numSubSpaces",
-        transform: (space) => {
-          const count = countSubSpaces(space);
-          return `${count} ${t("SpaceTable.subSpaceCount", { count })}`;
-        },
-        disableSorting: true,
+      isSortable: false,
+    },
+    {
+      headerName: t("Unit.headings.code"),
+      key: "code",
+      transform: ({ code }: SpaceNode) => trim(code),
+      isSortable: false,
+    },
+    {
+      headerName: t("Unit.headings.numSubSpaces"),
+      key: "numSubSpaces",
+      transform: (space) => {
+        const count = countSubSpaces(space);
+        return `${count} ${t("SpaceTable.subSpaceCount", { count })}`;
       },
-      {
-        title: "Unit.headings.surfaceArea",
-        key: "surfaceArea",
-        transform: ({ surfaceArea }: SpaceNode) =>
-          surfaceArea ? `${surfaceArea}m²` : "",
-        disableSorting: true,
-      },
-      {
-        title: "Unit.headings.maxPersons",
-        key: "maxPersons",
-        transform: (space: SpaceNode) => {
-          return (
-            <MaxPersons>
-              {space.maxPersons ? (
-                <Prop>
-                  <IconGroup />
-                  {space.maxPersons}
-                </Prop>
-              ) : null}
-              <PopupMenu
-                items={[
-                  {
-                    name: t("SpaceTable.menuAddSubSpace"),
-                    onClick: () =>
-                      openWithContent(
-                        <NewSpaceModal
-                          parentSpace={space}
-                          unit={unit}
-                          closeModal={closeModal}
-                          onSave={onSave}
-                          onDataError={onDataError}
-                        />
-                      ),
-                  },
-                  {
-                    name: t("SpaceTable.menuEditSpace"),
-                    onClick: () => {
-                      history(`/unit/${unit.pk}/space/edit/${space.pk}`);
-                    },
-                  },
-                  {
-                    name: t("SpaceTable.menuRemoveSpace"),
-                    onClick: () => {
-                      if (
-                        space &&
-                        space.resources &&
-                        space?.resources?.length > 0
-                      ) {
-                        notifyError(
-                          t("SpaceTable.removeConflictMessage"),
-                          t("SpaceTable.removeConflictTitle")
-                        );
-                        return;
-                      }
-                      modal.current?.open({
-                        id: "confirmation-modal",
-                        open: true,
-                        heading: t("SpaceTable.removeConfirmationTitle", {
-                          name: space.nameFi,
-                        }),
-                        content: t("SpaceTable.removeConfirmationMessage"),
-                        acceptLabel: t("SpaceTable.removeConfirmationAccept"),
-                        cancelLabel: t("SpaceTable.removeConfirmationCancel"),
-                        onAccept: () => {
-                          deleteSpace(space.pk as number)
-                            .then((d) => {
-                              if (d.data?.deleteSpace.deleted) {
-                                onDelete();
-                              } else {
-                                onDataError("SpaceTable.removeFailed");
-                              }
-                            })
-                            .catch(() => {
-                              onDataError("SpaceTable.removeFailed");
-                            });
-                        },
-                      });
-                    },
-                  },
-                ]}
-              />
-            </MaxPersons>
-          );
-        },
-        disableSorting: true,
-      },
-    ],
-    order: "asc",
-    index: "pk",
-    rowLink: ({ pk }: SpaceNode) => `/unit/${unit.pk}/space/edit/${pk}`,
-  } as CellConfig;
+      isSortable: false,
+    },
+    {
+      headerName: t("Unit.headings.surfaceArea"),
+      key: "surfaceArea",
+      transform: ({ surfaceArea }: SpaceNode) =>
+        surfaceArea ? `${surfaceArea}m²` : "",
+      isSortable: false,
+    },
+    {
+      headerName: t("Unit.headings.maxPersons"),
+      key: "maxPersons",
+      transform: (space: SpaceNode) => (
+        <MaxPersons>
+          {space.maxPersons != null && (
+            <Prop>
+              <IconGroup />
+              {space.maxPersons}
+            </Prop>
+          )}
+          <PopupMenu
+            items={[
+              {
+                name: t("SpaceTable.menuAddSubSpace"),
+                onClick: () => handeAddSubSpace(space),
+              },
+              {
+                name: t("SpaceTable.menuEditSpace"),
+                onClick: () => handleEditSpace(space),
+              },
+              {
+                name: t("SpaceTable.menuRemoveSpace"),
+                onClick: () => handleRemoveSpace(space),
+              },
+            ]}
+          />
+        </MaxPersons>
+      ),
+      isSortable: false,
+    },
+  ];
 
   const ref = useRef(null);
 
+  const rows = unit.spaces;
+
+  // TODO add if no spaces => "Unit.noSpaces"
   return (
-    <Wrapper>
-      <DataTable
-        key={spaces.length}
-        groups={spacesAsGroups(spaces)}
-        hasGrouping
-        renderGroup={renderGroup}
-        config={{
-          filtering: false,
-          rowFilters: false,
-          selection: false,
-        }}
-        cellConfig={cellConfig}
-        filterConfig={[]}
-        noResultsKey="Unit.noSpaces"
+    // has to be a grid otherwise inner table breaks
+    <div style={{ display: "grid" }}>
+      <CustomTable
+        indexKey="pk"
+        rows={rows}
+        cols={cols}
+        // no sort on purpose
       />
       <Modal
         id="modal-id"
@@ -293,8 +247,6 @@ const SpacesTable = ({
         {modalContent}
       </Modal>
       <ConfirmationDialog open={false} id="confirmation-dialog" ref={modal} />
-    </Wrapper>
+    </div>
   );
-};
-
-export default SpacesTable;
+}

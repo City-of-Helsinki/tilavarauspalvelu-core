@@ -1,8 +1,8 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
-import { ContentContainer } from "../../../styles/layout";
-import ResourceEditor from "./ResourceEditor";
+import { ContentContainer } from "@/styles/layout";
+import { ResourceEditor } from "./ResourceEditor";
 
 type Props = {
   unitPk: string;

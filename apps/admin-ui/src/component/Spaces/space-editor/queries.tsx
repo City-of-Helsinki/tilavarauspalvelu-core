@@ -6,10 +6,6 @@ export const CREATE_SPACE = gql`
   mutation createSpace($input: SpaceCreateMutationInput!) {
     createSpace(input: $input) {
       pk
-      errors {
-        field
-        messages
-      }
     }
   }
 `;
@@ -18,17 +14,13 @@ export const UPDATE_SPACE = gql`
   mutation updateSpace($input: SpaceUpdateMutationInput!) {
     updateSpace(input: $input) {
       pk
-      errors {
-        field
-        messages
-      }
     }
   }
 `;
 
 export const SPACE_HIERARCHY_QUERY = gql`
-  query unitSpaces($pk: Int) {
-    unitByPk(pk: $pk) {
+  query unitSpaces($id: ID!) {
+    unit(id: $id) {
       spaces {
         pk
         nameFi
@@ -44,8 +36,8 @@ export const SPACE_HIERARCHY_QUERY = gql`
 export const SPACE_QUERY = gql`
   ${SPACE_COMMON_FRAGMENT}
   ${LOCATION_FRAGMENT}
-  query space($pk: Int) {
-    spaceByPk(pk: $pk) {
+  query space($id: ID!) {
+    space(id: $id) {
       ...SpaceCommonFields
       nameSv
       nameEn

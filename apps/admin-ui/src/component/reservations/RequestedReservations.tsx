@@ -2,14 +2,14 @@ import { debounce } from "lodash";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { H1 } from "common/src/common/typography";
-import Filters, { FilterArguments, emptyState } from "./Filters";
-import ReservationUnitsDataReader, { Sort } from "./ReservationsDataLoader";
+import Filters, { type FilterArguments, emptyState } from "./Filters";
+import { ReservationsDataLoader, type Sort } from "./ReservationsDataLoader";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import { HR } from "@/component/Table";
 import { Container } from "@/styles/layout";
-import { DATE_FORMAT, formatDate } from "@/common/util";
+import { toUIDate } from "common/src/common/util";
 
-const Reservations = (): JSX.Element => {
+function Reservations(): JSX.Element {
   const [search, setSearch] = useState<FilterArguments>(emptyState);
   const [sort, setSort] = useState<Sort>({ field: "state", asc: false });
   const debouncedSearch = debounce((value) => setSearch(value), 300);
@@ -34,11 +34,11 @@ const Reservations = (): JSX.Element => {
         <Filters
           onSearch={debouncedSearch}
           initialFiltering={{
-            begin: formatDate(new Date().toISOString(), DATE_FORMAT) as string,
+            begin: toUIDate(new Date()) ?? "",
           }}
         />
         <HR />
-        <ReservationUnitsDataReader
+        <ReservationsDataLoader
           defaultFiltering={{
             state: ["DENIED", "CONFIRMED", "REQUIRES_HANDLING"],
           }}
@@ -49,6 +49,6 @@ const Reservations = (): JSX.Element => {
       </Container>
     </>
   );
-};
+}
 
 export default Reservations;

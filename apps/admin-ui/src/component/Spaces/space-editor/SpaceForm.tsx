@@ -1,14 +1,12 @@
 import React from "react";
-import { NumberInput, TextInput } from "hds-react";
-import { get, upperFirst } from "lodash";
+import { TextInput } from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { breakpoints } from "common/src/common/style";
-import {
-  SpaceCreateMutationInput,
-  SpaceUpdateMutationInput,
-} from "common/types/gql-types";
-import { languages } from "../../../common/const";
+import { z } from "zod";
+import { UseFormReturn } from "react-hook-form";
+import { ControlledNumberInput } from "common/src/components/form/ControlledNumberInput";
+import { getTranslatedError } from "@/common/util";
 
 const EditorColumns = styled.div`
   display: grid;
@@ -32,97 +30,73 @@ const EditorRows = styled.div`
   grid-template-columns: 1fr;
 `;
 
-const Container = styled.div``;
+export const SpaceUpdateSchema = z.object({
+  nameFi: z.string().max(80).min(1),
+  // TODO check that empty is valid
+  nameSv: z.string().max(80),
+  nameEn: z.string().max(80),
+  // TODO should be min 0
+  surfaceArea: z.number().nullish(),
+  maxPersons: z.number().nullish(),
+  unit: z.number(),
+  // optional because of TS, update requires it, create can't have it
+  pk: z.number().optional(),
+  parent: z.number().nullable(),
+  code: z.string().nullish(),
+});
+
+export type SpaceUpdateForm = z.infer<typeof SpaceUpdateSchema>;
 
 type Props = {
-  getValidationError: (path: string) => string | undefined;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  setValue: (value: any) => void;
-  data: SpaceCreateMutationInput | SpaceUpdateMutationInput | null;
+  form: UseFormReturn<SpaceUpdateForm>;
 };
 
-const SpaceForm = ({
-  getValidationError,
-  setValue,
-  data,
-}: Props): JSX.Element | null => {
+export function SpaceForm({ form }: Props): JSX.Element {
   const { t } = useTranslation();
 
-  if (!data) {
-    return null;
-  }
+  const { control, register, formState } = form;
+  const { errors } = formState;
+
   return (
-    <Container>
+    <div>
       <EditorRows>
-        {languages.map((lang) => {
-          const fieldName = `name${upperFirst(lang)}`;
-          return (
-            <TextInput
-              key={fieldName}
-              required={lang === "fi"}
-              id={fieldName}
-              label={t(`SpaceEditor.label.${fieldName}`)}
-              value={get(data, fieldName, "")}
-              placeholder={t("SpaceEditor.namePlaceholder", {
-                language: t(`language.${lang}`),
-              })}
-              onChange={(e) =>
-                setValue({
-                  [fieldName]: e.target.value,
-                })
-              }
-              maxLength={80}
-              errorText={getValidationError(fieldName)}
-              invalid={!!getValidationError(fieldName)}
-            />
-          );
-        })}
+        {(["nameFi", "nameEn", "nameSv"] as const).map((fieldName) => (
+          <TextInput
+            {...register(fieldName)}
+            key={fieldName}
+            required={fieldName === "nameFi"}
+            id={fieldName}
+            label={t(`SpaceEditor.label.${fieldName}`)}
+            maxLength={80}
+            errorText={getTranslatedError(t, errors[fieldName]?.message)}
+            invalid={errors[fieldName]?.message != null}
+          />
+        ))}
       </EditorRows>
       <EditorColumns>
-        <NumberInput
-          value={Math.ceil(data.surfaceArea || 0)}
-          id="surfaceArea"
+        <ControlledNumberInput
+          name="surfaceArea"
+          control={control}
           label={t("SpaceEditor.label.surfaceArea")}
           helperText={t("SpaceModal.page2.surfaceAreaHelperText")}
-          minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
-          plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
-          onChange={(e) =>
-            setValue({ surfaceArea: Math.ceil(Number(e.target.value)) })
-          }
-          step={1}
-          type="number"
           min={1}
-          required
-          errorText={getValidationError("surfaceArea")}
-          invalid={!!getValidationError("surfaceArea")}
+          errorText={getTranslatedError(t, errors.surfaceArea?.message)}
         />
-        <NumberInput
-          value={Math.ceil(data.maxPersons || 0)}
-          id="maxPersons"
+        <ControlledNumberInput
+          name="maxPersons"
+          control={control}
           label={t("SpaceEditor.label.maxPersons")}
-          minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
-          plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
-          onChange={(e) =>
-            setValue({ maxPersons: Math.ceil(Number(e.target.value)) })
-          }
-          step={1}
-          type="number"
           min={1}
           helperText={t("SpaceModal.page2.maxPersonsHelperText")}
-          required
-          errorText={getValidationError("maxPersons")}
-          invalid={!!getValidationError("maxPersons")}
+          errorText={getTranslatedError(t, errors.maxPersons?.message)}
         />
         <TextInput
+          {...register("code")}
           id="code"
           label={t("SpaceModal.page2.codeLabel")}
           placeholder={t("SpaceModal.page2.codePlaceholder")}
-          value={data.code || ""}
-          onChange={(e) => setValue({ code: e.target.value })}
         />
       </EditorColumns>
-    </Container>
+    </div>
   );
-};
-
-export default SpaceForm;
+}

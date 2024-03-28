@@ -21,11 +21,6 @@ export const SPACES_QUERY = gql`
             pk
             nameFi
           }
-          parent {
-            building {
-              nameFi
-            }
-          }
         }
       }
     }
@@ -130,7 +125,6 @@ export const DELETE_RESOURCE = gql`
   mutation DeleteResource($input: ResourceDeleteMutationInput!) {
     deleteResource(input: $input) {
       deleted
-      errors
     }
   }
 `;

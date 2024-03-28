@@ -1,143 +1,45 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { omit } from "lodash";
+import { Button, Dialog, IconArrowLeft, IconCheck } from "hds-react";
+import type { UnitNode } from "common/types/gql-types";
+import { CustomDialogHeader } from "@/component/CustomDialogHeader";
 import {
-  Button,
-  Dialog,
-  IconArrowLeft,
-  IconCheck,
-  IconPlusCircleFill,
-} from "hds-react";
-import { FetchResult } from "@apollo/client";
-import {
-  SpaceCreateMutationInput,
-  SpaceCreateMutationPayload,
-  UnitNode,
-} from "common/types/gql-types";
-import { CustomDialogHeader } from "../../../CustomDialogHeader";
-import {
-  Action,
   ActionButtons,
   Address,
-  ButtonContainer,
-  IconDelete,
   Name,
-  NewRowButton,
   NextButton,
   Parent,
   RoundTag,
-  State,
   UnitInfo,
 } from "./modules/newSpaceModal";
-import { parseAddress } from "../../../../common/util";
-
-import SpaceForm from "../SpaceForm";
-import { schema } from "../util";
-import FormErrorSummary from "../../../../common/FormErrorSummary";
-
-const SpaceEditor = ({
-  space,
-  index,
-  dispatch,
-  getValidationError,
-}: {
-  space: SpaceCreateMutationInput;
-  index: number;
-  dispatch: React.Dispatch<Action>;
-  getValidationError: (name: string) => string | undefined;
-}) => {
-  return (
-    <div
-      style={{ display: "grid", gridTemplateColumns: "1fr var(--spacing-2-xl" }}
-    >
-      <SpaceForm
-        data={space}
-        setValue={(value) => dispatch({ type: "set", index, value })}
-        getValidationError={getValidationError}
-      />
-      {index > 0 ? (
-        <IconDelete
-          tabIndex={0}
-          onKeyPress={() => dispatch({ type: "delete", index })}
-          onClick={() => dispatch({ type: "delete", index })}
-        />
-      ) : null}
-    </div>
-  );
-};
+import { parseAddress } from "@/common/util";
+import { SpaceForm, type SpaceUpdateForm } from "../SpaceForm";
+import { FormErrorSummary } from "@/common/FormErrorSummary";
+import { UseFormReturn } from "react-hook-form";
 
 type Props = {
-  editorState: State;
   unit: UnitNode;
-  dispatch: React.Dispatch<Action>;
   closeModal: () => void;
-  createSpace: (
-    variables: SpaceCreateMutationInput
-  ) => Promise<FetchResult<{ createSpace: SpaceCreateMutationPayload }>>;
-  onSave: () => void;
-  onDataError: (message: string) => void;
   hasFixedParent: boolean;
+  onPrevPage: () => void;
+  form: UseFormReturn<SpaceUpdateForm>;
 };
 
-const Page2 = ({
-  editorState,
+export function Page2({
   unit,
-  dispatch,
+  onPrevPage,
   closeModal,
-  createSpace,
-  onSave,
-  onDataError,
   hasFixedParent,
-}: Props): JSX.Element => {
+  form,
+}: Props): JSX.Element {
   const { t } = useTranslation();
+  const { watch, formState } = form;
+  const { errors, isDirty } = formState;
 
-  const nextEnabled =
-    editorState.numSpaces > 0 && editorState.parentPk !== undefined;
-
-  function createSpaces() {
-    const promises = Promise.allSettled(
-      editorState.spaces.map((s) =>
-        createSpace({
-          ...(omit(s, ["key", "parentId"]) as SpaceCreateMutationInput),
-          unitPk: editorState.unitPk,
-        })
-      )
-    );
-
-    promises
-      .then((res) => {
-        const succesful = res.filter(
-          (r) => r.status === "fulfilled" && !r.value.errors
-        ) as PromiseFulfilledResult<
-          FetchResult<{ createSpace: SpaceCreateMutationPayload }>
-        >[];
-
-        if (succesful.length === editorState.spaces.length) {
-          onSave();
-          closeModal();
-        } else {
-          onDataError(t("SpaceModal.page2.saveFailed"));
-        }
-      })
-      .catch(() => {
-        onDataError(t("SpaceModal.page2.saveFailed"));
-      });
-  }
-
-  const getValidationError =
-    (index: number) =>
-    (name: string): string | undefined => {
-      const error = editorState.validationErrors[index]?.error?.details.find(
-        (errorDetail) => errorDetail.path.find((path) => path === name)
-      );
-
-      if (!error) {
-        return undefined;
-      }
-
-      // @ts-expect-error: TODO: Joi should be deprecated so ignore this for now
-      return t(`validation.${error.type}`, { ...error.context });
-    };
+  // TODO get the parent name (form doesn't have it)
+  const parentName = watch("parent")
+    ? watch("parent")
+    : t("SpaceModal.page2.newRootSpace");
 
   return (
     <>
@@ -163,78 +65,40 @@ const Page2 = ({
           <IconCheck />
           <div>
             <Name>{unit.nameFi}</Name>
-            <Parent>
-              {editorState.parentPk
-                ? editorState.parentName
-                : t("SpaceModal.page2.newRootSpace")}
-            </Parent>
+            <Parent>{parentName}</Parent>
           </div>
-          {unit.location ? (
+          {unit.location != null && (
             <Address>{parseAddress(unit.location)}</Address>
-          ) : null}
+          )}
         </UnitInfo>
-        {editorState.spaces.map((space, i) => (
-          <div key={space.key}>
-            <FormErrorSummary
-              fieldNamePrefix="SpaceEditor.label."
-              validationErrors={editorState.validationErrors[i] || null}
-              linkToError={false}
-            />
-            <SpaceEditor
-              index={i}
-              key={space.key}
-              space={space as SpaceCreateMutationInput}
-              dispatch={dispatch}
-              getValidationError={getValidationError(i)}
-            />
-          </div>
-        ))}
-        <ButtonContainer>
-          <NewRowButton
-            variant="supplementary"
-            iconLeft={<IconPlusCircleFill />}
-            onClick={() => dispatch({ type: "addRow" })}
+        <div>
+          <FormErrorSummary errors={errors} />
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr var(--spacing-2-xl",
+            }}
           >
-            {t("SpaceModal.page2.addRowButton")}
-          </NewRowButton>
-        </ButtonContainer>
+            <SpaceForm form={form} />
+          </div>
+        </div>
       </Dialog.Content>
       <ActionButtons>
         <Button
-          onClick={() => dispatch({ type: "prevPage" })}
+          onClick={onPrevPage}
           variant="supplementary"
           iconLeft={<IconArrowLeft />}
         >
           {t("SpaceModal.page2.prevButton")}
         </Button>
         <NextButton
-          disabled={!nextEnabled}
+          disabled={!isDirty}
+          type="submit"
           loadingText={t("SpaceModal.page2.saving")}
-          onClick={(e) => {
-            e.preventDefault();
-            const validationResults = editorState.spaces.map((space) =>
-              schema.validate(omit(space, ["key"]))
-            );
-
-            if (
-              validationResults.filter(
-                (result) => result != null && result.error !== undefined
-              ).length > 0
-            ) {
-              dispatch({
-                type: "setValidationErrors",
-                validationErrors: validationResults,
-              });
-            } else {
-              createSpaces();
-            }
-          }}
         >
           {t("SpaceModal.page2.createButton")}
         </NextButton>
       </ActionButtons>
     </>
   );
-};
-
-export default Page2;
+}

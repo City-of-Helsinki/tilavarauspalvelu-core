@@ -1,11 +1,5 @@
 import { Button, IconTrash, Tag } from "hds-react";
-import Joi from "joi";
 import styled from "styled-components";
-import type {
-  SpaceCreateMutationInput,
-  SpaceNode,
-  UnitNode,
-} from "common/types/gql-types";
 
 export const Title = styled.div`
   font-family: var(--tilavaraus-admin-font-bold);
@@ -81,31 +75,3 @@ export const IconDelete = styled(IconTrash)`
   margin: var(--spacing-m) 0 0 var(--spacing-s);
   padding: var(--spacing-s);
 `;
-
-export type SpaceMutationInputWithKey<T> = Partial<T> & { key: string };
-
-export type State = {
-  numSpaces: number;
-  parentPk: number | null;
-  parentName: string | null;
-  spaces: SpaceMutationInputWithKey<SpaceCreateMutationInput>[];
-  page: number;
-  unitPk: number;
-  unitSpaces?: SpaceNode[];
-  validationErrors: (Joi.ValidationResult | null)[];
-};
-
-export type Action =
-  | { type: "setNumSpaces"; numSpaces: number }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  | { type: "set"; index: number; value: any }
-  | { type: "setParent"; parentPk: number | null; parentName: string | null }
-  | { type: "setUnit"; unit: UnitNode }
-  | {
-      type: "setValidationErrors";
-      validationErrors: (Joi.ValidationResult | null)[];
-    }
-  | { type: "nextPage" }
-  | { type: "prevPage" }
-  | { type: "addRow" }
-  | { type: "delete"; index: number };

@@ -56,15 +56,15 @@ const getColConfig = (t: TFunction): ReservationTableColumn[] => [
     headerName: t("Reservations.headings.reservationUnit"),
     key: "reservation_unit_name_fi",
     isSortable: true,
-    transform: ({ reservationUnits }: ReservationNode) =>
-      truncate(reservationUnits?.[0]?.nameFi || "-", MAX_NAME_LENGTH),
+    transform: ({ reservationUnit }: ReservationNode) =>
+      truncate(reservationUnit?.[0]?.nameFi || "-", MAX_NAME_LENGTH),
   },
   {
     headerName: t("Reservations.headings.unit"),
     key: "unit_name_fi",
     isSortable: true,
-    transform: ({ reservationUnits }: ReservationNode) =>
-      truncate(reservationUnits?.[0]?.unit?.nameFi || "-", MAX_NAME_LENGTH),
+    transform: ({ reservationUnit }: ReservationNode) =>
+      truncate(reservationUnit?.[0]?.unit?.nameFi || "-", MAX_NAME_LENGTH),
   },
   {
     headerName: t("Reservations.headings.datetime"),
@@ -96,12 +96,12 @@ const getColConfig = (t: TFunction): ReservationTableColumn[] => [
   },
 ];
 
-const ReservationsTable = ({
+export function ReservationsTable({
   sort,
   sortChanged: onSortChanged,
   isLoading,
   reservations,
-}: Props): JSX.Element => {
+}: Props): JSX.Element {
   const { t } = useTranslation();
 
   const cols = memoize(() => getColConfig(t))();
@@ -124,6 +124,4 @@ const ReservationsTable = ({
       }
     />
   );
-};
-
-export default ReservationsTable;
+}

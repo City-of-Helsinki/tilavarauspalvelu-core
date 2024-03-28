@@ -2,26 +2,31 @@ import React, { useRef } from "react";
 import { trim } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { FetchResult, useMutation } from "@apollo/client";
-import { useNavigate } from "react-router-dom";
 import {
+  type FetchResult,
+  useMutation,
+  type ApolloQueryResult,
+} from "@apollo/client";
+import { useNavigate } from "react-router-dom";
+import type {
+  Maybe,
+  Query,
   ResourceDeleteMutationInput,
   ResourceDeleteMutationPayload,
   ResourceNode,
   UnitNode,
 } from "common/types/gql-types";
-import DataTable, { CellConfig } from "../DataTable";
 import PopupMenu from "./PopupMenu";
 import ConfirmationDialog, { ModalRef } from "../ConfirmationDialog";
-import { DELETE_RESOURCE } from "../../common/queries";
-import { resourceUrl } from "../../common/urls";
+import { DELETE_RESOURCE } from "@/common/queries";
+import { resourceUrl } from "@/common/urls";
+import { CustomTable } from "../Table";
+import { useNotification } from "@/context/NotificationContext";
 
 interface IProps {
-  resources: ResourceNode[] | undefined;
+  resources: ResourceNode[];
   unit: UnitNode;
-  hasSpaces: boolean;
-  onDelete: (text?: string) => void;
-  onDataError: (error: string) => void;
+  refetch: () => Promise<ApolloQueryResult<Query>>;
 }
 
 const Name = styled.div`
@@ -34,13 +39,18 @@ const ResourceNodeContainer = styled.div`
   align-items: center;
 `;
 
-const ResourcesTable = ({
+type ResourcesTableColumn = {
+  headerName: string;
+  key: string;
+  isSortable: boolean;
+  transform?: (space: ResourceNode) => JSX.Element | string;
+};
+
+export function ResourcesTable({
   resources,
   unit,
-  hasSpaces,
-  onDelete,
-  onDataError,
-}: IProps): JSX.Element => {
+  refetch,
+}: IProps): JSX.Element {
   const [deleteResourceMutation] = useMutation<
     { deleteSpace: ResourceDeleteMutationPayload },
     { input: ResourceDeleteMutationInput }
@@ -56,88 +66,93 @@ const ResourcesTable = ({
   const modal = useRef<ModalRef>();
   const history = useNavigate();
 
-  const cellConfig = {
-    cols: [
-      {
-        title: "ResourceTable.headings.name",
-        key: `nameFi`,
-        transform: ({ nameFi }: ResourceNode) => (
-          <Name>{trim(nameFi as string)}</Name>
-        ),
-      },
-      {
-        title: "ResourceTable.headings.unitName",
-        key: "space.unit.nameFi",
-        transform: ({ space }: ResourceNode) =>
-          space?.unit?.nameFi || t("ResourceTable.noSpace"),
-      },
-      {
-        title: "",
-        key: "type",
-        transform: ({ nameFi, pk, locationType }: ResourceNode) => (
-          <ResourceNodeContainer>
-            <span>{locationType}</span>
-            <PopupMenu
-              items={[
-                {
-                  name: t("ResourceTable.menuEditResource"),
-                  onClick: () => {
-                    history(resourceUrl(Number(pk), Number(unit.pk)));
-                  },
-                },
-                {
-                  name: t("ResourceTable.menuRemoveResource"),
-                  onClick: () => {
-                    modal.current?.open({
-                      id: "confirmation-modal",
-                      open: true,
-                      heading: t("ResourceTable.removeConfirmationTitle", {
-                        name: nameFi,
-                      }),
-                      content: t("ResourceTable.removeConfirmationMessage"),
-                      acceptLabel: t("ResourceTable.removeConfirmationAccept"),
-                      cancelLabel: t("ResourceTable.removeConfirmationCancel"),
-                      onAccept: async () => {
-                        try {
-                          await deleteResource(pk as number);
-                          onDelete(t("ResourceTable.removeSuccess"));
-                        } catch (error) {
-                          onDataError(t("ResourceTable.removeFailed"));
-                        }
-                      },
-                    });
-                  },
-                },
-              ]}
-            />
-          </ResourceNodeContainer>
-        ),
-        disableSorting: true,
-      },
-    ],
-    index: "pk",
-    sorting: "nameFi",
-    order: "asc",
-    rowLink: ({ pk }: ResourceNode) => resourceUrl(Number(pk), Number(unit.pk)),
-  } as CellConfig;
+  const { notifyError, notifySuccess } = useNotification();
 
+  function handleEditResource(pk: Maybe<number> | undefined) {
+    if (pk == null || unit.pk == null) {
+      return;
+    }
+    history(resourceUrl(pk, unit.pk));
+  }
+
+  function handleDeleteResource(
+    pk: Maybe<number> | undefined,
+    name: Maybe<string> | undefined
+  ) {
+    if (pk == null) {
+      return;
+    }
+    modal.current?.open({
+      id: "confirmation-modal",
+      open: true,
+      heading: t("ResourceTable.removeConfirmationTitle", {
+        name,
+      }),
+      content: t("ResourceTable.removeConfirmationMessage"),
+      acceptLabel: t("ResourceTable.removeConfirmationAccept"),
+      cancelLabel: t("ResourceTable.removeConfirmationCancel"),
+      onAccept: async () => {
+        try {
+          await deleteResource(pk);
+          notifySuccess(t("ResourceTable.removeSuccess"));
+          refetch();
+        } catch (error) {
+          notifyError(t("ResourceTable.removeFailed"));
+        }
+      },
+    });
+  }
+
+  const cols: ResourcesTableColumn[] = [
+    {
+      headerName: t("ResourceTable.headings.name"),
+      key: `nameFi`,
+      transform: ({ nameFi }: ResourceNode) => (
+        <Name>{trim(nameFi ?? "-")}</Name>
+      ),
+      isSortable: false,
+    },
+    {
+      headerName: t("ResourceTable.headings.unitName"),
+      key: "space.unit.nameFi",
+      transform: ({ space }: ResourceNode) =>
+        space?.unit?.nameFi ?? t("ResourceTable.noSpace"),
+      isSortable: false,
+    },
+    {
+      headerName: "",
+      key: "type",
+      transform: ({ nameFi, pk, locationType }: ResourceNode) => (
+        <ResourceNodeContainer>
+          <span>{locationType}</span>
+          <PopupMenu
+            items={[
+              {
+                name: t("ResourceTable.menuEditResource"),
+                onClick: () => handleEditResource(pk),
+              },
+              {
+                name: t("ResourceTable.menuRemoveResource"),
+                onClick: () => handleDeleteResource(pk, nameFi),
+              },
+            ]}
+          />
+        </ResourceNodeContainer>
+      ),
+      isSortable: false,
+    },
+  ];
+
+  const rows = resources ?? [];
+
+  // TODO add if no resources:
+  // const hasSpaces={Boolean(unit?.spaces?.length)}
+  // noResultsKey={hasSpaces ? "Unit.noResources" : "Unit.noResourcesSpaces"}
   return (
-    <div>
-      <DataTable
-        groups={[{ id: 1, data: resources }]}
-        hasGrouping={false}
-        config={{
-          filtering: false,
-          rowFilters: false,
-          selection: false,
-        }}
-        cellConfig={cellConfig}
-        filterConfig={[]}
-        noResultsKey={hasSpaces ? "Unit.noResources" : "Unit.noResourcesSpaces"}
-      />
+    // has to be a grid otherwise inner table breaks
+    <div style={{ display: "grid" }}>
+      <CustomTable indexKey="pk" rows={rows} cols={cols} />
       <ConfirmationDialog open={false} id="confirmation-dialog" ref={modal} />
     </div>
   );
-};
-
-export default ResourcesTable;
+}

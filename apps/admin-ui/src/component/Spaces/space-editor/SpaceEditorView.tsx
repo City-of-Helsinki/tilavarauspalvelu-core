@@ -13,7 +13,7 @@ const SpaceEditorView = (): JSX.Element | null => {
   const { spacePk, unitPk } = useParams<Props>();
   const { t } = useTranslation();
 
-  const [space, unit] = [spacePk, unitPk].map(Number);
+  const [space, unit] = [spacePk, unitPk].map(Number).filter(Number.isFinite);
 
   if (!space) {
     return (

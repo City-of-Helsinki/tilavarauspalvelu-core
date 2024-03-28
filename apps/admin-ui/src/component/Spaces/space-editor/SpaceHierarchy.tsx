@@ -13,11 +13,11 @@ const Tree = styled.div`
   margin-bottom: var(--spacing-xs);
 `;
 
-const getParents = (
+function getParents(
   root?: SpaceNode,
   spaces?: SpaceNode[],
   hierarchy: SpaceNode[] = []
-) => {
+) {
   if (root) {
     hierarchy.push(root);
     const nextParentId = root.parent?.pk;
@@ -27,16 +27,16 @@ const getParents = (
     }
   }
   return hierarchy;
-};
+}
 
-const SpaceHierarchy = ({ space, unitSpaces }: Props): JSX.Element => {
+// TODO this is a huge problem because we cant do a recursive query, would require backend support
+export function SpaceHierarchy({ space, unitSpaces }: Props): JSX.Element {
   const tree = getParents(space, unitSpaces, []).reverse();
+  // TODO there is weird: unit spaces is undefined all
 
   return (
     <Tree>
       {tree.map((parent, i) => `${i !== 0 ? " › " : ""} ${parent.nameFi}`)}
     </Tree>
   );
-};
-
-export default SpaceHierarchy;
+}

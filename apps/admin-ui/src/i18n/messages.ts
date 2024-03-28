@@ -986,7 +986,6 @@ const translations: ITranslations = {
       surfaceArea: ["Pinta-ala"],
       maxPersons: ["Henkilömäärä enintään"],
     },
-    namePlaceholder: ["Tilan nimi {{language}}"],
     touLabel: ["Tilan ohjeet {{lang}}"],
     noMaxPersons: ["Henkilömäärää ei asetettu"],
     spaceUpdated: ["Tiedot tallennettu"],
