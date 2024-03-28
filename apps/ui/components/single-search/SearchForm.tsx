@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { ReactNode, useEffect } from "react";
 import { useTranslation } from "next-i18next";
 import { IconSearch, Select } from "hds-react";
 import { type FieldValues, type SubmitHandler, useForm } from "react-hook-form";
@@ -33,6 +33,7 @@ import {
   MultiSelectDropdown,
 } from "@/components/form";
 import FilterTagList from "./FilterTagList";
+import SingleLabelInputGroup from "@/components/common/SingleLabelInputGroup";
 
 type Props = {
   onSearch: (search: Record<string, string>) => void;
@@ -80,7 +81,7 @@ const Filters = styled.div`
   }
 `;
 
-const StyledSelect = styled(Select<OptionType>)`
+const StyledSelect = styled(Select<OptionType>)<{ $hideLabel?: boolean }>`
   button {
     display: grid;
     text-align: left;
@@ -89,24 +90,17 @@ const StyledSelect = styled(Select<OptionType>)`
   span {
     ${truncatedText}
   }
+  label {
+    ${(props) => (props.$hideLabel ? `color: transparent !important;` : ``)}
+  }
 `;
 
 const StyledCheckBox = styled(Checkbox)`
   &&& {
     @media (min-width: ${breakpoints.m}) {
-      margin-top: -70px;
+      margin-top: calc(-70px + var(--spacing-layout-2-xs));
       grid-column: 3 / span 1;
       grid-row: 4;
-    }
-  }
-`;
-
-const TwInput = styled.div`
-  display: grid;
-  grid-template-columns: 50% 50%;
-  .inputGroupStart {
-    & > div {
-      border-right-width: 0;
     }
   }
 `;
@@ -168,48 +162,12 @@ const BottomContainer = styled.div`
   }
 `;
 
-const DateRangeWrapper = styled.div`
-  > div {
-    display: flex;
-    > div {
-      width: 50%;
-    }
-    label {
-      height: 24px;
-    }
-    /* Starting date picker */
-    > div:first-child {
-      input {
-        border-right: 0;
-      }
-    }
-    /* Ending date picker */
-    > div:last-child {
-      margin-top: 0;
-    }
-  }
-`;
-
-const TimeRangeWrapper = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto auto;
-  gap: 0;
-  .error-message {
-    grid-column: span 2;
-  }
-  /* Starting date picker */
-  > div:first-child > div {
-    border-right: 0;
-  }
-  /* Hide the label text (but keep its height) for the end time select, since HDS adds a "*" to required field labels
-  TODO: Make the displaying of the label text component conditional on having an empty text as before label, as it could possibly often be empty. Especially if the component to be is re-used. */
-  /* Ending date picker */
-  > div:nth-child(2) label {
-    height: 24px;
-    span {
-      display: none;
-    }
+const SingleLabelRangeWrapper = styled(SingleLabelInputGroup)<{
+  label: string;
+  children: ReactNode;
+}>`
+  & > div:not(:first-child) {
+    margin-top: var(--spacing-s);
   }
 `;
 
@@ -439,7 +397,7 @@ const SearchForm = ({
             value={watch("equipments")?.split(",") ?? [""]}
           />
 
-          <DateRangeWrapper>
+          <SingleLabelRangeWrapper label={t("searchForm:dateFilter")}>
             <DateRangePicker
               startDate={fromUIDate(String(getValues("startDate")))}
               endDate={fromUIDate(String(getValues("endDate")))}
@@ -450,8 +408,8 @@ const SearchForm = ({
                 setValue("endDate", date != null ? toUIDate(date) : null)
               }
               labels={{
-                begin: t("searchForm:dateFilter"),
-                end: " ",
+                begin: t("dateSelector:labelStartDate"),
+                end: t("dateSelector:labelEndDate"),
               }}
               placeholder={{
                 begin: t("common:beginLabel"),
@@ -464,20 +422,23 @@ const SearchForm = ({
                 endMaxDate: addYears(new Date(), 2),
               }}
             />
-          </DateRangeWrapper>
+          </SingleLabelRangeWrapper>
 
-          <TimeRangeWrapper>
+          <SingleLabelRangeWrapper label={t("searchForm:timeFilter")}>
             <TimeRangePicker
               control={control}
-              name={{ begin: "timeBegin", end: "timeEnd" }}
-              label={{ begin: t("searchForm:timeFilter"), end: " " }}
-              placeholder={{
+              names={{ begin: "timeBegin", end: "timeEnd" }}
+              labels={{
+                begin: `${t("searchForm:timeFilter")}: ${t("common:beginLabel")}`,
+                end: `${t("searchForm:timeFilter")}: ${t("common:endLabel")}`,
+              }}
+              placeholders={{
                 begin: t("common:beginLabel"),
                 end: t("common:endLabel"),
               }}
               clearable={{ begin: true, end: true }}
             />
-          </TimeRangeWrapper>
+          </SingleLabelRangeWrapper>
 
           <StyledSelect
             id="durationFilter"
@@ -511,14 +472,16 @@ const SearchForm = ({
               formValues.textSearch != null
             }
           >
-            <TwInput>
+            <SingleLabelInputGroup
+              label={t("searchForm:participantCountCombined")}
+            >
               <StyledSelect
                 id="participantMinCountFilter"
                 placeholder={t("common:minimum")}
                 options={[emptyOption(t("common:minimum"), "")].concat(
                   participantCountOptions
                 )}
-                label={t("searchForm:participantCountCombined")}
+                label={`${t("searchForm:participantCountCombined")} ${t("common:minimum")}`}
                 onChange={(selection: OptionType): void => {
                   setValue("minPersons", String(selection.value));
                 }}
@@ -528,6 +491,7 @@ const SearchForm = ({
                 )}
                 key={`minPersons${getValues("minPersons")}`}
                 className="inputSm inputGroupStart"
+                $hideLabel
               />
 
               <StyledSelect
@@ -536,7 +500,7 @@ const SearchForm = ({
                 options={[emptyOption(t("common:maximum"))].concat(
                   participantCountOptions
                 )}
-                label="&nbsp;"
+                label={`${t("searchForm:participantCountCombined")} ${t("common:maximum")}`}
                 onChange={(selection: OptionType): void => {
                   setValue("maxPersons", String(selection.value));
                 }}
@@ -547,7 +511,7 @@ const SearchForm = ({
                 key={`maxPersons${getValues("maxPersons")}`}
                 className="inputSm inputGroupEnd"
               />
-            </TwInput>
+            </SingleLabelInputGroup>
             <MultiSelectDropdown
               id="reservationUnitTypeFilter"
               checkboxName="reservationUnitTypeFilter"

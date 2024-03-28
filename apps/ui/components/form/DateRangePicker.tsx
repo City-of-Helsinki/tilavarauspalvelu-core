@@ -2,7 +2,6 @@ import { type FC, useState, useEffect } from "react";
 import { isBefore } from "date-fns";
 import { DateInput } from "hds-react";
 import { useTranslation } from "next-i18next";
-import styled from "styled-components";
 import { fromUIDate, toUIDate, isValidDate } from "common/src/common/util";
 import { getLocalizationLang } from "common/src/helpers";
 
@@ -30,12 +29,6 @@ export interface DateRangePickerProps {
     end?: string;
   };
 }
-
-const Wrapper = styled.div`
-  & > div:not(:first-child) {
-    margin-top: var(--spacing-s);
-  }
-`;
 
 const DateRangePicker: FC<DateRangePickerProps> = ({
   endDate,
@@ -181,7 +174,7 @@ const DateRangePicker: FC<DateRangePickerProps> = ({
   const internalStartDate = fromUIDate(internalStartDateString);
 
   return (
-    <Wrapper className="date-range-input__wrapper">
+    <>
       <DateInput
         autoComplete="off"
         id="start-date"
@@ -222,7 +215,7 @@ const DateRangePicker: FC<DateRangePickerProps> = ({
         required={required?.end}
         placeholder={placeholder?.end ?? t("dateSelector:placeholderEnd")}
       />
-    </Wrapper>
+    </>
   );
 };
 

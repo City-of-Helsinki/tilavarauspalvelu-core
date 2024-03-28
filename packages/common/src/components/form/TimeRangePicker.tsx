@@ -13,12 +13,13 @@ import { removeRefParam } from "../../reservation-form/util";
 
 interface TimeRangePickerProps<T extends FieldValues>
   extends Omit<UseControllerProps<T>, "name" | "disabled"> {
-  name: { begin: Path<T>; end: Path<T> };
+  names: { begin: Path<T>; end: Path<T> };
   error?: string;
   required?: { begin?: boolean; end?: boolean };
   disabled?: { begin?: boolean; end?: boolean };
-  label?: { begin?: string; end?: string };
-  placeholder?: { begin?: string; end?: string };
+  labels?: { begin?: string; end?: string };
+  commonLabel?: string;
+  placeholders?: { begin?: string; end?: string };
   clearable?: { begin?: boolean; end?: boolean };
 }
 
@@ -65,20 +66,20 @@ const StartBeforeEndError = styled.div`
  */
 const TimeRangePicker = <T extends FieldValues>({
   control,
-  name,
+  names,
   required,
-  label,
-  placeholder,
+  labels,
+  placeholders,
   clearable,
 }: TimeRangePickerProps<T>): JSX.Element => {
   const { field: beginField, fieldState: beginFieldState } = useController({
     control,
-    name: name?.begin,
+    name: names?.begin,
     rules: { required: required?.begin },
   });
   const { field: endField, fieldState: endFieldState } = useController({
     control,
-    name: name?.end,
+    name: names?.end,
     rules: { required: required?.end },
   });
   const { t } = useTranslation();
@@ -136,9 +137,9 @@ const TimeRangePicker = <T extends FieldValues>({
     <>
       <StyledSelect
         {...removeRefParam(beginField)}
-        label={label?.begin ?? t("common:beginLabel")}
+        label={labels?.begin ?? t("common:beginLabel")}
         options={populatedTimeOptions}
-        placeholder={placeholder?.begin}
+        placeholder={placeholders?.begin}
         required={required?.begin}
         error={beginFieldState.error && beginFieldState.error.message}
         clearable={clearable?.begin}
@@ -150,9 +151,9 @@ const TimeRangePicker = <T extends FieldValues>({
       />
       <StyledSelect
         {...removeRefParam(endField)}
-        label={label?.end ?? t("common:endLabel")}
+        label={labels?.end ?? t("common:endLabel")}
         options={populatedTimeOptions}
-        placeholder={placeholder?.end}
+        placeholder={placeholders?.end}
         required={required?.end}
         error={endFieldState.error && endFieldState.error.message}
         clearable={clearable?.end}
