@@ -275,7 +275,12 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       reservationUnitData.reservationUnit?.reservableTimeSpans
     );
     const reservableTimeSpans = [...timespans, ...moreTimespans];
-    const { date, time, duration } = query;
+    const queryParams = new URLSearchParams(query as Record<string, string>);
+    const searchDate = queryParams.get("date") ?? null;
+    const searchTime = queryParams.get("time") ?? null;
+    const searchDuration = Number.isNaN(Number(queryParams.get("duration")))
+      ? null
+      : Number(queryParams.get("duration"));
     const reservations = filterNonNullable(
       additionalData?.reservationUnit?.reservations
     );
@@ -293,11 +298,9 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
         activeApplicationRounds,
         termsOfUse: { genericTerms: bookingTerms },
         isPostLogin: query?.isPostLogin === "true",
-        searchDuration: Number.isNaN(Number(duration))
-          ? null
-          : Number(duration),
-        searchDate: date ? `${date}` : null,
-        searchTime: time ? `${time}` : null,
+        searchDuration,
+        searchDate,
+        searchTime,
       },
     };
   }
@@ -486,10 +489,9 @@ const ReservationUnit = ({
       (reservationUnit.minReservationDuration
         ? reservationUnit.minReservationDuration / 60
         : 0),
-    time:
-      searchTime ?? todaysTimeSpans[0]
-        ? getTimeString(new Date(todaysTimeSpans[0].startDatetime ?? ""))
-        : getTimeString(),
+    time: searchTime
+      ? searchTime
+      : getTimeString(new Date(todaysTimeSpans[0]?.startDatetime ?? "")),
   };
   const reservationForm = useForm<PendingReservationFormType>({
     defaultValues: initialFieldValues,
@@ -503,13 +505,21 @@ const ReservationUnit = ({
       ? reservationUnit.minReservationDuration / 60
       : 0);
   const dateValue = watch("date");
-  const formUIDate = fromUIDate(dateValue ?? "");
+  const timeValue = watch("time") ?? getTimeString();
+  const formUIDate = fromUIDate(dateValue ?? "")?.setHours(
+    Number.isNaN(Number(timeValue.split(":")[0]))
+      ? Number(timeValue.split(":")[0])
+      : 0,
+    Number.isNaN(Number(timeValue.split(":")[1]))
+      ? Number(timeValue.split(":")[1])
+      : 0
+  );
+
   const focusDate = useMemo(
     () => new Date(formUIDate ?? new Date()),
     [formUIDate]
   );
 
-  const timeValue = watch("time") ?? getTimeString();
   const submitReservation = (_data: PendingReservationFormType) => {
     if (focusSlot.start && focusSlot.end && reservationUnit.pk)
       setErrorMsg(null);
