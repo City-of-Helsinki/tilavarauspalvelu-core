@@ -1,8 +1,9 @@
 import pytest
-from graphene_django_extensions.testing import build_query
 
 from tests.factories import PaymentMerchantFactory, ServiceSectorFactory, UnitFactory, UnitGroupFactory, UserFactory
 from tests.helpers import UserType
+
+from .helpers import units_query
 
 # Applied to all tests
 pytestmark = [
@@ -14,7 +15,7 @@ def test_units__filter__only_with_permission__regular_user(graphql):
     UnitFactory.create()
     graphql.login_user_based_on_type(UserType.REGULAR)
 
-    query = build_query("units", connection=True, only_with_permission=True)
+    query = units_query(only_with_permission=True)
     response = graphql(query)
 
     assert response.has_errors is False
@@ -27,7 +28,7 @@ def test_units__filter__only_with_permission__general_admin__can_manage_units(gr
     user = UserFactory.create_with_general_permissions(perms=["can_manage_units"])
     graphql.force_login(user)
 
-    query = build_query("units", connection=True, only_with_permission=True)
+    query = units_query(only_with_permission=True)
     response = graphql(query)
 
     assert response.has_errors is False
@@ -41,7 +42,7 @@ def test_units__filter__only_with_permission__unit_admin__can_manage_units(graph
     user = UserFactory.create_with_unit_permissions(unit=unit, perms=["can_manage_units"])
     graphql.force_login(user)
 
-    query = build_query("units", connection=True, only_with_permission=True)
+    query = units_query(only_with_permission=True)
     response = graphql(query)
 
     assert response.has_errors is False
@@ -57,7 +58,7 @@ def test_units__filter__only_with_permission__unit_group_admin__can_manage_units
     user = UserFactory.create_with_unit_group_permissions(unit_group=unit_group, perms=["can_manage_units"])
     graphql.force_login(user)
 
-    query = build_query("units", connection=True, only_with_permission=True)
+    query = units_query(only_with_permission=True)
     response = graphql(query)
 
     assert response.has_errors is False
@@ -73,7 +74,7 @@ def test_units__filter__only_with_permission__service_sector_admin__can_manage_u
     user = UserFactory.create_with_service_sector_permissions(service_sector=sector, perms=["can_manage_units"])
     graphql.force_login(user)
 
-    query = build_query("units", connection=True, only_with_permission=True)
+    query = units_query(only_with_permission=True)
     response = graphql(query)
 
     assert response.has_errors is False
@@ -85,7 +86,7 @@ def test_units__query__hide_payment_merchant_without_permissions(graphql):
     unit = UnitFactory.create(payment_merchant=PaymentMerchantFactory.create())
 
     graphql.login_user_based_on_type(UserType.REGULAR)
-    query = build_query("units", fields="nameFi paymentMerchant { name }", connection=True)
+    query = units_query(fields="nameFi paymentMerchant { name }")
     response = graphql(query)
 
     assert response.has_errors is False
@@ -98,7 +99,7 @@ def test_units__query__show_payment_merchant_with_permissions(graphql):
     unit = UnitFactory.create(payment_merchant=PaymentMerchantFactory.create())
 
     graphql.login_user_based_on_type(UserType.SUPERUSER)
-    query = build_query("units", fields="nameFi paymentMerchant { name }", connection=True)
+    query = units_query(fields="nameFi paymentMerchant { name }")
     response = graphql(query)
 
     assert response.has_errors is False
