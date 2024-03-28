@@ -195,7 +195,7 @@ def test_reservation__staff_create__end_before_begin(graphql):
     assert response.error_message() == "End cannot be before begin"
 
 
-def test_reservation__staff_create__begin_date_in_past(graphql):
+def test_reservation__staff_create__begin_date_in_the_past(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
     now = local_datetime()
@@ -211,8 +211,32 @@ def test_reservation__staff_create__begin_date_in_past(graphql):
     assert response.error_message() == "Reservation begin date cannot be in the past."
 
 
+@freezegun.freeze_time(datetime.datetime(2021, 1, 5, hour=12, minute=15, tzinfo=DEFAULT_TIMEZONE))
+def test_reservation__staff_create__begin_date_in_the_past__today(graphql):
+    #
+    # Allow staff members to create reservations to an earlier time today.
+    #
+    reservation_unit = ReservationUnitFactory.create()
+
+    now = local_datetime()
+    last_hour = now.replace(minute=0, second=0, microsecond=0)
+
+    begin = last_hour - datetime.timedelta(hours=1)
+    end = begin + datetime.timedelta(hours=1)
+
+    graphql.login_with_superuser()
+    data = get_staff_create_data(reservation_unit, begin=begin, end=end)
+    response = graphql(CREATE_STAFF_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+    assert reservation.begin == begin
+    assert reservation.end == end
+
+
 @freezegun.freeze_time(datetime.datetime(2021, 1, 5, hour=0, minute=15, tzinfo=DEFAULT_TIMEZONE))
-def test_reservation__staff_create__begin_date_in_past__move_to_yesterday_on_first_hour_of_day(graphql):
+def test_reservation__staff_create__begin_date_in_the_past__move_to_yesterday_on_first_hour_of_day(graphql):
     #
     # We allow booking the reservation for the previous day if it's the first hour of the day.
     #
