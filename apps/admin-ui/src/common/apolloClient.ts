@@ -20,7 +20,6 @@ import type {
 import { buildGraphQLUrl } from "common/src/urlBuilder";
 import { env } from "@/env.mjs";
 import { isBrowser } from "./const";
-import { CustomFormData } from "./CustomFormData";
 
 const authLink = new ApolloLink((operation, forward) => {
   // TODO this doesn't work with SSR (use the ui implementation when we add SSR requests)
@@ -58,7 +57,6 @@ function createClient(apiBaseUrl: string) {
   const uploadLinkOptions = {
     uri,
     credentials: "include",
-    FormData: CustomFormData,
   };
 
   // TODO replace most of this code with the one in ui (that includes server context)
@@ -67,7 +65,6 @@ function createClient(apiBaseUrl: string) {
 
   // NOTE upload link typing is broken when updating apollo to 3.8
   // FIXME upload link is broken locally (it succeeds but no new image is available)
-  // @ts-expect-error FIXME
   const uploadLink: ApolloLink = createUploadLink(uploadLinkOptions);
   const httpLink = new HttpLink({ uri, credentials: "include" });
 

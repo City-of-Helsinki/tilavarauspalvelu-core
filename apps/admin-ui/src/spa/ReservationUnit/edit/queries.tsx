@@ -143,31 +143,27 @@ export const CREATE_RESERVATION_UNIT = gql`
   }
 `;
 
+// TODO this allows for a pk input (is it for a change? i.e. not needing to delete and create a new one)
 export const CREATE_IMAGE = gql`
   mutation createReservationUnitImage(
     $image: Upload!
-    $reservationUnitPk: Int!
-    $imageType: String!
+    $reservationUnit: Int!
+    $imageType: ImageType!
   ) {
     createReservationUnitImage(
       input: {
         image: $image
-        reservationUnitPk: $reservationUnitPk
+        reservationUnit: $reservationUnit
         imageType: $imageType
       }
     ) {
       pk
-      reservationUnitImage {
-        pk
-        imageType
-        mediumUrl
-      }
     }
   }
 `;
 
 export const DELETE_IMAGE = gql`
-  mutation deleteImage($pk: Int!) {
+  mutation deleteImage($pk: ID!) {
     deleteReservationUnitImage(input: { pk: $pk }) {
       deleted
     }
@@ -175,7 +171,7 @@ export const DELETE_IMAGE = gql`
 `;
 
 export const UPDATE_IMAGE_TYPE = gql`
-  mutation updateImage($pk: Int!, $imageType: String!) {
+  mutation updateImage($pk: Int!, $imageType: ImageType!) {
     updateReservationUnitImage(input: { pk: $pk, imageType: $imageType }) {
       pk
     }

@@ -45,6 +45,8 @@ import {
   type PurposeNode,
   type QualifierNode,
   ImageType,
+  ReservationUnitImageUpdateMutationInput,
+  ReservationUnitImageDeleteMutationInput,
 } from "common/types/gql-types";
 import { DateTimeInput } from "common/src/components/form/DateTimeInput";
 import { base64encode, filterNonNullable } from "common/src/helpers";
@@ -461,8 +463,14 @@ const useImageMutations = () => {
     ReservationUnitImageCreateMutationInput
   >(CREATE_IMAGE);
 
-  const [delImage] = useMutation<Mutation>(DELETE_IMAGE);
-  const [updateImagetype] = useMutation<Mutation>(UPDATE_IMAGE_TYPE);
+  const [delImage] = useMutation<
+    Mutation,
+    ReservationUnitImageDeleteMutationInput
+  >(DELETE_IMAGE);
+  const [updateImagetype] = useMutation<
+    Mutation,
+    ReservationUnitImageUpdateMutationInput
+  >(UPDATE_IMAGE_TYPE);
 
   const reconcileImageChanges = async (
     resUnitPk: number,
@@ -472,7 +480,9 @@ const useImageMutations = () => {
     try {
       const deletePromises = images
         .filter((image) => image.deleted)
-        .map((image) => delImage({ variables: { pk: image.pk } }));
+        .map((image) =>
+          delImage({ variables: { pk: image.pk?.toString() ?? "" } })
+        );
       await Promise.all(deletePromises);
     } catch (e) {
       return false;
@@ -506,7 +516,7 @@ const useImageMutations = () => {
         .map((image) => {
           return updateImagetype({
             variables: {
-              pk: image.pk,
+              pk: image.pk ?? 0,
               imageType: image.imageType,
             },
           });
