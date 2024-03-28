@@ -483,7 +483,7 @@ const ReservationUnitReservationWithReservationProp = ({
   // NOTE: only navigate away from the page if the reservation is cancelled the confirmation hook handles delete
   const cancelReservation = useCallback(async () => {
     router.push(`${reservationUnitPrefix}/${reservationUnit?.pk}`);
-  }, [reservationUnitPrefix, reservationPk]);
+  }, [router, reservationUnit?.pk]);
 
   const shouldDisplayReservationUnitPrice = useMemo(() => {
     switch (step) {
