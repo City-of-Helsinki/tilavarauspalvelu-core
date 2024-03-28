@@ -1160,12 +1160,12 @@ const translations: ITranslations = {
       nameFi: ["Varausyksikön nimi fi"],
       nameSv: ["Varausyksikön nimi sv"],
       nameEn: ["Varausyksikön nimi en"],
-      spacePks: ["Tilat"],
-      resourcePks: ["Resurssit"],
+      spaces: ["Tilat"],
+      resources: ["Resurssit"],
       surfaceArea: ["Pinta-ala (m2)"],
       maxPersons: ["Henkilömäärä enintään"],
       minPersons: ["Henkilömäärä vähintään"],
-      reservationUnitTypePk: ["Tilatyyppi"],
+      reservationUnitType: ["Tilatyyppi"],
       descriptionFi: ["Kuvaus fi"],
       descriptionSv: ["Kuvaus sv"],
       descriptionEn: ["Kuvaus en"],
@@ -1191,17 +1191,15 @@ const translations: ITranslations = {
         "Asiakas voi pyytää hinnan alennusta tai maksuttomuutta",
       ],
       pricings: ["Hinnoittelu"],
-      metadataSetPk: ["Varauslomake"],
+      metadataSet: ["Varauslomake"],
       termsOfUseFi: ["Varausyksikkökohtaiset lisätiedot fi"],
       termsOfUseSv: ["Varausyksikkökohtaiset lisätiedot sv"],
       termsOfUseEn: ["Varausyksikkökohtaiset lisätiedot en"],
-      serviceSpecificTermsPk: ["Palvelukohtaiset täydentävät ehdot"],
-      cancellationTermsPk: ["Peruutusehdot"],
-      paymentTermsPk: ["Maksuehdot"],
+      serviceSpecificTerms: ["Palvelukohtaiset täydentävät ehdot"],
+      cancellationTerms: ["Peruutusehdot"],
+      paymentTerms: ["Maksuehdot"],
       paymentTypes: ["Maksutapa"],
       priceUnit: ["Hinnan yksikkö"],
-      // TODO deprecated (rename it in the code)
-      taxPercentagePk: ["Hinnan alv%"],
       taxPercentage: ["Hinnan alv%"],
       reservationPendingInstructionsEn: [
         "Varausvahvistuksen lisäohjeteksti englanniksi",
@@ -1237,7 +1235,7 @@ const translations: ITranslations = {
         SEASON: ["Vain kausivaraus"],
       },
       pricingType: ["Varausyksikön maksullisuus"],
-      pricingTermsPk: ["Hinnoitteluperiaate"],
+      pricingTerms: ["Hinnoitteluperiaate"],
       pricingTypes: {
         PAID: ["Maksullinen"],
         FREE: ["Maksuton"],
@@ -1273,12 +1271,12 @@ const translations: ITranslations = {
       - Jos toimipisteen opasteet ovat vain suomeksi, tilan suomenkielinen nimi tulee näkyä joko tilan nimessä tai kuvauksessa
       esim. ruotsiksi Rantasauna [Strandbastu]`,
       ],
-      spacePks: [
+      spaces: [
         `Varausyksikkö voi koostua yhdestä tai useammasta tilasta. Jokainen resurssi tai laite tarvitsee oman tilansa.
       Huomioi tilahierarkia ja että tila ei voi koskaan olla samanaikaisesti varattuna kuin kerran.
       Tilahierarkiaa pääset muokkaamaan toimipisteen sivulla.`,
       ],
-      resourcePks: [
+      resources: [
         "Valitse tilaan liitettävät resurssit ja laitteet. Luo laitteille tarvittaessa uusi alitila toimipisteen sivulla.",
       ],
       surfaceArea: [
@@ -1290,7 +1288,7 @@ const translations: ITranslations = {
       minPersons: [
         "Minimihenkilömäärä voidaan ilmoittaa, jos tilan käyttöä halutaan ohjata riittävän suuriin varauksiin. Esimerkki: 100hlö sali  halutaan tarjota vähintään 30hlön tilaisuuksiin tai yksin työskentelyä halutaan välttää ryhmätiloissa (min 2 hlö). Suositus: jätetään tyhjäksi",
       ],
-      reservationUnitTypePk: [
+      reservationUnitType: [
         `Valitse varausyksikköä parhaiten kuvaava tilatyyppi. Valinnalla on vaikutusta hakutulokseen.
         TILAT:
         Valitse “MONITOIMITILA”, jos et löydä listalta sopivaa tyyppiä.
@@ -1397,7 +1395,7 @@ const translations: ITranslations = {
       8vko (55 vrk) – leirikeskukset
       Jos peruutukset on käsiteltävä, ota yhteyttä ylläpitoon.`,
       ],
-      metadataSetPk: [
+      metadataSet: [
         `Lomake määrittää varauksessa asiakkaalta kysyttävät kentät.
       Jos et löydä tarvitsemaasi lomaketta, ota yhteyttä palvelusi Varaamo-tuoteomistajaan tai ylläpitoon.`,
       ],
@@ -1450,19 +1448,17 @@ const translations: ITranslations = {
       Alennuspyynnöt tulevat automaattisesti käsiteltäväksi.
       Jos et ole valinnut käsittelyä kohdassa “Haluan käsitellä kaikki varausanomukset”, normaalihintaisia varauksia ei käsitellä.`,
       ],
-      pricingTermsPk: [
+      pricingTerms: [
         `Valitse listalta palvelussasi noudatettavat hinnoittelu- ja maksuttomuusperiaateet.
       Asiakkaan hinnanalennuspyyntö perustuu näihin periaatteisiin.
       Ota tarvittaessa yhteys ylläpitoon.`,
       ],
-      serviceSpecificTermsPk: [
+      serviceSpecificTerms: [
         `Helsingin kaupungin tilojen ja laitteiden varausehdot liitetään kaikkiin varausyksiköihin automaattisesti.
       Täydennä ehtoja tarvittaessa palvelusi ehdoilla.`,
       ],
-      paymentTermsPk: [
-        `Jos varausyksikkösi on maksullinen valitse maksuehdot.`,
-      ],
-      cancellationTermsPk: [
+      paymentTerms: [`Jos varausyksikkösi on maksullinen valitse maksuehdot.`],
+      cancellationTerms: [
         `Valitse kirjallinen peruutusehto.
       Varmista, että peruutusasetukset kohdassa “Varauksen peruutus > Peruutus mahdollista” vastaa tässä valittua ehtoa.`,
       ],

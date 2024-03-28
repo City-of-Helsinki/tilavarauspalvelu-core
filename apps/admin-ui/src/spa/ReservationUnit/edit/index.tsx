@@ -643,7 +643,7 @@ function BasicSection({
     spaces.flatMap((s) => s?.resourceSet)
   ).map((r) => ({ label: String(r?.nameFi), value: Number(r?.pk) }));
 
-  const spacePks = watch("spacePks");
+  const spacePks = watch("spaces");
   const selectedSpaces = filterNonNullable(
     spacePks.map((pk) => spaces.find((s) => s.pk === pk))
   );
@@ -655,8 +655,8 @@ function BasicSection({
     errors.minPersons != null ||
     errors.maxPersons != null ||
     errors.surfaceArea != null ||
-    errors.spacePks != null ||
-    errors.resourcePks != null ||
+    errors.spaces != null ||
+    errors.resources != null ||
     errors.nameFi != null ||
     errors.nameEn != null ||
     errors.nameSv != null;
@@ -717,15 +717,15 @@ function BasicSection({
         ))}
         <Controller
           control={control}
-          name="spacePks"
+          name="spaces"
           render={({ field: { value, onChange } }) => (
             // @ts-expect-error - HDS multiselect has weird typings
             <Select<{ label: string; value: number }>
-              id="spacePks"
+              id="spaces"
               multiselect
               required
               // style={{ gridColumn: "1 / span 2" }}
-              label={t("ReservationUnitEditor.label.spacePks")}
+              label={t("ReservationUnitEditor.label.spaces")}
               placeholder={t("ReservationUnitEditor.spacesPlaceholder")}
               options={spaceOptions}
               disabled={spaceOptions.length === 0}
@@ -746,29 +746,29 @@ function BasicSection({
                 }
               }}
               value={spaceOptions.filter((x) => value.includes(x.value))}
-              invalid={errors.spacePks?.message != null}
-              error={getTranslatedError(t, errors.spacePks?.message)}
-              tooltipText={t("ReservationUnitEditor.tooltip.spacePks")}
+              invalid={errors.spaces?.message != null}
+              error={getTranslatedError(t, errors.spaces?.message)}
+              tooltipText={t("ReservationUnitEditor.tooltip.spaces")}
             />
           )}
         />
         <Controller
           control={control}
-          name="resourcePks"
+          name="resources"
           render={({ field: { value, onChange } }) => (
             // @ts-expect-error - HDS multiselect has weird typings
             <Select<{ label: string; value: number }>
-              id="resourcePks"
+              id="resources"
               multiselect
-              label={t("ReservationUnitEditor.label.resourcePks")}
+              label={t("ReservationUnitEditor.label.resources")}
               placeholder={t("ReservationUnitEditor.resourcesPlaceholder")}
               options={resourceOptions}
               disabled={resourceOptions.length === 0}
               onChange={(vals) => onChange(vals.map((y) => y.value))}
               value={resourceOptions.filter((x) => value.includes(x.value))}
-              error={getTranslatedError(t, errors.resourcePks?.message)}
-              invalid={errors.resourcePks?.message != null}
-              tooltipText={t("ReservationUnitEditor.tooltip.resourcePks")}
+              error={getTranslatedError(t, errors.resources?.message)}
+              invalid={errors.resources?.message != null}
+              tooltipText={t("ReservationUnitEditor.tooltip.resources")}
             />
           )}
         />
@@ -825,8 +825,8 @@ function ReservationUnitSettings({
     errors.reservationEndsDate != null ||
     errors.reservationBeginsTime != null ||
     errors.reservationEndsTime != null ||
-    errors.metadataSetPk != null ||
-    errors.cancellationRulePk != null ||
+    errors.metadataSet != null ||
+    errors.cancellationRule != null ||
     errors.reservationStartInterval != null ||
     errors.reservationsMinDaysBefore != null ||
     errors.reservationsMaxDaysBefore != null ||
@@ -1160,14 +1160,14 @@ function ReservationUnitSettings({
           >
             <Controller
               control={control}
-              name="cancellationRulePk"
+              name="cancellationRule"
               render={({ field: { value, onChange } }) => (
                 <SelectionGroup
                   required
                   label={t("ReservationUnitEditor.cancellationGroupLabel")}
                   errorText={getTranslatedError(
                     t,
-                    errors.cancellationRulePk?.message
+                    errors.cancellationRule?.message
                   )}
                 >
                   {cancellationRuleOptions.map((o) => (
@@ -1187,21 +1187,21 @@ function ReservationUnitSettings({
         </FieldGroup>
         <Controller
           control={control}
-          name="metadataSetPk"
+          name="metadataSet"
           render={({ field: { value, onChange } }) => (
             <Select
-              id="metadataSetPk"
+              id="metadataSet"
               // sort
               required
               options={metadataOptions}
-              label={t("ReservationUnitEditor.label.metadataSetPk")}
+              label={t("ReservationUnitEditor.label.metadataSet")}
               onChange={(v: { label: string; value: number }) =>
                 onChange(v.value)
               }
               value={metadataOptions.find((o) => o.value === value) ?? null}
-              error={getTranslatedError(t, errors.metadataSetPk?.message)}
-              invalid={errors.metadataSetPk?.message != null}
-              tooltipText={t("ReservationUnitEditor.tooltip.metadataSetPk")}
+              error={getTranslatedError(t, errors.metadataSet?.message)}
+              invalid={errors.metadataSet?.message != null}
+              tooltipText={t("ReservationUnitEditor.tooltip.metadataSet")}
             />
           )}
         />
@@ -1372,7 +1372,7 @@ function PricingSection({
             render={({ field: { value, onChange } }) => (
               <Select
                 id="pricingTerms"
-                label={t("ReservationUnitEditor.label.pricingTermsPk")}
+                label={t("ReservationUnitEditor.label.pricingTerms")}
                 placeholder={t("common.select")}
                 required
                 clearable
@@ -1385,7 +1385,7 @@ function PricingSection({
                 }
                 error={getTranslatedError(t, errors.pricingTerms?.message)}
                 invalid={!!errors.pricingTerms}
-                tooltipText={t("ReservationUnitEditor.tooltip.pricingTermsPk")}
+                tooltipText={t("ReservationUnitEditor.tooltip.pricingTerms")}
               />
             )}
           />
@@ -1421,16 +1421,12 @@ function TermsSection({
     >
       <AutoGrid $minWidth="20rem">
         {(
-          [
-            "serviceSpecificTermsPk",
-            "paymentTermsPk",
-            "cancellationTermsPk",
-          ] as const
+          ["serviceSpecificTerms", "paymentTerms", "cancellationTerms"] as const
         ).map((name) => {
           const options =
-            name === "serviceSpecificTermsPk"
+            name === "serviceSpecificTerms"
               ? serviceSpecificTermsOptions
-              : name === "cancellationTermsPk"
+              : name === "cancellationTerms"
                 ? cancellationTermsOptions
                 : paymentTermsOptions;
           return (
@@ -1669,7 +1665,7 @@ function DescriptionSection({
   }));
 
   const hasErrors =
-    errors.reservationUnitTypePk != null ||
+    errors.reservationUnitType != null ||
     errors.descriptionFi != null ||
     errors.descriptionEn != null ||
     errors.descriptionSv != null;
@@ -1683,13 +1679,13 @@ function DescriptionSection({
         <Span6>
           <Controller
             control={control}
-            name="reservationUnitTypePk"
+            name="reservationUnitType"
             render={({ field: { value, onChange } }) => (
               <Select
                 // sort
                 required
-                id="reservationUnitTypePk"
-                label={t(`ReservationUnitEditor.label.reservationUnitTypePk`)}
+                id="reservationUnitType"
+                label={t(`ReservationUnitEditor.label.reservationUnitType`)}
                 placeholder={t(
                   `ReservationUnitEditor.reservationUnitTypePlaceholder`
                 )}
@@ -1706,11 +1702,11 @@ function DescriptionSection({
                 )}
                 error={getTranslatedError(
                   t,
-                  errors.reservationUnitTypePk?.message
+                  errors.reservationUnitType?.message
                 )}
-                invalid={errors.reservationUnitTypePk?.message != null}
+                invalid={errors.reservationUnitType?.message != null}
                 tooltipText={t(
-                  "ReservationUnitEditor.tooltip.reservationUnitTypePk"
+                  "ReservationUnitEditor.tooltip.reservationUnitType"
                 )}
               />
             )}
@@ -1719,7 +1715,7 @@ function DescriptionSection({
         <Span6>
           <Controller
             control={control}
-            name="purposePks"
+            name="purposes"
             render={({ field: { value, onChange } }) => (
               // @ts-expect-error - HDS multiselect has weird typings
               <Select<{ label: string; value: number }>
@@ -1738,7 +1734,7 @@ function DescriptionSection({
         <Span6>
           <Controller
             control={control}
-            name="equipmentPks"
+            name="equipments"
             render={({ field: { value, onChange } }) => (
               // @ts-expect-error - HDS multiselect has weird typings
               <Select<{ label: string; value: number }>
@@ -1757,7 +1753,7 @@ function DescriptionSection({
         <Span6>
           <Controller
             control={control}
-            name="qualifierPks"
+            name="qualifiers"
             render={({ field: { value, onChange, ...field } }) => (
               // @ts-expect-error - HDS multiselect has weird typings
               <Select<{ label: string; value: number }>
@@ -1983,10 +1979,11 @@ const ReservationUnitEditor = ({
   // ----------------------------- Callbacks ----------------------------------
   const onSubmit = async (formValues: ReservationUnitEditFormValues) => {
     const input = transformReservationUnit(formValues);
+    const { pk } = input ?? {};
     try {
       const promise =
-        "pk" in input
-          ? updateMutation({ variables: { input } })
+        pk != null
+          ? updateMutation({ variables: { input: { ...input, pk } } })
           : createMutation({ variables: { input } });
 
       const { data, errors: mutationErrors } = await promise;
@@ -1997,17 +1994,17 @@ const ReservationUnitEditor = ({
         return undefined;
       }
 
-      const pk =
+      const upPk =
         data?.updateReservationUnit?.pk ?? data?.createReservationUnit?.pk;
 
-      if (pk) {
+      if (upPk) {
         const { images } = formValues;
         // res unit is saved, we can save changes to images
-        const success = await reconcileImageChanges(pk, images);
+        const success = await reconcileImageChanges(upPk, images);
         if (success) {
           // redirect if new one was created
-          if (formValues.pk === 0 && pk > 0) {
-            history(`/unit/${unitPk}/reservationUnit/edit/${pk}`);
+          if (formValues.pk === 0 && upPk > 0) {
+            history(`/unit/${unitPk}/reservationUnit/edit/${upPk}`);
           }
           const tkey =
             formValues.pk === 0
@@ -2027,7 +2024,7 @@ const ReservationUnitEditor = ({
         return undefined;
       }
       refetch();
-      return pk;
+      return upPk;
     } catch (error) {
       notifyError(t("ReservationUnitEditor.saveFailed", { error }));
     }
@@ -2250,7 +2247,7 @@ function EditorWrapper({ previewUrlPrefix }: { previewUrlPrefix: string }) {
     shouldFocusError: false,
     defaultValues: {
       ...convertReservationUnit(reservationUnit),
-      unitPk: Number(unitPk),
+      unit: Number(unitPk),
     },
     resolver: zodResolver(ReservationUnitEditSchema),
   });
@@ -2259,7 +2256,7 @@ function EditorWrapper({ previewUrlPrefix }: { previewUrlPrefix: string }) {
     if (reservationUnitData?.reservationUnit != null) {
       reset({
         ...convertReservationUnit(reservationUnitData.reservationUnit),
-        unitPk: Number(unitPk),
+        unit: Number(unitPk),
       });
     }
   }, [reservationUnitData, reset, unitPk]);

@@ -13,8 +13,6 @@ import {
   Status,
   PriceUnit,
   type ReservationUnitPricingNode,
-  type ReservationUnitUpdateMutationInput,
-  type ReservationUnitCreateMutationInput,
   ImageType,
   type ReservationUnitImageNode,
   type ReservationUnitNode,
@@ -377,7 +375,7 @@ export const ReservationUnitEditSchema = z
     requireIntroduction: z.boolean(),
     requireReservationHandling: z.boolean(),
     reservationStartInterval: z.nativeEnum(ReservationStartInterval),
-    unitPk: z.number().min(1),
+    unit: z.number().min(1),
     canApplyFreeOfCharge: z.boolean(),
     reservationsMinDaysBefore: z.number(),
     reservationsMaxDaysBefore: z.number(),
@@ -402,23 +400,23 @@ export const ReservationUnitEditSchema = z
     termsOfUseFi: z.string().max(10000),
     termsOfUseEn: z.string().max(10000),
     termsOfUseSv: z.string().max(10000),
-    spacePks: z.array(z.number()),
-    resourcePks: z.array(z.number()),
-    equipmentPks: z.array(z.number()),
-    purposePks: z.array(z.number()),
-    qualifierPks: z.array(z.number()),
+    spaces: z.array(z.number()),
+    resources: z.array(z.number()),
+    equipments: z.array(z.number()),
+    purposes: z.array(z.number()),
+    qualifiers: z.array(z.number()),
     paymentTypes: z.array(z.string()),
     pricings: z.array(PricingFormSchema),
     seasons: z.array(SeasonalFormSchema),
     // "Not draft reservation unit must have a reservation unit type."
-    reservationUnitTypePk: z.number().nullable(),
-    cancellationRulePk: z.number().nullable(),
+    reservationUnitType: z.number().nullable(),
+    cancellationRule: z.number().nullable(),
     // Terms pks are actually slugs
-    paymentTermsPk: z.string().nullable(),
+    paymentTerms: z.string().nullable(),
     pricingTerms: z.string().nullable(),
-    cancellationTermsPk: z.string().nullable(),
-    serviceSpecificTermsPk: z.string().nullable(),
-    metadataSetPk: z.number().nullable(),
+    cancellationTerms: z.string().nullable(),
+    serviceSpecificTerms: z.string().nullable(),
+    metadataSet: z.number().nullable(),
     surfaceArea: z.number(),
     images: z.array(ImageFormSchema),
     // internal values
@@ -493,11 +491,11 @@ export const ReservationUnitEditSchema = z
           path: ["authentication"],
         });
       }
-      if (v.metadataSetPk == null) {
+      if (v.metadataSet == null) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "Required",
-          path: ["metadataSetPk"],
+          path: ["metadataSet"],
         });
       }
     }
@@ -544,18 +542,18 @@ export const ReservationUnitEditSchema = z
     }
 
     // the backend error on mutation: "Not draft state reservation unit must have one or more space or resource",
-    if (v.spacePks.length === 0 && v.resourcePks.length === 0) {
+    if (v.spaces.length === 0 && v.resources.length === 0) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: "Required",
-        path: ["spacePks"],
+        path: ["spaces"],
       });
     }
-    if (v.reservationUnitTypePk == null) {
+    if (v.reservationUnitType == null) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: "Required",
-        path: ["reservationUnitTypePk"],
+        path: ["reservationUnitType"],
       });
     }
     if (v.nameEn === "") {
@@ -794,7 +792,7 @@ export const convertReservationUnit = (
     reservationStartInterval:
       data?.reservationStartInterval ??
       ReservationStartInterval.Interval_15Mins,
-    unitPk: data?.unit?.pk ?? 0,
+    unit: data?.unit?.pk ?? 0,
     canApplyFreeOfCharge: data?.canApplyFreeOfCharge ?? false,
     reservationsMinDaysBefore: data?.reservationsMinDaysBefore ?? 0,
     reservationsMaxDaysBefore: data?.reservationsMaxDaysBefore ?? 0,
@@ -827,25 +825,25 @@ export const convertReservationUnit = (
     termsOfUseFi: data?.termsOfUseFi ?? "",
     termsOfUseEn: data?.termsOfUseEn ?? "",
     termsOfUseSv: data?.termsOfUseSv ?? "",
-    spacePks: filterNonNullable(data?.spaces?.map((s) => s?.pk)),
-    resourcePks: filterNonNullable(data?.resources?.map((r) => r?.pk)),
-    equipmentPks: filterNonNullable(data?.equipments?.map((e) => e?.pk)),
-    purposePks: filterNonNullable(data?.purposes?.map((p) => p?.pk)),
-    qualifierPks: filterNonNullable(data?.qualifiers?.map((q) => q?.pk)),
+    spaces: filterNonNullable(data?.spaces?.map((s) => s?.pk)),
+    resources: filterNonNullable(data?.resources?.map((r) => r?.pk)),
+    equipments: filterNonNullable(data?.equipments?.map((e) => e?.pk)),
+    purposes: filterNonNullable(data?.purposes?.map((p) => p?.pk)),
+    qualifiers: filterNonNullable(data?.qualifiers?.map((q) => q?.pk)),
     surfaceArea: data?.surfaceArea ?? 0,
     authentication: data?.authentication ?? Authentication.Weak,
-    reservationUnitTypePk: data?.reservationUnitType?.pk ?? null,
-    metadataSetPk: data?.metadataSet?.pk ?? null,
-    paymentTermsPk: data?.paymentTerms?.pk ?? null,
+    reservationUnitType: data?.reservationUnitType?.pk ?? null,
+    metadataSet: data?.metadataSet?.pk ?? null,
+    paymentTerms: data?.paymentTerms?.pk ?? null,
     pricingTerms: data?.pricingTerms?.pk ?? null,
-    serviceSpecificTermsPk: data?.serviceSpecificTerms?.pk ?? null,
-    cancellationTermsPk: data?.cancellationTerms?.pk ?? null,
-    cancellationRulePk: data?.cancellationRule?.pk ?? null,
+    serviceSpecificTerms: data?.serviceSpecificTerms?.pk ?? null,
+    cancellationTerms: data?.cancellationTerms?.pk ?? null,
+    cancellationRule: data?.cancellationRule?.pk ?? null,
     paymentTypes: filterNonNullable(data?.paymentTypes?.map((pt) => pt?.code)),
     pricings: convertPricingList(filterNonNullable(data?.pricings)),
     images: filterNonNullable(data?.images).map((i) => convertImage(i)),
     isDraft: data?.isDraft ?? false,
-    isArchived: data?.isArchived ?? false,
+    isArchived: false,
     seasons: convertSeasonalList(
       filterNonNullable(data?.applicationRoundTimeSlots)
     ),
@@ -869,7 +867,7 @@ export const convertReservationUnit = (
 
 export function transformReservationUnit(
   values: ReservationUnitEditFormValues
-): ReservationUnitUpdateMutationInput | ReservationUnitCreateMutationInput {
+) {
   const {
     pk,
     isDraft,
@@ -897,12 +895,14 @@ export function transformReservationUnit(
     reservationBlockWholeDay,
     bufferTimeAfter,
     bufferTimeBefore,
-    cancellationRulePk,
+    cancellationRule,
     termsOfUseEn,
     termsOfUseFi,
     termsOfUseSv,
     seasons,
     images, // images are updated with a separate mutation
+    // never send unit so we don't accidentially move a unit to another unit
+    unit,
     ...vals
   } = values;
 
@@ -926,7 +926,8 @@ export function transformReservationUnit(
 
   return {
     ...vals,
-    ...(pk ? { pk } : {}),
+    ...(pk > 0 ? { pk } : {}),
+    name: vals.nameFi.trim(),
     surfaceArea:
       surfaceArea != null && surfaceArea > 0 ? Math.floor(surfaceArea) : null,
     reservationBegins:
@@ -959,23 +960,24 @@ export function transformReservationUnit(
     termsOfUseEn: termsOfUseEn !== "" ? termsOfUseEn : null,
     termsOfUseFi: termsOfUseFi !== "" ? termsOfUseFi : null,
     termsOfUseSv: termsOfUseSv !== "" ? termsOfUseSv : null,
-    cancellationRulePk: hasCancellationRule ? cancellationRulePk : null,
+    cancellationRule: hasCancellationRule ? cancellationRule : null,
     // TODO only one active price can be saved
     // the form doesn't allow multiples but make sure here that we only have one active and one future and warn the user if not
     pricings: filterNonNullable(pricings)
       .filter(shouldSavePricing)
       .map((p) => ({
         begins: toApiDate(fromUIDate(p.begins) ?? new Date()) ?? "",
-        highestPrice: Number(p.highestPrice),
-        highestPriceNet: Number(p.highestPriceNet),
-        lowestPrice: Number(p.lowestPrice),
-        lowestPriceNet: Number(p.lowestPriceNet),
+        // TODO don't need to save both net and gross prices
+        highestPrice: p.highestPrice.toString(),
+        highestPriceNet: p.highestPriceNet.toString(),
+        lowestPrice: p.lowestPrice.toString(),
+        lowestPriceNet: p.lowestPriceNet.toString(),
         ...(p.pk !== 0 ? { pk: p.pk } : {}),
         ...(p.priceUnit != null ? { priceUnit: p.priceUnit } : {}),
         pricingType: p.pricingType,
         status: p.status,
         ...(p.taxPercentage.pk !== 0
-          ? { taxPercentagePk: p.taxPercentage.pk }
+          ? { taxPercentage: p.taxPercentage.pk }
           : {}),
       })),
     applicationRoundTimeSlots,
