@@ -1,12 +1,20 @@
 import React, { useState } from "react";
 import { useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
-import type { Query, ReservationUnitNode } from "common/types/gql-types";
-import type { OptionType } from "@/common/types";
+import type {
+  Query,
+  QueryReservationUnitsArgs,
+  ReservationUnitNode,
+} from "common/types/gql-types";
 import { SortedSelect } from "@/component/SortedSelect";
 import { GQL_MAX_RESULTS_PER_QUERY } from "@/common/const";
-import { RESERVATION_UNITS_QUERY } from "./queries";
+import { RESERVATION_UNITS_FILTER_PARAMS_QUERY } from "./queries";
 import { filterNonNullable } from "common/src/helpers";
+
+type OptionType = {
+  label: string;
+  value: number;
+};
 
 type Props = {
   onChange: (reservationUnits: OptionType[]) => void;
@@ -25,20 +33,28 @@ const ReservationUnitFilter = ({ onChange, value }: Props): JSX.Element => {
   const [resUnits, setResUnits] = useState<ReservationUnitNode[]>([]);
 
   // TODO this request is rerun whenever the selection changes (it'll return 0 every time)
-  const { loading } = useQuery<Query>(RESERVATION_UNITS_QUERY, {
-    variables: { offset: resUnits.length, count: GQL_MAX_RESULTS_PER_QUERY },
-    onCompleted: (data) => {
-      const qd = data?.reservationUnits;
-      if (qd?.edges.length != null && qd?.totalCount && qd?.edges.length > 0) {
-        const ds = filterNonNullable(qd?.edges.map((x) => x?.node));
-        setResUnits([...resUnits, ...ds]);
-      }
-    },
-  });
+  const offset = resUnits.length > 0 ? resUnits.length : undefined;
+  const { loading } = useQuery<Query, QueryReservationUnitsArgs>(
+    RESERVATION_UNITS_FILTER_PARAMS_QUERY,
+    {
+      variables: { offset, first: GQL_MAX_RESULTS_PER_QUERY },
+      onCompleted: (data) => {
+        const qd = data?.reservationUnits;
+        if (
+          qd?.edges.length != null &&
+          qd?.totalCount &&
+          qd?.edges.length > 0
+        ) {
+          const ds = filterNonNullable(qd?.edges.map((x) => x?.node));
+          setResUnits([...resUnits, ...ds]);
+        }
+      },
+    }
+  );
 
-  const opts: OptionType[] = (resUnits ?? []).map((reservationUnit) => ({
+  const opts = resUnits.map((reservationUnit) => ({
     label: reservationUnit?.nameFi ?? "",
-    value: reservationUnit?.pk ?? "",
+    value: reservationUnit?.pk ?? 0,
   }));
 
   // NOTE replaced frontend sort with backend, but this caused the sort to be case sensitive.

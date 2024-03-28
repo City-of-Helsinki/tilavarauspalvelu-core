@@ -14,14 +14,19 @@ export const RESERVATION_UNIT_TYPES_QUERY = gql`
   }
 `;
 
-export const RESERVATION_UNITS_QUERY = gql`
-  query ReservationUnitsFilter($offset: Int, $unit: [Int], $count: Int) {
+export const RESERVATION_UNITS_FILTER_PARAMS_QUERY = gql`
+  query ReservationUnitsFilterParams(
+    $offset: Int
+    $unit: [Int]
+    $first: Int
+    $orderBy: [ReservationUnitOrderingChoices]
+  ) {
     reservationUnits(
       offset: $offset
       onlyWithPermission: true
       unit: $unit
-      orderBy: "nameFi"
-      first: $count
+      orderBy: $orderBy
+      first: $first
     ) {
       edges {
         node {

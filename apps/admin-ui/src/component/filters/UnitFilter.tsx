@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import { gql, useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
-import type { Query, UnitNode } from "common/types/gql-types";
+import type { Query, QueryUnitsArgs, UnitNode } from "common/types/gql-types";
 import type { OptionType } from "@/common/types";
 import { SortedSelect } from "@/component/SortedSelect";
 import { GQL_MAX_RESULTS_PER_QUERY } from "@/common/const";
 import { filterNonNullable } from "common/src/helpers";
 
 const UNITS_QUERY = gql`
-  query UnitsFilter($offset: Int, $count: Int) {
-    units(onlyWithPermission: true, offset: $offset, first: $count) {
+  query UnitsFilter($offset: Int, $first: Int) {
+    units(onlyWithPermission: true, offset: $offset, first: $first) {
       edges {
         node {
           nameFi
@@ -31,8 +31,9 @@ const UnitFilter = ({ onChange, value }: Props): JSX.Element => {
   const [units, setUnits] = useState<UnitNode[]>([]);
 
   // Copy-paste from ReservationUnitFilter (same issues etc.)
-  const { loading } = useQuery<Query>(UNITS_QUERY, {
-    variables: { offset: units.length, count: GQL_MAX_RESULTS_PER_QUERY },
+  const offset = units.length > 0 ? units.length : undefined;
+  const { loading } = useQuery<Query, QueryUnitsArgs>(UNITS_QUERY, {
+    variables: { offset, first: GQL_MAX_RESULTS_PER_QUERY },
     onCompleted: (data) => {
       const qd = data?.units;
       if (qd?.edges.length != null && qd?.totalCount && qd?.edges.length > 0) {

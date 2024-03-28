@@ -1,11 +1,20 @@
 import React from "react";
 import { useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
-import { Query, QueryReservationUnitsArgs } from "common/types/gql-types";
-import { OptionType } from "@/common/types";
+import {
+  Query,
+  QueryReservationUnitsArgs,
+  ReservationUnitOrderingChoices,
+} from "common/types/gql-types";
 import { SortedSelect } from "@/component/SortedSelect";
-import { RESERVATION_UNITS_QUERY } from "./queries";
+import { RESERVATION_UNITS_FILTER_PARAMS_QUERY } from "./queries";
+import { filterNonNullable } from "common/src/helpers";
+import { GQL_MAX_RESULTS_PER_QUERY } from "@/common/const";
 
+type OptionType = {
+  label: string;
+  value: number;
+};
 type Props = {
   onChange: (reservationUnits: OptionType) => void;
   value?: OptionType;
@@ -19,27 +28,24 @@ const SingleReservationUnitFilter = ({
 }: Props): JSX.Element => {
   const { t } = useTranslation();
   const { data, loading } = useQuery<Query, QueryReservationUnitsArgs>(
-    RESERVATION_UNITS_QUERY,
+    RESERVATION_UNITS_FILTER_PARAMS_QUERY,
     {
-      variables: { unit: [Number(unitPk)] },
-      skip:
-        !unitPk ||
-        unitPk === "" ||
-        Number(unitPk) === 0 ||
-        Number.isNaN(Number(unitPk)),
+      variables: {
+        unit: unitPk != null ? [Number(unitPk)] : undefined,
+        orderBy: [ReservationUnitOrderingChoices.NameFiAsc],
+        first: GQL_MAX_RESULTS_PER_QUERY,
+        offset: undefined,
+      },
     }
   );
 
-  const options = (data?.reservationUnits?.edges || [])
-    .map((e) => e?.node)
-    .map((reservationUnit) => ({
-      label: reservationUnit?.nameFi ?? "",
-      value: reservationUnit?.pk ?? "",
-    }));
-  const valueOption = options.find((o) => o.value === value?.value) ?? {
-    value: "",
-    label: "",
-  };
+  const options = filterNonNullable(
+    data?.reservationUnits?.edges.map((e) => e?.node)
+  ).map((reservationUnit) => ({
+    label: reservationUnit?.nameFi ?? "",
+    value: reservationUnit?.pk ?? 0,
+  }));
+  const valueOption = options.find((o) => o.value === value?.value) ?? null;
 
   return (
     <SortedSelect
