@@ -46,10 +46,12 @@ const UnitsDataLoader = ({
 }: Props): JSX.Element => {
   const { notifyError } = useNotification();
 
+  /*
   let sortString;
   if (sort) {
     sortString = (sort?.sort ? "" : "-") + sort.field;
   }
+  */
 
   const { fetchMore, loading, data } = useQuery<Query, QueryUnitsArgs>(
     UNITS_QUERY,

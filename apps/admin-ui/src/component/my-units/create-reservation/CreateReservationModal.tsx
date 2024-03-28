@@ -312,7 +312,6 @@ const DialogContent = ({
       );
       onClose();
     } catch (e) {
-      console.error("exception thrown: ", e);
       errorHandler(get(e, "message"));
     }
   };

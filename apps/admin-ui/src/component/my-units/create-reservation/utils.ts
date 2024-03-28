@@ -4,15 +4,20 @@ import {
   type RecurringReservationForm,
   type ReservationChangeFormType,
 } from "app/schemas";
+import { type ReservationMetadataFieldNode } from "common/types/gql-types";
 
 export function flattenMetadata(
   values:
     | ReservationFormType
     | RecurringReservationForm
     | ReservationChangeFormType,
-  metadataSetFields: string[]
+  metadataSetFields: ReservationMetadataFieldNode[]
 ) {
-  const metadataSetValues = pick(values, metadataSetFields);
+  // TODO don't use pick
+  const metadataSetValues = pick(
+    values,
+    metadataSetFields.map((f) => f.fieldName)
+  );
 
   const renamePkFields = ["ageGroup", "homeCity", "purpose"];
 

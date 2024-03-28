@@ -9,6 +9,7 @@ import {
 
 // TODO reuse the backend enums
 // TODO add a safe conversion from Unit -> General permission
+/* eslint-disable @typescript-eslint/prefer-literal-enum-member -- Dirty method, change to proper enum */
 export enum Permission {
   CAN_COMMENT_RESERVATIONS = GeneralPermissionChoices.CanCommentReservations,
   CAN_CREATE_STAFF_RESERVATIONS = GeneralPermissionChoices.CanCreateStaffReservations,
@@ -21,6 +22,7 @@ export enum Permission {
   CAN_VALIDATE_APPLICATIONS = GeneralPermissionChoices.CanValidateApplications,
   CAN_MANAGE_BANNER_NOTIFICATIONS = GeneralPermissionChoices.CanManageNotifications,
 }
+/* eslint-enable @typescript-eslint/prefer-literal-enum-member */
 
 const hasGeneralPermission = (permissionName: string, user: UserNode) =>
   user.generalRoles?.find((x) =>

@@ -68,7 +68,6 @@ export const RESERVATION_UNIT_QUERY = gql`
           nameSv
         }
       }
-      allowReservationsWithoutOpeningHours
     }
   }
 `;

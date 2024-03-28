@@ -67,10 +67,11 @@ const mapFilterParams = (
 const useReservations = (
   filters: FilterArguments,
   defaultFiltering: QueryReservationsArgs,
-  sort?: Sort
+  _sort?: Sort
 ) => {
   const { notifyError } = useNotification();
 
+  /*
   let sortString;
   if (sort) {
     if (sort.field === "begin") {
@@ -85,6 +86,7 @@ const useReservations = (
   } else {
     sortString = "state";
   }
+  */
 
   const { fetchMore, loading, data, previousData } = useQuery<
     Query,

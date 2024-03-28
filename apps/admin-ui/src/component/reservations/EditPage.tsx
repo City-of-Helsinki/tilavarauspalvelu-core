@@ -62,7 +62,7 @@ const Form = styled.form`
   flex-direction: column;
 `;
 
-const EditReservation = ({
+function EditReservation({
   onCancel,
   reservation,
   reservationUnit,
@@ -74,7 +74,7 @@ const EditReservation = ({
   reservationUnit: ReservationUnitNode;
   options: PossibleOptions;
   onSuccess: () => void;
-}) => {
+}) {
   const { t } = useTranslation();
 
   // TODO recurring requires a description and a name box
@@ -213,9 +213,9 @@ const EditReservation = ({
       </Form>
     </FormProvider>
   );
-};
+}
 
-const EditPage = () => {
+function EditPage() {
   const params = useParams();
   const id = params.id ?? undefined;
 
@@ -231,8 +231,8 @@ const EditPage = () => {
     navigate(-1);
   };
 
-  const handleSuccess = () => {
-    refetch();
+  const handleSuccess = async () => {
+    await refetch();
     navigate(-1);
   };
 
@@ -259,6 +259,6 @@ const EditPage = () => {
       )}
     </EditPageWrapper>
   );
-};
+}
 
 export default EditPage;

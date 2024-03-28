@@ -155,8 +155,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
-  let relatedReservationUnits: ReservationUnitNode[] = [];
-
   // TODO does this return only possible rounds or do we need to do frontend filtering on them?
   const { data } = await apolloClient.query<Query>({
     query: APPLICATION_ROUNDS_PERIODS,
@@ -227,23 +225,23 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       },
     });
 
+    let relatedReservationUnits: ReservationUnitNode[] = [];
     if (reservationUnit?.unit?.pk) {
-      const { data: relatedReservationUnitsData } = await apolloClient.query<
+      const { data: relatedData } = await apolloClient.query<
         Query,
         QueryReservationUnitsArgs
       >({
         query: RELATED_RESERVATION_UNITS,
         variables: {
           unit: [reservationUnit.unit.pk],
+          // TODO check if we can remove isDraft filter
           isDraft: false,
           isVisible: true,
         },
       });
 
       relatedReservationUnits = filterNonNullable(
-        relatedReservationUnitsData?.reservationUnits?.edges?.map(
-          (n) => n?.node
-        )
+        relatedData?.reservationUnits?.edges?.map((n) => n?.node)
       ).filter((n) => n?.pk !== reservationUnitData.reservationUnit?.pk);
     }
 
