@@ -199,3 +199,26 @@ def test_reservation_unit__update__archiving_removes_contact_information_and_aud
     # Old log entries are removed
     log_entries = LogEntry.objects.filter(content_type_id=content_type.pk, object_id=reservation_unit.pk)
     assert log_entries.count() == 0
+
+
+def test_reservation_unit__update__publish(graphql):
+    graphql.login_with_superuser()
+
+    reservation_unit = ReservationUnitFactory.create(
+        is_draft=True,
+        name="foo",
+        name_fi="foo",
+        name_sv="foo",
+        name_en="foo",
+        description="foo",
+        description_fi="foo",
+        description_sv="foo",
+        description_en="foo",
+    )
+    data = get_draft_update_input_data(reservation_unit, isDraft=False)
+
+    response = graphql(UPDATE_MUTATION, input_data=data)
+    assert response.has_errors is False, response
+
+    reservation_unit.refresh_from_db()
+    assert reservation_unit.is_draft is False

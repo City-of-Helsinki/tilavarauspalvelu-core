@@ -221,7 +221,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
         When reservation unit is archived, we want to delete all personally identifiable information (GDPR stuff).
         Because all changes are stored to the audit log, we also need to delete old audit events related to the unit.
         """
-        if self.validated_data.get("is_archived", False) and not instance.is_archived:
+        if not self.validated_data.get("is_archived", False) and not instance.is_archived:
             return
 
         # Reset contact information and mark reservation unit as draft
