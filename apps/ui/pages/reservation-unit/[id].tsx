@@ -470,15 +470,16 @@ const ReservationUnit = ({
 
   const hash = router.asPath.split("#")[1];
 
-  const reservableTimeSpans = useMemo(
-    () => filterNonNullable(reservationUnit?.reservableTimeSpans),
-    [reservationUnit?.reservableTimeSpans]
-  );
-  const todaysTimeSpans = reservableTimeSpans.filter(
-    (span) => span.startDatetime && isToday(new Date(span.startDatetime))
+  const reservableTimeSpans = reservationUnit?.reservableTimeSpans;
+  const todaysTimeSpans = useMemo(
+    () =>
+      reservableTimeSpans.filter(
+        (span) => span.startDatetime && isToday(new Date(span.startDatetime))
+      ),
+    [reservableTimeSpans]
   );
   const searchUIDate = fromUIDate(searchDate ?? "");
-  // TODO: plug in query parameters
+
   const initialFieldValues = {
     date:
       searchDate && searchUIDate && isValidDate(searchUIDate)
@@ -998,9 +999,6 @@ const ReservationUnit = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focusSlot]);
 
-  if (reservationUnit == null) {
-    return <CenterSpinner />;
-  }
   const subventionSuffix = reservationUnit?.canApplyFreeOfCharge ? (
     <SubventionSuffix
       placement="reservation-unit-head"
@@ -1014,16 +1012,22 @@ const ReservationUnit = ({
     reservationUnit,
     activeApplicationRounds,
   });
-  const LoginAndSubmit = (
-    <SubmitFragment
-      focusSlot={focusSlot}
-      apiBaseUrl={apiBaseUrl}
-      actionCallback={() => storeReservationForLogin()}
-      reservationForm={reservationForm}
-      loadingText={t("reservationCalendar:makeReservationLoading")}
-      buttonText={t("reservationCalendar:makeReservation")}
-    />
+  const LoginAndSubmit = useMemo(
+    () => (
+      <SubmitFragment
+        focusSlot={focusSlot}
+        apiBaseUrl={apiBaseUrl}
+        actionCallback={() => storeReservationForLogin()}
+        reservationForm={reservationForm}
+        loadingText={t("reservationCalendar:makeReservationLoading")}
+        buttonText={t("reservationCalendar:makeReservation")}
+      />
+    ),
+    [apiBaseUrl, focusSlot, reservationForm, storeReservationForLogin, t]
   );
+  if (reservationUnit == null) {
+    return <CenterSpinner />;
+  }
   const reservationControlProps = {
     reservationUnit,
     reservationForm,

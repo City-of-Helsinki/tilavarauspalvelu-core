@@ -224,6 +224,7 @@ const QuickReservation = ({
       itemsPerChunk
     ).slice(0, timeItems / itemsPerChunk);
   }, [startingTimeOptions]);
+  // Find out which slide has the slot that reflects the selected focusSlot
   let activeChunk = 0;
   for (let i = 0; i < timeChunks.length; i++) {
     if (
