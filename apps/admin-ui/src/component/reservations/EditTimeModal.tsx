@@ -114,19 +114,14 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
     },
     update(cache, { data }) {
       // NOTE: recurring uses a long list of reservations that is cached, manual update needed
+      // TODO can we just remove this now and use refetch? the recurring is a lot faster now
       cache.modify({
         fields: {
           // find the pk => slice the array => replace the state variable in the slice
           // @ts-expect-error: TODO: typechecks broke with ts or apollo-client upgrade
           reservations(existing: ReservationNodeConnection) {
             const queryRes = data?.staffAdjustReservationTime;
-            if (queryRes?.errors) {
-              // eslint-disable-next-line no-console
-              console.error(
-                "NOT updating cache: mutation failed with: ",
-                queryRes?.errors
-              );
-            } else if (!queryRes?.errors && !queryRes?.pk) {
+            if (queryRes?.pk == null) {
               // eslint-disable-next-line no-console
               console.error(
                 "NOT updating cache: mutation success but PK missing"
@@ -172,7 +167,7 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
   const startDateTime = new Date(reservation.begin);
   const endDateTime = new Date(reservation.end);
 
-  const reservationUnit = reservation.reservationUnits?.find(() => true);
+  const reservationUnit = reservation.reservationUnit?.find(() => true);
 
   // TODO this matches the CreateReservationModal logic (should use a common function that is documented)
   // not doing it right now because of open question and because of breaking enum name change.

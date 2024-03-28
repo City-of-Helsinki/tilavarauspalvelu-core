@@ -6,9 +6,9 @@ import {
   type RecurringReservationUpdateMutationInput,
   type RecurringReservationUpdateMutationPayload,
   type ReservationStaffModifyMutationInput,
-  type ReservationStaffModifyMutationPayload,
   type ReservationNode,
   type ReservationWorkingMemoMutationInput,
+  type Mutation,
 } from "common/types/gql-types";
 import { useRecurringReservations } from "../requested/hooks";
 import {
@@ -17,17 +17,17 @@ import {
 } from "./queries";
 
 /// Combines regular and recurring reservation change mutation
-export const useStaffReservationMutation = ({
+export function useStaffReservationMutation({
   reservation,
   onSuccess,
 }: {
   reservation: ReservationNode;
   onSuccess: () => void;
-}) => {
+}) {
   const { t } = useTranslation();
   const { notifyError, notifySuccess } = useNotification();
   const [mutation] = useMutation<
-    { staffReservationModify: ReservationStaffModifyMutationPayload },
+    Mutation,
     {
       input: ReservationStaffModifyMutationInput;
       workingMemo: ReservationWorkingMemoMutationInput;
@@ -156,4 +156,4 @@ export const useStaffReservationMutation = ({
   };
 
   return editStaffReservation;
-};
+}
