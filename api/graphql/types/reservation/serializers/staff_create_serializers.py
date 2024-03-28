@@ -8,6 +8,7 @@ from api.graphql.extensions.serializers import OldPrimaryKeySerializer
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from api.graphql.types.reservation.serializers.mixins import ReservationSchedulingMixin
 from applications.models import City
+from common.date_utils import local_datetime
 from common.fields.serializer import IntegerPrimaryKeyField
 from reservation_units.models import ReservationUnit
 from reservations.choices import (
@@ -193,17 +194,22 @@ class ReservationStaffCreateSerializer(OldPrimaryKeySerializer, ReservationSched
 
         return reservation_type
 
-    def check_begin(self, begin, end):
+    def check_begin(self, begin: datetime.datetime, end: datetime.datetime) -> None:
         if begin > end:
             raise ValidationErrorWithCode(
                 "End cannot be before begin",
                 ValidationErrorCodes.RESERVATION_BEGIN_AFTER_END,
             )
 
-        now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
+        now = local_datetime()
+        min_allowed_date = now.date()
 
-        if begin < now:
+        # For the first hour of the day, we allow reservations to be created for the previous day
+        if now.hour == 0:
+            min_allowed_date -= datetime.timedelta(days=1)
+
+        if begin.date() < min_allowed_date:
             raise ValidationErrorWithCode(
-                "Reservation new begin cannot be in the past",
+                "Reservation begin date cannot be in the past.",
                 ValidationErrorCodes.RESERVATION_BEGIN_IN_PAST,
             )

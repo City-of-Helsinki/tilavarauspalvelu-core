@@ -5,6 +5,7 @@ from django.utils.timezone import get_default_timezone
 from api.graphql.extensions.serializers import OldPrimaryKeyUpdateSerializer
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from api.graphql.types.reservation.serializers.mixins import ReservationSchedulingMixin
+from common.date_utils import local_datetime
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from reservation_units.models import ReservationUnit
 from reservations.choices import ReservationStateChoice, ReservationTypeChoice
@@ -81,26 +82,28 @@ class StaffReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reserv
 
         return data
 
-    def check_begin(self, new_begin, new_end):
+    def check_begin(self, new_begin: datetime.datetime, new_end: datetime.datetime) -> None:
         if new_begin > new_end:
             raise ValidationErrorWithCode(
                 "End cannot be before begin",
                 ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED,
             )
 
-        now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
+        now = local_datetime()
+        min_allowed_date = now.date()
 
-        if now.hour <= 1:
-            now = now - datetime.timedelta(days=1)
+        # For the first hour of the day, we allow reservations to be moved to the previous day
+        if now.hour == 0:
+            min_allowed_date -= datetime.timedelta(days=1)
 
-        if self.instance.end.date() < now.date():
+        if self.instance.end.date() < min_allowed_date:
             raise ValidationErrorWithCode(
                 "Reservation time cannot be changed anymore.",
                 ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED,
             )
 
-        if new_begin.date() < now.date():
+        if new_begin.date() < min_allowed_date:
             raise ValidationErrorWithCode(
-                "Reservation new begin cannot be in the past.",
+                "Reservation new begin date cannot be in the past.",
                 ValidationErrorCodes.RESERVATION_BEGIN_IN_PAST,
             )
