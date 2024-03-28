@@ -40,6 +40,9 @@ class ApplicationRoundTimeSlot(models.Model):
                 fields=["reservation_unit", "weekday"],
                 name="unique_reservation_unit_weekday",
                 violation_error_message="A reservation unit can only have one timeslot per weekday.",
+                # Allows replacing reservable times for the same weekday
+                # in the same reservation unit in a transaction
+                deferrable=models.Deferrable.DEFERRED,
             ),
             models.CheckConstraint(
                 check=(
