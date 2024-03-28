@@ -397,7 +397,7 @@ def test_reservation__confirm__default_payment_type__invoice(graphql):
     reservation = ReservationFactory.create_for_confirmation(
         reservation_unit__payment_types=[PaymentType.ON_SITE, PaymentType.INVOICE],
     )
-    VerkkokauppaAPIClient.create_order.return_value = OrderFactory()
+    VerkkokauppaAPIClient.create_order.return_value = OrderFactory.create()
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
@@ -417,7 +417,7 @@ def test_reservation__confirm__default_payment_type__online(graphql):
     reservation = ReservationFactory.create_for_confirmation(
         reservation_unit__payment_types=[PaymentType.ON_SITE, PaymentType.INVOICE, PaymentType.ONLINE],
     )
-    VerkkokauppaAPIClient.create_order.return_value = OrderFactory()
+    VerkkokauppaAPIClient.create_order.return_value = OrderFactory.create()
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
@@ -457,10 +457,14 @@ def test_reservation__confirm__order_not_created_when_price_is_zero(graphql):
     assert PaymentOrder.objects.count() == 0
 
 
+@patch_method(VerkkokauppaAPIClient.create_order)
 def test_reservation__confirm__return_order_data(graphql):
-    reservation = ReservationFactory.create_for_confirmation()
+    reservation = ReservationFactory.create_for_confirmation(reservation_unit__payment_types=[PaymentType.ONLINE])
 
-    query = build_mutation("confirmReservation", "ReservationConfirmMutation", fields="order { paymentType }")
+    VerkkokauppaAPIClient.create_order.return_value = OrderFactory.create()
+
+    fields = "state order { paymentType checkoutUrl }"
+    query = build_mutation("confirmReservation", "ReservationConfirmMutation", fields=fields)
 
     graphql.login_with_superuser()
     data = get_confirm_data(reservation)
@@ -468,11 +472,20 @@ def test_reservation__confirm__return_order_data(graphql):
 
     assert response.has_errors is False, response.errors
 
-    orders = list(PaymentOrder.objects.all())
+    assert VerkkokauppaAPIClient.create_order.called is True
+
+    reservation.refresh_from_db()
+    orders = list(reservation.payment_order.all())
     assert len(orders) == 1
     order: PaymentOrder = orders[0]
 
-    assert response.first_query_object["order"]["paymentType"] == order.payment_type
+    assert response.first_query_object == {
+        "state": reservation.state.upper(),
+        "order": {
+            "checkoutUrl": "https://checkout.url",
+            "paymentType": order.payment_type,
+        },
+    }
 
 
 def test_reservation__confirm__with_price_requires_payment_product(graphql):
