@@ -304,3 +304,70 @@ def test__find_first_reservable_time_span_for_reservation_unit__buffer_goes_thro
     )
 
     assert result == _time(hour=8)
+
+
+def test__find_first_reservable_time_span_for_reservation_unit__interval_is_longer_than_min_duration():
+    """Test that the first reservable time is found correctly when the interval is longer than the minimum duration."""
+    # ┌──────────────────────────────────────────────┐
+    # │ 0   1   2   3   4   5   6   7   8   9   10   │
+    # │ ░░░░░░░░░░░░▁▁▁▁████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
+    # │                     ════════                 │
+
+    origin_hauki_resource = OriginHaukiResourceFactory(id="999", latest_fetched_date=date(2024, 12, 31))
+    reservation_unit = ReservationUnitFactory(
+        origin_hauki_resource=origin_hauki_resource,
+        min_reservation_duration=timedelta(minutes=15),
+        reservation_start_interval=ReservationStartInterval.INTERVAL_120_MINUTES.value,
+    )
+
+    reservable_time_spans = [
+        TimeSpanElement(start_datetime=_time(hour=3), end_datetime=_time(hour=4), is_reservable=True),
+        TimeSpanElement(start_datetime=_time(hour=5), end_datetime=_time(hour=9), is_reservable=True),
+    ]
+    original_reservable_time_span = ReservableTimeSpanFactory(
+        resource=origin_hauki_resource,
+        start_datetime=reservable_time_spans[0].start_datetime,
+        end_datetime=reservable_time_spans[1].end_datetime,
+    )
+
+    reservation_time_spans = [
+        TimeSpanElement(start_datetime=_time(hour=4), end_datetime=_time(hour=5), is_reservable=False),
+    ]
+
+    helper = FirstReservableTimeHelper(ReservationUnit.objects.none())
+    reservation_unit_helper = ReservationUnitFirstReservableTimeHelper(helper, reservation_unit)
+    reservable_time_span_helper = ReservableTimeSpanFirstReservableTimeHelper(
+        reservation_unit_helper,
+        original_reservable_time_span,
+    )
+    result = reservable_time_span_helper._find_first_reservable_time_span(
+        normalised_reservable_time_spans=reservable_time_spans,
+        reservation_time_spans=reservation_time_spans,
+    )
+
+    assert reservation_unit_helper.minimum_duration_minutes == 120
+    assert result == _time(hour=5)
+
+
+def test__find_first_reservable_time_span_for_reservation_unit__max_duration_is_not_multiple_of_interval():
+    """
+    If the maximum duration is not a multiple of the interval, it is rounded down to the last multiple of the interval.
+    e.g.
+    Interval: 3 hours
+    Max duration: 14 hours
+    Rounded down max duration: 12 hours
+    """
+    reservation_unit = ReservationUnitFactory(
+        min_reservation_duration=timedelta(minutes=140),
+        max_reservation_duration=timedelta(minutes=200),
+        reservation_start_interval=ReservationStartInterval.INTERVAL_120_MINUTES.value,
+    )
+
+    helper = FirstReservableTimeHelper(ReservationUnit.objects.none())
+    reservation_unit_helper = ReservationUnitFirstReservableTimeHelper(helper, reservation_unit)
+
+    # Minimum duration is longer than interval, so it is kept as-is
+    assert reservation_unit_helper.minimum_duration_minutes == 140
+    # Maximum is not a multiple of interval, so it is rounded down to the last multiple of the interval, which is 120
+    # causing the maximum duration to be less than the minimum duration
+    assert reservation_unit_helper.is_reservation_unit_max_duration_invalid is True
