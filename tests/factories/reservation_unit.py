@@ -102,6 +102,21 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
     application_round_time_slots = OneToManyFactory("tests.factories.ApplicationRoundTimeSlotFactory")
 
     @classmethod
+    def create_published(cls, **kwargs: Any) -> ReservationUnit:
+        return cls.create(
+            is_draft=False,
+            name="foo",
+            name_fi="foo",
+            name_sv="foo",
+            name_en="foo",
+            description="foo",
+            description_fi="foo",
+            description_sv="foo",
+            description_en="foo",
+            **kwargs,
+        )
+
+    @classmethod
     def create_reservable_now(cls, **kwargs: Any) -> ReservationUnit:
         """Create a reservation unit that is reservable for yesterday, the current day, and the next day."""
         from .opening_hours import ReservableTimeSpanFactory
