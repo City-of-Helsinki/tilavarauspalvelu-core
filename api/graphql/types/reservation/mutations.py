@@ -65,7 +65,9 @@ class ReservationConfirmMutation(UpdateMutation):
 
     @classmethod
     def get_serializer_output(cls, instance: Reservation) -> dict[str, Any]:
-        return {"order": PaymentOrder.objects.filter(reservation=instance).first()}
+        output = super().get_serializer_output(instance)
+        output["order"] = instance.payment_order.first()
+        return output
 
 
 class ReservationCancellationMutation(UpdateMutation):

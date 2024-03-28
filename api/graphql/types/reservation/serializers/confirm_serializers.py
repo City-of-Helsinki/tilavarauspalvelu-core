@@ -23,6 +23,7 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
     payment_type = OldChoiceCharField(
         choices=PaymentType.choices,
         required=False,
+        write_only=True,
         help_text=(
             "Type of the payment. "
             f"Possible values are {', '.join(value[0].upper() for value in PaymentType.choices)}."
