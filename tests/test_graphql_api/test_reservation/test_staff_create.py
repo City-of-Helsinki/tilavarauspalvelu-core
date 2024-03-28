@@ -33,7 +33,7 @@ pytestmark = [
 
 
 @freezegun.freeze_time("2021-01-01")
-def test_reservation__create_staff__reservation_block_whole_day(graphql):
+def test_reservation__staff_create__reservation_block_whole_day(graphql):
     reservation_unit = ReservationUnitFactory.create(
         origin_hauki_resource=OriginHaukiResourceFactory(id=999),
         reservation_block_whole_day=True,
@@ -69,7 +69,7 @@ def test_reservation__create_staff__reservation_block_whole_day(graphql):
 
 
 @freezegun.freeze_time("2021-01-01")
-def test_reservation__create_staff__reservation_block_whole_day__ignore_given_buffers(graphql):
+def test_reservation__staff_create__reservation_block_whole_day__ignore_given_buffers(graphql):
     reservation_unit = ReservationUnitFactory.create(
         origin_hauki_resource=OriginHaukiResourceFactory(id=999),
         reservation_block_whole_day=True,
@@ -106,7 +106,7 @@ def test_reservation__create_staff__reservation_block_whole_day__ignore_given_bu
     assert reservation.buffer_time_after == datetime.timedelta(hours=11)
 
 
-def test_reservation__create_staff__general_admin_can_create(graphql):
+def test_reservation__staff_create__general_admin_can_create(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
     admin = UserFactory.create_with_general_permissions(
@@ -123,7 +123,7 @@ def test_reservation__create_staff__general_admin_can_create(graphql):
     assert reservation.type == ReservationTypeChoice.STAFF
 
 
-def test_reservation__create_staff__service_sector_admin_can_create(graphql):
+def test_reservation__staff_create__service_sector_admin_can_create(graphql):
     reservation_unit = ReservationUnitFactory.create()
     sector = ServiceSectorFactory.create(units=[reservation_unit.unit])
 
@@ -142,7 +142,7 @@ def test_reservation__create_staff__service_sector_admin_can_create(graphql):
     assert reservation.type == ReservationTypeChoice.STAFF
 
 
-def test_reservation__create_staff__unit_admin_can_create(graphql):
+def test_reservation__staff_create__unit_admin_can_create(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
     admin = UserFactory.create_with_unit_permissions(
@@ -160,7 +160,7 @@ def test_reservation__create_staff__unit_admin_can_create(graphql):
     assert reservation.type == ReservationTypeChoice.STAFF
 
 
-def test_reservation__create_staff__regular_user_cannot_create(graphql):
+def test_reservation__staff_create__regular_user_cannot_create(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
     graphql.login_with_regular_user()
@@ -173,7 +173,7 @@ def test_reservation__create_staff__regular_user_cannot_create(graphql):
 
 
 @pytest.mark.parametrize("field", ["type", "begin", "end"])
-def test_reservation__create_staff__fails_missing_fields(graphql, field):
+def test_reservation__staff_create__missing_fields(graphql, field):
     reservation_unit = ReservationUnitFactory.create()
 
     graphql.login_with_superuser()
@@ -184,7 +184,7 @@ def test_reservation__create_staff__fails_missing_fields(graphql, field):
     assert response.has_errors is True, response
 
 
-def test_reservation__create_staff__fails_end_before_begin(graphql):
+def test_reservation__staff_create__end_before_begin(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
     graphql.login_with_superuser()
@@ -195,7 +195,47 @@ def test_reservation__create_staff__fails_end_before_begin(graphql):
     assert response.error_message() == "End cannot be before begin"
 
 
-def test_reservation__create_staff__optional_fields(graphql):
+def test_reservation__staff_create__begin_date_in_past(graphql):
+    reservation_unit = ReservationUnitFactory.create()
+
+    now = local_datetime()
+    last_hour = now.replace(minute=0, second=0, microsecond=0)
+
+    begin = last_hour - datetime.timedelta(days=1)
+    end = last_hour + datetime.timedelta(hours=2)
+
+    graphql.login_with_superuser()
+    data = get_staff_create_data(reservation_unit, begin=begin, end=end)
+    response = graphql(CREATE_STAFF_MUTATION, input_data=data)
+
+    assert response.error_message() == "Reservation begin date cannot be in the past."
+
+
+@freezegun.freeze_time(datetime.datetime(2021, 1, 5, hour=0, minute=15, tzinfo=DEFAULT_TIMEZONE))
+def test_reservation__staff_create__begin_date_in_past__move_to_yesterday_on_first_hour_of_day(graphql):
+    #
+    # We allow booking the reservation for the previous day if it's the first hour of the day.
+    #
+    reservation_unit = ReservationUnitFactory.create()
+
+    now = local_datetime()
+    last_hour = now.replace(minute=0, second=0, microsecond=0)
+
+    begin = last_hour - datetime.timedelta(days=1)
+    end = last_hour + datetime.timedelta(hours=2)
+
+    graphql.login_with_superuser()
+    data = get_staff_create_data(reservation_unit, begin=begin, end=end)
+    response = graphql(CREATE_STAFF_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+    assert reservation.begin == begin
+    assert reservation.end == end
+
+
+def test_reservation__staff_create__optional_fields(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
     data = get_staff_create_data(
@@ -271,7 +311,7 @@ def test_reservation__create_staff__optional_fields(graphql):
     assert reservation.recurring_reservation.pk == data["recurringReservationPk"]
 
 
-def test_reservation__create_staff__reservation_overlapping_fails(graphql):
+def test_reservation__staff_create__reservation_overlapping_fails(graphql):
     space = SpaceFactory.create()
     reservation_unit = ReservationUnitFactory.create(spaces=[space])
 
@@ -294,7 +334,7 @@ def test_reservation__create_staff__reservation_overlapping_fails(graphql):
     assert response.error_message() == "Overlapping reservations are not allowed."
 
 
-def test_reservation__create_staff__buffer_times_cause_overlap_fails(graphql):
+def test_reservation__staff_create__buffer_times_cause_overlap_fails(graphql):
     space = SpaceFactory.create()
     reservation_unit = ReservationUnitFactory.create(spaces=[space])
 
@@ -318,7 +358,7 @@ def test_reservation__create_staff__buffer_times_cause_overlap_fails(graphql):
     assert response.error_message() == "Reservation overlaps with reservation after due to buffer time."
 
 
-def test_reservation__create_staff__buffer_times_cause_overlap_fails_with_buffer_time_before(graphql):
+def test_reservation__staff_create__buffer_times_cause_overlap_fails_with_buffer_time_before(graphql):
     space = SpaceFactory.create()
     reservation_unit = ReservationUnitFactory.create(spaces=[space])
 
@@ -346,7 +386,7 @@ def test_reservation__create_staff__buffer_times_cause_overlap_fails_with_buffer
     assert response.error_message() == "Reservation overlaps with reservation before due to buffer time."
 
 
-def test_reservation__create_staff__buffer_times_cause_overlap_fails_with_buffer_time_after(graphql):
+def test_reservation__staff_create__buffer_times_cause_overlap_fails_with_buffer_time_after(graphql):
     space = SpaceFactory.create()
     reservation_unit = ReservationUnitFactory.create(spaces=[space])
 
@@ -374,7 +414,7 @@ def test_reservation__create_staff__buffer_times_cause_overlap_fails_with_buffer
     assert response.error_message() == "Reservation overlaps with reservation after due to buffer time."
 
 
-def test_reservation__create_staff__interval_not_respected_fails(graphql):
+def test_reservation__staff_create__interval_not_respected_fails(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
     now = local_datetime()
@@ -389,7 +429,7 @@ def test_reservation__create_staff__interval_not_respected_fails(graphql):
     assert response.error_message() == "Reservation start time does not match the allowed interval of 15 minutes."
 
 
-def test_reservation__create_staff__reservation_type_normal_not_accepted(graphql):
+def test_reservation__staff_create__reservation_type_normal_not_accepted(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
     graphql.login_with_superuser()
@@ -401,7 +441,7 @@ def test_reservation__create_staff__reservation_type_normal_not_accepted(graphql
     )
 
 
-def test_reservation__create_staff__reservation_type_behalf_accepted(graphql):
+def test_reservation__staff_create__reservation_type_behalf_accepted(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
     graphql.login_with_superuser()

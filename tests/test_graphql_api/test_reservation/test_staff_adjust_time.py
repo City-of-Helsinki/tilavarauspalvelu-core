@@ -1,8 +1,9 @@
 import datetime
 
+import freezegun
 import pytest
 
-from common.date_utils import local_datetime
+from common.date_utils import DEFAULT_TIMEZONE, local_datetime
 from email_notification.models import EmailType
 from reservation_units.enums import ReservationStartInterval
 from reservations.choices import ReservationStateChoice, ReservationTypeChoice
@@ -99,7 +100,31 @@ def test_reservation__staff_adjust_time__begin_date_in_past(graphql):
     data = get_staff_adjust_data(reservation, begin=begin, end=end)
     response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation new begin cannot be in the past."
+    assert response.error_message() == "Reservation new begin date cannot be in the past."
+
+
+@freezegun.freeze_time(datetime.datetime(2021, 1, 5, hour=0, minute=15, tzinfo=DEFAULT_TIMEZONE))
+def test_reservation__staff_adjust_time__begin_date_in_past__move_to_yesterday_on_first_hour_of_day(graphql):
+    #
+    # We allow changing the reservation time to the previous day if it's the first hour of the day.
+    #
+    reservation = ReservationFactory.create_for_time_adjustment()
+
+    now = local_datetime()
+    last_hour = now.replace(minute=0, second=0, microsecond=0)
+
+    begin = last_hour - datetime.timedelta(days=1)
+    end = last_hour + datetime.timedelta(hours=2)
+
+    graphql.login_with_superuser()
+    data = get_staff_adjust_data(reservation, begin=begin, end=end)
+    response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation.refresh_from_db()
+    assert reservation.begin == begin
+    assert reservation.end == end
 
 
 def test_reservation__staff_adjust_time__overlaps_with_another_reservation(graphql):
