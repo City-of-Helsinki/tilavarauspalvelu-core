@@ -173,7 +173,7 @@ class FirstReservableTimeHelper:
         self.filter_date_end = filter_date_end
         self.filter_time_start = filter_time_start
         self.filter_time_end = filter_time_end
-        self.minimum_duration_minutes = minimum_duration_minutes
+        self.filter_minimum_duration_minutes = minimum_duration_minutes
 
         ##########################################
         # Get required objects from the database #
@@ -318,6 +318,9 @@ class ReservationUnitFirstReservableTimeHelper:
     # [ ] Can overlap with buffers
     reservation_closed_time_spans: list[TimeSpanElement]
 
+    # Minimum duration in minutes for the ReservationUnit
+    minimum_duration_minutes: int
+
     is_reservation_unit_max_duration_invalid: bool
 
     def __init__(self, parent: FirstReservableTimeHelper, reservation_unit: ReservationUnit):
@@ -334,12 +337,24 @@ class ReservationUnitFirstReservableTimeHelper:
         self.soft_closed_time_spans += self.reservation_closed_time_spans
         self.soft_closed_time_spans += self.blocking_reservation_closed_time_spans
 
-        # Check if the ReservationUnits Maximum Reservation Duration is at least as long as the minimum duration.
-        # Note that wes till need to check if the ReservationUnit is considered Open, so we can't return early here.
-        self.is_reservation_unit_max_duration_invalid: bool = (
-            reservation_unit.max_reservation_duration is not None
-            and reservation_unit.max_reservation_duration < timedelta(minutes=parent.minimum_duration_minutes)
+        start_interval_minutes = ReservationStartInterval(reservation_unit.reservation_start_interval).as_number
+
+        self.minimum_duration_minutes = max(
+            parent.filter_minimum_duration_minutes,
+            int((reservation_unit.min_reservation_duration or timedelta()).total_seconds() / 60),
+            start_interval_minutes,  # Minimum duration must be at least as long as the start interval
         )
+
+        if reservation_unit.max_reservation_duration is None:
+            self.is_reservation_unit_max_duration_invalid = False
+        else:
+            maximum_duration_minutes = reservation_unit.max_reservation_duration.total_seconds() / 60
+            # Ensure that the maximum duration is a multiple of the start interval
+            if maximum_duration_minutes % start_interval_minutes != 0:
+                maximum_duration_minutes -= maximum_duration_minutes % start_interval_minutes
+            # Check if the ReservationUnits Maximum Reservation Duration is at least as long as the minimum duration.
+            # Note that we still need to check if the ReservationUnit is considered Open, so we can't return early here.
+            self.is_reservation_unit_max_duration_invalid = maximum_duration_minutes < self.minimum_duration_minutes
 
     def calculate_first_reservable_time(self) -> ReservableTimeOutput:
         is_closed = True
@@ -539,7 +554,7 @@ class ReservableTimeSpanFirstReservableTimeHelper:
         After processing, we can check if the reservable_time_span is still long enough to fit the minimum duration.
         """
         reservation_unit = self.parent.reservation_unit
-        minimum_duration_minutes = self.parent.parent.minimum_duration_minutes
+        minimum_duration_minutes = self.parent.minimum_duration_minutes
 
         for reservable_time_span in normalised_reservable_time_spans:
             if reservable_time_span is None:
@@ -651,13 +666,7 @@ class ReservableTimeSpanFirstReservableTimeHelper:
         We need to validate front, back and total duration separately because the buffers can be of different lengths.
         """
         reservation_unit = self.parent.reservation_unit
-        minimum_duration_minutes = self.parent.parent.minimum_duration_minutes
-
-        if reservation_unit.min_reservation_duration:
-            minimum_duration_minutes = max(
-                reservation_unit.min_reservation_duration.total_seconds() / 60,
-                minimum_duration_minutes,
-            )
+        minimum_duration_minutes = self.parent.minimum_duration_minutes
 
         # If this time span's duration is less than the minimum duration, it obviously can't fit.
         if time_span.duration_minutes < minimum_duration_minutes:
