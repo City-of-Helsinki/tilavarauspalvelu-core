@@ -1,19 +1,14 @@
 import pytest
 
 from tests.factories import UnitFactory
-from tests.gql_builders import build_mutation
 from tests.helpers import UserType
+
+from .helpers import UPDATE_MUTATION
 
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
 ]
-
-
-UPDATE_MUTATION = build_mutation(
-    "updateUnit",
-    "UnitUpdateMutationInput",
-)
 
 
 def test_units__query(graphql):

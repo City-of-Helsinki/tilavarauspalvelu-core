@@ -27,7 +27,9 @@ def test_recurring_reservations__query(graphql):
         recurrenceInDays
         weekdays
         created
-        user
+        user {
+            email
+        }
         ageGroup {
             minimum
             maximum
@@ -56,7 +58,9 @@ def test_recurring_reservations__query(graphql):
         "recurrenceInDays": recurring_reservation.recurrence_in_days,
         "weekdays": [1, 2, 3, 4, 5],
         "created": recurring_reservation.created.isoformat(),
-        "user": recurring_reservation.user.email,
+        "user": {
+            "email": recurring_reservation.user.email,
+        },
         "ageGroup": {
             "minimum": recurring_reservation.age_group.minimum,
             "maximum": recurring_reservation.age_group.maximum,
@@ -256,9 +260,9 @@ def test_recurring_reservations__filter__by_reservation_unit_type__multiple(grap
 @pytest.mark.parametrize(
     "field",
     [
-        "reservationUnitNameFi",
-        "reservationUnitNameEn",
-        "reservationUnitNameSv",
+        "reservationUnitNameFiAsc",
+        "reservationUnitNameEnAsc",
+        "reservationUnitNameSvAsc",
     ],
 )
 def test_recurring_reservations__order__by_reservation_unit_name(graphql, field):
@@ -287,9 +291,9 @@ def test_recurring_reservations__order__by_reservation_unit_name(graphql, field)
 @pytest.mark.parametrize(
     "field",
     [
-        "unitNameFi",
-        "unitNameEn",
-        "unitNameSv",
+        "unitNameFiAsc",
+        "unitNameEnAsc",
+        "unitNameSvAsc",
     ],
 )
 def test_recurring_reservations__order__by_unit_name(graphql, field):
@@ -325,7 +329,7 @@ def test_recurring_reservations__order__by_crated(graphql):
 
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
-    query = recurring_reservations_query(order_by="created")
+    query = recurring_reservations_query(order_by="createdAsc")
     response = graphql(query)
 
     assert response.has_errors is False

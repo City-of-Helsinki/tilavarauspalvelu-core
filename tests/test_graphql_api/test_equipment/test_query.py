@@ -32,7 +32,7 @@ def test_equipment__order__by_category_rank(graphql):
     equipment_3 = EquipmentFactory.create(name="baz", category__rank=1)
 
     graphql.login_user_based_on_type(UserType.SUPERUSER)
-    query = equipments_query(fields="nameFi category { nameFi }", order_by="categoryRank")
+    query = equipments_query(fields="nameFi category { nameFi }", order_by="categoryRankAsc")
     response = graphql(query)
 
     assert response.has_errors is False
@@ -60,7 +60,7 @@ def test_equipment__filter__by_category_rank(graphql):
     EquipmentFactory.create(name="3", category__rank=3)
 
     graphql.login_user_based_on_type(UserType.SUPERUSER)
-    query = equipments_query(fields="nameFi category { nameFi }", rank_gte=1, rank_lte=2, order_by="name")
+    query = equipments_query(fields="nameFi category { nameFi }", rank_gte=1, rank_lte=2, order_by="nameAsc")
     response = graphql(query)
 
     assert response.has_errors is False

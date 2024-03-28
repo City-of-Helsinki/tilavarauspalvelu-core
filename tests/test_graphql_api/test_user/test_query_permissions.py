@@ -1,7 +1,8 @@
 import pytest
+from graphene_django_extensions.testing import build_query
+from graphql_relay import to_global_id
 
 from tests.factories import ServiceSectorFactory, UnitFactory, UserFactory
-from tests.gql_builders import build_query
 
 # Applied to all tests
 pytestmark = [
@@ -17,7 +18,8 @@ def test_user__query__unit_admin_read_other(graphql):
     )
     graphql.force_login(admin)
 
-    query = build_query("user", pk=user.pk)
+    global_id = to_global_id("UserNode", user.pk)
+    query = build_query("user", id=global_id)
     response = graphql(query)
 
     assert response.has_errors is False
@@ -33,7 +35,8 @@ def test_user__query__service_sector_admin_read_other(graphql):
     )
     graphql.force_login(admin)
 
-    query = build_query("user", pk=user.pk)
+    global_id = to_global_id("UserNode", user.pk)
+    query = build_query("user", id=global_id)
     response = graphql(query)
 
     assert response.has_errors is False
@@ -45,10 +48,12 @@ def test_user__query__regular_user_read_self(graphql):
     user = UserFactory.create()
     graphql.force_login(user)
 
-    query = build_query("user", pk=user.pk)
+    global_id = to_global_id("UserNode", user.pk)
+    query = build_query("user", id=global_id)
     response = graphql(query)
 
-    assert response.error_message() == "No permissions to this operation."
+    assert response.has_errors is False, response.errors
+    assert response.first_query_object == {"pk": user.pk}
 
 
 def test_user__query__regular_user_read_other(graphql):
@@ -56,7 +61,8 @@ def test_user__query__regular_user_read_other(graphql):
     other = UserFactory.create()
     graphql.force_login(user)
 
-    query = build_query("user", pk=other.pk)
+    global_id = to_global_id("UserNode", other.pk)
+    query = build_query("user", id=global_id)
     response = graphql(query)
 
-    assert response.error_message() == "No permissions to this operation."
+    assert response.error_message() == "No permission to access node."

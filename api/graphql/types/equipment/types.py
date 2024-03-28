@@ -1,30 +1,17 @@
-import graphene
-from graphene_permissions.mixins import AuthNode
+from graphene_django_extensions import DjangoNode
 
-from api.graphql.extensions.base_types import TVPBaseConnection
-from api.graphql.extensions.legacy_helpers import OldPrimaryKeyObjectType, get_all_translatable_fields
+from api.graphql.types.equipment.filtersets import EquipmentFilterSet
 from api.graphql.types.equipment.permissions import EquipmentPermission
-from api.graphql.types.equipment_category.types import EquipmentCategoryType
-from common.typing import GQLInfo
 from reservation_units.models import Equipment
 
 
-class EquipmentType(AuthNode, OldPrimaryKeyObjectType):
-    permission_classes = (EquipmentPermission,)
-    category = graphene.Field(EquipmentCategoryType)
-
+class EquipmentNode(DjangoNode):
     class Meta:
         model = Equipment
-        fields = ["pk", *get_all_translatable_fields(model)]
-
-        filter_fields = {
-            "name_fi": ["exact", "icontains", "istartswith"],
-            "name_sv": ["exact", "icontains", "istartswith"],
-            "name_en": ["exact", "icontains", "istartswith"],
-        }
-
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
-
-    def resolve_category(root: Equipment, info: GQLInfo):
-        return root.category
+        fields = [
+            "pk",
+            "name",
+            "category",
+        ]
+        filterset_class = EquipmentFilterSet
+        permission_classes = [EquipmentPermission]

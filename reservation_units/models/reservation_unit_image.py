@@ -3,6 +3,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from easy_thumbnails.fields import ThumbnailerImageField
 
+from reservation_units.enums import ReservationUnitImageType
 from reservation_units.tasks import update_urls
 
 from ._mixins import PurgeImageCacheMixin
@@ -13,14 +14,7 @@ __all__ = [
 
 
 class ReservationUnitImage(models.Model, PurgeImageCacheMixin):
-    TYPES = (
-        ("main", _("Main image")),
-        ("ground_plan", _("Ground plan")),
-        ("map", _("Map")),
-        ("other", _("Other")),
-    )
-
-    image_type = models.CharField(max_length=20, verbose_name=_("Type"), choices=TYPES)
+    image_type = models.CharField(max_length=20, verbose_name=_("Type"), choices=ReservationUnitImageType.choices)
 
     reservation_unit = models.ForeignKey(
         "reservation_units.ReservationUnit",

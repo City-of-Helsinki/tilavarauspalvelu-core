@@ -1,15 +1,21 @@
-import graphene
-from graphene_permissions.mixins import AuthNode
+from graphene_django_extensions import DjangoNode
 
-from api.graphql.extensions.base_types import TVPBaseConnection
-from api.graphql.extensions.legacy_helpers import OldPrimaryKeyObjectType
+from api.graphql.types.tax_percentage.filtersets import TaxPercentageFilterSet
 from reservation_units.models import TaxPercentage
 
+from .permissions import TaxPercentagePermission
 
-class TaxPercentageType(AuthNode, OldPrimaryKeyObjectType):
+__all__ = [
+    "TaxPercentageNode",
+]
+
+
+class TaxPercentageNode(DjangoNode):
     class Meta:
         model = TaxPercentage
-        fields = ["pk", "value"]
-        filter_fields = ["value"]
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
+        fields = [
+            "pk",
+            "value",
+        ]
+        filterset_class = TaxPercentageFilterSet
+        permission_classes = [TaxPercentagePermission]

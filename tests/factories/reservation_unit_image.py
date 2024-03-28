@@ -1,5 +1,6 @@
 import factory
 
+from reservation_units.enums import ReservationUnitImageType
 from reservation_units.models import ReservationUnitImage
 from tests.factories._base import GenericDjangoModelFactory
 
@@ -12,7 +13,7 @@ class ReservationUnitImageFactory(GenericDjangoModelFactory[ReservationUnitImage
     class Meta:
         model = ReservationUnitImage
 
-    image_type = ReservationUnitImage.TYPES[0][0]
+    image_type = ReservationUnitImageType.MAIN.value
     reservation_unit = factory.SubFactory("tests.factories.ReservationUnitFactory")
     image = None
 

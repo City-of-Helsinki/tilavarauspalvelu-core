@@ -2,8 +2,8 @@ import datetime
 from typing import Any
 
 from django.db import models
-from django.db.models import NOT_PROVIDED
 from graphene_django_extensions import NestingModelSerializer
+from graphene_django_extensions.serializers import NotProvided
 from rest_framework.exceptions import ValidationError
 
 from api.graphql.types.reservation_unit_option.serializers import ReservationUnitOptionApplicantSerializer
@@ -111,10 +111,10 @@ class ApplicationSectionSerializer(NestingModelSerializer):
         reservations_begin_date: datetime.date = self.get_or_default("reservations_begin_date", data)
         reservations_end_date: datetime.date = self.get_or_default("reservations_end_date", data)
 
-        application: Application | NOT_PROVIDED = self.get_or_default("application", data)
+        application: Application | NotProvided = self.get_or_default("application", data)
 
         # Creating/updating application with application section
-        if application is NOT_PROVIDED:
+        if application is NotProvided:
             parent_serializer = self.parent.parent
             application_round = parent_serializer.get_or_default("application_round", parent_serializer.initial_data)
             if isinstance(application_round, ApplicationRound):

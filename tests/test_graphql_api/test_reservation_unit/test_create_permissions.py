@@ -30,8 +30,8 @@ def test_reservation_unit__create__draft__permissions(graphql, user_type, expect
 
     data = {
         "isDraft": True,
-        "nameFi": "foo",
-        "unitPk": unit.pk,
+        "name": "foo",
+        "unit": unit.pk,
     }
 
     # when:
@@ -42,4 +42,4 @@ def test_reservation_unit__create__draft__permissions(graphql, user_type, expect
     # - The response contains errors about missing permissions
     assert response.has_errors is expected_errors, response
     if expected_errors:
-        assert response.error_message() == "No permission to mutate"
+        assert response.error_message() == "No permission to create."

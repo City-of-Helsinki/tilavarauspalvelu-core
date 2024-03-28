@@ -24,7 +24,7 @@ def test_regular_user_cannot_update_space(graphql):
 
     # then:
     # - The response has errors about permissions
-    assert response.error_message() == "No permission to mutate"
+    assert response.error_message() == "No permission to update."
 
 
 def test_unit_admin_can_update_space(graphql):
@@ -59,7 +59,7 @@ def test_unit_admin_cannot_update_space_for_other_unit(graphql):
 
     # then:
     # - The response has errors about permissions
-    assert response.error_message() == "No permission to mutate"
+    assert response.error_message() == "No permission to update."
 
 
 def test_service_sector_admin_can_update_space(graphql):
@@ -95,7 +95,7 @@ def test_service_sector_admin_can_update_space_for_other_service_sector(graphql)
 
     # then:
     # - The response has errors about permissions
-    assert response.error_message() == "No permission to mutate"
+    assert response.error_message() == "No permission to update."
 
 
 def test_general_admin_can_update_space(graphql):

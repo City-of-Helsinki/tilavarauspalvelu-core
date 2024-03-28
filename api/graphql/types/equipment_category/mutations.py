@@ -1,42 +1,30 @@
-import graphene
-from graphene import ClientIDMutation
-from graphene_django.rest_framework.mutation import SerializerMutation
+from graphene_django_extensions import CreateMutation, DeleteMutation, UpdateMutation
 
-from api.graphql.extensions.legacy_helpers import OldAuthDeleteMutation, OldAuthSerializerMutation
-from api.graphql.types.equipment_category.permissions import EquipmentCategoryPermission
-from api.graphql.types.equipment_category.serializers import (
-    EquipmentCategoryCreateSerializer,
-    EquipmentCategoryUpdateSerializer,
-)
-from api.graphql.types.equipment_category.types import EquipmentCategoryType
 from reservation_units.models import EquipmentCategory
 
+from .permissions import EquipmentCategoryPermission
+from .serializers import EquipmentCategorySerializer
 
-class EquipmentCategoryCreateMutation(OldAuthSerializerMutation, SerializerMutation):
-    equipment_category = graphene.Field(EquipmentCategoryType)
+__all__ = [
+    "EquipmentCategoryCreateMutation",
+    "EquipmentCategoryUpdateMutation",
+    "EquipmentCategoryDeleteMutation",
+]
 
-    permission_classes = (EquipmentCategoryPermission,)
 
+class EquipmentCategoryCreateMutation(CreateMutation):
     class Meta:
-        model_operations = ["create"]
-        serializer_class = EquipmentCategoryCreateSerializer
+        serializer_class = EquipmentCategorySerializer
+        permission_classes = [EquipmentCategoryPermission]
 
 
-class EquipmentCategoryUpdateMutation(OldAuthSerializerMutation, SerializerMutation):
-    equipment_category = graphene.Field(EquipmentCategoryType)
-
-    permission_classes = (EquipmentCategoryPermission,)
-
+class EquipmentCategoryUpdateMutation(UpdateMutation):
     class Meta:
-        model_operations = ["update"]
-        lookup_field = "pk"
-        serializer_class = EquipmentCategoryUpdateSerializer
+        serializer_class = EquipmentCategorySerializer
+        permission_classes = [EquipmentCategoryPermission]
 
 
-class EquipmentCategoryDeleteMutation(OldAuthDeleteMutation, ClientIDMutation):
-    permission_classes = (EquipmentCategoryPermission,)
-    model = EquipmentCategory
-
-    @classmethod
-    def validate(cls, root, info, **input):
-        return None
+class EquipmentCategoryDeleteMutation(DeleteMutation):
+    class Meta:
+        model = EquipmentCategory
+        permission_classes = [EquipmentCategoryPermission]

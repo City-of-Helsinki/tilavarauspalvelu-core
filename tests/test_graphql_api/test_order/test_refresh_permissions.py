@@ -19,7 +19,7 @@ def test_refresh_order__anonymous_user(graphql):
     data = {"orderUuid": str(order.remote_id)}
     response = graphql(REFRESH_MUTATION, input_data=data)
 
-    assert response.error_message() == "No permission to refresh the order"
+    assert response.error_message() == "No permission to mutate."
 
 
 def test_refresh_order__regular_user(graphql):
@@ -29,7 +29,7 @@ def test_refresh_order__regular_user(graphql):
     data = {"orderUuid": str(order.remote_id)}
     response = graphql(REFRESH_MUTATION, input_data=data)
 
-    assert response.error_message() == "No permission to refresh the order"
+    assert response.error_message() == "No permission to mutate."
 
 
 @patch_method(VerkkokauppaAPIClient.get_payment, return_value=None)

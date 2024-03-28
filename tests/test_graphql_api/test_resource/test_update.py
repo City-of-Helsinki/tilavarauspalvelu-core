@@ -21,8 +21,8 @@ def test_resource__update(graphql):
         "nameFi": "a",
         "nameEn": "b",
         "nameSv": "c",
-        "spacePk": resource.space.pk,
-        "locationType": ResourceLocationType.FIXED.value,
+        "space": resource.space.pk,
+        "locationType": ResourceLocationType.FIXED.value.upper(),
     }
     response = graphql(UPDATE_MUTATION, input_data=data)
 
@@ -42,6 +42,7 @@ def test_resource__update__remove_translations(graphql):
 
     data = {
         "pk": resource.pk,
+        "name": "abc",
         "nameEn": None,
         "nameSv": None,
     }
@@ -60,11 +61,12 @@ def test_resource__update__empty_name_fi(graphql):
 
     data = {
         "pk": resource.pk,
-        "nameFi": "",
+        "name": "",
     }
     response = graphql(UPDATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "Missing translation for nameFi."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("name") == ["Tämä kenttä ei voi olla tyhjä."]
 
 
 def test_resource__update__null_space_with_fixed_location(graphql):
@@ -73,7 +75,7 @@ def test_resource__update__null_space_with_fixed_location(graphql):
 
     data = {
         "pk": resource.pk,
-        "spacePk": None,
+        "space": None,
     }
     response = graphql(UPDATE_MUTATION, input_data=data)
 
@@ -86,7 +88,7 @@ def test_resource__update__null_space_with_movable_location(graphql):
 
     data = {
         "pk": resource.pk,
-        "spacePk": None,
+        "space": None,
     }
     response = graphql(UPDATE_MUTATION, input_data=data)
 
@@ -107,4 +109,4 @@ def test_resource__update__bad_location(graphql):
     }
     response = graphql(UPDATE_MUTATION, input_data=data)
 
-    assert response.error_message().startswith("Wrong type of location type.")
+    assert response.error_message().startswith("Variable '$input'")

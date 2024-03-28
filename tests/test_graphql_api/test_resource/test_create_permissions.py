@@ -18,15 +18,16 @@ def test_resource__create__regular_user(graphql):
     graphql.login_user_based_on_type(UserType.REGULAR)
 
     data = {
+        "name": "abc",
         "nameFi": "a",
         "nameEn": "b",
         "nameSv": "c",
-        "spacePk": space.pk,
-        "locationType": ResourceLocationType.FIXED.value,
+        "space": space.pk,
+        "locationType": ResourceLocationType.FIXED.value.upper(),
     }
     response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "No permission to mutate"
+    assert response.error_message() == "No permission to create."
 
 
 def test_resource__create__unit_admin__can_manage_resources(graphql):
@@ -36,11 +37,12 @@ def test_resource__create__unit_admin__can_manage_resources(graphql):
     graphql.force_login(user)
 
     data = {
+        "name": "abc",
         "nameFi": "a",
         "nameEn": "b",
         "nameSv": "c",
-        "spacePk": space.pk,
-        "locationType": ResourceLocationType.FIXED.value,
+        "space": space.pk,
+        "locationType": ResourceLocationType.FIXED.value.upper(),
     }
     response = graphql(CREATE_MUTATION, input_data=data)
 
@@ -57,11 +59,12 @@ def test_resource__create__unit_group_admin__can_manage_resources(graphql):
     graphql.force_login(user)
 
     data = {
+        "name": "abc",
         "nameFi": "a",
         "nameEn": "b",
         "nameSv": "c",
-        "spacePk": space.pk,
-        "locationType": ResourceLocationType.FIXED.value,
+        "space": space.pk,
+        "locationType": ResourceLocationType.FIXED.value.upper(),
     }
     response = graphql(CREATE_MUTATION, input_data=data)
 
@@ -78,11 +81,12 @@ def test_resource__create__service_sector_admin__can_manage_resources(graphql):
     graphql.force_login(user)
 
     data = {
+        "name": "abc",
         "nameFi": "a",
         "nameEn": "b",
         "nameSv": "c",
-        "spacePk": space.pk,
-        "locationType": ResourceLocationType.FIXED.value,
+        "space": space.pk,
+        "locationType": ResourceLocationType.FIXED.value.upper(),
     }
     response = graphql(CREATE_MUTATION, input_data=data)
 

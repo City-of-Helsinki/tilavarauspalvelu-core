@@ -1,39 +1,31 @@
-import graphene
-from graphene import ClientIDMutation
-from graphene_django.rest_framework.mutation import SerializerMutation
+from graphene_django_extensions import CreateMutation, DeleteMutation, UpdateMutation
 
-from api.graphql.extensions.legacy_helpers import OldAuthDeleteMutation, OldAuthSerializerMutation
 from api.graphql.types.equipment.permissions import EquipmentPermission
-from api.graphql.types.equipment.serializers import EquipmentCreateSerializer, EquipmentUpdateSerializer
-from api.graphql.types.equipment.types import EquipmentType
+from api.graphql.types.equipment.serializers import (
+    EquipmentSerializer,
+)
 from reservation_units.models import Equipment
 
+__all__ = [
+    "EquipmentCreateMutation",
+    "EquipmentUpdateMutation",
+    "EquipmentDeleteMutation",
+]
 
-class EquipmentCreateMutation(OldAuthSerializerMutation, SerializerMutation):
-    equipment = graphene.Field(EquipmentType)
 
-    permission_classes = (EquipmentPermission,)
-
+class EquipmentCreateMutation(CreateMutation):
     class Meta:
-        model_operations = ["create"]
-        serializer_class = EquipmentCreateSerializer
+        serializer_class = EquipmentSerializer
+        permission_classes = [EquipmentPermission]
 
 
-class EquipmentUpdateMutation(OldAuthSerializerMutation, SerializerMutation):
-    equipment = graphene.Field(EquipmentType)
-
-    permission_classes = (EquipmentPermission,)
-
+class EquipmentUpdateMutation(UpdateMutation):
     class Meta:
-        model_operations = ["update"]
-        lookup_field = "pk"
-        serializer_class = EquipmentUpdateSerializer
+        serializer_class = EquipmentSerializer
+        permission_classes = [EquipmentPermission]
 
 
-class EquipmentDeleteMutation(OldAuthDeleteMutation, ClientIDMutation):
-    permission_classes = (EquipmentPermission,)
-    model = Equipment
-
-    @classmethod
-    def validate(cls, root, info, **input):
-        return None
+class EquipmentDeleteMutation(DeleteMutation):
+    class Meta:
+        model = Equipment
+        permission_classes = [EquipmentPermission]

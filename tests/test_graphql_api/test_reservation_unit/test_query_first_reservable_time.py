@@ -5,6 +5,7 @@ from typing import NamedTuple
 
 import freezegun
 import pytest
+from graphene_django_extensions.testing import parametrize_helper
 
 from applications.choices import ApplicationRoundStatusChoice
 from common.date_utils import DEFAULT_TIMEZONE
@@ -20,7 +21,6 @@ from tests.factories import (
     ResourceFactory,
     SpaceFactory,
 )
-from tests.helpers import parametrize_helper
 
 from .helpers import reservation_units_query
 
@@ -29,7 +29,11 @@ pytestmark = [
     pytest.mark.django_db,
 ]
 
-reservation_units_reservable_query = partial(reservation_units_query, fields="isClosed firstReservableDatetime")
+reservation_units_reservable_query = partial(
+    reservation_units_query,
+    fields="isClosed firstReservableDatetime",
+    calculate_first_reservable_time=True,
+)
 
 
 def _datetime(year=2024, month=1, day=1, hour=0, minute=0) -> datetime:

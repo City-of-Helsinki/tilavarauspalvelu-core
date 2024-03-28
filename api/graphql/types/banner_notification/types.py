@@ -1,7 +1,7 @@
 import graphene
+from graphene_django_extensions import DjangoNode
+from graphene_django_extensions.permissions import restricted_field
 
-from api.graphql.extensions.base_types import DjangoAuthNode
-from api.graphql.extensions.permission_helpers import private_field
 from api.graphql.types.banner_notification.filtersets import BannerNotificationFilterSet
 from api.graphql.types.banner_notification.permissions import BannerNotificationPermission
 from common.choices import BannerNotificationState
@@ -9,8 +9,12 @@ from common.models import BannerNotification
 from common.typing import GQLInfo
 from permissions.helpers import can_manage_banner_notifications
 
+__all__ = [
+    "BannerNotificationNode",
+]
 
-class BannerNotificationNode(DjangoAuthNode):
+
+class BannerNotificationNode(DjangoNode):
     state = graphene.Field(graphene.Enum.from_enum(BannerNotificationState))
 
     class Meta:
@@ -34,8 +38,8 @@ class BannerNotificationNode(DjangoAuthNode):
             "target": can_manage_banner_notifications,
         }
         filterset_class = BannerNotificationFilterSet
-        permission_classes = (BannerNotificationPermission,)
+        permission_classes = [BannerNotificationPermission]
 
-    @private_field(can_manage_banner_notifications)
+    @restricted_field(can_manage_banner_notifications)
     def resolve_state(root: BannerNotification, info: GQLInfo) -> BannerNotificationState:
         return root.state

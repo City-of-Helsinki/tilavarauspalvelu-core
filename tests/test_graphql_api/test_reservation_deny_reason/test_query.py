@@ -1,7 +1,7 @@
 import pytest
+from graphene_django_extensions.testing import build_query
 
 from tests.factories import ReservationDenyReasonFactory
-from tests.gql_builders import build_query
 from tests.helpers import UserType
 
 # Applied to all tests
@@ -49,5 +49,4 @@ def test_reservation_deny_reasons__query__anonymous_user(graphql):
     query = build_query("reservationDenyReasons", fields=fields, connection=True)
     response = graphql(query)
 
-    assert response.has_errors is False
-    assert response.edges == []
+    assert response.error_message() == "No permission to access node."

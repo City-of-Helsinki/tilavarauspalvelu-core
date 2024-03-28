@@ -1,8 +1,9 @@
 import pytest
+from graphene_django_extensions.testing import parametrize_helper
 
 from common.choices import BannerNotificationTarget
 from tests.factories import BannerNotificationFactory
-from tests.helpers import UserType, parametrize_helper
+from tests.helpers import UserType
 from tests.test_graphql_api.test_banner_notification.helpers import FieldParams, TargetParams, UserTypeParams
 
 # Applied to all tests
@@ -270,7 +271,7 @@ def test_user_permissions_on_banner_notifications_without_target_filter(graphql,
     response = graphql(
         """
         query {
-          bannerNotifications (isVisible: true, orderBy: "pk") {
+          bannerNotifications (isVisible: true, orderBy: pkAsc) {
             edges {
               node {
                 message

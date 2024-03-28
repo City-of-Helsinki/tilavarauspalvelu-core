@@ -1,6 +1,6 @@
 from typing import Any
 
-from rest_framework import serializers
+from graphene_django_extensions import NestingModelSerializer
 
 from applications.models import ApplicationRoundTimeSlot
 from applications.validators import (
@@ -10,7 +10,7 @@ from applications.validators import (
 )
 
 
-class ApplicationRoundTimeSlotSerializer(serializers.ModelSerializer):
+class ApplicationRoundTimeSlotSerializer(NestingModelSerializer):
     reservable_times = TimeSlotSerializer(many=True, required=False)
 
     class Meta:
@@ -20,6 +20,11 @@ class ApplicationRoundTimeSlotSerializer(serializers.ModelSerializer):
             "closed",
             "reservable_times",
         ]
+        extra_kwargs = {
+            "weekday": {
+                "required": True,
+            },
+        }
 
     @staticmethod
     def validate_reservable_times(timeslots: list[dict[str, Any]]) -> list[dict[str, Any]]:

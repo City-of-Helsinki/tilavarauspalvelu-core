@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("permissions", "0019_edit_permission_descriptions"),
     ]
@@ -95,7 +94,10 @@ class Migration(migrations.Migration):
                         "can_manage_application_rounds",
                         "Can create, edit and delete application rounds in the whole system",
                     ),
-                    ("can_view_users", "Can view users in the whole system"),
+                    (
+                        "can_view_users",
+                        "Can view users in the whole system",
+                    ),
                     (
                         "can_comment_reservations",
                         "Can comment reservations in the whole system",
@@ -185,7 +187,10 @@ class Migration(migrations.Migration):
             name="permission",
             field=models.CharField(
                 choices=[
-                    ("can_manage_unit_roles", "Can modify roles for the unit"),
+                    (
+                        "can_manage_unit_roles",
+                        "Can modify roles for the unit",
+                    ),
                     (
                         "can_manage_reservation_units",
                         "Can create, edit and delete reservation units in the unit",
@@ -198,8 +203,14 @@ class Migration(migrations.Migration):
                         "can_view_reservations",
                         "Can view details of all reservations in the unit",
                     ),
-                    ("can_view_users", "Can view users in the whole system"),
-                    ("can_allocate_applications", "Can allocate applications"),
+                    (
+                        "can_view_users",
+                        "Can view users in the whole system",
+                    ),
+                    (
+                        "can_allocate_applications",
+                        "Can allocate applications",
+                    ),
                     (
                         "can_validate_applications",
                         "Can validate applications in the unit",
@@ -208,8 +219,14 @@ class Migration(migrations.Migration):
                         "can_allocate_applications",
                         "Can allocate application in the unit",
                     ),
-                    ("can_handle_applications", "Can handle application in the unit"),
-                    ("can_manage_units", "Can edit unit information"),
+                    (
+                        "can_handle_applications",
+                        "Can handle application in the unit",
+                    ),
+                    (
+                        "can_manage_units",
+                        "Can edit unit information",
+                    ),
                     (
                         "can_manage_spaces",
                         "Can create, edit and delete spaces in the unit",

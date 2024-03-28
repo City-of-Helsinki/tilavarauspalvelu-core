@@ -6,9 +6,7 @@ from graphql_relay import to_global_id
 
 from applications.choices import WeekdayChoice
 from common.date_utils import local_datetime
-from reservation_units.enums import ReservationUnitState
-from reservations.choices import ReservationStateChoice
-from reservations.models import Reservation
+from reservation_units.enums import PricingType, ReservationUnitState
 from terms_of_use.models import TermsOfUse
 from tests.factories import (
     ApplicationRoundFactory,
@@ -23,7 +21,6 @@ from tests.factories import (
     ReservationUnitCancellationRuleFactory,
     ReservationUnitFactory,
     ReservationUnitPaymentTypeFactory,
-    ReservationUnitPricingFactory,
     ResourceFactory,
     ServiceFactory,
     SpaceFactory,
@@ -50,7 +47,7 @@ def test_reservation_unit__single__query(graphql):
     graphql.login_with_superuser()
 
     reservation_unit = ReservationUnitFactory.create()
-    global_id = to_global_id("ReservationUnitType", reservation_unit.pk)
+    global_id = to_global_id("ReservationUnitNode", reservation_unit.pk)
     query = reservation_unit_query(id=global_id)
     response = graphql(query)
 
@@ -64,7 +61,7 @@ def test_reservation_unit__single__query__authentication(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
     fields = "authentication"
-    global_id = to_global_id("ReservationUnitType", reservation_unit.pk)
+    global_id = to_global_id("ReservationUnitNode", reservation_unit.pk)
     query = reservation_unit_query(fields=fields, id=global_id)
     response = graphql(query)
 
@@ -80,7 +77,7 @@ def test_reservation_unit__single__query__reservation_blocks_whole_day(graphql):
     reservation_unit = ReservationUnitFactory.create(reservation_block_whole_day=True)
 
     fields = "reservationBlockWholeDay"
-    global_id = to_global_id("ReservationUnitType", reservation_unit.pk)
+    global_id = to_global_id("ReservationUnitNode", reservation_unit.pk)
     query = reservation_unit_query(id=global_id, fields=fields)
     response = graphql(query)
 
@@ -90,57 +87,9 @@ def test_reservation_unit__single__query__reservation_blocks_whole_day(graphql):
     }
 
 
-def test_reservation_unit__single__filter__reservations__by_timestamps(graphql):
-    graphql.login_with_superuser()
-
-    reservation_unit = ReservationUnitFactory.create()
-
-    tz = get_default_timezone()
-
-    ReservationFactory.create(
-        reservation_unit=[reservation_unit],
-        begin=datetime.datetime(2023, 1, 1, 15, 0, 0, tzinfo=tz),
-        end=datetime.datetime(2023, 1, 1, 16, 0, 0, tzinfo=tz),
-    )
-    reservation_1 = ReservationFactory.create(
-        reservation_unit=[reservation_unit],
-        begin=datetime.datetime(2023, 1, 2, 0, 0, 0, tzinfo=tz),
-        end=datetime.datetime(2023, 1, 2, 1, 0, 0, tzinfo=tz),
-    )
-    reservation_2 = ReservationFactory.create(
-        reservation_unit=[reservation_unit],
-        begin=datetime.datetime(2023, 1, 3, 23, 00, 00, tzinfo=tz),
-        end=datetime.datetime(2023, 1, 3, 23, 59, 59, tzinfo=tz),
-    )
-    ReservationFactory.create(
-        reservation_unit=[reservation_unit],
-        begin=datetime.datetime(2023, 1, 4, 0, 0, 0, tzinfo=tz),
-        end=datetime.datetime(2023, 1, 4, 1, 0, 0, tzinfo=tz),
-    )
-
-    fields = "reservations { pk }"
-    global_id = to_global_id("ReservationUnitType", reservation_unit.pk)
-    query = reservation_unit_query(
-        fields=fields,
-        id=global_id,
-        reservations__from="2023-01-02",
-        reservations__to="2023-01-03",
-    )
-    response = graphql(query)
-
-    assert response.has_errors is False, response.errors
-    assert response.first_query_object == {
-        "reservations": [
-            {"pk": reservation_1.pk},
-            {"pk": reservation_2.pk},
-        ],
-    }
-
-
 # Multiple
 
 
-@pytest.mark.usefixtures("_celery_synchronous")
 def test_reservation_unit__query__all_fields(graphql):
     graphql.login_with_superuser()
 
@@ -198,77 +147,6 @@ def test_reservation_unit__query__all_fields(graphql):
         reservationKind
         state
         reservationState
-
-        unit {
-            nameFi
-        }
-        reservationUnitType {
-            nameFi
-        }
-        cancellationRule {
-            nameFi
-        }
-        metadataSet {
-            name
-            supportedFields
-            requiredFields
-        }
-        cancellationTerms {
-            termsType
-        }
-        serviceSpecificTerms {
-            termsType
-        }
-        pricingTerms {
-            termsType
-        }
-        paymentTerms {
-            termsType
-        }
-        paymentProduct {
-            pk
-        }
-        paymentMerchant {
-            name
-        }
-
-        spaces {
-            nameFi
-        }
-        resources {
-            nameFi
-        }
-        purposes {
-            nameFi
-        }
-        equipment {
-            nameFi
-        }
-        services {
-            nameFi
-        }
-        paymentTypes {
-            code
-        }
-        qualifiers {
-            nameFi
-        }
-
-        applicationRounds {
-            nameFi
-        }
-        pricings {
-            begins
-            taxPercentage {
-                value
-            }
-        }
-        reservations {
-            begin
-        }
-        images {
-            largeUrl
-        }
     """
 
     reservation_unit = ReservationUnitFactory.create(
@@ -286,26 +164,6 @@ def test_reservation_unit__query__all_fields(graphql):
         publish_ends=datetime.datetime(2021, 5, 3, tzinfo=datetime.UTC),
         min_reservation_duration=datetime.timedelta(minutes=15),
         max_reservation_duration=datetime.timedelta(hours=2),
-        cancellation_rule=ReservationUnitCancellationRuleFactory.create(),
-        metadata_set=ReservationMetadataSetFactory.create(),
-        cancellation_terms=TermsOfUseFactory.create(terms_type=TermsOfUse.TERMS_TYPE_CANCELLATION),
-        service_specific_terms=TermsOfUseFactory.create(terms_type=TermsOfUse.TERMS_TYPE_SERVICE),
-        pricing_terms=TermsOfUseFactory.create(terms_type=TermsOfUse.TERMS_TYPE_PRICING),
-        payment_terms=TermsOfUseFactory.create(terms_type=TermsOfUse.TERMS_TYPE_PAYMENT),
-        payment_product=PaymentProductFactory.create(),
-        payment_merchant=PaymentMerchantFactory.create(),
-        spaces=[SpaceFactory.create()],
-        resources=[ResourceFactory.create()],
-        purposes=[PurposeFactory.create()],
-        equipments=[EquipmentFactory.create()],
-        services=[ServiceFactory.create()],
-        payment_types=[ReservationUnitPaymentTypeFactory.create()],
-        qualifiers=[QualifierFactory.create()],
-        application_rounds=[ApplicationRoundFactory.create()],
-        pricings=[ReservationUnitPricingFactory.create()],
-        reservation_set=[ReservationFactory.create()],
-        images__large_url="https://example.com",
-        application_round_time_slots__weekday=WeekdayChoice.MONDAY,
     )
     query = reservation_units_query(fields=fields)
     response = graphql(query)
@@ -366,7 +224,63 @@ def test_reservation_unit__query__all_fields(graphql):
         "reservationKind": reservation_unit.reservation_kind.upper(),
         "state": reservation_unit.state.value,
         "reservationState": reservation_unit.reservation_state.value,
-        #
+    }
+
+
+def test_reservation_unit__query__all_to_one_relations(graphql):
+    graphql.login_with_superuser()
+
+    fields = """
+        pk
+        unit {
+            nameFi
+        }
+        reservationUnitType {
+            nameFi
+        }
+        cancellationRule {
+            nameFi
+        }
+        metadataSet {
+            name
+        }
+        cancellationTerms {
+            termsType
+        }
+        serviceSpecificTerms {
+            termsType
+        }
+        pricingTerms {
+            termsType
+        }
+        paymentTerms {
+            termsType
+        }
+        paymentProduct {
+            pk
+        }
+        paymentMerchant {
+            name
+        }
+    """
+
+    reservation_unit = ReservationUnitFactory.create(
+        cancellation_rule=ReservationUnitCancellationRuleFactory.create(),
+        metadata_set=ReservationMetadataSetFactory.create(),
+        cancellation_terms=TermsOfUseFactory.create(terms_type=TermsOfUse.TERMS_TYPE_CANCELLATION),
+        service_specific_terms=TermsOfUseFactory.create(terms_type=TermsOfUse.TERMS_TYPE_SERVICE),
+        pricing_terms=TermsOfUseFactory.create(terms_type=TermsOfUse.TERMS_TYPE_PRICING),
+        payment_terms=TermsOfUseFactory.create(terms_type=TermsOfUse.TERMS_TYPE_PAYMENT),
+        payment_product=PaymentProductFactory.create(),
+        payment_merchant=PaymentMerchantFactory.create(),
+    )
+    query = reservation_units_query(fields=fields)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 1
+    assert response.node(0) == {
+        "pk": reservation_unit.pk,
         "unit": {
             "nameFi": reservation_unit.unit.name_fi,
         },
@@ -378,8 +292,6 @@ def test_reservation_unit__query__all_fields(graphql):
         },
         "metadataSet": {
             "name": reservation_unit.metadata_set.name,
-            "requiredFields": [],
-            "supportedFields": [],
         },
         "cancellationTerms": {
             "termsType": reservation_unit.cancellation_terms.terms_type.upper(),
@@ -399,7 +311,117 @@ def test_reservation_unit__query__all_fields(graphql):
         "paymentMerchant": {
             "name": reservation_unit.payment_merchant.name,
         },
+    }
+
+
+@pytest.mark.usefixtures("_celery_synchronous")  # for updating image urls when creating images for reservation unit
+def test_reservation_unit__query__all_one_to_many_relations(graphql):
+    fields = """
+        pk
+        pricings {
+            begins
+            taxPercentage {
+                value
+            }
+        }
+        images {
+            largeUrl
+        }
+        applicationRoundTimeSlots {
+            closed
+        }
+    """
+
+    reservation_unit = ReservationUnitFactory.create(
+        pricings__pricing_type=PricingType.PAID,
+        images__large_url="https://example.com",
+        application_round_time_slots__closed=False,
+    )
+    graphql.login_with_superuser()
+    query = reservation_units_query(fields=fields)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 1
+    assert response.node(0) == {
+        "pk": reservation_unit.pk,
+        "pricings": [
+            {
+                "begins": reservation_unit.pricings.first().begins.isoformat(),
+                "taxPercentage": {
+                    "value": str(reservation_unit.pricings.first().tax_percentage.value),
+                },
+            },
+        ],
+        "images": [
+            {
+                "largeUrl": reservation_unit.images.first().large_url,
+            },
+        ],
+        "applicationRoundTimeSlots": [
+            {
+                "closed": reservation_unit.application_round_time_slots.first().closed,
+            },
+        ],
+    }
+
+
+def test_reservation_unit__query__all_many_to_many_relations(graphql):
+    graphql.login_with_superuser()
+
+    fields = """
+        pk
+
+        spaces {
+            nameFi
+        }
+        resources {
+            nameFi
+        }
+        purposes {
+            nameFi
+        }
+        equipments {
+            nameFi
+        }
+        services {
+            nameFi
+        }
+        paymentTypes {
+            code
+        }
+        qualifiers {
+            nameFi
+        }
+
+        applicationRounds {
+            nameFi
+        }
+        reservationSet {
+            begin
+        }
+    """
+
+    reservation_unit = ReservationUnitFactory.create(
+        spaces=[SpaceFactory.create()],
+        resources=[ResourceFactory.create()],
+        purposes=[PurposeFactory.create()],
+        equipments=[EquipmentFactory.create()],
+        services=[ServiceFactory.create()],
+        payment_types=[ReservationUnitPaymentTypeFactory.create()],
+        qualifiers=[QualifierFactory.create()],
+        application_rounds=[ApplicationRoundFactory.create()],
+        reservation_set=[ReservationFactory.create()],
+    )
+    query = reservation_units_query(fields=fields)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 1
+    assert response.node(0) == {
+        "pk": reservation_unit.pk,
         #
+        # Forward
         "spaces": [
             {
                 "nameFi": reservation_unit.spaces.first().name_fi,
@@ -415,7 +437,7 @@ def test_reservation_unit__query__all_fields(graphql):
                 "nameFi": reservation_unit.purposes.first().name_fi,
             },
         ],
-        "equipment": [
+        "equipments": [
             {
                 "nameFi": reservation_unit.equipments.first().name_fi,
             },
@@ -436,27 +458,15 @@ def test_reservation_unit__query__all_fields(graphql):
             },
         ],
         #
+        # Reverse
         "applicationRounds": [
             {
                 "nameFi": reservation_unit.application_rounds.first().name_fi,
             },
         ],
-        "pricings": [
-            {
-                "begins": reservation_unit.pricings.first().begins.isoformat(),
-                "taxPercentage": {
-                    "value": str(reservation_unit.pricings.first().tax_percentage.value),
-                },
-            },
-        ],
-        "reservations": [
+        "reservationSet": [
             {
                 "begin": reservation_unit.reservation_set.first().begin.isoformat(),
-            },
-        ],
-        "images": [
-            {
-                "largeUrl": reservation_unit.images.first().large_url,
             },
         ],
     }
@@ -575,79 +585,6 @@ def test_reservation_unit__query__reservation_blocks_whole_day(graphql):
     }
 
 
-def test_reservation_unit__query__include_reservations_with_same_components(graphql):
-    space_1 = SpaceFactory.create()
-    space_2 = SpaceFactory.create()
-    reservation_unit_1 = ReservationUnitFactory.create(spaces=[space_1, space_2])
-    reservation_unit_2 = ReservationUnitFactory.create(spaces=[space_2])
-
-    reservation_1: Reservation = ReservationFactory.create(
-        name="foo",
-        begin=datetime.datetime(2024, 1, 1, hour=12, tzinfo=datetime.UTC),
-        end=datetime.datetime(2024, 1, 1, hour=14, tzinfo=datetime.UTC),
-        reservation_unit=[reservation_unit_1],
-        state=ReservationStateChoice.CONFIRMED,
-    )
-    reservation_2: Reservation = ReservationFactory.create(
-        name="bar",
-        begin=datetime.datetime(2024, 1, 2, hour=13, tzinfo=datetime.UTC),
-        end=datetime.datetime(2024, 1, 2, hour=15, tzinfo=datetime.UTC),
-        reservation_unit=[reservation_unit_2],
-        state=ReservationStateChoice.CONFIRMED,
-    )
-
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
-    fields = """
-        pk
-        reservations {
-            name
-            begin
-            end
-        }
-    """
-    query = reservation_units_query(
-        fields=fields,
-        reservations__from=datetime.datetime(2024, 1, 1).date().isoformat(),
-        reservations__to=datetime.datetime(2024, 1, 2).date().isoformat(),
-        reservations__include_with_same_components=True,
-    )
-
-    response = graphql(query)
-
-    assert response.has_errors is False, response
-    assert len(response.edges) == 2
-    assert response.node(0) == {
-        "pk": reservation_unit_1.pk,
-        "reservations": [
-            {
-                "name": "foo",
-                "begin": reservation_1.begin.isoformat(),
-                "end": reservation_1.end.isoformat(),
-            },
-            {
-                "name": "bar",
-                "begin": reservation_2.begin.isoformat(),
-                "end": reservation_2.end.isoformat(),
-            },
-        ],
-    }
-    assert response.node(1) == {
-        "pk": reservation_unit_2.pk,
-        "reservations": [
-            {
-                "name": "foo",
-                "begin": reservation_1.begin.isoformat(),
-                "end": reservation_1.end.isoformat(),
-            },
-            {
-                "name": "bar",
-                "begin": reservation_2.begin.isoformat(),
-                "end": reservation_2.end.isoformat(),
-            },
-        ],
-    }
-
-
 def test_reservation_unit__query__timeslots(graphql):
     # given:
     # - There is a reservation unit with timeslots
@@ -740,7 +677,7 @@ def test_reservation_unit__query__payment_product(graphql):
     ReservationUnitFactory.create(payment_merchant=merchant, payment_product=product)
 
     graphql.login_with_superuser()
-    query = reservation_units_query(fields="paymentProduct { pk merchantPk }")
+    query = reservation_units_query(fields="paymentProduct { pk merchant { pk } }")
     response = graphql(query)
 
     assert response.has_errors is False, response.errors
@@ -748,6 +685,8 @@ def test_reservation_unit__query__payment_product(graphql):
     assert response.node(0) == {
         "paymentProduct": {
             "pk": str(product.id),
-            "merchantPk": str(merchant.id),
+            "merchant": {
+                "pk": str(merchant.id),
+            },
         },
     }

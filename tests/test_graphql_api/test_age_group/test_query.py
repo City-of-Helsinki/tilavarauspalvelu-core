@@ -1,9 +1,9 @@
 from functools import partial
 
 import pytest
+from graphene_django_extensions.testing import build_query
 
 from tests.factories import AgeGroupFactory
-from tests.gql_builders import build_query
 from tests.helpers import UserType
 
 # Applied to all tests

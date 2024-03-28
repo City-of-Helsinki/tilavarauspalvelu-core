@@ -1,7 +1,11 @@
+from __future__ import annotations
+
 import datetime
+from decimal import Decimal
+from typing import TYPE_CHECKING
 
 from django.db import models
-from django.utils import timezone
+from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
 
@@ -15,266 +19,149 @@ from reservations.choices import (
 from reservations.querysets import ReservationManager
 from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 
+if TYPE_CHECKING:
+    from applications.models import City
+    from reservations.models import (
+        AgeGroup,
+        RecurringReservation,
+        ReservationCancelReason,
+        ReservationDenyReason,
+        ReservationPurpose,
+    )
+    from users.models import User
+
+
 __all__ = [
     "Reservation",
 ]
 
 
 class Reservation(SerializableMixin, models.Model):
-    reservee_type = models.CharField(
+    # Basic information
+    sku: str = models.CharField(max_length=255, blank=True, default="")
+    name: str = models.CharField(max_length=255, blank=True, default="")
+    description: str = models.CharField(max_length=255, blank=True, default="")
+    num_persons: int | None = models.fields.PositiveIntegerField(null=True, blank=True)
+    state: str = models.CharField(
+        max_length=32,
+        choices=ReservationStateChoice.choices,
+        default=ReservationStateChoice.CREATED,
+        db_index=True,
+    )
+    type: str | None = models.CharField(
         max_length=50,
-        choices=CustomerTypeChoice.choices,
         null=True,
-        blank=True,
-        help_text="Type of reservee",
+        blank=False,
+        choices=ReservationTypeChoice.choices,
+        default=ReservationTypeChoice.NORMAL,
     )
-    reservee_first_name = models.CharField(
-        verbose_name=_("Reservee first name"), max_length=255, blank=True, default=""
-    )
-    reservee_last_name = models.CharField(verbose_name=_("Reservee last name"), max_length=255, blank=True, default="")
-    reservee_organisation_name = models.CharField(
-        verbose_name=_("Reservee organisation name"),
-        max_length=255,
-        blank=True,
-        default="",
-    )
-    reservee_phone = models.CharField(verbose_name=_("Reservee phone"), max_length=255, blank=True, default="")
-    reservee_email = models.EmailField(verbose_name=_("Reservee email"), null=True, blank=True)
-    reservee_id = models.CharField(
-        verbose_name=_("Reservee ID"),
-        max_length=255,
-        blank=True,
-        default="",
-        help_text="Reservee's business or association identity code",
-    )
-    reservee_is_unregistered_association = models.BooleanField(
-        verbose_name=_("Reservee is an unregistered association"),
-        null=False,
-        default=False,
-        blank=True,
-    )
-    reservee_address_street = models.CharField(
-        verbose_name=_("Reservee address street"),
-        max_length=255,
-        blank=True,
-        default="",
-    )
-    reservee_address_city = models.CharField(
-        verbose_name=_("Reservee address city"),
-        max_length=255,
-        blank=True,
-        default="",
-    )
-    reservee_address_zip = models.CharField(
-        verbose_name=_("Reservee address zip code"),
-        max_length=255,
-        blank=True,
-        default="",
-    )
-    reservee_language = models.CharField(
-        verbose_name=_("Preferred language of reservee"),
+    cancel_details: str = models.TextField(blank=True, default="")
+    handling_details: str = models.TextField(blank=True, default="")
+    working_memo: str = models.TextField(null=True, blank=True, default="")
+
+    # Time information
+    begin: datetime.datetime = models.DateTimeField()
+    end: datetime.datetime = models.DateTimeField()
+    buffer_time_before: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
+    buffer_time_after: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
+    handled_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
+    confirmed_at: datetime.datetime | None = models.DateTimeField(null=True)
+    created_at: datetime.datetime | None = models.DateTimeField(null=True, default=now)
+
+    # Pricing details
+    price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    price_net: Decimal = models.DecimalField(max_digits=20, decimal_places=6, default=0)
+    non_subsidised_price: Decimal = models.DecimalField(max_digits=20, decimal_places=2, default=0)
+    non_subsidised_price_net: Decimal = models.DecimalField(max_digits=20, decimal_places=6, default=0)
+    unit_price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    tax_percentage_value: Decimal = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+
+    # Free of charge information
+    applying_for_free_of_charge: bool = models.BooleanField(null=False, default=False, blank=True)
+    free_of_charge_reason: bool | None = models.TextField(null=True, blank=True)
+
+    # Reservee information
+    reservee_id: str = models.CharField(max_length=255, blank=True, default="")
+    reservee_first_name: str = models.CharField(max_length=255, blank=True, default="")
+    reservee_last_name: str = models.CharField(max_length=255, blank=True, default="")
+    reservee_email: str | None = models.EmailField(null=True, blank=True)
+    reservee_phone: str = models.CharField(max_length=255, blank=True, default="")
+    reservee_organisation_name: str = models.CharField(max_length=255, blank=True, default="")
+    reservee_address_street: str = models.CharField(max_length=255, blank=True, default="")
+    reservee_address_city: str = models.CharField(max_length=255, blank=True, default="")
+    reservee_address_zip: str = models.CharField(max_length=255, blank=True, default="")
+    reservee_is_unregistered_association: bool = models.BooleanField(null=False, default=False, blank=True)
+    reservee_language: str = models.CharField(
         max_length=255,
         blank=True,
         default="",
         choices=RESERVEE_LANGUAGE_CHOICES,
     )
-    billing_first_name = models.CharField(verbose_name=_("Billing first name"), max_length=255, blank=True, default="")
-    billing_last_name = models.CharField(verbose_name=_("Billing last name"), max_length=255, blank=True, default="")
-    billing_phone = models.CharField(verbose_name=_("Billing phone"), max_length=255, blank=True, default="")
-    billing_email = models.EmailField(verbose_name=_("Billing email"), null=True, blank=True)
-    billing_address_street = models.CharField(
-        verbose_name=_("Billing address street"),
-        max_length=255,
+    reservee_type: str | None = models.CharField(
+        max_length=50,
+        choices=CustomerTypeChoice.choices,
+        null=True,
         blank=True,
-        default="",
     )
-    billing_address_city = models.CharField(
-        verbose_name=_("Billing address city"),
-        max_length=255,
+
+    # Billing information
+    billing_first_name: str = models.CharField(max_length=255, blank=True, default="")
+    billing_last_name: str = models.CharField(max_length=255, blank=True, default="")
+    billing_email: str | None = models.EmailField(null=True, blank=True)
+    billing_phone: str = models.CharField(max_length=255, blank=True, default="")
+    billing_address_street: str = models.CharField(max_length=255, blank=True, default="")
+    billing_address_city: str = models.CharField(max_length=255, blank=True, default="")
+    billing_address_zip: str = models.CharField(max_length=255, blank=True, default="")
+
+    # Relations
+    reservation_unit = models.ManyToManyField("reservation_units.ReservationUnit")
+
+    user: User | None = models.ForeignKey(
+        "users.User",
+        related_name="reservations",
+        on_delete=models.SET_NULL,
+        null=True,
         blank=True,
-        default="",
     )
-    billing_address_zip = models.CharField(
-        verbose_name=_("Billing address zip code"),
-        max_length=255,
+    recurring_reservation: RecurringReservation | None = models.ForeignKey(
+        "reservations.RecurringReservation",
+        related_name="reservations",
+        on_delete=models.PROTECT,
+        null=True,
         blank=True,
-        default="",
     )
-    home_city = models.ForeignKey(
+    deny_reason: ReservationDenyReason | None = models.ForeignKey(
+        "reservations.ReservationDenyReason",
+        related_name="reservations",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+    )
+    cancel_reason: ReservationCancelReason | None = models.ForeignKey(
+        "reservations.ReservationCancelReason",
+        related_name="reservations",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+    )
+    purpose: ReservationPurpose | None = models.ForeignKey(
+        "reservations.ReservationPurpose",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    home_city: City | None = models.ForeignKey(
         "applications.City",
-        verbose_name=_("Home city"),
         related_name="home_city_reservation",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        help_text="Home city of the group or association",
     )
-    age_group = models.ForeignKey(
+    age_group: AgeGroup | None = models.ForeignKey(
         "reservations.AgeGroup",
-        verbose_name=_("Age group"),
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-    )
-    applying_for_free_of_charge = models.BooleanField(
-        verbose_name=_("Reservee is applying for a free-of-charge reservation"),
-        null=False,
-        default=False,
-        blank=True,
-    )
-    free_of_charge_reason = models.TextField(
-        verbose_name=_("Reason for applying for a free-of-charge reservation"),
-        null=True,
-        blank=True,
-    )
-
-    sku = models.CharField(verbose_name=_("SKU"), max_length=255, blank=True, default="")
-    name = models.CharField(verbose_name=_("Name"), max_length=255, blank=True, default="")
-    description = models.CharField(verbose_name=_("Description"), max_length=255, blank=True, default="")
-
-    state = models.CharField(
-        max_length=32,
-        choices=ReservationStateChoice.choices,
-        verbose_name=_("State"),
-        default=ReservationStateChoice.CREATED,
-        db_index=True,
-    )
-
-    user = models.ForeignKey(
-        "users.User",
-        null=True,
-        verbose_name=_("User"),
-        on_delete=models.SET_NULL,
-        related_name="reservations",
-    )
-    begin = models.DateTimeField(verbose_name=_("Begin time"))
-    end = models.DateTimeField(verbose_name=_("End time"))
-
-    buffer_time_before: datetime.timedelta = models.DurationField(
-        verbose_name=_("Buffer time before"),
-        default=datetime.timedelta(),
-        blank=True,
-    )
-    buffer_time_after: datetime.timedelta = models.DurationField(
-        verbose_name=_("Buffer time after"),
-        default=datetime.timedelta(),
-        blank=True,
-    )
-
-    reservation_unit = models.ManyToManyField("reservation_units.ReservationUnit", verbose_name=_("Reservation unit"))
-
-    recurring_reservation = models.ForeignKey(
-        "reservations.RecurringReservation",
-        verbose_name=_("Recurring reservation"),
-        related_name="reservations",
-        on_delete=models.PROTECT,
-        null=True,
-        blank=True,
-    )
-
-    num_persons = models.fields.PositiveIntegerField(verbose_name=_("Number of persons"), null=True, blank=True)
-
-    purpose = models.ForeignKey(
-        "reservations.ReservationPurpose",
-        verbose_name=_("Reservation purpose"),
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-    )
-
-    cancel_reason = models.ForeignKey(
-        "reservations.ReservationCancelReason",
-        verbose_name=_("Reason for cancellation"),
-        related_name="reservations",
-        on_delete=models.PROTECT,
-        null=True,
-        blank=True,
-    )
-
-    cancel_details = models.TextField(verbose_name=_("Details for this reservation's cancellation"), blank=True)
-
-    created_at = models.DateTimeField(verbose_name=_("Created at"), null=True, default=timezone.now)
-    confirmed_at = models.DateTimeField(verbose_name=_("Confirmed at"), null=True)
-
-    unit_price = models.DecimalField(
-        verbose_name=_("Unit price"),
-        max_digits=10,
-        decimal_places=2,
-        default=0,
-        help_text="The unit price of this particular reservation",
-    )
-    tax_percentage_value = models.DecimalField(
-        verbose_name=_("Tax percentage value"),
-        max_digits=5,
-        decimal_places=2,
-        default=0,
-        help_text="The value of the tax percentage for this particular reservation",
-    )
-    price = models.DecimalField(
-        verbose_name=_("Price"),
-        max_digits=10,
-        decimal_places=2,
-        default=0,
-        help_text="The price of this particular reservation including VAT",
-    )
-    price_net = models.DecimalField(
-        verbose_name=_("Price net"),
-        max_digits=20,
-        decimal_places=6,
-        default=0,
-        help_text="The price of this particular reservation excluding VAT",
-    )
-    non_subsidised_price = models.DecimalField(
-        verbose_name=_("Non subsidised price"),
-        max_digits=20,
-        decimal_places=2,
-        default=0,
-        help_text="The non subsidised price of this reservation including VAT",
-    )
-    non_subsidised_price_net = models.DecimalField(
-        verbose_name=_("Non subsidised net price"),
-        max_digits=20,
-        decimal_places=6,
-        default=0,
-        help_text="The non subsidised price of this reservation excluding VAT",
-    )
-    handled_at = models.DateTimeField(
-        verbose_name=_("Handled at"),
-        null=True,
-        blank=True,
-        help_text="When this reservation was handled.",
-    )
-
-    deny_reason = models.ForeignKey(
-        "reservations.ReservationDenyReason",
-        verbose_name=_("Reason for deny"),
-        related_name="reservations",
-        on_delete=models.PROTECT,
-        null=True,
-        blank=True,
-    )
-
-    handling_details = models.TextField(
-        verbose_name=_("Handling details for this reservation"),
-        blank=True,
-        help_text="Additional details for denying or approving the reservation",
-    )
-
-    working_memo = models.TextField(
-        verbose_name=_("Working memo"),
-        null=True,
-        blank=True,
-        default="",
-        help_text="Working memo for staff users.",
-    )
-
-    type = models.CharField(
-        max_length=50,
-        choices=ReservationTypeChoice.choices,
-        null=True,
-        blank=False,
-        default=ReservationTypeChoice.NORMAL,
-        help_text="Type of reservation",
     )
 
     objects = ReservationManager()
@@ -283,6 +170,9 @@ class Reservation(SerializableMixin, models.Model):
     class Meta:
         db_table = "reservation"
         base_manager_name = "objects"
+        ordering = [
+            "begin",
+        ]
 
     # For GDPR API
     serialize_fields = (
@@ -312,14 +202,6 @@ class Reservation(SerializableMixin, models.Model):
 
     def __str__(self) -> str:
         return f"{self.name} ({self.type})"
-
-    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        super().save(
-            force_insert=force_insert,
-            force_update=force_update,
-            using=using,
-            update_fields=update_fields,
-        )
 
     @property
     def requires_handling(self) -> bool:

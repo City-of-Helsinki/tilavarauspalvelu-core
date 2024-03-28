@@ -14,9 +14,9 @@ pytestmark = [
 def test_equipment__update__regular_user_cannot_update(graphql):
     equipment = EquipmentFactory.create(name="foo")
 
-    data = {"pk": equipment.pk, "nameFi": "bar", "categoryPk": equipment.category.pk}
+    data = {"pk": equipment.pk, "name": "bar", "category": equipment.category.pk}
 
     graphql.login_user_based_on_type(UserType.REGULAR)
     response = graphql(UPDATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "No permission to mutate"
+    assert response.error_message() == "No permission to update."

@@ -96,7 +96,7 @@ class NullableSubFactory(SubFactory, Generic[TModel]):
 class ManyFactory(PostGeneration, Generic[TModel]):
     """Factory for many-related fields."""
 
-    def __init__(self, factory: str | Factory) -> None:
+    def __init__(self, factory: str | type[Factory]) -> None:
         super().__init__(function=self.generate)
         self.field_name: str = ""
         self.factory_wrapper = _FactoryWrapper(factory)

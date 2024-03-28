@@ -18,11 +18,12 @@ def test_resource__create(graphql):
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     data = {
+        "name": "abc",
         "nameFi": "a",
         "nameEn": "b",
         "nameSv": "c",
-        "spacePk": space.pk,
-        "locationType": ResourceLocationType.FIXED.value,
+        "space": space.pk,
+        "locationType": ResourceLocationType.FIXED.value.upper(),
     }
     response = graphql(CREATE_MUTATION, input_data=data)
 
@@ -42,11 +43,12 @@ def test_resource__create__missing_name(graphql, field):
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     data = {
+        "name": "abc",
         "nameFi": "a",
         "nameEn": "b",
         "nameSv": "c",
-        "spacePk": space.pk,
-        "locationType": ResourceLocationType.FIXED.value,
+        "space": space.pk,
+        "locationType": ResourceLocationType.FIXED.value.upper(),
     }
     del data[field]
     response = graphql(CREATE_MUTATION, input_data=data)
@@ -60,10 +62,11 @@ def test_resource__create__no_space_fixed_location(graphql):
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     data = {
+        "name": "abc",
         "nameFi": "a",
         "nameEn": "b",
         "nameSv": "c",
-        "locationType": ResourceLocationType.FIXED.value,
+        "locationType": ResourceLocationType.FIXED.value.upper(),
     }
     response = graphql(CREATE_MUTATION, input_data=data)
 
@@ -74,10 +77,11 @@ def test_resource__create__no_space_movable_location(graphql):
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     data = {
+        "name": "abc",
         "nameFi": "a",
         "nameEn": "b",
         "nameSv": "c",
-        "locationType": ResourceLocationType.MOVABLE.value,
+        "locationType": ResourceLocationType.MOVABLE.value.upper(),
     }
     response = graphql(CREATE_MUTATION, input_data=data)
 
@@ -95,12 +99,13 @@ def test_resource__create__wrong_location_type(graphql):
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     data = {
+        "name": "abc",
         "nameFi": "a",
         "nameEn": "b",
         "nameSv": "c",
-        "spacePk": space.pk,
+        "space": space.pk,
         "locationType": "foo",
     }
     response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.error_message().startswith("Wrong type of location type.")
+    assert response.error_message().startswith("Variable '$input'")

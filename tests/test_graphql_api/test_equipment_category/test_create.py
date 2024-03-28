@@ -12,7 +12,7 @@ pytestmark = [
 
 
 def test_equipment_category__create(graphql):
-    data = {"nameFi": "foo"}
+    data = {"name": "foo"}
 
     graphql.login_user_based_on_type(UserType.SUPERUSER)
     response = graphql(CREATE_MUTATION, input_data=data)
@@ -24,10 +24,11 @@ def test_equipment_category__create(graphql):
 
 
 def test_equipment_category__create__empty_name(graphql):
-    data = {"nameFi": ""}
+    data = {"name": ""}
 
     graphql.login_user_based_on_type(UserType.SUPERUSER)
     response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "nameFi is required."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("name") == ["Tämä kenttä ei voi olla tyhjä."]
     assert EquipmentCategory.objects.count() == 0

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime, timedelta
 from decimal import Decimal
 
@@ -77,6 +79,14 @@ class OrderStatus(models.TextChoices):
     PAID = "PAID", _("Paid")
     PAID_MANUALLY = "PAID_MANUALLY", _("Paid manually")
     REFUNDED = "REFUNDED", _("Refunded")
+
+    @classmethod
+    def needs_update_statuses(cls) -> list[OrderStatus]:
+        return [
+            OrderStatus.DRAFT,
+            OrderStatus.EXPIRED,
+            OrderStatus.CANCELLED,
+        ]
 
 
 class Language(models.TextChoices):
@@ -184,7 +194,7 @@ class PaymentOrder(models.Model):
     def __str__(self) -> str:
         return f"PaymentOrder {self.pk}"
 
-    def save(self, *args, **kwargs) -> "PaymentOrder":
+    def save(self, *args, **kwargs) -> PaymentOrder:
         self.full_clean()
         return super().save(*args, **kwargs)
 

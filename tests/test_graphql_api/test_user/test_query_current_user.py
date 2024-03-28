@@ -109,7 +109,13 @@ def test_query_current_user__general_roles(graphql):
     # given:
     # - There is a general admin in the system
     # - That admin is using the system
-    user = UserFactory.create_with_general_permissions(perms=["can_manage_general_roles"])
+    user = UserFactory.create_with_general_permissions(
+        first_name="Unique",
+        last_name="Admin",
+        perms=["can_manage_general_roles"],
+        code="new_admin",
+    )
+
     general_role: GeneralRole = user.general_roles.first()
     graphql.force_login(user)
 
@@ -123,9 +129,9 @@ def test_query_current_user__general_roles(graphql):
                 verboseNameFi
                 verboseNameSv
                 verboseNameEn
-            }
-            permissions {
-                permission
+                permissions {
+                    permission
+                }
             }
         }
     """
@@ -148,8 +154,13 @@ def test_query_current_user__general_roles(graphql):
                     "verboseNameFi": general_role.role.verbose_name_fi,
                     "verboseNameSv": general_role.role.verbose_name_sv,
                     "verboseNameEn": general_role.role.verbose_name_en,
+                    "permissions": [
+                        {
+                            "permission": perm.permission.upper(),
+                        }
+                        for perm in general_role.role.permissions.all()
+                    ],
                 },
-                "permissions": [{"permission": perm.permission} for perm in general_role.role.permissions.all()],
             },
         ],
     }
@@ -162,7 +173,9 @@ def test_query_current_user__service_sector_roles(graphql):
     # - That admin is using the system
     sector = ServiceSectorFactory.create()
     user = UserFactory.create_with_service_sector_permissions(
-        service_sector=sector, perms=["can_manage_service_sector_roles"]
+        service_sector=sector,
+        perms=["can_manage_service_sector_roles"],
+        code="new_admin",
     )
     service_sector_role: ServiceSectorRole = user.service_sector_roles.first()
     graphql.force_login(user)
@@ -177,12 +190,12 @@ def test_query_current_user__service_sector_roles(graphql):
                 verboseNameFi
                 verboseNameSv
                 verboseNameEn
+                permissions {
+                    permission
+                }
             }
             serviceSector {
                 nameFi
-            }
-            permissions {
-                permission
             }
         }
     """
@@ -205,9 +218,16 @@ def test_query_current_user__service_sector_roles(graphql):
                     "verboseNameFi": service_sector_role.role.verbose_name_fi,
                     "verboseNameSv": service_sector_role.role.verbose_name_sv,
                     "verboseNameEn": service_sector_role.role.verbose_name_en,
+                    "permissions": [
+                        {
+                            "permission": perm.permission.upper(),
+                        }
+                        for perm in service_sector_role.role.permissions.all()
+                    ],
                 },
-                "serviceSector": {"nameFi": sector.name_fi},
-                "permissions": [{"permission": perm.permission} for perm in service_sector_role.role.permissions.all()],
+                "serviceSector": {
+                    "nameFi": sector.name_fi,
+                },
             },
         ],
     }
@@ -219,7 +239,11 @@ def test_query_current_user__unit_admin(graphql):
     # - There is a unit admin for that unit in the system
     # - That admin is using the system
     unit = UnitFactory.create()
-    user = UserFactory.create_with_unit_permissions(unit=unit, perms=["can_manage_unit_roles"])
+    user = UserFactory.create_with_unit_permissions(
+        unit=unit,
+        perms=["can_manage_unit_roles"],
+        code="new_admin",
+    )
     unit_role: UnitRole = user.unit_roles.first()
     graphql.force_login(user)
 
@@ -233,15 +257,15 @@ def test_query_current_user__unit_admin(graphql):
                 verboseNameFi
                 verboseNameSv
                 verboseNameEn
+                permissions {
+                    permission
+                }
             }
-            units {
+            unit {
                 nameFi
             }
-            unitGroups {
+            unitGroup {
                 name
-            }
-            permissions {
-                permission
             }
         }
     """
@@ -264,10 +288,19 @@ def test_query_current_user__unit_admin(graphql):
                     "verboseNameFi": unit_role.role.verbose_name_fi,
                     "verboseNameSv": unit_role.role.verbose_name_sv,
                     "verboseNameEn": unit_role.role.verbose_name_en,
+                    "permissions": [
+                        {
+                            "permission": perm.permission.upper(),
+                        }
+                        for perm in unit_role.role.permissions.all()
+                    ],
                 },
-                "units": [{"nameFi": unit.name_fi}],
-                "unitGroups": [],
-                "permissions": [{"permission": perm.permission} for perm in unit_role.role.permissions.all()],
+                "unit": [
+                    {
+                        "nameFi": unit.name_fi,
+                    },
+                ],
+                "unitGroup": [],
             },
         ],
     }

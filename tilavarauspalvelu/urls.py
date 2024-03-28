@@ -3,7 +3,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 from django.views.decorators.csrf import csrf_exempt
-from graphene_file_upload.django import FileUploadGraphQLView
+from graphene_django_extensions import FileUploadGraphQLView
 
 from api.legacy_rest_api.urls import legacy_outer
 from api.webhooks.urls import webhook_router
@@ -16,8 +16,13 @@ admin.site.autocomplete_view = lambda request, extra_context: real_autocomplete_
 real_catch_all_view = admin.site.catch_all_view
 admin.site.catch_all_view = lambda request, url, extra_context: real_catch_all_view(request, url)
 
+# Make it possible to turn off CSRF protection for the GraphQL endpoint for frontend graphql codegen
+graphql_view = FileUploadGraphQLView.as_view(graphiql=settings.DEBUG)
+if settings.GRAPHQL_CODEGEN_ENABLED:
+    graphql_view = csrf_exempt(graphql_view)  # NOSONAR
+
 urlpatterns = [
-    path("graphql/", csrf_exempt(FileUploadGraphQLView.as_view(graphiql=settings.DEBUG))),  # NOSONAR
+    path("graphql/", graphql_view),
     path("admin/", admin.site.urls, {"extra_context": {"version": settings.APP_VERSION}}),
     path("v1/", include(legacy_outer.urls)),
     path("v1/webhook/", include(webhook_router.urls)),

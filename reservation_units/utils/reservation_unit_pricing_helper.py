@@ -77,9 +77,9 @@ class ReservationUnitPricingHelper:
             raise GraphQLError("only ACTIVE and FUTURE pricings can be mutated")
 
     @classmethod
-    def calculate_vat_prices(cls, data: dict[str, Any]) -> dict[str, Any]:
+    def calculate_vat_prices(cls, data: dict[str, Any]) -> list[dict[str, Any]]:
         """Calculates vat prices from net prices and returns a dict of pricing data."""
-        pricings = data.get("pricings", {})
+        pricings: list[dict[str, Any]] = data.get("pricings", [])
 
         for pricing in pricings:
             highest_price = pricing.get("highest_price")

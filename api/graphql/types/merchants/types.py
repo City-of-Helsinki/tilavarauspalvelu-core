@@ -1,16 +1,20 @@
 import graphene
-from graphene_permissions.mixins import AuthNode
+from graphene_django_extensions import DjangoNode
 
-from api.graphql.extensions.base_types import TVPBaseConnection
-from api.graphql.extensions.legacy_helpers import OldPrimaryKeyObjectType
 from api.graphql.types.merchants.permissions import PaymentOrderPermission
 from common.date_utils import local_datetime
 from common.typing import GQLInfo
-from merchants.models import PaymentMerchant, PaymentOrder, PaymentProduct
+from merchants.models import OrderStatus, PaymentMerchant, PaymentOrder, PaymentProduct
+
+__all__ = [
+    "PaymentMerchantNode",
+    "PaymentOrderNode",
+    "PaymentProductNode",
+]
 
 
-class PaymentMerchantType(AuthNode, OldPrimaryKeyObjectType):
-    pk = graphene.String()
+class PaymentMerchantNode(DjangoNode):
+    pk = graphene.UUID()
 
     class Meta:
         model = PaymentMerchant
@@ -19,53 +23,41 @@ class PaymentMerchantType(AuthNode, OldPrimaryKeyObjectType):
             "name",
         ]
 
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
 
-
-class PaymentProductType(AuthNode, OldPrimaryKeyObjectType):
-    pk = graphene.String()
-    merchant_pk = graphene.String()
+class PaymentProductNode(DjangoNode):
+    pk = graphene.UUID()
 
     class Meta:
         model = PaymentProduct
-        fields = ["pk", "merchant_pk"]
-
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
-
-    def resolve_merchant_pk(root: PaymentProduct, info: GQLInfo) -> str:
-        return root.merchant.pk
+        fields = [
+            "pk",
+            "merchant",
+        ]
 
 
-class PaymentOrderType(AuthNode, OldPrimaryKeyObjectType):
-    permission_classes = (PaymentOrderPermission,)
-
-    order_uuid = graphene.String()
-    status = graphene.String()
-    payment_type = graphene.String()
-    processed_at = graphene.DateTime()
-    checkout_url = graphene.String()
-    receipt_url = graphene.String()
+class PaymentOrderNode(DjangoNode):
+    order_uuid = graphene.UUID()
+    refund_uuid = graphene.UUID()
     reservation_pk = graphene.String()
-    refund_uuid = graphene.String()
+    checkout_url = graphene.String()
     expires_in_minutes = graphene.Int()
+
+    status = graphene.Field(graphene.Enum.from_enum(OrderStatus))
 
     class Meta:
         model = PaymentOrder
         fields = [
             "order_uuid",
-            "status",
+            "refund_uuid",
             "payment_type",
-            "processed_at",
+            "status",
             "checkout_url",
             "receipt_url",
-            "reservation_pk",
-            "refund_uuid",
             "expires_in_minutes",
+            "processed_at",
+            "reservation_pk",
         ]
-        interfaces = (graphene.relay.Node,)
-        connection_class = TVPBaseConnection
+        permission_classes = [PaymentOrderPermission]
 
     def resolve_order_uuid(root: PaymentOrder, info: GQLInfo) -> str | None:
         return root.remote_id
