@@ -1,9 +1,8 @@
 from datetime import datetime, timedelta
 from uuid import uuid4
 
-from assertpy import assert_that
 from dateutil.relativedelta import relativedelta
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils.timezone import get_current_timezone, get_default_timezone
 from freezegun import freeze_time
 
@@ -28,7 +27,7 @@ class PruneInactiveReservationsTestCase(TestCase):
         twenty_minutes_ago = datetime.now(tz=get_current_timezone()) - timedelta(minutes=20)
         ReservationFactory(created_at=twenty_minutes_ago, state=ReservationStateChoice.CREATED)
         prune_inactive_reservations(older_than_minutes=20)
-        assert_that(Reservation.objects.exists()).is_false()
+        assert Reservation.objects.exists() is False
 
     def test_prune_reservations_does_not_delete_inactive_reservations_with_state(self):
         ignored_states = tuple(
@@ -38,13 +37,13 @@ class PruneInactiveReservationsTestCase(TestCase):
             twenty_minutes_ago = datetime.now(tz=get_current_timezone()) - timedelta(minutes=20)
             ReservationFactory(created_at=twenty_minutes_ago, state=state)
             prune_inactive_reservations(older_than_minutes=20)
-            assert_that(Reservation.objects.exists()).is_true()
+            assert Reservation.objects.exists() is True
 
     def test_prune_reservations_does_not_delete_recent_reservations(self):
         under_twenty_minutes_ago = datetime.now(tz=get_current_timezone()) - timedelta(minutes=19)
         ReservationFactory(created_at=under_twenty_minutes_ago, state=ReservationStateChoice.CREATED)
         prune_inactive_reservations(older_than_minutes=20)
-        assert_that(Reservation.objects.exists()).is_true()
+        assert Reservation.objects.exists() is True
 
 
 class PruneReservationStatisticsTestCase(TestCase):
@@ -57,10 +56,11 @@ class PruneReservationStatisticsTestCase(TestCase):
 
         prune_reservation_statistics(5)
 
-        assert_that(ReservationStatistic.objects.filter(reservation=delete).count()).is_zero()
-        assert_that(ReservationStatistic.objects.filter(reservation=keep).count()).is_equal_to(1)
+        assert ReservationStatistic.objects.filter(reservation=delete).exists() is False
+        assert ReservationStatistic.objects.filter(reservation=keep).count() == 1
 
 
+@override_settings(VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES=5)
 class PruneReservationsWithInactivePaymentsTestCase(TestCase):
     def test_prune_deletes_reservations_with_inactive_payments(self):
         now = datetime.now(tz=get_current_timezone())
@@ -86,8 +86,8 @@ class PruneReservationsWithInactivePaymentsTestCase(TestCase):
             )
 
         with freeze_time(now):
-            prune_reservation_with_inactive_payments(older_than_minutes=5)
-            assert_that(Reservation.objects.exists()).is_false()
+            prune_reservation_with_inactive_payments()
+            assert Reservation.objects.exists() is False
 
     def test_prune_does_not_delete_reservations_with_fresh_payments(self):
         now = datetime.now(tz=get_current_timezone())
@@ -125,8 +125,8 @@ class PruneReservationsWithInactivePaymentsTestCase(TestCase):
             )
 
         with freeze_time(now):
-            prune_reservation_with_inactive_payments(older_than_minutes=5)
-            assert_that(Reservation.objects.count()).is_equal_to(2)
+            prune_reservation_with_inactive_payments()
+            assert Reservation.objects.count() == 2
 
     def test_prune_does_not_delete_reservations_in_other_states(self):
         now = datetime.now(tz=get_current_timezone())
@@ -146,8 +146,8 @@ class PruneReservationsWithInactivePaymentsTestCase(TestCase):
                 )
 
             with freeze_time(now):
-                prune_reservation_with_inactive_payments(older_than_minutes=5)
-                assert_that(Reservation.objects.count()).is_equal_to(1)
+                prune_reservation_with_inactive_payments()
+                assert Reservation.objects.count() == 1
                 Reservation.objects.all().delete()
 
     def test_prune_does_not_delete_reservations_without_remote_id(self):
@@ -159,14 +159,14 @@ class PruneReservationsWithInactivePaymentsTestCase(TestCase):
             PaymentOrderFactory(reservation=reservation, status=OrderStatus.CANCELLED, remote_id=None)
 
         with freeze_time(now):
-            prune_reservation_with_inactive_payments(older_than_minutes=5)
-            assert_that(Reservation.objects.exists()).is_true()
+            prune_reservation_with_inactive_payments()
+            assert Reservation.objects.exists() is True
 
     def test_prune_does_not_delete_reservations_without_order(self):
         ReservationFactory(name="do not delete_me", state=ReservationStateChoice.WAITING_FOR_PAYMENT)
 
-        prune_reservation_with_inactive_payments(older_than_minutes=5)
-        assert_that(Reservation.objects.exists()).is_true()
+        prune_reservation_with_inactive_payments()
+        assert Reservation.objects.exists() is True
 
 
 class PruneRecurringReservationsTestCase(TestCase):
@@ -176,7 +176,7 @@ class PruneRecurringReservationsTestCase(TestCase):
             RecurringReservationFactory()
 
         prune_recurring_reservations(1)
-        assert_that(RecurringReservation.objects.exists()).is_false()
+        assert Reservation.objects.exists() is False
 
     def test_prune_recurring_reservations_does_not_delete_ones_with_reservations(self):
         day_ago = datetime.now(tz=get_default_timezone()) - timedelta(days=1)
@@ -190,9 +190,9 @@ class PruneRecurringReservationsTestCase(TestCase):
         prune_recurring_reservations(1)
 
         rec_1.refresh_from_db()
-        assert_that(rec_1.id).is_not_none()
+        assert rec_1.id is not None
 
-        assert_that(RecurringReservation.objects.count()).is_equal_to(1)
+        assert RecurringReservation.objects.count() == 1
 
     def test_prune_recurring_reservations_respects_remove_older_than_days(self):
         not_a_day_ago = datetime.now(tz=get_default_timezone()) - timedelta(hours=23, minutes=59)
@@ -200,4 +200,4 @@ class PruneRecurringReservationsTestCase(TestCase):
             RecurringReservationFactory(created=not_a_day_ago)
         prune_recurring_reservations(1)
 
-        assert_that(RecurringReservation.objects.exists()).is_true()
+        assert RecurringReservation.objects.exists() is True
