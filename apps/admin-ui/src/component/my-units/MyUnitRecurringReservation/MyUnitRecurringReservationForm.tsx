@@ -5,7 +5,6 @@ import {
   ReservationTypeChoice,
   type ReservationUnitNode,
 } from "common/types/gql-types";
-import { camelCase, get } from "lodash";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { Button, TextInput } from "hds-react";
@@ -203,10 +202,6 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
 
   const navigate = useNavigate();
 
-  const handleError = (error = "") => {
-    notifyError(t("ReservationDialog.saveFailed", { error }));
-  };
-
   const onSubmit = async (data: RecurringReservationForm) => {
     // TODO notifyError does a double translation somewhere
     if (!newReservations.success) {
@@ -231,7 +226,7 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
     try {
       const metaFields = filterNonNullable(
         reservationUnit?.metadataSet?.supportedFields
-      ).map(camelCase);
+      );
 
       const buffers = {
         before:
@@ -258,8 +253,9 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
         },
       });
     } catch (e) {
-      const err = get(e, "message");
-      handleError(err);
+      // eslint-disable-next-line no-console
+      console.warn("Exception in RecurringReservation", e);
+      notifyError(t("ReservationDialog.saveFailed"));
       // on exception in RecurringReservation (because we are catching the individual errors)
       // We don't need to cleanup the RecurringReservation that has zero connections.
       // Based on documentation backend will do this for us.

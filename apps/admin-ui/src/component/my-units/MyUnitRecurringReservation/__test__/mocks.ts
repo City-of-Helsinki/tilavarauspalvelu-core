@@ -11,38 +11,60 @@ import {
   CREATE_RECURRING_RESERVATION,
   GET_RESERVATIONS_IN_INTERVAL,
 } from "../queries";
+import { base64encode } from "common/src/helpers";
 
 const unitCommon = {
-  reservationStartInterval: ReservationStartInterval.Interval_15Mins,
   allowReservationsWithoutOpeningHours: true,
   authentication: Authentication.Weak,
+  bufferTimeAfter: 0,
+  bufferTimeBefore: 0,
   canApplyFreeOfCharge: false,
-  reservationBlockWholeDay: false,
-  bufferTimeBefore: null,
-  bufferTimeAfter: null,
-  __typename: "ReservationUnitNode",
+  contactInformation: "",
+  description: "",
   isArchived: false,
   isDraft: false,
+  name: "",
+  reservationStartInterval: ReservationStartInterval.Interval_15Mins,
+  reservationBlockWholeDay: false,
   requireIntroduction: false,
   requireReservationHandling: false,
   reservationKind: ReservationKind.Direct,
-  uuid: "",
-  id: "",
-  contactInformation: "",
+  reservationCancelledInstructions: "",
+  reservationConfirmedInstructions: "",
+  reservationPendingInstructions: "",
+  maxPersons: 10,
+  uuid: "be4fa7a2-05b7-11ee-be56-0242ac120004",
+  __typename: "ReservationUnitNode",
 } as const;
+
+const arrays = {
+  applicationRoundTimeSlots: [],
+  applicationRounds: [],
+  paymentTypes: [],
+  pricings: [],
+  purposes: [],
+  qualifiers: [],
+  equipments: [],
+  images: [],
+  resources: [],
+  services: [],
+  spaces: [],
+};
 
 export const units: ReservationUnitNode[] = [
   {
     ...unitCommon,
+    ...arrays,
     pk: 1,
+    id: base64encode(`ReservationUnitNode:${1}`),
     nameFi: "Unit",
-    images: [],
   },
   {
     ...unitCommon,
+    ...arrays,
     pk: 2,
+    id: base64encode(`ReservationUnitNode:${2}`),
     nameFi: "Absolute",
-    images: [],
   },
 ];
 

@@ -13,6 +13,7 @@ import type {
   QueryUnitArgs,
   ReservationUnitNodeReservationSetArgs,
   Maybe,
+  ReservationMetadataFieldNode,
 } from "common/types/gql-types";
 import {
   ReservationTypeChoice,
@@ -334,13 +335,10 @@ export const useCreateRecurringReservation = () => {
     reservationsToMake: NewReservationListItem[],
     // TODO why is this named unitPk?
     unitPk: number,
-    metaFields: string[],
+    metaFields: ReservationMetadataFieldNode[],
     buffers: { before?: number; after?: number }
   ): Promise<[number | undefined, ReservationMade[]]> => {
-    // TODO this is not correct
-    const metadataSetFields = metaFields;
-
-    const flattenedMetadataSetValues = flattenMetadata(data, metadataSetFields);
+    const flattenedMetadataSetValues = flattenMetadata(data, metaFields);
 
     const name = data.type === "BLOCKED" ? "BLOCKED" : data.seriesName ?? "";
 
