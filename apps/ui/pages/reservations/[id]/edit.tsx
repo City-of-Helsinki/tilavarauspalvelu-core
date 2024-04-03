@@ -6,13 +6,12 @@ import { useSession } from "@/hooks/auth";
 import { ReservationEdit } from "@/components/reservation/ReservationEdit";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
-import {
-  type Query,
-  type QueryReservationUnitArgs,
-  type QueryReservationArgs,
-  type ReservationUnitNodeReservableTimeSpansArgs,
-  type ReservationUnitNodeReservationSetArgs,
-  ReservationUnitNode,
+import type {
+  Query,
+  QueryReservationUnitArgs,
+  QueryReservationArgs,
+  ReservationUnitNodeReservableTimeSpansArgs,
+  ReservationUnitNodeReservationSetArgs,
 } from "common/types/gql-types";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import {
@@ -83,17 +82,13 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     const moreTimespans = filterNonNullable(
       additionalData?.reservationUnit?.reservableTimeSpans
     ).filter((n) => n?.startDatetime != null && n?.endDatetime != null);
-    const reservableTimeSpans = [...timespans, ...moreTimespans];
+    const reservableTimeSpans = filterNonNullable([
+      ...timespans,
+      ...moreTimespans,
+    ]);
     const reservations = filterNonNullable(
       additionalData?.reservationUnit?.reservationSet
     );
-
-    // FIXME
-    const reservationUnitChanged: ReservationUnitNode = {
-      ...reservationUnit,
-      reservableTimeSpans,
-      reservationSet: reservations,
-    };
 
     // TODO check for nulls and return notFound if necessary
     return {
@@ -103,7 +98,9 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         key: `${pk}-edit-${locale}`,
         pk,
         reservation: reservation ?? null,
-        reservationUnit: reservationUnitChanged ?? null,
+        reservations,
+        reservationUnit: reservationUnit ?? null,
+        reservableTimeSpans,
       },
     };
   }

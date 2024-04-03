@@ -215,6 +215,7 @@ export function ReservationEdit({
     userReservationsData?.reservations?.edges?.map((e) => e?.node)
   )
     .filter((n) => n.type === ReservationTypeChoice.Normal)
+    // why? the filter is already done in the query
     .filter((n) => RELATED_RESERVATION_STATES.includes(n.state));
 
   // TODO this should be redundant, use the reservationUnit.applicationRounds instead
@@ -228,7 +229,7 @@ export function ReservationEdit({
     ar.reservationUnits?.map((n) => n?.pk).includes(reservationUnit.pk)
   );
 
-  const [adjustReservationTimeMutation, { loading: isLoading }] = useMutation<
+  const [mutation, { loading: isLoading }] = useMutation<
     Mutation,
     MutationAdjustReservationTimeArgs
   >(ADJUST_RESERVATION_TIME, {
@@ -259,7 +260,7 @@ export function ReservationEdit({
     const endDate = new Date(end);
     endDate.setSeconds(0);
     endDate.setMilliseconds(0);
-    return adjustReservationTimeMutation({
+    return mutation({
       variables: {
         input: {
           begin: beginDate.toISOString(),

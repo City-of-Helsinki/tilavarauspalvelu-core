@@ -6,7 +6,7 @@ import styled from "styled-components";
 import { useRouter } from "next/router";
 import { Notification } from "hds-react";
 import { useMedia } from "react-use";
-import { isEqual, omit, pick } from "lodash";
+import { isEqual, omit } from "lodash";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { breakpoints } from "common/src/common/style";
 import { type OptionType } from "common/types/common";
@@ -272,8 +272,12 @@ function SearchSingle({ data: initData }: Props): JSX.Element {
 
   // TODO type this properly
   const onSearch = async (criteria: Record<string, string>) => {
-    const sortingCriteria = pick(router.query, ["sort", "order"]);
-    router.replace(singleSearchUrl({ ...criteria, ...sortingCriteria }));
+    const { sort, order } = router.query;
+    const newSort = sort != null && !Array.isArray(sort) ? sort : null;
+    const newOrder = order != null && !Array.isArray(order) ? order : null;
+    router.replace(
+      singleSearchUrl({ ...criteria, sort: newSort, order: newOrder })
+    );
   };
 
   const onRemove = (key?: string[], subItemKey?: string) => {
@@ -290,13 +294,15 @@ function SearchSingle({ data: initData }: Props): JSX.Element {
       newValues = omit(searchValues, key);
     }
 
-    const sortingCriteria = pick(router.query, ["sort", "order"]);
+    const { sort, order } = router.query;
+    const newSort = sort != null && !Array.isArray(sort) ? sort : null;
+    const newOrder = order != null && !Array.isArray(order) ? order : null;
 
     router.replace(
-      // TODO: fix this
       singleSearchUrl({
         ...newValues,
-        ...sortingCriteria,
+        sort: newSort,
+        order: newOrder,
         // a hacky way to bypass query cache
         textSearch:
           !key || key.includes("textSearch")

@@ -26,7 +26,6 @@ jest.mock("next-i18next", () => ({
 }));
 
 const defaultProps: Props = {
-  id: "foobar",
   items: [],
   totalCount: 0,
   fetchMore: jest.fn(),
@@ -35,7 +34,6 @@ const defaultProps: Props = {
     hasNextPage: true,
     hasPreviousPage: false,
   },
-  loading: false,
   loadingMore: false,
 };
 
@@ -75,11 +73,10 @@ describe("ListWithPagination", () => {
       items: getItems(itemCount),
       totalCount: itemCount,
       className: "test-hooky-2",
-      id: "barfoo",
       pageInfo: { hasNextPage: false, hasPreviousPage: false },
     });
 
-    expect(document.querySelector("#barfoo.test-hooky-2")).toBeInTheDocument();
+    expect(document.querySelector(".test-hooky-2")).toBeInTheDocument();
     expect(
       screen.queryByTestId("list-with-pagination__hit-count")
     ).toHaveTextContent("30 hakutulosta");
@@ -104,22 +101,6 @@ describe("ListWithPagination", () => {
     expect(
       screen.queryByTestId("list-with-pagination__list--container")
     ).toBeNull();
-    expect(
-      screen.queryByTestId("list-with-pagination__pagination--summary")
-    ).toBeNull();
-  });
-
-  test("should render loading state", () => {
-    renderComponent({
-      items: getItems(10),
-      totalCount: 20,
-      loading: true,
-    });
-
-    expect(
-      screen.queryByTestId("list-with-pagination__list--container")
-    ).toBeNull();
-    expect(screen.queryByTestId("list-with-pagination__hit-count")).toBeNull();
     expect(
       screen.queryByTestId("list-with-pagination__pagination--summary")
     ).toBeNull();

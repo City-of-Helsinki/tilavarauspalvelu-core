@@ -84,6 +84,10 @@ const EditStep1 = ({
   const genericTerms = useGenericTerms();
   const hasTermsOfUse = genericTerms != null;
 
+  // But why? shouldn't it be an error if the reservationUnit doesn't match the reservation?
+  // should we even be querying reservation.reservationUnit in the first place if we are making a separate
+  // query for the reservationUnit itself? and are we making or
+  // is it just reservationUnit = reservation.reservationUnit in the parent component?
   const frozenReservationUnit = useMemo(() => {
     return (
       reservation.reservationUnit?.find((n) => n?.pk === reservationUnit.pk) ??

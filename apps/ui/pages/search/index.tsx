@@ -217,7 +217,7 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
 
   const setStoredValues = useLocalStorage("reservationUnit-search", null)[1];
 
-  const { data, fetchMore, loading, error, networkStatus } = useQuery<
+  const { data, fetchMore, error, networkStatus } = useQuery<
     Query,
     QueryReservationUnitsArgs
   >(RESERVATION_UNITS, {
@@ -325,7 +325,6 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
       </HeadContainer>
       <BottomWrapper>
         <ListWithPagination
-          id="searchResultList"
           items={reservationUnits?.map((ru) => (
             <ReservationUnitCard
               selectReservationUnit={selectReservationUnit}
@@ -335,7 +334,6 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
               key={ru.id}
             />
           ))}
-          loading={loading}
           loadingMore={loadingMore}
           pageInfo={pageInfo}
           totalCount={totalCount ?? undefined}

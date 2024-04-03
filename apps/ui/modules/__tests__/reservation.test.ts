@@ -24,7 +24,7 @@ import {
 } from "../reservation";
 import mockTranslations from "../../public/locales/fi/prices.json";
 import { toApiDate } from "common/src/common/util";
-import { TFunction } from "i18next";
+import { type TFunction } from "i18next";
 
 jest.mock("next-i18next", () => ({
   i18n: {
@@ -102,8 +102,12 @@ describe("getDurationOptions", () => {
 
 const reservationUnit: ReservationUnitNode = {
   authentication: Authentication.Weak,
+  bufferTimeBefore: 0,
+  bufferTimeAfter: 0,
   canApplyFreeOfCharge: false,
   contactInformation: "",
+  description: "",
+  name: "Reservation unit",
   id: "123f4w90",
   uuid: "123f4w90",
   images: [],
@@ -120,11 +124,25 @@ const reservationUnit: ReservationUnitNode = {
       endDatetime: `${toApiDate(addDays(new Date(), index))}T20:00:00+00:00`,
     };
   }),
+  reservationConfirmedInstructions: "",
+  reservationPendingInstructions: "",
+  reservationCancelledInstructions: "",
+  applicationRounds: [],
+  purposes: [],
+  applicationRoundTimeSlots: [],
+  paymentTypes: [],
+  pricings: [],
+  qualifiers: [],
+  equipments: [],
+  resources: [],
+  services: [],
+  spaces: [],
   cancellationRule: {
     id: "fr8ejifod",
+    name: "Cancellation rule",
     needsHandling: false,
   },
-  reservations: [],
+  reservationSet: [],
   allowReservationsWithoutOpeningHours: false,
   requireReservationHandling: false,
   reservationBlockWholeDay: false,
@@ -133,10 +151,12 @@ const reservationUnit: ReservationUnitNode = {
 const reservation: ReservationNode = {
   id: "123f4w90",
   state: State.Confirmed,
-  price: 0,
+  price: "0",
+  bufferTimeBefore: 0,
+  bufferTimeAfter: 0,
   begin: addHours(startOfToday(), 34).toISOString(),
   end: addHours(startOfToday(), 35).toISOString(),
-  reservationUnits: [reservationUnit as ReservationUnitNode],
+  reservationUnit: [reservationUnit],
   handlingDetails: "",
 };
 
@@ -147,7 +167,7 @@ describe("canUserCancelReservation", () => {
       begin: new Date().toISOString(),
       end: addHours(new Date(), 1).toISOString(),
       id: "123",
-      reservationUnits: [
+      reservationUnit: [
         {
           ...reservationUnit,
           cancellationRule: {
@@ -164,7 +184,7 @@ describe("canUserCancelReservation", () => {
       ...reservation,
       begin: addMinutes(new Date(), 10).toISOString(),
       state: State.Confirmed,
-      reservationUnits: [
+      reservationUnit: [
         {
           ...reservationUnit,
           cancellationRule: {
@@ -180,7 +200,7 @@ describe("canUserCancelReservation", () => {
     const reservation_ = {
       begin: new Date().toISOString(),
       state: State.Confirmed,
-      reservationUnits: [
+      reservationUnit: [
         {
           cancellationRule: {
             needsHandling: false,
@@ -195,7 +215,7 @@ describe("canUserCancelReservation", () => {
     const reservation_ = {
       begin: new Date().toISOString(),
       state: State.RequiresHandling,
-      reservationUnits: [
+      reservationUnit: [
         {
           cancellationRule: {
             needsHandling: false,
@@ -210,7 +230,7 @@ describe("canUserCancelReservation", () => {
     const reservation_ = {
       begin: new Date().toISOString(),
       state: State.Confirmed,
-      reservationUnits: [
+      reservationUnit: [
         {
           cancellationRule: {
             needsHandling: false,
@@ -225,7 +245,7 @@ describe("canUserCancelReservation", () => {
   test("with 1 sec of buffer time", () => {
     const reservation_ = {
       begin: new Date().toISOString(),
-      reservationUnits: [
+      reservationUnit: [
         {
           cancellationRule: {
             needsHandling: false,
@@ -240,7 +260,7 @@ describe("canUserCancelReservation", () => {
   test("without cancellation rule", () => {
     const reservation_ = {
       begin: new Date().toISOString(),
-      reservationUnits: [{}],
+      reservationUnit: [{}],
     } as ReservationNode;
     expect(canUserCancelReservation(reservation_)).toBe(false);
   });
@@ -309,7 +329,7 @@ describe("getReservationCancellationReason", () => {
   const reservation2: ReservationNode = {
     ...reservation,
     begin: addMinutes(new Date(), 60).toISOString(),
-    reservationUnits: [
+    reservationUnit: [
       {
         ...reservationUnit,
         cancellationRule: {
@@ -325,7 +345,7 @@ describe("getReservationCancellationReason", () => {
     expect(
       getReservationCancellationReason({
         ...reservation2,
-        reservationUnits: [],
+        reservationUnit: [],
       })
     ).toBe("NO_CANCELLATION_RULE");
   });
@@ -339,7 +359,7 @@ describe("getReservationCancellationReason", () => {
     expect(
       getReservationCancellationReason({
         ...reservation,
-        reservationUnits: [resUnit],
+        reservationUnit: [resUnit],
       })
     ).toBe("NO_CANCELLATION_RULE");
   });
@@ -355,7 +375,7 @@ describe("getReservationCancellationReason", () => {
     expect(
       getReservationCancellationReason({
         ...reservation,
-        reservationUnits: [resUnit],
+        reservationUnit: [resUnit],
       })
     ).toBe("REQUIRES_HANDLING");
   });
@@ -384,7 +404,7 @@ describe("getReservationCancellationReason", () => {
         // duplicating these to be explicit what is tested
         begin: addHours(startOfToday(), 34).toISOString(),
         end: addHours(startOfToday(), 35).toISOString(),
-        reservationUnits: [resUnit],
+        reservationUnit: [resUnit],
       })
     ).toBe(null);
   });
@@ -403,7 +423,7 @@ describe("getReservationCancellationReason", () => {
         ...reservation,
         begin: addHours(new Date(), 12).toISOString(),
         end: addHours(new Date(), 13).toISOString(),
-        reservationUnits: [resUnit],
+        reservationUnit: [resUnit],
       })
     ).toBe("BUFFER");
   });
@@ -518,7 +538,7 @@ describe("canReservationBeChanged", () => {
       canReservationTimeBeChanged({
         reservation: {
           ...reservation,
-          reservationUnits: [
+          reservationUnit: [
             {
               ...reservationUnit,
               cancellationRule: null,
@@ -532,7 +552,7 @@ describe("canReservationBeChanged", () => {
       canReservationTimeBeChanged({
         reservation: {
           ...reservation,
-          reservationUnits: [
+          reservationUnit: [
             {
               ...reservationUnit,
               cancellationRule: {
@@ -551,7 +571,7 @@ describe("canReservationBeChanged", () => {
         reservation: {
           ...reservation,
           begin: addHours(new Date(), 1).toISOString(),
-          reservationUnits: [
+          reservationUnit: [
             {
               ...reservationUnit,
               cancellationRule: {
@@ -569,7 +589,7 @@ describe("canReservationBeChanged", () => {
         reservation: {
           ...reservation,
           begin: addHours(new Date(), 1).toISOString(),
-          reservationUnits: [
+          reservationUnit: [
             {
               ...reservationUnit,
               cancellationRule: {
