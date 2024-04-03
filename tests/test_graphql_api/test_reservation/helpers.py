@@ -63,6 +63,22 @@ def mock_profile_reader(profile_data: dict[str, Any] | None = None, **kwargs: An
         yield mock
 
 
+def next_hour(hours: int = 0, *, minutes: int = 0, days: int = 0) -> datetime.datetime:
+    """
+    Return a timestamp for the next hour.
+
+    Without any arguments, the timestamp will be for the next full hour, any additional arguments will be added to that.
+    e.g.
+    Now the time is 12:30
+    next_hour() -> 13:00
+    next_hour(hours=1, minutes=30) -> 14:30
+    """
+    now = local_datetime()
+    return now.replace(minute=0, second=0, microsecond=0) + datetime.timedelta(
+        hours=1 + hours, minutes=minutes, days=days
+    )
+
+
 def get_adjust_data(
     reservation: Reservation,
     **overrides: Any,
@@ -105,10 +121,7 @@ def get_staff_create_data(
     **overrides: Any,
 ) -> dict[str, Any]:
     if begin is None:
-        now = local_datetime()
-        next_hour = now.replace(minute=0, second=0, microsecond=0) + datetime.timedelta(hours=1)
-        begin = next_hour + datetime.timedelta(hours=1)
-
+        begin = next_hour(1)
     if end is None:
         end = begin + datetime.timedelta(hours=1)
 
@@ -128,10 +141,7 @@ def get_create_data(
     **overrides: Any,
 ) -> dict[str, Any]:
     if begin is None:
-        now = local_datetime()
-        next_hour = now.replace(minute=0, second=0, microsecond=0) + datetime.timedelta(hours=1)
-        begin = next_hour + datetime.timedelta(hours=1)
-
+        begin = next_hour(1)
     if end is None:
         end = begin + datetime.timedelta(hours=1)
 
@@ -186,10 +196,7 @@ def get_staff_adjust_data(
     **overrides: Any,
 ) -> dict[str, Any]:
     if begin is None:
-        now = local_datetime()
-        next_hour = now.replace(minute=0, second=0, microsecond=0) + datetime.timedelta(hours=1)
-        begin = next_hour + datetime.timedelta(hours=1)
-
+        begin = next_hour(1)
     if end is None:
         end = begin + datetime.timedelta(hours=1)
 
