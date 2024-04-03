@@ -2,6 +2,7 @@ import datetime
 from dataclasses import dataclass
 from typing import Annotated, Any, Self
 
+from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models import F, Manager, Q, QuerySet, Subquery, Sum
 from helsinki_gdpr.models import SerializableMixin
@@ -220,12 +221,13 @@ class ReservationQuerySet(QuerySet):
             created_at__lte=local_datetime() - datetime.timedelta(minutes=older_than_minutes),
         )
 
-    def with_inactive_payments(self: Self, older_than_minutes: int) -> Self:
+    def with_inactive_payments(self: Self) -> Self:
+        expiration_time = local_datetime() - datetime.timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
         return self.filter(
             state=ReservationStateChoice.WAITING_FOR_PAYMENT,
             payment_order__remote_id__isnull=False,
             payment_order__status__in=[OrderStatus.EXPIRED, OrderStatus.CANCELLED],
-            payment_order__created_at__lte=local_datetime() - datetime.timedelta(minutes=older_than_minutes),
+            payment_order__created_at__lte=expiration_time,
         )
 
     def affecting_reservations(self: Self, units: list[int], reservation_units: list[int]) -> Self:

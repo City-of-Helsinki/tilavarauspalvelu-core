@@ -13,10 +13,6 @@ from reservations.pruning import (
     prune_reservation_with_inactive_payments,
 )
 from tilavarauspalvelu.celery import app
-from tilavarauspalvelu.settings import VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES
-
-# The pruning task will be run periodically at every PRUNE_INTERVAL_SECONDS
-PRUNE_INTERVAL_SECONDS = 60 * 5
 
 # Reservations older than PRUNE_OLDER_THAN_MINUTES will be deleted when the task is run
 PRUNE_OLDER_THAN_MINUTES = 20
@@ -29,13 +25,11 @@ REMOVE_RECURRINGS_OLDER_THAN_DAYS = 1
 @app.task(name="prune_reservations")
 def _prune_reservations() -> None:
     prune_inactive_reservations(PRUNE_OLDER_THAN_MINUTES)
-    prune_reservation_with_inactive_payments(VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
+    prune_reservation_with_inactive_payments()
 
 
 @app.task(name="update_expired_orders")
-def update_expired_orders_task(
-    older_than_minutes=VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES,
-):
+def update_expired_orders_task(older_than_minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES):
     update_expired_orders(older_than_minutes)
 
 

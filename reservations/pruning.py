@@ -2,6 +2,7 @@ import datetime
 from logging import getLogger
 
 from dateutil.relativedelta import relativedelta
+from django.conf import settings
 from django.utils.timezone import get_default_timezone
 
 from reservations.models import RecurringReservation, Reservation, ReservationStatistic
@@ -19,15 +20,16 @@ def prune_inactive_reservations(older_than_minutes: int) -> None:
     logger.info(f"Pruned {num_deleted} inactive reservations.")
 
 
-def prune_reservation_with_inactive_payments(older_than_minutes: int) -> None:
+def prune_reservation_with_inactive_payments() -> None:
     """
     Finds reservations with order that was created given minutes ago and
     are expired or cancelled, and deletes them
     """
+    older_than_minutes = settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES
     logger.info(
         f"Pruning reservations with expired/cancelled orders that are older than {older_than_minutes} minutes..."
     )
-    num_deleted, _ = Reservation.objects.with_inactive_payments(older_than_minutes).delete()
+    num_deleted, _ = Reservation.objects.with_inactive_payments().delete()
     logger.info(f"Pruned {num_deleted} reservations with inactive orders")
 
 
