@@ -14,33 +14,26 @@ from reservations.pruning import (
 )
 from tilavarauspalvelu.celery import app
 
-# Reservations older than PRUNE_OLDER_THAN_MINUTES will be deleted when the task is run
-PRUNE_OLDER_THAN_MINUTES = 20
-
-REMOVE_STATS_OLDER_THAN_YEARS = 5
-
-REMOVE_RECURRINGS_OLDER_THAN_DAYS = 1
-
 
 @app.task(name="prune_reservations")
 def _prune_reservations() -> None:
-    prune_inactive_reservations(PRUNE_OLDER_THAN_MINUTES)
+    prune_inactive_reservations()
     prune_reservation_with_inactive_payments()
 
 
 @app.task(name="update_expired_orders")
-def update_expired_orders_task(older_than_minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES):
-    update_expired_orders(older_than_minutes)
+def update_expired_orders_task():
+    update_expired_orders()
 
 
 @app.task(name="prune_reservation_statistics")
-def prune_reservation_statistics_task(older_than_years=REMOVE_STATS_OLDER_THAN_YEARS):
-    prune_reservation_statistics(older_than_years=older_than_years)
+def prune_reservation_statistics_task():
+    prune_reservation_statistics()
 
 
 @app.task(name="prune_recurring_reservations")
 def prune_recurring_reservations_task() -> None:
-    prune_recurring_reservations(REMOVE_RECURRINGS_OLDER_THAN_DAYS)
+    prune_recurring_reservations()
 
 
 @app.task(
