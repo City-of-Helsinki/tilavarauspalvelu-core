@@ -1,3 +1,5 @@
+import datetime
+
 import pytest
 
 from applications.choices import WeekdayChoice
@@ -319,6 +321,65 @@ def test_reservation_unit__create__non_draft__reservation_kind_defaults_to_direc
 
     reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
     assert reservation_unit.reservation_kind == ReservationKind.DIRECT_AND_SEASON
+
+
+# Min/Max Reservation Duration #########################################################################################
+
+
+def test_reservation_unit__create__min_max_reservation_duration__valid(graphql):
+    data = get_create_non_draft_input_data()
+    data["minReservationDuration"] = int(datetime.timedelta(hours=2).total_seconds())
+    data["maxReservationDuration"] = int(datetime.timedelta(hours=3).total_seconds())
+
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False
+    assert ReservationUnit.objects.filter(pk=response.first_query_object["pk"]).exists()
+
+
+def test_reservation_unit__create__min_reservation_duration_greater_than_max_reservation_duration(graphql):
+    data = get_create_non_draft_input_data()
+    data["minReservationDuration"] = int(datetime.timedelta(hours=2).total_seconds())
+    data["maxReservationDuration"] = int(datetime.timedelta(hours=1).total_seconds())
+
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.error_message().startswith("Mutation was unsuccessful."), response
+    assert response.field_error_messages() == ["minReservationDuration can't be greater than maxReservationDuration"]
+    assert ReservationUnit.objects.count() == 0
+
+
+@pytest.mark.parametrize("field_name", ["minReservationDuration", "maxReservationDuration"])
+def test_reservation_unit__create__min_max_reservation_duration__shorter_than_start_interval(graphql, field_name):
+    data = get_create_non_draft_input_data()
+    assert "60" in data["reservationStartInterval"]
+    data[field_name] = int(datetime.timedelta(minutes=30).total_seconds())
+
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.error_message().startswith("Mutation was unsuccessful."), response
+    assert response.field_error_messages() == [f"{field_name} must be at least the reservation start interval"]
+    assert ReservationUnit.objects.count() == 0
+
+
+@pytest.mark.parametrize("field_name", ["minReservationDuration", "maxReservationDuration"])
+def test_reservation_unit__create__min_max_reservation_duration__not_multiple_of_start_interval(graphql, field_name):
+    data = get_create_non_draft_input_data()
+    assert "60" in data["reservationStartInterval"]
+    data[field_name] = int(datetime.timedelta(minutes=90).total_seconds())
+
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.error_message().startswith("Mutation was unsuccessful."), response
+    assert response.field_error_messages() == [f"{field_name} must be a multiple of the reservation start interval"]
+    assert ReservationUnit.objects.count() == 0
+
+
+# Timeslots ############################################################################################################
 
 
 def test_reservation_unit__create__with_timeslots(graphql):
