@@ -134,7 +134,7 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
         ReservableTimeSpanFactory.create(
             resource=reservation_unit.origin_hauki_resource,
             start_datetime=start_of_today - datetime.timedelta(days=1),
-            end_datetime=start_of_today + datetime.timedelta(days=2),
+            end_datetime=start_of_today + datetime.timedelta(days=3),
         )
 
         return reservation_unit
