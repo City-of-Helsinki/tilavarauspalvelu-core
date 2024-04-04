@@ -251,9 +251,7 @@ class ReservationSchedulingMixin:
                 ValidationErrorCodes.RESERVATION_UNIT_MIN_DURATION_NOT_EXCEEDED,
             )
 
-        interval_minutes = int(
-            reservation_unit.reservation_start_interval.replace("interval_", "").replace("_mins", "")
-        )
+        interval_minutes = ReservationStartInterval(reservation_unit.reservation_start_interval).as_number
         duration_minutes = duration.total_seconds() / 60
         if duration_minutes % interval_minutes > 0:
             raise ValidationErrorWithCode(
