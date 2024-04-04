@@ -22,7 +22,6 @@ import { GET_RESERVATION } from "@/modules/queries/reservation";
 import { toApiDate } from "common/src/common/util";
 import { addYears } from "date-fns";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
-import { CenterSpinner } from "@/components/common/common";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -82,27 +81,29 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     const moreTimespans = filterNonNullable(
       additionalData?.reservationUnit?.reservableTimeSpans
     ).filter((n) => n?.startDatetime != null && n?.endDatetime != null);
-    const reservableTimeSpans = filterNonNullable([
-      ...timespans,
-      ...moreTimespans,
-    ]);
+    const reservableTimeSpans = [...timespans, ...moreTimespans];
     const reservations = filterNonNullable(
       additionalData?.reservationUnit?.reservationSet
     );
 
     // TODO check for nulls and return notFound if necessary
-    return {
-      props: {
-        ...commonProps,
-        ...(await serverSideTranslations(locale ?? "fi")),
-        key: `${pk}-edit-${locale}`,
-        pk,
-        reservation: reservation ?? null,
-        reservations,
-        reservationUnit: reservationUnit ?? null,
-        reservableTimeSpans,
-      },
-    };
+    if (reservation != null && reservationUnit != null) {
+      return {
+        props: {
+          ...commonProps,
+          ...(await serverSideTranslations(locale ?? "fi")),
+          key: `${pk}-edit-${locale}`,
+          pk,
+          reservation,
+          // TODO the queries should be combined so that we don't need to do this
+          reservationUnit: {
+            ...reservationUnit,
+            reservableTimeSpans: reservableTimeSpans ?? null,
+            reservationSet: reservations ?? null,
+          },
+        },
+      };
+    }
   }
 
   return {
@@ -124,13 +125,6 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
   // NOTE should not end up here (SSR redirect to login)
   if (!isAuthenticated) {
     return <div>{t("common:error.notAuthenticated")}</div>;
-  }
-
-  // FIXME pass the reservation and reservationUnit to the components
-  // Should return notFound if reservation or reservationUnit is null
-  const isLoading = !reservation || !reservationUnit;
-  if (isLoading) {
-    return <CenterSpinner />;
   }
 
   return (

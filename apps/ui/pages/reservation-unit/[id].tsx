@@ -268,7 +268,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     const searchDuration = Number.isNaN(Number(queryParams.get("duration")))
       ? null
       : Number(queryParams.get("duration"));
-    const reservations = filterNonNullable(
+    const reservationSet = filterNonNullable(
       additionalData?.reservationUnit?.reservationSet
     );
     return {
@@ -276,10 +276,11 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
         key: `${pk}-${locale}`,
         ...commonProps,
         ...(await serverSideTranslations(locale ?? "fi")),
+        // TODO the queries should be combined so that we don't need to do this
         reservationUnit: {
           ...reservationUnit,
           reservableTimeSpans,
-          reservations,
+          reservationSet,
         },
         relatedReservationUnits,
         activeApplicationRounds,
@@ -757,7 +758,7 @@ const ReservationUnit = ({
     const calendarDuration = diff >= 90 ? `(${formatDuration(diff, t)})` : "";
 
     const existingReservations = filterNonNullable(
-      reservationUnit?.reservations
+      reservationUnit?.reservationSet
     );
     const focusEvent = {
       begin: focusSlot?.start,

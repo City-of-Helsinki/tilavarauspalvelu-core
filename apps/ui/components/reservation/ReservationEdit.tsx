@@ -234,6 +234,8 @@ export function ReservationEdit({
     MutationAdjustReservationTimeArgs
   >(ADJUST_RESERVATION_TIME, {
     errorPolicy: "all",
+    // TODO this should be handled in the mutation
+    // TODO don't print the error message to the user
     onError: (e) => {
       setErrorMsg(e.message);
     },
