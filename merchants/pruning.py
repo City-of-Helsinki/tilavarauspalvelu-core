@@ -1,5 +1,7 @@
 from datetime import timedelta
 
+from django.conf import settings
+
 from common.date_utils import local_datetime
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from merchants.models import OrderStatus, PaymentOrder
@@ -12,7 +14,8 @@ from reservations.models import Reservation
 from utils.sentry import SentryLogger
 
 
-def update_expired_orders(older_than_minutes: int) -> None:
+def update_expired_orders() -> None:
+    older_than_minutes = settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES
     expired_datetime = local_datetime() - timedelta(minutes=older_than_minutes)
     expired_orders = PaymentOrder.objects.filter(
         status=OrderStatus.DRAFT,

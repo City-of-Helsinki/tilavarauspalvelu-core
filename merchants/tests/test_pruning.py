@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from uuid import uuid4
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils.timezone import get_default_timezone
 from freezegun import freeze_time
 
@@ -20,6 +20,7 @@ from utils.sentry import SentryLogger
 DEFAULT_TIMEZONE = get_default_timezone()
 
 
+@override_settings(VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES=5)
 @freeze_time(datetime(2022, 11, 28, 10, 10, 0, tzinfo=DEFAULT_TIMEZONE))
 class UpdateExpiredOrderTestCase(TestCase):
     def setUp(self) -> None:
@@ -39,7 +40,7 @@ class UpdateExpiredOrderTestCase(TestCase):
         )
 
         with freeze_time(datetime(2022, 11, 28, 10, 15, 0, tzinfo=DEFAULT_TIMEZONE)):
-            update_expired_orders(5)
+            update_expired_orders()
 
         order.refresh_from_db()
         assert order.status == OrderStatus.CANCELLED
@@ -58,7 +59,7 @@ class UpdateExpiredOrderTestCase(TestCase):
         )
 
         with freeze_time(datetime(2022, 11, 28, 10, 15, 0, tzinfo=DEFAULT_TIMEZONE)):
-            update_expired_orders(5)
+            update_expired_orders()
 
         order.refresh_from_db()
         assert order.status == OrderStatus.PAID
@@ -86,7 +87,7 @@ class UpdateExpiredOrderTestCase(TestCase):
         )
 
         with freeze_time(datetime(2022, 11, 28, 10, 15, 0, tzinfo=DEFAULT_TIMEZONE)):
-            update_expired_orders(5)
+            update_expired_orders()
 
         assert VerkkokauppaAPIClient.cancel_order.called is True
 
@@ -107,7 +108,7 @@ class UpdateExpiredOrderTestCase(TestCase):
         )
 
         with freeze_time(datetime(2022, 11, 28, 10, 15, 0, tzinfo=DEFAULT_TIMEZONE)):
-            update_expired_orders(5)
+            update_expired_orders()
 
         assert VerkkokauppaAPIClient.cancel_order.called is True
 
@@ -128,7 +129,7 @@ class UpdateExpiredOrderTestCase(TestCase):
         )
 
         with freeze_time(datetime(2022, 11, 28, 10, 15, 0, tzinfo=DEFAULT_TIMEZONE)):
-            update_expired_orders(5)
+            update_expired_orders()
 
         order.refresh_from_db()
         assert order.status == OrderStatus.DRAFT
@@ -152,7 +153,7 @@ class UpdateExpiredOrderTestCase(TestCase):
         )
 
         with freeze_time(datetime(2022, 11, 28, 10, 15, 0, tzinfo=DEFAULT_TIMEZONE)):
-            update_expired_orders(5)
+            update_expired_orders()
 
         order.refresh_from_db()
         assert order.status == OrderStatus.DRAFT
@@ -177,7 +178,7 @@ class UpdateExpiredOrderTestCase(TestCase):
         )
 
         with freeze_time(datetime(2022, 11, 28, 10, 15, 0, tzinfo=DEFAULT_TIMEZONE)):
-            update_expired_orders(5)
+            update_expired_orders()
 
         assert VerkkokauppaAPIClient.get_payment.called is True
         assert VerkkokauppaAPIClient.cancel_order.called is False
