@@ -1,4 +1,4 @@
-import { get, pick, zipObject } from "lodash";
+import { camelCase, get, pick, zipObject } from "lodash";
 import {
   type ReservationFormType,
   type RecurringReservationForm,
@@ -13,11 +13,9 @@ export function flattenMetadata(
     | ReservationChangeFormType,
   metadataSetFields: ReservationMetadataFieldNode[]
 ) {
+  const fieldNames = metadataSetFields.map((f) => f.fieldName).map(camelCase);
   // TODO don't use pick
-  const metadataSetValues = pick(
-    values,
-    metadataSetFields.map((f) => f.fieldName)
-  );
+  const metadataSetValues = pick(values, fieldNames);
 
   const renamePkFields = ["ageGroup", "homeCity", "purpose"];
 

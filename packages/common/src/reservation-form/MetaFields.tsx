@@ -13,6 +13,7 @@ import React, { Fragment } from "react";
 import styled from "styled-components";
 import { Controller, useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { camelCase } from "lodash";
 import {
   type ReservationMetadataSetNode,
   CustomerTypeChoice,
@@ -159,11 +160,12 @@ const ReservationFormFields = ({
 }) => {
   const { getValues } = useFormContext<Reservation>();
 
-  const requiredFields = filterNonNullable(metadata?.requiredFields);
-  // TODO do we need to do string conversion here? camelCase?
+  const requiredFields = filterNonNullable(metadata?.requiredFields)
+    .map((x) => x.fieldName)
+    .map(camelCase);
   const fieldsExtended = fields.map((field) => ({
     field,
-    required: requiredFields.find((x) => x.fieldName === field) != null,
+    required: requiredFields.find((x) => x === field) != null,
   }));
 
   // TODO the subheading logic is weird / inefficient

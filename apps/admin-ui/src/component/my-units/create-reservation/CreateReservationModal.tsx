@@ -274,14 +274,11 @@ const DialogContent = ({
         throw new Error("Missing reservation unit");
       }
 
-      const metadataSetFields = filterNonNullable(
+      const fields = filterNonNullable(
         reservationUnit.metadataSet?.supportedFields
       );
 
-      const flattenedMetadataSetValues = flattenMetadata(
-        values,
-        metadataSetFields
-      );
+      const flatMetaValues = flattenMetadata(values, fields);
 
       const bufferBefore =
         values.type !== "BLOCKED" && values.bufferTimeBefore
@@ -299,7 +296,7 @@ const DialogContent = ({
         bufferTimeBefore: bufferBefore.toString(),
         bufferTimeAfter: bufferAfter.toString(),
         workingMemo: values.comments,
-        ...flattenedMetadataSetValues,
+        ...flatMetaValues,
         reserveeType: values.reserveeType,
       };
 
