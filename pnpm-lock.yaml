@@ -374,8 +374,8 @@ importers:
         specifier: ^8.0.0
         version: 8.0.0
       jest-date-mock:
-        specifier: ^1.0.8
-        version: 1.0.8
+        specifier: ^1.0.9
+        version: 1.0.9
       jest-environment-jsdom:
         specifier: ^29.7.0
         version: 29.7.0
@@ -11933,8 +11933,8 @@ packages:
       - supports-color
     dev: true
 
-  /jest-date-mock@1.0.8:
-    resolution: {integrity: sha512-0Lyp+z9xvuNmLbK+5N6FOhSiBeux05Lp5bbveFBmYo40Aggl2wwxFoIrZ+rOWC8nDNcLeBoDd2miQdEDSf3iQw==}
+  /jest-date-mock@1.0.9:
+    resolution: {integrity: sha512-1cAXJMNFRYPctj/up9eOC2XwJF0ktHTTaHZ64yHF5sjojfZ+805DAqBJY5GbLCgajz71Lfw5dQwDgIiyQ5QA9g==}
     dev: true
 
   /jest-diff@29.7.0:
