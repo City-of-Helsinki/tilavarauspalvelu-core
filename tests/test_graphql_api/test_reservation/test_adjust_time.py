@@ -280,8 +280,8 @@ def test_reservation__adjust_time__reservation_unit_not_open_in_new_time(graphql
     graphql.login_with_superuser()
     data = get_adjust_data(
         reservation,
-        begin=(reservation.begin + datetime.timedelta(days=2)).isoformat(),
-        end=(reservation.end + datetime.timedelta(days=2)).isoformat(),
+        begin=(reservation.begin + datetime.timedelta(days=3)).isoformat(),
+        end=(reservation.end + datetime.timedelta(days=3)).isoformat(),
     )
     response = graphql(ADJUST_MUTATION, input_data=data)
 
@@ -294,7 +294,7 @@ def test_reservation__adjust_time__reservation_unit_in_open_application_round(gr
     ApplicationRoundFactory.create_in_status_open(
         reservation_units=[reservation.reservation_unit.first()],
         reservation_period_begin=reservation.begin.date(),
-        reservation_period_end=reservation.end.date(),
+        reservation_period_end=reservation.end.date() + datetime.timedelta(days=1),  # +1d to reduce flakiness at night
     )
 
     graphql.login_with_superuser()
