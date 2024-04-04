@@ -213,9 +213,18 @@ class ReservationQuerySet(QuerySet):
         )
 
     def active(self: Self) -> Self:
+        """
+        Filter reservations that have not ended yet.
+
+        Note:
+        - There might be older reservations with buffers that are still active,
+          even if the reservation itself is not returned by this queryset.
+        - Returned data may contain some 'Inactive' reservations, before they are deleted by a periodic task.
+        """
         return self.going_to_occur().filter(end__gte=local_datetime())
 
     def inactive(self: Self, older_than_minutes: int) -> Self:
+        """Filter 'draft' reservations, which are older than X minutes old, and can be assumed to be inactive."""
         return self.filter(
             state=ReservationStateChoice.CREATED,
             created_at__lte=local_datetime() - datetime.timedelta(minutes=older_than_minutes),
