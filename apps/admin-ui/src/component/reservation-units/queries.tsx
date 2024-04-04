@@ -3,7 +3,6 @@ import { gql } from "@apollo/client";
 export const SEARCH_RESERVATION_UNITS_QUERY = gql`
   query SearchReservationUnits(
     $nameFi: String
-    $after: String
     $maxPersonsGte: Decimal
     $maxPersonsLte: Decimal
     $surfaceAreaGte: Decimal
@@ -20,7 +19,6 @@ export const SEARCH_RESERVATION_UNITS_QUERY = gql`
       offset: $offset
       orderBy: $orderBy
       nameFi: $nameFi
-      after: $after
       maxPersonsGte: $maxPersonsGte
       minPersonsGte: $maxPersonsGte
       maxPersonsLte: $maxPersonsLte

@@ -22,7 +22,7 @@ type ReservationTableColumn = {
 };
 
 type Props = {
-  sort?: Sort;
+  sort: string;
   sortChanged: (field: string) => void;
   isLoading: boolean;
   reservations: ReservationNode[];
@@ -118,10 +118,8 @@ export function ReservationsTable({
       rows={reservations}
       cols={cols}
       isLoading={isLoading}
-      initialSortingColumnKey={sort === undefined ? undefined : sort.field}
-      initialSortingOrder={
-        sort === undefined ? undefined : (sort.asc && "asc") || "desc"
-      }
+      initialSortingColumnKey={sort.startsWith("-") ? sort.slice(1) : sort}
+      initialSortingOrder={sort.startsWith("-") ? "desc" : "asc"}
     />
   );
 }

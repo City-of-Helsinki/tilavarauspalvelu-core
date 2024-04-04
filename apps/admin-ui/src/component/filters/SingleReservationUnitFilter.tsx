@@ -30,6 +30,8 @@ const SingleReservationUnitFilter = ({
   const { data, loading } = useQuery<Query, QueryReservationUnitsArgs>(
     RESERVATION_UNITS_FILTER_PARAMS_QUERY,
     {
+      // breaks the cache
+      fetchPolicy: "no-cache",
       variables: {
         unit: unitPk != null ? [Number(unitPk)] : undefined,
         orderBy: [ReservationUnitOrderingChoices.NameFiAsc],

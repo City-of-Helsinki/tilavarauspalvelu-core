@@ -1,7 +1,11 @@
-import React from "react";
-import { ApolloError, useQuery } from "@apollo/client";
+import React, { useState } from "react";
+import { type ApolloError, useQuery } from "@apollo/client";
 import { values } from "lodash";
-import { Query, QueryReservationsArgs } from "common/types/gql-types";
+import {
+  type Query,
+  type QueryReservationsArgs,
+  ReservationOrderingChoices,
+} from "common/types/gql-types";
 import { More } from "@/component/More";
 import { LIST_PAGE_SIZE } from "@/common/const";
 import { useNotification } from "@/context/NotificationContext";
@@ -12,15 +16,8 @@ import { ReservationsTable } from "./ReservationsTable";
 import { fromUIDate, toApiDate } from "common/src/common/util";
 import { filterNonNullable } from "common/src/helpers";
 
-export type Sort = {
-  field: string;
-  asc: boolean;
-};
-
 type Props = {
   filters: FilterArguments;
-  sort?: Sort;
-  sortChanged: (field: string) => void;
   defaultFiltering: QueryReservationsArgs;
 };
 
@@ -67,27 +64,11 @@ function mapFilterParams(
 function useReservations(
   filters: FilterArguments,
   defaultFiltering: QueryReservationsArgs,
-  _sort?: Sort
+  sort: string
 ) {
   const { notifyError } = useNotification();
 
-  /*
-  let sortString;
-  if (sort) {
-    if (sort.field === "begin") {
-      if (sort.asc) {
-        sortString = "begin,end";
-      } else {
-        sortString = "-begin,-end";
-      }
-    } else {
-      sortString = `${(sort?.asc ? "" : "-") + sort.field},begin,end`;
-    }
-  } else {
-    sortString = "state";
-  }
-  */
-
+  const orderBy = transformSortString(sort);
   const { fetchMore, loading, data, previousData } = useQuery<
     Query,
     QueryReservationsArgs
@@ -96,8 +77,7 @@ function useReservations(
     nextFetchPolicy: "cache-first",
     errorPolicy: "all",
     variables: {
-      // FIXME
-      // orderBy: sortString,
+      orderBy,
       first: LIST_PAGE_SIZE,
       ...mapFilterParams(filters, defaultFiltering),
     },
@@ -122,10 +102,17 @@ function useReservations(
 
 export function ReservationsDataLoader({
   filters,
-  sort,
-  sortChanged: onSortChanged,
   defaultFiltering,
 }: Props): JSX.Element {
+  const [sort, setSort] = useState<string>("-state");
+  const onSortChanged = (sortField: string) => {
+    if (sort === sortField) {
+      setSort(`-${sortField}`);
+    } else {
+      setSort(sortField);
+    }
+  };
+
   const { fetchMore, loading, data, totalCount, offset } = useReservations(
     filters,
     defaultFiltering,
@@ -151,4 +138,83 @@ export function ReservationsDataLoader({
       />
     </>
   );
+}
+
+function transformOrderBy(
+  orderBy: string,
+  desc: boolean
+): ReservationOrderingChoices | null {
+  switch (orderBy) {
+    case "pk":
+      return desc
+        ? ReservationOrderingChoices.PkDesc
+        : ReservationOrderingChoices.PkAsc;
+    case "begin":
+      return desc
+        ? ReservationOrderingChoices.BeginDesc
+        : ReservationOrderingChoices.BeginAsc;
+    case "end":
+      return desc
+        ? ReservationOrderingChoices.EndDesc
+        : ReservationOrderingChoices.EndAsc;
+    case "created_at":
+      return desc
+        ? ReservationOrderingChoices.CreatedAtDesc
+        : ReservationOrderingChoices.CreatedAtAsc;
+    case "reservee_name":
+      return desc
+        ? ReservationOrderingChoices.ReserveeNameDesc
+        : ReservationOrderingChoices.ReserveeNameAsc;
+    case "reservation_unit_name_fi":
+      return desc
+        ? ReservationOrderingChoices.ReservationUnitNameFiDesc
+        : ReservationOrderingChoices.ReservationUnitNameFiAsc;
+    case "unit_name_fi":
+      return desc
+        ? ReservationOrderingChoices.UnitNameFiDesc
+        : ReservationOrderingChoices.UnitNameFiAsc;
+    // NOTE inconsistent naming
+    case "orderStatus":
+      return desc
+        ? ReservationOrderingChoices.OrderStatusDesc
+        : ReservationOrderingChoices.OrderStatusAsc;
+    case "state":
+      return desc
+        ? ReservationOrderingChoices.StateDesc
+        : ReservationOrderingChoices.StateAsc;
+    default:
+      return null;
+  }
+}
+
+function transformSortString(
+  orderBy: string | null
+): ReservationOrderingChoices[] {
+  const defaultSort = [
+    ReservationOrderingChoices.StateDesc,
+    ReservationOrderingChoices.BeginAsc,
+    ReservationOrderingChoices.EndAsc,
+  ];
+  if (!orderBy) {
+    return defaultSort;
+  }
+
+  const desc = orderBy.startsWith("-");
+  const rest = desc ? orderBy.slice(1) : orderBy;
+  const transformed = transformOrderBy(rest, desc);
+  if (transformed == null) {
+    return defaultSort;
+  }
+
+  if (transformed === ReservationOrderingChoices.BeginAsc) {
+    return [transformed, ReservationOrderingChoices.EndAsc];
+  }
+  if (transformed === ReservationOrderingChoices.BeginDesc) {
+    return [transformed, ReservationOrderingChoices.EndDesc];
+  }
+  return [
+    transformed,
+    ReservationOrderingChoices.BeginAsc,
+    ReservationOrderingChoices.EndAsc,
+  ];
 }

@@ -37,15 +37,18 @@ const ReservationUnitFilter = ({ onChange, value }: Props): JSX.Element => {
   const { loading } = useQuery<Query, QueryReservationUnitsArgs>(
     RESERVATION_UNITS_FILTER_PARAMS_QUERY,
     {
+      // breaks the cache
+      fetchPolicy: "no-cache",
       variables: { offset, first: GQL_MAX_RESULTS_PER_QUERY },
-      onCompleted: (data) => {
-        const qd = data?.reservationUnits;
+      onCompleted: ({ reservationUnits }) => {
         if (
-          qd?.edges.length != null &&
-          qd?.totalCount &&
-          qd?.edges.length > 0
+          reservationUnits != null &&
+          reservationUnits.totalCount &&
+          reservationUnits.edges.length > 0
         ) {
-          const ds = filterNonNullable(qd?.edges.map((x) => x?.node));
+          const ds = filterNonNullable(
+            reservationUnits?.edges.map((x) => x?.node)
+          );
           setResUnits([...resUnits, ...ds]);
         }
       },

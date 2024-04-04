@@ -1,25 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 import { type ApolloError, useQuery } from "@apollo/client";
-import type { Query, QueryReservationUnitsArgs } from "common/types/gql-types";
+import {
+  Query,
+  QueryReservationUnitsArgs,
+  ReservationUnitOrderingChoices,
+} from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { LARGE_LIST_PAGE_SIZE } from "@/common/const";
-import { combineResults } from "@/common/util";
 import { useNotification } from "@/context/NotificationContext";
 import Loader from "@/component/Loader";
 import { More } from "@/component/More";
-import ReservationUnitsTable from "./ReservationUnitsTable";
+import { ReservationUnitsTable } from "./ReservationUnitsTable";
 import { SEARCH_RESERVATION_UNITS_QUERY } from "./queries";
 import { FilterArguments } from "./Filters";
 
-export type Sort = {
-  field: string;
-  sort: boolean;
-};
-
 type Props = {
   filters: FilterArguments;
-  sort?: Sort;
-  sortChanged: (field: string) => void;
 };
 
 const mapFilterParams = ({
@@ -38,38 +34,72 @@ const mapFilterParams = ({
     .map(Number),
 });
 
-const updateQuery = (
-  previousResult: Query,
-  { fetchMoreResult }: { fetchMoreResult: Query }
-): Query => {
-  if (!fetchMoreResult) {
-    return previousResult;
+function transformOrderBy(
+  orderBy: string,
+  desc: boolean
+): ReservationUnitOrderingChoices | null {
+  switch (orderBy) {
+    case "nameFi":
+      return desc
+        ? ReservationUnitOrderingChoices.NameFiDesc
+        : ReservationUnitOrderingChoices.NameFiAsc;
+    case "unitNameFi":
+      return desc
+        ? ReservationUnitOrderingChoices.UnitNameFiDesc
+        : ReservationUnitOrderingChoices.UnitNameFiAsc;
+    case "typeFi":
+      return desc
+        ? ReservationUnitOrderingChoices.TypeFiDesc
+        : ReservationUnitOrderingChoices.TypeFiAsc;
+    case "maxPersons":
+      return desc
+        ? ReservationUnitOrderingChoices.MaxPersonsDesc
+        : ReservationUnitOrderingChoices.MaxPersonsAsc;
+    case "surfaceArea":
+      return desc
+        ? ReservationUnitOrderingChoices.SurfaceAreaDesc
+        : ReservationUnitOrderingChoices.SurfaceAreaAsc;
+    default:
+      return null;
+  }
+}
+
+function transformSortString(
+  orderBy: string | null
+): ReservationUnitOrderingChoices[] {
+  if (!orderBy) {
+    return [];
   }
 
-  return combineResults(previousResult, fetchMoreResult, "reservationUnits");
-};
+  const desc = orderBy.startsWith("-");
+  const rest = desc ? orderBy.slice(1) : orderBy;
+  const transformed = transformOrderBy(rest, desc);
+  if (transformed) {
+    return [transformed];
+  }
 
-const ReservationUnitsDataReader = ({
-  filters,
-  sort,
-  sortChanged: onSortChanged,
-}: Props): JSX.Element => {
+  return [];
+}
+
+export function ReservationUnitsDataReader({ filters }: Props): JSX.Element {
   const { notifyError } = useNotification();
 
-  /*
-  let sortString;
-  if (sort) {
-    sortString = (sort?.sort ? "" : "-") + sort.field;
-  }
-  */
+  const [sort, setSort] = useState<string>("");
+  const onSortChanged = (sortField: string) => {
+    if (sort === sortField) {
+      setSort(`-${sortField}`);
+    } else {
+      setSort(sortField);
+    }
+  };
 
-  const { fetchMore, loading, data } = useQuery<
+  const orderBy = transformSortString(sort);
+  const { fetchMore, loading, data, previousData } = useQuery<
     Query,
     QueryReservationUnitsArgs
   >(SEARCH_RESERVATION_UNITS_QUERY, {
     variables: {
-      // FIXME
-      // orderBy: sortString,
+      orderBy,
       first: LARGE_LIST_PAGE_SIZE,
       ...mapFilterParams(filters),
     },
@@ -79,36 +109,30 @@ const ReservationUnitsDataReader = ({
     fetchPolicy: "cache-and-network",
   });
 
-  if (loading) {
+  const { reservationUnits } = data ?? previousData ?? {};
+  const resUnits = filterNonNullable(
+    reservationUnits?.edges.map((edge) => edge?.node)
+  );
+
+  if (loading && resUnits.length === 0) {
     return <Loader />;
   }
 
-  const reservationUnits = filterNonNullable(
-    data?.reservationUnits?.edges.map((edge) => edge?.node)
-  );
-
+  const offset = data?.reservationUnits?.edges.length;
   return (
     <>
       <ReservationUnitsTable
-        reservationUnits={reservationUnits}
+        reservationUnits={resUnits}
         sort={sort}
         sortChanged={onSortChanged}
+        isLoading={loading}
       />
       <More
-        key={reservationUnits.length}
+        key={resUnits.length}
         totalCount={data?.reservationUnits?.totalCount ?? 0}
-        count={reservationUnits.length}
-        fetchMore={() =>
-          fetchMore({
-            variables: {
-              offset: data?.reservationUnits?.edges.length,
-            },
-            updateQuery,
-          })
-        }
+        count={resUnits.length}
+        fetchMore={() => fetchMore({ variables: { offset } })}
       />
     </>
   );
-};
-
-export default ReservationUnitsDataReader;
+}

@@ -6,15 +6,11 @@ import { truncate } from "@/helpers";
 import { reservationUnitUrl } from "@/common/urls";
 import { CustomTable, TableLink } from "@/component/Table";
 
-export type Sort = {
-  field: string;
-  sort: boolean;
-};
-
 type Props = {
-  sort?: Sort;
+  sort: string;
   sortChanged: (field: string) => void;
   reservationUnits: ReservationUnitNode[];
+  isLoading?: boolean;
 };
 
 const MAX_NAME_LENGTH = 22;
@@ -79,11 +75,12 @@ const getColConfig = (t: TFunction) => [
   },
 ];
 
-const ReservationUnitsTable = ({
+export function ReservationUnitsTable({
   sort,
   sortChanged: onSortChanged,
   reservationUnits,
-}: Props): JSX.Element => {
+  isLoading,
+}: Props): JSX.Element {
   const { t } = useTranslation();
 
   const cols = getColConfig(t);
@@ -98,12 +95,9 @@ const ReservationUnitsTable = ({
       indexKey="pk"
       rows={reservationUnits}
       cols={cols}
-      initialSortingColumnKey={sort === undefined ? undefined : sort.field}
-      initialSortingOrder={
-        sort === undefined ? undefined : (sort.sort && "asc") || "desc"
-      }
+      initialSortingColumnKey={sort.startsWith("-") ? sort.slice(1) : sort}
+      initialSortingOrder={sort.startsWith("-") ? "desc" : "asc"}
+      isLoading={isLoading}
     />
   );
-};
-
-export default ReservationUnitsTable;
+}

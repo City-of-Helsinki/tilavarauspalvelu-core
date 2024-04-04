@@ -7,16 +7,12 @@ import { truncate } from "@/helpers";
 import { myUnitUrl, unitUrl } from "@/common/urls";
 import { CustomTable, TableLink } from "@/component/Table";
 
-export type Sort = {
-  field: string;
-  sort: boolean;
-};
-
 type Props = {
-  sort?: Sort;
+  sort: string;
   sortChanged: (field: string) => void;
   units: UnitNode[];
   isMyUnits?: boolean;
+  isLoading?: boolean;
 };
 
 const MAX_NAME_LENGTH = 40;
@@ -54,12 +50,13 @@ const getColConfig = (t: TFunction, isMyUnits?: boolean) => [
   },
 ];
 
-const UnitsTable = ({
+export function UnitsTable({
   sort,
   sortChanged: onSortChanged,
   units,
   isMyUnits,
-}: Props): JSX.Element => {
+  isLoading,
+}: Props): JSX.Element {
   const { t } = useTranslation();
 
   const cols = memoize(() => getColConfig(t, isMyUnits))();
@@ -74,12 +71,9 @@ const UnitsTable = ({
       indexKey="pk"
       rows={units}
       cols={cols}
-      initialSortingColumnKey={sort === undefined ? undefined : sort.field}
-      initialSortingOrder={
-        sort === undefined ? undefined : (sort.sort && "asc") || "desc"
-      }
+      initialSortingColumnKey={sort.startsWith("-") ? sort.slice(1) : sort}
+      initialSortingOrder={sort.startsWith("-") ? "desc" : "asc"}
+      isLoading={isLoading}
     />
   );
-};
-
-export default UnitsTable;
+}

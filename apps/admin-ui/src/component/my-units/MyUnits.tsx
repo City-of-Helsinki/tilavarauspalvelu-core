@@ -4,25 +4,16 @@ import { useTranslation } from "react-i18next";
 import { H1 } from "common/src/common/typography";
 import { Container } from "@/styles/layout";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
-import { Sort } from "../Unit/UnitsTable";
 import Filters, { FilterArguments, emptyFilterState } from "../Unit/Filters";
 import { HR } from "@/component/Table";
-import UnitsDataLoader from "../Unit/UnitsDataLoader";
+import { UnitsDataLoader } from "../Unit/UnitsDataLoader";
 
 // NOTE copy pasta from Unit/Units.tsx
 const MyUnits = () => {
-  const [search, setSearch] = useState<FilterArguments>(emptyFilterState);
-  const [sort, setSort] = useState<Sort>();
-  const debouncedSearch = debounce((value) => setSearch(value), 300);
+  const [filters, setFilters] = useState<FilterArguments>(emptyFilterState);
+  const debouncedSearch = debounce((value) => setFilters(value), 100);
 
   const { t } = useTranslation();
-
-  const handleSortChanged = (sortField: string) => {
-    setSort({
-      field: sortField,
-      sort: sort?.field === sortField ? !sort?.sort : true,
-    });
-  };
 
   return (
     <>
@@ -34,12 +25,7 @@ const MyUnits = () => {
         </div>
         <Filters onSearch={debouncedSearch} />
         <HR />
-        <UnitsDataLoader
-          filters={search}
-          sort={sort}
-          onSortChanged={handleSortChanged}
-          isMyUnits
-        />
+        <UnitsDataLoader filters={filters} isMyUnits />
       </Container>
     </>
   );

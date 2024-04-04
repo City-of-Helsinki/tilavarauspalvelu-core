@@ -6,23 +6,14 @@ import { debounce } from "lodash";
 import { Container } from "../../styles/layout";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import Filters, { emptyFilterState, FilterArguments } from "./Filters";
-import UnitsDataLoader from "./UnitsDataLoader";
-import { Sort } from "./UnitsTable";
+import { UnitsDataLoader } from "./UnitsDataLoader";
 import { HR } from "@/component/Table";
 
-const Units = (): JSX.Element => {
+function Units(): JSX.Element {
   const [search, setSearch] = useState<FilterArguments>(emptyFilterState);
-  const [sort, setSort] = useState<Sort>({ field: "nameFi", sort: true });
   const debouncedSearch = debounce((value) => setSearch(value), 300);
 
   const { t } = useTranslation();
-
-  const handleSortChanged = (sortField: string) => {
-    setSort({
-      field: sortField,
-      sort: sort?.field === sortField ? !sort?.sort : true,
-    });
-  };
 
   return (
     <>
@@ -44,14 +35,10 @@ const Units = (): JSX.Element => {
         </div>
         <Filters onSearch={debouncedSearch} />
         <HR />
-        <UnitsDataLoader
-          filters={search}
-          sort={sort}
-          onSortChanged={handleSortChanged}
-        />
+        <UnitsDataLoader filters={search} />
       </Container>
     </>
   );
-};
+}
 
 export default Units;

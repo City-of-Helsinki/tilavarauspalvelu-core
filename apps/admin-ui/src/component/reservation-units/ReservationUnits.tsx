@@ -5,22 +5,14 @@ import { H1 } from "common";
 import { HR } from "@/component/Table";
 import { Container } from "@/styles/layout";
 import Filters, { FilterArguments, emptyState } from "./Filters";
-import ReservationUnitsDataReader, { Sort } from "./ReservationUnitsDataLoader";
+import { ReservationUnitsDataReader } from "./ReservationUnitsDataLoader";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 
 const ReservationUnits = (): JSX.Element => {
-  const [search, setSearch] = useState<FilterArguments>(emptyState);
-  const [sort, setSort] = useState<Sort>();
-  const debouncedSearch = debounce((value) => setSearch(value), 300);
+  const [filters, setFilters] = useState<FilterArguments>(emptyState);
+  const debouncedSearch = debounce((value) => setFilters(value), 100);
 
   const { t } = useTranslation();
-
-  const onSortChanged = (sortField: string) => {
-    setSort({
-      field: sortField,
-      sort: sort?.field === sortField ? !sort?.sort : true,
-    });
-  };
 
   return (
     <>
@@ -32,12 +24,7 @@ const ReservationUnits = (): JSX.Element => {
         </div>
         <Filters onSearch={debouncedSearch} />
         <HR />
-        <ReservationUnitsDataReader
-          key={JSON.stringify({ ...search, ...sort })}
-          filters={search}
-          sort={sort}
-          sortChanged={onSortChanged}
-        />
+        <ReservationUnitsDataReader filters={filters} />
       </Container>
     </>
   );
