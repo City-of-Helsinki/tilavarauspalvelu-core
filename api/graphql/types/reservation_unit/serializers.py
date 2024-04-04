@@ -1,3 +1,4 @@
+from datetime import timedelta
 from typing import Any
 
 from auditlog.models import LogEntry
@@ -13,7 +14,7 @@ from api.graphql.types.reservation_unit_image.serializers import ReservationUnit
 from api.graphql.types.reservation_unit_pricing.serializers import ReservationUnitPricingSerializer
 from applications.choices import WeekdayChoice
 from opening_hours.utils.hauki_resource_hash_updater import HaukiResourceHashUpdater
-from reservation_units.enums import PricingStatus
+from reservation_units.enums import PricingStatus, ReservationStartInterval
 from reservation_units.models import ReservationUnit, ReservationUnitPricing
 from reservation_units.utils.reservation_unit_pricing_helper import ReservationUnitPricingHelper
 from utils.external_service.errors import ExternalServiceError
@@ -108,6 +109,8 @@ class ReservationUnitSerializer(NestingModelSerializer):
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         is_draft = data.get("is_draft", getattr(self.instance, "is_draft", False))
 
+        self.validate_reservation_duration_fields(data)
+
         if self.instance is not None:
             self.validate_updated_pricings(data)
         else:
@@ -117,6 +120,53 @@ class ReservationUnitSerializer(NestingModelSerializer):
             self.validate_for_publish(data)
 
         return data
+
+    def validate_reservation_duration_fields(self, data: dict[str, Any]) -> None:
+        """
+        Validates:
+        - min_reservation_duration
+        - max_reservation_duration
+        - reservation_start_interval
+        """
+        min_duration: timedelta | None = self.get_or_default("min_reservation_duration", data)
+        max_duration: timedelta | None = self.get_or_default("max_reservation_duration", data)
+        start_interval: str | None = self.get_or_default("reservation_start_interval", data)
+
+        if min_duration and max_duration and min_duration > max_duration:
+            raise ValidationError(
+                "minReservationDuration can't be greater than maxReservationDuration",
+                code=error_codes.RESERVATION_UNIT_MIN_MAX_RESERVATION_DURATIONS_INVALID,
+            )
+
+        if start_interval is None:
+            return
+
+        interval_minutes = ReservationStartInterval(start_interval).as_number
+        if min_duration:
+            min_duration_minutes = min_duration.total_seconds() // 60
+            if min_duration_minutes < interval_minutes:
+                raise ValidationError(
+                    "minReservationDuration must be at least the reservation start interval",
+                    code=error_codes.RESERVATION_UNIT_MIN_RESERVATION_DURATION_INVALID,
+                )
+            if min_duration_minutes % interval_minutes != 0:
+                raise ValidationError(
+                    "minReservationDuration must be a multiple of the reservation start interval",
+                    code=error_codes.RESERVATION_UNIT_MIN_RESERVATION_DURATION_INVALID,
+                )
+
+        if max_duration:
+            max_duration_minutes = max_duration.total_seconds() // 60
+            if max_duration_minutes < interval_minutes:
+                raise ValidationError(
+                    "maxReservationDuration must be at least the reservation start interval",
+                    code=error_codes.RESERVATION_UNIT_MAX_RESERVATION_DURATION_INVALID,
+                )
+            if max_duration_minutes % interval_minutes != 0:
+                raise ValidationError(
+                    "maxReservationDuration must be a multiple of the reservation start interval",
+                    code=error_codes.RESERVATION_UNIT_MAX_RESERVATION_DURATION_INVALID,
+                )
 
     def validate_for_publish(self, data: dict[str, Any]) -> None:
         required_translations: list[str] = [
