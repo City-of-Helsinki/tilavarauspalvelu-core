@@ -568,6 +568,15 @@ TPREK_UNIT_URL = env("TPREK_UNIT_URL")
 # Turns off csrf protection for the graphql view for frontend codegen
 GRAPHQL_CODEGEN_ENABLED = env("GRAPHQL_CODEGEN_ENABLED")
 
+
+# ----- Pruning -----------------------------------------------------------------------------------------
+
+# Reservations older than PRUNE_OLDER_THAN_MINUTES will be deleted when the task is run
+PRUNE_OLDER_THAN_MINUTES = 20
+REMOVE_STATS_OLDER_THAN_YEARS = 5
+REMOVE_RECURRINGS_OLDER_THAN_DAYS = 1
+
+
 # ----- Local settings ---------------------------------------------------------------------------------
 
 local_settings_path = BASE_DIR / "local_settings.py"
