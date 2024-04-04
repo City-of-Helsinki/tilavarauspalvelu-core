@@ -9,6 +9,7 @@ from graphene_django_extensions.testing import parametrize_helper
 
 from common.date_utils import local_datetime, local_end_of_day, local_start_of_day
 from reservation_units.enums import PriceUnit, PricingStatus, ReservationKind
+from reservation_units.models import ReservationUnit
 from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import Reservation
 from tests.factories import (
@@ -478,7 +479,7 @@ def test_reservation__create__max_reservations_per_user__past_reservations(graph
     assert Reservation.objects.count() == 2
 
 
-def test_reservation__create__max_reservations_per_user__reservations_for_other_reservation_units(graphql):
+def test_reservation__create__max_reservations_per_user__reservations_for_other_unrelated_reservation_units(graphql):
     reservation_unit_1 = ReservationUnitFactory.create_reservable_now(max_reservations_per_user=1)
     reservation_unit_2 = ReservationUnitFactory.create()
 
@@ -489,6 +490,41 @@ def test_reservation__create__max_reservations_per_user__reservations_for_other_
     ReservationFactory.create(
         begin=begin,
         end=end,
+        state=ReservationStateChoice.CONFIRMED,
+        reservation_unit=[reservation_unit_2],
+        user=user,
+    )
+
+    data = get_create_data(reservation_unit_1, begin=begin, end=end)
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+    assert reservation.state == ReservationStateChoice.CREATED
+
+    assert Reservation.objects.count() == 2
+
+
+def test_reservation__create__max_reservations_per_user__reservations_for_other_related_reservation_units(graphql):
+    """Reservations in the same hierarchy should NOT be counted towards the max_reservations_per_user limit."""
+    reservation_unit_1: ReservationUnit = ReservationUnitFactory.create_reservable_now(
+        max_reservations_per_user=1,
+        spaces=[SpaceFactory.create()],
+    )
+    reservation_unit_2: ReservationUnit = ReservationUnitFactory.create(
+        max_reservations_per_user=1,
+        unit=reservation_unit_1.unit,  # In the same hierarchy as reservation_unit_1
+        spaces=reservation_unit_1.spaces.all(),
+    )
+
+    begin = next_hour(1)
+    end = begin + timedelta(hours=1)
+
+    user = graphql.login_with_superuser()
+    ReservationFactory.create(
+        begin=begin + timedelta(hours=1),
+        end=end + timedelta(hours=1),
         state=ReservationStateChoice.CONFIRMED,
         reservation_unit=[reservation_unit_2],
         user=user,

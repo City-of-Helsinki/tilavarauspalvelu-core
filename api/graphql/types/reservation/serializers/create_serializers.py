@@ -8,12 +8,10 @@ from rest_framework import serializers
 from api.graphql.extensions.fields import DurationField, OldChoiceCharField
 from api.graphql.extensions.serializers import OldPrimaryKeySerializer
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
-from api.graphql.types.reservation.serializers.mixins import (
-    ReservationPriceMixin,
-    ReservationSchedulingMixin,
-)
+from api.graphql.types.reservation.serializers.mixins import ReservationPriceMixin, ReservationSchedulingMixin
 from applications.models import City
 from common.fields.serializer import IntegerPrimaryKeyField
+from common.typing import AnyUser
 from permissions.helpers import can_handle_reservation_with_units
 from reservation_units.enums import ReservationKind
 from reservation_units.models import ReservationUnit
@@ -253,21 +251,21 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
                 ValidationErrorCodes.AMBIGUOUS_SKU,
             )
 
-    def check_max_reservations_per_user(self, user, reservation_unit):
-        max_count = reservation_unit.max_reservations_per_user
-        if max_count is not None:
-            current_reservation_pk = getattr(self.instance, "pk", None)
-            reservation_count = (
-                Reservation.objects.filter(user=user, reservation_unit=reservation_unit)
-                .exclude(pk=current_reservation_pk)
-                .active()
-                .count()
+    def check_max_reservations_per_user(self, user: AnyUser, reservation_unit: ReservationUnit) -> None:
+        if reservation_unit.max_reservations_per_user is None:
+            return
+
+        existing_reservations_count = (
+            Reservation.objects.filter(user=user, reservation_unit=reservation_unit)
+            .exclude(pk=getattr(self.instance, "pk", None))  # Safely handle both create and update cases
+            .active()
+            .count()
+        )
+        if existing_reservations_count >= reservation_unit.max_reservations_per_user:
+            raise ValidationErrorWithCode(
+                "Maximum number of active reservations for this reservation unit exceeded.",
+                ValidationErrorCodes.MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED,
             )
-            if reservation_count >= max_count:
-                raise ValidationErrorWithCode(
-                    "Maximum number of active reservations for this reservation unit exceeded.",
-                    ValidationErrorCodes.MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED,
-                )
 
     def check_reservation_kind(self, reservation_unit):
         if reservation_unit.reservation_kind == ReservationKind.SEASON:
