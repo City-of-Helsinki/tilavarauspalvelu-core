@@ -10,11 +10,11 @@ import { breakpoints } from "common/src/common/style";
 import {
   type Maybe,
   type Query,
-  type QueryReservationByPkArgs,
   type ReservationType,
   ReserveeType,
   PricingType,
   State,
+  type QueryReservationArgs,
 } from "common/types/gql-types";
 import { Permission } from "@/modules/permissionHelper";
 import { useNotification } from "@/context/NotificationContext";
@@ -43,6 +43,7 @@ import { useRecurringReservations, useReservationData } from "./hooks";
 import ApprovalButtonsRecurring from "./ApprovalButtonsRecurring";
 import ReservationTitleSection from "./ReservationTitleSection";
 import { SINGLE_RESERVATION_QUERY } from "./hooks/queries";
+import { base64encode } from "common/src/helpers";
 
 const ApplicationDatas = styled.div`
   display: grid;
@@ -609,16 +610,18 @@ const RequestedReservation = ({
 };
 
 const PermissionWrappedReservation = () => {
-  const { id } = useParams() as { id: string };
+  const { id: pk } = useParams() as { id: string };
   const { t } = useTranslation();
   const { notifyError } = useNotification();
-  const { data, loading, refetch } = useQuery<Query, QueryReservationByPkArgs>(
+  const typename = "ReservationType";
+  const id = base64encode(`${typename}:${pk}`);
+  const { data, loading, refetch } = useQuery<Query, QueryReservationArgs>(
     SINGLE_RESERVATION_QUERY,
     {
-      skip: !id || Number.isNaN(Number(id)),
+      skip: !pk || Number.isNaN(Number(pk)),
       fetchPolicy: "no-cache",
       variables: {
-        pk: Number(id),
+        id,
       },
       onError: () => {
         notifyError(t("errors.errorFetchingData"));
@@ -626,7 +629,7 @@ const PermissionWrappedReservation = () => {
     }
   );
 
-  const reservation = data?.reservationByPk;
+  const { reservation } = data ?? {};
 
   if (loading) {
     return <Loader />;

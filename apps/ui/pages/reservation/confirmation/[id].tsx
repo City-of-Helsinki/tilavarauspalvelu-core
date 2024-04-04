@@ -2,7 +2,7 @@ import React from "react";
 import { useQuery } from "@apollo/client";
 import { breakpoints } from "common/src/common/style";
 import { H2 } from "common/src/common/typography";
-import { Query, QueryReservationByPkArgs } from "common/types/gql-types";
+import type { Query, QueryReservationArgs } from "common/types/gql-types";
 import { LoadingSpinner } from "hds-react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -15,6 +15,7 @@ import { Paragraph } from "@/components/reservation/styles";
 import { GET_RESERVATION } from "@/modules/queries/reservation";
 import { useOrder } from "@/hooks/reservation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { base64encode } from "common/src/helpers";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
@@ -59,16 +60,18 @@ const Columns = styled.div`
 const ReservationSuccess = ({ reservationPk, apiBaseUrl }: Props) => {
   const { t } = useTranslation();
 
+  const typename = "ReservationType";
+  const id = base64encode(`${typename}:${reservationPk}`);
   const {
     data,
     loading: isReservationLoading,
     error: isError,
-  } = useQuery<Query, QueryReservationByPkArgs>(GET_RESERVATION, {
+  } = useQuery<Query, QueryReservationArgs>(GET_RESERVATION, {
     skip: !reservationPk,
     fetchPolicy: "no-cache",
-    variables: { pk: reservationPk },
+    variables: { id },
   });
-  const reservation = data?.reservationByPk;
+  const { reservation } = data ?? {};
 
   const {
     order,

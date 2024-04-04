@@ -70,7 +70,6 @@ const SPECIALISED_SINGLE_RESERVATION_FRAGMENT = gql`
   }
 `;
 
-// TODO replace with relay query
 export const SINGLE_RESERVATION_QUERY = gql`
   ${RESERVATION_META_FRAGMENT}
   ${RESERVATION_UNIT_FRAGMENT}
@@ -78,8 +77,8 @@ export const SINGLE_RESERVATION_QUERY = gql`
   ${RESERVATION_COMMON_FRAGMENT}
   ${RESERVATION_RECURRING_FRAGMENT}
   ${SPECIALISED_SINGLE_RESERVATION_FRAGMENT}
-  query reservationByPk($pk: Int!) {
-    reservationByPk(pk: $pk) {
+  query reservation($id: ID!) {
+    reservation(id: $id) {
       ...ReservationCommon
       ...ReservationRecurring
       ...ReservationSpecialisation

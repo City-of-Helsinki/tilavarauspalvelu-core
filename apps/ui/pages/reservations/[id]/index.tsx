@@ -15,7 +15,7 @@ import { H2, H4, fontRegular } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
   type Query,
-  type QueryReservationByPkArgs,
+  type QueryReservationArgs,
   ReserveeType,
   State,
 } from "common/types/gql-types";
@@ -54,27 +54,29 @@ import {
   getGenericTerms,
 } from "@/modules/serverUtils";
 import { GET_RESERVATION } from "@/modules/queries/reservation";
+import { base64encode } from "common/src/helpers";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const { locale, params } = ctx;
-  const id = Number(params?.id);
+  const pk = Number(params?.id);
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
-  if (isFinite(id)) {
+  if (isFinite(pk)) {
     const bookingTerms = await getGenericTerms(apolloClient);
 
     // NOTE errors will fallback to 404
+    const id = base64encode(`ReservationType:${pk}`);
     const { data, error } = await apolloClient.query<
       Query,
-      QueryReservationByPkArgs
+      QueryReservationArgs
     >({
       query: GET_RESERVATION,
       fetchPolicy: "no-cache",
-      variables: { pk: id },
+      variables: { id },
     });
 
     if (error) {
@@ -82,7 +84,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       console.error("Error while fetching reservation", error);
     }
 
-    const reservation = data?.reservationByPk ?? null;
+    const { reservation } = data ?? {};
     if (reservation != null) {
       return {
         props: {

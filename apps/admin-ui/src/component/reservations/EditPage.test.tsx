@@ -99,7 +99,7 @@ const extendedMocks = [
     },
     result: {
       data: {
-        reservationByPk: extendedReservation,
+        reservation: extendedReservation,
       },
     },
   },
