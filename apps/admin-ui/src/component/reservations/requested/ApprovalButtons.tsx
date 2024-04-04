@@ -107,22 +107,36 @@ const ApprovalButtons = ({
   return (
     <>
       {endTime > new Date() && isPossibleToApprove(state, endTime) && (
-        <Button {...btnCommon} onClick={handleApproveClick}>
+        <Button
+          {...btnCommon}
+          onClick={handleApproveClick}
+          data-testid="approval-buttons__approve-button"
+        >
           {t("RequestedReservation.approve")}
         </Button>
       )}
       {isPossibleToDeny(state, endTime) && (
-        <Button {...btnCommon} onClick={handleDenyClick}>
+        <Button
+          {...btnCommon}
+          onClick={handleDenyClick}
+          data-testid="approval-buttons__reject-button"
+        >
           {t("RequestedReservation.reject")}
         </Button>
       )}
       {isPossibleToReturn(state, endTime) && (
-        <Button {...btnCommon} onClick={handleReturnToHandlingClick}>
+        <Button
+          {...btnCommon}
+          onClick={handleReturnToHandlingClick}
+          data-testid="approval-buttons__return-to-handling-button"
+        >
           {t("RequestedReservation.returnToHandling")}
         </Button>
       )}
       {!disableNonEssentialButtons && isAllowedToModify && (
-        <ButtonLikeLink to="edit">{t("ApprovalButtons.edit")}</ButtonLikeLink>
+        <ButtonLikeLink to="edit" data-testid="approval-buttons__edit-link">
+          {t("ApprovalButtons.edit")}
+        </ButtonLikeLink>
       )}
     </>
   );

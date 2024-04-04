@@ -307,12 +307,18 @@ const DialogContent = ({
         </VerticalFlex>
       </Dialog.Content>
       <ActionButtons>
-        <Button variant="secondary" onClick={onClose} theme="black">
+        <Button
+          variant="secondary"
+          onClick={onClose}
+          theme="black"
+          data-testid="deny-dialog__cancel-button"
+        >
           {t("common.prev")}
         </Button>
         <Button
           disabled={!denyReasonPk || returnState === "not-decided"}
           onClick={handleDeny}
+          data-testid="deny-dialog__deny-button"
         >
           {t("RequestedReservation.DenyDialog.reject")}
         </Button>

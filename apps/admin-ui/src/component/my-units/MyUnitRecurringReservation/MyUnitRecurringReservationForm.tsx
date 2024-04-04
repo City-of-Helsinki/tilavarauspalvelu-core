@@ -430,6 +430,7 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
             {/* cancel is disabled while sending because we have no rollback */}
             <Button
               variant="secondary"
+              data-testid="recurring-reservation-form__cancel-button"
               onClick={handleCancel}
               disabled={isSubmitting}
             >
@@ -438,6 +439,7 @@ const MyUnitRecurringReservationForm = ({ reservationUnits }: Props) => {
             <Button
               variant="primary"
               type="submit"
+              data-testid="recurring-reservation-form__submit-button"
               isLoading={isSubmitting}
               disabled={newReservationsToMake.length === 0}
             >

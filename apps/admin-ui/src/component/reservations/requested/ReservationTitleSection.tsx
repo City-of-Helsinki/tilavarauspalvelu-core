@@ -85,7 +85,9 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
             </AlignVertically>
           </HorisontalFlex>
         </NameState>
-        <Tagline>{tagline}</Tagline>
+        <Tagline data-testid="reservation_title_section__tagline">
+          {tagline}
+        </Tagline>
         <DateTime>
           {t("RequestedReservation.createdAt")}{" "}
           {formatDateTime(reservation.createdAt ?? "")}

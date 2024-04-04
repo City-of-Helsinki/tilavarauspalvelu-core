@@ -81,11 +81,20 @@ const ApprovalButtonsRecurring = ({
 
   return (
     <>
-      <Button {...btnCommon} onClick={handleDenyClick}>
+      <Button
+        {...btnCommon}
+        onClick={handleDenyClick}
+        data-testid="approval-buttons-recurring__reject-button"
+      >
         {t("ApprovalButtons.recurring.rejectAllButton")}
       </Button>
       {!disableNonEssentialButtons && (
-        <ButtonLikeLink to="edit">{t("ApprovalButtons.edit")}</ButtonLikeLink>
+        <ButtonLikeLink
+          to="edit"
+          data-testid="approval-buttons-recurring__edit-link"
+        >
+          {t("ApprovalButtons.edit")}
+        </ButtonLikeLink>
       )}
     </>
   );

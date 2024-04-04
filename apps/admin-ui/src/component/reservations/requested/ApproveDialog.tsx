@@ -125,8 +125,8 @@ const DialogContent = ({
             <>
               <Checkbox
                 label={t("RequestedReservation.ApproveDialog.clearPrice")}
-                id="organisation.notRegistered"
-                name="organisation.notRegistered"
+                id="clearPrice"
+                type="button"
                 checked={Number(price) === 0}
                 onClick={() => {
                   if (Number(price) !== 0) {
@@ -143,7 +143,7 @@ const DialogContent = ({
                   minusStepButtonAriaLabel={t("common:subtract")}
                   plusStepButtonAriaLabel={t("common:add")}
                   step={1}
-                  id="name"
+                  id="approvalPrice"
                   label={t("RequestedReservation.ApproveDialog.price")}
                   onChange={(e) => setPrice(e.target.value)}
                   errorText={
@@ -155,7 +155,6 @@ const DialogContent = ({
               </div>
             </>
           ) : null}
-
           <TextArea
             value={handlingDetails}
             onChange={(e) => setHandlingDetails(e.target.value)}
@@ -166,11 +165,18 @@ const DialogContent = ({
         </VerticalFlex>
       </Dialog.Content>
       <ActionButtons>
-        <Button variant="secondary" onClick={onClose}>
+        <Button
+          variant="secondary"
+          onClick={onClose}
+          data-testid="approval-dialog__cancel-button"
+        >
           {t("common.cancel")}
         </Button>
-
-        <Button disabled={!priceIsValid} onClick={handleApprove}>
+        <Button
+          disabled={!priceIsValid}
+          onClick={handleApprove}
+          data-testid="approval-dialog__accept-button"
+        >
           {t("RequestedReservation.ApproveDialog.accept")}
         </Button>
       </ActionButtons>
