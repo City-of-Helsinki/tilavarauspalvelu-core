@@ -13,7 +13,7 @@ import { useNotification } from "@/context/NotificationContext";
 import { Container } from "@/styles/layout";
 import { BasicLink } from "@/styles/util";
 import Loader from "../Loader";
-import ReservationUnitList from "./ReservationUnitList";
+import { ReservationUnitList } from "./ReservationUnitList";
 import ExternalLink from "./ExternalLink";
 import BreadcrumbWrapper from "../BreadcrumbWrapper";
 import { base64encode, filterNonNullable } from "common/src/helpers";

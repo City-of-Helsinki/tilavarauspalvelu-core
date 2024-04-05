@@ -1,8 +1,7 @@
 import { format, parseISO } from "date-fns";
 import i18next from "i18next";
-import { groupBy, set, get, trim } from "lodash";
+import { set, get, trim } from "lodash";
 import type { LocationNode, Query } from "common/types/gql-types";
-import { DataFilterOption } from "./types";
 import { NUMBER_OF_DECIMALS } from "./const";
 import type { TFunction } from "next-i18next";
 
@@ -196,27 +195,6 @@ export const parseAddress = (location: LocationNode): string => {
     }`,
     ", "
   );
-};
-
-/** Filtering logic "OR within the group, AND between groups" */
-export const filterData = <T>(data: T[], filters: DataFilterOption[]): T[] => {
-  const groups = groupBy(filters, "key");
-  const groupCount = Object.keys(groups).length;
-
-  return data.filter((row) => {
-    const groupsNames = Object.keys(groups);
-    const groupsMatched = groupsNames.filter((name) => {
-      const found = groups[name].find((filter) => {
-        if (filter.function) {
-          return filter.function(row);
-        }
-        return get(row, filter.key as string) === filter.value;
-      });
-      return Boolean(found);
-    });
-
-    return groupsMatched.length === groupCount;
-  });
 };
 
 export const combineResults = (

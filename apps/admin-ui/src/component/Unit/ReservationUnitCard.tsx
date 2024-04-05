@@ -8,11 +8,12 @@ import {
   Tag,
 } from "hds-react";
 import { useTranslation } from "react-i18next";
-import { H2 } from "common/src/common/typography";
+import { H2, fontMedium } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { ImageType, type ReservationUnitNode } from "common/types/gql-types";
-import { BasicLink } from "../../styles/util";
-import IconDraft from "../../images/icon_draft.svg";
+import { BasicLink } from "@/styles/util";
+import IconDraft from "@/images/icon_draft.svg";
+import { getImageSource } from "common/src/helpers";
 
 interface IProps {
   reservationUnit: ReservationUnitNode;
@@ -22,7 +23,6 @@ interface IProps {
 const Wrapper = styled.div`
   background-color: var(--color-black-5);
   display: grid;
-  margin-bottom: var(--spacing-2-xs);
 
   @media (min-width: ${breakpoints.l}) {
     grid-template-columns: 213px auto;
@@ -32,11 +32,15 @@ const Wrapper = styled.div`
   }
 `;
 
+// NOTE height is weird, we should have the card height defined then wouldn't this kinda hacks
+// with 160px the text overflows, 100% without image => 213px (becomes a square)
 const ImageBox = styled.div`
   display: none;
   height: 160px;
 
   @media (min-width: ${breakpoints.l}) {
+    height: 100%;
+    max-height: 180px;
     background-color: var(--color-silver);
     display: flex;
     align-items: center;
@@ -49,13 +53,13 @@ const ImageBox = styled.div`
 `;
 
 const Image = styled.img`
-  height: 160px;
+  height: 100%;
   width: 100%;
   object-fit: cover;
 `;
 
 const Content = styled.div`
-  padding: var(--spacing-m) var(--spacing-l);
+  padding: var(--spacing-m);
 
   ${H2} {
     margin: 0;
@@ -69,20 +73,17 @@ const ComboType = styled.div`
 const Props = styled.div`
   @media (min-width: ${breakpoints.s}) {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: repeat(4, auto);
     gap: var(--spacing-m);
   }
 `;
 
 const Prop = styled.div<{ $disabled?: boolean }>`
   overflow: hidden;
-  display: grid;
-  grid-template-columns: 32px 1fr;
+  display: flex;
   align-items: center;
   gap: var(--spacing-2-xs);
-  font-family: var(--tilavaraus-admin-font-medium);
-  font-weight: 500;
-  margin-bottom: var(--spacing-xs);
+  ${fontMedium}
 
   ${({ $disabled }) => $disabled && "opacity: 0.4;"}
 
@@ -96,31 +97,34 @@ const Published = styled(Tag)`
   color: var(--color-white);
 `;
 
-const NoBr = styled.span`
+const NoWrap = styled.span`
   white-space: nowrap;
 `;
 
-const ReservationUnitCard = ({
+export function ReservationUnitCard({
   reservationUnit,
   unitId,
-}: IProps): JSX.Element => {
+}: IProps): JSX.Element {
   const { t } = useTranslation();
 
   const image =
-    reservationUnit.images?.find((i) => i?.imageType === ImageType.Main) ||
-    reservationUnit.images?.find(() => true);
+    reservationUnit.images?.find((i) => i?.imageType === ImageType.Main) ??
+    reservationUnit.images?.find(() => true) ??
+    null;
 
   const hasPurposes = (reservationUnit?.purposes?.length || 0) > 0;
+
+  // TODO use urlBuilder
+  const link = `/unit/${unitId}/reservationUnit/edit/${reservationUnit.pk}`;
+  const imgSrc = getImageSource(image, "medium");
 
   return (
     <Wrapper>
       <ImageBox>
-        {image?.mediumUrl ? <Image src={image?.mediumUrl} /> : null}
+        <Image src={imgSrc} alt="" />
       </ImageBox>
       <Content>
-        <BasicLink
-          to={`/unit/${unitId}/reservationUnit/edit/${reservationUnit.pk}`}
-        >
+        <BasicLink to={link}>
           <H2 $legacy>{reservationUnit.nameFi}</H2>
           <IconArrowRight />
         </BasicLink>
@@ -134,14 +138,14 @@ const ReservationUnitCard = ({
         <Props>
           <Prop $disabled={!hasPurposes}>
             <IconLayers />{" "}
-            <NoBr>
+            <NoWrap>
               {t(
                 hasPurposes
                   ? "ReservationUnitCard.purpose"
                   : "ReservationUnitCard.noPurpose",
                 { count: reservationUnit.purposes?.length }
               )}
-            </NoBr>
+            </NoWrap>
           </Prop>
           <Prop $disabled={!reservationUnit.reservationUnitType}>
             <IconHome />{" "}
@@ -165,16 +169,11 @@ const ReservationUnitCard = ({
                 {t("ReservationUnitCard.stateDraft")}
               </>
             ) : (
-              <>
-                <span />
-                <Published>{t("ReservationUnitCard.statePublished")}</Published>
-              </>
+              <Published>{t("ReservationUnitCard.statePublished")}</Published>
             )}
           </Prop>
         </Props>
       </Content>
     </Wrapper>
   );
-};
-
-export default ReservationUnitCard;
+}
