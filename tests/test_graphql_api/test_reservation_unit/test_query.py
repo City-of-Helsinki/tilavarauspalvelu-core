@@ -1,12 +1,14 @@
 import datetime
 
 import pytest
+from django.contrib.auth import get_user_model
 from django.utils.timezone import get_default_timezone
 from graphql_relay import to_global_id
 
 from applications.choices import WeekdayChoice
 from common.date_utils import local_datetime
 from reservation_units.enums import PricingType, ReservationUnitState
+from reservations.choices import ReservationStateChoice
 from terms_of_use.models import TermsOfUse
 from tests.factories import (
     ApplicationRoundFactory,
@@ -26,7 +28,7 @@ from tests.factories import (
     SpaceFactory,
     TermsOfUseFactory,
 )
-from tests.helpers import UserType
+from tests.helpers import UserType, next_hour
 
 from .helpers import reservation_unit_query, reservation_units_query
 
@@ -689,3 +691,64 @@ def test_reservation_unit__query__payment_product(graphql):
             },
         },
     }
+
+
+def test_reservation_unit__query__num_active_user_reservations(graphql):
+    user = graphql.login_with_regular_user()
+    other_user = get_user_model().objects.create_user(username="other_user", email="other_user@django.com")
+
+    reservation_unit = ReservationUnitFactory.create()
+
+    begin = next_hour(1)
+    end = begin + datetime.timedelta(hours=1)
+
+    # Correct user
+    ReservationFactory.create_for_reservation_unit(begin=begin, end=end, reservation_unit=reservation_unit, user=user)
+    # Another user
+    ReservationFactory.create_for_reservation_unit(
+        begin=begin, end=end, reservation_unit=reservation_unit, user=other_user
+    )
+    # Unauthenticated user
+    ReservationFactory.create_for_reservation_unit(begin=begin, end=end, reservation_unit=reservation_unit)
+    # Another reservation unit
+    ReservationFactory.create(begin=begin, end=end)
+    # Another reservation unit with correct user
+    ReservationFactory.create(begin=begin, end=end, user=user)
+    # Past reservation
+    ReservationFactory.create_for_reservation_unit(
+        begin=begin - datetime.timedelta(days=1),
+        end=end - datetime.timedelta(days=1),
+        reservation_unit=reservation_unit,
+        user=user,
+    )
+    # Denied reservation
+    ReservationFactory.create_for_reservation_unit(
+        begin=begin, end=end, reservation_unit=reservation_unit, user=user, state=ReservationStateChoice.DENIED
+    )
+
+    query = reservation_units_query(fields="numActiveUserReservations", pk=reservation_unit.pk)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 1
+    assert response.node(0) == {"numActiveUserReservations": 1}
+
+
+def test_reservation_unit__query__num_active_user_reservations__user_unauthenticated(graphql):
+    reservation_unit = ReservationUnitFactory.create()
+
+    begin = next_hour(1)
+    end = begin + datetime.timedelta(hours=1)
+
+    # Reservation with a user
+    user = get_user_model().objects.create_user(username="other_user", email="other_user@django.com")
+    ReservationFactory.create_for_reservation_unit(begin=begin, end=end, reservation_unit=reservation_unit, user=user)
+    # Reservation without a user
+    ReservationFactory.create_for_reservation_unit(begin=begin, end=end, reservation_unit=reservation_unit)
+
+    query = reservation_units_query(fields="numActiveUserReservations", pk=reservation_unit.pk)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 1
+    assert response.node(0) == {"numActiveUserReservations": 0}

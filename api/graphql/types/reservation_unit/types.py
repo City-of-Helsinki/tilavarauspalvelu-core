@@ -55,6 +55,8 @@ class ReservationUnitNode(DjangoNode):
 
     reservation_set = DjangoListField(ReservationNode)
 
+    num_active_user_reservations = graphene.Int()
+
     calculated_surface_area = AnnotatedField(graphene.Int, expression=Sum("surface_area"))
 
     class Meta:
@@ -146,6 +148,7 @@ class ReservationUnitNode(DjangoNode):
             "reservable_time_spans",
             "is_closed",
             "first_reservable_datetime",
+            "num_active_user_reservations",
         ]
         restricted_fields = {
             "cancellation_rule": lambda user: user.is_authenticated,
@@ -207,3 +210,12 @@ class ReservationUnitNode(DjangoNode):
                 start_date, end_date
             )
         ]
+
+    def resolve_num_active_user_reservations(root: ReservationUnit, info: GQLInfo) -> int:
+        """
+        Number of active reservations made by the user to this ReservationUnit.
+        This is used to determine if the user can make a new reservation based on the max_reservations_per_user.
+        """
+        if not info.context.user.is_authenticated:
+            return 0
+        return root.reservation_set.filter(user=info.context.user).active().count()
