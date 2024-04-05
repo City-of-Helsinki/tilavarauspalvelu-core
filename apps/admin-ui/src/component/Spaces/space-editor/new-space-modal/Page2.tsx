@@ -4,10 +4,8 @@ import { Button, Dialog, IconArrowLeft, IconCheck } from "hds-react";
 import type { UnitNode } from "common/types/gql-types";
 import { CustomDialogHeader } from "@/component/CustomDialogHeader";
 import {
-  ActionButtons,
   Address,
   Name,
-  NextButton,
   Parent,
   RoundTag,
   UnitInfo,
@@ -16,6 +14,7 @@ import { parseAddress } from "@/common/util";
 import { SpaceForm, type SpaceUpdateForm } from "../SpaceForm";
 import { FormErrorSummary } from "@/common/FormErrorSummary";
 import { UseFormReturn } from "react-hook-form";
+import { DialogActionsButtons } from "app/styles/util";
 
 type Props = {
   unit: UnitNode;
@@ -83,7 +82,7 @@ export function Page2({
           </div>
         </div>
       </Dialog.Content>
-      <ActionButtons>
+      <DialogActionsButtons>
         <Button
           onClick={onPrevPage}
           variant="supplementary"
@@ -91,14 +90,14 @@ export function Page2({
         >
           {t("SpaceModal.page2.prevButton")}
         </Button>
-        <NextButton
+        <Button
           disabled={!isDirty}
           type="submit"
           loadingText={t("SpaceModal.page2.saving")}
         >
           {t("SpaceModal.page2.createButton")}
-        </NextButton>
-      </ActionButtons>
+        </Button>
+      </DialogActionsButtons>
     </>
   );
 }

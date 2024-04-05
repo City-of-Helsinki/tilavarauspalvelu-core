@@ -1,4 +1,4 @@
-import { Button, IconTrash, Tag } from "hds-react";
+import { Tag } from "hds-react";
 import styled from "styled-components";
 
 export const Title = styled.div`
@@ -27,24 +27,6 @@ export const Parent = styled.div`
   margin-bottom: var(--spacing-m);
 `;
 
-export const ActionButtons = styled.div`
-  display: flex;
-  padding: var(--spacing-m);
-`;
-
-export const NextButton = styled(Button)`
-  margin-left: auto;
-`;
-
-export const ButtonContainer = styled.div`
-  display: flex;
-`;
-export const NewRowButton = styled(Button)`
-  color: var(--color-black);
-  position: relative;
-  margin-left: auto;
-`;
-
 export const EditorContainer = styled.div`
   margin: var(--spacing-l) 0;
   display: grid;
@@ -69,9 +51,4 @@ export const RoundTag = styled(Tag)`
   font-weight: 600;
   margin-top: var(--spacing-s);
   margin-left: auto;
-`;
-
-export const IconDelete = styled(IconTrash)`
-  margin: var(--spacing-m) 0 0 var(--spacing-s);
-  padding: var(--spacing-s);
 `;

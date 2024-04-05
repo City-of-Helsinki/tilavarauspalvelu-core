@@ -6,10 +6,8 @@ import { parseAddress } from "@/common/util";
 import { CustomDialogHeader } from "@/component/CustomDialogHeader";
 import { ParentSelector } from "../ParentSelector";
 import {
-  ActionButtons,
   Address,
   Name,
-  NextButton,
   Parent,
   RoundTag,
   Title,
@@ -17,6 +15,7 @@ import {
 } from "./modules/newSpaceModal";
 import { Controller, UseFormReturn } from "react-hook-form";
 import { SpaceUpdateForm } from "../SpaceForm";
+import { DialogActionsButtons } from "@/styles/util";
 
 export function Page1({
   unit,
@@ -34,8 +33,8 @@ export function Page1({
   const { t } = useTranslation();
   const { control, watch } = form;
 
-  // FIXME needs to do a lookup if parent pk is set to find the name
-  const parentName = watch("parent") ?? null;
+  const parentPk = watch("parent") ?? null;
+  const parentName = unit.spaces.find((space) => space.pk === parentPk)?.nameFi;
   return (
     <>
       <CustomDialogHeader
@@ -63,29 +62,6 @@ export function Page1({
           ) : null}
         </UnitInfo>
         {!hasFixedParent ? <Title>{t("SpaceModal.page1.title")}</Title> : null}
-        {/*
-        <NumberInput
-          style={{ maxWidth: "15em" }}
-          value={editorState.numSpaces}
-          helperText={t("SpaceModal.page1.numSpacesHelperText")}
-          id="WithDefaultValue"
-          label={t("SpaceModal.page1.numSpacesLabel")}
-          minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
-          plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
-          onChange={(e) => {
-            dispatch({
-              type: "setNumSpaces",
-              numSpaces: Number(e.target.value),
-            });
-          }}
-          step={1}
-          type="number"
-          min={1}
-          max={10}
-          required
-        />
-        */}
-        {/* TODO should be inside a Controller */}
         {!hasFixedParent ? (
           <Controller
             control={control}
@@ -95,24 +71,24 @@ export function Page1({
                 label={t("SpaceModal.page1.parentLabel")}
                 unitPk={unit.pk ?? 0}
                 value={value}
-                onChange={(parentPk) => onChange(parentPk)}
+                onChange={(parent) => onChange(parent)}
               />
             )}
           />
         ) : null}
       </Dialog.Content>
-      <ActionButtons>
-        <Button onClick={closeModal} variant="secondary">
+      <DialogActionsButtons>
+        <Button onClick={closeModal} variant="secondary" theme="black">
           {t("SpaceModal.page1.buttonCancel")}
         </Button>
-        <NextButton
+        <Button
           iconRight={<IconArrowRight />}
           variant="supplementary"
           onClick={onNextPage}
         >
           {t("SpaceModal.page1.buttonNext")}
-        </NextButton>
-      </ActionButtons>
+        </Button>
+      </DialogActionsButtons>
     </>
   );
 }

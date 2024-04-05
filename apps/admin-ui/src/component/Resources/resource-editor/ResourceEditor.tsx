@@ -25,7 +25,6 @@ import {
   Editor,
   ResourceUpdateSchema,
   type ResourceUpdateForm,
-  SaveButton,
 } from "./modules/resourceEditor";
 import { ResourceEditorFields } from "./EditForm";
 import BreadcrumbWrapper from "app/component/BreadcrumbWrapper";
@@ -147,9 +146,9 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
               >
                 {t("ResourceModal.cancel")}
               </Button>
-              <SaveButton type="submit" variant="secondary" disabled={!isDirty}>
+              <Button type="submit" disabled={!isDirty}>
                 {t("ResourceModal.save")}
-              </SaveButton>
+              </Button>
             </ButtonContainer>
           </Editor>
         </form>

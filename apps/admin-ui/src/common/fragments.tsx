@@ -36,6 +36,9 @@ export const SPACE_FRAGMENT = gql`
     resourceSet {
       ...ResourceFields
     }
+    children {
+      pk
+    }
   }
 `;
 

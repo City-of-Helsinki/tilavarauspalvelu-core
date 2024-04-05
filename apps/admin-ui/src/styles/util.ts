@@ -1,4 +1,4 @@
-import { Checkbox, Navigation, Notification } from "hds-react";
+import { Checkbox, Dialog, Navigation, Notification } from "hds-react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { breakpoints } from "common/src/common/style";
@@ -61,4 +61,8 @@ export const StyledNotification = styled(Notification)`
   @media (min-width: ${breakpoints.xl}) {
     margin: var(--spacing-s) var(--spacing-layout-xl);
   }
+`;
+
+export const DialogActionsButtons = styled(Dialog.ActionButtons)`
+  justify-content: space-between;
 `;

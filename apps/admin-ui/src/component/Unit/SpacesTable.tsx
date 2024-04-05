@@ -190,6 +190,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
     {
       headerName: t("Unit.headings.maxPersons"),
       key: "maxPersons",
+      // TODO this is weird it creates both the max Persons and the buttons to the same cell
       transform: (space: SpaceNode) => (
         <MaxPersons>
           {space.maxPersons != null && (

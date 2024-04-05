@@ -50,6 +50,7 @@ const ConfirmationDialog = forwardRef(
         <Dialog.ActionButtons>
           <Button
             variant="secondary"
+            theme="black"
             onClick={() => {
               setState({ ...state, open: false });
               if (state.onCancel) {
@@ -60,6 +61,7 @@ const ConfirmationDialog = forwardRef(
             {t(state.cancelLabel || "common.cancel")}
           </Button>
           <Button
+            variant="danger"
             onClick={() => {
               setState({ ...state, open: false });
               if (state.onAccept) {

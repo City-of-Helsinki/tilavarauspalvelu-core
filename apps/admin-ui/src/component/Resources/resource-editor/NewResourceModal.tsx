@@ -17,16 +17,14 @@ import { CREATE_RESOURCE } from "./queries";
 import { useNotification } from "@/context/NotificationContext";
 import {
   Editor,
-  EditorContainer,
   ResourceUpdateForm,
   ResourceUpdateSchema,
-  SaveButton,
 } from "./modules/resourceEditor";
 import { FormErrorSummary } from "@/common/FormErrorSummary";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ResourceEditorFields } from "./EditForm";
-import { ButtonContainer } from "@/styles/layout";
+import { DialogActionsButtons } from "app/styles/util";
 
 interface IProps {
   unit: UnitNode;
@@ -112,13 +110,11 @@ export function NewResourceModal({
           ) : null}
         </UnitInfo>
         <FormErrorSummary errors={errors} />
-        <EditorContainer>
-          <Editor>
-            <ResourceEditorFields form={form} unitPk={unit.pk ?? 0} />
-          </Editor>
-        </EditorContainer>
+        <Editor>
+          <ResourceEditorFields form={form} unitPk={unit.pk ?? 0} />
+        </Editor>
       </Dialog.Content>
-      <ButtonContainer>
+      <DialogActionsButtons>
         <Button
           onClick={closeModal}
           variant="secondary"
@@ -127,10 +123,10 @@ export function NewResourceModal({
         >
           {t("ResourceModal.cancel")}
         </Button>
-        <SaveButton type="submit" variant="secondary" disabled={!isDirty}>
+        <Button type="submit" disabled={!isDirty}>
           {t("ResourceModal.save")}
-        </SaveButton>
-      </ButtonContainer>
+        </Button>
+      </DialogActionsButtons>
     </form>
   );
 }
