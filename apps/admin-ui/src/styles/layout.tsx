@@ -34,12 +34,6 @@ export const NarrowContainer = styled.div`
 
 NarrowContainer.displayName = "NarrowContainer";
 
-export const WideContainer = styled(IngressContainer)`
-  padding-left: var(--spacing-m);
-`;
-
-WideContainer.displayName = "WideContainer";
-
 export const GridCol = styled.div`
   &:last-child {
     padding-bottom: var(--spacing-xl);
@@ -129,6 +123,7 @@ HorisontalFlex.displayName = "HorisontalFlex";
 export const ButtonContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
+  justify-content: space-between;
   gap: var(--spacing-2-xs);
   width: 100%;
   margin-bottom: var(--spacing-s);

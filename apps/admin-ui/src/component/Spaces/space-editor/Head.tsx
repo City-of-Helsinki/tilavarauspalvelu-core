@@ -6,8 +6,6 @@ import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import type { Maybe, UnitNode } from "common/types/gql-types";
 import { parseAddress } from "@/common/util";
-import { ContentContainer, IngressContainer } from "@/styles/layout";
-import LinkPrev from "@/component/LinkPrev";
 
 interface IProps {
   title: string;
@@ -28,11 +26,6 @@ const Name = styled.div`
 const Address = styled.div`
   font-size: var(--fontsize-body-s);
   line-height: 26px;
-`;
-
-const Ingress = styled.div`
-  display: flex;
-  gap: var(--spacing-m);
 `;
 
 const Props = styled.div`
@@ -57,7 +50,12 @@ const Prop = styled.div<{ $disabled: boolean }>`
   ${({ $disabled }) => $disabled && "opacity: 0.4;"}
 `;
 
-function Head({ title, unit, surfaceArea, maxPersons }: IProps): JSX.Element {
+export function Head({
+  title,
+  unit,
+  surfaceArea,
+  maxPersons,
+}: IProps): JSX.Element {
   const { t } = useTranslation();
 
   // TODO use urlBuilder
@@ -65,43 +63,34 @@ function Head({ title, unit, surfaceArea, maxPersons }: IProps): JSX.Element {
 
   return (
     <Wrapper>
-      <ContentContainer>
-        <LinkPrev route={unitUrl} />
-      </ContentContainer>
-      <IngressContainer>
-        <Ingress>
-          <div>
-            <Name>{title}</Name>
-            <Address>
-              {unit?.location
-                ? parseAddress(unit?.location)
-                : t("SpaceEditor.noAddress")}
-            </Address>
-            <Props>
-              <Prop $disabled={!unit}>
-                <IconLocation />{" "}
-                {unit ? (
-                  <Link to={unitUrl}>{unit?.nameFi}</Link>
-                ) : (
-                  t("SpaceEditor.noUnit")
-                )}
-              </Prop>
-              <Prop $disabled={!maxPersons}>
-                <IconGroup /> {maxPersons || t("SpaceEditor.noMaxPersons")}
-              </Prop>
-              <Prop $disabled={!surfaceArea}>
-                {`${
-                  surfaceArea
-                    ? t("SpaceEditor.area", { surfaceArea })
-                    : t("SpaceEditor.noSurfaceArea")
-                }`}
-              </Prop>
-            </Props>
-          </div>
-        </Ingress>
-      </IngressContainer>
+      <div>
+        <Name>{title}</Name>
+        <Address>
+          {unit?.location
+            ? parseAddress(unit?.location)
+            : t("SpaceEditor.noAddress")}
+        </Address>
+        <Props>
+          <Prop $disabled={!unit}>
+            <IconLocation />{" "}
+            {unit ? (
+              <Link to={unitUrl}>{unit?.nameFi}</Link>
+            ) : (
+              t("SpaceEditor.noUnit")
+            )}
+          </Prop>
+          <Prop $disabled={!maxPersons}>
+            <IconGroup /> {maxPersons || t("SpaceEditor.noMaxPersons")}
+          </Prop>
+          <Prop $disabled={!surfaceArea}>
+            {`${
+              surfaceArea
+                ? t("SpaceEditor.area", { surfaceArea })
+                : t("SpaceEditor.noSurfaceArea")
+            }`}
+          </Prop>
+        </Props>
+      </div>
     </Wrapper>
   );
 }
-
-export default Head;

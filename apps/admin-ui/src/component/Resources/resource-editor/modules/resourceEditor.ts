@@ -15,11 +15,6 @@ export const ResourceUpdateSchema = z.object({
 
 export type ResourceUpdateForm = z.infer<typeof ResourceUpdateSchema>;
 
-export const Buttons = styled.div`
-  display: flex;
-  padding: var(--spacing-m);
-`;
-
 export const SaveButton = styled(Button)`
   margin-left: auto;
 `;
@@ -31,10 +26,7 @@ export const EditorContainer = styled.div`
 `;
 
 export const Editor = styled.div`
-  @media (min-width: ${breakpoints.m}) {
-    margin: 0 var(--spacing-layout-m);
-  }
-  max-width: 52rem;
+  max-width: var(--prose-width);
 `;
 
 export const EditorColumns = styled.div`

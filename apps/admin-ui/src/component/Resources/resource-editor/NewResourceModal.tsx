@@ -16,7 +16,6 @@ import { CustomDialogHeader } from "@/component/CustomDialogHeader";
 import { CREATE_RESOURCE } from "./queries";
 import { useNotification } from "@/context/NotificationContext";
 import {
-  Buttons,
   Editor,
   EditorContainer,
   ResourceUpdateForm,
@@ -27,6 +26,7 @@ import { FormErrorSummary } from "@/common/FormErrorSummary";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ResourceEditorFields } from "./EditForm";
+import { ButtonContainer } from "@/styles/layout";
 
 interface IProps {
   unit: UnitNode;
@@ -118,10 +118,11 @@ export function NewResourceModal({
           </Editor>
         </EditorContainer>
       </Dialog.Content>
-      <Buttons>
+      <ButtonContainer>
         <Button
           onClick={closeModal}
           variant="secondary"
+          theme="black"
           disabled={isMutationLoading}
         >
           {t("ResourceModal.cancel")}
@@ -129,7 +130,7 @@ export function NewResourceModal({
         <SaveButton type="submit" variant="secondary" disabled={!isDirty}>
           {t("ResourceModal.save")}
         </SaveButton>
-      </Buttons>
+      </ButtonContainer>
     </form>
   );
 }

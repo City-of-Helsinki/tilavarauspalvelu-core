@@ -5,11 +5,11 @@ import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import { useQuery } from "@apollo/client";
 import type { Query, QueryUnitArgs } from "common/types/gql-types";
-import { ContentContainer, WideContainer } from "@/styles/layout";
+import { Container } from "@/styles/layout";
 import Loader from "../Loader";
 import { ResourcesTable } from "./ResourcesTable";
 import { SpacesTable } from "./SpacesTable";
-import SubPageHead from "./SubPageHead";
+import { SubPageHead } from "./SubPageHead";
 import Modal, { useModal as useHDSModal } from "../HDSModal";
 import { NewSpaceModal } from "../Spaces/space-editor/new-space-modal/NewSpaceModal";
 import { NewResourceModal } from "../Resources/resource-editor/NewResourceModal";
@@ -17,6 +17,7 @@ import { UNIT_QUERY } from "@/common/queries";
 import { base64encode } from "common/src/helpers";
 import { useNotification } from "@/context/NotificationContext";
 import Error404 from "@/common/Error404";
+import BreadcrumbWrapper from "../BreadcrumbWrapper";
 
 interface IProps {
   [key: string]: string;
@@ -25,8 +26,8 @@ interface IProps {
 
 const TableHead = styled.div`
   display: flex;
-  margin: 2em 0;
-  padding-left: 2.5em;
+  margin-bottom: var(--spacing-m);
+  margin-top: var(--spacing-m);
 `;
 
 const Title = styled.div`
@@ -85,7 +86,6 @@ function SpacesResources(): JSX.Element {
   }
 
   const { unit } = data ?? {};
-  // TODO this should be an error
   if (unit == null) {
     return <Error404 />;
   }
@@ -93,21 +93,22 @@ function SpacesResources(): JSX.Element {
   const resources = unit.spaces?.flatMap((s) => s?.resourceSet);
 
   return (
-    <ContentContainer>
-      <Modal
-        id="space-modal"
-        open={newSpaceDialogIsOpen}
-        close={() => closeNewSpaceModal()}
-        afterCloseFocusRef={newSpacesButtonRef}
-      >
-        <NewSpaceModal
-          unit={unit}
-          closeModal={() => closeNewSpaceModal()}
-          refetch={refetch}
-        />
-      </Modal>
-      <SubPageHead title={t("Unit.spacesAndResources")} unit={unit} />
-      <WideContainer>
+    <>
+      <BreadcrumbWrapper backLink=".." />
+      <Container>
+        <Modal
+          id="space-modal"
+          open={newSpaceDialogIsOpen}
+          close={() => closeNewSpaceModal()}
+          afterCloseFocusRef={newSpacesButtonRef}
+        >
+          <NewSpaceModal
+            unit={unit}
+            closeModal={() => closeNewSpaceModal()}
+            refetch={refetch}
+          />
+        </Modal>
+        <SubPageHead title={t("Unit.spacesAndResources")} unit={unit} />
         <TableHead>
           <Title>{t("Unit.spaces")}</Title>
           <ActionButton
@@ -119,9 +120,7 @@ function SpacesResources(): JSX.Element {
             {t("Unit.addSpace")}
           </ActionButton>
         </TableHead>
-      </WideContainer>
-      <SpacesTable unit={unit} refetch={refetch} />
-      <WideContainer>
+        <SpacesTable unit={unit} refetch={refetch} />
         <TableHead>
           <Title>{t("Unit.resources")}</Title>
           <ActionButton
@@ -142,17 +141,17 @@ function SpacesResources(): JSX.Element {
             {t("Unit.addResource")}
           </ActionButton>
         </TableHead>
-      </WideContainer>
-      <ResourcesTable unit={unit} resources={resources} refetch={refetch} />
-      <Modal
-        id="resource-modal"
-        open={isNewResourceModalOpen}
-        close={closeNewResourceModal}
-        afterCloseFocusRef={newResourceButtonRef}
-      >
-        {modalContent}
-      </Modal>
-    </ContentContainer>
+        <ResourcesTable unit={unit} resources={resources} refetch={refetch} />
+        <Modal
+          id="resource-modal"
+          open={isNewResourceModalOpen}
+          close={closeNewResourceModal}
+          afterCloseFocusRef={newResourceButtonRef}
+        >
+          {modalContent}
+        </Modal>
+      </Container>
+    </>
   );
 }
 

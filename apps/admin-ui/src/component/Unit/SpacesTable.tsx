@@ -4,7 +4,7 @@ import { trim } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { type ApolloQueryResult, useMutation } from "@apollo/client";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import type {
   Maybe,
   SpaceDeleteMutationInput,
@@ -19,18 +19,14 @@ import Modal, { useModal as useHDSModal } from "../HDSModal";
 import { NewSpaceModal } from "../Spaces/space-editor/new-space-modal/NewSpaceModal";
 import ConfirmationDialog, { ModalRef } from "../ConfirmationDialog";
 import { useNotification } from "@/context/NotificationContext";
-import { CustomTable } from "../Table";
+import { CustomTable, TableLink } from "@/component/Table";
 import { getSpaceUrl } from "@/common/urls";
+import { truncate } from "common/src/helpers";
 
 interface IProps {
   unit: UnitNode;
   refetch: () => Promise<ApolloQueryResult<Query>>;
 }
-
-const Name = styled.div`
-  font-size: var(--fontsize-body-l);
-  font-family: var(--tilavaraus-admin-font-bold);
-`;
 
 const Prop = styled.div`
   margin-top: auto;
@@ -151,6 +147,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
     history(link);
   }
 
+  const MAX_NAME_LENGTH = 22;
   // TODO translation keys are wonky, yeah it's under a unit page but the table should be reusable
   const cols: SpacesTableColumn[] = [
     {
@@ -159,12 +156,11 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
       transform: (space: SpaceNode) => {
         const { pk, nameFi } = space;
         const link = getSpaceUrl(pk, unit.pk);
-        // TODO should use truncate instead so it doesn't overflow
         const name = nameFi != null && nameFi.length > 0 ? nameFi : "-";
         return (
-          <Link to={link}>
-            <Name>{trim(name)}</Name>
-          </Link>
+          <TableLink href={link}>
+            {truncate(trim(name), MAX_NAME_LENGTH)}
+          </TableLink>
         );
       },
       isSortable: false,

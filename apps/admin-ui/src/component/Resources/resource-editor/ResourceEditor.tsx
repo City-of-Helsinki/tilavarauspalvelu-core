@@ -16,20 +16,19 @@ import {
 import { base64encode } from "common/src/helpers";
 import { UNIT_WITH_SPACES_AND_RESOURCES } from "@/common/queries";
 import Loader from "@/component/Loader";
-import { ContentContainer, IngressContainer } from "@/styles/layout";
-import SubPageHead from "@/component/Unit/SubPageHead";
+import { ButtonContainer, Container, IngressContainer } from "@/styles/layout";
+import { SubPageHead } from "@/component/Unit/SubPageHead";
 import { useNotification } from "@/context/NotificationContext";
 import { FormErrorSummary } from "@/common/FormErrorSummary";
 import { RESOURCE_QUERY, UPDATE_RESOURCE } from "./queries";
 import {
-  Buttons,
   Editor,
-  EditorContainer,
   ResourceUpdateSchema,
   type ResourceUpdateForm,
   SaveButton,
 } from "./modules/resourceEditor";
 import { ResourceEditorFields } from "./EditForm";
+import BreadcrumbWrapper from "app/component/BreadcrumbWrapper";
 
 type Props = {
   resourcePk?: number;
@@ -124,31 +123,37 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
   const unit = unitData.unit;
   const resource = data.resource;
 
+  // TODO use url builder
+  const previousPage = `/unit/${unitPk}/spacesResources`;
   return (
-    <ContentContainer>
-      <SubPageHead
-        link={`/unit/${unitPk}/spacesResources`}
-        unit={unit}
-        title={resource.nameFi || t("ResourceEditor.defaultHeading")}
-      />
-      <IngressContainer>
-        <FormErrorSummary errors={errors} />
-      </IngressContainer>
-      <EditorContainer>
+    <>
+      <BreadcrumbWrapper backLink={previousPage} />
+      <Container>
+        <SubPageHead
+          unit={unit}
+          title={resource.nameFi || t("ResourceEditor.defaultHeading")}
+        />
+        <IngressContainer>
+          <FormErrorSummary errors={errors} />
+        </IngressContainer>
         <form noValidate onSubmit={handleSubmit(onSubmit)}>
           <Editor>
             <ResourceEditorFields form={form} unitPk={unitPk} />
-            <Buttons>
-              <Button onClick={() => history(-1)} variant="secondary">
+            <ButtonContainer>
+              <Button
+                onClick={() => history(-1)}
+                variant="secondary"
+                theme="black"
+              >
                 {t("ResourceModal.cancel")}
               </Button>
               <SaveButton type="submit" variant="secondary" disabled={!isDirty}>
                 {t("ResourceModal.save")}
               </SaveButton>
-            </Buttons>
+            </ButtonContainer>
           </Editor>
         </form>
-      </EditorContainer>
-    </ContentContainer>
+      </Container>
+    </>
   );
 }

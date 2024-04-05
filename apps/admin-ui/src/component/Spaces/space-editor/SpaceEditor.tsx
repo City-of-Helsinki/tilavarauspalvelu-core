@@ -4,8 +4,7 @@ import { useMutation, useQuery } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { H1 } from "common/src/common/typography";
-import { breakpoints } from "common/src/common/style";
+import { H2 } from "common/src/common/typography";
 import type {
   Mutation,
   MutationUpdateSpaceArgs,
@@ -15,10 +14,10 @@ import type {
 } from "common/types/gql-types";
 import { useNotification } from "@/context/NotificationContext";
 import Loader from "@/component/Loader";
-import { ContentContainer } from "@/styles/layout";
+import { ButtonContainer, Container } from "@/styles/layout";
 import { FormErrorSummary } from "@/common/FormErrorSummary";
 import { SPACE_QUERY, UPDATE_SPACE } from "./queries";
-import Head from "./Head";
+import { Head } from "./Head";
 import { SpaceHierarchy } from "./SpaceHierarchy";
 import { ParentSelector } from "./ParentSelector";
 import {
@@ -29,40 +28,21 @@ import {
 import { base64encode } from "common/src/helpers";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
-const EditorContainer = styled.div`
-  margin: 0;
-  @media (min-width: ${breakpoints.l}) {
-    margin: 0 var(--spacing-layout-m);
-  }
-`;
+import BreadcrumbWrapper from "app/component/BreadcrumbWrapper";
 
 const Editor = styled.div`
   margin: 0;
-  max-width: 52rem;
-
-  @media (min-width: ${breakpoints.l}) {
-    margin: 0 var(--spacing-layout-m);
-  }
+  max-width: var(--prose-width);
 `;
 
-const Section = styled.div`
-  margin: var(--spacing-layout-l) 0;
+const Section = styled.section`
+  margin: var(--spacing-m) 0;
 `;
 
 const SubHeading = styled.div`
   font-family: var(--tilavaraus-admin-font-bold);
   font-size: var(--fontsize-heading-xs);
   margin-bottom: var(--spacing-m);
-`;
-
-const Buttons = styled.div`
-  display: flex;
-  margin: var(--spacing-layout-m) 0;
-`;
-
-const SaveButton = styled(Button)`
-  margin-left: auto;
 `;
 
 type Props = {
@@ -167,68 +147,74 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
     }
   };
 
+  // TODO use url builder
+  const prevLink = `/unit/${unit}/spacesResources`;
+
   return (
     <form noValidate onSubmit={handleSubmit(onSubmit)}>
-      <Head
-        title={data?.space?.parent?.nameFi || t("SpaceEditor.noParent")}
-        unit={data?.space?.unit}
-        maxPersons={watch("maxPersons") || undefined}
-        surfaceArea={watch("surfaceArea") || undefined}
-      />
-      <ContentContainer>
-        <EditorContainer>
-          <H1 $legacy>{t("SpaceEditor.details")}</H1>
-          <Editor>
-            <FormErrorSummary errors={errors} />
-            <Section>
-              <SubHeading>{t("SpaceEditor.hierarchy")}</SubHeading>
-              {data?.space && (
-                <SpaceHierarchy
-                  space={data?.space}
-                  unitSpaces={data?.unit?.spaces}
+      <BreadcrumbWrapper backLink={prevLink} />
+      <Container>
+        <Head
+          title={data?.space?.parent?.nameFi || t("SpaceEditor.noParent")}
+          unit={data?.space?.unit}
+          maxPersons={watch("maxPersons") || undefined}
+          surfaceArea={watch("surfaceArea") || undefined}
+        />
+        <H2 $legacy style={{ margin: 0 }}>
+          {t("SpaceEditor.details")}
+        </H2>
+        <Editor>
+          <FormErrorSummary errors={errors} />
+          <Section>
+            <SubHeading>{t("SpaceEditor.hierarchy")}</SubHeading>
+            {data?.space && (
+              <SpaceHierarchy
+                space={data?.space}
+                unitSpaces={data?.unit?.spaces}
+              />
+            )}
+            <Controller
+              control={control}
+              name="parent"
+              render={({ field: { onChange, value } }) => (
+                <ParentSelector
+                  helperText={t("SpaceModal.page1.parentHelperText")}
+                  label={t("SpaceModal.page1.parentLabel")}
+                  // FIXME this should remove this space from the list
+                  onChange={(parentPk) => onChange(parentPk)}
+                  value={value}
+                  placeholder={t("SpaceModal.page1.parentPlaceholder")}
+                  unitPk={unit}
                 />
               )}
-              <Controller
-                control={control}
-                name="parent"
-                render={({ field: { onChange, value } }) => (
-                  <ParentSelector
-                    helperText={t("SpaceModal.page1.parentHelperText")}
-                    label={t("SpaceModal.page1.parentLabel")}
-                    // FIXME this should remove this space from the list
-                    onChange={(parentPk) => onChange(parentPk)}
-                    value={value}
-                    placeholder={t("SpaceModal.page1.parentPlaceholder")}
-                    unitPk={unit}
-                  />
-                )}
-              />
-            </Section>
-            <Section>
-              <SubHeading>{t("SpaceEditor.other")}</SubHeading>
-              <SpaceForm form={form} />
-            </Section>
-            <Buttons>
-              <Button
-                variant="secondary"
-                type="button"
-                onClick={() => history(-1)}
-                // TODO check loading state on mutations
-              >
-                {t("SpaceEditor.cancel")}
-              </Button>
-              <SaveButton
-                disabled={!isDirty}
-                type="submit"
-                isLoading={isLoading}
-                // loadingText={t("saving")}
-              >
-                {t("SpaceEditor.save")}
-              </SaveButton>
-            </Buttons>
-          </Editor>
-        </EditorContainer>
-      </ContentContainer>
+            />
+          </Section>
+          <Section>
+            <SubHeading>{t("SpaceEditor.other")}</SubHeading>
+            <SpaceForm form={form} />
+          </Section>
+          <ButtonContainer>
+            <Button
+              variant="secondary"
+              theme="black"
+              type="button"
+              onClick={() => history(-1)}
+              // TODO check loading state on mutations
+            >
+              {t("SpaceEditor.cancel")}
+            </Button>
+            <Button
+              disabled={!isDirty}
+              variant="primary"
+              type="submit"
+              isLoading={isLoading}
+              // loadingText={t("saving")}
+            >
+              {t("SpaceEditor.save")}
+            </Button>
+          </ButtonContainer>
+        </Editor>
+      </Container>
     </form>
   );
 }

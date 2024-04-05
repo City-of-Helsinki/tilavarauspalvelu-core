@@ -1,33 +1,25 @@
 import { IconLocation } from "hds-react";
 import React from "react";
-import { H1 } from "common/src/common/typography";
+import { H1, fontMedium } from "common/src/common/typography";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { type UnitNode } from "common/types/gql-types";
 import { parseAddress } from "../../common/util";
-import { Container, ContentContainer } from "../../styles/layout";
-import LinkPrev from "../LinkPrev";
 
 interface IProps {
   title: string;
   unit: UnitNode;
-  link?: string;
-  state?: JSX.Element | string;
 }
 
 const Wrapper = styled.div`
-  margin-bottom: var(--spacing-m);
-  max-width: var(--container-width-l);
-`;
-const Name = styled.div`
-  font-size: var(--fontsize-heading-m);
-  font-family: var(--tilavaraus-admin-font-bold);
-  margin-bottom: var(--spacing-xs);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-m);
 `;
 
-const TitleRow = styled.div`
-  display: flex;
-  align-items: flex-start;
+const Name = styled.div`
+  font-size: var(--fontsize-heading-s);
+  ${fontMedium}
 `;
 
 const Address = styled.span`
@@ -39,37 +31,32 @@ const LocationIcon = styled(IconLocation)`
 `;
 
 const Label = styled(Address)`
-  font-family: var(--tilavaraus-admin-font-bold);
+  ${fontMedium}
 `;
 
-const SubPageHead = ({ title, unit, link, state }: IProps): JSX.Element => {
+const AddressSection = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+export function SubPageHead({ title, unit }: IProps): JSX.Element {
   const { t } = useTranslation();
 
   return (
     <Wrapper>
-      <LinkPrev route={link || `/unit/${unit.pk}`} />
-      <ContentContainer>
-        <Container>
-          <TitleRow>
-            <H1 style={{ flexGrow: 1 }} $legacy>
-              {title}
-            </H1>
-            <div style={{ marginTop: "2em" }}>{state}</div>
-          </TitleRow>
-        </Container>
-        <div style={{ display: "flex" }}>
-          <LocationIcon />
-          <div>
-            <Name>{unit.nameFi}</Name>
-            <Label>{t("Unit.address")}</Label>:{" "}
-            {unit.location ? (
-              <Address>{parseAddress(unit.location)}</Address>
-            ) : null}
-          </div>
+      <H1 style={{ flexGrow: 1, margin: 0 }} $legacy>
+        {title}
+      </H1>
+      <AddressSection>
+        <LocationIcon />
+        <div>
+          <Name>{unit.nameFi}</Name>
+          <Label>{t("Unit.address")}</Label>:{" "}
+          {unit.location ? (
+            <Address>{parseAddress(unit.location)}</Address>
+          ) : null}
         </div>
-      </ContentContainer>
+      </AddressSection>
     </Wrapper>
   );
-};
-
-export default SubPageHead;
+}
