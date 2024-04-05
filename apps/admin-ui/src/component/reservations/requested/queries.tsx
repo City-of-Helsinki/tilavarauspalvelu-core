@@ -22,7 +22,6 @@ export const REFUND_RESERVATION = gql`
   mutation refundReservation($input: ReservationRefundMutationInput!) {
     refundReservation(input: $input) {
       pk
-      state
     }
   }
 `;

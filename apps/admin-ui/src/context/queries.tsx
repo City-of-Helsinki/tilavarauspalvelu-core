@@ -14,6 +14,9 @@ export const CURRENT_USER = gql`
         role {
           code
           verboseNameFi
+          permissions {
+            permission
+          }
         }
         unit {
           pk
@@ -23,11 +26,6 @@ export const CURRENT_USER = gql`
           units {
             pk
             nameFi
-          }
-        }
-        role {
-          permissions {
-            permission
           }
         }
       }
@@ -48,8 +46,6 @@ export const CURRENT_USER = gql`
         role {
           code
           verboseNameFi
-        }
-        role {
           permissions {
             permission
           }
