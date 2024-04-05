@@ -1,5 +1,5 @@
 import { Button, IconMenuDots } from "hds-react";
-import React, { RefObject, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import FocusTrap from "focus-trap-react";
 import ReactDOM from "react-dom";
@@ -7,8 +7,7 @@ import ReactDOM from "react-dom";
 interface IProps {
   items: {
     name: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onClick: (e: any) => void;
+    onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   }[];
 }
 
@@ -60,37 +59,13 @@ const Overlay = styled.div`
   background-color: transparent;
 `;
 
-let open = false;
-
-const usePopup = (
-  ref: RefObject<HTMLDivElement | undefined>
-): [() => void, () => void, DOMRect | null] => {
-  const [rect, setRect] = useState<DOMRect | null>(null);
-  const openModal = () => {
-    open = true;
-    if (ref?.current) {
-      setRect(ref.current.getBoundingClientRect());
-    }
-  };
-  const closeModal = () => {
-    open = false;
-    setRect(null);
-  };
-  return [openModal, closeModal, rect];
-};
-
-const PopupMenu = ({ items }: IProps): JSX.Element => {
+// TODO now this is relative to the button, but that causes few other issues
+// - the popup is forced to open on the left side so using it on the left of a page would cause an overflow
+// - the popup will expand containers the buttons are inside of (like <table>, not the cell)
+// These seem to be ok for this use case, but for others would need some more work.
+function PopupMenu({ items }: IProps): JSX.Element {
   const buttonRef = useRef<HTMLDivElement>(null);
   const firstMenuItemRef = useRef<HTMLButtonElement>(null);
-  const [openPopup, closePopup, rect] = usePopup(buttonRef);
-
-  let popupRoot = document.getElementById("popup-root") as HTMLDivElement;
-
-  if (!popupRoot) {
-    popupRoot = document.createElement("div");
-    popupRoot.setAttribute("id", "popup-root");
-    document.body.appendChild(popupRoot);
-  }
 
   useEffect(() => {
     if (firstMenuItemRef.current) {
@@ -98,12 +73,58 @@ const PopupMenu = ({ items }: IProps): JSX.Element => {
     }
   });
 
-  const style = rect ? { top: rect.top + 36, left: rect.left - 120 } : {};
+  const [isOpen, setIsOpen] = useState(false);
 
-  const content = (
+  const openPopup = () => {
+    setIsOpen(true);
+    document.addEventListener("click", closePopup);
+  };
+
+  const closePopup = () => {
+    setIsOpen(false);
+    document.removeEventListener("click", closePopup);
+  };
+
+  return (
+    <Container ref={buttonRef} style={{ position: "relative" }}>
+      <RowButton
+        onClick={(e) => {
+          e.stopPropagation();
+          openPopup();
+        }}
+        iconLeft={<MenuIcon />}
+        variant="supplementary"
+      >
+        {" "}
+      </RowButton>
+      {isOpen && buttonRef.current
+        ? ReactDOM.createPortal(
+            <PopupContent
+              items={items}
+              closePopup={closePopup}
+              firstMenuItemRef={firstMenuItemRef}
+            />,
+            buttonRef.current
+          )
+        : null}
+    </Container>
+  );
+}
+
+function PopupContent({
+  items,
+  closePopup,
+  firstMenuItemRef,
+}: {
+  items: IProps["items"];
+  closePopup: () => void;
+  firstMenuItemRef: React.RefObject<HTMLButtonElement>;
+}) {
+  const style = { top: 36, right: 0 };
+  return (
     <>
       <Overlay
-        onKeyPress={closePopup}
+        onKeyUp={closePopup}
         onClick={(e) => {
           e.stopPropagation();
           closePopup();
@@ -136,22 +157,6 @@ const PopupMenu = ({ items }: IProps): JSX.Element => {
       </FocusTrap>
     </>
   );
-
-  return (
-    <Container ref={buttonRef}>
-      <RowButton
-        onClick={(e) => {
-          e.stopPropagation();
-          openPopup();
-        }}
-        iconLeft={<MenuIcon />}
-        variant="supplementary"
-      >
-        {" "}
-      </RowButton>
-      {open && popupRoot ? ReactDOM.createPortal(content, popupRoot) : null}
-    </Container>
-  );
-};
+}
 
 export default PopupMenu;

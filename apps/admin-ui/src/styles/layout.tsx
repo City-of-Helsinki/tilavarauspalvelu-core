@@ -123,7 +123,6 @@ HorisontalFlex.displayName = "HorisontalFlex";
 export const ButtonContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
   gap: var(--spacing-2-xs);
   width: 100%;
   margin-bottom: var(--spacing-s);
