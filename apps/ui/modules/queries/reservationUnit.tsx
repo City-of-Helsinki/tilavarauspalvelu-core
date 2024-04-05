@@ -1,5 +1,8 @@
 import { gql } from "@apollo/client";
-import { RESERVATION_UNIT_FRAGMENT, UNIT_NAME_FRAGMENT } from "./fragments";
+import {
+  RESERVATION_UNIT_FRAGMENT,
+  UNIT_NAME_FRAGMENT_I18N,
+} from "./fragments";
 import { IMAGE_FRAGMENT, PRICING_FRAGMENT } from "common/src/queries/fragments";
 
 export { TERMS_OF_USE_QUERY as TERMS_OF_USE } from "common/src/queries/queries";
@@ -74,7 +77,7 @@ export const RESERVATION_UNIT_QUERY = gql`
 export const RESERVATION_UNITS = gql`
   ${PRICING_FRAGMENT}
   ${IMAGE_FRAGMENT}
-  ${UNIT_NAME_FRAGMENT}
+  ${UNIT_NAME_FRAGMENT_I18N}
   ${RESERVATION_UNIT_TYPE_FRAGMENT}
   query SearchReservationUnits(
     $textSearch: String
@@ -133,7 +136,6 @@ export const RESERVATION_UNITS = gql`
           nameFi
           nameEn
           nameSv
-          nameFi
           reservationBegins
           reservationEnds
           isClosed
@@ -142,7 +144,7 @@ export const RESERVATION_UNITS = gql`
             ...ReservationUnitTypeFields
           }
           unit {
-            ...UnitNameFields
+            ...UnitNameFieldsI18N
             id: pk
           }
           maxPersons
@@ -164,7 +166,7 @@ export const RESERVATION_UNITS = gql`
 `;
 
 export const RELATED_RESERVATION_UNITS = gql`
-  ${UNIT_NAME_FRAGMENT}
+  ${UNIT_NAME_FRAGMENT_I18N}
   ${PRICING_FRAGMENT}
   ${IMAGE_FRAGMENT}
   ${RESERVATION_UNIT_TYPE_FRAGMENT}
@@ -185,7 +187,7 @@ export const RELATED_RESERVATION_UNITS = gql`
             ...ImageFragment
           }
           unit {
-            ...UnitNameFields
+            ...UnitNameFieldsI18N
           }
           reservationUnitType {
             ...ReservationUnitTypeFields

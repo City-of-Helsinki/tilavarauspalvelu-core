@@ -10,8 +10,12 @@ import { ApplicationOrderingChoices } from "common/types/gql-types";
 export const APPLICATIONS = gql`
   ${APPLICATION_ROUND_FRAGMENT}
   ${APPLICANT_NAME_FRAGMENT}
-  query Applications($user: Int!, $status: [ApplicationStatusChoice]!) {
-    applications(user: $user, status: $status, orderBy:  ${ApplicationOrderingChoices.PkDesc}) {
+  query Applications(
+    $user: Int!,
+    $status: [ApplicationStatusChoice]!,
+    $orderBy: [ApplicationOrderingChoices] = [${ApplicationOrderingChoices.PkDesc}]
+  ) {
+    applications(user: $user, status: $status, orderBy: $orderBy) {
       edges {
         node {
           pk
@@ -31,7 +35,7 @@ export const APPLICATIONS = gql`
 `;
 
 export const CREATE_APPLICATION_MUTATION = gql`
-  mutation ($input: ApplicationCreateMutationInput!) {
+  mutation CreateApplication($input: ApplicationCreateMutationInput!) {
     createApplication(input: $input) {
       pk
     }
@@ -39,7 +43,7 @@ export const CREATE_APPLICATION_MUTATION = gql`
 `;
 
 export const UPDATE_APPLICATION_MUTATION = gql`
-  mutation ($input: ApplicationUpdateMutationInput!) {
+  mutation UpdateApplication($input: ApplicationUpdateMutationInput!) {
     updateApplication(input: $input) {
       pk
     }
@@ -47,7 +51,7 @@ export const UPDATE_APPLICATION_MUTATION = gql`
 `;
 
 export const SEND_APPLICATION_MUTATION = gql`
-  mutation ($input: ApplicationSendMutationInput!) {
+  mutation SendApplication($input: ApplicationSendMutationInput!) {
     sendApplication(input: $input) {
       pk
     }
@@ -55,7 +59,7 @@ export const SEND_APPLICATION_MUTATION = gql`
 `;
 
 export const CANCEL_APPLICATION_MUTATION = gql`
-  mutation ($input: ApplicationCancelMutationInput!) {
+  mutation CancelApplication($input: ApplicationCancelMutationInput!) {
     cancelApplication(input: $input) {
       pk
     }

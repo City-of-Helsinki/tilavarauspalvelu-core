@@ -16,7 +16,7 @@ import { filterNonNullable } from "common/src/helpers";
 import { useNotification } from "@/context/NotificationContext";
 import {
   OPTIONS_QUERY,
-  UNIT_QUERY,
+  UNIT_VIEW_QUERY,
   RESERVATION_UNITS_BY_UNIT,
   RESERVATION_UNIT_QUERY,
 } from "./queries";
@@ -102,7 +102,7 @@ export const useReservationUnitQuery = (unitPk?: number) => {
 export const useUnitQuery = (pk?: number | string) => {
   const { notifyError } = useNotification();
 
-  const res = useQuery<Query, QueryUnitsArgs>(UNIT_QUERY, {
+  const res = useQuery<Query, QueryUnitsArgs>(UNIT_VIEW_QUERY, {
     skip: pk == null,
     onError: (err) => {
       notifyError(err.message);

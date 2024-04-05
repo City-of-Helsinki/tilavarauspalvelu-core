@@ -37,10 +37,11 @@ export const OPTIONS_QUERY = gql`
 `;
 
 // NOTE old pk: ID type
-export const UNIT_QUERY = gql`
+// TODO this is a single query, replace with a relay
+export const UNIT_VIEW_QUERY = gql`
   ${LOCATION_FRAGMENT}
   ${UNIT_NAME_FRAGMENT}
-  query units($pk: [ID]) {
+  query UnitView($pk: [ID]) {
     units(pk: $pk, onlyWithPermission: true) {
       edges {
         node {

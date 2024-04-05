@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
 export const SEARCH_RESERVATION_UNITS_QUERY = gql`
-  query searchReservationUnits(
+  query SearchReservationUnits(
     $nameFi: String
     $after: String
     $maxPersonsGte: Decimal
@@ -52,7 +52,6 @@ export const SEARCH_RESERVATION_UNITS_QUERY = gql`
       pageInfo {
         hasNextPage
         endCursor
-        hasNextPage
       }
       totalCount
     }

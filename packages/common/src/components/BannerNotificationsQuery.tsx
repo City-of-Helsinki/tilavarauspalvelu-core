@@ -38,7 +38,11 @@ export const BANNER_NOTIFICATIONS_ADMIN = gql`
 
 export const BANNER_NOTIFICATIONS_ADMIN_LIST = gql`
   ${BANNER_NOTIFICATION_ADMIN_FRAGMENT}
-  query BannerNotificationsList($first: Int, $offset: Int, $orderBy: String) {
+  query BannerNotificationsAdminList(
+    $first: Int
+    $offset: Int
+    $orderBy: String
+  ) {
     bannerNotifications(first: $first, offset: $offset, orderBy: $orderBy) {
       edges {
         node {
@@ -46,7 +50,6 @@ export const BANNER_NOTIFICATIONS_ADMIN_LIST = gql`
         }
       }
       pageInfo {
-        hasNextPage
         endCursor
         hasNextPage
       }

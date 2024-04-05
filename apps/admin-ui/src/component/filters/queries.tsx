@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
 export const RESERVATION_UNIT_TYPES_QUERY = gql`
-  query reservationUnitTypes($offset: Int, $first: Int) {
+  query ReservationUnitTypesFilter($offset: Int, $first: Int) {
     reservationUnitTypes(offset: $offset, first: $first) {
       edges {
         node {
@@ -15,7 +15,7 @@ export const RESERVATION_UNIT_TYPES_QUERY = gql`
 `;
 
 export const RESERVATION_UNITS_QUERY = gql`
-  query reservationUnits($offset: Int, $unit: [Int], $count: Int) {
+  query ReservationUnitsFilter($offset: Int, $unit: [Int], $count: Int) {
     reservationUnits(
       offset: $offset
       onlyWithPermission: true

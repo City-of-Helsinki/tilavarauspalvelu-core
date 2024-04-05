@@ -3,7 +3,7 @@ import { RESERVATIONUNIT_RESERVATIONS_FRAGMENT } from "../reservations/fragments
 
 // NOTE old pk: ID type
 export const RECURRING_RESERVATION_UNIT_QUERY = gql`
-  query units($pk: [ID]) {
+  query RecurringReservationUnit($pk: [ID]) {
     units(pk: $pk, onlyWithPermission: true) {
       edges {
         node {
@@ -24,7 +24,7 @@ export const RECURRING_RESERVATION_UNIT_QUERY = gql`
 
 export const RESERVATIONS_BY_RESERVATIONUNITS = gql`
   ${RESERVATIONUNIT_RESERVATIONS_FRAGMENT}
-  query reservationUnitReservations(
+  query ReservationUnitReservations(
     $id: ID!
     $from: Date
     $to: Date

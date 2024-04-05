@@ -12,7 +12,7 @@ import {
 
 export const SPACES_QUERY = gql`
   ${SPACE_COMMON_FRAGMENT}
-  query getSpaces {
+  query Spaces {
     spaces(onlyWithPermission: true) {
       edges {
         node {
@@ -34,7 +34,7 @@ export const SPACES_QUERY = gql`
 
 export const RESOURCES_QUERY = gql`
   ${RESOURCE_FRAGMENT}
-  query getResources {
+  query Resources {
     resources(onlyWithPermission: true) {
       edges {
         node {
@@ -48,7 +48,7 @@ export const RESOURCES_QUERY = gql`
 
 export const RESERVATION_UNITS_QUERY = gql`
   ${RESERVATION_UNIT_COMMON_FRAGMENT}
-  query reservationUnits {
+  query ReservationUnits {
     reservationUnits(onlyWithPermission: true) {
       edges {
         node {
@@ -64,7 +64,7 @@ export const RESERVATION_UNITS_QUERY = gql`
 `;
 
 export const DELETE_SPACE = gql`
-  mutation deleteSpace($input: SpaceDeleteMutationInput!) {
+  mutation DeleteSpace($input: SpaceDeleteMutationInput!) {
     deleteSpace(input: $input) {
       deleted
     }
@@ -76,7 +76,7 @@ export const UNIT_QUERY = gql`
   ${RESERVATION_UNIT_COMMON_FRAGMENT}
   ${IMAGE_FRAGMENT}
   ${LOCATION_FRAGMENT}
-  query unit($pk: Int) {
+  query Unit($pk: Int) {
     unitByPk(pk: $pk) {
       pk
       nameFi
@@ -109,7 +109,7 @@ export const UNIT_QUERY = gql`
 export const UNIT_WITH_SPACES_AND_RESOURCES = gql`
   ${SPACE_COMMON_FRAGMENT}
   ${LOCATION_FRAGMENT}
-  query unit($pk: Int) {
+  query UnitWithSpacesAndResources($pk: Int) {
     unitByPk(pk: $pk) {
       pk
       nameFi
@@ -128,7 +128,7 @@ export const UNIT_WITH_SPACES_AND_RESOURCES = gql`
 `;
 
 export const DELETE_RESOURCE = gql`
-  mutation deleteResource($input: ResourceDeleteMutationInput!) {
+  mutation DeleteResource($input: ResourceDeleteMutationInput!) {
     deleteResource(input: $input) {
       deleted
       errors
@@ -138,7 +138,7 @@ export const DELETE_RESOURCE = gql`
 
 // TODO backend should add: onlyWithHandlingPermission parameter for this query (replaces the onlyWithPermission)
 export const HANDLING_COUNT_QUERY = gql`
-  query dataQueries($beginDate: Date!) {
+  query HandlingData($beginDate: Date!) {
     reservations(
       state: "REQUIRES_HANDLING"
       beginDate: $beginDate

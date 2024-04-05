@@ -12,7 +12,7 @@ const APPLICATION_ROUND_FRAGMENT = gql`
 
 export const APPLICATION_ROUNDS_QUERY = gql`
   ${APPLICATION_ROUND_FRAGMENT}
-  query applicationRounds {
+  query ApplicationRounds {
     applicationRounds {
       edges {
         node {
@@ -32,9 +32,10 @@ export const APPLICATION_ROUNDS_QUERY = gql`
   }
 `;
 
+// TODO replace with relay query
 export const APPLICATION_ROUND_QUERY = gql`
   ${APPLICATION_ROUND_FRAGMENT}
-  query ApplicationRoundCriteria($pk: [Int]!) {
+  query ApplicationRound($pk: [Int]!) {
     applicationRounds(pk: $pk) {
       edges {
         node {

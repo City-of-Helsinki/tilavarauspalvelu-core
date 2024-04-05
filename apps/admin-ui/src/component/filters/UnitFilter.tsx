@@ -7,7 +7,7 @@ import { SortedSelect } from "@/component/SortedSelect";
 import { GQL_MAX_RESULTS_PER_QUERY } from "@/common/const";
 
 const UNITS_QUERY = gql`
-  query units($offset: Int, $count: Int) {
+  query UnitsFilter($offset: Int, $count: Int) {
     units(onlyWithPermission: true, offset: $offset, first: $count) {
       edges {
         node {

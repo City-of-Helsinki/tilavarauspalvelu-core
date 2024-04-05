@@ -29,7 +29,7 @@ export const APPLICATION_ROUND_FRAGMENT = gql`
 // This is a simple variant that maps to RoundPeriod[] for time collision checks
 // TODO this should have filter params added on the backend for the status
 export const APPLICATION_ROUNDS_PERIODS = gql`
-  query ApplicationRounds {
+  query ApplicationRoundPeriods {
     applicationRounds {
       edges {
         node {
@@ -49,7 +49,7 @@ export const APPLICATION_ROUNDS_PERIODS = gql`
 
 export const APPLICATION_ROUNDS = gql`
   ${APPLICATION_ROUND_FRAGMENT}
-  query ApplicationRounds($orderBy: [ApplicationRoundOrderingChoices]) {
+  query ApplicationRoundsUi($orderBy: [ApplicationRoundOrderingChoices]) {
     applicationRounds(orderBy: $orderBy) {
       edges {
         node {
@@ -63,7 +63,7 @@ export const APPLICATION_ROUNDS = gql`
 export const APPLICATION_ROUND_BY_ID = gql`
   ${APPLICATION_ROUND_FRAGMENT}
   ${IMAGE_FRAGMENT}
-  query ApplicationRound($id: ID!) {
+  query ApplicationRoundUi($id: ID!) {
     applicationRound(id: $id) {
       ...ApplicationRoundFields
       reservationUnits {

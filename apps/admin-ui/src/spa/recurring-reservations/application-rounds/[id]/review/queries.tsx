@@ -60,7 +60,7 @@ export const APPLICATIONS_QUERY = gql`
 /// TODO see if we can remove some of the fields (like reservationUnitOptions)
 export const APPLICATIONS_EVENTS_QUERY = gql`
   ${APPLICATION_SECTION_ADMIN_FRAGMENT}
-  query getApplicationSections(
+  query ApplicationSections(
     $applicationRound: Int!
     $applicationStatus: [ApplicationStatusChoice]!
     $status: [ApplicationSectionStatusChoice]
@@ -125,7 +125,7 @@ export const APPLICATIONS_EVENTS_QUERY = gql`
 /// NOTE Requires higher backend optimizer complexity limit (14 works, lower doesn't)
 export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
   ${APPLICATION_SECTION_ADMIN_FRAGMENT}
-  query getApplicationSections(
+  query ApplicationSectionAllocations(
     $applicationRound: Int!
     $applicationStatus: [ApplicationStatusChoice]!
     $status: [ApplicationSectionStatusChoice]

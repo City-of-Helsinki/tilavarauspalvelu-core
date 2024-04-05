@@ -58,7 +58,9 @@ const RichTextInput = dynamic(() => import("app/component/RichTextInput"), {
 });
 
 const BANNER_NOTIFICATIONS_CREATE = gql`
-  mutation ($input: BannerNotificationCreateMutationInput!) {
+  mutation BannerNotificationCreate(
+    $input: BannerNotificationCreateMutationInput!
+  ) {
     createBannerNotification(input: $input) {
       pk
     }
@@ -66,14 +68,18 @@ const BANNER_NOTIFICATIONS_CREATE = gql`
 `;
 
 const BANNER_NOTIFICATIONS_UPDATE = gql`
-  mutation ($input: BannerNotificationUpdateMutationInput!) {
+  mutation BannerNotificationUpdate(
+    $input: BannerNotificationUpdateMutationInput!
+  ) {
     updateBannerNotification(input: $input) {
       pk
     }
   }
 `;
 const BANNER_NOTIFICATIONS_DELETE = gql`
-  mutation ($input: BannerNotificationDeleteMutationInput!) {
+  mutation BannerNotificationDelete(
+    $input: BannerNotificationDeleteMutationInput!
+  ) {
     deleteBannerNotification(input: $input) {
       deleted
     }

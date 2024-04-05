@@ -20,10 +20,6 @@ export const UPDATE_APPLICATION_WORKING_MEMO = gql`
     updateApplication(input: { pk: $pk, workingMemo: $workingMemo }) {
       pk
       workingMemo
-      errors {
-        field
-        messages
-      }
     }
   }
 `;

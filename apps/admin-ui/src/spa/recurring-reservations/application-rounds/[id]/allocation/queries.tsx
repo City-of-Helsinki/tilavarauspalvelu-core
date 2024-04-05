@@ -5,7 +5,7 @@ import { gql } from "@apollo/client";
  * filtered queries only include the reservation-units that match the filters
  */
 export const APPLICATION_ROUND_FILTER_OPTIONS = gql`
-  query ApplicationRound($id: ID!) {
+  query ApplicationRoundFilter($id: ID!) {
     applicationRound(id: $id) {
       nameFi
       status
@@ -53,7 +53,9 @@ export const ALL_EVENTS_PER_UNIT_QUERY = gql`
 `;
 
 export const CREATE_ALLOCATED_TIME_SLOT = gql`
-  mutation ($input: AllocatedTimeSlotCreateMutationInput!) {
+  mutation CreateAllocatedTimeSlot(
+    $input: AllocatedTimeSlotCreateMutationInput!
+  ) {
     createAllocatedTimeslot(input: $input) {
       beginTime
       dayOfTheWeek
@@ -65,7 +67,9 @@ export const CREATE_ALLOCATED_TIME_SLOT = gql`
 `;
 
 export const DELETE_ALLOCATED_TIME_SLOT = gql`
-  mutation ($input: AllocatedTimeSlotDeleteMutationInput!) {
+  mutation DeleteAllocatedTimeSlot(
+    $input: AllocatedTimeSlotDeleteMutationInput!
+  ) {
     deleteAllocatedTimeslot(input: $input) {
       deleted
     }

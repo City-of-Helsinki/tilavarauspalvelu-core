@@ -6,7 +6,10 @@ import {
   IMAGE_FRAGMENT,
   PRICING_FRAGMENT,
 } from "common/src/queries/fragments";
-import { RESERVATION_UNIT_FRAGMENT, UNIT_NAME_FRAGMENT } from "./fragments";
+import {
+  RESERVATION_UNIT_FRAGMENT,
+  UNIT_NAME_FRAGMENT_I18N,
+} from "./fragments";
 
 export const CREATE_RESERVATION = gql`
   mutation createReservation($input: ReservationCreateMutationInput!) {
@@ -59,7 +62,7 @@ export const UPDATE_RESERVATION = gql`
 `;
 
 export const DELETE_RESERVATION = gql`
-  mutation deleteReservation($input: ReservationDeleteMutationInput!) {
+  mutation DeleteReservation($input: ReservationDeleteMutationInput!) {
     deleteReservation(input: $input) {
       deleted
       errors
@@ -68,7 +71,7 @@ export const DELETE_RESERVATION = gql`
 `;
 
 export const CANCEL_RESERVATION = gql`
-  mutation cancelReservation($input: ReservationCancellationMutationInput!) {
+  mutation CancelReservation($input: ReservationCancellationMutationInput!) {
     cancelReservation(input: $input) {
       pk
       cancelReasonPk
@@ -84,7 +87,7 @@ export const CANCEL_RESERVATION = gql`
 `;
 
 export const CONFIRM_RESERVATION = gql`
-  mutation confirmReservation($input: ReservationConfirmMutationInput!) {
+  mutation ConfirmReservation($input: ReservationConfirmMutationInput!) {
     confirmReservation(input: $input) {
       pk
       state
@@ -118,9 +121,9 @@ const CANCELLATION_RULE_FRAGMENT = gql`
 export const LIST_RESERVATIONS = gql`
   ${PRICING_FRAGMENT}
   ${IMAGE_FRAGMENT}
-  ${UNIT_NAME_FRAGMENT}
+  ${UNIT_NAME_FRAGMENT_I18N}
   ${CANCELLATION_RULE_FRAGMENT}
-  query listReservations(
+  query Reservations(
     $before: String
     $after: String
     $first: Int
@@ -165,7 +168,7 @@ export const LIST_RESERVATIONS = gql`
             nameEn
             nameSv
             unit {
-              ...UnitNameFields
+              ...UnitNameFieldsI18N
             }
             ...CancellationRuleFields
             images {
@@ -186,7 +189,7 @@ export const GET_RESERVATION = gql`
   ${RESERVATION_UNIT_FRAGMENT}
   ${CANCELLATION_RULE_FRAGMENT}
   ${RESERVEE_NAME_FRAGMENT}
-  query reservation($id: ID!) {
+  query Reservation($id: ID!) {
     reservation(id: $id) {
       pk
       name
@@ -273,10 +276,6 @@ export const GET_RESERVATION = gql`
           nameFi
           nameEn
           nameSv
-        }
-        metadataSet {
-          supportedFields
-          requiredFields
         }
         images {
           ...ImageFragment

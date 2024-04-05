@@ -1,14 +1,13 @@
 import { gql } from "@apollo/client";
 
 export const CURRENT_USER = gql`
-  query currentUser {
+  query CurrentUser {
     currentUser {
       username
       firstName
       lastName
       email
       isSuperuser
-      username
       pk
       unitRoles {
         pk

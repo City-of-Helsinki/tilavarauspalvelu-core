@@ -9,9 +9,9 @@ import {
 
 // TODO improve naming of the fragments to match the purpose or use case
 
-export const UNIT_NAME_FRAGMENT = gql`
+export const UNIT_NAME_FRAGMENT_I18N = gql`
   ${LOCATION_FRAGMENT_I18N}
-  fragment UnitNameFields on UnitType {
+  fragment UnitNameFieldsI18N on UnitType {
     pk
     nameFi
     nameEn
@@ -23,9 +23,9 @@ export const UNIT_NAME_FRAGMENT = gql`
 `;
 
 export const UNIT_FRAGMENT = gql`
-  ${UNIT_NAME_FRAGMENT}
+  ${UNIT_NAME_FRAGMENT_I18N}
   fragment UnitFields on UnitType {
-    ...UnitNameFields
+    ...UnitNameFieldsI18N
     id
     tprekId
     location {

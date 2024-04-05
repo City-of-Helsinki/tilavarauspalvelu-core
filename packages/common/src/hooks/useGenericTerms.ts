@@ -5,11 +5,11 @@ import {
 } from "../../types/gql-types";
 import { useQuery } from "@apollo/client";
 import { filterNonNullable } from "../helpers";
-import { TERMS_OF_USE } from "../queries/terms";
 import { genericTermsVariant } from "../const";
+import { TERMS_OF_USE_QUERY } from "../queries/queries";
 
 export function useGenericTerms() {
-  const { data } = useQuery<Query, QueryTermsOfUseArgs>(TERMS_OF_USE, {
+  const { data } = useQuery<Query, QueryTermsOfUseArgs>(TERMS_OF_USE_QUERY, {
     variables: {
       termsType: TermsType.GenericTerms,
     },

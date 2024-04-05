@@ -4,7 +4,7 @@ import { PRICING_FRAGMENT, IMAGE_FRAGMENT } from "common/src/queries/fragments";
 export const RESERVATIONUNIT_QUERY = gql`
   ${IMAGE_FRAGMENT}
   ${PRICING_FRAGMENT}
-  query reservationUnit($id: ID!) {
+  query ReservationUnitEdit($id: ID!) {
     reservationUnit(id: $id) {
       pk
       state
@@ -69,10 +69,6 @@ export const RESERVATIONUNIT_QUERY = gql`
       canApplyFreeOfCharge
       reservationsMinDaysBefore
       reservationsMaxDaysBefore
-      images {
-        imageType
-        imageUrl
-      }
       equipment {
         pk
         nameFi
@@ -125,7 +121,6 @@ export const RESERVATIONUNIT_QUERY = gql`
         pk
         closed
         weekday
-        closed
         reservableTimes {
           begin
           end

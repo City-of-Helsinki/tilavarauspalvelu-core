@@ -49,7 +49,6 @@ export const RESERVATIONS_QUERY = gql`
         }
       }
       pageInfo {
-        hasNextPage
         endCursor
         hasNextPage
       }
