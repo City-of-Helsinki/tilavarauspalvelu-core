@@ -8,6 +8,7 @@ from email_notification.models import EmailType
 from reservation_units.enums import ReservationStartInterval
 from reservations.choices import ReservationStateChoice, ReservationTypeChoice
 from tests.factories import EmailTemplateFactory, ReservationFactory, UserFactory
+from tests.helpers import next_hour
 
 from .helpers import ADJUST_STAFF_MUTATION, get_staff_adjust_data
 
@@ -75,9 +76,7 @@ def test_reservation__staff_adjust_time__wrong_state(graphql):
 def test_reservation__staff_adjust_time__end_before_begin(graphql):
     reservation = ReservationFactory.create_for_time_adjustment()
 
-    now = local_datetime()
-    next_hour = now.replace(minute=0, second=0, microsecond=0) + datetime.timedelta(hours=1)
-    end = next_hour + datetime.timedelta(hours=1)
+    end = next_hour(1)
     begin = end + datetime.timedelta(hours=1)
 
     graphql.login_with_superuser()
@@ -152,10 +151,7 @@ def test_reservation__staff_adjust_time__begin_date_in_the_past__move_to_yesterd
 
 
 def test_reservation__staff_adjust_time__overlaps_with_another_reservation(graphql):
-    now = local_datetime()
-    next_hour = now.replace(minute=0, second=0, microsecond=0) + datetime.timedelta(hours=1)
-
-    begin = next_hour + datetime.timedelta(hours=1)
+    begin = next_hour(1)
     end = begin + datetime.timedelta(hours=1)
 
     new_begin = end
