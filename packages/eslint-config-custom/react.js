@@ -1,8 +1,39 @@
+// @ts-check
+const { defineConfig } = require('eslint-define-config');
 const { resolve } = require('node:path');
 
 const project = resolve(process.cwd(), "tsconfig.json");
 
-module.exports = {
+const SCHEMA_PATH = "../../tilavaraus.graphql";
+
+/// <reference types="@eslint-types/typescript-eslint" />
+module.exports = defineConfig({
+  overrides: [
+    {
+      "files": ["*.ts", "*.tsx"],
+      "processor": "@graphql-eslint/graphql",
+    },
+    {
+      "files": ["*.graphql"],
+      "parser": "@graphql-eslint/eslint-plugin",
+      "plugins": ["@graphql-eslint"],
+      // operations is the client side queries
+      "extends": "plugin:@graphql-eslint/operations-recommended",
+      rules: {
+        // old incorrect naming should be migrated
+        "@graphql-eslint/naming-convention": "off",
+        // need to check why we are not querying ids
+        "@graphql-eslint/require-id-when-available": "off",
+      },
+      parserOptions: {
+        schema: SCHEMA_PATH,
+        // monorepo paths... should use a find root function
+        operations: ["../../apps/**/*.{ts,tsx}", "../../packages/**/*.{ts,tsx}"],
+        // our graphql codegen config is old and has issues disable it and use the above
+        skipGraphQLConfig: true
+     },
+    },
+  ],
   root: true,
   extends: [
     require.resolve('@vercel/style-guide/eslint/node'),
@@ -169,4 +200,4 @@ module.exports = {
       },
     ],
   },
-};
+});
