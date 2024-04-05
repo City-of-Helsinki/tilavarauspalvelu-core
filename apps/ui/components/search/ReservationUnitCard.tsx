@@ -12,11 +12,12 @@ import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { H5, fontMedium } from "common/src/common/typography";
 import type { ReservationUnitNode } from "common/types/gql-types";
-import { getImageSource, getMainImage, getTranslation } from "@/modules/util";
+import { getMainImage, getTranslation } from "@/modules/util";
 import IconWithText from "@/components/common/IconWithText";
 import { truncatedText } from "@/styles/util";
 import { reservationUnitPrefix } from "@/modules/const";
 import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
+import { getImageSource } from "common/src/helpers";
 
 interface IProps {
   reservationUnit: ReservationUnitNode;

@@ -9,7 +9,7 @@ import { breakpoints } from "common/src/common/style";
 import type { ReservationUnitNode } from "common/types/gql-types";
 import { format, isToday, isTomorrow } from "date-fns";
 import { toUIDate } from "common/src/common/util";
-import { getImageSource, getMainImage, getTranslation } from "@/modules/util";
+import { getMainImage, getTranslation } from "@/modules/util";
 import IconWithText from "../common/IconWithText";
 import { truncatedText } from "@/styles/util";
 import {
@@ -21,6 +21,7 @@ import {
 import { reservationUnitPrefix } from "@/modules/const";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
 import { useSearchParams } from "next/navigation";
+import { getImageSource } from "common/src/helpers";
 
 interface PropsT {
   reservationUnit: ReservationUnitNode;

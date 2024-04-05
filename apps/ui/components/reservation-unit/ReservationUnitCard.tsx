@@ -11,13 +11,10 @@ import styled from "styled-components";
 import { fontBold, H6 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import type { ReservationUnitNode } from "common/types/gql-types";
-import {
-  getImageSource,
-  getMainImage,
-  getTranslation,
-} from "../../modules/util";
-import { MediumButton } from "../../styles/util";
-import { getReservationUnitName } from "../../modules/reservationUnit";
+import { getMainImage, getTranslation } from "@/modules/util";
+import { MediumButton } from "@/styles/util";
+import { getReservationUnitName } from "@/modules/reservationUnit";
+import { getImageSource } from "common/src/helpers";
 
 type Props = {
   order: number;

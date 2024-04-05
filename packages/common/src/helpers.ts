@@ -1,4 +1,9 @@
-import type { Maybe, ReservationMetadataFieldNode } from "../types/gql-types";
+import type {
+  Maybe,
+  ReservationMetadataFieldNode,
+  ReservationUnitImageNode,
+} from "../types/gql-types";
+import { pixel } from "./common/style";
 
 export function filterNonNullable<T>(
   arr: Maybe<Maybe<T>[]> | undefined
@@ -79,4 +84,36 @@ export function containsNameField(
     containsField(formFields, "reserveeFirstName") ||
     containsField(formFields, "reserveeLastName")
   );
+}
+
+/// Always return an image because the Design and process should not allow imageless reservation units
+/// On production returns the cached medium image url
+/// On development we don't have image cache so we return the full image url
+/// If image is null or undefined returns a static pixel
+export function getImageSource(
+  image: ReservationUnitImageNode | null,
+  size: "small" | "large" | "medium" | "full" = "medium"
+): string {
+  if (!image) {
+    return pixel;
+  }
+  return getImageSourceWithoutDefault(image, size) || image?.imageUrl || pixel;
+}
+
+function getImageSourceWithoutDefault(
+  image: ReservationUnitImageNode,
+  size: "small" | "large" | "medium" | "full"
+): string | null {
+  switch (size) {
+    case "small":
+      return image.smallUrl ?? null;
+    case "large":
+      return image.largeUrl ?? null;
+    case "medium":
+      return image.mediumUrl ?? null;
+    case "full":
+      return image.imageUrl ?? null;
+    default:
+      return null;
+  }
 }

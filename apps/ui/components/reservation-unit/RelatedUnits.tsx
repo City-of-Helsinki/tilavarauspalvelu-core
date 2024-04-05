@@ -8,12 +8,8 @@ import styled from "styled-components";
 import { useMedia } from "react-use";
 import { breakpoints } from "common/src/common/style";
 import type { ReservationUnitNode } from "common/types/gql-types";
-import { reservationUnitPath } from "../../modules/const";
-import {
-  getImageSource,
-  getMainImage,
-  getTranslation,
-} from "../../modules/util";
+import { reservationUnitPath } from "@/modules/const";
+import { getMainImage, getTranslation } from "@/modules/util";
 import IconWithText from "../common/IconWithText";
 import Carousel from "../Carousel";
 import {
@@ -21,8 +17,9 @@ import {
   getPrice,
   getReservationUnitName,
   getUnitName,
-} from "../../modules/reservationUnit";
-import { SupplementaryButton, truncatedText } from "../../styles/util";
+} from "@/modules/reservationUnit";
+import { SupplementaryButton, truncatedText } from "@/styles/util";
+import { getImageSource } from "common/src/helpers";
 
 type PropsType = {
   units: ReservationUnitNode[];

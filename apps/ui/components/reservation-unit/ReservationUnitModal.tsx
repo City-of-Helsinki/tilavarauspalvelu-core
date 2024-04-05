@@ -23,14 +23,9 @@ import {
   type ReservationUnitNode,
   ReservationUnitOrderingChoices,
 } from "common/types/gql-types";
-import { filterNonNullable } from "common/src/helpers";
+import { filterNonNullable, getImageSource } from "common/src/helpers";
 import { reservationUnitPath } from "@/modules/const";
-import {
-  getAddressAlt,
-  getImageSource,
-  getMainImage,
-  getTranslation,
-} from "@/modules/util";
+import { getAddressAlt, getMainImage, getTranslation } from "@/modules/util";
 import { MediumButton } from "@/styles/util";
 import { RESERVATION_UNITS } from "@/modules/queries/reservationUnit";
 import { getApplicationRoundName } from "@/modules/applicationRound";

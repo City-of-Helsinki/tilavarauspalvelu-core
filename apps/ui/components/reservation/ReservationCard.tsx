@@ -9,7 +9,6 @@ import { breakpoints } from "common/src/common/style";
 import { ReservationNode, State } from "common/types/gql-types";
 import {
   capitalize,
-  getImageSource,
   getMainImage,
   getTranslation,
   reservationsUrl,
@@ -28,6 +27,7 @@ import IconWithText from "@/components/common/IconWithText";
 import { ReservationOrderStatus } from "./ReservationOrderStatus";
 import { ReservationStatus } from "./ReservationStatus";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
+import { getImageSource } from "common/src/helpers";
 
 type CardType = "upcoming" | "past" | "cancelled";
 

@@ -19,11 +19,11 @@ import { getReservationUnitPrice } from "@/modules/reservationUnit";
 import {
   capitalize,
   formatDuration,
-  getImageSource,
   getMainImage,
   getTranslation,
 } from "@/modules/util";
 import { reservationUnitPath } from "@/modules/const";
+import { getImageSource } from "common/src/helpers";
 
 type Type = "pending" | "confirmed" | "complete";
 

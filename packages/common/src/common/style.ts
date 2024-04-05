@@ -5,3 +5,6 @@ export const breakpoints = {
   l: "992px",
   xl: "1248px",
 };
+
+export const pixel =
+  "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
