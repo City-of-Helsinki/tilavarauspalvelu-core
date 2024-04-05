@@ -4,7 +4,7 @@ import { TFunction } from "i18next";
 import { memoize, orderBy, uniqBy } from "lodash";
 import { IconLinkExternal } from "hds-react";
 import type { ApplicationSectionNode } from "common/types/gql-types";
-import { PUBLIC_URL } from "@/common/const";
+import { MAX_APPLICATION_ROUND_NAME_LENGTH, PUBLIC_URL } from "@/common/const";
 import { truncate } from "@/helpers";
 import { applicationDetailsUrl } from "@/common/urls";
 import { getApplicantName } from "@/component/applications/util";
@@ -71,8 +71,6 @@ function appEventMapper(
   };
 }
 
-const MAX_NAME_LENGTH = 30;
-
 const COLS = [
   {
     headerTKey: "ApplicationEvent.headings.id",
@@ -104,7 +102,7 @@ const COLS = [
     isSortable: true,
     key: "nameFi",
     transform: ({ nameFi }: ApplicationEventView) =>
-      truncate(nameFi, MAX_NAME_LENGTH),
+      truncate(nameFi, MAX_APPLICATION_ROUND_NAME_LENGTH),
   },
   {
     headerTKey: "ApplicationEvent.headings.unit",

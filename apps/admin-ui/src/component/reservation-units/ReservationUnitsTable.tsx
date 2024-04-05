@@ -5,6 +5,7 @@ import { ReservationUnitNode } from "common/types/gql-types";
 import { truncate } from "@/helpers";
 import { reservationUnitUrl } from "@/common/urls";
 import { CustomTable, TableLink } from "@/component/Table";
+import { MAX_NAME_LENGTH } from "@/common/const";
 
 type Props = {
   sort: string;
@@ -13,7 +14,6 @@ type Props = {
   isLoading?: boolean;
 };
 
-const MAX_NAME_LENGTH = 22;
 const getColConfig = (t: TFunction) => [
   {
     headerName: t("ReservationUnits.headings.name"),

@@ -22,6 +22,7 @@ import { useNotification } from "@/context/NotificationContext";
 import { CustomTable, TableLink } from "@/component/Table";
 import { getSpaceUrl } from "@/common/urls";
 import { truncate } from "common/src/helpers";
+import { MAX_NAME_LENGTH } from "@/common/const";
 
 interface IProps {
   unit: UnitNode;
@@ -147,7 +148,6 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
     history(link);
   }
 
-  const MAX_NAME_LENGTH = 22;
   // TODO translation keys are wonky, yeah it's under a unit page but the table should be reusable
   const cols: SpacesTableColumn[] = [
     {

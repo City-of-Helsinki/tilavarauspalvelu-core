@@ -6,6 +6,7 @@ import type { TFunction } from "i18next";
 import { truncate } from "@/helpers";
 import { myUnitUrl, unitUrl } from "@/common/urls";
 import { CustomTable, TableLink } from "@/component/Table";
+import { MAX_UNIT_NAME_LENGTH } from "@/common/const";
 
 type Props = {
   sort: string;
@@ -15,15 +16,13 @@ type Props = {
   isLoading?: boolean;
 };
 
-const MAX_NAME_LENGTH = 40;
-
 const getColConfig = (t: TFunction, isMyUnits?: boolean) => [
   {
     headerName: t("Units.headings.name"),
     key: "nameFi",
     transform: ({ nameFi, pk }: UnitNode) => (
       <TableLink href={isMyUnits ? myUnitUrl(pk ?? 0) : unitUrl(pk ?? 0)}>
-        {truncate(nameFi ?? "-", MAX_NAME_LENGTH)}
+        {truncate(nameFi ?? "-", MAX_UNIT_NAME_LENGTH)}
       </TableLink>
     ),
     width: "50%",

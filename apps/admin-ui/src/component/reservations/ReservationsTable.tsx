@@ -8,6 +8,7 @@ import { reservationUrl } from "@/common/urls";
 import { formatDateTime } from "@/common/util";
 import { CustomTable, TableLink } from "@/component/Table";
 import { getReserveeName, reservationDateTimeString } from "./requested/util";
+import { MAX_NAME_LENGTH } from "@/common/const";
 
 export type Sort = {
   field: string;
@@ -28,7 +29,6 @@ type Props = {
   reservations: ReservationNode[];
 };
 
-const MAX_NAME_LENGTH = 22;
 const getColConfig = (t: TFunction): ReservationTableColumn[] => [
   {
     headerName: t("Reservations.headings.id"),

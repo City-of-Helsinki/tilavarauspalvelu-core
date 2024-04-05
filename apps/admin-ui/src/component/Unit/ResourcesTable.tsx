@@ -19,20 +19,17 @@ import type {
 import PopupMenu from "./PopupMenu";
 import ConfirmationDialog, { ModalRef } from "../ConfirmationDialog";
 import { DELETE_RESOURCE } from "@/common/queries";
-import { resourceUrl } from "@/common/urls";
-import { CustomTable } from "../Table";
+import { getResourceUrl, resourceUrl } from "@/common/urls";
+import { CustomTable, TableLink } from "../Table";
 import { useNotification } from "@/context/NotificationContext";
+import { truncate } from "common/src/helpers";
+import { MAX_NAME_LENGTH } from "@/common/const";
 
 interface IProps {
   resources: ResourceNode[];
   unit: UnitNode;
   refetch: () => Promise<ApolloQueryResult<Query>>;
 }
-
-const Name = styled.div`
-  font-size: var(--fontsize-body-l);
-  font-family: var(--tilavaraus-admin-font-bold);
-`;
 
 const ResourceNodeContainer = styled.div`
   display: flex;
@@ -107,9 +104,15 @@ export function ResourcesTable({
     {
       headerName: t("ResourceTable.headings.name"),
       key: `nameFi`,
-      transform: ({ nameFi }: ResourceNode) => (
-        <Name>{trim(nameFi ?? "-")}</Name>
-      ),
+      transform: ({ pk, nameFi }: ResourceNode) => {
+        const link = getResourceUrl(pk, unit.pk);
+        const name = nameFi != null && nameFi.length > 0 ? nameFi : "-";
+        return (
+          <TableLink href={link}>
+            {truncate(trim(name), MAX_NAME_LENGTH)}
+          </TableLink>
+        );
+      },
       isSortable: false,
     },
     {
@@ -122,22 +125,12 @@ export function ResourcesTable({
     {
       headerName: "",
       key: "type",
-      transform: ({ nameFi, pk, locationType }: ResourceNode) => (
-        <ResourceNodeContainer>
-          <span>{locationType}</span>
-          <PopupMenu
-            items={[
-              {
-                name: t("ResourceTable.menuEditResource"),
-                onClick: () => handleEditResource(pk),
-              },
-              {
-                name: t("ResourceTable.menuRemoveResource"),
-                onClick: () => handleDeleteResource(pk, nameFi),
-              },
-            ]}
-          />
-        </ResourceNodeContainer>
+      transform: (resource: ResourceNode) => (
+        <ResourceMenu
+          {...resource}
+          onEdit={() => handleEditResource(resource.pk)}
+          onDelete={() => handleDeleteResource(resource.pk, resource.nameFi)}
+        />
       ),
       isSortable: false,
     },
@@ -154,5 +147,32 @@ export function ResourcesTable({
       <CustomTable indexKey="pk" rows={rows} cols={cols} />
       <ConfirmationDialog open={false} id="confirmation-dialog" ref={modal} />
     </div>
+  );
+}
+
+function ResourceMenu({
+  locationType,
+  onEdit,
+  onDelete,
+}: ResourceNode & { onDelete: () => void; onEdit: () => void }) {
+  const { t } = useTranslation();
+  const ref = useRef<HTMLDivElement>(null);
+
+  return (
+    <ResourceNodeContainer ref={ref}>
+      <span>{locationType}</span>
+      <PopupMenu
+        items={[
+          {
+            name: t("ResourceTable.menuEditResource"),
+            onClick: onEdit,
+          },
+          {
+            name: t("ResourceTable.menuRemoveResource"),
+            onClick: onDelete,
+          },
+        ]}
+      />
+    </ResourceNodeContainer>
   );
 }

@@ -32,6 +32,11 @@ export const ALLOCATION_POLL_INTERVAL = 10000;
 // This is a backend (or library) limit based on testing
 export const GQL_MAX_RESULTS_PER_QUERY = 100;
 
+// truncate names when they are printed to table cells (placeholder / default)
+export const MAX_NAME_LENGTH = 22;
+export const MAX_UNIT_NAME_LENGTH = 40;
+export const MAX_APPLICATION_ROUND_NAME_LENGTH = 30;
+
 // TODO PUBLIC_URL should be cleaned up and always end in /
 export const HERO_IMAGE_URL = `${PUBLIC_URL}/hero-user@1x.jpg`;
 export const LOGO_IMAGE_URL = `${PUBLIC_URL}/logo.png`;
