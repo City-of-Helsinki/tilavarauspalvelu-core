@@ -25,11 +25,11 @@ from tests.factories import (
     SpaceFactory,
     UserFactory,
 )
-from tests.helpers import UserType
+from tests.helpers import UserType, next_hour
 from users.helauth.utils import ADLoginAMR
 from utils.decimal_utils import round_decimal
 
-from .helpers import CREATE_MUTATION, get_create_data, mock_profile_reader, next_hour
+from .helpers import CREATE_MUTATION, get_create_data, mock_profile_reader
 
 # Applied to all tests
 pytestmark = [
@@ -598,7 +598,7 @@ class ReservationsMinMaxDaysParams(NamedTuple):
         }
     )
 )
-def test_reservation__create__reservation_unit_reservations_max_days_before__exceeded(
+def test_reservation__create__reservation_unit_reservations_min_and_max_days_before_and_after(
     graphql,
     reservation_days_delta,
     reservations_max_days_before,

@@ -1,3 +1,4 @@
+import datetime
 from collections.abc import Callable
 from enum import Enum, auto
 from functools import wraps
@@ -7,11 +8,15 @@ from unittest import mock
 from django.contrib.auth import get_user_model
 from graphene_django_extensions.testing import GraphQLClient as BaseGraphQLClient
 
+from common.date_utils import local_datetime
+
 __all__ = [
     "GraphQLClient",
     "ResponseMock",
     "UserType",
+    "next_hour",
 ]
+
 
 TNamedTuple = TypeVar("TNamedTuple", bound=NamedTuple)
 
@@ -96,3 +101,19 @@ def patch_method(
         return wrapper
 
     return decorator
+
+
+def next_hour(hours: int = 0, *, minutes: int = 0, days: int = 0) -> datetime.datetime:
+    """
+    Return a timestamp for the next hour.
+
+    Without any arguments, the timestamp will be for the next full hour, any additional arguments will be added to that.
+    e.g.
+    Now the time is 12:30
+    next_hour() -> 13:00
+    next_hour(hours=1, minutes=30) -> 14:30
+    """
+    now = local_datetime()
+    return now.replace(minute=0, second=0, microsecond=0) + datetime.timedelta(
+        hours=1 + hours, minutes=minutes, days=days
+    )
