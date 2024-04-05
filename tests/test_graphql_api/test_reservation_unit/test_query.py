@@ -32,7 +32,6 @@ from .helpers import reservation_unit_query, reservation_units_query
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
-
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,

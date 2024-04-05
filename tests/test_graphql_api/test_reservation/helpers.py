@@ -6,12 +6,11 @@ from unittest.mock import patch
 
 from graphene_django_extensions.testing import build_mutation, build_query
 
-from common.date_utils import local_datetime
 from reservation_units.models import ReservationUnit
 from reservations.choices import ReservationTypeChoice
 from reservations.models import Reservation
 from tests.factories import ReservationCancelReasonFactory, ReservationDenyReasonFactory
-from tests.helpers import ResponseMock
+from tests.helpers import ResponseMock, next_hour
 
 reservation_query = partial(build_query, "reservation")
 reservations_query = partial(build_query, "reservations", connection=True, order_by="pkAsc")
@@ -63,26 +62,7 @@ def mock_profile_reader(profile_data: dict[str, Any] | None = None, **kwargs: An
         yield mock
 
 
-def next_hour(hours: int = 0, *, minutes: int = 0, days: int = 0) -> datetime.datetime:
-    """
-    Return a timestamp for the next hour.
-
-    Without any arguments, the timestamp will be for the next full hour, any additional arguments will be added to that.
-    e.g.
-    Now the time is 12:30
-    next_hour() -> 13:00
-    next_hour(hours=1, minutes=30) -> 14:30
-    """
-    now = local_datetime()
-    return now.replace(minute=0, second=0, microsecond=0) + datetime.timedelta(
-        hours=1 + hours, minutes=minutes, days=days
-    )
-
-
-def get_adjust_data(
-    reservation: Reservation,
-    **overrides: Any,
-) -> dict[str, Any]:
+def get_adjust_data(reservation: Reservation, **overrides: Any) -> dict[str, Any]:
     return {
         "pk": reservation.pk,
         "begin": (reservation.begin + datetime.timedelta(hours=2)).isoformat(),
