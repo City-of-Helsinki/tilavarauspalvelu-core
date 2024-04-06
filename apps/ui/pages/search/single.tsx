@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useTranslation } from "next-i18next";
 import { NetworkStatus, useQuery } from "@apollo/client";
 import type { GetServerSidePropsContext } from "next";
@@ -6,33 +6,31 @@ import styled from "styled-components";
 import { useRouter } from "next/router";
 import { Notification } from "hds-react";
 import { useMedia } from "react-use";
-import { isEqual, omit } from "lodash";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { breakpoints } from "common/src/common/style";
 import { H2 } from "common/src/common/typography";
-import ClientOnly from "common/src/ClientOnly";
 import {
   type Query,
   type QueryReservationUnitsArgs,
+  type QueryUnitsArgs,
   ReservationKind,
 } from "common/types/gql-types";
 import { Container } from "common";
 import { filterNonNullable } from "common/src/helpers";
-import { fromUIDate, singleSearchUrl } from "@/modules/util";
 import { isBrowser } from "@/modules/const";
 import { RESERVATION_UNITS } from "@/modules/queries/reservationUnit";
-import SearchForm from "@/components/single-search/SearchForm";
+import { SingleSearchForm } from "@/components/single-search/SearchForm";
 import Sorting from "@/components/form/Sorting";
 import ListWithPagination from "@/components/common/ListWithPagination";
 import ReservationUnitCard from "@/components/single-search/ReservationUnitCard";
 import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
-import { toApiDate } from "common/src/common/util";
-import { startOfDay } from "date-fns";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
-import { transformSortString } from "@/modules/search";
-
-const pagingLimit = 36;
+import { processVariables } from "@/modules/search";
+import { useSearchValues } from "@/hooks/useSearchValues";
+import { OPTIONS_QUERY } from "@/hooks/useOptions";
+import { SEARCH_FORM_PARAMS_UNIT } from "@/modules/queries/params";
+import { getUnitName } from "@/modules/reservationUnit";
 
 const Wrapper = styled.div`
   margin-bottom: var(--spacing-layout-l);
@@ -70,113 +68,86 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, query } = ctx;
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
-  // TODO type this properly
-  const values = query as Record<string, string>;
+  const variables = processVariables(
+    query,
+    locale ?? "fi",
+    ReservationKind.Direct
+  );
   const { data } = await apolloClient.query<Query, QueryReservationUnitsArgs>({
     query: RESERVATION_UNITS,
     fetchPolicy: "no-cache",
-    variables: processVariables(values, locale ?? "fi"),
-    // TODO limit the count?
+    variables,
   });
+
+  // TODO this is copy pasta from search.tsx (combine into a single function)
+  const { data: optionsData } = await apolloClient.query<Query>({
+    query: OPTIONS_QUERY,
+  });
+  const reservationUnitTypes = filterNonNullable(
+    optionsData?.reservationUnitTypes?.edges?.map((edge) => edge?.node)
+  );
+  const purposes = filterNonNullable(
+    optionsData?.reservationPurposes?.edges?.map((edge) => edge?.node)
+  );
+  const equipments = filterNonNullable(
+    optionsData?.equipments?.edges?.map((edge) => edge?.node)
+  );
+
+  const reservationUnitTypeOptions = reservationUnitTypes.map((n) => ({
+    value: n.pk?.toString() ?? "",
+    label: n.nameFi ?? "",
+  }));
+  const purposeOptions = purposes.map((n) => ({
+    value: n.pk?.toString() ?? "",
+    label: n.nameFi ?? "",
+  }));
+  const equipmentsOptions = equipments.map((n) => ({
+    value: n.pk ?? 0,
+    label: n.nameFi ?? "",
+  }));
+
+  const { data: unitData } = await apolloClient.query<Query, QueryUnitsArgs>({
+    query: SEARCH_FORM_PARAMS_UNIT,
+    variables: {
+      publishedReservationUnits: true,
+    },
+  });
+
+  const unitOptions = filterNonNullable(
+    unitData?.units?.edges?.map((e) => e?.node)
+  )
+    .map((node) => ({
+      pk: node.pk ?? 0,
+      name: getUnitName(node) ?? "",
+    }))
+    .map((node) => ({
+      value: node.pk,
+      label: node.name,
+    }));
 
   return {
     props: {
       ...getCommonServerSideProps(),
-      key: JSON.stringify({ ...query, locale }),
       overrideBackgroundColor: "var(--tilavaraus-gray)",
       ...(await serverSideTranslations(locale ?? "fi")),
       data,
+      unitOptions,
+      reservationUnitTypeOptions,
+      purposeOptions,
+      equipmentsOptions,
     },
   };
 }
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
-// TODO type this properly and combine with the one in search.tsx
-function processVariables(values: Record<string, string>, language: string) {
-  const sortCriteria = values.sort;
-  const desc = values.order === "desc";
-  const orderBy = transformSortString(sortCriteria, language, desc);
-
-  const startDate = fromUIDate(values.startDate);
-  const endDate = fromUIDate(values.endDate);
-  const today = startOfDay(new Date());
-
-  const replaceIfExists = (condition: string | boolean, returnObject: object) =>
-    condition && returnObject;
-  return {
-    ...omit(values, [
-      "order",
-      "sort",
-      "minPersons",
-      "maxPersons",
-      "purposes",
-      "unit",
-      "reservationUnitType",
-      "equipments",
-      "startDate",
-      "endDate",
-      "timeBegin",
-      "timeEnd",
-      "duration",
-      "showOnlyReservable",
-    ]),
-    ...replaceIfExists(values.minPersons, {
-      minPersons: parseInt(values.minPersons, 10),
-    }),
-    ...replaceIfExists(values.maxPersons, {
-      maxPersons: parseInt(values.maxPersons, 10),
-    }),
-    ...replaceIfExists(values.purposes, {
-      purposes: values.purposes
-        ?.split(",")
-        .map(Number)
-        .filter(Number.isInteger),
-    }),
-    ...replaceIfExists(values.unit, {
-      unit: values.unit?.split(",").map(Number).filter(Number.isInteger),
-    }),
-    ...replaceIfExists(values.reservationUnitType, {
-      reservationUnitType: values.reservationUnitType
-        ?.split(",")
-        .map(Number)
-        .filter(Number.isInteger),
-    }),
-    ...replaceIfExists(values.equipments, {
-      equipments: values.equipments
-        ?.split(",")
-        .map(Number)
-        .filter(Number.isInteger),
-    }),
-    ...replaceIfExists(values.startDate, {
-      reservableDateStart:
-        startDate && startDate >= today ? toApiDate(startDate) : null,
-    }),
-    ...replaceIfExists(values.endDate, {
-      reservableDateEnd:
-        endDate && endDate >= today ? toApiDate(endDate) : null,
-    }),
-    ...replaceIfExists(values.timeBegin, {
-      reservableTimeStart: values.timeBegin,
-    }),
-    ...replaceIfExists(values.timeBegin, {
-      reservableTimeEnd: values.timeEnd,
-    }),
-    ...replaceIfExists(values.duration, {
-      reservableMinimumDurationMinutes: parseInt(values.duration, 10),
-    }),
-    ...replaceIfExists(values.showOnlyReservable !== "false", {
-      showOnlyReservable: true,
-    }),
-    first: pagingLimit,
-    orderBy,
-    isDraft: false,
-    isVisible: true,
-    reservationKind: ReservationKind.Direct,
-  };
-}
-
-function SearchSingle({ data: initData }: Props): JSX.Element {
+function SearchSingle({
+  data: initialData,
+  unitOptions,
+  reservationUnitTypeOptions,
+  purposeOptions,
+  equipmentsOptions,
+}: Props): JSX.Element {
   const { t, i18n } = useTranslation();
 
   const sortingOptions = [
@@ -194,26 +165,29 @@ function SearchSingle({ data: initData }: Props): JSX.Element {
     },
   ];
 
-  const [searchValues, setSearchValues] = useState(
-    {} as Record<string, string>
-  );
+  const searchValues = useSearchValues();
 
-  const { data, fetchMore, error, networkStatus } = useQuery<
+  const vars = processVariables(
+    searchValues,
+    i18n.language,
+    ReservationKind.Direct
+  );
+  // TODO should really hydrate the ApolloClient from SSR
+  const { data, fetchMore, error, loading, networkStatus } = useQuery<
     Query,
     QueryReservationUnitsArgs
   >(RESERVATION_UNITS, {
-    variables: processVariables(searchValues, i18n.language),
+    variables: vars,
     fetchPolicy: "network-only",
     // Why?
     // skip: Object.keys(searchValues).length === 0,
     notifyOnNetworkStatusChange: true,
     onError: (error1) =>
       // eslint-disable-next-line no-console
-      console.warn(error1, processVariables(searchValues, i18n.language)),
+      console.warn(error1, vars),
   });
 
-  // TODO should really hydrate the ApolloClient from SSR
-  const currData = data ?? initData;
+  const currData = data ?? initialData;
   const reservationUnits = filterNonNullable(
     currData?.reservationUnits?.edges?.map((e) => e?.node)
   );
@@ -222,31 +196,6 @@ function SearchSingle({ data: initData }: Props): JSX.Element {
 
   const content = useRef<HTMLElement>(null);
   const router = useRouter();
-
-  // TODO why???
-  useEffect(() => {
-    if (router.query) {
-      const parsed = router.query;
-      if (!parsed.sort) parsed.sort = "name";
-      if (!parsed.order) parsed.order = "asc";
-
-      const newValues = Object.keys(parsed).reduce<Record<string, string>>(
-        (p, key) => {
-          if (parsed[key]) {
-            return { ...p, [key]: parsed[key]?.toString() } as Record<
-              string,
-              string
-            >;
-          }
-          return p;
-        },
-        {}
-      );
-      if (!isEqual(searchValues, newValues)) {
-        setSearchValues(newValues);
-      }
-    }
-  }, [router.query, searchValues, i18n.language]);
 
   // TODO this is hackish, but the purpose is to scroll to the list (esp on mobile)
   // if the search options were selected on the front page already (and the search is automatic).
@@ -269,48 +218,6 @@ function SearchSingle({ data: initData }: Props): JSX.Element {
 
   const loadingMore = networkStatus === NetworkStatus.fetchMore;
 
-  // TODO type this properly
-  const onSearch = async (criteria: Record<string, string>) => {
-    const { sort, order } = router.query;
-    const newSort = sort != null && !Array.isArray(sort) ? sort : null;
-    const newOrder = order != null && !Array.isArray(order) ? order : null;
-    router.replace(
-      singleSearchUrl({ ...criteria, sort: newSort, order: newOrder })
-    );
-  };
-
-  const onRemove = (key?: string[], subItemKey?: string) => {
-    let newValues = {};
-    if (subItemKey) {
-      newValues = {
-        ...searchValues,
-        [subItemKey]: searchValues[subItemKey]
-          .split(",")
-          .filter((n) => !key?.includes(n))
-          .join(","),
-      };
-    } else if (key) {
-      newValues = omit(searchValues, key);
-    }
-
-    const { sort, order } = router.query;
-    const newSort = sort != null && !Array.isArray(sort) ? sort : null;
-    const newOrder = order != null && !Array.isArray(order) ? order : null;
-
-    router.replace(
-      singleSearchUrl({
-        ...newValues,
-        sort: newSort,
-        order: newOrder,
-        // a hacky way to bypass query cache
-        textSearch:
-          !key || key.includes("textSearch")
-            ? ""
-            : searchValues.textSearch ?? "",
-      })
-    );
-  };
-
   const isOrderingAsc = searchValues.order !== "desc";
 
   return (
@@ -324,56 +231,63 @@ function SearchSingle({ data: initData }: Props): JSX.Element {
         <BreadcrumbWrapper route={["searchSingle"]} />
         <StyledContainer>
           <Heading>{t("search:single.heading")}</Heading>
-          <SearchForm
-            onSearch={onSearch}
-            formValues={omit(searchValues, ["order", "sort"])}
-            removeValue={onRemove}
+          <SingleSearchForm
+            unitOptions={unitOptions}
+            reservationUnitTypeOptions={reservationUnitTypeOptions}
+            purposeOptions={purposeOptions}
+            equipmentsOptions={equipmentsOptions}
+            isLoading={loading}
           />
         </StyledContainer>
       </HeadContainer>
       <section ref={content}>
-        <ClientOnly>
-          <BottomWrapper>
-            <ListWithPagination
-              items={filterNonNullable(reservationUnits).map((ru) => (
-                <ReservationUnitCard reservationUnit={ru} key={ru.id} />
-              ))}
-              loadingMore={loadingMore}
-              pageInfo={pageInfo}
-              totalCount={totalCount ?? undefined}
-              fetchMore={(cursor) => {
-                const variables = {
-                  ...searchValues,
-                  after: cursor,
-                };
-                fetchMore({
-                  variables: processVariables(variables, i18n.language),
-                });
-              }}
-              sortingComponent={
-                <StyledSorting
-                  value={searchValues.sort}
-                  sortingOptions={sortingOptions}
-                  setSorting={(val) => {
-                    const params = {
-                      ...searchValues,
-                      sort: String(val.value),
-                    };
-                    router.replace(singleSearchUrl(params));
-                  }}
-                  isOrderingAsc={isOrderingAsc}
-                  setIsOrderingAsc={(isAsc: boolean) => {
-                    const params = {
-                      ...searchValues,
-                      order: isAsc ? "asc" : "desc",
-                    };
-                    router.replace(singleSearchUrl(params));
-                  }}
-                />
-              }
-            />
-          </BottomWrapper>
-        </ClientOnly>
+        <BottomWrapper>
+          <ListWithPagination
+            items={filterNonNullable(reservationUnits).map((ru) => (
+              <ReservationUnitCard reservationUnit={ru} key={ru.id} />
+            ))}
+            loadingMore={loadingMore}
+            pageInfo={pageInfo}
+            totalCount={totalCount ?? undefined}
+            fetchMore={(cursor) => {
+              const variables = {
+                ...processVariables(
+                  searchValues,
+                  i18n.language,
+                  ReservationKind.Direct
+                ),
+                after: cursor,
+              };
+              fetchMore({ variables });
+            }}
+            sortingComponent={
+              <StyledSorting
+                // TODO these should be gotten from a hook function (set / get)
+                value={
+                  searchValues.sort != null && !Array.isArray(searchValues.sort)
+                    ? searchValues.sort
+                    : "name"
+                }
+                sortingOptions={sortingOptions}
+                setSorting={(val) => {
+                  const params = {
+                    ...searchValues,
+                    sort: val.value,
+                  };
+                  router.replace({ query: params });
+                }}
+                isOrderingAsc={isOrderingAsc}
+                setIsOrderingAsc={(isAsc: boolean) => {
+                  const params = {
+                    ...searchValues,
+                    order: isAsc ? "asc" : "desc",
+                  };
+                  router.replace({ query: params });
+                }}
+              />
+            }
+          />
+        </BottomWrapper>
       </section>
     </Wrapper>
   );

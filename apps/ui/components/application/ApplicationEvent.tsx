@@ -20,7 +20,7 @@ import {
 } from "@/modules/util";
 import { ApplicationEventSummary } from "./ApplicationEventSummary";
 import Accordion from "../common/Accordion";
-import { getDurationNumberOptions } from "@/modules/const";
+import { getDurationOptions } from "@/modules/const";
 import ConfirmationModal, { ModalRef } from "../common/ConfirmationModal";
 import { MediumButton } from "@/styles/util";
 import { ApplicationFormValues } from "./Form";
@@ -177,6 +177,7 @@ function ApplicationEventInner({
     return "";
   };
 
+  const durationOptions = getDurationOptions(t);
   return (
     <>
       <SubHeadLine>
@@ -219,11 +220,13 @@ function ApplicationEventInner({
           rules={{ required: true }}
           name={`applicationSections.${index}.ageGroup`}
           render={({ field }) => (
-            <Select<OptionType>
+            <Select
               value={
                 ageGroupOptions.find((v) => v.value === field.value) ?? null
               }
-              onChange={(v: OptionType) => field.onChange(v.value)}
+              onChange={(v: (typeof ageGroupOptions)[0]) =>
+                field.onChange(v.value)
+              }
               required
               label={t("application:Page1.ageGroup")}
               options={ageGroupOptions}
@@ -237,12 +240,14 @@ function ApplicationEventInner({
           rules={{ required: true }}
           name={`applicationSections.${index}.purpose`}
           render={({ field }) => (
-            <Select<OptionType>
+            <Select
               label={t("application:Page1.purpose")}
               value={
                 purposeOptions.find((v) => v.value === field.value) ?? null
               }
-              onChange={(v: OptionType) => field.onChange(v.value)}
+              onChange={(v: (typeof purposeOptions)[0]) =>
+                field.onChange(v.value)
+              }
               required
               options={purposeOptions}
               invalid={errors.applicationSections?.[index]?.purpose != null}
@@ -332,6 +337,7 @@ function ApplicationEventInner({
           invalid={errors.applicationSections?.[index]?.end != null}
           errorText={getTranslatedError("end")}
         />
+        {/* TODO should use ControlledSelect */}
         <Controller
           control={control}
           name={`applicationSections.${index}.minDuration`}
@@ -340,15 +346,13 @@ function ApplicationEventInner({
             <Select
               id={field.name}
               value={
-                getDurationNumberOptions().find(
-                  (x) => x.value === field.value
-                ) ?? null
+                durationOptions.find((x) => x.value === field.value) ?? null
               }
               placeholder={t("common:select")}
-              options={getDurationNumberOptions()}
+              options={durationOptions}
               label={t("application:Page1.minDuration")}
               required
-              onChange={(selection: OptionType): void => {
+              onChange={(selection: (typeof durationOptions)[0]): void => {
                 field.onChange(selection.value);
               }}
               invalid={errors.applicationSections?.[index]?.minDuration != null}
@@ -356,6 +360,7 @@ function ApplicationEventInner({
             />
           )}
         />
+        {/* TODO should use ControlledSelect */}
         <Controller
           control={control}
           name={`applicationSections.${index}.maxDuration`}
@@ -364,15 +369,13 @@ function ApplicationEventInner({
             <Select
               id={field.name}
               value={
-                getDurationNumberOptions().find(
-                  (x) => x.value === field.value
-                ) ?? null
+                durationOptions.find((x) => x.value === field.value) ?? null
               }
               placeholder={t("common:select")}
-              options={getDurationNumberOptions()}
+              options={durationOptions}
               label={t("application:Page1.maxDuration")}
               required
-              onChange={(selection: OptionType): void => {
+              onChange={(selection: (typeof durationOptions)[0]): void => {
                 field.onChange(selection.value);
               }}
               invalid={errors.applicationSections?.[index]?.maxDuration != null}

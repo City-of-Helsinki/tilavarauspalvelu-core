@@ -1,5 +1,5 @@
-import { i18n } from "next-i18next";
-import { OptionType } from "common/types/common";
+import type { OptionType } from "common/types/common";
+import type { TFunction } from "i18next";
 
 export { isBrowser } from "common/src/helpers";
 export { getSignInUrl, getSignOutUrl } from "common/src/urlBuilder";
@@ -17,6 +17,8 @@ export const parametersPrefix = "/parameters";
 
 export const mapUrlPrefix = "https://palvelukartta.hel.fi/";
 
+export const SEARCH_PAGING_LIMIT = 36;
+
 export const reservationUnitPath = (id: number): string =>
   `${reservationUnitPrefix}/${id}`;
 
@@ -30,7 +32,7 @@ export const emptyOption = (
 
 export const participantCountOptions = [
   1, 2, 5, 10, 15, 20, 25, 30, 40, 50, 60, 80, 100, 150, 200,
-].map((v) => ({ label: `${v}`, value: v }) as OptionType);
+].map((v) => ({ label: `${v}`, value: v }));
 
 export const DATE_TYPES = {
   TODAY: "today",
@@ -39,61 +41,43 @@ export const DATE_TYPES = {
   THIS_WEEK: "this_week",
 };
 
-/// @return options array with value in seconds
-// TODO use of i18n.t is bad (loading of translations)
-export const getDurationNumberOptions = (): Array<{
-  label: string;
-  value: number;
-}> => {
-  const result: Array<{ label: string; value: number }> = [];
-  let h = 1;
-  let m = 0;
-  // Generate options for 30min intervals, starting from 1h & ending in 12h (=23 options)
-  for (let i = 0; i < 23; i += 1) {
-    const label = `${i18n?.t("common:abbreviations.hour", { count: h })} ${
-      m ? `${i18n?.t("common:abbreviations.minute", { count: m })}` : ""
-    }`;
-    result.push({ label, value: (h * 60 + m) * 60 });
-    m += 30;
-    if (m === 60) {
-      m = 0;
-      h += 1;
+type DurationOption = { label: string; value: number };
+function durationMinuteOptions(t: TFunction) {
+  const durations: DurationOption[] = [];
+  let minute = 30; // no zero duration option, as all available reservations have a positive/non-zero duration
+  while (minute <= 90) {
+    durations.push({
+      label: t("common:minute_other", { count: minute }),
+      value: minute,
+    });
+    minute += 30;
+  }
+  return durations;
+}
+
+export function getDurationOptions(t: TFunction): DurationOption[] {
+  const times: DurationOption[] = [];
+  let hour = 2;
+  let minute = 0;
+
+  while (hour < 24) {
+    times.push({
+      label: t("common:hour_other", { count: hour + minute / 60 }),
+      value: hour * 60 + minute,
+    });
+    minute += 30;
+    // Reset the minute counter, and increment the hour counter if necessary
+    if (minute === 60) {
+      minute = 0;
+      hour++;
     }
   }
 
-  return result;
-};
+  // we need to add the minute times to the beginning of the duration options
+  return durationMinuteOptions(t).concat(times);
+}
 
-const option = (label: string, value: string): OptionType => {
-  return { label, value };
-};
-
-const formatNumber = (n: number): string => `00${n}`.slice(-2);
-
-export const getDurationOptions = (): OptionType[] => {
-  const result: OptionType[] = [];
-  let h = 1;
-  let m = 0;
-  for (let i = 0; i < 45; i += 1) {
-    result.push(
-      option(
-        `${i18n?.t("common:abbreviations.hour", { count: h })} ${
-          m ? `${i18n?.t("common:abbreviations.minute", { count: m })}` : ""
-        }`,
-        `${formatNumber(h)}:${formatNumber(m)}:00`
-      )
-    );
-    m += 15;
-    if (m === 60) {
-      m = 0;
-      h += 1;
-    }
-  }
-
-  return result;
-};
-
-export const daysByMonths: OptionType[] = [
+export const daysByMonths: Array<{ label: string; value: number }> = [
   { label: "2", value: 14 },
   { label: "1", value: 30 },
   { label: "2", value: 60 },

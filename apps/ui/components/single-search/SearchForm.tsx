@@ -1,45 +1,28 @@
-import React, { ReactNode, useEffect } from "react";
+import React, { ReactNode } from "react";
 import { useTranslation } from "next-i18next";
-import { IconSearch, Select } from "hds-react";
-import { type FieldValues, type SubmitHandler, useForm } from "react-hook-form";
+import { IconSearch, TextInput } from "hds-react";
+import { type SubmitHandler, useForm, Controller } from "react-hook-form";
 import styled from "styled-components";
-import { DocumentNode, useQuery } from "@apollo/client";
-import { sortBy } from "lodash";
-import { OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
-import { Query, QueryUnitsArgs } from "common/types/gql-types";
 import { addYears, startOfDay } from "date-fns";
 import { ShowAllContainer } from "common/src/components";
-import { TextInput, TimeRangePicker } from "common/src/components/form";
+import { TimeRangePicker } from "common/src/components/form";
 import { toUIDate } from "common/src/common/util";
-import { type FormValues } from "common/src/components/single-search/types";
-import {
-  fromUIDate,
-  getSelectedOption,
-  getTranslation,
-  mapOptions,
-} from "@/modules/util";
-import { emptyOption, participantCountOptions } from "@/modules/const";
-import { MediumButton, truncatedText } from "@/styles/util";
-import {
-  SEARCH_FORM_PARAMS_EQUIPMENT,
-  SEARCH_FORM_PARAMS_PURPOSE,
-  SEARCH_FORM_PARAMS_UNIT,
-} from "@/modules/queries/params";
-import { RESERVATION_UNIT_TYPES } from "@/modules/queries/reservationUnit";
-import {
-  Checkbox,
-  DateRangePicker,
-  MultiSelectDropdown,
-} from "@/components/form";
-import FilterTagList from "./FilterTagList";
+import { fromUIDate } from "@/modules/util";
+import { getDurationOptions, participantCountOptions } from "@/modules/const";
+import { MediumButton } from "@/styles/util";
+import { Checkbox, DateRangePicker } from "@/components/form";
+import { FilterTagList } from "./FilterTagList";
 import SingleLabelInputGroup from "@/components/common/SingleLabelInputGroup";
-
-type Props = {
-  onSearch: (search: Record<string, string>) => void;
-  formValues: { [key: string]: string | null };
-  removeValue?: (key?: string[], subItemKey?: string) => void;
-};
+import { useSearchModify, useSearchValues } from "@/hooks/useSearchValues";
+import { type ParsedUrlQuery } from "node:querystring";
+import { ControlledMultiSelect } from "../search/ControlledMultiSelect";
+import { ControlledSelect } from "@/components/common/ControlledSelect";
+import {
+  mapQueryParamToNumber,
+  mapSingleBooleanParamToFormValue,
+  mapSingleParamToFormValue,
+} from "@/modules/search";
 
 const TopContainer = styled.div`
   display: flex;
@@ -78,20 +61,6 @@ const Filters = styled.div`
 
   @media (min-width: ${breakpoints.l}) {
     grid-template-columns: repeat(3, 1fr);
-  }
-`;
-
-const StyledSelect = styled(Select<OptionType>)<{ $hideLabel?: boolean }>`
-  button {
-    display: grid;
-    text-align: left;
-  }
-
-  span {
-    ${truncatedText}
-  }
-  label {
-    ${(props) => (props.$hideLabel ? `color: transparent !important;` : ``)}
   }
 `;
 
@@ -179,157 +148,114 @@ const SubmitButton = styled(MediumButton)`
   }
 `;
 
-// Custom hook for fetching options from the backend and mapping them to the format used by the Select component
-const useMappedOptions = (
-  queryName: DocumentNode,
-  queryNodeName: string,
-  queryOptions?: { publishedReservationUnits: boolean }
-): { options: OptionType[]; isLoading: boolean } => {
-  const { data, loading } = useQuery<Query, QueryUnitsArgs>(queryName, {
-    variables: { ...queryOptions },
-  });
-  if (data != null && queryNodeName in data) {
-    const options: { pk: number; name: string }[] =
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      data[queryNodeName]?.edges
-        ?.map((e: { node: unknown }) => e?.node)
-        .filter((n: null): n is NonNullable<typeof n> => n != null)
-        .map((node: { pk: number }) => ({
-          pk: String(node.pk),
-          name: getTranslation(node, "name"),
-        })) ?? [];
-    return {
-      options: mapOptions(sortBy(options, "name")),
-      isLoading: loading,
-    };
-  }
-  return { options: [], isLoading: loading };
+type FormValues = {
+  // TODO there is some confusion on the types of these
+  // they are actually an array of pks (number) but they are encoded as val1,val2,val3 string
+  purposes: string;
+  unit: string;
+  equipments: string;
+  reservationUnitTypes: string;
+  timeBegin: string | null;
+  timeEnd: string | null;
+  startDate: string | null;
+  endDate: string | null;
+  duration: number | null;
+  minPersons: number | null;
+  maxPersons: number | null;
+  showOnlyReservable?: boolean;
+  textSearch: string;
 };
 
-const SearchForm = ({
-  onSearch,
-  formValues,
-  removeValue,
-}: Props): JSX.Element | null => {
-  const formValueKeys = Object.keys(formValues);
+function mapQueryToForm(query: ParsedUrlQuery): FormValues {
+  const dur = mapQueryParamToNumber(query.duration);
+  const duration = dur != null && dur > 0 ? dur : null;
+  const showOnlyReservable =
+    mapSingleBooleanParamToFormValue(query.showOnlyReservable) ?? true;
+  return {
+    // array parameters (string encoded with ',' separator)
+    purposes: mapSingleParamToFormValue(query.purposes) ?? "",
+    unit: mapSingleParamToFormValue(query.unit) ?? "",
+    equipments: mapSingleParamToFormValue(query.equipments) ?? "",
+    reservationUnitTypes:
+      mapSingleParamToFormValue(query.reservationUnitType) ?? "",
+    // ?
+    timeBegin: mapSingleParamToFormValue(query.timeBegin) ?? null,
+    timeEnd: mapSingleParamToFormValue(query.timeEnd) ?? null,
+    startDate: mapSingleParamToFormValue(query.startDate) ?? null,
+    endDate: mapSingleParamToFormValue(query.endDate) ?? null,
+    // number params
+    duration,
+    minPersons: mapQueryParamToNumber(query.minPersons) ?? null,
+    maxPersons: mapQueryParamToNumber(query.maxPersons) ?? null,
+    showOnlyReservable,
+    textSearch: mapSingleParamToFormValue(query.textSearch) ?? "",
+  };
+}
+
+// TODO is this the full list? can we filter out all the rest? (i.e. remove the hideList)
+const filterOrder = [
+  "textSearch",
+  "timeBegin",
+  "timeEnd",
+  "startDate",
+  "endDate",
+  "duration",
+  "minPersons",
+  "maxPersons",
+  "reservationUnitType",
+  "unit",
+  "purposes",
+  "equipments",
+];
+const multiSelectFilters = [
+  "unit",
+  "reservationUnitType",
+  "purposes",
+  "equipments",
+];
+// we don't want to show "showOnlyReservable" as a FilterTag, as it has its own checkbox in the form
+const hideTagList = ["showOnlyReservable", "order", "sort"];
+
+// TODO rewrite this witout the form state (use query params directly, but don't refresh the page)
+export function SingleSearchForm({
+  reservationUnitTypeOptions,
+  purposeOptions,
+  unitOptions,
+  equipmentsOptions,
+  isLoading,
+}: {
+  reservationUnitTypeOptions: Array<{ value: string; label: string }>;
+  purposeOptions: Array<{ value: string; label: string }>;
+  unitOptions: Array<{ value: number; label: string }>;
+  equipmentsOptions: Array<{ value: number; label: string }>;
+  isLoading: boolean;
+}): JSX.Element | null {
+  const { handleSearch } = useSearchModify();
+
   const { t } = useTranslation();
-  const { options: unitOptions } = useMappedOptions(
-    SEARCH_FORM_PARAMS_UNIT,
-    "units",
-    { publishedReservationUnits: true }
-  );
-  const { options: purposeOptions } = useMappedOptions(
-    SEARCH_FORM_PARAMS_PURPOSE,
-    "purposes"
-  );
-  const { options: unitTypeOptions } = useMappedOptions(
-    RESERVATION_UNIT_TYPES,
-    "reservationUnitTypes"
-  );
-  const { options: equipmentsOptions } = useMappedOptions(
-    SEARCH_FORM_PARAMS_EQUIPMENT,
-    "equipments"
-  );
-  const durationMinuteOptions = () => {
-    const durations: OptionType[] = [];
-    let minute = 30; // no zero duration option, as all available reservations have a positive/non-zero duration
-    while (minute <= 90) {
-      durations.push({
-        label: t("common:minute_other", { count: minute }),
-        value: minute,
-      });
-      minute += 30;
-    }
-    return durations;
-  };
+  const unitTypeOptions = reservationUnitTypeOptions;
+  const durationOptions = getDurationOptions(t);
 
-  const populateDurationOptions = (): OptionType[] => {
-    const times: OptionType[] = [];
-    let hour = 2;
-    let minute = 0;
-
-    while (hour < 24) {
-      times.push({
-        label: t("common:hour_other", { count: hour + minute / 60 }),
-        value: hour * 60 + minute,
-      });
-      minute += 30;
-      // Reset the minute counter, and increment the hour counter if necessary
-      if (minute === 60) {
-        minute = 0;
-        hour++;
-      }
-    }
-    // we need to add the minute times to the beginning of the duration options
-    return durationMinuteOptions().concat(times);
-  };
-  const durationOptions = populateDurationOptions();
-
-  const initialValues = {
-    unit: "",
-    equipments: "",
-    startDate: null,
-    endDate: null,
-    timeBegin: null,
-    timeEnd: null,
-    duration: null,
-    minPersons: "",
-    maxPersons: "",
-    reservationUnitType: "",
-    showOnlyReservable: true,
-    textSearch: "",
-  };
-
-  const { register, watch, handleSubmit, setValue, getValues, control } =
+  const searchValues = useSearchValues();
+  // TODO the users of this should be using watch
+  const formValues = mapQueryToForm(searchValues);
+  const { handleSubmit, setValue, getValues, control, register } =
     useForm<FormValues>({
-      defaultValues: {
-        ...initialValues,
-        ...formValues,
-      },
+      values: formValues,
     });
 
-  useEffect(() => {
-    register("purposes");
-    register("unit");
-    register("equipments");
-    register("startDate");
-    register("endDate");
-    register("timeBegin");
-    register("timeEnd");
-    register("duration");
-    register("minPersons");
-    register("maxPersons");
-    register("reservationUnitType");
-    register("textSearch");
-    register("showOnlyReservable");
-  }, [register]);
-
-  // FIXME this is awful, don't set a random KeyValue map, use form.reset with a typed JS object
-  useEffect(() => {
-    Object.keys(formValues).forEach((p) =>
-      setValue(
-        p as keyof FormValues,
-        p === "showOnlyReservable"
-          ? formValues[p as keyof FormValues] !== "false"
-          : formValues[p as keyof FormValues]
-      )
-    );
-  }, [formValues, setValue]);
-
-  const getFormSubValueLabel = (
-    key: string,
-    value: string
-  ): string | undefined => {
-    const compFn = (a: (typeof unitOptions)[0], b: string) =>
+  const translateTag = (key: string, value: string): string | undefined => {
+    // Handle possible number / string comparison
+    const compFn = (a: { value: unknown }, b: string) =>
       a != null && String(a.value) === b;
+    // TODO should rework the find matcher (typing issues) (it works but it's confusing)
     switch (key) {
       case "unit":
         return unitOptions.find((n) => compFn(n, value))?.label;
       case "reservationUnitType":
-        return unitTypeOptions.find((n) => compFn(n, value))?.label;
+        return unitTypeOptions.find((n) => n.value === value)?.label;
       case "purposes":
-        return purposeOptions.find((n) => compFn(n, value))?.label;
+        return purposeOptions.find((n) => n.value === value)?.label;
       case "equipments":
         return equipmentsOptions.find((n) => compFn(n, value))?.label;
       case "duration":
@@ -350,53 +276,37 @@ const SearchForm = ({
       if (cv[1] == null || cv[1] === "") return c;
       return { ...c, [cv[0]]: cv[1] };
     }, {});
-    onSearch(searchCriteria);
+    handleSearch(searchCriteria);
   };
 
+  const showOptionalFilters =
+    formValues.reservationUnitTypes !== "" ||
+    formValues.minPersons != null ||
+    formValues.maxPersons != null ||
+    formValues.textSearch != null;
+
   return (
-    <>
+    <form noValidate onSubmit={handleSubmit(search)}>
       <TopContainer>
         <Filters>
-          <MultiSelectDropdown
-            id="purposeFilter"
-            checkboxName="purposeFilter"
+          <ControlledMultiSelect
             name="purposes"
-            onChange={(selection: string[]): void => {
-              setValue("purposes", selection.filter((n) => n !== "").join(","));
-            }}
+            control={control}
             options={purposeOptions}
-            showSearch
-            title={t("searchForm:purposesFilter")}
-            value={watch("purposes")?.split(",") ?? [""]}
+            label={t("searchForm:purposesFilter")}
           />
-          <MultiSelectDropdown
-            id="unitFilter"
-            checkboxName="unitFilter"
+          <ControlledMultiSelect
             name="unit"
-            onChange={(selection: string[]): void => {
-              setValue("unit", selection.filter((n) => n !== "").join(","));
-            }}
+            control={control}
             options={unitOptions}
-            showSearch
-            title={t("searchForm:unitFilter")}
-            value={watch("unit")?.split(",") ?? [""]}
+            label={t("searchForm:unitFilter")}
           />
-          <MultiSelectDropdown
-            id="reservationUnitEquipmentsFilter"
-            checkboxName="reservationUnitEquipmentsFilter"
+          <ControlledMultiSelect
             name="equipments"
-            onChange={(selection: string[]): void => {
-              setValue(
-                "equipments",
-                selection.filter((n) => n !== "").join(",")
-              );
-            }}
+            control={control}
             options={equipmentsOptions}
-            showSearch
-            title={t("searchForm:equipmentsFilter")}
-            value={watch("equipments")?.split(",") ?? [""]}
+            label={t("searchForm:equipmentsFilter")}
           />
-
           <SingleLabelRangeWrapper label={t("searchForm:dateFilter")}>
             <DateRangePicker
               startDate={fromUIDate(String(getValues("startDate")))}
@@ -423,7 +333,6 @@ const SearchForm = ({
               }}
             />
           </SingleLabelRangeWrapper>
-
           <SingleLabelRangeWrapper label={t("searchForm:timeFilter")}>
             <TimeRangePicker
               control={control}
@@ -439,137 +348,91 @@ const SearchForm = ({
               clearable={{ begin: true, end: true }}
             />
           </SingleLabelRangeWrapper>
-
-          <StyledSelect
-            id="durationFilter"
-            placeholder={t("common:minimum")}
-            options={[emptyOption(t("common:minimum"))].concat(durationOptions)}
+          <ControlledSelect
+            name="duration"
+            control={control}
+            clearable
+            options={durationOptions}
             label={t("searchForm:durationFilter", { duration: "" })}
-            onChange={(selection: OptionType): void => {
-              setValue(
-                "duration",
-                !Number.isNaN(Number(selection.value))
-                  ? Math.round(Number(selection.value) * 10) / 10
-                  : null
-              );
-            }}
-            defaultValue={getSelectedOption(
-              getValues("duration"),
-              durationOptions
-            )}
-            key={`duration${getValues("duration")}`}
           />
-
           <OptionalFilters
             showAllLabel={t("searchForm:showMoreFilters")}
             showLessLabel={t("searchForm:showLessFilters")}
             maximumNumber={0}
             data-testid="search-form__filters--optional"
-            initiallyOpen={
-              formValues.reservationUnitType != null ||
-              formValues.minPersons != null ||
-              formValues.maxPersons != null ||
-              formValues.textSearch != null
-            }
+            initiallyOpen={showOptionalFilters}
           >
             <SingleLabelInputGroup
               label={t("searchForm:participantCountCombined")}
             >
-              <StyledSelect
-                id="participantMinCountFilter"
-                placeholder={t("common:minimum")}
-                options={[emptyOption(t("common:minimum"), "")].concat(
-                  participantCountOptions
-                )}
+              <ControlledSelect
+                name="minPersons"
+                control={control}
+                options={participantCountOptions}
+                clearable
                 label={`${t("searchForm:participantCountCombined")} ${t("common:minimum")}`}
-                onChange={(selection: OptionType): void => {
-                  setValue("minPersons", String(selection.value));
-                }}
-                defaultValue={getSelectedOption(
-                  getValues("minPersons"),
-                  participantCountOptions
-                )}
-                key={`minPersons${getValues("minPersons")}`}
+                placeholder={t("common:minimum")}
                 className="inputSm inputGroupStart"
-                $hideLabel
               />
-
-              <StyledSelect
-                id="participantMaxCountFilter"
-                placeholder={t("common:maximum")}
-                options={[emptyOption(t("common:maximum"))].concat(
-                  participantCountOptions
-                )}
+              <ControlledSelect
+                name="maxPersons"
+                control={control}
+                options={participantCountOptions}
+                clearable
                 label={`${t("searchForm:participantCountCombined")} ${t("common:maximum")}`}
-                onChange={(selection: OptionType): void => {
-                  setValue("maxPersons", String(selection.value));
-                }}
-                defaultValue={getSelectedOption(
-                  getValues("maxPersons"),
-                  participantCountOptions
-                )}
-                key={`maxPersons${getValues("maxPersons")}`}
+                placeholder={t("common:maximum")}
                 className="inputSm inputGroupEnd"
               />
             </SingleLabelInputGroup>
-            <MultiSelectDropdown
-              id="reservationUnitTypeFilter"
-              checkboxName="reservationUnitTypeFilter"
-              name="reservationType"
-              onChange={(selection: string[]): void => {
-                setValue(
-                  "reservationUnitType",
-                  selection.filter((n) => n !== "").join(",")
-                );
-              }}
+            <ControlledMultiSelect
+              name="reservationUnitTypes"
+              control={control}
               options={unitTypeOptions}
-              showSearch
-              title={t("searchForm:typeLabel")}
-              value={watch("reservationUnitType")?.split(",") || [""]}
-              key={`minPersons${getValues("minPersons")}`}
+              label={t("searchForm:typeLabel")}
             />
             <TextInput
-              control={control}
               id="search"
-              name="textSearch"
               label={t("searchForm:textSearchLabel")}
+              {...register("textSearch")}
               placeholder={t("searchForm:searchTermPlaceholder")}
-              onEnterKeyPress={() => handleSubmit(search)()}
-              defaultValue={formValues.textSearch ?? undefined}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSubmit(search)();
+                }
+              }}
             />
           </OptionalFilters>
-          <StyledCheckBox
-            id="showOnlyReservable"
+          <Controller
             name="showOnlyReservable"
-            label={t("searchForm:showOnlyReservableLabel")}
-            onChange={() =>
-              setValue(
-                "showOnlyReservable",
-                Boolean(!getValues("showOnlyReservable"))
-              )
-            }
-            checked={Boolean(watch("showOnlyReservable"))}
+            control={control}
+            render={({ field: { value, onChange } }) => (
+              <StyledCheckBox
+                id="showOnlyReservable"
+                name="showOnlyReservable"
+                label={t("searchForm:showOnlyReservableLabel")}
+                onChange={onChange}
+                checked={value}
+              />
+            )}
           />
         </Filters>
       </TopContainer>
-
       <BottomContainer>
         <FilterTagList
-          formValueKeys={formValueKeys}
-          formValues={formValues}
-          removeValue={removeValue}
-          getFormSubValueLabel={getFormSubValueLabel}
+          translateTag={translateTag}
+          filters={filterOrder}
+          multiSelectFilters={multiSelectFilters}
+          hideList={hideTagList}
         />
         <SubmitButton
           id="searchButton"
-          onClick={handleSubmit(search) as SubmitHandler<FieldValues>}
+          type="submit"
           iconLeft={<IconSearch />}
+          isLoading={isLoading}
         >
           {t("searchForm:searchButton")}
         </SubmitButton>
       </BottomContainer>
-    </>
+    </form>
   );
-};
-
-export default SearchForm;
+}

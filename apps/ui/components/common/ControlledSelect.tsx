@@ -1,21 +1,31 @@
 import React from "react";
 import { Select } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { Controller, useForm } from "react-hook-form";
-import { OptionType } from "common/types/common";
-import { getSelectedOption } from "@/modules/util";
+import {
+  type Control,
+  type FieldValues,
+  type Path,
+  useController,
+} from "react-hook-form";
 
-type Props = {
-  name: string;
+type Props<T extends FieldValues, U> = {
+  name: Path<T>;
+  control: Control<T>;
   label: string;
-  control: ReturnType<typeof useForm>["control"];
-  options: OptionType[];
+  options: Array<{ label: string; value: U }>;
   required?: boolean;
   placeholder?: string;
   error?: string;
   validate?: { [key: string]: (val: string) => boolean };
+  style?: React.CSSProperties;
+  className?: string;
+  clearable?: boolean;
 };
-const ControlledSelect = ({
+
+export function ControlledSelect<
+  T extends FieldValues,
+  U extends number | string,
+>({
   name,
   label,
   control,
@@ -24,36 +34,33 @@ const ControlledSelect = ({
   error,
   placeholder,
   validate,
-}: Props): JSX.Element => {
+  style,
+  className,
+  clearable,
+}: Props<T, U>): JSX.Element {
   const { t } = useTranslation();
+  const {
+    field: { value, onChange },
+  } = useController({ name, control, rules: { required, validate } });
+
+  const currentValue = options.find((x) => x.value === value) ?? null;
+
   return (
-    <Controller
-      control={control}
-      name={name}
-      rules={{ required, validate }}
-      render={({ field }) => {
-        const currentValue = getSelectedOption(field.value, options) ?? {
-          label: "",
-          value: "",
-        };
-        return (
-          <Select
-            id={name}
-            value={currentValue}
-            options={options}
-            label={label}
-            required={required ?? false}
-            onChange={(selection: OptionType): void => {
-              field.onChange(selection.value);
-            }}
-            placeholder={placeholder ?? t("common:select")}
-            invalid={Boolean(error)}
-            error={error}
-          />
-        );
+    <Select
+      id={name}
+      style={style}
+      className={className}
+      clearable={clearable}
+      value={currentValue}
+      options={options}
+      label={label}
+      required={required}
+      onChange={(selection?: (typeof options)[0]): void => {
+        onChange(selection?.value);
       }}
+      placeholder={placeholder ?? t("common:select")}
+      invalid={Boolean(error)}
+      error={error}
     />
   );
-};
-
-export default ControlledSelect;
+}

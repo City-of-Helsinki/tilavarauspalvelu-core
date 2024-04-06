@@ -5,7 +5,6 @@ import { Button, IconAngleDown, IconAngleUp, IconCross } from "hds-react";
 import { maxBy, trim } from "lodash";
 import { fromUIDate, toUIDate } from "common/src/common/util";
 import { Transition } from "react-transition-group";
-import type { OptionType } from "common/types/common";
 import {
   fontBold,
   fontMedium,
@@ -23,7 +22,7 @@ import type { SubmitHandler, UseFormReturn } from "react-hook-form";
 import type { TimeRange } from "@/components/reservation-unit/QuickReservation";
 import { PendingReservationFormType } from "@/components/reservation-unit/schema";
 import ControlledDateInput from "@/components/common/ControlledDateInput";
-import ControlledSelect from "@/components/common/ControlledSelect";
+import { ControlledSelect } from "@/components/common/ControlledSelect";
 
 export type FocusTimeSlot = TimeRange & {
   isReservable: boolean;
@@ -41,7 +40,7 @@ type Props = {
     date?: string;
     time?: string;
   }>;
-  durationOptions: OptionType[];
+  durationOptions: { label: string; value: number }[];
   startingTimeOptions: { label: string; value: string }[];
   focusSlot: FocusTimeSlot;
   submitReservation: SubmitHandler<PendingReservationFormType>;

@@ -1,5 +1,5 @@
 import { IconClock, IconGroup, IconGlyphEuro } from "hds-react";
-import React, { useMemo } from "react";
+import React from "react";
 import NextImage from "next/image";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
@@ -11,8 +11,6 @@ import {
   ReservationKind,
   type ReservationUnitNode,
 } from "common/types/gql-types";
-import { omit } from "lodash";
-import { useLocalStorage } from "react-use";
 import { Container } from "common";
 import {
   formatDate,
@@ -142,21 +140,15 @@ const NonReservableNotification = ({
   );
 };
 
-const Head = ({
+function Head({
   reservationUnit,
   // activeOpeningTimes,
   reservationUnitIsReservable,
   subventionSuffix,
-}: PropsType): JSX.Element => {
+}: PropsType): JSX.Element {
   const { t } = useTranslation();
 
-  const storageKey = "reservationUnit-search";
-
-  const [storedValues] = useLocalStorage(storageKey, null);
-
-  const searchUrlWithParams = useMemo(() => {
-    return singleSearchUrl(omit(storedValues, "applicationRound"));
-  }, [storedValues]);
+  const searchUrl = singleSearchUrl();
 
   const minDur = reservationUnit.minReservationDuration ?? 0;
   const maxDur = reservationUnit.maxReservationDuration ?? 0;
@@ -180,9 +172,9 @@ const Head = ({
   return (
     <>
       <BreadcrumbWrapper
-        route={[searchUrlWithParams, "reservationUnitName"]}
+        route={[searchUrl, "reservationUnitName"]}
         aliases={[
-          { slug: searchUrlWithParams, title: t("breadcrumb:search") },
+          { slug: searchUrl, title: t("breadcrumb:search") },
           { slug: "reservationUnitName", title: reservationUnitName ?? "-" },
         ]}
       />
@@ -270,6 +262,6 @@ const Head = ({
       </TopContainer>
     </>
   );
-};
+}
 
 export default Head;

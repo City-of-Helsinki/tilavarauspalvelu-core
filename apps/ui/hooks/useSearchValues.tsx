@@ -1,0 +1,87 @@
+import { useRouter } from "next/router";
+import { ParsedUrlQuery } from "node:querystring";
+
+// TODO should take a list of keys or use a type instead of a record so we can remove invalid keys
+export function useSearchValues() {
+  const router = useRouter();
+  const parsed = router.query;
+  if (!parsed.sort) {
+    parsed.sort = "name";
+  }
+  if (!parsed.order) {
+    parsed.order = "asc";
+  }
+
+  return parsed;
+}
+
+export function useSearchModify() {
+  const router = useRouter();
+  const searchValues = useSearchValues();
+
+  // TODO type this properly (not a Record)
+  const handleSearch = (criteria: Record<string, string>) => {
+    const { sort, order } = router.query;
+    const newSort = sort != null && !Array.isArray(sort) ? sort : null;
+    const newOrder = order != null && !Array.isArray(order) ? order : null;
+    const newValues = { ...criteria, sort: newSort, order: newOrder };
+    router.replace({
+      query: newValues,
+    });
+  };
+
+  /// @param hideList - list of keys to ignore when resetting the query
+  const handleResetTags = (hideList: string[]) => {
+    const keys = Object.keys(searchValues);
+    const newValues = keys.reduce<ParsedUrlQuery>((acc, key) => {
+      if (hideList.includes(key)) {
+        acc[key] = searchValues[key];
+      }
+      return acc;
+    }, {});
+    router.replace({
+      query: newValues,
+    });
+  };
+
+  // TODO is there a case where we remove the whole key: array<string>? and not just single values
+  // also we can do a lot simpler variant of this, just remove the key from the query instead of constructing a new query
+  // TODO what are the use cases for array input?
+  // TODO what are the use cases for subItemKey? and can it be null?
+  const handleRemoveTag = (key: string[], subItemKey?: string) => {
+    // Forbidding resetting all filters (need to rework this so we always remove a single value)
+    if (key.length === 0) {
+      throw new Error("key must have at least one value");
+    }
+
+    // Oh this allows for a case of removing a single value? or no
+    // yeah, the subItemKey is the actual query key we are finding from
+    // the key: [] is the values we are removing
+    let newValues = {};
+    if (subItemKey) {
+      const values = searchValues[subItemKey];
+      if (values != null && typeof values === "string") {
+        const newValue = values.split(",").filter((n) => !key?.includes(n));
+        newValues = {
+          ...searchValues,
+          [subItemKey]: newValue.join(","),
+        };
+      } else if (values != null && Array.isArray(values)) {
+        const newValue = values.filter((n) => !key?.includes(n));
+        newValues = {
+          ...searchValues,
+          [subItemKey]: newValue,
+        };
+      }
+    } else if (key) {
+      const { [`${key}`]: _, ...rest } = searchValues;
+      newValues = rest;
+    }
+
+    router.replace({
+      query: newValues,
+    });
+  };
+
+  return { handleSearch, handleRemoveTag, handleResetTags };
+}

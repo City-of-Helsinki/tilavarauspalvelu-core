@@ -21,7 +21,7 @@ import {
 import { reservationUnitPrefix } from "@/modules/const";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
 import { useSearchParams } from "next/navigation";
-import { getImageSource } from "common/src/helpers";
+import { getImageSource, isBrowser } from "common/src/helpers";
 
 interface PropsT {
   reservationUnit: ReservationUnitNode;
@@ -221,14 +221,19 @@ const StatusTag = (ru: {
   return <StyledTag $status="available">{`${dayText} ${timeText}`}</StyledTag>;
 };
 
-const ReservationUnitCard = ({ reservationUnit }: PropsT): JSX.Element => {
-  const { t } = useTranslation();
+// TODO SSR version (and remove the use hook)
+function useConstrucLink(reservationUnit: ReservationUnitNode): string {
   const params = useSearchParams();
   const date = params.get("startDate");
   const time = params.get("timeBegin");
   const duration = params.get("duration");
 
-  const name = getReservationUnitName(reservationUnit);
+  if (!isBrowser) {
+    return "";
+  }
+  if (reservationUnit.pk == null) {
+    return "";
+  }
 
   const linkURL = new URL(
     `${reservationUnitPrefix}/${reservationUnit.pk}`,
@@ -238,6 +243,15 @@ const ReservationUnitCard = ({ reservationUnit }: PropsT): JSX.Element => {
   if (date != null) linkURL.searchParams.set("date", date);
   if (time != null) linkURL.searchParams.set("time", time);
   const link = linkURL.toString();
+
+  return link;
+}
+
+const ReservationUnitCard = ({ reservationUnit }: PropsT): JSX.Element => {
+  const { t } = useTranslation();
+  const name = getReservationUnitName(reservationUnit);
+
+  const link = useConstrucLink(reservationUnit);
   const unitName = getUnitName(reservationUnit.unit ?? undefined);
 
   const pricing = getActivePricing(reservationUnit);

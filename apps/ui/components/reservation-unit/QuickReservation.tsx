@@ -1,5 +1,4 @@
 import React, { useCallback, useMemo } from "react";
-import type { OptionType } from "common/types/common";
 import { Button } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
@@ -14,7 +13,7 @@ import type { FocusTimeSlot } from "@/components/calendar/ReservationCalendarCon
 import type { SubmitHandler, UseFormReturn } from "react-hook-form";
 import { PendingReservationFormType } from "@/components/reservation-unit/schema";
 import ControlledDateInput from "@/components/common/ControlledDateInput";
-import ControlledSelect from "@/components/common/ControlledSelect";
+import { ControlledSelect } from "@/components/common/ControlledSelect";
 import { getSelectedOption } from "@/modules/util";
 
 export type TimeRange = {
@@ -30,7 +29,7 @@ type Props = {
     date?: string;
     time?: string;
   }>;
-  durationOptions: OptionType[];
+  durationOptions: { label: string; value: number }[];
   startingTimeOptions: { label: string; value: string }[];
   focusSlot: FocusTimeSlot | null;
   nextAvailableTime: Date | null;

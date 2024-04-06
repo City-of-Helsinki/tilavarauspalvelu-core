@@ -1,41 +1,27 @@
-import React, { ReactNode, useEffect, useMemo, useState } from "react";
+import React, { ReactNode, useState } from "react";
 import { useTranslation } from "next-i18next";
 import {
-  Select,
   TextInput,
   IconSearch,
-  Tag,
   Button,
   IconAngleUp,
   IconAngleDown,
 } from "hds-react";
-import { useForm } from "react-hook-form";
+import { type SubmitHandler, useForm } from "react-hook-form";
 import styled from "styled-components";
-import { useQuery } from "@apollo/client";
-import { OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
-import {
-  ApplicationRoundNode,
-  Query,
-  QueryUnitsArgs,
-} from "common/types/gql-types";
-import { filterNonNullable } from "common/src/helpers";
-import { getSelectedOption } from "@/modules/util";
-import { emptyOption, participantCountOptions } from "@/modules/const";
-import { MediumButton, truncatedText } from "@/styles/util";
-import { SEARCH_FORM_PARAMS_UNIT } from "@/modules/queries/params";
-import { getApplicationRoundName } from "@/modules/applicationRound";
-import { getUnitName } from "@/modules/reservationUnit";
+import { participantCountOptions } from "@/modules/const";
+import { MediumButton } from "@/styles/util";
 import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
-import { useOptions } from "@/hooks/useOptions";
-import MultiSelectDropdown from "@/components/form/MultiSelectDropdown";
-
-type Props = {
-  onSearch: (search: Record<string, string>) => void;
-  formValues: { [key: string]: string };
-  removeValue: (key?: string[], subItemKey?: string) => void;
-  applicationRounds: ApplicationRoundNode[];
-};
+import { useSearchModify, useSearchValues } from "@/hooks/useSearchValues";
+import { FilterTagList } from "../single-search/FilterTagList";
+import { ParsedUrlQuery } from "node:querystring";
+import { ControlledSelect } from "@/components/common/ControlledSelect";
+import { ControlledMultiSelect } from "./ControlledMultiSelect";
+import {
+  mapQueryParamToNumber,
+  mapSingleParamToFormValue,
+} from "@/modules/search";
 
 const desktopBreakpoint = "840px";
 
@@ -93,17 +79,6 @@ const Filters = styled.div<{ $areFiltersVisible: boolean }>`
   }
 `;
 
-const StyledSelect = styled(Select<OptionType>)`
-  button {
-    display: grid;
-    text-align: left;
-  }
-
-  span {
-    ${truncatedText}
-  }
-`;
-
 const Group = styled.div<{ children: ReactNode[]; $gap?: string }>`
   > div:first-of-type {
     label {
@@ -144,30 +119,6 @@ const ButtonContainer = styled.div`
   gap: var(--spacing-m);
 `;
 
-const TagControls = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--spacing-s);
-`;
-
-const StyledTag = styled(Tag)`
-  font-size: var(--fontsize-body-m);
-`;
-
-const FilterTags = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-s);
-  margin-right: var(--spacing-m);
-`;
-
-const ResetButton = styled(StyledTag).attrs({
-  theme: {
-    "--tag-background": "transparent",
-  },
-})``;
-
 const SubmitButton = styled(MediumButton)`
   width: 100%;
 
@@ -187,63 +138,63 @@ const filterOrder = [
   "purposes",
 ];
 
-const SearchForm = ({
-  onSearch,
-  formValues,
-  removeValue,
-  applicationRounds,
-}: Props): JSX.Element | null => {
+type FormValues = {
+  applicationRound: number;
+  minPersons: number | null;
+  maxPersons: number | null;
+  unit: string;
+  reservationUnitTypes: string;
+  purposes: string;
+  textSearch: string;
+};
+
+// TODO combine as much as possible with the one in single-search (move them to a common place)
+function mapQueryToForm(query: ParsedUrlQuery): FormValues {
+  return {
+    applicationRound: mapQueryParamToNumber(query.applicationRound) ?? 0,
+    unit: mapSingleParamToFormValue(query.unit) ?? "",
+    purposes: mapSingleParamToFormValue(query.purposes) ?? "",
+    reservationUnitTypes:
+      mapSingleParamToFormValue(query.reservationUnitType) ?? "",
+    minPersons: mapQueryParamToNumber(query.minPersons) ?? null,
+    maxPersons: mapQueryParamToNumber(query.maxPersons) ?? null,
+    textSearch: mapSingleParamToFormValue(query.textSearch) ?? "",
+  };
+}
+
+export function SeasonalSearchForm({
+  applicationRoundOptions,
+  reservationUnitTypeOptions,
+  purposeOptions,
+  unitOptions,
+  isLoading,
+}: {
+  applicationRoundOptions: Array<{ value: number; label: string }>;
+  reservationUnitTypeOptions: Array<{ value: string; label: string }>;
+  purposeOptions: Array<{ value: string; label: string }>;
+  unitOptions: Array<{ value: number; label: string }>;
+  isLoading: boolean;
+}): JSX.Element | null {
   const { t } = useTranslation();
 
   const [areFiltersVisible, setAreFiltersVisible] = useState(false);
+  const { handleSearch } = useSearchModify();
 
-  const applicationPeriodOptions = useMemo(() => {
-    return applicationRounds.map((applicationRound) => ({
-      value: applicationRound.pk ?? 0,
-      label: getApplicationRoundName(applicationRound),
-    }));
-  }, [applicationRounds]);
+  const searchValues = useSearchValues();
+  const { control, register, handleSubmit } = useForm<FormValues>({
+    values: mapQueryToForm(searchValues),
+  });
 
-  const { options } = useOptions();
-  const { reservationUnitTypeOptions, purposeOptions } = options;
-  const { data: unitData } = useQuery<Query, QueryUnitsArgs>(
-    SEARCH_FORM_PARAMS_UNIT,
-    {
-      variables: {
-        publishedReservationUnits: true,
-      },
-    }
-  );
-
-  const unitOptions = filterNonNullable(
-    unitData?.units?.edges?.map((e) => e?.node)
-  )
-    .map((node) => ({
-      pk: node.pk ?? 0,
-      name: getUnitName(node) ?? "",
-    }))
-    .map((node) => ({
-      value: node.pk,
-      label: node.name,
-    }));
-
-  const { register, watch, handleSubmit, setValue, getValues } = useForm();
-
-  const getFormValueLabel = (value: string): string | undefined => {
-    switch (value) {
-      case "applicationRound":
-        return applicationPeriodOptions.find(
-          (n) => n.value === Number(formValues[value])
-        )?.label;
-      default:
-        return "";
-    }
+  const search: SubmitHandler<FormValues> = (criteria: FormValues) => {
+    // Remove empty (null || "") values from the criteria
+    const searchCriteria = Object.entries(criteria).reduce((c, cv) => {
+      if (cv[1] == null || cv[1] === "") return c;
+      return { ...c, [cv[0]]: cv[1] };
+    }, {});
+    handleSearch(searchCriteria);
   };
 
-  const getFormSubValueLabel = (
-    key: string,
-    value: string
-  ): string | undefined => {
+  const translateTag = (key: string, value: string): string | undefined => {
     switch (key) {
       case "unit":
         return unitOptions.find((n) => String(n.value) === value)?.label;
@@ -258,51 +209,17 @@ const SearchForm = ({
   };
 
   const multiSelectFilters = ["unit", "reservationUnitType", "purposes"];
-
-  useEffect(() => {
-    register("applicationRound");
-    register("minPersons");
-    register("maxPersons");
-    register("unit");
-    register("reservationUnitType");
-    register("purposes");
-  }, [register]);
-
-  useEffect(() => {
-    Object.keys(formValues).forEach((p) => setValue(p, formValues[p]));
-  }, [formValues, setValue]);
-
-  const search = (criteria: Record<string, string>) => {
-    onSearch(criteria);
-  };
-
-  const areOptionsLoaded = useMemo(
-    () =>
-      reservationUnitTypeOptions.length > 0 &&
-      unitOptions.length > 0 &&
-      purposeOptions.length > 0,
-    [reservationUnitTypeOptions, unitOptions, purposeOptions]
-  );
-
-  const formValueKeys = Object.keys(formValues);
+  const hideList = ["applicationRound", "order", "sort"];
 
   return (
-    <>
+    <form noValidate onSubmit={handleSubmit(search)}>
       <TopContainer>
         <Filters $areFiltersVisible={areFiltersVisible}>
-          <StyledSelect
-            id="applicationRound"
-            placeholder={t("common:select")}
-            options={applicationPeriodOptions}
-            onChange={(selection: OptionType): void => {
-              setValue("applicationRound", selection.value);
-            }}
-            defaultValue={getSelectedOption(
-              getValues("applicationRound"),
-              applicationPeriodOptions
-            )}
+          <ControlledSelect
+            name="applicationRound"
+            control={control}
+            options={applicationRoundOptions}
             label={t("searchForm:roundLabel")}
-            key={`minPersons${getValues("applicationRound")}`}
           />
           <TextInput
             id="search"
@@ -314,88 +231,49 @@ const SearchForm = ({
                 handleSubmit(search)();
               }
             }}
-            defaultValue={formValues.textSearch}
           />
           <Group>
-            <StyledSelect
-              id="participantMinCountFilter"
-              placeholder={t("common:minimum")}
-              options={[emptyOption(t("common:select"))].concat(
-                participantCountOptions
-              )}
+            <ControlledSelect
+              name="minPersons"
+              control={control}
+              clearable
+              options={participantCountOptions}
               label={t("searchForm:participantCountCombined")}
-              onChange={(selection: OptionType): void => {
-                setValue("minPersons", selection.value);
-              }}
-              defaultValue={getSelectedOption(
-                getValues("minPersons"),
-                participantCountOptions
-              )}
-              key={`minPersons${getValues("minPersons")}`}
               className="inputSm inputGroupStart"
             />
-            <StyledSelect
-              id="participantMaxCountFilter"
-              placeholder={t("common:maximum")}
-              options={[emptyOption(t("common:select"))].concat(
-                participantCountOptions
-              )}
+            <ControlledSelect
+              name="maxPersons"
+              control={control}
+              clearable
+              options={participantCountOptions}
               label="&nbsp;"
-              onChange={(selection: OptionType): void => {
-                setValue("maxPersons", selection.value);
-              }}
-              defaultValue={getSelectedOption(
-                getValues("maxPersons"),
-                participantCountOptions
-              )}
-              key={`maxPersons${getValues("maxPersons")}`}
               className="inputSm inputGroupEnd"
             />
           </Group>
-          <MultiSelectDropdown
-            id="reservationUnitTypeFilter"
-            checkboxName="reservationUnitTypeFilter"
-            name="reservationType"
-            onChange={(selection: string[]): void => {
-              setValue(
-                "reservationUnitType",
-                selection.filter((n) => n !== "").join(",")
-              );
-            }}
+          <ControlledMultiSelect
+            name="reservationUnitTypes"
+            control={control}
             options={reservationUnitTypeOptions}
-            showSearch
-            title={t("searchForm:typeLabel")}
-            value={watch("reservationUnitType")?.split(",") || [""]}
+            label={t("searchForm:typeLabel")}
           />
-          <MultiSelectDropdown
-            id="unitFilter"
-            checkboxName="unitFilter"
+          <ControlledMultiSelect
             name="unit"
-            onChange={(selection: string[]): void => {
-              setValue("unit", selection.filter((n) => n !== "").join(","));
-            }}
+            control={control}
             options={unitOptions}
-            showSearch
-            title={t("searchForm:unitFilter")}
-            value={watch("unit")?.split(",") || [""]}
+            label={t("searchForm:unitFilter")}
           />
-          <MultiSelectDropdown
-            id="purposeFilter"
-            checkboxName="purposeFilter"
+          <ControlledMultiSelect
             name="purposes"
-            onChange={(selection: string[]): void => {
-              setValue("purposes", selection.filter((n) => n !== "").join(","));
-            }}
+            control={control}
             options={purposeOptions}
-            showSearch
-            title={t("searchForm:purposesFilter")}
-            value={watch("purposes")?.split(",") || [""]}
+            label={t("searchForm:purposesFilter")}
           />
         </Filters>
         <JustForDesktop customBreakpoint={desktopBreakpoint}>
           <SubmitButton
             id="searchButton-desktop"
-            onClick={handleSubmit(search)}
+            type="submit"
+            isLoading={isLoading}
             iconLeft={<IconSearch />}
           >
             {t("searchForm:searchButton")}
@@ -416,74 +294,26 @@ const SearchForm = ({
         <Hr />
       </JustForMobile>
       <ButtonContainer>
-        {areOptionsLoaded && formValueKeys.length > 0 && (
-          <TagControls>
-            <FilterTags data-test-id="search-form__filter--tags">
-              {formValueKeys
-                .sort((a, b) => filterOrder.indexOf(a) - filterOrder.indexOf(b))
-                .map((value) => {
-                  const label = t(`searchForm:filters.${value}`, {
-                    label: getFormValueLabel(value),
-                    value: formValues[value],
-                    count: Number(formValues[value]),
-                  });
-
-                  return multiSelectFilters.includes(value) ? (
-                    formValues[value].split(",").map((subValue) => (
-                      <StyledTag
-                        id={`filter-tag__${value}-${subValue}`}
-                        onClick={() => removeValue([subValue], value)}
-                        onDelete={() => removeValue([subValue], value)}
-                        key={`${value}-${subValue}`}
-                        deleteButtonAriaLabel={t(`searchForm:removeFilter`, {
-                          value: getFormSubValueLabel(value, subValue),
-                        })}
-                      >
-                        {getFormSubValueLabel(value, subValue)}
-                      </StyledTag>
-                    ))
-                  ) : (
-                    <StyledTag
-                      id={`filter-tag__${value}`}
-                      onClick={() => removeValue([value])}
-                      onDelete={() => removeValue([value])}
-                      key={value}
-                      deleteButtonAriaLabel={t(`searchForm:removeFilter`, {
-                        value: label,
-                      })}
-                    >
-                      {label}
-                    </StyledTag>
-                  );
-                })}
-            </FilterTags>
-            {formValueKeys.length > 0 && (
-              <ResetButton
-                aria-label={t("searchForm:resetForm")}
-                onClick={() => removeValue()}
-                onDelete={() => removeValue()}
-                data-test-id="search-form__reset-button"
-              >
-                {t("searchForm:resetForm")}
-              </ResetButton>
-            )}
-          </TagControls>
-        )}
+        <FilterTagList
+          translateTag={translateTag}
+          filters={filterOrder}
+          multiSelectFilters={multiSelectFilters}
+          hideList={hideList}
+        />
         <JustForMobile
           style={{ width: "100%" }}
           customBreakpoint={desktopBreakpoint}
         >
           <SubmitButton
             id="searchButton-mobile"
-            onClick={handleSubmit(search)}
+            type="submit"
+            isLoading={isLoading}
             iconLeft={<IconSearch />}
           >
             {t("searchForm:searchButton")}
           </SubmitButton>
         </JustForMobile>
       </ButtonContainer>
-    </>
+    </form>
   );
-};
-
-export default SearchForm;
+}

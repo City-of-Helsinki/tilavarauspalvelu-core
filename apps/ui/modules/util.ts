@@ -167,7 +167,7 @@ export const searchUrl = (params: SearchParams): string => {
 
 // @deprecated, todo rewrite a getSingleSearchUrl function
 // or alternatively remove the use of query-string
-export const singleSearchUrl = (params: SearchParams): string => {
+export const singleSearchUrl = (params?: SearchParams): string => {
   const response = `${singleSearchPrefix}/`;
 
   if (params && Object.keys(params).length > 0) {

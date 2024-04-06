@@ -58,6 +58,16 @@ export const OPTIONS_QUERY = gql`
         }
       }
     }
+    equipments {
+      edges {
+        node {
+          pk
+          nameFi
+          nameEn
+          nameSv
+        }
+      }
+    }
   }
 `;
 

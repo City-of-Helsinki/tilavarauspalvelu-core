@@ -88,7 +88,7 @@ export function Navigation({
     // NOTE have to do both, otherwise the i18n and router are out of sync and
     // navigation uses translations for the previous language
     i18n.changeLanguage(language);
-    router.replace(router.pathname, router.asPath, {
+    router.replace({ query: router.query }, router.asPath, {
       locale: language,
     });
   };
