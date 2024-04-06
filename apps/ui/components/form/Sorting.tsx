@@ -2,9 +2,12 @@ import React from "react";
 import styled from "styled-components";
 import { IconSortAscending, IconSortDescending, Select } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { OptionType } from "common/types/common";
 import { fontMedium } from "common/src/common/typography";
 
+type OptionType = {
+  label: string;
+  value: string;
+};
 type Props = {
   value: string;
   sortingOptions: OptionType[];

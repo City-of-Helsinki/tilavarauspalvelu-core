@@ -9,7 +9,6 @@ import { useMedia } from "react-use";
 import { isEqual, omit } from "lodash";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { breakpoints } from "common/src/common/style";
-import { type OptionType } from "common/types/common";
 import { H2 } from "common/src/common/typography";
 import ClientOnly from "common/src/ClientOnly";
 import {
@@ -19,7 +18,7 @@ import {
 } from "common/types/gql-types";
 import { Container } from "common";
 import { filterNonNullable } from "common/src/helpers";
-import { capitalize, fromUIDate, singleSearchUrl } from "@/modules/util";
+import { fromUIDate, singleSearchUrl } from "@/modules/util";
 import { isBrowser } from "@/modules/const";
 import { RESERVATION_UNITS } from "@/modules/queries/reservationUnit";
 import SearchForm from "@/components/single-search/SearchForm";
@@ -31,6 +30,7 @@ import { toApiDate } from "common/src/common/util";
 import { startOfDay } from "date-fns";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
+import { transformSortString } from "@/modules/search";
 
 const pagingLimit = 36;
 
@@ -94,9 +94,9 @@ type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
 // TODO type this properly and combine with the one in search.tsx
 function processVariables(values: Record<string, string>, language: string) {
-  const _sortCriteria = ["name", "unitName"].includes(values.sort)
-    ? `${values.sort}${capitalize(language)}`
-    : values.sort;
+  const sortCriteria = values.sort;
+  const desc = values.order === "desc";
+  const orderBy = transformSortString(sortCriteria, language, desc);
 
   const startDate = fromUIDate(values.startDate);
   const endDate = fromUIDate(values.endDate);
@@ -169,7 +169,7 @@ function processVariables(values: Record<string, string>, language: string) {
       showOnlyReservable: true,
     }),
     first: pagingLimit,
-    // orderBy: values.order === "desc" ? `-${sortCriteria}` : sortCriteria,
+    orderBy,
     isDraft: false,
     isVisible: true,
     reservationKind: ReservationKind.Direct,
@@ -355,7 +355,7 @@ function SearchSingle({ data: initData }: Props): JSX.Element {
                 <StyledSorting
                   value={searchValues.sort}
                   sortingOptions={sortingOptions}
-                  setSorting={(val: OptionType) => {
+                  setSorting={(val) => {
                     const params = {
                       ...searchValues,
                       sort: String(val.value),

@@ -23,7 +23,7 @@ import {
 import { Container } from "common";
 import { filterNonNullable } from "common/src/helpers";
 import SearchForm from "../../components/search/SearchForm";
-import { capitalize, searchUrl } from "../../modules/util";
+import { searchUrl } from "../../modules/util";
 import { isBrowser } from "../../modules/const";
 import { HeroSubheading } from "../../modules/style/typography";
 import { RESERVATION_UNITS } from "../../modules/queries/reservationUnit";
@@ -36,6 +36,7 @@ import useReservationUnitsList from "../../hooks/useReservationUnitList";
 import ListWithPagination from "../../components/common/ListWithPagination";
 import StartApplicationBar from "../../components/common/StartApplicationBar";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { transformSortString } from "@/modules/search";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
@@ -107,10 +108,11 @@ const StyledSorting = styled(Sorting)`
   }
 `;
 
-const processVariables = (values: Record<string, string>, language: string) => {
-  const _sortCriteria = ["name", "unitName"].includes(values.sort)
-    ? `${values.sort}${capitalize(language)}`
-    : values.sort;
+function processVariables(values: Record<string, string>, language: string) {
+  const sortCriteria = values.sort;
+  const desc = values.order === "desc";
+  const orderBy = transformSortString(sortCriteria, language, desc);
+
   return {
     ...omit(values, [
       "order",
@@ -147,13 +149,12 @@ const processVariables = (values: Record<string, string>, language: string) => {
         .filter(Number.isInteger),
     }),
     first: pagingLimit,
-    // FIXME orderBy needs to be an enum now
-    // orderBy: values.order === "desc" ? `-${sortCriteria}` : sortCriteria,
+    orderBy,
     isDraft: false,
     isVisible: true,
     reservationKind: ReservationKind.Season,
   };
-};
+}
 
 function convertParamsToValues(params: ParsedQuery<string>) {
   const parsed = params;
@@ -176,7 +177,7 @@ function convertParamsToValues(params: ParsedQuery<string>) {
   return newValues;
 }
 
-const Search = ({ applicationRounds }: Props): JSX.Element => {
+function SeasonalSearch({ applicationRounds }: Props): JSX.Element {
   const searchParams = isBrowser ? window.location.search : "";
   const parsedParams = queryString.parse(searchParams);
   const [values, setValues] = useState<Record<string, string>>(
@@ -248,6 +249,7 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
     }
   }, [parsedParams, values, i18n.language]);
 
+  // TODO remove this (and storing of queryparams to localstorage), it's silly
   useEffect(() => {
     const params = queryString.parse(searchParams);
     // @ts-expect-error: TODO: fix this (first though figure out why we are saving queryparams to localstorage)
@@ -375,6 +377,6 @@ const Search = ({ applicationRounds }: Props): JSX.Element => {
       </BottomWrapper>
     </Wrapper>
   );
-};
+}
 
-export default Search;
+export default SeasonalSearch;

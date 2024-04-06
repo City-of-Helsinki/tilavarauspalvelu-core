@@ -154,6 +154,8 @@ type SearchParams = Record<
   string | (string | null)[] | number | boolean | null
 >;
 
+// @deprecated, todo rewrite a getSearcSeasonalhUrl function
+// or alternatively remove the use of query-string
 export const searchUrl = (params: SearchParams): string => {
   const response = `${searchPrefix}/`;
 
@@ -164,6 +166,8 @@ export const searchUrl = (params: SearchParams): string => {
   return response;
 };
 
+// @deprecated, todo rewrite a getSingleSearchUrl function
+// or alternatively remove the use of query-string
 export const singleSearchUrl = (params: SearchParams): string => {
   const response = `${singleSearchPrefix}/`;
 
