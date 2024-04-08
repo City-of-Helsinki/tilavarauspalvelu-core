@@ -28,6 +28,9 @@ class OriginHaukiResource(models.Model):
     class Meta:
         db_table = "origin_hauki_resource"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self) -> str:
         return str(self.id)
@@ -52,7 +55,11 @@ class ReservableTimeSpan(models.Model):
     class Meta:
         db_table = "reservable_time_span"
         base_manager_name = "objects"
-        ordering = ["resource", "start_datetime", "end_datetime"]
+        ordering = [
+            "resource",
+            "start_datetime",
+            "end_datetime",
+        ]
         constraints = [
             models.CheckConstraint(
                 name="reservable_time_span_start_before_end",

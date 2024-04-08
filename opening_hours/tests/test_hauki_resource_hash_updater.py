@@ -28,8 +28,8 @@ def test__HaukiResourceHashUpdater__init__no_params(reservation_unit):
     updater = HaukiResourceHashUpdater()
 
     assert list(updater.hauki_resource_ids) == [
-        reservation_unit.origin_hauki_resource_id,
         reservation_unit.unit.origin_hauki_resource_id,
+        reservation_unit.origin_hauki_resource_id,
     ]
 
 

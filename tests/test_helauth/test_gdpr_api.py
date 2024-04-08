@@ -371,7 +371,7 @@ def test_query_user_data__user_not_found(api_client, settings):
         response = api_client.get(url)
 
     assert response.status_code == 404, response.data
-    assert response.data == {"detail": "Ei löydy."}
+    assert response.data == {"detail": "No ProfileUser matches the given query."}
 
 
 def test_query_user_data__wrong_scope(api_client, settings):

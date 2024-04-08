@@ -20,6 +20,9 @@ class City(models.Model):
         base_manager_name = "objects"
         verbose_name = _("City")
         verbose_name_plural = _("Cities")
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self) -> str:
         return self.name

@@ -43,6 +43,9 @@ class SuitableTimeRange(models.Model):
         base_manager_name = "objects"
         verbose_name = _("Suitable Time Range")
         verbose_name_plural = _("Suitable Time Ranges")
+        ordering = [
+            "pk",
+        ]
         constraints = [
             models.CheckConstraint(
                 check=(

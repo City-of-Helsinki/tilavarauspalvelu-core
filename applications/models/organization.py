@@ -60,6 +60,9 @@ class Organisation(SerializableMixin, models.Model):
         base_manager_name = "objects"
         verbose_name = _("Organisation")
         verbose_name_plural = _("Organisations")
+        ordering = [
+            "pk",
+        ]
 
     # For GDPR API
     serialize_fields = (

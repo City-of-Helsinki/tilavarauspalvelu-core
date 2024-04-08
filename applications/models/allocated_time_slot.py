@@ -48,6 +48,9 @@ class AllocatedTimeSlot(models.Model):
         base_manager_name = "objects"
         verbose_name = _("Allocated Time Slot")
         verbose_name_plural = _("Allocated Time Slots")
+        ordering = [
+            "pk",
+        ]
         constraints = [
             models.CheckConstraint(
                 check=(

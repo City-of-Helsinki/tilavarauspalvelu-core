@@ -65,6 +65,9 @@ class Location(models.Model):
     class Meta:
         db_table = "location"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self) -> str:
         return f"{self.address_street}, {self.address_zip} {self.address_city}"

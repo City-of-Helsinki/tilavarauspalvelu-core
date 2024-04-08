@@ -28,6 +28,9 @@ class Resource(models.Model):
     class Meta:
         db_table = "resource"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self) -> str:
         value = self.name

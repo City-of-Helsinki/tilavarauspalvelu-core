@@ -37,6 +37,9 @@ class Service(models.Model):
     class Meta:
         db_table = "service"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self):
         return f"{self.name} ({self.service_type})"

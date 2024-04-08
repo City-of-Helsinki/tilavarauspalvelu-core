@@ -4,7 +4,7 @@ from unittest import mock
 
 import pytest
 from django.utils import timezone
-from graphene_django_extensions.testing import parametrize_helper
+from graphene_django_extensions.testing.utils import parametrize_helper
 
 from reservation_units.enums import PricingStatus
 from reservation_units.models import ReservationUnit

@@ -60,7 +60,7 @@ def test_allocated_time_slot__order__by_applicant(graphql):
     allocation_2 = AllocatedTimeSlotFactory.create(
         reservation_unit_option__application_section__application__organisation__name="B",
     )
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+    graphql.login_with_superuser()
 
     # when:
     # - Use tries to fetch the allocated time slots by applicant in ascending order

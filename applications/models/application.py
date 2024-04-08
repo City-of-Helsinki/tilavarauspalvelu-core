@@ -90,6 +90,9 @@ class Application(SerializableMixin, models.Model):
         base_manager_name = "objects"
         verbose_name = _("Application")
         verbose_name_plural = _("Applications")
+        ordering = [
+            "pk",
+        ]
 
     # For GDPR API
     serialize_fields = (

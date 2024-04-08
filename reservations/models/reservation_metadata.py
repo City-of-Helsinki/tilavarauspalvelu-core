@@ -15,6 +15,9 @@ class ReservationMetadataField(models.Model):
         base_manager_name = "objects"
         verbose_name = _("Reservation metadata field")
         verbose_name_plural = _("Reservation metadata fields")
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self) -> str:
         return self.field_name
@@ -39,6 +42,9 @@ class ReservationMetadataSet(models.Model):
         base_manager_name = "objects"
         verbose_name = _("Reservation metadata set")
         verbose_name_plural = _("Reservation metadata sets")
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self) -> str:
         return self.name

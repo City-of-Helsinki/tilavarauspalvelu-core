@@ -24,6 +24,9 @@ class EquipmentCategory(models.Model):
     class Meta:
         db_table = "equipment_category"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self):
         return self.name
@@ -47,6 +50,9 @@ class Equipment(models.Model):
     class Meta:
         db_table = "equipment"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self):
         return self.name

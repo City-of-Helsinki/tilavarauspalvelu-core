@@ -12,6 +12,9 @@ class ReservationUnitPaymentType(models.Model):
     class Meta:
         db_table = "reservation_unit_payment_type"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self):
         return self.code

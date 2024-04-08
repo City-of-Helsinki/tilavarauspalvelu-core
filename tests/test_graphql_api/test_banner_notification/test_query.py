@@ -1,7 +1,7 @@
 from typing import Any, NamedTuple
 
 import pytest
-from graphene_django_extensions.testing import parametrize_helper
+from graphene_django_extensions.testing.utils import parametrize_helper
 from graphql_relay import to_global_id
 
 from api.graphql.types.banner_notification.types import BannerNotificationNode

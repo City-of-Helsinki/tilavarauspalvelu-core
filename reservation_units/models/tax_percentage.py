@@ -19,6 +19,9 @@ class TaxPercentage(models.Model):
     class Meta:
         db_table = "tax_percentage"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self) -> str:
         return f"{self.value}%"
