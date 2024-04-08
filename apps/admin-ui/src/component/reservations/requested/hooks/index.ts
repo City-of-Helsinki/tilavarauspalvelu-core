@@ -110,19 +110,19 @@ export function useRecurringReservations(recurringPk?: number) {
   const { t } = useTranslation();
 
   const id = base64encode(`RecurringReservationNode:${recurringPk}`);
-  const { data, loading, refetch } = useQuery<Query, QueryRecurringReservationArgs>(
-    RECURRING_RESERVATION_QUERY,
-    {
-      skip: !recurringPk,
-      fetchPolicy: "cache-and-network",
-      nextFetchPolicy: "cache-first",
-      errorPolicy: "all",
-      variables: { id },
-      onError: () => {
-        notifyError(t("errors.errorFetchingData"));
-      },
-    }
-  );
+  const { data, loading, refetch } = useQuery<
+    Query,
+    QueryRecurringReservationArgs
+  >(RECURRING_RESERVATION_QUERY, {
+    skip: !recurringPk,
+    fetchPolicy: "cache-and-network",
+    nextFetchPolicy: "cache-first",
+    errorPolicy: "all",
+    variables: { id },
+    onError: () => {
+      notifyError(t("errors.errorFetchingData"));
+    },
+  });
 
   const { recurringReservation } = data ?? {};
   const reservations = filterNonNullable(recurringReservation?.reservations);

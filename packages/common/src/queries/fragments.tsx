@@ -8,9 +8,11 @@ export const RESERVEE_NAME_FRAGMENT = gql`
     reserveePhone
     reserveeType
     reserveeOrganisationName
+    reserveeId
   }
 `;
 
+// TODO is this ever used without the name fields? duplicating reserveeId just in case
 export const RESERVEE_BILLING_FRAGMENT = gql`
   fragment ReserveeBillingFields on ReservationNode {
     reserveeId

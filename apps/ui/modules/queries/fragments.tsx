@@ -83,12 +83,6 @@ export const RESERVATION_UNIT_FRAGMENT = gql`
     images {
       ...ImageFragment
     }
-    spaces {
-      pk
-      nameFi
-      nameEn
-      nameSv
-    }
     metadataSet {
       id
       name

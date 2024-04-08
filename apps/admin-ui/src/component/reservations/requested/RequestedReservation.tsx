@@ -642,7 +642,7 @@ function PermissionWrappedReservation() {
 
   const handleRefetch = () => {
     return refetch();
-  }
+  };
 
   return (
     <VisibleIfPermission

@@ -2,7 +2,11 @@ import React from "react";
 import { H6 } from "common/src/common/typography";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
-import { State, type ReservationNode, type Query } from "common/types/gql-types";
+import {
+  State,
+  type ReservationNode,
+  type Query,
+} from "common/types/gql-types";
 import { type ApolloQueryResult } from "@apollo/client";
 import { useRecurringReservations } from "./hooks";
 import ReservationList from "../../ReservationsList";
@@ -25,7 +29,8 @@ const RecurringReservationsView = ({
   const { t } = useTranslation();
   const { setModalContent } = useModal();
 
-  const { loading, reservations, refetch } = useRecurringReservations(recurringPk);
+  const { loading, reservations, refetch } =
+    useRecurringReservations(recurringPk);
 
   if (loading) {
     return <div>Loading</div>;

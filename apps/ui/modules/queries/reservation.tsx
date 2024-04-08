@@ -4,8 +4,6 @@ import {
   RESERVEE_NAME_FRAGMENT,
   IMAGE_FRAGMENT,
   PRICING_FRAGMENT,
-  TERMS_OF_USE_TEXT_FRAGMENT,
-  LOCATION_FRAGMENT_I18N,
 } from "common/src/queries/fragments";
 import {
   RESERVATION_UNIT_FRAGMENT,
@@ -129,24 +127,43 @@ export const LIST_RESERVATIONS = gql`
   }
 `;
 
+// NOTE this is used to display some general info about the reservation (on /reservation/:id page)
+const RESERVATION_INFO_FRAGMENT = gql`
+  fragment ReservationInfoFragment on ReservationNode {
+    description
+    purpose {
+      pk
+      nameFi
+      nameEn
+      nameSv
+    }
+    ageGroup {
+      pk
+      minimum
+      maximum
+    }
+    homeCity {
+      pk
+      name
+    }
+    numPersons
+  }
+`;
+
 // TODO do we need all the fields from ReservationUnitNode? ex. pricing (since we should be using the Reservations own pricing anyway)
 // TODO can we split this into smaller queries? per case?
 // making a reservation, showing a reservation, editing a reservation, cancelling a reservation
+// TODO why pricing fields? instead of asking the reservation price info? lets say the unit is normally paid only but you made the reservation free
 export const GET_RESERVATION = gql`
-  ${IMAGE_FRAGMENT}
+  ${RESERVEE_NAME_FRAGMENT}
   ${RESERVATION_UNIT_FRAGMENT}
   ${CANCELLATION_RULE_FRAGMENT}
-  ${RESERVEE_NAME_FRAGMENT}
-  ${TERMS_OF_USE_TEXT_FRAGMENT}
-  ${LOCATION_FRAGMENT_I18N}
-  ${PRICING_FRAGMENT}
+  ${RESERVATION_INFO_FRAGMENT}
   query Reservation($id: ID!) {
     reservation(id: $id) {
       pk
       name
       ...ReserveeNameFields
-      description
-      reserveeId
       bufferTimeBefore
       bufferTimeAfter
       begin
@@ -164,83 +181,10 @@ export const GET_RESERVATION = gql`
         status
       }
       reservationUnit {
-        pk
-        nameFi
-        nameEn
-        nameSv
-        reservationPendingInstructionsFi
-        reservationPendingInstructionsEn
-        reservationPendingInstructionsSv
-        reservationConfirmedInstructionsFi
-        reservationConfirmedInstructionsEn
-        reservationConfirmedInstructionsSv
-        reservationCancelledInstructionsFi
-        reservationCancelledInstructionsEn
-        reservationCancelledInstructionsSv
-        termsOfUseFi
-        termsOfUseEn
-        termsOfUseSv
-        serviceSpecificTerms {
-          ...TermsOfUseTextFields
-        }
-        cancellationTerms {
-          ...TermsOfUseTextFields
-        }
-        paymentTerms {
-          ...TermsOfUseTextFields
-        }
-        pricingTerms {
-          ...TermsOfUseTextFields
-        }
-        unit {
-          pk
-          tprekId
-          nameFi
-          nameEn
-          nameSv
-          location {
-            latitude
-            longitude
-            ...LocationFieldsI18n
-          }
-        }
-        cancellationRule {
-          canBeCancelledTimeBefore
-          needsHandling
-        }
-        spaces {
-          pk
-          nameFi
-          nameEn
-          nameSv
-        }
-        images {
-          ...ImageFragment
-        }
-        pricings {
-          ...PricingFields
-        }
-        minPersons
-        maxPersons
         ...ReservationUnitFields
         ...CancellationRuleFields
       }
-      purpose {
-        pk
-        nameFi
-        nameEn
-        nameSv
-      }
-      ageGroup {
-        pk
-        minimum
-        maximum
-      }
-      homeCity {
-        pk
-        name
-      }
-      numPersons
+      ...ReservationInfoFragment
       isHandled
     }
   }
