@@ -204,6 +204,7 @@ class ReservationNode(DjangoNode):
             "staff_event": staff_field_check,
             "calendar_url": private_field_check,
         }
+        max_complexity = 20
         filterset_class = ReservationFilterSet
         permission_classes = [ReservationPermission]
 
