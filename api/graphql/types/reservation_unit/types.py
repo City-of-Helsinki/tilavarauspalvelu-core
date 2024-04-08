@@ -153,6 +153,7 @@ class ReservationUnitNode(DjangoNode):
             "payment_product": lambda user, reservation_unit: can_modify_reservation_unit(user, reservation_unit),
             "hauki_url": lambda user, reservation_unit: can_manage_units(user, reservation_unit.unit),
         }
+        max_complexity = 20
         filterset_class = ReservationUnitFilterSet
         permission_classes = [ReservationUnitPermission]
 
