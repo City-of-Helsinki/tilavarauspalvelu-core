@@ -70,6 +70,9 @@ class User(AbstractUser):
     class Meta:
         db_table = "user"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self) -> str:
         default = super().__str__()
@@ -232,6 +235,9 @@ class PersonalInfoViewLog(models.Model):
     class Meta:
         db_table = "personal_info_view_log"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self) -> str:
         return f"{self.viewer_username} viewed {self.user}'s {self.field} at {self.access_time}"

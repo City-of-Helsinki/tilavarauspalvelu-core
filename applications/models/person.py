@@ -18,6 +18,9 @@ class Person(SerializableMixin, models.Model):
         base_manager_name = "objects"
         verbose_name = _("Person")
         verbose_name_plural = _("Persons")
+        ordering = [
+            "pk",
+        ]
 
     # For GDPR API
     serialize_fields = (

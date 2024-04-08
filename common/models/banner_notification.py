@@ -27,6 +27,9 @@ class BannerNotification(models.Model):
     class Meta:
         db_table = "banner_notification"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
         indexes = [
             models.Index(
                 BANNER_LEVEL_SORT_ORDER,

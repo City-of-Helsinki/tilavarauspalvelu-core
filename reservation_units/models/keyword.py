@@ -19,6 +19,9 @@ class KeywordCategory(models.Model):
     class Meta:
         db_table = "keyword_category"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self):
         return f"{self.name}"
@@ -44,6 +47,9 @@ class KeywordGroup(models.Model):
     class Meta:
         db_table = "keyword_group"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self):
         return f"{self.name}"
@@ -69,6 +75,9 @@ class Keyword(models.Model):
     class Meta:
         db_table = "keyword"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self):
         return f"{self.name}"

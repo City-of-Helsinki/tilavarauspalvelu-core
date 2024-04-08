@@ -16,6 +16,9 @@ class ReservationPurpose(models.Model):
     class Meta:
         db_table = "reservation_purpose"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self) -> str:
         return self.name

@@ -12,6 +12,9 @@ class AgeGroup(models.Model):
     class Meta:
         db_table = "age_group"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self) -> str:
         if self.maximum is None:

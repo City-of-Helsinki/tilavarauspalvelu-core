@@ -247,6 +247,9 @@ class ReservationStatistic(models.Model):
     class Meta:
         db_table = "reservation_statistic"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self) -> str:
         return f"{self.reservee_uuid} - {self.begin} - {self.end}"
@@ -270,6 +273,9 @@ class ReservationStatisticsReservationUnit(models.Model):
     class Meta:
         db_table = "reservation_statistics_reservation_unit"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self) -> str:
         return f"{self.reservation_statistics} - {self.reservation_unit}"

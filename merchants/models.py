@@ -36,6 +36,9 @@ class PaymentMerchant(models.Model):
     class Meta:
         db_table = "payment_merchant"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self) -> str:
         return self.name
@@ -61,6 +64,9 @@ class PaymentProduct(models.Model):
     class Meta:
         db_table = "payment_product"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self) -> str:
         return str(self.id)
@@ -190,6 +196,9 @@ class PaymentOrder(models.Model):
     class Meta:
         db_table = "payment_order"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self) -> str:
         return f"PaymentOrder {self.pk}"
@@ -284,6 +293,9 @@ class PaymentAccounting(models.Model):
     class Meta:
         db_table = "payment_accounting"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self) -> str:
         return self.name

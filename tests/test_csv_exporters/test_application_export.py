@@ -3,7 +3,7 @@ from unittest import mock
 
 import pytest
 from django.utils import timezone
-from graphene_django_extensions.testing import parametrize_helper
+from graphene_django_extensions.testing.utils import parametrize_helper
 
 from applications.choices import ApplicantTypeChoice, Priority, Weekday
 from applications.exporter import ApplicationExportRow, export_application_data, get_header_rows

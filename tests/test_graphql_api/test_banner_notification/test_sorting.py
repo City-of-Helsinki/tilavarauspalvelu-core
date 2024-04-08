@@ -4,7 +4,7 @@ from typing import NamedTuple
 import pytest
 from django.utils import timezone
 from freezegun import freeze_time
-from graphene_django_extensions.testing import parametrize_helper
+from graphene_django_extensions.testing.utils import parametrize_helper
 
 from common.choices import BannerNotificationLevel, BannerNotificationTarget
 from tests.factories import BannerNotificationFactory, UserFactory

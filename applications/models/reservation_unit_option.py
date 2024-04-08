@@ -42,6 +42,9 @@ class ReservationUnitOption(models.Model):
         base_manager_name = "objects"
         verbose_name = _("Reservation Unit Option")
         verbose_name_plural = _("Reservation Unit Options")
+        ordering = [
+            "pk",
+        ]
         constraints = [
             models.UniqueConstraint(
                 name="unique_application_section_preferred_order",
