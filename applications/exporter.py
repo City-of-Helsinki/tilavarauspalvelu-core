@@ -87,8 +87,8 @@ def get_header_rows(max_options: int) -> tuple[list[str], list[str], list[str]]:
     return (
         list(
             ApplicationExportRow(
-                primary_monday="Ensisijaisesti haetut tilat",
-                secondary_monday="Toissijaisesti haetut tilat",
+                primary_monday="Ensisijaiset aikatoiveet",
+                secondary_monday="Toissijaiset aikatoiveet",
             )
         ),
         list(
