@@ -34,8 +34,7 @@ const ActionButtons = styled(Dialog.ActionButtons)`
   justify-content: end;
 `;
 
-const parseNumber = (n: string): number => Number(n.replace(",", "."));
-const calcPriceNet = (price: string, taxPercentageValue?: number | null) => {
+const calcPriceNet = (price: number, taxPercentageValue?: number | null) => {
   const priceNet =
     taxPercentageValue != null && taxPercentageValue > 0
       ? Number(price) / ((1 + taxPercentageValue) / 100)
@@ -46,7 +45,7 @@ const calcPriceNet = (price: string, taxPercentageValue?: number | null) => {
 
 const DialogContent = ({
   reservation,
-  isFree,
+  isFree: isReservationUnitFree,
   onClose,
   onAccept,
 }: {
@@ -85,22 +84,27 @@ const DialogContent = ({
   const approveReservation = (input: ReservationApproveMutationInput) =>
     approveReservationMutation({ variables: { input } });
 
-  const [price, setPrice] = useState<string>(String(reservation.price || 0));
+  const [price, setPrice] = useState(reservation.price ?? 0);
   const [handlingDetails, setHandlingDetails] = useState<string>(
     reservation.handlingDetails
   );
-  const hasPrice = Boolean(reservation.price !== undefined);
-  const priceIsValid = !hasPrice || !Number.isNaN(parseNumber(price));
+  const hasPrice = reservation.price != null && reservation.price > 0;
+  const priceIsValid = !hasPrice || !Number.isNaN(price);
 
   const handleApprove = () => {
     const taxP = reservation.taxPercentageValue ?? "0";
     approveReservation({
       pk: reservation.pk,
-      price: parseNumber(price),
+      price,
       priceNet: calcPriceNet(price, parseFloat(taxP)),
       handlingDetails,
     });
   };
+
+  // the reservation has a price and the reservation unit is paid
+  // might be extrenous checks (the reservation price is what is important here)
+  // a free reservation should never be allowed to be approved with a price
+  const shouldDisplayPrice = !isReservationUnitFree && hasPrice;
 
   return (
     <>
@@ -121,23 +125,22 @@ const DialogContent = ({
               </Notification>
             </>
           )}
-          {!isFree && hasPrice ? (
+          {shouldDisplayPrice && (
             <>
               <Checkbox
                 label={t("RequestedReservation.ApproveDialog.clearPrice")}
                 id="clearPrice"
-                type="button"
-                checked={Number(price) === 0}
+                checked={price === 0}
                 onClick={() => {
-                  if (Number(price) !== 0) {
-                    setPrice("0");
+                  if (price !== 0) {
+                    setPrice(0);
                   }
                 }}
               />
               <div style={{ width: "14em" }}>
                 <NumberInput
                   type="number"
-                  value={price ? Number(price) : ""}
+                  value={price}
                   required
                   min={0}
                   minusStepButtonAriaLabel={t("common:subtract")}
@@ -145,7 +148,16 @@ const DialogContent = ({
                   step={1}
                   id="approvalPrice"
                   label={t("RequestedReservation.ApproveDialog.price")}
-                  onChange={(e) => setPrice(e.target.value)}
+                  onChange={(e) => {
+                    if (e.target.value === "") {
+                      setPrice(0);
+                      return;
+                    }
+                    if (Number.isNaN(Number(e.target.value))) {
+                      return;
+                    }
+                    setPrice(Number(e.target.value));
+                  }}
                   errorText={
                     !priceIsValid
                       ? t("RequestedReservation.ApproveDialog.missingPrice")
@@ -154,7 +166,7 @@ const DialogContent = ({
                 />
               </div>
             </>
-          ) : null}
+          )}
           <TextArea
             value={handlingDetails}
             onChange={(e) => setHandlingDetails(e.target.value)}
