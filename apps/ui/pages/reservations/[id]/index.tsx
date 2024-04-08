@@ -18,6 +18,8 @@ import {
   type QueryReservationArgs,
   CustomerTypeChoice,
   State,
+  type ReservationNode,
+  type ReservationMetadataFieldNode,
 } from "common/types/gql-types";
 import Link from "next/link";
 import { Container } from "common";
@@ -64,6 +66,9 @@ import { fromApiDate } from "common/src/common/util";
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
+// TODO this should return 500 if the backend query fails (not 404), or 400 if the query is incorrect etc.
+// typically 500 would be MAX_COMPLEXITY issue (could also make it 400 but 400 should be invalid query, not too complex)
+// 500 should not be if the backend is down (which one is that?)
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, params } = ctx;
   const pk = Number(params?.id);
@@ -275,6 +280,125 @@ const PageContent = styled.div`
   }
 `;
 
+function ReserveeInfo({
+  reservation,
+  supportedFields,
+}: {
+  reservation: ReservationNode;
+  supportedFields: ReservationMetadataFieldNode[];
+}) {
+  const { t } = useTranslation();
+  if (
+    CustomerTypeChoice.Business === reservation.reserveeType ||
+    CustomerTypeChoice.Nonprofit === reservation.reserveeType
+  ) {
+    return (
+      <ContentContainer>
+        {containsField(supportedFields, "reserveeOrganisationName") && (
+          <ParagraphAlt>
+            {t("reservations:organisationName")}:{" "}
+            <span data-testid="reservation__reservee-organisation-name">
+              {reservation.reserveeOrganisationName || "-"}
+            </span>
+          </ParagraphAlt>
+        )}
+        {containsField(supportedFields, "reserveeId") && (
+          <ParagraphAlt>
+            {t("reservations:reserveeId")}:
+            <span data-testid="reservation__reservee-id">
+              {reservation.reserveeId || "-"}
+            </span>
+          </ParagraphAlt>
+        )}
+        {containsNameField(supportedFields) && (
+          <ParagraphAlt>
+            {t("reservations:contactName")}:{" "}
+            <span data-testid="reservation__reservee-name">
+              {`${reservation.reserveeFirstName || ""} ${
+                reservation.reserveeLastName || ""
+              }`.trim()}
+            </span>
+          </ParagraphAlt>
+        )}
+        {containsField(supportedFields, "reserveePhone") && (
+          <ParagraphAlt>
+            {t("reservations:contactPhone")}:
+            <span data-testid="reservation__reservee-phone">
+              {reservation.reserveePhone}
+            </span>
+          </ParagraphAlt>
+        )}
+        {containsField(supportedFields, "reserveeEmail") && (
+          <ParagraphAlt>
+            {t("reservations:contactEmail")}:
+            <span data-testid="reservation__reservee-email">
+              {reservation.reserveeEmail}
+            </span>
+          </ParagraphAlt>
+        )}
+      </ContentContainer>
+    );
+  }
+
+  return (
+    <ContentContainer>
+      {containsNameField(supportedFields) && (
+        <ParagraphAlt>
+          {t("common:name")}:{" "}
+          <span data-testid="reservation__reservee-name">
+            {`${reservation.reserveeFirstName || ""} ${
+              reservation.reserveeLastName || ""
+            }`.trim()}
+          </span>
+        </ParagraphAlt>
+      )}
+      {containsField(supportedFields, "reserveePhone") && (
+        <ParagraphAlt>
+          {t("common:phone")}:
+          <span data-testid="reservation__reservee-phone">
+            {reservation.reserveePhone || "-"}
+          </span>
+        </ParagraphAlt>
+      )}
+      {containsField(supportedFields, "reserveeEmail") && (
+        <ParagraphAlt>
+          {t("common:email")}:
+          <span data-testid="reservation__reservee-email">
+            {reservation.reserveeEmail || "-"}
+          </span>
+        </ParagraphAlt>
+      )}
+    </ContentContainer>
+  );
+}
+
+function ReservationInfo({
+  reservation,
+  supportedFields,
+}: {
+  reservation: ReservationNode;
+  supportedFields: ReservationMetadataFieldNode[];
+}) {
+  const { t } = useTranslation();
+  const POSSIBLE_FIELDS = ["purpose", "numPersons", "ageGroup", "description"];
+  const fields = POSSIBLE_FIELDS.filter((field) =>
+    containsField(supportedFields, field)
+  );
+
+  return (
+    <ContentContainer>
+      {fields.map((field) => (
+        <ParagraphAlt key={field}>
+          {t(`reservationApplication:label.common.${field}`)}:{" "}
+          <span data-testid={`reservation__${field}`}>
+            {getReservationValue(reservation, field) || "-"}
+          </span>
+        </ParagraphAlt>
+      ))}
+    </ContentContainer>
+  );
+}
+
 // TODO add a state check => if state is Created redirect to the reservation funnel
 // if state is Cancelled, Denied, WaitingForPayment what then?
 function Reservation({
@@ -384,101 +508,6 @@ function Reservation({
   const supportedFields = filterNonNullable(
     reservationUnit.metadataSet?.supportedFields
   );
-
-  const reservationInfo = [
-    "purpose",
-    "numPersons",
-    "ageGroup",
-    "description",
-  ].map(
-    (field) =>
-      containsField(supportedFields, field) && (
-        <ParagraphAlt key={field}>
-          {t(`reservationApplication:label.common.${field}`)}:{" "}
-          <span data-testid={`reservation__${field}`}>
-            {getReservationValue(reservation, field) || "-"}
-          </span>
-        </ParagraphAlt>
-      )
-  );
-
-  const reserveeInfo =
-    CustomerTypeChoice.Business === reservation.reserveeType ||
-    CustomerTypeChoice.Nonprofit === reservation.reserveeType ? (
-      <>
-        {containsField(supportedFields, "reserveeOrganisationName") && (
-          <ParagraphAlt>
-            {t("reservations:organisationName")}:{" "}
-            <span data-testid="reservation__reservee-organisation-name">
-              {reservation.reserveeOrganisationName || "-"}
-            </span>
-          </ParagraphAlt>
-        )}
-        {containsField(supportedFields, "reserveeId") && (
-          <ParagraphAlt>
-            {t("reservations:reserveeId")}:
-            <span data-testid="reservation__reservee-id">
-              {reservation.reserveeId || "-"}
-            </span>
-          </ParagraphAlt>
-        )}
-        {containsNameField(supportedFields) && (
-          <ParagraphAlt>
-            {t("reservations:contactName")}:{" "}
-            <span data-testid="reservation__reservee-name">
-              {`${reservation.reserveeFirstName || ""} ${
-                reservation.reserveeLastName || ""
-              }`.trim()}
-            </span>
-          </ParagraphAlt>
-        )}
-        {containsField(supportedFields, "reserveePhone") && (
-          <ParagraphAlt>
-            {t("reservations:contactPhone")}:
-            <span data-testid="reservation__reservee-phone">
-              {reservation.reserveePhone}
-            </span>
-          </ParagraphAlt>
-        )}
-        {containsField(supportedFields, "reserveeEmail") && (
-          <ParagraphAlt>
-            {t("reservations:contactEmail")}:
-            <span data-testid="reservation__reservee-email">
-              {reservation.reserveeEmail}
-            </span>
-          </ParagraphAlt>
-        )}
-      </>
-    ) : (
-      <>
-        {containsNameField(supportedFields) && (
-          <ParagraphAlt>
-            {t("common:name")}:{" "}
-            <span data-testid="reservation__reservee-name">
-              {`${reservation.reserveeFirstName || ""} ${
-                reservation.reserveeLastName || ""
-              }`.trim()}
-            </span>
-          </ParagraphAlt>
-        )}
-        {containsField(supportedFields, "reserveePhone") && (
-          <ParagraphAlt>
-            {t("common:phone")}:
-            <span data-testid="reservation__reservee-phone">
-              {reservation.reserveePhone || "-"}
-            </span>
-          </ParagraphAlt>
-        )}
-        {containsField(supportedFields, "reserveeEmail") && (
-          <ParagraphAlt>
-            {t("common:email")}:
-            <span data-testid="reservation__reservee-email">
-              {reservation.reserveeEmail || "-"}
-            </span>
-          </ParagraphAlt>
-        )}
-      </>
-    );
 
   const isReservationCancelled = reservation.state === "CANCELLED";
   const isBeingHandled = reservation.state === "REQUIRES_HANDLING";
@@ -651,11 +680,17 @@ function Reservation({
             <ParagraphHeading>
               {t("reservationApplication:applicationInfo")}
             </ParagraphHeading>
-            <ContentContainer>{reservationInfo}</ContentContainer>
+            <ReservationInfo
+              reservation={reservation}
+              supportedFields={supportedFields}
+            />
             <ParagraphHeading>
               {t("reservationCalendar:reserverInfo")}
             </ParagraphHeading>
-            <ContentContainer>{reserveeInfo}</ContentContainer>
+            <ReserveeInfo
+              reservation={reservation}
+              supportedFields={supportedFields}
+            />
             <Terms>
               {(paymentTermsContent || cancellationTermsContent) && (
                 <Accordion
