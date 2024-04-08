@@ -85,6 +85,9 @@ class ApplicationRound(models.Model):
         base_manager_name = "objects"
         verbose_name = _("Application Round")
         verbose_name_plural = _("Application Rounds")
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self) -> str:
         return f"{self.name} ({self.reservation_period_begin} - {self.reservation_period_end})"

@@ -1,7 +1,7 @@
 from typing import Any, NamedTuple
 
 import pytest
-from graphene_django_extensions.testing import parametrize_helper
+from graphene_django_extensions.testing.utils import parametrize_helper
 
 from reservations.choices import CustomerTypeChoice, ReservationTypeChoice
 from tests.factories import RecurringReservationFactory, ReservationFactory

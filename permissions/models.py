@@ -134,6 +134,9 @@ class GeneralRoleChoice(models.Model):
     class Meta:
         db_table = "general_role_choice"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self):
         return self.verbose_name
@@ -155,6 +158,9 @@ class GeneralRolePermission(models.Model):
     class Meta:
         db_table = "general_role_permission"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self) -> str:
         return f"GeneralRolePermission {self.role.verbose_name} ({self.permission})"
@@ -176,6 +182,9 @@ class GeneralRole(BaseRole):
     class Meta:
         db_table = "general_role"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self):
         return f"{self.role.verbose_name} ({self.user.email})"
@@ -251,6 +260,9 @@ class UnitRoleChoice(models.Model):
     class Meta:
         db_table = "unit_role_choice"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self):
         return self.verbose_name
@@ -272,6 +284,9 @@ class UnitRolePermission(models.Model):
     class Meta:
         db_table = "unit_role_permission"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self) -> str:
         return f"UnitRolePermission {self.role.verbose_name} ({self.permission})"
@@ -302,6 +317,9 @@ class UnitRole(BaseRole):
     class Meta:
         db_table = "unit_role"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self):
         return f"{self.role.verbose_name} ({self.user.email})"
@@ -385,6 +403,9 @@ class ServiceSectorRoleChoice(models.Model):
     class Meta:
         db_table = "service_sector_role_choice"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self):
         return self.verbose_name
@@ -406,6 +427,9 @@ class ServiceSectorRolePermission(models.Model):
     class Meta:
         db_table = "service_sector_role_permission"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self) -> str:
         return f"ServiceSectorRolePermission {self.role.verbose_name} ({self.permission})"
@@ -431,6 +455,9 @@ class ServiceSectorRole(BaseRole):
     class Meta:
         db_table = "service_sector_role"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self):
         return f"{self.role.verbose_name} ({self.user.email})"

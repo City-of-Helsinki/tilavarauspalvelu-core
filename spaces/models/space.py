@@ -62,6 +62,9 @@ class Space(MPTTModel):
     class Meta:
         db_table = "space"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self) -> str:
         value = self.name

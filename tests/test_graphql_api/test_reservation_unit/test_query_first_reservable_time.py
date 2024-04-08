@@ -5,7 +5,7 @@ from typing import NamedTuple
 
 import freezegun
 import pytest
-from graphene_django_extensions.testing import parametrize_helper
+from graphene_django_extensions.testing.utils import parametrize_helper
 
 from applications.choices import ApplicationRoundStatusChoice
 from common.date_utils import DEFAULT_TIMEZONE

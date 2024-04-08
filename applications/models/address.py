@@ -25,6 +25,9 @@ class Address(SerializableMixin, models.Model):
         base_manager_name = "objects"
         verbose_name = _("Address")
         verbose_name_plural = _("Addresses")
+        ordering = [
+            "pk",
+        ]
 
     # For GDPR API
     serialize_fields = (

@@ -30,6 +30,9 @@ class ReservationUnitCancellationRule(models.Model):
     class Meta:
         db_table = "reservation_unit_cancellation_rule"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self):
         return self.name

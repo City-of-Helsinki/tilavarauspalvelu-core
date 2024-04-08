@@ -86,6 +86,9 @@ class ApplicationSection(SerializableMixin, models.Model):
         base_manager_name = "objects"
         verbose_name = _("Application Section")
         verbose_name_plural = _("Application Sections")
+        ordering = [
+            "pk",
+        ]
         constraints = [
             models.CheckConstraint(
                 check=models.Q(reservations_begin_date__lte=models.F("reservations_end_date")),

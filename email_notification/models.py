@@ -75,6 +75,9 @@ class EmailTemplate(models.Model):
     class Meta:
         db_table = "email_template"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self) -> str:
         choices = dict(EmailType.choices)

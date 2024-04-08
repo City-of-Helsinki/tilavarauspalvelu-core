@@ -93,7 +93,9 @@ class ReservationUnitPricing(models.Model):
     class Meta:
         db_table = "reservation_unit_pricing"
         base_manager_name = "objects"
-
+        ordering = [
+            "pk",
+        ]
         constraints = [
             models.CheckConstraint(
                 name="lower_price_greater_than_highest_price",

@@ -50,6 +50,9 @@ class TermsOfUse(models.Model):
         base_manager_name = "objects"
         verbose_name = pgettext_lazy("singular", "terms of use")
         verbose_name_plural = pgettext_lazy("plural", "terms of use")
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self) -> str:
         return self.name

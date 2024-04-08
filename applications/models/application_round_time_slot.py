@@ -34,7 +34,10 @@ class ApplicationRoundTimeSlot(models.Model):
         base_manager_name = "objects"
         verbose_name = _("Application Round Time Slot")
         verbose_name_plural = _("Application Round Time Slots")
-        ordering = ["reservation_unit", "weekday"]
+        ordering = [
+            "reservation_unit",
+            "weekday",
+        ]
         constraints = [
             models.UniqueConstraint(
                 fields=["reservation_unit", "weekday"],

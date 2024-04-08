@@ -22,6 +22,9 @@ class ServiceSector(models.Model):
     class Meta:
         db_table = "service_sector"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self) -> str:
         return self.name

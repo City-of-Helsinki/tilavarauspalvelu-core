@@ -60,7 +60,9 @@ class Unit(models.Model):
     class Meta:
         db_table = "unit"
         base_manager_name = "objects"
-        ordering = ["rank"]
+        ordering = [
+            "rank",
+        ]
 
     def __str__(self) -> str:
         return self.name

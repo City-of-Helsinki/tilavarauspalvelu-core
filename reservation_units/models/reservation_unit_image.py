@@ -32,6 +32,9 @@ class ReservationUnitImage(models.Model, PurgeImageCacheMixin):
     class Meta:
         db_table = "reservation_unit_image"
         base_manager_name = "objects"
+        ordering = [
+            "pk",
+        ]
 
     def __str__(self):
         return f"{self.reservation_unit.name} ({self.get_image_type_display()})"
