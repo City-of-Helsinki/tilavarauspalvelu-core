@@ -66,8 +66,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/common
       date-fns:
-        specifier: ^2.30.0
-        version: 2.30.0
+        specifier: ^3.6.0
+        version: 3.6.0
       eslint-config-custom:
         specifier: workspace:*
         version: link:../../packages/eslint-config-custom
@@ -247,8 +247,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/common
       date-fns:
-        specifier: ^2.30.0
-        version: 2.30.0
+        specifier: ^3.6.0
+        version: 3.6.0
       eslint-config-custom:
         specifier: workspace:*
         version: link:../../packages/eslint-config-custom
@@ -370,9 +370,6 @@ importers:
       axe-core:
         specifier: ^4.9.0
         version: 4.9.0
-      date-fns-tz:
-        specifier: ^2.0.0
-        version: 2.0.0(date-fns@2.30.0)
       jest:
         specifier: ^29.7.0
         version: 29.7.0(@types/node@18.18.8)
@@ -419,8 +416,8 @@ importers:
         specifier: ^2.5.1
         version: 2.5.1
       date-fns:
-        specifier: ^2.30.0
-        version: 2.30.0
+        specifier: ^3.6.0
+        version: 3.6.0
       eslint-config-custom:
         specifier: workspace:*
         version: link:../eslint-config-custom
@@ -3890,6 +3887,7 @@ packages:
     engines: {node: '>=6.9.0'}
     dependencies:
       regenerator-runtime: 0.14.1
+    dev: false
 
   /@babel/runtime@7.23.7:
     resolution: {integrity: sha512-w06OXVOFso7LcbzMiDGt+3X7Rh7Ho8MmgPoWU3rarH+8upf+wSU/grlGbWzQyr3DkdN6ZeuMFjpdwW0Q+HxobA==}
@@ -9604,24 +9602,14 @@ packages:
     resolution: {integrity: sha512-QWxYLR5P/6GStZcdem+V1xoto6DMadYWpMXU82ES3/RfR3Wdwr3D0+be7mgOJ+Ov0G9D5Dmb9T17sNLQYj9XOg==}
     dev: false
 
-  /date-fns-tz@2.0.0(date-fns@2.30.0):
-    resolution: {integrity: sha512-OAtcLdB9vxSXTWHdT8b398ARImVwQMyjfYGkKD2zaGpHseG2UPHbHjXELReErZFxWdSLph3c2zOaaTyHfOhERQ==}
-    peerDependencies:
-      date-fns: '>=2.0.0'
-    dependencies:
-      date-fns: 2.30.0
-    dev: true
-
   /date-fns@2.16.1:
     resolution: {integrity: sha512-sAJVKx/FqrLYHAQeN7VpJrPhagZc9R4ImZIWYRFZaaohR3KzmuK88touwsSwSVT8Qcbd4zoDsnGfX4GFB4imyQ==}
     engines: {node: '>=0.11'}
     dev: false
 
-  /date-fns@2.30.0:
-    resolution: {integrity: sha512-fnULvOpxnC5/Vg3NCiWelDsLiUc9bRwAPs/+LfTLNvetFCtCTN+yQz15C/fs4AwX1R9K5GLtLfn8QW+dWisaAw==}
-    engines: {node: '>=0.11'}
-    dependencies:
-      '@babel/runtime': 7.22.15
+  /date-fns@3.6.0:
+    resolution: {integrity: sha512-fRHTG8g/Gif+kSh50gaGEdToemgfj74aRX3swtiouboip5JDLAyDE9F11nHMIcvOaXeOC6D7SpNhi7uFyB7Uww==}
+    dev: false
 
   /dayjs@1.11.10:
     resolution: {integrity: sha512-vjAczensTgRcqDERK0SR2XMwsF/tSvnvlv6VcF2GIhg6Sx4yOIt/irsr1RDJsKiIyBzJDpCoXiWWq28MqH2cnQ==}

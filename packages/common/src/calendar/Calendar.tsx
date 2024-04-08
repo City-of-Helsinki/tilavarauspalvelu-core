@@ -1,6 +1,5 @@
 import React from "react";
 import styled from "styled-components";
-/* eslint-disable import/no-duplicates */
 import {
   addHours,
   endOfMonth,
@@ -9,10 +8,9 @@ import {
   getDay,
   startOfDay,
 } from "date-fns";
-import fi from "date-fns/locale/fi";
-import en from "date-fns/locale/en-GB";
-import sv from "date-fns/locale/sv";
-/* eslint-enable import/no-duplicates */
+import { fi } from "date-fns/locale/fi";
+import { enGB } from "date-fns/locale/en-GB";
+import { sv } from "date-fns/locale/sv";
 import {
   Calendar as BigCalendar,
   dateFnsLocalizer,
@@ -453,7 +451,7 @@ const StyledCalendarDND = styled(withDragAndDrop(StyledCalendar))``;
 
 const locales = {
   fi,
-  en,
+  en: enGB,
   sv,
 };
 

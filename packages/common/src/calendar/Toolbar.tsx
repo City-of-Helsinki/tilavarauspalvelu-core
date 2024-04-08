@@ -1,10 +1,8 @@
 import React from "react";
 import { IconAngleLeft, IconAngleRight } from "hds-react";
 import classNames from "classnames";
-/* eslint-disable import/no-duplicates */
 import { format, startOfWeek, endOfWeek } from "date-fns";
-import fi from "date-fns/locale/fi";
-/* eslint-enable import/no-duplicates */
+import { fi } from "date-fns/locale/fi";
 import styled from "styled-components";
 import type { NavigateAction, View } from "react-big-calendar";
 import { useTranslation } from "next-i18next";

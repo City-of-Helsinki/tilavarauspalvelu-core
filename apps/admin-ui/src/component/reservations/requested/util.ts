@@ -17,7 +17,7 @@ import {
   type ReservationQuery,
 } from "@gql/gql-types";
 import { formatDuration, fromApiDate } from "common/src/common/util";
-import { toMondayFirst } from "common/src/helpers";
+import { toMondayFirstUnsafe } from "common/src/helpers";
 import { truncate } from "@/helpers";
 import { DATE_FORMAT, formatDate, formatTime } from "@/common/util";
 
@@ -29,7 +29,7 @@ export function reservationDateTime(
   end: Date,
   t: TFunction
 ): string {
-  const startDay = t(`dayShort.${toMondayFirst(getDay(start))}`);
+  const startDay = t(`dayShort.${toMondayFirstUnsafe(getDay(start))}`);
 
   if (isSameDay(start, end)) {
     return `${startDay} ${format(start, DATE_FORMAT)} ${format(
