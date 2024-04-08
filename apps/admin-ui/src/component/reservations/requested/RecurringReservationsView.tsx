@@ -2,7 +2,8 @@ import React from "react";
 import { H6 } from "common/src/common/typography";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
-import { State, type ReservationNode } from "common/types/gql-types";
+import { State, type ReservationNode, type Query } from "common/types/gql-types";
+import { type ApolloQueryResult } from "@apollo/client";
 import { useRecurringReservations } from "./hooks";
 import ReservationList from "../../ReservationsList";
 import ReservationListButton from "../../ReservationListButton";
@@ -18,13 +19,13 @@ const RecurringReservationsView = ({
 }: {
   recurringPk: number;
   onSelect?: (selected: ReservationNode) => void;
-  onChange?: () => void;
+  onChange?: () => Promise<ApolloQueryResult<Query>>;
   onReservationUpdated?: () => void;
 }) => {
   const { t } = useTranslation();
   const { setModalContent } = useModal();
 
-  const { loading, reservations } = useRecurringReservations(recurringPk);
+  const { loading, reservations, refetch } = useRecurringReservations(recurringPk);
 
   if (loading) {
     return <div>Loading</div>;
@@ -33,6 +34,7 @@ const RecurringReservationsView = ({
   const handleChangeSuccess = () => {
     setModalContent(null);
     if (onChange) {
+      refetch();
       onChange();
     }
   };
@@ -57,6 +59,7 @@ const RecurringReservationsView = ({
       <DenyDialog
         reservations={[res]}
         onReject={() => {
+          refetch();
           if (onReservationUpdated) {
             onReservationUpdated();
           }

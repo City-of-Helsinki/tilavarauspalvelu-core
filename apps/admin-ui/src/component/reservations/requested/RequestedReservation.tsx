@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client";
+import { ApolloQueryResult, useQuery } from "@apollo/client";
 import { trim } from "lodash";
 import React, { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -288,7 +288,7 @@ const TimeBlock = ({
   onReservationUpdated,
 }: {
   reservation: ReservationNode;
-  onReservationUpdated: () => void;
+  onReservationUpdated: () => Promise<ApolloQueryResult<Query>>;
 }) => {
   const [selected, setSelected] = useState<ReservationNode | undefined>(
     undefined
@@ -328,9 +328,10 @@ const TimeBlock = ({
     reservation?.pk ?? undefined
   );
 
-  const handleChanged = () => {
-    onReservationUpdated();
-    calendarRefetch();
+  const handleChanged = async (): Promise<ApolloQueryResult<Query>> => {
+    // TODO use allSettled
+    await calendarRefetch();
+    return onReservationUpdated();
   };
 
   return (
@@ -375,7 +376,7 @@ const RequestedReservation = ({
   refetch,
 }: {
   reservation: ReservationNode;
-  refetch: () => void;
+  refetch: () => Promise<ApolloQueryResult<Query>>;
 }): JSX.Element | null => {
   const { t } = useTranslation();
 
@@ -639,6 +640,10 @@ function PermissionWrappedReservation() {
     return null;
   }
 
+  const handleRefetch = () => {
+    return refetch();
+  }
+
   return (
     <VisibleIfPermission
       permission={Permission.CAN_VIEW_RESERVATIONS}
@@ -649,7 +654,7 @@ function PermissionWrappedReservation() {
         </Container>
       }
     >
-      <RequestedReservation reservation={reservation} refetch={refetch} />
+      <RequestedReservation reservation={reservation} refetch={handleRefetch} />
     </VisibleIfPermission>
   );
 }

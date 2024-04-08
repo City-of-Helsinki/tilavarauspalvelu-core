@@ -16,17 +16,19 @@ const ApprovalButtonsRecurring = ({
 }: {
   recurringReservation: RecurringReservationNode;
   handleClose: () => void;
+  // TODO weird name for the after deny callback
   handleAccept: () => void;
   disableNonEssentialButtons?: boolean;
 }) => {
   const { setModalContent } = useModal();
   const { t } = useTranslation();
 
-  const { loading, reservations } = useRecurringReservations(
+  const { loading, reservations, refetch } = useRecurringReservations(
     recurringReservation.pk ?? undefined
   );
 
-  const handleDeleteSuccess = () => {
+  const handleReject = () => {
+    refetch();
     handleAccept();
   };
 
@@ -40,7 +42,7 @@ const ApprovalButtonsRecurring = ({
     setModalContent(
       <DenyDialog
         reservations={reservationsPossibleToDelete}
-        onReject={handleDeleteSuccess}
+        onReject={handleReject}
         onClose={handleClose}
         title={t("ApprovalButtons.recurring.DenyDialog.title")}
       />,

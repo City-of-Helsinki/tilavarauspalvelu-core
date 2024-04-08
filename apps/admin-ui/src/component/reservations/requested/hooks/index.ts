@@ -105,18 +105,12 @@ export const useReservationData = (
 /// @param recurringPk fetch reservations related to this pk
 /// @param state optionally only fetch some reservation states
 /// @param limit allows to over fetch: 100 is the limit per query, larger amounts are done with multiple fetches
-///
-/// NOTE on cache
-/// refetching this query is a super bad idea
-/// use cache invalidation in the mutation instead
-/// The two solutions are either to queryInvalidate / refetch if you REALLY REALLY must do it (it's super slow)
-/// or use the update callback in the mutation to update the cache manually with cache.modify
 export function useRecurringReservations(recurringPk?: number) {
   const { notifyError } = useNotification();
   const { t } = useTranslation();
 
   const id = base64encode(`RecurringReservationNode:${recurringPk}`);
-  const { data, loading } = useQuery<Query, QueryRecurringReservationArgs>(
+  const { data, loading, refetch } = useQuery<Query, QueryRecurringReservationArgs>(
     RECURRING_RESERVATION_QUERY,
     {
       skip: !recurringPk,
@@ -137,6 +131,7 @@ export function useRecurringReservations(recurringPk?: number) {
     loading,
     reservations,
     recurringReservation,
+    refetch,
   };
 }
 
