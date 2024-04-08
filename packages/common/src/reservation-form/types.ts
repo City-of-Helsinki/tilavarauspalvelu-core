@@ -8,6 +8,7 @@ type Billing = {
   billingAddressStreet: string;
   billingAddressCity: string;
   billingAddressZip: string;
+  showBillingAddress?: boolean;
 };
 
 type Reservee = {

@@ -14,7 +14,11 @@ import {
   ReservationTypeChoice,
 } from "common/types/gql-types";
 import { toApiDate } from "common/src/common/util";
-import { base64encode, filterNonNullable } from "common/src/helpers";
+import {
+  base64encode,
+  containsField,
+  filterNonNullable,
+} from "common/src/helpers";
 import { useNotification } from "@/context/NotificationContext";
 import {
   OPTIONS_QUERY,
@@ -29,19 +33,17 @@ export const useApplicationFields = (
   reserveeType?: CustomerTypeChoice
 ) => {
   return useMemo(() => {
-    const reserveeTypeString = reserveeType || CustomerTypeChoice.Individual;
-
-    const supportedFields = filterNonNullable(
+    const fields = filterNonNullable(
       reservationUnit.metadataSet?.supportedFields
     );
-    const type = reservationUnit.metadataSet?.supportedFields?.find(
-      (n) => n.fieldName === "reservee_type"
-    )
-      ? reserveeTypeString
-      : CustomerTypeChoice.Individual;
+
+    const type =
+      reserveeType != null && containsField(fields, "reserveeType")
+        ? reserveeType
+        : CustomerTypeChoice.Individual;
 
     return getReservationApplicationFields({
-      supportedFields,
+      supportedFields: fields,
       reserveeType: type,
     });
   }, [reservationUnit.metadataSet?.supportedFields, reserveeType]);
@@ -49,11 +51,11 @@ export const useApplicationFields = (
 
 export const useGeneralFields = (reservationUnit: ReservationUnitNode) => {
   return useMemo(() => {
-    const supportedFields = filterNonNullable(
+    const fields = filterNonNullable(
       reservationUnit.metadataSet?.supportedFields
     );
     return getReservationApplicationFields({
-      supportedFields,
+      supportedFields: fields,
       reserveeType: "common",
     }).filter((n) => n !== "reserveeType");
   }, [reservationUnit.metadataSet?.supportedFields]);

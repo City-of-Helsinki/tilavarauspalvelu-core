@@ -20,7 +20,7 @@ import { capitalize, getTranslation } from "@/modules/util";
 import Sanitize from "../common/Sanitize";
 import { BlackButton, MediumButton } from "@/styles/util";
 import { reservationsPrefix } from "@/modules/const";
-import { filterNonNullable } from "common/src/helpers";
+import { containsField, filterNonNullable } from "common/src/helpers";
 import { useGenericTerms } from "common/src/hooks/useGenericTerms";
 
 type Props = {
@@ -108,10 +108,10 @@ const EditStep1 = ({
     reserveeType: "common",
   }).filter((n) => n !== "reserveeType");
 
-  const type =
-    supportedFields.find((x) => x.fieldName === "reservee_type") != null
-      ? reservation.reserveeType
-      : CustomerTypeChoice.Individual;
+  const includesReserveeType = containsField(supportedFields, "reserveeType");
+  const type = includesReserveeType
+    ? reservation.reserveeType
+    : CustomerTypeChoice.Individual;
   const reservationApplicationFields = getReservationApplicationFields({
     supportedFields,
     reserveeType: type ?? "common",

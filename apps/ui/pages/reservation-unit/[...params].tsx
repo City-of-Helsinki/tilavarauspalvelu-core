@@ -361,29 +361,30 @@ function ReservationUnitReservationWithReservationProp({
     console.warn("No ageGroups received!");
   }
 
-  // TODO why isn't this on the SSR side?
+  // TODO why isn't this on the SSR side? the creation of the options that is
   const sortedAgeGroups = ageGroups.sort((a, b) => a.minimum - b.minimum);
-  const options = useMemo(
-    () => ({
-      purpose: reservationPurposes.map((purpose) => ({
-        label: getTranslation(purpose, "name"),
-        value: purpose.pk ?? 0,
-      })),
-      // the sortedAgeGroups array has "1 - 99" as the first element, so let's move it to the end for correct order
-      ageGroup: [
-        ...sortedAgeGroups.slice(1),
-        ...sortedAgeGroups.slice(0, 1),
-      ].map((ageGroup) => ({
-        label: `${ageGroup.minimum} - ${ageGroup.maximum ?? ""}`,
-        value: ageGroup.pk ?? 0,
-      })),
-      homeCity: cities.map((city) => ({
-        label: getTranslation(city, "name"),
-        value: city.pk ?? 0,
-      })),
-    }),
-    [reservationPurposes, cities, sortedAgeGroups]
-  );
+  const purposeOptions = reservationPurposes.map((purpose) => ({
+    label: getTranslation(purpose, "name"),
+    value: purpose.pk ?? 0,
+  }));
+  const ageGroupOptions = [
+    // the sortedAgeGroups array has "1 - 99" as the first element, so let's move it to the end for correct order
+    ...sortedAgeGroups.slice(1),
+    ...sortedAgeGroups.slice(0, 1),
+  ].map((ageGroup) => ({
+    label: `${ageGroup.minimum} - ${ageGroup.maximum ?? ""}`,
+    value: ageGroup.pk ?? 0,
+  }));
+  const homeCityOptions = cities.map((city) => ({
+    label: getTranslation(city, "name"),
+    value: city.pk ?? 0,
+  }));
+
+  const options = {
+    purpose: purposeOptions,
+    ageGroup: ageGroupOptions,
+    homeCity: homeCityOptions,
+  };
 
   const pageTitle =
     step === 0
@@ -399,7 +400,7 @@ function ReservationUnitReservationWithReservationProp({
     reserveeType: "common",
   }).filter((n) => n !== "reserveeType");
 
-  const type = containsField(supportedFields, "reservee_type")
+  const type = containsField(supportedFields, "reserveeType")
     ? reserveeType
     : CustomerTypeChoice.Individual;
   const reservationApplicationFields = getReservationApplicationFields({
@@ -409,17 +410,15 @@ function ReservationUnitReservationWithReservationProp({
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: type the form
   const onSubmitStep0 = async (payload: any): Promise<void> => {
-    const hasReserveeTypeField = containsField(
-      supportedFields,
-      "reservee_type"
-    );
+    const hasReserveeTypeField = containsField(supportedFields, "reserveeType");
     if (hasReserveeTypeField && !reserveeType) {
       return Promise.reject();
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: type the form
     const normalizedPayload = Object.keys(payload).reduce<any>((acc, key) => {
-      if (["showBillingAddress"].includes(key)) {
+      // TODO is this correct key? we need to skip the dynamically created field
+      if (key === "showBillingAddress") {
         return acc;
       }
       acc[key] = {}.propertyIsEnumerable.call(payload[key] || {}, "value")

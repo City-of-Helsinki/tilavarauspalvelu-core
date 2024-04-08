@@ -24,6 +24,7 @@ import {
 } from "../reservation-unit/ReservationUnitStyles";
 import Sanitize from "../common/Sanitize";
 import { ReservationUnitNode } from "common/types/gql-types";
+import { containsField, filterNonNullable } from "common/src/helpers";
 
 type Props = {
   reservationUnit: ReservationUnitNode;
@@ -88,16 +89,18 @@ const Step0 = ({
       return fields.indexOf(a) - fields.indexOf(b);
     }) || [];
 
-  const { supportedFields } = reservationUnit.metadataSet ?? {};
-  const includesReserveeType =
-    supportedFields?.find((x) => x.fieldName === "reservee_type") != null;
+  const supportedFields = filterNonNullable(
+    reservationUnit.metadataSet?.supportedFields
+  );
+  const includesReserveeType = containsField(supportedFields, "reserveeType");
+
   const reserveeType = watch("reserveeType");
   const homeCity = watch("homeCity");
-  const includesHomeCity =
-    supportedFields?.find((x) => x.fieldName === "home_city") != null;
+  const includesHomeCity = containsField(supportedFields, "homeCity");
 
-  if (includesReserveeType && isSubmitted && !reserveeType)
+  if (includesReserveeType && isSubmitted && !reserveeType) {
     errorKeys.push("reserveeType");
+  }
 
   const isHomeCityValid = !includesHomeCity || Boolean(homeCity);
   const isReserveeTypeValid = !includesReserveeType || Boolean(reserveeType);

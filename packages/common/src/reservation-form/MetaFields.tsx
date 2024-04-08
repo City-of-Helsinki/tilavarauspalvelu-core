@@ -26,7 +26,7 @@ import { fontMedium, fontRegular } from "../common/typography";
 import type { OptionType } from "../../types/common";
 import { GroupHeading, Subheading, TwoColumnContainer } from "./styles";
 import IconPremises from "../icons/IconPremises";
-import { filterNonNullable } from "../helpers";
+import { containsField, filterNonNullable } from "../helpers";
 
 type CommonProps = {
   options: Record<string, OptionType[]>;
@@ -291,6 +291,7 @@ export const ReserverMetaFields = ({
   options,
   data,
 }: {
+  // TODO should not be arbitary strings
   fields: string[];
   reservationUnit: ReservationUnitNode;
   options: Record<string, OptionType[]>;
@@ -301,10 +302,10 @@ export const ReserverMetaFields = ({
   const { watch } = useFormContext<Reservation & Partial<Inputs>>();
   const { t } = useTranslation();
 
-  const isTypeSelectable =
-    reservationUnit?.metadataSet?.supportedFields?.find(
-      (x) => x.fieldName === "reservee_type"
-    ) ?? false;
+  const supportedFields = filterNonNullable(
+    reservationUnit?.metadataSet?.supportedFields
+  );
+  const isTypeSelectable = containsField(supportedFields, "reserveeType");
 
   const reserveeType = watch("reserveeType");
 

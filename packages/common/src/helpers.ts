@@ -1,3 +1,4 @@
+import { camelCase } from "lodash";
 import type {
   Maybe,
   ReservationMetadataFieldNode,
@@ -61,8 +62,8 @@ export function truncate(val: string, maxLen: number): string {
 }
 
 /// Transitional helper when moving from string fields
+/// backend field names are in snake_case so we convert them to camelCase
 /// TODO should be enums or string literals instead of arbitary strings
-/// TODO are the backend fields in camelCase or snake_case?
 export function containsField(
   formFields: ReservationMetadataFieldNode[],
   fieldName: string
@@ -70,13 +71,17 @@ export function containsField(
   if (!formFields || formFields?.length === 0 || !fieldName) {
     return false;
   }
-  if (formFields.find((x) => x.fieldName === fieldName)) {
+  const found = formFields
+    .map((x) => x.fieldName)
+    .map(camelCase)
+    .find((x) => x === fieldName);
+  if (found != null) {
     return true;
   }
   return false;
 }
 
-/// TODO are the backend fields in camelCase or snake_case?
+/// backend fields are in snake_case, containsField handles the conversion
 export function containsNameField(
   formFields: ReservationMetadataFieldNode[]
 ): boolean {
@@ -84,6 +89,13 @@ export function containsNameField(
     containsField(formFields, "reserveeFirstName") ||
     containsField(formFields, "reserveeLastName")
   );
+}
+
+export function containsBillingField(
+  formFields: ReservationMetadataFieldNode[]
+): boolean {
+  const formFieldsNames = formFields.map((x) => x.fieldName).map(camelCase);
+  return formFieldsNames.some((x) => x.startsWith("billing"));
 }
 
 /// Always return an image because the Design and process should not allow imageless reservation units
