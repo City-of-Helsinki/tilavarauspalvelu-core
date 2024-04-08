@@ -59,7 +59,7 @@
     "react-router-dom": "^6.22.3",
     "react-use": "^17.5.0",
     "reactjs-popup": "^2.0.6",
-    "sass": "^1.72.0",
+    "sass": "^1.74.1",
     "sharp": "^0.33.3",
     "styled-components": "5.3.11",
     "tsconfig": "workspace:*",
