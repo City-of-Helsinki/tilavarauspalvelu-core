@@ -1,7 +1,7 @@
 from assertpy import assert_that
-from django.contrib.auth import get_user_model
 from django.test import TestCase
 
+from tests.factories import UserFactory
 from users.models import PersonalInfoViewLog
 from users.tasks import save_personal_info_view_log
 
@@ -9,7 +9,7 @@ from users.tasks import save_personal_info_view_log
 class SavePersonalInfoViewLogTaskTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user = get_user_model().objects.create(
+        cls.user = UserFactory.create(
             username="test_user",
             first_name="Test",
             last_name="User",
@@ -22,7 +22,7 @@ class SavePersonalInfoViewLogTaskTestCase(TestCase):
         assert_that(PersonalInfoViewLog.objects.exists()).is_false()
 
     def test_save_personal_info_view_log_as_other_user_saves(self):
-        other = get_user_model().objects.create(
+        other = UserFactory.create(
             username="other_user",
             first_name="Other",
             last_name="User",

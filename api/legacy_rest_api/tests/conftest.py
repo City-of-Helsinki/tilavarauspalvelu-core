@@ -2,7 +2,6 @@ import datetime
 
 import pytest
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.utils.timezone import get_default_timezone
 from rest_framework.test import APIClient
@@ -31,6 +30,7 @@ from reservation_units.models import Equipment, EquipmentCategory, ReservationUn
 from reservations.models import AbilityGroup, AgeGroup, Reservation, ReservationPurpose
 from resources.models import Resource
 from spaces.models import Location, ServiceSector, Space, Unit, UnitGroup
+from tests.factories import UserFactory
 from users.models import ReservationNotification
 
 DEFAULT_TIMEZONE = get_default_timezone()
@@ -44,7 +44,7 @@ def _setup_audit_log(settings):
 @pytest.mark.django_db()
 @pytest.fixture()
 def user():
-    return get_user_model().objects.create(
+    return UserFactory.create(
         username="test_user",
         first_name="James",
         last_name="Doe",
@@ -55,7 +55,7 @@ def user():
 @pytest.mark.django_db()
 @pytest.fixture()
 def user_2():
-    return get_user_model().objects.create(
+    return UserFactory.create(
         username="test_user_2",
         first_name="Jon",
         last_name="Doe",
@@ -564,7 +564,7 @@ def equipment_hammer(tools_equipment_category) -> Equipment:
 @pytest.mark.django_db()
 @pytest.fixture()
 def service_sector_admin(service_sector):
-    user = get_user_model().objects.create(
+    user = UserFactory.create(
         username="ss_admin",
         first_name="Amin",
         last_name="Dee",
@@ -590,7 +590,7 @@ def service_sector_admin_api_client(service_sector_admin):
 @pytest.mark.django_db()
 @pytest.fixture()
 def service_sector_2_admin(service_sector_2):
-    user = get_user_model().objects.create(
+    user = UserFactory.create(
         username="ss_admin_2",
         first_name="Amin The Second",
         last_name="Dee",
@@ -616,7 +616,7 @@ def service_sector_2_admin_api_client(service_sector_2_admin):
 @pytest.mark.django_db()
 @pytest.fixture()
 def service_sector_application_manager(service_sector):
-    user = get_user_model().objects.create(
+    user = UserFactory.create(
         username="ss_app_man",
         first_name="Man",
         last_name="Ager",
@@ -642,7 +642,7 @@ def service_sector_application_manager_api_client(service_sector_application_man
 @pytest.mark.django_db()
 @pytest.fixture()
 def unit_admin(unit):
-    user = get_user_model().objects.create(
+    user = UserFactory.create(
         username="u_admin",
         first_name="Amin",
         last_name="Uuu",
@@ -667,7 +667,7 @@ def unit_admin_api_client(unit_admin):
 @pytest.mark.django_db()
 @pytest.fixture()
 def unit_manager(unit):
-    user = get_user_model().objects.create(
+    user = UserFactory.create(
         username="u_manager",
         first_name="Mangus",
         last_name="Uuu",
@@ -693,7 +693,7 @@ def unit_manager_api_client(unit_manager):
 @pytest.mark.django_db()
 @pytest.fixture()
 def unit_viewer(unit):
-    user = get_user_model().objects.create(
+    user = UserFactory.create(
         username="u_viewer",
         first_name="Ville",
         last_name="Uuu",
@@ -716,7 +716,7 @@ def unit_viewer_api_client(unit_viewer):
 @pytest.mark.django_db()
 @pytest.fixture()
 def unit_group_admin(unit_group):
-    user = get_user_model().objects.create(
+    user = UserFactory.create(
         username="ug_admin",
         first_name="Amin",
         last_name="Uuugee",
@@ -742,7 +742,7 @@ def unit_group_admin_api_client(unit_group_admin):
 @pytest.mark.django_db()
 @pytest.fixture()
 def general_admin(service_sector):
-    user = get_user_model().objects.create(
+    user = UserFactory.create(
         username="gen_admin",
         first_name="Amin",
         last_name="General",
@@ -820,7 +820,7 @@ def _set_ical_secret(db):
 @pytest.mark.django_db()
 @pytest.fixture()
 def staff_user():
-    user = get_user_model().objects.create(
+    user = UserFactory.create(
         username="gen_admin",
         first_name="Amin",
         last_name="General",

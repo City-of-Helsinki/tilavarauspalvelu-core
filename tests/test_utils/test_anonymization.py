@@ -1,6 +1,5 @@
 from assertpy import assert_that
 from auditlog.models import LogEntry
-from django.contrib.auth import get_user_model
 from django.test import TestCase
 
 from permissions.models import (
@@ -18,6 +17,7 @@ from tests.factories import (
     ReservationFactory,
     ServiceSectorFactory,
     UnitFactory,
+    UserFactory,
 )
 from users.anonymisation import (
     ANONYMIZED,
@@ -33,15 +33,12 @@ from users.models import ReservationNotification
 class AnonymizationTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.mr_anonymous = get_user_model().objects.create(
+        cls.mr_anonymous = UserFactory.create_superuser(
             username="anonym",
             first_name="anony",
             last_name="mous",
             email="anony.mous@foo.com",
             reservation_notification=ReservationNotification.ALL,
-            is_active=True,
-            is_superuser=True,
-            is_staff=True,
         )
 
         general_role_choice = GeneralRoleChoice.objects.create(code="general_role")

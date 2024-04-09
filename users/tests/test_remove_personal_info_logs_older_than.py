@@ -1,8 +1,8 @@
 from assertpy import assert_that
-from django.contrib.auth import get_user_model
 from django.test import TestCase
 from freezegun import freeze_time
 
+from tests.factories import UserFactory
 from users.models import PersonalInfoViewLog
 from users.tasks import remove_old_personal_info_view_logs
 from users.utils.remove_personal_info_view_logs import (
@@ -15,7 +15,7 @@ class RemovePersonalInfoViewLogsOlderThanTestCase(TestCase):
     def setUpTestData(cls):
         super().setUpTestData()
 
-        cls.user = get_user_model().objects.create_user(
+        cls.user = UserFactory.create(
             username="testuser",
             email="test@localhost",
             first_name="Test",
