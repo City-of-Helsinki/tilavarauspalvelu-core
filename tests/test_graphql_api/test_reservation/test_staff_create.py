@@ -20,6 +20,7 @@ from tests.factories import (
     SpaceFactory,
     UserFactory,
 )
+from tests.helpers import next_hour
 
 from .helpers import CREATE_STAFF_MUTATION, get_staff_create_data
 
@@ -339,9 +340,7 @@ def test_reservation__staff_create__reservation_overlapping_fails(graphql):
     space = SpaceFactory.create()
     reservation_unit = ReservationUnitFactory.create(spaces=[space])
 
-    now = local_datetime()
-    next_hour = now.replace(minute=0, second=0, microsecond=0) + datetime.timedelta(hours=1)
-    begin = next_hour + datetime.timedelta(hours=1)
+    begin = next_hour(1)
     end = begin + datetime.timedelta(hours=1)
 
     ReservationFactory.create(
@@ -362,9 +361,7 @@ def test_reservation__staff_create__buffer_times_cause_overlap_fails(graphql):
     space = SpaceFactory.create()
     reservation_unit = ReservationUnitFactory.create(spaces=[space])
 
-    now = local_datetime()
-    next_hour = now.replace(minute=0, second=0, microsecond=0) + datetime.timedelta(hours=1)
-    begin = next_hour + datetime.timedelta(hours=1)
+    begin = next_hour(1)
     end = begin + datetime.timedelta(hours=1)
 
     ReservationFactory.create(
@@ -386,9 +383,7 @@ def test_reservation__staff_create__buffer_times_cause_overlap_fails_with_buffer
     space = SpaceFactory.create()
     reservation_unit = ReservationUnitFactory.create(spaces=[space])
 
-    now = local_datetime()
-    next_hour = now.replace(minute=0, second=0, microsecond=0) + datetime.timedelta(hours=1)
-    begin = next_hour + datetime.timedelta(hours=1)
+    begin = next_hour(1)
     end = begin + datetime.timedelta(hours=1)
 
     ReservationFactory.create(
@@ -414,9 +409,7 @@ def test_reservation__staff_create__buffer_times_cause_overlap_fails_with_buffer
     space = SpaceFactory.create()
     reservation_unit = ReservationUnitFactory.create(spaces=[space])
 
-    now = local_datetime()
-    next_hour = now.replace(minute=0, second=0, microsecond=0) + datetime.timedelta(hours=1)
-    begin = next_hour + datetime.timedelta(hours=1)
+    begin = next_hour(1)
     end = begin + datetime.timedelta(hours=1)
 
     ReservationFactory.create(
@@ -441,9 +434,7 @@ def test_reservation__staff_create__buffer_times_cause_overlap_fails_with_buffer
 def test_reservation__staff_create__interval_not_respected_fails(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
-    now = local_datetime()
-    next_hour = now.replace(minute=0, second=0, microsecond=0) + datetime.timedelta(hours=1)
-    begin = next_hour + datetime.timedelta(hours=1, minutes=1)
+    begin = next_hour(1, plus_minutes=1)
     end = begin + datetime.timedelta(hours=1)
 
     graphql.login_with_superuser()
