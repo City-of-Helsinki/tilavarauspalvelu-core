@@ -323,7 +323,7 @@ def test_reservation__create__start_time_does_not_match_reservation_start_interv
         allow_reservations_without_opening_hours=allow_reservations_without_opening_hours
     )
 
-    begin = next_hour(1, minutes=1)  # NOTE! 1 minute after the next hour
+    begin = next_hour(1, plus_minutes=1)  # NOTE! 1 minute after the next hour
     end = begin + timedelta(hours=1)
 
     graphql.login_with_superuser()
@@ -393,10 +393,10 @@ def test_reservation__create__reservation_unit_reservation_and_publish_in_the_pa
     end = begin + timedelta(hours=1)
 
     reservation_unit = ReservationUnitFactory.create_reservable_now(
-        reservation_begins=next_hour(days=reservation_begins_delta) if reservation_begins_delta else None,
-        reservation_ends=next_hour(days=reservation_ends_delta) if reservation_ends_delta else None,
-        publish_begins=next_hour(days=publish_begins_delta) if publish_begins_delta else None,
-        publish_ends=next_hour(days=publish_ends_delta) if publish_ends_delta else None,
+        reservation_begins=next_hour(plus_days=reservation_begins_delta) if reservation_begins_delta else None,
+        reservation_ends=next_hour(plus_days=reservation_ends_delta) if reservation_ends_delta else None,
+        publish_begins=next_hour(plus_days=publish_begins_delta) if publish_begins_delta else None,
+        publish_ends=next_hour(plus_days=publish_ends_delta) if publish_ends_delta else None,
     )
 
     graphql.login_with_superuser()
@@ -610,8 +610,8 @@ def test_reservation__create__reservation_unit_reservations_min_and_max_days_bef
         reservations_min_days_before=reservations_min_days_before,
     )
 
-    begin = next_hour(1, days=reservation_days_delta)
-    end = next_hour(2, days=reservation_days_delta)
+    begin = next_hour(1, plus_days=reservation_days_delta)
+    end = next_hour(2, plus_days=reservation_days_delta)
 
     graphql.login_with_superuser()
     data = get_create_data(reservation_unit, begin=begin, end=end)
@@ -815,7 +815,7 @@ def test_reservation__create__duration_is_not_multiple_of_interval(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now()
 
     begin = next_hour(1)
-    end = next_hour(2, minutes=1)
+    end = next_hour(2, plus_minutes=1)
 
     graphql.login_with_superuser()
     input_data = get_create_data(reservation_unit, begin=begin, end=end)
