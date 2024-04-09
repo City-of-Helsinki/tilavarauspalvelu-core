@@ -1,7 +1,6 @@
 import datetime
 
 import pytest
-from django.contrib.auth import get_user_model
 from django.utils.timezone import get_default_timezone
 from graphql_relay import to_global_id
 
@@ -27,6 +26,7 @@ from tests.factories import (
     ServiceFactory,
     SpaceFactory,
     TermsOfUseFactory,
+    UserFactory,
 )
 from tests.helpers import UserType, next_hour
 
@@ -695,7 +695,7 @@ def test_reservation_unit__query__payment_product(graphql):
 
 def test_reservation_unit__query__num_active_user_reservations(graphql):
     user = graphql.login_with_regular_user()
-    other_user = get_user_model().objects.create_user(username="other_user", email="other_user@django.com")
+    other_user = UserFactory.create()
 
     reservation_unit = ReservationUnitFactory.create()
 
@@ -741,7 +741,7 @@ def test_reservation_unit__query__num_active_user_reservations__user_unauthentic
     end = begin + datetime.timedelta(hours=1)
 
     # Reservation with a user
-    user = get_user_model().objects.create_user(username="other_user", email="other_user@django.com")
+    user = UserFactory.create()
     ReservationFactory.create_for_reservation_unit(begin=begin, end=end, reservation_unit=reservation_unit, user=user)
     # Reservation without a user
     ReservationFactory.create_for_reservation_unit(begin=begin, end=end, reservation_unit=reservation_unit)

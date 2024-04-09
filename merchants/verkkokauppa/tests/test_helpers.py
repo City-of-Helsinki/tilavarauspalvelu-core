@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 
 import pytest
 from assertpy import assert_that
-from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.utils import timezone
 from freezegun import freeze_time
@@ -11,7 +10,7 @@ from merchants.verkkokauppa.exceptions import UnsupportedMetaKey
 from merchants.verkkokauppa.helpers import get_formatted_reservation_time, get_meta_label, get_verkkokauppa_order_params
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.choices import CustomerTypeChoice
-from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory
+from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory, UserFactory
 from tests.helpers import patch_method
 
 pytestmark = [
@@ -23,7 +22,7 @@ pytestmark = [
 class HelpersTestCase(TestCase):
     def setUp(self):
         super().setUp()
-        self.user = get_user_model().objects.create(
+        self.user = UserFactory.create(
             username="test_user",
             first_name="First",
             last_name="Last",
@@ -67,7 +66,7 @@ class HelpersTestCase(TestCase):
 
     @patch_method(VerkkokauppaAPIClient.create_order)
     def test_get_verkkokauppa_order_params_respect_reservee_language(self):
-        user = get_user_model().objects.create(
+        user = UserFactory.create(
             username="testuser",
             first_name="Test",
             last_name="User",
