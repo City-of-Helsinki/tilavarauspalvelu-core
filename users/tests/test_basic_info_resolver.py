@@ -4,11 +4,10 @@ from unittest.mock import MagicMock, patch
 import pytest
 from assertpy import assert_that
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.test import TestCase
 from requests import Response
 
-from tests.factories import CityFactory
+from tests.factories import CityFactory, UserFactory
 from users.utils.open_city_profile.basic_info_resolver import (
     ProfileNodeIdReader,
     ProfileReadError,
@@ -166,7 +165,7 @@ class ProfileUserInfoReaderTestCase(TestCase):
     def setUpTestData(cls):
         cls.request = MagicMock()
         cls.request.headers = {"X-Authorization": b"jwtokeny"}
-        cls.user = get_user_model().objects.create(
+        cls.user = UserFactory.create(
             username="testy",
             first_name="tes",
             last_name="ty",

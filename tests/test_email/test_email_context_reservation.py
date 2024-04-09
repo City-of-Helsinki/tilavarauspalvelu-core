@@ -1,5 +1,4 @@
 import pytest
-from django.contrib.auth import get_user_model
 from django.utils.timezone import get_default_timezone
 
 from common.utils import get_attr_by_language
@@ -14,6 +13,7 @@ from tests.factories import (
     ReservationDenyReasonFactory,
     ReservationFactory,
     ReservationUnitFactory,
+    UserFactory,
 )
 
 pytestmark = [
@@ -111,7 +111,7 @@ def test_email_context__from_reservation__no_location(reservation):
 
 
 def test_email_context__from_reservation_unit__name_uses_reservation_user_preferred_language(reservation):
-    user = get_user_model().objects.create(
+    user = UserFactory.create(
         username="test",
         first_name="test",
         last_name="user",
