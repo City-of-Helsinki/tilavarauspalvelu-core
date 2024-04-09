@@ -103,17 +103,24 @@ def patch_method(
     return decorator
 
 
-def next_hour(hours: int = 0, *, minutes: int = 0, days: int = 0) -> datetime.datetime:
+def next_hour(plus_hours: int = 0, *, plus_minutes: int = 0, plus_days: int = 0) -> datetime.datetime:
     """
     Return a timestamp for the next hour.
 
     Without any arguments, the timestamp will be for the next full hour, any additional arguments will be added to that.
     e.g.
-    Now the time is 12:30
-    next_hour() -> 13:00
-    next_hour(hours=1, minutes=30) -> 14:30
+    >>> datetime.datetime.now()
+    2021-01-01 12:30:00
+
+    >>> next_hour()
+    13:00
+
+    >>> next_hour(plus_hours=1, plus_minutes=30)
+    14:30
+
+    >>> next_hour(-1)
+    12:00
     """
     now = local_datetime()
-    return now.replace(minute=0, second=0, microsecond=0) + datetime.timedelta(
-        hours=1 + hours, minutes=minutes, days=days
-    )
+    start_of_hour = now.replace(minute=0, second=0, microsecond=0)
+    return start_of_hour + datetime.timedelta(hours=1 + plus_hours, minutes=plus_minutes, days=plus_days)
