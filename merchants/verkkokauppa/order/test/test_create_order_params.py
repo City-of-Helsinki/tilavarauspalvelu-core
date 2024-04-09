@@ -4,13 +4,12 @@ from decimal import Decimal
 import freezegun
 from assertpy import assert_that
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.utils.timezone import get_default_timezone
 
 from merchants.verkkokauppa.helpers import get_verkkokauppa_order_params
 from reservations.choices import CustomerTypeChoice
-from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory
+from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory, UserFactory
 
 
 class CreateOrderParamsToJsonTestCase(TestCase):
@@ -18,7 +17,7 @@ class CreateOrderParamsToJsonTestCase(TestCase):
     def test_to_json(self):
         payment_product = PaymentProductFactory()
         reservation_unit = ReservationUnitFactory(payment_product=payment_product)
-        user = get_user_model().objects.create_user(
+        user = UserFactory.create(
             username="test",
             email="test@localhost",
             first_name="First",
@@ -88,7 +87,7 @@ class CreateOrderParamsToJsonTestCase(TestCase):
     def test_meta_label_language_support(self):
         payment_product = PaymentProductFactory()
         reservation_unit = ReservationUnitFactory(payment_product=payment_product)
-        user = get_user_model().objects.create_user(
+        user = UserFactory.create(
             username="test",
             email="test@localhost",
             first_name="First",
