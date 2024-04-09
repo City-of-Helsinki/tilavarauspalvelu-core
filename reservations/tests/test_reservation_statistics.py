@@ -2,7 +2,6 @@ import datetime
 from decimal import Decimal
 
 from assertpy import assert_that
-from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.utils.timezone import get_default_timezone
 
@@ -16,13 +15,14 @@ from tests.factories import (
     ReservationPurposeFactory,
     ReservationUnitFactory,
     UnitFactory,
+    UserFactory,
 )
 
 
 class ReservationStatisticsCreateTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.joe_the_reggie = get_user_model().objects.create(
+        cls.joe_the_reggie = UserFactory.create(
             username="regjoe",
             first_name="joe",
             last_name="reggie",
