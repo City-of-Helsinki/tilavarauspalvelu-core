@@ -1,15 +1,15 @@
-from rest_framework.request import Request
+from django.core.handlers.wsgi import WSGIRequest
 
 from users.helauth.utils import get_profile_token
 
 
 class ProfileReaderTokenMixin:
     def __get_token(self) -> str:
-        request: Request | None = getattr(self, "request", None)
+        request: WSGIRequest | None = getattr(self, "request", None)
         if not request:
             raise ValueError("Request is not set")
 
-        token: str = get_profile_token(request.session)
+        token: str = get_profile_token(request)
         if not token:
             raise ValueError("Could not fetch open city profile token from session")
 
