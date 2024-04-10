@@ -117,6 +117,8 @@ def can_modify_application(user: AnyUser, application: Application) -> bool:
         return True
     if application.user == user and local_datetime() < application.application_round.application_period_end:
         return True
+    if application.application_round.service_sector is None:
+        return False
     return can_manage_service_sectors_applications(user, application.application_round.service_sector)
 
 
@@ -127,8 +129,11 @@ def can_read_application(user: AnyUser, application: Application) -> bool:
         return True
     if application.user == user:
         return True
-    if can_manage_service_sectors_applications(user, application.application_round.service_sector):
+
+    sector: ServiceSector | None = application.application_round.service_sector
+    if sector is not None and can_manage_service_sectors_applications(user, sector):
         return True
+
     return can_validate_unit_applications(user, list(application.units.values_list("pk", flat=True)))
 
 
@@ -137,8 +142,11 @@ def can_access_application_private_fields(user: AnyUser, application: Applicatio
         return False
     if user.is_superuser:
         return True
-    if can_manage_service_sectors_applications(user, application.application_round.service_sector):
+
+    sector: ServiceSector | None = application.application_round.service_sector
+    if sector is not None and can_manage_service_sectors_applications(user, sector):
         return True
+
     return can_validate_unit_applications(user, list(application.units.values_list("pk", flat=True)))
 
 
