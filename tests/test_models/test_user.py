@@ -15,7 +15,7 @@ from tests.factories import (
     UnitRolePermissionFactory,
     UserFactory,
 )
-from users.models import ProxyUserSocialAuth
+from users.models import get_user
 
 # Applied to all tests
 pytestmark = [
@@ -203,7 +203,7 @@ def test_request_user__general_admin__permission_are_fetched(query_counter):
     )
 
     with query_counter() as count_1:
-        same_user = ProxyUserSocialAuth.get_user(user.pk)
+        same_user = get_user(user.pk)
 
     # Should only need one query.
     assert len(count_1.queries) == 1, count_1.log
@@ -227,7 +227,7 @@ def test_request_user__service_sector_admin__permission_are_fetched(query_counte
     )
 
     with query_counter() as count_1:
-        same_user = ProxyUserSocialAuth.get_user(user.pk)
+        same_user = get_user(user.pk)
 
     # Should only need one query.
     assert len(count_1.queries) == 1, count_1.log
@@ -251,7 +251,7 @@ def test_request_user__unit_admin__permission_are_fetched(query_counter):
     )
 
     with query_counter() as count_1:
-        same_user = ProxyUserSocialAuth.get_user(user.pk)
+        same_user = get_user(user.pk)
 
     # Should only need one query.
     assert len(count_1.queries) == 1, count_1.log
@@ -275,7 +275,7 @@ def test_request_user__unit_group_admin__permission_are_fetched(query_counter):
     )
 
     with query_counter() as count_1:
-        same_user = ProxyUserSocialAuth.get_user(user.pk)
+        same_user = get_user(user.pk)
 
     # Should only need one query.
     assert len(count_1.queries) == 1, count_1.log

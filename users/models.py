@@ -1,6 +1,6 @@
 import uuid
 from functools import cached_property
-from typing import Any, Self
+from typing import Self
 
 from django.conf import settings
 from django.contrib.postgres.aggregates import StringAgg
@@ -10,7 +10,6 @@ from django.utils.timezone import get_default_timezone
 from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
 from helusers.models import AbstractUser
-from social_django.models import DjangoStorage, UserSocialAuth
 
 from common.db import SubqueryArray
 
@@ -20,7 +19,6 @@ DEFAULT_TIMEZONE = get_default_timezone()
 __all__ = [
     "PersonalInfoViewLog",
     "ProfileUser",
-    "ProxyUserSocialAuth",
     "ReservationNotification",
     "User",
     "get_user",
@@ -364,20 +362,3 @@ def get_user(pk: int) -> User | None:
         ).get(pk=pk)
     except User.DoesNotExist:
         return None
-
-
-class ProxyUserSocialAuth(UserSocialAuth):
-    """Overriden accessing get_user for optimizing request user fetching."""
-
-    class Meta:
-        proxy = True
-
-    @classmethod
-    def get_user(cls, pk: Any = None, **kwargs: Any) -> User | None:
-        return get_user(pk) if pk is not None else None
-
-
-class ProxyDjangoStorage(DjangoStorage):
-    """Overridden for accessing ProxyUserSocialAuth. `SOCIAL_AUTH_STORAGE` setting points to this."""
-
-    user = ProxyUserSocialAuth
