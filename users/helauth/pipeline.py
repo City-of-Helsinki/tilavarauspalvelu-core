@@ -12,14 +12,13 @@ from social_django.strategy import DjangoStrategy
 from common.utils import get_nested
 from users.helauth.utils import get_profile_token, is_ad_login
 from users.models import User
+from utils.sentry import SentryLogger
 
 __all__ = [
     "fetch_additional_info_for_user_from_helsinki_profile",
     "id_number_to_date",
     "update_user_from_profile",
 ]
-
-from utils.sentry import SentryLogger
 
 
 class UserDetails(TypedDict):
@@ -82,7 +81,7 @@ def fetch_additional_info_for_user_from_helsinki_profile(
     kwargs: ExtraKwargs  # NOSONAR
     id_token = backend.id_token or {}
     if not is_ad_login(id_token) and user.profile_id == "":
-        token = get_profile_token(request.session)
+        token = get_profile_token(request)
         try:
             update_user_from_profile(user, token)
         except Exception as err:
