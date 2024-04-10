@@ -377,7 +377,6 @@ const ReservationUnit = ({
   activeApplicationRounds,
   termsOfUse,
   isPostLogin,
-  mapboxToken,
   apiBaseUrl,
 }: PropsNarrowed): JSX.Element | null => {
   const { t, i18n } = useTranslation();
@@ -1089,18 +1088,13 @@ const ReservationUnit = ({
                 </PaddedContent>
               </Accordion>
             )}
-            {reservationUnit.unit?.location && (
+            {reservationUnit.unit?.tprekId && (
               <Accordion heading={t("common:location")} theme="thin" open>
                 <JustForMobile customBreakpoint={breakpoints.l}>
                   <AddressSection reservationUnit={reservationUnit} />
                 </JustForMobile>
                 <MapWrapper>
-                  <Map
-                    title={getTranslation(reservationUnit.unit, "name")}
-                    latitude={Number(reservationUnit.unit.location.latitude)}
-                    longitude={Number(reservationUnit.unit.location.longitude)}
-                    mapboxToken={mapboxToken}
-                  />
+                  <Map tprekId={reservationUnit.unit?.tprekId ?? ""} />
                 </MapWrapper>
               </Accordion>
             )}

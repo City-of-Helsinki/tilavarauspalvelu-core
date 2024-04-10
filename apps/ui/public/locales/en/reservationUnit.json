@@ -5,6 +5,7 @@
   "maxDuration": "Duration",
   "price": "Price",
   "billableHours": "Chargeable hours",
+  "mapTitle": "Service Map - location",
   "linkMap": "Open map in a new window",
   "linkHSL": "HSL Route Guide",
   "linkGoogle": "Google Directions",

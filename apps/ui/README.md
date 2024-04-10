@@ -43,7 +43,6 @@ See `.env.local.example` and Azure DevOps library for values.
 | NEXT_PUBLIC_BASE_URL           | application baseUrl                                             |
 | TILAVARAUS_API_URL             | tilavaraus-core base url                                        |
 | PROFILE_UI_URL                 | helsinki profile frontend url for a link                        |
-| MAPBOX_TOKEN                   | token tor mapbox service                                        |
 | SENTRY_DSN                     | Sentry dsn                                                      |
 | SENTRY_ENVIRONMENT             | Sentry environment, for example 'test', 'prod'                  |
 | SENTRY_AUTH_TOKEN              | auth token for sentry cli                                       |

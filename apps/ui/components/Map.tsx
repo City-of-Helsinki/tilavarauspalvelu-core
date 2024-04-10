@@ -1,65 +1,23 @@
-import React, { useState } from "react";
-import Image from "next/image";
-import ReactMapGL, { Marker, NavigationControl, ViewState } from "react-map-gl";
-import { mapStyle } from "../modules/const";
-import "mapbox-gl/dist/mapbox-gl.css";
+import React from "react";
+import { useTranslation } from "next-i18next";
+import { mapUrlPrefix } from "@/modules/const";
 
 type Props = {
-  title: string;
-  mapboxToken: string;
-  latitude?: number;
-  longitude?: number;
+  tprekId: string;
   height?: string;
-};
-const ZOOM = 14;
-
-const navControlStyle = {
-  right: 10,
-  bottom: 10,
 };
 
 export const Map = ({
-  title,
-  latitude,
-  longitude,
+  tprekId,
   height = "480px",
-  mapboxToken,
 }: Props): JSX.Element | null => {
-  const [viewport, setViewport] = useState({
-    latitude,
-    longitude,
-    zoom: ZOOM,
-  } as ViewState);
-
-  if (!latitude || !longitude) {
-    return null;
-  }
-
+  const { t, i18n } = useTranslation();
+  const mapUrl = `${mapUrlPrefix}${i18n.language}/embed/unit/${tprekId}`;
   return (
-    <ReactMapGL
-      {...viewport}
-      id="hel-osm-light"
-      mapStyle={mapStyle}
-      style={{ width: "100%", height }}
-      onMove={(event) => {
-        setViewport(event.viewState);
-      }}
-      initialViewState={{
-        longitude,
-        latitude,
-        zoom: ZOOM,
-      }}
-      mapboxAccessToken={mapboxToken}
-    >
-      <Marker
-        key={title}
-        longitude={longitude}
-        latitude={latitude}
-        anchor="bottom"
-      >
-        <NavigationControl style={navControlStyle} showCompass={false} />
-        <Image src="/icons/map_marker_icon.svg" height="42" width="32" alt="" />
-      </Marker>
-    </ReactMapGL>
+    <iframe
+      title={t("reservationUnit:mapTitle")}
+      style={{ border: "none", width: "100%", height }}
+      src={mapUrl}
+    />
   );
 };

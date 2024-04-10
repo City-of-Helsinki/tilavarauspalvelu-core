@@ -7,6 +7,7 @@ import { IconLinkExternal } from "hds-react";
 import { IconButton } from "common/src/components";
 import type { ReservationUnitNode } from "common";
 import { getTranslation } from "../../modules/util";
+import { mapUrlPrefix } from "@/modules/const";
 
 type Props = {
   reservationUnit: ReservationUnitNode;
@@ -87,7 +88,7 @@ function createMapUrl(locale: string, unit?: Maybe<UnitType>): string {
     return "";
   }
 
-  return `https://palvelukartta.hel.fi/${locale}/unit/${unit.tprekId}`;
+  return `${mapUrlPrefix}${locale}/unit/${unit.tprekId}`;
 }
 
 function createAccessibilityUrl(

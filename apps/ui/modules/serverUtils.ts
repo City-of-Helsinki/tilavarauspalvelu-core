@@ -16,7 +16,6 @@ export function getCommonServerSideProps() {
   const hotjarEnabled = env.HOTJAR_ENABLED ?? false;
   const profileLink = env.PROFILE_UI_URL ?? "";
   const apiBaseUrl = env.TILAVARAUS_API_URL ?? "";
-  const mapboxToken = env.MAPBOX_TOKEN ?? "";
 
   return {
     cookiehubEnabled,
@@ -24,7 +23,6 @@ export function getCommonServerSideProps() {
     hotjarEnabled,
     profileLink,
     apiBaseUrl,
-    mapboxToken,
   };
 }
 

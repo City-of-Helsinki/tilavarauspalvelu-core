@@ -1,6 +1,5 @@
 import { i18n } from "next-i18next";
 import { OptionType } from "common/types/common";
-import { MapboxStyle } from "react-map-gl";
 
 export { isBrowser } from "common/src/helpers";
 export { getSignInUrl, getSignOutUrl } from "common/src/urlBuilder";
@@ -16,26 +15,7 @@ export const reservationsPrefix = "/reservations";
 export const criteriaPrefix = "/criteria";
 export const parametersPrefix = "/parameters";
 
-export const mapStyle: MapboxStyle = {
-  version: 8,
-  name: "hel-osm-light",
-  metadata: {},
-  sources: {
-    osm: {
-      type: "raster",
-      tiles: ["https://tiles.hel.ninja/styles/hel-osm-light/{z}/{x}/{y}.png"],
-      minzoom: 0,
-      maxzoom: 20,
-    },
-  },
-  layers: [
-    {
-      id: "osm",
-      type: "raster",
-      source: "osm",
-    },
-  ],
-};
+export const mapUrlPrefix = "https://palvelukartta.hel.fi/";
 
 export const reservationUnitPath = (id: number): string =>
   `${reservationUnitPrefix}/${id}`;
