@@ -73,7 +73,8 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
               {reservation.order?.status && (
                 <Tag
                   theme={{ "--tag-background": "var(--color-engel-light)" }}
-                  id="orderStatus"
+                  data-testid="reservation_title_section__order_status"
+                  id="reservation-order_status"
                 >
                   {t(`Payment.status.${reservation.order?.status}`)}
                 </Tag>
@@ -81,7 +82,9 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
             </AlignVertically>
             <AlignVertically style={{ gap: "var(--spacing-xs)" }}>
               <Dot />
-              {t(`RequestedReservation.state.${reservation.state}`)}
+              <span data-testid="reservation_title_section__state">
+                {t(`RequestedReservation.state.${reservation.state}`)}
+              </span>
             </AlignVertically>
           </HorisontalFlex>
         </NameState>
