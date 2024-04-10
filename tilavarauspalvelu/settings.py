@@ -105,7 +105,6 @@ env = environ.Env(
     TPREK_UNIT_URL=(str, "https://www.hel.fi/palvelukarttaws/rest/v4/unit/"),
     TRUST_X_FORWARDED_HOST=(bool, True),
     TUNNISTAMO_ADMIN_KEY=(str, "tilavaraus-django-admin-dev"),
-    TUNNISTAMO_ADMIN_OIDC_ENDPOINT=(str, "https://tunnistamo.test.hel.ninja/openid"),
     TUNNISTAMO_ADMIN_SECRET=(str, None),
     TUNNISTAMO_ALLOWED_REDIRECT_HOSTS=(list, []),
     TUNNISTAMO_BASE_URL=(str, "https://tunnistamo.test.hel.ninja"),
@@ -348,7 +347,7 @@ USE_TZ = True
 # ----- Authentication settings ------------------------------------------------------------------------
 
 AUTHENTICATION_BACKENDS = [
-    "helusers.tunnistamo_oidc.TunnistamoOIDCAuth",
+    "tilavarauspalvelu.auth.ProxyTunnistamoOIDCAuthBackend",
     "tilavarauspalvelu.auth.ProxyModelBackend",
 ]
 
@@ -371,13 +370,11 @@ TUNNISTAMO_BASE_URL = env("TUNNISTAMO_BASE_URL")
 
 # Url where user is redirected after login error or cancellation
 SOCIAL_AUTH_LOGIN_ERROR_URL = env("LOGIN_ERROR_URL")
-# Overridden to get access to user fetching
-SOCIAL_AUTH_STORAGE = "users.models.ProxyDjangoStorage"
 
 SOCIAL_AUTH_TUNNISTAMO_KEY = env("TUNNISTAMO_ADMIN_KEY")
 SOCIAL_AUTH_TUNNISTAMO_SECRET = env("TUNNISTAMO_ADMIN_SECRET")
 SOCIAL_AUTH_TUNNISTAMO_SCOPE = [env("OPEN_CITY_PROFILE_SCOPE")]
-SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT = env("TUNNISTAMO_ADMIN_OIDC_ENDPOINT")
+SOCIAL_AUTH_TUNNISTAMO_OIDC_ENDPOINT = f"{TUNNISTAMO_BASE_URL}/openid"
 SOCIAL_AUTH_TUNNISTAMO_ALLOWED_REDIRECT_HOSTS = env("TUNNISTAMO_ALLOWED_REDIRECT_HOSTS")
 SOCIAL_AUTH_TUNNISTAMO_PIPELINE = (
     *defaults.SOCIAL_AUTH_PIPELINE,

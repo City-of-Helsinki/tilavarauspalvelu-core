@@ -1,8 +1,10 @@
 import requests
 from django.conf import settings
+from django.core.handlers.wsgi import WSGIRequest
 from simplejson.errors import JSONDecodeError
 
 from applications.models import City
+from users.models import User
 from users.utils.open_city_profile.mixins import ProfileReaderTokenMixin
 
 REQUEST_TIMEOUT_SECONDS = 5
@@ -15,7 +17,7 @@ class ProfileReadError(Exception):
 class ProfileUserInfoReader(ProfileReaderTokenMixin):
     fields = []
 
-    def __init__(self, user, request):
+    def __init__(self, user: User, request: WSGIRequest) -> None:
         self.user = user
         self.request = request
         self.vp_info = None
@@ -231,7 +233,7 @@ class ProfileUserInfoReader(ProfileReaderTokenMixin):
 
 
 class ProfileNodeIdReader(ProfileReaderTokenMixin):
-    def __init__(self, request):
+    def __init__(self, request: WSGIRequest) -> None:
         self.request = request
 
     def get_user_profile_id(self) -> [str, None]:

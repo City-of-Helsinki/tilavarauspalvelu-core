@@ -1,20 +1,25 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, reverse
 from django.views.decorators.csrf import csrf_exempt
 from graphene_django_extensions import FileUploadGraphQLView
 
 from api.legacy_rest_api.urls import legacy_outer
 from api.webhooks.urls import webhook_router
 
-# Mock the autocomplete view to be able to include `extra_context` for other pages
-real_autocomplete_view = admin.site.autocomplete_view
-admin.site.autocomplete_view = lambda request, extra_context: real_autocomplete_view(request)
-
-# Mock the catch-all view to be able to include `extra_context` for other pages
-real_catch_all_view = admin.site.catch_all_view
-admin.site.catch_all_view = lambda request, url, extra_context: real_catch_all_view(request, url)
+# Mock the `each_context` method to add some custom context variables.
+original_each_context = admin.site.each_context
+admin.site.each_context = lambda request: original_each_context(request) | {
+    "version": settings.APP_VERSION,
+    # The helauth variables need to be added, since we subclass `helusers.tunnistamo_oidc.TunnistamoOIDCAuth`
+    # with `tilavarauspalvelu.auth.ProxyTunnistamoOIDCAuthBackend` for optimizing request user fetching.
+    # `helusers.admin_site.AdminSite.each_context` refers to the original backend by
+    # string reference, so subclasses won't have the login/logout urls added.
+    "helsinki_provider_installed": True,
+    "helsinki_login_url": reverse("helusers:auth_login"),
+    "helsinki_logout_url": reverse("helusers:auth_logout"),
+}
 
 # Make it possible to turn off CSRF protection for the GraphQL endpoint for frontend graphql codegen
 graphql_view = FileUploadGraphQLView.as_view(graphiql=settings.DEBUG)
@@ -23,7 +28,7 @@ if settings.GRAPHQL_CODEGEN_ENABLED:
 
 urlpatterns = [
     path("graphql/", graphql_view),
-    path("admin/", admin.site.urls, {"extra_context": {"version": settings.APP_VERSION}}),
+    path("admin/", admin.site.urls),
     path("v1/", include(legacy_outer.urls)),
     path("v1/webhook/", include(webhook_router.urls)),
     path("pysocial/", include("social_django.urls", namespace="social")),
