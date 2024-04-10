@@ -25,7 +25,7 @@ from reservation_units.models import (
 )
 from reservations.models import AbilityGroup, RecurringReservation, ReservationMetadataField
 from spaces.models import Building, RealEstate
-from users.models import PersonalInfoViewLog, ProxyUserSocialAuth
+from users.models import PersonalInfoViewLog
 
 apps_to_check: list[str] = [
     "common",
@@ -69,7 +69,6 @@ models_that_should_be_empty: list[type[models.Model]] = [
     KeywordGroup,
     PaymentOrder,
     PersonalInfoViewLog,
-    ProxyUserSocialAuth,
     RealEstate,
     RecurringReservation,
     ReservationUnitImage,
