@@ -127,30 +127,28 @@ export const RESERVATION_COMMON_FRAGMENT = gql`
 // TODO replace this with affectingReservations Query (not a fragment)
 export const RESERVATIONUNIT_RESERVATIONS_FRAGMENT = gql`
   ${RESERVATION_COMMON_FRAGMENT}
-  fragment ReservationUnitReservations on ReservationUnitNode {
-    reservationSet(state: $state, beginDate: $beginDate, endDate: $endDate) {
-      ...ReservationCommon
-      name
-      numPersons
-      calendarUrl
-      reservationUnit {
+  fragment ReservationUnitReservations on ReservationNode {
+    ...ReservationCommon
+    name
+    numPersons
+    calendarUrl
+    reservationUnit {
+      pk
+      nameFi
+      bufferTimeBefore
+      bufferTimeAfter
+      unit {
         pk
-        nameFi
-        bufferTimeBefore
-        bufferTimeAfter
-        unit {
+        serviceSectors {
           pk
-          serviceSectors {
-            pk
-          }
         }
       }
-      user {
-        firstName
-        lastName
-        email
-        pk
-      }
+    }
+    user {
+      firstName
+      lastName
+      email
+      pk
     }
   }
 `;

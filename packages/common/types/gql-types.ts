@@ -2496,6 +2496,8 @@ export type QueryUnitsArgs = {
   nameSv_Icontains?: InputMaybe<Scalars["String"]["input"]>;
   nameSv_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
+  onlyDirectBookable?: InputMaybe<Scalars["Boolean"]["input"]>;
+  onlySeasonalBookable?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<UnitOrderingChoices>>>;
   ownReservations?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -2797,8 +2799,6 @@ export type ReservationConfirmMutationPayload = {
   nonSubsidisedPriceNet?: Maybe<Scalars["Decimal"]["output"]>;
   numPersons?: Maybe<Scalars["Int"]["output"]>;
   order?: Maybe<PaymentOrderNode>;
-  /** Type of the payment. Possible values are ONLINE, INVOICE, ON_SITE. */
-  paymentType?: Maybe<Scalars["String"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
   price?: Maybe<Scalars["Decimal"]["output"]>;
   priceNet?: Maybe<Scalars["Decimal"]["output"]>;
@@ -3018,6 +3018,8 @@ export type ReservationMetadataSetNodeEdge = {
 
 export type ReservationNode = Node & {
   __typename?: "ReservationNode";
+  /** Which reservation units' reserveability is affected by this reservation? */
+  affectedReservationUnits?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
   ageGroup?: Maybe<AgeGroupNode>;
   applyingForFreeOfCharge?: Maybe<Scalars["Boolean"]["output"]>;
   begin: Scalars["DateTime"]["output"];
@@ -4936,6 +4938,8 @@ export type UnitGroupNodeUnitsArgs = {
   nameSv?: InputMaybe<Scalars["String"]["input"]>;
   nameSv_Icontains?: InputMaybe<Scalars["String"]["input"]>;
   nameSv_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
+  onlyDirectBookable?: InputMaybe<Scalars["Boolean"]["input"]>;
+  onlySeasonalBookable?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<UnitOrderingChoices>>>;
   ownReservations?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -5064,6 +5068,8 @@ export enum UnitOrderingChoices {
   NameFiDesc = "nameFiDesc",
   NameSvAsc = "nameSvAsc",
   NameSvDesc = "nameSvDesc",
+  PkAsc = "pkAsc",
+  PkDesc = "pkDesc",
   RankAsc = "rankAsc",
   RankDesc = "rankDesc",
   ReservationCountAsc = "reservationCountAsc",
@@ -5119,6 +5125,8 @@ export type UnitRoleNodeUnitArgs = {
   nameSv?: InputMaybe<Scalars["String"]["input"]>;
   nameSv_Icontains?: InputMaybe<Scalars["String"]["input"]>;
   nameSv_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
+  onlyDirectBookable?: InputMaybe<Scalars["Boolean"]["input"]>;
+  onlySeasonalBookable?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<UnitOrderingChoices>>>;
   ownReservations?: InputMaybe<Scalars["Boolean"]["input"]>;

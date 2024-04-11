@@ -16,58 +16,110 @@ const RESERVATION_UNIT_TYPE_FRAGMENT = gql`
   }
 `;
 
-export const RESERVATION_UNIT_QUERY = gql`
+const RESERVATION_UNIT_PAGE_FRAGMENT = gql`
   ${IMAGE_FRAGMENT}
   ${RESERVATION_UNIT_FRAGMENT}
   ${RESERVATION_UNIT_TYPE_FRAGMENT}
-  query ReservationUnit($id: ID!) {
-    reservationUnit(id: $id) {
-      ...ReservationUnitFields
-      id
-      isDraft
-      images {
-        ...ImageFragment
+  fragment ReservationUnitPageFields on ReservationUnitNode {
+    ...ReservationUnitFields
+    id
+    isDraft
+    images {
+      ...ImageFragment
+    }
+    applicationRoundTimeSlots {
+      closed
+      weekday
+      reservableTimes {
+        begin
+        end
       }
-      applicationRoundTimeSlots {
-        closed
-        weekday
-        reservableTimes {
-          begin
-          end
-        }
-      }
-      descriptionFi
-      descriptionEn
-      descriptionSv
-      reservationKind
-      bufferTimeBefore
-      bufferTimeAfter
-      reservationStartInterval
-      reservationBegins
-      reservationEnds
-      canApplyFreeOfCharge
-      state
-      reservationState
-      reservationUnitType {
-        ...ReservationUnitTypeFields
-      }
-      minReservationDuration
-      maxReservationDuration
-      maxReservationsPerUser
-      reservationsMinDaysBefore
-      reservationsMaxDaysBefore
-      requireReservationHandling
-      equipments {
-        pk
+    }
+    descriptionFi
+    descriptionEn
+    descriptionSv
+    reservationKind
+    bufferTimeBefore
+    bufferTimeAfter
+    reservationStartInterval
+    reservationBegins
+    reservationEnds
+    canApplyFreeOfCharge
+    state
+    reservationState
+    reservationUnitType {
+      ...ReservationUnitTypeFields
+    }
+    minReservationDuration
+    maxReservationDuration
+    maxReservationsPerUser
+    reservationsMinDaysBefore
+    reservationsMaxDaysBefore
+    requireReservationHandling
+    equipments {
+      pk
+      nameFi
+      nameEn
+      nameSv
+      category {
         nameFi
         nameEn
         nameSv
-        category {
-          nameFi
-          nameEn
-          nameSv
-        }
       }
+    }
+  }
+`;
+
+const BLOCKING_RESERVATION_FRAGMENT = gql`
+  fragment BlockingReservationFields on ReservationNode {
+    pk
+    state
+    isBlocked
+    begin
+    end
+    numPersons
+    calendarUrl
+    bufferTimeBefore
+    bufferTimeAfter
+  }
+`;
+
+export const RESERVATION_UNIT_PARAMS_PAGE_QUERY = gql`
+  ${RESERVATION_UNIT_PAGE_FRAGMENT}
+  query ReservationUnit($id: ID!) {
+    reservationUnit(id: $id) {
+      ...ReservationUnitPageFields
+    }
+  }
+`;
+
+export { type ReservationUnitWithAffectingArgs } from "common/src/queries/fragments";
+
+// Combined version for the reservation-unit/[id] page so we can show the Calendar and check for collisions
+export const RESERVATION_UNIT_PAGE_QUERY = gql`
+  ${RESERVATION_UNIT_PAGE_FRAGMENT}
+  ${BLOCKING_RESERVATION_FRAGMENT}
+  query ReservationUnit(
+    $id: ID!
+    $pk: Int!
+    $beginDate: Date!
+    $endDate: Date!
+    $state: [String]
+  ) {
+    reservationUnit(id: $id) {
+      ...ReservationUnitPageFields
+      reservableTimeSpans(startDate: $beginDate, endDate: $endDate) {
+        startDatetime
+        endDatetime
+      }
+    }
+    affectingReservations(
+      forReservationUnits: [$pk]
+      beginDate: $beginDate
+      endDate: $endDate
+      state: $state
+    ) {
+      ...BlockingReservationFields
     }
   }
 `;
@@ -166,6 +218,8 @@ export const RESERVATION_UNITS = gql`
   }
 `;
 
+// Only needed on the reservation-unit/[id] page
+// TODO should be made into a fragment and combined into the main query
 export const RELATED_RESERVATION_UNITS = gql`
   ${UNIT_NAME_FRAGMENT_I18N}
   ${PRICING_FRAGMENT}
@@ -199,33 +253,6 @@ export const RELATED_RESERVATION_UNITS = gql`
             ...PricingFields
           }
         }
-      }
-    }
-  }
-`;
-
-export const OPENING_HOURS = gql`
-  query ReservationUnitOpeningHours(
-    $id: ID!
-    $startDate: Date!
-    $endDate: Date!
-    $state: [String]
-  ) {
-    reservationUnit(id: $id) {
-      reservableTimeSpans(startDate: $startDate, endDate: $endDate) {
-        startDatetime
-        endDatetime
-      }
-      reservationSet(state: $state, beginDate: $startDate, endDate: $endDate) {
-        pk
-        state
-        isBlocked
-        begin
-        end
-        numPersons
-        calendarUrl
-        bufferTimeBefore
-        bufferTimeAfter
       }
     }
   }

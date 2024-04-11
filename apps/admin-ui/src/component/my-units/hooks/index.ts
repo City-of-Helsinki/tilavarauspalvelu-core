@@ -2,14 +2,11 @@ import { useMemo } from "react";
 import { sortBy } from "lodash";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
 import { useQuery } from "@apollo/client";
-import type {
-  Query,
-  ReservationUnitNode,
-  QueryUnitArgs,
-  QueryReservationUnitArgs,
-  ReservationUnitNodeReservationSetArgs,
-} from "common/types/gql-types";
 import {
+  type Query,
+  type ReservationUnitNode,
+  type QueryReservationUnitArgs,
+  type ReservationNode,
   CustomerTypeChoice,
   ReservationTypeChoice,
 } from "common/types/gql-types";
@@ -22,11 +19,11 @@ import {
 import { useNotification } from "@/context/NotificationContext";
 import {
   OPTIONS_QUERY,
-  UNIT_VIEW_QUERY,
   RESERVATION_UNITS_BY_UNIT,
   RESERVATION_UNIT_QUERY,
 } from "./queries";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
+import { ReservationUnitWithAffectingArgs } from "common/src/queries/fragments";
 
 export const useApplicationFields = (
   reservationUnit: ReservationUnitNode,
@@ -107,22 +104,6 @@ export function useReservationUnitQuery(pk?: number) {
   return { reservationUnit, loading };
 }
 
-export function useUnitQuery(pk?: number | string) {
-  const { notifyError } = useNotification();
-
-  const typename = "UnitNode";
-  const id = base64encode(`${typename}:${pk}`);
-  const res = useQuery<Query, QueryUnitArgs>(UNIT_VIEW_QUERY, {
-    skip: pk == null,
-    variables: { id },
-    onError: (err) => {
-      notifyError(err.message);
-    },
-  });
-
-  return res;
-}
-
 export function useUnitResources(
   begin: Date,
   unitPk: string,
@@ -131,22 +112,47 @@ export function useUnitResources(
   const { notifyError } = useNotification();
 
   const id = base64encode(`UnitNode:${unitPk}`);
-  const { data, ...rest } = useQuery<
-    Query,
-    QueryReservationUnitArgs & ReservationUnitNodeReservationSetArgs
-  >(RESERVATION_UNITS_BY_UNIT, {
-    skip: unitPk === "" || Number.isNaN(Number(unitPk)) || Number(unitPk) === 0,
-    variables: {
-      id,
-      beginDate: toApiDate(begin),
-      // TODO should this be +1 day? or is it already inclusive? seems to be inclusive
-      endDate: toApiDate(begin),
-      state: RELATED_RESERVATION_STATES,
-    },
-    onError: () => {
-      notifyError("Varauksia ei voitu hakea");
-    },
-  });
+  const { data, ...rest } = useQuery<Query, ReservationUnitWithAffectingArgs>(
+    RESERVATION_UNITS_BY_UNIT,
+    {
+      skip:
+        unitPk === "" || Number.isNaN(Number(unitPk)) || Number(unitPk) === 0,
+      variables: {
+        id,
+        pk: Number(unitPk),
+        beginDate: toApiDate(begin) ?? "",
+        // TODO should this be +1 day? or is it already inclusive? seems to be inclusive
+        endDate: toApiDate(begin) ?? "",
+        state: RELATED_RESERVATION_STATES,
+      },
+      onError: () => {
+        notifyError("Varauksia ei voitu hakea");
+      },
+    }
+  );
+
+  const { affectingReservations } = data ?? {};
+
+  function convertToEvent(y: ReservationNode, x: ReservationUnitNode) {
+    return {
+      ...y,
+      ...(y.type !== ReservationTypeChoice.Blocked
+        ? {
+            bufferTimeBefore: y.bufferTimeBefore ?? x.bufferTimeBefore ?? 0,
+            bufferTimeAfter: y.bufferTimeAfter ?? x.bufferTimeAfter ?? 0,
+          }
+        : {}),
+    };
+  }
+
+  function doesReservationAffectUnit(
+    reservation: ReservationNode,
+    unit: ReservationUnitNode
+  ) {
+    return reservation.affectedReservationUnits?.some(
+      (affectedUnit) => affectedUnit === unit.pk
+    );
+  }
 
   const resources = filterNonNullable(data?.unit?.reservationunitSet)
     .filter(
@@ -161,21 +167,19 @@ export function useUnitResources(
       isDraft: x.isDraft,
       pk: x.pk ?? 0,
       events:
-        filterNonNullable(x.reservationSet).map((y) => ({
-          event: {
-            ...y,
-            ...(y.type !== ReservationTypeChoice.Blocked
-              ? {
-                  bufferTimeBefore:
-                    y.bufferTimeBefore ?? x.bufferTimeBefore ?? 0,
-                  bufferTimeAfter: y.bufferTimeAfter ?? x.bufferTimeAfter ?? 0,
-                }
-              : {}),
-          },
+        // concat is necessary because if the reservation is only for one reservationUnit it's not included in the affectingReservations
+        filterNonNullable(
+          x.reservationSet?.concat(
+            affectingReservations?.filter((y) =>
+              doesReservationAffectUnit(y, x)
+            ) ?? []
+          )
+        ).map((y) => ({
+          event: convertToEvent(y, x),
           title: y.name ?? "",
           start: new Date(y.begin),
           end: new Date(y.end),
-        })) ?? [],
+        })),
     }));
 
   return { ...rest, resources };

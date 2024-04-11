@@ -47,14 +47,11 @@ import {
   PricingType,
   type Query,
   type QueryReservationsArgs,
-  type QueryReservationUnitArgs,
   type QueryReservationUnitsArgs,
   type ReservationCreateMutationInput,
   type ReservationCreateMutationPayload,
   type ReservationNode,
-  type ReservationUnitNodeReservableTimeSpansArgs,
   type ReservationUnitNode,
-  type ReservationUnitNodeReservationSetArgs,
 } from "common/types/gql-types";
 import {
   base64encode,
@@ -81,9 +78,9 @@ import {
   printErrorMessages,
 } from "@/modules/util";
 import {
-  OPENING_HOURS,
   RELATED_RESERVATION_UNITS,
-  RESERVATION_UNIT_QUERY,
+  RESERVATION_UNIT_PAGE_QUERY,
+  type ReservationUnitWithAffectingArgs,
 } from "@/modules/queries/reservationUnit";
 import {
   CREATE_RESERVATION,
@@ -166,16 +163,24 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     .filter((n) => n?.reservationUnits?.find((x) => x?.pk === pk));
 
   if (pk) {
+    const today = new Date();
+    const startDate = today;
+    const endDate = addYears(today, 2);
+
     const typename = "ReservationUnitNode";
     const id = base64encode(`${typename}:${pk}`);
     const { data: reservationUnitData } = await apolloClient.query<
       Query,
-      QueryReservationUnitArgs
+      ReservationUnitWithAffectingArgs
     >({
-      query: RESERVATION_UNIT_QUERY,
+      query: RESERVATION_UNIT_PAGE_QUERY,
       fetchPolicy: "no-cache",
       variables: {
         id,
+        beginDate: toApiDate(startDate) ?? "",
+        endDate: toApiDate(endDate) ?? "",
+        state: RELATED_RESERVATION_STATES,
+        pk,
       },
     });
 
@@ -205,26 +210,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
 
     const bookingTerms = await getGenericTerms(apolloClient);
 
-    const today = new Date();
-    const startDate = today;
-    const endDate = addYears(today, 2);
-    // TODO remove
-    const { data: additionalData } = await apolloClient.query<
-      Query,
-      QueryReservationUnitArgs &
-        ReservationUnitNodeReservableTimeSpansArgs &
-        ReservationUnitNodeReservationSetArgs
-    >({
-      query: OPENING_HOURS,
-      fetchPolicy: "no-cache",
-      variables: {
-        id,
-        startDate: toApiDate(startDate) ?? "",
-        endDate: toApiDate(endDate) ?? "",
-        state: RELATED_RESERVATION_STATES,
-      },
-    });
-
     let relatedReservationUnits: ReservationUnitNode[] = [];
     if (reservationUnit?.unit?.pk) {
       const { data: relatedData } = await apolloClient.query<
@@ -234,8 +219,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
         query: RELATED_RESERVATION_UNITS,
         variables: {
           unit: [reservationUnit.unit.pk],
-          // TODO check if we can remove isDraft filter
-          isDraft: false,
           isVisible: true,
         },
       });
@@ -255,28 +238,26 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       };
     }
 
-    const timespans = filterNonNullable(
-      additionalData.reservationUnit?.reservableTimeSpans
-    );
-    const moreTimespans = filterNonNullable(
+    const reservableTimeSpans = filterNonNullable(
       reservationUnitData.reservationUnit?.reservableTimeSpans
     );
-    const reservableTimeSpans = [...timespans, ...moreTimespans];
     const queryParams = new URLSearchParams(query as Record<string, string>);
     const searchDate = queryParams.get("date") ?? null;
     const searchTime = queryParams.get("time") ?? null;
     const searchDuration = Number.isNaN(Number(queryParams.get("duration")))
       ? null
       : Number(queryParams.get("duration"));
+    // TODO is this enough? or do we need to query the reservationUnit.reservationSet also?
     const reservationSet = filterNonNullable(
-      additionalData?.reservationUnit?.reservationSet
+      reservationUnitData?.affectingReservations
     );
+
     return {
       props: {
         key: `${pk}-${locale}`,
         ...commonProps,
         ...(await serverSideTranslations(locale ?? "fi")),
-        // TODO the queries should be combined so that we don't need to do this
+        // TODO don't edit the GQL response (requires refactoring the component)
         reservationUnit: {
           ...reservationUnit,
           reservableTimeSpans,

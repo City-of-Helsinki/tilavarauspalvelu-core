@@ -4,14 +4,12 @@ import { useTranslation } from "react-i18next";
 import get from "lodash/get";
 import type {
   Query,
-  QueryReservationUnitArgs,
   ReservationUnitNode,
   RecurringReservationCreateMutationInput,
   RecurringReservationCreateMutationPayload,
   ReservationStaffCreateMutationInput,
   ReservationStaffCreateMutationPayload,
   QueryUnitArgs,
-  ReservationUnitNodeReservationSetArgs,
   Maybe,
   ReservationMetadataFieldNode,
 } from "common/types/gql-types";
@@ -47,6 +45,7 @@ import { ReservationMade } from "./RecurringReservationDone";
 import { flattenMetadata } from "../create-reservation/utils";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
+import { ReservationUnitWithAffectingArgs } from "common/src/queries/fragments";
 
 export const useMultipleReservation = ({
   form,
@@ -135,7 +134,7 @@ const useReservationsInInterval = ({
   // so it doesn't have the 100 limitation of array fetch nor does it have pagination
   const { loading, data, refetch } = useQuery<
     Query,
-    QueryReservationUnitArgs & ReservationUnitNodeReservationSetArgs
+    ReservationUnitWithAffectingArgs
   >(GET_RESERVATIONS_IN_INTERVAL, {
     skip:
       !reservationUnitPk ||
@@ -144,9 +143,10 @@ const useReservationsInInterval = ({
       !apiEnd,
     variables: {
       id,
+      pk: reservationUnitPk ?? 0,
       state: RELATED_RESERVATION_STATES,
-      beginDate: apiStart,
-      endDate: apiEnd,
+      beginDate: apiStart ?? "",
+      endDate: apiEnd ?? "",
     },
     fetchPolicy: "no-cache",
     onError: (err) => {
@@ -154,7 +154,13 @@ const useReservationsInInterval = ({
     },
   });
 
-  const reservations = filterNonNullable(data?.reservationUnit?.reservationSet)
+  // TODO this is done in multiple places, should add a helper
+  // the same query => concat => filter
+  // allows also to add a warning if either query is empty
+  const rawReservations = data?.reservationUnit?.reservationSet?.concat(
+    data?.affectingReservations ?? []
+  );
+  const reservations = filterNonNullable(rawReservations)
     .map((x) => reservationToInterval(x, reservationType))
     .filter((x): x is CollisionInterval => x != null);
 
@@ -185,6 +191,7 @@ const listItemToInterval = (
   return undefined;
 };
 
+// TODO this is only used for RecurringReservationForm, why? (the above query + hook also)
 export const useFilteredReservationList = ({
   items,
   reservationUnitPk,

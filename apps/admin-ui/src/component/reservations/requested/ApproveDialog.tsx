@@ -84,19 +84,19 @@ const DialogContent = ({
   const approveReservation = (input: ReservationApproveMutationInput) =>
     approveReservationMutation({ variables: { input } });
 
-  const [price, setPrice] = useState(reservation.price ?? 0);
+  const [price, setPrice] = useState(Number(reservation.price) ?? 0);
   const [handlingDetails, setHandlingDetails] = useState<string>(
     reservation.handlingDetails ?? ""
   );
-  const hasPrice = reservation.price != null && reservation.price > 0;
+  const hasPrice = reservation.price != null && Number(reservation.price) > 0;
   const priceIsValid = !hasPrice || !Number.isNaN(price);
 
   const handleApprove = () => {
     const taxP = reservation.taxPercentageValue ?? "0";
     approveReservation({
       pk: reservation.pk,
-      price,
-      priceNet: calcPriceNet(price, parseFloat(taxP)),
+      price: Number(price),
+      priceNet: calcPriceNet(Number(price), parseFloat(taxP)),
       handlingDetails,
     });
   };

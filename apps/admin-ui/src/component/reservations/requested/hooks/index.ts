@@ -4,10 +4,8 @@ import {
   type ReservationNode,
   State,
   type QueryReservationDenyReasonsArgs,
-  type QueryReservationUnitArgs,
   type QueryReservationArgs,
   type QueryRecurringReservationArgs,
-  type ReservationUnitNodeReservationSetArgs,
   ReservationTypeChoice,
 } from "common/types/gql-types";
 import { useTranslation } from "react-i18next";
@@ -22,6 +20,7 @@ import { useNotification } from "@/context/NotificationContext";
 import { RESERVATION_DENY_REASONS } from "../queries";
 import { OptionType } from "@/common/types";
 import { base64encode, filterNonNullable } from "common/src/helpers";
+import { ReservationUnitWithAffectingArgs } from "common/src/queries/fragments";
 
 export { default as useCheckCollisions } from "./useCheckCollisions";
 
@@ -69,33 +68,41 @@ export const useReservationData = (
 
   const typename = "ReservationUnitNode";
   const id = base64encode(`${typename}:${reservationUnitPk}`);
-  const { data, ...rest } = useQuery<
-    Query,
-    QueryReservationUnitArgs & ReservationUnitNodeReservationSetArgs
-  >(RESERVATIONS_BY_RESERVATIONUNIT, {
-    fetchPolicy: "no-cache",
-    skip: !reservationUnitPk,
-    variables: {
-      id,
-      beginDate: toApiDate(begin ?? today) ?? "",
-      endDate: toApiDate(end ?? today) ?? "",
-      // NOTE we need denied to show the past reservations
-      state: [
-        State.Confirmed,
-        State.RequiresHandling,
-        State.Denied,
-        State.WaitingForPayment,
-      ],
-    },
-    onError: () => {
-      notifyError("Varauksia ei voitu hakea");
-    },
-  });
+  const { data, ...rest } = useQuery<Query, ReservationUnitWithAffectingArgs>(
+    RESERVATIONS_BY_RESERVATIONUNIT,
+    {
+      fetchPolicy: "no-cache",
+      skip: !reservationUnitPk,
+      variables: {
+        id,
+        pk: reservationUnitPk ?? 0,
+        beginDate: toApiDate(begin ?? today) ?? "",
+        endDate: toApiDate(end ?? today) ?? "",
+        // NOTE we need denied to show the past reservations
+        state: [
+          State.Confirmed,
+          State.RequiresHandling,
+          State.Denied,
+          State.WaitingForPayment,
+        ],
+      },
+      onError: () => {
+        notifyError("Varauksia ei voitu hakea");
+      },
+    }
+  );
 
   const blockedName = t("ReservationUnits.reservationState.RESERVATION_CLOSED");
 
+  // TODO concat is questionable (it creates duplicates), but if there is no common spaces the affecingReservations is empty
+  // i.e. the reservationUnit doesn't have a space but has reservations (might be other cases too)
+  const reservations = filterNonNullable(
+    data?.reservationUnit?.reservationSet?.concat(
+      data?.affectingReservations ?? []
+    )
+  );
   const events =
-    filterNonNullable(data?.reservationUnit?.reservationSet)
+    reservations
       .filter((r) => shouldBeShownInTheCalendar(r, reservationPk))
       .map((r) => convertReservationToCalendarEvent(r, blockedName)) ?? [];
 

@@ -86,6 +86,7 @@ type Props<T> = {
   culture?: LocalizationLanguages;
   longPressThreshold?: number;
   underlineEvents?: boolean;
+  isLoading?: boolean;
 };
 
 const StyledCalendar = styled(BigCalendar)<{
@@ -94,7 +95,15 @@ const StyledCalendar = styled(BigCalendar)<{
   timeslots: number;
   $isDraggable: boolean;
   $underlineEvents?: boolean;
+  $isLoading?: boolean;
 }>`
+  ${({ $isLoading }) =>
+    $isLoading &&
+    `
+    pointer-events: none;
+    filter: brightness(0.9);
+  `}
+
   ${({ timeslots }) => {
     switch (timeslots) {
       case 2:
@@ -497,6 +506,7 @@ function Calendar<T extends Record<string, unknown>>({
   culture = "fi",
   longPressThreshold = 250,
   underlineEvents = false,
+  isLoading,
 }: Props<T>): JSX.Element {
   // FIXME this breaks TS type ckecking => replace with prop spreading
   const Component: React.ElementType = draggable
@@ -505,6 +515,7 @@ function Calendar<T extends Record<string, unknown>>({
 
   return (
     <Component
+      $isLoading={isLoading}
       culture={culture}
       formats={{
         dayFormat: "EEEEEE d.M.",

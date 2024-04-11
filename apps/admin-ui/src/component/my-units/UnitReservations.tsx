@@ -48,12 +48,12 @@ const UnitReservations = ({
 
   const { t } = useTranslation();
 
+  // TODO I changed the wrong one
   const { loading, resources, refetch } = useUnitResources(
     currentDate ?? new Date(),
     unitPk,
     reservationUnitTypes
   );
-
   const date =
     currentDate && isValidDate(currentDate) ? currentDate : new Date();
 

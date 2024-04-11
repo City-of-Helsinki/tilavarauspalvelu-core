@@ -6,17 +6,11 @@ import { useSession } from "@/hooks/auth";
 import { ReservationEdit } from "@/components/reservation/ReservationEdit";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
-import type {
-  Query,
-  QueryReservationUnitArgs,
-  QueryReservationArgs,
-  ReservationUnitNodeReservableTimeSpansArgs,
-  ReservationUnitNodeReservationSetArgs,
-} from "common/types/gql-types";
+import type { Query, QueryReservationArgs } from "common/types/gql-types";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import {
-  OPENING_HOURS,
-  RESERVATION_UNIT_QUERY,
+  RESERVATION_UNIT_PAGE_QUERY,
+  type ReservationUnitWithAffectingArgs,
 } from "@/modules/queries/reservationUnit";
 import { GET_RESERVATION } from "@/modules/queries/reservation";
 import { toApiDate } from "common/src/common/util";
@@ -43,47 +37,36 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     });
     const reservation = data?.reservation ?? undefined;
 
+    // TODO this is copy pasta from reservation-unit/[id].tsx
+    const today = new Date();
+    const startDate = today;
+    const endDate = addYears(today, 2);
+
     const resUnitPk = reservation?.reservationUnit?.[0]?.pk;
     const id = resUnitPk
       ? base64encode(`ReservationUnitNode:${resUnitPk}`)
       : "";
     const { data: reservationUnitData } = await client.query<
       Query,
-      QueryReservationUnitArgs
+      ReservationUnitWithAffectingArgs
     >({
-      query: RESERVATION_UNIT_QUERY,
-      fetchPolicy: "no-cache",
-      variables: { id },
-    });
-    const { reservationUnit } = reservationUnitData;
-
-    // TODO why is this needed? why isn't it part of the reservationUnit query?
-    // TODO remove this and combine it to the original query
-    // TODO why is this necessary? why require a second client side query after the page has loaded?
-    const now = new Date();
-    const { data: additionalData } = await client.query<
-      Query,
-      QueryReservationUnitArgs &
-        ReservationUnitNodeReservableTimeSpansArgs &
-        ReservationUnitNodeReservationSetArgs
-    >({
-      query: OPENING_HOURS,
+      query: RESERVATION_UNIT_PAGE_QUERY,
       fetchPolicy: "no-cache",
       variables: {
-        id: base64encode(`ReservationUnitNode:${resUnitPk}`),
-        startDate: toApiDate(new Date(now)) ?? "",
-        endDate: toApiDate(addYears(new Date(), 1)) ?? "",
+        id,
+        pk: resUnitPk ?? 0,
+        beginDate: toApiDate(startDate) ?? "",
+        endDate: toApiDate(endDate) ?? "",
         state: RELATED_RESERVATION_STATES,
       },
     });
+    const { reservationUnit } = reservationUnitData;
 
     const timespans = filterNonNullable(reservationUnit?.reservableTimeSpans);
-    const moreTimespans = filterNonNullable(
-      additionalData?.reservationUnit?.reservableTimeSpans
-    ).filter((n) => n?.startDatetime != null && n?.endDatetime != null);
-    const reservableTimeSpans = [...timespans, ...moreTimespans];
+    const reservableTimeSpans = timespans;
+    // TODO is this enough? or do we need to query the reservationUnit.reservationSet also?
     const reservations = filterNonNullable(
-      additionalData?.reservationUnit?.reservationSet
+      reservationUnitData?.affectingReservations
     );
 
     // TODO check for nulls and return notFound if necessary

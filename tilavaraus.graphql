@@ -1777,6 +1777,8 @@ type Query {
     onlyWithPermission: Boolean
     publishedReservationUnits: Boolean
     ownReservations: Boolean
+    onlyDirectBookable: Boolean
+    onlySeasonalBookable: Boolean
 
     """Järjestä"""
     orderBy: [UnitOrderingChoices]
@@ -2510,8 +2512,6 @@ input ReservationConfirmMutationInput {
 }
 
 type ReservationConfirmMutationPayload {
-  """Type of the payment. Possible values are ONLINE, INVOICE, ON_SITE."""
-  paymentType: String
   pk: Int
   reserveeFirstName: String
   reserveeLastName: String
@@ -2862,6 +2862,11 @@ type ReservationNode implements Node {
   isHandled: Boolean
   staffEvent: Boolean @deprecated(reason: "Please refer to type.")
   calendarUrl: String
+
+  """
+  Which reservation units' reserveability is affected by this reservation?
+  """
+  affectedReservationUnits: [Int]
   pk: Int
 }
 
@@ -4692,6 +4697,8 @@ type UnitGroupNode implements Node {
     onlyWithPermission: Boolean
     publishedReservationUnits: Boolean
     ownReservations: Boolean
+    onlyDirectBookable: Boolean
+    onlySeasonalBookable: Boolean
 
     """Järjestä"""
     orderBy: [UnitOrderingChoices]
@@ -4816,6 +4823,8 @@ type UnitNodeEdge {
 
 """Ordering fields for the 'Unit' model."""
 enum UnitOrderingChoices {
+  pkAsc
+  pkDesc
   nameFiAsc
   nameFiDesc
   nameEnAsc
@@ -4875,6 +4884,8 @@ type UnitRoleNode implements Node {
     onlyWithPermission: Boolean
     publishedReservationUnits: Boolean
     ownReservations: Boolean
+    onlyDirectBookable: Boolean
+    onlySeasonalBookable: Boolean
 
     """Järjestä"""
     orderBy: [UnitOrderingChoices]

@@ -11,10 +11,14 @@ import { myUnitUrl } from "@/common/urls";
 import { BasicLink } from "@/styles/util";
 import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import Loader from "@/component/Loader";
-import ReservationUnitCalendarView from "./ReservationUnitCalendarView";
+import { ReservationUnitCalendarView } from "./ReservationUnitCalendarView";
 import UnitReservationsView from "./UnitReservationsView";
 import { TabHeader, Tabs } from "../Tabs";
-import { useUnitQuery } from "./hooks";
+import { useNotification } from "@/context/NotificationContext";
+import { useQuery } from "@apollo/client";
+import { Query, QueryUnitArgs } from "common/types/gql-types";
+import { UNIT_VIEW_QUERY } from "./hooks/queries";
+import { base64encode } from "common/src/helpers";
 
 type Params = {
   unitId: string;
@@ -52,7 +56,7 @@ const ReservationTabPanel = styled(UnitCalendarTabPanel)`
 `;
 
 function MyUnitView() {
-  const { unitId } = useParams<Params>();
+  const { unitId: pk } = useParams<Params>();
   const { t } = useTranslation();
 
   const TabHeaders: TabHeader[] = [
@@ -66,7 +70,17 @@ function MyUnitView() {
     },
   ];
 
-  const { loading, data } = useUnitQuery(unitId);
+  const { notifyError } = useNotification();
+
+  const isPkValid = pk != null && !Number.isNaN(Number(pk));
+  const id = base64encode(`UnitNode:${pk}`);
+  const { loading, data } = useQuery<Query, QueryUnitArgs>(UNIT_VIEW_QUERY, {
+    skip: !isPkValid,
+    variables: { id },
+    onError: (err) => {
+      notifyError(err.message);
+    },
+  });
 
   const { unit } = data ?? {};
 
@@ -74,12 +88,12 @@ function MyUnitView() {
     return <Loader />;
   }
   // TODO improve the error reporting (404)
-  if (!unit || !unitId) {
+  if (!unit || !isPkValid) {
     return <div>{t("MyUnits.Calendar.error.unitNotFound")}</div>;
   }
 
   const recurringReservationUrl = `${myUnitUrl(
-    parseInt(unitId, 10)
+    parseInt(pk, 10)
   )}/recurring-reservation`;
 
   const routes = [

@@ -59,6 +59,7 @@ export const RESERVATION_UNITS_BY_UNIT = gql`
   ${RESERVATIONUNIT_RESERVATIONS_FRAGMENT}
   query reservationUnitsByUnit(
     $id: ID!
+    $pk: Int!
     $state: [String]
     $beginDate: Date
     $endDate: Date
@@ -77,8 +78,22 @@ export const RESERVATION_UNITS_BY_UNIT = gql`
         bufferTimeAfter
         isDraft
         authentication
-        ...ReservationUnitReservations
+        reservationSet(
+          beginDate: $beginDate
+          endDate: $endDate
+          state: $state
+        ) {
+          ...ReservationUnitReservations
+        }
       }
+    }
+    affectingReservations(
+      beginDate: $beginDate
+      endDate: $endDate
+      state: $state
+      forUnits: [$pk]
+    ) {
+      ...ReservationUnitReservations
     }
   }
 `;

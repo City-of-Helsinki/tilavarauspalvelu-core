@@ -8,31 +8,47 @@ import {
   RESERVATION_UNIT_PRICING_FRAGMENT,
 } from "../../fragments";
 
+const CALENDAR_RESERVATION_FRAGMENT = gql`
+  fragment CalendarReservation on ReservationNode {
+    user {
+      email
+    }
+    name
+    reserveeName
+    pk
+    begin
+    end
+    state
+    type
+    bufferTimeBefore
+    bufferTimeAfter
+    recurringReservation {
+      pk
+    }
+  }
+`;
+
 export const RESERVATIONS_BY_RESERVATIONUNIT = gql`
+  ${CALENDAR_RESERVATION_FRAGMENT}
   query reservationUnit(
     $id: ID!
+    $pk: Int!
     $beginDate: Date
     $endDate: Date
     $state: [String]
   ) {
     reservationUnit(id: $id) {
       reservationSet(state: $state, beginDate: $beginDate, endDate: $endDate) {
-        user {
-          email
-        }
-        name
-        reserveeName
-        pk
-        begin
-        end
-        state
-        type
-        bufferTimeBefore
-        bufferTimeAfter
-        recurringReservation {
-          pk
-        }
+        ...CalendarReservation
       }
+    }
+    affectingReservations(
+      forReservationUnits: [$pk]
+      state: $state
+      beginDate: $beginDate
+      endDate: $endDate
+    ) {
+      ...CalendarReservation
     }
   }
 `;

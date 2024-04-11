@@ -21,12 +21,23 @@ export const RESERVATIONS_BY_RESERVATIONUNITS = gql`
   ${RESERVATIONUNIT_RESERVATIONS_FRAGMENT}
   query ReservationUnitReservations(
     $id: ID!
+    $pk: Int!
     $state: [String]
     $beginDate: Date
     $endDate: Date
   ) {
     reservationUnit(id: $id) {
       pk
+      reservationSet(state: $state, beginDate: $beginDate, endDate: $endDate) {
+        ...ReservationUnitReservations
+      }
+    }
+    affectingReservations(
+      forReservationUnits: [$pk]
+      state: $state
+      beginDate: $beginDate
+      endDate: $endDate
+    ) {
       ...ReservationUnitReservations
     }
   }

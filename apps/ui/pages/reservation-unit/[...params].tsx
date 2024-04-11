@@ -31,7 +31,7 @@ import { Container } from "common";
 import { createApolloClient } from "@/modules/apolloClient";
 import { isBrowser, reservationUnitPrefix } from "@/modules/const";
 import { getTranslation, reservationsUrl } from "@/modules/util";
-import { RESERVATION_UNIT_QUERY } from "@/modules/queries/reservationUnit";
+import { RESERVATION_UNIT_PARAMS_PAGE_QUERY } from "@/modules/queries/reservationUnit";
 import {
   CONFIRM_RESERVATION,
   DELETE_RESERVATION,
@@ -82,7 +82,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       Query,
       QueryReservationUnitArgs
     >({
-      query: RESERVATION_UNIT_QUERY,
+      query: RESERVATION_UNIT_PARAMS_PAGE_QUERY,
       variables: { id },
       fetchPolicy: "no-cache",
     });
