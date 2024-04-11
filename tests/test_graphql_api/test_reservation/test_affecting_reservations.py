@@ -202,3 +202,50 @@ def test_reservation__affecting__for_reservation_unit(graphql):
         {"pk": reservation_2.pk},
         {"pk": reservation_3.pk},
     ]
+
+
+def test_reservation__affecting__affected_reservation_units(graphql):
+    parent_space = SpaceFactory.create()
+    other_space = SpaceFactory.create()
+
+    reservation_unit_1 = ReservationUnitFactory.create(spaces=[parent_space])
+    reservation_unit_2 = ReservationUnitFactory.create(spaces=[parent_space, other_space])
+    reservation_unit_3 = ReservationUnitFactory.create(spaces=[other_space])
+
+    reservation_1 = ReservationFactory.create(
+        reservation_unit=[reservation_unit_1],
+        state=ReservationStateChoice.CREATED,
+    )
+    reservation_2 = ReservationFactory.create(
+        reservation_unit=[reservation_unit_2],
+        state=ReservationStateChoice.CREATED,
+    )
+    ReservationFactory.create(
+        reservation_unit=[reservation_unit_3],
+        state=ReservationStateChoice.CREATED,
+    )
+
+    graphql.login_with_superuser()
+
+    fields = "pk affectedReservationUnits"
+    query = affecting_reservations_query(fields=fields, for_reservation_units=[reservation_unit_1.pk])
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert response.first_query_object == [
+        {
+            "pk": reservation_1.pk,
+            "affectedReservationUnits": [
+                reservation_unit_1.pk,
+                reservation_unit_2.pk,
+            ],
+        },
+        {
+            "pk": reservation_2.pk,
+            "affectedReservationUnits": [
+                reservation_unit_1.pk,
+                reservation_unit_2.pk,
+                reservation_unit_3.pk,
+            ],
+        },
+    ]
