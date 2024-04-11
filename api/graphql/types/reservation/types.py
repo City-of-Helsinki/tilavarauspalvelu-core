@@ -1,14 +1,17 @@
 import graphene
+from django.db.models import OuterRef
 from graphene_django_extensions import DjangoNode
-from query_optimizer import DjangoListField
+from query_optimizer import AnnotatedField, DjangoListField
 from rest_framework.reverse import reverse
 
 from api.graphql.types.merchants.types import PaymentOrderNode
 from api.graphql.types.reservation.permissions import ReservationPermission
 from api.legacy_rest_api.utils import hmac_signature
+from common.db import SubqueryArray
 from common.typing import GQLInfo
 from merchants.models import PaymentOrder
 from permissions.helpers import can_view_reservation
+from reservation_units.models import ReservationUnit
 from reservations.choices import CustomerTypeChoice, ReservationTypeChoice
 from reservations.choices import ReservationTypeChoice as ReservationTypeField
 from reservations.models import Reservation
@@ -42,6 +45,24 @@ class ReservationNode(DjangoNode):
     # Needs to be singular since the many-to-many field is also singular,
     # and otherwise the optimizer cannot optimize this properly.
     reservation_unit = DjangoListField("api.graphql.types.reservation_unit.types.ReservationUnitNode")
+
+    affected_reservation_units = AnnotatedField(
+        graphene.List(graphene.Int),
+        description="Which reservation units' reserveability is affected by this reservation?",
+        expression=(
+            SubqueryArray(
+                queryset=(
+                    # Double OuterRef is needed, since `reservation_units_with_common_hierarchy`
+                    # creates another subquery from ReservationUnit queryset before it was called,
+                    # and we want the OuterRef to point to the Reservation queryset.
+                    ReservationUnit.objects.filter(reservation=OuterRef(OuterRef("id")))
+                    .reservation_units_with_common_hierarchy()
+                    .values_list("id", flat=True)
+                ),
+                agg_field="id",
+            )
+        ),
+    )
 
     #
     # These fields are defined "unnecessarily" since they can be null due to permission checks.
