@@ -16,7 +16,7 @@ from common.typing import GQLInfo
 from merchants.models import PaymentOrder
 from permissions.helpers import can_manage_banner_notifications
 from reservations.models import Reservation
-from users.helauth.utils import ensure_profile_token_valid
+from users.helauth.clients import HelsinkiProfileClient
 from users.models import User
 
 # NOTE: Queries __need__ to be imported before mutations, see mutations.py!
@@ -199,7 +199,7 @@ class Query(graphene.ObjectType):
         debug = Field(DjangoDebug, name="_debug")
 
     def resolve_current_user(root: None, info: GQLInfo, **kwargs: Any):
-        ensure_profile_token_valid(info.context)
+        HelsinkiProfileClient.ensure_token_valid(info.context)
         return get_object_or_404(User, pk=info.context.user.pk)
 
     def resolve_order(root: None, info: GQLInfo, **kwargs: Any):
