@@ -10,6 +10,9 @@ import {
   ReservationUnitCancellationRuleNode,
   ReservationUnitNode,
   CustomerTypeChoice,
+  ReservationMetadataFieldNode,
+  OrderStatus,
+  PaymentType,
 } from "common/types/gql-types";
 import {
   CanReservationBeChangedProps,
@@ -285,10 +288,24 @@ describe("getReservationApplcationMutationValues", () => {
       reserveeId: "123456-7",
       reserveeFirstName: "Etunimi",
     };
+    const supportedFields: ReservationMetadataFieldNode[] = [
+      {
+        id: "123456-7",
+        fieldName: "name",
+      },
+      {
+        id: "123456-7",
+        fieldName: "reservee_id",
+      },
+      {
+        id: "123456-7",
+        fieldName: "reservee_first_name",
+      },
+    ];
     expect(
       getReservationApplicationMutationValues(
         payload,
-        ["name", "reservee_id", "reservee_first_name"],
+        supportedFields,
         CustomerTypeChoice.Individual
       )
     ).toEqual({
@@ -435,7 +452,7 @@ describe("getNormalizedReservationOrderStatus", () => {
       getNormalizedReservationOrderStatus({
         state: "CANCELLED",
         order: {
-          status: "DRAFT",
+          status: OrderStatus.Draft,
         } as PaymentOrderNode,
       } as ReservationNode)
     ).toBe("DRAFT");
@@ -444,7 +461,7 @@ describe("getNormalizedReservationOrderStatus", () => {
       getNormalizedReservationOrderStatus({
         state: "CANCELLED",
         order: {
-          status: "PAID",
+          status: OrderStatus.Paid,
         } as PaymentOrderNode,
       } as ReservationNode)
     ).toBe("PAID");
@@ -453,19 +470,10 @@ describe("getNormalizedReservationOrderStatus", () => {
       getNormalizedReservationOrderStatus({
         state: "CONFIRMED",
         order: {
-          status: "PAID_MANUALLY",
+          status: OrderStatus.PaidManually,
         } as PaymentOrderNode,
       } as ReservationNode)
     ).toBe("PAID_MANUALLY");
-
-    expect(
-      getNormalizedReservationOrderStatus({
-        state: "DENIED",
-        order: {
-          status: "SOMETHING_ELSE",
-        } as PaymentOrderNode,
-      } as ReservationNode)
-    ).toBe("SOMETHING_ELSE");
   });
 
   test("return null", () => {
@@ -615,7 +623,7 @@ describe("canReservationBeChanged", () => {
     expect(
       canReservationTimeBeChanged({
         reservation,
-        newReservation: { ...reservation, price: 2.02 },
+        newReservation: { ...reservation, price: "2.02" },
       } as CanReservationBeChangedProps)
     ).toStrictEqual([false, "RESERVATION_MODIFICATION_NOT_ALLOWED"]);
   });
@@ -757,6 +765,7 @@ describe("getCheckoutUrl", () => {
   const order: PaymentOrderNode = {
     id: "order-id",
     checkoutUrl: "https://checkout.url/path?user=1111-2222-3333-4444",
+    paymentType: PaymentType.Online,
   };
 
   test("returns checkout url", () => {

@@ -108,14 +108,17 @@ const selectUnit = async () => {
     selector: "ul",
   });
   expect(units[0].nameFi).toBeDefined();
+  const unitName = units[0].nameFi!;
 
   // Select works for HDS listbox but
   // to check the selected value we have to read the button text not check options
-  await userEvent.selectOptions(listbox, "Unit");
-  expect(btn).toHaveTextContent("Unit");
+  await userEvent.selectOptions(listbox, unitName);
+  expect(btn).toHaveTextContent(unitName);
 };
 
-test("selecting unit field allows input to other mandatory fields", async () => {
+// Smoke test (if this fails, all others will fail also, and it's harder to debug)
+// TODO make it so that it skips the other tests if this fails
+test("SMOKE: selecting unit field allows input to other mandatory fields", async () => {
   const view = customRender();
 
   await selectUnit();
@@ -193,6 +196,7 @@ test("Form doesn't have meta without a reservation unit.", async () => {
 
 // TODO replace screen with view that is passed in here
 // TODO this is brittle to any changes in the form layout, should use labels to find the elements not tab
+// TODO should break this function into smaller pieces and remove expects from it (otherwise we end up testing the test)
 async function fillForm({
   begin,
   end,
@@ -216,6 +220,7 @@ async function fillForm({
   expect(btn).toHaveTextContent("common.select");
   await act(() => user.click(btn));
 
+  // TODO replace the select code with the utility function: selectUnit
   const listbox = screen.getByLabelText(/reservationUnit/, {
     selector: "ul",
   });
@@ -227,10 +232,11 @@ async function fillForm({
 
   await user.tab();
   await user.keyboard(begin);
-  // find by
   const startDateLabel = screen.getByRole("textbox", {
     name: /ReservationDialog.startingDate/,
   });
+  // make sure that the form is active and can be filled before continuing
+  expect(startDateLabel).not.toBeDisabled();
   expect(startDateLabel).toHaveValue(begin);
 
   await user.tab();

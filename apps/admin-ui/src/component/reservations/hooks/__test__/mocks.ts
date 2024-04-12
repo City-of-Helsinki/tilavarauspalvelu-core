@@ -65,13 +65,13 @@ const getValidInterval = (daysToAdd: number) => {
   return [begin.toISOString(), addHours(begin, 1).toISOString()];
 };
 
-const createRecurringEdges = (
+function createRecurringEdges(
   startingPk: number,
   recurringPk: number,
   state: State = State.Confirmed
-) => [
-  {
-    node: {
+) {
+  return [
+    {
       begin: getValidInterval(0)[0],
       end: getValidInterval(0)[1],
       pk: startingPk,
@@ -82,9 +82,7 @@ const createRecurringEdges = (
       },
       state,
     },
-  },
-  {
-    node: {
+    {
       begin: getValidInterval(7)[0],
       end: getValidInterval(7)[1],
       pk: startingPk + 1,
@@ -95,8 +93,8 @@ const createRecurringEdges = (
       },
       state,
     },
-  },
-];
+  ];
+}
 
 const correctRecurringReservationQueryResult = (
   startingPk: number,
@@ -111,20 +109,17 @@ const correctRecurringReservationQueryResult = (
     request: {
       query: RECURRING_RESERVATION_QUERY,
       variables: {
-        pk: recurringPk,
-        count: 100,
-        state: [State.Confirmed, State.Denied],
+        id: base64encode(`RecurringReservationNode:${recurringPk}`),
       },
     },
     result: {
       data: {
-        reservations: {
-          edges: createRecurringEdges(
+        recurringReservation: {
+          reservations: createRecurringEdges(
             startingPk,
             recurringPk,
             options?.allDenied ? State.Denied : State.Confirmed
           ),
-          totalCount: 2,
         },
       },
     },

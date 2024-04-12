@@ -10,6 +10,10 @@ import { mocks } from "./__test__/mocks";
 import { ReservationMade } from "./RecurringReservationDone";
 import { CREATE_RECURRING_RESERVATION } from "./queries";
 import { CREATE_STAFF_RESERVATION } from "../create-reservation/queries";
+import {
+  RecurringReservationCreateMutationInput,
+  RecurringReservationCreateMutationPayload,
+} from "common/types/gql-types";
 
 const N_DAYS = 10;
 const today = new Date();
@@ -43,9 +47,9 @@ const createRecurringMock = (
           name: "test series name",
           description: "",
           recurrenceInDays: 7,
-          reservationUnitPk: unitPk,
+          reservationUnit: unitPk,
           weekdays: [0, 1, 2, 3, 4, 5, 6],
-        },
+        } as RecurringReservationCreateMutationInput,
       },
     },
     result: {
@@ -53,7 +57,7 @@ const createRecurringMock = (
         createRecurringReservation: {
           errors: null,
           pk,
-        },
+        } as RecurringReservationCreateMutationPayload,
       },
     },
   },

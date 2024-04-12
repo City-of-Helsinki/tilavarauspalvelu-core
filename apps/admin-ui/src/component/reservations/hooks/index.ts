@@ -16,6 +16,11 @@ import {
   UPDATE_STAFF_RESERVATION,
 } from "./queries";
 
+export type MutationInputParams = ReservationStaffModifyMutationInput & {
+  seriesName?: string;
+  workingMemo?: string;
+};
+
 /// Combines regular and recurring reservation change mutation
 export function useStaffReservationMutation({
   reservation,
@@ -54,11 +59,6 @@ export function useStaffReservationMutation({
   };
   const handleError = () => {
     notifyError(t("Reservation.EditPage.saveError"));
-  };
-
-  type MutationInputParams = ReservationStaffModifyMutationInput & {
-    seriesName?: string;
-    workingMemo?: string;
   };
 
   const editStaffReservation = async (input: MutationInputParams) => {

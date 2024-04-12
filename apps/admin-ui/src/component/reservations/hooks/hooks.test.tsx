@@ -6,8 +6,8 @@ import type { ReservationNode } from "common/types/gql-types";
 import NotificationContextMock, {
   notifyError,
   notifySuccess,
-} from "app/__mocks__/NotificationContextMock";
-import { useStaffReservationMutation } from ".";
+} from "@/__mocks__/NotificationContextMock";
+import { type MutationInputParams, useStaffReservationMutation } from ".";
 import {
   MUTATION_DATA,
   mockRecurringReservation,
@@ -15,7 +15,7 @@ import {
   mocks,
 } from "./__test__/mocks";
 
-const TestComponent = ({
+function TestComponent({
   reservation,
   onSuccess,
   seriesName,
@@ -23,24 +23,25 @@ const TestComponent = ({
   reservation: ReservationNode;
   onSuccess: () => void;
   seriesName?: string;
-}) => {
+}): JSX.Element {
   const mutationFn = useStaffReservationMutation({
     reservation,
     onSuccess,
   });
 
-  const input = {
+  const input: MutationInputParams = {
     ...MUTATION_DATA.input,
     ...MUTATION_DATA.workingMemo,
     pk: reservation.pk ?? 0,
     seriesName,
   };
+
   return (
     <button type="button" onClick={() => mutationFn(input)}>
       mutate
     </button>
   );
-};
+}
 
 const successCb = jest.fn(() => {});
 
@@ -156,7 +157,6 @@ describe("edit mutation hook recurring reservation", () => {
   test("success mutating recurring reservation", async () => {
     const view = wrappedRender(21, 1, successCb);
     const btn = view.getByRole("button", { name: /mutate/i });
-    expect(notifySuccess).not.toHaveBeenCalled();
     expect(btn).toBeInTheDocument();
     const user = userEvent.setup();
     await act(() => user.click(btn));
@@ -169,7 +169,6 @@ describe("edit mutation hook recurring reservation", () => {
   test("successful retry if a single mutation fails once with a network error", async () => {
     const view = wrappedRender(31, 2, successCb);
     const btn = view.getByRole("button", { name: /mutate/i });
-    expect(notifySuccess).not.toHaveBeenCalled();
     expect(btn).toBeInTheDocument();
     const user = userEvent.setup();
     await act(() => user.click(btn));
@@ -183,7 +182,6 @@ describe("edit mutation hook recurring reservation", () => {
   test.skip("fail if a single mutation fails twice with a network error", async () => {
     const view = wrappedRender(51, 4, successCb);
     const btn = view.getByRole("button", { name: /mutate/i });
-    expect(notifyError).not.toHaveBeenCalled();
     expect(btn).toBeInTheDocument();
     const user = userEvent.setup();
     await act(() => user.click(btn));

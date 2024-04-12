@@ -4,6 +4,9 @@ import {
   ReservationKind,
   ReservationStartInterval,
   type ReservationUnitNode,
+  TermsOfUseNode,
+  TermsType,
+  ReservationTypeChoice,
 } from "common/types/gql-types";
 import { RESERVATION_UNIT_QUERY } from "../../hooks/queries";
 import { CREATE_STAFF_RESERVATION } from "../../create-reservation/queries";
@@ -12,6 +15,7 @@ import {
   GET_RESERVATIONS_IN_INTERVAL,
 } from "../queries";
 import { base64encode } from "common/src/helpers";
+import { ReservationUnitWithAffectingArgs } from "common/src/queries/fragments";
 
 const unitCommon = {
   allowReservationsWithoutOpeningHours: true,
@@ -58,6 +62,7 @@ export const units: ReservationUnitNode[] = [
     pk: 1,
     id: base64encode(`ReservationUnitNode:${1}`),
     nameFi: "Unit",
+    name: "Unit",
   },
   {
     ...unitCommon,
@@ -65,88 +70,110 @@ export const units: ReservationUnitNode[] = [
     pk: 2,
     id: base64encode(`ReservationUnitNode:${2}`),
     nameFi: "Absolute",
+    name: "Absolute",
   },
 ];
 
-const emptyTerms = {
+const emptyTerms: TermsOfUseNode = {
+  id: "",
   textFi: "",
+  text: "",
   nameFi: "",
+  name: "",
+  termsType: TermsType.PaymentTerms,
 };
 
 // Use next year for all tests (today to two years in the future is allowed in the form)
 // NOTE using jest fake timers would be better but they timeout the tests
 export const YEAR = getYear(new Date()) + 1;
 
-const unitResponse = [
-  {
-    node: {
-      nameFi: "Studiohuone 1 + soittimet",
-      maxPersons: null,
-      pk: 1,
-      bufferTimeBefore: 0,
-      bufferTimeAfter: 0,
-      reservationStartInterval: "INTERVAL_15_MINS",
-      pricingTerms: emptyTerms,
-      paymentTerms: emptyTerms,
-      cancellationTerms: emptyTerms,
-      serviceSpecificTerms: emptyTerms,
-      termsOfUseFi: "",
-      unit: {
+const unitResponse: ReservationUnitNode = {
+  ...unitCommon,
+  ...arrays,
+  nameFi: "Studiohuone 1 + soittimet",
+  name: "Studiohuone 1 + soittimet",
+  pk: 1,
+  id: base64encode(`ReservationUnitNode:${1}`),
+  maxPersons: null,
+  bufferTimeBefore: 0,
+  bufferTimeAfter: 0,
+  reservationStartInterval: ReservationStartInterval.Interval_15Mins,
+  pricingTerms: emptyTerms,
+  paymentTerms: emptyTerms,
+  cancellationTerms: emptyTerms,
+  serviceSpecificTerms: emptyTerms,
+  termsOfUseFi: "",
+  unit: {
+    id: base64encode(`UnitNode:${1}`),
+    pk: 1,
+    nameFi: "unit name",
+    name: "unit name",
+    phone: "",
+    email: "",
+    description: "",
+    shortDescription: "",
+    spaces: [],
+    webPage: "",
+    reservationunitSet: [],
+    serviceSectors: [
+      {
+        id: "1",
         pk: 1,
-        nameFi: "unit name",
-        serviceSectors: [
-          {
-            pk: 1,
-          },
-        ],
+        name: "service sector",
       },
-      metadataSet: {
-        name: "full_meta",
-        supportedFields: [
-          "reservee_type",
-          "reservee_first_name",
-          "reservee_last_name",
-          "reservee_organisation_name",
-          "reservee_phone",
-          "reservee_email",
-          "reservee_id",
-          "reservee_is_unregistered_association",
-          "reservee_address_street",
-          "reservee_address_city",
-          "reservee_address_zip",
-          "billing_first_name",
-          "billing_last_name",
-          "billing_phone",
-          "billing_email",
-          "billing_address_street",
-          "billing_address_city",
-          "billing_address_zip",
-          "home_city",
-          "age_group",
-          "applying_for_free_of_charge",
-          "free_of_charge_reason",
-          "name",
-          "description",
-          "num_persons",
-          "purpose",
-        ],
-        requiredFields: [
-          "reservee_first_name",
-          "reservee_type",
-          "reservee_email",
-          "age_group",
-          "name",
-          "description",
-          "num_persons",
-          "purpose",
-        ],
-        __typename: "ReservationMetadataSetNode",
-      },
-      __typename: "ReservationUnitNode",
-    },
-    __typename: "ReservationUnitNodeEdge",
+    ],
   },
-];
+  metadataSet: {
+    id: "1",
+    name: "full_meta",
+    supportedFields: [
+      "reservee_type",
+      "reservee_first_name",
+      "reservee_last_name",
+      "reservee_organisation_name",
+      "reservee_phone",
+      "reservee_email",
+      "reservee_id",
+      "reservee_is_unregistered_association",
+      "reservee_address_street",
+      "reservee_address_city",
+      "reservee_address_zip",
+      "billing_first_name",
+      "billing_last_name",
+      "billing_phone",
+      "billing_email",
+      "billing_address_street",
+      "billing_address_city",
+      "billing_address_zip",
+      "home_city",
+      "age_group",
+      "applying_for_free_of_charge",
+      "free_of_charge_reason",
+      "name",
+      "description",
+      "num_persons",
+      "purpose",
+    ].map((x) => ({
+      fieldName: x,
+      id: x,
+    })),
+    requiredFields: [
+      "reservee_first_name",
+      "reservee_type",
+      "reservee_email",
+      "age_group",
+      "name",
+      "description",
+      "num_persons",
+      "purpose",
+    ].map((x) => ({
+      fieldName: x,
+      id: x,
+    })),
+    __typename: "ReservationMetadataSetNode",
+  },
+  __typename: "ReservationUnitNode",
+};
 
 // First monday off the month has reservation from 9:00 - 12:00
 export const mondayMorningReservations = Array.from(Array(12).keys()).map(
@@ -200,6 +227,9 @@ const reservationsByUnitResponse = mondayMorningReservations
   .map((x) => ({
     begin: x.begin.toUTCString(),
     end: x.end.toUTCString(),
+    bufferTimeBefore: 0,
+    bufferTimeAfter: 0,
+    type: ReservationTypeChoice.Normal,
     __typename: "ReservationNode",
   }));
 
@@ -207,13 +237,11 @@ export const mocks = [
   {
     request: {
       query: RESERVATION_UNIT_QUERY,
-      variables: { pk: [1] },
+      variables: { id: base64encode(`ReservationUnitNode:${1}`) },
     },
     result: {
       data: {
-        reservationUnits: {
-          edges: unitResponse,
-        },
+        reservationUnit: unitResponse,
       },
     },
   },
@@ -221,17 +249,18 @@ export const mocks = [
     request: {
       query: GET_RESERVATIONS_IN_INTERVAL,
       variables: {
+        id: base64encode(`ReservationUnitNode:${1}`),
         pk: 1,
-        from: `${YEAR}-01-01`,
-        // NOTE backend problem with date +1
-        to: `${YEAR + 1}-01-01`,
-      },
+        beginDate: `${YEAR}-01-01`,
+        endDate: `${YEAR + 1}-01-01`,
+      } as ReservationUnitWithAffectingArgs,
     },
     result: {
       data: {
         reservationUnit: {
-          reservations: reservationsByUnitResponse,
-        },
+          reservationSet: reservationsByUnitResponse,
+        } as ReservationUnitNode,
+        affectingReservations: reservationsByUnitResponse,
       },
     },
   },
@@ -240,7 +269,9 @@ export const mocks = [
       query: CREATE_STAFF_RESERVATION,
     },
     result: {
-      data: {},
+      data: {
+        pk: 1,
+      },
     },
   },
   {
@@ -248,7 +279,9 @@ export const mocks = [
       query: CREATE_RECURRING_RESERVATION,
     },
     result: {
-      data: {},
+      data: {
+        pk: 1,
+      },
     },
   },
 ];

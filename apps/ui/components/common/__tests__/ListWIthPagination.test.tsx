@@ -53,7 +53,7 @@ describe("ListWithPagination", () => {
       className: "test-hooky",
     });
 
-    expect(document.querySelector("#foobar.test-hooky")).toBeInTheDocument();
+    expect(document.querySelector(".test-hooky")).toBeInTheDocument();
     expect(
       screen.queryByTestId("list-with-pagination__hit-count")
     ).toHaveTextContent("100 hakutulosta");

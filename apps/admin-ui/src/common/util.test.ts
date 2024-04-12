@@ -2,7 +2,6 @@ import {
   convertHMSToSeconds,
   formatTimeDistance,
   secondsToHms,
-  filterData,
   formatDecimal,
   parseDurationString,
 } from "./util";
@@ -52,35 +51,6 @@ test("convertHMSToSeconds", () => {
   expect(convertHMSToSeconds("13:23:01")).toBe(48181);
   expect(convertHMSToSeconds("13gr01")).toBe(null);
   expect(convertHMSToSeconds("")).toBe(null);
-});
-
-test("filterData", () => {
-  expect(filterData([], [])).toEqual([]);
-  expect(filterData([], [{ title: "", key: "name", value: "bar" }])).toEqual(
-    []
-  );
-  expect(filterData([{ name: "foo" }, { name: "bar" }], [])).toEqual([
-    { name: "foo" },
-    { name: "bar" },
-  ]);
-  expect(
-    filterData(
-      [{ name: "foo" }, { name: "bar" }],
-      [{ title: "", key: "name", value: "bar" }]
-    )
-  ).toEqual([{ name: "bar" }]);
-  expect(
-    filterData(
-      [
-        { name: "bar", size: 4 },
-        { name: "bar", size: 5 },
-      ],
-      [
-        { title: "", key: "name", value: "bar" },
-        { title: "", key: "size", value: 5 },
-      ]
-    )
-  ).toEqual([{ name: "bar", size: 5 }]);
 });
 
 test("formatDecimal", () => {

@@ -111,6 +111,7 @@ export const canUserCancelReservation = (
 };
 
 export const getReservationApplicationMutationValues = (
+  // TODO don't use Records to avoid proper typing
   payload: Record<string, string | number | boolean>,
   supportedFields: ReservationMetadataFieldNode[],
   reserveeType: CustomerTypeChoice

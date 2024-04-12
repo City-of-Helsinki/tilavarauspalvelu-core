@@ -5,9 +5,10 @@ import {
   type ReservationNode,
   type ReservationUnitPricingNode,
   PriceUnit,
-  type PricingType,
+  PricingType,
   Status,
   type ReservationUnitNode,
+  State,
 } from "common/types/gql-types";
 import {
   createTagString,
@@ -19,14 +20,15 @@ const PRICING_FREE: ReservationUnitPricingNode = {
   begins: "2021-01-01",
   pricingType: PricingType.Free,
   pk: 1,
+  id: "1",
   priceUnit: PriceUnit.PerHour,
-  lowestPrice: 120,
-  lowestPriceNet: 120 / 1.24,
-  highestPrice: 120,
-  highestPriceNet: 120 / 1.24,
+  lowestPrice: "120",
+  lowestPriceNet: (120 / 1.24).toString(),
+  highestPrice: "120",
+  highestPriceNet: (120 / 1.24).toString(),
   taxPercentage: {
     id: "1",
-    value: 24,
+    value: "24",
   },
   status: Status.Active,
 };
@@ -37,43 +39,55 @@ const PRICING_PAID = {
   status: Status.Future,
 };
 
+function constructReservation(
+  begin: string,
+  end: string,
+  pricings: ReservationUnitPricingNode[]
+): ReservationNode {
+  return {
+    begin,
+    end,
+    id: "1",
+    bufferTimeBefore: 0,
+    bufferTimeAfter: 0,
+    state: State.Confirmed,
+    reservationUnit: [
+      {
+        nameFi: "Foobar",
+        pricings,
+      } as ReservationUnitNode,
+    ],
+  };
+}
+
 describe("pricingDetails", () => {
   test("renders fixed price", () => {
-    const r = {
-      begin: "2022-01-01T10:00:00Z",
-      end: "2022-01-01T11:00:00Z",
-      reservationUnits: [
+    const reservation: ReservationNode = constructReservation(
+      "2022-01-01T10:00:00Z",
+      "2022-01-01T11:00:00Z",
+      [
         {
-          pricings: [
-            {
-              ...PRICING_PAID,
-              priceUnit: PriceUnit.Fixed,
-              status: Status.Active,
-            },
-          ],
-        } as ReservationUnitNode,
-      ],
-    } as ReservationNode;
-
+          ...PRICING_PAID,
+          priceUnit: PriceUnit.Fixed,
+          status: Status.Active,
+        },
+      ]
+    );
     const t1 = ((_s: unknown, a: string) => get(a, "price") ?? "") as TFunction;
-    expect(getReservationPriceDetails(r, t1)).toEqual("120 €");
+    expect(getReservationPriceDetails(reservation, t1)).toEqual("120 €");
   });
 
   test("renders price in hours", () => {
-    const reservation = {
-      begin: "2022-01-01T10:00:00Z",
-      end: "2022-01-01T11:30:00Z",
-      reservationUnits: [
+    const reservation: ReservationNode = constructReservation(
+      "2022-01-01T10:00:00Z",
+      "2022-01-01T11:30:00Z",
+      [
         {
-          pricings: [
-            {
-              ...PRICING_FREE,
-              pricingType: PricingType.Paid,
-            },
-          ],
-        } as ReservationUnitNode,
-      ],
-    } as ReservationNode;
+          ...PRICING_FREE,
+          pricingType: PricingType.Paid,
+        },
+      ]
+    );
 
     const t1 = ((_s: unknown, a: string) => get(a, "price") ?? "") as TFunction;
     const t2 = ((_s: unknown, a: string) =>
@@ -104,20 +118,18 @@ describe("getReservatinUnitPricing", () => {
 
 describe("createTag", () => {
   test("recurring has a tag with a date range and multiple weekdays days", () => {
-    const res = {
-      begin: "2023-04-01T09:00:00Z",
-      end: "2023-04-01T11:00:00Z",
+    const res: ReservationNode = {
+      ...constructReservation(
+        "2023-04-01T09:00:00Z",
+        "2023-04-01T11:00:00Z",
+        []
+      ),
       recurringReservation: {
         beginDate: "2023-04-01T09:00:00Z",
         endDate: "2023-07-01T09:00:00Z",
         weekdays: [0, 1, 3],
       } as RecurringReservationNode,
-      reservationUnits: [
-        {
-          nameFi: "Foobar",
-        } as ReservationUnitNode,
-      ],
-    } as ReservationNode;
+    };
 
     const mockT = ((x: string) => x) as TFunction;
     const tag = createTagString(res, mockT);
@@ -129,16 +141,11 @@ describe("createTag", () => {
   });
 
   test("no recurring defaults to reservation tag", () => {
-    const res = {
-      begin: "2023-04-01T09:00:00Z",
-      end: "2023-04-01T11:00:00Z",
-      recurringReservation: undefined,
-      reservationUnits: [
-        {
-          nameFi: "Foobar",
-        } as ReservationUnitNode,
-      ],
-    } as ReservationNode;
+    const res: ReservationNode = constructReservation(
+      "2023-04-01T09:00:00Z",
+      "2023-04-01T11:00:00Z",
+      []
+    );
 
     const mockT = ((x: string) => x) as TFunction;
     const tag = createTagString(res, mockT);
