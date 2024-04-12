@@ -337,7 +337,6 @@ def test_helsinki_profile_client__prefill_info__non_200_response():
 @patch_method(HelsinkiProfileClient.generic)
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
 def test_helsinki_profile_client__prefill_info__contains_errors():
-    user = UserFactory.create()
     profile_data = MyProfileDataFactory.create_basic()
 
     HelsinkiProfileClient.generic.return_value = ResponseMock(
@@ -347,13 +346,9 @@ def test_helsinki_profile_client__prefill_info__contains_errors():
         }
     )
 
-    msg = (
-        "Helsinki profile: Could not read all profile info for prefill operation. "
-        f"User ID: {user.pk}. "
-        "Errors: [{'message': 'foo'}]"
-    )
+    msg = 'Helsinki profile: Helsinki profile response contains errors. [{"message": "foo"}]'
     with pytest.raises(ExternalServiceError, match=re.escape(msg)):
-        HelsinkiProfileClient.get_reservation_prefill_info(mock_request(user))
+        HelsinkiProfileClient.get_reservation_prefill_info(mock_request(UserFactory.create()))
 
 
 @patch_method(HelsinkiProfileClient.generic)
