@@ -1,3 +1,5 @@
+from collections.abc import Callable
+from functools import wraps
 from typing import Any, Literal
 
 from sentry_sdk import capture_exception, capture_message, push_scope
@@ -22,3 +24,27 @@ class SentryLogger:
                 scope.set_extra(key, value)
 
             capture_exception(err)
+
+    @staticmethod
+    def log_if_raises(details: str, *, re_raise: bool = False):
+        """
+        Decorator that logs exceptions raised by the decorated function.
+        Note that the decorated function should return None.
+
+        :param details: A string describing the context of the exception.
+        :param re_raise: Whether to re-raise the exception after logging.
+        """
+
+        def decorator[**P](func: Callable[P, None]) -> Callable[P, None]:
+            @wraps(func)
+            def wrapper(*args: P.args, **kwargs: P.kwargs) -> None:
+                try:
+                    return func(*args, **kwargs)
+                except Exception as err:
+                    SentryLogger.log_exception(err, details)
+                    if re_raise:
+                        raise
+
+            return wrapper
+
+        return decorator

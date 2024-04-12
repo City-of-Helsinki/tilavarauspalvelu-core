@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import json
 import logging
 import time
 from typing import Any
@@ -8,7 +9,7 @@ from typing import Any
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
 from graphene_django_extensions.utils import get_nested
-from requests import HTTPError
+from requests import HTTPError, Response
 from social_django.models import DjangoStorage
 from social_django.strategy import DjangoStrategy
 
@@ -21,6 +22,7 @@ from users.helauth.typing import (
     ProfileTokenPayload,
     RefreshResponse,
     ReservationPrefillInfo,
+    SocialSecurityNumberInfo,
 )
 from users.helauth.utils import get_jwt_payload, get_session_data
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
@@ -52,17 +54,7 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
         headers = {"Authorization": f"Bearer {token}"}
 
         response = cls.post(url=url, json=request_data, headers=headers)
-
-        if response.status_code != 200:
-            raise ExternalServiceRequestError(response, cls.SERVICE_NAME)
-
         response_data = cls.response_json(response)
-        errors: dict[str, Any] | None = response_data.get("errors")
-        if errors is not None:
-            msg = f"{cls.SERVICE_NAME.capitalize()}: Could not read all profile info for prefill operation."
-            details = f"User ID: {request.user.pk}. Errors: {errors}"
-            SentryLogger.log_message(message=msg, details=details, level="error")
-            raise ExternalServiceError(f"{msg} {details}")
 
         my_profile_data: MyProfileData = get_nested(response_data, "data", "myProfile", default={})
         return ReservationPrefillParser(my_profile_data).parse()
@@ -192,6 +184,44 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
         )
 
     @classmethod
+    def get_social_security_number(cls, request: WSGIRequest) -> SocialSecurityNumberInfo | None:
+        """Fetch social security number from Helsinki profile."""
+        token = cls.get_token(request)
+        if token is None:
+            return None
+
+        url: str = settings.OPEN_CITY_PROFILE_GRAPHQL_API
+        request_data = {"query": cls._social_security_number_query()}
+        headers = {"Authorization": f"Bearer {token}"}
+
+        response = cls.post(url=url, json=request_data, headers=headers)
+        response_data = cls.response_json(response)
+
+        my_profile_data: MyProfileData = get_nested(response_data, "data", "myProfile", default={})
+
+        return SocialSecurityNumberInfo(
+            id=my_profile_data.get("id"),
+            social_security_number=get_nested(
+                my_profile_data,
+                "verifiedPersonalInformation",
+                "nationalIdentificationNumber",
+            ),
+        )
+
+    @classmethod
+    def _social_security_number_query(cls) -> str:
+        return """
+            query {
+                myProfile {
+                    id
+                    verifiedPersonalInformation {
+                        nationalIdentificationNumber
+                    }
+                }
+            }
+        """
+
+    @classmethod
     def ensure_token_valid(cls, request: WSGIRequest) -> bool:
         """
         Ensure that the request user's helsinki profile JWT is valid. Refresh if necessary.
@@ -260,8 +290,24 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
             return None
 
         session_data = get_session_data(request)
-        session_data["api_tokens"] = cls.response_json(response=response)
+        session_data["api_tokens"] = BaseExternalServiceClient.response_json(response=response)
         return session_data["api_tokens"].get(settings.OPEN_CITY_PROFILE_SCOPE)
+
+    @classmethod
+    def response_json(cls, response: Response) -> dict[str, Any]:
+        if response.status_code != 200:
+            raise ExternalServiceRequestError(response, cls.SERVICE_NAME)
+
+        response_data = super().response_json(response)
+
+        errors: dict[str, Any] | None = response_data.get("errors")
+        if errors is not None:
+            msg = f"{cls.SERVICE_NAME.capitalize()}: Helsinki profile response contains errors."
+            details = json.dumps(errors)
+            SentryLogger.log_message(message=msg, details=details, level="error")
+            raise ExternalServiceError(f"{msg} {details}")
+
+        return response_data
 
 
 class TunnistamoClient(BaseExternalServiceClient):
