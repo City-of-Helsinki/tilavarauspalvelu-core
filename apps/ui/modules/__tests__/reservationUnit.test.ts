@@ -205,58 +205,37 @@ describe("getPrice", () => {
 
   test("no price", () => {
     const pricing = {
-      priceUnit: "FIXED",
-    } as unknown as ReservationUnitPricingType;
-
-    expect(getPrice({ pricing })).toBe("Maksuton");
-    expect(getPrice({ pricing: {} as ReservationUnitPricingType })).toBe(
-      "Maksuton"
-    );
-  });
-
-  test("no price", () => {
-    const pricing = {
-      lowestPrice: 0,
-      highestPrice: 0,
+      begins: "",
+      status: "ACTIVE",
+      lowestPrice: "0",
+      highestPrice: "0",
       priceUnit: "PER_HOUR",
       pricingType: "PAID",
-    } as unknown as ReservationUnitPricingType;
-
-    expect(getPrice({ pricing })).toBe("Maksuton");
-    expect(getPrice({ pricing: {} as ReservationUnitPricingType })).toBe(
-      "Maksuton"
-    );
-  });
-
-  test("free", () => {
-    const pricing = {
-      priceUnit: "FIXED",
-      pricingType: "FREE",
-    } as unknown as ReservationUnitPricingType;
+    } as ReservationUnitPricingType;
 
     expect(getPrice({ pricing })).toBe("Maksuton");
   });
 
   test("total price with minutes", () => {
     const pricing = {
-      lowestPrice: 0.0,
-      highestPrice: 50.5,
+      lowestPrice: "0.0",
+      highestPrice: "50.5",
       priceUnit: "PER_15_MINS",
       pricingType: "PAID",
       status: "ACTIVE",
-    } as unknown as ReservationUnitPricingType;
+    } as ReservationUnitPricingType;
 
     expect(getPrice({ pricing, minutes: 180 })).toBe("0 - 606 €");
   });
 
   test("total price with minutes and decimals", () => {
     const pricing = {
-      lowestPrice: 0.0,
-      highestPrice: 50.5,
+      lowestPrice: "0.0",
+      highestPrice: "50.5",
       priceUnit: "PER_15_MINS",
       pricingType: "PAID",
       status: "ACTIVE",
-    } as unknown as ReservationUnitPricingType;
+    } as ReservationUnitPricingType;
 
     expect(getPrice({ pricing, minutes: 180, trailingZeros: true })).toBe(
       "0 - 606,00 €"

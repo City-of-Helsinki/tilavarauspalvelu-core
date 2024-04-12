@@ -250,13 +250,14 @@ export type GetPriceType = {
 
 export const getPrice = (props: GetPriceType): string => {
   const { pricing, minutes, trailingZeros = false, asNumeral = false } = props;
-
   if (
+    pricing.pricingType == null ||
     pricing.pricingType === PricingType.Free ||
     (pricing.pricingType === PricingType.Paid &&
       parseFloat(pricing.highestPrice) === 0)
-  )
-    return asNumeral ? i18n?.t("prices:priceFree") ?? "0" : "0";
+  ) {
+    return asNumeral ? "0" : i18n?.t("prices:priceFree") ?? "0";
+  }
 
   const volume = getReservationVolume(minutes ?? 0, pricing.priceUnit);
   const highestPrice = parseFloat(pricing.highestPrice) * volume;

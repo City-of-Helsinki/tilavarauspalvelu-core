@@ -2,7 +2,7 @@ import { filterNonNullable } from "common/src/helpers";
 import { addDays, addMinutes, isAfter, isBefore } from "date-fns";
 import {
   ReservableTimeSpanType,
-  ReservationUnitByPkType,
+  ReservationUnitType,
 } from "common/types/gql-types";
 import {
   getPossibleTimesForDay,
@@ -40,7 +40,7 @@ const dayMax = (days: Array<Date | undefined>): Date | undefined => {
 
 // Returns the last possible reservation date for the given reservation unit
 const getLastPossibleReservationDate = (
-  reservationUnit?: ReservationUnitByPkType
+  reservationUnit?: ReservationUnitType
 ): Date | null => {
   if (!reservationUnit) {
     return null;
@@ -72,7 +72,7 @@ const getLastPossibleReservationDate = (
 type AvailableTimesProps = {
   start: Date;
   duration: number;
-  reservationUnit: ReservationUnitByPkType;
+  reservationUnit: ReservationUnitType;
   slots: ReservableTimeSpanType[];
   activeApplicationRounds: RoundPeriod[];
   fromStartOfDay?: boolean;
@@ -186,7 +186,7 @@ const getNextAvailableTime = (props: AvailableTimesProps): Date | null => {
 const isSlotReservable = (
   start: Date,
   end: Date,
-  reservationUnit: ReservationUnitByPkType,
+  reservationUnit: ReservationUnitType,
   activeApplicationRounds?: RoundPeriod[],
   skipLengthCheck = false
 ): boolean => {

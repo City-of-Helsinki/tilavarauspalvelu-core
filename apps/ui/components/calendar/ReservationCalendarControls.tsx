@@ -3,7 +3,7 @@ import { useTranslation, type TFunction } from "next-i18next";
 import styled from "styled-components";
 import { Button, IconAngleDown, IconAngleUp, IconCross } from "hds-react";
 import { maxBy, trim } from "lodash";
-import { toUIDate } from "common/src/common/util";
+import { fromUIDate, toUIDate } from "common/src/common/util";
 import { Transition } from "react-transition-group";
 import type { OptionType } from "common/types/common";
 import {
@@ -13,7 +13,7 @@ import {
 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { ReservationUnitType } from "common/types/gql-types";
-import { MediumButton, truncatedText } from "@/styles/util";
+import { truncatedText } from "@/styles/util";
 import {
   getReservationUnitPrice,
   getTimeString,
@@ -42,7 +42,7 @@ type Props = {
     time?: string;
   }>;
   durationOptions: OptionType[];
-  startingTimeOptions: string[];
+  startingTimeOptions: { label: string; value: string }[];
   focusSlot: FocusTimeSlot;
   submitReservation: SubmitHandler<PendingReservationFormType>;
   LoginAndSubmit?: JSX.Element;
@@ -143,7 +143,9 @@ const Content = styled.div<{ $isAnimated: boolean }>`
   }
 
   @media (min-width: ${breakpoints.xl}) {
-    grid-template-columns: 154px 120px 140px minmax(100px, 1fr) 110px auto;
+    grid-template-columns:
+      154px 140px minmax(max-content, 190px) minmax(90px, 1fr)
+      110px auto;
   }
 `;
 
@@ -286,7 +288,7 @@ const ReservationCalendarControls = ({
   const formDate = watch("date");
   const formDuration = watch("duration");
   const date = new Date(formDate ?? "");
-  const dateValue = useMemo(() => new Date(formDate ?? ""), [formDate]);
+  const dateValue = useMemo(() => fromUIDate(formDate ?? ""), [formDate]);
   const focusDate = useMemo(
     () => focusSlot?.start ?? dateValue,
     [focusSlot, dateValue]
@@ -410,13 +412,6 @@ const ReservationCalendarControls = ({
                     : new Date()
                 }
               />
-              <StyledControlledSelect
-                name="time"
-                label={t("reservationCalendar:startTime")}
-                control={reservationForm.control}
-                options={startingTimeOptions}
-                disabled={!(startingTimeOptions?.length >= 1) && !time}
-              />
               <div data-testid="reservation__input--duration">
                 <StyledControlledSelect
                   name="duration"
@@ -425,6 +420,13 @@ const ReservationCalendarControls = ({
                   options={durationOptions}
                 />
               </div>
+              <StyledControlledSelect
+                name="time"
+                label={t("reservationCalendar:startTime")}
+                control={reservationForm.control}
+                options={startingTimeOptions}
+                placeholder={"Ei aikoja" ?? t("common:select")}
+              />
               <PriceWrapper>
                 {focusSlot.isReservable && (
                   <>

@@ -1,9 +1,9 @@
 import React, { useCallback, useMemo } from "react";
 import type { OptionType } from "common/types/common";
-import { IconAngleDown } from "hds-react";
+import { Button } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { chunkArray, toUIDate } from "common/src/common/util";
+import { chunkArray, fromUIDate, toUIDate } from "common/src/common/util";
 import { fontBold, fontMedium, H4 } from "common/src/common/typography";
 import type { ReservationUnitType } from "common/types/gql-types";
 import { breakpoints } from "common";
@@ -15,6 +15,7 @@ import type { SubmitHandler, UseFormReturn } from "react-hook-form";
 import { PendingReservationFormType } from "@/components/reservation-unit/schema";
 import ControlledDateInput from "@/components/common/ControlledDateInput";
 import ControlledSelect from "@/components/common/ControlledSelect";
+import { getSelectedOption } from "@/modules/util";
 
 export type TimeRange = {
   start: Date;
@@ -23,7 +24,6 @@ export type TimeRange = {
 
 type Props = {
   reservationUnit: ReservationUnitType | null;
-  calendarRef: React.RefObject<HTMLDivElement>;
   subventionSuffix: JSX.Element | undefined;
   reservationForm: UseFormReturn<{
     duration?: number;
@@ -31,7 +31,7 @@ type Props = {
     time?: string;
   }>;
   durationOptions: OptionType[];
-  startingTimeOptions: string[];
+  startingTimeOptions: { label: string; value: string }[];
   focusSlot: FocusTimeSlot | null;
   nextAvailableTime: Date | null;
   submitReservation: SubmitHandler<PendingReservationFormType>;
@@ -95,7 +95,7 @@ const Subheading = styled.div`
 `;
 
 const Times = styled.div`
-  margin: var(--spacing-s) 0 var(--spacing-m);
+  margin: var(--spacing-s) 0 var(--spacing-l);
 `;
 
 const Slots = styled.div``;
@@ -140,39 +140,14 @@ const StyledSelect = styled(ControlledSelect)`
   li[role="option"] {
     white-space: nowrap;
   }
-
-  #quick-reservation-duration-toggle-button {
-    position: relative;
-
-    > span {
-      position: absolute;
-      white-space: nowrap;
-    }
-  }
 `;
 
 const NoTimes = styled.div`
-  button {
-    color: var(--color-bus) !important;
-    ${fontMedium};
-    appearance: none;
-    border: none;
-    background-color: transparent;
-  }
-
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
   gap: var(--spacing-m);
-`;
-
-const CalendarLink = styled.a`
-  display: flex;
-  margin-top: var(--spacing-xs);
-  grid-column: 1/-1;
-  align-items: center;
-  justify-self: flex-end;
-  color: var(--color-bus) !important;
-  ${fontMedium};
+  margin: var(--spacing-s) 0 calc(var(--spacing-s) * -1) 0;
 `;
 
 const ActionWrapper = styled.div`
@@ -183,7 +158,6 @@ const ActionWrapper = styled.div`
 const QuickReservation = ({
   reservationUnit,
   subventionSuffix,
-  calendarRef,
   reservationForm,
   focusSlot,
   durationOptions,
@@ -195,7 +169,7 @@ const QuickReservation = ({
   const { t } = useTranslation();
   const { setValue, watch, handleSubmit } = reservationForm;
   const formDate = watch("date");
-  const dateValue = useMemo(() => new Date(formDate ?? ""), [formDate]);
+  const dateValue = useMemo(() => fromUIDate(formDate ?? ""), [formDate]);
   const duration =
     watch("duration") ?? reservationUnit?.minReservationDuration ?? 0;
 
@@ -220,7 +194,7 @@ const QuickReservation = ({
     const itemsPerChunk = 8;
 
     return chunkArray(
-      startingTimeOptions.map((opt) => (opt ? opt.toString() : "")),
+      startingTimeOptions.map((opt) => (opt.label ? opt.label.toString() : "")),
       itemsPerChunk
     ).slice(0, timeItems / itemsPerChunk);
   }, [startingTimeOptions]);
@@ -264,14 +238,6 @@ const QuickReservation = ({
           options={durationOptions}
         />
       </Selects>
-      <Price data-testid="quick-reservation-price">
-        {focusSlot?.isReservable && (
-          <>
-            {t("reservationUnit:price")}: <PriceValue>{getPrice()}</PriceValue>
-            {getPrice(true) !== "0" && subventionSuffix}
-          </>
-        )}
-      </Price>
 
       <Subheading>
         {t("reservationCalendar:quickReservation.subheading")}
@@ -284,7 +250,7 @@ const QuickReservation = ({
               wrapAround={false}
               slideIndex={activeChunk}
             >
-              {timeChunks.map((chunk: string[], index: number) => (
+              {timeChunks.map((chunk: string[]) => (
                 <SlotGroup key={chunk[0]}>
                   {chunk.map((value: string) => (
                     <Slot $active={watch("time") === value} key={value}>
@@ -297,35 +263,23 @@ const QuickReservation = ({
                       </SlotButton>
                     </Slot>
                   ))}
-                  {startingTimeOptions.length > timeItems &&
-                    index + 1 === timeChunks.length && (
-                      <CalendarLink
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          window.scroll({
-                            top: calendarRef?.current?.parentElement?.offsetTop,
-                            left: 0,
-                            behavior: "smooth",
-                          });
-
-                          return false;
-                        }}
-                      >
-                        {t("reservationCalendar:quickReservation.gotoCalendar")}
-                        <IconAngleDown />
-                      </CalendarLink>
-                    )}
                 </SlotGroup>
               ))}
             </Carousel>
           </Slots>
         ) : (
           <NoTimes>
-            <span>{t("reservationCalendar:quickReservation.noTimes")}</span>
+            <span>
+              {t("reservationCalendar:quickReservation.noTimes", {
+                duration: getSelectedOption(
+                  duration,
+                  durationOptions
+                )?.label.trim(),
+              })}
+            </span>
             {nextAvailableTime != null && (
               <span>
-                <button
+                <Button
                   data-testid="quick-reservation-next-available-time"
                   type="button"
                   onClick={(e) => {
@@ -334,13 +288,24 @@ const QuickReservation = ({
                   }}
                 >
                   {t("reservationCalendar:quickReservation.nextAvailableTime")}
-                </button>
+                </Button>
               </span>
             )}
           </NoTimes>
         )}
       </Times>
-      <ActionWrapper>{LoginAndSubmit}</ActionWrapper>
+      <ActionWrapper>
+        <Price data-testid="quick-reservation-price">
+          {focusSlot?.isReservable && (
+            <>
+              {t("reservationUnit:price")}:{" "}
+              <PriceValue>{getPrice()}</PriceValue>
+              {getPrice(true) !== "0" && subventionSuffix}
+            </>
+          )}
+        </Price>
+        {focusSlot?.isReservable && LoginAndSubmit}
+      </ActionWrapper>
     </Wrapper>
   );
 };

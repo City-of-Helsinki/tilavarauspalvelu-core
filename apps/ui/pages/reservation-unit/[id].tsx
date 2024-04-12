@@ -46,17 +46,17 @@ import {
   ApplicationRoundStatusChoice,
   type ApplicationRoundTimeSlotNode,
   PricingType,
-  Query,
-  QueryReservationsArgs,
-  QueryReservationUnitArgs,
-  QueryReservationUnitsArgs,
-  ReservationCreateMutationInput,
-  ReservationCreateMutationPayload,
-  ReservationType,
-  ReservationUnitType,
+  type Query,
+  type QueryReservationsArgs,
+  type QueryReservationUnitArgs,
+  type QueryReservationUnitsArgs,
+  type ReservationCreateMutationInput,
+  type ReservationCreateMutationPayload,
+  type ReservationType,
+  type ReservationUnitType,
   State,
-  ReservationUnitTypeReservableTimeSpansArgs,
-  ReservationUnitTypeReservationsArgs,
+  type ReservationUnitTypeReservableTimeSpansArgs,
+  type ReservationUnitTypeReservationsArgs,
 } from "common/types/gql-types";
 import {
   base64encode,
@@ -123,7 +123,7 @@ import {
 } from "@/components/reservation-unit/ReservationUnitStyles";
 import { Toast } from "@/components/common/Toast";
 import QuickReservation, {
-  TimeRange,
+  type TimeRange,
 } from "@/components/reservation-unit/QuickReservation";
 import ReservationInfoContainer from "@/components/reservation-unit/ReservationInfoContainer";
 import { useCurrentUser } from "@/hooks/user";
@@ -134,12 +134,12 @@ import {
   getGenericTerms,
 } from "@/modules/serverUtils";
 import { eventStyleGetter } from "@/components/common/calendarUtils";
-import { useForm, UseFormReturn } from "react-hook-form";
+import { useForm, type UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { getNextAvailableTime } from "@/components/reservation-unit/utils";
 import {
   PendingReservationFormSchema,
-  PendingReservationFormType,
+  type PendingReservationFormType,
 } from "@/components/reservation-unit/schema";
 import { MediumButton } from "@/styles/util";
 import LoginFragment from "@/components/LoginFragment";
@@ -417,14 +417,16 @@ any): JSX.Element => {
   });
 };
 
-function SubmitFragment(props: {
-  focusSlot: TimeRange & { isReservable: boolean; durationMinutes: number };
-  apiBaseUrl: string;
-  actionCallback: () => void;
-  reservationForm: UseFormReturn<PendingReservationFormType>;
-  loadingText: string;
-  buttonText: string;
-}) {
+function SubmitFragment(
+  props: Readonly<{
+    focusSlot: TimeRange & { isReservable: boolean; durationMinutes: number };
+    apiBaseUrl: string;
+    actionCallback: () => void;
+    reservationForm: UseFormReturn<PendingReservationFormType>;
+    loadingText: string;
+    buttonText: string;
+  }>
+) {
   return (
     <LoginFragment
       isActionDisabled={!props.focusSlot?.isReservable}
@@ -479,20 +481,38 @@ const ReservationUnit = ({
     [reservableTimeSpans]
   );
   const searchUIDate = fromUIDate(searchDate ?? "");
-
+  const durationOptions = useMemo(() => {
+    const {
+      minReservationDuration,
+      maxReservationDuration,
+      reservationStartInterval,
+    } = reservationUnit || {};
+    if (
+      minReservationDuration == null ||
+      maxReservationDuration == null ||
+      reservationStartInterval == null
+    ) {
+      return [];
+    }
+    return getDurationOptions(
+      minReservationDuration,
+      maxReservationDuration,
+      reservationStartInterval,
+      t
+    );
+  }, [reservationUnit, t]);
+  const minReservationDuration = reservationUnit.minReservationDuration
+    ? reservationUnit.minReservationDuration / 60
+    : 30;
   const initialFieldValues = {
     date:
       searchDate && searchUIDate && isValidDate(searchUIDate)
         ? searchDate
         : toUIDate(new Date(todaysTimeSpans[0]?.startDatetime ?? "")),
-    duration:
-      searchDuration ??
-      (reservationUnit.minReservationDuration
-        ? reservationUnit.minReservationDuration / 60
-        : 0),
-    time: searchTime
-      ? searchTime
-      : getTimeString(new Date(todaysTimeSpans[0]?.startDatetime ?? "")),
+    duration: searchDuration ?? minReservationDuration,
+    time:
+      searchTime ??
+      getTimeString(new Date(todaysTimeSpans[0]?.startDatetime ?? "")),
   };
   const reservationForm = useForm<PendingReservationFormType>({
     defaultValues: initialFieldValues,
@@ -501,12 +521,10 @@ const ReservationUnit = ({
   });
   const { watch, setValue } = reservationForm;
   const durationValue =
-    watch("duration") ??
-    (reservationUnit.minReservationDuration
-      ? reservationUnit.minReservationDuration / 60
-      : 0);
+    watch("duration") ?? durationOptions[0]?.value ?? minReservationDuration;
   const dateValue = watch("date");
   const timeValue = watch("time") ?? getTimeString();
+
   const formUIDate = fromUIDate(dateValue ?? "")?.setHours(
     Number.isNaN(Number(timeValue.split(":")[0]))
       ? Number(timeValue.split(":")[0])
@@ -559,27 +577,6 @@ const ReservationUnit = ({
     reservationUnit,
     activeApplicationRounds,
   ]);
-
-  const durationOptions = useMemo(() => {
-    const {
-      minReservationDuration,
-      maxReservationDuration,
-      reservationStartInterval,
-    } = reservationUnit || {};
-    if (
-      minReservationDuration == null ||
-      maxReservationDuration == null ||
-      reservationStartInterval == null
-    ) {
-      return [];
-    }
-    return getDurationOptions(
-      minReservationDuration,
-      maxReservationDuration,
-      reservationStartInterval,
-      t
-    );
-  }, [reservationUnit, t]);
 
   const startingTimeOptions = useMemo(() => {
     return getPossibleTimesForDay(
@@ -877,6 +874,11 @@ const ReservationUnit = ({
     [addReservation]
   );
 
+  // Set default duration if it's not set
+  useEffect(() => {
+    if (durationValue === 0) setValue("duration", durationOptions[0]?.value);
+  }, [dateValue, timeValue, durationValue, durationOptions, setValue]);
+
   // store reservation unit overall reservability to use in JSX and pass to some child elements
   const [reservationUnitIsReservable, reason] =
     isReservationUnitReservable(reservationUnit);
@@ -886,7 +888,7 @@ const ReservationUnit = ({
   }
   const [storedReservation, setStoredReservation, _removeStoredReservation] =
     useLocalStorage<PendingReservation>("reservation");
-  const storeReservationForLogin = () => {
+  const storeReservationForLogin = useCallback(() => {
     if (reservationUnit.pk != null && focusSlot != null) {
       const { start, end } = focusSlot ?? {};
       setStoredReservation({
@@ -896,7 +898,7 @@ const ReservationUnit = ({
         reservationUnitPk: reservationUnit.pk ?? 0,
       });
     }
-  };
+  }, [focusSlot, reservationUnit.pk, setStoredReservation]);
 
   // If returning from login, continue on to reservation details
   useEffect(() => {
@@ -1051,7 +1053,6 @@ const ReservationUnit = ({
               reservationUnitIsReservable && (
                 <QuickReservation
                   {...reservationControlProps}
-                  calendarRef={calendarRef}
                   subventionSuffix={subventionSuffix}
                   nextAvailableTime={nextAvailableTime}
                 />

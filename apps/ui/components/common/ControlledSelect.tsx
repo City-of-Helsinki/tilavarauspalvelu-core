@@ -11,7 +11,7 @@ type Props = {
   control: ReturnType<typeof useForm>["control"];
   options: OptionType[];
   required?: boolean;
-  disabled?: boolean;
+  placeholder?: string;
   error?: string;
   validate?: { [key: string]: (val: string) => boolean };
 };
@@ -22,6 +22,7 @@ const ControlledSelect = ({
   required,
   options,
   error,
+  placeholder,
   validate,
 }: Props): JSX.Element => {
   const { t } = useTranslation();
@@ -39,13 +40,13 @@ const ControlledSelect = ({
           <Select
             id={name}
             value={currentValue}
-            placeholder={t("common:select")}
             options={options}
             label={label}
             required={required ?? false}
             onChange={(selection: OptionType): void => {
               field.onChange(selection.value);
             }}
+            placeholder={placeholder ?? t("common:select")}
             invalid={Boolean(error)}
             error={error}
           />

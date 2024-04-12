@@ -87,8 +87,8 @@
   "reservationQuotaFull_other": "Et voi tehdä uusia varauksia.",
   "quickReservation": {
     "heading": "Katso vapaat ajat ja varaa",
-    "subheading": "Seuraavat vapaat ajat",
-    "noTimes": "Ei vapaita aikoja",
+    "subheading": "Vapaat ajat",
+    "noTimes": "Ei vapaita {{duration}} aikoja",
     "gotoCalendar": "Katso kaikki vapaat ajat",
     "nextAvailableTime": "Näytä seuraava"
   }

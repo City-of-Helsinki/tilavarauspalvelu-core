@@ -52,6 +52,7 @@ import {
   PendingReservationFormType,
 } from "@/components/reservation-unit/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toUIDate } from "common/src/common/util";
 
 type Props = {
   reservation: ReservationType;
@@ -150,7 +151,7 @@ const EditStep0 = ({
   );
   const reservationForm = useForm<PendingReservationFormType>({
     defaultValues: {
-      date: reservation.begin,
+      date: toUIDate(new Date(reservation.begin)),
       duration: differenceInMinutes(startDate, new Date(reservation.end ?? "")),
       time: getTimeString(startDate),
     },

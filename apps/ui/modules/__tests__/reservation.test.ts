@@ -51,23 +51,23 @@ describe("getDurationOptions", () => {
     expect(getDurationOptions(1800, 5400, interval15, mockT)).toEqual([
       {
         label: " common:abbreviations.minute",
-        value: "0:30",
+        value: 30,
       },
       {
         label: " common:abbreviations.minute",
-        value: "0:45",
+        value: 45,
       },
       {
         label: " common:abbreviations.minute",
-        value: "1:00",
+        value: 60,
       },
       {
         label: " common:abbreviations.minute",
-        value: "1:15",
+        value: 75,
       },
       {
         label: " common:abbreviations.minute",
-        value: "1:30",
+        value: 90,
       },
     ]);
   });
@@ -78,23 +78,23 @@ describe("getDurationOptions", () => {
     expect(getDurationOptions(1800, 30600, interval90, mockT)).toEqual([
       {
         label: " common:abbreviations.minute",
-        value: "1:30",
-      },
-      {
-        label: "common:abbreviations.hour ",
-        value: "3:00",
+        value: 90,
       },
       {
         label: "common:abbreviations.hour common:abbreviations.minute",
-        value: "4:30",
-      },
-      {
-        label: "common:abbreviations.hour ",
-        value: "6:00",
+        value: 180,
       },
       {
         label: "common:abbreviations.hour common:abbreviations.minute",
-        value: "7:30",
+        value: 270,
+      },
+      {
+        label: "common:abbreviations.hour common:abbreviations.minute",
+        value: 360,
+      },
+      {
+        label: "common:abbreviations.hour common:abbreviations.minute",
+        value: 450,
       },
     ]);
   });

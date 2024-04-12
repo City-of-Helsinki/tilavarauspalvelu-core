@@ -53,7 +53,7 @@
   },
   "saveReservation": "Spara bokningen",
   "selectedTime": "Vald tid",
-  "nextAvailableTime": "Nästa lediga tid",
+  "nextAvailableTime": "Nästa lediga {{duration}} tid",
   "nextAvailableSlot": "Nästa lediga timme",
   "nextAvailableSlot_plural": "Följande lediga {{slot}}",
   "showCalendar": "Visa kalender",

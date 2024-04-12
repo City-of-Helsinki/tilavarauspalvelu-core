@@ -43,71 +43,71 @@ const ReservationInfoContainer = ({
 
   const maxDaysBefore = reservationUnit.reservationsMaxDaysBefore ?? 0;
   const minDaysBefore = reservationUnit.reservationsMinDaysBefore ?? 0;
+  const isReservable =
+    reservationUnitIsReservable &&
+    (reservationUnit.reservationsMaxDaysBefore != null ||
+      reservationUnit.reservationsMinDaysBefore != null);
   return (
     <>
       <Subheading $withBorder>
         {t("reservationCalendar:reservationInfo")}
       </Subheading>
       <Content data-testid="reservation-unit__reservation-info">
-        {reservationUnitIsReservable &&
-          (reservationUnit.reservationsMaxDaysBefore != null ||
-            reservationUnit.reservationsMinDaysBefore != null) && (
-            <p>
-              {maxDaysBefore > 0 && minDaysBefore > 0 && (
-                <Trans
-                  i18nKey="reservationUnit:reservationInfo1-1"
-                  defaults="Voit tehdä varauksen <strong>aikaisintaan {{reservationsMaxDaysBefore}} {{unit}}</strong> ja <bold>viimeistään {{reservationsMinDaysBefore}} päivää etukäteen</bold>."
-                  values={{
-                    reservationsMaxDaysBefore: daysByMonths.find(
-                      (n) =>
-                        n.value === reservationUnit.reservationsMaxDaysBefore
-                    )?.label,
-                    unit: t(
-                      `reservationUnit:reservationInfo1-${
-                        reservationUnit.reservationsMaxDaysBefore === 14
-                          ? "weeks"
-                          : "months"
-                      }`
-                    ),
-                    reservationsMinDaysBefore:
-                      reservationUnit.reservationsMinDaysBefore,
-                  }}
-                  components={{ bold: <strong /> }}
-                />
-              )}
-              {maxDaysBefore > 0 && minDaysBefore === 0 && (
-                <Trans
-                  i18nKey="reservationUnit:reservationInfo1-2"
-                  defaults="Voit tehdä varauksen <bold>aikaisintaan {{reservationsMaxDaysBefore}} {{unit}} etukäteen</bold>."
-                  values={{
-                    reservationsMaxDaysBefore: daysByMonths.find(
-                      (n) =>
-                        n.value === reservationUnit.reservationsMaxDaysBefore
-                    )?.label,
-                    unit: t(
-                      `reservationUnit:reservationInfo1-${
-                        reservationUnit.reservationsMaxDaysBefore === 14
-                          ? "weeks"
-                          : "months"
-                      }`
-                    ),
-                  }}
-                  components={{ bold: <strong /> }}
-                />
-              )}
-              {maxDaysBefore === 0 && minDaysBefore > 0 && (
-                <Trans
-                  i18nKey="reservationUnit:reservationInfo1-3"
-                  defaults="Voit tehdä varauksen <bold>viimeistään {{reservationsMinDaysBefore}} päivää etukäteen</bold>."
-                  values={{
-                    reservationsMinDaysBefore:
-                      reservationUnit.reservationsMinDaysBefore,
-                  }}
-                  components={{ bold: <strong /> }}
-                />
-              )}
-            </p>
-          )}
+        {isReservable && (
+          <p>
+            {maxDaysBefore > 0 && minDaysBefore > 0 && (
+              <Trans
+                i18nKey="reservationUnit:reservationInfo1-1"
+                defaults="Voit tehdä varauksen <strong>aikaisintaan {{reservationsMaxDaysBefore}} {{unit}}</strong> ja <bold>viimeistään {{reservationsMinDaysBefore}} päivää etukäteen</bold>."
+                values={{
+                  reservationsMaxDaysBefore: daysByMonths.find(
+                    (n) => n.value === reservationUnit.reservationsMaxDaysBefore
+                  )?.label,
+                  unit: t(
+                    `reservationUnit:reservationInfo1-${
+                      reservationUnit.reservationsMaxDaysBefore === 14
+                        ? "weeks"
+                        : "months"
+                    }`
+                  ),
+                  reservationsMinDaysBefore:
+                    reservationUnit.reservationsMinDaysBefore,
+                }}
+                components={{ bold: <strong /> }}
+              />
+            )}
+            {maxDaysBefore > 0 && minDaysBefore === 0 && (
+              <Trans
+                i18nKey="reservationUnit:reservationInfo1-2"
+                defaults="Voit tehdä varauksen <bold>aikaisintaan {{reservationsMaxDaysBefore}} {{unit}} etukäteen</bold>."
+                values={{
+                  reservationsMaxDaysBefore: daysByMonths.find(
+                    (n) => n.value === reservationUnit.reservationsMaxDaysBefore
+                  )?.label,
+                  unit: t(
+                    `reservationUnit:reservationInfo1-${
+                      reservationUnit.reservationsMaxDaysBefore === 14
+                        ? "weeks"
+                        : "months"
+                    }`
+                  ),
+                }}
+                components={{ bold: <strong /> }}
+              />
+            )}
+            {maxDaysBefore === 0 && minDaysBefore > 0 && (
+              <Trans
+                i18nKey="reservationUnit:reservationInfo1-3"
+                defaults="Voit tehdä varauksen <bold>viimeistään {{reservationsMinDaysBefore}} päivää etukäteen</bold>."
+                values={{
+                  reservationsMinDaysBefore:
+                    reservationUnit.reservationsMinDaysBefore,
+                }}
+                components={{ bold: <strong /> }}
+              />
+            )}
+          </p>
+        )}
         {reservationStatus === "willOpen" && (
           <p>
             <Trans

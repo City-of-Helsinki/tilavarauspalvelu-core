@@ -53,7 +53,7 @@
   },
   "saveReservation": "Save the booking",
   "selectedTime": "Selected time",
-  "nextAvailableTime": "Next available time",
+  "nextAvailableTime": "Next available {{duration}} time",
   "nextAvailableSlot": "Next available hour",
   "nextAvailableSlot_plural": "Next available {{slot}}",
   "showCalendar": "Show calendar",
