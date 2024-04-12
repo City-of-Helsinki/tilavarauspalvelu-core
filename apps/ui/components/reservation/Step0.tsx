@@ -24,7 +24,8 @@ import {
 } from "../reservation-unit/ReservationUnitStyles";
 import Sanitize from "../common/Sanitize";
 import { ReservationUnitNode } from "common/types/gql-types";
-import { containsField, filterNonNullable } from "common/src/helpers";
+import { filterNonNullable } from "common/src/helpers";
+import { containsField } from "common/src/metaFieldsHelpers";
 
 type Props = {
   reservationUnit: ReservationUnitNode;

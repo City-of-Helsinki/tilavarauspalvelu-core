@@ -4,7 +4,7 @@ import {
   ReservationMetadataFieldNode,
 } from "../../types/gql-types";
 import { reservationApplicationFields } from "./types";
-import { containsField } from "../helpers";
+import { containsField } from "../metaFieldsHelpers";
 
 // TODO this is bad
 // and there seems to be other functions that have same or similar names

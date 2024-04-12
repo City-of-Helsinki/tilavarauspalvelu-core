@@ -58,13 +58,10 @@ import {
 } from "@/modules/serverUtils";
 import { OPTIONS_QUERY } from "@/hooks/useOptions";
 import { useConfirmNavigation } from "@/hooks/useConfirmNavigation";
-import {
-  base64encode,
-  containsField,
-  filterNonNullable,
-} from "common/src/helpers";
+import { base64encode, filterNonNullable } from "common/src/helpers";
 import Error from "next/error";
 import { CenterSpinner } from "@/components/common/common";
+import { containsField } from "common/src/metaFieldsHelpers";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;

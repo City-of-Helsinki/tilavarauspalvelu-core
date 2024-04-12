@@ -1,3 +1,10 @@
+// NOTE middleware can't import lodash or any other library that has
+// Dynamic Code Evaluation
+// This is because Vercel doesn't support NodeJs as a runtime environment
+// and edge doesn't allow Dynamic Code Evaluation
+// This app is not edge compatible, but it's impossible to disable the checks.
+// Workaround as long as the function isn't needed is to split imports in such a way
+// that libraries are not imported in the middleware.
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getSignInUrl } from "@/modules/const";

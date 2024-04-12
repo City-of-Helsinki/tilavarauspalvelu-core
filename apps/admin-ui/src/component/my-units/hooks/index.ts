@@ -11,11 +11,7 @@ import {
   ReservationTypeChoice,
 } from "common/types/gql-types";
 import { toApiDate } from "common/src/common/util";
-import {
-  base64encode,
-  containsField,
-  filterNonNullable,
-} from "common/src/helpers";
+import { base64encode, filterNonNullable } from "common/src/helpers";
 import { useNotification } from "@/context/NotificationContext";
 import {
   OPTIONS_QUERY,
@@ -24,6 +20,7 @@ import {
 } from "./queries";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { ReservationUnitWithAffectingArgs } from "common/src/queries/fragments";
+import { containsField } from "common/src/metaFieldsHelpers";
 
 export const useApplicationFields = (
   reservationUnit: ReservationUnitNode,

@@ -20,8 +20,9 @@ import { capitalize, getTranslation } from "@/modules/util";
 import Sanitize from "../common/Sanitize";
 import { BlackButton, MediumButton } from "@/styles/util";
 import { reservationsPrefix } from "@/modules/const";
-import { containsField, filterNonNullable } from "common/src/helpers";
+import { filterNonNullable } from "common/src/helpers";
 import { useGenericTerms } from "common/src/hooks/useGenericTerms";
+import { containsField } from "common/src/metaFieldsHelpers";
 
 type Props = {
   reservation: ReservationNode;

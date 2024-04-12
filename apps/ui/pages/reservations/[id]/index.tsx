@@ -55,13 +55,9 @@ import {
   getGenericTerms,
 } from "@/modules/serverUtils";
 import { GET_RESERVATION } from "@/modules/queries/reservation";
-import {
-  base64encode,
-  containsField,
-  containsNameField,
-  filterNonNullable,
-} from "common/src/helpers";
+import { base64encode, filterNonNullable } from "common/src/helpers";
 import { fromApiDate } from "common/src/common/util";
+import { containsField, containsNameField } from "common/src/metaFieldsHelpers";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;

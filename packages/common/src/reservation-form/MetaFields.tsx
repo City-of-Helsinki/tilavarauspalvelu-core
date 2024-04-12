@@ -26,7 +26,8 @@ import { fontMedium, fontRegular } from "../common/typography";
 import type { OptionType } from "../../types/common";
 import { GroupHeading, Subheading, TwoColumnContainer } from "./styles";
 import IconPremises from "../icons/IconPremises";
-import { containsField, filterNonNullable } from "../helpers";
+import { containsField } from "../metaFieldsHelpers";
+import { filterNonNullable } from "../helpers";
 
 type CommonProps = {
   options: Record<string, OptionType[]>;

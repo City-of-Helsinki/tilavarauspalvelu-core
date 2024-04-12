@@ -1,9 +1,4 @@
-import { camelCase } from "lodash";
-import type {
-  Maybe,
-  ReservationMetadataFieldNode,
-  ReservationUnitImageNode,
-} from "../types/gql-types";
+import type { Maybe, ReservationUnitImageNode } from "../types/gql-types";
 import { pixel } from "./common/style";
 
 export function filterNonNullable<T>(
@@ -59,43 +54,6 @@ export function base64encode(str: string) {
 
 export function truncate(val: string, maxLen: number): string {
   return val.length > maxLen ? `${val.substring(0, maxLen - 1)}…` : val;
-}
-
-/// Transitional helper when moving from string fields
-/// backend field names are in snake_case so we convert them to camelCase
-/// TODO should be enums or string literals instead of arbitary strings
-export function containsField(
-  formFields: ReservationMetadataFieldNode[],
-  fieldName: string
-): boolean {
-  if (!formFields || formFields?.length === 0 || !fieldName) {
-    return false;
-  }
-  const found = formFields
-    .map((x) => x.fieldName)
-    .map(camelCase)
-    .find((x) => x === fieldName);
-  if (found != null) {
-    return true;
-  }
-  return false;
-}
-
-/// backend fields are in snake_case, containsField handles the conversion
-export function containsNameField(
-  formFields: ReservationMetadataFieldNode[]
-): boolean {
-  return (
-    containsField(formFields, "reserveeFirstName") ||
-    containsField(formFields, "reserveeLastName")
-  );
-}
-
-export function containsBillingField(
-  formFields: ReservationMetadataFieldNode[]
-): boolean {
-  const formFieldsNames = formFields.map((x) => x.fieldName).map(camelCase);
-  return formFieldsNames.some((x) => x.startsWith("billing"));
 }
 
 /// Always return an image because the Design and process should not allow imageless reservation units
