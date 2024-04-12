@@ -1,31 +1,24 @@
 import datetime
 from contextlib import contextmanager
 from dataclasses import dataclass
-from typing import Any
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
+from django.core.handlers.wsgi import WSGIRequest
 from django.utils.timezone import get_default_timezone
 from helusers.settings import api_token_auth_settings
 from jose import jwk, jwt
 from jose.constants import ALGORITHMS
 
+from tests.helpers import ResponseMock
 from users.models import User
-
-
-@dataclass
-class RequestMock:
-    data: dict[str, Any]
-
-    def json(self) -> dict[str, Any]:
-        return self.data
 
 
 @contextmanager
 def patch_oidc_config():
     issuer = api_token_auth_settings.ISSUER
     side_effects = [
-        RequestMock(data={"issuer": issuer, "jwks_uri": f"{issuer}/jwks"}),
-        RequestMock(data={"keys": [RSA.public_key]}),
+        ResponseMock(json_data={"issuer": issuer, "jwks_uri": f"{issuer}/jwks"}),
+        ResponseMock(json_data={"keys": [RSA.public_key]}),
     ]
 
     with patch("helusers.oidc.requests.get", side_effect=side_effects) as mock:
@@ -121,3 +114,9 @@ RQIDAQAB
 
 
 RSA = _build_key(RSA_PRIVATE_KEY, RSA_PUBLIC_KEY)
+
+
+def mock_request(user: User) -> WSGIRequest:
+    request = MagicMock()
+    request.user = user
+    return request

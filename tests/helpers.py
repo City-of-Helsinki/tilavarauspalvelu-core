@@ -71,36 +71,50 @@ T = TypeVar("T")
 P = ParamSpec("P")
 
 
-def patch_method(
-    method: Callable,
-    return_value: Any = None,
-    side_effect: Any = None,
-) -> Callable[[Callable[P, T]], Callable[P, T]]:
+class patch_method:
     """
     Patch a method inside a class.
 
     Used in place of 'mock.patch' to have the 'method' argument as a function instead of a string.
-    e.g.
-        @patch_method(MyClass.my_method, return_value=...)
-        def test_something(...):
-            ...
-
     Does not work on functions declared outside of classes.
+
+    >>> @patch_method(MyClass.my_method, return_value=...)
+    >>> def test_something(...):
+    >>>     ...
+
+    or
+
+    >>> @patch_method(MyClass.my_method)
+    >>> def test_something(...):
+    >>>     MyClass.my_method.return_value = ...
+    >>>     ...
+
+    or
+
+    >>> def test_something(...):
+    >>>     with patch_method(MyClass.my_method, return_value=...):
+    >>>         ...
     """
 
-    def decorator(func: Callable[P, T]) -> Callable[P, T]:
+    def __init__(self, method: Callable, return_value: Any = None, side_effect: Any = None) -> None:
+        # Get the full path to the method, e.g., 'module.submodule.Class.method'
+        method_path = method.__module__ + "." + method.__qualname__  # type: ignore[attr-defined]
+        self.patch = mock.patch(method_path, return_value=return_value, side_effect=side_effect)
+
+    def __call__(self, func: Callable[P, T]) -> Callable[P, T]:
         @wraps(func)
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
-            # Get the full path to the method, e.g., 'module.submodule.Class.method'
-            method_path = method.__module__ + "." + method.__qualname__  # type: ignore
-
             # Run the test with the method patched
-            with mock.patch(method_path, return_value=return_value, side_effect=side_effect):
+            with self.patch:
                 return func(*args, **kwargs)
 
         return wrapper
 
-    return decorator
+    def __enter__(self) -> Any:
+        return self.patch.__enter__()
+
+    def __exit__(self, *exc_info: Any) -> Any:
+        return self.patch.__exit__(*exc_info)
 
 
 def next_hour(plus_hours: int = 0, *, plus_minutes: int = 0, plus_days: int = 0) -> datetime.datetime:
