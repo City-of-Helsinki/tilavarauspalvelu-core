@@ -166,8 +166,8 @@ importers:
         specifier: 18.0.27
         version: 18.0.27
       '@types/react-dom':
-        specifier: 18.0.10
-        version: 18.0.10
+        specifier: 18.2.25
+        version: 18.2.25
       '@types/react-router-dom':
         specifier: ^5.3.3
         version: 5.3.3
@@ -338,8 +338,8 @@ importers:
         specifier: 18.0.27
         version: 18.0.27
       '@types/react-dom':
-        specifier: 18.0.10
-        version: 18.0.10
+        specifier: 18.2.25
+        version: 18.2.25
       '@types/react-transition-group':
         specifier: ^4.4.10
         version: 4.4.10
@@ -492,8 +492,8 @@ importers:
         specifier: ^1.8.8
         version: 1.8.8
       '@types/react-dom':
-        specifier: 18.0.10
-        version: 18.0.10
+        specifier: 18.2.25
+        version: 18.2.25
       '@types/styled-components':
         specifier: ^5.1.29
         version: 5.1.29
@@ -6802,7 +6802,7 @@ packages:
     dependencies:
       '@babel/runtime': 7.24.0
       '@testing-library/dom': 9.3.4
-      '@types/react-dom': 18.0.10
+      '@types/react-dom': 18.2.25
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
     dev: true
@@ -7019,8 +7019,8 @@ packages:
       '@types/react': 18.0.27
     dev: true
 
-  /@types/react-dom@18.0.10:
-    resolution: {integrity: sha512-E42GW/JA4Qv15wQdqJq8DL4JhNpB3prJgjgapN3qJT9K2zO5IIAQh4VXvCEDupoqAwnz0cY4RlXeC/ajX5SFHg==}
+  /@types/react-dom@18.2.25:
+    resolution: {integrity: sha512-o/V48vf4MQh7juIKZU2QGDfli6p1+OOi5oXx36Hffpc9adsHeXjVp8rHuPkjd8VT8sOJ2Zp05HR7CdpGTIUFUA==}
     dependencies:
       '@types/react': 18.0.27
     dev: true
