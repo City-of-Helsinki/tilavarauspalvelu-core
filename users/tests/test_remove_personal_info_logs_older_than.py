@@ -4,10 +4,7 @@ from freezegun import freeze_time
 
 from tests.factories import UserFactory
 from users.models import PersonalInfoViewLog
-from users.tasks import remove_old_personal_info_view_logs
-from users.utils.remove_personal_info_view_logs import (
-    remove_personal_info_view_logs_older_than,
-)
+from users.tasks import remove_old_personal_info_view_logs, remove_personal_info_view_logs_older_than
 
 
 class RemovePersonalInfoViewLogsOlderThanTestCase(TestCase):
