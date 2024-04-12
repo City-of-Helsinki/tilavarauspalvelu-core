@@ -3,7 +3,6 @@ from typing import Any, Literal
 
 from requests import Response, request
 
-from merchants.verkkokauppa.constants import REQUEST_TIMEOUT_SECONDS
 from utils.external_service.errors import ExternalServiceParseJSONError, ExternalServiceRequestError
 
 
@@ -52,7 +51,7 @@ class BaseExternalServiceClient:
         return cls._get_headers(headers)
 
     @classmethod
-    def response_json(cls, response: Response) -> dict:
+    def response_json(cls, response: Response) -> dict[str, Any]:
         """
         Parse a response from an API as json
         Raises an appropriate error if parsing fails or response is not ok
@@ -74,7 +73,7 @@ class BaseExternalServiceClient:
 
     @classmethod
     def generic(cls, method: Literal["get", "post", "put"], url: str, **kwargs) -> Response:
-        return request(method, url, **kwargs, timeout=REQUEST_TIMEOUT_SECONDS)
+        return request(method, url, **kwargs, timeout=cls.REQUEST_TIMEOUT_SECONDS)
 
     @classmethod
     def get(cls, *, url: str, params: dict[str, Any] | None = None, headers: dict[str, Any] | None = None) -> Response:
