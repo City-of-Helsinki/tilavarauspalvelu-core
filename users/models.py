@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import uuid
 from functools import cached_property
-from typing import Self
+from typing import TYPE_CHECKING, Self
 
 from django.conf import settings
 from django.contrib.postgres.aggregates import StringAgg
@@ -12,6 +14,12 @@ from helsinki_gdpr.models import SerializableMixin
 from helusers.models import AbstractUser
 
 from common.db import SubqueryArray
+from users.helauth.typing import IDToken
+from users.helauth.utils import get_jwt_payload
+
+if TYPE_CHECKING:
+    from social_django.models import UserSocialAuth
+
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
@@ -97,8 +105,7 @@ class User(AbstractUser):
     @cached_property
     def general_permissions(self) -> list[str]:
         """Get general permissions for the user."""
-        # Could have been annotated in the queryset, so use the annotated value if available.
-        # See. `users.models.ProxyUserSocialAuth.get_user`.
+        # Could have been annotated in `get_user`, so use the annotated value if available.
         if hasattr(self, "_general_permissions"):
             return self._general_permissions
 
@@ -115,8 +122,7 @@ class User(AbstractUser):
         """Get unit permissions by unit id for the user."""
         perms: dict[int, list[str]] = {}
 
-        # Could have been annotated in the `users.models.ProxyUserSocialAuth.get_user`,
-        # so use the annotated value if available.
+        # Could have been annotated in `get_user`, so use the annotated value if available.
         if hasattr(self, "_unit_permissions"):
             item: str
             for item in self._unit_permissions:
@@ -150,8 +156,7 @@ class User(AbstractUser):
         """Get unit permissions by unit group id for the user."""
         perms: dict[int, list[str]] = {}
 
-        # Could have been annotated in the `users.models.ProxyUserSocialAuth.get_user`,
-        # so use the annotated value if available.
+        # Could have been annotated in `get_user`, so use the annotated value if available.
         if hasattr(self, "_unit_group_permissions"):
             item: str
             for item in self._unit_group_permissions:
@@ -185,8 +190,7 @@ class User(AbstractUser):
         """Get service sector permissions by service sector id for the user."""
         perms: dict[int, list[str]] = {}
 
-        # Could have been annotated in the `users.models.ProxyUserSocialAuth.get_user`,
-        # so use the annotated value if available.
+        # Could have been annotated in `get_user`, so use the annotated value if available.
         if hasattr(self, "_service_sector_permissions"):
             item: str
             for item in self._service_sector_permissions:
@@ -207,6 +211,39 @@ class User(AbstractUser):
         for perm in sector_perms:
             perms.setdefault(perm["service_sector"], []).append(perm["permission"])
         return perms
+
+    @property
+    def current_social_auth(self) -> UserSocialAuth | None:
+        # After login in once, the user will have a UserSocialAuth entry created for it.
+        # This entry is updated when the user logs in again, so we can use it to get the
+        # latest login information. If the user has multiple entries (for some reason),
+        # we use the latest modified one.
+        return self.social_auth.order_by("-modified").first()
+
+    @property
+    def id_token(self) -> IDToken | None:
+        social_auth = self.current_social_auth
+        if social_auth is None:
+            return None
+
+        payload = get_jwt_payload(social_auth.extra_data["id_token"])
+        return IDToken(
+            iss=payload.get("iss"),
+            sub=payload.get("sub"),
+            aud=payload.get("aud"),
+            exp=payload.get("exp"),
+            iat=payload.get("iat"),
+            auth_time=payload.get("auth_time"),
+            nonce=payload.get("nonce"),
+            at_hash=payload.get("at_hash"),
+            email=payload.get("email"),
+            email_verified=payload.get("email_verified"),
+            ad_groups=payload.get("ad_groups"),
+            azp=payload.get("azp"),
+            sid=payload.get("sid"),
+            amr=payload.get("amr"),
+            loa=payload.get("loa"),
+        )
 
 
 class PersonalInfoViewLog(models.Model):
@@ -262,13 +299,16 @@ class ProfileUser(SerializableMixin, User):
 
 def get_user(pk: int) -> User | None:
     """
-    This method is called by python-social-auth and to fetch the user object during HTTP requests.
+    This method is called by the authentication backends to fetch the request user object.
     Any optimization for fetching the user should be done here.
     """
     from permissions.models import GeneralRolePermission, ServiceSectorRolePermission, UnitRolePermission
 
     try:
         # Annotate permissions to the user object, since they are used so often.
+        # These permissions can then be accessed from corresponding properties of the user object,
+        # without the underscore prefix. The data is modifier slightly in said properties,
+        # see the specific properties for more information.
         return User.objects.annotate(
             # General Permissions in form: ["<permission>", ...]
             _general_permissions=SubqueryArray(
