@@ -1,22 +1,20 @@
+import contextlib
 import re
 from datetime import date
 from typing import Any, TypedDict, Unpack
 
-import requests
-from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
 from helusers.tunnistamo_oidc import TunnistamoOIDCAuth
 from social_django.models import DjangoStorage, UserSocialAuth
 from social_django.strategy import DjangoStrategy
 
-from common.utils import get_nested
 from users.helauth.clients import HelsinkiProfileClient
 from users.models import User
 from utils.sentry import SentryLogger
 
 __all__ = [
     "fetch_additional_info_for_user_from_helsinki_profile",
-    "id_number_to_date",
+    "ssn_to_date",
     "update_user_from_profile",
 ]
 
@@ -83,65 +81,53 @@ def fetch_additional_info_for_user_from_helsinki_profile(
 
     id_token = user.id_token
     if not id_token.is_ad_login and user.profile_id == "":
-        token = HelsinkiProfileClient.get_token(request)
-        try:
-            update_user_from_profile(user, token)
-        except Exception as err:
-            SentryLogger.log_exception(err, "Helsinki-profiili: Failed to update user from profile")
+        update_user_from_profile(request, user=user)
 
     return {"user": user}
 
 
-def update_user_from_profile(user: User, token: str | None) -> None:
-    if token is None:
-        SentryLogger.log_message(f"Helsinki-profiili: Could not fetch JWT from Tunnistamo for user {user.pk!r}")
-        return
-
-    query = """
-        query {
-            myProfile {
-                id
-                verifiedPersonalInformation {
-                    nationalIdentificationNumber
-                }
-            }
-        }
+@contextlib.contextmanager
+def use_request_user(*, request: WSGIRequest, user: User):
     """
-    response = requests.get(
-        settings.OPEN_CITY_PROFILE_GRAPHQL_API,
-        json={"query": query},
-        headers={"Authorization": f"Bearer {token}"},
-        timeout=5,
-    )
-    data = response.json()
-    if "errors" in data:
-        msg = data["errors"][0]["message"]
-        SentryLogger.log_message(msg)
+    Use the provided user as the request user for the duration of the context.
+    This is needed since during login, the request user is still anonymous.
+    """
+    original_user = request.user
+    try:
+        request.user = user
+        yield
+    finally:
+        request.user = original_user
+
+
+@SentryLogger.log_if_raises("Helsinki profile: Failed to update user from profile")
+def update_user_from_profile(request: WSGIRequest, *, user: User | None = None) -> None:
+    user = user or request.user
+    if user.is_anonymous:
         return
 
-    profile_id: str | None = get_nested(data, "data", "myProfile", "id")
-    if profile_id is None:
-        SentryLogger.log_message(f"Helsinki-profiili: Profile ID not found for user {user.pk!r}")
+    with use_request_user(request=request, user=user):
+        ssn_data = HelsinkiProfileClient.get_social_security_number(request)
+
+    if ssn_data is None:
+        SentryLogger.log_message(f"Helsinki profile: Could not fetch JWT from Tunnistamo for user {user.pk!r}")
         return
 
-    user.profile_id = profile_id
+    if ssn_data["id"] is None:
+        SentryLogger.log_message(f"Helsinki profile: Profile ID not found for user {user.pk!r}")
+        return
 
-    id_number: str | None = get_nested(
-        data,
-        "data",
-        "myProfile",
-        "verifiedPersonalInformation",
-        "nationalIdentificationNumber",
-    )
-    if id_number is None:
-        SentryLogger.log_message(f"Helsinki-profiili: ID number not found for user {user.pk!r}")
+    user.profile_id = ssn_data["id"]
+
+    if ssn_data["social_security_number"] is None:
+        SentryLogger.log_message(f"Helsinki profile: ID number not found for user {user.pk!r}")
         user.save()
         return
 
-    date_of_birth = id_number_to_date(id_number)
+    date_of_birth = ssn_to_date(ssn_data["social_security_number"])
     if date_of_birth is None:
         SentryLogger.log_message(
-            f"Helsinki-profiili: ID number received from profile was not of correct format for user {user.pk!r}"
+            f"Helsinki profile: ID number received from profile was not of correct format for user {user.pk!r}"
         )
         user.save()
         return
@@ -150,7 +136,7 @@ def update_user_from_profile(user: User, token: str | None) -> None:
     user.save()
 
 
-def id_number_to_date(id_number: str) -> date | None:
+def ssn_to_date(id_number: str) -> date | None:
     if ID_PATTERN.fullmatch(id_number) is None:
         return None
 
