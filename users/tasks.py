@@ -1,10 +1,8 @@
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 
 from tilavarauspalvelu.celery import app
 from users.models import PersonalInfoViewLog
-from users.utils.remove_personal_info_view_logs import (
-    remove_personal_info_view_logs_older_than,
-)
 
 
 @app.task(name="save_personal_info_view_log")
@@ -29,3 +27,11 @@ def save_personal_info_view_log(user_id: int, viewer_user_id: int, field: str):
 @app.task(name="remove_old_personal_info_view_logs")
 def remove_old_personal_info_view_logs():
     remove_personal_info_view_logs_older_than()
+
+
+REMOVE_OLDER_THAN_DAYS = 365 * 2
+
+
+def remove_personal_info_view_logs_older_than(days: int = REMOVE_OLDER_THAN_DAYS):
+    remove_lt = timezone.now() - timezone.timedelta(days=days)
+    PersonalInfoViewLog.objects.filter(access_time__lt=remove_lt).delete()
