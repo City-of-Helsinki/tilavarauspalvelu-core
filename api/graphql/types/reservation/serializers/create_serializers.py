@@ -1,6 +1,8 @@
 import datetime
+from typing import Any
 
 from django.conf import settings
+from django.core.handlers.wsgi import WSGIRequest
 from django.utils.timezone import get_default_timezone
 from graphql import GraphQLError
 from rest_framework import serializers
@@ -23,8 +25,9 @@ from reservations.choices import (
     ReservationTypeChoice,
 )
 from reservations.models import AgeGroup, Reservation, ReservationPurpose
-from users.helauth.utils import get_id_token, is_ad_login
-from users.utils.open_city_profile.basic_info_resolver import ProfileReadError, ProfileUserInfoReader
+from users.helauth.clients import HelsinkiProfileClient
+from users.models import User
+from utils.external_service.errors import ExternalServiceError
 from utils.sentry import SentryLogger
 
 DEFAULT_TIMEZONE = get_default_timezone()
@@ -132,7 +135,7 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
         self.fields["num_persons"].required = False
         self.fields["purpose_pk"].required = False
 
-    def validate(self, data, prefill_from_profile=True):
+    def validate(self, data: dict[str, Any], prefill_from_profile: bool = True) -> dict[str, Any]:
         begin: datetime.datetime = data.get("begin", getattr(self.instance, "begin", None))
         end: datetime.datetime = data.get("end", getattr(self.instance, "end", None))
         begin = begin.astimezone(DEFAULT_TIMEZONE)
@@ -166,11 +169,12 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
         data["state"] = ReservationStateChoice.CREATED.value
         data["buffer_time_before"], data["buffer_time_after"] = self._calculate_buffers(begin, end, reservation_units)
 
-        user = self.context.get("request").user
-        if user.is_anonymous:
-            user = None
+        request: WSGIRequest = self.context["request"]
+        request_user: User | None = request.user
+        if request_user.is_anonymous:
+            request_user = None
 
-        data["user"] = user
+        data["user"] = request_user
 
         if self.requires_price_calculation(data):
             price_calculation_result = self.calculate_price(begin, end, reservation_units)
@@ -181,15 +185,13 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
             data["non_subsidised_price"] = price_calculation_result.non_subsidised_price
             data["non_subsidised_price_net"] = price_calculation_result.non_subsidised_price_net
 
-        reservation_type = data.get("type", None)
+        reservation_type = data.get("type")
         reservation_unit_ids = [x.pk for x in reservation_units]
-        self.check_reservation_type(user, reservation_unit_ids, reservation_type)
+        self.check_reservation_type(request_user, reservation_unit_ids, reservation_type)
 
         prefill_from_profile = prefill_from_profile and settings.PREFILL_RESERVATION_WITH_PROFILE_DATA
-        id_token = get_id_token(user) or {}
-
-        if prefill_from_profile and not is_ad_login(id_token):
-            data = self._prefill_from_from_profile(user, data)
+        if prefill_from_profile:
+            self._prefill_reservation_from_profile(data)
 
         return data
 
@@ -214,35 +216,27 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
 
         return buffer_time_before, buffer_time_after
 
-    def _prefill_from_from_profile(self, user, data):
+    def _prefill_reservation_from_profile(self, data: dict[str, Any]) -> None:
+        request: WSGIRequest = self.context["request"]
+        user: AnyUser = request.user
+        if user.is_anonymous:
+            return
+
+        id_token = user.id_token
+        if id_token is None or id_token.is_ad_login:
+            return
+
         try:
-            reader = ProfileUserInfoReader(user, self.context.get("request"))
+            prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(request)
+        except ExternalServiceError:
+            return
+        except Exception as error:
+            msg = "Unexpected error reading profile data"
+            SentryLogger.log_exception(error, details=msg, user=user.pk)
+            return
 
-            basic_details = {
-                "reservee_first_name": reader.get_first_name(),
-                "reservee_last_name": reader.get_last_name(),
-                "reservee_email": reader.get_email(),
-                "reservee_phone": reader.get_phone(),
-                "home_city": reader.get_user_home_city(),
-            }
-
-            for key, value in [(key, value) for key, value in basic_details.items() if value]:
-                data[key] = value
-
-            address = reader.get_address()
-            if address and address.get("address"):
-                data["reservee_address_street"] = address.get("address")
-            if address and address.get("postalCode"):
-                data["reservee_address_zip"] = address.get("postalCode")
-            if address and address.get("city"):
-                data["reservee_address_city"] = address.get("city")
-
-        except ProfileReadError as prof_err:
-            SentryLogger.log_exception(prof_err, details="Error reading profile data", user=user, data=data)
-        except Exception as ex:
-            SentryLogger.log_exception(ex, details="Unexpected error reading profile data", user=user, data=data)
-
-        return data
+        if prefill_info is not None:
+            data.update(prefill_info)
 
     def check_sku(self, current_sku, new_sku):
         if current_sku is not None and current_sku != new_sku:
