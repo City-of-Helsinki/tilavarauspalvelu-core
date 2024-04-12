@@ -2,7 +2,6 @@ import datetime
 from contextlib import contextmanager
 from functools import partial
 from typing import Any
-from unittest.mock import patch
 
 from graphene_django_extensions.testing import build_mutation, build_query
 
@@ -10,7 +9,9 @@ from reservation_units.models import ReservationUnit
 from reservations.choices import ReservationTypeChoice
 from reservations.models import Reservation
 from tests.factories import ReservationCancelReasonFactory, ReservationDenyReasonFactory
-from tests.helpers import ResponseMock, next_hour
+from tests.factories.helsinki_profile import MyProfileDataFactory
+from tests.helpers import ResponseMock, next_hour, patch_method
+from users.helauth.clients import HelsinkiProfileClient
 
 reservation_query = partial(build_query, "reservation")
 reservations_query = partial(build_query, "reservations", connection=True, order_by="pkAsc")
@@ -32,34 +33,14 @@ UPDATE_WORKING_MEMO_MUTATION = build_mutation("updateReservationWorkingMemo", "R
 
 
 @contextmanager
-def mock_profile_reader(profile_data: dict[str, Any] | None = None, **kwargs: Any):
-    if profile_data is None:
-        profile_data = {
-            "firstName": "John",
-            "lastName": "Doe",
-            "primaryAddress": {
-                "postalCode": "00100",
-                "address": "Test street 1",
-                "city": "Helsinki",
-                "addressType": "HOME",
-            },
-            "primaryPhone": {
-                "phone": "123456789",
-            },
-            "verifiedPersonalInformation": {
-                "municipalityOfResidence": "Helsinki",
-                "municipalityOfResidenceNumber": "12345",
-            },
-        }
+def mock_profile_reader(**kwargs: Any):
+    profile_data = MyProfileDataFactory.create_basic(**kwargs)
+    response = ResponseMock(json_data={"data": {"myProfile": profile_data}})
+    patch_http = patch_method(HelsinkiProfileClient.generic, return_value=response)
+    patch_token = patch_method(HelsinkiProfileClient.get_token, return_value="foo")
 
-    profile_data.update(kwargs)
-    data = {"data": {"myProfile": profile_data}}
-
-    response = ResponseMock(status_code=200, json_data=data)
-    get_from_profile = "users.utils.open_city_profile.basic_info_resolver.requests.get"
-    get_profile_token = "users.utils.open_city_profile.mixins.get_profile_token"  # noqa: S105
-    with patch(get_from_profile, return_value=response) as mock, patch(get_profile_token, return_value="token"):
-        yield mock
+    with patch_http, patch_token:
+        yield
 
 
 def get_adjust_data(reservation: Reservation, **overrides: Any) -> dict[str, Any]:
