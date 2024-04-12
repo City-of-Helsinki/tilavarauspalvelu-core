@@ -5,7 +5,6 @@ from graphene_django_extensions import DjangoNode
 
 from api.graphql.types.user.permissions import UserPermission
 from common.typing import GQLInfo
-from users.helauth.utils import get_id_token, is_ad_login, is_strong_login
 from users.models import User
 from users.tasks import save_personal_info_view_log
 
@@ -50,13 +49,13 @@ class UserNode(DjangoNode):
         return root.date_of_birth
 
     def resolve_is_ad_authenticated(root: User, info: GQLInfo) -> bool:
-        token = get_id_token(root)
+        token = root.id_token
         if token is None:
             return False
-        return is_ad_login(token)
+        return token.is_ad_login
 
     def resolve_is_strongly_authenticated(root: User, info: GQLInfo) -> bool:
-        token = get_id_token(root)
+        token = root.id_token
         if token is None:
             return False
-        return is_strong_login(token)
+        return token.is_strong_login

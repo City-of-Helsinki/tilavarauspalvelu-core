@@ -1,6 +1,6 @@
 import re
 from datetime import date
-from typing import Any, TypedDict
+from typing import Any, TypedDict, Unpack
 
 import requests
 from django.conf import settings
@@ -10,7 +10,7 @@ from social_django.models import DjangoStorage, UserSocialAuth
 from social_django.strategy import DjangoStrategy
 
 from common.utils import get_nested
-from users.helauth.utils import get_profile_token, is_ad_login
+from users.helauth.clients import HelsinkiProfileClient
 from users.models import User
 from utils.sentry import SentryLogger
 
@@ -76,12 +76,14 @@ def fetch_additional_info_for_user_from_helsinki_profile(
     backend: TunnistamoOIDCAuth,
     request: WSGIRequest,
     user: User | None = None,
-    **kwargs: Any,  # NOSONAR
+    **kwargs: Unpack[ExtraKwargs],
 ) -> dict[str, Any]:
-    kwargs: ExtraKwargs  # NOSONAR
-    id_token = backend.id_token or {}
-    if not is_ad_login(id_token) and user.profile_id == "":
-        token = get_profile_token(request)
+    if user is None:
+        return {"user": user}
+
+    id_token = user.id_token
+    if not id_token.is_ad_login and user.profile_id == "":
+        token = HelsinkiProfileClient.get_token(request)
         try:
             update_user_from_profile(user, token)
         except Exception as err:
