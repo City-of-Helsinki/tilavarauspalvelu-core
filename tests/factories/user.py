@@ -3,7 +3,8 @@ import json
 import uuid
 from base64 import urlsafe_b64encode
 from collections.abc import Iterable
-from typing import Any
+from dataclasses import asdict
+from typing import Any, Literal
 
 import factory
 from django.conf import settings
@@ -12,7 +13,7 @@ from social_django.models import UserSocialAuth
 
 from permissions.models import GeneralPermissionChoices, ServiceSectorPermissionsChoices, UnitPermissionChoices
 from spaces.models import ServiceSector, Unit, UnitGroup
-from users.helauth.utils import IDToken
+from users.helauth.typing import IDToken
 from users.models import User
 
 from ._base import GenericDjangoModelFactory
@@ -160,11 +161,11 @@ class UserSocialAuthFactory(GenericDjangoModelFactory[UserSocialAuth]):
         model = UserSocialAuth
 
     user = factory.SubFactory(UserFactory)
-    provider = "helsinki"
+    provider = "tunnistamo"  # matches `tilavarauspalvelu.auth.ProxyTunnistamoOIDCAuthBackend.name`
     uid = factory.Sequence(lambda n: f"{n}")
 
     @factory.post_generation
-    def extra_data(self, create: bool, extra_data: dict[str, Any] | None, **kwargs: Any) -> None:
+    def extra_data(self: UserSocialAuth, create: bool, extra_data: dict[str, Any] | None, **kwargs: Any) -> None:
         if not create:
             return
         self.extra_data = extra_data or get_extra_data(self, **kwargs)
@@ -184,7 +185,7 @@ def get_extra_data(instance: UserSocialAuth, **kwargs: Any) -> dict[str, Any]:
 def get_id_token(
     instance: UserSocialAuth,
     amr: str = "helsinkiazuread",
-    loa: str = "low",
+    loa: Literal["substantial", "low"] = "low",
     ad_groups: Iterable[str] = (),
 ) -> str:
     return ".".join(
@@ -201,22 +202,24 @@ def get_id_token(
             # Payload
             urlsafe_b64encode(
                 json.dumps(
-                    IDToken(
-                        iss="https://tunnistamo.test.hel.ninja/openid",
-                        sub=str(instance.user.uuid),
-                        aud="tilavaraus-test",
-                        exp=int(datetime.datetime.now().timestamp()),
-                        iat=int(datetime.datetime.now().timestamp()),
-                        auth_time=int(datetime.datetime.now().timestamp()),
-                        nonce=get_random_string(64),
-                        at_hash=uuid.uuid4().hex,
-                        email=instance.user.email,
-                        email_verified=True,
-                        ad_groups=list(ad_groups),
-                        azp="tilavaraus-test",
-                        sid=uuid.uuid4().hex,
-                        amr=amr,
-                        loa=loa,
+                    asdict(
+                        IDToken(
+                            iss="https://tunnistamo.test.hel.ninja/openid",
+                            sub=str(instance.user.uuid),
+                            aud="tilavaraus-test",
+                            exp=int(datetime.datetime.now().timestamp()),
+                            iat=int(datetime.datetime.now().timestamp()),
+                            auth_time=int(datetime.datetime.now().timestamp()),
+                            nonce=get_random_string(64),
+                            at_hash=uuid.uuid4().hex,
+                            email=instance.user.email,
+                            email_verified=True,
+                            ad_groups=list(ad_groups),
+                            azp="tilavaraus-test",
+                            sid=uuid.uuid4().hex,
+                            amr=amr,
+                            loa=loa,
+                        )
                     ),
                 ).encode(),
             ).decode(),

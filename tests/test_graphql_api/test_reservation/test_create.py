@@ -25,8 +25,9 @@ from tests.factories import (
     SpaceFactory,
     UserFactory,
 )
-from tests.helpers import UserType, next_hour
-from users.helauth.utils import ADLoginAMR
+from tests.helpers import ResponseMock, UserType, next_hour, patch_method
+from users.helauth.clients import HelsinkiProfileClient
+from users.helauth.typing import ADLoginAMR
 from utils.decimal_utils import round_decimal
 
 from .helpers import CREATE_MUTATION, get_create_data, mock_profile_reader
@@ -830,7 +831,7 @@ def test_reservation__create__prefill_profile_data(graphql, settings, arm):
     # given:
     # - Prefill setting is on
     # - There is a reservation unit in the system
-    # - The reservation unit has reservable time span
+    # - The reservation unit has a reservable time span
     # - There is a city in the system
     # - A regular user who has logged in with Suomi.fi is using the system
     settings.PREFILL_RESERVATION_WITH_PROFILE_DATA = True
@@ -854,18 +855,23 @@ def test_reservation__create__prefill_profile_data(graphql, settings, arm):
     reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
 
     # Check that the reservation has been prefilled with the profile data
-    assert reservation.reservee_first_name == "John"
-    assert reservation.reservee_last_name == "Doe"
-    assert reservation.reservee_address_city == "Helsinki"
-    assert reservation.reservee_address_street == "Test street 1"
+    assert reservation.reservee_first_name == "Example"
+    assert reservation.reservee_last_name == "User"
+    assert reservation.reservee_email == "user@example.com"
+    assert reservation.reservee_phone == "0123456789"
+    assert reservation.reservee_address_street == "Example street 1"
     assert reservation.reservee_address_zip == "00100"
+    assert reservation.reservee_address_city == "Helsinki"
     assert reservation.home_city.name == "Helsinki"
 
 
-def test_create_reservation__prefilled_with_profile_data__missing(graphql, settings):
+@patch_method(HelsinkiProfileClient.generic, return_value=ResponseMock(status_code=500, json_data={}))
+@patch_method(HelsinkiProfileClient.get_token, return_value="foo")
+def test_reservation__create__prefilled_with_profile_data__api_call_fails(graphql, settings):
     # given:
     # - Prefill setting is on
     # - There is a reservation unit in the system
+    # - The reservation unit has a reservable time span
     # - There is a city in the system
     # - A regular user who has logged in with Suomi.fi is using the system
     settings.PREFILL_RESERVATION_WITH_PROFILE_DATA = True
@@ -876,7 +882,7 @@ def test_create_reservation__prefilled_with_profile_data__missing(graphql, setti
     graphql.force_login(user)
 
     # when:
-    # - The user tries to create a reservation, but the profile data is missing
+    # - The user tries to create a reservation, but the helsinki profile call fails.
     data = get_create_data(reservation_unit)
     response = graphql(CREATE_MUTATION, input_data=data)
 
@@ -895,7 +901,7 @@ def test_create_reservation__prefilled_with_profile_data__missing(graphql, setti
 
 
 @pytest.mark.parametrize("arm", ADLoginAMR)
-def test_create_reservation__prefilled_with_profile_data__ad_login(graphql, settings, arm: ADLoginAMR):
+def test_reservation__create__prefilled_with_profile_data__ad_login(graphql, settings, arm: ADLoginAMR):
     # given:
     # - Prefill setting is on
     # - There is a reservation unit in the system
@@ -929,7 +935,7 @@ def test_create_reservation__prefilled_with_profile_data__ad_login(graphql, sett
 
 
 @freezegun.freeze_time("2021-01-01")
-def test_create_reservation__reservation_block_whole_day__non_reserved_time_is_filled_by_buffers(graphql):
+def test_reservation__create__reservation_block_whole_day__non_reserved_time_is_filled_by_buffers(graphql):
     reservation_unit = ReservationUnitFactory.create(
         origin_hauki_resource=OriginHaukiResourceFactory(id=999),
         reservation_block_whole_day=True,
@@ -963,7 +969,7 @@ def test_create_reservation__reservation_block_whole_day__non_reserved_time_is_f
 
 
 @freezegun.freeze_time("2021-01-01")
-def test_create_reservation__reservation_block_whole_day__start_and_end_at_midnight_has_no_buffers(graphql):
+def test_reservation__create__reservation_block_whole_day__start_and_end_at_midnight_has_no_buffers(graphql):
     reservation_unit = ReservationUnitFactory.create(
         origin_hauki_resource=OriginHaukiResourceFactory(id=999),
         reservation_block_whole_day=True,
@@ -1004,7 +1010,7 @@ def test_create_reservation__reservation_block_whole_day__start_and_end_at_midni
         (timedelta(hours=3), "Reservation overlaps with reservation before due to buffer time."),
     ],
 )
-def test_create_reservation__reservation_block_whole_day__blocks_reserving_for_new_reservation(
+def test_reservation__create__reservation_block_whole_day__blocks_reserving_for_new_reservation(
     graphql,
     new_reservation_begin_delta,
     error_message,
