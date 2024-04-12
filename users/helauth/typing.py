@@ -155,6 +155,9 @@ class ProfileEdges[T](TypedDict):
     edges: list[ProfileNode[T]]
 
 
+# Note `total=False`. This means that the responses could be missing any of the fields!
+
+
 class ProfilePhone(TypedDict, total=False):
     phone: str | None
     phoneType: Literal["MOBILE", "HOME", "WORK", "OTHER", "NONE"] | None
@@ -194,6 +197,7 @@ class VerifiedPersonalInfo(TypedDict, total=False):
 
 
 class MyProfileData(TypedDict, total=False):
+    id: str | None  # random string
     firstName: str | None
     lastName: str | None
     nickname: str | None
@@ -230,3 +234,8 @@ class ReservationPrefillInfo(TypedDict):
     reservee_address_zip: str | None
     reservee_address_city: str | None
     home_city: City | None
+
+
+class SocialSecurityNumberInfo(TypedDict):
+    id: str | None  # random string
+    social_security_number: str | None
