@@ -253,7 +253,7 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
 
         if response.status_code != 200:
             msg = (
-                f"Unable to get API tokens for helsinki profile for user {request.user.pk}: "
+                f"Unable to get API tokens for helsinki profile for user {int(request.user.pk)}: "
                 f"[{response.status_code}] {response.text}"
             )
             logger.info(msg)
@@ -310,7 +310,7 @@ class TunnistamoClient(BaseExternalServiceClient):
 
         social_auth = user.current_social_auth
         if social_auth is None:
-            msg = f"Unable to get `social_auth` for user {request.user.pk}."
+            msg = f"Unable to get `social_auth` for user {int(request.user.pk)}."
             logger.info(msg)
             return None
 
@@ -323,7 +323,7 @@ class TunnistamoClient(BaseExternalServiceClient):
             # Delegate refresh to OAuth backend.
             response: RefreshResponse = backend.refresh_token(token=extra_data["refresh_token"])
         except HTTPError as error:
-            msg = f"Unable to refresh token for user {request.user.pk}: {error.response.text}"
+            msg = f"Unable to refresh token for user {int(request.user.pk)}: {error.response.text}"
             logger.info(msg, exc_info=error)
             return None
 
