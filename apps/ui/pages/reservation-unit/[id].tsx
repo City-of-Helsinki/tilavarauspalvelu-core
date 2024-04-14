@@ -18,7 +18,6 @@ import {
   addSeconds,
   addYears,
   differenceInMinutes,
-  isToday,
   startOfDay,
 } from "date-fns";
 import {
@@ -473,52 +472,41 @@ const ReservationUnit = ({
   const hash = router.asPath.split("#")[1];
 
   const reservableTimeSpans = reservationUnit?.reservableTimeSpans;
-  const todaysTimeSpans = useMemo(
-    () =>
-      reservableTimeSpans.filter(
-        (span) => span.startDatetime && isToday(new Date(span.startDatetime))
-      ),
-    [reservableTimeSpans]
-  );
-  const searchUIDate = fromUIDate(searchDate ?? "");
-  const durationOptions = useMemo(() => {
-    const {
-      minReservationDuration,
-      maxReservationDuration,
-      reservationStartInterval,
-    } = reservationUnit || {};
-    if (
-      minReservationDuration == null ||
-      maxReservationDuration == null ||
-      reservationStartInterval == null
-    ) {
-      return [];
-    }
-    return getDurationOptions(
-      minReservationDuration,
-      maxReservationDuration,
-      reservationStartInterval,
-      t
-    );
-  }, [reservationUnit, t]);
+
+  const { maxReservationDuration, reservationStartInterval } =
+    reservationUnit || {};
+
   const minReservationDuration = reservationUnit.minReservationDuration
     ? reservationUnit.minReservationDuration / 60
     : 30;
-  const initialFieldValues = {
+
+  const durationOptions = getDurationOptions(
+    minReservationDuration ?? undefined,
+    maxReservationDuration ?? undefined,
+    reservationStartInterval,
+    t
+  );
+
+  const searchUIDate = fromUIDate(searchDate ?? "");
+  // TODO should be the first reservable day (the reservableTimeSpans logic is too complex and needs refactoring)
+  // i.e. using a naive approach will return empty timespsans either reuse the logic for QuickReservation or refactor
+  const defaultDate = new Date();
+  const defaultDateString = toUIDate(defaultDate);
+  const defaultValues = {
     date:
-      searchDate && searchUIDate && isValidDate(searchUIDate)
-        ? searchDate
-        : toUIDate(new Date(todaysTimeSpans[0]?.startDatetime ?? "")),
+      searchUIDate != null && isValidDate(searchUIDate)
+        ? searchDate ?? ""
+        : defaultDateString,
     duration: searchDuration ?? minReservationDuration,
-    time:
-      searchTime ??
-      getTimeString(new Date(todaysTimeSpans[0]?.startDatetime ?? "")),
+    time: searchTime ?? getTimeString(defaultDate),
   };
+
   const reservationForm = useForm<PendingReservationFormType>({
-    defaultValues: initialFieldValues,
+    defaultValues,
     mode: "onChange",
     resolver: zodResolver(PendingReservationFormSchema),
   });
+
   const { watch, setValue } = reservationForm;
   const durationValue =
     watch("duration") ?? durationOptions[0]?.value ?? minReservationDuration;
@@ -667,12 +655,17 @@ const ReservationUnit = ({
 
   const [shouldCalendarControlsBeVisible, setShouldCalendarControlsBeVisible] =
     useState(false);
-  const isClientATouchDevice = isTouchDevice();
+
   const handleCalendarEventChange = useCallback(
     ({ start, end }: CalendarEvent<ReservationType>): boolean => {
       if (!reservationUnit) {
         return false;
       }
+
+      if (isReservationQuotaReached) {
+        return false;
+      }
+
       if (
         !isReservationReservable({
           reservationUnit,
@@ -680,15 +673,16 @@ const ReservationUnit = ({
           start,
           end,
           skipLengthCheck: false,
-        }) ||
-        isReservationQuotaReached
+        })
       ) {
         return false;
       }
 
+      // Limit the duration to the max reservation duration
+      // TODO should be replaced with a utility function that is properly named
       const newReservation = getNewReservation({
-        start: new Date(start),
-        end: addMinutes(new Date(start), durationValue),
+        start,
+        end,
         reservationUnit,
       });
 
@@ -696,30 +690,29 @@ const ReservationUnit = ({
       const newTime = getTimeString(new Date(newReservation.begin));
       setValue("date", newDate);
       setValue("time", newTime);
+      setValue("duration", differenceInMinutes(end, start));
 
-      if (isClientATouchDevice) {
+      if (isTouchDevice()) {
         setShouldCalendarControlsBeVisible(true);
       }
 
       return true;
     },
     [
-      isClientATouchDevice,
       isReservationQuotaReached,
       reservationUnit,
       activeApplicationRounds,
       setValue,
-      durationValue,
     ]
   );
 
   const handleSlotClick = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO Calendar prop typing
     ({ start, end, action }: any): boolean => {
-      const isTouchClick = action === "select" && isClientATouchDevice;
+      const isTouchClick = action === "select" && isTouchDevice();
 
       if (
-        (action === "select" && !isClientATouchDevice) ||
+        (action === "select" && !isTouchDevice()) ||
         isReservationQuotaReached ||
         !reservationUnit
       ) {
@@ -732,12 +725,6 @@ const ReservationUnit = ({
           ? addSeconds(start, reservationUnit?.minReservationDuration ?? 0)
           : new Date(end);
 
-      const newReservation = getNewReservation({
-        start: new Date(start),
-        end: normalizedEnd,
-        reservationUnit,
-      });
-
       if (
         !isReservationReservable({
           reservationUnit,
@@ -749,15 +736,22 @@ const ReservationUnit = ({
       ) {
         return false;
       }
+
+      const newReservation = getNewReservation({
+        start: new Date(start),
+        end: normalizedEnd,
+        reservationUnit,
+      });
+
       const newDate = toUIDate(new Date(newReservation.begin));
       const newTime = getTimeString(new Date(newReservation.begin));
+      // click doesn't change the duration
       setValue("date", newDate);
       setValue("time", newTime);
 
       return true;
     },
     [
-      isClientATouchDevice,
       isReservationQuotaReached,
       reservationUnit,
       activeApplicationRounds,
@@ -816,6 +810,7 @@ const ReservationUnit = ({
         return event;
       });
   }, [reservationUnit, activeApplicationRounds, t, focusSlot]);
+
   const eventBuffers = useMemo(() => {
     const bufferTimeBefore =
       reservationUnit?.bufferTimeBefore != null &&
@@ -863,6 +858,7 @@ const ReservationUnit = ({
       setErrorMsg(msg || t("errors:general_error"));
     },
   });
+
   const createReservation = useCallback(
     async (input: ReservationCreateMutationInput): Promise<void> => {
       await addReservation({
@@ -886,6 +882,7 @@ const ReservationUnit = ({
     // eslint-disable-next-line no-console
     console.warn("not reservable because: ", reason);
   }
+
   const [storedReservation, setStoredReservation, _removeStoredReservation] =
     useLocalStorage<PendingReservation>("reservation");
   const storeReservationForLogin = useCallback(() => {
@@ -1001,12 +998,6 @@ const ReservationUnit = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focusSlot]);
 
-  const subventionSuffix = reservationUnit?.canApplyFreeOfCharge ? (
-    <SubventionSuffix
-      placement="reservation-unit-head"
-      setIsDialogOpen={setIsDialogOpen}
-    />
-  ) : undefined;
   const nextAvailableTime = getNextAvailableTime({
     start: focusDate,
     slots: reservableTimeSpans,
@@ -1014,6 +1005,7 @@ const ReservationUnit = ({
     reservationUnit,
     activeApplicationRounds,
   });
+
   const LoginAndSubmit = useMemo(
     () => (
       <SubmitFragment
@@ -1027,9 +1019,11 @@ const ReservationUnit = ({
     ),
     [apiBaseUrl, focusSlot, reservationForm, storeReservationForLogin, t]
   );
+
   if (reservationUnit == null) {
     return <CenterSpinner />;
   }
+
   const reservationControlProps = {
     reservationUnit,
     reservationForm,
@@ -1044,7 +1038,14 @@ const ReservationUnit = ({
       <Head
         reservationUnit={reservationUnit}
         reservationUnitIsReservable={reservationUnitIsReservable}
-        subventionSuffix={subventionSuffix}
+        subventionSuffix={
+          reservationUnit?.canApplyFreeOfCharge ? (
+            <SubventionSuffix
+              placement="reservation-unit-head"
+              setIsDialogOpen={setIsDialogOpen}
+            />
+          ) : undefined
+        }
       />
       <Container>
         <Columns>
@@ -1053,7 +1054,14 @@ const ReservationUnit = ({
               reservationUnitIsReservable && (
                 <QuickReservation
                   {...reservationControlProps}
-                  subventionSuffix={subventionSuffix}
+                  subventionSuffix={
+                    reservationUnit?.canApplyFreeOfCharge ? (
+                      <SubventionSuffix
+                        placement="reservation-unit-head"
+                        setIsDialogOpen={setIsDialogOpen}
+                      />
+                    ) : undefined
+                  }
                   nextAvailableTime={nextAvailableTime}
                 />
               )}

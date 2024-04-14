@@ -211,7 +211,7 @@ export const isReservationReservable = ({
   end,
   skipLengthCheck = false,
 }: {
-  reservationUnit: ReservationUnitType;
+  reservationUnit: ReservationUnitType | null;
   activeApplicationRounds: RoundPeriod[];
   start: Date;
   end: Date;

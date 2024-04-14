@@ -27,7 +27,10 @@ import { filterNonNullable } from "common/src/helpers";
 import { capitalize, getTranslation } from "./util";
 import { isReservationReservable } from "@/modules/reservation";
 
-export const getTimeString = (date = new Date()) => {
+export const getTimeString = (date = new Date()): string => {
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
   return `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
 };
 

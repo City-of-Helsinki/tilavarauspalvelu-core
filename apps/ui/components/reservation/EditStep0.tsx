@@ -12,13 +12,7 @@ import {
   ReservationType,
   ReservationUnitType,
 } from "common/types/gql-types";
-import {
-  addHours,
-  addMinutes,
-  addSeconds,
-  differenceInMinutes,
-  startOfDay,
-} from "date-fns";
+import { addMinutes, addSeconds, differenceInMinutes } from "date-fns";
 import classNames from "classnames";
 import { IconArrowRight, IconCross } from "hds-react";
 import { useRouter } from "next/router";
@@ -46,22 +40,15 @@ import ReservationCalendarControls, {
 } from "../calendar/ReservationCalendarControls";
 import { CalendarWrapper } from "../reservation-unit/ReservationUnitStyles";
 import { eventStyleGetter } from "@/components/common/calendarUtils";
-import { useForm } from "react-hook-form";
-import {
-  PendingReservationFormSchema,
-  PendingReservationFormType,
-} from "@/components/reservation-unit/schema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { toUIDate } from "common/src/common/util";
+import { type UseFormReturn } from "react-hook-form";
+import { type PendingReservationFormType } from "@/components/reservation-unit/schema";
+import { fromUIDate, isValidDate, toUIDate } from "common/src/common/util";
 
 type Props = {
   reservation: ReservationType;
   reservationUnit: ReservationUnitType;
   userReservations: ReservationType[];
-  initialReservation: PendingReservation | null;
-  setInitialReservation: React.Dispatch<
-    React.SetStateAction<PendingReservation | null>
-  >;
+  reservationForm: UseFormReturn<PendingReservationFormType>;
   activeApplicationRounds: ApplicationRoundNode[];
   setErrorMsg: React.Dispatch<React.SetStateAction<string | null>>;
   nextStep: () => void;
@@ -126,13 +113,57 @@ any): JSX.Element => {
   });
 };
 
+/// To check availability for the reservation.
+/// The check functions use the reservationUnit instead of a list of other reservations
+/// so have to do some questionable edits.
+function getWithoutThisReservation(
+  reservationUnit: ReservationUnitType,
+  reservation: ReservationType
+): ReservationUnitType {
+  const otherReservations = filterNonNullable(
+    reservationUnit?.reservations?.filter((n) => n?.pk !== reservation.pk)
+  );
+  return {
+    ...reservationUnit,
+    reservations: otherReservations,
+  };
+}
+
+function calculateFocusSlot(
+  date: string,
+  timeValue: string,
+  durationMinutes: number
+): Omit<FocusTimeSlot, "isReservable"> {
+  if (!timeValue) {
+    throw new Error("Invalid time value");
+  }
+  const [hours, minutes] = timeValue
+    .split(":")
+    .map(Number)
+    .filter(Number.isFinite);
+  if (hours == null || minutes == null) {
+    throw new Error("Invalid time value");
+  }
+  const start = fromUIDate(date) ?? new Date();
+  if (!isValidDate(start)) {
+    throw new Error("Invalid date value");
+  }
+  start.setHours(hours, minutes, 0, 0);
+  const end = addMinutes(start, durationMinutes);
+
+  return {
+    start,
+    end,
+    durationMinutes,
+  };
+}
+
 const EditStep0 = ({
   reservation,
   reservationUnit,
   userReservations,
-  initialReservation,
-  setInitialReservation,
   activeApplicationRounds,
+  reservationForm,
   setErrorMsg,
   nextStep,
   isLoading,
@@ -142,185 +173,94 @@ const EditStep0 = ({
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
   const [calendarViewType, setCalendarViewType] = useState<WeekOptions>("week");
 
-  const isClientATouchDevice = isTouchDevice();
   const [shouldCalendarControlsBeVisible, setShouldCalendarControlsBeVisible] =
     useState(false);
-  const startDate = useMemo(
-    () => new Date(reservation.begin),
-    [reservation.begin]
-  );
-  const reservationForm = useForm<PendingReservationFormType>({
-    defaultValues: {
-      date: toUIDate(new Date(reservation.begin)),
-      duration: differenceInMinutes(startDate, new Date(reservation.end ?? "")),
-      time: getTimeString(startDate),
-    },
-    mode: "onChange",
-    resolver: zodResolver(PendingReservationFormSchema),
-  });
-  const { watch, setValue, handleSubmit } = reservationForm;
-  const durationValue =
-    watch("duration") ??
-    differenceInMinutes(startDate, new Date(reservation.end));
-  const focusDate = useMemo(
-    () => new Date(watch("date") ?? initialReservation?.begin ?? startDate),
-    [watch, startDate, initialReservation?.begin]
-  );
-  const timeValue =
-    watch("time") ?? initialReservation?.begin
-      ? getTimeString(new Date(initialReservation?.begin ?? ""))
-      : getTimeString(startDate);
-  const submitReservation = (_data: PendingReservationFormType) => {
-    if (!focusSlot?.start || !focusSlot?.end) {
-      return;
-    }
-    const newReservation: PendingReservation = {
-      begin: focusSlot.start.toISOString(),
-      end: focusSlot.end.toISOString(),
-      price: getReservationUnitPrice({
-        reservationUnit,
-        pricingDate: focusSlot?.start ? new Date(focusSlot.start) : undefined,
-        minutes: 0,
-        asNumeral: true,
-      }),
-    };
-    const [isNewReservationValid, validationError] =
-      canReservationTimeBeChanged({
-        reservation,
-        newReservation,
-        reservationUnit: normalizedReservationUnit,
-        activeApplicationRounds,
-      });
 
-    if (validationError) {
-      setErrorMsg(t(`reservations:modifyTimeReasons.${validationError}`));
-    } else if (isNewReservationValid) {
-      nextStep();
-    }
-  };
-  const isSlotReservable = useCallback(
+  const originalBegin = new Date(reservation.begin);
+  const originalEnd = new Date(reservation.end);
+
+  const { watch, handleSubmit, setValue, formState } = reservationForm;
+  const { isDirty } = formState;
+
+  const [focusDate, setFocusDate] = useState<Date>(originalBegin);
+
+  const isSlotAvailable = useCallback(
     (start: Date, end: Date, skipLengthCheck = false): boolean => {
-      return (
-        reservationUnit != null &&
-        isReservationReservable({
-          reservationUnit,
-          activeApplicationRounds,
-          start,
-          end,
-          skipLengthCheck,
-        })
-      );
+      const resUnit = getWithoutThisReservation(reservationUnit, reservation);
+      return isReservationReservable({
+        reservationUnit: resUnit,
+        activeApplicationRounds,
+        start,
+        end,
+        skipLengthCheck,
+      });
     },
-    [activeApplicationRounds, reservationUnit]
+    [reservationUnit, reservation, activeApplicationRounds]
   );
-  const focusSlot: FocusTimeSlot = useMemo(() => {
-    const start = focusDate;
-    const [hours, minutes] = timeValue.split(":").map(Number);
-    start.setHours(hours, minutes, 0, 0);
-    const end = addMinutes(start, durationValue);
-    return {
-      start,
-      end,
-      isReservable: isSlotReservable(start, end),
-      durationMinutes: durationValue,
-    };
-  }, [focusDate, durationValue, isSlotReservable, timeValue]);
-  const durationOptions = useMemo(() => {
-    const {
-      minReservationDuration,
-      maxReservationDuration,
-      reservationStartInterval,
-    } = reservationUnit || {};
-    if (
-      minReservationDuration == null ||
-      maxReservationDuration == null ||
-      reservationStartInterval == null
-    ) {
-      return [];
-    }
-    return getDurationOptions(
-      minReservationDuration ?? undefined,
-      maxReservationDuration ?? undefined,
-      reservationStartInterval ?? 0,
-      t
-    );
-  }, [reservationUnit, t]);
-  const reservableTimeSpans = useMemo(
-    () => filterNonNullable(reservationUnit?.reservableTimeSpans),
-    [reservationUnit?.reservableTimeSpans]
+
+  const {
+    minReservationDuration,
+    maxReservationDuration,
+    reservationStartInterval,
+  } = reservationUnit || {};
+
+  const durationOptions = getDurationOptions(
+    minReservationDuration ?? undefined,
+    maxReservationDuration ?? undefined,
+    reservationStartInterval ?? 0,
+    t
   );
-  const startingTimeOptions = useMemo(() => {
-    return getPossibleTimesForDay(
-      reservableTimeSpans,
-      reservationUnit?.reservationStartInterval,
-      focusDate,
-      reservationUnit,
-      activeApplicationRounds,
-      durationValue
-    );
-  }, [
+
+  const reservableTimeSpans = filterNonNullable(
+    reservationUnit?.reservableTimeSpans
+  );
+
+  const duration =
+    watch("duration") ?? differenceInMinutes(originalBegin, originalEnd);
+  const startingTimeOptions = getPossibleTimesForDay(
     reservableTimeSpans,
-    focusDate,
+    reservationUnit?.reservationStartInterval,
+    fromUIDate(watch("date") ?? "") ?? new Date(),
     reservationUnit,
     activeApplicationRounds,
-    durationValue,
-  ]);
+    duration
+  );
+
+  const focusSlot = calculateFocusSlot(
+    watch("date") ?? "",
+    watch("time") ?? "",
+    duration
+  );
+  const isReservable = isSlotAvailable(focusSlot.start, focusSlot.end);
+
   const calendarEvents: CalendarEvent<ReservationType>[] = useMemo(() => {
-    const diff = focusSlot?.durationMinutes ?? 0;
-    const duration = diff >= 90 ? `(${formatDuration(diff, t)})` : "";
-    const shownReservation =
-      focusSlot != null
-        ? { begin: focusSlot.start, end: focusSlot.end, state: "INITIAL" }
-        : {
-            begin: reservation.begin,
-            end: reservation.end,
-            state: "OWN",
-          };
-    const reservations =
-      (focusSlot?.start
-        ? reservationUnit?.reservations?.filter((n) => n?.pk !== reservation.pk)
-        : reservationUnit?.reservations) ?? [];
-    if (userReservations && reservationUnit?.reservations) {
-      return [...reservations, shownReservation]
-        .filter((n): n is NonNullable<typeof n> => n != null)
-        .map((n) => {
-          const suffix = n.state === "INITIAL" ? duration : "";
-          const event = {
-            title: `${
-              n.state === "CANCELLED"
-                ? `${t("reservationCalendar:prefixForCancelled")}: `
-                : suffix
-            }`,
-            start: n.begin ? new Date(n.begin) : new Date(),
-            end: n.end ? new Date(n.end) : new Date(),
-            allDay: false,
-            event: n,
-          };
-
-          return event as CalendarEvent<ReservationType>;
-        });
-    }
-    return [];
-  }, [
-    reservationUnit,
-    t,
-    focusSlot,
-    userReservations,
-    reservation.pk,
-    reservation.begin,
-    reservation.end,
-  ]);
-
-  // Why are we modifying the reservation unit, instead of splitting the reservations out
-  // and filtering that list
-  const normalizedReservationUnit = useMemo(() => {
-    return {
-      ...reservationUnit,
-      reservations: reservationUnit.reservations?.filter(
-        (n) => n?.pk !== reservation.pk
-      ),
+    const diff = focusSlot.durationMinutes ?? 0;
+    const dur = diff >= 90 ? `(${formatDuration(diff, t)})` : "";
+    // TODO show different style if the reservation has not been modified
+    const currentReservation = {
+      begin: focusSlot.start,
+      end: focusSlot.end,
+      state: "INITIAL",
     };
-  }, [reservation.pk, reservationUnit]);
+    const resUnit = getWithoutThisReservation(reservationUnit, reservation);
+    const otherReservations = filterNonNullable(resUnit.reservations);
+    return [...otherReservations, currentReservation].map((n) => {
+      const suffix = n.state === "INITIAL" ? dur : "";
+      const event = {
+        title: `${
+          n.state === "CANCELLED"
+            ? `${t("reservationCalendar:prefixForCancelled")}: `
+            : suffix
+        }`,
+        start: n.begin ? new Date(n.begin) : new Date(),
+        end: n.end ? new Date(n.end) : new Date(),
+        allDay: false,
+        event: n,
+      };
+
+      return event as CalendarEvent<ReservationType>;
+    });
+  }, [reservationUnit, t, focusSlot, reservation]);
 
   const eventBuffers = useMemo(() => {
     // TODO refactor
@@ -329,40 +269,36 @@ const EditStep0 = ({
     const reservationBufferTimeBefore =
       reservation?.bufferTimeBefore != null &&
       reservation.bufferTimeBefore !== 0
-        ? reservation?.bufferTimeBefore.toString()
+        ? reservation.bufferTimeBefore.toString()
         : undefined;
     const reservationBufferTimeAfter =
       reservation?.bufferTimeAfter != null && reservation.bufferTimeAfter !== 0
-        ? reservation?.bufferTimeAfter.toString()
+        ? reservation.bufferTimeAfter.toString()
         : undefined;
 
     const bufferTimeBefore =
       reservationUnit?.bufferTimeBefore != null &&
       reservationUnit.bufferTimeBefore !== 0
-        ? reservationUnit?.bufferTimeBefore.toString()
+        ? reservationUnit.bufferTimeBefore.toString()
         : reservationBufferTimeBefore;
     const bufferTimeAfter =
       reservationUnit?.bufferTimeAfter != null &&
       reservationUnit.bufferTimeAfter !== 0
-        ? reservationUnit?.bufferTimeAfter.toString()
+        ? reservationUnit.bufferTimeAfter.toString()
         : reservationBufferTimeAfter;
 
     return getEventBuffers([
       ...(calendarEvents.flatMap((e) => e.event) as ReservationType[]),
       {
-        begin: focusSlot?.start.toISOString() || reservation.begin,
-        end: focusSlot?.end.toISOString() || reservation.end,
-        bufferTimeBefore:
-          focusSlot != null ? bufferTimeBefore : reservationBufferTimeBefore,
-        bufferTimeAfter:
-          focusSlot != null ? bufferTimeAfter : reservationBufferTimeAfter,
+        begin: focusSlot.start.toISOString(),
+        end: focusSlot.end.toISOString(),
+        bufferTimeBefore,
+        bufferTimeAfter,
       },
     ]);
   }, [
     calendarEvents,
     focusSlot,
-    reservation.begin,
-    reservation.end,
     reservation?.bufferTimeAfter,
     reservation?.bufferTimeBefore,
     reservationUnit?.bufferTimeAfter,
@@ -405,36 +341,80 @@ const EditStep0 = ({
     reservableTimeSpans,
   ]);
 
-  const handleEventChange = useCallback(
+  // TODO submit should be completely unnecessary
+  // just disable nextStep button if the form is invalid
+  // the form isn't submitted from this step at all
+  const submitReservation = (_data: PendingReservationFormType) => {
+    if (!focusSlot?.start || !focusSlot?.end) {
+      return;
+    }
+    const newReservation: PendingReservation = {
+      begin: focusSlot.start.toISOString(),
+      end: focusSlot.end.toISOString(),
+      price: getReservationUnitPrice({
+        reservationUnit,
+        pricingDate: focusSlot?.start ? new Date(focusSlot.start) : undefined,
+        minutes: 0,
+        asNumeral: true,
+      }),
+    };
+
+    const resUnit = getWithoutThisReservation(reservationUnit, reservation);
+
+    const [isNewReservationValid, validationError] =
+      canReservationTimeBeChanged({
+        reservation,
+        newReservation,
+        reservationUnit: resUnit,
+        activeApplicationRounds,
+      });
+
+    if (validationError) {
+      setErrorMsg(t(`reservations:modifyTimeReasons.${validationError}`));
+    } else if (isNewReservationValid) {
+      nextStep();
+    }
+  };
+
+  const handleCalendarEventChange = useCallback(
     (
       { start, end }: CalendarEvent<ReservationType>,
       skipLengthCheck = false
     ): boolean => {
-      const newReservation = getNewReservation({ start, end, reservationUnit });
-
-      if (!isSlotReservable(start, end, skipLengthCheck)) {
+      if (!isSlotAvailable(start, end, skipLengthCheck)) {
         return false;
       }
 
-      setInitialReservation(newReservation);
+      const newReservation = getNewReservation({ start, end, reservationUnit });
+      const newDate = toUIDate(new Date(newReservation.begin));
+      const newTime = getTimeString(new Date(newReservation.begin));
+      setValue("date", newDate, { shouldDirty: true });
+      setValue("time", newTime, { shouldDirty: true });
+      setValue("duration", differenceInMinutes(end, start), {
+        shouldDirty: true,
+      });
 
+      const isClientATouchDevice = isTouchDevice();
       if (isClientATouchDevice) {
         setShouldCalendarControlsBeVisible(true);
       }
 
       return true;
     },
-    [
-      isClientATouchDevice,
-      setInitialReservation,
-      isSlotReservable,
-      reservationUnit,
-    ]
+    [isSlotAvailable, reservationUnit, setValue]
   );
 
+  // FIXME some issues still moving a reservation (requires multiple clicks at times)
   const handleSlotClick = useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO type calendar props
-    ({ start, end, action }: any, skipLengthCheck = false): boolean => {
+    (
+      {
+        start,
+        end,
+        action,
+      }: { start: Date; end: Date; action: "select" | "click" | "doubleClick" },
+      skipLengthCheck = false
+    ): boolean => {
+      const isClientATouchDevice = isTouchDevice();
       const isTouchClick = action === "select" && isClientATouchDevice;
 
       if (action === "select" && !isClientATouchDevice) {
@@ -444,10 +424,7 @@ const EditStep0 = ({
       const normalizedEnd =
         action === "click" ||
         (isTouchClick && differenceInMinutes(end, start) <= 30)
-          ? addSeconds(
-              new Date(start),
-              reservationUnit.minReservationDuration || 0
-            )
+          ? addSeconds(start, reservationUnit?.minReservationDuration ?? 0)
           : new Date(end);
 
       const newReservation = getNewReservation({
@@ -456,26 +433,21 @@ const EditStep0 = ({
         reservationUnit,
       });
 
-      if (
-        !isSlotReservable(start, new Date(newReservation.end), skipLengthCheck)
-      ) {
+      if (!isSlotAvailable(start, end, skipLengthCheck)) {
         return false;
       }
 
-      setInitialReservation(newReservation);
+      const newDate = toUIDate(new Date(newReservation.begin));
+      const newTime = getTimeString(new Date(newReservation.begin));
+      // click doesn't change the duration
+      setValue("date", newDate, { shouldDirty: true });
+      setValue("time", newTime, { shouldDirty: true });
 
       return true;
     },
-    [
-      isClientATouchDevice,
-      isSlotReservable,
-      reservationUnit,
-      setInitialReservation,
-    ]
+    [reservationUnit, isSlotAvailable, setValue]
   );
 
-  const currentDate = focusDate || new Date();
-  const dayStartTime = addHours(startOfDay(currentDate), 6);
   const events = [...calendarEvents, ...eventBuffers];
 
   return (
@@ -484,8 +456,9 @@ const EditStep0 = ({
         <div aria-hidden>
           <Calendar<ReservationType>
             events={events}
-            begin={currentDate}
-            onNavigate={(d: Date) => setValue("date", d.toISOString())}
+            begin={focusDate}
+            // TODO should not set the reservation date, but a separate focus date
+            onNavigate={(d: Date) => setFocusDate(d)}
             eventStyleGetter={(event) =>
               eventStyleGetter(
                 event,
@@ -499,17 +472,18 @@ const EditStep0 = ({
                 setCalendarViewType(str);
               }
             }}
-            onSelecting={(event) => handleEventChange(event, true)}
-            min={dayStartTime}
+            onSelecting={(event) => handleCalendarEventChange(event, true)}
+            // TODO what is the purpose of this?
+            // min={addHours(startOfDay(focusDate), 6)}
             showToolbar
             reservable
             toolbarComponent={Toolbar}
             dateCellWrapperComponent={TouchCellWrapper}
             eventWrapperComponent={EventWrapperComponent}
             resizable
-            draggable={!isClientATouchDevice}
-            onEventDrop={handleEventChange}
-            onEventResize={handleEventChange}
+            draggable={!isTouchDevice()}
+            onEventDrop={handleCalendarEventChange}
+            onEventResize={handleCalendarEventChange}
             onSelectSlot={handleSlotClick}
             draggableAccessor={({ event }) =>
               event?.state.toString() === "INITIAL"
@@ -535,15 +509,15 @@ const EditStep0 = ({
             isAnimated={isMobile}
             reservationForm={reservationForm}
             durationOptions={durationOptions}
-            focusSlot={focusSlot}
+            focusSlot={{ ...focusSlot, isReservable }}
             startingTimeOptions={startingTimeOptions}
             submitReservation={submitReservation}
           />
         </CalendarFooter>
         <Legend />
       </CalendarWrapper>
-      <Actions>
-        <form noValidate onSubmit={handleSubmit(submitReservation)}>
+      <form noValidate onSubmit={handleSubmit(submitReservation)}>
+        <Actions>
           <BlackButton
             type="button"
             variant="secondary"
@@ -558,7 +532,7 @@ const EditStep0 = ({
           <MediumButton
             variant="primary"
             iconRight={<IconArrowRight aria-hidden />}
-            disabled={!focusSlot.isReservable}
+            disabled={!isReservable || !isDirty}
             type="submit"
             data-testid="reservation-edit__button--continue"
             isLoading={isLoading}
@@ -566,8 +540,8 @@ const EditStep0 = ({
           >
             {t("reservationCalendar:nextStep")}
           </MediumButton>
-        </form>
-      </Actions>
+        </Actions>
+      </form>
     </>
   );
 };

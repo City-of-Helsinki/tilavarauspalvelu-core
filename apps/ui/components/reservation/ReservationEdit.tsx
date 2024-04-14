@@ -21,15 +21,13 @@ import {
   type QueryReservationUnitArgs,
   type QueryReservationArgs,
 } from "common/types/gql-types";
-import { pick } from "lodash";
 import { useRouter } from "next/router";
 import { LoadingSpinner, Stepper } from "hds-react";
-import { addYears } from "date-fns";
+import { addYears, differenceInMinutes, set } from "date-fns";
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { PendingReservation } from "common/types/common";
-import { toApiDate } from "common/src/common/util";
+import { fromUIDate, toApiDate, toUIDate } from "common/src/common/util";
 import { Subheading } from "common/src/reservation-form/styles";
 import { Container } from "common";
 import { base64encode, filterNonNullable } from "common/src/helpers";
@@ -51,6 +49,13 @@ import EditStep1 from "./EditStep1";
 import { reservationsPrefix } from "@/modules/const";
 import { APPLICATION_ROUNDS } from "@/modules/queries/applicationRound";
 import { Toast } from "@/styles/util";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  PendingReservationFormSchema,
+  PendingReservationFormType,
+} from "../reservation-unit/schema";
+import { getTimeString } from "@/modules/reservationUnit";
+import { UseFormReturn, useForm } from "react-hook-form";
 
 type Props = {
   id: number;
@@ -142,31 +147,61 @@ const EditCalendarSection = styled.div`
   }
 `;
 
-const BylineContent = ({
+function convertFormToApi(
+  formValues: PendingReservationFormType
+): { begin: string; end: string } | null {
+  const time = formValues.time;
+  const date = fromUIDate(formValues.date ?? "");
+  const duration = formValues.duration;
+  if (date == null || time == null || duration == null) {
+    return null;
+  }
+  const [hours, minutes] = time.split(":").map(Number);
+  const begin: Date = set(date, { hours, minutes });
+  const end: Date = set(begin, { hours, minutes: minutes + duration });
+  return { begin: begin.toISOString(), end: end.toISOString() };
+}
+
+/// First step shows the current time, next step shows the new time
+function BylineContent({
   reservation,
   reservationUnit,
+  form,
   step,
-  initialReservation,
 }: {
   reservation: ReservationType;
   reservationUnit: ReservationUnitType;
+  form: UseFormReturn<PendingReservationFormType>;
   step: number;
-  initialReservation: PendingReservation | null;
-}) => {
-  const reservationData =
-    step === 1
-      ? { ...reservation, ...pick(initialReservation, ["begin", "end"]) }
-      : reservation;
-
+}) {
+  const { watch } = form;
+  const date = watch("date");
+  const time = watch("time");
+  const duration = watch("duration");
+  const formValues = { date, time, duration };
+  const times = convertFormToApi(formValues);
+  const modifiedReservation =
+    times && step !== 0 ? { ...reservation, ...times } : reservation;
   return (
     <ReservationInfoCard
-      // @ts-expect-error: TODO: fix this
-      reservation={reservationData}
+      reservation={modifiedReservation}
       reservationUnit={reservationUnit}
       type="confirmed"
     />
   );
-};
+}
+
+function convertReservationEdit(
+  reservation?: ReservationType
+): PendingReservationFormType {
+  const originalBegin = new Date(reservation?.begin ?? "");
+  const originalEnd = new Date(reservation?.end ?? "");
+  return {
+    date: toUIDate(originalBegin),
+    duration: differenceInMinutes(originalEnd, originalBegin),
+    time: getTimeString(originalBegin),
+  };
+}
 
 const ReservationEdit = ({ id: resPk, apiBaseUrl }: Props): JSX.Element => {
   const { t, i18n } = useTranslation();
@@ -179,8 +214,6 @@ const ReservationEdit = ({ id: resPk, apiBaseUrl }: Props): JSX.Element => {
   >([]);
   const [step, setStep] = useState(0);
 
-  const [initialReservation, setInitialReservation] =
-    useState<PendingReservation | null>(null);
   const [userReservations, setUserReservations] = useState<ReservationType[]>(
     []
   );
@@ -368,6 +401,17 @@ const ReservationEdit = ({ id: resPk, apiBaseUrl }: Props): JSX.Element => {
     ];
   }, [t, step]);
 
+  const reservationForm = useForm<PendingReservationFormType>({
+    defaultValues: convertReservationEdit(reservation),
+    mode: "onChange",
+    resolver: zodResolver(PendingReservationFormSchema),
+  });
+
+  const { getValues, reset } = reservationForm;
+  useEffect(() => {
+    reset(convertReservationEdit(reservation));
+  }, [reservation, reset]);
+
   const isLoading = !reservation || !reservationUnit || !additionalData;
   if (isLoading) {
     return (
@@ -377,12 +421,12 @@ const ReservationEdit = ({ id: resPk, apiBaseUrl }: Props): JSX.Element => {
     );
   }
 
+  // TODO refactor to use form submit instead of getValues
   const handleSubmit = () => {
-    // TODO refactor: using initial reservation when we only need time information is bad
-    const begin = initialReservation?.begin;
-    const end = initialReservation?.end;
-    if (reservation.pk && begin && end) {
-      adjustReservationTime({ pk: reservation.pk, begin, end });
+    const formValues = getValues();
+    const times = convertFormToApi(formValues);
+    if (reservation.pk && times) {
+      adjustReservationTime({ pk: reservation.pk, ...times });
     }
   };
 
@@ -417,7 +461,7 @@ const ReservationEdit = ({ id: resPk, apiBaseUrl }: Props): JSX.Element => {
           <BylineContent
             reservation={reservation}
             reservationUnit={reservationUnit}
-            initialReservation={initialReservation}
+            form={reservationForm}
             step={step}
           />
         </BylineSection>
@@ -436,9 +480,8 @@ const ReservationEdit = ({ id: resPk, apiBaseUrl }: Props): JSX.Element => {
               reservation={reservation}
               reservationUnit={reservationUnit}
               userReservations={userReservations}
-              initialReservation={initialReservation}
-              setInitialReservation={setInitialReservation}
               activeApplicationRounds={activeApplicationRounds}
+              reservationForm={reservationForm}
               setErrorMsg={setErrorMsg}
               nextStep={() => setStep(1)}
               apiBaseUrl={apiBaseUrl}

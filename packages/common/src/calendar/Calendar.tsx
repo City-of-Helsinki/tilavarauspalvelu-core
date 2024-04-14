@@ -64,8 +64,9 @@ type Props<T> = {
   onSelectSlot?: (
     {
       start,
+      end,
       action,
-    }: { start: Date; action: "select" | "click" | "doubleClick" },
+    }: { start: Date; end: Date; action: "select" | "click" | "doubleClick" },
     skipLengthCheck: boolean
   ) => void;
   min?: Date;
