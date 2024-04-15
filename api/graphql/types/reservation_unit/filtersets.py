@@ -26,6 +26,8 @@ __all__ = [
 
 class ReservationUnitFilterSet(ModelFilterSet):
     pk = IntMultipleChoiceFilter()
+    tprek_id = django_filters.CharFilter(field_name="unit__tprek_id")
+    tprek_department_id = django_filters.CharFilter(field_name="unit__tprek_department_id")
     unit = IntMultipleChoiceFilter()
     reservation_unit_type = IntMultipleChoiceFilter()
 
