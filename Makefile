@@ -20,7 +20,7 @@
 .PHONY: stop
 .PHONY: check-translations
 .PHONY: translations
-.PHONT: translate
+.PHONY: translate
 
 # Trick to allow passing commands to make
 # Use quotes (" ") if command contains flags (-h / --help)
@@ -68,7 +68,7 @@ bash:
 	@docker exec -it tvp-core bash
 
 celery:
-	@celery -A tilavarauspalvelu worker --beat --loglevel info --scheduler django
+	@celery -A tilavarauspalvelu worker --beat --loglevel=INFO --scheduler=django
 
 clear-db:
 	@python manage.py dbshell -- -c "DROP SCHEMA $(call args, 'public') CASCADE;CREATE SCHEMA $(call args, 'public');"
