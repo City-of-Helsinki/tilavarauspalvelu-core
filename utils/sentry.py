@@ -26,12 +26,13 @@ class SentryLogger:
             capture_exception(err)
 
     @staticmethod
-    def log_if_raises(details: str, *, re_raise: bool = False):
+    def log_if_raises(details: str, *, catch: list[type[Exception]] | None = None, re_raise: bool = False):
         """
         Decorator that logs exceptions raised by the decorated function.
         Note that the decorated function should return None.
 
         :param details: A string describing the context of the exception.
+        :param catch: A list of exceptions to catch. Catch all exceptions if not set.
         :param re_raise: Whether to re-raise the exception after logging.
         """
 
@@ -41,6 +42,10 @@ class SentryLogger:
                 try:
                     return func(*args, **kwargs)
                 except Exception as err:
+                    # If catching specific errors, and the error is not in the list, re-raise it
+                    if catch is not None and not any(isinstance(err, exception) for exception in catch):
+                        raise
+
                     SentryLogger.log_exception(err, details)
                     if re_raise:
                         raise
