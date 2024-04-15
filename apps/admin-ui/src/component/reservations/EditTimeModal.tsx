@@ -8,7 +8,6 @@ import {
   type Mutation,
   type MutationStaffAdjustReservationTimeArgs,
   type ReservationNode,
-  type ReservationNodeConnection,
   ReservationStartInterval,
   ReservationTypeChoice,
 } from "common/types/gql-types";
@@ -104,63 +103,12 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
     },
     onError: (error) => {
       const { message } = error;
-
       const translatedError = i18n.exists(`errors.descriptive.${message}`)
         ? t(`errors.descriptive.${message}`)
         : t("errors.descriptive.genericError");
       notifyError(
         t("ReservationDialog.saveFailed", { error: translatedError })
       );
-    },
-    update(cache, { data }) {
-      // NOTE: recurring uses a long list of reservations that is cached, manual update needed
-      // TODO can we just remove this now and use refetch? the recurring is a lot faster now
-      cache.modify({
-        fields: {
-          // find the pk => slice the array => replace the state variable in the slice
-          // @ts-expect-error: TODO: typechecks broke with ts or apollo-client upgrade
-          reservations(existing: ReservationNodeConnection) {
-            const queryRes = data?.staffAdjustReservationTime;
-            if (queryRes?.pk == null) {
-              // eslint-disable-next-line no-console
-              console.error(
-                "NOT updating cache: mutation success but PK missing"
-              );
-            } else {
-              const { begin, end, pk } = queryRes;
-              const fid = existing.edges.findIndex((x) => x?.node?.pk === pk);
-              if (fid > -1 && begin && end) {
-                const cpy = structuredClone(existing.edges[fid]);
-                if (cpy?.node && begin && end) {
-                  cpy.node.begin = begin;
-                  cpy.node.end = end;
-                  return {
-                    ...existing,
-                    edges: [
-                      ...existing.edges.slice(0, fid),
-                      cpy,
-                      ...existing.edges.slice(fid + 1),
-                    ],
-                  };
-                }
-                if (!begin || !end) {
-                  // eslint-disable-next-line no-console
-                  console.error(
-                    "Cache update failed reservation found, but no begin or end time in the response"
-                  );
-                } else {
-                  // eslint-disable-next-line no-console
-                  console.error(
-                    "Cache update failed: No reservation found with pk: ",
-                    pk
-                  );
-                }
-              }
-            }
-            return existing;
-          },
-        },
-      });
     },
   });
 
@@ -362,7 +310,7 @@ const StyledDialog = styled(Dialog)`
   max-width: 944px;
 `;
 
-const EditTimeModal = ({ reservation, onAccept, onClose }: Props) => {
+function EditTimeModal({ reservation, onAccept, onClose }: Props) {
   const { isOpen } = useModal();
   const { t } = useTranslation();
 
@@ -387,6 +335,6 @@ const EditTimeModal = ({ reservation, onAccept, onClose }: Props) => {
       </ErrorBoundary>
     </StyledDialog>
   );
-};
+}
 
 export default EditTimeModal;

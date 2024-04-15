@@ -78,7 +78,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   };
 }
 
-function ReservationParams(props: PropsNarrowed): JSX.Element {
+function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
   const { isAuthenticated } = useSession();
   const { t } = useTranslation("common");
 
@@ -96,4 +96,4 @@ function ReservationParams(props: PropsNarrowed): JSX.Element {
   return <ReservationCancellation {...props} reservation={reservation} />;
 }
 
-export default ReservationParams;
+export default ReservationCancelPage;

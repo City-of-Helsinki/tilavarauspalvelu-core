@@ -15,7 +15,7 @@ import DenyDialog from "./DenyDialog";
 import { useModal } from "@/context/ModalContext";
 import EditTimeModal from "../EditTimeModal";
 
-const RecurringReservationsView = ({
+function RecurringReservationsView({
   recurringPk,
   onSelect,
   onChange,
@@ -25,7 +25,7 @@ const RecurringReservationsView = ({
   onSelect?: (selected: ReservationNode) => void;
   onChange?: () => Promise<ApolloQueryResult<Query>>;
   onReservationUpdated?: () => void;
-}) => {
+}) {
   const { t } = useTranslation();
   const { setModalContent } = useModal();
 
@@ -38,8 +38,8 @@ const RecurringReservationsView = ({
 
   const handleChangeSuccess = () => {
     setModalContent(null);
+    refetch();
     if (onChange) {
-      refetch();
       onChange();
     }
   };
@@ -129,6 +129,6 @@ const RecurringReservationsView = ({
       items={forDisplay}
     />
   );
-};
+}
 
 export default RecurringReservationsView;

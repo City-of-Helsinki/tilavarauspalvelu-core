@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useMutation } from "@apollo/client";
-import { z } from "zod";
 import {
   Button,
   Dialog,
@@ -17,8 +16,6 @@ import {
   type ReservationDenyMutationInput,
   type ReservationRefundMutationInput,
   type ReservationNode,
-  type ReservationNodeConnection,
-  State,
 } from "common/types/gql-types";
 import { useModal } from "@/context/ModalContext";
 import { DENY_RESERVATION, REFUND_RESERVATION } from "./queries";
@@ -146,51 +143,7 @@ const DialogContent = ({
   const [denyReservationMutation] = useMutation<
     Mutation,
     MutationDenyReservationArgs
-  >(DENY_RESERVATION, {
-    update(cache, { data }) {
-      // Manually update the cache instead of invalidating the whole query
-      // because we can't invalidate single elements in the recurring list.
-      // For a single reservation doing a query invalidation is fine
-      // but doing that to a list of 2000 reservations when a single one of them gets
-      // denied would cause 5s delay and full rerender of the list on every button press.
-      cache.modify({
-        fields: {
-          // find the pk => slice the array => replace the state variable in the slice
-          // @ts-expect-error; TODO: typecheck broke after updating Apollo or Typescript
-          reservations(existing: ReservationNodeConnection) {
-            const queryRes = data?.denyReservation;
-            if (queryRes?.pk == null || queryRes?.state == null) {
-              // eslint-disable-next-line no-console
-              console.error(
-                "NOT updating cache: mutation success but PK missing"
-              );
-            } else {
-              const { state, pk } = queryRes;
-              const fid = existing.edges.findIndex((x) => x?.node?.pk === pk);
-              if (fid > -1) {
-                const cpy = structuredClone(existing.edges[fid]);
-                if (cpy?.node && state) {
-                  // State === ReservationsReservationStateChoices: are the exact same enum
-                  // but Typescript complains about them so use zod just in case.
-                  const val = z.nativeEnum(State).parse(state.valueOf());
-                  cpy.node.state = val;
-                }
-                return {
-                  ...existing,
-                  edges: [
-                    ...existing.edges.slice(0, fid),
-                    cpy,
-                    ...existing.edges.slice(fid + 1),
-                  ],
-                };
-              }
-            }
-            return existing;
-          },
-        },
-      });
-    },
-  });
+  >(DENY_RESERVATION);
 
   const { notifyError, notifySuccess } = useNotification();
   const { t } = useTranslation();
@@ -329,7 +282,7 @@ const DialogContent = ({
   );
 };
 
-const DenyDialog = ({
+function DenyDialog({
   reservations,
   onClose,
   onReject,
@@ -339,7 +292,7 @@ const DenyDialog = ({
   onClose: () => void;
   onReject: () => void;
   title?: string;
-}): JSX.Element => {
+}): JSX.Element {
   const { isOpen } = useModal();
   const { t } = useTranslation();
 
@@ -364,6 +317,6 @@ const DenyDialog = ({
       </VerticalFlex>
     </Dialog>
   );
-};
+}
 
 export default DenyDialog;

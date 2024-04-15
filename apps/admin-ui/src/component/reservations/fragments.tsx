@@ -124,7 +124,6 @@ export const RESERVATION_COMMON_FRAGMENT = gql`
 // TODO do we still need the user here?
 // TODO what is the reservation name vs. reserveeName?
 // TODO why do we need the pk of the unit and serviceSector
-// TODO replace this with affectingReservations Query (not a fragment)
 export const RESERVATIONUNIT_RESERVATIONS_FRAGMENT = gql`
   ${RESERVATION_COMMON_FRAGMENT}
   fragment ReservationUnitReservations on ReservationNode {

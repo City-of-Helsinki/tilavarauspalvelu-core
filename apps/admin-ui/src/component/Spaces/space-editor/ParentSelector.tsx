@@ -16,6 +16,7 @@ type Props = {
   helperText?: string;
   noParentless?: boolean;
   errorText?: string;
+  selfPk?: number;
   // TODO why is the label sent upstream?
   onChange: (val: number | null, name?: string) => void;
 };
@@ -34,6 +35,7 @@ export function ParentSelector({
   label,
   placeholder,
   noParentless = false,
+  selfPk,
   helperText,
   errorText,
 }: Props): JSX.Element {
@@ -49,11 +51,17 @@ export function ParentSelector({
   const unitSpaces = spacesAsHierarchy(parentSpaces, "\u2007");
 
   // NOTE there used to be children filtering, but it filtered out all possible options
-
-  const opts = unitSpaces.map((space) => ({
-    label: space.nameFi != null && space.nameFi.length > 0 ? space.nameFi : "-",
-    value: space.pk ?? null,
-  }));
+  // this handles the first level of children, but if it's a deeper hierarchy, it's not handled
+  const opts = unitSpaces
+    .filter(
+      (space) =>
+        selfPk == null || (space.pk !== selfPk && space.parent?.pk !== selfPk)
+    )
+    .map((space) => ({
+      label:
+        space.nameFi != null && space.nameFi.length > 0 ? space.nameFi : "-",
+      value: space.pk ?? null,
+    }));
 
   const options = noParentless ? opts : [...opts, parentLessOption(t)];
 

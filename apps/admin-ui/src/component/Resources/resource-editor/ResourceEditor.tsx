@@ -50,24 +50,27 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
     },
   });
 
-  const { data, loading: isSpaceLoading } = useQuery<Query, QueryResourceArgs>(
-    RESOURCE_QUERY,
-    {
-      variables: { id: base64encode(`ResourceNode:${resourcePk}`) },
-      skip: !resourcePk || Number.isNaN(resourcePk),
-      onError: (e) => {
-        notifyError(t("errors.errorFetchingData", { error: e }));
-      },
-    }
-  );
+  const {
+    data,
+    loading: isSpaceLoading,
+    refetch,
+  } = useQuery<Query, QueryResourceArgs>(RESOURCE_QUERY, {
+    variables: { id: base64encode(`ResourceNode:${resourcePk}`) },
+    skip: !resourcePk || Number.isNaN(resourcePk),
+    onError: (e) => {
+      notifyError(t("errors.errorFetchingData", { error: e }));
+    },
+  });
 
   const isLoading = isUnitLoading || isSpaceLoading;
 
-  // FIXME mutation not working
   const [mutation] = useMutation<Mutation>(UPDATE_RESOURCE);
 
-  const updateResource = (input: ResourceUpdateMutationInput) =>
-    mutation({ variables: { input } });
+  const updateResource = async (input: ResourceUpdateMutationInput) => {
+    const res = await mutation({ variables: { input } });
+    await refetch();
+    return res;
+  };
 
   const form = useForm<ResourceUpdateForm>({
     resolver: zodResolver(ResourceUpdateSchema),

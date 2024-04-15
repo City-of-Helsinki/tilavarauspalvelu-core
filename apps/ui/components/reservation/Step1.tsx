@@ -139,7 +139,6 @@ function isNotEmpty(
   if (
     rawValue == null ||
     rawValue === "" ||
-    rawValue === undefined ||
     rawValue === false ||
     rawValue === 0
   ) {

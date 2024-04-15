@@ -32,12 +32,10 @@ const EditorRows = styled.div`
 
 export const SpaceUpdateSchema = z.object({
   nameFi: z.string().max(80).min(1),
-  // TODO check that empty is valid
   nameSv: z.string().max(80),
   nameEn: z.string().max(80),
-  // TODO should be min 0
-  surfaceArea: z.number().nullish(),
-  maxPersons: z.number().nullish(),
+  surfaceArea: z.number().min(1).nullish(),
+  maxPersons: z.number().min(1).nullish(),
   unit: z.number(),
   // optional because of TS, update requires it, create can't have it
   pk: z.number().optional(),

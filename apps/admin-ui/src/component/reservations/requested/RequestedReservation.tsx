@@ -1,6 +1,6 @@
 import { ApolloQueryResult, useQuery } from "@apollo/client";
 import { trim } from "lodash";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
@@ -114,7 +114,7 @@ const ApplicationData = ({
   </KVPair>
 );
 
-const ButtonsWithPermChecks = ({
+function ButtonsWithPermChecks({
   reservation,
   isFree,
   onReservationUpdated,
@@ -122,10 +122,9 @@ const ButtonsWithPermChecks = ({
 }: {
   reservation: ReservationNode;
   isFree: boolean;
-  // Hack to deal with reservation query not being cached so we need to refetch
   onReservationUpdated: () => void;
   disableNonEssentialButtons?: boolean;
-}) => {
+}) {
   const { setModalContent } = useModal();
 
   const closeDialog = () => {
@@ -162,7 +161,7 @@ const ButtonsWithPermChecks = ({
       )}
     </VisibleIfPermission>
   );
-};
+}
 
 const translateType = (res: ReservationNode, t: TFunction) => {
   const [part1, part2] = getTranslationKeyForCustomerTypeChoice(
@@ -327,6 +326,14 @@ const TimeBlock = ({
     reservation?.reservationUnit?.[0]?.pk ?? undefined,
     reservation?.pk ?? undefined
   );
+
+  // Necessary because the reservation can be removed (denied) from the parent component
+  // so update the calendar when that happens.
+  useEffect(() => {
+    if (reservation != null) {
+      calendarRefetch();
+    }
+  }, [reservation, calendarRefetch]);
 
   const handleChanged = async (): Promise<ApolloQueryResult<Query>> => {
     // TODO use allSettled
@@ -640,10 +647,6 @@ function PermissionWrappedReservation() {
     return null;
   }
 
-  const handleRefetch = () => {
-    return refetch();
-  };
-
   return (
     <VisibleIfPermission
       permission={Permission.CAN_VIEW_RESERVATIONS}
@@ -654,7 +657,7 @@ function PermissionWrappedReservation() {
         </Container>
       }
     >
-      <RequestedReservation reservation={reservation} refetch={handleRefetch} />
+      <RequestedReservation reservation={reservation} refetch={refetch} />
     </VisibleIfPermission>
   );
 }

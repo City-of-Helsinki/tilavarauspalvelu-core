@@ -50,7 +50,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     fetchPolicy: "no-cache",
     variables: {
       orderBy: [PurposeOrderingChoices.RankAsc],
-      // "rank",
     },
   });
   const purposes = filterNonNullable(

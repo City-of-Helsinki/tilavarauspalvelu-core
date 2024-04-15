@@ -26,6 +26,25 @@ import {
 import { toApiDate } from "common/src/common/util";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 
+function convertOrderStatus(status: string): OrderStatus | undefined {
+  switch (status) {
+    case OrderStatus.Cancelled:
+      return OrderStatus.Cancelled;
+    case OrderStatus.Draft:
+      return OrderStatus.Draft;
+    case OrderStatus.Expired:
+      return OrderStatus.Expired;
+    case OrderStatus.Paid:
+      return OrderStatus.Paid;
+    case OrderStatus.PaidManually:
+      return OrderStatus.PaidManually;
+    case OrderStatus.Refunded:
+      return OrderStatus.Refunded;
+    default:
+      return undefined;
+  }
+}
+
 type UseOrderProps = {
   orderUuid?: string;
 };
@@ -67,12 +86,12 @@ export const useOrder = ({
       fetchPolicy: "no-cache",
       variables: { input: { orderUuid: orderUuid ?? "" } },
       onCompleted: (res) => {
-        // TODO type safe coerse status: string to OrderStatus
-        const newData: PaymentOrderNode | undefined =
-          data != null && res.refreshOrder != null
-            ? { ...data, status: res.refreshOrder.status as OrderStatus }
-            : undefined;
-        setData(newData);
+        if (data != null && res.refreshOrder.status != null) {
+          const status = convertOrderStatus(res.refreshOrder.status);
+          setData({ ...data, status });
+        } else {
+          setData(undefined);
+        }
       },
       // catch all thrown errors so we don't crash
       // particularly there is an EXTERNAL_SERVICE_ERROR that happens occasionally
@@ -160,7 +179,6 @@ export function useReservations({
       skip: !currentUser?.pk,
       variables: {
         ...(states != null && states?.length > 0 && { state: states }),
-        // TODO should we just pass an array here?
         ...(orderBy && { orderBy: [orderBy] }),
         user: currentUser?.pk?.toString(),
         beginDate: toApiDate(new Date()),

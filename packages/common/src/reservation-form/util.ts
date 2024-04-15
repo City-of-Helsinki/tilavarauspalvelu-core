@@ -6,11 +6,6 @@ import {
 import { reservationApplicationFields } from "./types";
 import { containsField } from "../metaFieldsHelpers";
 
-// TODO this is bad
-// and there seems to be other functions that have same or similar names
-// what is the purpose and use cases for this one?
-// also it uses types that are exclusive to it
-// WHAT? why doesn't tsc catch if this isn't exported
 export function getReservationApplicationFields({
   supportedFields,
   reserveeType,

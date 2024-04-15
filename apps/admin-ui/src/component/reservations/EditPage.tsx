@@ -16,9 +16,9 @@ import {
   type ReservationChangeFormType,
   ReservationChangeFormSchema,
 } from "@/schemas";
-import { useNotification } from "../../context/NotificationContext";
+import { useNotification } from "@/context/NotificationContext";
 import { flattenMetadata } from "../my-units/create-reservation/utils";
-import ReservationNodeForm from "../my-units/ReservationTypeForm";
+import ReservationTypeForm from "../my-units/ReservationTypeForm";
 import Loader from "../Loader";
 import { HR } from "@/component/Table";
 import { useOptions } from "../my-units/hooks";
@@ -180,7 +180,7 @@ function EditReservation({
   return (
     <FormProvider {...form}>
       <Form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <ReservationNodeForm
+        <ReservationTypeForm
           reservationUnit={reservationUnit}
           disableBufferToggle
         >
@@ -195,7 +195,7 @@ function EditReservation({
               errorText={translateError(errors.seriesName?.message)}
             />
           )}
-        </ReservationNodeForm>
+        </ReservationTypeForm>
         <HR />
         <ButtonContainer>
           <Button

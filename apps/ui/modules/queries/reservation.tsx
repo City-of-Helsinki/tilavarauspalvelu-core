@@ -19,7 +19,6 @@ export const CREATE_RESERVATION = gql`
   }
 `;
 
-// TODO is this still correct?
 export const UPDATE_RESERVATION = gql`
   mutation updateReservation($input: ReservationUpdateMutationInput!) {
     updateReservation(input: $input) {

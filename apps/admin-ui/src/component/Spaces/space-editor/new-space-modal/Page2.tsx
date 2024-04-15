@@ -35,10 +35,8 @@ export function Page2({
   const { watch, formState } = form;
   const { errors, isDirty } = formState;
 
-  // TODO get the parent name (form doesn't have it)
-  const parentName = watch("parent")
-    ? watch("parent")
-    : t("SpaceModal.page2.newRootSpace");
+  const parentPk = watch("parent") ?? null;
+  const parentName = unit.spaces.find((space) => space.pk === parentPk)?.nameFi;
 
   return (
     <>
@@ -72,14 +70,7 @@ export function Page2({
         </UnitInfo>
         <div>
           <FormErrorSummary errors={errors} />
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr var(--spacing-2-xl",
-            }}
-          >
-            <SpaceForm form={form} />
-          </div>
+          <SpaceForm form={form} />
         </div>
       </Dialog.Content>
       <DialogActionsButtons>

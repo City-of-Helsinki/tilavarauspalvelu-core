@@ -202,7 +202,6 @@ function SearchSingle({ data: initData }: Props): JSX.Element {
     Query,
     QueryReservationUnitsArgs
   >(RESERVATION_UNITS, {
-    // FIXME orderBy change
     variables: processVariables(searchValues, i18n.language),
     fetchPolicy: "network-only",
     // Why?

@@ -429,7 +429,6 @@ function UnitCalendar({ date, resources, refetch }: Props): JSX.Element {
   // todo find out min and max opening hour of every reservationunit
   const [beginHour, endHour] = [0, 24];
   const numHours = endHour - beginHour;
-  // TODO need to add affected reservations to the event
   const orderedResources = sortByDraftStatusAndTitle([...resources]);
   const { setModalContent } = useModal();
   const startDate = startOfDay(date);

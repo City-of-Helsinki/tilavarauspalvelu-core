@@ -16,7 +16,7 @@ import { getEventBuffers } from "common/src/calendar/util";
 
 type Props = {
   reservation: ReservationNode;
-  refetch?: (focusDate?: Date) => void;
+  refetch: (focusDate?: Date) => void;
   selected?: ReservationNode;
   focusDate: Date;
   events: Array<{
@@ -49,13 +49,13 @@ type WeekOptions = "day" | "week" | "month";
 /// @param selected (for recurring only) different styling
 /// @param focusDate date to show in the calendar
 // TODO combine with the one in my-unit/ReservationUnitCalendar (without the time change button)
-const Calendar = ({
+function Calendar({
   reservation,
   selected,
   refetch,
   focusDate,
   events: eventsAll,
-}: Props): JSX.Element => {
+}: Props): JSX.Element {
   const { t } = useTranslation();
   const { setModalContent } = useModal();
   const [calendarViewType, setCalendarViewType] = useState<WeekOptions>("week");
@@ -68,9 +68,7 @@ const Calendar = ({
   const events = eventsAll.filter(isInsideCalendarRange);
 
   const handleEditAccept = () => {
-    if (refetch) {
-      refetch();
-    }
+    refetch();
     setModalContent(null);
   };
 
@@ -115,9 +113,7 @@ const Calendar = ({
         begin={focusDate}
         eventStyleGetter={eventStyleGetter(reservation, selected)}
         onNavigate={(d: Date) => {
-          if (refetch) {
-            refetch(d);
-          }
+          refetch(d);
         }}
         viewType={calendarViewType}
         onView={(n: string) => {
@@ -133,6 +129,6 @@ const Calendar = ({
       </Legends>{" "}
     </Container>
   );
-};
+}
 
 export default Calendar;

@@ -234,14 +234,6 @@ export function ReservationEdit({
     MutationAdjustReservationTimeArgs
   >(ADJUST_RESERVATION_TIME, {
     errorPolicy: "all",
-    // TODO this should be handled in the mutation
-    // TODO don't print the error message to the user
-    onError: (e) => {
-      setErrorMsg(e.message);
-    },
-    onCompleted: () => {
-      setShowSuccessMsg(true);
-    },
   });
 
   // TODO should rework this so we don't pass a string here (use Dates till we do the mutation)
@@ -298,11 +290,22 @@ export function ReservationEdit({
   }, [reservation, reset]);
 
   // TODO refactor to use form submit instead of getValues
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const formValues = getValues();
     const times = convertFormToApi(formValues);
-    if (reservation.pk && times) {
-      adjustReservationTime({ pk: reservation.pk, ...times });
+    if (reservation.pk == null || times == null) {
+      return;
+    }
+    try {
+      await adjustReservationTime({ pk: reservation.pk, ...times });
+      setShowSuccessMsg(true);
+    } catch (e) {
+      if (e instanceof Error) {
+        // TODO don't print the error message to the user
+        setErrorMsg(e.message);
+      } else {
+        setErrorMsg("Unknown error");
+      }
     }
   };
 

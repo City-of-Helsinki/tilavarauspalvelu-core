@@ -93,6 +93,9 @@ function getImageSourceWithoutDefault(
 }
 
 // concat is necessary because if the reservation is only for one reservationUnit it's not included in the affectingReservations
+// NOTE concat is questionable (it creates duplicates), but if there is no common spaces the affecingReservations is empty
+// i.e. the reservationUnit doesn't have a space but has reservations (might be other cases too)
+// NOTE some users could be changed to use regular concat instead (if there is only a single reservationUnit the filter check is not needed).
 export function concatAffectedReservations(
   reservationSet: ReservationNode[],
   affectingReservations: ReservationNode[],

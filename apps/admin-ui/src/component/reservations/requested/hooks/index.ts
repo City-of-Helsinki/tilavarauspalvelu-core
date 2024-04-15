@@ -58,13 +58,15 @@ const shouldBeShownInTheCalendar = (r: ReservationNode, ownPk?: number) =>
   r.state === State.RequiresHandling ||
   r.pk === ownPk;
 
-/// NOTE only fetches 100 reservations => use pageInfo and fetchMore
-export const useReservationData = (
+// TODO there is an issue here with denied "Blocked" reservations shown in the Calendar as regular "Blocked" reservations
+// so it looks confusing. It works properly if we want to show the reservation itself even if it's denied, but there should
+// be either different styling or handling of "Blocked" reservations that are denied.
+export function useReservationData(
   begin: Date,
   end: Date,
   reservationUnitPk?: number,
   reservationPk?: number
-) => {
+) {
   const { notifyError } = useNotification();
   const { t } = useTranslation();
 
@@ -98,12 +100,10 @@ export const useReservationData = (
 
   const blockedName = t("ReservationUnits.reservationState.RESERVATION_CLOSED");
 
-  // TODO concat is questionable (it creates duplicates), but if there is no common spaces the affecingReservations is empty
-  // i.e. the reservationUnit doesn't have a space but has reservations (might be other cases too)
-
   const reservationSet = filterNonNullable(
     data?.reservationUnit?.reservationSet
   );
+  // NOTE we could use a recular concat here (we only have single reservationUnit here)
   const affectingReservations = filterNonNullable(data?.affectingReservations);
   const reservations = concatAffectedReservations(
     reservationSet,
@@ -117,7 +117,7 @@ export const useReservationData = (
       .map((r) => convertReservationToCalendarEvent(r, blockedName)) ?? [];
 
   return { ...rest, events };
-};
+}
 
 /// @param recurringPk fetch reservations related to this pk
 /// @param state optionally only fetch some reservation states

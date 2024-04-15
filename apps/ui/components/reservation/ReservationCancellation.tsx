@@ -171,16 +171,7 @@ function ReservationCancellation(props: Props): JSX.Element {
   const [cancelReservation, { loading }] = useMutation<
     { cancelReservation: ReservationCancellationMutationPayload },
     { input: ReservationCancellationMutationInput }
-  >(CANCEL_RESERVATION, {
-    onError: () => {
-      setErrorMsg(t("reservations:reservationCancellationFailed"));
-    },
-    onCompleted: () => {
-      setFormState("sent");
-      // TODO Why?
-      window.scrollTo(0, 0);
-    },
-  });
+  >(CANCEL_RESERVATION);
 
   const { register, handleSubmit, getValues, setValue, watch, control } =
     useForm();
@@ -218,15 +209,22 @@ function ReservationCancellation(props: Props): JSX.Element {
       return;
     }
     const { reason, description } = formData;
-    cancelReservation({
-      variables: {
-        input: {
-          pk: reservation.pk,
-          cancelReasonPk: reason,
-          cancelDetails: description,
+    try {
+      cancelReservation({
+        variables: {
+          input: {
+            pk: reservation.pk,
+            cancelReasonPk: reason,
+            cancelDetails: description,
+          },
         },
-      },
-    });
+      });
+      setFormState("sent");
+      // TODO Why?
+      window.scrollTo(0, 0);
+    } catch (e) {
+      setErrorMsg(t("reservations:reservationCancellationFailed"));
+    }
   };
 
   return (

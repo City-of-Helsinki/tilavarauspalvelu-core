@@ -101,7 +101,7 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
     }
   }, [data, reset, unit]);
 
-  const isLoading = isMutationLoading || isQueryLoading;
+  const isLoading = isQueryLoading;
 
   if (isLoading) {
     return <Loader />;
@@ -180,11 +180,11 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
                 <ParentSelector
                   helperText={t("SpaceModal.page1.parentHelperText")}
                   label={t("SpaceModal.page1.parentLabel")}
-                  // FIXME this should remove this space from the list
                   onChange={(parentPk) => onChange(parentPk)}
                   value={value}
                   placeholder={t("SpaceModal.page1.parentPlaceholder")}
                   unitPk={unit}
+                  selfPk={space}
                 />
               )}
             />
@@ -199,7 +199,7 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
               theme="black"
               type="button"
               onClick={() => history(-1)}
-              // TODO check loading state on mutations
+              disabled={isMutationLoading}
             >
               {t("SpaceEditor.cancel")}
             </Button>
@@ -207,8 +207,7 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
               disabled={!isDirty}
               variant="primary"
               type="submit"
-              isLoading={isLoading}
-              // loadingText={t("saving")}
+              isLoading={isMutationLoading}
             >
               {t("SpaceEditor.save")}
             </Button>

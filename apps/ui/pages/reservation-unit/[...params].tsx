@@ -196,8 +196,6 @@ const useRemoveStoredReservation = () => {
 // - using back multiple times breaks the confirmation hook (bypassing it or blocking the navigation while deleting the reservation)
 // - requires complex logic to handle the steps and keep the url in sync with what's on the page
 // - forward / backward navigation work differently
-// FIXME form validation isn't working correctly now.
-// TODO should split the steps here now (it's causing more headaches than it's worth)
 function ReservationUnitReservationWithReservationProp({
   reservation,
   reservationUnit,
@@ -414,7 +412,6 @@ function ReservationUnitReservationWithReservationProp({
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: type the form
     const normalizedPayload = Object.keys(payload).reduce<any>((acc, key) => {
-      // TODO is this correct key? we need to skip the dynamically created field
       if (key === "showBillingAddress") {
         return acc;
       }

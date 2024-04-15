@@ -22,7 +22,6 @@ const RESERVATIONS_IN_INTERVAL_FRAGMENT = gql`
   }
 `;
 
-// TODO is reservationSet needed? or is affectingReservations enough?
 // TODO this query would not be needed if the Calendar query would be passed to the useCheckCollisions
 export const GET_RESERVATIONS_IN_INTERVAL = gql`
   ${RESERVATIONS_IN_INTERVAL_FRAGMENT}
