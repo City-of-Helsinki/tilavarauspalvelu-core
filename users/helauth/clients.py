@@ -315,15 +315,6 @@ class TunnistamoClient(BaseExternalServiceClient):
     REQUEST_TIMEOUT_SECONDS = 5
 
     @classmethod
-    def ensure_token_valid(cls, request: WSGIRequest) -> None:
-        """
-        Ensure that the request user's tunnistamo access token is valid. Refresh if necessary.
-
-        :return: True if the user has a valid token, False otherwise.
-        """
-        return cls.get_token(request) is not None
-
-    @classmethod
     def get_token(cls, request: WSGIRequest) -> str | None:
         """
         Get tunnistamo access token from the user session. Refresh if necessary.
