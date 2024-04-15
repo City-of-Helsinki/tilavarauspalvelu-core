@@ -1,6 +1,4 @@
 import contextlib
-import re
-from datetime import date
 from typing import Any, TypedDict, Unpack
 
 from django.core.handlers.wsgi import WSGIRequest
@@ -15,7 +13,6 @@ from utils.sentry import SentryLogger
 
 __all__ = [
     "fetch_additional_info_for_user_from_helsinki_profile",
-    "ssn_to_date",
     "update_user_from_profile",
 ]
 
@@ -52,24 +49,6 @@ class ExtraKwargs(TypedDict):
     username: str
 
 
-ID_PATTERN = re.compile(r"^\d{6}[-+ABCDEFUVWXY]\d{3}[0-9ABCDEFHJKLMNPRSTUVWXY]$")
-ID_LETTER_TO_CENTURY: dict[str, int] = {
-    "A": 2000,
-    "B": 2000,
-    "C": 2000,
-    "D": 2000,
-    "E": 2000,
-    "F": 2000,
-    "-": 1900,
-    "U": 1900,
-    "V": 1900,
-    "W": 1900,
-    "X": 1900,
-    "Y": 1900,
-    "+": 1800,
-}
-
-
 def fetch_additional_info_for_user_from_helsinki_profile(
     backend: TunnistamoOIDCAuth,
     request: WSGIRequest,
@@ -91,7 +70,7 @@ def fetch_additional_info_for_user_from_helsinki_profile(
 def use_request_user(*, request: WSGIRequest, user: User):
     """
     Use the provided user as the request user for the duration of the context.
-    This is needed since during login, the request user is still anonymous.
+    This is needed during login, since the request user is still anonymous.
     """
     original_user = request.user
     try:
@@ -108,42 +87,15 @@ def update_user_from_profile(request: WSGIRequest, *, user: User | None = None) 
         return
 
     with use_request_user(request=request, user=user):
-        ssn_data = HelsinkiProfileClient.get_social_security_number(request)
+        birthday_info = HelsinkiProfileClient.get_birthday_info(request)
 
-    if ssn_data is None:
-        SentryLogger.log_message(f"Helsinki profile: Could not fetch JWT from Tunnistamo for user {user.pk!r}")
+    if birthday_info is None:
+        SentryLogger.log_message(f"Helsinki profile: Could not fetch JWT from Tunnistamo for user {int(user.pk)}")
         return
 
-    if ssn_data["id"] is None:
-        SentryLogger.log_message(f"Helsinki profile: Profile ID not found for user {user.pk!r}")
-        return
+    if birthday_info["id"] is not None:
+        user.profile_id = birthday_info["id"]
+    if birthday_info["birthday"] is not None:
+        user.date_of_birth = birthday_info["birthday"]
 
-    user.profile_id = ssn_data["id"]
-
-    if ssn_data["social_security_number"] is None:
-        SentryLogger.log_message(f"Helsinki profile: ID number not found for user {user.pk!r}")
-        user.save()
-        return
-
-    date_of_birth = ssn_to_date(ssn_data["social_security_number"])
-    if date_of_birth is None:
-        SentryLogger.log_message(
-            f"Helsinki profile: ID number received from profile was not of correct format for user {user.pk!r}"
-        )
-        user.save()
-        return
-
-    user.date_of_birth = date_of_birth
     user.save()
-
-
-def ssn_to_date(id_number: str) -> date | None:
-    if ID_PATTERN.fullmatch(id_number) is None:
-        return None
-
-    century = ID_LETTER_TO_CENTURY[id_number[6]]
-    return date(
-        year=century + int(id_number[4:6]),
-        month=int(id_number[2:4]),
-        day=int(id_number[0:2]),
-    )

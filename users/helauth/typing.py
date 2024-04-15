@@ -216,6 +216,7 @@ class PermanentForeignAddress(TypedDict, total=False):
 class VerifiedPersonalInfo(TypedDict, total=False):
     firstName: str | None
     lastName: str | None
+    nationalIdentificationNumber: str | None
     municipalityOfResidence: str | None
     municipalityOfResidenceNumber: str | None
     permanentAddress: PermanentAddress | None
@@ -262,6 +263,6 @@ class ReservationPrefillInfo(TypedDict):
     home_city: City | None
 
 
-class SocialSecurityNumberInfo(TypedDict):
+class BirthdayInfo(TypedDict):
     id: str | None  # random string
-    social_security_number: str | None
+    birthday: datetime.date | None

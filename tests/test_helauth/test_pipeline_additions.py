@@ -7,7 +7,8 @@ from graphene_django_extensions.testing import parametrize_helper
 from tests.factories import UserFactory
 from tests.helpers import ResponseMock, patch_method
 from users.helauth.clients import HelsinkiProfileClient
-from users.helauth.pipeline import ssn_to_date, update_user_from_profile
+from users.helauth.parsers import ssn_to_date
+from users.helauth.pipeline import update_user_from_profile
 from utils.sentry import SentryLogger
 
 from .helpers import mock_request

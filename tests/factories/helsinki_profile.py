@@ -78,6 +78,7 @@ class VerifiedPersonalInfoFactory(GenericFactory[VerifiedPersonalInfo]):
 
     firstName = factory.Faker("first_name", locale="fi_FI")
     lastName = factory.Faker("last_name", locale="fi_FI")
+    nationalIdentificationNumber = factory.Faker("ssn", locale="fi_FI")
     municipalityOfResidence = "Helsinki"
     municipalityOfResidenceNumber = "091"
     permanentAddress = factory.SubFactory(PermanentAddressFactory)
