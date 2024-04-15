@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+import datetime
+import re
+
 from django.conf import settings
 from graphene_django_extensions.utils import get_nested
 
 from applications.models import City
 from users.helauth.typing import (
+    BirthdayInfo,
     MyProfileData,
     PermanentAddress,
     PermanentForeignAddress,
@@ -19,15 +23,15 @@ from users.helauth.typing import (
 )
 
 __all__ = [
-    "ReservationPrefillParser",
+    "ProfileDataParser",
 ]
 
 
-class ReservationPrefillParser:
+class ProfileDataParser:
     def __init__(self, data: MyProfileData) -> None:
         self.data = data
 
-    def parse(self) -> ReservationPrefillInfo:
+    def parse_reservation_prefill_data(self) -> ReservationPrefillInfo:
         address = self.get_address() or {}
         return ReservationPrefillInfo(
             reservee_first_name=self.get_first_name(),
@@ -38,6 +42,12 @@ class ReservationPrefillParser:
             reservee_address_zip=address.get("postalCode"),
             reservee_address_city=address.get("city"),
             home_city=self.get_user_home_city(),
+        )
+
+    def parse_birthday_info(self) -> BirthdayInfo:
+        return BirthdayInfo(
+            id=self.data.get("id"),
+            birthday=self.get_birthday(),
         )
 
     def get_last_name(self) -> str | None:
@@ -161,3 +171,46 @@ class ReservationPrefillParser:
                 return city
 
         return City.objects.filter(name__iexact=settings.SECONDARY_MUNICIPALITY_NAME).first()
+
+    def get_social_security_number(self) -> str | None:
+        return get_nested(
+            self.data,
+            "verifiedPersonalInformation",
+            "nationalIdentificationNumber",
+        )
+
+    def get_birthday(self) -> datetime.date | None:
+        ssn = self.get_social_security_number()
+        if ssn is None:
+            return None
+        return ssn_to_date(ssn)
+
+
+def ssn_to_date(id_number: str) -> datetime.date | None:
+    if ID_PATTERN.fullmatch(id_number) is None:
+        return None
+
+    century = ID_LETTER_TO_CENTURY[id_number[6]]
+    return datetime.date(
+        year=century + int(id_number[4:6]),
+        month=int(id_number[2:4]),
+        day=int(id_number[0:2]),
+    )
+
+
+ID_PATTERN = re.compile(r"^\d{6}[-+ABCDEFUVWXY]\d{3}[0-9ABCDEFHJKLMNPRSTUVWXY]$")
+ID_LETTER_TO_CENTURY: dict[str, int] = {
+    "A": 2000,
+    "B": 2000,
+    "C": 2000,
+    "D": 2000,
+    "E": 2000,
+    "F": 2000,
+    "-": 1900,
+    "U": 1900,
+    "V": 1900,
+    "W": 1900,
+    "X": 1900,
+    "Y": 1900,
+    "+": 1800,
+}

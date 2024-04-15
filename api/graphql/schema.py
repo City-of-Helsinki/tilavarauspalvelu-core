@@ -21,6 +21,7 @@ from users.models import User
 
 # NOTE: Queries __need__ to be imported before mutations, see mutations.py!
 from .queries import (  # isort:skip
+    AgeGroupNode,
     AllocatedTimeSlotNode,
     ApplicationNode,
     ApplicationRoundNode,
@@ -35,23 +36,22 @@ from .queries import (  # isort:skip
     PaymentOrderNode,
     PurposeNode,
     QualifierNode,
+    RecurringReservationNode,
+    ReservationCancelReasonNode,
+    ReservationDenyReasonNode,
+    ReservationMetadataSetNode,
     ReservationNode,
+    ReservationPurposeNode,
     ReservationUnitCancellationRuleNode,
     ReservationUnitNode,
     ReservationUnitTypeNode,
     ResourceNode,
+    ServiceSectorNode,
     SpaceNode,
     TaxPercentageNode,
     TermsOfUseNode,
     UnitNode,
     UserNode,
-    AgeGroupNode,
-    RecurringReservationNode,
-    ReservationCancelReasonNode,
-    ReservationDenyReasonNode,
-    ReservationMetadataSetNode,
-    ReservationPurposeNode,
-    ServiceSectorNode,
 )
 from .types.merchants.permissions import PaymentOrderPermission
 
@@ -198,13 +198,15 @@ class Query(graphene.ObjectType):
     if "graphiql_debug_toolbar" in settings.INSTALLED_APPS:
         debug = Field(DjangoDebug, name="_debug")
 
-    def resolve_current_user(root: None, info: GQLInfo, **kwargs: Any):
+    def resolve_current_user(root: None, info: GQLInfo, **kwargs: Any) -> User | None:
+        if info.context.user.is_anonymous:
+            return None
+
         HelsinkiProfileClient.ensure_token_valid(info.context)
         return get_object_or_404(User, pk=info.context.user.pk)
 
-    def resolve_order(root: None, info: GQLInfo, **kwargs: Any):
-        remote_id: str = kwargs["order_uuid"]
-        order = get_object_or_404(PaymentOrder, remote_id=remote_id)
+    def resolve_order(root: None, info: GQLInfo, order_uuid: str, **kwargs: Any):
+        order = get_object_or_404(PaymentOrder, remote_id=order_uuid)
         if PaymentOrderPermission.has_node_permission(order, info.context.user, {}):
             return order
         return None
