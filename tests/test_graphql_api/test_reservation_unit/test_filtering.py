@@ -53,6 +53,30 @@ def test_reservation_unit__filter__by_pk__multiple(graphql):
     assert response.node(1) == {"pk": reservation_unit_2.pk}
 
 
+def test_reservation_unit__filter__by_tprek_id(graphql):
+    reservation_unit = ReservationUnitFactory.create(unit__tprek_id="foo")
+    ReservationUnitFactory.create(unit__tprek_id="bar")
+
+    query = reservation_units_query(tprek_id=reservation_unit.unit.tprek_id)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": reservation_unit.pk}
+
+
+def test_reservation_unit__filter__by_tprek_department_id(graphql):
+    reservation_unit = ReservationUnitFactory.create(unit__tprek_department_id="foo")
+    ReservationUnitFactory.create(unit__tprek_department_id="bar")
+
+    query = reservation_units_query(tprek_department_id=reservation_unit.unit.tprek_department_id)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": reservation_unit.pk}
+
+
 def test_reservation_unit__filter__by_equipment(graphql):
     # given:
     # - There are two reservation units with different equipments
