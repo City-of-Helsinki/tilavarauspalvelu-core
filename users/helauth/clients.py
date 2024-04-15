@@ -8,6 +8,7 @@ from typing import Any
 
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
+from django.utils.functional import classproperty
 from graphene_django_extensions.utils import get_nested
 from requests import HTTPError, Response
 from social_django.models import DjangoStorage
@@ -15,14 +16,14 @@ from social_django.strategy import DjangoStrategy
 
 from common.typing import AnyUser
 from tilavarauspalvelu.auth import ProxyTunnistamoOIDCAuthBackend
-from users.helauth.parsers import ReservationPrefillParser
+from users.helauth.parsers import ProfileDataParser
 from users.helauth.typing import (
+    BirthdayInfo,
     ExtraData,
     MyProfileData,
     ProfileTokenPayload,
     RefreshResponse,
     ReservationPrefillInfo,
-    SocialSecurityNumberInfo,
 )
 from users.helauth.utils import get_jwt_payload, get_session_data
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
@@ -44,182 +45,19 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
 
     @classmethod
     def get_reservation_prefill_info(cls, request: WSGIRequest) -> ReservationPrefillInfo | None:
-        """Fetch reservation prefill info from Helsinki Profile."""
-        token = cls.get_token(request)
-        if token is None:
+        """Fetch reservation prefill info for the request user from Helsinki Profile."""
+        my_profile_data = cls.graphql_request(request, query=cls.reservation_prefill_query)
+        if my_profile_data is None:
             return None
-
-        url: str = settings.OPEN_CITY_PROFILE_GRAPHQL_API
-        request_data = {"query": cls._reservation_prefill_query()}
-        headers = {"Authorization": f"Bearer {token}"}
-
-        response = cls.post(url=url, json=request_data, headers=headers)
-        response_data = cls.response_json(response)
-
-        my_profile_data: MyProfileData = get_nested(response_data, "data", "myProfile", default={})
-        return ReservationPrefillParser(my_profile_data).parse()
+        return ProfileDataParser(my_profile_data).parse_reservation_prefill_data()
 
     @classmethod
-    def _reservation_prefill_query(cls) -> str:
-        primary_email_fragment = """
-            fragment MyPrimaryEmail on ProfileNode {
-                primaryEmail {
-                    email
-                    primary
-                    emailType
-                }
-            }
-        """
-        primary_phone_fragment = """
-            fragment MyPrimaryPhone on ProfileNode {
-                primaryPhone {
-                    phone
-                    primary
-                    phoneType
-                }
-            }
-        """
-        primary_address_fragment = """
-            fragment MyPrimaryAddress on ProfileNode {
-                primaryAddress {
-                    primary
-                    address
-                    postalCode
-                    city
-                    countryCode
-                    addressType
-                }
-            }
-        """
-
-        emails_fragment = """
-            fragment MyEmails on ProfileNode {
-                emails {
-                    edges {
-                        node {
-                            email
-                            primary
-                            emailType
-                        }
-                    }
-                }
-            }
-        """
-        phones_fragment = """
-            fragment MyPhones on ProfileNode {
-                phones {
-                    edges {
-                        node {
-                            phone
-                            primary
-                            phoneType
-                        }
-                    }
-                }
-            }
-        """
-        addresses_fragment = """
-            fragment MyAddresses on ProfileNode {
-                addresses {
-                    edges {
-                        node {
-                            primary
-                            address
-                            postalCode
-                            city
-                            countryCode
-                            addressType
-                        }
-                    }
-                }
-            }
-        """
-
-        verified_info_fragment = """
-            fragment MyVerifiedPersonalInformation on ProfileNode {
-                verifiedPersonalInformation {
-                    firstName
-                    lastName
-                    municipalityOfResidence
-                    municipalityOfResidenceNumber
-                    permanentAddress {
-                         streetAddress
-                         postalCode
-                         postOffice
-                    }
-                    permanentForeignAddress {
-                        streetAddress
-                        additionalAddress
-                        countryCode
-                    }
-                }
-            }
-        """
-
-        return (
-            """
-            query {
-                myProfile {
-                    firstName
-                    lastName
-                    nickname
-                    language
-                    ...MyPrimaryEmail
-                    ...MyPrimaryPhone
-                    ...MyPrimaryAddress
-                    ...MyEmails
-                    ...MyPhones
-                    ...MyAddresses
-                    ...MyVerifiedPersonalInformation
-                }
-            }
-            """
-            + primary_email_fragment
-            + primary_phone_fragment
-            + primary_address_fragment
-            + emails_fragment
-            + phones_fragment
-            + addresses_fragment
-            + verified_info_fragment
-        )
-
-    @classmethod
-    def get_social_security_number(cls, request: WSGIRequest) -> SocialSecurityNumberInfo | None:
-        """Fetch social security number from Helsinki profile."""
-        token = cls.get_token(request)
-        if token is None:
+    def get_birthday_info(cls, request: WSGIRequest) -> BirthdayInfo | None:
+        """Fetch profile ID and birthday for the request user from Helsinki profile."""
+        my_profile_data = cls.graphql_request(request, query=cls.social_security_number_query)
+        if my_profile_data is None:
             return None
-
-        url: str = settings.OPEN_CITY_PROFILE_GRAPHQL_API
-        request_data = {"query": cls._social_security_number_query()}
-        headers = {"Authorization": f"Bearer {token}"}
-
-        response = cls.post(url=url, json=request_data, headers=headers)
-        response_data = cls.response_json(response)
-
-        my_profile_data: MyProfileData = get_nested(response_data, "data", "myProfile", default={})
-
-        return SocialSecurityNumberInfo(
-            id=my_profile_data.get("id"),
-            social_security_number=get_nested(
-                my_profile_data,
-                "verifiedPersonalInformation",
-                "nationalIdentificationNumber",
-            ),
-        )
-
-    @classmethod
-    def _social_security_number_query(cls) -> str:
-        return """
-            query {
-                myProfile {
-                    id
-                    verifiedPersonalInformation {
-                        nationalIdentificationNumber
-                    }
-                }
-            }
-        """
+        return ProfileDataParser(my_profile_data).parse_birthday_info()
 
     @classmethod
     def ensure_token_valid(cls, request: WSGIRequest) -> bool:
@@ -294,6 +132,21 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
         return session_data["api_tokens"].get(settings.OPEN_CITY_PROFILE_SCOPE)
 
     @classmethod
+    def graphql_request(cls, request: WSGIRequest, *, query: str) -> MyProfileData | None:
+        token = cls.get_token(request)
+        if token is None:
+            return None
+
+        url: str = settings.OPEN_CITY_PROFILE_GRAPHQL_API
+        request_data = {"query": query}
+        headers = {"Authorization": f"Bearer {token}"}
+
+        response = cls.post(url=url, json=request_data, headers=headers)
+        response_data = cls.response_json(response)
+
+        return get_nested(response_data, "data", "myProfile", default={})
+
+    @classmethod
     def response_json(cls, response: Response) -> dict[str, Any]:
         if response.status_code != 200:
             raise ExternalServiceRequestError(response, cls.SERVICE_NAME)
@@ -308,6 +161,180 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
             raise ExternalServiceError(f"{msg} {details}")
 
         return response_data
+
+    @classproperty
+    def reservation_prefill_query(cls) -> str:
+        return (
+            """
+            query {
+                myProfile {
+                    firstName
+                    lastName
+                    ...MyPrimaryEmail
+                    ...MyPrimaryPhone
+                    ...MyPrimaryAddress
+                    ...MyEmails
+                    ...MyPhones
+                    ...MyAddresses
+                    ...MyVerifiedPersonalInformation
+                }
+            }
+            """
+            + cls._primary_email_fragment
+            + cls._primary_phone_fragment
+            + cls._primary_address_fragment
+            + cls._emails_fragment
+            + cls._phones_fragment
+            + cls._addresses_fragment
+            + cls._verified_info_fragment
+        )
+
+    @classproperty
+    def social_security_number_query(cls) -> str:
+        return """
+            query {
+                myProfile {
+                    id
+                    verifiedPersonalInformation {
+                        nationalIdentificationNumber
+                    }
+                }
+            }
+        """
+
+    @classproperty
+    def _primary_email_fragment(cls) -> str:
+        return """
+            fragment MyPrimaryEmail on ProfileNode {
+                primaryEmail {
+                    email
+                    primary
+                    emailType
+                }
+            }
+        """
+
+    @classproperty
+    def _primary_phone_fragment(cls) -> str:
+        return """
+            fragment MyPrimaryPhone on ProfileNode {
+                primaryPhone {
+                    phone
+                    primary
+                    phoneType
+                }
+            }
+        """
+
+    @classproperty
+    def _primary_address_fragment(cls) -> str:
+        return """
+            fragment MyPrimaryAddress on ProfileNode {
+                primaryAddress {
+                    primary
+                    address
+                    postalCode
+                    city
+                    countryCode
+                    addressType
+                }
+            }
+        """
+
+    @classproperty
+    def _emails_fragment(cls) -> str:
+        return """
+            fragment MyEmails on ProfileNode {
+                emails {
+                    edges {
+                        node {
+                            email
+                            primary
+                            emailType
+                        }
+                    }
+                }
+            }
+        """
+
+    @classproperty
+    def _phones_fragment(cls) -> str:
+        return """
+            fragment MyPhones on ProfileNode {
+                phones {
+                    edges {
+                        node {
+                            phone
+                            primary
+                            phoneType
+                        }
+                    }
+                }
+            }
+        """
+
+    @classproperty
+    def _addresses_fragment(cls) -> str:
+        return """
+            fragment MyAddresses on ProfileNode {
+                addresses {
+                    edges {
+                        node {
+                            primary
+                            address
+                            postalCode
+                            city
+                            countryCode
+                            addressType
+                        }
+                    }
+                }
+            }
+        """
+
+    @classproperty
+    def _permanent_address(cls) -> str:
+        return """
+            fragment MyPermanentAddress on VerifiedPersonalInformationNode {
+                permanentAddress {
+                    streetAddress
+                    postalCode
+                    postOffice
+                }
+            }
+        """
+
+    @classproperty
+    def _permanent_foreign_address(cls) -> str:
+        return """
+            fragment MyPermanentForeignAddress on VerifiedPersonalInformationNode {
+                permanentForeignAddress {
+                    streetAddress
+                    additionalAddress
+                    countryCode
+                }
+            }
+        """
+
+    @classproperty
+    def _verified_info_fragment(cls) -> str:
+        return (
+            """
+            fragment MyVerifiedPersonalInformation on ProfileNode {
+                verifiedPersonalInformation {
+                    firstName
+                    lastName
+                    nationalIdentificationNumber
+                    municipalityOfResidence
+                    municipalityOfResidenceNumber
+                    ...MyPermanentAddress
+                    ...MyPermanentForeignAddress
+                }
+            }
+            """
+            + cls._permanent_address
+            + cls._permanent_foreign_address
+        )
 
 
 class TunnistamoClient(BaseExternalServiceClient):
