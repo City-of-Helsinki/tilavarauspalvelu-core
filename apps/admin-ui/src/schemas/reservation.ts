@@ -6,7 +6,6 @@ import {
   checkTimeStringFormat,
   checkValidFutureDate,
 } from "common/src/schemas/schemaCommon";
-import { constructApiDate } from "@/helpers";
 
 export const ReservationTypes = [
   "STAFF",
@@ -82,6 +81,9 @@ export const checkReservationInterval = (
   }
 };
 
+// Date can't be in past
+// Time is allowed to be in the past on purpose so it's not validated
+// i.e. you can make a reservation for today 10:00 even if it's 10:30
 const ReservationFormSchemaRefined = (interval: ReservationStartInterval) =>
   ReservationFormSchema.partial()
     .superRefine((val, ctx) => {
@@ -96,18 +98,6 @@ const ReservationFormSchemaRefined = (interval: ReservationStartInterval) =>
       checkTimeStringFormat(val.endTime, ctx, "endTime")
     )
     .superRefine((val, ctx) => checkStartEndTime(val, ctx))
-    .superRefine((val, ctx) => {
-      if (val.startTime && val.date) {
-        const d = constructApiDate(val.date, val.startTime);
-        if (d != null && new Date(d) < new Date()) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "startTime must be before now",
-            path: ["startTime"],
-          });
-        }
-      }
-    })
     .superRefine((val, ctx) =>
       checkReservationInterval(
         val.startTime,
