@@ -6,7 +6,7 @@
     "PER_HOUR": "tunti",
     "PER_HALF_DAY": "½ pv",
     "PER_DAY": "päivä",
-    "PER_WEEK": "vikko"
+    "PER_WEEK": "viikko"
   },
   "priceFree": "Maksuton",
   "taxPercentage": "alv {{count}}%",
