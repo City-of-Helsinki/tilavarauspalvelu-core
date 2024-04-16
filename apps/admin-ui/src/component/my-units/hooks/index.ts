@@ -158,7 +158,6 @@ export function useUnitResources(
       url: String(x.pk || 0),
       isDraft: x.isDraft,
       pk: x.pk ?? 0,
-      // concat is necessary because if the reservation is only for one reservationUnit it's not included in the affectingReservations
       events: concatAffectedReservations(
         filterNonNullable(x.reservationSet),
         filterNonNullable(affectingReservations),

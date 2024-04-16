@@ -1,30 +1,47 @@
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
 import { addDays, formatISO, startOfDay, subDays } from "date-fns";
-import SingleReservationUnitFilter from "../filters/SingleReservationUnitFilter";
 import { AutoGrid, HorisontalFlex } from "@/styles/layout";
 import { ReservationUnitCalendar } from "./ReservationUnitCalendar";
 import WeekNavigation from "./WeekNavigation";
+import { SortedSelect } from "@/component/SortedSelect";
+import { useTranslation } from "react-i18next";
 
-type Params = {
-  unitId: string;
-  reservationUnitId: string;
-};
+export function ReservationUnitCalendarView({
+  reservationUnitOptions,
+}: {
+  reservationUnitOptions: { label: string; value: number }[];
+}): JSX.Element {
+  const { t } = useTranslation();
 
-export function ReservationUnitCalendarView(): JSX.Element {
   const today = formatISO(startOfDay(new Date()));
 
   const [begin, setBegin] = useState(today);
   const [reservationUnitPk, setReservationUnitPk] = useState(-1);
-  const { unitId } = useParams<Params>();
+
+  const valueOption =
+    reservationUnitOptions.find((o) => o.value === reservationUnitPk) ??
+    reservationUnitOptions[0] ??
+    null;
+
+  const onChange = (reservationUnits: { label: string; value: number }) => {
+    setReservationUnitPk(reservationUnits.value);
+  };
 
   return (
     <>
       <AutoGrid>
-        <SingleReservationUnitFilter
-          unitPk={unitId}
-          value={{ value: reservationUnitPk, label: "x" }}
-          onChange={(ru) => setReservationUnitPk(Number(ru.value))}
+        <SortedSelect
+          style={{
+            zIndex: "var(--tilavaraus-admin-stack-select-over-calendar)",
+          }}
+          disabled={reservationUnitOptions.length === 0}
+          sort
+          label={t("ReservationUnitsFilter.label")}
+          placeholder={t("common.select")}
+          options={reservationUnitOptions}
+          value={valueOption}
+          onChange={onChange}
+          id="reservation-unit"
         />
       </AutoGrid>
       <HorisontalFlex style={{ justifyContent: "center" }}>

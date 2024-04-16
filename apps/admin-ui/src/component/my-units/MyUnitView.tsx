@@ -18,7 +18,7 @@ import { useNotification } from "@/context/NotificationContext";
 import { useQuery } from "@apollo/client";
 import { Query, QueryUnitArgs } from "common/types/gql-types";
 import { UNIT_VIEW_QUERY } from "./hooks/queries";
-import { base64encode } from "common/src/helpers";
+import { base64encode, filterNonNullable } from "common/src/helpers";
 
 type Params = {
   unitId: string;
@@ -107,6 +107,13 @@ function MyUnitView() {
     },
   ];
 
+  const reservationUnitOptions = filterNonNullable(
+    data?.unit?.reservationunitSet
+  ).map((reservationUnit) => ({
+    label: reservationUnit?.nameFi ?? "",
+    value: reservationUnit?.pk ?? 0,
+  }));
+
   return (
     <>
       <BreadcrumbWrapper route={routes} />
@@ -136,7 +143,9 @@ function MyUnitView() {
             <UnitReservationsView />
           </ReservationTabPanel>
           <UnitCalendarTabPanel key="reservation-unit">
-            <ReservationUnitCalendarView />
+            <ReservationUnitCalendarView
+              reservationUnitOptions={reservationUnitOptions}
+            />
           </UnitCalendarTabPanel>
         </Tabs>
       </ContainerHack>

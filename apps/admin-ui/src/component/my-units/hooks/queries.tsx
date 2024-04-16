@@ -47,6 +47,7 @@ export const UNIT_VIEW_QUERY = gql`
       }
       reservationunitSet {
         pk
+        nameFi
         spaces {
           pk
         }
