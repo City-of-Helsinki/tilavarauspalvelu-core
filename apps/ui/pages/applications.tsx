@@ -4,9 +4,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useQuery } from "@apollo/client";
 import { Notification } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { Dictionary, groupBy } from "lodash";
 import styled from "styled-components";
-import { ReducedApplicationStatus } from "common/types/common";
 import {
   ApplicationNode,
   ApplicationStatusChoice,
@@ -15,7 +13,6 @@ import {
 } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { useSession } from "@/hooks/auth";
-import { getReducedApplicationStatus } from "@/modules/util";
 import Head from "@/components/applications/Head";
 import ApplicationsGroup from "@/components/applications/ApplicationsGroup";
 import { CenterSpinner } from "@/components/common/common";
@@ -41,38 +38,63 @@ const Container = styled.div`
   font-size: var(--fontsize-body-xl);
 `;
 
-const statusGroupOrder: ReducedApplicationStatus[] = [
-  "sent",
-  "processing",
-  "draft",
-];
-
-const ApplicationGroups = ({
+function ApplicationGroups({
   applications,
   actionCallback,
 }: {
-  applications: { [key: string]: ApplicationNode[] };
+  applications: ApplicationNode[];
   actionCallback: (string: "error" | "cancel") => Promise<void>;
-}) => {
+}) {
   const { t } = useTranslation();
   if (Object.keys(applications).length === 0) {
     return <span>{t("applications:noApplications")}</span>;
   }
+
+  const sent = applications.filter(
+    (a) => a.status === ApplicationStatusChoice.ResultsSent
+  );
+  const received = applications.filter(
+    (a) => a.status === ApplicationStatusChoice.Received
+  );
+  const processing = applications.filter(
+    (a) =>
+      a.status === ApplicationStatusChoice.InAllocation ||
+      a.status === ApplicationStatusChoice.Handled
+  );
+  const draft = applications.filter(
+    (a) =>
+      a.status === ApplicationStatusChoice.Draft ||
+      a.status === ApplicationStatusChoice.Cancelled ||
+      a.status === ApplicationStatusChoice.Expired
+  );
+
   return (
     <>
-      {statusGroupOrder.map((gr) => (
-        <ApplicationsGroup
-          key={gr}
-          name={t(`applications:group.${gr}`)}
-          applications={applications[gr] || []}
-          actionCallback={actionCallback}
-        />
-      ))}
+      <ApplicationsGroup
+        name={t(`applications:group.sent`)}
+        applications={sent}
+        actionCallback={actionCallback}
+      />
+      <ApplicationsGroup
+        name={t(`applications:group.received`)}
+        applications={received}
+        actionCallback={actionCallback}
+      />
+      <ApplicationsGroup
+        name={t(`applications:group.processing`)}
+        applications={processing}
+        actionCallback={actionCallback}
+      />
+      <ApplicationsGroup
+        name={t(`applications:group.draft`)}
+        applications={draft}
+        actionCallback={actionCallback}
+      />
     </>
   );
-};
+}
 
-const ApplicationsPage = (): JSX.Element | null => {
+function ApplicationsPage(): JSX.Element | null {
   const { t } = useTranslation();
   const { isAuthenticated, user } = useSession();
   const [cancelled, setCancelled] = useState(false);
@@ -100,9 +122,6 @@ const ApplicationsPage = (): JSX.Element | null => {
 
   const appNodes = filterNonNullable(
     appData?.applications?.edges?.map((n) => n?.node)
-  );
-  const applications: Dictionary<ApplicationNode[]> = groupBy(appNodes, (a) =>
-    getReducedApplicationStatus(a?.status ?? undefined)
   );
 
   const actionCallback = async (type: "cancel" | "error") => {
@@ -139,7 +158,7 @@ const ApplicationsPage = (): JSX.Element | null => {
         )}
         {!isLoading && !isError ? (
           <ApplicationGroups
-            applications={applications}
+            applications={appNodes}
             actionCallback={actionCallback}
           />
         ) : null}
@@ -172,6 +191,6 @@ const ApplicationsPage = (): JSX.Element | null => {
       )}
     </>
   );
-};
+}
 
 export default ApplicationsPage;

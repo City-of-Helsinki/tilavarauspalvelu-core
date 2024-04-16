@@ -19,7 +19,7 @@ import {
   ApplicationStatusChoice,
   Maybe,
 } from "common/types/gql-types";
-import { applicationUrl, getReducedApplicationStatus } from "@/modules/util";
+import { applicationUrl } from "@/modules/util";
 import { BlackButton } from "@/styles/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { CANCEL_APPLICATION_MUTATION } from "@/modules/queries/application";
@@ -176,6 +176,26 @@ function isEditable(
   return false;
 }
 
+function getApplicationStatusColour(
+  status?: Maybe<ApplicationStatusChoice>
+): "normal" | "yellow" | "green" {
+  switch (status) {
+    case ApplicationStatusChoice.ResultsSent:
+      return "green";
+    case ApplicationStatusChoice.InAllocation:
+    case ApplicationStatusChoice.Handled:
+      return "normal";
+    case ApplicationStatusChoice.Received:
+      return "green";
+    case ApplicationStatusChoice.Cancelled:
+    case ApplicationStatusChoice.Expired:
+    case ApplicationStatusChoice.Draft:
+      return "yellow";
+    default:
+      return "normal";
+  }
+}
+
 function ApplicationCard({ application, actionCallback }: Props): JSX.Element {
   const { t } = useTranslation();
   const modal = useRef<ModalRef>();
@@ -197,30 +217,21 @@ function ApplicationCard({ application, actionCallback }: Props): JSX.Element {
     },
   });
 
-  const cancel = async () => {
-    await mutation();
+  const cancel = () => {
+    mutation();
   };
 
   const { applicationRound } = application;
 
-  const reducedApplicationStatus = getReducedApplicationStatus(
-    application.status ?? undefined
-  );
-
   const editable = isEditable(application.status);
 
-  const style =
-    reducedApplicationStatus === "draft"
-      ? "yellow"
-      : reducedApplicationStatus === "sent"
-        ? "green"
-        : "normal";
+  const style = getApplicationStatusColour(application.status);
 
   return (
     <Card border key={application.pk} data-testid="applications__card--wrapper">
       <div>
         <Tag $style={style}>
-          {t(`applicationCard:status.${reducedApplicationStatus}`)}
+          {t(`applicationCard:status.${application.status}`)}
         </Tag>
         <RoundName>{getApplicationRoundName(applicationRound)}</RoundName>
         <Applicant>

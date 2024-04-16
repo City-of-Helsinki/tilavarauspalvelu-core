@@ -9,7 +9,14 @@
   "status": {
     "draft": "Utkast",
     "processing": "I behandling",
-    "sent": "Behandlad"
+    "sent": "Behandlad",
+    "CANCELLED": "Ångrad",
+    "DRAFT": "Utkast",
+    "EXPIRED": "Utgått",
+    "HANDLED": "Käsittelyssä",
+    "IN_ALLOCATION": "I behandling",
+    "RECEIVED": "Skickat",
+    "RESULTS_SENT": "Behandlad"
   },
   "reservations": "Bokningar",
   "saved": "Senast sparad: {{date, d.M.yyyy 'kl' H:mm}}",

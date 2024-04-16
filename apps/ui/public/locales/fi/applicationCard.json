@@ -9,7 +9,14 @@
   "status": {
     "draft": "Kesken",
     "processing": "Käsittelyssä",
-    "sent": "Käsitelty"
+    "sent": "Käsitelty",
+    "CANCELLED": "Peruttu",
+    "DRAFT": "Luonnos",
+    "EXPIRED": "Rauennut",
+    "HANDLED": "Käsittelyssä",
+    "IN_ALLOCATION": "Käsittelyssä",
+    "RECEIVED": "Lähetetty",
+    "RESULTS_SENT": "Tulokset lähetetty"
   },
   "reservations": "Varaukset",
   "saved": "Viimeksi tallennettu: {{date, d.M.yyyy 'klo' H:mm}}",

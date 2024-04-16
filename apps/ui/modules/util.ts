@@ -3,6 +3,7 @@ import { i18n, TFunction } from "next-i18next";
 import queryString from "query-string";
 import { trim } from "lodash";
 import { ApolloError } from "@apollo/client";
+import type { OptionType } from "common";
 import {
   toApiDate,
   toUIDate,
@@ -10,11 +11,9 @@ import {
   fromApiDate as fromAPIDate,
   fromUIDate,
 } from "common/src/common/util";
-import type { OptionType, ReducedApplicationStatus } from "common/types/common";
 import {
   type ReservationUnitImageNode,
   type ReservationUnitNode,
-  ApplicationStatusChoice,
   type AgeGroupNode,
 } from "common/types/gql-types";
 import {
@@ -253,28 +252,6 @@ export const applicationErrorText = (
   key: string | undefined,
   attrs: { [key: string]: string | number } = {}
 ): string => (key ? t(`application:error.${key}`, attrs) : "");
-
-/// @deprecated TODO: remove this (it makes no sense anymore with the changes to the statuses)
-// TODO all of these should return an unknown status if the status is not recognized or allowed
-// not a null / undefined
-export const getReducedApplicationStatus = (
-  status?: ApplicationStatusChoice
-): ReducedApplicationStatus | null => {
-  switch (status) {
-    case ApplicationStatusChoice.Received:
-      return "processing";
-    case ApplicationStatusChoice.Cancelled:
-    case ApplicationStatusChoice.Expired:
-    case ApplicationStatusChoice.Draft:
-      return "draft";
-    case ApplicationStatusChoice.InAllocation:
-    case ApplicationStatusChoice.ResultsSent:
-    case ApplicationStatusChoice.Handled:
-      return "sent";
-    default:
-      return null;
-  }
-};
 
 export const getReadableList = (list: string[]): string => {
   if (list.length === 0) {

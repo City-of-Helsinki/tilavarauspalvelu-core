@@ -13,9 +13,6 @@ export type SlotProps = {
   style?: React.CSSProperties;
 };
 
-// @deprecated used by applications page for grouping
-export type ReducedApplicationStatus = "draft" | "processing" | "sent";
-
 export type DAY = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 export type ApplicationEventSchedulePriority = number;
