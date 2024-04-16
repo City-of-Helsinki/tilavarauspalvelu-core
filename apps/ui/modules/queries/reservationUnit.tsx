@@ -81,6 +81,7 @@ const BLOCKING_RESERVATION_FRAGMENT = gql`
     calendarUrl
     bufferTimeBefore
     bufferTimeAfter
+    affectedReservationUnits
   }
 `;
 
@@ -111,6 +112,9 @@ export const RESERVATION_UNIT_PAGE_QUERY = gql`
       reservableTimeSpans(startDate: $beginDate, endDate: $endDate) {
         startDatetime
         endDatetime
+      }
+      reservationSet {
+        ...BlockingReservationFields
       }
     }
     affectingReservations(

@@ -3,7 +3,11 @@ import { useQuery } from "@apollo/client";
 import { useNotification } from "@/context/NotificationContext";
 import { doesIntervalCollide, reservationToInterval } from "@/helpers";
 import { RESERVATIONS_BY_RESERVATIONUNIT } from "./queries";
-import { base64encode, filterNonNullable } from "common/src/helpers";
+import {
+  base64encode,
+  concatAffectedReservations,
+  filterNonNullable,
+} from "common/src/helpers";
 import { toApiDate } from "common/src/common/util";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { ReservationUnitWithAffectingArgs } from "common/src/queries/fragments";
@@ -50,10 +54,16 @@ function useCheckCollisions({
     }
   );
 
-  const rawReservations = data?.reservationUnit?.reservationSet?.concat(
-    data?.affectingReservations ?? []
+  const reservationSet = filterNonNullable(
+    data?.reservationUnit?.reservationSet
   );
-  const reservations = filterNonNullable(rawReservations);
+  const affectingReservations = filterNonNullable(data?.affectingReservations);
+  const reservations = concatAffectedReservations(
+    reservationSet,
+    affectingReservations,
+    reservationUnitPk ?? 0
+  );
+
   const collisions = reservations
     .filter((x) => x?.pk !== reservationPk)
     .map((x) => reservationToInterval(x, reservationType))

@@ -25,6 +25,7 @@ const CALENDAR_RESERVATION_FRAGMENT = gql`
     recurringReservation {
       pk
     }
+    affectedReservationUnits
   }
 `;
 

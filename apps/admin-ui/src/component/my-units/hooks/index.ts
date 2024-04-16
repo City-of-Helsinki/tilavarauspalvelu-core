@@ -11,7 +11,11 @@ import {
   ReservationTypeChoice,
 } from "common/types/gql-types";
 import { toApiDate } from "common/src/common/util";
-import { base64encode, filterNonNullable } from "common/src/helpers";
+import {
+  base64encode,
+  concatAffectedReservations,
+  filterNonNullable,
+} from "common/src/helpers";
 import { useNotification } from "@/context/NotificationContext";
 import {
   OPTIONS_QUERY,
@@ -142,15 +146,6 @@ export function useUnitResources(
     };
   }
 
-  function doesReservationAffectUnit(
-    reservation: ReservationNode,
-    unit: ReservationUnitNode
-  ) {
-    return reservation.affectedReservationUnits?.some(
-      (affectedUnit) => affectedUnit === unit.pk
-    );
-  }
-
   const resources = filterNonNullable(data?.unit?.reservationunitSet)
     .filter(
       (x) =>
@@ -163,20 +158,17 @@ export function useUnitResources(
       url: String(x.pk || 0),
       isDraft: x.isDraft,
       pk: x.pk ?? 0,
-      events:
-        // concat is necessary because if the reservation is only for one reservationUnit it's not included in the affectingReservations
-        filterNonNullable(
-          x.reservationSet?.concat(
-            affectingReservations?.filter((y) =>
-              doesReservationAffectUnit(y, x)
-            ) ?? []
-          )
-        ).map((y) => ({
-          event: convertToEvent(y, x),
-          title: y.name ?? "",
-          start: new Date(y.begin),
-          end: new Date(y.end),
-        })),
+      // concat is necessary because if the reservation is only for one reservationUnit it's not included in the affectingReservations
+      events: concatAffectedReservations(
+        filterNonNullable(x.reservationSet),
+        filterNonNullable(affectingReservations),
+        x.pk ?? 0
+      ).map((y) => ({
+        event: convertToEvent(y, x),
+        title: y.name ?? "",
+        start: new Date(y.begin),
+        end: new Date(y.end),
+      })),
     }));
 
   return { ...rest, resources };

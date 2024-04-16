@@ -1,4 +1,4 @@
-import type { Maybe, ReservationUnitImageNode } from "../types/gql-types";
+import type { Maybe, ReservationNode, ReservationUnitImageNode } from "../types/gql-types";
 import { pixel } from "./common/style";
 
 export function filterNonNullable<T>(
@@ -86,4 +86,26 @@ function getImageSourceWithoutDefault(
     default:
       return null;
   }
+}
+
+// concat is necessary because if the reservation is only for one reservationUnit it's not included in the affectingReservations
+export function concatAffectedReservations(
+    reservationSet: ReservationNode[],
+    affectingReservations: ReservationNode[],
+    reservationUnitPk: number
+  ) {
+  return filterNonNullable(
+    reservationSet?.concat(
+      affectingReservations?.filter((y) => doesReservationAffectReservationUnit(y, reservationUnitPk)) ?? []
+    )
+  );
+}
+
+function doesReservationAffectReservationUnit(
+    reservation: ReservationNode,
+    reservationUnitPk: number
+  ) {
+  return reservation.affectedReservationUnits?.some(
+    (pk) => pk === reservationUnitPk
+  );
 }

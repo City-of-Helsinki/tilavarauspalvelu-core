@@ -7,7 +7,11 @@ import { ReservationEdit } from "@/components/reservation/ReservationEdit";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 import type { Query, QueryReservationArgs } from "common/types/gql-types";
-import { base64encode, filterNonNullable } from "common/src/helpers";
+import {
+  base64encode,
+  concatAffectedReservations,
+  filterNonNullable,
+} from "common/src/helpers";
 import {
   RESERVATION_UNIT_PAGE_QUERY,
   type ReservationUnitWithAffectingArgs,
@@ -64,9 +68,16 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
     const timespans = filterNonNullable(reservationUnit?.reservableTimeSpans);
     const reservableTimeSpans = timespans;
-    // TODO is this enough? or do we need to query the reservationUnit.reservationSet also?
-    const reservations = filterNonNullable(
+    const reservationSet = filterNonNullable(
+      reservationUnitData?.reservationUnit?.reservationSet
+    );
+    const affectingReservations = filterNonNullable(
       reservationUnitData?.affectingReservations
+    );
+    const reservations = concatAffectedReservations(
+      reservationSet,
+      affectingReservations,
+      resUnitPk ?? 0
     );
 
     // TODO check for nulls and return notFound if necessary

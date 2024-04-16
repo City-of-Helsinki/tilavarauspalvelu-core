@@ -55,6 +55,7 @@ import {
 } from "common/types/gql-types";
 import {
   base64encode,
+  concatAffectedReservations,
   filterNonNullable,
   fromMondayFirstUnsafe,
   getLocalizationLang,
@@ -247,9 +248,17 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     const searchDuration = Number.isNaN(Number(queryParams.get("duration")))
       ? null
       : Number(queryParams.get("duration"));
-    // TODO is this enough? or do we need to query the reservationUnit.reservationSet also?
-    const reservationSet = filterNonNullable(
+
+    const reservations = filterNonNullable(
+      reservationUnitData?.reservationUnit?.reservationSet
+    );
+    const affectingReservations = filterNonNullable(
       reservationUnitData?.affectingReservations
+    );
+    const reservationSet = concatAffectedReservations(
+      reservations,
+      affectingReservations,
+      pk
     );
 
     return {

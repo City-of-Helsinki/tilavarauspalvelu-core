@@ -18,6 +18,7 @@ const RESERVATIONS_IN_INTERVAL_FRAGMENT = gql`
     bufferTimeBefore
     bufferTimeAfter
     type
+    affectedReservationUnits
   }
 `;
 

@@ -21,7 +21,11 @@ import { RESERVATIONS_BY_RESERVATIONUNITS } from "./queries";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
 import { PUBLIC_URL } from "@/common/const";
 import { getReserveeName } from "../reservations/requested/util";
-import { base64encode, filterNonNullable } from "common/src/helpers";
+import {
+  base64encode,
+  concatAffectedReservations,
+  filterNonNullable,
+} from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { ReservationUnitWithAffectingArgs } from "common/src/queries/fragments";
 
@@ -107,10 +111,14 @@ export function ReservationUnitCalendar({
     },
   });
 
-  const reservations = filterNonNullable(
-    data?.reservationUnit?.reservationSet?.concat(
-      data?.affectingReservations ?? []
-    )
+  const reservationSet = filterNonNullable(
+    data?.reservationUnit?.reservationSet
+  );
+  const affecting = filterNonNullable(data?.affectingReservations);
+  const reservations = concatAffectedReservations(
+    reservationSet,
+    affecting,
+    reservationUnitPk
   );
 
   const events = reservations.map((reservation) => {

@@ -150,5 +150,6 @@ export const RESERVATIONUNIT_RESERVATIONS_FRAGMENT = gql`
       email
       pk
     }
+    affectedReservationUnits
   }
 `;

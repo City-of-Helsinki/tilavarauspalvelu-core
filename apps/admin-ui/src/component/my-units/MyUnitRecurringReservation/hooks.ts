@@ -43,7 +43,11 @@ import { convertToDate } from "./utils";
 import { CREATE_STAFF_RESERVATION } from "../create-reservation/queries";
 import { ReservationMade } from "./RecurringReservationDone";
 import { flattenMetadata } from "../create-reservation/utils";
-import { base64encode, filterNonNullable } from "common/src/helpers";
+import {
+  base64encode,
+  concatAffectedReservations,
+  filterNonNullable,
+} from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { ReservationUnitWithAffectingArgs } from "common/src/queries/fragments";
 
@@ -154,13 +158,15 @@ const useReservationsInInterval = ({
     },
   });
 
-  // TODO this is done in multiple places, should add a helper
-  // the same query => concat => filter
-  // allows also to add a warning if either query is empty
-  const rawReservations = data?.reservationUnit?.reservationSet?.concat(
-    data?.affectingReservations ?? []
+  const reservationSet = filterNonNullable(
+    data?.reservationUnit?.reservationSet
   );
-  const reservations = filterNonNullable(rawReservations)
+  const affectingReservations = filterNonNullable(data?.affectingReservations);
+  const reservations = concatAffectedReservations(
+    reservationSet,
+    affectingReservations,
+    reservationUnitPk ?? 0
+  )
     .map((x) => reservationToInterval(x, reservationType))
     .filter((x): x is CollisionInterval => x != null);
 

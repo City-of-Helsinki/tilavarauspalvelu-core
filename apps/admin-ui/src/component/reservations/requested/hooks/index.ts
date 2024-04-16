@@ -19,7 +19,11 @@ import {
 import { useNotification } from "@/context/NotificationContext";
 import { RESERVATION_DENY_REASONS } from "../queries";
 import { OptionType } from "@/common/types";
-import { base64encode, filterNonNullable } from "common/src/helpers";
+import {
+  base64encode,
+  concatAffectedReservations,
+  filterNonNullable,
+} from "common/src/helpers";
 import { ReservationUnitWithAffectingArgs } from "common/src/queries/fragments";
 
 export { default as useCheckCollisions } from "./useCheckCollisions";
@@ -96,11 +100,17 @@ export const useReservationData = (
 
   // TODO concat is questionable (it creates duplicates), but if there is no common spaces the affecingReservations is empty
   // i.e. the reservationUnit doesn't have a space but has reservations (might be other cases too)
-  const reservations = filterNonNullable(
-    data?.reservationUnit?.reservationSet?.concat(
-      data?.affectingReservations ?? []
-    )
+
+  const reservationSet = filterNonNullable(
+    data?.reservationUnit?.reservationSet
   );
+  const affectingReservations = filterNonNullable(data?.affectingReservations);
+  const reservations = concatAffectedReservations(
+    reservationSet,
+    affectingReservations,
+    reservationUnitPk ?? 0
+  );
+
   const events =
     reservations
       .filter((r) => shouldBeShownInTheCalendar(r, reservationPk))
