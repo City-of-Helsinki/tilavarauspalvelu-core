@@ -137,7 +137,7 @@ const OrganisationForm = ({ homeCityOptions }: Props): JSX.Element | null => {
       <TextInput
         {...register("organisation.address.streetAddress", {
           required: true,
-          maxLength: 255,
+          maxLength: 80,
         })}
         label={t("application:Page3.organisation.streetAddress")}
         id="organisation.address.streetAddress"
@@ -148,7 +148,7 @@ const OrganisationForm = ({ homeCityOptions }: Props): JSX.Element | null => {
           t,
           errors.organisation?.address?.streetAddress?.type,
           {
-            count: 255,
+            count: 80,
           }
         )}
       />
@@ -170,7 +170,7 @@ const OrganisationForm = ({ homeCityOptions }: Props): JSX.Element | null => {
       <TextInput
         {...register("organisation.address.city", {
           required: true,
-          maxLength: 255,
+          maxLength: 80,
         })}
         label={t("application:Page3.organisation.city")}
         id="organisation.address.city"
@@ -180,7 +180,7 @@ const OrganisationForm = ({ homeCityOptions }: Props): JSX.Element | null => {
           t,
           errors.organisation?.address?.city?.type,
           {
-            count: 255,
+            count: 80,
           }
         )}
       />

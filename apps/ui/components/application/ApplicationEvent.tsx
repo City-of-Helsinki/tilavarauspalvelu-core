@@ -185,10 +185,7 @@ function ApplicationEventInner({
       <TwoColumnContainer>
         <div>
           <TextInput
-            {...register(`applicationSections.${index}.name`, {
-              required: true,
-              maxLength: 255,
-            })}
+            {...register(`applicationSections.${index}.name`)}
             label={t("application:Page1.name")}
             id={`applicationSections.${index}.name`}
             required

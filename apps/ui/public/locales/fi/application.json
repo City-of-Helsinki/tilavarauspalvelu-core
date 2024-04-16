@@ -32,7 +32,9 @@
     "begin date must be before application round end date": "Aloituspäivän pitää olla ennen hakukierroksen päättymispäivän",
     "end date must be before application round end date": "Päättymispäivän pitää olla ennen hakukierroksen päättymispäivän",
     "end date must be after application round begin date": "Päättymispäivän pitää olla hakukierroksen alkamispäivän jälkeen",
-    "Invalid date": "Virheellinen päivämäärä"
+    "Invalid date": "Virheellinen päivämäärä",
+    "String must contain at most 255 character(s)": "Maksimissaan 255 merkkiä",
+    "String must contain at most 100 character(s)": "Maksimissaan 100 merkkiä"
   },
   "Intro": {
     "startNewApplication": "Täytä hakemus",

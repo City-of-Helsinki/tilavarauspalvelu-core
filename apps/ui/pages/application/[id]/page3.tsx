@@ -163,8 +163,8 @@ function Page3Wrapped(props: Props): JSX.Element | null {
   const form = useForm<ApplicationFormPage3Values>({
     mode: "onChange",
     defaultValues: convertApplicationToForm(application),
-    // No resolver for now because schema overrides the registed checks
-    // and the schema is incomplete compared to the form checks
+    // No resolver because different types require different mandatory values.
+    // Would need to write more complex validation logic that branches based on the type.
     // resolver: zodResolver(ApplicationFormPage3Schema),
   });
 

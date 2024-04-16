@@ -22,7 +22,7 @@ const BillingAddress = () => {
       <TextInput
         {...register("billingAddress.streetAddress", {
           required: true,
-          maxLength: 255,
+          maxLength: 80,
         })}
         label={t("application:Page3.billingAddress.streetAddress")}
         id="billingAddress.streetAddress"
@@ -32,7 +32,7 @@ const BillingAddress = () => {
           t,
           errors.billingAddress?.streetAddress?.type,
           {
-            count: 255,
+            count: 80,
           }
         )}
       />
@@ -52,13 +52,13 @@ const BillingAddress = () => {
         )}
       />
       <TextInput
-        {...register("billingAddress.city", { required: true, maxLength: 255 })}
+        {...register("billingAddress.city", { required: true, maxLength: 80 })}
         label={t("application:Page3.billingAddress.city")}
         id="billingAddress.city"
         required
         invalid={!!errors.billingAddress?.city?.type}
         errorText={applicationErrorText(t, errors.billingAddress?.city?.type, {
-          count: 255,
+          count: 80,
         })}
       />
     </>

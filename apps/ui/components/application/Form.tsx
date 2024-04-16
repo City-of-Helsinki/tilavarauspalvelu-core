@@ -55,7 +55,7 @@ export type SuitableTimeRangeFormValues = z.infer<
 const ApplicationSectionFormValueSchema = z
   .object({
     pk: z.number().optional(),
-    name: z.string().min(1, { message: "Required" }),
+    name: z.string().min(1, { message: "Required" }).max(100),
     numPersons: z.number().min(1),
     ageGroup: z.number().refine((s) => s, { path: [""], message: "Required" }),
     purpose: z.number().refine((s) => s, { path: [""], message: "Required" }),

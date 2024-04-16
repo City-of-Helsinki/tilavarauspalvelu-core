@@ -81,7 +81,7 @@ const CompanyForm = (): JSX.Element => {
       <TextInput
         {...register("organisation.address.streetAddress", {
           required: true,
-          maxLength: 255,
+          maxLength: 80,
         })}
         label={t("application:Page3.organisation.streetAddress")}
         id="organisation.address.streetAddress"
@@ -91,7 +91,7 @@ const CompanyForm = (): JSX.Element => {
           t,
           errors.organisation?.address?.streetAddress?.type,
           {
-            count: 255,
+            count: 80,
           }
         )}
       />
@@ -113,7 +113,7 @@ const CompanyForm = (): JSX.Element => {
       <TextInput
         {...register("organisation.address.city", {
           required: true,
-          maxLength: 255,
+          maxLength: 80,
         })}
         label={t("application:Page3.organisation.city")}
         id="organisation.address.city"
@@ -123,7 +123,7 @@ const CompanyForm = (): JSX.Element => {
           t,
           errors.organisation?.address?.city?.type,
           {
-            count: 255,
+            count: 80,
           }
         )}
       />
@@ -149,7 +149,7 @@ const CompanyForm = (): JSX.Element => {
       <TextInput
         {...register("contactPerson.firstName", {
           required: true,
-          maxLength: 255,
+          maxLength: 50,
         })}
         label={t("application:Page3.contactPerson.firstName")}
         id="contactPerson.firstName"
@@ -159,14 +159,14 @@ const CompanyForm = (): JSX.Element => {
           t,
           errors.contactPerson?.firstName?.type,
           {
-            count: 255,
+            count: 50,
           }
         )}
       />
       <TextInput
         {...register("contactPerson.lastName", {
           required: true,
-          maxLength: 255,
+          maxLength: 50,
         })}
         label={t("application:Page3.contactPerson.lastName")}
         id="contactPerson.lastName"
@@ -176,14 +176,14 @@ const CompanyForm = (): JSX.Element => {
           t,
           errors.contactPerson?.lastName?.type,
           {
-            count: 255,
+            count: 50,
           }
         )}
       />
       <TextInput
         {...register("contactPerson.phoneNumber", {
           required: true,
-          maxLength: 255,
+          maxLength: 50,
         })}
         label={t("application:Page3.contactPerson.phoneNumber")}
         id="contactPerson.phoneNumber"
@@ -194,7 +194,7 @@ const CompanyForm = (): JSX.Element => {
           t,
           errors.contactPerson?.phoneNumber?.type,
           {
-            count: 255,
+            count: 50,
           }
         )}
       />

@@ -32,7 +32,9 @@
     "begin date must be before application round end date": "Startdatum måste vara före ansökningsperiodens slutdatum",
     "end date must be before application round end date": "Slutdatum måste vara före ansökningsperiodens slutdatum",
     "end date must be after application round begin date": "Slutdatum måste vara efter ansökningsperiodens startdatum",
-    "Invalid date": "Ogiltigt datum"
+    "Invalid date": "Ogiltigt datum",
+    "String must contain at most 255 character(s)": "Max 255 tecken",
+    "String must contain at most 100 character(s)": "Max 100 tecken"
   },
   "Intro": {
     "startNewApplication": "Fyll i ansökan",

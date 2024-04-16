@@ -27,7 +27,7 @@ const EmailInput = () => {
       <TextInput
         {...register("contactPerson.email", {
           required: true,
-          maxLength: 255,
+          maxLength: 254,
           pattern:
             /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
         })}
@@ -38,7 +38,7 @@ const EmailInput = () => {
         required
         invalid={!!errors.contactPerson?.email?.type}
         errorText={applicationErrorText(t, errors.contactPerson?.email?.type, {
-          count: 255,
+          count: 254,
         })}
       />
     </>

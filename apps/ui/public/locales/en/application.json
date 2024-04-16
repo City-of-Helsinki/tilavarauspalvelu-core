@@ -32,7 +32,9 @@
     "begin date must be before application round end date": "Begin date must be before application round end date",
     "end date must be before application round end date": "End date must be before application round end date",
     "end date must be after application round begin date": "End date must be after application round begin date",
-    "Invalid date": "Invalid date"
+    "Invalid date": "Invalid date",
+    "String must contain at most 255 character(s)": "Maximum of 255 characters",
+    "String must contain at most 100 character(s)": "Maximum of 100 characters"
   },
   "Intro": {
     "startNewApplication": "Apply",

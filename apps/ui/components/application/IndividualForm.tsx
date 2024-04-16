@@ -28,7 +28,7 @@ const IndividualForm = (): JSX.Element => {
       <TextInput
         {...register("contactPerson.firstName", {
           required: true,
-          maxLength: 255,
+          maxLength: 50,
         })}
         label={t("application:Page3.firstName")}
         id="contactPerson.firstName"
@@ -38,14 +38,14 @@ const IndividualForm = (): JSX.Element => {
           t,
           errors.contactPerson?.firstName?.type,
           {
-            count: 255,
+            count: 50,
           }
         )}
       />
       <TextInput
         {...register("contactPerson.lastName", {
           required: true,
-          maxLength: 255,
+          maxLength: 50,
         })}
         label={t("application:Page3.lastName")}
         id="contactPerson.lastName"
@@ -55,7 +55,7 @@ const IndividualForm = (): JSX.Element => {
           t,
           errors.contactPerson?.lastName?.type,
           {
-            count: 255,
+            count: 50,
           }
         )}
       />
@@ -66,7 +66,7 @@ const IndividualForm = (): JSX.Element => {
       <TextInput
         {...register("contactPerson.phoneNumber", {
           required: true,
-          maxLength: 255,
+          maxLength: 50,
         })}
         label={t("application:Page3.phoneNumber")}
         id="contactPerson.phoneNumber"
@@ -76,7 +76,7 @@ const IndividualForm = (): JSX.Element => {
           t,
           errors.contactPerson?.phoneNumber?.type,
           {
-            count: 255,
+            count: 50,
           }
         )}
       />
