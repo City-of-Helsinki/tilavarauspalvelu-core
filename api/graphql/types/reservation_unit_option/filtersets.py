@@ -6,6 +6,7 @@ from applications.models import ReservationUnitOption
 class ReservationUnitOptionFilterSet(ModelFilterSet):
     pk = IntMultipleChoiceFilter()
     reservation_unit = IntMultipleChoiceFilter()
+    preferred_order = IntMultipleChoiceFilter()
 
     class Meta:
         model = ReservationUnitOption
