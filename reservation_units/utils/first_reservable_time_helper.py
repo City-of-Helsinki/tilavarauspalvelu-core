@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+import math
 from collections.abc import Iterable
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
-from math import ceil
 from typing import TYPE_CHECKING, NamedTuple
 
 from django.db import models
@@ -649,7 +649,7 @@ class ReservableTimeSpanFirstReservableTimeHelper:
         difference: timedelta = time_span.start_datetime - self.reservable_time_span.start_datetime
         difference_minutes = difference.total_seconds() / 60
 
-        minutes_past_interval = ceil(difference_minutes % interval_minutes)
+        minutes_past_interval = math.ceil(difference_minutes % interval_minutes)
         if minutes_past_interval == 0:
             return
 
