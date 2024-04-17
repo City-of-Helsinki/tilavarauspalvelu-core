@@ -113,7 +113,7 @@ class patch_method:
     def __enter__(self) -> Any:
         return self.patch.__enter__()
 
-    def __exit__(self, *exc_info: Any) -> Any:
+    def __exit__(self, *exc_info: object) -> Any:
         return self.patch.__exit__(*exc_info)
 
 
