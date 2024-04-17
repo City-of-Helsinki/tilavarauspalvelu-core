@@ -125,16 +125,6 @@ class ReservationStatisticsCreateTestCase(TestCase):
         stat = ReservationStatistic.objects.first()
         assert_that(stat.cancel_reason_text).is_equal_to("cancel")
 
-    # def test_is_applied_has_ability_group_name(self):
-    #     self.reservation.recurring_reservation = RecurringReservationFactory(
-    #         ability_group=AbilityGroupFactory(name="abbis"),
-    #     )
-    #     self.reservation.save()
-    #
-    #     stat = ReservationStatistic.objects.first()
-    #     assert_that(stat.is_applied).is_true()
-    #     assert_that(stat.ability_group_name).is_equal_to(self.reservation.recurring_reservation.ability_group.name)
-
     def test_reservation_units_removed(self):
         self.reservation.reservation_unit.remove(self.reservation_unit)
         resu = ReservationUnitFactory()
