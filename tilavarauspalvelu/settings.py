@@ -85,6 +85,8 @@ env = environ.Env(
     PREFILL_RESERVATION_WITH_PROFILE_DATA=(bool, False),
     PRIMARY_MUNICIPALITY_NAME=(str, "Helsinki"),
     PRIMARY_MUNICIPALITY_NUMBER=(str, "091"),
+    QUERY_LOGGING_ENABLED=(bool, False),
+    QUERY_LOGGING_SKIP_ROUTES=(list, []),
     REDIS_MASTER=(str, None),
     REDIS_PASSWORD=(str, None),
     REDIS_SENTINEL_SERVICE=(str, None),
@@ -214,6 +216,7 @@ INSTALLED_APPS = [
 # ----- Middleware -------------------------------------------------------------------------------------
 
 MIDDLEWARE = [
+    "tilavarauspalvelu.middleware.QueryLoggingMiddleware",
     "tilavarauspalvelu.middleware.MultipleProxyMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
@@ -338,6 +341,8 @@ LOGGING = {
 }
 
 AUDIT_LOGGING_ENABLED = env("AUDIT_LOGGING_ENABLED")
+QUERY_LOGGING_ENABLED = env("QUERY_LOGGING_ENABLED")
+QUERY_LOGGING_SKIP_ROUTES = env("QUERY_LOGGING_SKIP_ROUTES")
 
 if env("SENTRY_DSN"):
     sentry_sdk.init(
