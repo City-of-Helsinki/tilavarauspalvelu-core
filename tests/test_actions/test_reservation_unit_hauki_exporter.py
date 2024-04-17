@@ -59,7 +59,7 @@ def test__hauki_exporter__get_parent_id__fail__does_not_exist_in_hauki_api(reser
     assert parent_id is None
 
 
-@patch_method(HaukiAPIClient.get_resource, side_effect=HaukiAPIError())
+@patch_method(HaukiAPIClient.get_resource, side_effect=HaukiAPIError("foo"))
 def test__hauki_exporter__get_parent_id__fail__hauki_api_error(reservation_unit):
     reservation_unit.unit.origin_hauki_resource = None
     parent_id = reservation_unit.actions._get_parent_resource_id()

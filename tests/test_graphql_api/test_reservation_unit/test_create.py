@@ -90,7 +90,7 @@ def test_reservation_unit__create__send_to_hauki__succeeded(graphql, settings):
 
 
 @patch_method(HaukiAPIClient.get_resource, return_value=HaukiAPIResource(id=123))
-@patch_method(HaukiAPIClient.create_resource, side_effect=HaukiAPIError())
+@patch_method(HaukiAPIClient.create_resource, side_effect=HaukiAPIError("foo"))
 def test_reservation_unit__create__send_to_hauki__failed(graphql, settings):
     settings.HAUKI_EXPORTS_ENABLED = True
 

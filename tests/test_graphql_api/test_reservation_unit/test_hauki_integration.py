@@ -67,7 +67,7 @@ def test_reservation_unit__update__send_resource_to_hauki_when_exports_disabled(
     assert ReservationUnitHaukiExporter.send_reservation_unit_to_hauki.call_count == 0
 
 
-@patch_method(ReservationUnitHaukiExporter.send_reservation_unit_to_hauki, side_effect=HaukiAPIError())
+@patch_method(ReservationUnitHaukiExporter.send_reservation_unit_to_hauki, side_effect=HaukiAPIError("foo"))
 def test_reservation_unit__update__send_resource_to_hauki_errors_returns_error_message(graphql, settings):
     settings.HAUKI_EXPORTS_ENABLED = True
     graphql.login_with_superuser()
