@@ -1,4 +1,4 @@
-from logging import getLogger
+import logging
 
 import requests
 from django.contrib.gis.geos import Point
@@ -9,7 +9,7 @@ from opening_hours.utils.hauki_api_client import HaukiAPIClient
 from opening_hours.utils.hauki_api_types import HaukiAPIResourceListResponse
 from spaces.models import Location, Unit
 
-logger = getLogger(__name__)
+logger = logging.getLogger(__name__)
 REQUEST_TIMEOUT_SECONDS = 15
 
 

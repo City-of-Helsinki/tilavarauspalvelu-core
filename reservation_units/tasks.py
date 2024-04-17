@@ -1,5 +1,5 @@
+import logging
 from datetime import date
-from logging import getLogger
 
 from django.conf import settings
 from easy_thumbnails.exceptions import InvalidImageFormatError
@@ -14,7 +14,7 @@ from tilavarauspalvelu.celery import app
 from utils.image_cache import purge
 from utils.sentry import SentryLogger
 
-logger = getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 @app.task(name="update_reservation_unit_pricings")

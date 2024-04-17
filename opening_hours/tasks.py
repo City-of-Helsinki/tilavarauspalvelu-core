@@ -1,9 +1,9 @@
-from logging import getLogger
+import logging
 
 from opening_hours.utils.hauki_resource_hash_updater import HaukiResourceHashUpdater
 from tilavarauspalvelu.celery import app
 
-logger = getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 @app.task(name="update_origin_hauki_resource_reservable_time_spans")
