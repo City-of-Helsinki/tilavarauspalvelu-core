@@ -103,6 +103,7 @@ lint.select = [
     "E",        # pycodestyle errors
     "F",        # pyflakes
     "I",        # isort
+    "INP",      # flake8-no-pep420
     "ISC",      # flake8-implicit-str-concat
     "LOG",      # flake8-logging
     "PIE",      # flake8-pie
