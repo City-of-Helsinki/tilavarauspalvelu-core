@@ -346,7 +346,7 @@ def test_helsinki_profile_client__prefill_info__contains_errors():
         }
     )
 
-    msg = 'Helsinki profile: Helsinki profile response contains errors. [{"message": "foo"}]'
+    msg = 'Helsinki profile: Response contains errors. [{"message": "foo"}]'
     with pytest.raises(ExternalServiceError, match=re.escape(msg)):
         HelsinkiProfileClient.get_reservation_prefill_info(mock_request(UserFactory.create()))
 

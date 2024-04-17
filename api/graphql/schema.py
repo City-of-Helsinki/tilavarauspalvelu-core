@@ -17,6 +17,7 @@ from merchants.models import PaymentOrder
 from permissions.helpers import can_manage_banner_notifications
 from reservations.models import Reservation
 from users.helauth.clients import HelsinkiProfileClient
+from users.helauth.typing import UserProfileInfo
 from users.models import User
 
 # NOTE: Queries __need__ to be imported before mutations, see mutations.py!
@@ -30,6 +31,7 @@ from .queries import (  # isort:skip
     CityNode,
     EquipmentCategoryNode,
     EquipmentNode,
+    HelsinkiProfileDataNode,
     KeywordCategoryNode,
     KeywordGroupNode,
     KeywordNode,
@@ -187,6 +189,12 @@ class Query(graphene.ObjectType):
     # User
     user = UserNode.Node()
     current_user = UserNode.Field()
+    profile_data = Field(
+        HelsinkiProfileDataNode,
+        reservation_id=graphene.Int(),
+        application_id=graphene.Int(),
+        description="Get information about the user, using Helsinki profile if necessary.",
+    )
     #
     # Misc.
     terms_of_use = TermsOfUseNode.Connection()
@@ -205,7 +213,12 @@ class Query(graphene.ObjectType):
         HelsinkiProfileClient.ensure_token_valid(info.context)
         return get_object_or_404(User, pk=info.context.user.pk)
 
-    def resolve_order(root: None, info: GQLInfo, order_uuid: str, **kwargs: Any):
+    def resolve_profile_data(root: None, info: GQLInfo, **kwargs: Any) -> UserProfileInfo:
+        reservation_id: int | None = kwargs.get("reservation_id")
+        application_id: int | None = kwargs.get("application_id")
+        return HelsinkiProfileDataNode.get_data(info, application_id=application_id, reservation_id=reservation_id)
+
+    def resolve_order(root: None, info: GQLInfo, *, order_uuid: str, **kwargs: Any):
         order = get_object_or_404(PaymentOrder, remote_id=order_uuid)
         if PaymentOrderPermission.has_node_permission(order, info.context.user, {}):
             return order

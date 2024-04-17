@@ -91,8 +91,6 @@ class MyProfileDataFactory(GenericFactory[MyProfileData]):
 
     firstName = factory.Faker("first_name", locale="fi_FI")
     lastName = factory.Faker("last_name", locale="fi_FI")
-    nickname = ""
-    language = "FINNISH"
     primaryPhone = factory.SubFactory(ProfilePhoneFactory)
     primaryEmail = factory.SubFactory(ProfileEmailFactory)
     primaryAddress = factory.SubFactory(ProfileAddressFactory)
