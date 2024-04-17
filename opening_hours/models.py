@@ -69,9 +69,9 @@ class ReservableTimeSpan(models.Model):
         ]
 
     def __str__(self) -> str:
-        return f"{self.resource} {self._get_datetime_str()}"
+        return f"{self.resource} {self.get_datetime_str()}"
 
-    def _get_datetime_str(self) -> str:
+    def get_datetime_str(self) -> str:
         strformat = "%Y-%m-%d %H:%M"
 
         start = self.start_datetime.astimezone(DEFAULT_TIMEZONE)
