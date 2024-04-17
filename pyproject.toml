@@ -94,6 +94,7 @@ extend-exclude = [
 lint.select = [
     "B",        # flake8-bugbear
     "C4",       # flake8-comprehensions
+    "COM",      # flake8-commas
     "D200",     # pydocstyle: One-line docstring should fit on one line
     "D201",     # pydocstyle: No blank lines allowed before function docstring (found {num_lines})
     "D202",     # pydocstyle: No blank lines allowed after function docstring (found {num_lines})
@@ -103,14 +104,19 @@ lint.select = [
     "E",        # pycodestyle errors
     "ERA",      # eradicate
     "F",        # pyflakes
+    "FA",       # flake8-future-annotations
+    "FLY",      # flynt
     "I",        # isort
     "INP",      # flake8-no-pep420
+    "INT",      # flake8-gettext
     "ISC",      # flake8-implicit-str-concat
     "LOG",      # flake8-logging
+    "N",        # pep8-naming
     "PIE",      # flake8-pie
     "PL",       # pylint
     "PT",       # flake8-pytest-style
     "PYI",      # flake8-pyi
+    "Q",        # flake8-quotes
     "RET502",   # flake8-return: Do not implicitly return None in function able to return non-None value
     "RET503",   # flake8-return: Missing explicit return at the end of function able to return non-None value
     "RSE",      # flake8-raise
@@ -128,6 +134,12 @@ lint.ignore = [
     "B905",     # zip without strict
     "DJ001",    # Allow `null=True` in text-based fields TODO: Remove this ignore once the issues are fixed.
     "S101",     # assert is fine
+    "N801",     # invalid-class-name
+    "N802",     # invalid-function-name
+    "N805",     # invalid-first-argument-name-for-method
+    "N806",     # non-lowercase-variable-in-function
+    "N815",     # mixed-case-variable-in-class-scope
+    "N818",     # error-suffix-on-exception-name
     #
     # Conflicting with ruff-format
     #
@@ -164,6 +176,9 @@ lint.ignore = [
 ]
 "api/graphql/extensions/error_codes.py" = [
     "ERA001",   # Commented code is fine here.
+]
+"api/graphql/*.py" = [
+    "N805",     # Allow first argument of a method to NOT be `self`.
 ]
 "test_*.py" = [
     "S105",     # Hardcoded passwords are fine in tests
