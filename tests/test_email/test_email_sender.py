@@ -123,7 +123,7 @@ def test_email_sender__reservation__with_multiple_recipients__too_many_recipient
     ]
 
     msg = re.escape(
-        f"Refusing to notify more than '{settings.EMAIL_MAX_RECIPIENTS}' users. " f"Email type: '{email_template.type}'"
+        f"Refusing to notify more than '{settings.EMAIL_MAX_RECIPIENTS}' users. Email type: '{email_template.type}'"
     )
     with pytest.raises(SendEmailNotificationError, match=msg):
         EmailNotificationSender(email_type=email_template.type, recipients=recipients)
