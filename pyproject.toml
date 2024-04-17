@@ -101,6 +101,7 @@ lint.select = [
     "D213",     # pydocstyle: Multi-line docstring summary should start at the second line
     "DJ",       # flake8-django
     "E",        # pycodestyle errors
+    "ERA",      # eradicate
     "F",        # pyflakes
     "I",        # isort
     "INP",      # flake8-no-pep420
@@ -160,6 +161,9 @@ lint.ignore = [
 ]
 "common/management/commands/_utils.py" = [
     "S311",     # pseudo-random generators are fine here.
+]
+"api/graphql/extensions/error_codes.py" = [
+    "ERA001",   # Commented code is fine here.
 ]
 "test_*.py" = [
     "S105",     # Hardcoded passwords are fine in tests

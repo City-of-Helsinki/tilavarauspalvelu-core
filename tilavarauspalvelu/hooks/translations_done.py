@@ -33,12 +33,12 @@ def working_directory(directory: Path):
 def main() -> int:
     django.setup()
     path_fi = BASE_PATH / "locale" / "fi" / "LC_MESSAGES" / "django.po"
-    # path_sv = BASE_PATH / "locale" / "sv" / "LC_MESSAGES" / "django.po"
+    # path_sv = BASE_PATH / "locale" / "sv" / "LC_MESSAGES" / "django.po"  # noqa: ERA001
 
     missing: dict[str, MissingTranslations] = defaultdict(MissingTranslations)
 
     contents_before_fi = polib.pofile(str(path_fi))
-    # contents_before_sv = polib.pofile(str(path_sv))
+    # contents_before_sv = polib.pofile(str(path_sv))  # noqa: ERA001
 
     with working_directory(BASE_PATH):
         call_command(
@@ -55,7 +55,7 @@ def main() -> int:
 
     items: list[tuple[LangType, str, polib.POFile]] = [
         ("fi", str(path_fi), contents_before_fi),
-        # ("sv", str(path_sv), contents_before_sv),
+        # ("sv", str(path_sv), contents_before_sv),  # noqa: ERA001
     ]
 
     for lang, path, contents_before in items:
