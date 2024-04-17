@@ -1,7 +1,7 @@
 import datetime
+import math
 from collections.abc import Iterable
 from decimal import Decimal
-from math import ceil
 from typing import Any
 
 from django.utils import timezone
@@ -135,7 +135,7 @@ class ReservationPriceMixin:
             if pricing.price_unit not in fixed_price_units:
                 duration_minutes = (end_datetime - begin_datetime).total_seconds() / 60
                 # Price calculations use duration rounded to the next 15 minutes
-                duration_minutes = Decimal(ceil(duration_minutes / 15) * 15)
+                duration_minutes = Decimal(math.ceil(duration_minutes / 15) * 15)
 
                 price_unit_minutes: int = price_unit_to_minutes.get(pricing.price_unit)
                 price_per_minute = price / price_unit_minutes
