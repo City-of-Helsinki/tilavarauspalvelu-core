@@ -132,6 +132,10 @@ lint.select = [
     "ICN",      # flake8-import-conventions
 ]
 lint.ignore = [
+    # Conflicting with ruff-format
+    "ISC001",   # single-line-implicit-string-concatenation
+    # Other
+    "COM812",   # missing-trailing-comma
     "DJ001",    # Allow `null=True` in text-based fields TODO: Remove this ignore once the issues are fixed.
     "N801",     # invalid-class-name
     "N802",     # invalid-function-name
@@ -139,11 +143,6 @@ lint.ignore = [
     "N806",     # non-lowercase-variable-in-function
     "N815",     # mixed-case-variable-in-class-scope
     "N818",     # error-suffix-on-exception-name
-    #
-    # Conflicting with ruff-format
-    #
-    "COM812",   # missing-trailing-comma
-    "ISC001",   # single-line-implicit-string-concatenation
     "PLR0911",  # too-many-return-statements
     "PLR0912",  # too-many-branches
     "PLR0913",  # too-many-arguments
