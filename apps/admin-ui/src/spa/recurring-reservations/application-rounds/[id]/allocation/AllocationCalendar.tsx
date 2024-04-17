@@ -9,6 +9,8 @@ import {
   type ReservationUnitOptionNode,
   Weekday,
   ApplicationSectionStatusChoice,
+  type AllocatedTimeSlotNode,
+  type SuitableTimeRangeNode,
 } from "common/types/gql-types";
 import { breakpoints } from "common";
 import { type Day } from "common/src/conversion";
@@ -24,11 +26,14 @@ import {
   encodeTimeSlot,
   type RelatedSlot,
 } from "./modules/applicationRoundAllocation";
-import { useSlotSelection } from "./hooks";
+import {
+  useFocusAllocatedSlot,
+  useFocusApplicationEvent,
+  useSlotSelection,
+} from "./hooks";
 
 type Props = {
   applicationSections: ApplicationSectionNode[] | null;
-  focusedApplicationEvent?: ApplicationSectionNode;
   relatedAllocations: RelatedSlot[][];
 };
 
@@ -220,7 +225,6 @@ function addTimeSlotToArray(
 
 export function AllocationCalendar({
   applicationSections,
-  focusedApplicationEvent,
   relatedAllocations,
 }: Props): JSX.Element {
   const [selection, setSelection] = useSlotSelection();
@@ -231,6 +235,12 @@ export function AllocationCalendar({
       ALLOCATION_CALENDAR_TIMES[1]
     )
   );
+
+  const [focused] = useFocusApplicationEvent();
+  const focusedApplicationEvent = applicationSections?.find(
+    (ae) => ae.pk === focused
+  );
+  const [focusedAllocated] = useFocusAllocatedSlot();
 
   const handleFinishSelection = () => {
     setIsSelecting(false);
@@ -269,57 +279,52 @@ export function AllocationCalendar({
         const resUnits = filterNonNullable(
           aesForThisUnit?.flatMap((ae) => ae.reservationUnitOptions)
         );
+
+        const isDay = (slot: AllocatedTimeSlotNode | SuitableTimeRangeNode) =>
+          slot.dayOfTheWeek === transformWeekday(day);
         // TODO wrap this into a function? we need the same for focused
         // TODO do we have to do it like this? or should we split the data (similar to Column / Cards)?
         // reason why it's needed is because we need per day time slot data but all of the section data (the section includes all the days)
         const allocated = resUnits
-          .filter((a) =>
-            a.allocatedTimeSlots?.some(
-              (ts) => ts.dayOfTheWeek === transformWeekday(day)
-            )
-          )
-          .map((a) => {
-            return {
-              ...a,
-              allocatedTimeSlots: a.allocatedTimeSlots?.filter(
-                (ts) => ts.dayOfTheWeek === transformWeekday(day)
-              ),
-            };
-          });
+          .filter((a) => a.allocatedTimeSlots?.some(isDay))
+          .map((a) => ({
+            ...a,
+            allocatedTimeSlots: a.allocatedTimeSlots?.filter(isDay),
+          }));
 
         // this should transform it into
         // so focused: Array<{ beginTime, endTime, allocated: boolean }>
         // then use a separate map to transform it into the cells (we want to remove the cell type completely)
         const focusedTimeSlots = filterNonNullable(
-          focusedApplicationEvent?.suitableTimeRanges?.filter(
-            (tr) => tr.dayOfTheWeek === transformWeekday(day)
-          )
+          focusedApplicationEvent?.suitableTimeRanges?.filter(isDay)
         );
-        const focusedAllocatedTimeSlots = filterNonNullable(
-          focusedApplicationEvent?.reservationUnitOptions?.filter((a) =>
-            a.allocatedTimeSlots?.some(
-              (ts) => ts.dayOfTheWeek === transformWeekday(day)
-            )
-          )
-        ).map((a) => {
-          return {
-            ...a,
-            allocatedTimeSlots: a.allocatedTimeSlots?.filter(
-              (ts) => ts.dayOfTheWeek === transformWeekday(day)
-            ),
-          };
-        });
+        const focusedAllocatedTimeSlots =
+          focusedAllocated != null
+            ? allocated.filter((a) =>
+                a.allocatedTimeSlots?.some((ts) => ts.pk === focusedAllocated)
+              )
+            : focusedApplicationEvent?.reservationUnitOptions
+                ?.filter((a) => a.allocatedTimeSlots?.some(isDay))
+                .map((a) => ({
+                  ...a,
+                  allocatedTimeSlots: a.allocatedTimeSlots?.filter(isDay),
+                }));
 
         const focusedSlots: Slot[] = [];
-        for (const ts of focusedTimeSlots) {
-          addTimeSlotToArray(focusedSlots, ts, day, false);
+        if (focusedAllocated == null) {
+          for (const ts of focusedTimeSlots) {
+            addTimeSlotToArray(focusedSlots, ts, day, false);
+          }
         }
 
-        for (const a of focusedAllocatedTimeSlots) {
+        for (const a of filterNonNullable(focusedAllocatedTimeSlots)) {
           if (!a.allocatedTimeSlots) {
             continue;
           }
           for (const ts of a.allocatedTimeSlots) {
+            if (focusedAllocated != null && focusedAllocated !== ts.pk) {
+              continue;
+            }
             addTimeSlotToArray(focusedSlots, ts, day, true);
           }
         }

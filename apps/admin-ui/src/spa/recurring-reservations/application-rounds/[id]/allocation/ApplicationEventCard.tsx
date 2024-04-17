@@ -17,6 +17,7 @@ import {
   createDurationString,
   formatTime,
 } from "./modules/applicationRoundAllocation";
+import { useFocusAllocatedSlot, useFocusApplicationEvent } from "./hooks";
 
 export type AllocationApplicationSectionCardType =
   | "unallocated"
@@ -26,8 +27,6 @@ export type AllocationApplicationSectionCardType =
 
 type Props = {
   applicationSection: ApplicationSectionNode;
-  focusedApplicationSection?: ApplicationSectionNode;
-  setFocusedApplicationSection: (val?: ApplicationSectionNode) => void;
   reservationUnit: ReservationUnitNode;
   type: AllocationApplicationSectionCardType;
 };
@@ -131,14 +130,14 @@ const StyledLink = styled(Link)`
 // TODO rename, this is the Listing Card / Info Card, that doesn't have any functionality
 export function ApplicationSectionCard({
   applicationSection,
-  focusedApplicationSection,
-  setFocusedApplicationSection,
   reservationUnit,
   type,
 }: Props): JSX.Element | null {
   const { t } = useTranslation();
 
   const [isExpanded, setIsExpanded] = useState(false);
+  const [focused, setFocusedApplicationSection] = useFocusApplicationEvent();
+  const isActive = applicationSection.pk === focused;
 
   const application = applicationSection.application ?? null;
 
@@ -155,7 +154,6 @@ export function ApplicationSectionCard({
   }
 
   const applicantName = getApplicantName(application);
-  const isActive = applicationSection === focusedApplicationSection;
   const durationString = createDurationString(applicationSection, t);
 
   const nReservationUnits =
@@ -181,7 +179,7 @@ export function ApplicationSectionCard({
           id={`applicationSection-${applicationSection.pk}`}
           label={applicationSection.name}
           checked={isActive}
-          onClick={() => toggleSelection()}
+          onClick={toggleSelection}
           $topPadding
         />
         <ToggleButton onClick={() => setIsExpanded(!isExpanded)}>
@@ -320,6 +318,18 @@ function AllocatedScheduleSection({
   const day = convertWeekday(allocatedTimeSlot.dayOfTheWeek);
   const begin = allocatedTimeSlot.beginTime;
   const end = allocatedTimeSlot.endTime;
+
+  const [focused, setFocused] = useFocusAllocatedSlot();
+  const isActive = allocatedTimeSlot.pk === focused;
+
+  const handleSelect = () => {
+    if (isActive) {
+      setFocused();
+    } else {
+      setFocused(allocatedTimeSlot);
+    }
+  };
+
   const allocatedReservationUnit =
     allocatedTimeSlot.reservationUnitOption?.reservationUnit;
 
@@ -333,6 +343,8 @@ function AllocatedScheduleSection({
       <StyledRadioButton
         id={`applicationSectionSchedule-${allocatedTimeSlot.pk}`}
         disabled={isInDifferentUnit}
+        onClick={handleSelect}
+        checked={isActive}
       />
       <div>
         <SemiBold>

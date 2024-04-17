@@ -439,6 +439,7 @@ function ApplicationRoundAllocation({
     "aes",
     "selectionBegin",
     "selectionEnd",
+    "allocated",
   ];
 
   const handleResetFilters = () => {

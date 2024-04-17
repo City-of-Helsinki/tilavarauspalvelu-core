@@ -33,14 +33,12 @@ export function useFocusApplicationEvent(): [
     ? Number(params.get("aes"))
     : undefined;
 
-  // TODO this can be removed if we move this to a hook and reuse it in the other component
-  // the state is already in a query param
   const setFocused = (aes?: ApplicationSectionNode) => {
-    //  setFocusedApplicationEvent(aes);
-    // TODO if the applicationEvent is completely allocated => remove the selection
+    // TODO ?? if the applicationEvent is completely allocated => remove the selection
     if (aes?.pk != null) {
       const p = new URLSearchParams(params);
       p.set("aes", aes.pk.toString());
+      p.delete("allocated");
       setParams(p);
     } else {
       const p = new URLSearchParams(params);
@@ -50,6 +48,33 @@ export function useFocusApplicationEvent(): [
   };
 
   return [selectedAeasPk, setFocused];
+}
+
+/// Mutaully exclusive with useFocusApplicationEvent
+export function useFocusAllocatedSlot(): [
+  number | undefined,
+  (allocated?: AllocatedTimeSlotNode) => void,
+] {
+  const [params, setParams] = useSearchParams();
+
+  const allocatedPk = params.get("allocated")
+    ? Number(params.get("allocated"))
+    : undefined;
+
+  const setAllocated = (allocated?: AllocatedTimeSlotNode) => {
+    if (allocated?.pk != null) {
+      const p = new URLSearchParams(params);
+      p.set("allocated", allocated.pk.toString());
+      p.delete("aes");
+      setParams(p);
+    } else {
+      const p = new URLSearchParams(params);
+      p.delete("allocated");
+      setParams(p);
+    }
+  };
+
+  return [allocatedPk, setAllocated];
 }
 
 /// Allow selecting a continuous block on a single day

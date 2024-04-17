@@ -88,11 +88,6 @@ function EventGroupList({
   reservationUnit: ReservationUnitNode;
   type: AllocationApplicationSectionCardType;
 }): JSX.Element {
-  const [focused, setFocusedApplicationSection] = useFocusApplicationEvent();
-  const focusedApplicationSection = applicationSections?.find(
-    (ae) => ae.pk === focused
-  );
-
   if (applicationSections.length < 1) {
     return <div>-</div>;
   }
@@ -103,8 +98,6 @@ function EventGroupList({
         <ApplicationSectionCard
           key={`${ae.pk}-${reservationUnit?.pk}`}
           applicationSection={ae}
-          focusedApplicationSection={focusedApplicationSection}
-          setFocusedApplicationSection={setFocusedApplicationSection}
           reservationUnit={reservationUnit}
           type={type}
         />
@@ -134,10 +127,7 @@ export function AllocationPageContent({
   // TODO could also pass the applicationSections to the hook and let it handle the filtering
   // and validating that the focused application event is in the list of application events
   // could also add a reset toggle to the hook, and remove the effect from here
-  const [focused, setFocusedApplicationEvent] = useFocusApplicationEvent();
-  const focusedApplicationEvent = applicationSections?.find(
-    (ae) => ae.pk === focused
-  );
+  const [, setFocusedApplicationEvent] = useFocusApplicationEvent();
 
   // When selected reservation unit changes, remove any focused application event that's not in the new reservation unit
   // TODO could include it in the hook or wrap it inside it's own
@@ -179,7 +169,6 @@ export function AllocationPageContent({
       />
       <AllocationCalendar
         applicationSections={applicationSections}
-        focusedApplicationEvent={focusedApplicationEvent}
         relatedAllocations={relatedSpacesTimeSlotsByDayReduced}
       />
       <AllocationColumn
