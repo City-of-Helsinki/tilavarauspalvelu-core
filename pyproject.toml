@@ -134,7 +134,6 @@ lint.select = [
 lint.ignore = [
     "B905",     # zip without strict
     "DJ001",    # Allow `null=True` in text-based fields TODO: Remove this ignore once the issues are fixed.
-    "S101",     # assert is fine
     "N801",     # invalid-class-name
     "N802",     # invalid-function-name
     "N805",     # invalid-first-argument-name-for-method
@@ -182,6 +181,7 @@ lint.ignore = [
     "N805",     # Allow first argument of a method to NOT be `self`.
 ]
 "test_*.py" = [
+    "S101",     # Obviousle asserts are fine in tests
     "S105",     # Hardcoded passwords are fine in tests
     "S106",     # Hardcoded passwords are fine in tests
     "S108",     # No need to care about insecure temp file usages in tests
