@@ -1,5 +1,5 @@
+import uuid
 from datetime import datetime
-from uuid import UUID
 
 import pytest
 from django.conf import settings
@@ -31,9 +31,9 @@ refund_status_json = {
 def test__refund_status__from_json():
     refund_status = RefundStatusResult.from_json(refund_status_json)
 
-    assert refund_status.order_id == UUID("63c0e5b7-a460-38f1-97d8-2ffce25cce31")
+    assert refund_status.order_id == uuid.UUID("63c0e5b7-a460-38f1-97d8-2ffce25cce31")
     assert refund_status.refund_payment_id == "ea0f16e8-14d7-4510-b83f-1a29494756f0_at_20230329-073612"
-    assert refund_status.refund_transaction_id == UUID("61b2d842-ce04-11ed-9991-c7842594818f")
+    assert refund_status.refund_transaction_id == uuid.UUID("61b2d842-ce04-11ed-9991-c7842594818f")
     assert refund_status.namespace == "tilanvaraus"
     assert refund_status.status == "refund_paid_online"
     assert refund_status.created_at == datetime(2023, 3, 29, 7, 36, 13, 576000, tzinfo=settings.VERKKOKAUPPA_TIMEZONE)

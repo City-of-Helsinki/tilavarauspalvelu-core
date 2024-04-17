@@ -1,4 +1,4 @@
-from uuid import uuid4
+import uuid
 
 from django.test import TestCase, override_settings
 
@@ -18,7 +18,7 @@ from tests.factories import (
 from tests.helpers import patch_method
 from utils.sentry import SentryLogger
 
-product_id = uuid4()
+product_id = uuid.uuid4()
 
 
 def mock_create_product():

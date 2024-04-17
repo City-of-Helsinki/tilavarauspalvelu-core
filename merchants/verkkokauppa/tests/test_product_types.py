@@ -1,4 +1,4 @@
-from uuid import UUID
+import uuid
 
 import pytest
 from assertpy import assert_that
@@ -37,10 +37,10 @@ class ProductTypesTestCase(TestCase):
         }
         product = Product.from_json(json)
         expected = Product(
-            product_id=UUID(json["productId"]),
+            product_id=uuid.UUID(json["productId"]),
             namespace=json["namespace"],
             namespace_entity_id=json["namespaceEntityId"],
-            merchant_id=UUID(json["merchantId"]),
+            merchant_id=uuid.UUID(json["merchantId"]),
         )
         assert_that(product).is_equal_to(expected)
 

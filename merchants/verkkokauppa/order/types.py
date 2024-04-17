@@ -1,8 +1,8 @@
+import uuid
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
 from typing import Any, Literal
-from uuid import UUID
 
 from django.conf import settings
 
@@ -21,9 +21,9 @@ class OrderItemMetaParams:
 
 @dataclass(frozen=True)
 class OrderItemMeta:
-    order_item_meta_id: UUID
-    order_item_id: UUID
-    order_id: UUID
+    order_item_meta_id: uuid.UUID
+    order_item_id: uuid.UUID
+    order_id: uuid.UUID
     key: str
     value: str
     label: str | None
@@ -33,7 +33,7 @@ class OrderItemMeta:
 
 @dataclass(frozen=True)
 class OrderItemParams:
-    product_id: UUID
+    product_id: uuid.UUID
     product_name: str
     quantity: int
     unit: str
@@ -49,9 +49,9 @@ class OrderItemParams:
 
 @dataclass(frozen=True)
 class OrderItem:
-    order_item_id: UUID
-    order_id: UUID
-    product_id: UUID
+    order_item_id: uuid.UUID
+    order_id: uuid.UUID
+    product_id: uuid.UUID
     product_name: str
     quantity: int
     unit: str
@@ -83,7 +83,7 @@ OrderType = Literal["subscription", "order"]
 
 @dataclass(frozen=True)
 class Order:
-    order_id: UUID
+    order_id: uuid.UUID
     namespace: str
     user: str
     created_at: datetime
@@ -95,7 +95,7 @@ class Order:
     receipt_url: str | None
     customer: OrderCustomer | None
     status: str | None
-    subscription_id: UUID | None
+    subscription_id: uuid.UUID | None
     type: OrderType
 
     @classmethod
@@ -104,21 +104,21 @@ class Order:
 
         subscription_id = json.get("subscriptionId")
         try:
-            subscription_id = UUID(subscription_id)
+            subscription_id = uuid.UUID(subscription_id)
         except (TypeError, ValueError):
             subscription_id = None
 
         try:
             return Order(
-                order_id=UUID(json["orderId"]),
+                order_id=uuid.UUID(json["orderId"]),
                 namespace=json["namespace"],
                 user=json["user"],
                 created_at=parse_datetime(json["createdAt"]),
                 items=[
                     OrderItem(
-                        order_item_id=UUID(item["orderItemId"]),
-                        order_id=UUID(item["orderId"]),
-                        product_id=UUID(item["productId"]),
+                        order_item_id=uuid.UUID(item["orderItemId"]),
+                        order_id=uuid.UUID(item["orderId"]),
+                        product_id=uuid.UUID(item["productId"]),
                         product_name=item["productName"],
                         quantity=item["quantity"],
                         unit=item["unit"],
@@ -131,9 +131,9 @@ class Order:
                         vat_percentage=Decimal(item["vatPercentage"]),
                         meta=[
                             OrderItemMeta(
-                                order_item_meta_id=UUID(meta["orderItemMetaId"]),
-                                order_item_id=UUID(meta["orderItemId"]),
-                                order_id=UUID(meta["orderId"]),
+                                order_item_meta_id=uuid.UUID(meta["orderItemMetaId"]),
+                                order_item_id=uuid.UUID(meta["orderItemId"]),
+                                order_id=uuid.UUID(meta["orderId"]),
                                 key=meta["key"],
                                 value=meta["value"],
                                 label=meta.get("label"),
@@ -173,7 +173,7 @@ class Order:
 @dataclass(frozen=True)
 class CreateOrderParams:
     namespace: str
-    user: UUID
+    user: uuid.UUID
     language: str
     items: list[OrderItemParams]
     customer: OrderCustomer

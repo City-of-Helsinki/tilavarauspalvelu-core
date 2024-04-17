@@ -1,7 +1,6 @@
 import uuid
 from datetime import datetime
 from decimal import Decimal
-from uuid import uuid4
 
 from django.utils.timezone import get_default_timezone
 
@@ -32,7 +31,7 @@ def get_mock_order_refund_api(order_id: uuid.UUID, refund_id: uuid.UUID, status:
     return RefundStatusResult(
         order_id=order_id,
         refund_payment_id=str(refund_id),
-        refund_transaction_id=uuid4(),
+        refund_transaction_id=uuid.uuid4(),
         namespace="tilanvaraus",
         status=status or RefundStatus.PAID_ONLINE.value,
         created_at=datetime.now(tz=get_default_timezone()),

@@ -1,4 +1,4 @@
-from uuid import UUID
+import uuid
 
 import pytest
 from django.conf import settings
@@ -113,7 +113,7 @@ def test__create_or_update__account_makes_valid_request():
     )
 
     response = VerkkokauppaAPIClient.create_or_update_accounting(
-        product_uuid=UUID("0bd382a0-d79f-44c8-b3c6-8617bf72ebd5"),
+        product_uuid=uuid.UUID("0bd382a0-d79f-44c8-b3c6-8617bf72ebd5"),
         params=create_or_update_account_params,
     )
 
@@ -138,7 +138,7 @@ def test__create_or_update_accounting__raises_exception_if_status_code_is_not_20
 
     with pytest.raises(CreateOrUpdateAccountingError):
         VerkkokauppaAPIClient.create_or_update_accounting(
-            product_uuid=UUID("0bd382a0-d79f-44c8-b3c6-8617bf72ebd5"),
+            product_uuid=uuid.UUID("0bd382a0-d79f-44c8-b3c6-8617bf72ebd5"),
             params=create_or_update_account_params,
         )
 
@@ -147,6 +147,6 @@ def test__create_or_update_accounting__raises_exception_if_status_code_is_not_20
 def test__create_or_update_accounting__raises_exception_on_timeout():
     with pytest.raises(CreateOrUpdateAccountingError):
         VerkkokauppaAPIClient.create_or_update_accounting(
-            product_uuid=UUID("0bd382a0-d79f-44c8-b3c6-8617bf72ebd5"),
+            product_uuid=uuid.UUID("0bd382a0-d79f-44c8-b3c6-8617bf72ebd5"),
             params=create_or_update_account_params,
         )

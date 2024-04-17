@@ -1,6 +1,6 @@
+import uuid
 from datetime import datetime
 from decimal import Decimal
-from uuid import uuid4
 
 import factory
 from django.utils.timezone import get_default_timezone
@@ -32,10 +32,10 @@ class PaymentFactory(GenericFactory[Payment]):
     class Meta:
         model = Payment
 
-    payment_id = uuid4()
+    payment_id = uuid.uuid4()
     namespace = "tilanvaraus"
-    order_id = uuid4()
-    user_id = uuid4()
+    order_id = uuid.uuid4()
+    user_id = uuid.uuid4()
     status = "payment_created"
     payment_method = "creditcards"
     payment_type = "order"
@@ -44,7 +44,7 @@ class PaymentFactory(GenericFactory[Payment]):
     tax_amount = Decimal("24")
     description = "Mock description"
     additional_info = '{"payment_method": creditcards}'
-    token = uuid4()
+    token = uuid.uuid4()
     timestamp = datetime.now(tz=get_default_timezone())
     payment_method_label = "Visa"
 
@@ -53,7 +53,7 @@ class PaymentMerchantFactory(GenericDjangoModelFactory[PaymentMerchant]):
     class Meta:
         model = PaymentMerchant
 
-    id = factory.LazyFunction(uuid4)
+    id = factory.LazyFunction(uuid.uuid4)
     name = fuzzy.FuzzyText()
 
 
@@ -61,7 +61,7 @@ class PaymentProductFactory(GenericDjangoModelFactory[PaymentProduct]):
     class Meta:
         model = PaymentProduct
 
-    id = factory.LazyFunction(uuid4)
+    id = factory.LazyFunction(uuid.uuid4)
     merchant = factory.SubFactory("tests.factories.PaymentMerchantFactory")
 
     @factory.post_generation
@@ -77,7 +77,7 @@ class PaymentOrderFactory(GenericDjangoModelFactory[PaymentOrder]):
         model = PaymentOrder
 
     reservation = factory.SubFactory("tests.factories.ReservationFactory")
-    remote_id = factory.LazyFunction(uuid4)
+    remote_id = factory.LazyFunction(uuid.uuid4)
     payment_id = None  # uuid
     refund_id = None  # uuid
     payment_type = PaymentType.INVOICE
