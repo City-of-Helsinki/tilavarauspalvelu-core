@@ -23,7 +23,7 @@ class MockVerkkokauppaView(TemplateView):
         try:
             payment_order = get_object_or_404(PaymentOrder, remote_id=order_uuid)
         except (ValueError, ValidationError) as err:  # Catch invalid UUIDs
-            raise Http404(str(err))
+            raise Http404(str(err)) from err
 
         return payment_order
 

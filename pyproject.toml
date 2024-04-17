@@ -121,7 +121,6 @@ lint.select = [
     "W",        # pycodestyle warnings
 ]
 lint.ignore = [
-    "B904",     # bare raise is fine
     "B905",     # zip without strict
     "DJ001",    # Allow `null=True` in text-based fields TODO: Remove this ignore once the issues are fixed.
     "S101",     # assert is fine
