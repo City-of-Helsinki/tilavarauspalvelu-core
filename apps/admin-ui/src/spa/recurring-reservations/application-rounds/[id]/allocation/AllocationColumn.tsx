@@ -11,23 +11,18 @@ import {
   type Query,
   type AllocatedTimeSlotNode,
   type SuitableTimeRangeNode,
-  Weekday,
   ApplicationSectionStatusChoice,
   type ReservationUnitNode,
 } from "common/types/gql-types";
 import { ShowAllContainer } from "common/src/components/";
-import {
-  convertWeekday,
-  transformWeekday,
-  type Day,
-} from "common/src/conversion";
+import { transformWeekday, type Day } from "common/src/conversion";
 import { filterNonNullable } from "common/src/helpers";
 import { ALLOCATION_CALENDAR_TIMES } from "@/common/const";
 import {
   type RelatedSlot,
-  constructTimeSlot,
   decodeTimeSlot,
   getTimeSlotOptions,
+  isInsideSelection,
 } from "./modules/applicationRoundAllocation";
 import { AllocatedCard, SuitableTimeCard } from "./AllocationCard";
 import { useSlotSelection } from "./hooks";
@@ -214,36 +209,6 @@ function TimeSelection(): JSX.Element {
   );
 }
 
-function isInsideSelection(
-  selection: { day: Day; start: number; end: number },
-  tr: {
-    dayOfTheWeek: Weekday;
-    beginTime: string;
-    endTime: string;
-  }
-): boolean {
-  const start = constructTimeSlot(selection.day, tr.beginTime);
-  const end = constructTimeSlot(selection.day, tr.endTime);
-  if (!start || !end) {
-    return false;
-  }
-  // NOTE 00:00 could be either 24:00 or 00:00
-  // but we use number comparison so for end we need 24 and start 0
-  if (end?.hour === 0) {
-    end.hour = 24;
-  }
-  if (selection.day !== convertWeekday(tr.dayOfTheWeek)) {
-    return false;
-  }
-  if (start.hour > selection.end) {
-    return false;
-  }
-  if (end.hour <= selection.start) {
-    return false;
-  }
-  return true;
-}
-
 function getAllocatedTimeSlot(
   section: ApplicationSectionNode,
   selection: { day: Day; startHour: number; endHour: number }
@@ -295,32 +260,21 @@ export function AllocationColumn({
   // - the section
   // - the selected time slot / allocation (this is used for the mutation pk)
   // NOTE we show Handled for already allocated, but not for suitable that have already been allocated.
-  const selectedInterval = { day, start: startHour, end: endHour };
+  const selected = { day, start: startHour, end: endHour };
+  const isDay = (ts: SuitableTimeRangeNode | AllocatedTimeSlotNode) =>
+    ts.dayOfTheWeek === transformWeekday(day);
+
   const timeslots = aes
     .filter((ae) => ae.status !== ApplicationSectionStatusChoice.Handled)
+    .filter((ae) => ae.suitableTimeRanges?.some(isDay))
     .filter((ae) =>
-      ae.suitableTimeRanges?.some(
-        (tr) => tr.dayOfTheWeek === transformWeekday(day)
-      )
-    )
-    .filter((ae) =>
-      ae.suitableTimeRanges?.some((tr) =>
-        isInsideSelection(selectedInterval, tr)
-      )
+      ae.suitableTimeRanges?.some((tr) => isInsideSelection(selected, tr))
     );
-  const resUnits = filterNonNullable(
-    aes?.flatMap((ae) => ae.reservationUnitOptions)
-  );
+  const resUnits = aes?.flatMap((ae) => ae.reservationUnitOptions);
   const allocated = resUnits
-    .filter((a) =>
-      a.allocatedTimeSlots?.some(
-        (ts) => ts.dayOfTheWeek === transformWeekday(day)
-      )
-    )
+    .filter((a) => a.allocatedTimeSlots?.some(isDay))
     .filter((ae) =>
-      ae.allocatedTimeSlots?.some((tr) =>
-        isInsideSelection(selectedInterval, tr)
-      )
+      ae.allocatedTimeSlots?.some((tr) => isInsideSelection(selected, tr))
     );
 
   // check if something is already allocated and push it down to the Card components

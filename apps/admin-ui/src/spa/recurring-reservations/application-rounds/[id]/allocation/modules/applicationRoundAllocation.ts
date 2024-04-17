@@ -6,12 +6,13 @@ import {
   type ApplicationNode,
   Priority,
   type AllocatedTimeSlotNode,
+  Weekday,
 } from "common/types/gql-types";
 import i18next from "i18next";
 import { type TFunction } from "next-i18next";
 import { filterNonNullable } from "common/src/helpers";
 import { formatDuration } from "common/src/common/util";
-import { convertWeekday } from "common/src/conversion";
+import { Day, convertWeekday, transformWeekday } from "common/src/conversion";
 
 export type RelatedSlot = {
   day: number;
@@ -22,7 +23,6 @@ export type RelatedSlot = {
 export type Cell = {
   hour: number;
   minute: number;
-  state?: string;
   key: string;
 };
 
@@ -268,4 +268,60 @@ export function getRelatedTimeSlots(
   // TODO reduce the array to contiguous time slots
 
   return relatedSpacesTimeSlotsByDay;
+}
+
+export function isInsideSelection(
+  selection: { day: Day; start: number; end: number },
+  tr: {
+    dayOfTheWeek: Weekday;
+    beginTime: string;
+    endTime: string;
+  }
+): boolean {
+  const start = constructTimeSlot(selection.day, tr.beginTime);
+  const end = constructTimeSlot(selection.day, tr.endTime);
+  if (!start || !end) {
+    return false;
+  }
+  // NOTE 00:00 could be either 24:00 or 00:00
+  // but we use number comparison so for end we need 24 and start 0
+  if (end?.hour === 0) {
+    end.hour = 24;
+  }
+  if (selection.day !== convertWeekday(tr.dayOfTheWeek)) {
+    return false;
+  }
+  if (start.hour > selection.end) {
+    return false;
+  }
+  if (end.hour <= selection.start) {
+    return false;
+  }
+  return true;
+}
+
+// TODO combine common functionaility with isInsideSelection
+export function isInsideCell(
+  day: Day,
+  cell: Cell,
+  ts: {
+    dayOfTheWeek: Weekday;
+    beginTime: string;
+    endTime: string;
+  }
+) {
+  const { beginTime, endTime, dayOfTheWeek } = ts;
+  if (dayOfTheWeek !== transformWeekday(day)) {
+    return false;
+  }
+  // NOTE if the end time is 00:00 swap it to 24:00 (24h)
+  const begin = parseApiTime(beginTime);
+  const end = parseApiTime(endTime);
+  if (begin == null || end == null) {
+    return false;
+  }
+  const cellTime = cell.hour * 60 + cell.minute;
+  const beginMinutes = begin * 60;
+  const endMinutes = (end === 0 ? 24 : end) * 60;
+  return cellTime >= beginMinutes && cellTime < endMinutes;
 }

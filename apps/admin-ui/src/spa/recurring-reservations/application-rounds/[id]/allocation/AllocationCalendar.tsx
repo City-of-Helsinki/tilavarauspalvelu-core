@@ -7,7 +7,6 @@ import { filterNonNullable } from "common/src/helpers";
 import {
   type ApplicationSectionNode,
   type ReservationUnitOptionNode,
-  Weekday,
   ApplicationSectionStatusChoice,
   type AllocatedTimeSlotNode,
   type SuitableTimeRangeNode,
@@ -25,6 +24,7 @@ import {
   parseApiTime,
   encodeTimeSlot,
   type RelatedSlot,
+  isInsideCell,
 } from "./modules/applicationRoundAllocation";
 import {
   useFocusAllocatedSlot,
@@ -223,12 +223,78 @@ function addTimeSlotToArray(
   }
 }
 
+function generateAllocatedSlots(
+  allocated: ReservationUnitOptionNode[],
+  day: Day
+): Slot[] {
+  const arr: Slot[] = [];
+  for (const a of allocated) {
+    if (!a.allocatedTimeSlots) {
+      continue;
+    }
+    for (const ts of a.allocatedTimeSlots) {
+      addTimeSlotToArray(arr, ts, day, true);
+    }
+  }
+  return arr;
+}
+
+function isDay(slot: AllocatedTimeSlotNode | SuitableTimeRangeNode, day: Day) {
+  return slot.dayOfTheWeek === transformWeekday(day);
+}
+
+/// We have to have all allocated slots for the event in the original data
+/// at some point (either here or in the draw function) those other days have to be removed
+function removeOtherAllocatedDays(
+  a: ReservationUnitOptionNode,
+  day: Day
+): ReservationUnitOptionNode {
+  return {
+    ...a,
+    allocatedTimeSlots: a.allocatedTimeSlots?.filter((ts) => isDay(ts, day)),
+  };
+}
+
+// Generate the focused slots for a selected application section
+function generateFocusedSlots(
+  focusedAes: ApplicationSectionNode,
+  day: Day
+): Slot[] {
+  const focusedTimeSlots = focusedAes?.suitableTimeRanges?.filter((ts) =>
+    isDay(ts, day)
+  );
+  const focusedAllocatedTimeSlots = focusedAes?.reservationUnitOptions
+    ?.filter((a) => a.allocatedTimeSlots?.some((ts) => isDay(ts, day)))
+    .map((ts) => removeOtherAllocatedDays(ts, day));
+
+  const focusedSlots: Slot[] = [];
+
+  for (const ts of filterNonNullable(focusedTimeSlots)) {
+    addTimeSlotToArray(focusedSlots, ts, day, false);
+  }
+
+  const tmp = filterNonNullable(focusedAllocatedTimeSlots);
+  return focusedSlots.concat(generateAllocatedSlots(tmp, day));
+}
+
+function isInRange(ae: ApplicationSectionNode, cell: Cell, day: Day): boolean {
+  return ae.suitableTimeRanges?.some((tr) => isInsideCell(day, cell, tr));
+}
+
+function isAllocated(
+  ae: ReservationUnitOptionNode,
+  cell: Cell,
+  day: Day
+): boolean {
+  return ae.allocatedTimeSlots
+    ?.map((tr) => isInsideCell(day, cell, tr))
+    .some((x) => x);
+}
+
 export function AllocationCalendar({
   applicationSections,
   relatedAllocations,
 }: Props): JSX.Element {
-  const [selection, setSelection] = useSlotSelection();
-  const [isSelecting, setIsSelecting] = useState(false);
   const [cells] = useState(
     applicationEventSchedulesToCells(
       ALLOCATION_CALENDAR_TIMES[0],
@@ -242,11 +308,39 @@ export function AllocationCalendar({
   );
   const [focusedAllocated] = useFocusAllocatedSlot();
 
-  const handleFinishSelection = () => {
-    setIsSelecting(false);
-  };
-
   const aesForThisUnit = filterNonNullable(applicationSections);
+  const data = WEEKDAYS.map((day) => {
+    const isNotHandled = (ae: ApplicationSectionNode) =>
+      ae.status !== ApplicationSectionStatusChoice.Handled;
+    // Only show allocated that match the unit and day
+    const timeslots = aesForThisUnit
+      .filter(isNotHandled)
+      .filter((ae) => ae.suitableTimeRanges?.some((tr) => isDay(tr, day)));
+
+    const resUnits = aesForThisUnit?.flatMap((ae) => ae.reservationUnitOptions);
+
+    const allocated = resUnits
+      .filter((a) => a.allocatedTimeSlots?.some((ts) => isDay(ts, day)))
+      .map((ts) => removeOtherAllocatedDays(ts, day));
+
+    const focusedAllocatedTimes = allocated.filter((a) =>
+      a.allocatedTimeSlots?.some((ts) => ts.pk === focusedAllocated)
+    );
+
+    const focusedSlots =
+      focusedAllocated == null && focusedApplicationEvent != null
+        ? generateFocusedSlots(focusedApplicationEvent, day)
+        : generateAllocatedSlots(focusedAllocatedTimes, day);
+
+    return {
+      day,
+      allocated,
+      timeslots,
+      focusedSlots,
+      relatedTimeSpans: relatedAllocations[day] ?? [],
+    };
+  });
+
   return (
     <Wrapper>
       <div>
@@ -262,141 +356,46 @@ export function AllocationCalendar({
           );
         })}
       </div>
-      {WEEKDAYS.map((day) => {
-        // Only show allocated that match the unit and day
-        const timeslots = filterNonNullable(
-          aesForThisUnit
-            .filter(
-              (ae) => ae.status !== ApplicationSectionStatusChoice.Handled
-            )
-            .filter((ae) =>
-              ae.suitableTimeRanges?.some(
-                (tr) => tr.dayOfTheWeek === transformWeekday(day)
-              )
-            )
-        );
-
-        const resUnits = filterNonNullable(
-          aesForThisUnit?.flatMap((ae) => ae.reservationUnitOptions)
-        );
-
-        const isDay = (slot: AllocatedTimeSlotNode | SuitableTimeRangeNode) =>
-          slot.dayOfTheWeek === transformWeekday(day);
-        // TODO wrap this into a function? we need the same for focused
-        // TODO do we have to do it like this? or should we split the data (similar to Column / Cards)?
-        // reason why it's needed is because we need per day time slot data but all of the section data (the section includes all the days)
-        const allocated = resUnits
-          .filter((a) => a.allocatedTimeSlots?.some(isDay))
-          .map((a) => ({
-            ...a,
-            allocatedTimeSlots: a.allocatedTimeSlots?.filter(isDay),
-          }));
-
-        // this should transform it into
-        // so focused: Array<{ beginTime, endTime, allocated: boolean }>
-        // then use a separate map to transform it into the cells (we want to remove the cell type completely)
-        const focusedTimeSlots = filterNonNullable(
-          focusedApplicationEvent?.suitableTimeRanges?.filter(isDay)
-        );
-        const focusedAllocatedTimeSlots =
-          focusedAllocated != null
-            ? allocated.filter((a) =>
-                a.allocatedTimeSlots?.some((ts) => ts.pk === focusedAllocated)
-              )
-            : focusedApplicationEvent?.reservationUnitOptions
-                ?.filter((a) => a.allocatedTimeSlots?.some(isDay))
-                .map((a) => ({
-                  ...a,
-                  allocatedTimeSlots: a.allocatedTimeSlots?.filter(isDay),
-                }));
-
-        const focusedSlots: Slot[] = [];
-        if (focusedAllocated == null) {
-          for (const ts of focusedTimeSlots) {
-            addTimeSlotToArray(focusedSlots, ts, day, false);
-          }
-        }
-
-        for (const a of filterNonNullable(focusedAllocatedTimeSlots)) {
-          if (!a.allocatedTimeSlots) {
-            continue;
-          }
-          for (const ts of a.allocatedTimeSlots) {
-            if (focusedAllocated != null && focusedAllocated !== ts.pk) {
-              continue;
-            }
-            addTimeSlotToArray(focusedSlots, ts, day, true);
-          }
-        }
-
-        return (
+      {data.map(
+        ({ day, allocated, timeslots, focusedSlots, relatedTimeSpans }) => (
           <CalendarDay
             key={`day-${day}`}
             allocated={allocated}
             suitable={timeslots}
             day={day}
-            cells={cells}
-            isSelecting={isSelecting}
-            selection={selection}
-            setSelection={setSelection}
-            onFinishSelection={handleFinishSelection}
-            onStartSelection={(key: string) => {
-              setIsSelecting(true);
-              setSelection([key]);
-            }}
-            relatedTimeSpans={relatedAllocations[day] ?? []}
+            cells={cells[day]}
+            relatedTimeSpans={relatedTimeSpans}
             focusedSlots={focusedSlots}
           />
-        );
-      })}
+        )
+      )}
     </Wrapper>
   );
 }
 
-// TODO combine with isInsideSelection in AllocationColumn
-function checkCell(
-  day: Day,
-  cell: Cell,
-  ts: {
-    dayOfTheWeek: Weekday;
-    beginTime: string;
-    endTime: string;
-  }
-) {
-  const { beginTime, endTime, dayOfTheWeek } = ts;
-  if (dayOfTheWeek !== transformWeekday(day)) {
-    return false;
-  }
-  // NOTE if the end time is 00:00 swap it to 24:00 (24h)
-  const begin = parseApiTime(beginTime);
-  const end = parseApiTime(endTime);
-  if (begin == null || end == null) {
-    return false;
-  }
-  const cellTime = cell.hour * 60 + cell.minute;
-  const beginMinutes = begin * 60;
-  const endMinutes = (end === 0 ? 24 : end) * 60;
-  return cellTime >= beginMinutes && cellTime < endMinutes;
+function useSelection() {
+  const [selection, setSelection] = useSlotSelection();
+  const [isSelecting, setIsSelecting] = useState(false);
+
+  const handleFinishSelection = () => {
+    setIsSelecting(false);
+  };
+
+  const handleStartSelection = (key: string) => {
+    setIsSelecting(true);
+    setSelection([key]);
+  };
+
+  return {
+    selection,
+    setSelection,
+    isSelecting,
+    handleFinishSelection,
+    handleStartSelection,
+  };
 }
 
-function isInRange(ae: ApplicationSectionNode, cell: Cell, day: Day) {
-  return (
-    ae.suitableTimeRanges?.some((tr) => {
-      return checkCell(day, cell, tr);
-    }) ?? false
-  );
-}
-
-function isAllocated(ae: ReservationUnitOptionNode, cell: Cell, day: Day) {
-  return ae.allocatedTimeSlots
-    ?.map((tr) => {
-      return checkCell(day, cell, tr);
-    })
-    .some((x) => x);
-}
-
-// TODO filter this before passing it to the component
-// so it should be Cell[] not Cell[][]
+// TODO
 // the allocated / suitable should be filtered by day
 // focused should be filtered by day
 // remove day if possible (key's might require it)
@@ -405,29 +404,27 @@ function CalendarDay({
   suitable,
   day,
   cells,
-  isSelecting,
-  selection,
-  setSelection,
-  onFinishSelection,
-  onStartSelection,
   focusedSlots,
   relatedTimeSpans,
 }: {
   allocated: ReservationUnitOptionNode[];
   suitable: ApplicationSectionNode[];
-  day: 0 | 1 | 2 | 3 | 4 | 5 | 6;
-  cells: Cell[][];
-  isSelecting: boolean;
-  selection: string[];
-  setSelection: (selection: string[]) => void;
-  onFinishSelection: () => void;
-  onStartSelection: (key: string) => void;
+  day: Day;
+  cells: Cell[];
   focusedSlots: Slot[];
   relatedTimeSpans: RelatedSlot[];
 }): JSX.Element {
   const { t } = useTranslation();
 
-  const handleMouseEnter = (cell: (typeof cells)[0][0]) => {
+  const {
+    selection,
+    setSelection,
+    isSelecting,
+    handleFinishSelection,
+    handleStartSelection,
+  } = useSelection();
+
+  const handleMouseEnter = (cell: Cell) => {
     if (isSelecting && selection.length > 0) {
       const [d] = selection ? selection[0].split("-") : cell.key.split("-");
       const timeSeries = [...selection, cell.key].sort((a, b) => {
@@ -442,38 +439,41 @@ function CalendarDay({
     }
   };
 
+  // NOTE this should already be filtered by day
   const focused = focusedSlots.filter((x) => x.day === day);
+
+  // debug checks
+  if (focused.length !== focusedSlots.length) {
+    // eslint-disable-next-line no-console
+    console.warn("focused slots is not prefiltered by day");
+  }
+
   return (
-    <div key={`day-${day}`}>
+    <div>
       <DayLabel>{t(`dayShort.${day}`)}</DayLabel>
-      {cells[day].map((cell) => {
+      {cells.map((cell) => {
         const foundAes = suitable.filter((aes) => isInRange(aes, cell, day));
         const isSlotDeclined = false;
         const isAccepted = allocated.some((aes) => isAllocated(aes, cell, day));
         const slotEventCount = foundAes.length;
-        const focusedSlot = focused.find(
-          (x) => x.minutes === cell.hour * 60 + cell.minute
-        );
+        const timeInMinutes = cell.hour * 60 + cell.minute;
+        const focusedSlot = focused.find((x) => x.minutes === timeInMinutes);
         const isFocused = focusedSlot != null;
         // TODO these don't look nice and don't work if the array is not presorted
         const isFocusedFirst =
-          focused.length > 0 &&
-          focused[0].minutes === cell.hour * 60 + cell.minute;
+          focused.length > 0 && focused[0].minutes === timeInMinutes;
         const isFocusedLast =
           focused.length > 0 &&
-          focused[focused.length - 1].minutes === cell.hour * 60 + cell.minute;
+          focused[focused.length - 1].minutes === timeInMinutes;
         const isInsideRelatedTimeSpan =
-          relatedTimeSpans?.some((ts) => {
-            return (
-              ts.beginTime <= cell.hour * 60 + cell.minute &&
-              ts.endTime > cell.hour * 60 + cell.minute
-            );
-          }) ?? false;
+          relatedTimeSpans?.some(
+            (ts) => ts.beginTime <= timeInMinutes && ts.endTime > timeInMinutes
+          ) ?? false;
         return (
           <CalendarSlot
             key={cell.key}
-            onMouseDown={() => onStartSelection(cell.key)}
-            onMouseUp={onFinishSelection}
+            onMouseDown={() => handleStartSelection(cell.key)}
+            onMouseUp={handleFinishSelection}
             onMouseEnter={() => handleMouseEnter(cell)}
             $eventCount={slotEventCount}
             $isAccepted={isAccepted}
