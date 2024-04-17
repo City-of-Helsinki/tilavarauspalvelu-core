@@ -32,7 +32,7 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
         filter_date_end: date | None,
         filter_time_start: time | None,
         filter_time_end: time | None,
-        minimum_duration_minutes: int | float | Decimal | None,
+        minimum_duration_minutes: float | Decimal | None,
     ) -> Self:
         """Annotate the queryset with `first_reservable_time` and `is_closed` for each reservation unit."""
         helper = FirstReservableTimeHelper(

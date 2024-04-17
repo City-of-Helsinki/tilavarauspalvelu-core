@@ -121,7 +121,7 @@ class FirstReservableTimeHelper:
         filter_date_end: date | None = None,
         filter_time_start: time | None = None,
         filter_time_end: time | None = None,
-        minimum_duration_minutes: int | float | Decimal | None = None,
+        minimum_duration_minutes: float | Decimal | None = None,
     ):
         from reservations.models import Reservation
 
