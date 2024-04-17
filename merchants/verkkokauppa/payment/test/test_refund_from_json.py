@@ -1,5 +1,5 @@
+import uuid
 from datetime import datetime
-from uuid import UUID
 
 import pytest
 from django.conf import settings
@@ -31,8 +31,8 @@ class RefundFromJsonTestCase(TestCase):
     @staticmethod
     def test_refund_from_json():
         refund = Refund.from_json(refund_json)
-        assert refund.refund_id == UUID("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6")
-        assert refund.order_id == UUID("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6")
+        assert refund.refund_id == uuid.UUID("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6")
+        assert refund.order_id == uuid.UUID("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6")
         assert refund.namespace == "tilavaraus"
         assert refund.user == "b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6"
         assert refund.created_at == datetime(2021, 2, 25, 10, 22, 59, tzinfo=settings.VERKKOKAUPPA_TIMEZONE)

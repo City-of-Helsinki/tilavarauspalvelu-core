@@ -220,8 +220,8 @@ known-first-party = [
 banned-from = [
     # Python standard libraries
     "base64",
-#    "csv",
-#    "datetime",
+    # "csv",
+    # "datetime",
     "hashlib",
     "hmac",
     "json",
@@ -236,10 +236,10 @@ banned-from = [
     "sys",
     "tempfile",
     "time",
-#    "uuid",
+    "uuid",
     "xml",
     "yaml",
-#    # Project-specific
+    # Project-specific
     "error_codes",
 ]
 

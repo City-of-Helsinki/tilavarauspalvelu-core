@@ -1,9 +1,9 @@
+import uuid
 from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
 from typing import Any
-from uuid import UUID
 
 from django.conf import settings
 
@@ -34,7 +34,7 @@ class RefundStatus(Enum):
 class Payment:
     payment_id: str
     namespace: str
-    order_id: UUID
+    order_id: uuid.UUID
     user_id: str
     status: str
     payment_method: str
@@ -54,7 +54,7 @@ class Payment:
             return Payment(
                 payment_id=json["paymentId"],
                 namespace=json["namespace"],
-                order_id=UUID(json["orderId"]),
+                order_id=uuid.UUID(json["orderId"]),
                 user_id=json["userId"],
                 status=json["status"],
                 payment_method=json["paymentMethod"],
@@ -79,8 +79,8 @@ class Payment:
 
 @dataclass(frozen=True)
 class Refund:
-    refund_id: UUID
-    order_id: UUID
+    refund_id: uuid.UUID
+    order_id: uuid.UUID
     namespace: str
     user: str
     created_at: datetime
@@ -97,8 +97,8 @@ class Refund:
 
         try:
             return Refund(
-                refund_id=UUID(json["refundId"]),
-                order_id=UUID(json["orderId"]),
+                refund_id=uuid.UUID(json["refundId"]),
+                order_id=uuid.UUID(json["orderId"]),
                 namespace=json["namespace"],
                 user=json["user"],
                 created_at=parse_datetime(json["createdAt"]),
@@ -116,9 +116,9 @@ class Refund:
 
 @dataclass(frozen=True)
 class RefundStatusResult:
-    order_id: UUID
+    order_id: uuid.UUID
     refund_payment_id: str
-    refund_transaction_id: UUID
+    refund_transaction_id: uuid.UUID
     namespace: str
     status: str
     created_at: datetime
@@ -129,9 +129,9 @@ class RefundStatusResult:
 
         try:
             return RefundStatusResult(
-                order_id=UUID(json["orderId"]),
+                order_id=uuid.UUID(json["orderId"]),
                 refund_payment_id=json["refundPaymentId"],
-                refund_transaction_id=UUID(json["refundTransactionId"]),
+                refund_transaction_id=uuid.UUID(json["refundTransactionId"]),
                 namespace=json["namespace"],
                 status=json["status"],
                 created_at=parse_datetime(json["createdAt"]),

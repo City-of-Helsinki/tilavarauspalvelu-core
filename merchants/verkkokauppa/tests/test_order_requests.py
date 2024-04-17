@@ -1,8 +1,8 @@
+import uuid
 from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any
 from urllib.parse import urljoin
-from uuid import UUID
 
 import pytest
 from requests import Timeout
@@ -30,7 +30,7 @@ create_order_params: CreateOrderParams = CreateOrderParams(
     last_valid_purchase_datetime=datetime(2022, 11, 24, 12, 0, 0, tzinfo=UTC),
     items=[
         OrderItemParams(
-            product_id=UUID("306ab20a-6b30-3ce3-95e8-fef818e6c30e"),
+            product_id=uuid.UUID("306ab20a-6b30-3ce3-95e8-fef818e6c30e"),
             product_name="Test Product Name",
             quantity=1,
             unit="pcs",
@@ -329,7 +329,7 @@ def test_verkkokauppa__create_order__raises_exception_if_status_code_is_not_201(
 
 @patch_method(VerkkokauppaAPIClient.generic, return_value=MockResponse(status_code=200, json=get_order_response))
 def test_verkkokauppa__get_order__makes_valid_request(settings):
-    order_uuid = UUID(get_order_response["orderId"])
+    order_uuid = uuid.UUID(get_order_response["orderId"])
     returned_value = VerkkokauppaAPIClient.get_order(order_uuid=order_uuid)
 
     VerkkokauppaAPIClient.generic.assert_called_with(
@@ -347,7 +347,7 @@ def test_verkkokauppa__get_order__makes_valid_request(settings):
 @patch_method(VerkkokauppaAPIClient.generic)
 def test_verkkokauppa__get_order__raises_exception_if_order_id_is_missing():
     return_value = get_order_response.copy()
-    order_uuid = UUID(return_value.pop("orderId"))
+    order_uuid = uuid.UUID(return_value.pop("orderId"))
 
     VerkkokauppaAPIClient.generic.return_value = MockResponse(status_code=200, json=return_value)
 
@@ -375,13 +375,13 @@ def test_verkkokauppa__get_order__raises_exception_on_timeout():
 @patch_method(VerkkokauppaAPIClient.generic, return_value=MockResponse(status_code=404, json=get_order_404_response))
 def test_verkkokauppa__get_order__raises_exception_on_404():
     with pytest.raises(GetOrderError) as err:
-        VerkkokauppaAPIClient.get_order(order_uuid=UUID(get_order_response["orderId"]))
+        VerkkokauppaAPIClient.get_order(order_uuid=uuid.UUID(get_order_response["orderId"]))
     assert str(err.value) == "Order not found: [{'code': 'order-not-found', 'message': 'Order not found'}]"
 
 
 @patch_method(VerkkokauppaAPIClient.generic, return_value=MockResponse(status_code=200, json=cancel_order_response))
 def test_verkkokauppa__cancel_order__makes_valid_request(settings):
-    order_uuid = UUID(cancel_order_response["order"]["orderId"])
+    order_uuid = uuid.UUID(cancel_order_response["order"]["orderId"])
     user_uuid = cancel_order_response["order"]["user"]
 
     returned_value = VerkkokauppaAPIClient.cancel_order(order_uuid=order_uuid, user_uuid=user_uuid)
@@ -401,7 +401,7 @@ def test_verkkokauppa__cancel_order__makes_valid_request(settings):
 
 @patch_method(VerkkokauppaAPIClient.generic, return_value=MockResponse(status_code=404, json={}))
 def test_verkkokauppa__cancel_order__returns_none_if_order_is_not_found():
-    order_uuid = UUID(cancel_order_response["order"]["orderId"])
+    order_uuid = uuid.UUID(cancel_order_response["order"]["orderId"])
     user_uuid = cancel_order_response["order"]["user"]
 
     order = VerkkokauppaAPIClient.cancel_order(order_uuid=order_uuid, user_uuid=user_uuid)
@@ -411,7 +411,7 @@ def test_verkkokauppa__cancel_order__returns_none_if_order_is_not_found():
 @patch_method(SentryLogger.log_message)
 @patch_method(VerkkokauppaAPIClient.generic, return_value=MockResponse(status_code=500, json={}, method="post"))
 def test_verkkokauppa__cancel_order__raises_exception_on_500_status():
-    order_uuid = UUID(cancel_order_response["order"]["orderId"])
+    order_uuid = uuid.UUID(cancel_order_response["order"]["orderId"])
     user_uuid = cancel_order_response["order"]["user"]
 
     with pytest.raises(CancelOrderError) as ex:

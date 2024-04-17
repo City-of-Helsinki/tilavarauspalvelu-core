@@ -1,4 +1,4 @@
-from uuid import UUID, uuid4
+import uuid
 
 from assertpy import assert_that
 from django.test import override_settings
@@ -12,18 +12,22 @@ from tests.helpers import patch_method
 
 def mock_create_product():
     return Product(
-        product_id=uuid4(),
+        product_id=uuid.uuid4(),
         namespace="tilanvaraus",
-        namespace_entity_id=uuid4(),
-        merchant_id=uuid4(),
+        namespace_entity_id=str(uuid.uuid4()),
+        merchant_id=uuid.uuid4(),
     )
 
 
 class UnitMerchantUpdateTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.merchant_1 = PaymentMerchantFactory(pk=UUID("f9a94a6e-007d-4157-94f2-5ac9bd6e1a5f"), name="First Merchant")
-        cls.merchant_2 = PaymentMerchantFactory(pk=UUID("83c0b65c-2e4f-4600-8466-66f67422bf43"), name="Second Merchant")
+        cls.merchant_1 = PaymentMerchantFactory(
+            pk=uuid.UUID("f9a94a6e-007d-4157-94f2-5ac9bd6e1a5f"), name="First Merchant"
+        )
+        cls.merchant_2 = PaymentMerchantFactory(
+            pk=uuid.UUID("83c0b65c-2e4f-4600-8466-66f67422bf43"), name="Second Merchant"
+        )
         cls.unit = UnitFactory(name="Test unit", payment_merchant=cls.merchant_1)
 
     @override_settings(CELERY_TASK_ALWAYS_EAGER=True, UPDATE_PRODUCT_MAPPING=True)

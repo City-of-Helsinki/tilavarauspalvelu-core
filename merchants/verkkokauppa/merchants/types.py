@@ -1,7 +1,7 @@
+import uuid
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
-from uuid import UUID
 
 from merchants.verkkokauppa.merchants.exceptions import ParseMerchantError, ParseMerchantInfoError
 
@@ -40,7 +40,7 @@ class MerchantInfo:
 
 @dataclass(frozen=True)
 class Merchant:
-    id: UUID
+    id: uuid.UUID
     namespace: str
     created_at: datetime
     updated_at: datetime
@@ -62,7 +62,7 @@ class Merchant:
         try:
             configurations = json["configurations"]
             return Merchant(
-                id=UUID(json["merchantId"]),
+                id=uuid.UUID(json["merchantId"]),
                 namespace=json["namespace"],
                 created_at=parse_datetime(json["createdAt"]),
                 updated_at=parse_datetime(json["updatedAt"]),

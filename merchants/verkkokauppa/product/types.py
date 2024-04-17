@@ -1,6 +1,6 @@
+import uuid
 from dataclasses import dataclass
 from typing import Any
-from uuid import UUID
 
 from merchants.verkkokauppa.product.exceptions import ParseAccountingError, ParseProductError
 
@@ -21,19 +21,19 @@ class CreateProductParams:
 
 @dataclass(frozen=True)
 class Product:
-    product_id: UUID
+    product_id: uuid.UUID
     namespace: str
     namespace_entity_id: str
-    merchant_id: UUID
+    merchant_id: uuid.UUID
 
     @classmethod
     def from_json(cls, json: dict[str, Any]) -> "Product":
         try:
             return Product(
-                product_id=UUID(json["productId"]),
+                product_id=uuid.UUID(json["productId"]),
                 namespace=json["namespace"],
                 namespace_entity_id=json["namespaceEntityId"],
-                merchant_id=UUID(json["merchantId"]),
+                merchant_id=uuid.UUID(json["merchantId"]),
             )
         except (KeyError, ValueError) as e:
             raise ParseProductError("Could not parse product") from e

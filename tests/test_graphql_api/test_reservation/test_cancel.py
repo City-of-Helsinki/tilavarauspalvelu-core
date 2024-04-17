@@ -1,7 +1,7 @@
 import datetime
+import uuid
 from decimal import Decimal
 from unittest import mock
-from uuid import uuid4
 
 import pytest
 
@@ -178,7 +178,7 @@ def test_reservation__cancel__sends_email_notification(graphql, outbox, settings
 def test_reservation__cancel__starts_refund_process_for_paid_reservation(graphql):
     reservation = ReservationFactory.create_for_cancellation(price_net=1)
 
-    remote_id = uuid4()
+    remote_id = uuid.uuid4()
     payment_order = PaymentOrderFactory.create(
         reservation=reservation,
         remote_id=remote_id,
@@ -189,7 +189,7 @@ def test_reservation__cancel__starts_refund_process_for_paid_reservation(graphql
         price_total=Decimal("124.00"),
     )
 
-    refund_id = uuid4()
+    refund_id = uuid.uuid4()
     mock_refund = mock.MagicMock()
     mock_refund.refund_id = refund_id
 

@@ -1,7 +1,7 @@
+import uuid
 from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any
-from uuid import UUID
 
 import pytest
 from assertpy import assert_that
@@ -31,7 +31,7 @@ class OrderTypesTestCase(TestCase):
         last_valid_purchase_datetime=datetime(2022, 11, 24, 12, 0, 0, tzinfo=UTC),
         items=[
             OrderItemParams(
-                product_id=UUID("306ab20a-6b30-3ce3-95e8-fef818e6c30e"),
+                product_id=uuid.UUID("306ab20a-6b30-3ce3-95e8-fef818e6c30e"),
                 product_name="Test Product Name",
                 quantity=1,
                 unit="pcs",
@@ -179,7 +179,7 @@ class OrderTypesTestCase(TestCase):
         order = Order.from_json(self.create_order_response)
         assert_that(order).is_equal_to(
             Order(
-                order_id=UUID("79ccf2c7-afcf-3e49-80bd-38867c586f8f"),
+                order_id=uuid.UUID("79ccf2c7-afcf-3e49-80bd-38867c586f8f"),
                 namespace="test-namespace",
                 user="test-user",
                 created_at=datetime(
@@ -194,9 +194,9 @@ class OrderTypesTestCase(TestCase):
                 ),
                 items=[
                     OrderItem(
-                        order_item_id=UUID("10e64522-bc1b-4758-b8c0-14d42e0719d4"),
-                        order_id=UUID("79ccf2c7-afcf-3e49-80bd-38867c586f8f"),
-                        product_id=UUID("306ab20a-6b30-3ce3-95e8-fef818e6c30e"),
+                        order_item_id=uuid.UUID("10e64522-bc1b-4758-b8c0-14d42e0719d4"),
+                        order_id=uuid.UUID("79ccf2c7-afcf-3e49-80bd-38867c586f8f"),
+                        product_id=uuid.UUID("306ab20a-6b30-3ce3-95e8-fef818e6c30e"),
                         product_name="Test Product Name",
                         quantity=1,
                         unit="pcs",
@@ -209,9 +209,9 @@ class OrderTypesTestCase(TestCase):
                         vat_percentage=Decimal("24"),
                         meta=[
                             OrderItemMeta(
-                                order_item_meta_id=UUID("60f1949a-e2c8-497c-b9d4-c1ae61d20973"),
-                                order_item_id=UUID("10e64522-bc1b-4758-b8c0-14d42e0719d4"),
-                                order_id=UUID("79ccf2c7-afcf-3e49-80bd-38867c586f8f"),
+                                order_item_meta_id=uuid.UUID("60f1949a-e2c8-497c-b9d4-c1ae61d20973"),
+                                order_item_id=uuid.UUID("10e64522-bc1b-4758-b8c0-14d42e0719d4"),
+                                order_id=uuid.UUID("79ccf2c7-afcf-3e49-80bd-38867c586f8f"),
                                 key="testKey",
                                 value="Test Value",
                                 label="Test Label",

@@ -1,6 +1,6 @@
+import uuid
 from datetime import datetime
 from decimal import Decimal
-from uuid import uuid4
 
 import factory
 from django.utils.timezone import get_default_timezone
@@ -19,9 +19,9 @@ class OrderFactory(GenericFactory[Order]):
     class Meta:
         model = Order
 
-    order_id = uuid4()
+    order_id = uuid.uuid4()
     namespace = "tilavaraus"
-    user = str(uuid4())
+    user = str(uuid.uuid4())
     created_at = datetime.now(tz=get_default_timezone())
     items = []
     price_net = Decimal("10.0")

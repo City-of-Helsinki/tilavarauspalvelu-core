@@ -1,5 +1,5 @@
+import uuid
 from unittest import mock
-from uuid import uuid4
 
 import pytest
 from django.test.testcases import TestCase
@@ -25,10 +25,10 @@ class RefundPaidReservationTestCase(TestCase):
     @patch_method(VerkkokauppaAPIClient.refund_order)
     def test_updates_payment_order_on_success(self):
         reservation = ReservationFactory.create()
-        order = PaymentOrderFactory.create(reservation=reservation, remote_id=uuid4())
+        order = PaymentOrderFactory.create(reservation=reservation, remote_id=uuid.uuid4())
 
         refund = mock.MagicMock()
-        refund.refund_id = uuid4()
+        refund.refund_id = uuid.uuid4()
         VerkkokauppaAPIClient.refund_order.return_value = refund
 
         refund_paid_reservation_task(reservation.pk)
@@ -41,7 +41,7 @@ class RefundPaidReservationTestCase(TestCase):
     @patch_method(VerkkokauppaAPIClient.refund_order)
     def test_throws_on_refund_call_failure(self):
         reservation = ReservationFactory.create()
-        order = PaymentOrderFactory.create(reservation=reservation, remote_id=uuid4())
+        order = PaymentOrderFactory.create(reservation=reservation, remote_id=uuid.uuid4())
 
         VerkkokauppaAPIClient.refund_order.side_effect = Exception("Test exception")
 

@@ -1,5 +1,5 @@
+import uuid
 from typing import Any
-from uuid import UUID
 
 import pytest
 from django.conf import settings
@@ -134,7 +134,7 @@ def test__update_merchant__makes_valid_request_returns_merchant():
     VerkkokauppaAPIClient.generic.return_value = MockResponse(status_code=200, json=mutation_merchant_response)
 
     response = VerkkokauppaAPIClient.update_merchant(
-        merchant_uuid=UUID("7107df38-5985-39c9-8c83-ffe18bff24f5"),
+        merchant_uuid=uuid.UUID("7107df38-5985-39c9-8c83-ffe18bff24f5"),
         params=update_merchant_params,
     )
 
@@ -161,7 +161,7 @@ def test__update_merchant__raises_exception_if_merchant_id_is_missing():
 
     with pytest.raises(UpdateMerchantError):
         VerkkokauppaAPIClient.update_merchant(
-            merchant_uuid=UUID("7107df38-5985-39c9-8c83-ffe18bff24f5"), params=create_merchant_params
+            merchant_uuid=uuid.UUID("7107df38-5985-39c9-8c83-ffe18bff24f5"), params=create_merchant_params
         )
 
 
@@ -173,7 +173,7 @@ def test__update_merchant__raises_exception_if_merchant_id_is_invalid():
 
     with pytest.raises(UpdateMerchantError):
         VerkkokauppaAPIClient.update_merchant(
-            merchant_uuid=UUID("7107df38-5985-39c9-8c83-ffe18bff24f5"), params=create_merchant_params
+            merchant_uuid=uuid.UUID("7107df38-5985-39c9-8c83-ffe18bff24f5"), params=create_merchant_params
         )
 
 
@@ -183,7 +183,7 @@ def test__update_merchant__raises_exception_if_status_code_is_not_200():
 
     with pytest.raises(UpdateMerchantError):
         VerkkokauppaAPIClient.update_merchant(
-            merchant_uuid=UUID("7107df38-5985-39c9-8c83-ffe18bff24f5"), params=create_merchant_params
+            merchant_uuid=uuid.UUID("7107df38-5985-39c9-8c83-ffe18bff24f5"), params=create_merchant_params
         )
 
 
@@ -193,7 +193,7 @@ def test__update_merchant__raises_exception_if_status_code_is_404():
 
     with pytest.raises(UpdateMerchantError):
         VerkkokauppaAPIClient.update_merchant(
-            merchant_uuid=UUID("7107df38-5985-39c9-8c83-ffe18bff24f5"), params=create_merchant_params
+            merchant_uuid=uuid.UUID("7107df38-5985-39c9-8c83-ffe18bff24f5"), params=create_merchant_params
         )
 
 
@@ -201,7 +201,7 @@ def test__update_merchant__raises_exception_if_status_code_is_404():
 def test__get_merchant__returns_merchant():
     VerkkokauppaAPIClient.generic.return_value = MockResponse(status_code=200, json=get_merchant_response)
 
-    response = VerkkokauppaAPIClient.get_merchant(merchant_uuid=UUID("0312c2f7-3ed6-409e-84e3-ae21196e685d"))
+    response = VerkkokauppaAPIClient.get_merchant(merchant_uuid=uuid.UUID("0312c2f7-3ed6-409e-84e3-ae21196e685d"))
     assert response == MerchantInfo.from_json(get_merchant_response)
 
 
@@ -217,5 +217,5 @@ def test__get_merchant__returns_none():
     }
     VerkkokauppaAPIClient.generic.return_value = MockResponse(status_code=404, json=error_response)
 
-    merchant = VerkkokauppaAPIClient.get_merchant(merchant_uuid=UUID("0312c2f7-3ed6-409e-84e3-ae21196e685d"))
+    merchant = VerkkokauppaAPIClient.get_merchant(merchant_uuid=uuid.UUID("0312c2f7-3ed6-409e-84e3-ae21196e685d"))
     assert merchant is None
