@@ -1,4 +1,6 @@
+import json
 import uuid
+from contextlib import suppress
 
 from common.models import SQLLog
 from common.typing import QueryInfo
@@ -11,10 +13,13 @@ __all__ = [
 
 @app.task(name="save_sql_queries_from_request")
 def save_sql_queries_from_request(queries: list[QueryInfo], path: str, body: bytes) -> None:
-    try:
-        decoded_body: str | None = body.decode()
-    except Exception:
-        decoded_body = None
+    decoded_body: str | None = None
+    if path.startswith("/graphql"):
+        with suppress(Exception):
+            decoded_body = body.decode()
+        if decoded_body:
+            data = json.loads(decoded_body)
+            decoded_body = data.get("query")
 
     request_id = uuid.uuid4()
     sql_logs = [
