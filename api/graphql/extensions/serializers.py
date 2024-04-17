@@ -9,14 +9,14 @@ class OldPrimaryKeySerializerBase(serializers.ModelSerializer):
         for identifier in id_list:
             try:
                 int(identifier)
-            except ValueError:
-                raise GraphQLError(f"Wrong type of id: {identifier} for {field_name}")
+            except ValueError as err:
+                raise GraphQLError(f"Wrong type of id: {identifier} for {field_name}") from err
 
     def to_internal_value(self, data):
         try:
             int_val = super().to_internal_value(data)
-        except serializers.ValidationError as error:
-            raise self.validation_error_to_graphql_error(error)
+        except serializers.ValidationError as err:
+            raise self.validation_error_to_graphql_error(err) from err
 
         return int_val
 

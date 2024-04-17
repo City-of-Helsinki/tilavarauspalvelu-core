@@ -294,8 +294,8 @@ class ReservationUnitSerializer(NestingModelSerializer):
         if settings.HAUKI_EXPORTS_ENABLED:
             try:
                 instance.actions.send_reservation_unit_to_hauki()
-            except ExternalServiceError:
-                raise GraphQLError("Sending reservation unit as resource to HAUKI failed.")
+            except ExternalServiceError as err:
+                raise GraphQLError("Sending reservation unit as resource to HAUKI failed.") from err
 
     @staticmethod
     def handle_pricings(pricings: list[dict[Any, Any]], reservation_unit):

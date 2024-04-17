@@ -182,16 +182,16 @@ class ReservationUnitViewSet(viewsets.ModelViewSet):
         try:
             period_start_date: datetime.date = parse(period_start).date()
             period_end_date: datetime.date = parse(period_end).date()
-        except (ValueError, OverflowError):
-            raise serializers.ValidationError("Wrong date format. Use YYYY-MM-dd")
+        except (ValueError, OverflowError) as err:
+            raise serializers.ValidationError("Wrong date format. Use YYYY-MM-dd") from err
 
         if not reservation_units:
             raise serializers.ValidationError("reservation_unit parameter is required.")
 
         try:
             reservation_units = [int(res_unit) for res_unit in reservation_units.split(",")]
-        except ValueError:
-            raise serializers.ValidationError("Given reservation unit id is not an integer")
+        except ValueError as err:
+            raise serializers.ValidationError("Given reservation unit id is not an integer") from err
 
         reservation_unit_qs = ReservationUnit.objects.filter(id__in=reservation_units)
 
