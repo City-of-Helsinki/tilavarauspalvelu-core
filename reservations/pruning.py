@@ -1,5 +1,5 @@
 import datetime
-from logging import getLogger
+import logging
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
@@ -7,7 +7,7 @@ from django.utils.timezone import get_default_timezone
 
 from reservations.models import RecurringReservation, Reservation, ReservationStatistic
 
-logger = getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def prune_inactive_reservations() -> None:
