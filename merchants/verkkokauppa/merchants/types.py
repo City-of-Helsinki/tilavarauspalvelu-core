@@ -34,8 +34,8 @@ class MerchantInfo:
                 business_id=json.get("merchantBusinessId", ""),
                 shop_id=json.get("merchantShopId", ""),
             )
-        except (KeyError, ValueError) as e:
-            raise ParseMerchantInfoError(f"Could not parse merchant: {e}")
+        except (KeyError, ValueError) as err:
+            raise ParseMerchantInfoError(f"Could not parse merchant: {err}") from err
 
 
 @dataclass(frozen=True)
@@ -77,8 +77,8 @@ class Merchant:
                 business_id=cls._parse_configuration("merchantBusinessId", configurations),
                 shop_id=cls._parse_configuration("merchantShopId", configurations),
             )
-        except (KeyError, ValueError) as e:
-            raise ParseMerchantError(f"Could not parse merchant: {e}")
+        except (KeyError, ValueError) as err:
+            raise ParseMerchantError(f"Could not parse merchant: {err}") from err
 
     @classmethod
     def _parse_configuration(cls, key: str, configurations: list[dict[str, Any]]) -> str:

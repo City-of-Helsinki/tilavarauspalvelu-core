@@ -58,8 +58,8 @@ class BaseExternalServiceClient:
         """
         try:
             response_json = response.json()
-        except (ValueError, json.JSONDecodeError):
-            raise ExternalServiceParseJSONError(f"Parsing {cls.SERVICE_NAME} return data failed.")
+        except (ValueError, json.JSONDecodeError) as err:
+            raise ExternalServiceParseJSONError(f"Parsing {cls.SERVICE_NAME} return data failed.") from err
 
         return response_json
 
