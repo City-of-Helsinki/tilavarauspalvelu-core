@@ -1091,6 +1091,65 @@ msgid ""
 "would be active."
 msgstr ""
 
+#: common/admin/forms/sql_log.py common/admin/sql_log.py
+msgid "SQL"
+msgstr ""
+
+#: common/admin/forms/sql_log.py
+msgid "Path"
+msgstr ""
+
+#: common/admin/forms/sql_log.py
+msgid "Body"
+msgstr ""
+
+#: common/admin/forms/sql_log.py
+#, fuzzy
+#| msgid "Reservation Unit Options"
+msgid "Duration (ns)"
+msgstr "Varausyksikkö-vaihtoehdot"
+
+#: common/admin/forms/sql_log.py
+msgid "Succeeded"
+msgstr ""
+
+#: common/admin/forms/sql_log.py
+msgid "Request ID"
+msgstr ""
+
+#: common/admin/forms/sql_log.py permissions/base_models.py
+#: reservations/choices.py
+msgid "Created"
+msgstr ""
+
+#: common/admin/forms/sql_log.py
+msgid "SQL that was executed (without params)."
+msgstr ""
+
+#: common/admin/forms/sql_log.py
+msgid "Request path where the SQL was executed."
+msgstr ""
+
+#: common/admin/forms/sql_log.py
+msgid "Body of the request that executed the SQL."
+msgstr ""
+
+#: common/admin/forms/sql_log.py
+msgid "Duration of the SQL query in nanoseconds."
+msgstr ""
+
+#: common/admin/forms/sql_log.py
+msgid "Whether the SQL query succeeded or not."
+msgstr ""
+
+#: common/admin/forms/sql_log.py
+msgid "Random ID for grouping this log with other logs from the same request."
+msgstr ""
+
+#: common/admin/forms/sql_log.py
+msgid "When the SQL query was executed."
+msgstr ""
+
 #: common/choices/banner_notification.py
 msgid "Exception"
 msgstr ""
@@ -1133,6 +1192,14 @@ msgstr ""
 msgid ""
 "Both 'active_from' and 'active_until' must be either empty or set. If both "
 "are set, 'active_until' must be after 'active_from'."
+msgstr ""
+
+#: common/models/sql_log.py
+msgid "SQL log"
+msgstr ""
+
+#: common/models/sql_log.py
+msgid "SQL logs"
 msgstr ""
 
 #: email_notification/admin/email_tester.py
@@ -1492,10 +1559,6 @@ msgstr ""
 
 #: permissions/base_models.py
 msgid "Assigner"
-msgstr ""
-
-#: permissions/base_models.py reservations/choices.py
-msgid "Created"
 msgstr ""
 
 #: permissions/base_models.py

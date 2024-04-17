@@ -4,6 +4,7 @@ from django.db import models
 
 from applications.models import ApplicationEvent, ApplicationEventSchedule, EventReservationUnit
 from common.management.commands.create_test_data import create_test_data
+from common.models import SQLLog
 from email_notification.models import EmailTemplate
 from merchants.models import PaymentOrder
 from permissions.models import (
@@ -72,6 +73,7 @@ models_that_should_be_empty: list[type[models.Model]] = [
     RealEstate,
     RecurringReservation,
     ReservationUnitImage,
+    SQLLog,
 ]
 
 
