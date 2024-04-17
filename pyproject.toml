@@ -143,12 +143,6 @@ lint.ignore = [
     # Conflicting with ruff-format
     #
     "COM812",   # missing-trailing-comma
-    "COM819",   # prohibited-trailing-comma
-    "D206",     # indent-with-spaces
-    "D300",     # triple-single-quotes
-    "E111",     # indentation-with-invalid-multiple
-    "E114",     # indentation-with-invalid-multiple-comment
-    "E117",     # over-indented
     "ISC001",   # single-line-implicit-string-concatenation
     "PLR0911",  # too-many-return-statements
     "PLR0912",  # too-many-branches
@@ -156,13 +150,8 @@ lint.ignore = [
     "PLR0915",  # too-many-statements
     "PLR2004",  # magic-value-comparison
     "PLW2901",  # redefined-loop-name
-    "Q000",     # bad-quotes-inline-string
-    "Q001",     # bad-quotes-multiline-string
-    "Q002",     # bad-quotes-docstring
-    "Q003",     # avoidable-escaped-quote
     "RUF012",   # mutable-class-default
     "TRY003",   # raise-vanilla-args
-    "W191",     # tab-indentation
 ]
 
 [tool.ruff.lint.extend-per-file-ignores]
