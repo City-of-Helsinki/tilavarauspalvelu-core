@@ -170,6 +170,27 @@ combine-as-imports = false
 known-third-party = [
     "django",
 ]
+known-first-party = [
+    "actions",
+    "api",
+    "applications",
+    "common",
+    "elastic_django",
+    "email_notification",
+    "merchants",
+    "opening_hours",
+    "permissions",
+    "reservation_units",
+    "reservations",
+    "resources",
+    "services",
+    "spaces",
+    "terms_of_use",
+    "tests",
+    "tilavarauspalvelu",
+    "users",
+    "utils",
+]
 
 [tool.ruff.lint.mccabe]
 max-complexity = 10
