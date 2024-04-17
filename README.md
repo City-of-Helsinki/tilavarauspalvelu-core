@@ -259,6 +259,10 @@ else:  # No Error
     MIDDLEWARE.insert(0, "graphiql_debug_toolbar.middleware.DebugToolbarMiddleware")
 ```
 
+### Development environment
+
+It's recommended to set up [ruff-lsp] to enable Ruff linting and formatting support in your editor.
+
 ### Image cache
 
 In production, [Varnish cache] is used for reservation unit and purpose images.
@@ -308,6 +312,7 @@ In settings there are four configurations:
 [Reliability Rating Link]: https://sonarcloud.io/summary/new_code?id=City-of-Helsinki_tilavarauspalvelu-core
 [Reliability Rating]: https://sonarcloud.io/api/project_badges/measure?project=City-of-Helsinki_tilavarauspalvelu-core&metric=reliability_rating
 [reservation platform]: https://tilavaraus.hel.fi/
+[ruff-lsp]: https://github.com/astral-sh/ruff-lsp
 [Security Rating Link]: https://sonarcloud.io/summary/new_code?id=City-of-Helsinki_tilavarauspalvelu-core
 [Security Rating]: https://sonarcloud.io/api/project_badges/measure?project=City-of-Helsinki_tilavarauspalvelu-core&metric=security_rating
 [Tilavarauspalvelu page in Confluence]: https://helsinkisolutionoffice.atlassian.net/wiki/spaces/KAN/pages/887029864/Tilavarauspalvelu+Varaamo
