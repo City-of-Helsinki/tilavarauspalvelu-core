@@ -129,6 +129,7 @@ lint.select = [
     "TRY",      # tryceratops
     "UP",       # pyupgrade
     "W",        # pycodestyle warnings
+    "ICN",      # flake8-import-conventions
 ]
 lint.ignore = [
     "B905",     # zip without strict
@@ -213,6 +214,33 @@ known-first-party = [
     "tilavarauspalvelu",
     "users",
     "utils",
+]
+
+[tool.ruff.lint.flake8-import-conventions]
+banned-from = [
+    # Python standard libraries
+    "base64",
+#    "csv",
+#    "datetime",
+#    "hashlib",
+#    "hmac",
+#    "json",
+#    "logging",
+#    "math",
+#    "os",
+#    "pickle",
+#    "random",
+#    "re",
+#    "shutil",
+#    "subprocess",
+#    "sys",
+#    "tempfile",
+#    "time",
+#    "uuid",
+#    "xml",
+#    "yaml",
+#    # Project-specific
+#    "error_codes",
 ]
 
 [tool.ruff.lint.flake8-self]

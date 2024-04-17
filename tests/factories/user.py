@@ -1,7 +1,7 @@
+import base64
 import datetime
 import json
 import uuid
-from base64 import urlsafe_b64encode
 from collections.abc import Iterable
 from dataclasses import asdict
 from typing import Any, Literal
@@ -191,7 +191,7 @@ def get_id_token(
     return ".".join(
         [
             # Header
-            urlsafe_b64encode(
+            base64.urlsafe_b64encode(
                 json.dumps(
                     {
                         "alg": "RS256",
@@ -200,7 +200,7 @@ def get_id_token(
                 ).encode(),
             ).decode(),
             # Payload
-            urlsafe_b64encode(
+            base64.urlsafe_b64encode(
                 json.dumps(
                     asdict(
                         IDToken(
