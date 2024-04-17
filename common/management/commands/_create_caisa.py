@@ -156,7 +156,7 @@ def _create_caisa(metadata_sets: dict[SetName, ReservationMetadataSet]):
             "name_en": "KUVA - Aluekirjasto",
             "name_sv": "KUVA - Aluekirjasto",
             "text": (
-                "Tähän varaukseen sovelletaan Helsingin kaupungin " "tilojen ja laitteiden varaamisen sopimusehtoja."
+                "Tähän varaukseen sovelletaan Helsingin kaupungin tilojen ja laitteiden varaamisen sopimusehtoja."
             ),
             "terms_type": TermsOfUse.TERMS_TYPE_SERVICE,
         },

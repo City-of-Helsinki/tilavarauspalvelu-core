@@ -150,7 +150,6 @@ lint.ignore = [
     "E114",     # indentation-with-invalid-multiple-comment
     "E117",     # over-indented
     "ISC001",   # single-line-implicit-string-concatenation
-    "ISC002",   # multi-line-implicit-string-concatenation
     "PLR0911",  # too-many-return-statements
     "PLR0912",  # too-many-branches
     "PLR0913",  # too-many-arguments
