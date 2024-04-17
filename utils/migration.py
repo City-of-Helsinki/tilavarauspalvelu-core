@@ -48,7 +48,11 @@ class AlterModelTable(migrations.AlterModelTable):
             )
 
             # Rename M2M fields whose name is based on this model's db_table
-            for old_field, new_field in zip(old_model._meta.local_many_to_many, new_model._meta.local_many_to_many):
+            for old_field, new_field in zip(
+                old_model._meta.local_many_to_many,
+                new_model._meta.local_many_to_many,
+                strict=False,
+            ):
                 if new_field.remote_field.through._meta.auto_created:
                     through_table_name = old_field.remote_field.through._meta.object_name.lower()
                     schema_editor.alter_db_table(
