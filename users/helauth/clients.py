@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 import datetime
-import json
 import logging
 import time
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
@@ -24,11 +23,16 @@ from users.helauth.typing import (
     ProfileTokenPayload,
     RefreshResponse,
     ReservationPrefillInfo,
+    UserProfileInfo,
 )
 from users.helauth.utils import get_jwt_payload, get_session_data
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
 from utils.external_service.errors import ExternalServiceError, ExternalServiceRequestError
 from utils.sentry import SentryLogger
+
+if TYPE_CHECKING:
+    from users.models import User
+
 
 __all__ = [
     "HelsinkiProfileClient",
@@ -58,6 +62,15 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
         if my_profile_data is None:
             return None
         return ProfileDataParser(my_profile_data).parse_birthday_info()
+
+    @classmethod
+    def get_user_profile_info(cls, request: WSGIRequest, *, user: User, fields: list[str]) -> UserProfileInfo | None:
+        """Fetch user profile info for the given user from Helsinki Profile."""
+        query = cls.user_profile_data(profile_id=user.profile_id, fields=fields)
+        my_profile_data = cls.graphql_request(request, query=query)
+        if my_profile_data is None:
+            return None
+        return ProfileDataParser(my_profile_data).parse_user_profile_info()
 
     @classmethod
     def ensure_token_valid(cls, request: WSGIRequest) -> bool:
@@ -155,10 +168,9 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
 
         errors: dict[str, Any] | None = response_data.get("errors")
         if errors is not None:
-            msg = f"{cls.SERVICE_NAME.capitalize()}: Helsinki profile response contains errors."
-            details = json.dumps(errors)
-            SentryLogger.log_message(message=msg, details=details, level="error")
-            raise ExternalServiceError(f"{msg} {details}")
+            msg = f"{cls.SERVICE_NAME.capitalize()}: Response contains errors."
+            SentryLogger.log_message(message=msg, details=errors, level="error")
+            raise ExternalServiceError(msg, details=errors)
 
         return response_data
 
@@ -201,6 +213,51 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
                 }
             }
         """
+
+    @classmethod
+    def user_profile_data(cls, *, profile_id: str, fields: list[str]) -> str:
+        node = f'profile(id:"{profile_id}")'
+        selections: set[str] = set()
+        fragments: set[str] = set()
+
+        if "first_name" in fields:
+            selections.add("firstName")
+            selections.add("...MyVerifiedPersonalInformation")
+            fragments.add(cls._verified_info_fragment)
+
+        if "last_name" in fields:
+            selections.add("lastName")
+            selections.add("...MyVerifiedPersonalInformation")
+            fragments.add(cls._verified_info_fragment)
+
+        if "email" in fields:
+            selections.add("...MyPrimaryEmail")
+            selections.add("...MyEmails")
+            fragments.add(cls._primary_email_fragment)
+            fragments.add(cls._emails_fragment)
+
+        if "phone" in fields:
+            selections.add("...MyPrimaryPhone")
+            selections.add("...MyPhones")
+            fragments.add(cls._primary_phone_fragment)
+            fragments.add(cls._phones_fragment)
+
+        if any(f in fields for f in ["street_address", "postal_code", "city"]):
+            selections.add("...MyPrimaryAddress")
+            selections.add("...MyAddresses")
+            selections.add("...MyVerifiedPersonalInformation")
+            fragments.add(cls._primary_address_fragment)
+            fragments.add(cls._addresses_fragment)
+            fragments.add(cls._verified_info_fragment)
+
+        if any(f in fields for f in ["birthday", "ssn", "municipality_code", "municipality_name"]):
+            selections.add("...MyVerifiedPersonalInformation")
+            fragments.add(cls._verified_info_fragment)
+
+        return (
+            "query { %s { %s } }" % (node, " ".join(selections))  # noqa: UP031
+            + " ".join(fragments)
+        )
 
     @classproperty
     def _primary_email_fragment(cls) -> str:

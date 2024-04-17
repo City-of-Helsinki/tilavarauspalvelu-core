@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import re
+from typing import TYPE_CHECKING
 
 from django.conf import settings
 from graphene_django_extensions.utils import get_nested
@@ -9,6 +10,7 @@ from graphene_django_extensions.utils import get_nested
 from applications.models import City
 from users.helauth.typing import (
     BirthdayInfo,
+    LoginMethod,
     MyProfileData,
     PermanentAddress,
     PermanentForeignAddress,
@@ -19,8 +21,12 @@ from users.helauth.typing import (
     ProfileNode,
     ProfilePhone,
     ReservationPrefillInfo,
+    UserProfileInfo,
     VerifiedPersonalInfo,
 )
+
+if TYPE_CHECKING:
+    pass
 
 __all__ = [
     "ProfileDataParser",
@@ -50,11 +56,37 @@ class ProfileDataParser:
             birthday=self.get_birthday(),
         )
 
-    def get_last_name(self) -> str | None:
-        return self.data.get("lastName")
+    def parse_user_profile_info(self) -> UserProfileInfo:
+        address = self.get_address()
+        return UserProfileInfo(
+            first_name=self.get_first_name(),
+            last_name=self.get_last_name(),
+            email=self.get_email(),
+            phone=self.get_phone(),
+            birthday=self.get_birthday(),
+            ssn=self.get_social_security_number(),
+            street_address=address.get("address"),
+            postal_code=address.get("postalCode"),
+            city=address.get("city"),
+            municipality_code=self.get_municipality_code(),
+            municipality_name=self.get_municipality_name(),
+            login_method=LoginMethod.PROFILE,
+            is_strong_login=True,  # Helsinki profile login is always strong
+        )
 
     def get_first_name(self) -> str | None:
-        return self.data.get("firstName")
+        last_name = self.data.get("firstName")
+        if last_name is not None:
+            return last_name
+
+        return get_nested(self.data, "verifiedPersonalInformation", "firstName")
+
+    def get_last_name(self) -> str | None:
+        first_name = self.data.get("lastName")
+        if first_name is not None:
+            return first_name
+
+        return get_nested(self.data, "verifiedPersonalInformation", "lastName")
 
     def get_email(self) -> str | None:
         primary_email: ProfileEmail | None = self.data.get("primaryEmail")
@@ -152,21 +184,36 @@ class ProfileDataParser:
 
         return None
 
+    def get_municipality_name(self) -> str | None:
+        verified_info: VerifiedPersonalInfo | None = self.data.get("verifiedPersonalInformation")
+        if verified_info is None:
+            return None
+
+        return verified_info.get("municipalityOfResidence")
+
+    def get_municipality_code(self) -> str | None:
+        verified_info: VerifiedPersonalInfo | None = self.data.get("verifiedPersonalInformation")
+        if verified_info is None:
+            return None
+
+        return verified_info.get("municipalityOfResidenceNumber")
+
     def get_user_home_city(self) -> City | None:
         verified_info: VerifiedPersonalInfo | None = self.data.get("verifiedPersonalInformation")
         if verified_info is None:
             return None
 
-        city_str: str | None = verified_info.get("municipalityOfResidence")
-        mun_code: str | None = verified_info.get("municipalityOfResidenceNumber")
+        municipality_code = self.get_municipality_code()
 
-        if mun_code == settings.PRIMARY_MUNICIPALITY_NUMBER:
-            city: City | None = City.objects.filter(municipality_code=mun_code).first()
+        if municipality_code == settings.PRIMARY_MUNICIPALITY_NUMBER:
+            city: City | None = City.objects.filter(municipality_code=municipality_code).first()
             if city is not None:
                 return city
 
-        if city_str == settings.PRIMARY_MUNICIPALITY_NAME:
-            city: City | None = City.objects.filter(name__iexact=city_str).first()
+        municipality_name = self.get_municipality_name()
+
+        if municipality_name == settings.PRIMARY_MUNICIPALITY_NAME:
+            city: City | None = City.objects.filter(name__iexact=municipality_name).first()
             if city is not None:
                 return city
 
