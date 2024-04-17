@@ -12,6 +12,7 @@ from modeltranslation.admin import TranslationAdmin
 
 from applications.admin.forms.application_round import ApplicationRoundAdminForm
 from applications.exporter.application_round_applications_exporter import ApplicationRoundApplicationsCSVExporter
+from applications.exporter.application_round_result_exporter import ApplicationRoundResultCSVExporter
 from applications.models import ApplicationRound
 from utils.sentry import SentryLogger
 
@@ -57,6 +58,23 @@ class ApplicationRoundAdmin(ExtraButtonsMixin, TranslationAdmin):
         except Exception as err:
             self.message_user(request, f"Error while exporting applications: {err}", level=messages.ERROR)
             SentryLogger.log_exception(err, "Error while exporting ApplicationRound applications")
+            return None
+
+        if not response:
+            self.message_user(request, "No data to export for application round.", level=messages.WARNING)
+
+        return response
+
+    @button(label="Export results to CSV")
+    def export_results_to_csv(self, request, extra_context=None) -> FileResponse | None:
+        application_round_id: int | None = request.resolver_match.kwargs.get("extra_context")
+
+        exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round_id)
+        try:
+            response = exporter.export_as_file_response()
+        except Exception as err:
+            self.message_user(request, f"Error while exporting results: {err}", level=messages.ERROR)
+            SentryLogger.log_exception(err, "Error while exporting ApplicationRound results")
             return None
 
         if not response:
