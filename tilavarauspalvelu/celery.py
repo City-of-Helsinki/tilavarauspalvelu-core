@@ -1,6 +1,6 @@
+import logging
 import os
 import sys
-from logging import StreamHandler
 from logging.handlers import TimedRotatingFileHandler
 
 from celery import Celery
@@ -14,10 +14,10 @@ broker_options = os.getenv("CELERY_BROKER_TRANSPORT_OPTIONS", {})  # noqa: PLW15
 
 
 class RotatingCeleryLogging(Logging):
-    def _detect_handler(self, logfile: str | None = None) -> StreamHandler | TimedRotatingFileHandler:
+    def _detect_handler(self, logfile: str | None = None) -> logging.StreamHandler | TimedRotatingFileHandler:
         logfile = sys.__stderr__ if logfile is None else logfile
         if hasattr(logfile, "write"):
-            return StreamHandler(logfile)
+            return logging.StreamHandler(logfile)
 
         # Modify default file logging handler to the rotating file handler
         # to avoid log file growing too large. Keep 12 hourly backups.
