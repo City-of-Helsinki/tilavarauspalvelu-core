@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { type ApolloQueryResult, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { Select, Tabs } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { uniqBy } from "lodash";
@@ -37,12 +37,9 @@ import { truncate } from "@/helpers";
 import {
   ALL_EVENTS_PER_UNIT_QUERY,
   APPLICATION_ROUND_FILTER_OPTIONS,
+  APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY,
 } from "./queries";
 import { AllocationPageContent } from "./ApplicationEvents";
-import {
-  AFFECTING_ALLOCATED_TIME_SLOTS_QUERY,
-  APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY,
-} from "../review/queries";
 import { ComboboxFilter, SearchFilter } from "@/component/QueryParamFilters";
 
 const MAX_RES_UNIT_NAME_LENGTH = 35;
@@ -310,7 +307,7 @@ function ApplicationRoundAllocation({
     // NOTE specialised variation of the query so the params don't match the generate types
     Omit<QueryApplicationSectionsArgs, "reservationUnit"> & {
       reservationUnit: number;
-    }
+    } & QueryAffectingAllocatedTimeSlotsArgs
   >(APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY, {
     // On purpose skip if the reservation unit is not selected (it is required)
     skip: !applicationRoundPk || reservationUnitFilterQuery == null,
@@ -329,6 +326,8 @@ function ApplicationRoundAllocation({
       ageGroup: ageGroupFilterQuery,
       reservationUnit: reservationUnitFilterQuery ?? 0,
       applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,
+      beginDate: applicationRound?.reservationPeriodBegin ?? "",
+      endDate: applicationRound?.reservationPeriodEnd ?? "",
     },
     onError: () => {
       notifyError(t("errors.errorFetchingData"));
@@ -345,26 +344,9 @@ function ApplicationRoundAllocation({
       "Skipping allocation query because reservation unit or reservation period is not set"
     );
   }
-  const {
-    data: affectingAllocationsData,
-    refetch: refetchAffectedAllocations,
-  } = useQuery<Query, QueryAffectingAllocatedTimeSlotsArgs>(
-    AFFECTING_ALLOCATED_TIME_SLOTS_QUERY,
-    {
-      pollInterval: ALLOCATION_POLL_INTERVAL,
-      skip:
-        !reservationUnitFilterQuery ||
-        applicationRound?.reservationPeriodBegin == null ||
-        applicationRound.reservationPeriodEnd == null,
-      variables: {
-        reservationUnit: reservationUnitFilterQuery ?? 0,
-        beginDate: applicationRound?.reservationPeriodBegin ?? "",
-        endDate: applicationRound?.reservationPeriodEnd ?? "",
-      },
-    }
-  );
+
   const affectingAllocations = filterNonNullable(
-    affectingAllocationsData?.affectingAllocatedTimeSlots
+    data?.affectingAllocatedTimeSlots
   );
 
   // NOTE get the count of all application sections for the selected reservation unit
@@ -468,25 +450,7 @@ function ApplicationRoundAllocation({
     setParams(newParams, { replace: true });
   };
 
-  const handleRefetchApplicationEvents = async () => {
-    const res = await Promise.allSettled([
-      refetch(),
-      refetchAffectedAllocations(),
-    ]);
-    const success = res.filter(
-      (r): r is PromiseFulfilledResult<ApolloQueryResult<Query>> =>
-        r.status === "fulfilled"
-    );
-    const error = res.filter(
-      (r): r is PromiseRejectedResult => r.status === "rejected"
-    );
-    if (error.length > 0) {
-      notifyError(t("errors.errorFetchingData"));
-    }
-    if (success.length > 0) {
-      const retval = success[0];
-      return retval.value;
-    }
+  const handleRefetchApplicationEvents = () => {
     return refetch();
   };
 
@@ -573,7 +537,6 @@ function ApplicationRoundAllocation({
 
 // Do a single full query to get filter / page data
 function AllocationWrapper({
-  // TODO rename to Pk
   applicationRoundPk,
 }: {
   applicationRoundPk: number;
@@ -598,6 +561,7 @@ function AllocationWrapper({
   if (loading) {
     return <Loader />;
   }
+
   // TODO improve this (disabled filters if error, notify the user, but don't block the whole page)
   if (error) {
     // eslint-disable-next-line no-console
