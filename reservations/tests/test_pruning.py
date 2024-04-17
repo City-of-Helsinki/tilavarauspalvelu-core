@@ -1,5 +1,5 @@
+import uuid
 from datetime import datetime, timedelta
-from uuid import uuid4
 
 from dateutil.relativedelta import relativedelta
 from django.test import TestCase, override_settings
@@ -70,7 +70,7 @@ class PruneReservationsWithInactivePaymentsTestCase(TestCase):
             )
             PaymentOrderFactory(
                 reservation=reservation_with_cancelled,
-                remote_id=uuid4(),
+                remote_id=uuid.uuid4(),
                 status=OrderStatus.CANCELLED,
             )
 
@@ -79,7 +79,7 @@ class PruneReservationsWithInactivePaymentsTestCase(TestCase):
             )
             PaymentOrderFactory(
                 reservation=reservation_with_expired,
-                remote_id=uuid4(),
+                remote_id=uuid.uuid4(),
                 status=OrderStatus.CANCELLED,
             )
 
@@ -98,7 +98,7 @@ class PruneReservationsWithInactivePaymentsTestCase(TestCase):
             )
             PaymentOrderFactory(
                 reservation=reservation_with_fresh_1,
-                remote_id=uuid4(),
+                remote_id=uuid.uuid4(),
                 status=OrderStatus.CANCELLED,
             )
 
@@ -107,7 +107,7 @@ class PruneReservationsWithInactivePaymentsTestCase(TestCase):
             )
             PaymentOrderFactory(
                 reservation=reservation_with_fresh_2,
-                remote_id=uuid4(),
+                remote_id=uuid.uuid4(),
                 status=OrderStatus.CANCELLED,
             )
 
@@ -117,7 +117,7 @@ class PruneReservationsWithInactivePaymentsTestCase(TestCase):
             )
             PaymentOrderFactory(
                 reservation=reservation_with_old,
-                remote_id=uuid4(),
+                remote_id=uuid.uuid4(),
                 created_at=five_minutes_ago,
                 status=OrderStatus.CANCELLED,
             )
@@ -139,7 +139,7 @@ class PruneReservationsWithInactivePaymentsTestCase(TestCase):
                 reservation_with_ignored_state = ReservationFactory(name="do not delete me", state=state)
                 PaymentOrderFactory(
                     reservation=reservation_with_ignored_state,
-                    remote_id=uuid4(),
+                    remote_id=uuid.uuid4(),
                     status=OrderStatus.CANCELLED,
                 )
 

@@ -1,7 +1,7 @@
 import datetime
+import uuid
 from decimal import Decimal
 from unittest.mock import MagicMock
-from uuid import uuid4
 
 import pytest
 
@@ -21,7 +21,7 @@ pytestmark = [
 ]
 
 
-REFUND = MagicMock(refund_id=uuid4())
+REFUND = MagicMock(refund_id=uuid.uuid4())
 
 
 @patch_method(VerkkokauppaAPIClient.refund_order, return_value=REFUND)
@@ -154,7 +154,7 @@ def test_reservation__refund__payment_order_is_not_paid(graphql):
 
 @patch_method(VerkkokauppaAPIClient.refund_order, return_value=REFUND)
 def test_reservation__refund__payment_order_is_waiting_for_refund(graphql):
-    refund_id = uuid4()
+    refund_id = uuid.uuid4()
 
     reservation = ReservationFactory.create_for_refund(
         state=ReservationStateChoice.CONFIRMED,

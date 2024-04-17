@@ -1,5 +1,5 @@
+import uuid
 from typing import Any
-from uuid import UUID
 
 from django.conf import settings
 from requests import RequestException, Response
@@ -54,7 +54,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
     #########
 
     @classmethod
-    def get_order(cls, *, order_uuid: UUID) -> Order:
+    def get_order(cls, *, order_uuid: uuid.UUID) -> Order:
         action_fail = "Order retrieval failed"
         url = f"{settings.VERKKOKAUPPA_ORDER_API_URL}/admin/{order_uuid}"
 
@@ -98,7 +98,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             raise CreateOrderError(f"{action_fail}: {err!s}") from err
 
     @classmethod
-    def cancel_order(cls, *, order_uuid: UUID, user_uuid: UUID) -> Order | None:
+    def cancel_order(cls, *, order_uuid: uuid.UUID, user_uuid: uuid.UUID) -> Order | None:
         action_fail = "Order cancellation failed"
         url = f"{settings.VERKKOKAUPPA_ORDER_API_URL}/{order_uuid}/cancel"
 
@@ -125,7 +125,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
     ###########
 
     @classmethod
-    def get_payment(cls, *, order_uuid: UUID) -> Payment | None:
+    def get_payment(cls, *, order_uuid: uuid.UUID) -> Payment | None:
         action_fail = "Payment retrieval failed"
         url = f"{settings.VERKKOKAUPPA_PAYMENT_API_URL}/admin/{order_uuid}"
 
@@ -148,7 +148,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             raise GetPaymentError(action_fail) from err
 
     @classmethod
-    def get_refund_status(cls, *, order_uuid: UUID) -> RefundStatusResult | None:
+    def get_refund_status(cls, *, order_uuid: uuid.UUID) -> RefundStatusResult | None:
         action_fail = "Payment refund status retrieval failed"
         url = f"{settings.VERKKOKAUPPA_PAYMENT_API_URL}/admin/refund-payment/{order_uuid}"
 
@@ -171,7 +171,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             raise GetRefundStatusError(f"{action_fail}: {err!s}") from err
 
     @classmethod
-    def refund_order(cls, *, order_uuid: UUID) -> Refund | None:
+    def refund_order(cls, *, order_uuid: uuid.UUID) -> Refund | None:
         action_fail = "Payment refund failed"
         url = f"{settings.VERKKOKAUPPA_PAYMENT_API_URL}/refund/instant/{order_uuid}"
 
@@ -210,7 +210,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
     ############
 
     @classmethod
-    def get_merchant(cls, *, merchant_uuid: UUID) -> MerchantInfo | None:
+    def get_merchant(cls, *, merchant_uuid: uuid.UUID) -> MerchantInfo | None:
         action_fail = f"Fetching merchant {merchant_uuid} failed"
         url = f"{settings.VERKKOKAUPPA_MERCHANT_API_URL}/{settings.VERKKOKAUPPA_NAMESPACE}/{merchant_uuid}"
 
@@ -249,7 +249,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             raise CreateMerchantError(action_fail) from err
 
     @classmethod
-    def update_merchant(cls, *, merchant_uuid: UUID, params: UpdateMerchantParams) -> Merchant:
+    def update_merchant(cls, *, merchant_uuid: uuid.UUID, params: UpdateMerchantParams) -> Merchant:
         action_fail = "Merchant update failed"
         url = (
             f"{settings.VERKKOKAUPPA_MERCHANT_API_URL}/"
@@ -298,7 +298,12 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             raise CreateProductError(f"{action_fail}: {err}") from err
 
     @classmethod
-    def create_or_update_accounting(cls, *, product_uuid: UUID, params: CreateOrUpdateAccountingParams) -> Accounting:
+    def create_or_update_accounting(
+        cls,
+        *,
+        product_uuid: uuid.UUID,
+        params: CreateOrUpdateAccountingParams,
+    ) -> Accounting:
         """
         Be aware that this endpoint allows creating accounting data for products that
         do not exist. This is intentional, since in some uses cases there is a need

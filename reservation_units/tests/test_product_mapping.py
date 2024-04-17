@@ -1,4 +1,4 @@
-from uuid import uuid4
+import uuid
 
 from django.test import TestCase, override_settings
 
@@ -7,7 +7,7 @@ from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tests.factories import PaymentMerchantFactory, ReservationUnitFactory, ReservationUnitPricingFactory
 from tests.helpers import patch_method
 
-product_id = uuid4()
+product_id = uuid.uuid4()
 
 
 def mock_create_product(*args, **kwargs):

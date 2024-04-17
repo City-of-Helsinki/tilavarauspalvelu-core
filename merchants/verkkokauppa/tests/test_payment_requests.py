@@ -1,7 +1,7 @@
+import uuid
 from copy import deepcopy
 from typing import Any
 from urllib.parse import urljoin
-from uuid import UUID
 
 import pytest
 from django.conf import settings
@@ -35,7 +35,7 @@ get_payment_response: dict[str, Any] = {
 
 @patch_method(VerkkokauppaAPIClient.generic, return_value=MockResponse(status_code=200, json=get_payment_response))
 def test__get_payment__makes_valid_request():
-    order_uuid = UUID(get_payment_response["orderId"])
+    order_uuid = uuid.UUID(get_payment_response["orderId"])
 
     payment = VerkkokauppaAPIClient.get_payment(order_uuid=order_uuid)
 
@@ -68,7 +68,7 @@ def test__get_payment__makes_valid_request():
     ),
 )
 def test__get_payment__returns_none_when_payment_is_missing():
-    order_uuid = UUID(get_payment_response["orderId"])
+    order_uuid = uuid.UUID(get_payment_response["orderId"])
 
     payment = VerkkokauppaAPIClient.get_payment(order_uuid=order_uuid)
     assert payment is None
@@ -77,7 +77,7 @@ def test__get_payment__returns_none_when_payment_is_missing():
 @patch_method(VerkkokauppaAPIClient.generic)
 def test__get_payment__raises_exception_if_key_is_missing():
     response = get_payment_response.copy()
-    order_uuid = UUID(response.pop("orderId"))
+    order_uuid = uuid.UUID(response.pop("orderId"))
     VerkkokauppaAPIClient.generic.return_value = MockResponse(status_code=200, json=response)
 
     with pytest.raises(GetPaymentError):
@@ -86,7 +86,7 @@ def test__get_payment__raises_exception_if_key_is_missing():
 
 @patch_method(VerkkokauppaAPIClient.generic)
 def test__get_payment__raises_exception_if_value_is_invalid():
-    order_uuid = UUID(get_payment_response["orderId"])
+    order_uuid = uuid.UUID(get_payment_response["orderId"])
 
     response = get_payment_response.copy()
     response["orderId"] = "invalid-id"
@@ -99,7 +99,7 @@ def test__get_payment__raises_exception_if_value_is_invalid():
 
 @patch_method(VerkkokauppaAPIClient.generic, side_effect=Timeout())
 def test__get_payment__raises_exception_on_timeout():
-    order_uuid = UUID(get_payment_response["orderId"])
+    order_uuid = uuid.UUID(get_payment_response["orderId"])
     with pytest.raises(GetPaymentError):
         VerkkokauppaAPIClient.get_payment(order_uuid=order_uuid)
 
@@ -125,7 +125,7 @@ refund_status_response: dict[str, Any] = {
 
 @patch_method(VerkkokauppaAPIClient.generic, return_value=MockResponse(status_code=200, json=refund_status_response))
 def test__get_refund_status__returns_status():
-    order_uuid = UUID(refund_status_response["orderId"])
+    order_uuid = uuid.UUID(refund_status_response["orderId"])
     refund_status = VerkkokauppaAPIClient.get_refund_status(order_uuid=order_uuid)
     expected = RefundStatusResult.from_json(refund_status_response)
     assert refund_status == expected
@@ -155,7 +155,7 @@ refund_response: dict[str, Any] = {
 
 @patch_method(VerkkokauppaAPIClient.generic, return_value=MockResponse(status_code=200, json=refund_response))
 def test__refund_order__returns_refund():
-    order_uuid = UUID(refund_response["refunds"][0]["orderId"])
+    order_uuid = uuid.UUID(refund_response["refunds"][0]["orderId"])
     refund = VerkkokauppaAPIClient.refund_order(order_uuid=order_uuid)
     expected = Refund.from_json(refund_response["refunds"][0])
     assert refund == expected
@@ -164,7 +164,7 @@ def test__refund_order__returns_refund():
 @patch_method(SentryLogger.log_message)
 @patch_method(VerkkokauppaAPIClient.generic, return_value=MockResponse(status_code=500, json={}))
 def test__refund_order__raises_exception_on_non_200_status_code():
-    order_uuid = UUID(refund_response["refunds"][0]["orderId"])
+    order_uuid = uuid.UUID(refund_response["refunds"][0]["orderId"])
 
     with pytest.raises(RefundPaymentError) as err:
         VerkkokauppaAPIClient.refund_order(order_uuid=order_uuid)
@@ -177,7 +177,7 @@ def test__refund_order__raises_exception_on_non_200_status_code():
 @patch_method(SentryLogger.log_message)
 @patch_method(VerkkokauppaAPIClient.generic)
 def test__refund_order__raises_exception_on_multi_refund_response():
-    order_uuid = UUID(refund_response["refunds"][0]["orderId"])
+    order_uuid = uuid.UUID(refund_response["refunds"][0]["orderId"])
 
     response = deepcopy(refund_response)
     response["refunds"].append({})
@@ -194,7 +194,7 @@ def test__refund_order__raises_exception_on_multi_refund_response():
 @patch_method(VerkkokauppaAPIClient.generic)
 @patch_method(SentryLogger.log_exception)
 def test__refund_order__raises_exception_on_invalid_response():
-    order_uuid = UUID(refund_response["refunds"][0]["orderId"])
+    order_uuid = uuid.UUID(refund_response["refunds"][0]["orderId"])
 
     response = deepcopy(refund_response)
     response["refunds"][0]["refundId"] = "not-a-uuid"

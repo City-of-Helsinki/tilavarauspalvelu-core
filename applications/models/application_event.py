@@ -1,5 +1,5 @@
+import uuid as uuid_
 from datetime import date, timedelta
-from uuid import UUID, uuid4
 
 from django.db import models
 from helsinki_gdpr.models import SerializableMixin
@@ -12,7 +12,7 @@ __all__ = [
 # DEPRECATED: Use ApplicationSection model instead
 class ApplicationEvent(SerializableMixin, models.Model):
     name: str = models.CharField(max_length=100, null=False, blank=True)
-    uuid: UUID = models.UUIDField(default=uuid4, null=False, editable=False, unique=True)
+    uuid: uuid_.UUID = models.UUIDField(default=uuid_.uuid4, null=False, editable=False, unique=True)
     num_persons: int | None = models.PositiveIntegerField(null=True, blank=True)
 
     min_duration: timedelta | None = models.DurationField(null=True, blank=True)

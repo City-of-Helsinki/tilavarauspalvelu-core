@@ -1,5 +1,5 @@
+import uuid
 from typing import Any, NamedTuple
-from uuid import UUID
 
 from graphene_django_extensions.bases import DjangoMutation
 
@@ -17,7 +17,7 @@ from utils.sentry import SentryLogger
 
 
 class RefreshOrderMutationOutput(NamedTuple):
-    order_uuid: UUID
+    order_uuid: uuid.UUID
     status: str
     reservation_pk: int
 
@@ -30,7 +30,7 @@ class RefreshOrderMutation(DjangoMutation):
 
     @classmethod
     def custom_mutation(cls, info: GQLInfo, input_data: dict[str, Any]) -> RefreshOrderMutationOutput:
-        remote_id: UUID = input_data["order_uuid"]
+        remote_id: uuid.UUID = input_data["order_uuid"]
 
         payment_order: PaymentOrder | None = PaymentOrder.objects.filter(remote_id=remote_id).first()
         if not payment_order:

@@ -1,19 +1,19 @@
 import datetime
 import hashlib
 import hmac
+import uuid
 from datetime import timedelta
 from urllib.parse import quote_plus, urlencode
-from uuid import UUID
 
 from django.conf import settings
 from django.utils.timezone import get_default_timezone
 
 
 def generate_hauki_link(
-    uuid: UUID,
+    uuid: uuid.UUID,
     username: str,
     organization_id: str,
-    target_resources: list[UUID] | None = None,
+    target_resources: list[uuid.UUID] | None = None,
 ) -> None | str:
     if not (
         settings.HAUKI_ADMIN_UI_URL

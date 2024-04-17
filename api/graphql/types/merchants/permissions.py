@@ -1,5 +1,5 @@
+import uuid
 from typing import Any
-from uuid import UUID
 
 from graphene_django_extensions.permissions import BasePermission
 from graphene_django_extensions.typing import GraphQLFilterInfo
@@ -17,7 +17,7 @@ __all__ = [
 class OrderRefreshPermission(BasePermission):
     @classmethod
     def has_mutation_permission(cls, user: AnyUser, input_data: dict[str, Any]) -> bool:
-        remote_id: UUID | None = input_data.get("order_uuid")
+        remote_id: uuid.UUID | None = input_data.get("order_uuid")
         if remote_id is None:
             return False
         payment_order = PaymentOrder.objects.filter(remote_id=remote_id).first()

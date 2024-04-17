@@ -1,6 +1,6 @@
+import uuid
 from datetime import datetime
 from typing import Any
-from uuid import UUID
 
 from assertpy import assert_that
 from django.conf import settings
@@ -84,7 +84,7 @@ class MerchantTypesTestCase(MerchantTypesBaseTestCase):
 
     def test_merchant_from_json(self):
         expected = Merchant(
-            id=UUID("7107df38-5985-39c9-8c83-ffe18bff24f5"),
+            id=uuid.UUID("7107df38-5985-39c9-8c83-ffe18bff24f5"),
             namespace="tilanvaraus",
             created_at=datetime(2022, 9, 26, 10, 11, 12, tzinfo=settings.VERKKOKAUPPA_TIMEZONE),
             updated_at=datetime(2022, 9, 27, 10, 11, 12, tzinfo=settings.VERKKOKAUPPA_TIMEZONE),
@@ -104,7 +104,7 @@ class MerchantTypesTestCase(MerchantTypesBaseTestCase):
 
     def test_merchant_from_json_empty_configurations(self):
         expected = Merchant(
-            id=UUID("7107df38-5985-39c9-8c83-ffe18bff24f5"),
+            id=uuid.UUID("7107df38-5985-39c9-8c83-ffe18bff24f5"),
             namespace="tilanvaraus",
             created_at=datetime(2022, 9, 26, 10, 11, 12, tzinfo=settings.VERKKOKAUPPA_TIMEZONE),
             updated_at=datetime(2022, 9, 27, 10, 11, 12, tzinfo=settings.VERKKOKAUPPA_TIMEZONE),

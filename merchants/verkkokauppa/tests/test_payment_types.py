@@ -1,7 +1,7 @@
+import uuid
 from datetime import datetime
 from decimal import Decimal
 from typing import Any
-from uuid import UUID
 
 import pytest
 from assertpy import assert_that
@@ -37,7 +37,7 @@ class PaymentTestCase(TestCase):
             Payment(
                 payment_id="08c2d282-eb98-3271-a3fc-81fe200f129b_at_20211115-122645",
                 namespace="tilavarauspalvelu",
-                order_id=UUID("08c2d282-eb98-3271-a3fc-81fe200f129b"),
+                order_id=uuid.UUID("08c2d282-eb98-3271-a3fc-81fe200f129b"),
                 user_id="Esperanza_Daniel23",
                 status="payment_created",
                 payment_method="nordea",

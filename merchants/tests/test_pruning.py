@@ -1,5 +1,5 @@
+import uuid
 from datetime import datetime, timedelta
-from uuid import uuid4
 
 from django.test import TestCase, override_settings
 from django.utils.timezone import get_default_timezone
@@ -36,7 +36,7 @@ class UpdateExpiredOrderTestCase(TestCase):
             status=OrderStatus.DRAFT,
             created_at=six_minutes_ago,
             reservation=self.reservation,
-            remote_id=uuid4(),
+            remote_id=uuid.uuid4(),
         )
 
         with freeze_time(datetime(2022, 11, 28, 10, 15, 0, tzinfo=DEFAULT_TIMEZONE)):
@@ -55,7 +55,7 @@ class UpdateExpiredOrderTestCase(TestCase):
             status=OrderStatus.DRAFT,
             created_at=six_minutes_ago,
             reservation=self.reservation,
-            remote_id=uuid4(),
+            remote_id=uuid.uuid4(),
         )
 
         with freeze_time(datetime(2022, 11, 28, 10, 15, 0, tzinfo=DEFAULT_TIMEZONE)):
@@ -83,7 +83,7 @@ class UpdateExpiredOrderTestCase(TestCase):
             status=OrderStatus.DRAFT,
             created_at=six_minutes_ago,
             reservation=self.reservation,
-            remote_id=uuid4(),
+            remote_id=uuid.uuid4(),
         )
 
         with freeze_time(datetime(2022, 11, 28, 10, 15, 0, tzinfo=DEFAULT_TIMEZONE)):
@@ -104,7 +104,7 @@ class UpdateExpiredOrderTestCase(TestCase):
             status=OrderStatus.DRAFT.value,
             created_at=six_minutes_ago,
             reservation=self.reservation,
-            remote_id=uuid4(),
+            remote_id=uuid.uuid4(),
         )
 
         with freeze_time(datetime(2022, 11, 28, 10, 15, 0, tzinfo=DEFAULT_TIMEZONE)):
@@ -125,7 +125,7 @@ class UpdateExpiredOrderTestCase(TestCase):
             status=OrderStatus.DRAFT.value,
             created_at=six_minutes_ago,
             reservation=self.reservation,
-            remote_id=uuid4(),
+            remote_id=uuid.uuid4(),
         )
 
         with freeze_time(datetime(2022, 11, 28, 10, 15, 0, tzinfo=DEFAULT_TIMEZONE)):
@@ -149,7 +149,7 @@ class UpdateExpiredOrderTestCase(TestCase):
             status=OrderStatus.DRAFT,
             created_at=six_minutes_ago,
             reservation=self.reservation,
-            remote_id=uuid4(),
+            remote_id=uuid.uuid4(),
         )
 
         with freeze_time(datetime(2022, 11, 28, 10, 15, 0, tzinfo=DEFAULT_TIMEZONE)):
@@ -174,7 +174,7 @@ class UpdateExpiredOrderTestCase(TestCase):
             status=OrderStatus.DRAFT,
             created_at=six_minutes_ago,
             reservation=self.reservation,
-            remote_id=uuid4(),
+            remote_id=uuid.uuid4(),
         )
 
         with freeze_time(datetime(2022, 11, 28, 10, 15, 0, tzinfo=DEFAULT_TIMEZONE)):
