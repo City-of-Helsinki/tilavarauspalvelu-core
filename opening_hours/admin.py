@@ -41,8 +41,8 @@ class ReservableTimeSpanInline(admin.TabularInline):
     def has_add_permission(self, request, obj=None):
         return False
 
-    def time_span_str(self, obj):
-        return obj._get_datetime_str()
+    def time_span_str(self, obj: ReservableTimeSpan) -> str:
+        return obj.get_datetime_str()
 
 
 class OriginHaukiResourceAdminForm(forms.ModelForm):

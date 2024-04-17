@@ -116,6 +116,7 @@ lint.select = [
     "RUF",      # ruff-specific rules
     "S",        # flake8-bandit
     "SIM",      # flake8-simplify
+    "SLF",      # flake8-self
     "T20",      # flake8-print
     "TID",      # flake8-tidy-imports
     "TRY",      # tryceratops
@@ -165,6 +166,7 @@ lint.ignore = [
     "S106",     # Hardcoded passwords are fine in tests
     "S108",     # No need to care about insecure temp file usages in tests
     "S311",     # Pseudo-random generators are fine here.
+    "SLF",      # Allow accessing private members in tests
 ]
 
 [tool.ruff.lint.isort]
@@ -193,6 +195,9 @@ known-first-party = [
     "users",
     "utils",
 ]
+
+[tool.ruff.lint.flake8-self]
+extend-ignore-names = ["_base_manager", "_default_manager",  "_meta", "_mptt_meta", "_defaults", "_errors"]
 
 [tool.ruff.lint.mccabe]
 max-complexity = 10
