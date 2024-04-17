@@ -1,3 +1,6 @@
+import json
+from typing import Any
+
 from requests import Response
 
 from utils.sentry import SentryLogger
@@ -5,6 +8,16 @@ from utils.sentry import SentryLogger
 
 class ExternalServiceError(Exception):
     """Base class for exceptions related to external services."""
+
+    def __init__(self, msg: str, /, *, details: dict[str, Any] | None = None) -> None:
+        self.details = details
+        super().__init__(msg)
+
+    def __str__(self) -> str:
+        base = super().__str__()
+        if self.details is not None:
+            return f"{base} {json.dumps(self.details)}"
+        return base
 
 
 class ExternalServiceRequestError(ExternalServiceError):

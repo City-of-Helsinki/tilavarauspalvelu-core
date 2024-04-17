@@ -13,8 +13,10 @@ __all__ = [
     "ADLoginAMR",
     "ExtraData",
     "IDToken",
+    "LoginMethod",
     "ProfileForeignAddress",
     "ProfileLocalAddress",
+    "ProfileLoginAMR",
     "ProfileTokenPayload",
     "RefreshResponse",
     "ReservationPrefillInfo",
@@ -95,6 +97,16 @@ class IDToken:
         return any(method.value in amr for method in ADLoginAMR)
 
     @property
+    def is_profile_login(self) -> bool:
+        amr = self.amr
+        if amr is None:
+            return False
+
+        if isinstance(amr, str):
+            amr = [amr]
+        return any(method.value in amr for method in ProfileLoginAMR)
+
+    @property
     def is_strong_login(self) -> bool:
         return self.loa == "substantial"
 
@@ -170,6 +182,17 @@ class ADLoginAMR(enum.Enum):
     HELSINKIAZUREAD = "helsinkiazuread"
 
 
+class ProfileLoginAMR(enum.Enum):
+    SUOMI_FI = "suomi_fi"
+    HELTUNNISTUSSUOMIFI = "heltunnistussuomifi"
+
+
+class LoginMethod(enum.Enum):
+    PROFILE = "PROFILE"
+    AD = "AD"
+    OTHER = "OTHER"
+
+
 # Profile raw response
 
 
@@ -227,8 +250,6 @@ class MyProfileData(TypedDict, total=False):
     id: str | None  # random string
     firstName: str | None
     lastName: str | None
-    nickname: str | None
-    language: str | None
     primaryPhone: ProfilePhone | None
     primaryEmail: ProfileEmail | None
     primaryAddress: ProfileAddress | None
@@ -266,3 +287,19 @@ class ReservationPrefillInfo(TypedDict):
 class BirthdayInfo(TypedDict):
     id: str | None  # random string
     birthday: datetime.date | None
+
+
+class UserProfileInfo(TypedDict):
+    first_name: str | None
+    last_name: str | None
+    email: str | None
+    phone: str | None
+    birthday: datetime.date | None
+    ssn: str | None
+    street_address: str | None
+    postal_code: str | None
+    city: str | None
+    municipality_code: str | None
+    municipality_name: str | None
+    login_method: LoginMethod
+    is_strong_login: bool
