@@ -4,7 +4,7 @@ import uuid
 import zoneinfo
 from datetime import UTC, date, datetime, time, timedelta
 from decimal import Decimal
-from enum import Enum
+from enum import StrEnum
 from itertools import cycle
 from typing import Any, Literal, NamedTuple, TypedDict, TypeVar
 
@@ -126,7 +126,7 @@ RolePermission = TypeVar(
 )
 
 
-class UserType(str, Enum):
+class UserType(StrEnum):
     reserver = "Varaaja"
     viewer = "Katselija"
     handler = "Käsittelijä"
