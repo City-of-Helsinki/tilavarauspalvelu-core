@@ -249,7 +249,7 @@ known-first-party = [
 banned-from = [
     # Python standard libraries
     "base64",
-    # "csv",
+    "csv",
     # "datetime",
     "hashlib",
     "hmac",
