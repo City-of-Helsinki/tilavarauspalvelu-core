@@ -140,6 +140,7 @@ lint.extend-select = [
     "PLR1730",  # if-stmt-min-max
     "PLR1733",  # unnecessary-dict-index-lookup
     "PLR1736",  # unnecessary-list-index-lookup
+    "PLR6104",  # non-augmented-assignment
     "PLW0211",  # bad-staticmethod-argument
     "FURB110",  # if-exp-instead-of-or-operator
     "FURB142",  # for-loop-set-mutations
