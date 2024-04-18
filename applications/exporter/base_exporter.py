@@ -1,4 +1,4 @@
-from collections.abc import Iterator
+from collections.abc import Iterable, Iterator
 from dataclasses import asdict, dataclass
 from io import StringIO
 
@@ -28,14 +28,24 @@ class BaseCSVExporter:
         response["Content-Disposition"] = f"attachment;filename={file_name}"
         return response
 
-    def _get_header_rows(self, **kwargs) -> tuple:
-        """Return the header rows for the CSV file."""
+    def _get_header_rows(self, **kwargs) -> BaseExportRow | tuple:
+        """
+        Return the header rows for the CSV file.
+
+        Return a BaseExportRow instance if the header is simple and can be written to a single row.
+        Return a tuple if the header is complex and needs to be split into multiple rows.
+        """
         raise NotImplementedError
 
     def _get_queryset(self, **kwargs) -> QuerySet:
         """Return the queryset used to fetch the data for the CSV file."""
         raise NotImplementedError
 
-    def _get_single_row_data(self, **kwargs) -> list:
-        """Process and return the data for a single row in the CSV file."""
+    def _get_single_row_data(self, **kwargs) -> Iterable[BaseExportRow] | list[str]:
+        """
+        Process and return the data for a single row in the CSV file.
+
+        Return an iterable of BaseExportRow instances if the data is complex and needs to be split into multiple rows.
+        Return a list of strings if the data is simple and can be written to a single row.
+        """
         raise NotImplementedError

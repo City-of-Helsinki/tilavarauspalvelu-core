@@ -39,7 +39,7 @@ class ApplicationSectionExportRow(BaseExportRow):
     end_time: str = ""
 
     # Price
-    price: str = ""  # TODO
+    price: str = ""  # empty by design, the column will be manually filled after export
 
 
 class ApplicationRoundResultCSVExporter(BaseCSVExporter):
@@ -173,7 +173,7 @@ class ApplicationRoundResultCSVExporter(BaseCSVExporter):
 
         # Reservation Unit Options
         for option in section.reservation_unit_options.all():
-            option_row = ApplicationSectionExportRow(**asdict(row))
+            option_row = ApplicationSectionExportRow(**asdict(row))  # Copy to prevent modifying the original
             option_row.reservation_unit_name = option.reservation_unit.name
             option_row.unit_name = option.reservation_unit.unit.name
 
@@ -183,7 +183,7 @@ class ApplicationRoundResultCSVExporter(BaseCSVExporter):
                 yield option_row
                 continue
             for allocated_time_slot in option.allocated_time_slots.all():
-                slot_row = ApplicationSectionExportRow(**asdict(option_row))
+                slot_row = ApplicationSectionExportRow(**asdict(option_row))  # Copy to prevent modifying the original
                 slot_row.day_of_the_week = allocated_time_slot.day_of_the_week
                 slot_row.begin_time = local_time_string(allocated_time_slot.begin_time)
                 slot_row.end_time = local_time_string(allocated_time_slot.end_time)
