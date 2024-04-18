@@ -9,6 +9,7 @@ from social_django.models import DjangoStorage, UserSocialAuth
 from social_django.strategy import DjangoStrategy
 
 from users.helauth.clients import HelsinkiProfileClient
+from users.helauth.typing import IDToken
 from users.models import User
 from utils.sentry import SentryLogger
 
@@ -44,7 +45,6 @@ class ExtraKwargs(TypedDict):
     is_new: bool
     new_association: bool
     pipeline_index: int
-    response: OIDCResponse
     social: UserSocialAuth
     storage: DjangoStorage
     strategy: DjangoStrategy
@@ -73,14 +73,15 @@ ID_LETTER_TO_CENTURY: dict[str, int] = {
 def fetch_additional_info_for_user_from_helsinki_profile(
     backend: TunnistamoOIDCAuth,
     request: WSGIRequest,
+    response: OIDCResponse,
     user: User | None = None,
     **kwargs: Unpack[ExtraKwargs],
 ) -> dict[str, Any]:
     if user is None:
         return {"user": user}
 
-    id_token = user.id_token
-    if not id_token.is_ad_login and user.profile_id == "":
+    id_token = IDToken.from_string(response["id_token"])
+    if id_token is not None and not id_token.is_ad_login and user.profile_id == "":
         update_user_from_profile(request, user=user)
 
     return {"user": user}
