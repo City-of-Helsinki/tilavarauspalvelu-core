@@ -102,7 +102,8 @@ def test_query_current_user__unauthenticated(graphql, settings):
 
     # then:
     # - The response contains the expected data
-    assert response.error_message() == "No User matches the given query."
+    assert response.has_errors is False, response.errors
+    assert response.first_query_object is None
 
 
 def test_query_current_user__general_roles(graphql):

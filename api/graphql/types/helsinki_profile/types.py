@@ -1,9 +1,7 @@
 import graphene
-from graphene.utils.str_converters import to_snake_case
-from graphene_django_extensions.errors import GQLPermissionDeniedError
-from graphene_django_extensions.settings import gdx_settings
-from graphene_django_extensions.utils import get_fields_from_info
+from graphene_django_extensions.errors import GQLNodePermissionDeniedError
 from graphql import GraphQLError
+from query_optimizer.selections import get_field_selections
 
 from api.graphql.extensions import error_codes
 from applications.models import Application
@@ -43,10 +41,7 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
         reservation_id: int | None = None,
     ) -> UserProfileInfo:
         if not can_view_users(info.context.user):
-            raise GQLPermissionDeniedError(
-                message=gdx_settings.QUERY_PERMISSION_ERROR_MESSAGE,
-                code=gdx_settings.QUERY_PERMISSION_ERROR_CODE,
-            )
+            raise GQLNodePermissionDeniedError
 
         if reservation_id is not None:
             user = cls.get_user_from_reservation(reservation_id)
@@ -82,7 +77,7 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
             raise GraphQLError(msg, extensions=extensions)
 
         # Modify profile request based on the requested fields in the graphql query
-        fields: list[str] = [to_snake_case(field) for field in get_fields_from_info(info)[0]["profileData"]]
+        fields: list[str] = get_field_selections(info)
 
         data = HelsinkiProfileClient.get_user_profile_info(info.context, user=user, fields=fields)
         if data is None:

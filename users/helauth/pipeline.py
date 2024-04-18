@@ -90,7 +90,10 @@ def update_user_from_profile(request: WSGIRequest, *, user: User | None = None) 
         birthday_info = HelsinkiProfileClient.get_birthday_info(request)
 
     if birthday_info is None:
-        SentryLogger.log_message(f"Helsinki profile: Could not fetch JWT from Tunnistamo for user {int(user.pk)}")
+        SentryLogger.log_message(
+            "Helsinki profile: Could not fetch JWT from Tunnistamo.",
+            details={"user_id": str(user.pk)},
+        )
         return
 
     if birthday_info["id"] is not None:
