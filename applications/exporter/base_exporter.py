@@ -1,4 +1,4 @@
-from collections.abc import Iterable, Iterator
+from collections.abc import Iterator
 from dataclasses import asdict, dataclass
 from io import StringIO
 
@@ -41,11 +41,11 @@ class BaseCSVExporter:
         """Return the queryset used to fetch the data for the CSV file."""
         raise NotImplementedError
 
-    def _get_single_row_data(self, **kwargs) -> Iterable[BaseExportRow] | list[str]:
+    def _get_single_row_data(self, **kwargs) -> list[str | BaseExportRow]:
         """
         Process and return the data for a single row in the CSV file.
 
-        Return an iterable of BaseExportRow instances if the data is complex and needs to be split into multiple rows.
         Return a list of strings if the data is simple and can be written to a single row.
+        Return a list of BaseExportRow instances if the data is complex and needs to be split into multiple rows.
         """
         raise NotImplementedError
