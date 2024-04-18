@@ -1,4 +1,4 @@
-from csv import QUOTE_ALL, writer
+import csv
 from pathlib import Path
 
 from django.conf import settings
@@ -94,7 +94,7 @@ class ReservationUnitExporter:
             file_name = f"reservation_units__{now.strftime('%d-%m-%Y')}.csv"
 
             with open(path / file_name, "w", newline="") as reservations_file:
-                reservations_writer = writer(reservations_file, "excel", quoting=QUOTE_ALL)
+                reservations_writer = csv.writer(reservations_file, "excel", quoting=csv.QUOTE_ALL)
 
                 cls._write_header_row(reservations_writer)
 

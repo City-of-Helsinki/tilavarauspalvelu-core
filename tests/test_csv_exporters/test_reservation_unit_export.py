@@ -45,7 +45,7 @@ def test_reservation_unit_export_multiple():
     # when:
     # - The exporter is run for all reservation units
     open_mock = mock.patch("reservation_units.utils.export_data.open", new=mock.mock_open())
-    csv_writer_mock = mock.patch("reservation_units.utils.export_data.writer")
+    csv_writer_mock = mock.patch("reservation_units.utils.export_data.csv.writer")
     with open_mock, csv_writer_mock as mock_file:
         ReservationUnitExporter.export_reservation_unit_data()
 
@@ -250,7 +250,7 @@ def test_reservation_unit_export_missing_relations(column_value_mapping, missing
     # when:
     # - The exporter is run for all reservation units
     open_mock = mock.patch("reservation_units.utils.export_data.open", new=mock.mock_open())
-    csv_writer_mock = mock.patch("reservation_units.utils.export_data.writer")
+    csv_writer_mock = mock.patch("reservation_units.utils.export_data.csv.writer")
     with open_mock, csv_writer_mock as mock_file:
         ReservationUnitExporter.export_reservation_unit_data()
 
@@ -272,7 +272,7 @@ def test_reservation_unit_export_subset():
     # when:
     # - The exporter is run for the first 3 reservation units
     open_mock = mock.patch("reservation_units.utils.export_data.open", new=mock.mock_open())
-    csv_writer_mock = mock.patch("reservation_units.utils.export_data.writer")
+    csv_writer_mock = mock.patch("reservation_units.utils.export_data.csv.writer")
     with open_mock, csv_writer_mock as mock_file:
         ReservationUnitExporter.export_reservation_unit_data(queryset=ReservationUnit.objects.all()[:3])
 
