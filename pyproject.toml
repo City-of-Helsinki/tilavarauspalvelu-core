@@ -221,6 +221,7 @@ lint.ignore = [
 
 [tool.ruff.lint.isort]
 combine-as-imports = false
+split-on-trailing-comma = false
 known-third-party = [
     "django",
 ]

@@ -1,9 +1,6 @@
 import pytest
 
-from tests.factories import (
-    ApplicationSectionFactory,
-    SuitableTimeRangeFactory,
-)
+from tests.factories import ApplicationSectionFactory, SuitableTimeRangeFactory
 from tests.helpers import UserType
 from tests.test_graphql_api.test_application_section.helpers import sections_query
 

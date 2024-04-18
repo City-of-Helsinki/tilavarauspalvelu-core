@@ -4,9 +4,7 @@ from graphene_django_extensions.permissions import BasePermission
 
 from applications.models import Application, ApplicationSection
 from common.typing import AnyUser
-from permissions.helpers import (
-    can_modify_application,
-)
+from permissions.helpers import can_modify_application
 
 __all__ = [
     "ApplicationSectionPermission",

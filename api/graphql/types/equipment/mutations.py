@@ -1,9 +1,7 @@
 from graphene_django_extensions import CreateMutation, DeleteMutation, UpdateMutation
 
 from api.graphql.types.equipment.permissions import EquipmentPermission
-from api.graphql.types.equipment.serializers import (
-    EquipmentSerializer,
-)
+from api.graphql.types.equipment.serializers import EquipmentSerializer
 from reservation_units.models import Equipment
 
 __all__ = [
