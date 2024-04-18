@@ -4,11 +4,10 @@ import React, { useEffect, useReducer } from "react";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 import styled from "styled-components";
-import { breakpoints } from "common/src/common/style";
 import ShowAllContainer from "common/src/components/ShowAllContainer";
 import UnitFilter from "../filters/UnitFilter";
 import Tags, { Action, getReducer, toTags } from "../lists/Tags";
-import { Grid, Span3 } from "@/styles/layout";
+import { AutoGrid } from "@/styles/layout";
 import ReservationUnitStateFilter from "../filters/ReservationUnitStateFilter";
 import ReservationUnitTypeFilter from "../filters/ReservationUnitTypeFilter";
 import { ReservationUnitState } from "@gql/gql-types";
@@ -37,21 +36,6 @@ const multivaluedFields = [
 type Props = {
   onSearch: (args: FilterArguments) => void;
 };
-
-const Grid3Container = styled.div`
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--spacing-l);
-  @media (min-width: ${breakpoints.l}) {
-    grid-template-columns: 1fr 1fr 1fr;
-  }
-`;
-
-const Grid2Container = styled(Grid3Container)`
-  @media (min-width: ${breakpoints.l}) {
-    grid-template-columns: 1fr 1fr;
-  }
-`;
 
 const RangeContrainer = styled.div`
   display: grid;
@@ -136,89 +120,79 @@ function Filters({ onSearch }: Props): JSX.Element {
   );
 
   return (
-    <div>
-      <Wrapper>
-        <Grid>
-          <Span3>
-            <TextInput
-              id="nameFi"
-              label={t("ReservationUnitsSearch.textSearchLabel")}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  onSearch(state);
-                }
-              }}
-              onChange={(e) =>
-                dispatch({ type: "set", value: { nameFi: e.target.value } })
-              }
-              placeholder={t("ReservationUnitsSearch.textSearchPlaceHolder")}
-              value={state.nameFi || ""}
-            />
-          </Span3>
-          <Span3>
-            <UnitFilter
-              onChange={(e) => dispatch({ type: "set", value: { unit: e } })}
-              value={state.unit}
-            />
-          </Span3>
-          <Span3>
-            <ReservationUnitTypeFilter
-              onChange={(e) =>
-                dispatch({ type: "set", value: { reservationUnitType: e } })
-              }
-              value={state.reservationUnitType}
-            />
-          </Span3>
-          <Span3>
-            <ReservationUnitStateFilter
-              value={state.reservationUnitStates}
-              onChange={(e) =>
-                dispatch({ type: "set", value: { reservationUnitStates: e } })
-              }
-            />
-          </Span3>
-        </Grid>
-        <MoreWrapper
-          showAllLabel={t("ReservationUnitsSearch.moreFilters")}
-          showLessLabel={t("ReservationUnitsSearch.lessFilters")}
-          maximumNumber={0}
-        >
-          <Grid2Container>
-            <div>
-              <div>{t("ReservationUnitsSearch.maxPersonsLabel")}</div>
-              <RangeContrainer>
-                <MyTextInput
-                  id="maxPersonsGte"
-                  value={state.maxPersonsGte}
-                  dispatch={dispatch}
-                />
-                <MyTextInput
-                  id="maxPersonsLte"
-                  value={state.maxPersonsLte}
-                  dispatch={dispatch}
-                />
-              </RangeContrainer>
-            </div>
-            <div>
-              <div>{t("ReservationUnitsSearch.surfaceAreaLabel")}</div>
-              <RangeContrainer>
-                <MyTextInput
-                  id="surfaceAreaGte"
-                  value={state.surfaceAreaGte}
-                  dispatch={dispatch}
-                />
-                <MyTextInput
-                  id="surfaceAreaLte"
-                  value={state.surfaceAreaLte}
-                  dispatch={dispatch}
-                />
-              </RangeContrainer>
-            </div>
-          </Grid2Container>
-        </MoreWrapper>
-      </Wrapper>
+    <Wrapper>
+      <AutoGrid>
+        <TextInput
+          id="nameFi"
+          label={t("ReservationUnitsSearch.textSearchLabel")}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              onSearch(state);
+            }
+          }}
+          onChange={(e) =>
+            dispatch({ type: "set", value: { nameFi: e.target.value } })
+          }
+          placeholder={t("ReservationUnitsSearch.textSearchPlaceHolder")}
+          value={state.nameFi || ""}
+        />
+        <UnitFilter
+          onChange={(e) => dispatch({ type: "set", value: { unit: e } })}
+          value={state.unit}
+        />
+        <ReservationUnitTypeFilter
+          onChange={(e) =>
+            dispatch({ type: "set", value: { reservationUnitType: e } })
+          }
+          value={state.reservationUnitType}
+        />
+        <ReservationUnitStateFilter
+          value={state.reservationUnitStates}
+          onChange={(e) =>
+            dispatch({ type: "set", value: { reservationUnitStates: e } })
+          }
+        />
+      </AutoGrid>
+      <MoreWrapper
+        showAllLabel={t("ReservationUnitsSearch.moreFilters")}
+        showLessLabel={t("ReservationUnitsSearch.lessFilters")}
+        maximumNumber={0}
+      >
+        <AutoGrid>
+          <div>
+            <div>{t("ReservationUnitsSearch.maxPersonsLabel")}</div>
+            <RangeContrainer>
+              <MyTextInput
+                id="maxPersonsGte"
+                value={state.maxPersonsGte}
+                dispatch={dispatch}
+              />
+              <MyTextInput
+                id="maxPersonsLte"
+                value={state.maxPersonsLte}
+                dispatch={dispatch}
+              />
+            </RangeContrainer>
+          </div>
+          <div>
+            <div>{t("ReservationUnitsSearch.surfaceAreaLabel")}</div>
+            <RangeContrainer>
+              <MyTextInput
+                id="surfaceAreaGte"
+                value={state.surfaceAreaGte}
+                dispatch={dispatch}
+              />
+              <MyTextInput
+                id="surfaceAreaLte"
+                value={state.surfaceAreaLte}
+                dispatch={dispatch}
+              />
+            </RangeContrainer>
+          </div>
+        </AutoGrid>
+      </MoreWrapper>
       <Tags tags={tags} t={t} dispatch={dispatch} />
-    </div>
+    </Wrapper>
   );
 }
 

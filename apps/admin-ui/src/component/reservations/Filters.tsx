@@ -95,7 +95,7 @@ const MyTextInput = ({
   />
 );
 
-const Filters = ({ onSearch, initialFiltering }: Props): JSX.Element => {
+function Filters({ onSearch, initialFiltering }: Props): JSX.Element {
   const { t } = useTranslation();
   const initialEmptyState = { ...emptyState, ...initialFiltering };
 
@@ -120,70 +120,54 @@ const Filters = ({ onSearch, initialFiltering }: Props): JSX.Element => {
   return (
     <Wrapper>
       <AutoGrid>
-        <div>
-          <ReservationUnitTypeFilter
-            onChange={(reservationUnitType) =>
-              dispatch({ type: "set", value: { reservationUnitType } })
-            }
-            value={state.reservationUnitType}
-          />
-        </div>
-        <div>
-          <ReservationStateFilter
-            onChange={(reservationState) =>
-              dispatch({ type: "set", value: { reservationState } })
-            }
-            value={state.reservationState}
-          />
-        </div>
-        <div>
-          <UnitFilter
-            onChange={(unit) => dispatch({ type: "set", value: { unit } })}
-            value={state.unit}
-          />
-        </div>
-        <div>
-          <MyTextInput
-            id="textSearch"
-            dispatch={dispatch}
-            value={state.textSearch || ""}
-          />
-        </div>
-        <div>
-          <PaymentStatusFilter
-            onChange={(paymentStatuses) =>
-              dispatch({ type: "set", value: { paymentStatuses } })
-            }
-            value={state.paymentStatuses || []}
-          />
-        </div>
-        <div>
-          <ReservationUnitFilter
-            onChange={(reservationUnit) =>
-              dispatch({ type: "set", value: { reservationUnit } })
-            }
-            // FIXME should not coerce types (it's correct now, but not after 6 months)
-            value={state.reservationUnit as { value: number; label: string }[]}
-          />
-        </div>
-        <div>
-          <DateInput
-            language="fi"
-            id="begin"
-            label={t("ReservationsSearch.begin")}
-            onChange={(begin) => dispatch({ type: "set", value: { begin } })}
-            value={state.begin}
-          />
-        </div>
-        <div>
-          <DateInput
-            id="end"
-            language="fi"
-            label={t("ReservationsSearch.end")}
-            onChange={(end) => dispatch({ type: "set", value: { end } })}
-            value={state.end}
-          />
-        </div>
+        <ReservationUnitTypeFilter
+          onChange={(reservationUnitType) =>
+            dispatch({ type: "set", value: { reservationUnitType } })
+          }
+          value={state.reservationUnitType}
+        />
+        <ReservationStateFilter
+          onChange={(reservationState) =>
+            dispatch({ type: "set", value: { reservationState } })
+          }
+          value={state.reservationState}
+        />
+        <UnitFilter
+          onChange={(unit) => dispatch({ type: "set", value: { unit } })}
+          value={state.unit}
+        />
+        <MyTextInput
+          id="textSearch"
+          dispatch={dispatch}
+          value={state.textSearch || ""}
+        />
+        <PaymentStatusFilter
+          onChange={(paymentStatuses) =>
+            dispatch({ type: "set", value: { paymentStatuses } })
+          }
+          value={state.paymentStatuses || []}
+        />
+        <ReservationUnitFilter
+          onChange={(reservationUnit) =>
+            dispatch({ type: "set", value: { reservationUnit } })
+          }
+          // FIXME should not coerce types (it's correct now, but not after 6 months)
+          value={state.reservationUnit as { value: number; label: string }[]}
+        />
+        <DateInput
+          language="fi"
+          id="begin"
+          label={t("ReservationsSearch.begin")}
+          onChange={(begin) => dispatch({ type: "set", value: { begin } })}
+          value={state.begin}
+        />
+        <DateInput
+          id="end"
+          language="fi"
+          label={t("ReservationsSearch.end")}
+          onChange={(end) => dispatch({ type: "set", value: { end } })}
+          value={state.end}
+        />
       </AutoGrid>
       <MoreWrapper
         showAllLabel={t("ReservationUnitsSearch.moreFilters")}
@@ -191,53 +175,49 @@ const Filters = ({ onSearch, initialFiltering }: Props): JSX.Element => {
         maximumNumber={0}
       >
         <AutoGrid>
-          <div>
-            <NumberInput
-              type="number"
-              value={
-                state.minPrice === "" ? state.minPrice : Number(state.minPrice)
-              }
-              min={0}
-              minusStepButtonAriaLabel={t("common:subtract")}
-              plusStepButtonAriaLabel={t("common:add")}
-              step={1}
-              id="minPrice"
-              label={t("ReservationsSearch.minPrice")}
-              onChange={(e) =>
-                dispatch({
-                  type: "set",
-                  value: { minPrice: e.target.value },
-                })
-              }
-            />
-          </div>
-          <div>
-            <NumberInput
-              type="number"
-              value={
-                state.maxPrice === "" ? state.maxPrice : Number(state.maxPrice)
-              }
-              min={0}
-              minusStepButtonAriaLabel={t("common:subtract")}
-              plusStepButtonAriaLabel={t("common:add")}
-              step={1}
-              id="maxPrice"
-              label={t("ReservationsSearch.maxPrice")}
-              onChange={(e) => {
-                dispatch({
-                  type: "set",
-                  value: {
-                    maxPrice: e.target.value,
-                  },
-                });
-              }}
-            />
-          </div>
+          <NumberInput
+            type="number"
+            value={
+              state.minPrice === "" ? state.minPrice : Number(state.minPrice)
+            }
+            min={0}
+            minusStepButtonAriaLabel={t("common:subtract")}
+            plusStepButtonAriaLabel={t("common:add")}
+            step={1}
+            id="minPrice"
+            label={t("ReservationsSearch.minPrice")}
+            onChange={(e) =>
+              dispatch({
+                type: "set",
+                value: { minPrice: e.target.value },
+              })
+            }
+          />
+          <NumberInput
+            type="number"
+            value={
+              state.maxPrice === "" ? state.maxPrice : Number(state.maxPrice)
+            }
+            min={0}
+            minusStepButtonAriaLabel={t("common:subtract")}
+            plusStepButtonAriaLabel={t("common:add")}
+            step={1}
+            id="maxPrice"
+            label={t("ReservationsSearch.maxPrice")}
+            onChange={(e) => {
+              dispatch({
+                type: "set",
+                value: {
+                  maxPrice: e.target.value,
+                },
+              });
+            }}
+          />
         </AutoGrid>
       </MoreWrapper>
       <Tags tags={tags} t={t} dispatch={dispatch} />
     </Wrapper>
   );
-};
+}
 
 export default Filters;
