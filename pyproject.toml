@@ -133,6 +133,18 @@ lint.select = [
     "W",        # pycodestyle warnings
     "ICN",      # flake8-import-conventions
 ]
+# Preview rules
+lint.extend-select = [
+    "B909",     # loop-iterator-mutation
+    "PLR0916",  # too-many-boolean-expressions
+    "PLR1730",  # if-stmt-min-max
+    "PLR1733",  # unnecessary-dict-index-lookup
+    "PLR1736",  # unnecessary-list-index-lookup
+    "PLW0211",  # bad-staticmethod-argument
+    "FURB142",  # for-loop-set-mutations
+    "FURB145",  # slice-copy
+    "FURB187",  # single-item-membership-test
+]
 lint.ignore = [
     # Conflicting with ruff-format
     "ISC001",   # single-line-implicit-string-concatenation
@@ -248,6 +260,7 @@ extend-ignore-names = ["_base_manager", "_default_manager",  "_meta", "_mptt_met
 [tool.ruff.lint.pylint]
 max-returns = 8
 max-args = 10
+max-bool-expr = 6
 
 [tool.ruff.lint.mccabe]
 max-complexity = 10
