@@ -25,7 +25,7 @@ from common.date_utils import (
     utc_time_min,
 )
 from tilavarauspalvelu.utils.date_util import (
-    InvalidWeekdayException,
+    InvalidWeekdayError,
     localized_short_weekday,
     next_or_current_matching_weekday,
     previous_or_current_matching_weekday,
@@ -53,16 +53,16 @@ def test_previous_should_return_current_date_if_weekday_matches():
 
 
 def test_next_match_should_validate_weekday():
-    with pytest.raises(InvalidWeekdayException):
+    with pytest.raises(InvalidWeekdayError):
         next_or_current_matching_weekday(datetime.date(year=2020, month=1, day=1), 7)
-    with pytest.raises(InvalidWeekdayException):
+    with pytest.raises(InvalidWeekdayError):
         next_or_current_matching_weekday(datetime.date(year=2020, month=1, day=1), -1)
 
 
 def test_previous_match_should_validate_weekday():
-    with pytest.raises(InvalidWeekdayException):
+    with pytest.raises(InvalidWeekdayError):
         previous_or_current_matching_weekday(datetime.date(year=2020, month=1, day=1), 7)
-    with pytest.raises(InvalidWeekdayException):
+    with pytest.raises(InvalidWeekdayError):
         previous_or_current_matching_weekday(datetime.date(year=2020, month=1, day=1), -1)
 
 

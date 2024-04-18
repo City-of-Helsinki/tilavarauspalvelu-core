@@ -9,5 +9,5 @@ class VerkkokauppaConfigurationError(VerkkokauppaError):
         )
 
 
-class UnsupportedMetaKey(VerkkokauppaError):
+class UnsupportedMetaKeyError(VerkkokauppaError):
     pass

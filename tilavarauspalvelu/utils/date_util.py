@@ -1,13 +1,13 @@
 import datetime
 
 
-class InvalidWeekdayException(Exception):
+class InvalidWeekdayError(Exception):
     pass
 
 
 def validate_weekday(weekday: int):
     if weekday < 0 or weekday > 6:
-        raise InvalidWeekdayException("Not a valid weekday")
+        raise InvalidWeekdayError("Not a valid weekday")
 
 
 # Finds the next matching weekday after or on given date
