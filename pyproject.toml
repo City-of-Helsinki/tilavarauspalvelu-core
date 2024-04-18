@@ -91,6 +91,8 @@ extend-exclude = [
     "tilavarauspalvelu/settings.py",
     "venv",
 ]
+lint.explicit-preview-rules = true
+lint.preview = true
 lint.select = [
     "B",        # flake8-bugbear
     "C4",       # flake8-comprehensions

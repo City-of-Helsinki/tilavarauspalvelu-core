@@ -18,9 +18,7 @@ def can_reserve_based_on_opening_hours(
             # If the reservation period is not fully contained in the time span, we can't reserve
             if max_start > reservation_start:
                 return False
-            if min_end < reservation_end:
-                return False
-            return True
+            return reservation_end <= min_end
 
     # Don't know if opening hours exists, so assume we can't get what we want
     return False

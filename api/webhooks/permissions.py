@@ -6,7 +6,4 @@ class WebhookPermission(permissions.BasePermission):
         return True
 
     def has_permission(self, request, view):
-        if request.method == "POST":
-            return True
-
-        return False
+        return request.method == "POST"
