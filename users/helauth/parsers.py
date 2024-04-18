@@ -11,10 +11,10 @@ from applications.models import City
 from users.helauth.typing import (
     BirthdayInfo,
     LoginMethod,
-    MyProfileData,
     PermanentAddress,
     PermanentForeignAddress,
     ProfileAddress,
+    ProfileData,
     ProfileEmail,
     ProfileForeignAddress,
     ProfileLocalAddress,
@@ -34,7 +34,7 @@ __all__ = [
 
 
 class ProfileDataParser:
-    def __init__(self, data: MyProfileData) -> None:
+    def __init__(self, data: ProfileData) -> None:
         self.data = data
 
     def parse_reservation_prefill_data(self) -> ReservationPrefillInfo:
