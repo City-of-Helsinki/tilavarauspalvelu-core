@@ -123,7 +123,7 @@ def test_application_round_results_export__section_has_no_allocated_time_slots(g
 
     section_row: ApplicationSectionExportRow = writes[1]  # type: ignore
     assert section_row.section_id == str(section.id)
-    assert section_row.reservation_unit_name == "foo"
+    assert section_row.reservation_unit_name == ""
     assert section_row.day_of_the_week == ""
     assert section_row.begin_time == ""
     assert section_row.end_time == ""
@@ -137,9 +137,24 @@ def test_application_round_results_export__reservation_unit_option_ordering(grap
         suitable_time_ranges__day_of_the_week=Weekday.TUESDAY,
     )
 
-    ReservationUnitOptionFactory.create(application_section=section, reservation_unit__name="three", preferred_order=3)
-    ReservationUnitOptionFactory.create(application_section=section, reservation_unit__name="one", preferred_order=1)
-    ReservationUnitOptionFactory.create(application_section=section, reservation_unit__name="two", preferred_order=2)
+    ReservationUnitOptionFactory.create(
+        application_section=section,
+        preferred_order=3,
+        reservation_unit__name="three",
+        allocated_time_slots__day_of_the_week=Weekday.TUESDAY,
+    )
+    ReservationUnitOptionFactory.create(
+        application_section=section,
+        preferred_order=1,
+        reservation_unit__name="one",
+        allocated_time_slots__day_of_the_week=Weekday.TUESDAY,
+    )
+    ReservationUnitOptionFactory.create(
+        application_section=section,
+        preferred_order=2,
+        reservation_unit__name="two",
+        allocated_time_slots__day_of_the_week=Weekday.TUESDAY,
+    )
 
     exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round)
     with mock.patch(CSV_WRITER_MOCK_PATH) as mock_writer:
@@ -159,10 +174,13 @@ def test_application_round_results_export__allocated_slot_ordering(graphql):
         application=application,
         suitable_time_ranges__day_of_the_week=Weekday.TUESDAY,
     )
+
+    # Not included, since it has no allocated time slots
+    ReservationUnitOptionFactory.create(application_section=section, reservation_unit__name="bar", preferred_order=1)
+
     option_2 = ReservationUnitOptionFactory.create(
         application_section=section, reservation_unit__name="foo", preferred_order=2
     )
-    ReservationUnitOptionFactory.create(application_section=section, reservation_unit__name="bar", preferred_order=1)
 
     AllocatedTimeSlotFactory.create(
         reservation_unit_option=option_2,
@@ -187,30 +205,23 @@ def test_application_round_results_export__allocated_slot_ordering(graphql):
     with mock.patch(CSV_WRITER_MOCK_PATH) as mock_writer:
         exporter.export()
     writes = get_writes(mock_writer)
-    assert len(writes) == 5
+    assert len(writes) == 4
 
     section_row: ApplicationSectionExportRow = writes[1]  # type: ignore
-    assert section_row.section_id == str(section.id)
-    assert section_row.reservation_unit_name == "bar"
-    assert section_row.day_of_the_week == ""
-    assert section_row.begin_time == ""
-    assert section_row.end_time == ""
-
-    section_row: ApplicationSectionExportRow = writes[2]  # type: ignore
     assert section_row.section_id == str(section.id)
     assert section_row.reservation_unit_name == "foo"
     assert section_row.day_of_the_week == Weekday.WEDNESDAY
     assert section_row.begin_time == "12:00"
     assert section_row.end_time == "14:00"
 
-    section_row: ApplicationSectionExportRow = writes[3]  # type: ignore
+    section_row: ApplicationSectionExportRow = writes[2]  # type: ignore
     assert section_row.section_id == str(section.id)
     assert section_row.reservation_unit_name == "foo"
     assert section_row.day_of_the_week == Weekday.WEDNESDAY
     assert section_row.begin_time == "18:00"
     assert section_row.end_time == "20:00"
 
-    section_row: ApplicationSectionExportRow = writes[4]  # type: ignore
+    section_row: ApplicationSectionExportRow = writes[3]  # type: ignore
     assert section_row.section_id == str(section.id)
     assert section_row.reservation_unit_name == "foo"
     assert section_row.day_of_the_week == Weekday.FRIDAY
