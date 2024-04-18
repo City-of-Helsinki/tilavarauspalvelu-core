@@ -1,10 +1,9 @@
 from collections.abc import Iterator
-from csv import QUOTE_ALL, writer
+from csv import writer
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from django.conf import settings
-from django.contrib.postgres.aggregates import StringAgg
 from django.db.models import Prefetch
 from lookup_property import L
 
@@ -14,7 +13,6 @@ from common.date_utils import local_date, local_date_string, local_time_string, 
 
 __all__ = [
     "export_application_data",
-    "export_application_round_statistics_for_reservation_units",
     "get_header_rows",
 ]
 
@@ -74,12 +72,6 @@ class ApplicationExportRow:
 
     def __iter__(self) -> Iterator[str]:
         """Iterate over the values of the dataclass in the order they were defined."""
-        return iter(asdict(self).values())
-
-
-@dataclass
-class ExportRowSuitableTimeRanges:
-    def __iter__(self) -> Iterator[str]:
         return iter(asdict(self).values())
 
 
@@ -253,37 +245,3 @@ def export_application_data(application_round_id: int) -> Path | None:
             applications_writer.writerow(list(row) + options_part)
 
         return path / file_name
-
-
-def export_application_round_statistics_for_reservation_units(application_round_id: int) -> None:
-    root = settings.BASE_DIR
-    path = root / "exports"
-    path.mkdir(parents=True, exist_ok=True)
-
-    with open(path / "reservation_units.csv", "w", newline="") as export_file:
-        export_writer = writer(export_file, dialect="excel", quoting=QUOTE_ALL)
-
-        export_writer.writerow(["Application ID", "Section name", "Status", "Reservation unit names"])
-
-        data = (
-            ApplicationSection.objects.filter(application__application_round=application_round_id)
-            .exclude(
-                L(application__status__in=[ApplicationStatusChoice.DRAFT.value, ApplicationStatusChoice.EXPIRED.value])
-            )
-            .annotate(
-                status=L("status"),
-                # Concatenate all reservation unit names from the application section
-                # reservation unit options into a single string, separated by a semicolon.
-                unit_string=StringAgg(
-                    "reservation_unit_options__reservation_unit__name",
-                    delimiter="; ",
-                    default="",
-                    ordering="reservation_unit_options__preferred_order",
-                ),
-            )
-            .values_list("application__id", "name", "status", "unit_string")
-            .order_by("application__organisation__name", "application__pk")
-        )
-
-        for application_id, section_name, status, unit_string in data:
-            export_writer.writerow([application_id, section_name, status, unit_string])
