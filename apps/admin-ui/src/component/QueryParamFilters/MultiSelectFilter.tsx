@@ -10,9 +10,13 @@ import { useSearchParams } from "react-router-dom";
 export function MultiSelectFilter<T extends string | number>({
   name,
   options,
+  style,
+  className,
 }: {
   name: string;
   options: { label: string; value: T }[];
+  style?: React.CSSProperties;
+  className?: string;
 }): JSX.Element {
   const { t } = useTranslation();
   const [params, setParams] = useSearchParams();
@@ -39,6 +43,8 @@ export function MultiSelectFilter<T extends string | number>({
   const placeholder = t(`filters.placeholder.${name}`);
   return (
     <Select
+      style={style}
+      className={className}
       label={label}
       multiselect
       placeholder={placeholder}

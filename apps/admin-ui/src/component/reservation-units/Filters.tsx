@@ -6,13 +6,17 @@ import i18next from "i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import ShowAllContainer from "common/src/components/ShowAllContainer";
-import { OptionType } from "../../common/types";
 import UnitFilter from "../filters/UnitFilter";
 import Tags, { Action, getReducer, toTags } from "../lists/Tags";
-import { Grid, Span3 } from "../../styles/layout";
+import { Grid, Span3 } from "@/styles/layout";
 import ReservationUnitStateFilter from "../filters/ReservationUnitStateFilter";
 import ReservationUnitTypeFilter from "../filters/ReservationUnitTypeFilter";
+import { ReservationUnitState } from "@gql/gql-types";
 
+type OptionType = {
+  label: string;
+  value: number;
+};
 export type FilterArguments = {
   nameFi?: string;
   maxPersonsGte?: string;
@@ -21,7 +25,7 @@ export type FilterArguments = {
   surfaceAreaLte?: string;
   unit: OptionType[];
   reservationUnitType: OptionType[];
-  reservationUnitStates: OptionType[];
+  reservationUnitStates: Array<{ label: string; value: ReservationUnitState }>;
 };
 
 const multivaluedFields = [
@@ -112,7 +116,7 @@ const MyTextInput = ({
   />
 );
 
-const Filters = ({ onSearch }: Props): JSX.Element => {
+function Filters({ onSearch }: Props): JSX.Element {
   const { t } = useTranslation();
   const [state, dispatch] = useReducer(
     getReducer<FilterArguments>(emptyState),
@@ -213,10 +217,9 @@ const Filters = ({ onSearch }: Props): JSX.Element => {
           </Grid2Container>
         </MoreWrapper>
       </Wrapper>
-
       <Tags tags={tags} t={t} dispatch={dispatch} />
     </div>
   );
-};
+}
 
 export default Filters;

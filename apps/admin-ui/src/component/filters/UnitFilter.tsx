@@ -2,7 +2,6 @@ import React from "react";
 import { gql } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import { useUnitsFilterQuery } from "@gql/gql-types";
-import type { OptionType } from "@/common/types";
 import { SortedSelect } from "@/component/SortedSelect";
 import { filterNonNullable } from "common/src/helpers";
 
@@ -22,6 +21,10 @@ export const UNITS_QUERY = gql`
   }
 `;
 
+type OptionType = {
+  label: string;
+  value: number;
+};
 type Props = {
   onChange: (units: OptionType[]) => void;
   value: OptionType[];
@@ -37,7 +40,7 @@ const UnitFilter = ({ onChange, value }: Props): JSX.Element => {
 
   const opts: OptionType[] = units.map((unit) => ({
     label: unit?.nameFi ?? "",
-    value: unit?.pk ?? "",
+    value: unit?.pk ?? 0,
   }));
 
   return (

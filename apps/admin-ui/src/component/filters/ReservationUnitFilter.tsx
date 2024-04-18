@@ -14,16 +14,7 @@ type Props = {
   value: OptionType[];
 };
 
-// TODO this should be refactored to use Apollo cache because local state is bad
-// local state problems:
-// - two components have separate state so a mutation requires refetch on both
-// - load time issues if the data changes between component loads they are inconsistant
-// - the fetch (that could include 100s of gql queries) is run for every component
-// i.e. create dummy data of 10k ReservationUnits, add 100 filter components to the page and
-// watch the backend break.
-const ReservationUnitFilter = ({ onChange, value }: Props): JSX.Element => {
-  const { t } = useTranslation();
-
+export function useReservationUnitTypes() {
   // TODO this request is rerun whenever the selection changes (it'll return 0 every time)
   const { data, loading } = useReservationUnitsFilterParamsQuery({
     // breaks the cache
@@ -34,10 +25,24 @@ const ReservationUnitFilter = ({ onChange, value }: Props): JSX.Element => {
     data?.reservationUnits?.edges.map((x) => x?.node)
   );
 
-  const opts = resUnits.map((reservationUnit) => ({
+  const options = resUnits.map((reservationUnit) => ({
     label: reservationUnit?.nameFi ?? "",
     value: reservationUnit?.pk ?? 0,
   }));
+
+  return { options, loading };
+}
+// TODO this should be refactored to use Apollo cache because local state is bad
+// local state problems:
+// - two components have separate state so a mutation requires refetch on both
+// - load time issues if the data changes between component loads they are inconsistant
+// - the fetch (that could include 100s of gql queries) is run for every component
+// i.e. create dummy data of 10k ReservationUnits, add 100 filter components to the page and
+// watch the backend break.
+function ReservationUnitFilter({ onChange, value }: Props): JSX.Element {
+  const { t } = useTranslation();
+
+  const { options: opts, loading } = useReservationUnitTypes();
 
   // NOTE replaced frontend sort with backend, but this caused the sort to be case sensitive.
   // TODO combobox would be preferable since we have like 400 items in it
@@ -54,6 +59,6 @@ const ReservationUnitFilter = ({ onChange, value }: Props): JSX.Element => {
       id="reservation-unit"
     />
   );
-};
+}
 
 export default ReservationUnitFilter;

@@ -1,9 +1,12 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { ReservationUnitState } from "@gql/gql-types";
-import type { OptionType } from "@/common/types";
 import { SortedSelect } from "@/component/SortedSelect";
 
+type OptionType = {
+  label: string;
+  value: ReservationUnitState;
+};
 type Props = {
   onChange: (units: OptionType[]) => void;
   value: OptionType[];

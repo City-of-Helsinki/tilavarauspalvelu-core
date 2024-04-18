@@ -1,18 +1,18 @@
 import { fromUIDate, isValidDate, toUIDate } from "common/src/common/util";
 import { startOfDay } from "date-fns";
 import { Button } from "hds-react";
-import React, { useReducer, useState } from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useLocation } from "react-use";
 import styled from "styled-components";
 import { AutoGrid, VerticalFlex } from "@/styles/layout";
-import { OptionType } from "../../common/types";
-import ReservationUnitTypeFilter from "../filters/ReservationUnitTypeFilter";
-import Tags, { getReducer, toTags } from "../lists/Tags";
+import { useReservationUnitTypes } from "../filters/ReservationUnitTypeFilter";
 import DayNavigation from "./DayNavigation";
-import UnitReservations from "./UnitReservations";
+import { UnitReservations } from "./UnitReservations";
 import { HR } from "@/component/Table";
+import { SearchTags } from "../SearchTags";
+import { MultiSelectFilter } from "../QueryParamFilters";
 
 const HorisontalFlexWrapper = styled.div`
   display: flex;
@@ -26,7 +26,7 @@ type Params = {
   reservationUnitId: string;
 };
 
-const UnitReservationsView = (): JSX.Element => {
+function UnitReservationsView(): JSX.Element {
   const { hash } = useLocation();
   const [queryParams] = useSearchParams();
 
@@ -41,13 +41,6 @@ const UnitReservationsView = (): JSX.Element => {
   const { unitId } = useParams<Params>();
   const { t } = useTranslation();
   const history = useNavigate();
-
-  const initialEmptyState = { reservationUnitType: [] };
-
-  const [state, dispatch] = useReducer(
-    getReducer<{ reservationUnitType: OptionType[] }>(initialEmptyState),
-    initialEmptyState
-  );
 
   const onDateChange = (dateString: string) => {
     setBegin(dateString);
@@ -65,28 +58,38 @@ const UnitReservationsView = (): JSX.Element => {
     }
   };
 
-  const tags = toTags(
-    state,
-    t,
-    ["reservationUnitType"],
-    [],
-    "UnitReservationsView"
-  );
+  const { options: reservationUnitTypeOptions } = useReservationUnitTypes();
+
+  const translateTag = (key: string, value: string) => {
+    switch (key) {
+      case "reservationUnitType":
+        return (
+          reservationUnitTypeOptions.find((u) => u.value === Number(value))
+            ?.label ?? ""
+        );
+      default:
+        return "";
+    }
+  };
+
+  const [searchParams] = useSearchParams();
+  const reservationUnitTypes = searchParams
+    .getAll("reservationUnitType")
+    .map(Number)
+    .filter(Number.isInteger);
 
   return (
     <VerticalFlex>
       <AutoGrid>
-        <ReservationUnitTypeFilter
+        <MultiSelectFilter
           style={{
             zIndex: "var(--tilavaraus-admin-stack-select-over-calendar)",
           }}
-          value={state.reservationUnitType}
-          onChange={(reservationUnitType) => {
-            dispatch({ type: "set", value: { reservationUnitType } });
-          }}
+          name="reservationUnitType"
+          options={reservationUnitTypeOptions}
         />
       </AutoGrid>
-      <Tags tags={tags} dispatch={dispatch} t={t} />
+      <SearchTags hide={[]} translateTag={translateTag} />
       <HR />
       <HorisontalFlexWrapper>
         <Button
@@ -105,9 +108,7 @@ const UnitReservationsView = (): JSX.Element => {
       {/* TODO missing unitId is an error, not return null */}
       {unitId ? (
         <UnitReservations
-          reservationUnitTypes={state.reservationUnitType.map((option) =>
-            Number(option.value)
-          )}
+          reservationUnitTypes={reservationUnitTypes}
           unitPk={unitId}
           key={begin}
           begin={begin}
@@ -115,6 +116,6 @@ const UnitReservationsView = (): JSX.Element => {
       ) : null}
     </VerticalFlex>
   );
-};
+}
 
 export default UnitReservationsView;

@@ -33,11 +33,11 @@ const LegendContainer = styled.div`
   }
 `;
 
-const UnitReservations = ({
+export function UnitReservations({
   begin,
   unitPk,
   reservationUnitTypes,
-}: Props): JSX.Element => {
+}: Props): JSX.Element {
   const currentDate = fromUIDate(begin);
 
   // TODO if the date is invalid show it to the user and disable the calendar
@@ -73,6 +73,4 @@ const UnitReservations = ({
       </LegendContainer>
     </>
   );
-};
-
-export default UnitReservations;
+}

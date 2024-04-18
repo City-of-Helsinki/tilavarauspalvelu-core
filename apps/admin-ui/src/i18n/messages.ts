@@ -1832,6 +1832,7 @@ const translations: ITranslations = {
       ageGroup: ["Valitse ikäryhmä"],
       purpose: ["Valitse käyttötarkoitus"],
       homeCity: ["Valitse kotikunta"],
+      reservationUnitType: ["Valitse varausyksikön tyyppi"],
     },
     label: {
       unit: ["Toimipiste"],
@@ -1848,6 +1849,7 @@ const translations: ITranslations = {
       homeCity: ["Kotikunta"],
       applicantType: ["Asiakastyyppi"],
       order: ["Varausyksiköiden toivejärjestys"],
+      reservationUnitType: ["Varausyksikön tyyppi"],
     },
     // weird values that don't fit under placeholder or label (custom options in this case)
     reservationUnitApplication: ["Tilatoive"],
