@@ -178,7 +178,7 @@ def test_reservation_unit__update__archiving_removes_contact_information_and_aud
     log_entries = LogEntry.objects.filter(content_type_id=content_type.pk, object_id=reservation_unit.pk).order_by("pk")
 
     assert log_entries[0].action == LogEntry.Action.CREATE
-    assert log_entries[1].changes == '{"contact_information": ["foo", "bar"]}'
+    assert log_entries[1].changes == {"contact_information": ["foo", "bar"]}
     assert log_entries.count() == 2
 
     # Update the reservation unit to be archived
