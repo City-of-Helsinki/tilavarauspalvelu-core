@@ -6,7 +6,7 @@ from django.test import TestCase
 from django.utils import timezone
 from freezegun import freeze_time
 
-from merchants.verkkokauppa.exceptions import UnsupportedMetaKey
+from merchants.verkkokauppa.exceptions import UnsupportedMetaKeyError
 from merchants.verkkokauppa.helpers import get_formatted_reservation_time, get_meta_label, get_verkkokauppa_order_params
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from reservations.choices import CustomerTypeChoice
@@ -105,6 +105,6 @@ class HelpersTestCase(TestCase):
         assert_that(number_label).is_equal_to("Varausnumero")
 
     def test_get_meta_label_raises_exception_with_unsupported_key(self):
-        with pytest.raises(UnsupportedMetaKey) as err:
+        with pytest.raises(UnsupportedMetaKeyError) as err:
             get_meta_label("unsupported", self.reservation)
         assert_that(str(err.value)).is_equal_to("Invalid meta label key 'unsupported'")

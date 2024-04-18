@@ -11,7 +11,7 @@ class Command(BaseCommand):
         parser.add_argument("--password", help="Admin's password")
 
     def handle(self, *args, **options):
-        User = get_user_model()  # NOSONAR (python:S117)
+        User = get_user_model()  # NOSONAR (python:S117)  # noqa: N806
         if User.objects.count() == 0:
             User.objects.create_superuser(
                 username=options["username"],

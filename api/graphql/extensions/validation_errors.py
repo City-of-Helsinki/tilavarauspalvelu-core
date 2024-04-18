@@ -42,7 +42,7 @@ class ValidationErrorCodes(Enum):
     RESERVATION_TYPE_NOT_ALLOWED = "RESERVATION_TYPE_NOT_ALLOWED"
 
 
-class ValidationErrorWithCode(GraphQLError):
+class ValidationErrorWithCode(GraphQLError):  # noqa: N818
     def __init__(
         self,
         message: str,
