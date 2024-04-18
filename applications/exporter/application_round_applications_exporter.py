@@ -107,16 +107,12 @@ class ApplicationRoundApplicationsCSVExporter(BaseCSVExporter):
 
         return csv_file
 
-    def export_as_file_response(self) -> FileResponse | None:
-        csv_file = self.export()
-        if csv_file is None:
-            return None
+    def export_as_file_response(self, file_name: str | None = None) -> FileResponse | None:
+        if file_name is None:
+            today = local_date()
+            file_name = f"application_round_applications_{self.application_round_id}_{today.isoformat()}.csv"
 
-        today = local_date()
-        file_name = f"application_round_applications_{self.application_round_id}_{today.isoformat()}.csv"
-        response = FileResponse(csv_file.getvalue(), content_type="text/csv")
-        response["Content-Disposition"] = f"attachment;filename={file_name}"
-        return response
+        return super().export_as_file_response(file_name)
 
     def _get_header_rows(self) -> tuple[list[str], list[str], list[str]]:
         return (
