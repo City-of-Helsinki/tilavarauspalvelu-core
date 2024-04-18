@@ -1,3 +1,5 @@
+from admin_extra_buttons.decorators import button
+from admin_extra_buttons.mixins import ExtraButtonsMixin
 from django.contrib import admin, messages
 from django.contrib.admin import helpers
 from django.core.handlers.wsgi import WSGIRequest
@@ -8,11 +10,10 @@ from django.utils.translation import gettext_lazy as _
 from lookup_property import L
 from modeltranslation.admin import TranslationAdmin
 
-from applications.exporter import export_application_data
+from applications.admin.forms.application_round import ApplicationRoundAdminForm
+from applications.exporter.application_round_applications_exporter import ApplicationRoundApplicationsCSVExporter
 from applications.models import ApplicationRound
 from utils.sentry import SentryLogger
-
-from .forms.application_round import ApplicationRoundAdminForm
 
 __all__ = [
     "ApplicationRoundAdmin",
@@ -20,13 +21,12 @@ __all__ = [
 
 
 @admin.register(ApplicationRound)
-class ApplicationRoundAdmin(TranslationAdmin):
+class ApplicationRoundAdmin(ExtraButtonsMixin, TranslationAdmin):
     form = ApplicationRoundAdminForm
     list_display = [
         "_name",
     ]
     actions = [
-        "export_to_csv",
         "reset_application_rounds",
     ]
     autocomplete_fields = [
@@ -35,9 +35,11 @@ class ApplicationRoundAdmin(TranslationAdmin):
 
     def get_queryset(self, request: WSGIRequest) -> QuerySet:
         return (
-            super()  #
+            super()
             .get_queryset(request)
-            .annotate(status=L("status"))
+            .annotate(
+                status=L("status"),
+            )
             .select_related("service_sector")
         )
 
@@ -45,30 +47,22 @@ class ApplicationRoundAdmin(TranslationAdmin):
     def _name(self, obj: ApplicationRound) -> str:
         return str(obj)
 
-    @admin.action(description=_("Export application sections in the selected application round to CSV"))
-    def export_to_csv(self, request, queryset):
+    @button(label="Export applications to CSV")
+    def export_applications_to_csv(self, request, extra_context=None) -> FileResponse | None:
+        application_round_id: int | None = request.resolver_match.kwargs.get("extra_context")
+
+        exporter = ApplicationRoundApplicationsCSVExporter(application_round_id=application_round_id)
         try:
-            app_round = queryset.first()
-            path = export_application_data(application_round_id=app_round)
-
+            response = exporter.export_as_file_response()
         except Exception as err:
-            self.message_user(
-                request,
-                f"Error while exporting applications: {err}",
-                level=messages.ERROR,
-            )
-            SentryLogger.log_exception(err, "Error while exporting applications")
-        else:
-            if path:
-                # Filehandler needs to be left open for Django to be able to stream the file
-                # Should fix the exporter to use an in-memory stream instead of writing to a file.
-                return FileResponse(open(path, "rb"))  # noqa: SIM115
+            self.message_user(request, f"Error while exporting applications: {err}", level=messages.ERROR)
+            SentryLogger.log_exception(err, "Error while exporting ApplicationRound applications")
+            return None
 
-            self.message_user(
-                request,
-                "No export data in selected application round.",
-                level=messages.INFO,
-            )
+        if not response:
+            self.message_user(request, "No data to export for application round.", level=messages.WARNING)
+
+        return response
 
     @admin.action(description=_("Reset application round allocations"))
     def reset_application_rounds(self, request: WSGIRequest, queryset: QuerySet) -> TemplateResponse | None:
