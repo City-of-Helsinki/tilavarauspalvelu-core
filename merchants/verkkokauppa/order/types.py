@@ -162,7 +162,7 @@ class Order:
                     phone=json["customer"].get("phone", ""),
                 ),
                 status=json["status"],
-                subscription_id=subscription_id if subscription_id else None,
+                subscription_id=subscription_id or None,
                 type=json["type"],
             )
         except (KeyError, ValueError) as err:
