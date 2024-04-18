@@ -12,10 +12,7 @@ from api.graphql.extensions.filters import TimezoneAwareDateFilter
 from common.db import raw_prefixed_query
 from merchants.models import OrderStatus
 from permissions.getters import get_service_sectors_with_permission, get_units_with_permission
-from permissions.helpers import (
-    get_service_sectors_where_can_view_reservations,
-    get_units_where_can_view_reservations,
-)
+from permissions.helpers import get_service_sectors_where_can_view_reservations, get_units_where_can_view_reservations
 from reservation_units.models import ReservationUnit, ReservationUnitType
 from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import RecurringReservation, Reservation
