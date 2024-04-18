@@ -135,6 +135,7 @@ lint.select = [
 ]
 # Preview rules
 lint.extend-select = [
+    "RUF021",   # parenthesize-chained-operators
     "UP042",    # replace-str-enum
     "B909",     # loop-iterator-mutation
     "PLR0916",  # too-many-boolean-expressions

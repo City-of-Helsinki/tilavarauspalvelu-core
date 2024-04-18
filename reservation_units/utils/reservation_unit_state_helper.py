@@ -135,13 +135,12 @@ class ReservationUnitStateHelper:
                     and reservation_unit.publish_begins <= reservation_unit.publish_ends
                 )
             )
-            or (
-                reservation_unit.publish_begins
-                and reservation_unit.publish_ends
-                and reservation_unit.publish_ends > now
-                and reservation_unit.publish_begins > now
-                and reservation_unit.publish_begins == reservation_unit.publish_ends
-            )
+        ) or (
+            reservation_unit.publish_begins
+            and reservation_unit.publish_ends
+            and reservation_unit.publish_ends > now
+            and reservation_unit.publish_begins > now
+            and reservation_unit.publish_begins == reservation_unit.publish_ends
         )
 
     @staticmethod
