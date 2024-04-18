@@ -5,9 +5,7 @@ from django.utils.timezone import get_default_timezone
 from freezegun import freeze_time
 
 from reservation_units.models import ReservationUnit
-from reservation_units.utils.reservation_unit_reservation_scheduler import (
-    ReservationUnitReservationScheduler,
-)
+from reservation_units.utils.reservation_unit_reservation_scheduler import ReservationUnitReservationScheduler
 from reservations.choices import ReservationStateChoice
 from tests.factories import (
     ApplicationRoundFactory,

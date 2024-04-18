@@ -7,10 +7,7 @@ import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 from email_notification.exceptions import EmailTemplateValidationError
-from email_notification.helpers.email_builder_reservation import (
-    ReservationEmailBuilder,
-    ReservationEmailContext,
-)
+from email_notification.helpers.email_builder_reservation import ReservationEmailBuilder, ReservationEmailContext
 from email_notification.models import EmailTemplate, EmailType
 from reservations.models import Reservation
 from tests.factories import EmailTemplateFactory, ReservationFactory, ReservationUnitFactory

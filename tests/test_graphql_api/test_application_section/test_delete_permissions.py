@@ -3,10 +3,7 @@ import pytest
 from applications.models import ApplicationSection
 from tests.factories import ApplicationSectionFactory
 from tests.helpers import UserType
-from tests.test_graphql_api.test_application_section.helpers import (
-    DELETE_MUTATION,
-    get_application_section_delete_data,
-)
+from tests.test_graphql_api.test_application_section.helpers import DELETE_MUTATION, get_application_section_delete_data
 
 # Applied to all tests
 pytestmark = [

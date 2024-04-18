@@ -17,12 +17,7 @@ from reservations.choices import (
     ReservationStateChoice,
     ReservationTypeChoice,
 )
-from reservations.models import (
-    AgeGroup,
-    RecurringReservation,
-    Reservation,
-    ReservationPurpose,
-)
+from reservations.models import AgeGroup, RecurringReservation, Reservation, ReservationPurpose
 
 DEFAULT_TIMEZONE = get_default_timezone()
 

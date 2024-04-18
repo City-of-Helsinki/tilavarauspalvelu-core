@@ -8,11 +8,7 @@ from graphene_django_extensions.testing import build_query
 from graphql_relay import to_global_id
 
 from reservation_units.models import ReservationUnit
-from tests.factories import (
-    OriginHaukiResourceFactory,
-    ReservableTimeSpanFactory,
-    ReservationUnitFactory,
-)
+from tests.factories import OriginHaukiResourceFactory, ReservableTimeSpanFactory, ReservationUnitFactory
 
 # Applied to all tests
 pytestmark = [
