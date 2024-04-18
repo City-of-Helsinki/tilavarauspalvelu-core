@@ -14,9 +14,7 @@ from spaces.models import Unit
 class ReservationUnitPermission(permissions.BasePermission):
     def has_object_permission(self, request, view, reservation_unit):
         if view.action == "capacity":
-            if request.user.is_authenticated:
-                return True
-            return False
+            return request.user.is_authenticated
 
         if request.method in permissions.SAFE_METHODS:
             return True
@@ -32,9 +30,7 @@ class ReservationUnitPermission(permissions.BasePermission):
             return request.user.is_authenticated and can_manage_units_reservation_units(request.user, unit)
 
         if view.action == "capacity":
-            if request.user.is_authenticated:
-                return True
-            return False
+            return request.user.is_authenticated
 
         return True
 

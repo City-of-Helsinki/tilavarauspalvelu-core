@@ -18,9 +18,7 @@ class AllocatedTimeSlotPermission(BasePermission):
             return False
         if user.is_superuser:
             return True
-        if not user.has_staff_permissions:
-            return False
-        return True
+        return user.has_staff_permissions
 
     @classmethod
     def has_create_permission(cls, user: AnyUser, input_data: dict[str, Any]) -> bool:
