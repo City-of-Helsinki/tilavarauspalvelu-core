@@ -73,9 +73,7 @@ class ApplicationRoundStatusChoice(models.TextChoices):
 
     @DynamicClassAttribute
     def can_remove_allocations(self) -> bool:
-        return self in [
-            ApplicationRoundStatusChoice.IN_ALLOCATION,
-        ]
+        return self == ApplicationRoundStatusChoice.IN_ALLOCATION
 
     @DynamicClassAttribute
     def past_allocation(self) -> bool:
@@ -86,9 +84,7 @@ class ApplicationRoundStatusChoice(models.TextChoices):
 
     @DynamicClassAttribute
     def is_ongoing(self) -> bool:
-        return self not in [
-            ApplicationRoundStatusChoice.RESULTS_SENT,
-        ]
+        return self != ApplicationRoundStatusChoice.RESULTS_SENT
 
 
 class ApplicationStatusChoice(models.TextChoices):
@@ -115,9 +111,7 @@ class ApplicationStatusChoice(models.TextChoices):
 
     @DynamicClassAttribute
     def can_decline(self) -> bool:
-        return self in [
-            ApplicationStatusChoice.IN_ALLOCATION,
-        ]
+        return self == ApplicationStatusChoice.IN_ALLOCATION
 
     @DynamicClassAttribute
     def can_allocate(self) -> bool:
@@ -178,7 +172,7 @@ class ApplicationSectionStatusChoice(models.TextChoices):
 
     @DynamicClassAttribute
     def can_delete(self) -> bool:
-        return self in [ApplicationSectionStatusChoice.UNALLOCATED]
+        return self == ApplicationSectionStatusChoice.UNALLOCATED
 
     @DynamicClassAttribute
     def can_reset(self) -> bool:
