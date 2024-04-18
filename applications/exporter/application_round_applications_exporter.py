@@ -213,7 +213,7 @@ class ApplicationRoundApplicationsCSVExporter(BaseCSVExporter):
             .order_by("application__organisation__name")
         )
 
-    def _get_single_row_data(self, section: ApplicationSection):
+    def _get_single_row_data(self, section: ApplicationSection) -> list[str]:
         row = ApplicationExportRow(
             application_id=str(section.application.id),
             application_status=section.application_status,  # type: ignore[attr-defined]
