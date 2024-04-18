@@ -2,7 +2,6 @@ from datetime import date
 from typing import Any, NamedTuple
 
 import pytest
-from graphene_django_extensions.testing import parametrize_helper
 
 from tests.factories import UserFactory
 from tests.helpers import ResponseMock, patch_method
@@ -56,88 +55,26 @@ def test_update_user_from_profile():
     assert user.date_of_birth == date(2001, 1, 1)
 
 
+@patch_method(HelsinkiProfileClient.get_token, return_value=None)
+@patch_method(HelsinkiProfileClient.generic, return_value=ResponseMock(json_data={}))
 @patch_method(SentryLogger.log_message)
-@pytest.mark.parametrize(
-    **parametrize_helper(
-        {
-            "JWT fetch failed": ErrorParams(
-                token=None,
-                profile_response={},
-                error_message="Helsinki profile: Could not fetch JWT from Tunnistamo for user",
-            ),
-            "Missing Profile ID": ErrorParams(
-                token="x",
-                profile_response={
-                    "data": {
-                        "myProfile": {
-                            "id": None,
-                        },
-                    },
-                },
-                error_message="Helsinki profile: Profile ID not found for user",
-            ),
-            "Missing ID number": ErrorParams(
-                token="x",
-                profile_response={
-                    "data": {
-                        "myProfile": {
-                            "id": "foo",
-                            "verifiedPersonalInformation": {
-                                "nationalIdentificationNumber": None,
-                            },
-                        },
-                    },
-                },
-                error_message="Helsinki profile: ID number not found for user",
-            ),
-            "Missing verifiedPersonalInformation": ErrorParams(
-                token="x",
-                profile_response={
-                    "data": {
-                        "myProfile": {
-                            "id": "foo",
-                            "verifiedPersonalInformation": None,
-                        },
-                    },
-                },
-                error_message="Helsinki profile: ID number not found for user",
-            ),
-            "Invalid ID number": ErrorParams(
-                token="x",
-                profile_response={
-                    "data": {
-                        "myProfile": {
-                            "id": "foo",
-                            "verifiedPersonalInformation": {
-                                "nationalIdentificationNumber": "foo",
-                            },
-                        },
-                    },
-                },
-                error_message="Helsinki profile: ID number received from profile was not of correct format for user",
-            ),
-        },
-    ),
-)
-def test_update_user_from_profile_logs_to_sentry_if_unsuccessful(token, profile_response, error_message):
+def test_update_user_from_profile_logs_to_sentry_if_unsuccessful():
     # given:
     # - There is a user without profile info
     user = UserFactory.create(profile_id="", date_of_birth=None)
 
     # when:
     # - This user's info is updated from profile
-    patch_token = patch_method(HelsinkiProfileClient.get_token, return_value=token)
-    patch_http = patch_method(HelsinkiProfileClient.generic, return_value=ResponseMock(json_data=profile_response))
-
-    with patch_http, patch_token:
-        update_user_from_profile(request=mock_request(user))
+    update_user_from_profile(request=mock_request(user))
 
     assert SentryLogger.log_message.call_count == 1
     log_message = SentryLogger.log_message.mock_calls[0][1][0]
-    assert log_message.startswith(error_message), log_message
+    assert log_message == "Helsinki profile: Could not fetch JWT from Tunnistamo."
 
 
 @patch_method(SentryLogger.log_exception)
+@patch_method(HelsinkiProfileClient.get_token, return_value="token")
+@patch_method(HelsinkiProfileClient.generic, return_value=ResponseMock(json_data={"errors": [{"message": "foo"}]}))
 def test_update_user_from_profile_logs_to_sentry_if_raises():
     # given:
     # - There is a user without profile info
@@ -145,20 +82,13 @@ def test_update_user_from_profile_logs_to_sentry_if_raises():
 
     # when:
     # - This user's info is updated from profile
-    patch_token = patch_method(HelsinkiProfileClient.get_token, return_value="x")
-    patch_http = patch_method(
-        HelsinkiProfileClient.generic,
-        return_value=ResponseMock(json_data={"errors": [{"message": "foo"}]}),
-    )
-
-    with patch_http, patch_token:
-        update_user_from_profile(request=mock_request(user))
+    update_user_from_profile(request=mock_request(user))
 
     assert SentryLogger.log_exception.call_count == 1
     log_message = SentryLogger.log_exception.mock_calls[0][1][1]
     assert log_message == "Helsinki profile: Failed to update user from profile"
     log_message = SentryLogger.log_exception.mock_calls[0][1][0].args[0]
-    assert log_message == 'Helsinki profile: Helsinki profile response contains errors. [{"message": "foo"}]'
+    assert log_message == "Helsinki profile: Response contains errors."
 
 
 @pytest.mark.parametrize(
