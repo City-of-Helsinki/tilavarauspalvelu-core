@@ -23,7 +23,7 @@ def test_helsinki_profile_data__query__all_fields(graphql):
     profile_data = MyProfileDataFactory.create_basic(
         verifiedPersonalInformation__nationalIdentificationNumber="181106A830T",
     )
-    HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
+    HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
     graphql.login_with_superuser()
     fields = """
@@ -71,7 +71,7 @@ def test_helsinki_profile_data__query__application_user(graphql):
     application = ApplicationFactory.create(user=user)
 
     profile_data = MyProfileDataFactory.create_basic()
-    HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
+    HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
     graphql.login_with_superuser()
     query = profile_query(application_id=application.id)
@@ -93,7 +93,7 @@ def test_helsinki_profile_data__query__reservation_user(graphql):
     reservation = ReservationFactory.create(user=user)
 
     profile_data = MyProfileDataFactory.create_basic()
-    HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
+    HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
     graphql.login_with_superuser()
     query = profile_query(reservation_id=reservation.id)
@@ -115,7 +115,7 @@ def test_helsinki_profile_data__query__ad_user(graphql):
     application = ApplicationFactory.create(user=user)
 
     profile_data = MyProfileDataFactory.create_basic()
-    HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
+    HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
     graphql.login_with_superuser()
     fields = """
@@ -163,7 +163,7 @@ def test_helsinki_profile_data__query__non_helauth_user(graphql):
     application = ApplicationFactory.create(user=user)
 
     profile_data = MyProfileDataFactory.create_basic()
-    HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
+    HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
     graphql.login_with_superuser()
     fields = """
@@ -211,7 +211,7 @@ def test_helsinki_profile_data__query__no_profile_id(graphql):
     application = ApplicationFactory.create(user=user)
 
     profile_data = MyProfileDataFactory.create_basic()
-    HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
+    HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
     graphql.login_with_superuser()
     query = profile_query(application_id=application.id)
@@ -228,7 +228,7 @@ def test_helsinki_profile_data__query__no_token(graphql):
     application = ApplicationFactory.create(user=user)
 
     profile_data = MyProfileDataFactory.create_basic()
-    HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
+    HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
     graphql.login_with_superuser()
     query = profile_query(application_id=application.id)
@@ -261,7 +261,7 @@ def test_helsinki_profile_data__query__no_permission(graphql):
     application = ApplicationFactory.create(user=user)
 
     profile_data = MyProfileDataFactory.create_basic()
-    HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"myProfile": profile_data}})
+    HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
     graphql.login_with_regular_user()
     query = profile_query(application_id=application.id)
