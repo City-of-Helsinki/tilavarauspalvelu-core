@@ -19,7 +19,7 @@ from users.helauth.parsers import ProfileDataParser
 from users.helauth.typing import (
     BirthdayInfo,
     ExtraData,
-    MyProfileData,
+    ProfileData,
     ProfileTokenPayload,
     RefreshResponse,
     ReservationPrefillInfo,
@@ -145,7 +145,7 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
         return session_data["api_tokens"].get(settings.OPEN_CITY_PROFILE_SCOPE)
 
     @classmethod
-    def graphql_request(cls, request: WSGIRequest, *, query: str, endpoint: str = "myProfile") -> MyProfileData | None:
+    def graphql_request(cls, request: WSGIRequest, *, query: str, endpoint: str = "myProfile") -> ProfileData | None:
         token = cls.get_token(request)
         if token is None:
             return None
@@ -182,13 +182,13 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
                 myProfile {
                     firstName
                     lastName
-                    ...MyPrimaryEmail
-                    ...MyPrimaryPhone
-                    ...MyPrimaryAddress
-                    ...MyEmails
-                    ...MyPhones
-                    ...MyAddresses
-                    ...MyVerifiedPersonalInformation
+                    ...PrimaryEmail
+                    ...PrimaryPhone
+                    ...PrimaryAddress
+                    ...Emails
+                    ...Phones
+                    ...Addresses
+                    ...VerifiedPersonalInformation
                 }
             }
             """
@@ -222,36 +222,36 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
 
         if "first_name" in fields:
             selections.add("firstName")
-            selections.add("...MyVerifiedPersonalInformation")
+            selections.add("...VerifiedPersonalInformation")
             fragments.add(cls._verified_info_fragment)
 
         if "last_name" in fields:
             selections.add("lastName")
-            selections.add("...MyVerifiedPersonalInformation")
+            selections.add("...VerifiedPersonalInformation")
             fragments.add(cls._verified_info_fragment)
 
         if "email" in fields:
-            selections.add("...MyPrimaryEmail")
-            selections.add("...MyEmails")
+            selections.add("...PrimaryEmail")
+            selections.add("...Emails")
             fragments.add(cls._primary_email_fragment)
             fragments.add(cls._emails_fragment)
 
         if "phone" in fields:
-            selections.add("...MyPrimaryPhone")
-            selections.add("...MyPhones")
+            selections.add("...PrimaryPhone")
+            selections.add("...Phones")
             fragments.add(cls._primary_phone_fragment)
             fragments.add(cls._phones_fragment)
 
         if any(f in fields for f in ["street_address", "postal_code", "city"]):
-            selections.add("...MyPrimaryAddress")
-            selections.add("...MyAddresses")
-            selections.add("...MyVerifiedPersonalInformation")
+            selections.add("...PrimaryAddress")
+            selections.add("...Addresses")
+            selections.add("...VerifiedPersonalInformation")
             fragments.add(cls._primary_address_fragment)
             fragments.add(cls._addresses_fragment)
             fragments.add(cls._verified_info_fragment)
 
         if any(f in fields for f in ["birthday", "ssn", "municipality_code", "municipality_name"]):
-            selections.add("...MyVerifiedPersonalInformation")
+            selections.add("...VerifiedPersonalInformation")
             fragments.add(cls._verified_info_fragment)
 
         return (
@@ -262,7 +262,7 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
     @classproperty
     def _primary_email_fragment(cls) -> str:
         return """
-            fragment MyPrimaryEmail on ProfileNode {
+            fragment PrimaryEmail on ProfileNode {
                 primaryEmail {
                     email
                     primary
@@ -274,7 +274,7 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
     @classproperty
     def _primary_phone_fragment(cls) -> str:
         return """
-            fragment MyPrimaryPhone on ProfileNode {
+            fragment PrimaryPhone on ProfileNode {
                 primaryPhone {
                     phone
                     primary
@@ -286,7 +286,7 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
     @classproperty
     def _primary_address_fragment(cls) -> str:
         return """
-            fragment MyPrimaryAddress on ProfileNode {
+            fragment PrimaryAddress on ProfileNode {
                 primaryAddress {
                     primary
                     address
@@ -301,7 +301,7 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
     @classproperty
     def _emails_fragment(cls) -> str:
         return """
-            fragment MyEmails on ProfileNode {
+            fragment Emails on ProfileNode {
                 emails {
                     edges {
                         node {
@@ -317,7 +317,7 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
     @classproperty
     def _phones_fragment(cls) -> str:
         return """
-            fragment MyPhones on ProfileNode {
+            fragment Phones on ProfileNode {
                 phones {
                     edges {
                         node {
@@ -333,7 +333,7 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
     @classproperty
     def _addresses_fragment(cls) -> str:
         return """
-            fragment MyAddresses on ProfileNode {
+            fragment Addresses on ProfileNode {
                 addresses {
                     edges {
                         node {
@@ -352,7 +352,7 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
     @classproperty
     def _permanent_address(cls) -> str:
         return """
-            fragment MyPermanentAddress on VerifiedPersonalInformationNode {
+            fragment PermanentAddress on VerifiedPersonalInformationNode {
                 permanentAddress {
                     streetAddress
                     postalCode
@@ -364,7 +364,7 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
     @classproperty
     def _permanent_foreign_address(cls) -> str:
         return """
-            fragment MyPermanentForeignAddress on VerifiedPersonalInformationNode {
+            fragment PermanentForeignAddress on VerifiedPersonalInformationNode {
                 permanentForeignAddress {
                     streetAddress
                     additionalAddress
@@ -377,15 +377,15 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
     def _verified_info_fragment(cls) -> str:
         return (
             """
-            fragment MyVerifiedPersonalInformation on ProfileNode {
+            fragment VerifiedPersonalInformation on ProfileNode {
                 verifiedPersonalInformation {
                     firstName
                     lastName
                     nationalIdentificationNumber
                     municipalityOfResidence
                     municipalityOfResidenceNumber
-                    ...MyPermanentAddress
-                    ...MyPermanentForeignAddress
+                    ...PermanentAddress
+                    ...PermanentForeignAddress
                 }
             }
             """

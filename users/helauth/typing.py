@@ -246,7 +246,7 @@ class VerifiedPersonalInfo(TypedDict, total=False):
     permanentForeignAddress: PermanentForeignAddress | None
 
 
-class MyProfileData(TypedDict, total=False):
+class ProfileData(TypedDict, total=False):
     id: str | None  # random string
     firstName: str | None
     lastName: str | None
