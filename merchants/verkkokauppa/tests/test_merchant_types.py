@@ -7,12 +7,7 @@ from django.conf import settings
 from django.test.testcases import TestCase
 
 from merchants.verkkokauppa.merchants.exceptions import ParseMerchantError
-from merchants.verkkokauppa.merchants.types import (
-    CreateMerchantParams,
-    Merchant,
-    MerchantInfo,
-    UpdateMerchantParams,
-)
+from merchants.verkkokauppa.merchants.types import CreateMerchantParams, Merchant, MerchantInfo, UpdateMerchantParams
 
 
 class MerchantTypesBaseTestCase(TestCase):

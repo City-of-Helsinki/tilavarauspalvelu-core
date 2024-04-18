@@ -5,10 +5,7 @@ from django.test import TestCase, override_settings
 from merchants.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError
 from merchants.verkkokauppa.product.types import CreateOrUpdateAccountingParams, Product
 from merchants.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from reservation_units.tasks import (
-    refresh_reservation_unit_accounting,
-    refresh_reservation_unit_product_mapping,
-)
+from reservation_units.tasks import refresh_reservation_unit_accounting, refresh_reservation_unit_product_mapping
 from tests.factories import (
     PaymentAccountingFactory,
     PaymentMerchantFactory,

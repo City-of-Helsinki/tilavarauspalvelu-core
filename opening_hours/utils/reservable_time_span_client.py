@@ -6,19 +6,12 @@ from typing import TYPE_CHECKING
 
 from django.conf import settings
 
-from common.date_utils import (
-    local_date,
-)
+from common.date_utils import local_date
 from common.utils import with_indices
-from opening_hours.errors import (
-    ReservableTimeSpanClientNothingToDoError,
-    ReservableTimeSpanClientValueError,
-)
+from opening_hours.errors import ReservableTimeSpanClientNothingToDoError, ReservableTimeSpanClientValueError
 from opening_hours.models import OriginHaukiResource, ReservableTimeSpan
 from opening_hours.utils.hauki_api_client import HaukiAPIClient
-from opening_hours.utils.hauki_api_types import (
-    HaukiAPIOpeningHoursResponseItem,
-)
+from opening_hours.utils.hauki_api_types import HaukiAPIOpeningHoursResponseItem
 from opening_hours.utils.time_span_element import TimeSpanElement
 
 if TYPE_CHECKING:
