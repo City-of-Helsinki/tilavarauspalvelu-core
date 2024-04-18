@@ -7,7 +7,7 @@ import ShowAllContainer from "common/src/components/ShowAllContainer";
 import type { OptionType } from "@/common/types";
 import ReservationUnitTypeFilter from "../filters/ReservationUnitTypeFilter";
 import Tags, { Action, getReducer, toTags } from "../lists/Tags";
-import UnitFilter from "../filters/UnitFilter";
+import { UnitFilter } from "../filters/UnitFilter";
 import ReservationUnitFilter from "../filters/ReservationUnitFilter";
 import ReservationStateFilter from "../filters/ReservationStateFilter";
 import PaymentStatusFilter from "./PaymentStatusFilter";

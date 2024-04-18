@@ -30,18 +30,23 @@ type Props = {
   value: OptionType[];
 };
 
-const UnitFilter = ({ onChange, value }: Props): JSX.Element => {
-  const { t } = useTranslation();
+export function useUnitFilterOptions() {
+  const query = useUnitsFilterQuery();
 
-  // Copy-paste from ReservationUnitFilter (same issues etc.)
-  const { data, loading } = useUnitsFilterQuery();
+  const units = filterNonNullable(query.data?.units?.edges.map((x) => x?.node));
 
-  const units = filterNonNullable(data?.units?.edges.map((x) => x?.node));
-
-  const opts: OptionType[] = units.map((unit) => ({
+  const options = units.map((unit) => ({
     label: unit?.nameFi ?? "",
     value: unit?.pk ?? 0,
   }));
+
+  return { options, ...query };
+}
+
+export function UnitFilter({ onChange, value }: Props): JSX.Element {
+  const { t } = useTranslation();
+
+  const { options, loading } = useUnitFilterOptions();
 
   return (
     <SortedSelect
@@ -50,12 +55,10 @@ const UnitFilter = ({ onChange, value }: Props): JSX.Element => {
       label={t("ReservationUnitsSearch.unitLabel")}
       multiselect
       placeholder={t("ReservationUnitsSearch.unitPlaceHolder")}
-      options={opts}
+      options={options}
       value={value}
       onChange={onChange}
       id="reservation-unit-combobox"
     />
   );
-};
-
-export default UnitFilter;
+}

@@ -14,7 +14,7 @@ type Props = {
   style?: React.CSSProperties;
 };
 
-export function useReservationUnitTypes () {
+export function useReservationUnitTypes() {
   const { data, loading } = useReservationUnitTypesFilterQuery();
 
   const qd = data?.reservationUnitTypes;
