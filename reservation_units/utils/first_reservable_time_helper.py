@@ -688,7 +688,4 @@ class ReservableTimeSpanFirstReservableTimeHelper:
 
         # Validate duration with front and back buffers together
         buffered_minimum_duration_minutes = minimum_duration_minutes + buffer_front_minutes + buffer_back_minutes
-        if time_span.buffered_duration_minutes < buffered_minimum_duration_minutes:
-            return False
-
-        return True
+        return buffered_minimum_duration_minutes <= time_span.buffered_duration_minutes

@@ -18,16 +18,15 @@ class ReservationUnitPaymentHelper:
         payment_merchant = cls.get_merchant(reservation_unit)
         if payment_merchant is None:
             return False
-
-        if reservation_unit.payment_product is not None or (
-            not reservation_unit.is_draft
-            and reservation_unit.pricings.filter(pricing_type=PricingType.PAID)
+        if reservation_unit.payment_product is not None:
+            return True
+        if reservation_unit.is_draft:
+            return False
+        return (
+            reservation_unit.pricings.filter(pricing_type=PricingType.PAID)
             .exclude(status=PricingStatus.PRICING_STATUS_PAST)
             .exists()
-        ):
-            return True
-
-        return False
+        )
 
     @classmethod
     def get_accounting(cls, reservation_unit) -> PaymentAccounting | None:
