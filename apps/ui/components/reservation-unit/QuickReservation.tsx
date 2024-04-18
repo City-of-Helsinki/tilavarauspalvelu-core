@@ -152,7 +152,7 @@ const NoTimes = styled.div`
 
 const ActionWrapper = styled.div`
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
 `;
 
 const QuickReservation = ({
