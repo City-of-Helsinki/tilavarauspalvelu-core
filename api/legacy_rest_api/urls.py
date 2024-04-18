@@ -1,11 +1,6 @@
 from rest_framework import routers
 
-from .views import (
-    RecurringReservationViewSet,
-    ReservationIcalViewset,
-    ReservationUnitViewSet,
-    ReservationViewSet,
-)
+from .views import RecurringReservationViewSet, ReservationIcalViewset, ReservationUnitViewSet, ReservationViewSet
 
 legacy_outer = routers.DefaultRouter()
 

@@ -7,9 +7,7 @@ from factory import fuzzy
 
 from common.date_utils import local_start_of_day
 from reservation_units.enums import AuthenticationType, ReservationKind, ReservationStartInterval
-from reservation_units.models import (
-    ReservationUnit,
-)
+from reservation_units.models import ReservationUnit
 
 from ._base import GenericDjangoModelFactory, ManyToManyFactory, NullableSubFactory, OneToManyFactory
 

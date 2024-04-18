@@ -6,12 +6,7 @@ from graphene_django_extensions.testing import build_mutation, build_query
 
 from applications.choices import ApplicantTypeChoice, Priority, Weekday
 from applications.models import Application, ApplicationRound
-from tests.factories import (
-    AgeGroupFactory,
-    CityFactory,
-    ReservationPurposeFactory,
-    ReservationUnitFactory,
-)
+from tests.factories import AgeGroupFactory, CityFactory, ReservationPurposeFactory, ReservationUnitFactory
 
 applications_query = partial(build_query, "applications", connection=True, order_by="pkAsc")
 

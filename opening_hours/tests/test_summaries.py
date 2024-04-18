@@ -3,9 +3,7 @@ import datetime
 import pytest
 from django.utils.timezone import get_default_timezone
 
-from opening_hours.utils.summaries import (
-    get_resources_total_hours_per_resource,
-)
+from opening_hours.utils.summaries import get_resources_total_hours_per_resource
 from tests.factories import OriginHaukiResourceFactory, ReservableTimeSpanFactory
 
 # Applied to all tests
