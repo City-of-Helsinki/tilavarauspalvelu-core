@@ -18,11 +18,14 @@ class BaseCSVExporter:
         """Write the data to an in-memory CSV file and return it."""
         raise NotImplementedError
 
-    def export_as_file_response(self) -> FileResponse | None:
+    def export_as_file_response(self, file_name: str) -> FileResponse | None:
         """Write the data to a CSV file and return it as a FileResponse."""
         csv_file = self.export()
+        if csv_file is None:
+            return None
+
         response = FileResponse(csv_file.getvalue(), content_type="text/csv")
-        response["Content-Disposition"] = "attachment;filename=export.csv"
+        response["Content-Disposition"] = f"attachment;filename={file_name}"
         return response
 
     def _get_header_rows(self, **kwargs) -> tuple:
