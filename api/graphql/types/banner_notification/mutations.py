@@ -6,8 +6,8 @@ from common.models import BannerNotification
 
 __all__ = [
     "BannerNotificationCreateMutation",
-    "BannerNotificationUpdateMutation",
     "BannerNotificationDeleteMutation",
+    "BannerNotificationUpdateMutation",
 ]
 
 

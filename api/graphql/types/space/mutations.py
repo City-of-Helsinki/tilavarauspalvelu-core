@@ -9,8 +9,8 @@ from spaces.models import Space
 
 __all__ = [
     "SpaceCreateMutation",
-    "SpaceUpdateMutation",
     "SpaceDeleteMutation",
+    "SpaceUpdateMutation",
 ]
 
 

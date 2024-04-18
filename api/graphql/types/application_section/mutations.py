@@ -8,8 +8,8 @@ from common.typing import AnyUser
 
 __all__ = [
     "ApplicationSectionCreateMutation",
-    "ApplicationSectionUpdateMutation",
     "ApplicationSectionDeleteMutation",
+    "ApplicationSectionUpdateMutation",
 ]
 
 

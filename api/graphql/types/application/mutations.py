@@ -9,10 +9,10 @@ from api.graphql.types.application.serializers import (
 )
 
 __all__ = [
-    "ApplicationCreateMutation",
-    "ApplicationUpdateMutation",
-    "ApplicationSendMutation",
     "ApplicationCancelMutation",
+    "ApplicationCreateMutation",
+    "ApplicationSendMutation",
+    "ApplicationUpdateMutation",
 ]
 
 

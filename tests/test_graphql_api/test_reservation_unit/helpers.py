@@ -29,6 +29,7 @@ from tests.factories import (
 
 __all__ = [
     "CREATE_MUTATION",
+    "UPDATE_MUTATION",
     "create_reservation_units_for_reservation_state_filtering",
     "create_reservation_units_for_reservation_unit_state_filtering",
     "get_create_draft_input_data",
@@ -38,7 +39,6 @@ __all__ = [
     "get_pricing_data",
     "reservation_unit_query",
     "reservation_units_query",
-    "UPDATE_MUTATION",
 ]
 
 

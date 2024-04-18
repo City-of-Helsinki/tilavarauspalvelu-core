@@ -6,6 +6,6 @@ from common.choices.banner_notification import (
 
 __all__ = [
     "BannerNotificationLevel",
-    "BannerNotificationTarget",
     "BannerNotificationState",
+    "BannerNotificationTarget",
 ]

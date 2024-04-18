@@ -6,9 +6,9 @@ from reservation_units.models import Keyword, KeywordCategory, KeywordGroup
 from ._base import GenericDjangoModelFactory
 
 __all__ = [
+    "KeywordCategoryFactory",
     "KeywordFactory",
     "KeywordGroupFactory",
-    "KeywordCategoryFactory",
 ]
 
 

@@ -9,8 +9,8 @@ from reservation_units.models import ReservationUnitImage
 
 __all__ = [
     "ReservationUnitImageCreateMutation",
-    "ReservationUnitImageUpdateMutation",
     "ReservationUnitImageDeleteMutation",
+    "ReservationUnitImageUpdateMutation",
 ]
 
 

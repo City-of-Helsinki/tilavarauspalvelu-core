@@ -7,10 +7,10 @@ from django.db import models
 __all__ = [
     "ArrayRemove",
     "ArrayUnnest",
-    "raw_prefixed_query",
     "SubqueryArray",
     "SubqueryCount",
     "SubquerySum",
+    "raw_prefixed_query",
 ]
 
 

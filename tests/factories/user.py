@@ -33,9 +33,9 @@ __all__ = [
     "UserFactory",
     "UserSocialAuthFactory",
     "add_general_permissions",
-    "add_unit_permissions",
-    "add_unit_group_permissions",
     "add_service_sector_permissions",
+    "add_unit_group_permissions",
+    "add_unit_permissions",
 ]
 
 
