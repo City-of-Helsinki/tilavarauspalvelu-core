@@ -141,6 +141,7 @@ lint.extend-select = [
     "PLR1733",  # unnecessary-dict-index-lookup
     "PLR1736",  # unnecessary-list-index-lookup
     "PLW0211",  # bad-staticmethod-argument
+    "FURB110",  # if-exp-instead-of-or-operator
     "FURB142",  # for-loop-set-mutations
     "FURB145",  # slice-copy
     "FURB171",  # single-item-membership-test

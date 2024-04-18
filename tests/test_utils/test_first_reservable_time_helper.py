@@ -35,8 +35,8 @@ class ReservationBuffers:
     buffer_time_after: timedelta
 
     def __init__(self, buffer_time_before: int | None, buffer_time_after: int | None):
-        self.buffer_time_before = timedelta(minutes=buffer_time_before if buffer_time_before else 0)
-        self.buffer_time_after = timedelta(minutes=buffer_time_after if buffer_time_after else 0)
+        self.buffer_time_before = timedelta(minutes=buffer_time_before or 0)
+        self.buffer_time_after = timedelta(minutes=buffer_time_after or 0)
 
 
 class ReservationUnitAndReservationBufferParams(NamedTuple):
