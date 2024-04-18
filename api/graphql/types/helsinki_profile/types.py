@@ -6,7 +6,7 @@ from query_optimizer.selections import get_field_selections
 from api.graphql.extensions import error_codes
 from applications.models import Application
 from common.typing import GQLInfo
-from permissions.helpers import can_view_users
+from permissions.helpers import can_read_application, can_view_reservation
 from reservations.models import Reservation
 from users.helauth.clients import HelsinkiProfileClient
 from users.helauth.typing import LoginMethod, UserProfileInfo
@@ -40,13 +40,10 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
         application_id: int | None = None,
         reservation_id: int | None = None,
     ) -> UserProfileInfo:
-        if not can_view_users(info.context.user):
-            raise GQLNodePermissionDeniedError
-
         if reservation_id is not None:
-            user = cls.get_user_from_reservation(reservation_id)
+            user = cls.get_user_from_reservation(reservation_id, info=info)
         elif application_id is not None:
-            user = cls.get_user_from_application(application_id)
+            user = cls.get_user_from_application(application_id, info=info)
         else:
             msg = "Either 'reservation_id' or 'application_id' required."
             raise GraphQLError(msg)
@@ -88,12 +85,15 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
         return data
 
     @classmethod
-    def get_user_from_application(cls, application_id: int) -> User:
+    def get_user_from_application(cls, application_id: int, info: GQLInfo) -> User:
         application: Application | None = Application.objects.select_related("user").filter(pk=application_id).first()
         if application is None:
             msg = f"Application with id {application_id} not found."
             extensions = {"code": error_codes.HELSINKI_PROFILE_APPLICATION_USER_NOT_FOUND}
             raise GraphQLError(msg, extensions=extensions)
+
+        if not can_read_application(info.context.user, application):
+            raise GQLNodePermissionDeniedError
 
         user: User | None = application.user
         if user is None:
@@ -104,12 +104,15 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
         return user
 
     @classmethod
-    def get_user_from_reservation(cls, reservation_id: int) -> User:
+    def get_user_from_reservation(cls, reservation_id: int, info: GQLInfo) -> User:
         reservation: Reservation | None = Reservation.objects.select_related("user").filter(pk=reservation_id).first()
         if reservation is None:
             msg = f"Reservation with id {reservation_id} not found."
             extensions = {"code": error_codes.HELSINKI_PROFILE_RESERVATION_USER_NOT_FOUND}
             raise GraphQLError(msg, extensions=extensions)
+
+        if not can_view_reservation(info.context.user, reservation):
+            raise GQLNodePermissionDeniedError
 
         user: User | None = reservation.user
         if user is None:
