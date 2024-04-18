@@ -67,7 +67,7 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
     def get_user_profile_info(cls, request: WSGIRequest, *, user: User, fields: list[str]) -> UserProfileInfo | None:
         """Fetch user profile info for the given user from Helsinki Profile."""
         query = cls.user_profile_data(profile_id=user.profile_id, fields=fields)
-        my_profile_data = cls.graphql_request(request, query=query)
+        my_profile_data = cls.graphql_request(request, query=query, endpoint="profile")
         if my_profile_data is None:
             return None
         return ProfileDataParser(my_profile_data).parse_user_profile_info()
@@ -145,7 +145,7 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
         return session_data["api_tokens"].get(settings.OPEN_CITY_PROFILE_SCOPE)
 
     @classmethod
-    def graphql_request(cls, request: WSGIRequest, *, query: str) -> MyProfileData | None:
+    def graphql_request(cls, request: WSGIRequest, *, query: str, endpoint: str = "myProfile") -> MyProfileData | None:
         token = cls.get_token(request)
         if token is None:
             return None
@@ -157,7 +157,7 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
         response = cls.post(url=url, json=request_data, headers=headers)
         response_data = cls.response_json(response)
 
-        return get_nested(response_data, "data", "myProfile", default={})
+        return get_nested(response_data, "data", endpoint, default={})
 
     @classmethod
     def response_json(cls, response: Response) -> dict[str, Any]:
