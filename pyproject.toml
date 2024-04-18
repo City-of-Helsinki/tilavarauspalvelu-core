@@ -94,7 +94,11 @@ extend-exclude = [
 lint.explicit-preview-rules = true
 lint.preview = true
 lint.select = [
+    #"A",       # flake8-builtins  # TODO: Enable this and fix (3) issues
+    #"ANN",     # flake8-annotations  # TODO: Enable this and fix (5400) issues
+    #"ARG",     # flake8-unused-arguments # TODO: Enable this and fix (353) issues
     "B",        # flake8-bugbear
+    #"BLE",     # flake8-blind-except  # TODO: Enable this and fix (7) issues
     "C4",       # flake8-comprehensions
     "COM",      # flake8-commas
     "D200",     # pydocstyle: One-line docstring should fit on one line
@@ -103,22 +107,30 @@ lint.select = [
     "D209",     # pydocstyle: Multi-line docstring closing quotes should be on a separate line
     "D213",     # pydocstyle: Multi-line docstring summary should start at the second line
     "DJ",       # flake8-django
+    #"DTZ",     # flake8-datetimez  # TODO: Enable this and fix (52) issues
     "E",        # pycodestyle errors
+    #"EM",      # flake8-errmsg  # TODO: Enable this and fix (188) issues
     "ERA",      # eradicate
     "F",        # pyflakes
     "FA",       # flake8-future-annotations
+    #"FBT",     # flake8-boolean-trap  # TODO: Enable this and fix (95) issues
     "FLY",      # flynt
+    #"G",       # flake8-logging-format  # TODO: Enable this and fix (20) issues
     "I",        # isort
+    "ICN",      # flake8-import-conventions
     "INP",      # flake8-no-pep420
     "INT",      # flake8-gettext
     "ISC",      # flake8-implicit-str-concat
     "LOG",      # flake8-logging
     "N",        # pep8-naming
+    #"PERF",    # Perflint  # TODO: Enable this and fix (8) issues
     "PIE",      # flake8-pie
     "PL",       # pylint
     "PT",       # flake8-pytest-style
+    #"PTH",     # flake8-use-pathlib  # TODO: Enable this and fix (6) issues
     "PYI",      # flake8-pyi
     "Q",        # flake8-quotes
+    #"R",       # Refactor  # TODO: Enable this and fix (51) issues
     "RET502",   # flake8-return: Do not implicitly return None in function able to return non-None value
     "RET503",   # flake8-return: Missing explicit return at the end of function able to return non-None value
     "RSE",      # flake8-raise
@@ -127,11 +139,11 @@ lint.select = [
     "SIM",      # flake8-simplify
     "SLF",      # flake8-self
     "T20",      # flake8-print
+    #"TCH",     # flake8-type-checking  # TODO: Enable this and fix (97) issues
     "TID",      # flake8-tidy-imports
     "TRY",      # tryceratops
     "UP",       # pyupgrade
     "W",        # pycodestyle warnings
-    "ICN",      # flake8-import-conventions
 ]
 # Preview rules
 lint.extend-select = [
