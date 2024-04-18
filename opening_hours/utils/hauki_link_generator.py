@@ -26,14 +26,14 @@ def generate_hauki_link(
 
     now = datetime.datetime.now(tz=get_default_timezone())
 
-    HAUKI_EXPIRACY_TIME_MINUTES = 30
+    hauki_expire_time_minutes = 30
 
     get_parameters_dict = {
         "hsa_source": settings.HAUKI_ORIGIN_ID,
         "hsa_username": username,
         "hsa_organization": organization_id,
         "hsa_created_at": now.isoformat(),
-        "hsa_valid_until": (now + timedelta(minutes=HAUKI_EXPIRACY_TIME_MINUTES)).isoformat(),
+        "hsa_valid_until": (now + timedelta(minutes=hauki_expire_time_minutes)).isoformat(),
         "hsa_resource": f"{settings.HAUKI_ORIGIN_ID}:{uuid}",
         "hsa_has_organization_rights": "true",
     }

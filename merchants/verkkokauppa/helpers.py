@@ -8,7 +8,7 @@ from django.utils.timezone import get_default_timezone
 
 from common.date_utils import local_datetime
 from merchants.models import PaymentMerchant, PaymentProduct
-from merchants.verkkokauppa.exceptions import UnsupportedMetaKey
+from merchants.verkkokauppa.exceptions import UnsupportedMetaKeyError
 from merchants.verkkokauppa.order.types import (
     CreateOrderParams,
     Order,
@@ -59,7 +59,7 @@ def get_meta_label(key: str, reservation: Reservation) -> str:
         },
     }
     if key not in labels:
-        raise UnsupportedMetaKey(f"Invalid meta label key '{key}'")
+        raise UnsupportedMetaKeyError(f"Invalid meta label key '{key}'")
 
     preferred_language = reservation.reservee_language or "fi"
     return labels[key][preferred_language]
