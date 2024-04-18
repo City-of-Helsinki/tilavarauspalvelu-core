@@ -8,8 +8,8 @@ from reservation_units.models import Equipment
 
 __all__ = [
     "EquipmentCreateMutation",
-    "EquipmentUpdateMutation",
     "EquipmentDeleteMutation",
+    "EquipmentUpdateMutation",
 ]
 
 

@@ -7,8 +7,8 @@ from .serializers import EquipmentCategorySerializer
 
 __all__ = [
     "EquipmentCategoryCreateMutation",
-    "EquipmentCategoryUpdateMutation",
     "EquipmentCategoryDeleteMutation",
+    "EquipmentCategoryUpdateMutation",
 ]
 
 

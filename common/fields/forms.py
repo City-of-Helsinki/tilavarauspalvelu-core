@@ -15,10 +15,10 @@ from lookup_property.field import LookupPropertyField
 from common.typing import GQLInfo
 
 __all__ = [
-    "IntChoiceField",
-    "IntMultipleChoiceField",
     "EnumChoiceField",
     "EnumMultipleChoiceField",
+    "IntChoiceField",
+    "IntMultipleChoiceField",
     "disabled_widget",
 ]
 

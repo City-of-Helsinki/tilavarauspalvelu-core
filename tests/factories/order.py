@@ -10,8 +10,8 @@ from merchants.verkkokauppa.order.types import Order, OrderCustomer
 from ._base import GenericFactory
 
 __all__ = [
-    "OrderFactory",
     "OrderCustomerFactory",
+    "OrderFactory",
 ]
 
 

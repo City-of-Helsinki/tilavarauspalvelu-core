@@ -4,9 +4,9 @@ from graphene_django_extensions.filters import IntMultipleChoiceFilter
 from reservation_units.models import Keyword, KeywordGroup
 
 __all__ = [
+    "KeywordCategoryFilterSet",
     "KeywordFilterSet",
     "KeywordGroupFilterSet",
-    "KeywordCategoryFilterSet",
 ]
 
 

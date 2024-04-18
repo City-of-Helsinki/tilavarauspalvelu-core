@@ -6,9 +6,9 @@ from .filtersets import KeywordCategoryFilterSet, KeywordFilterSet, KeywordGroup
 from .permissions import KeywordCategoryPermission, KeywordGroupPermission, KeywordPermission
 
 __all__ = [
-    "KeywordNode",
-    "KeywordGroupNode",
     "KeywordCategoryNode",
+    "KeywordGroupNode",
+    "KeywordNode",
 ]
 
 
