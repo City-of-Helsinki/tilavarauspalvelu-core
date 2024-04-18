@@ -143,6 +143,7 @@ lint.extend-select = [
     "PLW0211",  # bad-staticmethod-argument
     "FURB142",  # for-loop-set-mutations
     "FURB145",  # slice-copy
+    "FURB171",  # single-item-membership-test
     "FURB187",  # single-item-membership-test
 ]
 lint.ignore = [
