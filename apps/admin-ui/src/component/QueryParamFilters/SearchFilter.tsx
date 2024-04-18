@@ -4,7 +4,14 @@ import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 
 // TODO should we check that name cant be empty?
-export function SearchFilter({ name }: { name: string }) {
+/* TODO allow overriding the placeholder / label without changing the key */
+export function SearchFilter({
+  name,
+  labelKey,
+}: {
+  name: string;
+  labelKey?: string;
+}) {
   const { t } = useTranslation();
   const [searchParams, setParams] = useSearchParams();
 
@@ -20,7 +27,7 @@ export function SearchFilter({ name }: { name: string }) {
   };
 
   // TODO general purpose filter labels and placeholders
-  const label = t(`filters.label.${name}`);
+  const label = t(`filters.label.${labelKey ?? name}`);
   const placeholder = t(`filters.placeholder.${name}`);
   return (
     <SearchInput

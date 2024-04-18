@@ -1,53 +1,26 @@
-import React, { useEffect, useReducer } from "react";
-import { TextInput } from "hds-react";
-import { useTranslation } from "react-i18next";
-import { AutoGrid } from "@/styles/layout";
-import Tags, { getReducer, toTags } from "../lists/Tags";
+import React from "react";
+import { AutoGrid, FullRow } from "@/styles/layout";
+import { SearchFilter } from "../QueryParamFilters";
+import { SearchTags } from "../SearchTags";
 
-export type FilterArguments = {
-  nameFi?: string;
-};
-
-export const emptyFilterState = {};
-
-type Props = {
-  onSearch: (args: FilterArguments) => void;
-};
-
-const Filters = ({ onSearch }: Props): JSX.Element => {
-  const { t } = useTranslation();
-  const [state, dispatch] = useReducer(
-    getReducer<FilterArguments>(emptyFilterState),
-    emptyFilterState
-  );
-
-  useEffect(() => {
-    onSearch(state);
-  }, [state, onSearch]);
-
-  const tags = toTags(state, t, [], ["nameFi"], "Units");
+export function Filters(): JSX.Element {
+  const translateTag = (key: string, value: string) => {
+    switch (key) {
+      case "search":
+        return value;
+      default:
+        return "";
+    }
+  };
 
   return (
     <>
       <AutoGrid>
-        <TextInput
-          id="nameFi"
-          label={t("Units.filters.nameLabel")}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              onSearch(state);
-            }
-          }}
-          onChange={(e) =>
-            dispatch({ type: "set", value: { nameFi: e.target.value } })
-          }
-          placeholder={t("common.search")}
-          value={state.nameFi ?? ""}
-        />
+        <SearchFilter name="search" labelKey="unit" />
       </AutoGrid>
-      <Tags tags={tags} t={t} dispatch={dispatch} />
+      <FullRow>
+        <SearchTags hide={[]} translateTag={translateTag} />
+      </FullRow>
     </>
   );
-};
-
-export default Filters;
+}

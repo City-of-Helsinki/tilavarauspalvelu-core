@@ -5,20 +5,15 @@ import { filterNonNullable } from "common/src/helpers";
 import { useNotification } from "@/context/NotificationContext";
 import { LARGE_LIST_PAGE_SIZE } from "@/common/const";
 import { More } from "@/component/More";
-import { FilterArguments } from "./Filters";
 import Loader from "../Loader";
 import { UnitsTable } from "./UnitsTable";
+import { useSearchParams } from "react-router-dom";
 
 type Props = {
-  filters: FilterArguments;
   isMyUnits?: boolean;
 };
 
-const mapFilterParams = (params: FilterArguments) => ({
-  nameFi: params.nameFi,
-});
-
-export function UnitsDataLoader({ filters, isMyUnits }: Props): JSX.Element {
+export function UnitsDataLoader({ isMyUnits }: Props): JSX.Element {
   const { notifyError } = useNotification();
 
   const [sort, setSort] = useState<string>("nameFi");
@@ -32,11 +27,14 @@ export function UnitsDataLoader({ filters, isMyUnits }: Props): JSX.Element {
 
   const orderBy = transformSortString(sort);
 
+  const [searchParams] = useSearchParams();
+  const searchFilter = searchParams.get("search");
+
   const { fetchMore, loading, data, previousData } = useUnitsQuery({
     variables: {
       orderBy,
       first: LARGE_LIST_PAGE_SIZE,
-      ...mapFilterParams(filters),
+      nameFi: searchFilter,
     },
     onError: (err: ApolloError) => {
       notifyError(err.message);
