@@ -17,7 +17,7 @@ __all__ = (
     "ReservationCreateSerializer",
     "ReservationDenySerializer",
     "ReservationRequiresHandlingSerializer",
-    "ReservationWorkingMemoSerializer",
-    "ReservationUpdateSerializer",
     "ReservationStaffCreateSerializer",
+    "ReservationUpdateSerializer",
+    "ReservationWorkingMemoSerializer",
 )

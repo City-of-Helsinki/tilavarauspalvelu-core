@@ -27,14 +27,14 @@ from .permissions import (
 
 __all__ = [
     "GeneralRoleChoiceNode",
-    "GeneralRolePermissionNode",
     "GeneralRoleNode",
+    "GeneralRolePermissionNode",
     "ServiceSectorRoleChoiceNode",
-    "ServiceSectorRolePermissionNode",
     "ServiceSectorRoleNode",
+    "ServiceSectorRolePermissionNode",
     "UnitRoleChoiceNode",
-    "UnitRolePermissionNode",
     "UnitRoleNode",
+    "UnitRolePermissionNode",
 ]
 
 

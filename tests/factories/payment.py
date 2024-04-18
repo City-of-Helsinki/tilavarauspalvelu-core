@@ -20,11 +20,11 @@ from merchants.verkkokauppa.payment.types import Payment
 from ._base import GenericDjangoModelFactory, GenericFactory
 
 __all__ = [
+    "PaymentAccountingFactory",
     "PaymentFactory",
     "PaymentMerchantFactory",
-    "PaymentProductFactory",
     "PaymentOrderFactory",
-    "PaymentAccountingFactory",
+    "PaymentProductFactory",
 ]
 
 

@@ -4,8 +4,8 @@ from common.typing import AnyUser
 from permissions.helpers import has_general_permission
 
 __all__ = [
-    "get_units_with_permission",
     "get_service_sectors_with_permission",
+    "get_units_with_permission",
 ]
 
 

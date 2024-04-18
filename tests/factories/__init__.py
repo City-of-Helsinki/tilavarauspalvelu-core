@@ -70,10 +70,6 @@ from .user import (
 
 __all__ = [
     "AbilityGroupFactory",
-    "add_general_permissions",
-    "add_service_sector_permissions",
-    "add_unit_group_permissions",
-    "add_unit_permissions",
     "AddressFactory",
     "AgeGroupFactory",
     "AllocatedTimeSlotFactory",
@@ -139,4 +135,8 @@ __all__ = [
     "UnitRolePermissionFactory",
     "UserFactory",
     "UserSocialAuthFactory",
+    "add_general_permissions",
+    "add_service_sector_permissions",
+    "add_unit_group_permissions",
+    "add_unit_permissions",
 ]

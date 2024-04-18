@@ -5,8 +5,8 @@ from reservations.models import ReservationMetadataField, ReservationMetadataSet
 from .permissions import ReservationMetadataSetPermission
 
 __all__ = [
-    "ReservationMetadataSetNode",
     "ReservationMetadataFieldNode",
+    "ReservationMetadataSetNode",
 ]
 
 

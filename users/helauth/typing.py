@@ -10,15 +10,15 @@ if TYPE_CHECKING:
 
 
 __all__ = [
-    "IDToken",
-    "ExtraData",
-    "RefreshResponse",
-    "ProfileTokenPayload",
-    "SessionData",
     "ADLoginAMR",
-    "ProfileLocalAddress",
+    "ExtraData",
+    "IDToken",
     "ProfileForeignAddress",
+    "ProfileLocalAddress",
+    "ProfileTokenPayload",
+    "RefreshResponse",
     "ReservationPrefillInfo",
+    "SessionData",
 ]
 
 
