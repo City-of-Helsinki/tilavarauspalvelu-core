@@ -1,6 +1,6 @@
 import random
 from collections.abc import Callable, Generator, Sequence
-from enum import Enum
+from enum import StrEnum
 from functools import wraps
 from types import DynamicClassAttribute
 from typing import Any, NamedTuple, ParamSpec, TypeVar
@@ -80,7 +80,7 @@ def with_logs(
     return decorator
 
 
-class SetName(str, Enum):
+class SetName(StrEnum):
     set_1 = "Lomake 1"
     set_2 = "Lomake 2"
     set_3 = "Lomake 3"
