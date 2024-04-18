@@ -6,7 +6,7 @@ import i18next from "i18next";
 import ShowAllContainer from "common/src/components/ShowAllContainer";
 import type { OptionType } from "@/common/types";
 import ReservationUnitTypeFilter from "../filters/ReservationUnitTypeFilter";
-import Tags, { Action, getReducer, toTags } from "../lists/Tags";
+import Tags, { type Action, getReducer, toTags } from "../lists/Tags";
 import { UnitFilter } from "../filters/UnitFilter";
 import ReservationUnitFilter from "../filters/ReservationUnitFilter";
 import ReservationStateFilter from "../filters/ReservationStateFilter";
@@ -16,7 +16,7 @@ import { AutoGrid } from "@/styles/layout";
 export type FilterArguments = {
   reservationUnitType: Array<{ label: string; value: number }>;
   unit: Array<{ label: string; value: number }>;
-  reservationUnit: OptionType[];
+  reservationUnit: Array<{ label: string; value: number }>;
   reservationState: OptionType[];
   paymentStatuses: OptionType[];
   textSearch: string;
@@ -151,8 +151,7 @@ function Filters({ onSearch, initialFiltering }: Props): JSX.Element {
           onChange={(reservationUnit) =>
             dispatch({ type: "set", value: { reservationUnit } })
           }
-          // FIXME should not coerce types (it's correct now, but not after 6 months)
-          value={state.reservationUnit as { value: number; label: string }[]}
+          value={state.reservationUnit}
         />
         <DateInput
           language="fi"
