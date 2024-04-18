@@ -4,10 +4,7 @@ from graphene_django_extensions.permissions import BasePermission
 from query_optimizer.typing import GraphQLFilterInfo
 
 from common.typing import AnyUser
-from permissions.helpers import (
-    can_create_staff_reservation,
-    can_view_recurring_reservation,
-)
+from permissions.helpers import can_create_staff_reservation, can_view_recurring_reservation
 from reservation_units.models import ReservationUnit
 from reservations.models import RecurringReservation
 

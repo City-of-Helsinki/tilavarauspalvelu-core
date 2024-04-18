@@ -8,9 +8,7 @@ from opening_hours.utils.hauki_api_client import HaukiAPIClient
 from opening_hours.utils.hauki_api_types import HaukiAPIResource, HaukiTranslatedField
 from reservation_units.enums import ReservationKind
 from reservation_units.models import ReservationUnit
-from tests.factories import (
-    UnitFactory,
-)
+from tests.factories import UnitFactory
 from tests.helpers import UserType, patch_method
 
 from .helpers import CREATE_MUTATION, get_create_non_draft_input_data
