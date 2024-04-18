@@ -2,7 +2,7 @@ import uuid
 from typing import Any
 
 from graphene_django_extensions.permissions import BasePermission
-from graphene_django_extensions.typing import GraphQLFilterInfo
+from query_optimizer.typing import GraphQLFilterInfo
 
 from common.typing import AnyUser
 from merchants.models import PaymentOrder
