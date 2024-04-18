@@ -166,6 +166,7 @@ def create_test_data(flush: bool = True) -> None:
     metadata_sets = _create_reservation_metadata_sets()
 
     spaces = _create_spaces(units)
+    extra_units = create_spaces_in_hierarchy()
     resources = _create_resources(spaces)
     equipments = _create_equipments()
     qualifiers = _create_qualifiers()
@@ -173,10 +174,11 @@ def create_test_data(flush: bool = True) -> None:
     services = _create_services()
     hauki_resources = _create_hauki_resources()
 
-    _rename_empty_units(units[-3:])  # leave few units without reservation units
+    empty_units, units = units[-3:], units[:-3]  # leave few units without reservation units
+    _rename_empty_units(empty_units)
 
     reservation_units = _create_reservation_units(
-        units[:-3],  # leave few units without reservation units
+        units + extra_units,
         reservation_unit_types,
         terms_of_use,
         cancellation_rules,
@@ -186,7 +188,6 @@ def create_test_data(flush: bool = True) -> None:
         qualifiers,
         resources,
         services,
-        spaces,
         hauki_resources,
     )
     _create_pricings(reservation_units)
@@ -580,7 +581,7 @@ def _create_service_sector_roles(
     text_entering="Creating units...",
     text_exiting="Units created!",
 )
-def _create_units(*, number: int = 15) -> list[Unit]:
+def _create_units(*, number: int = 300) -> list[Unit]:
     # Some actual tprek identifiers for Hauki testing
     tprek_ids = {
         # Oodin nuorisotila - Oodin nuorisotila
@@ -699,48 +700,145 @@ def _create_service_sectors(
     text_exiting="Spaces created!",
 )
 def _create_spaces(units: list[Unit]) -> list[Space]:
-    is_without_unit_created: bool = False
-
     spaces: list[Space] = []
-    linked: int = 0
 
     # Can bulk create spaces since we need to
     # link them to each other to form the space hierarchy.
     for i, unit in enumerate(units):
-        if not is_without_unit_created:
-            space = Space.objects.create(
-                name=f"Space {i}",
-                name_fi=f"Space {i}",
-                name_sv=f"Space {i}",
-                name_en=f"Space {i}",
-            )
-            spaces.append(space)
-            is_without_unit_created = True
-            continue
-
-        # Add 1-3 spaces to each unit
-        for _ in range(random.randint(1, 3)):
-            # 20% chance to add a parent space
-            parent: Space | None = None
-            has_parent = weighted_choice([True, False], [1, 4])
-            if has_parent:
-                linked += 1
-                parent = random.choice(spaces)
-
-            space = Space.objects.create(
-                name=f"Space {i} - {unit.name}",
-                name_fi=f"Space {i} - {unit.name}",
-                name_sv=f"Space {i} - {unit.name}",
-                name_en=f"Space {i} - {unit.name}",
-                unit=unit,
-                parent=parent,
-            )
-            spaces.append(space)
+        space = Space.objects.create(
+            name=f"Space {i}",
+            name_fi=f"Space {i}",
+            name_sv=f"Space {i}",
+            name_en=f"Space {i}",
+            unit=unit,
+        )
+        spaces.append(space)
 
     Space.objects.rebuild()
-    print(f"Linked {linked} spaces to other spaces")  # noqa: T201, RUF100
-
     return list(Space.objects.all())
+
+
+@with_logs(
+    text_entering="Creating spaces in hierarchy with each other...",
+    text_exiting="Spaces in hierarchy created!",
+)
+def create_spaces_in_hierarchy() -> list[Unit]:
+    parent_unit = Unit.objects.create(
+        name="Parent unit",
+        name_fi="Parent unit",
+        name_sv="Parent unit",
+        name_en="Parent unit",
+    )
+    child_unit_1 = Unit.objects.create(
+        name="Child unit 1",
+        name_fi="Child unit 1",
+        name_sv="Child unit 1",
+        name_en="Child unit 1",
+    )
+    child_unit_2 = Unit.objects.create(
+        name="Child unit 2",
+        name_fi="Child unit 2",
+        name_sv="Child unit 2",
+        name_en="Child unit 2",
+    )
+    child_unit_3 = Unit.objects.create(
+        name="Child unit 3",
+        name_fi="Child unit 3",
+        name_sv="Child unit 3",
+        name_en="Child unit 3",
+    )
+    child_unit_4 = Unit.objects.create(
+        name="Child unit 4",
+        name_fi="Child unit 4",
+        name_sv="Child unit 4",
+        name_en="Child unit 4",
+    )
+    child_unit_5 = Unit.objects.create(
+        name="Child unit 5",
+        name_fi="Child unit 5",
+        name_sv="Child unit 5",
+        name_en="Child unit 5",
+    )
+    child_unit_6 = Unit.objects.create(
+        name="Child unit 6",
+        name_fi="Child unit 6",
+        name_sv="Child unit 6",
+        name_en="Child unit 6",
+    )
+
+    # parent
+    # -- child_1
+    # ---- child_3
+    # ------ child_5
+    # ------ child_6
+    # -- child_2
+    # ---- child_4
+    parent_space = Space.objects.create(
+        name="Parent space",
+        name_fi="Parent space",
+        name_sv="Parent space",
+        name_en="Parent space",
+        unit=parent_unit,
+    )
+    child_space_1 = Space.objects.create(
+        name="Child space 1",
+        name_fi="Child space 1",
+        name_sv="Child space 1",
+        name_en="Child space 1",
+        unit=child_unit_1,
+        parent=parent_space,
+    )
+    child_space_2 = Space.objects.create(
+        name="Child space 2",
+        name_fi="Child space 2",
+        name_sv="Child space 2",
+        name_en="Child space 2",
+        unit=child_unit_2,
+        parent=parent_space,
+    )
+    child_space_3 = Space.objects.create(
+        name="Child space 3",
+        name_fi="Child space 3",
+        name_sv="Child space 3",
+        name_en="Child space 3",
+        unit=child_unit_3,
+        parent=child_space_1,
+    )
+    Space.objects.create(
+        name="Child space 4",
+        name_fi="Child space 4",
+        name_sv="Child space 4",
+        name_en="Child space 4",
+        unit=child_unit_4,
+        parent=child_space_2,
+    )
+    Space.objects.create(
+        name="Child space 5",
+        name_fi="Child space 5",
+        name_sv="Child space 5",
+        name_en="Child space 5",
+        unit=child_unit_5,
+        parent=child_space_3,
+    )
+    Space.objects.create(
+        name="Child space 6",
+        name_fi="Child space 6",
+        name_sv="Child space 6",
+        name_en="Child space 6",
+        unit=child_unit_6,
+        parent=child_space_3,
+    )
+    Space.objects.rebuild()
+
+    return [
+        parent_unit,
+        child_unit_1,
+        child_unit_2,
+        child_unit_3,
+        child_unit_4,
+        child_unit_5,
+        child_unit_6,
+    ]
 
 
 @with_logs(
@@ -1197,20 +1295,13 @@ def _create_purposes(*, number: int = 10) -> list[Purpose]:
     text_exiting="Resources created!",
 )
 def _create_resources(spaces: list[Space], *, number: int = 10) -> list[Resource]:
-    is_without_space_created: bool = False
-
     resources: list[Resource] = []
     for i in range(number):
         buffer_after = weighted_choice([0, 1], weights=[5, 1])
         buffer_before = weighted_choice([0, 1], weights=[5, 1])
 
-        if not is_without_space_created:
-            is_without_space_created = True
-            space = None
-            name = "Resource without space"
-        else:
-            space = random.choice(spaces)
-            name = f"Resource {i} - {space.name}"
+        space = random.choice(spaces)
+        name = f"Resource {i} - {space.name}"
 
         reservation_purpose = Resource(
             name=name,
@@ -1358,13 +1449,9 @@ def _create_reservation_units(
     qualifiers: list[Qualifier],
     resources: list[Resource],
     services: list[Service],
-    spaces: list[Space],
     hauki_resources: list[OriginHaukiResource],
-    *,
-    number: int = 300,
 ) -> list[ReservationUnit]:
     reservation_unit_types_loop = cycle(reservation_unit_types)
-    units_loop = cycle(units)
     cancellation_rules_loop = cycle(cancellation_rules)
     metadata_set_loop = cycle(metadata_sets.items())
 
@@ -1378,7 +1465,7 @@ def _create_reservation_units(
     }
 
     reservation_units: list[ReservationUnit] = []
-    for i in range(number):
+    for i, unit in enumerate(units):
         description = get_paragraphs()
         terms = get_paragraphs()
         pending = get_paragraphs()
@@ -1410,6 +1497,10 @@ def _create_reservation_units(
         name = f"Reservation Unit {i}"
         if reservation_kind == ReservationKind.SEASON:
             name += ", vain kausivarattava"
+        if unit.spaces.first().parent is not None:
+            name += ", alitila"
+        if unit.spaces.first().children.exists():
+            name += ", ylitila"
 
         reservation_unit = ReservationUnit(
             allow_reservations_without_opening_hours=True,
@@ -1463,7 +1554,7 @@ def _create_reservation_units(
             terms_of_use_en=terms.en,
             terms_of_use_fi=terms.fi,
             terms_of_use_sv=terms.sv,
-            unit=next(units_loop),
+            unit=unit,
             uuid=hauki_id,
         )
         reservation_units.append(reservation_unit)
@@ -1489,7 +1580,7 @@ def _create_reservation_units(
             continue
 
         reservation_unit.resources.add(*random_subset(resources))
-        reservation_unit.spaces.add(*random_subset(spaces))
+        reservation_unit.spaces.add(*list(reservation_unit.unit.spaces.all()))
 
     _create_application_round_time_slots(reservation_units)
 
