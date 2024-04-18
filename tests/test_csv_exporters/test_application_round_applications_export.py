@@ -6,7 +6,10 @@ from django.utils import timezone
 from graphene_django_extensions.testing.utils import parametrize_helper
 
 from applications.choices import ApplicantTypeChoice, Priority, Weekday
-from applications.exporter import ApplicationExportRow, export_application_data, get_header_rows
+from applications.exporter.application_round_applications_exporter import (
+    ApplicationExportRow,
+    ApplicationRoundApplicationsCSVExporter,
+)
 from applications.models import ApplicationSection
 from common.date_utils import local_date_string, local_timedelta_string
 from tests.factories import ApplicationFactory, ApplicationRoundFactory
@@ -18,8 +21,10 @@ pytestmark = [
     pytest.mark.django_db,
 ]
 
+CSV_WRITER_MOCK_PATH = "applications.exporter.application_round_applications_exporter.csv.writer"
 
-def test_application_export_multiple(graphql):
+
+def test_application_round_applications_export__multiple_applications(graphql):
     application_round = ApplicationRoundFactory.create_in_status_in_allocation()
     application_1 = ApplicationFactory.create_in_status_in_allocation(
         application_round=application_round,
@@ -40,13 +45,14 @@ def test_application_export_multiple(graphql):
     section_1: ApplicationSection = application_1.application_sections.first()
     section_2: ApplicationSection = application_2.application_sections.first()
 
-    open_mock = mock.patch("applications.exporter.open", new=mock.mock_open())
-    csv_writer_mock = mock.patch("applications.exporter.writer")
-    with open_mock, csv_writer_mock as mock_file:
-        export_application_data(application_round_id=application_round.id)
+    exporter = ApplicationRoundApplicationsCSVExporter(application_round_id=application_round)
+    with mock.patch(CSV_WRITER_MOCK_PATH) as mock_writer:
+        exporter.export()
 
-    writes = get_writes(mock_file)
-    header_rows = get_header_rows(max_options=1)
+    writes = get_writes(mock_writer)
+
+    assert exporter.max_options == 1
+    header_rows = exporter._get_header_rows()
     assert writes[0] == header_rows[0]
     assert writes[1] == header_rows[1]
     assert writes[2] == header_rows[2]
@@ -177,7 +183,7 @@ def test_application_export_multiple(graphql):
         }
     )
 )
-def test_application_export_missing_data(graphql, column_value_mapping, missing):
+def test_application_round_applications_export__missing_data(graphql, column_value_mapping, missing):
     # given:
     # - There is one non-draft application with the given missing data in the system
     application_round = ApplicationRoundFactory.create_in_status_in_allocation(
@@ -213,14 +219,12 @@ def test_application_export_missing_data(graphql, column_value_mapping, missing)
 
     # when:
     # - The exporter is run
-    open_mock = mock.patch("applications.exporter.open", new=mock.mock_open())
-    csv_writer_mock = mock.patch("applications.exporter.writer")
-    with open_mock, csv_writer_mock as mock_file:
-        export_application_data(application_round_id=application_round.id)
+    with mock.patch(CSV_WRITER_MOCK_PATH) as mock_writer:
+        ApplicationRoundApplicationsCSVExporter(application_round_id=application_round).export()
 
     # then:
     # - The writes to the csv file are correct
-    writes = get_writes(mock_file)
+    writes = get_writes(mock_writer)
 
     header_row = writes[2]
     data_row = writes[3]
@@ -230,7 +234,7 @@ def test_application_export_missing_data(graphql, column_value_mapping, missing)
         assert data_row[index] == expected_value
 
 
-def test_application_export__no_reservation_unit_options(graphql):
+def test_application_round_applications_export__no_reservation_unit_options(graphql):
     # given:
     # - There is a single application with no reservation unit options
     application_round = ApplicationRoundFactory.create_in_status_in_allocation()
@@ -243,14 +247,12 @@ def test_application_export__no_reservation_unit_options(graphql):
 
     # when:
     # - The exporter is run
-    open_mock = mock.patch("applications.exporter.open", new=mock.mock_open())
-    csv_writer_mock = mock.patch("applications.exporter.writer")
-    with open_mock, csv_writer_mock as mock_file:
-        export_application_data(application_round_id=application_round.id)
+    with mock.patch(CSV_WRITER_MOCK_PATH) as mock_writer:
+        ApplicationRoundApplicationsCSVExporter(application_round_id=application_round).export()
 
     # then:
     # - The csv doesn't contain the reservation unit options column
-    writes = get_writes(mock_file)
+    writes = get_writes(mock_writer)
 
     header_row = writes[2]
     assert "tilatoive 1" not in header_row
