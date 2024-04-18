@@ -269,3 +269,55 @@ def test_helsinki_profile_data__query__no_permission(graphql):
 
     assert HelsinkiProfileClient.generic.call_count == 0
     assert response.error_message() == "No permission to access node."
+
+
+@patch_method(HelsinkiProfileClient.get_token, return_value="token")
+@patch_method(HelsinkiProfileClient.generic)
+def test_helsinki_profile_data__query__general_admin(graphql):
+    user = UserFactory.create(profile_id="foo", social_auth__extra_data__amr=ProfileLoginAMR.SUOMI_FI.value)
+    application = ApplicationFactory.create(user=user)
+
+    profile_data = MyProfileDataFactory.create_basic()
+    HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
+
+    admin = UserFactory.create_with_general_permissions(perms=["can_validate_applications"], code="foo")
+    graphql.force_login(admin)
+
+    query = profile_query(application_id=application.id)
+    response = graphql(query)
+
+    assert HelsinkiProfileClient.generic.call_count == 1
+    assert response.has_errors is False, response.errors
+
+    assert response.first_query_object == {
+        "firstName": profile_data["firstName"],
+        "lastName": profile_data["lastName"],
+    }
+
+
+@patch_method(HelsinkiProfileClient.get_token, return_value="token")
+@patch_method(HelsinkiProfileClient.generic)
+def test_helsinki_profile_data__query__unit_admin(graphql):
+    user = UserFactory.create(profile_id="foo", social_auth__extra_data__amr=ProfileLoginAMR.SUOMI_FI.value)
+    application = ApplicationFactory.create(
+        user=user,
+        application_sections__reservation_unit_options__reservation_unit__unit__name="foo",
+    )
+    unit = application.units.first()
+
+    profile_data = MyProfileDataFactory.create_basic()
+    HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
+
+    admin = UserFactory.create_with_unit_permissions(unit=unit, perms=["can_validate_applications"], code="foo")
+    graphql.force_login(admin)
+
+    query = profile_query(application_id=application.id)
+    response = graphql(query)
+
+    assert HelsinkiProfileClient.generic.call_count == 1
+    assert response.has_errors is False, response.errors
+
+    assert response.first_query_object == {
+        "firstName": profile_data["firstName"],
+        "lastName": profile_data["lastName"],
+    }
