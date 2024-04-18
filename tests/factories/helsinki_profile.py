@@ -4,10 +4,10 @@ import factory
 from factory import fuzzy
 
 from users.helauth.typing import (
-    MyProfileData,
     PermanentAddress,
     PermanentForeignAddress,
     ProfileAddress,
+    ProfileData,
     ProfileEdges,
     ProfileEmail,
     ProfileNode,
@@ -85,9 +85,9 @@ class VerifiedPersonalInfoFactory(GenericFactory[VerifiedPersonalInfo]):
     permanentForeignAddress = factory.SubFactory(PermanentForeignAddressFactory)
 
 
-class MyProfileDataFactory(GenericFactory[MyProfileData]):
+class MyProfileDataFactory(GenericFactory[ProfileData]):
     class Meta:
-        model = MyProfileData
+        model = ProfileData
 
     firstName = factory.Faker("first_name", locale="fi_FI")
     lastName = factory.Faker("last_name", locale="fi_FI")
@@ -97,7 +97,7 @@ class MyProfileDataFactory(GenericFactory[MyProfileData]):
     verifiedPersonalInformation = factory.SubFactory(VerifiedPersonalInfoFactory)
 
     @factory.post_generation
-    def phones(self: MyProfileData, create: bool, nodes: list[ProfilePhone] | None, **kwargs: Any) -> None:
+    def phones(self: ProfileData, create: bool, nodes: list[ProfilePhone] | None, **kwargs: Any) -> None:
         if nodes:
             self["phones"] = ProfileEdges(edges=[ProfileNode(node=node) for node in nodes])
         elif kwargs:
@@ -108,7 +108,7 @@ class MyProfileDataFactory(GenericFactory[MyProfileData]):
             self["phones"] = ProfileEdges(edges=[])
 
     @factory.post_generation
-    def emails(self: MyProfileData, create: bool, nodes: list[ProfileEmail] | None, **kwargs: Any) -> None:
+    def emails(self: ProfileData, create: bool, nodes: list[ProfileEmail] | None, **kwargs: Any) -> None:
         if nodes:
             self["emails"] = ProfileEdges(edges=[ProfileNode(node=node) for node in nodes])
         elif kwargs:
@@ -119,7 +119,7 @@ class MyProfileDataFactory(GenericFactory[MyProfileData]):
             self["emails"] = ProfileEdges(edges=[])
 
     @factory.post_generation
-    def addresses(self: MyProfileData, create: bool, nodes: list[ProfileAddress] | None, **kwargs: Any) -> None:
+    def addresses(self: ProfileData, create: bool, nodes: list[ProfileAddress] | None, **kwargs: Any) -> None:
         if nodes:
             self["addresses"] = ProfileEdges(edges=[ProfileNode(node=node) for node in nodes])
         elif kwargs:
@@ -130,7 +130,7 @@ class MyProfileDataFactory(GenericFactory[MyProfileData]):
             self["addresses"] = ProfileEdges(edges=[])
 
     @classmethod
-    def create_basic(cls, **kwargs: Any) -> MyProfileData:
+    def create_basic(cls, **kwargs: Any) -> ProfileData:
         kwargs.setdefault("firstName", "Example")
         kwargs.setdefault("lastName", "User")
         kwargs.setdefault(
