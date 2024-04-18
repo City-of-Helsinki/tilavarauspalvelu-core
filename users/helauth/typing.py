@@ -58,6 +58,32 @@ class IDToken:
     loa: Literal["substantial", "low"]
     """level of authentication"""
 
+    @classmethod
+    def from_string(cls, token: str) -> IDToken | None:
+        from users.helauth.utils import get_jwt_payload
+
+        try:
+            payload = get_jwt_payload(token)
+            return cls(
+                iss=payload["iss"],
+                sub=payload["sub"],
+                aud=payload["aud"],
+                exp=payload["exp"],
+                iat=payload["iat"],
+                auth_time=payload["auth_time"],
+                nonce=payload["nonce"],
+                at_hash=payload["at_hash"],
+                email=payload["email"],
+                email_verified=payload["email_verified"],
+                ad_groups=payload["ad_groups"],
+                azp=payload["azp"],
+                sid=payload["sid"],
+                amr=payload["amr"],
+                loa=payload["loa"],
+            )
+        except Exception:
+            return None
+
     @property
     def is_ad_login(self) -> bool:
         amr = self.amr
