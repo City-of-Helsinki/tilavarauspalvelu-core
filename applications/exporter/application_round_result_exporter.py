@@ -1,5 +1,4 @@
 import csv
-from collections.abc import Iterable
 from dataclasses import asdict, dataclass
 from io import StringIO
 
@@ -151,8 +150,8 @@ class ApplicationRoundResultCSVExporter(BaseCSVExporter):
             .distinct()  # Avoid duplicate rows due to implicit joins
         )
 
-    def _get_single_row_data(self, section: ApplicationSection) -> Iterable[ApplicationSectionExportRow]:
-        row = ApplicationSectionExportRow(
+    def _get_single_row_data(self, section: ApplicationSection) -> list[ApplicationSectionExportRow]:
+        section_row = ApplicationSectionExportRow(
             application_id=str(section.application.id),
             application_status=section.application_status,  # type: ignore[attr-defined]
             section_id=str(section.id),
@@ -167,24 +166,27 @@ class ApplicationRoundResultCSVExporter(BaseCSVExporter):
 
         # Applicant
         if section.application.organisation is not None:
-            row.applicant = section.application.organisation.name
+            section_row.applicant = section.application.organisation.name
         elif (contact_person := section.application.contact_person) is not None:
-            row.applicant = f"{contact_person.first_name} {contact_person.last_name}"
+            section_row.applicant = f"{contact_person.first_name} {contact_person.last_name}"
 
+        ret_val = []
         # Reservation Unit Options
         for option in section.reservation_unit_options.all():
-            option_row = ApplicationSectionExportRow(**asdict(row))  # Copy to prevent modifying the original
+            option_row = ApplicationSectionExportRow(**asdict(section_row))  # Copy to prevent modifying the original
             option_row.reservation_unit_name = option.reservation_unit.name
             option_row.unit_name = option.reservation_unit.unit.name
 
             # One row per Allocated Time Slot
-            if len(option.allocated_time_slots.all()) == 0:
-                # An option without allocated time slots must still be exported
-                yield option_row
-                continue
             for allocated_time_slot in option.allocated_time_slots.all():
                 slot_row = ApplicationSectionExportRow(**asdict(option_row))  # Copy to prevent modifying the original
                 slot_row.day_of_the_week = allocated_time_slot.day_of_the_week
                 slot_row.begin_time = local_time_string(allocated_time_slot.begin_time)
                 slot_row.end_time = local_time_string(allocated_time_slot.end_time)
-                yield slot_row
+                ret_val.append(slot_row)
+
+        if not ret_val:
+            # A section without any allocated time slots must still be exported
+            ret_val.append(section_row)
+
+        return ret_val
