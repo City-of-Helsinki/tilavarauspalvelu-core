@@ -34,7 +34,7 @@ class ReservationUnitReservationScheduler:
         # If reservation_min_days_before is set, start date must be at least that many days from now
         if self.reservation_unit.reservations_min_days_before:
             delta = self.reservation_unit.reservations_min_days_before
-            start_date = start_date + timedelta(days=delta)
+            start_date += timedelta(days=delta)
 
         # If reservation_begins is set, use it as the start date instead
         if self.reservation_unit.reservation_begins and self.reservation_unit.reservation_begins > start_date:

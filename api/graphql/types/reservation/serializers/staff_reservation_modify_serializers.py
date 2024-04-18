@@ -170,7 +170,7 @@ class StaffReservationModifySerializer(OldPrimaryKeyUpdateSerializer, Reservatio
         now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
 
         if now.hour <= 1:
-            now = now - datetime.timedelta(days=1)
+            now -= datetime.timedelta(days=1)
 
         if self.instance.end.date() < now.date():
             raise ValidationErrorWithCode(
