@@ -71,7 +71,9 @@ class ProfileDataParser:
             municipality_code=self.get_municipality_code(),
             municipality_name=self.get_municipality_name(),
             login_method=LoginMethod.PROFILE,
-            is_strong_login=True,  # Helsinki profile login is always strong
+            # For now, Helsinki profile login is always strong.
+            # When helsinki profile gets support for weak login, this should be updated.
+            is_strong_login=True,
         )
 
     def get_first_name(self) -> str | None:
