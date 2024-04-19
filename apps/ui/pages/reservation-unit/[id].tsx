@@ -862,14 +862,16 @@ const ReservationUnit = ({
     console.warn("not reservable because: ", reason);
   }
 
-  const [storedReservation, setStoredReservation, _removeStoredReservation] =
+  const [storedReservation, setStoredReservation] =
     useLocalStorage<PendingReservation>("reservation");
   const storeReservationForLogin = useCallback(() => {
     if (reservationUnit.pk != null && focusSlot != null) {
       const { start, end } = focusSlot ?? {};
+      // NOTE the only place where we use ISO strings since they are always converted to Date objects
+      // another option would be to refactor storaged reservation to use Date objects
       setStoredReservation({
-        begin: toUIDate(start),
-        end: toUIDate(end),
+        begin: start.toISOString(),
+        end: end.toISOString(),
         price: undefined,
         reservationUnitPk: reservationUnit.pk ?? 0,
       });
@@ -900,17 +902,18 @@ const ReservationUnit = ({
   }, []);
 
   useEffect(() => {
-    const start = storedReservation?.begin
-      ? new Date(storedReservation.begin)
-      : null;
-    const end = storedReservation?.end ? new Date(storedReservation.end) : null;
-
-    if (start && end) {
-      handleCalendarEventChange({
-        start,
-        end,
-      } as CalendarEvent<ReservationNode>);
+    const { begin, end } = storedReservation ?? {};
+    if (begin == null || end == null) {
+      return;
     }
+
+    const beginDate = new Date(begin);
+    const endDate = new Date(end);
+
+    handleCalendarEventChange({
+      start: beginDate,
+      end: endDate,
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storedReservation?.begin, storedReservation?.end]);
 
