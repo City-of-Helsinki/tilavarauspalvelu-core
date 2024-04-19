@@ -27,7 +27,7 @@ __all__ = [
 class ReservationPermission(BasePermission):
     @classmethod
     def has_permission(cls, user: AnyUser) -> bool:
-        return user.is_authenticated
+        return True
 
     @classmethod
     def has_create_permission(cls, user: AnyUser, input_data: dict[str, Any]) -> bool:
