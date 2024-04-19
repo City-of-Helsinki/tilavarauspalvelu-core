@@ -12,7 +12,7 @@ __all__ = [
 class ReservationMetadataSetPermission(BasePermission):
     @classmethod
     def has_permission(cls, user: AnyUser) -> bool:
-        return user.is_authenticated
+        return True
 
     @classmethod
     def has_mutation_permission(cls, user: AnyUser, input_data: dict[str, Any]) -> bool:
