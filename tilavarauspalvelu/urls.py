@@ -1,6 +1,9 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.core.handlers.wsgi import WSGIRequest
+from django.http import JsonResponse
+from django.middleware.csrf import get_token
 from django.urls import include, path, reverse
 from django.views.decorators.csrf import csrf_exempt
 from graphene_django_extensions import FileUploadGraphQLView
@@ -21,6 +24,17 @@ admin.site.each_context = lambda request: original_each_context(request) | {
     "helsinki_logout_url": reverse("helusers:auth_logout"),
 }
 
+
+def csrf_view(request: WSGIRequest) -> JsonResponse:  # NOSONAR
+    """Return a CSRF token for the frontend to use."""
+    # From: https://fractalideas.com/blog/making-react-and-django-play-well-together-single-page-app-model/
+    # > You may wonder whether this endpoint creates a security vulnerability.
+    # > From a security perspective, it's no different from any page that contains
+    # > the CSRF token on a traditional Django website. The browser's same-origin policy
+    # > prevents an attacker from getting access to the token with a cross-origin request.
+    return JsonResponse({"csrfToken": get_token(request)})
+
+
 # Make it possible to turn off CSRF protection for the GraphQL endpoint for frontend graphql codegen
 graphql_view = FileUploadGraphQLView.as_view(graphiql=settings.DEBUG)
 if settings.GRAPHQL_CODEGEN_ENABLED:
@@ -35,6 +49,7 @@ urlpatterns = [
     path("helauth/", include("api.helauth.urls")),
     path("gdpr/v1/", include("api.gdpr.urls")),
     path("tinymce/", include("tinymce.urls")),
+    path("csrf/", csrf_view),
 ]
 
 if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
