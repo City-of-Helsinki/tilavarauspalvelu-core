@@ -72,9 +72,7 @@ class ProfileDataParser:
             municipality_code=self.get_municipality_code(),
             municipality_name=self.get_municipality_name(),
             login_method=LoginMethod.PROFILE,
-            # For now, Helsinki profile login is always strong.
-            # When helsinki profile gets support for weak login, this should be updated.
-            is_strong_login=True,
+            is_strong_login=self.is_strong_login(),
         )
 
     def get_first_name(self) -> str | None:
@@ -234,6 +232,9 @@ class ProfileDataParser:
         if ssn is None:
             return None
         return ssn_to_date(ssn)
+
+    def is_strong_login(self) -> bool:
+        return self.data.get("verifiedPersonalInformation") is not None
 
 
 def ssn_to_date(id_number: str) -> datetime.date | None:
