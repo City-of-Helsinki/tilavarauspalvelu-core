@@ -102,7 +102,7 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
 
         user: User | None = application.user
         if user is None:
-            msg = f"Application with id {application_id} does have a user."
+            msg = f"Application with id {application_id} does not have a user."
             extensions = {"code": error_codes.HELSINKI_PROFILE_APPLICATION_USER_MISSING}
             raise GraphQLError(msg, extensions=extensions)
 

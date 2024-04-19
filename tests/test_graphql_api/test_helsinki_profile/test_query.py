@@ -51,15 +51,15 @@ def test_helsinki_profile_data__query__all_fields(graphql):
 
     assert response.first_query_object == {
         "pk": user.pk,
-        "firstName": profile_data["firstName"],
-        "lastName": profile_data["lastName"],
+        "firstName": profile_data["verifiedPersonalInformation"]["firstName"],
+        "lastName": profile_data["verifiedPersonalInformation"]["lastName"],
         "email": profile_data["primaryEmail"]["email"],
         "phone": profile_data["primaryPhone"]["phone"],
         "birthday": "2006-11-18",
         "ssn": profile_data["verifiedPersonalInformation"]["nationalIdentificationNumber"],
-        "streetAddress": profile_data["primaryAddress"]["address"],
-        "postalCode": profile_data["primaryAddress"]["postalCode"],
-        "city": profile_data["primaryAddress"]["city"],
+        "streetAddress": profile_data["verifiedPersonalInformation"]["permanentAddress"]["streetAddress"],
+        "postalCode": profile_data["verifiedPersonalInformation"]["permanentAddress"]["postalCode"],
+        "city": profile_data["verifiedPersonalInformation"]["permanentAddress"]["postOffice"],
         "municipalityCode": profile_data["verifiedPersonalInformation"]["municipalityOfResidenceNumber"],
         "municipalityName": profile_data["verifiedPersonalInformation"]["municipalityOfResidence"],
         "loginMethod": LoginMethod.PROFILE.value,
@@ -84,8 +84,8 @@ def test_helsinki_profile_data__query__application_user(graphql):
     assert response.has_errors is False, response.errors
 
     assert response.first_query_object == {
-        "firstName": profile_data["firstName"],
-        "lastName": profile_data["lastName"],
+        "firstName": profile_data["verifiedPersonalInformation"]["firstName"],
+        "lastName": profile_data["verifiedPersonalInformation"]["lastName"],
     }
 
 
@@ -106,8 +106,8 @@ def test_helsinki_profile_data__query__reservation_user(graphql):
     assert response.has_errors is False, response.errors
 
     assert response.first_query_object == {
-        "firstName": profile_data["firstName"],
-        "lastName": profile_data["lastName"],
+        "firstName": profile_data["verifiedPersonalInformation"]["firstName"],
+        "lastName": profile_data["verifiedPersonalInformation"]["lastName"],
     }
 
 
@@ -297,8 +297,8 @@ def test_helsinki_profile_data__query__general_admin(graphql):
     assert response.has_errors is False, response.errors
 
     assert response.first_query_object == {
-        "firstName": profile_data["firstName"],
-        "lastName": profile_data["lastName"],
+        "firstName": profile_data["verifiedPersonalInformation"]["firstName"],
+        "lastName": profile_data["verifiedPersonalInformation"]["lastName"],
     }
 
 
@@ -325,6 +325,6 @@ def test_helsinki_profile_data__query__unit_admin(graphql):
     assert response.has_errors is False, response.errors
 
     assert response.first_query_object == {
-        "firstName": profile_data["firstName"],
-        "lastName": profile_data["lastName"],
+        "firstName": profile_data["verifiedPersonalInformation"]["firstName"],
+        "lastName": profile_data["verifiedPersonalInformation"]["lastName"],
     }
