@@ -70,7 +70,7 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
         my_profile_data = cls.graphql_request(request, query=query, endpoint="profile")
         if my_profile_data is None:
             return None
-        return ProfileDataParser(my_profile_data).parse_user_profile_info()
+        return ProfileDataParser(my_profile_data).parse_user_profile_info(user=user)
 
     @classmethod
     def ensure_token_valid(cls, request: WSGIRequest) -> bool:
