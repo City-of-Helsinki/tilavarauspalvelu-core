@@ -1,4 +1,4 @@
-from collections.abc import Generator, Sequence
+from collections.abc import Generator, Iterable, Sequence
 from typing import Any, Generic, Literal, TypeVar
 
 from django.conf import settings
@@ -17,19 +17,34 @@ __all__ = [
 T = TypeVar("T")
 
 
-def comma_sep_str(values: Sequence[str]) -> str:
+def comma_sep_str(values: Iterable[Any], *, last_sep: str = "&", quote: bool = False) -> str:
     """
     Return a comma separated string of the given values,
-    with an ampersand before the last value:
+    with the value of `last_sep` before the last value.
+    Remove any empty values.
 
     >>> comma_sep_str(["foo", "bar", "baz"])
     "foo, bar & baz"
+
+    >>> comma_sep_str(["foo", "bar", "baz"], last_sep="or", quote=True)
+    "'foo', 'bar' or 'baz'"
     """
-    if len(values) == 0:
-        return ""
-    if len(values) == 1:
-        return str(values[0])
-    return ", ".join(values[:-1]) + f" & {values[-1]}"
+    string: str = ""
+    previous_value: str = ""
+    values_iter = iter(values)
+    try:
+        while value := str(next(values_iter)):
+            if previous_value:
+                if string:
+                    string += ", "
+                string += f"'{previous_value}'" if quote else previous_value
+            previous_value = value
+    except StopIteration:
+        if string:
+            string += f" {last_sep} "
+        string += f"'{previous_value}'" if quote else previous_value
+
+    return string
 
 
 def get_field_to_related_field_mapping(model: type[models.Model]) -> dict[str, str]:

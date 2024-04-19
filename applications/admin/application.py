@@ -40,7 +40,7 @@ class ApplicationSectionInline(admin.TabularInline):
         return False
 
     def suitable_days_of_the_week(self, obj: ApplicationSection) -> str:
-        return comma_sep_str([str(item.label) for item in obj.suitable_days_of_the_week])
+        return comma_sep_str(item.label for item in obj.suitable_days_of_the_week)
 
 
 @admin.register(Application)
