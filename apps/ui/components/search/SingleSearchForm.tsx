@@ -16,7 +16,7 @@ import { FilterTagList } from "./FilterTagList";
 import SingleLabelInputGroup from "@/components/common/SingleLabelInputGroup";
 import { useSearchModify, useSearchValues } from "@/hooks/useSearchValues";
 import { type ParsedUrlQuery } from "node:querystring";
-import { ControlledMultiSelect } from "../search/ControlledMultiSelect";
+import { ControlledMultiSelect } from "./ControlledMultiSelect";
 import { ControlledSelect } from "@/components/common/ControlledSelect";
 import {
   mapQueryParamToNumber,

@@ -18,7 +18,7 @@ import {
 } from "common/types/gql-types";
 import { Container } from "common";
 import { filterNonNullable } from "common/src/helpers";
-import { SeasonalSearchForm } from "@/components/search/SearchForm";
+import { SeasonalSearchForm } from "@/components/search/SeasonalSearchForm";
 import { HeroSubheading } from "@/modules/style/typography";
 import { RESERVATION_UNITS } from "@/modules/queries/reservationUnit";
 import Sorting from "@/components/form/Sorting";
