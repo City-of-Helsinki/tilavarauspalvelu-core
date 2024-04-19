@@ -57,11 +57,11 @@ class ProfileDataParser:
         )
 
     def parse_user_profile_info(self, *, user: User) -> UserProfileInfo:
-        address = self.get_address()
+        address = self.get_address(prefer_verified=True)
         return UserProfileInfo(
             pk=user.pk,
-            first_name=self.get_first_name(),
-            last_name=self.get_last_name(),
+            first_name=self.get_first_name(prefer_verified=True),
+            last_name=self.get_last_name(prefer_verified=True),
             email=self.get_email(),
             phone=self.get_phone(),
             birthday=self.get_birthday(),
@@ -75,19 +75,15 @@ class ProfileDataParser:
             is_strong_login=self.is_strong_login(),
         )
 
-    def get_first_name(self) -> str | None:
-        last_name = self.data.get("firstName")
-        if last_name is not None:
-            return last_name
+    def get_first_name(self, *, prefer_verified: bool = False) -> str | None:
+        first_name = self.data.get("firstName")
+        verified_first_name = get_nested(self.data, "verifiedPersonalInformation", "firstName")
+        return verified_first_name or first_name if prefer_verified else first_name or verified_first_name
 
-        return get_nested(self.data, "verifiedPersonalInformation", "firstName")
-
-    def get_last_name(self) -> str | None:
-        first_name = self.data.get("lastName")
-        if first_name is not None:
-            return first_name
-
-        return get_nested(self.data, "verifiedPersonalInformation", "lastName")
+    def get_last_name(self, *, prefer_verified: bool = False) -> str | None:
+        last_name = self.data.get("lastName")
+        verified_last_name = get_nested(self.data, "verifiedPersonalInformation", "lastName")
+        return verified_last_name or last_name if prefer_verified else last_name or verified_last_name
 
     def get_email(self) -> str | None:
         primary_email: ProfileEmail | None = self.data.get("primaryEmail")
@@ -120,16 +116,16 @@ class ProfileDataParser:
 
         return None
 
-    def get_address(self) -> ProfileLocalAddress | ProfileForeignAddress | None:
+    def get_address(self, *, prefer_verified: bool = False) -> ProfileLocalAddress | ProfileForeignAddress | None:
         address = self._get_address_by_priority()
-        if address is not None:
-            return address
+        permanent_address = self._get_permanent_address()
+        permanent_foreign_address = self._get_permanent_foreign_address()
 
-        address = self._get_permanent_address()
-        if address is not None:
-            return address
-
-        return self._get_permanent_foreign_address()
+        return (
+            permanent_address or permanent_foreign_address or address
+            if prefer_verified
+            else address or permanent_address or permanent_foreign_address
+        )
 
     def _get_address_by_priority(self) -> ProfileLocalAddress | None:
         primary_address: ProfileAddress | None = self.data.get("primaryAddress")

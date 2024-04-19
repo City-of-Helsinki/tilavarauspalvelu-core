@@ -1,3 +1,5 @@
+# ruff: noqa: N815
+
 from typing import Any
 
 import factory

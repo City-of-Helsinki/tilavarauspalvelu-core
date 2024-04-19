@@ -250,7 +250,7 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
             fragments.add(cls._addresses_fragment)
             fragments.add(cls._verified_info_fragment)
 
-        if any(f in fields for f in ["birthday", "ssn", "municipality_code", "municipality_name"]):
+        if any(f in fields for f in ["birthday", "ssn", "municipality_code", "municipality_name", "is_strong_login"]):
             selections.add("...VerifiedPersonalInformation")
             fragments.add(cls._verified_info_fragment)
 
