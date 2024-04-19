@@ -1,18 +1,58 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
-from django.utils.translation import gettext_lazy as _
 
 from users.anonymisation import anonymize_user_data
 from users.models import User
 
 
 @admin.register(User)
-class UserAdmin(DjangoUserAdmin):
-    actions = ["anonymize_user_data"]
+class UserAdmin(admin.ModelAdmin):
+    list_display = [
+        "username",
+        "email",
+        "first_name",
+        "last_name",
+        "is_staff",
+        "is_superuser",
+        "reservation_notification",
+    ]
+    fields = [
+        "username",
+        "last_login",
+        "date_joined",
+        "email",
+        "first_name",
+        "last_name",
+        "is_active",
+        "is_staff",
+        "is_superuser",
+        "preferred_language",
+        "reservation_notification",
+        "tvp_uuid",
+        "profile_id",
+        "ad_groups",
+        "has_staff_permissions",
+        "id_token",
+    ]
+    readonly_fields = [
+        "last_login",
+        "date_joined",
+        "tvp_uuid",
+        "profile_id",
+        "ad_groups",
+        "has_staff_permissions",
+        "id_token",
+    ]
+    search_fields = [
+        "username",
+        "first_name",
+        "last_name",
+        "email",
+    ]
+    ordering = [
+        "username",
+    ]
 
-    list_display = (*DjangoUserAdmin.list_display, "reservation_notification")
-    fieldsets = (*DjangoUserAdmin.fieldsets, (_("Notifications"), {"fields": ("reservation_notification",)}))
-    add_fieldsets = (*DjangoUserAdmin.add_fieldsets, (_("Notifications"), {"fields": ("reservation_notification",)}))
+    actions = ["anonymize_user_data"]
 
     @admin.action
     def anonymize_user_data(self, request, queryset):
