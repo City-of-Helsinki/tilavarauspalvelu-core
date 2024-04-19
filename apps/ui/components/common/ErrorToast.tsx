@@ -1,17 +1,19 @@
 import React from "react";
 import { Notification } from "hds-react";
 
-export const ErrorToast = ({
+export function ErrorToast({
   error,
   onClose,
+  title,
 }: {
   error: string;
   onClose?: () => void;
-}): JSX.Element => {
+  title?: string;
+}): JSX.Element {
   return (
     <Notification
       type="error"
-      label={error}
+      label={title ?? error}
       position="top-center"
       autoClose
       displayAutoCloseProgress={false}
@@ -20,4 +22,4 @@ export const ErrorToast = ({
       {error}
     </Notification>
   );
-};
+}

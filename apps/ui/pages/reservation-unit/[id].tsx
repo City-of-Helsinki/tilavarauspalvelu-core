@@ -118,7 +118,6 @@ import {
   TwoColumnLayout,
   Wrapper,
 } from "@/components/reservation-unit/ReservationUnitStyles";
-import { Toast } from "@/components/common/Toast";
 import QuickReservation, {
   type TimeRange,
 } from "@/components/reservation-unit/QuickReservation";
@@ -141,6 +140,7 @@ import {
 import { MediumButton } from "@/styles/util";
 import LoginFragment from "@/components/LoginFragment";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
+import { ErrorToast } from "@/components/common/ErrorToast";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -1313,19 +1313,11 @@ const ReservationUnit = ({
         )}
       </BottomWrapper>
       {errorMsg && (
-        <Toast
-          type="error"
-          label={t("reservationUnit:reservationFailed")}
-          position="top-center"
-          autoClose={false}
-          displayAutoCloseProgress={false}
+        <ErrorToast
+          title={t("reservationUnit:reservationFailed")}
           onClose={() => setErrorMsg(null)}
-          dismissible
-          closeButtonLabelText={t("common:error.closeErrorMsg")}
-          trapFocus
-        >
-          {errorMsg}
-        </Toast>
+          error={errorMsg}
+        />
       )}
     </Wrapper>
   );

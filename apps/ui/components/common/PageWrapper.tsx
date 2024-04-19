@@ -1,10 +1,10 @@
 import React from "react";
+import Head from "next/head";
 import styled from "styled-components";
 import { BannerNotificationsList } from "common/src/components";
 import { BannerNotificationTarget } from "common/types/gql-types";
 import Footer from "./Footer";
 import { Navigation } from "./Navigation/Navigation";
-import Title from "./Title";
 import { InProgressReservationNotification } from "@/components/reservations/UnpaidReservationNotification";
 
 interface Props {
@@ -28,7 +28,9 @@ function PageWrapper({
 }: Props): JSX.Element {
   return (
     <>
-      <Title>Tilavarauspalvelu</Title>
+      <Head>
+        <title>Tilavarauspalvelu</title>
+      </Head>
       <Navigation apiBaseUrl={apiBaseUrl} profileLink={profileLink} />
       <BannerNotificationsList
         centered

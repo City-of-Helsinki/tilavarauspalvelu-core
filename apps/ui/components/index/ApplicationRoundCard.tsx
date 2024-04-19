@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Container, IconArrowRight } from "hds-react";
+import { Card, Container, IconArrowRight } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
@@ -12,10 +12,9 @@ import {
   ApplicationRoundStatusChoice,
 } from "common/types/gql-types";
 import { IconButton } from "common/src/components";
-import Card from "../common/Card";
-import { searchUrl } from "../../modules/util";
-import { MediumButton } from "../../styles/util";
-import { getApplicationRoundName } from "../../modules/applicationRound";
+import { searchUrl } from "@/modules/util";
+import { MediumButton } from "@/styles/util";
+import { getApplicationRoundName } from "@/modules/applicationRound";
 
 interface Props {
   applicationRound: ApplicationRoundNode;
