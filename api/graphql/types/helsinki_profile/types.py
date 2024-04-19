@@ -1,3 +1,5 @@
+import datetime
+
 import graphene
 from graphene_django_extensions.errors import GQLNodePermissionDeniedError
 from graphql import GraphQLError
@@ -11,6 +13,7 @@ from reservations.models import Reservation
 from users.helauth.clients import HelsinkiProfileClient
 from users.helauth.typing import LoginMethod, UserProfileInfo
 from users.models import User
+from users.tasks import save_personal_info_view_log
 
 __all__ = [
     "HelsinkiProfileDataNode",
@@ -18,6 +21,7 @@ __all__ = [
 
 
 class HelsinkiProfileDataNode(graphene.ObjectType):
+    pk = graphene.Int(required=True)
     first_name = graphene.String()
     last_name = graphene.String()
     email = graphene.String()
@@ -53,6 +57,7 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
         # Allow some information to be queried from non-helsinki profile users
         if id_token is None or not id_token.is_profile_login:
             return UserProfileInfo(
+                pk=user.pk,
                 first_name=user.first_name,
                 last_name=user.last_name,
                 email=user.email,
@@ -121,3 +126,19 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
             raise GraphQLError(msg, extensions=extensions)
 
         return user
+
+    def resolve_birthday(root: UserProfileInfo, info: GQLInfo) -> datetime.date | None:
+        save_personal_info_view_log.delay(root["pk"], info.context.user.id, "profile.birthday")
+        return root["birthday"]
+
+    def resolve_ssn(root: UserProfileInfo, info: GQLInfo) -> str | None:
+        save_personal_info_view_log.delay(root["pk"], info.context.user.id, "profile.ssn")
+        return root["ssn"]
+
+    def resolve_municipality_code(root: UserProfileInfo, info: GQLInfo) -> str | None:
+        save_personal_info_view_log.delay(root["pk"], info.context.user.id, "profile.municipality_code")
+        return root["municipality_code"]
+
+    def resolve_municipality_name(root: UserProfileInfo, info: GQLInfo) -> str | None:
+        save_personal_info_view_log.delay(root["pk"], info.context.user.id, "profile.municipality_name")
+        return root["municipality_name"]

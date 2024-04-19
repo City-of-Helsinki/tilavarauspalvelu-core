@@ -26,7 +26,7 @@ from users.helauth.typing import (
 )
 
 if TYPE_CHECKING:
-    pass
+    from users.models import User
 
 __all__ = [
     "ProfileDataParser",
@@ -56,9 +56,10 @@ class ProfileDataParser:
             birthday=self.get_birthday(),
         )
 
-    def parse_user_profile_info(self) -> UserProfileInfo:
+    def parse_user_profile_info(self, *, user: User) -> UserProfileInfo:
         address = self.get_address()
         return UserProfileInfo(
+            pk=user.pk,
             first_name=self.get_first_name(),
             last_name=self.get_last_name(),
             email=self.get_email(),

@@ -290,6 +290,7 @@ class BirthdayInfo(TypedDict):
 
 
 class UserProfileInfo(TypedDict):
+    pk: int
     first_name: str | None
     last_name: str | None
     email: str | None

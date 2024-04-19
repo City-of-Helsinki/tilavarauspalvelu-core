@@ -11,6 +11,7 @@ from .helpers import profile_query
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
+    pytest.mark.usefixtures("_celery_synchronous"),
 ]
 
 
@@ -27,6 +28,7 @@ def test_helsinki_profile_data__query__all_fields(graphql):
 
     graphql.login_with_superuser()
     fields = """
+        pk
         firstName
         lastName
         email
@@ -48,6 +50,7 @@ def test_helsinki_profile_data__query__all_fields(graphql):
     assert response.has_errors is False, response.errors
 
     assert response.first_query_object == {
+        "pk": user.pk,
         "firstName": profile_data["firstName"],
         "lastName": profile_data["lastName"],
         "email": profile_data["primaryEmail"]["email"],
@@ -119,6 +122,7 @@ def test_helsinki_profile_data__query__ad_user(graphql):
 
     graphql.login_with_superuser()
     fields = """
+        pk
         firstName
         lastName
         email
@@ -140,6 +144,7 @@ def test_helsinki_profile_data__query__ad_user(graphql):
     assert response.has_errors is False, response.errors
 
     assert response.first_query_object == {
+        "pk": user.pk,
         "firstName": user.first_name,
         "lastName": user.last_name,
         "email": user.email,
@@ -167,6 +172,7 @@ def test_helsinki_profile_data__query__non_helauth_user(graphql):
 
     graphql.login_with_superuser()
     fields = """
+        pk
         firstName
         lastName
         email
@@ -188,6 +194,7 @@ def test_helsinki_profile_data__query__non_helauth_user(graphql):
     assert response.has_errors is False, response.errors
 
     assert response.first_query_object == {
+        "pk": user.pk,
         "firstName": user.first_name,
         "lastName": user.last_name,
         "email": user.email,
