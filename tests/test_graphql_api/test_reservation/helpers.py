@@ -57,8 +57,8 @@ def get_approve_data(reservation: Reservation, **overrides: Any) -> dict[str, An
     return {
         "pk": reservation.pk,
         "handlingDetails": "You're welcome.",
-        "price": 10.59,
-        "priceNet": 8.61,
+        "price": "10.59",
+        "priceNet": "8.61",
         **overrides,
     }
 
@@ -67,7 +67,7 @@ def get_cancel_data(reservation: Reservation, **overrides: Any) -> dict[str, Any
     reason = ReservationCancelReasonFactory.create()
     return {
         "pk": reservation.pk,
-        "cancelReasonPk": reason.pk,
+        "cancelReason": reason.pk,
         **overrides,
     }
 
@@ -132,7 +132,7 @@ def get_deny_data(reservation: Reservation, **overrides: Any) -> dict[str, Any]:
     return {
         "pk": reservation.pk,
         "handlingDetails": "foo",
-        "denyReasonPk": reason.pk,
+        "denyReason": reason.pk,
         **overrides,
     }
 

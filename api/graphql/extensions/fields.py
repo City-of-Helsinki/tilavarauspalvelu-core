@@ -1,5 +1,4 @@
 from datetime import timedelta
-from decimal import Decimal
 from typing import Any
 
 from django.core.exceptions import ValidationError
@@ -8,11 +7,6 @@ from django.utils.deconstruct import deconstructible
 from django.utils.translation import gettext_lazy as _
 from graphene import Scalar
 from rest_framework import serializers
-
-
-class DecimalField(serializers.FloatField):
-    def to_internal_value(self, data):
-        return Decimal(str(data))
 
 
 class Duration(Scalar):

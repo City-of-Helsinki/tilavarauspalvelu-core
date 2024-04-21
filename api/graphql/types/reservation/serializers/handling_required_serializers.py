@@ -1,39 +1,42 @@
-from api.graphql.extensions.serializers import OldPrimaryKeySerializer
-from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
+from typing import Any
+
+from graphene_django_extensions import NestingModelSerializer
+from rest_framework.exceptions import ValidationError
+
+from api.graphql.extensions import error_codes
+from common.utils import comma_sep_str
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from reservations.choices import ReservationStateChoice
 from reservations.models import Reservation
 
+__all__ = [
+    "ReservationRequiresHandlingSerializer",
+]
 
-class ReservationRequiresHandlingSerializer(OldPrimaryKeySerializer):
+
+class ReservationRequiresHandlingSerializer(NestingModelSerializer):
+    instance: Reservation
+
     class Meta:
         model = Reservation
         fields = [
             "pk",
             "state",
         ]
+        extra_kwargs = {
+            "state": {"read_only": True},
+        }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["state"].read_only = True
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
+        if self.instance.state not in ReservationStateChoice.states_that_can_change_to_handling:
+            states = comma_sep_str(ReservationStateChoice.states_that_can_change_to_handling, last_sep="or", quote=True)
+            msg = f"Only reservations with states {states} can be returned to handling."
+            raise ValidationError(msg, code=error_codes.RESERVATION_STATE_CHANGE_NOT_ALLOWED)
 
-    @property
-    def validated_data(self):
-        validated_data = super().validated_data
-        validated_data["state"] = ReservationStateChoice.REQUIRES_HANDLING.value
-        return validated_data
-
-    def validate(self, data):
-        valid_states = [ReservationStateChoice.DENIED.value, ReservationStateChoice.CONFIRMED.value]
-        if self.instance.state not in valid_states:
-            raise ValidationErrorWithCode(
-                f"Only reservations with states {' and '.join(valid_states)} can be reverted to requires handling.",
-                ValidationErrorCodes.STATE_CHANGE_NOT_ALLOWED,
-            )
-        data = super().validate(data)
         return data
 
-    def save(self, **kwargs):
+    def save(self, **kwargs: Any) -> Reservation:
+        kwargs["state"] = ReservationStateChoice.REQUIRES_HANDLING.value
         instance = super().save(**kwargs)
         ReservationEmailNotificationSender.send_requires_handling_email(reservation=instance)
         return instance

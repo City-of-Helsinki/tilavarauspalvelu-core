@@ -60,7 +60,10 @@ def test_reservation__cancel__fails_if_state_is_not_confirmed(graphql):
     data = get_cancel_data(reservation)
     response = graphql(CANCEL_MUTATION, input_data=data)
 
-    assert response.error_message() == "Only reservations in confirmed state can be cancelled through this."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Only reservations with state 'confirmed' can be cancelled.",
+    ]
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CREATED
@@ -71,7 +74,7 @@ def test_reservation__cancel__fails_if_cancel_reason_not_given(graphql):
 
     graphql.login_with_superuser()
     data = get_cancel_data(reservation)
-    data.pop("cancelReasonPk")
+    data.pop("cancelReason")
     response = graphql(CANCEL_MUTATION, input_data=data)
 
     assert response.has_errors
@@ -115,7 +118,10 @@ def test_reservation__cancel__fails_when_cancellation_time_is_over(graphql):
     data = get_cancel_data(reservation)
     response = graphql(CANCEL_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation cannot be cancelled because the cancellation period has expired."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Reservation cannot be cancelled because the cancellation period is over.",
+    ]
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CONFIRMED
@@ -132,7 +138,10 @@ def test_reservation__cancel__fails_when_reservation_in_the_past(graphql):
     data = get_cancel_data(reservation)
     response = graphql(CANCEL_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation cannot be cancelled because the cancellation period has expired."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Reservation cannot be cancelled after it has begun.",
+    ]
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CONFIRMED
@@ -145,7 +154,10 @@ def test_reservation__cancel__fails_if_no_cancellation_rule(graphql):
     data = get_cancel_data(reservation)
     response = graphql(CANCEL_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation cannot be cancelled thus no cancellation rule."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Reservation cannot be cancelled because its reservation unit has no cancellation rule.",
+    ]
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CONFIRMED
@@ -182,6 +194,7 @@ def test_reservation__cancel__starts_refund_process_for_paid_reservation(graphql
     payment_order = PaymentOrderFactory.create(
         reservation=reservation,
         remote_id=remote_id,
+        refund_id=None,
         payment_type=PaymentType.ONLINE,
         status=OrderStatus.PAID,
         price_net=Decimal("100.00"),

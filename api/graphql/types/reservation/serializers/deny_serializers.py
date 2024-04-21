@@ -1,83 +1,56 @@
-from rest_framework import serializers
+from typing import Any
 
-from api.graphql.extensions.serializers import OldPrimaryKeySerializer
-from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
+from graphene_django_extensions import NestingModelSerializer
+from rest_framework.exceptions import ValidationError
+
+from api.graphql.extensions import error_codes
 from common.date_utils import local_datetime
-from common.fields.serializer import IntegerPrimaryKeyField
+from common.utils import comma_sep_str
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
-from reservations.choices import ReservationStateChoice, ReservationTypeChoice
-from reservations.models import Reservation, ReservationDenyReason
+from reservations.choices import ReservationStateChoice
+from reservations.models import Reservation
+
+__all__ = [
+    "ReservationDenySerializer",
+]
 
 
-class ReservationDenySerializer(OldPrimaryKeySerializer):
-    deny_reason_pk = IntegerPrimaryKeyField(
-        queryset=ReservationDenyReason.objects.all(),
-        source="deny_reason",
-        required=True,
-        help_text="Primary key for the pre-defined deny reason.",
-    )
-
-    handling_details = serializers.CharField(
-        help_text="Additional information for denying.",
-        required=False,
-        allow_blank=True,
-    )
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["state"].read_only = True
-        self.fields["handled_at"].read_only = True
+class ReservationDenySerializer(NestingModelSerializer):
+    instance: Reservation
 
     class Meta:
         model = Reservation
         fields = [
             "pk",
-            "state",
+            "deny_reason",
             "handling_details",
+            "state",
             "handled_at",
-            "deny_reason_pk",
         ]
+        extra_kwargs = {
+            "state": {"read_only": True},
+            "handled_at": {"read_only": True},
+            "deny_reason": {"required": True},
+            "handling_details": {"required": True},
+        }
 
-    @property
-    def validated_data(self):
-        validated_data = super().validated_data
-        validated_data["state"] = ReservationStateChoice.DENIED.value
-        validated_data["handled_at"] = local_datetime()
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
+        if self.instance.state not in ReservationStateChoice.states_that_can_change_to_deny:
+            states = comma_sep_str(ReservationStateChoice.states_that_can_change_to_deny, last_sep="or", quote=True)
+            msg = f"Only reservations with states {states} can be denied."
+            raise ValidationError(msg, code=error_codes.RESERVATION_DENYING_NOT_ALLOWED)
 
-        return validated_data
-
-    def validate(self, data):
-        allowed_states = [ReservationStateChoice.REQUIRES_HANDLING.value, ReservationStateChoice.CONFIRMED.value]
-
-        if self.instance.state not in allowed_states:
-            raise ValidationErrorWithCode(
-                f"Only reservations with state as {', '.join(allowed_states)} can be denied.",
-                ValidationErrorCodes.DENYING_NOT_ALLOWED,
-            )
-
-        # For confirmed reservations check that the reservation has not ended.
-        if self.instance.state == ReservationStateChoice.CONFIRMED.value:
-            self.check_reservation_has_not_ended()
-
-        data = super().validate(data)
+        if self.instance.state == ReservationStateChoice.CONFIRMED:
+            now = local_datetime()
+            if self.instance.end < now:
+                msg = "Reservation cannot be denied after it has ended."
+                raise ValidationError(msg, code=error_codes.RESERVATION_DENYING_NOT_ALLOWED)
 
         return data
 
-    def check_reservation_has_not_ended(self):
-        now = local_datetime()
-
-        if self.instance.end < now:
-            raise ValidationErrorWithCode(
-                "Reservation cannot be denied when the reservation has ended.",
-                ValidationErrorCodes.DENYING_NOT_ALLOWED,
-            )
-
-    def save(self, **kwargs):
+    def save(self, **kwargs: Any) -> Reservation:
+        kwargs["state"] = ReservationStateChoice.DENIED.value
+        kwargs["handled_at"] = local_datetime()
         instance = super().save(**kwargs)
-        now = local_datetime()
-
-        # Send the notification email only for normal reservations which has not ended.
-        if instance.type == ReservationTypeChoice.NORMAL and instance.end > now:
-            ReservationEmailNotificationSender.send_deny_email(reservation=instance)
-
+        ReservationEmailNotificationSender.send_deny_email(reservation=instance)
         return instance

@@ -1,6 +1,13 @@
 from django.conf import settings
 from django.db import models
+from django.utils.functional import classproperty
 from django.utils.translation import gettext_lazy as _
+
+__all__ = [
+    "CustomerTypeChoice",
+    "ReservationStateChoice",
+    "ReservationTypeChoice",
+]
 
 
 class CustomerTypeChoice(models.TextChoices):
@@ -16,6 +23,20 @@ class ReservationStateChoice(models.TextChoices):
     WAITING_FOR_PAYMENT = "waiting_for_payment", _("Waiting for payment")
     CONFIRMED = "confirmed", _("Confirmed")
     DENIED = "denied", _("Denied")
+
+    @classproperty
+    def states_that_can_change_to_handling(self) -> list["ReservationStateChoice"]:
+        return [
+            ReservationStateChoice.CONFIRMED,
+            ReservationStateChoice.DENIED,
+        ]
+
+    @classproperty
+    def states_that_can_change_to_deny(self) -> list["ReservationStateChoice"]:
+        return [
+            ReservationStateChoice.REQUIRES_HANDLING,
+            ReservationStateChoice.CONFIRMED,
+        ]
 
 
 class ReservationTypeChoice(models.TextChoices):

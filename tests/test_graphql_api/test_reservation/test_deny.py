@@ -76,7 +76,10 @@ def test_reservation__deny__status_not_allowed_states(graphql):
     input_data = get_deny_data(reservation)
     response = graphql(DENY_MUTATION, input_data=input_data)
 
-    assert response.error_message() == "Only reservations with state as requires_handling, confirmed can be denied."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Only reservations with states 'requires_handling' or 'confirmed' can be denied.",
+    ]
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CREATED
@@ -87,27 +90,27 @@ def test_reservation__deny__reason_missing(graphql):
 
     graphql.login_with_superuser()
     input_data = get_deny_data(reservation)
-    input_data.pop("denyReasonPk")
+    input_data.pop("denyReason")
     response = graphql(DENY_MUTATION, input_data=input_data)
 
-    assert response.error_message().startswith("Variable '$input'")  # Schema error
+    assert response.has_schema_errors
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
 
 
-def test_reservation__deny__empty_handling_details(graphql):
+def test_reservation__deny__handling_details_missing(graphql):
     reservation = ReservationFactory.create_for_deny()
 
     graphql.login_with_superuser()
-    input_data = get_deny_data(reservation, handlingDetails="")
+    input_data = get_deny_data(reservation)
+    input_data.pop("handlingDetails")
     response = graphql(DENY_MUTATION, input_data=input_data)
 
-    assert response.has_errors is False, response.errors
+    assert response.has_schema_errors
 
     reservation.refresh_from_db()
-    assert reservation.state == ReservationStateChoice.DENIED
-    assert reservation.handling_details == ""
+    assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
 
 
 def test_reservation__deny__state_confirmed_and_reservation_ended(graphql):
@@ -122,7 +125,10 @@ def test_reservation__deny__state_confirmed_and_reservation_ended(graphql):
     input_data = get_deny_data(reservation)
     response = graphql(DENY_MUTATION, input_data=input_data)
 
-    assert response.error_message() == "Reservation cannot be denied when the reservation has ended."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Reservation cannot be denied after it has ended.",
+    ]
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CONFIRMED
