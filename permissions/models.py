@@ -52,6 +52,10 @@ class GeneralPermissionChoices(models.TextChoices):
         "can_manage_age_groups",
         _("Can create, edit and delete age groups in the whole system"),
     )
+    CAN_MANAGE_QUALIFIERS = (
+        "can_manage_qualifiers",
+        _("Can create, edit and delete qualifiers in the whole system"),
+    )
     CAN_MANAGE_ABILITY_GROUPS = (
         "can_manage_ability_groups",
         _("Can create, edit and delete ability groups in the whole system"),

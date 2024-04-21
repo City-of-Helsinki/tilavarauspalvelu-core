@@ -6,6 +6,7 @@ from django.db import models
 
 from common.date_utils import local_datetime
 from common.typing import AnyUser
+from permissions.models import GeneralPermissionChoices, ServiceSectorPermissionsChoices, UnitPermissionChoices
 
 if TYPE_CHECKING:
     from applications.models import Application
@@ -15,13 +16,13 @@ if TYPE_CHECKING:
     from spaces.models import ServiceSector, Space, Unit
 
 
-def has_general_permission(user: AnyUser, required_permission: str) -> bool:
+def has_general_permission(user: AnyUser, required_permission: GeneralPermissionChoices) -> bool:
     if user.is_anonymous:
         return False
     return required_permission in user.general_permissions
 
 
-def has_unit_permission(user: AnyUser, required_permission: str, units: list[int]) -> bool:
+def has_unit_permission(user: AnyUser, required_permission: UnitPermissionChoices, units: list[int]) -> bool:
     from spaces.models import UnitGroup
 
     if user.is_anonymous:
@@ -34,48 +35,60 @@ def has_unit_permission(user: AnyUser, required_permission: str, units: list[int
     return has_unit_group_permission(user, required_permission, unit_groups)
 
 
-def has_unit_group_permission(user: AnyUser, required_permission: str, unit_groups: list[int]) -> bool:
+def has_unit_group_permission(
+    user: AnyUser,
+    required_permission: UnitPermissionChoices,
+    unit_groups: list[int],
+) -> bool:
     if user.is_anonymous:
         return False
     return any(required_permission in user.unit_group_permissions.get(unit_group, []) for unit_group in unit_groups)
 
 
-def has_service_sector_permission(user: AnyUser, required_permission: str, service_sectors: list[int]) -> bool:
+def has_service_sector_permission(
+    user: AnyUser,
+    required_permission: ServiceSectorPermissionsChoices,
+    service_sectors: list[int],
+) -> bool:
     if user.is_anonymous:
         return False
     return any(required_permission in user.service_sector_permissions.get(sector, []) for sector in service_sectors)
 
 
 def can_manage_units(user: AnyUser, unit: Unit) -> bool:
-    permission = "can_manage_units"
+    general_permission = GeneralPermissionChoices.CAN_MANAGE_UNITS
+    unit_permission = UnitPermissionChoices.CAN_MANAGE_UNITS
+    service_sector_permission = ServiceSectorPermissionsChoices.CAN_MANAGE_UNITS
 
     if user.is_anonymous:
         return False
     if user.is_superuser:
         return True
-    if has_general_permission(user, permission):
+    if has_general_permission(user, general_permission):
         return True
-    if has_unit_permission(user, permission, [unit.id]):
+    if has_unit_permission(user, unit_permission, [unit.id]):
         return True
 
     sectors: list[int] = list(unit.service_sectors.values_list("pk", flat=True))
-    return has_service_sector_permission(user, permission, sectors)
+    return has_service_sector_permission(user, service_sector_permission, sectors)
 
 
 def can_manage_units_reservation_units(user: AnyUser, unit: Unit) -> bool:
-    permission = "can_manage_reservation_units"
+    general_permission = GeneralPermissionChoices.CAN_MANAGE_RESERVATION_UNITS
+    unit_permission = UnitPermissionChoices.CAN_MANAGE_RESERVATION_UNITS
+    service_sector_permission = ServiceSectorPermissionsChoices.CAN_MANAGE_RESERVATION_UNITS
 
     if user.is_anonymous:
         return False
     if user.is_superuser:
         return True
-    if has_general_permission(user, permission):
+    if has_general_permission(user, general_permission):
         return True
-    if has_unit_permission(user, permission, [unit.id]):
+    if has_unit_permission(user, unit_permission, [unit.id]):
         return True
 
     sectors: list[int] = list(unit.service_sectors.values_list("pk", flat=True))
-    return has_service_sector_permission(user, permission, sectors)
+    return has_service_sector_permission(user, service_sector_permission, sectors)
 
 
 def can_modify_reservation_unit(user: AnyUser, reservation_unit: ReservationUnit) -> bool:
@@ -87,27 +100,29 @@ def can_modify_reservation_unit(user: AnyUser, reservation_unit: ReservationUnit
 
 
 def can_manage_service_sectors_applications(user: AnyUser, service_sector: ServiceSector) -> bool:
-    permission = "can_handle_applications"
+    general_permission = GeneralPermissionChoices.CAN_HANDLE_APPLICATIONS
+    service_sector_permission = ServiceSectorPermissionsChoices.CAN_HANDLE_APPLICATIONS
 
     if user.is_anonymous:
         return False
     if user.is_superuser:
         return True
-    if has_general_permission(user, permission):
+    if has_general_permission(user, general_permission):
         return True
-    return has_service_sector_permission(user, permission, [service_sector.pk])
+    return has_service_sector_permission(user, service_sector_permission, [service_sector.pk])
 
 
 def can_validate_unit_applications(user: AnyUser, units: list[int]) -> bool:
-    permission = "can_validate_applications"
+    general_permission = GeneralPermissionChoices.CAN_VALIDATE_APPLICATIONS
+    unit_permission = UnitPermissionChoices.CAN_VALIDATE_APPLICATIONS
 
     if user.is_anonymous:
         return False
     if user.is_superuser:
         return True
-    if has_general_permission(user, permission):
+    if has_general_permission(user, general_permission):
         return True
-    return has_unit_permission(user, permission, units)
+    return has_unit_permission(user, unit_permission, units)
 
 
 def can_modify_application(user: AnyUser, application: Application) -> bool:
@@ -153,7 +168,9 @@ def can_access_application_private_fields(user: AnyUser, application: Applicatio
 def can_view_reservation(user: AnyUser, reservation: Reservation, needs_staff_permissions: bool = False) -> bool:
     from spaces.models import ServiceSector, Unit
 
-    permission = "can_view_reservations"
+    general_permission = GeneralPermissionChoices.CAN_VIEW_RESERVATIONS
+    unit_permission = UnitPermissionChoices.CAN_VIEW_RESERVATIONS
+    service_sector_permission = ServiceSectorPermissionsChoices.CAN_VIEW_RESERVATIONS
 
     if user.is_anonymous:
         return False
@@ -161,22 +178,24 @@ def can_view_reservation(user: AnyUser, reservation: Reservation, needs_staff_pe
         return True
     if reservation.user == user and (user.has_staff_permissions if needs_staff_permissions else True):
         return True
-    if has_general_permission(user, permission):
+    if has_general_permission(user, general_permission):
         return True
 
     reservation_units = reservation.reservation_unit.all()
     units: list[int] = list(Unit.objects.filter(reservationunit__in=reservation_units).values_list("pk", flat=True))
-    if has_unit_permission(user, permission, units):
+    if has_unit_permission(user, unit_permission, units):
         return True
 
     sectors: list[int] = list(ServiceSector.objects.filter(units__in=units).values_list("pk", flat=True))
-    return has_service_sector_permission(user, permission, sectors)
+    return has_service_sector_permission(user, service_sector_permission, sectors)
 
 
 def can_modify_reservation(user: AnyUser, reservation: Reservation) -> bool:
     from spaces.models import ServiceSector, Unit
 
-    permission = "can_manage_reservations"
+    general_permission = GeneralPermissionChoices.CAN_MANAGE_RESERVATIONS
+    unit_permission = UnitPermissionChoices.CAN_MANAGE_RESERVATIONS
+    service_sector_permission = ServiceSectorPermissionsChoices.CAN_MANAGE_RESERVATIONS
 
     if user.is_anonymous:
         return False
@@ -184,43 +203,47 @@ def can_modify_reservation(user: AnyUser, reservation: Reservation) -> bool:
         return True
     if reservation.user == user:
         return True
-    if has_general_permission(user, permission):
+    if has_general_permission(user, general_permission):
         return True
 
     reservation_units = reservation.reservation_unit.all()
     units: list[int] = list(Unit.objects.filter(reservationunit__in=reservation_units).values_list("pk", flat=True))
-    if has_unit_permission(user, permission, units):
+    if has_unit_permission(user, unit_permission, units):
         return True
 
     sectors: list[int] = list(ServiceSector.objects.filter(units__in=units).values_list("pk", flat=True))
-    return has_service_sector_permission(user, permission, sectors)
+    return has_service_sector_permission(user, service_sector_permission, sectors)
 
 
 def can_handle_reservation(user: AnyUser, reservation: Reservation) -> bool:
     from spaces.models import ServiceSector, Unit
 
-    permission = "can_manage_reservations"
+    general_permission = GeneralPermissionChoices.CAN_MANAGE_RESERVATIONS
+    unit_permission = UnitPermissionChoices.CAN_MANAGE_RESERVATIONS
+    service_sector_permission = ServiceSectorPermissionsChoices.CAN_MANAGE_RESERVATIONS
 
     if user.is_anonymous:
         return False
     if user.is_superuser:
         return True
-    if has_general_permission(user, permission):
+    if has_general_permission(user, general_permission):
         return True
 
     reservation_units = reservation.reservation_unit.all()
     units: list[int] = list(Unit.objects.filter(reservationunit__in=reservation_units).values_list("pk", flat=True))
-    if has_unit_permission(user, permission, units):
+    if has_unit_permission(user, unit_permission, units):
         return True
 
     sectors: list[int] = list(ServiceSector.objects.filter(units__in=units).values_list("pk", flat=True))
-    return has_service_sector_permission(user, permission, sectors)
+    return has_service_sector_permission(user, service_sector_permission, sectors)
 
 
 def can_comment_reservation(user: AnyUser, reservation: Reservation) -> bool:
     from spaces.models import ServiceSector, Unit
 
-    permission = "can_comment_reservations"
+    general_permission = GeneralPermissionChoices.CAN_COMMENT_RESERVATIONS
+    unit_permission = UnitPermissionChoices.CAN_COMMENT_RESERVATIONS
+    service_sector_permission = ServiceSectorPermissionsChoices.CAN_COMMENT_RESERVATIONS
 
     if user.is_anonymous:
         return False
@@ -228,16 +251,16 @@ def can_comment_reservation(user: AnyUser, reservation: Reservation) -> bool:
         return True
     if reservation.user == user and user.has_staff_permissions:
         return True
-    if has_general_permission(user, permission):
+    if has_general_permission(user, general_permission):
         return True
 
     reservation_units = reservation.reservation_unit.all()
     units: list[int] = list(Unit.objects.filter(reservationunit__in=reservation_units).values_list("pk", flat=True))
-    if has_unit_permission(user, permission, units):
+    if has_unit_permission(user, unit_permission, units):
         return True
 
     sectors: list[int] = list(ServiceSector.objects.filter(units__in=units).values_list("pk", flat=True))
-    if has_service_sector_permission(user, permission, sectors):
+    if has_service_sector_permission(user, service_sector_permission, sectors):
         return True
 
     return can_handle_reservation(user, reservation)
@@ -246,27 +269,31 @@ def can_comment_reservation(user: AnyUser, reservation: Reservation) -> bool:
 def can_handle_reservation_with_units(user: AnyUser, reservation_units: list[int]) -> bool:
     from spaces.models import ServiceSector, Unit
 
-    permission = "can_manage_reservations"
+    general_permission = GeneralPermissionChoices.CAN_MANAGE_RESERVATIONS
+    unit_permission = UnitPermissionChoices.CAN_MANAGE_RESERVATIONS
+    service_sector_permission = ServiceSectorPermissionsChoices.CAN_MANAGE_RESERVATIONS
 
     if user.is_anonymous:
         return False
     if user.is_superuser:
         return True
-    if has_general_permission(user, permission):
+    if has_general_permission(user, general_permission):
         return True
 
     units: list[int] = list(Unit.objects.filter(reservationunit__in=reservation_units).values_list("pk", flat=True))
-    if has_unit_permission(user, permission, units):
+    if has_unit_permission(user, unit_permission, units):
         return True
 
     sectors: list[int] = list(ServiceSector.objects.filter(units__in=units).values_list("pk", flat=True))
-    return has_service_sector_permission(user, permission, sectors)
+    return has_service_sector_permission(user, service_sector_permission, sectors)
 
 
 def can_view_recurring_reservation(user: AnyUser, recurring_reservation: RecurringReservation) -> bool:
     from spaces.models import ServiceSector, Unit
 
-    permission = "can_view_reservations"
+    general_permission = GeneralPermissionChoices.CAN_VIEW_RESERVATIONS
+    unit_permission = UnitPermissionChoices.CAN_VIEW_RESERVATIONS
+    service_sector_permission = ServiceSectorPermissionsChoices.CAN_VIEW_RESERVATIONS
 
     if user.is_anonymous:
         return False
@@ -275,22 +302,24 @@ def can_view_recurring_reservation(user: AnyUser, recurring_reservation: Recurri
     if recurring_reservation.user == user:
         return True
 
-    if has_general_permission(user, permission):
+    if has_general_permission(user, general_permission):
         return True
 
     reservation_units = recurring_reservation.reservations.values_list("reservation_unit", flat=True)
     units: list[int] = list(Unit.objects.filter(reservationunit__in=reservation_units).values_list("pk", flat=True))
-    if has_unit_permission(user, permission, units):
+    if has_unit_permission(user, unit_permission, units):
         return True
 
     sectors: list[int] = list(ServiceSector.objects.filter(units__in=units).values_list("pk", flat=True))
-    return has_service_sector_permission(user, permission, sectors)
+    return has_service_sector_permission(user, service_sector_permission, sectors)
 
 
 def can_modify_recurring_reservation(user: AnyUser, recurring_reservation: RecurringReservation) -> bool:
     from spaces.models import ServiceSector, Unit
 
-    permission = "can_manage_reservations"
+    general_permission = GeneralPermissionChoices.CAN_MANAGE_RESERVATIONS
+    unit_permission = UnitPermissionChoices.CAN_MANAGE_RESERVATIONS
+    service_sector_permission = ServiceSectorPermissionsChoices.CAN_MANAGE_RESERVATIONS
 
     if user.is_anonymous:
         return False
@@ -298,160 +327,166 @@ def can_modify_recurring_reservation(user: AnyUser, recurring_reservation: Recur
         return True
     if recurring_reservation.user == user:
         return True
-    if has_general_permission(user, permission):
+    if has_general_permission(user, general_permission):
         return True
 
     reservation_unit = recurring_reservation.reservation_unit
     units: list[int] = list(Unit.objects.filter(reservationunit__in=[reservation_unit]).values_list("pk", flat=True))
-    if has_unit_permission(user, permission, units):
+    if has_unit_permission(user, unit_permission, units):
         return True
 
     sectors: list[int] = list(ServiceSector.objects.filter(units__in=units).values_list("pk", flat=True))
-    return has_service_sector_permission(user, permission, sectors)
+    return has_service_sector_permission(user, service_sector_permission, sectors)
 
 
 def can_manage_age_groups(user: AnyUser):
-    permission = "can_manage_age_groups"
+    general_permission = GeneralPermissionChoices.CAN_MANAGE_AGE_GROUPS
 
     if user.is_anonymous:
         return False
     if user.is_superuser:
         return True
-    return has_general_permission(user, permission)
+    return has_general_permission(user, general_permission)
 
 
 def can_manage_purposes(user: AnyUser):
-    permission = "can_manage_purposes"
+    general_permission = GeneralPermissionChoices.CAN_MANAGE_PURPOSES
 
     if user.is_anonymous:
         return False
     if user.is_superuser:
         return True
-    return has_general_permission(user, permission)
+    return has_general_permission(user, general_permission)
 
 
 def can_manage_qualifiers(user: AnyUser):
-    permission = "can_manage_qualifiers"
+    general_permission = GeneralPermissionChoices.CAN_MANAGE_QUALIFIERS
 
     if user.is_anonymous:
         return False
     if user.is_superuser:
         return True
-    return has_general_permission(user, permission)
+    return has_general_permission(user, general_permission)
 
 
 def can_manage_reservation_purposes(user: AnyUser):
-    permission = "can_manage_reservation_purposes"
+    general_permission = GeneralPermissionChoices.CAN_MANAGE_RESERVATION_PURPOSES
 
     if user.is_anonymous:
         return False
     if user.is_superuser:
         return True
-    return has_general_permission(user, permission)
+    return has_general_permission(user, general_permission)
 
 
 def can_manage_ability_groups(user: AnyUser):
-    permission = "can_manage_ability_groups"
+    general_permission = GeneralPermissionChoices.CAN_MANAGE_ABILITY_GROUPS
 
     if user.is_anonymous:
         return False
     if user.is_superuser:
         return True
-    return has_general_permission(user, permission)
+    return has_general_permission(user, general_permission)
 
 
 def can_manage_equipment_categories(user: AnyUser):
-    permission = "can_manage_equipment_categories"
+    general_permission = GeneralPermissionChoices.CAN_MANAGE_EQUIPMENT_CATEGORIES
 
     if user.is_anonymous:
         return False
     if user.is_superuser:
         return True
-    return has_general_permission(user, permission)
+    return has_general_permission(user, general_permission)
 
 
 def can_manage_equipment(user: AnyUser):
-    permission = "can_manage_equipment"
+    general_permission = GeneralPermissionChoices.CAN_MANAGE_EQUIPMENT
 
     if user.is_anonymous:
         return False
     if user.is_superuser:
         return True
-    return has_general_permission(user, permission)
+    return has_general_permission(user, general_permission)
 
 
 def can_manage_resources(user: AnyUser, space: Space | None = None):
-    permission = "can_manage_resources"
+    general_permission = GeneralPermissionChoices.CAN_MANAGE_RESOURCES
+    unit_permission = UnitPermissionChoices.CAN_MANAGE_RESOURCES
+    service_sector_permission = ServiceSectorPermissionsChoices.CAN_MANAGE_RESOURCES
 
     if user.is_anonymous:
         return False
     if user.is_superuser:
         return True
-    if has_general_permission(user, permission):
+    if has_general_permission(user, general_permission):
         return True
     if space is None:
         return False
-    if has_unit_permission(user, permission, [space.unit.pk]):
+    if has_unit_permission(user, unit_permission, [space.unit.pk]):
         return True
 
     sectors: list[int] = list(space.unit.service_sectors.values_list("pk", flat=True))
-    return has_service_sector_permission(user, permission, sectors)
+    return has_service_sector_permission(user, service_sector_permission, sectors)
 
 
 def can_manage_spaces(user: AnyUser):
-    permission = "can_manage_spaces"
+    general_permission = GeneralPermissionChoices.CAN_MANAGE_SPACES
 
     if user.is_anonymous:
         return False
     if user.is_superuser:
         return True
-    return has_general_permission(user, permission)
+    return has_general_permission(user, general_permission)
 
 
 def can_manage_units_spaces(user: AnyUser, unit: Unit):
-    permission = "can_manage_spaces"
+    general_permission = GeneralPermissionChoices.CAN_MANAGE_SPACES
+    unit_permission = UnitPermissionChoices.CAN_MANAGE_SPACES
+    service_sector_permission = ServiceSectorPermissionsChoices.CAN_MANAGE_SPACES
 
     if user.is_anonymous:
         return False
     if user.is_superuser:
         return True
-    if has_general_permission(user, permission):
+    if has_general_permission(user, general_permission):
         return True
-    if has_unit_permission(user, permission, [unit.pk]):
+    if has_unit_permission(user, unit_permission, [unit.pk]):
         return True
 
     sectors: list[int] = list(unit.service_sectors.values_list("pk", flat=True))
-    return has_service_sector_permission(user, permission, sectors)
+    return has_service_sector_permission(user, service_sector_permission, sectors)
 
 
 def can_view_users(user: AnyUser):
     from spaces.models import ServiceSector, Unit
 
-    permission = "can_view_users"
+    general_permission = GeneralPermissionChoices.CAN_VIEW_USERS
+    unit_permission = UnitPermissionChoices.CAN_VIEW_USERS
+    service_sector_permission = ServiceSectorPermissionsChoices.CAN_VIEW_USERS
 
     if user.is_anonymous:
         return False
     if user.is_superuser:
         return True
-    if has_general_permission(user, permission):
+    if has_general_permission(user, general_permission):
         return True
 
     units: list[int] = list(Unit.objects.all().values_list("pk", flat=True))
-    if has_unit_permission(user, permission, units):
+    if has_unit_permission(user, unit_permission, units):
         return True
 
     sectors: list[int] = list(ServiceSector.objects.all().values_list("pk", flat=True))
-    return has_service_sector_permission(user, permission, sectors)
+    return has_service_sector_permission(user, service_sector_permission, sectors)
 
 
 def can_refresh_order(user: AnyUser, payment_order: PaymentOrder | None) -> bool:
-    permission = "can_manage_reservations"
+    general_permission = GeneralPermissionChoices.CAN_MANAGE_RESERVATIONS
 
     if user.is_anonymous:
         return False
     if user.is_superuser:
         return True
-    if has_general_permission(user, permission):
+    if has_general_permission(user, general_permission):
         return True
     if payment_order is None:
         return False
@@ -461,29 +496,32 @@ def can_refresh_order(user: AnyUser, payment_order: PaymentOrder | None) -> bool
 def can_create_staff_reservation(user: AnyUser, units: list[int]) -> bool:
     from spaces.models import ServiceSector
 
-    permission = "can_create_staff_reservations"
+    general_permission = GeneralPermissionChoices.CAN_CREATE_STAFF_RESERVATIONS
+    unit_permission = UnitPermissionChoices.CAN_CREATE_STAFF_RESERVATIONS
+    service_sector_permission = ServiceSectorPermissionsChoices.CAN_CREATE_STAFF_RESERVATIONS
 
     if user.is_anonymous:
         return False
     if user.is_superuser:
         return True
-    if has_general_permission(user, permission):
+    if has_general_permission(user, general_permission):
         return True
 
-    if has_unit_permission(user, permission, units):
+    if has_unit_permission(user, unit_permission, units):
         return True
 
     sectors: list[int] = list(ServiceSector.objects.filter(units__in=units).values_list("pk", flat=True))
-    return has_service_sector_permission(user, permission, sectors)
+    return has_service_sector_permission(user, service_sector_permission, sectors)
 
 
 def can_manage_banner_notifications(user: AnyUser) -> bool:
-    permission = "can_manage_notifications"
+    general_permission = GeneralPermissionChoices.CAN_MANAGE_NOTIFICATIONS
+
     if user.is_anonymous:
         return False
     if user.is_superuser:
         return True
-    return has_general_permission(user, permission)
+    return has_general_permission(user, general_permission)
 
 
 # HELPERS FOR FINDING OBJECTS WHERE USER HAS PERMISSIONS
@@ -492,31 +530,34 @@ def can_manage_banner_notifications(user: AnyUser) -> bool:
 def get_service_sectors_where_can_view_applications(user: AnyUser) -> models.QuerySet:
     from spaces.models import ServiceSector
 
-    permission = "can_handle_applications"
+    general_permission = GeneralPermissionChoices.CAN_HANDLE_APPLICATIONS
+    service_sector_permission = ServiceSectorPermissionsChoices.CAN_HANDLE_APPLICATIONS
 
     if user.is_anonymous:
         return ServiceSector.objects.none().values("pk").values("pk")
     if user.is_superuser:
         return ServiceSector.objects.all().values("pk")
-    if has_general_permission(user, permission):
+    if has_general_permission(user, general_permission):
         return ServiceSector.objects.all().values("pk")
 
-    service_sector_ids = [pk for pk, perms in user.service_sector_permissions.items() if permission in perms]
+    service_sector_ids = [
+        pk for pk, perms in user.service_sector_permissions.items() if service_sector_permission.value in perms
+    ]
     return ServiceSector.objects.filter(id__in=service_sector_ids).values("pk")
 
 
 def get_units_where_can_view_applications(user: AnyUser) -> models.QuerySet:
     from spaces.models import Unit
 
-    permission = "can_validate_applications"
+    unit_permission = UnitPermissionChoices.CAN_VALIDATE_APPLICATIONS
 
     if user.is_anonymous:
         return Unit.objects.none().values("pk")
     if user.is_superuser:
         return Unit.objects.all().values("pk")
 
-    unit_ids = [pk for pk, perms in user.unit_permissions.items() if permission in perms]
-    unit_group_ids = [pk for pk, perms in user.unit_group_permissions.items() if permission in perms]
+    unit_ids = [pk for pk, perms in user.unit_permissions.items() if unit_permission.value in perms]
+    unit_group_ids = [pk for pk, perms in user.unit_group_permissions.items() if unit_permission.value in perms]
 
     return (
         Unit.objects.filter(models.Q(id__in=unit_ids) | models.Q(unit_groups__in=unit_group_ids))
@@ -528,17 +569,18 @@ def get_units_where_can_view_applications(user: AnyUser) -> models.QuerySet:
 def get_units_where_can_view_reservations(user: AnyUser) -> models.QuerySet:
     from spaces.models import Unit
 
-    permission = "can_view_reservations"
+    general_permission = GeneralPermissionChoices.CAN_VIEW_RESERVATIONS
+    unit_permission = UnitPermissionChoices.CAN_VIEW_RESERVATIONS
 
     if user.is_anonymous:
         return Unit.objects.none().values("pk")
     if user.is_superuser:
         return Unit.objects.all().values("pk")
-    if has_general_permission(user, permission):
+    if has_general_permission(user, general_permission):
         return Unit.objects.all().values("pk")
 
-    unit_ids = [pk for pk, perms in user.unit_permissions.items() if permission in perms]
-    unit_group_ids = [pk for pk, perms in user.unit_group_permissions.items() if permission in perms]
+    unit_ids = [pk for pk, perms in user.unit_permissions.items() if unit_permission.value in perms]
+    unit_group_ids = [pk for pk, perms in user.unit_group_permissions.items() if unit_permission.value in perms]
 
     return (
         Unit.objects.filter(models.Q(id__in=unit_ids) | models.Q(unit_groups__in=unit_group_ids))
@@ -551,11 +593,13 @@ def get_units_with_permission(user: AnyUser, permission: str) -> models.QuerySet
     """Given a permission, returns units that match to that permission on different levels"""
     from spaces.models import Unit
 
+    general_permission = GeneralPermissionChoices(permission)
+
     if user.is_anonymous:
         return Unit.objects.none().values("pk")
     if user.is_superuser:
         return Unit.objects.all().values("pk")
-    if has_general_permission(user, permission):
+    if has_general_permission(user, general_permission):
         return Unit.objects.all().values("pk")
 
     unit_ids = [pk for pk, perms in user.unit_permissions.items() if permission in perms]
@@ -576,14 +620,17 @@ def get_units_with_permission(user: AnyUser, permission: str) -> models.QuerySet
 def get_service_sectors_where_can_view_reservations(user: AnyUser) -> models.QuerySet:
     from spaces.models import ServiceSector
 
-    permission = "can_view_reservations"
+    general_permission = GeneralPermissionChoices.CAN_VIEW_RESERVATIONS
+    service_sector_permission = ServiceSectorPermissionsChoices.CAN_VIEW_RESERVATIONS
 
     if user.is_anonymous:
         return ServiceSector.objects.none().values("pk")
     if user.is_superuser:
         return ServiceSector.objects.all().values("pk")
-    if has_general_permission(user, permission):
+    if has_general_permission(user, general_permission):
         return ServiceSector.objects.all().values("pk")
 
-    service_sector_ids = [pk for pk, perms in user.service_sector_permissions.items() if permission in perms]
+    service_sector_ids = [
+        pk for pk, perms in user.service_sector_permissions.items() if service_sector_permission.value in perms
+    ]
     return ServiceSector.objects.filter(id__in=service_sector_ids).values("pk")
