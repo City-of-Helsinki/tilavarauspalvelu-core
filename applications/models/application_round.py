@@ -30,6 +30,7 @@ class ApplicationRound(models.Model):
     name: str = models.CharField(max_length=255)
     target_group: str = models.CharField(choices=TargetGroupChoice.choices, max_length=50)
     criteria: str = models.TextField(default="")
+    notes_when_applying: str = models.TextField(blank=True, default="")
 
     # When the application round accepts reservations
     application_period_begin: datetime = models.DateTimeField()
@@ -79,6 +80,9 @@ class ApplicationRound(models.Model):
     criteria_fi: str | None
     criteria_sv: str | None
     criteria_en: str | None
+    notes_when_applying_fi: str | None
+    notes_when_applying_sv: str | None
+    notes_when_applying_en: str | None
 
     class Meta:
         db_table = "application_round"

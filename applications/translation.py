@@ -15,7 +15,7 @@ class OrganisationTranslationOptions(TranslationOptions):
 
 @register(ApplicationRound)
 class ApplicationRoundTranslationOptions(TranslationOptions):
-    fields = ["name", "criteria"]
+    fields = ["name", "criteria", "notes_when_applying"]
 
 
 @register(City)

@@ -416,6 +416,22 @@ msgid "Application criteria (Swedish)"
 msgstr "Hakemuksen osa"
 
 #: applications/admin/forms/application_round.py
+msgid "Notes when applying"
+msgstr ""
+
+#: applications/admin/forms/application_round.py
+msgid "Notes when applying (Finnish)"
+msgstr ""
+
+#: applications/admin/forms/application_round.py
+msgid "Notes when applying (English)"
+msgstr ""
+
+#: applications/admin/forms/application_round.py
+msgid "Notes when applying (Swedish)"
+msgstr ""
+
+#: applications/admin/forms/application_round.py
 msgid "Name that describes the application round."
 msgstr ""
 
@@ -487,6 +503,10 @@ msgstr ""
 
 #: applications/admin/forms/application_round.py
 msgid "Application criteria for the application round in Swedish."
+msgstr ""
+
+#: applications/admin/forms/application_round.py
+msgid "Text to show to applicants while they fill out their application."
 msgstr ""
 
 #: applications/admin/forms/application_section.py

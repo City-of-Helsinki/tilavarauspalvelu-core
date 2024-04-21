@@ -381,6 +381,22 @@ msgid "Application criteria (Swedish)"
 msgstr "Hakukriteerit (ruotsiksi)"
 
 #: applications/admin/forms/application_round.py
+msgid "Notes when applying"
+msgstr "Huomioi hakiessa"
+
+#: applications/admin/forms/application_round.py
+msgid "Notes when applying (Finnish)"
+msgstr "Huomioi hakiessa (Suomeksi)"
+
+#: applications/admin/forms/application_round.py
+msgid "Notes when applying (English)"
+msgstr "Huomioi hakiessa (Englanniksi)"
+
+#: applications/admin/forms/application_round.py
+msgid "Notes when applying (Swedish)"
+msgstr "Huomioi hakiessa (Ruotsiksi)"
+
+#: applications/admin/forms/application_round.py
 msgid "Name that describes the application round."
 msgstr "Kausivarauskierrosta kuvaava nimi"
 
@@ -457,6 +473,10 @@ msgstr "Kausivarauskierroksen hakukriteerit englanniksi."
 #: applications/admin/forms/application_round.py
 msgid "Application criteria for the application round in Swedish."
 msgstr "Kausivarauskierroksen hakukriteerit ruotsiksi."
+
+#: applications/admin/forms/application_round.py
+msgid "Text to show to applicants while they fill out their application."
+msgstr "Teksti, joka näytetään hakijoille heidän täyttäessään hakemuksia."
 
 #: applications/admin/forms/application_section.py
 msgid "Application this section is in."
