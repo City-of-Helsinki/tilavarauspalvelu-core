@@ -4,13 +4,12 @@ from typing import Any
 
 from factory import fuzzy
 
-from common.date_utils import local_start_of_day
+from common.date_utils import local_start_of_day, next_hour
 from merchants.models import OrderStatus, PaymentType
 from reservation_units.enums import PricingType
 from reservation_units.models import ReservationUnit
 from reservations.choices import ReservationStateChoice, ReservationTypeChoice
 from reservations.models import Reservation
-from tests.helpers import next_hour
 
 from ._base import GenericDjangoModelFactory, ManyToManyFactory, NullableSubFactory, OneToManyFactory
 
@@ -141,7 +140,7 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
             end_datetime=day_start + datetime.timedelta(days=3),
         )
 
-        begin = next_hour(1)
+        begin = next_hour(plus_hours=1)
         kwargs.setdefault("state", ReservationStateChoice.CONFIRMED)
         kwargs.setdefault("type", ReservationTypeChoice.NORMAL)
         kwargs.setdefault("begin", begin)
@@ -158,7 +157,7 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         sub_kwargs.setdefault("cancellation_rule__can_be_cancelled_time_before", datetime.timedelta(hours=1))
         reservation_unit = ReservationUnitFactory.create(**sub_kwargs)
 
-        begin = next_hour(1)
+        begin = next_hour(plus_hours=1)
         kwargs.setdefault("state", ReservationStateChoice.CONFIRMED)
         kwargs.setdefault("begin", begin)
         kwargs.setdefault("end", begin + datetime.timedelta(hours=1))
@@ -186,7 +185,7 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
             end_datetime=day_start + datetime.timedelta(days=1),
         )
 
-        begin = next_hour(1)
+        begin = next_hour(plus_hours=1)
         kwargs.setdefault("state", ReservationStateChoice.CREATED)
         kwargs.setdefault("begin", begin)
         kwargs.setdefault("end", begin + datetime.timedelta(hours=1))
@@ -210,7 +209,7 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         sub_kwargs = cls.pop_sub_kwargs("reservation_unit", kwargs)
         reservation_unit = ReservationUnitFactory.create(**sub_kwargs)
 
-        begin = next_hour(1)
+        begin = next_hour(plus_hours=1)
         kwargs.setdefault("state", ReservationStateChoice.CONFIRMED)
         kwargs.setdefault("begin", begin)
         kwargs.setdefault("end", begin + datetime.timedelta(hours=1))
@@ -225,7 +224,7 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         sub_kwargs = cls.pop_sub_kwargs("reservation_unit", kwargs)
         reservation_unit = ReservationUnitFactory.create(**sub_kwargs)
 
-        begin = next_hour(1)
+        begin = next_hour(plus_hours=1)
         kwargs.setdefault("state", ReservationStateChoice.CREATED)
         kwargs.setdefault("begin", begin)
         kwargs.setdefault("end", begin + datetime.timedelta(hours=1))
@@ -240,7 +239,7 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         sub_kwargs = cls.pop_sub_kwargs("reservation_unit", kwargs)
         reservation_unit = ReservationUnitFactory.create(**sub_kwargs)
 
-        begin = next_hour(1)
+        begin = next_hour(plus_hours=1)
         kwargs.setdefault("state", ReservationStateChoice.REQUIRES_HANDLING)
         kwargs.setdefault("type", ReservationTypeChoice.NORMAL)
         kwargs.setdefault("begin", begin)
@@ -256,7 +255,7 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         sub_kwargs = cls.pop_sub_kwargs("reservation_unit", kwargs)
         reservation_unit = ReservationUnitFactory.create(**sub_kwargs)
 
-        begin = next_hour(-1)
+        begin = next_hour(plus_hours=-1)
         kwargs.setdefault("state", ReservationStateChoice.CANCELLED)
         kwargs.setdefault("begin", begin - datetime.timedelta(hours=2))
         kwargs.setdefault("end", begin - datetime.timedelta(hours=1))
@@ -278,7 +277,7 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         sub_kwargs = cls.pop_sub_kwargs("reservation_unit", kwargs)
         reservation_unit = ReservationUnitFactory.create(**sub_kwargs)
 
-        begin = next_hour(1)
+        begin = next_hour(plus_hours=1)
         kwargs.setdefault("state", ReservationStateChoice.CONFIRMED)
         kwargs.setdefault("begin", begin)
         kwargs.setdefault("end", begin + datetime.timedelta(hours=1))

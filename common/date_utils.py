@@ -196,6 +196,30 @@ def local_timedelta_string(delta: datetime.timedelta, /) -> str:
     return duration_string
 
 
+def next_hour(*, plus_minutes: int = 0, plus_hours: int = 0, plus_days: int = 0) -> datetime.datetime:
+    """
+    Return a timestamp for the next hour.
+
+    Without any arguments, the timestamp will be for the next full hour,
+    any additional arguments will be added to that.
+
+    >>> datetime.datetime.now()
+    2021-01-01 12:30:00
+
+    >>> next_hour()
+    13:00
+
+    >>> next_hour(plus_hours=1, plus_minutes=30)
+    14:30
+
+    >>> next_hour(plus_hours=-1)
+    12:00
+    """
+    now = local_datetime()
+    start_of_hour = now.replace(minute=0, second=0, microsecond=0)
+    return start_of_hour + datetime.timedelta(hours=1 + plus_hours, minutes=plus_minutes, days=plus_days)
+
+
 ### UTC TIME #############################################################################################
 
 

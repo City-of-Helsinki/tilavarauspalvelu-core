@@ -5,7 +5,7 @@ from django.utils.timezone import get_default_timezone
 from graphql_relay import to_global_id
 
 from applications.choices import WeekdayChoice
-from common.date_utils import local_datetime
+from common.date_utils import local_datetime, next_hour
 from reservation_units.enums import PricingType, ReservationUnitState
 from reservations.choices import ReservationStateChoice
 from terms_of_use.models import TermsOfUse
@@ -28,7 +28,7 @@ from tests.factories import (
     TermsOfUseFactory,
     UserFactory,
 )
-from tests.helpers import UserType, next_hour
+from tests.helpers import UserType
 
 from .helpers import reservation_unit_query, reservation_units_query
 
@@ -699,7 +699,7 @@ def test_reservation_unit__query__num_active_user_reservations(graphql):
 
     reservation_unit = ReservationUnitFactory.create()
 
-    begin = next_hour(1)
+    begin = next_hour(plus_hours=1)
     end = begin + datetime.timedelta(hours=1)
 
     # Correct user
@@ -737,7 +737,7 @@ def test_reservation_unit__query__num_active_user_reservations(graphql):
 def test_reservation_unit__query__num_active_user_reservations__user_unauthenticated(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
-    begin = next_hour(1)
+    begin = next_hour(plus_hours=1)
     end = begin + datetime.timedelta(hours=1)
 
     # Reservation with a user

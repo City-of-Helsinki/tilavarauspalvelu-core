@@ -4,7 +4,7 @@ import freezegun
 import pytest
 from django.utils.timezone import get_default_timezone
 
-from common.date_utils import local_datetime, timedelta_to_json
+from common.date_utils import local_datetime, next_hour, timedelta_to_json
 from reservations.choices import ReservationStateChoice, ReservationTypeChoice
 from reservations.models import Reservation
 from tests.factories import (
@@ -19,7 +19,6 @@ from tests.factories import (
     SpaceFactory,
     UserFactory,
 )
-from tests.helpers import next_hour
 
 from .helpers import CREATE_STAFF_MUTATION, get_staff_create_data
 
@@ -318,7 +317,7 @@ def test_reservation__staff_create__reservation_overlapping_fails(graphql):
     space = SpaceFactory.create()
     reservation_unit = ReservationUnitFactory.create(spaces=[space])
 
-    begin = next_hour(1)
+    begin = next_hour(plus_hours=1)
     end = begin + datetime.timedelta(hours=1)
 
     ReservationFactory.create(
@@ -339,7 +338,7 @@ def test_reservation__staff_create__buffer_times_cause_overlap_fails(graphql):
     space = SpaceFactory.create()
     reservation_unit = ReservationUnitFactory.create(spaces=[space])
 
-    begin = next_hour(1)
+    begin = next_hour(plus_hours=1)
     end = begin + datetime.timedelta(hours=1)
 
     ReservationFactory.create(
@@ -361,7 +360,7 @@ def test_reservation__staff_create__buffer_times_cause_overlap_fails_with_buffer
     space = SpaceFactory.create()
     reservation_unit = ReservationUnitFactory.create(spaces=[space])
 
-    begin = next_hour(1)
+    begin = next_hour(plus_hours=1)
     end = begin + datetime.timedelta(hours=1)
 
     ReservationFactory.create(
@@ -387,7 +386,7 @@ def test_reservation__staff_create__buffer_times_cause_overlap_fails_with_buffer
     space = SpaceFactory.create()
     reservation_unit = ReservationUnitFactory.create(spaces=[space])
 
-    begin = next_hour(1)
+    begin = next_hour(plus_hours=1)
     end = begin + datetime.timedelta(hours=1)
 
     ReservationFactory.create(
@@ -412,7 +411,7 @@ def test_reservation__staff_create__buffer_times_cause_overlap_fails_with_buffer
 def test_reservation__staff_create__interval_not_respected_fails(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
-    begin = next_hour(1, plus_minutes=1)
+    begin = next_hour(plus_hours=1, plus_minutes=1)
     end = begin + datetime.timedelta(hours=1)
 
     graphql.login_with_superuser()
