@@ -42,6 +42,7 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
     service_sector = factory.SubFactory("tests.factories.ServiceSectorFactory")
     terms_of_use = factory.SubFactory("tests.factories.TermsOfUseFactory")
     criteria = ""
+    notes_when_applying = ""
 
     @classmethod
     def create_in_status(cls, status: ApplicationRoundStatusChoice, **kwargs: Any) -> ApplicationRound:

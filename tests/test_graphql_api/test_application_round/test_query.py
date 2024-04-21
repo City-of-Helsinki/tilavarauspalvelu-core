@@ -26,6 +26,9 @@ def test_can_query_application_rounds__all_fields(graphql):
         criteriaFi
         criteriaEn
         criteriaSv
+        notesWhenApplyingFi
+        notesWhenApplyingEn
+        notesWhenApplyingSv
         applicationPeriodBegin
         applicationPeriodEnd
         reservationPeriodBegin
@@ -67,6 +70,9 @@ def test_can_query_application_rounds__all_fields(graphql):
         "criteriaFi": application_round.criteria_fi,
         "criteriaEn": application_round.criteria_en,
         "criteriaSv": application_round.criteria_sv,
+        "notesWhenApplyingFi": application_round.notes_when_applying_fi,
+        "notesWhenApplyingEn": application_round.notes_when_applying_en,
+        "notesWhenApplyingSv": application_round.notes_when_applying_sv,
         "applicationPeriodBegin": application_round.application_period_begin.isoformat(),
         "applicationPeriodEnd": application_round.application_period_end.isoformat(),
         "reservationPeriodBegin": application_round.reservation_period_begin.isoformat(),

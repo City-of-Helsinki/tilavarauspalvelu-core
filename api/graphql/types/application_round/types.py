@@ -25,6 +25,7 @@ class ApplicationRoundNode(DjangoNode):
             "target_group",
             "terms_of_use",
             "criteria",
+            "notes_when_applying",
             "application_period_begin",
             "application_period_end",
             "reservation_period_begin",

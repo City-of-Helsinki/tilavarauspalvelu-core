@@ -85,9 +85,11 @@ class ApplicationRoundAdminForm(forms.ModelForm):
             "service_sector",
             "terms_of_use",
             "criteria",
+            "notes_when_applying",
         ]
         widgets = {
             "criteria": TinyMCE(),
+            "notes_when_applying": TinyMCE(),
         }
         labels = {
             "name": _("Name"),
@@ -111,6 +113,10 @@ class ApplicationRoundAdminForm(forms.ModelForm):
             "criteria_fi": _("Application criteria (Finnish)"),
             "criteria_en": _("Application criteria (English)"),
             "criteria_sv": _("Application criteria (Swedish)"),
+            "notes_when_applying": _("Notes when applying"),
+            "notes_when_applying_fi": _("Notes when applying (Finnish)"),
+            "notes_when_applying_en": _("Notes when applying (English)"),
+            "notes_when_applying_sv": _("Notes when applying (Swedish)"),
         }
         help_texts = {
             "name": _("Name that describes the application round."),
@@ -134,4 +140,8 @@ class ApplicationRoundAdminForm(forms.ModelForm):
             "criteria_fi": _("Application criteria for the application round in Finnish."),
             "criteria_en": _("Application criteria for the application round in English."),
             "criteria_sv": _("Application criteria for the application round in Swedish."),
+            "notes_when_applying": _("Text to show to applicants while they fill out their application."),
+            "notes_when_applying_fi": _("Text to show to applicants while they fill out their application."),
+            "notes_when_applying_en": _("Text to show to applicants while they fill out their application."),
+            "notes_when_applying_sv": _("Text to show to applicants while they fill out their application."),
         }
