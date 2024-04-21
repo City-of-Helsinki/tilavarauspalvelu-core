@@ -2,9 +2,9 @@ import datetime
 
 import pytest
 
+from common.date_utils import next_hour
 from reservations.choices import ReservationStateChoice, ReservationTypeChoice
 from tests.factories import ReservationFactory, UserFactory
-from tests.helpers import next_hour
 
 from .helpers import UPDATE_STAFF_MUTATION, get_staff_modify_data
 
@@ -130,7 +130,7 @@ def test_reservation__staff_modify__wrong_state(graphql):
 
 
 def test_reservation__staff_modify__end_date_passed(graphql):
-    end = next_hour(-1, plus_days=-1)
+    end = next_hour(plus_hours=-1, plus_days=-1)
     begin = end - datetime.timedelta(hours=1)
 
     reservation = ReservationFactory.create_for_staff_update(begin=begin, end=end)

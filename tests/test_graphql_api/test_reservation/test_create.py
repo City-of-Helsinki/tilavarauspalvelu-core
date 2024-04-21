@@ -7,7 +7,7 @@ import pytest
 from django.utils.timezone import get_default_timezone
 from graphene_django_extensions.testing import parametrize_helper
 
-from common.date_utils import local_datetime, local_end_of_day, local_start_of_day
+from common.date_utils import local_datetime, local_end_of_day, local_start_of_day, next_hour
 from reservation_units.enums import PriceUnit, PricingStatus, ReservationKind
 from reservation_units.models import ReservationUnit
 from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
@@ -25,7 +25,7 @@ from tests.factories import (
     SpaceFactory,
     UserFactory,
 )
-from tests.helpers import ResponseMock, UserType, next_hour, patch_method
+from tests.helpers import ResponseMock, UserType, patch_method
 from users.helauth.clients import HelsinkiProfileClient
 from users.helauth.typing import ADLoginAMR
 from utils.decimal_utils import round_decimal
@@ -165,7 +165,7 @@ def test_reservation__create__cannot_set_reservation_price(graphql):
 def test_reservation__create__overlapping_reservation(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now()
 
-    begin = next_hour(1)
+    begin = next_hour(plus_hours=1)
     end = begin + timedelta(hours=1)
 
     # An overlapping reservation
@@ -234,7 +234,7 @@ def test_reservation__create__overlaps_with_reservation_buffer_before_or_after(
         buffer_time_after=reservation_unit_buffer_after,
     )
 
-    begin = next_hour(1)
+    begin = next_hour(plus_hours=1)
     end = begin + timedelta(hours=1)
 
     ReservationFactory.create(
@@ -324,7 +324,7 @@ def test_reservation__create__start_time_does_not_match_reservation_start_interv
         allow_reservations_without_opening_hours=allow_reservations_without_opening_hours
     )
 
-    begin = next_hour(1, plus_minutes=1)  # NOTE! 1 minute after the next hour
+    begin = next_hour(plus_hours=1, plus_minutes=1)  # NOTE! 1 minute after the next hour
     end = begin + timedelta(hours=1)
 
     graphql.login_with_superuser()
@@ -390,7 +390,7 @@ def test_reservation__create__reservation_unit_reservation_and_publish_in_the_pa
     publish_ends_delta,
     is_error,
 ):
-    begin = next_hour(1)
+    begin = next_hour(plus_hours=1)
     end = begin + timedelta(hours=1)
 
     reservation_unit = ReservationUnitFactory.create_reservable_now(
@@ -436,7 +436,7 @@ def test_reservation__create__under_max_reservations_per_user(graphql):
 def test_reservation__create__over_max_reservations_per_user(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(max_reservations_per_user=1)
 
-    begin = next_hour(1)
+    begin = next_hour(plus_hours=1)
     end = begin + timedelta(hours=1)
 
     user = graphql.login_with_superuser()
@@ -457,7 +457,7 @@ def test_reservation__create__over_max_reservations_per_user(graphql):
 def test_reservation__create__max_reservations_per_user__past_reservations(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(max_reservations_per_user=1)
 
-    begin = next_hour(1)
+    begin = next_hour(plus_hours=1)
     end = begin + timedelta(hours=1)
 
     user = graphql.login_with_superuser()
@@ -484,7 +484,7 @@ def test_reservation__create__max_reservations_per_user__reservations_for_other_
     reservation_unit_1 = ReservationUnitFactory.create_reservable_now(max_reservations_per_user=1)
     reservation_unit_2 = ReservationUnitFactory.create()
 
-    begin = next_hour(1)
+    begin = next_hour(plus_hours=1)
     end = begin + timedelta(hours=1)
 
     user = graphql.login_with_superuser()
@@ -519,7 +519,7 @@ def test_reservation__create__max_reservations_per_user__reservations_for_other_
         spaces=reservation_unit_1.spaces.all(),
     )
 
-    begin = next_hour(1)
+    begin = next_hour(plus_hours=1)
     end = begin + timedelta(hours=1)
 
     user = graphql.login_with_superuser()
@@ -611,8 +611,8 @@ def test_reservation__create__reservation_unit_reservations_min_and_max_days_bef
         reservations_min_days_before=reservations_min_days_before,
     )
 
-    begin = next_hour(1, plus_days=reservation_days_delta)
-    end = next_hour(2, plus_days=reservation_days_delta)
+    begin = next_hour(plus_hours=1, plus_days=reservation_days_delta)
+    end = next_hour(plus_hours=2, plus_days=reservation_days_delta)
 
     graphql.login_with_superuser()
     data = get_create_data(reservation_unit, begin=begin, end=end)
@@ -815,8 +815,8 @@ def test_reservation__create__price_calculation__future_pricing(graphql):
 def test_reservation__create__duration_is_not_multiple_of_interval(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now()
 
-    begin = next_hour(1)
-    end = next_hour(2, plus_minutes=1)
+    begin = next_hour(plus_hours=1)
+    end = next_hour(plus_hours=2, plus_minutes=1)
 
     graphql.login_with_superuser()
     input_data = get_create_data(reservation_unit, begin=begin, end=end)
@@ -1067,7 +1067,7 @@ def test_reservation__create__reservation_block_whole_day__blocks_reserving_for_
         spaces=[SpaceFactory.create()],
     )
 
-    begin = next_hour(1)
+    begin = next_hour(plus_hours=1)
     end = begin + timedelta(hours=1)
 
     ReservableTimeSpanFactory.create(
