@@ -1,92 +1,79 @@
-from rest_framework import serializers
+from typing import Any
 
-from api.graphql.extensions.serializers import OldPrimaryKeyUpdateSerializer
-from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
+from graphene_django_extensions import NestingModelSerializer
+from rest_framework.exceptions import ValidationError
+
+from api.graphql.extensions import error_codes
 from common.date_utils import local_datetime
-from common.fields.serializer import IntegerPrimaryKeyField
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from merchants.models import OrderStatus, PaymentOrder
 from reservations.choices import ReservationStateChoice
-from reservations.models import Reservation, ReservationCancelReason
+from reservations.models import Reservation
 from reservations.tasks import refund_paid_reservation_task
 
+__all__ = [
+    "ReservationCancellationSerializer",
+]
 
-class ReservationCancellationSerializer(OldPrimaryKeyUpdateSerializer):
-    cancel_reason_pk = IntegerPrimaryKeyField(
-        queryset=ReservationCancelReason.objects.all(),
-        source="cancel_reason",
-        required=True,
-        help_text="Primary key for the pre-defined cancel reason.",
-    )
-    cancel_details = serializers.CharField(
-        help_text="Additional information for the cancellation.",
-        required=False,
-    )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["state"].read_only = True
+class ReservationCancellationSerializer(NestingModelSerializer):
+    instance: Reservation
 
     class Meta:
         model = Reservation
         fields = [
             "pk",
-            "cancel_reason_pk",
+            "cancel_reason",
             "cancel_details",
             "state",
         ]
+        extra_kwargs = {
+            "state": {"read_only": True},
+            "cancel_reason": {"required": True},
+        }
 
-    @property
-    def validated_data(self):
-        validated_data = super().validated_data
-        validated_data["state"] = ReservationStateChoice.CANCELLED.value
-        return validated_data
-
-    def validate(self, data):
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         data = super().validate(data)
         if self.instance.state != ReservationStateChoice.CONFIRMED.value:
-            raise ValidationErrorWithCode(
-                "Only reservations in confirmed state can be cancelled through this.",
-                ValidationErrorCodes.CANCELLATION_NOT_ALLOWED,
-            )
+            state = str(ReservationStateChoice.CONFIRMED)
+            msg = f"Only reservations with state {state!r} can be cancelled."
+            raise ValidationError(msg, code=error_codes.RESERVATION_CANCELLATION_NOT_ALLOWED)
 
         now = local_datetime()
         if self.instance.begin < now:
-            ValidationErrorWithCode(
-                "Reservation cannot be cancelled when begin time is in past.",
-                ValidationErrorCodes.CANCELLATION_NOT_ALLOWED,
-            )
+            msg = "Reservation cannot be cancelled after it has begun."
+            raise ValidationError(msg, code=error_codes.RESERVATION_CANCELLATION_NOT_ALLOWED)
+
         for reservation_unit in self.instance.reservation_unit.all():
             cancel_rule = reservation_unit.cancellation_rule
-            if not cancel_rule:
-                raise ValidationErrorWithCode(
-                    "Reservation cannot be cancelled thus no cancellation rule.",
-                    ValidationErrorCodes.CANCELLATION_NOT_ALLOWED,
-                )
+            if cancel_rule is None:
+                msg = "Reservation cannot be cancelled because its reservation unit has no cancellation rule."
+                raise ValidationError(msg, code=error_codes.RESERVATION_CANCELLATION_NOT_ALLOWED)
+
             must_be_cancelled_before = self.instance.begin - cancel_rule.can_be_cancelled_time_before
             if must_be_cancelled_before < now:
-                raise ValidationErrorWithCode(
-                    "Reservation cannot be cancelled because the cancellation period has expired.",
-                    ValidationErrorCodes.CANCELLATION_NOT_ALLOWED,
-                )
+                msg = "Reservation cannot be cancelled because the cancellation period is over."
+                raise ValidationError(msg, code=error_codes.RESERVATION_CANCELLATION_NOT_ALLOWED)
+
             if cancel_rule.needs_handling:
-                raise ValidationErrorWithCode(
-                    "Reservation cancellation needs manual handling.",
-                    ValidationErrorCodes.REQUIRES_MANUAL_HANDLING,
-                )
+                msg = "Reservation cancellation needs manual handling."
+                raise ValidationError(msg, code=error_codes.RESERVATION_REQUIRES_MANUAL_HANDLING)
 
         return data
 
-    def save(self, **kwargs):
-        instance = super().save(**kwargs)
+    def save(self, **kwargs: Any) -> Reservation:
+        kwargs["state"] = ReservationStateChoice.CANCELLED.value
+        instance: Reservation = super().save(**kwargs)
 
-        payment_order = PaymentOrder.objects.filter(reservation=self.instance).first()
+        payment_order: PaymentOrder | None = instance.payment_order.first()
         payment_is_refundable = (
-            payment_order and payment_order.status == OrderStatus.PAID and not payment_order.refund_id
+            payment_order is not None  # There is a payment order
+            and payment_order.status == OrderStatus.PAID  # This is a paid reservation
+            and payment_order.refund_id is None  # Not refunded already
         )
 
-        if payment_is_refundable and self.instance.price_net > 0:
-            refund_paid_reservation_task.delay(self.instance.pk)
+        if payment_is_refundable and instance.price_net > 0:
+            refund_paid_reservation_task.delay(instance.pk)
 
         ReservationEmailNotificationSender.send_cancellation_email(reservation=instance)
         return instance

@@ -279,6 +279,7 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
 
         begin = next_hour(plus_hours=1)
         kwargs.setdefault("state", ReservationStateChoice.CONFIRMED)
+        kwargs.setdefault("type", ReservationTypeChoice.NORMAL)
         kwargs.setdefault("begin", begin)
         kwargs.setdefault("end", begin + datetime.timedelta(hours=1))
         kwargs.setdefault("reservation_unit", [reservation_unit])

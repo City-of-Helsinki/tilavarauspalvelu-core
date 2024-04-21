@@ -1,56 +1,51 @@
-from rest_framework import serializers
+from typing import Any
 
-from api.graphql.extensions.fields import DecimalField
-from api.graphql.extensions.serializers import OldPrimaryKeySerializer
-from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
+from graphene_django_extensions import NestingModelSerializer
+from rest_framework.exceptions import ValidationError
+
+from api.graphql.extensions import error_codes
 from common.date_utils import local_datetime
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from reservations.choices import ReservationStateChoice
 from reservations.models import Reservation
 
+__all__ = [
+    "ReservationApproveSerializer",
+]
 
-class ReservationApproveSerializer(OldPrimaryKeySerializer):
-    handling_details = serializers.CharField(
-        help_text="Additional information for approval.",
-        required=False,
-        allow_blank=True,
-    )
-    price = DecimalField()
-    price_net = DecimalField()
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["state"].read_only = True
-        self.fields["handled_at"].read_only = True
-        self.fields["price"].required = True
-        self.fields["price_net"].required = True
-        self.fields["handling_details"].required = True
+class ReservationApproveSerializer(NestingModelSerializer):
+    instance: Reservation
 
     class Meta:
         model = Reservation
-        fields = ["pk", "state", "handling_details", "handled_at", "price", "price_net"]
+        fields = [
+            "pk",
+            "price",
+            "price_net",
+            "handling_details",
+            "state",
+            "handled_at",
+        ]
+        extra_kwargs = {
+            "state": {"read_only": True},
+            "handled_at": {"read_only": True},
+            "handling_details": {"required": True},
+            "price": {"required": True},
+            "price_net": {"required": True},
+        }
 
-    @property
-    def validated_data(self):
-        validated_data = super().validated_data
-        validated_data["state"] = ReservationStateChoice.CONFIRMED.value
-        validated_data["handled_at"] = local_datetime()
-
-        return validated_data
-
-    def validate(self, data):
-        if self.instance.state != ReservationStateChoice.REQUIRES_HANDLING.value:
-            raise ValidationErrorWithCode(
-                f"Only reservations with state as {ReservationStateChoice.REQUIRES_HANDLING.value.upper()} "
-                f"can be approved.",
-                ValidationErrorCodes.APPROVING_NOT_ALLOWED,
-            )
-
-        data = super().validate(data)
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
+        if self.instance.state != ReservationStateChoice.REQUIRES_HANDLING:
+            state = str(ReservationStateChoice.REQUIRES_HANDLING)
+            msg = f"Only reservations with state {state!r} can be approved."
+            raise ValidationError(msg, code=error_codes.RESERVATION_APPROVING_NOT_ALLOWED)
 
         return data
 
-    def save(self, **kwargs):
+    def save(self, **kwargs: Any) -> Reservation:
+        kwargs["state"] = ReservationStateChoice.CONFIRMED.value
+        kwargs["handled_at"] = local_datetime()
         instance = super().save(**kwargs)
         ReservationEmailNotificationSender.send_approve_email(reservation=instance)
         return instance

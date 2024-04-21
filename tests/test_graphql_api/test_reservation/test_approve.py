@@ -1,5 +1,8 @@
+import datetime
+
 import pytest
 
+from common.date_utils import next_hour
 from email_notification.models import EmailType
 from reservations.choices import ReservationStateChoice
 from tests.factories import EmailTemplateFactory, ReservationFactory, ReservationUnitFactory, UserFactory
@@ -16,10 +19,15 @@ pytestmark = [
 def test_reservation__approve__superuser_can_approve(graphql, outbox, settings):
     settings.SEND_RESERVATION_NOTIFICATION_EMAILS = True
 
+    begin = next_hour()
+    end = begin + datetime.timedelta(hours=1)
+
     reservation_unit = ReservationUnitFactory.create()
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
         reservation_unit=[reservation_unit],
+        begin=begin,
+        end=end,
     )
 
     # A unit admin that will receive a notification about new reservations
@@ -81,7 +89,10 @@ def test_reservation__approve__cant_approve_if_status_not_requires_handling(grap
     data = get_approve_data(reservation)
     response = graphql(APPROVE_MUTATION, input_data=data)
 
-    assert response.error_message() == "Only reservations with state as REQUIRES_HANDLING can be approved."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Only reservations with state 'requires_handling' can be approved.",
+    ]
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CREATED
