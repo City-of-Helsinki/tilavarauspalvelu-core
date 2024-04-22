@@ -21,10 +21,16 @@ class ApplicationEmailContext(BaseEmailContext):
 
     # Builders
     @classmethod
-    def from_application(cls, application: Application) -> ApplicationEmailContext:
-        language: LanguageType = getattr(application.user, "preferred_language", None)
-        if not language:
-            language = settings.LANGUAGE_CODE
+    def from_application(
+        cls,
+        application: Application,
+        forced_language: LanguageType | None = None,
+    ) -> ApplicationEmailContext:
+        language = settings.LANGUAGE_CODE
+        if forced_language:
+            language = forced_language
+        elif user_language := getattr(application.user, "preferred_language", None):
+            language = user_language
 
         return ApplicationEmailContext(
             # Links
@@ -75,10 +81,16 @@ class ApplicationEmailBuilder(BaseEmailBuilder):
         super().__init__(template=template, context=context)
 
     @classmethod
-    def from_application(cls, *, template: EmailTemplate, application: Application) -> ApplicationEmailBuilder:
+    def from_application(
+        cls,
+        *,
+        template: EmailTemplate,
+        application: Application,
+        forced_language: LanguageType | None = None,
+    ) -> ApplicationEmailBuilder:
         return ApplicationEmailBuilder(
             template=template,
-            context=ApplicationEmailContext.from_application(application),
+            context=ApplicationEmailContext.from_application(application, forced_language=forced_language),
         )
 
     @classmethod

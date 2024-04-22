@@ -43,7 +43,7 @@ def send_staff_reservation_email_task(
         return
 
     email_notification_sender = EmailNotificationSender(email_type=email_type, recipients=recipients)
-    email_notification_sender.send_reservation_email(reservation=reservation)
+    email_notification_sender.send_reservation_email(reservation=reservation, forced_language=settings.LANGUAGE_CODE)
 
 
 def _get_reservation_staff_notification_recipients(

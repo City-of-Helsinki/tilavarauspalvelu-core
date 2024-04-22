@@ -53,9 +53,15 @@ class ReservationEmailContext(BaseEmailContext):
 
     # Builders
     @classmethod
-    def from_reservation(cls, reservation: Reservation) -> ReservationEmailContext:
+    def from_reservation(
+        cls,
+        reservation: Reservation,
+        forced_language: LanguageType | None = None,
+    ) -> ReservationEmailContext:
         language = settings.LANGUAGE_CODE
-        if reservation.reservee_language:
+        if forced_language:
+            language = forced_language
+        elif reservation.reservee_language:
             language = reservation.reservee_language
         elif reservation.user and reservation.user.preferred_language:
             language = reservation.user.preferred_language
@@ -237,10 +243,16 @@ class ReservationEmailBuilder(BaseEmailBuilder):
         super().__init__(template=template, context=context)
 
     @classmethod
-    def from_reservation(cls, *, template: EmailTemplate, reservation: Reservation) -> ReservationEmailBuilder:
+    def from_reservation(
+        cls,
+        *,
+        template: EmailTemplate,
+        reservation: Reservation,
+        forced_language: LanguageType | None = None,
+    ) -> ReservationEmailBuilder:
         return ReservationEmailBuilder(
             template=template,
-            context=ReservationEmailContext.from_reservation(reservation),
+            context=ReservationEmailContext.from_reservation(reservation, forced_language=forced_language),
         )
 
     @classmethod

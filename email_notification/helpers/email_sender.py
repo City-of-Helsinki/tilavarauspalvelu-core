@@ -46,7 +46,7 @@ class EmailNotificationSender:
             msg = f"Unable to send '{email_type}' notification, there is no EmailTemplate defined for it."
             raise SendEmailNotificationError(msg)
 
-    def send_reservation_email(self, *, reservation: Reservation):
+    def send_reservation_email(self, *, reservation: Reservation, forced_language: LanguageType | None = None):
         if self.recipients is None:
             # Get recipients from the reservation
             self.recipients = []
@@ -59,6 +59,7 @@ class EmailNotificationSender:
         message_builder = ReservationEmailBuilder.from_reservation(
             template=self.email_template,
             reservation=reservation,
+            forced_language=forced_language,
         )
 
         self._send_email(message_builder)
@@ -75,7 +76,7 @@ class EmailNotificationSender:
             )
             self._send_email(message_builder)
 
-    def send_application_email(self, *, application: Application):
+    def send_application_email(self, *, application: Application, forced_language: LanguageType | None = None):
         # Get recipients from the application
         if self.recipients is None:
             self.recipients = []
@@ -88,6 +89,7 @@ class EmailNotificationSender:
         message_builder = ApplicationEmailBuilder.from_application(
             template=self.email_template,
             application=application,
+            forced_language=forced_language,
         )
 
         self._send_email(message_builder)
