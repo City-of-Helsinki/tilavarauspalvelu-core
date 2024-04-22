@@ -7,14 +7,10 @@ import { useTranslation } from "next-i18next";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type {
-  ApplicationNode,
-  ApplicationRoundNode,
-} from "common/types/gql-types";
+import type { QueryApplicationArgs, Query } from "common/types/gql-types";
 import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
 import { Page1 } from "@/components/application/Page1";
 import Page2 from "@/components/application/Page2";
-import { CenterSpinner } from "@/components/common/common";
 import { getTranslation } from "@/modules/util";
 import {
   type ApplicationFormValues,
@@ -26,8 +22,10 @@ import { getValidationErrors } from "common/src/apolloUtils";
 import useReservationUnitsList from "@/hooks/useReservationUnitList";
 import { useApplicationUpdate } from "@/hooks/useApplicationUpdate";
 import { ErrorToast } from "@/components/common/ErrorToast";
-import { useApplicationQuery } from "@/hooks/useApplicationQuery";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { base64encode } from "common/src/helpers";
+import { createApolloClient } from "@/modules/apolloClient";
+import { APPLICATION_QUERY } from "common/src/queries/application";
 
 // TODO move this to a shared file
 // and combine all the separate error handling functions to one
@@ -102,10 +100,37 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const [id, slug] = params ?? [];
   const pk = Number.isNaN(Number(id)) ? null : Number(id);
 
+  const commonProps = getCommonServerSideProps();
   if (pk == null) {
     return {
       props: {
-        ...getCommonServerSideProps(),
+        ...commonProps,
+        notFound: true,
+        slug,
+        ...(await serverSideTranslations(locale ?? "fi")),
+      },
+      notFound: true,
+    };
+  }
+
+  const client = createApolloClient(commonProps.apiBaseUrl, ctx);
+  const typename = "ApplicationNode";
+  const { data } = await client.query<Query, QueryApplicationArgs>({
+    query: APPLICATION_QUERY,
+    variables: {
+      id: base64encode(`${typename}:${pk}`),
+    },
+  });
+
+  // Pass the application and round as props because we don't need to hydrate
+  // and our codegen would allow undefineds if we passed data instead.
+  const { application } = data;
+
+  const applicationRound = application?.applicationRound ?? undefined;
+  if (application == null || applicationRound == null) {
+    return {
+      props: {
+        ...commonProps,
         notFound: true,
         slug,
         ...(await serverSideTranslations(locale ?? "fi")),
@@ -116,24 +141,20 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   return {
     props: {
-      ...getCommonServerSideProps(),
-      key: locale,
-      pk,
+      ...commonProps,
       slug,
       ...(await serverSideTranslations(locale ?? "fi")),
+      data: {
+        application,
+        applicationRound,
+      },
     },
   };
 }
 
-function ApplicationRootPage({
-  application,
-  applicationRound,
-  pageId,
-}: {
-  application: ApplicationNode;
-  applicationRound: ApplicationRoundNode;
-  pageId: string;
-}): JSX.Element | null {
+function ApplicationRootPage({ slug, data }: PropsNarrowed): JSX.Element {
+  const { application, applicationRound } = data;
+  const pageId = slug;
   const router = useRouter();
 
   const [update, { error }] = useApplicationUpdate();
@@ -224,47 +245,4 @@ function ApplicationRootPage({
   );
 }
 
-function ApplicationPageWithQuery({
-  pk,
-  slug,
-}: PropsNarrowed): JSX.Element | null {
-  const router = useRouter();
-  const { t } = useTranslation();
-
-  const { application, error, isLoading } = useApplicationQuery(
-    pk ?? undefined
-  );
-
-  if (error != null) {
-    // eslint-disable-next-line no-console
-    console.error("applications query failed: ", error);
-    return (
-      <ErrorToast
-        error={`${t("common:error.dataError")}`}
-        onClose={() => router.reload()}
-      />
-    );
-  }
-
-  const applicationRound = application?.applicationRound ?? undefined;
-
-  if (pk == null) {
-    return <Error statusCode={404} />;
-  }
-  if (isLoading) {
-    return <CenterSpinner />;
-  }
-  if (application == null || applicationRound == null) {
-    return <Error statusCode={404} />;
-  }
-
-  return (
-    <ApplicationRootPage
-      application={application}
-      pageId={slug}
-      applicationRound={applicationRound}
-    />
-  );
-}
-
-export default ApplicationPageWithQuery;
+export default ApplicationRootPage;
