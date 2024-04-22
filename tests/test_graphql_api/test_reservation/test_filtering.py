@@ -286,10 +286,15 @@ def test_reservation__filter__by_only_with_handling_permission__unit_group_admin
     reservation_unit_2 = ReservationUnitFactory.create(unit=unit_2)
 
     admin = UserFactory.create_with_unit_group_permissions(
-        unit_group=unit_group_1, perms=["can_manage_reservations"], code="unit_group_manage"
+        unit_group=unit_group_1,
+        perms=["can_manage_reservations"],
+        code="unit_group_manage",
     )
     add_unit_group_permissions(
-        user=admin, unit_group=unit_group_2, perms=["can_view_reservations"], code="unit_group_view"
+        user=admin,
+        unit_group=unit_group_2,
+        perms=["can_view_reservations"],
+        code="unit_group_view",
     )
 
     # Reservation for the admin
@@ -320,10 +325,15 @@ def test_reservation__filter__by_only_with_handling_permission__service_sector_a
     reservation_unit_2 = ReservationUnitFactory.create(unit=unit_2)
 
     admin = UserFactory.create_with_service_sector_permissions(
-        service_sector=sector_1, perms=["can_manage_reservations"], code="sector_manage"
+        service_sector=sector_1,
+        perms=["can_manage_reservations"],
+        code="sector_manage",
     )
     add_service_sector_permissions(
-        user=admin, service_sector=sector_2, perms=["can_view_reservations"], code="sector_view"
+        user=admin,
+        service_sector=sector_2,
+        perms=["can_view_reservations"],
+        code="sector_view",
     )
 
     # Reservation for the admin

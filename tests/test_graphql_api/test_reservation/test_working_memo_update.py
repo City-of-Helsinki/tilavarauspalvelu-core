@@ -13,10 +13,7 @@ def test_reservation__update__working_memo__general_admin(graphql):
     reservation_unit = ReservationUnitFactory.create()
     reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
 
-    admin = UserFactory.create_with_general_permissions(
-        perms=["can_manage_reservations"],
-        code="foo",
-    )
+    admin = UserFactory.create_with_general_permissions(perms=["can_manage_reservations"])
 
     graphql.force_login(admin)
     data = get_working_memo_update_data(reservation)
@@ -32,10 +29,7 @@ def test_reservation__update__working_memo__general_commenter(graphql):
     reservation_unit = ReservationUnitFactory.create()
     reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
 
-    admin = UserFactory.create_with_general_permissions(
-        perms=["can_comment_reservations"],
-        code="foo",
-    )
+    admin = UserFactory.create_with_general_permissions(perms=["can_comment_reservations"])
 
     graphql.force_login(admin)
     data = get_working_memo_update_data(reservation)
@@ -55,7 +49,6 @@ def test_reservation__update__working_memo__service_sector_commenter(graphql):
     admin = UserFactory.create_with_service_sector_permissions(
         service_sector=sector,
         perms=["can_comment_reservations"],
-        code="foo",
     )
 
     graphql.force_login(admin)
@@ -75,7 +68,6 @@ def test_reservation__update__working_memo__unit_commenter(graphql):
     admin = UserFactory.create_with_unit_permissions(
         unit=reservation_unit.unit,
         perms=["can_comment_reservations"],
-        code="foo",
     )
 
     graphql.force_login(admin)
@@ -105,10 +97,7 @@ def test_reservation__update__working_memo__regular_user(graphql):
 def test_reservation__update__working_memo__staff_and_own_reservation(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
-    admin = UserFactory.create_with_general_permissions(
-        perms=["can_manage_purposes"],
-        code="foo",
-    )
+    admin = UserFactory.create_with_general_permissions(perms=["can_manage_purposes"])
 
     reservation = ReservationFactory.create(reservation_unit=[reservation_unit], user=admin)
 
@@ -125,10 +114,7 @@ def test_reservation__update__working_memo__staff_and_own_reservation(graphql):
 def test_reservation__update__working_memo__reserver_staff_user_and_not_own_reservation(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
-    admin = UserFactory.create_with_general_permissions(
-        perms=["can_manage_purposes"],
-        code="foo",
-    )
+    admin = UserFactory.create_with_general_permissions(perms=["can_manage_purposes"])
 
     reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
 

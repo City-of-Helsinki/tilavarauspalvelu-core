@@ -167,7 +167,6 @@ def test_reservation__approve__unit_reserver_can_approve_own_reservation(graphql
         user=UserFactory.create_with_unit_permissions(
             unit=reservation_unit.unit,
             perms=["can_create_staff_reservations"],
-            code="foo",
         ),
     )
 
@@ -192,7 +191,6 @@ def test_reservation__approve__unit_reserver_cant_approve_other_reservation(grap
     admin = UserFactory.create_with_unit_permissions(
         unit=reservation_unit.unit,
         perms=["can_create_staff_reservations"],
-        code="foo",
     )
 
     graphql.force_login(admin)
