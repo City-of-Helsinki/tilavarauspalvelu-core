@@ -208,11 +208,9 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
             before = reservation_unit.actions.get_actual_before_buffer(begin)
             after = reservation_unit.actions.get_actual_after_buffer(end)
 
-            if before > buffer_time_before:
-                buffer_time_before = before
+            buffer_time_before = max(before, buffer_time_before)
 
-            if after > buffer_time_after:
-                buffer_time_after = after
+            buffer_time_after = max(after, buffer_time_after)
 
         return buffer_time_before, buffer_time_after
 
