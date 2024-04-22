@@ -8,17 +8,85 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { env } from "@/env.mjs";
-import { getSignInUrl } from "common/src/urlBuilder";
+import { getSignInUrl, buildGraphQLUrl } from "common/src/urlBuilder";
 
 const apiBaseUrl = env.TILAVARAUS_API_URL ?? "";
 
-/// should we redirect to the login page
-function redirectProtectedRoute(req: NextRequest) {
-  // TODO check that the cookie is valid not just present
+/// Check if user is logged in
+/// @param req - NextRequest
+/// @returns boolean
+/// Checks both sessionid and makes a request to the backend to check if the session is valid
+/// log incorrect requests but don't throw errors
+async function isLoggedIn(req: NextRequest) {
   const { cookies, headers } = req;
   const hasSession = cookies.has("sessionid");
-
   if (!hasSession) {
+    return false;
+  }
+
+  const sessionid = cookies.get("sessionid");
+  const csrfToken = cookies.get("csrftoken");
+
+  if (csrfToken == null || sessionid == null) {
+    return false;
+  }
+
+  // TODO this is copy to the createApolloClient function but different header types
+  // NextRequest vs. RequestInit
+  const newHeaders = new Headers({
+    ...headers,
+    "Content-Type": "application/json",
+  });
+
+  newHeaders.append("X-Csrftoken", csrfToken.value);
+  newHeaders.append("Cookie", `sessionid=${sessionid.value}`);
+  newHeaders.append("Cookie", `csrftoken=${csrfToken.value}`);
+
+  // Use of fetch requires a string body (vs. gql query object)
+  // the request returns either a valid user (e.g. pk) or null if user was not found
+  const body: string = JSON.stringify({
+    query: `
+      query GetCurrentUser {
+        currentUser {
+          pk
+        }
+      }`,
+    variables: {},
+  });
+
+  const res = await fetch({
+    method: "POST",
+    url: buildGraphQLUrl(apiBaseUrl, env.ENABLE_FETCH_HACK),
+    headers: newHeaders,
+    // @ts-expect-error -- something broken in node types, body can be a string
+    body,
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    // eslint-disable-next-line no-console
+    console.warn(`request failed: ${res.status} with message: ${text}`);
+    return false;
+  }
+
+  const data = await res.json();
+  if (!data.data) {
+    // eslint-disable-next-line no-console
+    console.warn("no data in response");
+    return false;
+  }
+  const { currentUser } = data.data;
+  if (!currentUser) {
+    return false;
+  }
+  return true;
+}
+
+async function redirectProtectedRoute(req: NextRequest) {
+  const { headers } = req;
+  const isSignedIn = await isLoggedIn(req);
+
+  if (!isSignedIn) {
     // on the server we are behind a gateway so get the forwarded headers
     // localhost has no headers
     const currentUrl = req.url;
@@ -100,7 +168,7 @@ export async function middleware(req: NextRequest) {
   }
 
   if (authenticatedRoutes.some((route) => doesUrlMatch(req.url, route))) {
-    const redirect = redirectProtectedRoute(req);
+    const redirect = await redirectProtectedRoute(req);
     if (redirect) {
       return NextResponse.redirect(new URL(redirect, req.url));
     }

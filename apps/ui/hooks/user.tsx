@@ -14,8 +14,10 @@ export const useCurrentUser = (): {
     nextFetchPolicy: "cache-first",
   });
 
+  const currentUser =
+    data?.currentUser ?? previousData?.currentUser ?? undefined;
   return {
-    currentUser: data?.currentUser ?? previousData?.currentUser ?? undefined,
+    currentUser,
     error,
     loading,
   };
