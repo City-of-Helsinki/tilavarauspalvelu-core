@@ -10,11 +10,13 @@ import type { NextRequest } from "next/server";
 import { getSignInUrl } from "@/modules/const";
 import { env } from "@/env.mjs";
 
+const apiBaseUrl = env.TILAVARAUS_API_URL ?? "";
+
+/// should we redirect to the login page
 function redirectProtectedRoute(req: NextRequest) {
   // TODO check that the cookie is valid not just present
   const { cookies, headers } = req;
   const hasSession = cookies.has("sessionid");
-  const apiBaseUrl = env.TILAVARAUS_API_URL ?? "";
 
   if (!hasSession) {
     // on the server we are behind a gateway so get the forwarded headers
@@ -27,6 +29,40 @@ function redirectProtectedRoute(req: NextRequest) {
     return getSignInUrl(apiBaseUrl, url.pathname, origin);
   }
   return undefined;
+}
+
+/// are we missing a csrf token in cookies and should redirect to get one
+function redirectCsrfToken(req: NextRequest): URL | undefined {
+  // need to ignore all assets outside of html requests (which don't have an extension)
+  // so could we just check any request that doesn't have an extension?
+  if (
+    req.url.startsWith("/_next") ||
+    req.url.match(
+      /\.(js|css|png|jpg|jpeg|svg|gif|ico|json|woff|woff2|ttf|eot|otf)$/
+    )
+  ) {
+    return undefined;
+  }
+
+  const { cookies } = req;
+  const hasCsrfToken = cookies.has("csrftoken");
+  if (hasCsrfToken) {
+    return undefined;
+  }
+
+  const csrfUrl = `${apiBaseUrl}/csrf/`;
+  const redirectUrl = new URL(csrfUrl);
+  const requestUrl = new URL(req.url);
+
+  // On server envs everything is in the same domain and 80/443 ports, so ignore the host part of the url.
+  // More robust solution (supporting separate domains) would need to take into account us being behind
+  // a gateway so the public url doesn't match the internal url.
+  const origin = requestUrl.origin;
+  const hostPart = origin.includes("localhost") ? origin : "";
+  const next = `${hostPart}${requestUrl.pathname}`;
+  redirectUrl.searchParams.set("redirect_to", next);
+
+  return redirectUrl;
 }
 
 // Run the middleware only on paths that require authentication
@@ -43,12 +79,23 @@ const authenticatedRoutes = [
   "success",
 ];
 // url matcher that is very specific to our case
-const doesUrlMatch = (url: string, route: string) => {
+function doesUrlMatch(url: string, route: string) {
   const ref: string[] = url.split("/");
   return ref.includes(route);
-};
+}
 
-export const middleware = async (req: NextRequest) => {
+export async function middleware(req: NextRequest) {
+  const redirectUrl = redirectCsrfToken(req);
+  if (redirectUrl) {
+    // block infinite redirect loop (there is no graceful way to handle this)
+    if (req.url.includes("redirect_to")) {
+      // eslint-disable-next-line no-console
+      console.error("Infinite redirect loop detected");
+      return NextResponse.next();
+    }
+    return NextResponse.redirect(redirectUrl);
+  }
+
   if (authenticatedRoutes.some((route) => doesUrlMatch(req.url, route))) {
     const redirect = redirectProtectedRoute(req);
     if (redirect) {
@@ -56,7 +103,7 @@ export const middleware = async (req: NextRequest) => {
     }
   }
   return NextResponse.next();
-};
+}
 
 export const config = {
   /* i18n locale router and middleware have a bug in nextjs, matcher breaks the router

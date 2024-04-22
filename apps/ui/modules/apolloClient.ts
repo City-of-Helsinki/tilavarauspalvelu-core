@@ -31,20 +31,16 @@ function getServerCookie(
 ) {
   const cookie = headers?.cookie;
   if (cookie == null) {
-    // eslint-disable-next-line no-console
-    console.warn("cookie not found in headers", headers);
     return null;
   }
   const decoded = qs.decode(cookie, "; ");
   const token = decoded[name];
   if (token == null) {
-    // eslint-disable-next-line no-console
-    console.warn(`${name} not found in cookie`, decoded);
     return null;
   }
   if (Array.isArray(token)) {
     // eslint-disable-next-line no-console
-    console.warn(`multiple ${name} in cookies`, decoded);
+    console.warn(`multiple ${name} in cookies`, token);
     return token[0];
   }
   return token;
@@ -55,28 +51,46 @@ export function createApolloClient(
   ctx?: GetServerSidePropsContext<ParsedUrlQuery, PreviewData>
 ) {
   const isServer = typeof window === "undefined";
+
+  const uri = buildGraphQLUrl(hostUrl, env.ENABLE_FETCH_HACK);
   const csrfToken = isServer
     ? getServerCookie(ctx?.req?.headers, "csrftoken")
     : getCookie("csrftoken");
 
-  const sessionCookie = isServer
-    ? getServerCookie(ctx?.req?.headers, "sessionid")
-    : getCookie("sessionid");
-
-  const uri = buildGraphQLUrl(hostUrl, env.ENABLE_FETCH_HACK);
-
-  // TODO on client side we might not need this (only on SSR)
-  const enchancedFetch = (url: RequestInfo | URL, init?: RequestInit) => {
+  const enchancedFetch = async (url: RequestInfo | URL, init?: RequestInit) => {
     const headers = new Headers({
       ...(init?.headers != null ? init.headers : {}),
+      // TODO missing csrf token is a non recoverable error
       ...(csrfToken != null ? { "X-Csrftoken": csrfToken } : {}),
-      // NOTE server requests don't include cookies by default
-      // TODO include session cookie here also when we use SSR for user specific requests
-      ...(csrfToken != null ? { Cookie: `csrftoken=${csrfToken}` } : {}),
     });
 
-    if (sessionCookie != null) {
-      headers.append("Cookie", `sessionid=${sessionCookie}`);
+    // NOTE server requests don't include cookies by default
+    // TODO do we want to copy request headers from client or no?
+    if (isServer) {
+      if (csrfToken == null) {
+        throw new Error("csrftoken not found in cookies");
+      }
+      headers.append("Set-Cookie", `csrftoken=${csrfToken}`);
+      headers.append("Cookie", `csrftoken=${csrfToken}`);
+      // Django fails with 403 if there is no referer (only on Kubernetes)
+      const requestUrl = ctx?.req?.url ?? "";
+      const hostname =
+        ctx?.req?.headers?.["x-forwarded-host"] ??
+        ctx?.req?.headers?.host ??
+        "";
+      // NOTE not exactly correct
+      // For our case this is sufficent because we are always behind a proxy,
+      // but technically there is a case where we are not behind a gateway and not localhost
+      // so the proto would be https and no x-forwarded-proto set
+      // TODO we have .json blobs in the referer (translations), does it matter?
+      const proto = ctx?.req?.headers?.["x-forwarded-proto"] ?? "http";
+      headers.append("Referer", `${proto}://${hostname}${requestUrl}`);
+
+      const sessionCookie = getServerCookie(ctx?.req?.headers, "sessionid");
+      if (sessionCookie != null) {
+        headers.append("Cookie", `sessionid=${sessionCookie}`);
+        headers.append("Set-Cookie", `sessionid=${sessionCookie}`);
+      }
     }
 
     return fetch(url, {
@@ -89,7 +103,7 @@ export function createApolloClient(
     uri,
     // TODO this might be useless
     credentials: "include",
-    // @ts-expect-error: TODO undici (node fetch) is a mess
+    // @ts-expect-error: node-fetch is a subset of fetch API
     fetch: enchancedFetch,
   });
 
