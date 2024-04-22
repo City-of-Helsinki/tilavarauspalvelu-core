@@ -57,18 +57,12 @@ def test_user__superuser__has_staff_permissions():
 
 
 def test_user__general_admin__has_staff_permissions():
-    user = UserFactory.create_with_general_permissions(
-        perms=["can_manage_general_roles"],
-        code="foo",
-    )
+    user = UserFactory.create_with_general_permissions(perms=["can_manage_general_roles"])
     assert user.has_staff_permissions is True
 
 
 def test_user__general_admin__access_to_permissions(query_counter):
-    user = UserFactory.create_with_general_permissions(
-        perms=["can_manage_general_roles"],
-        code="foo",
-    )
+    user = UserFactory.create_with_general_permissions(perms=["can_manage_general_roles"])
     with query_counter() as count:
         perms = user.general_permissions
 
@@ -82,7 +76,6 @@ def test_user__service_sector_admin__has_staff_permissions():
     user = UserFactory.create_with_service_sector_permissions(
         service_sector=sector,
         perms=["can_manage_service_sector_roles"],
-        code="foo",
     )
     assert user.has_staff_permissions is True
 
@@ -93,7 +86,6 @@ def test_user__service_sector_admin__access_to_permissions(query_counter):
     user = UserFactory.create_with_service_sector_permissions(
         service_sector=sector_1,
         perms=["can_manage_service_sector_roles", "can_handle_applications"],
-        code="foo",
     )
 
     choice = ServiceSectorRoleChoiceFactory.create(code="bar")
@@ -115,7 +107,6 @@ def test_user__unit_admin__has_staff_permissions():
     user = UserFactory.create_with_unit_permissions(
         unit=unit,
         perms=["can_manage_unit_roles"],
-        code="foo",
     )
     assert user.has_staff_permissions is True
 
@@ -129,7 +120,6 @@ def test_user__unit_admin__access_to_permissions(query_counter):
     user = UserFactory.create_with_unit_permissions(
         unit=unit_1,
         perms=["can_manage_unit_roles", "can_handle_applications"],
-        code="foo",
     )
 
     choice_1 = UnitRoleChoiceFactory.create(code="bar")
@@ -157,7 +147,8 @@ def test_user__unit_admin__access_to_permissions(query_counter):
 def test_user__unit_group_admin__has_staff_permissions():
     unit_group = UnitGroupFactory.create()
     user = UserFactory.create_with_unit_group_permissions(
-        unit_group=unit_group, perms=["can_manage_unit_roles"], code="foo"
+        unit_group=unit_group,
+        perms=["can_manage_unit_roles"],
     )
     assert user.has_staff_permissions is True
 
@@ -171,7 +162,6 @@ def test_user__unit_group_admin__access_to_permissions(query_counter):
     user = UserFactory.create_with_unit_group_permissions(
         unit_group=unit_group_1,
         perms=["can_manage_unit_roles", "can_handle_applications"],
-        code="foo",
     )
 
     choice_1 = UnitRoleChoiceFactory.create(code="bar")
@@ -197,10 +187,7 @@ def test_user__unit_group_admin__access_to_permissions(query_counter):
 
 
 def test_request_user__general_admin__permission_are_fetched(query_counter):
-    user = UserFactory.create_with_general_permissions(
-        perms=["can_manage_general_roles"],
-        code="foo",
-    )
+    user = UserFactory.create_with_general_permissions(perms=["can_manage_general_roles"])
 
     with query_counter() as count_1:
         same_user = get_user(user.pk)
@@ -223,7 +210,6 @@ def test_request_user__service_sector_admin__permission_are_fetched(query_counte
     user = UserFactory.create_with_service_sector_permissions(
         service_sector=sector,
         perms=["can_manage_service_sector_roles"],
-        code="foo",
     )
 
     with query_counter() as count_1:
@@ -247,7 +233,6 @@ def test_request_user__unit_admin__permission_are_fetched(query_counter):
     user = UserFactory.create_with_unit_permissions(
         unit=unit,
         perms=["can_manage_unit_roles"],
-        code="foo",
     )
 
     with query_counter() as count_1:
@@ -271,7 +256,6 @@ def test_request_user__unit_group_admin__permission_are_fetched(query_counter):
     user = UserFactory.create_with_unit_group_permissions(
         unit_group=unit_group,
         perms=["can_manage_unit_roles"],
-        code="foo",
     )
 
     with query_counter() as count_1:

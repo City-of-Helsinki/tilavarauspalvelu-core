@@ -65,7 +65,7 @@ class UserFactory(GenericDjangoModelFactory[User]):
         cls,
         *,
         perms: Iterable[str] = (),
-        code: str = "admin",
+        code: str = "test-admin",
         **kwargs: Any,
     ) -> User:
         diff = set(perms).difference(GeneralPermissionChoices.values)
@@ -87,7 +87,7 @@ class UserFactory(GenericDjangoModelFactory[User]):
         service_sector: ServiceSector,
         *,
         perms: Iterable[str] = (),
-        code: str = "admin",
+        code: str = "test-admin",
         **kwargs: Any,
     ) -> User:
         diff = set(perms).difference(ServiceSectorPermissionsChoices.values)
@@ -109,7 +109,7 @@ class UserFactory(GenericDjangoModelFactory[User]):
         unit: Unit,
         *,
         perms: Iterable[str] = (),
-        code: str = "admin",
+        code: str = "test-admin",
         **kwargs: Any,
     ) -> User:
         diff = set(perms).difference(UnitPermissionChoices.values)
@@ -132,7 +132,7 @@ class UserFactory(GenericDjangoModelFactory[User]):
         unit_group: UnitGroup,
         *,
         perms: Iterable[str] = (),
-        code: str = "admin",
+        code: str = "test-admin",
         **kwargs: Any,
     ) -> User:
         diff = set(perms).difference(UnitPermissionChoices.values)

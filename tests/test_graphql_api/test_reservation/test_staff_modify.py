@@ -32,7 +32,6 @@ def test_reservation__staff_modify__unit_handler__other_users_reservation(graphq
     admin = UserFactory.create_with_unit_permissions(
         unit=reservation.reservation_unit.first().unit,
         perms=["can_manage_reservations"],
-        code="foo",
     )
 
     graphql.force_login(admin)
@@ -51,7 +50,6 @@ def test_reservation__staff_modify__unit_reserver__other_users_reservation(graph
     admin = UserFactory.create_with_unit_permissions(
         unit=reservation.reservation_unit.first().unit,
         perms=["can_create_staff_reservations"],
-        code="foo",
     )
 
     graphql.force_login(admin)

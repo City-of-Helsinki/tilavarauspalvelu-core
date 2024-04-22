@@ -68,7 +68,6 @@ def test_reservation__handling_required__unit_reserver__own_reservation(graphql)
     admin = UserFactory.create_with_unit_permissions(
         unit=unit,
         perms=["can_create_staff_reservations"],
-        code="foo",
     )
     reservation = ReservationFactory.create_for_handling_required(user=admin, reservation_unit__unit=unit)
 
@@ -87,7 +86,6 @@ def test_reservation__handling_required__unit_reserver__other_user_reservation(g
     admin = UserFactory.create_with_unit_permissions(
         unit=unit,
         perms=["can_create_staff_reservations"],
-        code="foo",
     )
     reservation = ReservationFactory.create_for_handling_required(reservation_unit__unit=unit)
 

@@ -114,7 +114,6 @@ def test_query_current_user__general_roles(graphql):
         first_name="Unique",
         last_name="Admin",
         perms=["can_manage_general_roles"],
-        code="new_admin",
     )
 
     general_role: GeneralRole = user.general_roles.first()
@@ -176,7 +175,6 @@ def test_query_current_user__service_sector_roles(graphql):
     user = UserFactory.create_with_service_sector_permissions(
         service_sector=sector,
         perms=["can_manage_service_sector_roles"],
-        code="new_admin",
     )
     service_sector_role: ServiceSectorRole = user.service_sector_roles.first()
     graphql.force_login(user)
@@ -243,7 +241,6 @@ def test_query_current_user__unit_admin(graphql):
     user = UserFactory.create_with_unit_permissions(
         unit=unit,
         perms=["can_manage_unit_roles"],
-        code="new_admin",
     )
     unit_role: UnitRole = user.unit_roles.first()
     graphql.force_login(user)
