@@ -37,21 +37,9 @@ def test_reservation__query__regular_user_cannot_see_working_memo_for_other_user
 
 
 def test_reservation__query__staff_user_can_see_working_memo_for_own_reservation(graphql):
-    staff_user = UserFactory.create_staff_user()
+    # 'Staff user' here is any user with permission, but not the specific permission for this endpoint
+    staff_user = UserFactory.create_with_general_permissions(perms=["can_manage_general_roles"])
     reservation = ReservationFactory.create(working_memo="foo", user=staff_user)
-
-    graphql.force_login(staff_user)
-    query = reservations_query(fields="pk workingMemo")
-    response = graphql(query)
-
-    assert response.has_errors is False, response
-    assert len(response.edges) == 1
-    assert response.node(0) == {"pk": reservation.pk, "workingMemo": "foo"}
-
-
-def test_reservation__query__staff_user_can_see_working_memo_for_other_users_reservation(graphql):
-    staff_user = UserFactory.create_staff_user()
-    reservation = ReservationFactory.create(working_memo="foo")
 
     graphql.force_login(staff_user)
     query = reservations_query(fields="pk workingMemo")

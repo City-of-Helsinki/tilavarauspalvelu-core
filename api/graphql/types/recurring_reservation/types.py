@@ -7,7 +7,6 @@ from api.graphql.types.recurring_reservation.permissions import RecurringReserva
 from common.typing import GQLInfo
 from permissions.helpers import (
     can_view_recurring_reservation,
-    get_service_sectors_where_can_view_reservations,
     get_units_where_can_view_reservations,
 )
 from reservations.models import RecurringReservation
@@ -52,13 +51,8 @@ class RecurringReservationNode(DjangoNode):
             return queryset.none()
 
         viewable_units = get_units_where_can_view_reservations(user)
-        viewable_service_sectors = get_service_sectors_where_can_view_reservations(user)
 
-        return queryset.filter(
-            models.Q(reservation_unit__unit__in=viewable_units)
-            | models.Q(reservation_unit__unit__service_sectors__in=viewable_service_sectors)
-            | models.Q(user=user)
-        ).distinct()
+        return queryset.filter(models.Q(reservation_unit__unit__in=viewable_units) | models.Q(user=user)).distinct()
 
     def resolve_weekdays(root: RecurringReservation, info: GQLInfo) -> list[int]:
         if root.weekdays:

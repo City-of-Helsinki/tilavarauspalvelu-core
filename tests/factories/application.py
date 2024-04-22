@@ -228,9 +228,28 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
 
     @classmethod
     def create_in_status_cancelled(cls, **kwargs: Any) -> Application:
-        """Create a cancelled application."""
+        """
+        Create a cancelled application.
+        - in an open application round
+        - with a single application section
+            - with a single reservation unit option
+        """
         kwargs.setdefault("cancelled_date", now())
-        return cls.create(**kwargs)
+
+        if "application_round" not in kwargs:
+            sub_kwargs = cls.pop_sub_kwargs("application_round", kwargs)
+            kwargs["application_round"] = ApplicationRoundFactory.create_in_status_open(**sub_kwargs)
+
+        key = "application_sections"
+        key_kwargs = cls.pop_sub_kwargs(key, kwargs)
+
+        application = cls.create(**kwargs)
+
+        if key not in kwargs:
+            key_kwargs["application"] = application
+            ApplicationSectionFactory.create_in_status_unallocated(**key_kwargs)
+
+        return application
 
     @classmethod
     def create_application_ready_for_allocation(

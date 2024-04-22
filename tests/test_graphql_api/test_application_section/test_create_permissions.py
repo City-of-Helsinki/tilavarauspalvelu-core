@@ -1,7 +1,7 @@
 import pytest
 
 from applications.models import ApplicationSection
-from tests.factories import ApplicationFactory, ServiceSectorFactory, UserFactory
+from tests.factories import ApplicationFactory, UserFactory
 from tests.helpers import UserType
 from tests.test_graphql_api.test_application_section.helpers import CREATE_MUTATION, get_application_section_create_data
 
@@ -89,52 +89,3 @@ def test_general_admin_can_create_application_event(graphql):
     assert response.has_errors is False, response
 
     assert ApplicationSection.objects.count() == 1
-
-
-def test_service_sector_admin_can_create_application_event(graphql):
-    # given:
-    # - There is draft application in an open application round
-    # - A service sector admin for the application round's service sector,
-    #   with application permissions, is using the system
-    application = ApplicationFactory.create_in_status_draft_no_sections()
-    service_sector_admin = UserFactory.create_with_service_sector_permissions(
-        service_sector=application.application_round.service_sector,
-        perms=["can_handle_applications"],
-    )
-    graphql.force_login(service_sector_admin)
-
-    # when:
-    # - User tries to create a new application event
-    data = get_application_section_create_data(application=application)
-    response = graphql(CREATE_MUTATION, input_data=data)
-
-    # then:
-    # - The response contains no errors
-    # - The database contains the created application event
-    assert response.has_errors is False, response
-
-    assert ApplicationSection.objects.count() == 1
-
-
-def test_service_sector_admin_for_other_service_sector_cannot_create_application_event(graphql):
-    # given:
-    # - There is draft application in an open application round
-    # - A service sector admin for some other service sector than the application round's service sector,
-    #   with application permissions, is using the system
-    application = ApplicationFactory.create_in_status_draft_no_sections()
-    service_sector_admin = UserFactory.create_with_service_sector_permissions(
-        service_sector=ServiceSectorFactory.create(),
-        perms=["can_handle_applications"],
-    )
-    graphql.force_login(service_sector_admin)
-
-    # when:
-    # - User tries to create a new application event
-    data = get_application_section_create_data(application=application)
-    response = graphql(CREATE_MUTATION, input_data=data)
-
-    # then:
-    # - The response contains errors about mutation permissions
-    assert response.error_message() == "No permission to create."
-
-    assert ApplicationSection.objects.count() == 0

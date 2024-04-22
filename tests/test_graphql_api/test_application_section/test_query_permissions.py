@@ -82,28 +82,6 @@ def test_application_sections__query__perms__general_admin(graphql):
     assert response.node(1) == {"pk": section_2.pk}
 
 
-def test_application_sections__query__perms__service_sector_admin(graphql):
-    # given:
-    # - There are two application sections in different service sectors
-    # - A service sector admin for one of those sectors is using the system
-    section_1 = ApplicationSectionFactory.create_in_status_unallocated()
-    ApplicationSectionFactory.create_in_status_unallocated()
-    user = UserFactory.create_with_service_sector_permissions(
-        section_1.application.application_round.service_sector,
-        perms=["can_handle_applications"],
-    )
-    graphql.force_login(user)
-
-    # when:
-    # - The user queries for application sections
-    response = graphql(sections_query())
-
-    # then:
-    # - The response contains only the application section belonging to the user's administered service sector
-    assert len(response.edges) == 1
-    assert response.node(0) == {"pk": section_1.pk}
-
-
 def test_application_sections__query__perms__test_unit_admin(graphql):
     # given:
     # - There are two application sections with different units

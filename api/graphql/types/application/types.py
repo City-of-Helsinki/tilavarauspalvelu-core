@@ -12,7 +12,6 @@ from applications.models import Application
 from common.typing import GQLInfo
 from permissions.helpers import (
     can_access_application_private_fields,
-    get_service_sectors_where_can_view_applications,
     get_units_where_can_view_applications,
 )
 
@@ -56,10 +55,8 @@ class ApplicationNode(DjangoNode):
     @classmethod
     def filter_queryset(cls, queryset: models.QuerySet, info: GQLInfo) -> models.QuerySet:
         units = get_units_where_can_view_applications(info.context.user)
-        service_sectors = get_service_sectors_where_can_view_applications(info.context.user)
 
         return queryset.filter(
-            models.Q(application_round__service_sector__in=service_sectors)
-            | models.Q(application_sections__reservation_unit_options__reservation_unit__unit__in=units)
+            models.Q(application_sections__reservation_unit_options__reservation_unit__unit__in=units)
             | models.Q(user=info.context.user)
         ).distinct()

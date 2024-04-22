@@ -110,9 +110,7 @@ def test_reservation__staff_create__reservation_block_whole_day__ignore_given_bu
 def test_reservation__staff_create__general_admin_can_create(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
-    admin = UserFactory.create_with_general_permissions(
-        perms=["can_create_staff_reservations"],
-    )
+    admin = UserFactory.create_with_general_permissions(perms=["can_create_staff_reservations"])
     graphql.force_login(admin)
 
     data = get_staff_create_data(reservation_unit)

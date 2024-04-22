@@ -357,6 +357,9 @@ def test_reservation__staff_adjust_time__unit_reserver_can_adjust_own_reservatio
         perms=["can_create_staff_reservations"],
     )
 
+    reservation.user = admin
+    reservation.save()
+
     graphql.force_login(admin)
     data = get_staff_adjust_data(reservation)
     response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
