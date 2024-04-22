@@ -32,7 +32,11 @@ def csrf_view(request: WSGIRequest) -> JsonResponse:  # NOSONAR
     # > From a security perspective, it's no different from any page that contains
     # > the CSRF token on a traditional Django website. The browser's same-origin policy
     # > prevents an attacker from getting access to the token with a cross-origin request.
-    return JsonResponse({"csrfToken": get_token(request)})
+    #
+    # Set these META-flags to force `django.middleware.csrf.CsrfViewMiddleware` to update the CSRF cookie.
+    request.META["CSRF_COOKIE_NEEDS_UPDATE"] = True
+    request.META["CSRF_COOKIE"] = csrf = get_token(request)
+    return JsonResponse({"csrfToken": csrf})
 
 
 # Make it possible to turn off CSRF protection for the GraphQL endpoint for frontend graphql codegen
