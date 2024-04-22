@@ -287,8 +287,7 @@ class ReservationSchedulingMixin:
         )
         if previous_reservation:
             previous_buffer = previous_reservation.buffer_time_after
-            if previous_buffer > buffer_before:
-                buffer_before = previous_buffer
+            buffer_before = max(previous_buffer, buffer_before)
 
         buffer_after: datetime.timedelta = (
             new_buffer_after
@@ -298,8 +297,7 @@ class ReservationSchedulingMixin:
         next_reservation = reservation_unit.actions.get_next_reservation(end, self.instance, exclude_blocked=True)
         if next_reservation:
             next_buffer = next_reservation.buffer_time_before
-            if next_buffer > buffer_after:
-                buffer_after = next_buffer
+            buffer_after = max(next_buffer, buffer_after)
 
         if previous_reservation and buffer_before and (previous_reservation.end + buffer_before) > begin:
             raise ValidationErrorWithCode(

@@ -17,8 +17,7 @@ class ReservationActions:
         reservation_unit: ReservationUnit
         for reservation_unit in self.reservation.reservation_unit.all():
             before = reservation_unit.actions.get_actual_before_buffer(self.reservation.begin)
-            if before > buffer_time_before:
-                buffer_time_before = before
+            buffer_time_before = max(before, buffer_time_before)
         return buffer_time_before
 
     def get_actual_after_buffer(self) -> datetime.timedelta:
@@ -26,6 +25,5 @@ class ReservationActions:
         reservation_unit: ReservationUnit
         for reservation_unit in self.reservation.reservation_unit.all():
             after = reservation_unit.actions.get_actual_after_buffer(self.reservation.end)
-            if after > buffer_time_after:
-                buffer_time_after = after
+            buffer_time_after = max(after, buffer_time_after)
         return buffer_time_after
