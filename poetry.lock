@@ -1338,13 +1338,13 @@ test = ["coveralls", "django-filter (>=22.1)", "djangorestframework (>=3.6.3)", 
 
 [[package]]
 name = "graphene-django-extensions"
-version = "0.4.3"
+version = "0.4.4"
 description = "Extensions for graphene-django"
 optional = false
 python-versions = "<4,>=3.10"
 files = [
-    {file = "graphene_django_extensions-0.4.3-py3-none-any.whl", hash = "sha256:ae7c11a7ea43d9dffd6b2d7b56ebd23fba44062ffa9b619ee4e662ca2f576cc9"},
-    {file = "graphene_django_extensions-0.4.3.tar.gz", hash = "sha256:47ace1c1ea2196c28a71cc2da86aee0375b64e4093ba134a1da588776d23bcea"},
+    {file = "graphene_django_extensions-0.4.4-py3-none-any.whl", hash = "sha256:3e161e4ffd89e1bb928d264040ef7774a2286df26a70fdcd42e2a8f32af438a0"},
+    {file = "graphene_django_extensions-0.4.4.tar.gz", hash = "sha256:3451180537085899a316d1e57564415f3bc1744adb28885cc8a47b9d8810a603"},
 ]
 
 [package.dependencies]
@@ -1353,7 +1353,7 @@ django-filter = ">=23.5"
 django-settings-holder = ">=0.1.2"
 djangorestframework = ">=3.14.0"
 graphene-django = ">=3.0.0"
-graphene-django-query-optimizer = ">=0.5.1"
+graphene-django-query-optimizer = ">=0.5.2"
 
 [package.extras]
 files = ["pillow (>=10.2.0)"]
@@ -1361,13 +1361,13 @@ translation = ["django-modeltranslation (>=0.18.11)"]
 
 [[package]]
 name = "graphene-django-query-optimizer"
-version = "0.5.1"
+version = "0.5.2"
 description = "Automatically optimize SQL queries in Graphene-Django schemas."
 optional = false
 python-versions = "<4,>=3.9"
 files = [
-    {file = "graphene_django_query_optimizer-0.5.1-py3-none-any.whl", hash = "sha256:1650c040a210bc7892986d1edc90a93b4736f9956bf19b1f40e3ef17abc7ec4b"},
-    {file = "graphene_django_query_optimizer-0.5.1.tar.gz", hash = "sha256:ceb0f27850b9a6a4724d4781baae2f6e1cb1b9dbd1aacf9c1d919ce5f4d38abd"},
+    {file = "graphene_django_query_optimizer-0.5.2-py3-none-any.whl", hash = "sha256:20dd491dc10b7a9f06c81027f4d6ef6b62a239a3ab5334d91f69b06ad7cebdb3"},
+    {file = "graphene_django_query_optimizer-0.5.2.tar.gz", hash = "sha256:063559786529136ecf379aea1ca6885aac99c624f0da06a14bb50f9468ef4a23"},
 ]
 
 [package.dependencies]
@@ -2996,4 +2996,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.12,<3.13"
-content-hash = "ad3b56e2ba45cab2b095e644725b09a8bbf7eca8aed347c89dc3b2a43921813f"
+content-hash = "b7db6b75c0f0ec47d72106698fa8c917d4c105c856d32eb50ab52ceae6693c6d"
