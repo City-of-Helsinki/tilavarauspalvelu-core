@@ -90,6 +90,7 @@ const Reservations = (): JSX.Element | null => {
   // TODO add pagination
   // TODO also combine with other instances of LIST_RESERVATIONS
   // TODO also should do cache invalidation if the user makes a reservation
+  // TODO move the query to SSR (and remove useSession)
   const {
     data,
     loading: isLoading,

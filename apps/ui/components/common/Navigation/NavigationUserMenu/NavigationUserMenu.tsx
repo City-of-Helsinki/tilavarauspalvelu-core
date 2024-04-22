@@ -121,6 +121,7 @@ export function NavigationUserMenu({
   profileLink: string;
 }) {
   const router = useRouter();
+  // TODO refactor this to fetch the user on SSR (and pass it to this component)
   const { isAuthenticated, user } = useSession();
   const { t } = useTranslation();
   const isAdAuthenticated = user?.isAdAuthenticated;

@@ -16,7 +16,6 @@ import {
   type Query,
   type QueryApplicationRoundsArgs,
 } from "common/types/gql-types";
-import { useSession } from "@/hooks/auth";
 import { MediumButton } from "@/styles/util";
 import Head from "@/components/application/Head";
 import { APPLICATION_ROUNDS } from "@/modules/queries/applicationRound";
@@ -70,7 +69,6 @@ const Container = styled.div`
 `;
 
 const IntroPage = ({ applicationRounds }: Props): JSX.Element => {
-  const { isAuthenticated } = useSession();
   const history = useRouter();
   const { t } = useTranslation();
 
@@ -118,11 +116,6 @@ const IntroPage = ({ applicationRounds }: Props): JSX.Element => {
       );
     }
   };
-
-  // NOTE should never happen since we do an SSR redirect
-  if (!isAuthenticated) {
-    return <div>{t("common:error.notAuthenticated")}</div>;
-  }
 
   return (
     <>

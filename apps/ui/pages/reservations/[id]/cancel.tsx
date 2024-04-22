@@ -10,9 +10,7 @@ import type {
   QueryReservationArgs,
   QueryReservationCancelReasonsArgs,
 } from "common/types/gql-types";
-import { useTranslation } from "next-i18next";
 import Error from "next/error";
-import { useSession } from "@/hooks/auth";
 import ReservationCancellation from "@/components/reservation/ReservationCancellation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
@@ -79,14 +77,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 }
 
 function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
-  const { isAuthenticated } = useSession();
-  const { t } = useTranslation("common");
-
-  // NOTE should not end up here (SSR redirect to login)
-  if (!isAuthenticated) {
-    return <div>{t("common:error.notAuthenticated")}</div>;
-  }
-
   // TODO can be removed if SSR returns notFound for nulls
   const { reservation } = props;
   if (reservation == null) {

@@ -1,8 +1,6 @@
 import React from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useTranslation } from "next-i18next";
-import { useSession } from "@/hooks/auth";
 import { ReservationEdit } from "@/components/reservation/ReservationEdit";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
@@ -111,15 +109,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 }
 
 function ReservationEditPage(props: PropsNarrowed): JSX.Element {
-  const { isAuthenticated } = useSession();
-  const { t } = useTranslation();
-
   const { reservation, reservationUnit } = props;
-
-  // NOTE should not end up here (SSR redirect to login)
-  if (!isAuthenticated) {
-    return <div>{t("common:error.notAuthenticated")}</div>;
-  }
 
   return (
     <ReservationEdit

@@ -55,6 +55,7 @@ const LoginFragment = ({
   actionCallback,
   returnUrl,
 }: Props): JSX.Element | null => {
+  // TODO pass the isAuthenticated from SSR and remove the hook
   const { isAuthenticated } = useSession();
   const { t } = useTranslation();
 

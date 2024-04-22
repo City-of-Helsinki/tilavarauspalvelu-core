@@ -23,7 +23,6 @@ import {
 } from "common/types/gql-types";
 import Link from "next/link";
 import { Container } from "common";
-import { useSession } from "@/hooks/auth";
 import { useOrder } from "@/hooks/reservation";
 import { reservationUnitPath } from "@/modules/const";
 import { createApolloClient } from "@/modules/apolloClient";
@@ -402,7 +401,6 @@ function Reservation({
   reservation,
 }: PropsNarrowed): JSX.Element | null {
   const { t, i18n } = useTranslation();
-  const { isAuthenticated } = useSession();
 
   // TODO this should be moved to SSR also
   const { order, isLoading: orderLoading } = useOrder({
@@ -465,11 +463,6 @@ function Reservation({
         return null;
     }
   }, [reservation]);
-
-  // NOTE should never end up here (SSR redirect to login)
-  if (!isAuthenticated) {
-    return <div>{t("common:error.notAuthenticated")}</div>;
-  }
 
   const normalizedOrderStatus =
     getNormalizedReservationOrderStatus(reservation);

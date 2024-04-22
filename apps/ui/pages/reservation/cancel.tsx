@@ -5,9 +5,7 @@ import React, { useEffect } from "react";
 import { breakpoints } from "common/src/common/style";
 import { LoadingSpinner } from "hds-react";
 import styled from "styled-components";
-import { useTranslation } from "next-i18next";
 import { Container } from "common";
-import { useSession } from "@/hooks/auth";
 import { useDeleteReservation, useOrder } from "@/hooks/reservation";
 import DeleteCancelled from "@/components/reservation/DeleteCancelled";
 import ReservationFail from "@/components/reservation/ReservationFail";
@@ -38,7 +36,6 @@ const StyledContainer = styled(Container)`
 `;
 
 const Cancel = ({ apiBaseUrl }: Props): JSX.Element => {
-  const { isAuthenticated } = useSession();
   const router = useRouter();
   const { orderId } = router.query;
 
@@ -60,15 +57,6 @@ const Cancel = ({ apiBaseUrl }: Props): JSX.Element => {
       });
     }
   }, [deleteReservation, order]);
-
-  const { t } = useTranslation("common");
-
-  // NOTE should not end up here (SSR redirect to login)
-  if (!isAuthenticated) {
-    <StyledContainer>
-      <div>{t("common:error.notAuthenticated")}</div>
-    </StyledContainer>;
-  }
 
   if (isLoading || isDeleteLoading || !called) {
     return (
