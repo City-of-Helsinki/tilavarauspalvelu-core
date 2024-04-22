@@ -3,13 +3,16 @@ import re
 from decimal import Decimal
 
 import pytest
+from django.test import override_settings
 
 from email_notification.admin.email_tester import EmailTemplateTesterForm
 from email_notification.exceptions import SendEmailNotificationError
 from email_notification.helpers.email_sender import EmailNotificationSender
+from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from email_notification.models import EmailTemplate, EmailType
 from reservations.models import Reservation
-from tests.factories import EmailTemplateFactory, ReservationFactory
+from tests.factories import EmailTemplateFactory, ReservationFactory, UserFactory
+from users.models import ReservationNotification
 
 # Applied to all tests
 pytestmark = [
@@ -143,6 +146,31 @@ def test_email_sender__reservation__reservation_language_is_used(outbox, languag
     assert outbox[0].subject == getattr(email_template, f"subject_{language}", None)
     assert outbox[0].body == getattr(email_template, f"content_{language}", None)
     assert outbox[0].bcc == [reservation.user.email]
+
+
+@pytest.mark.parametrize("language", ["fi", "en", "sv"])
+@override_settings(CELERY_TASK_ALWAYS_EAGER=True)
+@override_settings(SEND_RESERVATION_NOTIFICATION_EMAILS=True)
+def test_email_sender__reservation__staff_email_sent_in_default_language(outbox, language, email_template):
+    reservation: Reservation = ReservationFactory.create(reservation_unit__unit__name="foo", reservee_language=language)
+
+    # Change email template to one that is used for staff emails
+    email_template.type = EmailType.STAFF_NOTIFICATION_RESERVATION_REQUIRES_HANDLING
+    email_template.save()
+
+    # Create a user with permissions to manage reservations, who will receive the email
+    staff_user = UserFactory.create_with_unit_permissions(
+        unit=reservation.reservation_unit.first().unit,
+        perms=["can_manage_reservations"],
+        reservation_notification=ReservationNotification.ALL,
+    )
+
+    ReservationEmailNotificationSender._send_staff_requires_handling_email(reservation)
+
+    assert len(outbox) == 1
+    assert outbox[0].subject == getattr(email_template, "subject_fi", None)
+    assert outbox[0].body == getattr(email_template, "content_fi", None)
+    assert outbox[0].bcc == [staff_user.email]
 
 
 def test_email_sender__test_emails(outbox, email_template):
