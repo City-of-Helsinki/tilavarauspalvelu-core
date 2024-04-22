@@ -1,20 +1,24 @@
 
 changelog:
+  exclude:
+    authors:
+      - dependabot[bot]
+      - pre-commit-ci[bot]
   categories:
     - title: Features
       labels:
         - "*"
       exclude:
         labels:
-          - bug
-          - maintenance
+          - fix
+          - improvement
+          - refactor
           - dependencies
     - title: Fixes
       labels:
-        - bug
-    - title: Maintenance
+        - fix
+    - title: Updates
       labels:
-        - maintenance
-    - title: Automated
-      labels:
+        - improvement
+        - refactor
         - dependencies
