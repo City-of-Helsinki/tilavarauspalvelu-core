@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useQuery } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client";
 import { Notification } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
@@ -12,24 +12,66 @@ import {
   QueryApplicationsArgs,
 } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
-import { useSession } from "@/hooks/auth";
 import Head from "@/components/applications/Head";
 import ApplicationsGroup from "@/components/applications/ApplicationsGroup";
-import { CenterSpinner } from "@/components/common/common";
 import { APPLICATIONS } from "@/modules/queries/application";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
+import { createApolloClient } from "@/modules/apolloClient";
+import { CURRENT_USER } from "@/modules/queries/user";
+import { useCurrentUser } from "@/hooks/user";
 
-export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
+
+const VALID_STATUSES = [
+  ApplicationStatusChoice.Draft,
+  ApplicationStatusChoice.ResultsSent,
+  ApplicationStatusChoice.InAllocation,
+  ApplicationStatusChoice.Handled,
+  ApplicationStatusChoice.Received,
+];
+
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale } = ctx;
+
+  const commonProps = getCommonServerSideProps();
+  const client = createApolloClient(commonProps.apiBaseUrl, ctx);
+
+  const { data: userData } = await client.query<Query>({
+    query: CURRENT_USER,
+  });
+
+  const { currentUser: user } = userData;
+
+  if (!user) {
+    return {
+      notFound: true,
+      props: {
+        ...commonProps,
+        ...(await serverSideTranslations(locale ?? "fi")),
+        notFound: true,
+      },
+    };
+  }
+
+  const { data: appData } = await client.query<Query, QueryApplicationsArgs>({
+    query: APPLICATIONS,
+    fetchPolicy: "no-cache",
+    variables: {
+      user: user.pk,
+      status: VALID_STATUSES,
+    },
+  });
 
   return {
     props: {
       ...getCommonServerSideProps(),
       overrideBackgroundColor: "var(--tilavaraus-gray)",
       ...(await serverSideTranslations(locale ?? "fi")),
+      data: appData,
     },
   };
-};
+}
 
 const Container = styled.div`
   padding: 0 var(--spacing-m) var(--spacing-m);
@@ -94,40 +136,37 @@ function ApplicationGroups({
   );
 }
 
-function ApplicationsPage(): JSX.Element | null {
+function ApplicationsPage({
+  data: initialData,
+}: PropsNarrowed): JSX.Element | null {
   const { t } = useTranslation();
-  const { isAuthenticated, user } = useSession();
   const [cancelled, setCancelled] = useState(false);
   const [cancelError, setCancelError] = useState(false);
 
-  const {
-    data: appData,
-    error: isError,
-    loading: isLoading,
-    refetch,
-  } = useQuery<Query, QueryApplicationsArgs>(APPLICATIONS, {
-    fetchPolicy: "no-cache",
-    skip: !user?.pk,
-    variables: {
-      user: user?.pk,
-      status: [
-        ApplicationStatusChoice.Draft,
-        ApplicationStatusChoice.ResultsSent,
-        ApplicationStatusChoice.InAllocation,
-        ApplicationStatusChoice.Handled,
-        ApplicationStatusChoice.Received,
-      ],
-    },
-  });
-
-  const appNodes = filterNonNullable(
-    appData?.applications?.edges?.map((n) => n?.node)
+  const { currentUser } = useCurrentUser();
+  // Requires a client side query because we can do modifications without leaving the page
+  // TODO better would be to hydrate the client and use refetch when modifying
+  const [fetch, { data: appData }] = useLazyQuery<Query, QueryApplicationsArgs>(
+    APPLICATIONS,
+    {
+      fetchPolicy: "no-cache",
+      variables: {
+        user: currentUser?.pk,
+        status: VALID_STATUSES,
+      },
+    }
   );
 
+  const data = appData ?? initialData;
+  const applications = filterNonNullable(
+    data.applications?.edges?.map((n) => n?.node)
+  );
+
+  // TODO add refetching?
   const actionCallback = async (type: "cancel" | "error") => {
     switch (type) {
       case "cancel":
-        await refetch();
+        await fetch();
         setCancelled(true);
         break;
       case "error":
@@ -137,31 +176,14 @@ function ApplicationsPage(): JSX.Element | null {
     }
   };
 
-  // NOTE should never happen since we do an SSR redirect
-  if (!isAuthenticated) {
-    return <div>{t("common:error.notAuthenticated")}</div>;
-  }
-
   return (
     <>
       <Head />
       <Container>
-        {isLoading && <CenterSpinner />}
-        {isError && (
-          <Notification
-            type="error"
-            label={t("common:error.error")}
-            position="top-center"
-          >
-            {t("common:error.dataError")}
-          </Notification>
-        )}
-        {!isLoading && !isError ? (
-          <ApplicationGroups
-            applications={appNodes}
-            actionCallback={actionCallback}
-          />
-        ) : null}
+        <ApplicationGroups
+          applications={applications}
+          actionCallback={actionCallback}
+        />
       </Container>
       {cancelled && (
         <Notification
