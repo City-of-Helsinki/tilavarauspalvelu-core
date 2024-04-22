@@ -132,9 +132,12 @@ def can_modify_application(user: AnyUser, application: Application) -> bool:
         return True
     if application.user == user and local_datetime() < application.application_round.application_period_end:
         return True
-    if application.application_round.service_sector is None:
-        return False
-    return can_manage_service_sectors_applications(user, application.application_round.service_sector)
+
+    if has_general_permission(user, GeneralPermissionChoices.CAN_HANDLE_APPLICATIONS):
+        return True
+
+    units: list[int] = list(application.units.values_list("pk", flat=True))
+    return has_unit_permission(user, UnitPermissionChoices.CAN_HANDLE_APPLICATIONS, units)
 
 
 def can_read_application(user: AnyUser, application: Application) -> bool:
@@ -145,24 +148,21 @@ def can_read_application(user: AnyUser, application: Application) -> bool:
     if application.user == user:
         return True
 
-    sector: ServiceSector | None = application.application_round.service_sector
-    if sector is not None and can_manage_service_sectors_applications(user, sector):
+    if has_general_permission(user, GeneralPermissionChoices.CAN_HANDLE_APPLICATIONS):
+        return True
+    if has_general_permission(user, GeneralPermissionChoices.CAN_VALIDATE_APPLICATIONS):
         return True
 
-    return can_validate_unit_applications(user, list(application.units.values_list("pk", flat=True)))
+    units: list[int] = list(application.units.values_list("pk", flat=True))
+    if has_unit_permission(user, UnitPermissionChoices.CAN_HANDLE_APPLICATIONS, units):
+        return True
+
+    return has_unit_permission(user, UnitPermissionChoices.CAN_VALIDATE_APPLICATIONS, units)
 
 
 def can_access_application_private_fields(user: AnyUser, application: Application) -> bool:
-    if user.is_anonymous:
-        return False
-    if user.is_superuser:
-        return True
-
-    sector: ServiceSector | None = application.application_round.service_sector
-    if sector is not None and can_manage_service_sectors_applications(user, sector):
-        return True
-
-    return can_validate_unit_applications(user, list(application.units.values_list("pk", flat=True)))
+    units = list(application.units.values_list("pk", flat=True))
+    return can_validate_unit_applications(user, units)
 
 
 def can_view_reservation(user: AnyUser, reservation: Reservation, needs_staff_permissions: bool = False) -> bool:
@@ -552,9 +552,13 @@ def get_units_where_can_view_applications(user: AnyUser) -> models.QuerySet:
     unit_permission = UnitPermissionChoices.CAN_VALIDATE_APPLICATIONS
 
     if user.is_anonymous:
-        return Unit.objects.none().values("pk")
+        return Unit.objects.none().values("id")
     if user.is_superuser:
-        return Unit.objects.all().values("pk")
+        return Unit.objects.all().values("id")
+    if has_general_permission(user, GeneralPermissionChoices.CAN_HANDLE_APPLICATIONS):
+        return Unit.objects.all().values("id")
+    if has_general_permission(user, GeneralPermissionChoices.CAN_VALIDATE_APPLICATIONS):
+        return Unit.objects.all().values("id")
 
     unit_ids = [pk for pk, perms in user.unit_permissions.items() if unit_permission.value in perms]
     unit_group_ids = [pk for pk, perms in user.unit_group_permissions.items() if unit_permission.value in perms]

@@ -1,6 +1,6 @@
 import pytest
 
-from tests.factories import RecurringReservationFactory, ReservationUnitFactory, ServiceSectorFactory, UserFactory
+from tests.factories import RecurringReservationFactory, ReservationUnitFactory, UserFactory
 from tests.helpers import UserType
 
 from .helpers import recurring_reservations_query
@@ -27,11 +27,9 @@ def test_recurring_reservations__query__regular_user__can_only_see_own(graphql):
 
 
 def test_recurring_reservations__query__general_admin__can_see_all(graphql):
-    user = UserFactory.create_with_general_permissions()
+    user = UserFactory.create_with_general_permissions(perms=["can_view_reservations"])
     recurring_reservation_1 = RecurringReservationFactory.create(name="1", user=user)
-    recurring_reservation_2 = RecurringReservationFactory.create(
-        name="2",
-    )
+    recurring_reservation_2 = RecurringReservationFactory.create(name="2")
 
     graphql.force_login(user)
 
@@ -49,27 +47,6 @@ def test_recurring_reservations__query__unit_admin__can_only_see_in_own_unit_fro
     reservation_unit = ReservationUnitFactory.create()
 
     user = UserFactory.create_with_unit_permissions(unit=reservation_unit.unit, perms=["can_view_reservations"])
-    recurring_reservation_1 = RecurringReservationFactory.create(name="1", user=user)
-    recurring_reservation_2 = RecurringReservationFactory.create(name="2", reservation_unit=reservation_unit)
-    RecurringReservationFactory.create()
-
-    graphql.force_login(user)
-
-    query = recurring_reservations_query()
-    response = graphql(query)
-
-    assert response.has_errors is False
-
-    assert len(response.edges) == 2
-    assert response.node(0) == {"pk": recurring_reservation_1.pk}
-    assert response.node(1) == {"pk": recurring_reservation_2.pk}
-
-
-def test_recurring_reservations__query__service_sector_admin__can_only_see_in_own_sector_from_others(graphql):
-    reservation_unit = ReservationUnitFactory.create()
-    sector = ServiceSectorFactory.create(units=[reservation_unit.unit])
-
-    user = UserFactory.create_with_service_sector_permissions(service_sector=sector, perms=["can_view_reservations"])
     recurring_reservation_1 = RecurringReservationFactory.create(name="1", user=user)
     recurring_reservation_2 = RecurringReservationFactory.create(name="2", reservation_unit=reservation_unit)
     RecurringReservationFactory.create()

@@ -18,7 +18,7 @@ class ApplicationPermission(BasePermission):
 
     @classmethod
     def has_node_permission(cls, instance: Application, user: AnyUser, filters: dict[str, Any]) -> bool:
-        return user.is_authenticated and can_read_application(user, instance)
+        return can_read_application(user, instance)
 
     @classmethod
     def has_update_permission(cls, instance: Application, user: AnyUser, input_data: dict[str, Any]) -> bool:

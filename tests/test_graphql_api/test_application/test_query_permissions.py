@@ -3,12 +3,10 @@ import pytest
 from tests.factories import (
     ApplicationFactory,
     ApplicationSectionFactory,
-    ServiceSectorFactory,
     UnitFactory,
     UnitGroupFactory,
     UserFactory,
 )
-from tests.helpers import UserType
 
 from .helpers import applications_query
 
@@ -18,12 +16,11 @@ pytestmark = [
 ]
 
 
-def test_anonymous_user_cannot_view_applications(graphql):
+def test_application__anonymous_user(graphql):
     # given:
     # - There is an application in the system
     # - An anonymous user is using the system
     ApplicationFactory.create_in_status_draft()
-    graphql.login_user_based_on_type(UserType.ANONYMOUS)
 
     # when:
     # - User tries to search for applications
@@ -34,12 +31,12 @@ def test_anonymous_user_cannot_view_applications(graphql):
     assert response.error_message() == "No permission to access node."
 
 
-def test_regular_user_cannot_view_other_applications(graphql):
+def test_application__regular_user__other_users_applications(graphql):
     # given:
     # - There is an application in the system
     # - A regular user is using the system
     ApplicationFactory.create_in_status_draft()
-    graphql.login_user_based_on_type(UserType.REGULAR)
+    graphql.login_with_regular_user()
 
     # when:
     # - User tries to search for applications
@@ -51,7 +48,7 @@ def test_regular_user_cannot_view_other_applications(graphql):
     assert response.edges == []
 
 
-def test_application_owner_can_view_own_applications(graphql):
+def test_application__regular_user__own_applications(graphql):
     # given:
     # - There is an application in the system
     # - The application owner is using the system
@@ -69,50 +66,7 @@ def test_application_owner_can_view_own_applications(graphql):
     assert response.node(0) == {"pk": application.pk}
 
 
-def test_service_sector_admin_can_view_applications(graphql):
-    # given:
-    # - There is an application in the system
-    # - A service sector admin for the application round's service sector is using the system
-    application = ApplicationFactory.create_in_status_draft()
-    admin = UserFactory.create_with_service_sector_permissions(
-        service_sector=application.application_round.service_sector,
-        perms=["can_handle_applications"],
-    )
-    graphql.force_login(admin)
-
-    # when:
-    # - User tries to search for applications
-    response = graphql(applications_query())
-
-    # then:
-    # - The response has no errors, and contains the application
-    assert response.has_errors is False, response
-    assert len(response.edges) == 1
-    assert response.node(0) == {"pk": application.pk}
-
-
-def test_service_sector_admin_cannot_view_applications_for_other_sector(graphql):
-    # given:
-    # - There is an application in the system
-    # - A service sector admin for some other sector is using the system
-    ApplicationFactory.create_in_status_draft()
-    admin = UserFactory.create_with_service_sector_permissions(
-        service_sector=ServiceSectorFactory.create(),
-        perms=["can_handle_applications"],
-    )
-    graphql.force_login(admin)
-
-    # when:
-    # - User tries to search for applications
-    response = graphql(applications_query())
-
-    # then:
-    # - The response has no errors, but is empty
-    assert response.has_errors is False, response
-    assert response.edges == []
-
-
-def test_unit_admin_can_view_applications(graphql):
+def test_application__unit_admin(graphql):
     # given:
     # - There is an application section in an application with an event reservation unit
     # - A unit admin for that unit is using the system
@@ -136,7 +90,7 @@ def test_unit_admin_can_view_applications(graphql):
     assert response.node(0) == {"pk": section.application.pk}
 
 
-def test_unit_admin_can_view_applications_for_other_units(graphql):
+def test_application__unit_admin__other_units(graphql):
     # given:
     # - There is an application event in an application with an event reservation unit
     # - A unit admin for some other unit is using the system
@@ -159,7 +113,7 @@ def test_unit_admin_can_view_applications_for_other_units(graphql):
     assert response.edges == []
 
 
-def test_unit_group_admin_can_view_applications(graphql):
+def test_application__unit_group_admin(graphql):
     # given:
     # - There is an application section in an application with a reservation unit option
     # - A unit group admin for that unit's group is using the system
@@ -183,7 +137,7 @@ def test_unit_group_admin_can_view_applications(graphql):
     assert response.node(0) == {"pk": event.application.pk}
 
 
-def test_unit_group_admin_can_view_applications_for_other_unit_groups(graphql):
+def test_application__unit_group_admin__other_unit_groups(graphql):
     # given:
     # - There is an application section in an application with a reservation unit option
     # - A unit group admin for some other unit group is using the system
@@ -207,7 +161,7 @@ def test_unit_group_admin_can_view_applications_for_other_unit_groups(graphql):
 
 
 @pytest.mark.parametrize("perms", ["can_handle_applications", "can_validate_applications"])
-def test_general_admin_can_view_applications(graphql, perms):
+def test_application__general_admin(graphql, perms):
     # given:
     # - There is an application in the system
     # - The general admin is using the system
@@ -226,7 +180,7 @@ def test_general_admin_can_view_applications(graphql, perms):
     assert response.node(0) == {"pk": application.pk}
 
 
-def test_application_user_cannot_see_own_application_working_memo(graphql):
+def test_application__regular_user__working_memo(graphql):
     # given:
     # - There is an application in the system
     # - The application user is using the system
@@ -242,27 +196,7 @@ def test_application_user_cannot_see_own_application_working_memo(graphql):
     assert response.error_message("workingMemo") == "No permission to access field."
 
 
-def test_service_sector_admin_can_see_working_memo(graphql):
-    # given:
-    # - There is an application in the system
-    # - A service sector admin is using the system
-    application = ApplicationFactory.create_in_status_draft()
-    admin = UserFactory.create_with_service_sector_permissions(
-        service_sector=application.application_round.service_sector,
-        perms=["can_handle_applications"],
-    )
-    graphql.force_login(admin)
-
-    # when:
-    # - User tries to search for applications working memo
-    response = graphql(applications_query(fields="workingMemo"))
-
-    # then:
-    # - The response has no errors
-    assert response.has_errors is False, response
-
-
-def test_unit_admin_can_see_working_memo(graphql):
+def test_application__unit_admin__working_memo(graphql):
     # given:
     # - There is an application section in an application with a reservation unit option
     # - A unit admin for that unit is using the system

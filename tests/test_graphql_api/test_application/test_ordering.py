@@ -116,7 +116,8 @@ def test_application__order__by_status(graphql):
     application_5 = ApplicationFactory.create_in_status_expired()
     application_6 = ApplicationFactory.create_in_status_handled()
     application_7 = ApplicationFactory.create_in_status_in_allocation()
-    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    graphql.login_with_superuser()
 
     # when:
     # - User tries to search for applications ordered by application statuses ascending

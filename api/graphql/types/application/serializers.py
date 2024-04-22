@@ -60,11 +60,10 @@ class ApplicationUpdateSerializer(ApplicationCreateSerializer):
         fields = [*ApplicationCreateSerializer.Meta.fields, "working_memo"]
 
     def validate_working_memo(self, value: str) -> str:
-        if not can_validate_unit_applications(
-            user=self.request_user,
-            units=list(self.instance.units.values_list("pk", flat=True)),
-        ):
+        units: list[int] = list(self.instance.units.values_list("pk", flat=True))
+        if not can_validate_unit_applications(self.request_user, units):
             raise serializers.ValidationError("No permission to access working memo.")
+
         return value
 
 

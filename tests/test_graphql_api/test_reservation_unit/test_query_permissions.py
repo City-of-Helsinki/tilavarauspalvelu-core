@@ -193,7 +193,7 @@ def test_reservation_unit__query__sensitive_information__general_admin(graphql):
         working_memo="Working Memo",
     )
 
-    admin = UserFactory.create_with_general_permissions(perms=["can_manage_reservations"])
+    admin = UserFactory.create_with_general_permissions(perms=["can_view_reservations"])
     graphql.force_login(admin)
 
     query = reservation_units_query(fields=SENSITIVE_FIELDS)

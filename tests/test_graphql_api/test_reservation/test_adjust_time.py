@@ -427,7 +427,7 @@ def test_reservation__update__reservation_block_whole_day__ignore_given_buffers(
         handled_at=None,
     )
 
-    user = UserFactory.create_with_unit_permissions(reservation_unit.unit, perms=["can_create_staff_reservations"])
+    user = UserFactory.create_with_unit_permissions(reservation_unit.unit, perms=["can_manage_reservations"])
     graphql.force_login(user)
 
     input_data = {
@@ -475,7 +475,7 @@ def test_reservation__update__update_reservation_buffer_on_adjust(graphql):
     reservation_unit.buffer_time_after = timedelta(hours=2)
     reservation_unit.save()
 
-    user = UserFactory.create_with_unit_permissions(reservation_unit.unit, perms=["can_create_staff_reservations"])
+    user = UserFactory.create_with_unit_permissions(reservation_unit.unit, perms=["can_manage_reservations"])
     graphql.force_login(user)
 
     input_data = {

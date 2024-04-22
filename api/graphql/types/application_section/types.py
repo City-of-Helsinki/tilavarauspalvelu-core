@@ -9,7 +9,7 @@ from api.graphql.types.application_section.permissions import ApplicationSection
 from applications.choices import ApplicationSectionStatusChoice
 from applications.models import ApplicationSection
 from common.typing import GQLInfo
-from permissions.helpers import get_service_sectors_where_can_view_applications, get_units_where_can_view_applications
+from permissions.helpers import get_units_where_can_view_applications
 
 
 class ApplicationSectionNode(DjangoNode):
@@ -42,10 +42,8 @@ class ApplicationSectionNode(DjangoNode):
     @classmethod
     def filter_queryset(cls, queryset: models.QuerySet, info: GQLInfo) -> models.QuerySet:
         units = get_units_where_can_view_applications(info.context.user)
-        service_sectors = get_service_sectors_where_can_view_applications(info.context.user)
 
         return queryset.filter(
-            models.Q(application__application_round__service_sector__in=service_sectors)
-            | models.Q(reservation_unit_options__reservation_unit__unit__in=units)
+            models.Q(reservation_unit_options__reservation_unit__unit__in=units)
             | models.Q(application__user=info.context.user)
         ).distinct()

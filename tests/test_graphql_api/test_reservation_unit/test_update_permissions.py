@@ -1,6 +1,5 @@
 import pytest
 
-from applications.choices import WeekdayChoice
 from tests.factories import ReservationUnitFactory
 from tests.helpers import UserType
 
@@ -13,45 +12,12 @@ pytestmark = [
 ]
 
 
-def test_reservation_unit__update__regular_user(graphql):
-    graphql.login_user_based_on_type(UserType.REGULAR)
-
-    reservation_unit = ReservationUnitFactory.create(is_draft=True)
-    data = get_draft_update_input_data(reservation_unit)
-
-    response = graphql(UPDATE_MUTATION, input_data=data)
-
-    assert response.error_message() == "No permission to update."
-
-
-@pytest.mark.parametrize(
-    ("user_type", "expected_errors"),
-    [
-        (UserType.ANONYMOUS, True),
-        (UserType.REGULAR, True),
-        (UserType.STAFF, False),
-        (UserType.SUPERUSER, False),
-    ],
-)
-def test_anonymous_user_cannot_update_reservation_unit_with_timeslots(graphql, user_type, expected_errors):
+def test_reservation_unit__update__anonymous_user(graphql):
     # given:
     # - There is a draft reservation unit with no timeslots
-    # - The given user is using the system
+    # - An anonymous user is using the system
     reservation_unit = ReservationUnitFactory.create(is_draft=True)
-    graphql.login_user_based_on_type(user_type)
-
-    data = {
-        "pk": reservation_unit.pk,
-        "applicationRoundTimeSlots": [
-            {
-                "weekday": WeekdayChoice.MONDAY.value,
-                "reservableTimes": [
-                    {"begin": "10:00", "end": "12:00"},
-                ],
-            },
-        ],
-        "pricings": [],
-    }
+    data = get_draft_update_input_data(reservation_unit)
 
     # when:
     # - The user tries to update a reservation unit with new timeslots
@@ -59,6 +25,48 @@ def test_anonymous_user_cannot_update_reservation_unit_with_timeslots(graphql, u
 
     # then:
     # - The response contains errors about missing permissions
-    assert response.has_errors is expected_errors, response
-    if expected_errors:
-        assert response.error_message() == "No permission to update."
+    assert response.error_message() == "No permission to update."
+
+
+def test_reservation_unit__update__regular_user(graphql):
+    reservation_unit = ReservationUnitFactory.create(is_draft=True)
+    data = get_draft_update_input_data(reservation_unit)
+
+    graphql.login_with_regular_user()
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    assert response.error_message() == "No permission to update."
+
+
+def test_reservation_unit__update__staff_user(graphql):
+    # given:
+    # - There is a draft reservation unit with no timeslots
+    # - The given user is using the system
+    reservation_unit = ReservationUnitFactory.create(is_draft=True)
+    data = get_draft_update_input_data(reservation_unit)
+    graphql.login_user_based_on_type(UserType.STAFF)
+
+    # when:
+    # - The user tries to update a reservation unit with new timeslots
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    # then:
+    # - The response contains errors about missing permissions
+    assert response.error_message() == "No permission to update."
+
+
+def test_reservation_unit__update__regular_user__with_timeslots(graphql):
+    # given:
+    # - There is a draft reservation unit with no timeslots
+    # - A superuser is using the system
+    reservation_unit = ReservationUnitFactory.create(is_draft=True)
+    data = get_draft_update_input_data(reservation_unit)
+    graphql.login_with_superuser()
+
+    # when:
+    # - The user tries to update a reservation unit with new timeslots
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    # then:
+    # - The response has no errors
+    assert response.has_errors is False, response

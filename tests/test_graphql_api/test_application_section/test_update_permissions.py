@@ -1,7 +1,7 @@
 import pytest
 
 from applications.models import ApplicationSection
-from tests.factories import ApplicationSectionFactory, ServiceSectorFactory, UserFactory
+from tests.factories import ApplicationSectionFactory, UserFactory
 from tests.helpers import UserType
 from tests.test_graphql_api.test_application_section.helpers import UPDATE_MUTATION, get_application_section_update_data
 
@@ -90,51 +90,3 @@ def test_application_section__update__perms__general_admin(graphql):
 
     application_sections: list[ApplicationSection] = list(ApplicationSection.objects.all())
     assert len(application_sections) == 1
-
-
-def test_application_section__update__perms__service_sector(graphql):
-    # given:
-    # - There is an unallocated application section in a draft application in an open application round
-    # - A service sector admin for the application round's service sector,
-    #   with application permissions, is using the system
-    application_section = ApplicationSectionFactory.create_in_status_unallocated()
-    service_sector_admin = UserFactory.create_with_service_sector_permissions(
-        service_sector=application_section.application.application_round.service_sector,
-        perms=["can_handle_applications"],
-    )
-    graphql.force_login(service_sector_admin)
-
-    # when:
-    # - User tries to update the application section
-    data = get_application_section_update_data(application_section=application_section)
-    response = graphql(UPDATE_MUTATION, input_data=data)
-
-    # then:
-    # - The response contains no errors
-    # - The database contains the created application section
-    assert response.has_errors is False, response
-
-    application_sections: list[ApplicationSection] = list(ApplicationSection.objects.all())
-    assert len(application_sections) == 1
-
-
-def test_application_section__update__perms__service_sector_admin__for_other_service_sector(graphql):
-    # given:
-    # - There is an unallocated application section in a draft application in an open application round
-    # - A service sector admin for some other service sector than the application round's service sector,
-    #   with application permissions, is using the system
-    application_section = ApplicationSectionFactory.create_in_status_unallocated()
-    service_sector_admin = UserFactory.create_with_service_sector_permissions(
-        service_sector=ServiceSectorFactory.create(),
-        perms=["can_handle_applications"],
-    )
-    graphql.force_login(service_sector_admin)
-
-    # when:
-    # - User tries to update the application section
-    data = get_application_section_update_data(application_section=application_section)
-    response = graphql(UPDATE_MUTATION, input_data=data)
-
-    # then:
-    # - The response contains errors about mutation permissions
-    assert response.error_message() == "No permission to update."
