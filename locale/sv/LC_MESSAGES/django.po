@@ -1594,6 +1594,10 @@ msgid "Can create, edit and delete age groups in the whole system"
 msgstr ""
 
 #: permissions/models.py
+msgid "Can create, edit and delete qualifiers in the whole system"
+msgstr ""
+
+#: permissions/models.py
 msgid "Can create, edit and delete ability groups in the whole system"
 msgstr ""
 
