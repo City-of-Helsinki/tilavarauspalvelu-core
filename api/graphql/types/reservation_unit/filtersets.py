@@ -162,9 +162,7 @@ class ReservationUnitFilterSet(ModelFilterSet):
 
     @staticmethod
     def get_state(qs: ReservationUnitQuerySet, name: str, value: list[str]):
-        queries = []
-        for state in value:
-            queries.append(ReservationUnitStateHelper.get_state_query(state))
+        queries = [ReservationUnitStateHelper.get_state_query(state) for state in value]
         query = reduce(operator.or_, (query for query in queries))
         return qs.filter(query).distinct()
 
