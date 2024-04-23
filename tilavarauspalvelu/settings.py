@@ -309,7 +309,18 @@ LOGGING = {
     "formatters": {
         "common": {
             "()": "tilavarauspalvelu.logging.TVPFormatter",
-            "format": "{asctime} | {levelname} | {dotpath}.{funcName}:{lineno} | {message}",
+            "format": (
+                "Time: {asctime} "
+                "| Level: {levelname} "
+                "| Location: {dotpath}.{funcName}:{lineno} "
+                "| Message: {message} "
+                # These will be filled if the request is added as an extra to the logging function:
+                # > logger.info("message", extra={"request": request})
+                # `django.utils.log.log_response` will add these automatically for failing requests.
+                "| URL: {url} "
+                "| Headers: {headers} "
+                "| User: {user_id}"
+            ),
             "datefmt": "%Y-%m-%dT%H:%M:%S%z",
             "style": "{",
         },

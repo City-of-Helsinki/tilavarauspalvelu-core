@@ -1,12 +1,22 @@
+import json
 import logging
 from pathlib import Path
+
+from django.core.handlers.wsgi import WSGIRequest
 
 BASE_PATH = str(Path(__file__).resolve().parent.parent)
 
 
 class TVPFormatter(logging.Formatter):
     def format(self, record):
-        self._style._defaults = {"dotpath": self.get_dotpath(record)}
+        extra = {"dotpath": self.get_dotpath(record), "url": "-", "headers": "-", "user_id": "-"}
+        if hasattr(record, "request"):
+            request: WSGIRequest = record.request
+            extra["url"] = request.path
+            extra["headers"] = json.dumps(dict(request.headers))
+            extra["user_id"] = "Anonymous" if request.user.is_anonymous else request.user.id
+
+        self._style._defaults = extra
         return super().format(record)
 
     def get_dotpath(self, record: logging.LogRecord) -> str:
