@@ -1,3 +1,4 @@
+import operator
 from collections.abc import Generator, Iterable, Sequence
 from typing import Any, Generic, Literal, TypeVar
 
@@ -132,3 +133,19 @@ def get_attr_by_language(instance: Any, field: str, language: str) -> str | None
     if localised_value:
         return localised_value
     return getattr(instance, field, None)
+
+
+def safe_getattr(obj: object, dotted_path: str, default: Any = None) -> Any:
+    """
+    Examples:
+        >>> safe_getattr(object, "__class__.__name__.__class__.__name__")
+        'str'
+        >>> safe_getattr(object, "foo.bar.baz") is None
+        True
+        >>> safe_getattr(object, "foo.bar.baz", default="")
+        ''
+    """
+    try:
+        return operator.attrgetter(dotted_path)(obj)
+    except AttributeError:
+        return default

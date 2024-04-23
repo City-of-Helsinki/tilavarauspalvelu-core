@@ -1,18 +1,15 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
 from urllib.parse import urljoin
 
 from django.conf import settings
 
 from applications.models import Application
+from common.utils import safe_getattr
 from email_notification.helpers.email_builder_base import BaseEmailBuilder, BaseEmailContext
 from email_notification.models import EmailTemplate, EmailType
 from tilavarauspalvelu.utils.commons import LanguageType
-
-if TYPE_CHECKING:
-    from email_notification.admin.email_tester import EmailTemplateTesterForm
 
 
 @dataclass
@@ -21,26 +18,7 @@ class ApplicationEmailContext(BaseEmailContext):
 
     # Builders
     @classmethod
-    def from_application(
-        cls,
-        application: Application,
-        forced_language: LanguageType | None = None,
-    ) -> ApplicationEmailContext:
-        language = settings.LANGUAGE_CODE
-        if forced_language:
-            language = forced_language
-        elif user_language := getattr(application.user, "preferred_language", None):
-            language = user_language
-
-        return ApplicationEmailContext(
-            # Links
-            my_applications_ext_link=cls._get_my_applications_ext_link(language),
-            # Common
-            **cls._get_common_kwargs(language),
-        )
-
-    @classmethod
-    def from_form(cls, form: EmailTemplateTesterForm, language: LanguageType) -> ApplicationEmailContext:
+    def build(cls, language: LanguageType) -> ApplicationEmailContext:
         return ApplicationEmailContext(
             # Links
             my_applications_ext_link=cls._get_my_applications_ext_link(language),
@@ -88,16 +66,19 @@ class ApplicationEmailBuilder(BaseEmailBuilder):
         application: Application,
         forced_language: LanguageType | None = None,
     ) -> ApplicationEmailBuilder:
-        return ApplicationEmailBuilder(
-            template=template,
-            context=ApplicationEmailContext.from_application(application, forced_language=forced_language),
-        )
+        """Build an email for only a single application"""
+        language = settings.LANGUAGE_CODE
+        if forced_language:
+            language = forced_language
+        elif user_language := safe_getattr(application.user, "preferred_language"):
+            language = user_language
+
+        return cls.build(template=template, language=language)
 
     @classmethod
-    def from_form(
-        cls, *, template: EmailTemplate, form: EmailTemplateTesterForm, language: LanguageType
-    ) -> ApplicationEmailBuilder:
+    def build(cls, *, template: EmailTemplate, language: LanguageType) -> ApplicationEmailBuilder:
+        """Build an email for multiple applications in a single language"""
         return ApplicationEmailBuilder(
             template=template,
-            context=ApplicationEmailContext.from_form(form, language),
+            context=ApplicationEmailContext.build(language),
         )

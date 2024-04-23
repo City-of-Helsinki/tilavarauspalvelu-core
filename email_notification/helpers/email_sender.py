@@ -93,9 +93,8 @@ class EmailNotificationSender:
 
         language: LanguageType
         for language in ["fi", "sv", "en"]:
-            message_builder = ApplicationEmailBuilder.from_form(
+            message_builder = ApplicationEmailBuilder.build(
                 template=self.email_template,
-                form=form,
                 language=language,
             )
             self._send_email(message_builder)
