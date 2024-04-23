@@ -203,7 +203,7 @@ class BaseModelSerializer(serializers.ModelSerializer):
         """
         related_serializers: dict[str, serializers.ListSerializer] = {}
 
-        for name, _value in validated_data.copy().items():
+        for name in validated_data.copy():
             field: serializers.Field | None = self.fields.get(name, None)
             if field is None:
                 continue
