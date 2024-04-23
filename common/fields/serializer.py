@@ -1,10 +1,18 @@
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from django.utils.translation import gettext_lazy
+from graphene_django_extensions.typing import AnyUser
 from rest_framework import serializers
 from rest_framework.relations import PKOnlyObject
 
+if TYPE_CHECKING:
+    from users.models import User
+
+
 __all__ = [
+    "CurrentUserDefaultNullable",
     "IntChoiceField",
     "IntegerPrimaryKeyField",
 ]
@@ -50,3 +58,21 @@ class IntChoiceField(serializers.IntegerField):
         if data not in self.choices:
             self.fail("invalid_choice", input=data)
         return data
+
+
+class CurrentUserDefaultNullable:
+    """
+    Get the current user from the request context. If the user is anonymous, return None.
+    See: `rest_framework.fields.CurrentUserDefault`.
+    """
+
+    requires_context: bool = True
+
+    def __call__(self, serializer_field: serializers.Field) -> User | None:
+        user: AnyUser = serializer_field.context["request"].user
+        if user.is_anonymous:
+            return None
+        return user
+
+    def __repr__(self) -> str:
+        return "%s()" % self.__class__.__name__

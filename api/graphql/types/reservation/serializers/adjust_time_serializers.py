@@ -8,7 +8,6 @@ from api.graphql.extensions.validation_errors import ValidationErrorCodes, Valid
 from api.graphql.types.reservation.serializers.mixins import ReservationPriceMixin, ReservationSchedulingMixin
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from reservation_units.models import ReservationUnit
-from reservation_units.utils.reservation_unit_reservation_scheduler import ReservationUnitReservationScheduler
 from reservations.choices import ReservationStateChoice
 from reservations.models import Reservation
 
@@ -68,11 +67,9 @@ class ReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reservation
             self.check_reservation_duration(reservation_unit, begin, end)
             self.check_buffer_times(reservation_unit, begin, end)
             self.check_reservation_days_before(begin, reservation_unit)
-
-            scheduler = ReservationUnitReservationScheduler(reservation_unit, opening_hours_end=end.date())
-            self.check_opening_hours(scheduler, begin, end)
-            self.check_open_application_round(scheduler, begin, end)
-            self.check_reservation_start_time(scheduler, begin)
+            self.check_opening_hours(reservation_unit, begin, end)
+            self.check_open_application_round(reservation_unit, begin, end)
+            self.check_reservation_start_time(reservation_unit, begin)
 
         self.check_and_handle_pricing(data)
 

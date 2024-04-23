@@ -1,7 +1,7 @@
 import pytest
 
 from tests.factories import RecurringReservationFactory, UserFactory
-from tests.helpers import UserType
+from tests.helpers import UserType, next_hour
 
 from .helpers import UPDATE_MUTATION
 
@@ -23,7 +23,8 @@ def test_recurring_reservations__update__regular_user(graphql):
 
 
 def test_recurring_reservations__update__general_admin(graphql):
-    recurring_reservation = RecurringReservationFactory.create(name="foo")
+    begin = next_hour()
+    recurring_reservation = RecurringReservationFactory.create(begin=begin, name="foo")
 
     admin = UserFactory.create_with_general_permissions(
         perms=["can_create_staff_reservations"],
@@ -41,7 +42,8 @@ def test_recurring_reservations__update__general_admin(graphql):
 
 
 def test_recurring_reservations__update__unit_admin(graphql):
-    recurring_reservation = RecurringReservationFactory.create(name="foo")
+    begin = next_hour()
+    recurring_reservation = RecurringReservationFactory.create(begin=begin, name="foo")
 
     admin = UserFactory.create_with_unit_permissions(
         unit=recurring_reservation.reservation_unit.unit,

@@ -2,6 +2,7 @@ import datetime
 
 import pytest
 
+from reservation_units.enums import ReservationStartInterval
 from reservations.models import RecurringReservation
 from tests.factories import AbilityGroupFactory, AgeGroupFactory, ReservationUnitFactory
 from tests.helpers import UserType
@@ -55,7 +56,8 @@ def test_recurring_reservations__create__end_time_before_begin_time(graphql):
 
     response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "Begin time cannot be after end time."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Begin time cannot be after end time."]
     assert RecurringReservation.objects.exists() is False
 
 
@@ -69,7 +71,8 @@ def test_recurring_reservations__create__end_date_before_begin_date(graphql):
 
     response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "Begin date cannot be after end date."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Begin date cannot be after end date."]
     assert RecurringReservation.objects.exists() is False
 
 
@@ -122,5 +125,25 @@ def test_recurring_reservations__create__recurrence_in_days_not_in_allowed_value
 
     response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "Interval value not allowed, allowed values are 7,14,28 etc. divisible by seven."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("recurrenceInDays") == ["Reoccurrence interval must be a multiple of 7 days."]
+    assert RecurringReservation.objects.exists() is False
+
+
+def test_recurring_reservations__create__start_interval_not_allowed(graphql):
+    reservation_unit = ReservationUnitFactory.create(
+        reservation_start_interval=ReservationStartInterval.INTERVAL_15_MINUTES,
+    )
+
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    data = get_minimal_create_date(reservation_unit)
+    data["beginTime"] = "09:00:01"
+
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Reservation start time does not match the allowed interval of 15 minutes."
+    ]
     assert RecurringReservation.objects.exists() is False

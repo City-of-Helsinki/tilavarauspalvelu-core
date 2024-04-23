@@ -12,7 +12,6 @@ from api.graphql.types.reservation.types import ReservationNode
 from reservation_units.enums import PriceUnit, PricingType, ReservationStartInterval, ReservationUnitState
 from reservation_units.models import ReservationUnit, ReservationUnitPricing
 from reservation_units.utils.reservation_unit_pricing_helper import ReservationUnitPricingHelper
-from reservation_units.utils.reservation_unit_reservation_scheduler import ReservationUnitReservationScheduler
 from reservations.choices import ReservationTypeChoice
 from reservations.models import Reservation
 
@@ -186,7 +185,7 @@ class ReservationSchedulingMixin:
         )
         return reservation_in_reservations_closed_period or reservation_in_non_published_reservation_unit
 
-    def check_reservation_time(self, reservation_unit: ReservationUnit):
+    def check_reservation_time(self, reservation_unit: ReservationUnit) -> None:
         state = reservation_unit.state
         if state in (ReservationUnitState.DRAFT, ReservationUnitState.ARCHIVED):
             raise ValidationErrorWithCode(
@@ -206,7 +205,12 @@ class ReservationSchedulingMixin:
                 ValidationErrorCodes.RESERVATION_UNIT_NOT_RESERVABLE,
             )
 
-    def check_reservation_overlap(self, reservation_unit: ReservationUnit, begin, end):
+    def check_reservation_overlap(
+        self,
+        reservation_unit: ReservationUnit,
+        begin: datetime.datetime,
+        end: datetime.datetime,
+    ) -> None:
         if reservation_unit.actions.check_reservation_overlap(begin, end, self.instance):
             raise ValidationErrorWithCode(
                 "Overlapping reservations are not allowed.",
@@ -215,12 +219,12 @@ class ReservationSchedulingMixin:
 
     @staticmethod
     def check_opening_hours(
-        scheduler: ReservationUnitReservationScheduler,
+        reservation_unit: ReservationUnit,
         begin: datetime.datetime,
         end: datetime.datetime,
     ):
-        is_reservation_unit_open = scheduler.is_reservation_unit_open(begin, end)
-        if not scheduler.reservation_unit.allow_reservations_without_opening_hours and not is_reservation_unit_open:
+        is_open = reservation_unit.actions.is_open(begin, end)
+        if not reservation_unit.allow_reservations_without_opening_hours and not is_open:
             raise ValidationErrorWithCode(
                 "Reservation unit is not open within desired reservation time.",
                 ValidationErrorCodes.RESERVATION_UNIT_IS_NOT_OPEN,
@@ -307,12 +311,12 @@ class ReservationSchedulingMixin:
             )
 
     @staticmethod
-    def check_reservation_start_time(scheduler: ReservationUnitReservationScheduler, begin: datetime.datetime) -> None:
-        if scheduler.reservation_unit.allow_reservations_without_opening_hours:
+    def check_reservation_start_time(reservation_unit: ReservationUnit, begin: datetime.datetime) -> None:
+        if reservation_unit.allow_reservations_without_opening_hours:
             return
 
-        interval_minutes = ReservationStartInterval(scheduler.reservation_unit.reservation_start_interval).as_number
-        possible_start_times = scheduler.get_reservation_unit_possible_start_times(begin.date(), interval_minutes)
+        interval_minutes = ReservationStartInterval(reservation_unit.reservation_start_interval).as_number
+        possible_start_times = reservation_unit.actions.get_possible_start_times(begin.date(), interval_minutes)
         if begin not in possible_start_times:
             raise ValidationErrorWithCode(
                 f"Reservation start time does not match the allowed interval of {interval_minutes} minutes.",
@@ -342,11 +346,11 @@ class ReservationSchedulingMixin:
 
     @staticmethod
     def check_open_application_round(
-        scheduler: ReservationUnitReservationScheduler,
+        reservation_unit: ReservationUnit,
         begin: datetime.datetime,
         end: datetime.datetime,
     ) -> None:
-        open_app_round = scheduler.get_conflicting_open_application_round(begin.date(), end.date())
+        open_app_round = reservation_unit.actions.is_in_open_application_round(begin.date(), end.date())
 
         if open_app_round:
             raise ValidationErrorWithCode(

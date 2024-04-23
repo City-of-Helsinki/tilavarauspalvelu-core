@@ -1,7 +1,9 @@
+import datetime
+
 import pytest
 
 from tests.factories import RecurringReservationFactory, ReservationUnitFactory
-from tests.helpers import UserType
+from tests.helpers import UserType, next_hour
 
 from .helpers import UPDATE_MUTATION
 
@@ -12,7 +14,8 @@ pytestmark = [
 
 
 def test_recurring_reservations__update(graphql):
-    recurring_reservation = RecurringReservationFactory.create(name="foo")
+    begin = next_hour()
+    recurring_reservation = RecurringReservationFactory.create(begin=begin, name="foo")
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     data = {"pk": recurring_reservation.pk, "name": "bar"}
@@ -26,10 +29,10 @@ def test_recurring_reservations__update(graphql):
 
 
 def test_recurring_reservations__update__end_time_before_begin_time(graphql):
-    recurring_reservation = RecurringReservationFactory.create(
-        begin_time="10:00:00",
-        end_time="12:00:00",
-    )
+    begin = next_hour(plus_hours=1)
+    end = begin - datetime.timedelta(hours=1)
+
+    recurring_reservation = RecurringReservationFactory.create(begin=begin, end=end)
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     data = {
@@ -39,7 +42,8 @@ def test_recurring_reservations__update__end_time_before_begin_time(graphql):
 
     response = graphql(UPDATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "Begin time cannot be after end time."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Begin time cannot be after end time."]
 
 
 def test_recurring_reservations__update__end_date_before_begin_date(graphql):
@@ -56,7 +60,8 @@ def test_recurring_reservations__update__end_date_before_begin_date(graphql):
 
     response = graphql(UPDATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "Begin date cannot be after end date."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Begin date cannot be after end date."]
 
 
 def test_recurring_reservations__update__cannot_update_reservation_unit(graphql):
@@ -68,7 +73,7 @@ def test_recurring_reservations__update__cannot_update_reservation_unit(graphql)
     data = {
         "pk": recurring_reservation.pk,
         "name": "bar",
-        "reservationUnitPk": new_reservation_unit.pk,
+        "reservationUnit": new_reservation_unit.pk,
     }
 
     response = graphql(UPDATE_MUTATION, input_data=data)
@@ -80,7 +85,8 @@ def test_recurring_reservations__update__cannot_update_reservation_unit(graphql)
 
 
 def test_recurring_reservations__update__description_can_be_empty(graphql):
-    recurring_reservation = RecurringReservationFactory.create(description="foo")
+    begin = next_hour()
+    recurring_reservation = RecurringReservationFactory.create(begin=begin, description="foo")
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
     data = {

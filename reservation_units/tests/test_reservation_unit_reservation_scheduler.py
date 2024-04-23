@@ -5,7 +5,6 @@ from django.utils.timezone import get_default_timezone
 from freezegun import freeze_time
 
 from reservation_units.models import ReservationUnit
-from reservation_units.utils.reservation_unit_reservation_scheduler import ReservationUnitReservationScheduler
 from reservations.choices import ReservationStateChoice
 from tests.factories import (
     ApplicationRoundFactory,
@@ -71,10 +70,8 @@ def test__reservation_unit_reservation_scheduler__get_reservation_unit_possible_
         end_datetime=_get_dt(month=7, day=1, hour=22),
     )
 
-    scheduler = ReservationUnitReservationScheduler(reservation_unit, opening_hours_end=_get_date(month=1, day=2))
-
-    possible_start_times = scheduler.get_reservation_unit_possible_start_times(
-        selected_date=_get_date(month=1, day=1),
+    possible_start_times = reservation_unit.actions.get_possible_start_times(
+        from_date=_get_date(month=1, day=1),
         interval_minutes=90,
     )
 

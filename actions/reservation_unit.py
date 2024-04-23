@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import datetime
+from collections.abc import Iterable
 from typing import TYPE_CHECKING, Any
 
 from django.db import models
 
-from common.date_utils import time_as_timedelta
+from common.date_utils import DEFAULT_TIMEZONE, local_start_of_day, time_as_timedelta
 from opening_hours.errors import HaukiAPIError
-from opening_hours.models import OriginHaukiResource
+from opening_hours.models import OriginHaukiResource, ReservableTimeSpan
 from opening_hours.utils.hauki_api_client import HaukiAPIClient
 from opening_hours.utils.hauki_api_types import HaukiAPIResource, HaukiTranslatedField
 from utils.external_service.errors import ExternalServiceError
@@ -247,3 +248,46 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         from reservation_units.models import ReservationUnit
 
         return ReservationUnit.objects.filter(pk=self.reservation_unit.pk).reservation_units_with_common_hierarchy()
+
+    def get_possible_start_times(self, from_date: datetime.date, interval_minutes: int) -> set[datetime.datetime]:
+        reservable_time_spans: Iterable[ReservableTimeSpan] = (
+            self.reservation_unit.origin_hauki_resource.reservable_time_spans.filter(
+                start_datetime__date__lte=from_date,
+                end_datetime__date__gte=from_date,
+            )
+        )
+
+        possible_start_times = set()
+        start_time = local_start_of_day(from_date)
+        interval_timedelta = datetime.timedelta(minutes=interval_minutes)
+
+        for time_span in reservable_time_spans:
+            # If the time span starts on the previous day, start from the beginning of selected date instead.
+            # Also handles cases where the time spans have a break smaller than the interval.
+            start_time = max(time_span.start_datetime, start_time).astimezone(DEFAULT_TIMEZONE)
+
+            # Get all possible start times by looping through the time span until the time span or day ends
+            while start_time < time_span.end_datetime and start_time.date() == from_date:
+                possible_start_times.add(start_time)
+                start_time += interval_timedelta
+
+        return possible_start_times
+
+    def is_open(self, start_datetime: datetime.datetime, end_datetime: datetime.datetime) -> bool:
+        origin_hauki_resource = self.reservation_unit.origin_hauki_resource
+        if not origin_hauki_resource:
+            return False
+        return origin_hauki_resource.is_reservable(start_datetime, end_datetime)
+
+    def is_in_open_application_round(self, start_date: datetime.date, end_date: datetime.date) -> bool:
+        from applications.models import ApplicationRound
+
+        for app_round in ApplicationRound.objects.filter(
+            reservation_units=self.reservation_unit,
+            reservation_period_end__gte=start_date,
+            reservation_period_begin__lte=end_date,
+        ):
+            if app_round.status.is_ongoing:
+                return True
+
+        return False

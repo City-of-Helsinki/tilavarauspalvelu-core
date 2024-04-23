@@ -5,6 +5,7 @@ from typing import Any
 import factory
 from factory import fuzzy
 
+from common.date_utils import DEFAULT_TIMEZONE
 from reservations.models import RecurringReservation, Reservation
 
 from ._base import GenericDjangoModelFactory
@@ -22,10 +23,10 @@ class RecurringReservationFactory(GenericDjangoModelFactory[RecurringReservation
 
     name = fuzzy.FuzzyText()
     description = fuzzy.FuzzyText()
-    recurrence_in_days = fuzzy.FuzzyInteger(1, 14)
-    weekdays = "1,2,3,4,5"
+    recurrence_in_days = 14
+    weekdays = "1,2,3,4,5"  # ti, ke, to, pe, la
 
-    begin = fuzzy.FuzzyDateTime(start_dt=datetime.datetime(2023, 1, 1, tzinfo=datetime.UTC))
+    begin = fuzzy.FuzzyDateTime(start_dt=datetime.datetime(2023, 1, 1, tzinfo=DEFAULT_TIMEZONE))
     end = factory.LazyAttribute(lambda r: r.begin + datetime.timedelta(days=30))
 
     begin_date = factory.LazyAttribute(lambda r: r.begin.date())

@@ -17,7 +17,6 @@ from common.typing import AnyUser
 from permissions.helpers import can_handle_reservation_with_units
 from reservation_units.enums import ReservationKind
 from reservation_units.models import ReservationUnit
-from reservation_units.utils.reservation_unit_reservation_scheduler import ReservationUnitReservationScheduler
 from reservations.choices import (
     RESERVEE_LANGUAGE_CHOICES,
     CustomerTypeChoice,
@@ -156,12 +155,9 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
             self.check_max_reservations_per_user(self.context.get("request").user, reservation_unit)
             self.check_sku(sku, reservation_unit.sku)
             self.check_reservation_kind(reservation_unit)
-
-            # Scheduler dependent checks.
-            scheduler = ReservationUnitReservationScheduler(reservation_unit, opening_hours_end=end.date())
-            self.check_opening_hours(scheduler, begin, end)
-            self.check_open_application_round(scheduler, begin, end)
-            self.check_reservation_start_time(scheduler, begin)
+            self.check_opening_hours(reservation_unit, begin, end)
+            self.check_open_application_round(reservation_unit, begin, end)
+            self.check_reservation_start_time(reservation_unit, begin)
 
             sku = reservation_unit.sku
 
