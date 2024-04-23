@@ -78,6 +78,7 @@ requests-mock = "1.12.1"
 [tool.poetry.group.lint.dependencies]
 pre-commit = "3.7.0"
 ruff-lsp = "0.0.53"
+ruff = "^0.4.1"
 
 [tool.ruff]
 fix = true
