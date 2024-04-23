@@ -426,6 +426,8 @@ export type ApplicationRoundNodeReservationUnitsArgs = {
   surfaceAreaGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   surfaceAreaLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
+  tprekDepartmentId?: InputMaybe<Scalars["String"]["input"]>;
+  tprekId?: InputMaybe<Scalars["String"]["input"]>;
   typeRankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   typeRankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
@@ -565,7 +567,7 @@ export type ApplicationSectionNode = Node & {
 export type ApplicationSectionNodeReservationUnitOptionsArgs = {
   orderBy?: InputMaybe<Array<InputMaybe<ReservationUnitOptionOrderingChoices>>>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  preferredOrder?: InputMaybe<Scalars["Int"]["input"]>;
+  preferredOrder?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   reservationUnit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
@@ -2363,6 +2365,8 @@ export type QueryReservationUnitsArgs = {
   surfaceAreaGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   surfaceAreaLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
+  tprekDepartmentId?: InputMaybe<Scalars["String"]["input"]>;
+  tprekId?: InputMaybe<Scalars["String"]["input"]>;
   typeRankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   typeRankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
@@ -3124,6 +3128,8 @@ export type ReservationNodeReservationUnitArgs = {
   surfaceAreaGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   surfaceAreaLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
+  tprekDepartmentId?: InputMaybe<Scalars["String"]["input"]>;
+  tprekId?: InputMaybe<Scalars["String"]["input"]>;
   typeRankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   typeRankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
@@ -3790,6 +3796,7 @@ export type ReservationUnitNode = Node & {
   nameEn?: Maybe<Scalars["String"]["output"]>;
   nameFi?: Maybe<Scalars["String"]["output"]>;
   nameSv?: Maybe<Scalars["String"]["output"]>;
+  numActiveUserReservations?: Maybe<Scalars["Int"]["output"]>;
   paymentMerchant?: Maybe<PaymentMerchantNode>;
   paymentProduct?: Maybe<PaymentProductNode>;
   paymentTerms?: Maybe<TermsOfUseNode>;
@@ -5022,6 +5029,8 @@ export type UnitNodeReservationunitSetArgs = {
   surfaceAreaGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   surfaceAreaLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
+  tprekDepartmentId?: InputMaybe<Scalars["String"]["input"]>;
+  tprekId?: InputMaybe<Scalars["String"]["input"]>;
   typeRankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   typeRankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;

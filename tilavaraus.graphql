@@ -320,6 +320,8 @@ type ApplicationRoundNode implements Node {
     descriptionEn: String
     descriptionEn_Icontains: String
     pk: [Int]
+    tprekId: String
+    tprekDepartmentId: String
     unit: [Int]
     reservationUnitType: [Int]
     minPersonsGte: Decimal
@@ -493,7 +495,7 @@ type ApplicationSectionNode implements Node {
   ageGroup: AgeGroupNode
   reservationUnitOptions(
     pk: [Int]
-    preferredOrder: Int
+    preferredOrder: [Int]
     reservationUnit: [Int]
 
     """Järjestä"""
@@ -1903,6 +1905,8 @@ type Query {
     descriptionEn: String
     descriptionEn_Icontains: String
     pk: [Int]
+    tprekId: String
+    tprekDepartmentId: String
     unit: [Int]
     reservationUnitType: [Int]
     minPersonsGte: Decimal
@@ -2811,6 +2815,8 @@ type ReservationNode implements Node {
     descriptionEn: String
     descriptionEn_Icontains: String
     pk: [Int]
+    tprekId: String
+    tprekDepartmentId: String
     unit: [Int]
     reservationUnitType: [Int]
     minPersonsGte: Decimal
@@ -3689,6 +3695,7 @@ type ReservationUnitNode implements Node {
   firstReservableDatetime: DateTime
   haukiUrl: String
   reservableTimeSpans(startDate: Date!, endDate: Date!): [ReservableTimeSpanType]
+  numActiveUserReservations: Int
   calculatedSurfaceArea: Int
   pk: Int
 }
@@ -4762,6 +4769,8 @@ type UnitNode implements Node {
     descriptionEn: String
     descriptionEn_Icontains: String
     pk: [Int]
+    tprekId: String
+    tprekDepartmentId: String
     unit: [Int]
     reservationUnitType: [Int]
     minPersonsGte: Decimal
