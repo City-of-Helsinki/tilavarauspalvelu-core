@@ -26,8 +26,8 @@ import { CANCEL_APPLICATION_MUTATION } from "@/modules/queries/application";
 import ConfirmationModal, {
   ModalRef,
 } from "@/components/common/ConfirmationModal";
-import { CenterSpinner } from "@/components/common/common";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
+import ClientOnly from "common/src/ClientOnly";
 
 const Card = styled(HdsCard)`
   border-width: 0;
@@ -239,32 +239,32 @@ function ApplicationCard({ application, actionCallback }: Props): JSX.Element {
             ? getApplicant(application, t)
             : ""}
         </Applicant>
-        <Modified>
-          {application.lastModifiedDate
-            ? t("applicationCard:saved", {
-                date: parseISO(application.lastModifiedDate),
-              })
-            : ""}
-        </Modified>
+        {/* Causes hydration mismatch */}
+        <ClientOnly>
+          <Modified>
+            {application.lastModifiedDate
+              ? t("applicationCard:saved", {
+                  date: parseISO(application.lastModifiedDate),
+                })
+              : ""}
+          </Modified>
+        </ClientOnly>
       </div>
       <Buttons>
-        {isLoading ? (
-          <CenterSpinner />
-        ) : (
-          <StyledButton
-            aria-label={t("applicationCard:cancel")}
-            onClick={() => {
-              // TODO modal.open scrolls the page to the top
-              modal?.current?.open();
-            }}
-            disabled={!editable}
-            iconRight={<IconCross aria-hidden />}
-          >
-            {t("applicationCard:cancel")}
-          </StyledButton>
-        )}
+        <StyledButton
+          aria-label={t("applicationCard:cancel")}
+          onClick={() => {
+            // TODO modal.open scrolls the page to the top
+            modal?.current?.open();
+          }}
+          isLoading={isLoading}
+          disabled={!editable}
+          iconRight={<IconCross aria-hidden />}
+        >
+          {t("applicationCard:cancel")}
+        </StyledButton>
         <ButtonLikeLink
-          disabled={!editable || application.pk == null}
+          disabled={!editable || application.pk == null || isLoading}
           href={
             editable && application.pk != null
               ? `${applicationUrl(application.pk ?? 0)}/page1`
