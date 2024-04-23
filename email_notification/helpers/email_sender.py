@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import copy
 from typing import TYPE_CHECKING
 
 from django.conf import settings
@@ -34,13 +35,6 @@ class EmailNotificationSender:
         # Manually defined recipients, if the notification should be sent to a specific list of email addresses.
         # If None, the recipients are determined based on the reservation or application.
         self.recipients = recipients
-
-        # Validate recipients count
-        if self.recipients and len(self.recipients) > settings.EMAIL_MAX_RECIPIENTS:
-            raise SendEmailNotificationError(
-                f"Refusing to notify more than '{settings.EMAIL_MAX_RECIPIENTS}' users. "
-                f"Email type: '{self.email_template.type}'"
-            )
 
         if not self.email_template:
             msg = f"Unable to send '{email_type}' notification, there is no EmailTemplate defined for it."
@@ -107,6 +101,9 @@ class EmailNotificationSender:
             self._send_email(message_builder)
 
     def _send_email(self, message_builder: BaseEmailBuilder) -> None:
+        if not self.recipients:
+            raise SendEmailNotificationError("No recipients defined for the email notification.")
+
         subject = message_builder.get_subject()
         text_content = message_builder.get_content()
         html_content = message_builder.get_html_content()
@@ -117,8 +114,14 @@ class EmailNotificationSender:
             from_email=settings.DEFAULT_FROM_EMAIL,
             bcc=self.recipients,
         )
-
         if html_content:
             email_message.attach_alternative(html_content, "text/html")
 
-        email_message.send(fail_silently=False)
+        if len(self.recipients) <= settings.EMAIL_MAX_RECIPIENTS:
+            email_message.send(fail_silently=False)
+        else:
+            # Send emails in batches, if there are more recipients than the maximum allowed
+            for i in range(0, len(self.recipients), settings.EMAIL_MAX_RECIPIENTS):
+                email_message_copy = copy(email_message)  # Copy the email message to avoid modifying the original
+                email_message_copy.bcc = self.recipients[i : i + settings.EMAIL_MAX_RECIPIENTS]
+                email_message_copy.send(fail_silently=False)

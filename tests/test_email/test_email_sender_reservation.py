@@ -1,12 +1,10 @@
 import datetime
-import re
 from decimal import Decimal
 
 import pytest
 from django.test import override_settings
 
 from email_notification.admin.email_tester import EmailTemplateTesterForm
-from email_notification.exceptions import SendEmailNotificationError
 from email_notification.helpers.email_sender import EmailNotificationSender
 from email_notification.helpers.reservation_email_notification_sender import ReservationEmailNotificationSender
 from email_notification.models import EmailTemplate, EmailType
@@ -115,8 +113,9 @@ def test_email_sender__reservation__with_multiple_recipients__success(outbox, em
     assert outbox[0].bcc == recipients
 
 
-def test_email_sender__reservation__with_multiple_recipients__too_many_recipients(outbox, settings, email_template):
-    settings.EMAIL_MAX_RECIPIENTS = 3
+@override_settings(EMAIL_MAX_RECIPIENTS=3)
+def test_email_sender__reservation__with_multiple_recipients__too_many_recipients(outbox, email_template):
+    reservation: Reservation = ReservationFactory.create(reservation_unit__unit__name="foo")
 
     recipients = [
         "liu.kang@earthrealm.com",
@@ -125,21 +124,20 @@ def test_email_sender__reservation__with_multiple_recipients__too_many_recipient
         "mileena@outworld.com",
     ]
 
-    msg = re.escape(
-        f"Refusing to notify more than '{settings.EMAIL_MAX_RECIPIENTS}' users. Email type: '{email_template.type}'"
-    )
-    with pytest.raises(SendEmailNotificationError, match=msg):
-        EmailNotificationSender(email_type=email_template.type, recipients=recipients)
+    email_notification_sender = EmailNotificationSender(email_type=email_template.type, recipients=recipients)
+    email_notification_sender.send_reservation_email(reservation=reservation)
+
+    # Emails are sent in batches
+    assert len(outbox) == 2
+    assert len(outbox[0].bcc) == 3
+    assert len(outbox[1].bcc) == 1
 
 
 @pytest.mark.parametrize("language", ["fi", "en", "sv"])
 def test_email_sender__reservation__reservation_language_is_used(outbox, language, email_template):
     reservation: Reservation = ReservationFactory.create(reservation_unit__unit__name="foo", reservee_language=language)
 
-    email_notification_sender = EmailNotificationSender(
-        email_type=email_template.type,
-        recipients=None,
-    )
+    email_notification_sender = EmailNotificationSender(email_type=email_template.type, recipients=None)
     email_notification_sender.send_reservation_email(reservation=reservation)
 
     assert len(outbox) == 1
