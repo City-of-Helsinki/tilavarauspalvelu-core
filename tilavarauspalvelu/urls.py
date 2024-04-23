@@ -2,7 +2,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.core.handlers.wsgi import WSGIRequest
-from django.http import JsonResponse
+from django.http import HttpResponseRedirect
 from django.middleware.csrf import get_token
 from django.urls import include, path, reverse
 from django.views.decorators.csrf import csrf_exempt
@@ -25,8 +25,8 @@ admin.site.each_context = lambda request: original_each_context(request) | {
 }
 
 
-def csrf_view(request: WSGIRequest) -> JsonResponse:  # NOSONAR
-    """Return a CSRF token for the frontend to use."""
+def csrf_view(request: WSGIRequest) -> HttpResponseRedirect:  # NOSONAR
+    """View for updating the CSRF cookie."""
     # From: https://fractalideas.com/blog/making-react-and-django-play-well-together-single-page-app-model/
     # > You may wonder whether this endpoint creates a security vulnerability.
     # > From a security perspective, it's no different from any page that contains
@@ -34,9 +34,10 @@ def csrf_view(request: WSGIRequest) -> JsonResponse:  # NOSONAR
     # > prevents an attacker from getting access to the token with a cross-origin request.
     #
     # Set these META-flags to force `django.middleware.csrf.CsrfViewMiddleware` to update the CSRF cookie.
+    redirect_to: str = request.GET.get("redirect_to", "/")
     request.META["CSRF_COOKIE_NEEDS_UPDATE"] = True
-    request.META["CSRF_COOKIE"] = csrf = get_token(request)
-    return JsonResponse({"csrfToken": csrf})
+    request.META["CSRF_COOKIE"] = get_token(request)
+    return HttpResponseRedirect(redirect_to=redirect_to)
 
 
 # Make it possible to turn off CSRF protection for the GraphQL endpoint for frontend graphql codegen
