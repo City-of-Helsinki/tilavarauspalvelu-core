@@ -1,4 +1,5 @@
 import datetime
+from typing import Any
 
 import pytest
 from django.urls import reverse
@@ -123,12 +124,13 @@ def test_reservation_fetch_filtering_by_reservation_unit(
     confirmed_reservation,
     reservation_in_second_unit,
 ):
-    def to_reservation_unit_ids(data: list[Reservation]) -> list[int]:
-        unit_ids = []
-        for res in data:
-            for unit in res["reservation_unit"]:
-                unit_ids.append(unit["id"])
-        return unit_ids
+    def to_reservation_unit_ids(data: list[dict[str, Any]]) -> list[int]:
+        res_unit_ids = []
+        for reservation in data:
+            reservation_res_unit_ids = [res_unit["id"] for res_unit in reservation["reservation_unit"]]
+            res_unit_ids.extend(reservation_res_unit_ids)
+
+        return res_unit_ids
 
     url = f"{reverse('reservation-list')}?reservation_unit={reservation_unit.id}"
 
