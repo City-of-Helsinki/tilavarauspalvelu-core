@@ -308,22 +308,24 @@ export function AllocationCalendar({
   );
   const [focusedAllocated] = useFocusAllocatedSlot();
 
-  const aesForThisUnit = filterNonNullable(applicationSections);
   const data = WEEKDAYS.map((day) => {
     const isNotHandled = (ae: ApplicationSectionNode) =>
       ae.status !== ApplicationSectionStatusChoice.Handled;
+
     // Only show allocated that match the unit and day
-    const timeslots = aesForThisUnit
+    const timeslots = filterNonNullable(applicationSections)
       .filter(isNotHandled)
       .filter((ae) => ae.suitableTimeRanges?.some((tr) => isDay(tr, day)));
 
-    const resUnits = aesForThisUnit?.flatMap((ae) => ae.reservationUnitOptions);
+    const resUnits = applicationSections?.flatMap(
+      (ae) => ae.reservationUnitOptions
+    );
 
-    const allocated = resUnits
+    const allocated = filterNonNullable(resUnits)
       .filter((a) => a.allocatedTimeSlots?.some((ts) => isDay(ts, day)))
       .map((ts) => removeOtherAllocatedDays(ts, day));
 
-    const focusedAllocatedTimes = allocated.filter((a) =>
+    const focusedAllocatedTimes = filterNonNullable(allocated).filter((a) =>
       a.allocatedTimeSlots?.some((ts) => ts.pk === focusedAllocated)
     );
 

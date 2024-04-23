@@ -16,7 +16,6 @@ import {
 } from "common/types/gql-types";
 import { ShowAllContainer } from "common/src/components/";
 import { transformWeekday, type Day } from "common/src/conversion";
-import { filterNonNullable } from "common/src/helpers";
 import { ALLOCATION_CALENDAR_TIMES } from "@/common/const";
 import {
   type RelatedSlot,
@@ -283,17 +282,13 @@ export function AllocationColumn({
     applicationRoundStatus === ApplicationRoundStatusChoice.InAllocation;
 
   // NOTE have to reverse search for the pk, as the reservationUnitOption doesn't include any other fields than pk
-  const allocatedPks = filterNonNullable(
-    allocated
-      .flatMap((ruo) =>
-        ruo.allocatedTimeSlots?.map(
-          (ts) => ts.reservationUnitOption.applicationSection
-        )
-      )
-      .map((as) => as?.pk)
+  const allocatedPks = allocated.flatMap((ruo) =>
+    ruo.allocatedTimeSlots?.map(
+      (ts) => ts.reservationUnitOption.applicationSection.pk
+    )
   );
   const allocatedSections = aes.filter(
-    (as) => as.pk != null && allocatedPks.includes(as.pk)
+    (as) => as.pk != null && allocatedPks.find((x) => x === as.pk)
   );
 
   const doesCollideToOtherAllocations = relatedAllocations[day].some((slot) => {

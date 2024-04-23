@@ -144,21 +144,26 @@ export function AllocationPageContent({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- We only care if reservationUnit changes, and adding the rest causes an infinite loop
   }, [reservationUnit, params]);
 
-  /* TODO: rework / remove
-   * issues
-   * Any time anything is changed in the filters or selection this is going to reset.
-   * Rather make it a higher level hook (on the page level) and reset only for the few things that need it.
-   * Could also include it inside the Selection hook (pass things that should cause side effects to it).
-   * For now NOT reseting at all, add them individually as the client requests not before
-   * 2nd note: when reseting check if the value is valid or makes sense, don't just reset it
-   * 3rd note: make sure landing on the page with query params works as expected (and doesn't just remove them)
-  useEffect( () => setSelectedSlots([]),
-    [focusedApplicationEvent, reservationUnit]
-  );
-  */
-
   const relatedSpacesTimeSlotsByDayReduced =
     getRelatedTimeSlots(relatedAllocations);
+
+  // NOTE left hand cards include other reservation units as well (if they are allocated)
+  // remove those from the calendar and the right hand side
+  const aesForThisUnit = filterNonNullable(applicationSections)
+    .filter((ae) => {
+      if (ae.reservationUnitOptions.length === 0) {
+        return false;
+      }
+      return ae.reservationUnitOptions?.some(
+        (a) => a.reservationUnit.pk === reservationUnit.pk
+      );
+    })
+    .map((ae) => ({
+      ...ae,
+      reservationUnitOptions: ae.reservationUnitOptions?.filter(
+        (ruo) => ruo.reservationUnit.pk === reservationUnit.pk
+      ),
+    }));
 
   // TODO should use mobile menu layout if the screen is small (this page probably requires  >= 1200px)
   return (
@@ -168,11 +173,11 @@ export function AllocationPageContent({
         reservationUnit={reservationUnit}
       />
       <AllocationCalendar
-        applicationSections={applicationSections}
+        applicationSections={aesForThisUnit}
         relatedAllocations={relatedSpacesTimeSlotsByDayReduced}
       />
       <AllocationColumn
-        applicationSections={applicationSections}
+        applicationSections={aesForThisUnit}
         reservationUnit={reservationUnit}
         refetchApplicationEvents={refetchApplicationEvents}
         applicationRoundStatus={applicationRoundStatus}

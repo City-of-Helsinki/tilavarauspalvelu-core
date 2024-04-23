@@ -304,7 +304,8 @@ function ApplicationRoundAllocation({
     skip: !applicationRoundPk || reservationUnitFilterQuery == null,
     pollInterval: ALLOCATION_POLL_INTERVAL,
     // NOTE required otherwise this returns stale data when filters change
-    fetchPolicy: "cache-and-network",
+    // there is an issue with the caches (sometimes returns incorrect data, not stale but incorrect)
+    fetchPolicy: "network-only",
     variables: {
       applicationRound: applicationRoundPk,
       priority: priorityFilterQuery,
@@ -374,9 +375,37 @@ function ApplicationRoundAllocation({
 
   // TODO show loading state somewhere down the line
   const appEventsData = data ?? previousData;
+
+  // NOTE we can't filter the query because we need to show allocated in different units
+  // so for all data we remove non allocated that don't match the preferredOrder
+  // for calendar / right hand side we do more extensive filtering later.
   const applicationSections = filterNonNullable(
     appEventsData?.applicationSections?.edges.map((e) => e?.node)
-  );
+  ).filter((section) => {
+    const opts = section?.reservationUnitOptions?.filter((r) => {
+      if (r?.reservationUnit == null) {
+        return false;
+      }
+      if (
+        r.allocatedTimeSlots.filter(
+          (ats) => ats.reservationUnitOption?.pk === r.pk
+        ).length > 0
+      ) {
+        return true;
+      }
+      if (preferredOrderFilterQuery.length > 0) {
+        const includedInPreferredOrder =
+          preferredOrderFilterQuery.includes(r.preferredOrder) ||
+          (includePreferredOrder10OrHigher && (r.preferredOrder ?? 0) >= 10);
+        const orderFiltered =
+          includedInPreferredOrder &&
+          r.reservationUnit.pk === reservationUnitFilterQuery;
+        return orderFiltered;
+      }
+      return r?.reservationUnit.pk === reservationUnitFilterQuery;
+    });
+    return opts.length > 0;
+  });
 
   const priorityOptions = ([300, 200] as const).map((n) => ({
     value: n,
