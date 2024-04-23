@@ -415,14 +415,14 @@ class ReservationUnitFirstReservableTimeHelper:
 
         # The `RESULTS_SENT` status ApplicationRounds already excluded when `application_rounds` are prefetched,
         # so we don't need to filter those away here.
-        for application_round in self.reservation_unit.application_rounds.all():
-            reservation_unit_closed_time_spans.append(
-                TimeSpanElement(
-                    start_datetime=local_start_of_day(application_round.reservation_period_begin),
-                    end_datetime=local_start_of_day(application_round.reservation_period_end) + timedelta(days=1),
-                    is_reservable=False,
-                )
+        reservation_unit_closed_time_spans.extend(
+            TimeSpanElement(
+                start_datetime=local_start_of_day(application_round.reservation_period_begin),
+                end_datetime=local_start_of_day(application_round.reservation_period_end) + timedelta(days=1),
+                is_reservable=False,
             )
+            for application_round in self.reservation_unit.application_rounds.all()
+        )
 
         return reservation_unit_closed_time_spans
 
