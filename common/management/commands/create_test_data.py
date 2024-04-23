@@ -464,14 +464,7 @@ def _create_roles_and_permissions() -> Roles:
                 verbose_name=user_type.value,
             )
             role_choices.append(new_role)
-
-            for name in choices:
-                role_permissions.append(
-                    permission(
-                        role=new_role,
-                        permission=name,
-                    )
-                )
+            role_permissions.extend(permission(role=new_role, permission=name) for name in choices)
 
         roles[role_kind] = {role.code: role for role in role_choice.objects.bulk_create(role_choices)}
         permission.objects.bulk_create(role_permissions)

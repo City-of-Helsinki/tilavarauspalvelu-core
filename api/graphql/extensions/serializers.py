@@ -42,8 +42,7 @@ class OldPrimaryKeySerializerBase(serializers.ModelSerializer):
                     messages.append(message)
 
         elif isinstance(detail, list) and len(detail) > 0:
-            for item in detail:
-                messages.append(item)
+            messages.extend(detail)
 
         elif isinstance(detail, ErrorDetail | str):
             messages.append(detail)
