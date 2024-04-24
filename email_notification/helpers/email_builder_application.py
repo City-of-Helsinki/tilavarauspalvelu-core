@@ -51,7 +51,7 @@ class ApplicationEmailBuilder(BaseEmailBuilder):
 
     email_template_types = [
         EmailType.APPLICATION_HANDLED,
-        EmailType.APPLICATION_IN_HANDLING,
+        EmailType.APPLICATION_IN_ALLOCATION,
         EmailType.APPLICATION_RECEIVED,
     ]
 
