@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from django.utils.translation import gettext_lazy
 from graphene_django_extensions.typing import AnyUser
 from rest_framework import serializers
-from rest_framework.relations import PKOnlyObject
+from rest_framework.fields import Field, SkipField
 
 if TYPE_CHECKING:
     from users.models import User
@@ -13,51 +12,8 @@ if TYPE_CHECKING:
 
 __all__ = [
     "CurrentUserDefaultNullable",
-    "IntChoiceField",
-    "IntegerPrimaryKeyField",
+    "input_only_field",
 ]
-
-
-class IntPkOnlyObject(PKOnlyObject):
-    """PK object that is coerced to an integer."""
-
-    def __int__(self) -> int:
-        return int(self.pk)
-
-
-class IntegerPrimaryKeyField(serializers.PrimaryKeyRelatedField, serializers.IntegerField):
-    """
-    A field that refers to foreign keys by an integer primary key.
-    If `common.serializers.BaseModelSerializer` is used, this field is automatically used for foreign keys.
-    """
-
-    def get_attribute(self, instance) -> IntPkOnlyObject | None:
-        attribute = super().get_attribute(instance)
-        if isinstance(attribute, PKOnlyObject) and attribute.pk:
-            return IntPkOnlyObject(pk=attribute.pk)
-        return None
-
-
-class IntChoiceField(serializers.IntegerField):
-    """
-    Pairs with 'common.fields.model.IntChoiceField' to allow plain integers as choices in graphql endpoints.
-    If `common.serializers.BaseModelSerializer` is used, this field is automatically used for
-    model fields using `common.fields.model.IntChoiceField`.
-    """
-
-    default_error_messages = serializers.IntegerField.default_error_messages | {
-        "invalid_choice": gettext_lazy('"{input}" is not a valid choice.'),
-    }
-
-    def __init__(self, choices: list[tuple[int, str]], **kwargs: Any) -> None:
-        self.choices = [val for val, _ in choices]
-        super().__init__(**kwargs)
-
-    def to_internal_value(self, data: int | str) -> int:
-        data = super().to_internal_value(data)
-        if data not in self.choices:
-            self.fail("invalid_choice", input=data)
-        return data
 
 
 class CurrentUserDefaultNullable:
@@ -76,3 +32,24 @@ class CurrentUserDefaultNullable:
 
     def __repr__(self) -> str:
         return "%s()" % self.__class__.__name__
+
+
+def input_only_field(value: Any, field: Field) -> None:
+    """
+    This is a bit of a hack, but adding this validator to any ModelSerializer field
+    will exclude that field from `validated_data`. This can be used to create fields
+    that are only used for input, but not saved on the model. The value for the field
+    is still present in the `initial_data` attribute of the serializer, and will be run
+    through the `to_internal_value` method of the field. The internal value is then saved
+    to `initial_data`.
+
+    Note that you should not set a `default` value for the field, or this will not work.
+    Instead, use `self.initial_data.get(<field_name>, <default_value>)` for default values.
+    Additionally, fields should be marked as `write_only=True` to prevent them from being
+    serialized in responses.
+    """
+    field.parent.initial_data[field.field_name] = value  # Save the validated value
+    raise SkipField
+
+
+input_only_field.requires_context = True  # See. `rest_framework.fields.Field.run_validators`

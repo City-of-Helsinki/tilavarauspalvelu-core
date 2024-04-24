@@ -1,6 +1,7 @@
 import datetime
 
 from django.utils.timezone import get_default_timezone
+from graphene_django_extensions.fields import IntegerPrimaryKeyField
 from rest_framework import serializers
 
 from api.graphql.extensions.fields import OldChoiceCharField
@@ -9,7 +10,6 @@ from api.graphql.extensions.validation_errors import ValidationErrorCodes, Valid
 from api.graphql.types.reservation.serializers.mixins import ReservationSchedulingMixin
 from applications.models import City
 from common.date_utils import local_datetime
-from common.fields.serializer import IntegerPrimaryKeyField
 from reservation_units.models import ReservationUnit
 from reservations.choices import (
     RESERVEE_LANGUAGE_CHOICES,

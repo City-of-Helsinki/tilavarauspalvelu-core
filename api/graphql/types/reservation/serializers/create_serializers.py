@@ -4,6 +4,7 @@ from typing import Any
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
 from django.utils.timezone import get_default_timezone
+from graphene_django_extensions.fields import IntegerPrimaryKeyField
 from graphql import GraphQLError
 from rest_framework import serializers
 
@@ -12,7 +13,6 @@ from api.graphql.extensions.serializers import OldPrimaryKeySerializer
 from api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from api.graphql.types.reservation.serializers.mixins import ReservationPriceMixin, ReservationSchedulingMixin
 from applications.models import City
-from common.fields.serializer import IntegerPrimaryKeyField
 from common.typing import AnyUser
 from permissions.helpers import can_handle_reservation_with_units
 from reservation_units.enums import ReservationKind
