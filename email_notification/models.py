@@ -11,7 +11,7 @@ __all__ = [
 class EmailType(models.TextChoices):
     ACCESS_CODE_FOR_RESERVATION = "access_code_for_reservation"
     APPLICATION_HANDLED = "application_handled"
-    APPLICATION_IN_HANDLING = "application_in_handling"
+    APPLICATION_IN_ALLOCATION = "application_in_allocation"
     APPLICATION_RECEIVED = "application_received"
     HANDLING_REQUIRED_RESERVATION = "handling_required_reservation"
     RESERVATION_CANCELLED = "reservation_cancelled"
