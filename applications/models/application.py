@@ -37,6 +37,8 @@ class Application(SerializableMixin, models.Model):
     last_modified_date: datetime = models.DateTimeField(auto_now=True)
     cancelled_date: datetime | None = models.DateTimeField(null=True, blank=True, default=None)
     sent_date: datetime | None = models.DateTimeField(null=True, blank=True, default=None)
+    in_allocation_notification_sent_date: datetime | None = models.DateTimeField(null=True, blank=True, default=None)
+    results_ready_notification_sent_date: datetime | None = models.DateTimeField(null=True, blank=True, default=None)
     additional_information: str | None = models.TextField(null=True, blank=True)
     working_memo: str = models.TextField(blank=True, default="")
 
