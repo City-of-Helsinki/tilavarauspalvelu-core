@@ -31,28 +31,31 @@ function redirectProtectedRoute(req: NextRequest) {
   return undefined;
 }
 
-/// are we missing a csrf token in cookies and should redirect to get one
+/// are we missing a csrf token in cookies
+/// if so get the backend url to redirect to and add the current url as a redirect_to parameter
 function redirectCsrfToken(req: NextRequest): URL | undefined {
-  // need to ignore all assets outside of html requests (which don't have an extension)
-  // so could we just check any request that doesn't have an extension?
-  if (
-    req.url.startsWith("/_next") ||
-    req.url.match(
-      /\.(js|css|png|jpg|jpeg|svg|gif|ico|json|woff|woff2|ttf|eot|otf)$/
-    )
-  ) {
-    return undefined;
-  }
-
   const { cookies } = req;
   const hasCsrfToken = cookies.has("csrftoken");
   if (hasCsrfToken) {
     return undefined;
   }
 
+  // need to ignore all assets outside of html requests (which don't have an extension)
+  // so could we just check any request that doesn't have an extension?
+  const requestUrl = new URL(req.url);
+  if (
+    // ignore healthcheck because it's for automated test suite that can't do redirects
+    requestUrl.pathname.startsWith("/healthcheck") ||
+    requestUrl.pathname.startsWith("/_next") ||
+    requestUrl.pathname.match(
+      /\.(js|css|png|jpg|jpeg|svg|gif|ico|json|woff|woff2|ttf|eot|otf)$/
+    )
+  ) {
+    return undefined;
+  }
+
   const csrfUrl = `${apiBaseUrl}/csrf/`;
   const redirectUrl = new URL(csrfUrl);
-  const requestUrl = new URL(req.url);
 
   // On server envs everything is in the same domain and 80/443 ports, so ignore the host part of the url.
   // More robust solution (supporting separate domains) would need to take into account us being behind
