@@ -824,6 +824,7 @@ function ApplicationDetails({
     data,
     loading: isLoading,
     refetch,
+    error,
   } = useQuery<Query, QueryApplicationArgs>(APPLICATION_ADMIN_QUERY, {
     skip: applicationPk === 0,
     variables: { id },
@@ -837,6 +838,17 @@ function ApplicationDetails({
 
   if (isLoading) {
     return <Loader />;
+  }
+
+  if (error) {
+    return <div>{t("errors.errorFetchingApplication")}</div>;
+  }
+
+  // NOTE id query will return null if the application is not found or the user does not have permission
+  // we can't distinguish between these two cases
+  const canView = application != null;
+  if (!canView) {
+    return <div>{t("errors.noPermission")}</div>;
   }
 
   const isOrganisation = application?.organisation != null;
