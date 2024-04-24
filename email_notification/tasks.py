@@ -1,6 +1,10 @@
 from django.conf import settings
+from lookup_property import L
 
+from applications.choices import ApplicationRoundStatusChoice, ApplicationSectionStatusChoice
 from applications.models import Application
+from common.date_utils import local_datetime
+from email_notification.exceptions import SendEmailNotificationError
 from email_notification.helpers.email_sender import EmailNotificationSender
 from email_notification.models import EmailType
 from permissions.helpers import has_unit_permission
@@ -95,3 +99,28 @@ def send_application_email_task(application_id: int, email_type: EmailType) -> N
 
     email_notification_sender = EmailNotificationSender(email_type=email_type, recipients=None)
     email_notification_sender.send_application_email(application=application)
+
+
+@app.task(name="send_application_in_allocation_emails")
+def send_application_in_allocation_email_task() -> None:
+    if not settings.SEND_RESERVATION_NOTIFICATION_EMAILS:
+        return
+
+    # Don't try to send anything if the email template is not defined (EmailNotificationSender will raise an error)
+    try:
+        email_sender = EmailNotificationSender(email_type=EmailType.APPLICATION_IN_ALLOCATION, recipients=None)
+    except SendEmailNotificationError:
+        return
+
+    # Get all applications that need a notification to be sent
+    applications = Application.objects.filter(
+        L(application_round__status=ApplicationRoundStatusChoice.IN_ALLOCATION.value),
+        status=ApplicationSectionStatusChoice.IN_ALLOCATION.value,
+        in_allocation_notification_sent_date__isnull=True,
+        application_sections__isnull=False,
+    ).order_by("created_date")
+    if not applications:
+        return
+
+    email_sender.send_batch_application_emails(applications=applications)
+    applications.update(in_allocation_notification_sent_date=local_datetime())
