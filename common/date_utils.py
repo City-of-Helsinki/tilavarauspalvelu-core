@@ -1,5 +1,6 @@
 import datetime
 import zoneinfo
+from collections.abc import Generator
 from typing import Generic, TypedDict, TypeVar
 
 from django.utils.timezone import get_default_timezone
@@ -12,6 +13,7 @@ __all__ = [
     "combine",
     "compare_datetimes",
     "compare_times",
+    "get_periods_between",
     "local_date",
     "local_date_string",
     "local_datetime",
@@ -339,3 +341,39 @@ def merge_time_slots(time_slots: list[TimeSlot]) -> list[TimeSlot]:
         # Otherwise the periods are not contiguous -> append the period and continue.
         merged_slots.append(period)
     return merged_slots
+
+
+def get_periods_between(
+    start_date: datetime.date,
+    end_date: datetime.date,
+    start_time: datetime.time,
+    end_time: datetime.time,
+    *,
+    interval: int = 7,
+    tzinfo: zoneinfo.ZoneInfo | datetime.timezone | None = None,
+) -> Generator[tuple[datetime.datetime, datetime.datetime], None, None]:
+    """
+    Generate datetimes based on the given start and end dates.
+
+    Note: This will generate the times in such a way that the time will be the same after
+          switching to daylight saving time and back.
+
+    :param start_date: From which date to generate dates?
+    :param end_date: Until which date to generate dates?
+    :param start_time: Start time of a period.
+    :param end_time: End time of a period.
+    :param interval: Days between each period.
+    :param tzinfo: Timezone information for the datetimes (if times are not datetime-aware yet).
+    """
+    if end_date < start_date:
+        msg = "End date cannot be before start date."
+        raise ValueError(msg)
+    if end_time < start_time:
+        msg = "End time cannot be before start time."
+        raise ValueError(msg)
+
+    start_datetime = combine(start_date, start_time, tzinfo=tzinfo)
+    end_datetime = combine(start_date, end_time, tzinfo=tzinfo)
+
+    for delta in range(0, (end_date - start_date).days + 1, interval):
+        yield start_datetime + datetime.timedelta(days=delta), end_datetime + datetime.timedelta(days=delta)

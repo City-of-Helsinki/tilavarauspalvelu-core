@@ -53,6 +53,7 @@ from api.graphql.types.purpose.mutations import PurposeCreateMutation, PurposeUp
 from api.graphql.types.recurring_reservation.mutations import (
     RecurringReservationCreateMutation,
     RecurringReservationUpdateMutation,
+    ReservationSeriesCreateMutation,
 )
 from api.graphql.types.reservation.mutations import (
     ReservationAdjustTimeMutation,
@@ -117,6 +118,7 @@ __all__ = [
     "ReservationDenyMutation",
     "ReservationRefundMutation",
     "ReservationRequiresHandlingMutation",
+    "ReservationSeriesCreateMutation",
     "ReservationStaffAdjustTimeMutation",
     "ReservationStaffCreateMutation",
     "ReservationStaffModifyMutation",

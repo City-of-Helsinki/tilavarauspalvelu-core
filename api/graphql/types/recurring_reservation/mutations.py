@@ -4,12 +4,19 @@ from api.graphql.types.recurring_reservation.permissions import RecurringReserva
 from api.graphql.types.recurring_reservation.serializers import (
     RecurringReservationCreateSerializer,
     RecurringReservationUpdateSerializer,
+    ReservationSeriesSerializer,
 )
 
 __all__ = [
     "RecurringReservationCreateMutation",
     "RecurringReservationUpdateMutation",
 ]
+
+
+class ReservationSeriesCreateMutation(CreateMutation):
+    class Meta:
+        serializer_class = ReservationSeriesSerializer
+        permission_classes = [RecurringReservationPermission]
 
 
 class RecurringReservationCreateMutation(CreateMutation):

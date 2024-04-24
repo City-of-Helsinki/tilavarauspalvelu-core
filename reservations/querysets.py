@@ -197,9 +197,17 @@ class ReservationQuerySet(QuerySet):
         )
 
     def within_period(self: Self, period_start: datetime.date, period_end: datetime.date) -> Self:
+        """All reservation fully withing a period."""
         return self.filter(
-            begin__gte=period_start,
-            end__lte=period_end,
+            begin__date__gte=period_start,
+            end__date__lte=period_end,
+        )
+
+    def overlapping_period(self: Self, period_start: datetime.date, period_end: datetime.date) -> Self:
+        """All reservations that overlap with a period, even partially."""
+        return self.filter(
+            begin__date__lte=period_end,
+            end__date__gte=period_start,
         )
 
     def going_to_occur(self: Self):
@@ -239,7 +247,7 @@ class ReservationQuerySet(QuerySet):
             payment_order__created_at__lte=expiration_time,
         )
 
-    def affecting_reservations(self: Self, units: list[int], reservation_units: list[int]) -> Self:
+    def affecting_reservations(self: Self, units: list[int] = (), reservation_units: list[int] = ()) -> Self:
         """Filter reservations that affect other reservations in the given units and/or reservation units."""
         qs = ReservationUnit.objects.all()
         if units:
