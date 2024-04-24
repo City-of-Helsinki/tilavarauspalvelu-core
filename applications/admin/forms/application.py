@@ -58,6 +58,8 @@ class ApplicationAdminForm(forms.ModelForm):
             "working_memo",
             "sent_date",
             "cancelled_date",
+            "in_allocation_notification_sent_date",
+            "results_ready_notification_sent_date",
         ]
         labels = {
             "applicant_type": _("Applicant type"),
@@ -71,6 +73,8 @@ class ApplicationAdminForm(forms.ModelForm):
             "working_memo": _("Working memo"),
             "sent_date": _("Sent date"),
             "cancelled_date": _("Cancelled date"),
+            "in_allocation_notification_sent_date": _("In allocation notification sent date"),
+            "results_ready_notification_sent_date": _("Results ready notification sent date"),
         }
         help_texts = {
             "applicant_type": _("Applicant type."),
@@ -84,4 +88,10 @@ class ApplicationAdminForm(forms.ModelForm):
             "working_memo": _("Working memo for staff users."),
             "sent_date": _("Date when the application was sent."),
             "cancelled_date": _("Date when the application was cancelled."),
+            "in_allocation_notification_sent_date": _(
+                "Date when the applicant was notified that this application round is now in allocation."
+            ),
+            "results_ready_notification_sent_date": _(
+                "Date when the applicant was notified that this application round results are now ready."
+            ),
         }
