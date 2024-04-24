@@ -589,6 +589,7 @@ function AllocationWrapper({
 
   const { t } = useTranslation();
   const { hasUnitPermission } = usePermission();
+  const { hasApplicationRoundPermission } = usePermission();
 
   // TODO don't use spinners, skeletons are better
   // also this blocks the sub component query (the initial with zero filters) which slows down the page load
@@ -603,8 +604,24 @@ function AllocationWrapper({
     return <p>{t("errors.errorFetchingData")}</p>;
   }
 
-  const appRound = data?.applicationRound;
-  const reservationUnits = filterNonNullable(appRound?.reservationUnits);
+  const { applicationRound } = data ?? {};
+
+  // should never be null but our codegen causes type problems
+  const canManage =
+    applicationRound != null
+      ? hasApplicationRoundPermission(
+          applicationRound,
+          Permission.CAN_MANAGE_APPLICATIONS
+        )
+      : false;
+
+  if (!canManage) {
+    return <div>{t("errors.noPermission")}</div>;
+  }
+
+  const reservationUnits = filterNonNullable(
+    applicationRound?.reservationUnits
+  );
   const unitData = reservationUnits.map((ru) => ru?.unit);
 
   // TODO name sort fails with numbers because 11 < 2
@@ -614,7 +631,7 @@ function AllocationWrapper({
     )
     .sort((a, b) => a?.nameFi?.localeCompare(b?.nameFi ?? "") ?? 0);
 
-  const roundName = appRound?.nameFi ?? "-";
+  const roundName = applicationRound?.nameFi ?? "-";
 
   const resUnits = uniqBy(filterNonNullable(reservationUnits), "pk").sort(
     (a, b) => a?.nameFi?.localeCompare(b?.nameFi ?? "") ?? 0
@@ -624,13 +641,13 @@ function AllocationWrapper({
     <>
       <BreadcrumbWrapper backLink=".." />
       <ApplicationRoundAllocation
-        applicationRound={appRound ?? undefined}
+        applicationRound={applicationRound ?? undefined}
         applicationRoundPk={applicationRoundPk}
         units={units}
         reservationUnits={resUnits}
         roundName={roundName}
         applicationRoundStatus={
-          appRound?.status ?? ApplicationRoundStatusChoice.Upcoming
+          applicationRound?.status ?? ApplicationRoundStatusChoice.Upcoming
         }
       />
     </>

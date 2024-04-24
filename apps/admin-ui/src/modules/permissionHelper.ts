@@ -20,6 +20,7 @@ export enum Permission {
   CAN_MANAGE_RESOURCES = GeneralPermissionChoices.CanManageResources,
   CAN_MANAGE_UNITS = GeneralPermissionChoices.CanManageUnits,
   CAN_VALIDATE_APPLICATIONS = GeneralPermissionChoices.CanValidateApplications,
+  CAN_MANAGE_APPLICATIONS = GeneralPermissionChoices.CanHandleApplications,
   CAN_MANAGE_BANNER_NOTIFICATIONS = GeneralPermissionChoices.CanManageNotifications,
 }
 /* eslint-enable @typescript-eslint/prefer-literal-enum-member */

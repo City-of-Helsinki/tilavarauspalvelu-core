@@ -3,6 +3,7 @@ import type {
   UnitNode,
   ReservationNode,
   UserNode,
+  ApplicationRoundNode,
 } from "common/types/gql-types";
 import {
   hasPermission as baseHasPermission,
@@ -83,6 +84,24 @@ const usePermission = () => {
     return baseHasAnyPermission(user);
   };
 
+  // TODO restrict the Permission type to only those that are applicable to application rounds
+  const hasApplicationRoundPermission = (
+    applicationRound: ApplicationRoundNode,
+    permission: Permission
+  ) => {
+    if (!user) return false;
+    const units = filterNonNullable(
+      applicationRound.reservationUnits.flatMap((ru) => ru.unit)
+    );
+    for (const unit of units) {
+      if (hasUnitPermission(user, permission, unit)) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  // TODO this is becoming convoluted with the addition of a new function for each object type
   return {
     user,
     hasPermission: (
@@ -94,6 +113,7 @@ const usePermission = () => {
     hasAnyPermission,
     hasUnitPermission: (permission: Permission, unit: UnitNode) =>
       hasUnitPermission(user, permission, unit),
+    hasApplicationRoundPermission,
   };
 };
 
