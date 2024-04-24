@@ -275,6 +275,9 @@ def can_view_recurring_reservation(user: AnyUser, recurring_reservation: Recurri
     if recurring_reservation.user == user:
         return True
 
+    if has_general_permission(user, permission):
+        return True
+
     reservation_units = recurring_reservation.reservations.values_list("reservation_unit", flat=True)
     units: list[int] = list(Unit.objects.filter(reservationunit__in=reservation_units).values_list("pk", flat=True))
     if has_unit_permission(user, permission, units):
