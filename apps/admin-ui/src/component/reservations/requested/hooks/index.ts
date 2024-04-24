@@ -13,7 +13,7 @@ import { useQuery } from "@apollo/client";
 import { toApiDate } from "common/src/common/util";
 import {
   RECURRING_RESERVATION_QUERY,
-  RESERVATIONS_BY_RESERVATIONUNIT,
+  RESERVATIONS_BY_RESERVATIONUNITS,
   SINGLE_RESERVATION_QUERY,
 } from "./queries";
 import { useNotification } from "@/context/NotificationContext";
@@ -75,7 +75,7 @@ export function useReservationData(
   const typename = "ReservationUnitNode";
   const id = base64encode(`${typename}:${reservationUnitPk}`);
   const { data, ...rest } = useQuery<Query, ReservationUnitWithAffectingArgs>(
-    RESERVATIONS_BY_RESERVATIONUNIT,
+    RESERVATIONS_BY_RESERVATIONUNITS,
     {
       fetchPolicy: "no-cache",
       skip: !reservationUnitPk,

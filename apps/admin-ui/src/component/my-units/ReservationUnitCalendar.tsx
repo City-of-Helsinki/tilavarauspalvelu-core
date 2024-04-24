@@ -17,7 +17,7 @@ import { getEventBuffers } from "common/src/calendar/util";
 import { reservationUrl } from "@/common/urls";
 import { useNotification } from "@/context/NotificationContext";
 import Legend from "../reservations/requested/Legend";
-import { RESERVATIONS_BY_RESERVATIONUNITS } from "./queries";
+import { RESERVATION_UNIT_CALENDAR_QUERY } from "./queries";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
 import { PUBLIC_URL } from "@/common/const";
 import { getReserveeName } from "../reservations/requested/util";
@@ -96,7 +96,7 @@ export function ReservationUnitCalendar({
   const { data, loading: isLoading } = useQuery<
     Query,
     ReservationUnitWithAffectingArgs
-  >(RESERVATIONS_BY_RESERVATIONUNITS, {
+  >(RESERVATION_UNIT_CALENDAR_QUERY, {
     fetchPolicy: "network-only",
     skip: reservationUnitPk === 0,
     variables: {

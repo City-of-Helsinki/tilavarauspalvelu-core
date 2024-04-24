@@ -2,7 +2,7 @@ import { type Query, ReservationTypeChoice } from "common/types/gql-types";
 import { useQuery } from "@apollo/client";
 import { useNotification } from "@/context/NotificationContext";
 import { doesIntervalCollide, reservationToInterval } from "@/helpers";
-import { RESERVATIONS_BY_RESERVATIONUNIT } from "./queries";
+import { RESERVATIONS_BY_RESERVATIONUNITS } from "./queries";
 import {
   base64encode,
   concatAffectedReservations,
@@ -37,7 +37,7 @@ function useCheckCollisions({
   const typename = "ReservationUnitNode";
   const id = base64encode(`${typename}:${reservationUnitPk}`);
   const { data, loading } = useQuery<Query, ReservationUnitWithAffectingArgs>(
-    RESERVATIONS_BY_RESERVATIONUNIT,
+    RESERVATIONS_BY_RESERVATIONUNITS,
     {
       fetchPolicy: "no-cache",
       skip: !reservationUnitPk || !start || !end,

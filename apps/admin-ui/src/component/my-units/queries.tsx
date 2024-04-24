@@ -17,9 +17,11 @@ export const RECURRING_RESERVATION_UNIT_QUERY = gql`
   }
 `;
 
-export const RESERVATIONS_BY_RESERVATIONUNITS = gql`
+// TODO the fragments that this uses should be combined with the other tab page (my-units)
+// This is only used in the ReservationUnitCalendar component.
+export const RESERVATION_UNIT_CALENDAR_QUERY = gql`
   ${RESERVATIONUNIT_RESERVATIONS_FRAGMENT}
-  query ReservationUnitReservations(
+  query ReservationUnitCalendar(
     $id: ID!
     $pk: Int!
     $state: [String]

@@ -1,5 +1,4 @@
 import { gql } from "@apollo/client";
-
 import {
   RESERVATION_COMMON_FRAGMENT,
   RESERVATION_META_FRAGMENT,
@@ -22,16 +21,15 @@ const CALENDAR_RESERVATION_FRAGMENT = gql`
     type
     bufferTimeBefore
     bufferTimeAfter
-    recurringReservation {
-      pk
-    }
     affectedReservationUnits
   }
 `;
 
-export const RESERVATIONS_BY_RESERVATIONUNIT = gql`
+// TODO there is two versions of this query.
+// This is used in the hooks (collision checks).
+export const RESERVATIONS_BY_RESERVATIONUNITS = gql`
   ${CALENDAR_RESERVATION_FRAGMENT}
-  query reservationUnit(
+  query ReservationsByReservationUnit(
     $id: ID!
     $pk: Int!
     $beginDate: Date
@@ -117,6 +115,9 @@ export const RECURRING_RESERVATION_QUERY = gql`
         begin
         end
         state
+        reservationUnit {
+          pk
+        }
       }
     }
   }
