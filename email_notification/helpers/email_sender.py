@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from copy import copy
 from typing import TYPE_CHECKING
 
@@ -7,6 +8,7 @@ from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 
 from applications.models import Application
+from common.utils import safe_getattr
 from email_notification.exceptions import SendEmailNotificationError
 from email_notification.helpers.email_builder_application import ApplicationEmailBuilder
 from email_notification.helpers.email_builder_base import BaseEmailBuilder
@@ -87,6 +89,31 @@ class EmailNotificationSender:
         )
 
         self._send_email(message_builder)
+
+    def send_batch_application_emails(self, *, applications: Iterable[Application]):
+        # Sort recipients by language, so that we can batch send the emails in the correct language
+        # and avoid sending the same email to the same recipient multiple times.
+        all_recipients: set[str] = set()
+        recipients_by_language: dict[LanguageType, set[str]] = {"fi": set(), "sv": set(), "en": set()}
+        for application in applications:
+            user_language = safe_getattr(application.user, "preferred_language") or settings.LANGUAGE_CODE
+            if email := safe_getattr(application.contact_person, "email"):
+                if email in all_recipients:
+                    continue
+                all_recipients.add(email)
+                recipients_by_language[user_language].add(email)
+            if email := safe_getattr(application.user, "email"):
+                if email in all_recipients:
+                    continue
+                all_recipients.add(email)
+                recipients_by_language[user_language].add(email)
+
+        for language, recipients in recipients_by_language.items():
+            if not recipients:
+                continue
+            self.recipients = list(recipients)
+            message_builder = ApplicationEmailBuilder.build(template=self.email_template, language=language)
+            self._send_email(message_builder)
 
     def send_test_application_email(self, *, form: EmailTemplateTesterForm):
         self.recipients = [form.cleaned_data["recipient"]]
