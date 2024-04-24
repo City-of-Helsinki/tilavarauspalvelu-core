@@ -57,7 +57,7 @@ function ApplicationRound({
   return (
     <>
       <BreadcrumbWrapper route={route} />
-      <Review applicationRound={applicationRound} />;
+      <Review applicationRound={applicationRound} />
     </>
   );
 }

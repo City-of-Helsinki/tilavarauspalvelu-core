@@ -73,7 +73,7 @@ type ReviewProps = {
   applicationRound: ApplicationRoundNode;
 };
 
-export function Review({ applicationRound }: ReviewProps): JSX.Element | null {
+export function Review({ applicationRound }: ReviewProps): JSX.Element {
   const { t } = useTranslation();
 
   const [searchParams, setParams] = useSearchParams();
