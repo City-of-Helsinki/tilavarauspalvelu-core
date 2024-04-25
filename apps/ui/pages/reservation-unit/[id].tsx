@@ -452,19 +452,11 @@ const ReservationUnit = ({
 
   const reservableTimeSpans = reservationUnit?.reservableTimeSpans;
 
-  const { maxReservationDuration, reservationStartInterval } =
-    reservationUnit || {};
+  const durationOptions = getDurationOptions(reservationUnit, t);
 
-  const minReservationDuration = reservationUnit.minReservationDuration
+  const minReservationDurationMinutes = reservationUnit.minReservationDuration
     ? reservationUnit.minReservationDuration / 60
     : 30;
-
-  const durationOptions = getDurationOptions(
-    minReservationDuration ?? undefined,
-    maxReservationDuration ?? undefined,
-    reservationStartInterval,
-    t
-  );
 
   const searchUIDate = fromUIDate(searchDate ?? "");
   // TODO should be the first reservable day (the reservableTimeSpans logic is too complex and needs refactoring)
@@ -476,7 +468,7 @@ const ReservationUnit = ({
       searchUIDate != null && isValidDate(searchUIDate)
         ? searchDate ?? ""
         : defaultDateString,
-    duration: searchDuration ?? minReservationDuration,
+    duration: searchDuration ?? minReservationDurationMinutes,
     time: searchTime ?? getTimeString(defaultDate),
   };
 
@@ -488,7 +480,9 @@ const ReservationUnit = ({
 
   const { watch, setValue } = reservationForm;
   const durationValue =
-    watch("duration") ?? durationOptions[0]?.value ?? minReservationDuration;
+    watch("duration") ??
+    durationOptions[0]?.value ??
+    minReservationDurationMinutes;
   const dateValue = watch("date");
   const timeValue = watch("time") ?? getTimeString();
 

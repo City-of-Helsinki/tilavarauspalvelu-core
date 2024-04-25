@@ -198,18 +198,7 @@ const EditStep0 = ({
     [reservationUnit, reservation, activeApplicationRounds]
   );
 
-  const {
-    minReservationDuration,
-    maxReservationDuration,
-    reservationStartInterval,
-  } = reservationUnit || {};
-
-  const durationOptions = getDurationOptions(
-    minReservationDuration ?? undefined,
-    maxReservationDuration ?? undefined,
-    reservationStartInterval ?? 0,
-    t
-  );
+  const durationOptions = getDurationOptions(reservationUnit, t);
 
   const reservableTimeSpans = filterNonNullable(
     reservationUnit?.reservableTimeSpans

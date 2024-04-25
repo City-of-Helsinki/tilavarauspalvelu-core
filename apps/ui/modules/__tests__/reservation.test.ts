@@ -44,14 +44,50 @@ describe("getDurationOptions", () => {
     const mockT = ((x: string) => x) as TFunction;
     const interval90 = ReservationStartInterval.Interval_90Mins;
     const interval60 = ReservationStartInterval.Interval_60Mins;
-    expect(getDurationOptions(0, 5400, interval90, mockT)).toEqual([]);
-    expect(getDurationOptions(5400, 0, interval60, mockT)).toEqual([]);
-    expect(getDurationOptions(0, 0, interval90, mockT)).toEqual([]);
+    expect(
+      getDurationOptions(
+        {
+          minReservationDuration: 0,
+          maxReservationDuration: 5400,
+          reservationStartInterval: interval90,
+        },
+        mockT
+      )
+    ).toEqual([]);
+    expect(
+      getDurationOptions(
+        {
+          minReservationDuration: 5400,
+          maxReservationDuration: 0,
+          reservationStartInterval: interval60,
+        },
+        mockT
+      )
+    ).toEqual([]);
+    expect(
+      getDurationOptions(
+        {
+          minReservationDuration: 0,
+          maxReservationDuration: 0,
+          reservationStartInterval: interval60,
+        },
+        mockT
+      )
+    ).toEqual([]);
   });
   test("with 15 min intervals", () => {
     const mockT = ((x: string) => x) as TFunction;
     const interval15 = ReservationStartInterval.Interval_15Mins;
-    expect(getDurationOptions(1800, 5400, interval15, mockT)).toEqual([
+    expect(
+      getDurationOptions(
+        {
+          minReservationDuration: 1800,
+          maxReservationDuration: 5400,
+          reservationStartInterval: interval15,
+        },
+        mockT
+      )
+    ).toEqual([
       {
         label: " common:abbreviations.minute",
         value: 30,
@@ -78,7 +114,16 @@ describe("getDurationOptions", () => {
   test("with 90 min intervals", () => {
     const mockT = ((x: string) => x) as TFunction;
     const interval90 = ReservationStartInterval.Interval_90Mins;
-    expect(getDurationOptions(1800, 30600, interval90, mockT)).toEqual([
+    expect(
+      getDurationOptions(
+        {
+          minReservationDuration: 1800,
+          maxReservationDuration: 30600,
+          reservationStartInterval: interval90,
+        },
+        mockT
+      )
+    ).toEqual([
       {
         label: " common:abbreviations.minute",
         value: 90,

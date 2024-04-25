@@ -25,44 +25,58 @@ import { filterNonNullable } from "common/src/helpers";
 import { getTranslation } from "./util";
 import type { TFunction } from "i18next";
 
-export const getDurationOptions = (
-  minReservationDuration: number | undefined,
-  maxReservationDuration: number | undefined,
-  reservationStartInterval: ReservationStartInterval,
+/// @param opts subset of ReservationUnitNode
+/// @param t translation function
+/// opts should never include undefined values but our codegen doesn't properly type it
+export function getDurationOptions(
+  opts: {
+    minReservationDuration?: Maybe<number>;
+    maxReservationDuration?: Maybe<number>;
+    reservationStartInterval: Maybe<ReservationStartInterval> | undefined;
+  },
   t: TFunction
-): { label: string; value: number }[] => {
-  const intervalSeconds = getIntervalMinutes(reservationStartInterval) * 60;
-  if (!minReservationDuration || !maxReservationDuration || !intervalSeconds)
+): { label: string; value: number }[] {
+  if (
+    !opts.minReservationDuration ||
+    !opts.maxReservationDuration ||
+    !opts.reservationStartInterval
+  ) {
     return [];
+  }
+  const intervalMinutes = getIntervalMinutes(opts.reservationStartInterval);
+  if (!intervalMinutes) {
+    return [];
+  }
+
+  const minuteString = (mins: number, hours: number) => {
+    if (mins > 90)
+      return t("common:abbreviations.minute", { count: mins % 60 });
+    if (mins <= 90) return t("common:abbreviations.minute", { count: mins });
+    if (mins !== 0)
+      return t("common:abbreviations.minute", {
+        count: mins - hours * 60,
+      });
+    return "";
+  };
 
   const durationOptions: { label: string; value: number }[] = [];
-  const intervalMinutes = getIntervalMinutes(reservationStartInterval);
-  if (!minReservationDuration || !maxReservationDuration || !intervalMinutes)
-    return durationOptions;
-  const minReservationDurationMinutes = minReservationDuration / 60;
-  const maxReservationDurationMinutes = maxReservationDuration / 60;
+  const minReservationDurationMinutes = opts.minReservationDuration / 60;
+  const maxReservationDurationMinutes = opts.maxReservationDuration / 60;
+  const start =
+    minReservationDurationMinutes > intervalMinutes
+      ? minReservationDurationMinutes
+      : intervalMinutes;
 
   for (
-    let i =
-      minReservationDurationMinutes > intervalMinutes
-        ? minReservationDurationMinutes
-        : intervalMinutes;
+    let i = start;
     i <= maxReservationDurationMinutes;
     i += intervalMinutes
   ) {
     const hours: number = Math.floor(i / 60);
     const hourString =
       i > 90 ? t("common:abbreviations.hour", { count: hours }) : "";
-    const minuteString = () => {
-      if (i > 90) return t("common:abbreviations.minute", { count: i % 60 });
-      if (i <= 90) return t("common:abbreviations.minute", { count: i });
-      if (i !== 0)
-        return t("common:abbreviations.minute", {
-          count: i - hours * 60,
-        });
-      return "";
-    };
-    const optionString = `${hourString} ${minuteString()}`;
+
+    const optionString = `${hourString} ${minuteString(i, hours)}`;
     durationOptions.push({
       label: optionString,
       value: i,
@@ -70,7 +84,7 @@ export const getDurationOptions = (
   }
 
   return durationOptions;
-};
+}
 
 export const isReservationInThePast = (
   reservation: ReservationNode

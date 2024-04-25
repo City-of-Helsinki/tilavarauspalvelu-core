@@ -152,9 +152,9 @@ const doesSlotCollideWithApplicationRounds = (
   );
 };
 
-export const getIntervalMinutes = (
+export function getIntervalMinutes(
   reservationStartInterval: ReservationStartInterval
-): number => {
+): number {
   switch (reservationStartInterval) {
     case "INTERVAL_15_MINS":
       return 15;
@@ -177,9 +177,9 @@ export const getIntervalMinutes = (
     case "INTERVAL_420_MINS":
       return 420;
     default:
-      return 0;
+      throw new Error("Invalid reservation start interval");
   }
-};
+}
 
 export const generateSlots = (
   start: Date,
