@@ -865,6 +865,52 @@ def test_reservation__create__prefill_profile_data(graphql, settings, arm):
     assert reservation.home_city.name == "Helsinki"
 
 
+def test_reservation__create__prefill_profile_data__null_values(graphql, settings):
+    # given:
+    # - Prefill setting is on
+    # - There is a reservation unit in the system
+    # - The reservation unit has a reservable time span
+    # - There is a city in the system
+    # - A regular user who has logged in with Suomi.fi is using the system
+    settings.PREFILL_RESERVATION_WITH_PROFILE_DATA = True
+
+    reservation_unit = ReservationUnitFactory.create_reservable_now()
+    CityFactory.create(name="Helsinki")
+    user = UserFactory.create(social_auth__extra_data__amr="suomi_fi")
+    graphql.force_login(user)
+
+    # when:
+    # - The user tries to create a reservation, but receives null data from Helsinki profile
+    data = get_create_data(reservation_unit)
+    null_data = {
+        "firstName": None,
+        "lastName": None,
+        "primaryEmail": None,
+        "primaryPhone": None,
+        "primaryAddress": None,
+        "verifiedPersonalInformation": None,
+    }
+    with mock_profile_reader(**null_data):
+        response = graphql(CREATE_MUTATION, input_data=data)
+
+    # then:
+    # - There are no errors in the response
+    # - The reservation is prefilled from the users profile data
+    assert response.has_errors is False, response.errors
+
+    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+
+    # Check that the reservation has been prefilled with the profile data
+    assert reservation.reservee_first_name == ""
+    assert reservation.reservee_last_name == ""
+    assert reservation.reservee_email is None
+    assert reservation.reservee_phone == ""
+    assert reservation.reservee_address_street == ""
+    assert reservation.reservee_address_zip == ""
+    assert reservation.reservee_address_city == ""
+    assert reservation.home_city is None
+
+
 @patch_method(HelsinkiProfileClient.generic, return_value=ResponseMock(status_code=500, json_data={}))
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
 def test_reservation__create__prefilled_with_profile_data__api_call_fails(graphql, settings):
