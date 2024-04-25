@@ -124,3 +124,28 @@ def send_application_in_allocation_email_task() -> None:
 
     email_sender.send_batch_application_emails(applications=applications)
     applications.update(in_allocation_notification_sent_date=local_datetime())
+
+
+@app.task(name="send_application_handled_emails")
+def send_application_handled_email_task() -> None:
+    if not settings.SEND_RESERVATION_NOTIFICATION_EMAILS:
+        return
+
+    # Don't try to send anything if the email template is not defined (EmailNotificationSender will raise an error)
+    try:
+        email_sender = EmailNotificationSender(email_type=EmailType.APPLICATION_HANDLED, recipients=None)
+    except SendEmailNotificationError:
+        return
+
+    # Get all applications that need a notification to be sent
+    applications = Application.objects.filter(
+        L(application_round__status=ApplicationRoundStatusChoice.HANDLED.value),
+        status=ApplicationSectionStatusChoice.HANDLED.value,
+        results_ready_notification_sent_date__isnull=True,
+        application_sections__isnull=False,
+    ).order_by("created_date")
+    if not applications:
+        return
+
+    email_sender.send_batch_application_emails(applications=applications)
+    applications.update(results_ready_notification_sent_date=local_datetime())
