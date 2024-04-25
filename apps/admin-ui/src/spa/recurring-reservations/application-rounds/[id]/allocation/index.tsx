@@ -19,13 +19,16 @@ import {
   type ApplicationRoundNode,
   type ReservationUnitNode,
 } from "common/types/gql-types";
-import { breakpoints } from "common";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { SearchTags } from "@/component/SearchTags";
 import Loader from "@/component/Loader";
 import BreadcrumbWrapper from "@/component/BreadcrumbWrapper";
 import { useOptions } from "@/component/my-units/hooks";
-import { Container as BaseContainer, autoGridCss } from "@/styles/layout";
+import {
+  Container as BaseContainer,
+  TabWrapper,
+  autoGridCss,
+} from "@/styles/layout";
 import { useNotification } from "@/context/NotificationContext";
 import {
   ALLOCATION_POLL_INTERVAL,
@@ -116,18 +119,6 @@ const MoreWrapper = styled(ShowAllContainer)`
   }
   .ShowAllContainer__Content {
     ${autoGridCss}
-  }
-`;
-
-// Tab causes horizontal overflow without this
-// because it's inside a grid so an element with fixed width and no max-width breaks the grid
-const TabWrapper = styled.div`
-  max-width: 95vw;
-  @media (width > ${breakpoints.m}) {
-    max-width: min(
-      calc(95vw - var(--main-menu-width) - 2 * var(--spacing-layout-m)),
-      var(--container-width-xl)
-    );
   }
 `;
 

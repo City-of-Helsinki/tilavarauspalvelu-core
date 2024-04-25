@@ -14,7 +14,7 @@ import {
   type UnitNode,
 } from "common/types/gql-types";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
-import { Container } from "@/styles/layout";
+import { Container, TabWrapper } from "@/styles/layout";
 import { ApplicationRoundStatusTag } from "../../ApplicationRoundStatusTag";
 import TimeframeStatus from "../../TimeframeStatus";
 import { ApplicationDataLoader } from "./ApplicationDataLoader";
@@ -132,49 +132,51 @@ export function Review({ applicationRound }: ReviewProps): JSX.Element | null {
           )}
         </AlignEndContainer>
       </Header>
-      <Tabs initiallyActiveTab={activeTabIndex}>
-        <Tabs.TabList>
-          <Tabs.Tab onClick={() => handleTabChange("applications")}>
-            {t("ApplicationRound.applications")}
-          </Tabs.Tab>
-          <Tabs.Tab onClick={() => handleTabChange("events")}>
-            {t("ApplicationRound.appliedReservations")}
-          </Tabs.Tab>
-          <Tabs.Tab onClick={() => handleTabChange("allocated")}>
-            {t("ApplicationRound.allocatedReservations")}
-          </Tabs.Tab>
-        </Tabs.TabList>
-        <Tabs.TabPanel>
-          <TabContent>
-            <Filters units={unitPks} />
-            <ApplicationDataLoader
-              applicationRoundPk={applicationRound.pk ?? 0}
-            />
-          </TabContent>
-        </Tabs.TabPanel>
-        <Tabs.TabPanel>
-          <TabContent>
-            <Filters units={unitPks} statusOption="event" />
-            <ApplicationEventDataLoader
-              applicationRoundPk={applicationRound.pk ?? 0}
-            />
-          </TabContent>
-        </Tabs.TabPanel>
-        <Tabs.TabPanel>
-          <TabContent>
-            <Filters
-              units={unitPks}
-              reservationUnits={reseevationUnitOptions}
-              enableWeekday
-              enableReservationUnit
-              statusOption="eventShort"
-            />
-            <AllocatedEventDataLoader
-              applicationRoundPk={applicationRound.pk ?? 0}
-            />
-          </TabContent>
-        </Tabs.TabPanel>
-      </Tabs>
+      <TabWrapper>
+        <Tabs initiallyActiveTab={activeTabIndex}>
+          <Tabs.TabList>
+            <Tabs.Tab onClick={() => handleTabChange("applications")}>
+              {t("ApplicationRound.applications")}
+            </Tabs.Tab>
+            <Tabs.Tab onClick={() => handleTabChange("events")}>
+              {t("ApplicationRound.appliedReservations")}
+            </Tabs.Tab>
+            <Tabs.Tab onClick={() => handleTabChange("allocated")}>
+              {t("ApplicationRound.allocatedReservations")}
+            </Tabs.Tab>
+          </Tabs.TabList>
+          <Tabs.TabPanel>
+            <TabContent>
+              <Filters units={unitPks} />
+              <ApplicationDataLoader
+                applicationRoundPk={applicationRound.pk ?? 0}
+              />
+            </TabContent>
+          </Tabs.TabPanel>
+          <Tabs.TabPanel>
+            <TabContent>
+              <Filters units={unitPks} statusOption="event" />
+              <ApplicationEventDataLoader
+                applicationRoundPk={applicationRound.pk ?? 0}
+              />
+            </TabContent>
+          </Tabs.TabPanel>
+          <Tabs.TabPanel>
+            <TabContent>
+              <Filters
+                units={unitPks}
+                reservationUnits={reseevationUnitOptions}
+                enableWeekday
+                enableReservationUnit
+                statusOption="eventShort"
+              />
+              <AllocatedEventDataLoader
+                applicationRoundPk={applicationRound.pk ?? 0}
+              />
+            </TabContent>
+          </Tabs.TabPanel>
+        </Tabs>
+      </TabWrapper>
     </Container>
   );
 }
