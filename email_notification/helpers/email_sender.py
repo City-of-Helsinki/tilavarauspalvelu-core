@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 from copy import copy
+from itertools import batched
 from typing import TYPE_CHECKING
 
 from django.conf import settings
@@ -143,11 +144,8 @@ class EmailNotificationSender:
         if html_content:
             email_message.attach_alternative(html_content, "text/html")
 
-        if len(self.recipients) <= settings.EMAIL_MAX_RECIPIENTS:
-            email_message.send(fail_silently=False)
-        else:
-            # Send emails in batches, if there are more recipients than the maximum allowed
-            for i in range(0, len(self.recipients), settings.EMAIL_MAX_RECIPIENTS):
-                email_message_copy = copy(email_message)  # Copy the email message to avoid modifying the original
-                email_message_copy.bcc = self.recipients[i : i + settings.EMAIL_MAX_RECIPIENTS]
-                email_message_copy.send(fail_silently=False)
+        # Send emails in batches (if there are more recipients than the maximum allowed)
+        for batch in batched(self.recipients, settings.EMAIL_MAX_RECIPIENTS):
+            email_message_copy = copy(email_message)  # Copy the email message to avoid modifying the original
+            email_message_copy.bcc = list(batch)
+            email_message_copy.send(fail_silently=False)
