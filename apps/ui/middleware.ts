@@ -48,7 +48,7 @@ function redirectCsrfToken(req: NextRequest): URL | undefined {
     requestUrl.pathname.startsWith("/healthcheck") ||
     requestUrl.pathname.startsWith("/_next") ||
     requestUrl.pathname.match(
-      /\.(js|css|png|jpg|jpeg|svg|gif|ico|json|woff|woff2|ttf|eot|otf)$/
+      /\.(webmanifest|js|css|png|jpg|jpeg|svg|gif|ico|json|woff|woff2|ttf|eot|otf)$/
     )
   ) {
     return undefined;
