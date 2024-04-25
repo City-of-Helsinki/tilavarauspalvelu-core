@@ -468,7 +468,7 @@ const ReservationUnit = ({
       searchUIDate != null && isValidDate(searchUIDate)
         ? searchDate ?? ""
         : defaultDateString,
-    duration: searchDuration ?? minReservationDurationMinutes,
+    duration: Math.max(searchDuration ?? 0, minReservationDurationMinutes),
     time: searchTime ?? getTimeString(defaultDate),
   };
 
@@ -519,16 +519,18 @@ const ReservationUnit = ({
     const [hours, minutes] = timeValue.split(":").map(Number);
     start.setHours(hours, minutes, 0, 0);
     const end = addMinutes(start, durationValue);
+    const isReservable = isReservationReservable({
+      reservationUnit,
+      activeApplicationRounds,
+      start,
+      end,
+      skipLengthCheck: false,
+    });
+
     return {
       start,
       end,
-      isReservable: isReservationReservable({
-        reservationUnit,
-        activeApplicationRounds,
-        start,
-        end,
-        skipLengthCheck: false,
-      }),
+      isReservable,
       durationMinutes: durationValue,
     };
   }, [
@@ -639,15 +641,20 @@ const ReservationUnit = ({
         return false;
       }
 
-      if (
-        !isReservationReservable({
-          reservationUnit,
-          activeApplicationRounds,
-          start,
-          end,
-          skipLengthCheck: false,
-        })
-      ) {
+      // the next check is going to systematically fail unless the times are at least minReservationDuration apart
+      const { minReservationDuration } = reservationUnit;
+      const minEnd = addSeconds(start, minReservationDuration ?? 0);
+      const newEnd = new Date(Math.max(end.getTime(), minEnd.getTime()));
+
+      const isReservable = isReservationReservable({
+        reservationUnit,
+        activeApplicationRounds,
+        start,
+        end: newEnd,
+        skipLengthCheck: false,
+      });
+
+      if (!isReservable) {
         return false;
       }
 
@@ -655,7 +662,7 @@ const ReservationUnit = ({
       // TODO should be replaced with a utility function that is properly named
       const newReservation = getNewReservation({
         start,
-        end,
+        end: newEnd,
         reservationUnit,
       });
 
@@ -698,15 +705,14 @@ const ReservationUnit = ({
           ? addSeconds(start, reservationUnit?.minReservationDuration ?? 0)
           : new Date(end);
 
-      if (
-        !isReservationReservable({
-          reservationUnit,
-          activeApplicationRounds,
-          start,
-          end: normalizedEnd,
-          skipLengthCheck: false,
-        })
-      ) {
+      const isReservable = isReservationReservable({
+        reservationUnit,
+        activeApplicationRounds,
+        start,
+        end: normalizedEnd,
+        skipLengthCheck: false,
+      });
+      if (!isReservable) {
         return false;
       }
 
@@ -749,16 +755,17 @@ const ReservationUnit = ({
       end: focusSlot?.end,
       state: "INITIAL",
     };
+    const isReservable = isReservationReservable({
+      reservationUnit,
+      activeApplicationRounds,
+      start: focusSlot?.start,
+      end: focusSlot?.end,
+      skipLengthCheck: false,
+    });
+
     const shouldDisplayFocusSlot =
-      focusSlot?.start != null &&
-      focusSlot?.end != null &&
-      isReservationReservable({
-        reservationUnit,
-        activeApplicationRounds,
-        start: focusSlot?.start,
-        end: focusSlot?.end,
-        skipLengthCheck: false,
-      });
+      focusSlot?.start != null && focusSlot?.end != null && isReservable;
+
     return [
       ...existingReservations,
       ...(shouldDisplayFocusSlot ? [focusEvent] : []),

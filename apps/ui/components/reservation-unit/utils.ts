@@ -107,15 +107,15 @@ const getAvailableTimesForDay = ({
       const endDate = addMinutes(startDate, duration ?? 0);
       const startTime = new Date(start);
       startTime.setHours(timeHours, timeMinutes, 0, 0);
-      return isReservationReservable({
+      const isReservable = isReservationReservable({
         reservationUnit,
         activeApplicationRounds,
         start: startDate,
         end: endDate,
         skipLengthCheck: false,
-      }) && !isBefore(startDate, startTime)
-        ? n.label
-        : null;
+      });
+
+      return isReservable && !isBefore(startDate, startTime) ? n.label : null;
     })
     .filter((n): n is NonNullable<typeof n> => n != null);
 };
@@ -190,7 +190,9 @@ const isSlotReservable = (
   activeApplicationRounds?: RoundPeriod[],
   skipLengthCheck = false
 ): boolean => {
-  if (!reservationUnit || !activeApplicationRounds) return false;
+  if (!reservationUnit || !activeApplicationRounds) {
+    return false;
+  }
   return isReservationReservable({
     reservationUnit,
     activeApplicationRounds,

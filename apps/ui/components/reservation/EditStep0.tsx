@@ -266,12 +266,10 @@ const EditStep0 = ({
         : undefined;
 
     const bufferTimeBefore =
-      reservationUnit?.bufferTimeBefore != null &&
       reservationUnit.bufferTimeBefore !== 0
         ? reservationUnit.bufferTimeBefore.toString()
         : reservationBufferTimeBefore;
     const bufferTimeAfter =
-      reservationUnit?.bufferTimeAfter != null &&
       reservationUnit.bufferTimeAfter !== 0
         ? reservationUnit.bufferTimeAfter.toString()
         : reservationBufferTimeAfter;

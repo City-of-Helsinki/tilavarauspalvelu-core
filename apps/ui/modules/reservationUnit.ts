@@ -381,16 +381,14 @@ export function getPossibleTimesForDay(
       const [slotH, slotM] = span.split(":").map(Number);
       const slotDate = new Date(date);
       slotDate.setHours(slotH, slotM, 0, 0);
-      return (
-        slotDate >= new Date() &&
-        isReservationReservable({
-          reservationUnit,
-          activeApplicationRounds,
-          start: slotDate,
-          end: addMinutes(slotDate, durationValue),
-          skipLengthCheck: false,
-        })
-      );
+      const isReservable = isReservationReservable({
+        reservationUnit,
+        activeApplicationRounds,
+        start: slotDate,
+        end: addMinutes(slotDate, durationValue),
+        skipLengthCheck: false,
+      });
+      return slotDate >= new Date() && isReservable;
     })
     .map((time) => ({ label: time, value: time }));
 }

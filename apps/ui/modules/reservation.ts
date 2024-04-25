@@ -217,7 +217,9 @@ export const getNormalizedReservationOrderStatus = (
   return null;
 };
 
-export const isReservationReservable = ({
+/// NOTE don't return [boolean, string] causes issues in TS / JS
+/// instead break this function into cleaner separate functions
+export function isReservationReservable({
   reservationUnit,
   activeApplicationRounds,
   start,
@@ -229,7 +231,7 @@ export const isReservationReservable = ({
   start: Date;
   end: Date;
   skipLengthCheck: boolean;
-}): boolean => {
+}): boolean {
   if (!reservationUnit) {
     return false;
   }
@@ -297,17 +299,27 @@ export const isReservationReservable = ({
   ) {
     return false;
   }
+
   if (
-    (!skipLengthCheck &&
-      !isReservationLongEnough(start, end, minReservationDuration ?? 0)) ||
-    !isReservationShortEnough(start, end, maxReservationDuration ?? 0) ||
-    doReservationsCollide({ start, end }, reservationsArr)
+    !skipLengthCheck &&
+    !isReservationLongEnough(start, end, minReservationDuration ?? 0)
   ) {
     return false;
   }
 
+  if (
+    !skipLengthCheck &&
+    !isReservationShortEnough(start, end, maxReservationDuration ?? 0)
+  ) {
+    return false;
+  }
+
+  if (doReservationsCollide({ start, end }, reservationsArr)) {
+    return false;
+  }
+
   return true;
-};
+}
 
 export const isReservationConfirmed = (reservation: ReservationNode): boolean =>
   reservation.state === "CONFIRMED";
@@ -323,7 +335,10 @@ export type CanReservationBeChangedProps = {
   activeApplicationRounds?: RoundPeriod[];
 };
 
-// TODO disable undefined from reservation and reservationUnit
+/// NOTE [boolean, string] causes issues in TS / JS
+/// ![false] === ![true] === false, with no type errors
+/// either refactor the return value or add lint rules to disable ! operator
+/// TODO disable undefined from reservation and reservationUnit
 export const canReservationTimeBeChanged = ({
   reservation,
   newReservation,
@@ -363,23 +378,25 @@ export const canReservationTimeBeChanged = ({
     return [false, "RESERVATION_MODIFICATION_NOT_ALLOWED"];
   }
 
-  if (reservation && newReservation) {
+  if (newReservation) {
     //  new reservation is free
     if (!isReservationFreeOfCharge(newReservation)) {
       return [false, "RESERVATION_MODIFICATION_NOT_ALLOWED"];
     }
 
+    if (reservationUnit == null) {
+      return [false, "RESERVATION_UNIT_NOT_FOUND"];
+    }
+
     //  new reservation is valid
-    if (
-      reservationUnit != null &&
-      !isReservationReservable({
-        reservationUnit,
-        activeApplicationRounds,
-        start: new Date(newReservation.begin),
-        end: new Date(newReservation.end),
-        skipLengthCheck: false,
-      })
-    ) {
+    const isReservable = isReservationReservable({
+      reservationUnit,
+      activeApplicationRounds,
+      start: new Date(newReservation.begin),
+      end: new Date(newReservation.end),
+      skipLengthCheck: false,
+    });
+    if (!isReservable) {
       return [false, "RESERVATION_TIME_INVALID"];
     }
   }
