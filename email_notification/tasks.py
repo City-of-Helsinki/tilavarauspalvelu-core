@@ -115,7 +115,7 @@ def send_application_in_allocation_email_task() -> None:
     # Get all applications that need a notification to be sent
     applications = Application.objects.filter(
         L(application_round__status=ApplicationRoundStatusChoice.IN_ALLOCATION.value),
-        status=ApplicationSectionStatusChoice.IN_ALLOCATION.value,
+        L(status=ApplicationSectionStatusChoice.IN_ALLOCATION.value),
         in_allocation_notification_sent_date__isnull=True,
         application_sections__isnull=False,
     ).order_by("created_date")
@@ -140,7 +140,7 @@ def send_application_handled_email_task() -> None:
     # Get all applications that need a notification to be sent
     applications = Application.objects.filter(
         L(application_round__status=ApplicationRoundStatusChoice.HANDLED.value),
-        status=ApplicationSectionStatusChoice.HANDLED.value,
+        L(status=ApplicationSectionStatusChoice.HANDLED.value),
         results_ready_notification_sent_date__isnull=True,
         application_sections__isnull=False,
     ).order_by("created_date")
