@@ -454,9 +454,13 @@ const ReservationUnit = ({
 
   const durationOptions = getDurationOptions(reservationUnit, t);
 
+  // technically these can be left empty (backend allows it)
   const minReservationDurationMinutes = reservationUnit.minReservationDuration
     ? reservationUnit.minReservationDuration / 60
     : 30;
+  const maxReservationDurationMinutes = reservationUnit.maxReservationDuration
+    ? reservationUnit.maxReservationDuration / 60
+    : Number.MAX_SAFE_INTEGER;
 
   const searchUIDate = fromUIDate(searchDate ?? "");
   // TODO should be the first reservable day (the reservableTimeSpans logic is too complex and needs refactoring)
@@ -468,7 +472,10 @@ const ReservationUnit = ({
       searchUIDate != null && isValidDate(searchUIDate)
         ? searchDate ?? ""
         : defaultDateString,
-    duration: Math.max(searchDuration ?? 0, minReservationDurationMinutes),
+    duration: Math.min(
+      Math.max(searchDuration ?? 0, minReservationDurationMinutes),
+      maxReservationDurationMinutes
+    ),
     time: searchTime ?? getTimeString(defaultDate),
   };
 
