@@ -90,10 +90,7 @@ jobs:
         run: poetry config virtualenvs.in-project true
 
       - name: "Install additional libraries"
-        # TODO: Remove this workaround when the issue is fixed in Microsoft repo.
-        #       https://github.com/microsoft/linux-package-repositories/issues/130
         run: |
-          sudo rm /etc/apt/sources.list.d/microsoft-prod.list | true
           sudo apt-get update
           sudo apt install -y --no-install-recommends gdal-bin gettext
 
