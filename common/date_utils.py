@@ -368,8 +368,8 @@ def get_periods_between(
     if end_date < start_date:
         msg = "End date cannot be before start date."
         raise ValueError(msg)
-    if end_time < start_time:
-        msg = "End time cannot be before start time."
+    if end_time <= start_time:
+        msg = "End time cannot be at or before start time."
         raise ValueError(msg)
 
     start_datetime = combine(start_date, start_time, tzinfo=tzinfo)

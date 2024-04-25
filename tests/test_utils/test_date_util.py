@@ -1,14 +1,18 @@
 import datetime
 import re
 import zoneinfo
+from typing import NamedTuple
 
 import freezegun
 import pytest
+from graphene_django_extensions.testing import parametrize_helper
 
 from common.date_utils import (
+    DEFAULT_TIMEZONE,
     combine,
     compare_datetimes,
     compare_times,
+    get_periods_between,
     local_date,
     local_datetime,
     local_datetime_max,
@@ -271,3 +275,108 @@ def test_date_utils__combine():
 
     dt = combine(utc_date(), datetime.time.min, tzinfo=datetime.UTC)
     assert dt == datetime.datetime.combine(utc_date(), datetime.time.min, tzinfo=datetime.UTC)
+
+
+class Params(NamedTuple):
+    start_date: datetime.date
+    end_date: datetime.date
+    start_time: datetime.time
+    end_time: datetime.time
+    periods: list[tuple[datetime.datetime, datetime.datetime]]
+    interval: int = 7
+
+
+@pytest.mark.parametrize(
+    **parametrize_helper(
+        {
+            "single day": Params(
+                start_date=datetime.date(2024, 1, 1),
+                end_date=datetime.date(2024, 1, 1),
+                start_time=datetime.time(12, 0, 0, tzinfo=DEFAULT_TIMEZONE),
+                end_time=datetime.time(14, 0, 0, tzinfo=DEFAULT_TIMEZONE),
+                periods=[
+                    (
+                        datetime.datetime(2024, 1, 1, 12, 0, tzinfo=DEFAULT_TIMEZONE),
+                        datetime.datetime(2024, 1, 1, 14, 0, tzinfo=DEFAULT_TIMEZONE),
+                    )
+                ],
+            ),
+            "multiple days": Params(
+                start_date=datetime.date(2024, 1, 1),
+                end_date=datetime.date(2024, 1, 15),
+                start_time=datetime.time(12, 0, 0, tzinfo=DEFAULT_TIMEZONE),
+                end_time=datetime.time(14, 0, 0, tzinfo=DEFAULT_TIMEZONE),
+                periods=[
+                    (
+                        datetime.datetime(2024, 1, 1, 12, 0, tzinfo=DEFAULT_TIMEZONE),
+                        datetime.datetime(2024, 1, 1, 14, 0, tzinfo=DEFAULT_TIMEZONE),
+                    ),
+                    (
+                        datetime.datetime(2024, 1, 8, 12, 0, tzinfo=DEFAULT_TIMEZONE),
+                        datetime.datetime(2024, 1, 8, 14, 0, tzinfo=DEFAULT_TIMEZONE),
+                    ),
+                    (
+                        datetime.datetime(2024, 1, 15, 12, 0, tzinfo=DEFAULT_TIMEZONE),
+                        datetime.datetime(2024, 1, 15, 14, 0, tzinfo=DEFAULT_TIMEZONE),
+                    ),
+                ],
+            ),
+            "different interval": Params(
+                start_date=datetime.date(2024, 1, 1),
+                end_date=datetime.date(2024, 1, 12),
+                start_time=datetime.time(12, 0, 0, tzinfo=DEFAULT_TIMEZONE),
+                end_time=datetime.time(14, 0, 0, tzinfo=DEFAULT_TIMEZONE),
+                interval=4,
+                periods=[
+                    (
+                        datetime.datetime(2024, 1, 1, 12, 0, tzinfo=DEFAULT_TIMEZONE),
+                        datetime.datetime(2024, 1, 1, 14, 0, tzinfo=DEFAULT_TIMEZONE),
+                    ),
+                    (
+                        datetime.datetime(2024, 1, 5, 12, 0, tzinfo=DEFAULT_TIMEZONE),
+                        datetime.datetime(2024, 1, 5, 14, 0, tzinfo=DEFAULT_TIMEZONE),
+                    ),
+                    (
+                        datetime.datetime(2024, 1, 9, 12, 0, tzinfo=DEFAULT_TIMEZONE),
+                        datetime.datetime(2024, 1, 9, 14, 0, tzinfo=DEFAULT_TIMEZONE),
+                    ),
+                ],
+            ),
+        },
+    ),
+)
+def test_date_utils__get_periods_between(start_date, end_date, start_time, end_time, periods, interval):
+    assert list(get_periods_between(start_date, end_date, start_time, end_time, interval=interval)) == periods
+
+
+def test_date_utils__get_periods_between__end_date_before_start_date():
+    start_date = datetime.date(2024, 1, 2)
+    end_date = datetime.date(2024, 1, 1)
+    start_time = datetime.time(12, 0, 0, tzinfo=DEFAULT_TIMEZONE)
+    end_time = datetime.time(14, 0, 0, tzinfo=DEFAULT_TIMEZONE)
+
+    msg = "End date cannot be before start date."
+    with pytest.raises(ValueError, match=re.escape(msg)):
+        list(get_periods_between(start_date, end_date, start_time, end_time))
+
+
+def test_date_utils__get_periods_between__end_time_before_start_time():
+    start_date = datetime.date(2024, 1, 1)
+    end_date = datetime.date(2024, 1, 2)
+    start_time = datetime.time(15, 0, 0, tzinfo=DEFAULT_TIMEZONE)
+    end_time = datetime.time(14, 0, 0, tzinfo=DEFAULT_TIMEZONE)
+
+    msg = "End time cannot be at or before start time."
+    with pytest.raises(ValueError, match=re.escape(msg)):
+        list(get_periods_between(start_date, end_date, start_time, end_time))
+
+
+def test_date_utils__get_periods_between__end_time_sames_as_start_time():
+    start_date = datetime.date(2024, 1, 1)
+    end_date = datetime.date(2024, 1, 2)
+    start_time = datetime.time(14, 0, 0, tzinfo=DEFAULT_TIMEZONE)
+    end_time = datetime.time(14, 0, 0, tzinfo=DEFAULT_TIMEZONE)
+
+    msg = "End time cannot be at or before start time."
+    with pytest.raises(ValueError, match=re.escape(msg)):
+        list(get_periods_between(start_date, end_date, start_time, end_time))
