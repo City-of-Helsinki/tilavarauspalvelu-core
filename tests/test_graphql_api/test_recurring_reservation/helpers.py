@@ -37,7 +37,9 @@ def get_minimal_series_data(reservation_unit: ReservationUnit, user: User, **ove
         "endTime": datetime.time(12, 0, 0).isoformat(),
         "reservationUnit": reservation_unit.pk,
         "recurrenceInDays": 7,
-        "reservationType": ReservationTypeChoice.STAFF.value.upper(),
-        "reservationUser": user.pk,
+        "reservationDetails": {
+            "type": ReservationTypeChoice.STAFF.value.upper(),
+            "user": user.pk,
+        },
         **overrides,
     }

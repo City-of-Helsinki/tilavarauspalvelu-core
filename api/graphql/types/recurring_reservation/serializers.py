@@ -4,7 +4,6 @@ from typing import Any, TypedDict
 
 from django.db import models, transaction
 from graphene_django_extensions import NestingModelSerializer
-from graphene_django_extensions.fields import IntegerPrimaryKeyField
 from graphql import GraphQLError
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -18,21 +17,10 @@ from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import ReservationUnit
 from reservations.choices import ReservationTypeChoice
 from reservations.models import RecurringReservation, Reservation
-from users.models import User
 
 __all__ = [
     "RecurringReservationCreateSerializer",
 ]
-
-
-class ReservationPeriod(TypedDict):
-    begin: datetime.datetime
-    end: datetime.datetime
-
-
-class ReservationPeriodJSON(TypedDict):
-    begin: str  # iso-format str
-    end: str  # iso-format str
 
 
 class RecurringReservationCreateSerializer(NestingModelSerializer):
@@ -136,17 +124,75 @@ class RecurringReservationUpdateSerializer(RecurringReservationCreateSerializer)
         }
 
 
+# Reservation series
+
+
+class ReservationPeriod(TypedDict):
+    begin: datetime.datetime
+    end: datetime.datetime
+
+
+class ReservationPeriodJSON(TypedDict):
+    begin: str  # iso-format str
+    end: str  # iso-format str
+
+
+class ReservationSeriesReservationSerializer(NestingModelSerializer):
+    type = serializers.ChoiceField(choices=ReservationTypeChoice.allowed_for_staff_create, required=True)
+
+    class Meta:
+        model = Reservation
+        fields = [
+            #
+            "name",
+            "description",
+            "num_persons",
+            "state",
+            "type",
+            "working_memo",
+            #
+            "buffer_time_before",
+            "buffer_time_after",
+            "handled_at",
+            "confirmed_at",
+            #
+            "unit_price",
+            #
+            "applying_for_free_of_charge",
+            "free_of_charge_reason",
+            #
+            "reservee_id",
+            "reservee_first_name",
+            "reservee_last_name",
+            "reservee_email",
+            "reservee_phone",
+            "reservee_organisation_name",
+            "reservee_address_street",
+            "reservee_address_city",
+            "reservee_address_zip",
+            "reservee_is_unregistered_association",
+            "reservee_language",
+            "reservee_type",
+            #
+            "billing_first_name",
+            "billing_last_name",
+            "billing_email",
+            "billing_phone",
+            "billing_address_street",
+            "billing_address_city",
+            "billing_address_zip",
+            #
+            "user",
+            "purpose",
+            "home_city",
+        ]
+        extra_kwargs = {field: {"required": field in ["type", "user"]} for field in fields}
+
+
 class ReservationSeriesSerializer(RecurringReservationCreateSerializer):
     """Create the recurring reservation with all its reservations."""
 
-    reservation_type = serializers.ChoiceField(
-        choices=ReservationTypeChoice.values,
-        required=True,
-        write_only=True,
-        validators=[input_only_field],
-    )
-    reservation_user = IntegerPrimaryKeyField(
-        queryset=User.objects.all(),
+    reservation_details = ReservationSeriesReservationSerializer(
         required=True,
         write_only=True,
         validators=[input_only_field],
@@ -167,31 +213,28 @@ class ReservationSeriesSerializer(RecurringReservationCreateSerializer):
     class Meta(RecurringReservationCreateSerializer.Meta):
         fields = [
             *RecurringReservationCreateSerializer.Meta.fields,
-            "reservation_type",
-            "reservation_user",
-            "skip_dates",
+            "reservation_details",
             "check_opening_hours",
+            "skip_dates",
         ]
 
     def save(self, **kwargs: Any) -> RecurringReservation:
+        reservation_details: dict[str, Any] = self.initial_data.get("reservation_details")
         skip = self.initial_data.get("skip_dates", [])
         check_opening_hours = self.initial_data.get("check_opening_hours", False)
-        reservation_type = ReservationTypeChoice(self.initial_data.get("reservation_type"))
-        reservation_user: User = self.initial_data.get("reservation_user")
 
         # Create both the recurring reservation and the reservations in a transaction.
-        # This way if we get overlapping reservations in the second step, the whole operation is rolled back.
+        # This way if we get, e.g., overlapping reservations, the whole operation is rolled back.
         with transaction.atomic():
             instance = super().save()
-            self.create_reservations(instance, reservation_type, reservation_user, skip, check_opening_hours)
+            self.create_reservations(instance, reservation_details, skip, check_opening_hours)
 
         return instance
 
     def create_reservations(
         self,
         instance: RecurringReservation,
-        reservation_type: ReservationTypeChoice,
-        reservation_user: User,
+        reservation_details: dict[str, Any],
         skip: list[datetime.date],
         check_opening_hours: bool,
     ) -> None:
@@ -285,16 +328,11 @@ class ReservationSeriesSerializer(RecurringReservationCreateSerializer):
 
         for period in non_overlapping:
             reservation = Reservation(
-                name=instance.name,
-                description=instance.description,
                 begin=period["begin"],
                 end=period["end"],
-                user=reservation_user,
-                type=reservation_type,
                 recurring_reservation=instance,
                 age_group=instance.age_group,
-                buffer_time_before=instance.reservation_unit.buffer_time_before,
-                buffer_time_after=instance.reservation_unit.buffer_time_after,
+                **reservation_details,
             )
             through = ThroughModel(
                 reservation=reservation,

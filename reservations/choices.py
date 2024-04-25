@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.conf import settings
 from django.db import models
 from django.utils.functional import classproperty
@@ -44,6 +46,14 @@ class ReservationTypeChoice(models.TextChoices):
     BLOCKED = "blocked", _("Blocked")
     STAFF = "staff", _("Staff")
     BEHALF = "behalf", _("Behalf")
+
+    @classproperty
+    def allowed_for_staff_create(cls) -> list[str]:
+        return [  # type: ignore[return-type]
+            ReservationTypeChoice.BLOCKED.value,
+            ReservationTypeChoice.STAFF.value,
+            ReservationTypeChoice.BEHALF.value,
+        ]
 
 
 RESERVEE_LANGUAGE_CHOICES = (*settings.LANGUAGES, ("", ""))
