@@ -14,8 +14,6 @@ cp .env.example .env.local
 | NEXT_PUBLIC_BASE_URL                | The baseUrl to use usually /kasittely                         |
 | TILAVARAUS_API_URL                  | tilavaraus-core base url                                      |
 | RESERVATION_UNIT_PREVIEW_URL_PREFIX | https://tilavaraus.dev.hel.ninja/reservation-unit             |
-| COOKIEHUB_ENABLED                   | Whether Cookiehub should be enabled                           |
-| HOTJAR_ENABLED                      | Whether Hotjar should be enabled                              |
 
 `TILAVARAUS_API_URL` is required to be set because the node server doing SSR can't connect to the backend without it.
 Unlike a pure browser bundle even if they are running on the same host, the SSR is a separate server behind a reverse proxy.

@@ -14,8 +14,6 @@ const ServerSchema = z.object({
   // TODO enum?
   SENTRY_ENVIRONMENT: z.string().optional(),
   ENABLE_FETCH_HACK: coerceBoolean,
-  COOKIEHUB_ENABLED: coerceBoolean,
-  HOTJAR_ENABLED: coerceBoolean,
   TUNNISTAMO_URL: z.string().optional(),
   RESERVATION_UNIT_PREVIEW_URL_PREFIX: z.string().optional(),
   // mandatory because the SSR can't connect to the API without it

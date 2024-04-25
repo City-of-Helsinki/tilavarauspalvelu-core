@@ -5,21 +5,14 @@ import "common/styles/variables.css";
 import "../index.scss";
 import { ApolloProvider } from "@apollo/client";
 import { createClient } from "@/common/apolloClient";
-import { ExternalScripts } from "@/common/ExternalScripts";
 
 export default function App({ Component, pageProps }: AppProps) {
   // TODO fix typing (type the AppProps)
-  const { hotjarEnabled, cookiehubEnabled, apiBaseUrl } = pageProps;
+  const { apiBaseUrl } = pageProps;
   const apolloClient = createClient(apiBaseUrl ?? "");
   return (
-    <>
-      <ApolloProvider client={apolloClient}>
-        <Component {...pageProps} />
-      </ApolloProvider>
-      <ExternalScripts
-        isCookiehubEnabled={cookiehubEnabled ?? false}
-        isHotjarEnabled={hotjarEnabled ?? false}
-      />
-    </>
+    <ApolloProvider client={apolloClient}>
+      <Component {...pageProps} />
+    </ApolloProvider>
   );
 }
