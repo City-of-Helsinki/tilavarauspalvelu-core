@@ -12,6 +12,7 @@ from reservations.models import Reservation
 from spaces.models import Unit
 from tilavarauspalvelu.celery import app
 from users.models import ReservationNotification, User
+from utils.sentry import SentryLogger
 
 ###############
 # Reservation #
@@ -110,6 +111,8 @@ def send_application_in_allocation_email_task() -> None:
     try:
         email_sender = EmailNotificationSender(email_type=EmailType.APPLICATION_IN_ALLOCATION, recipients=None)
     except SendEmailNotificationError:
+        msg = "Tried to send an email, but Email Template for APPLICATION_IN_ALLOCATION was not found."
+        SentryLogger.log_message(msg, level="warning")
         return
 
     # Get all applications that need a notification to be sent
@@ -135,6 +138,8 @@ def send_application_handled_email_task() -> None:
     try:
         email_sender = EmailNotificationSender(email_type=EmailType.APPLICATION_HANDLED, recipients=None)
     except SendEmailNotificationError:
+        msg = "Tried to send an email, but Email Template for APPLICATION_HANDLED was not found."
+        SentryLogger.log_message(msg, level="warning")
         return
 
     # Get all applications that need a notification to be sent
