@@ -61,6 +61,21 @@ def test_recurring_reservations__create__end_time_before_begin_time(graphql):
     assert RecurringReservation.objects.exists() is False
 
 
+def test_recurring_reservations__create__end_time_same_as_begin_time(graphql):
+    reservation_unit = ReservationUnitFactory.create()
+
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    data = get_minimal_create_date(reservation_unit)
+    data["endTime"] = "10:00:00"
+
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Begin time cannot be after end time."]
+    assert RecurringReservation.objects.exists() is False
+
+
 def test_recurring_reservations__create__end_date_before_begin_date(graphql):
     reservation_unit = ReservationUnitFactory.create()
 

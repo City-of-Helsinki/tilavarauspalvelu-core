@@ -27,7 +27,7 @@ class RecurringReservationFactory(GenericDjangoModelFactory[RecurringReservation
     weekdays = "1,2,3,4,5"  # ti, ke, to, pe, la
 
     begin = fuzzy.FuzzyDateTime(start_dt=datetime.datetime(2023, 1, 1, tzinfo=DEFAULT_TIMEZONE))
-    end = factory.LazyAttribute(lambda r: r.begin + datetime.timedelta(days=30))
+    end = factory.LazyAttribute(lambda r: r.begin + datetime.timedelta(days=30, hours=1))
 
     begin_date = factory.LazyAttribute(lambda r: r.begin.date())
     begin_time = factory.LazyAttribute(lambda r: r.begin.time())

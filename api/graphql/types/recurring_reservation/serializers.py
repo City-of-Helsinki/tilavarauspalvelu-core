@@ -77,7 +77,7 @@ class RecurringReservationCreateSerializer(NestingModelSerializer):
             msg = "Begin date cannot be after end date."
             raise ValidationError(msg, code=error_codes.RESERVATION_BEGIN_DATE_AFTER_END_DATE)
 
-        if end_time < begin_time:
+        if end_time <= begin_time:
             msg = "Begin time cannot be after end time."
             raise ValidationError(msg, code=error_codes.RESERVATION_BEGIN_TIME_AFTER_END_TIME)
 

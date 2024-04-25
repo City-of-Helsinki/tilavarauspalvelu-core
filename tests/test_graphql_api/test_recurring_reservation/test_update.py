@@ -35,10 +35,23 @@ def test_recurring_reservations__update__end_time_before_begin_time(graphql):
     recurring_reservation = RecurringReservationFactory.create(begin=begin, end=end)
     graphql.login_user_based_on_type(UserType.SUPERUSER)
 
-    data = {
-        "pk": recurring_reservation.pk,
-        "endTime": "09:00:00",
-    }
+    new_end = begin - datetime.timedelta(hours=1)
+    data = {"pk": recurring_reservation.pk, "endTime": new_end.time().isoformat(timespec="seconds")}
+
+    response = graphql(UPDATE_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Begin time cannot be after end time."]
+
+
+def test_recurring_reservations__update__end_time_same_as_begin_time(graphql):
+    begin = next_hour(plus_hours=1)
+    end = begin - datetime.timedelta(hours=1)
+
+    recurring_reservation = RecurringReservationFactory.create(begin=begin, end=end)
+    graphql.login_user_based_on_type(UserType.SUPERUSER)
+
+    data = {"pk": recurring_reservation.pk, "endTime": begin.time().isoformat(timespec="seconds")}
 
     response = graphql(UPDATE_MUTATION, input_data=data)
 
