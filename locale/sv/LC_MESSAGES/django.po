@@ -70,12 +70,6 @@ msgstr "Hakemuksen osa"
 
 #: applications/admin/application_round.py
 #, fuzzy
-#| msgid "Application sections"
-msgid "Export application sections in the selected application round to CSV"
-msgstr "Hakemuksen osat"
-
-#: applications/admin/application_round.py
-#, fuzzy
 #| msgid "Application section"
 msgid "Reset application round allocations"
 msgstr "Hakemuksen osa"
@@ -241,6 +235,14 @@ msgid "Cancelled date"
 msgstr ""
 
 #: applications/admin/forms/application.py
+msgid "In allocation notification sent date"
+msgstr ""
+
+#: applications/admin/forms/application.py
+msgid "Results ready notification sent date"
+msgstr ""
+
+#: applications/admin/forms/application.py
 msgid "Applicant type."
 msgstr ""
 
@@ -282,6 +284,18 @@ msgstr ""
 
 #: applications/admin/forms/application.py
 msgid "Date when the application was cancelled."
+msgstr ""
+
+#: applications/admin/forms/application.py
+msgid ""
+"Date when the applicant was notified that this application round is now in "
+"allocation."
+msgstr ""
+
+#: applications/admin/forms/application.py
+msgid ""
+"Date when the applicant was notified that this application round results are "
+"now ready."
 msgstr ""
 
 #: applications/admin/forms/application_round.py
@@ -3005,10 +3019,6 @@ msgstr ""
 #: terms_of_use/models.py
 msgctxt "plural"
 msgid "terms of use"
-msgstr ""
-
-#: users/admin.py
-msgid "Notifications"
 msgstr ""
 
 #: users/models.py

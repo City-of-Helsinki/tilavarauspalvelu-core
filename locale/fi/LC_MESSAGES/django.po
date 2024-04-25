@@ -63,10 +63,6 @@ msgid "Application Round"
 msgstr "Kausivarauskierros"
 
 #: applications/admin/application_round.py
-msgid "Export application sections in the selected application round to CSV"
-msgstr "Vie valitun kausivarauskierroksen hakemuksen osat CSV-tiedostoon"
-
-#: applications/admin/application_round.py
 msgid "Reset application round allocations"
 msgstr "Nollaa kausivarauskierroksen allokoinnit"
 
@@ -218,6 +214,14 @@ msgid "Cancelled date"
 msgstr "Perumispäivä"
 
 #: applications/admin/forms/application.py
+msgid "In allocation notification sent date"
+msgstr "'Käsittelyssä' ilmoituksen lähettämispäivä ja -aika"
+
+#: applications/admin/forms/application.py
+msgid "Results ready notification sent date"
+msgstr "'Käsitelty' ilmoituksen lähettämispäivä ja -aika"
+
+#: applications/admin/forms/application.py
 msgid "Applicant type."
 msgstr "Hakijan tyyppi."
 
@@ -260,6 +264,18 @@ msgstr "Päivämäärä, jolloin hakemus lähetettiin."
 #: applications/admin/forms/application.py
 msgid "Date when the application was cancelled."
 msgstr "Päivämäärä, jolloin hakemus peruttiin."
+
+#: applications/admin/forms/application.py
+msgid ""
+"Date when the applicant was notified that this application round is now in "
+"allocation."
+msgstr "Päivä ja aika, millon hakija sai tiedon, että hakemus on käsittelyssä."
+
+#: applications/admin/forms/application.py
+msgid ""
+"Date when the applicant was notified that this application round results are "
+"now ready."
+msgstr "Päivä ja aika, millon hakija sai tiedon, että hakemus on käsitelty."
 
 #: applications/admin/forms/application_round.py
 #, python-format
@@ -2930,10 +2946,6 @@ msgstr "Käyttöehto"
 msgctxt "plural"
 msgid "terms of use"
 msgstr "Käyttöehdot"
-
-#: users/admin.py
-msgid "Notifications"
-msgstr "Ilmoitukset"
 
 #: users/models.py
 msgid "Preferred UI language"
