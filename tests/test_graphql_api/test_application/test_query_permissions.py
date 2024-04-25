@@ -1,12 +1,6 @@
 import pytest
 
-from tests.factories import (
-    ApplicationFactory,
-    ApplicationSectionFactory,
-    UnitFactory,
-    UnitGroupFactory,
-    UserFactory,
-)
+from tests.factories import ApplicationFactory, ApplicationSectionFactory, UnitFactory, UnitGroupFactory, UserFactory
 
 from .helpers import applications_query
 

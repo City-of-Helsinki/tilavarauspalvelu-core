@@ -5,10 +5,7 @@ from graphene_django_extensions import DjangoNode
 from api.graphql.types.recurring_reservation.filtersets import RecurringReservationFilterSet
 from api.graphql.types.recurring_reservation.permissions import RecurringReservationPermission
 from common.typing import GQLInfo
-from permissions.helpers import (
-    can_view_recurring_reservation,
-    get_units_where_can_view_reservations,
-)
+from permissions.helpers import can_view_recurring_reservation, get_units_where_can_view_reservations
 from reservations.models import RecurringReservation
 
 __all__ = [

@@ -10,10 +10,7 @@ from api.graphql.types.application_section.types import ApplicationSectionNode
 from applications.choices import ApplicationStatusChoice
 from applications.models import Application
 from common.typing import GQLInfo
-from permissions.helpers import (
-    can_access_application_private_fields,
-    get_units_where_can_view_applications,
-)
+from permissions.helpers import can_access_application_private_fields, get_units_where_can_view_applications
 
 __all__ = [
     "ApplicationNode",
