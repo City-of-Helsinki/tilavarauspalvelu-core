@@ -18,6 +18,7 @@ import {
   addSeconds,
   addYears,
   differenceInMinutes,
+  set,
   startOfDay,
 } from "date-fns";
 import {
@@ -496,23 +497,22 @@ const ReservationUnit = ({
   const dateValue = watch("date");
   const timeValue = watch("time");
 
-  const formUIDate = fromUIDate(dateValue ?? "")?.setHours(
-    Number.isNaN(Number(timeValue.split(":")[0]))
-      ? Number(timeValue.split(":")[0])
-      : 0,
-    Number.isNaN(Number(timeValue.split(":")[1]))
-      ? Number(timeValue.split(":")[1])
-      : 0
-  );
-
-  const focusDate = useMemo(
-    () => new Date(formUIDate ?? new Date()),
-    [formUIDate]
-  );
+  const focusDate = useMemo(() => {
+    const [hours, minutes]: Array<number | undefined> = timeValue
+      .split(":")
+      .map(Number)
+      .filter((n) => Number.isFinite(n));
+    const maybeDate = fromUIDate(dateValue);
+    if (maybeDate != null && isValidDate(maybeDate)) {
+      return set(maybeDate, { hours, minutes });
+    }
+    return new Date();
+  }, [dateValue, timeValue]);
 
   const submitReservation = (_data: PendingReservationFormType) => {
-    if (focusSlot.start && focusSlot.end && reservationUnit.pk)
+    if (focusSlot.start && focusSlot.end && reservationUnit.pk) {
       setErrorMsg(null);
+    }
     const { start: begin, end } = focusSlot;
     if (reservationUnit?.pk == null || begin == null || end == null) {
       return;
@@ -526,9 +526,7 @@ const ReservationUnit = ({
   };
 
   const focusSlot: FocusTimeSlot = useMemo(() => {
-    const start = new Date(focusDate);
-    const [hours, minutes] = timeValue.split(":").map(Number);
-    start.setHours(hours, minutes, 0, 0);
+    const start = focusDate;
     const end = addMinutes(start, durationValue);
     const isReservable = isReservationReservable({
       reservationUnit,
@@ -544,13 +542,7 @@ const ReservationUnit = ({
       isReservable,
       durationMinutes: durationValue,
     };
-  }, [
-    focusDate,
-    timeValue,
-    durationValue,
-    reservationUnit,
-    activeApplicationRounds,
-  ]);
+  }, [focusDate, durationValue, reservationUnit, activeApplicationRounds]);
 
   const startingTimeOptions = useMemo(() => {
     return getPossibleTimesForDay(
