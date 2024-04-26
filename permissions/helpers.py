@@ -76,7 +76,6 @@ def can_manage_units(user: AnyUser, unit: Unit) -> bool:
 def can_manage_units_reservation_units(user: AnyUser, unit: Unit) -> bool:
     general_permission = GeneralPermissionChoices.CAN_MANAGE_RESERVATION_UNITS
     unit_permission = UnitPermissionChoices.CAN_MANAGE_RESERVATION_UNITS
-    service_sector_permission = ServiceSectorPermissionsChoices.CAN_MANAGE_RESERVATION_UNITS
 
     if user.is_anonymous:
         return False
@@ -84,11 +83,8 @@ def can_manage_units_reservation_units(user: AnyUser, unit: Unit) -> bool:
         return True
     if has_general_permission(user, general_permission):
         return True
-    if has_unit_permission(user, unit_permission, [unit.id]):
-        return True
 
-    sectors: list[int] = list(unit.service_sectors.values_list("pk", flat=True))
-    return has_service_sector_permission(user, service_sector_permission, sectors)
+    return has_unit_permission(user, unit_permission, [unit.id])
 
 
 def can_modify_reservation_unit(user: AnyUser, reservation_unit: ReservationUnit) -> bool:
