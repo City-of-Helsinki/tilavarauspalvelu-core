@@ -374,7 +374,6 @@ export const ReservationUnitEditSchema = z
     requireIntroduction: z.boolean(),
     requireReservationHandling: z.boolean(),
     reservationStartInterval: z.nativeEnum(ReservationStartInterval),
-    unit: z.number().min(1),
     canApplyFreeOfCharge: z.boolean(),
     reservationsMinDaysBefore: z.number(),
     reservationsMaxDaysBefore: z.number(),
@@ -791,7 +790,6 @@ export const convertReservationUnit = (
     reservationStartInterval:
       data?.reservationStartInterval ??
       ReservationStartInterval.Interval_15Mins,
-    unit: data?.unit?.pk ?? 0,
     canApplyFreeOfCharge: data?.canApplyFreeOfCharge ?? false,
     reservationsMinDaysBefore: data?.reservationsMinDaysBefore ?? 0,
     reservationsMaxDaysBefore: data?.reservationsMaxDaysBefore ?? 0,
@@ -900,8 +898,6 @@ export function transformReservationUnit(
     termsOfUseSv,
     seasons,
     images, // images are updated with a separate mutation
-    // never send unit so we don't accidentially move a unit to another unit
-    unit,
     ...vals
   } = values;
 

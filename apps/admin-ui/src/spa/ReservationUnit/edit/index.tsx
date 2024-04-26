@@ -1869,7 +1869,7 @@ const ReservationUnitEditor = ({
   previewUrlPrefix,
 }: {
   reservationUnit?: ReservationUnitNode;
-  unitPk: string;
+  unitPk: number;
   form: UseFormReturn<ReservationUnitEditFormValues>;
   refetch: () => void;
   previewUrlPrefix: string;
@@ -1977,7 +1977,9 @@ const ReservationUnitEditor = ({
       const promise =
         pk != null
           ? updateMutation({ variables: { input: { ...input, pk } } })
-          : createMutation({ variables: { input } });
+          : createMutation({
+              variables: { input: { ...input, unit: unitPk } },
+            });
 
       const { data, errors: mutationErrors } = await promise;
       if (mutationErrors != null) {
@@ -2211,7 +2213,7 @@ type IRouterProps = {
 
 /// Wrap the editor so we never reset the form after async loading (because of HDS TimeInput bug)
 function EditorWrapper({ previewUrlPrefix }: { previewUrlPrefix: string }) {
-  const { reservationUnitPk, unitPk } = useParams<IRouterProps>();
+  const { reservationUnitPk, unitPk: unitPkString } = useParams<IRouterProps>();
   const { t } = useTranslation();
 
   const typename = "ReservationUnitNode";
@@ -2230,8 +2232,6 @@ function EditorWrapper({ previewUrlPrefix }: { previewUrlPrefix: string }) {
 
   const reservationUnit = reservationUnitData?.reservationUnit ?? undefined;
 
-  // NOTE override the unitPk from the url for new units
-  // there is no harm in doing it to existing units either (since it should be valid)
   const form = useForm<ReservationUnitEditFormValues>({
     mode: "onBlur",
     // NOTE disabling because it throws an error when submitting because it can't focus the field
@@ -2240,7 +2240,6 @@ function EditorWrapper({ previewUrlPrefix }: { previewUrlPrefix: string }) {
     shouldFocusError: false,
     defaultValues: {
       ...convertReservationUnit(reservationUnit),
-      unit: Number(unitPk),
     },
     resolver: zodResolver(ReservationUnitEditSchema),
   });
@@ -2249,15 +2248,16 @@ function EditorWrapper({ previewUrlPrefix }: { previewUrlPrefix: string }) {
     if (reservationUnitData?.reservationUnit != null) {
       reset({
         ...convertReservationUnit(reservationUnitData.reservationUnit),
-        unit: Number(unitPk),
       });
     }
-  }, [reservationUnitData, reset, unitPk]);
+  }, [reservationUnitData, reset]);
 
   if (isLoading) {
     return <Loader />;
   }
-  if (unitPk == null || Number(unitPk) === 0 || Number.isNaN(Number(unitPk))) {
+
+  const unitPk = Number(unitPkString);
+  if (!(unitPk > 0)) {
     return <Error404 />;
   }
 
