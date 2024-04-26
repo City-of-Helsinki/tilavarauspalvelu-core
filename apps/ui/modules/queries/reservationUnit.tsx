@@ -113,7 +113,7 @@ export const RESERVATION_UNIT_PAGE_QUERY = gql`
         startDatetime
         endDatetime
       }
-      reservationSet {
+      reservationSet(state: $state) {
         ...BlockingReservationFields
       }
     }
