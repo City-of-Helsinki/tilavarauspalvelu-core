@@ -156,9 +156,9 @@ export function processVariables(
           unit: paramToIntegers(values.unit),
         }
       : {}),
-    ...(values.reservationUnitType != null
+    ...(values.reservationUnitTypes != null
       ? {
-          reservationUnitType: paramToIntegers(values.reservationUnitType),
+          reservationUnitType: paramToIntegers(values.reservationUnitTypes),
         }
       : {}),
     ...(values.equipments != null

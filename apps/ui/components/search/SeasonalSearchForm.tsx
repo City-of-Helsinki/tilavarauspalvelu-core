@@ -133,7 +133,7 @@ const filterOrder = [
   "textSearch",
   "minPersons",
   "maxPersons",
-  "reservationUnitType",
+  "reservationUnitTypes",
   "unit",
   "purposes",
 ];
@@ -155,7 +155,7 @@ function mapQueryToForm(query: ParsedUrlQuery): FormValues {
     unit: mapSingleParamToFormValue(query.unit) ?? "",
     purposes: mapSingleParamToFormValue(query.purposes) ?? "",
     reservationUnitTypes:
-      mapSingleParamToFormValue(query.reservationUnitType) ?? "",
+      mapSingleParamToFormValue(query.reservationUnitTypes) ?? "",
     minPersons: mapQueryParamToNumber(query.minPersons) ?? null,
     maxPersons: mapQueryParamToNumber(query.maxPersons) ?? null,
     textSearch: mapSingleParamToFormValue(query.textSearch) ?? "",
@@ -198,7 +198,7 @@ export function SeasonalSearchForm({
     switch (key) {
       case "unit":
         return unitOptions.find((n) => String(n.value) === value)?.label;
-      case "reservationUnitType":
+      case "reservationUnitTypes":
         return reservationUnitTypeOptions.find((n) => String(n.value) === value)
           ?.label;
       case "purposes":
@@ -208,7 +208,7 @@ export function SeasonalSearchForm({
     }
   };
 
-  const multiSelectFilters = ["unit", "reservationUnitType", "purposes"];
+  const multiSelectFilters = ["unit", "reservationUnitTypes", "purposes"];
   const hideList = ["applicationRound", "order", "sort"];
 
   return (

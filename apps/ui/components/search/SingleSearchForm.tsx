@@ -177,7 +177,7 @@ function mapQueryToForm(query: ParsedUrlQuery): FormValues {
     unit: mapSingleParamToFormValue(query.unit) ?? "",
     equipments: mapSingleParamToFormValue(query.equipments) ?? "",
     reservationUnitTypes:
-      mapSingleParamToFormValue(query.reservationUnitType) ?? "",
+      mapSingleParamToFormValue(query.reservationUnitTypes) ?? "",
     // ?
     timeBegin: mapSingleParamToFormValue(query.timeBegin) ?? null,
     timeEnd: mapSingleParamToFormValue(query.timeEnd) ?? null,
@@ -202,14 +202,14 @@ const filterOrder = [
   "duration",
   "minPersons",
   "maxPersons",
-  "reservationUnitType",
+  "reservationUnitTypes",
   "unit",
   "purposes",
   "equipments",
 ];
 const multiSelectFilters = [
   "unit",
-  "reservationUnitType",
+  "reservationUnitTypes",
   "purposes",
   "equipments",
 ];
@@ -252,7 +252,7 @@ export function SingleSearchForm({
     switch (key) {
       case "unit":
         return unitOptions.find((n) => compFn(n, value))?.label;
-      case "reservationUnitType":
+      case "reservationUnitTypes":
         return unitTypeOptions.find((n) => n.value === value)?.label;
       case "purposes":
         return purposeOptions.find((n) => n.value === value)?.label;
