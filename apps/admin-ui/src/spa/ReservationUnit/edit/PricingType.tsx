@@ -108,7 +108,7 @@ function PaidPricingPart({
             id={`pricings.${index}.taxPercentage.pk`}
             placeholder={t("common.select")}
             required
-            label={t(`ReservationUnitEditor.label.taxPercentagePk`)}
+            label={t(`ReservationUnitEditor.label.taxPercentage`)}
             options={taxPercentageOptions}
             onChange={(v: { value: number; label: string }) => {
               onChange({ pk: v.value, value: Number(v.label) });
