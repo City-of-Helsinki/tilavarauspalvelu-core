@@ -1,5 +1,5 @@
 import { filterNonNullable } from "common/src/helpers";
-import { addDays, addMinutes, isAfter, isBefore } from "date-fns";
+import { addDays, addMinutes, isAfter, isBefore, set } from "date-fns";
 import {
   ReservableTimeSpanType,
   ReservationUnitNode,
@@ -121,8 +121,8 @@ const getAvailableTimesForDay = ({
 };
 
 // Returns the next available time, after the given time (Date object)
-const getNextAvailableTime = (props: AvailableTimesProps): Date | null => {
-  const { start, reservationUnit, slots, activeApplicationRounds } = props;
+function getNextAvailableTime(props: AvailableTimesProps): Date | null {
+  const { start, reservationUnit } = props;
   if (reservationUnit == null) {
     return null;
   }
@@ -140,6 +140,7 @@ const getNextAvailableTime = (props: AvailableTimesProps): Date | null => {
   const interval = filterNonNullable(reservableTimeSpans).find((x) =>
     isInTimeSpan(minDay, x)
   );
+
   if (!interval?.startDatetime || !interval.endDatetime) {
     return null;
   }
@@ -155,33 +156,24 @@ const getNextAvailableTime = (props: AvailableTimesProps): Date | null => {
 
   // Find the first possible time for that day, continue for each day until we find one
   for (const singleDay of days) {
-    const availableTimesForDay =
-      slots ??
-      (getAvailableTimesForDay({
-        ...props,
-        start: singleDay,
-        fromStartOfDay: true,
-        reservationUnit,
-        activeApplicationRounds,
-      }) as ReservableTimeSpanType[]);
-    if (
-      availableTimesForDay.length > 0 &&
-      !!availableTimesForDay[0].startDatetime
-    ) {
-      const [hours, minutes] = availableTimesForDay[0].startDatetime
-        ? availableTimesForDay[0].startDatetime
-            .toString()
-            .split("T")[1]
-            .split(":")
-            .map(Number)
-        : [0, 0];
-      singleDay.setHours(hours, minutes, 0, 0);
-      return singleDay;
+    // have to run this complex check to remove already reserved times
+    const availableTimesForDay = getAvailableTimesForDay({
+      ...props,
+      start: singleDay,
+    });
+    const hasAvailableTimes = availableTimesForDay.length > 0;
+    if (hasAvailableTimes) {
+      const startDatetime = availableTimesForDay[0];
+      const [hours, minutes] = startDatetime
+        .split(":")
+        .map(Number)
+        .filter(Number.isFinite);
+      return set(singleDay, { hours, minutes });
     }
   }
 
   return null;
-};
+}
 
 const isSlotReservable = (
   start: Date,
