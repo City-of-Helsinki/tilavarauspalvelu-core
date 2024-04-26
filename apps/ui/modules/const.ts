@@ -55,6 +55,7 @@ function durationMinuteOptions(t: TFunction) {
   return durations;
 }
 
+/// @returns an array of duration options in minutes
 export function getDurationOptions(t: TFunction): DurationOption[] {
   const times: DurationOption[] = [];
   let hour = 2;

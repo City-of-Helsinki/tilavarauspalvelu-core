@@ -177,7 +177,12 @@ function ApplicationEventInner({
     return "";
   };
 
-  const durationOptions = getDurationOptions(t);
+  // convert from minutes to seconds (search page uses minutes, this uses seconds)
+  const durationOptions = getDurationOptions(t).map((x) => ({
+    label: x.label,
+    value: x.value * 60,
+  }));
+
   return (
     <>
       <SubHeadLine>
