@@ -1,8 +1,10 @@
 from typing import Any
 
+from graphene_django_extensions.errors import GQLCodeError
 from graphene_django_extensions.permissions import BasePermission
 from query_optimizer.typing import GraphQLFilterInfo
 
+from api.graphql.extensions import error_codes
 from common.typing import AnyUser
 from permissions.helpers import can_create_staff_reservation, can_view_recurring_reservation
 from reservation_units.models import ReservationUnit
@@ -30,11 +32,14 @@ class RecurringReservationPermission(BasePermission):
     def has_create_permission(cls, user: AnyUser, input_data: dict[str, Any]) -> bool:
         reservation_unit_pk: int | None = input_data.get("reservation_unit")
         if reservation_unit_pk is None:
-            return False
+            msg = "Reservation Unit is required for creating a Recurring Reservation."
+            raise GQLCodeError(msg, code=error_codes.REQUIRED_FIELD_MISSING)
 
         units: list[int] = list(ReservationUnit.objects.filter(pk=reservation_unit_pk).values_list("unit", flat=True))
         if not units:
-            return False
+            msg = f"Units for Reservation Unit with pk {reservation_unit_pk} do not exist."
+            raise GQLCodeError(msg, code=error_codes.ENTITY_NOT_FOUND)
+
         return can_create_staff_reservation(user, units)
 
     @classmethod

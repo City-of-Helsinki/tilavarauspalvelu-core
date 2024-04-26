@@ -1,7 +1,9 @@
 from typing import Any
 
+from graphene_django_extensions.errors import GQLCodeError
 from graphene_django_extensions.permissions import BasePermission
 
+from api.graphql.extensions import error_codes
 from common.typing import AnyUser
 from permissions.helpers import can_manage_spaces, can_manage_units_spaces
 from spaces.models import Space, Unit
@@ -24,7 +26,9 @@ class SpacePermission(BasePermission):
 
         unit: Unit | None = Unit.objects.filter(pk=unit_pk).first()
         if unit is None:
-            return False
+            msg = f"Unit with pk {unit_pk} does not exist."
+            raise GQLCodeError(msg, code=error_codes.ENTITY_NOT_FOUND)
+
         return can_manage_units_spaces(user, unit)
 
     @classmethod

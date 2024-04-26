@@ -19,7 +19,7 @@ class ResourcePermission(BasePermission):
 
     @classmethod
     def has_create_permission(cls, user: AnyUser, input_data: dict[str, Any]) -> bool:
-        space_pk: int | None = input_data.get("space")
+        space_pk: int | None = input_data.get("space")  # Space is not required for creating a Resource
         space = None if space_pk is None else Space.objects.filter(pk=space_pk).first()
         return can_manage_resources(user, space)
 

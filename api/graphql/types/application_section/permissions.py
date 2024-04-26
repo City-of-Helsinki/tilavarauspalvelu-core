@@ -1,7 +1,9 @@
 from typing import Any
 
+from graphene_django_extensions.errors import GQLCodeError
 from graphene_django_extensions.permissions import BasePermission
 
+from api.graphql.extensions import error_codes
 from applications.models import Application, ApplicationSection
 from common.typing import AnyUser
 from permissions.helpers import can_modify_application
@@ -20,11 +22,13 @@ class ApplicationSectionPermission(BasePermission):
     def has_create_permission(cls, user: AnyUser, input_data: dict[str, Any]) -> bool:
         application_pk: int | None = input_data.get("application")
         if application_pk is None:
-            return False
+            msg = "Application is required for creating an Application Section."
+            raise GQLCodeError(msg, code=error_codes.REQUIRED_FIELD_MISSING)
 
         application: Application | None = Application.objects.filter(pk=application_pk).first()
         if application is None:
-            return False
+            msg = f"Application with pk {application_pk} does not exist."
+            raise GQLCodeError(msg, code=error_codes.ENTITY_NOT_FOUND)
 
         return can_modify_application(user, application)
 
