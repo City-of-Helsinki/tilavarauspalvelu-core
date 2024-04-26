@@ -10,7 +10,12 @@ import { getReservationUnitPrice } from "@/modules/reservationUnit";
 import Carousel from "../Carousel";
 import { getLastPossibleReservationDate } from "@/components/reservation-unit/utils";
 import type { FocusTimeSlot } from "@/components/calendar/ReservationCalendarControls";
-import type { SubmitHandler, UseFormReturn } from "react-hook-form";
+import {
+  Control,
+  FieldValues,
+  type SubmitHandler,
+  type UseFormReturn,
+} from "react-hook-form";
 import { PendingReservationFormType } from "@/components/reservation-unit/schema";
 import ControlledDateInput from "@/components/common/ControlledDateInput";
 import { ControlledSelect } from "@/components/common/ControlledSelect";
@@ -24,11 +29,7 @@ export type TimeRange = {
 type Props = {
   reservationUnit: ReservationUnitNode | null;
   subventionSuffix: JSX.Element | undefined;
-  reservationForm: UseFormReturn<{
-    duration?: number;
-    date?: string;
-    time?: string;
-  }>;
+  reservationForm: UseFormReturn<PendingReservationFormType>;
   durationOptions: { label: string; value: number }[];
   startingTimeOptions: { label: string; value: string }[];
   focusSlot: FocusTimeSlot | null;
@@ -166,11 +167,10 @@ const QuickReservation = ({
   LoginAndSubmit,
 }: Props): JSX.Element | null => {
   const { t } = useTranslation();
-  const { setValue, watch, handleSubmit } = reservationForm;
+  const { control, setValue, watch, handleSubmit } = reservationForm;
   const formDate = watch("date");
   const dateValue = useMemo(() => fromUIDate(formDate ?? ""), [formDate]);
-  const duration =
-    watch("duration") ?? reservationUnit?.minReservationDuration ?? 0;
+  const duration = watch("duration");
 
   const getPrice = useCallback(
     (asNumeral = false) => {
@@ -212,6 +212,7 @@ const QuickReservation = ({
   const lastPossibleDate = getLastPossibleReservationDate(
     reservationUnit ?? undefined
   );
+
   return (
     <Wrapper
       id="quick-reservation"
@@ -223,7 +224,7 @@ const QuickReservation = ({
         <ControlledDateInput
           id="quick-reservation-date"
           name="date"
-          control={reservationForm.control}
+          control={control}
           label={t("reservationCalendar:startDate")}
           initialMonth={dateValue ?? new Date()}
           minDate={new Date()}
@@ -232,7 +233,8 @@ const QuickReservation = ({
         />
         <StyledSelect
           name="duration"
-          control={reservationForm.control}
+          // react-hook-form has issues with typing generic Select
+          control={control as unknown as Control<FieldValues>}
           label={t("reservationCalendar:duration")}
           options={durationOptions}
         />

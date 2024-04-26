@@ -6,13 +6,14 @@ import {
   type FieldValues,
   type Path,
   useController,
+  type UseControllerProps,
 } from "react-hook-form";
 
-type Props<T extends FieldValues, U> = {
+interface Props<T extends FieldValues> extends UseControllerProps<T> {
   name: Path<T>;
   control: Control<T>;
   label: string;
-  options: Array<{ label: string; value: U }>;
+  options: Array<{ label: string; value: string | number }>;
   required?: boolean;
   placeholder?: string;
   error?: string;
@@ -20,12 +21,9 @@ type Props<T extends FieldValues, U> = {
   style?: React.CSSProperties;
   className?: string;
   clearable?: boolean;
-};
+}
 
-export function ControlledSelect<
-  T extends FieldValues,
-  U extends number | string,
->({
+export function ControlledSelect<T extends FieldValues>({
   name,
   label,
   control,
@@ -37,7 +35,7 @@ export function ControlledSelect<
   style,
   className,
   clearable,
-}: Props<T, U>): JSX.Element {
+}: Props<T>): JSX.Element {
   const { t } = useTranslation();
   const {
     field: { value, onChange },
@@ -56,6 +54,9 @@ export function ControlledSelect<
       label={label}
       required={required}
       onChange={(selection?: (typeof options)[0]): void => {
+        if (!clearable && !selection) {
+          return;
+        }
         onChange(selection?.value);
       }}
       placeholder={placeholder ?? t("common:select")}

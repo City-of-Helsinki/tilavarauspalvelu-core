@@ -1,9 +1,9 @@
 import { z } from "zod";
 
 export const PendingReservationFormSchema = z.object({
-  duration: z.number().min(0).optional(),
-  date: z.string().optional(),
-  time: z.string().optional(),
+  duration: z.number().min(0),
+  date: z.string(),
+  time: z.string(),
 });
 
 export type PendingReservationFormType = z.infer<

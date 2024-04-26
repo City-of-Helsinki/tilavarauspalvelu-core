@@ -462,6 +462,11 @@ const ReservationUnit = ({
     ? reservationUnit.maxReservationDuration / 60
     : Number.MAX_SAFE_INTEGER;
 
+  const initialDuration = Math.max(
+    minReservationDurationMinutes,
+    durationOptions[0]?.value ?? 0
+  );
+
   const searchUIDate = fromUIDate(searchDate ?? "");
   // TODO should be the first reservable day (the reservableTimeSpans logic is too complex and needs refactoring)
   // i.e. using a naive approach will return empty timespsans either reuse the logic for QuickReservation or refactor
@@ -473,7 +478,7 @@ const ReservationUnit = ({
         ? searchDate ?? ""
         : defaultDateString,
     duration: Math.min(
-      Math.max(searchDuration ?? 0, minReservationDurationMinutes),
+      Math.max(searchDuration ?? 0, initialDuration),
       maxReservationDurationMinutes
     ),
     time: searchTime ?? getTimeString(defaultDate),
@@ -486,12 +491,10 @@ const ReservationUnit = ({
   });
 
   const { watch, setValue } = reservationForm;
-  const durationValue =
-    watch("duration") ??
-    durationOptions[0]?.value ??
-    minReservationDurationMinutes;
+
+  const durationValue = watch("duration");
   const dateValue = watch("date");
-  const timeValue = watch("time") ?? getTimeString();
+  const timeValue = watch("time");
 
   const formUIDate = fromUIDate(dateValue ?? "")?.setHours(
     Number.isNaN(Number(timeValue.split(":")[0]))
@@ -521,6 +524,7 @@ const ReservationUnit = ({
     };
     createReservation(input);
   };
+
   const focusSlot: FocusTimeSlot = useMemo(() => {
     const start = new Date(focusDate);
     const [hours, minutes] = timeValue.split(":").map(Number);
@@ -859,7 +863,9 @@ const ReservationUnit = ({
 
   // Set default duration if it's not set
   useEffect(() => {
-    if (durationValue === 0) setValue("duration", durationOptions[0]?.value);
+    if (!durationValue) {
+      setValue("duration", durationOptions[0]?.value);
+    }
   }, [dateValue, timeValue, durationValue, durationOptions, setValue]);
 
   // store reservation unit overall reservability to use in JSX and pass to some child elements

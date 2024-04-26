@@ -18,7 +18,12 @@ import {
   getTimeString,
 } from "@/modules/reservationUnit";
 import { capitalize, getSelectedOption } from "@/modules/util";
-import type { SubmitHandler, UseFormReturn } from "react-hook-form";
+import type {
+  Control,
+  FieldValues,
+  SubmitHandler,
+  UseFormReturn,
+} from "react-hook-form";
 import type { TimeRange } from "@/components/reservation-unit/QuickReservation";
 import { PendingReservationFormType } from "@/components/reservation-unit/schema";
 import ControlledDateInput from "@/components/common/ControlledDateInput";
@@ -35,11 +40,7 @@ type Props = {
   shouldCalendarControlsBeVisible?: boolean;
   setShouldCalendarControlsBeVisible?: (value: boolean) => void;
   isAnimated?: boolean;
-  reservationForm: UseFormReturn<{
-    duration?: number;
-    date?: string;
-    time?: string;
-  }>;
+  reservationForm: UseFormReturn<PendingReservationFormType>;
   durationOptions: { label: string; value: number }[];
   startingTimeOptions: { label: string; value: string }[];
   focusSlot: FocusTimeSlot;
@@ -282,7 +283,7 @@ const ReservationCalendarControls = ({
   LoginAndSubmit,
 }: Props): JSX.Element => {
   const { t } = useTranslation();
-  const { watch, handleSubmit } = reservationForm;
+  const { control, watch, handleSubmit } = reservationForm;
   const { start, end } = focusSlot ?? {};
   const formDate = watch("date");
   const formDuration = watch("duration");
@@ -401,7 +402,7 @@ const ReservationCalendarControls = ({
             <Content className={state} $isAnimated={isAnimated}>
               <ControlledDateInput
                 name="date"
-                control={reservationForm.control}
+                control={control}
                 label={t("reservationCalendar:startDate")}
                 initialMonth={dateValue ?? new Date()}
                 minDate={new Date()}
@@ -414,7 +415,8 @@ const ReservationCalendarControls = ({
               <div data-testid="reservation__input--duration">
                 <StyledControlledSelect
                   name="duration"
-                  control={reservationForm.control}
+                  // react-hook-form has issues with typing generic Select
+                  control={control as unknown as Control<FieldValues>}
                   label={t("reservationCalendar:duration")}
                   options={durationOptions}
                 />
@@ -422,9 +424,10 @@ const ReservationCalendarControls = ({
               <StyledControlledSelect
                 name="time"
                 label={t("reservationCalendar:startTime")}
-                control={reservationForm.control}
+                // react-hook-form has issues with typing generic Select
+                control={control as unknown as Control<FieldValues>}
                 options={startingTimeOptions}
-                placeholder={"Ei aikoja" ?? t("common:select")}
+                placeholder={t("common:select")}
               />
               <PriceWrapper>
                 {focusSlot.isReservable && (
