@@ -1,9 +1,11 @@
 import uuid
 from typing import Any
 
+from graphene_django_extensions.errors import GQLCodeError
 from graphene_django_extensions.permissions import BasePermission
 from query_optimizer.typing import GraphQLFilterInfo
 
+from api.graphql.extensions import error_codes
 from common.typing import AnyUser
 from merchants.models import PaymentOrder
 from permissions.helpers import can_handle_reservation, can_refresh_order
@@ -19,7 +21,9 @@ class OrderRefreshPermission(BasePermission):
     def has_mutation_permission(cls, user: AnyUser, input_data: dict[str, Any]) -> bool:
         remote_id: uuid.UUID | None = input_data.get("order_uuid")
         if remote_id is None:
-            return False
+            msg = "Cannot refresh order without Order UUID."
+            raise GQLCodeError(msg, code=error_codes.REQUIRED_FIELD_MISSING)
+
         payment_order = PaymentOrder.objects.filter(remote_id=remote_id).first()
         return can_refresh_order(user, payment_order)
 

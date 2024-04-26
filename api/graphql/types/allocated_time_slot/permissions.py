@@ -1,7 +1,9 @@
 from typing import Any
 
+from graphene_django_extensions.errors import GQLCodeError
 from graphene_django_extensions.permissions import BasePermission
 
+from api.graphql.extensions import error_codes
 from applications.models import AllocatedTimeSlot, ReservationUnitOption
 from common.typing import AnyUser
 from permissions.helpers import can_manage_service_sectors_applications
@@ -31,7 +33,8 @@ class AllocatedTimeSlotPermission(BasePermission):
 
         option_pk: int | None = input_data.get("reservation_unit_option")
         if option_pk is None:
-            return False
+            msg = "Reservation Unit Option is required for creating an Allocated Time Slot."
+            raise GQLCodeError(msg, code=error_codes.REQUIRED_FIELD_MISSING)
 
         option: ReservationUnitOption | None = (
             ReservationUnitOption.objects.filter(pk=option_pk)
@@ -39,7 +42,8 @@ class AllocatedTimeSlotPermission(BasePermission):
             .first()
         )
         if not option:
-            return False
+            msg = f"Reservation Unit Option with pk {option_pk} does not exist."
+            raise GQLCodeError(msg, code=error_codes.ENTITY_NOT_FOUND)
 
         sector = option.application_section.application.application_round.service_sector
         return can_manage_service_sectors_applications(user, sector)
