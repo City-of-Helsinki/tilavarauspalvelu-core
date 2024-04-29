@@ -12,8 +12,8 @@
 - [Tech Stack](#tech-stack)
 - [Integrations](#integrations)
 - [Setup](#setup)
-    - [Frontend devs](#frontend-devs)
-    - [Backend devs](#backend-devs)
+    - [With docker](#with-docker)
+    - [Without docker](#without-docker)
 - [Testing](#testing)
 - [Updating dependencies](#updating-dependencies)
 - [Miscellaneous](#miscellaneous)
@@ -22,6 +22,7 @@
     - [Static files](#static-files)
     - [Translations](#translations)
     - [Debugging](#debugging)
+    - [Development environment](#development-environment)
     - [Image cache](#image-cache)
 
 ## Overview
@@ -55,95 +56,132 @@ The preferred contact method is through Helsinki City Slack.
 
 ## Setup
 
-### Frontend devs
+### With docker
 
-1. Copy `.env.example` to `.env`
+These instructions will set up the backend for local development using Docker.
+This is recommended for especially for frontend developers, as it requires fewer dependencies.
+
+Before we start, make sure [Docker] and [Make] are installed your system.
+Then, follow the steps below.
+
+1. Copy `.env.example` to `.env`.
 
 ```shell
 cp .env.example .env
 ```
 
-2. Start backend in docker
+2. Build and run backend with Docker.
 
 ```shell
 make run
 ```
 
-3. Connect to running container
+You should now be able to log into Django admin panel at `localhost:8000/admin/`.
+GraphQL endpoint is at `localhost:8000/graphql/`.
+
+To generate test data, follow the steps below.
+
+1. Connect to running container.
 
 ```shell
 make bash
 ```
 
-4. (Re)create elastic search index
+2. (Re)create elastic search index.
 
 ```shell
 make indices
 ```
 
-5. Generate test data
+3. Generate test data.
 
 ```shell
 make generate
 ```
 
-You should not be able to log into Django admin panel at `localhost:8000/admin/`.
-GraphQL endpoint is at `localhost:8000/graphql/`.
 
 ### Backend devs
 
-1. Copy `.env.example` to `.env`
+These instructions will set up the backend for local development without Docker.
+This is mainly for backend developers, as it requires more dependencies and setup.
+
+Before you start, you'll need the following dependencies:
+
+- CPython (check `pyproject.toml` for version)
+- [Poetry] (latest version)
+- [Make] ([Windows][Make (Windows)], [Mac][Make (Mac)])
+- [PostgreSQL] (with the [PostGIS] extension) (13 or newer)
+- [Redis] (7 or newer)
+- [Elasticsearch] (8.8 or newer)
+- [GDAL] (version compatible with Django, check their documentation for more info)
+    - Ubuntu: `sudo apt-get install gdal-bin`
+    - Mac: `brew install gdal`
+    - Windows: Use WSL. We haven't gotten GDAL & Django to work on Windows yet.
+- [gettext]
+    - Ubuntu: `sudo apt-get install gettext`
+    - Mac: `brew install gettext`
+    - Windows: https://mlocati.github.io/articles/gettext-iconv-windows.html
+
+> Installation instructions for the dependencies will depend on the OS and can
+> change over time, so please refer to the official documentation for each dependency
+> on how to set them up correctly.
+
+> You can skip the dependencies for Postgres, Redis, and Elasticsearch by running
+> them using Docker. To do this, install [Docker] and run `make services`.
+
+Now, follow the steps below.
+
+1. Copy `.env.example` to `.env`.
 
 ```shell
 cp .env.example .env
 ```
 
-2. Start required services
+> This file contains environment variables used by the project. You can modify these
+> to suit your local development environment.
+
+2. Copy `local_settings_example.py` to `local_settings.py`.
 
 ```shell
-make services
+cp local_settings_example.py local_settings.py
 ```
 
-3. Install GDAL.
+> These can be used to modify settings for local development without changing the main settings file.
 
-Linux: `sudo apt-get install gdal-bin`
-Mac: `brew install gdal`
-Windows: Use WSL or Docker.
-
-4. Create a virtual environment & install dependencies
+3. Create a virtual environment & install dependencies.
 
 ```shell
 poetry install
 ```
 
-5. Add pre-commit hooks
+4. Add pre-commit hooks
 
 ```shell
 poetry run make hooks
 ```
 
-6. Run migrations
+5. Run migrations
 
 ```shell
 poetry run make migrate
 ```
 
-7. (Re)create elastic search indices
+6. (Re)create elastic search indices
 
 ```shell
 poetry run make indices
 ```
 
-8. Generate test data
+7. Generate test data
 
 ```shell
 poetry run make generate
 ```
 
-9. Start the server
+8. Start the server
 
 ```shell
-make dev
+poetry run make dev
 ```
 
 Backend should now be running at `localhost:8000`.
@@ -233,31 +271,12 @@ The package has integrations in all the relevant parts of the project
 For debugging during development, the [Django Debug Toolbar] package can be used.
 The [Django GraphQL Debug Toolbar] extension is used for the GraphQL endpoint.
 
-You'll need to add a `local_settings.py` on the root level of the project and add the following code
-to it in order to enable the debug toolbar:
+You should add a `local_settings.py` on the root level of the project and add
+a two classes called `LocalMixin` and `AutomatedTestMixin` to it.
+These can be used to override settings for local development and automated tests respectively.
 
-```python
-try:
-    # Assure debug toolbars are installed
-    import debug_toolbar
-    import graphiql_debug_toolbar
-
-except ImportError:
-    pass
-
-else:  # No Error
-    # Hardcode to internal IPs as debug toolbar will expose internal information
-    INTERNAL_IPS = ["127.0.0.1", "localhost"]
-
-    # Graphene debug settings
-    GRAPHENE["MIDDLEWARE"] += ["graphene_django.debug.DjangoDebugMiddleware"]
-
-    INSTALLED_APPS.append("debug_toolbar")
-    INSTALLED_APPS.append("graphiql_debug_toolbar")
-
-    # According to documentation, this should be as early as possible in the middleware tree
-    MIDDLEWARE.insert(0, "graphiql_debug_toolbar.middleware.DebugToolbarMiddleware")
-```
+Note that in order for development settings to work correctly, you need to set the
+`DJANGO_SETTINGS_ENVIRONMENT` environment variable to `Local` when running the server.
 
 ### Development environment
 
@@ -290,6 +309,8 @@ In settings there are four configurations:
 [Django]: https://www.djangoproject.com/
 [Docker]: https://www.docker.com/
 [Elasticsearch]: https://www.elastic.co/guide/en/elasticsearch/reference/current/elasticsearch-intro.html
+[GDAL]: https://gdal.org/index.html
+[gettext]: https://www.gnu.org/software/gettext/
 [Graphene]: https://github.com/graphql-python/graphene-django
 [Hauki]: https://github.com/City-of-Helsinki/hauki
 [Helsinki Profile]: https://github.com/City-of-Helsinki/open-city-profile-ui
