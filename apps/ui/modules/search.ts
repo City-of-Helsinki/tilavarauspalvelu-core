@@ -77,7 +77,7 @@ function transformOrderBy(
 }
 
 /// Defaults to name sorting
-export function transformSortString(
+function transformSortString(
   orderBy: string | null,
   language: string,
   desc: boolean

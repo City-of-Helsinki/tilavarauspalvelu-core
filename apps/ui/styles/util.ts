@@ -34,10 +34,6 @@ export const SupplementaryButton = styled(Button)`
   }
 `;
 
-export const NoWrap = styled.span`
-  white-space: nowrap;
-`;
-
 export const arrowUp = css`
   content: "";
   position: absolute;

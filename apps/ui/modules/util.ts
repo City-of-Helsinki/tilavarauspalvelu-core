@@ -78,7 +78,7 @@ type ParameterType =
     }
   | { pk: number; name: string };
 
-export const getLabel = (
+const getLabel = (
   parameter: ParameterType | AgeGroupNode,
   lang: LocalizationLanguages = "fi"
 ): string => {
@@ -179,18 +179,6 @@ export const singleSearchUrl = (params?: SearchParams): string => {
 
 export const applicationsUrl = `${applicationsPrefix}/`;
 export const reservationsUrl = `${reservationsPrefix}/`;
-
-export function deepCopy<T>(src: T): T {
-  return JSON.parse(JSON.stringify(src));
-}
-
-export const apiDurationToMinutes = (duration: string): number => {
-  if (!duration) {
-    return 0;
-  }
-  const parts = duration.split(":");
-  return Number(parts[0]) * 60 + Number(parts[1]);
-};
 
 const imagePriority = ["main", "map", "ground_plan", "other"].map((n) =>
   n.toUpperCase()

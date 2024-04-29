@@ -13,7 +13,7 @@ import { EmailInput } from "./EmailInput";
 import { BillingAddress } from "./BillingAddress";
 import { ApplicationFormPage3Values } from "./Form";
 
-export const Placeholder = styled.span`
+const Placeholder = styled.span`
   @media (max-width: ${breakpoints.m}) {
     display: none;
   }

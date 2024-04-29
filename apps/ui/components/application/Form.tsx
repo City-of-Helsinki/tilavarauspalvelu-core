@@ -29,7 +29,7 @@ import {
 // the new mutation interface allows only updating the fields that are present
 // also then all manual validations and setErrors should be removed
 
-export const ApplicationEventScheduleFormTypeSchema = z.object({
+const ApplicationEventScheduleFormTypeSchema = z.object({
   day: z.number().min(0).max(6),
   begin: z.string(),
   end: z.string(),
@@ -99,7 +99,7 @@ export type ApplicationSectionFormValue = z.infer<
   typeof ApplicationSectionFormValueSchema
 >;
 
-export function transformApplicationSectionToForm(
+function transformApplicationSectionToForm(
   section: ApplicationSectionNode
 ): ApplicationSectionFormValue {
   return {
@@ -154,7 +154,7 @@ function convertDate(date: string | null | undefined): string | undefined {
   return date != null && date.includes("-") ? apiDateToUIDate(date) : undefined;
 }
 
-export const AddressFormValueSchema = z.object({
+const AddressFormValueSchema = z.object({
   pk: z.number().optional(),
   streetAddress: z.string(),
   city: z.string(),
@@ -163,7 +163,7 @@ export const AddressFormValueSchema = z.object({
 export type AddressFormValues = z.infer<typeof AddressFormValueSchema>;
 
 // TODO identifier is only optional for Associations (not for Companies / Communities)
-export const OrganisationFormValuesSchema = z.object({
+const OrganisationFormValuesSchema = z.object({
   pk: z.number().optional(),
   name: z.string().min(1).max(255),
   identifier: z.string().optional(),
@@ -175,7 +175,7 @@ export type OrganisationFormValues = z.infer<
   typeof OrganisationFormValuesSchema
 >;
 
-export const PersonFormValuesSchema = z.object({
+const PersonFormValuesSchema = z.object({
   pk: z.number().optional(),
   firstName: z.string().min(1).max(255),
   lastName: z.string().min(1).max(255),
@@ -217,7 +217,7 @@ const ApplicantTypeSchema = z.enum([
   ApplicantTypeChoice.Association,
   ApplicantTypeChoice.Community,
 ]);
-export const ApplicationFormSchema = z.object({
+const ApplicationFormSchema = z.object({
   pk: z.number(),
   applicantType: ApplicantTypeSchema,
   applicationSections: z
@@ -315,7 +315,7 @@ export function ApplicationFormSchemaRefined(round: {
 // TODO refine the form (different applicant types require different fields)
 // if applicantType === Organisation | Company => organisation.identifier is required
 // if hasBillingAddress | applicantType === Individual => billingAddress is required
-export const ApplicationFormPage3Schema = z.object({
+const ApplicationFormPage3Schema = z.object({
   pk: z.number(),
   applicantType: ApplicantTypeSchema,
   organisation: OrganisationFormValuesSchema.optional(),

@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { LoadingSpinner, Notification as HDSNotification } from "hds-react";
+import { LoadingSpinner } from "hds-react";
 import { breakpoints } from "common/src/common/style";
 import { H5 } from "common/src/common/typography";
 
@@ -36,11 +36,6 @@ export const FormSubHeading = styled(H5)`
   }
 `;
 
-export const Notification = styled(HDSNotification)`
-  margin-top: var(--spacing-s);
-  margin-bottom: var(--spacing-m);
-`;
-
 export const ButtonContainer = styled.div`
   display: flex;
   flex-direction: column-reverse;
@@ -53,13 +48,6 @@ export const ButtonContainer = styled.div`
   @media (min-width: ${breakpoints.m}) {
     flex-direction: row;
   }
-`;
-
-export const HorisontalRule = styled.div`
-  border: 0;
-  height: 1px;
-  background-color: var(--color-black-60);
-  margin-top: var(--spacing-layout-m);
 `;
 
 export const CenterSpinner = styled(LoadingSpinner)`

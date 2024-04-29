@@ -6,7 +6,7 @@ import { participantCountOptions } from "@/modules/const";
 import { mapOptions } from "@/modules/util";
 import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
 
-export type OptionTypes = {
+type OptionTypes = {
   ageGroupOptions: OptionType[];
   abilityGroupOptions: OptionType[];
   reservationUnitTypeOptions: OptionType[];

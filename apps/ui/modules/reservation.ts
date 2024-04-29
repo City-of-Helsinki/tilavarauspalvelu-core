@@ -97,7 +97,7 @@ export const isReservationInThePast = (
   return !isAfter(new Date(reservation.begin).setSeconds(0, 0), now);
 };
 
-export const isReservationWithinCancellationPeriod = (
+const isReservationWithinCancellationPeriod = (
   reservation: ReservationNode
 ): boolean => {
   const reservationUnit = reservation.reservationUnit?.[0];
@@ -159,7 +159,7 @@ export const getReservationApplicationMutationValues = (
   return result;
 };
 
-export type ReservationCancellationReason =
+type ReservationCancellationReason =
   | "PAST"
   | "NO_CANCELLATION_RULE"
   | "REQUIRES_HANDLING"
@@ -321,10 +321,10 @@ export function isReservationReservable({
   return true;
 }
 
-export const isReservationConfirmed = (reservation: ReservationNode): boolean =>
-  reservation.state === "CONFIRMED";
+const isReservationConfirmed = (reservation: ReservationNode): boolean =>
+  reservation.state === State.Confirmed;
 
-export const isReservationFreeOfCharge = (
+const isReservationFreeOfCharge = (
   reservation: ReservationNode | PendingReservation
 ): boolean => parseInt(String(reservation.price), 10) === 0;
 

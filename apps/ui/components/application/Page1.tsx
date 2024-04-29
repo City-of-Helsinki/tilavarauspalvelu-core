@@ -156,5 +156,3 @@ export function Page1({ applicationRound, onNext }: Props): JSX.Element | null {
     </form>
   );
 }
-
-export default Page1;

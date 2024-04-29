@@ -5,7 +5,7 @@ import type {
 } from "common/types/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 
-export type ReservationUnitList = {
+type ReservationUnitList = {
   reservationUnits: ReservationUnitNode[];
   selectReservationUnit: (ru: ReservationUnitNode) => void;
   containsReservationUnit: (ru: ReservationUnitNode) => boolean;

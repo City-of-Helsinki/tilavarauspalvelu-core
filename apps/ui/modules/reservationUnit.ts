@@ -158,12 +158,6 @@ export const getReservationUnitInstructionsKey = (
   }
 };
 
-export const getDurationRange = (
-  reservationUnit: ReservationUnitNode
-): string => {
-  return `${reservationUnit.minReservationDuration} - ${reservationUnit.maxReservationDuration}`;
-};
-
 export const getActivePricing = (
   reservationUnit: ReservationUnitNode
 ): ReservationUnitPricingNode | undefined => {
@@ -240,7 +234,7 @@ function formatPrice(
   return parseFloat(price.toString()) ? formatter.format(price) : 0;
 }
 
-export type GetPriceType = {
+type GetPriceType = {
   pricing: ReservationUnitPricingNode;
   minutes?: number; // additional minutes for total price calculation
   trailingZeros?: boolean;
@@ -272,7 +266,7 @@ export const getPrice = (props: GetPriceType): string => {
   return trim(`${priceString} / ${unitString}`, " / ");
 };
 
-export type GetReservationUnitPriceProps = {
+type GetReservationUnitPriceProps = {
   reservationUnit?: ReservationUnitNode | null;
   pricingDate?: Date;
   minutes?: number;

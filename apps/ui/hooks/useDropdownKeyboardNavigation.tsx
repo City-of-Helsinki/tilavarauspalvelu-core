@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 
-export interface KeyboardNavigationProps {
+interface KeyboardNavigationProps {
   container: React.MutableRefObject<HTMLDivElement | null>;
   listLength: number;
   initialFocusedIndex?: number;

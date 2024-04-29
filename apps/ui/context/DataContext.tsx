@@ -1,6 +1,6 @@
-import React, { Dispatch, SetStateAction, useContext, useMemo } from "react";
+import React, { Dispatch, SetStateAction, useMemo } from "react";
 
-export type DataContextProps = {
+type DataContextProps = {
   reservation: ReservationProps | null;
   setReservation: Dispatch<SetStateAction<ReservationProps>>;
 };
@@ -13,12 +13,10 @@ export type ReservationProps = {
   reservationUnitPk: number | null;
 };
 
-export const DataContext = React.createContext<DataContextProps>({
+const DataContext = React.createContext<DataContextProps>({
   reservation: null,
   setReservation: async () => {},
 });
-
-export const useDataContext = (): DataContextProps => useContext(DataContext);
 
 type Props = { children: React.ReactNode };
 

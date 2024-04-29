@@ -1,5 +1,4 @@
 import { gql } from "@apollo/client";
-import { IMAGE_FRAGMENT } from "common/src/queries/fragments";
 
 export const APPLICATION_ROUND_FRAGMENT = gql`
   fragment ApplicationRoundFields on ApplicationRoundNode {
@@ -54,31 +53,6 @@ export const APPLICATION_ROUNDS = gql`
       edges {
         node {
           ...ApplicationRoundFields
-        }
-      }
-    }
-  }
-`;
-
-export const APPLICATION_ROUND_BY_ID = gql`
-  ${APPLICATION_ROUND_FRAGMENT}
-  ${IMAGE_FRAGMENT}
-  query ApplicationRoundUi($id: ID!) {
-    applicationRound(id: $id) {
-      ...ApplicationRoundFields
-      reservationUnits {
-        pk
-        nameFi
-        nameEn
-        nameSv
-        images {
-          ...ImageFragment
-        }
-        unit {
-          pk
-          nameFi
-          nameEn
-          nameSv
         }
       }
     }

@@ -7,8 +7,8 @@
 // that libraries are not imported in the middleware.
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getSignInUrl } from "@/modules/const";
 import { env } from "@/env.mjs";
+import { getSignInUrl } from "common/src/urlBuilder";
 
 const apiBaseUrl = env.TILAVARAUS_API_URL ?? "";
 

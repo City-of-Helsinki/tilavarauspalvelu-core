@@ -39,7 +39,7 @@ const dayMax = (days: Array<Date | undefined>): Date | undefined => {
 };
 
 // Returns the last possible reservation date for the given reservation unit
-const getLastPossibleReservationDate = (
+export const getLastPossibleReservationDate = (
   reservationUnit?: ReservationUnitNode
 ): Date | null => {
   if (!reservationUnit) {
@@ -80,12 +80,12 @@ type AvailableTimesProps = {
 
 // Returns an array of available times for the given duration and day
 // TODO this is really slow (especially if called from a loop)
-const getAvailableTimesForDay = ({
+function getAvailableTimesForDay({
   start,
   duration,
   reservationUnit,
   activeApplicationRounds,
-}: AvailableTimesProps): string[] => {
+}: AvailableTimesProps): string[] {
   if (!reservationUnit || !activeApplicationRounds) return [];
   const [timeHours, timeMinutesRaw] = [0, 0];
 
@@ -118,10 +118,10 @@ const getAvailableTimesForDay = ({
       return isReservable && !isBefore(startDate, startTime) ? n.label : null;
     })
     .filter((n): n is NonNullable<typeof n> => n != null);
-};
+}
 
 // Returns the next available time, after the given time (Date object)
-function getNextAvailableTime(props: AvailableTimesProps): Date | null {
+export function getNextAvailableTime(props: AvailableTimesProps): Date | null {
   const { start, reservationUnit } = props;
   if (reservationUnit == null) {
     return null;
@@ -174,29 +174,3 @@ function getNextAvailableTime(props: AvailableTimesProps): Date | null {
 
   return null;
 }
-
-const isSlotReservable = (
-  start: Date,
-  end: Date,
-  reservationUnit: ReservationUnitNode,
-  activeApplicationRounds?: RoundPeriod[],
-  skipLengthCheck = false
-): boolean => {
-  if (!reservationUnit || !activeApplicationRounds) {
-    return false;
-  }
-  return isReservationReservable({
-    reservationUnit,
-    activeApplicationRounds,
-    start,
-    end,
-    skipLengthCheck,
-  });
-};
-
-export {
-  dayMax,
-  getNextAvailableTime,
-  getLastPossibleReservationDate,
-  isSlotReservable,
-};

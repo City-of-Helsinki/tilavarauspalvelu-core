@@ -261,16 +261,3 @@ export const RELATED_RESERVATION_UNITS = gql`
     }
   }
 `;
-
-export const RESERVATION_UNIT_TYPES = gql`
-  ${RESERVATION_UNIT_TYPE_FRAGMENT}
-  query ReservationUnitTypes {
-    reservationUnitTypes {
-      edges {
-        node {
-          ...ReservationUnitTypeFields
-        }
-      }
-    }
-  }
-`;

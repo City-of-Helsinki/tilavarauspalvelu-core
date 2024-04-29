@@ -22,7 +22,7 @@ export const UNIT_NAME_FRAGMENT_I18N = gql`
   }
 `;
 
-export const UNIT_FRAGMENT = gql`
+const UNIT_FRAGMENT = gql`
   ${UNIT_NAME_FRAGMENT_I18N}
   fragment UnitFields on UnitNode {
     ...UnitNameFieldsI18N

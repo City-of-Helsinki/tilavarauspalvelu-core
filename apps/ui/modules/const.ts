@@ -1,19 +1,13 @@
-import type { OptionType } from "common/types/common";
 import type { TFunction } from "i18next";
 
 export { isBrowser } from "common/src/helpers";
-export { getSignInUrl, getSignOutUrl } from "common/src/urlBuilder";
 export { genericTermsVariant } from "common/src/const";
 
 export const reservationUnitPrefix = "/reservation-unit";
 export const searchPrefix = "/search";
 export const singleSearchPrefix = "/search/single";
 export const applicationsPrefix = "/applications";
-export const applicationPrefix = "/application";
-export const applicationRoundPrefix = "/application_round";
 export const reservationsPrefix = "/reservations";
-export const criteriaPrefix = "/criteria";
-export const parametersPrefix = "/parameters";
 
 export const mapUrlPrefix = "https://palvelukartta.hel.fi/";
 
@@ -22,24 +16,9 @@ export const SEARCH_PAGING_LIMIT = 36;
 export const reservationUnitPath = (id: number): string =>
   `${reservationUnitPrefix}/${id}`;
 
-export const emptyOption = (
-  label: string,
-  value?: string | number | null
-): OptionType => ({
-  label,
-  value: value != null ? value : undefined,
-});
-
 export const participantCountOptions = [
   1, 2, 5, 10, 15, 20, 25, 30, 40, 50, 60, 80, 100, 150, 200,
 ].map((v) => ({ label: `${v}`, value: v }));
-
-export const DATE_TYPES = {
-  TODAY: "today",
-  TOMORROW: "tomorrow",
-  WEEKEND: "weekend",
-  THIS_WEEK: "this_week",
-};
 
 type DurationOption = { label: string; value: number };
 function durationMinuteOptions(t: TFunction) {
@@ -87,9 +66,6 @@ export const daysByMonths: Array<{ label: string; value: number }> = [
   { label: "12", value: 365 },
   { label: "24", value: 730 },
 ];
-
-export const defaultDuration = "01:30:00";
-export const defaultDurationMins = 90;
 
 // TODO the validation needs to go to env.mjs because this reloads the page constantly
 // TODO we should default to this host if the env variable is not set

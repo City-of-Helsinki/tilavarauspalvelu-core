@@ -38,33 +38,3 @@ export const RESERVATION_UNIT_PURPOSES = gql`
     }
   }
 `;
-
-export const SEARCH_FORM_PARAMS_PURPOSE = gql`
-  query SearchFormParamsPurpose {
-    purposes {
-      edges {
-        node {
-          pk
-          nameFi
-          nameEn
-          nameSv
-        }
-      }
-    }
-  }
-`;
-
-export const SEARCH_FORM_PARAMS_EQUIPMENT = gql`
-  query Equipment {
-    equipments {
-      edges {
-        node {
-          pk
-          nameFi
-          nameEn
-          nameSv
-        }
-      }
-    }
-  }
-`;
