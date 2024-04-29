@@ -1,43 +1,18 @@
 import React from "react";
 import { type ReservationNode, State } from "common/types/gql-types";
 import { useTranslation } from "react-i18next";
-import { addHours, isToday } from "date-fns";
 import { Button } from "hds-react";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import DenyDialog from "./DenyDialog";
 import ApproveDialog from "./ApproveDialog";
 import ReturnToRequiredHandlingDialog from "./ReturnToRequiresHandlingDialog";
 import { useModal } from "@/context/ModalContext";
-
-/* Rules
- * Approve only if REQUIRES_HANDLING
- * Deny if REQUIRES_HANDLING or CONFIRMED
- * Return to handling if DENIED or CONFIRMED
- * Other states (e.g. WAITING_FOR_PAYMENT) are not allowed to be modified
- *
- * Allowed to change state (except deny unconfirmed) only till it's ended.
- * Allowed to modify the reservation after ending as long as it's the same date or within one hour.
- */
-const isPossibleToApprove = (state: State, end: Date): boolean =>
-  state === State.RequiresHandling && end > new Date();
-
-const isPossibleToDeny = (state: State, end: Date): boolean => {
-  if (state === State.RequiresHandling) {
-    return true;
-  }
-  return state === State.Confirmed && end > new Date();
-};
-
-const isPossibleToReturn = (state: State, end: Date): boolean =>
-  (state === State.Denied || state === State.Confirmed) && end > new Date();
-
-const isPossibleToEdit = (state: State, end: Date): boolean => {
-  if (state !== State.Confirmed) {
-    return false;
-  }
-  const now = new Date();
-  return end > addHours(now, -1) || isToday(end);
-};
+import {
+  isPossibleToApprove,
+  isPossibleToDeny,
+  isPossibleToEdit,
+  isPossibleToReturn,
+} from "./reservationModificationRules";
 
 const ApprovalButtons = ({
   state,

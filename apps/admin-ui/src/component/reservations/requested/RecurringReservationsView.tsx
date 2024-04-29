@@ -9,8 +9,8 @@ import {
 } from "common/types/gql-types";
 import { type ApolloQueryResult } from "@apollo/client";
 import { useRecurringReservations } from "./hooks";
-import ReservationList from "../../ReservationsList";
-import ReservationListButton from "../../ReservationListButton";
+import { ReservationList } from "@/component/ReservationsList";
+import ReservationListButton from "@/component/ReservationListButton";
 import DenyDialog from "./DenyDialog";
 import { useModal } from "@/context/ModalContext";
 import EditTimeModal from "../EditTimeModal";

@@ -17,8 +17,9 @@ import {
   type RecurringReservationForm,
 } from "@/schemas";
 import { SortedSelect } from "@/component/SortedSelect";
-import ReservationList, {
-  NewReservationListItem,
+import {
+  ReservationList,
+  type NewReservationListItem,
 } from "@/component/ReservationsList";
 import { useNotification } from "@/context/NotificationContext";
 import { ActionsWrapper, Grid, Element } from "./commonStyling";

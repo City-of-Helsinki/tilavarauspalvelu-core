@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { Button } from "hds-react";
 
-type NewReservationListItem = {
+export type NewReservationListItem = {
   date: Date;
   startTime: string;
   endTime: string;
@@ -140,13 +140,15 @@ const StatusElement = ({ item }: { item: NewReservationListItem }) => {
   );
 };
 
-const ReservationList = ({
+/// Used by the RecurringReservation pages to show a list of reservations
+/// TODO should be renamed / moved to signify that this is only for recurring reservations
+export function ReservationList({
   header,
   items,
   hasPadding,
   onLoadMore,
   hasMore,
-}: Props) => {
+}: Props) {
   const { t } = useTranslation();
 
   if (!items.length) return null;
@@ -187,7 +189,4 @@ const ReservationList = ({
       </StyledList>
     </ListWrapper>
   );
-};
-
-export default ReservationList;
-export type { NewReservationListItem };
+}

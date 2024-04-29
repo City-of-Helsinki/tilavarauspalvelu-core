@@ -16,7 +16,7 @@ const Ingress = styled(H2).attrs({ $legacy: true })`
   line-height: 1.8125rem;
 `;
 
-function ApplicationRounds(): JSX.Element {
+function HomePage(): JSX.Element {
   const { t } = useTranslation();
 
   const { user } = usePermission();
@@ -37,4 +37,4 @@ function ApplicationRounds(): JSX.Element {
   );
 }
 
-export default ApplicationRounds;
+export default HomePage;

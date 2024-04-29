@@ -5,7 +5,7 @@ import { addDays, format, nextMonday } from "date-fns";
 import { ReservationStartInterval } from "common/types/gql-types";
 import { toUIDate } from "common/src/common/util";
 import { generateReservations } from "./generateReservations";
-import ReservationList from "../../ReservationsList";
+import { ReservationList } from "../../ReservationsList";
 
 const DATE_FORMAT = "dd.MM.yyyy";
 const today = new Date();
