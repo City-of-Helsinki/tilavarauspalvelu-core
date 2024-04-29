@@ -8,7 +8,6 @@ from .helpers import SET_HANDLED_MUTATION, disable_reservation_generation
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_celery_synchronous"),
 ]
 
 

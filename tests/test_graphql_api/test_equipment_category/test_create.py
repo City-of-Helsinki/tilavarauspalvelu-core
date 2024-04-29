@@ -30,5 +30,5 @@ def test_equipment_category__create__empty_name(graphql):
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages("name") == ["Tämä kenttä ei voi olla tyhjä."]
+    assert response.field_error_messages("name") == ["This field may not be blank."]
     assert EquipmentCategory.objects.count() == 0

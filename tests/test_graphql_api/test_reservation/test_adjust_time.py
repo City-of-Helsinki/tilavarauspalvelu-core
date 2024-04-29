@@ -27,7 +27,6 @@ from .helpers import ADJUST_MUTATION, get_adjust_data
 
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_celery_synchronous"),
 ]
 
 

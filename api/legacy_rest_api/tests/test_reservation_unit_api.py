@@ -127,7 +127,7 @@ def test_unauthenticated_cannot_create_reservation_unit(unauthenticated_api_clie
     response = unauthenticated_api_client.post(
         reverse("reservationunit-list"), valid_reservation_unit_data, format="json"
     )
-    assert response.status_code == 401
+    assert response.status_code == 403
 
 
 @pytest.mark.django_db()

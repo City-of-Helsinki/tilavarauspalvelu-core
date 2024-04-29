@@ -16,8 +16,6 @@ from .helpers import REFUND_MUTATION, get_refund_data
 
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_celery_synchronous"),
-    pytest.mark.usefixtures("_setup_verkkokauppa_env_variables"),
 ]
 
 

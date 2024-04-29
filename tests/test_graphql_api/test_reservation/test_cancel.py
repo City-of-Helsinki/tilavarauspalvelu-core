@@ -18,8 +18,6 @@ from .helpers import CANCEL_MUTATION, get_cancel_data
 
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_celery_synchronous"),
-    pytest.mark.usefixtures("_setup_verkkokauppa_env_variables"),
 ]
 
 

@@ -66,7 +66,7 @@ def test_resource__update__empty_name_fi(graphql):
     response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages("name") == ["Tämä kenttä ei voi olla tyhjä."]
+    assert response.field_error_messages("name") == ["This field may not be blank."]
 
 
 def test_resource__update__null_space_with_fixed_location(graphql):

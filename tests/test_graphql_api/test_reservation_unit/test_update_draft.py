@@ -13,7 +13,6 @@ from .helpers import UPDATE_MUTATION, get_draft_update_input_data
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_disable_hauki_export"),
 ]
 
 
@@ -152,7 +151,7 @@ def test_reservation_unit__update__errors_with_empty_name(graphql):
     response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages("name") == ["Tämä kenttä ei voi olla tyhjä."]
+    assert response.field_error_messages("name") == ["This field may not be blank."]
 
     reservation_unit.refresh_from_db()
     assert reservation_unit.name_fi != ""

@@ -12,7 +12,6 @@ from .helpers import APPROVE_MUTATION, get_approve_data
 
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_celery_synchronous"),
 ]
 
 

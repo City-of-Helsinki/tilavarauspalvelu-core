@@ -9,7 +9,6 @@ from .helpers import REQUIRE_HANDLING_MUTATION, get_require_handling_data
 
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_celery_synchronous"),
 ]
 
 

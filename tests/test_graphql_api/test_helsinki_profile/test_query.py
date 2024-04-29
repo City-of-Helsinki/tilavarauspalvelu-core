@@ -11,7 +11,6 @@ from .helpers import profile_query
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_celery_synchronous"),
 ]
 
 

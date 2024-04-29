@@ -13,7 +13,6 @@ from tests.test_webhooks.helpers import get_mock_order_refund_api
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_setup_verkkokauppa_env_variables"),
 ]
 
 
@@ -111,7 +110,7 @@ def test_order_refund_webhook__missing_fields(api_client, settings, missing_fiel
     response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 400, response.data
-    assert response.data == {missing_field: ["Tämä kenttä vaaditaan."]}
+    assert response.data == {missing_field: ["This field is required."]}
 
 
 @patch_method(VerkkokauppaAPIClient.get_refund_status)

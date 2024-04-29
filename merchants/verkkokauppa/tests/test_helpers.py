@@ -13,10 +13,6 @@ from reservations.choices import CustomerTypeChoice
 from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory, UserFactory
 from tests.helpers import patch_method
 
-pytestmark = [
-    pytest.mark.usefixtures("_setup_verkkokauppa_env_variables"),
-]
-
 
 @freeze_time("2022-11-05T10:00:00")
 class HelpersTestCase(TestCase):

@@ -386,7 +386,7 @@ def test_query_user_data__wrong_scope(api_client, settings):
         response = api_client.get(url)
 
     assert response.status_code == 403, response.data
-    assert response.data == {"detail": "Sinulla ei ole oikeutta suorittaa tätä toimintoa."}
+    assert response.data == {"detail": "You do not have permission to perform this action."}
 
 
 def test_delete_user_data__should_anonymize(api_client, settings):
@@ -540,7 +540,7 @@ def test_delete_user_data__cannot_anonymize_other_users_data(api_client, setting
         response = api_client.delete(url)
 
     assert response.status_code == 403, response.data
-    assert response.data == {"detail": "Sinulla ei ole oikeutta suorittaa tätä toimintoa."}
+    assert response.data == {"detail": "You do not have permission to perform this action."}
     other_user.refresh_from_db()
     assert other_user.username == "bar"
 
@@ -555,7 +555,7 @@ def test_delete_user_data__not_authenticated(api_client, settings):
         response = api_client.delete(url)
 
     assert response.status_code == 401, response.data
-    assert response.data == {"detail": "Autentikaatiotunnuksia ei annettu."}
+    assert response.data == {"detail": "Authentication credentials were not provided."}
     user.refresh_from_db()
     assert user.username == "foo"
 
@@ -572,7 +572,7 @@ def test_delete_user_data__wrong_scope(api_client, settings):
         response = api_client.delete(url)
 
     assert response.status_code == 403, response.data
-    assert response.data == {"detail": "Sinulla ei ole oikeutta suorittaa tätä toimintoa."}
+    assert response.data == {"detail": "You do not have permission to perform this action."}
     user.refresh_from_db()
     assert user.username == "foo"
 

@@ -7,7 +7,6 @@ from tests.factories import SpaceFactory
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_celery_synchronous"),
 ]
 
 

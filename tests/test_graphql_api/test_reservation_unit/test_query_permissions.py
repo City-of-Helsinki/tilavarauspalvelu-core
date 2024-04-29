@@ -20,7 +20,6 @@ from .helpers import reservation_units_query
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_disable_hauki_export"),
 ]
 
 
@@ -160,7 +159,6 @@ def test_reservation_unit__query__sensitive_information__regular_user(graphql):
     }
 
 
-@pytest.mark.usefixtures("_celery_synchronous")
 def test_reservation_unit__query__sensitive_information__general_admin(graphql):
     reservation_unit = ReservationUnitFactory.create()
     user = UserFactory.create(date_of_birth=datetime.date(2020, 1, 1))

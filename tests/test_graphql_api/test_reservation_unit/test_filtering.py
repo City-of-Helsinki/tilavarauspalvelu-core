@@ -23,7 +23,6 @@ from .helpers import (
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_setup_verkkokauppa_env_variables"),
 ]
 
 

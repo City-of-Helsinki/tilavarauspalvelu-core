@@ -8,7 +8,6 @@ from .helpers import SEND_MUTATION
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_disable_reservation_email_sending"),
 ]
 
 

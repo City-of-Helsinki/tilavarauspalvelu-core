@@ -13,7 +13,6 @@ from .helpers import ADJUST_STAFF_MUTATION, get_staff_adjust_data
 
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_celery_synchronous"),
 ]
 
 
