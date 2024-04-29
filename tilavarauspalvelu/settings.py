@@ -3,6 +3,7 @@ import os
 import zoneinfo
 from pathlib import Path
 
+import dj_database_url
 from django.utils.translation import gettext_lazy
 from dotenv.main import StrPath
 from env_config import Environment, values
@@ -367,8 +368,8 @@ class Common(Environment):
     VERKKOKAUPPA_API_KEY = values.StringValue()
 
     MOCK_VERKKOKAUPPA_API_ENABLED = values.BooleanValue(default=False)
-    MOCK_VERKKOKAUPPA_FRONTEND_URL = values.StringValue()
-    MOCK_VERKKOKAUPPA_BACKEND_URL = values.StringValue()
+    MOCK_VERKKOKAUPPA_FRONTEND_URL = values.StringValue(default="")
+    MOCK_VERKKOKAUPPA_BACKEND_URL = values.StringValue(default="")
     UPDATE_PRODUCT_MAPPING = values.BooleanValue(default=False)
     UPDATE_ACCOUNTING = values.BooleanValue(default=False)
 
@@ -511,8 +512,8 @@ class Local(LocalMixin, Common):
 
     # --- CORS and CSRF settings -------------------------------------------------------------------------------------
 
-    CORS_ALLOWED_ORIGINS = []
-    CSRF_TRUSTED_ORIGINS = []
+    CORS_ALLOWED_ORIGINS = values.ListValue(default=[])
+    CSRF_TRUSTED_ORIGINS = values.ListValue(default=[])
 
     # --- Database settings ------------------------------------------------------------------------------------------
 
@@ -561,31 +562,20 @@ class Local(LocalMixin, Common):
 class Docker(Common):
     """Settings for local Docker development."""
 
-    # --- Basic settings ---------------------------------------------------------------------------------------------
-
     DEBUG = True
     SECRET_KEY = "secret"  # noqa: S105 # nosec # NOSONAR
     ALLOWED_HOSTS = ["*"]
     ADMIN = []
 
-    # --- CORS and CSRF settings -------------------------------------------------------------------------------------
+    CORS_ALLOWED_ORIGINS = values.ListValue(default=[])
+    CSRF_TRUSTED_ORIGINS = values.ListValue(default=[])
 
-    CORS_ALLOWED_ORIGINS = []
-    CSRF_TRUSTED_ORIGINS = []
+    STATIC_ROOT = "/srv/static"
+    MEDIA_ROOT = "/media"
 
-    # --- Database settings ------------------------------------------------------------------------------------------
-
-    DATABASES = values.DatabaseURLValue(default="postgis://tvp:tvp@127.0.0.1:5555/tvp")
-
-    # --- Redis settings ---------------------------------------------------------------------------------------------
-
-    REDIS_URL = values.StringValue(default="redis://127.0.0.1:6379/0")
-
-    # --- Elasticsearch settings -------------------------------------------------------------------------------------
-
-    ELASTICSEARCH_URL = values.StringValue(default="http://localhost:9200")
-
-    # ----- Misc -------------------------------------------------------------------------------------------
+    DATABASES = {"default": dj_database_url.parse(url="postgis://tvp:tvp@db/tvp")}
+    REDIS_URL = "redis://redis:6379/0"
+    ELASTICSEARCH_URL = "http://elastic:9200"
 
     GRAPHQL_CODEGEN_ENABLED = values.BooleanValue(default=False)
 
@@ -696,6 +686,52 @@ class AutomatedTests(AutomatedTestMixin, Common, dotenv_path=None):  # Do not lo
     # ----- Misc -------------------------------------------------------------------------------------------
 
     TPREK_UNIT_URL = "https://fake.test.tprek.com"
+
+
+class Build(Common):
+    """Settings when building docker image."""
+
+    def load_dotenv(*, dotenv_path: StrPath | None = None) -> dict[str, str]:
+        # During build, we should not have a .env file, so use environment variables instead.
+        return os.environ.copy()
+
+    DEBUG = True
+    SECRET_KEY = "secret"  # noqa: S105 # nosec # NOSONAR
+    ALLOWED_HOSTS = ["*"]
+    ADMIN = []
+
+    CORS_ALLOWED_ORIGINS = []
+    CSRF_TRUSTED_ORIGINS = []
+
+    DATABASES = {}
+    REDIS_URL = ""
+    ELASTICSEARCH_URL = ""
+
+    HAUKI_API_URL = ""
+    HAUKI_ADMIN_UI_URL = ""
+    HAUKI_ORIGIN_ID = ""
+    HAUKI_ORGANISATION_ID = ""
+    HAUKI_SECRET = ""  # nosec # NOSONAR
+    HAUKI_API_KEY = ""
+
+    VERKKOKAUPPA_PRODUCT_API_URL = ""
+    VERKKOKAUPPA_ORDER_API_URL = ""
+    VERKKOKAUPPA_PAYMENT_API_URL = ""
+    VERKKOKAUPPA_MERCHANT_API_URL = ""
+    VERKKOKAUPPA_NAMESPACE = ""
+    VERKKOKAUPPA_API_KEY = ""
+
+    TUNNISTAMO_BASE_URL = ""
+    TUNNISTAMO_JWT_AUDIENCE = ""
+    TUNNISTAMO_JWT_ISSUER = ""
+
+    SOCIAL_AUTH_TUNNISTAMO_KEY = ""
+    SOCIAL_AUTH_TUNNISTAMO_SECRET = ""  # nosec # NOSONAR
+
+    OPEN_CITY_PROFILE_SCOPE = ""
+    OPEN_CITY_PROFILE_GRAPHQL_API = ""
+
+    TPREK_UNIT_URL = ""
 
 
 class Platta(Common):

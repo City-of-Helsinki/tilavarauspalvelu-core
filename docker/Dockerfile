@@ -12,6 +12,7 @@ ENV PYTHONUNBUFFERED=1 \
 # Setup build time variables.
 ARG PROJECT_ROOT=/tvp
 ARG STATIC_ROOT=/srv/static
+ARG MEDIA_ROOT=/media
 
 # Setup common dependencies and create required directories.
 RUN echo "Install common dependencies" \
@@ -29,6 +30,8 @@ RUN echo "Install common dependencies" \
     && echo "Create directories for static files" \
     && mkdir -p "$STATIC_ROOT" \
     && chmod g=u "$STATIC_ROOT" \
+    && mkdir -p "$MEDIA_ROOT" \
+    && chmod g=u "$MEDIA_ROOT" \
     && echo "Create celery broker directories and set permissions" \
     && mkdir -p /broker \
     && mkdir -p /broker/queue \
@@ -104,7 +107,10 @@ ENV PATH=$VENV_ROOT/bin:$PATH \
     VIRTUAL_ENV=$VENV_ROOT
 
 # Collect static files.
-RUN STATIC_ROOT="$STATIC_ROOT" python manage.py collectstatic --clear --no-input --verbosity=2
+RUN \
+    STATIC_ROOT="$STATIC_ROOT" \
+    DJANGO_SETTINGS_ENVIRONMENT="Build" \
+    python manage.py collectstatic --clear --no-input --verbosity=2
 
 
 FROM base AS production
@@ -130,7 +136,9 @@ ENV PATH=$VENV_ROOT/bin:$PATH \
     VIRTUAL_ENV=$VENV_ROOT
 
 # Compile translations.
-RUN python manage.py compilemessages -l fi -l sv -x "$VENV_ROOT"
+RUN \
+    DJANGO_SETTINGS_ENVIRONMENT="Build" \
+    python manage.py compilemessages -l fi -l sv -x "$VENV_ROOT"
 
 # Expose port for uWSGI.
 EXPOSE 8000
