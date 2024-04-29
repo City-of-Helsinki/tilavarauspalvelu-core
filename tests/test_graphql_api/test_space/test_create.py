@@ -57,5 +57,5 @@ def test_create_space__name_cannot_be_empty(graphql, value):
     # - The response has errors about nameFi field
     # - The space is not created in the database
     assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages("name") == ["Tämä kenttä ei voi olla tyhjä."]
+    assert response.field_error_messages("name") == ["This field may not be blank."]
     assert Space.objects.count() == 0

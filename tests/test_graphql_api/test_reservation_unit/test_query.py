@@ -37,7 +37,6 @@ DEFAULT_TIMEZONE = get_default_timezone()
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_disable_hauki_export"),
 ]
 
 
@@ -315,7 +314,6 @@ def test_reservation_unit__query__all_to_one_relations(graphql):
     }
 
 
-@pytest.mark.usefixtures("_celery_synchronous")  # for updating image urls when creating images for reservation unit
 def test_reservation_unit__query__all_one_to_many_relations(graphql):
     fields = """
         pk

@@ -10,7 +10,6 @@ from .helpers import CREATE_MUTATION
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_in_memory_file_storage", "_celery_synchronous"),
 ]
 
 
@@ -30,7 +29,7 @@ def test_reservation_unit_image__create(graphql, mock_png):
 
     reservation_unit_image: ReservationUnitImage | None = reservation_unit.images.first()
     assert reservation_unit_image is not None
-    assert reservation_unit_image.image.name == "reservation_unit_images/image.png"
+    assert reservation_unit_image.image.name.startswith("reservation_unit_images/image")
     assert reservation_unit_image.image_type == ReservationUnitImageType.MAIN
 
 

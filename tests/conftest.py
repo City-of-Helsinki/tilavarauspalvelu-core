@@ -30,70 +30,10 @@ def _toggle_elasticsearch(request, settings):
 
 
 @pytest.fixture()
-def _celery_synchronous(settings):
-    """
-    Run celery tasks synchronously for the duration of the test.
-    Use with '@pytest.mark.usefixtures' decorator.
-    """
-    settings.CELERY_TASK_ALWAYS_EAGER = True
-
-
-@pytest.fixture()
-def _disable_reservation_email_sending(settings):
-    """
-    Disable sending emails for the duration of the test.
-    Use with '@pytest.mark.usefixtures' decorator.
-    """
-    # Trigger celery tasks synchronously, but don't send the reservation emails
-    settings.CELERY_TASK_ALWAYS_EAGER = True
-    settings.SEND_RESERVATION_NOTIFICATION_EMAILS = False
-
-
-@pytest.fixture()
-def _in_memory_file_storage(settings):
-    settings.STATICFILES_STORAGE = "django.core.files.storage.memory.InMemoryStorage"
-    settings.DEFAULT_FILE_STORAGE = "django.core.files.storage.memory.InMemoryStorage"
-
-
-@pytest.fixture()
-def outbox(settings) -> list[EmailMessage]:
-    settings.EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+def outbox() -> list[EmailMessage]:
     from django.core import mail
 
     return mail.outbox
-
-
-@pytest.fixture()
-def _disable_hauki_export(settings):
-    settings.HAUKI_EXPORTS_ENABLED = None
-
-
-@pytest.fixture(autouse=True)
-def _disable_translations(settings):
-    settings.LOCALE_PATHS = []
-
-
-@pytest.fixture()
-def _setup_hauki(settings):
-    settings.HAUKI_API_URL = "url"
-    settings.HAUKI_EXPORTS_ENABLED = None
-    settings.HAUKI_ORIGIN_ID = "origin"
-    settings.HAUKI_SECRET = "HAUKISECRET"  # noqa: S105
-    settings.HAUKI_ORGANISATION_ID = None
-    settings.HAUKI_ADMIN_UI_URL = "https://test.com"
-
-
-@pytest.fixture()
-def _setup_verkkokauppa_env_variables(settings):
-    settings.VERKKOKAUPPA_API_KEY = "test-api-key"
-    settings.VERKKOKAUPPA_PRODUCT_API_URL = "http://test-product:1234"
-    settings.VERKKOKAUPPA_ORDER_API_URL = "http://test-order:1234"
-    settings.VERKKOKAUPPA_PAYMENT_API_URL = "http://test-payment:1234"
-    settings.VERKKOKAUPPA_MERCHANT_API_URL = "http://test-merchant:1234"
-    settings.VERKKOKAUPPA_NAMESPACE = "tilanvaraus"
-    settings.MOCK_VERKKOKAUPPA_API_ENABLED = False
-    settings.MOCK_VERKKOKAUPPA_FRONTEND_URL = "http://mock-verkkokauppa.com"
-    settings.MOCK_VERKKOKAUPPA_BACKEND_URL = "http://mock-verkkokauppa.com"
 
 
 @pytest.hookimpl()

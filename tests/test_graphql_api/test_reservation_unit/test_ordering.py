@@ -11,7 +11,6 @@ DEFAULT_TIMEZONE = get_default_timezone()
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_disable_hauki_export"),
 ]
 
 

@@ -113,6 +113,6 @@ def test_application__create__sub_serializer_error(graphql, field):
         {
             "code": "blank",
             "field": f"billingAddress.{field}",
-            "message": "Tämä kenttä ei voi olla tyhjä.",
+            "message": "This field may not be blank.",
         }
     ]

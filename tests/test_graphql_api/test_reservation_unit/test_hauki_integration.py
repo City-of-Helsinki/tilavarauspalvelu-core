@@ -15,7 +15,6 @@ from .helpers import UPDATE_MUTATION, get_draft_update_input_data, reservation_u
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_setup_hauki"),
 ]
 
 
@@ -82,7 +81,6 @@ def test_reservation_unit__update__send_resource_to_hauki_errors_returns_error_m
 
 
 @freezegun.freeze_time("2023-01-01T12:00:00+02:00")
-@pytest.mark.usefixtures("_setup_hauki")
 def test_reservation_unit__query__hauki_url__regular_user(graphql):
     graphql.login_with_regular_user()
 
@@ -99,7 +97,6 @@ def test_reservation_unit__query__hauki_url__regular_user(graphql):
 
 
 @freezegun.freeze_time("2023-01-01T12:00:00+02:00")
-@pytest.mark.usefixtures("_setup_hauki")
 def test_reservation_unit__query__hauki_url__superuser(graphql, settings):
     user = graphql.login_with_superuser()
 
@@ -127,7 +124,7 @@ def test_reservation_unit__query__hauki_url__superuser(graphql, settings):
             f"&hsa_resource={settings.HAUKI_ORIGIN_ID}:{reservation_unit.uuid}"
             f"&hsa_has_organization_rights=true"
             # See: `opening_hours.utils.hauki_link_generator.generate_hauki_link`
-            f"&hsa_signature=66f9c7f6f5f64898ea368f0354627d2d4260d07d6dfb78d7bab7f94a1575f158"
+            f"&hsa_signature=1dc8823af4b4dfe050de12893adcb11e9ea457e53905181006a9e2345f65ee1f"
         ),
         safe="/&?=",
     )

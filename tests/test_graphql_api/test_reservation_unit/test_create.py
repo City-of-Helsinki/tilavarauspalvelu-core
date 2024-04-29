@@ -16,7 +16,6 @@ from .helpers import CREATE_MUTATION, get_create_non_draft_input_data
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_disable_hauki_export"),
 ]
 
 
@@ -129,7 +128,7 @@ def test_reservation_unit__create__empty_name(graphql):
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages("name") == ["Tämä kenttä ei voi olla tyhjä."]
+    assert response.field_error_messages("name") == ["This field may not be blank."]
 
 
 def test_reservation_unit__create__payment_types(graphql):

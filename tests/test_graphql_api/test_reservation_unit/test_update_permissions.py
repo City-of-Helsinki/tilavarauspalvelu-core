@@ -8,7 +8,6 @@ from .helpers import UPDATE_MUTATION, get_draft_update_input_data
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("_disable_hauki_export"),
 ]
 
 
