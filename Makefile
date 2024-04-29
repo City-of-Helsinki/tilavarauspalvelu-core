@@ -14,9 +14,6 @@
 .PHONY: migrations
 .PHONY: run
 .PHONY: services
-.PHONY: services-local-start
-.PHONY: services-local-status
-.PHONY: services-local-stop
 .PHONY: stop
 .PHONY: check-translations
 .PHONY: translations
@@ -48,9 +45,6 @@ define helptext
   migrations                         Compile database migrations.
   run                                Start docker containers for frontend development.
   services                           Run required services in docker.
-  services-local-start               Start required services locally with 'systemctl'.
-  services-local-stop                Stop required services locally with 'systemctl'.
-  services-local-status              Check status of services running locally with 'systemctl'.
   stop                               Stop running containers.
   check-translations                 Check if translations are up to date.
   translations                       Fetch all translation strings under ./locale/.
@@ -102,32 +96,6 @@ run:
 
 services:
 	@docker compose up --detach --build db elastic redis
-
-services-local-start:
-	@echo "Starting PostgreSQL..."
-	@sudo systemctl start postgresql
-	@echo "Starting Redis..."
-	@sudo systemctl start redis-server
-	@echo "Starting ElasticSearch..."
-	@sudo systemctl start elasticsearch.service
-	@echo "Done!"
-
-services-local-stop:
-	@echo "Stopping PostgreSQL..."
-	@sudo systemctl stop postgresql
-	@echo "Stopping Redis..."
-	@sudo systemctl stop redis-server
-	@echo "Stopping ElasticSearch..."
-	@sudo systemctl stop elasticsearch.service
-	@echo "Done!"
-
-services-local-status:
-	@echo -n "PostgreSQL status: "
-	@sudo systemctl is-active postgresql || true
-	@echo -n "Redis status: "
-	@sudo systemctl is-active redis-server || true
-	@echo -n "ElasticSearch status: "
-	@sudo systemctl is-active elasticsearch.service || true
 
 stop:
 	@docker compose stop
