@@ -32,7 +32,7 @@ import resourceEventStyleGetter from "./eventStyleGetter";
 import { getReserveeName } from "../reservations/requested/util";
 import CreateReservationModal from "./create-reservation/CreateReservationModal";
 
-export type Resource = {
+type Resource = {
   title: string;
   pk: number;
   url: string;

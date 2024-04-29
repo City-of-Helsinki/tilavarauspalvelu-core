@@ -19,11 +19,6 @@ import { useSearchParams } from "react-router-dom";
 import { AllocatedEventsTable, SORT_KEYS } from "./AllocatedEventsTable";
 import { transformWeekday, type Day } from "common/src/conversion";
 
-export type Sort = {
-  field: string;
-  sort: boolean;
-};
-
 type Props = {
   applicationRoundPk: number;
 };

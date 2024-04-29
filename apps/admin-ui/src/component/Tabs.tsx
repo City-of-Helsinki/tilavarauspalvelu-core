@@ -1,17 +1,8 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Tabs as HDSTabs } from "hds-react";
-import styled from "styled-components";
 
-const TabPanel = styled(HDSTabs.TabPanel)`
-  margin-top: var(--spacing-s);
-  padding-block: var(--spacing-m);
-  & > div {
-    display: grid;
-  }
-`;
-
-type TabHeader = {
+export type TabHeader = {
   key: string;
   label: string;
 };
@@ -21,7 +12,7 @@ type Props = {
   children: React.ReactNode[];
 };
 
-const Tabs: React.FC<Props> = ({ headers, children: panels }: Props) => {
+export const Tabs: React.FC<Props> = ({ headers, children: panels }: Props) => {
   const history = useNavigate();
   const { hash } = useLocation();
   const hashIndex = headers.findIndex((header) => header.key === hash);
@@ -48,6 +39,3 @@ const Tabs: React.FC<Props> = ({ headers, children: panels }: Props) => {
     </HDSTabs>
   );
 };
-
-export { Tabs, TabPanel };
-export type { TabHeader };

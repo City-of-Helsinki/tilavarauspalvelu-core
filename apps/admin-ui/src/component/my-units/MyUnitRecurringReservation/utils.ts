@@ -1,6 +1,6 @@
 import { parse } from "date-fns";
 
-export type DateRange = {
+type DateRange = {
   begin: Date;
   end: Date;
 };

@@ -10,7 +10,7 @@ import {
 import { HR } from "@/component/Table";
 import { MultiSelectFilter, SearchFilter } from "@/component/QueryParamFilters";
 
-export type UnitPkName = {
+type UnitPkName = {
   pk: number;
   nameFi: string;
 };

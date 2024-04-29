@@ -93,7 +93,7 @@ export function getTimeSlotOptions(
   return timeSlots;
 }
 
-export type TimeSlot = { day: number; hour: number };
+type TimeSlot = { day: number; hour: number };
 
 export function decodeTimeSlot(slot: string): TimeSlot {
   const [day, hour, min] = slot.split("-").map(Number);
@@ -106,7 +106,7 @@ export function encodeTimeSlot(day: number, hour: number): string {
   return `${day}-${h < 10 ? `0${h}` : h}-${m < 10 ? `0${m}` : m}`;
 }
 
-export function constructTimeSlot(day: number, begin: string): TimeSlot | null {
+function constructTimeSlot(day: number, begin: string): TimeSlot | null {
   const time = parseApiTime(begin);
   if (time == null) {
     return null;
@@ -202,11 +202,6 @@ export function formatTime(time?: string) {
   }
   return time.slice(0, 5);
 }
-
-export type ApplicationEventScheduleResultStatuses = {
-  acceptedSlots: string[];
-  declinedSlots: string[];
-};
 
 export function createDurationString(
   section: ApplicationSectionNode,

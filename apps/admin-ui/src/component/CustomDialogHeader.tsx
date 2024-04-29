@@ -3,12 +3,6 @@ import React, { useEffect, useState } from "react";
 import { IconCross } from "hds-react";
 import styled from "styled-components";
 
-export type DialogHeaderProps = {
-  id: string;
-  title: string;
-  iconLeft?: React.ReactNode;
-};
-
 const Title = styled.h3`
   :focus {
     border: 2px solid var(--color-coat-of-arms);

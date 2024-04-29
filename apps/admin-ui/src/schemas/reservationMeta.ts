@@ -6,9 +6,7 @@ import { CustomerTypeChoice } from "common/types/gql-types";
 import { z } from "zod";
 import { OptionSchema } from "common/src/schemas/schemaCommon";
 
-export const reservationTypeSchema = z.enum(["STAFF", "BEHALF", "BLOCKED"]);
-
-export const ReservationFormMetaSchema = z.object({
+const ReservationFormMetaSchema = z.object({
   name: z.string().optional(),
   description: z.string().optional(),
   ageGroup: OptionSchema.optional(),

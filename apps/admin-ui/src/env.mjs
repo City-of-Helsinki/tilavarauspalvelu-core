@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 // Coerces a string to true if it's "true" or "1", false if "false" or "0"
-export const coerceBoolean = z
+const coerceBoolean = z
   .enum(["0", "1", "true", "false"])
   .catch("false")
   // eslint-disable-next-line eqeqeq

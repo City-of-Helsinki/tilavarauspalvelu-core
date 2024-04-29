@@ -11,7 +11,7 @@ import {
 // import core base styles
 import styles from "../../Table.module.scss";
 
-export type SortingHeaderCellProps = React.ComponentPropsWithoutRef<"th"> & {
+type SortingHeaderCellProps = React.ComponentPropsWithoutRef<"th"> & {
   ariaLabelSortButtonUnset: string;
   ariaLabelSortButtonAscending: string;
   ariaLabelSortButtonDescending: string;

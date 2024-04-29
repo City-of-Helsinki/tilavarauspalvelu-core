@@ -1,5 +1,3 @@
-import { breakpoints } from "common/src/common/style";
-import { Button } from "hds-react";
 import styled from "styled-components";
 import { z } from "zod";
 
@@ -14,16 +12,6 @@ export const ResourceUpdateSchema = z.object({
 });
 
 export type ResourceUpdateForm = z.infer<typeof ResourceUpdateSchema>;
-
-export const SaveButton = styled(Button)`
-  margin-left: auto;
-`;
-
-export const EditorContainer = styled.div`
-  @media (min-width: ${breakpoints.l}) {
-    margin: 0 var(--spacing-layout-m);
-  }
-`;
 
 export const Editor = styled.div`
   max-width: var(--prose-width);

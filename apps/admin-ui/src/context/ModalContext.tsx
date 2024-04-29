@@ -1,12 +1,12 @@
 import React, { useContext, useMemo, useState } from "react";
 
-export type ModalContextProps = {
+type ModalContextProps = {
   modalContent: { isHds: boolean; content: JSX.Element | null };
   setModalContent: (content: JSX.Element | null, isHds?: boolean) => void;
   isOpen: boolean;
 };
 
-export const ModalContext = React.createContext<ModalContextProps>({
+const ModalContext = React.createContext<ModalContextProps>({
   modalContent: { isHds: false, content: null },
   setModalContent: () => undefined,
   isOpen: false,

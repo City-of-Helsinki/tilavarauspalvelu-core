@@ -31,7 +31,7 @@ type Header = {
   transform?: ({ args }: any) => string | JSX.Element; // eslint-disable-line @typescript-eslint/no-explicit-any
 };
 
-export interface TableCustomTheme {
+interface TableCustomTheme {
   /**
    * Deprecated. Use --header-background-color instead.
    */

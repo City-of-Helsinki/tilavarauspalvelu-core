@@ -24,7 +24,7 @@ import { FormErrorSummary } from "@/common/FormErrorSummary";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ResourceEditorFields } from "./EditForm";
-import { DialogActionsButtons } from "app/styles/util";
+import { DialogActionsButtons } from "@/styles/util";
 
 interface IProps {
   unit: UnitNode;

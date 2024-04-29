@@ -41,23 +41,6 @@ export const RESOURCES_QUERY = gql`
   }
 `;
 
-export const RESERVATION_UNITS_QUERY = gql`
-  ${RESERVATION_UNIT_COMMON_FRAGMENT}
-  query ReservationUnits {
-    reservationUnits(onlyWithPermission: true) {
-      edges {
-        node {
-          ...ReservationUnitCommonFields
-          unit {
-            pk
-            nameFi
-          }
-        }
-      }
-    }
-  }
-`;
-
 export const DELETE_SPACE = gql`
   mutation DeleteSpace($input: SpaceDeleteMutationInput!) {
     deleteSpace(input: $input) {

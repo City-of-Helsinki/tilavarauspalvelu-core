@@ -105,8 +105,6 @@ export const timeSelectionSchema = (interval: ReservationStartInterval) =>
       checkReservationInterval(val.endTime, ctx, "endTime", 15)
     );
 
-export type TimeSelectorType = z.infer<typeof timeSelectionSchemaBase>;
-
 export type RecurringReservationForm = z.infer<
   typeof RecurringReservationFormSchema
 >;

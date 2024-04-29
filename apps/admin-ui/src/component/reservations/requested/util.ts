@@ -66,7 +66,7 @@ function reservationDurationString(
   return formatDuration(durMinutes, t, abbreviated);
 }
 
-export const reservationUnitName = (
+const reservationUnitName = (
   reservationUnit: Maybe<ReservationUnitNode>
 ): string =>
   reservationUnit

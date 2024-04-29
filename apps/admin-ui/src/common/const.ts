@@ -39,7 +39,6 @@ export const MAX_APPLICATION_ROUND_NAME_LENGTH = 30;
 
 // TODO PUBLIC_URL should be cleaned up and always end in /
 export const HERO_IMAGE_URL = `${PUBLIC_URL}/hero-user@1x.jpg`;
-export const LOGO_IMAGE_URL = `${PUBLIC_URL}/logo.png`;
 
 // Why?
 // not sure actually, since we are using the RAW PUBLIC_URL for static data
@@ -76,11 +75,6 @@ export function getSignInUrl(apiBaseUrl: string, callBackUrl: string): string {
 export const VALID_ALLOCATION_APPLICATION_STATUSES = [
   ApplicationStatusChoice.Received,
   ApplicationStatusChoice.InAllocation,
-  ApplicationStatusChoice.Handled,
-  ApplicationStatusChoice.ResultsSent,
-];
-
-export const VALID_ALLOCATED_APPLICATION_STATUSES = [
   ApplicationStatusChoice.Handled,
   ApplicationStatusChoice.ResultsSent,
 ];

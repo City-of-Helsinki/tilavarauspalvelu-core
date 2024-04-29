@@ -3,7 +3,7 @@ import React from "react";
 
 import styles from "../../Table.module.scss";
 
-export type TableContainerProps = React.ComponentPropsWithoutRef<"table"> & {
+type TableContainerProps = React.ComponentPropsWithoutRef<"table"> & {
   children: React.ReactNode;
   dataTestId?: string;
   variant?: "dark" | "light";

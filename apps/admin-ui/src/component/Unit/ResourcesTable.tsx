@@ -19,7 +19,7 @@ import type {
 import { PopupMenu } from "@/component/PopupMenu";
 import ConfirmationDialog, { ModalRef } from "../ConfirmationDialog";
 import { DELETE_RESOURCE } from "@/common/queries";
-import { getResourceUrl, resourceUrl } from "@/common/urls";
+import { getResourceUrl } from "@/common/urls";
 import { CustomTable, TableLink } from "../Table";
 import { useNotification } from "@/context/NotificationContext";
 import { truncate } from "common/src/helpers";
@@ -69,7 +69,7 @@ export function ResourcesTable({
     if (pk == null || unit.pk == null) {
       return;
     }
-    history(resourceUrl(pk, unit.pk));
+    history(getResourceUrl(pk, unit.pk));
   }
 
   function handleDeleteResource(

@@ -6,7 +6,7 @@ import styled from "styled-components";
 import { truncate } from "@/helpers";
 import type { OptionType } from "@/common/types";
 
-export type Tag<T> = {
+type Tag<T> = {
   key: string;
   value: string;
   ac: Action<T>;

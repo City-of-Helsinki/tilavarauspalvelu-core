@@ -37,16 +37,7 @@ export const Heading = styled(H1).attrs({ $legacy: true })`
   margin-bottom: var(--spacing-xs);
 `;
 
-export const SubHeading = styled.span`
-  font-size: var(--fontsize-heading-s);
-  font-family: HelsinkiGroteskBold, var(--font-default);
-  font-weight: bold;
-  letter-spacing: 1px;
-  line-height: var(--lineheight-m);
-  margin-top: var(--spacing-2-xs);
-`;
-
-export const Content = styled.div<{ $heroImage: boolean }>`
+const Content = styled.div<{ $heroImage: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;

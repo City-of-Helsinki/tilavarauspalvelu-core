@@ -27,14 +27,6 @@ export const Parent = styled.div`
   margin-bottom: var(--spacing-m);
 `;
 
-export const EditorContainer = styled.div`
-  margin: var(--spacing-l) 0;
-  display: grid;
-  grid-template-columns: 1fr 2em;
-  gap: var(--spacing-m);
-  border-bottom: 1px solid var(--color-black);
-`;
-
 export const EditorColumns = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;

@@ -8,7 +8,7 @@ export type NotificationContextProps = {
   clearNotification: () => void;
 };
 
-export type NotificationType = {
+type NotificationType = {
   type: "error" | "success";
   title?: string;
   message?: string;
@@ -22,10 +22,6 @@ export const NotificationContext =
     notifyError: () => {},
     notifySuccess: () => {},
   });
-
-export type NotificationOptions = {
-  autoClose?: boolean;
-};
 
 export const useNotification = (): NotificationContextProps =>
   useContext(NotificationContext);

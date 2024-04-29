@@ -28,7 +28,7 @@ import { intervalToNumber } from "@/schemas/utils";
 
 export const PaymentTypes = ["ONLINE", "INVOICE", "ON_SITE"] as const;
 
-export const PricingFormSchema = z.object({
+const PricingFormSchema = z.object({
   // pk === 0 means new pricing good decission?
   // pk === 0 fails silently on the backend, but undefined creates a new pricing
   pk: z.number(),
@@ -47,7 +47,7 @@ export const PricingFormSchema = z.object({
   begins: z.string(),
 });
 
-export type PricingFormValues = z.infer<typeof PricingFormSchema>;
+type PricingFormValues = z.infer<typeof PricingFormSchema>;
 
 const refinePricing = (
   data: PricingFormValues,

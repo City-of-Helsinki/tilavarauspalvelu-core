@@ -14,7 +14,7 @@ import { parseAddress } from "@/common/util";
 import { SpaceForm, type SpaceUpdateForm } from "../SpaceForm";
 import { FormErrorSummary } from "@/common/FormErrorSummary";
 import { UseFormReturn } from "react-hook-form";
-import { DialogActionsButtons } from "app/styles/util";
+import { DialogActionsButtons } from "@/styles/util";
 
 type Props = {
   unit: UnitNode;

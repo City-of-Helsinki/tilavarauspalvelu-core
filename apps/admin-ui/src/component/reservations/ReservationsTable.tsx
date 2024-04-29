@@ -10,11 +10,6 @@ import { CustomTable, TableLink } from "@/component/Table";
 import { getReserveeName, reservationDateTimeString } from "./requested/util";
 import { MAX_NAME_LENGTH } from "@/common/const";
 
-export type Sort = {
-  field: string;
-  asc: boolean;
-};
-
 type ReservationTableColumn = {
   headerName: string;
   key: string;
