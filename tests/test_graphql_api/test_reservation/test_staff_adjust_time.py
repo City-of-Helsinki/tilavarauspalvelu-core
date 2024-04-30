@@ -125,6 +125,51 @@ def test_reservation__staff_adjust_time__begin_date_in_the_past__today(graphql):
     assert reservation.end == end
 
 
+def test_reservation__staff_adjust_time__reservation_in_the_past(graphql):
+    with freezegun.freeze_time(datetime.datetime(2021, 1, 5, hour=12, minute=15, tzinfo=DEFAULT_TIMEZONE)):
+        reservation = ReservationFactory.create_for_time_adjustment()
+
+    begin = next_hour(plus_hours=1)
+    end = begin + datetime.timedelta(hours=1)
+
+    graphql.login_with_superuser()
+    data = get_staff_adjust_data(reservation, begin=begin, end=end)
+    response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
+
+    assert response.error_message() == "Reservation time cannot be changed anymore."
+
+
+def test_reservation__staff_adjust_time__reservation_in_the_past__timezone_check(graphql):
+    #
+    # Regression test to check that the timezone is taken into account when checking reservation's date.
+    # against the minimum allowed date.
+    #
+    # If the reservation begins at the beginning of the day, and it's saved in Helsinki timezone, but is
+    # looked up in UTC during the check, then `.date()` would give you the wrong date (the day before).
+    # This causes a false negative if the reservation is for the beginning of the current day.
+    #
+    creation_time = datetime.datetime(2021, 1, 5, hour=0, minute=15, tzinfo=DEFAULT_TIMEZONE)
+    with freezegun.freeze_time(creation_time):
+        begin = local_datetime()
+        end = begin + datetime.timedelta(hours=1)
+        reservation = ReservationFactory.create_for_time_adjustment(begin=begin, end=end)
+
+    modify_time = datetime.datetime(2021, 1, 5, hour=10, minute=15, tzinfo=DEFAULT_TIMEZONE)
+    with freezegun.freeze_time(modify_time):
+        new_begin = next_hour(plus_hours=10)
+        new_end = new_begin + datetime.timedelta(hours=1)
+
+        graphql.login_with_superuser()
+        data = get_staff_adjust_data(reservation, begin=new_begin, end=new_end)
+        response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation.refresh_from_db()
+    assert reservation.begin == new_begin
+    assert reservation.end == new_end
+
+
 @freezegun.freeze_time(datetime.datetime(2021, 1, 5, hour=0, minute=15, tzinfo=DEFAULT_TIMEZONE))
 def test_reservation__staff_adjust_time__begin_date_in_the_past__move_to_yesterday_on_first_hour_of_day(graphql):
     #

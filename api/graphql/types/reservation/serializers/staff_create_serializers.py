@@ -203,7 +203,7 @@ class ReservationStaffCreateSerializer(OldPrimaryKeySerializer, ReservationSched
         if now.hour == 0:
             min_allowed_date -= datetime.timedelta(days=1)
 
-        if begin.date() < min_allowed_date:
+        if begin.astimezone(DEFAULT_TIMEZONE).date() < min_allowed_date:
             raise ValidationErrorWithCode(
                 "Reservation begin date cannot be in the past.",
                 ValidationErrorCodes.RESERVATION_BEGIN_IN_PAST,

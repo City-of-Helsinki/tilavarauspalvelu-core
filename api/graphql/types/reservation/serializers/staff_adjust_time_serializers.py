@@ -96,13 +96,13 @@ class StaffReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reserv
         if now.hour == 0:
             min_allowed_date -= datetime.timedelta(days=1)
 
-        if self.instance.end.date() < min_allowed_date:
+        if self.instance.end.astimezone(DEFAULT_TIMEZONE).date() < min_allowed_date:
             raise ValidationErrorWithCode(
                 "Reservation time cannot be changed anymore.",
                 ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED,
             )
 
-        if new_begin.date() < min_allowed_date:
+        if new_begin.astimezone(DEFAULT_TIMEZONE).date() < min_allowed_date:
             raise ValidationErrorWithCode(
                 "Reservation new begin date cannot be in the past.",
                 ValidationErrorCodes.RESERVATION_BEGIN_IN_PAST,
