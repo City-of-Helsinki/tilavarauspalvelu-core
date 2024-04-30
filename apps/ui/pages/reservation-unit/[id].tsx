@@ -61,11 +61,11 @@ import {
   fromMondayFirstUnsafe,
   getLocalizationLang,
 } from "common/src/helpers";
-import Head from "../../components/reservation-unit/Head";
+import Head from "@/components/reservation-unit/Head";
 import { AddressSection } from "@/components/reservation-unit/Address";
-import Sanitize from "../../components/common/Sanitize";
-import RelatedUnits from "../../components/reservation-unit/RelatedUnits";
-import { AccordionWithState as Accordion } from "../../components/common/Accordion";
+import Sanitize from "@/components/common/Sanitize";
+import RelatedUnits from "@/components/reservation-unit/RelatedUnits";
+import { AccordionWithState as Accordion } from "@/components/common/Accordion";
 import { createApolloClient } from "@/modules/apolloClient";
 import { Map } from "@/components/Map";
 import Legend from "@/components/calendar/Legend";
@@ -96,14 +96,14 @@ import {
   isReservationUnitPaidInFuture,
   isReservationUnitPublished,
 } from "@/modules/reservationUnit";
-import EquipmentList from "../../components/reservation-unit/EquipmentList";
+import EquipmentList from "@/components/reservation-unit/EquipmentList";
 import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
 import {
   getDurationOptions,
   isReservationReservable,
 } from "@/modules/reservation";
-import SubventionSuffix from "../../components/reservation/SubventionSuffix";
-import InfoDialog from "../../components/common/InfoDialog";
+import SubventionSuffix from "@/components/reservation/SubventionSuffix";
+import InfoDialog from "@/components/common/InfoDialog";
 import {
   BottomContainer,
   BottomWrapper,
@@ -795,23 +795,15 @@ const ReservationUnit = ({
   }, [reservationUnit, activeApplicationRounds, t, focusSlot]);
 
   const eventBuffers = useMemo(() => {
-    const bufferTimeBefore =
-      reservationUnit?.bufferTimeBefore != null &&
-      reservationUnit.bufferTimeBefore !== 0
-        ? reservationUnit?.bufferTimeBefore.toString()
-        : undefined;
-    const bufferTimeAfter =
-      reservationUnit?.bufferTimeAfter != null &&
-      reservationUnit.bufferTimeAfter !== 0
-        ? reservationUnit?.bufferTimeAfter.toString()
-        : undefined;
+    const bufferTimeBefore = reservationUnit.bufferTimeBefore ?? 0;
+    const bufferTimeAfter = reservationUnit.bufferTimeAfter ?? 0;
     return getEventBuffers([
       ...calendarEvents
         .flatMap((e) => e.event)
         .filter((n): n is NonNullable<typeof n> => n != null),
       {
-        begin: toUIDate(focusSlot?.start),
-        end: toUIDate(focusSlot?.end),
+        begin: focusSlot.start.toISOString(),
+        end: focusSlot.end.toISOString(),
         state: "INITIAL",
         bufferTimeBefore,
         bufferTimeAfter,

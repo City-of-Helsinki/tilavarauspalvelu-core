@@ -252,27 +252,8 @@ const EditStep0 = ({
   }, [reservationUnit, t, focusSlot, reservation]);
 
   const eventBuffers = useMemo(() => {
-    // TODO refactor
-    // backend sends 0 => front shows 30 min buffer, so has to be undefined
-    // if reservation buffers !== reservationUnit buffers, we want the to show the reservation buffers till user edits the reservation
-    const reservationBufferTimeBefore =
-      reservation?.bufferTimeBefore != null &&
-      reservation.bufferTimeBefore !== 0
-        ? reservation.bufferTimeBefore.toString()
-        : undefined;
-    const reservationBufferTimeAfter =
-      reservation?.bufferTimeAfter != null && reservation.bufferTimeAfter !== 0
-        ? reservation.bufferTimeAfter.toString()
-        : undefined;
-
-    const bufferTimeBefore =
-      reservationUnit.bufferTimeBefore !== 0
-        ? reservationUnit.bufferTimeBefore.toString()
-        : reservationBufferTimeBefore;
-    const bufferTimeAfter =
-      reservationUnit.bufferTimeAfter !== 0
-        ? reservationUnit.bufferTimeAfter.toString()
-        : reservationBufferTimeAfter;
+    const bufferTimeBefore = reservationUnit.bufferTimeBefore ?? 0;
+    const bufferTimeAfter = reservationUnit.bufferTimeAfter ?? 0;
 
     return getEventBuffers([
       ...(calendarEvents.flatMap((e) => e.event) as ReservationNode[]),
@@ -286,8 +267,6 @@ const EditStep0 = ({
   }, [
     calendarEvents,
     focusSlot,
-    reservation?.bufferTimeAfter,
-    reservation?.bufferTimeBefore,
     reservationUnit?.bufferTimeAfter,
     reservationUnit?.bufferTimeBefore,
   ]);

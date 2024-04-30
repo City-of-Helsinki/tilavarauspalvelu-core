@@ -573,15 +573,17 @@ export const getEventBuffers = (
   events: (PendingReservation | ReservationNode)[]
 ): CalendarEventBuffer[] => {
   const buffers: CalendarEventBuffer[] = [];
-  events.forEach((event) => {
-    if (!event.begin || !event.end) return;
+  for (const event of events) {
+    if (!event.begin || !event.end) {
+      continue;
+    }
     const { bufferTimeBefore, bufferTimeAfter } = event;
     const begin = new Date(event.begin);
     const end = new Date(event.end);
 
     if (bufferTimeBefore) {
       buffers.push({
-        start: addSeconds(begin, -1 * Number(bufferTimeBefore)),
+        start: addSeconds(begin, -1 * bufferTimeBefore),
         end: begin,
         event: { ...event, state: "BUFFER" },
       });
@@ -589,11 +591,11 @@ export const getEventBuffers = (
     if (bufferTimeAfter) {
       buffers.push({
         start: end,
-        end: addSeconds(end, Number(bufferTimeAfter)),
+        end: addSeconds(end, bufferTimeAfter),
         event: { ...event, state: "BUFFER" },
       });
     }
-  });
+  }
 
   return buffers;
 };
