@@ -45,7 +45,7 @@ class ReservationFilterSet(ModelFilterSet):
             )
             for key, value in OrderStatus.choices
         ),
-        label="PaymentOrder's statuses; %s" % ", ".join([k for k, v in OrderStatus.choices]),
+        label=f"PaymentOrder's statuses; {", ".join([k for k, v in OrderStatus.choices])}",
     )
 
     price_gte = django_filters.NumberFilter(field_name="price", lookup_expr="gte")
