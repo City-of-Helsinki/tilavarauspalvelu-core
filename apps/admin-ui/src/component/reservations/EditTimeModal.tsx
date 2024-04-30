@@ -12,17 +12,17 @@ import {
   ReservationTypeChoice,
 } from "common/types/gql-types";
 import { FormProvider, useForm } from "react-hook-form";
-import { format } from "date-fns";
+import { differenceInMinutes, format } from "date-fns";
 import { ErrorBoundary } from "react-error-boundary";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@apollo/client";
-import { toUIDate } from "common/src/common/util";
+import { formatDuration, toUIDate } from "common/src/common/util";
 import { useNotification } from "app/context/NotificationContext";
 import { useModal } from "app/context/ModalContext";
 import { TimeChangeFormSchemaRefined, TimeFormSchema } from "app/schemas";
 import { CHANGE_RESERVATION_TIME } from "./queries";
 import ControlledTimeInput from "../my-units/components/ControlledTimeInput";
-import { reservationDateTime, reservationDuration } from "./requested/util";
+import { reservationDateTime } from "./requested/util";
 import ControlledDateInput from "../my-units/components/ControlledDateInput";
 import { BufferToggles } from "../my-units/BufferToggles";
 import { useCheckCollisions } from "./requested/hooks";
@@ -89,6 +89,13 @@ const recurringReservationInfoText = ({
 
 type FormValueType = z.infer<typeof TimeFormSchema>;
 
+function formatDateInterval(begin: Date, end: Date, t: TFunction) {
+  return `${reservationDateTime(
+    begin,
+    end,
+    t
+  )}, ${formatDuration(differenceInMinutes(end, begin), t)}`;
+}
 const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
   const { t, i18n } = useTranslation();
   const { notifyError, notifySuccess } = useNotification();
@@ -213,20 +220,8 @@ const DialogContent = ({ reservation, onAccept, onClose }: Props) => {
   const translateError = (errorMsg?: string) =>
     errorMsg ? t(`reservationForm:errors.${errorMsg}`) : "";
 
-  const newTimeString =
-    start && end
-      ? `${reservationDateTime(
-          start,
-          end,
-          t
-        )}, ${reservationDuration(start, end)} t`
-      : "";
-
-  const originalTime = `${reservationDateTime(
-    startDateTime,
-    endDateTime,
-    t
-  )}, ${reservationDuration(startDateTime, endDateTime)} t`;
+  const newTimeString = start && end ? formatDateInterval(start, end, t) : "";
+  const originalTime = formatDateInterval(startDateTime, endDateTime, t);
 
   return (
     <Dialog.Content>

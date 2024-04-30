@@ -1,10 +1,4 @@
-import {
-  differenceInHours,
-  differenceInMinutes,
-  format,
-  getDay,
-  isSameDay,
-} from "date-fns";
+import { differenceInMinutes, format, getDay, isSameDay } from "date-fns";
 import type { TFunction } from "i18next";
 import { trim } from "lodash";
 import {
@@ -57,10 +51,6 @@ export const reservationDateTimeString = (
   const endDate = new Date(end);
 
   return reservationDateTime(startDate, endDate, t);
-};
-
-export const reservationDuration = (start: Date, end: Date): string => {
-  return `${differenceInHours(end, start)}`;
 };
 
 function reservationDurationString(
