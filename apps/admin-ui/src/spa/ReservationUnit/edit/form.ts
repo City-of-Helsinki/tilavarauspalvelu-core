@@ -24,6 +24,7 @@ import {
   checkTimeStringFormat,
 } from "common/src/schemas/schemaCommon";
 import { constructApiDate } from "@/helpers";
+import { intervalToNumber } from "@/schemas/utils";
 
 export const PaymentTypes = ["ONLINE", "INVOICE", "ON_SITE"] as const;
 
@@ -442,6 +443,61 @@ export const ReservationUnitEditSchema = z
       validateSeasonalTimes(v.seasons, ctx);
     }
 
+    // Drafts require this validation
+    if (v.minReservationDuration != null && v.maxReservationDuration != null) {
+      if (v.minReservationDuration > v.maxReservationDuration) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Min reservation duration must be less than max duration",
+          path: ["maxReservationDuration"],
+        });
+      }
+    }
+
+    if (v.minReservationDuration != null) {
+      const minDurationMinutes = Math.floor(v.minReservationDuration / 60);
+      if (minDurationMinutes < intervalToNumber(v.reservationStartInterval)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "duration can't be less than reservation start interval",
+          path: ["minReservationDuration"],
+        });
+      }
+      if (
+        minDurationMinutes % intervalToNumber(v.reservationStartInterval) !==
+        0
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            "duration must be a multiple of the reservation start interval",
+          path: ["minReservationDuration"],
+        });
+      }
+    }
+
+    if (v.maxReservationDuration != null) {
+      const maxDurationMinutes = Math.floor(v.maxReservationDuration / 60);
+      if (
+        maxDurationMinutes % intervalToNumber(v.reservationStartInterval) !==
+        0
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            "duration must be a multiple of the reservation start interval",
+          path: ["maxReservationDuration"],
+        });
+      }
+      if (maxDurationMinutes < intervalToNumber(v.reservationStartInterval)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "duration can't be less than reservation start interval",
+          path: ["maxReservationDuration"],
+        });
+      }
+    }
+
     if (v.isDraft) {
       return;
     }
@@ -494,16 +550,6 @@ export const ReservationUnitEditSchema = z
           code: z.ZodIssueCode.custom,
           message: "Required",
           path: ["metadataSet"],
-        });
-      }
-    }
-
-    if (v.minReservationDuration != null && v.maxReservationDuration != null) {
-      if (v.minReservationDuration > v.maxReservationDuration) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Min reservation duration must be less than max duration",
-          path: ["maxReservationDuration"],
         });
       }
     }

@@ -2021,7 +2021,34 @@ const ReservationUnitEditor = ({
       refetch();
       return upPk;
     } catch (error) {
-      notifyError(t("ReservationUnitEditor.saveFailed", { error }));
+      if (
+        error != null &&
+        typeof error === "object" &&
+        "graphQLErrors" in error
+      ) {
+        const { graphQLErrors } = error;
+        if (Array.isArray(graphQLErrors) && graphQLErrors.length > 0) {
+          if ("extensions" in graphQLErrors[0]) {
+            const { extensions } = graphQLErrors[0];
+            if ("errors" in extensions) {
+              const { errors } = extensions;
+              if (Array.isArray(errors) && errors.length > 0) {
+                let str = "";
+                for (const e of errors) {
+                  if ("message" in e) {
+                    str += `${e.message}\n`;
+                  }
+                }
+                notifyError(
+                  t("ReservationUnitEditor.saveFailed", { error: str })
+                );
+                return undefined;
+              }
+            }
+          }
+        }
+      }
+      notifyError(t("ReservationUnitEditor.saveFailed", { error: "" }));
     }
     return undefined;
   };

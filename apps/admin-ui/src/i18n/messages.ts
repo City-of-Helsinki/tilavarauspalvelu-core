@@ -816,6 +816,12 @@ const translations: ITranslations = {
         "reservationBeginsDate must be before end": [
           "Varausajan tulee alkaa ennen kuin se päättyy.",
         ],
+        "duration can't be less than reservation start interval": [
+          "Kesto ei voi olla pienempi kuin varauksen alkamisväli.",
+        ],
+        "duration must be a multiple of the reservation start interval": [
+          "Keston on oltava varauksen alkamisvälin kerrannainen",
+        ],
       },
     },
     level: {
