@@ -23,6 +23,8 @@ from api.graphql.types.application.mutations import (
     ApplicationCreateMutation,
     ApplicationSendMutation,
     ApplicationUpdateMutation,
+    RejectAllApplicationOptionsMutation,
+    RestoreAllApplicationOptionsMutation,
 )
 from api.graphql.types.application_section.mutations import (
     ApplicationSectionCreateMutation,
@@ -104,6 +106,7 @@ __all__ = [
     "RecurringReservationCreateMutation",
     "RecurringReservationUpdateMutation",
     "RefreshOrderMutation",
+    "RejectAllApplicationOptionsMutation",
     "RejectAllSectionOptionsMutation",
     "ReservationAdjustTimeMutation",
     "ReservationApproveMutation",
@@ -128,6 +131,7 @@ __all__ = [
     "ResourceCreateMutation",
     "ResourceDeleteMutation",
     "ResourceUpdateMutation",
+    "RestoreAllApplicationOptionsMutation",
     "RestoreAllSectionOptionsMutation",
     "SpaceCreateMutation",
     "SpaceDeleteMutation",

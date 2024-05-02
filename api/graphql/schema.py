@@ -44,6 +44,7 @@ from .mutations import (
     RecurringReservationCreateMutation,
     RecurringReservationUpdateMutation,
     RefreshOrderMutation,
+    RejectAllApplicationOptionsMutation,
     RejectAllSectionOptionsMutation,
     ReservationAdjustTimeMutation,
     ReservationApproveMutation,
@@ -68,6 +69,7 @@ from .mutations import (
     ResourceCreateMutation,
     ResourceDeleteMutation,
     ResourceUpdateMutation,
+    RestoreAllApplicationOptionsMutation,
     RestoreAllSectionOptionsMutation,
     SpaceCreateMutation,
     SpaceDeleteMutation,
@@ -266,6 +268,8 @@ class Mutation(graphene.ObjectType):
     update_reservation_unit_option = ReservationUnitOptionUpdateMutation.Field()
     reject_all_section_options = RejectAllSectionOptionsMutation.Field()
     restore_all_section_options = RestoreAllSectionOptionsMutation.Field()
+    reject_all_application_options = RejectAllApplicationOptionsMutation.Field()
+    restore_all_application_options = RestoreAllApplicationOptionsMutation.Field()
     #
     # Reservable entities
     update_unit = UnitUpdateMutation.Field()

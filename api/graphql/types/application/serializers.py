@@ -4,14 +4,16 @@ from typing import Any
 from django.utils import timezone
 from graphene_django_extensions import NestingModelSerializer
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from rest_framework.settings import api_settings
 
+from api.graphql.extensions import error_codes
 from api.graphql.types.address.serializers import AddressSerializer
 from api.graphql.types.application_section.serializers import ApplicationSectionForApplicationSerializer
 from api.graphql.types.organisation.serializers import OrganisationSerializer
 from api.graphql.types.person.serializers import PersonSerializer
 from applications.choices import ApplicationStatusChoice
-from applications.models import Application
+from applications.models import AllocatedTimeSlot, Application, ReservationUnitOption
 from email_notification.helpers.application_email_notification_sender import ApplicationEmailNotificationSender
 from permissions.helpers import can_validate_unit_applications
 
@@ -125,4 +127,43 @@ class ApplicationCancelSerializer(NestingModelSerializer):
     def save(self, **kwargs: Any) -> Application:
         self.instance.cancelled_date = timezone.now()
         self.instance.save()
+        return self.instance
+
+
+class RejectAllApplicationOptionsSerializer(NestingModelSerializer):
+    instance: Application
+
+    class Meta:
+        model = Application
+        fields = [
+            "pk",
+        ]
+
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
+        slots_exist = AllocatedTimeSlot.objects.filter(
+            reservation_unit_option__application_section__application=self.instance,
+        ).exists()
+
+        if slots_exist:
+            msg = "Application has allocated time slots and cannot be rejected."
+            raise ValidationError(msg, code=error_codes.CANNOT_REJECT_APPLICATION_OPTIONS)
+
+        return data
+
+    def save(self, **kwargs: Any) -> Application:
+        ReservationUnitOption.objects.filter(application_section__application=self.instance).update(rejected=True)
+        return self.instance
+
+
+class RestoreAllApplicationOptionsSerializer(NestingModelSerializer):
+    instance: Application
+
+    class Meta:
+        model = Application
+        fields = [
+            "pk",
+        ]
+
+    def save(self, **kwargs: Any) -> Application:
+        ReservationUnitOption.objects.filter(application_section__application=self.instance).update(rejected=False)
         return self.instance
