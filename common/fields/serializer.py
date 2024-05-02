@@ -31,7 +31,7 @@ class CurrentUserDefaultNullable:
         return user
 
     def __repr__(self) -> str:
-        return "%s()" % self.__class__.__name__
+        return f"{self.__class__.__name__}()"
 
 
 def input_only_field(value: Any, field: Field) -> None:
