@@ -6,10 +6,11 @@ from graphene_django_extensions.permissions import BasePermission
 from api.graphql.extensions import error_codes
 from applications.models import Application, ApplicationSection
 from common.typing import AnyUser
-from permissions.helpers import can_modify_application
+from permissions.helpers import can_modify_application, has_general_permission, has_unit_permission
 
 __all__ = [
     "ApplicationSectionPermission",
+    "UpdateAllSectionOptionsPermission",
 ]
 
 
@@ -39,3 +40,17 @@ class ApplicationSectionPermission(BasePermission):
     @classmethod
     def has_delete_permission(cls, instance: ApplicationSection, user: AnyUser, input_data: dict[str, Any]) -> bool:
         return can_modify_application(user, instance.application)
+
+
+class UpdateAllSectionOptionsPermission(BasePermission):
+    @classmethod
+    def has_update_permission(cls, instance: ApplicationSection, user: AnyUser, input_data: dict[str, Any]) -> bool:
+        if user.is_anonymous:
+            return False
+        if user.is_superuser:
+            return True
+        if has_general_permission(user, required_permission="can_handle_applications"):
+            return True
+
+        units = list(instance.reservation_unit_options.all().values_list("reservation_unit__unit__id", flat=True))
+        return has_unit_permission(user, "can_handle_applications", units)

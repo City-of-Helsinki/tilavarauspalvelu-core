@@ -1,7 +1,7 @@
 """
 Import all ObjectTypes backing django models to this file.
 This avoids issues in creating mutation classes (see mutation.py for more information).
-Note that the type should be imported here even if it's not imported to schema.py,
+Note that the type should be imported here even if it's not imported to `schema.py`,
 simply so that it's registered before any mutations.
 """
 

@@ -1,8 +1,15 @@
 from graphene_django_extensions import CreateMutation, DeleteMutation, UpdateMutation
 from rest_framework.exceptions import ValidationError
 
-from api.graphql.types.application_section.permissions import ApplicationSectionPermission
-from api.graphql.types.application_section.serializers import ApplicationSectionSerializer
+from api.graphql.types.application_section.permissions import (
+    ApplicationSectionPermission,
+    UpdateAllSectionOptionsPermission,
+)
+from api.graphql.types.application_section.serializers import (
+    ApplicationSectionSerializer,
+    RejectAllSectionOptionsSerializer,
+    RestoreAllSectionOptionsSerializer,
+)
 from applications.models import ApplicationSection
 from common.typing import AnyUser
 
@@ -10,6 +17,8 @@ __all__ = [
     "ApplicationSectionCreateMutation",
     "ApplicationSectionDeleteMutation",
     "ApplicationSectionUpdateMutation",
+    "RejectAllSectionOptionsMutation",
+    "RestoreAllSectionOptionsMutation",
 ]
 
 
@@ -34,3 +43,15 @@ class ApplicationSectionDeleteMutation(DeleteMutation):
     def validate_deletion(cls, instance: ApplicationSection, user: AnyUser) -> None:
         if not instance.status.can_delete:
             raise ValidationError("Application section has been allocated and cannot be deleted anymore.")
+
+
+class RejectAllSectionOptionsMutation(UpdateMutation):
+    class Meta:
+        serializer_class = RejectAllSectionOptionsSerializer
+        permission_classes = [UpdateAllSectionOptionsPermission]
+
+
+class RestoreAllSectionOptionsMutation(UpdateMutation):
+    class Meta:
+        serializer_class = RestoreAllSectionOptionsSerializer
+        permission_classes = [UpdateAllSectionOptionsPermission]
