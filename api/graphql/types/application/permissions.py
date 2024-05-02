@@ -52,4 +52,4 @@ class UpdateAllApplicationOptionsPermission(BasePermission):
             )
             for unit_id in section.reservation_unit_options.all().values_list("reservation_unit__unit__id", flat=True)
         ]
-        return has_unit_permission(user, "can_handle_applications", units)
+        return all(has_unit_permission(user, "can_handle_applications", [unit]) for unit in units)
