@@ -6,9 +6,10 @@ from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.serializers import NotProvided
 from rest_framework.exceptions import ValidationError
 
+from api.graphql.extensions import error_codes
 from api.graphql.types.reservation_unit_option.serializers import ReservationUnitOptionApplicantSerializer
 from api.graphql.types.suitable_time_range.serializers import SuitableTimeRangeSerializer
-from applications.models import Application, ApplicationRound, ApplicationSection
+from applications.models import AllocatedTimeSlot, Application, ApplicationRound, ApplicationSection
 from common.utils import comma_sep_str
 
 __all__ = [
@@ -151,3 +152,42 @@ class ApplicationSectionForApplicationSerializer(ApplicationSectionSerializer):
     class Meta:
         model = ApplicationSection
         fields = [item for item in ApplicationSectionSerializer.Meta.fields if item != "application"]
+
+
+class RejectAllSectionOptionsSerializer(NestingModelSerializer):
+    instance: ApplicationSection
+
+    class Meta:
+        model = ApplicationSection
+        fields = [
+            "pk",
+        ]
+
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
+        slots_exist = AllocatedTimeSlot.objects.filter(
+            reservation_unit_option__application_section=self.instance,
+        ).exists()
+
+        if slots_exist:
+            msg = "Application section has allocated time slots and cannot be rejected."
+            raise ValidationError(msg, code=error_codes.CANNOT_REJECT_SECTION_OPTIONS)
+
+        return data
+
+    def save(self, **kwargs: Any) -> ApplicationSection:
+        self.instance.reservation_unit_options.all().update(rejected=True)
+        return self.instance
+
+
+class RestoreAllSectionOptionsSerializer(NestingModelSerializer):
+    instance: ApplicationSection
+
+    class Meta:
+        model = ApplicationSection
+        fields = [
+            "pk",
+        ]
+
+    def save(self, **kwargs: Any) -> ApplicationSection:
+        self.instance.reservation_unit_options.all().update(rejected=False)
+        return self.instance

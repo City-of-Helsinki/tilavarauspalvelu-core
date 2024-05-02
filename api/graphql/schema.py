@@ -20,8 +20,62 @@ from users.helauth.clients import HelsinkiProfileClient
 from users.helauth.typing import UserProfileInfo
 from users.models import User
 
-# NOTE: Queries __need__ to be imported before mutations, see mutations.py!
-from .queries import (  # isort:skip
+from .mutations import (
+    AllocatedTimeSlotCreateMutation,
+    AllocatedTimeSlotDeleteMutation,
+    ApplicationCancelMutation,
+    ApplicationCreateMutation,
+    ApplicationSectionCreateMutation,
+    ApplicationSectionDeleteMutation,
+    ApplicationSectionUpdateMutation,
+    ApplicationSendMutation,
+    ApplicationUpdateMutation,
+    BannerNotificationCreateMutation,
+    BannerNotificationDeleteMutation,
+    BannerNotificationUpdateMutation,
+    EquipmentCategoryCreateMutation,
+    EquipmentCategoryDeleteMutation,
+    EquipmentCategoryUpdateMutation,
+    EquipmentCreateMutation,
+    EquipmentDeleteMutation,
+    EquipmentUpdateMutation,
+    PurposeCreateMutation,
+    PurposeUpdateMutation,
+    RecurringReservationCreateMutation,
+    RecurringReservationUpdateMutation,
+    RefreshOrderMutation,
+    RejectAllSectionOptionsMutation,
+    ReservationAdjustTimeMutation,
+    ReservationApproveMutation,
+    ReservationCancellationMutation,
+    ReservationConfirmMutation,
+    ReservationCreateMutation,
+    ReservationDeleteMutation,
+    ReservationDenyMutation,
+    ReservationRefundMutation,
+    ReservationRequiresHandlingMutation,
+    ReservationStaffAdjustTimeMutation,
+    ReservationStaffCreateMutation,
+    ReservationStaffModifyMutation,
+    ReservationUnitCreateMutation,
+    ReservationUnitImageCreateMutation,
+    ReservationUnitImageDeleteMutation,
+    ReservationUnitImageUpdateMutation,
+    ReservationUnitOptionUpdateMutation,
+    ReservationUnitUpdateMutation,
+    ReservationUpdateMutation,
+    ReservationWorkingMemoMutation,
+    ResourceCreateMutation,
+    ResourceDeleteMutation,
+    ResourceUpdateMutation,
+    RestoreAllSectionOptionsMutation,
+    SpaceCreateMutation,
+    SpaceDeleteMutation,
+    SpaceUpdateMutation,
+    UnitUpdateMutation,
+    UserUpdateMutation,
+)
+from .queries import (
     AgeGroupNode,
     AllocatedTimeSlotNode,
     ApplicationNode,
@@ -56,60 +110,6 @@ from .queries import (  # isort:skip
     UserNode,
 )
 from .types.merchants.permissions import PaymentOrderPermission
-
-from .mutations import (  # isort:skip
-    AllocatedTimeSlotCreateMutation,
-    AllocatedTimeSlotDeleteMutation,
-    ApplicationCancelMutation,
-    ApplicationCreateMutation,
-    ApplicationSectionCreateMutation,
-    ApplicationSectionDeleteMutation,
-    ApplicationSectionUpdateMutation,
-    ApplicationSendMutation,
-    ApplicationUpdateMutation,
-    BannerNotificationCreateMutation,
-    BannerNotificationDeleteMutation,
-    BannerNotificationUpdateMutation,
-    EquipmentCategoryCreateMutation,
-    EquipmentCategoryDeleteMutation,
-    EquipmentCategoryUpdateMutation,
-    EquipmentCreateMutation,
-    EquipmentDeleteMutation,
-    EquipmentUpdateMutation,
-    PurposeCreateMutation,
-    PurposeUpdateMutation,
-    RecurringReservationCreateMutation,
-    RecurringReservationUpdateMutation,
-    RefreshOrderMutation,
-    ReservationAdjustTimeMutation,
-    ReservationApproveMutation,
-    ReservationCancellationMutation,
-    ReservationConfirmMutation,
-    ReservationCreateMutation,
-    ReservationDeleteMutation,
-    ReservationDenyMutation,
-    ReservationRefundMutation,
-    ReservationRequiresHandlingMutation,
-    ReservationStaffAdjustTimeMutation,
-    ReservationStaffCreateMutation,
-    ReservationStaffModifyMutation,
-    ReservationUnitCreateMutation,
-    ReservationUnitImageCreateMutation,
-    ReservationUnitImageDeleteMutation,
-    ReservationUnitImageUpdateMutation,
-    ReservationUnitOptionUpdateMutation,
-    ReservationUnitUpdateMutation,
-    ReservationUpdateMutation,
-    ReservationWorkingMemoMutation,
-    ResourceCreateMutation,
-    ResourceDeleteMutation,
-    ResourceUpdateMutation,
-    SpaceCreateMutation,
-    SpaceDeleteMutation,
-    SpaceUpdateMutation,
-    UnitUpdateMutation,
-    UserUpdateMutation,
-)
 
 
 class Query(graphene.ObjectType):
@@ -264,6 +264,8 @@ class Mutation(graphene.ObjectType):
     create_allocated_timeslot = AllocatedTimeSlotCreateMutation.Field()
     delete_allocated_timeslot = AllocatedTimeSlotDeleteMutation.Field()
     update_reservation_unit_option = ReservationUnitOptionUpdateMutation.Field()
+    reject_all_section_options = RejectAllSectionOptionsMutation.Field()
+    restore_all_section_options = RestoreAllSectionOptionsMutation.Field()
     #
     # Reservable entities
     update_unit = UnitUpdateMutation.Field()

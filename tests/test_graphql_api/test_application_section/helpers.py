@@ -23,6 +23,14 @@ DELETE_MUTATION = build_mutation(
     "ApplicationSectionDeleteMutation",
     fields="deleted",
 )
+REJECT_MUTATION = build_mutation(
+    "rejectAllSectionOptions",
+    "RejectAllSectionOptionsMutation",
+)
+RESTORE_MUTATION = build_mutation(
+    "restoreAllSectionOptions",
+    "RestoreAllSectionOptionsMutation",
+)
 
 
 def get_application_section_create_data(application: Application) -> dict[str, Any]:
