@@ -1,7 +1,7 @@
 import pytest
 
 from applications.choices import Weekday
-from tests.factories import ApplicationFactory, UserFactory
+from tests.factories import ApplicationFactory, ReservationUnitOptionFactory, UserFactory, add_unit_permissions
 
 from .helpers import REJECT_MUTATION
 
@@ -67,3 +67,39 @@ def test_application__reject_all_options__unit_admin(graphql):
     response = graphql(REJECT_MUTATION, input_data={"pk": application.pk})
 
     assert response.has_errors is False
+
+
+def test_application__reject_all_options__unit_admin__no_permission_for_all_units(graphql):
+    application = ApplicationFactory.create_in_status_in_allocation()
+    section = application.application_sections.first()
+
+    ReservationUnitOptionFactory.create(application_section=section)
+
+    unit = section.reservation_unit_options.first().reservation_unit.unit
+    admin = UserFactory.create_with_unit_permissions(unit=unit, perms=["can_handle_applications"])
+    graphql.force_login(admin)
+
+    response = graphql(REJECT_MUTATION, input_data={"pk": application.pk})
+
+    assert response.error_message() == "No permission to update."
+
+
+def test_application__reject_all_options__unit_admin__has_permission_for_all_units(graphql):
+    application = ApplicationFactory.create_in_status_in_allocation()
+    section = application.application_sections.first()
+
+    option_1 = section.reservation_unit_options.first()
+    option_2 = ReservationUnitOptionFactory.create(application_section=section)
+
+    unit_1 = option_1.reservation_unit.unit
+    unit_2 = option_2.reservation_unit.unit
+
+    admin = UserFactory.create()
+    add_unit_permissions(admin, unit=unit_1, perms=["can_handle_applications"])
+    add_unit_permissions(admin, unit=unit_2, perms=["can_handle_applications"])
+
+    graphql.force_login(admin)
+
+    response = graphql(REJECT_MUTATION, input_data={"pk": application.pk})
+
+    assert response.has_errors is False, response.errors
