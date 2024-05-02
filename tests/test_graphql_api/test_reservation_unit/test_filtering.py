@@ -600,24 +600,6 @@ def test_reservation_unit__filter__only_with_permission__unit_admin(graphql):
     assert response.node(0) == {"pk": reservation_unit.pk}
 
 
-def test_reservation_unit__filter__only_with_permission__service_sector_admin(graphql):
-    reservation_unit = ReservationUnitFactory.create(unit__service_sectors__name="foo")
-    ReservationUnitFactory.create(unit__service_sectors__name="bar")
-
-    user = UserFactory.create_with_service_sector_permissions(
-        service_sector=reservation_unit.unit.service_sectors.first(),
-        perms=["can_manage_reservations"],
-    )
-    graphql.force_login(user)
-
-    query = reservation_units_query(onlyWithPermission=True)
-    response = graphql(query)
-
-    assert response.has_errors is False, response.errors
-    assert len(response.edges) == 1
-    assert response.node(0) == {"pk": reservation_unit.pk}
-
-
 # Reservation state
 
 

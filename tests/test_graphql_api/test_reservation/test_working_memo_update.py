@@ -1,6 +1,6 @@
 import pytest
 
-from tests.factories import ReservationFactory, ReservationUnitFactory, ServiceSectorFactory, UserFactory
+from tests.factories import ReservationFactory, ReservationUnitFactory, UserFactory
 
 from .helpers import UPDATE_WORKING_MEMO_MUTATION, get_working_memo_update_data
 
@@ -30,26 +30,6 @@ def test_reservation__update__working_memo__general_commenter(graphql):
     reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
 
     admin = UserFactory.create_with_general_permissions(perms=["can_comment_reservations"])
-
-    graphql.force_login(admin)
-    data = get_working_memo_update_data(reservation)
-    response = graphql(UPDATE_WORKING_MEMO_MUTATION, input_data=data)
-
-    assert response.has_errors is False, response.errors
-
-    reservation.refresh_from_db()
-    assert reservation.working_memo == data["workingMemo"]
-
-
-def test_reservation__update__working_memo__service_sector_commenter(graphql):
-    reservation_unit = ReservationUnitFactory.create()
-    reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
-    sector = ServiceSectorFactory.create(units=[reservation_unit.unit])
-
-    admin = UserFactory.create_with_service_sector_permissions(
-        service_sector=sector,
-        perms=["can_comment_reservations"],
-    )
 
     graphql.force_login(admin)
     data = get_working_memo_update_data(reservation)

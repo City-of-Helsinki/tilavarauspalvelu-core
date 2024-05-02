@@ -20,7 +20,7 @@ from api.legacy_rest_api.permissions import (
     ReservationUnitPermission,
 )
 from opening_hours.utils.summaries import get_resources_total_hours_per_resource
-from permissions.helpers import get_service_sectors_where_can_view_reservations, get_units_where_can_view_reservations
+from permissions.helpers import get_units_where_can_view_reservations
 from reservation_units.models import Equipment, ReservationUnit
 from reservations.models import RecurringReservation, Reservation
 from resources.models import Resource
@@ -125,17 +125,8 @@ class RecurringReservationViewSet(viewsets.ReadOnlyModelViewSet):
         queryset = super().get_queryset()
         user = self.request.user
 
-        can_view_units_reservations = Q(
-            reservations__reservation_unit__unit__in=get_units_where_can_view_reservations(user)
-        )
-        can_view_service_sectors_reservations = Q(
-            reservations__reservation_unit__unit__service_sectors__in=get_service_sectors_where_can_view_reservations(
-                user
-            )
-        )
-
         return queryset.filter(
-            can_view_units_reservations | can_view_service_sectors_reservations | Q(user=user)
+            Q(reservations__reservation_unit__unit__in=get_units_where_can_view_reservations(user)) | Q(user=user)
         ).distinct()
 
 
@@ -279,7 +270,5 @@ class ReservationViewSet(viewsets.ModelViewSet):
 
         user = self.request.user
         return queryset.filter(
-            Q(reservation_unit__unit__in=get_units_where_can_view_reservations(user))
-            | Q(reservation_unit__unit__service_sectors__in=get_service_sectors_where_can_view_reservations(user))
-            | Q(user=user)
+            Q(reservation_unit__unit__in=get_units_where_can_view_reservations(user)) | Q(user=user)
         ).order_by("begin")

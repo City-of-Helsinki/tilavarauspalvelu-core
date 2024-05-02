@@ -1,6 +1,6 @@
 import pytest
 
-from tests.factories import ResourceFactory, ServiceSectorFactory, UnitGroupFactory, UserFactory
+from tests.factories import ResourceFactory, UnitGroupFactory, UserFactory
 from tests.helpers import UserType
 
 from .helpers import resources_query
@@ -65,22 +65,6 @@ def test_resources__filter__only_with_permissions__unit_group_admin__can_manage_
         unit_group=unit_group,
         perms=["can_manage_resources"],
     )
-    graphql.force_login(user)
-
-    query = resources_query(only_with_permission=True)
-    response = graphql(query)
-
-    assert response.has_errors is False
-    assert len(response.edges) == 1
-    assert response.node() == {"pk": resource_1.pk}
-
-
-def test_resources__filter__only_with_permissions__service_sector_admin__can_manage_resources(graphql):
-    resource_1 = ResourceFactory.create()
-    ResourceFactory.create()
-    sector = ServiceSectorFactory.create(units=[resource_1.space.unit])
-
-    user = UserFactory.create_with_service_sector_permissions(service_sector=sector, perms=["can_manage_resources"])
     graphql.force_login(user)
 
     query = resources_query(only_with_permission=True)

@@ -46,26 +46,6 @@ def test_general_admin__only_with_permissions(graphql):
     assert len(response.edges) == 2
 
 
-def test_service_sector_admin__only_with_permissions(graphql):
-    # given:
-    # - There are two spaces in the database
-    # - A service sector admin for one of the space's unit's service sectors is using the system
-    space = SpaceFactory.create(unit__service_sectors__name="foo")
-    SpaceFactory.create(unit__service_sectors__name="bar")
-    sector = space.unit.service_sectors.first()
-    admin = UserFactory.create_with_service_sector_permissions(service_sector=sector, perms=["can_manage_spaces"])
-    graphql.force_login(admin)
-
-    # when:
-    # - User tries to search for spaces with all fields
-    response = graphql(spaces_query(onlyWithPermission=True))
-
-    # then:
-    # - The response contains the space the user has access to
-    assert len(response.edges) == 1
-    assert response.node(0) == {"pk": space.pk}
-
-
 def test_unit_admin__only_with_permissions(graphql):
     # given:
     # - There are two spaces in the database

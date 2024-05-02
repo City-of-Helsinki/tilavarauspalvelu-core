@@ -1,6 +1,6 @@
 import pytest
 
-from tests.factories import PaymentMerchantFactory, ServiceSectorFactory, UnitFactory, UnitGroupFactory, UserFactory
+from tests.factories import PaymentMerchantFactory, UnitFactory, UnitGroupFactory, UserFactory
 from tests.helpers import UserType
 
 from .helpers import units_query
@@ -56,22 +56,6 @@ def test_units__filter__only_with_permission__unit_group_admin__can_manage_units
     unit_group = UnitGroupFactory.create(units=[unit])
 
     user = UserFactory.create_with_unit_group_permissions(unit_group=unit_group, perms=["can_manage_units"])
-    graphql.force_login(user)
-
-    query = units_query(only_with_permission=True)
-    response = graphql(query)
-
-    assert response.has_errors is False
-    assert len(response.edges) == 1
-    assert response.node(0) == {"pk": unit.pk}
-
-
-def test_units__filter__only_with_permission__service_sector_admin__can_manage_units(graphql):
-    unit = UnitFactory.create()
-    UnitFactory.create()
-    sector = ServiceSectorFactory.create(units=[unit])
-
-    user = UserFactory.create_with_service_sector_permissions(service_sector=sector, perms=["can_manage_units"])
     graphql.force_login(user)
 
     query = units_query(only_with_permission=True)

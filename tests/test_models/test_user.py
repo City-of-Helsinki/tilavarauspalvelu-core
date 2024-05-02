@@ -4,10 +4,6 @@ import pytest
 from django.utils.timezone import get_default_timezone
 
 from tests.factories import (
-    ServiceSectorFactory,
-    ServiceSectorRoleChoiceFactory,
-    ServiceSectorRoleFactory,
-    ServiceSectorRolePermissionFactory,
     UnitFactory,
     UnitGroupFactory,
     UnitRoleChoiceFactory,
@@ -69,37 +65,6 @@ def test_user__general_admin__access_to_permissions(query_counter):
     assert len(count.queries) == 1, count.log
 
     assert perms == ["can_manage_general_roles"]
-
-
-def test_user__service_sector_admin__has_staff_permissions():
-    sector = ServiceSectorFactory.create()
-    user = UserFactory.create_with_service_sector_permissions(
-        service_sector=sector,
-        perms=["can_manage_service_sector_roles"],
-    )
-    assert user.has_staff_permissions is True
-
-
-def test_user__service_sector_admin__access_to_permissions(query_counter):
-    sector_1 = ServiceSectorFactory.create()
-    sector_2 = ServiceSectorFactory.create()
-    user = UserFactory.create_with_service_sector_permissions(
-        service_sector=sector_1,
-        perms=["can_manage_service_sector_roles", "can_handle_applications"],
-    )
-
-    choice = ServiceSectorRoleChoiceFactory.create(code="bar")
-    ServiceSectorRoleFactory.create(role=choice, service_sector=sector_2, user=user)
-    ServiceSectorRolePermissionFactory.create(role=choice, permission="can_manage_unit_roles")
-
-    with query_counter() as count:
-        perms = user.service_sector_permissions
-
-    assert len(count.queries) == 1, count.log
-
-    assert sorted(perms) == sorted([sector_1.pk, sector_2.pk])
-    assert sorted(perms[sector_1.pk]) == sorted(["can_manage_service_sector_roles", "can_handle_applications"])
-    assert sorted(perms[sector_2.pk]) == sorted(["can_manage_unit_roles"])
 
 
 def test_user__unit_admin__has_staff_permissions():
@@ -197,30 +162,6 @@ def test_request_user__general_admin__permission_are_fetched(query_counter):
 
     with query_counter() as count_2:
         assert same_user.general_permissions == ["can_manage_general_roles"]
-        assert same_user.service_sector_permissions == {}
-        assert same_user.unit_permissions == {}
-        assert same_user.unit_group_permissions == {}
-
-    # Things should be cached, not additional queries needed.
-    assert len(count_2.queries) == 0, count_2.log
-
-
-def test_request_user__service_sector_admin__permission_are_fetched(query_counter):
-    sector = ServiceSectorFactory.create()
-    user = UserFactory.create_with_service_sector_permissions(
-        service_sector=sector,
-        perms=["can_manage_service_sector_roles"],
-    )
-
-    with query_counter() as count_1:
-        same_user = get_user(user.pk)
-
-    # Should only need one query.
-    assert len(count_1.queries) == 1, count_1.log
-
-    with query_counter() as count_2:
-        assert same_user.general_permissions == []
-        assert same_user.service_sector_permissions == {sector.pk: ["can_manage_service_sector_roles"]}
         assert same_user.unit_permissions == {}
         assert same_user.unit_group_permissions == {}
 
@@ -243,7 +184,6 @@ def test_request_user__unit_admin__permission_are_fetched(query_counter):
 
     with query_counter() as count_2:
         assert same_user.general_permissions == []
-        assert same_user.service_sector_permissions == {}
         assert same_user.unit_permissions == {unit.pk: ["can_manage_unit_roles"]}
         assert same_user.unit_group_permissions == {}
 
@@ -266,7 +206,6 @@ def test_request_user__unit_group_admin__permission_are_fetched(query_counter):
 
     with query_counter() as count_2:
         assert same_user.general_permissions == []
-        assert same_user.service_sector_permissions == {}
         assert same_user.unit_permissions == {}
         assert same_user.unit_group_permissions == {unit_group.pk: ["can_manage_unit_roles"]}
 
