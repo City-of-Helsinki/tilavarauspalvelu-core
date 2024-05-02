@@ -1,6 +1,6 @@
 import pytest
 
-from tests.factories import ApplicationRoundFactory
+from tests.factories import ApplicationRoundFactory, ReservationUnitFactory, UserFactory
 from tests.helpers import UserType
 from tests.test_graphql_api.test_application_round.helpers import rounds_query
 
@@ -10,7 +10,7 @@ pytestmark = [
 ]
 
 
-def test_can_filter_application_rounds__by_pk(graphql):
+def test_application_round__filter__by_pk(graphql):
     # given:
     # - There are two application rounds
     # - A superuser is using the system
@@ -28,7 +28,7 @@ def test_can_filter_application_rounds__by_pk(graphql):
     assert response.node(0) == {"pk": application_round.pk}
 
 
-def test_can_filter_application_rounds__by_pk__multiple(graphql):
+def test_application_round__filter__by_pk__multiple(graphql):
     # given:
     # - There are two application rounds
     # - A superuser is using the system
@@ -45,3 +45,93 @@ def test_can_filter_application_rounds__by_pk__multiple(graphql):
     assert len(response.edges) == 2, response
     assert response.node(0) == {"pk": application_round_1.pk}
     assert response.node(1) == {"pk": application_round_2.pk}
+
+
+def test_application_round__filter__by_active(graphql):
+    ApplicationRoundFactory.create_in_status_upcoming()
+    application_round = ApplicationRoundFactory.create_in_status_open()
+    ApplicationRoundFactory.create_in_status_in_allocation()
+
+    graphql.login_with_superuser()
+    query = rounds_query(active=True)
+    response = graphql(query)
+
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"pk": application_round.pk}
+
+
+def test_application_round__filter__by_active__negative(graphql):
+    application_round_1 = ApplicationRoundFactory.create_in_status_upcoming()
+    ApplicationRoundFactory.create_in_status_open()
+    application_round_2 = ApplicationRoundFactory.create_in_status_in_allocation()
+
+    graphql.login_with_superuser()
+    query = rounds_query(active=False)
+    response = graphql(query)
+
+    assert len(response.edges) == 2, response
+    assert response.node(0) == {"pk": application_round_1.pk}
+    assert response.node(1) == {"pk": application_round_2.pk}
+
+
+def test_application_round__filter__by_only_with_permissions__superuser(graphql):
+    application_round = ApplicationRoundFactory.create()
+
+    graphql.login_with_superuser()
+    query = rounds_query(only_with_permissions=True)
+    response = graphql(query)
+
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"pk": application_round.pk}
+
+
+def test_application_round__filter__by_only_with_permissions__anonymous_user(graphql):
+    ApplicationRoundFactory.create()
+
+    query = rounds_query(only_with_permissions=True)
+    response = graphql(query)
+
+    assert len(response.edges) == 0, response
+
+
+def test_application_round__filter__by_only_with_permissions__regular_user(graphql):
+    ApplicationRoundFactory.create()
+
+    graphql.login_with_regular_user()
+    query = rounds_query(only_with_permissions=True)
+    response = graphql(query)
+
+    assert len(response.edges) == 0, response
+
+
+@pytest.mark.parametrize("permission", ["can_validate_applications", "can_handle_applications"])
+def test_application_round__filter__by_only_with_permissions__general_admin(graphql, permission):
+    application_round = ApplicationRoundFactory.create()
+
+    admin = UserFactory.create_with_general_permissions(perms=[permission])
+    graphql.force_login(admin)
+
+    query = rounds_query(only_with_permissions=True)
+    response = graphql(query)
+
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"pk": application_round.pk}
+
+
+@pytest.mark.parametrize("permission", ["can_validate_applications", "can_handle_applications"])
+def test_application_round__filter__by_only_with_permissions__unit_admin(graphql, permission):
+    reservation_unit_1 = ReservationUnitFactory.create()
+    reservation_unit_2 = ReservationUnitFactory.create()
+
+    application_round = ApplicationRoundFactory.create(reservation_units=[reservation_unit_1])
+    ApplicationRoundFactory.create(reservation_units=[reservation_unit_2])
+
+    unit = reservation_unit_1.unit
+    admin = UserFactory.create_with_unit_permissions(unit=unit, perms=[permission])
+    graphql.force_login(admin)
+
+    query = rounds_query(only_with_permissions=True)
+    response = graphql(query)
+
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"pk": application_round.pk}
