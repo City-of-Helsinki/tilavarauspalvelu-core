@@ -26,6 +26,7 @@ from api.graphql.types.application.mutations import (
     RejectAllApplicationOptionsMutation,
     RestoreAllApplicationOptionsMutation,
 )
+from api.graphql.types.application_round.mutation import SetApplicationRoundHandledMutation
 from api.graphql.types.application_section.mutations import (
     ApplicationSectionCreateMutation,
     ApplicationSectionDeleteMutation,
@@ -135,6 +136,7 @@ __all__ = [
     "ResourceUpdateMutation",
     "RestoreAllApplicationOptionsMutation",
     "RestoreAllSectionOptionsMutation",
+    "SetApplicationRoundHandledMutation",
     "SpaceCreateMutation",
     "SpaceDeleteMutation",
     "SpaceUpdateMutation",
