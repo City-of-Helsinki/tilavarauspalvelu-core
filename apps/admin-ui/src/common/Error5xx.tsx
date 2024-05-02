@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { H1 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { PUBLIC_URL } from "./const";
+import { useTranslation } from "react-i18next";
 
 const Wrapper = styled.div`
   margin: 0 var(--spacing-s);
@@ -42,23 +43,19 @@ const Image = styled.img`
   }
 `;
 
-const Error5xx = (): JSX.Element => {
+const Error5xx = ({ feedbackUrl }: { feedbackUrl: string }): JSX.Element => {
+  const { t } = useTranslation();
+
   return (
     <Wrapper>
       <Content>
-        <H1 $legacy>Jokin meni vikaan</H1>
-        <p>
-          Pahoittelut, emme valitettavasti pysty näyttämään sivua juuri nyt.
-          Yritä myöhemmin uudelleen!
-        </p>
+        <H1 $legacy>{t("errorPages.generalError.title")}</H1>
+        <p>{t("errorPages.generalError.title")}</p>
         <Link external href="/">
-          Siirry Varaamon etusivulle
+          {t("errorPages.linkToVaraamo")}
         </Link>
-        <Link
-          external
-          href="https://app.helmet-kirjasto.fi/forms/?site=varaamopalaute&ref=https://tilavaraus.hel.fi/"
-        >
-          Anna palautetta
+        <Link external href={feedbackUrl}>
+          {t("errorPages.giveFeedback")}
         </Link>
       </Content>
       <Image src={`${PUBLIC_URL}/5xx.png`} />

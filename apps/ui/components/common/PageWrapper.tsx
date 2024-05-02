@@ -12,6 +12,7 @@ interface Props {
   overrideBackgroundColor?: string;
   apiBaseUrl: string;
   profileLink: string;
+  feedbackUrl: string;
 }
 
 const Main = styled.main<{ $bgColor?: string }>`
@@ -23,6 +24,7 @@ const Main = styled.main<{ $bgColor?: string }>`
 function PageWrapper({
   apiBaseUrl,
   profileLink,
+  feedbackUrl,
   children,
   overrideBackgroundColor,
 }: Props): JSX.Element {
@@ -44,7 +46,7 @@ function PageWrapper({
       >
         {children}
       </Main>
-      <Footer />
+      <Footer feedbackUrl={feedbackUrl} />
       <div id="modal-root" />
     </>
   );

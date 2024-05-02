@@ -10,9 +10,11 @@ const AuthorisationChecker = ({
   apiUrl,
   children,
   permission,
+  feedbackUrl,
 }: {
   apiUrl: string;
   children: React.ReactNode;
+  feedbackUrl: string;
   permission?: Permission;
 }) => {
   const { hasAnyPermission, hasSomePermission } = usePermissionSuspended();
@@ -29,7 +31,11 @@ const AuthorisationChecker = ({
   // Use suspense to avoid flash of unauthorised content
   return (
     <Suspense fallback={<Loader />}>
-      {hasAccess ? children : <Error403 apiBaseUrl={apiUrl} />}
+      {hasAccess ? (
+        children
+      ) : (
+        <Error403 apiBaseUrl={apiUrl} feedbackUrl={feedbackUrl} />
+      )}
     </Suspense>
   );
 };

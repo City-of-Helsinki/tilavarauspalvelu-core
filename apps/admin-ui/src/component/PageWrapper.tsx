@@ -16,6 +16,7 @@ import { MainLander } from "./MainLander";
 
 type Props = {
   apiBaseUrl: string;
+  feedbackUrl: string;
   children: React.ReactNode;
 };
 
@@ -32,22 +33,23 @@ const Wrapper = styled.div`
   flex-grow: 1;
 `;
 
-const FallbackComponent = (err: unknown) => {
+const FallbackComponent = (err: unknown, feedbackUrl: string) => {
   // eslint-disable-next-line no-console
   console.error(err);
   Sentry.captureException(err);
-  return <Error5xx />;
+  return <Error5xx feedbackUrl={feedbackUrl} />;
 };
 
 // NOTE client only because Navigation requires react-router-dom
 export default function PageWrapper({
   apiBaseUrl,
+  feedbackUrl,
   children,
 }: Props): JSX.Element {
   const { hasAnyPermission, user } = usePermission();
   const hasAccess = user && hasAnyPermission();
   return (
-    <ErrorBoundary FallbackComponent={FallbackComponent}>
+    <ErrorBoundary FallbackComponent={(e) => FallbackComponent(e, feedbackUrl)}>
       <ClientOnly>
         <Navigation apiBaseUrl={apiBaseUrl} />
         <Wrapper>

@@ -18,9 +18,23 @@ const Wrapper = styled(HDSFooter)`
   }
 `;
 
-const Footer = (): JSX.Element => {
+const constructFeedbackUrl = (
+  feedbackUrl: string,
+  i18n: { language: string }
+) => {
+  try {
+    const url = new URL(feedbackUrl);
+    url.searchParams.set("lang", i18n.language);
+    return url.toString();
+  } catch (e) {
+    return null;
+  }
+};
+
+const Footer = ({ feedbackUrl }: { feedbackUrl: string }): JSX.Element => {
   const { t, i18n } = useTranslation("footer");
   const locale = i18n.language === "fi" ? "" : `/${i18n.language}`;
+  const languageUrl = constructFeedbackUrl(feedbackUrl, i18n);
   // TODO HDS:Footer causes a hydration error
   // related to hydration problems, any params we set to it are ignored in SSR
   // so if the page is static this renders the default style
@@ -45,15 +59,15 @@ const Footer = (): JSX.Element => {
           icon={<IconLinkExternal size="s" aria-hidden />}
           rel="noopener noreferrer"
         />
-        <HDSFooter.Item
-          href={`https://app.helmet-kirjasto.fi/forms/?site=varaamopalaute&ref=https://tilavaraus.hel.fi/${
-            locale !== "" ? `&lang=${i18n.language}` : ""
-          }`}
-          label={t(`footer:Navigation.feedbackLabel`)}
-          target="_blank"
-          icon={<IconLinkExternal size="s" aria-hidden />}
-          rel="noopener noreferrer"
-        />
+        {languageUrl && (
+          <HDSFooter.Item
+            href={languageUrl}
+            label={t(`footer:Navigation.feedbackLabel`)}
+            target="_blank"
+            icon={<IconLinkExternal size="s" aria-hidden />}
+            rel="noopener noreferrer"
+          />
+        )}
       </HDSFooter.Navigation>
       <HDSFooter.Base
         copyrightHolder={t("footer:Base.copyrightHolder")}

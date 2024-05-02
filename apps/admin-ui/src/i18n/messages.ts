@@ -255,9 +255,15 @@ const translations: ITranslations = {
       description: [
         "Sivu on nähtävillä vain kirjautuneille käyttäjille. Voit nähdä sivun sisällön, jos kirjaudut sisään ja sinulla on riittävän laajat käyttöoikeudet.",
       ],
-      linkToVaraamo: ["Siirry Varaamon etusivulle"],
-      giveFeedback: ["Anna palautetta"],
     },
+    generalError: {
+      title: ["Jokin meni vikaan"],
+      description: [
+        "Pahoittelut, emme valitettavasti pysty näyttämään sivua juuri nyt. Yritä myöhemmin uudelleen!",
+      ],
+    },
+    linkToVaraamo: ["Siirry Varaamon etusivulle"],
+    giveFeedback: ["Ota yhteyttä"],
   },
   // TODO used inside the ReservationUnitEditor
   ArchiveReservationUnitDialog: {

@@ -60,9 +60,14 @@ const ApplicationRoundAllocation = dynamic(
 const withAuthorization = (
   component: JSX.Element,
   apiBaseUrl: string,
+  feedbackUrl: string,
   permission?: Permission
 ) => (
-  <AuthorizationChecker permission={permission} apiUrl={apiBaseUrl}>
+  <AuthorizationChecker
+    permission={permission}
+    apiUrl={apiBaseUrl}
+    feedbackUrl={feedbackUrl}
+  >
     {component}
   </AuthorizationChecker>
 );
@@ -70,6 +75,7 @@ const withAuthorization = (
 type Props = {
   reservationUnitPreviewUrl: string;
   apiBaseUrl: string;
+  feedbackUrl: string;
 };
 const UnitsRouter = ({
   reservationUnitPreviewUrl,
@@ -117,16 +123,26 @@ const ApplicationRoundsRouter = () => (
   </Routes>
 );
 
-const PremisesRouter = () => (
+const PremisesRouter = ({
+  apiBaseUrl,
+  feedbackUrl,
+}: Omit<Props, "reservationUnitPreviewUrl">) => (
   <Routes>
     <Route
       path="spaces"
-      element={withAuthorization(<SpacesList />, Permission.CAN_MANAGE_SPACES)}
+      element={withAuthorization(
+        <SpacesList />,
+        apiBaseUrl,
+        feedbackUrl,
+        Permission.CAN_MANAGE_SPACES
+      )}
     />
     <Route
       path={`${prefixes.reservationUnits}`}
       element={withAuthorization(
         <ReservationUnits />,
+        apiBaseUrl,
+        feedbackUrl,
         Permission.CAN_MANAGE_UNITS
       )}
     />
@@ -134,30 +150,43 @@ const PremisesRouter = () => (
       path="resources"
       element={withAuthorization(
         <ResourcesList />,
+        apiBaseUrl,
+        feedbackUrl,
         Permission.CAN_MANAGE_RESOURCES
       )}
     />
     <Route
       path="units"
-      element={withAuthorization(<Units />, Permission.CAN_MANAGE_UNITS)}
+      element={withAuthorization(
+        <Units />,
+        apiBaseUrl,
+        feedbackUrl,
+        Permission.CAN_MANAGE_UNITS
+      )}
     />
   </Routes>
 );
 
-function ClientApp({ reservationUnitPreviewUrl, apiBaseUrl }: Props) {
+function ClientApp({
+  reservationUnitPreviewUrl,
+  apiBaseUrl,
+  feedbackUrl,
+}: Props) {
   return (
     <BrowserRouter basename={PUBLIC_URL}>
-      <PageWrapper apiBaseUrl={apiBaseUrl}>
+      <PageWrapper apiBaseUrl={apiBaseUrl} feedbackUrl={feedbackUrl}>
         <Routes>
           <Route path="*" element={<Error404 />} />
           <Route
             path="/"
-            element={withAuthorization(<HomePage />, apiBaseUrl)}
+            element={withAuthorization(<HomePage />, apiBaseUrl, feedbackUrl)}
           />
           <Route
             path={`${prefixes.applications}/*`}
             element={withAuthorization(
               <ApplicationRouter />,
+              apiBaseUrl,
+              feedbackUrl,
               Permission.CAN_VALIDATE_APPLICATIONS
             )}
           />
@@ -165,12 +194,21 @@ function ClientApp({ reservationUnitPreviewUrl, apiBaseUrl }: Props) {
             path={`${prefixes.recurringReservations}/application-rounds/*`}
             element={withAuthorization(
               <ApplicationRoundsRouter />,
+              apiBaseUrl,
+              feedbackUrl,
               Permission.CAN_VALIDATE_APPLICATIONS
             )}
           />
           <Route
             path="/premises-and-settings/*"
-            element={withAuthorization(<PremisesRouter />, apiBaseUrl)}
+            element={withAuthorization(
+              <PremisesRouter
+                apiBaseUrl={apiBaseUrl}
+                feedbackUrl={feedbackUrl}
+              />,
+              apiBaseUrl,
+              feedbackUrl
+            )}
           />
           <Route
             path="/unit/*"
@@ -178,21 +216,32 @@ function ClientApp({ reservationUnitPreviewUrl, apiBaseUrl }: Props) {
               <UnitsRouter
                 reservationUnitPreviewUrl={reservationUnitPreviewUrl}
               />,
-              apiBaseUrl
+              apiBaseUrl,
+              feedbackUrl
             )}
           />
           <Route
             path="/reservations/*"
-            element={withAuthorization(<ReservationsRouter />, apiBaseUrl)}
+            element={withAuthorization(
+              <ReservationsRouter />,
+              apiBaseUrl,
+              feedbackUrl
+            )}
           />
           <Route
             path="/my-units/*"
-            element={withAuthorization(<MyUnitsRouter />, apiBaseUrl)}
+            element={withAuthorization(
+              <MyUnitsRouter />,
+              apiBaseUrl,
+              feedbackUrl
+            )}
           />
           <Route
             path="/messaging/notifications/*"
             element={withAuthorization(
               <NotificationsRouter />,
+              apiBaseUrl,
+              feedbackUrl,
               Permission.CAN_MANAGE_BANNER_NOTIFICATIONS
             )}
           />

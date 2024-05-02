@@ -17,8 +17,10 @@ const ServerSchema = z.object({
   TUNNISTAMO_URL: z.string().optional(),
   RESERVATION_UNIT_PREVIEW_URL_PREFIX: z.string().optional(),
   // mandatory because the SSR can't connect to the API without it
-  // frontend SSR is running on a different host than the backend
+  // frontend SSR is running on a different
+  // host than the backend
   TILAVARAUS_API_URL: z.string().url(),
+  EMAIL_VARAAMO_EXT_LINK: z.string().url().optional(),
 });
 
 // NOTE if you add a new variable to client it will be fixed in the build

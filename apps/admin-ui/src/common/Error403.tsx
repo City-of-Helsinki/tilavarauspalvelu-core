@@ -8,23 +8,33 @@ import { breakpoints } from "common/src/common/style";
 import { PUBLIC_URL } from "./const";
 
 const Wrapper = styled.div`
-  margin: var(--spacing-layout-s);
+  padding: var(--spacing-layout-s);
   word-break: break-word;
   gap: var(--spacing-layout-m);
   h1 {
     margin-bottom: 0;
     font-size: 2.5em;
   }
+  p {
+    margin-bottom: var(--spacing-layout-m);
+  }
 
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
 
   @media (min-width: ${breakpoints.l}) {
-    margin: var(--spacing-layout-m);
+    grid-template-columns: minmax(400px, 600px) 400px;
+    margin: 0 auto;
     h1 {
       font-size: 4em;
     }
   }
+`;
+
+const Column = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-layout-2-xs);
 `;
 
 const Image = styled.img`
@@ -35,21 +45,24 @@ const ButtonContainer = styled.div`
   margin-top: var(--spacing-s);
 `;
 
-const LogoutSection = ({ apiBaseUrl }: { apiBaseUrl: string }): JSX.Element => {
+const LogoutSection = ({
+  apiBaseUrl,
+  feedbackUrl,
+}: {
+  apiBaseUrl: string;
+  feedbackUrl: string;
+}): JSX.Element => {
   const { isAuthenticated } = useSession();
 
   const { t } = useTranslation();
 
   return (
-    <>
+    <Column>
       <Link external href="/">
-        {t("errorPages.accessForbidden.linkToVaraamo")}
+        {t("errorPages.linkToVaraamo")}
       </Link>
-      <Link
-        external
-        href="https://app.helmet-kirjasto.fi/forms/?site=varaamopalaute&ref=https://tilavaraus.hel.fi/"
-      >
-        {t("errorPages.accessForbidden.giveFeedback")}
+      <Link external href={feedbackUrl}>
+        {t("errorPages.giveFeedback")}
       </Link>
       {isAuthenticated && (
         <ButtonContainer>
@@ -58,16 +71,16 @@ const LogoutSection = ({ apiBaseUrl }: { apiBaseUrl: string }): JSX.Element => {
           </Button>
         </ButtonContainer>
       )}
-    </>
+    </Column>
   );
 };
 
 const Error403 = ({
   apiBaseUrl,
-  showLogoutSection,
+  feedbackUrl,
 }: {
   apiBaseUrl: string;
-  showLogoutSection?: boolean;
+  feedbackUrl: string;
 }): JSX.Element => {
   const { t } = useTranslation();
 
@@ -76,7 +89,7 @@ const Error403 = ({
       <div>
         <H1 $legacy>403 - {t("errorPages.accessForbidden.title")}</H1>
         <p>{t("errorPages.accessForbidden.description")}</p>
-        {showLogoutSection && <LogoutSection apiBaseUrl={apiBaseUrl} />}
+        <LogoutSection apiBaseUrl={apiBaseUrl} feedbackUrl={feedbackUrl} />
       </div>
       <Image src={`${PUBLIC_URL}/403.png`} />
     </Wrapper>
