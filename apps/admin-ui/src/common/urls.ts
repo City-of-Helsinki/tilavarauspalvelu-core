@@ -1,4 +1,5 @@
 import { type Maybe } from "common/types/gql-types";
+import { PUBLIC_URL } from "./const";
 
 export const prefixes = {
   recurringReservations: "/recurring-reservations",
@@ -74,3 +75,18 @@ export const myReservationUnitUrl = (
 ): string => `${myUnitUrl(unitId)}/${reservationUnitId}`;
 
 export const reservationUnitsUrl = `/premises-and-settings/reservation-units`;
+
+// Weird why the other urls are not relative to PUBLIC_URL
+// This is passed as Link href
+export function getApplicationSectionUrl(
+  applicationPk: Maybe<number> | undefined,
+  sectionPk: Maybe<number> | undefined
+) {
+  if (applicationPk == null || sectionPk == null) {
+    return "";
+  }
+  if (applicationPk < 1 || sectionPk < 1) {
+    return "";
+  }
+  return `${PUBLIC_URL}/application/${applicationPk}/details#${sectionPk}`;
+}

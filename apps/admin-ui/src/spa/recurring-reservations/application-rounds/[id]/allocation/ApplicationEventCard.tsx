@@ -5,10 +5,12 @@ import styled, { css } from "styled-components";
 import type {
   AllocatedTimeSlotNode,
   ApplicationSectionNode,
+  Maybe,
+  MutationUpdateReservationUnitOptionArgs,
+  Query,
   ReservationUnitNode,
 } from "common/types/gql-types";
 import { SemiBold, fontMedium } from "common";
-import { PUBLIC_URL } from "@/common/const";
 import { getApplicantName } from "@/component/applications/util";
 import { ageGroup } from "@/component/reservations/requested/util";
 import { filterNonNullable } from "common/src/helpers";
@@ -18,6 +20,11 @@ import {
   formatTime,
 } from "./modules/applicationRoundAllocation";
 import { useFocusAllocatedSlot, useFocusApplicationEvent } from "./hooks";
+import { PopupMenu } from "@/component/PopupMenu";
+import { type ApolloQueryResult, useMutation } from "@apollo/client";
+import { getApplicationSectionUrl } from "@/common/urls";
+import { useNotification } from "@/context/NotificationContext";
+import { UPDATE_RESERVATION_UNIT_OPTION } from "./queries";
 
 export type AllocationApplicationSectionCardType =
   | "unallocated"
@@ -29,6 +36,7 @@ type Props = {
   applicationSection: ApplicationSectionNode;
   reservationUnit: ReservationUnitNode;
   type: AllocationApplicationSectionCardType;
+  refetch: () => Promise<ApolloQueryResult<Query>>;
 };
 
 const borderCss = css<{ $type: AllocationApplicationSectionCardType }>`
@@ -132,6 +140,7 @@ export function ApplicationSectionCard({
   applicationSection,
   reservationUnit,
   type,
+  refetch,
 }: Props): JSX.Element | null {
   const { t } = useTranslation();
 
@@ -194,10 +203,10 @@ export function ApplicationSectionCard({
           section={applicationSection}
           currentReservationUnit={reservationUnit}
           eventsPerWeek={applicationSection.appliedReservationsPerWeek ?? 0}
+          refetch={refetch}
         />
         <StyledLink
-          // TODO use an url constructor
-          href={`${PUBLIC_URL}/application/${application.pk}/details#${applicationSection.pk}`}
+          href={getApplicationSectionUrl(application.pk, applicationSection.pk)}
           external
           openInNewTab
           openInExternalDomainAriaLabel={t("common.openToNewTab")}
@@ -236,11 +245,10 @@ export function ApplicationSectionCard({
 const SelectionListContainer = styled.div`
   text-align: left;
   width: 100%;
-  padding-left: var(--spacing-s);
   box-sizing: border-box;
 `;
 
-const SelectionListCount = styled.div`
+const SelectionListCount = styled.span`
   padding: var(--spacing-xs) 0;
   border-bottom: 1px solid var(--color-black-20);
   ${fontMedium}
@@ -250,10 +258,12 @@ function SchedulesList({
   section,
   currentReservationUnit,
   eventsPerWeek,
+  refetch,
 }: {
   currentReservationUnit: ReservationUnitNode;
   section: ApplicationSectionNode;
   eventsPerWeek: number;
+  refetch: () => Promise<ApolloQueryResult<Query>>;
 }): JSX.Element {
   const { t } = useTranslation();
 
@@ -278,7 +288,52 @@ function SchedulesList({
     (a, b) => convertWeekday(a.dayOfTheWeek) - convertWeekday(b.dayOfTheWeek)
   );
 
+  const [mutation, { loading }] = useMutation<
+    Query,
+    MutationUpdateReservationUnitOptionArgs
+  >(UPDATE_RESERVATION_UNIT_OPTION);
+
+  const thisOption = section.reservationUnitOptions?.find(
+    (ruo) => ruo.reservationUnit?.pk === currentReservationUnit.pk
+  );
+
+  const { notifyError } = useNotification();
+
+  const updateOption = async (
+    pk: Maybe<number> | undefined,
+    locked: boolean
+  ) => {
+    if (loading) {
+      return;
+    }
+    if (pk == null) {
+      return;
+    }
+    try {
+      await mutation({
+        variables: {
+          input: {
+            pk,
+            locked,
+          },
+        },
+      });
+      refetch();
+    } catch (e) {
+      notifyError(t("errors.mutationFailed"));
+    }
+  };
+
+  const handleLock = async () => {
+    updateOption(thisOption?.pk, true);
+  };
+
+  const handleUnlock = async () => {
+    updateOption(thisOption?.pk, false);
+  };
+
   const nToAllocate = eventsPerWeek - allocatedSchedules.length;
+  const isLocked = thisOption?.locked ?? false;
   return (
     <SelectionListContainer>
       {allocatedSchedules.map((ats) => (
@@ -288,18 +343,32 @@ function SchedulesList({
           currentReservationUnit={currentReservationUnit}
         />
       ))}
-      {nToAllocate > 0 && (
-        <SelectionListCount>
-          {t("Allocation.schedulesWithoutAllocation")} {nToAllocate}/
-          {eventsPerWeek}
-        </SelectionListCount>
+      {(nToAllocate > 0 || isLocked) && (
+        <div style={{ display: "flex", gap: "1rem" }}>
+          <SelectionListCount>
+            {t("Allocation.schedulesWithoutAllocation")} {nToAllocate}/
+            {eventsPerWeek}
+          </SelectionListCount>
+          <PopupMenu
+            items={[
+              {
+                name: isLocked
+                  ? t("Allocation.unlockOptions")
+                  : allocatedSchedules.length > 0
+                    ? t("Allocation.lockPartialOptions")
+                    : t("Allocation.lockOptions"),
+                onClick: () => (isLocked ? handleUnlock() : handleLock()),
+              },
+            ]}
+          />
+        </div>
       )}
     </SelectionListContainer>
   );
 }
 
 const ScheduleCard = styled.div`
-  padding: var(--spacing-xs) 0;
+  padding: var(--spacing-xs) var(--spacing-s);
   border-bottom: 1px solid var(--color-black-10);
   display: flex;
   gap: 1rem;

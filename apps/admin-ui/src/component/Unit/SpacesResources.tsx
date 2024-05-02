@@ -10,7 +10,7 @@ import Loader from "../Loader";
 import { ResourcesTable } from "./ResourcesTable";
 import { SpacesTable } from "./SpacesTable";
 import { SubPageHead } from "./SubPageHead";
-import Modal, { useModal as useHDSModal } from "../HDSModal";
+import Modal, { useModal } from "../HDSModal";
 import { NewSpaceModal } from "../Spaces/space-editor/new-space-modal/NewSpaceModal";
 import { NewResourceModal } from "../Resources/resource-editor/NewResourceModal";
 import { UNIT_QUERY } from "@/common/queries";
@@ -72,14 +72,14 @@ function SpacesResources(): JSX.Element {
     open: newSpaceDialogIsOpen,
     openModal: openNewSpaceModal,
     closeModal: closeNewSpaceModal,
-  } = useHDSModal();
+  } = useModal();
 
   const {
     openWithContent,
     modalContent,
     open: isNewResourceModalOpen,
     closeModal: closeNewResourceModal,
-  } = useHDSModal();
+  } = useModal();
 
   if (isLoading) {
     return <Loader />;

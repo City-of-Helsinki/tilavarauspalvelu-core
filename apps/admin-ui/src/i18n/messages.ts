@@ -197,6 +197,7 @@ const translations: ITranslations = {
     errorRecurringReservationsDoneDisplay: [
       "Virhe. Varaus tehty, mutta sen näyttäminen epäonnistui.",
     ],
+    mutationFailed: ["Muutos epäonnistui"],
     noPermission: ["Sinulla ei ole käyttöoikeutta."],
     mutationNoDataReturned: ["Odottamaton vastaus."],
     descriptive: {
@@ -1959,6 +1960,9 @@ const translations: ITranslations = {
     countResultsPostfix: ["tuloksesta näytetty"],
     countAllResults: ["Kaikki {{ count }}  tulosta näytetty"],
     clearFiltersButton: ["Tyhjennä suodattimet"],
+    lockOptions: ["Hylkää kaikki"],
+    lockPartialOptions: ["Hylkää loput"],
+    unlockOptions: ["Palauta käsittelyyn"],
     errors: {
       accepting: {
         alreadyDeclined: ['Varaukselle "{{name}}" on jo tehty hylkäys.'],

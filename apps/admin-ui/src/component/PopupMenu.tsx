@@ -39,6 +39,7 @@ const Popup = styled.div`
   button {
     text-align: left;
     padding: var(--spacing-xs);
+    white-space: nowrap;
     width: 100%;
     border: none;
     background-color: transparent;

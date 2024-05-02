@@ -83,10 +83,12 @@ function EventGroupList({
   applicationSections,
   reservationUnit,
   type,
+  refetch,
 }: {
   applicationSections: ApplicationSectionNode[];
   reservationUnit: ReservationUnitNode;
   type: AllocationApplicationSectionCardType;
+  refetch: () => Promise<ApolloQueryResult<Query>>;
 }): JSX.Element {
   if (applicationSections.length < 1) {
     return <div>-</div>;
@@ -100,6 +102,7 @@ function EventGroupList({
           applicationSection={ae}
           reservationUnit={reservationUnit}
           type={type}
+          refetch={refetch}
         />
       ))}
     </EventGroupListWrapper>
@@ -171,6 +174,7 @@ export function AllocationPageContent({
       <ApplicationSectionColumn
         applicationSections={applicationSections}
         reservationUnit={reservationUnit}
+        refetchApplicationEvents={refetchApplicationEvents}
       />
       <AllocationCalendar
         applicationSections={aesForThisUnit}
@@ -190,32 +194,40 @@ export function AllocationPageContent({
 function ApplicationSectionColumn({
   applicationSections,
   reservationUnit,
+  refetchApplicationEvents,
   // TODO separate these types (use a union of two types or use Pick to define a new type)
 }: Pick<
   ApplicationEventsProps,
-  "applicationSections" | "reservationUnit"
+  "applicationSections" | "reservationUnit" | "refetchApplicationEvents"
 >): JSX.Element {
   const { t } = useTranslation();
 
+  // TODO how is Rejected supposed to be shown? or is it ever shown in this list (or any other list)?
+  // there are no possible actions on this page for it, but do we filter out completely or disable all actions?
+
+  // allocations are not specific to the reservation unit
   const isAllocated = (as: ApplicationSectionNode) =>
     as.allocations != null && as.allocations > 0;
-  const isRejected = (as: ApplicationSectionNode) =>
-    as.reservationUnitOptions?.map((ruo) => ruo.rejected).some(Boolean);
+  // Locked is specific to this reservation unit
+  const isLocked = (as: ApplicationSectionNode) =>
+    as.reservationUnitOptions
+      .filter((ruo) => ruo.reservationUnit.pk === reservationUnit.pk)
+      ?.map((ruo) => ruo.locked)
+      .some(Boolean);
 
-  const allocated = filterNonNullable(
-    applicationSections?.filter(
-      (as) => as.status === ApplicationSectionStatusChoice.Handled
-    )
+  const sections = filterNonNullable(applicationSections);
+  const allocated = sections.filter(
+    (as) => as.status === ApplicationSectionStatusChoice.Handled
   );
 
-  const partiallyAllocated = filterNonNullable(
-    applicationSections?.filter(
-      (as) =>
-        as.status !== ApplicationSectionStatusChoice.Handled && isAllocated(as)
-    )
+  const partiallyAllocated = sections.filter(
+    (as) =>
+      as.status !== ApplicationSectionStatusChoice.Handled &&
+      isAllocated(as) &&
+      !isLocked(as)
   );
 
-  const declined = (applicationSections ?? []).filter((as) => isRejected(as));
+  const locked = sections.filter((as) => isLocked(as));
 
   // take certain states and omit colliding application events
   const unallocatedApplicationEvents = (applicationSections ?? []).filter(
@@ -236,6 +248,7 @@ function ApplicationSectionColumn({
             applicationSections={unallocatedApplicationEvents}
             reservationUnit={reservationUnit}
             type="unallocated"
+            refetch={refetchApplicationEvents}
           />
         </StyledAccordion>
         <H4 as="h2" style={{ margin: 0 }}>
@@ -251,6 +264,7 @@ function ApplicationSectionColumn({
             applicationSections={partiallyAllocated}
             reservationUnit={reservationUnit}
             type="partial"
+            refetch={refetchApplicationEvents}
           />
         </StyledAccordion>
         <StyledAccordion
@@ -263,18 +277,20 @@ function ApplicationSectionColumn({
             applicationSections={allocated}
             reservationUnit={reservationUnit}
             type="allocated"
+            refetch={refetchApplicationEvents}
           />
         </StyledAccordion>
         <StyledAccordion
           headingLevel="h3"
           heading={t("Allocation.declinedApplicants")}
-          disabled={declined.length === 0}
+          disabled={locked.length === 0}
           initiallyOpen
         >
           <EventGroupList
-            applicationSections={declined}
+            applicationSections={locked}
             reservationUnit={reservationUnit}
             type="declined"
+            refetch={refetchApplicationEvents}
           />
         </StyledAccordion>
       </ApplicationEventsContainer>

@@ -124,6 +124,8 @@ export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
             fulfilled
           }
           reservationUnitOptions {
+            locked
+            rejected
             allocatedTimeSlots {
               pk
               dayOfTheWeek
@@ -166,6 +168,16 @@ export const AFFECTING_ALLOCATED_TIME_SLOTS_QUERY = gql`
       beginTime
       dayOfTheWeek
       endTime
+    }
+  }
+`;
+
+export const UPDATE_RESERVATION_UNIT_OPTION = gql`
+  mutation RejectRest($input: ReservationUnitOptionUpdateMutationInput!) {
+    updateReservationUnitOption(input: $input) {
+      pk
+      rejected
+      locked
     }
   }
 `;
