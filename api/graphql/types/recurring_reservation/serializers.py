@@ -1,18 +1,15 @@
 import datetime
-from collections.abc import Iterable
-from typing import Any, TypedDict
+from typing import Any
 
-from django.db import models, transaction
+from django.db import transaction
 from graphene_django_extensions import NestingModelSerializer
 from graphql import GraphQLError
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from api.graphql.extensions import error_codes
-from common.date_utils import DEFAULT_TIMEZONE, combine, get_periods_between, local_date
+from common.date_utils import local_date
 from common.fields.serializer import CurrentUserDefaultNullable, input_only_field
-from opening_hours.models import ReservableTimeSpan
-from opening_hours.utils.time_span_element import TimeSpanElement
 from reservation_units.enums import ReservationStartInterval
 from reservation_units.models import ReservationUnit
 from reservations.choices import ReservationTypeChoice
@@ -127,16 +124,6 @@ class RecurringReservationUpdateSerializer(RecurringReservationCreateSerializer)
 # Reservation series
 
 
-class ReservationPeriod(TypedDict):
-    begin: datetime.datetime
-    end: datetime.datetime
-
-
-class ReservationPeriodJSON(TypedDict):
-    begin: str  # iso-format str
-    end: str  # iso-format str
-
-
 class ReservationSeriesReservationSerializer(NestingModelSerializer):
     type = serializers.ChoiceField(choices=ReservationTypeChoice.allowed_for_staff_create, required=True)
 
@@ -236,183 +223,22 @@ class ReservationSeriesSerializer(RecurringReservationCreateSerializer):
         skip_dates: list[datetime.date],
         check_opening_hours: bool,
     ) -> None:
-        reserved_timespans = self.get_reserved_timespans(
-            start_date=instance.begin_date,
-            end_date=instance.end_date,
-            reservation_unit=instance.reservation_unit,
-        )
+        slots = instance.actions.pre_calculate_slots(check_opening_hours=check_opening_hours, skip_dates=skip_dates)
 
-        reservable_timespans = self.get_reservable_timespans(instance) if check_opening_hours else []
-
-        non_overlapping: list[ReservationPeriod] = []
-        overlapping: list[ReservationPeriodJSON] = []
-        not_reservable: list[ReservationPeriodJSON] = []
-
-        begin_time: datetime.time = instance.begin_time  # type: ignore[assignment]
-        end_time: datetime.time = instance.end_time  # type: ignore[assignment]
-
-        weekdays: list[int] = [int(val) for val in instance.weekdays.split(",")]
-        if not weekdays:
-            weekdays = [instance.begin_date.weekday()]
-
-        for weekday in weekdays:
-            delta: int = weekday - instance.begin_date.weekday()
-            if delta < 0:
-                delta += 7
-
-            begin_date: datetime.date = instance.begin_date + datetime.timedelta(days=delta)
-
-            periods = get_periods_between(
-                start_date=begin_date,
-                end_date=instance.end_date,
-                start_time=begin_time,
-                end_time=end_time,
-                interval=instance.recurrence_in_days,
-                tzinfo=DEFAULT_TIMEZONE,
-            )
-            for begin, end in periods:
-                if begin.date() in skip_dates:
-                    continue
-
-                timespan = TimeSpanElement(
-                    start_datetime=begin,
-                    end_datetime=end,
-                    is_reservable=True,
-                    buffer_time_after=instance.reservation_unit.buffer_time_after,
-                    buffer_time_before=instance.reservation_unit.buffer_time_before,
-                )
-
-                # Would the reservation overlap with any existing reservations?
-                # Also checks that buffers for the reservation will also not overlap.
-                if any(timespan.overlaps_with(reserved) for reserved in reserved_timespans):
-                    overlapping.append(
-                        ReservationPeriodJSON(
-                            begin=begin.isoformat(timespec="seconds"),
-                            end=end.isoformat(timespec="seconds"),
-                        )
-                    )
-                    continue
-
-                # Would the reservation be fully inside any reservable timespans for the resource?
-                # Ignores buffers for the reservation, since those can be outside reservable times.
-                if check_opening_hours and not any(
-                    timespan.fully_inside_of(reservable) for reservable in reservable_timespans
-                ):
-                    not_reservable.append(
-                        ReservationPeriodJSON(
-                            begin=begin.isoformat(timespec="seconds"),
-                            end=end.isoformat(timespec="seconds"),
-                        )
-                    )
-                    continue
-
-                non_overlapping.append(ReservationPeriod(begin=begin, end=end))
-
-        if overlapping:
+        if slots.overlapping:
             msg = "Not all reservations can be made due to overlapping reservations."
-            extensions = {"code": error_codes.RESERVATION_SERIES_OVERLAPS, "overlapping": overlapping}
+            extensions = {
+                "code": error_codes.RESERVATION_SERIES_OVERLAPS,
+                "overlapping": slots.overlapping_json,
+            }
             raise GraphQLError(msg, extensions=extensions)
 
-        if not_reservable:
+        if slots.not_reservable:
             msg = "Not all reservations can be made due to falling outside reservable times."
-            extensions = {"code": error_codes.RESERVATION_SERIES_NOT_OPEN, "not_reservable": not_reservable}
+            extensions = {
+                "code": error_codes.RESERVATION_SERIES_NOT_OPEN,
+                "not_reservable": slots.not_reservable_json,
+            }
             raise GraphQLError(msg, extensions=extensions)
 
-        # Pick out the through model for the many-to-many relationship and use if for bulk creation
-        ThroughModel: type[models.Model] = Reservation.reservation_unit.through  # noqa: N806
-
-        reservations: list[Reservation] = []
-        through_models: list[models.Model] = []
-
-        for period in non_overlapping:
-            if instance.reservation_unit.reservation_block_whole_day:
-                reservation_details["buffer_time_before"] = instance.reservation_unit.actions.get_actual_before_buffer(
-                    period["begin"]
-                )
-                reservation_details["buffer_time_after"] = instance.reservation_unit.actions.get_actual_after_buffer(
-                    period["end"]
-                )
-
-            reservation = Reservation(
-                begin=period["begin"],
-                end=period["end"],
-                recurring_reservation=instance,
-                age_group=instance.age_group,
-                **reservation_details,
-            )
-            through = ThroughModel(
-                reservation=reservation,
-                reservationunit=instance.reservation_unit,
-            )
-            reservations.append(reservation)
-            through_models.append(through)
-
-        Reservation.objects.bulk_create(reservations)
-        ThroughModel.objects.bulk_create(through_models)
-
-    def get_reserved_timespans(
-        self,
-        start_date: datetime.date,
-        end_date: datetime.date,
-        reservation_unit: ReservationUnit,
-    ) -> list[TimeSpanElement]:
-        time_spans: list[TimeSpanElement] = []
-        current_period: ReservationPeriod | None = None
-
-        periods: Iterable[ReservationPeriod] = (
-            Reservation.objects.overlapping_period(
-                period_start=start_date,
-                period_end=end_date,
-            )
-            .affecting_reservations(
-                reservation_units=[reservation_unit.pk],
-            )
-            .values("begin", "end")
-            .order_by("begin")
-        )
-
-        # Go through all affected reservations' periods and merge overlapping ones
-        for period in periods:
-            if current_period is None:
-                current_period = period
-                continue
-
-            # If periods overlap or touch, merge them
-            if period["begin"] <= current_period["end"]:
-                current_period["end"] = period["end"]
-                continue
-
-            time_spans.append(
-                TimeSpanElement(
-                    start_datetime=current_period["begin"],
-                    end_datetime=current_period["end"],
-                    is_reservable=False,
-                )
-            )
-            current_period = period
-
-        # Add the remaining period after merging
-        if current_period is not None:
-            time_spans.append(
-                TimeSpanElement(
-                    start_datetime=current_period["begin"],
-                    end_datetime=current_period["end"],
-                    is_reservable=False,
-                )
-            )
-
-        return time_spans
-
-    def get_reservable_timespans(self, instance: RecurringReservation) -> list[TimeSpanElement]:
-        begin_time: datetime.time = instance.begin_time  # type: ignore[assignment]
-        end_time: datetime.time = instance.end_time  # type: ignore[assignment]
-        resource = instance.reservation_unit.origin_hauki_resource
-        if resource is None:
-            return []
-
-        timespans: Iterable[ReservableTimeSpan] = resource.reservable_time_spans.all().overlapping_with_period(
-            start=combine(instance.begin_date, begin_time, tzinfo=DEFAULT_TIMEZONE),
-            end=combine(instance.end_date, end_time, tzinfo=DEFAULT_TIMEZONE),
-        )
-
-        return [timespan.as_time_span_element() for timespan in timespans]
+        instance.actions.bulk_create_reservation_for_periods(slots.non_overlapping, reservation_details)
