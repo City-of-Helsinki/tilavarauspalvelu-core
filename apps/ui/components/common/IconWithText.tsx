@@ -13,6 +13,7 @@ const Container = styled.div`
   align-items: center;
   grid-template-columns: 1.5em 1fr 4fr;
   margin-top: var(--spacing-s);
+  white-space: nowrap;
 `;
 
 const SpanTwoColumns = styled.span`

@@ -21,6 +21,7 @@ const Message = styled.div`
 const CustomIconWithText = styled(IconWithText)`
   font-size: var(--fontsize-body-m);
   margin-top: var(--spacing-2-xs);
+  white-space: unset;
 `;
 
 const SubHeadLine = styled(H5).attrs({
