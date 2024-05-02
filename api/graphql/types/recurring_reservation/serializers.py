@@ -156,8 +156,6 @@ class ReservationSeriesReservationSerializer(NestingModelSerializer):
             "handled_at",
             "confirmed_at",
             #
-            "unit_price",
-            #
             "applying_for_free_of_charge",
             "free_of_charge_reason",
             #

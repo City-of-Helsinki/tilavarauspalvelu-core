@@ -1,5 +1,4 @@
 import datetime
-from decimal import Decimal
 
 import pytest
 
@@ -91,7 +90,6 @@ def test_recurring_reservations__create_series__reservation_details(graphql):
     data["reservationDetails"]["bufferTimeAfter"] = 30 * 60  # 30 mins
     data["reservationDetails"]["handledAt"] = datetime.datetime(2023, 1, 1).isoformat(timespec="seconds")
     data["reservationDetails"]["confirmedAt"] = datetime.datetime(2023, 1, 2).isoformat(timespec="seconds")
-    data["reservationDetails"]["unitPrice"] = "12.34"
     data["reservationDetails"]["applyingForFreeOfCharge"] = True
     data["reservationDetails"]["freeOfChargeReason"] = "reason"
     data["reservationDetails"]["reserveeId"] = "id"
@@ -139,7 +137,6 @@ def test_recurring_reservations__create_series__reservation_details(graphql):
     assert reservations[0].buffer_time_after == datetime.timedelta(minutes=30)
     assert reservations[0].handled_at == datetime.datetime(2023, 1, 1, tzinfo=DEFAULT_TIMEZONE)
     assert reservations[0].confirmed_at == datetime.datetime(2023, 1, 2, tzinfo=DEFAULT_TIMEZONE)
-    assert reservations[0].unit_price == Decimal("12.34")
     assert reservations[0].applying_for_free_of_charge is True
     assert reservations[0].free_of_charge_reason == "reason"
     assert reservations[0].reservee_id == "id"
