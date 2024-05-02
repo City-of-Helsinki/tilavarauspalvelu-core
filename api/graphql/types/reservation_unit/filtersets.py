@@ -17,7 +17,6 @@ from reservation_units.models import ReservationUnit
 from reservation_units.querysets import ReservationUnitQuerySet
 from reservation_units.utils.reservation_unit_reservation_state_helper import ReservationUnitReservationStateHelper
 from reservation_units.utils.reservation_unit_state_helper import ReservationUnitStateHelper
-from spaces.models import Unit
 
 __all__ = [
     "ReservationUnitFilterSet",
@@ -191,11 +190,6 @@ class ReservationUnitFilterSet(ModelFilterSet):
         return qs.filter(
             Q(unit_id__in=user.unit_roles.values_list("unit", flat=True))
             | Q(unit__unit_groups__in=user.unit_roles.values_list("unit_group", flat=True))
-            | Q(
-                unit_id__in=Unit.objects.filter(
-                    service_sectors__in=user.service_sector_roles.values_list("service_sector", flat=True)
-                )
-            )
         ).distinct()
 
     @staticmethod

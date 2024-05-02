@@ -6,11 +6,13 @@ from graphene_django_extensions.permissions import BasePermission
 from api.graphql.extensions import error_codes
 from applications.models import AllocatedTimeSlot, ReservationUnitOption
 from common.typing import AnyUser
-from permissions.helpers import can_manage_service_sectors_applications
+from permissions.helpers import has_general_permission, has_unit_permission
 
 __all__ = [
     "AllocatedTimeSlotPermission",
 ]
+
+from permissions.models import GeneralPermissionChoices, UnitPermissionChoices
 
 
 class AllocatedTimeSlotPermission(BasePermission):
@@ -30,6 +32,8 @@ class AllocatedTimeSlotPermission(BasePermission):
             return True
         if not user.has_staff_permissions:
             return False
+        if has_general_permission(user, GeneralPermissionChoices.CAN_HANDLE_APPLICATIONS):
+            return True
 
         option_pk: int | None = input_data.get("reservation_unit_option")
         if option_pk is None:
@@ -37,16 +41,14 @@ class AllocatedTimeSlotPermission(BasePermission):
             raise GQLCodeError(msg, code=error_codes.REQUIRED_FIELD_MISSING)
 
         option: ReservationUnitOption | None = (
-            ReservationUnitOption.objects.filter(pk=option_pk)
-            .select_related("application_section__application__application_round__service_sector")
-            .first()
+            ReservationUnitOption.objects.select_related("reservation_unit__unit").filter(pk=option_pk).first()
         )
         if not option:
             msg = f"Reservation Unit Option with pk {option_pk} does not exist."
             raise GQLCodeError(msg, code=error_codes.ENTITY_NOT_FOUND)
 
-        sector = option.application_section.application.application_round.service_sector
-        return can_manage_service_sectors_applications(user, sector)
+        perm = UnitPermissionChoices.CAN_HANDLE_APPLICATIONS
+        return has_unit_permission(user, perm, [option.reservation_unit.unit.id])
 
     @classmethod
     def has_delete_permission(cls, instance: AllocatedTimeSlot, user: AnyUser, input_data: dict[str, Any]) -> bool:
@@ -56,6 +58,8 @@ class AllocatedTimeSlotPermission(BasePermission):
             return True
         if not user.has_staff_permissions:
             return False
+        if has_general_permission(user, GeneralPermissionChoices.CAN_HANDLE_APPLICATIONS):
+            return True
 
-        sector = instance.reservation_unit_option.application_section.application.application_round.service_sector
-        return can_manage_service_sectors_applications(user, sector)
+        perm = UnitPermissionChoices.CAN_HANDLE_APPLICATIONS
+        return has_unit_permission(user, perm, [instance.reservation_unit_option.reservation_unit.unit.id])

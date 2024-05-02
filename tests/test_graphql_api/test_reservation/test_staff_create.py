@@ -16,7 +16,6 @@ from tests.factories import (
     ReservationFactory,
     ReservationPurposeFactory,
     ReservationUnitFactory,
-    ServiceSectorFactory,
     SpaceFactory,
     UserFactory,
 )
@@ -111,25 +110,6 @@ def test_reservation__staff_create__general_admin_can_create(graphql):
     reservation_unit = ReservationUnitFactory.create()
 
     admin = UserFactory.create_with_general_permissions(perms=["can_create_staff_reservations"])
-    graphql.force_login(admin)
-
-    data = get_staff_create_data(reservation_unit)
-    response = graphql(CREATE_STAFF_MUTATION, input_data=data)
-
-    assert response.has_errors is False, response.errors
-
-    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
-    assert reservation.type == ReservationTypeChoice.STAFF
-
-
-def test_reservation__staff_create__service_sector_admin_can_create(graphql):
-    reservation_unit = ReservationUnitFactory.create()
-    sector = ServiceSectorFactory.create(units=[reservation_unit.unit])
-
-    admin = UserFactory.create_with_service_sector_permissions(
-        service_sector=sector,
-        perms=["can_create_staff_reservations"],
-    )
     graphql.force_login(admin)
 
     data = get_staff_create_data(reservation_unit)

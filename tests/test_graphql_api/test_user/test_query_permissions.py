@@ -2,7 +2,7 @@ import pytest
 from graphene_django_extensions.testing import build_query
 from graphql_relay import to_global_id
 
-from tests.factories import ServiceSectorFactory, UnitFactory, UserFactory
+from tests.factories import UnitFactory, UserFactory
 
 # Applied to all tests
 pytestmark = [
@@ -14,23 +14,6 @@ def test_user__query__unit_admin_read_other(graphql):
     user = UserFactory.create()
     admin = UserFactory.create_with_unit_permissions(
         unit=UnitFactory.create(),
-        perms=["can_view_users"],
-    )
-    graphql.force_login(admin)
-
-    global_id = to_global_id("UserNode", user.pk)
-    query = build_query("user", id=global_id)
-    response = graphql(query)
-
-    assert response.has_errors is False
-
-    assert response.first_query_object == {"pk": user.pk}
-
-
-def test_user__query__service_sector_admin_read_other(graphql):
-    user = UserFactory.create()
-    admin = UserFactory.create_with_service_sector_permissions(
-        service_sector=ServiceSectorFactory.create(),
         perms=["can_view_users"],
     )
     graphql.force_login(admin)
