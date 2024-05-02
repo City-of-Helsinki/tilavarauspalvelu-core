@@ -16,7 +16,7 @@ from reservations.choices import (
     ReservationStateChoice,
     ReservationTypeChoice,
 )
-from reservations.querysets import ReservationManager
+from reservations.querysets import ReservationQuerySet
 from tilavarauspalvelu.utils.auditlog_util import AuditLogger
 
 if TYPE_CHECKING:
@@ -34,6 +34,10 @@ if TYPE_CHECKING:
 __all__ = [
     "Reservation",
 ]
+
+
+class ReservationManager(SerializableMixin.SerializableManager, models.Manager.from_queryset(ReservationQuerySet)):
+    """Contains custom queryset methods and GDPR serialization."""
 
 
 class Reservation(SerializableMixin, models.Model):

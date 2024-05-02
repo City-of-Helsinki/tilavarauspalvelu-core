@@ -4,8 +4,7 @@ from typing import Annotated, Any, Self
 
 from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models import F, Manager, Q, QuerySet, Subquery, Sum
-from helsinki_gdpr.models import SerializableMixin
+from django.db.models import F, Q, QuerySet, Subquery, Sum
 
 from applications.models import ApplicationRound
 from common.date_utils import local_datetime
@@ -266,7 +265,3 @@ class ReservationQuerySet(QuerySet):
                 ReservationStateChoice.DENIED,
             ]
         )
-
-
-class ReservationManager(SerializableMixin.SerializableManager, Manager.from_queryset(ReservationQuerySet)):
-    """Contains custom queryset methods and GDPR serialization."""

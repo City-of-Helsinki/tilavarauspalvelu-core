@@ -6,6 +6,7 @@ from django.db import models
 
 from common.connectors import RecurringReservationActionsConnector
 from reservations.choices import ReservationStateChoice
+from reservations.querysets.recurring_reservation import RecurringReservationQuerySet
 from tilavarauspalvelu.utils.commons import WEEKDAYS
 
 __all__ = [
@@ -67,6 +68,7 @@ class RecurringReservation(models.Model):
 
     created: datetime.datetime = models.DateTimeField(auto_now_add=True)
 
+    objects = RecurringReservationQuerySet.as_manager()
     actions = RecurringReservationActionsConnector()
 
     class Meta:
