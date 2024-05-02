@@ -99,7 +99,6 @@ class User(AbstractUser):
             or bool(self.general_permissions)
             or bool(self.unit_permissions)
             or bool(self.unit_group_permissions)
-            or bool(self.service_sector_permissions)
         )
 
     @cached_property
@@ -183,33 +182,6 @@ class User(AbstractUser):
         for perm in unit_group_perms:
             for unit_group in perm["unit_groups"].split(","):
                 perms.setdefault(int(unit_group), []).append(perm["permission"])
-        return perms
-
-    @cached_property
-    def service_sector_permissions(self) -> dict[int, list[str]]:
-        """Get service sector permissions by service sector id for the user."""
-        perms: dict[int, list[str]] = {}
-
-        # Could have been annotated in `get_user`, so use the annotated value if available.
-        if hasattr(self, "_service_sector_permissions"):
-            item: str
-            for item in self._service_sector_permissions:
-                service_sector, permission = item.split(":")
-                perms.setdefault(int(service_sector), []).append(permission)
-            return perms
-
-        from permissions.models import ServiceSectorRolePermission
-
-        sector_perms: list[dict[str, str | int]] = list(
-            ServiceSectorRolePermission.objects.select_related("role")
-            .prefetch_related("role__servicesectorrole")
-            .annotate(service_sector=models.F("role__servicesectorrole__service_sector_id"))
-            .filter(role__servicesectorrole__user__pk=self.pk)
-            .values("permission", "service_sector")
-        )
-
-        for perm in sector_perms:
-            perms.setdefault(perm["service_sector"], []).append(perm["permission"])
         return perms
 
     @property
@@ -302,7 +274,7 @@ def get_user(pk: int) -> User | None:
     This method is called by the authentication backends to fetch the request user object.
     Any optimization for fetching the user should be done here.
     """
-    from permissions.models import GeneralRolePermission, ServiceSectorRolePermission, UnitRolePermission
+    from permissions.models import GeneralRolePermission, UnitRolePermission
 
     try:
         # Annotate permissions to the user object, since they are used so often.
@@ -374,27 +346,6 @@ def get_user(pk: int) -> User | None:
                     .values("unit_group_to_permission")
                 ),
                 agg_field="unit_group_to_permission",
-                distinct=True,
-                output_field=models.CharField(),
-                coalesce_output_type="varchar",
-            ),
-            # Service Sector Permissions in form: ["<id>:<permission>", ...]
-            _service_sector_permissions=SubqueryArray(
-                queryset=(
-                    ServiceSectorRolePermission.objects.filter(
-                        role__servicesectorrole__user__pk=pk,
-                    )
-                    .annotate(
-                        sector_to_permission=Concat(
-                            models.F("role__servicesectorrole__service_sector"),
-                            models.Value(":"),
-                            models.F("permission"),
-                            output_field=models.CharField(),
-                        ),
-                    )
-                    .values("sector_to_permission")
-                ),
-                agg_field="sector_to_permission",
                 distinct=True,
                 output_field=models.CharField(),
                 coalesce_output_type="varchar",

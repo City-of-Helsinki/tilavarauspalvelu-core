@@ -1,6 +1,6 @@
 import pytest
 
-from tests.factories import ServiceSectorFactory, UnitFactory, UserFactory
+from tests.factories import UnitFactory, UserFactory
 from tests.helpers import UserType
 
 from .helpers import CREATE_MUTATION
@@ -52,40 +52,6 @@ def test_spaces__create__unit_admin_cannot_create_space_for_other_unit(graphql):
     # when:
     # - User tries to create a space for some other unit they don't manage
     response = graphql(CREATE_MUTATION, input_data={"name": "foo", "unit": unit_2.id})
-
-    # then:
-    # - The response complains about permissions
-    assert response.error_message() == "No permission to create."
-
-
-def test_spaces__create__service_sector_admin_can_create_space(graphql):
-    # given:
-    # - A service sector admin for one of the space's unit's service sectors is using the system
-    unit = UnitFactory.create(service_sectors__name="foo")
-    sector = unit.service_sectors.first()
-    admin = UserFactory.create_with_service_sector_permissions(service_sector=sector, perms=["can_manage_spaces"])
-    graphql.force_login(admin)
-
-    # when:
-    # - User tries to create a space for a unit in a service sector they manage
-    response = graphql(CREATE_MUTATION, input_data={"name": "foo", "unit": unit.id})
-
-    # then:
-    # - The response has no errors
-    assert response.has_errors is False, response
-
-
-def test_spaces__create__service_sector_admin_cannot_create_space_for_other_service_sector(graphql):
-    # given:
-    # - A service sector admin for some other service sector is using the system
-    unit = UnitFactory.create(service_sectors__name="foo")
-    sector = ServiceSectorFactory.create(name="bar")
-    admin = UserFactory.create_with_service_sector_permissions(service_sector=sector, perms=["can_manage_spaces"])
-    graphql.force_login(admin)
-
-    # when:
-    # - User tries to create a space for a unit in a service sector they don't manage
-    response = graphql(CREATE_MUTATION, input_data={"name": "foo", "unit": unit.id})
 
     # then:
     # - The response complains about permissions

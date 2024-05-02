@@ -4,11 +4,13 @@ from graphene_django_extensions.permissions import BasePermission
 
 from applications.models import ReservationUnitOption
 from common.typing import AnyUser
-from permissions.helpers import can_manage_service_sectors_applications
+from permissions.helpers import has_general_permission, has_unit_permission
 
 __all__ = [
     "ReservationUnitOptionPermission",
 ]
+
+from permissions.models import GeneralPermissionChoices, UnitPermissionChoices
 
 
 class ReservationUnitOptionPermission(BasePermission):
@@ -28,6 +30,8 @@ class ReservationUnitOptionPermission(BasePermission):
             return True
         if not user.has_staff_permissions:
             return False
+        if has_general_permission(user, GeneralPermissionChoices.CAN_HANDLE_APPLICATIONS):
+            return True
 
-        sector = instance.application_section.application.application_round.service_sector
-        return can_manage_service_sectors_applications(user, sector)
+        perm = UnitPermissionChoices.CAN_HANDLE_APPLICATIONS
+        return has_unit_permission(user, perm, [instance.reservation_unit.unit.id])

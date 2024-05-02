@@ -71,11 +71,6 @@ class UnitFilterSet(ModelFilterSet):
         return qs.filter(
             Q(id__in=user.unit_roles.values_list("unit", flat=True))
             | Q(unit_groups__in=user.unit_roles.values_list("unit_group", flat=True))
-            | Q(
-                id__in=Unit.objects.filter(
-                    service_sectors__in=user.service_sector_roles.values_list("service_sector", flat=True)
-                )
-            )
         ).distinct()
 
     def get_published_reservation_units(self, qs, name, value):

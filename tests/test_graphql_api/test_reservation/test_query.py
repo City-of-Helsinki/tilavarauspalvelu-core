@@ -11,7 +11,6 @@ from tests.factories import (
     PaymentOrderFactory,
     ReservationFactory,
     ReservationUnitFactory,
-    ServiceSectorFactory,
     UnitFactory,
     UnitGroupFactory,
     UserFactory,
@@ -295,36 +294,6 @@ def test_reservation__query__reservee_date_of_birth_is_show_but_logged__unit_gro
     reservation_unit = ReservationUnitFactory.create(unit=unit)
     reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
     admin = UserFactory.create_with_unit_group_permissions(unit_group=unit_group, perms=["can_view_reservations"])
-
-    graphql.force_login(admin)
-    query = reservations_query(fields="pk user { dateOfBirth }")
-    response = graphql(query)
-
-    assert response.has_errors is False, response
-    assert len(response.edges) == 1
-    assert response.node(0) == {
-        "pk": reservation.pk,
-        "user": {
-            "dateOfBirth": reservation.user.date_of_birth.isoformat(),
-        },
-    }
-
-    view_log: PersonalInfoViewLog | None = PersonalInfoViewLog.objects.first()
-    assert view_log is not None
-    assert view_log.user == reservation.user
-    assert view_log.viewer_user == admin
-    assert view_log.viewer_username == admin.username
-    assert view_log.field == "User.date_of_birth"
-
-
-def test_reservation__query__reservee_date_of_birth_is_show_but_logged__service_sector_admin(graphql, settings):
-    settings.CELERY_TASK_ALWAYS_EAGER = True
-
-    sector = ServiceSectorFactory.create()
-    unit = UnitFactory.create(service_sectors=[sector])
-    reservation_unit = ReservationUnitFactory.create(unit=unit)
-    reservation = ReservationFactory.create(reservation_unit=[reservation_unit])
-    admin = UserFactory.create_with_service_sector_permissions(service_sector=sector, perms=["can_view_reservations"])
 
     graphql.force_login(admin)
     query = reservations_query(fields="pk user { dateOfBirth }")

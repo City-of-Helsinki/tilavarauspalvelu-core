@@ -11,8 +11,8 @@ from graphene_django_extensions import ModelFilterSet
 from api.graphql.extensions.filters import TimezoneAwareDateFilter
 from common.db import raw_prefixed_query
 from merchants.models import OrderStatus
-from permissions.getters import get_service_sectors_with_permission, get_units_with_permission
-from permissions.helpers import get_service_sectors_where_can_view_reservations, get_units_where_can_view_reservations
+from permissions.getters import get_units_with_permission
+from permissions.helpers import get_units_where_can_view_reservations
 from reservation_units.models import ReservationUnit, ReservationUnitType
 from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from reservations.models import RecurringReservation, Reservation
@@ -147,14 +147,9 @@ class ReservationFilterSet(ModelFilterSet):
 
         user = self.request.user
         viewable_units = get_units_where_can_view_reservations(user)
-        viewable_service_sectors = get_service_sectors_where_can_view_reservations(user)
         if user.is_anonymous:
             return qs.none()
-        return qs.filter(
-            Q(reservation_unit__unit__in=viewable_units)
-            | Q(reservation_unit__unit__service_sectors__in=viewable_service_sectors)
-            | Q(user=user)
-        ).distinct()
+        return qs.filter(Q(reservation_unit__unit__in=viewable_units) | Q(user=user)).distinct()
 
     def get_only_with_handling_permission(self, qs: QuerySet, name: str, value: bool) -> QuerySet:
         if not value:
@@ -165,12 +160,7 @@ class ReservationFilterSet(ModelFilterSet):
             return qs.none()
 
         units = get_units_with_permission(user, permission="can_manage_reservations")
-        sectors = get_service_sectors_with_permission(user, permission="can_manage_reservations")
-        return qs.filter(
-            Q(user=user)  #
-            | Q(reservation_unit__unit__in=units)
-            | Q(reservation_unit__unit__service_sectors__in=sectors)
-        ).distinct()
+        return qs.filter(Q(user=user) | Q(reservation_unit__unit__in=units)).distinct()
 
     def get_requested(self, qs: QuerySet, name, value: str) -> QuerySet:
         query = Q(state=ReservationStateChoice.REQUIRES_HANDLING) | Q(handled_at__isnull=False)
