@@ -325,6 +325,14 @@ class ReservationSeriesSerializer(RecurringReservationCreateSerializer):
         through_models: list[models.Model] = []
 
         for period in non_overlapping:
+            if instance.reservation_unit.reservation_block_whole_day:
+                reservation_details["buffer_time_before"] = instance.reservation_unit.actions.get_actual_before_buffer(
+                    period["begin"]
+                )
+                reservation_details["buffer_time_after"] = instance.reservation_unit.actions.get_actual_after_buffer(
+                    period["end"]
+                )
+
             reservation = Reservation(
                 begin=period["begin"],
                 end=period["end"],

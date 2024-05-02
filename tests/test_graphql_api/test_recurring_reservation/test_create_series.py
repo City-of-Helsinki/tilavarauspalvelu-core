@@ -552,3 +552,23 @@ def test_recurring_reservations__create_series__overlapping_reservations(graphql
     # Assure that the series was not created, and no reservations either
     assert RecurringReservation.objects.count() == 0
     assert Reservation.objects.count() == 1  # The overlapping reservation still exists
+
+
+def test_recurring_reservations__create_series__block_whole_day(graphql):
+    reservation_unit = ReservationUnitFactory.create(reservation_block_whole_day=True)
+    user = graphql.login_with_superuser()
+
+    data = get_minimal_series_data(reservation_unit, user)
+    response = graphql(CREATE_SERIES_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    recurring_reservation = RecurringReservation.objects.get(pk=response.first_query_object["pk"])
+    reservations = list(recurring_reservation.reservations.order_by("begin").all())
+    assert len(reservations) == 1
+
+    assert reservations[0].begin == datetime.datetime(2024, 1, 1, 10, 0, 0, tzinfo=DEFAULT_TIMEZONE)
+    assert reservations[0].end == datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=DEFAULT_TIMEZONE)
+
+    assert reservations[0].buffer_time_before == datetime.timedelta(hours=10)
+    assert reservations[0].buffer_time_after == datetime.timedelta(hours=12)
