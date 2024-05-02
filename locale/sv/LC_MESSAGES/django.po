@@ -1193,11 +1193,6 @@ msgstr ""
 msgid "Active"
 msgstr ""
 
-#: common/fields/serializer.py
-#, python-brace-format
-msgid "\"{input}\" is not a valid choice."
-msgstr ""
-
 #: common/models/banner_notification.py
 msgid "Non-draft notifications must have an active period and message set."
 msgstr ""
@@ -2833,6 +2828,10 @@ msgstr ""
 
 #: reservations/choices.py
 msgid "Behalf"
+msgstr ""
+
+#: reservations/choices.py
+msgid "Seasonal"
 msgstr ""
 
 #: reservations/models/reservation.py

@@ -1148,11 +1148,6 @@ msgstr "Ajastettu"
 msgid "Active"
 msgstr "Aktiivinen"
 
-#: common/fields/serializer.py
-#, python-brace-format
-msgid "\"{input}\" is not a valid choice."
-msgstr "\"{input}\" ei ole sallittu valinta."
-
 #: common/models/banner_notification.py
 msgid "Non-draft notifications must have an active period and message set."
 msgstr "Ei-luonnos ilmoituksilla täytyy olla aktiivinen ajanjakso ja viesti."
@@ -2760,6 +2755,10 @@ msgstr "Estetty"
 #: reservations/choices.py
 msgid "Behalf"
 msgstr "Puolesta"
+
+#: reservations/choices.py
+msgid "Seasonal"
+msgstr "Kausi"
 
 #: reservations/models/reservation.py
 msgid "Closed"

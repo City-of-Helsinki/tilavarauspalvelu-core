@@ -46,6 +46,7 @@ class ReservationTypeChoice(models.TextChoices):
     BLOCKED = "blocked", _("Blocked")
     STAFF = "staff", _("Staff")
     BEHALF = "behalf", _("Behalf")
+    SEASONAL = "seasonal", _("Seasonal")
 
     @classproperty
     def allowed_for_staff_create(cls) -> list[str]:
