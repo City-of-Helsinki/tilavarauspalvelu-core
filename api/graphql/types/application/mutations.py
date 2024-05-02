@@ -1,11 +1,13 @@
 from graphene_django_extensions import CreateMutation, UpdateMutation
 
-from api.graphql.types.application.permissions import ApplicationPermission
+from api.graphql.types.application.permissions import ApplicationPermission, UpdateAllApplicationOptionsPermission
 from api.graphql.types.application.serializers import (
     ApplicationCancelSerializer,
     ApplicationCreateSerializer,
     ApplicationSendSerializer,
     ApplicationUpdateSerializer,
+    RejectAllApplicationOptionsSerializer,
+    RestoreAllApplicationOptionsSerializer,
 )
 
 __all__ = [
@@ -13,6 +15,8 @@ __all__ = [
     "ApplicationCreateMutation",
     "ApplicationSendMutation",
     "ApplicationUpdateMutation",
+    "RejectAllApplicationOptionsMutation",
+    "RestoreAllApplicationOptionsMutation",
 ]
 
 
@@ -38,3 +42,15 @@ class ApplicationCancelMutation(UpdateMutation):
     class Meta:
         serializer_class = ApplicationCancelSerializer
         permission_classes = [ApplicationPermission]
+
+
+class RejectAllApplicationOptionsMutation(UpdateMutation):
+    class Meta:
+        serializer_class = RejectAllApplicationOptionsSerializer
+        permission_classes = [UpdateAllApplicationOptionsPermission]
+
+
+class RestoreAllApplicationOptionsMutation(UpdateMutation):
+    class Meta:
+        serializer_class = RestoreAllApplicationOptionsSerializer
+        permission_classes = [UpdateAllApplicationOptionsPermission]
