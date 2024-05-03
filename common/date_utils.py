@@ -19,6 +19,7 @@ __all__ = [
     "local_datetime_max",
     "local_datetime_min",
     "local_end_of_day",
+    "local_iso_format",
     "local_start_of_day",
     "local_time",
     "local_time_max",
@@ -33,6 +34,8 @@ __all__ = [
     "utc_datetime",
     "utc_datetime_max",
     "utc_datetime_min",
+    "utc_end_of_day",
+    "utc_iso_format",
     "utc_start_of_day",
     "utc_time",
     "utc_time_max",
@@ -122,18 +125,48 @@ class compare_times(_TZComparator[datetime.datetime | datetime.time, datetime.ti
 ### LOCAL TIME ###########################################################################################
 
 
-def local_datetime() -> datetime.datetime:
-    """Get current datetime in the local timezone."""
+def local_datetime(
+    year: int | None = None,
+    month: int | None = None,
+    day: int | None = None,
+    hour: int = 0,
+    minute: int = 0,
+    second: int = 0,
+    microsecond: int = 0,
+) -> datetime.datetime:
+    """Get datetime in the local timezone. Without arguments, the current datetime is returned."""
+    if all((year, month, day)):
+        return datetime.datetime(year, month, day, hour, minute, second, microsecond, tzinfo=DEFAULT_TIMEZONE)
+    if any((year, month, day)):
+        raise ValueError("'year', 'month' and 'day' must be given together")
     return datetime.datetime.now(tz=DEFAULT_TIMEZONE)
 
 
-def local_date() -> datetime.date:
-    """Get current date in the local timezone."""
-    return local_datetime().date()
+def local_date(
+    year: int | None = None,
+    month: int | None = None,
+    day: int | None = None,
+) -> datetime.date:
+    """Get date in the local timezone. Without arguments, the current date is returned."""
+    return local_datetime(year, month, day).date()
 
 
-def local_time() -> datetime.time:
-    """Get current time in the local timezone."""
+def local_time(
+    hour: int = 0,
+    minute: int = 0,
+    second: int = 0,
+    microsecond: int = 0,
+    *,
+    date: datetime.date | None = None,
+) -> datetime.time:
+    """
+    Get time in the local timezone on the given date (or today by default).
+    Without arguments, the current time is returned.
+    """
+    if any((hour, minute, second, microsecond)):
+        today = date or local_date()
+        return local_datetime(today.year, today.month, today.day, hour, minute, second, microsecond).timetz()
+
     return local_datetime().timetz()
 
 
@@ -171,6 +204,11 @@ def local_end_of_day(_date: datetime.date | datetime.datetime, /) -> datetime.da
     if isinstance(_date, datetime.datetime):
         _date = _date.astimezone(DEFAULT_TIMEZONE).date()
     return datetime.datetime.combine(_date, datetime.time.max, tzinfo=DEFAULT_TIMEZONE)
+
+
+def local_iso_format(_datetime: datetime.datetime, /) -> str:
+    """Get the datetime in the local timezone in ISO format."""
+    return _datetime.astimezone(DEFAULT_TIMEZONE).isoformat(timespec="seconds")
 
 
 def local_date_string(_date: datetime.date, /) -> str:
@@ -227,18 +265,45 @@ def next_hour(*, plus_minutes: int = 0, plus_hours: int = 0, plus_days: int = 0)
 ### UTC TIME #############################################################################################
 
 
-def utc_datetime() -> datetime.datetime:
-    """Get current datetime in UTC."""
+def utc_datetime(
+    year: int | None = None,
+    month: int | None = None,
+    day: int | None = None,
+    hour: int = 0,
+    minute: int = 0,
+    second: int = 0,
+    microsecond: int = 0,
+) -> datetime.datetime:
+    """Get datetime in UTC. Without arguments, the current datetime is returned."""
+    if all((year, month, day)):
+        return datetime.datetime(year, month, day, hour, minute, second, microsecond, tzinfo=datetime.UTC)
+    if any((year, month, day)):
+        raise ValueError("'year', 'month' and 'day' must be given together")
     return datetime.datetime.now(tz=datetime.UTC)
 
 
-def utc_date() -> datetime.date:
-    """Get current date in UTC."""
-    return utc_datetime().date()
+def utc_date(
+    year: int | None = None,
+    month: int | None = None,
+    day: int | None = None,
+) -> datetime.date:
+    """Get date in UTC. Without arguments, the current date is returned."""
+    return utc_datetime(year, month, day).date()
 
 
-def utc_time() -> datetime.time:
-    """Get current time in UTC."""
+def utc_time(
+    hour: int = 0,
+    minute: int = 0,
+    second: int = 0,
+    microsecond: int = 0,
+    *,
+    date: datetime.date | None = None,
+) -> datetime.time:
+    """Get time in UTC on the given date (or today by default). Without arguments, the current time is returned."""
+    if any((hour, minute, second, microsecond)):
+        today = date or local_date()
+        return utc_datetime(today.year, today.month, today.day, hour, minute, second, microsecond).timetz()
+
     return utc_datetime().timetz()
 
 
@@ -269,6 +334,18 @@ def utc_start_of_day(_date: datetime.date | datetime.datetime | None = None, /) 
     if _date is None:
         _date = utc_date()
     return datetime.datetime.combine(_date, datetime.time.min, tzinfo=datetime.UTC)
+
+
+def utc_end_of_day(_date: datetime.date | datetime.datetime, /) -> datetime.datetime:
+    """Get the end of day (23:59:59) as datetime for the given date in UTC."""
+    if isinstance(_date, datetime.datetime):
+        _date = _date.astimezone(datetime.UTC).date()
+    return datetime.datetime.combine(_date, datetime.time.max, tzinfo=datetime.UTC)
+
+
+def utc_iso_format(_datetime: datetime.datetime, /) -> str:
+    """Get the datetime in UTC in ISO format."""
+    return _datetime.astimezone(datetime.UTC).isoformat(timespec="seconds")
 
 
 ### COMMON UTILS #########################################################################################
