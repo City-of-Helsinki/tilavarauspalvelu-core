@@ -16,38 +16,48 @@ type Props = {
   isLoading?: boolean;
 };
 
-const getColConfig = (t: TFunction, isMyUnits?: boolean) => [
-  {
-    headerName: t("Units.headings.name"),
-    key: "nameFi",
-    transform: ({ nameFi, pk }: UnitNode) => (
-      <TableLink href={isMyUnits ? myUnitUrl(pk ?? 0) : unitUrl(pk ?? 0)}>
-        {truncate(nameFi ?? "-", MAX_UNIT_NAME_LENGTH)}
-      </TableLink>
-    ),
-    width: "50%",
-    isSortable: true,
-  },
-  {
-    headerName: t("Units.headings.serviceSector"),
-    key: "serviceSector",
-    isSortable: false,
-    transform: (unit: UnitNode) =>
-      (unit?.serviceSectors || [])
-        .map((serviceSector) => serviceSector?.nameFi)
-        .join(","),
-    width: "25%",
-  },
-  {
-    headerName: t("Units.headings.reservationUnitCount"),
-    key: "typeFi",
-    isSortable: false,
-    transform: (unit: UnitNode) => (
-      <> {unit?.reservationunitSet?.length ?? 0} </>
-    ),
-    width: "25%",
-  },
-];
+type ColumnType = {
+  headerName: string;
+  key: string;
+  transform?: (unit: UnitNode) => JSX.Element | string;
+  width: string;
+  isSortable: boolean;
+};
+
+function getColConfig(t: TFunction, isMyUnits?: boolean): ColumnType[] {
+  return [
+    {
+      headerName: t("Units.headings.name"),
+      key: "nameFi",
+      transform: ({ nameFi, pk }: UnitNode) => (
+        <TableLink href={isMyUnits ? myUnitUrl(pk ?? 0) : unitUrl(pk ?? 0)}>
+          {truncate(nameFi ?? "-", MAX_UNIT_NAME_LENGTH)}
+        </TableLink>
+      ),
+      width: "50%",
+      isSortable: true,
+    },
+    {
+      headerName: t("Units.headings.serviceSector"),
+      key: "serviceSector",
+      isSortable: false,
+      transform: (unit: UnitNode) =>
+        (unit?.serviceSectors || [])
+          .map((serviceSector) => serviceSector?.nameFi)
+          .join(","),
+      width: "25%",
+    },
+    {
+      headerName: t("Units.headings.reservationUnitCount"),
+      key: "typeFi",
+      isSortable: false,
+      transform: (unit: UnitNode) => (
+        <> {unit?.reservationunitSet?.length ?? 0} </>
+      ),
+      width: "25%",
+    },
+  ];
+}
 
 export function UnitsTable({
   sort,
