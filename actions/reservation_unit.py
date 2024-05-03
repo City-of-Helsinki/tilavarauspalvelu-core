@@ -11,6 +11,7 @@ from opening_hours.errors import HaukiAPIError
 from opening_hours.models import OriginHaukiResource, ReservableTimeSpan
 from opening_hours.utils.hauki_api_client import HaukiAPIClient
 from opening_hours.utils.hauki_api_types import HaukiAPIResource, HaukiTranslatedField
+from reservation_units.enums import ReservationStartInterval
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
@@ -308,3 +309,13 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
                 return True
 
         return False
+
+    def is_valid_staff_start_interval(self, begin_time: datetime.time) -> bool:
+        interval_minutes = ReservationStartInterval(self.reservation_unit.reservation_start_interval).as_number
+
+        # Staff reservations ignore start intervals longer than 30 minutes
+        interval_minutes = min(interval_minutes, 30)
+
+        # For staff reservations, we don't need to care about opening hours,
+        # so we can just check start interval from the beginning of the day.
+        return begin_time.second == 0 and begin_time.microsecond == 0 and begin_time.minute % interval_minutes == 0

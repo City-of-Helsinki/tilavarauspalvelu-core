@@ -7,6 +7,7 @@ from graphql import GraphQLError
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+from actions.recurring_reservation import ReservationDetails
 from api.graphql.extensions import error_codes
 from common.date_utils import local_date
 from common.fields.serializer import CurrentUserDefaultNullable, input_only_field
@@ -92,18 +93,11 @@ class RecurringReservationCreateSerializer(NestingModelSerializer):
 
     @staticmethod
     def validate_start_interval(reservation_unit: ReservationUnit, begin_time: datetime.time) -> None:
-        interval_minutes = ReservationStartInterval(reservation_unit.reservation_start_interval).as_number
-
-        # Staff reservations ignore start intervals longer than 30 minutes
-        interval_minutes = min(interval_minutes, 30)
-
-        # For staff reservations, we don't need to care about opening hours,
-        # so we can just check start interval from the beginning of the day.
-        if begin_time.second == 0 and begin_time.microsecond == 0 and begin_time.minute % interval_minutes == 0:
-            return
-
-        msg = f"Reservation start time does not match the allowed interval of {interval_minutes} minutes."
-        raise ValidationError(msg, code=error_codes.RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL)
+        is_valid = reservation_unit.actions.is_valid_staff_start_interval(begin_time)
+        if not is_valid:
+            interval_minutes = ReservationStartInterval(reservation_unit.reservation_start_interval).as_number
+            msg = f"Reservation start time does not match the allowed interval of {interval_minutes} minutes."
+            raise ValidationError(msg, code=error_codes.RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL)
 
 
 class RecurringReservationUpdateSerializer(RecurringReservationCreateSerializer):
@@ -205,7 +199,7 @@ class ReservationSeriesSerializer(RecurringReservationCreateSerializer):
         ]
 
     def save(self, **kwargs: Any) -> RecurringReservation:
-        reservation_details: dict[str, Any] = self.initial_data.get("reservation_details")
+        reservation_details: ReservationDetails = self.initial_data.get("reservation_details")
         skip_dates = self.initial_data.get("skip_dates", [])
         check_opening_hours = self.initial_data.get("check_opening_hours", False)
 
@@ -220,11 +214,15 @@ class ReservationSeriesSerializer(RecurringReservationCreateSerializer):
     def create_reservations(
         self,
         instance: RecurringReservation,
-        reservation_details: dict[str, Any],
+        reservation_details: ReservationDetails,
         skip_dates: list[datetime.date],
         check_opening_hours: bool,
     ) -> None:
-        slots = instance.actions.pre_calculate_slots(check_opening_hours=check_opening_hours, skip_dates=skip_dates)
+        slots = instance.actions.pre_calculate_slots(
+            check_opening_hours=check_opening_hours,
+            check_buffers=True,
+            skip_dates=skip_dates,
+        )
 
         if slots.overlapping:
             msg = "Not all reservations can be made due to overlapping reservations."
@@ -239,6 +237,14 @@ class ReservationSeriesSerializer(RecurringReservationCreateSerializer):
             extensions = {
                 "code": error_codes.RESERVATION_SERIES_NOT_OPEN,
                 "not_reservable": slots.not_reservable_json,
+            }
+            raise GraphQLError(msg, extensions=extensions)
+
+        if slots.invalid_start_interval:
+            msg = "Not all reservations can be made due to invalid start intervals."
+            extensions = {
+                "code": error_codes.RESERVATION_SERIES_INVALID_START_INTERVAL,
+                "invalid_start_interval": slots.invalid_start_interval_json,
             }
             raise GraphQLError(msg, extensions=extensions)
 

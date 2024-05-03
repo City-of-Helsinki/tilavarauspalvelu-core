@@ -3,7 +3,7 @@ from __future__ import annotations
 import dataclasses
 import datetime
 from collections.abc import Collection, Iterable
-from typing import Any, TypedDict
+from typing import TYPE_CHECKING, Any, TypedDict
 
 from django.db import models
 
@@ -12,7 +12,12 @@ from opening_hours.models import ReservableTimeSpan
 from opening_hours.utils.reservable_time_span_client import merge_overlapping_time_span_elements
 from opening_hours.utils.time_span_element import TimeSpanElement
 from reservation_units.models import ReservationUnit
-from reservations.models import RecurringReservation, Reservation
+from reservations.choices import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
+from reservations.models import RecurringReservation, Reservation, ReservationPurpose
+
+if TYPE_CHECKING:
+    from applications.models import City
+    from users.models import User
 
 
 class ReservationPeriod(TypedDict):
@@ -25,26 +30,70 @@ class ReservationSeriesCalculationResults:
     non_overlapping: list[ReservationPeriod] = dataclasses.field(default_factory=list)
     overlapping: list[ReservationPeriod] = dataclasses.field(default_factory=list)
     not_reservable: list[ReservationPeriod] = dataclasses.field(default_factory=list)
+    invalid_start_interval: list[ReservationPeriod] = dataclasses.field(default_factory=list)
 
-    @property
-    def overlapping_json(self):
+    def as_json(self, periods: list[ReservationPeriod]) -> list[dict[str, Any]]:
         return [
             {
                 "begin": period["begin"].isoformat(timespec="seconds"),
                 "end": period["end"].isoformat(timespec="seconds"),
             }
-            for period in self.overlapping
+            for period in periods
         ]
 
     @property
-    def not_reservable_json(self):
-        return [
-            {
-                "begin": period["begin"].isoformat(timespec="seconds"),
-                "end": period["end"].isoformat(timespec="seconds"),
-            }
-            for period in self.not_reservable
-        ]
+    def overlapping_json(self) -> list[dict[str, Any]]:
+        return self.as_json(self.overlapping)
+
+    @property
+    def not_reservable_json(self) -> list[dict[str, Any]]:
+        return self.as_json(self.not_reservable)
+
+    @property
+    def invalid_start_interval_json(self) -> list[dict[str, Any]]:
+        return self.as_json(self.invalid_start_interval)
+
+
+class ReservationDetails(TypedDict, total=False):
+    name: str
+    description: str
+    num_persons: int
+    state: ReservationStateChoice
+    type: ReservationTypeChoice
+    working_memo: str
+
+    buffer_time_before: datetime.timedelta
+    buffer_time_after: datetime.timedelta
+    handled_at: datetime.datetime
+    confirmed_at: datetime.datetime
+
+    applying_for_free_of_charge: bool
+    free_of_charge_reason: bool
+
+    reservee_id: str
+    reservee_first_name: str
+    reservee_last_name: str
+    reservee_email: str
+    reservee_phone: str
+    reservee_organisation_name: str
+    reservee_address_street: str
+    reservee_address_city: str
+    reservee_address_zip: str
+    reservee_is_unregistered_association: bool
+    reservee_language: str
+    reservee_type: CustomerTypeChoice
+
+    billing_first_name: str
+    billing_last_name: str
+    billing_email: str
+    billing_phone: str
+    billing_address_street: str
+    billing_address_city: str
+    billing_address_zip: str
+
+    user: int | User
+    purpose: int | ReservationPurpose
+    home_city: int | City
 
 
 class RecurringReservationActions:
@@ -55,9 +104,18 @@ class RecurringReservationActions:
         self,
         *,
         check_opening_hours: bool = False,
+        check_buffers: bool = False,
+        check_start_interval: bool = False,
         skip_dates: Collection[datetime.date] = (),
     ) -> ReservationSeriesCalculationResults:
-        """Pre-calculate slots in the recurring reservation."""
+        """
+        Pre-calculate slots in the recurring reservation.
+
+        :param check_opening_hours: Whether to check if the reservation falls within reservable times.
+        :param check_buffers: Whether to check if the reservation overlaps with other reservations' buffers.
+        :param check_start_interval: Whether to check if the reservation starts at the correct interval.
+        :param skip_dates: Dates to skip when calculating slots.
+        """
         pk = self.recurring_reservation.reservation_unit.pk
         closed, blocked = Reservation.objects.get_affecting_reservations_as_closed_time_spans(
             reservation_unit_queryset=ReservationUnit.objects.filter(pk=pk),
@@ -75,8 +133,9 @@ class RecurringReservationActions:
 
         begin_time: datetime.time = self.recurring_reservation.begin_time
         end_time: datetime.time = self.recurring_reservation.end_time
+        reservation_unit = self.recurring_reservation.reservation_unit
 
-        weekdays: list[int] = [int(val) for val in self.recurring_reservation.weekdays.split(",")]
+        weekdays: list[int] = [int(val) for val in self.recurring_reservation.weekdays.split(",") if val != ""]
         if not weekdays:
             weekdays = [self.recurring_reservation.begin_date.weekday()]
 
@@ -103,8 +162,12 @@ class RecurringReservationActions:
                     start_datetime=begin,
                     end_datetime=end,
                     is_reservable=True,
-                    buffer_time_after=self.recurring_reservation.reservation_unit.buffer_time_after,
-                    buffer_time_before=self.recurring_reservation.reservation_unit.buffer_time_before,
+                    buffer_time_after=(
+                        reservation_unit.actions.get_actual_after_buffer(begin) if check_buffers else None
+                    ),
+                    buffer_time_before=(
+                        reservation_unit.actions.get_actual_before_buffer(end) if check_buffers else None
+                    ),
                 )
 
                 # Would the reservation timespan overlap with any closing timespans
@@ -112,6 +175,7 @@ class RecurringReservationActions:
                 # 1) Unbuffered reservation timespan overlapping with any buffered closed timespan
                 # 2) Unbuffered closed timespan overlapping with any buffered reservation timespan
                 # 3) Unbuffered reservation timespan overlapping with any unbuffered blocked timespan
+                # Note that reservation timespans buffers are only checks if `check_buffers=True`.
                 if (
                     any(reservation_timespan.overlaps_with(closed) for closed in closed_timespans)
                     or any(closed.overlaps_with(reservation_timespan) for closed in closed_timespans)
@@ -121,11 +185,15 @@ class RecurringReservationActions:
                     continue
 
                 # Would the reservation be fully inside any reservable timespans for the resource?
-                # Ignores buffers for the reservation, since those can be outside reservable times.
+                # Ignore buffers for the reservation, since those can be outside reservable times.
                 if check_opening_hours and not any(
                     reservation_timespan.fully_inside_of(reservable) for reservable in reservable_timespans
                 ):
                     results.not_reservable.append(ReservationPeriod(begin=begin, end=end))
+                    continue
+
+                if check_start_interval and not reservation_unit.actions.is_valid_staff_start_interval(begin.timetz()):
+                    results.invalid_start_interval.append(ReservationPeriod(begin=begin, end=end))
                     continue
 
                 results.non_overlapping.append(ReservationPeriod(begin=begin, end=end))
@@ -148,8 +216,8 @@ class RecurringReservationActions:
 
     def bulk_create_reservation_for_periods(
         self,
-        periods: list[ReservationPeriod],
-        reservation_details: dict[str, Any],
+        periods: Iterable[ReservationPeriod],
+        reservation_details: ReservationDetails,
     ) -> list[Reservation]:
         # Pick out the through model for the many-to-many relationship and use if for bulk creation
         ThroughModel: type[models.Model] = Reservation.reservation_unit.through  # noqa: N806
