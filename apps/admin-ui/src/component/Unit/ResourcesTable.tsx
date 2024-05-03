@@ -16,7 +16,7 @@ import type {
   ResourceNode,
   UnitNode,
 } from "common/types/gql-types";
-import PopupMenu from "./PopupMenu";
+import { PopupMenu } from "@/component/PopupMenu";
 import ConfirmationDialog, { ModalRef } from "../ConfirmationDialog";
 import { DELETE_RESOURCE } from "@/common/queries";
 import { getResourceUrl, resourceUrl } from "@/common/urls";

@@ -26,6 +26,7 @@ const MenuIcon = styled(IconMenuDots)`
 
 const Container = styled.div`
   margin-left: auto;
+  position: relative;
 `;
 
 const Popup = styled.div`
@@ -33,7 +34,7 @@ const Popup = styled.div`
   flex-direction: column;
   background-color: white;
   padding: 0;
-  z-index: 501;
+  z-index: var(--tilavaraus-admin-stack-popup-menu);
   border: 2px solid var(--color-black);
   button {
     text-align: left;
@@ -63,7 +64,7 @@ const Overlay = styled.div`
 // - the popup is forced to open on the left side so using it on the left of a page would cause an overflow
 // - the popup will expand containers the buttons are inside of (like <table>, not the cell)
 // These seem to be ok for this use case, but for others would need some more work.
-function PopupMenu({ items }: IProps): JSX.Element {
+export function PopupMenu({ items }: IProps): JSX.Element {
   const buttonRef = useRef<HTMLDivElement>(null);
   const firstMenuItemRef = useRef<HTMLButtonElement>(null);
 
@@ -86,7 +87,7 @@ function PopupMenu({ items }: IProps): JSX.Element {
   };
 
   return (
-    <Container ref={buttonRef} style={{ position: "relative" }}>
+    <Container ref={buttonRef}>
       <RowButton
         onClick={(e) => {
           e.stopPropagation();
@@ -158,5 +159,3 @@ function PopupContent({
     </>
   );
 }
-
-export default PopupMenu;

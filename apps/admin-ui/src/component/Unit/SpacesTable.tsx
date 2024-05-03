@@ -14,7 +14,7 @@ import type {
   Query,
 } from "common/types/gql-types";
 import { DELETE_SPACE } from "@/common/queries";
-import PopupMenu from "./PopupMenu";
+import { PopupMenu } from "@/component/PopupMenu";
 import Modal, { useModal as useHDSModal } from "../HDSModal";
 import { NewSpaceModal } from "../Spaces/space-editor/new-space-modal/NewSpaceModal";
 import ConfirmationDialog, { ModalRef } from "../ConfirmationDialog";
