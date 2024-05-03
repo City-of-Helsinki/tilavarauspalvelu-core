@@ -334,6 +334,7 @@ function SchedulesList({
 
   const nToAllocate = eventsPerWeek - allocatedSchedules.length;
   const isLocked = thisOption?.locked ?? false;
+  const isRejected = thisOption?.rejected ?? false;
   return (
     <SelectionListContainer>
       {allocatedSchedules.map((ats) => (
@@ -352,6 +353,7 @@ function SchedulesList({
           <PopupMenu
             items={[
               {
+                disabled: isRejected || loading,
                 name: isLocked
                   ? t("Allocation.unlockOptions")
                   : allocatedSchedules.length > 0

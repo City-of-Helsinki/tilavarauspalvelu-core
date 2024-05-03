@@ -7,6 +7,7 @@ import ReactDOM from "react-dom";
 interface IProps {
   items: {
     name: string;
+    disabled?: boolean;
     onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   }[];
 }
@@ -35,7 +36,16 @@ const Popup = styled.div`
   background-color: white;
   padding: 0;
   z-index: var(--tilavaraus-admin-stack-popup-menu);
-  border: 2px solid var(--color-black);
+
+  border: 1px solid var(--color-black-50);
+  :not(:has(> button:disabled)) {
+    border: 1px solid var(--color-black);
+  }
+
+  top: 36;
+  right: 0;
+  position: absolute;
+
   button {
     text-align: left;
     padding: var(--spacing-xs);
@@ -47,6 +57,9 @@ const Popup = styled.div`
       background-color: var(--color-bus);
       outline: none;
       color: var(--color-white);
+    }
+    :disabled {
+      color: var(--color-black-50);
     }
   }
 `;
@@ -113,6 +126,7 @@ export function PopupMenu({ items }: IProps): JSX.Element {
   );
 }
 
+// TODO add loading indicator also
 function PopupContent({
   items,
   closePopup,
@@ -122,7 +136,7 @@ function PopupContent({
   closePopup: () => void;
   firstMenuItemRef: React.RefObject<HTMLButtonElement>;
 }) {
-  const style = { top: 36, right: 0 };
+  const canBeTrapped = items.some((i) => !i.disabled);
   return (
     <>
       <Overlay
@@ -134,13 +148,18 @@ function PopupContent({
         role="button"
         tabIndex={-1}
       />
-      <FocusTrap focusTrapOptions={{ allowOutsideClick: true }}>
-        <Popup style={{ ...style, position: "absolute" }}>
+      <FocusTrap
+        focusTrapOptions={{ allowOutsideClick: true }}
+        active={canBeTrapped}
+      >
+        <Popup>
           {items.map((i, index) => (
+            // TODO should use HDS button
             <button
               key={i.name}
               ref={index === 0 ? firstMenuItemRef : undefined}
               type="button"
+              disabled={i.disabled}
               onKeyDown={(e) => {
                 if (e.key === "Escape") {
                   closePopup();
