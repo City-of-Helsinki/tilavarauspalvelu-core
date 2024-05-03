@@ -610,7 +610,7 @@ class ReservableTimeSpanFirstReservableTimeHelper:
                     reservable_time_span.end_datetime -= overlap
 
                 # Reservable Time Span is now shorter than the minimum duration, so we can't use it.
-                if reservable_time_span.duration_minutes <= minimum_duration_minutes:
+                if reservable_time_span.duration_minutes < minimum_duration_minutes:
                     break
 
             # In case of an invalid start time due to normalisation, move to the next valid start time
