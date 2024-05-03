@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from types import DynamicClassAttribute
+from typing import Literal
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -34,6 +37,80 @@ class Weekday(models.TextChoices):
     FRIDAY = "FRIDAY", _("Friday")
     SATURDAY = "SATURDAY", _("Saturday")
     SUNDAY = "SUNDAY", _("Sunday")
+
+    @classmethod
+    def from_iso_week_day(cls, weekday: Literal[1, 2, 3, 4, 5, 6, 7]) -> Weekday:
+        """ISO weekday number, starting from 1."""
+        match weekday:
+            case 1:
+                return Weekday.MONDAY
+            case 2:
+                return Weekday.TUESDAY
+            case 3:
+                return Weekday.WEDNESDAY
+            case 4:
+                return Weekday.THURSDAY
+            case 5:
+                return Weekday.FRIDAY
+            case 6:
+                return Weekday.SATURDAY
+
+    @classmethod
+    def from_week_day(cls, weekday: Literal[0, 1, 2, 3, 4, 5, 6]) -> Weekday:
+        """Weekday number, starting from 0."""
+        match weekday:
+            case 0:
+                return Weekday.MONDAY
+            case 1:
+                return Weekday.TUESDAY
+            case 2:
+                return Weekday.WEDNESDAY
+            case 3:
+                return Weekday.THURSDAY
+            case 4:
+                return Weekday.FRIDAY
+            case 5:
+                return Weekday.SATURDAY
+            case 6:
+                return Weekday.SUNDAY
+
+    @DynamicClassAttribute
+    def as_iso_weekday_number(self) -> int:
+        """ISO weekday number, starting from 1."""
+        match self:
+            case Weekday.MONDAY:
+                return 1
+            case Weekday.TUESDAY:
+                return 2
+            case Weekday.WEDNESDAY:
+                return 3
+            case Weekday.THURSDAY:
+                return 4
+            case Weekday.FRIDAY:
+                return 5
+            case Weekday.SATURDAY:
+                return 6
+            case Weekday.SUNDAY:
+                return 7
+
+    @DynamicClassAttribute
+    def as_weekday_number(self) -> int:
+        """Weekday number, starting from 0."""
+        match self:
+            case Weekday.MONDAY:
+                return 0
+            case Weekday.TUESDAY:
+                return 1
+            case Weekday.WEDNESDAY:
+                return 2
+            case Weekday.THURSDAY:
+                return 3
+            case Weekday.FRIDAY:
+                return 4
+            case Weekday.SATURDAY:
+                return 5
+            case Weekday.SUNDAY:
+                return 6
 
 
 class Priority(models.TextChoices):

@@ -4,7 +4,11 @@ from typing import Any, Generic, Literal, TypeVar
 
 from django.conf import settings
 from django.db import models
+from django.utils import translation
+from django.utils.functional import Promise
 from modeltranslation.manager import get_translatable_fields_for_model
+
+from users.models import User
 
 __all__ = [
     "comma_sep_str",
@@ -133,6 +137,15 @@ def get_attr_by_language(instance: Any, field: str, language: str) -> str | None
     if localised_value:
         return localised_value
     return getattr(instance, field, None)
+
+
+def translate_for_user(text: Promise, user: User) -> str:
+    """
+    Translate the given text based on the user's preferred language.
+    If the user has no language set, use the default language of Finnish.
+    """
+    with translation.override(user.get_preferred_language()):
+        return str(text)
 
 
 def safe_getattr(obj: object, dotted_path: str, default: Any = None) -> Any:

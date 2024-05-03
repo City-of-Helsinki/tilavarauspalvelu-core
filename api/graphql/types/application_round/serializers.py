@@ -6,6 +6,7 @@ from rest_framework.exceptions import ValidationError
 from api.graphql.extensions import error_codes
 from applications.choices import ApplicationRoundStatusChoice
 from applications.models import ApplicationRound
+from applications.tasks import generate_reservation_series_from_allocations
 from common.date_utils import local_datetime
 
 
@@ -26,4 +27,6 @@ class SetApplicationRoundHandledSerializer(NestingModelSerializer):
 
     def save(self, **kwargs: Any) -> ApplicationRound:
         kwargs["handled_date"] = local_datetime()
-        return super().save(**kwargs)
+        instance = super().save(**kwargs)
+        generate_reservation_series_from_allocations.delay(instance.pk)
+        return instance

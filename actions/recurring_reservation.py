@@ -3,6 +3,7 @@ from __future__ import annotations
 import dataclasses
 import datetime
 from collections.abc import Collection, Iterable
+from itertools import chain
 from typing import TYPE_CHECKING, Any, TypedDict
 
 from django.db import models
@@ -52,6 +53,14 @@ class ReservationSeriesCalculationResults:
     @property
     def invalid_start_interval_json(self) -> list[dict[str, Any]]:
         return self.as_json(self.invalid_start_interval)
+
+    @property
+    def possible(self) -> Iterable[ReservationPeriod]:
+        return self.non_overlapping
+
+    @property
+    def not_possible(self) -> Iterable[ReservationPeriod]:
+        return chain(self.overlapping, self.not_reservable, self.invalid_start_interval)
 
 
 class ReservationDetails(TypedDict, total=False):
@@ -227,11 +236,13 @@ class RecurringReservationActions:
 
         for period in periods:
             if self.recurring_reservation.reservation_unit.reservation_block_whole_day:
-                reservation_details["buffer_time_before"] = (
-                    self.recurring_reservation.reservation_unit.actions.get_actual_before_buffer(period["begin"])
+                reservation_details.setdefault(
+                    "buffer_time_before",
+                    self.recurring_reservation.reservation_unit.actions.get_actual_before_buffer(period["begin"]),
                 )
-                reservation_details["buffer_time_after"] = (
-                    self.recurring_reservation.reservation_unit.actions.get_actual_after_buffer(period["end"])
+                reservation_details.setdefault(
+                    "buffer_time_after",
+                    self.recurring_reservation.reservation_unit.actions.get_actual_after_buffer(period["end"]),
                 )
 
             reservation = Reservation(
